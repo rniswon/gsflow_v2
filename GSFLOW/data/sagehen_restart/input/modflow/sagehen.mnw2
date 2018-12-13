@@ -1,0 +1,69 @@
+ 8  0  2                   ; 1.  MNWMAX,IMNWCB,MNWPRNT
+Well-A  -1                   ; 2a. WELLID,NNODES
+SKIN  0  1  0  0             ; 2b. LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+ 0.1333  1.79471628  12.5    ; 2c. Rw,Rskin,Kskin
+2016. 1915. 45 66               ; 2d. ztop,zbotm,row,col
+1915.0  -1 0.10 0.15             ; 2f. hlim, QCUT, Qfrcmn, Qfrcmx
+Well-B  -1                   ; 2a. WELLID,NNODES
+SKIN  0  1  0  0             ; 2b. LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+ 0.1333  1.79471628  12.5    ; 2c. Rw,Rskin,Kskin
+2004. 1905.0 45 68               ; 2d. ztop,zbotm,row,col
+1895.0  -1 0.10 0.15             ; 2f. hlim, QCUT, Qfrcmn, Qfrcmx
+Well-C  -1                   ; 2a. WELLID,NNODES
+SKIN  0  1  0  0             ; 2b. LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+ 0.1333  1.79471628  12.5    ; 2c. Rw,Rskin,Kskin
+2015.0 1915. 33 64               ; 2d. ztop,zbotm,row,col
+1905.0  -1 0.10 0.15             ; 2f. hlim, QCUT, Qfrcmn, Qfrcmx
+Well-D  -1                   ; 2a. WELLID,NNODES
+SKIN  0  1  0  0             ; 2b. LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+ 0.1333  1.79471628  12.5    ; 2c. Rw,Rskin,Kskin
+2011.0 1915. 33 66               ; 2d. ztop,zbotm,row,col
+1905.0  -1 0.10 0.15             ; 2f. hlim, QCUT, Qfrcmn, Qfrcmx
+Well-E  -1                   ; 2a. WELLID,NNODES
+SKIN  0  1  0  0             ; 2b. LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+ 0.1333  1.79471628  12.5    ; 2c. Rw,Rskin,Kskin
+1977.0 1875. 41 67               ; 2d. ztop,zbotm,row,col
+1865.0  -1 0.10 0.15             ; 2f. hlim, QCUT, Qfrcmn, Qfrcmx
+Well-F  -1                   ; 2a. WELLID,NNODES
+SKIN  0  1  0  0             ; 2b. LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+ 0.1333  1.79471628  12.5    ; 2c. Rw,Rskin,Kskin
+1971.0 1875. 42 69               ; 2d. ztop,zbotm,row,col
+1865.0  -1 0.10 0.15             ; 2f. hlim, QCUT, Qfrcmn, Qfrcmx
+Well-G  -1                   ; 2a. WELLID,NNODES
+SKIN  0  1  0  0             ; 2b. LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+ 0.1333  1.79471628  12.5    ; 2c. Rw,Rskin,Kskin
+1962.0 1865. 39 66               ; 2d. ztop,zbotm,row,col
+1855.0  -1 0.10 0.15             ; 2f. hlim, QCUT, Qfrcmn, Qfrcmx
+Well-H  -1                   ; 2a. WELLID,NNODES
+SKIN  0  1  0  0             ; 2b. LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+ 0.1333  1.79471628  12.5    ; 2c. Rw,Rskin,Kskin
+1965.0 1865. 39 67               ; 2d. ztop,zbotm,row,col
+1855.0  -1 0.10 0.15             ; 2f. hlim, QCUT, Qfrcmn, Qfrcmx
+8                            ; 3.  ITMP (SP1; 8 wells)
+Well-A 0.0                   ; 4.  WELLID, Qdes(0.0 for initial steady-state SP)
+Well-B 0.0                   ; 4.  WELLID, Qdes(0.0 for initial steady-state SP)
+Well-C 0.0                   ; 4.  WELLID, Qdes(0.0 for initial steady-state SP)
+Well-D 0.0                   ; 4.  WELLID, Qdes(0.0 for initial steady-state SP)
+Well-E 0.0                   ; 4.  WELLID, Qdes(0.0 for initial steady-state SP)
+Well-F 0.0                   ; 4.  WELLID, Qdes(0.0 for initial steady-state SP)
+Well-G 0.0                   ; 4.  WELLID, Qdes(0.0 for initial steady-state SP)
+Well-H 0.0                   ; 4.  WELLID, Qdes(0.0 for initial steady-state SP)
+8                            ; 3.  ITMP (SP2; 8 wells)
+Well-A -10000.0              ; 4.  WELLID, Qdes
+Well-B -10000.0              ; 4.  WELLID, Qdes
+Well-C -10000.0              ; 4.  WELLID, Qdes
+Well-D -10000.0              ; 4.  WELLID, Qdes
+Well-E -10000.0              ; 4.  WELLID, Qdes
+Well-F -10000.0              ; 4.  WELLID, Qdes
+Well-G -10000.0              ; 4.  WELLID, Qdes
+Well-H -10000.0              ; 4.  WELLID, Qdes
+8                            ; 3.  ITMP (SP3; 8 wells)
+Well-A -10000.0              ; 4.  WELLID, Qdes
+Well-B -10000.0              ; 4.  WELLID, Qdes
+Well-C -10000.0              ; 4.  WELLID, Qdes
+Well-D -10000.0              ; 4.  WELLID, Qdes
+Well-E -10000.0              ; 4.  WELLID, Qdes
+Well-F -10000.0              ; 4.  WELLID, Qdes
+Well-G -10000.0              ; 4.  WELLID, Qdes
+Well-H -10000.0              ; 4.  WELLID, Qdes
+
