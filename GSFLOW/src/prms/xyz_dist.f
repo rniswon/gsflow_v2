@@ -66,12 +66,10 @@
 !     Main xyz_dist routine
 !***********************************************************************
       INTEGER FUNCTION xyz_dist()
-      USE PRMS_MODULE, ONLY: Process, Save_vars_to_file,
-     &    Init_vars_from_file
+      USE PRMS_MODULE, ONLY: Process
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: xyzdecl, xyzinit, xyzrun, xyzsetdims
-      EXTERNAL :: xyz_restart
 !***********************************************************************
       xyz_dist = 0
 
@@ -82,10 +80,7 @@
       ELSEIF ( Process(:4)=='decl' ) THEN
         xyz_dist = xyzdecl()
       ELSEIF ( Process(:4)=='init' ) THEN
-        IF ( Init_vars_from_file==1 )  CALL xyz_restart(1)
         xyz_dist = xyzinit()
-      ELSEIF ( Process(:5)=='clean' ) THEN
-        IF ( Save_vars_to_file==1 ) CALL xyz_restart(0)
       ENDIF
 
       END FUNCTION xyz_dist
@@ -135,7 +130,7 @@
       xyzdecl = 0
 
       Version_xyz_dist =
-     +'xyz_dist.f 2016-07-22 17:22:00Z'
+     +'xyz_dist.f 2018-04-18 11:09:00Z'
       CALL print_module(Version_xyz_dist,
      +                  'Temp & Precip Distribution  ', 77)
       MODNAME = 'xyz_dist'
@@ -461,8 +456,7 @@
 !***********************************************************************
       INTEGER FUNCTION xyzinit()
       USE PRMS_XYZ_DIST
-      USE PRMS_MODULE, ONLY: Nhru, Inputerror_flag, Ntemp, Nrain,
-     +    Init_vars_from_file
+      USE PRMS_MODULE, ONLY: Nhru, Inputerror_flag, Ntemp, Nrain
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv,
      +    Hru_elev, Active_hrus, Hru_route_order, FEET2METERS
       USE PRMS_CLIMATEVARS, ONLY: Psta_elev, Tsta_elev
@@ -477,11 +471,9 @@
       xyzinit = 0
 
 ! Initialize declared variables
-      IF ( Init_vars_from_file==0 ) THEN
-        Is_rain_day = 0
-        Tmax_rain_sta = 0.0
-        Tmin_rain_sta = 0.0
-      ENDIF
+      Is_rain_day = 0
+      Tmax_rain_sta = 0.0
+      Tmin_rain_sta = 0.0
 
       IF ( getparam(MODNAME, 'adjust_rain', Nrain*12, 'real',
      +     Adjust_rain)/=0 ) CALL read_error(2, 'adjust_rain')
@@ -870,14 +862,14 @@
 !  Compute maximum temperature at XY centroid of basin at the elevation
 !  of the solrad station used to develop the DD solrad curves.
 !
-      Solrad_tmax = ((maxlapse1*Basin_centroid_x)+
+      Solrad_tmax = SNGL( ((maxlapse1*Basin_centroid_x)+
      +              (maxlapse2*Basin_centroid_y)+
      +              (maxlapse3*Solradelev+intmax))*DBLE(Tmax_div)
-     +              - DBLE(Tmax_add)
-      Solrad_tmin = ((minlapse1*Basin_centroid_x)+
+     +              - DBLE(Tmax_add) )
+      Solrad_tmin = SNGL( ((minlapse1*Basin_centroid_x)+
      +              (minlapse2*Basin_centroid_y)+
      +              (minlapse3*Solradelev+intmin))*DBLE(Tmin_div)
-     +              - DBLE(Tmin_add)
+     +              - DBLE(Tmin_add) )
 
 !
 !  Compute temperatures at distribution stations.
@@ -1251,30 +1243,3 @@
       Temp_meanz = (Temp_meanz+Z_add)/DBLE(Z_div)
 
       END SUBROUTINE mean_by_month
-
-!***********************************************************************
-!     xyz_restart - write or read xyz restart file
-!***********************************************************************
-      SUBROUTINE xyz_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
-      USE PRMS_XYZ_DIST
-      IMPLICIT NONE
-      ! Argument
-      INTEGER, INTENT(IN) :: In_out
-      EXTERNAL check_restart
-      ! Local Variable
-      CHARACTER(LEN=8) :: module_name
-!***********************************************************************
-      IF ( In_out==0 ) THEN
-        WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Is_rain_day
-        WRITE ( Restart_outunit ) Tmax_rain_sta
-        WRITE ( Restart_outunit ) Tmin_rain_sta
-      ELSE
-        READ ( Restart_inunit ) module_name
-        CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Is_rain_day
-        READ ( Restart_inunit ) Tmax_rain_sta
-        READ ( Restart_inunit ) Tmin_rain_sta
-      ENDIF
-      END SUBROUTINE xyz_restart

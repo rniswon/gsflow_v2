@@ -337,7 +337,7 @@
       IF ( getparam(MODNAME, 'print_freq', 1, 'integer', Print_freq) &
      &     /=0 ) CALL read_error(2, 'print_freq')
 
-      IF ( Init_vars_from_file==1 ) THEN
+      IF ( Init_vars_from_file>0 ) THEN
         CALL basin_sum_restart(1)
       ELSE
 !  Zero stuff out when Timestep = 0
@@ -478,7 +478,7 @@
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, &
      &    Basin_actet, Basin_perv_et, Basin_swale_et, Hru_actet, &
      &    Basin_ssstor, Basin_soil_moist, Basin_cfs, Basin_stflow_out, Basin_lake_stor
-      USE PRMS_CLIMATEVARS, ONLY: Basin_potsw, Basin_ppt, Basin_potet, Basin_tmax, Basin_tmin
+      USE PRMS_CLIMATEVARS, ONLY: Basin_swrad, Basin_ppt, Basin_potet, Basin_tmax, Basin_tmin
       USE PRMS_SET_TIME, ONLY: Jday, Modays, Yrdays, Julwater, Nowyear, Nowmonth, Nowday, Cfs2inches
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_GWFLOW, ONLY: Basin_gwflow, Basin_gwstor, Basin_gwsink, Basin_gwstor_minarea_wb
@@ -486,7 +486,7 @@
       USE PRMS_SNOW, ONLY: Basin_snowmelt, Basin_pweqv, Basin_snowevap
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_imperv_evap, Basin_sroff, &
      &    Basin_dprst_evap, Basin_dprst_volcl, Basin_dprst_volop
-      USE PRMS_MUSKINGUM, ONLY: Basin_segment_storage
+      USE PRMS_ROUTING, ONLY: Basin_segment_storage
       IMPLICIT NONE
 ! Functions
       INTRINSIC SNGL, ABS, ALOG, DBLE
@@ -511,7 +511,7 @@
       Basin_storage = Basin_soil_moist + Basin_intcp_stor + &
      &                Basin_gwstor + Basin_ssstor + Basin_pweqv + &
      &                Basin_imperv_stor + Basin_lake_stor + Basin_dprst_volop + Basin_dprst_volcl
-      IF ( Strmflow_flag==4 ) Basin_storage = Basin_storage + Basin_segment_storage
+      IF ( Strmflow_flag==3 .OR. Strmflow_flag==4 ) Basin_storage = Basin_storage + Basin_segment_storage
 
 ! volume calculation for storage
       Basin_storvol = Basin_storage*Active_area
@@ -562,7 +562,7 @@
           CALL write_outfile(Buffer80)
 
         ELSEIF ( Print_type==2 ) THEN
-          WRITE ( Buffer151, 9001 ) Nowyear, Nowmonth, Nowday, Basin_potsw, &
+          WRITE ( Buffer151, 9001 ) Nowyear, Nowmonth, Nowday, Basin_swrad, &
      &            Basin_tmax, Basin_tmin, Basin_ppt, Basin_net_ppt, &
      &            Basin_intcp_stor, Basin_intcp_evap, Basin_potet, &
      &            Basin_actet, Basin_soil_moist, Basin_pweqv, &
@@ -602,7 +602,7 @@
       Basin_cfs_mo = Basin_cfs_mo + Basin_cfs
       Basin_ppt_mo = Basin_ppt_mo + Basin_ppt
       Basin_net_ppt_mo = Basin_net_ppt_mo + Basin_net_ppt
-      Basin_swrad_mo = Basin_swrad_mo + Basin_potsw
+      Basin_swrad_mo = Basin_swrad_mo + Basin_swrad
       Basin_max_temp_mo = Basin_max_temp_mo + Basin_tmax
       Basin_min_temp_mo = Basin_min_temp_mo + Basin_tmin
       Basin_intcp_evap_mo = Basin_intcp_evap_mo + Basin_intcp_evap
@@ -664,7 +664,7 @@
         Basin_cfs_yr = Basin_cfs_yr + Basin_cfs
         Basin_ppt_yr = Basin_ppt_yr + Basin_ppt
         Basin_net_ppt_yr = Basin_net_ppt_yr + Basin_net_ppt
-        Basin_swrad_yr = Basin_swrad_yr + Basin_potsw
+        Basin_swrad_yr = Basin_swrad_yr + Basin_swrad
         Basin_max_temp_yr = Basin_max_temp_yr + Basin_tmax
         Basin_min_temp_yr = Basin_min_temp_yr + Basin_tmin
         Basin_intcp_evap_yr = Basin_intcp_evap_yr + Basin_intcp_evap
@@ -754,7 +754,7 @@
         Basin_cfs_tot = Basin_cfs_tot + Basin_cfs
         Basin_ppt_tot = Basin_ppt_tot + Basin_ppt
         Basin_net_ppt_tot = Basin_net_ppt_tot + Basin_net_ppt
-        Basin_swrad_tot = Basin_swrad_tot + Basin_potsw
+        Basin_swrad_tot = Basin_swrad_tot + Basin_swrad
         Basin_max_temp_tot = Basin_max_temp_tot + Basin_tmax
         Basin_min_temp_tot = Basin_min_temp_tot + Basin_tmin
         Basin_intcp_evap_tot = Basin_intcp_evap_tot + Basin_intcp_evap

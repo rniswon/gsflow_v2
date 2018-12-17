@@ -49,7 +49,7 @@
       ELSEIF ( Process(:4)=='decl' ) THEN
         temp_dist2 = t2dist2decl()
       ELSEIF ( Process(:4)=='init' ) THEN
-        IF ( Init_vars_from_file==1 ) CALL temp_dist2_restart(1)
+        IF ( Init_vars_from_file>0 ) CALL temp_dist2_restart(1)
         temp_dist2 = t2dist2init()
       ELSEIF ( Process(:5)=='clean' ) THEN
         IF ( Save_vars_to_file==1 ) CALL temp_dist2_restart(0)
@@ -78,7 +78,7 @@
 !***********************************************************************
       t2dist2decl = 0
 
-      Version_temp = 'temp_dist2.f90 2016-05-12 20:03:40Z'
+      Version_temp = 'temp_dist2.f90 2017-09-27 14:04:00Z'
       CALL print_module(Version_temp, 'Temperature Distribution    ', 90)
       MODNAME = 'temp_dist2'
 
@@ -321,7 +321,7 @@
       INTEGER FUNCTION t2dist2run()
       USE PRMS_TEMP_DIST2
       USE PRMS_MODULE, ONLY: Ntemp
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, DNEARZERO
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, DNEARZERO, MAXTEMP, MINTEMP
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, Tmax_aspect_adjust, Tmin_aspect_adjust, &
      &    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, Tavgc, Basin_tsta
       USE PRMS_SET_TIME, ONLY: Nowmonth
@@ -456,7 +456,7 @@
 
       Solrad_tmax = Tmax(Basin_tsta)
       Solrad_tmin = Tmin(Basin_tsta)
-      IF ( Solrad_tmax<-99.0 .OR. Solrad_tmax>150.0 ) THEN
+      IF ( Solrad_tmax<MINTEMP .OR. Solrad_tmax>MAXTEMP ) THEN
         PRINT *, 'Bad temperature data to set solrad_tmax:', &
      &           Solrad_tmax, ' using last valid value:', solrad_tmax_good
         CALL print_date(0)
@@ -464,7 +464,7 @@
       ELSE
         Solrad_tmax_good = Solrad_tmax
       ENDIF
-      IF ( Solrad_tmin<-99.0 .OR. Solrad_tmin>150.0 ) THEN
+      IF ( Solrad_tmin<MINTEMP .OR. Solrad_tmin>MAXTEMP ) THEN
         PRINT *, 'Bad temperature data to set solrad_tmin:', &
      &           Solrad_tmin, ' using last valid value:', solrad_tmin_good
         CALL print_date(0)

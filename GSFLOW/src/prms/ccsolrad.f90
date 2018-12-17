@@ -111,7 +111,7 @@
         Basin_cloud_cover = Basin_cloud_cover*Basin_area_inv
 
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_ccsolrad = 'ccsolrad.f90 2016-11-03 17:50:00Z'
+        Version_ccsolrad = 'ccsolrad.f90 2018-04-17 14:43:00Z'
         CALL print_module(Version_ccsolrad, 'Solar Radiation Distribution', 90)
         MODNAME = 'ccsolrad'
 
@@ -171,8 +171,8 @@
 
         Cloud_radadj = 0.0
         Basin_radadj = 0.0D0
-        Cloud_cover_hru = 0.0
         Basin_cloud_cover = 0.0D0
+        Cloud_cover_hru = 0.0
 
         Observed_flag = 0
         IF ( Nsol>0 .AND. Basin_solsta>0 ) Observed_flag = 1

@@ -10,7 +10,7 @@
         IMPLICIT NONE
         ! Local Variables
         CHARACTER(LEN=8), SAVE :: MODNAME
-!        REAL, SAVE, ALLOCATABLE :: Tavgc_ante(:)
+        !REAL, SAVE, ALLOCATABLE :: Tavgc_ante(:) ! if Tavgc_ante is used in future, need to add save in restart file
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Pt_alpha(:, :)
       END MODULE PRMS_POTET_PT
@@ -18,7 +18,7 @@
 !***********************************************************************
       INTEGER FUNCTION potet_pt()
       USE PRMS_POTET_PT
-      USE PRMS_MODULE, ONLY: Process, Nhru, Save_vars_to_file, Init_vars_from_file, Humidity_cbh_flag
+      USE PRMS_MODULE, ONLY: Process, Nhru, Humidity_cbh_flag
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Swrad, Tminc, Tmaxc, &
      &    Tempc_dewpt, Vp_actual, Lwrad_net, Vp_slope, Basin_humidity, Humidity_percent
@@ -30,7 +30,7 @@
       INTRINSIC SQRT, DBLE, LOG, SNGL
       INTEGER, EXTERNAL :: declparam, getparam
       REAL, EXTERNAL :: sat_vapor_press
-      EXTERNAL read_error, print_module, potet_pt_restart
+      EXTERNAL read_error, print_module
 ! Local Variables
       INTEGER :: i, j
       REAL :: elh, satvapor, prsr, psycnst, ratio, eeq, heat_flux, net_rad
@@ -112,7 +112,7 @@
           IF (Soltab_potsw(Jday,i) <= 10.0) THEN
             stab = 10.0
           ELSE
-            stab = Soltab_potsw(Jday,i)
+            stab = SNGL( Soltab_potsw(Jday,i) )
           ENDIF
 
           IF (Swrad(i) <= 10.0) THEN
@@ -151,7 +151,7 @@
         Basin_humidity = Basin_humidity*Basin_area_inv
 
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_potet = 'potet_pt.f90 2018-01-23 14:02:00Z'
+        Version_potet = 'potet_pt.f90 2018-04-18 11:10:00Z'
         CALL print_module(Version_potet, 'Potential Evapotranspiration', 90)
         MODNAME = 'potet_pt'
 
@@ -166,36 +166,10 @@
 !******Get parameters
       ELSEIF ( Process(:4)=='init' ) THEN
         IF ( getparam(MODNAME, 'pt_alpha', Nhru*12, 'real', Pt_alpha)/=0 ) CALL read_error(2, 'pt_alpha')
-        IF ( Init_vars_from_file==1 ) CALL potet_pt_restart(1)
 
         !ALLOCATE ( Tavgc_ante(Nhru) )
         !Tavgc_ante = Tavgc
 
-      ELSEIF ( Process(:5)=='clean' ) THEN
-        IF ( Save_vars_to_file==1 ) CALL potet_pt_restart(0)
       ENDIF
 
       END FUNCTION potet_pt
-
-!***********************************************************************
-!     Write to or read from restart file
-!***********************************************************************
-      SUBROUTINE potet_pt_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
-      USE PRMS_POTET_PT
-      IMPLICIT NONE
-      ! Argument
-      INTEGER, INTENT(IN) :: In_out
-      EXTERNAL check_restart
-      ! Local Variable
-      CHARACTER(LEN=8) :: module_name
-!***********************************************************************
-      IF ( In_out==0 ) THEN
-        WRITE ( Restart_outunit ) MODNAME
-!        WRITE ( Restart_outunit ) Tavgc_ante
-      ELSE
-        READ ( Restart_inunit ) module_name
-        CALL check_restart(MODNAME, module_name)
-!        READ ( Restart_inunit ) Tavgc_ante
-      ENDIF
-      END SUBROUTINE potet_pt_restart

@@ -84,16 +84,11 @@
       IMPLICIT NONE
 !   Local Variables
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
-      INTEGER, SAVE, ALLOCATABLE :: Ts_i(:)
-      REAL, SAVE, ALLOCATABLE :: Ts(:), C0(:), C1(:), C2(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Outflow_ts(:), Inflow_ts(:)
       CHARACTER(LEN=9), SAVE :: MODNAME
-!   Declared Variables
-      DOUBLE PRECISION, SAVE :: Basin_segment_storage
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Segment_delta_flow(:)
 !   Declared Parameters
-      REAL, SAVE, ALLOCATABLE :: K_coef(:), X_coef(:), Segment_flow_init(:)
+      REAL, SAVE, ALLOCATABLE :: Segment_flow_init(:)
       END MODULE PRMS_MUSKINGUM
 
 !***********************************************************************
@@ -113,7 +108,7 @@
       ELSEIF ( Process(:4)=='decl' ) THEN
         muskingum  = muskingum_decl()
       ELSEIF ( Process(:4)=='init' ) THEN
-        IF ( Init_vars_from_file==1 ) CALL muskingum_restart(1)
+        IF ( Init_vars_from_file>0 ) CALL muskingum_restart(1)
         muskingum = muskingum_init()
       ELSEIF ( Process(:5)=='clean' ) THEN
         IF ( Save_vars_to_file==1 ) CALL muskingum_restart(0)
@@ -131,50 +126,22 @@
       USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL read_error, print_module
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_muskingum
 !***********************************************************************
       muskingum_decl = 0
 
-      Version_muskingum = 'muskingum.f90 2017-07-11 11:02:00Z'
+      Version_muskingum = 'muskingum.f90 2017-10-06 11:04:00Z'
       CALL print_module(Version_muskingum, 'Streamflow Routing          ', 90)
       MODNAME = 'muskingum'
 
-      ALLOCATE ( C1(Nsegment), C2(Nsegment), C0(Nsegment), Ts(Nsegment) )
-      ALLOCATE ( Currinsum(Nsegment), Ts_i(Nsegment) )
+      ALLOCATE ( Currinsum(Nsegment) )
       ALLOCATE ( Pastin(Nsegment), Pastout(Nsegment) )
       ALLOCATE ( Outflow_ts(Nsegment), Inflow_ts(Nsegment) )
 
-      IF ( declvar(MODNAME, 'basin_segment_storage', 'one', 1, 'double', &
-     &     'Basin area-weighted average storage in the stream network', &
-     &     'inches', Basin_segment_storage)/=0 ) CALL read_error(3, 'basin_segment_storage')
-
-      ALLOCATE ( Segment_delta_flow(Nsegment) )
-      IF ( declvar(MODNAME, 'segment_delta_flow', 'nsegment', Nsegment, 'double', &
-     &     'Cummulative flow in minus flow out for each stream segment', &
-     &     'cfs', Segment_delta_flow)/=0 ) CALL read_error(3, 'segment_delta_flow')
-
-      ALLOCATE ( K_coef(Nsegment) )
-      IF ( declparam(MODNAME, 'K_coef', 'nsegment', 'real', &
-     &     '1.0', '0.01', '24.0', &
-     &     'Muskingum storage coefficient', &
-     &     'Travel time of flood wave from one segment to the next downstream segment,'// &
-     &     ' called the Muskingum storage coefficient; enter 1.0 for reservoirs,'// &
-     &     ' diversions, and segment(s) flowing out of the basin', &
-     &     'hours')/=0 ) CALL read_error(1, 'K_coef')
-
-      ALLOCATE ( X_coef(Nsegment) )
-      IF ( declparam(MODNAME, 'x_coef', 'nsegment', 'real', &
-     &     '0.2', '0.0', '0.5', &
-     &     'Routing weighting factor', &
-     &     'The amount of attenuation of the flow wave, called the'// &
-     &     ' Muskingum routing weighting factor; enter 0.0 for'// &
-     &     ' reservoirs, diversions, and segment(s) flowing out of the basin', &
-     &     'decimal fraction')/=0 ) CALL read_error(1, 'x_coef')
-
-      IF ( Init_vars_from_file==0 ) THEN
+      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 ) THEN
         ALLOCATE ( Segment_flow_init(Nsegment) )
         IF ( declparam(MODNAME, 'segment_flow_init', 'nsegment', 'real', &
      &       '0.0', '0.0', '1.0E7', &
@@ -190,152 +157,34 @@
 !***********************************************************************
       INTEGER FUNCTION muskingum_init()
       USE PRMS_MUSKINGUM
-      USE PRMS_MODULE, ONLY: Nsegment, Inputerror_flag, Parameter_check_flag, &
-     &    Init_vars_from_file
+      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file
       USE PRMS_BASIN, ONLY: NEARZERO, Basin_area_inv
-      USE PRMS_FLOWVARS, ONLY: Seg_inflow, Seg_outflow
+      USE PRMS_FLOWVARS, ONLY: Seg_outflow
       USE PRMS_SET_TIME, ONLY: Cfs_conv
+      USE PRMS_ROUTING, ONLY: Basin_segment_storage
       IMPLICIT NONE
+! Functions
       EXTERNAL :: read_error
       INTEGER, EXTERNAL :: getparam
 ! Local Variables
-      INTEGER :: i, ierr
-      REAL :: k, x, d, x_max
+      INTEGER :: i
 !***********************************************************************
       muskingum_init = 0
 
-      IF ( getparam(MODNAME, 'K_coef', Nsegment, 'real', K_coef)/=0 ) CALL read_error(2, 'K_coef')
-      IF ( getparam(MODNAME, 'x_coef', Nsegment, 'real', X_coef)/=0 ) CALL read_error(2, 'x_coef')
-      IF ( Init_vars_from_file==0 ) THEN
+      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 ) THEN
         IF ( getparam(MODNAME, 'segment_flow_init',  Nsegment, 'real', Segment_flow_init)/=0 ) &
      &       CALL read_error(2,'segment_flow_init')
-        Seg_inflow = 0.0D0
         DO i = 1, Nsegment
           Seg_outflow(i) = Segment_flow_init(i)
         ENDDO
         DEALLOCATE ( Segment_flow_init )
-        Segment_delta_flow = 0.0D0
-        Outflow_ts = 0.0D0
       ENDIF
-!
-!     Compute the three constants in the Muskingum routing equation based
-!     on the values of K_coef and a routing period of 1 hour. See the notes
-!     at the top of this file.
+      IF ( Init_vars_from_file==0 ) Outflow_ts = 0.0D0
 
-!
-      C0 = 0.0
-      C1 = 0.0
-      C2 = 0.0
-!make sure K>0
-      Ts = 1.0
-      ierr = 0
       Basin_segment_storage = 0.0D0
       DO i = 1, Nsegment
         Basin_segment_storage = Basin_segment_storage + Seg_outflow(i)
-        k = K_coef(i)
-        x = X_coef(i)
-
-! check the values of k and x to make sure that Muskingum routing is stable
-
-        IF ( k<1.0 ) THEN
-!          IF ( Parameter_check_flag>0 ) THEN
-!            PRINT '(/,A,I6,A,F6.2,/,9X,A,/)', 'WARNING, segment ', i, ' has K_coef < 1.0,', k, &
-!     &            'this may produce unstable results'
-!            ierr = 1
-!          ENDIF
-!          Ts(i) = 0.0 ! not sure why this was set to zero, causes divide by 0 if K_coef < 1, BUG FIX 10/18/2016 RSR
-          Ts_i(i) = -1
-
-        ELSEIF ( k<2.0 ) THEN
-          Ts(i) = 1.0
-          Ts_i(i) = 1
-
-        ELSEIF ( k<3.0 ) THEN
-          Ts(i) = 2.0
-          Ts_i(i) = 2
-
-        ELSEIF ( k<4.0 ) THEN
-          Ts(i) = 3.0
-          Ts_i(i) = 3
-
-        ELSEIF ( k<6.0 ) THEN
-          Ts(i) = 4.0
-          Ts_i(i) = 4
-
-        ELSEIF ( k<8.0 ) THEN
-          Ts(i) = 6.0
-          Ts_i(i) = 6
-
-        ELSEIF ( k<12.0 ) THEN
-          Ts(i) = 8.0
-          Ts_i(i) = 8
-
-        ELSEIF ( k<24.0 ) THEN
-          Ts(i) = 12.0
-          Ts_i(i) = 12
-
-        ELSE
-          Ts(i) = 24.0
-          Ts_i(i) = 24
-
-        ENDIF
-
-!  x must be <= t/(2K) the C coefficents will be negative. Check for this for all segments
-!  with Ts >= minimum Ts (1 hour).
-        IF ( Ts(i)>0.1 ) THEN
-          x_max = Ts(i) / (2.0 * k)
-          IF ( x>x_max ) THEN
-            PRINT *, 'ERROR, x_coef value is too large for stable routing for segment:', i, ' x_coef:', x
-            PRINT *, '       a maximum value of:', x_max, ' is suggested'
-            Inputerror_flag = 1
-            CYCLE
-          ENDIF
-        ENDIF
-
-        d = k - (k * x) + (0.5 * Ts(i))
-        IF ( d==0.0 ) THEN
-          PRINT *, 'ERROR, segment ', i, ' computed value d = 0.0, change values of K_coef and x_coef'
-          Inputerror_flag = 1
-        ENDIF
-        C0(i) = (-(k * x) + (0.5 * Ts(i))) / d
-        C1(i) = ((k * x) + (0.5 * Ts(i))) / d 
-        C2(i) = (k - (k * x) - (0.5 * Ts(i))) / d
-
-        ! the following code was in the original musroute, but, not in Linsley and others
-        ! rsr, 3/1/2016 - having < 0 coefficient can cause negative flows as found by Jacob in GCPO headwater
-!  if c2 is <= 0.0 then  short travel time though reach (less daily
-!  flows), thus outflow is mainly = inflow w/ small influence of previous
-!  inflow. Therefore, keep c0 as is, and lower c1 by c2, set c2=0
-
-!  if c0 is <= 0.0 then long travel time through reach (greater than daily
-!  flows), thus mainly dependent on yesterdays flows.  Therefore, keep
-!  c2 as is, reduce c1 by c0 and set c0=0
-! SHORT travel time
-        IF ( C2(i)<0.0 ) THEN
-          IF ( Parameter_check_flag>0 ) THEN
-            PRINT '(/,A)', 'WARNING, c2 < 0, set to 0, c1 set to c1 + c2'
-            PRINT *, '        old c2:', C2(i), '; old c1:', C1(i), '; new c1:', C1(i) + C2(i)
-            PRINT *, '        K_coef:', K_coef(i), '; x_coef:', x_coef(i)
-          ENDIF
-          C1(i) = C1(i) + C2(i)
-          C2(i) = 0.0
-        ENDIF
-
-! LONG travel time
-        IF ( C0(i)<0.0 ) THEN
-          IF ( Parameter_check_flag>0 ) THEN
-            PRINT '(/,A)', 'WARNING, c0 < 0, set to 0, c0 set to c1 + c0'
-            PRINT *, '      old c0:', C0(i), 'old c1:', C1(i), 'new c1:', C1(i) + C0(i)
-            PRINT *, '        K_coef:', K_coef(i), '; x_coef:', x_coef(i)
-          ENDIF
-          C1(i) = C1(i) + C0(i)
-          C0(i) = 0.0
-        ENDIF
-
       ENDDO
-      IF ( ierr==1 ) PRINT '(/,A,/)', '***Recommend that the Muskingum parameters be adjusted in the Parameter File'
-      DEALLOCATE ( K_coef, X_coef)
-
       Basin_segment_storage = Basin_segment_storage*Basin_area_inv/Cfs_conv
 
       END FUNCTION muskingum_init
@@ -348,19 +197,22 @@
       USE PRMS_MODULE, ONLY: Nsegment
       USE PRMS_BASIN, ONLY: CFS2CMS_CONV, Basin_area_inv
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_cms, Basin_gwflow_cfs, Basin_ssflow_cfs, &
-     &    Basin_stflow_out, Basin_cfs, Basin_stflow_in, Basin_sroff_cfs, Seg_inflow, Seg_outflow, Seg_upstream_inflow, &
-     &    Seg_lateral_inflow, Flow_out
+     &    Basin_stflow_out, Basin_cfs, Basin_stflow_in, Basin_sroff_cfs, Seg_inflow, Seg_outflow, &
+     &    Seg_upstream_inflow, Seg_lateral_inflow, Flow_out
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv
-      USE PRMS_ROUTING, ONLY: Obsin_segment, Segment_order, Tosegment
+      USE PRMS_ROUTING, ONLY: Use_transfer_segment, Segment_delta_flow, Basin_segment_storage, &
+     &    Obsin_segment, Segment_order, Tosegment, C0, C1, C2, Ts, Ts_i, Obsout_segment, &
+     &    Flow_to_ocean, Flow_to_great_lakes, Flow_out_region, Flow_out_NHM, Segment_type, Flow_terminus, &
+     &    Flow_to_lakes, Flow_replacement, Flow_in_region, Flow_in_nation, Flow_headwater, Flow_in_great_lakes
       USE PRMS_SRUNOFF, ONLY: Basin_sroff
       USE PRMS_GWFLOW, ONLY: Basin_gwflow
       IMPLICIT NONE
 ! Functions
       INTRINSIC MOD
 ! Local Variables
-      INTEGER :: i, j, iorder, toseg, imod, tspd
-      DOUBLE PRECISION :: area_fac, currin
+      INTEGER :: i, j, iorder, toseg, imod, tspd, segtype
+      DOUBLE PRECISION :: area_fac, segout, currin
 !***********************************************************************
       muskingum_run = 0
 
@@ -433,6 +285,21 @@
             Inflow_ts(iorder) = 0.0D0
           ENDIF
 
+          IF ( Obsout_segment(iorder)>0 ) Outflow_ts(iorder) = Streamflow_cfs(Obsout_segment(iorder))
+
+          ! water-use removed/added in routing module
+          ! check for negative flow
+          IF ( Outflow_ts(iorder)<0.0 ) THEN
+            IF ( Use_transfer_segment==1 ) THEN
+              PRINT *, 'ERROR, transfer(s) from stream segment:', iorder, ' causes outflow to be negative'
+              PRINT *, '       outflow =', Outflow_ts(iorder), ' must fix water-use stream segment transfer file'
+            ELSE
+              PRINT *, 'ERROR, outflow from segment:', iorder, ' is negative:', Outflow_ts(iorder)
+              PRINT *, '       routing parameters may be invalid'
+            ENDIF
+            STOP
+          ENDIF
+
           ! Seg_outflow (the mean daily flow rate for each segment) will be the average of the hourly values.
           Seg_outflow(iorder) = Seg_outflow(iorder) + Outflow_ts(iorder)
           ! pastout is equal to the Inflow_ts on the previous routed timestep
@@ -453,14 +320,51 @@
 
       Basin_segment_storage = 0.0D0
       Flow_out = 0.0D0
+      Flow_to_lakes = 0.0D0
+      Flow_to_ocean = 0.0D0
+      Flow_to_great_lakes = 0.0D0
+      Flow_out_region = 0.0D0
+      Flow_out_NHM = 0.0D0
+      Flow_in_region = 0.0D0
+      Flow_terminus = 0.0D0
+      Flow_in_nation = 0.0D0
+      Flow_headwater = 0.0D0
+      Flow_in_great_lakes = 0.0D0
+      Flow_replacement = 0.0D0
       DO i = 1, Nsegment
         Seg_outflow(i) = Seg_outflow(i) * ONE_24TH
+        segout = Seg_outflow(i)
+        segtype = Segment_type(i)
         Seg_inflow(i) = Seg_inflow(i) * ONE_24TH
         Seg_upstream_inflow(i) = Currinsum(i) * ONE_24TH
 ! Flow_out is the total flow out of the basin, which allows for multiple outlets
 ! includes closed basins (tosegment=0)
-        IF ( Tosegment(i)==0 ) Flow_out = Flow_out + Seg_outflow(i)
-        Segment_delta_flow(i) = Segment_delta_flow(i) + Seg_inflow(i) - Seg_outflow(i)
+        IF ( segtype==1 ) THEN
+          Flow_headwater = Flow_headwater + segout
+        ELSEIF ( segtype==2 ) THEN
+          Flow_to_lakes = Flow_to_lakes + segout
+        ELSEIF ( segtype==3 ) THEN
+          Flow_replacement = Flow_replacement + segout
+        ELSEIF ( segtype==4 ) THEN
+          Flow_in_nation = Flow_in_nation + segout
+        ELSEIF ( segtype==5 ) THEN
+          Flow_out_NHM = Flow_out_NHM + segout
+        ELSEIF ( segtype==6 ) THEN
+          Flow_in_region = Flow_in_region + segout
+        ELSEIF ( segtype==7 ) THEN
+          Flow_out_region = Flow_out_region + segout
+        ELSEIF ( segtype==8 ) THEN
+          Flow_to_ocean = Flow_to_ocean + segout
+        ELSEIF ( segtype==9 ) THEN
+          Flow_terminus = Flow_terminus + segout
+        ELSEIF ( segtype==10 ) THEN
+          Flow_in_great_lakes = Flow_in_great_lakes + segout
+        ELSEIF ( segtype==11 ) THEN
+          Flow_to_great_lakes = Flow_to_great_lakes + segout
+        ENDIF
+        IF ( Tosegment(i)==0 ) Flow_out = Flow_out + segout
+        Segment_delta_flow(i) = Segment_delta_flow(i) + Seg_inflow(i) - segout
+!        IF ( Segment_delta_flow(i) < 0.0D0 ) PRINT *, 'negative delta flow', Segment_delta_flow(i)
         Basin_segment_storage = Basin_segment_storage + Segment_delta_flow(i)
       ENDDO
 
@@ -492,18 +396,10 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Basin_segment_storage
-        WRITE ( Restart_outunit ) Segment_delta_flow
         WRITE ( Restart_outunit ) Outflow_ts
-        WRITE ( Restart_outunit ) Pastin
-        WRITE ( Restart_outunit ) Pastout
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Basin_segment_storage
-        READ ( Restart_inunit ) Segment_delta_flow
         READ ( Restart_inunit ) Outflow_ts
-        READ ( Restart_inunit ) Pastin
-        READ ( Restart_inunit ) Pastout
       ENDIF
       END SUBROUTINE muskingum_restart

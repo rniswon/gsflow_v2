@@ -1,4 +1,4 @@
-      ! utils_prms.f90 2018-02-23 14:04:00Z
+      ! utils_prms.f90 2018-05-24 09:44:00Z
 !***********************************************************************
 !     Read CBH File to current time
 !***********************************************************************
@@ -8,6 +8,7 @@
       INTEGER, INTENT(OUT) :: Iret
 ! Local Variables
       INTEGER :: yr, mo, dy
+      CHARACTER(LEN=20), PARAMETER :: fmt1 = '(A, I5, 2("/",I2.2))'
 !***********************************************************************
       Iret = 0
       DO
@@ -16,7 +17,7 @@
         ELSE
           READ ( Iunit, IOSTAT=Iret ) yr, mo, dy
         ENDIF
-        IF ( Iret==-1 ) PRINT *, 'ERROR, end-of-file found reading input file for date:', Year, Month, Day
+        IF ( Iret==-1 ) PRINT fmt1, 'ERROR, end-of-file found reading input file for date:', Year, Month, Day
         IF ( Iret/=0 ) RETURN
         IF ( yr==Year .AND. mo==Month .AND. dy==Day ) EXIT
       ENDDO
@@ -151,7 +152,7 @@
               EXIT
             ENDIF
             IF ( dim/=Nhru ) THEN
-              PRINT '(/,2(A,I7))', '***CBH file dimension incorrect*** nhru=', Nhru, ' CBH dimension=', dim, ' File: '//Fname
+              PRINT '(/,2(A,I0))', '***CBH file dimension incorrect*** nhru= ', Nhru, ' CBH dimension= ', dim, ' File: '//Fname
               STOP 'ERROR: update Control File with correct CBH files'
             ENDIF
             IF ( Cbh_binary_flag==0 ) THEN
@@ -247,11 +248,11 @@
       CHARACTER(LEN=*), INTENT(IN) :: Parm_name, Dimen_name
 ! Local Variables
       INTEGER i
-      CHARACTER(LEN=48), PARAMETER :: fmt1 = '("####", /, A, /, "1", /, A, /, I6, /, "1")'
+      CHARACTER(LEN=48), PARAMETER :: fmt1 = '("####", /, A, /, "1", /, A, /, I0, /, "1")'
 !***********************************************************************
       WRITE ( Iunit, fmt1 ) Parm_name, Dimen_name, Dimen
       DO i = 1, Dimen
-        WRITE ( Iunit, * ) Values(i)
+        WRITE ( Iunit, '(I0)' ) Values(i)
       ENDDO
       END SUBROUTINE write_integer_param
 
@@ -265,7 +266,7 @@
       CHARACTER(LEN=*), INTENT(IN) :: Parm_name, Dimen_name
 ! Local Variables
       INTEGER i
-      CHARACTER(LEN=48), PARAMETER :: fmt1 = '("####", /, A, /, "1", /, A, /, I6, /, "2")'
+      CHARACTER(LEN=48), PARAMETER :: fmt1 = '("####", /, A, /, "1", /, A, /, I0, /, "2")'
 !***********************************************************************
       WRITE ( Iunit, fmt1) Parm_name, Dimen_name, Dimen
       DO i = 1, Dimen
@@ -283,7 +284,7 @@
       CHARACTER(LEN=*), INTENT(IN) :: Parm_name, Dimen_name
 ! Local Variables
       INTEGER i
-      CHARACTER(LEN=40), PARAMETER :: fmt1 = '("####", /, A, /, "1", /, A, /, I6, "3")'
+      CHARACTER(LEN=40), PARAMETER :: fmt1 = '("####", /, A, /, "1", /, A, /, I0, "3")'
 !***********************************************************************
       WRITE ( Iunit, fmt1 ) Parm_name, Dimen_name, Dimen
       DO i = 1, Dimen
@@ -303,7 +304,7 @@
       CHARACTER(LEN=*), INTENT(IN) :: Dimen_name1, Dimen_name2
 ! Local Variables
       INTEGER i, j
-      CHARACTER(LEN=46), PARAMETER :: fmt1 = '("####", /, A, /, "2", /, A, /, A, /, I8, "3")'
+      CHARACTER(LEN=46), PARAMETER :: fmt1 = '("####", /, A, /, "2", /, A, /, A, /, I0, "3")'
 !***********************************************************************
       WRITE ( Iunit, fmt1 ) Parm_name, Dimen_name1, Dimen_name2, Dimen1*Dimen2
       DO i = 1, Dimen2
@@ -332,7 +333,7 @@
         WRITE ( Iunit, fmt ) (Values(j, i), j=1,Dimen1)
       ENDDO
 
- 9001 FORMAT ( '####', /, A, /, '2', /, A, /, A, /, I8, /, '3' )
+ 9001 FORMAT ( '####', /, A, /, '2', /, A, /, A, /, I0, /, '3' )
  9002 FORMAT ( '(', I5, 'F10.5)' )
       END SUBROUTINE write_2D_double_array_grid
 
@@ -412,7 +413,7 @@
 !**********************************************************************
       PRINT 9001, Modname, Arg, Retcode
       STOP
- 9001 FORMAT ('ERROR in ', A, ' module, arg = ', A, /, 'Return val =', I4)
+ 9001 FORMAT ('ERROR in ', A, ' module, arg = ', A, /, 'Return val = ', I0)
       END SUBROUTINE module_error
 
 !***********************************************************************
@@ -481,7 +482,7 @@
 ! write_outfile - print to model output file
 !***********************************************************************
       SUBROUTINE write_outfile(String)
-      USE PRMS_MODULE, ONLY: PRMS_output_unit
+      USE PRMS_MODULE, ONLY: PRMS_output_unit, Print_debug
       IMPLICIT NONE
       ! Functions
       INTRINSIC LEN_TRIM
@@ -490,6 +491,7 @@
       ! Local variable
       INTEGER nchars
 !***********************************************************************
+      IF ( Print_debug==-2 ) RETURN
       nchars = LEN_TRIM(String)
       IF ( nchars>0 ) THEN
         WRITE ( PRMS_output_unit, '(A)' ) String(:nchars)
@@ -831,7 +833,7 @@
 ! print module version information to user's screen
 !***********************************************************************
       SUBROUTINE print_module(Versn, Description, Ftntype)
-      USE PRMS_MODULE, ONLY: PRMS_output_unit, Model, Logunt, Print_debug
+      USE PRMS_MODULE, ONLY: PRMS_output_unit, Model, Print_debug, Logunt
       IMPLICIT NONE
       ! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: Description, Versn
@@ -854,9 +856,11 @@
       blanks = ' '
       nb = 29 - (n + 3)
       string = Description//'   '//Versn(:n)//blanks(:nb)//Versn(n+is:nc)
-      IF ( Print_debug>-1 ) PRINT '(A)', TRIM( string )
+      IF ( Print_debug>-2 ) THEN
+        PRINT '(A)', TRIM( string )
+        IF ( Model/=2 ) WRITE ( PRMS_output_unit, '(A)' ) TRIM( string )
+      ENDIF
       WRITE ( Logunt, '(A)' ) TRIM( string )
-      IF ( Model/=2 ) WRITE ( PRMS_output_unit, '(A)' ) TRIM( string )
       END SUBROUTINE print_module
 
 !***********************************************************************
@@ -885,7 +889,7 @@
 !***********************************************************************
       IF ( Oldval/=Newval ) THEN
         PRINT *, 'ERROR READING RESTART FILE, for dimension ', Dimen
-        PRINT *, '      restart value=', Oldval, ' new value=', Newval
+        PRINT '(A,I0,A,I0,/)', '      restart value= ', Oldval, ' new value= ', Newval
         ierr = 1
       ENDIF
       END SUBROUTINE check_restart_dimen
@@ -912,23 +916,6 @@
 !***********************************************************************
 !     Check parameter value limits
 !***********************************************************************
-      SUBROUTINE check_param_value(Ihru, Param, Param_value, Iret)
-! Arguments
-      INTEGER, INTENT(IN) :: Ihru
-      REAL, INTENT(IN) :: Param_value
-      CHARACTER(LEN=*), INTENT(IN) :: Param
-      INTEGER, INTENT(INOUT) :: Iret
-!***********************************************************************
-      IF ( Param_value<0.0 .OR. Param_value>1.0 ) THEN
-        PRINT *, 'ERROR, ', Param, ' < 0.0 or > 1.0 for HRU:', Ihru, '; value:', Param_value
-        PRINT *, ' '
-        Iret = 1
-      ENDIF
-      END SUBROUTINE check_param_value
-
-!***********************************************************************
-!     Check parameter value limits
-!***********************************************************************
       SUBROUTINE check_param_limits(Indx, Param, Param_value, Lower_val, Upper_val, Iret)
 ! Arguments
       INTEGER, INTENT(IN) :: Indx
@@ -946,24 +933,6 @@
       END SUBROUTINE check_param_limits
 
 !***********************************************************************
-!     Check integer parameter value limits
-!***********************************************************************
-      SUBROUTINE checkint_param_limits(Indx, Param, Param_value, Lower_val, Upper_val, Iret)
-! Arguments
-      INTEGER, INTENT(IN) :: Indx, Param_value, Lower_val, Upper_val
-      CHARACTER(LEN=*), INTENT(IN) :: Param
-      INTEGER, INTENT(INOUT) :: Iret
-!***********************************************************************
-      IF ( Param_value<Lower_val .OR. Param_value>Upper_val ) THEN
-        PRINT *, 'ERROR, out-of-bounds value for parameter: ', Param
-        PRINT *, '       value:  ', Param_value, '; array index:', Indx
-        PRINT *, '       minimum:', Lower_val, '; maximum:', Upper_val
-        PRINT *, ' '
-        Iret = 1
-      ENDIF
-      END SUBROUTINE checkint_param_limits
-
-!***********************************************************************
 !     Check parameter value against dimension
 !***********************************************************************
       SUBROUTINE checkdim_param_limits(Indx, Param, Dimen, Param_value, Lower_val, Upper_val, Iret)
@@ -974,9 +943,8 @@
 !***********************************************************************
       IF ( Param_value<Lower_val .OR. Param_value>Upper_val ) THEN
         PRINT *, 'ERROR, out-of-bounds value for bounded parameter: ', Param
-        PRINT *, '       value:  ', Param_value, '; array index:', Indx
-        PRINT *, '       minimum:', Lower_val, '; maximum is dimension ', Dimen, ' =', Upper_val
-        PRINT *, ' '
+        PRINT '(A,I0,A,I0)', '       value:  ', Param_value, '; array index: ', Indx
+        PRINT '(A,I0,3A,I0,/)', '       minimum: ', Lower_val, '; maximum is dimension ', Dimen, ' = ', Upper_val
         Iret = 1
       ENDIF
       END SUBROUTINE checkdim_param_limits
@@ -992,13 +960,11 @@
 ! Local Variable
       INTEGER :: i
 !***********************************************************************
-      Iret = 0
       DO i = 1, Num_values
         IF ( Param_value(i)<Lower_val .OR. Param_value(i)>Upper_val ) THEN
           PRINT *, 'ERROR, out-of-bounds value for bounded parameter: ', Param
-          PRINT *, '       value:  ', Param_value(i), '; array index:', i
-          PRINT *, '       minimum:', Lower_val, '; maximum is dimension ', Bound, ' =', Upper_val
-          PRINT *, ' '
+          PRINT '(A,I0,A,I0)', '       value:  ', Param_value(i), '; array index: ', i
+          PRINT '(A,I0,3A,I0,/)', '       minimum: ', Lower_val, '; maximum is dimension ', Bound, ' = ', Upper_val
           Iret = 1
         ENDIF
       ENDDO
@@ -1021,29 +987,3 @@
         Iret = 1
       ENDIF
       END SUBROUTINE check_param_zero
-
-!***********************************************************************
-! checks values of basin wide parameters
-! and compute some basin variables
-!***********************************************************************
-      SUBROUTINE check_nhru_params()
-      USE PRMS_MODULE, ONLY: Temp_flag, Ntemp, Nevap, Inputerror_flag
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
-      USE PRMS_CLIMATEVARS, ONLY: Hru_tsta, Hru_pansta, Use_pandata
-      IMPLICIT NONE
-! Functions
-      EXTERNAL :: checkdim_param_limits
-! Local variables
-      INTEGER :: i, j, check_tsta
-!***********************************************************************
-      check_tsta = 0
-      IF ( Temp_flag==1 .OR. Temp_flag==2 ) check_tsta = 1
-
-      ! Sanity checks for parameters
-      DO j = 1, Active_hrus
-        i = Hru_route_order(j)
-        IF ( check_tsta==1 ) CALL checkdim_param_limits(i, 'hru_tsta', 'ntemp', Hru_tsta(i), 1, Ntemp, Inputerror_flag)
-        IF ( Use_pandata==1 ) CALL checkdim_param_limits(i, 'hru_pansta', 'nevap', Hru_pansta(i), 1, Nevap, Inputerror_flag)
-      ENDDO
-
-      END SUBROUTINE check_nhru_params

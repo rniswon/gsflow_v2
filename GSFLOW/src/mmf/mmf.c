@@ -183,6 +183,7 @@ int main (int argc, char *argv[]) {
 		err = read_params (fname[i], i, 1);
 		if (err) {
 			(void)fprintf (stderr,"\n%s\n", err);
+			exit (1);
 		}
 	}
 
@@ -203,6 +204,7 @@ int main (int argc, char *argv[]) {
 		err = read_params (fname[i], i, 0);
 		if (err) {
 			(void)fprintf (stderr,"\n%s\n", err);
+			exit (1);
 		}
 	}
     

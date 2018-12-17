@@ -62,14 +62,14 @@
       USE PRMS_MODULE, ONLY: Model, Nhru, Nrain
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL read_error, print_module
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_precip
 !***********************************************************************
       pptdist2decl = 0
 
-      Version_precip = 'precip_dist2.f90 2016-05-12 15:48:00Z'
+      Version_precip = 'precip_dist2.f90 2017-09-27 14:01:00Z'
       CALL print_module(Version_precip, 'Precipitation Distribution  ', 90)
       MODNAME = 'precip_dist2'
 

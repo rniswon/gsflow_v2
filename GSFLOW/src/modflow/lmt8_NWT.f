@@ -46,7 +46,7 @@ C THE 'EXTENDED' HEADER OPTION IS THE DEFAULT. THE RESULTING LINK FILE
 C IS COMPATIBLE WITH MT3DMS VERSION [4.00] OR LATER OR MT3D-USGS VERSION
 C [1.00] OR LATER.
 !rgn------REVISION NUMBER CHANGED TO INDICATE MODIFICATIONS FOR NWT 
-!rgn------NEW VERSION NUMBER 1.1.3, 8/01/2017
+!rgn------NEW VERSION NUMBER 1.1.4, 4/01/2018
 C **********************************************************************
 C last modified: 06-23-2016
 C last modified: 10-21-2010 swm: added MTMNW1 & MTMNW2
@@ -909,7 +909,8 @@ C--CALCULATE AND SAVE GROUNDWATER STORAGE IF TRANSIENT
       TEXT='STO'
 C
 C--INITIALIZE AND CLEAR BUFFER
-      TLED=ONE/DELT
+      TLED = ZERO
+      IF (DELT.GT.ZERO)TLED=ONE/DELT
       DO K=1,NLAY
         DO I=1,NROW
           DO J=1,NCOL
@@ -1286,7 +1287,8 @@ cswm: moved below      TLED=ONE/DELT
       IF(ISSCURRENT.NE.0) GOTO 704
 C
 C--RUN THROUGH EVERY CELL IN THE GRID
-      TLED=ONE/DELT !swm: moved after check for transient sp
+      TLED = ZERO
+      IF (DELT.GT.ZERO)TLED=ONE/DELT !swm: moved after check for transient sp
       KT=0
       DO K=1,NLAY
         LC=LAYTYP(K)
@@ -1708,8 +1710,9 @@ C--CALCULATE AND SAVE GROUNDWATER STORAGE IF TRANSIENT
       IF(ISSMT3D.NE.0) GO TO 705
       TEXT='STO'
 C
-C--INITIALIZE AND CLEAR BUFFER           
-      TLED=ONE/DELT
+C--INITIALIZE AND CLEAR BUFFER      
+      TLED = ZERO
+      IF (DELT.GT.ZERO)TLED=ONE/DELT
       DO K=1,NLAY
         DO I=1,NROW
           DO J=1,NCOL
@@ -2175,7 +2178,8 @@ C--CALCULATE AND SAVE GROUNDWATER STORAGE IF TRANSIENT
       TEXT='STO'
 C
 C--INITIALIZE and CLEAR BUFFER
-      TLED=ONE/DELT
+      TLED = ZERO
+      IF (DELT.GT.ZERO)TLED=ONE/DELT
       DO K=1,NLAY 
         DO I=1,NROW
           DO J=1,NCOL
@@ -3234,7 +3238,7 @@ C
       DOUBLE PRECISION QQ,HH,SS,DD,XX,HHCOF,RRHS,PXDP1,PXDP2
 C
 C--SET POINTERS FOR THE CURRENT GRID
-!gsf      CALL SGWF2ETS7PNT(IGRID)
+      CALL SGWF2ETS7PNT(IGRID)
 C      
       TEXT='ETS'
       ZERO=0.      
@@ -3373,7 +3377,7 @@ C
       DOUBLE PRECISION HHNEW,EEL,CC,CEL,QQ,QQIN
 C
 C--SET POINTERS FOR THE CURRENT GRID
-!gsf      CALL SGWF2DRT7PNT(IGRID)
+      CALL SGWF2DRT7PNT(IGRID)
 C      
       TEXT='DRT'
       ZERO=0.
@@ -3474,12 +3478,13 @@ C
       CHARACTER*16 TEXT,TEXT2
       INTEGER I,J,K,l,ll,IR,IC,IL,KPER,KSTP,ILMTFMT,IUMT3D,ISSMT3D,IGRID
       INTEGER, DIMENSION(NCOL,NROW) :: IUZFRCH
-      REAL cellarea,ZERO
+      REAL cellarea,ZERO,TLED,ONE
 C--SET POINTERS FOR THE CURRENT GRID      
 C  ALREADY SET IN GWF2RCH7BD?
 C     CALL SGWF2UZF1PNT(IGRID)
       TEXT='UZF RECHARGE'
       ZERO=0.
+      ONE=1.0
 C
 C--CLEAR THE BUFFER.
       DO IL=1,NLAY
@@ -3494,11 +3499,13 @@ C
 C--DETERMINE WHICH LAYER THE RECHARGE IS HAPPENING IN, SINCE IT NEEDS TO BE SPECIFIED.
 C  ACCOMPLISH THIS BY STORING ALL FLUXES IN BUFF AND THEN ADJUSTING VALUES OF BUFF BACK
 C  TO 0 THAT ARE ABOVE THE CELL WITH THE WATER TABLE.  
+      TLED = ZERO
+      IF (DELT.GT.ZERO)TLED=ONE/DELT
       DO ll = 1, numcells
         I = IUZHOLD(1, ll)
         J = IUZHOLD(2, ll)
         IF(IUZFBND(J,I).NE.0) THEN
-          BUFF(J,I,1) = UZFLWT(J,I)/DELT
+          BUFF(J,I,1) = UZFLWT(J,I)*TLED
         END IF
       ENDDO
 C--Initialize IUZFRCH integer array
@@ -3802,7 +3809,7 @@ C
       INTEGER I,J,K,l,ll,IR,IC,IL,KPER,KSTP,ILMTFMT,IUMT3D,ISSMT3D,
      &        IGRID,numcells
       CHARACTER*16 TEXT1, TEXT2
-      REAL cellarea
+      REAL cellarea,ONE,ZERO,TLED
       IF ( RTSOLUTE.LE.0 ) RETURN
       IF ( IETFLG.LE.0 ) RETURN
 C
@@ -3810,6 +3817,8 @@ C--SET POINTERS FOR THE CURRENT GRID
       CALL SGWF2UZF1PNT(IGRID)
 C            
       TEXT1='UZ-ET'
+      ONE=1.0
+      ZERO=0.0
 C
 C--CLEAR THE BUFFER FOR UZ ET
       DO IL=1,NLAY
@@ -3822,6 +3831,8 @@ C--CLEAR THE BUFFER FOR UZ ET
       numcells = NCOL*NROW
 C
 C--FOR EACH CELL CALCULATE UZ ET & STORE IN BUFFER
+      TLED = ZERO
+      IF (DELT.GT.ZERO)TLED=ONE/DELT
       IF ( IUZM.GT.0 .AND. IUZFOPT.GT.0 ) THEN
       DO K = 1, NLAY
         l = 0
@@ -3833,10 +3844,10 @@ C--FOR EACH CELL CALCULATE UZ ET & STORE IN BUFFER
             IF( K.GE.IUZFBND(J,I) ) THEN
               IF( HNEW(J,I,K).LT.BOTM(J,I,K-1) )THEN
                 cellarea = DELR(J)*DELC(I)
-                BUFF(J,I,K)=-1*ABS(GRIDET(J,I,K))*cellarea/DELT
+                BUFF(J,I,K)=-1*ABS(GRIDET(J,I,K))*cellarea*TLED
               ELSEIF ( ABS(SNGL(HNEW(J,I,K))-HNOFLO).LT.1.0 ) THEN
                 cellarea = DELR(J)*DELC(I)
-                BUFF(J,I,K)=-1*ABS(GRIDET(J,I,K))*cellarea/DELT
+                BUFF(J,I,K)=-1*ABS(GRIDET(J,I,K))*cellarea*TLED
                 GRIDET(J,I,K) = 0.0
               END IF
             END IF
@@ -4277,7 +4288,7 @@ C
       INTEGER I,J,III,JJJ,LK,IDISP,NINFLOW,ITRIB,IUPSEG,IUPRCH,USED,
      &        LENGTH
       REAL    STRLEN,TRBFLW,FLOWIN,XSA,transtor,runof,etsw,pptsw,
-     &        USERFLOW
+     &        USERFLOW,TRBFLW_TOT
       DOUBLE PRECISION CLOSEZERO
       LOGICAL WRITEVAL
       REAL, DIMENSION(5,NSTRM)   :: SFRFLOWVAL
@@ -4528,6 +4539,7 @@ C
           IDISP = 0
           III = 0
           JJJ = 0
+          TRBFLW_TOT = 0.0
 C
 C---------------------------------------------------------------
 C-------DETERMINE ALL INFLOW NODES, RATES, DISPERSION IDENTIFIER
@@ -4624,6 +4636,7 @@ C21-----CHECK TO SEE IF MORE THAN ONE TRIBUTARY OUTFLOW, WRITE EACH OF THE CONNE
                 DO WHILE(ITRIB.LE.NSS)
                   IF(ISTSG.EQ.IOTSG(ITRIB)) THEN
                     TRBFLW = SGOTFLW(ITRIB)
+                    TRBFLW_TOT = TRBFLW_TOT + TRBFLW
                     I=LASTRCH(ITRIB)
                     !IDENTIFY THE INDEX WITHIN STRM THAT IS CONTRIBUTING TRIBUTARY
                     !INFLOW TO THE CURRENT REACH.
@@ -4648,6 +4661,11 @@ C         AMEND CONNECTIONS WITH USER-SPECIFIED FLOWS THAT ARE IN ADDITION
 C         TO TRIBUTARY INFLOW (WHICH ARE PRINTED BY CODE ABOVE)
                 IF(ABS(SEG(2,ISTSG)).GT.CLOSEZERO) THEN
                   USERFLOW = SEG(2,ISTSG)      !Set flowin equal to specified inflow
+                  IF(USERFLOW.LT.0.0) THEN    
+                    IF(ABS(USERFLOW).GT.TRBFLW_TOT) THEN
+                      USERFLOW = -1 * TRBFLW_TOT !Ensure user-specified flow is capped at what's available from tribs
+                    ENDIF
+                  ENDIF
                   NINFLOW = 1
                   IDISP = 0
                   III = -ISTSG

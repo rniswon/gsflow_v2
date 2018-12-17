@@ -39,7 +39,7 @@ c
       SUBROUTINE GWF2MNW17AR(In, Iusip, Iude4, Iunwt, Iusor, Iupcg, 
      +                      Iulmg, Iugmg, Fname, Igrid)
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.3, 8/01/2017
+!rgn------NEW VERSION NUMBER 1.1.4, 4/01/2018
 c
 c----- MNW by K.J. Halford        1/31/98
 c     ******************************************************************
@@ -53,7 +53,7 @@ c     ------------------------------------------------------------------
       USE SIPMODULE,ONLY:HCLOSE
       USE DE4MODULE,ONLY:HCLOSEDE4
       USE PCGMODULE,ONLY:HCLOSEPCG
-!      USE GMGMODULE,ONLY:HCLOSEGMG
+      USE GMGMODULE,ONLY:HCLOSEGMG
       USE GWFNWTMODULE,ONLY:Tol
       IMPLICIT NONE
 c     ------------------------------------------------------------------
@@ -255,7 +255,7 @@ C-------SET SMALL DEPENDING ON CLOSURE CRITERIA OF THE SOLVER
 !     IF ( Iusor.NE.0 ) SMALL = HCLOSESOR
       IF ( Iupcg.NE.0 ) SMALL = HCLOSEPCG
       IF ( Iulmg.NE.0 ) SMALL = 0.0D0  !LMG SETS HCLOSE TO ZERO
-!      IF ( Iugmg.NE.0 ) SMALL = HCLOSEGMG
+      IF ( Iugmg.NE.0 ) SMALL = HCLOSEGMG
       IF ( Iunwt.NE.0 ) SMALL = TOL
 c
 c-----SAVE POINTERS FOR GRID AND RETURN

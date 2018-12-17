@@ -185,6 +185,10 @@ void setup_cont (void) {
 		lval[0] = 0;
 		decl_control_int_array ("stream_temp_flag", 1, lval);
 
+		lval = (long *)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("strmtemp_humidity_flag", 1, lval);
+		
 		lval = (long *)umalloc(sizeof (long));
 		lval[0] = 0;
 		decl_control_int_array("stream_temp_shade_flag", 1, lval);
@@ -388,6 +392,9 @@ void setup_cont (void) {
 		lval[0] = 1;
 		decl_control_int_array("nhruOut_freq", 1, lval);
 		lval[0] = 1;
+		decl_control_int_array("nhruOut_format", 1, lval);
+
+		lval[0] = 1;
 		decl_control_int_array("prms_warmup", 1, lval);
 
 
@@ -403,6 +410,8 @@ void setup_cont (void) {
 		lval = (long *)umalloc(sizeof(long));
 		lval[0] = 1;
 		decl_control_int_array("nsubOut_freq", 1, lval);
+		lval[0] = 1;
+		decl_control_int_array("nsubOut_format", 1, lval);
 
 		/*
 		**	basin_summary
@@ -429,6 +438,8 @@ void setup_cont (void) {
 		lval = (long *)umalloc(sizeof(long));
 		lval[0] = 1;
 		decl_control_int_array("nsegmentOut_freq", 1, lval);
+		lval[0] = 1;
+		decl_control_int_array("nsegmentOut_format", 1, lval);
 
 /*
 **	graphics display

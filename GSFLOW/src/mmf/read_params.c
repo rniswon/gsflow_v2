@@ -7,6 +7,7 @@
  *            File name is passed in as an argument
  *
  * $Id$
+ * Last modified 03/27/2018 RSR modified for multiple values per line separated by spaces
  *
 -*/
 
@@ -841,7 +842,7 @@ static char *READ_param_values (long size, long type, char *name,
     int  done;
 	int	desc_count = 0;
 	int repeat_count;
-	char delims[] = ",";
+	char delims[] = " ";
 	char *result = NULL;
 	char *comp_ptr = NULL;
 	static char *crap = NULL;
@@ -926,7 +927,7 @@ static char *READ_param_values (long size, long type, char *name,
 									bad_param_value (d, i, name, min_d, max_d);
 								}
 
-								if (comp_ptr != endp && *endp == '\n') {
+								if (comp_ptr != endp && (*endp == '\n' || *endp == '\0')) {
 									((double *)value)[i++] = d;
 								} else {
 									return error_string("parameter format error");
@@ -940,7 +941,7 @@ static char *READ_param_values (long size, long type, char *name,
 									bad_param_value (d, i, name, min_d, max_d);
 								}
 
-								if (comp_ptr != endp && *endp == '\n') {
+								if (comp_ptr != endp && (*endp == '\n' || *endp == '\0')) {
 									((float *)value)[i++] = (float)d;
 								} else {
 									return error_string("parameter format error");
@@ -956,7 +957,7 @@ static char *READ_param_values (long size, long type, char *name,
 									bad_param_value_l (l, i, name, min_l, max_l);
 								}
 
-								if (comp_ptr != endp && *endp == '\n') {
+								if (comp_ptr != endp && (*endp == '\n' || *endp == '\0')) {
 									((int *)value)[i++] = (int)l;
 								} else {
 									return error_string("parameter format error");

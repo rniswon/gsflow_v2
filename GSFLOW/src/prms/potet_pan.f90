@@ -59,7 +59,7 @@
         ALLOCATE ( Last_pan_evap(Nevap) )
 
       ELSEIF ( Process(:4)=='init' ) THEN
-        IF ( Init_vars_from_file==1 ) THEN
+        IF ( Init_vars_from_file>0 ) THEN
           CALL potet_pan_restart(1)
         ELSE
           Last_pan_evap = 0.0

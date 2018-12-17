@@ -38,12 +38,10 @@
 !     Main ide_dist routine
 !***********************************************************************
       INTEGER FUNCTION ide_dist()
-      USE PRMS_MODULE, ONLY: Process, Save_vars_to_file,
-     &    Init_vars_from_file
+      USE PRMS_MODULE, ONLY: Process
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: idedecl, ideinit, iderun
-      EXTERNAL :: ide_restart
 !***********************************************************************
       ide_dist = 0
 
@@ -52,10 +50,7 @@
       ELSEIF ( Process(:4)=='decl' ) THEN
         ide_dist = idedecl()
       ELSEIF ( Process(:4)=='init' ) THEN
-        IF ( Init_vars_from_file==1 ) CALL ide_restart(1)
         ide_dist = ideinit()
-      ELSEIF ( Process(:5)=='clean' ) THEN
-        IF ( Save_vars_to_file==1 ) CALL ide_restart(0)
       ENDIF
 
       END FUNCTION ide_dist
@@ -76,7 +71,7 @@
       idedecl = 0
 
       Version_ide_dist =
-     +'ide_dist.f 2016-07-22 17:22:00Z'
+     +'ide_dist.f 2018-04-18 11:09:00Z'
       CALL print_module(Version_ide_dist,
      +                  'Temp & Precip Distribution  ', 77)
       MODNAME = 'ide_dist'
@@ -256,8 +251,7 @@
 !***********************************************************************
       INTEGER FUNCTION ideinit()
       USE PRMS_IDE
-      USE PRMS_MODULE, ONLY: Nhru, Ntemp, Nrain, Init_vars_from_file,
-     +    Inputerror_flag
+      USE PRMS_MODULE, ONLY: Nhru, Ntemp, Nrain, Inputerror_flag
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv,
      +    Active_hrus, Hru_route_order
       IMPLICIT NONE
@@ -271,10 +265,8 @@
       ideinit = 0
 
 ! Initialize declared variables
-      IF ( Init_vars_from_file==0 ) THEN
-        Tmax_rain_sta = 0.0
-        Tmin_rain_sta = 0.0
-      ENDIF
+      Tmax_rain_sta = 0.0
+      Tmin_rain_sta = 0.0
 
       IF ( getparam(MODNAME, 'adjust_rain', Nrain*12, 'real',
      +     Adjust_rain)/=0 ) CALL read_error(2, 'adjust_rain')
@@ -951,7 +943,7 @@
             IF ( slope>0.0D0 ) slope = Dalr
           ENDIF
         ENDIF
-        Dat_elev = (slope*z_dble) + b
+        Dat_elev = SNGL( (slope*z_dble) + b )
 !
       ELSE
 !
@@ -967,7 +959,7 @@
         j2 = rb(2)
         slope = (xmndat(j2)-xmndat(j1))/(xmnelv(j2)-xmnelv(j1))
         b = xmndat(j1) - (slope*xmnelv(j1))
-        Dat_elev = (slope*z_dble) + b
+        Dat_elev = SNGL( (slope*z_dble) + b )
 !
       ENDIF
 !
@@ -1115,28 +1107,3 @@
       var = var/(N-1)
       Sdev = SQRT(var)
       END SUBROUTINE moments
-
-!***********************************************************************
-!     ide_restart - write or read ide restart file
-!***********************************************************************
-      SUBROUTINE ide_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
-      USE PRMS_IDE, ONLY: MODNAME, Tmax_rain_sta, Tmin_rain_sta
-      IMPLICIT NONE
-      ! Argument
-      INTEGER, INTENT(IN) :: In_out
-      EXTERNAL check_restart
-      ! Local Variable
-      CHARACTER(LEN=8) :: module_name
-!***********************************************************************
-      IF ( In_out==0 ) THEN
-        WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Tmax_rain_sta
-        WRITE ( Restart_outunit ) Tmin_rain_sta
-      ELSE
-        READ ( Restart_inunit ) module_name
-        CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Tmax_rain_sta
-        READ ( Restart_inunit ) Tmin_rain_sta
-      ENDIF
-      END SUBROUTINE ide_restart
