@@ -34,7 +34,7 @@
       ELSEIF ( Process(:4)=='decl' ) THEN
         gsflow_budget = gsfbuddecl()
       ELSEIF ( Process(:4)=='init' ) THEN
-        IF ( Init_vars_from_file==1 ) CALL gsflow_budget_restart(1)
+        IF ( Init_vars_from_file>0 ) CALL gsflow_budget_restart(1)
         gsflow_budget = gsfbudinit()
       ELSEIF ( Process(:5)=='clean' ) THEN
         IF ( Save_vars_to_file==1 ) CALL gsflow_budget_restart(0)
@@ -58,7 +58,7 @@
 !***********************************************************************
       gsfbuddecl = 0
 
-      Version_gsflow_budget = 'gsflow_budget.f90 2018-01-23 16:34:00Z'
+      Version_gsflow_budget = 'gsflow_budget.f90 2018-03-02 10:40:00Z'
       CALL print_module(Version_gsflow_budget, 'GSFLOW Output Budget Summary', 90)
       MODNAME = 'gsflow_budget'
 
@@ -198,11 +198,11 @@
         STOP
       ENDIF
 
+      Reach_cfs = 0.0 ! dimension NSTRM
+      Reach_wse = 0.0 ! dimension NSTRM
+      Total_pump = 0.0D0
+      Total_pump_cfs = 0.0D0
       IF ( Init_vars_from_file==0 ) THEN
-        Reach_cfs = 0.0 ! dimension NSTRM
-        Reach_wse = 0.0 ! dimension NSTRM
-        Total_pump = 0.0D0
-        Total_pump_cfs = 0.0D0
         Unsat_S = UZTSRAT(6)
         IF ( IUNIT(1)>0 ) CALL MODFLOW_GET_STORAGE_BCF()
         IF ( IUNIT(23)>0 ) CALL MODFLOW_GET_STORAGE_LPF()
@@ -214,14 +214,14 @@
         Lake2Unsat_Q = 0.0D0
         Stream_inflow = 0.0D0
         Basin_gw2sm = 0.0D0
-!        Uzf_infil_map = 0.0 ! dimension nhru
-!        Sat_recharge = 0.0 ! dimension nhru
-!        Mfoutflow_to_gvr = 0.0 ! dimension nhru
-        Gw2sm = 0.0 ! dimension nhru
-        Actet_gw = 0.0 ! dimension nhru
-        Actet_tot_gwsz = 0.0 ! dimension nhru
-        Streamflow_sfr = 0.0 ! dimension nsegment
       ENDIF
+!      Uzf_infil_map = 0.0 ! dimension nhru
+!      Sat_recharge = 0.0 ! dimension nhru
+!      Mfoutflow_to_gvr = 0.0 ! dimension nhru
+      Gw2sm = 0.0 ! dimension nhru
+      Actet_gw = 0.0 ! dimension nhru
+      Actet_tot_gwsz = 0.0 ! dimension nhru
+      Streamflow_sfr = 0.0 ! dimension nsegment
 
 !  Set the volume budget indicies to -1 anytime "init" is called.
 !  This will make "run" figure out the vbnm order.
@@ -779,29 +779,11 @@
         WRITE ( Restart_outunit ) Total_pump, Total_pump_cfs, Unsat_S, Sat_S, &
      &          Sat_dS, StreamExchng2Sat_Q, Stream2Unsat_Q, Stream_inflow, &
      &          Basin_gw2sm, LakeExchng2Sat_Q, Lake2Unsat_Q
-        WRITE ( Restart_outunit ) Gw2sm
-        WRITE ( Restart_outunit ) Actet_gw
-        WRITE ( Restart_outunit ) Actet_tot_gwsz
-        WRITE ( Restart_outunit ) Streamflow_sfr
-!        WRITE ( Restart_outunit ) Uzf_infil_map
-!        WRITE ( Restart_outunit ) Sat_recharge
-!        WRITE ( Restart_outunit ) Mfoutflow_to_gvr
-        WRITE ( Restart_outunit ) Reach_cfs
-        WRITE ( Restart_outunit ) Reach_wse
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Total_pump, Total_pump_cfs, Unsat_S, Sat_S, &
      &         Sat_dS, StreamExchng2Sat_Q, Stream2Unsat_Q, Stream_inflow, &
      &         Basin_gw2sm, LakeExchng2Sat_Q, Lake2Unsat_Q
-        READ ( Restart_inunit ) Gw2sm
-        READ ( Restart_inunit ) Actet_gw
-        READ ( Restart_inunit ) Actet_tot_gwsz
-        READ ( Restart_inunit ) Streamflow_sfr
-!        READ ( Restart_inunit ) Uzf_infil_map
-!        READ ( Restart_inunit ) Sat_recharge
-!        READ ( Restart_inunit ) Mfoutflow_to_gvr
-        READ ( Restart_inunit ) Reach_cfs
-        READ ( Restart_inunit ) Reach_wse
       ENDIF
       END SUBROUTINE gsflow_budget_restart

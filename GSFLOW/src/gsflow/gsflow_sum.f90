@@ -108,7 +108,7 @@
 !***********************************************************************
       gsfsumdecl = 0
 
-      Version_gsflow_sum = 'gsflow_sum.f90 2017-11-08 12:26:00Z'
+      Version_gsflow_sum = 'gsflow_sum.f90 2018-02-12 16:10:00Z'
       CALL print_module(Version_gsflow_sum, 'GSFLOW Output CSV Summary   ', 90)
       MODNAME = 'gsflow_sum'
 
@@ -1013,7 +1013,7 @@
       DOUBLE PRECISION :: ratediff, cum_error, rate_error, cum_percent
       DOUBLE PRECISION :: rate_out, rate_percent, temp
       CHARACTER(LEN=18) :: text1, text2, text3, text4, text5, text6
-      CHARACTER(LEN=18) :: text7, text8, text9, text10, text11, text12
+      CHARACTER(LEN=18) :: text7, text8, text9, text10, text11
       CHARACTER(LEN=18) :: val1, val2
 !***********************************************************************
       text1 = '     PRECIPITATION'
@@ -1027,7 +1027,6 @@
       text9 = '    SATURATED ZONE'
       text10 ='             LAKES'
       text11 ='           STREAMS'
-      text12 =' FAR-FIELD OUTFLOW'
       WRITE (Gsf_unt, 9001) Nowmonth, Nowday, Nowyear, Nstep, Kkper, Kkstp, KKITER
 !
 !1------PRINT CUMULATIVE VOLUMES AND RATES FOR INFLOW.
@@ -1099,7 +1098,7 @@
 !4------INFLOW RATE MINUS OUTFLOW RATE.
 !      rate_in = Rate_precip + Rate_strmin + Rate_gwbndin + Rate_wellin + Rate_lakin
 !      rate_out = Rate_et + Rate_strmot + Rate_gwbndot + Rate_wellot +
-!     &           Rate_lakot + Rate_farout
+!     &           Rate_lakot
 
       rate_in = Rate_precip + Rate_strmin + Rate_gwbndin + Rate_wellin
       rate_out = Rate_et + Rate_strmot + Rate_gwbndot + Rate_wellot
