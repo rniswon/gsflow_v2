@@ -10,9 +10,6 @@ C------MINOR UPDATES JAN. 2013 (LFK)
         INTEGER,SAVE,POINTER   ::MXLKND,LKNODE,ICMX,NCLS,LWRT,NDV,NTRB,
      +                           IRDTAB
         REAL,   SAVE,POINTER   ::THETA,SSCNCR,SURFDEPTH
-        DOUBLE PRECISION,   SAVE,POINTER   ::RAMP
-        REAL,   SAVE, DIMENSION(:),  POINTER :: DEADPOOLVOL,MXLKVOLF,
-     +                                          RELEASABLE_STOR
 Cdep    Added SURFDEPTH  3/3/2009
 Crgn    Added budget variables for GSFLOW CSV file
         REAL,   SAVE,POINTER   ::TOTGWIN_LAK,TOTGWOT_LAK,TOTDELSTOR_LAK
@@ -27,9 +24,9 @@ Crgn    Added budget variables for GSFLOW CSV file
         DOUBLE PRECISION,SAVE,DIMENSION(:), POINTER ::STGNEW,STGOLD,
      +                                        STGITER,VOLOLDD,STGOLD2
         DOUBLE PRECISION,SAVE,DIMENSION(:), POINTER :: RUNF, RUNOFF     !EDM
-        INTEGER,SAVE,                POINTER :: NLKFLWTYP
+        INTEGER,SAVE,                POINTER ::NLKFLWTYP
         CHARACTER*16, SAVE, DIMENSION(:), POINTER :: LKFLOWTYPE
-        REAL,   SAVE, DIMENSION(:),  POINTER :: VOL,FLOB,DSRFOT
+        REAL,   SAVE, DIMENSION(:),  POINTER ::VOL,FLOB,DSRFOT
         DOUBLE PRECISION,   SAVE, DIMENSION(:),  POINTER ::PRCPLK,EVAPLK
         REAL,   SAVE, DIMENSION(:),  POINTER ::BEDLAK
         REAL,   SAVE, DIMENSION(:),  POINTER ::WTHDRW,RNF,CUMRNF
@@ -84,9 +81,6 @@ Crsr    Allocate arrays in BD subroutine
      +                            IRDTAB
 Cdep    Added SURFDEPTH 3/3/2009
         REAL,         POINTER   ::THETA,SSCNCR,SURFDEPTH
-        DOUBLE PRECISION,         POINTER   ::RAMP
-        REAL,  DIMENSION(:),     POINTER :: DEADPOOLVOL,RELEASABLE_STOR,
-     +                                      MXLKVOLF
 Crgn    Added budget variables for GSFLOW CSV file
         REAL,         POINTER   ::TOTGWIN_LAK,TOTGWOT_LAK,TOTDELSTOR_LAK
         REAL,         POINTER   ::TOTSTOR_LAK,TOTEVAP_LAK,TOTPPT_LAK

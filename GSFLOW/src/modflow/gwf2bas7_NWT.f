@@ -100,7 +100,7 @@ C  this file to use the IMPLICIT NONE statement.
         CHARACTER(LEN=20), SAVE, POINTER   ::CHEDFM,CDDNFM,CBOUFM
         INTEGER,           SAVE, DIMENSION(:,:), POINTER ::IOFLG
         REAL,              SAVE, DIMENSION(:,:), POINTER ::VBVL
-        CHARACTER(LEN=20), SAVE, DIMENSION(:),   POINTER ::VBNM
+        CHARACTER(LEN=16), SAVE, DIMENSION(:),   POINTER ::VBNM
       TYPE GWFBASTYPE
         INTEGER, POINTER  ::MSUM
         INTEGER, POINTER  ::IHEDFM,IHEDUN,IDDNFM,IDDNUN,IBOUUN
@@ -112,7 +112,7 @@ C  this file to use the IMPLICIT NONE statement.
         CHARACTER(LEN=20), POINTER   ::CHEDFM,CDDNFM,CBOUFM
         INTEGER,           DIMENSION(:,:), POINTER ::IOFLG
         REAL,              DIMENSION(:,:), POINTER ::VBVL
-        CHARACTER(LEN=20), DIMENSION(:),   POINTER ::VBNM
+        CHARACTER(LEN=16), DIMENSION(:),   POINTER ::VBNM
       END TYPE
       TYPE(GWFBASTYPE), SAVE  ::GWFBASDAT(10)
       END MODULE GWFBASMODULE
@@ -1433,7 +1433,7 @@ C     ******************************************************************
 C
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      CHARACTER*20 VBNM(MSUM)
+      CHARACTER*16 VBNM(MSUM)
       DIMENSION VBVL(4,MSUM)
       CHARACTER*17 VAL1,VAL2
 C     ------------------------------------------------------------------
@@ -1576,13 +1576,13 @@ C
   265 FORMAT(1X,/5X,'CUMULATIVE VOLUMES',6X,'L**3',7X
      1,'RATES FOR THIS TIME STEP',6X,'L**3/T'/5X,18('-'),17X,24('-')
      2//11X,'IN:',38X,'IN:'/11X,'---',38X,'---')
-  275 FORMAT(1X,3X,A20,' =',A17,6X,A20,' =',A17)
-  286 FORMAT(1X,/16X,'TOTAL IN =',A,18X,'TOTAL IN =',A)
+  275 FORMAT(1X,3X,A16,' =',A17,6X,A16,' =',A17)
+  286 FORMAT(1X,/12X,'TOTAL IN =',A,14X,'TOTAL IN =',A)
   287 FORMAT(1X,/10X,'OUT:',37X,'OUT:'/10X,4('-'),37X,4('-'))
-  298 FORMAT(1X,/15X,'TOTAL OUT =',A,17X,'TOTAL OUT =',A)
-  299 FORMAT(1X,/16X,'IN - OUT =',A,18X,'IN - OUT =',A)
-  300 FORMAT(1X,/5X,'PERCENT DISCREPANCY =',F15.2
-     1,9X,'PERCENT DISCREPANCY =',F15.2,///)
+  298 FORMAT(1X,/11X,'TOTAL OUT =',A,13X,'TOTAL OUT =',A)
+  299 FORMAT(1X,/12X,'IN - OUT =',A,14X,'IN - OUT =',A)
+  300 FORMAT(1X,/1X,'PERCENT DISCREPANCY =',F15.2
+     1,5X,'PERCENT DISCREPANCY =',F15.2,///)
 C
       END
       SUBROUTINE SGWF2BAS7N(KPER,KSTP,INOC,IOUT,NLAY)
