@@ -3,7 +3,7 @@ GSFLOW Control File for the Sagehen Creek Watershed
 model_mode
 1
 4
-GSFLOW
+GSFLOW5
 ####
 modflow_time_zero
 6
@@ -93,6 +93,11 @@ solrad_module
 1
 4
 ddsolrad
+####
+strmflow_module
+1
+4
+strmflow
 ####
 et_module
 1
@@ -184,11 +189,6 @@ print_debug
 0
 ####
 parameter_check_flag
-1
-1
-0
-####
-cbh_check_flag
 1
 1
 0
