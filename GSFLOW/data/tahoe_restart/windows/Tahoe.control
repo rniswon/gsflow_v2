@@ -3,7 +3,7 @@ GSFLOW Control File for the Tahoe Creek Watershed
 model_mode
 1
 4
-GSFLOW
+GSFLOW5
 ####
 start_time
 6
@@ -71,9 +71,11 @@ data_file
 ../input/PRMS/tahoe.data
 ####
 param_file
-1
+3
 4
 ../input/PRMS/tahoe.param_v8_rgn
+../input/PRMS/cascade.params
+../input/PRMS/gis.params
 ####
 modflow_name
 1

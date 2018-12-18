@@ -1,0 +1,77 @@
+
+               Precipitation-Runoff Modeling System (PRMS)
+                       Version 5.0.0 06/01/2018
+
+        Process            Available Modules
+--------------------------------------------------------------------
+  Basin Definition: basin
+    Cascading Flow: cascade
+  Time Series Data: obs, water_use_read, dynamic_param_read
+   Potet Solar Rad: soltab
+  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru
+       Precip Dist: precip_1sta, precip_laps, precip_dist2,
+                    climate_hru
+Temp & Precip Dist: xyz_dist, ide_dist
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
+Transpiration Dist: transp_tindex, climate_hru, transp_frost
+      Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
+                    potet_hs, potet_pt, potet_pm, potet_pm_sta
+      Interception: intcp
+     Snow Dynamics: snowcomp
+    Surface Runoff: srunoff_smidx, srunoff_carea
+         Soil Zone: soilzone
+       Groundwater: gwflow
+Streamflow Routing: strmflow, strmflow_in_out, muskingum,
+                    muskingum_lake
+    Output Summary: basin_sum, subbasin, map_results, prms_summary,
+                    nhru_summary, nsub_summary, water_balance
+                    basin_summary, nsegment_summary
+     Preprocessing: write_climate_hru, frost_date
+--------------------------------------------------------------------
+
+
+    Active modules listed in the order in which they are called
+
+        Process                   Module                Version Date
+====================================================================
+GSFLOW Computation Order       gsflow_prms                2018-12-17
+Basin Definition               basin                      2018-04-06
+Cascading Flow                 cascade                    2018-05-25
+Common States and Fluxes       climateflow                2018-12-13
+Potential Solar Radiation      soltab                     2016-09-09
+PRMS Set Time Variables        prms_time                  2015-03-31
+Time Series Data               obs                        2018-02-23
+Temperature Distribution       temp_laps                  2018-01-16
+Precipitation Distribution     precip_1sta                2016-10-21
+Solar Radiation Distribution   ddsolrad                   2016-11-03
+Transpiration Distribution     transp_tindex              2015-01-06
+Potential Evapotranspiration   potet_jh                   2016-05-10
+Canopy Interception            intcp                      2018-02-26
+Snow Dynamics                  snowcomp                   2018-05-04
+Surface Runoff                 srunoff_smidx              2018-04-25
+Soil Zone Computations         soilzone                   2018-09-19
+GSFLOW PRMS to MODFLOW         gsflow_prms2mf             2017-11-15
+GSFLOW MODFLOW to PRMS         gsflow_mf2prms             2017-11-15
+GSFLOW Output Budget Summary   gsflow_budget              2018-03-02
+GSFLOW Output CSV Summary      gsflow_sum                 2018-02-12
+Output Summary                 subbasin                   2018-04-25
+====================================================================
+GSFLOW MODFLOW main            gsflow_modflow             2018-12-17
+UZF-NWT Package                gwf2uzf1_NWT               2017-03-08
+SFR-NWT Package                gwf2sfr7_NWT               2017-03-08
+LAK-NWT Package                gwf2lak7_NWT               2016-07-21
+
+Using Control File: .\Tahoe.control
+
+Using Parameter File: ../input/PRMS/tahoe.param_v8_rgn
+
+
+Start time: 1983/09/16 00:00:00
+End time:   1983/09/22 00:00:00
+
+
+Model domain area:       577870.77    Active basin area:    325452.62
+Fraction impervious:        0.0022    Fraction pervious:       0.6180
+Lake area:             123607.0564    Fraction lakes:          0.3798
+
+

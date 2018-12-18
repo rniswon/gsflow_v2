@@ -1,0 +1,41 @@
+1
+ SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
+ DATE: 11 10 1983              CUMULATIVE TIME STEP:    1136
+ MODFLOW STRESS PERIOD      1     CURRENT TIME STEP:    1136     ITERATIONS:      16
+
+ -----------------------------------------------------------------------------------
+
+   CUMULATIVE VOLUMES               L**3   RATES FOR THIS TIME STEP           L**3/T
+   ------------------                      ------------------------
+
+                                     IN                                         IN
+                                     --                                         --
+        PRECIPITATION =        1.0338D+08          PRECIPITATION =        8.7230D+07
+           STREAMFLOW =                               STREAMFLOW =                  
+     GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
+
+
+                                    OUT                                        OUT
+                                    ---                                        ---
+   EVAPOTRANSPIRATION =        1.3271D+07     EVAPOTRANSPIRATION =         643700.12
+           STREAMFLOW =        1.7081D+07             STREAMFLOW =        2998088.75
+     GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
+
+   INFLOWS - OUTFLOWS =        7.3032D+07     INFLOWS - OUTFLOWS =        8.3588D+07
+             --------                                   --------
+
+ TOTAL STORAGE CHANGE =        7.2718D+07         STORAGE CHANGE =        8.3251D+07
+       --------------                             --------------
+         LAND SURFACE =        4.8919D+07           LAND SURFACE =        4.6421D+07
+            SOIL ZONE =        5698740.83              SOIL ZONE =        7489613.36
+     UNSATURATED ZONE =         394915.66       UNSATURATED ZONE =         190194.94
+       SATURATED ZONE =        -509852.55         SATURATED ZONE =         758825.25
+                LAKES =        1.8215D+07                  LAKES =        2.8392D+07
+
+ OVERALL BUDGET ERROR =         313903.02           BUDGET ERROR =         336651.83
+
+
+  PERCENT DISCREPANCY =              0.30    PERCENT DISCREPANCY =              0.39
+
+
+

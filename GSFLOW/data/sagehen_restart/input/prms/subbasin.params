@@ -1,5 +1,5 @@
 ####
-subbasin_down 0
+subbasin_down
 1
 nsub
 2
@@ -7,7 +7,7 @@ nsub
 2
 0
 ####
-hru_subbasin 0
+hru_subbasin
 1
 nhru
 128
