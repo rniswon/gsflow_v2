@@ -1887,6 +1887,8 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
+      USE GWFAGMODULE, ONLY: DIVERSIONIRRUZF,NUMIRRDIVERSION,
+     +                        WELLIRRUZF,NUMIRRWEL
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -1988,6 +1990,15 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
           !  IF ( finfsaveadd < zero ) finfsaveadd = zero
           !END IF
           finfhold  = finfhold + finfsave(ic,ir)
+        END IF
+! ADD SFR DIVERSION AS IRRIGATION
+        IF ( IUNIT(44) > 0 .AND. IUNIT(66) > 0 ) THEN
+          IF ( NUMIRRDIVERSION > 0 ) 
+     +         finfhold = finfhold + DIVERSIONIRRUZF(IC,IR)
+        ENDIF
+! ADD WELL PUMPING AS IRRIGATION
+        IF ( IUNIT(66) > 0 ) THEN
+          IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRRUZF(IC,IR)
         END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( IGSFLOW.GT.0 .and. Isavefinf.EQ.0 ) THEN
@@ -2263,7 +2274,7 @@ C7------CALCULATE ET DEMAND LEFT FOR GROUND WATER.
               ij = Icell(IC,IR,IL)
               A(IA(ij)) = A(IA(ij)) - dET*etgw
             END IF
-          END IF
+          END IF         
         END IF
       END IF
       END DO
@@ -2271,7 +2282,7 @@ C
 C8------ADD OVERLAND FLOW TO STREAMS, LAKES AND CONDUITS. 
       IF ( IRUNFLG.GT.0 .AND. (Iunitsfr.GT.0.OR.
      +     Iunitlak.GT.0.OR.Iunitswr.GT.0) )
-     +     CALL SGWF2UZF1OLF(Iunitsfr, Iunitlak, Iunitswr, Igrid )
+     +     CALL SGWF2UZF1OLF(Iunitsfr, Iunitlak, Iunitswr, Igrid )      
 
 C9------RETURN.
       RETURN
@@ -2408,8 +2419,9 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: ICBCFL, IBUDFL, TOTIM, PERTIM, DELT, MSUM,
      +                        VBNM, VBVL, HNOFLO, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW, LAKSEEP
+      USE GWFAGMODULE, ONLY: DIVERSIONIRRUZF, NUMIRRDIVERSION, 
+     +                        WELLIRRUZF, NUMIRRWEL
       USE GWFSFRMODULE, ONLY: FNETSEEP
-!!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -2544,6 +2556,14 @@ CDEP 05/05/2006
           !END IF
           finfhold  = finfhold + finfsave(ic,ir)
         END IF
+! ADD SFR DIVERSION AS IRRIGATION
+        IF ( IUNIT(44) > 0  .AND. IUNIT(66) > 0 ) THEN
+          IF ( NUMIRRDIVERSION > 0 ) 
+     +         finfhold = finfhold + DIVERSIONIRRUZF(IC,IR)
+        ENDIF
+        IF ( IUNIT(66) > 0 ) THEN
+          IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRRUZF(IC,IR)
+        END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( IGSFLOW.GT.0 .and. Isavefinf.EQ.0 ) THEN
           Excespp(ic, ir) = 0.0
@@ -2553,7 +2573,6 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
         ELSE
           EXCESPP(ic, ir) = 0.0
         ENDIF
-! EDM
         IF ( IUZFBND(ic, ir).EQ.0 ) finfhold = 0.0D0
         flength = DELC(ir)
         width = DELR(ic)
@@ -3353,10 +3372,8 @@ C28-----COMPUTE UNSATURATED ERROR FOR EACH CELL.
           UZTOTBAL(ic, ir, 4) = UZTOTBAL(ic, ir, 4) + volet
           UZTOTBAL(ic, ir, 7) = UZTOTBAL(ic, ir, 7) + volinflt +
      +                              Excespp(ic, ir) + rej_inf(ic, ir)
-!      if(kkstp==2)then
 !      error = volinflt-volflwtb-volet-DELSTOR(ic, ir)
 !      write(222,333)l,ll,ic,ir,il,error,volflwtb
-!      end if
 !333   format(5i10,2e20.10)
           IF ( IUZFOPT.GT.0 ) THEN
             IF ( ibnd.GT.0 ) THEN
@@ -4012,8 +4029,18 @@ C60----LOOP OVER GAGING STATIONS.
                 gdelstor = UZTOTBAL(iuzcol, iuzrow, 2)
                 ginfltr = UZOLSFLX(iuzcol, iuzrow)*
      +                  DELC(iuzrow)*DELR(iuzcol)
-                gaplinfltr = FINF(iuzcol, iuzrow)*
-     +                     (DELC(iuzrow)*DELR(iuzcol))
+                gaplinfltr = FINF(iuzcol, iuzrow)
+                if ( IUNIT(66) > 0 ) then
+                  if ( NUMIRRWEL > 0 )  
+     +                 gaplinfltr = gaplinfltr + 
+     +                 WELLIRRUZF(iuzcol, iuzrow)
+                end if
+                if ( IUNIT(44) > 0 .AND. IUNIT(66) > 0 ) then
+                  if ( NUMIRRDIVERSION > 0 ) gaplinfltr = 
+     +                                 gaplinfltr +
+     +                                 DIVERSIONIRRUZF(iuzcol, iuzrow)
+                end if
+                gaplinfltr = gaplinfltr*(DELC(iuzrow)*DELR(iuzcol))
                 IF ( IUZFOPT.GT.0 ) THEN
                   guzstore = UZSTOR(iuzcol, iuzrow) 
                   grchr = UZFLWT(iuzcol, iuzrow)/DELT
@@ -4143,11 +4170,6 @@ C67-----FORMATS.
  9014 FORMAT (62X, 2(1PE14.7, 1X))
  9015 FORMAT (//)
  9016 FORMAT (9X, 1PE14.7, 1X, 9(2X,1PE14.7))
-      
-  !    write(222, 333)laynum(158,13),UZDPST(1, 3),BOTM(158,13,0)-
-  !   +               hnew(158,13,laynum(158,13)),HLDUZF(158,13),
-  !   +               hnew(158,13,laynum(158,13))     
-  !333 format(i5,4e20.10)
 C
       RETURN
       END SUBROUTINE GWF2UZF1BD
@@ -5549,7 +5571,7 @@ C     AVEARGE WATER CONTENT AND FLUX FOR MT3DMS
 C     ******************************************************************
       USE GLOBAL,       ONLY: BOTM, IOUT, NLAY
       USE GWFBASMODULE, ONLY: DELT
-      USE GWFUZFMODULE, ONLY: NWAV, CLOSEZERO, IUZFBND, NWAVST, ZEROD9,
+      USE GWFUZFMODULE, ONLY: NWAV, CLOSEZERO, IUZFBND, NWAVST,
      +                        RTSOLUTE, GRIDSTOR, GRIDET, IUZFOPT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -5603,7 +5625,7 @@ C65-----TOTAL WATER CONTENT AND FLUX OVER SPECIFIED DEPTH.
                     jk = iset + Nwv - 1
                     nwavm1 = jk - 1
                     DO WHILE ( jk.GT.iset-1 )
-                      IF ( Depth(jk)-depthsave.LT. -ZEROD9 ) jj = jk
+                      IF ( Depth(jk)-depthsave.LT.0.0D0 ) jj = jk
                         jk = jk - 1
                     END DO
                     IF ( jj.GT.iset ) THEN
@@ -5693,7 +5715,54 @@ C
         END IF
       END IF 
       END FUNCTION CAPH
+! ----------------------------------------------------------------------
+
+      function unsat_stor(d1,uzthst,uzdpst,ic,ir,nwav)
+!     ******************************************************************
+!     unsat_stor---- sums up mobile water over depth interval
+!     ******************************************************************
+!     SPECIFICATIONS:
+      USE GWFUZFMODULE, ONLY:NWAVST
+! ----------------------------------------------------------------------
+      !modules
+      !arguments
+      DOUBLE PRECISION, intent(inout) :: d1
+      DOUBLE PRECISION, intent(inout) :: uzthst(NWAV), uzdpst(NWAV)
+      ! -- dummy
+      DOUBLE PRECISION :: fm, unsat_stor
+      integer :: j, k,nwavm1,jj, numwaves
+! ----------------------------------------------------------------------
+      fm = 0.0d0
+      DEM30 = 1.0d-30
+      numwaves = NWAVST(ic, ir)
+      j = numwaves + 1
+      k = numwaves
+      nwavm1 = k-1
+      if ( d1 > uzdpst(1) ) d1 = uzdpst(1)
+      !
+      !find deepest wave above depth d1, counter held as j
+      do while ( k > 0 )
+        if ( uzdpst(k) - d1 < -DEM30) j = k
+          k = k - 1
+      end do
+      if ( j > numwaves ) then
+        fm = fm + (uzthst(numwaves)-thtr)*d1
+      elseif ( numwaves > 1 ) then
+        if ( j > 1 ) then
+          fm = fm + (uzthst(j-1)-thtr)*(d1-uzdpst(j))
+        end if
+        do jj = j, nwavm1
+          fm = fm + (uzthst(jj)-thtr)*(uzdpst(jj)-uzdpst(jj+1))
+        end do
+        fm = fm + (uzthst(numwaves)-thtr)*(uzdpst(numwaves))
+      else
+        fm = fm + (uzthst(1)-thtr)*d1
+      end if
+      unsat_stor = fm
+      end function unsat_stor
+!
 C
+! ----------------------------------------------------------------------
 C-------SUBROUTINE GWF2UZF1DA
       SUBROUTINE GWF2UZF1DA(Igrid)
 C    Deallocate UZF DATA. 
@@ -5791,7 +5860,8 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFUZFDAT(Igrid)%FINFSAVE)
       DEALLOCATE (GWFUZFDAT(Igrid)%Isavefinf)
       DEALLOCATE (GWFUZFDAT(Igrid)%ETOFH_FLAG)
-      DEALLOCATE (GWFUZFDAT(Igrid)%landlayer)
+      DEALLOCATE (GWFUZFDAT(Igrid)%UZFRESTART)
+      DEALLOCATE (GWFUZFDAT(Igrid)%LANDLAYER)
 C
       END SUBROUTINE GWF2UZF1DA
 C
@@ -5891,7 +5961,8 @@ C     ------------------------------------------------------------------
       FINFSAVE=>GWFUZFDAT(Igrid)%FINFSAVE
       ISAVEFINF=>GWFUZFDAT(Igrid)%ISAVEFINF
       ETOFH_FLAG=>GWFUZFDAT(Igrid)%ETOFH_FLAG 
-      landlayer=>GWFUZFDAT(Igrid)%landlayer
+      UZFRESTART=>GWFUZFDAT(Igrid)%UZFRESTART
+      LANDLAYER=>GWFUZFDAT(Igrid)%LANDLAYER
 C
       END SUBROUTINE SGWF2UZF1PNT
 C
@@ -5992,6 +6063,7 @@ C     ------------------------------------------------------------------
       GWFUZFDAT(Igrid)%FINFSAVE=>FINFSAVE
       GWFUZFDAT(Igrid)%Isavefinf=>Isavefinf
       GWFUZFDAT(Igrid)%ETOFH_FLAG=>ETOFH_FLAG
-      GWFUZFDAT(Igrid)%landlayer=>landlayer
+      GWFUZFDAT(Igrid)%UZFRESTART=>UZFRESTART
+      GWFUZFDAT(Igrid)%LANDLAYER=>LANDLAYER
 C
       END SUBROUTINE SGWF2UZF1PSV

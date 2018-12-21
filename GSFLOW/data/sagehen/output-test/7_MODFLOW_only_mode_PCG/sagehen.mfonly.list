@@ -17563,29 +17563,29 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =           0.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-      STREAM LEAKAGE =        6553.3110        STREAM LEAKAGE =        6553.3110
-        UZF RECHARGE =       23337.3965          UZF RECHARGE =       23337.3965
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =           0.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+      STREAM LEAKAGE     =        6553.3110        STREAM LEAKAGE     =        6553.3110
+        UZF RECHARGE     =       23337.3965          UZF RECHARGE     =       23337.3965
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =       29890.7070              TOTAL IN =       29890.7070
+                TOTAL IN =       29890.7070                  TOTAL IN =       29890.7070
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =           0.0000               STORAGE =           0.0000
-       CONSTANT HEAD =         648.8576         CONSTANT HEAD =         648.8576
-      STREAM LEAKAGE =       13010.5830        STREAM LEAKAGE =       13010.5830
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =       16232.4902       SURFACE LEAKAGE =       16232.4902
+             STORAGE     =           0.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =         648.8576         CONSTANT HEAD     =         648.8576
+      STREAM LEAKAGE     =       13010.5830        STREAM LEAKAGE     =       13010.5830
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =       16232.4902       SURFACE LEAKAGE     =       16232.4902
 
-           TOTAL OUT =       29891.9316             TOTAL OUT =       29891.9316
+               TOTAL OUT =       29891.9316                 TOTAL OUT =       29891.9316
 
-            IN - OUT =          -1.2246              IN - OUT =          -1.2246
+                IN - OUT =          -1.2246                  IN - OUT =          -1.2246
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -17914,29 +17914,29 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =           0.9229               STORAGE =           0.9229
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-      STREAM LEAKAGE =       13106.4590        STREAM LEAKAGE =        6553.1484
-        UZF RECHARGE =       46671.5469          UZF RECHARGE =       23334.1484
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =           0.9229               STORAGE     =           0.9229
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+      STREAM LEAKAGE     =       13106.4590        STREAM LEAKAGE     =        6553.1484
+        UZF RECHARGE     =       46671.5469          UZF RECHARGE     =       23334.1484
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =       59778.9297              TOTAL IN =       29888.2207
+                TOTAL IN =       59778.9297                  TOTAL IN =       29888.2207
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =       2.6663E-02               STORAGE =       2.6663E-02
-       CONSTANT HEAD =        1297.7161         CONSTANT HEAD =         648.8584
-      STREAM LEAKAGE =       26020.9766        STREAM LEAKAGE =       13010.3945
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =       32464.9219       SURFACE LEAKAGE =       16232.4326
+             STORAGE     =       2.6663E-02               STORAGE     =       2.6663E-02
+       CONSTANT HEAD     =        1297.7161         CONSTANT HEAD     =         648.8584
+      STREAM LEAKAGE     =       26020.9766        STREAM LEAKAGE     =       13010.3945
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =       32464.9219       SURFACE LEAKAGE     =       16232.4326
 
-           TOTAL OUT =       59783.6406             TOTAL OUT =       29891.7148
+               TOTAL OUT =       59783.6406                 TOTAL OUT =       29891.7148
 
-            IN - OUT =          -4.7109              IN - OUT =          -3.4941
+                IN - OUT =          -4.7109                  IN - OUT =          -3.4941
 
- PERCENT DISCREPANCY =          -0.01     PERCENT DISCREPANCY =          -0.01
+     PERCENT DISCREPANCY =          -0.01         PERCENT DISCREPANCY =          -0.01
 
 
 
@@ -17952,6 +17952,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2018/12/17 18:51:48
- Elapsed run time:  2.170 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2018/12/20 15:12:45
+ Elapsed run time:  2.055 Seconds
 

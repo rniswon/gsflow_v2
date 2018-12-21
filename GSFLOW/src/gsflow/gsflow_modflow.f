@@ -79,7 +79,7 @@ C
 !***********************************************************************
       gsfdecl = 0
 
-      Version_gsflow_modflow = 'gsflow_modflow.f 2018-12-17 15:48:00Z'
+      Version_gsflow_modflow = 'gsflow_modflow.f 2018-12-20 12:20:00Z'
 C
 C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
       IF ( Print_debug>-2 )
@@ -1334,7 +1334,7 @@ C
 !***********************************************************************
       SUBROUTINE READ_STRESS()
       USE GSFMODFLOW, ONLY: IGRID, KKPER, KPER, NSOL, IOUTS, KKSTP,
-     &                      Mft_to_sec, KSTP, KPERSTART
+     &                      Mft_to_sec, KSTP
       USE GLOBAL, ONLY: IUNIT, ISSFLG, IOUT
       USE PRMS_MODULE, ONLY: Model
       USE PRMS_SET_TIME, ONLY: Timestep_seconds
