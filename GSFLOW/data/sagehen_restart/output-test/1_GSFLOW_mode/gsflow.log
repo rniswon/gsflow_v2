@@ -2,14 +2,14 @@
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version 2.0.0 10/01/2018
+                         Version 2.0.0 01/01/2019
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.0.0 06/01/2018
+                       Version 5.0.0 12/01/2018
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -45,7 +45,6 @@ Transpiration Dist: transp_tindex, climate_hru, transp_frost
        Groundwater: gwflow
 Streamflow Routing: strmflow, strmflow_in_out, muskingum,
                     muskingum_lake
-Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
                     basin_summary, nsegment_summary
@@ -57,10 +56,10 @@ Stream Temperature: stream_temp
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2018-09-26
+GSFLOW Computation Order       gsflow_prms                2018-12-20
 Basin Definition               basin                      2018-04-06
 Cascading Flow                 cascade                    2018-05-25
-Common States and Fluxes       climateflow                2018-09-19
+Common States and Fluxes       climateflow                2018-12-13
 Potential Solar Radiation      soltab                     2016-09-09
 PRMS Set Time Variables        prms_time                  2015-03-31
 Time Series Data               obs                        2018-02-23
@@ -79,7 +78,7 @@ GSFLOW Output Budget Summary   gsflow_budget              2018-03-02
 GSFLOW Output CSV Summary      gsflow_sum                 2018-02-12
 Output Summary                 subbasin                   2018-04-25
 ====================================================================
-GSFLOW MODFLOW main            gsflow_modflow             2018-09-26
+GSFLOW MODFLOW main            gsflow_modflow             2018-12-20
 ====================================================================
 MODFLOW Packages
 ====================================================================
@@ -305,8 +304,8 @@ Date: 1984/01/30; Stress:  2; Step:  1216; Simulation step: 1217
                   MF iterations:        8; SZ iterations:      8
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2018/09/27 12:23:20
- Elapsed run time: 16.737 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2018/12/20 17:08:04
+ Elapsed run time: 14.475 Seconds
 
  Number of time steps:     60;  Number of non-convergence:   0
  MF iterations:           520;  SZ iterations:             520

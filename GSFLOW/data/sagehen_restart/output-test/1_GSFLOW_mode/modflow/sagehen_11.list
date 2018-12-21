@@ -11171,31 +11171,31 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP  1129 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =        9800.5752               STORAGE =        9800.5752
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-      STREAM LEAKAGE =        8462.0664        STREAM LEAKAGE =        8462.0664
-        UZF RECHARGE =        6871.1465          UZF RECHARGE =        6871.1465
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
-                MNW2 =          26.9286                  MNW2 =          26.9286
+             STORAGE     =        9800.5752               STORAGE     =        9800.5752
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+      STREAM LEAKAGE     =        8462.0664        STREAM LEAKAGE     =        8462.0664
+        UZF RECHARGE     =        6871.1465          UZF RECHARGE     =        6871.1465
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
+                MNW2     =          26.9286                  MNW2     =          26.9286
 
-            TOTAL IN =       25160.7168              TOTAL IN =       25160.7168
+                TOTAL IN =       25160.7168                  TOTAL IN =       25160.7168
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =        2293.6067               STORAGE =        2293.6067
-       CONSTANT HEAD =         720.1353         CONSTANT HEAD =         720.1353
-      STREAM LEAKAGE =       10438.7559        STREAM LEAKAGE =       10438.7559
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =       11203.9365       SURFACE LEAKAGE =       11203.9365
-                MNW2 =         504.2762                  MNW2 =         504.2762
+             STORAGE     =        2293.6067               STORAGE     =        2293.6067
+       CONSTANT HEAD     =         720.1353         CONSTANT HEAD     =         720.1353
+      STREAM LEAKAGE     =       10438.7559        STREAM LEAKAGE     =       10438.7559
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =       11203.9365       SURFACE LEAKAGE     =       11203.9365
+                MNW2     =         504.2762                  MNW2     =         504.2762
 
-           TOTAL OUT =       25160.7109             TOTAL OUT =       25160.7109
+               TOTAL OUT =       25160.7109                 TOTAL OUT =       25160.7109
 
-            IN - OUT =       5.8594E-03              IN - OUT =       5.8594E-03
+                IN - OUT =       5.8594E-03                  IN - OUT =       5.8594E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -11603,6 +11603,6 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
   WRITING DATA FOR RESTART MNW2
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2018/12/17 20:09:15
- Elapsed run time:  1.775 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2018/12/20 17:07:43
+ Elapsed run time:  1.868 Seconds
 

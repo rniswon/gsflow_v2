@@ -1210,7 +1210,7 @@
       INTEGER, EXTERNAL :: write_climate_hru, muskingum, muskingum_lake
 !gsf      INTEGER, EXTERNAL :: stream_temp
       EXTERNAL :: nhru_summary, prms_summary, water_balance, nsub_summary, basin_summary, nsegment_summary
-      INTEGER, EXTERNAL :: dynamic_param_read, water_use_read, setup, potet_pm_sta
+      INTEGER, EXTERNAL :: dynamic_param_read, water_use_read, potet_pm_sta
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
 ! Local variable
       INTEGER :: test
