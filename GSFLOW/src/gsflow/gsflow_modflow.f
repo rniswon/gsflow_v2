@@ -79,7 +79,7 @@ C
 !***********************************************************************
       gsfdecl = 0
 
-      Version_gsflow_modflow = 'gsflow_modflow.f 2018-12-20 12:20:00Z'
+      Version_gsflow_modflow = 'gsflow_modflow.f 2019-01-28 11:26:00Z'
 C
 C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
       IF ( Print_debug>-2 )
@@ -967,8 +967,6 @@ C7C6---JUMP TO END OF PROGRAM IF CONVERGENCE WAS NOT ACHIEVED.
      &           PRINT 9004, Nowyear, Nowmonth, Nowday, Convfail_cnt
             WRITE (Logunt, 9004) Nowyear, Nowmonth, Nowday, Convfail_cnt
           ENDIF
-!----INCREMENT CONTINUOUS TIME COUNTER FOR MODFLOW
-!          TOTIM = TOTIM + DELT    
 C
 C-----END OF TIME STEP (KSTP) AND STRESS PERIOD (KPER) LOOPS
 !gsf 90   CONTINUE
@@ -1535,8 +1533,6 @@ C
             Steady_state = 1
             IF ( gsfrun()/=0 ) STOP 'ERROR, steady state failed'
             Steady_state = 0
- !           TOTIM = plen !RGN 9/4/2018 TOTIM needs to stay in MF time units
-            TOTIM = PERLEN(i)  !RGN 9/4/2018 TOTIM needs to stay in MF time units
             IF ( ICNVG==0 ) THEN
               PRINT 222, KKITER
               WRITE ( Logunt, 222 ) KKITER

@@ -6,21 +6,34 @@ MFNWTLIB = $(LIBDIR)/libmfnwt.a
 
 LIBOBJS = \
         utl7.o \
+        mach_mod.o \
+        NWT1_module.o \
         gwf2bas7_NWT.o \
+		nogmg.o \
         pcg7_NWT.o \
         sip7_NWT.o \
         de47_NWT.o \
         gwf2bcf7.o \
         gwf2lpf7.o \
         gwf2huf7.o \
+        gwf2drn7_NWT.o \
+        gwf2drt7.o \
+        gwf2riv7_NWT.o \
+        gwf2res7.o \
+        gwf2sub7_NWT.o \
+        gwf2str7.o \
+        gwf2ets7.o \
+        gwf2evt7.o \
+        gwf2rch7.o \
+		obs2bas7.o \
+		gwf2ibs7.o \
         hufutl7.o \
-        mach_mod.o \
-        NWT1_module.o \
+        gwf2gag7.o \
+        gwf2ag1_NWT.o \
         gwf2upw1.o \
         gwfuzfmodule_NWT.o \
         gwfsfrmodule_NWT.o \
         gwflakmodule_NWT.o \
-        gwf_other_modules.o \
         gwf2lak7_NWT.o \
         gwf2sfr7_NWT.o \
         gwf2uzf1_NWT.o \
@@ -37,14 +50,15 @@ LIBOBJS = \
         NWT1_solver.o \
         gwf2chd7.o \
         gwf2hfb7_NWT.o \
-        gwf2gag7.o \
         gwf2swi27.o \
         gwf2swt7.o \
         lmt8_NWT.o \
         parutl7.o \
-	obs2bas7.o \
-	obs2chd7.o \
-	obs2ghb7.o \
+        gwf2hydmod7.o \
+		obs2chd7.o \
+		obs2ghb7.o \
+		obs2riv7.o \
+		obs2str7.o \
         Irestart.o
 
 all: lib
@@ -151,10 +165,29 @@ sip7_NWT.o: sip7_NWT.f gwf2bas7_NWT.o
 Irestart.o: Irestart.f gwfuzfmodule_NWT.o gwfsfrmodule_NWT.o gsfmodflow.mod
 	$(FC) $(FFLAGS) -c Irestart.f
 
+gwf2ag1_NWT.o: gwf2ag1_NWT.f prms_module.mod gwfbasmodule.mod gsfmodflow.mod prms_flowvars.mod prms_climatevars.mod prms_basin.mod
+	$(FC) $(FFLAGS) -c gwf2ag1_NWT.f
+
+prms_flowvars.mod:
+	$(CD) ../prms;make climateflow.o
+	$(CP) ../prms/prms_flowvars.mod .
+
+prms_climatevars.mod:
+	$(CD) ../prms;make climateflow.o
+	$(CP) ../prms/prms_climatevars.mod .
+	
+prms_module.mod:
+	$(CD) ../gsflow;make prms_module.mod
+	$(CP) ../gsflow/prms_module.mod .
+	
+prms_basin.mod:
+	$(CD) ../gsflow;make prms_basin.mod
+	$(CP) ../gsflow/prms_basin.mod .
+
 gsfmodflow.mod:
 	$(CD) ../gsflow;make gsfmodflow.mod
 	$(CP) ../gsflow/gsfmodflow.mod .
-
+	
 de47_NWT.o: de47_NWT.f gwf2bas7_NWT.o
 	$(FC) $(FFLAGS) -c de47_NWT.f
 
@@ -185,15 +218,14 @@ gwflakmodule_NWT.o: gwflakmodule_NWT.f
 global.mod: gwf2bas7_NWT.o
 	$(FC) $(FFLAGS) -c gwf2bas7_NWT.f
 
-lmt8_NWT.o: lmt8_NWT.f gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwfuzfmodule_NWT.o gwflakmodule_NWT.o gwf2bcf7.o gwf_other_modules.o
+lmt8_NWT.o: lmt8_NWT.f gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwfuzfmodule_NWT.o gwflakmodule_NWT.o gwf2bcf7.o
 	$(FC) $(FFLAGS) -c lmt8_NWT.f
 
-gwf2swi27.o: gwf2swi27.f gwf2bas7_NWT.o gwf2bcf7.o gwf2upw1.o gwf2lpf7.o gwf_other_modules.o
+gwf2swi27.o: gwf2swi27.f gwf2bas7_NWT.o gwf2bcf7.o gwf2upw1.o gwf2lpf7.o
 	$(FC) $(FFLAGS) -c gwf2swi27.f
 
 gwf2swt7_NWT.o: gwf2swt7.f gwf2bas7_NWT.o
 	$(FC) $(FFLAGS) -c gwf2swt7.f
 
-gwf_other_modules.o: gwf_other_modules.f90
-	$(FC) $(FFLAGS) -c gwf_other_modules.f90
+
 #  end

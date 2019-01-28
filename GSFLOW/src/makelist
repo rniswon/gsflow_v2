@@ -48,7 +48,8 @@ RM		= rm -f
 AR  		= ar ruv
 RANLIB		= ranlib
 MAKE		= make
-LN		= ln -s
+#LN		= ln -s
+LN		= cp
 CD		= cd
 CP		= cp
 

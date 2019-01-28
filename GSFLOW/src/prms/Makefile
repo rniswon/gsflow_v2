@@ -227,9 +227,6 @@ dynamic_param_read.o: dynamic_param_read.f90 prms_module.mod prms_basin.mod prms
 water_use_read.o: water_use_read.f90 prms_module.mod prms_basin.mod prms_set_time.mod prms_flowvars.mod
 	$(FC) -c $(FFLAGS) water_use_read.f90
 
-basin_sum.o: basin_sum.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_intcp.mod prms_snow.mod prms_srunoff.mod prms_gwflow.mod prms_climatevars.mod prms_set_time.mod prms_obs.mod prms_routing.mod
-	$(FC) -c $(FFLAGS) basin_sum.f90
-
 convert_params.o: convert_params.f90 prms_module.mod
 	$(FC) -c $(FFLAGS) convert_params.f90
 
