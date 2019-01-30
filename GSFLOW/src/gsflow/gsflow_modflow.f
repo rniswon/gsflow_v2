@@ -79,7 +79,7 @@ C
 !***********************************************************************
       gsfdecl = 0
 
-      Version_gsflow_modflow = 'gsflow_modflow.f 2019-01-28 11:26:00Z'
+      Version_gsflow_modflow = 'gsflow_modflow.f 2019-01-30 13:15:00Z'
 C
 C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
       IF ( Print_debug>-2 )
@@ -1014,14 +1014,12 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Model, Timestep, Logunt, Save_vars_to_file,
-     &    First_timestep
+      USE PRMS_MODULE, ONLY: Model, Timestep, Logunt, Save_vars_to_file
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
 !gsf  USE PCGN
       USE GWFNWTMODULE, ONLY:LINMETH
       IMPLICIT NONE
       EXTERNAL RESTART1WRITE, gsflow_modflow_restart
-      INTEGER istep
 !***********************************************************************
       gsfclean = 0
 C
@@ -1110,13 +1108,12 @@ c      IF(IUNIT(14).GT.0) CALL LMG7DA(IGRID)
       CALL GWF2BAS7DA(IGRID)
 C
       IF ( Model==0 ) THEN
-        istep = Timestep - First_timestep
-        PRINT 9001, istep, Convfail_cnt, Iterations, Sziters,
-     &              FLOAT(Iterations)/FLOAT(istep),
-     &              FLOAT(Sziters)/FLOAT(istep), Max_iters, Max_sziters
-        WRITE ( Logunt, 9001 ) istep, Convfail_cnt, Iterations, Sziters,
-     &          FLOAT(Iterations)/FLOAT(istep),
-     &          FLOAT(Sziters)/FLOAT(istep), Max_iters, Max_sziters
+        PRINT 9001, Timestep, Convfail_cnt, Iterations, Sziters,
+     &            FLOAT(Iterations)/FLOAT(Timestep),
+     &            FLOAT(Sziters)/FLOAT(Timestep), Max_iters, Max_sziters
+        WRITE ( Logunt, 9001 ) Timestep, Convfail_cnt, Iterations,
+     &          Sziters, FLOAT(Iterations)/FLOAT(Timestep),
+     &          FLOAT(Sziters)/FLOAT(Timestep), Max_iters, Max_sziters
         IF ( Stopcount>0 ) THEN
           PRINT 9005, Stopcount
           WRITE (Logunt, 9005) Stopcount
@@ -1451,7 +1448,7 @@ C
       USE GSFMODFLOW, ONLY: Modflow_skip_time, Modflow_skip_stress,
      &    Modflow_time_in_stress, Stress_dates, Modflow_time_zero,
      &    Steady_state, ICNVG, KPER, KSTP, Mft_to_days, KPERSTART,
-     &    Modflow_skip_time_step
+     &    Modflow_skip_time_step, IGRID
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Kkiter, Model,
      &    Starttime, Start_year, Start_month, Start_day, Logunt,
      &    Print_debug
@@ -1463,7 +1460,7 @@ C
       INTRINSIC :: INT
       DOUBLE PRECISION, EXTERNAL :: getjulday
 ! Local Variables
-      INTEGER :: i, j
+      INTEGER :: i, j, n, nstress
       DOUBLE PRECISION :: seconds, start_jul, mfstrt_jul, plen, time
       DOUBLE PRECISION :: kstpskip
 !***********************************************************************
@@ -1517,7 +1514,6 @@ C
       IF ( Mft_to_days>1.0 ) PRINT *, 'CAUTION, MF time step /= 1 day'
 
       IF ( Model>0 ) PRINT *, ' '
-      TOTIM = 0.0
       KPER = 0
       KSTP = 0
       Steady_state = 0
@@ -1540,8 +1536,8 @@ C
               PRINT 223, KKITER
               WRITE ( Logunt, 223 ) KKITER
             ENDIF
-          ELSE
-            CALL GWF2BAS7OC(1,1,1,IUNIT(12),1)  !assumes only SP1 can be SS
+          ELSE ! call OC as SS is skipped
+            CALL GWF2BAS7OC(1,1,1,IUNIT(12),IGRID)  !assumes only SP1 can be SS
           ENDIF
         ENDIF
         Stress_dates(i+1) = Stress_dates(i) + plen
@@ -1572,22 +1568,25 @@ C
         ENDDO
 !        Modflow_time_in_stress = Modflow_time_in_stress - time   !RGN
         Modflow_time_in_stress = Modflow_skip_time - kstpskip
-        IF ( Modflow_time_in_stress<0.0D0 ) Modflow_time_in_stress = 0.0D0
+        IF ( Modflow_time_in_stress<0.0D0 ) Modflow_time_in_stress=0.0D0
         ! skip stress periods from modflow_time_zero to start_time
         IF ( Modflow_skip_stress - ISSFLG(1) == 0 ) THEN
           KPER = 1
           IF ( ISSFLG(1)==0 ) CALL READ_STRESS()
         ELSE
-          DO i = 1, Modflow_skip_stress - ISSFLG(1)   !RGN because SP1 already read if SS during first period.
+          nstress = Modflow_skip_stress - ISSFLG(1)
+          DO i = 1, nstress   !RGN because SP1 already read if SS during first period.
             KPER = KPER + 1 ! set to next stress period
             IF ( ISSFLG(i) == 0 ) CALL READ_STRESS()
-            DO KSTP = 1, NSTP(KPER)
-              CALL GWF2BAS7OC(KSTP,KPER,1,IUNIT(12),1)  !RGN 4/4/2018 skip through OC file
+            n = NSTP(KPER)
+            IF ( i==nstress ) n = Modflow_time_in_stress
+            DO KSTP = 1, n
+              CALL GWF2BAS7OC(KSTP,KPER,1,IUNIT(12),IGRID)  !RGN 4/4/2018 skip through OC file
             END DO
           ENDDO
+!        print *, nstress, n, Modflow_time_in_stress, Modflow_skip_stress
         ENDIF
         KPERSTART = KPER
-        TOTIM = TOTIM + Modflow_skip_time/Mft_to_days ! TOTIM includes SS time as set above, rsr
       ELSEIF ( Init_vars_from_file==0 .AND. ISSFLG(1)/=1) THEN
         !start with TR and no restart and no skip time
         KPER = KPER + 1 ! set to next stress period

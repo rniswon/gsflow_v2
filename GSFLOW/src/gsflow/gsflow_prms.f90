@@ -24,7 +24,7 @@
       INTEGER, SAVE :: Inputerror_flag, Timestep
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, PRMS4_flag
-      INTEGER, SAVE :: Grid_flag, Logunt, First_timestep
+      INTEGER, SAVE :: Grid_flag, Logunt
       INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, PRMS_flag, GSFLOW_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Nwateruse, Nexternal, Nconsumed, Npoigages, Prms_warmup
@@ -99,7 +99,7 @@
         ENDIF
         Process_flag = 1
 
-        PRMS_versn = 'gsflow_prms.f90 2018-12-20 12:20:00Z'
+        PRMS_versn = 'gsflow_prms.f90 2019-01-30 13:14:00Z'
 
         IF ( check_dims()/=0 ) STOP
 
@@ -179,12 +179,8 @@
 
         Kkiter = 1 ! set for PRMS-only mode
 
-        IF ( Init_vars_from_file==0 ) THEN
-          Timestep = 0
-        ELSE
-          CALL call_modules_restart(1)
-        ENDIF
-        First_timestep = Timestep
+        Timestep = 0
+        IF ( Init_vars_from_file>0 ) CALL call_modules_restart(1)
 
       ELSEIF ( Process(:4)=='init' ) THEN
         Process_flag = 2
@@ -1395,20 +1391,20 @@
       ! Functions
       INTRINSIC TRIM
       ! Local Variables
-      INTEGER :: nhru_test, dprst_test, nsegment_test, temp_test, et_test, ierr
+      INTEGER :: nhru_test, dprst_test, nsegment_test, temp_test, et_test, ierr, time_step
       INTEGER :: cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: model_test
       CHARACTER(LEN=11) :: module_name
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
+        WRITE ( Restart_outunit ) time_step, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
      &          Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
       ELSE
         ierr = 0
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Timestep, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
+        READ ( Restart_inunit ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
      &         cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
         IF ( TRIM(Model_mode)/=TRIM(model_test) ) THEN
           PRINT *, 'ERROR, Initial Conditions File saved for model_mode=', model_test
