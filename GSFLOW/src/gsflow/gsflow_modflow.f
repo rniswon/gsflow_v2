@@ -534,61 +534,9 @@ C7------SIMULATE EACH STRESS PERIOD.
       gsflag = 0
       IF ( Model.EQ.0 .AND. iss==0 ) gsflag = 1
 C
-C7C-----SIMULATE EACH TIME STEP.
-!gsf    DO 90 KSTP = 1, NSTP(KPER)
-          KSTP = KSTP + 1
-          KKSTP = KSTP
+C7D-----CALL READ_TIME TO READ AND PREPARE FOR TIME STEPS
+          CALL READ_TIME()
           IF ( IUNIT(63).GT.0 )itreal = 0
-C
-C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
-          IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(1,Igrid)
-          CALL GWF2BAS7AD(KKPER,KKSTP,IGRID)
-          IF(IUNIT(62).GT.0) CALL GWF2UPW1AD(IGRID)
-          IF(IUNIT(20).GT.0) CALL GWF2CHD7AD(KKPER,IGRID)
-          IF(IUNIT(1).GT.0) CALL GWF2BCF7AD(KKPER,IGRID)
-          IF(IUNIT(17).GT.0) CALL GWF2RES7AD(KKSTP,KKPER,IGRID)
-          IF(IUNIT(23).GT.0) CALL GWF2LPF7AD(KKPER,IGRID)
-          IF(IUNIT(37).GT.0) CALL GWF2HUF7AD(KKPER,IGRID)
-          IF(IUNIT(16).GT.0) CALL GWF2FHB7AD(IGRID)
-          IF(IUNIT(22).GT.0) CALL GWF2LAK7AD(KKPER,KKSTP,IUNIT(15),
-     1                                           IGRID)
-          IF(IUNIT(55).GT.0) CALL GWF2UZF1AD(IUNIT(55), KKPER, KKSTP, 
-     1                                       Igrid)
-          IF(IUNIT(65).GT.0) CALL GWF2SWI2AD(KKSTP,KKPER,IGRID)  !SWI2
-          IF( IUNIT(44).GT.0 ) CALL GWF2SFR7AD(IUNIT(44),IUNIT(22),
-     2                                         KKSTP,KKPER,IGRID)
-          IF(IUNIT(50).GT.0) THEN
-            IF (IUNIT(1).GT.0) THEN
-              CALL GWF2MNW27BCF(KPER,IGRID)
-            ELSE IF (IUNIT(23).GT.0) THEN
-              CALL GWF2MNW27LPF(KPER,IGRID)
-            ELSE IF(IUNIT(37).GT.0) THEN
-              CALL GWF2MNW27HUF(KPER,IGRID)
-            ELSE IF(IUNIT(62).GT.0) THEN
-              CALL GWF2MNW27UPW(KPER,IGRID)
-            ELSE
-              WRITE(IOUT,1000)
- 1000         FORMAT(/1X,
-     &      '***ERROR: MNW2 PACKAGE DOES NOT SUPPORT',/,
-     &      ' SELECTED FLOW PACKAGE',/,
-     &  ' (MNW2 DOES FULLY SUPPORT BCF, LPF, HUF, AND UPW PACKAGES)',/,
-     &      ' -- STOP EXECUTION')
-              CALL USTOP('MNW2 error-flow package')
-            END IF
-            CALL GWF2MNW27AD(KKSTP,KKPER,IUNIT(62),IGRID)
-          END IF
-          IF(IUNIT(52).GT.0) CALL GWF2MNW17AD(IUNIT(1),IUNIT(23),
-     1                                  IUNIT(37),IUNIT(62),IGRID)
-!          IF(IUNIT(61).GT.0) THEN                                       !FMP2AD CALL ADDED BY SCHMID
-!             IF(IRTFL.EQ.3.OR.ICUFL.EQ.3.OR.IPFL.EQ.3
-!     1                           .OR.IEBFL.EQ.1.OR.IEBFL.EQ.3)
-!     2       CALL FMP2AD(ISTARTFL,KKPER,IGRID)
-!          ENDIF     
-          IF(IUNIT(64).GT.0) CALL GWF2SWR7AD(KKPER,KKSTP,
-     2                                       IGRID,IUNIT(54))  !SWR - JDH
-!gsf          IF(IUNIT(66).GT.0 .AND. ISSFLG(KPER)==0 ) 
-!gsf     1                            CALL GWF2AWU7AD(IUNIT(66),KKPER)
-
           IF ( Model.EQ.2 ) THEN
 C
 C---------INDICATE IN PRINTOUT THAT SOLUTION IS FOR HEADS
@@ -1326,7 +1274,75 @@ C     Write times to file if requested
 C
       RETURN
       END SUBROUTINE GLO1BAS6ET
+!
+!***********************************************************************
+!     READ AND PREPARE INFORMATION FOR STRESS PERIOD.
+!***********************************************************************
+      SUBROUTINE READ_TIME()
+      USE GSFMODFLOW, ONLY: IGRID, KKPER, KPER, NSOL, IOUTS, KKSTP,
+     &                      Mft_to_sec, KSTP
+      USE GLOBAL, ONLY: IUNIT, ISSFLG, IOUT
+      USE PRMS_MODULE, ONLY: Model
+      USE PRMS_SET_TIME, ONLY: Timestep_seconds
+      USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_BASIN, ONLY: NEARZERO
+      IMPLICIT NONE
+      INTRINSIC ABS
+!***********************************************************************
+      
+C
+C7C-----RUN THROUGH AD SUBROUTINES FOR FAST FORWARDING TO START TIME
+C       OR FOR SOLVING FOR HEAD DURING EACH TIME STEP.
+C
+C
+C7C-----SIMULATE EACH TIME STEP.
+!gsf    DO 90 KSTP = 1, NSTP(KPER)
+          KSTP = KSTP + 1
+          KKSTP = KSTP
+C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
+          IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(1,Igrid)
+          CALL GWF2BAS7AD(KKPER,KKSTP,IGRID)
+          IF(IUNIT(62).GT.0) CALL GWF2UPW1AD(IGRID)
+          IF(IUNIT(20).GT.0) CALL GWF2CHD7AD(KKPER,IGRID)
+          IF(IUNIT(1).GT.0) CALL GWF2BCF7AD(KKPER,IGRID)
+          IF(IUNIT(17).GT.0) CALL GWF2RES7AD(KKSTP,KKPER,IGRID)
+          IF(IUNIT(23).GT.0) CALL GWF2LPF7AD(KKPER,IGRID)
+          IF(IUNIT(37).GT.0) CALL GWF2HUF7AD(KKPER,IGRID)
+          IF(IUNIT(16).GT.0) CALL GWF2FHB7AD(IGRID)
+          IF(IUNIT(22).GT.0) CALL GWF2LAK7AD(KKPER,KKSTP,IUNIT(15),
+     1                                           IGRID)
+          IF(IUNIT(55).GT.0) CALL GWF2UZF1AD(IUNIT(55), KKPER, KKSTP, 
+     1                                       Igrid)
+          IF(IUNIT(65).GT.0) CALL GWF2SWI2AD(KKSTP,KKPER,IGRID)  !SWI2
+          IF( IUNIT(44).GT.0 ) CALL GWF2SFR7AD(IUNIT(44),IUNIT(22),
+     2                                         KKSTP,KKPER,IGRID)
+          IF(IUNIT(50).GT.0) THEN
+            IF (IUNIT(1).GT.0) THEN
+              CALL GWF2MNW27BCF(KPER,IGRID)
+            ELSE IF (IUNIT(23).GT.0) THEN
+              CALL GWF2MNW27LPF(KPER,IGRID)
+            ELSE IF(IUNIT(37).GT.0) THEN
+              CALL GWF2MNW27HUF(KPER,IGRID)
+            ELSE IF(IUNIT(62).GT.0) THEN
+              CALL GWF2MNW27UPW(KPER,IGRID)
+            ELSE
+              WRITE(IOUT,1000)
+ 1000         FORMAT(/1X,
+     &      '***ERROR: MNW2 PACKAGE DOES NOT SUPPORT',/,
+     &      ' SELECTED FLOW PACKAGE',/,
+     &  ' (MNW2 DOES FULLY SUPPORT BCF, LPF, HUF, AND UPW PACKAGES)',/,
+     &      ' -- STOP EXECUTION')
+              CALL USTOP('MNW2 error-flow package')
+            END IF
+            CALL GWF2MNW27AD(KKSTP,KKPER,IUNIT(62),IGRID)
+          END IF
+          IF(IUNIT(52).GT.0) CALL GWF2MNW17AD(IUNIT(1),IUNIT(23),
+     1                                  IUNIT(37),IUNIT(62),IGRID) 
+          IF(IUNIT(64).GT.0) CALL GWF2SWR7AD(KKPER,KKSTP,
+     2                                       IGRID,IUNIT(54))  !SWR - JDH
 
+      END SUBROUTINE READ_TIME
+!
 !***********************************************************************
 !     READ AND PREPARE INFORMATION FOR STRESS PERIOD.
 !***********************************************************************
@@ -1451,7 +1467,7 @@ C
       USE GSFMODFLOW, ONLY: Modflow_skip_time, Modflow_skip_stress,
      &    Modflow_time_in_stress, Stress_dates, Modflow_time_zero,
      &    Steady_state, ICNVG, KPER, KSTP, Mft_to_days, KPERSTART,
-     &    Modflow_skip_time_step
+     &    Modflow_skip_time_step, IGRID
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Kkiter, Model,
      &    Starttime, Start_year, Start_month, Start_day, Logunt,
      &    Print_debug
@@ -1517,7 +1533,7 @@ C
       IF ( Mft_to_days>1.0 ) PRINT *, 'CAUTION, MF time step /= 1 day'
 
       IF ( Model>0 ) PRINT *, ' '
-      TOTIM = 0.0
+!      TOTIM = 0.0
       KPER = 0
       KSTP = 0
       Steady_state = 0
@@ -1580,18 +1596,24 @@ C
         ELSE
           DO i = 1, Modflow_skip_stress - ISSFLG(1)   !RGN because SP1 already read if SS during first period.
             KPER = KPER + 1 ! set to next stress period
-            IF ( ISSFLG(i) == 0 ) CALL READ_STRESS()
+            IF ( ISSFLG(i) == 0 ) THEN
+                CALL READ_STRESS()
+            END IF
             DO KSTP = 1, NSTP(KPER)
+              CALL GWF2BAS7AD(KPER,KSTP,IGRID)
               CALL GWF2BAS7OC(KSTP,KPER,1,IUNIT(12),1)  !RGN 4/4/2018 skip through OC file
             END DO
           ENDDO
         ENDIF
         KPERSTART = KPER
-        TOTIM = TOTIM + Modflow_skip_time/Mft_to_days ! TOTIM includes SS time as set above, rsr
+ !       TOTIM = TOTIM + Modflow_skip_time/Mft_to_days ! TOTIM includes SS time as set above, rsr
       ELSEIF ( Init_vars_from_file==0 .AND. ISSFLG(1)/=1) THEN
         !start with TR and no restart and no skip time
         KPER = KPER + 1 ! set to next stress period
         CALL READ_STRESS()
+        IF ( Modflow_skip_time > 0 ) then
+          CALL GWF2BAS7AD(KPER,KSTP,IGRID)
+        end if
       ENDIF
       KSTP = INT( Modflow_time_in_stress ) ! caution, in days
       Modflow_skip_time_step = Modflow_skip_time_step + KSTP ! caution, in days
