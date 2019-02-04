@@ -99,7 +99,7 @@
         ENDIF
         Process_flag = 1
 
-        PRMS_versn = 'gsflow_prms.f90 2019-01-30 13:14:00Z'
+        PRMS_versn = 'gsflow_prms.f90 2019-02-01 14:31:00Z'
 
         IF ( check_dims()/=0 ) STOP
 
@@ -1398,7 +1398,7 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) time_step, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
+        WRITE ( Restart_outunit ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
      &          Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
       ELSE
         ierr = 0

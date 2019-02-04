@@ -34,7 +34,7 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2018-12-20
+GSFLOW Computation Order       gsflow_prms                2019-02-01
 Basin Definition               basin                      2018-04-06
 Cascading Flow                 cascade                    2018-05-25
 Common States and Fluxes       climateflow                2018-12-13
@@ -96,5 +96,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  *************************************************************
  Total for run     668.938  375.975    9.300  286.763  260.348
  *************************************************************
-Execution elapsed time    0 minutes  0.90 seconds
+Execution elapsed time    0 minutes  0.88 seconds
 

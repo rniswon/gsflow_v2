@@ -56,7 +56,7 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2018-12-20
+GSFLOW Computation Order       gsflow_prms                2019-02-01
 Basin Definition               basin                      2018-04-06
 Cascading Flow                 cascade                    2018-05-25
 Common States and Fluxes       climateflow                2018-12-13
@@ -75,10 +75,10 @@ Soil Zone Computations         soilzone                   2018-09-19
 GSFLOW PRMS to MODFLOW         gsflow_prms2mf             2017-11-15
 GSFLOW MODFLOW to PRMS         gsflow_mf2prms             2017-11-15
 GSFLOW Output Budget Summary   gsflow_budget              2018-03-02
-GSFLOW Output CSV Summary      gsflow_sum                 2018-02-12
+GSFLOW Output CSV Summary      gsflow_sum                 2019-01-30
 Output Summary                 subbasin                   2018-04-25
 ====================================================================
-GSFLOW MODFLOW main            gsflow_modflow             2019-01-28
+GSFLOW MODFLOW main            gsflow_modflow             2019-01-30
 ====================================================================
 MODFLOW Packages
 ====================================================================
@@ -17647,8 +17647,8 @@ Date: 1996/09/30; Stress:  2; Step:  5844; Simulation step: 5844
                   MF iterations:       18; SZ iterations:     18
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/01/28 11:50:49
- Elapsed run time: 17 Minutes, 24.551 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/02/04 12:05:48
+ Elapsed run time: 17 Minutes, 49.970 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         65678;  SZ iterations:           65561

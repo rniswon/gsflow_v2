@@ -34,7 +34,7 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2018-12-20
+GSFLOW Computation Order       gsflow_prms                2019-02-01
 Basin Definition               basin                      2018-04-06
 Cascading Flow                 cascade                    2018-05-25
 Common States and Fluxes       climateflow                2018-12-13
@@ -53,10 +53,10 @@ Soil Zone Computations         soilzone                   2018-09-19
 GSFLOW PRMS to MODFLOW         gsflow_prms2mf             2017-11-15
 GSFLOW MODFLOW to PRMS         gsflow_mf2prms             2017-11-15
 GSFLOW Output Budget Summary   gsflow_budget              2018-03-02
-GSFLOW Output CSV Summary      gsflow_sum                 2018-02-12
+GSFLOW Output CSV Summary      gsflow_sum                 2019-01-30
 Output Summary                 subbasin                   2018-04-25
 ====================================================================
-GSFLOW MODFLOW main            gsflow_modflow             2019-01-28
+GSFLOW MODFLOW main            gsflow_modflow             2019-01-30
 UZF-NWT Package                gwf2uzf1_NWT               2017-03-08
 SFR-NWT Package                gwf2sfr7_NWT               2017-03-08
 

@@ -1,7 +1,7 @@
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
- DATE: 12 08 1983              CUMULATIVE TIME STEP:    1164
- MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:    1163     ITERATIONS:       8
+ DATE: 12 08 1983              CUMULATIVE TIME STEP:    1163
+ MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:       7     ITERATIONS:       8
 
  -----------------------------------------------------------------------------------
 
@@ -42,8 +42,8 @@
 
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
- DATE: 12 15 1983              CUMULATIVE TIME STEP:    1171
- MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:    1170     ITERATIONS:       8
+ DATE: 12 15 1983              CUMULATIVE TIME STEP:    1170
+ MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:      14     ITERATIONS:       8
 
  -----------------------------------------------------------------------------------
 
@@ -84,8 +84,8 @@
 
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
- DATE: 12 22 1983              CUMULATIVE TIME STEP:    1178
- MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:    1177     ITERATIONS:       9
+ DATE: 12 22 1983              CUMULATIVE TIME STEP:    1177
+ MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:      21     ITERATIONS:       9
 
  -----------------------------------------------------------------------------------
 
@@ -126,8 +126,8 @@
 
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
- DATE: 12 29 1983              CUMULATIVE TIME STEP:    1185
- MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:    1184     ITERATIONS:       9
+ DATE: 12 29 1983              CUMULATIVE TIME STEP:    1184
+ MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:      28     ITERATIONS:       9
 
  -----------------------------------------------------------------------------------
 
@@ -168,8 +168,8 @@
 
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
- DATE: 01 05 1984              CUMULATIVE TIME STEP:    1192
- MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:    1191     ITERATIONS:       8
+ DATE: 01 05 1984              CUMULATIVE TIME STEP:    1191
+ MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:      35     ITERATIONS:       8
 
  -----------------------------------------------------------------------------------
 
@@ -210,8 +210,8 @@
 
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
- DATE: 01 12 1984              CUMULATIVE TIME STEP:    1199
- MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:    1198     ITERATIONS:       8
+ DATE: 01 12 1984              CUMULATIVE TIME STEP:    1198
+ MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:      42     ITERATIONS:       8
 
  -----------------------------------------------------------------------------------
 
@@ -252,8 +252,8 @@
 
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
- DATE: 01 19 1984              CUMULATIVE TIME STEP:    1206
- MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:    1205     ITERATIONS:       9
+ DATE: 01 19 1984              CUMULATIVE TIME STEP:    1205
+ MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:      49     ITERATIONS:       9
 
  -----------------------------------------------------------------------------------
 
@@ -294,8 +294,8 @@
 
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
- DATE: 01 26 1984              CUMULATIVE TIME STEP:    1213
- MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:    1212     ITERATIONS:      12
+ DATE: 01 26 1984              CUMULATIVE TIME STEP:    1212
+ MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:      56     ITERATIONS:      12
 
  -----------------------------------------------------------------------------------
 

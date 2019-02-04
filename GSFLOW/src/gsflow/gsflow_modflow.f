@@ -450,7 +450,6 @@ C  Observation allocate and read    rgn 5/4/2018 MOVED IN ORDER TO SKIP STEPS FO
       IF(IUNIT(38).GT.0) CALL OBS2CHD7AR(IUNIT(38),IGRID)
 C
       KPER = 1
-      KKPER = KPER
       KPERSTART = 1
       ! run SS if needed, read to current stress period, read restart if needed
       CALL SET_STRESS_DATES()
@@ -459,6 +458,7 @@ C
       Delt_save = DELT
       IF ( ISSFLG(1).EQ.1 ) DELT = 1.0/Mft_to_days
 C
+      KKPER = KPER
       IF ( Model==2 ) THEN
         Kkper_new = GET_KPER()
         Kper_mfo = Kkper_new
@@ -1514,6 +1514,7 @@ C
       IF ( Mft_to_days>1.0 ) PRINT *, 'CAUTION, MF time step /= 1 day'
 
       IF ( Model>0 ) PRINT *, ' '
+      TOTIM = 0.0
       KPER = 0
       KSTP = 0
       Steady_state = 0
@@ -1529,6 +1530,8 @@ C
             Steady_state = 1
             IF ( gsfrun()/=0 ) STOP 'ERROR, steady state failed'
             Steady_state = 0
+ !           TOTIM = plen !RGN 9/4/2018 TOTIM needs to stay in MF time units
+            TOTIM = PERLEN(i)  !RGN 9/4/2018 TOTIM needs to stay in MF time units
             IF ( ICNVG==0 ) THEN
               PRINT 222, KKITER
               WRITE ( Logunt, 222 ) KKITER
@@ -1587,6 +1590,7 @@ C
 !        print *, nstress, n, Modflow_time_in_stress, Modflow_skip_stress
         ENDIF
         KPERSTART = KPER
+        TOTIM = TOTIM + Modflow_skip_time/Mft_to_days ! TOTIM includes SS time as set above, rsr
       ELSEIF ( Init_vars_from_file==0 .AND. ISSFLG(1)/=1) THEN
         !start with TR and no restart and no skip time
         KPER = KPER + 1 ! set to next stress period
