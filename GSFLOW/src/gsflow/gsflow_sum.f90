@@ -108,7 +108,7 @@
 !***********************************************************************
       gsfsumdecl = 0
 
-      Version_gsflow_sum = 'gsflow_sum.f90 2018-02-12 16:10:00Z'
+      Version_gsflow_sum = 'gsflow_sum.f90 2019-01-30 13:14:00Z'
       CALL print_module(Version_gsflow_sum, 'GSFLOW Output CSV Summary   ', 90)
       MODNAME = 'gsflow_sum'
 
@@ -1027,7 +1027,7 @@
       text9 = '    SATURATED ZONE'
       text10 ='             LAKES'
       text11 ='           STREAMS'
-      WRITE (Gsf_unt, 9001) Nowmonth, Nowday, Nowyear, Nstep, Kkper, Kkstp, KKITER
+      WRITE (Gsf_unt, 9001) Nowmonth, Nowday, Nowyear, Kkstp, Kkper, Nstep, KKITER
 !
 !1------PRINT CUMULATIVE VOLUMES AND RATES FOR INFLOW.
       WRITE (Gsf_unt, 9002)
