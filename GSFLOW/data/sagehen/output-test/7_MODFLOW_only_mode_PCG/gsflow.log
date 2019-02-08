@@ -15,7 +15,7 @@
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
- Run start date and time (yyyy/mm/dd hh:mm:ss): 2019/02/04 13:37:13
+ Run start date and time (yyyy/mm/dd hh:mm:ss): 2019/02/08 15:14:01
 
 GSFLOW MODFLOW main            gsflow_modflow             2019-01-30
 ====================================================================
@@ -30,11 +30,11 @@ Using NAME file: ../input/modflow/sagehen.mf.nam
 Using Solver Package: PCG 
  Solving:  Stress period:     1    Time step:     1    Groundwater-Flow Eqn.
 
-Steady state simulation successful, used 357 iterations
+Steady state simulation successful, used 351 iterations
 
  Solving:  Stress period:     2    Time step:     1    Groundwater-Flow Eqn.
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/02/04 13:37:15
- Elapsed run time:  2.124 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/02/08 15:14:04
+ Elapsed run time:  2.268 Seconds
 
 Normal termination of simulation
