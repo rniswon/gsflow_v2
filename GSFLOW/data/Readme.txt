@@ -18,7 +18,7 @@ demonstrates use of the GSFLOW restart option. The problem is described in
 Regan and others (2015, USGS TM 6-D3).
 
 3. tahoe_restart: This sample GSFLOW model is for the Lake Tahoe watershed
-and demonsatrates use of the GSFLOW restart option. The problem is described
+and demonstrates use of the GSFLOW restart option. The problem is described
 in Regan and others (2015, USGS TM 6-D3).
 
 
