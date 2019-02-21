@@ -525,10 +525,12 @@ C7------SIMULATE EACH STRESS PERIOD.
           KSTP = 0
         END IF
         CALL READ_STRESS() ! second time in run, read restart
-        IF ( ISSFLG(KKPER).EQ.1 ) STOP
+        IF ( Model .NE. 2 ) THEN    !RGN added check for MF only mode 2/21/19
+          IF ( ISSFLG(KKPER).EQ.1 ) STOP
      &       'ERROR, cannot run steady state after first stress period.'
-        IF ( ISSFLG(1).EQ.1 ) Delt_save = DELT
-        IF ( DELT.NE.Delt_save ) STOP 'Error, cannot change DELT'
+          IF ( ISSFLG(1).EQ.1 ) Delt_save = DELT
+          IF ( DELT.NE.Delt_save ) STOP 'Error, cannot change DELT'
+        END IF
       ENDIF
       iss = ISSFLG(KKPER)
       gsflag = 0
