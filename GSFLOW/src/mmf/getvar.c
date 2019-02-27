@@ -76,7 +76,7 @@ long getvar (char *module, char *name, long maxsize, char *type, double *value) 
   
 /*
   vkey = (char *) umalloc(strlen(module) + strlen(name) + 2);
-  (void)strcpy(vkey, module);
+  (void)strncpy(vkey, module, strlen(module) + strlen(name) + 2);
   strcat(strcat(vkey, "."), name);
 */
 //  vkey = strdup (name);

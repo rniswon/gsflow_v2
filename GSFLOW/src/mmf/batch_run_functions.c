@@ -127,10 +127,10 @@ char *single_run_pre_init () {
 * Open statvar file, and store number of variables and variable names
 */
   if (stats_flag) {
-    (void)sprintf(statvar_path, "%s", *((char **) control_var("stat_var_file")));
+    (void)snprintf(statvar_path, MAXPATHLEN, "%s", *((char **) control_var("stat_var_file")));
 
     if ((statvar_file = fopen(statvar_path, "w")) == NULL) {
-      (void)sprintf (err, "ERROR - single_run: Could not open statvar file '%s'\n",
+      (void)snprintf (err, 256, "ERROR - single_run: Could not open statvar file '%s'\n",
 		     statvar_path);
       return (err);
     }
@@ -152,7 +152,7 @@ char *single_run_pre_init () {
 */
   if (ani_out_flag) {
     aniVar_names = (char **) control_var("aniOutVar_names");
-    (void)sprintf(ani_path, "%s", *((char **) control_var("ani_output_file")));
+    (void)snprintf(ani_path, MAXPATHLEN, "%s", *((char **) control_var("ani_output_file")));
 
     ani_out_dims = (DIMEN **)malloc (naniVars * sizeof (DIMEN *));
     ani_var_files = (FILE **)malloc (naniVars * sizeof (FILE *));
@@ -167,7 +167,7 @@ char *single_run_pre_init () {
          if (c)
            *c = '\0';
 
-       sprintf (buf, "%s.%s", ani_path, aniVar_names[i]);
+       snprintf (buf, 256, "%s.%s", ani_path, aniVar_names[i]);
        c = strchr (buf, ' ');
          if (c)
            *c = '\0';
@@ -209,9 +209,9 @@ char *single_run_pre_init () {
     ani_out_files = (FILE **)malloc (num_ani_dims * sizeof (FILE *));
 
     for (i = 0; i < num_ani_dims; i++) {
-       sprintf (buf, "%s.%s", ani_path, ani_out_dims[i]->name);
+       snprintf (buf, 256, "%s.%s", ani_path, ani_out_dims[i]->name);
        if ((ani_out_files[i] = fopen(buf, "w")) == NULL) {
-          (void)sprintf (err, "ERROR - single_run: Could not open ani file '%s'\n", buf);
+          (void)snprintf (err, 256, "ERROR - single_run: Could not open ani file '%s'\n", buf);
           return (err);
        }
 

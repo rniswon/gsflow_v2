@@ -67,7 +67,7 @@ void create_vstats (void) {
 			curr_stat_list = curr_stat_list->next;
 		}
 
-		(void)strcpy (curr_stat_list->key, statVar_names[i]);
+		(void)strncpy (curr_stat_list->key, statVar_names[i], max_data_ln_len);
 		ptr = strchr (curr_stat_list->key, '.');
 		if (ptr) *ptr = '\0';
 

@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.0.0 12/01/2018
+                       Version 5.0.0 03/01/2019
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -34,7 +34,7 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2019-02-01
+GSFLOW Computation Order       gsflow_prms                2019-03-01
 Basin Definition               basin                      2018-04-06
 Cascading Flow                 cascade                    2018-05-25
 Common States and Fluxes       climateflow                2018-12-13
@@ -56,7 +56,7 @@ GSFLOW Output Budget Summary   gsflow_budget              2018-03-02
 GSFLOW Output CSV Summary      gsflow_sum                 2019-01-30
 Output Summary                 subbasin                   2018-04-25
 ====================================================================
-GSFLOW MODFLOW main            gsflow_modflow             2019-01-30
+GSFLOW MODFLOW main            gsflow_modflow             2019-03-01
 UZF-NWT Package                gwf2uzf1_NWT               2017-03-08
 SFR-NWT Package                gwf2sfr7_NWT               2017-03-08
 LAK-NWT Package                gwf2lak7_NWT               2016-07-21

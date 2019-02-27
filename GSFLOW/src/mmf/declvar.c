@@ -192,7 +192,7 @@ long declvar (char *module, char *name, char *dimen, long maxsize, char *type,
 
   var->dimen = (DIMEN **)umalloc (var->ndimen * sizeof(DIMEN *));
 
-  (void)strcpy (tmpdimen, dimen);
+  (void)strncpy (tmpdimen, dimen, strlen(dimen)+1);
 
   i = 0;
   token = strtok(tmpdimen, ",");

@@ -106,7 +106,7 @@ int read_vars (char *var_file_name) {
 /*
 * space fwd to #### header
 */
-   (void)strcpy(line, " ");
+   (void)strncpy(line, " ", MAXVARLEN);
    while (strncmp(line, "####", 4)) {
       if (fgets(line, MAXVARLEN, var_file) == NULL) {
          fclose(var_file);
@@ -183,7 +183,7 @@ variables:
 /*
 * space fwd to #### header
 */
-      (void)strcpy(line, " ");
+      (void)strncpy(line, " ", MAXVARLEN);
       while (strncmp(line, "####", 4)) {
          if (fgets(line, MAXVARLEN, var_file) == NULL) {
             fclose(var_file);

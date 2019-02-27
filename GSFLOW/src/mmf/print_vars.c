@@ -36,7 +36,7 @@ int print_vars (void) {
    * get var file path name, open file
    */
 
-  (void)sprintf (pathname, "%s.var_name", MAltContFile);
+  (void)snprintf (pathname, MAXPATHLEN, "%s.var_name", MAltContFile);
 
 
   if ((var_file = fopen (pathname, "w")) == NULL) {
@@ -69,7 +69,7 @@ int print_vars (void) {
    */
 
   infostr = (char *) umalloc (strlen(Mparaminfo) + 1);
-  (void)strcpy(infostr, Mparaminfo);
+  (void)strncpy(infostr, Mparaminfo, strlen(Mparaminfo) + 1);
   (void)fprintf(var_file, "%s\n\n", infostr);
 
   /*

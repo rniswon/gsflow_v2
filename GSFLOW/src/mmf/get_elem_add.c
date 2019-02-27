@@ -66,7 +66,7 @@ int CheckIndices (char *key, char *elemString, int type) {
 /*
 **	Parse the index string. First make a local copy
 */
-	(void)strcpy (tsave, elemString);
+	(void)strncpy (tsave, elemString, 80);
 
 /*
 **	Check for '(' and ')', and delete them
@@ -98,7 +98,7 @@ int CheckIndices (char *key, char *elemString, int type) {
 			*ptr = '\0';
 
 		strindx[list_count] = (char *)malloc (20 * sizeof (char));
-		(void)strcpy(strindx[list_count], t);
+		(void)strncpy(strindx[list_count], t, 20);
 		list_count++;
 
 		if (ptr)
@@ -189,7 +189,7 @@ char *GetElemAddress (char *key, char *elemString, int type) {
 /*
 **	first, make a temporary copy of the key
 */
-	(void)strcpy (tkey, key);
+	(void)strncpy (tkey, key, 80);
 
 /*
 **	strips leading blanks
@@ -231,7 +231,7 @@ char *GetElemAddress (char *key, char *elemString, int type) {
 /*
 **	parse the string. First make a local copy
 */
-	(void)strcpy (elmstr, elemString);
+	(void)strncpy (elmstr, elemString, 80);
 	temp = elmstr; 
 
 /*
@@ -264,7 +264,7 @@ char *GetElemAddress (char *key, char *elemString, int type) {
 
 		strindx[list_count] = (char *)malloc (20 * sizeof (char));
 
-		(void)strcpy (strindx[list_count], t);
+		(void)strncpy (strindx[list_count], t, 20);
 		list_count++;
 
 		if (ptr)

@@ -74,10 +74,10 @@ long readvar (char *module, char *name) {
 
 /*
   vkey = (char *) umalloc(strlen(module) + strlen(name) + 2);
-  (void)strcpy(vkey, module);
-  strcat(strcat(vkey, "."), name);
+  (void)strncpy(vkey, module, 80);
+  strncat(strncat(vkey, ".", 80), name, 80);
 */
-	strcpy (vkey, name);
+	strncpy (vkey, name, 80);
 
 /*
 * get pointer to variable with key

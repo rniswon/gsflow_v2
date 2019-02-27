@@ -60,7 +60,7 @@ int write_preprocess_params () {
 	char *ptr, *ptr1;
 
 	fname =   control_svar ("param_file");
-	strcpy (param_file_name, fname[0]);
+	strncpy (param_file_name, fname[0], 512);
 
 // Isolate the file name from the path
 	ptr1 = strrchr (param_file_name, '/');
@@ -75,7 +75,7 @@ int write_preprocess_params () {
 	if (!ptr) {
 		ptr = param_file_name + strlen(param_file_name);
 	}
-	strcpy (ptr, "_preprocess.params");
+	strncpy (ptr, "_preprocess.params", 512-strlen(param_file_name));
 
 
 	printf ("NOTICE: preprocessed parameters are being written to file: %s\n", param_file_name);

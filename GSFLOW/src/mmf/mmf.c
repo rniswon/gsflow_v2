@@ -49,6 +49,7 @@ int main (int argc, char *argv[]) {
    static int      num_param_files = 0;
    char   **fname;
    char pathname[MAXPATHLEN];
+   int set_size;
 
 
     /*
@@ -70,9 +71,10 @@ int main (int argc, char *argv[]) {
   **	parse the command-line arguments
   */
    set_count = 0;
-   set_name = (char **)malloc (100 * sizeof (char *));
-   set_value = (char **)malloc (100 * sizeof (char *));
-   parse_args (argc, argv, &set_count, set_name, set_value);
+   set_size = 100;
+   set_name = (char **)malloc (set_size * sizeof (char *));
+   set_value = (char **)malloc (set_size * sizeof (char *));
+   parse_args (argc, argv, &set_count, set_name, set_value, set_size);
 
    if (MAltContFile == NULL) {
       (void)fprintf (stderr,"Usage: Set the full path to the control file using the '-C' option.\n\n");
@@ -223,7 +225,7 @@ int main (int argc, char *argv[]) {
       print_params();
       print_vars();
       print_model_info();
-	  (void)sprintf (pathname, "%s.param", MAltContFile);
+	  (void)snprintf (pathname, MAXPATHLEN, "%s.param", MAltContFile);
 	  save_params (pathname);
 
     } else {

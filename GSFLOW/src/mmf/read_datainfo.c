@@ -44,7 +44,7 @@ char *read_datainfo (FILE_DATA *fd) {
    }
 
    if (!(fgets (fd->info, max_data_ln_len, fd->fp))) {
-      (void)sprintf (err_buf, "Can't read data file info string\n%s", fd->name);
+      (void)snprintf (err_buf, 512, "Can't read data file info string\n%s", fd->name);
       return (err_buf);
    }
 
@@ -55,10 +55,10 @@ char *read_datainfo (FILE_DATA *fd) {
 **  Read the header of the data file.  The end of the header occures
 **  when a line starts with at least 4 "#"s.
 */
-   (void)strcpy (line, "");
+   (void)strncpy (line, "", max_data_ln_len);
    while (strncmp (line, "####", 4)) {
       if ((fgets (line, max_data_ln_len, fd->fp)) == NULL) {
-         (void)sprintf (err_buf,"#### delimiter not found in data file\n%s", fd->name);
+         (void)snprintf (err_buf, 512, "#### delimiter not found in data file\n%s", fd->name);
          return (err_buf);
       }
 
@@ -95,11 +95,11 @@ char *read_datainfo (FILE_DATA *fd) {
 **    get key, check the var has been declared
 */
 
-            (void)strcpy(linecopy, line);
+            (void)strncpy(linecopy, line, max_data_ln_len);
             key = strtok(linecopy, " \t");
 
             if (key == NULL) {
-               (void)sprintf (err_buf,"Check format at line number %ld in\n%s\n%s", nline,
+               (void)snprintf (err_buf, 512, "Check format at line number %ld in\n%s\n%s", nline,
                   fd->name, line);
                return (err_buf);
             }
@@ -110,7 +110,7 @@ char *read_datainfo (FILE_DATA *fd) {
             countstr = strtok(NULL, " \t");
 
             if (countstr == NULL) {
-               (void)sprintf (err_buf,"Check format at line number %ld in\n%s\n%s", nline,
+               (void)snprintf (err_buf, 512, "Check format at line number %ld in\n%s\n%s", nline,
                   fd->name, line);
                return (err_buf);
             }
@@ -121,7 +121,7 @@ char *read_datainfo (FILE_DATA *fd) {
 				if (count > 0) {  // Old style Data files have variables with size 0. PRMS should now skip over these, as if they are not there.
 
 					if ((var = var_addr(key)) == NULL) {
-						(void)sprintf (err_buf,
+						(void)snprintf (err_buf,  512,
 							"Variable %s not declared at line number %ld in\n%s\n%s",
 							key, nline, fd->name, line);
 						return (err_buf);
@@ -137,7 +137,7 @@ char *read_datainfo (FILE_DATA *fd) {
 
 
 					if (errno || (count < 0)) {
-						(void)sprintf (err_buf,"Decoding %s at line number %ld in\n%s\n%s",
+						(void)snprintf (err_buf, 512, "Decoding %s at line number %ld in\n%s\n%s",
 							countstr, nline, fd->name, line);
 						return (err_buf);
 					}
@@ -177,7 +177,7 @@ char *read_datainfo (FILE_DATA *fd) {
 **   Read first line of data
 */
    if (!(fgets (fd->line, max_data_ln_len, fd->fp))) {
-      (void)sprintf (err_buf,
+      (void)snprintf (err_buf, 512,
          "read_datainfo: Data for first timestep not found in file %s\n",
          fd->name);
       return (err_buf);

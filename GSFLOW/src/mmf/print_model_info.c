@@ -33,7 +33,7 @@ int print_model_info (void) {
   MODULE_DATA *module;
   LIST *vlist, *plist;
 
-	(void)sprintf (pathname, "%s.mod_name", MAltContFile);
+	(void)snprintf (pathname, MAXPATHLEN, "%s.mod_name", MAltContFile);
 
 	if ((model_info_file = fopen (pathname, "w")) == NULL) {
 		(void)fprintf(stderr, "ERROR - print_model_info - creating file '%s'\n", pathname);

@@ -29,7 +29,6 @@ LIBOBJS = \
 		gwf2ibs7.o \
         hufutl7.o \
         gwf2gag7.o \
-        gwf2ag1_NWT.o \
         gwf2upw1.o \
         gwfuzfmodule_NWT.o \
         gwfsfrmodule_NWT.o \
@@ -164,9 +163,6 @@ sip7_NWT.o: sip7_NWT.f gwf2bas7_NWT.o
 
 Irestart.o: Irestart.f gwfuzfmodule_NWT.o gwfsfrmodule_NWT.o gsfmodflow.mod
 	$(FC) $(FFLAGS) -c Irestart.f
-
-gwf2ag1_NWT.o: gwf2ag1_NWT.f prms_module.mod gwfbasmodule.mod gsfmodflow.mod prms_flowvars.mod prms_climatevars.mod prms_basin.mod
-	$(FC) $(FFLAGS) -c gwf2ag1_NWT.f
 
 prms_flowvars.mod:
 	$(CD) ../prms;make climateflow.o

@@ -161,7 +161,7 @@ cur_fd->time = {year = 1956, month = 2, day = 19, hour = 0, min = 0, sec = 0,
             Mprevjt = Mnowtime->jt - (double)(initial_deltat / 24.0);
          }
 
-         (void)strcpy (line, cur_fd->start_of_data);
+         (void)strncpy (line, cur_fd->start_of_data, max_data_ln_len);
          Mnsteps++;
 /*
 **  DANGER -- Mprevjt must be hacked if starting from var init file.
@@ -346,7 +346,7 @@ char *DATA_read_init (void) {
    for (i = 0; i < num_data_files; i++) {
       (fd[i])->name = strdup (fname[i]);
       if (!((fd[i])->fp = fopen (fname[i], "r"))) {
-         (void)sprintf (err, "DATA_read_init: can't open data file %s\n",
+         (void)snprintf (err, 256, "DATA_read_init: can't open data file %s\n",
             fname[i]);
          return (err);
       }
@@ -354,7 +354,7 @@ char *DATA_read_init (void) {
       fgets (line, max_data_ln_len, (fd[i])->fp);
       while (strncmp (line, "####", 4)) {
          if (!(fgets (line, max_data_ln_len, (fd[i])->fp))) {
-               (void)sprintf (buf, "DATA_read_init - Spacing fwd to data - Check format of file %s.", fname[i]);
+               (void)snprintf (buf, 256, "DATA_read_init - Spacing fwd to data - Check format of file %s.", fname[i]);
                return (buf);
             }
       }
@@ -402,11 +402,11 @@ char *READ_data_info (void) {
 */
    for (i = 0; i < num_data_files; i++) {
       if (stat (fname[i], &stbuf) == -1) {
-         (void)sprintf (err, "Reading Data Info: Can't open data file %s\n",
+         (void)snprintf (err, 256, "Reading Data Info: Can't open data file %s\n",
             fname[i]);
          return (err);
       } else if ((stbuf.st_mode & S_IFMT) == S_IFDIR) {
-         (void)sprintf (err, "Reading Data Info: Can't open data file %s\n",
+         (void)snprintf (err, 256, "Reading Data Info: Can't open data file %s\n",
             fname[i]);
          return (err);
       }
@@ -417,7 +417,7 @@ char *READ_data_info (void) {
    for (i = 0; i < num_data_files; i++) {
       lfd.name = strdup (fname[i]);
       if (!(lfd.fp = fopen (fname[i], "r"))) {
-         (void)sprintf (err, "DATA_read_init: can't open data file %s\n",
+         (void)snprintf (err, 256, "DATA_read_init: can't open data file %s\n",
             fname[i]);
          return (err);
       }
@@ -595,7 +595,7 @@ char * EXTRACT_time (FILE_DATA *data) {
       return (NULL);
    }
 
-   (void)strcpy (line, data->line);
+   (void)strncpy (line, data->line, max_data_ln_len);
 
    start_point = line;
 
@@ -603,13 +603,13 @@ char * EXTRACT_time (FILE_DATA *data) {
    data->time.year = strtol (start_point, &end_point, 10);
 
    if (data->time.year < 1800 || data->time.year > 2200) {
-      (void)sprintf (err_buf, "EXTRACT_time - year %ld out of range.\nline:%s",
+      (void)snprintf (err_buf, max_data_ln_len, "EXTRACT_time - year %ld out of range.\nline:%s",
          data->time.year, data->line);
       return (err_buf);
    }
 
    if (errno == EDOM || errno == ERANGE) {
-      (void)sprintf(err_buf, "EXTRACT_time - Decoding year line %s", start_point);
+      (void)snprintf(err_buf, max_data_ln_len, "EXTRACT_time - Decoding year line %s", start_point);
       return (err_buf);
    }
 
@@ -618,13 +618,13 @@ char * EXTRACT_time (FILE_DATA *data) {
    data->time.month = strtol (start_point, &end_point, 10);
 
    if (data->time.month < 1 || data->time.month > 12) {
-      (void)sprintf (err_buf, "EXTRACT_time - month %ld out of range.\nline:%s",
+      (void)snprintf (err_buf, max_data_ln_len, "EXTRACT_time - month %ld out of range.\nline:%s",
          data->time.month, data->line);
       return (err_buf);
    }
 
    if (errno == EDOM || errno == ERANGE) {
-      (void)sprintf(err_buf, "EXTRACT_time - Decoding month line %s",start_point);
+      (void)snprintf(err_buf, max_data_ln_len, "EXTRACT_time - Decoding month line %s",start_point);
       return (err_buf);
    }
 
@@ -633,12 +633,12 @@ char * EXTRACT_time (FILE_DATA *data) {
    data->time.day = strtol (start_point, &end_point, 10);
 
    if (data->time.day < 1 || data->time.day > 31) {
-      (void)sprintf (err_buf, "EXTRACT_time - day %ld out of range.\nline:%s",data->time.day, data->line);
+      (void)snprintf (err_buf, max_data_ln_len, "EXTRACT_time - day %ld out of range.\nline:%s",data->time.day, data->line);
       return (err_buf);
    }
 
    if (errno == EDOM || errno == ERANGE) {
-      (void)sprintf (err_buf, "Decoding day line %s", start_point);
+      (void)snprintf (err_buf, max_data_ln_len, "Decoding day line %s", start_point);
       return (err_buf);
    }
 
@@ -647,12 +647,12 @@ char * EXTRACT_time (FILE_DATA *data) {
    data->time.hour = strtol(start_point, &end_point, 10);
 
    if (data->time.hour < 0 || data->time.hour > 24) {
-      (void)sprintf(err_buf,"EXTRACT_time - hour %ld out of range.\nline:%s",data->time.hour, data->line);
+      (void)snprintf(err_buf, max_data_ln_len, "EXTRACT_time - hour %ld out of range.\nline:%s",data->time.hour, data->line);
       return  (err_buf);
    }
 
    if (errno == EDOM || errno == ERANGE)   {
-      (void)sprintf (err_buf, "Decoding hour line %s", start_point);
+      (void)snprintf (err_buf, max_data_ln_len, "Decoding hour line %s", start_point);
       return (err_buf);
    }
 
@@ -662,13 +662,13 @@ char * EXTRACT_time (FILE_DATA *data) {
 
 
     if (data->time.min < 0 || data->time.min > 59) {
-      (void)sprintf (err_buf, "EXTRACT_time - minute %ld out of range.\nline:%s",
+      (void)snprintf (err_buf, max_data_ln_len, "EXTRACT_time - minute %ld out of range.\nline:%s",
          data->time.min, data->line);
       return (err_buf);
    }
 
    if (errno == EDOM || errno == ERANGE) {
-      (void)sprintf (err_buf, "Decoding minute line %s", start_point);
+      (void)snprintf (err_buf, max_data_ln_len, "Decoding minute line %s", start_point);
       return (err_buf);
    }
 
@@ -680,13 +680,13 @@ char * EXTRACT_time (FILE_DATA *data) {
 */
 
    if (data->time.sec < 0 || data->time.min > 59) {
-      (void)sprintf (err_buf, "EXTRACT_time - second %ld out of range.\nline:%s",
+      (void)snprintf (err_buf, max_data_ln_len, "EXTRACT_time - second %ld out of range.\nline:%s",
          data->time.sec, data->line);
       return (err_buf);
    }
 
    if (errno == EDOM || errno == ERANGE) {
-      (void)sprintf (err_buf, "Decoding second line %s\n", start_point);
+      (void)snprintf (err_buf, max_data_ln_len, "Decoding second line %s\n", start_point);
       return (err_buf);
    }
 

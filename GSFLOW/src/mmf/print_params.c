@@ -38,7 +38,7 @@ int print_params (void) {
    * get param file path name, open file
    */
 
-  (void)sprintf (pathname, "%s.par_name", MAltContFile);
+  (void)snprintf (pathname, MAXPATHLEN, "%s.par_name", MAltContFile);
 
   if ((param_file = fopen (pathname, "w")) == NULL) {
     (void)fprintf(stderr,
@@ -68,7 +68,7 @@ int print_params (void) {
    */
 
   infostr = (char *) umalloc (strlen(Mparaminfo) + 1);
-  (void)strcpy(infostr, Mparaminfo);
+  (void)strncpy(infostr, Mparaminfo, strlen(Mparaminfo) + 1);
 /*
   (void)fprintf(param_file, "%s\n\n", insert_crs(infostr, PRINTLEN));
 */

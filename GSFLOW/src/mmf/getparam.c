@@ -279,7 +279,7 @@ long getoutname_ (char *dinfo, char *ext, ftnlen len, ftnlen elen) {
 	strncpy(foo, ext, elen);
 	foo[elen] = '\0';
 
-	ret = getoutname (dinfo, foo);
+	ret = getoutname (dinfo, len, foo);
 
     if (strlen (dinfo) >= (size_t)len) {
 		printf ("getoutname:  path name is too long for your buffer!\n");
@@ -295,8 +295,8 @@ long getoutname_ (char *dinfo, char *ext, ftnlen len, ftnlen elen) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getoutname (char *dinfo, char *ext) {
-	sprintf(dinfo, "%s\\%s", *control_svar("model_output_file"), ext);
+long getoutname (char *dinfo, int dinlen, char *ext) {
+	snprintf(dinfo, dinlen, "%s\\%s", *control_svar("model_output_file"), ext);
 	return(0);
 }
 
@@ -315,7 +315,7 @@ long getdataname_ (char *dinfo, char *ext, ftnlen len, ftnlen elen) {
 	strncpy(foo, ext, elen);
 	foo[elen] = '\0';
 
-	retval = getdataname (dinfo, foo);
+	retval = getdataname (dinfo, len, foo);
 	return(retval);
 }
 
@@ -326,8 +326,8 @@ long getdataname_ (char *dinfo, char *ext, ftnlen len, ftnlen elen) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getdataname (char *dinfo, char *ext) {
-	sprintf(dinfo, "%s%s", *control_svar("data_file"), ext);
+long getdataname (char *dinfo, int dinlen, char *ext) {
+	snprintf(dinfo, dinlen, "%s%s", *control_svar("data_file"), ext);
 	return(0);
 }
 
@@ -357,8 +357,8 @@ long getdataname (char *dinfo, char *ext) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-/*long getoutdirfile (char *dinfo, char *foo) {
-   sprintf(dinfo, "%s%s", *control_svar("mms_user_out_dir"), foo);
+/*long getoutdirfile (char *dinfo, int dinlen, char *foo) {
+   snprintf(dinfo, dinlen, "%s%s", *control_svar("mms_user_out_dir"), foo);
    return(0);
 }
 */
@@ -377,7 +377,7 @@ long getdataname (char *dinfo, char *ext) {
 	strncpy(foo, ext, elen);
 	foo[elen] = '\0';
 
-   retval = getuserdirfile (dinfo, foo);
+   retval = getuserdirfile (dinfo, len, foo);
    return(retval);
 }
 */
@@ -388,8 +388,8 @@ long getdataname (char *dinfo, char *ext) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-/*long getuserdirfile (char *dinfo, char *foo) {
-   sprintf(dinfo, "%s%s", *control_svar("mms_user_dir"), foo);
+/*long getuserdirfile (char *dinfo, int dinlen, char *foo) {
+   snprintf(dinfo, dinlen, "%s%s", *control_svar("mms_user_dir"), foo);
    return (0);
 }
 */
@@ -400,8 +400,8 @@ long getdataname (char *dinfo, char *ext) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getparamfile (char *dinfo) {
-	sprintf(dinfo, "%s", *control_svar("param_file"));
+long getparamfile (char *dinfo, int dinlen) {
+	snprintf(dinfo, dinlen, "%s", *control_svar("param_file"));
 	return (0);
 }
 
@@ -414,7 +414,7 @@ long getparamfile (char *dinfo) {
 \*--------------------------------------------------------------------*/
 long getparamfile_ (char *dinfo, ftnlen len) {
 	long retval;
-	retval = getparamfile (dinfo);
+	retval = getparamfile (dinfo, len);
 	return(retval);
 }
 
