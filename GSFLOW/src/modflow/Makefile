@@ -51,6 +51,8 @@ LIBOBJS = \
         gwf2hfb7_NWT.o \
         gwf2swi27.o \
         gwf2swt7.o \
+        gwf2swr7.o \
+        gwf2swr7util.o \
         lmt8_NWT.o \
         parutl7.o \
         gwf2hydmod7.o \
@@ -58,6 +60,7 @@ LIBOBJS = \
 		obs2ghb7.o \
 		obs2riv7.o \
 		obs2str7.o \
+		obs2drn7.o \
         Irestart.o
 
 all: lib
@@ -196,6 +199,9 @@ obs2bas7.o: obs2bas7.f gwf2bas7_NWT.o
 obs2chd7.o: obs2chd7.f gwf2bas7_NWT.o
 	$(FC) $(FFLAGS) -c obs2chd7.f
 
+obs2drn7.o: obs2drn7.f gwf2bas7_NWT.o
+	$(FC) $(FFLAGS) -c obs2drn7.f
+
 gwf2lak7_NWT.o: gwf2lak7_NWT.f gwflakmodule_NWT.o gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwfuzfmodule_NWT.o
 	$(FC) $(FFLAGS) -c gwf2lak7_NWT.f
 
@@ -220,8 +226,14 @@ lmt8_NWT.o: lmt8_NWT.f gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwfuzfmodule_NWT.o gwfl
 gwf2swi27.o: gwf2swi27.f gwf2bas7_NWT.o gwf2bcf7.o gwf2upw1.o gwf2lpf7.o
 	$(FC) $(FFLAGS) -c gwf2swi27.f
 
-gwf2swt7_NWT.o: gwf2swt7.f gwf2bas7_NWT.o
+gwf2swt7.o: gwf2swt7.f gwf2bas7_NWT.o
 	$(FC) $(FFLAGS) -c gwf2swt7.f
+
+gwf2swr7.o: gwf2swr7.f gwf2bas7_NWT.o
+	$(FC) $(FFLAGS) -c gwf2swr7.f
+
+gwf2swr7util.o: gwf2swr7util.f
+	$(FC) $(FFLAGS) -c gwf2swr7util.f
 
 
 #  end
