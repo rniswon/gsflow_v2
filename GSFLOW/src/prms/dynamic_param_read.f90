@@ -381,7 +381,7 @@
       IF ( istop==1 ) STOP 'ERROR in dynamic_param_read initialize procedure'
 
       IF ( Print_debug>-2 ) THEN
-        Output_unit = get_ftnunit(520)
+        Output_unit = get_ftnunit(8888)
         OPEN ( Output_unit, FILE='dynamic_parameter.out' )
         PRINT '(/,A,//)', 'A summary of dynamic parameter events are written to file: dynamic_parameter.out'
       ENDIF
