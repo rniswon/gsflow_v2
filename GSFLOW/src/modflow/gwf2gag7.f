@@ -1,4 +1,4 @@
-C $Id: gwf2gag7.f 3234 2007-03-24 01:44:52Z deprudic $      
+C $Id: gwf2gag7.f 3234 2007-03-24 01:44:52Z deprudic $
       MODULE GWFGAGMODULE
         INTEGER,SAVE,POINTER  ::NUMGAGE
         INTEGER,SAVE,  DIMENSION(:,:),  POINTER :: IGGLST
@@ -24,7 +24,7 @@ C     ------------------------------------------------------------------
       ALLOCATE (NUMGAGE)
       NUMGAGE = 0
 C
-C1------TURN OFF GAGE PACKAGE IF ACTIVE AND 
+C1------TURN OFF GAGE PACKAGE IF ACTIVE AND
 C         STREAMS AND LAKES ARE INACTIVE.
       IF(IUNITSFR.LE.0.AND.IUNITLAK.LE.0) THEN
          WRITE(IOUT,1)
@@ -45,10 +45,10 @@ C         IS LESS THAN OR EQUAL TO ZERO.
          RETURN
       END IF
 C
-C3------IGGLST ARRAY IS: 
+C3------IGGLST ARRAY IS:
 C         (1) SEGMENT (or LAKE) NUMBER;
 C         (2) REACH NUMBER (NULL FOR LAKE);
-C         (3) UNIT #; and 
+C         (3) UNIT #; and
 C         (4) OUTTYPE
       NGAGESAR = 1
       IF (NUMGAGE.GT.0) NGAGESAR = NUMGAGE
@@ -206,7 +206,7 @@ C3------STREAM GAGE; SAVE STREAM REACH INDEX; WRITE HEADER LINES.
      +OT ACTIVE'
               CALL USTOP('')
             END IF
-              
+
             IG2=IGGLST(2,IOG)
             DO 20 IRCH=1,NSTRM
                IF (ISTRM(4,IRCH).EQ.IG.AND.ISTRM(5,IRCH).EQ.IG2) THEN
@@ -272,7 +272,7 @@ Cdep  Revised output to include precipitation, et, and runoff
 C
 C8------TRANSPORT IS ON.
                ELSE
-                 IF(IUNITUZF.GT.0) WRITE (IOUT,296)              
+                 IF(IUNITUZF.GT.0) WRITE (IOUT,296)
 C
 C9------GET VARIABLE OUTTYPE.
                  IF (NSOL.LE.0) THEN
@@ -621,7 +621,7 @@ Cdep 4/20/2009 revised format to include lake seepage to UZF
      *'' Withdrawal'',5x,''Lake-Inflx'',5x,''Total-Cond.'',5x,
      *''Del-H-TS'',7x,''Del-V-TS     '', ',I2,'A12,4x,''Del-H-Cum'',
      *4x,''  Del-V-Cum     '', ',I2,'A12,2x'' Cum-Prcnt-Err "'')')
-Cdep 4/20/2009 revised format to denote option 4    
+Cdep 4/20/2009 revised format to denote option 4
  319  FORMAT ('( 1X,''"DATA: Time'',8X,''Stage(H)'',7X,''Volume'',3X,
      *',I2,'A12,5X,'' Vol.Change'',8X,''Precip'',10x,''Evap.'',9x,
      *''Runoff'',8x,''GW-Inflw'',6x,''GW-Outflw'',7x,''SW-Inflw'',6x,
@@ -661,7 +661,7 @@ C18-----RETURN.
 C
 C
 C SGWF2GAG5LO Lake GAGING STATIONS--RECORD DATA
-Cdep 4/20/2009 added Lake seepage to unsaturated flow 
+Cdep 4/20/2009 added Lake seepage to unsaturated flow
       SUBROUTINE SGWF2GAG7LO(IUNITGWT,IUNITUZF,CLAKE,GAGETM,GWIN,GWOUT,
      2                       SEEP,FLXINL,VOLOLD,CLKOLD,CLAKINIT,NSOL)
 C     ******************************************************************
@@ -674,7 +674,8 @@ C     ******************************************************************
       USE GWFLAKMODULE, ONLY:NLAKES,RNF,VOL,STGNEW,PRECIP,EVAP,
      1                       SURFIN,SURFOT,WITHDRW,SUMCNN,DELH,TDELH,
      2                       VOLINIT,OVRLNDRNF,TSLAKERR,CMLAKERR,DELVOL,
-     3                       SEEPUZ     
+     3                       SEEPUZ,PRCPLK,BGAREA
+! above line modified by LFK 3/7/19
 C     ------------------------------------------------------------------
       DIMENSION CLAKE(NLAKES,NSOL)
 cdep 4/20/2009 dimensioned SEEP array to nlakes
@@ -694,17 +695,25 @@ C1------LOOP OVER LAKE GAGING STATIONS.
             GO TO 10
          ELSE
 C
-C2------LAKE GAGE: WRITE TIME, STAGE, VOLUME, AND 
+C2------LAKE GAGE: WRITE TIME, STAGE, VOLUME, AND
 C         CONCENTRATION OF EACH SOLUTE.
             LK=-IG1
             IF (LK.GT.NLAKES) THEN
                GO TO 10
             ELSE
-!dep  all arrays in LAK3 converted to volumetric fluxes 
+!dep  all arrays in LAK3 converted to volumetric fluxes
 !dep  compute volumes per time step for printing  (4/19/2009)
             PP = PRECIP(LK)*DELT
             ET = EVAP(LK)*DELT
             RUNF = RNF(LK)*DELT
+!lfk add 3/8/19
+            RUNFRT=RUNF
+            IF(RNF(LK).LT.0.0) THEN
+              RUNF =-RNF(LK)*PRCPLK(LK)*BGAREA(LK)*DELT
+              RUNFRT = RUNF/DELT
+C      RUNFRT IS THE RATE OF OVERLAND RUNOFF TO THE LAKE
+            END IF
+!
             SRIN = SURFIN(LK)*DELT
             SROT = SURFOT(LK)*DELT
             WDRW = WITHDRW(LK)*DELT
@@ -714,7 +723,7 @@ C         CONCENTRATION OF EACH SOLUTE.
             UZFRNF = OVRLNDRNF(LK)*DELT
 !dep added 4/20/2009
             SEEPUZF = SEEPUZ(LK)*DELT
-            VOLRATE = (VOL(LK)-VOLOLD(LK))/DELT 
+            VOLRATE = (VOL(LK)-VOLOLD(LK))/DELT
 !dep  FLUXIN is a volumetric rate 4/20/2009
             FLUXIN = FLXINL(LK)/DELT
             DELHTS=DELH(LK)
@@ -734,7 +743,7 @@ Cdep   4/17/2009 fixed output from uzfrunoff and ground inflow and outflow
      *              PP,ET,RUNF,GWFIN,GWFOT,SRIN,SROT,
      *              WDRW,FLXINL(LK),SUMCNN(LK),TSLAKERR(LK)
                  ELSE
-Cdep   4/20/2009 added lake seepage to unsaturated zone 
+Cdep   4/20/2009 added lake seepage to unsaturated zone
                    WRITE (IG3,405) GAGETM,STGNEW(LK),VOL(LK),
      *              PP,ET,RUNF,UZFRNF,GWFIN,GWFOT,SEEPUZF,
      +              SRIN,SROT,WDRW,FLXINL(LK),SUMCNN(LK),
@@ -751,7 +760,7 @@ Cdep   4/20/2009 added lake seepage to unsaturated zone
      *                     SUMCNN(LK),DELHTS,DELVOL(LK),DELHCUM,
      *                     VOL(LK)-VOLINIT(LK),CMLAKERR(LK)
                  ELSE
-Cdep   4/20/2009 added lake seepage to unsaturated zone 
+Cdep   4/20/2009 added lake seepage to unsaturated zone
                    WRITE (IG3,406) GAGETM,STGNEW(LK),VOL(LK),
      *              PP,ET,RUNF,UZFRNF,GWFIN,GWFOT,SEEPUZF,
      *              SRIN,SROT,WDRW,FLXINL(LK),SUMCNN(LK),
@@ -762,14 +771,18 @@ Cdep   4/20/2009 added lake seepage to unsaturated zone
                  CASE (4)
                  IF (IUNITUZF.LE.0) THEN
                    WRITE (IG3,404) GAGETM,STGNEW(LK),VOL(LK),VOLRATE,
-     *              PRECIP(LK),EVAP(LK),RNF(LK),GWIN(LK),GWOUT(LK),
+!     *              PRECIP(LK),EVAP(LK),RNF(LK),GWIN(LK),GWOUT(LK),
+     *              PRECIP(LK),EVAP(LK),RUNFRT,GWIN(LK),GWOUT(LK),
      *              SURFIN(LK),SURFOT(LK),WITHDRW(LK),FLUXIN,
      *              SUMCNN(LK),TSLAKERR(LK)
-                 ELSE
+!LFK  3/8/19 modify above because RNF can be negative
+                   ELSE
                    WRITE (IG3,407) GAGETM,STGNEW(LK),VOL(LK),VOLRATE,
-     *              PRECIP(LK),EVAP(LK),RNF(LK),OVRLNDRNF(LK),GWIN(LK),
+!     *              PRECIP(LK),EVAP(LK),RNF(LK),OVRLNDRNF(LK),GWIN(LK),
+     *              PRECIP(LK),EVAP(LK),RUNFRT,OVRLNDRNF(LK),GWIN(LK),
      *              GWOUT(LK),SEEPUZ(LK),SURFIN(LK),SURFOT(LK),
      *              WITHDRW(LK),FLUXIN,SUMCNN(LK),TSLAKERR(LK)
+!LFK  3/8/19 modify above because RNF can be negative
                  END IF
                  END SELECT
 C
@@ -777,7 +790,7 @@ C5------TRANSPORT IS ON.
                ELSE
 C
 C6------GET VARIABLE OUTTYPE.
-Cdep 4/20/2009 changed variable names according to if volumes or 
+Cdep 4/20/2009 changed variable names according to if volumes or
 C       volumetric rates
                  SELECT CASE (IGGLST(4,IOG))
                  CASE (0)
@@ -823,8 +836,10 @@ C-LFK
 C-LFK                   WRITE (IG3,LFRMAT) GAGETM,STGNEW(LK),VOLRATE,
                    WRITE (IG3,LFRMAT) GAGETM,STGNEW(LK),VOL(LK),
      *             (CLAKE(LK,ISOL),ISOL=1,NSOL),VOLRATE,PRECIP(LK),
-     *             EVAP(LK),RNF(LK),GWIN(LK),GWOUT(LK),SURFIN(LK),
+!     *             EVAP(LK),RNF(LK),GWIN(LK),GWOUT(LK),SURFIN(LK),
+     *             EVAP(LK),RUNFRT,GWIN(LK),GWOUT(LK),SURFIN(LK),
      *             SURFOT(LK),WITHDRW(LK),FLUXIN,SUMCNN(LK),TSLAKERR(LK)
+!LFK  3/8/19 modify above because RNF can be negative
                  END SELECT
                END IF
             END IF
@@ -949,16 +964,16 @@ C7------OUTTYPE 6 IS USED TO PRINT TIME SERIES FOR UNSATURATED FLOW.
      *                      STRM(19,II),SFRQ(1,II),STRM(11,II),
      *                      STRM(21,II),STRM(22,II),STRM(23,II)
 C
-C8------OUTTYPE 7 IS USED TO PRINT WATER CONTENT PROFILES BENEATH 
+C8------OUTTYPE 7 IS USED TO PRINT WATER CONTENT PROFILES BENEATH
 C         STREAMBED.
                    CASE (7)
                      IF(IBD.NE.0) THEN
                        WRITE (IG3,280) GAGETM
                        DO IL=1,NUMAVE-1
                          WRITE (IG3,285) AVDPT(IL,II),AVWAT(IL,II),
-     *                                   WAT1(IL,II)     
-                       END DO 
-                     END IF                  
+     *                                   WAT1(IL,II)
+                       END DO
+                     END IF
                  END SELECT
 C
 C9------TRANSPORT IS ON.
@@ -1048,7 +1063,7 @@ C14-----RETURN.
       RETURN
       END SUBROUTINE SGWF2GAG7SO
 C
-C-------SUBROUTINE GWF2GAG7DA      
+C-------SUBROUTINE GWF2GAG7DA
       SUBROUTINE GWF2GAG7DA(IGRID)
 C  Deallocate GAG data for a grid.
       USE GWFGAGMODULE
@@ -1070,7 +1085,7 @@ C
 C
       END SUBROUTINE SGWF2GAG7PNT
 C
-C-------SUBROUTINE SGWF2GAG7PSV      
+C-------SUBROUTINE SGWF2GAG7PSV
       SUBROUTINE SGWF2GAG7PSV(IGRID)
 C  Save GAG data for a grid.
       USE GWFGAGMODULE
