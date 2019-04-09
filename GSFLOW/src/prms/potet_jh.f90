@@ -46,13 +46,13 @@
 
 !******Declare parameters
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_potet_jh = 'potet_jh.f90 2016-05-10 15:48:00Z'
+        Version_potet_jh = 'potet_jh.f90 2019-04-04 11:43:00Z'
         CALL print_module(Version_potet_jh, 'Potential Evapotranspiration', 90)
         MODNAME = 'potet_jh'
 
         ALLOCATE ( Jh_coef(Nhru,12) )
         IF ( declparam(MODNAME, 'jh_coef', 'nhru,nmonths', 'real', &
-     &       '0.014', '0.0', '0.1', &
+     &       '0.014', '-0.5', '1.5', &
      &       'Monthly air temperature coefficient for each HRU - Jensen-Haise', &
      &       'Monthly (January to December) air temperature coefficient used in Jensen-Haise potential ET computations'// &
      &       ' for each HRU', &

@@ -83,7 +83,7 @@
 !***********************************************************************
       gwflowdecl = 0
 
-      Version_gwflow = 'gwflow.f90 2018-02-26 12:57:00Z'
+      Version_gwflow = 'gwflow.f90 2019-04-04 11:41:00Z'
       CALL print_module(Version_gwflow, 'Groundwater                 ', 90)
       MODNAME = 'gwflow'
 
@@ -190,7 +190,7 @@
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==6 ) THEN
         ALLOCATE ( Gwstor_init(Ngw) )
         IF ( declparam(MODNAME, 'gwstor_init', 'ngw', 'real', &
-     &       '2.0', '0.0', '10.0', &
+     &       '2.0', '0.0', '50.0', &
      &       'Initial storage in each GWR', &
      &       'Storage in each GWR at the beginning of a simulation', &
      &       'inches')/=0 ) CALL read_error(1, 'gwstor_init')

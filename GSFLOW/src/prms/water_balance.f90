@@ -12,6 +12,7 @@
         CHARACTER(LEN=13), SAVE :: MODNAME_WB
 !   Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_capillary_wb, Basin_gravity_wb, Basin_soilzone_wb
+!        DOUBLE PRECISION, ALLOCATABLE, SAVE :: Hru_runoff(:)
       END MODULE PRMS_WATER_BALANCE
 
 !***********************************************************************
@@ -69,6 +70,11 @@
       IF ( declvar(MODNAME_WB, 'basin_soilzone_wb', 'one', 1, 'double', &
      &     'Basin area-weighted average storage in soilzone reservoirs', &
      &     'inches', Basin_soilzone_wb)/=0 ) CALL read_error(3, 'basin_soilzone_wb')
+
+!      ALLOCATE ( Hru_runoff(Nhru) )
+!      IF ( declvar(MODNAME, 'hru_runoff', 'nhru', Nhru, 'double', &
+!     &     'Total lateral flow leaving each HRU (includes cascading flow)', &
+!     &     'inches', Hru_runoff)/=0 ) CALL read_error(3, 'hru_runoff')
 
       ALLOCATE ( Hru_storage_ante(Nhru) )
 
@@ -130,6 +136,7 @@
       Basin_gravity_wb = 0.0D0
       Basin_soilzone_wb = 0.0D0
       Basin_dprst_wb = 0.0D0
+!      Hru_runoff = 0.0D0
       Last_basin_gwstor = Basin_gwstor
       Gwstor_ante = Gwres_stor
       Hru_storage_ante = Hru_storage
@@ -195,6 +202,7 @@
       soil_in = 0.0D0
       basin_robal = 0.0D0
       bsnobal = 0.0D0
+!      Hru_runoff = 0.0D0
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 
@@ -362,6 +370,7 @@
           hru_out = hru_out + Hru_gw_cascadeflow(i)
           hru_in = hru_in + Gw_upslope(i)/DBLE(harea)
         ENDIF
+!        Hru_runoff(i) = hru_out - DBLE( Hru_actet(i) )
         wbal = hru_in - hru_out + Hru_storage_ante(i) - Hru_storage(i)
         IF ( Gwminarea_flag==1 ) wbal = wbal + Gwstor_minarea_wb(i)
         IF ( DABS(wbal)>DTOOSMALL ) THEN

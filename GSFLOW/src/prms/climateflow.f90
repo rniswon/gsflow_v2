@@ -120,7 +120,7 @@
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       USE PRMS_MODULE, ONLY: Temp_flag, Precip_flag, Model, Nhru, Nssr, Nevap, Nlake, &
-     &    Nsegment, Strmflow_module, Temp_module, Ntemp, Stream_order_flag, &
+     &    Nsegment, Strmflow_module, Temp_module, Ntemp, Stream_order_flag, GSFLOW_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, Init_vars_from_file, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Nrain, Nsol, Call_cascade, Et_flag, Dprst_flag, Solrad_flag
       IMPLICIT NONE
@@ -132,7 +132,7 @@
 !***********************************************************************
       climateflow_decl = 0
 
-      Version_climateflow = 'climateflow.f90 2018-12-13 12:43:00Z'
+      Version_climateflow = 'climateflow.f90 2019-04-03 14:30:00Z'
       CALL print_module(Version_climateflow, 'Common States and Fluxes    ', 90)
       MODNAME = 'climateflow'
 
@@ -425,7 +425,7 @@
      &     'inches', Basin_soil_to_gw)/=0 ) CALL read_error(3, 'basin_soil_to_gw')
 
 ! gwflow
-      IF ( Model/=0 ) THEN
+      IF ( GSFLOW_flag==0 ) THEN
         ALLOCATE ( Gwres_stor(Nhru) )
         IF ( declvar('gwflow', 'gwres_stor', 'ngw', Nhru, 'double', &
      &       'Storage in each GWR', &
@@ -824,7 +824,7 @@
       USE PRMS_MODULE, ONLY: Temp_flag, Precip_flag, Nhru, Nssr, Temp_module, Precip_module, Parameter_check_flag, &
      &    Solrad_module, Soilzone_module, Srunoff_module, Stream_order_flag, Ntemp, Nrain, Nsol, Nevap, &
      &    Init_vars_from_file, Inputerror_flag, Dprst_flag, Solrad_flag, Et_flag, Nlake, Et_module, Humidity_cbh_flag, &
-     &    PRMS4_flag, Print_debug, Model
+     &    PRMS4_flag, Print_debug, GSFLOW_flag
       USE PRMS_BASIN, ONLY: Elev_units, FEET2METERS, METERS2FEET, Active_hrus, Hru_route_order, Hru_type
       IMPLICIT NONE
 ! Functions
@@ -1024,7 +1024,7 @@
             PRINT 9006, i, Soil_moist_max(i)
             ierr = 1
           ELSE
-            Soil_moist_max = 0.00001
+            Soil_moist_max(i) = 0.00001
             IF ( Print_debug>-1 ) PRINT 9008, i
           ENDIF
         ENDIF
@@ -1033,7 +1033,7 @@
             PRINT 9007, i, Soil_rechr_max(i)
             ierr = 1
           ELSE
-            Soil_rechr_max = 0.00001
+            Soil_rechr_max(i) = 0.00001
             IF ( Print_debug>-1 ) PRINT 9009, i
           ENDIF
         ENDIF
@@ -1183,7 +1183,7 @@
 ! initialize storage variables
       Imperv_stor = 0.0
       Pkwater_equiv = 0.0D0
-      IF ( Model/=0 ) Gwres_stor = 0.0D0 ! not needed for GSFLOW
+      IF ( GSFLOW_flag==0 ) Gwres_stor = 0.0D0 ! not needed for GSFLOW
       IF ( Dprst_flag==1 ) THEN
         Dprst_vol_open = 0.0D0
         Dprst_vol_clos = 0.0D0
@@ -1333,7 +1333,7 @@
 !     Write or read restart file
 !***********************************************************************
       SUBROUTINE climateflow_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Stream_order_flag, Dprst_flag, Nlake, Model
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Stream_order_flag, Dprst_flag, Nlake, GSFLOW_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       IMPLICIT NONE
@@ -1358,7 +1358,7 @@
         WRITE ( Restart_outunit ) Ssres_stor
         WRITE ( Restart_outunit ) Soil_rechr
         WRITE ( Restart_outunit ) Imperv_stor
-        IF ( Model/=0 ) WRITE ( Restart_outunit ) Gwres_stor
+        IF ( GSFLOW_flag==0 ) WRITE ( Restart_outunit ) Gwres_stor
         IF ( Dprst_flag==1 ) THEN
           WRITE ( Restart_outunit ) Dprst_vol_open
           WRITE ( Restart_outunit ) Dprst_vol_clos
@@ -1384,7 +1384,7 @@
         READ ( Restart_inunit ) Ssres_stor
         READ ( Restart_inunit ) Soil_rechr
         READ ( Restart_inunit ) Imperv_stor
-        IF ( Model/=0 ) READ ( Restart_inunit ) Gwres_stor
+        IF ( GSFLOW_flag==0 ) READ ( Restart_inunit ) Gwres_stor
         IF ( Dprst_flag==1 ) THEN
           READ ( Restart_inunit ) Dprst_vol_open
           READ ( Restart_inunit ) Dprst_vol_clos

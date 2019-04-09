@@ -381,7 +381,7 @@
       IF ( istop==1 ) STOP 'ERROR in dynamic_param_read initialize procedure'
 
       IF ( Print_debug>-2 ) THEN
-        Output_unit = get_ftnunit(8888)
+        Output_unit = get_ftnunit(520)
         OPEN ( Output_unit, FILE='dynamic_parameter.out' )
         PRINT '(/,A,//)', 'A summary of dynamic parameter events are written to file: dynamic_parameter.out'
       ENDIF
@@ -397,10 +397,10 @@
      &    Dyn_covtype_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, Dyn_snareathresh_flag, &
      &    Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Et_flag, Dyn_potet_flag, PRMS4_flag
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Dprst_clos_flag, &
+      USE PRMS_BASIN, ONLY: Hru_type, Hru_area, Dprst_clos_flag, &
      &    Hru_percent_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Dprst_frac, Dprst_open_flag, &
      &    Dprst_area_max, Dprst_area_open_max, Dprst_area_clos_max, Dprst_frac_open, &
-     &    Cov_type, Basin_area_inv, NEARZERO, Covden_win, Covden_sum, DNEARZERO
+     &    Cov_type, Basin_area_inv, NEARZERO, Covden_win, Covden_sum
       USE PRMS_CLIMATEVARS, ONLY: Transp_on, Epan_coef
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Soil_moist, Soil_rechr, Imperv_stor, Sat_threshold, &
      &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor
@@ -419,24 +419,36 @@
      &    Op_flow_thres, Dprst_vol_open_max, Dprst_vol_clos_max, Dprst_vol_thres_open, &
      &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac
       USE PRMS_SOILZONE, ONLY: Basin_soil_rechr, Soil_zone_max, Soil_moist_tot, &
-     &    Soil_lower_stor_max, Replenish_frac, Soil_lower_ratio, Soil_lower
-!     &    Soil_moist_frac, Cpr_stor_frac, Soil_lower_stor_max, Replenish_frac, &
-!     &    Soil_lower_ratio, Soil_lower, Soil_rechr_ratio
+     &    Soil_lower_stor_max, Replenish_frac
       IMPLICIT NONE
 ! Functions
       INTRINSIC SNGL, DBLE
       EXTERNAL write_dynoutput, is_eof, write_dynparam, write_dynparam_int
-      EXTERNAL write_dynparam_potet !, write_dynparam_dble
+      EXTERNAL write_dynparam_potet
 ! Local Variables
-      INTEGER :: i, jj, istop
-      REAL :: soilmoist, soilrechr, harea, frac_imperv, tmp, hruperv, dprst_areamax
+      INTEGER :: i, istop, check_dprst_depth_flag
+      REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj
 !***********************************************************************
       dynparamrun = 0
       istop = 0
 
-      IF ( Imperv_frac_flag==1 .OR. Dprst_frac_flag==1 ) THEN
+      IF ( Imperv_frac_flag==1 .OR. Dprst_frac_flag==1 .OR. Dprst_depth_flag==1 ) THEN
+        Check_imperv = 0
+        Check_dprst_frac = 0
+        check_dprst_depth_flag = 0
+
+        IF ( Dprst_depth_flag==1 ) THEN
+          IF ( Dprst_depth_next_mo/=0 ) THEN
+            IF ( Dprst_depth_next_yr==Nowyear .AND. Dprst_depth_next_mo==Nowmonth .AND. Dprst_depth_next_day==Nowday ) THEN
+              READ ( Dprst_depth_unit, * ) Dprst_depth_next_yr, Dprst_depth_next_mo, Dprst_depth_next_day, Temp
+              CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Dprst_depth_avg, 'dprst_depth_avg')
+              CALL is_eof(Dprst_depth_unit, Dprst_depth_next_yr, Dprst_depth_next_mo, Dprst_depth_next_day)
+              check_dprst_depth_flag = 1
+            ENDIF
+          ENDIF
+        ENDIF
+
         IF ( Imperv_frac_flag==1 ) THEN
-          Check_imperv = 0
           IF ( Imperv_next_mo/=0 ) THEN
             IF ( Imperv_next_yr==Nowyear .AND. Imperv_next_mo==Nowmonth .AND. Imperv_next_day==Nowday ) THEN
               READ ( Imperv_frac_unit, * ) Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Temp
@@ -450,14 +462,11 @@
         ENDIF
 
         IF ( Dprst_frac_flag==1 ) THEN
-          Check_dprst_frac = 0
           Dprst_clos_flag = 0
           Dprst_open_flag = 0
           IF ( Dprst_frac_next_mo/=0 ) THEN
             IF ( Dprst_frac_next_yr==Nowyear .AND. Dprst_frac_next_mo==Nowmonth .AND. Dprst_frac_next_day==Nowday ) THEN
-              ! Temp3 has new values, Dprst_frac has old values
               READ ( Dprst_frac_unit, * ) Dprst_frac_next_yr, Dprst_frac_next_mo, Dprst_frac_next_day, Temp3
-              ! Temp3 has new values with negative values set to the old value
               CALL write_dynoutput(Output_unit, Nhru, Updated_hrus, Temp3, Dprst_frac, 'dprst_frac')
               CALL is_eof(Dprst_frac_unit, Dprst_frac_next_yr, Dprst_frac_next_mo, Dprst_frac_next_day)
               Check_dprst_frac = 1
@@ -465,123 +474,113 @@
           ENDIF
         ENDIF
 
-        Basin_soil_moist = 0.0D0
-        DO jj = 1, Active_hrus
-          i = Hru_route_order(jj)
-          IF ( Hru_type(i)==2 ) CYCLE ! skip lake HRUs
-          soilmoist = Soil_moist(i)
-          soilrechr = Soil_rechr(i)
-          harea = Hru_area(i)
-          IF ( Dprst_frac_flag==1 ) Dprst_area_max(i) = Dprst_frac(i)*harea
-          IF ( Check_imperv==1 ) THEN
-            frac_imperv = Temp(i) ! updated value
-            IF ( frac_imperv>0.999 ) THEN
-              PRINT *, 'ERROR, dynamic value of hru_percent_imperv > 0.999'
-              PRINT *, '       Impervious fraction:', frac_imperv, ' HRU:', i
-              istop = 1
-            ELSEIF ( Imperv_stor(i)>0.0 ) THEN
-              IF ( frac_imperv>0.0 ) THEN
-                Imperv_stor(i) = Imperv_stor(i)*Hru_percent_imperv(i)/frac_imperv
-              ELSE
-                PRINT *, 'WARNING, dynamic impervious changed to 0 when impervious storage > 0'
-                PRINT *, '         storage added to soil_moist and soil_rechr'
-                tmp = Imperv_stor(i)*Hru_percent_imperv(i)/Hru_frac_perv(i)
-                soilmoist = soilmoist + tmp
-                soilrechr = soilrechr + tmp
-                Imperv_stor(i) = 0.0
-              ENDIF
-            ENDIF
-            Hru_percent_imperv(i) = frac_imperv
-            Hru_imperv(i) = harea*frac_imperv
-          ENDIF
+        IF ( Check_imperv==1 .OR. Check_dprst_frac==1 .OR. check_dprst_depth_flag==1 ) THEN
+          Basin_soil_moist = 0.0D0
+          DO i = 1, Nhru
+            IF ( Hru_type(i)==2 .OR. Hru_type(i)==0 ) CYCLE ! skip lake and inactive HRUs
+            harea = Hru_area(i)
+            soil_adj = 0.0
 
-          ! CAUTION: other DPRST parameters need to have valid values as related to any dynamic parameter updates
-          IF ( Dprst_frac_flag==1 ) THEN
-            dprst_areamax = Dprst_area_max(i)
-            IF ( Check_dprst_frac==1 ) dprst_areamax = Temp3(i)*harea ! updated value
-            IF ( dprst_areamax>0.0 ) THEN
-              IF ( Hru_percent_imperv(i)+dprst_areamax>0.999 ) THEN
-                tmp = 0.999 - Hru_percent_imperv(i)
-                IF ( tmp<0.001) THEN
-                  PRINT *, 'ERROR, fraction impervious + fraction dprst > 0.999 for HRU:', i
-                  PRINT *, '   hru_area:', harea, ' hru_imperv:', Hru_imperv(i), ' dprst_area:', dprst_areamax
-                  PRINT *, '   (hru_imperv+dprst_area)/hru_area =', (Hru_imperv(i)+dprst_areamax)/harea
-                  istop = 1
+            IF ( Check_imperv==1 ) THEN
+              ! Temp has new values with negative values set to the old value, Hru_percent_imperv has old values
+              frac_imperv = Temp(i)
+              IF ( Imperv_stor(i)>0.0 ) THEN
+                IF ( frac_imperv>0.0 ) THEN
+                  Imperv_stor(i) = Imperv_stor(i)*Hru_percent_imperv(i)/frac_imperv
+                ELSE
+                  tmp = Imperv_stor(i)*Hru_percent_imperv(i)/Hru_frac_perv(i) ! not sure this is correct???
+                  PRINT *, 'WARNING, dynamic impervious changed to 0 when impervious storage > 0'
+                  PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
+                  soil_adj = tmp
+                  Imperv_stor(i) = 0.0
                 ENDIF
               ENDIF
+              Hru_percent_imperv(i) = frac_imperv
+              Hru_imperv(i) = harea*frac_imperv
             ENDIF
-            tmp = SNGL( Dprst_vol_open(i) + Dprst_vol_clos(i) )
-            IF ( dprst_areamax==0.0 .AND. tmp>0.0 ) THEN
-              PRINT *, 'Warning, dprst_area reduced to 0 with storage > 0'
-              PRINT *, '         storage added to soil_moist and soil_rechr'
-              tmp = tmp/dprst_areamax/Hru_frac_perv(i) ! not sure this is correct???
-              soilmoist = soilmoist + tmp
-              soilrechr = soilrechr + tmp
-              Dprst_vol_open(i) = 0.0D0
-              Dprst_vol_clos(i) = 0.0D0
-            ENDIF
-            ! adjust dprst_area, volume stays the same
-            Dprst_area_open_max(i) = dprst_areamax*Dprst_frac_open(i)
-            Dprst_area_clos_max(i) = dprst_areamax - Dprst_area_open_max(i)
-            Dprst_area_max(i) = Dprst_area_open_max(i) + Dprst_area_clos_max(i)
-            IF ( Dprst_area_clos_max(i)>0.0 ) Dprst_clos_flag = 0
-            IF ( Dprst_area_open_max(i)>0.0 ) Dprst_open_flag = 0
-            Dprst_frac(i) = Dprst_area_max(i)/harea
-            Dprst_vol_clos_max(i) = DBLE( Dprst_area_clos_max(i)*Dprst_depth_avg(i) )
-            Dprst_vol_open_max(i) = DBLE( Dprst_area_open_max(i)*Dprst_depth_avg(i) )
-            Dprst_vol_thres_open(i) = Dprst_vol_open_max(i)*DBLE(Op_flow_thres(i))
-          ENDIF
 
-          IF ( Check_imperv==1 .OR. Dprst_frac_flag==1 ) THEN
+            IF ( Check_dprst_frac==1 .OR. check_dprst_depth_flag==1 ) THEN
+              ! CAUTION: other DPRST parameters need to have valid values as related to any dynamic parameter updates
+              tmp = SNGL( Dprst_vol_open(i) + Dprst_vol_clos(i) )
+              IF ( Check_dprst_frac==1 ) THEN
+                ! Temp3 has new values with negative values set to the old value, Dprst_frac has old values
+                dprstfrac = Temp3(i)
+                IF ( dprstfrac==0.0 .AND. tmp>0.0 ) THEN
+                  tmp = tmp/(Dprst_frac(i)*harea)/Hru_frac_perv(i) ! not sure this is correct???
+                  PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0'
+                  PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
+                  soil_adj = soil_adj + tmp
+                  Dprst_vol_open(i) = 0.0D0
+                  Dprst_vol_clos(i) = 0.0D0
+                  tmp = 0.0
+                ENDIF
+              ELSE
+                dprstfrac = Dprst_frac(i)
+              ENDIF
+
+              IF ( Dprst_depth_avg(i)==0.0 .AND. dprstfrac>0.0 ) THEN
+                istop = 1
+                PRINT *, 'ERROR, dprst_frac>0 and dprst_depth_avg==0 for HRU:', i, '; dprst_frac:', dprstfrac
+                CYCLE
+              ENDIF
+
+              Dprst_frac(i) = dprstfrac
+              Dprst_area_max(i) = Dprst_frac(i)*harea
+              Dprst_area_open_max(i) = Dprst_area_max(i)*Dprst_frac_open(i)
+              Dprst_area_clos_max(i) = Dprst_area_max(i) - Dprst_area_open_max(i)
+              IF ( Dprst_area_clos_max(i)>0.0 ) Dprst_clos_flag = 1
+              IF ( Dprst_area_open_max(i)>0.0 ) Dprst_open_flag = 1
+              Dprst_vol_clos_max(i) = DBLE( Dprst_area_clos_max(i)*Dprst_depth_avg(i) )
+              Dprst_vol_open_max(i) = DBLE( Dprst_area_open_max(i)*Dprst_depth_avg(i) )
+              Dprst_vol_thres_open(i) = Dprst_vol_open_max(i)*DBLE(Op_flow_thres(i))
+              ! update variables as dprst could have gone from positive value to 0 and not get updated in srunoff
+              IF ( Dprst_vol_open_max(i)>0.0 ) THEN
+                Dprst_vol_open_frac(i) = SNGL( Dprst_vol_open(i)/Dprst_vol_open_max(i) )
+              ELSE
+                Dprst_vol_open_frac(i) = 0.0D0
+              ENDIF
+              IF ( Dprst_vol_clos_max(i)>0.0 ) THEN
+                Dprst_vol_clos_frac(i) = SNGL( Dprst_vol_clos(i)/Dprst_vol_clos_max(i) )
+              ELSE
+                Dprst_vol_clos_frac(i) = 0.0D0
+              ENDIF
+              IF ( Dprst_vol_open_max(i)+Dprst_vol_clos_max(i)>0.0 ) THEN
+                Dprst_vol_frac(i) = SNGL( (Dprst_vol_open(i)+Dprst_vol_clos(i))/(Dprst_vol_open_max(i)+Dprst_vol_clos_max(i)) )
+              ELSE
+                Dprst_vol_frac(i) = 0.0
+              ENDIF
+            ENDIF
+
+            ! check sum of imperv and dprst if either are updated!!!!!!
             hruperv = harea - Hru_imperv(i)
             IF ( Dprst_flag==1 ) THEN
               hruperv = hruperv - Dprst_area_max(i)
-              IF ( Dprst_area_max(i)+Hru_imperv(i)>0.999*harea ) THEN
-                PRINT *, 'ERROR, Impervious + depression area > 0.999*hru_area, HRU:', i
-                PRINT *, '       Pervious area:', hruperv, ' Impervious area:', Hru_imperv(i), &
-     &                   '       Depression area:', Dprst_area_max(i), &
-     &                   '       Impervious + Depression area:', Dprst_area_max(i)+Hru_imperv(i)
-                istop = 1
-                CYCLE
-              ENDIF
+              dprstfrac = Dprst_frac(i)
+            ELSE
+              dprstfrac = 0.0
             ENDIF
-            IF ( Hru_perv(i)/=hruperv ) THEN
-                !print *, hru_perv(i), hruperv, hru_perv(i)-hruperv, Dprst_area_max(i), hru_imperv(i),i
-              IF ( hruperv<NEARZERO ) &
-     &             PRINT *, 'pervious area error for dynamic parameter, HRU:', i, hruperv, harea
+            IF ( Hru_percent_imperv(i)+dprstfrac > 0.999 ) THEN
+              istop = 1
+              PRINT *, 'ERROR, fraction impervious + fraction dprst > 0.999 for HRU:', i
+              PRINT *, '       fraction impervious + dprst:', Hru_percent_imperv(i) + dprstfrac
+              PRINT *, '       hru_percent_imperv:', Hru_percent_imperv(i), '; dprst_frac:', dprstfrac
+              CYCLE
+            ENDIF
+            ! adjust pervious area and capillary storage for dynamic parameters
+            Soil_moist(i) = Soil_moist(i) + soil_adj
+            Soil_rechr(i) = Soil_rechr(i) + soil_adj
+            IF ( Hru_perv(i) /= hruperv ) THEN
               tmp = Hru_perv(i)/hruperv
-              Soil_moist(i) = soilmoist*tmp
-              Soil_rechr(i) = soilrechr*tmp
+              Soil_moist(i) = Soil_moist(i)*tmp
+              Soil_rechr(i) = Soil_rechr(i)*tmp
               Hru_perv(i) = hruperv
               Hru_frac_perv(i) = Hru_perv(i)/harea
             ENDIF
-          ENDIF
-          Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*Hru_perv(i) )
-          Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(i)*Hru_perv(i) )
-        ENDDO
-        Basin_soil_moist = Basin_soil_moist*Basin_area_inv
-        Basin_soil_rechr = Basin_soil_rechr*Basin_area_inv
-      ENDIF
-
-      ! need to update maximum volumes after DPRST area is updated
-      IF ( Dprst_depth_flag==1 ) THEN
-        IF ( Dprst_depth_next_mo/=0 ) THEN
-          IF ( Dprst_depth_next_yr==Nowyear .AND. Dprst_depth_next_mo==Nowmonth .AND. Dprst_depth_next_day==Nowday ) THEN
-            READ ( Dprst_depth_unit, * ) Dprst_depth_next_yr, Dprst_depth_next_mo, Dprst_depth_next_day, Temp
-            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Dprst_depth_avg, 'dprst_depth_avg')
-            DO jj = 1, Active_hrus
-              i = Hru_route_order(jj)
-              IF ( Hru_type(i)==2 ) CYCLE ! skip lake HRUs
-              IF ( Dprst_area_max(i)>NEARZERO ) THEN
-                Dprst_vol_clos_max(i) = DBLE( Dprst_area_clos_max(i)*Dprst_depth_avg(i) )
-                Dprst_vol_open_max(i) = DBLE( Dprst_area_open_max(i)*Dprst_depth_avg(i) )
-                IF ( Dprst_vol_open_max(i)>0.0 ) Dprst_vol_open_frac(i) = SNGL( Dprst_vol_open(i)/Dprst_vol_open_max(i) )
-                IF ( Dprst_vol_clos_max(i)>0.0 ) Dprst_vol_clos_frac(i) = SNGL( Dprst_vol_clos(i)/Dprst_vol_clos_max(i) )
-                Dprst_vol_frac(i) = SNGL( (Dprst_vol_open(i)+Dprst_vol_clos(i))/(Dprst_vol_open_max(i)+Dprst_vol_clos_max(i)) )
-              ENDIF
-            ENDDO
-            CALL is_eof(Dprst_depth_unit, Dprst_depth_next_yr, Dprst_depth_next_mo, Dprst_depth_next_day)
-          ENDIF
+            Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*Hru_perv(i) )
+            Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(i)*Hru_perv(i) )
+          ENDDO
+          Basin_soil_moist = Basin_soil_moist*Basin_area_inv
+          Basin_soil_rechr = Basin_soil_rechr*Basin_area_inv
         ENDIF
       ENDIF
 
@@ -763,32 +762,31 @@
       ENDIF
 
       IF ( Soilmoist_flag==1 .OR. Soilrechr_flag==1 ) THEN
-        DO jj = 1, Active_hrus
-          i = Hru_route_order(jj)
-          IF ( Hru_type(i)==2 ) CYCLE ! skip lake HRUs
+        DO i = 1, Nhru
+          IF ( Hru_type(i)==2 .OR. Hru_type(i)==0 ) CYCLE ! skip lake and inactive HRUs
 
-          IF ( Soil_moist_max(i)<NEARZERO ) THEN
+          IF ( Soil_moist_max(i)<0.00001 ) THEN
             istop = 1
-            PRINT 9001, 'soil_moist_max', NEARZERO, i, Soil_moist_max(i), NEARZERO
+            PRINT 9001, 'soil_moist_max', 0.00001, i, Soil_moist_max(i), 0.00001
+            CYCLE
           ENDIF
           IF ( PRMS4_flag==0 ) Soil_rechr_max(i) = Soil_moist_max(i)*Soil_rechr_max_frac(i)
-          IF ( Soil_rechr_max(i)<NEARZERO ) THEN
+          IF ( Soil_rechr_max(i)<0.00001 ) THEN
             istop = 1
-            PRINT 9001, 'soil_rechr_max', NEARZERO, i, Soil_rechr_max(i), NEARZERO
+            PRINT 9001, 'soil_rechr_max', 0.00001, i, Soil_rechr_max(i), 0.00001
+            CYCLE
           ENDIF
-          IF ( istop==1 ) CYCLE
-
+          IF ( Soil_rechr_max(i)>Soil_moist_max(i) ) THEN
+            istop = 1
+            PRINT 9002, Soil_rechr_max(i), Soil_moist_max(i), i
+            CYCLE
+          ENDIF
           Soil_zone_max(i) = Sat_threshold(i) + Soil_moist_max(i)*Hru_frac_perv(i)
           Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*Hru_frac_perv(i)
-!          Soil_moist_frac(i) = Soil_moist_tot(i)/Soil_zone_max(i)
-!          Cpr_stor_frac(i) = Soil_moist(i)/Soil_moist_max(i)
           Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
           Replenish_frac(i) = Soil_rechr_max(i)/Soil_moist_max(i)
-          IF ( Soil_lower_stor_max(i)>0.0 ) Soil_lower_ratio(i) = Soil_lower(i)/Soil_lower_stor_max(i)
-!          Soil_rechr_ratio(i) = Soil_rechr(i)/Soil_rechr_max(i)
         ENDDO
       ENDIF
-      IF ( istop==1 ) STOP
 
       IF ( Dyn_radtrncf_flag==1 ) THEN
         IF ( Rad_trncf_next_mo/=0 ) THEN
@@ -840,7 +838,10 @@
         ENDIF
       ENDIF
 
-9001  FORMAT (/, 'ERROR, dynamic parameter', A, ' <', F10.7, ' for HRU:', I7, /, 9X, 'value:', F10.7) !, ' set to', F10.7)
+      IF ( istop==1 ) STOP
+
+ 9001 FORMAT (/, 'ERROR, dynamic parameter', A, ' <', F0.7, ' for HRU:', I0, /, 9X, 'value:', F0.7) !, ' set to', F0.7)
+ 9002 FORMAT (/, 'ERROR, dynamic parameter causes soil_rechr_max:', F0.7, ' > soil_moist_max:', F0.7, ' for HRU:', I0)
 
       END FUNCTION dynparamrun
 
@@ -849,7 +850,7 @@
 !***********************************************************************
       SUBROUTINE write_dynoutput(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_MODULE, ONLY: Nhru, Print_debug
-      USE PRMS_BASIN, ONLY: NEARZERO, Active_hrus, Hru_route_order
+      USE PRMS_BASIN, ONLY: Hru_type
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
@@ -859,24 +860,25 @@
       INTEGER, INTENT(OUT) :: Updated_hrus(Nhru)
       CHARACTER(LEN=*), INTENT(IN) :: Param_name
 ! Local Variables
-      INTEGER i, j, num
+      INTEGER i, num
 !***********************************************************************
       Updated_hrus = 0
       num = 0
-      DO j = 1, Active_hrus
-        i = Hru_route_order(j)
+      DO i = 1, Nhru
+        IF ( Hru_type(i)==0 ) CYCLE ! skip inactive HRUs
         IF ( Values(i)<0.0 ) THEN
           Values(i) = Param(i)
-        ELSEIF ( ABS(Values(i)-Param(i))>NEARZERO ) THEN
+        ELSEIF ( ABS(Values(i)-Param(i))>0.0 ) THEN
           num = num + 1
           Updated_hrus(num) = i
         ENDIF
       ENDDO
-      IF ( Print_debug>-2 ) &
-    &      WRITE ( Output_unit, '(/,3A,I4,2("/",I2.2))' ) 'Parameter ', Param_name, ' updated on: ', Nowyear, Nowmonth, Nowday
-      IF ( Print_debug>-1 ) THEN
-        WRITE ( Output_unit, '(/,A,I5,2("/",I2.2))' ) 'List of updated HRUs; Date:', Nowyear, Nowmonth, Nowday
-        WRITE ( Output_unit, '(20I7)' ) (Updated_hrus(i), i=1,num)
+      IF ( Print_debug>-2 ) THEN
+        WRITE ( Output_unit, '(/,3A,I4,2("/",I2.2))' ) 'Parameter ', Param_name, ' updated on: ', Nowyear, Nowmonth, Nowday
+        IF ( Print_debug>-1 ) THEN
+          WRITE ( Output_unit, '(/,A,I5,2("/",I2.2))' ) 'List of updated HRUs; Date:', Nowyear, Nowmonth, Nowday
+          WRITE ( Output_unit, '(20I7)' ) (Updated_hrus(i), i=1,num)
+        ENDIF
       ENDIF
       END SUBROUTINE write_dynoutput
 
@@ -885,7 +887,7 @@
 !***********************************************************************
       SUBROUTINE write_dynparam_int(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_MODULE, ONLY: Nhru, Print_debug
-      USE PRMS_BASIN, ONLY: NEARZERO, Active_hrus, Hru_route_order
+      USE PRMS_BASIN, ONLY: Hru_type
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
@@ -895,24 +897,25 @@
       INTEGER, INTENT(OUT) :: Updated_hrus(Nhru)
       CHARACTER(LEN=*), INTENT(IN) :: Param_name
 ! Local Variables
-      INTEGER i, j, num
+      INTEGER i, num
 !***********************************************************************
       Updated_hrus = 0
       num = 0
-      DO j = 1, Active_hrus
-        i = Hru_route_order(j)
-        IF ( Values(i)<0.0 ) CYCLE
-        IF ( ABS(Values(i)-Param(i))>NEARZERO ) THEN
+      DO i = 1, Nhru
+        IF ( Hru_type(i)==0 ) CYCLE ! skip inactive HRUs
+        IF ( Values(i)<0 ) CYCLE
+        IF ( ABS(Values(i)-Param(i))>0 ) THEN
           num = num + 1
           Updated_hrus(num) = i
           Param(i) = Values(i)
         ENDIF
       ENDDO
-      IF ( Print_debug>-2 ) &
-     &     WRITE ( Output_unit, '(/,3A,I4,2("/",I2.2))' ) 'Parameter ', Param_name, ' updated on: ', Nowyear, Nowmonth, Nowday
-      IF ( Print_debug>-1 ) THEN
-        WRITE ( Output_unit, '(/,A,I5,2("/",I2.2))' ) 'List of updated HRUs; Date:', Nowyear, Nowmonth, Nowday
-        WRITE ( Output_unit, '(20I7)' ) (Updated_hrus(i), i=1,num)
+      IF ( Print_debug>-2 ) THEN
+        WRITE ( Output_unit, '(/,3A,I4,2("/",I2.2))' ) 'Parameter ', Param_name, ' updated on: ', Nowyear, Nowmonth, Nowday
+        IF ( Print_debug>-1 ) THEN
+          WRITE ( Output_unit, '(/,A,I5,2("/",I2.2))' ) 'List of updated HRUs; Date:', Nowyear, Nowmonth, Nowday
+          WRITE ( Output_unit, '(20I7)' ) (Updated_hrus(i), i=1,num)
+        ENDIF
       ENDIF
       END SUBROUTINE write_dynparam_int
 
@@ -921,7 +924,7 @@
 !***********************************************************************
       SUBROUTINE write_dynparam(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_MODULE, ONLY: Nhru, Print_debug
-      USE PRMS_BASIN, ONLY: NEARZERO, Active_hrus, Hru_route_order
+      USE PRMS_BASIN, ONLY: Hru_type
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
@@ -931,24 +934,25 @@
       INTEGER, INTENT(OUT) :: Updated_hrus(Nhru)
       CHARACTER(LEN=*), INTENT(IN) :: Param_name
 ! Local Variables
-      INTEGER i, j, num
+      INTEGER i, num
 !***********************************************************************
       Updated_hrus = 0
       num = 0
-      DO j = 1, Active_hrus
-        i = Hru_route_order(j)
+      DO i = 1, Nhru
+        IF ( Hru_type(i)==0 ) CYCLE ! skip inactive HRUs
         IF ( Values(i)<0.0 ) CYCLE
-        IF ( ABS(Values(i)-Param(i))>NEARZERO ) THEN
+        IF ( ABS(Values(i)-Param(i))>0.0 ) THEN
           Param(i) = Values(i)
           num = num + 1
           Updated_hrus(num) = i
         ENDIF
       ENDDO
-      IF ( Print_debug>-2 ) &
-     &     WRITE ( Output_unit, '(/,3A,I4,2("/",I2.2))' ) 'Parameter ', Param_name, ' updated on: ', Nowyear, Nowmonth, Nowday
-      IF ( Print_debug>-1 ) THEN
-        WRITE ( Output_unit, '(/,A,I5,2("/",I2.2))' ) 'List of updated HRUs; Date:', Nowyear, Nowmonth, Nowday
-        WRITE ( Output_unit, '(20I7)' ) (Updated_hrus(i), i=1,num)
+      IF ( Print_debug>-2 ) THEN
+        WRITE ( Output_unit, '(/,3A,I4,2("/",I2.2))' ) 'Parameter ', Param_name, ' updated on: ', Nowyear, Nowmonth, Nowday
+        IF ( Print_debug>-1 ) THEN
+          WRITE ( Output_unit, '(/,A,I5,2("/",I2.2))' ) 'List of updated HRUs; Date:', Nowyear, Nowmonth, Nowday
+          WRITE ( Output_unit, '(20I7)' ) (Updated_hrus(i), i=1,num)
+        ENDIF
       ENDIF
       END SUBROUTINE write_dynparam
 
@@ -957,7 +961,7 @@
 !***********************************************************************
 !      SUBROUTINE write_dynparam_dble(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
 !      USE PRMS_MODULE, ONLY: Print_debug, Nhru
-!      USE PRMS_BASIN, ONLY: NEARZERO, Active_hrus, Hru_route_order
+!      USE PRMS_BASIN, ONLY: Hru_type
 !      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
 !      IMPLICIT NONE
 ! Arguments
@@ -973,20 +977,21 @@
 !***********************************************************************
 !      Updated_hrus = 0
 !      num = 0
-!      DO j = 1, Active_hrus
-!        i = Hru_route_order(j)
+!      DO i = 1, Nhru
+!        IF ( Hru_type(i)==0 ) CYCLE ! skip inactive HRUs
 !        IF ( Values(i)<0.0 ) CYCLE
-!        IF ( ABS(Values(i)-SNGL(Param(i)))>NEARZERO ) THEN
+!        IF ( ABS(Values(i)-SNGL(Param(i)))>0.0 ) THEN
 !          Param(i) = DBLE( Values(i) )
 !          num = num + 1
 !          Updated_hrus(num) = i
 !        ENDIF
 !      ENDDO
-!      IF ( Print_debug>-2 ) &
-!     &     WRITE ( Output_unit, '(/,3A,I4,2("/",I2.2))' ) 'Parameter ', Param_name, ' updated on: ', Nowyear, Nowmonth, Nowday
-!      IF ( Print_debug>-1 ) THEN
-!        WRITE ( Output_unit, '(/,A,I5,2("/",I2.2))' ) 'List of updated HRUs; Date:', Nowyear, Nowmonth, Nowday
-!        WRITE ( Output_unit, '(20I7)' ) (Updated_hrus(i), i=1,num)
+!      IF ( Print_debug>-2 ) THEN
+!        WRITE ( Output_unit, '(/,3A,I4,2("/",I2.2))' ) 'Parameter ', Param_name, ' updated on: ', Nowyear, Nowmonth, Nowday
+!        IF ( Print_debug>-1 ) THEN
+!          WRITE ( Output_unit, '(/,A,I5,2("/",I2.2))' ) 'List of updated HRUs; Date:', Nowyear, Nowmonth, Nowday
+!          WRITE ( Output_unit, '(20I7)' ) (Updated_hrus(i), i=1,num)
+!        ENDIF
 !      ENDIF
 !      END SUBROUTINE write_dynparam_dble
 
@@ -995,7 +1000,7 @@
 !***********************************************************************
       SUBROUTINE write_dynparam_potet(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_MODULE, ONLY: Print_debug, Nhru
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
+      USE PRMS_BASIN, ONLY: Hru_type
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
@@ -1005,22 +1010,23 @@
       INTEGER, INTENT(OUT) :: Updated_hrus(Nhru)
       CHARACTER(LEN=*), INTENT(IN) :: Param_name
 ! Local Variables
-      INTEGER i, j, num
+      INTEGER i, num
 !***********************************************************************
       Updated_hrus = 0
       num = 0
-      DO j = 1, Active_hrus
-        i = Hru_route_order(j)
+      DO i = 1, Nhru
+        IF ( Hru_type(i)==0 ) CYCLE ! skip inactive HRUs
         IF ( ABS(Values(i)-Param(i))>0.0 ) THEN
           Param(i) = Values(i)
           num = num + 1
           Updated_hrus(num) = i
         ENDIF
       ENDDO
-      IF ( Print_debug>-2 ) &
-     &     WRITE ( Output_unit, '(/,3A,I4,2("/",I2.2))' ) 'Parameter ', Param_name, ' updated on: ', Nowyear, Nowmonth, Nowday
-      IF ( Print_debug>-1 ) THEN
-        WRITE ( Output_unit, '(/,A,I5,2("/",I2.2))' ) 'List of updated HRUs; Date:', Nowyear, Nowmonth, Nowday
-        WRITE ( Output_unit, '(20I7)' ) (Updated_hrus(i), i=1,num)
+      IF ( Print_debug>-2 ) THEN
+        WRITE ( Output_unit, '(/,3A,I4,2("/",I2.2))' ) 'Parameter ', Param_name, ' updated on: ', Nowyear, Nowmonth, Nowday
+        IF ( Print_debug>-1 ) THEN
+          WRITE ( Output_unit, '(/,A,I5,2("/",I2.2))' ) 'List of updated HRUs; Date:', Nowyear, Nowmonth, Nowday
+          WRITE ( Output_unit, '(20I7)' ) (Updated_hrus(i), i=1,num)
+        ENDIF
       ENDIF
       END SUBROUTINE write_dynparam_potet

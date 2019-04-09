@@ -94,7 +94,7 @@
 !***********************************************************************
       srunoffdecl = 0
 
-      Version_srunoff = 'srunoff.f90 2018-04-25 17:02:00Z'
+      Version_srunoff = 'srunoff.f90 2019-04-03 15:20:00Z'
       IF ( Sroff_flag==1 ) THEN
         MODNAME = 'srunoff_smidx'
       ELSE
@@ -294,7 +294,7 @@
      &       'decimal fraction')/=0 ) CALL read_error(1, 'smidx_coef')
         ALLOCATE ( Smidx_exp(Nhru) )
         IF ( declparam(MODNAME, 'smidx_exp', 'nhru', 'real', &
-     &       '0.3', '0.0', '1.0', &
+     &       '0.3', '0.0', '5.0', &
      &       'Exponent in contributing area computations', &
      &       'Exponent in non-linear contributing area algorithm for each HRU', &
      &       '1.0/inch')/=0 ) CALL read_error(1, 'smidx_exp')
@@ -334,7 +334,7 @@
 
         ALLOCATE ( Dprst_seep_rate_open(Nhru) )
         IF ( declparam(MODNAME, 'dprst_seep_rate_open', 'nhru', 'real', &
-     &       '0.02', '0.0001', '0.1', &
+     &       '0.02', '0.0', '0.2', &
      &       'Coefficient used in linear seepage flow equation for open surface depressions', &
      &       'Coefficient used in linear seepage flow equation for'// &
      &       ' open surface depressions for each HRU', &
@@ -342,7 +342,7 @@
 
         ALLOCATE ( Dprst_seep_rate_clos(Nhru) )
         IF ( declparam(MODNAME, 'dprst_seep_rate_clos', 'nhru', 'real', &
-     &       '0.02', '0.0001', '0.1', &
+     &       '0.02', '0.0', '0.2', &
      &       'Coefficient used in linear seepage flow equation for closed surface depressions', &
      &       'Coefficient used in linear seepage flow equation for'// &
      &       ' closed surface depressions for each HRU', &
@@ -387,7 +387,7 @@
 
         ALLOCATE ( Dprst_et_coef(Nhru) )
         IF ( declparam(MODNAME, 'dprst_et_coef', 'nhru', 'real', &
-     &       '1.0', '0.0', '1.0', &
+     &       '1.0', '0.5', '1.5', &
      &       'Fraction of unsatisfied potential evapotranspiration to apply to surface-depression storage', &
      &       'Fraction of unsatisfied potential evapotranspiration to apply to surface-depression storage', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'dprst_et_coef')
@@ -438,16 +438,16 @@
       INTEGER FUNCTION srunoffinit()
       USE PRMS_SRUNOFF
       USE PRMS_MODULE, ONLY: Dprst_flag, Nhru, Nlake, Cascade_flag, Sroff_flag, &
-     &    Parameter_check_flag, Init_vars_from_file, Call_cascade, Water_use_flag
+     &    Init_vars_from_file, Call_cascade, Water_use_flag !, Parameter_check_flag
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
-      USE PRMS_FLOWVARS, ONLY: Soil_moist_max
+!      USE PRMS_FLOWVARS, ONLY: Soil_moist_max
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: getparam
       EXTERNAL read_error
 ! Local Variables
-      INTEGER :: i, j, k, num_hrus
-      REAL :: frac
+      INTEGER :: i, j !, k, num_hrus
+!      REAL :: frac
 !***********************************************************************
       srunoffinit = 0
 
@@ -499,20 +499,24 @@
 ! Carea parameters
         IF ( getparam(MODNAME, 'carea_min', Nhru, 'real', Carea_min)/=0 ) CALL read_error(2, 'carea_min')
         Carea_dif = 0.0
+        DO j = 1, Active_hrus
+          i = Hru_route_order(j)
+          Carea_dif(i) = Carea_max(i) - Carea_min(i)
+        ENDDO
       ENDIF
 
-      num_hrus = 0
-      DO j = 1, Active_hrus
-        i = Hru_route_order(j)
-        IF ( Sroff_flag==2 ) THEN
-          Carea_dif(i) = Carea_max(i) - Carea_min(i)
-        ELSEIF ( Parameter_check_flag>0 ) THEN
-          frac = Smidx_coef(i)*10**(Soil_moist_max(i)*Smidx_exp(i))
-          k = 0
-          IF ( frac>2.0 ) k = 1
-          IF ( frac>Carea_max(i)*2.0 ) k = k + 2
-          IF ( k>0 ) THEN
-            num_hrus = num_hrus + 1
+!      num_hrus = 0
+!      DO j = 1, Active_hrus
+!        i = Hru_route_order(j)
+!        IF ( Sroff_flag==2 ) THEN
+!          Carea_dif(i) = Carea_max(i) - Carea_min(i)
+!        ELSEIF ( Parameter_check_flag>0 ) THEN
+!          frac = Smidx_coef(i)*10**(Soil_moist_max(i)*Smidx_exp(i))
+!          k = 0
+!          IF ( frac>2.0 ) k = 1
+!          IF ( frac>Carea_max(i)*2.0 ) k = k + 2
+!          IF ( k>0 ) THEN
+!            num_hrus = num_hrus + 1
             !IF ( Print_debug>-1 ) THEN
             !  PRINT *, ' '
             !  PRINT *, 'WARNING'
@@ -523,9 +527,9 @@
             !  PRINT *, 'smidx_coef:', Smidx_coef(i), '; smidx_exp:', Smidx_exp(i)
             !  PRINT *, 'This can make smidx parameters insensitive and carea_max very sensitive'
             !ENDIF
-          ENDIF
-        ENDIF
-      ENDDO
+!          ENDIF
+!        ENDIF
+!      ENDDO
 !      IF ( num_hrus>0 .AND. Print_debug>-1 ) THEN
 !        WRITE (*, '(/,A,/,9X,A,/,9X,A,I7,/,9X,A,/,9X,A,/)') &
 !     &         'WARNING, maximum contributing area based on smidx coefficents and', &
@@ -1002,8 +1006,8 @@
 !***********************************************************************
       SUBROUTINE dprst_init()
       USE PRMS_SRUNOFF
-      USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru, PRMS4_flag
-      USE PRMS_BASIN, ONLY: Dprst_clos_flag, NEARZERO, Dprst_area_max, &
+      USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru, PRMS4_flag, Inputerror_flag
+      USE PRMS_BASIN, ONLY: Dprst_clos_flag, NEARZERO, Dprst_frac, &
      &    Dprst_area_clos_max, Dprst_area_open_max, Basin_area_inv, &
      &    Hru_area_dble, Active_hrus, Hru_route_order, Dprst_open_flag
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_vol_clos
@@ -1065,7 +1069,12 @@
       DO j = 1, Active_hrus
         i = Hru_route_order(j)
 
-        IF ( Dprst_area_max(i)>0.0 ) THEN
+        IF ( Dprst_frac(i)>0.0 ) THEN
+          IF ( Dprst_depth_avg(i)==0.0 ) THEN
+            PRINT *, 'ERROR, dprst_frac>0 and dprst_depth_avg==0 for HRU:', i, '; dprst_frac:', Dprst_frac(i)
+            Inputerror_flag = 1
+            CYCLE
+          ENDIF
 !         calculate open and closed volumes (acre-inches) of depression storage by HRU
 !         Dprst_area_open_max is the maximum open depression area (acres) that can generate surface runoff:
           IF ( Dprst_clos_flag==1 ) Dprst_vol_clos_max(i) = DBLE( Dprst_area_clos_max(i)*Dprst_depth_avg(i) )

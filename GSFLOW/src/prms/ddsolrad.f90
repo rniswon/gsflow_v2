@@ -119,14 +119,14 @@
         Basin_potsw = Basin_swrad
 
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_ddsolrad = 'ddsolrad.f90 2016-11-03 17:48:00Z'
+        Version_ddsolrad = 'ddsolrad.f90 2019-04-04 11:36:00Z'
         CALL print_module(Version_ddsolrad, 'Solar Radiation Distribution', 90)
         MODNAME = 'ddsolrad'
 
         ! Declare Parameters
         ALLOCATE ( Dday_slope(Nhru,12) )
         IF ( declparam(MODNAME, 'dday_slope', 'nhru,nmonths', 'real', &
-     &       '0.4', '0.2', '0.9', &
+     &       '0.4', '0.1', '1.4', &
      &       'Slope in temperature degree-day relationship', &
      &       'Monthly (January to December) slope in degree-day equation for each HRU', &
      &       'dday/temp_units')/=0 ) CALL read_error(1, 'dday_slope')
