@@ -868,7 +868,7 @@
         IF ( Hru_type(i)==0 ) CYCLE ! skip inactive HRUs
         IF ( Values(i)<0.0 ) THEN
           Values(i) = Param(i)
-        ELSEIF ( ABS(Values(i)-Param(i))>0.0 ) THEN
+        ELSEIF ( Values(i)/=Param(i) ) THEN
           num = num + 1
           Updated_hrus(num) = i
         ENDIF
@@ -904,7 +904,7 @@
       DO i = 1, Nhru
         IF ( Hru_type(i)==0 ) CYCLE ! skip inactive HRUs
         IF ( Values(i)<0 ) CYCLE
-        IF ( ABS(Values(i)-Param(i))>0 ) THEN
+        IF ( Values(i)/=Param(i) ) THEN
           num = num + 1
           Updated_hrus(num) = i
           Param(i) = Values(i)
@@ -941,7 +941,7 @@
       DO i = 1, Nhru
         IF ( Hru_type(i)==0 ) CYCLE ! skip inactive HRUs
         IF ( Values(i)<0.0 ) CYCLE
-        IF ( ABS(Values(i)-Param(i))>0.0 ) THEN
+        IF ( Values(i)/=Param(i) ) THEN
           Param(i) = Values(i)
           num = num + 1
           Updated_hrus(num) = i
@@ -980,7 +980,7 @@
 !      DO i = 1, Nhru
 !        IF ( Hru_type(i)==0 ) CYCLE ! skip inactive HRUs
 !        IF ( Values(i)<0.0 ) CYCLE
-!        IF ( ABS(Values(i)-SNGL(Param(i)))>0.0 ) THEN
+!        IF ( Values(i)/=SNGL(Param(i)) ) THEN
 !          Param(i) = DBLE( Values(i) )
 !          num = num + 1
 !          Updated_hrus(num) = i
@@ -1016,7 +1016,7 @@
       num = 0
       DO i = 1, Nhru
         IF ( Hru_type(i)==0 ) CYCLE ! skip inactive HRUs
-        IF ( ABS(Values(i)-Param(i))>0.0 ) THEN
+        IF ( Values(i)/=Param(i) ) THEN
           Param(i) = Values(i)
           num = num + 1
           Updated_hrus(num) = i
