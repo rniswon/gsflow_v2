@@ -141,7 +141,7 @@ char *read_dims (char *param_file_name) {
 //			     printf ("Comment line = %s\n", line);
 			    Comments[nComments++] = strdup (line);
             } else {
-                printf("read_dims: more than %s dimension comments.\n", max_comment);
+                printf("read_dims: more than %d dimension comments.\n", max_comment);
             }
 		}
 	}

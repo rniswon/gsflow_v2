@@ -38,7 +38,7 @@ int BATCH_run (void) {
 
    ret = single_run_pre_init ();
    if (ret) {
-      fprintf (stderr, ret);
+      fprintf (stderr,"%s\n", ret);
       return(1);
    }
 

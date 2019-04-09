@@ -90,7 +90,7 @@ int write_preprocess_params () {
 }
 
 static void write_header (FILE *param_file, char *desc) {
-    (void)fprintf (param_file, desc);
+    (void)fprintf (param_file, "%s\n", desc);
 	(void)fprintf (param_file, "PRMS version 4\n");
 }
 

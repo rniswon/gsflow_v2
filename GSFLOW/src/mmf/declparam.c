@@ -593,7 +593,7 @@ static int CHECK_param_in_db (char *pkey, char *module, char *dimen, int var_typ
 		}
 
 		if (inconsistent)
-		    fprintf(stderr, buf);
+		    fprintf(stderr,"%s\n", buf);
 
 		return (1);
 	}
