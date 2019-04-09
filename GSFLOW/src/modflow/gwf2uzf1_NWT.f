@@ -4532,7 +4532,8 @@ C8--------ROUTE TRAILING WAVES.
           FLUXB = Flux(jpntp1)
           THETAB = Theta(jpntp1)
           iflx = 1
-          itrwaveb = Itrwave(Jpnt+2)
+          itrwaveb = 0   !RGN 4/8/2019
+          if ( Numwaves >= Jpnt+2 ) itrwaveb = Itrwave(Jpnt+2)   !RGN 4/8/2019
           DO k = 2 + jpntm1, Numwaves
             km1 = k - 1
             Flux(km1) = Flux(k)
