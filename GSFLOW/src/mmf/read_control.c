@@ -132,7 +132,7 @@ static char *rc (char *control_name) {
 ** This is a hack, but 1000 should be a good upper limit on the number of indexes for a control variable.
 */
       if (size > 999) {
-         (void)snprintf (buf, 256, "read_control: too many control indexes; size = %d, key = %s, line = %s", size, key, line);
+         (void)snprintf (buf, 256, "read_control: too many control indexes; size = %ld, key = %s, line = %s", size, key, line);
          return (buf);
       }
 

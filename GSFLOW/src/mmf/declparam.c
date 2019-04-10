@@ -552,43 +552,43 @@ static int CHECK_param_in_db (char *pkey, char *module, char *dimen, int var_typ
 		}
 		if (strcmp (dimen, dim_names)) {
 			inconsistent = TRUE;
-			(void)snprintf (buf1, 1024, " The dimensions have been declared as %s and %s.", dimen, dim_names);
+			(void)snprintf (buf1, 256, " The dimensions have been declared as %s and %s.", dimen, dim_names);
 			strcat (buf, buf1);
 		}
 
 		if (var_type != check_param->type) {
 			inconsistent = TRUE;
-			(void)snprintf (buf1, 1024, " The types have been declared as %s and %s.", types[var_type], types[check_param->type]);
+			(void)snprintf (buf1, 256, " The types have been declared as %s and %s.", types[var_type], types[check_param->type]);
 			strcat (buf, buf1);
 		}
 
 		if (strcmp (value, check_param->value_string)) {
 			inconsistent = TRUE;
-			(void)snprintf (buf1, 1024, " The default values have been declared as %s and %s.", value, check_param->value_string);
+			(void)snprintf (buf1, 256, " The default values have been declared as %s and %s.", value, check_param->value_string);
 			strcat (buf, buf1);
 		}
 
 		if (strcmp (minimum, check_param->min_string)) {
 			inconsistent = TRUE;
-			(void)snprintf (buf1, 1024, " The minimum value has been declared as %s and %s.", minimum, check_param->min_string);
+			(void)snprintf (buf1, 256, " The minimum value has been declared as %s and %s.", minimum, check_param->min_string);
 			strcat (buf, buf1);
 		}
 
 		if (strcmp (maximum, check_param->max_string)) {
 			inconsistent = TRUE;
-			(void)snprintf (buf1, 1024, " The maximum value has been declared as %s and %s.", maximum, check_param->max_string);
+			(void)snprintf (buf1, 256, " The maximum value has been declared as %s and %s.", maximum, check_param->max_string);
 			strcat (buf, buf1);
 		}
 
 		if (strcmp (descr, check_param->descr)) {
 			inconsistent = TRUE;
-			(void)snprintf (buf1, 1024, " The parameter description has been set as \"%s\"and \"%s.\"", descr, check_param->descr);
+			(void)snprintf (buf, 1024, " The parameter description has been set as \"%s\"and \"%s.\"", descr, check_param->descr);
 			strcat (buf, buf1);
 		}
 
 		if (strcmp (units, check_param->units)) {
 			inconsistent = TRUE;
-			(void)snprintf (buf1, 1024, " The units have been set as %s and %s.", help, check_param->help);
+			(void)snprintf (buf1, 256, " The units have been set as %s and %s.", help, check_param->help);
 			strcat (buf, buf1);
 		}
 
