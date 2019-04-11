@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.0.0 03/01/2019
+                       Version 5.0.0 04/05/2019
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -34,22 +34,22 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2019-03-01
+GSFLOW Computation Order       gsflow_prms                2019-04-05
 Basin Definition               basin                      2018-04-06
 Cascading Flow                 cascade                    2018-05-25
-Common States and Fluxes       climateflow                2018-12-13
+Common States and Fluxes       climateflow                2019-04-03
 Potential Solar Radiation      soltab                     2016-09-09
 PRMS Set Time Variables        prms_time                  2015-03-31
 Time Series Data               obs                        2018-02-23
 Temperature Distribution       temp_1sta                  2018-01-16
 Precipitation Distribution     precip_1sta                2016-10-21
-Solar Radiation Distribution   ddsolrad                   2016-11-03
+Solar Radiation Distribution   ddsolrad                   2019-04-04
 Transpiration Distribution     transp_tindex              2015-01-06
-Potential Evapotranspiration   potet_jh                   2016-05-10
+Potential Evapotranspiration   potet_jh                   2019-04-04
 Canopy Interception            intcp                      2018-02-26
 Snow Dynamics                  snowcomp                   2018-05-04
-Surface Runoff                 srunoff_smidx              2018-04-25
-Soil Zone Computations         soilzone                   2018-09-19
+Surface Runoff                 srunoff_smidx              2019-04-03
+Soil Zone Computations         soilzone                   2019-03-05
 GSFLOW PRMS to MODFLOW         gsflow_prms2mf             2017-11-15
 GSFLOW MODFLOW to PRMS         gsflow_mf2prms             2017-11-15
 GSFLOW Output Budget Summary   gsflow_budget              2018-03-02
