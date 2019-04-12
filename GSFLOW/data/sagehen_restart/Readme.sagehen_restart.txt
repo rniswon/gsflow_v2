@@ -39,7 +39,7 @@ names 'prms_ic_#,' in which # refers to the restart simulation number.
 
 2. PRMS mode: The batch file for this simulation is 'gsflow_prms.bat' and the
 control file is 'gsflow_prms.control.' Note that control parameter 'model_mode' is
-reset from a value of GSFLOW to PRMS in the batch file. This simulation extends
+reset from a value of GSFLOW5 to PRMS5 in the batch file. This simulation extends
 from October 1, 1980, through January 30, 1984. Output for the simulation is 
 provided in the '2_PRMS_model' subdirectory under the 'output-test' subdirectory.
 

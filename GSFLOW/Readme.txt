@@ -44,7 +44,7 @@ A. DISTRIBUTION FILE
 
 The following distribution file is for use on personal computers:
 
-         gsflowv2_0_0.zip
+         gsflow_2.0.0.zip
 
 The distribution file contains:
 
