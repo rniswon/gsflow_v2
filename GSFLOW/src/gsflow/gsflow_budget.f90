@@ -386,7 +386,7 @@
       !IF ( IUNIT(62)>0 ) CALL MODFLOW_GET_STORAGE_UPW()
 
       IF ( Vbnm_index(1)==-1 ) CALL MODFLOW_VB_DECODE(Vbnm_index)
-      Sat_dS = VBVL(4,Vbnm_index(12)) - VBVL(3,Vbnm_index(12))
+      Sat_dS = (VBVL(4,Vbnm_index(12)) - VBVL(3,Vbnm_index(12)))*DELT
       Sat_S = Sat_S + Sat_dS
 
       Unsat_S = UZTSRAT(6)
@@ -603,54 +603,47 @@
       SUBROUTINE MODFLOW_GET_STORAGE_UPW()
       USE GSFBUDGET, ONLY: Sat_S
       USE PRMS_BASIN, ONLY: NEARZERO
-      USE GLOBAL, ONLY: NCOL, NROW, NLAY, IBOUND, BOTM, HNEW, LBOTM
+      USE GLOBAL, ONLY: NCOL, NROW, NLAY, IBOUND, BOTM, HNEW, LBOTM, HOLD
       USE GWFBASMODULE, ONLY: DELT, HDRY
-      USE GWFUPWMODULE, ONLY: LAYTYPUPW, SC1, SC2UPW
+      USE GWFUPWMODULE, ONLY: LAYTYPUPW, SC1, SC2UPW, So, Sn
+      USE GWFNWTMODULE,ONLY: Icell
       IMPLICIT NONE
 ! Functions
       INTRINSIC ABS
 ! Local Variables
-      INTEGER :: i, j, k, kt, lc
-      DOUBLE PRECISION :: tled, top, bot, rho, storage, head
+      INTEGER :: i, j, k, kt, lc, IJ
+      DOUBLE PRECISION :: tled, top, bot, rho1, storage, head, rho2
+      DOUBLE PRECISION :: ZERO, ONE, HSING, HLD, tp, bt, thick
+      DOUBLE PRECISION :: strg
 !***********************************************************************
       tled = 1.0D0/DELT
       Sat_S = 0.0D0
 
-!5------LOOP THROUGH EVERY CELL IN THE GRID.
-      kt = 0
-      DO k = 1, NLAY
-        lc = LAYTYPUPW(k)
-        IF ( lc/=0 ) kt = kt + 1
-        DO j = 1, NCOL
-          DO i = 1, NROW
-
-!6------SKIP NO-FLOW AND CONSTANT-HEAD CELLS.
-            IF ( IBOUND(j, i, k)>0 .AND. ABS(HNEW(j, i, k)-HDRY)>NEARZERO ) THEN
-              head = HNEW(j, i, k)
-              top = BOTM(j, i, LBOTM(k)-1)
-              bot = BOTM(j, i, LBOTM(k))
-
-!7-----CHECK LAYER TYPE TO SEE IF ONE STORAGE CAPACITY OR TWO.
-              IF ( lc/=0 ) THEN
-!7A----TWO STORAGE CAPACITIES.
-!  markstro - always use specific yield
-                rho = SC2UPW(j, i, kt)
-              ELSE
-!7A----ONE STORAGE CAPACITY.
-                rho = SC1(j, i, k)
-              ENDIF
-              IF ( head>=top ) THEN
-                storage = rho*(top-bot)*tled
-              ELSE
-                storage = rho*(head-bot)*tled
-              ENDIF
-              Sat_S = Sat_S + storage
-            ENDIF
-
-          ENDDO
-        ENDDO
-      ENDDO
-
+      ZERO=0.0D0
+      ONE=1.0D0
+      TLED=ONE/DBLE(DELT)
+!C
+!C5------LOOP THROUGH EVERY CELL IN THE GRID.
+      KT=0
+      DO 300 K=1,NLAY
+      DO 300 I=1,NROW
+      DO 300 J=1,NCOL
+!C
+!C6------SKIP NO-FLOW AND CONSTANT-HEAD CELLS.
+      IF(IBOUND(J,I,K).LE.0) GO TO 300
+      HSING=HNEW(J,I,K)
+      HLD = DBLE(HOLD(J,I,K))
+!C
+!C7A----TWO STORAGE CAPACITIES.
+      TP=dble(BOTM(J,I,LBOTM(K)-1))
+      BT=dble(BOTM(J,I,LBOTM(K)))
+      THICK = (TP-BT)
+      RHO2 = dble(SC2UPW(J,I,K))
+      ij = Icell(J,I,K)
+      RHO1 = dble(SC1(J,I,K))
+      STRG= THICK*RHO2*Sn(ij) + Sn(ij)*THICK*RHO1*HSING
+      Sat_S = Sat_S + STRG
+  300 CONTINUE
       END SUBROUTINE MODFLOW_GET_STORAGE_UPW
 
 !***********************************************************************

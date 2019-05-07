@@ -848,9 +848,8 @@
       Rate_uzstor = Unsat_dS + UnsatStream_dS
       Cum_uzstor = Cum_uzstor + Rate_uzstor*DELT
 
-      Rate_satstor = Sat_dS
-      Cum_satstor = Cum_satstor + Rate_satstor
-
+      Rate_satstor = Sat_dS/DELT    !RGN 5/6/2019
+      Cum_satstor = Cum_satstor + Sat_dS  !RGN 5/6/2019
       Rate_delstore = Rate_surfstor + Rate_soilstor + Rate_satstor + &
      &                Rate_uzstor + Rate_lakestor + STRMDELSTOR_RATE
 
@@ -861,7 +860,7 @@
         Rate_delstore = Rate_delstore + Basin_dprst_volop + Basin_dprst_volcl ! need rate
       ENDIF
 
-      Cum_delstore = Cum_delstore + Rate_delstore*DELT
+      Cum_delstore = Cum_delstore + Rate_delstore*delt   !RGN 5/6/2019
 
       Rpt_count = Rpt_count + 1
       IF ( Rpt_count==Rpt_days ) THEN  !rpt_days default = 7
