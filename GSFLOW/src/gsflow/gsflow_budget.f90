@@ -638,10 +638,11 @@
       TP=dble(BOTM(J,I,LBOTM(K)-1))
       BT=dble(BOTM(J,I,LBOTM(K)))
       THICK = (TP-BT)
-      RHO2 = dble(SC2UPW(J,I,K))
-      ij = Icell(J,I,K)
       RHO1 = dble(SC1(J,I,K))
-      STRG= THICK*RHO2*Sn(ij) + Sn(ij)*THICK*RHO1*HSING
+      RHO2 = dble(SC2UPW(J,I,K))
+      if ( RHO2 < RHO1 ) RHO2 = RHO1
+      ij = Icell(J,I,K)
+      STRG= THICK*RHO2*Sn(ij)
       Sat_S = Sat_S + STRG
   300 CONTINUE
       END SUBROUTINE MODFLOW_GET_STORAGE_UPW
