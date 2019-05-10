@@ -9,7 +9,7 @@
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.0.0 04/05/2019
+                       Version 5.0.0 05/10/2019
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -43,7 +43,7 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2019-04-05
+GSFLOW Computation Order       gsflow_prms                2019-05-10
 Basin Definition               basin                      2018-04-06
 Cascading Flow                 cascade                    2018-05-25
 Common States and Fluxes       climateflow                2019-04-03
@@ -77,5 +77,5 @@ Simulation time period: 1980/10/01 - 1996/09/30
 
 ====================================================================
 
-Execution elapsed time    0 minutes  0.92 seconds
+Execution elapsed time    0 minutes  1.02 seconds
 

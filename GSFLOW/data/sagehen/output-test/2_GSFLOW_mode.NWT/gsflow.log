@@ -9,7 +9,7 @@
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.0.0 04/05/2019
+                       Version 5.0.0 05/10/2019
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -56,7 +56,7 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2019-04-05
+GSFLOW Computation Order       gsflow_prms                2019-05-10
 Basin Definition               basin                      2018-04-06
 Cascading Flow                 cascade                    2018-05-25
 Common States and Fluxes       climateflow                2019-04-03
@@ -77,7 +77,7 @@ GSFLOW MODFLOW to PRMS         gsflow_mf2prms             2017-11-15
 GSFLOW Output Budget Summary   gsflow_budget              2018-03-02
 GSFLOW Output CSV Summary      gsflow_sum                 2019-01-30
 ====================================================================
-GSFLOW MODFLOW main            gsflow_modflow             2019-03-01
+GSFLOW MODFLOW main            gsflow_modflow             2019-05-10
 ====================================================================
 MODFLOW Packages
 ====================================================================
@@ -17646,8 +17646,8 @@ Date: 1996/09/30; Stress:  2; Step:  5844; Simulation step: 5844
                   MF iterations:       11; SZ iterations:     11
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/04/11 10:59:30
- Elapsed run time: 14 Minutes, 52.892 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/05/10 15:44:04
+ Elapsed run time: 14 Minutes, 46.884 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         46034;  SZ iterations:           46034
