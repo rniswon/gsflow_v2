@@ -642,7 +642,7 @@
       RHO2 = dble(SC2UPW(J,I,K))
       if ( RHO2 < RHO1 ) RHO2 = RHO1
       ij = Icell(J,I,K)
-      STRG= THICK*RHO2*Sn(ij)
+      STRG = THICK*RHO2*Sn(ij)
       Sat_S = Sat_S + STRG
   300 CONTINUE
       END SUBROUTINE MODFLOW_GET_STORAGE_UPW
