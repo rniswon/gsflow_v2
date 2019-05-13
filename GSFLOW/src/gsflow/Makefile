@@ -28,7 +28,7 @@ all: $(TARGET)
 
 $(TARGET): $(MFNWTLIB) $(PRMSLIB) $(MODOBJS) $(LIBDIR)/libmmf.a
 	$(RM) $(TARGET)
-	$(CC) $(LDFLAGS) -o $(TARGET) $(MODOBJS) $(LIBS)
+	$(FC) $(LDFLAGS) -o $(TARGET) $(MODOBJS) $(LIBS)
 
 clean:
 	$(RM) $(TARGET)

@@ -18,27 +18,42 @@ ARC		= LINUX
 
 #OPTLEVEL	= -g
 OPTLEVEL	= -O -Bstatic
-LDFLAGS		=$(OPTLEVEL)
+#for gfortran
+#LDFLAGS	=$(OPTLEVEL)
+#for ifort
+LDFLAGS		=$(OPTLEVEL) -nofor_main
 
 ##########################################################
 # Define the Fortran compile flags
 ##########################################################
+#for gfortran
 #FFLAGS= $(OPTLEVEL) -fbounds-check -fno-second-underscore -Wall
-FFLAGS= $(OPTLEVEL) -fno-second-underscore
-FC		= gfortran
+#FFLAGS= $(OPTLEVEL) -fno-second-underscore
+#for ifort
+#FFLAGS= $(OPTLEVEL) -warn all -fltconsistency
+FFLAGS= $(OPTLEVEL) -fp-model source
+#FC		= gfortran
+FC		= ifort
 
 ##########################################################
 # Define the C compile flags
 # -D_UF defines UNIX naming conventions for mixed language compilation.
 ##########################################################
-CFLAGS		= $(OPTLEVEL) -D$(ARC) -D_UF
-CC		= gcc
+CFLAGS		= $(OPTLEVEL) -D$(ARC) -D_UF -Wall
+#for gfortran
+#CC		= gcc
+#for ifort
+CC		= icc
 
 ##########################################################
 # Define the libraries
 ##########################################################
-MATHLIB		= -lm
-GCLIB		= -lgfortran -lgcc $(MATHLIB)
+#for gfortran
+#MATHLIB		= -lm
+#GCLIB		= -lgfortran -lgcc $(MATHLIB)
+#for ifort
+MATHLIB		= 
+GCLIB		= 
 FLIBS    = $(GCLIB)
 
 ##########################################################
