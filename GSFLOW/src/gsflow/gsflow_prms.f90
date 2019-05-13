@@ -8,7 +8,7 @@
       CHARACTER(LEN=68), PARAMETER :: &
      &  EQULS = '===================================================================='
       CHARACTER(LEN=11), PARAMETER :: MODNAME = 'gsflow_prms'
-      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.0.0 04/05/2019'
+      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.0.0 05/10/2019'
       CHARACTER(LEN=8), SAVE :: Process
       CHARACTER(LEN=80), SAVE :: PRMS_versn
       INTEGER, SAVE :: Model, Process_flag, Call_cascade, Ncascade, Ncascdgw
@@ -99,7 +99,7 @@
         ENDIF
         Process_flag = 1
 
-        PRMS_versn = 'gsflow_prms.f90 2019-04-05 15:42:00Z'
+        PRMS_versn = 'gsflow_prms.f90 2019-05-10 11:11:00Z'
 
         IF ( check_dims()/=0 ) STOP
 
@@ -1392,7 +1392,7 @@
       INTRINSIC TRIM
       ! Local Variables
       INTEGER :: nhru_test, dprst_test, nsegment_test, temp_test, et_test, ierr, time_step
-      INTEGER :: cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test
+      INTEGER :: cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, start_time(6), end_time(6)
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: model_test
       CHARACTER(LEN=11) :: module_name
 !***********************************************************************
@@ -1400,12 +1400,17 @@
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
      &          Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
+        WRITE ( Restart_outunit ) Starttime, Endtime
       ELSE
         ierr = 0
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
      &         cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
+        READ ( Restart_inunit ) start_time, end_time
+        IF ( Print_debug>-2 ) PRINT 4, EQULS, 'Simulation time period of Restart File:', &
+     &       start_time(1), start_time(2), start_time(3), ' -', end_time(1), end_time(2), end_time(3), EQULS
+    4   FORMAT (/, A, /, 2(A, I5, 2('/',I2.2)), /, A, /)
         IF ( TRIM(Model_mode)/=TRIM(model_test) ) THEN
           PRINT *, 'ERROR, Initial Conditions File saved for model_mode=', model_test
           PRINT *, '       Current model has model_mode=', Model_mode, ' they must be equal'

@@ -79,7 +79,7 @@ C
 !***********************************************************************
       gsfdecl = 0
 
-      Version_gsflow_modflow = 'gsflow_modflow.f 2019-03-01 09:45:00Z'
+      Version_gsflow_modflow = 'gsflow_modflow.f 2019-05-10 11:11:00Z'
 C
 C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
       IF ( Print_debug>-2 )
@@ -1458,33 +1458,14 @@ C
       USE OBSBASMODULE, ONLY: OBSTART,ITS
       IMPLICIT NONE
       EXTERNAL :: READ_STRESS, RESTART1READ
-      INTEGER, EXTERNAL :: control_integer_array, gsfrun
+      INTEGER, EXTERNAL :: gsfrun
       INTRINSIC :: INT
       DOUBLE PRECISION, EXTERNAL :: getjulday
 ! Local Variables
-      INTEGER :: i, j, n, nstress
+      INTEGER :: i, n, nstress
       DOUBLE PRECISION :: seconds, start_jul, mfstrt_jul, plen, time
       DOUBLE PRECISION :: kstpskip
 !***********************************************************************
-      ! get modflow_time_zero and determine julian day
-      DO j = 1, 6
-        IF ( control_integer_array(Modflow_time_zero(j),
-     &       j, 'modflow_time_zero')/=0 ) THEN
-          PRINT *, 'ERROR, modflow_time_zero, index:', j,
-     &             'value: ', Modflow_time_zero(j)
-          STOP
-        ENDIF
-        IF ( j==1 ) THEN
-          IF ( Modflow_time_zero(1)<0 ) THEN
-      !     STOP
-      !&    'ERROR, control parameter modflow_time_zero must be specified'
-            Modflow_time_zero = Starttime
-            PRINT '(/, A)',
-     &     'WARNING, modflow_time_zero not specified, set to start_time'
-            EXIT
-          ENDIF
-        ENDIF
-      ENDDO
       IF ( Print_debug>-1 )
      &     PRINT ( '(/, A, I5,2("/",I2.2))' ), 'modflow_time_zero:',
      &  Modflow_time_zero(1), Modflow_time_zero(2), Modflow_time_zero(3)
@@ -1803,11 +1784,34 @@ C
 ! Set MODFLOW time factors
 !***********************************************************************
       SUBROUTINE SETMFTIME()
-      USE GSFMODFLOW, ONLY: Mft_to_sec, Mft_to_days
+      USE PRMS_MODULE, ONLY: Starttime
+      USE GSFMODFLOW, ONLY: Mft_to_sec, Mft_to_days, Modflow_time_zero
       USE GLOBAL, ONLY: ITMUNI
       IMPLICIT NONE
       INTRINSIC SNGL
+      INTEGER, EXTERNAL :: control_integer_array
+! Local Variables
+      INTEGER :: j
 !***********************************************************************
+      ! get modflow_time_zero and determine julian day
+      DO j = 1, 6
+        IF ( control_integer_array(Modflow_time_zero(j),
+     &       j, 'modflow_time_zero')/=0 ) THEN
+          PRINT *, 'ERROR, modflow_time_zero, index:', j,
+     &             'value: ', Modflow_time_zero(j)
+          STOP
+        ENDIF
+        IF ( j==1 ) THEN
+          IF ( Modflow_time_zero(1)<0 ) THEN
+      !     STOP
+      !&    'ERROR, control parameter modflow_time_zero must be specified'
+            Modflow_time_zero = Starttime
+            PRINT '(/, A)',
+     &     'WARNING, modflow_time_zero not specified, set to start_time'
+            EXIT
+          ENDIF
+        ENDIF
+      ENDDO
       IF ( ITMUNI==1 ) THEN
 ! Modflow in seconds
         Mft_to_sec = 1.0D0
@@ -1903,22 +1907,28 @@ C
 !     gsflow_modflow_restart - write or read restart file
 !***********************************************************************
       SUBROUTINE gsflow_modflow_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
-      USE GSFMODFLOW, ONLY: MODNAME
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit,Print_debug
+      USE GSFMODFLOW, ONLY: MODNAME, Modflow_time_zero
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
       EXTERNAL check_restart
-      ! Local Variable
+      ! Local Variables
       CHARACTER(LEN=14) :: module_name
+      INTEGER :: MF_time_zero(6)
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) DELT
+        WRITE ( Restart_outunit ) DELT, Modflow_time_zero
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) DELT
+        READ ( Restart_inunit ) DELT, MF_time_zero
+        IF ( Print_debug>-2 ) PRINT 4,
+     &       'modflow_time_zero of Restart File:', MF_time_zero(1),
+     &       MF_time_zero(2), MF_time_zero(3), MF_time_zero(4),
+     &       MF_time_zero(5), MF_time_zero(6)
+    4   FORMAT (/, A, I5, 2('/',I2.2), I3.2, 2(':', I2.2) )
       ENDIF
       END SUBROUTINE gsflow_modflow_restart
