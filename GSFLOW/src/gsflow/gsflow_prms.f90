@@ -1409,8 +1409,9 @@
      &         cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
         READ ( Restart_inunit ) start_time, end_time
         IF ( Print_debug>-2 ) PRINT 4, EQULS, 'Simulation time period of Restart File:', &
-     &       start_time(1), start_time(2), start_time(3), ' -', end_time(1), end_time(2), end_time(3), EQULS
-    4   FORMAT (/, A, /, 2(A, I5, 2('/',I2.2)), /, A, /)
+     &       start_time(1), start_time(2), start_time(3), ' -', end_time(1), end_time(2), end_time(3), &
+     &       'Last time step of simulation: ', time_step, EQULS
+    4   FORMAT (/, A, /, 2(A, I5, 2('/',I2.2)), /, A, I0, /, A, /)
         IF ( TRIM(Model_mode)/=TRIM(model_test) ) THEN
           PRINT *, 'ERROR, Initial Conditions File saved for model_mode=', model_test
           PRINT *, '       Current model has model_mode=', Model_mode, ' they must be equal'
