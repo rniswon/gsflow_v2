@@ -4615,7 +4615,10 @@ C20-----SET FLOW INTO DIVERSION IF SEGMENT IS DIVERSION.
                   DO WHILE(I.LT.NSTRM)  !Find the nstrm index for the strm/rch from which flow is diverted
                     IUPSEG = ISTRM(4, I)
                     IUPRCH = ISTRM(5, I)
-                    IF(IUPSEG.EQ.IDIVAR(1,ISTSG).AND.IUPRCH.EQ.1) EXIT
+                    IF(IUPSEG.EQ.IDIVAR(1,ISTSG).AND.IUPRCH.EQ.1) THEN
+                      I=I+(ISEG(4,IDIVAR(1,ISTSG))-1)
+                      EXIT
+                    ENDIF
                     I=I+1
                   ENDDO  
                   !JJJ=LASTRCH(III)
