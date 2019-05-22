@@ -94,7 +94,7 @@
 !***********************************************************************
       srunoffdecl = 0
 
-      Version_srunoff = 'srunoff.f90 2019-04-03 15:20:00Z'
+      Version_srunoff = 'srunoff.f90 2019-05-22 15:05:00Z'
       IF ( Sroff_flag==1 ) THEN
         MODNAME = 'srunoff_smidx'
       ELSE
@@ -631,12 +631,10 @@
         Hru_sroffp(i) = 0.0
         Contrib_fraction(i) = 0.0
         Hruarea_imperv = Hru_imperv(i)
-        IF ( Hruarea_imperv>0.0 ) THEN
-          Imperv_frac = Hru_percent_imperv(i)
-          Hru_sroffi(i) = 0.0
-          Imperv_evap(i) = 0.0
-          Hru_impervevap(i) = 0.0
-        ENDIF
+        Imperv_frac = Hru_percent_imperv(i)
+        Hru_sroffi(i) = 0.0
+        Imperv_evap(i) = 0.0
+        Hru_impervevap(i) = 0.0
 
         avail_et = Potet(i) - Snow_evap(i) - Hru_intcpevap(i)
 

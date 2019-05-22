@@ -69,7 +69,7 @@
 !***********************************************************************
       intdecl = 0
 
-      Version_intcp = 'intcp.f90 2018-02-26 12:28:00Z'
+      Version_intcp = 'intcp.f90 2019-05-22 16:12:00Z'
       CALL print_module(Version_intcp, 'Canopy Interception         ', 90)
       MODNAME = 'intcp'
 
@@ -254,7 +254,7 @@
      &    Hru_route_order, Hru_area, NEARZERO, DNEARZERO, Cov_type
       USE PRMS_WATER_USE, ONLY: Canopy_gain
 ! Newsnow and Pptmix can be modfied, WARNING!!!
-      USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, &
+      USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, Basin_ppt, &
      &    Hru_snow, Transp_on, Potet, Use_pandata, Hru_pansta, Epan_coef, Potet_sublim
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv
       USE PRMS_SET_TIME, ONLY: Nowmonth, Cfs_conv
@@ -281,6 +281,9 @@
       Basin_net_rain = 0.0D0
       Basin_intcp_evap = 0.0D0
       Basin_intcp_stor = 0.0D0
+! since hru_ppt can be changed with the addition of changeover water or 
+! when cov_type changed to 0 with canopy storage, recompute hru_ppt for water balance
+      Basin_ppt = 0.0D0
 
 ! zero application rate variables for today
       IF ( Use_transfer_intcp==1 ) THEN
@@ -292,10 +295,23 @@
       DO j = 1, Active_hrus
         i = Hru_route_order(j)
         harea = Hru_area(i)
-        Net_ppt(i) = Hru_ppt(i)
+        Intcp_evap(i) = 0.0
+        Hru_intcpevap(i) = 0.0
 
         ! Lake or bare ground HRUs
         IF ( Hru_type(i)==2 .OR. Cov_type(i)==0 ) THEN
+          IF ( Cov_type(i)==0 .AND. Intcp_stor(i)>0.0 ) THEN
+            ! could happen if cov_type changed from > 0 to 0 with storage using dynamic parameters
+            Hru_ppt(i) = Hru_ppt(i) + Hru_intcpstor(i)
+            Hru_rain(i) = Hru_rain(i) + Hru_intcpstor(i)
+            IF ( Print_debug>-1 ) THEN
+              PRINT *, 'WARNING, cov_type changed to 0 with canopy storage of:', Hru_intcpstor(i)
+              PRINT *, '         this storage added to hru_ppt, hru_rain, and net_rain; HRU:', i
+            ENDIF
+            Intcp_stor(i) = 0.0
+            Hru_intcpstor(i) = 0.0
+          ENDIF
+          Net_ppt(i) = Hru_ppt(i)
           Net_rain(i) = Hru_rain(i)
           Net_snow(i) = Hru_snow(i)
           Basin_net_ppt = Basin_net_ppt + DBLE( Net_ppt(i)*harea )
@@ -393,8 +409,10 @@
         ENDIF
 
         IF ( changeover>0.0) THEN
-          IF ( Print_debug>-1 ) PRINT *, 'Change over storage added to rain throughfall:', changeover, '; HRU:', i
+          IF ( Print_debug>-1 ) PRINT *, 'Change over storage added to hru_ppt, hru_rain, and net_rain:', changeover, '; HRU:', i
           netrain = netrain + changeover
+          Hru_rain(i) = Hru_rain(i) + changeover
+          Hru_ppt(i) = Hru_ppt(i) + changeover
           Basin_changeover = Basin_changeover + DBLE( changeover*harea )
         ENDIF
 
@@ -440,8 +458,6 @@
             ENDIF
           ENDIF
         ENDIF
-
-        Net_ppt(i) = netrain + netsnow
 
 !******compute evaporation or sublimation of interception
 
@@ -503,6 +519,7 @@
         Intcp_changeover(i) = changeover
         Net_rain(i) = netrain
         Net_snow(i) = netsnow
+        Net_ppt(i) = netrain + netsnow
 
         !rsr, question about depression storage for basin_net_ppt???
         !     my assumption is that cover density is for the whole HRU
@@ -511,6 +528,7 @@
         Basin_net_rain = Basin_net_rain + DBLE( Net_rain(i)*harea )
         Basin_intcp_stor = Basin_intcp_stor + DBLE( intcpstor*cov*harea )
         Basin_intcp_evap = Basin_intcp_evap + DBLE( intcpevap*cov*harea )
+        Basin_ppt = Basin_ppt + DBLE ( Hru_ppt(i)*harea )
 
       ENDDO
 
