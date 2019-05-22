@@ -254,7 +254,7 @@
      &    Hru_route_order, Hru_area, NEARZERO, DNEARZERO, Cov_type
       USE PRMS_WATER_USE, ONLY: Canopy_gain
 ! Newsnow and Pptmix can be modfied, WARNING!!!
-      USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, Basin_ppt, &
+      USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, Basin_ppt, Basin_rain, &
      &    Hru_snow, Transp_on, Potet, Use_pandata, Hru_pansta, Epan_coef, Potet_sublim
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv
       USE PRMS_SET_TIME, ONLY: Nowmonth, Cfs_conv
@@ -284,6 +284,7 @@
 ! since hru_ppt can be changed with the addition of changeover water or 
 ! when cov_type changed to 0 with canopy storage, recompute hru_ppt for water balance
       Basin_ppt = 0.0D0
+      Basin_rain = 0.0D0
 
 ! zero application rate variables for today
       IF ( Use_transfer_intcp==1 ) THEN
@@ -529,6 +530,7 @@
         Basin_intcp_stor = Basin_intcp_stor + DBLE( intcpstor*cov*harea )
         Basin_intcp_evap = Basin_intcp_evap + DBLE( intcpevap*cov*harea )
         Basin_ppt = Basin_ppt + DBLE ( Hru_ppt(i)*harea )
+        Basin_rain = Basin_rain + DBLE ( Hru_rain(i)*harea )
 
       ENDDO
 
@@ -542,6 +544,8 @@
         Basin_net_apply = Basin_net_apply*Basin_area_inv
         Basin_hru_apply = Basin_hru_apply*Basin_area_inv
       ENDIF
+      Basin_rain = Basin_rain*Basin_area_inv
+      Basin_ppt = Basin_ppt*Basin_area_inv
 
       END FUNCTION intrun
 
