@@ -572,7 +572,7 @@
       WRITE ( Logunt, 3 )
     3 FORMAT (//, 26X, 'U.S. Geological Survey', /, 8X, &
      &        'Coupled Groundwater and Surface-water FLOW model (GSFLOW)', /, &
-     &        25X, 'Version 2.0.0 05/22/2019', //, &
+     &        25X, 'Version 2.0.0 05/30/2019', //, &
      &        '    An integration of the Precipitation-Runoff Modeling System (PRMS)', /, &
      &        '    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)', /)
 
