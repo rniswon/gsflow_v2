@@ -1,7 +1,7 @@
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
  DATE: 09 15 1983              CUMULATIVE TIME STEP:    1080
- MODFLOW STRESS PERIOD      1     CURRENT TIME STEP:       7     ITERATIONS:      26
+ MODFLOW STRESS PERIOD      1     CURRENT TIME STEP:       7     ITERATIONS:      25
 
  -----------------------------------------------------------------------------------
 
@@ -17,25 +17,25 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        1.9498D+07     EVAPOTRANSPIRATION =        2705298.81
+   EVAPOTRANSPIRATION =        1.9495D+07     EVAPOTRANSPIRATION =        2704123.61
            STREAMFLOW =        9774285.25             STREAMFLOW =        1389678.38
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
-   INFLOWS - OUTFLOWS =       -2.9272D+07     INFLOWS - OUTFLOWS =       -4094977.19
+   INFLOWS - OUTFLOWS =       -2.9269D+07     INFLOWS - OUTFLOWS =       -4093801.99
              --------                                   --------
 
- TOTAL STORAGE CHANGE =       -2.9277D+07         STORAGE CHANGE =       -4092849.81
+ TOTAL STORAGE CHANGE =       -2.9281D+07         STORAGE CHANGE =       -4101923.65
        --------------                             --------------
-         LAND SURFACE =       -1101024.21           LAND SURFACE =        -128521.45
-            SOIL ZONE =       -5911006.55              SOIL ZONE =        -754488.69
-     UNSATURATED ZONE =       -1015172.87       UNSATURATED ZONE =        -140705.42
-       SATURATED ZONE =       -1598101.98         SATURATED ZONE =        -237096.50
-                LAKES =       -1.9652D+07                  LAKES =       -2832037.75
+         LAND SURFACE =       -1101041.51           LAND SURFACE =        -128524.02
+            SOIL ZONE =       -5911691.38              SOIL ZONE =        -754537.51
+     UNSATURATED ZONE =       -1041272.73       UNSATURATED ZONE =        -140779.42
+       SATURATED ZONE =       -1572615.58         SATURATED ZONE =        -237129.20
+                LAKES =       -1.9655D+07                  LAKES =       -2840953.50
 
- OVERALL BUDGET ERROR =           5038.62           BUDGET ERROR =          -2127.38
+ OVERALL BUDGET ERROR =          12292.48           BUDGET ERROR =           8121.67
 
 
-  PERCENT DISCREPANCY =              0.02    PERCENT DISCREPANCY =             -0.05
+  PERCENT DISCREPANCY =              0.04    PERCENT DISCREPANCY =              0.20
 
 
 

@@ -2,14 +2,14 @@
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version 2.0.0 04/05/2019
+                         Version 2.0.0 05/30/2019
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.0.0 05/10/2019
+                       Version 5.0.0 05/30/2019
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -56,7 +56,7 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2019-05-10
+GSFLOW Computation Order       gsflow_prms                2019-05-30
 Basin Definition               basin                      2018-04-06
 Cascading Flow                 cascade                    2018-05-25
 Common States and Fluxes       climateflow                2019-04-03
@@ -68,9 +68,9 @@ Precipitation Distribution     climate_hru                2017-10-23
 Solar Radiation Distribution   ddsolrad                   2019-04-04
 Transpiration Distribution     transp_tindex              2015-01-06
 Potential Evapotranspiration   potet_jh                   2019-04-04
-Canopy Interception            intcp                      2018-02-26
+Canopy Interception            intcp                      2019-05-30
 Snow Dynamics                  snowcomp                   2018-05-04
-Surface Runoff                 srunoff_smidx              2019-04-03
+Surface Runoff                 srunoff_smidx              2019-05-24
 Soil Zone Computations         soilzone                   2019-03-05
 GSFLOW PRMS to MODFLOW         gsflow_prms2mf             2017-11-15
 GSFLOW MODFLOW to PRMS         gsflow_mf2prms             2017-11-15
@@ -304,8 +304,8 @@ Date: 1984/01/30; Stress:  2; Step:  1216; Simulation step:   60
                   MF iterations:        8; SZ iterations:      8
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/05/10 16:36:30
- Elapsed run time: 14.168 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/05/30 15:14:47
+ Elapsed run time: 12.716 Seconds
 
  Number of time steps:     60;  Number of non-convergence:   0
  MF iterations:           520;  SZ iterations:             520
