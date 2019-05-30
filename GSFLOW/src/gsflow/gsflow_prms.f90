@@ -8,7 +8,7 @@
       CHARACTER(LEN=68), PARAMETER :: &
      &  EQULS = '===================================================================='
       CHARACTER(LEN=11), PARAMETER :: MODNAME = 'gsflow_prms'
-      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.0.0 05/22/2019'
+      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.0.0 05/30/2019'
       CHARACTER(LEN=8), SAVE :: Process
       CHARACTER(LEN=80), SAVE :: PRMS_versn
       INTEGER, SAVE :: Model, Process_flag, Call_cascade, Ncascade, Ncascdgw
@@ -99,7 +99,7 @@
         ENDIF
         Process_flag = 1
 
-        PRMS_versn = 'gsflow_prms.f90 2019-05-22 16:20:00Z'
+        PRMS_versn = 'gsflow_prms.f90 2019-05-30 14:00:00Z'
 
         IF ( check_dims()/=0 ) STOP
 

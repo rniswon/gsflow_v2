@@ -824,7 +824,7 @@
       USE PRMS_MODULE, ONLY: Temp_flag, Precip_flag, Nhru, Nssr, Temp_module, Precip_module, Parameter_check_flag, &
      &    Solrad_module, Soilzone_module, Srunoff_module, Stream_order_flag, Ntemp, Nrain, Nsol, Nevap, &
      &    Init_vars_from_file, Inputerror_flag, Dprst_flag, Solrad_flag, Et_flag, Nlake, Et_module, Humidity_cbh_flag, &
-     &    PRMS4_flag, Print_debug, GSFLOW_flag
+     &    PRMS4_flag, Print_debug, GSFLOW_flag 
       USE PRMS_BASIN, ONLY: Elev_units, FEET2METERS, METERS2FEET, Active_hrus, Hru_route_order, Hru_type
       IMPLICIT NONE
 ! Functions

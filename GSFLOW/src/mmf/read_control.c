@@ -266,6 +266,7 @@ char *fgets_rc (char *str, int num, FILE *stream) {
          ptr2 = strstr (str, "//");
 
 /* New -- terminate data part of line where the comment starts
+*/
          *(ptr2) = '\0';
          
 /* Now look for spaces before the comment deliminator. If there

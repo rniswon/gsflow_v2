@@ -62,10 +62,12 @@ char *urealloc (char *ptr, unsigned size) {
 \*--------------------------------------------------------------------*/
 char *ucalloc (unsigned num, unsigned size) {
   char *ptr;
-  if ((ptr = (char *)calloc(num, size)) == NULL) 
-    if ((size != 0) && (num != 0))
+  if ((ptr = (char *)calloc(num, size)) == NULL) {
+    if ((size != 0) && (num != 0)) {
       (void)fprintf(stderr, "Cannot perform calloc, num, size = %d,%d\n",num,size);
       exit(1);
+    }
+  }
   return(ptr);
 }
 

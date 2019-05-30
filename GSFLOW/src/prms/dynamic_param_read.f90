@@ -54,7 +54,7 @@
       IF ( Process(:3)=='run' ) THEN
         dynamic_param_read = dynparamrun()
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_dynamic_param_read = 'dynamic_param_read.f90 2018-04-18 11:21:00Z'
+        Version_dynamic_param_read = 'dynamic_param_read.f90 2019-05-30 13:50:00Z'
         CALL print_module(Version_dynamic_param_read, 'Time Series Data            ', 90)
         !MODNAME = 'dynamic_param_read'
       ELSEIF ( Process(:4)=='init' ) THEN
@@ -417,7 +417,7 @@
       USE PRMS_SNOW, ONLY: Rad_trncf, Snarea_thresh
       USE PRMS_SRUNOFF, ONLY: Sro_to_dprst_perv, Sro_to_dprst_imperv, Dprst_depth_avg, &
      &    Op_flow_thres, Dprst_vol_open_max, Dprst_vol_clos_max, Dprst_vol_thres_open, &
-     &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac
+     &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, Hru_impervstor
       USE PRMS_SOILZONE, ONLY: Basin_soil_rechr, Soil_zone_max, Soil_moist_tot, &
      &    Soil_lower_stor_max, Replenish_frac
       IMPLICIT NONE
@@ -428,6 +428,7 @@
 ! Local Variables
       INTEGER :: i, istop, check_dprst_depth_flag
       REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj
+      CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       dynparamrun = 0
       istop = 0
@@ -491,9 +492,11 @@
                   tmp = Imperv_stor(i)*Hru_percent_imperv(i)/Hru_frac_perv(i) ! not sure this is correct???
                   PRINT *, 'WARNING, dynamic impervious changed to 0 when impervious storage > 0'
                   PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
+                  PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
                   soil_adj = tmp
                   Imperv_stor(i) = 0.0
                 ENDIF
+                Hru_impervstor(i) = Imperv_stor(i)*frac_imperv
               ENDIF
               Hru_percent_imperv(i) = frac_imperv
               Hru_imperv(i) = harea*frac_imperv
@@ -509,6 +512,7 @@
                   tmp = tmp/(Dprst_frac(i)*harea)/Hru_frac_perv(i) ! not sure this is correct???
                   PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0'
                   PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
+                  PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
                   soil_adj = soil_adj + tmp
                   Dprst_vol_open(i) = 0.0D0
                   Dprst_vol_clos(i) = 0.0D0
