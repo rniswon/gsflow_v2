@@ -1852,6 +1852,7 @@ C
       INTEGER :: i
 !***********************************************************************
       IF ( LENUNI<1 .OR. ITMUNI<1 .OR. LENUNI>3 .OR. ITMUNI>6 ) THEN
+        IF ( Model==2 .AND. (LENUNI==0.OR.ITMUNI==0) ) RETURN
         WRITE ( IOUT, 9001 ) LENUNI, ITMUNI
         PRINT 9001, LENUNI, ITMUNI
         STOP
@@ -1899,7 +1900,7 @@ C
       ENDDO
 
  9001 FORMAT (' Units are undefined. LENUNI and ITMUNI must be > 0', /,
-     +        ' Lenuni =', I4, 'Itmuni =', I4)
+     +        ' Lenuni = ', I0, '; Itmuni = ', I0)
 
       END SUBROUTINE SETCONVFACTORS
 
