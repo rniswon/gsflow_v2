@@ -10,13 +10,12 @@ NOTE: Any use of trade, product or firm names is for descriptive purposes
 GSFLOW version 2.0.0 is packaged for personal computers using one of the 
 Microsoft Windows operating systems. An executable file compiled for 64-bit
 operating systems is provided. The executable was compiled on a personal
-computer with the Intel(R) Xeon(R) CPU E3-1545M v5 Processor, running the
-Microsoft Windows 10 Enterprise, Version 1803, 64-bit operating system, using the 
+computer with the Intel(R) Xeon(R) E-2186M CPU, running the Microsoft
+Windows 10 Enterprise, Version 1809, 64-bit operating system, using the 
 Microsoft Visual Studio 2015 Version 14.0.25425.01 Update 3, development environment 
-and the Intel® Parallel Studio XE 2017 Update 7 Composer Edition for Fortran Windows* 
-Integration for Microsoft Visual Studio* 2015, Version 17.0.0053.14 
-and Intel® Parallel Studio XE 2017 Update 2 Composer Edition for C++ Windows* 
-Integration for Microsoft Visual Studio* 2015, Version 17.0.72.14 compilers.
+and the Intel® Parallel Studio XE 2017 Update 7 Composer Edition for Fortran 
+Windows* Integration for Microsoft Visual Studio* 2015, Version 17.0.0053.14 
+and Microsoft Visual C++ 2015 Integration for Microsoft Visual Studio* 2015 compilers.
 
 The source code and Linux Makefiles are provided to aid users in compilation
 on other computers. However, no support is provided for compilation.
