@@ -27,6 +27,34 @@
           IF ( Hrucheck(Gvr_hru_id(i))==1 ) &
      &         Gw2sm_grav(i) = SEEPOUT(Gwc_col(Gvr_cell_id(i)), Gwc_row(Gvr_cell_id(i)))*Mfq2inch_conv(i)
         ENDDO
+!
+! Add irrigation to HRU from AG Package
+!
+! From irrigation wells
+!
+        soilzone_gain = 0.0
+        mf_q2prms_inch = DELT*Mfl2_to_acre*Mfl_to_inch
+        IF ( Iunit(66) > 0 ) then
+          DO J = 1, NUMIRRWELSP
+            IRWL = IRRWELVAR(J)
+            NMCL = NUMCELLS(IRWL)
+            DO K = 1, NMCL
+              ihru = IRRROW_GW(K,IRWL)
+              soilzone_gain(ihru) = soilzone_gain(ihru) + WELLIRRPRMS(k,j)*mf_q2prms_inch/HRU_PERV(IHRU)
+            END DO
+          END DO
+!
+! From segment diversions     
+!
+          DO J = 1, NUMIRRDIVERSIONSP
+            SGNM = IRRSEG(J)
+            NMCL = DVRCH(SGNM)
+            DO K=1,NMCL        
+              ihru = IRRROW_GW(K,SGNM)
+              soilzone_gain(ihru) = soilzone_gain(ihru) + DIVERSIONIRRPRMS(k,j)*mf_q2prms_inch/HRU_PERV(ihru)
+            END DO
+          END DO
+        END IF
 
       ELSEIF ( Process(:4)=='decl' ) THEN
         Version_gsflow_mf2prms = 'gsflow_mf2prms.f90 2017-11-15 09:58:00Z'
