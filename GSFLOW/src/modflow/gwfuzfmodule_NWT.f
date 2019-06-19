@@ -33,6 +33,7 @@
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: SEEPOUT, EXCESPP, VKS
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: SURFK
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: AIR_ENTRY, H_ROOT
+        REAL,   SAVE,  DIMENSION(:,:),  POINTER :: ROOTACT
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: REJ_INF
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: TO_CFP
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: EPS, THTS, THTI, THTR
@@ -86,6 +87,7 @@
         REAL,          DIMENSION(:,:),  POINTER :: SEEPOUT, EXCESPP, VKS
         REAL,          DIMENSION(:,:),  POINTER :: SURFK
         REAL,          DIMENSION(:,:),  POINTER :: AIR_ENTRY, H_ROOT
+        REAL,          DIMENSION(:,:),  POINTER :: ROOTACT
         REAL,          DIMENSION(:,:),  POINTER :: REJ_INF
         REAL,          DIMENSION(:,:),  POINTER :: TO_CFP
         REAL,          DIMENSION(:,:),  POINTER :: EPS, THTS, THTI, THTR

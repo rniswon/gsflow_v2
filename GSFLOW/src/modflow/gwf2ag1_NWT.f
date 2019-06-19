@@ -101,7 +101,7 @@
       USE GLOBAL, ONLY: IOUT, NCOL, NROW, IFREFM
       USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: NSEGDIM
-      USE PRMS_MODULE, ONLY: PRMS_flag
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS
@@ -353,7 +353,7 @@
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: IUNIT
       USE GWFAGMODULE
-      USE PRMS_MODULE, ONLY: PRMS_flag
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GWFUZFMODULE, ONLY: IETFLG
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
@@ -393,7 +393,7 @@
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, 
      +                  MAXSEGS, R, IOUT, IN)
             IF (NUMSUP .LT. 0) NUMSUP = 0
-            IF (PRMS_flag == 1 .or. IUNIT(44) > 0) found2 = .true.
+            IF (GSFLOW_flag == 1 .or. IUNIT(44) > 0) found2 = .true.
             IF (.not. found2) THEN
                WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
      +               //' Option: '//LINE(ISTART:ISTOP)
@@ -436,7 +436,7 @@
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IWELLCB, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
-            WRITE (IOUT, 37) IWELLCB
+            WRITE (IOUT, 37) abs(IWELLCB)
             WRITE (IOUT, *)
             !
             !5 - --- Option to output list for wells
@@ -444,7 +444,7 @@
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IWELLCBU, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
-            WRITE (IOUT, 37) IWELLCBU
+            WRITE (IOUT, 37) abs(IWELLCBU)
             WRITE (IOUT, *)
             !
             !6 - --- Option to output list for segments
@@ -452,7 +452,7 @@
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ISFRCB, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
-            WRITE (IOUT, 37) ISFRCB
+            WRITE (IOUT, 37) abs(ISFRCB)
             WRITE (IOUT, *)
             !
             !7 - --- Option to output list for irrigation segments
@@ -460,7 +460,7 @@
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRRSFRCB, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
-            WRITE (IOUT, 37) IRRSFRCB
+            WRITE (IOUT, 37) abs(IRRSFRCB)
             WRITE (IOUT, *)
             !
             !8 - --- Option to output list for irrigation wells
@@ -468,7 +468,7 @@
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRRWELLCB, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
-            WRITE (IOUT, 37) IRRWELLCB
+            WRITE (IOUT, 37) abs(IRRWELLCB)
             WRITE (IOUT, *)
             !
             !9 - --- Option to output time series by SW right
@@ -572,7 +572,7 @@
      +                  MAXCELLSDIVERSION, R, IOUT, IN)   
             IF (NUMIRRDIVERSION .LT. 0) NUMIRRDIVERSION = 0
             IF (MAXCELLSDIVERSION < 1) MAXCELLSDIVERSION = 1
-            IF (PRMS_flag == 1 .or. IUNIT(44) > 0) found2 = .true.
+            IF (GSFLOW_flag == 1 .or. IUNIT(44) > 0) found2 = .true.
             IF (.not. found2) THEN
                WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
      +                //' Option: '//LINE(ISTART:ISTOP)
@@ -591,7 +591,7 @@
             WRITE (IOUT, '(A)') ' AGRICULTURAL DEMANDS WILL BE '//
      +                          'CALCULATED USING ET DEFICIT'
             WRITE (iout, *)
-            IF (PRMS_flag == 1 .or. IUNIT(55) > 0) found2 = .true.
+            IF (GSFLOW_flag == 1 .or. IUNIT(55) > 0) found2 = .true.
             IF (.not. found2) THEN
                WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
      +                 //' Option: '//LINE(ISTART:ISTOP)
@@ -600,7 +600,7 @@
      +                 //' Option: '//LINE(ISTART:ISTOP)
      +                 //' PRMS or UZF1 must be active for this option')
             END IF
-            IF (IUNIT(55) > 0 .AND. PRMS_flag == 0) THEN
+            IF (IUNIT(55) > 0 .AND. GSFLOW_flag == 0) THEN
                IF (IETFLG == 0) THEN
                   WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
      +            //' Option: '//LINE(ISTART:ISTOP)
@@ -616,7 +616,7 @@
             WRITE (IOUT, '(A)') ' IRRIGATION WILL OCCUR FOR A SET '//
      +                  'PERIOD WHEN ET DEFICIT DROPS BELOW THRESHOLD'
             WRITE (iout, *)
-            IF (PRMS_flag == 1 .or. IUNIT(55) > 0) found2 = .true.
+            IF (GSFLOW_flag == 1 .or. IUNIT(55) > 0) found2 = .true.
             IF (.not. found2) THEN
                WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
      +             //' Option: '//LINE(ISTART:ISTOP)
@@ -625,7 +625,7 @@
      +             //' Option: '//LINE(ISTART:ISTOP)
      +             //' PRMS or UZF1 must be active for this option')
             END IF
-            IF (IUNIT(55) > 0 .AND. PRMS_flag == 0) THEN
+            IF (IUNIT(55) > 0 .AND. GSFLOW_flag == 0) THEN
                IF (IETFLG == 0) THEN
                   WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
      +              //' Option: '//LINE(ISTART:ISTOP)
@@ -693,11 +693,11 @@
      + ' A TOTAL OF    ', I10, ' SUPPLEMENTAL WELLS ARE ACTIVE')
 34    FORMAT(1X, 'OPTION TO APPLY PUMPED WATER AS IRRIGATION IS ',
      +      'ACTIVE. ','PUMPED IRRIGATION WATER WILL BE APPLIED TO ', 
-     +      I10,' CELLS/RHUS.')
+     +      I10,' CELLS/HRUS.')
 35    FORMAT(1X, 'OPTION TO APPLY SURFACE WATER AS IRRIGATION IS ',
      +      'ACTIVE.'
      +  , ' DIVERTED SURFACE WATER WILL BE APPLIED TO ', I10, 
-     +    ' CELLS/RHUS.')
+     +    ' CELLS/HRUS.')
 36    FORMAT(1X, 'THE MAXIMUM NUMBER OF WELLS FOR SUPPLEMENTING'
      +  , ' DIVERSIONS OR APPLYING IRRIGATION IS ', I10, ' WELLS.')
 37    FORMAT(1X, ' UNFORMATTED CELL BY CELL RATES FOR SUP AND IRR WELLS'
@@ -1072,7 +1072,7 @@
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: NSS, SEG
-      USE PRMS_MODULE, ONLY: PRMS_flag
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GLOBAL, ONLY: IUNIT
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
@@ -1090,7 +1090,7 @@
             if (IUNIT(44) > 0) then
                DEMAND(ISEG) = SEG(2, ISEG)
                IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
-            elseif (PRMS_flag == 1) then
+            elseif (GSFLOW_flag == 1) then
             end if
             SUPACT(ISEG) = 0.0
             ACTUAL(ISEG) = 0.0
@@ -1222,7 +1222,7 @@
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: IOUT, IUNIT
       USE GWFAGMODULE
-      USE PRMS_MODULE, ONLY: PRMS_flag
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS:
@@ -1279,7 +1279,7 @@
          NUMCELLS(IRWL) = NMCL
          IRRPERIODWELL(IRWL) = IPRW
          TRIGGERPERIODWELL(IRWL) = TRPW
-         IF (PRMS_flag == 1) then   
+         IF (GSFLOW_flag == 1) then   
             DO K = 1, NMCL
                READ (IN, *) IRRROW_GW(K, IRWL), IDUM, IRRFACT(K, IRWL),
      +                      IRRFIELDFACT(K, IRWL)
@@ -1332,7 +1332,7 @@
       !******************************************************************
       USE GWFAGMODULE
       USE GLOBAL, ONLY: IUNIT
-      USE PRMS_MODULE, ONLY: PRMS_flag
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS
@@ -1389,7 +1389,7 @@
             DVRCH(SGNM) = NMCL
             IRRPERIODSEG(SGNM) = IRRPER
             TRIGGERPERIODSEG(SGNM) = IRRTRGR
-            IF (PRMS_flag == 1) then
+            IF (GSFLOW_flag == 1) then
                DO K = 1, NMCL
                   READ (IN, *) IRRROW_SW(K, SGNM), idum, DVEFF(K, SGNM),
      +                         DVRPERC(K, SGNM)           
@@ -1427,7 +1427,7 @@
      +        'Fraction of diversion for each cell in group does '/,
      +        'does not sum to one. Sum = ', E15.5)
 9007  FORMAT('***Error in AG*** cell row or column for irrigation',
-     +       'cell specified as zero. Model stopping.')
+     +       ' cell specified as zero. Model stopping.')
 9008  FORMAT('***Error in AG*** maximum number of irrigation ',
      +       'segments is less than the number specified in ',
      +       'stress period. ', /
@@ -1437,7 +1437,7 @@
      +       'stress period. ', /
      +       'Maximum cells and the number specified are: ', 2i6)
 9010  FORMAT('***Error in AG*** HRU_ID for irrigation',
-     +       'cell specified as zero. Model stopping.')
+     +       ' cell specified as zero. Model stopping.')
       RETURN
       END
 !
@@ -1623,7 +1623,7 @@
         end select
       END SUBROUTINE WRITE_HEADER
 
-              !
+      !
       SUBROUTINE GWF2AG7FM(Kkper, Kkstp, Kkiter, Iunitnwt)
       !******************************************************************
       ! CALCULATE APPLIED IRRIGATION, DIVERISONS, AND PUMPING
@@ -1639,7 +1639,7 @@
      +                        SEG, STRM
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
-      USE PRMS_MODULE, ONLY: PRMS_flag
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
       !
       ! ARGUMENTS:
@@ -1681,7 +1681,7 @@
       !
       !2 - -----IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF (ETDEMANDFLAG > 0) THEN
-         IF (PRMS_flag == 0) THEN
+         IF (GSFLOW_flag == 0) THEN
             CALL demandconjunctive_uzf(kkper, kkstp, kkiter)
          ELSE
             CALL demandconjunctive_prms(kkiter)
@@ -1752,7 +1752,7 @@
                !
                !7 - -----CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
                IF (ETDEMANDFLAG > 0) THEN
-                  IF (PRMS_flag == 0) THEN
+                  IF (GSFLOW_flag == 0) THEN
                      QQ = demandgw_uzf(l, kkper, kkstp, kkiter, time)
                   ELSE
                      QQ = demandgw_prms(l, kkiter)
@@ -1795,7 +1795,7 @@
                ACTUAL(J) = ACTUAL(J) + SUP
             END DO
             !10------APPLY IRRIGATION FROM WELLS
-            IF (PRMS_flag == 0) THEN
+            IF (GSFLOW_flag == 0) THEN
                DO I = 1, NUMCELLS(L)
                   SUBVOL = -(DONE - IRRFACT(I, L))*Qp*IRRFIELDFACT(I, L)
                   SUBRATE = SUBVOL/(DELR(IRRCOL_GW(I, L))*
@@ -1815,7 +1815,7 @@
       ! APPLY IRRIGATION FROM SW DIVERSIONS
       DO L = 1, NUMIRRDIVERSIONSP
          istsg = IRRSEG(L)
-         IF (PRMS_flag == 0) THEN
+         IF (GSFLOW_flag == 0) THEN
             DO icount = 1, DVRCH(istsg)   !THESE VARS COULD BE DIMENSIONED NUMIRRDIVERSION TO SAVE MEMORY
                irr = IRRROW_SW(icount, istsg)
                icc = IRRCOL_SW(icount, istsg)
@@ -1857,7 +1857,7 @@
       USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, SEG, IDIVAR,
      +     DVRSFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
-      USE PRMS_MODULE, ONLY: PRMS_flag
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
       ! ARGUMENTS:
       ! - -----------------------------------------------------------------
@@ -2130,7 +2130,7 @@
          WRITE (IBD3, 61) TEXT3, KKPER, KKSTP
          DO L = 1, NUMIRRDIVERSIONSP
             ISTSG = IRRSEG(L)
-            IF (PRMS_flag == 0) THEN
+            IF (GSFLOW_flag == 0) THEN
                DO icount = 1, DVRCH(istsg)
                   ir = IRRROW_SW(icount, istsg)
                   ic = IRRCOL_SW(icount, istsg)
@@ -2154,7 +2154,7 @@
          WRITE (IBD4, *)
          WRITE (IBD4, 61) TEXT4, KKPER, KKSTP
          DO L = 1, NWELLSTEMP
-            IF (PRMS_flag == 0) THEN
+            IF (GSFLOW_flag == 0) THEN
                DO I = 1, NUMCELLS(L)
                   IC = IRRCOL_GW(I, L)
                   IR = IRRROW_GW(I, L)
@@ -2360,7 +2360,7 @@
         !
         SEG(2, iseg) = SUPACT(iseg)
         !
-        !1 - -----limit diversion to water right and flow in river
+        !2 - -----limit diversion to water right and flow in river
         !
         k = IDIVAR(1, ISEG)
         fmaxflow = STRM(9, LASTREACH(K))
@@ -2465,7 +2465,7 @@
       USE PRMS_BASIN, ONLY: HRU_PERV
       USE PRMS_FLOWVARS, ONLY: SOIL_MOIST, HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE PRMS_MODULE, ONLY: PRMS_flag
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
 ! --------------------------------------------
       !modules
@@ -2501,7 +2501,7 @@
          !1 - -----loop over hrus irrigated by diversion
          !
          do k = 1, DVRCH(iseg)
-            if (PRMS_flag == 0) THEN
+            if (GSFLOW_flag == 0) THEN
                ic = IRRCOL_SW(k, iseg)
                ir = IRRROW_SW(k, iseg)
                pet = pet + PETRATE(ic, ir)
@@ -2554,7 +2554,7 @@
       USE PRMS_BASIN, ONLY: HRU_PERV
       USE PRMS_FLOWVARS, ONLY: SOIL_MOIST, HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE PRMS_MODULE, ONLY: PRMS_flag
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
 ! --------------------------------------------
       !arguments
@@ -2577,7 +2577,7 @@
       pettotal = dzero
       aettotal = dzero
       DO i = 1, NUMCELLS(L)
-         if (PRMS_flag == 0) THEN
+         if (GSFLOW_flag == 0) THEN
             ic = IRRCOL_GW(i, l)
             ir = IRRROW_GW(i, l)
             uzet = uzfetout(ic, ir)/DELT
@@ -2779,7 +2779,7 @@
       USE PRMS_BASIN, ONLY: HRU_PERV
       USE PRMS_FLOWVARS, ONLY: SOIL_MOIST, HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE PRMS_MODULE, ONLY: PRMS_flag
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
       IMPLICIT NONE
 ! --------------------------------------
@@ -2824,7 +2824,7 @@
             iseg = TSSWETNUM(I)
             do k = 1, DVRCH(iseg)  !cells per segement
                IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
-                  IF (PRMS_flag == 0) THEN
+                  IF (GSFLOW_flag == 0) THEN
                      ic = IRRCOL_SW(k, iseg)
                      ir = IRRROW_SW(k, iseg)
                      area = delr(ic)*delc(ir)
@@ -2883,7 +2883,7 @@
                   UNIT = TSGWETUNIT(I)
                   do J = 1, NUMCELLS(L)
                      IF (ETDEMANDFLAG > 0) THEN
-                        IF (PRMS_flag == 0) THEN
+                        IF (GSFLOW_flag == 0) THEN
                            IC = IRRCOL_GW(J, L)
                            IR = IRRROW_GW(J, L)
                            area = delr(ic)*delc(ir)
@@ -2925,7 +2925,7 @@
             UNIT = TSGWETALLUNIT
             do J = 1, NUMCELLS(L)
                IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
-                  IF (PRMS_flag == 0) THEN
+                  IF (GSFLOW_flag == 0) THEN
                      IC = IRRCOL_GW(J, L)
                      IR = IRRROW_GW(J, L)
                      area = delr(ic)*delc(ir)
