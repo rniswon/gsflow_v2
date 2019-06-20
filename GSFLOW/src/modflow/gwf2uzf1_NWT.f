@@ -3394,9 +3394,10 @@ C29-----ACCUMULATE INFLOW AND OUTFLOW VOLUMES FROM CELLS.
           UZTSRAT(8) = UZTSRAT(8) + cellarea*finfsaveadd
           IF ( IETBUD.GT.0 )
      +         CUMGWET(ic,ir) = CUMGWET(ic,ir) + GWET(ic, ir)
-          
-          cumapplinf = cumapplinf + cellarea*FINF(ic, ir) ! + 
-!     +                 Excespp(ic, ir)    !RGN 6/20/2014
+          finfsaveadd = 0.0
+          IF ( Isavefinf+Igsflow == 2 ) finfsaveadd = finfsave(ic,ir)
+            cumapplinf = cumapplinf + cellarea*FINF(ic, ir)  + 
+     +                 finfsaveadd
           if ( isavefinf>0 .and. iss == 0 ) 
      +         cumapplinf = cumapplinf + cellarea*finfact
           UZTSRAT(1) = UZTSRAT(1) + volinflt/DELT
