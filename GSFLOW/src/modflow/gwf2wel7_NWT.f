@@ -55,7 +55,7 @@ C     ------------------------------------------------------------------
       ALLOCATE(NWELLS,MXWELL,NWELVL,IWELCB,IPRWEL)
       ALLOCATE(NPWEL,IWELPB,NNPWEL,PSIRAMP,IUNITRAMP)
       ALLOCATE(NUMTAB,MAXVAL)
-      PSIRAMP = 1.0E-5
+      PSIRAMP = 1.0E-1
       NUMTAB = 0
       MAXVAL = 1
       CLOSEZERO = 1.0E-7
@@ -139,7 +139,7 @@ C3------READ AUXILIARY VARIABLES AND PRINT FLAG.
          IF ( Iunitnwt.EQ.0 ) THEN
              write(IOUT,32)
          ELSE
-           IF(PSIRAMP.LT.1.0E-5) PSIRAMP=1.0E-5
+           IF(PSIRAMP.LT.1.0E-1) PSIRAMP=1.0E-1
            IF ( IUNITRAMP.EQ.0 ) IUNITRAMP = IOUT
            WRITE(IOUT,*)
            WRITE(IOUT,9) PSIRAMP,IUNITRAMP
