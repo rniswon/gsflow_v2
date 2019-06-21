@@ -550,7 +550,7 @@
 !***********************************************************************
       INTEGER FUNCTION setdims()
       USE PRMS_MODULE
-      USE GLOBAL, ONLY: NSTP, NPER
+      USE GLOBAL, ONLY: NSTP, NPER, ISSFLG
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: decldim, declfix, call_modules, control_integer_array, control_file_name
@@ -659,16 +659,19 @@
         IF ( test/=0 ) CALL module_error(MODNAME, 'initialize', test)
         PRINT *, ' '
         WRITE (Logunt, '(1X)')
-        Process_flag = 0
-        DO WHILE ( Kper_mfo<=Nper )
-          test = gsflow_modflow()
-          IF ( test/=0 ) CALL module_error(MODNAME, 'run', test)
-          IF ( mf_timestep==NSTP(Kper_mfo) ) THEN
-              Kper_mfo = Kper_mfo + 1
-              mf_timestep = 0
-          END IF
-          mf_timestep = mf_timestep + 1
-        ENDDO
+        If ( ISSFLG(Kper_mfo) == 1 .and. nper == 1) then
+        else
+          Process_flag = 0
+          DO WHILE ( Kper_mfo<=Nper )
+            test = gsflow_modflow()
+            IF ( test/=0 ) CALL module_error(MODNAME, 'run', test)
+            IF ( mf_timestep==NSTP(Kper_mfo) ) THEN
+                Kper_mfo = Kper_mfo + 1
+                mf_timestep = 0
+            END IF
+            mf_timestep = mf_timestep + 1
+          ENDDO
+        end if
         Process_flag = 3
         test = gsflow_modflow()
         IF ( test/=0 ) CALL module_error(MODNAME, 'clean', test)
