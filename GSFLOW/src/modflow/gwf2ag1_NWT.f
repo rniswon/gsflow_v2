@@ -436,7 +436,7 @@
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IWELLCB, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
-            WRITE (IOUT, 37) abs(IWELLCB)
+            WRITE (IOUT, 37) IWELLCB
             WRITE (IOUT, *)
             !
             !5 - --- Option to output list for wells
@@ -444,7 +444,7 @@
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IWELLCBU, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
-            WRITE (IOUT, 37) abs(IWELLCBU)
+            WRITE (IOUT, 37) IWELLCBU
             WRITE (IOUT, *)
             !
             !6 - --- Option to output list for segments
@@ -452,7 +452,7 @@
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ISFRCB, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
-            WRITE (IOUT, 37) abs(ISFRCB)
+            WRITE (IOUT, 37) ISFRCB
             WRITE (IOUT, *)
             !
             !7 - --- Option to output list for irrigation segments
@@ -460,7 +460,7 @@
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRRSFRCB, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
-            WRITE (IOUT, 37) abs(IRRSFRCB)
+            WRITE (IOUT, 37) IRRSFRCB
             WRITE (IOUT, *)
             !
             !8 - --- Option to output list for irrigation wells
@@ -468,7 +468,7 @@
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRRWELLCB, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
-            WRITE (IOUT, 37) abs(IRRWELLCB)
+            WRITE (IOUT, 37) IRRWELLCB
             WRITE (IOUT, *)
             !
             !9 - --- Option to output time series by SW right
@@ -520,7 +520,7 @@
                   write (IOUT, 32)
                   WRITE (IOUT, *)
                ELSE
-                  IF (PSIRAMP .LT. 1.0E-5) PSIRAMP = 1.0E-5
+                  IF (PSIRAMP .LT. 0.1) PSIRAMP = 0.1
                   IF (IUNITRAMP .EQ. 0) IUNITRAMP = IOUT
                   WRITE (IOUT, *)
                   WRITE (IOUT, 29) PSIRAMP, IUNITRAMP
@@ -693,11 +693,11 @@
      + ' A TOTAL OF    ', I10, ' SUPPLEMENTAL WELLS ARE ACTIVE')
 34    FORMAT(1X, 'OPTION TO APPLY PUMPED WATER AS IRRIGATION IS ',
      +      'ACTIVE. ','PUMPED IRRIGATION WATER WILL BE APPLIED TO ', 
-     +      I10,' CELLS/HRUS.')
+     +      I10,' CELLS/RHUS.')
 35    FORMAT(1X, 'OPTION TO APPLY SURFACE WATER AS IRRIGATION IS ',
      +      'ACTIVE.'
      +  , ' DIVERTED SURFACE WATER WILL BE APPLIED TO ', I10, 
-     +    ' CELLS/HRUS.')
+     +    ' CELLS/RHUS.')
 36    FORMAT(1X, 'THE MAXIMUM NUMBER OF WELLS FOR SUPPLEMENTING'
      +  , ' DIVERSIONS OR APPLYING IRRIGATION IS ', I10, ' WELLS.')
 37    FORMAT(1X, ' UNFORMATTED CELL BY CELL RATES FOR SUP AND IRR WELLS'
@@ -1080,16 +1080,22 @@
       INTEGER, INTENT(IN)::IN, KPER
       !
       INTEGER ISEG, i
+      DOUBLE PRECISION :: TOTAL
       ! - -----------------------------------------------------------------
       !
       !1 - ------RESET DEMAND IF IT CHANGES
       DEMAND = 0.0
+      TOTAL = 0.0
       DO i = 1, NUMIRRDIVERSION
          iseg = IRRSEG(i)
          if (iseg > 0) then
             if (IUNIT(44) > 0) then
+               ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
+               ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
+               ! contains the TABFILE values at this point.
                DEMAND(ISEG) = SEG(2, ISEG)
                IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
+               TOTAL = TOTAL + DEMAND(ISEG)
             elseif (GSFLOW_flag == 1) then
             end if
             SUPACT(ISEG) = 0.0
@@ -1108,6 +1114,8 @@
       WELLIRRUZF = 0.0
       WELLIRRPRMS = 0.0
       QONLY = 0.0
+ !     OPEN(999,FILE='DEMAND.OUT')
+!      WRITE(999,*)KPER,TOTAL
       RETURN
       END
 !
@@ -1427,7 +1435,7 @@
      +        'Fraction of diversion for each cell in group does '/,
      +        'does not sum to one. Sum = ', E15.5)
 9007  FORMAT('***Error in AG*** cell row or column for irrigation',
-     +       ' cell specified as zero. Model stopping.')
+     +       'cell specified as zero. Model stopping.')
 9008  FORMAT('***Error in AG*** maximum number of irrigation ',
      +       'segments is less than the number specified in ',
      +       'stress period. ', /
@@ -1437,7 +1445,7 @@
      +       'stress period. ', /
      +       'Maximum cells and the number specified are: ', 2i6)
 9010  FORMAT('***Error in AG*** HRU_ID for irrigation',
-     +       ' cell specified as zero. Model stopping.')
+     +       'cell specified as zero. Model stopping.')
       RETURN
       END
 !
@@ -1623,7 +1631,7 @@
         end select
       END SUBROUTINE WRITE_HEADER
 
-      !
+              !
       SUBROUTINE GWF2AG7FM(Kkper, Kkstp, Kkiter, Iunitnwt)
       !******************************************************************
       ! CALCULATE APPLIED IRRIGATION, DIVERISONS, AND PUMPING
@@ -1699,7 +1707,7 @@
          END DO
       END DO
       !
-      !2C - ---SRT CUMULATIVE SUP PUMPING TO ZERO EACH ITERATION
+      !2C - ---SET CUMULATIVE SUP PUMPING TO ZERO EACH ITERATION
       ACTUAL = ZERO
       !
       !3 - -----SET MAX PUMPING RATE OR IRR DEMAND FOR GW.
@@ -1745,6 +1753,7 @@
                SUPFLOW(L) = SUPFLOW(L) - SUP/dble(NUMSUPWELLSEG(L))
                !
                !6 - -----CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
+               !
                IF (SUPFLOW(L) < Q) SUPFLOW(L) = Q
                Q = SUPFLOW(L)
                QONLY(L) = DONENEG*Q
@@ -1766,7 +1775,7 @@
             END IF
             !
             !8 - -----IF THE CELL IS VARIABLE HEAD THEN SUBTRACT Q FROM
-            ! THE RHS ACCUMULATOR.
+            ! - ------THE RHS ACCUMULATOR.
             IF (IUNITNWT .NE. 0) THEN
                IF (LAYTYPUPW(il) .GT. 0) THEN
                   Hh = HNEW(ic, ir, il)
@@ -1776,6 +1785,7 @@
                   RHS(IC, IR, IL) = RHS(IC, IR, IL) - Qp
                   !
                   !8 - -----Derivative for RHS
+                  !
                   ij = Icell(IC, IR, IL)
                   A(IA(ij)) = A(IA(ij)) + dQp*Q
                ELSE
@@ -1788,13 +1798,16 @@
             END IF
             !
             !9 - -----SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
+            !
             SUP = 0.0
             DO I = 1, NUMSEGS(L)  ! need to test when multiple segs supported by single well
                J = DIVERSIONSEG(I, L)
                SUP = SUP - Qp
                ACTUAL(J) = ACTUAL(J) + SUP
             END DO
+            !
             !10------APPLY IRRIGATION FROM WELLS
+            !
             IF (GSFLOW_flag == 0) THEN
                DO I = 1, NUMCELLS(L)
                   SUBVOL = -(DONE - IRRFACT(I, L))*Qp*IRRFIELDFACT(I, L)
@@ -2360,7 +2373,7 @@
         !
         SEG(2, iseg) = SUPACT(iseg)
         !
-        !2 - -----limit diversion to water right and flow in river
+        !1 - -----limit diversion to water right and flow in river
         !
         k = IDIVAR(1, ISEG)
         fmaxflow = STRM(9, LASTREACH(K))

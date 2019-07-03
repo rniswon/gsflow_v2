@@ -1305,7 +1305,7 @@ C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
       DOUBLE PRECISION h, fks
-      DOUBLE PRECISION thtrcell
+      DOUBLE PRECISION thtrcell, fcheck
       DOUBLE PRECISION bottom, celtop, slen, width, etdpth, surfinf
       DOUBLE PRECISION thick, surfpotet, top
       INTEGER ic, iflginit, il, ilay, ill, ir, iss, jk, l, ncck,
@@ -1672,7 +1672,9 @@ C21-----CALCULATE INITIAL WATER CONTENT AND FLUX IF STEADY STATE.
      +                       (top/(THTS(ic,ir)-thtrcell))**EPS(ic,ir)
                           UZTHST(1, l) = THTI(ic, ir)
                         ELSE
-                          UZFLST(1, l) = FINF(ic, ir)
+                          fcheck = FINF(ic, ir)
+                          if ( fcheck > VKS(ic,ir) ) fcheck = VKS(ic,ir)
+                          UZFLST(1, l) = fcheck
                           UZTHST(1, l) = (((UZFLST(1, l)/VKS(ic,ir))**
      +                    (1.0/EPS(ic,ir)))*(THTS(ic,ir)-thtrcell))
      +                                 + thtrcell
@@ -1713,7 +1715,9 @@ C24-----IF NO UNSATURATED ZONE, SET ARRAY VALUES TO ZERO EXEPT WHEN
 C         STEADY STATE, THEN SET UZFLST ARRAY TO INFILRATION RATE.
                     ELSE
                       IF ( iss.NE.0 ) THEN
-                        UZFLST(1, l) = FINF(ic, ir)
+                        fcheck = FINF(ic, ir)
+                        if ( fcheck > VKS(ic,ir) ) fcheck = VKS(ic,ir)
+                        UZFLST(1, l) = fcheck
                       ELSE
                         UZFLST(1, l) = 0.0D0
                       END IF
@@ -1721,8 +1725,10 @@ C         STEADY STATE, THEN SET UZFLST ARRAY TO INFILRATION RATE.
                       UZSPST(1, l) = 0.0D0
                       UZTHST(1, l) = thtrcell
                       UZSTOR(ic, ir) = 0.0D0
-cupdate        
-                      UZOLSFLX(ic, ir) = FINF(ic, ir)
+cupdate       
+                      fcheck = FINF(ic, ir)
+                      if ( fcheck > VKS(ic,ir) ) fcheck = VKS(ic,ir)
+                      UZOLSFLX(ic, ir) = fcheck
                     END IF
                     IF( RTSOLUTE.GT.0 ) THEN
                       DO uzlay = 1, NLAY
@@ -2209,6 +2215,9 @@ C5------CALL UZFLOW TO ROUTE WAVES FOR LATEST ITERATION.
                 END IF
                 surflux = finfact
                 oldsflx = UZOLSFLX(ic, ir)
+      !if(ir==6.and.ic==4.and.kkper==5.and.kkstp==2)then
+      !write(777,*)kkiter,surflux,totetact
+      !end if
                 DO ik = 1, idelt
                   totflux = 0.0D0
                   etact = 0.0D0
@@ -3462,8 +3471,10 @@ C29-----ACCUMULATE INFLOW AND OUTFLOW VOLUMES FROM CELLS.
           UZTSRAT(8) = UZTSRAT(8) + cellarea*finfsaveadd
           IF ( IETBUD.GT.0 )
      +         CUMGWET(ic,ir) = CUMGWET(ic,ir) + GWET(ic, ir)
-          cumapplinf = cumapplinf + cellarea*FINF(ic, ir) + 
-     +                 Excespp(ic, ir)    !RGN 6/20/2014
+          finfsaveadd = 0.0
+          IF ( Isavefinf+Igsflow == 2 ) finfsaveadd = finfsave(ic,ir)
+            cumapplinf = cumapplinf + cellarea*FINF(ic, ir)  + 
+     +                 finfsaveadd
           if ( isavefinf>0 .and. iss == 0 ) 
      +         cumapplinf = cumapplinf + cellarea*finfact
           UZTSRAT(1) = UZTSRAT(1) + volinflt/DELT

@@ -218,7 +218,7 @@
 
       IF ( Cascade_flag>0 ) CALL init_cascade(cascinit)
 
-      iret = 0
+!      iret = 0
       IF ( Cascadegw_flag>0 ) THEN
         ALLOCATE ( Gwr_down(Ndown,Ngw), Gwr_down_frac(Ndown,Ngw), Cascade_gwr_area(Ndown,Ngw) )
 !        ALLOCATE ( Gwr_down_fracwt(Ndown,Ngw) )
@@ -248,7 +248,7 @@
           ENDDO
         ENDIF
       ENDIF
-      IF ( cascinit/=0 .OR. iret/=0 ) STOP
+!      IF ( cascinit/=0 .OR. iret/=0 ) STOP    !RGN to compile
 
       IF ( Print_debug==13 ) THEN
         IF ( Cascade_flag>0 ) THEN
@@ -319,7 +319,7 @@
       REAL, ALLOCATABLE :: hru_frac(:)
       REAL :: carea, frac
 !***********************************************************************
-      Iret = 0
+!      Iret = 0  !RGN can't get this to work
 
 ! Cascade parameters
       Ndown = 1
@@ -632,7 +632,7 @@
    11   FORMAT ('####', /, 'hru_type', /, '1', /, 'nhru', /, I7, /, '1')
       ENDIF
 
-      Iret = 0
+!      Iret = 0
 ! check for circles when circle_switch = 1
       IF ( Circle_switch==1 ) THEN
         circle_flg = 0
@@ -757,7 +757,7 @@
       REAL :: carea, frac
       REAL, ALLOCATABLE :: gwr_frac(:)
 !***********************************************************************
-     Iret = 0
+!     Iret = 0
 
       ALLOCATE ( gwr_frac(Ngw) )
       DO i = 1, Ngw
@@ -1043,7 +1043,7 @@
   11    FORMAT ('####', /, 'gwr_type', /, '1', /, 'ngw', /, I7, /, '2')
       ENDIF
 
-      Iret = 0
+!      Iret = 0
 ! check for circles when circle_switch = 1
       IF ( Circle_switch==1 ) THEN
         circle_flg = 0

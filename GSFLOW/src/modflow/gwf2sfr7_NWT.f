@@ -8362,9 +8362,7 @@ C     OF TIME TO CACULATE SPECIFIED INFLOW TO SEGMENTS.
       ELSE
 ! Find table value before beginning of time step.
         DO WHILE ( I.LE.NVAL-1 )
-          IF ( TIMEBEG-TABTIME(I,ISEG).LE.CLOSEZERO ) THEN
-            EXIT
-          ELSEIF ( TIMEBEG-TABTIME(I+1,ISEG).LE.CLOSEZERO ) THEN
+          IF ( TIMEBEG-TABTIME(I+1,ISEG).LE.CLOSEZERO ) THEN
             EXIT
           ELSE
             I = I + 1
@@ -8529,10 +8527,12 @@ C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
       INTEGER :: ISEG
+      double precision :: total !delete this
 C     -------------------------------------------------------------------
 C
 C1------LOOP OVER SEGMETS
 C
+        total = 0.0
         DO ISEG = 1, NSS
 C
 C4------APPLY DIVERSION AMOUNT TO SFR SEGMENT INFLOW.
@@ -8542,6 +8542,7 @@ C
             IF ( IDIVAR(1,iseg).LT.0 ) THEN
               FXLKOT(iseg) = SEG(2, iseg)
             END IF
+            total = total + Diversions(ISEG)/DELT
           END IF
         END DO
 C
