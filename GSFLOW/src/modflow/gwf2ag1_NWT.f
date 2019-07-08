@@ -1114,8 +1114,6 @@
       WELLIRRUZF = 0.0
       WELLIRRPRMS = 0.0
       QONLY = 0.0
- !     OPEN(999,FILE='DEMAND.OUT')
-!      WRITE(999,*)KPER,TOTAL
       RETURN
       END
 !
@@ -1692,7 +1690,7 @@
          IF (GSFLOW_flag == 0) THEN
             CALL demandconjunctive_uzf(kkper, kkstp, kkiter)
          ELSE
-            CALL demandconjunctive_prms(kkiter)
+            CALL demandconjunctive_prms(kkper, kkstp, kkiter)
          END IF
       END IF
       IF (TRIGGERFLAG > 0) THEN
@@ -2385,7 +2383,7 @@
 ! ----------------------------------------------------------------------
 !
 !
-      subroutine demandconjunctive_prms(kiter)
+      subroutine demandconjunctive_prms(kper, kstp, kiter)
 !     ******************************************************************
 !     demandconjunctive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
@@ -2401,7 +2399,7 @@
 ! --------------------------------------------------
       !modules
       !arguments
-      integer, intent(in) :: kiter
+      integer, intent(in) :: kper, kstp, kiter
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, finfsum, fks
       double precision :: zerod3, zerod7, done, dzero, dum, pettotal,
@@ -2461,6 +2459,11 @@
         fmaxflow = STRM(9, LASTREACH(K))
         IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
+  !      if(iseg==19.and.kper==11.and.kstp==6)then
+  !        write(999,33)kiter,SEG(2, iseg),fmaxflow,SUPACT(iseg),
+  !   +                 pettotal,aettotal
+  !      endif
+  !33  format(i5,5e20.10)
 300   continue
       return
       end subroutine demandconjunctive_prms

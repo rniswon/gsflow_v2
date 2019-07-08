@@ -32,6 +32,7 @@
 !***********************************************************************
       gsflow_mf2prms = 0
       mf_q2prms_inch = 0.0
+      Hru_ag_irr = 0.0
       IF ( Process(:3)=='run' ) THEN
         DO i = 1, Nhrucell
           IF ( Hrucheck(Gvr_hru_id(i))==1 ) &
@@ -42,7 +43,6 @@
 !
 ! From irrigation wells
 !
-        soilzone_gain = 0.0
         mf_q2prms_inch = DELT*Mfl2_to_acre*Mfl_to_inch
         IF ( Iunit(66) > 0 ) then
           DO J = 1, NUMIRRWELSP
