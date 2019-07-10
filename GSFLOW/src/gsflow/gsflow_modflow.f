@@ -154,7 +154,7 @@ C
      &           'HYD ', 'SFR ', '    ', 'GAGE', 'LVDA', '    ', 'LMT6',  ! 49
      &           'MNW2', 'MNWI', 'MNW1', 'KDEP', 'SUB ', 'UZF ', 'gwm ',  ! 56
      &           'SWT ', 'cfp ', 'pcgn', '    ', 'fmp ', 'UPW ', 'NWT ',  ! 63
-     &           'SWR ', 'SWI2', 'awu ', '    ', 'IWRT', 'IRED', '    ',  ! 70     - SWR - JDH 
+     &           'SWR ', 'SWI2', 'AG ', '    ', 'IWRT', 'IRED', '    ',  ! 70     - SWR - JDH 
      &           30*'    '/                                               ! 71-100 - SWR - JDH
 C     ------------------------------------------------------------------
       gsfinit = 0
@@ -239,10 +239,6 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
       ENDIF
       IF ( IUNIT(61)>0 ) THEN
         PRINT *, 'FMP Package not supported'
-        ierr = 1
-      ENDIF
-      IF ( IUNIT(66)>0 ) THEN
-        PRINT *, 'AWU Package not supported'
         ierr = 1
       ENDIF
 
@@ -387,12 +383,8 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
         IF(IUNIT(44).GT.0) CALL GWF2HYD7SFR7AR(IUNIT(43),IGRID)
       ENDIF
       IF(IUNIT(49).GT.0) CALL LMT8BAS7AR(INUNIT,CUNIT,IGRID)
-!gsf      IF(IUNIT(66).GT.0) CALL GWF2AWU7AR(IUNIT(66),IUNIT(44),IUNIT(63))
-!      IF(IUNIT(61).GT.0) THEN
-!        CALL FMP2AR(
-!     1  IUNIT(61),IUNIT(44),IUNIT(52),IUNIT(55),IGRID)                  !FMP2AR CALL ADDED BY SCHMID
-!        CALL FMP2RQ(IUNIT(61),IUNIT(44),IUNIT(52),IGRID)                !FMP2RQ CALL ADDED BY SCHMID
-!      ENDIF
+      IF(IUNIT(66).GT.0) CALL GWF2AG7AR(IUNIT(66),IUNIT(44),IUNIT(63))
+
 C
 C7------SIMULATE EACH STRESS PERIOD.
       CALL print_module(Version_gsflow_modflow,
@@ -588,8 +580,8 @@ C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
 !          ENDIF     
           IF(IUNIT(64).GT.0) CALL GWF2SWR7AD(KKPER,KKSTP,
      2                                       IGRID,IUNIT(54))  !SWR - JDH
-!gsf          IF(IUNIT(66).GT.0 .AND. ISSFLG(KPER)==0 ) 
-!gsf     1                            CALL GWF2AWU7AD(IUNIT(66),KKPER)
+          IF(IUNIT(66).GT.0 .AND. ISSFLG(KPER)==0 ) 
+     1                            CALL GWF2AG7AD(IUNIT(66),KKPER)
 
           IF ( Model.EQ.2 ) THEN
 C
@@ -707,8 +699,8 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
      1                                         IUNIT(9),IGRID)
             IF(IUNIT(57).GT.0) CALL GWF2SWT7FM(KKPER,IGRID)
             IF(IUNIT(64).GT.0) CALL GWF2SWR7FM(KKITER,KKPER,KKSTP,IGRID)  !SWR - JDH
-!gsf            IF(IUNIT(66).GT.0.AND. ISSFLG(KPER)==0 ) 
-!gsf     1                CALL GWF2AWU7FM(Kkper, Kkstp, Kkiter,IUNIT(63))
+            IF(IUNIT(66).GT.0.AND. ISSFLG(KPER)==0 ) 
+     1                CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63))
 C-------------SWI2 FORMULATE (GWF2SWI2FM) NEEDS TO BE THE LAST PACKAGE
 C             ENTRY SINCE SWI2 SAVES THE RHS (RHSFRESH) PRIOR TO ADDING SWI TERMS
 C             RHSFRESH IS USED TO CALCULATE BOUNDARY CONDITION FLUXES
@@ -900,8 +892,8 @@ C7C4----CALCULATE BUDGET TERMS. SAVE CELL-BY-CELL FLOW TERMS.
           IF(IUNIT(57).GT.0) CALL GWF2SWT7BD(KKSTP,KKPER,IGRID)     
           IF(IUNIT(64).GT.0) CALL GWF2SWR7BD(KKSTP,KKPER,IGRID)  !SWR - JDH
           IF(IUNIT(65).GT.0) CALL GWF2SWI2BD(KKSTP,KKPER,IGRID)  !SWI2 - JDH
-!gsf          IF(IUNIT(66).GT.0 .AND. ISSFLG(KPER)==0) 
-!gsf     +                       CALL GWF2AWU7BD(KKSTP,KKPER,IUNIT(63))
+          IF(IUNIT(66).GT.0 .AND. ISSFLG(KPER)==0) 
+     1                       CALL GWF2AG7BD(KKSTP,KKPER,IUNIT(63))
 CLMT
 CLMT----CALL LINK-MT3DMS SUBROUTINES TO SAVE FLOW-TRANSPORT LINK FILE
 CLMT----FOR USE BY MT3DMS FOR TRANSPORT SIMULATION
@@ -1106,6 +1098,7 @@ c      IF(IUNIT(14).GT.0) CALL LMG7DA(IGRID)
       IF(IUNIT(38).GT.0) CALL OBS2CHD7DA(IGRID)
       IF(IUNIT(43).GT.0) CALL GWF2HYD7DA(IGRID)
       IF(IUNIT(49).GT.0) CALL LMT8DA(IGRID)
+      IF(IUNIT(66).GT.0) CALL GWF2AG7DA()
 !      IF(IUNIT(61).GT.0) CALL FMP2DA(IGRID)
       CALL GWF2BAS7DA(IGRID)
 C
@@ -1382,6 +1375,7 @@ C----------READ USING PACKAGE READ AND PREPARE MODULES.
      2               IUNIT(62),KKPER,NSOL,IOUTS,IGRID)
         IF(IUNIT(46).GT.0.AND.KKPER.EQ.1) CALL GWF2GAG7RP(IUNIT(15),
      1             IUNIT(22),IUNIT(55),NSOL,IGRID)
+        
         IF(IUNIT(39).GT.0) CALL GWF2ETS7RP(IUNIT(39),IGRID)
         IF(IUNIT(40).GT.0) CALL GWF2DRT7RP(IUNIT(40),IGRID)
         IF(IUNIT(50).GT.0) CALL GWF2MNW27RP(IUNIT(50),KKPER,IUNIT(9),
@@ -1395,7 +1389,7 @@ C----------READ USING PACKAGE READ AND PREPARE MODULES.
 !        IF(IUNIT(61).GT.0) CALL FMP2RP(IUNIT(61),ISTARTFL,KKPER,        !FMP2AR CALL ADDED BY SCHMID
 !     1                          IUNIT(44),IUNIT(52),IGRID)     
         IF(IUNIT(64).GT.0) CALL GWF2SWR7RP(IUNIT(64),KKPER,IGRID)  !SWR - JDH
-!gsf       IF ( IUNIT(66).GT.0 ) CALL GWF2AWU7RP(IUNIT(66),IUNIT(44),KKPER)
+      IF ( IUNIT(66).GT.0 ) CALL GWF2AG7RP(IUNIT(66),IUNIT(44),KKPER)
 C
         IF ( Model.EQ.0 .AND. ISSFLG(KPER).EQ.0 )
      1                   CALL ZERO_SPECIFIED_FLOWS(IUNIT(22),IUNIT(44))

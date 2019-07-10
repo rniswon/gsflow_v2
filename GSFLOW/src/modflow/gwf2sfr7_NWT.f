@@ -2060,7 +2060,7 @@ CC45-----READ TABLES FOR SPECIFIED INFLOWS
  9033 FORMAT('TABULAR INFLOWS WERE READ FOR SEGMENT ',I6,/
      +       'FROM FILE UNIT NUMBER ',I6,/)
  9031 FORMAT(10X,'TIMES',20X,'INFLOWS')
- 9032 FORMAT(5X,F20.10,1X,F20.10)
+ 9032 FORMAT(5X,E20.10,1X,E20.10)
 C
  900  RETURN
       END SUBROUTINE GWF2SFR7RP
@@ -8362,9 +8362,7 @@ C     OF TIME TO CACULATE SPECIFIED INFLOW TO SEGMENTS.
       ELSE
 ! Find table value before beginning of time step.
         DO WHILE ( I.LE.NVAL-1 )
-          IF ( TIMEBEG-TABTIME(I,ISEG).LE.CLOSEZERO ) THEN
-            EXIT
-          ELSEIF ( TIMEBEG-TABTIME(I+1,ISEG).LE.CLOSEZERO ) THEN
+          IF ( TIMEBEG-TABTIME(I+1,ISEG).LE.CLOSEZERO ) THEN
             EXIT
           ELSE
             I = I + 1
@@ -8429,62 +8427,79 @@ C
 C
 C-------SUBROUTINE SFR2MODSIM
 C
-      SUBROUTINE SFR2MODSIM(EXCHANGE)
+      SUBROUTINE SFR2MODSIM(EXCHANGE, Diversions, IDIVERT, Nsegshold, 
+     +                      Timestep, KITER)
 C     *******************************************************************
+C-------- MARCH 8, 2017
 C     COMPUTE NET ACCRETION/DEPLETION OVER A SEGMENT FOR MODSIM.
 C     CAUTION: DOES NOT WORK WITH TRANSIENT ROUTING.
-C--------MARCH 8, 2017
+C-------- May 28, 2017
+C     ADDING CODE TO RETURN WATER-LIMITED RELEASES FROM RESERVOIRS
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM, ISEG
+      USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM, ISEG, IDIVAR,
+     1                        DVRSFLW, STRIN, STROUT
+      USE GWFLAKMODULE, ONLY: SURFOT
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     -------------------------------------------------------------------
 C     ARGUMENTS
+      INTEGER,          INTENT(IN)    :: Nsegshold, Timestep, KITER
       DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(NSS)
+      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold) 
+      INTEGER,          INTENT(IN)    :: IDIVERT(Nsegshold)
 C     -------------------------------------------------------------------
 !      INTEGER 
 !      DOUBLE PRECISION 
 C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
-      INTEGER :: ISTSG, IRNUM, L, ISTSGOLD, REACHNUMINSEG
+      INTEGER :: ISTSG, IRNUM, L, ISTSGOLD, REACHNUMINSEG, II
       DOUBLE PRECISION :: FLOWIN, FLOWOUT
 C     -------------------------------------------------------------------
 C
-        ISTSG = 1
-        ISTSGOLD = ISTSG
-        REACHNUMINSEG = 0
-        EXCHANGE = 0.0D0
-        FLOWIN = 0.0D0
-        FLOWOUT = 0.0D0
+      ISTSG = 1
+      ISTSGOLD = ISTSG
+      REACHNUMINSEG = 0
+      EXCHANGE = 0.0D0
+      FLOWIN = 0.0D0
+      FLOWOUT = 0.0D0
 C
 C1------LOOP OVER REACHES TO SET ACCRETIONS/DEPLETIONS
 C
-        DO L = 1, NSTRM
+      DO L = 1, NSTRM
 C
 C2------DETERMINE STREAM SEGMENT NUMBER.
-          REACHNUMINSEG = REACHNUMINSEG + 1
-          ISTSGOLD = ISTSG
-          ISTSG = ISTRM(4, L)
+        REACHNUMINSEG = REACHNUMINSEG + 1
+        ISTSGOLD = ISTSG
+        ISTSG = ISTRM(4, L)
 C
 C3------DIFFERENCE FLOW IN AND FLOW OUT OF SEGEMENT.
-          IF( ISTSG /= ISTSGOLD ) THEN
-            REACHNUMINSEG = 1
-          END IF
+        IF( ISTSG /= ISTSGOLD ) THEN
+          REACHNUMINSEG = 1
+        END IF
 C
 C4------IF FIRST REACH IN SEGMENT THEN SET FLOWIN
-          IF ( REACHNUMINSEG == 1 ) FLOWIN = STRM(10,L)
+        IF ( REACHNUMINSEG == 1 ) FLOWIN = STRM(10,L)
 C
 C5------IF LAST REACH IN SEGMENT THEN SET FLOWOT
-          IF ( REACHNUMINSEG == ISEG(4,ISTSG) ) THEN
-            FLOWOUT = STRM(9,L)
-            EXCHANGE(ISTSG) = EXCHANGE(ISTSG) + (FLOWOUT - FLOWIN)*DELT 
-          END IF
-        END DO
+        IF ( REACHNUMINSEG == ISEG(4,ISTSG) ) THEN
+          FLOWOUT = STRM(9,L)
+          EXCHANGE(ISTSG) = EXCHANGE(ISTSG) + (FLOWOUT - FLOWIN)*DELT
+        END IF
+      END DO
 C
-C8------RETURN.
+C6----GENERATE SOME DEBUG 'WATCHER' FILES
+  !    OPEN(223, FILE='SFR_DEBUG_outs.TXT')
+  !    WRITE(223,334) Timestep, KITER, (STRM(9,II), II=1, NSTRM)
+  !334 FORMAT(I5,1X,I5,1X,4909E17.10)
+  !    OPEN(224, FILE='SFR_DEBUG_ins.TXT')
+  !    WRITE(224,335) Timestep, KITER, (STRM(10,II), II=1, NSTRM)
+  !335 FORMAT(I5,1X,I5,1X,4909E17.10)
+
+C
+C8----RETURN.
       RETURN
       END SUBROUTINE SFR2MODSIM
 C
@@ -8496,8 +8511,9 @@ C     APPLY DIVERSIONS/LAKE RELEASES CALCULATED BY MODSIM TO DIVERSION
 C     SEGMENTS.
 !--------MARCH 8, 2017
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: NSS, SEG, IDIVAR
-      USE GWFBASMODULE, ONLY: DELT
+      USE GWFSFRMODULE, ONLY: NSS, SEG, IDIVAR, FXLKOT, SGOTFLW
+      USE GWFBASMODULE, ONLY: DELT,TOTIM   !delete totim
+!      USE GWFAGMODULE, only:demand !delete this
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -8511,16 +8527,22 @@ C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
       INTEGER :: ISEG
+!      double precision :: total !delete this
 C     -------------------------------------------------------------------
 C
 C1------LOOP OVER SEGMETS
 C
+!        total = 0.0
         DO ISEG = 1, NSS
 C
 C4------APPLY DIVERSION AMOUNT TO SFR SEGMENT INFLOW.
 C         
           IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
             SEG(2,iseg) = Diversions(ISEG)/DELT
+            IF ( IDIVAR(1,iseg).LT.0 ) THEN
+              FXLKOT(iseg) = SEG(2, iseg)
+            END IF
+!            total = total + Diversions(ISEG)/DELT
           END IF
         END DO
 C
