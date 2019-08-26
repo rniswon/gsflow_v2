@@ -351,7 +351,7 @@
       !
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
-      USE GLOBAL, ONLY: IUNIT
+      USE GLOBAL, ONLY: IUNIT, NPER, ISSFLG
       USE GWFAGMODULE
       USE PRMS_MODULE, ONLY: PRMS_flag
       USE GWFUZFMODULE, ONLY: IETFLG
@@ -610,6 +610,14 @@
      +            //' UZF1 IETFLG must not be zero for this option')
                END IF
             END IF
+            IF (NPER == 1 .AND. ISSFLG(1) == 1) THEN
+              WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
+     +        //' Option: '//LINE(ISTART:ISTOP)
+     +        //' cannot be used for SS only models'
+              CALL USTOP('Invalid '//trim(adjustl(text))
+     +        //' Option: '//LINE(ISTART:ISTOP)
+     +        //' cannot be used for SS only models')
+            END IF
          case ('TRIGGER')
             TRIGGERFLAG = 1
             WRITE (iout, *)
@@ -634,6 +642,14 @@
      +              //' Option: '//LINE(ISTART:ISTOP)
      +              //' UZF1 IETFLG must not be zero for this option')
                END IF
+            END IF
+            IF (NPER == 1 .AND. ISSFLG(1) == 1) THEN
+              WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
+     +        //' Option: '//LINE(ISTART:ISTOP)
+     +        //' cannot be used for SS only models'
+              CALL USTOP('Invalid '//trim(adjustl(text))
+     +        //' Option: '//LINE(ISTART:ISTOP)
+     +        //' cannot be used for SS only models')
             END IF
          case ('END')
             write (iout, '(/1x,a)') 'END PROCESSING '//
