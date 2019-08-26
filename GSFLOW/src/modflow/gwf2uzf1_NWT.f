@@ -1304,8 +1304,8 @@ C     -----------------------------------------------------------------
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
-      DOUBLE PRECISION h, fks
-      DOUBLE PRECISION thtrcell, fcheck
+      DOUBLE PRECISION h, fks, fcheck
+      DOUBLE PRECISION thtrcell
       DOUBLE PRECISION bottom, celtop, slen, width, etdpth, surfinf
       DOUBLE PRECISION thick, surfpotet, top
       INTEGER ic, iflginit, il, ilay, ill, ir, iss, jk, l, ncck,
@@ -5649,13 +5649,14 @@ C     ------------------------------------------------------------------
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
-      DOUBLE PRECISION fm, avwat, delstor
+      DOUBLE PRECISION fm, avwat, delstor, ZEROD9
       DOUBLE PRECISION totalwc, ghdif, depthinc, depthsave
       INTEGER kknt, jj, jk, j, iset, nwavm1, iret, kkntm1, Nwv
 C     ------------------------------------------------------------------
 C
 C65-----TOTAL WATER CONTENT AND FLUX OVER SPECIFIED DEPTH.
 !        IF ( il.GT.0 ) THEN
+          ZEROD9 = 1.0d0-9
           ghdif = celtop - H
           totalwc = 0.0
           iset = 1
@@ -5687,7 +5688,7 @@ C65-----TOTAL WATER CONTENT AND FLUX OVER SPECIFIED DEPTH.
                     jk = iset + Nwv - 1
                     nwavm1 = jk - 1
                     DO WHILE ( jk.GT.iset-1 )
-                      IF ( Depth(jk)-depthsave.LT.0.0D0 ) jj = jk
+                      IF ( Depth(jk)-depthsave.LT. -ZEROD9 ) jj = jk
                         jk = jk - 1
                     END DO
                     IF ( jj.GT.iset ) THEN
