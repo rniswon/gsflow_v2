@@ -1738,6 +1738,7 @@
             Q = RATETERPQ(TIME, TABID(L))
          END IF
          IF (NUMIRRDIVERSIONSP + NUMIRRWELSP == 0) Q = 0.0
+         QQ=Q
          !
          !4 - -----IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
          IF (IBOUND(IC, IR, IL) > 0) THEN
