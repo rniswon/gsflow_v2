@@ -1645,7 +1645,7 @@
         end select
       END SUBROUTINE WRITE_HEADER
 
-              !
+      !
       SUBROUTINE GWF2AG7FM(Kkper, Kkstp, Kkiter, Iunitnwt)
       !******************************************************************
       ! CALCULATE APPLIED IRRIGATION, DIVERISONS, AND PUMPING
