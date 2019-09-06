@@ -54,7 +54,7 @@
       IF ( Process(:3)=='run' ) THEN
         dynamic_param_read = dynparamrun()
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_dynamic_param_read = 'dynamic_param_read.f90 2019-05-30 13:50:00Z'
+        Version_dynamic_param_read = 'dynamic_param_read.f90 2019-09-06 16:05:00Z'
         CALL print_module(Version_dynamic_param_read, 'Time Series Data            ', 90)
         !MODNAME = 'dynamic_param_read'
       ELSEIF ( Process(:4)=='init' ) THEN
@@ -426,12 +426,14 @@
       EXTERNAL write_dynoutput, is_eof, write_dynparam, write_dynparam_int
       EXTERNAL write_dynparam_potet
 ! Local Variables
-      INTEGER :: i, istop, check_dprst_depth_flag
+      INTEGER :: i, istop, check_dprst_depth_flag, check_sm_max_flag, check_srechr_max_flag
       REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       dynparamrun = 0
       istop = 0
+      check_srechr_max_flag = 0
+      check_sm_max_flag = 0
 
       IF ( Imperv_frac_flag==1 .OR. Dprst_frac_flag==1 .OR. Dprst_depth_flag==1 ) THEN
         Check_imperv = 0
@@ -582,6 +584,7 @@
             ENDIF
             Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*Hru_perv(i) )
             Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(i)*Hru_perv(i) )
+            Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*Hru_frac_perv(i)
           ENDDO
           Basin_soil_moist = Basin_soil_moist*Basin_area_inv
           Basin_soil_rechr = Basin_soil_rechr*Basin_area_inv
@@ -668,33 +671,34 @@
               CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Potet_coef(1,Nowmonth), 'potet_coef')
             ENDIF
             CALL is_eof(Potetcoef_unit, Potetcoef_next_yr, Potetcoef_next_mo, Potetcoef_next_day)
-          ENDIF
-          IF ( Et_flag==1 ) THEN ! potet_jh
-            IF ( Dyn_potet_flag==1 ) THEN
-              Jh_coef = Potet_coef
-            ELSE
-              DO i = 1, Nhru
-                Jh_coef_hru(i) = Potet_coef(i,Nowmonth)
-              ENDDO
+
+            IF ( Et_flag==1 ) THEN ! potet_jh
+              IF ( Dyn_potet_flag==1 ) THEN
+                Jh_coef = Potet_coef
+              ELSE
+                DO i = 1, Nhru
+                  Jh_coef_hru(i) = Potet_coef(i,Nowmonth)
+                ENDDO
+              ENDIF
+            ELSEIF ( Et_flag==7 ) THEN ! climate_hru
+              Potet_cbh_adj = Potet_coef
+            ELSEIF ( Et_flag==11 ) THEN ! potet_pm
+              IF ( Dyn_potet_flag==1 ) THEN
+                Pm_n_coef = Potet_coef
+              ELSE
+                Pm_d_coef = Potet_coef
+              ENDIF
+            ELSEIF ( Et_flag==5 ) THEN ! potet_pt
+              Pt_alpha = Potet_coef
+            ELSEIF ( Et_flag==10 ) THEN ! potet_hs
+              Hs_krs = Potet_coef
+            ELSEIF ( Et_flag==2 ) THEN ! potet_hamon
+              Hamon_coef = Potet_coef
+            !ELSEIF ( Et_flag==6 ) THEN ! potet_jh_hru
+              !Jh_coef_hru2 = Potet_coef
+            ELSEIF ( Et_flag==4 ) THEN ! potet_pan
+              Epan_coef = Potet_coef
             ENDIF
-          ELSEIF ( Et_flag==7 ) THEN ! climate_hru
-            Potet_cbh_adj = Potet_coef
-          ELSEIF ( Et_flag==11 ) THEN ! potet_pm
-            IF ( Dyn_potet_flag==1 ) THEN
-              Pm_n_coef = Potet_coef
-            ELSE
-              Pm_d_coef = Potet_coef
-            ENDIF
-          ELSEIF ( Et_flag==5 ) THEN ! potet_pt
-            Pt_alpha = Potet_coef
-          ELSEIF ( Et_flag==10 ) THEN ! potet_hs
-            Hs_krs = Potet_coef
-          ELSEIF ( Et_flag==2 ) THEN ! potet_hamon
-            Hamon_coef = Potet_coef
-          !ELSEIF ( Et_flag==6 ) THEN ! potet_jh_hru
-            !Jh_coef_hru2 = Potet_coef
-          ELSEIF ( Et_flag==4 ) THEN ! potet_pan
-            Epan_coef = Potet_coef
           ENDIF
         ENDIF
       ENDIF
@@ -750,6 +754,7 @@
               CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Soil_rechr_max_frac, 'soil_rechr_max_frac')
             ENDIF
             CALL is_eof(Soil_rechr_unit, Soil_rechr_next_yr, Soil_rechr_next_mo, Soil_rechr_next_day)
+            check_srechr_max_flag = 1
           ENDIF
         ENDIF
       ENDIF
@@ -761,11 +766,12 @@
             READ ( Soil_moist_unit, * ) Soil_moist_next_yr, Soil_moist_next_mo, Soil_moist_next_day, Temp
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Soil_moist_max, 'soil_moist_max')
             CALL is_eof(Soil_moist_unit, Soil_moist_next_yr, Soil_moist_next_mo, Soil_moist_next_day)
+            check_sm_max_flag = 1
           ENDIF
         ENDIF
       ENDIF
 
-      IF ( Soilmoist_flag==1 .OR. Soilrechr_flag==1 ) THEN
+      IF ( check_sm_max_flag==1 .OR. check_srechr_max_flag==1 ) THEN
         DO i = 1, Nhru
           IF ( Hru_type(i)==2 .OR. Hru_type(i)==0 ) CYCLE ! skip lake and inactive HRUs
 
@@ -786,7 +792,6 @@
             CYCLE
           ENDIF
           Soil_zone_max(i) = Sat_threshold(i) + Soil_moist_max(i)*Hru_frac_perv(i)
-          Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*Hru_frac_perv(i)
           Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
           Replenish_frac(i) = Soil_rechr_max(i)/Soil_moist_max(i)
         ENDDO
