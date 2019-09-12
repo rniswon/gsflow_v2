@@ -1479,7 +1479,7 @@
       ENDIF
       Perv_actet = et
       ! sanity check
-      IF ( Perv_actet*Perv_frac>Avail_potet ) THEN
+      IF ( Perv_actet*Perv_frac-Avail_potet > NEARZERO ) THEN
         PRINT *, 'perv_et problem', Perv_actet*Perv_frac, Avail_potet, Perv_frac
 !        Soil_moist = Soil_moist + Perv_actet - Avail_potet
 !        Perv_actet = Avail_potet
