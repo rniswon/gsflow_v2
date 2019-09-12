@@ -125,7 +125,7 @@
 !***********************************************************************
       szdecl = 0
 
-      Version_soilzone = 'soilzone.f90 2019-03-05 11:11:00Z'
+      Version_soilzone = 'soilzone.f90 2019-09-12 09:49:00Z'
       CALL print_module(Version_soilzone, 'Soil Zone Computations      ', 90 )
       MODNAME = 'soilzone'
 
@@ -1009,7 +1009,7 @@
 !****** add soil excess (Dunnian flow) to infiltration
         ! perv_frac has to be > 0.001
         ! infil for pervious portion of HRU
-        capwater_maxin = Infil(i) + Hru_ag_irr(i)
+        capwater_maxin = Infil(i) + Hru_ag_irr(i)/perv_frac
         ! compute preferential flow and storage, and any dunnian flow
         prefflow = 0.0
         IF ( Pref_flow_flag(i)==1 ) THEN
@@ -1144,14 +1144,12 @@
 
         ! sanity check
         IF ( Soil_moist(i)<0.0 ) THEN
-          IF ( Print_debug>-1 ) PRINT *, i, Soil_moist(i), ' negative'
+          PRINT *, i, Soil_moist(i), ' negative'
           IF ( pervactet>=ABS(Soil_moist(i)) ) THEN
             pervactet = pervactet + Soil_moist(i)
             Soil_moist(i) = 0.0
           ENDIF
-          IF ( Soil_moist(i)<-NEARZERO ) THEN
-            IF ( Print_debug>-1 ) PRINT *, 'HRU:', i, ' soil_moist<0.0', Soil_moist(i)
-          ENDIF
+          IF ( Soil_moist(i)<-NEARZERO ) PRINT *, 'HRU:', i, ' soil_moist<0.0', Soil_moist(i)
           Soil_moist(i) = 0.0
         ENDIF
 
@@ -1159,17 +1157,16 @@
         avail_potet = Potet(i) - Hru_actet(i)
         ! sanity check
         IF ( avail_potet<0.0 ) THEN
-          IF ( Print_debug>-1 ) THEN
-            IF ( avail_potet<-NEARZERO ) PRINT *, 'hru_actet>potet', i, &
-     &           Nowmonth, Nowday, Hru_actet(i), Potet(i), avail_potet
-          ENDIF
-          Hru_actet(i) = Potet(i)
-          tmp = avail_potet/perv_frac
-          pervactet = pervactet + tmp
-          Soil_moist(i) = Soil_moist(i) - tmp
-          Soil_rechr(i) = Soil_rechr(i) - tmp
-          IF ( Soil_rechr(i)<0.0 ) Soil_rechr(i) = 0.0
-          IF ( Soil_moist(i)<0.0 ) Soil_moist(i) = 0.0
+!          IF ( Print_debug>-1 ) THEN
+            PRINT *, 'hru_actet>potet', i, Nowmonth, Nowday, Hru_actet(i), Potet(i), avail_potet
+!          ENDIF
+!          Hru_actet(i) = Potet(i)
+!          tmp = avail_potet/perv_frac
+!          pervactet = pervactet + tmp
+!          Soil_moist(i) = Soil_moist(i) - tmp
+!          Soil_rechr(i) = Soil_rechr(i) - tmp
+!          IF ( Soil_rechr(i)<0.0 ) Soil_rechr(i) = 0.0
+!          IF ( Soil_moist(i)<0.0 ) Soil_moist(i) = 0.0
         ENDIF
         Perv_actet(i) = pervactet
 
@@ -1389,14 +1386,15 @@
       REAL, INTENT(OUT) :: Perv_actet
 ! Local Variables
       REAL, PARAMETER :: ONETHIRD = 1.0/3.0, TWOTHIRDS = 2.0/3.0
-      REAL :: et, pcts, pctr, frac
+      REAL :: et, pcts, pctr, pet
 !***********************************************************************
 !******Determine if evaporation(Et_type = 2) or transpiration plus
 !******evaporation(Et_type = 3) are active.  if not, Et_type = 1
 
+      pet = Potet
       IF ( Avail_potet<NEARZERO ) THEN
         Et_type = 1
-        Avail_potet = 0.0
+        pet = 0.0
       ELSEIF ( Transp_on==0 ) THEN
         IF ( Snow_free<0.01 ) THEN
           Et_type = 1
@@ -1414,39 +1412,44 @@
       IF ( Et_type>1 ) THEN
         pcts = Soil_moist/Soil_moist_max
         pctr = Soil_rechr/Soil_rechr_max
-        Potet_lower = Potet
-        Potet_rechr = Potet
+        Potet_lower = pet
+        Potet_rechr = pet
 
 !******sandy soil
         IF ( Soil_type==1 ) THEN
-          IF ( pcts<0.25 ) Potet_lower = 0.5*pcts*Potet
-          IF ( pctr<0.25 ) Potet_rechr = 0.5*pctr*Potet
+          IF ( pcts<0.25 ) Potet_lower = 0.5*pcts*pet
+          IF ( pctr<0.25 ) Potet_rechr = 0.5*pctr*pet
 !******loam soil
         ELSEIF ( Soil_type==2 ) THEN
-          IF ( pcts<0.5 ) Potet_lower = pcts*Potet
-          IF ( pctr<0.5 ) Potet_rechr = pctr*Potet
+          IF ( pcts<0.5 ) Potet_lower = pcts*pet
+          IF ( pctr<0.5 ) Potet_rechr = pctr*pet
 !******clay soil
         ELSEIF ( Soil_type==3 ) THEN
           IF ( pcts<TWOTHIRDS .AND. pcts>ONETHIRD ) THEN
-            Potet_lower = pcts*Potet
+            Potet_lower = pcts*pet
           ELSEIF ( pcts<=ONETHIRD ) THEN
-            Potet_lower = 0.5*pcts*Potet
+            Potet_lower = 0.5*pcts*pet
           ENDIF
           IF ( pctr<TWOTHIRDS .AND. pctr>ONETHIRD ) THEN
-            Potet_rechr = pctr*Potet
+            Potet_rechr = pctr*pet
           ELSEIF ( pctr<=ONETHIRD ) THEN
-            Potet_rechr = 0.5*pctr*Potet
+            Potet_rechr = 0.5*pctr*pet
           ENDIF
         ENDIF
 
 !******Soil moisture accounting
         IF ( Et_type==2 ) Potet_rechr = Potet_rechr*Snow_free
 
-!!!! need to limit Potet_rechr and Potet_lower by Avail_potet
-        IF ( (Potet_rechr+Potet_lower)*Perv_frac>Avail_potet ) THEN
-          frac = Avail_potet / (Potet_rechr+Potet_lower)*Perv_frac
-          Potet_rechr = Potet_rechr * frac
-          Potet_lower = Potet_lower * frac
+!!!! need to limit Potet_rechr and Potet_lower (pervious area) by Avail_potet (whole HRU)
+        IF ( Potet_rechr*Perv_frac > Avail_potet ) THEN
+          print *, 'reducing potet in cap reservoir', perv_frac, pet
+          print *, potet_rechr, potet_lower, avail_potet, (Potet_rechr+Potet_lower)*Perv_frac
+          Potet_rechr = Avail_potet / Perv_frac
+        ENDIF
+        IF ( Potet_lower*Perv_frac > Avail_potet ) THEN
+          print *, 'reducing potet in cap reservoir', perv_frac, pet
+          print *, potet_rechr, potet_lower, avail_potet, (Potet_rechr+Potet_lower)*Perv_frac
+          Potet_lower = Avail_potet / Perv_frac
         ENDIF
 
         IF ( Potet_rechr>Soil_rechr ) THEN
@@ -1476,11 +1479,11 @@
       ENDIF
       Perv_actet = et
       ! sanity check
-!      IF ( Perv_actet>Avail_potet ) THEN
-!        PRINT *, 'perv_et problem', Perv_actet, Avail_potet
+      IF ( Perv_actet*Perv_frac>Avail_potet ) THEN
+        PRINT *, 'perv_et problem', Perv_actet*Perv_frac, Avail_potet, Perv_frac
 !        Soil_moist = Soil_moist + Perv_actet - Avail_potet
 !        Perv_actet = Avail_potet
-!      ENDIF
+      ENDIF
 
       END SUBROUTINE compute_szactet
 
