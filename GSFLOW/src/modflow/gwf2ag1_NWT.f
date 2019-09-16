@@ -840,9 +840,7 @@
      +                        ' IS POSITIVE AND SHOULD BE NEGATIVE.',
      +                        ' MODEL STOPPING'
                         WRITE (IOUT, *)
-                        CALL USTOP('ERROR: MAX AG PUMPING RATE IN LIST '
-     +                  ,'IS POSITIVE AND SHOULD BE NEGATIVE. MODEL ',
-     +                  'STOPPING')
+                  CALL USTOP('ERROR: MAX AG PUMPING RATE IS POSITIVE')
                      END IF
                   END DO
                ELSE
@@ -1821,6 +1819,10 @@
                ACTUAL(J) = ACTUAL(J) + SUP
             END DO
             !
+            !9b - -----SET ACTUAL PUMPING FOR NON SUP IRRIGATION WELLS.
+            !
+            Qonly(L) = DONENEG*Q
+            !
             !10------APPLY IRRIGATION FROM WELLS
             !
             IF (GSFLOW_flag == 0) THEN
@@ -2754,15 +2756,15 @@
       supold = QONLYOLD(l)
       factor = set_factor(l, aetold, pettotal, aettotal, sup, supold,
      +                    kiter)
-      SUPACTOLD(l) = SUPACT(l)
+      QONLYOLD(l) = QONLY(L)
       AETITERGW(l) = aettotal
       QONLY(L) = QONLY(L) + factor
       if (QONLY(L) < dzero) QONLY(L) = dzero
       demandgw_prms = doneneg*QONLY(L)
       end function demandgw_prms
 !
-      double precision function set_factor(l, aetold, pettotal, 
-     +                                     aettotal,sup, supold, kiter)
+      double precision function set_factor(l,aetold, pettotal, 
+     +                                     aettotal,sup,supold,kiter)
 !     ******************************************************************
 !     updates diversion or pumping rate based on ET deficit
 !     ******************************************************************
@@ -2798,6 +2800,9 @@
          if (abs(det) > dzero) factor = dq*etdif/det
          if (det <= zerod30) factor = dzero
       end if
+      open(222,file='debug.out')
+      if(l==18)write(222,333)kiter,etdif,dq,det,aettotal,aetold,factor
+333   format(i5,6e20.10)
       set_factor = factor
       end function set_factor
 !
@@ -2833,6 +2838,7 @@
       QQQ = 0.0
       prms_inch2mf_q = 0.0
       done = 1.0d0
+                      
       !
       ! - -------OUTPUT TIME SERIES FOR SEGMENTS DIVERSIONS
       !
@@ -2869,8 +2875,7 @@
                   ELSE
                      hru_id = IRRROW_SW(k, iseg)
                      area = hru_perv(hru_id)
-                     prms_inch2mf_q = done/
-     +                                (DELT*Mfl2_to_acre*Mfl_to_inch)
+                  prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
                      pet = potet(hru_id)*area*prms_inch2mf_q
                      aet = hru_actet(hru_id)*area*prms_inch2mf_q   !need to add GW ET here
                   end if
@@ -2928,8 +2933,9 @@
                         ELSE
                            hru_id = IRRROW_GW(J, L)
                            area = hru_perv(hru_id)
+                  prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
                            pet = potet(hru_id)*area*prms_inch2mf_q
-                           aet = hru_actet(hru_id)*area*prms_inch2mf_q   !need to add GW ET here
+                           aet = hru_actet(hru_id)*area*prms_inch2mf_q   !need to add GW ET here****
                         END IF
                         pettot = pettot + pet
                         aettot = aettot + aet
