@@ -2800,9 +2800,9 @@
          if (abs(det) > dzero) factor = dq*etdif/det
          if (det <= zerod30) factor = dzero
       end if
-      open(222,file='debug.out')
-      if(l==18)write(222,333)kiter,etdif,dq,det,aettotal,aetold,factor
-333   format(i5,6e20.10)
+!      open(222,file='debug.out')
+!      if(l==5)write(222,333)kiter,etdif,dq,det,aettotal,aetold,factor
+!333   format(i5,6e20.10)
       set_factor = factor
       end function set_factor
 !
