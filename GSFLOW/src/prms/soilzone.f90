@@ -125,7 +125,7 @@
 !***********************************************************************
       szdecl = 0
 
-      Version_soilzone = 'soilzone.f90 2019-09-12 09:49:00Z'
+      Version_soilzone = 'soilzone.f90 2019-09-18 13:21:00Z'
       CALL print_module(Version_soilzone, 'Soil Zone Computations      ', 90 )
       MODNAME = 'soilzone'
 
@@ -1009,7 +1009,7 @@
 !****** add soil excess (Dunnian flow) to infiltration
         ! perv_frac has to be > 0.001
         ! infil for pervious portion of HRU
-        capwater_maxin = Infil(i) + Hru_ag_irr(i)/perv_frac
+        capwater_maxin = Infil(i) + Hru_ag_irr(i)
         ! compute preferential flow and storage, and any dunnian flow
         prefflow = 0.0
         IF ( Pref_flow_flag(i)==1 ) THEN
@@ -1391,7 +1391,7 @@
 !******Determine if evaporation(Et_type = 2) or transpiration plus
 !******evaporation(Et_type = 3) are active.  if not, Et_type = 1
 
-      pet = Potet
+       pet = Potet
       IF ( Avail_potet<NEARZERO ) THEN
         Et_type = 1
         pet = 0.0
