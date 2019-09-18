@@ -1158,7 +1158,7 @@
         ! sanity check
         IF ( avail_potet<0.0 ) THEN
 !          IF ( Print_debug>-1 ) THEN
-            PRINT *, 'hru_actet>potet', i, Nowmonth, Nowday, Hru_actet(i), Potet(i), avail_potet
+!            PRINT *, 'hru_actet>potet', i, Nowmonth, Nowday, Hru_actet(i), Potet(i), avail_potet
 !          ENDIF
 !          Hru_actet(i) = Potet(i)
 !          tmp = avail_potet/perv_frac
@@ -1442,13 +1442,13 @@
 
 !!!! need to limit Potet_rechr and Potet_lower (pervious area) by Avail_potet (whole HRU)
         IF ( Potet_rechr*Perv_frac > Avail_potet ) THEN
-          print *, 'reducing potet in cap reservoir', perv_frac, pet
-          print *, potet_rechr, potet_lower, avail_potet, (Potet_rechr+Potet_lower)*Perv_frac
+!          print *, 'reducing potet in cap reservoir', perv_frac, pet
+!          print *, potet_rechr, potet_lower, avail_potet, (Potet_rechr+Potet_lower)*Perv_frac
           Potet_rechr = Avail_potet / Perv_frac
         ENDIF
         IF ( Potet_lower*Perv_frac > Avail_potet ) THEN
-          print *, 'reducing potet in cap reservoir', perv_frac, pet
-          print *, potet_rechr, potet_lower, avail_potet, (Potet_rechr+Potet_lower)*Perv_frac
+!          print *, 'reducing potet in cap reservoir', perv_frac, pet
+!          print *, potet_rechr, potet_lower, avail_potet, (Potet_rechr+Potet_lower)*Perv_frac
           Potet_lower = Avail_potet / Perv_frac
         ENDIF
 
