@@ -30,8 +30,7 @@
       CHARACTER(LEN=80), SAVE :: Version_gsflow_mf2prms
 !***********************************************************************
       gsflow_mf2prms = 0
-      mf_q2prms_inch = 0.0
-      Hru_ag_irr = 0.0
+
       IF ( Process(:3)=='run' ) THEN
         DO i = 1, Nhrucell
           IF ( Hrucheck(Gvr_hru_id(i))==1 ) &
@@ -42,8 +41,9 @@
 !
 ! From irrigation wells
 !
-        mf_q2prms_inch = DELT*Mfl2_to_acre*Mfl_to_inch
         IF ( Iunit(66) > 0 ) then
+          mf_q2prms_inch = DELT*Mfl2_to_acre*Mfl_to_inch
+          Hru_ag_irr = 0.0
           DO J = 1, NUMIRRWELSP
             IRWL = IRRWELVAR(J)
             NMCL = NUMCELLS(IRWL)
