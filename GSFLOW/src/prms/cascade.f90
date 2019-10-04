@@ -82,7 +82,7 @@
 !***********************************************************************
       cascdecl = 0
 
-      Version_cascade = 'cascade.f90 2018-05-25 15:11:00Z'
+      Version_cascade = 'cascade.f90 2019-09-25 12:31:00Z'
       CALL print_module(Version_cascade, 'Cascading Flow              ', 90)
       MODNAME = 'cascade'
 
@@ -202,7 +202,7 @@
       INTEGER, EXTERNAL :: getparam
       EXTERNAL read_error, init_cascade, initgw_cascade
 ! Local Variables
-      INTEGER :: i, j, k, ii, iret
+      INTEGER :: i, j, k, ii, iret, itest
 !***********************************************************************
       cascinit = 0
 
@@ -216,9 +216,9 @@
         IF ( getparam(MODNAME, 'circle_switch', 1, 'integer', Circle_switch)/=0 ) CALL read_error(2, 'circle_switch')
       ENDIF
 
-      IF ( Cascade_flag>0 ) CALL init_cascade(cascinit)
+      IF ( Cascade_flag>0 ) CALL init_cascade(itest)
 
-!      iret = 0
+      iret = 0
       IF ( Cascadegw_flag>0 ) THEN
         ALLOCATE ( Gwr_down(Ndown,Ngw), Gwr_down_frac(Ndown,Ngw), Cascade_gwr_area(Ndown,Ngw) )
 !        ALLOCATE ( Gwr_down_fracwt(Ndown,Ngw) )
@@ -248,7 +248,7 @@
           ENDDO
         ENDIF
       ENDIF
-!      IF ( cascinit/=0 .OR. iret/=0 ) STOP    !RGN to compile
+      IF ( itest/=0 .OR. iret/=0 ) STOP
 
       IF ( Print_debug==13 ) THEN
         IF ( Cascade_flag>0 ) THEN
@@ -319,7 +319,7 @@
       REAL, ALLOCATABLE :: hru_frac(:)
       REAL :: carea, frac
 !***********************************************************************
-!      Iret = 0  !RGN can't get this to work
+      Iret = 0
 
 ! Cascade parameters
       Ndown = 1
@@ -632,7 +632,7 @@
    11   FORMAT ('####', /, 'hru_type', /, '1', /, 'nhru', /, I7, /, '1')
       ENDIF
 
-!      Iret = 0
+      Iret = 0
 ! check for circles when circle_switch = 1
       IF ( Circle_switch==1 ) THEN
         circle_flg = 0
@@ -757,7 +757,7 @@
       REAL :: carea, frac
       REAL, ALLOCATABLE :: gwr_frac(:)
 !***********************************************************************
-!     Iret = 0
+      Iret = 0
 
       ALLOCATE ( gwr_frac(Ngw) )
       DO i = 1, Ngw
@@ -1043,7 +1043,7 @@
   11    FORMAT ('####', /, 'gwr_type', /, '1', /, 'ngw', /, I7, /, '2')
       ENDIF
 
-!      Iret = 0
+      Iret = 0
 ! check for circles when circle_switch = 1
       IF ( Circle_switch==1 ) THEN
         circle_flg = 0

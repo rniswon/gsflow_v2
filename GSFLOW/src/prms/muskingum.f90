@@ -86,9 +86,7 @@
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Outflow_ts(:), Inflow_ts(:)
-      CHARACTER(LEN=9), SAVE :: MODNAME
-!   Declared Parameters
-      REAL, SAVE, ALLOCATABLE :: Segment_flow_init(:)
+      CHARACTER(LEN=14), SAVE :: MODNAME
       END MODULE PRMS_MUSKINGUM
 
 !***********************************************************************
@@ -123,7 +121,7 @@
 !***********************************************************************
       INTEGER FUNCTION muskingum_decl()
       USE PRMS_MUSKINGUM
-      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file
+      USE PRMS_MODULE, ONLY: Nsegment, Strmflow_flag
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam
@@ -133,22 +131,17 @@
 !***********************************************************************
       muskingum_decl = 0
 
-      Version_muskingum = 'muskingum.f90 2017-10-06 11:04:00Z'
+      Version_muskingum = 'muskingum.f90 2019-09-26 17:18:00Z'
+      IF ( Strmflow_flag==4 ) THEN
+        MODNAME = 'muskingum'
+      ELSE
+        MODNAME = 'muskingum_mann'
+      ENDIF
       CALL print_module(Version_muskingum, 'Streamflow Routing          ', 90)
-      MODNAME = 'muskingum'
 
       ALLOCATE ( Currinsum(Nsegment) )
       ALLOCATE ( Pastin(Nsegment), Pastout(Nsegment) )
       ALLOCATE ( Outflow_ts(Nsegment), Inflow_ts(Nsegment) )
-
-      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 ) THEN
-        ALLOCATE ( Segment_flow_init(Nsegment) )
-        IF ( declparam(MODNAME, 'segment_flow_init', 'nsegment', 'real', &
-     &       '0.0', '0.0', '1.0E7', &
-     &       'Initial flow in each stream segment', &
-     &       'Initial flow in each stream segment', &
-     &       'cfs')/=0 ) CALL read_error(1, 'segment_flow_init')
-      ENDIF
 
       END FUNCTION muskingum_decl
 
@@ -171,14 +164,7 @@
 !***********************************************************************
       muskingum_init = 0
 
-      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 ) THEN
-        IF ( getparam(MODNAME, 'segment_flow_init',  Nsegment, 'real', Segment_flow_init)/=0 ) &
-     &       CALL read_error(2,'segment_flow_init')
-        DO i = 1, Nsegment
-          Seg_outflow(i) = Segment_flow_init(i)
-        ENDDO
-        DEALLOCATE ( Segment_flow_init )
-      ENDIF
+      !Seg_outflow will have been initialized to Segment_flow_init in PRMS_ROUTING
       IF ( Init_vars_from_file==0 ) Outflow_ts = 0.0D0
 
       Basin_segment_storage = 0.0D0

@@ -410,7 +410,7 @@
      &       'Coefficient in the exponential equation relating'// &
      &       ' maximum surface area to the fraction that open'// &
      &       ' depressions are full to compute current surface area for each HRU;'// &
-     &       ' 0.001 is an approximate rectangle; 1.0 is a triangle', &
+     &       ' 0.001 is an approximate cylinder; 1.0 is a cone', &
      &       'none')/=0 ) CALL read_error(1, 'va_open_exp')
 
         ALLOCATE ( Va_clos_exp(Nhru) )
@@ -421,7 +421,7 @@
      &       'Coefficient in the exponential equation relating'// &
      &       ' maximum surface area to the fraction that closed'// &
      &       ' depressions are full to compute current surface area for each HRU;'// &
-     &       ' 0.001 is an approximate rectangle; 1.0 is a triangle', &
+     &       ' 0.001 is an approximate cylinder; 1.0 is a cone', &
      &       'none')/=0 ) CALL read_error(1, 'va_clos_exp')
       ENDIF
 
@@ -438,7 +438,7 @@
       INTEGER FUNCTION srunoffinit()
       USE PRMS_SRUNOFF
       USE PRMS_MODULE, ONLY: Dprst_flag, Nhru, Nlake, Cascade_flag, Sroff_flag, &
-     &    Init_vars_from_file, Call_cascade, Water_use_flag !, Parameter_check_flag
+     &    Init_vars_from_file, Call_cascade, Water_use_flag, Print_debug !, Parameter_check_flag
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
 !      USE PRMS_FLOWVARS, ONLY: Soil_moist_max
       IMPLICIT NONE
@@ -460,7 +460,6 @@
       Hru_sroffp = 0.0
       Contrib_fraction = 0.0
       Hru_impervevap = 0.0
-      Hru_impervstor = 0.0
       IF ( Call_cascade==1 ) Strm_seg_in = 0.0D0
       IF ( Cascade_flag>0 ) THEN
         Upslope_hortonian = 0.0D0
@@ -485,6 +484,7 @@
         Basin_sroff_down = 0.0D0
         Basin_hortonian_lakes = 0.0D0
         Basin_contrib_fraction = 0.0D0
+        Hru_impervstor = 0.0
         Srp = 0.0
         Sri = 0.0
       ENDIF
@@ -541,6 +541,11 @@
 
 ! Depression Storage parameters and variables:
       IF ( Dprst_flag==1 ) CALL dprst_init()
+
+      IF ( Print_debug==1 ) THEN
+        Imperv_stor_ante = Hru_impervstor
+        IF ( Dprst_flag==1 ) Dprst_stor_ante = Dprst_stor_hru
+      ENDIF
 
       END FUNCTION srunoffinit
 
@@ -631,10 +636,12 @@
         Hru_sroffp(i) = 0.0
         Contrib_fraction(i) = 0.0
         Hruarea_imperv = Hru_imperv(i)
-        Imperv_frac = Hru_percent_imperv(i)
-        Hru_sroffi(i) = 0.0
-        Imperv_evap(i) = 0.0
-        Hru_impervevap(i) = 0.0
+        IF ( Hruarea_imperv>0.0 ) THEN
+          Imperv_frac = Hru_percent_imperv(i)
+          Hru_sroffi(i) = 0.0
+          Imperv_evap(i) = 0.0
+          Hru_impervevap(i) = 0.0
+        ENDIF
 
         avail_et = Potet(i) - Snow_evap(i) - Hru_intcpevap(i)
 
@@ -1409,6 +1416,7 @@
      &                            Sri, Srp, Basin_hortonian_lakes
         WRITE ( Restart_outunit ) Basin_dprst_sroff, Basin_dprst_evap, Basin_dprst_seep, &
      &                            Basin_dprst_volop, Basin_dprst_volcl, Basin_contrib_fraction
+        WRITE ( Restart_outunit ) Hru_impervstor
         IF ( Dprst_flag==1 ) THEN
           WRITE ( Restart_outunit ) Dprst_area_open
           WRITE ( Restart_outunit ) Dprst_area_clos
@@ -1423,6 +1431,7 @@
      &                          Sri, Srp, Basin_hortonian_lakes
         READ ( Restart_inunit ) Basin_dprst_sroff, Basin_dprst_evap, Basin_dprst_seep, &
      &                          Basin_dprst_volop, Basin_dprst_volcl, Basin_contrib_fraction
+        READ ( Restart_inunit ) Hru_impervstor
         IF ( Dprst_flag==1 ) THEN
           READ ( Restart_inunit ) Dprst_area_open
           READ ( Restart_inunit ) Dprst_area_clos

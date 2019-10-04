@@ -1,4 +1,4 @@
-      ! utils_prms.f90 2018-05-24 09:44:00Z
+      ! utils_prms.f90 2018-09-05 12:55:00Z
 !***********************************************************************
 !     Read CBH File to current time
 !***********************************************************************
@@ -187,6 +187,7 @@
       DO WHILE ( i==0 )
         READ ( Iunit, '(A)', iostat=ios ) dum
         IF ( ios/=0 ) RETURN
+        IF ( dum(:4)=='####' ) CYCLE
         IF ( dum(:2)/='//' ) i = 1
       ENDDO
       READ ( dum, *, iostat=ios ) Next_yr, Next_mo, Next_day
@@ -739,7 +740,9 @@
       IF ( Ftype==0 ) THEN
         OPEN ( Iunit, FILE=Fname(:nchars), STATUS='OLD', IOSTAT=ios )
       ELSE
-        OPEN ( Iunit, FILE=Fname(:nchars), STATUS='OLD', FORM='UNFORMATTED', IOSTAT=ios )
+        !USE UNFORMATTED for UNIX
+        !OPEN ( Iunit, FILE=Fname(:nchars), STATUS='OLD', FORM='UNFORMATTED', IOSTAT=ios ) ! for linux
+        OPEN ( Iunit, FILE=Fname(:nchars), STATUS='OLD', FORM='BINARY', IOSTAT=ios ) ! for windows
       ENDIF
       IF ( ios/=0 ) THEN
         WRITE ( *, '(/,2A,/,A,/,2A,/)' ) 'ERROR opening input file: ', Fname(:nchars), &
@@ -770,7 +773,9 @@
       IF ( Ftype==0 ) THEN
         OPEN ( Iunit, FILE=Fname(:nchars), STATUS='REPLACE', IOSTAT=ios )
       ELSE
-        OPEN ( Iunit, FILE=Fname(:nchars), STATUS='REPLACE', IOSTAT=ios, FORM='UNFORMATTED' )
+        !USE UNFORMATTED for UNIX
+        !OPEN ( Iunit, FILE=Fname(:nchars), STATUS='REPLACE', IOSTAT=ios, FORM='UNFORMATTED' ) ! for linux
+        OPEN ( Iunit, FILE=Fname(:nchars), STATUS='REPLACE', IOSTAT=ios, FORM='BINARY' ) ! for windows
       ENDIF
 
       IF ( ios/=0 ) THEN
