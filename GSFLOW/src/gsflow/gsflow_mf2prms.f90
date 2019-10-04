@@ -12,7 +12,6 @@
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Gw2sm_grav
       USE GWFUZFMODULE, ONLY: SEEPOUT
       USE PRMS_MODULE, ONLY: Process, Nhrucell, Gvr_cell_id, Hru_ag_irr
-      USE PRMS_WATER_USE, ONLY: soilzone_gain
       USE GLOBAL,       ONLY:IUNIT
       USE PRMS_BASIN, ONLY: HRU_PERV
       USE GWFBASMODULE, ONLY:DELT
@@ -25,7 +24,7 @@
 ! Local Variables
       INTEGER :: i, j, k, ihru
       integer :: IRWL,NMCL,SGNM
-      DOUBLE PRECISION :: mf_q2prms_inch, firr
+      DOUBLE PRECISION :: mf_q2prms_inch !, firr
 !      CHARACTER(LEN=14) :: MODNAME
 ! Save Variables
       CHARACTER(LEN=80), SAVE :: Version_gsflow_mf2prms

@@ -8,8 +8,11 @@
       CHARACTER(LEN=68), PARAMETER :: &
      &  EQULS = '===================================================================='
       CHARACTER(LEN=11), PARAMETER :: MODNAME = 'gsflow_prms'
-      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.0.0 05/30/2019'
+      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.1.0 10/02/2019'
       CHARACTER(LEN=8), SAVE :: Process
+      !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
+      INTEGER, PARAMETER :: GSFLOW = 0, PRMS = 1, MODFLOW = 2
+      INTEGER, PARAMETER :: DOCUMENTATION = 99
       CHARACTER(LEN=80), SAVE :: PRMS_versn
       INTEGER, SAVE :: Model, Process_flag, Call_cascade, Ncascade, Ncascdgw
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus
@@ -29,13 +32,14 @@
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Nwateruse, Nexternal, Nconsumed, Npoigages, Prms_warmup
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
+      INTEGER, SAVE :: Frozen_flag, Diversion2soil_flag
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
       INTEGER, SAVE :: Kkiter
+      REAL, SAVE, ALLOCATABLE :: Hru_ag_irr(:)    !Ag irrigation added to HRU
 !   Declared Parameters
       INTEGER, SAVE :: Mxsziter
       INTEGER, SAVE, ALLOCATABLE :: Gvr_cell_id(:)
       REAL, SAVE, ALLOCATABLE :: Gvr_cell_pct(:)
-      REAL, SAVE, ALLOCATABLE :: Hru_ag_irr(:)    !Ag irrigation added to HRU
 ! Precip_flag (1=precip_1sta; 2=precip_laps; 3=precip_dist2; 5=ide_dist; 6=xyz_dist; 7=climate_hru
 ! Temp_flag (1=temp_1sta; 2=temp_laps; 3=temp_dist2; 5=ide_dist; 6=xyz_dist; 7=climate_hru; 8=temp_sta
 ! Control parameters
@@ -93,7 +97,7 @@
         Process_flag = 0 !(0=run, 1=declare, 2=init, 3=clean, 4=setdims)
 
       ELSEIF ( Process(:4)=='decl' ) THEN
-        IF ( Model==1 ) THEN
+        IF ( Model==PRMS ) THEN
           CALL DATE_AND_TIME(VALUES=Elapsed_time_start)
           Execution_time_start = Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
      &                           Elapsed_time_start(7) + Elapsed_time_start(8)*0.001
@@ -102,7 +106,9 @@
 
         PRMS_versn = 'gsflow_prms.f90 2019-05-30 14:00:00Z'
 
-        IF ( check_dims()/=0 ) STOP
+        IF ( PRMS_flag==1 ) THEN ! PRMS is active, GSFLOW, PRMS
+          IF ( check_dims()/=0 ) STOP
+        ENDIF
 
         IF ( Print_debug>-2 ) THEN
           PRINT 10, PRMS_VERSION
@@ -129,7 +135,7 @@
      &        '         Soil Zone: soilzone', /, &
      &        '       Groundwater: gwflow', /, &
      &        'Streamflow Routing: strmflow, strmflow_in_out, muskingum,', /, &
-     &        '                    muskingum_lake', /, &
+     &        '                    muskingum_mann, muskingum_lake', /, &
 !gsf     &        'Stream Temperature: stream_temp', /, &
      &        '    Output Summary: basin_sum, subbasin, map_results, prms_summary,', /, &
      &        '                    nhru_summary, nsub_summary, water_balance', /, &
@@ -142,6 +148,7 @@
           call_modules = gsflow_modflow()
           IF ( call_modules/=0 ) CALL module_error(MODNAME, Arg, call_modules)
         ENDIF
+        Diversion2soil_flag = 0
 
         IF ( Print_debug>-2 ) THEN
           PRINT 15
@@ -154,7 +161,7 @@
         WRITE ( Logunt, 16 ) EQULS
         CALL print_module(PRMS_versn, 'GSFLOW Computation Order    ', 90)
 
-        IF ( GSFLOW_flag==1 .OR. Model==99 ) THEN
+        IF ( GSFLOW_flag==1 .OR. Model==DOCUMENTATION ) THEN
           IF ( declvar(MODNAME, 'KKITER', 'one', 1, 'integer', &
      &         'Current iteration in GSFLOW simulation', 'none', KKITER)/=0 ) CALL read_error(3, 'KKITER')
           IF ( declparam(MODNAME, 'mxsziter', 'one', 'integer', &
@@ -177,11 +184,6 @@
      &         'Index of the grid cell associated with each gravity reservoir', &
      &         'none')/=0 ) CALL read_error(1, 'gvr_cell_id')
         ENDIF
-        
-!
-! Allocate variable for adding irrigation water to HRU from AG Package
-        ALLOCATE ( Hru_ag_irr(Nhru) )
-        Hru_ag_irr = 0.0
 
         Kkiter = 1 ! set for PRMS-only mode
 
@@ -218,6 +220,16 @@
           ENDIF
           call_modules = gsflow_modflow()
           IF ( call_modules/=0 ) CALL module_error(MODNAME, Arg, call_modules)
+!          IF ( Nsegment/=NSS ) THEN
+!            PRINT *, 'ERROR, NSS not equal to nsegment'
+!            PRINT *, '       NSS=', NSS, '; nsegment=', Nsegment
+!            STOP
+!          ENDIF
+          IF ( Diversion2soil_flag==1 ) THEN
+            ! Allocate variable for adding irrigation water to HRU from AG Package
+            ALLOCATE ( Hru_ag_irr(Nhru) )
+            Hru_ag_irr = 0.0
+          ENDIF
         ENDIF
 
         nc = numchars(Model_control_file)
@@ -263,7 +275,7 @@
         ENDIF
       ENDIF
 
-      IF ( Model==99 ) THEN
+      IF ( Model==DOCUMENTATION ) THEN
         IF ( Process_flag==4 .OR. Process_flag<2 ) THEN
           Init_vars_from_file = 0 ! make sure this is set so all variables and parameters are declared
           CALL module_doc()
@@ -275,7 +287,7 @@
       ENDIF
 
 ! All modules must be called for setdims, declare, initialize, and cleanup
-      IF ( Process_flag/=0 ) THEN
+      IF ( Process_flag/=0 .AND. PRMS_flag==1 ) THEN
         call_modules = basin()
         IF ( call_modules/=0 ) CALL module_error('basin', Arg, call_modules)
 
@@ -334,12 +346,12 @@
         IF ( call_modules/=0 ) CALL module_error(Precip_module, Arg, call_modules)
       ENDIF
 
-      IF ( Model==6 ) THEN
+      IF ( Model==26 ) THEN
         IF ( Process_flag==0 ) RETURN
       ENDIF
 
 ! frost_date is a pre-process module
-      IF ( Model==9 ) THEN
+      IF ( Model==29 ) THEN
         call_modules = frost_date()
         IF ( call_modules/=0 ) CALL module_error('frost_date', Arg, call_modules)
         IF ( Process_flag==0 ) RETURN
@@ -362,7 +374,7 @@
       ENDIF
       IF ( call_modules/=0 ) CALL module_error(Transp_module, Arg, call_modules)
 
-      IF ( Model==8 ) THEN
+      IF ( Model==28 ) THEN
         IF ( Process_flag==0 ) RETURN
       ENDIF
 
@@ -385,13 +397,13 @@
         IF ( call_modules/=0 ) CALL module_error(Et_module, Arg, call_modules)
       ENDIF
 
-      IF ( Model==4 ) THEN
+      IF ( Model==24 ) THEN
         call_modules = write_climate_hru()
         IF ( call_modules/=0 ) CALL module_error('write_climate_hru', Arg, call_modules)
         IF ( Process_flag==0 ) RETURN
       ENDIF
 
-      IF ( Model==7 ) THEN
+      IF ( Model==27 ) THEN
         IF ( Process_flag==0 ) RETURN
       ENDIF
 
@@ -405,7 +417,7 @@
       IF ( call_modules/=0 ) CALL module_error(Srunoff_module, Arg, call_modules)
 
 ! for PRMS-only simulations
-      IF ( PRMS_flag==1 ) THEN
+      IF ( Model==PRMS ) THEN
         call_modules = soilzone()
         IF ( call_modules/=0 ) CALL module_error(Soilzone_module, Arg, call_modules)
 
@@ -491,7 +503,7 @@
       IF ( Process_flag==0 ) THEN
         RETURN
       ELSEIF ( Process_flag==3 ) THEN
-        IF ( Model==1 ) THEN
+        IF ( Model==PRMS ) THEN
           CALL DATE_AND_TIME(VALUES=Elapsed_time_end)
           Execution_time_end = Elapsed_time_end(5)*3600 + Elapsed_time_end(6)*60 + &
      &                         Elapsed_time_end(7) + Elapsed_time_end(8)*0.001
@@ -519,8 +531,8 @@
           PRINT '(A)', EQULS
           WRITE ( PRMS_output_unit, '(A)' ) EQULS
         ENDIF
-        WRITE ( Logunt, '(A)') EQULS
-        IF ( Model==10 ) CALL convert_params()
+        WRITE ( Logunt, '(A)' ) EQULS
+        IF ( Model==25 ) CALL convert_params()
       ELSEIF ( Process_flag==2 ) THEN
         IF ( Inputerror_flag==1 ) THEN
           PRINT '(//,A,//,A,/,A,/,A)', '**Fix input errors in your Parameter File to continue**', &
@@ -534,7 +546,7 @@
      &          'parameters have valid and compatible values.'
         ENDIF
         IF ( Parameter_check_flag==2 .OR. Inputerror_flag==1 ) STOP
-        IF ( Model==10 ) THEN
+        IF ( Model==25 ) THEN
           CALL convert_params()
           STOP
         ENDIF
@@ -601,24 +613,23 @@
       IF ( Model_mode(:6)=='GSFLOW' .OR. Model_mode(:4)=='    ') THEN
         Model = 0
         GSFLOW_flag = 1
-        PRMS_flag = 0
       ELSEIF ( Model_mode(:4)=='PRMS' .OR. Model_mode(:5)=='DAILY' )THEN
         Model = 1
       ELSEIF ( Model_mode(:7)=='MODFLOW' ) THEN
         Model = 2
         PRMS_flag = 0
       ELSEIF ( Model_mode(:5)=='FROST' ) THEN
-        Model = 9
+        Model = 29
       ELSEIF ( Model_mode(:13)=='WRITE_CLIMATE' ) THEN
-        Model = 4
+        Model = 24
       ELSEIF ( Model_mode(:7)=='CLIMATE' ) THEN
-        Model = 6
+        Model = 26
       ELSEIF ( Model_mode(:5)=='POTET' ) THEN
-        Model = 7
+        Model = 27
       ELSEIF ( Model_mode(:9)=='TRANSPIRE' ) THEN
-        Model = 8
+        Model = 28
       ELSEIF ( Model_mode(:7)=='CONVERT' ) THEN ! can be CONVERT4 or CONVERT5 or CONVERT (=CONVERT5)
-        Model = 10
+        Model = 25
       ELSEIF ( Model_mode(:13)=='DOCUMENTATION' ) THEN
         Model = 99
       ELSE
@@ -1032,8 +1043,8 @@
       ENDIF
       IF ( Cascadegw_flag==2 ) Ncascdgw = Ncascade
       IF ( Ncascade==0 ) Cascade_flag = 0
-      IF ( Ncascdgw==0 .OR. GSFLOW_flag==1 .OR. Model==2 ) Cascadegw_flag = 0
-      IF ( (Cascade_flag>0 .OR. Cascadegw_flag>0) .AND. Model/=10 ) THEN ! don't call if model_mode = CONVERT
+      IF ( Ncascdgw==0 .OR. GSFLOW_flag==1 .OR. Model==MODFLOW ) Cascadegw_flag = 0
+      IF ( (Cascade_flag>0 .OR. Cascadegw_flag>0) .AND. Model/=25 ) THEN ! don't call if model_mode = CONVERT
         Call_cascade = 1
       ELSE
         Call_cascade = 0
@@ -1112,7 +1123,7 @@
         Stream_order_flag = 1 ! strmflow_in_out, muskingum, muskingum_lake
       ENDIF
 
-      IF ( Nsegment<1 .AND. Model/=99 ) THEN
+      IF ( Nsegment<1 .AND. Model/=DOCUMENTATION ) THEN
         IF ( Stream_order_flag==1 .OR. Call_cascade==1 ) THEN
           PRINT *, 'ERROR, streamflow and cascade routing require nsegment > 0, specified as:', Nsegment
           STOP
@@ -1120,14 +1131,26 @@
       ENDIF
 
       Lake_route_flag = 0
-      IF ( Nlake>0 .AND. Strmflow_flag==3 .AND. Model/=0 ) Lake_route_flag = 1 ! muskingum_lake
+      IF ( Nlake>0 .AND. Strmflow_flag==3 .AND. GSFLOW_flag==0 ) Lake_route_flag = 1 ! muskingum_lake
+
+
+      IF ( Stream_temp_flag>0 .AND. Stream_order_flag==1 ) THEN
+        PRINT *, 'ERROR, stream temperature computation requires streamflow routing'
+        PRINT *, '       thus strmflow_module must be set to strmflow_in_out, muskingum, or muskingum_lake'
+        STOP
+      ENDIF
 
       IF ( NsubOutON_OFF==1 .AND. Nsub==0 ) THEN
         NsubOutON_OFF = 0
         IF ( Print_debug>-1 ) PRINT *, 'WARNING, nsubOutON_OFF = 1 and nsub = 0, thus nsub_summary not used'
       ENDIF
 
-      IF ( Model==99 .OR. Parameter_check_flag>0 ) CALL check_dimens()
+      IF ( NsegmentOutON_OFF==1 .AND. Nsegment==0 ) THEN
+        NsegmentOutON_OFF = 0
+        IF ( Print_debug>-1 ) PRINT *, 'WARNING, nsegmentOutON_OFF = 1 and nsegment = 0, thus nsegment_summary not used'
+      ENDIF
+
+      IF ( Model==DOCUMENTATION .OR. Parameter_check_flag>0 ) CALL check_dimens()
 
       check_dims = Inputerror_flag
       END FUNCTION check_dims
@@ -1160,7 +1183,7 @@
 
       IF ( ierr==1 ) STOP
 
-      IF ( Model==99 ) THEN
+      IF ( Model==DOCUMENTATION ) THEN
         IF ( Ntemp==0 ) Ntemp = 1
         IF ( Nrain==0 ) Nrain = 1
         IF ( Nlake==0 ) Nlake = 1
@@ -1213,7 +1236,7 @@
       INTEGER, EXTERNAL :: intcp, snowcomp, gwflow, srunoff, soilzone
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, strmflow_in_out
       INTEGER, EXTERNAL :: write_climate_hru, muskingum, muskingum_lake
-!gsf      INTEGER, EXTERNAL :: stream_temp
+!gsf      INTEGER, EXTERNAL :: stream_temp, setup
       EXTERNAL :: nhru_summary, prms_summary, water_balance, nsub_summary, basin_summary, nsegment_summary
       INTEGER, EXTERNAL :: dynamic_param_read, water_use_read, potet_pm_sta
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
@@ -1224,6 +1247,7 @@
       test = cascade()
       test = climateflow()
       test = soltab()
+!      test = setup()
       test = prms_time()
       test = obs()
       test = water_use_read()

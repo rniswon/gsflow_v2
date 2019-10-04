@@ -74,12 +74,13 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       ! Model (0=integrated; 1=PRMS-only; 2=MODFLOW-only)
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Model,Logunt,Print_debug
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, GSFLOW_flag, Logunt,
+     &    Print_debug
       IMPLICIT NONE
 !***********************************************************************
       gsfdecl = 0
 
-      Version_gsflow_modflow = 'gsflow_modflow.f 2019-05-10 11:11:00Z'
+      Version_gsflow_modflow = 'gsflow_modflow.f 2019-10-01 14:35:00Z'
 C
 C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
       IF ( Print_debug>-2 )
@@ -91,7 +92,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
      &  /,25X,'Version ',A/,14X,'BASED ON MODFLOW-2005 Version ',A,
      &  /,22X,'SWR1 Version ',A/)
 
-      IF ( Model==0 ) THEN
+      IF ( GSFLOW_flag==1 ) THEN
         IF ( Print_debug>-1 ) WRITE ( *, 8 )
         WRITE ( Logunt, 8 )
     8 FORMAT (14X, 'PROCESSES: GWF and OBS', /, 14X,
@@ -116,7 +117,8 @@ C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Model, Mxsziter, Print_debug,
-     &    EQULS, Logunt, Init_vars_from_file, Kper_mfo
+     &    EQULS, Logunt, Init_vars_from_file, Kper_mfo, GSFLOW_flag,
+     &    MODFLOW, Diversion2soil_flag
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -243,7 +245,7 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
       ENDIF
 
 ! Packages available in NWT but not in GSFLOW
-      IF ( Model==0 ) THEN
+      IF ( GSFLOW_flag==1 ) THEN
       IF ( IUNIT(3)>0 ) THEN
         PRINT *, 'DRN Package not supported'
         ierr = 1
@@ -383,7 +385,10 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
         IF(IUNIT(44).GT.0) CALL GWF2HYD7SFR7AR(IUNIT(43),IGRID)
       ENDIF
       IF(IUNIT(49).GT.0) CALL LMT8BAS7AR(INUNIT,CUNIT,IGRID)
-      IF(IUNIT(66).GT.0) CALL GWF2AG7AR(IUNIT(66),IUNIT(44),IUNIT(63))
+      IF(IUNIT(66).GT.0) THEN
+        CALL GWF2AG7AR(IUNIT(66),IUNIT(44),IUNIT(63))
+        Diversion2soil_flag = 1
+      ENDIF
 
 C
 C7------SIMULATE EACH STRESS PERIOD.
@@ -424,7 +429,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       Mfiter_cnt = 0
       Iter_cnt = 0
       CALL SETMFTIME()
-      IF ( Model==0 ) THEN
+      IF ( GSFLOW_flag==1 ) THEN
         CALL set_cell_values()
         IF ( Init_vars_from_file>0 ) CALL gsflow_modflow_restart(1)
         CALL check_gvr_cell_pct()
@@ -467,7 +472,7 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Model, Kper_mfo, Print_debug, Kkiter,
-     &    Timestep, Logunt, Init_vars_from_file, Mxsziter
+     &    Timestep, Logunt, Init_vars_from_file, Mxsziter, MODFLOW
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
 C1------USE package modules.
       USE GLOBAL
@@ -1007,7 +1012,8 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Model, Timestep, Logunt, Save_vars_to_file
+      USE PRMS_MODULE, ONLY: Model, Timestep, Logunt, Save_vars_to_file,
+     &    GSFLOW_flag
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
 !gsf  USE PCGN
       USE GWFNWTMODULE, ONLY:LINMETH
@@ -1022,7 +1028,7 @@ C-------SAVE RESTART RECORDS FOR SUB PACKAGE
 C-------WRITE RESTART INFORMATION FOR HEADS, SFR, AND UZF
       IF ( Save_vars_to_file==1 ) THEN
         CALL RESTART1WRITE()
-        IF ( Model/=2 ) CALL gsflow_modflow_restart(0)
+        IF ( GSFLOW_flag==1 ) CALL gsflow_modflow_restart(0)
       ENDIF
 C
 C  Observation output
@@ -1100,7 +1106,7 @@ c      IF(IUNIT(14).GT.0) CALL LMG7DA(IGRID)
 !      IF(IUNIT(61).GT.0) CALL FMP2DA(IGRID)
       CALL GWF2BAS7DA(IGRID)
 C
-      IF ( Model==0 ) THEN
+      IF ( GSFLOW_flag==1 ) THEN
         PRINT 9001, Timestep, Convfail_cnt, Iterations, Sziters,
      &            FLOAT(Iterations)/FLOAT(Timestep),
      &            FLOAT(Sziters)/FLOAT(Timestep), Max_iters, Max_sziters
@@ -1324,7 +1330,7 @@ C
       USE GSFMODFLOW, ONLY: IGRID, KKPER, KPER, NSOL, IOUTS, KKSTP,
      &                      Mft_to_sec, KSTP
       USE GLOBAL, ONLY: IUNIT, ISSFLG, IOUT
-      USE PRMS_MODULE, ONLY: Model
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE PRMS_SET_TIME, ONLY: Timestep_seconds
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: NEARZERO
@@ -1339,7 +1345,7 @@ C7------SIMULATE EACH STRESS PERIOD.
         IF(IUNIT(19).GT.0) CALL GWF2IBS7ST(KKPER,IGRID)
         IF(IUNIT(54).GT.0) CALL GWF2SUB7ST(KKPER,IGRID)
         IF(IUNIT(57).GT.0) CALL GWF2SWT7ST(KKPER,IGRID)
-        IF ( Model==0 ) THEN
+        IF ( GSFLOW_flag==1 ) THEN
           IF ( ABS(Timestep_seconds-DELT*Mft_to_sec)>NEARZERO ) THEN
             WRITE (IOUT, 9003) Timestep_seconds, DELT, Mft_to_sec
             PRINT 9003, Timestep_seconds, DELT, Mft_to_sec
@@ -1389,7 +1395,7 @@ C----------READ USING PACKAGE READ AND PREPARE MODULES.
         IF(IUNIT(64).GT.0) CALL GWF2SWR7RP(IUNIT(64),KKPER,IGRID)  !SWR - JDH
       IF ( IUNIT(66).GT.0 ) CALL GWF2AG7RP(IUNIT(66),IUNIT(44),KKPER)
 C
-        IF ( Model.EQ.0 .AND. ISSFLG(KPER).EQ.0 )
+        IF ( GSFLOW_flag==1 .AND. ISSFLG(KPER).EQ.0 )
      1                   CALL ZERO_SPECIFIED_FLOWS(IUNIT(22),IUNIT(44))
  9003 FORMAT (' Time steps must be equal: PRMS dtsec =', F12.4,
      1        ' MODFLOW delt =', F12.4, ' Mft_to_sec =', F12.4)
@@ -1836,7 +1842,8 @@ C
      &    Mfl2_to_acre, Mfl3_to_ft3, Mfl_to_inch, Sfr_conv,
      &    Acre_inches_to_mfl3, Inch_to_mfl_t, Mfl3t_to_cfs,
      &    Mfvol2inch_conv, Gvr2cell_conv, Mfq2inch_conv
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Model, Gvr_cell_pct
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Model, Gvr_cell_pct,
+     &    Gsflow_flag
       USE PRMS_BASIN, ONLY: FT2_PER_ACRE
       IMPLICIT NONE
 ! Local Variables
@@ -1879,7 +1886,7 @@ C
 ! inch over basin (acres) conversion to modflow length cubed
       Acre_inches_to_mfl3 = FT2_PER_ACRE/(Mfl3_to_ft3*12.0D0)
 
-      IF ( Model==2 ) RETURN
+      IF ( Gsflow_flag==0 ) RETURN
 
       DO i = 1, Nhrucell
         ! MF volume to PRMS inches
