@@ -247,7 +247,7 @@ C9E-----Find the zone array number.
                 CALL USTOP(' ')
               END IF
               WRITE(IOUT,48) (IPCLST(J,I),J=5,IPCLST(4,I))
-   48         FORMAT(1X,'               ZONE VALUES:',10I5)
+   48         FORMAT(1X,'               ZONE VALUES:',10I0)
               IF(NZONAR.GT.0) THEN
                 DO 50 J=1,NZONAR
                   CTMP2=ZONNAM(J)
