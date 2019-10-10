@@ -384,16 +384,18 @@ void setup_cont (void) {
 */
         lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
-        decl_control_int_array ("nhruOutON_OFF", 1, lval);
+		decl_control_int_array ("nhruOutON_OFF", 1, lval);
         lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
-        decl_control_int_array ("nhruOutVars", 1, lval);
-		lval = (long *)umalloc(sizeof (long));
+		decl_control_int_array ("nhruOutVars", 1, lval);
+        lval = (long *)umalloc(sizeof (long));
 		lval[0] = 1;
 		decl_control_int_array("nhruOut_freq", 1, lval);
+        lval = (long*)umalloc(sizeof(long));
 		lval[0] = 1;
 		decl_control_int_array("nhruOut_format", 1, lval);
 
+        lval = (long*)umalloc(sizeof(long));
 		lval[0] = 1;
 		decl_control_int_array("prms_warmup", 1, lval);
 
@@ -401,43 +403,47 @@ void setup_cont (void) {
 		/*
 		**	nsub_summary
 		*/
-		lval = (long *)umalloc(sizeof(long));
+        lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
-		decl_control_int_array("nsubOutON_OFF", 1, lval);
-		lval = (long *)umalloc(sizeof(long));
+		decl_control_int_array ("nsubOutON_OFF", 1, lval);
+        lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
-		decl_control_int_array("nsubOutVars", 1, lval);
-		lval = (long *)umalloc(sizeof(long));
+		decl_control_int_array ("nsubOutVars", 1, lval);
+        lval = (long *)umalloc(sizeof (long));
 		lval[0] = 1;
 		decl_control_int_array("nsubOut_freq", 1, lval);
+        lval = (long*)umalloc(sizeof(long));
 		lval[0] = 1;
 		decl_control_int_array("nsubOut_format", 1, lval);
 
 		/*
 		**	basin_summary
 		*/
-		lval = (long *)umalloc(sizeof(long));
+        lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
-		decl_control_int_array("basinOutON_OFF", 1, lval);
-		lval = (long *)umalloc(sizeof(long));
+		decl_control_int_array ("basinOutON_OFF", 1, lval);
+        lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
-		decl_control_int_array("basinOutVars", 1, lval);
-		lval = (long *)umalloc(sizeof(long));
+		decl_control_int_array ("basinOutVars", 1, lval);
+        lval = (long *)umalloc(sizeof (long));
 		lval[0] = 1;
 		decl_control_int_array("basinOut_freq", 1, lval);
-
+        lval = (long*)umalloc(sizeof(long));
+		lval[0] = 1;
+		decl_control_int_array("basinOut_format", 1, lval);
 		/*
 		**	nsegment_summary
 		*/
-		lval = (long *)umalloc(sizeof(long));
+        lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
-		decl_control_int_array("nsegmentOutON_OFF", 1, lval);
-		lval = (long *)umalloc(sizeof(long));
+		decl_control_int_array ("nsegmentOutON_OFF", 1, lval);
+        lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
-		decl_control_int_array("nsegmentOutVars", 1, lval);
-		lval = (long *)umalloc(sizeof(long));
+		decl_control_int_array ("nsegmentOutVars", 1, lval);
+        lval = (long *)umalloc(sizeof (long));
 		lval[0] = 1;
 		decl_control_int_array("nsegmentOut_freq", 1, lval);
+        lval = (long*)umalloc(sizeof(long));
 		lval[0] = 1;
 		decl_control_int_array("nsegmentOut_format", 1, lval);
 
