@@ -104,7 +104,7 @@
         ENDIF
         Process_flag = 1
 
-        PRMS_versn = 'gsflow_prms.f90 2019-05-30 14:00:00Z'
+        PRMS_versn = 'gsflow_prms.f90 2019-10-10 14:32:00Z'
 
         IF ( PRMS_flag==1 ) THEN ! PRMS is active, GSFLOW, PRMS
           IF ( check_dims()/=0 ) STOP
@@ -1131,8 +1131,7 @@
       ENDIF
 
       Lake_route_flag = 0
-      IF ( Nlake>0 .AND. Strmflow_flag==3 .AND. GSFLOW_flag==0 ) Lake_route_flag = 1 ! muskingum_lake
-
+      IF ( Nlake>0 .AND. Strmflow_flag==3 .AND. Model/=0 ) Lake_route_flag = 1 ! muskingum_lake
 
       IF ( Stream_temp_flag>0 .AND. Stream_order_flag==1 ) THEN
         PRINT *, 'ERROR, stream temperature computation requires streamflow routing'
