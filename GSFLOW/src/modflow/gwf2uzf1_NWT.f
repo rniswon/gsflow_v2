@@ -1882,7 +1882,7 @@ C     -----------------------------------------------------------------
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
-      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP, IBND2
+      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP, IBND2, ILACTIVE
       DOUBLE PRECISION :: S1, S2
 C     -----------------------------------------------------------------
 C      
@@ -1897,10 +1897,12 @@ C       FOR BEGINNING OF EACH TIME STEP
             IF ( ibnd*ibnd > 0 ) THEN
               ill = NLAY
               il = ILL
+              ilactive = 0
               DO WHILE ( ill > 0 )
                 IF ( IBOUND(IC,IR,ILL) > 0 ) THEN
                   S1 = HNEW(ic, ir, ill) - BOTM(ic, ir, ill)
                   S2 = ZEROD15
+                  if ( ilactive == 0 ) ilactive = ill
                   IF ( ill < NLAY) THEN  
                     IF ( IBOUND(IC,IR,ILL+1) > 0 ) S2 = 
      +                        HNEW(ic, ir, ill+1) - BOTM(ic, ir, ill)
@@ -1910,6 +1912,8 @@ C       FOR BEGINNING OF EACH TIME STEP
                 END IF
                 ill = ill - 1
               END DO
+              IF ( IBOUND(IC,IR,IL) == 0 .AND. ilactive > 0 ) 
+     +                                          il = ilactive
               IF ( IBOUND(IC,IR,IL) == 0 ) THEN
                 WRITE (IOUT, 9012) il,ir,ic
  9012   FORMAT (1X, '---ERROR---UZF cell connected to inactive cells ', 
