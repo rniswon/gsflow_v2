@@ -115,7 +115,7 @@ C     ALLOCATE ARRAY STORAGE FOR UNSATURATED FLOW, RECHARGE, AND ET
 C     READ AND CHECK VARIABLES THAT REMAIN CONSTANT
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.4, 4/01/2018
+!rgn------NEW VERSION NUMBER 1.1.5, 9/10/2019
 C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ITRSS, ISSFLG, 
@@ -2335,7 +2335,7 @@ C7------CALCULATE ET DEMAND LEFT FOR GROUND WATER.
               ij = Icell(IC,IR,IL)
               A(IA(ij)) = A(IA(ij)) - dET*etgw
             END IF
-          END IF         
+          END IF
         END IF
       END IF
       END DO
@@ -2343,7 +2343,7 @@ C
 C8------ADD OVERLAND FLOW TO STREAMS, LAKES AND CONDUITS. 
       IF ( IRUNFLG.GT.0 .AND. (Iunitsfr.GT.0.OR.
      +     Iunitlak.GT.0.OR.Iunitswr.GT.0) )
-     +     CALL SGWF2UZF1OLF(Iunitsfr, Iunitlak, Iunitswr, Igrid )      
+     +     CALL SGWF2UZF1OLF(Iunitsfr, Iunitlak, Iunitswr, Igrid )
 
 C9------RETURN.
       RETURN
@@ -3433,8 +3433,10 @@ C28-----COMPUTE UNSATURATED ERROR FOR EACH CELL.
           UZTOTBAL(ic, ir, 4) = UZTOTBAL(ic, ir, 4) + volet
           UZTOTBAL(ic, ir, 7) = UZTOTBAL(ic, ir, 7) + volinflt +
      +                              Excespp(ic, ir) + rej_inf(ic, ir)
+!      if(kkstp==2)then
 !      error = volinflt-volflwtb-volet-DELSTOR(ic, ir)
 !      write(222,333)l,ll,ic,ir,il,error,volflwtb
+!      end if
 !333   format(5i10,2e20.10)
           IF ( IUZFOPT.GT.0 ) THEN
             IF ( ibnd.GT.0 ) THEN
