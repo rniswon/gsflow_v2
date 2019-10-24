@@ -34,7 +34,7 @@
      &    Precip_units, Tmax_allrain_f, Adjmix_rain, &
      &    Basin_ppt, Basin_potet, Potet, Basin_snow, Basin_rain, &
      &    Basin_horad, Orad, Swrad, Basin_potsw, Basin_swrad, Basin_obs_ppt, &
-     &    Transp_on, Basin_transp_on, Tmax_allsnow_f, Basin_humidity
+     &    Transp_on, Basin_transp_on, Tmax_allsnow_f, Basin_humidity, Ppt_zero_thresh
       USE PRMS_SET_TIME, ONLY: Nowmonth, Jday
       USE PRMS_SOLTAB, ONLY: Soltab_basinpotsw, Hru_cossl, Soltab_potsw
       IMPLICIT NONE
@@ -75,6 +75,11 @@
             READ ( Precip_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Hru_ppt(i), i=1,Nhru)
           ELSE
             READ ( Precip_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Hru_ppt(i), i=1,Nhru)
+          ENDIF
+          IF ( Ppt_zero_thresh>0.0 ) THEN
+            DO i = 1, Nhru
+              IF ( Hru_ppt(i)<Ppt_zero_thresh ) Hru_ppt(i) = 0.0
+            ENDDO
           ENDIF
           IF ( Cbh_check_flag==1 ) CALL read_cbh_date(yr, mo, dy, 'Hru_ppt', ios, ierr)
           Basin_ppt = 0.0D0
@@ -242,7 +247,7 @@
         IF ( Windspeed_cbh_flag==1 ) Basin_windspeed = Basin_windspeed*Basin_area_inv
 
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_climate_hru = 'climate_hru.f90 2017-10-23 15:57:00Z'
+        Version_climate_hru = 'climate_hru.f90 2019-10-23 15:56:00Z'
         MODNAME = 'climate_hru'
 
         IF ( control_integer(Cbh_check_flag, 'cbh_check_flag')/=0 ) Cbh_check_flag = 1

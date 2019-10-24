@@ -44,6 +44,7 @@
       REAL, SAVE, ALLOCATABLE :: Tsta_elev(:), Tmax_aspect_adjust(:, :), Tmin_aspect_adjust(:, :)
 !   Declared Parameters - Precip
       INTEGER, SAVE :: Precip_units
+      REAL, SAVE :: Ppt_zero_thresh
       REAL, SAVE, ALLOCATABLE :: Tmax_allsnow(:, :), Adjmix_rain(:, :), Tmax_allrain(:, :), Tmax_allrain_offset(:, :)
       REAL, SAVE, ALLOCATABLE :: Psta_elev(:)
 !   Declared Parameters - Intcp
@@ -132,7 +133,7 @@
 !***********************************************************************
       climateflow_decl = 0
 
-      Version_climateflow = 'climateflow.f90 2019-04-03 14:30:00Z'
+      Version_climateflow = 'climateflow.f90 2019-10-23 15:56:00Z'
       CALL print_module(Version_climateflow, 'Common States and Fluxes    ', 90)
       MODNAME = 'climateflow'
 
@@ -620,6 +621,12 @@
      &     'Monthly (January to December) factor to adjust rain proportion in a mixed rain/snow event', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'adjmix_rain')
 
+      IF ( declparam(Precip_module, 'ppt_zero_thresh', 'one', 'real', &
+     &     '0.0', '0.0', '0.1', &
+     &     'Precipitation below this amount is set to 0.0', &
+     &     'Precipitation below this amount is set to 0.0', &
+     &     'precip_units')/=0 ) CALL read_error(1, 'ppt_zero_thresh')
+
       IF ( Precip_flag==2 .OR. Precip_flag==6 .OR. Precip_flag==5 .OR. Model==99 ) THEN
         ALLOCATE ( Psta_elev(Nrain) )
         IF ( declparam(Precip_module, 'psta_elev', 'nrain', 'real', &
@@ -916,6 +923,8 @@
       IF ( getparam(Precip_module, 'adjmix_rain', Nhru*12, 'real', Adjmix_rain)/=0 ) CALL read_error(2, 'adjmix_rain')
 
       IF ( getparam(Precip_module, 'precip_units', 1, 'integer', Precip_units)/=0 ) CALL read_error(2, 'precip_units')
+
+      IF ( getparam(Precip_module, 'ppt_zero_thresh', 1, 'real', Ppt_zero_thresh)/=0 ) CALL read_error(2, 'ppt_zero_thresh')
 
       IF ( Precip_flag==2 .OR. Precip_flag==6 .OR. Precip_flag==5 ) THEN
         IF ( getparam(Precip_module, 'psta_elev', Nrain, 'real', Psta_elev)/=0 ) CALL read_error(2, 'psta_elev')

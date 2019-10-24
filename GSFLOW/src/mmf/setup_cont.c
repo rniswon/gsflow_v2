@@ -323,6 +323,7 @@ void setup_cont (void) {
 		decl_control_string ("nsubOutBaseFileName", "nsubout_path");
 		decl_control_string ("basinOutBaseFileName", "basinout_path");
 		decl_control_string("nsegmentOutBaseFileName", "nsegmentout_path");
+		decl_control_string("dynamic_param_log_file", "dynamic_parameter.out");
 /*
 **	run start and end times
 */
