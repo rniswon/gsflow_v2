@@ -17,7 +17,7 @@
       INTEGER, SAVE, ALLOCATABLE :: Monthlyunit(:), Yearlyunit(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Nhru_var_monthly(:, :), Nhru_var_yearly(:, :)
 ! Paramters
-      INTEGER, SAVE :: Ncol
+      INTEGER, SAVE :: Nhru_out_ncol
       INTEGER, SAVE, ALLOCATABLE :: Nhm_id(:)
 ! Control Parameters
       INTEGER, SAVE :: NhruOutVars, NhruOut_freq, NhruOut_format
@@ -74,7 +74,7 @@
       INTEGER :: i
       CHARACTER(LEN=80), SAVE :: Version_nhru_summary
 !***********************************************************************
-      Version_nhru_summary = 'nhru_summary.f90 2019-10-24 12:22:00Z'
+      Version_nhru_summary = 'nhru_summary.f90 2019-10-25 12:57:00Z'
       CALL print_module(Version_nhru_summary, 'Nhru Output Summary         ', 90)
       MODNAME = 'nhru_summary'
 
@@ -108,11 +108,11 @@
      &       'none') /= 0 ) CALL read_error(1, 'nhm_id')
       ENDIF
 
-      IF ( declparam(MODNAME, 'ncol', 'one', 'integer', &
-     &     '-1', '-1', '50000', &
-     &     'Number of columns for each row of the mapped results', &
-     &     'Number of columns for each row of the mapped results', &
-     &     'none')/=0 ) CALL read_error(1, 'ncol')
+      IF ( declparam(MODNAME, 'nhru_out_ncol', 'one', 'integer', &
+     &     '-1', '-1', '999999', &
+     &     'Number of columns for each row of the CSV output', &
+     &     'Number of columns for each row of the CSV output', &
+     &     'none')/=0 ) CALL read_error(1, 'nhru_out_ncol')
 
       END SUBROUTINE nhru_summarydecl
 
@@ -135,27 +135,27 @@
       Begyr = Start_year + Prms_warmup
       Lastyear = Begyr
 
-      IF ( getparam(MODNAME, 'ncol', 1, 'integer', Ncol)/=0 ) CALL read_error(2, 'ncol')
-      IF ( Ncol<1 ) Ncol = Nhru
+      IF ( getparam(MODNAME, 'nhru_out_ncol', 1, 'integer', Nhru_out_ncol)/=0 ) CALL read_error(2, 'nhru_out_ncol')
+      IF ( Nhru_out_ncol<1 ) Nhru_out_ncol = Nhru
 
       IF ( NhruOut_format==1 ) THEN
         WRITE ( Output_fmt, 9001 ) Nhru
-        WRITE ( Output_grid_fmt, 9014 ) Ncol - 1
+        WRITE ( Output_grid_fmt, 9014 ) Nhru_out_ncol - 1
       ELSEIF ( NhruOut_format==2 ) THEN
         WRITE ( Output_fmt, 9007 ) Nhru
-        WRITE ( Output_grid_fmt, 9017 ) Ncol - 1
+        WRITE ( Output_grid_fmt, 9017 ) Nhru_out_ncol - 1
       ELSEIF ( NhruOut_format==3 ) THEN
         WRITE ( Output_fmt, 9006 ) Nhru
-        WRITE ( Output_grid_fmt, 9016 ) Ncol - 1
+        WRITE ( Output_grid_fmt, 9016 ) Nhru_out_ncol - 1
       ELSEIF ( NhruOut_format==4 ) THEN
         WRITE ( Output_fmt, 9005 ) Nhru
-        WRITE ( Output_grid_fmt, 9015 ) Ncol - 1
+        WRITE ( Output_grid_fmt, 9015 ) Nhru_out_ncol - 1
       ELSEIF ( NhruOut_format==5 ) THEN
         WRITE ( Output_fmt, 9012 ) Nhru
-        WRITE ( Output_grid_fmt, 9014 ) Ncol - 1
+        WRITE ( Output_grid_fmt, 9014 ) Nhru_out_ncol - 1
       ENDIF
       WRITE ( Output_fmtint, 9004 ) Nhru
-      WRITE ( Output_grid_fmtint, 9018 ) Ncol - 1
+      WRITE ( Output_grid_fmtint, 9018 ) Nhru_out_ncol - 1
       WRITE ( Output_date_fmt, 9013 )
 
       Double_vars = 0
@@ -215,7 +215,7 @@
           WRITE ( Output_fmt3, 9011 ) Nhru
         ENDIF
         WRITE ( Output_date_fmt3, "(A)" ) '(I0)'
-        WRITE ( Output_fmt3int, 9019 ) Ncol - 1
+        WRITE ( Output_fmt3int, 9019 ) Nhru_out_ncol - 1
       ELSEIF ( Monthly_flag==1 ) THEN
         Monthdays = 0.0D0
         ALLOCATE ( Nhru_var_monthly(Nhru, NhruOutVars), Monthlyunit(NhruOutVars) )
@@ -347,14 +347,14 @@
         ENDIF
         IF ( Daily_flag==1 ) THEN
           IF ( Nhru_var_type(jj)/=1 ) THEN
-            IF ( Ncol==Nhru) THEN
+            IF ( Nhru_out_ncol==Nhru) THEN
               WRITE ( Dailyunit(jj), Output_fmt) Nowyear, Nowmonth, Nowday, (Nhru_var_daily(j,jj), j=1,Nhru)
             ELSE
               WRITE ( Dailyunit(jj), Output_date_fmt) Nowyear, Nowmonth, Nowday
               WRITE ( Dailyunit(jj), Output_grid_fmt) (Nhru_var_daily(j,jj), j=1,Nhru)
             ENDIF
           ELSE
-            IF ( Ncol==Nhru) THEN
+            IF ( Nhru_out_ncol==Nhru) THEN
               WRITE ( Dailyunit(jj), Output_fmtint) Nowyear, Nowmonth, Nowday, (Nhru_var_int(j,jj), j=1,Nhru)
             ELSE
               WRITE ( Dailyunit(jj), Output_date_fmt) Nowyear, Nowmonth, Nowday
@@ -379,7 +379,7 @@
                 ENDDO
               ENDIF
               IF ( Nhru_var_type(jj)/=1 ) THEN
-                IF ( Ncol==Nhru) THEN
+                IF ( Nhru_out_ncol==Nhru) THEN
                   WRITE ( Yearlyunit(jj), Output_fmt3) Lastyear, (Nhru_var_yearly(j,jj), j=1,Nhru)
                 ELSE
                   WRITE ( Yearlyunit(jj), Output_date_fmt3) Lastyear
@@ -389,7 +389,7 @@
                 DO i = 1, Nhru
                   Nhru_var_int(i, jj) = INT( Nhru_var_yearly(i, jj) )
                 ENDDO
-                IF ( Ncol==Nhru) THEN
+                IF ( Nhru_out_ncol==Nhru) THEN
                   WRITE ( Yearlyunit(jj), Output_fmt3int) Lastyear, (Nhru_var_int(j,jj), j=1,Nhru)
                 ELSE
                   WRITE ( Yearlyunit(jj), Output_date_fmt3) Lastyear
@@ -440,7 +440,7 @@
       IF ( write_month==1 ) THEN
         DO jj = 1, NhruOutVars
           IF ( Nhru_var_type(jj)/=1 ) THEN
-            IF ( Ncol==Nhru) THEN
+            IF ( Nhru_out_ncol==Nhru) THEN
               WRITE ( Monthlyunit(jj), Output_fmt) Nowyear, Nowmonth, Nowday, (Nhru_var_monthly(j,jj), j=1,Nhru)
             ELSE
               WRITE ( Monthlyunit(jj), Output_date_fmt) Nowyear, Nowmonth, Nowday
@@ -450,7 +450,7 @@
             DO i = 1, Nhru
               Nhru_var_int(i, jj) = INT( Nhru_var_monthly(i, jj) )
             ENDDO
-            IF ( Ncol==Nhru) THEN
+            IF ( Nhru_out_ncol==Nhru) THEN
               WRITE ( Monthlyunit(jj), Output_fmtint) Nowyear, Nowmonth, Nowday, (Nhru_var_int(j,jj), j=1,Nhru)
             ELSE
               WRITE ( Monthlyunit(jj), Output_date_fmt) Nowyear, Nowmonth, Nowday
