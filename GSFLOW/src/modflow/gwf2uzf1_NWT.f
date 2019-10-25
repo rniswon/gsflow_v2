@@ -158,7 +158,7 @@ C     ------------------------------------------------------------------
       DATA aname(8)/'   INITIAL WATER CONTENT'/
       DATA aname(9)/' LAND SURFACE VERTICAL K'/
 C     ------------------------------------------------------------------
-      Version_uzf = 'gwf2uzf1_NWT.f 2017-03-08 09:56:00Z'
+      Version_uzf = 'gwf2uzf1_NWT.f 2019-09-10 09:56:00Z'
       ALLOCATE(NUMCELLS, TOTCELLS, Iseepsupress, IPRCNT, Isavefinf)
       ALLOCATE(Isurfkreject, Ireadsurfk, Iseepreject,ETOFH_FLAG)
       Iseepsupress = 0   ! Iseepsupress = 1 means seepout not calculated
@@ -192,8 +192,8 @@ C     ------------------------------------------------------------------
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE.
       WRITE (IOUT, 9001) In
- 9001 FORMAT (1X, /' UZF1 -- UNSATURATED FLOW PACKAGE, VERSION 1.4', 
-     +        ', 02/06/2012', /, 9X, 'INPUT READ FROM UNIT', I3)
+ 9001 FORMAT (1X, /' UZF1 -- UNSATURATED FLOW PACKAGE, VERSION 1.5', 
+     +        ', 09/10/2019', /, 9X, 'INPUT READ FROM UNIT', I3)
 C
 C2A------COMMENTS/FIRST LINE.
       CALL URDCOM(In, IOUT, line)
