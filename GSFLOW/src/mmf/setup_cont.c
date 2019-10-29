@@ -395,6 +395,9 @@ void setup_cont (void) {
         lval = (long*)umalloc(sizeof(long));
 		lval[0] = 1;
 		decl_control_int_array("nhruOut_format", 1, lval);
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("nhruOutNcol", 1, lval);
 
         lval = (long*)umalloc(sizeof(long));
 		lval[0] = 1;
