@@ -62,6 +62,7 @@
       REAL, SAVE, ALLOCATABLE :: Cap_waterin(:), Soil_lower(:), Soil_zone_max(:)
       REAL, SAVE, ALLOCATABLE :: Potet_lower(:), Potet_rechr(:), Soil_lower_ratio(:)
       REAL, SAVE, ALLOCATABLE :: Unused_potet(:)
+      INTEGER, SAVE, ALLOCATABLE :: Soil_saturated(:)
 !      REAL, SAVE, ALLOCATABLE :: Cascade_interflow(:), Cascade_dunnianflow(:), Interflow_max(:)
 !      REAL, SAVE, ALLOCATABLE :: Cpr_stor_frac(:), Pfr_stor_frac(:), Gvr_stor_frac(:), Soil_moist_frac(:)
 !      REAL, SAVE, ALLOCATABLE :: Soil_rechr_ratio(:), Snowevap_aet_frac(:), Cap_upflow_max(:)
@@ -125,7 +126,7 @@
 !***********************************************************************
       szdecl = 0
 
-      Version_soilzone = 'soilzone.f90 2019-10-03 15:03:00Z'
+      Version_soilzone = 'soilzone.f90 2019-10-30 14:45:00Z'
       CALL print_module(Version_soilzone, 'Soil Zone Computations      ', 90 )
       MODNAME = 'soilzone'
 
@@ -440,6 +441,11 @@
       IF ( declvar(MODNAME, 'unused_potet', 'nhru', Nhru, 'real', &
      &     'Unsatisfied potential evapotranspiration', &
      &     'inches', Unused_potet)/=0 ) CALL read_error(3, 'unused_potet')
+
+      ALLOCATE ( Soil_saturated(Nhru) )
+      IF ( declvar(MODNAME, 'soil_saturated', 'nhru', Nhru, 'integer', &
+     &     'Flag set if infiltration saturates capillary reservoir (0=no, 1=yes)', &
+     &     'none', Soil_saturated)/=0 ) CALL read_error(3, 'soil_saturated')
 
 !      ALLOCATE ( Snowevap_aet_frac(Nhru) )
 !      IF ( declvar(MODNAME, 'snowevap_aet_frac', 'nhru', Nhru, 'double', &
@@ -773,6 +779,7 @@
       Potet_lower = 0.0
       Potet_rechr = 0.0
       Unused_potet = 0.0 ! dimension nhru
+      Soil_saturated = 0
 !      Interflow_max = 0.0
 !      Snowevap_aet_frac = 0.0
 
@@ -1045,11 +1052,12 @@
         gvr_maxin = 0.0
         Cap_waterin(i) = capwater_maxin
 
+        Soil_saturated(i) = 0
         ! call even if capwater_maxin = 0, just in case soil_moist now > Soil_moist_max
         IF ( capwater_maxin+Soil_moist(i)>0.0 ) THEN
           CALL compute_soilmoist(Cap_waterin(i), Soil_moist_max(i), &
      &         Soil_rechr_max(i), Soil2gw_max(i), gvr_maxin, &
-     &         Soil_moist(i), Soil_rechr(i), Soil_to_gw(i), Soil2gw(i), perv_frac)
+     &         Soil_moist(i), Soil_rechr(i), Soil_to_gw(i), Soil2gw(i), perv_frac, Soil_saturated(i))
           Cap_waterin(i) = Cap_waterin(i)*perv_frac
           Basin_capwaterin = Basin_capwaterin + DBLE( Cap_waterin(i)*harea )
           Basin_soil_to_gw = Basin_soil_to_gw + DBLE( Soil_to_gw(i)*harea )
@@ -1334,11 +1342,12 @@
 !***********************************************************************
       SUBROUTINE compute_soilmoist(Infil, Soil_moist_max, &
      &           Soil_rechr_max, Soil2gw_max, Soil_to_ssr, Soil_moist, &
-     &           Soil_rechr, Soil_to_gw, Soil2gw, Perv_frac)
+     &           Soil_rechr, Soil_to_gw, Soil2gw, Perv_frac, Soil_saturated)
       IMPLICIT NONE
       INTRINSIC MIN
 ! Arguments
       INTEGER, INTENT(IN) :: Soil2gw
+      INTEGER, INTENT(INOUT) :: Soil_saturated
       REAL, INTENT(IN) :: Perv_frac, Soil_moist_max, Soil_rechr_max, Soil2gw_max
       REAL, INTENT(INOUT) :: Infil, Soil_moist, Soil_rechr, Soil_to_gw, Soil_to_ssr
 ! Local Variables
@@ -1370,6 +1379,7 @@
 
         Soil_to_ssr = excs
         IF ( Soil_to_ssr<0.0 ) Soil_to_ssr = 0.0
+        Soil_saturated = 1
       ENDIF
 
       END SUBROUTINE compute_soilmoist
@@ -1396,7 +1406,7 @@
 !******Determine if evaporation(Et_type = 2) or transpiration plus
 !******evaporation(Et_type = 3) are active.  if not, Et_type = 1
 
-       pet = Potet
+      pet = Potet
       IF ( Avail_potet<NEARZERO ) THEN
         Et_type = 1
         pet = 0.0

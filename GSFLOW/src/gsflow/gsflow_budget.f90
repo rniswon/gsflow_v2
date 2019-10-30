@@ -58,7 +58,7 @@
 !***********************************************************************
       gsfbuddecl = 0
 
-      Version_gsflow_budget = 'gsflow_budget.f90 2018-03-02 10:40:00Z'
+      Version_gsflow_budget = 'gsflow_budget.f90 2019-10-30 15:07:00Z'
       CALL print_module(Version_gsflow_budget, 'GSFLOW Output Budget Summary', 90)
       MODNAME = 'gsflow_budget'
 
@@ -604,15 +604,15 @@
       USE GSFBUDGET, ONLY: Sat_S
       USE PRMS_BASIN, ONLY: NEARZERO
       USE GLOBAL, ONLY: NCOL, NROW, NLAY, IBOUND, BOTM, HNEW, LBOTM, HOLD
-      USE GWFBASMODULE, ONLY: DELT, HDRY
-      USE GWFUPWMODULE, ONLY: LAYTYPUPW, SC1, SC2UPW, So, Sn
+      USE GWFBASMODULE, ONLY: DELT
+      USE GWFUPWMODULE, ONLY: SC1, SC2UPW, Sn
       USE GWFNWTMODULE,ONLY: Icell
       IMPLICIT NONE
 ! Functions
       INTRINSIC ABS
 ! Local Variables
-      INTEGER :: i, j, k, kt, lc, IJ
-      DOUBLE PRECISION :: tled, top, bot, rho1, storage, head, rho2
+      INTEGER :: i, j, k, kt, IJ
+      DOUBLE PRECISION :: tled, rho1, rho2
       DOUBLE PRECISION :: ZERO, ONE, HSING, HLD, tp, bt, thick
       DOUBLE PRECISION :: strg
 !***********************************************************************

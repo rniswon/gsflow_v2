@@ -65,7 +65,7 @@
 !***********************************************************************
       prms2mfdecl = 0
 
-      Version_gsflow_prms2mf = 'gsflow_prms2mf.f90 2017-11-15 14:24:00Z'
+      Version_gsflow_prms2mf = 'gsflow_prms2mf.f90 2019-10-30 14:24:00Z'
       CALL print_module(Version_gsflow_prms2mf, 'GSFLOW PRMS to MODFLOW      ', 90)
       MODNAME = 'gsflow_prms2mf'
 
@@ -198,8 +198,10 @@
         ierr = 1
       ENDIF
 
-      WRITE (Logunt, '(/, A,I4,/)') 'mxsziter =', Mxsziter
-      WRITE (Logunt, '(A,D15.7)') 'Tolerance check for gvr_hru_pct:', PCT_CHK
+      IF ( Print_debug>-2 ) THEN
+        WRITE (Logunt, '(/, A,I4,/)') 'mxsziter =', Mxsziter
+        WRITE (Logunt, '(A,D15.7)') 'Tolerance check for gvr_hru_pct:', PCT_CHK
+      ENDIF
 
       IF ( Nhru/=Nhrucell ) THEN
         IF ( getparam('prms2mf', 'gvr_hru_pct', Nhrucell, 'real', Gvr_hru_pct)/=0 ) CALL read_error(2, 'gvr_hru_pct')
@@ -269,7 +271,7 @@
 !      DO i = 1, Nsegment
 !        IF ( nseg_rch(i)/=Numreach_segment(i) ) PRINT *, 'Problem with number of reaches in a segment', i,
 !    &        nseg_rch(i), Numreach_segment(i)
-!        IF ( ABS(seg_area(i)-1.0D0)>PCT_CHK ) WRITE (Logunt, *) &
+!        IF ( ABS(seg_area(i)-1.0D0)>PCT_CHK .AND. Print_debug>-2 ) WRITE (Logunt, *) &
 !    &        'Possible issue with segment area percentages', i, seg_area(i)
 !       ENDDO
 
@@ -345,12 +347,14 @@
           IF ( pct<0.99D0 ) THEN
             ierr = 1
             PRINT *, 'ERROR, portion of HRU not included in mapping to cells', i, pct
-            WRITE ( Logunt, * ) 'ERROR, Portion of HRU not included in mapping to cells', i, pct
+            IF ( Print_debug>-2 ) WRITE ( Logunt, * ) &
+     &           'ERROR, Portion of HRU not included in mapping to cells', i, pct
           ELSEIF ( pct>1.00001D0 ) THEN
             IF ( pct>1.0001D0 ) THEN
               ierr = 1
               PRINT *, 'ERROR, extra portion of HRU included in mapping to cells', i, pct
-              WRITE ( Logunt, * ) 'ERROR, extra portion of HRU included in mapping to cells', i, pct
+              IF ( Print_debug>-2 ) WRITE ( Logunt, * ) &
+     &             'ERROR, extra portion of HRU included in mapping to cells', i, pct
             ENDIF
           ELSEIF ( pct<0.0D0 ) THEN
             PRINT *, 'ERROR, HRU to cell mapping is < 0.0', i, pct
@@ -374,7 +378,7 @@
       IF ( ierr==1 ) STOP
 
       Totalarea = Totalarea*Basin_area_inv
-      WRITE ( Logunt, 9003 ) (Totalarea-1.0D0)*100.0D0
+      IF ( Print_debug>-2 ) WRITE ( Logunt, 9003 ) (Totalarea-1.0D0)*100.0D0
       IF ( Print_debug>-1 ) PRINT 9003, (Totalarea-1.0D0)*100.0D0
 
       IF ( Nhru/=Nhrucell ) DEALLOCATE ( hru_pct, newpct, temp_pct )
