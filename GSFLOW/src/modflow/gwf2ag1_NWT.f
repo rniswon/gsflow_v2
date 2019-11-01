@@ -2715,6 +2715,8 @@
       USE PRMS_BASIN, ONLY: HRU_PERV, HRU_AREA
       USE PRMS_FLOWVARS, ONLY: SOIL_MOIST, HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
+      USE PRMS_SOILZONE, ONLY: Soil_saturated
+
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
       IMPLICIT NONE
 ! --------------------------------------
@@ -2748,6 +2750,7 @@
          areafactor = HRU_AREA(ihru) - area
          pet = potet(ihru)*area*prms_inch2mf_q
          aet = hru_actet(ihru)*area*prms_inch2mf_q
+         if ( Soil_saturated(ihru) == 1 ) aet = pet
          pettotal = pettotal + pet
          aettotal = aettotal + aet
       end do
@@ -2799,12 +2802,12 @@
          factor = etdif
       else
          if (abs(det) > dzero) factor = dq*etdif/det
-         if (det <= zerod30) factor = dzero
+         if (det <= 1.0e-4) factor = dzero
       end if
-      open(222,file='debug.out')
-      if(l==4)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
-     +aetold,factor
-333   format(i5,7e20.10)
+!      open(222,file='debug.out')
+!      if(l==4)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
+!     +aetold,factor
+!333   format(i5,7e20.10)
       set_factor = factor
       end function set_factor
 !
