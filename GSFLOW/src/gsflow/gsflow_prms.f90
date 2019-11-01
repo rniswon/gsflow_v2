@@ -103,7 +103,7 @@
 
         Process_flag = 1
 
-        PRMS_versn = 'gsflow_prms.f90 2019-10-30 12:48:00Z'
+        PRMS_versn = 'gsflow_prms.f90 2019-10-31 14:00:00Z'
 
         IF ( PRMS_flag==1 ) THEN ! PRMS is active, GSFLOW, PRMS
           IF ( check_dims()/=0 ) STOP
@@ -608,7 +608,7 @@
       ENDIF
     3 FORMAT (//, 26X, 'U.S. Geological Survey', /, 8X, &
      &        'Coupled Groundwater and Surface-water FLOW model (GSFLOW)', /, &
-     &        25X, 'Version 2.0.0 05/30/2019', //, &
+     &        25X, 'Version 2.1.0 10/31/2019', //, &
      &        '    An integration of the Precipitation-Runoff Modeling System (PRMS)', /, &
      &        '    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)', /)
 

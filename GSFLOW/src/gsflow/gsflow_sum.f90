@@ -108,7 +108,7 @@
 !***********************************************************************
       gsfsumdecl = 0
 
-      Version_gsflow_sum = 'gsflow_sum.f90 2019-10-30 14:21:00Z'
+      Version_gsflow_sum = 'gsflow_sum.f90 2019-10-31 13:26:00Z'
       CALL print_module(Version_gsflow_sum, 'GSFLOW Output CSV Summary   ', 90)
       MODNAME = 'gsflow_sum'
 
@@ -532,7 +532,6 @@
       SatDisch2Stream_Q = 0.0D0
       UnsatStream_S = 0.0D0
       SatDisch2Lake_Q = 0.0D0
-      Lake2Sat_Q = 0.0D0
       Basinslowflow = 0.0D0
       Infil2Soil_Q = 0.0D0
       Basinrain = 0.0D0
@@ -1253,9 +1252,9 @@
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Rate_soilstor, Rate_uzstor, Basingwstor, &
-     &          Rate_satstor, Basingvr2sm, Rate_pweqv, Lake_dS, &
+     &          Rate_satstor, Basingvr2sm, Rate_pweqv, Lake_dS, Rate_lakin, Rate_lakot, Rate_lakestor, &
      &          SnowPweqv_S, Ave_SoilDrainage2Unsat_Q, Infil2Soil_Q, Basinsoilstor, Cap_S, &
-     &          CapDrainage2Sat_Q, StreamOut_Q, SatDisch2Stream_Q
+     &          CapDrainage2Sat_Q, StreamOut_Q, SatDisch2Stream_Q, Rate_Dprst_S
         WRITE ( Restart_outunit ) Precip_Q, CapET_Q, ImpervEvap_Q, PotGravDrn2Unsat_Q, Sat2Grav_Q, Lake2Sat_Q, &
      &          Canopy_S, Imperv_S, Interflow2Stream_Q, Sroff2Stream_Q, Obs_strmflow, UnsatDrainageExcess_Q, UnsatET_Q, &
      &          SatET_Q, Uzf_et, RechargeUnsat2Sat_Q, Basinseepout, SoilDrainage2Unsat_Q, Unsat_dS, Basinrain, &
@@ -1271,9 +1270,9 @@
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Rate_soilstor, Rate_uzstor, Basingwstor, &
-     &         Rate_satstor, Basingvr2sm, Rate_pweqv, Lake_dS, &
+     &         Rate_satstor, Basingvr2sm, Rate_pweqv, Lake_dS, Rate_lakin, Rate_lakot, Rate_lakestor, &
      &         SnowPweqv_S, Ave_SoilDrainage2Unsat_Q, Infil2Soil_Q, Basinsoilstor, Cap_S, &
-     &         CapDrainage2Sat_Q, StreamOut_Q, SatDisch2Stream_Q
+     &         CapDrainage2Sat_Q, StreamOut_Q, SatDisch2Stream_Q, Rate_Dprst_S
         READ ( Restart_inunit ) Precip_Q, CapET_Q, ImpervEvap_Q, PotGravDrn2Unsat_Q, Sat2Grav_Q, Lake2Sat_Q, &
      &         Canopy_S, Imperv_S, Interflow2Stream_Q, Sroff2Stream_Q, Obs_strmflow, UnsatDrainageExcess_Q, UnsatET_Q, &
      &         SatET_Q, Uzf_et, RechargeUnsat2Sat_Q, Basinseepout, SoilDrainage2Unsat_Q, Unsat_dS, Basinrain, &

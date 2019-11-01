@@ -88,7 +88,7 @@
 !***********************************************************************
       INTEGER FUNCTION snodecl()
       USE PRMS_SNOW
-      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file, Model, DOCUMENTATION
+      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file, Model
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam, declvar
@@ -436,7 +436,7 @@
      &     ' type for each HRU (0=frontal storms; 1=convective storms)', &
      &     'none')/=0 ) CALL read_error(1, 'tstorm_mo')
 
-      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==3 .OR. Model==DOCUMENTATION ) THEN
+      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==3 ) THEN
         ALLOCATE ( Snowpack_init(Nhru) )
         IF ( declparam(MODNAME, 'snowpack_init', 'nhru', 'real', &
      &       '0.0', '0.0', '5000.0', &

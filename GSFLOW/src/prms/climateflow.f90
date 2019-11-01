@@ -133,7 +133,7 @@
 !***********************************************************************
       climateflow_decl = 0
 
-      Version_climateflow = 'climateflow.f90 2019-10-23 15:56:00Z'
+      Version_climateflow = 'climateflow.f90 2019-10-31 13:36:00Z'
       CALL print_module(Version_climateflow, 'Common States and Fluxes    ', 90)
       MODNAME = 'climateflow'
 
@@ -1115,7 +1115,6 @@
       Hru_rain = 0.0
       Hru_snow = 0.0
       Swrad = 0.0
-      Orad = 0.0
       Potet = 0.0
       Slow_flow = 0.0
       Soil_to_gw = 0.0
@@ -1183,6 +1182,7 @@
       Basin_sroff_cfs = 0.0D0
       Basin_gwflow_cfs = 0.0D0
       Flow_out = 0.0D0
+      Orad = 0.0
 ! initialize arrays (dimensioned Nsegment)
       IF ( Stream_order_flag==1 ) THEN
         Seg_inflow = 0.0D0
@@ -1192,6 +1192,7 @@
 ! initialize storage variables
       Imperv_stor = 0.0
       Pkwater_equiv = 0.0D0
+      Slow_stor = 0.0
       IF ( GSFLOW_flag==0 ) Gwres_stor = 0.0D0 ! not needed for GSFLOW
       IF ( Dprst_flag==1 ) THEN
         Dprst_vol_open = 0.0D0
@@ -1356,7 +1357,7 @@
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_ppt, Basin_rain, Basin_snow, Basin_obs_ppt, Basin_temp, Basin_orad, &
      &          Basin_tmax, Basin_tmin, Solrad_tmax, Solrad_tmin, Basin_transp_on, Basin_potet, Basin_horad, &
-     &          Basin_swrad, Orad, Flow_out
+     &          Basin_swrad, Orad, Flow_out, Basin_potsw, Basin_humidity
         WRITE ( Restart_outunit ) Basin_cfs, Basin_cms, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_stflow_in, &
      &          Basin_gwflow_cfs, Basin_stflow_out, Basin_ssflow, Basin_soil_to_gw, Basin_actet, &
      &          Basin_swale_et, Basin_perv_et, Basin_soil_moist, Basin_ssstor, Basin_lakeevap, Basin_lake_stor
@@ -1382,7 +1383,7 @@
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Basin_ppt, Basin_rain, Basin_snow, Basin_obs_ppt, Basin_temp, Basin_orad, &
      &         Basin_tmax, Basin_tmin, Solrad_tmax, Solrad_tmin, Basin_transp_on, Basin_potet, Basin_horad, &
-     &         Basin_swrad, Orad, Flow_out
+     &         Basin_swrad, Orad, Flow_out, Basin_potsw, Basin_humidity
         READ ( Restart_inunit ) Basin_cfs, Basin_cms, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_stflow_in, &
      &         Basin_gwflow_cfs, Basin_stflow_out, Basin_ssflow, Basin_soil_to_gw, Basin_actet, &
      &         Basin_swale_et, Basin_perv_et, Basin_soil_moist, Basin_ssstor, Basin_lakeevap, Basin_lake_stor
