@@ -339,6 +339,7 @@ C ------INITIALIZE ARRAYS
       DO I=1,NROW
       DO J=1,NCOL
       GL(J,I,N)=0.0
+      PCS(J,I,N)=0.0
       EST(J,I,N)=0.0
       ESTOLD(J,I,N)=0.0
       ZC(J,I,N)=0.0

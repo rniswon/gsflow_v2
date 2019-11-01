@@ -2451,7 +2451,7 @@
         !
         do k = 1, DVRCH(iseg)
            hru_id = IRRROW_SW(k, iseg)
-           area = hru_perv(hru_id)
+           area = HRU_PERV(hru_id)
            pet = potet(hru_id)*area*prms_inch2mf_q
            aet = hru_actet(hru_id)*area*prms_inch2mf_q
            pettotal = pettotal + pet
@@ -2712,7 +2712,7 @@
 !     SPECIFICATIONS:
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_BASIN, ONLY: HRU_PERV, HRU_AREA
       USE PRMS_FLOWVARS, ONLY: SOIL_MOIST, HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
@@ -2724,7 +2724,7 @@
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, prms_inch2mf_q,
      +                    dedt, aetold, aetnew, det, dq, detdq, 
-     +                    etdif, ettest,
+     +                    etdif, ettest, areafactor,
      +                    supold, sup, aettotal, pettotal
       double precision :: zerod3, zerod30, done, dzero, dum, 
      +                    dhundred, doneneg
@@ -2745,6 +2745,7 @@
       DO I = 1, NUMCELLS(L)
          ihru = IRRROW_GW(I, L)
          area = HRU_PERV(ihru)
+         areafactor = HRU_AREA(ihru) - area
          pet = potet(ihru)*area*prms_inch2mf_q
          aet = hru_actet(ihru)*area*prms_inch2mf_q
          pettotal = pettotal + pet
@@ -2800,9 +2801,10 @@
          if (abs(det) > dzero) factor = dq*etdif/det
          if (det <= zerod30) factor = dzero
       end if
-!      open(222,file='debug.out')
-!      if(l==5)write(222,333)kiter,etdif,dq,det,aettotal,aetold,factor
-!333   format(i5,6e20.10)
+      open(222,file='debug.out')
+      if(l==4)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
+     +aetold,factor
+333   format(i5,7e20.10)
       set_factor = factor
       end function set_factor
 !
@@ -2874,7 +2876,7 @@
                      aet = gwet(ic, ir) + uzet  !vol rate
                   ELSE
                      hru_id = IRRROW_SW(k, iseg)
-                     area = hru_perv(hru_id)
+                     area = HRU_PERV(hru_id)
                   prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
                      pet = potet(hru_id)*area*prms_inch2mf_q
                      aet = hru_actet(hru_id)*area*prms_inch2mf_q   !need to add GW ET here
@@ -2932,7 +2934,7 @@
                            aet = gwet(ic, ir) + uzet
                         ELSE
                            hru_id = IRRROW_GW(J, L)
-                           area = hru_perv(hru_id)
+                           area = HRU_PERV(hru_id)
                   prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
                            pet = potet(hru_id)*area*prms_inch2mf_q
                            aet = hru_actet(hru_id)*area*prms_inch2mf_q   !need to add GW ET here****
@@ -2975,7 +2977,7 @@
                      aet = gwet(ic, ir) + uzet
                   ELSE
                      hru_id = IRRROW_GW(J, L)
-                     area = hru_perv(hru_id)
+                     area = HRU_PERV(hru_id)
                      pet = potet(hru_id)
                      aet = hru_actet(hru_id)
                   END IF
