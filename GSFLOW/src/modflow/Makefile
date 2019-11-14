@@ -37,6 +37,7 @@ LIBOBJS = \
         gwf2sfr7_NWT.o \
         gwf2uzf1_NWT.o \
         gwf2wel7_NWT.o \
+		gwf2ag1_NWT.o \
         gwf2ghb7_NWT.o \
         gwf2fhb7.o \
         gwf2mnw17_NWT.o \
@@ -124,7 +125,10 @@ gwf2upw7.o: gwf2upw1.f gwf2bas7_NWT.o NWT1_module.o
 
 gwf2wel7.o: gwf2wel7.f gwf2bas7_NWT.o NWT1_module.o gwf2upw1.o
 	$(FC) $(FFLAGS) -c gwf2wel7.f
-
+	
+gwf2ag1_NWT.o: gwf2ag1_NWT.f gwf2bas7_NWT.o NWT1_module.o gwf2upw1.o
+	$(FC) $(FFLAGS) -c gwf2ag1_NWT.f
+	
 gwf2sfr7_NWT.o: gwf2sfr7_NWT.f gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwf2lpf7.o gwf2bcf7.o gwf2huf7.o gwf2upw1.o gwfuzfmodule_NWT.o NWT1_module.o gwflakmodule_NWT.o
 	$(FC) $(FFLAGS) -c gwf2sfr7_NWT.f
 
