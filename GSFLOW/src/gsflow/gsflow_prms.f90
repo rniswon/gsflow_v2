@@ -8,7 +8,7 @@
       CHARACTER(LEN=68), PARAMETER :: &
      &  EQULS = '===================================================================='
       CHARACTER(LEN=11), PARAMETER :: MODNAME = 'gsflow_prms'
-      CHARACTER(LEN=27), PARAMETER :: PRMS_VERSION = 'Version 5.1.0 RC 10/30/2019'
+      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.1.0 10/30/2019'
       CHARACTER(LEN=8), SAVE :: Process
       !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
       INTEGER, PARAMETER :: GSFLOW = 0, PRMS = 1, MODFLOW = 2
@@ -34,6 +34,7 @@
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
       INTEGER, SAVE :: Frozen_flag, Diversion2soil_flag
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
+!   Declared Variables
       INTEGER, SAVE :: Kkiter
       REAL, SAVE, ALLOCATABLE :: Hru_ag_irr(:)    !Ag irrigation added to HRU
 !   Declared Parameters
@@ -103,7 +104,7 @@
 
         Process_flag = 1
 
-        PRMS_versn = 'gsflow_prms.f90 2019-10-31 14:00:00Z'
+        PRMS_versn = 'gsflow_prms.f90 2019-11-13 12:06:00Z'
 
         IF ( PRMS_flag==1 ) THEN ! PRMS is active, GSFLOW, PRMS
           IF ( check_dims()/=0 ) STOP
@@ -227,6 +228,8 @@
           IF ( Diversion2soil_flag==1 ) THEN
             ! Allocate variable for adding irrigation water to HRU from AG Package
             ALLOCATE ( Hru_ag_irr(Nhru) )
+            IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real', &
+     &           'Irrigation added to soilzone from MODFLOW wells', 'inches', Hru_ag_irr)/=0 ) CALL read_error(3, 'hru_ag_irr')
             Hru_ag_irr = 0.0
           ENDIF
         ENDIF
@@ -641,7 +644,7 @@
       ELSEIF ( Model_mode(:7)=='CONVERT' ) THEN ! can be CONVERT4 or CONVERT5 or CONVERT (=CONVERT5)
         Model = 25
       ELSEIF ( Model_mode(:13)=='DOCUMENTATION' ) THEN
-        Model = 99
+        Model = DOCUMENTATION
       ELSE
         PRINT '(/,2A)', 'ERROR, invalid model_mode value: ', Model_mode
         STOP
@@ -686,8 +689,8 @@
         IF ( test/=0 ) CALL module_error(MODNAME, 'initialize', test)
         PRINT *, ' '
         IF ( Print_debug>-2 ) WRITE (Logunt, '(1X)')
-        If ( ISSFLG(Kper_mfo) == 1 .and. nper == 1) then
-        else
+        If ( ISSFLG(Kper_mfo) == 1 .and. nper == 1) THEN
+        ELSE
           Process_flag = 0
           DO WHILE ( Kper_mfo<=Nper )
             test = gsflow_modflow()
@@ -695,10 +698,10 @@
             IF ( mf_timestep==NSTP(Kper_mfo) ) THEN
                 Kper_mfo = Kper_mfo + 1
                 mf_timestep = 0
-            END IF
+            ENDIF
             mf_timestep = mf_timestep + 1
           ENDDO
-        end if
+        ENDIF
         Process_flag = 3
         test = gsflow_modflow()
         IF ( test/=0 ) CALL module_error(MODNAME, 'clean', test)
