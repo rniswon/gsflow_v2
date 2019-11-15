@@ -83,7 +83,7 @@
 !***********************************************************************
       INTEGER FUNCTION srunoffdecl()
       USE PRMS_SRUNOFF
-      USE PRMS_MODULE, ONLY: Model, Dprst_flag, Nhru, Nsegment, Print_debug, &
+      USE PRMS_MODULE, ONLY: Model, Dprst_flag, Nhru, Nsegment, Print_debug, DOCUMENTATION, &
      &    Cascade_flag, Sroff_flag, Nlake, Init_vars_from_file, Call_cascade, PRMS4_flag
       IMPLICIT NONE
 ! Functions
@@ -94,7 +94,7 @@
 !***********************************************************************
       srunoffdecl = 0
 
-      Version_srunoff = 'srunoff.f90 2019-11-14 11:22:00Z'
+      Version_srunoff = 'srunoff.f90 2019-11-15 12:11:00Z'
       IF ( Sroff_flag==1 ) THEN
         MODNAME = 'srunoff_smidx'
       ELSE
@@ -166,7 +166,7 @@
      &     'inches', Hru_sroffi)/=0 ) CALL read_error(3, 'hru_sroffi')
 
 ! Depression storage variables
-      IF ( Dprst_flag==1 .OR. Model==99 ) THEN
+      IF ( Dprst_flag==1 .OR. Model==DOCUMENTATION ) THEN
         IF ( declvar(MODNAME, 'basin_dprst_sroff', 'one', 1, 'double', &
      &       'Basin area-weighted average surface runoff from open surface-depression storage', &
      &       'inches', Basin_dprst_sroff)/=0 ) CALL read_error(3, 'basin_dprst_sroff')
@@ -246,7 +246,7 @@
      &     'inches', Hortonian_flow)/=0 ) CALL read_error(3, 'hortonian_flow')
 
 ! cascading variables and parameters
-      IF ( Cascade_flag>0 .OR. Model==99 ) THEN
+      IF ( Cascade_flag>0 .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Upslope_hortonian(Nhru) )
         IF ( declvar(MODNAME, 'upslope_hortonian', 'nhru', Nhru, 'double', &
      &       'Hortonian surface runoff received from upslope HRUs', &
@@ -277,7 +277,7 @@
         ENDIF
       ENDIF
 
-      IF ( Call_cascade==1 .OR. Model==99 ) THEN
+      IF ( Call_cascade==1 .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Strm_seg_in(Nsegment) )
         IF ( declvar(MODNAME, 'strm_seg_in', 'nsegment', Nsegment, 'double', &
      &       'Flow in stream segments as a result of cascading flow in each stream segment', &
@@ -285,7 +285,7 @@
       ENDIF
 
 ! Declare parameters
-      IF ( Sroff_flag==1 .OR. Model==99 ) THEN
+      IF ( Sroff_flag==1 .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Smidx_coef(Nhru) )
         IF ( declparam(MODNAME, 'smidx_coef', 'nhru', 'real', &
      &       '0.005', '0.0', '1.0', &
@@ -300,7 +300,7 @@
      &       '1.0/inch')/=0 ) CALL read_error(1, 'smidx_exp')
       ENDIF
 
-      IF ( Sroff_flag==2 .OR. Model==99 ) THEN
+      IF ( Sroff_flag==2 .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Carea_min(Nhru), Carea_dif(Nhru) )
         IF ( declparam(MODNAME, 'carea_min', 'nhru', 'real', &
      &       '0.2', '0.0', '1.0', &
@@ -317,7 +317,7 @@
      &     'decimal fraction')/=0 ) CALL read_error(1, 'carea_max')
 
 ! Depression Storage parameters:
-      IF ( Dprst_flag==1 .OR. Model==99 ) THEN
+      IF ( Dprst_flag==1 .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Dprst_depth_avg(Nhru) )
         IF ( declparam(MODNAME, 'dprst_depth_avg', 'nhru', 'real', &
      &       '132.0', '0.0', '500.0', &
@@ -358,7 +358,7 @@
      &       'decimal fraction')/=0 ) CALL read_error(1, 'op_flow_thres')
 
         ALLOCATE ( Sro_to_dprst_perv(Nhru) )
-        IF ( PRMS4_flag==1 ) THEN
+        IF ( PRMS4_flag==1 .OR. Model==DOCUMENTATION ) THEN
           IF ( declparam(MODNAME, 'sro_to_dprst', 'nhru', 'real', &
      &         '0.2', '0.0', '1.0', &
      &         'Fraction of pervious surface runoff that flows into surface-depression storage', &
@@ -366,7 +366,8 @@
      &         ' flows into surface-depression storage; the remainder'// &
      &         ' flows to a stream network for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'sro_to_dprst')
-        ELSE
+        ENDIF
+        IF ( PRMS4_flag==0 .OR. Model==DOCUMENTATION ) THEN
           IF ( declparam(MODNAME, 'sro_to_dprst_perv', 'nhru', 'real', &
      &         '0.2', '0.0', '1.0', &
      &         'Fraction of pervious surface runoff that flows into surface-depression storage', &
@@ -821,7 +822,7 @@
       IF ( Cascade_flag>0 ) THEN
         avail_water = SNGL( Upslope_hortonian(Ihru) )
         IF ( avail_water>0.0 ) THEN
-          Infil = avail_water
+          Infil = Infil + avail_water
           IF ( Hru_type==1 ) CALL perv_comp(avail_water, avail_water, Infil, Srp)
         ENDIF
       ELSE
