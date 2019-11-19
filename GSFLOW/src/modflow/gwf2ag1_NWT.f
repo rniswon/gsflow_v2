@@ -691,6 +691,11 @@
      +   'IS GREATER THAN THE MAXIMUM NUMBER OF AG WELLS: ', MXWELL
          CALL USTOP(' NUMSUP IS GREATER THAN MAX AG WELLS')
       END IF
+      IF (ETDEMANDFLAG > 0 .AND. TRIGGERFLAG > 0 ) THEN
+          WRITE (IOUT, *) 'ETDEMAND AND ETTRIGGER: ',
+     +   'ARE BOTH ACTIVE. ONLY ONE CAN BE USED AT A TIME '
+         CALL USTOP('BOTH ETDEMAND AND ETTRIGGER ARE ACTIVE')
+      END IF
 29    FORMAT(1X, 'NEGATIVE PUMPING RATES WILL BE REDUCED IF HEAD '/
      +  ' FALLS WITHIN THE INTERVAL PHIRAMP TIMES THE CELL '/
      +  ' THICKNESS. THE VALUE SPECIFIED FOR PHIRAMP IS ', E12.5, /
@@ -2782,11 +2787,12 @@
       integer, intent(in) :: kiter, l
       !dummy
       DOUBLE PRECISION :: factor, zerod5, dzero, etdif, det, dq,
-     +                    zerod30
+     +                    zerod30, zerod2
 ! -----------------------------------------
 !
       dzero = 0.0d0
       zerod5 = 1.0d-5
+      zerod2 = 1.0d-2
       set_factor = dzero
       zerod30 = 1.0d-30
       factor = dzero
@@ -2794,20 +2800,17 @@
       det = (aettotal - aetold)
       factor = etdif
       dq = sup - supold
-      if (etdif < zerod5*pettotal) then
-         set_factor = dzero
-         return
-      end if
       if (kiter == 1) then
          factor = etdif
-      else
-         if (abs(det) > dzero) factor = dq*etdif/det
-         if (det <= 1.0e-4) factor = dzero
+      else if (det < zerod5*pettotal) then
+         factor = dzero
+      else if (abs(det) > dzero) then
+         factor = dq*etdif/det
       end if
-!      open(222,file='debug.out')
-!      if(l==4)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
-!     +aetold,factor
-!333   format(i5,7e20.10)
+      open(222,file='debug.out')
+      if(l==46)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
+     +aetold,factor
+333   format(i5,7e20.10)
       set_factor = factor
       end function set_factor
 !
@@ -2981,8 +2984,8 @@
                   ELSE
                      hru_id = IRRROW_GW(J, L)
                      area = HRU_PERV(hru_id)
-                     pet = potet(hru_id)
-                     aet = hru_actet(hru_id)
+                     pet = potet(hru_id)*area
+                     aet = hru_actet(hru_id)*area
                   END IF
                   pettot = pettot + pet
                   aettot = aettot + aet
@@ -2992,9 +2995,9 @@
                   pettot = pettot - IRRFACT(J, L)*QQ*IRRFIELDFACT(J, L)
                END IF
             end do
-            QQ = aettot
-            Q = pettot
          END DO
+         QQ = aettot
+         Q = pettot
          QQQ = 0.0
          J = 0
          CALL timeseries(unit, Kkper, Kkstp, TOTIM, J,
