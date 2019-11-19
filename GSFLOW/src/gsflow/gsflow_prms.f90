@@ -32,7 +32,7 @@
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Nwateruse, Nexternal, Nconsumed, Npoigages, Prms_warmup
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
-      INTEGER, SAVE :: Frozen_flag, Diversion2soil_flag
+      INTEGER, SAVE :: Frozen_flag, Diversion2soil_flag, Snarea_curve_flag
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
@@ -830,6 +830,8 @@
       IF ( control_integer(Stream_temp_flag, 'stream_temp_flag')/=0 ) Stream_temp_flag = 0
       ! 0 = CBH File; 1 = specified constant; 2 = Stations
       IF ( control_integer(Strmtemp_humidity_flag, 'strmtemp_humidity_flag')/=0 ) Strmtemp_humidity_flag = 0
+
+      IF ( control_integer(Snarea_curve_flag, 'snarea_curve_flag')/=0 ) Snarea_curve_flag = 0
 
       Humidity_cbh_flag = 0
       Windspeed_cbh_flag = 0
