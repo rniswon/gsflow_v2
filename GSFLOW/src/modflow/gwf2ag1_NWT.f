@@ -1843,6 +1843,11 @@
                   SUBVOL = -(DONE - IRRFACT(I, L))*Qp*IRRFIELDFACT(I, L)
                   ! Keep irrigation for PRMS as volumetric rate
                   WELLIRRPRMS(I, L) = WELLIRRPRMS(I, L) + SUBVOL
+                  if ( i==1 .and. l==122 ) then
+                    print *, 'SUBVOL',SUBVOL, DONE, IRRFACT(I, L), Qp
+                    print *, IRRFIELDFACT(I, L), WELLIRRPRMS(I, L)
+                    print *, Qonly(L), DONENEG, Q
+                    endif
                END DO
             END IF
          END IF
