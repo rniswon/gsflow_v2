@@ -88,7 +88,7 @@
 !***********************************************************************
       INTEGER FUNCTION snodecl()
       USE PRMS_SNOW
-      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file, Model
+      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam, declvar

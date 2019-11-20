@@ -99,7 +99,7 @@
 !***********************************************************************
       stream_temp_decl = 0
 
-      Version_stream_temp = 'stream_temp.f90 2018-04-18 16:18:00Z'
+      Version_stream_temp = 'stream_temp.f90 2019-11-18 12:36:00Z'
       CALL print_module(Version_stream_temp, 'Stream Temperature          ', 90)
       MODNAME = 'stream_temp'
 
@@ -491,6 +491,10 @@
       seg_tave_ss = 0.0
       seg_tave_sroff = 0.0
 
+      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==8 ) THEN
+        IF ( getparam(MODNAME, 'stream_tave_init', Nsegment, 'real', Stream_tave_init)/=0 ) CALL read_error(2, 'stream_tave_init')
+        Seg_tave_water = Stream_tave_init
+      ENDIF
       IF ( Init_vars_from_file == 0 ) THEN
          gw_silo =  0.0
          ss_silo =  0.0
@@ -649,12 +653,6 @@
 !     This code is similar to the code above that computes latitude and elevation, but is different because it
 !     must always look upstream because the downstream computations will not have been done when the current
 !     segment is being calculated.
-      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==8 ) THEN
-        IF ( getparam(MODNAME, 'stream_tave_init', Nsegment, 'real', Stream_tave_init)/=0 ) CALL read_error(2, 'stream_tave_init')
-        Seg_tave_water = Stream_tave_init
-      ELSE
-        Seg_tave_water = 0.0
-      ENDIF
       do j = 1, nsegment
          this_seg = segment_order(j)
 
