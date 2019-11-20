@@ -2800,15 +2800,19 @@
       det = (aettotal - aetold)
       factor = etdif
       dq = sup - supold
-      if (kiter == 1) then
-         factor = etdif
+      if (kiter < 10000) then
+         if (det < zerod5*pettotal) then
+           factor = dzero
+         else
+           factor = etdif
+         end if
       else if (det < zerod5*pettotal) then
          factor = dzero
       else if (abs(det) > dzero) then
          factor = dq*etdif/det
       end if
       open(222,file='debug.out')
-      if(l==46)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
+      if(l==207)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
      +aetold,factor
 333   format(i5,7e20.10)
       set_factor = factor
@@ -2885,7 +2889,7 @@
                      area = HRU_PERV(hru_id)
                   prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
                      pet = potet(hru_id)*area*prms_inch2mf_q
-                     aet = hru_actet(hru_id)*area*prms_inch2mf_q   !need to add GW ET here
+                     aet = hru_actet(hru_id)*area*prms_inch2mf_q
                   end if
                   aettot = aettot + aet
                   pettot = pettot + pet
@@ -2943,7 +2947,7 @@
                            area = HRU_PERV(hru_id)
                   prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
                            pet = potet(hru_id)*area*prms_inch2mf_q
-                           aet = hru_actet(hru_id)*area*prms_inch2mf_q   !need to add GW ET here****
+                           aet = hru_actet(hru_id)*area*prms_inch2mf_q
                         END IF
                         pettot = pettot + pet
                         aettot = aettot + aet
@@ -2982,10 +2986,11 @@
                      uzet = uzfetout(ic, ir)/DELT
                      aet = gwet(ic, ir) + uzet
                   ELSE
+                  prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
                      hru_id = IRRROW_GW(J, L)
                      area = HRU_PERV(hru_id)
-                     pet = potet(hru_id)*area
-                     aet = hru_actet(hru_id)*area
+                     pet = potet(hru_id)*area*prms_inch2mf_q
+                     aet = hru_actet(hru_id)*area*prms_inch2mf_q
                   END IF
                   pettot = pettot + pet
                   aettot = aettot + aet
