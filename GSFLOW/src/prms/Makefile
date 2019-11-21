@@ -60,6 +60,7 @@ LIBOBJS = \
         muskingum.o \
         muskingum_lake.o \
         subbasin.o \
+        stream_temp.o \
         map_results.o \
         nhru_summary.o \
         nsub_summary.o \
@@ -158,6 +159,10 @@ strmflow.o: strmflow.f90 prms_module.mod prms_basin.mod prms_obs.mod prms_flowva
 strmflow_in_out.o: strmflow_in_out.f90 prms_module.mod prms_basin.mod prms_obs.mod prms_flowvars.mod prms_gwflow.mod prms_srunoff.mod prms_set_time.mod prms_routing.mod
 	$(FC) -c $(FFLAGS) strmflow_in_out.f90
 
+stream_temp.o: stream_temp.f90 prms_module.mod prms_basin.mod prms_obs.mod prms_flowvars.mod prms_routing.mod prms_set_time.mod prms_snow.mod prms_soltab.mod
+	$(FC) -c $(FFLAGS) stream_temp.f90
+
+potet_jh.o: potet_jh.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod
 potet_jh.o: potet_jh.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod
 	$(FC) -c $(FFLAGS) potet_jh.f90
 
