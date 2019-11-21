@@ -564,7 +564,7 @@
         ENDIF
         IF ( Print_debug>-2 ) THEN
           PRINT 4, 'Simulation time period:', Start_year, Start_month, Start_day, ' -', End_year, End_month, End_day, EQULS
-          WRITE ( Logunt, 4 ) 'Simulation time period:', Start_year, Start_month, Start_day, ' -', End_year, End_month, End_day, EQULS
+          WRITE ( Logunt, 4 ) 'Simulation time period:', Start_year, Start_month, Start_day, ' -', End_year,End_month,End_day,EQULS
         ENDIF
       ENDIF
 
