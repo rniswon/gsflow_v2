@@ -1843,11 +1843,11 @@
                   SUBVOL = -(DONE - IRRFACT(I, L))*Qp*IRRFIELDFACT(I, L)
                   ! Keep irrigation for PRMS as volumetric rate
                   WELLIRRPRMS(I, L) = WELLIRRPRMS(I, L) + SUBVOL
-                  if ( i==1 .and. l==122 ) then
-                    print *, 'SUBVOL',SUBVOL, DONE, IRRFACT(I, L), Qp
-                    print *, IRRFIELDFACT(I, L), WELLIRRPRMS(I, L)
-                    print *, Qonly(L), DONENEG, Q
-                    endif
+               !   if ( i==1 .and. l==122 ) then
+               !     print *, 'SUBVOL',SUBVOL, DONE, IRRFACT(I, L), Qp
+               !     print *, IRRFIELDFACT(I, L), WELLIRRPRMS(I, L)
+               !     print *, Qonly(L), DONENEG, Q
+               !     endif
                END DO
             END IF
          END IF
@@ -2817,7 +2817,7 @@
          factor = dq*etdif/det
       end if
       open(222,file='debug.out')
-      if(l==207)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
+      if(l==20)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
      +aetold,factor
 333   format(i5,7e20.10)
       set_factor = factor
