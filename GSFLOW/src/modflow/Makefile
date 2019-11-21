@@ -35,9 +35,9 @@ LIBOBJS = \
         gwflakmodule_NWT.o \
         gwf2lak7_NWT.o \
         gwf2sfr7_NWT.o \
-        gwf2uzf1_NWT.o \
+	gwf2ag1_NWT.o \
         gwf2wel7_NWT.o \
-		gwf2ag1_NWT.o \
+        gwf2uzf1_NWT.o \
         gwf2ghb7_NWT.o \
         gwf2fhb7.o \
         gwf2mnw17_NWT.o \
@@ -96,7 +96,7 @@ NWT1_gmres.o: NWT1_gmres.f90
 NWT1_ilupc_mod.o: NWT1_ilupc_mod.f90
 	$(FC) $(FFLAGS) -c NWT1_ilupc_mod.f90
 
-NWT1_module.o: NWT1_module.f
+NWT1_module.o: NWT1_module.f mach_mod.o
 	$(FC) $(FFLAGS) -c NWT1_module.f
 
 NWT1_xmd.o: NWT1_xmd.f NWT1_xmdlib.o gwf2bas7_NWT.o NWT1_module.o
@@ -126,7 +126,7 @@ gwf2upw7.o: gwf2upw1.f gwf2bas7_NWT.o NWT1_module.o
 gwf2wel7.o: gwf2wel7.f gwf2bas7_NWT.o NWT1_module.o gwf2upw1.o
 	$(FC) $(FFLAGS) -c gwf2wel7.f
 	
-gwf2ag1_NWT.o: gwf2ag1_NWT.f gwf2bas7_NWT.o NWT1_module.o gwf2upw1.o
+gwf2ag1_NWT.o: gwf2ag1_NWT.f gwf2bas7_NWT.o NWT1_module.o gwf2upw1.o prms_module.mod prms_basin.mod prms_flowvars.mod prms_climatevars.mod gsfmodflow.mod prms_soilzone.mod mach_mod.o
 	$(FC) $(FFLAGS) -c gwf2ag1_NWT.f
 	
 gwf2sfr7_NWT.o: gwf2sfr7_NWT.f gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwf2lpf7.o gwf2bcf7.o gwf2huf7.o gwf2upw1.o gwfuzfmodule_NWT.o NWT1_module.o gwflakmodule_NWT.o
@@ -171,26 +171,30 @@ sip7_NWT.o: sip7_NWT.f gwf2bas7_NWT.o
 Irestart.o: Irestart.f gwfuzfmodule_NWT.o gwfsfrmodule_NWT.o gsfmodflow.mod
 	$(FC) $(FFLAGS) -c Irestart.f
 
-prms_flowvars.mod:
-	$(CD) ../prms;make climateflow.o
-	$(CP) ../prms/prms_flowvars.mod .
-
-prms_climatevars.mod:
-	$(CD) ../prms;make climateflow.o
-	$(CP) ../prms/prms_climatevars.mod .
-	
 prms_module.mod:
 	$(CD) ../gsflow;make prms_module.mod
 	$(CP) ../gsflow/prms_module.mod .
 	
-prms_basin.mod:
-	$(CD) ../gsflow;make prms_basin.mod
-	$(CP) ../gsflow/prms_basin.mod .
-
 gsfmodflow.mod:
 	$(CD) ../gsflow;make gsfmodflow.mod
 	$(CP) ../gsflow/gsfmodflow.mod .
 	
+prms_basin.mod:
+	$(CD) ../prms;make prms_basin.mod
+	$(CP) ../prms/prms_basin.mod .
+
+prms_flowvars.mod:
+	$(CD) ../prms;make prms_flowvars.mod
+	$(CP) ../prms/prms_flowvars.mod .
+
+prms_climatevars.mod:
+	$(CD) ../prms;make prms_climatevars.mod
+	$(CP) ../prms/prms_climatevars.mod .
+
+prms_soilzone.mod:
+	$(CD) ../prms;make prms_soilzone.mod
+	$(CP) ../prms/prms_soilzone.mod .
+
 de47_NWT.o: de47_NWT.f gwf2bas7_NWT.o
 	$(FC) $(FFLAGS) -c de47_NWT.f
 
@@ -224,6 +228,9 @@ gwflakmodule_NWT.o: gwflakmodule_NWT.f
 global.mod: gwf2bas7_NWT.o
 	$(FC) $(FFLAGS) -c gwf2bas7_NWT.f
 
+pcgmodule.mod: pcg7_NWT.o
+	$(FC) $(FFLAGS) -c pcg7_NWT.f
+
 lmt8_NWT.o: lmt8_NWT.f gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwfuzfmodule_NWT.o gwflakmodule_NWT.o gwf2bcf7.o
 	$(FC) $(FFLAGS) -c lmt8_NWT.f
 
@@ -238,6 +245,5 @@ gwf2swr7.o: gwf2swr7.f gwf2bas7_NWT.o
 
 gwf2swr7util.o: gwf2swr7util.f
 	$(FC) $(FFLAGS) -c gwf2swr7util.f
-
 
 #  end
