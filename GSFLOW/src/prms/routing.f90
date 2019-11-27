@@ -67,7 +67,7 @@
 !***********************************************************************
       routingdecl = 0
 
-      Version_routing = 'routing.f90 2019-09-27 15:54:00Z'
+      Version_routing = 'routing.f90 2019-11-27 14:54:00Z'
       CALL print_module(Version_routing, 'Routing Initialization      ', 90)
       MODNAME = 'routing'
 
@@ -398,7 +398,7 @@
      &       CALL read_error(2,'segment_flow_init')
         DO i = 1, Nsegment
           Seg_outflow(i) = Segment_flow_init(i)
-          Seg_inflow(tosegment(i)) = Seg_outflow(i)
+          IF ( tosegment(i)>0 ) Seg_inflow(tosegment(i)) = Seg_outflow(i)
         ENDDO
         DEALLOCATE ( Segment_flow_init )
       ENDIF
