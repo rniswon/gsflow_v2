@@ -37,7 +37,7 @@
         INTEGER, SAVE, POINTER :: NUMTAB
         INTEGER, SAVE, POINTER :: MAXVAL
         REAL, SAVE, DIMENSION(:, :), POINTER :: VBVLAG
-        CHARACTER(LEN=20), SAVE, DIMENSION(:), POINTER :: VBNMAG
+        CHARACTER(LEN=22), SAVE, DIMENSION(:), POINTER :: VBNMAG
         INTEGER, SAVE, POINTER :: MSUMAG
         INTEGER, SAVE, DIMENSION(:, :), POINTER :: DIVERSIONSEG
         INTEGER, SAVE, DIMENSION(:, :), POINTER :: IRRROW_GW
@@ -98,22 +98,20 @@
       !
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
-      USE GLOBAL, ONLY: IOUT, NCOL, NROW, IFREFM
+      USE GLOBAL, ONLY: IOUT, NCOL, NROW
       USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: NSEGDIM
-      USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS
       INTEGER, INTENT(IN) :: IN, IUNITSFR, IUNITNWT
       ! - -----------------------------------------------------------------
       ! VARIABLES
-      CHARACTER(len=200) :: LINE
+      !CHARACTER(len=200) :: LINE
       INTEGER :: MXACTWSUP, MXACTWIRR, NUMSUPHOLD, NUMIRRHOLD
       INTEGER :: MAXSEGSHOLD, NUMCOLS, NUMROWS, MAXCELLSHOLD
       INTEGER :: NUMCELLSHOLD
-      INTEGER :: NUMTABHOLD, LLOC, ISTART, ISTOP, I, N
-      REAL :: R
+      INTEGER :: NUMTABHOLD
       ! - -----------------------------------------------------------------
       !
       !1 - --- ALLOCATE ALLOCATE CONSTANTS AND FLAGS
@@ -728,8 +726,8 @@
      +  , ' WILL BE SAVED TO TIMES SERIES OUTPUT FILES.')
 40    FORMAT(1X, ' GROUND WATER IRRIGATION, POTENTIAL AND ACTUAL ET'
      +  , ' WILL BE SAVED TO TIMES SERIES OUTPUT FILES.')
-41    FORMAT(1X, ' IRRIGATION RATE ADJUSTMENT FACTOR WAS'
-     +  , ' SET EQUAL TO.', F10.3)
+!41    FORMAT(1X, ' IRRIGATION RATE ADJUSTMENT FACTOR WAS'
+!     +  , ' SET EQUAL TO.', F10.3)
       END SUBROUTINE
       !
       SUBROUTINE GWF2AG7RP(IN, IUNITSFR, KPER)
@@ -766,7 +764,7 @@
 
       INTEGER LLOC, ISTART, ISTOP, ISTARTSAVE
       INTEGER J, II, KPER2, L, MATCH, NUMTABS, is
-      INTEGER istsg, nreach, istsgold, ISEG
+      INTEGER istsg, istsgold, ISEG
       logical :: FOUND
       logical :: found1, found2, found3, found4, found5
       REAL :: R, TTIME, TRATE
@@ -1090,7 +1088,7 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: NSS, SEG
+      USE GWFSFRMODULE, ONLY: SEG
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GLOBAL, ONLY: IUNIT
       IMPLICIT NONE
@@ -1143,7 +1141,7 @@
       !
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
-      USE GLOBAL, ONLY: IOUT, IUNIT
+      USE GLOBAL, ONLY: IOUT
       USE GWFAGMODULE
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
@@ -1153,7 +1151,7 @@
       ! VARIABLES:
       CHARACTER(LEN=200)::LINE
       INTEGER :: IERR, LLOC, ISTART, ISTOP, J, ISPWL
-      INTEGER :: NMSG, K, IRWL, NMCL, L, LL
+      INTEGER :: NMSG, K, L, LL
       REAL :: R
       ! - -----------------------------------------------------------------
       !
@@ -1207,9 +1205,9 @@
          CALL USTOP('')
       END IF
       !
-99    FORMAT(1X, /1X, '****MODEL STOPPING**** ',
-     + 'WELL PACKAGE MUST BE ACTIVE TO SIMULATE SUPPLEMENTAL ',
-     + 'WELLS')
+!99    FORMAT(1X, /1X, '****MODEL STOPPING**** ',
+!     + 'WELL PACKAGE MUST BE ACTIVE TO SIMULATE SUPPLEMENTAL ',
+!     + 'WELLS')
 102   FORMAT('***Error in WELL*** maximum number of supplimentary ',
      + 'wells is less than the number specified in ',
      + 'stress period. ', /
@@ -1220,8 +1218,8 @@
      + 'specified in stress period. ', /
      + 'Maximum segments and the number specified for stress '
      + 'period are: ', 2i6)
-106   FORMAT('***Error in SUP WEL*** cell row or column number for '
-     + , 'supplemental well specified as zero. Model stopping')
+!106   FORMAT('***Error in SUP WEL*** cell row or column number for '
+!     + , 'supplemental well specified as zero. Model stopping')
       !
       !4 - ---CALCULATE THE NUMBER OF SUPWELLS ASSOCIATED WITH A DIVERSION SEGEMENT
       NUMSUPWELLSEG = 1
@@ -1245,7 +1243,7 @@
       !
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
-      USE GLOBAL, ONLY: IOUT, IUNIT
+      USE GLOBAL, ONLY: IOUT
       USE GWFAGMODULE
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
@@ -1255,8 +1253,8 @@
       ! - -----------------------------------------------------------------
       ! VARIABLES:
       CHARACTER(LEN=200)::LINE
-      INTEGER :: IERR, LLOC, ISTART, ISTOP, J, ISPWL, IDUM
-      INTEGER :: NMSG, K, IRWL, NMCL, I
+      INTEGER :: IERR, LLOC, ISTART, ISTOP, J, IDUM
+      INTEGER :: K, IRWL, NMCL, I
       REAL :: R, IPRW, TRPW
       ! - -----------------------------------------------------------------
       !
@@ -1329,9 +1327,9 @@
             END DO
          END IF
       END DO
-99    FORMAT(1X, /1X, '****MODEL STOPPING**** ',
-     +  'WELL PACKAGE MUST BE ACTIVE TO SIMULATE IRRIGATION ',
-     +  'WELLS')
+!99    FORMAT(1X, /1X, '****MODEL STOPPING**** ',
+!     +  'WELL PACKAGE MUST BE ACTIVE TO SIMULATE IRRIGATION ',
+!     +  'WELLS')
 104   FORMAT('***Error in IRR WEL*** maximum number of irrigation ',
      +      'wells is less than the number specified in stress ',
      +      'period. ', /
@@ -1356,7 +1354,6 @@
       ! READ DIVERSION SEGMENT DATA FOR EACH STRESS PERIOD
       !******************************************************************
       USE GWFAGMODULE
-      USE GLOBAL, ONLY: IUNIT
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
@@ -1473,7 +1470,6 @@
       SUBROUTINE TSREAD(IN, IOUT)
       ! READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
       USE GWFAGMODULE
-      USE GLOBAL, ONLY: IUNIT
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS
@@ -1481,10 +1477,10 @@
       ! - -----------------------------------------------------------------
       ! VARIABLES
       ! - -----------------------------------------------------------------
-      INTEGER intchk, Iostat, LLOC, ISTART, ISTOP, I, SGNM, UNIT, WLNM
+      INTEGER LLOC, ISTART, ISTOP, I, SGNM, UNIT, WLNM
       INTEGER ISTARTSAVE, ITEST, NUMGWETALL, NUMGWALL
       real :: R
-      character(len=16)  :: text = 'AG'
+      !character(len=16)  :: text = 'AG'
       character(len=17)  :: char1 = 'TIME SERIES'
       character(len=200) :: line
       ! - -----------------------------------------------------------------
@@ -1658,10 +1654,9 @@
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: DELR, DELC, IBOUND, HNEW, LBOTM, BOTM,
      +                  RHS
-      USE GWFBASMODULE, ONLY: TOTIM, DELT
+      USE GWFBASMODULE, ONLY: TOTIM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, IDIVAR, DVRSFLW,
-     +                        SEG, STRM
+      USE GWFSFRMODULE, ONLY: IDIVAR, SEG, STRM
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -1673,7 +1668,7 @@
       !
       ! VARIABLES:
       ! - -----------------------------------------------------------------
-      INTEGER :: L, I, J, ISTSG, ICOUNT, IRR, ICC, IC, IR, IL, IJ, LL
+      INTEGER :: L, I, J, ISTSG, ICOUNT, IRR, ICC, IC, IR, IL, IJ
       DOUBLE PRECISION :: ZERO, DONE, SUP, FMIN, Q, SUBVOL, SUBRATE, DVT
       DOUBLE PRECISION :: DONENEG
       EXTERNAL :: SMOOTHQ, RATETERPQ, demandgw_uzf, demandgw_prms
@@ -1681,8 +1676,8 @@
       REAL :: RATETERPQ, TIME
       DOUBLE PRECISION :: Qp, Hh, Ttop, Bbot, dQp, SMOOTHQ
       DOUBLE PRECISION :: QSW, NEARZERO, QQ, demandtrigger_gw
-      DOUBLE PRECISION :: demandgw_uzf, demandgw_prms, mf_q2prms_inch
-      INTEGER :: ihru, k
+      DOUBLE PRECISION :: demandgw_uzf, demandgw_prms
+      INTEGER :: k
       !
       ! - -----------------------------------------------------------------
       !
@@ -1693,12 +1688,13 @@
       NEARZERO = 1.0D-17
       TIME = TOTIM
       SUP = ZERO
-      DIVERSIONIRRUZF = ZERO
-      DIVERSIONIRRPRMS = ZERO
-      WELLIRRUZF = ZERO
-      WELLIRRPRMS = ZERO
-      SUPFLOW = ZERO
+      DIVERSIONIRRUZF = 0.0
+      DIVERSIONIRRPRMS = 0.0
+      WELLIRRUZF = 0.0
+      WELLIRRPRMS = 0.0
+      SUPFLOW = 0.0
       Qp = ZERO
+      print *, 'qp', qp, totim, zero
       Q = ZERO
       QQ = ZERO
       QSW = ZERO
@@ -1725,7 +1721,7 @@
       END DO
       !
       !2C - ---SET CUMULATIVE SUP PUMPING TO ZERO EACH ITERATION
-      ACTUAL = ZERO
+      ACTUAL = 0.0
       !
       !3 - -----SET MAX PUMPING RATE OR IRR DEMAND FOR GW.
       DO L = 1, NWELLS
@@ -1768,13 +1764,13 @@
                   IF (FMIN < ZERO) FMIN = ZERO
                   SUP = SUP + FMIN
                END DO
-               SUPFLOW(L) = SUPFLOW(L) - SUP/dble(NUMSUPWELLSEG(L))
+               SUPFLOW(L) = SUPFLOW(L)-sngl(SUP/dble(NUMSUPWELLSEG(L)))
                !
                !6 - -----CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
                !
-               IF (SUPFLOW(L) < Q) SUPFLOW(L) = Q
+               IF (SUPFLOW(L) < Q) SUPFLOW(L) = SNGL(Q)
                Q = SUPFLOW(L)
-               QONLY(L) = DONENEG*Q
+               QONLY(L) = SNGL(DONENEG*Q)
             ELSEIF (Q < ZERO) THEN
                !
                !7 - -----CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
@@ -1799,7 +1795,11 @@
                   Hh = HNEW(ic, ir, il)
                   bbot = Botm(IC, IR, Lbotm(IL))
                   ttop = Botm(IC, IR, Lbotm(IL) - 1)
+                  print *, 'qp', 1, Qp
                   Qp = Q*smoothQ(Hh, Ttop, Bbot, dQp)
+                  print *, 'qp', 2, Qp, dQp
+                  print *, ic,ir,il, Hh, Ttop, Bbot, Hh, Q
+                  print *, 'HNEW', HNEW(ic, ir, il), kkiter
                   RHS(IC, IR, IL) = RHS(IC, IR, IL) - Qp
                   !
                   !8 - -----Derivative for RHS
@@ -1809,15 +1809,18 @@
                ELSE
                   RHS(IC, IR, IL) = RHS(IC, IR, IL) - Q
                   Qp = Q
+                  print *, 'qp', 3, Qp
                END IF
             ELSE
                RHS(IC, IR, IL) = RHS(IC, IR, IL) - Q
                Qp = Q
+               print *, 4, Qp
             END IF
             !
             !9 - -----SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
             !
-            SUP = 0.0
+            SUP = ZERO
+             print *, Qp, 'Qp'
             DO I = 1, NUMSEGS(L)  ! need to test when multiple segs supported by single well
                J = DIVERSIONSEG(I, L)
                SUP = SUP - Qp
@@ -1843,11 +1846,11 @@
                   SUBVOL = -(DONE - IRRFACT(I, L))*Qp*IRRFIELDFACT(I, L)
                   ! Keep irrigation for PRMS as volumetric rate
                   WELLIRRPRMS(I, L) = WELLIRRPRMS(I, L) + SUBVOL
-               !   if ( i==1 .and. l==122 ) then
-               !     print *, 'SUBVOL',SUBVOL, DONE, IRRFACT(I, L), Qp
-               !     print *, IRRFIELDFACT(I, L), WELLIRRPRMS(I, L)
-               !     print *, Qonly(L), DONENEG, Q
-               !     endif
+                  if ( i==1 .and. l==122 ) then
+                    print *, 'SUBVOL',SUBVOL, DONE, IRRFACT(I, L), Qp
+                    print *, IRRFIELDFACT(I, L), WELLIRRPRMS(I, L)
+                    print *, Qonly(L), DONENEG, Q
+                    endif
                END DO
             END IF
          END IF
@@ -1894,8 +1897,7 @@
       USE GWFBASMODULE, ONLY: ICBCFL, IAUXSV, DELT, PERTIM, TOTIM,
      +     VBNM, VBVL, MSUM, IBUDFL
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, SEG, IDIVAR,
-     +     DVRSFLW
+      USE GWFSFRMODULE, ONLY: SGOTFLW, DVRSFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
@@ -1906,20 +1908,21 @@
       ! - -----------------------------------------------------------------
       CHARACTER*22 TEXT2, TEXT6, TEXT7, TEXT8, TEXT1, TEXT3, TEXT4, 
      +             TEXT5
-      CHARACTER*16 TEXT9, TEXT10, TEXT11
-      DOUBLE PRECISION :: RATIN, RATOUT, FMIN, ZERO, DVT, RIN, ROUT
-      DOUBLE PRECISION :: SUP, SUBVOL, SUBRATE, RATINAG, RATOUTAG, AREA
+      CHARACTER*16 TEXT9
+      CHARACTER*19 TEXT10, TEXT11
+      DOUBLE PRECISION :: RATIN, RATOUT, ZERO, DVT, RIN, ROUT
+      DOUBLE PRECISION :: SUP, SUBVOL, RATINAG, RATOUTAG, AREA
       DOUBLE PRECISION :: QSW, QSWIRR, QWELL, QWELLIRR, QWELLET
       DOUBLE PRECISION :: QSWGL, DONE
       REAL :: Q, TIME, RATETERPQ, QIRR, BUDPERC
       INTEGER :: NWELLSTEMP, L, I, J, ISTSG, ICOUNT, IL
-      INTEGER :: IC, IR, IBDLBL, IW1, ISEG
-      INTEGER :: IBD1, IBD2, IBD3, IBD4, IBD5, UNIT
+      INTEGER :: IC, IR, IBDLBL, IW1
+      INTEGER :: IBD1, IBD2, IBD3, IBD4, IBD5
       INTEGER :: TOTWELLCELLS, TOTDIVERSIONCELLS, IHRU
       EXTERNAL :: SMOOTHQ, RATETERPQ
       DOUBLE PRECISION :: SMOOTHQ, bbot, ttop, hh
       DOUBLE PRECISION :: Qp, QQ, Qsave, dQp
-      DOUBLE PRECISION :: DONENEG, prms_inch2mf_q
+      DOUBLE PRECISION :: DONENEG
       DATA TEXT1/'           AG WELLS'/
       DATA TEXT2/'  DIVERSION SEGMENTS'/
       DATA TEXT3/'       SW IRRIGATION'/
@@ -1945,13 +1948,13 @@
       QWELLIRR = ZERO
       QWELLET = ZERO
       QWELL = ZERO
-      QIRR = ZERO
-      SUPSEG = ZERO
+      QIRR = 0.0
+      SUPSEG = 0.0
       TOTWELLCELLS = 0
       TOTDIVERSIONCELLS = 0
       TIME = TOTIM
-      ACTUAL = ZERO
-      ACTUALOLD = ZERO
+      ACTUAL = 0.0
+      ACTUALOLD = 0.0
       SUP = ZERO
       MSUMAG = 1
       IBD1 = 0
@@ -1993,7 +1996,7 @@
       DO 50 IL = 1, NLAY
       DO 50 IR = 1, NROW
       DO 50 IC = 1, NCOL
-      BUFF(IC, IR, IL) = ZERO
+      BUFF(IC, IR, IL) = 0.0
 50    CONTINUE
       !
       !
@@ -2061,7 +2064,7 @@
             END IF
             QQ = Q
             !8 - -----SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
-            SUP = 0.0
+            SUP = ZERO
             DO I = 1, NUMSEGS(L)
                J = DIVERSIONSEG(I, L)
                SUP = SUP - Q
@@ -2221,8 +2224,8 @@
       !15 - -----MOVE RATES, VOLUMES&LABELS INTO ARRAYS FOR PRINTING.
       RIN = RATIN
       ROUT = RATOUT
-      VBVL(3, MSUM) = RIN
-      VBVL(4, MSUM) = ROUT
+      VBVL(3, MSUM) = sngl(RIN)
+      VBVL(4, MSUM) = sngl(ROUT)
       VBVL(1, MSUM) = VBVL(1, MSUM) + RIN*DELT
       VBVL(2, MSUM) = VBVL(2, MSUM) + ROUT*DELT
       VBNM(MSUM) = TEXT9
@@ -2233,9 +2236,9 @@
       !18 - -----MOVE RATES, VOLUMES&LABELS INTO ARRAYS FOR PRINTING
       ! GW PUMPING (NEGATIVE OUT OF GW)
       RIN = -QWELL   
-      ROUT = 0.0
-      VBVLAG(3, MSUMAG) = RIN
-      VBVLAG(4, MSUMAG) = ROUT
+      ROUT = ZERO
+      VBVLAG(3, MSUMAG) = sngl(RIN)
+      VBVLAG(4, MSUMAG) = sngl(ROUT)
       VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
       VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
       VBNMAG(MSUMAG) = TEXT1
@@ -2243,39 +2246,39 @@
       !
       !18 - ------SW DIVERSIONS
       RIN = QSW
-      ROUT = 0.0
-      VBVLAG(3, MSUMAG) = RIN
-      VBVLAG(4, MSUMAG) = ROUT
+      ROUT = ZERO
+      VBVLAG(3, MSUMAG) = sngl(RIN)
+      VBVLAG(4, MSUMAG) = sngl(ROUT)
       VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
       VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
       VBNMAG(MSUMAG) = TEXT2
       MSUMAG = MSUMAG + 1
       !
       !18 - ------GW IRRIGATION
-      RIN = 0.0
+      RIN = ZERO
       ROUT = QWELLIRR
-      VBVLAG(3, MSUMAG) = RIN
-      VBVLAG(4, MSUMAG) = ROUT
+      VBVLAG(3, MSUMAG) = sngl(RIN)
+      VBVLAG(4, MSUMAG) = sngl(ROUT)
       VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
       VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
       VBNMAG(MSUMAG) = TEXT4
       MSUMAG = MSUMAG + 1
       !
       !18 - ------SW IRRIGATION
-      RIN = 0.0
+      RIN = ZERO
       ROUT = QSWIRR
-      VBVLAG(3, MSUMAG) = RIN
-      VBVLAG(4, MSUMAG) = ROUT
+      VBVLAG(3, MSUMAG) = sngl(RIN)
+      VBVLAG(4, MSUMAG) = sngl(ROUT)
       VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
       VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
       VBNMAG(MSUMAG) = TEXT3
       MSUMAG = MSUMAG + 1
       !
       !18 - ------GW EFFICIENCY ET
-      RIN = 0.0
+      RIN = ZERO
       ROUT = QWELLET
-      VBVLAG(3, MSUMAG) = RIN
-      VBVLAG(4, MSUMAG) = ROUT
+      VBVLAG(3, MSUMAG) = sngl(RIN)
+      VBVLAG(4, MSUMAG) = sngl(ROUT)
       VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
       VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
       VBNMAG(MSUMAG) = TEXT8
@@ -2289,8 +2292,8 @@
          RIN = -DONE*QSWGL
          ROUT = ZERO
       END IF
-      VBVLAG(3, MSUMAG) = RIN
-      VBVLAG(4, MSUMAG) = ROUT
+      VBVLAG(3, MSUMAG) = sngl(RIN)
+      VBVLAG(4, MSUMAG) = sngl(ROUT)
       VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
       VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
       VBNMAG(MSUMAG) = TEXT7
@@ -2324,9 +2327,8 @@
 !     demandconjunctive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
 !     SPECIFICATIONS:
-      USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE, VKS, 
-     +                        Isurfkreject, surfk
-      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, IDIVAR, SGOTFLW, STRM
+      USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE, VKS
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, IDIVAR, STRM
       USE GWFAGMODULE
       USE GLOBAL, ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
@@ -2336,21 +2338,18 @@
       !arguments
       integer, intent(in) :: kper, kstp, kiter
       !dummy
-      DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod7, zerod30, done, dzero, dum, pettotal,
-     +                    aettotal, dhundred, fmaxirr, fmaxflow, zerod3,
-     +                    dedt, aetold, aetnew, det, dq, detdq, etdif, 
+      DOUBLE PRECISION :: factor, area, uzet, aet, pet
+      double precision :: zerod7, done, dzero, pettotal,
+     +                    aettotal, aetold, aetnew, etdif, 
      +                    ettest, supold, sup, sumvks
+      real :: fmaxflow
       integer :: k, iseg, ic, ir, i
       external :: set_factor
       double precision :: set_factor
 ! ---------------------------------------------------------------------
 !
-      zerod30 = 1.0d-30
       zerod7 = 1.0d-7
-      zerod3 = 1.0d-3
       done = 1.0d0
-      dhundred = 100.0d0
       dzero = 0.0d0
       etdif = dzero
       ettest = dzero
@@ -2366,8 +2365,6 @@
         !1b - ------Update demand as max flow in segment
         !
         IF (DEMAND(iseg) < zerod7) goto 300
-        finfsum = dzero
-        dedt = dzero
         aetold = dzero
         aetnew = dzero
         pettotal = dzero
@@ -2392,9 +2389,9 @@
         supold = SUPACTOLD(ISEG) + ACTUALOLD(ISEG)
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
      +           supold, kiter)
-        AETITERSW(ISEG) = aettotal
+        AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
-        SUPACT(iseg) = SUPACT(iseg) + factor
+        SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
         !
         !1 - -----set diversion to demand
         !
@@ -2417,11 +2414,11 @@
 !     demandconjunctive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
 !     SPECIFICATIONS:
-      USE GWFSFRMODULE, ONLY: SEG, SGOTFLW, IDIVAR, STRM, DVRSFLW
+      USE GWFSFRMODULE, ONLY: SEG, IDIVAR, STRM, DVRSFLW
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: HRU_PERV
-      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST, HRU_ACTET
+      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
       IMPLICIT NONE
@@ -2430,20 +2427,18 @@
       !arguments
       integer, intent(in) :: kper, kstp, kiter
       !dummy
-      DOUBLE PRECISION :: factor, area, aet, pet, finfsum, fks
-      double precision :: zerod3, zerod7, done, dzero, dum, pettotal,
-     +                  aettotal, dhundred, prms_inch2mf_q, FMAXFLOW,
-     +        dedt, aetold, aetnew, det, dq, detdq, etdif, ettest,
-     +        supold, sup
+      DOUBLE PRECISION :: factor, area, aet, pet
+      double precision :: zerod7, done, dzero, pettotal,
+     +                    aettotal, prms_inch2mf_q,
+     +                    aetold, supold, sup
+      real :: fmaxflow
       integer :: k, iseg, hru_id, i
       external :: set_factor
       double precision :: set_factor
 ! --------------------------------------------------
 !
       zerod7 = 1.0d-7
-      zerod3 = 1.0d-3
       done = 1.0d0
-      dhundred = 100.0d0
       dzero = 0.0d0
       prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       !
@@ -2455,7 +2450,6 @@
         factor = DZERO
         iseg = IRRSEG(i)
         IF (DEMAND(iseg) < zerod7) goto 300
-        finfsum = dzero
         !
         !1 - -----loop over hrus irrigated by diversion
         !
@@ -2473,10 +2467,10 @@
         supold = SUPACTOLD(ISEG) + ACTUALOLD(ISEG)
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
      +           supold, kiter)
-        AETITERSW(ISEG) = aettotal
+        AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
-        SUPACT(iseg) = SUPACT(iseg) + factor
-        if (SUPACT(iseg) < dzero) SUPACT(iseg) = dzero
+        SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
+        if (SUPACT(iseg) < 0.0) SUPACT(iseg) = 0.0
         !
         !1 - -----set diversion to demand
         !
@@ -2503,12 +2497,11 @@
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GLOBAL, ONLY: DELR, DELC
-      USE GWFSFRMODULE, ONLY: SEG, SGOTFLW, IDIVAR, STRM, NSS
+      USE GWFSFRMODULE, ONLY: SEG, IDIVAR, STRM, NSS
       USE GWFAGMODULE
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
-      USE GWFBASMODULE, ONLY: DELT, TOTIM
-      USE PRMS_BASIN, ONLY: HRU_PERV
-      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST, HRU_ACTET
+      USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
@@ -2517,19 +2510,17 @@
       !arguments
       integer, intent(in) :: kper, kstp, kiter
       !dummy
-      DOUBLE PRECISION :: factor, area, aet, pet, finfsum, fks
-      double precision :: zerod2, zerod30, done, dzero, dum, pettotal,
-     +                    aettotal, dhundred, FMAXFLOW, uzet
+      DOUBLE PRECISION :: factor, area, aet, pet
+      double precision :: zerod30, done, dzero, uzet
       double precision, allocatable, dimension(:) :: petseg, aetseg
+      real :: fmaxflow
       integer :: k, iseg, hru_id, i, ic, ir
 ! --------------------------------------------
 !
       if ( NUMIRRDIVERSIONSP == 0 ) return
       allocate (petseg(NSS), aetseg(NSS))
       zerod30 = 1.0d-30
-      zerod2 = 1.0d-2
       done = 1.0d0
-      dhundred = 100.0d0
       dzero = 0.0d0
       aetseg = dzero
       petseg = dzero
@@ -2539,7 +2530,6 @@
       do 300 i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
          IF (DEMAND(iseg) < zerod30) goto 300
-         finfsum = dzero
          aet = dzero
          pet = dzero
          !
@@ -2566,11 +2556,11 @@
          !
          !1 - -----set diversion to demand if in period or triggered
          !
-         SEG(2, iseg) = DZERO
+         SEG(2, iseg) = 0.0
          if (TIMEINPERIODSEG(ISEG) > IRRPERIODSEG(ISEG)) then
             if (factor <= TRIGGERPERIODSEG(ISEG)) then
                SEG(2, iseg) = DEMAND(iseg)
-               TIMEINPERIODSEG(ISEG) = dzero
+               TIMEINPERIODSEG(ISEG) = 0.0
             end if
          end if
          if (TIMEINPERIODSEG(ISEG) - DELT < IRRPERIODSEG(ISEG))
@@ -2595,9 +2585,8 @@
       USE GLOBAL, ONLY: DELR, DELC
       USE GWFAGMODULE
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
-      USE GWFBASMODULE, ONLY: DELT, TOTIM
-      USE PRMS_BASIN, ONLY: HRU_PERV
-      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST, HRU_ACTET
+      USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
@@ -2606,10 +2595,10 @@
       integer, intent(in) :: kper, kstp, kiter, l
       DOUBLE PRECISION, INTENT(INOUT) :: Q
       !dummy
-      DOUBLE PRECISION :: factor, area, aet, pet, finfsum, fks, doneneg
-      DOUBLE PRECISION :: zerod2, zerod30, done, dzero, dum, pettotal
-      DOUBLE PRECISION :: aettotal, dhundred, FMAXFLOW, uzet, zerod7
-      integer :: k, iseg, hru_id, i, ic, ir
+      DOUBLE PRECISION :: factor, area, doneneg
+      DOUBLE PRECISION :: zerod30, done, dzero, pettotal
+      DOUBLE PRECISION :: aettotal, uzet, zerod7
+      integer :: hru_id, i, ic, ir
 ! --------------------------------------------
 !
       dzero = 0.0d0
@@ -2644,7 +2633,7 @@
       if (TIMEINPERIODWELL(L) > IRRPERIODWELL(L)) then
           if (factor <= TRIGGERPERIODWELL(L)) then
               demandtrigger_gw = Q
-              TIMEINPERIODWELL(L) = dzero
+              TIMEINPERIODWELL(L) = 0.0
           end if
       end if
       if (TIMEINPERIODWELL(L) - DELT < IRRPERIODWELL(L))
@@ -2667,13 +2656,12 @@
       integer, intent(in) :: l, kiter, kper, kstp
       real, intent(in) :: time
       !dummy
-      DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod30, done, dzero, dum, doneneg,
-     +                    dedt, aetold, aetnew, det, dq, detdq, 
-     +                    etdif, ettest, supold, sup, pettotal, 
+      DOUBLE PRECISION :: factor, area, uzet, aet, pet
+      double precision :: zerod30, done, dzero, doneneg,
+     +                    aetold, supold, sup, pettotal, 
      +                    aettotal, sumvks
       double precision :: zerod7
-      integer :: iseg, ic, ir, i
+      integer :: ic, ir, i
       external :: set_factor
       double precision :: set_factor
 ! --------------------------------------
@@ -2706,10 +2694,10 @@
       factor = set_factor(l, aetold, pettotal, aettotal, sup, supold,
      +                    kiter)
       QONLYOLD(l) = QONLY(l)
-      AETITERGW(l) = aettotal
-      QONLY(L) = QONLY(L) + factor
+      AETITERGW(l) = sngl(aettotal)
+      QONLY(L) = QONLY(L) + sngl(factor)
       if (QONLY(L) > sumvks) then
-         QONLY(L) = sumvks
+         QONLY(L) = sngl(sumvks)
       end if
       demandgw_uzf = doneneg*QONLY(L)
       end function demandgw_uzf
@@ -2723,7 +2711,7 @@
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: HRU_PERV, HRU_AREA
-      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST, HRU_ACTET
+      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_SOILZONE, ONLY: Soil_saturated
 
@@ -2735,18 +2723,14 @@
       integer, intent(in) :: l, kiter
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, prms_inch2mf_q,
-     +                    dedt, aetold, aetnew, det, dq, detdq, 
-     +                    etdif, ettest, areafactor,
+     +                    aetold, areafactor,
      +                    supold, sup, aettotal, pettotal
-      double precision :: zerod3, zerod30, done, dzero, dum, 
-     +                    dhundred, doneneg
-      integer :: i, ihru, K, ISEG
+      double precision :: done, dzero, doneneg
+      integer :: i, ihru
       external :: set_factor
       double precision :: set_factor
 ! --------------------------------------
 !
-      zerod30 = 1.0d-30
-      zerod3 = 1.0d-3
       dzero = 0.0d0
       done = 1.0d0
       doneneg = -1.0d0
@@ -2771,9 +2755,9 @@
       factor = set_factor(l, aetold, pettotal, aettotal, sup, supold,
      +                    kiter)
       QONLYOLD(l) = QONLY(L)
-      AETITERGW(l) = aettotal
-      QONLY(L) = QONLY(L) + factor
-      if (QONLY(L) < dzero) QONLY(L) = dzero
+      AETITERGW(l) = sngl(aettotal)
+      QONLY(L) = QONLY(L) + sngl(factor)
+      if (QONLY(L) < 0.0) QONLY(L) = 0.0
       demandgw_prms = doneneg*QONLY(L)
       end function demandgw_prms
 !
@@ -2791,15 +2775,12 @@
      +                                sup, supold
       integer, intent(in) :: kiter, l
       !dummy
-      DOUBLE PRECISION :: factor, zerod5, dzero, etdif, det, dq,
-     +                    zerod30, zerod2
+      DOUBLE PRECISION :: factor, zerod5, dzero, etdif, det, dq
 ! -----------------------------------------
 !
       dzero = 0.0d0
       zerod5 = 1.0d-5
-      zerod2 = 1.0d-2
       set_factor = dzero
-      zerod30 = 1.0d-30
       factor = dzero
       etdif = pettotal - aettotal
       det = (aettotal - aetold)
@@ -2817,7 +2798,7 @@
          factor = dq*etdif/det
       end if
       open(222,file='debug.out')
-      if(l==20)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
+      if(l==207)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
      +aetold,factor
 333   format(i5,7e20.10)
       set_factor = factor
@@ -2834,7 +2815,7 @@
       USE GLOBAL, ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: HRU_PERV
-      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST, HRU_ACTET
+      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
@@ -3023,7 +3004,7 @@
          DO L = 1, NWELLS
             UNIT = TSGWALLUNIT
             Q = Q + QONLY(L)
-            QQ = QQ + -1.0*WELL(NWELVL, L)
+            QQ = -1.0*WELL(NWELVL, L) + QQ
             QQQ = 0.0
          END DO
          CALL timeseries(unit, Kkper, Kkstp, TOTIM, J,
