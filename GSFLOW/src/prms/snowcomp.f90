@@ -50,6 +50,7 @@
       REAL, SAVE :: Den_init, Settle_const, Den_max
       REAL, SAVE, ALLOCATABLE :: Rad_trncf(:), Snarea_thresh(:), Snowpack_init(:)
       REAL, SAVE, ALLOCATABLE :: Snarea_curve(:, :)
+      REAL, SAVE, ALLOCATABLE :: Snarea_a(:), Snarea_b(:), Snarea_c(:), Snarea_d(:)
 
       END MODULE PRMS_SNOW
 
@@ -88,7 +89,7 @@
 !***********************************************************************
       INTEGER FUNCTION snodecl()
       USE PRMS_SNOW
-      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file
+      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file, Snarea_curve_flag, DOCUMENTATION, Model
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam, declvar
@@ -98,7 +99,7 @@
 !***********************************************************************
       snodecl = 0
 
-      Version_snowcomp = 'snowcomp.f90 2018-05-04 09:41:00Z'
+      Version_snowcomp = 'snowcomp.f90 2019-11-27 14:56:00Z'
       CALL print_module(Version_snowcomp, 'Snow Dynamics               ', 90)
       MODNAME = 'snowcomp'
 
@@ -354,19 +355,46 @@
      &     'decimal fraction')/=0 ) CALL read_error(1, 'rad_trncf')
 
       ALLOCATE ( Hru_deplcrv(Nhru) )
-      IF ( declparam(MODNAME, 'hru_deplcrv', 'nhru', 'integer', &
-     &     '1', 'bounded', 'ndepl', &
-     &     'Index number for snowpack areal depletion curve', &
-     &     'Index number for the snowpack areal depletion curve associated with each HRU', &
-     &     'none')/=0 ) CALL read_error(1, 'hru_deplcrv')
-
       ALLOCATE ( Snarea_curve(11, Ndepl) )
-      IF ( declparam(MODNAME, 'snarea_curve', 'ndeplval', 'real', &
-     &     '1.0', '0.0', '1.0', &
-     &     'Snow area depletion curve values', &
-     &     'Snow area depletion curve values, 11 values for each'// &
-     &     ' curve (0.0 to 1.0 in 0.1 increments)', &
-     &     'decimal fraction')/=0 ) CALL read_error(1, 'snarea_curve')
+      IF ( Snarea_curve_flag==0 .OR. Model==DOCUMENTATION ) THEN
+        IF ( declparam(MODNAME, 'hru_deplcrv', 'nhru', 'integer', &
+     &       '1', 'bounded', 'ndepl', &
+     &       'Index number for snowpack areal depletion curve', &
+     &       'Index number for the snowpack areal depletion curve associated with each HRU', &
+     &       'none')/=0 ) CALL read_error(1, 'hru_deplcrv')
+        IF ( declparam(MODNAME, 'snarea_curve', 'ndeplval', 'real', &
+     &       '1.0', '0.0', '1.0', &
+     &       'Snow area depletion curve values', &
+     &       'Snow area depletion curve values, 11 values for each'// &
+     &       ' curve (0.0 to 1.0 in 0.1 increments)', &
+     &       'decimal fraction')/=0 ) CALL read_error(1, 'snarea_curve')
+      ENDIF
+      IF ( Snarea_curve_flag==1 .OR. Model==DOCUMENTATION ) THEN
+        ALLOCATE ( Snarea_a(Nhru) )
+        IF ( declparam(MODNAME, 'snarea_a', 'nhru', 'real', &
+     &       '0.0', '0.0', '1.0', &
+     &       'Snow area depletion curve minimum SWE value', &
+     &       'Snow area depletion curve minimum SWE value for each HRU', &
+     &       'inches')/=0 ) CALL read_error(1, 'snarea_a')
+        ALLOCATE ( Snarea_b(Nhru) )
+        IF ( declparam(MODNAME, 'snarea_b', 'nhru', 'real', &
+     &       '2.0', '0.5', '20.0', &
+     &       'Snow area depletion S-curve coefficient B', &
+     &       'Snow area depletion S-curve coefficient B for each HRU', &
+     &       'none')/=0 ) CALL read_error(1, 'snarea_b')
+        ALLOCATE ( Snarea_c(Nhru) )
+        IF ( declparam(MODNAME, 'snarea_c', 'nhru', 'real', &
+     &       '1.5', '0.001', '3.0', &
+     &       'Snow area depletion S-curve coefficient C', &
+     &       'Snow area depletion S-curve coefficient C for each HRU', &
+     &       'none')/=0 ) CALL read_error(1, 'snarea_c')
+        ALLOCATE ( Snarea_d(Nhru) )
+        IF ( declparam(MODNAME, 'snarea_d', 'nhru', 'real', &
+     &       '0.975', '0.0', '3.0', &
+     &       'Snow area depletion S-curve coefficient D', &
+     &       'Snow area depletion S-curve coefficient D for each HRU', &
+     &       'none')/=0 ) CALL read_error(1, 'snarea_d')
+      ENDIF
 
       ALLOCATE ( Snarea_thresh(Nhru) )
       IF ( declparam(MODNAME, 'snarea_thresh', 'nhru', 'real', &
@@ -453,7 +481,7 @@
 !***********************************************************************
       INTEGER FUNCTION snoinit()
       USE PRMS_SNOW
-      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file
+      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file, Snarea_curve_flag, Print_debug
       USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_route_order, Active_hrus, Hru_area_dble
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv
       IMPLICIT NONE
@@ -463,6 +491,7 @@
       EXTERNAL :: read_error, snowcomp_restart, sca_deplcrv
 ! Local Variables
       INTEGER :: i, j
+      REAL :: x
 ! Save Variables
       REAL, SAVE :: acum_init(MAXALB), amlt_init(MAXALB)
       DATA acum_init/.80, .77, .75, .72, .70, .69, .68, .67, .66, .65, .64, .63, .62, .61, .60/
@@ -485,8 +514,28 @@
       IF ( getparam(MODNAME, 'melt_look', Nhru, 'integer', Melt_look)/=0 ) CALL read_error(2, 'melt_look')
       IF ( getparam(MODNAME, 'melt_force', Nhru, 'integer', Melt_force)/=0 ) CALL read_error(2, 'melt_force')
       IF ( getparam(MODNAME, 'rad_trncf', Nhru, 'real', Rad_trncf)/=0 ) CALL read_error(2, 'rad_trncf')
-      IF ( getparam(MODNAME, 'hru_deplcrv', Nhru, 'integer', Hru_deplcrv)/=0 ) CALL read_error(2, 'hru_deplcrv')
-      IF ( getparam(MODNAME, 'snarea_curve', Ndepl*11, 'real', Snarea_curve)/=0 ) CALL read_error(2, 'snarea_curve')
+      IF ( Snarea_curve_flag==0 ) THEN
+        IF ( getparam(MODNAME, 'hru_deplcrv', Nhru, 'integer', Hru_deplcrv)/=0 ) CALL read_error(2, 'hru_deplcrv')
+        IF ( getparam(MODNAME, 'snarea_curve', Ndepl*11, 'real', Snarea_curve)/=0 ) CALL read_error(2, 'snarea_curve')
+      ELSE
+        IF ( getparam(MODNAME, 'snarea_a', Nhru, 'real', Snarea_a)/=0 ) CALL read_error(2, 'snarea_a')
+        IF ( getparam(MODNAME, 'snarea_b', Nhru, 'real', Snarea_b)/=0 ) CALL read_error(2, 'snarea_b')
+        IF ( getparam(MODNAME, 'snarea_c', Nhru, 'real', Snarea_c)/=0 ) CALL read_error(2, 'snarea_c')
+        IF ( getparam(MODNAME, 'snarea_d', Nhru, 'real', Snarea_d)/=0 ) CALL read_error(2, 'snarea_d')
+        DO i = 1, Nhru
+          Hru_deplcrv(i) = i
+          x = 0.0
+          DO j = 1, 11
+            Snarea_curve(j,i) = (Snarea_a(i) - Snarea_d(i)) / (1 + (x**Snarea_b(i) / Snarea_c(i))) + Snarea_d(i)
+            IF ( Snarea_curve(j,i)>1.0 ) THEN
+              IF ( Print_debug>-1 ) PRINT *, 'WARNING, snarea_curve computed > 1.0 for HRU:', i, '; value:', Snarea_curve(j,i)
+              Snarea_curve(j,i) = 1.0
+            ENDIF
+!            write (777,*) snarea_curve(j,i), x
+            x = x + 0.1
+          ENDDO
+        ENDDO
+      ENDIF
       IF ( getparam(MODNAME, 'snarea_thresh', Nhru, 'real', Snarea_thresh)/=0 ) CALL read_error(2, 'snarea_thresh')
       IF ( getparam(MODNAME, 'albset_rnm', 1, 'real', Albset_rnm)/=0 ) CALL read_error(2, 'albset_rnm')
       IF ( getparam(MODNAME, 'albset_rna', 1, 'real', Albset_rna)/=0 ) CALL read_error(2, 'albset_rna')
