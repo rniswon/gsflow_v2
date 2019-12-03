@@ -8,7 +8,7 @@
       CHARACTER(LEN=68), PARAMETER :: &
      &  EQULS = '===================================================================='
       CHARACTER(LEN=11), PARAMETER :: MODNAME = 'gsflow_prms'
-      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.1.0 11/30/2019'
+      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.1.0 12/05/2019'
       CHARACTER(LEN=8), SAVE :: Process
       !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
       INTEGER, PARAMETER :: GSFLOW = 0, PRMS = 1, MODFLOW = 2
@@ -104,7 +104,7 @@
 
         Process_flag = 1
 
-        PRMS_versn = 'gsflow_prms.f90 2019-11-27 15:00:00Z'
+        PRMS_versn = 'gsflow_prms.f90 2019-12-02 17:00:00Z'
 
         IF ( PRMS_flag==1 ) THEN ! PRMS is active, GSFLOW, PRMS
           IF ( check_dims()/=0 ) STOP
