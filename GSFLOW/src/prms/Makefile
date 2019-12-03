@@ -163,7 +163,6 @@ stream_temp.o: stream_temp.f90 prms_module.mod prms_basin.mod prms_obs.mod prms_
 	$(FC) -c $(FFLAGS) stream_temp.f90
 
 potet_jh.o: potet_jh.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod
-potet_jh.o: potet_jh.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod
 	$(FC) -c $(FFLAGS) potet_jh.f90
 
 potet_pt.o: potet_pt.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_soltab.mod prms_set_time.mod prms_climate_hru.mod

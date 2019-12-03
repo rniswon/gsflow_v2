@@ -9,7 +9,7 @@
 ! problem
 !
 ! nlake_hrus set to nlake for version 5.0.0, nlake_hrus to be added in 5.0.1
-! in future this module may be used for muskingum only, so would need to 
+! in future this module may be used for muskingum only, so would need to
 ! check lake_route_flag = 1 in a bunch of places
 !
 !   The Muskingum equation is described in 'Hydrology for Engineers', 3rd ed.

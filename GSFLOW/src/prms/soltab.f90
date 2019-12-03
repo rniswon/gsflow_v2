@@ -8,7 +8,7 @@
 !
 !   Lee, R., 1963, Evaluation of solar beam irradiation as a climatic parameter
 !   of mountain watersheds, Colorado State University Hydrology Papers, 2,
-!   50 pp. 
+!   50 pp.
 !***********************************************************************
       MODULE PRMS_SOLTAB
       IMPLICIT NONE
@@ -19,6 +19,14 @@
 ! TWOPI ~ 6.2831853071786
 ! RADIANS ~ 0.017453292519943
 ! PI_12 ~ 3.8197186342055
+      DOUBLE PRECISION, PARAMETER :: ECCENTRICY = 0.01671D0
+      DOUBLE PRECISION, PARAMETER :: DAYSYR = 365.242D0
+      ! 0.016723401  daily change -1.115E-09, eccen = 0.016723401 + (julhour-julhour(1966,1,0,18))+dmin/60)/24*-1.115E-09
+      ! julday(1966,1,0.75 UT) = 2439126.25
+      ! eccen = 0.01675104-0.00004180*T-0.000000126*T^2  T is julian centuries (days time from epoch, is GMT from Jan 0.0
+      DOUBLE PRECISION, PARAMETER :: DEGDAY = 360.0D0/DAYSYR
+      DOUBLE PRECISION, PARAMETER :: DEGDAYRAD = DEGDAY*RADIANS ! about 0.00143356672
+! DEGDAY = 360 degrees/days in year
       CHARACTER(LEN=6), SAVE :: MODNAME
       DOUBLE PRECISION, SAVE :: Solar_declination(366), Soltab_basinpotsw(366)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_cossl(:), Soltab_sunhrs(:, :)
@@ -120,14 +128,6 @@
       DOUBLE PRECISION :: basin_cossl
       DOUBLE PRECISION :: basin_sunhrs(366), obliquity(366)
       DOUBLE PRECISION :: y, y2, y3, jddbl
-      DOUBLE PRECISION, PARAMETER :: ECCENTRICY = 0.01671D0
-      DOUBLE PRECISION, PARAMETER :: DAYSYR = 365.242D0
-      ! 0.016723401  daily change -1.115E-09, eccen = 0.016723401 + (julhour-julhour(1966,1,0,18))+dmin/60)/24*-1.115E-09
-      ! julday(1966,1,0.75 UT) = 2439126.25
-      ! eccen = 0.01675104-0.00004180*T-0.000000126*T^2  T is julian centuries (days time from epoch, is GMT from Jan 0.0
-      DOUBLE PRECISION, PARAMETER :: DEGDAY = 360.0D0/DAYSYR
-      DOUBLE PRECISION, PARAMETER :: DEGDAYRAD = DEGDAY*RADIANS ! about 0.00143356672
-! DEGDAY = 360 degrees/days in year
 !***********************************************************************
       sthinit = 0
 
@@ -210,7 +210,7 @@
      &                         Solar_declination(80), Solar_declination(94), Solar_declination(109), &
      &                         Solar_declination(123), Solar_declination(138), Solar_declination(152), &
      &                         Solar_declination(173)
-        CLOSE ( file_unit) 
+        CLOSE ( file_unit)
 ! from original soltab
 !     data obliquity/2.06699,2.06317,2.05582,2.04520,2.03243,2.01706,2.00080,
 !    +1.98553,1.96990,1.95714,1.94689,1.94005,1.93616/
@@ -387,7 +387,7 @@
 !  This is the sunrise equation
 !  Lat is the latitude
 !  Solar_declination is the declination of the sun on a day
-!  T is the angle hour from the local meridian (local solar noon) to the 
+!  T is the angle hour from the local meridian (local solar noon) to the
 !  sunrise (negative) or sunset (positive).  The Earth rotates at the angular
 !  speed of 15 degrees/hour (2 pi / 24 hour in radians) and, therefore, T/15 degress (T*24/pi
 !  in radians) gives the time of sunrise as the number of hours before the local

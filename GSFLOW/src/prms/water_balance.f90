@@ -169,8 +169,8 @@
      &    Dprst_stor_hru, Basin_sroffp, Basin_sroffi, Basin_dprst_sroff, Basin_sroff_down, &
      &    Basin_hortonian_lakes, Basin_imperv_evap, Basin_imperv_stor, &
      &    Basin_dprst_evap, Basin_dprst_seep, Basin_sroff, Hru_impervevap, Dprst_seep_hru, &
-     &    Dprst_evap_hru, Dprst_sroff_hru, Dprst_insroff_hru, &
-     &    Sro_to_dprst_perv, Dprst_area_clos, Hortonian_flow, Dprst_in, Hru_sroffp, Hru_sroffi, Imperv_stor_ante, &
+     &    Dprst_evap_hru, Dprst_sroff_hru, Dprst_insroff_hru, Sro_to_dprst_perv, &
+     &    Dprst_area_clos, Hortonian_flow, Dprst_in, Hru_sroffp, Hru_sroffi, Imperv_stor_ante, &
      &    Dprst_stor_ante, Use_sroff_transfer
       USE PRMS_SOILZONE, ONLY: Swale_actet, Dunnian_flow, Basin_sz2gw, &
      &    Perv_actet, Cap_infil_tot, Pref_flow_infil, Cap_waterin, Upslope_interflow, &
@@ -299,7 +299,7 @@
      &              Hru_impervstor(i), Hru_impervevap(i), Net_ppt(i), &
      &              Pkwater_equiv(i), Snow_evap(i), Net_snow(i), Net_rain(i), Hru_sroffp(i), Hru_sroffi(i), harea
           ELSE
-            WRITE ( BALUNT,'(3I3,F10.6,15F10.5,F10.3)' ) Nowmonth, Nowday, Pptmix_nopack(i), &
+            WRITE ( BALUNT,'(3I3,F10.6,15F10.4,F10.3)' ) Nowmonth, Nowday, Pptmix_nopack(i), &
      &              robal, Snowmelt(i), Imperv_stor_ante(i), Infil(i), &
      &              Hortonian_flow(i), Hru_impervstor(i), Hru_impervevap(i), Hru_percent_imperv(i), Net_ppt(i), &
      &              Pkwater_equiv(i), Snow_evap(i), Net_snow(i), Net_rain(i), Hru_sroffp(i), Hru_sroffi(i), harea
