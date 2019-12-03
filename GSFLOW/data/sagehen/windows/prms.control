@@ -31,13 +31,14 @@ data_file
 ..\input\prms\sagehen.data
 ####
 param_file
-5
+6
 4
 ..\input\prms\prms.params
 ..\input\prms\gis.params
 ..\input\prms\ncascade.params
 ..\input\prms\ncascdgw.params
 ..\input\prms\subbasin.params
+..\input\prms\strmflow_in_out.params
 ####
 model_output_file
 1
@@ -62,7 +63,7 @@ ddsolrad
 strmflow_module
 1
 4
-strmflow
+strmflow_in_out
 ####
 et_module
 1
@@ -203,6 +204,11 @@ nhruOutBaseFileName
 1
 4
 ..\output\prms\nhru_
+####
+nhruOutNcol
+1
+1
+16
 ####
 basinOutON_OFF
 1

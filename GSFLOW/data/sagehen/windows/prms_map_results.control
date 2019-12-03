@@ -31,7 +31,7 @@ data_file
 ..\input\prms\sagehen.data
 ####
 param_file
-6
+7
 4
 ..\input\prms\prms.params
 ..\input\prms\gis.params
@@ -39,6 +39,7 @@ param_file
 ..\input\prms\ncascade.params
 ..\input\prms\ncascdgw.params
 ..\input\prms\subbasin.params
+..\input\prms\map_results.params
 ####
 model_output_file
 1

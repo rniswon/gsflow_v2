@@ -57,6 +57,13 @@ ndays
 366
 ** Parameters **
 ####
+ppt_zero_thresh
+1
+one
+1
+2
+0.0
+####
 max_missing
 1
 one

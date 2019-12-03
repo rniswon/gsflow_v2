@@ -9,7 +9,7 @@
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.0.0 05/30/2019
+                       Version 5.1.0 RC 10/30/2019
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -31,7 +31,8 @@ Transpiration Dist: transp_tindex, climate_hru, transp_frost
          Soil Zone: soilzone
        Groundwater: gwflow
 Streamflow Routing: strmflow, strmflow_in_out, muskingum,
-                    muskingum_lake
+                    muskingum_lake, muskingum_mann
+Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
                     basin_summary, nsegment_summary
@@ -43,13 +44,13 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2019-05-30
-Basin Definition               basin                      2018-04-06
-Cascading Flow                 cascade                    2018-05-25
-Common States and Fluxes       climateflow                2019-04-03
+GSFLOW Computation Order       gsflow_prms                2019-10-30
+Basin Definition               basin                      2018-09-05
+Cascading Flow                 cascade                    2019-09-25
+Common States and Fluxes       climateflow                2019-10-23
 Potential Solar Radiation      soltab                     2016-09-09
 PRMS Set Time Variables        prms_time                  2015-03-31
-Time Series Data               obs                        2018-02-23
+Time Series Data               obs                        2019-10-23
 Temperature Distribution       temp_1sta                  2018-01-16
 Precipitation Distribution     precip_1sta                2016-10-21
 Solar Radiation Distribution   ddsolrad                   2019-04-04
@@ -58,7 +59,7 @@ Potential Evapotranspiration   potet_jh                   2019-04-04
 Canopy Interception            intcp                      2019-05-30
 Snow Dynamics                  snowcomp                   2018-05-04
 Surface Runoff                 srunoff_smidx              2019-05-24
-Soil Zone Computations         soilzone                   2019-03-05
+Soil Zone Computations         soilzone                   2019-10-30
 Groundwater                    gwflow                     2019-04-04
 Streamflow Routing             strmflow                   2014-12-02
 Summary                        basin_sum                  2017-10-21
@@ -77,5 +78,5 @@ Simulation time period: 1980/10/01 - 1996/09/30
 
 ====================================================================
 
-Execution elapsed time    0 minutes  0.77 seconds
+Execution elapsed time    0 minutes  0.73 seconds
 
