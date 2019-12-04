@@ -382,8 +382,8 @@
       IF ( Print_debug>-2 ) THEN
         IF ( control_string(dynamic_param_log_file, 'dynamic_param_log_file')/=0 ) CALL read_error(5, 'dynamic_param_log_file')
         CALL PRMS_open_output_file(Output_unit, dynamic_param_log_file, 'dynamic_param_log_file', 0, ierr)
-        PRINT '(/,A,//)', 'A summary of dynamic parameter events are written to file:', &
-     &                    dynamic_param_log_file(:numchars(dynamic_param_log_file))
+        PRINT '(/,A,/,A)', 'A summary of dynamic parameter events are written to file:', &
+     &                     dynamic_param_log_file(:numchars(dynamic_param_log_file))
       ENDIF
 
       IF ( istop==1 .OR. ierr/=0 ) STOP 'ERROR in dynamic_param_read initialize procedure'
