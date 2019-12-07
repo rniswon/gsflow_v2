@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.1.0 RC 10/30/2019
+                       Version 5.1.0 12/05/2019
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -35,8 +35,8 @@ Stream Temperature: stream_temp
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2019-10-30
-Basin Definition               basin                      2018-09-05
+GSFLOW Computation Order       gsflow_prms                2019-12-02
+Basin Definition               basin                      2019-11-14
 Cascading Flow                 cascade                    2019-09-25
 Common States and Fluxes       climateflow                2019-10-31
 Potential Solar Radiation      soltab                     2016-09-09
@@ -48,14 +48,14 @@ Solar Radiation Distribution   ddsolrad                   2019-04-04
 Transpiration Distribution     transp_tindex              2015-01-06
 Potential Evapotranspiration   potet_jh                   2019-04-04
 Canopy Interception            intcp                      2019-05-30
-Snow Dynamics                  snowcomp                   2018-05-04
-Surface Runoff                 srunoff_smidx              2019-05-24
-Soil Zone Computations         soilzone                   2019-10-30
+Snow Dynamics                  snowcomp                   2019-11-27
+Surface Runoff                 srunoff_smidx              2019-11-15
+Soil Zone Computations         soilzone                   2019-12-05
 GSFLOW PRMS to MODFLOW         gsflow_prms2mf             2019-10-30
 GSFLOW MODFLOW to PRMS         gsflow_mf2prms             2017-11-15
 GSFLOW Output Budget Summary   gsflow_budget              2019-10-30
 GSFLOW Output CSV Summary      gsflow_sum                 2019-10-31
-Output Summary                 subbasin                   2018-04-25
+Output Summary                 subbasin                   2019-12-02
 ====================================================================
 GSFLOW MODFLOW main            gsflow_modflow             2019-10-30
 UZF-NWT Package                gwf2uzf1_NWT               2019-09-10

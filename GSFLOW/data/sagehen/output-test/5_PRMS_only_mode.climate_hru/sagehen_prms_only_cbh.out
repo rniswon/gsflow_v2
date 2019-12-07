@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.1.0 RC 10/30/2019
+                       Version 5.1.0 12/05/2019
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -35,10 +35,10 @@ Stream Temperature: stream_temp
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2019-10-30
-Basin Definition               basin                      2018-09-05
+GSFLOW Computation Order       gsflow_prms                2019-12-02
+Basin Definition               basin                      2019-11-14
 Cascading Flow                 cascade                    2019-09-25
-Common States and Fluxes       climateflow                2019-10-23
+Common States and Fluxes       climateflow                2019-10-31
 Potential Solar Radiation      soltab                     2016-09-09
 PRMS Set Time Variables        prms_time                  2015-03-31
 Time Series Data               obs                        2019-10-23
@@ -48,13 +48,13 @@ Solar Radiation Distribution   climate_hru                2019-10-23
 Potential Evapotranspiration   climate_hru                2019-10-23
 Transpiration Distribution     transp_tindex              2015-01-06
 Canopy Interception            intcp                      2019-05-30
-Snow Dynamics                  snowcomp                   2018-05-04
-Surface Runoff                 srunoff_smidx              2019-05-24
-Soil Zone Computations         soilzone                   2019-10-30
+Snow Dynamics                  snowcomp                   2019-11-27
+Surface Runoff                 srunoff_smidx              2019-11-15
+Soil Zone Computations         soilzone                   2019-12-05
 Groundwater                    gwflow                     2019-04-04
 Streamflow Routing             strmflow                   2014-12-02
 Summary                        basin_sum                  2017-10-21
-Output Summary                 subbasin                   2018-04-25
+Output Summary                 subbasin                   2019-12-02
 Nhru Output Summary            nhru_summary               2019-10-25
 ====================================================================
 
@@ -77,24 +77,24 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
                   (inches) (inches) (inches) (inches) (inches)
  -------------------------------------------------------------
  initial                               3.100
-   1981             27.189   19.621    4.126    6.543    6.181
-   1982             76.778   30.512   11.981   38.412   36.819
-   1983             64.524   32.404   11.445   32.656   38.374
-   1984             52.146   30.871    9.762   22.958   26.168
-   1985             29.538   21.952    6.945   10.403   11.260
-   1986             60.447   30.253   10.520   26.618   27.044
-   1987             17.887   16.343    4.932    7.132    6.438
-   1988             21.214   17.187    3.413    5.546    4.140
-   1989             43.851   26.103    6.287   14.874   12.683
-   1990             29.970   23.628    5.881    6.747    6.491
-   1991             25.841   22.357    3.845    5.520    5.574
-   1992             21.591   15.887    3.473    6.076    3.847
-   1993             55.061   28.260    7.123   23.151   18.886
-   1994             20.340   16.378    5.097    5.989    4.182
-   1995             69.736   30.629    8.011   36.192   29.493
-   1996             52.824   26.073    8.959   25.803   22.769
+   1981             27.189   19.315    4.208    6.766    6.181
+   1982             76.778   30.356   12.028   38.602   36.819
+   1983             64.524   32.336   11.488   32.728   38.374
+   1984             52.146   30.845    9.784   23.005   26.168
+   1985             29.538   21.906    6.964   10.451   11.260
+   1986             60.447   30.202   10.543   26.665   27.044
+   1987             17.887   16.260    4.953    7.218    6.438
+   1988             21.214   16.894    3.479    5.795    4.140
+   1989             43.851   26.052    6.328   14.949   12.683
+   1990             29.970   23.274    6.025    7.000    6.491
+   1991             25.841   22.282    3.942    5.641    5.574
+   1992             21.591   15.423    3.655    6.455    3.847
+   1993             55.061   28.101    7.246   23.370   18.886
+   1994             20.340   16.194    5.208    6.185    4.182
+   1995             69.736   30.617    8.059   36.269   29.493
+   1996             52.824   25.939    9.001   25.943   22.769
  *************************************************************
- Total for run     668.938  388.458    8.959  274.620  260.348
+ Total for run     668.938  385.995    9.001  277.042  260.348
  *************************************************************
-Execution elapsed time    0 minutes  1.18 seconds
+Execution elapsed time    0 minutes  1.09 seconds
 

@@ -19,21 +19,21 @@
                                     OUT                                        OUT
                                     ---                                        ---
    EVAPOTRANSPIRATION =         195825.44     EVAPOTRANSPIRATION =          16472.16
-           STREAMFLOW =         310561.67             STREAMFLOW =          89862.86
+           STREAMFLOW =         310561.68             STREAMFLOW =          89862.85
      GW BOUNDARY FLOW =           5051.54       GW BOUNDARY FLOW =            723.82
                 WELLS =           3517.07                  WELLS =            500.66
 
-   INFLOWS - OUTFLOWS =        1446701.59     INFLOWS - OUTFLOWS =        1230616.30
+   INFLOWS - OUTFLOWS =        1446701.58     INFLOWS - OUTFLOWS =        1230616.31
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        1446719.56         STORAGE CHANGE =        1230618.89
+ TOTAL STORAGE CHANGE =        1446719.52         STORAGE CHANGE =        1230618.88
        --------------                             --------------
-         LAND SURFACE =         661129.48           LAND SURFACE =        1036800.81
-            SOIL ZONE =         827979.04              SOIL ZONE =         192941.06
-     UNSATURATED ZONE =           8329.92       UNSATURATED ZONE =           7022.11
-       SATURATED ZONE =         -50718.89         SATURATED ZONE =          -6145.08
+         LAND SURFACE =         661129.51           LAND SURFACE =        1036800.81
+            SOIL ZONE =         827978.98              SOIL ZONE =         192941.05
+     UNSATURATED ZONE =           8329.96       UNSATURATED ZONE =           7022.11
+       SATURATED ZONE =         -50718.93         SATURATED ZONE =          -6145.08
 
- OVERALL BUDGET ERROR =            -17.97           BUDGET ERROR =             -2.59
+ OVERALL BUDGET ERROR =            -17.94           BUDGET ERROR =             -2.57
 
 
   PERCENT DISCREPANCY =             -0.00    PERCENT DISCREPANCY =             -0.00

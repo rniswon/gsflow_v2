@@ -2,14 +2,14 @@
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version 2.0.0 05/30/2019
+                         Version 2.1.0 10/31/2019
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.0.0 05/30/2019
+                       Version 5.1.0 12/05/2019
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -31,7 +31,8 @@ Transpiration Dist: transp_tindex, climate_hru, transp_frost
          Soil Zone: soilzone
        Groundwater: gwflow
 Streamflow Routing: strmflow, strmflow_in_out, muskingum,
-                    muskingum_lake
+                    muskingum_lake, muskingum_mann
+Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
                     basin_summary, nsegment_summary
@@ -43,26 +44,26 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2019-05-30
-Basin Definition               basin                      2018-04-06
-Cascading Flow                 cascade                    2018-05-25
-Common States and Fluxes       climateflow                2019-04-03
+GSFLOW Computation Order       gsflow_prms                2019-12-02
+Basin Definition               basin                      2019-11-14
+Cascading Flow                 cascade                    2019-09-25
+Common States and Fluxes       climateflow                2019-10-31
 Potential Solar Radiation      soltab                     2016-09-09
 PRMS Set Time Variables        prms_time                  2015-03-31
-Time Series Data               obs                        2018-02-23
-Temperature Distribution       climate_hru                2017-10-23
-Precipitation Distribution     climate_hru                2017-10-23
+Time Series Data               obs                        2019-10-23
+Temperature Distribution       climate_hru                2019-10-23
+Precipitation Distribution     climate_hru                2019-10-23
 Solar Radiation Distribution   ddsolrad                   2019-04-04
 Transpiration Distribution     transp_tindex              2015-01-06
 Potential Evapotranspiration   potet_jh                   2019-04-04
 Canopy Interception            intcp                      2019-05-30
-Snow Dynamics                  snowcomp                   2018-05-04
-Surface Runoff                 srunoff_smidx              2019-05-24
-Soil Zone Computations         soilzone                   2019-03-05
+Snow Dynamics                  snowcomp                   2019-11-27
+Surface Runoff                 srunoff_smidx              2019-11-15
+Soil Zone Computations         soilzone                   2019-12-05
 Groundwater                    gwflow                     2019-04-04
 Streamflow Routing             strmflow                   2014-12-02
 Summary                        basin_sum                  2017-10-21
-Output Summary                 subbasin                   2018-04-25
+Output Summary                 subbasin                   2019-12-02
 ====================================================================
 
 Using Control File: .\prms.control
@@ -75,5 +76,5 @@ Simulation time period: 1980/10/01 - 1984/01/30
 
 ====================================================================
 
-Execution elapsed time    0 minutes  0.19 seconds
+Execution elapsed time    0 minutes  0.18 seconds
 

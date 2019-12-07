@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.0.0 05/30/2019
+                       Version 5.1.0 12/05/2019
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -22,7 +22,8 @@ Transpiration Dist: transp_tindex, climate_hru, transp_frost
          Soil Zone: soilzone
        Groundwater: gwflow
 Streamflow Routing: strmflow, strmflow_in_out, muskingum,
-                    muskingum_lake
+                    muskingum_lake, muskingum_mann
+Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
                     basin_summary, nsegment_summary
@@ -34,30 +35,30 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2019-05-30
-Basin Definition               basin                      2018-04-06
-Cascading Flow                 cascade                    2018-05-25
-Common States and Fluxes       climateflow                2019-04-03
+GSFLOW Computation Order       gsflow_prms                2019-12-02
+Basin Definition               basin                      2019-11-14
+Cascading Flow                 cascade                    2019-09-25
+Common States and Fluxes       climateflow                2019-10-31
 Potential Solar Radiation      soltab                     2016-09-09
 PRMS Set Time Variables        prms_time                  2015-03-31
-Time Series Data               obs                        2018-02-23
+Time Series Data               obs                        2019-10-23
 Temperature Distribution       temp_laps                  2018-01-16
 Precipitation Distribution     precip_1sta                2016-10-21
 Solar Radiation Distribution   ddsolrad                   2019-04-04
 Transpiration Distribution     transp_tindex              2015-01-06
 Potential Evapotranspiration   potet_jh                   2019-04-04
 Canopy Interception            intcp                      2019-05-30
-Snow Dynamics                  snowcomp                   2018-05-04
-Surface Runoff                 srunoff_smidx              2019-05-24
-Soil Zone Computations         soilzone                   2019-03-05
-GSFLOW PRMS to MODFLOW         gsflow_prms2mf             2017-11-15
+Snow Dynamics                  snowcomp                   2019-11-27
+Surface Runoff                 srunoff_smidx              2019-11-15
+Soil Zone Computations         soilzone                   2019-12-05
+GSFLOW PRMS to MODFLOW         gsflow_prms2mf             2019-10-30
 GSFLOW MODFLOW to PRMS         gsflow_mf2prms             2017-11-15
-GSFLOW Output Budget Summary   gsflow_budget              2018-03-02
-GSFLOW Output CSV Summary      gsflow_sum                 2019-01-30
-Output Summary                 subbasin                   2018-04-25
+GSFLOW Output Budget Summary   gsflow_budget              2019-10-30
+GSFLOW Output CSV Summary      gsflow_sum                 2019-10-31
+Output Summary                 subbasin                   2019-12-02
 ====================================================================
-GSFLOW MODFLOW main            gsflow_modflow             2019-05-10
-UZF-NWT Package                gwf2uzf1_NWT               2017-03-08
+GSFLOW MODFLOW main            gsflow_modflow             2019-10-30
+UZF-NWT Package                gwf2uzf1_NWT               2019-09-10
 SFR-NWT Package                gwf2sfr7_NWT               2017-03-08
 LAK-NWT Package                gwf2lak7_NWT               2016-07-21
 

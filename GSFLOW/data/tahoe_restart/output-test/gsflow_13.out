@@ -17,25 +17,25 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        2163706.61     EVAPOTRANSPIRATION =         483835.17
+   EVAPOTRANSPIRATION =        2163658.02     EVAPOTRANSPIRATION =         483855.26
            STREAMFLOW =        2.9240D+07             STREAMFLOW =        4453046.00
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
    INFLOWS - OUTFLOWS =        1.3013D+08     INFLOWS - OUTFLOWS =        4.0293D+07
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        1.2930D+08         STORAGE CHANGE =        4.0091D+07
+ TOTAL STORAGE CHANGE =        1.2932D+08         STORAGE CHANGE =        4.0095D+07
        --------------                             --------------
          LAND SURFACE =        1.1908D+08           LAND SURFACE =        3.3650D+07
-            SOIL ZONE =        -691112.49              SOIL ZONE =         -66893.93
-     UNSATURATED ZONE =         605361.16       UNSATURATED ZONE =          61223.18
-       SATURATED ZONE =       -1357741.17         SATURATED ZONE =        -182995.95
-                LAKES =        1.1660D+07                  LAKES =        6629361.00
+            SOIL ZONE =        -690448.39              SOIL ZONE =         -68331.15
+     UNSATURATED ZONE =         601421.38       UNSATURATED ZONE =          61152.02
+       SATURATED ZONE =       -1364080.33         SATURATED ZONE =        -183305.05
+                LAKES =        1.1693D+07                  LAKES =        6634842.50
 
- OVERALL BUDGET ERROR =         834036.87           BUDGET ERROR =         202453.26
+ OVERALL BUDGET ERROR =         810546.59           BUDGET ERROR =         198769.15
 
 
-  PERCENT DISCREPANCY =              0.52    PERCENT DISCREPANCY =              0.45
+  PERCENT DISCREPANCY =              0.50    PERCENT DISCREPANCY =              0.44
 
 
 

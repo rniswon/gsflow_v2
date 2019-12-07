@@ -17,25 +17,25 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        5071748.31     EVAPOTRANSPIRATION =         579575.84
+   EVAPOTRANSPIRATION =        5071529.59     EVAPOTRANSPIRATION =         579496.07
            STREAMFLOW =        2.1368D+07             STREAMFLOW =        3182123.00
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
    INFLOWS - OUTFLOWS =        1.7387D+08     INFLOWS - OUTFLOWS =        5.7622D+07
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        1.7303D+08         STORAGE CHANGE =        5.7372D+07
+ TOTAL STORAGE CHANGE =        1.7299D+08         STORAGE CHANGE =        5.7371D+07
        --------------                             --------------
          LAND SURFACE =        1.3829D+08           LAND SURFACE =        4.4149D+07
-            SOIL ZONE =        3901868.63              SOIL ZONE =         598305.34
-     UNSATURATED ZONE =         855058.76       UNSATURATED ZONE =         137770.11
-       SATURATED ZONE =       -1617497.06         SATURATED ZONE =        -111296.36
-                LAKES =        3.1595D+07                  LAKES =        1.2598D+07
+            SOIL ZONE =        3901883.39              SOIL ZONE =         598135.99
+     UNSATURATED ZONE =         862343.98       UNSATURATED ZONE =         136700.99
+       SATURATED ZONE =       -1645073.08         SATURATED ZONE =        -115290.42
+                LAKES =        3.1576D+07                  LAKES =        1.2602D+07
 
- OVERALL BUDGET ERROR =         837945.21           BUDGET ERROR =         250650.79
+ OVERALL BUDGET ERROR =         877406.76           BUDGET ERROR =         251188.13
 
 
-  PERCENT DISCREPANCY =              0.42    PERCENT DISCREPANCY =              0.41
+  PERCENT DISCREPANCY =              0.44    PERCENT DISCREPANCY =              0.41
 
 
 
