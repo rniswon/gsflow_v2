@@ -32,7 +32,7 @@
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Nwateruse, Nexternal, Nconsumed, Npoigages, Prms_warmup
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
-      INTEGER, SAVE :: Frozen_flag, Diversion2soil_flag, Snarea_curve_flag
+      INTEGER, SAVE :: Frozen_flag, Diversion2soil_flag, Snarea_curve_flag, Soilzone_aet_flag
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
@@ -832,6 +832,7 @@
       IF ( control_integer(Strmtemp_humidity_flag, 'strmtemp_humidity_flag')/=0 ) Strmtemp_humidity_flag = 0
 
       IF ( control_integer(Snarea_curve_flag, 'snarea_curve_flag')/=0 ) Snarea_curve_flag = 0
+      IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = 0
 
       Humidity_cbh_flag = 0
       Windspeed_cbh_flag = 0

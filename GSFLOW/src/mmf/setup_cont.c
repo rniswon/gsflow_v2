@@ -272,6 +272,10 @@ void setup_cont (void) {
 		lval = (long*)umalloc(sizeof(long));
 		lval[0] = 0;
 		decl_control_int_array("snarea_curve_flag", 1, lval);
+
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("soilzone_aet_flag", 1, lval);
 /*
 **	file names
 */

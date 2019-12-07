@@ -1641,15 +1641,9 @@ C
         END DO
         IF ( TESTSFR.GT.1.0E-5 ) THEN
           IF ( Print_debug>-2 ) THEN
-            WRITE (Logunt, *)
-            WRITE (Logunt, *)'***WARNING***'
             WRITE (Logunt, 10)
-            WRITE (Logunt, *)
-            WRITE (Logunt, *)
+            WRITE (*, 10)
           ENDIF
-          WRITE (*, *)
-          WRITE (*, *)'***WARNING***'
-          WRITE (*, 10)
         END IF
       END IF
 ! Zero LAK flows (PPT, EVAP, RUNOFF, SP.WITHDRAWL).
@@ -1657,27 +1651,26 @@ C
         DO i = 1, NLAKES
           TESTLAK = TESTLAK + ABS(PRCPLK(i)) + ABS(EVAPLK(i)) + 
      +              ABS(RNF(i)) + ABS(WTHDRW(i))
-          PRCPLK(i) = ZERO
-          EVAPLK(i) = ZERO
-          RNF(i) = ZERO
-          WTHDRW(i) = ZERO
+          IF ( TESTLAK.GT.1.0E-5 ) EXIT
         END DO
+        PRCPLK = ZERO
+        EVAPLK = ZERO
+        RNF = ZERO
+        WTHDRW = ZERO
         IF ( TESTLAK.GT.1.0E-5 ) THEN
           IF ( Print_debug>-2 ) THEN
-            WRITE (Logunt, *)
-            WRITE (Logunt, *)'***WARNING***'
             WRITE (Logunt, 11)
+            WRITE (*, 11)
           ENDIF
-          WRITE (*, *)
-          WRITE (*, *)'***WARNING***'
-          WRITE (*, 11)
         END IF
       END IF
-   10  FORMAT('Non-zero values were specified for precipitation,',/,
+   10 FORMAT(/, '***WARNING***', /,
+     +       'Non-zero values were specified for precipitation,',/,
      +       'streamflow, and ET for streams in MODFLOW input files.',/,
      +       'These values are set to zero for GSFLOW ',
-     +       'simulations')    
-   11 FORMAT('Non-zero values were specified for precipitation,',/,
+     +       'simulations', /)    
+   11 FORMAT(/, '***WARNING***', /,
+     +       'Non-zero values were specified for precipitation,',/,
      +       'streamflow, ET, and Sp.Flow for lakes in MODFLOW',/,
      +       'input files. These values are set to zero',/,
      +       'for GSFLOW simulations.', /)

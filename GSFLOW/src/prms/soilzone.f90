@@ -65,7 +65,7 @@
       INTEGER, SAVE, ALLOCATABLE :: Soil_saturated(:)
 !      REAL, SAVE, ALLOCATABLE :: Cascade_interflow(:), Cascade_dunnianflow(:), Interflow_max(:)
 !      REAL, SAVE, ALLOCATABLE :: Cpr_stor_frac(:), Pfr_stor_frac(:), Gvr_stor_frac(:), Soil_moist_frac(:)
-!      REAL, SAVE, ALLOCATABLE :: Soil_rechr_ratio(:), Snowevap_aet_frac(:), Cap_upflow_max(:)
+!      REAL, SAVE, ALLOCATABLE :: Soil_rechr_ratio(:), Snowevap_aet_frac(:), Perv_avail_et(:), Cap_upflow_max(:)
 !   GSFLOW Declared Variables
       DOUBLE PRECISION, SAVE :: Basin_gvr2sm
       REAL, SAVE, ALLOCATABLE :: Sm2gw_grav(:), Gw2sm_grav(:)
@@ -126,7 +126,7 @@
 !***********************************************************************
       szdecl = 0
 
-      Version_soilzone = 'soilzone.f90 2019-10-30 14:45:00Z'
+      Version_soilzone = 'soilzone.f90 2019-12-05 13:57:00Z'
       CALL print_module(Version_soilzone, 'Soil Zone Computations      ', 90 )
       MODNAME = 'soilzone'
 
@@ -277,6 +277,11 @@
       IF ( declvar(MODNAME, 'perv_actet', 'nhru', Nhru, 'real', &
      &     'Actual ET from the capillary reservoir of each HRU', &
      &     'inches', Perv_actet)/=0 ) CALL read_error(3, 'perv_actet')
+
+!      ALLOCATE ( Perv_avail_et(Nhru) )
+!      IF ( declvar(MODNAME, 'perv_avail_et', 'nhru', Nhru, 'real', &
+!     &     'Unsatisfied ET available to the capillary reservoir of each HRU', &
+!     &     'inches', Perv_avail_et)/=0 ) CALL read_error(3, 'perv_avail_et')
 
       ! added to be compatible with ssflow_prms
       IF ( declvar(MODNAME, 'basin_ssin', 'one', 1, 'double', &
@@ -774,6 +779,7 @@
       Gvr2pfr = 0.0
       Swale_actet = 0.0
       Perv_actet = 0.0
+!      Perv_avail_et = 0.0
       Recharge = 0.0
       Cap_waterin = 0.0
       Potet_lower = 0.0
@@ -1144,27 +1150,37 @@
         pervactet = 0.0
         IF ( Soil_moist(i)>0.0 ) THEN
           CALL compute_szactet(Soil_moist_max(i), Soil_rechr_max(i), Transp_on(i), Cov_type(i), &
-     &                         Soil_type(i), Soil_moist(i), Soil_rechr(i), pervactet, &
-     &                         avail_potet, Snow_free(i), Potet_rechr(i), Potet_lower(i), Potet(i), perv_frac)
+     &                         Soil_type(i), Soil_moist(i), Soil_rechr(i), pervactet, avail_potet, &
+     &                         Snow_free(i), Potet_rechr(i), Potet_lower(i), Potet(i), perv_frac)
+          ! sanity check
+!          IF ( pervactet>avail_potet ) THEN
+!            Soil_moist(i) = Soil_moist(i) + pervactet - avail_potet
+!            pervactet = avail_potet
+!            PRINT *, 'perv_et problem', pervactet, Avail_potet
+!          ENDIF
         ENDIF
+!        Perv_avail_et(i) = avail_potet
 
         ! sanity check
-        IF ( Soil_moist(i)<0.0 ) THEN
-          PRINT *, i, Soil_moist(i), ' negative'
-          IF ( pervactet>=ABS(Soil_moist(i)) ) THEN
-            pervactet = pervactet + Soil_moist(i)
-            Soil_moist(i) = 0.0
-          ENDIF
-          IF ( Soil_moist(i)<-NEARZERO ) PRINT *, 'HRU:', i, ' soil_moist<0.0', Soil_moist(i)
-          Soil_moist(i) = 0.0
-        ENDIF
+!        IF ( Soil_moist(i)<0.0 ) THEN
+!          IF ( Print_debug>-1 ) PRINT *, i, Soil_moist(i), ' negative'
+!          IF ( pervactet>=ABS(Soil_moist(i)) ) THEN
+!            pervactet = pervactet + Soil_moist(i)
+!            Soil_moist(i) = 0.0
+!          ENDIF
+!          IF ( Soil_moist(i)<-NEARZERO ) THEN
+!            IF ( Print_debug>-1 ) PRINT *, 'HRU:', i, ' soil_moist<0.0', Soil_moist(i)
+!          ENDIF
+!          Soil_moist(i) = 0.0
+!        ENDIF
 
         Hru_actet(i) = Hru_actet(i) + pervactet*perv_frac
         avail_potet = Potet(i) - Hru_actet(i)
         ! sanity check
 !        IF ( avail_potet<0.0 ) THEN
 !          IF ( Print_debug>-1 ) THEN
-!            PRINT *, 'hru_actet>potet', i, Nowmonth, Nowday, Hru_actet(i), Potet(i), avail_potet
+!            IF ( avail_potet<-NEARZERO ) PRINT *, 'hru_actet>potet', i, &
+!     &           Nowmonth, Nowday, Hru_actet(i), Potet(i), avail_potet
 !          ENDIF
 !          Hru_actet(i) = Potet(i)
 !          tmp = avail_potet/perv_frac
@@ -1391,6 +1407,7 @@
      &           Transp_on, Cov_type, Soil_type, &
      &           Soil_moist, Soil_rechr, Perv_actet, Avail_potet, &
      &           Snow_free, Potet_rechr, Potet_lower, Potet, Perv_frac)
+      USE PRMS_MODULE, ONLY: Soilzone_aet_flag
       USE PRMS_SOILZONE, ONLY: Et_type
       USE PRMS_BASIN, ONLY: NEARZERO
       IMPLICIT NONE
@@ -1406,7 +1423,11 @@
 !******Determine if evaporation(Et_type = 2) or transpiration plus
 !******evaporation(Et_type = 3) are active.  if not, Et_type = 1
 
-      pet = Potet
+      IF ( Soilzone_aet_flag==1 ) THEN
+        pet = Potet
+      ELSE
+        pet = Avail_potet
+      ENDIF
       IF ( Avail_potet<NEARZERO ) THEN
         Et_type = 1
         pet = 0.0
@@ -1457,14 +1478,16 @@
 
 !!!! need to limit Potet_rechr and Potet_lower (pervious area) by Avail_potet (whole HRU)
         IF ( Potet_rechr*Perv_frac > Avail_potet ) THEN
-!          print *, 'reducing potet in cap reservoir', perv_frac, pet
+!          print *, 'reducing potet_rechr in cap reservoir', perv_frac, pet
 !          print *, potet_rechr, potet_lower, avail_potet, (Potet_rechr+Potet_lower)*Perv_frac
           Potet_rechr = Avail_potet / Perv_frac
+!          print *, 'Potet_rechr', Potet_rechr
         ENDIF
         IF ( Potet_lower*Perv_frac > Avail_potet ) THEN
-!          print *, 'reducing potet in cap reservoir', perv_frac, pet
+!          print *, 'reducing potet_lower in cap reservoir', perv_frac, pet
 !          print *, potet_rechr, potet_lower, avail_potet, (Potet_rechr+Potet_lower)*Perv_frac
           Potet_lower = Avail_potet / Perv_frac
+!          print *, 'potet_lower', potet_lower
         ENDIF
 
         IF ( Potet_rechr>Soil_rechr ) THEN
@@ -1498,6 +1521,9 @@
         PRINT *, 'perv_et problem', Perv_actet*Perv_frac, Avail_potet, Perv_frac
 !        Soil_moist = Soil_moist + Perv_actet - Avail_potet
 !        Perv_actet = Avail_potet
+      ENDIF
+      IF ( Perv_actet>Potet ) THEN
+        PRINT *, 'perv_et PET problem', Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
       ENDIF
 
       END SUBROUTINE compute_szactet
