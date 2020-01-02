@@ -52,7 +52,7 @@
       !USE PRMS_DYNAMIC_PARAM_READ, ONLY: MODNAME
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: dynparamrun, dynparaminit, numchars
+      INTEGER, EXTERNAL :: dynparamrun, dynparaminit
       EXTERNAL print_module
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_dynamic_param_read
