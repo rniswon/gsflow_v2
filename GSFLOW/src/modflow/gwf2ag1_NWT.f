@@ -1694,7 +1694,7 @@
       WELLIRRPRMS = 0.0
       SUPFLOW = 0.0
       Qp = ZERO
-      print *, 'qp', qp, totim, zero
+!      print *, 'qp', qp, totim, zero
       Q = ZERO
       QQ = ZERO
       QSW = ZERO
@@ -1795,11 +1795,11 @@
                   Hh = HNEW(ic, ir, il)
                   bbot = Botm(IC, IR, Lbotm(IL))
                   ttop = Botm(IC, IR, Lbotm(IL) - 1)
-                  print *, 'qp', 1, Qp
+ !                 print *, 'qp', 1, Qp
                   Qp = Q*smoothQ(Hh, Ttop, Bbot, dQp)
-                  print *, 'qp', 2, Qp, dQp
-                  print *, ic,ir,il, Hh, Ttop, Bbot, Hh, Q
-                  print *, 'HNEW', HNEW(ic, ir, il), kkiter
+ !                 print *, 'qp', 2, Qp, dQp
+ !                 print *, ic,ir,il, Hh, Ttop, Bbot, Hh, Q
+ !                 print *, 'HNEW', HNEW(ic, ir, il), kkiter
                   RHS(IC, IR, IL) = RHS(IC, IR, IL) - Qp
                   !
                   !8 - -----Derivative for RHS
@@ -1809,18 +1809,18 @@
                ELSE
                   RHS(IC, IR, IL) = RHS(IC, IR, IL) - Q
                   Qp = Q
-                  print *, 'qp', 3, Qp
+ !                 print *, 'qp', 3, Qp
                END IF
             ELSE
                RHS(IC, IR, IL) = RHS(IC, IR, IL) - Q
                Qp = Q
-               print *, 4, Qp
+ !              print *, 4, Qp
             END IF
             !
             !9 - -----SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
             !
             SUP = ZERO
-             print *, Qp, 'Qp'
+!             print *, Qp, 'Qp'
             DO I = 1, NUMSEGS(L)  ! need to test when multiple segs supported by single well
                J = DIVERSIONSEG(I, L)
                SUP = SUP - Qp
@@ -1846,11 +1846,11 @@
                   SUBVOL = -(DONE - IRRFACT(I, L))*Qp*IRRFIELDFACT(I, L)
                   ! Keep irrigation for PRMS as volumetric rate
                   WELLIRRPRMS(I, L) = WELLIRRPRMS(I, L) + SUBVOL
-                  if ( i==1 .and. l==122 ) then
-                    print *, 'SUBVOL',SUBVOL, DONE, IRRFACT(I, L), Qp
-                    print *, IRRFIELDFACT(I, L), WELLIRRPRMS(I, L)
-                    print *, Qonly(L), DONENEG, Q
-                    endif
+!                  if ( i==1 .and. l==122 ) then
+!                    print *, 'SUBVOL',SUBVOL, DONE, IRRFACT(I, L), Qp
+!                    print *, IRRFIELDFACT(I, L), WELLIRRPRMS(I, L)
+!                    print *, Qonly(L), DONENEG, Q
+!                    endif
                END DO
             END IF
          END IF
@@ -2786,21 +2786,21 @@
       det = (aettotal - aetold)
       factor = etdif
       dq = sup - supold
-      if (kiter < 10000) then
-         if (det < zerod5*pettotal) then
-           factor = dzero
-         else
+      if (kiter == 1) then
+         !if (det < zerod5*pettotal) then
+         !  factor = dzero
+         !else
            factor = etdif
-         end if
+         !end if
       else if (det < zerod5*pettotal) then
          factor = dzero
       else if (abs(det) > dzero) then
          factor = dq*etdif/det
       end if
-      open(222,file='debug.out')
-      if(l==207)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
-     +aetold,factor
-333   format(i5,7e20.10)
+!      open(222,file='debug.out')
+!      if(l==207)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
+!     +aetold,factor
+!333   format(i5,7e20.10)
       set_factor = factor
       end function set_factor
 !
@@ -3131,16 +3131,16 @@
       END IF
       RETURN
       END FUNCTION RATETERPQ
-      !
+!
       SUBROUTINE SGWF2AG7V(MSUM, VBNMAG, VBVLAG, KSTP, KPER, IOUT, 
-     +                     BUDPERC)
+     +                    BUDPERC)
       !******************************************************************
       ! PRINT VOLUMETRIC BUDGET
       !******************************************************************
       !
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
-      CHARACTER*20 VBNMAG(MSUM)
+      CHARACTER*22 VBNMAG(MSUM)
       DIMENSION VBVLAG(4, MSUM)
       CHARACTER*17 VAL1, VAL2
       ! - -----------------------------------------------------------------
