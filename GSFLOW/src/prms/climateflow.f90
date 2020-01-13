@@ -133,7 +133,7 @@
 !***********************************************************************
       climateflow_decl = 0
 
-      Version_climateflow = 'climateflow.f90 2019-10-31 13:36:00Z'
+      Version_climateflow = 'climateflow.f90 2020-01-10 17:02:00Z'
       CALL print_module(Version_climateflow, 'Common States and Fluxes    ', 90)
       MODNAME = 'climateflow'
 
@@ -748,7 +748,7 @@
       ALLOCATE ( Soil_rechr_max(Nhru) )
       IF ( PRMS4_flag==1 ) THEN
         IF ( declparam(Soilzone_module, 'soil_rechr_max', 'nhru', 'real', &
-     &       '1.5', '0.00001', '5.0', &
+     &       '1.5', '0.00001', '20.0', &
      &       'Maximum storage for soil recharge zone', &
      &       'Maximum storage for soil recharge zone (upper portion of'// &
      &       ' capillary reservoir where losses occur as both'// &
@@ -782,7 +782,7 @@
         ALLOCATE ( Soil_rechr_init_frac(Nhru), Soil_moist_init_frac(Nhru), Ssstor_init_frac(Nssr) )
         IF ( PRMS4_flag==1 .OR. Model==DOCUMENTATION ) THEN
           IF ( declparam(MODNAME, 'soil_rechr_init', 'nhru', 'real', &
-     &         '1.0', '0.0', '10.0', &
+     &         '1.0', '0.0', '20.0', &
      &         'Initial storage of water for soil recharge zone', &
      &         'Initial storage for soil recharge zone (upper part of'// &
      &         ' capillary reservoir where losses occur as both'// &
@@ -790,12 +790,12 @@
      &         ' less than or equal to soil_moist_init', &
      &         'inches')/=0 ) CALL read_error(1, 'soil_rechr_init')
           IF ( declparam(MODNAME, 'soil_moist_init', 'nhru', 'real', &
-     &         '3.0', '0.0', '10.0', &
+     &         '3.0', '0.0', '20.0', &
      &         'Initial value of available water in capillary reservoir', &
      &         'Initial value of available water in capillary reservoir for each HRU', &
      &         'inches')/=0 ) CALL read_error(1, 'soil_moist_init')
           IF ( declparam(MODNAME, 'ssstor_init', 'nssr', 'real', &
-     &         '0.0', '0.0', '5.0', &
+     &         '0.0', '0.0', '10.0', &
      &         'Initial storage in each GVR and PFR', &
      &         'Initial storage of the gravity and preferential-flow reservoirs for each HRU', &
      &         'inches')/=0 ) CALL read_error(1, 'ssstor_init')

@@ -78,7 +78,7 @@
 !***********************************************************************
       obsdecl = 0
 
-      Version_obs = 'obs.f90 2019-10-23 15:55:00Z'
+      Version_obs = 'obs.f90 2020-01-09 14:38:00Z'
       CALL print_module(Version_obs, 'Time Series Data            ', 90)
       MODNAME = 'obs'
 
@@ -168,7 +168,7 @@
         ALLOCATE ( Wind_speed(Nwind) )
         IF ( declvar(MODNAME, 'wind_speed', 'nwind', Nwind, 'real', &
      &       'Wind speed at each measurement station', &
-     &       'mph', Wind_speed)/=0 ) CALL read_error(8, 'wind_speed')
+     &       'meters per second', Wind_speed)/=0 ) CALL read_error(8, 'wind_speed')
       ENDIF
 
 !   Declared Parameters
