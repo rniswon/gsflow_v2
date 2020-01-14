@@ -2,14 +2,14 @@
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version 2.1.0 10/31/2019
+                         Version 2.1.0 01/30/2020
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.1.0 12/05/2019
+                       Version 5.1.0 01/30/2020
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -57,13 +57,13 @@ Stream Temperature: stream_temp
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2019-12-02
+GSFLOW Computation Order       gsflow_prms                2020-01-10
 Basin Definition               basin                      2019-11-14
 Cascading Flow                 cascade                    2019-09-25
-Common States and Fluxes       climateflow                2019-10-31
+Common States and Fluxes       climateflow                2020-01-10
 Potential Solar Radiation      soltab                     2016-09-09
 PRMS Set Time Variables        prms_time                  2015-03-31
-Time Series Data               obs                        2019-10-23
+Time Series Data               obs                        2020-01-09
 Temperature Distribution       climate_hru                2019-10-23
 Precipitation Distribution     climate_hru                2019-10-23
 Solar Radiation Distribution   ddsolrad                   2019-04-04
@@ -72,7 +72,7 @@ Potential Evapotranspiration   potet_jh                   2019-04-04
 Canopy Interception            intcp                      2019-05-30
 Snow Dynamics                  snowcomp                   2019-11-27
 Surface Runoff                 srunoff_smidx              2019-11-15
-Soil Zone Computations         soilzone                   2019-12-05
+Soil Zone Computations         soilzone                   2020-01-10
 GSFLOW PRMS to MODFLOW         gsflow_prms2mf             2019-10-30
 GSFLOW MODFLOW to PRMS         gsflow_mf2prms             2017-11-15
 GSFLOW Output Budget Summary   gsflow_budget              2019-10-30
@@ -124,19 +124,19 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1983/12/02; Stress:  2; Step:  1157; Simulation step:    1
-                  MF iterations:        8; SZ iterations:      8
+                  MF iterations:        9; SZ iterations:      9
 
 Date: 1983/12/03; Stress:  2; Step:  1158; Simulation step:    2
-                  MF iterations:        8; SZ iterations:      8
+                  MF iterations:        9; SZ iterations:      9
 
 Date: 1983/12/04; Stress:  2; Step:  1159; Simulation step:    3
-                  MF iterations:        8; SZ iterations:      8
-
-Date: 1983/12/05; Stress:  2; Step:  1160; Simulation step:    4
                   MF iterations:       11; SZ iterations:     11
 
-Date: 1983/12/06; Stress:  2; Step:  1161; Simulation step:    5
+Date: 1983/12/05; Stress:  2; Step:  1160; Simulation step:    4
                   MF iterations:        8; SZ iterations:      8
+
+Date: 1983/12/06; Stress:  2; Step:  1161; Simulation step:    5
+                  MF iterations:        9; SZ iterations:      9
 
 Date: 1983/12/07; Stress:  2; Step:  1162; Simulation step:    6
                   MF iterations:        9; SZ iterations:      9
@@ -148,13 +148,13 @@ Date: 1983/12/09; Stress:  2; Step:  1164; Simulation step:    8
                   MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/10; Stress:  2; Step:  1165; Simulation step:    9
-                  MF iterations:        9; SZ iterations:      9
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/11; Stress:  2; Step:  1166; Simulation step:   10
                   MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/12; Stress:  2; Step:  1167; Simulation step:   11
-                  MF iterations:        8; SZ iterations:      8
+                  MF iterations:        9; SZ iterations:      9
 
 Date: 1983/12/13; Stress:  2; Step:  1168; Simulation step:   12
                   MF iterations:        8; SZ iterations:      8
@@ -166,10 +166,10 @@ Date: 1983/12/15; Stress:  2; Step:  1170; Simulation step:   14
                   MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/16; Stress:  2; Step:  1171; Simulation step:   15
-                  MF iterations:        9; SZ iterations:      9
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/17; Stress:  2; Step:  1172; Simulation step:   16
-                  MF iterations:        9; SZ iterations:      9
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/18; Stress:  2; Step:  1173; Simulation step:   17
                   MF iterations:        8; SZ iterations:      8
@@ -184,37 +184,37 @@ Date: 1983/12/21; Stress:  2; Step:  1176; Simulation step:   20
                   MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/22; Stress:  2; Step:  1177; Simulation step:   21
-                  MF iterations:        9; SZ iterations:      9
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/23; Stress:  2; Step:  1178; Simulation step:   22
-                  MF iterations:        9; SZ iterations:      9
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/24; Stress:  2; Step:  1179; Simulation step:   23
                   MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/25; Stress:  2; Step:  1180; Simulation step:   24
-                  MF iterations:        9; SZ iterations:      9
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/26; Stress:  2; Step:  1181; Simulation step:   25
-                  MF iterations:       11; SZ iterations:     11
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/27; Stress:  2; Step:  1182; Simulation step:   26
-                  MF iterations:        9; SZ iterations:      9
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/28; Stress:  2; Step:  1183; Simulation step:   27
                   MF iterations:        8; SZ iterations:      8
 
 Date: 1983/12/29; Stress:  2; Step:  1184; Simulation step:   28
-                  MF iterations:        9; SZ iterations:      9
-
-Date: 1983/12/30; Stress:  2; Step:  1185; Simulation step:   29
-                  MF iterations:        9; SZ iterations:      9
-
-Date: 1983/12/31; Stress:  2; Step:  1186; Simulation step:   30
                   MF iterations:        8; SZ iterations:      8
 
+Date: 1983/12/30; Stress:  2; Step:  1185; Simulation step:   29
+                  MF iterations:        8; SZ iterations:      8
+
+Date: 1983/12/31; Stress:  2; Step:  1186; Simulation step:   30
+                  MF iterations:       12; SZ iterations:     12
+
 Date: 1984/01/01; Stress:  2; Step:  1187; Simulation step:   31
-                  MF iterations:        9; SZ iterations:      9
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1984/01/02; Stress:  2; Step:  1188; Simulation step:   32
                   MF iterations:        9; SZ iterations:      9
@@ -223,22 +223,22 @@ Date: 1984/01/03; Stress:  2; Step:  1189; Simulation step:   33
                   MF iterations:        8; SZ iterations:      8
 
 Date: 1984/01/04; Stress:  2; Step:  1190; Simulation step:   34
-                  MF iterations:       11; SZ iterations:     11
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1984/01/05; Stress:  2; Step:  1191; Simulation step:   35
-                  MF iterations:        8; SZ iterations:      8
+                  MF iterations:        9; SZ iterations:      9
 
 Date: 1984/01/06; Stress:  2; Step:  1192; Simulation step:   36
                   MF iterations:        9; SZ iterations:      9
 
 Date: 1984/01/07; Stress:  2; Step:  1193; Simulation step:   37
-                  MF iterations:        9; SZ iterations:      9
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1984/01/08; Stress:  2; Step:  1194; Simulation step:   38
                   MF iterations:        9; SZ iterations:      9
 
 Date: 1984/01/09; Stress:  2; Step:  1195; Simulation step:   39
-                  MF iterations:        9; SZ iterations:      9
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1984/01/10; Stress:  2; Step:  1196; Simulation step:   40
                   MF iterations:        9; SZ iterations:      9
@@ -247,7 +247,7 @@ Date: 1984/01/11; Stress:  2; Step:  1197; Simulation step:   41
                   MF iterations:        9; SZ iterations:      9
 
 Date: 1984/01/12; Stress:  2; Step:  1198; Simulation step:   42
-                  MF iterations:        8; SZ iterations:      8
+                  MF iterations:        9; SZ iterations:      9
 
 Date: 1984/01/13; Stress:  2; Step:  1199; Simulation step:   43
                   MF iterations:        9; SZ iterations:      9
@@ -256,64 +256,64 @@ Date: 1984/01/14; Stress:  2; Step:  1200; Simulation step:   44
                   MF iterations:        9; SZ iterations:      9
 
 Date: 1984/01/15; Stress:  2; Step:  1201; Simulation step:   45
-                  MF iterations:        8; SZ iterations:      8
+                  MF iterations:        9; SZ iterations:      9
 
 Date: 1984/01/16; Stress:  2; Step:  1202; Simulation step:   46
                   MF iterations:        9; SZ iterations:      9
 
 Date: 1984/01/17; Stress:  2; Step:  1203; Simulation step:   47
-                  MF iterations:        8; SZ iterations:      8
+                  MF iterations:        9; SZ iterations:      9
 
 Date: 1984/01/18; Stress:  2; Step:  1204; Simulation step:   48
-                  MF iterations:        9; SZ iterations:      9
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1984/01/19; Stress:  2; Step:  1205; Simulation step:   49
                   MF iterations:        9; SZ iterations:      9
 
 Date: 1984/01/20; Stress:  2; Step:  1206; Simulation step:   50
-                  MF iterations:        9; SZ iterations:      9
-
-Date: 1984/01/21; Stress:  2; Step:  1207; Simulation step:   51
                   MF iterations:        8; SZ iterations:      8
 
-Date: 1984/01/22; Stress:  2; Step:  1208; Simulation step:   52
+Date: 1984/01/21; Stress:  2; Step:  1207; Simulation step:   51
                   MF iterations:        9; SZ iterations:      9
+
+Date: 1984/01/22; Stress:  2; Step:  1208; Simulation step:   52
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1984/01/23; Stress:  2; Step:  1209; Simulation step:   53
                   MF iterations:        8; SZ iterations:      8
 
 Date: 1984/01/24; Stress:  2; Step:  1210; Simulation step:   54
-                  MF iterations:        9; SZ iterations:      9
-
-Date: 1984/01/25; Stress:  2; Step:  1211; Simulation step:   55
                   MF iterations:        8; SZ iterations:      8
 
-Date: 1984/01/26; Stress:  2; Step:  1212; Simulation step:   56
+Date: 1984/01/25; Stress:  2; Step:  1211; Simulation step:   55
                   MF iterations:       12; SZ iterations:     12
+
+Date: 1984/01/26; Stress:  2; Step:  1212; Simulation step:   56
+                  MF iterations:        8; SZ iterations:      8
 
 Date: 1984/01/27; Stress:  2; Step:  1213; Simulation step:   57
                   MF iterations:        9; SZ iterations:      9
 
 Date: 1984/01/28; Stress:  2; Step:  1214; Simulation step:   58
-                  MF iterations:        8; SZ iterations:      8
+                  MF iterations:       10; SZ iterations:     10
 
 Date: 1984/01/29; Stress:  2; Step:  1215; Simulation step:   59
-                  MF iterations:        8; SZ iterations:      8
+                  MF iterations:        9; SZ iterations:      9
 
 Date: 1984/01/30; Stress:  2; Step:  1216; Simulation step:   60
-                  MF iterations:        8; SZ iterations:      8
+                  MF iterations:        9; SZ iterations:      9
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/12/06 15:47:09
- Elapsed run time: 11.909 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/01/14 12:34:32
+ Elapsed run time: 11.291 Seconds
 
  Number of time steps:     60;  Number of non-convergence:   0
- MF iterations:           520;  SZ iterations:             520
- Average MF iterations:  8.67;  Average SZ iterations:    8.67
+ MF iterations:           515;  SZ iterations:             515
+ Average MF iterations:  8.58;  Average SZ iterations:    8.58
  Maximum MF iterations:    12;  Maximum SZ iterations:      12
 
-MF iteration distribution:      0    0    0    0    0    0    0   29   27    0
-                                3    1    0    0    0    0    0    0    0    0
+MF iteration distribution:      0    0    0    0    0    0    0   34   22    1
+                                1    2    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
@@ -323,8 +323,8 @@ MF iteration distribution:      0    0    0    0    0    0    0   29   27    0
 
 
 
-SZ computation distribution:    0    0    0    0    0    0    0   29   27    0
-                                3    1    0    0    0    0    0    0    0    0
+SZ computation distribution:    0    0    0    0    0    0    0   34   22    1
+                                1    2    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0

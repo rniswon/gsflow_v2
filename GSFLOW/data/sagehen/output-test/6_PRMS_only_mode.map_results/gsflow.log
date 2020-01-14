@@ -2,14 +2,14 @@
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version 2.1.0 10/31/2019
+                         Version 2.1.0 01/30/2020
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.1.0 12/05/2019
+                       Version 5.1.0 01/30/2020
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -44,13 +44,13 @@ Stream Temperature: stream_temp
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2019-12-02
+GSFLOW Computation Order       gsflow_prms                2020-01-10
 Basin Definition               basin                      2019-11-14
 Cascading Flow                 cascade                    2019-09-25
-Common States and Fluxes       climateflow                2019-10-31
+Common States and Fluxes       climateflow                2020-01-10
 Potential Solar Radiation      soltab                     2016-09-09
 PRMS Set Time Variables        prms_time                  2015-03-31
-Time Series Data               obs                        2019-10-23
+Time Series Data               obs                        2020-01-09
 Temperature Distribution       temp_1sta                  2018-01-16
 Precipitation Distribution     precip_1sta                2016-10-21
 Solar Radiation Distribution   ddsolrad                   2019-04-04
@@ -59,7 +59,7 @@ Potential Evapotranspiration   potet_jh                   2019-04-04
 Canopy Interception            intcp                      2019-05-30
 Snow Dynamics                  snowcomp                   2019-11-27
 Surface Runoff                 srunoff_smidx              2019-11-15
-Soil Zone Computations         soilzone                   2019-12-05
+Soil Zone Computations         soilzone                   2020-01-10
 Groundwater                    gwflow                     2019-04-04
 Streamflow Routing             strmflow                   2014-12-02
 Summary                        basin_sum                  2017-10-21
@@ -78,5 +78,5 @@ Simulation time period: 1980/10/01 - 1996/09/30
 
 ====================================================================
 
-Execution elapsed time    0 minutes  0.72 seconds
+Execution elapsed time    0 minutes  0.77 seconds
 

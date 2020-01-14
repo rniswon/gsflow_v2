@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.1.0 12/05/2019
+                       Version 5.1.0 01/30/2020
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -35,13 +35,13 @@ Stream Temperature: stream_temp
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2019-12-02
+GSFLOW Computation Order       gsflow_prms                2020-01-10
 Basin Definition               basin                      2019-11-14
 Cascading Flow                 cascade                    2019-09-25
-Common States and Fluxes       climateflow                2019-10-31
+Common States and Fluxes       climateflow                2020-01-10
 Potential Solar Radiation      soltab                     2016-09-09
 PRMS Set Time Variables        prms_time                  2015-03-31
-Time Series Data               obs                        2019-10-23
+Time Series Data               obs                        2020-01-09
 Temperature Distribution       climate_hru                2019-10-23
 Precipitation Distribution     climate_hru                2019-10-23
 Solar Radiation Distribution   climate_hru                2019-10-23
@@ -50,7 +50,7 @@ Transpiration Distribution     transp_tindex              2015-01-06
 Canopy Interception            intcp                      2019-05-30
 Snow Dynamics                  snowcomp                   2019-11-27
 Surface Runoff                 srunoff_smidx              2019-11-15
-Soil Zone Computations         soilzone                   2019-12-05
+Soil Zone Computations         soilzone                   2020-01-10
 GSFLOW PRMS to MODFLOW         gsflow_prms2mf             2019-10-30
 GSFLOW MODFLOW to PRMS         gsflow_mf2prms             2017-11-15
 GSFLOW Output Budget Summary   gsflow_budget              2019-10-30

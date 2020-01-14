@@ -17,26 +17,26 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        8865307.54     EVAPOTRANSPIRATION =        2961211.88
-           STREAMFLOW =        6116110.53             STREAMFLOW =        1569209.25
+   EVAPOTRANSPIRATION =        8890592.22     EVAPOTRANSPIRATION =        2961507.18
+           STREAMFLOW =        6116107.34             STREAMFLOW =        1569209.25
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
-   INFLOWS - OUTFLOWS =        7.8076D+07     INFLOWS - OUTFLOWS =       -1299686.48
+   INFLOWS - OUTFLOWS =        7.8050D+07     INFLOWS - OUTFLOWS =       -1299981.77
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        7.6580D+07         STORAGE CHANGE =       -1687602.94
+ TOTAL STORAGE CHANGE =        7.6530D+07         STORAGE CHANGE =       -1695201.82
        --------------                             --------------
          LAND SURFACE =        1.0084D+07           LAND SURFACE =       -3866743.62
-            SOIL ZONE =        3.5351D+07              SOIL ZONE =        1338425.63
-     UNSATURATED ZONE =         153570.95       UNSATURATED ZONE =          61288.47
-       SATURATED ZONE =        1202941.92         SATURATED ZONE =         113787.33
-                LAKES =        2.9789D+07                  LAKES =         665639.25
+            SOIL ZONE =        3.5484D+07              SOIL ZONE =        1338436.62
+     UNSATURATED ZONE =         168956.58       UNSATURATED ZONE =          62810.90
+       SATURATED ZONE =        1180169.09         SATURATED ZONE =         111398.47
+                LAKES =        2.9613D+07                  LAKES =         658895.81
 
- OVERALL BUDGET ERROR =        1495931.59           BUDGET ERROR =         387916.47
+ OVERALL BUDGET ERROR =        1520518.95           BUDGET ERROR =         395220.05
 
   ***WARNING, FLUX RATES OFF > 3%
 
-  PERCENT DISCREPANCY =              1.62    PERCENT DISCREPANCY =              8.21
+  PERCENT DISCREPANCY =              1.65    PERCENT DISCREPANCY =              8.36
 
 
 

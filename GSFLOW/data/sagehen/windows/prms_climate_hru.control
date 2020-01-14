@@ -229,3 +229,8 @@ nhruOutBaseFileName
 1
 4
 ..\output\prms\nhru_
+####
+soilzone_aet_flag
+1
+1
+1
