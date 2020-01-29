@@ -2478,6 +2478,7 @@
         !
         !1 - -----limit diversion to water right
         !
+! NEED to check IPRIOR value here
         k = IDIVAR(1, ISEG)
         fmaxflow = STRM(9, LASTREACH(K))
         IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
@@ -2797,8 +2798,9 @@
       else if (abs(det) > dzero) then
          factor = dq*etdif/det
       end if
+!      if( factor > etdif ) factor = etdif
 !      open(222,file='debug.out')
-!      if(l==207)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
+!      if(l==148)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
 !     +aetold,factor
 !333   format(i5,7e20.10)
       set_factor = factor
