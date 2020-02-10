@@ -2809,10 +2809,10 @@
       if ( kiter > 1 ) then
         if( factor > accel*etdif ) factor = accel*etdif
       end if
-      open(222,file='debug.out')
-      if(l==17)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
-     +aetold,factor,sup
-333   format(i5,8e20.10)
+!      open(222,file='debug.out')
+!      if(l==17)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
+!     +aetold,factor,sup
+!333   format(i5,8e20.10)
       set_factor = factor
       end function set_factor
 !
