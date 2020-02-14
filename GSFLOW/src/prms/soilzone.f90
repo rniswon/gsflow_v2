@@ -1093,7 +1093,7 @@
               Soil_rechr(i) = MIN( Soil_rechr_max(i), (Soil_rechr(i) + MAX (0.0, excess)))
             ELSE
               Soil_rechr(i) = Soil_rechr(i) + Gvr2sm(i)/perv_frac*Replenish_frac(i)
-              if ( i==16288) print *, i, Soil_rechr(i) , Gvr2sm(i),perv_frac,Replenish_frac(i)
+!              if ( i==16288) print *, i, Soil_rechr(i) , Gvr2sm(i),perv_frac,Replenish_frac(i)
               Soil_rechr(i) = MIN( Soil_rechr_max(i), Soil_rechr(i) )
             ENDIF
             Basin_gvr2sm = Basin_gvr2sm + DBLE( Gvr2sm(i)*harea )

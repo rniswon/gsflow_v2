@@ -33,6 +33,7 @@
         INTEGER, SAVE, DIMENSION(:), POINTER :: SEGLIST
         INTEGER, SAVE, POINTER :: NUMSEGLIST
         REAL, SAVE, POINTER :: PSIRAMP
+        REAL, SAVE, POINTER :: ACCEL
         INTEGER, SAVE, POINTER :: IUNITRAMP
         INTEGER, SAVE, POINTER :: NUMTAB
         INTEGER, SAVE, POINTER :: MAXVAL
@@ -119,7 +120,7 @@
       ALLOCATE (NWELLS, MXWELL, NWELVL, IWELLCB, ISFRCB, NAUX)
       ALLOCATE (WELAUX(20))
       ALLOCATE (IRRWELLCB, IRRSFRCB, IWELLCBU)
-      ALLOCATE (PSIRAMP, IUNITRAMP)
+      ALLOCATE (PSIRAMP, IUNITRAMP, ACCEL)
       ALLOCATE (NUMTAB, MAXVAL, NPWEL, NNPWEL, IPRWEL)
       ALLOCATE (TSACTIVEGW, TSACTIVESW, NUMSW, NUMGW)
       ALLOCATE (TSACTIVEGWET, TSACTIVESWET, NUMSWET, NUMGWET)
@@ -127,6 +128,7 @@
       VBVLAG = 0.0
       MSUMAG = 0
       PSIRAMP = 0.10
+      ACCEL = 1.0
       NUMTAB = 0
       MAXVAL = 1
       IPRWEL = 1
@@ -584,6 +586,9 @@
             WRITE (IOUT, *)
             found = .true.
          case ('ETDEMAND')
+            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, R, 
+     +                     IOUT, IN)
+            if ( R > 0.0 ) ACCEL = R
             ETDEMANDFLAG = 1
             WRITE (iout, *)
             WRITE (IOUT, '(A)') ' AGRICULTURAL DEMANDS WILL BE '//
@@ -2478,6 +2483,7 @@
         !
         !1 - -----limit diversion to water right
         !
+! NEED to check IPRIOR value here
         k = IDIVAR(1, ISEG)
         fmaxflow = STRM(9, LASTREACH(K))
         IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
@@ -2767,6 +2773,7 @@
 !     updates diversion or pumping rate based on ET deficit
 !     ******************************************************************
 !     SPECIFICATIONS:
+      USE GWFAGMODULE
       IMPLICIT NONE
 ! -----------------------------------------
       !modules
@@ -2775,11 +2782,13 @@
      +                                sup, supold
       integer, intent(in) :: kiter, l
       !dummy
-      DOUBLE PRECISION :: factor, zerod5, dzero, etdif, det, dq
+      DOUBLE PRECISION :: factor, zerod5, dzero, etdif, det, dq,
+     +                    zerod22
 ! -----------------------------------------
 !
       dzero = 0.0d0
       zerod5 = 1.0d-5
+      zerod22 = 1.0d-2
       set_factor = dzero
       factor = dzero
       etdif = pettotal - aettotal
@@ -2797,10 +2806,13 @@
       else if (abs(det) > dzero) then
          factor = dq*etdif/det
       end if
+      if ( kiter > 1 ) then
+        if( factor > accel*etdif ) factor = accel*etdif
+      end if
 !      open(222,file='debug.out')
-!      if(l==207)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
-!     +aetold,factor
-!333   format(i5,7e20.10)
+!      if(l==17)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
+!     +aetold,factor,sup
+!333   format(i5,8e20.10)
       set_factor = factor
       end function set_factor
 !
@@ -3383,5 +3395,6 @@
       DEALLOCATE(TIMEINPERIODSEG)
       DEALLOCATE(SEGLIST)
       DEALLOCATE(NUMSEGLIST)
+      DEALLOCATE(ACCEL)
       RETURN
       END
