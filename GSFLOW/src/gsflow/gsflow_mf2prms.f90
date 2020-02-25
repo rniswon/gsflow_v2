@@ -46,7 +46,8 @@
           Hru_ag_irr = 0.0
           DO J = 1, NUMIRRWELSP
             IRWL = IRRWELVAR(J)
-            NMCL = NUMCELLS(IRWL)
+            NMCL = 0
+            IF ( IRWL > 0 ) NMCL = NUMCELLS(IRWL)
             DO K = 1, NMCL
               ihru = IRRROW_GW(K,IRWL)
               Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + WELLIRRPRMS(k,IRWL)*mf_q2prms_inch/HRU_PERV(IHRU)
@@ -57,10 +58,11 @@
 !
           DO J = 1, NUMIRRDIVERSIONSP
             SGNM = IRRSEG(J)
-            NMCL = DVRCH(SGNM)
+            NMCL = 0
+            IF ( SGNM>0 ) NMCL = DVRCH(SGNM)
             DO K=1,NMCL        
               ihru = IRRROW_SW(K,SGNM)
-              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + DIVERSIONIRRPRMS(k,IRWL)*mf_q2prms_inch/HRU_PERV(ihru)
+              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + DIVERSIONIRRPRMS(k,SGNM)*mf_q2prms_inch/HRU_PERV(ihru)
             END DO
           END DO
         END IF
