@@ -1,0 +1,82 @@
+#Sagehen-GRID Simulation -- Example problem for GSFLOW
+#  (File modified for version 1.1.00 release)
+#Budget output is written to the List file (sagehen.mf.list) at
+#  the end of the steady-state simulation and
+#  September 30 of 1981, 1985, 1990, 1995, and 1996
+#Calculated heads are written to the List file (sagehen.mf.list)
+#  and to the head output file (unit 58) at
+#  the end of the steady-state simulation and
+#  September 30, 1996
+HEAD SAVE UNIT 58
+Period 	1	Step 	1
+print budget			
+save budget			
+Period 	2	Step 	1
+print budget			
+save budget			
+Period 	3	Step 	1
+print budget			
+save budget			
+Period 	4	Step 	1
+print budget			
+save budget			
+Period 	5	Step 	1
+print budget			
+save budget			
+Period 	6	Step 	1
+print budget			
+save budget			
+Period 	7	Step 	1
+print budget			
+save budget			
+Period 	8	Step 	1
+print budget			
+save budget			
+Period 	9	Step 	1
+print budget			
+save budget			
+Period 	10	Step 	1
+print budget			
+save budget			
+Period 	11	Step 	6
+print budget			
+save budget			
+Period 	12	Step 	1
+print budget			
+save budget			
+Period 	13	Step 	1
+print budget			
+save budget			
+Period 	14	Step 	1
+print budget			
+save budget			
+Period 	15	Step 	1
+print budget			
+save budget			
+Period 	16	Step 	1
+print budget			
+save budget			
+Period 	17	Step 	1
+print budget			
+save budget			
+Period 	18	Step 	1
+print budget			
+save budget			
+Period 	19	Step 	1
+print budget			
+save budget			
+Period 	20	Step 	1
+print budget			
+save budget			
+Period 	21	Step 	1
+print budget			
+save budget			
+Period 	22	Step 	1
+print budget			
+save budget			
+Period 	23	Step 	1
+print budget			
+save budget			
+Period 	24	Step 	1
+print budget			
+save budget	
