@@ -17,8 +17,6 @@
       !   Local Variables
 
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
-      DOUBLE PRECISION, SAVE :: Deninv, Denmaxinv, Settle_const_dble
-      !     REAL, SAVE :: Setden, Set1
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
       REAL, SAVE, ALLOCATABLE :: Snowcov_areasv(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Scrv(:), Pss(:), Pksv(:), Pst(:)
@@ -47,7 +45,7 @@
       INTEGER, SAVE, ALLOCATABLE :: Hru_deplcrv(:)
       REAL, SAVE :: Albset_rnm, Albset_rna, Albset_snm, Albset_sna
       REAL, SAVE, ALLOCATABLE :: Emis_noppt(:), Freeh2o_cap(:), Cecn_coef(:, :)
-      REAL, SAVE :: Den_init, Settle_const, Den_max
+      REAL, SAVE, ALLOCATABLE :: Den_init(:), Settle_const(:), Den_max(:)
       REAL, SAVE, ALLOCATABLE :: Rad_trncf(:), Snarea_thresh(:), Snowpack_init(:)
       REAL, SAVE, ALLOCATABLE :: Snarea_curve(:, :)
       REAL, SAVE, ALLOCATABLE :: Snarea_a(:), Snarea_b(:), Snarea_c(:), Snarea_d(:)
@@ -310,19 +308,22 @@
      &     'decimal fraction', Frac_swe)/=0 ) CALL read_error(3, 'frac_swe')
 
 ! declare parameters
-      IF ( declparam(MODNAME, 'den_init', 'one', 'real', &
+      ALLOCATE ( Den_init(Nhru) )
+      IF ( declparam(MODNAME, 'den_init', 'nhru', 'real', &
      &     '0.10', '0.01', '0.5', &
      &     'Initial density of new-fallen snow', &
      &     'Initial density of new-fallen snow', &
      &     'gm/cm3')/=0 ) CALL read_error(1, 'den_init')
 
-      IF ( declparam(MODNAME, 'settle_const', 'one', 'real', &
+      ALLOCATE ( Settle_const(Nhru) )
+      IF ( declparam(MODNAME, 'settle_const', 'nhru', 'real', &
      &     '0.10', '0.01', '0.5', &
      &     'Snowpack settlement time constant', &
      &     'Snowpack settlement time constant', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'settle_const')
 
-      IF ( declparam(MODNAME, 'den_max', 'one', 'real', &
+      ALLOCATE ( Den_max(Nhru) )
+      IF ( declparam(MODNAME, 'den_max', 'nhru', 'real', &
      &     '0.6', '0.1', '0.8', &
      &     'Average maximum snowpack density', &
      &     'Average maximum snowpack density', &
@@ -501,15 +502,9 @@
 
       IF ( Init_vars_from_file>0 ) CALL snowcomp_restart(1)
 
-      IF ( getparam(MODNAME, 'den_init', 1, 'real', Den_init)/=0 ) CALL read_error(2, 'den_init')
-      Deninv = 1.0D0/DBLE(Den_init)
-      IF ( getparam(MODNAME, 'den_max', 1, 'real', Den_max)/=0 ) CALL read_error(2, 'den_max')
-      Denmaxinv = 1.0D0/DBLE(Den_max)
-
-      IF ( getparam(MODNAME, 'settle_const', 1, 'real', Settle_const)/=0 ) CALL read_error(2, 'settle_const')
-      Settle_const_dble = DBLE( Settle_const )
-!      Set1 = 1.0/(1.0+Settle_const)
-!      Setden = Settle_const/Den_max
+      IF ( getparam(MODNAME, 'den_init', Nhru, 'real', Den_init)/=0 ) CALL read_error(2, 'den_init')
+      IF ( getparam(MODNAME, 'den_max', Nhru, 'real', Den_max)/=0 ) CALL read_error(2, 'den_max')
+      IF ( getparam(MODNAME, 'settle_const', Nhru, 'real', Settle_const)/=0 ) CALL read_error(2, 'settle_const')
 
       IF ( getparam(MODNAME, 'melt_look', Nhru, 'integer', Melt_look)/=0 ) CALL read_error(2, 'melt_look')
       IF ( getparam(MODNAME, 'melt_force', Nhru, 'integer', Melt_force)/=0 ) CALL read_error(2, 'melt_force')
@@ -572,7 +567,7 @@
           Pkwater_equiv(i) = DBLE( Snowpack_init(i) )
           IF ( Pkwater_equiv(i)>0.0D0 ) THEN
             Basin_pweqv = Basin_pweqv + Pkwater_equiv(i)*Hru_area_dble(i)
-            Pk_depth(i) = Pkwater_equiv(i)*Deninv
+            Pk_depth(i) = Pkwater_equiv(i)/DBLE(Den_init(i))
             Pk_den(i) = SNGL( Pkwater_equiv(i)/Pk_depth(i) )
             Pk_ice(i) = SNGL( Pkwater_equiv(i) )
             Freeh2o(i) = Pk_ice(i)*Freeh2o_cap(i)
@@ -732,7 +727,8 @@
      &            Tavgc(i), Pkwater_equiv(i), Net_rain(i), Pk_def(i), &
      &            Pk_temp(i), Pk_ice(i), Freeh2o(i), Snowcov_area(i), &
      &            Snowmelt(i), Pk_depth(i), Pss(i), Pst(i), Net_snow(i), &
-     &            Pk_den(i), Pptmix_nopack(i), Pk_precip(i), Tmax_allsnow_c(i,Nowmonth), Freeh2o_cap(i))
+     &            Pk_den(i), Pptmix_nopack(i), Pk_precip(i), Tmax_allsnow_c(i,Nowmonth), &
+     &            Freeh2o_cap(i), Den_max(i))
 
         ! If there is still a snowpack
         IF ( Pkwater_equiv(i)>0.0D0 ) THEN
@@ -791,11 +787,10 @@
           ! The snow depth depends on the previous snow pack water
           ! equivalent plus the new net snow
           Pss(i) = Pss(i) + DBLE( Net_snow(i) ) ! [inches]
-          dpt_before_settle = Pk_depth(i) + DBLE(Net_snow(i))*Deninv
-          dpt1 = dpt_before_settle + Settle_const_dble * ((Pss(i)*Denmaxinv) - dpt_before_settle)
-!          dpt1 = Pk_depth(i) + (Net_snow(i)*Deninv) + &
-!                 Settle_const * ((Pss(i)*Denmaxinv) - Pk_depth(i))
-!          dpt1 = ((Net_snow(i)*Deninv)+ (Setden*Pss(i))+Pk_depth(i))*Set1 ! [inches]
+          dpt_before_settle = Pk_depth(i) + DBLE(Net_snow(i))/DBLE(Den_init(i))
+          dpt1 = dpt_before_settle + DBLE(Settle_const(i)) * ((Pss(i)/DBLE(Den_max(i))) - dpt_before_settle)
+!          dpt1 = Pk_depth(i) + (Net_snow(i)/DBLE(Den_init(i))) + &
+!                 DBLE(Settle_const(i)) * ((Pss(i)/DBLE(Den_max(i))) - Pk_depth(i))
           ! RAPCOMMENT - CHANGED TO THE APPROPRIATE FINITE DIFFERENCE 
           !             APPROXIMATION OF SNOW DEPTH
           Pk_depth(i) = dpt1 ! [inches]
@@ -881,7 +876,7 @@
      &                 Canopy_covden(i), cec, Pkwater_equiv(i), &
      &                 Pk_def(i), Pk_temp(i), Pk_ice(i), Freeh2o(i), &
      &                 Snowcov_area(i), Snowmelt(i), Pk_depth(i), &
-     &                 Pss(i), Pst(i), Pk_den(i), cst, cals, sw, Freeh2o_cap(i))
+     &                 Pss(i), Pst(i), Pk_den(i), cst, cals, sw, Freeh2o_cap(i), Den_max(i))
           ! track total heat flux from both night and day periods
           Tcal(i) = cals ! [cal/cm^2] or [Langleys]
 
@@ -900,7 +895,7 @@
      &                   Canopy_covden(i), cec, Pkwater_equiv(i), &
      &                   Pk_def(i), Pk_temp(i), Pk_ice(i), Freeh2o(i), &
      &                   Snowcov_area(i), Snowmelt(i), Pk_depth(i), &
-     &                   Pss(i), Pst(i), Pk_den(i), cst, cals, sw, Freeh2o_cap(i))
+     &                   Pss(i), Pst(i), Pk_den(i), cst, cals, sw, Freeh2o_cap(i), Den_max(i))
             ! track total heat flux from both night and day periods
             Tcal(i) = Tcal(i) + cals ! [cal/cm^2] or [Langleys]
           ENDIF
@@ -942,8 +937,8 @@
             IF ( Pk_den(i)>0.0 ) THEN
               Pk_depth(i) = Pkwater_equiv(i)/DBLE(Pk_den(i))
             ELSE
-              Pk_den(i) = Den_max
-              Pk_depth(i) = Pkwater_equiv(i)*Denmaxinv
+              Pk_den(i) = Den_max(i)
+              Pk_depth(i) = Pkwater_equiv(i)/DBLE(Den_max(i))
             ENDIF
             Pss(i) = Pkwater_equiv(i)
             ! If it is during the melt period and snowfall was
@@ -1021,7 +1016,7 @@
       SUBROUTINE ppt_to_pack(Pptmix, Iasw, Tmaxc, Tminc, Tavgc, &
      &           Pkwater_equiv, Net_rain, Pk_def, Pk_temp, Pk_ice, &
      &           Freeh2o, Snowcov_area, Snowmelt, Pk_depth, Pss, Pst, &
-     &           Net_snow, Pk_den, Pptmix_nopack, Pk_precip, Tmax_allsnow_c, Freeh2o_cap)
+     &           Net_snow, Pk_den, Pptmix_nopack, Pk_precip, Tmax_allsnow_c, Freeh2o_cap, Den_max)
       USE PRMS_BASIN, ONLY: CLOSEZERO, INCH2CM !, DNEARZERO
       IMPLICIT NONE
       REAL, EXTERNAL :: f_to_c
@@ -1031,7 +1026,7 @@
       INTEGER, INTENT(IN) :: Pptmix
       INTEGER, INTENT(INOUT) :: Iasw, Pptmix_nopack
       REAL, INTENT(IN) :: Tmaxc, Tminc, Tavgc, Net_rain, Net_snow
-      REAL, INTENT(IN) :: Freeh2o_cap, Tmax_allsnow_c
+      REAL, INTENT(IN) :: Freeh2o_cap, Tmax_allsnow_c, Den_max
       REAL, INTENT(INOUT) :: Snowmelt, Freeh2o, Pk_precip
       REAL, INTENT(INOUT) :: Pk_def, Pk_ice, Pk_den, Snowcov_area, Pk_temp
       DOUBLE PRECISION, INTENT(INOUT) :: Pkwater_equiv, Pk_depth, Pst, Pss
@@ -1180,7 +1175,7 @@
               ! pack ice when the water cools to 0 degC)
               CALL calin(calpr, Pkwater_equiv, Pk_def, Pk_temp, &
      &                   Pk_ice, Freeh2o, Snowcov_area, Snowmelt, &
-     &                   Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap)
+     &                   Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap, Den_max)
             ENDIF
 
           ! (1.2) Rain on snowpack that is isothermal
@@ -1196,7 +1191,7 @@
             ! the water cools to 0 degC)
             CALL calin(calpr, Pkwater_equiv, Pk_def, Pk_temp, &
      &                 Pk_ice, Freeh2o, Snowcov_area, Snowmelt, &
-     &                 Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap)
+     &                 Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap, Den_max)
           ENDIF
         ENDIF
 
@@ -1343,13 +1338,12 @@
 !***********************************************************************
       SUBROUTINE calin(Cal, Pkwater_equiv, Pk_def, Pk_temp, &
      &                 Pk_ice, Freeh2o, Snowcov_area, Snowmelt, &
-     &                 Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap)
-      USE PRMS_SNOW, ONLY: Denmaxinv, Den_max
+     &                 Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap, Den_max)
       USE PRMS_MODULE, ONLY: Print_debug
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(INOUT) :: Iasw
-      REAL, INTENT(IN) :: Cal, Freeh2o_cap, Snowcov_area
+      REAL, INTENT(IN) :: Cal, Freeh2o_cap, Snowcov_area, Den_max
       REAL, INTENT(INOUT) :: Freeh2o
       DOUBLE PRECISION, INTENT(INOUT) :: Pkwater_equiv
       REAL, INTENT(INOUT) :: Pk_def, Pk_temp, Pk_ice, Pk_den, Snowmelt
@@ -1467,7 +1461,7 @@
                 CALL print_date(1)
               ENDIF
               Pk_den = Den_max
-              Pk_depth = Pkwater_equiv*Denmaxinv ! [inches]
+              Pk_depth = Pkwater_equiv/DBLE(Den_max) ! [inches]
             ENDIF
 
             ! snowmelt increases by the excess free water
@@ -1754,7 +1748,7 @@
       SUBROUTINE snowbal(Niteda, Tstorm_mo, Iasw, Temp, Esv, Hru_ppt, &
      &           Trd, Emis_noppt, Canopy_covden, Cec, Pkwater_equiv, &
      &           Pk_def, Pk_temp, Pk_ice, Freeh2o, Snowcov_area, &
-     &           Snowmelt, Pk_depth, Pss, Pst, Pk_den, Cst, Cal, Sw, Freeh2o_cap)
+     &           Snowmelt, Pk_depth, Pss, Pst, Pk_den, Cst, Cal, Sw, Freeh2o_cap, Den_max)
       USE PRMS_BASIN, ONLY: CLOSEZERO
       IMPLICIT NONE
       INTRINSIC SNGL
@@ -1764,7 +1758,7 @@
       INTEGER, INTENT(INOUT) :: Iasw
       REAL, INTENT(IN) :: Temp, Esv, Trd, Cec, Cst, Canopy_covden
       REAL, INTENT(IN) :: Emis_noppt, Sw, Freeh2o_cap
-      REAL, INTENT(IN) :: Hru_ppt, Snowcov_area
+      REAL, INTENT(IN) :: Hru_ppt, Snowcov_area, Den_max
       DOUBLE PRECISION, INTENT(OUT) :: Pst, Pss
       REAL, INTENT(OUT) :: Cal
       REAL, INTENT(INOUT) :: Pk_den, Pk_def, Pk_temp, Pk_ice
@@ -1872,7 +1866,7 @@
         IF ( Cal>0.0 ) THEN
           CALL calin(Cal, Pkwater_equiv, Pk_def, Pk_temp, &
      &               Pk_ice, Freeh2o, Snowcov_area, Snowmelt, &
-     &               Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap)
+     &               Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap, Den_max)
           RETURN
         ENDIF
       ENDIF
@@ -1935,7 +1929,7 @@
           ! will have terminated
           IF ( Cal>0.0 ) CALL calin(Cal, Pkwater_equiv, Pk_def, Pk_temp, &
      &                              Pk_ice, Freeh2o, Snowcov_area, &
-     &                              Snowmelt, Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap)
+     &                              Snowmelt, Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap, Den_max)
         ENDIF
 
       ! (3) conduction is from the surface to the snowpack and the
@@ -2348,7 +2342,7 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Deninv, Denmaxinv, Basin_snowmelt, Basin_pweqv, Basin_snowcov, &
+        WRITE ( Restart_outunit ) Basin_snowmelt, Basin_pweqv, Basin_snowcov, &
      &          Basin_snowevap, Basin_snowdepth, Basin_pk_precip, Basin_tcal
         WRITE ( Restart_outunit ) Int_alb
         WRITE ( Restart_outunit ) Scrv
@@ -2376,7 +2370,7 @@
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Deninv, Denmaxinv, Basin_snowmelt, Basin_pweqv, Basin_snowcov, &
+        READ ( Restart_inunit ) Basin_snowmelt, Basin_pweqv, Basin_snowcov, &
      &         Basin_snowevap, Basin_snowdepth, Basin_pk_precip, Basin_tcal
         READ ( Restart_inunit ) Int_alb
         READ ( Restart_inunit ) Scrv
