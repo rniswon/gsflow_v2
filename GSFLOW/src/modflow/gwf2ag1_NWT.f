@@ -3287,8 +3287,8 @@
       !
       ! - --FORMATS
       !
-260   FORMAT('1', /2X, 'VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF'
-     +     , ' TIME STEP', I5, ', STRESS PERIOD', I4/2X, 78('-'))
+260   FORMAT('1', /2X, 'VOLUMETRIC BUDGET FOR AGRICULTURAL FIELDS AT '
+     +     , ' END OF TIME STEP', I5, ', STRESS PERIOD', I4/2X, 78('-'))
 265   FORMAT(1X, /5X, 'CUMULATIVE VOLUMES', 6X, 'L**3', 7X
      +     , 'RATES FOR THIS TIME STEP', 6X, 'L**3/T'/5X, 18('-'), 17X, 
      +     24('-')//11X, 'IN:', 38X, 'IN:'/11X, '---', 38X, '---')
