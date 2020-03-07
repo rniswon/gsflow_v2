@@ -54,7 +54,7 @@
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_water_balance
 !***********************************************************************
-      Version_water_balance = 'water_balance.f90 2019-05-30 13:40:00Z'
+      Version_water_balance = 'water_balance.f90 2020-03-03 13:40:00Z'
       CALL print_module(Version_water_balance, 'Water Balance Computations  ', 90 )
       MODNAME_WB = 'water_balance'
 
@@ -162,7 +162,7 @@
      &    Basin_intcp_stor, Net_rain, Net_snow, Hru_intcpevap, &
      &    Srain_intcp, Wrain_intcp, Snow_intcp, Intcp_stor, Intcp_evap, &
      &    Canopy_covden, Intcp_changeover, Net_ppt, Intcp_stor_ante, Last_intcp_stor, &
-     &    Net_apply, Gain_inches, Use_transfer_intcp, Basin_hru_apply, Basin_net_apply
+     &    Net_apply, Gain_inches, Use_transfer_intcp, Basin_hru_apply, Basin_net_apply, Basin_changeover
       USE PRMS_SNOW, ONLY: Snowmelt, Pptmix_nopack, Snow_evap, Snowcov_area, Basin_pweqv, &
      &    Basin_snowmelt, Basin_snowevap, Basin_snowcov, Pkwater_ante
       USE PRMS_SRUNOFF, ONLY: Basin_infil, Hru_hortn_cascflow, Upslope_hortonian, Hru_impervstor, &
@@ -288,21 +288,26 @@
             WRITE ( BALUNT, * ) Infil(i), perv_frac, Hru_impervevap(i), Imperv_stor_ante(i), Hru_impervstor(i), &
      &                          Hru_percent_imperv(i), Dprst_sroff_hru(i)
           ENDIF
+          IF ( Intcp_changeover(i)>SMALL ) then
+              print *, i, Intcp_changeover(i), SMALL
+              endif
           IF ( ABS(robal)>SMALL ) THEN
-            WRITE ( BALUNT, * ) 'Possible HRU surface runoff water balance ERROR', i, ' hru_type:', Hru_type(i)
+            WRITE ( BALUNT, '(A,I0,A,1X,I0)') 'Possible HRU surface runoff water balance ERROR, HRU: ', i, &
+     &                                         ' hru_type:', Hru_type(i)
+            print *, perv_frac, Hru_impervevap(i), Imperv_stor_ante(i), Hru_impervstor(i), Hru_percent_imperv(i)
           ELSE
-            WRITE ( BALUNT, * ) 'HRU surface runoff rounding issue', i, ' hru_type:', Hru_type(i)
+            WRITE ( BALUNT, '(A,I0,A,1X,I0)' ) 'HRU surface runoff rounding issue, HRU:', i, ' hru_type:', Hru_type(i)
           ENDIF
           IF ( Cascade_flag>0 ) THEN
-            WRITE ( BALUNT, '(3I3,F10.6,17F10.4)' ) Nowmonth, Nowday, Pptmix_nopack(i), robal, Snowmelt(i), &
+            WRITE ( BALUNT, '(4I4,1X,F0.6,17F0.5)' ) Nowyear, Nowmonth, Nowday, Pptmix_nopack(i), robal, Snowmelt(i), &
      &              Upslope_hortonian(i), Imperv_stor_ante(i), Hru_hortn_cascflow(i), Infil(i), Hortonian_flow(i), &
      &              Hru_impervstor(i), Hru_impervevap(i), Net_ppt(i), &
      &              Pkwater_equiv(i), Snow_evap(i), Net_snow(i), Net_rain(i), Hru_sroffp(i), Hru_sroffi(i), harea
           ELSE
-            WRITE ( BALUNT,'(3I3,F10.6,15F10.4,F10.3)' ) Nowmonth, Nowday, Pptmix_nopack(i), &
-     &              robal, Snowmelt(i), Imperv_stor_ante(i), Infil(i), &
-     &              Hortonian_flow(i), Hru_impervstor(i), Hru_impervevap(i), Hru_percent_imperv(i), Net_ppt(i), &
-     &              Pkwater_equiv(i), Snow_evap(i), Net_snow(i), Net_rain(i), Hru_sroffp(i), Hru_sroffi(i), harea
+            WRITE ( BALUNT,'(4I4,1X,F0.6,17(1X,F0.5))' ) Nowyear, Nowmonth, Nowday, Pptmix_nopack(i), &
+     &              robal, Snowmelt(i), Imperv_stor_ante(i), Infil(i), Hortonian_flow(i), Hru_impervstor(i), &
+     &              Hru_impervevap(i), Hru_percent_imperv(i), Net_ppt(i), Pkwater_equiv(i), Snow_evap(i), &
+     &              Net_snow(i), Net_rain(i), Hru_sroffp(i), Hru_sroffi(i), Intcp_changeover(i), harea
           ENDIF
         ENDIF
 
@@ -362,7 +367,7 @@
         ENDIF
 
         hru_out = DBLE( Sroff(i) + Gwres_flow(i) + Ssres_flow(i) + Hru_actet(i) + Gwres_sink(i) )
-        hru_in = DBLE( Hru_ppt(i) )
+        hru_in = DBLE( Hru_ppt(i) ) !+ Intcp_changeover(i)
         IF ( Cascade_flag>0 ) THEN
           hru_out = hru_out + DBLE( Hru_sz_cascadeflow(i) ) + Hru_hortn_cascflow(i)
           hru_in = hru_in + Upslope_dunnianflow(i) + Upslope_interflow(i) + Upslope_hortonian(i)
@@ -372,7 +377,7 @@
           hru_in = hru_in + Gw_upslope(i)/DBLE(harea)
         ENDIF
 !        Hru_runoff(i) = hru_out - DBLE( Hru_actet(i) )
-        wbal = hru_in - hru_out + Hru_storage_ante(i) - Hru_storage(i)
+        wbal = hru_in - hru_out + Hru_storage_ante(i) - Hru_storage(i) !- Intcp_changeover(i)
         IF ( Gwminarea_flag==1 ) wbal = wbal + Gwstor_minarea_wb(i)
         IF ( DABS(wbal)>DTOOSMALL ) THEN
           WRITE ( BALUNT, * ) 'Possible HRU water balance issue:', wbal, '; HRU:', i, ' hru_type:', Hru_type(i), '; area:', harea
@@ -386,7 +391,7 @@
           ENDIF
           IF ( Cascadegw_flag>0 ) WRITE ( BALUNT, * ) Gw_upslope(i)/DBLE(harea), Hru_gw_cascadeflow(i)
           !CALL print_date(0)
-          WRITE ( BALUNT, FMT1 ) '   Date:', Nowtime(1), Nowtime(2), Nowtime(3)
+          WRITE ( BALUNT, FMT1 ) '   Date:', Nowyear, Nowmonth, Nowday
         ENDIF
 
         wbal = Gwstor_ante(i) + Gwres_in(i)/harea - Gwres_stor(i) - DBLE( Gwres_sink(i) + Gwres_flow(i) )
@@ -409,9 +414,10 @@
 
 ! intcp
       delta_stor = Basin_intcp_stor - Last_intcp_stor
-      pptbal = Basin_ppt - Basin_net_ppt - delta_stor - Basin_intcp_evap
+      pptbal = Basin_ppt - Basin_net_ppt - delta_stor - Basin_intcp_evap - Basin_changeover
       IF ( Use_sroff_transfer==1 ) pptbal = pptbal + Basin_net_apply
       IF ( DABS(pptbal)>DSMALL ) THEN
+        print *, Basin_changeover
         WRITE ( BALUNT, 9003 ) 'Possible basin interception water balance error', &
      &                         Nowyear, Nowmonth, Nowday, pptbal
       ELSEIF ( DABS(pptbal)>DTOOSMALL ) THEN

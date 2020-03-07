@@ -17,25 +17,25 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        5072029.00     EVAPOTRANSPIRATION =         579833.70
+   EVAPOTRANSPIRATION =        5072100.43     EVAPOTRANSPIRATION =         579915.46
            STREAMFLOW =        2.1368D+07             STREAMFLOW =        3181969.25
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
    INFLOWS - OUTFLOWS =        1.7387D+08     INFLOWS - OUTFLOWS =        5.7622D+07
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        1.7288D+08         STORAGE CHANGE =        5.7368D+07
+ TOTAL STORAGE CHANGE =        1.7288D+08         STORAGE CHANGE =        5.7376D+07
        --------------                             --------------
          LAND SURFACE =        1.3829D+08           LAND SURFACE =        4.4149D+07
-            SOIL ZONE =        3951037.32              SOIL ZONE =         604790.31
-     UNSATURATED ZONE =         848567.69       UNSATURATED ZONE =         131459.61
-       SATURATED ZONE =       -1663147.30         SATURATED ZONE =        -110377.15
-                LAKES =        3.1455D+07                  LAKES =        1.2593D+07
+            SOIL ZONE =        3950938.83              SOIL ZONE =         604794.48
+     UNSATURATED ZONE =         848231.12       UNSATURATED ZONE =         131600.83
+       SATURATED ZONE =       -1665951.96         SATURATED ZONE =        -110657.29
+                LAKES =        3.1457D+07                  LAKES =        1.2601D+07
 
- OVERALL BUDGET ERROR =         981511.88           BUDGET ERROR =         253766.05
+ OVERALL BUDGET ERROR =         982251.07           BUDGET ERROR =         246182.04
 
 
-  PERCENT DISCREPANCY =              0.49    PERCENT DISCREPANCY =              0.41
+  PERCENT DISCREPANCY =              0.49    PERCENT DISCREPANCY =              0.40
 
 
 

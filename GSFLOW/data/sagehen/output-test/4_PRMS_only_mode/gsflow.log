@@ -56,9 +56,9 @@ Precipitation Distribution     precip_1sta                2016-10-21
 Solar Radiation Distribution   ddsolrad                   2019-04-04
 Transpiration Distribution     transp_tindex              2015-01-06
 Potential Evapotranspiration   potet_jh                   2019-04-04
-Canopy Interception            intcp                      2019-05-30
+Canopy Interception            intcp                      2020-03-03
 Snow Dynamics                  snowcomp                   2019-11-27
-Surface Runoff                 srunoff_smidx              2019-11-15
+Surface Runoff                 srunoff_smidx              2020-03-03
 Soil Zone Computations         soilzone                   2020-01-10
 Groundwater                    gwflow                     2019-04-04
 Routing Initialization         routing                    2019-11-27
@@ -79,5 +79,5 @@ Simulation time period: 1980/10/01 - 1996/09/30
 
 ====================================================================
 
-Execution elapsed time    0 minutes  1.16 seconds
+Execution elapsed time    0 minutes  0.95 seconds
 
