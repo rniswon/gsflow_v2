@@ -2,14 +2,14 @@
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version 2.1.0 01/30/2020
+                         Version 2.1.0 03/04/2020
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.1.0 01/30/2020
+                       Version 5.1.0 03/04/2020
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -57,7 +57,7 @@ Stream Temperature: stream_temp
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2020-01-10
+GSFLOW Computation Order       gsflow_prms                2020-03-04
 Basin Definition               basin                      2019-11-14
 Cascading Flow                 cascade                    2019-09-25
 Common States and Fluxes       climateflow                2020-01-10
@@ -17648,8 +17648,8 @@ Date: 1996/09/30; Stress:  2; Step:  5844; Simulation step: 5844
                   MF iterations:       18; SZ iterations:     18
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/03/06 14:13:29
- Elapsed run time: 12 Minutes, 31.690 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/03/06 18:30:27
+ Elapsed run time: 13 Minutes,  2.881 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         61529;  SZ iterations:           61466
