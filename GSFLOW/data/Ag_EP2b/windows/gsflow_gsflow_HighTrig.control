@@ -97,7 +97,7 @@ gsflow_output_file
 model_output_file
 1
 4
-..\output\prms\sagehen.out
+..\output\prms\sagehen_HighTrig.out
 ####
 gsf_rpt
 1
@@ -107,7 +107,7 @@ gsf_rpt
 csv_output_file
 1
 4
-..\output\gsflow.csv
+..\output\gsflow_HighTrig.csv
 ####
 temp_module
 1
@@ -147,7 +147,7 @@ init_vars_from_file
 var_init_file
 1
 4
-..\output\prms\prms.ic
+..\output\prms\prms_HighTrig.ic
 ####
 save_vars_to_file
 1
@@ -157,7 +157,7 @@ save_vars_to_file
 var_save_file
 1
 4
-..\output\prms\prms.ic
+..\output\prms\prms_HighTrig.ic
 ####
 dispVar_names
 8
@@ -268,7 +268,7 @@ basin_sroff
 basinOutBaseFileName
 1
 4
-../output/basin_out
+../output/basin_out_HighTrig
 ####
 nsegmentOutON_OFF
 1
@@ -294,7 +294,7 @@ strm_seg_in
 nsegmentOutBaseFileName
 1
 4
-../output/nsegment_out_
+../output/nsegment_out_HighTrig_
 ####
 nhruOutON_OFF
 1
@@ -322,4 +322,4 @@ hru_ppt
 nhruOutBaseFileName
 1
 4
-../output/nhru_out_
+../output/nhru_out_HighTrig_

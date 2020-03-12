@@ -8,7 +8,7 @@ gwr_swale_flag
 model_mode
 1
 4
-GSFLOW
+GSFLOW5
 ####
 start_time
 6
@@ -87,7 +87,7 @@ gsflow_output_file
 model_output_file
 1
 4
-..\output\prms\sagehen.out
+..\output\prms\sagehen_HighKc.out
 ####
 gsf_rpt
 1
@@ -137,7 +137,7 @@ init_vars_from_file
 var_init_file
 1
 4
-..\output\prms\prms.ic
+..\output\prms\prms_HighKc.ic
 ####
 save_vars_to_file
 1
@@ -147,7 +147,7 @@ save_vars_to_file
 var_save_file
 1
 4
-..\output\prms\prms.ic
+..\output\prms\prms_HighKc.ic
 ####
 dispVar_names
 8
@@ -208,7 +208,7 @@ subbasin_flag
 print_debug
 1
 1
-0
+-1
 ####
 parameter_check_flag
 1
@@ -248,7 +248,7 @@ basin_sroff
 basinOutBaseFileName
 1
 4
-../output/basin_out
+../output/basin_HighKc_out
 ####
 nsegmentOutON_OFF
 1
@@ -274,7 +274,7 @@ strm_seg_in
 nsegmentOutBaseFileName
 1
 4
-../output/nsegment_out_
+../output/nsegment_out_HighKc_
 ####
 nhruOutON_OFF
 1
@@ -302,4 +302,4 @@ hru_ppt
 nhruOutBaseFileName
 1
 4
-../output/nhru_out_
+../output/nhru_out_HighKc_
