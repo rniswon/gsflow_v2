@@ -2,7 +2,7 @@
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version 2.1.0 01/30/2020
+                         Version 2.1.0 03/04/2020
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
@@ -15,7 +15,7 @@
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
- Run start date and time (yyyy/mm/dd hh:mm:ss): 2020/01/14 12:23:11
+ Run start date and time (yyyy/mm/dd hh:mm:ss): 2020/03/07 16:12:01
 
 GSFLOW MODFLOW main            gsflow_modflow             2019-10-30
 ====================================================================
@@ -32,7 +32,7 @@ Using Solver Package: NWT
 Steady state simulation successful, used 70 iterations
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/01/14 12:26:10
- Elapsed run time:  2 Minutes, 59.565 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/03/07 16:14:56
+ Elapsed run time:  2 Minutes, 55.013 Seconds
 
 Normal termination of simulation

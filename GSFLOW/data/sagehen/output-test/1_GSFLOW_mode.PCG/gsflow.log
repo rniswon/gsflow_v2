@@ -2,14 +2,14 @@
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version 2.1.0 01/30/2020
+                         Version 2.1.0 03/04/2020
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.1.0 01/30/2020
+                       Version 5.1.0 03/04/2020
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -57,7 +57,7 @@ Stream Temperature: stream_temp
 
         Process                   Module                Version Date
 ====================================================================
-GSFLOW Computation Order       gsflow_prms                2020-01-10
+GSFLOW Computation Order       gsflow_prms                2020-03-04
 Basin Definition               basin                      2019-11-14
 Cascading Flow                 cascade                    2019-09-25
 Common States and Fluxes       climateflow                2020-01-10
@@ -69,9 +69,9 @@ Precipitation Distribution     precip_1sta                2016-10-21
 Solar Radiation Distribution   ddsolrad                   2019-04-04
 Transpiration Distribution     transp_tindex              2015-01-06
 Potential Evapotranspiration   potet_jh                   2019-04-04
-Canopy Interception            intcp                      2019-05-30
+Canopy Interception            intcp                      2020-03-03
 Snow Dynamics                  snowcomp                   2019-11-27
-Surface Runoff                 srunoff_smidx              2019-11-15
+Surface Runoff                 srunoff_smidx              2020-03-03
 Soil Zone Computations         soilzone                   2020-01-10
 GSFLOW PRMS to MODFLOW         gsflow_prms2mf             2019-10-30
 GSFLOW MODFLOW to PRMS         gsflow_mf2prms             2017-11-15
@@ -17648,8 +17648,8 @@ Date: 1996/09/30; Stress:  2; Step:  5844; Simulation step: 5844
                   MF iterations:       19; SZ iterations:     19
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/01/14 13:52:31
- Elapsed run time: 14 Minutes,  3.050 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/03/07 13:00:20
+ Elapsed run time: 13 Minutes, 37.738 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         65450;  SZ iterations:           65341

@@ -69,7 +69,7 @@
 !***********************************************************************
       intdecl = 0
 
-      Version_intcp = 'intcp.f90 2019-05-30 13:38:00Z'
+      Version_intcp = 'intcp.f90 2020-03-03 13:38:00Z'
       CALL print_module(Version_intcp, 'Canopy Interception         ', 90)
       MODNAME = 'intcp'
 
@@ -513,8 +513,10 @@
         Basin_net_rain = Basin_net_rain + DBLE( Net_rain(i)*harea )
         Basin_intcp_stor = Basin_intcp_stor + DBLE( intcpstor*cov*harea )
         Basin_intcp_evap = Basin_intcp_evap + DBLE( intcpevap*cov*harea )
-        IF ( changeover>0.0 .AND. Print_debug>-1 ) PRINT *, 'Change over storage:', changeover, '; HRU:', i
-        Basin_changeover = Basin_changeover + DBLE( changeover*harea )
+        IF ( Intcp_changeover(i)>0.0 ) THEN
+          IF ( Print_debug>-1 ) PRINT *, 'Change over storage:', Intcp_changeover(i), '; HRU:', i
+          Basin_changeover = Basin_changeover + DBLE( Intcp_changeover(i)*harea )
+        ENDIF
 
       ENDDO
 
