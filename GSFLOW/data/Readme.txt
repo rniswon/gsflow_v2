@@ -23,19 +23,19 @@ in Regan and others (2015, USGS TM 6-D3).
 
 4. Ag_EP1a: This sample GSFLOW model is for the Sagehen Creek watershed
 and demonstrates use of the MODFLOW AG Package. The problem is described
-in Niswonger (2020, AG_Package_EM&S.pdf).
+in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
 
 5. Ag_EP1b: This sample GSFLOW model is for the Sagehen Creek watershed
 and demonstrates use of the MODFLOW AG Package. The problem is described
-in Niswonger (2020, AG_Package_EM&S.pdf).
+in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
 
 6. Ag_EP2a: This sample GSFLOW model is for the Sagehen Creek watershed
 and demonstrates use of the MODFLOW AG Package. The problem is described
-in Niswonger (2020, AG_Package_EM&S.pdf).
+in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
 
 7. Ag_EP2b: This sample GSFLOW model is for the Sagehen Creek watershed
 and demonstrates use of the MODFLOW AG Package. The problem is described
-in Niswonger (2020, AG_Package_EM&S.pdf).
+in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
 
 References:
 
