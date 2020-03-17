@@ -20,9 +20,9 @@ systems is provided. The Linux executable was compiled on a personal computer us
 Intel Fortran (ifort) and C (icc) compilers version: 18.0.3 20180410. The Windows 
 executable was compiled on a personal computer with the Intel(R) Xeon(R) E-2186M CPU, 
 running the Microsoft Windows 10 Enterprise, Version 1809, 64-bit operating system, 
-using the Microsoft Visual Studio 2019 Version 16.3.7, development 
-environment and the Intel® Parallel Studio XE 2019 Update 5 Composer Edition for Fortran
-Windows* Integration for Microsoft Visual Studio* 2019 and Microsoft Visual C++ 2019 compilers.
+using the Microsoft Visual Studio 2019 Version 16.3.7, development environment and 
+the Intel® Parallel Studio XE 2019 Update 5 Composer Edition for Fortran Windows* 
+Integration for Microsoft Visual Studio* 2019 and Microsoft Visual C++ 2019 compilers.
 
 The source code and Linux Makefiles are provided to aid users in compilation
 on other computers. However, no support is provided for compilation.
@@ -57,8 +57,8 @@ The distribution file contains:
 
           Executable and source code for GSFLOW.
           GSFLOW documentation.
-          Related documentation for PRMS, MODFLOW, and MODFLOW-NWT.
-          Three GSFLOW example problems.
+          Related documentation for PRMS and MODFLOW.
+          Seven GSFLOW example problems.
           An Excel spreadsheet for analysis of GSFLOW water-budget results.
 
 Unzipping the distribution file creates numerous individual files contained in 
@@ -68,16 +68,18 @@ installation directory:
    |
    |--GSFLOW_2.1.0
    |    |--bin           ; Compiled GSFLOW executable for personal computers
-   |    |--data          ; Three example GSFLOW application models described
+   |    |--data          ; Seven example GSFLOW application models described
                             in USGS reports TM6-D1 and TM6-D3.
    |    |--doc           ; Documentation reports for GSFLOW and related
                             software.
+			|--Related reports (PRMS, MODFLOW, CRT)	; Additional reports and information files
    |    |--src
    |        |--gsflow           ; Source code for GSFLOW Modules
    |        |--mmf              ; Source code for MMF software
-   |        |--modflow          ; Source code for MODFLOW-2005 and MODFLOW-NWT 
+   |        |--modflow          ; Source code for MODFLOW 
                                   Packages
    |        |--prms             ; Source code for PRMS Modules
+   |        |--merge			; Source code for utility program to merge restart files
    |    |--water-budget utility ; Utility program for analysis of GSFLOW output
 
 
@@ -95,7 +97,7 @@ available from the following World Wide Web site: http://www.adobe.com/
 B. INSTALLING
 
 To make the executable version of GSFLOW accessible from any directory, the 
-directory containing the executable (GSFLOW_2.1.0/bin on Linux-based computers or 
+directory containing the executable (GSFLOW_2.1.0\bin on Linux-based computers or 
 GSFLOW_2.1.0\bin on Windows-based computers) should be included in the PATH
 environment variable. Also, if a prior release of GSFLOW is installed on your 
 system, the directory containing the executable for the prior release should be 
@@ -144,10 +146,10 @@ an executable version of GSFLOW that uses the same unformatted file structure.
 
 D. TESTING
 
-Three sample problems with GSFLOW data sets are provided in the "data" subdirectory
+Seven sample problems with GSFLOW data sets are provided in the "data" subdirectory
 to verify that GSFLOW is correctly installed and running on the user's system.
 The sample problems also may be looked at as examples of how to use the program. 
-See the 'Readme.txt' file in that subdirectory for a description of the three 
+See the 'Readme.txt' file in that subdirectory for a description of the seven 
 sample problems.
 
 
