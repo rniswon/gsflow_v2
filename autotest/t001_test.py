@@ -70,10 +70,10 @@ def do_model(model):
             for line in foo:
                 if '.nam' in line.lower():
                     mf_nam = line.strip().split()[0]
-                    mf_nam.replace("\\", "/")
+                    mf_nam = mf_nam.replace("\\", "/")
 
                 s += line
-            s.replace("\\", "/")
+            s = s.replace("\\", "/")
         with open(os.path.join(model_ws, name), "w") as foo:
             foo.write(s)
 
@@ -82,7 +82,7 @@ def do_model(model):
             with open(os.path.join(model_ws, mf_nam)) as foo:
                 for line in foo:
                     s += line
-                s.replace("\\", "/")
+                s = s.replace("\\", "/")
 
             with open(os.path.join(model_ws, mf_nam), "w") as foo:
                 foo.write(s)
