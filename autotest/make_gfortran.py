@@ -31,12 +31,12 @@ def cleanup(srcdir, tempdir):
         # shutil.rmtree(tempdir)
         return tempdir
     os.makedirs(tempdir)
-    copytree(srcdir, "./temp")
-    os.remove(os.path.join('temp', 'merge', "CSV_merge.f90"))
+    copytree(srcdir, "./stemp")
+    os.remove(os.path.join('stemp', 'merge', "CSV_merge.f90"))
     if platform.system().lower() == "windows":
-        os.remove(os.path.join('temp','prms', 'utils_prms_linux.f90'))
+        os.remove(os.path.join('stemp','prms', 'utils_prms_linux.f90'))
     else:
-        os.remove(os.path.join('temp', 'prms', 'utils_prms.f90'))
+        os.remove(os.path.join('stemp', 'prms', 'utils_prms.f90'))
     return tempdir
 
 
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     args = pymake.pymake.parser()
 
     srcdir = args.srcdir
-    srcdir = cleanup(srcdir, "./temp")
+    srcdir = cleanup(srcdir, "./stemp")
 
     optlevel = "-O -Bstatic"
     fflags = optlevel  + " -fno-second-underscore"
