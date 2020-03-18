@@ -28,7 +28,8 @@ def cleanup(srcdir, tempdir):
     for gfortran compilation.
     """
     if os.path.isdir(tempdir):
-        shutil.rmtree(tempdir)
+        # shutil.rmtree(tempdir)
+        return tempdir
     os.makedirs(tempdir)
     copytree(srcdir, "./temp")
     os.remove(os.path.join('temp', 'merge', "CSV_merge.f90"))
@@ -52,7 +53,7 @@ if __name__ == "__main__":
         cflags = optlevel + " -D WINDOWS -Wall"
     else:
         cflags = optlevel + " -D LINUX -Wall"
-    syslibs = "-lgfortran -lgcc -lm"
+    syslibs = ["-lgfortran", "-lgcc", "-lm"]
     args.double = False
     args.makefile = False
 
