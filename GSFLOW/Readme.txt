@@ -72,7 +72,7 @@ installation directory:
                             in USGS reports TM6-D1 and TM6-D3.
    |    |--doc           ; Documentation reports for GSFLOW and related
                             software.
-			|--Related reports (PRMS, MODFLOW, CRT)	; Additional reports and information files
+			|--Related reports	; Additional reports and information files
    |    |--src
    |        |--gsflow           ; Source code for GSFLOW Modules
    |        |--mmf              ; Source code for MMF software
