@@ -1108,7 +1108,7 @@
       !1 - ------RESET DEMAND IF IT CHANGES
       DEMAND = 0.0
       TOTAL = 0.0
-      DO i = 1, NUMIRRDIVERSION
+      DO i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
          if (iseg > 0) then
             if (IUNIT(44) > 0) then
@@ -1880,8 +1880,8 @@
      +                DVRPERC(ICOUNT, istsg)
                dvt = (1.0 - DVEFF(ICOUNT, istsg))*dvt
          ! Keep irrigation for PRMS as volume
-               DIVERSIONIRRPRMS(icount, l) = 
-     +         DIVERSIONIRRPRMS(icount, l) + dvt
+               DIVERSIONIRRPRMS(icount, istsg) = 
+     +         DIVERSIONIRRPRMS(icount, istsg) + dvt
             END DO
          END IF
       END DO
@@ -2190,7 +2190,7 @@
                DO icount = 1, DVRCH(istsg)
                   ihru = IRRROW_SW(icount, istsg)
                   WRITE (IBD3, 66) ISTSG, IHRU, 
-     +                             DIVERSIONIRRPRMS(icount, l)
+     +                             DIVERSIONIRRPRMS(icount, istsg)
                END DO
             END IF
          END DO
@@ -2435,7 +2435,7 @@
       DOUBLE PRECISION :: factor, area, aet, pet
       double precision :: zerod7, done, dzero, pettotal,
      +                    aettotal, prms_inch2mf_q,
-     +                    aetold, supold, sup
+     +                    aetold, supold, sup !, etdif
       real :: fmaxflow
       integer :: k, iseg, hru_id, i
       external :: set_factor
@@ -2475,7 +2475,7 @@
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
-        if (SUPACT(iseg) < 0.0) SUPACT(iseg) = 0.0
+!        if (SUPACT(iseg) < 0.0) SUPACT(iseg) = 0.0
         !
         !1 - -----set diversion to demand
         !
@@ -2488,11 +2488,12 @@
         fmaxflow = STRM(9, LASTREACH(K))
         IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
-  !      if(iseg==19.and.kper==11.and.kstp==6)then
-  !        write(999,33)kiter,SEG(2, iseg),fmaxflow,SUPACT(iseg),
-  !   +                 pettotal,aettotal
+  !      if(iseg==18)then
+  !    etdif = pettotal - aettotal
+  !        write(999,33)kper,kstp,kiter,SEG(2, iseg),fmaxflow,
+  !   +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
   !      endif
-  !33  format(i5,5e20.10)
+  !33  format(3i5,7e20.10)
 300   continue
       return
       end subroutine demandconjunctive_prms
@@ -2782,35 +2783,27 @@
      +                                sup, supold
       integer, intent(in) :: kiter, l
       !dummy
-      DOUBLE PRECISION :: factor, zerod5, dzero, etdif, det, dq,
-     +                    zerod22
+      DOUBLE PRECISION :: factor, zerod5, dzero, etdif, det, dq
 ! -----------------------------------------
 !
       dzero = 0.0d0
       zerod5 = 1.0d-5
-      zerod22 = 1.0d-2
       set_factor = dzero
       factor = dzero
       etdif = pettotal - aettotal
       det = (aettotal - aetold)
       factor = etdif
       dq = sup - supold
-      if (kiter == 1) then
-         !if (det < zerod5*pettotal) then
-         !  factor = dzero
-         !else
-           factor = etdif
-         !end if
-      else if (det < zerod5*pettotal) then
-         factor = dzero
-      else if (abs(det) > dzero) then
-         factor = dq*etdif/det
+      if (kiter > 1) then
+        if (abs(det) > dzero) then
+          factor = dq*etdif/det
+        end if
       end if
-      if ( kiter > 1 ) then
-        if( factor > accel*etdif ) factor = accel*etdif
-      end if
+      if( factor > accel*etdif ) factor = accel*etdif
+      if( factor < etdif ) factor = etdif
+      if( factor < dzero ) factor = dzero
 !      open(222,file='debug.out')
-!      if(l==17)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
+!      if(l==18)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
 !     +aetold,factor,sup
 !333   format(i5,8e20.10)
       set_factor = factor
@@ -3294,8 +3287,8 @@
       !
       ! - --FORMATS
       !
-260   FORMAT('1', /2X, 'VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF'
-     +     , ' TIME STEP', I5, ', STRESS PERIOD', I4/2X, 78('-'))
+260   FORMAT('1', /2X, 'VOLUMETRIC BUDGET FOR AGRICULTURAL FIELDS AT '
+     +     , ' END OF TIME STEP', I5, ', STRESS PERIOD', I4/2X, 78('-'))
 265   FORMAT(1X, /5X, 'CUMULATIVE VOLUMES', 6X, 'L**3', 7X
      +     , 'RATES FOR THIS TIME STEP', 6X, 'L**3/T'/5X, 18('-'), 17X, 
      +     24('-')//11X, 'IN:', 38X, 'IN:'/11X, '---', 38X, '---')

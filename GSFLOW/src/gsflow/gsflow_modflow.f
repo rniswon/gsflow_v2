@@ -1639,7 +1639,7 @@ C
             STRM(j,i) = ZERO
           END DO
         END DO
-        IF ( TESTSFR.GT.1.0E-5 ) THEN
+        IF ( TESTSFR.GT.1.0D0 ) THEN
           IF ( Print_debug>-2 ) THEN
             WRITE (Logunt, 10)
             WRITE (*, 10)
@@ -1651,13 +1651,13 @@ C
         DO i = 1, NLAKES
           TESTLAK = TESTLAK + ABS(PRCPLK(i)) + ABS(EVAPLK(i)) + 
      +              ABS(RNF(i)) + ABS(WTHDRW(i))
-          IF ( TESTLAK.GT.1.0E-5 ) EXIT
+          IF ( TESTLAK.GT.1.0D0 ) EXIT
         END DO
         PRCPLK = ZERO
         EVAPLK = ZERO
         RNF = ZERO
         WTHDRW = ZERO
-        IF ( TESTLAK.GT.1.0E-5 ) THEN
+        IF ( TESTLAK.GT.1.0D0 ) THEN
           IF ( Print_debug>-2 ) THEN
             WRITE (Logunt, 11)
             WRITE (*, 11)

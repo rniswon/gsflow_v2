@@ -21,6 +21,21 @@ Regan and others (2015, USGS TM 6-D3).
 and demonstrates use of the GSFLOW restart option. The problem is described
 in Regan and others (2015, USGS TM 6-D3).
 
+4. Ag_EP1a: This sample GSFLOW model is for the Sagehen Creek watershed
+and demonstrates use of the MODFLOW AG Package. The problem is described
+in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
+
+5. Ag_EP1b: This sample GSFLOW model is for the Sagehen Creek watershed
+and demonstrates use of the MODFLOW AG Package. The problem is described
+in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
+
+6. Ag_EP2a: This sample GSFLOW model is for the Sagehen Creek watershed
+and demonstrates use of the MODFLOW AG Package. The problem is described
+in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
+
+7. Ag_EP2b: This sample GSFLOW model is for the Sagehen Creek watershed
+and demonstrates use of the MODFLOW AG Package. The problem is described
+in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
 
 References:
 
@@ -30,6 +45,9 @@ FLOW model based on the integration of the Precipitation-Runoff
 Modeling System (PRMS) and the Modular Ground-Water Flow Model
 (MODFLOW-2005): U.S. Geological Survey Techniques and Methods
 6-D1, 240 p.
+
+Niswonger, R.G., 2020, An Agricultural Water Use Package for MODFLOW 
+and GSFLOW: Environmental Modelling and Software 125 (2020) 104617, 16 p.
 
 Regan, R.S., Niswonger, R.G., Markstrom, S.L., and Barlow, P.M., 2015, 
 Documentation of a restart option for the U.S. Geological Survey coupled 

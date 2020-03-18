@@ -689,10 +689,12 @@
       USE PRMS_FLOWVARS, ONLY: Basin_cfs, Basin_cms, Basin_stflow_out
       USE PRMS_BASIN, ONLY: CFS2CMS_CONV
       USE PRMS_SET_TIME, ONLY: Cfs2inches
+      USE GLOBAL, ONLY : IUNIT
+      USE GWFAGMODULE, ONLY:  NUMIRRDIVERSIONSP,IRRSEG
       IMPLICIT NONE
       INTRINSIC DBLE
 ! Local Variables
-      INTEGER :: i
+      INTEGER :: i, itemp, j
 !***********************************************************************
       DO i = 1, NSTRM
 ! Reach_cfs and reach_wse are not used except to be available for output
@@ -702,10 +704,17 @@
 
 ! Total streamflow out of basin for all streams leaving model area.
 ! Total specified streamflow into model area.
+! Ignore segments that are used for irrigation
       Basin_cfs = 0.0D0
       Stream_inflow = 0.0D0
       DO i = 1, NSS
-        IF ( IOTSG(i)==0 ) Basin_cfs = Basin_cfs + SGOTFLW(i)
+        itemp = 0
+        IF ( IUNIT(66) > 0 ) THEN
+          DO j = 1, NUMIRRDIVERSIONSP
+            IF ( i == IRRSEG(J) ) itemp = IRRSEG(J)
+          END DO
+        END IF
+        IF ( IOTSG(i)==0 .and. itemp == 0 ) Basin_cfs = Basin_cfs + SGOTFLW(i)
         Streamflow_sfr(i) = DBLE( SGOTFLW(i) )*Mfl3t_to_cfs
       ENDDO 
       IF ( TOTSPFLOW<0.0 ) THEN

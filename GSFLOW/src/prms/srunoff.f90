@@ -94,7 +94,7 @@
 !***********************************************************************
       srunoffdecl = 0
 
-      Version_srunoff = 'srunoff.f90 2019-11-15 12:11:00Z'
+      Version_srunoff = 'srunoff.f90 2020-03-03 12:11:00Z'
       IF ( Sroff_flag==1 ) THEN
         MODNAME = 'srunoff_smidx'
       ELSE
@@ -663,9 +663,8 @@
           ENDIF
         ENDIF
 
-        availh2o = Intcp_changeover(i) + Net_rain(i)
-        CALL compute_infil(availh2o, Net_ppt(i), Imperv_stor(i), Imperv_stor_max(i), Snowmelt(i), &
-     &                     Snowinfil_max(i), Net_snow(i), Pkwater_equiv(i), Infil(i), Hru_type(i))
+        CALL compute_infil(Net_rain(i), Net_ppt(i), Imperv_stor(i), Imperv_stor_max(i), Snowmelt(i), &
+     &                     Snowinfil_max(i), Net_snow(i), Pkwater_equiv(i), Infil(i), Hru_type(i), Intcp_changeover(i))
 
         IF ( Dprst_flag==1 ) THEN
           Dprst_in(i) = 0.0D0
@@ -674,6 +673,7 @@
             dprst_chk = 1
 !           ******Compute the depression storage component
 !           only call if total depression surface area for each HRU is > 0.0
+            availh2o = Intcp_changeover(i) + Net_rain(i)
             CALL dprst_comp(Dprst_vol_clos(i), Dprst_area_clos_max(i), Dprst_area_clos(i), &
      &                      Dprst_vol_open_max(i), Dprst_vol_open(i), Dprst_area_open_max(i), Dprst_area_open(i), &
      &                      Dprst_sroff_hru(i), Dprst_seep_hru(i), Sro_to_dprst_perv(i), Sro_to_dprst_imperv(i), &
@@ -800,7 +800,7 @@
 !     Compute infiltration
 !***********************************************************************
       SUBROUTINE compute_infil(Net_rain, Net_ppt, Imperv_stor, Imperv_stor_max, Snowmelt, &
-     &                         Snowinfil_max, Net_snow, Pkwater_equiv, Infil, Hru_type)
+     &                         Snowinfil_max, Net_snow, Pkwater_equiv, Infil, Hru_type, Intcp_changeover)
       USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp
       USE PRMS_SNOW, ONLY: Pptmix_nopack
       USE PRMS_BASIN, ONLY: NEARZERO, DNEARZERO
@@ -809,7 +809,7 @@
 ! Arguments
       INTEGER, INTENT(IN) :: Hru_type
       REAL, INTENT(IN) :: Net_rain, Net_ppt, Imperv_stor_max
-      REAL, INTENT(IN) :: Snowmelt, Snowinfil_max, Net_snow
+      REAL, INTENT(IN) :: Snowmelt, Snowinfil_max, Net_snow, Intcp_changeover
       DOUBLE PRECISION, INTENT(IN) :: Pkwater_equiv
       REAL, INTENT(INOUT) :: Imperv_stor, Infil
 ! Functions
@@ -827,6 +827,13 @@
         ENDIF
       ELSE
         avail_water = 0.0
+      ENDIF
+
+! compute runoff from canopy changeover water
+      IF ( Intcp_changeover>0.0 ) THEN
+        avail_water = avail_water + Intcp_changeover
+        Infil = Infil + Intcp_changeover
+        IF ( Hru_type==1 ) CALL perv_comp(Intcp_changeover, Intcp_changeover, Infil, Srp)
       ENDIF
 
 !******if rain/snow event with no antecedent snowpack,
