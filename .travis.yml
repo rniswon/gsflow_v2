@@ -1,0 +1,64 @@
+language: python
+os: linux
+dist: xenial
+sudo: false
+compiler: gcc
+services:
+- xvfb
+matrix:
+  include:
+  - env: GSFLOW
+    python: 3.6
+cache:
+  pip: true
+  directories:
+  - "$HOME/.cache/pip"
+  - "$HOME/.local"
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gfortran-8
+    - g++-8
+    - python-pip
+    - libhdf5-serial-dev
+    - netcdf-bin
+    - libnetcdf-dev
+    - gdal-bin
+    - libgdal-dev
+env:
+  global:
+  - NO_NET=1
+install:
+- if [[ ! -d "$HOME/.local/bin" ]]; then mkdir "$HOME/.local/bin"; fi
+- export PATH="$HOME/.local/bin:$PATH"
+- ln -fs /usr/bin/gfortran-8 "$HOME/.local/bin/gfortran" && gfortran --version
+- ls -l /usr/bin/gfortran-8
+- ln -fs /usr/bin/gcc-8 "$HOME/.local/bin/gcc" && gcc --version
+- ls -l /usr/bin/gcc-8
+- ln -fs /usr/bin/g++-8 "$HOME/.local/bin/g++" && g++ --version
+- ls -l /usr/bin/g++-8
+- export CXX="g++"
+- pip install -r requirements.travis.txt
+- pip install --upgrade numpy
+- pip install https://github.com/modflowpy/pymake/zipball/master
+- pip install shapely[vectorize]
+- pip install nose-timer
+- pip install flopy
+script:
+- export PYTHONPATH=$PYTHONPATH:.
+- echo python path; python -c "from __future__ import print_function; import sys;
+  print(sys.path)"
+- python -c "import os; is_travis = 'TRAVIS' in os.environ; print('TRAVIS {}'.format(is_travis))"
+- echo flopy version; python -c "from __future__ import print_function; import flopy;
+  print(flopy.__version__)"
+- echo numpy version; python -c "import numpy; print(numpy.version.version)"
+- echo pandas version; python -c "import pandas as pd; print(pd.__version__)"
+- echo pyshp; python -c "import shapefile; print(shapefile.__version__)"
+- echo nosetests version; nosetests --version
+- cd autotest
+- chmod u+x make_linux_gfortran.sh
+- sed -i -e 's/\r$//' make_linux_gfortran.sh
+- ./make_linux_gfortran.sh
+
