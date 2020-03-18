@@ -46,6 +46,7 @@ install:
 - pip install shapely[vectorize]
 - pip install nose-timer
 - pip install flopy
+- pip install https://github.com/pygsflow/pygsflow/zipball/master
 script:
 - export PYTHONPATH=$PYTHONPATH:.
 - echo python path; python -c "from __future__ import print_function; import sys;
