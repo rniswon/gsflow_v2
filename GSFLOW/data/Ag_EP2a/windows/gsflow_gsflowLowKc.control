@@ -57,7 +57,7 @@ param_file
 modflow_name
 1
 4
-.\sagehen_GSFLOW_LowKc.nam
+.\sagehen_gsflow_LowKc.nam
 ####
 mapOutVar_names
 1
