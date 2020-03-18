@@ -32,7 +32,10 @@ def cleanup(srcdir, tempdir):
     os.makedirs(tempdir)
     copytree(srcdir, "./temp")
     os.remove(os.path.join('temp', 'merge', "CSV_merge.f90"))
-    os.remove(os.path.join('temp','prms', 'utils_prms_linux.f90'))
+    if platform.system().lower() == "windows":
+        os.remove(os.path.join('temp','prms', 'utils_prms_linux.f90'))
+    else:
+        os.remove(os.path.join('temp', 'prms', 'utils_prms.f90'))
     return tempdir
 
 
@@ -45,7 +48,10 @@ if __name__ == "__main__":
 
     optlevel = "-O -Bstatic"
     fflags = optlevel  + " -fno-second-underscore"
-    cflags = optlevel + " -D WINDOWS -Wall"
+    if platform.system().lower() == 'windows':
+        cflags = optlevel + " -D WINDOWS -Wall"
+    else:
+        cflags = optlevel + " -D LINUX -Wall"
     syslibs = "-lgfortran -lgcc -lm"
     args.double = False
     args.makefile = False
