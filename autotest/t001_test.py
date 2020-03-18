@@ -14,7 +14,7 @@ if platform.system().lower() == "windows":
 gsflow_exe = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                           gsflow_exe_name)
 
-ismfnwt = fp.which(gsflow_exe)
+isgsflow = fp.which(gsflow_exe)
 
 data_dir = os.path.join("..", "GSFLOW", "data")
 out_dir = os.path.join(".", "temp")
@@ -23,22 +23,34 @@ out_dir = os.path.join(".", "temp")
 # add new models here to the test scenarios!
 model_name = [os.path.join("Ag_EP1a", "gsflow_modflow_high.control"),
               os.path.join("Ag_EP1a", "gsflow_modflow_low.control"),
-              # os.path.join("Ag_EP1b", "Agwater1_high.nam"),
-              # os.path.join("Ag_EP1b", "Agwater1_low.nam"),
+              os.path.join("Ag_EP1b", "gsflow_modflow_high.control"),
+              os.path.join("Ag_EP1b", "gsflow_modflow_low.control"),
+              os.path.join("Ag_EP2a", 'windows', 'gsflow_gsflowHighKc.control'),
+              os.path.join("Ag_EP2a", 'windows', 'gsflow_gsflowLowKc.control'),
               ]
 
 models = [os.path.join(data_dir, model) for model in model_name]
 
 has_external = {"gsflow_modflow_high.control":
                     (os.path.join("input", "seg1_high.tab"),
+                     os.path.join('input', 'seg1.tab'),
                      os.path.join("input", "seg9.tab"),
                      os.path.join("input", "Agwater1.uzf"),
                      os.path.join("input", "Agwater1.ag")),
                 "gsflow_modflow_low.control":
                     (os.path.join("input", "seg1_low.tab"),
+                     os.path.join("input", 'seg1.tab'),
                      os.path.join("input", "seg9.tab"),
                      os.path.join("input", "Agwater1.uzf"),
                      os.path.join("input", "Agwater1.ag")),
+                "gsflow_gsflowHighKc.control":
+                    (os.path.join("..", 'input', 'modflow', "seg18_tab.txt"),
+                     os.path.join("..", "input", "modflow", "seg19_tab.txt"),
+                     os.path.join("..", "input", "modflow", "well_tab.txt")),
+                "gsflow_gsflowLowKc.control":
+                    (os.path.join("..", 'input', 'modflow', "seg18_tab.txt"),
+                     os.path.join("..", "input", "modflow", "seg19_tab.txt"),
+                     os.path.join("..", "input", "modflow", "well_tab.txt")),
                 }
 
 
@@ -134,9 +146,14 @@ def do_model(model):
 
     gsf = gsflow.GsflowModel.load_from_file(os.path.join(out_dir, name),
                                             gsflow_exe=gsflow_exe)
-    success, buff = gsf.run_model()
-    print(success)
-    #
+
+    try:
+        success, _ = gsf.run_model(forgive=True)
+    except:
+        success = False
+    if not success:
+        raise AssertionError(isgsflow)
+
 
     # ml.write_input()
 
@@ -196,5 +213,5 @@ if __name__ == "__main__":
     test_pwd()
     test_gsflow_exists()
     # test_run_model()
-    for model in models:
+    for model in models[5:]:
         do_model(model)
