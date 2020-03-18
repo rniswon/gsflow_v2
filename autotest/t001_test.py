@@ -125,7 +125,8 @@ def do_model(model):
                                      model_ws=model_ws,
                                      check=False)
     '''
-    gsf = gsflow.GsflowModel.load_from_file(model, gsflow_exe=gsflow_exe)
+    gsf = gsflow.GsflowModel.load_from_file(model, gsflow_exe=gsflow_exe,
+                                            forgive=False)
     external_fnames = gsf.mf.external_fnames
     gsf.mf.external_fnames = [os.path.split(p)[-1] for p in external_fnames]
     gsf.write_input(workspace=out_dir)
@@ -145,7 +146,8 @@ def do_model(model):
                 pass
 
     gsf = gsflow.GsflowModel.load_from_file(os.path.join(out_dir, name),
-                                            gsflow_exe=gsflow_exe)
+                                            gsflow_exe=gsflow_exe,
+                                            forgive=False)
 
     try:
         success, _ = gsf.run_model(forgive=True)
