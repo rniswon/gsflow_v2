@@ -28,7 +28,8 @@ model_name = [os.path.join("Ag_EP1a", "gsflow_modflow_high.control"),
               os.path.join("Ag_EP2a", 'windows', 'gsflow_gsflowHighKc.control'),
               os.path.join("Ag_EP2a", 'windows', 'gsflow_gsflowLowKc.control'),
               os.path.join("Ag_EP2b", "windows", "gsflow_gsflow_HighTrig.control"),
-              os.path.join("Ag_EP2b", "windows", "gsflow_gsflow_LowTrig.control")]
+              os.path.join("Ag_EP2b", "windows", "gsflow_gsflow_LowTrig.control"),
+              os.path.join("sagehen", 'windows', 'gsflow.control')]
 
 
 models = [os.path.join(data_dir, model) for model in model_name]
@@ -61,6 +62,10 @@ has_external = {"gsflow_modflow_high.control":
                     (os.path.join("..", "input", "modflow", "seg18_tab.txt"),
                      os.path.join("..", "input", "modflow", "seg19_tab.txt"),
                      os.path.join("..", "input", "modflow", "well_tab.txt")),
+                'gsflow.control':
+                    (os.path.join("..", "input", "modflow", 'sagehen.uzf'),
+                     os.path.join("..", "input", "modflow", "sagehen.sfr"),
+                     os.path.join("..", "input", "modflow", "sagehen.dis"))
                 }
 
 
@@ -202,5 +207,5 @@ if __name__ == "__main__":
     test_pwd()
     test_gsflow_exists()
     # test_run_model()
-    for model in models[6:]:
+    for model in models[8:]:
         do_model(model)
