@@ -299,8 +299,8 @@ Date: 1984/01/30; Stress:  1; Step:  1217; Simulation step:   60
                   MF iterations:        8; SZ iterations:      8
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/03/19 10:28:45
- Elapsed run time: 25.263 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/03/19 13:40:26
+ Elapsed run time: 24.331 Seconds
 
  Number of time steps:     60;  Number of non-convergence:   0
  MF iterations:           448;  SZ iterations:             448
