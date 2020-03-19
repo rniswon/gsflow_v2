@@ -27,7 +27,9 @@ model_name = [os.path.join("Ag_EP1a", "gsflow_modflow_high.control"),
               os.path.join("Ag_EP1b", "gsflow_modflow_low.control"),
               os.path.join("Ag_EP2a", 'windows', 'gsflow_gsflowHighKc.control'),
               os.path.join("Ag_EP2a", 'windows', 'gsflow_gsflowLowKc.control'),
-              ]
+              os.path.join("Ag_EP2b", "windows", "gsflow_gsflow_HighTrig.control"),
+              os.path.join("Ag_EP2b", "windows", "gsflow_gsflow_LowTrig.control")]
+
 
 models = [os.path.join(data_dir, model) for model in model_name]
 
@@ -49,6 +51,14 @@ has_external = {"gsflow_modflow_high.control":
                      os.path.join("..", "input", "modflow", "well_tab.txt")),
                 "gsflow_gsflowLowKc.control":
                     (os.path.join("..", 'input', 'modflow', "seg18_tab.txt"),
+                     os.path.join("..", "input", "modflow", "seg19_tab.txt"),
+                     os.path.join("..", "input", "modflow", "well_tab.txt")),
+                "sagehen_gsflow_HighTrig.control":
+                    (os.path.join("..", "input", "modflow", "seg18_tab.txt"),
+                     os.path.join("..", "input", "modflow", "seg19_tab.txt"),
+                     os.path.join("..", "input", "modflow", "well_tab.txt")),
+                "sagehen_gsflow_LowTrig.control":
+                    (os.path.join("..", "input", "modflow", "seg18_tab.txt"),
                      os.path.join("..", "input", "modflow", "seg19_tab.txt"),
                      os.path.join("..", "input", "modflow", "well_tab.txt")),
                 }
@@ -99,32 +109,6 @@ def do_model(model):
             with open(os.path.join(model_ws, mf_nam), "w") as foo:
                 foo.write(s)
 
-    '''
-    if name in ("Sfr2weltab.nam", "UZF_cap_ET.nam",
-                "Agwater1_high.nam", "Agwater1_low.nam"):
-        # Sfr2weltab: need to avoid loading WEL file due to tabfiles
-        # UZF_cap_ET: need to avoid for now unitl PR to update flopy
-        # Agwater1: avoid loading AG and UZF until AgOptions PR to flopy
-        ml = fp.modflow.Modflow.load(name,
-                                     exe_name=nwt_exe,
-                                     model_ws=model_ws,
-                                     check=False,
-                                     load_only=["DIS", "GHB", "BAS6", "UPW",
-                                                "NWT", "OC", "SFR", "GAGE"])
-    elif name == "UZFtest2.nam":
-        ml = fp.modflow.Modflow.load(name,
-                                     exe_name=nwt_exe,
-                                     model_ws=model_ws,
-                                     check=False,
-                                     load_only=["DIS", "GHB", "BAS6", "UPW",
-                                                "NWT", "OC", "SFR", "GAGE",
-                                                "WEL"])
-    else:
-        ml = fp.modflow.Modflow.load(name,
-                                     exe_name=nwt_exe,
-                                     model_ws=model_ws,
-                                     check=False)
-    '''
     gsf = gsflow.GsflowModel.load_from_file(model, gsflow_exe=gsflow_exe,
                                             forgive=False)
     external_fnames = gsf.mf.external_fnames
@@ -215,5 +199,5 @@ if __name__ == "__main__":
     test_pwd()
     test_gsflow_exists()
     # test_run_model()
-    for model in models[5:]:
+    for model in models[6:]:
         do_model(model)
