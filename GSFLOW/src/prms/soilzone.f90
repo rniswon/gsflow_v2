@@ -1093,7 +1093,6 @@
               Soil_rechr(i) = MIN( Soil_rechr_max(i), (Soil_rechr(i) + MAX (0.0, excess)))
             ELSE
               Soil_rechr(i) = Soil_rechr(i) + Gvr2sm(i)/perv_frac*Replenish_frac(i)
-!              if ( i==16288) print *, i, Soil_rechr(i) , Gvr2sm(i),perv_frac,Replenish_frac(i)
               Soil_rechr(i) = MIN( Soil_rechr_max(i), Soil_rechr(i) )
             ENDIF
             Basin_gvr2sm = Basin_gvr2sm + DBLE( Gvr2sm(i)*harea )
@@ -1488,13 +1487,11 @@
 !          print *, 'reducing potet_rechr in cap reservoir', perv_frac, pet
 !          print *, potet_rechr, potet_lower, avail_potet, (Potet_rechr+Potet_lower)*Perv_frac
           Potet_rechr = Avail_potet / Perv_frac
-!          print *, 'Potet_rechr', Potet_rechr
         ENDIF
         IF ( Potet_lower*Perv_frac > Avail_potet ) THEN
 !          print *, 'reducing potet_lower in cap reservoir', perv_frac, pet
 !          print *, potet_rechr, potet_lower, avail_potet, (Potet_rechr+Potet_lower)*Perv_frac
           Potet_lower = Avail_potet / Perv_frac
-!          print *, 'potet_lower', potet_lower
         ENDIF
 
         IF ( Potet_rechr>Soil_rechr ) THEN

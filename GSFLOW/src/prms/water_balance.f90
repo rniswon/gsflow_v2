@@ -288,13 +288,9 @@
             WRITE ( BALUNT, * ) Infil(i), perv_frac, Hru_impervevap(i), Imperv_stor_ante(i), Hru_impervstor(i), &
      &                          Hru_percent_imperv(i), Dprst_sroff_hru(i)
           ENDIF
-          IF ( Intcp_changeover(i)>SMALL ) then
-              print *, i, Intcp_changeover(i), SMALL
-              endif
           IF ( ABS(robal)>SMALL ) THEN
             WRITE ( BALUNT, '(A,I0,A,1X,I0)') 'Possible HRU surface runoff water balance ERROR, HRU: ', i, &
      &                                         ' hru_type:', Hru_type(i)
-            print *, perv_frac, Hru_impervevap(i), Imperv_stor_ante(i), Hru_impervstor(i), Hru_percent_imperv(i)
           ELSE
             WRITE ( BALUNT, '(A,I0,A,1X,I0)' ) 'HRU surface runoff rounding issue, HRU:', i, ' hru_type:', Hru_type(i)
           ENDIF
@@ -367,7 +363,7 @@
         ENDIF
 
         hru_out = DBLE( Sroff(i) + Gwres_flow(i) + Ssres_flow(i) + Hru_actet(i) + Gwres_sink(i) )
-        hru_in = DBLE( Hru_ppt(i) ) !+ Intcp_changeover(i)
+        hru_in = DBLE( Hru_ppt(i) )
         IF ( Cascade_flag>0 ) THEN
           hru_out = hru_out + DBLE( Hru_sz_cascadeflow(i) ) + Hru_hortn_cascflow(i)
           hru_in = hru_in + Upslope_dunnianflow(i) + Upslope_interflow(i) + Upslope_hortonian(i)
@@ -377,7 +373,7 @@
           hru_in = hru_in + Gw_upslope(i)/DBLE(harea)
         ENDIF
 !        Hru_runoff(i) = hru_out - DBLE( Hru_actet(i) )
-        wbal = hru_in - hru_out + Hru_storage_ante(i) - Hru_storage(i) !- Intcp_changeover(i)
+        wbal = hru_in - hru_out + Hru_storage_ante(i) - Hru_storage(i)
         IF ( Gwminarea_flag==1 ) wbal = wbal + Gwstor_minarea_wb(i)
         IF ( DABS(wbal)>DTOOSMALL ) THEN
           WRITE ( BALUNT, * ) 'Possible HRU water balance issue:', wbal, '; HRU:', i, ' hru_type:', Hru_type(i), '; area:', harea
@@ -417,7 +413,6 @@
       pptbal = Basin_ppt - Basin_net_ppt - delta_stor - Basin_intcp_evap - Basin_changeover
       IF ( Use_sroff_transfer==1 ) pptbal = pptbal + Basin_net_apply
       IF ( DABS(pptbal)>DSMALL ) THEN
-        print *, Basin_changeover
         WRITE ( BALUNT, 9003 ) 'Possible basin interception water balance error', &
      &                         Nowyear, Nowmonth, Nowday, pptbal
       ELSEIF ( DABS(pptbal)>DTOOSMALL ) THEN
