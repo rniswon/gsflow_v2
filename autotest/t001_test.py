@@ -190,8 +190,11 @@ def test_gsflow_exists():
 
 
 def test_run_model():
-    for model in models:
-        yield do_model, model
+    for ix, model in enumerate(models):
+        if ix in (6, 7) and platform.system().lower() != 'windows':
+            continue
+        else:
+            yield do_model, model
     return
 
 
