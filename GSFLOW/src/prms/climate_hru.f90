@@ -40,9 +40,9 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC ABS, DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam, control_integer, getparam, control_string, declvar
+      INTEGER, EXTERNAL :: declparam, control_integer, getparam, control_string
       EXTERNAL :: read_error, precip_form, temp_set, find_header_end, find_current_time
-      EXTERNAL :: read_cbh_date, check_cbh_value, check_cbh_intvalue, print_module
+      EXTERNAL :: read_cbh_date, check_cbh_value, check_cbh_intvalue, print_module, declvar_dble, declvar_real
 ! Local Variables
       INTEGER :: yr, mo, dy, i, hr, mn, sec, jj, ierr, istop, missing, ios
       DOUBLE PRECISION :: sum_obs
@@ -260,18 +260,18 @@
         IF ( Climate_transp_flag==1 .OR. Model==99 ) CALL print_module(Version_climate_hru, 'Transpiration Distribution  ', 90)
         IF ( Humidity_cbh_flag==1 .OR. Model==99 ) THEN
           ALLOCATE ( Humidity_hru(Nhru) )
-          IF ( declvar(MODNAME, 'humidity_hru', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'humidity_hru', 'nhru', Nhru, 'real', &
      &         'Relative humidity of each HRU', &
-     &         'percentage', Humidity_hru)/=0 ) CALL read_error(3, 'humidity_hru')
+     &         'percentage', Humidity_hru)
         ENDIF
         IF ( Windspeed_cbh_flag==1 .OR. Model==99 ) THEN
-          IF ( declvar(MODNAME, 'basin_windspeed', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'basin_windspeed', 'one', 1, 'double', &
      &         'Basin area-weighted average wind speed', &
-     &         'meters/second', Basin_windspeed)/=0 ) CALL read_error(3, 'basin_windspeed')
+     &         'meters/second', Basin_windspeed)
           ALLOCATE ( Windspeed_hru(Nhru) )
-          IF ( declvar(MODNAME, 'windspeed_hru', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'windspeed_hru', 'nhru', Nhru, 'real', &
      &         'Area of HRU that is impervious', &
-     &         'meters/second', Windspeed_hru)/=0 ) CALL read_error(3, 'windspeed_hru')
+     &         'meters/second', Windspeed_hru)
         ENDIF
 
 !   Declared Parameters

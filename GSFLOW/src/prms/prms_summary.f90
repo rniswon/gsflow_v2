@@ -43,8 +43,8 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC CHAR, INDEX, MAX
-      INTEGER, EXTERNAL :: declparam, declvar, getparam !, control_integer
-      EXTERNAL :: read_error, PRMS_open_output_file, print_module, statvar_to_csv, checkdim_bounded_limits
+      INTEGER, EXTERNAL :: declparam, getparam !, control_integer
+      EXTERNAL :: read_error, PRMS_open_output_file, print_module, statvar_to_csv, checkdim_bounded_limits, declvar_dble
       INTEGER, EXTERNAL :: getparamstring, control_string
 ! Local Variables
       INTEGER :: i, ios, foo, idim !, statsON_OFF
@@ -100,12 +100,12 @@
           IF ( ios/=0 ) STOP
         ENDIF
 
-        IF ( declvar(MODNAME, 'basin_total_storage', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_total_storage', 'one', 1, 'double', &
      &       'Basin area-weighted average storage in all water storage reservoirs', &
-     &       'inches', Basin_total_storage)/=0 ) CALL read_error(3, 'basin_total_storage')
-        IF ( declvar(MODNAME, 'basin_surface_storage', 'one', 1, 'double', &
+     &       'inches', Basin_total_storage)
+        CALL declvar_dble(MODNAME, 'basin_surface_storage', 'one', 1, 'double', &
      &       'Basin area-weighted average storage in all surface water storage reservoirs', &
-     &       'inches', Basin_surface_storage)/=0 ) CALL read_error(3, 'basin_surface_storage')
+     &       'inches', Basin_surface_storage)
 
         IF ( Npoigages>0 ) THEN
 !          ALLOCATE ( Parent_poigages(Npoigages) )

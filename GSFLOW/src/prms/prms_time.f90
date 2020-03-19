@@ -5,7 +5,7 @@
       IMPLICIT NONE
 !   Local Variables
 !      CHARACTER(LEN=10), SAVE :: MODNAME
-      INTEGER, SAVE :: Modays(12), Yrdays, Summer_flag, Jday, Jsol, Julwater
+      INTEGER, SAVE :: Modays(12), Yrdays, Summer_flag, Jday, Jsol, Julwater, Julian_day_absolute
       INTEGER, SAVE :: Nowtime(6), Nowday, Nowmonth, Nowyear, Nowhour, Nowminute
       REAL, SAVE :: Timestep_hours, Timestep_days, Timestep_minutes
       DOUBLE PRECISION, SAVE :: Cfs2inches, Cfs_conv, Timestep_seconds
@@ -20,10 +20,11 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC SNGL
-      INTEGER, EXTERNAL :: leap_day, julian_day
+      INTEGER, EXTERNAL :: leap_day, julian_day, compute_julday
       DOUBLE PRECISION, EXTERNAL :: deltim
-      EXTERNAL :: dattim, print_module
+      EXTERNAL :: dattim, print_module, read_data_line
 ! Local Variables
+      INTEGER :: startday
       DOUBLE PRECISION :: dt
       CHARACTER(LEN=80), SAVE :: Version_prms_time
 !***********************************************************************
@@ -38,6 +39,8 @@
           Jday = julian_day('now', 'calendar')
           Jsol = julian_day('now', 'solar')
           Julwater = julian_day('now', 'water')
+          Julian_day_absolute = Julian_day_absolute + 1
+          CALL read_data_line()
 
         ELSE ! initialize
           Modays(1) = 31
@@ -56,6 +59,8 @@
           Jday = julian_day('start', 'calendar')
           Jsol = julian_day('start', 'solar')
           Julwater = julian_day('start', 'water')
+          startday = compute_julday(Starttime(1), Starttime(2), Starttime(3))
+          Julian_day_absolute = startday
         ENDIF
 
         Nowyear = Nowtime(1)
@@ -100,7 +105,7 @@
         ENDIF
 
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_prms_time = 'prms_time.f90 2015-03-31 16:00:42Z'
+        Version_prms_time = 'prms_time.f90 2017-07-06 14:16:00Z'
         CALL print_module(Version_prms_time, 'PRMS Set Time Variables     ', 90)
 !        MODNAME = 'prms_time'
         Timestep_seconds = 86400.0D0

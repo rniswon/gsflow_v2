@@ -71,8 +71,8 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC INDEX
-      INTEGER, EXTERNAL :: declparam, declvar
-      EXTERNAL read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL read_error, print_module, declvar_real
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_temp
 !***********************************************************************
@@ -90,13 +90,13 @@
 ! added by Mastin 5/8/98
       ALLOCATE ( Elfac(Nhru,Ntemp), Delv(Ntemp,Ntemp), Dist(Nhru,Ntemp), N_tsta(Nhru) )
 
-      IF ( declvar(MODNAME, 'basin_lapse_max', 'one', 1, 'real', &
+      CALL declvar_real(MODNAME, 'basin_lapse_max', 'one', 1, 'real', &
      &     'Basin area-weighted average maximum air temperature lapse rate per 1000 feet', &
-     &     'degrees', Basin_lapse_max)/=0 ) CALL read_error(3, 'basin_lapse_max')
+     &     'degrees', Basin_lapse_max)
 
-      IF ( declvar(MODNAME, 'basin_lapse_min', 'one', 1, 'real', &
+      CALL declvar_real(MODNAME, 'basin_lapse_min', 'one', 1, 'real', &
      &     'Basin area-weighted average minimum air temperature lapse rate per 1000 feet', &
-     &     'degrees', Basin_lapse_min)/=0 ) CALL read_error(3, 'basin_lapse_min')
+     &     'degrees', Basin_lapse_min)
 
       IF ( declparam(MODNAME, 'dist_max', 'one', 'real', &
      &     '1.0E9', '0.0', '1.0E9', &

@@ -95,7 +95,7 @@
       INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam
       EXTERNAL read_error, PRMS_open_output_file
 ! Local Variables
-      INTEGER :: ios, ierr, size, dum, jj
+      INTEGER :: ios, ierr, size, jj
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
 !***********************************************************************
       Begin_results = 1
@@ -108,13 +108,13 @@
       ierr = 0
       DO jj = 1, BasinOutVars
         Nc_vars(jj) = numchars(BasinOutVar_names(jj))
-        Basin_var_type = getvartype(BasinOutVar_names(jj)(:Nc_vars(jj)), Basin_var_type )
+        Basin_var_type = getvartype(BasinOutVar_names(jj)(:Nc_vars(jj)))
         IF ( Basin_var_type/=3 ) THEN
           PRINT *, 'ERROR, invalid basin_summary variable:', BasinOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only double variables allowed'
           ierr = 1
         ENDIF
-        size = getvarsize(BasinOutVar_names(jj)(:Nc_vars(jj)), dum )
+        size = getvarsize(BasinOutVar_names(jj)(:Nc_vars(jj)) )
         IF ( size/=1 ) THEN
           PRINT *, 'ERROR, invalid Basin_summary variable:', BasinOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only scalar variables are allowed'
@@ -190,8 +190,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC SNGL, DBLE
-      INTEGER, EXTERNAL :: getvar
-      EXTERNAL read_error
+      EXTERNAL getvar_dble
 ! Local Variables
       INTEGER :: jj, write_month, write_year, last_day
 !***********************************************************************
@@ -206,8 +205,7 @@
 !-----------------------------------------------------------------------
 ! need getvars for each variable (only can have short string)
       DO jj = 1, BasinOutVars
-        IF ( getvar(MODNAME, BasinOutVar_names(jj)(:Nc_vars(jj)), 1, 'double', Basin_var_daily(jj))/=0 ) &
-     &       CALL read_error(4, BasinOutVar_names(jj)(:Nc_vars(jj)))
+        CALL getvar_dble( MODNAME, BasinOutVar_names(jj)(:Nc_vars(jj)), 1, Basin_var_daily(jj) )
       ENDDO
 
       write_month = 0

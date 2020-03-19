@@ -66,26 +66,26 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC INDEX
-      INTEGER, EXTERNAL :: declparam, declvar
-      EXTERNAL read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL read_error, print_module !, declvar_dble
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_soltab
 !***********************************************************************
       sthdecl = 0
 
-      Version_soltab = 'soltab.f90 2016-09-09 12:53:00Z'
+      Version_soltab = 'soltab.f90 2019-09-25 12:57:00Z'
       CALL print_module(Version_soltab, 'Potential Solar Radiation   ', 90)
       MODNAME = 'soltab'
 
       ALLOCATE ( Soltab_potsw(366, Nhru) )
-      IF ( declvar(MODNAME, 'soltab_potsw', 'ndays,nhru', 366*Nhru, 'double', &
-     &     'Potential solar radiation for each Julian Day, for each HRU', &
-     &     'Langleys', Soltab_potsw)/=0 ) CALL read_error(3, 'soltab_potsw')
+!      CALL declvar_dble(MODNAME, 'soltab_potsw', 'ndays,nhru', 366*Nhru, 'double', &
+!     &     'Potential solar radiation for each Julian Day, for each HRU', &
+!     &     'Langleys', Soltab_potsw)
 
       ALLOCATE ( Soltab_horad_potsw(366, Nhru) )
-      IF ( declvar(MODNAME, 'soltab_horad_potsw', 'ndays,nhru', 366*Nhru, 'double', &
-     &     'Potential solar radiation on a horizontal plane for each Julian Day, for each HRU', &
-     &     'Langleys', Soltab_horad_potsw)/=0 ) CALL read_error(3, 'soltab_horad_potsw')
+!      CALL declvar_dble(MODNAME, 'soltab_horad_potsw', 'ndays,nhru', 366*Nhru, 'double', &
+!     &     'Potential solar radiation on a horizontal plane for each Julian Day, for each HRU', &
+!     &     'Langleys', Soltab_horad_potsw)
 
       ALLOCATE ( Hru_cossl(Nhru), Soltab_sunhrs(366, Nhru) )
 
