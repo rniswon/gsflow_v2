@@ -206,19 +206,16 @@ def test_gsflow_exists():
 
 def test_run_model():
     for ix, model in enumerate(models[0:6]):
-        print(model)
         yield do_model, model
     return
 
 
 def test_run_long_model():
     for ix, model in enumerate(models[6:]):
-        print(model)
         if platform.system().lower() == 'windows':
             yield do_model, model
         else:
-            if ix == 2:
-                yield do_model, model
+            continue
 
 
 if __name__ == "__main__":
