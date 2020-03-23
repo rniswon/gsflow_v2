@@ -222,5 +222,5 @@ if __name__ == "__main__":
     test_pwd()
     test_gsflow_exists()
     # test_run_model()
-    for model in models[9:]:
+    for model in models[6:8]:
         do_model(model)
