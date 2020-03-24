@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/jlarsen-usgs/gsflow_v2.svg?token=JQ4RYmycyrTBEPDUKxGA&branch=master)](https://travis-ci.com/jlarsen-usgs/gsflow_v2)
+[![Build Status](https://travis-ci.com/rniswon/gsflow_v2.svg?token=JQ4RYmycyrTBEPDUKxGA&branch=master)](https://travis-ci.com/rniswon/gsflow_v2)
 
 # GSFLOW: Coupled Groundwater and Surface-Water Flow Model
 
