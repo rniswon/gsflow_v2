@@ -824,7 +824,7 @@
 43    FORMAT(1X, 'OPTION TO APPLY POND WATER AS IRRIGATION IS ',
      +      'ACTIVE. ','POND IRRIGATION WATER WILL BE APPLIED TO ', 
      +      I10,' CELLS/RHUS.')
-44   FORMAT(1X, ' UNFORMATTED CELL BY CELL RATES FOR IRRIGATION PONDS'
+44    FORMAT(1X, ' UNFORMATTED CELL BY CELL RATES FOR IRRIGATION PONDS'
      +  , ' WILL BE SAVED TO FILE UNIT NUMBER ', I10)
 45    FORMAT(1X, ' POND WATER IRRIGATION, POTENTIAL AND ACTUAL ET'
      +  , ' WILL BE SAVED TO TIMES SERIES OUTPUT FILES.')
@@ -859,15 +859,17 @@
       character(len=16)  :: text6 = 'SUPWEL'
       character(len=16)  :: text7 = 'STRESS PERIOD'
       character(len=16)  :: text8 = 'END'
+      character(len=16)  :: text9 ='IRRIGATION POND'
+      character(len=16)  :: text10 = 'IRRPOND'
       character(len=16)  :: char1 = 'WELL LIST'
       character(len=16)  :: char2 = 'SEGMENT LIST'
       character(len=16)  :: char3 = 'POND LIST'
 
       INTEGER LLOC, ISTART, ISTOP, ISTARTSAVE
-      INTEGER J, II, KPER2, L, MATCH, NUMTABS, is
+      INTEGER J, II, KPER2, L, MATCH, NUMTABS, is, ip
       INTEGER istsg, istsgold, ISEG, IPOND
       logical :: FOUND
-      logical :: found1, found2, found3, found4, found5, found6
+      logical :: found1, found2, found3, found4, found5, found6, found7
       REAL :: R, TTIME, TRATE
       CHARACTER*6 CWELL
       ! - -----------------------------------------------------------------
@@ -876,6 +878,7 @@
       found6 = .false.
       is = 0
       ISEG = 0
+      ip = 0
       !
       !1 - ---READ SEGMENT AND WELL LIST DATA (OR FLAG SAYING REUSE AG DATA)
       IF (KPER .EQ. 1) THEN
@@ -918,6 +921,15 @@
                end select
             end do
          end select
+         !2 - ---READ WELL LIST
+         if (found5) then
+            CALL URDCOM(In, IOUT, line)
+            LLOC = 1
+            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
+            ISTARTSAVE = ISTART
+            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
+         end if
+         select case (LINE(ISTARTSAVE:ISTOP))
          case ('POND LIST')
             found6 = .true.
             write (iout, '(/1x,a)') 'PROCESSING '//
@@ -944,15 +956,15 @@
                      CALL USTOP('ERROR: INVALID POND HRU ID
      +                     CHECK AG POND LIST INPUT. MODEL STOPPING')
                   else
-                     is = is + 1
-                     seglist(is) = iseg
-                     numseglist = is
+                     ip = ip + 1
+                     pondlist(ip) = ipond
+                     numpondlist = ip
                   end if
                end select
             end do
          end select
          !2 - ---READ WELL LIST
-         if (found5) then
+         if (found5 .or. found6) then
             CALL URDCOM(In, IOUT, line)
             LLOC = 1
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
@@ -1068,7 +1080,8 @@
       found1 = .FALSE.
       found2 = .FALSE.
       found3 = .FALSE.
-      found4 = .false.
+      found4 = .FALSE.
+      found7 = .FALSE.
       if (NUMIRRDIVERSION == 0) found1 = .true.
       if (NUMIRRWEL == 0) found2 = .true.
       if (NUMSUP == 0) found3 = .true.
@@ -1133,6 +1146,20 @@
      +     //' found without key word '//trim(adjustl(text7))
                CALL USTOP('Key word '//trim(adjustl(text5))
      +     //'  found without key word '//trim(adjustl(text7)))
+            END IF
+         case ('IRRPOND')
+            found7 = .true.
+            write (iout, '(/1x,a)') 'READING '//
+     +      trim(adjustl(text9))//''
+            CALL URDCOM(In, IOUT, line)
+            LLOC = 1
+            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ITMP, R, IOUT, IN)
+            CALL IRRPOND(IN, ITMP)
+            IF (KPER == 1 .AND. ITMP < 0) THEN
+               WRITE (IOUT, *) 'Key word '//trim(adjustl(text10))
+     +     //' specified with no additional input.'
+               CALL USTOP('Keyvword '//trim(adjustl(text10))
+     +     //'  specified with no additional input.')
             END IF
          case ('SUPWELL')
             found3 = .true.
@@ -1558,18 +1585,18 @@
            END IF
         END DO
       END DO
-104   FORMAT('***Error in IRR Depression Storage *** maximum number ',
+104   FORMAT('***Error in IRR Ponds*** maximum number ',
      +      'of irrigation HRUs is less than the number specified in ',
      +      'stress period. ', /
-     +      'Maximum depression storage HRUs and the number specified '
+     +      'Maximum Pond storage HRUs and the number specified '
      +      'for stress period are: ', 2i6)
-105   FORMAT('***Error in IRR Depression Storage*** maximum number of ',
+105   FORMAT('***Error in IRR Ponds*** maximum number of ',
      +       'HRUs irrigated by a depression storage is less than ',
      +       'the number specified in stress period. ', /
      +       'Maximum HRUs and the number specified for stress '
      +       'period are: ', 2i6)
-106   FORMAT('***ERROR IN AG PACKAGE*** HRU ID for ',
-     +       'irrigation depression storage as zero. Model stopping.')
+106   FORMAT('***Error in IRR Ponds*** HRU ID for ',
+     +       'irrigation pond is zero. Model stopping.')
       RETURN
       END
 !
@@ -3610,18 +3637,18 @@
       DEALLOCATE(SEGLIST)
       DEALLOCATE(NUMSEGLIST)
       DEALLOCATE(ACCEL)
-      DEALLOCATE(MXPOND
-      DEALLOCATE(IPONDCB
-      DEALLOCATE(IPONDCBU
-      IRRPONDCB
-      TSACTIVEDS
-      TSACTIVEDSET
-      IRRROW_DS
-      IRRCOL_DS
-      IRRPERIODDS
-      TRIGGERPERIODDS
-      TIMEINPERIODDS
-      NUMPONDLIST
-      PONDLIST
+      DEALLOCATE(MXPOND)
+      DEALLOCATE(IPONDCB)
+      DEALLOCATE(IPONDCBU)
+      DEALLOCATE(IRRPONDCB)
+      DEALLOCATE(TSACTIVEDS)
+      DEALLOCATE(TSACTIVEDSET)
+      DEALLOCATE(IRRROW_DS)
+      DEALLOCATE(IRRCOL_DS)
+      DEALLOCATE(IRRPERIODDS)
+      DEALLOCATE(TRIGGERPERIODDS)
+      DEALLOCATE(TIMEINPERIODDS)
+      DEALLOCATE(NUMPONDLIST)
+      DEALLOCATE(PONDLIST)
       RETURN
       END
