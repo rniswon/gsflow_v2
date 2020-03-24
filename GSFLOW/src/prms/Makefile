@@ -1,6 +1,7 @@
 # prms library makefile
 
 include ../makelist
+
 PRMSLIB = $(LIBDIR)/libprms.a
 MMFLIB	 = $(LIBDIR)/libmmf.a
 LIBS	= $(PRMSLIB) $(MMFLIB) $(FLIBS)

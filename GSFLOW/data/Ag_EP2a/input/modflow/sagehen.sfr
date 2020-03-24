@@ -255,8 +255,8 @@ END
 19 1 0 6 0 0.0 0.0 0.0 0.0 0.04         # NSEG ICALC OUTSEG IUPSEG IPRIOR FLOW RUNOFF ETSW PPTSW ROUGHCH  
 3.0                                    #  This segment is used to divert flow for agriculture (AG Package).     
 3.0                                    #  It represents a lined canal and flow is evenly dist to fields 
-18 10075 53                             #  SEGNUM NUMVAL IUNIT
-19 10075 54                             #  SEGNUM NUMVAL IUNIT
+18 10075 53                             
+19 10075 54                            
 -1 0 0
 -1 0 0
 -1 0 0

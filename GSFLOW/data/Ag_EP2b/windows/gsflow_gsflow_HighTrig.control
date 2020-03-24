@@ -58,7 +58,7 @@ data_file
 param_file
 5
 4
-..\input\prms\sagehen_grid_v5_HighKc.params
+..\input\prms\sagehen_grid_v5_highKc.params
 ..\input\prms\sagehen_grid_constant.params
 ..\input\prms\sagehen_grid_fixed.params
 ..\input\prms\cascade.param
