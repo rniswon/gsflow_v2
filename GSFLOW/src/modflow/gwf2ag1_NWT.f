@@ -18,6 +18,9 @@
         REAL, SAVE, DIMENSION(:, :), POINTER :: TABRATE
         REAL, SAVE, DIMENSION(:), POINTER :: QONLY
         REAL, SAVE, DIMENSION(:), POINTER :: QONLYOLD
+        REAL, SAVE, DIMENSION(:), POINTER :: PONDFLOW
+        REAL, SAVE, DIMENSION(:), POINTER :: PONDFLOWOLD
+        REAL, SAVE, DIMENSION(:), POINTER :: PONDFLOWMAX
         INTEGER, SAVE, DIMENSION(:), POINTER :: TABLAY
         INTEGER, SAVE, DIMENSION(:), POINTER :: TABROW
         INTEGER, SAVE, DIMENSION(:), POINTER :: TABCOL
@@ -61,6 +64,7 @@
         REAL, SAVE, DIMENSION(:), POINTER :: TIMEINPERIODPOND  !DS
         REAL, SAVE, DIMENSION(:), POINTER :: AETITERSW
         REAL, SAVE, DIMENSION(:), POINTER :: AETITERGW
+        REAL, SAVE, DIMENSION(:), POINTER :: AETITERPOND
         REAL, SAVE, DIMENSION(:, :), POINTER :: WELLIRRUZF
         REAL, SAVE, DIMENSION(:, :), POINTER :: WELLIRRPRMS
         REAL, SAVE, DIMENSION(:, :), POINTER :: IRRFACT
@@ -100,6 +104,7 @@
         INTEGER, SAVE, DIMENSION(:, :), POINTER :: IRRCOL_SW
         REAL, SAVE, DIMENSION(:, :), POINTER :: DIVERSIONIRRUZF
         REAL, SAVE, DIMENSION(:, :), POINTER :: DIVERSIONIRRPRMS
+        REAL, SAVE, DIMENSION(:, :), POINTER :: PONDIRRPRMS
         REAL, SAVE, DIMENSION(:, :), POINTER :: DVRPERC
         REAL, SAVE, DIMENSION(:, :), POINTER :: DVEFF
         REAL, SAVE, DIMENSION(:, :), POINTER :: KCROPDIVERSION
@@ -225,7 +230,10 @@
       ALLOCATE (SEGLIST(NSEGDIMTEMP), NUMSEGLIST)
       ALLOCATE (IRRPERIODPOND(MXPOND),TRIGGERPERIODPOND(MXPOND))
       ALLOCATE (TIMEINPERIODPOND(MXPOND),NUMPONDLIST)
-      ALLOCATE (PONDLIST(MXPOND))
+      ALLOCATE (PONDLIST(MXPOND),AETITERPOND(MXPOND))
+      ALLOCATE (PONDFLOW(MXPOND),PONDFLOWOLD(MXPOND))
+      ALLOCATE (PONDFLOWMAX(MXPOND))
+      ALLOCATE (PONDIRRPRMS(MAXCELLSPOND,NUMIRRPOND))
       TSSWNUM = 0
       TSGWNUM = 0
       QONLY = 0.0
@@ -245,6 +253,11 @@
       TIMEINPERIODPOND = 1E30
       TRIGGERPERIODPOND = 0.0
       IRRPERIODPOND = 0.0
+      AETITERPOND = 0.0
+      PONDFLOW = 0.0
+      PONDFLOWOLD = 0.0
+      PONDFLOWMAX = 0.0
+      PONDIRRPRMS = 0.0
       SEGLIST = 0
       NUMSEGLIST = 0
       NUMPONDLIST = 0
@@ -1338,7 +1351,8 @@
       IF (NUMSUPSP > NUMSUP) THEN
          WRITE (IOUT, *)
          WRITE (IOUT, 102) NUMSUP, NUMSUPSP
-         CALL USTOP('')
+         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR ',
+     +                 'SUP WELLS')
       END IF
       IERR = 0
       DO J = 1, NUMSUPSP
@@ -1349,7 +1363,8 @@
          IF (NMSG > MAXSEGS) THEN
             WRITE (IOUT, *)
             WRITE (IOUT, 103) MAXSEGS, NMSG
-            CALL USTOP('')
+            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR ',
+     +                 'SUP WELLS')
          END IF
          SUPWELVAR(J) = ISPWL
          NUMSEGS(ISPWL) = NMSG
@@ -1364,7 +1379,8 @@
       IF (IERR == 1) THEN
          WRITE (IOUT, *) 'SEGMENT NUMBER FOR SUPPLEMENTAL WELL ',
      +                   'SPECIFIED AS ZERO. MODEL STOPPING'
-         CALL USTOP('')
+         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR ',
+     +                 'SUP WELLS')
       END IF
       !
 !99    FORMAT(1X, /1X, '****MODEL STOPPING**** ',
@@ -1446,7 +1462,7 @@
       IF (NUMIRRWELSP > NUMIRRWEL) THEN
          WRITE (IOUT, *)
          WRITE (IOUT, 104) NUMIRRWEL, NUMIRRWELSP
-         CALL USTOP('')
+         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR WELLS')
       END IF
       DO J = 1, NUMIRRWELSP
          CALL URDCOM(IN, IOUT, LINE)
@@ -1458,7 +1474,8 @@
          IF (NMCL > MAXCELLSWEL) THEN
             WRITE (IOUT, *)
             WRITE (IOUT, 105) MAXCELLSWEL, NMCL
-            CALL USTOP('')
+            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR ',
+     +                 'WELLS')
          END IF
          IRRWELVAR(J) = IRWL
          NUMCELLS(IRWL) = NMCL
@@ -1472,7 +1489,8 @@
             DO K = 1, NUMCELLS(IRRWELVAR(J))
                IF (IRRROW_GW(K, IRRWELVAR(J)) == 0) THEN
                   WRITE (IOUT, 107)
-                  CALL USTOP('')
+                  CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR ',
+     +                 'IRR WELLS')
                END IF
             END DO
          ELSE
@@ -1484,7 +1502,8 @@
                IF (IRRROW_GW(K, IRRWELVAR(J)) == 0 .OR.
      +             IRRCOL_GW(K, IRRWELVAR(J)) == 0) THEN
                   WRITE (IOUT, 106)
-                  CALL USTOP('')
+                  CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR ',
+     +                 'IRR WELLS')
                END IF
             END DO
          END IF
@@ -1526,7 +1545,7 @@
       ! VARIABLES:
       CHARACTER(LEN=200)::LINE
       INTEGER :: IERR, LLOC, ISTART, ISTOP, J, IDUM
-      INTEGER :: K, IRWL, NMCL, IP
+      INTEGER :: K, IRWL, NMCL, IP, I
       REAL :: R, IPRW, TRPW
       logical :: TEST
       ! - -----------------------------------------------------------------
@@ -1584,6 +1603,7 @@
            WRITE(IOUT,107)IRWL 
            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR ',
      +                 'PONDS')
+         END IF
          DO K = 1, NMCL
            READ (IN, *)IRRROW_POND(K, IRWL), IDUM, IRRFACTPOND(K, IRWL),
      +                           IRRFIELDFACTPOND(K, IRWL)
@@ -1656,7 +1676,8 @@
       IF (NUMIRRDIVERSIONSP > NUMIRRDIVERSION) THEN
          WRITE (IOUT, *)
          WRITE (IOUT, 9008) NUMIRRDIVERSION, NUMIRRDIVERSIONSP
-         CALL USTOP('')
+         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR ',
+     +                 'DIVERSION')
       END IF
       DO J = 1, NUMIRRDIVERSIONSP
          LLOC = 1
@@ -1670,7 +1691,8 @@
          IF (NMCL > MAXCELLSDIVERSION) THEN
             WRITE (IOUT, *)
             WRITE (IOUT, 9009) MAXCELLSDIVERSION, NMCL
-            CALL USTOP('')
+            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR ',
+     +                 'DIVERSION')
          END IF
          IF (SGNM > 0) THEN
             IRRSEG(J) = SGNM
@@ -1687,7 +1709,8 @@
                   IF (IRRROW_SW(K, SGNM) == 0) THEN
                      totdum = totdum + DVRPERC(NMCL, SGNM)
                      WRITE (IOUT, 9010)
-                     CALL USTOP('')
+                     CALL USTOP('ERROR IN STRESS PERIOD INFORMATION ',
+     +                 'FOR IRR DIVERSION')
                      IF (totdum .GT. 1.000001 .OR. totdum .LT. 0.999)
      +                   WRITE (Iout, 9006) totdum
                   END IF
@@ -1703,7 +1726,8 @@
      +                IRRCOL_SW(K, SGNM) == 0) THEN
                      totdum = totdum + DVRPERC(NMCL, SGNM)
                      WRITE (IOUT, 9007)
-                     CALL USTOP('')
+                     CALL USTOP('ERROR IN STRESS PERIOD INFORMATION ',
+     +                 'FOR IRR DIVERSION')
                      IF (totdum .GT. 1.000001 .OR. totdum .LT. 0.999)
      +                  WRITE (Iout, 9006) totdum
                   END IF
@@ -1958,7 +1982,9 @@
       DIVERSIONIRRPRMS = 0.0
       WELLIRRUZF = 0.0
       WELLIRRPRMS = 0.0
+      PONDIRRPRMS = 0.0
       SUPFLOW = 0.0
+      PONDFLOW = 0.0
       Qp = ZERO
 !      print *, 'qp', qp, totim, zero
       Q = ZERO
@@ -1972,6 +1998,7 @@
             CALL demandconjunctive_uzf(kkper, kkstp, kkiter)
          ELSE
             CALL demandconjunctive_prms(kkper, kkstp, kkiter)
+            CALL demandpond_prms(kkper, kkstp, kkiter)
          END IF
       END IF
       IF (TRIGGERFLAG > 0) THEN
@@ -2112,11 +2139,6 @@
                   SUBVOL = -(DONE - IRRFACT(I, L))*Qp*IRRFIELDFACT(I, L)
                   ! Keep irrigation for PRMS as volumetric rate
                   WELLIRRPRMS(I, L) = WELLIRRPRMS(I, L) + SUBVOL
-!                  if ( i==1 .and. l==122 ) then
-!                    print *, 'SUBVOL',SUBVOL, DONE, IRRFACT(I, L), Qp
-!                    print *, IRRFIELDFACT(I, L), WELLIRRPRMS(I, L)
-!                    print *, Qonly(L), DONENEG, Q
-!                    endif
                END DO
             END IF
          END IF
@@ -2145,6 +2167,18 @@
      +         DIVERSIONIRRPRMS(icount, istsg) + dvt
             END DO
          END IF
+      END DO
+      !
+      ! divide pond water into irrigated HRUs
+      !
+      DO icount = 1, NUMIRRPONDSP
+        K = NUMCELLSPOND(icount)
+        SUBVOL = PONDFLOW(ICOUNT)
+        DO L = 1, K
+          dvt = IRRFIELDFACTPOND(L, icount)*SUBVOL
+          dvt = IRRFACTPOND(L, icount)*dvt
+          PONDIRRPRMS(L, icount) = dvt
+        END DO
       END DO
       !
       !3 - -----RETURN
@@ -2758,6 +2792,80 @@
 300   continue
       return
       end subroutine demandconjunctive_prms
+!
+!
+      subroutine demandpond_prms(kper, kstp, kiter)
+!     ******************************************************************
+!     demandpond----sums up pond irrigation demand using ET deficit
+!     ******************************************************************
+!     SPECIFICATIONS:
+      USE GWFAGMODULE
+      USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
+      USE PRMS_CLIMATEVARS, ONLY: POTET
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
+      IMPLICIT NONE
+! --------------------------------------------------
+      !modules
+      !arguments
+      integer, intent(in) :: kper, kstp, kiter
+      !dummy
+      DOUBLE PRECISION :: factor, area, aet, pet
+      double precision :: zerod7, done, dzero, pettotal,
+     +                    aettotal, prms_inch2mf_q,
+     +                    aetold, supold, sup
+      real :: fmaxflow
+      integer :: k, ipond, hru_id, i
+      external :: set_factor
+      double precision :: set_factor
+! --------------------------------------------------
+!
+      zerod7 = 1.0d-7
+      done = 1.0d0
+      dzero = 0.0d0
+      prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
+      !
+      !1 - -----loop over HRUs with ponds that supply irrigation
+      !
+      do 300 i = 1, NUMIRRPONDSP
+        pettotal = DZERO
+        aettotal = DZERO
+        factor = DZERO
+        ipond = IRRPONDVAR(i)
+        IF (DEMAND(ipond) < zerod7) goto 300   !check this because demand is not correct
+        !
+        !1 - -----loop over HRUs irrigated by pond
+        !
+        do k = 1, NUMCELLSPOND(i)
+           hru_id = IRRROW_POND(K, ipond)
+           area = HRU_PERV(hru_id)
+           pet = potet(hru_id)*area*prms_inch2mf_q
+           aet = hru_actet(hru_id)*area*prms_inch2mf_q
+           pettotal = pettotal + pet
+           aettotal = aettotal + aet
+        end do
+        ! convert PRMS ET deficit to MODFLOW flow
+        aetold = AETITERPOND(IPOND)
+        sup = PONDFLOW(IPOND)
+        supold = PONDFLOWOLD(IPOND)
+        factor = set_factor(ipond, aetold, pettotal, aettotal, sup,
+     +           supold, kiter)
+        AETITERPOND(IPOND) = SNGL(aettotal)
+        PONDFLOWOLD(IPOND) = PONDFLOW(IPOND)
+        PONDFLOW(IPOND) = PONDFLOW(IPOND) + SNGL(factor)
+        !
+        !1 - -----limit pond irrigation to storage
+        !
+  !      if(ipond==18)then
+  !    etdif = pettotal - aettotal
+  !        write(999,33)kper,kstp,kiter,PONDFLOW(IPOND),
+  !   +                 pettotal,aettotal,etdif
+  !      endif
+  !33  format(3i5,4e20.10)
+300   continue
+      return
+      end subroutine demandpond_prms
 
       subroutine demandtrigger_sw(kper, kstp, kiter)
 !     ******************************************************************
@@ -3665,5 +3773,9 @@
       DEALLOCATE(NUMPONDLIST)
       DEALLOCATE(PONDLIST)
       DEALLOCATE(NUMIRRPONDSP)
+      DEALLOCATE(AETITERPOND)
+      DEALLOCATE(PONDFLOW)
+      DEALLOCATE(PONDFLOWOLD)
+      DEALLOCATE(PONDFLOWMAX)
       RETURN
       END
