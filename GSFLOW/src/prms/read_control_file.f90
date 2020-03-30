@@ -13,9 +13,8 @@
      &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, NsegmentOutON_OFF, &
      &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Dyn_covden_flag, Segment_transferON_OFF, Gwr_transferON_OFF, &
-     &      Lake_transferON_OFF, External_transferON_OFF, Dprst_transferON_OFF, BasinOutON_OFF, mappingFileName, xyFileName, &
-	 &      Snarea_curve_flag, Soilzone_aet_flag
-        USE GSFMODFLOW, ONLY: Modflow_name, Modflow_time_zero
+     &      Lake_transferON_OFF, External_transferON_OFF, Dprst_transferON_OFF, BasinOutON_OFF, &
+	 &      Snarea_curve_flag, Soilzone_aet_flag, Modflow_name, Modflow_time_zero
         USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, &
      &      Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day
         USE GSFSUM, ONLY: Gsf_rpt, Rpt_days, Gsflow_output_file, Csv_output_file
@@ -57,7 +56,8 @@
 
       SUBROUTINE read_control_file()
       USE PRMS_CONTROL_FILE
-      USE PRMS_MODULE, ONLY: Version_read_control_file, Print_debug, Model_output_file, Model_control_file
+      USE PRMS_MODULE, ONLY: Version_read_control_file, Print_debug, Model_output_file, Model_control_file, &
+     &    MAXCONTROL_LENGTH, MAXFILE_LENGTH
       IMPLICIT NONE
       ! Functions
       INTRINSIC TRIM
@@ -528,16 +528,6 @@
       Control_parameter_data(i)%values_character(1) = Model_output_file
       Control_parameter_data(i)%data_type = 4
       i = i + 1
-      Control_parameter_data(i)%name = 'mappingFileName'
-      mappingFileName = 'MODSIM.map'
-      Control_parameter_data(i)%values_character(1) = mappingFileName
-      Control_parameter_data(i)%data_type = 4
-      i = i + 1
-      Control_parameter_data(i)%name = 'xyFileName'
-      xyFileName = 'MODSIM.xy'
-      Control_parameter_data(i)%values_character(1) = xyFileName
-      Control_parameter_data(i)%data_type = 4
-      i = i + 1
       Control_parameter_data(i)%name = 'csv_output_file'
       Csv_output_file = 'prms_summary.csv'
       Control_parameter_data(i)%values_character(1) = Csv_output_file
@@ -621,6 +611,11 @@
       Control_parameter_data(i)%name = 'humidity_day'
       Humidity_day = 'humidity_day'
       Control_parameter_data(i)%values_character(1) = Humidity_day
+      Control_parameter_data(i)%data_type = 4
+      i = i + 1
+      Control_parameter_data(i)%name = 'dynamic_param_log_file'
+      Dynamic_param_log_file = 'dynamic_parameter.out'
+      Control_parameter_data(i)%values_character(1) = Dynamic_param_log_file
       Control_parameter_data(i)%data_type = 4
       i = i + 1
       ! GSFLOW parameters
