@@ -1,8 +1,8 @@
 
                             GSFLOW Sample Problems
-                                 August 2015
+                                 March 2020
  
-Three sample problems with GSFLOW data sets are provided in this subdirectory
+Seven sample problems with GSFLOW data sets are provided in this subdirectory
 to verify that GSFLOW is correctly installed and running on the user's system.
 The sample problems also may be looked at as examples of how to use the 
 program. 
@@ -48,6 +48,13 @@ Modeling System (PRMS) and the Modular Ground-Water Flow Model
 
 Niswonger, R.G., 2020, An Agricultural Water Use Package for MODFLOW 
 and GSFLOW: Environmental Modelling and Software 125 (2020) 104617, 16 p.
+
+Regan, R.S., and LaFontaine, J.H., 2017, Documentation of the dynamic 
+parameter, water-use, stream and lake flow routing, and two summary 
+output modules and updates to surface-depression storage simulation and 
+initial conditions specification options with the Precipitation-Runoff 
+Modeling System (PRMS): U.S. Geological Survey Techniques and Methods, 
+book 6, chap. B8, 60 p.
 
 Regan, R.S., Niswonger, R.G., Markstrom, S.L., and Barlow, P.M., 2015, 
 Documentation of a restart option for the U.S. Geological Survey coupled 

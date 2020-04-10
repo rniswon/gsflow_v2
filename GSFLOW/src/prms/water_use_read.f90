@@ -42,8 +42,9 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC SNGL, DBLE
-      INTEGER, EXTERNAL :: control_string, declvar, decldim, getdim
-      EXTERNAL read_error, find_header_end, find_current_file_time, read_event, print_module, PRMS_open_module_file
+      INTEGER, EXTERNAL :: control_string, decldim, getdim
+      EXTERNAL :: read_error, find_header_end, find_current_file_time, read_event, print_module
+      EXTERNAL :: PRMS_open_module_file, declvar_real, declvar_dble
 ! Control Parameters
       CHARACTER(LEN=MAXFILE_LENGTH) :: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file
       CHARACTER(LEN=MAXFILE_LENGTH) :: External_transfer_file, Lake_transfer_file
@@ -261,28 +262,28 @@
           IF ( Dprst_transferON_OFF==1 .OR. Model==99 ) THEN
             Dprst_transfers_on = 1
             ALLOCATE ( Dprst_transfer(Nhru) )
-            IF ( declvar(MODNAME, 'dprst_transfer', 'nhru', Nhru, 'real', &
+            CALL declvar_real(MODNAME, 'dprst_transfer', 'nhru', Nhru, 'real', &
      &           'Transfer flow rate from surface-depression storage for each HRU for each time step', &
-     &           'cfs', Dprst_transfer)/=0 ) CALL read_error(1, 'dprst_transfer')
+     &           'cfs', Dprst_transfer)
             ALLOCATE ( Dprst_transfer_tot(Nhru) )
-            IF ( declvar(MODNAME, 'dprst_transfer_tot', 'nhru', Nhru, 'real', &
+            CALL declvar_real(MODNAME, 'dprst_transfer_tot', 'nhru', Nhru, 'real', &
      &           'Transfer flow rate from surface-depression storage for each HRU for the simulation', &
-     &           'cfs', Dprst_transfer_tot)/=0 ) CALL read_error(1, 'dprst_transfer_tot')
-            IF ( declvar(MODNAME, 'total_dprst_transfer', 'one', 1, 'double', &
+     &           'cfs', Dprst_transfer_tot)
+            CALL declvar_dble(MODNAME, 'total_dprst_transfer', 'one', 1, 'double', &
      &           'Transfer flow rates from all surface-depression storage for each time step', &
-     &           'cfs', Total_dprst_transfer)/=0 ) CALL read_error(1, 'total_dprst_transfer')
+     &           'cfs', Total_dprst_transfer)
           ENDIF
           ALLOCATE ( Dprst_gain(Nhru) )
-          IF ( declvar(MODNAME, 'dprst_gain', 'nhru', Nhru, 'real', &
+           CALL declvar_real(MODNAME, 'dprst_gain', 'nhru', Nhru, 'real', &
      &         'Transfer gain to surface-depression storage for each HRU for each time step', &
-     &         'cfs', Dprst_gain)/=0 ) CALL read_error(1, 'dprst_gain')
+     &         'cfs', Dprst_gain)
           ALLOCATE ( Dprst_gain_tot(Nhru) )
-          IF ( declvar(MODNAME, 'dprst_gain_tot', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'dprst_gain_tot', 'nhru', Nhru, 'real', &
      &         'Transfer gain to surface-depression storage for each HRU for the simulation', &
-     &         'cfs', Dprst_gain_tot)/=0 ) CALL read_error(1, 'dprst_gain_tot')
-          IF ( declvar(MODNAME, 'total_dprst_gain', 'one', 1, 'double', &
+     &         'cfs', Dprst_gain_tot)
+          CALL declvar_dble(MODNAME, 'total_dprst_gain', 'one', 1, 'double', &
      &         'Transfer gains to all surface-depression storage for each time step', &
-     &         'cfs', Total_dprst_gain)/=0 ) CALL read_error(1, 'total_dprst_gain')
+     &         'cfs', Total_dprst_gain)
         ELSEIF ( Dprst_transferON_OFF==1 .AND. Model/=99 ) THEN
           PRINT *, 'ERROR, specified to transfer water from surface-depression storage when dprst_flag = 0'
           Inputerror_flag = 1
@@ -293,28 +294,28 @@
           IF ( Segment_transferON_OFF==1 .OR. Model==99 ) THEN
             Segment_transfers_on = 1
             ALLOCATE ( Segment_transfer(Nsegment) )
-            IF ( declvar(MODNAME, 'segment_transfer', 'nsegment', Nsegment, 'real', &
+            CALL declvar_real(MODNAME, 'segment_transfer', 'nsegment', Nsegment, 'real', &
      &           'Transfer flow rate from each stream segment for each time step', &
-     &           'cfs', Segment_transfer)/=0 ) CALL read_error(1, 'segment_transfer')
+     &           'cfs', Segment_transfer)
             ALLOCATE ( Segment_transfer_tot(Nsegment) )
-            IF ( declvar(MODNAME, 'segment_transfer_tot', 'nsegment', Nsegment, 'real', &
+            CALL declvar_real(MODNAME, 'segment_transfer_tot', 'nsegment', Nsegment, 'real', &
      &           'Transfer flow rate from each stream segment for the simulation', &
-     &           'cfs', Segment_transfer_tot)/=0 ) CALL read_error(1, 'segment_transfer_tot')
-            IF ( declvar(MODNAME, 'total_segment_transfer', 'one', 1, 'double', &
+     &           'cfs', Segment_transfer_tot)
+            CALL declvar_dble(MODNAME, 'total_segment_transfer', 'one', 1, 'double', &
      &           'Transfer flow rates from all stream segments for each time step', &
-     &           'cfs', Total_segment_transfer)/=0 ) CALL read_error(1, 'total_segment_transfer')
+     &           'cfs', Total_segment_transfer)
           ENDIF
           ALLOCATE ( Segment_gain(Nsegment) )
-          IF ( declvar(MODNAME, 'segment_gain', 'nsegment', Nsegment, 'real', &
+          CALL declvar_real(MODNAME, 'segment_gain', 'nsegment', Nsegment, 'real', &
      &         'Transfer gain for each stream segment for each time step', &
-     &         'cfs', Segment_gain)/=0 ) CALL read_error(1, 'segment_gain')
+     &         'cfs', Segment_gain)
           ALLOCATE ( Segment_gain_tot(Nsegment) )
-          IF ( declvar(MODNAME, 'segment_gain_tot', 'nsegment', Nsegment, 'real', &
+          CALL declvar_real(MODNAME, 'segment_gain_tot', 'nsegment', Nsegment, 'real', &
      &         'Transfer gain for each stream segment for the simulation', &
-     &         'cfs', Segment_gain_tot)/=0 ) CALL read_error(1, 'segment_gain_tot')
-          IF ( declvar(MODNAME, 'total_segment_gain', 'one', 1, 'double', &
+     &         'cfs', Segment_gain_tot)
+          CALL declvar_dble(MODNAME, 'total_segment_gain', 'one', 1, 'double', &
      &         'Transfer gains to all stream segments for each time step', &
-     &         'cfs', Total_segment_gain)/=0 ) CALL read_error(1, 'total_segment_gain')
+     &         'cfs', Total_segment_gain)
         ELSEIF ( Segment_transferON_OFF==1 .AND. Model/=99 ) THEN
           PRINT *, 'ERROR, specified to transfer water from stream segments when they are not present'
           Inputerror_flag = 1
@@ -324,56 +325,56 @@
         IF ( Gwr_transferON_OFF==1 .OR. Model==99 ) THEN
           Gwr_transfers_on = 1
           ALLOCATE ( Gwr_transfer(Nhru) )
-          IF ( declvar(MODNAME, 'gwr_transfer', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'gwr_transfer', 'nhru', Nhru, 'real', &
      &         'Transfer flow rate from the groundwater reservoir of each HRU for each time step', &
-     &         'cfs', Gwr_transfer)/=0 ) CALL read_error(1, 'gwr_transfer')
+     &         'cfs', Gwr_transfer)
           ALLOCATE ( Gwr_transfer_tot(Nhru) )
-          IF ( declvar(MODNAME, 'gwr_transfer_tot', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'gwr_transfer_tot', 'nhru', Nhru, 'real', &
      &         'Transfer flow rate from the groundwater reservoir of each HRU for the simulation', &
-     &         'cfs', Gwr_transfer_tot)/=0 ) CALL read_error(1, 'gwr_transfer_tot')
-          IF ( declvar(MODNAME, 'total_gwr_transfer', 'one', 1, 'double', &
+     &         'cfs', Gwr_transfer_tot)
+          CALL declvar_dble(MODNAME, 'total_gwr_transfer', 'one', 1, 'double', &
      &         'Transfer flow rates from all groundwater reservoirs for each time step', &
-     &         'cfs', Total_gwr_transfer)/=0 ) CALL read_error(1, 'total_gwr_transfer')
+     &         'cfs', Total_gwr_transfer)
         ENDIF
         ALLOCATE ( Gwr_gain(Nhru) )
-        IF ( declvar(MODNAME, 'gwr_gain', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'gwr_gain', 'nhru', Nhru, 'real', &
      &       'Transfer gain to the groundwater reservoir of each HRU for each time step', &
-     &       'cfs', Gwr_gain)/=0 ) CALL read_error(1, 'gwr_gain')
+     &       'cfs', Gwr_gain)
         ALLOCATE ( Gwr_gain_tot(Nhru) )
-        IF ( declvar(MODNAME, 'gwr_gain_tot', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'gwr_gain_tot', 'nhru', Nhru, 'real', &
      &       'Transfer gain to the groundwater reservoir of each HRU for the simulation', &
-     &       'cfs', Gwr_gain_tot)/=0 ) CALL read_error(1, 'gwr_gain_tot')
-        IF ( declvar(MODNAME, 'total_gwr_gain', 'one', 1, 'double', &
+     &       'cfs', Gwr_gain_tot)
+        CALL declvar_dble(MODNAME, 'total_gwr_gain', 'one', 1, 'double', &
      &       'Flow to all groundwater reservoirs for each time step', &
-     &       'cfs', Total_gwr_gain)/=0 ) CALL read_error(1, 'total_gwr_gain')
+     &       'cfs', Total_gwr_gain)
 
         Lake_transfers_on = 0
         IF ( Strmflow_flag==3 .OR. Model==99 ) THEN
           IF ( Lake_transferON_OFF==1 .OR. Model==99 ) THEN
             Lake_transfers_on = 1
             ALLOCATE ( Lake_transfer(Nhru) )
-            IF ( declvar(MODNAME, 'lake_transfer', 'nhru', Nhru, 'real', &
+            CALL declvar_real(MODNAME, 'lake_transfer', 'nhru', Nhru, 'real', &
      &           'Transfer flow rate from each lake HRU for each time step', &
-     &           'cfs', Lake_transfer)/=0 ) CALL read_error(1, 'lake_transfer')
+     &           'cfs', Lake_transfer)
             ALLOCATE ( Lake_transfer_tot(Nhru) )
-            IF ( declvar(MODNAME, 'lake_transfer_tot', 'nhru', Nhru, 'real', &
+            CALL declvar_real(MODNAME, 'lake_transfer_tot', 'nhru', Nhru, 'real', &
      &           'Transfer flow rate from each lake HRU for the simulation', &
-     &           'cfs', Lake_transfer_tot)/=0 ) CALL read_error(1, 'lake_transfer_tot')
-            IF ( declvar(MODNAME, 'total_lake_transfer', 'one', 1, 'double', &
+     &           'cfs', Lake_transfer_tot)
+            CALL declvar_dble(MODNAME, 'total_lake_transfer', 'one', 1, 'double', &
      &           'Transfer flow rates from all lake HRUs for each time step', &
-     &           'cfs', Total_lake_transfer)/=0 ) CALL read_error(1, 'total_lake_transfer')
+     &           'cfs', Total_lake_transfer)
           ENDIF
           ALLOCATE ( Lake_gain(Nhru) )
-          IF ( declvar(MODNAME, 'lake_gain', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'lake_gain', 'nhru', Nhru, 'real', &
      &         'Transfer gain to each lake HRU for each time step', &
-     &         'cfs', Lake_gain)/=0 ) CALL read_error(1, 'lake_gain')
+     &         'cfs', Lake_gain)
           ALLOCATE ( Lake_gain_tot(Nhru) )
-          IF ( declvar(MODNAME, 'lake_gain_tot', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'lake_gain_tot', 'nhru', Nhru, 'real', &
      &         'Transfer gain to each lake HRU for the simulation', &
-     &         'cfs', Lake_gain_tot)/=0 ) CALL read_error(1, 'lake_gain_tot')
-          IF ( declvar(MODNAME, 'total_lake_gain', 'one', 1, 'double', &
+     &         'cfs', Lake_gain_tot)
+          CALL declvar_dble(MODNAME, 'total_lake_gain', 'one', 1, 'double', &
      &         'Transfer gains to all lake HRUs for each time step', &
-     &         'cfs', Total_lake_gain)/=0 ) CALL read_error(1, 'total_lake_gain')
+     &         'cfs', Total_lake_gain)
         ELSEIF ( Lake_transferON_OFF==1 .AND. Model/=99 ) THEN
           PRINT *, 'ERROR, specified to transfer water from lakes when lake module is not active'
           Inputerror_flag = 1
@@ -383,79 +384,79 @@
         IF ( (External_transferON_OFF==1.AND.Nexternal>0) .OR. Model==99 ) THEN
           External_transfers_on = 1
           ALLOCATE ( External_transfer(Nexternal) )
-          IF ( declvar(MODNAME, 'external_transfer', 'nexternal', Nexternal, 'real', &
+          CALL declvar_real(MODNAME, 'external_transfer', 'nexternal', Nexternal, 'real', &
      &         'Transfer flow rate from each external source for each time step', &
-     &         'cfs', External_transfer)/=0 ) CALL read_error(1, 'external_transfer')
+     &         'cfs', External_transfer)
           ALLOCATE ( External_transfer_tot(Nexternal) )
-          IF ( declvar(MODNAME, 'external_transfer_tot', 'nexternal', Nexternal, 'real', &
+          CALL declvar_real(MODNAME, 'external_transfer_tot', 'nexternal', Nexternal, 'real', &
      &         'Transfer flow rate from each external source for the simulation', &
-     &         'cfs', External_transfer_tot)/=0 ) CALL read_error(1, 'external_transfer_tot')
-          IF ( declvar(MODNAME, 'total_external_transfer', 'one', 1, 'double', &
+     &         'cfs', External_transfer_tot)
+          CALL declvar_dble(MODNAME, 'total_external_transfer', 'one', 1, 'double', &
      &         'Transfer flow rates from all external sources for each time step', &
-     &         'cfs', Total_external_transfer)/=0 ) CALL read_error(1, 'total_external_transfer')
+     &         'cfs', Total_external_transfer)
         ENDIF
         IF ( Nexternal>0 ) THEN
           ALLOCATE ( External_gain(Nexternal) )
-          IF ( declvar(MODNAME, 'external_gain', 'nexternal', Nexternal, 'real', &
+          CALL declvar_real(MODNAME, 'external_gain', 'nexternal', Nexternal, 'real', &
      &         'Transfer gain to each external location for each time step', &
-     &         'cfs', External_gain)/=0 ) CALL read_error(1, 'external_gain')
+     &         'cfs', External_gain)
           ALLOCATE ( External_gain_tot(Nexternal) )
-          IF ( declvar(MODNAME, 'external_gain_tot', 'nexternal', Nexternal, 'real', &
+          CALL declvar_real(MODNAME, 'external_gain_tot', 'nexternal', Nexternal, 'real', &
      &         'Transfer gain to each external location for each time step', &
-     &         'cfs', External_gain_tot)/=0 ) CALL read_error(1, 'external_gain_tot')
+     &         'cfs', External_gain_tot)
         ENDIF
-        IF ( declvar(MODNAME, 'total_external_gain', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'total_external_gain', 'one', 1, 'double', &
      &       'Transfer gains to all external locations for each time step', &
-     &       'cfs', Total_external_gain)/=0 ) CALL read_error(1, 'total_external_gain')
+     &       'cfs', Total_external_gain)
 
         Consumed_transfers_on = 0
         IF ( Nconsumed>0 ) THEN
           Consumed_transfers_on = 1
           ALLOCATE ( Consumed_gain(Nconsumed) )
-          IF ( declvar(MODNAME, 'consumed_gain', 'nconsumed', Nconsumed, 'real', &
+          CALL declvar_real(MODNAME, 'consumed_gain', 'nconsumed', Nconsumed, 'real', &
      &         'Transfer flow rate to each water-use comsumption destination for each time step', &
-     &         'cfs', Consumed_gain)/=0 ) CALL read_error(1, 'consumed_gain')
+     &         'cfs', Consumed_gain)
           ALLOCATE ( Consumed_gain_tot(Nconsumed) )
-          IF ( declvar(MODNAME, 'consumed_gain_tot', 'nconsumed', Nconsumed, 'real', &
+          CALL declvar_real(MODNAME, 'consumed_gain_tot', 'nconsumed', Nconsumed, 'real', &
      &         'Transfer flow rate to each water-use comsumption destination for the simulation', &
-     &         'cfs', Consumed_gain_tot)/=0 ) CALL read_error(1, 'consumed_gain_tot')
+     &         'cfs', Consumed_gain_tot)
         ENDIF
-        IF ( declvar(MODNAME, 'total_consumed_gain', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'total_consumed_gain', 'one', 1, 'double', &
      &       'Transfer flow rates to all water-use comsumption destinations for each time step', &
-     &       'cfs', Total_consumed_gain)/=0 ) CALL read_error(1, 'total_consumed_gain')
+     &       'cfs', Total_consumed_gain)
 
         ALLOCATE ( Soilzone_gain(Nhru) )
-        IF ( declvar(MODNAME, 'soilzone_gain', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'soilzone_gain', 'nhru', Nhru, 'real', &
      &       'Transfer gain to the capillary reservoir within the soilzone for each HRU for each time step', &
-     &       'cfs', Soilzone_gain)/=0 ) CALL read_error(1, 'soilzone_gain')
+     &       'cfs', Soilzone_gain)
         ALLOCATE ( Soilzone_gain_tot(Nhru) )
-        IF ( declvar(MODNAME, 'soilzone_gain_tot', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'soilzone_gain_tot', 'nhru', Nhru, 'real', &
      &       'Transfer gain to the capillary reservoir within the soilzone for each HRU for the simulation', &
-     &       'cfs', Soilzone_gain_tot)/=0 ) CALL read_error(1, 'soilzone_gain_tot')
-        IF ( declvar(MODNAME, 'total_soilzone_gain', 'one', 1, 'double', &
+     &       'cfs', Soilzone_gain_tot)
+        CALL declvar_dble(MODNAME, 'total_soilzone_gain', 'one', 1, 'double', &
      &       'Transfer gains to all capillary reservoirs for each time step', &
-     &       'cfs', Total_soilzone_gain)/=0 ) CALL read_error(1, 'total_soilzone_gain')
+     &       'cfs', Total_soilzone_gain)
 
         ALLOCATE ( Canopy_gain(Nhru) )
-        IF ( declvar(MODNAME, 'canopy_gain', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'canopy_gain', 'nhru', Nhru, 'real', &
      &       'Transfer gain to the canopy reservoir for each HRU for each time step', &
-     &       'cfs', Canopy_gain)/=0 ) CALL read_error(1, 'canopy_gain')
+     &       'cfs', Canopy_gain)
         ALLOCATE ( Canopy_gain_tot(Nhru) )
-        IF ( declvar(MODNAME, 'canopy_gain_tot', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'canopy_gain_tot', 'nhru', Nhru, 'real', &
      &       'Transfer gain to the canopy reservoir for each HRU for the simulation', &
-     &       'cfs', Canopy_gain_tot)/=0 ) CALL read_error(1, 'canopy_gain_tot')
-        IF ( declvar(MODNAME, 'total_canopy_gain', 'one', 1, 'double', &
+     &       'cfs', Canopy_gain_tot)
+        CALL declvar_dble(MODNAME, 'total_canopy_gain', 'one', 1, 'double', &
      &       'Transfer gains to all canopy reservoirs for each time step', &
-     &       'cfs', Total_canopy_gain)/=0 ) CALL read_error(1, 'total_canopy_gain')
+     &       'cfs', Total_canopy_gain)
 
         ALLOCATE ( Transfer_rate(Nwateruse), Source_id(Nwateruse), Source_type(Nwateruse) )
         ALLOCATE ( Destination_id(Nwateruse), Destination_type(Nwateruse) )
-        IF ( declvar(MODNAME, 'total_transfers', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'total_transfers', 'one', 1, 'double', &
      &           'Transfer of all water-use transfers for each time step', &
-     &           'cfs', Total_transfers)/=0 ) CALL read_error(1, 'total_transfers')
-        IF ( declvar(MODNAME, 'transfer_rate', 'nwateruse', nwateruse, 'double', &
+     &           'cfs', Total_transfers)
+        CALL declvar_dble(MODNAME, 'transfer_rate', 'nwateruse', nwateruse, 'double', &
      &           'Transfer of each water-use transfer for each time step', &
-     &           'cfs', Transfer_rate)/=0 ) CALL read_error(1, 'transfer_rate')
+     &           'cfs', Transfer_rate)
         
       ELSEIF ( Process(:4)=='init' ) THEN
         Ndiversions = 0

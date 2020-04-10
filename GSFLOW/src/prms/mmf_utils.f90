@@ -7,7 +7,7 @@
         USE PRMS_MODULE, ONLY: MAXCONTROL_LENGTH, MAXFILE_LENGTH
         IMPLICIT NONE
         ! DANGER, DANGER, hard coded maximum number of paraemters and dimensions, DANGER, DANGER
-        INTEGER, PARAMETER :: MAXDIMENSIONS = 50, MAXPARAMETERS = 200
+        INTEGER, PARAMETER :: MAXDIMENSIONS = 50, MAXPARAMETERS = 240, MAXVARIABLES = 500
         INTEGER, SAVE :: Num_parameters, Num_dimensions, Num_variables  !, Total_parameters
  
         TYPE PRMS_parameter
@@ -298,7 +298,7 @@
 ! declvar - set up memory for variables
 !***********************************************************************
       SUBROUTINE declvar(Modname, Varname, Dimenname, Numvalues, Data_type, Desc, Units)
-      USE PRMS_MMFAPI, ONLY: Variable_data, Num_variables
+      USE PRMS_MMFAPI, ONLY: Variable_data, Num_variables, MAXVARIABLES
       IMPLICIT NONE
       ! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Dimenname, Data_type, Desc, Units
@@ -314,11 +314,14 @@
       IF ( init==0 ) THEN
         init = 1
         Num_variables = 0
-        ALLOCATE ( Variable_data(400) ) ! don't know how many, need to read var_name file
+        ALLOCATE ( Variable_data(MAXVARIABLES) ) ! don't know how many, need to read var_name file
       ENDIF
       ! need to declare parameters first, but don't know how many, know how many in Parameter File
       Num_variables = Num_variables + 1
-      IF ( Num_variables>400 ) STOP 'PRMS ERROR, maximum number of declared variables (400) exceeded'
+      IF ( Num_variables>MAXVARIABLES ) THEN
+        PRINT '(A,I0)', 'PRMS ERROR, maximum number of declared variables exceeded: ', MAXVARIABLES
+        STOP 'PRMS ERROR, maximum number of declared variables exceeded'
+      ENDIF
       Variable_data(Num_variables)%get_flag = 0
       Variable_data(Num_variables)%decl_flag = 1
       Variable_data(Num_variables)%variable_name = Varname

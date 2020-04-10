@@ -90,8 +90,8 @@
       USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file, Snarea_curve_flag, DOCUMENTATION, Model
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar
-      EXTERNAL read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL read_error, print_module, declvar_real, declvar_dble, declvar_int
 ! Local Variables
       CHARACTER(LEN=80) :: Version_snowcomp
 !***********************************************************************
@@ -103,209 +103,209 @@
 
 ! declare variables
       ALLOCATE ( Scrv(Nhru) )
-      IF ( declvar(MODNAME, 'scrv', 'nhru', Nhru, 'double', &
+      CALL declvar_dble(MODNAME, 'scrv', 'nhru', Nhru, 'double', &
      &     'Snowpack water equivalent plus a portion of new snow on each HRU', &
-     &     'inches', Scrv)/=0 ) CALL read_error(3, 'scrv')
+     &     'inches', Scrv)
 
       ALLOCATE ( Pksv(Nhru) )
-      IF ( declvar(MODNAME, 'pksv', 'nhru', Nhru, 'double', &
+      CALL declvar_dble(MODNAME, 'pksv', 'nhru', Nhru, 'double', &
      &     'Snowpack water equivalent when there is new snow and in melt phase;'// &
      &     ' used to interpolate between depletion curve and 100 percent on each HRU', &
-     &     'inches', Pksv)/=0 ) CALL read_error(3, 'pksv')
+     &     'inches', Pksv)
 
       ALLOCATE ( Snowcov_areasv(Nhru) )
-      IF ( declvar(MODNAME, 'snowcov_areasv', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'snowcov_areasv', 'nhru', Nhru, 'real', &
      &     'Snow cover fraction when there is new snow and in melt phase;'// &
      &     ' used to interpolate between depletion curve and 100 percent on each HRU', &
-     &     'decimal fraction', Snowcov_areasv)/=0 ) CALL read_error(3, 'snowcov_areasv')
+     &     'decimal fraction', Snowcov_areasv)
 
       ALLOCATE ( Salb(Nhru) )
-      IF ( declvar(MODNAME, 'salb', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'salb', 'nhru', Nhru, 'real', &
      &     'Days since last new snow to reset albedo for each HRU', &
-     &     'days', Salb)/=0 ) CALL read_error(3, 'salb')
+     &     'days', Salb)
 
       ALLOCATE ( Slst(Nhru) )
-      IF ( declvar(MODNAME, 'slst', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'slst', 'nhru', Nhru, 'real', &
      &     'Days since last new snow for each HRU', &
-     &     'days', Slst)/=0 ) CALL read_error(3, 'slst')
+     &     'days', Slst)
 
       ALLOCATE ( Int_alb(Nhru) )
-      IF ( declvar(MODNAME, 'int_alb', 'nhru', Nhru, 'integer', &
+      CALL declvar_int(MODNAME, 'int_alb', 'nhru', Nhru, 'integer', &
      &     'Flag to indicate (1: accumulation season curve; 2: use of the melt season curve)', &
-     &     'none', Int_alb)/=0 ) CALL read_error(3, 'int_alb')
+     &     'none', Int_alb)
 
-      IF ( declvar(MODNAME, 'basin_snowdepth', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_snowdepth', 'one', 1, 'double', &
      &     'Basin area-weighted average snow depth', &
-     &     'inches', Basin_snowdepth)/=0 ) CALL read_error(3, 'basin_snowdepth')
+     &     'inches', Basin_snowdepth)
 
       ALLOCATE ( Pk_precip(Nhru) )
-      IF ( declvar(MODNAME, 'pk_precip', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'pk_precip', 'nhru', Nhru, 'real', &
      &     'Precipitation added to snowpack for each HRU', &
-     &     'inches', Pk_precip)/=0 ) CALL read_error(3, 'pk_precip')
+     &     'inches', Pk_precip)
 
-      IF ( declvar(MODNAME, 'basin_pk_precip', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_pk_precip', 'one', 1, 'double', &
      &     'Basin area-weighted average precipitation added to snowpack', &
-     &     'inches', Basin_pk_precip)/=0 ) CALL read_error(3, 'basin_pk_precip')
+     &     'inches', Basin_pk_precip)
 
       ALLOCATE ( Albedo(Nhru) )
-      IF ( declvar(MODNAME, 'albedo', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'albedo', 'nhru', Nhru, 'real', &
      &     'Snow surface albedo or the fraction of radiation reflected from the'// &
      &     ' snowpack surface for each HRU', &
-     &     'decimal fraction', Albedo)/=0 ) CALL read_error(3, 'albedo')
+     &     'decimal fraction', Albedo)
 
       ALLOCATE ( Pk_temp(Nhru) )
-      IF ( declvar(MODNAME, 'pk_temp', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'pk_temp', 'nhru', Nhru, 'real', &
      &     'Temperature of the snowpack on each HRU', &
-     &     'degrees Celsius', Pk_temp)/=0 ) CALL read_error(3, 'pk_temp')
+     &     'degrees Celsius', Pk_temp)
 
       ALLOCATE ( Pk_den(Nhru) )
-      IF ( declvar(MODNAME, 'pk_den', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'pk_den', 'nhru', Nhru, 'real', &
      &     'Density of the snowpack on each HRU', &
-     &     'gm/cm3', Pk_den)/=0 ) CALL read_error(3, 'pk_den')
+     &     'gm/cm3', Pk_den)
 
-      IF ( declvar(MODNAME, 'basin_tcal', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_tcal', 'one', 1, 'double', &
      &     'Basin area-weighted average net snowpack energy balance', &
-     &     'Langleys', Basin_tcal)/=0 ) CALL read_error(3, 'basin_tcal')
+     &     'Langleys', Basin_tcal)
 
       ALLOCATE ( Tcal(Nhru) )
-      IF ( declvar(MODNAME, 'tcal', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'tcal', 'nhru', Nhru, 'real', &
      &     'Net snowpack energy balance on each HRU', &
-     &     'Langleys', Tcal)/=0 ) CALL read_error(3, 'tcal')
+     &     'Langleys', Tcal)
 
       ALLOCATE ( Snow_evap(Nhru) )
-      IF ( declvar(MODNAME, 'snow_evap', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'snow_evap', 'nhru', Nhru, 'real', &
      &     'Evaporation and sublimation from snowpack on each HRU', &
-     &     'inches', Snow_evap)/=0 ) CALL read_error(3, 'snow_evap')
+     &     'inches', Snow_evap)
 
       ALLOCATE ( Snowmelt(Nhru) )
-      IF ( declvar(MODNAME, 'snowmelt', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'snowmelt', 'nhru', Nhru, 'real', &
      &     'Snowmelt from snowpack on each HRU', &
-     &     'inches', Snowmelt)/=0 ) CALL read_error(3, 'snowmelt')
+     &     'inches', Snowmelt)
 
-      IF ( declvar(MODNAME, 'basin_snowmelt', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_snowmelt', 'one', 1, 'double', &
      &     'Basin area-weighted average snowmelt', &
-     &     'inches', Basin_snowmelt)/=0 ) CALL read_error(3, 'basin_snowmelt')
+     &     'inches', Basin_snowmelt)
 
-      IF ( declvar(MODNAME, 'basin_pweqv', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_pweqv', 'one', 1, 'double', &
      &     'Basin area-weighted average snowpack water equivalent', &
-     &     'inches', Basin_pweqv)/=0 ) CALL read_error(3, 'basin_pweqv')
+     &     'inches', Basin_pweqv)
 
       ALLOCATE ( Pkwater_ante(Nhru) )
-      IF ( declvar(MODNAME, 'pkwater_ante', 'nhru', Nhru, 'double', &
+      CALL declvar_dble(MODNAME, 'pkwater_ante', 'nhru', Nhru, 'double', &
      &     'Antecedent snowpack water equivalent on each HRU', &
-     &     'inches', Pkwater_ante)/=0 ) CALL read_error(3, 'pkwater_ante')
+     &     'inches', Pkwater_ante)
 
       ALLOCATE ( Snowcov_area(Nhru) )
-      IF ( declvar(MODNAME, 'snowcov_area', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'snowcov_area', 'nhru', Nhru, 'real', &
      &     'Snow-covered area on each HRU prior to melt and sublimation unless snowpack depleted', &
-     &     'decimal fraction', Snowcov_area)/=0 ) CALL read_error(3, 'snowcov_area')
+     &     'decimal fraction', Snowcov_area)
 
-      IF ( declvar(MODNAME, 'basin_snowevap', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_snowevap', 'one', 1, 'double', &
      &     'Basin area-weighted average evaporation and sublimation from snowpack', &
-     &     'inches', Basin_snowevap)/=0 ) CALL read_error(3, 'basin_snowevap')
+     &     'inches', Basin_snowevap)
 
-      IF ( declvar(MODNAME, 'basin_snowcov', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_snowcov', 'one', 1, 'double', &
      &     'Basin area-weighted average snow-covered area', &
-     &     'decimal fraction', Basin_snowcov)/=0 ) CALL read_error(3, 'basin_snowcov')
+     &     'decimal fraction', Basin_snowcov)
 
       !rpayn commented
       ALLOCATE ( Pptmix_nopack(Nhru) )
-      IF ( declvar(MODNAME, 'pptmix_nopack', 'nhru', Nhru, 'integer', &
+      CALL declvar_int(MODNAME, 'pptmix_nopack', 'nhru', Nhru, 'integer', &
      &     'Flag indicating that a mixed precipitation event has'// &
      &     ' occurred with no snowpack present on an HRU (1), otherwise (0)', &
-     &     'none', Pptmix_nopack)/=0 ) CALL read_error(3, 'pptmix_nopack')
+     &     'none', Pptmix_nopack)
 
       !rpayn commented
       ALLOCATE ( Iasw(Nhru) )
-      IF ( declvar(MODNAME, 'iasw', 'nhru', Nhru, 'integer', &
+      CALL declvar_int(MODNAME, 'iasw', 'nhru', Nhru, 'integer', &
      &     'Flag indicating that snow covered area is'// &
      &     ' interpolated between previous location on curve and'// &
      &     ' maximum (1), or is on the defined curve (0)', &
-     &     'none', Iasw)/=0 ) CALL read_error(3, 'iasw')
+     &     'none', Iasw)
 
       !rpayn commented
       ALLOCATE ( Iso(Nhru) )
-      IF ( declvar(MODNAME, 'iso', 'nhru', Nhru, 'integer', &
+      CALL declvar_int(MODNAME, 'iso', 'nhru', Nhru, 'integer', &
      &     'Flag to indicate if time is before (1) or after (2)'// &
      &     ' the day to force melt season (melt_force)', &
-     &     'none', Iso)/=0 ) CALL read_error(3, 'iso')
+     &     'none', Iso)
 
       !rpayn commented
       ALLOCATE ( Mso(Nhru) )
-      IF ( declvar(MODNAME, 'mso', 'nhru', Nhru, 'integer', &
+      CALL declvar_int(MODNAME, 'mso', 'nhru', Nhru, 'integer', &
      &     'Flag to indicate if time is before (1) or after (2)'// &
      &     ' the first potential day for melt season (melt_look)', &
-     &     'none', Mso)/=0 ) CALL read_error(3, 'mso')
+     &     'none', Mso)
 
       !rpayn commented
       ALLOCATE ( Lso(Nhru) )
-      IF ( declvar(MODNAME, 'lso', 'nhru', Nhru, 'integer', &
+      CALL declvar_int(MODNAME, 'lso', 'nhru', Nhru, 'integer', &
      &     'Counter for tracking the number of days the snowpack'// &
      &     ' is at or above 0 degrees Celsius', &
-     &     'number of iterations', Lso)/=0 ) CALL read_error(3, 'lso')
+     &     'number of iterations', Lso)
 
       !rpayn commented
       ALLOCATE ( Lst(Nhru) )
-      IF ( declvar(MODNAME, 'lst', 'nhru', Nhru, 'integer', &
+      CALL declvar_int(MODNAME, 'lst', 'nhru', Nhru, 'integer', &
      &     'Flag indicating whether there was new snow that'// &
      &     ' was insufficient to reset the albedo curve (1)'// &
      &     ' (albset_snm or albset_sna), otherwise (0)', &
-     &     'none', Lst)/=0 ) CALL read_error(3, 'lst')
+     &     'none', Lst)
 
       !rpayn commented
       ALLOCATE ( Pk_def(Nhru) )
-      IF ( declvar(MODNAME, 'pk_def', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'pk_def', 'nhru', Nhru, 'real', &
      &     'Heat deficit, amount of heat necessary to make'// &
      &     ' the snowpack isothermal at 0 degrees Celsius', &
-     &     'Langleys', Pk_def)/=0 ) CALL read_error(3, 'pk_def')
+     &     'Langleys', Pk_def)
 
       !rpayn commented
       ALLOCATE ( Pk_ice(Nhru) )
-      IF ( declvar(MODNAME, 'pk_ice', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'pk_ice', 'nhru', Nhru, 'real', &
      &     'Storage of frozen water in the snowpack on each HRU', &
-     &     'inches', Pk_ice)/=0 ) CALL read_error(3, 'pk_ice')
+     &     'inches', Pk_ice)
 
       !rpayn commented
       ALLOCATE ( Freeh2o(Nhru) )
-      IF ( declvar(MODNAME, 'freeh2o', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'freeh2o', 'nhru', Nhru, 'real', &
      &     'Storage of free liquid water in the snowpack on each HRU', &
-     &     'inches', Freeh2o)/=0 ) CALL read_error(3, 'freeh2o')
+     &     'inches', Freeh2o)
 
       !rpayn commented
       ALLOCATE ( Pk_depth(Nhru) )
-      IF ( declvar(MODNAME, 'pk_depth', 'nhru', Nhru, 'double', &
+      CALL declvar_dble(MODNAME, 'pk_depth', 'nhru', Nhru, 'double', &
      &     'Depth of snowpack on each HRU', &
-     &     'inches', Pk_depth)/=0 ) CALL read_error(3, 'pk_depth')
+     &     'inches', Pk_depth)
 
       !rpayn commented
       ALLOCATE ( Pss(Nhru) )
-      IF ( declvar(MODNAME, 'pss', 'nhru', Nhru, 'double', &
+      CALL declvar_dble(MODNAME, 'pss', 'nhru', Nhru, 'double', &
      &     'Previous snowpack water equivalent plus new snow', &
-     &     'inches', Pss)/=0 ) CALL read_error(3, 'pss')
+     &     'inches', Pss)
 
       !rpayn commented
       ALLOCATE ( Pst(Nhru) )
-      IF ( declvar(MODNAME, 'pst', 'nhru', Nhru, 'double', &
+      CALL declvar_dble(MODNAME, 'pst', 'nhru', Nhru, 'double', &
      &     'While a snowpack exists, pst tracks the maximum'// &
      &     ' snow water equivalent of that snowpack', &
-     &     'inches', Pst)/=0 ) CALL read_error(3, 'pst')
+     &     'inches', Pst)
 
       !rpayn commented
       ALLOCATE ( Snsv(Nhru) )
-      IF ( declvar(MODNAME, 'snsv', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'snsv', 'nhru', Nhru, 'real', &
      &     'Tracks the cumulative amount of new snow until'// &
      &     ' there is enough to reset the albedo curve (albset_snm or albset_sna)', &
-     &     'inches', Snsv)/=0 ) CALL read_error(3, 'snsv')
+     &     'inches', Snsv)
 
       ALLOCATE ( Ai(Nhru) )
-      IF ( declvar(MODNAME, 'ai', 'nhru', Nhru, 'double', &
+      CALL declvar_dble(MODNAME, 'ai', 'nhru', Nhru, 'double', &
      &     'Maximum snowpack for each HRU', &
-     &     'inches', Ai)/=0 ) CALL read_error(3, 'ai')
+     &     'inches', Ai)
 
       ALLOCATE ( Frac_swe(Nhru) )
-      IF ( declvar(MODNAME, 'frac_swe', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'frac_swe', 'nhru', Nhru, 'real', &
      &     'Fraction of maximum snow-water equivalent (snarea_thresh) on each HRU', &
-     &     'decimal fraction', Frac_swe)/=0 ) CALL read_error(3, 'frac_swe')
+     &     'decimal fraction', Frac_swe)
 
 ! declare parameters
       ALLOCATE ( Den_init(Nhru) )

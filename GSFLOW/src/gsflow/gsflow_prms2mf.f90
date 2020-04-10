@@ -58,8 +58,8 @@
       USE GSFPRMS2MF
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Nsegment, Model
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: declparam, declvar
-      EXTERNAL read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL read_error, print_module, declvar_dble, declvar_real
 ! Save Variables
       CHARACTER(LEN=80), SAVE :: Version_gsflow_prms2mf
 !***********************************************************************
@@ -70,10 +70,10 @@
       MODNAME = 'gsflow_prms2mf'
 
 ! Declared Variables
-      IF ( declvar(MODNAME, 'net_sz2gw', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'net_sz2gw', 'one', 1, 'double', &
      &     'Net volumetric flow rate of gravity drainage from the'// &
      &     ' soil zone to the unsaturated and saturated zones', &
-     &     'L3/T', Net_sz2gw)/=0 ) CALL read_error(3, 'net_sz2gw')
+     &     'L3/T', Net_sz2gw)
 
 !     ALLOCATE (Reach_latflow(Nreach))
 !     IF ( decl var(MODNAME, 'reach_latflow', 'nreach', Nreach, 'double', &
@@ -87,24 +87,24 @@
 !    &     'none', Reach_id)/=0 ) CALL read_error(3, 'reach_id')
 
       ALLOCATE (Cell_drain_rate(Ngwcell))
-      IF ( declvar(MODNAME, 'cell_drain_rate', 'ngwcell', Ngwcell, 'real', &
+      CALL declvar_real(MODNAME, 'cell_drain_rate', 'ngwcell', Ngwcell, 'real', &
      &     'Recharge rate for each cell', &
-     &     'L/T', Cell_drain_rate)/=0 ) CALL read_error(3, 'Cell_drain_rate')
+     &     'L/T', Cell_drain_rate)
 
-      IF ( declvar(MODNAME, 'basin_reach_latflow', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_reach_latflow', 'one', 1, 'double', &
      &     'Lateral flow into all reaches in basin', &
-     &     'cfs', Basin_reach_latflow)/=0 ) CALL read_error(3, 'basin_reach_latflow')
+     &     'cfs', Basin_reach_latflow)
 
       ALLOCATE (Gw_rejected_grav(Nhrucell))
-      IF ( declvar(MODNAME, 'gw_rejected_grav', 'nhrucell', Nhrucell, 'real', &
+      CALL declvar_real(MODNAME, 'gw_rejected_grav', 'nhrucell', Nhrucell, 'real', &
      &   'Recharge rejected by UZF for each gravity-flow reservoir', &
-     &   'inches', Gw_rejected_grav)/=0 ) CALL read_error(3, 'gw_rejected_grav')
+     &   'inches', Gw_rejected_grav)
 
       !rsr, all reaches receive same precentage of flow to each segment
       ALLOCATE (Segment_pct_area(Nsegment))
-!      IF ( declvar(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, 'double', &
+!      CALL declvar_dble(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, 'double', &
 !     &     'Proportion of each segment that contributes flow to a stream reach', &
-!     &     'decimal fraction', Segment_pct_area)/=0 ) CALL read_error(3, 'segment_pct_area')
+!     &     'decimal fraction', Segment_pct_area)
 
       ! Allocate local arrays
       ALLOCATE ( Excess(Ngwcell) )
@@ -153,9 +153,9 @@
       USE GWFUZFMODULE, ONLY: NTRAIL, NWAV
       USE GWFSFRMODULE, ONLY: ISEG, NSS
       USE GWFLAKMODULE, ONLY: NLAKES
-      USE GSFMODFLOW, ONLY: Gwc_row, Gwc_col, Have_lakes
+      USE GSFMODFLOW, ONLY: Gwc_row, Gwc_col
       USE PRMS_MODULE, ONLY: Nhru, Nsegment, Nlake, Print_debug, &
-     &    Nhrucell, Ngwcell, Gvr_cell_id, Logunt, Mxsziter
+     &    Nhrucell, Ngwcell, Gvr_cell_id, Logunt, Mxsziter, Have_lakes
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, &
      &    Basin_area_inv, Hru_area
       USE PRMS_SOILZONE, ONLY: Gvr_hru_id, Gvr_hru_pct_adjusted
@@ -291,7 +291,7 @@
 !      WRITE (839,'(f15.13)') seg_area
 !      STOP
 
-        Cell_drain_rate = 0.0 ! dimension ngwcell
+      Cell_drain_rate = 0.0 ! dimension ngwcell
 
       ierr = 0
       IF ( Nhru/=Nhrucell ) THEN
@@ -360,7 +360,7 @@
             PRINT *, 'ERROR, HRU to cell mapping is < 0.0', i, pct
             ierr = 1
           ELSEIF ( pct<PCT_CHK ) THEN
-            PRINT *, 'WARNING, active HRU is not mapped to any cell', i, pct
+            IF ( Print_debug>-1 ) PRINT *, 'WARNING, active HRU is not mapped to any cell', i, pct
           ENDIF
           Totalarea = Totalarea + pct*DBLE( Hru_area(i) )
         ELSE
@@ -372,6 +372,7 @@
             WRITE (*, 9001) i
             ierr = 1
 ! must separate condition as lake_hru_id not allocated if have_lakes=0
+            ! rsr, need to check that lake_hru_id not 0
           ENDIF
         ENDIF
       ENDDO
@@ -407,12 +408,12 @@
       INTEGER FUNCTION prms2mfrun()
       USE GSFPRMS2MF
       USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, &
-     &    Inch_to_mfl_t, Gwc_row, Gwc_col, Have_lakes, Mft_to_days
+     &    Inch_to_mfl_t, Gwc_row, Gwc_col, Mft_to_days
       USE GLOBAL, ONLY: IBOUND
 !     USE GLOBAL, ONLY: IOUT
       USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, IGSFLOW, FINF
       USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK, NLAKES
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_area, Lake_hru_id, NEARZERO
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Hru_actet

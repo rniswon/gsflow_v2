@@ -9,7 +9,7 @@
       INTEGER, SAVE :: KSTP, KKSTP, IERR, Max_iters
       INTEGER, SAVE :: Mfiter_cnt(ITDIM), Iter_cnt(ITDIM), Iterations
       INTEGER, SAVE :: Szcheck, Sziters, INUNIT, KPER, NCVGERR
-      INTEGER, SAVE :: Have_lakes, Max_sziters, Maxgziter
+      INTEGER, SAVE :: Max_sziters, Maxgziter
       INTEGER, SAVE, ALLOCATABLE :: Gwc_col(:), Gwc_row(:)
       REAL, SAVE :: Delt_save
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Stress_dates(:)
@@ -34,9 +34,6 @@ C-------ASSIGN VERSION NUMBER AND DATE
       PARAMETER (VERSION3='1.04.0 09/15/2016')
       PARAMETER (MFVNAM='-NWT-SWR1')
       INTEGER, SAVE :: IBDT(8)
-!   Control Parameters
-      INTEGER, SAVE :: Modflow_time_zero(6)
-      CHARACTER(LEN=200), SAVE :: Modflow_name
       END MODULE GSFMODFLOW
 
 C     ******************************************************************
@@ -119,13 +116,13 @@ C     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Model, Mxsziter, Print_debug,
      &    EQULS, Logunt, Init_vars_from_file, Kper_mfo, GSFLOW_flag,
-     &    MODFLOW, Diversion2soil_flag
+     &    MODFLOW, Diversion2soil_flag, Have_lakes, NLAKES_MF
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
       USE GWFUZFMODULE, ONLY: Version_uzf
       USE GWFSFRMODULE, ONLY: Version_sfr
-      USE GWFLAKMODULE, ONLY: Version_lak
+      USE GWFLAKMODULE, ONLY: Version_lak, NLAKES
 !gsf  USE PCGN
       IMPLICIT NONE
       INTEGER :: I
@@ -192,7 +189,7 @@ C4------OPEN NAME FILE.
 C
 C5------Get current date and time, assign to IBDT, and write to screen
       CALL DATE_AND_TIME(VALUES=IBDT)
-      IF ( Model>0 ) THEN
+      IF ( Model==MODFLOW ) THEN
         WRITE(*,2) (IBDT(I),I=1,3),(IBDT(I),I=5,7)
         IF ( Print_debug>-2 )
      &       WRITE (Logunt, 2) (IBDT(I),I=1,3),(IBDT(I),I=5,7)
@@ -354,8 +351,11 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
       IF(IUNIT(55).GT.0) CALL GWF2UZF1AR(IUNIT(55),IUNIT(1),
      1                                   IUNIT(23),IUNIT(37),
      2                                   IUNIT(63),IGRID)
-      IF(IUNIT(22).GT.0 .OR. IUNIT(44).GT.0) CALL GWF2LAK7AR(
+      IF(IUNIT(22).GT.0 .OR. IUNIT(44).GT.0) THEN
+          CALL GWF2LAK7AR(
      1             IUNIT(22),IUNIT(44),IUNIT(15),IUNIT(55),NSOL,IGRID)
+          NLAKES_MF = NLAKES
+      END IF
       IF(IUNIT(46).GT.0) CALL GWF2GAG7AR(IUNIT(46),IUNIT(44),
      1                                     IUNIT(22),IGRID)
       IF(IUNIT(39).GT.0) CALL GWF2ETS7AR(IUNIT(39),IGRID)
@@ -1168,7 +1168,7 @@ C
 C     ******************************************************************
 C     GET THE NAME OF THE NAME FILE
 C     ******************************************************************
-      USE GSFMODFLOW, ONLY: Modflow_name
+      USE PRMS_MODULE, ONLY: Modflow_name
       INTEGER, EXTERNAL :: control_string, numchars
       EXTERNAL :: read_error
 C        SPECIFICATIONS:
@@ -1425,26 +1425,27 @@ C
       INTEGER FUNCTION GET_KPER()
       USE GLOBAL, ONLY: NPER
       USE GSFMODFLOW, ONLY: Stress_dates, KPER
-      USE PRMS_MODULE, ONLY: Starttime, Start_year, Start_month,
-     &                       Start_day
+      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day !, Starttime
+      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
       INTRINSIC DBLE
-      DOUBLE PRECISION, EXTERNAL :: nowjt, getjulday
+!      DOUBLE PRECISION, EXTERNAL :: nowjt
+      INTEGER, EXTERNAL :: compute_julday
 ! Local Variables
-      DOUBLE PRECISION :: now, seconds
+      DOUBLE PRECISION :: now !, seconds
       INTEGER :: KPERTEST
 !     ------------------------------------------------------------------
       GET_KPER = -1
-      now = nowjt()
+!      now = nowjt()
+      now = compute_julday(Nowyear, Nowmonth, Nowday)
       KPERTEST = 1
       IF ( KPER > KPERTEST ) KPERTEST = KPER
 !
 !     If called from init, then "now" isn't set yet.
 !     Set "now" to model start date.
       IF ( now.LE.1.0D0 ) THEN
-        seconds = DBLE(Starttime(6))
-        now = getjulday(Start_month, Start_day, Start_year,
-     &                  Starttime(4), Starttime(5), seconds)
+!        seconds = DBLE(Starttime(6))
+        now = DBLE( compute_julday(Start_year, Start_month, Start_day) )
       ENDIF
       IF ( now.LT.Stress_dates(KPERTEST) )
      &     STOP 'ERROR, now<stress period time'
@@ -1464,19 +1465,20 @@ C
       SUBROUTINE SET_STRESS_DATES()
       USE GLOBAL, ONLY: NPER, ISSFLG, PERLEN, IUNIT, NSTP
       USE GSFMODFLOW, ONLY: Modflow_skip_time, Modflow_skip_stress,
-     &    Modflow_time_in_stress, Stress_dates, Modflow_time_zero,
+     &    Modflow_time_in_stress, Stress_dates,
      &    Steady_state, ICNVG, KPER, KSTP, Mft_to_days, KPERSTART,
      &    Modflow_skip_time_step, IGRID
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Kkiter, Model,
-     &    Starttime, Start_year, Start_month, Start_day, Logunt,
-     &    Print_debug
+     &    Start_year, Start_month, Start_day, Logunt,
+     &    Print_debug, MODFLOW, Modflow_time_zero
       USE GWFBASMODULE, ONLY: TOTIM
       USE OBSBASMODULE, ONLY: OBSTART,ITS
       IMPLICIT NONE
+      ! Functions
       EXTERNAL :: READ_STRESS, RESTART1READ
       INTEGER, EXTERNAL :: gsfrun
-      INTRINSIC :: INT
-      DOUBLE PRECISION, EXTERNAL :: getjulday
+      INTRINSIC :: INT, DBLE
+      INTEGER, EXTERNAL :: compute_julday, control_integer_array
 ! Local Variables
       INTEGER :: i, n, nstress
       DOUBLE PRECISION :: seconds, start_jul, mfstrt_jul, plen, time
@@ -1488,16 +1490,12 @@ C
       seconds = Modflow_time_zero(6)
       ALLOCATE ( Stress_dates(NPER+1) )
       Stress_dates = 0.0D0
-      Stress_dates(1) =
-     &          getjulday(Modflow_time_zero(2), Modflow_time_zero(3),
-     &                    Modflow_time_zero(1), Modflow_time_zero(4),
-     &                    Modflow_time_zero(5), seconds)
+      Stress_dates(1) = DBLE( compute_julday(Modflow_time_zero(1),
+     &                  Modflow_time_zero(2), Modflow_time_zero(3)) )
       mfstrt_jul = Stress_dates(1)
 
       ! determine julian day
-      seconds = Starttime(6)
-      start_jul = getjulday(Start_month, Start_day, Start_year,
-     &                      Starttime(4), Starttime(5), seconds)
+      start_jul=DBLE(compute_julday(Start_year, Start_month, Start_day))
 
       IF ( mfstrt_jul>start_jul ) THEN
         PRINT *, 'ERROR, modflow_time_zero > start_time',
@@ -1512,7 +1510,7 @@ C
 
       IF ( Mft_to_days>1.0 ) PRINT *, 'CAUTION, MF time step /= 1 day'
 
-      IF ( Model>0 ) PRINT *, ' '
+      IF ( Model==MODFLOW ) PRINT *, ' '
       TOTIM = 0.0
       KPER = 0
       KSTP = 0
@@ -1795,8 +1793,8 @@ C
 ! Set MODFLOW time factors
 !***********************************************************************
       SUBROUTINE SETMFTIME()
-      USE PRMS_MODULE, ONLY: Starttime
-      USE GSFMODFLOW, ONLY: Mft_to_sec, Mft_to_days, Modflow_time_zero
+      USE PRMS_MODULE, ONLY: Starttime, Modflow_time_zero
+      USE GSFMODFLOW, ONLY: Mft_to_sec, Mft_to_days
       USE GLOBAL, ONLY: ITMUNI
       IMPLICIT NONE
       INTRINSIC SNGL
@@ -1920,8 +1918,9 @@ C
 !     gsflow_modflow_restart - write or read restart file
 !***********************************************************************
       SUBROUTINE gsflow_modflow_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit,Print_debug
-      USE GSFMODFLOW, ONLY: MODNAME, Modflow_time_zero
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit,
+     &    Print_debug, Modflow_time_zero
+      USE GSFMODFLOW, ONLY: MODNAME
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
       ! Argument

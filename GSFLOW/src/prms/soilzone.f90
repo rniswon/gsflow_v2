@@ -402,7 +402,7 @@
 
       ALLOCATE ( Recharge(Nhru) )
       CALL declvar_real(MODNAME, 'recharge', 'nhru', Nhru, 'real', &
-     &     'Recharge to the associated GWR as sum of soil_to_gw and ssr_to_gw for each HRU', &
+     &     'Recharge to the associated GWR as sum of soil_to_gw, ssr_to_gw, and dprst_seep_hru for each HRU', &
      &     'inches', Recharge)
 
       ALLOCATE ( Cap_waterin(Nhru) )
