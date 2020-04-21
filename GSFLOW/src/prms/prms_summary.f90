@@ -34,8 +34,8 @@
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_INTCP, ONLY: Basin_intcp_evap, Basin_intcp_stor
       USE PRMS_SNOW, ONLY: Basin_pweqv, Basin_snowevap, Basin_snowmelt, Basin_snowcov, Basin_pk_precip
-      USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_dprst_evap, Basin_imperv_evap, Basin_dprst_seep, &
-     &    Basin_dprst_volop, Basin_dprst_volcl, Basin_hortonian
+      USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_imperv_evap, Basin_hortonian
+      USE PRMS_DPRST, ONLY: Basin_dprst_evap, Basin_dprst_seep, Basin_dprst_volop, Basin_dprst_volcl
       USE PRMS_SOILZONE, ONLY: Basin_capwaterin, Basin_pref_flow_infil, Basin_prefflow, Basin_recharge, Basin_slowflow, &
      &    Basin_pref_stor, Basin_slstor, Basin_soil_rechr, Basin_sz2gw, Basin_dunnian
       USE PRMS_GWFLOW, ONLY: Basin_gwstor, Basin_gwin, Basin_gwsink, Basin_gwflow, &
@@ -89,7 +89,7 @@
 
 ! Declare procedure
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_prms_summary = 'prms_summary.f90 2019-06-20 15:10:00Z'
+        Version_prms_summary = 'prms_summary.f90 2020-04-15 17:10:00Z'
         CALL print_module(Version_prms_summary, 'Output Summary              ', 90)
         MODNAME = 'prms_summary'
 

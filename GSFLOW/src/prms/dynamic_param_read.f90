@@ -62,7 +62,7 @@
       IF ( Process(:3)=='run' ) THEN
         dynamic_param_read = dynparamrun()
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_dynamic_param_read = 'dynamic_param_read.f90 2019-11-14 11:47:00Z'
+        Version_dynamic_param_read = 'dynamic_param_read.f90 2020-04-15 17:47:00Z'
         CALL print_module(Version_dynamic_param_read, 'Time Series Data            ', 90)
         !MODNAME = 'dynamic_param_read'
       ELSEIF ( Process(:4)=='init' ) THEN
@@ -417,9 +417,10 @@
       USE PRMS_TRANSP_FROST, ONLY: Fall_frost, Spring_frost
       USE PRMS_INTCP, ONLY: Wrain_intcp, Srain_intcp, Snow_intcp
       USE PRMS_SNOW, ONLY: Rad_trncf, Snarea_thresh
-      USE PRMS_SRUNOFF, ONLY: Sro_to_dprst_perv, Sro_to_dprst_imperv, Dprst_depth_avg, &
-     &    Op_flow_thres, Dprst_vol_open_max, Dprst_vol_clos_max, Dprst_vol_thres_open, &
-     &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, Hru_impervstor
+      USE PRMS_SRUNOFF, ONLY: Hru_impervstor
+      USE PRMS_DPRST, ONLY: Dprst_depth_avg, Op_flow_thres, Dprst_vol_open_max, Dprst_vol_clos_max, &
+     &    Dprst_vol_thres_open, Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, &
+     &    Sro_to_dprst_perv, Sro_to_dprst_imperv
       USE PRMS_SOILZONE, ONLY: Basin_soil_rechr, Soil_zone_max, Soil_moist_tot, &
      &    Soil_lower_stor_max, Replenish_frac
       IMPLICIT NONE

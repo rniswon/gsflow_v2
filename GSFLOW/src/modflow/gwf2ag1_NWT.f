@@ -1512,7 +1512,7 @@
       IF (NUMSUPSP > NUMSUP) THEN
          WRITE (IOUT, *)
          WRITE (IOUT, 102) NUMSUP, NUMSUPSP
-         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR ',
+         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR '//
      +                 'SUP WELLS')
       END IF
       IERR = 0
@@ -1524,7 +1524,7 @@
          IF (NMSG > MAXSEGS) THEN
             WRITE (IOUT, *)
             WRITE (IOUT, 103) MAXSEGS, NMSG
-            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR ',
+            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR '//
      +                 'SUP WELLS')
          END IF
          SUPWELVAR(J) = ISPWL
@@ -1540,7 +1540,7 @@
       IF (IERR == 1) THEN
          WRITE (IOUT, *) 'SEGMENT NUMBER FOR SUPPLEMENTAL WELL ',
      +                   'SPECIFIED AS ZERO. MODEL STOPPING'
-         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR ',
+         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR '//
      +                 'SUP WELLS')
       END IF
       !
@@ -1635,7 +1635,7 @@
          IF (NMCL > MAXCELLSWEL) THEN
             WRITE (IOUT, *)
             WRITE (IOUT, 105) MAXCELLSWEL, NMCL
-            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR ',
+            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
      +                 'WELLS')
          END IF
          IRRWELVAR(J) = IRWL
@@ -1650,7 +1650,7 @@
             DO K = 1, NUMCELLS(IRRWELVAR(J))
                IF (IRRROW_GW(K, IRRWELVAR(J)) == 0) THEN
                   WRITE (IOUT, 107)
-                  CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR ',
+                  CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR '//
      +                 'IRR WELLS')
                END IF
             END DO
@@ -1663,7 +1663,7 @@
                IF (IRRROW_GW(K, IRRWELVAR(J)) == 0 .OR.
      +             IRRCOL_GW(K, IRRWELVAR(J)) == 0) THEN
                   WRITE (IOUT, 106)
-                  CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR ',
+                  CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR '//
      +                 'IRR WELLS')
                END IF
             END DO
@@ -1749,7 +1749,7 @@
          IF (NMCL > MAXCELLSPOND) THEN
             WRITE (IOUT, *)
             WRITE (IOUT, 105) MAXCELLSPOND, NMCL
-            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR ',
+            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
      +                 'PONDS')
          END IF
          IRRPONDVAR(J) = IRWL
@@ -1762,7 +1762,7 @@
          END DO
          IF (TEST) THEN
            WRITE(IOUT,107)IRWL 
-           CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR ',
+           CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
      +                 'PONDS')
          END IF
          DO K = 1, NMCL
@@ -1772,7 +1772,7 @@
          DO K = 1, NUMCELLSPOND(IRRPONDVAR(J))
            IF (IRRROW_POND(K, IRRPONDVAR(J)) == 0) THEN
              WRITE (IOUT, 106)
-             CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR ',
+             CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
      +                 'PONDS')
            END IF
         END DO
@@ -1837,7 +1837,7 @@
       IF (NUMIRRDIVERSIONSP > NUMIRRDIVERSION) THEN
          WRITE (IOUT, *)
          WRITE (IOUT, 9008) NUMIRRDIVERSION, NUMIRRDIVERSIONSP
-         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR ',
+         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
      +                 'DIVERSION')
       END IF
       DO J = 1, NUMIRRDIVERSIONSP
@@ -1852,7 +1852,7 @@
          IF (NMCL > MAXCELLSDIVERSION) THEN
             WRITE (IOUT, *)
             WRITE (IOUT, 9009) MAXCELLSDIVERSION, NMCL
-            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR ',
+            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
      +                 'DIVERSION')
          END IF
          IF (SGNM > 0) THEN
@@ -1870,7 +1870,7 @@
                   IF (IRRROW_SW(K, SGNM) == 0) THEN
                      totdum = totdum + DVRPERC(NMCL, SGNM)
                      WRITE (IOUT, 9010)
-                     CALL USTOP('ERROR IN STRESS PERIOD INFORMATION ',
+                     CALL USTOP('ERROR IN STRESS PERIOD INFORMATION '//
      +                 'FOR IRR DIVERSION')
                      IF (totdum .GT. 1.000001 .OR. totdum .LT. 0.999)
      +                   WRITE (Iout, 9006) totdum
@@ -1887,7 +1887,7 @@
      +                IRRCOL_SW(K, SGNM) == 0) THEN
                      totdum = totdum + DVRPERC(NMCL, SGNM)
                      WRITE (IOUT, 9007)
-                     CALL USTOP('ERROR IN STRESS PERIOD INFORMATION ',
+                     CALL USTOP('ERROR IN STRESS PERIOD INFORMATION '//
      +                 'FOR IRR DIVERSION')
                      IF (totdum .GT. 1.000001 .OR. totdum .LT. 0.999)
      +                  WRITE (Iout, 9006) totdum

@@ -413,7 +413,7 @@
       USE PRMS_MODULE, ONLY: Init_vars_from_file
       USE PRMS_BASIN, ONLY: Active_area
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor
-      USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop, Basin_dprst_volcl
+      USE PRMS_DPRST, ONLY: Basin_dprst_volop, Basin_dprst_volcl
       IMPLICIT NONE
       INTEGER, EXTERNAL :: getparam
       EXTERNAL GSF_PRINT, gsflow_sum_restart, MODFLOW_SFR_GET_STORAGE
@@ -572,9 +572,9 @@
       USE PRMS_FLOWVARS, ONLY: Basin_perv_et, Basin_swale_et, &
      &    Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_actet, &
      &    Basin_soil_moist, Basin_ssstor, Basin_cfs
-      USE PRMS_SRUNOFF, ONLY: Basin_imperv_evap, &
-     &    Basin_sroff, Basin_hortonian, Basin_hortonian_lakes, &
-     &    Basin_infil, Basin_dprst_evap, Basin_dprst_volop, Basin_dprst_volcl
+      USE PRMS_SRUNOFF, ONLY: Basin_imperv_evap, Basin_sroff, Basin_hortonian, &
+     &    Basin_hortonian_lakes, Basin_infil
+      USE PRMS_DPRST, ONLY: Basin_dprst_evap, Basin_dprst_volop, Basin_dprst_volcl
       USE PRMS_SNOW, ONLY: Basin_snowevap, Basin_snowmelt
       USE PRMS_INTCP, ONLY: Basin_intcp_evap
       USE PRMS_SOILZONE, ONLY: Basin_lakeprecip, Basin_dunnian, &

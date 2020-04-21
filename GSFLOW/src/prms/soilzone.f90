@@ -116,7 +116,8 @@
 !***********************************************************************
       INTEGER FUNCTION szdecl()
       USE PRMS_SOILZONE
-      USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Nhrucell, Print_debug, Cascade_flag, GSFLOW_flag
+      USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Nhrucell, Print_debug, Cascade_flag, &
+     &    GSFLOW_flag, DOCUMENTATION
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam, getdim
@@ -126,7 +127,7 @@
 !***********************************************************************
       szdecl = 0
 
-      Version_soilzone = 'soilzone.f90 2020-01-10 17:04:00Z'
+      Version_soilzone = 'soilzone.f90 2020-04-17 17:04:00Z'
       CALL print_module(Version_soilzone, 'Soil Zone Computations      ', 90 )
       MODNAME = 'soilzone'
 
@@ -293,7 +294,7 @@
 !     &     'Maximum interflow for each HRU', &
 !     &     'inches', Interflow_max)
 
-      IF ( Cascade_flag>0 .OR. Model==99 ) THEN
+      IF ( Cascade_flag>0 .OR. Model==DOCUMENTATION ) THEN
         CALL declvar_dble(MODNAME, 'basin_dndunnianflow', 'one', 1, 'double', &
      &       'Basin area-weighted average cascading Dunnian flow', &
      &       'inches', Basin_dndunnianflow)
@@ -457,7 +458,7 @@
 !     &     'Fraction of sublimation of AET for each HRU', &
 !     &     'decimal fraction', Snowevap_aet_frac)
 
-      IF ( GSFLOW_flag==1 .OR. Model==99 ) THEN
+      IF ( GSFLOW_flag==1 .OR. Model==DOCUMENTATION ) THEN
         IF ( Nhrucell<-1 ) STOP 'ERROR, dimension nhrucell not specified > 0'
         ALLOCATE ( Gravity_stor_res(Nhrucell) )
         CALL declvar_real(MODNAME, 'gravity_stor_res', 'nhrucell', Nhrucell, 'real', &
@@ -487,7 +488,9 @@
         CALL declvar_real(MODNAME, 'grav_gwin', 'nhru', Nhru, 'real', &
      &       'Groundwater discharge to gravity-flow reservoirs for each HRU', &
      &       'inches', Grav_gwin)
+      ENDIF
 
+      IF ( GSFLOW_flag==1 ) THEN
         ALLOCATE ( Gvr_hru_pct_adjusted(Nhrucell) )
         ALLOCATE ( Hru_gvr_count(Nhru), Hrucheck(Nhru) )
         ALLOCATE ( It0_pref_flow_stor(Nhru), It0_ssres_stor(Nhru), It0_soil_rechr(Nhru), It0_soil_moist(Nhru) )
@@ -503,7 +506,7 @@
       IF ( Print_debug==7 ) CALL PRMS_open_module_file(DBGUNT, 'soilzone.dbg')
 
 ! Declare Parameters
-      IF ( GSFLOW_flag==1 .OR. Model==99 ) THEN
+      IF ( GSFLOW_flag==1 .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Gvr_hru_id(Nhrucell) )
         IF ( Nhru/=Nhrucell ) THEN
           IF ( declparam(MODNAME, 'gvr_hru_id', 'nhrucell', 'integer', &
@@ -852,7 +855,7 @@
       INTEGER FUNCTION szrun()
       USE PRMS_SOILZONE
       USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug, Kkiter, Soilzone_aet_flag, &
-     &    GSFLOW_flag, Nlake, Cascade_flag, Dprst_flag, Frozen_flag, Hru_ag_irr, Diversion2soil_flag
+     &    GSFLOW_flag, Nlake, Cascade_flag, Frozen_flag, Hru_ag_irr, Diversion2soil_flag
       USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Hru_frac_perv, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
      &    NEARZERO, Lake_hru_id, Cov_type, Numlake_hrus, Hru_area_dble
@@ -868,7 +871,8 @@
       USE PRMS_SET_TIME, ONLY: Nowmonth !, Nowday
       USE PRMS_INTCP, ONLY: Hru_intcpevap
       USE PRMS_SNOW, ONLY: Snowcov_area, Snow_evap
-      USE PRMS_SRUNOFF, ONLY: Basin_sroff, Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen
+      USE PRMS_SRUNOFF, ONLY: Basin_sroff, Hru_impervevap, Strm_seg_in, Frozen
+      USE PRMS_DPRST, ONLY: Dprst_evap_hru, Dprst_seep_hru
 !      USE PRMS_WATER_USE, ONLY: Soilzone_gain
       IMPLICIT NONE
 ! Functions
@@ -889,8 +893,6 @@
       szrun = 0
 
       IF ( GSFLOW_flag==1 ) THEN
-        IF ( Kkiter==0 ) STOP 'ERROR, problem with KKITER, equals 0'
-
         IF ( Kkiter==1 ) THEN
 ! It0 variables used with MODFLOW integration to save iteration states.
           DO k = 1, Active_hrus
@@ -1684,7 +1686,7 @@
       USE PRMS_SOILZONE, ONLY: Gravity_stor_res, Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, &
      &    Gw2sm_grav, Gvr_hru_pct_adjusted
       USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug
-      USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
+      USE PRMS_DPRST, ONLY: Dprst_seep_hru
       IMPLICIT NONE
 ! Functions
       INTRINSIC MAX, DBLE, SNGL
