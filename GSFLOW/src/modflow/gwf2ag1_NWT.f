@@ -956,8 +956,6 @@
       ! - -----------------------------------------------------------------
       ! VARIABLES:
       ! - -----------------------------------------------------------------
-      CHARACTER(LEN=200)::LINE
-      INTEGER I, ITMP
       character(len=22)  :: text = 'AG STRESS PERIOD DATA'
       character(len=18)  :: text1 = 'IRRIGATION SEGMENT'
       character(len=16)  :: text2 = 'IRRIGATION WELL'
@@ -972,9 +970,10 @@
       character(len=16)  :: char1 = 'WELL LIST'
       character(len=16)  :: char2 = 'SEGMENT LIST'
       character(len=16)  :: char3 = 'POND LIST'
-
+      CHARACTER(LEN=200)::LINE
+      INTEGER I, ITMP
       INTEGER LLOC, ISTART, ISTOP, ISTARTSAVE
-      INTEGER J, II, KPER2, L, MATCH, NUMTABS, is, ip
+      INTEGER J, II, KPER2, L, MATCH, NUMTABS, is, ip, nseg
       INTEGER istsg, istsgold, ISEG, IPOND
       logical :: FOUND
       logical :: found1, found2, found3, found4, found5, found6, found7
@@ -1001,7 +1000,9 @@
             found5 = .true.
             write (iout, '(/1x,a)') 'PROCESSING '//
      +             trim(adjustl(CHAR2))//''
+            nseg = 0
             do
+               nseg = nseg + 1
                CALL URDCOM(In, IOUT, line)
                LLOC = 1
                CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
@@ -1011,6 +1012,15 @@
      +                                     trim(adjustl(char2))
                   exit
                case default
+                 if ( nseg > NUMIRRDIVERSION ) then
+                    WRITE (IOUT, *)
+                    WRITE (IOUT, *) 'ERROR IN AG: TOO MANY SEGMENTS IN',
+     +                               ' LIST, OR LIST DOES NOT INCLUDE ',
+     +                               ' KEY WORD "END". MODEL STOPPING'
+                    WRITE (IOUT, *)
+                    CALL USTOP('ERROR IN AG: TOO MANY SEGMENTS IN LIST,
+     +                     OR "END" NOT SPECIFIED. MODEL STOPPING') 
+                  end if
                   LLOC = 1
                   CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ISEG, R, 
      +                        IOUT, IN)
@@ -1031,7 +1041,7 @@
             end do
          end select
          !2 - ---READ POND LIST
-         if ( found4 ) then
+         if ( found5 ) then
             CALL URDCOM(In, IOUT, line)
             LLOC = 1
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
@@ -1104,7 +1114,7 @@
                   END DO
                END IF
             case ('END')
-               found6 = .false.
+!               found6 = .false.
                write (iout, '(/1x,a)') 'FINISHED READING '//
      +          trim(adjustl(char3))
                exit
@@ -1168,7 +1178,8 @@
                      END IF
                      IF (TABUNITWELL(J) .LE. 0) THEN
                         WRITE (IOUT, 100)
-                        CALL USTOP('')
+                        CALL USTOP('UNIT NUMBER FOR TABULAR INPUT FILE 
+     +                              SPECIFIED AS ZERO.')
                      END IF
                      REWIND (TABUNITWELL(J))   
                      DO II = 1, TABVALWELL(J)
