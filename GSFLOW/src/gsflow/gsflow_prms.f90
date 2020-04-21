@@ -8,7 +8,7 @@
       CHARACTER(LEN=68), PARAMETER :: &
      &  EQULS = '===================================================================='
       CHARACTER(LEN=11), PARAMETER :: MODNAME = 'gsflow_prms'
-      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.2.0 03/19/2020'
+      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.2.0 04/21/2020'
       CHARACTER(LEN=8), SAVE :: Process, Arg
       !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
       INTEGER, PARAMETER :: GSFLOW = 0, PRMS = 1, MODFLOW = 2
@@ -83,7 +83,7 @@
       INTEGER, EXTERNAL :: ddsolrad, ccsolrad
       INTEGER, EXTERNAL :: potet_pan, potet_jh, potet_hamon, potet_hs, potet_pt, potet_pm
       INTEGER, EXTERNAL :: intcp, snowcomp, gwflow
-      INTEGER, EXTERNAL :: srunoff, soilzone
+      INTEGER, EXTERNAL :: srunoff, soilzone, depression_storage
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, write_climate_hru
       INTEGER, EXTERNAL :: strmflow_in_out, muskingum, muskingum_lake, numchars
       INTEGER, EXTERNAL :: water_use_read, dynamic_param_read, potet_pm_sta
@@ -111,7 +111,7 @@
           CALL DATE_AND_TIME(VALUES=Elapsed_time_start)
           Execution_time_start = Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
      &                           Elapsed_time_start(7) + Elapsed_time_start(8)*0.001
-          PRMS_versn = 'gsflow_prms.f90 2020-03-20 08:24:00Z'
+          PRMS_versn = 'gsflow_prms.f90 2020-04-21 16:45:00Z'
         ! Note, MODFLOW-only doesn't leave setdims
         CALL setdims()
       ELSEIF ( Process_flag==1 ) THEN  ! after setdims finished
@@ -131,7 +131,7 @@
           WRITE ( Logunt, 10 ) PRMS_VERSION
         ENDIF
   10  FORMAT (/, 15X, 'Precipitation-Runoff Modeling System (PRMS)', /, 23X, A)
-  15  FORMAT (/, 8X, 'Process',  12X, 'Available Modules', /, 68('-'), /, &
+      15  FORMAT (/, 8X, 'Process',  12X, 'Available Modules', /, 68('-'), /, &
      &        '  Basin Definition: basin', /, &
      &        '    Cascading Flow: cascade', /, &
      &        '  Time Series Data: obs, water_use_read, dynamic_param_read', /, &
@@ -147,7 +147,8 @@
      &        '      Interception: intcp', /, &
      &        '     Snow Dynamics: snowcomp', /, &
      &        '    Surface Runoff: srunoff_smidx, srunoff_carea', /, &
-     &        '         Soil Zone: soilzone', /, &
+     &        'Surface Depression: depression_storage', /, &
+&        '         Soil Zone: soilzone', /, &
      &        '       Groundwater: gwflow', /, &
      &        'Streamflow Routing: strmflow, strmflow_in_out, muskingum,', /, &
      &        '                    muskingum_lake, muskingum_mann', /, &
@@ -447,6 +448,11 @@
 
 ! for PRMS-only simulations
       IF ( Model==PRMS ) THEN
+        IF ( Dprst_flag==1 ) THEN
+          call_modules = depression_storage()
+          IF ( call_modules/=0 ) CALL module_error('depression_storage', Arg, call_modules)
+        ENDIF
+
         call_modules = soilzone()
         IF ( call_modules/=0 ) CALL module_error(Soilzone_module, Arg, call_modules)
 
@@ -493,6 +499,11 @@
 
 ! SOILZONE for GSFLOW is in the MODFLOW iteration loop,
 ! only call for declare, initialize, and cleanup.
+          IF ( Dprst_flag==1 ) THEN
+            call_modules = depression_storage()
+            IF ( call_modules/=0 ) CALL module_error('depression_storage', Arg, call_modules)
+          ENDIF
+
           call_modules = soilzone()
           IF ( call_modules/=0 ) CALL module_error(Soilzone_module, Arg, call_modules)
 
@@ -617,7 +628,7 @@
       INTEGER, EXTERNAL :: precip_dist2, xyz_dist, ide_dist
       INTEGER, EXTERNAL :: ddsolrad, ccsolrad
       INTEGER, EXTERNAL :: potet_pan, potet_jh, potet_hamon, potet_hs, potet_pt, potet_pm
-      INTEGER, EXTERNAL :: intcp, snowcomp, gwflow, srunoff, soilzone
+      INTEGER, EXTERNAL :: intcp, snowcomp, gwflow, srunoff, soilzone, depression_storage
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, strmflow_in_out
       INTEGER, EXTERNAL :: write_climate_hru, muskingum, muskingum_lake
       INTEGER, EXTERNAL :: stream_temp
@@ -661,6 +672,7 @@
       test = intcp()
       test = snowcomp()
       test = srunoff()
+      test = depression_storage()
       test = soilzone()
       test = gsflow_prms2mf()
       test = gsflow_mf2prms()

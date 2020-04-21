@@ -66,7 +66,7 @@
 !***********************************************************************
       dprst_decl = 0
 
-      Version_dprst = 'depression_storage.f90 2020-04-17 14:26:00Z'
+      Version_dprst = 'depression_storage.f90 2020-04-21 16:41:00Z'
       MODNAME = 'depression_storage'
       Version_dprst = MODNAME//'.f90 '//Version_dprst(13:80)
       CALL print_module(Version_dprst, 'Surface Depression Storage  ', 90)
@@ -420,14 +420,13 @@
      &    Dprst_clos_flag, Dprst_open_flag, Dprst_area_max, Hru_type, &
      &    Dprst_area_clos_max, Dprst_area_open_max, Hru_area_dble
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_vol_clos, Sroff, Hru_actet
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_vol_clos, Sroff, Hru_actet, Recharge, Basin_recharge, Basin_sroff
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_SNOW, ONLY: Snow_evap
       USE PRMS_INTCP, ONLY: Net_rain, Hru_intcpevap, Intcp_changeover
-      USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Frozen, Basin_hortonian, Basin_hortonian_lakes, Basin_sroff, &
+      USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Frozen, Basin_hortonian, Basin_hortonian_lakes, &
      &    Basin_sroff_down, Basin_sroff_upslope, Hortonian_flow, Hortonian_lakes, Hru_hortn_cascflow, &
      &    Hru_sroffp, Hru_sroffi
-      USE PRMS_SOILZONE, ONLY: Upslope_dunnianflow, Recharge
       IMPLICIT NONE
       INTRINSIC SNGL, DBLE
       EXTERNAL dprst_comp, run_cascade_dprst, compute_dprst_gravflow
@@ -465,6 +464,7 @@
       Basin_dprst_volop = 0.0D0
       Basin_dprst_volcl = 0.0D0
       Basin_sroff = Basin_sroff*Active_area
+      Basin_recharge = Basin_recharge*Active_area
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
         Hruarea_dble = Hru_area_dble(i)
@@ -498,11 +498,10 @@
      &                      Dprst_area_open(i), Dprst_sroff_hru(i), Dprst_seep_hru(i), &
      &                      Sro_to_dprst_perv(i), Sro_to_dprst_imperv(i), Dprst_evap_hru(i), &
      &                      avail_et, availh2o, Dprst_in(i), Hru_frac_perv(i), Hru_percent_imperv(i), &
-     &                      Hru_sroffp(i), Hru_sroffi(i), Hru_area(i), Upslope_dunnianflow(i))
+     &                      Hru_sroffp(i), Hru_sroffi(i), Hru_area(i))
             runoff = Dprst_sroff_hru(i)*Hruarea_dble
             srunoff = SNGL( Dprst_sroff_hru(i) )
             Hru_actet(i) = Hru_actet(i) + Dprst_evap_hru(i)
-            Recharge(i) = Recharge(i) + SNGL( Dprst_seep_hru(i) )
 
             !******Compute HRU weighted average (to units of inches/dt)
             IF ( Cascade_flag>0 ) THEN
@@ -525,6 +524,8 @@
         Dprst_stor_hru(i) = (Dprst_vol_open(i)+Dprst_vol_clos(i))/Hruarea_dble
         Basin_hortonian = Basin_hortonian + DBLE( Hortonian_flow(i) )*Hruarea_dble
         Basin_sroff = Basin_sroff + DBLE( Sroff(i) )*Hruarea_dble
+        Recharge(i) = Recharge(i) + SNGL( Dprst_seep_hru(i) )
+        Basin_recharge = Basin_recharge + Dprst_seep_hru(i)*Hruarea_dble
         IF ( GSFLOW_flag==1 ) CALL compute_dprst_gravflow(i, Dprst_seep_hru(i))
       ENDDO
 
@@ -542,6 +543,7 @@
       Basin_dprst_sroff = Basin_dprst_sroff*Basin_area_inv
       Basin_sroff = Basin_sroff*Basin_area_inv
       Basin_hortonian = Basin_hortonian*Basin_area_inv
+      Basin_recharge = Basin_recharge*Basin_area_inv
 
       END FUNCTION dprst_run
 

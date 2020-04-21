@@ -108,7 +108,7 @@
 !***********************************************************************
       gsfsumdecl = 0
 
-      Version_gsflow_sum = 'gsflow_sum.f90 2019-10-31 13:26:00Z'
+      Version_gsflow_sum = 'gsflow_sum.f90 2020-04-21 16:45:00Z'
       CALL print_module(Version_gsflow_sum, 'GSFLOW Output CSV Summary   ', 90)
       MODNAME = 'gsflow_sum'
 
@@ -571,8 +571,8 @@
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       USE PRMS_FLOWVARS, ONLY: Basin_perv_et, Basin_swale_et, &
      &    Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_actet, &
-     &    Basin_soil_moist, Basin_ssstor, Basin_cfs
-      USE PRMS_SRUNOFF, ONLY: Basin_imperv_evap, Basin_sroff, Basin_hortonian, &
+     &    Basin_soil_moist, Basin_ssstor, Basin_cfs, Basin_sroff
+      USE PRMS_SRUNOFF, ONLY: Basin_imperv_evap, Basin_hortonian, &
      &    Basin_hortonian_lakes, Basin_infil
       USE PRMS_DPRST, ONLY: Basin_dprst_evap, Basin_dprst_volop, Basin_dprst_volcl
       USE PRMS_SNOW, ONLY: Basin_snowevap, Basin_snowmelt

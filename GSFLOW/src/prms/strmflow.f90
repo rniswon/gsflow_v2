@@ -7,8 +7,7 @@
       USE PRMS_BASIN, ONLY: Active_area, CFS2CMS_CONV
       USE PRMS_GWFLOW, ONLY: Basin_gwflow
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_cfs, Basin_cms, Basin_stflow_in, &
-     &    Basin_sroff_cfs, Basin_ssflow_cfs, Basin_gwflow_cfs, Basin_stflow_out
-      USE PRMS_SRUNOFF, ONLY: Basin_sroff
+     &    Basin_sroff_cfs, Basin_ssflow_cfs, Basin_gwflow_cfs, Basin_stflow_out, Basin_sroff
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       IMPLICIT NONE
 ! Functions
@@ -32,7 +31,7 @@
         Basin_gwflow_cfs = Basin_gwflow*area_fac
 
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_strmflow = 'strmflow.f90 2014-12-02 19:06:41Z'
+        Version_strmflow = 'strmflow.f90 2020-04-21 16:43:41Z'
         CALL print_module(Version_strmflow, 'Streamflow Routing          ', 90)
 !        MODNAME = 'strmflow'
       ENDIF

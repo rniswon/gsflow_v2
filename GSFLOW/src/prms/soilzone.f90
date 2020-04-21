@@ -38,8 +38,7 @@
 !   Declared Variables
       DOUBLE PRECISION, SAVE :: Basin_sz2gw, Basin_cap_infil_tot
       DOUBLE PRECISION, SAVE :: Basin_interflow_max, Basin_sm2gvr_max ! this is the same as basin_sm2gvr
-      DOUBLE PRECISION, SAVE :: Basin_soil_rechr, Basin_dunnian_gvr
-      DOUBLE PRECISION, SAVE :: Basin_recharge, Basin_pref_flow_infil
+      DOUBLE PRECISION, SAVE :: Basin_soil_rechr, Basin_dunnian_gvr, Basin_pref_flow_infil
       DOUBLE PRECISION, SAVE :: Basin_ssin, Basin_dunnian_pfr
       DOUBLE PRECISION, SAVE :: Basin_sm2gvr, Basin_dninterflow
       DOUBLE PRECISION, SAVE :: Basin_dncascadeflow, Basin_dndunnianflow
@@ -47,12 +46,10 @@
       DOUBLE PRECISION, SAVE :: Basin_gvr2pfr, Basin_slowflow
       DOUBLE PRECISION, SAVE :: Basin_pref_stor, Basin_slstor, Basin_prefflow
       DOUBLE PRECISION, SAVE :: Basin_lakeinsz, Basin_lakeprecip
-      DOUBLE PRECISION, SAVE :: Basin_cap_up_max
-      DOUBLE PRECISION, SAVE :: Basin_soil_moist_tot
+      DOUBLE PRECISION, SAVE :: Basin_cap_up_max, Basin_soil_moist_tot
       DOUBLE PRECISION, SAVE :: Basin_soil_lower_stor_frac, Basin_soil_rechr_stor_frac, Basin_sz_stor_frac
       DOUBLE PRECISION, SAVE :: Basin_cpr_stor_frac, Basin_gvr_stor_frac, Basin_pfr_stor_frac
-      REAL, SAVE, ALLOCATABLE :: Perv_actet(:), Pref_flow_thrsh(:)
-      REAL, SAVE, ALLOCATABLE :: Soil_moist_tot(:), Recharge(:)
+      REAL, SAVE, ALLOCATABLE :: Perv_actet(:), Pref_flow_thrsh(:), Soil_moist_tot(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Upslope_interflow(:), Upslope_dunnianflow(:), Lakein_sz(:)
       REAL, SAVE, ALLOCATABLE :: Dunnian_flow(:), Cap_infil_tot(:)
       REAL, SAVE, ALLOCATABLE :: Pref_flow_stor(:), Pref_flow(:)
@@ -127,7 +124,7 @@
 !***********************************************************************
       szdecl = 0
 
-      Version_soilzone = 'soilzone.f90 2020-04-17 17:04:00Z'
+      Version_soilzone = 'soilzone.f90 2020-04-21 16:42:00Z'
       CALL print_module(Version_soilzone, 'Soil Zone Computations      ', 90 )
       MODNAME = 'soilzone'
 
@@ -397,14 +394,7 @@
      &     'Evaporation from the gravity and preferential-flow reservoirs that exceeds sat_threshold', &
      &     'inches', Swale_actet)
 
-      CALL declvar_dble(MODNAME, 'basin_recharge', 'one', 1, 'double', &
-     &     'Basin area-weighted average recharge to GWRs', &
-     &     'inches', Basin_recharge)
 
-      ALLOCATE ( Recharge(Nhru) )
-      CALL declvar_real(MODNAME, 'recharge', 'nhru', Nhru, 'real', &
-     &     'Recharge to the associated GWR as sum of soil_to_gw, ssr_to_gw, and dprst_seep_hru for each HRU', &
-     &     'inches', Recharge)
 
       ALLOCATE ( Cap_waterin(Nhru) )
       CALL declvar_real(MODNAME, 'cap_waterin', 'nhru', Nhru, 'real', &
@@ -783,7 +773,6 @@
       Swale_actet = 0.0
       Perv_actet = 0.0
 !      Perv_avail_et = 0.0
-      Recharge = 0.0
       Cap_waterin = 0.0
       Potet_lower = 0.0
       Potet_rechr = 0.0
@@ -854,7 +843,7 @@
 !***********************************************************************
       INTEGER FUNCTION szrun()
       USE PRMS_SOILZONE
-      USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug, Kkiter, Soilzone_aet_flag, &
+      USE PRMS_MODULE, ONLY: Print_debug, Kkiter, Soilzone_aet_flag, &
      &    GSFLOW_flag, Nlake, Cascade_flag, Frozen_flag, Hru_ag_irr, Diversion2soil_flag
       USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Hru_frac_perv, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -866,13 +855,13 @@
      &    Soil_to_ssr, Basin_lakeevap, Basin_perv_et, Basin_swale_et, &
      &    Sroff, Soil_moist_max, Infil, Soil_rechr_max, Ssres_in, &
      &    Basin_soil_moist, Basin_ssstor, Slow_stor, Slow_flow, &
-     &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_lake_stor
+     &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_lake_stor, &
+     &    Basin_recharge, Recharge, Basin_sroff
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_SET_TIME, ONLY: Nowmonth !, Nowday
       USE PRMS_INTCP, ONLY: Hru_intcpevap
       USE PRMS_SNOW, ONLY: Snowcov_area, Snow_evap
-      USE PRMS_SRUNOFF, ONLY: Basin_sroff, Hru_impervevap, Strm_seg_in, Frozen
-      USE PRMS_DPRST, ONLY: Dprst_evap_hru, Dprst_seep_hru
+      USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Frozen
 !      USE PRMS_WATER_USE, ONLY: Soilzone_gain
       IMPLICIT NONE
 ! Functions
@@ -963,7 +952,6 @@
         i = Hru_route_order(k)
 
         Hru_actet(i) = Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i)
-        IF ( Dprst_flag==1 ) Hru_actet(i) = Hru_actet(i) + Dprst_evap_hru(i)
         harea = Hru_area(i)
 
         IF ( Hru_type(i)==2 ) THEN ! lake or reservoir
@@ -1315,7 +1303,6 @@
 !        Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + Soil_rechr_ratio(i)*perv_area
         Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + Soil_rechr(i)/Soil_rechr_max(i)*perv_area
         Recharge(i) = Soil_to_gw(i) + Ssr_to_gw(i)
-        IF ( Dprst_flag==1 ) Recharge(i) = Recharge(i) + SNGL( Dprst_seep_hru(i) )
         Basin_recharge = Basin_recharge + DBLE( Recharge(i)*harea )
         Grav_dunnian_flow(i) = dunnianflw_gvr
         Unused_potet(i) = Potet(i) - Hru_actet(i)
@@ -1685,8 +1672,7 @@
      &           Slow_flow, Slow_stor, Gvr2sm, Soil_to_gw, Gwin, Hru_type)
       USE PRMS_SOILZONE, ONLY: Gravity_stor_res, Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, &
      &    Gw2sm_grav, Gvr_hru_pct_adjusted
-      USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug
-      USE PRMS_DPRST, ONLY: Dprst_seep_hru
+      USE PRMS_MODULE, ONLY: Print_debug
       IMPLICIT NONE
 ! Functions
       INTRINSIC MAX, DBLE, SNGL
@@ -1766,7 +1752,6 @@
 
 ! add any direct recharge from soil infiltration
         Sm2gw_grav(igvr) = Sm2gw_grav(igvr) + Soil_to_gw
-        IF ( Dprst_flag==1 ) Sm2gw_grav(igvr) = Sm2gw_grav(igvr) + SNGL( Dprst_seep_hru(Ihru) )
 
       ENDDO ! end loop of GVRs in the HRU
 
@@ -1825,9 +1810,8 @@
 !***********************************************************************
       SUBROUTINE init_basin_vars()
       USE PRMS_SOILZONE
-      USE PRMS_FLOWVARS, ONLY: Basin_actet, Basin_perv_et, &
-     &    Basin_swale_et, Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow
-      USE PRMS_SRUNOFF, ONLY: Basin_sroff
+      USE PRMS_FLOWVARS, ONLY: Basin_actet, Basin_perv_et, Basin_recharge, &
+     &    Basin_swale_et, Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_sroff
       IMPLICIT NONE
 !***********************************************************************
       Basin_lakeinsz = 0.0D0
@@ -1879,7 +1863,7 @@
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_sz_gwin, Basin_sz2gw, Basin_interflow_max, Basin_sm2gvr_max, Basin_cap_infil_tot, &
-     &          Basin_soil_rechr, Basin_dunnian_gvr, Basin_recharge, Basin_ssin, Basin_sm2gvr, Basin_capwaterin, Basin_dunnian, &
+     &          Basin_soil_rechr, Basin_dunnian_gvr, Basin_ssin, Basin_sm2gvr, Basin_capwaterin, Basin_dunnian, &
      &          Basin_slowflow, Basin_slstor, Basin_cap_up_max, Basin_soil_moist_tot, Basin_gvr2sm, Et_type, Basin_lakeprecip
         WRITE ( Restart_outunit ) Basin_prefflow, Basin_pref_flow_infil, Basin_pref_stor, Basin_gvr2pfr, Basin_dunnian_pfr
         WRITE ( Restart_outunit ) Basin_dndunnianflow, Basin_dninterflow, Basin_dncascadeflow, Basin_lakeinsz, Basin_lakeprecip
@@ -1889,7 +1873,7 @@
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Basin_sz_gwin, Basin_sz2gw, Basin_interflow_max, Basin_sm2gvr_max, Basin_cap_infil_tot, &
-     &         Basin_soil_rechr, Basin_dunnian_gvr, Basin_recharge, Basin_ssin, Basin_sm2gvr, Basin_capwaterin, Basin_dunnian, &
+     &         Basin_soil_rechr, Basin_dunnian_gvr, Basin_ssin, Basin_sm2gvr, Basin_capwaterin, Basin_dunnian, &
      &         Basin_slowflow, Basin_slstor, Basin_cap_up_max, Basin_soil_moist_tot, Basin_gvr2sm, Et_type, Basin_lakeprecip
         READ ( Restart_inunit ) Basin_prefflow, Basin_pref_flow_infil, Basin_pref_stor, Basin_gvr2pfr, Basin_dunnian_pfr
         READ ( Restart_inunit ) Basin_dndunnianflow, Basin_dninterflow, Basin_dncascadeflow, Basin_lakeinsz, Basin_lakeprecip

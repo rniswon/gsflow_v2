@@ -53,7 +53,7 @@
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_water_balance
 !***********************************************************************
-      Version_water_balance = 'water_balance.f90 2020-04-15 17:40:00Z'
+      Version_water_balance = 'water_balance.f90 2020-04-21 16:43:00Z'
       CALL print_module(Version_water_balance, 'Water Balance Computations  ', 90 )
       MODNAME_WB = 'water_balance'
 
@@ -154,7 +154,7 @@
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Soil_to_gw, Soil_to_ssr, &
      &    Infil, Soil_moist_max, Ssr_to_gw, Ssres_flow, Basin_soil_to_gw, Soil_moist, Ssres_stor, &
      &    Slow_flow, Basin_perv_et, Basin_ssflow, Basin_swale_et, Slow_stor, Ssres_in, Soil_rechr, &
-     &    Basin_lakeevap, Sroff, Hru_actet, Pkwater_equiv, Gwres_stor, Dprst_vol_open, Dprst_vol_clos
+     &    Basin_lakeevap, Sroff, Hru_actet, Pkwater_equiv, Gwres_stor, Dprst_vol_open, Dprst_vol_clos, Basin_sroff
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday, Nowtime
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_INTCP, ONLY: Hru_intcpstor, Basin_net_ppt, Basin_intcp_evap, Basin_changeover, &
@@ -167,7 +167,7 @@
       USE PRMS_SRUNOFF, ONLY: Basin_infil, Hru_hortn_cascflow, Upslope_hortonian, Hru_impervstor, &
      &    Basin_sroffp, Basin_sroffi, Basin_sroff_down, Use_sroff_transfer, Basin_cfgi_sroff, &
      &    Basin_hortonian_lakes, Basin_imperv_evap, Basin_imperv_stor, &
-     &    Basin_sroff, Hru_impervevap, Hortonian_flow, Hru_sroffp, Hru_sroffi, Imperv_stor_ante 
+     &    Hru_impervevap, Hortonian_flow, Hru_sroffp, Hru_sroffi, Imperv_stor_ante 
       USE PRMS_DPRST, ONLY: Dprst_stor_hru, Basin_dprst_sroff, Basin_dprst_evap, Basin_dprst_seep, &
      &    Dprst_evap_hru, Dprst_sroff_hru, Dprst_insroff_hru, Sro_to_dprst_perv, Dprst_seep_hru, &
      &    Dprst_area_clos, Dprst_in, Dprst_stor_ante

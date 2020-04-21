@@ -131,7 +131,7 @@
 !***********************************************************************
       muskingum_decl = 0
 
-      Version_muskingum = 'muskingum.f90 2019-09-26 17:18:00Z'
+      Version_muskingum = 'muskingum.f90 2020-04-21 16:41:00Z'
       IF ( Strmflow_flag==4 ) THEN
         MODNAME = 'muskingum'
       ELSE
@@ -184,14 +184,13 @@
       USE PRMS_BASIN, ONLY: CFS2CMS_CONV, Basin_area_inv
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_cms, Basin_gwflow_cfs, Basin_ssflow_cfs, &
      &    Basin_stflow_out, Basin_cfs, Basin_stflow_in, Basin_sroff_cfs, Seg_inflow, Seg_outflow, &
-     &    Seg_upstream_inflow, Seg_lateral_inflow, Flow_out
+     &    Seg_upstream_inflow, Seg_lateral_inflow, Flow_out, Basin_sroff
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_ROUTING, ONLY: Use_transfer_segment, Segment_delta_flow, Basin_segment_storage, &
      &    Obsin_segment, Segment_order, Tosegment, C0, C1, C2, Ts, Ts_i, Obsout_segment, &
      &    Flow_to_ocean, Flow_to_great_lakes, Flow_out_region, Flow_out_NHM, Segment_type, Flow_terminus, &
      &    Flow_to_lakes, Flow_replacement, Flow_in_region, Flow_in_nation, Flow_headwater, Flow_in_great_lakes
-      USE PRMS_SRUNOFF, ONLY: Basin_sroff
       USE PRMS_GWFLOW, ONLY: Basin_gwflow
       IMPLICIT NONE
 ! Functions

@@ -32,7 +32,7 @@
 !   Declared Variables
       DOUBLE PRECISION, SAVE :: Basin_sroff_down, Basin_sroff_upslope
       DOUBLE PRECISION, SAVE :: Basin_sroffi, Basin_sroffp
-      DOUBLE PRECISION, SAVE :: Basin_imperv_stor, Basin_imperv_evap, Basin_sroff, Basin_infil
+      DOUBLE PRECISION, SAVE :: Basin_imperv_stor, Basin_imperv_evap, Basin_infil
       DOUBLE PRECISION, SAVE :: Basin_hortonian, Basin_hortonian_lakes, Basin_contrib_fraction
       REAL, SAVE, ALLOCATABLE :: Contrib_fraction(:)
       REAL, SAVE, ALLOCATABLE :: Imperv_evap(:)
@@ -96,7 +96,7 @@
 !***********************************************************************
       srunoffdecl = 0
 
-      Version_srunoff = 'srunoff.f90 2020-04-17 15:47:00Z'
+      Version_srunoff = 'srunoff.f90 2020-04-21 16:42:00Z'
       IF ( Sroff_flag==1 ) THEN
         MODNAME = 'srunoff_smidx'
       ELSE
@@ -116,10 +116,6 @@
       CALL declvar_dble(MODNAME, 'basin_infil', 'one', 1, 'double', &
      &     'Basin area-weighted average infiltration to the capillary reservoirs', &
      &     'inches', Basin_infil)
-
-      CALL declvar_dble(MODNAME, 'basin_sroff', 'one', 1, 'double', &
-     &     'Basin area-weighted average surface runoff to the stream network', &
-     &     'inches', Basin_sroff)
 
       CALL declvar_dble(MODNAME, 'basin_hortonian', 'one', 1, 'double', &
      &     'Basin area-weighted average Hortonian runoff', &
@@ -212,8 +208,8 @@
       ENDIF
 
 ! frozen ground variables and parameters
+      ALLOCATE ( Frozen(Nhru) )
       IF ( Frozen_flag==1 .OR. Model==DOCUMENTATION ) THEN
-        ALLOCATE ( Frozen(Nhru) )
         CALL declvar_int(MODNAME, 'frozen', 'nhru', Nhru, 'integer', &
      &       'Flag for frozen ground (0=no; 1=yes)', &
      &       'none', Frozen)
@@ -316,7 +312,6 @@
         Basin_sroffi = 0.0D0
         Basin_sroffp = 0.0D0
         Basin_infil = 0.0D0
-        Basin_sroff = 0.0D0
         Basin_imperv_evap = 0.0D0
         Basin_imperv_stor = 0.0D0
         Basin_hortonian = 0.0D0
@@ -328,8 +323,8 @@
         Srp = 0.0
         Sri = 0.0
 
+        Frozen = 0
         IF ( Frozen_flag==1 ) THEN
-          Frozen = 0
           Cfgi = 0.0
           Cfgi_prev = 0.0
         ENDIF
@@ -406,7 +401,7 @@
      &    Hru_perv, Hru_imperv, Hru_percent_imperv, Hru_frac_perv, &
      &    Hru_area, Hru_type, Basin_area_inv, Hru_area_dble
       USE PRMS_CLIMATEVARS, ONLY: Potet, Tavgc
-      USE PRMS_FLOWVARS, ONLY: Sroff, Infil, Imperv_stor, Pkwater_equiv, Imperv_stor_max, Snowinfil_max
+      USE PRMS_FLOWVARS, ONLY: Sroff, Infil, Imperv_stor, Pkwater_equiv, Imperv_stor_max, Snowinfil_max, Basin_sroff
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Hru_intcpevap, Net_apply, Intcp_changeover
       USE PRMS_SNOW, ONLY: Snow_evap, Snowcov_area, Snowmelt, Pk_depth
@@ -873,7 +868,7 @@
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_sroff_down, Basin_sroff_upslope, Basin_sroffi, Basin_sroffp, &
-     &                            Basin_imperv_stor, Basin_imperv_evap, Basin_sroff, Basin_infil, Basin_hortonian, &
+     &                            Basin_imperv_stor, Basin_imperv_evap, Basin_infil, Basin_hortonian, &
      &                            Sri, Srp, Basin_hortonian_lakes, Basin_contrib_fraction
         WRITE ( Restart_outunit ) Hru_impervstor
         IF ( Frozen_flag==1 ) THEN
@@ -885,7 +880,7 @@
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Basin_sroff_down, Basin_sroff_upslope, Basin_sroffi, Basin_sroffp, &
-     &                          Basin_imperv_stor, Basin_imperv_evap, Basin_sroff, Basin_infil, Basin_hortonian, &
+     &                          Basin_imperv_stor, Basin_imperv_evap, Basin_infil, Basin_hortonian, &
      &                          Sri, Srp, Basin_hortonian_lakes, Basin_contrib_fraction
         READ ( Restart_inunit ) Hru_impervstor
         IF ( Frozen_flag==1 ) THEN ! could be problem for restart
