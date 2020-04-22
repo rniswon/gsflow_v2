@@ -268,8 +268,10 @@
             !??  IF ( frzen==1 ) robal = robal + Net_rain(i)
           ENDIF
         ENDIF
-        IF ( Cascade_flag>0 ) robal = robal + SNGL( Upslope_hortonian(i) - Hru_hortn_cascflow(i) &
-     &                                + Upslope_dprst_hortonian(i) )
+        IF ( Cascade_flag>0 ) THEN
+          robal = robal + SNGL( Upslope_hortonian(i) - Hru_hortn_cascflow(i) )
+          IF ( Dprst_flag==1 ) robal = robal + Upslope_dprst_hortonian(i)
+        ENDIF
         IF ( Dprst_flag==1 ) robal = robal - Dprst_evap_hru(i) + &
      &                               SNGL( Dprst_stor_ante(i) - Dprst_stor_hru(i) - Dprst_seep_hru(i) ) !- Dprst_in(i) - Dprst_insroff_hru(i)
         basin_robal = basin_robal + DBLE( robal )
