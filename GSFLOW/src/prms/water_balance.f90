@@ -53,7 +53,7 @@
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_water_balance
 !***********************************************************************
-      Version_water_balance = 'water_balance.f90 2020-04-21 16:43:00Z'
+      Version_water_balance = 'water_balance.f90 2020-04-22 16:43:00Z'
       CALL print_module(Version_water_balance, 'Water Balance Computations  ', 90 )
       MODNAME_WB = 'water_balance'
 
@@ -167,10 +167,10 @@
       USE PRMS_SRUNOFF, ONLY: Basin_infil, Hru_hortn_cascflow, Upslope_hortonian, Hru_impervstor, &
      &    Basin_sroffp, Basin_sroffi, Basin_sroff_down, Use_sroff_transfer, Basin_cfgi_sroff, &
      &    Basin_hortonian_lakes, Basin_imperv_evap, Basin_imperv_stor, &
-     &    Hru_impervevap, Hortonian_flow, Hru_sroffp, Hru_sroffi, Imperv_stor_ante 
+     &    Hru_impervevap, Hortonian_flow, Hru_sroffp, Hru_sroffi, Imperv_stor_ante
       USE PRMS_DPRST, ONLY: Dprst_stor_hru, Basin_dprst_sroff, Basin_dprst_evap, Basin_dprst_seep, &
      &    Dprst_evap_hru, Dprst_sroff_hru, Dprst_insroff_hru, Sro_to_dprst_perv, Dprst_seep_hru, &
-     &    Dprst_area_clos, Dprst_in, Dprst_stor_ante
+     &    Dprst_area_clos, Dprst_in, Dprst_stor_ante, Upslope_dprst_hortonian
       USE PRMS_SOILZONE, ONLY: Swale_actet, Dunnian_flow, Basin_sz2gw, &
      &    Perv_actet, Cap_infil_tot, Pref_flow_infil, Cap_waterin, Upslope_interflow, &
      &    Upslope_dunnianflow, Pref_flow, Pref_flow_stor, Soil_lower, Gvr2pfr, Basin_ssin, &
@@ -268,7 +268,8 @@
             !??  IF ( frzen==1 ) robal = robal + Net_rain(i)
           ENDIF
         ENDIF
-        IF ( Cascade_flag>0 ) robal = robal + SNGL( Upslope_hortonian(i) - Hru_hortn_cascflow(i) )
+        IF ( Cascade_flag>0 ) robal = robal + SNGL( Upslope_hortonian(i) - Hru_hortn_cascflow(i) &
+     &                                + Upslope_dprst_hortonian(i) )
         IF ( Dprst_flag==1 ) robal = robal - Dprst_evap_hru(i) + &
      &                               SNGL( Dprst_stor_ante(i) - Dprst_stor_hru(i) - Dprst_seep_hru(i) ) !- Dprst_in(i) - Dprst_insroff_hru(i)
         basin_robal = basin_robal + DBLE( robal )
@@ -276,6 +277,7 @@
           IF ( Dprst_flag==1 ) THEN
             dprst_hru_wb = Dprst_stor_ante(i) - Dprst_stor_hru(i) - Dprst_seep_hru(i) - Dprst_sroff_hru(i) + Dprst_in(i) &
      &                     - DBLE( Dprst_evap_hru(i) ) + DBLE( Dprst_insroff_hru(i) )
+            IF ( Cascade_flag>0 ) dprst_hru_wb = dprst_hru_wb + Upslope_dprst_hortonian(i)
             Basin_dprst_wb = Basin_dprst_wb + dprst_hru_wb*harea
             WRITE ( BALUNT, * ) 'dprst', dprst_hru_wb, Dprst_stor_hru(i), Dprst_stor_hru(i), &
      &              Dprst_seep_hru(i), Dprst_evap_hru(i), Dprst_sroff_hru(i), Snowmelt(i), Net_rain(i), &
@@ -366,7 +368,7 @@
         hru_in = DBLE( Hru_ppt(i) )
         IF ( Cascade_flag>0 ) THEN
           hru_out = hru_out + DBLE( Hru_sz_cascadeflow(i) ) + Hru_hortn_cascflow(i)
-          hru_in = hru_in + Upslope_dunnianflow(i) + Upslope_interflow(i) + Upslope_hortonian(i)
+          hru_in = hru_in + Upslope_dunnianflow(i) + Upslope_interflow(i) + Upslope_hortonian(i) !+ Upslope_dprst_hortonian(i) ??
         ENDIF
         IF ( Cascadegw_flag>0 ) THEN
           hru_out = hru_out + Hru_gw_cascadeflow(i)
@@ -378,11 +380,11 @@
         IF ( DABS(wbal)>DTOOSMALL ) THEN
           WRITE ( BALUNT, * ) 'Possible HRU water balance issue:', wbal, '; HRU:', i, ' hru_type:', Hru_type(i), '; area:', harea
           WRITE ( BALUNT, * ) Sroff(i), Gwres_flow(i), Ssres_flow(i), Hru_actet(i), Gwres_sink(i), &
-     &            Hru_storage_ante(i), Hru_storage(i), Hru_type(i),  Pfr_dunnian_flow(i), Intcp_changeover(i)
+     &            Hru_storage_ante(i), Hru_storage(i), Hru_type(i),  Pfr_dunnian_flow(i), Intcp_changeover(i), Snowmelt(i)
           !WRITE ( BALUNT, * ) Gwstor_minarea_wb(i)
           WRITE ( BALUNT, * ) Soil_moist_tot(i), Hru_intcpstor(i), Gwres_stor(i), Pkwater_equiv(i), Hru_impervstor(i)
           IF ( Cascade_flag>0 ) THEN
-            WRITE ( BALUNT, * ) Hru_sz_cascadeflow(i), Upslope_dunnianflow(i), Upslope_interflow(i)
+            WRITE ( BALUNT, * ) Hru_sz_cascadeflow(i), Upslope_dunnianflow(i), Upslope_interflow(i), Upslope_dprst_hortonian(i)
             WRITE ( BALUNT, * ) Upslope_hortonian(i), Hru_hortn_cascflow(i)
           ENDIF
           IF ( Cascadegw_flag>0 ) WRITE ( BALUNT, * ) Gw_upslope(i)/DBLE(harea), Hru_gw_cascadeflow(i)

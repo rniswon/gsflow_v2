@@ -96,7 +96,7 @@
 !***********************************************************************
       srunoffdecl = 0
 
-      Version_srunoff = 'srunoff.f90 2020-04-21 16:42:00Z'
+      Version_srunoff = 'srunoff.f90 2020-04-22 16:42:00Z'
       IF ( Sroff_flag==1 ) THEN
         MODNAME = 'srunoff_smidx'
       ELSE
@@ -638,7 +638,7 @@
 !***********************************************************************
       SUBROUTINE compute_infil(Net_rain, Net_ppt, Imperv_stor, Imperv_stor_max, Snowmelt, &
      &                         Snowinfil_max, Net_snow, Pkwater_equiv, Infil, Hru_type, Intcp_changeover)
-      USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp
+      USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp, Perv_frac
       USE PRMS_SNOW, ONLY: Pptmix_nopack
       USE PRMS_BASIN, ONLY: NEARZERO, DNEARZERO
       USE PRMS_MODULE, ONLY: Cascade_flag
@@ -655,9 +655,9 @@
 ! Local Variables
       REAL :: avail_water
 !***********************************************************************
-! compute runoff from cascading Hortonian flow
+! compute runoff from cascading Hortonian flow, all upslope goes to pervious
       IF ( Cascade_flag>0 ) THEN
-        avail_water = SNGL( Upslope_hortonian(Ihru) )
+        avail_water = SNGL( Upslope_hortonian(Ihru)/Perv_frac )
         IF ( avail_water>0.0 ) THEN
           Infil = Infil + avail_water
           IF ( Hru_type==1 ) CALL perv_comp(avail_water, avail_water, Infil, Srp)

@@ -72,7 +72,7 @@
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: paramstring
       REAL, ALLOCATABLE :: real_parameter_values(:)
 !***********************************************************************
-      Version_read_control_file = 'read_control_file.f90 2018-06-07 10:44:00Z'
+      Version_read_control_file = 'read_control_file.f90 2020-04-21 10:44:00Z'
 
       ! control filename cannot include blanks
       CALL get_control_filename(Model_control_file, nchars)
@@ -715,7 +715,7 @@
       Control_parameter_data(i)%data_type = 4
       i = i + 1
       Control_parameter_data(i)%name = 'radtrncf_dynamic'
-      Radtrncf_dynamic = 'dynradtrnch'
+      Radtrncf_dynamic = 'dynradtrncf'
       Control_parameter_data(i)%values_character(1) = Radtrncf_dynamic
       Control_parameter_data(i)%data_type = 4
       i = i + 1
