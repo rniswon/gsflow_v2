@@ -53,7 +53,7 @@
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_water_balance
 !***********************************************************************
-      Version_water_balance = 'water_balance.f90 2020-04-22 16:43:00Z'
+      Version_water_balance = 'water_balance.f90 2020-04-23 16:43:00Z'
       CALL print_module(Version_water_balance, 'Water Balance Computations  ', 90 )
       MODNAME_WB = 'water_balance'
 
@@ -190,7 +190,7 @@
 ! Local Variables
       INTEGER :: i, k
       REAL :: last_sm, last_ss, soilbal, perv_frac, gvrbal, test, waterin, waterout, hrubal
-      REAL :: delstor, robal
+      REAL :: delstor, robal, availh2o
       DOUBLE PRECISION :: basin_bal, bsmbal, soil_in, gwbal, gwup, basin_robal, bsnobal
       DOUBLE PRECISION :: hru_out, hru_in, wbal, delta_stor, pptbal, brobal, dprst_hru_wb, harea
       CHARACTER(LEN=20), PARAMETER :: fmt1 = '(A, I5, 2("/",I2.2))'
@@ -252,28 +252,24 @@
           bsnobal = bsnobal + DBLE(hrubal)*harea
         ENDIF
 
-        robal = Snowmelt(i) - Hortonian_flow(i) & !includes dprst runoff, if any
-     &          - Infil(i)*perv_frac - Hru_impervevap(i) + Imperv_stor_ante(i) - Hru_impervstor(i) + Intcp_changeover(i)
-        IF ( Use_sroff_transfer==1 ) robal = robal + Net_apply(i)*perv_frac
-        IF ( Net_ppt(i)>0.0 ) THEN
-          IF ( Pptmix_nopack(i)==1 ) THEN
-            robal = robal + Net_rain(i)
-          ELSEIF ( Snowmelt(i)<NEARZERO .AND. Pkwater_equiv(i)<DNEARZERO) THEN
-            IF ( Snow_evap(i)<NEARZERO ) THEN
-              robal = robal + Net_ppt(i)
-            ELSEIF ( Net_snow(i)<NEARZERO ) THEN
-              robal = robal + Net_rain(i)
-            ENDIF
-            !IF ( Net_snow(i)<NEARZERO ) robal = robal + Net_rain(i)
-            !??  IF ( frzen==1 ) robal = robal + Net_rain(i)
-          ENDIF
-        ENDIF
+        availh2o = Intcp_changeover(i)
         IF ( Cascade_flag>0 ) THEN
-          robal = robal + SNGL( Upslope_hortonian(i) - Hru_hortn_cascflow(i) )
-          IF ( Dprst_flag==1 ) robal = robal + Upslope_dprst_hortonian(i)
+          availh2o = availh2o + SNGL( Upslope_hortonian(i) )
+          IF ( Dprst_flag==1 ) availh2o = availh2o + SNGL( Upslope_dprst_hortonian(i) )
         ENDIF
+        IF ( Pptmix_nopack(i)==1 ) availh2o = availh2o + Net_rain(i)
+        IF ( Snowmelt(i)>0.0 ) THEN
+          availh2o = availh2o + Snowmelt(i)
+          IF ( Pkwater_equiv(i)<DNEARZERO .AND. Net_ppt(i)-Net_snow(i)>0.0 ) availh2o = availh2o + Net_ppt(i)
+        ELSEIF ( Pkwater_equiv(i)<DNEARZERO ) THEN
+          IF ( Net_snow(i)<NEARZERO .AND. Net_rain(i)>0.0 ) availh2o = availh2o + Net_rain(i)
+        ENDIF
+        IF ( Use_sroff_transfer==1 ) availh2o = availh2o + Net_apply(i)*perv_frac
+
+        robal = availh2o - Hortonian_flow(i) & !includes dprst runoff, if any
+     &          - Infil(i)*perv_frac - Hru_impervevap(i) + Imperv_stor_ante(i) - Hru_impervstor(i)
         IF ( Dprst_flag==1 ) robal = robal - Dprst_evap_hru(i) + &
-     &                               SNGL( Dprst_stor_ante(i) - Dprst_stor_hru(i) - Dprst_seep_hru(i) ) !- Dprst_in(i) - Dprst_insroff_hru(i)
+     &                               SNGL( Dprst_stor_ante(i) - Dprst_stor_hru(i) - Dprst_seep_hru(i) )
         basin_robal = basin_robal + DBLE( robal )
         IF ( ABS(robal)>TOOSMALL ) THEN
           IF ( Dprst_flag==1 ) THEN

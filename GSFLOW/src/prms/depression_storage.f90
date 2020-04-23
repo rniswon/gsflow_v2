@@ -424,7 +424,7 @@
      &    Basin_recharge, Basin_sroff, Pkwater_equiv
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_SNOW, ONLY: Snow_evap, Snowmelt, Pptmix_nopack
-      USE PRMS_INTCP, ONLY: Net_rain, Hru_intcpevap, Intcp_changeover, Net_rain, Net_ppt, Net_snow
+      USE PRMS_INTCP, ONLY: Net_rain, Hru_intcpevap, Intcp_changeover, Net_rain, Net_snow, Net_ppt
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Frozen, Basin_hortonian, Basin_hortonian_lakes, &
      &    Basin_sroff_down, Basin_sroff_upslope, Hortonian_flow, Hortonian_lakes, Hru_hortn_cascflow, &
      &    Hru_sroffp, Hru_sroffi
@@ -487,17 +487,14 @@
           Dprst_in(i) = 0.0D0
           runoff = 0.0D0
           avail_et = Potet(i) - Snow_evap(i) - Hru_intcpevap(i) - Hru_impervevap(i)
-          availh2o = Intcp_changeover(i) + Snowmelt(i)
-          IF ( Net_ppt(i)>0.0 ) THEN
-            IF ( Pptmix_nopack(i)==1 ) THEN
-              availh2o = availh2o + Net_rain(i)
-            ELSEIF ( Snowmelt(i)<NEARZERO .AND. Pkwater_equiv(i)<DNEARZERO) THEN
-              IF ( Snow_evap(i)<NEARZERO ) THEN
-                availh2o = availh2o + Net_ppt(i)
-              ELSEIF ( Net_snow(i)<NEARZERO ) THEN
-                availh2o = availh2o + Net_rain(i)
-              ENDIF
-            ENDIF
+          availh2o = Intcp_changeover(i)
+          IF ( Cascade_flag>0 ) availh2o = availh2o + Upslope_dprst_hortonian(i)
+          IF ( Pptmix_nopack(i)==1 ) availh2o = availh2o + Net_rain(i)
+          IF ( Snowmelt(i)>0.0 ) THEN
+            availh2o = availh2o + Snowmelt(i)
+            IF ( Pkwater_equiv(i)<DNEARZERO .AND. Net_ppt(i)-Net_snow(i)>0.0 ) availh2o = availh2o + Net_ppt(i)
+          ELSEIF ( Pkwater_equiv(i)<DNEARZERO ) THEN
+            IF ( Net_snow(i)<NEARZERO .AND. Net_rain(i)>0.0 ) availh2o = availh2o + Net_rain(i)
           ENDIF
           Dprst_evap_hru(i) = 0.0
           Dprst_sroff_hru(i) = 0.0D0

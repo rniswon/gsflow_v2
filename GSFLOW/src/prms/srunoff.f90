@@ -96,7 +96,7 @@
 !***********************************************************************
       srunoffdecl = 0
 
-      Version_srunoff = 'srunoff.f90 2020-04-22 16:42:00Z'
+      Version_srunoff = 'srunoff.f90 2020-04-23 16:42:00Z'
       IF ( Sroff_flag==1 ) THEN
         MODNAME = 'srunoff_smidx'
       ELSE
@@ -449,8 +449,8 @@
 !     eventually add code for lake area less than hru_area
 !     that includes soil_moist for fraction of hru_area that is dry bank
           ! Sanity check
-          IF ( Infil(i)+Sroff(i)+Imperv_stor(i)+Imperv_evap(i)>0.0 ) &
-     &         PRINT *, 'srunoff lake ERROR', Infil(i), Sroff(i), Imperv_stor(i), Imperv_evap(i), i
+!          IF ( Infil(i)+Sroff(i)+Imperv_stor(i)+Imperv_evap(i)>0.0 ) &
+!     &         PRINT *, 'srunoff lake ERROR', Infil(i), Sroff(i), Imperv_stor(i), Imperv_evap(i), i
           IF ( Cascade_flag>0 ) THEN
             Hortonian_lakes(i) = Upslope_hortonian(i)
             Basin_hortonian_lakes = Basin_hortonian_lakes + Hortonian_lakes(i)*Hruarea_dble
@@ -474,10 +474,9 @@
         ENDIF
 
         avail_et = Potet(i) - Snow_evap(i) - Hru_intcpevap(i)
-        availh2o = Intcp_changeover(i) + Net_rain(i)
-
         frzen = 0
         IF ( Frozen_flag==1 ) THEN
+          availh2o = Intcp_changeover(i) + Net_rain(i) + Snowmelt(i)
           IF ( Tavgc(i)>0.0 ) THEN
             cfgi_k = 0.5
           ELSE
@@ -491,9 +490,9 @@
             frzen = 1
             ! depression storage states are not changed if frozen
             IF ( Cascade_flag>0 ) THEN
-              cfgi_sroff = (Snowmelt(i) + availh2o + Upslope_hortonian(i))*Hruarea
+              cfgi_sroff = (availh2o + Upslope_hortonian(i))*Hruarea
             ELSE
-              cfgi_sroff = (Snowmelt(i) + availh2o)*Hruarea
+              cfgi_sroff = availh2o*Hruarea
             ENDIF
             IF ( Use_sroff_transfer==1 ) cfgi_sroff = cfgi_sroff + Net_apply(i)*Hruarea
             runoff = runoff + cfgi_sroff
@@ -662,9 +661,8 @@
           Infil = Infil + avail_water
           IF ( Hru_type==1 ) CALL perv_comp(avail_water, avail_water, Infil, Srp)
         ENDIF
-      ELSE
-        avail_water = 0.0
       ENDIF
+      avail_water = 0.0
 
 ! compute runoff from canopy changeover water
       IF ( Intcp_changeover>0.0 ) THEN
