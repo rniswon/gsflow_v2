@@ -108,7 +108,7 @@
 !***********************************************************************
       gsfsumdecl = 0
 
-      Version_gsflow_sum = 'gsflow_sum.f90 2020-04-21 16:45:00Z'
+      Version_gsflow_sum = 'gsflow_sum.f90 2020-04-30 16:45:00Z'
       CALL print_module(Version_gsflow_sum, 'GSFLOW Output CSV Summary   ', 90)
       MODNAME = 'gsflow_sum'
 
@@ -915,7 +915,7 @@
      &       Csv_output_file(:1)==CHAR(0) ) Csv_output_file = 'gsflow.csv'
 
         CALL PRMS_open_output_file(Balance_unt, Csv_output_file, 'csv_output_file', 0, ios)
-        IF ( ios/=0 ) STOP
+        IF ( ios/=0 ) ERROR STOP -1
       ENDIF
  
 ! Open the GSF volumetric balance report file
@@ -927,7 +927,7 @@
       IF ( Gsflow_output_file(:1)==' ' .OR. Gsflow_output_file(:1)==CHAR(0) ) Gsflow_output_file = 'gsflow.out'
 
       CALL PRMS_open_output_file(Gsf_unt, Gsflow_output_file, 'gsflow_output_file', 0, ios)
-      IF ( ios/=0 ) STOP
+      IF ( ios/=0 ) ERROR STOP -1
       nc = numchars(Gsflow_output_file)
       IF ( Print_debug>-1 ) PRINT 9001, 'Writing GSFLOW Water Budget File: ', Gsflow_output_file(:nc)
       IF ( Print_debug>-2 ) WRITE ( Logunt, 9001 ) 'Writing GSFLOW Water Budget File: ', Gsflow_output_file(:nc)

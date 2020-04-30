@@ -65,7 +65,7 @@
 !***********************************************************************
       prms2mfdecl = 0
 
-      Version_gsflow_prms2mf = 'gsflow_prms2mf.f90 2019-10-30 14:24:00Z'
+      Version_gsflow_prms2mf = 'gsflow_prms2mf.f90 2020-40-30 14:24:00Z'
       CALL print_module(Version_gsflow_prms2mf, 'GSFLOW PRMS to MODFLOW      ', 90)
       MODNAME = 'gsflow_prms2mf'
 
@@ -217,7 +217,7 @@
           Segment_pct_area(i) = 1.0D0 / DBLE( Numreach_segment(i) )
         ENDIF
       ENDDO
-      IF ( ierr==1 ) STOP
+      IF ( ierr==1 ) ERROR STOP -1
 
 !     IF ( get param(MODNAME, 'reach_segment', Nreach, 'integer', Reach_segment)/=0 ) CALL read_error(2, 'reach_segment')
 
@@ -321,7 +321,7 @@
           ENDIF
         ENDIF
       ENDDO
-      IF ( ierr==1 ) STOP
+      IF ( ierr==1 ) ERROR STOP -1
 
       IF ( Nhru/=Nhrucell ) THEN
 ! way to adjust gvr_hru_pct, rsr
@@ -336,7 +336,7 @@
       ELSE
         Gvr_hru_pct_adjusted = 1.0D0
       ENDIF
-!      STOP
+!      ERROR STOP -1
 
       Totalarea = 0.0D0
       DO ii = 1, Active_hrus
@@ -376,7 +376,7 @@
           ENDIF
         ENDIF
       ENDDO
-      IF ( ierr==1 ) STOP
+      IF ( ierr==1 ) ERROR STOP -1
 
       Totalarea = Totalarea*Basin_area_inv
       IF ( Print_debug>-2 ) WRITE ( Logunt, 9003 ) (Totalarea-1.0D0)*100.0D0

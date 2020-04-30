@@ -58,7 +58,7 @@
 !***********************************************************************
       gsfbuddecl = 0
 
-      Version_gsflow_budget = 'gsflow_budget.f90 2020-04-21 16:45:00Z'
+      Version_gsflow_budget = 'gsflow_budget.f90 2020-04-30 16:45:00Z'
       CALL print_module(Version_gsflow_budget, 'GSFLOW Output Budget Summary', 90)
       MODNAME = 'gsflow_budget'
 
@@ -195,7 +195,7 @@
 
       IF ( Nreach/=NSTRM ) THEN
         PRINT *, 'ERROR, nreach must equal to NSTRM', Nreach, NSTRM
-        STOP
+        ERROR STOP -1
       ENDIF
 
       Reach_cfs = 0.0 ! dimension NSTRM

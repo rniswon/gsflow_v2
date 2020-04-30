@@ -118,7 +118,7 @@
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam, getdim
-      EXTERNAL :: read_error, print_module, PRMS_open_module_file, declvar_dble, declvar_real, declvar_int
+      EXTERNAL :: read_error, print_module, PRMS_open_module_file, declvar_dble, declvar_real, declvar_int, error_stop
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_soilzone
 !***********************************************************************
@@ -449,7 +449,7 @@
 !     &     'decimal fraction', Snowevap_aet_frac)
 
       IF ( GSFLOW_flag==1 .OR. Model==DOCUMENTATION ) THEN
-        IF ( Nhrucell<-1 ) STOP 'ERROR, dimension nhrucell not specified > 0'
+        IF ( Nhrucell<-1 ) CALL error_stop('dimension nhrucell not specified > 0')
         ALLOCATE ( Gravity_stor_res(Nhrucell) )
         CALL declvar_real(MODNAME, 'gravity_stor_res', 'nhrucell', Nhrucell, 'real', &
      &       'Storage in each gravity-flow reservoir', &
@@ -1017,7 +1017,7 @@
           IF ( Frozen(i)==1 ) THEN
             IF ( Hru_type(i)==3 ) THEN
               PRINT *, 'ERROR, a swale HRU cannot be frozen for CFGI, HRU:', i
-              STOP
+              ERROR STOP -2
             ENDIF
             cfgi_frozen_hru = 1
           ENDIF

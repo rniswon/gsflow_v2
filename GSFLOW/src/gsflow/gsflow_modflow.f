@@ -77,7 +77,7 @@ C
 !***********************************************************************
       gsfdecl = 0
 
-      Version_gsflow_modflow = 'gsflow_modflow.f 2019-10-30 14:00:00Z'
+      Version_gsflow_modflow = 'gsflow_modflow.f 2020-04-30 14:00:00Z'
 C
 C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
       IF ( Print_debug>-2 ) THEN
@@ -134,7 +134,7 @@ C1------USE package modules.
       EXTERNAL :: SET_STRESS_DATES
       EXTERNAL :: print_module, SETMFTIME
       EXTERNAL :: SETCONVFACTORS, check_gvr_cell_pct
-      EXTERNAL :: gsflow_modflow_restart, set_cell_values
+      EXTERNAL :: gsflow_modflow_restart, set_cell_values, error_stop
 ! Local Variables
       INTEGER :: MAXUNIT, NC
 !     INTEGER :: kkper_new
@@ -318,7 +318,7 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
 !        ierr = 1
 !      ENDIF
       ENDIF
-      IF ( ierr==1 ) STOP 'ERROR, INVALID PACKAGE SELECTION'
+      IF ( ierr==1 ) CALL error_stop('INVALID PACKAGE SELECTION')
 
       IF ( IUNIT(22).GT.0 ) Have_lakes = 1
       IF(IUNIT(1).GT.0) CALL GWF2BCF7AR(IUNIT(1),IGRID)
@@ -528,10 +528,10 @@ C7------SIMULATE EACH STRESS PERIOD.
         END IF
         CALL READ_STRESS() ! second time in run, read restart
         IF ( Model .NE. 2 ) THEN    !RGN added check for MF only mode 2/21/19
-          IF ( ISSFLG(KKPER).EQ.1 ) STOP
-     &       'ERROR, cannot run steady state after first stress period.'
+          IF ( ISSFLG(KKPER).EQ.1 ) CALL error_stop
+     &         ('cannot run steady state after first stress period.')
           IF ( ISSFLG(1).EQ.1 ) Delt_save = DELT
-          IF ( DELT.NE.Delt_save ) STOP 'Error, cannot change DELT'
+          IF ( DELT.NE.Delt_save ) CALL error_stop('cannot change DELT')
         END IF
       ENDIF
       iss = ISSFLG(KKPER)
@@ -1367,7 +1367,7 @@ C7------SIMULATE EACH STRESS PERIOD.
           IF ( ABS(Timestep_seconds-DELT*Mft_to_sec)>NEARZERO ) THEN
             WRITE (IOUT, 9003) Timestep_seconds, DELT, Mft_to_sec
             PRINT 9003, Timestep_seconds, DELT, Mft_to_sec
-            STOP
+            ERROR STOP -1
           ENDIF
         ENDIF
 C
@@ -1475,7 +1475,7 @@ C
       USE OBSBASMODULE, ONLY: OBSTART,ITS
       IMPLICIT NONE
       ! Functions
-      EXTERNAL :: READ_STRESS, RESTART1READ
+      EXTERNAL :: READ_STRESS, RESTART1READ, error_stop
       INTEGER, EXTERNAL :: gsfrun
       INTRINSIC :: INT, DBLE
       INTEGER, EXTERNAL :: compute_julday, control_integer_array
@@ -1500,7 +1500,7 @@ C
       IF ( mfstrt_jul>start_jul ) THEN
         PRINT *, 'ERROR, modflow_time_zero > start_time',
      &           mfstrt_jul, start_jul
-        STOP
+        ERROR STOP -1
       ENDIF
 
       IF ( mfstrt_jul==start_jul .AND. Init_vars_from_file==1 .AND.
@@ -1519,13 +1519,13 @@ C
       DO i = 1, NPER
         plen = PERLEN(i)*Mft_to_days
         IF ( ISSFLG(i)==1 ) THEN
-          IF ( i/=1 ) STOP 'ERROR, only first time step can be SS'
+          IF ( i/=1 ) CALL error_stop('only first time step can be SS')
           Stress_dates(i) = Stress_dates(i) - plen
           KPER = 1
           CALL READ_STRESS()
           IF ( Init_vars_from_file==0 ) THEN
             Steady_state = 1
-            IF ( gsfrun()/=0 ) STOP 'ERROR, steady state failed'
+            IF ( gsfrun()/=0 ) CALL error_stop('steady state failed')
             Steady_state = 0
  !           TOTIM = plen !RGN 9/4/2018 TOTIM needs to stay in MF time units
             TOTIM = PERLEN(i)  !RGN 9/4/2018 TOTIM needs to stay in MF time units
@@ -1601,7 +1601,8 @@ C
         IF ( Iunit(69)==0 ) THEN
           IF ( Print_debug>-2 ) WRITE(Logunt,111)
           PRINT 111
-          STOP
+          CALL error_stop('Restart option active and no restart file'//
+     +         'listed in Name File. Model stopping')
         ENDIF
         CALL RESTART1READ()
       END IF
@@ -1684,13 +1685,14 @@ C
       USE PRMS_MODULE, ONLY: Ngwcell
       USE PRMS_BASIN, ONLY: NEARZERO
       IMPLICIT NONE
+      EXTERNAL error_stop
 ! Local Variables
       INTEGER :: i, irow, icell, icol, ierr
 !***********************************************************************
       IF ( NROW*NCOL/=Ngwcell ) THEN
-        PRINT *, 'ERROR, dimension ngwcell not equal to NROW*NCOL',
+        CALL error_stop('Check for use of correct Parameter File')
+        PRINT *, '       dimension ngwcell not equal to NROW*NCOL',
      &           Ngwcell, NROW, NCOL
-        STOP '       Check for use of correct Parameter File'
       ENDIF
 
       ierr = 0
@@ -1725,6 +1727,7 @@ C
       USE GWFUZFMODULE, ONLY: IUZFBND
       IMPLICIT NONE
       INTRINSIC DBLE
+      EXTERNAL error_stop
 ! Local Variables
       INTEGER :: icell, ierr, i, irow, icol
       DOUBLE PRECISION :: pctdiff
@@ -1755,10 +1758,7 @@ C
         cell_pct(icell) = cell_pct(icell) + DBLE( Gvr_cell_pct(i) )
       ENDDO
 
-      IF ( ierr==1 ) THEN
-        PRINT *, 'ERROR, check gsflow.log for messages'
-        STOP
-      ENDIF
+      IF ( ierr==1 ) CALL error_stop('check gsflow.log for messages')
 
       Ncells = 0
       Totalarea_mf = 0.0D0
@@ -1799,6 +1799,7 @@ C
       IMPLICIT NONE
       INTRINSIC SNGL
       INTEGER, EXTERNAL :: control_integer_array
+      EXTERNAL error_stop
 ! Local Variables
       INTEGER :: j
 !***********************************************************************
@@ -1808,12 +1809,12 @@ C
      &       j, 'modflow_time_zero')/=0 ) THEN
           PRINT *, 'ERROR, modflow_time_zero, index:', j,
      &             'value: ', Modflow_time_zero(j)
-          STOP
+          ERROR STOP -1
         ENDIF
         IF ( j==1 ) THEN
           IF ( Modflow_time_zero(1)<0 ) THEN
-      !     STOP
-      !&    'ERROR, control parameter modflow_time_zero must be specified'
+      !     CALL error_stop
+      !&    ('control parameter modflow_time_zero must be specified')
             Modflow_time_zero = Starttime
             PRINT '(/, A)',
      &     'WARNING, modflow_time_zero not specified, set to start_time'
@@ -1838,7 +1839,7 @@ C
 !DANGER, not all years have 365 days
         Mft_to_sec = 86400.0D0*365.0D0
       ELSE
-        STOP '***ERROR, invalid MODFLOW Time Unit'
+        CALL error_stop('invalid MODFLOW Time Unit')
       ENDIF
       Mft_to_days = SNGL( Mft_to_sec/86400.0D0 )
       END SUBROUTINE SETMFTIME
@@ -1857,6 +1858,7 @@ C
      &    Gsflow_flag
       USE PRMS_BASIN, ONLY: FT2_PER_ACRE
       IMPLICIT NONE
+      EXTERNAL error_stop
 ! Local Variables
       REAL :: inch_to_mfl
       INTEGER :: i
@@ -1865,7 +1867,7 @@ C
         IF ( Model==2 .AND. (LENUNI==0.OR.ITMUNI==0) ) RETURN
         WRITE ( IOUT, 9001 ) LENUNI, ITMUNI
         PRINT 9001, LENUNI, ITMUNI
-        STOP
+        ERROR STOP -1
       ENDIF
 
       IF ( LENUNI==1 ) THEN
@@ -1886,7 +1888,7 @@ C
         Mfl2_to_acre = 328.0839895*328.0839895
         Mfl3_to_ft3 = 328.0839895D0**3.0D0
       ELSE
-        STOP '***ERROR, invalid MODFLOW Length unit'
+        CALL error_stop('invalid MODFLOW Length unit')
       ENDIF
       Mfl_to_inch = 1.0/inch_to_mfl
       Mfl2_to_acre = Mfl2_to_acre/FT2_PER_ACRE

@@ -8,16 +8,17 @@
       CHARACTER(LEN=68), PARAMETER :: &
      &  EQULS = '===================================================================='
       CHARACTER(LEN=11), PARAMETER :: MODNAME = 'gsflow_prms'
-      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.2.0 04/21/2020'
+      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.1.0 05/01/2020'
       CHARACTER(LEN=8), SAVE :: Process, Arg
       !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
       INTEGER, PARAMETER :: GSFLOW = 0, PRMS = 1, MODFLOW = 2
       INTEGER, PARAMETER :: DOCUMENTATION = 99
       CHARACTER(LEN=80), SAVE :: PRMS_versn
 ! Dimensions
+      INTEGER, SAVE :: Ncascade, Ncascdgw
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus
       INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval
-      INTEGER, SAVE :: Ncascade, Ncascdgw, Nsnow, NLAKES_MF, NSS_MF
+      INTEGER, SAVE :: Nsnow, NLAKES_MF
 ! Global
       INTEGER, SAVE :: Model, Process_flag, Call_cascade, call_modules
       INTEGER, SAVE :: Start_year, Start_month, Start_day, End_year, End_month, End_day
@@ -29,11 +30,11 @@
       INTEGER, SAVE :: Inputerror_flag, Timestep
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag
       INTEGER, SAVE :: Grid_flag, Logunt
-      INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, PRMS_flag, GSFLOW_flag
+      INTEGER, SAVE :: PRMS_flag, GSFLOW_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Nwateruse, Nexternal, Nconsumed, Npoigages, Prms_warmup
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
-      INTEGER, SAVE :: PRMS4_flag, Diversion2soil_flag
+      INTEGER, SAVE :: PRMS4_flag, Kper_mfo, Kkstp_mfo, Diversion2soil_flag
       INTEGER, SAVE :: mf_timestep, startday, endday, mf_nowtime, Number_timesteps, Have_lakes
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
       CHARACTER(LEN=80), SAVE :: Version_read_control_file, Version_read_parameter_file
@@ -52,8 +53,8 @@
       INTEGER, SAVE :: Init_vars_from_file, Save_vars_to_file, Orad_flag, Cascade_flag, Cascadegw_flag
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
-      INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, Frozen_flag, statsON_OFF
-      INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag
+      INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF
+      INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Csv_output_file, Model_control_file, Param_file
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Temp_module, Srunoff_module, Et_module
@@ -93,7 +94,7 @@
       EXTERNAL :: prms_summary, nhru_summary, module_doc, convert_params, read_error, nsub_summary
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
       INTEGER, EXTERNAL :: declparam, getparam, gsfdecl, gsfinit, gsfrun, gsfclean
-      EXTERNAL :: setdims, declvar_int, declvar_real, check_parameters, read_prms_data_file
+      EXTERNAL :: setdims, declvar_int, declvar_real, check_parameters, read_prms_data_file, error_stop
 ! Local Variables
       INTEGER :: i, iret, nc
 !***********************************************************************
@@ -111,7 +112,7 @@
           CALL DATE_AND_TIME(VALUES=Elapsed_time_start)
           Execution_time_start = Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
      &                           Elapsed_time_start(7) + Elapsed_time_start(8)*0.001
-          PRMS_versn = 'gsflow_prms.f90 2020-04-21 16:45:00Z'
+          PRMS_versn = 'gsflow_prms.f90 2020-05-01 10:10:00Z'
         ! Note, MODFLOW-only doesn't leave setdims
         CALL setdims()
       ELSEIF ( Process_flag==1 ) THEN  ! after setdims finished
@@ -148,7 +149,7 @@
      &        '     Snow Dynamics: snowcomp', /, &
      &        '    Surface Runoff: srunoff_smidx, srunoff_carea', /, &
      &        'Surface Depression: depression_storage', /, &
-&        '         Soil Zone: soilzone', /, &
+     &        '         Soil Zone: soilzone', /, &
      &        '       Groundwater: gwflow', /, &
      &        'Streamflow Routing: strmflow, strmflow_in_out, muskingum,', /, &
      &        '                    muskingum_lake, muskingum_mann', /, &
@@ -219,7 +220,7 @@
         IF ( Model==DOCUMENTATION ) THEN
           Init_vars_from_file = 0 ! make sure this is set so all variables and parameters are declared
           CALL module_doc()
-          STOP
+          STOP 0
         ENDIF
 
       ELSEIF ( Process_flag==2 ) THEN ! after declare finished
@@ -246,7 +247,7 @@
                 Gvr_cell_id(i) = i
               ENDDO
             ELSE
-              STOP 'ERROR, gvr_cell_id must be specified'
+              CALL error_stop('gvr_cell_id must be specified')
             ENDIF
           ENDIF
           call_modules = gsfinit()
@@ -254,12 +255,12 @@
           IF ( Have_lakes==1 .AND. Nlake/=NLAKES_MF ) THEN
             PRINT *, 'ERROR, NLAKES not equal to Nlake'
             PRINT *, '       NLAKES=', NLAKES_MF, '; Nlake=', Nlake
-            STOP
+            ERROR STOP -1
           ENDIF
 !          IF ( Nsegment/=NSS_MF ) THEN
 !            PRINT *, 'ERROR, NSS not equal to nsegment'
 !            PRINT *, '       NSS=', NSS_MF, '; nsegment=', Nsegment
-!            STOP
+!            ERROR STOP -1
 !          ENDIF
         ENDIF
 
@@ -301,7 +302,7 @@
         IF ( Init_vars_from_file>0 ) CLOSE ( Restart_inunit )
         IF ( Save_vars_to_file==1 ) THEN
           CALL PRMS_open_output_file(Restart_outunit, Var_save_file, 'var_save_file', 1, iret)
-          IF ( iret/=0 ) STOP
+          IF ( iret/=0 ) ERROR STOP -1
           CALL call_modules_restart(0)
         ENDIF
         IF ( GSFLOW_flag==1 ) THEN
@@ -384,7 +385,7 @@
         call_modules = frost_date()
         IF ( call_modules/=0 ) CALL module_error('frost_date', Arg, call_modules)
         IF ( Process_flag==0 ) CYCLE
-        IF ( Process_flag==3 ) STOP
+        IF ( Process_flag==3 ) STOP 0
       ENDIF
 
       IF ( Climate_swrad_flag==0 ) THEN
@@ -570,7 +571,7 @@
           CLOSE ( Logunt )
         ENDIF
         IF ( Save_vars_to_file>0 ) CLOSE ( Restart_outunit )
-        STOP
+        STOP 0
       ELSEIF ( Process_flag==1 ) THEN
         CALL read_parameter_file_params()
         IF ( Print_debug>-2 ) THEN
@@ -592,10 +593,11 @@
      &          'parameter_check_flag to 1 to verify that those calibration', &
      &          'parameters have valid and compatible values.'
         ENDIF
-        IF ( Parameter_check_flag==2 .OR. Inputerror_flag==1 ) STOP
+        IF ( Parameter_check_flag==2 ) STOP 0
+        IF ( Inputerror_flag==1 ) ERROR STOP -1
         IF ( Model==25 ) THEN
           CALL convert_params()
-          STOP
+          STOP 0
         ENDIF
         IF ( Print_debug>-2 ) THEN
           PRINT 4, 'Simulation time period:', Start_year, Start_month, Start_day, ' -', End_year, End_month, End_day, EQULS
@@ -705,14 +707,13 @@
 !***********************************************************************
 !     check module names
 !***********************************************************************
-      SUBROUTINE check_module_names()
+      SUBROUTINE check_module_names(Inputerror_flag)
       USE PRMS_MODULE, ONLY: Temp_module, Precip_module, Et_module, Solrad_module, &
      &    Transp_module, Srunoff_module, Strmflow_module
       IMPLICIT NONE
-! Local Variables
-      INTEGER :: ierr
+! Arguments
+      INTEGER, INTENT(INOUT) :: Inputerror_flag
 !***********************************************************************
-      ierr = 0
       IF ( Temp_module(:14)=='temp_1sta_prms' ) THEN
         PRINT *, 'WARNING, deprecated temp_module value, change temp_1sta_prms to temp_1sta'
         Temp_module = 'temp_1sta'
@@ -724,7 +725,7 @@
         Temp_module = 'temp_dist2'
       ELSEIF ( Temp_module(:9)=='temp_2sta' ) THEN
         PRINT *, 'ERROR, module temp_2sta_prms not available, use a different temp_module'
-        ierr = 1
+        Inputerror_flag = 1
       ENDIF
 
       IF ( Precip_module(:11)=='precip_prms' ) THEN
@@ -741,19 +742,19 @@
       IF ( Temp_module(:8)=='ide_dist' .AND. Precip_module(:8)/='ide_dist') THEN
         PRINT '(/,A,/,2A)', 'ERROR, if ide_dist is specified for temp_module,', &
      &        'it also must be specified for precip_module: ', Precip_module
-        ierr = 1
+        Inputerror_flag = 1
       ELSEIF ( Precip_module(:8)=='ide_dist' .AND. Temp_module(:8)/='ide_dist') THEN
         PRINT '(/,A,/,2A)', 'ERROR, if ide_dist is specified for precip_module,', &
      &        'it also must be specified for temp_module: ', Temp_module
-        ierr = 1
+        Inputerror_flag = 1
       ELSEIF ( Temp_module(:8)=='xyz_dist' .AND. Precip_module(:8)/='xyz_dist') THEN
         PRINT '(/,A,/,2A)', 'ERROR, if xyz_dist is specified for temp_module,', &
      &        'it also must be specified for precip_module: ', Precip_module
-        ierr = 1
+        Inputerror_flag = 1
       ELSEIF ( Precip_module(:8)=='xyz_dist' .AND. Temp_module(:8)/='xyz_dist') THEN
         PRINT '(/,A,/,2A)', 'ERROR, if xyz_dist is specified for precip_module,', &
      &        'it also must be specified for temp_module: ', Temp_module
-        ierr = 1
+        Inputerror_flag = 1
       ENDIF
 
       IF ( Transp_module(:18)=='transp_tindex_prms' ) THEN
@@ -769,7 +770,7 @@
         Et_module = 'potet_pan'
       ELSEIF ( Et_module(:15)=='potet_epan_prms' ) THEN
         PRINT *, 'ERROR, deprecated et_module value, change potet_epan_prms to potet_pan'
-        ierr = 1
+        Inputerror_flag = 1
       ELSEIF ( Et_module(:20)=='potet_hamon_hru_prms' ) THEN
         PRINT *, 'WARNING, deprecated et_module value, change potet_hamon_hru_prms to potet_hamon_hru'
         Et_module = 'potet_hamon'
@@ -805,9 +806,9 @@
         Strmflow_module = 'strmflow'
       ELSEIF ( Strmflow_module(:13)=='strmflow_lake' ) THEN
         PRINT *, 'ERROR, module strmflow_lake not available, use a different strmflow_module, such as muskingum_lake'
-        ierr = 1
+        Inputerror_flag = 1
       ENDIF
-      IF ( ierr==1 ) STOP
+
       END SUBROUTINE check_module_names
 
 !***********************************************************************
@@ -887,6 +888,6 @@
             ierr = 1
           ENDIF
         ENDIF
-        IF ( ierr==1 ) STOP
+        IF ( ierr==1 ) ERROR STOP -3
       ENDIF
       END SUBROUTINE call_modules_restart

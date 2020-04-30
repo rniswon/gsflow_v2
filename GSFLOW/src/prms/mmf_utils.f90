@@ -121,7 +121,7 @@
       INTRINSIC INDEX, TRIM
       ! Functions
       INTEGER, EXTERNAL :: numchars, isdeclared, getdim
-      EXTERNAL :: check_parameters_declared, read_error
+      EXTERNAL :: check_parameters_declared, read_error, error_stop
       ! Local Variables
       INTEGER :: comma, ndimen, nval, nvals, nvals2, declared, numvalues, type_flag, iset, i, itemp
       REAL :: temp
@@ -214,7 +214,7 @@
           Parameter_data(Num_parameters)%maximum_int = nvals
           Parameter_data(Num_parameters)%minimum_int = Parameter_data(Num_parameters)%default_int
         ELSE
-          STOP 'ERROR, bounded parameter not real type'
+          CALL error_stop('bounded parameter not real type')
         ENDIF
       ELSE
         IF ( type_flag==1 ) THEN
@@ -254,7 +254,7 @@
       ELSE
         PRINT *, 'ERROR, invalid data type: ', Data_type
         PRINT *, '       valid values are real, double, string, integer'
-        STOP
+        ERROR STOP -1
       ENDIF
       END SUBROUTINE set_data_type
 
@@ -305,7 +305,7 @@
       INTEGER, INTENT(IN) :: Numvalues
       ! Functions
       INTEGER, EXTERNAL :: numchars
-      EXTERNAL set_data_type
+      EXTERNAL set_data_type, error_stop
       ! Local Variables
       INTEGER type_flag
       INTEGER, SAVE :: init
@@ -320,7 +320,7 @@
       Num_variables = Num_variables + 1
       IF ( Num_variables>MAXVARIABLES ) THEN
         PRINT '(A,I0)', 'PRMS ERROR, maximum number of declared variables exceeded: ', MAXVARIABLES
-        STOP 'PRMS ERROR, maximum number of declared variables exceeded'
+        CALL error_stop('maximum number of declared variables exceeded')
       ENDIF
       Variable_data(Num_variables)%get_flag = 0
       Variable_data(Num_variables)%decl_flag = 1
@@ -337,7 +337,7 @@
       IF ( type_flag<1 .OR. type_flag>3 ) THEN
         PRINT *, 'ERROR, data type not implemented: ', Data_type, ' Variable: ', &
      &           Varname(:Variable_data(Num_variables)%var_name_nchars)
-        STOP
+        ERROR STOP -1
       ENDIF
       Variable_data(Num_variables)%data_flag = type_flag
 
@@ -545,7 +545,7 @@
         PRINT *, 'ERROR in: ', Modname, ', Variable: ', Varname, ' not declared'
         ierr = 1
       ENDIF
-      IF ( ierr==1 ) STOP
+      IF ( ierr==1 ) ERROR STOP -1
 
       END FUNCTION find_variable
 
@@ -570,7 +570,7 @@
         ENDIF
       ENDDO
       PRINT *, 'ERROR variable: ', Varname, ' not available'
-      STOP
+      ERROR STOP -1
       END FUNCTION getvar_id
 
 !***********************************************************************
@@ -595,7 +595,7 @@
         ENDIF
       ENDDO
       PRINT *, 'ERROR variable: ', Varname, ' not available'
-      STOP
+      ERROR STOP -1
       END FUNCTION getvartype
 
 !***********************************************************************
@@ -619,7 +619,7 @@
         ENDIF
       ENDDO
       PRINT *, 'ERROR in: getvarnvals, Variable: ', Varname, ' not declared'
-      STOP
+      ERROR STOP -1
       END FUNCTION getvarnvals
 
 !***********************************************************************
@@ -636,6 +636,7 @@
       REAL, INTENT(OUT) :: Values(Numvalues)
       ! Functions
       INTRINSIC TRIM
+      EXTERNAL error_stop
       ! Local Variables
       INTEGER :: type_flag, found, param_id, i, ierr
 !***********************************************************************
@@ -663,7 +664,7 @@
         PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' not declared'
         ierr = 1
       ENDIF
-      IF ( ierr==1 ) STOP
+      IF ( ierr==1 ) ERROR STOP -1
 
       type_flag = Parameter_data(param_id)%data_flag
 
@@ -687,7 +688,7 @@
         CALL getvalues_int(param_id, Numvalues, Values)
       ELSE
         PRINT *, 'Paramname: ', Paramname, ' type: ', type_flag
-        STOP 'Parameter type not implemented'
+        CALL error_stop('Parameter type not implemented')
       ENDIF
 
       getparam = 0
@@ -766,7 +767,7 @@
       ! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: String
       INTEGER, INTENT(OUT) :: Datetime(6)
-      EXTERNAL compute_gregorian
+      EXTERNAL compute_gregorian, error_stop
       ! Local variable
       INTEGER string_length
 !***********************************************************************
@@ -784,7 +785,7 @@
         IF ( String(:5)=='start' ) THEN
           Datetime = Starttime
         ELSE
-          STOP 'ERROR, invalid call to dattim'
+          CALL error_stop('invalid call to dattim')
         ENDIF
       ENDIF
       END SUBROUTINE dattim
@@ -801,9 +802,10 @@
       CHARACTER(LEN=*), INTENT(IN) :: Dimname, Desc
       ! Functions
       INTEGER, EXTERNAL :: numchars
+      EXTERNAL error_stop
 !***********************************************************************
       Num_dimensions = Num_dimensions + 1
-      IF ( Num_dimensions>MAXDIMENSIONS ) STOP 'ERROR, hard-coded number of dimensions exceeded, report to developers'
+      IF ( Num_dimensions>MAXDIMENSIONS ) CALL error_stop('hard-coded number of dimensions exceeded, report to developers')
       Dimension_data(Num_dimensions)%name = Dimname
       Dimension_data(Num_dimensions)%default = Defval
       Dimension_data(Num_dimensions)%maximum = Maxval
@@ -899,6 +901,7 @@
       INTEGER, INTENT(OUT) :: Parmval
       ! Functions
       INTRINSIC :: TRIM
+      EXTERNAL error_stop
       ! Local Variables
       INTEGER :: i, found
 !***********************************************************************
@@ -912,7 +915,7 @@
       ENDDO
       IF ( found==0 ) THEN
         Num_control_parameters = Num_control_parameters + 1
-        IF ( Num_control_parameters > Max_num_control_parameters ) STOP 'ERROR, exceeded maximum number of control parameters'
+        IF ( Num_control_parameters > Max_num_control_parameters ) CALL error_stop('exceeded maximum number of control parameters')
         PRINT *, 'WARNING, control parameter not in Control File: ', TRIM(Paramname), ', set to 0'
         Control_parameter_data(Num_control_parameters)%read_flag = 2 ! set to default
         Control_parameter_data(Num_control_parameters)%data_type = 1
@@ -937,6 +940,8 @@
       INTEGER, INTENT(IN) :: Array_index
       CHARACTER(LEN=*), INTENT(IN) :: Paramname
       INTEGER, INTENT(OUT) :: Parmval
+      ! Functions
+      EXTERNAL error_stop
       ! Local Variables
       INTEGER :: found, i
 !***********************************************************************
@@ -949,8 +954,8 @@
         ENDIF
       ENDDO
       IF ( found==0 ) THEN
-        PRINT *, 'ERROR, invalid array control parameter: ', TRIM(Paramname)
-        STOP 'execution terminated'
+        PRINT *, 'invalid array control parameter: ', TRIM(Paramname)
+        CALL error_stop('execution terminated')
       ENDIF
 
       control_integer_array = 0
@@ -1006,6 +1011,8 @@
       INTEGER, INTENT(IN) :: Array_index
       CHARACTER(LEN=*), INTENT(IN) :: Paramname
       CHARACTER(LEN=*), INTENT(OUT) :: Parmval
+      ! Functions
+      EXTERNAL error_stop
       ! Local Variables
       INTEGER :: found, i
 !***********************************************************************
@@ -1018,8 +1025,8 @@
         ENDIF
       ENDDO
       IF ( found==0 ) THEN
-        PRINT *, 'ERROR, invalid array control parameter: ', TRIM(Paramname)
-        STOP 'execution terminated'
+        PRINT *, 'invalid array control parameter: ', TRIM(Paramname)
+        CALL error_stop('execution terminated')
       ENDIF
 
       control_string_array = 0
@@ -1053,7 +1060,7 @@
         PRINT *, 'ERROR, number of values does not equal values for the dimension'
         PRINT *, '       parameter: ', Dimenname(:nchars), ' dimension value:', num_values
         PRINT *, '       dimension: ', Paramname(:nchars_param), ' number of values:', Numvalues
-        STOP
+        ERROR STOP -1
       ENDIF
       nchars = INDEX( Data_type, ' ') - 1
       ! Data_type(:nchars)
@@ -1132,7 +1139,7 @@
                   PRINT *, 'ERROR, parameter not evenly divisible by 12'
                   PRINT *, '       number of parameter values expected:', Parameter_data(i)%numvals
                   PRINT *, '       number of parameter values specified:', Numvalues
-                  STOP
+                  ERROR STOP -1
                 ENDIF
               ENDIF
               comma = INDEX(Parameter_data(found)%dimen_names,',')
@@ -1196,7 +1203,7 @@
         PRINT *, 'ERROR, Parameter: ', Paramname, ' not declared'
         ierr = 1
       ENDIF
-      IF ( ierr==1 ) STOP
+      IF ( ierr==1 ) ERROR STOP -1
  
       END SUBROUTINE setparam
 
@@ -1224,7 +1231,7 @@
 
       IF ( found==0 ) THEN
         PRINT *, 'ERROR, Variable: ', Varname, ' not declared'
-        STOP
+        ERROR STOP -1
       ENDIF
  
       END FUNCTION getvarsize
