@@ -98,14 +98,14 @@
         ! Check to see if in a daily or subdaily time step
         IF ( Timestep_hours>24.0 ) THEN
           PRINT *, 'ERROR, timestep > daily, fix Data File, timestep:', Timestep_hours
-          STOP
+          ERROR STOP -3
         ELSEIF ( Timestep_hours<24.0 ) THEN
           PRINT *, 'ERROR, timestep < daily for daily model, fix Data File', Timestep_hours
-          STOP
+          ERROR STOP -3
         ENDIF
 
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_prms_time = 'prms_time.f90 2017-07-06 14:16:00Z'
+        Version_prms_time = 'prms_time.f90 2020-04-28 16:00:42Z'
         CALL print_module(Version_prms_time, 'PRMS Set Time Variables     ', 90)
 !        MODNAME = 'prms_time'
         Timestep_seconds = 86400.0D0

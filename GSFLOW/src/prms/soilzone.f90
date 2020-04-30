@@ -124,7 +124,7 @@
 !***********************************************************************
       szdecl = 0
 
-      Version_soilzone = 'soilzone.f90 2020-04-21 16:42:00Z'
+      Version_soilzone = 'soilzone.f90 2020-04-28 17:04:00Z'
       CALL print_module(Version_soilzone, 'Soil Zone Computations      ', 90 )
       MODNAME = 'soilzone'
 
@@ -601,7 +601,7 @@
       USE PRMS_SNOW, ONLY: Snowcov_area
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: init_basin_vars, checkdim_bounded_limits
+      EXTERNAL :: init_basin_vars, checkdim_bounded_limits, error_stop
       INTEGER, EXTERNAL :: getparam
       INTRINSIC MIN, DBLE
 ! Local Variables
@@ -809,10 +809,8 @@
         ENDDO
         ALLOCATE ( Hru_gvr_index(Max_gvrs, Nhru) )
         IF ( Nhru==Nhrucell ) THEN
-          IF ( Max_gvrs/=1 ) THEN
-            PRINT *, 'ERROR, nhru=nhrucell, but, gvr_hru_id array specifies more than one GVR for an HRU'
-            STOP
-          ENDIF
+          IF ( Max_gvrs/=1 ) &
+     &         CALL error_stop('nhru=nhrucell, but, gvr_hru_id array specifies more than one GVR for an HRU')
           DO i = 1, Nhru
             Hru_gvr_index(1, i) = i
           ENDDO
@@ -1572,6 +1570,8 @@
 ! Arguments
       REAL, INTENT(IN) :: Coef_lin, Coef_sq, Ssres_in
       REAL, INTENT(INOUT) :: Storage, Inter_flow
+! Functions
+      EXTERNAL error_stop
 ! Local Variables
       REAL :: c1, c2, c3, sos
 !***********************************************************************
@@ -1586,7 +1586,7 @@
       ELSEIF ( Coef_sq>0.0 ) THEN
         c3 = SQRT(Coef_lin**2.0+4.0*Coef_sq*Ssres_in)
         sos = Storage - ((c3-Coef_lin)/(2.0*Coef_sq))
-        IF ( c3==0.0 ) STOP 'ERROR, in compute_interflow sos=0, please contact code developers'
+        IF ( c3==0.0 ) CALL error_stop('in compute_interflow sos=0, please contact code developers')
         c1 = Coef_sq*sos/c3
         c2 = 1.0 - EXP(-c3)
         IF ( 1.0+c1*c2>0.0 ) THEN

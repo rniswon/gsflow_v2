@@ -64,18 +64,18 @@
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_dble
+      EXTERNAL :: read_error, print_module, error_stop, declvar_dble
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_subbasin
 !***********************************************************************
       subdecl = 0
 
-      Version_subbasin = 'subbasin.f90 2020-04-21 16:43:00Z'
+      Version_subbasin = 'subbasin.f90 2020-04-28 16:10:00Z'
       CALL print_module(Version_subbasin, 'Output Summary              ', 90)
       MODNAME = 'subbasin'
 
       IF ( Nsub==0 ) THEN
-        IF ( Model/=DOCUMENTATION ) STOP 'ERROR, nsub=0 when subbasin module called'
+        IF ( Model/=DOCUMENTATION ) CALL error_stop('nsub=0 when subbasin module called')
         Nsub = 1
       ENDIF
 

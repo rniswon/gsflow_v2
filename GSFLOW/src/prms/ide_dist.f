@@ -71,7 +71,7 @@
       idedecl = 0
 
       Version_ide_dist =
-     +'ide_dist.f 2018-04-18 11:09:00Z'
+     +'ide_dist.f 2020-04-27 09:09:00Z'
       CALL print_module(Version_ide_dist,
      +                  'Temp & Precip Distribution  ', 77)
       MODNAME = 'ide_dist'
@@ -606,6 +606,7 @@
       IMPLICIT NONE
 ! Functions
       EXTERNAL precip_form, compute_inv, compute_elv, print_date
+      EXTERNAL error_stop
 ! Arguments
       REAL, INTENT(IN) :: Prcp_wght_dist, Prcp_wght_elev
 ! Local variables
@@ -645,9 +646,8 @@
         ENDIF
       ENDDO
       IF ( allmissing==0 ) THEN
-        PRINT *, 'ERROR, all precipitation stations have missing data'
         CALL print_date(1)
-        STOP
+        CALL error_stop('all precipitation stations have missing data')
       ENDIF
 
       Basin_ppt = 0.0D0
@@ -718,7 +718,7 @@
      +                       Dat_dist, Ndist, Dist_exp)
       IMPLICIT NONE
       INTRINSIC SQRT, DBLE, SNGL
-      EXTERNAL SORT2I, print_date
+      EXTERNAL SORT2I, print_date, error_stop
 ! Arguments
       INTEGER, INTENT(IN) :: Imax, Ndist, Nsta
       INTEGER, DIMENSION(Imax), INTENT(IN) :: Nuse
@@ -745,9 +745,8 @@
         ENDIF
       ENDDO
       IF ( allmissing==0 ) THEN
-        PRINT *, 'ERROR, all temperature stations have missing data'
         CALL print_date(1)
-        STOP
+        CALL error_stop('all temperature stations have missing data')
       ENDIF
 !
 ! calculate weighting functions for ndist closest stations

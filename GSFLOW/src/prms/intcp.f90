@@ -69,7 +69,7 @@
 !***********************************************************************
       intdecl = 0
 
-      Version_intcp = 'intcp.f90 2020-03-03 13:38:00Z'
+      Version_intcp = 'intcp.f90 2020-04-27 19:05:00Z'
       CALL print_module(Version_intcp, 'Canopy Interception         ', 90)
       MODNAME = 'intcp'
 
@@ -269,7 +269,7 @@
       USE PRMS_SET_TIME, ONLY: Nowmonth, Cfs_conv, Nowyear, Nowday
       USE PRMS_OBS, ONLY: Pan_evap
       IMPLICIT NONE
-      EXTERNAL intercept
+      EXTERNAL intercept, error_stop
       INTRINSIC DBLE, SNGL
 ! Local Variables
       INTEGER :: i, j
@@ -424,7 +424,7 @@
                 Basin_hru_apply = Basin_hru_apply + DBLE( Gain_inches(i)*harea )
                 Basin_net_apply = Basin_net_apply + DBLE( Net_apply(i)*harea )
               ELSE
-                STOP 'ERROR, canopy transfer attempted to HRU with cov_den = 0.0'
+                CALL error_stop('canopy transfer attempted to HRU with cov_den = 0.0')
               ENDIF
             ENDIF
           ENDIF

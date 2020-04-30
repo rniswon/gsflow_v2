@@ -6,7 +6,7 @@
 !   Local Variables
         INTEGER, SAVE :: BALUNT, SZUNIT, GWUNIT, INTCPUNT, SROUNIT, SNOWUNIT
         REAL, PARAMETER :: TOOSMALL = 3.1E-05, SMALL = 1.0E-04, BAD = 1.0E-03
-        DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 1.0D-05
+        DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 5.0D-05
         DOUBLE PRECISION, SAVE :: Last_basin_gwstor, Basin_dprst_wb
         DOUBLE PRECISION, ALLOCATABLE, SAVE :: Hru_storage_ante(:), Gwstor_ante(:)
         CHARACTER(LEN=13), SAVE :: MODNAME_WB
@@ -366,7 +366,8 @@
         hru_in = DBLE( Hru_ppt(i) )
         IF ( Cascade_flag>0 ) THEN
           hru_out = hru_out + DBLE( Hru_sz_cascadeflow(i) ) + Hru_hortn_cascflow(i)
-          hru_in = hru_in + Upslope_dunnianflow(i) + Upslope_interflow(i) + Upslope_hortonian(i) !+ Upslope_dprst_hortonian(i) ??
+          hru_in = hru_in + Upslope_dunnianflow(i) + Upslope_interflow(i) + Upslope_hortonian(i)
+          IF ( Dprst_flag==1 ) hru_in = hru_in + Upslope_dprst_hortonian(i)
         ENDIF
         IF ( Cascadegw_flag>0 ) THEN
           hru_out = hru_out + Hru_gw_cascadeflow(i)

@@ -99,7 +99,7 @@
 !***********************************************************************
       stream_temp_decl = 0
 
-      Version_stream_temp = 'stream_temp.f90 2019-11-18 12:36:00Z'
+      Version_stream_temp = 'stream_temp.f90 2020-04-28 12:36:00Z'
       CALL print_module(Version_stream_temp, 'Stream Temperature          ', 90)
       MODNAME = 'stream_temp'
 
@@ -420,7 +420,7 @@
       INTRINSIC :: COS, SIN, ABS, SIGN, ASIN, maxval
       INTEGER, EXTERNAL :: getparam
       REAL, EXTERNAL :: solalt
-      EXTERNAL :: read_error, checkdim_param_limits
+      EXTERNAL :: read_error, checkdim_param_limits, error_stop
 ! Local Variables
       INTEGER :: i, j, k, iseg, ierr, ii, this_seg
       REAL :: tan_d, tano, sinhro, temp, decl, cos_d, tanod, alrs
@@ -577,7 +577,7 @@
                   IF ( j>1 ) THEN
                      Seg_close(i) = Segment_order(j-1) ! set to previous segment id
                   ELSE ! this is a problem, shouldn't happen
-                     STOP 'ERROR, segments do not have associated HRUs'
+                     CALL error_stop('segments do not have associated HRUs')
                     ! Seg_close(i) = Segment_order(1) ! set to first segment id
                   ENDIF
                ENDIF

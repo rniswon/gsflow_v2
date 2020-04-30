@@ -65,14 +65,14 @@
 ! Functions
       INTRINSIC CHAR
       INTEGER, EXTERNAL :: declparam, control_string_array, control_integer
-      EXTERNAL read_error, print_module
+      EXTERNAL read_error, print_module, error_stop
 ! Local Variables
       INTEGER :: i
       CHARACTER(LEN=80), SAVE :: Version_map_results
 !***********************************************************************
       map_resultsdecl = 0
 
-      Version_map_results = 'map_results.f90 2018-04-25 15:27:00Z'
+      Version_map_results = 'map_results.f90 2020-04-27 19:00:00Z'
       CALL print_module(Version_map_results, 'Output Summary              ', 90)
       MODNAME = 'map_results'
 
@@ -96,7 +96,7 @@
       Mapflg = 1
       Numvalues = Nhru
       IF ( (Nhru/=Ngwcell .AND. Ngwcell/=0) .OR. mapOutON_OFF==2 ) THEN
-        IF ( Ngwcell==0 ) STOP 'ERROR, dimension ngwcell must be specified > 0'
+        IF ( Ngwcell==0 ) CALL error_stop('in map_results, ngwcell must be specified > 0')
         Mapflg = 0
         Numvalues = Ngwcell
       ENDIF
@@ -106,7 +106,7 @@
           IF ( Model==99 ) THEN
             Nhrucell = 1
           ELSE
-            STOP 'ERROR, in map_results, nhrucell = 0 and must be > 0'
+            CALL error_stop('in map_results, nhrucell = 0 and must be > 0')
           ENDIF
         ENDIF
         ALLOCATE ( Gvr_map_id(Nhrucell), Gvr_map_frac(Nhrucell), Gvr_hru_id(Nhrucell), Map_var_id(Ngwcell) )

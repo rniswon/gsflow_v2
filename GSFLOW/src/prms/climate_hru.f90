@@ -58,13 +58,21 @@
           ELSE
             READ ( Tmax_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Tmaxf(i), i=1,Nhru)
           ENDIF
-          IF ( Cbh_check_flag==1 ) CALL read_cbh_date(yr, mo, dy, 'Tmaxf', ios, ierr)
+          IF ( ios/=0 ) THEN
+            ierr = 1
+          ELSEIF ( Cbh_check_flag==1 ) THEN
+            CALL read_cbh_date(yr, mo, dy, 'Tmaxf', ios, ierr)
+          ENDIF
           IF ( Cbh_binary_flag==0 ) THEN
             READ ( Tmin_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Tminf(i), i=1,Nhru)
           ELSE
             READ ( Tmin_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Tminf(i), i=1,Nhru)
           ENDIF
-          IF ( Cbh_check_flag==1 ) CALL read_cbh_date(yr, mo, dy, 'Tminf', ios, ierr)
+          IF ( ios/=0 ) THEN
+            ierr = 1
+          ELSEIF ( Cbh_check_flag==1 ) THEN
+            CALL read_cbh_date(yr, mo, dy, 'Tminf', ios, ierr)
+          ENDIF
           Basin_tmax = 0.0D0
           Basin_tmin = 0.0D0
           Basin_temp = 0.0D0
@@ -76,12 +84,16 @@
           ELSE
             READ ( Precip_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Hru_ppt(i), i=1,Nhru)
           ENDIF
-          IF ( Ppt_zero_thresh>0.0 ) THEN
-            DO i = 1, Nhru
-              IF ( Hru_ppt(i)<Ppt_zero_thresh ) Hru_ppt(i) = 0.0
-            ENDDO
+          IF ( ios/=0 ) THEN
+            ierr = 1
+          ELSE
+            IF ( Ppt_zero_thresh>0.0 ) THEN
+              DO i = 1, Nhru
+                IF ( Hru_ppt(i)<Ppt_zero_thresh ) Hru_ppt(i) = 0.0
+              ENDDO
+            ENDIF
+            IF ( Cbh_check_flag==1 ) CALL read_cbh_date(yr, mo, dy, 'Hru_ppt', ios, ierr)
           ENDIF
-          IF ( Cbh_check_flag==1 ) CALL read_cbh_date(yr, mo, dy, 'Hru_ppt', ios, ierr)
           Basin_ppt = 0.0D0
           Basin_rain = 0.0D0
           Basin_snow = 0.0D0
@@ -94,7 +106,11 @@
           ELSE
             READ ( Et_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Potet(i), i=1,Nhru)
           ENDIF
-          IF ( Cbh_check_flag==1 ) CALL read_cbh_date(yr, mo, dy, 'Potet', ios, ierr)
+          IF ( ios/=0 ) THEN
+            ierr = 1
+          ELSEIF ( Cbh_check_flag==1 ) THEN
+            CALL read_cbh_date(yr, mo, dy, 'Potet', ios, ierr)
+          ENDIF
           Basin_potet = 0.0D0
         ENDIF
 
@@ -112,7 +128,11 @@
               READ ( Swrad_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Swrad(i), i=1,Nhru), Orad
             ENDIF
           ENDIF
-          IF ( Cbh_check_flag==1 ) CALL read_cbh_date(yr, mo, dy, 'Swrad', ios, ierr)
+          IF ( ios/=0 ) THEN
+            ierr = 1
+          ELSEIF ( Cbh_check_flag==1 ) THEN
+            CALL read_cbh_date(yr, mo, dy, 'Swrad', ios, ierr)
+          ENDIF
           Basin_swrad = 0.0D0
         ENDIF
 
@@ -122,7 +142,11 @@
           ELSE
             READ ( Transp_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Transp_on(i), i=1,Nhru)
           ENDIF
-          IF ( Cbh_check_flag==1 ) CALL read_cbh_date(yr, mo, dy, 'Transp_on', ios, ierr)
+          IF ( ios/=0 ) THEN
+            ierr = 1
+          ELSEIF ( Cbh_check_flag==1 ) THEN
+            CALL read_cbh_date(yr, mo, dy, 'Transp_on', ios, ierr)
+          ENDIF
           Basin_transp_on = 0
         ENDIF
 
@@ -142,11 +166,15 @@
           ELSE
             READ ( Windspeed_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Windspeed_hru(i), i=1,Nhru)
           ENDIF
-          IF ( Cbh_check_flag==1 ) CALL read_cbh_date(yr, mo, dy, 'Windspeed_hru', ios, ierr)
+          IF ( ios/=0 ) THEN
+            ierr = 1
+          ELSEIF ( Cbh_check_flag==1 ) THEN
+            CALL read_cbh_date(yr, mo, dy, 'Windspeed_hru', ios, ierr)
+          ENDIF
           Basin_windspeed = 0.0D0
         ENDIF
 
-        IF ( ierr/=0 ) STOP
+        IF ( ierr/=0 ) ERROR STOP -3
 
         missing = 0
         DO jj = 1, Active_hrus
@@ -200,26 +228,24 @@
      &                         Adjmix_rain(i,Nowmonth), harea, sum_obs, Tmax_allsnow_f(i,Nowmonth))
             ELSEIF ( Hru_ppt(i)<0.0 ) THEN
               PRINT *, 'ERROR, negative precipitation value entered in CBH File, HRU:', i
-              CALL print_date(0)
               ierr = 1
-!              Hru_ppt(i) = 0.0
             ENDIF
           ENDIF
 
           IF ( Humidity_cbh_flag==1 ) THEN
             IF ( Cbh_check_flag==1 ) CALL check_cbh_value('Humidity_hru', Humidity_hru(i), 0.0, 100.0, missing)
-            IF ( missing==0 ) Basin_humidity = Basin_humidity + DBLE( Humidity_hru(i)*harea )
+            Basin_humidity = Basin_humidity + DBLE( Humidity_hru(i)*harea )
           ENDIF
 
           IF ( Windspeed_cbh_flag==1 ) THEN
             IF ( Cbh_check_flag==1 ) CALL check_cbh_value('Windspeed_hru', Windspeed_hru(i), 0.0, 400.0, missing)
-            IF ( missing==0 ) Basin_windspeed = Basin_windspeed + DBLE( Windspeed_hru(i)*harea )
+            Basin_windspeed = Basin_windspeed + DBLE( Windspeed_hru(i)*harea )
           ENDIF
         ENDDO
 
         IF ( missing==1 .OR. ierr==1 ) THEN
           CALL print_date(0)
-          STOP
+          ERROR STOP -3
         ENDIF
 
         IF ( Climate_temp_flag==1 ) THEN
@@ -247,7 +273,7 @@
         IF ( Windspeed_cbh_flag==1 ) Basin_windspeed = Basin_windspeed*Basin_area_inv
 
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_climate_hru = 'climate_hru.f90 2019-10-23 15:56:00Z'
+        Version_climate_hru = 'climate_hru.f90 2020-04-27 08:56:00Z'
         MODNAME = 'climate_hru'
 
         IF ( control_integer(Cbh_check_flag, 'cbh_check_flag')/=0 ) Cbh_check_flag = 1
@@ -451,7 +477,10 @@
           ENDIF
         ENDIF
 
-        IF ( istop==1 ) STOP 'ERROR in climate_hru'
+        IF ( istop==1 ) THEN
+          PRINT *, 'ERROR in climate_hru'
+          ERROR STOP -3
+        ENDIF
 
       ENDIF
 
@@ -466,8 +495,6 @@
       INTEGER, INTENT(IN) :: Year, Month, Day, Ios
       CHARACTER(LEN=*), INTENT(IN) :: Var
       INTEGER, INTENT(INOUT) :: Iret
-! Functions
-      EXTERNAL :: print_date
 ! Local Variables
       INTEGER :: right_day
 !***********************************************************************
@@ -482,7 +509,6 @@
         ELSE
           PRINT *, '       Invalid data value found'
         ENDIF
-        CALL print_date(0)
         Iret = 1
       ENDIF
       END SUBROUTINE read_cbh_date
@@ -498,7 +524,6 @@
       INTEGER, INTENT(INOUT) :: Missing
 ! Functions
       !INTRINSIC ISNAN
-      EXTERNAL :: print_date
 !***********************************************************************
       !IF ( ISNAN(Var_value) ) THEN
       !  PRINT *, 'ERROR, NaN value found for variable: ', Var
@@ -510,7 +535,6 @@
         PRINT *, 'ERROR, bad value, variable: ', Var, ' Value:', Var_value
         PRINT *, '       lower bound:', Lower_val, ' upper bound:', Upper_val
         Missing = 1
-        CALL print_date(0)
       ENDIF
       END SUBROUTINE check_cbh_value
 
@@ -522,13 +546,10 @@
       INTEGER, INTENT(IN) :: Var_value, Lower_val, Upper_val
       CHARACTER(LEN=*), INTENT(IN) :: Var
       INTEGER, INTENT(INOUT) :: Missing
-! Functions
-      EXTERNAL :: print_date
 !***********************************************************************
       IF ( Var_value<Lower_val .OR. Var_value>Upper_val ) THEN
         PRINT *, 'ERROR, bad value, variable: ', Var, ' Value:', Var_value
         PRINT *, '       lower bound:', Lower_val, ' upper bound:', Upper_val
         Missing = 1
-        CALL print_date(0)
       ENDIF
       END SUBROUTINE check_cbh_intvalue

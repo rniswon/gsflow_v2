@@ -1,4 +1,4 @@
-      ! utils_prms.f90 2019-10-30 14:13:00Z
+      ! utils_prms.f90 2020-04-27 12:55:00Z
 !***********************************************************************
 !     Read CBH File to current time
 !***********************************************************************
@@ -96,7 +96,8 @@
       IMPLICIT NONE
 ! Argument
       INTEGER, INTENT(IN) :: Cbh_flag, Cbh_binary_flag
-      INTEGER, INTENT(OUT) :: Iunit, Iret
+      INTEGER, INTENT(OUT) :: Iunit
+      INTEGER, INTENT(INOUT) :: Iret
       CHARACTER(LEN=*), INTENT(IN) :: Fname, Paramname
 ! Functions
       INTRINSIC :: trim
@@ -106,6 +107,7 @@
       CHARACTER(LEN=4) :: dum
       CHARACTER(LEN=80) :: dum2
 !***********************************************************************
+      IF ( Iret/=2 ) Iret = 0
       Iunit = get_ftnunit(7777)
       IF ( Cbh_binary_flag==0 ) THEN
         OPEN ( Iunit, FILE=trim(Fname), STATUS='OLD', IOSTAT=ios )
@@ -114,13 +116,13 @@
       ENDIF
       IF ( ios/=0 ) THEN
         IF ( Iret==2 ) THEN ! this signals climate_hru to ignore the Humidity CBH file, could add other files
+          Iret = 0
           IF ( Print_debug>-1 ) &
      &         WRITE ( *, '(/,A,/,A,/,A)' ) 'WARNING, optional CBH file not found, will use associated parameter values'
         ELSE
           WRITE ( *, '(/,A,/,A,/,A)' ) 'ERROR reading file:', Fname, 'check to be sure the input file exists'
           Iret = 1
         ENDIF
-        RETURN
       ELSE
 ! read to line before data starts in each file
         i = 0
@@ -153,19 +155,26 @@
             ENDIF
             IF ( dim/=Nhru ) THEN
               PRINT '(/,2(A,I0))', '***CBH file dimension incorrect*** nhru= ', Nhru, ' CBH dimension= ', dim, ' File: '//Fname
-              STOP 'ERROR: update Control File with correct CBH files'
+              PRINT *, 'ERROR: update Control File with correct CBH files'
+              Iret = 1
+              EXIT
             ENDIF
             IF ( Cbh_binary_flag==0 ) THEN
               READ ( Iunit, FMT='(A4)', IOSTAT=ios ) dum
             ELSE
               READ ( Iunit, IOSTAT=ios ) dum
             ENDIF
+            IF ( ios/=0 ) THEN
+              WRITE ( *, '(/,A,/,A,/)' ) 'ERROR reading file:', Fname
+              Iret = 1
+              EXIT
+            ENDIF
             IF ( Orad_flag==1 .AND. Paramname(:5)=='swrad' ) READ ( Iunit, FMT='(A4)' ) dum ! read again as swrad CBH file contains orad as last column
             i = 1
           ENDIF
         ENDDO
       ENDIF
-      Iret = ios
+
       END SUBROUTINE find_header_end
 
 !**********************
@@ -400,7 +409,7 @@
       ELSEIF ( Iflag==16 ) THEN
         PRINT *, 'ERROR, declared parameter ', Name
       ENDIF
-      STOP
+      ERROR STOP -1
       END SUBROUTINE read_error
 
 !**********************************************************************
@@ -413,7 +422,7 @@
       INTEGER, INTENT(IN) :: Retcode
 !**********************************************************************
       PRINT 9001, Modname, Arg, Retcode
-      STOP
+      ERROR STOP -1
  9001 FORMAT ('ERROR in ', A, ' module, arg = ', A, /, 'Return val = ', I0)
       END SUBROUTINE module_error
 
@@ -532,7 +541,7 @@
         time_array = Starttime
       ELSE
         PRINT *, 'ERROR, invalid argument to compute Julian Day: ', Date_type
-        STOP
+        ERROR STOP -3
       ENDIF
       year = time_array(1)
       month = time_array(2)
@@ -614,7 +623,7 @@
       ENDIF
       IF ( found==0 ) THEN
         PRINT *, 'ERROR, invalid year type argument to compute Julian Day: ', Year_type
-        STOP
+        ERROR STOP -3
       ENDIF
 
       ! set actual Julian Day
@@ -806,7 +815,7 @@
       IF ( ios/=0 ) THEN
         WRITE ( *, '(/,A,/,A,/)' ) 'ERROR opening water balance output file:', Fname(:nchars), &
      &                             'check to be sure the pathname is valid and the file is not open'
-        STOP
+        ERROR STOP -1
       ENDIF
       END SUBROUTINE PRMS_open_module_file
 
@@ -829,7 +838,7 @@
         PRINT *, 'PRMS code error, string longer than:', MAXFILE_LENGTH, ' referenced'
         PRINT *, 'string length:', numchars, ' value: ', String
         PRINT *, 'Contact PRMS program support'
-        STOP
+        ERROR STOP -1
       ENDIF
       END FUNCTION numchars
 
@@ -877,7 +886,7 @@
 !***********************************************************************
       IF ( Restart_module/=Modname ) THEN
         PRINT *, 'ERROR READING RESTART FILE, expecting module: ', Modname, ' found: ', Restart_module
-        STOP
+        ERROR STOP -1
       ENDIF
       END SUBROUTINE check_restart
 
@@ -991,3 +1000,15 @@
         Iret = 1
       ENDIF
       END SUBROUTINE check_param_zero
+
+!***********************************************************************
+! Print ERROR message and stop
+!***********************************************************************
+      SUBROUTINE error_stop(Msg)
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: Msg
+!***********************************************************************
+      PRINT '(/,2A,/)', 'ERROR, ', Msg
+      ERROR STOP -1
+      END SUBROUTINE error_stop

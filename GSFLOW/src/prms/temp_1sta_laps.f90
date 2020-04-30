@@ -68,7 +68,7 @@
               ELSE
                 PRINT 9002, 'tmax', Tmax(i), i
                 CALL print_date(0)
-                STOP
+                ERROR STOP -3
               ENDIF
             ELSE
               Tmax_prev(i) = Tmax(i)
@@ -86,7 +86,7 @@
               ELSE
                 PRINT 9002, 'tmin', Tmin(i), i
                 CALL print_date(0)
-                STOP
+                ERROR STOP -3
               ENDIF
             ELSE
               Tmin_prev(i) = Tmin(i)

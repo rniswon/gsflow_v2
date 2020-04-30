@@ -20,7 +20,7 @@
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam, getparam
-      EXTERNAL read_error, print_module, potet_pan_restart, print_date
+      EXTERNAL read_error, print_module, potet_pan_restart, print_date, error_stop
 ! Local Variables
       INTEGER :: i, k, j
       CHARACTER(LEN=80), SAVE :: Version_potet_pan
@@ -51,11 +51,11 @@
 
 !******Declare parameters
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_potet_pan = 'potet_pan.f90 2015-12-04 23:29:08Z'
+        Version_potet_pan = 'potet_pan.f90 2020-04-28 23:29:08Z'
         CALL print_module(Version_potet_pan, 'Potential Evapotranspiration', 90)
         MODNAME = 'potet_pan'
 
-        IF ( Nevap==0 ) STOP 'ERROR, potet_pan module selected, but nevap=0'
+        IF ( Nevap==0 ) CALL error_stop('potet_pan module selected, but nevap=0')
         ALLOCATE ( Last_pan_evap(Nevap) )
 
       ELSEIF ( Process(:4)=='init' ) THEN
