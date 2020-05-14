@@ -3091,7 +3091,7 @@
         AETITERPOND(IPOND) = SNGL(aettotal)
         PONDFLOWOLD(IPOND) = PONDFLOW(IPOND)
         PONDFLOW(IPOND) = PONDFLOW(IPOND) + SNGL(factor)
-        IF ( PONDFLOW(IPOND)
+!        IF ( PONDFLOW(IPOND)
         !
         !1 - -----limit pond irrigation to storage
         !
