@@ -1,41 +1,26 @@
       MODULE GWFAGMODULE
         INTEGER, SAVE, POINTER :: NWELLS, MXWELL, NWELVL, NPWEL, IPRWEL
-        INTEGER, SAVE, POINTER :: MXPOND
-        INTEGER, SAVE, POINTER :: IWELLCB, IRDPSI, NNPWEL, NAUXWELL
-        INTEGER, SAVE, POINTER :: IWELLCBU, ISFRCB
-        INTEGER, SAVE, POINTER :: IPONDCB, IPONDCBU  !DS
-        INTEGER, SAVE, POINTER :: IRRWELLCB, IRRSFRCB, IRRPONDCB
+        INTEGER, SAVE, POINTER :: IWELLCB, IRDPSI, NNPWEL, NAUX, ISFRCB
+        INTEGER, SAVE, POINTER :: IWELLCBU
+        INTEGER, SAVE, POINTER :: IRRWELLCB, IRRSFRCB
         LOGICAL, SAVE, POINTER :: TSACTIVEGW, TSACTIVESW
         LOGICAL, SAVE, POINTER :: TSACTIVEGWET, TSACTIVESWET
-        LOGICAL, SAVE, POINTER :: TSACTIVEPOND, TSACTIVEPONDET  !DS
         INTEGER, SAVE, POINTER :: NUMSW, NUMGW, NUMSWET, NUMGWET
-        INTEGER, SAVE, POINTER :: NUMPOND, NUMPONDET
         INTEGER, SAVE, POINTER :: TSGWETALLUNIT, TSGWALLUNIT
         INTEGER, SAVE, POINTER :: NSEGDIMTEMP
         CHARACTER(LEN=16), SAVE, DIMENSION(:), POINTER :: WELAUX
-        CHARACTER(LEN=16), SAVE, DIMENSION(:), POINTER :: PONDAUX
-!        CHARACTER(LEN=16), SAVE, DIMENSION(:), POINTER :: SFRAUX
+        CHARACTER(LEN=16), SAVE, DIMENSION(:), POINTER :: SFRAUX
         REAL, SAVE, DIMENSION(:, :), POINTER :: WELL
-        REAL, SAVE, DIMENSION(:, :), POINTER :: POND
-        REAL, SAVE, DIMENSION(:, :), POINTER :: TABTIMEWELL
-        REAL, SAVE, DIMENSION(:, :), POINTER :: TABRATEWELL
-        REAL, SAVE, DIMENSION(:, :), POINTER :: TABTIMEPOND
-        REAL, SAVE, DIMENSION(:, :), POINTER :: TABRATEPOND
+        REAL, SAVE, DIMENSION(:, :), POINTER :: TABTIME
+        REAL, SAVE, DIMENSION(:, :), POINTER :: TABRATE
         REAL, SAVE, DIMENSION(:), POINTER :: QONLY
         REAL, SAVE, DIMENSION(:), POINTER :: QONLYOLD
-        REAL, SAVE, DIMENSION(:), POINTER :: PONDFLOW
-        REAL, SAVE, DIMENSION(:), POINTER :: PONDFLOWOLD
-        REAL, SAVE, DIMENSION(:), POINTER :: PONDFLOWMAX
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TABLAYWELL
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TABROWWELL
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TABCOLWELL
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TABVALWELL
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TABIDWELL
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TABUNITWELL
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TABPONDHRU
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TABVALPOND
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TABIDPOND
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TABUNITPOND
+        INTEGER, SAVE, DIMENSION(:), POINTER :: TABLAY
+        INTEGER, SAVE, DIMENSION(:), POINTER :: TABROW
+        INTEGER, SAVE, DIMENSION(:), POINTER :: TABCOL
+        INTEGER, SAVE, DIMENSION(:), POINTER :: TABVAL
+        INTEGER, SAVE, DIMENSION(:), POINTER :: TABID
+        INTEGER, SAVE, DIMENSION(:), POINTER :: TABUNIT
         INTEGER, SAVE, DIMENSION(:), POINTER :: TSSWUNIT
         INTEGER, SAVE, DIMENSION(:), POINTER :: TSSWNUM
         INTEGER, SAVE, DIMENSION(:), POINTER :: TSGWUNIT
@@ -44,66 +29,48 @@
         INTEGER, SAVE, DIMENSION(:), POINTER :: TSGWETUNIT
         INTEGER, SAVE, DIMENSION(:), POINTER :: TSSWETNUM
         INTEGER, SAVE, DIMENSION(:), POINTER :: TSGWETNUM
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TSPONDUNIT
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TSPONDNUM
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TSPONDETUNIT
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TSPONDETNUM
         INTEGER, SAVE, DIMENSION(:), POINTER :: LASTREACH
         INTEGER, SAVE, DIMENSION(:), POINTER :: SEGLIST
         INTEGER, SAVE, POINTER :: NUMSEGLIST
         REAL, SAVE, POINTER :: PSIRAMP
         REAL, SAVE, POINTER :: ACCEL
         INTEGER, SAVE, POINTER :: IUNITRAMP
-        INTEGER, SAVE, POINTER :: NUMTABWELL
-        INTEGER, SAVE, POINTER :: NUMTABPOND
-        INTEGER, SAVE, POINTER :: MAXVALWELL
-        INTEGER, SAVE, POINTER :: MAXVALPOND
+        INTEGER, SAVE, POINTER :: NUMTAB
+        INTEGER, SAVE, POINTER :: MAXVAL
         REAL, SAVE, DIMENSION(:, :), POINTER :: VBVLAG
         CHARACTER(LEN=22), SAVE, DIMENSION(:), POINTER :: VBNMAG
         INTEGER, SAVE, POINTER :: MSUMAG
         INTEGER, SAVE, DIMENSION(:, :), POINTER :: DIVERSIONSEG
         INTEGER, SAVE, DIMENSION(:, :), POINTER :: IRRROW_GW
         INTEGER, SAVE, DIMENSION(:, :), POINTER :: IRRCOL_GW
-        INTEGER, SAVE, DIMENSION(:, :), POINTER :: IRRHRU_POND   !DS
         REAL, SAVE, DIMENSION(:), POINTER :: IRRPERIODWELL
-        REAL, SAVE, DIMENSION(:), POINTER :: IRRPERIODPOND   !DS
         REAL, SAVE, DIMENSION(:), POINTER :: IRRPERIODSEG
         REAL, SAVE, DIMENSION(:), POINTER :: TRIGGERPERIODWELL
-        REAL, SAVE, DIMENSION(:), POINTER :: TRIGGERPERIODPOND  !DS
         REAL, SAVE, DIMENSION(:), POINTER :: TRIGGERPERIODSEG
         REAL, SAVE, DIMENSION(:), POINTER :: TIMEINPERIODSEG
         REAL, SAVE, DIMENSION(:), POINTER :: TIMEINPERIODWELL
-        REAL, SAVE, DIMENSION(:), POINTER :: TIMEINPERIODPOND  !DS
         REAL, SAVE, DIMENSION(:), POINTER :: AETITERSW
         REAL, SAVE, DIMENSION(:), POINTER :: AETITERGW
-        REAL, SAVE, DIMENSION(:), POINTER :: AETITERPOND
         REAL, SAVE, DIMENSION(:, :), POINTER :: WELLIRRUZF
         REAL, SAVE, DIMENSION(:, :), POINTER :: WELLIRRPRMS
         REAL, SAVE, DIMENSION(:, :), POINTER :: IRRFACT
-        REAL, SAVE, DIMENSION(:, :), POINTER :: IRRFACTPOND    !DS
         REAL, SAVE, DIMENSION(:, :), POINTER :: IRRFIELDFACT
-        REAL, SAVE, DIMENSION(:, :), POINTER :: IRRFIELDFACTPOND  !DS
         INTEGER, SAVE, DIMENSION(:), POINTER :: SUPWELVAR
         REAL, SAVE, DIMENSION(:), POINTER :: SUPFLOW
         REAL, SAVE, DIMENSION(:), POINTER :: SUPSEG
         INTEGER, SAVE, DIMENSION(:), POINTER :: IRRWELVAR
-        INTEGER, SAVE, DIMENSION(:), POINTER :: IRRPONDVAR   !DS
         REAL, SAVE, DIMENSION(:, :), POINTER :: FRACSUP
         REAL, SAVE, DIMENSION(:, :), POINTER :: FRACSUPMAX
         INTEGER, SAVE, POINTER :: NUMSUP
         INTEGER, SAVE, POINTER :: NUMSUPSP
         INTEGER, SAVE, POINTER :: UNITSUP
         INTEGER, SAVE, POINTER :: NUMIRRWEL
-        INTEGER, SAVE, POINTER :: NUMIRRPOND
         INTEGER, SAVE, POINTER :: UNITIRRWEL
         INTEGER, SAVE, DIMENSION(:), POINTER :: NUMSUPWELLSEG
         INTEGER, SAVE, POINTER :: MAXSEGS
         INTEGER, SAVE, POINTER :: MAXCELLSWEL
-        INTEGER, SAVE, POINTER :: MAXCELLSPOND  !DS
         INTEGER, SAVE, POINTER :: NUMIRRWELSP
-        INTEGER, SAVE, POINTER :: NUMIRRPONDSP   !DS
         INTEGER, SAVE, DIMENSION(:), POINTER :: NUMCELLS
-        INTEGER, SAVE, DIMENSION(:), POINTER :: NUMCELLSPOND  !DS
         INTEGER, SAVE, DIMENSION(:), POINTER :: NUMSEGS
         INTEGER, SAVE, POINTER :: ETDEMANDFLAG
         INTEGER, SAVE, POINTER :: TRIGGERFLAG
@@ -116,7 +83,6 @@
         INTEGER, SAVE, DIMENSION(:, :), POINTER :: IRRCOL_SW
         REAL, SAVE, DIMENSION(:, :), POINTER :: DIVERSIONIRRUZF
         REAL, SAVE, DIMENSION(:, :), POINTER :: DIVERSIONIRRPRMS
-        REAL, SAVE, DIMENSION(:, :), POINTER :: PONDIRRPRMS
         REAL, SAVE, DIMENSION(:, :), POINTER :: DVRPERC
         REAL, SAVE, DIMENSION(:, :), POINTER :: DVEFF
         REAL, SAVE, DIMENSION(:, :), POINTER :: KCROPDIVERSION
@@ -151,62 +117,47 @@
       !
       !1 - --- ALLOCATE ALLOCATE CONSTANTS AND FLAGS
       ALLOCATE (VBVLAG(4, 10), VBNMAG(10), MSUMAG)
-      ALLOCATE (NWELLS, MXWELL, NWELVL, IWELLCB, ISFRCB, NAUXWELL)
+      ALLOCATE (NWELLS, MXWELL, NWELVL, IWELLCB, ISFRCB, NAUX)
       ALLOCATE (WELAUX(20))
       ALLOCATE (IRRWELLCB, IRRSFRCB, IWELLCBU)
-      ALLOCATE (IPONDCB, IPONDCBU, IRRPONDCB)
       ALLOCATE (PSIRAMP, IUNITRAMP, ACCEL)
-      ALLOCATE (NUMTABWELL, MAXVALWELL, NPWEL, NNPWEL, IPRWEL)
+      ALLOCATE (NUMTAB, MAXVAL, NPWEL, NNPWEL, IPRWEL)
       ALLOCATE (TSACTIVEGW, TSACTIVESW, NUMSW, NUMGW)
       ALLOCATE (TSACTIVEGWET, TSACTIVESWET, NUMSWET, NUMGWET)
-      ALLOCATE (TSACTIVEPOND, TSACTIVEPONDET)
       ALLOCATE (TSGWALLUNIT, TSGWETALLUNIT, NSEGDIMTEMP)
-      ALLOCATE (MXPOND, NUMPOND, NUMPONDET, NUMTABPOND, MAXVALPOND)
-      MXPOND = 0
-      NUMPOND = 0
       VBVLAG = 0.0
       MSUMAG = 0
       PSIRAMP = 0.10
       ACCEL = 1.0
-      NUMTABWELL = 0
-      NUMTABPOND = 0
-      MAXVALWELL = 1
-      MAXVALPOND = 1
+      NUMTAB = 0
+      MAXVAL = 1
       IPRWEL = 1
-      NAUXWELL = 0
+      NAUX = 0
       TSACTIVEGW = .FALSE.
       TSACTIVESW = .FALSE.
       TSACTIVEGWET = .FALSE.
       TSACTIVESWET = .FALSE.
-      TSACTIVEPOND = .FALSE.
-      TSACTIVEPONDET = .FALSE.
       NUMSW = 0
       NUMGW = 0
       NUMSWET = 0
       NUMGWET = 0
-      NUMPOND = 0
-      NUMPONDET = 0
       TSGWETALLUNIT = 0
       TSGWALLUNIT = 0
-      WELAUX = ''
-      ALLOCATE (NUMSUP, NUMIRRWEL, UNITSUP, MAXCELLSWEL)
+      ALLOCATE (MAXVAL, NUMSUP, NUMIRRWEL, UNITSUP, MAXCELLSWEL)
       ALLOCATE (NUMSUPSP, MAXSEGS, NUMIRRWELSP)
       ALLOCATE (ETDEMANDFLAG, NUMIRRDIVERSION, NUMIRRDIVERSIONSP)
       ALLOCATE (MAXCELLSDIVERSION, TRIGGERFLAG)
-      ALLOCATE (NUMIRRPOND, MAXCELLSPOND)
       NWELLS = 0
       NNPWEL = 0
       MXWELL = 0
       NWELVL = 0
       IWELLCB = 0
       IWELLCBU = 0
-      IPONDCB = 0
-      IPONDCBU = 0
-      IRRPONDCB = 0
       ISFRCB = 0
       IRRWELLCB = 0
       IRRSFRCB = 0
       IUNITRAMP = IOUT
+      MAXVAL = 1
       NUMSUP = 0
       NUMSUPSP = 0
       NUMIRRWEL = 0
@@ -219,13 +170,11 @@
       NUMIRRDIVERSION = 0
       NUMIRRDIVERSIONSP = 0
       TRIGGERFLAG = 0
-      NUMIRRPOND = 0
-      MAXCELLSPOND = 0
       !
       !2 - --- IDENTIFY PACKAGE AND INITIALIZE AG OPTIONS.
       WRITE (IOUT, 1) IN
-1     FORMAT(1X, /1X, 'AG -- AG PACKAGE FOR NWT VERSION 1.2.0, ',
-     +     ' 3/03/2020 INPUT READ FROM UNIT ', I4)
+1     FORMAT(1X, /1X, 'AG -- AG PACKAGE FOR NWT VERSION 1.1.3, ',
+     +     ' 8/01/2017 INPUT READ FROM UNIT ', I4)
       !
       !3 - --- CHECK FOR KEYWORDS.
       CALL PARSEAG7OPTIONS(In, Iout, Iunitnwt)
@@ -245,15 +194,6 @@
       ALLOCATE (TRIGGERPERIODSEG(NSEGDIMTEMP))
       ALLOCATE (TIMEINPERIODWELL(MXWELL), TIMEINPERIODSEG(NSEGDIMTEMP))
       ALLOCATE (SEGLIST(NSEGDIMTEMP), NUMSEGLIST)
-      ALLOCATE (IRRPERIODPOND(MXPOND),TRIGGERPERIODPOND(MXPOND))
-      ALLOCATE (TIMEINPERIODPOND(MXPOND))
-      ALLOCATE (AETITERPOND(MXPOND))
-      ALLOCATE (PONDFLOW(MXPOND),PONDFLOWOLD(MXPOND))
-      ALLOCATE (PONDFLOWMAX(MXPOND))
-      ALLOCATE (PONDIRRPRMS(MAXCELLSPOND,NUMIRRPOND))
-      ALLOCATE (TSPONDUNIT(MXPOND),TSPONDNUM(MXPOND))
-      ALLOCATE (TSPONDETUNIT(MXPOND),TSPONDETNUM(MXPOND))
-      
       TSSWNUM = 0
       TSGWNUM = 0
       QONLY = 0.0
@@ -262,10 +202,6 @@
       TSGWETUNIT = 0
       TSSWETNUM = 0
       TSGWETNUM = 0
-      TSPONDUNIT = 0
-      TSPONDNUM = 0
-      TSPONDETUNIT = 0
-      TSPONDETNUM = 0
       SUPSEG = 0.0
       LASTREACH = 0
       IRRPERIODWELL = 0.0
@@ -274,71 +210,41 @@
       TRIGGERPERIODSEG = 0.0
       TIMEINPERIODWELL = 1E30
       TIMEINPERIODSEG = 1E30
-      TIMEINPERIODPOND = 1E30
-      TRIGGERPERIODPOND = 0.0
-      IRRPERIODPOND = 0.0
-      AETITERPOND = 0.0
-      PONDFLOW = 0.0
-      PONDFLOWOLD = 0.0
-      PONDFLOWMAX = 0.0
-      PONDIRRPRMS = 0.0
       SEGLIST = 0
       NUMSEGLIST = 0
       !
       !5 - --- ALLOCATE TIME SERIES VARIABLES
       IF (TSACTIVEGW .OR. TSACTIVESW .OR. TSACTIVEGWET .OR.
-     +    TSACTIVESWET .OR. TSACTIVEPONDET .OR. TSACTIVEPOND ) 
-     +    CALL TSREAD(IN, IOUT)
+     +    TSACTIVESWET) CALL TSREAD(IN, IOUT)
       !
       !6 - --- ALLOCATE VARIABLES FOR TIME SERIES WELL INPUT RATES
-      NUMTABHOLD = NUMTABWELL
+      NUMTABHOLD = NUMTAB
       IF (NUMTABHOLD .EQ. 0) NUMTABHOLD = 1
-      ALLOCATE (TABTIMEWELL(MAXVALWELL, NUMTABHOLD))
-      ALLOCATE (TABRATEWELL(MAXVALWELL, NUMTABHOLD))
-      ALLOCATE (TABLAYWELL(MXWELL), TABROWWELL(MXWELL))
-      ALLOCATE (TABVALWELL(MXWELL), TABIDWELL(MXWELL))
-      ALLOCATE (TABCOLWELL(MXWELL),TABUNITWELL(MXWELL))
-      TABTIMEWELL = 0.0
-      TABRATEWELL = 0.0
-      TABLAYWELL = 0
-      TABROWWELL = 0
-      TABCOLWELL = 0
-      TABVALWELL = 0
-      TABIDWELL = 0
-      TABUNITWELL = 0
-      !
-      !6B - --- ALLOCATE VARIABLES FOR TIME SERIES POND INPUT RATES
-      NUMTABHOLD = NUMTABPOND
-      IF (NUMTABHOLD .EQ. 0) NUMTABHOLD = 1
-      ALLOCATE (TABTIMEPOND(MAXVALPOND, NUMTABHOLD))
-      ALLOCATE (TABRATEPOND(MAXVALPOND, NUMTABHOLD))
-      ALLOCATE (TABVALPOND(MXPOND),TABIDPOND(MXPOND))
-      ALLOCATE (TABPONDHRU(MXPOND),TABUNITPOND(MXPOND))
-      TABTIMEPOND = 0.0
-      TABRATEPOND = 0.0
-      TABPONDHRU = 0
-      TABVALPOND = 0
-      TABIDPOND = 0
-      TABUNITPOND = 0
+      ALLOCATE (TABTIME(MAXVAL, NUMTABHOLD))
+      ALLOCATE (TABRATE(MAXVAL, NUMTABHOLD))
+      ALLOCATE (TABLAY(MXWELL), TABROW(MXWELL), TABCOL(MXWELL))
+      ALLOCATE (TABVAL(MXWELL), TABID(MXWELL), TABUNIT(MXWELL))
+      TABTIME = 0.0
+      TABRATE = 0.0
+      TABLAY = 0
+      TABROW = 0
+      TABCOL = 0
+      TABVAL = 0
+      TABID = 0
+      TABUNIT = 0
       !
       !7 - --- THERE ARE FOUR INPUT VALUES PLUS ONE LOCATION FOR
       !7 - --- CELL - BY - CELL FLOW.
-      NWELVL = 5 + NAUXWELL
+      NWELVL = 5 + NAUX
       !
-      !8 - ---ALLOCATE SPACE FOR THE WELL POND DATA
+      !8 - ---ALLOCATE SPACE FOR THE WELL DATA
       IF (MXWELL .LT. 1) THEN
          WRITE (IOUT, 17)
 17       FORMAT(1X,
      +        'No wells active in the AG Package')
          MXWELL = 1
       END IF
-      IF (MXPOND .LT. 1) THEN
-         WRITE (IOUT, 18)
-18       FORMAT(1X,
-     +        'No ponds active in the AG Package')
-         MXPOND = 1
-      END IF
-      ALLOCATE (POND(2, MXPOND))
+      ALLOCATE (WELL(NWELVL, MXWELL))
       !
       !9 - --- ALLOCATE SUPPLEMENTAL AND IRRIGATION WELL ARRAYS
       NUMSUPHOLD = NUMSUP
@@ -457,7 +363,7 @@
       ! VARIABLES
       ! - -----------------------------------------------------------------
       INTEGER intchk, Iostat, LLOC, ISTART, ISTOP, I
-      logical :: found, option, found1, found2, found3
+      logical :: found, option, found1, found2
       real :: R
       character(len=16)  :: text = 'AG'
       character(len=200) :: line
@@ -467,7 +373,6 @@
       found = .false.
       found1 = .false.
       option = .false.
-      found3 = .false.
       CALL URDCOM(In, IOUT, line)
       DO
          LLOC = 1
@@ -516,19 +421,6 @@
             WRITE (IOUT, *)
             found = .true.
             found1 = .true.
-            !3 - --- MAX NUMBER OF PRMS DETENTION RESERVOIRS
-         case ('IRRIGATION_POND')
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, NUMIRRPOND, 
-     +                  R, IOUT, IN)
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, MAXCELLSPOND, 
-     +                  R, IOUT, IN)
-            IF (NUMIRRPOND .LT. 0) NUMIRRPOND = 0
-            IF (MAXCELLSPOND < 1) MAXCELLSPOND = 1
-            WRITE (IOUT, *)
-            WRITE (IOUT, 43) NUMIRRPOND
-            WRITE (IOUT, *)
-            found = .true.
-            found3 = .true.
             !
             !3 - --- MAX NUMBER OF SUP OR IRR WELLS
          case ('MAXWELLS')
@@ -537,15 +429,6 @@
             IF (MXWELL .LT. 0) MXWELL = 0
             WRITE (IOUT, *)
             WRITE (IOUT, 36) MXWELL
-            WRITE (IOUT, *)
-            !
-            !3 - --- MAX NUMBER OF STORAGE PONDS
-         case ('MAXPONDS')
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, MXPOND, 
-     +                  R, IOUT, IN)
-            IF (MXPOND .LT. 0) MXPOND = 0
-            WRITE (IOUT, *)
-            WRITE (IOUT, 41) MXPOND
             WRITE (IOUT, *)
             !
             !4 - --- Option to output list for wells
@@ -564,13 +447,6 @@
             WRITE (IOUT, 37) IWELLCBU
             WRITE (IOUT, *)
             !
-            !5 - --- Option to output list for ponds
-         case ('PONDCBC')
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IPONDCBU, 
-     +                  R, IOUT, IN)
-            WRITE (IOUT, *)
-            WRITE (IOUT, 42) IPONDCBU
-            WRITE (IOUT, *)
             !6 - --- Option to output list for segments
          case ('DIVERSIONLIST')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ISFRCB, 
@@ -588,13 +464,6 @@
             WRITE (IOUT, *)
             !
             !8 - --- Option to output list for irrigation wells
-         case ('PONDIRRLIST')
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRRWELLCB, 
-     +                  R, IOUT, IN)
-            WRITE (IOUT, *)
-            WRITE (IOUT, 44) IRRPONDCB
-            WRITE (IOUT, *)
-            !8 - --- Option to output list for irrigation ponds
          case ('WELLIRRLIST')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRRWELLCB, 
      +                  R, IOUT, IN)
@@ -615,12 +484,6 @@
             WRITE (IOUT, *)
             WRITE (IOUT, 40)
             WRITE (IOUT, *)
-            !10 - --- Option to output time series by IRR pond
-         case ('TIMESERIES_POND')
-            TSACTIVEPOND = .TRUE.
-            WRITE (IOUT, *)
-            WRITE (IOUT, 40)
-            WRITE (IOUT, *)
             !
             !11 - --- Option to output time series by SW right
          case ('TIMESERIES_DIVERSIONET')
@@ -634,12 +497,6 @@
             TSACTIVEGWET = .TRUE.
             WRITE (IOUT, *)
             WRITE (IOUT, 40)
-            WRITE (IOUT, *)
-           !12 - --- Option to output time series by IRR pond
-         case ('TIMESERIES_PONDET')
-            TSACTIVEPONDET = .TRUE.
-            WRITE (IOUT, *)
-            WRITE (IOUT, 45)
             WRITE (IOUT, *)
             !
             !13 - --- Option to turn off writing to LST file
@@ -680,22 +537,22 @@
             found = .true.
             !
             !16 - --- SPEICYING PUMPING RATES AS TIMES SERIES INPUT FILE FOR EACH WELL
-         case ('TABFILESWELL')
+         case ('TABFILES')
             if (found1) then
-               CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, NUMTABWELL, R, 
+               CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, NUMTAB, R, 
      +                     IOUT, IN)
-               IF (NUMTABWELL .LT. 0) NUMTABWELL = 0
+               IF (NUMTAB .LT. 0) NUMTAB = 0
                WRITE (IOUT, *)
-               WRITE (IOUT, 30) NUMTABWELL
+               WRITE (IOUT, 30) NUMTAB
                WRITE (IOUT, *)
-               CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, MAXVALWELL, R, 
+               CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, MAXVAL, R, 
      +                     IOUT, IN)
-               IF (MAXVALWELL .LT. 0) THEN
-                  MAXVALWELL = 1
-                  NUMTABWELL = 0
+               IF (MAXVAL .LT. 0) THEN
+                  MAXVAL = 1
+                  NUMTAB = 0
                END IF
                WRITE (IOUT, *)
-               WRITE (IOUT, 31) MAXVALWELL
+               WRITE (IOUT, 31) MAXVAL
                WRITE (IOUT, *)
             else
                WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
@@ -704,34 +561,6 @@
                CALL USTOP('Invalid '//trim(adjustl(text))
      +                       //' Option: '//LINE(ISTART:ISTOP)
      +                       //' SUP or IRR wells required')
-            end if
-            found = .true.
-      !
-      !16b - --- SPEICYING POND DIVERSION RATES AS TIMES SERIES INPUT FILE FOR EACH POND
-         case ('TABFILESPOND')
-            if (found3) then
-               CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, NUMTABPOND, R, 
-     +                     IOUT, IN)
-               IF (NUMTABPOND .LT. 0) NUMTABPOND = 0
-               WRITE (IOUT, *)
-               WRITE (IOUT, 46) NUMTABPOND
-               WRITE (IOUT, *)
-               CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, MAXVALPOND, R, 
-     +                     IOUT, IN)
-               IF (MAXVALPOND .LT. 0) THEN
-                  MAXVALPOND = 1
-                  NUMTABPOND = 0
-               END IF
-               WRITE (IOUT, *)
-               WRITE (IOUT, 47) MAXVALPOND
-               WRITE (IOUT, *)
-            else
-               WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
-     +                       //' Option: '//LINE(ISTART:ISTOP)
-     +                       //' IRR ponds required'
-               CALL USTOP('Invalid '//trim(adjustl(text))
-     +                       //' Option: '//LINE(ISTART:ISTOP)
-     +                       //' IRR ponds required')
             end if
             found = .true.
          !
@@ -902,23 +731,8 @@
      +  , ' WILL BE SAVED TO TIMES SERIES OUTPUT FILES.')
 40    FORMAT(1X, ' GROUND WATER IRRIGATION, POTENTIAL AND ACTUAL ET'
      +  , ' WILL BE SAVED TO TIMES SERIES OUTPUT FILES.')
-41    FORMAT(1X, 'OPTION TO APPLY POND WATER AS IRRIGATION IS ',
-     +      'ACTIVE. ','POND IRRIGATION WATER WILL BE APPLIED TO ', 
-     +      I10,' CELLS/RHUS.')
-42    FORMAT(1X, ' UNFORMATTED CELL BY CELL RATES FOR IRR PONDS'
-     +  , ' WILL BE SAVED TO FILE UNIT NUMBER ', I10)
-43    FORMAT(1X, 'OPTION TO APPLY POND WATER AS IRRIGATION IS ',
-     +      'ACTIVE. ','POND IRRIGATION WATER WILL BE APPLIED TO ', 
-     +      I10,' CELLS/RHUS.')
-44    FORMAT(1X, ' UNFORMATTED CELL BY CELL RATES FOR IRRIGATION PONDS'
-     +  , ' WILL BE SAVED TO FILE UNIT NUMBER ', I10)
-45    FORMAT(1X, ' POND WATER IRRIGATION, POTENTIAL AND ACTUAL ET'
-     +  , ' WILL BE SAVED TO TIMES SERIES OUTPUT FILES.')
-46    FORMAT(1X, ' POND DIVERSION RATES WILL BE READ FROM TIME ',
-     +  'SERIES INPUT FILE. ', I10, ' FILES WILL BE READ')
-47    FORMAT(1X, ' POND DIVERSION RATES WILL BE READ FROM TIME ',
-     + 'SERIES INPUT FILE. A MAXIMUM OF ', I10,
-     + ' ROW ENTRIES WILL BE READ FROM EACH FILE')
+!41    FORMAT(1X, ' IRRIGATION RATE ADJUSTMENT FACTOR WAS'
+!     +  , ' SET EQUAL TO.', F10.3)
       END SUBROUTINE
       !
       SUBROUTINE GWF2AG7RP(IN, IUNITSFR, KPER)
@@ -939,6 +753,8 @@
       ! - -----------------------------------------------------------------
       ! VARIABLES:
       ! - -----------------------------------------------------------------
+      CHARACTER(LEN=200)::LINE
+      INTEGER I, ITMP
       character(len=22)  :: text = 'AG STRESS PERIOD DATA'
       character(len=18)  :: text1 = 'IRRIGATION SEGMENT'
       character(len=16)  :: text2 = 'IRRIGATION WELL'
@@ -948,33 +764,23 @@
       character(len=16)  :: text6 = 'SUPWEL'
       character(len=16)  :: text7 = 'STRESS PERIOD'
       character(len=16)  :: text8 = 'END'
-      character(len=16)  :: text9 ='IRRIGATION POND'
-      character(len=16)  :: text10 = 'IRRPOND'
       character(len=16)  :: char1 = 'WELL LIST'
       character(len=16)  :: char2 = 'SEGMENT LIST'
-      character(len=16)  :: char3 = 'POND LIST'
-      CHARACTER(LEN=200)::LINE
-      INTEGER I, ITMP
+
       INTEGER LLOC, ISTART, ISTOP, ISTARTSAVE
-      INTEGER J, II, KPER2, L, MATCH, NUMTABS, is, ip, nseg
-      INTEGER istsg, istsgold, ISEG, IPOND
+      INTEGER J, II, KPER2, L, MATCH, NUMTABS, is
+      INTEGER istsg, istsgold, ISEG
       logical :: FOUND
-      logical :: found1, found2, found3, found4, found5, found6, found7
-      REAL :: R, TTIME, TRATE, QPOND
+      logical :: found1, found2, found3, found4, found5
+      REAL :: R, TTIME, TRATE
       CHARACTER*6 CWELL
       ! - -----------------------------------------------------------------
       found4 = .false.
       found5 = .false.
-      found6 = .false.
-      found7 = .false.
       is = 0
       ISEG = 0
-      ip = 0
-      QPOND = 0.0
-      TTIME = 0.0
-      TRATE = 0.0
       !
-      !1 - ---READ SEGMENT, POND, AND WELL LIST DATA
+      !1 - ---READ SEGMENT AND WELL LIST DATA (OR FLAG SAYING REUSE AG DATA)
       IF (KPER .EQ. 1) THEN
          CALL URDCOM(In, IOUT, line)
          LLOC = 1
@@ -986,9 +792,7 @@
             found5 = .true.
             write (iout, '(/1x,a)') 'PROCESSING '//
      +             trim(adjustl(CHAR2))//''
-            nseg = 0
             do
-               nseg = nseg + 1
                CALL URDCOM(In, IOUT, line)
                LLOC = 1
                CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
@@ -998,15 +802,6 @@
      +                                     trim(adjustl(char2))
                   exit
                case default
-                 if ( nseg > NUMIRRDIVERSION ) then
-                    WRITE (IOUT, *)
-                    WRITE (IOUT, *) 'ERROR IN AG: TOO MANY SEGMENTS IN',
-     +                               ' LIST, OR LIST DOES NOT INCLUDE ',
-     +                               ' KEY WORD "END". MODEL STOPPING'
-                    WRITE (IOUT, *)
-                    CALL USTOP('ERROR IN AG: TOO MANY SEGMENTS IN LIST,
-     +                     OR "END" NOT SPECIFIED. MODEL STOPPING') 
-                  end if
                   LLOC = 1
                   CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ISEG, R, 
      +                        IOUT, IN)
@@ -1026,102 +821,8 @@
                end select
             end do
          end select
-         !2 - ---READ POND LIST
-         if ( found5 ) then
-            CALL URDCOM(In, IOUT, line)
-            LLOC = 1
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-            ISTARTSAVE = ISTART
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-         end if
-         do
-            select case (LINE(ISTARTSAVE:ISTOP))
-            case ('POND LIST')
-               found6 = .true.
-               write (iout, '(/1x,a)') 'PROCESSING '//
-     +                         trim(adjustl(CHAR3))//''
-               IF (NUMTABPOND .EQ. 0) THEN
-                  DO L = 1, MXPOND
-                     CALL URDCOM(In, IOUT, line)
-                     LLOC = 1 
-                     CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IPOND, R,
-     +                           IOUT, IN)
-                     CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
-     +                           QPOND, IOUT,IN)
-                     POND(1,L) = IPOND
-                     POND(2,L) = QPOND
-                     IF (POND(2, L) < 0.0) THEN
-                        WRITE (IOUT, *)
-                        WRITE (IOUT, *) 'ERROR: MAX AG POND DIVERSION '
-     +                        ,'IN LIST',
-     +                        ' IS NEGATIVE AND SHOULD BE POSITIVE.',
-     +                        ' MODEL STOPPING'
-                        WRITE (IOUT, *)
-                  CALL USTOP('ERROR: MAX AG DIVERSION RATE IS NEGATIVE')
-                     END IF
-                  END DO
-               ELSE
-                  NUMTABPOND = 0
-                  MATCH = 0
-                  DO J = 1, MXPOND    
-                     READ (IN, *) TABUNITPOND(J), TABVALPOND(J), 
-     +                            TABPONDHRU(J)
-                     DO I = 1, J - 1
-                        IF (TABUNITPOND(I) == TABUNITPOND(J)) THEN
-                           MATCH = 1
-                           TABIDPOND(J) = TABIDPOND(I)
-                        END IF
-                     END DO
-                     IF (MATCH == 0) THEN
-                        NUMTABPOND = NUMTABPOND + 1
-                        TABIDPOND(J) = NUMTABPOND
-                     END IF
-                     IF (TABUNITPOND(J) .LE. 0) THEN
-                        WRITE (IOUT, 100)
-                        CALL USTOP('')
-                     END IF
-                     REWIND (TABUNITPOND(J))   
-                     DO II = 1, TABVALPOND(J)
-                        LLOC = 1
-                        CALL URDCOM(TABUNITPOND(J), IOUT, LINE)
-                        CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
-     +                              TTIME, IOUT,TABUNITPOND(J))
-                        CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
-     +                              TRATE, IOUT,TABUNITPOND(J))
-                        IF (TRATE < 0.0) THEN
-                           WRITE (IOUT, *)
-                           WRITE (IOUT, *) 'ERROR: MAX AG POND',
-     +                          ' DIVERSION IN LIST IS NEGATIVE AND ',
-     +                          ' SHOULD BE POSITIVE. MODEL STOPPING'
-                           WRITE (IOUT, *)
-                           CALL USTOP('ERROR: MAX POND DIVERSION RATE IN
-     +                     LIST IS NEGATIVE AND SHOULD BE POSITIVE.
-     +                     MODEL STOPPING')
-                        END IF
-                        TABTIMEPOND(II, TABIDPOND(J)) = TTIME
-                        TABRATEPOND(II, TABIDPOND(J)) = TRATE
-                     END DO
-                  END DO
-               END IF
-            case ('END')
-!               found6 = .false.
-               write (iout, '(/1x,a)') 'FINISHED READING '//
-     +          trim(adjustl(char3))
-               exit
-            case default
-               WRITE (IOUT, *) 'Invalid AG Input: '//LINE(ISTART:ISTOP)
-     +           //' Should be: '//trim(adjustl(CHAR3))
-               CALL USTOP('Invalid AG Input: '//LINE(ISTART:ISTOP)
-     +          //' Should be: '//trim(adjustl(CHAR3)))
-            end select
-            if (found6) then
-               CALL URDCOM(In, IOUT, line)
-               LLOC = 1
-               CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-            end if
-         end do
          !2 - ---READ WELL LIST
-         if (found5 .or. found6) then
+         if (found5) then
             CALL URDCOM(In, IOUT, line)
             LLOC = 1
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
@@ -1134,11 +835,11 @@
                found4 = .true.
                write (iout, '(/1x,a)') 'PROCESSING '//
      +                         trim(adjustl(CHAR1))//''
-               IF (NUMTABWELL .EQ. 0) THEN
+               IF (NUMTAB .EQ. 0) THEN
                   CALL ULSTRD(NNPWEL, WELL, 1, NWELVL, MXWELL, 1, IN, 
      +                 IOUT,'LAYER   ROW   COL   MAX STRESS RATE',
-     +                 WELAUX, 20, NAUXWELL, IFREFM, NCOL, NROW, NLAY, 
-     +                 4, 4, IPRWEL)
+     +                 WELAUX, 20, NAUX, IFREFM, NCOL, NROW, NLAY, 4, 
+     +                 4, IPRWEL)
                   DO L = 1, NNPWEL
                      IF (WELL(4, L) > 0.0) THEN
                         WRITE (IOUT, *)
@@ -1154,31 +855,30 @@
                   NUMTABS = 0
                   MATCH = 0
                   DO J = 1, MXWELL    
-                     READ (IN, *) TABUNITWELL(J), TABVALWELL(J), 
-     +                    TABLAYWELL(J),TABROWWELL(J), TABCOLWELL(J)
+                     READ (IN, *) TABUNIT(J), TABVAL(J), TABLAY(J),
+     +                            TABROW(J), TABCOL(J)
                      DO I = 1, J - 1
-                        IF (TABUNITWELL(I) == TABUNITWELL(J)) THEN
+                        IF (TABUNIT(I) == TABUNIT(J)) THEN
                            MATCH = 1
-                           TABIDWELL(J) = TABIDWELL(I)
+                           TABID(J) = TABID(I)
                         END IF
                      END DO
                      IF (MATCH == 0) THEN
                         NUMTABS = NUMTABS + 1
-                        TABIDWELL(J) = NUMTABS
+                        TABID(J) = NUMTABS
                      END IF
-                     IF (TABUNITWELL(J) .LE. 0) THEN
+                     IF (TABUNIT(J) .LE. 0) THEN
                         WRITE (IOUT, 100)
-                        CALL USTOP('UNIT NUMBER FOR TABULAR INPUT FILE 
-     +                              SPECIFIED AS ZERO.')
+                        CALL USTOP('')
                      END IF
-                     REWIND (TABUNITWELL(J))   
-                     DO II = 1, TABVALWELL(J)
+                     REWIND (TABUNIT(J))   
+                     DO II = 1, TABVAL(J)
                         LLOC = 1
-                        CALL URDCOM(TABUNITWELL(J), IOUT, LINE)
+                        CALL URDCOM(TABUNIT(J), IOUT, LINE)
                         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
-     +                              TTIME, IOUT,TABUNITWELL(J))
+     +                              TTIME, IOUT,TABUNIT(J))
                         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
-     +                              TRATE, IOUT,TABUNITWELL(J))
+     +                              TRATE, IOUT,TABUNIT(J))
                         IF (TRATE > 0.0) THEN
                            WRITE (IOUT, *)
                            WRITE (IOUT, *) 'ERROR: MAX AG PUMPING RATE',
@@ -1189,8 +889,8 @@
      +                     LIST IS POSITIVE AND SHOULD BE NEGATIVE.
      +                     MODEL STOPPING')
                         END IF
-                        TABTIMEWELL(II, TABIDWELL(J)) = TTIME
-                        TABRATEWELL(II, TABIDWELL(J)) = TRATE
+                        TABTIME(II, TABID(J)) = TTIME
+                        TABRATE(II, TABID(J)) = TRATE
                      END DO
                   END DO
                END IF
@@ -1238,8 +938,7 @@
       found1 = .FALSE.
       found2 = .FALSE.
       found3 = .FALSE.
-      found4 = .FALSE.
-      found7 = .FALSE.
+      found4 = .false.
       if (NUMIRRDIVERSION == 0) found1 = .true.
       if (NUMIRRWEL == 0) found2 = .true.
       if (NUMSUP == 0) found3 = .true.
@@ -1305,20 +1004,6 @@
                CALL USTOP('Key word '//trim(adjustl(text5))
      +     //'  found without key word '//trim(adjustl(text7)))
             END IF
-         case ('IRRPOND')
-            found7 = .true.
-            write (iout, '(/1x,a)') 'READING '//
-     +      trim(adjustl(text9))//''
-            CALL URDCOM(In, IOUT, line)
-            LLOC = 1
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ITMP, R, IOUT, IN)
-            CALL IRRPOND(IN, ITMP)
-            IF (KPER == 1 .AND. ITMP < 0) THEN
-               WRITE (IOUT, *) 'Key word '//trim(adjustl(text10))
-     +     //' specified with no additional input.'
-               CALL USTOP('Keyvword '//trim(adjustl(text10))
-     +     //'  specified with no additional input.')
-            END IF
          case ('SUPWELL')
             found3 = .true.
             write (iout, '(/1x,a)') 'READING '//
@@ -1376,9 +1061,6 @@
               if (.not. found3) then
                  WRITE (IOUT, 8)
               end if
-              if (.not. found7) then
-                 WRITE (IOUT, 9)
-              end if
 !           end if
             write (iout, '(/1x,a)') 'END PROCESSING '//
      +      trim(adjustl(text))//' OPTIONS'
@@ -1400,9 +1082,6 @@
 8     FORMAT(1X, /
      +       1X, 'NO SUPWEL OR REUSING SUPWEL DATA ',
      +       'FROM LAST STRESS PERIOD')
-9     FORMAT(1X, /
-     +       1X, 'NO IRRPOND OR REUSING IRRPOND DATA ',
-     +       'FROM LAST STRESS PERIOD')
       RETURN
       END
 !
@@ -1417,22 +1096,18 @@
       USE GWFSFRMODULE, ONLY: SEG
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GLOBAL, ONLY: IUNIT
-      USE GWFBASMODULE, ONLY: TOTIM
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS:
       INTEGER, INTENT(IN)::IN, KPER
       !
-      INTEGER ISEG, i, L
+      INTEGER ISEG, i
       DOUBLE PRECISION :: TOTAL
-      EXTERNAL :: RATETERPQ
-      REAL :: RATETERPQ, TIME
       ! - -----------------------------------------------------------------
       !
       !1 - ------RESET DEMAND IF IT CHANGES
       DEMAND = 0.0
       TOTAL = 0.0
-      TIME = TOTIM
       DO i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
          if (iseg > 0) then
@@ -1455,18 +1130,7 @@
             SEG(2, SEGLIST(i)) = 0.0
          END DO
       END IF
-      !
-      !3 - -----SET MAXIMUM POND DIVERSION RATES WHEN TABFILES ARE USED
-      IF ( MXPOND > 0 ) THEN
-          IF (NUMTABPOND > 0) THEN
-            DO L = 1, MXPOND
-              POND(1,L) = TABPONDHRU(L)
-              POND(2,L) = RATETERPQ(TIME, TABTIMEPOND, TABRATEPOND, 
-     +                              TABIDPOND(L), TABVALPOND(L))
-            END DO
-          END IF
-      END IF
-      !4 - -----RESET SAVED AET FROM LAST ITERATION
+      !3 - -----RESET SAVED AET FROM LAST ITERATION
       DIVERSIONIRRUZF = 0.0
       DIVERSIONIRRPRMS = 0.0
       WELLIRRUZF = 0.0
@@ -1517,8 +1181,7 @@
       IF (NUMSUPSP > NUMSUP) THEN
          WRITE (IOUT, *)
          WRITE (IOUT, 102) NUMSUP, NUMSUPSP
-         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR '//
-     +                 'SUP WELLS')
+         CALL USTOP('')
       END IF
       IERR = 0
       DO J = 1, NUMSUPSP
@@ -1529,8 +1192,7 @@
          IF (NMSG > MAXSEGS) THEN
             WRITE (IOUT, *)
             WRITE (IOUT, 103) MAXSEGS, NMSG
-            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR '//
-     +                 'SUP WELLS')
+            CALL USTOP('')
          END IF
          SUPWELVAR(J) = ISPWL
          NUMSEGS(ISPWL) = NMSG
@@ -1545,8 +1207,7 @@
       IF (IERR == 1) THEN
          WRITE (IOUT, *) 'SEGMENT NUMBER FOR SUPPLEMENTAL WELL ',
      +                   'SPECIFIED AS ZERO. MODEL STOPPING'
-         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR '//
-     +                 'SUP WELLS')
+         CALL USTOP('')
       END IF
       !
 !99    FORMAT(1X, /1X, '****MODEL STOPPING**** ',
@@ -1628,7 +1289,7 @@
       IF (NUMIRRWELSP > NUMIRRWEL) THEN
          WRITE (IOUT, *)
          WRITE (IOUT, 104) NUMIRRWEL, NUMIRRWELSP
-         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR WELLS')
+         CALL USTOP('')
       END IF
       DO J = 1, NUMIRRWELSP
          CALL URDCOM(IN, IOUT, LINE)
@@ -1640,8 +1301,7 @@
          IF (NMCL > MAXCELLSWEL) THEN
             WRITE (IOUT, *)
             WRITE (IOUT, 105) MAXCELLSWEL, NMCL
-            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
-     +                 'WELLS')
+            CALL USTOP('')
          END IF
          IRRWELVAR(J) = IRWL
          NUMCELLS(IRWL) = NMCL
@@ -1655,8 +1315,7 @@
             DO K = 1, NUMCELLS(IRRWELVAR(J))
                IF (IRRROW_GW(K, IRRWELVAR(J)) == 0) THEN
                   WRITE (IOUT, 107)
-                  CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR '//
-     +                 'IRR WELLS')
+                  CALL USTOP('')
                END IF
             END DO
          ELSE
@@ -1668,8 +1327,7 @@
                IF (IRRROW_GW(K, IRRWELVAR(J)) == 0 .OR.
      +             IRRCOL_GW(K, IRRWELVAR(J)) == 0) THEN
                   WRITE (IOUT, 106)
-                  CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR '//
-     +                 'IRR WELLS')
+                  CALL USTOP('')
                END IF
             END DO
          END IF
@@ -1691,110 +1349,6 @@
      +       'irrigation well specified as zero. Model stopping.')
 107   FORMAT('***ERROR IN AG PACKAGE*** HRU ID for ',
      +       'irrigation well specified as zero. Model stopping.')
-      RETURN
-      END
-      !
-      SUBROUTINE IRRPOND(IN, ITMP)
-      !******************************************************************
-      ! READ POND IRRIGATION DATA FOR EACH STRESS PERIOD
-      !******************************************************************
-      !
-      ! SPECIFICATIONS:
-      ! - -----------------------------------------------------------------
-      USE GLOBAL, ONLY: IOUT
-      USE GWFAGMODULE
-      IMPLICIT NONE
-      ! - -----------------------------------------------------------------
-      ! ARGUMENTS:
-      INTEGER, INTENT(IN)::IN, ITMP
-      ! - -----------------------------------------------------------------
-      ! VARIABLES:
-      CHARACTER(LEN=200)::LINE
-      INTEGER :: IERR, LLOC, ISTART, ISTOP, J, IDUM
-      INTEGER :: K, IRWL, NMCL, IP, I
-      REAL :: R, IPRW, TRPW
-      logical :: TEST
-      ! - -----------------------------------------------------------------
-      !
-      !
-      !1 - --REUSE VALUES FROM PREVIOUS STRESS PERIOD.
-      IF (ITMP < 0) RETURN
-      !
-      !2 - --INITIALIZE AG VARIABLES TO ZERO.
-      IRRPONDVAR = 0
-      NUMCELLSPOND = 0
-      IRRFACTPOND = 0.0
-      IRRFIELDFACTPOND = 0.0
-      IRRHRU_POND = 0
-      !
-      !3 - --INACTIVATE ALL IRRIGATION DEPRESSION STORAGE RESERRVOIRS.
-      IF (ITMP == 0) THEN
-         NUMIRRPONDSP = 0
-         RETURN
-      END IF
-      !
-      !4 - --READ NEW IRRIGATION DEPRESSION STORAGE DATA
-      IERR = 0
-      NUMIRRPONDSP = ITMP
-      !
-      !5 - --READ LIST OF IRRIGATION HRUS FOR EACH DEPRESSION STORAGE RESERVOIR
-      IF (NUMIRRPONDSP > NUMIRRPOND) THEN
-         WRITE (IOUT, *)
-         WRITE (IOUT, 104) NUMIRRPOND, NUMIRRPONDSP
-         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR PONDS')
-      END IF
-      DO J = 1, NUMIRRPONDSP
-         CALL URDCOM(IN, IOUT, LINE)
-         LLOC = 1
-         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRWL, R, IOUT, IN)
-         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, NMCL, R, IOUT, IN)
-         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, i, IPRW, IOUT, In)
-         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, i, TRPW, IOUT, In)
-         IF (NMCL > MAXCELLSPOND) THEN
-            WRITE (IOUT, *)
-            WRITE (IOUT, 105) MAXCELLSPOND, NMCL
-            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
-     +                 'PONDS')
-         END IF
-         IRRPONDVAR(J) = IRWL
-         NUMCELLSPOND(IRWL) = NMCL
-         IRRPERIODPOND(IRWL) = IPRW
-         TRIGGERPERIODPOND(IRWL) = TRPW 
-         TEST = .TRUE.
-         DO IP = 1, MXPOND 
-           IF ( POND(1,IP) == IRRPONDVAR(J) ) TEST = .FALSE.
-         END DO
-         IF (TEST) THEN
-           WRITE(IOUT,107)IRWL 
-           CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
-     +                 'PONDS')
-         END IF
-         DO K = 1, NMCL
-           READ (IN, *)IRRHRU_POND(K, IRWL), IDUM, IRRFACTPOND(K, IRWL),
-     +                           IRRFIELDFACTPOND(K, IRWL)
-         END DO
-         DO K = 1, NUMCELLSPOND(IRRPONDVAR(J))
-           IF (IRRHRU_POND(K, IRRPONDVAR(J)) == 0) THEN
-             WRITE (IOUT, 106)
-             CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
-     +                 'PONDS')
-           END IF
-        END DO
-      END DO
-104   FORMAT('***Error in IRR Ponds*** maximum number ',
-     +      'of irrigation HRUs is less than the number specified in ',
-     +      'stress period. ', /
-     +      'Maximum Pond storage HRUs and the number specified '
-     +      'for stress period are: ', 2i6)
-105   FORMAT('***Error in IRR Ponds*** maximum number of ',
-     +       'HRUs irrigated by a depression storage is less than ',
-     +       'the number specified in stress period. ', /
-     +       'Maximum HRUs and the number specified for stress '
-     +       'period are: ', 2i6)
-106   FORMAT('***Error in IRR Ponds*** HRU ID ',
-     +       'irrigated by pond is zero. Model stopping.')
-107   FORMAT('***Error in IRR Ponds*** HRU ID for ',
-     +    'irrigation pond is not listed in POND LIST. Model stopping.')
       RETURN
       END
 !
@@ -1841,8 +1395,7 @@
       IF (NUMIRRDIVERSIONSP > NUMIRRDIVERSION) THEN
          WRITE (IOUT, *)
          WRITE (IOUT, 9008) NUMIRRDIVERSION, NUMIRRDIVERSIONSP
-         CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
-     +                 'DIVERSION')
+         CALL USTOP('')
       END IF
       DO J = 1, NUMIRRDIVERSIONSP
          LLOC = 1
@@ -1856,8 +1409,7 @@
          IF (NMCL > MAXCELLSDIVERSION) THEN
             WRITE (IOUT, *)
             WRITE (IOUT, 9009) MAXCELLSDIVERSION, NMCL
-            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
-     +                 'DIVERSION')
+            CALL USTOP('')
          END IF
          IF (SGNM > 0) THEN
             IRRSEG(J) = SGNM
@@ -1874,8 +1426,7 @@
                   IF (IRRROW_SW(K, SGNM) == 0) THEN
                      totdum = totdum + DVRPERC(NMCL, SGNM)
                      WRITE (IOUT, 9010)
-                     CALL USTOP('ERROR IN STRESS PERIOD INFORMATION '//
-     +                 'FOR IRR DIVERSION')
+                     CALL USTOP('')
                      IF (totdum .GT. 1.000001 .OR. totdum .LT. 0.999)
      +                   WRITE (Iout, 9006) totdum
                   END IF
@@ -1891,8 +1442,7 @@
      +                IRRCOL_SW(K, SGNM) == 0) THEN
                      totdum = totdum + DVRPERC(NMCL, SGNM)
                      WRITE (IOUT, 9007)
-                     CALL USTOP('ERROR IN STRESS PERIOD INFORMATION '//
-     +                 'FOR IRR DIVERSION')
+                     CALL USTOP('')
                      IF (totdum .GT. 1.000001 .OR. totdum .LT. 0.999)
      +                  WRITE (Iout, 9006) totdum
                   END IF
@@ -1923,7 +1473,7 @@
       !
       ! - ------SUBROUTINE TSREAD
       SUBROUTINE TSREAD(IN, IOUT)
-      ! READ SEGMENTS, PONDS, AND WELLS WITH TIME SERIES OUTPUT
+      ! READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
       USE GWFAGMODULE
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
@@ -1933,18 +1483,15 @@
       ! VARIABLES
       ! - -----------------------------------------------------------------
       INTEGER LLOC, ISTART, ISTOP, I, SGNM, UNIT, WLNM
-      INTEGER PDNM
       INTEGER ISTARTSAVE, ITEST, NUMGWETALL, NUMGWALL
       real :: R
       !character(len=16)  :: text = 'AG'
       character(len=17)  :: char1 = 'TIME SERIES'
       character(len=200) :: line
-      logical :: TEST
       ! - -----------------------------------------------------------------
       !
       NUMGWETALL = 0
       NUMGWALL = 0
-      TEST = .FALSE.
       CALL URDCOM(In, IOUT, line)
       LLOC = 1
       CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
@@ -1953,7 +1500,6 @@
       do
          select case (LINE(ISTARTSAVE:ISTOP))
          case ('TIME SERIES')
-            TEST = .TRUE.
             write (iout, '(/1x,a)') 'PROCESSING '//
      +                     trim(adjustl(CHAR1))//''
          case ('DIVERSION')
@@ -1986,21 +1532,6 @@
                WRITE (IOUT, *) 'Bad well number for AG time series. '
                CALL USTOP('Bad well number for AG time series.')
             END IF
-         case ('POND')
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, PDNM, R, IOUT, IN)
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
-            NUMPOND = NUMPOND + 1
-            TSPONDUNIT(NUMPOND) = UNIT
-            TSPONDNUM(NUMPOND) = PDNM
-            ITEST = 0
-            DO I = 1, NUMPOND - 1
-               IF (UNIT == TSPONDUNIT(I)) ITEST = 1
-            END DO
-            IF (ITEST /= 1) CALL WRITE_HEADER('PND', NUMPOND)
-            IF (PDNM > MXPOND) THEN
-               WRITE (IOUT, *) 'Bad pond number for AG time series. '
-               CALL USTOP('Bad pond number for AG time series.')
-            END IF
          case ('DIVERSIONET')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, SGNM, R, IOUT, IN)
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
@@ -2031,21 +1562,6 @@
                WRITE (IOUT, *) 'Bad well number for AG ET time series. '
                CALL USTOP('Bad well number for AG ET time series.')
             END IF
-         case ('PONDET')
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, PDNM, R, IOUT, IN)
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
-            NUMPONDET = NUMPONDET + 1
-            TSPONDETUNIT(NUMPONDET) = UNIT
-            TSPONDETNUM(NUMPONDET) = PDNM
-            ITEST = 0
-            DO I = 1, NUMPONDET - 1
-               IF (UNIT == TSPONDETUNIT(I)) ITEST = 1
-            END DO
-            IF (ITEST /= 1) CALL WRITE_HEADER('PET', NUMPONDET)
-            IF (WLNM > MXWELL) THEN
-               WRITE (IOUT, *) 'Bad pond number for AG ET time series. '
-               CALL USTOP('Bad pond number for AG ET time series.')
-            END IF
          case ('WELLETALL')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
             TSGWETALLUNIT = UNIT
@@ -2071,14 +1587,10 @@
          CALL URWORD(LINE, LLOC, ISTARTSAVE, ISTOP, 1, I, R, IOUT, IN)
       end do
       !11 - ----output number of files activated for time series output.
-      IF ( TEST ) THEN
-        write (iout, 6) NUMSW
-        write (iout, 7) NUMGW + NUMGWALL
-        write (iout, 8) NUMSWET
-        write (iout, 9) NUMGWET + NUMGWETALL
-      ELSE
-        BACKSPACE(IN)
-      END IF
+      write (iout, 6) NUMSW
+      write (iout, 7) NUMGW + NUMGWALL
+      write (iout, 8) NUMSWET
+      write (iout, 9) NUMGWET + NUMGWETALL
 6     FORMAT(' A total number of ', i10, ' AG output time series files '
      +       'were activated for SURFACE WATER ')
 7     FORMAT(' A total number of ', i10, ' AG output time series files '
@@ -2127,15 +1639,6 @@
            UNIT = TSGWETUNIT(NUM)
            WLNM = TSGWETNUM(NUM)
            WRITE (UNIT, *) 'TIME KPER KSTP WELL ETww ETa NULL'
-        case ('PND')
-           UNIT = TSPONDUNIT(NUM)
-           WLNM = TSPONDNUM(NUM)
-           WRITE (UNIT, *) 'TIME KPER KSTP POND-HRU POND-DEMAND ',
-     +                     'POND-DIVERTED NULL'
-        case ('PET')
-           UNIT = TSPONDETUNIT(NUM)
-           WLNM = TSPONDETNUM(NUM)
-           WRITE (UNIT, *) 'TIME KPER KSTP POND-HRU ETww ETa NULL'
         case ('AL1')
            UNIT = TSGWETALLUNIT
            WRITE (UNIT, *) 'TIME KPER KSTP NULL ETww ETa NULL'
@@ -2194,9 +1697,7 @@
       DIVERSIONIRRPRMS = 0.0
       WELLIRRUZF = 0.0
       WELLIRRPRMS = 0.0
-      PONDIRRPRMS = 0.0
       SUPFLOW = 0.0
-      PONDFLOW = 0.0
       Qp = ZERO
 !      print *, 'qp', qp, totim, zero
       Q = ZERO
@@ -2210,7 +1711,6 @@
             CALL demandconjunctive_uzf(kkper, kkstp, kkiter)
          ELSE
             CALL demandconjunctive_prms(kkper, kkstp, kkiter)
-            CALL demandpond_prms(kkper, kkstp, kkiter)
          END IF
       END IF
       IF (TRIGGERFLAG > 0) THEN
@@ -2230,17 +1730,16 @@
       !
       !3 - -----SET MAX PUMPING RATE OR IRR DEMAND FOR GW.
       DO L = 1, NWELLS
-         IF (NUMTABWELL .LE. 0) THEN
+         IF (NUMTAB .LE. 0) THEN
             IR = WELL(2, L)
             IC = WELL(3, L)
             IL = WELL(1, L)
             Q = WELL(4, L)
          ELSE
-            IR = TABROWWELL(L)
-            IC = TABCOLWELL(L)
-            IL = TABLAYWELL(L)
-            Q = RATETERPQ(TIME, TABTIMEWELL, TABRATEWELL, 
-     +                    TABIDWELL(L), TABVALWELL(L))
+            IR = TABROW(L)
+            IC = TABCOL(L)
+            IL = TABLAY(L)
+            Q = RATETERPQ(TIME, TABID(L))
          END IF
          IF (NUMIRRDIVERSIONSP + NUMIRRWELSP == 0) Q = 0.0
          QQ=Q
@@ -2352,6 +1851,11 @@
                   SUBVOL = -(DONE - IRRFACT(I, L))*Qp*IRRFIELDFACT(I, L)
                   ! Keep irrigation for PRMS as volumetric rate
                   WELLIRRPRMS(I, L) = WELLIRRPRMS(I, L) + SUBVOL
+!                  if ( i==1 .and. l==122 ) then
+!                    print *, 'SUBVOL',SUBVOL, DONE, IRRFACT(I, L), Qp
+!                    print *, IRRFIELDFACT(I, L), WELLIRRPRMS(I, L)
+!                    print *, Qonly(L), DONENEG, Q
+!                    endif
                END DO
             END IF
          END IF
@@ -2382,25 +1886,13 @@
          END IF
       END DO
       !
-      ! divide pond water into irrigated HRUs
-      !
-      DO icount = 1, NUMIRRPONDSP
-        K = NUMCELLSPOND(icount)
-        SUBVOL = PONDFLOW(icount)
-        DO L = 1, K
-          dvt = IRRFIELDFACTPOND(L, icount)*SUBVOL
-          dvt = IRRFACTPOND(L, icount)*dvt
-          PONDIRRPRMS(L, icount) = dvt
-        END DO
-      END DO
-      !
       !3 - -----RETURN
       RETURN
       END
 !
       SUBROUTINE GWF2AG7BD(kkstp, kkper, Iunitnwt)
       !******************************************************************
-      ! CALCULATE FLOWS FOR AG OPTIONS(DIVERSIONS, PONDS, AND PUMPING)
+      ! CALCULATE FLOWS FOR AG OPTIONS(DIVERSIONS AND PUMPING)
       !******************************************************************
       !
       ! SPECIFICATIONS:
@@ -2420,38 +1912,33 @@
       ! VARIABLES:
       ! - -----------------------------------------------------------------
       CHARACTER*22 TEXT2, TEXT6, TEXT7, TEXT8, TEXT1, TEXT3, TEXT4, 
-     +             TEXT5, TEXT13, TEXT14, TEXT15
+     +             TEXT5
       CHARACTER*16 TEXT9
-      CHARACTER*21 TEXT10, TEXT11, TEXT12
+      CHARACTER*19 TEXT10, TEXT11
       DOUBLE PRECISION :: RATIN, RATOUT, ZERO, DVT, RIN, ROUT
       DOUBLE PRECISION :: SUP, SUBVOL, RATINAG, RATOUTAG, AREA
       DOUBLE PRECISION :: QSW, QSWIRR, QWELL, QWELLIRR, QWELLET
-      DOUBLE PRECISION :: QSWGL, DONE, QPOND
+      DOUBLE PRECISION :: QSWGL, DONE
       REAL :: Q, TIME, RATETERPQ, QIRR, BUDPERC
       INTEGER :: NWELLSTEMP, L, I, J, ISTSG, ICOUNT, IL
-      INTEGER :: IC, IR, IBDLBL, IW1, IHRU
-      INTEGER :: IBD1, IBD2, IBD3, IBD4, IBD5, IBD6, IBD7
-!      INTEGER :: TOTWELLCELLS, TOTDIVERSIONCELLS
-!      INTEGER :: TOTPONDCELLS
+      INTEGER :: IC, IR, IBDLBL, IW1
+      INTEGER :: IBD1, IBD2, IBD3, IBD4, IBD5
+      INTEGER :: TOTWELLCELLS, TOTDIVERSIONCELLS, IHRU
       EXTERNAL :: SMOOTHQ, RATETERPQ
       DOUBLE PRECISION :: SMOOTHQ, bbot, ttop, hh
       DOUBLE PRECISION :: Qp, QQ, Qsave, dQp
       DOUBLE PRECISION :: DONENEG
       DATA TEXT1/'           AG WELLS'/
       DATA TEXT2/'  DIVERSION SEGMENTS'/
-      DATA TEXT13/'   IRRIGATION PONDS'/
       DATA TEXT3/'       SW IRRIGATION'/
       DATA TEXT4/'       GW IRRIGATION'/
-      DATA TEXT14/'    POND IRRIGATION'/
       DATA TEXT5/'       SW RETURN FLOW'/
       DATA TEXT6/'       GW RETURN FLOW'/
-      DATA TEXT15/'    POND RETURN FLOW'/
       DATA TEXT7/'    SYSTEM LOSSES SW'/
       DATA TEXT8/'    SYSTEM LOSSES GW'/
       DATA TEXT9/'       AG WELLS'/
       DATA TEXT10/'CROP CONSUMPTION SW'/
       DATA TEXT11/'CROP CONSUMPTION GW'/
-      DATA TEXT12/'CROP CONSUMPTION POND'/
       ! - -----------------------------------------------------------------
       ZERO = 0.0D0
       DONE = 1.0D0
@@ -2467,11 +1954,9 @@
       QWELLET = ZERO
       QWELL = ZERO
       QIRR = 0.0
-      QPOND = 0.0
       SUPSEG = 0.0
-!      TOTWELLCELLS = 0
-!      TOTDIVERSIONCELLS = 0
-!      TOTPONDCELLS = 0
+      TOTWELLCELLS = 0
+      TOTDIVERSIONCELLS = 0
       TIME = TOTIM
       ACTUAL = 0.0
       ACTUALOLD = 0.0
@@ -2482,8 +1967,6 @@
       IBD3 = 0
       IBD4 = 0
       IBD5 = 0
-      IBD6 = 0
-      IBD7 = 0
       Qp = 1.0
       NWELLSTEMP = NWELLS
       IBDLBL = 0
@@ -2502,11 +1985,6 @@
       ! Budeget output for irrigation wells
       IF (IRRWELLCB .LT. 0 .AND. ICBCFL .NE. 0) IBD4 = IOUT
       IF (IRRWELLCB .GT. 0 .AND. ICBCFL .NE. 0) IBD4 = IRRWELLCB
-      ! Budget output for ponds
-      IF (IPONDCB .LT. 0 .AND. ICBCFL .NE. 0) IBD6 = IOUT
-      IF (IPONDCB .GT. 0 .AND. ICBCFL .NE. 0) IBD6 = IPONDCB
-      ! Unformatted cbc budget output for ponds
-      IF (IPONDCBU .GT. 0) IBD7= ICBCFL
       !
       !1 - -----ADD UP TOTAL NUMBER OF WELL IRRIGATION CELLS DURING STRESS PERIOD.
       !DO L=1,NWELLSTEMP
@@ -2529,32 +2007,31 @@
       !
       !4 - -----SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
       NWELLSTEMP = NWELLS
-      !      IF ( NUMTABWELL.GT.0 ) NWELLSTEMP = NUMTABWELL
+      !      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
       !
       !2 - ----IF CELL - BY - CELL PUMPING WILL BE SAVED AS A LIST(COMPACT BUDGET),
       ! WRITE HEADER.
-      NAUXWELL = NWELVL - 5
-      IF (IAUXSV .EQ. 0) NAUXWELL = 0
+      NAUX = NWELVL - 5
+      IF (IAUXSV .EQ. 0) NAUX = 0
       !
       !2 - ----IF CELL - BY - CELL FLOWS WILL BE SAVED AS A LIST, WRITE HEADER.
       IF (IBD5 .EQ. 2) THEN
-         CALL UBDSV4(KKSTP, KKPER, TEXT1, NAUXWELL, WELAUX, IWELLCBU,  
-     +    NCOL,NROW, NLAY, NWELLS, IOUT, DELT, PERTIM, TOTIM, IBOUND)
+         CALL UBDSV4(KKSTP, KKPER, TEXT1, NAUX, WELAUX, IWELLCBU, NCOL, 
+     +        NROW, NLAY, NWELLS, IOUT, DELT, PERTIM, TOTIM, IBOUND)
       END IF
       !
       !5 - -----CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
       DO L = 1, NWELLSTEMP
-         IF (NUMTABWELL .LE. 0) THEN
+         IF (NUMTAB .LE. 0) THEN
             IR = WELL(2, L)
             IC = WELL(3, L)
             IL = WELL(1, L)
             Q = WELL(4, L)
          ELSE
-            IR = TABROWWELL(L)
-            IC = TABCOLWELL(L)
-            IL = TABLAYWELL(L)
-            Q = RATETERPQ(TIME, TABTIMEWELL, TABRATEWELL, 
-     +                    TABIDWELL(L), TABVALWELL(L))
+            IR = TABROW(L)
+            IC = TABCOL(L)
+            IL = TABLAY(L)
+            Q = RATETERPQ(TIME, TABID(L))
          END IF
          !
          !6 - -----IF TRIGGER ACTIVE THEN IMCREMENT IRRIGATION PERIOD FOR WELL
@@ -2623,13 +2100,13 @@
          !11A - ----ADD FLOW RATE TO BUFFER.
          BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + QQ
          !
-         !11D-----FLOW RATE IS ALWAYS NEGATIVE(DISCHARGE) ADD IT TO RATOUT.
+         !11D-----FLOW RATE IS ALWAYS NEGATIVE(DISCHARGE) .ADD IT TO RATOUT.
          RATOUT = RATOUT - QQ
          !
          !11E-----IF SAVING CELL - BY - CELL FLOWS IN A LIST, WRITE FLOW.
          !
          IF (IBD5 .EQ. 2) CALL UBDSVB(IWELLCBU, NCOL, NROW, IC, IR, IL, 
-     +                Q, WELL(:, L), NWELVL, NAUXWELL, 5, IBOUND, NLAY)
+     +                     Q,WELL(:, L), NWELVL, NAUX, 5, IBOUND, NLAY)
          !
          ! - -------COPY FLOW TO WELL LIST.
          WELL(NWELVL, L) = QQ
@@ -2670,20 +2147,20 @@
          WRITE (IBD1, *)
          WRITE (IBD1, 61) TEXT1, KKPER, KKSTP
          DO L = 1, NWELLSTEMP
-            IF (NUMTABWELL .LE. 0) THEN
+            IF (NUMTAB .LE. 0) THEN
                IR = WELL(2, L)
                IC = WELL(3, L)
                IL = WELL(1, L)
             ELSE
-               IR = TABROWWELL(L)
-               IC = TABCOLWELL(L)
-               IL = TABLAYWELL(L)
+               IR = TABROW(L)
+               IC = TABCOL(L)
+               IL = TABLAY(L)
             END IF
             WRITE (IBD1, 62) L, IL, IR, IC, WELL(NWELVL, L)
          END DO
          WRITE (IBD1, *)
       END IF
-      !
+!
       !13 - ----PRINT IRRIGATION DIVERSION RATE IF REQUESTED.
       IF (IBD2 .GT. 0) THEN
          WRITE (IBD2, *)
@@ -2694,7 +2171,7 @@
          END DO
          WRITE (IBD2, *)
       END IF
-      !
+!
       !13 - ----PRINT APPLIED SW IRRIGATION FOR EACH CELL
       IF (IBD3 .GT. 0) THEN
          WRITE (IBD3, *)
@@ -2781,15 +2258,6 @@
       VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
       VBNMAG(MSUMAG) = TEXT2
       MSUMAG = MSUMAG + 1
-      !19 - ------POND RELEASES
-      RIN = QPOND
-      ROUT = ZERO
-      VBVLAG(3, MSUMAG) = sngl(RIN)
-      VBVLAG(4, MSUMAG) = sngl(ROUT)
-      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
-      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
-      VBNMAG(MSUMAG) = TEXT13
-      MSUMAG = MSUMAG + 1
       !
       !18 - ------GW IRRIGATION
       RIN = ZERO
@@ -2859,7 +2327,7 @@
       END
 ! ----------------------------------------------------------------------
 !
-      SUBROUTINE demandconjunctive_uzf(kper, kstp, kiter)
+      SUBROUTINE DEMANDCONJUNCTIVE_UZF(kper, kstp, kiter)
 !     ******************************************************************
 !     demandconjunctive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
@@ -2942,7 +2410,7 @@
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
 300   CONTINUE
       RETURN
-      END SUBROUTINE demandconjunctive_uzf
+      END SUBROUTINE DEMANDCONJUNCTIVE_UZF
 ! ----------------------------------------------------------------------
 !
 !
@@ -3029,81 +2497,6 @@
 300   continue
       return
       end subroutine demandconjunctive_prms
-!
-!
-      subroutine demandpond_prms(kper, kstp, kiter)
-!     ******************************************************************
-!     demandpond----sums up pond irrigation demand using ET deficit
-!     ******************************************************************
-!     SPECIFICATIONS:
-      USE GWFAGMODULE
-      USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_BASIN, ONLY: HRU_PERV
-      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
-      USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
-      IMPLICIT NONE
-! --------------------------------------------------
-      !modules
-      !arguments
-      integer, intent(in) :: kper, kstp, kiter
-      !dummy
-      DOUBLE PRECISION :: factor, area, aet, pet
-      double precision :: zerod7, done, dzero, pettotal,
-     +                    aettotal, prms_inch2mf_q,
-     +                    aetold, supold, sup
-      real :: fmaxflow
-      integer :: k, ipond, hru_id, i
-      external :: set_factor
-      double precision :: set_factor
-! --------------------------------------------------
-!
-      zerod7 = 1.0d-7
-      done = 1.0d0
-      dzero = 0.0d0
-      prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
-      !
-      !1 - -----loop over HRUs with ponds that supply irrigation
-      !
-      do 300 i = 1, NUMIRRPONDSP
-        pettotal = DZERO
-        aettotal = DZERO
-        factor = DZERO
-        ipond = IRRPONDVAR(i)
-        IF (DEMAND(ipond) < zerod7) goto 300   !check this because demand is not correct
-        !
-        !1 - -----loop over HRUs irrigated by pond
-        !
-        do k = 1, NUMCELLSPOND(i)
-           hru_id = IRRHRU_POND(K, ipond)
-           area = HRU_PERV(hru_id)
-           pet = potet(hru_id)*area*prms_inch2mf_q
-           aet = hru_actet(hru_id)*area*prms_inch2mf_q
-           pettotal = pettotal + pet
-           aettotal = aettotal + aet
-        end do
-        ! convert PRMS ET deficit to MODFLOW flow
-        aetold = AETITERPOND(IPOND)
-        sup = PONDFLOW(IPOND)
-        supold = PONDFLOWOLD(IPOND)
-        factor = set_factor(ipond, aetold, pettotal, aettotal, sup,
-     +           supold, kiter)
-        AETITERPOND(IPOND) = SNGL(aettotal)
-        PONDFLOWOLD(IPOND) = PONDFLOW(IPOND)
-        PONDFLOW(IPOND) = PONDFLOW(IPOND) + SNGL(factor)
-!        IF ( PONDFLOW(IPOND)
-        !
-        !1 - -----limit pond irrigation to storage
-        !
-  !      if(ipond==18)then
-  !    etdif = pettotal - aettotal
-  !        write(999,33)kper,kstp,kiter,PONDFLOW(IPOND),
-  !   +                 pettotal,aettotal,etdif
-  !      endif
-  !33  format(3i5,4e20.10)
-300   continue
-      return
-      end subroutine demandpond_prms
 
       subroutine demandtrigger_sw(kper, kstp, kiter)
 !     ******************************************************************
@@ -3416,7 +2809,7 @@
       set_factor = factor
       end function set_factor
 !
-      subroutine TIMESERIESOUT(KKPER, KKSTP, TOTIM)
+      subroutine timeseriesout(KKPER, KKSTP, TOTIM)
 !     ******************************************************************
 !     timeseriesout---- output to time series file each time step
 !     ******************************************************************
@@ -3456,20 +2849,6 @@
          DO I = 1, NUMSW
             UNIT = TSSWUNIT(I)
             L = TSSWNUM(I)
-            Q = demand(L)
-            QQ = DVRSFLW(L)
-            QQQ = SUPSEG(L)
-            CALL timeseries(unit, Kkper, Kkstp, TOTIM, L,
-     +                      Q, QQ, QQQ)
-         END DO
-      END IF
-      !
-      ! - -------OUTPUT TIME SERIES FOR PONDS
-      !
-      IF (TSACTIVEPOND) THEN
-         DO I = 1, NUMPOND
-            UNIT = TSPONDUNIT(I)
-            L = TSPONDNUM(I)
             Q = demand(L)
             QQ = DVRSFLW(L)
             QQQ = SUPSEG(L)
@@ -3694,8 +3073,8 @@
       END IF
       smoothQ = Qp
       END FUNCTION smoothQ
-      !
-      REAL FUNCTION RATETERPQ(TIME, TABTIME, TABRATE, INUM, NVAL)
+                                   !
+      REAL FUNCTION RATETERPQ(TIME, INUM)
       !******************************************************************
       ! LINEARLY INTERPOLATE PUMPING RATE FROM TABFILE
       !******************************************************************
@@ -3710,11 +3089,10 @@
       REAL CLOSEZERO
       REAL FLOW, TIMEBEG, TIMEND, TIMESTART, SUMFLOW, TOLF2
       INTEGER IEND, ISTM1, ISTART, iflg, NVAL, I
-      REAL, DIMENSION(:,:), POINTER :: TABTIME, TABRATE
       TOLF2 = 1.0E-4
       CLOSEZERO = 1.0E-15
       FLOW = 0.0
-!      NVAL = TABVAL(INUM)
+      NVAL = TABVAL(INUM)
       IFLG = 0
       SUMFLOW = 0.0
       I = 1
@@ -3728,8 +3106,7 @@
          DO WHILE (I .LE. NVAL - 1)
             IF (TIMEBEG - TABTIME(I, INUM) .LE. CLOSEZERO) THEN
                EXIT
-            ELSEIF (TIMEBEG - TABTIME(I + 1, INUM) .LE. 
-     +              CLOSEZERO) THEN
+            ELSEIF (TIMEBEG - TABTIME(I + 1, INUM) .LE. CLOSEZERO) THEN
                EXIT
             ELSE
                I = I + 1
@@ -3753,8 +3130,7 @@
             TIMEND = TABTIME(I + 1, INUM)
             IF (TIMEBEG - TIMESTART .GT. 0.0) TIMESTART = TIMEBEG
             IF (TIME - TIMEND .LT. 0.0) TIMEND = TIME
-            SUMFLOW = SUMFLOW + (TIMEND - TIMESTART)*
-     +                TABRATE(I, INUM)
+            SUMFLOW = SUMFLOW + (TIMEND - TIMESTART)*TABRATE(I, INUM)
          END DO
          RATETERPQ = SUMFLOW/DELT
       END IF
@@ -3960,15 +3336,13 @@
       DEALLOCATE(NPWEL)
       DEALLOCATE(NNPWEL)
       DEALLOCATE(WELL)
-      DEALLOCATE(NUMTABWELL)
-      DEALLOCATE(NUMTABPOND)
-      DEALLOCATE(MAXVALWELL)
-      DEALLOCATE(MAXVALPOND)
-      DEALLOCATE(TABTIMEWELL)
-      DEALLOCATE(TABRATEWELL)
-      DEALLOCATE(TABVALWELL)
-      DEALLOCATE(TABIDWELL)
-      DEALLOCATE(TABUNITWELL)
+      DEALLOCATE(NUMTAB)
+      DEALLOCATE(MAXVAL)
+      DEALLOCATE(TABTIME)
+      DEALLOCATE(TABRATE)
+      DEALLOCATE(TABVAL)
+      DEALLOCATE(TABID)
+      DEALLOCATE(TABUNIT)
       DEALLOCATE(KCROPDIVERSION)
       DEALLOCATE(DVRCH)
       DEALLOCATE(DVEFF)
@@ -4015,27 +3389,5 @@
       DEALLOCATE(SEGLIST)
       DEALLOCATE(NUMSEGLIST)
       DEALLOCATE(ACCEL)
-      DEALLOCATE(MXPOND)
-      DEALLOCATE(MAXCELLSPOND)
-      DEALLOCATE(IPONDCB)
-      DEALLOCATE(IPONDCBU)
-      DEALLOCATE(IRRPONDCB)
-      DEALLOCATE(TSACTIVEPOND)
-      DEALLOCATE(TSACTIVEPONDET)
-      DEALLOCATE(IRRHRU_POND)
-      DEALLOCATE(IRRPERIODPOND)
-      DEALLOCATE(TRIGGERPERIODPOND)
-      DEALLOCATE(TIMEINPERIODPOND)
-      DEALLOCATE(NUMIRRPONDSP)
-      DEALLOCATE(AETITERPOND)
-      DEALLOCATE(PONDFLOW)
-      DEALLOCATE(PONDFLOWOLD)
-      DEALLOCATE(PONDFLOWMAX)
-      DEALLOCATE(TSPONDUNIT)
-      DEALLOCATE(TSPONDNUM)
-      DEALLOCATE(TSPONDETUNIT)
-      DEALLOCATE(TSPONDETNUM)
-      DEALLOCATE(NUMPOND)
-      DEALLOCATE(NUMPONDET)
       RETURN
       END
