@@ -59,7 +59,8 @@
 !***********************************************************************
       INTEGER FUNCTION routingdecl()
       USE PRMS_ROUTING
-      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Model, Strmflow_flag, Cascade_flag, Init_vars_from_file
+      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Model, Strmflow_flag, Cascade_flag, &
+     &    Stream_temp_flag, Init_vars_from_file, DOCUMENTATION
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam
@@ -127,7 +128,7 @@
       ! 11 = outbound to Great Lakes; 12 = ephemeral; + 100 user updated; 1000 user virtual segment
       ! 100 = user normal; 101 - 108 = not used; 109 sink (tosegment used by Lumen)
 
-      IF ( Strmflow_flag==7 .OR. Model==99 ) THEN ! muskingum_mann
+      IF ( Strmflow_flag==7 .OR. Model==DOCUMENTATION ) THEN ! muskingum_mann
         ALLOCATE ( Mann_n(Nsegment) )
         IF ( declparam( MODNAME, 'mann_n', 'nsegment', 'real', &
      &     '0.04', '0.001', '0.15', &
@@ -135,18 +136,11 @@
      &     'Mannings roughness coefficient for each segment', &
      &     'dimensionless')/=0 ) CALL read_error(1, 'mann_n')
 
-        ALLOCATE ( Seg_slope(Nsegment) )
-        IF ( declparam( MODNAME, 'seg_slope', 'nsegment', 'real', &
-     &     '0.0001', '0.0000001', '2.0', &
-     &     'Surface slope of each segment', &
-     &     'Surface slope of each segment as approximation for bed slope of stream', &
-     &     'decimal fraction')/=0 ) CALL read_error(1, 'seg_slope')
-
         ALLOCATE ( Seg_length(Nsegment) )
         IF ( declparam( MODNAME, 'seg_length', 'nsegment', 'real', &
      &     '1000.0', '0.001', '200000.0', &
      &     'Length of each segment', &
-     &     'Length of each segment, bounds based on CONUS', &
+     &     'Length of each segment including vertical drop, bounds based on CONUS', &
      &     'meters')/=0 ) CALL read_error(1, 'seg_length')
 
         ALLOCATE ( Seg_depth(Nsegment) )
@@ -156,6 +150,15 @@
      &       'Segment river depth at bankfull, shallowest from Blackburn-Lynch 2017,'//&
      &       'Congo is deepest at 250 m but in the US it is probably the Hudson at 66 m', &
      &       'meters')/=0 ) CALL read_error(1, 'seg_depth')
+      ENDIF
+
+      IF ( Stream_temp_flag==1 .OR. Strmflow_flag==7 .OR. Model==DOCUMENTATION ) THEN
+        ALLOCATE ( Seg_slope(Nsegment) )
+        IF ( declparam( MODNAME, 'seg_slope', 'nsegment', 'real', &
+     &     '0.0001', '0.0000001', '2.0', &
+     &     'Surface slope of each segment', &
+     &     'Surface slope of each segment as approximation for bed slope of stream', &
+     &     'decimal fraction')/=0 ) CALL read_error(1, 'seg_slope')
       ENDIF
 
       ALLOCATE ( Segment_type(Nsegment) )
@@ -306,7 +309,8 @@
       INTEGER FUNCTION routinginit()
       USE PRMS_ROUTING
       USE PRMS_MODULE, ONLY: Nsegment, Nhru, Init_vars_from_file, Strmflow_flag, &
-     &    Water_use_flag, Segment_transferON_OFF, Inputerror_flag, Parameter_check_flag !, Print_debug
+     &    Water_use_flag, Segment_transferON_OFF, Inputerror_flag, Parameter_check_flag, &
+     &    Stream_temp_flag !, Print_debug
       USE PRMS_SET_TIME, ONLY: Timestep_seconds
       USE PRMS_BASIN, ONLY: FT2_PER_ACRE, DNEARZERO, Active_hrus, Hru_route_order, Hru_area_dble, NEARZERO !, Active_area
       USE PRMS_FLOWVARS, ONLY: Seg_outflow, Seg_inflow
@@ -364,7 +368,6 @@
       IF ( Strmflow_flag==7 ) THEN
         IF ( getparam(MODNAME, 'mann_n', Nsegment, 'real', Mann_n)/=0 ) CALL read_error(2, 'mann_n')
         IF ( getparam( MODNAME, 'seg_length', Nsegment, 'real', Seg_length)/=0 ) CALL read_error(2, 'seg_length')
-        IF ( getparam( MODNAME, 'seg_slope', Nsegment, 'real', Seg_slope)/=0 ) CALL read_error(2, 'seg_slope')
 ! find segments that are too short and print them out as they are found
         ierr = 0
         DO i = 1, Nsegment
@@ -379,6 +382,9 @@
            RETURN
         ENDIF
         IF ( getparam(MODNAME, 'seg_depth', Nsegment, 'real', seg_depth)/=0 ) CALL read_error(2, 'seg_depth')
+      ENDIF
+      IF ( Stream_temp_flag==1 .OR. Strmflow_flag==7 ) THEN
+        IF ( getparam( MODNAME, 'seg_slope', Nsegment, 'real', Seg_slope)/=0 ) CALL read_error(2, 'seg_slope')
       ENDIF
 
       IF ( getparam(MODNAME, 'tosegment', Nsegment, 'integer', Tosegment)/=0 ) CALL read_error(2, 'tosegment')

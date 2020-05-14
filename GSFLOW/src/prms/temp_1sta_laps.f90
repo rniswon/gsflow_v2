@@ -159,7 +159,7 @@
         ENDIF
 
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_temp = 'temp_1sta_laps.f90 2018-01-16 13:42:00Z'
+        Version_temp = 'temp_1sta_laps.f90 2020-04-27 13:42:00Z'
         IF ( Temp_flag==1 ) THEN
           MODNAME = 'temp_1sta'
         ELSEIF ( Temp_flag==2 ) THEN

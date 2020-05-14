@@ -205,7 +205,7 @@
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam, getdim
-      EXTERNAL read_error, print_module, declvar_dble
+      EXTERNAL read_error, print_module, error_stop, declvar_dble
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_muskingum_lake
 !***********************************************************************

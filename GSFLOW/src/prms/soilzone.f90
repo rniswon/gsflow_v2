@@ -478,9 +478,7 @@
         CALL declvar_real(MODNAME, 'grav_gwin', 'nhru', Nhru, 'real', &
      &       'Groundwater discharge to gravity-flow reservoirs for each HRU', &
      &       'inches', Grav_gwin)
-      ENDIF
 
-      IF ( GSFLOW_flag==1 ) THEN
         ALLOCATE ( Gvr_hru_pct_adjusted(Nhrucell) )
         ALLOCATE ( Hru_gvr_count(Nhru), Hrucheck(Nhru) )
         ALLOCATE ( It0_pref_flow_stor(Nhru), It0_ssres_stor(Nhru), It0_soil_rechr(Nhru), It0_soil_moist(Nhru) )
@@ -865,7 +863,7 @@
 ! Functions
       INTRINSIC MIN, ABS, MAX, SNGL, DBLE
       EXTERNAL compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow
-      EXTERNAL compute_interflow, compute_gwflow, init_basin_vars, print_date
+      EXTERNAL compute_interflow, compute_gwflow, init_basin_vars, print_date, error_stop
 ! Local Variables
       INTEGER :: i, k, update_potet
       REAL :: dunnianflw, interflow, perv_area, harea

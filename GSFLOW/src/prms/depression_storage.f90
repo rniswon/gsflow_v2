@@ -522,6 +522,7 @@
                 Hru_hortn_cascflow(i) = Hru_hortn_cascflow(i) + hru_sroff_down
                 Basin_sroff_upslope = Basin_sroff_upslope + Upslope_dprst_hortonian(i)*Hruarea_dble
                 Basin_sroff_down = Basin_sroff_down + hru_sroff_down*Hruarea_dble
+                            print *, Dprst_sroff_hru(i) - srunoff, Dprst_sroff_hru(i), srunoff, 'dprst srunoff'
               ENDIF
             ENDIF
             Sroff(i) = Sroff(i) + srunoff

@@ -252,24 +252,27 @@
           bsnobal = bsnobal + DBLE(hrubal)*harea
         ENDIF
 
-        availh2o = Intcp_changeover(i)
+        robal = Snowmelt(i) - Hortonian_flow(i) - Infil(i)*perv_frac & ! Hortonian_flow includes in DPRST runoff
+     &          - Hru_impervevap(i) + Imperv_stor_ante(i) - Hru_impervstor(i) + Intcp_changeover(i)
+        IF ( Use_sroff_transfer==1 ) robal = robal + Net_apply(i)*perv_frac
         IF ( Cascade_flag>0 ) THEN
-          availh2o = availh2o + SNGL( Upslope_hortonian(i) )
-          IF ( Dprst_flag==1 ) availh2o = availh2o + SNGL( Upslope_dprst_hortonian(i) )
+          robal = robal + SNGL( Upslope_hortonian(i) - Hru_hortn_cascflow(i) )
+          IF ( Dprst_flag==1 ) robal = robal + SNGL( Upslope_dprst_hortonian(i) )
         ENDIF
-        IF ( Pptmix_nopack(i)==1 ) availh2o = availh2o + Net_rain(i)
-        IF ( Snowmelt(i)>0.0 ) THEN
-          availh2o = availh2o + Snowmelt(i)
-          IF ( Pkwater_equiv(i)<DNEARZERO .AND. Net_ppt(i)-Net_snow(i)>0.0 ) availh2o = availh2o + Net_ppt(i)
-        ELSEIF ( Pkwater_equiv(i)<DNEARZERO ) THEN
-          IF ( Net_snow(i)<NEARZERO .AND. Net_rain(i)>0.0 ) availh2o = availh2o + Net_rain(i)
-        ENDIF
-        IF ( Use_sroff_transfer==1 ) availh2o = availh2o + Net_apply(i)*perv_frac
-
-        robal = availh2o - Hortonian_flow(i) & !includes dprst runoff, if any
-     &          - Infil(i)*perv_frac - Hru_impervevap(i) + Imperv_stor_ante(i) - Hru_impervstor(i)
         IF ( Dprst_flag==1 ) robal = robal - Dprst_evap_hru(i) + &
      &                               SNGL( Dprst_stor_ante(i) - Dprst_stor_hru(i) - Dprst_seep_hru(i) )
+        IF ( Net_ppt(i)>0.0 ) THEN
+          IF ( Pptmix_nopack(i)==1 ) THEN
+            robal = robal + Net_rain(i)
+          ELSEIF ( Snowmelt(i)<NEARZERO .AND. Pkwater_equiv(i)<DNEARZERO) THEN
+            IF ( Snow_evap(i)<NEARZERO ) THEN
+              robal = robal + Net_ppt(i)
+            ELSEIF ( Net_snow(i)<NEARZERO ) THEN
+              robal = robal + Net_rain(i)
+            ENDIF
+            !IF ( Net_snow(i)<NEARZERO ) robal = robal + Net_rain(i)
+           ENDIF
+         ENDIF
         basin_robal = basin_robal + DBLE( robal )
         IF ( ABS(robal)>TOOSMALL ) THEN
           IF ( Dprst_flag==1 ) THEN
@@ -288,9 +291,13 @@
             WRITE ( BALUNT, * ) Infil(i), perv_frac, Hru_impervevap(i), Imperv_stor_ante(i), Hru_impervstor(i), &
      &                          Hru_percent_imperv(i), Dprst_sroff_hru(i)
           ENDIF
+!          IF ( Intcp_changeover(i)>SMALL ) then
+!              print *, i, Intcp_changeover(i), SMALL
+!              endif
           IF ( ABS(robal)>SMALL ) THEN
             WRITE ( BALUNT, '(A,I0,A,1X,I0)') 'Possible HRU surface runoff water balance ERROR, HRU: ', i, &
      &                                         ' hru_type:', Hru_type(i)
+!            print *, perv_frac, Hru_impervevap(i), Imperv_stor_ante(i), Hru_impervstor(i), Hru_percent_imperv(i)
           ELSE
             WRITE ( BALUNT, '(A,I0,A,1X,I0)' ) 'HRU surface runoff rounding issue, HRU:', i, ' hru_type:', Hru_type(i)
           ENDIF
@@ -363,7 +370,7 @@
         ENDIF
 
         hru_out = DBLE( Sroff(i) + Gwres_flow(i) + Ssres_flow(i) + Hru_actet(i) + Gwres_sink(i) )
-        hru_in = DBLE( Hru_ppt(i) )
+        hru_in = DBLE( Hru_ppt(i) ) !+ Intcp_changeover(i)
         IF ( Cascade_flag>0 ) THEN
           hru_out = hru_out + DBLE( Hru_sz_cascadeflow(i) ) + Hru_hortn_cascflow(i)
           hru_in = hru_in + Upslope_dunnianflow(i) + Upslope_interflow(i) + Upslope_hortonian(i)
@@ -374,7 +381,7 @@
           hru_in = hru_in + Gw_upslope(i)/DBLE(harea)
         ENDIF
 !        Hru_runoff(i) = hru_out - DBLE( Hru_actet(i) )
-        wbal = hru_in - hru_out + Hru_storage_ante(i) - Hru_storage(i)
+        wbal = hru_in - hru_out + Hru_storage_ante(i) - Hru_storage(i) !- Intcp_changeover(i)
         IF ( Gwminarea_flag==1 ) wbal = wbal + Gwstor_minarea_wb(i)
         IF ( DABS(wbal)>DTOOSMALL ) THEN
           WRITE ( BALUNT, * ) 'Possible HRU water balance issue:', wbal, '; HRU:', i, ' hru_type:', Hru_type(i), '; area:', harea
