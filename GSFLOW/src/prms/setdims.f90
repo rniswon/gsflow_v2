@@ -7,9 +7,9 @@
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: decldim, declfix, control_integer_array, check_dims
-      INTEGER, EXTERNAL :: control_string, control_integer, compute_julday
-      INTEGER, EXTERNAL :: gsfdecl, gsfinit, gsfrun, gsfclean
+      INTEGER, EXTERNAL :: decldim, declfix, control_integer_array
+      INTEGER, EXTERNAL :: control_string, control_integer
+      INTEGER, EXTERNAL :: gsfdecl, gsfinit, gsfrun, gsfclean, compute_julday, check_dims
       EXTERNAL :: read_error, PRMS_open_output_file, PRMS_open_input_file, check_module_names, module_error
       EXTERNAL :: read_control_file, setup_dimens, read_parameter_file_dimens, get_control_arguments, setup_params
 ! Local Variables
@@ -32,12 +32,12 @@
       IF ( Print_debug>-1 ) PRINT 3
       IF ( Print_debug>-2 ) THEN
         CALL PRMS_open_output_file(Logunt, 'gsflow.log', 'gsflow.log', 0, iret)
-        IF ( iret/=0 ) STOP
+        IF ( iret/=0 ) ERROR STOP -1
         WRITE ( Logunt, 3 )
       ENDIF
     3 FORMAT (//, 26X, 'U.S. Geological Survey', /, 8X, &
      &        'Coupled Groundwater and Surface-water FLOW model (GSFLOW)', /, &
-     &        25X, 'Version 2.1.0 03/04/2020', //, &
+     &        25X, 'Version 2.2.0 05/01/2020', //, &
      &        '    An integration of the Precipitation-Runoff Modeling System (PRMS)', /, &
      &        '    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)', /)
 
@@ -49,7 +49,7 @@
       PRMS_flag = 1
       GSFLOW_flag = 0
       ! Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
-      IF ( Model_mode(:4)=='PRMS' .OR. Model_mode(:5)=='DAILY' )THEN
+      IF ( Model_mode(:4)=='PRMS' .OR. Model_mode(:5)=='DAILY' ) THEN
         Model = PRMS
       ELSEIF ( Model_mode(:6)=='GSFLOW' .OR. Model_mode(:4)=='    ') THEN
         Model = GSFLOW
@@ -73,7 +73,7 @@
         Model = DOCUMENTATION
       ELSE
         PRINT '(/,2A)', 'ERROR, invalid model_mode value: ', Model_mode
-        STOP
+        Inputerror_flag = 1
       ENDIF
 
       ! get simulation start_time and end_time
@@ -81,11 +81,14 @@
       DO j = 1, 6
         IF ( control_integer_array(Starttime(j), j, 'start_time')/=0 ) THEN
           PRINT *, 'ERROR, start_time, index:', j, 'value: ', Starttime(j)
-          STOP
+          Inputerror_flag = 1
         ENDIF
       ENDDO
       Start_year = Starttime(1)
-      IF ( Start_year<0 ) STOP 'ERROR, control parameter start_time must be specified'
+      IF ( Start_year<0 ) THEN
+        PRINT *, 'ERROR, control parameter start_time must be specified'
+        Inputerror_flag = 1
+      ENDIF
       Start_month = Starttime(2)
       Start_day = Starttime(3)
       Nowyear = Start_year
@@ -95,11 +98,14 @@
       DO j = 1, 6
         IF ( control_integer_array(Endtime(j), j, 'end_time')/=0 ) THEN
           PRINT *, 'ERROR, end_time, index:', j, 'value: ', Endtime(j)
-          STOP
+          Inputerror_flag = 1
         ENDIF
       ENDDO
       End_year = Endtime(1)
-      IF ( End_year<0 ) STOP 'ERROR, control parameter start_time must be specified'
+      IF ( End_year<0 ) THEN
+        PRINT *, 'ERROR, control parameter start_time must be specified'
+        Inputerror_flag = 1
+      ENDIF
       End_month = Endtime(2)
       End_day = Endtime(3)
 
@@ -146,7 +152,7 @@
       IF ( control_string(Model_output_file, 'model_output_file')/=0 ) CALL read_error(5, 'model_output_file')
       IF ( Print_debug>-2 ) THEN
         CALL PRMS_open_output_file(PRMS_output_unit, Model_output_file, 'model_output_file', 0, iret)
-        IF ( iret/=0 ) STOP
+        IF ( iret/=0 ) Inputerror_flag = 1
       ENDIF
       IF ( control_string(Param_file, 'param_file')/=0 ) CALL read_error(5, 'param_file')
 
@@ -154,7 +160,7 @@
       IF ( Init_vars_from_file>0 ) THEN
         IF ( control_string(Var_init_file, 'var_init_file')/=0 ) CALL read_error(5, 'var_init_file')
         CALL PRMS_open_input_file(Restart_inunit, Var_init_file, 'var_init_file', 1, iret)
-        IF ( iret/=0 ) STOP
+        IF ( iret/=0 ) Inputerror_flag = 1
       ENDIF
       IF ( Save_vars_to_file==1 ) THEN
         IF ( control_string(Var_save_file, 'var_save_file')/=0 ) CALL read_error(5, 'var_save_file')
@@ -175,7 +181,7 @@
       Strmflow_module = 'strmflow'
       IF ( control_string(Strmflow_module, 'strmflow_module')/=0 ) CALL read_error(5, 'strmflow_module')
 
-      IF ( Parameter_check_flag>0 ) CALL check_module_names()
+      IF ( Parameter_check_flag>0 ) CALL check_module_names(Inputerror_flag)
 
       Climate_precip_flag = 0
       Climate_temp_flag = 0
@@ -329,7 +335,7 @@
         PRINT '(/,2A)', 'ERROR, invalid strmflow_module value: ', Strmflow_module
         Inputerror_flag = 1
       ENDIF
-      
+
 ! cascade dimensions
       IF ( decldim('ncascade', 0, MAXDIM, &
      &     'Number of HRU links for cascading flow')/=0 ) CALL read_error(7, 'ncascade')
@@ -447,15 +453,12 @@
       IF ( declfix('nmonths', 12, 12, 'Number of months in a year')/=0 ) CALL read_error(7, 'nmonths')
       IF ( declfix('one', 1, 1, 'Number of values for scaler array')/=0 ) CALL read_error(7, 'one')
 
-      IF ( Inputerror_flag==1 ) THEN
-        PRINT '(//,A,/,A)', '**FIX input errors in your Control File to continue**', &
-     &        'NOTE: some errors may be due to use of defalut values'
-        STOP
-      ENDIF
+      IF ( Inputerror_flag==1 ) PRINT '(//,A,/,A,/ )', '**FIX input errors in your Control File to continue**', &
+     &     'NOTE: some errors may be due to use of defalut values'
 
       CALL setup_params()
       CALL read_parameter_file_dimens()
-      IF ( check_dims()/=0 ) STOP
+      IF ( check_dims()/=0 ) STOP -1
 
       END SUBROUTINE setdims
 
@@ -468,8 +471,6 @@
 ! Functions
       INTEGER, EXTERNAL :: getdim
       EXTERNAL :: check_dimens
-! Local Variables
-      INTEGER :: ierr
 !***********************************************************************
 
       Nhru = getdim('nhru')
@@ -568,19 +569,17 @@
      &       Dprst_transferON_OFF==1 .OR. Lake_transferON_OFF==1 .OR. Nconsumed>0 .OR. Nwateruse>0 ) Water_use_flag = 1
       ENDIF
 
-      ierr = 0
       IF ( Segment_transferON_OFF==1 .OR. Gwr_transferON_OFF==1 .OR. External_transferON_OFF==1 .OR. &
      &     Dprst_transferON_OFF==1 .OR. Lake_transferON_OFF==1 .OR. Nconsumed>0 ) THEN
         IF ( Dprst_transferON_OFF==1 .AND. Dprst_flag==0 ) THEN
           PRINT *, 'ERROR, specified water-use event based dprst input and have dprst inactive'
-          ierr = 1
+          Inputerror_flag = 1
         ENDIF
         IF ( Lake_transferON_OFF==1 .AND. Strmflow_flag/=3 ) THEN
           PRINT *, 'ERROR, specified water-use event based lake input and have lake simulation inactive'
-          ierr = 1
+          Inputerror_flag = 1
         ENDIF
       ENDIF
-      IF ( ierr==1 ) STOP
 
       Stream_order_flag = 0
       IF ( Nsegment>0 .AND. Strmflow_flag>1 .AND. Model/=0 ) THEN
@@ -590,7 +589,7 @@
       IF ( Nsegment<1 .AND. Model/=DOCUMENTATION ) THEN
         IF ( Stream_order_flag==1 .OR. Call_cascade==1 ) THEN
           PRINT *, 'ERROR, streamflow and cascade routing require nsegment > 0, specified as:', Nsegment
-          STOP
+          Inputerror_flag = 1
         ENDIF
       ENDIF
 
@@ -600,7 +599,7 @@
       IF ( Stream_temp_flag>0 .AND. Stream_order_flag==0 ) THEN
         PRINT *, 'ERROR, stream temperature computation requires streamflow routing, thus strmflow_module'
         PRINT *, '       must be set to strmflow_in_out, muskingum, muskingum_mann, or muskingum_lake'
-        STOP
+        Inputerror_flag = 1
       ENDIF
 
       IF ( NsubOutON_OFF==1 .AND. Nsub==0 ) THEN
@@ -624,27 +623,22 @@
       SUBROUTINE check_dimens()
       USE PRMS_MODULE
       IMPLICIT NONE
-! Local Variables
-      INTEGER :: ierr
 !***********************************************************************
-      ierr = 0
       IF ( Nhru==0 .OR. Nssr==0 .OR. Ngw==0 ) THEN
         PRINT *, 'ERROR, nhru, nssr, and ngw must be > 0: nhru=', Nhru, ', nssr=', Nssr, ', ngw=', Ngw
-        ierr = 1
+        Inputerror_flag = 1
       ELSEIF ( Nssr/=Nhru .OR. Ngw/=Nhru ) THEN
         PRINT *, 'ERROR, nhru, nssr, and ngw must equal: nhru=', Nhru, ', nssr=', Nssr, ', ngw=', Ngw
-        ierr = 1
+        Inputerror_flag = 1
       ENDIF
       IF ( Ndepl==0 ) THEN
         PRINT *, 'ERROR, ndepl must be > 0: ndepl=', Ndepl
-        ierr = 1
+        Inputerror_flag = 1
       ENDIF
       IF ( Ndeplval/=Ndepl*11 ) THEN
         PRINT *, 'ERROR, ndeplval must be = ndepl*11: ndeplval:', Ndeplval, ', ndepl=', Ndepl
-        ierr = 1
+        Inputerror_flag = 1
       ENDIF
-
-      IF ( ierr==1 ) STOP
 
       IF ( Model==DOCUMENTATION ) THEN
         IF ( Ntemp==0 ) Ntemp = 1

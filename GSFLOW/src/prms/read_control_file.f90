@@ -72,7 +72,7 @@
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: paramstring
       REAL, ALLOCATABLE :: real_parameter_values(:)
 !***********************************************************************
-      Version_read_control_file = 'read_control_file.f90 2018-06-07 10:44:00Z'
+      Version_read_control_file = 'read_control_file.f90 2020-04-21 10:44:00Z'
 
       ! control filename cannot include blanks
       CALL get_control_filename(Model_control_file, nchars)
@@ -715,7 +715,7 @@
       Control_parameter_data(i)%data_type = 4
       i = i + 1
       Control_parameter_data(i)%name = 'radtrncf_dynamic'
-      Radtrncf_dynamic = 'dynradtrnch'
+      Radtrncf_dynamic = 'dynradtrncf'
       Control_parameter_data(i)%values_character(1) = Radtrncf_dynamic
       Control_parameter_data(i)%data_type = 4
       i = i + 1
@@ -817,6 +817,7 @@
       IMPLICIT NONE
       ! Functions
       INTRINSIC :: GET_COMMAND_ARGUMENT, COMMAND_ARGUMENT_COUNT, GET_COMMAND, TRIM
+      EXTERNAL error_stop
       ! Local Variables
       CHARACTER(LEN=MAXFILE_LENGTH) command_line_arg, command_line
       LOGICAL exists
@@ -832,11 +833,11 @@
       IF ( status/=0 ) THEN
         WRITE ( *,'(/,A)' ) 'Enter the name of the PRMS Control File or quit:'
         READ ( *, '(A)' ) Model_control_file
-        IF ( Model_control_file(:4)=='quit' .OR. Model_control_file(:4)=='QUIT' ) STOP
+        IF ( Model_control_file(:4)=='quit' .OR. Model_control_file(:4)=='QUIT' ) ERROR STOP -2
       ELSE
         IF ( TRIM(command_line_arg)=='-C' ) THEN
           CALL GET_COMMAND_ARGUMENT(2, Model_control_file, nchars, status)
-          IF ( status/=0 ) STOP 'ERROR, bad argment value after -C argument'
+          IF ( status/=0 ) CALL error_stop('bad argment value after -C argument')
         ELSE
           Model_control_file = TRIM(command_line_arg)
         ENDIF
@@ -846,7 +847,7 @@
       IF ( .NOT.exists ) THEN
         WRITE ( *,'(/,A)' ) 'Control File does not exist, file name: '//TRIM(Model_control_file)
         PRINT *, 'Note: Control File names cannot include spaces'
-        STOP
+        ERROR STOP -2
       ENDIF
 
       END SUBROUTINE get_control_filename
@@ -860,6 +861,7 @@
       IMPLICIT NONE
       ! Functions
       INTRINSIC :: GET_COMMAND_ARGUMENT, COMMAND_ARGUMENT_COUNT, GET_COMMAND, TRIM
+      EXTERNAL error_stop
       ! Local Variables
       CHARACTER(LEN=MAXFILE_LENGTH) command_line_arg, command_line
       INTEGER status, i, j, nchars, numargs, index, param_type, num_param_values
@@ -873,7 +875,7 @@
       DO WHILE ( i < numargs )
         i = i + 1
         CALL GET_COMMAND_ARGUMENT(i, command_line_arg, nchars, status)
-        IF ( status/=0 ) STOP 'ERROR, setting control parameters from command line'
+        IF ( status/=0 ) CALL error_stop('setting control parameters from command line')
         IF ( TRIM(command_line_arg)=='-C' ) THEN
           i = i + 2
           CYCLE
@@ -886,7 +888,7 @@
             ! find control file parameter and reset it, need type and number of values
             i = i + 1
             CALL GET_COMMAND_ARGUMENT(i, command_line_arg, nchars, status)
-            IF ( status/=0 ) STOP 'ERROR, bad argment value after -set argument'
+            IF ( status/=0 ) CALL error_stop('bad argment value after -set argument')
             IF ( Print_debug>-1 ) PRINT *, 'PRMS command line argument,', i, ': ', TRIM(command_line_arg)
             index = 0
             DO j = 1, Num_control_parameters
@@ -897,25 +899,25 @@
                 EXIT
               ENDIF
             ENDDO
-            IF ( index==0 ) STOP 'ERROR, control parameter argument not found'
+            IF ( index==0 ) CALL error_stop('control parameter argument not found')
             DO j = 1, num_param_values
               i = i + 1
               CALL GET_COMMAND_ARGUMENT(i, command_line_arg, nchars, status)
-              IF ( status/=0 ) STOP 'ERROR, bad value after -set argument'
+              IF ( status/=0 ) CALL error_stop('bad value after -set argument')
               IF ( Print_debug>-1 ) PRINT *, 'PRMS command line argument,', i, ': ', TRIM(command_line_arg)
               IF ( param_type==1 ) THEN
                 READ ( command_line_arg, *, IOSTAT=status ) Control_parameter_data(index)%values_int(j)
-                IF ( status/=0 ) STOP 'ERROR, reading integer command line argument'
+                IF ( status/=0 ) CALL error_stop('reading integer command line argument')
               ELSEIF ( param_type==4 ) THEN
                 Control_parameter_data(index)%values_character(j) = command_line_arg
               ELSEIF ( param_type==2 ) THEN
                 READ ( command_line_arg, * ) Control_parameter_data(index)%values_real(j)
               ELSE
-                STOP 'ERROR, control parameter type not implemented'
+                CALL error_stop('control parameter type not implemented')
               ENDIF
             ENDDO
           ELSE
-            STOP 'ERROR, command line argument invalid'
+            CALL error_stop('command line argument invalid')
           ENDIF
         ENDIF
       ENDDO
@@ -937,6 +939,7 @@
       CHARACTER(LEN=MAXFILE_LENGTH), INTENT(IN) :: Paramval_char(Numvalues)
       ! Functions
       INTRINSIC :: TRIM
+      EXTERNAL error_stop
       ! Local Variables
       INTEGER :: i, j, found, dtype
 !***********************************************************************
@@ -954,7 +957,7 @@
               DEALLOCATE ( Control_parameter_data(i)%values_character )
               ALLOCATE ( Control_parameter_data(i)%values_character(Numvalues) )
             ELSE
-              STOP 'ERROR, allocatable control parameter that is real'
+              CALL error_stop('allocatable control parameter that is real')
             ENDIF
           ENDIF
           Control_parameter_data(i)%read_flag = 1

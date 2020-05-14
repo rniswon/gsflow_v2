@@ -36,7 +36,7 @@
 
 !***Declare Procedure***
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_write_climate_hru = 'write_climate_hru.f90 2014-12-02 19:06:41Z'
+        Version_write_climate_hru = 'write_climate_hru.f90 2020-04-27 19:06:41Z'
         CALL print_module(Version_write_climate_hru, 'Preprocessing               ', 90)
 !        MODNAME = 'write_climate_hru'
 
@@ -110,7 +110,7 @@
           ENDIF
         ENDIF
         
-        IF ( ierr==1 ) STOP
+        IF ( ierr==1 ) ERROR STOP -1
 
 !***Clean-up Procedure***
       ELSEIF ( Process(:5)=='clean' ) THEN

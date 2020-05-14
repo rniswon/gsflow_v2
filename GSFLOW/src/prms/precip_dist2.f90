@@ -63,20 +63,18 @@
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL read_error, print_module
+      EXTERNAL read_error, print_module, error_stop
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_precip
 !***********************************************************************
       pptdist2decl = 0
 
-      Version_precip = 'precip_dist2.f90 2017-09-27 14:01:00Z'
+      Version_precip = 'precip_dist2.f90 2020-04-28 14:01:00Z'
       CALL print_module(Version_precip, 'Precipitation Distribution  ', 90)
       MODNAME = 'precip_dist2'
 
-      IF ( Nrain<2 .AND. Model/=99 ) THEN
-        PRINT *, 'ERROR, precip_dist2 requires at least 2 precipitation measurement stations'
-        STOP
-      ENDIF
+      IF ( Nrain<2 .AND. Model/=99 ) &
+     &     CALL error_stop('precip_dist2 requires at least 2 precipitation measurement stations')
 
       ALLOCATE ( N_psta(Nhru), Dist2(Nhru, Nrain) )
 
@@ -283,7 +281,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC ABS, DBLE, SNGL
-      EXTERNAL :: print_date
+      EXTERNAL :: print_date, error_stop
 ! Local Variables
       INTEGER :: i, iform, k, j, kk, allmissing
       REAL :: tdiff, pcor, ppt
@@ -360,9 +358,8 @@
           ENDIF
         ENDDO
         IF ( allmissing==0 ) THEN
-          PRINT *,'ERROR, all precipitation stations have missing data'
           CALL print_date(1)
-          STOP
+          CALL error_stop('all precipitation stations have missing data')
         ENDIF
 
         ppt = SNGL( ppt_dble )

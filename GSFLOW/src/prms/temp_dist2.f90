@@ -72,20 +72,17 @@
 ! Functions
       INTRINSIC INDEX
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL read_error, print_module, declvar_real
+      EXTERNAL read_error, print_module, error_stop, declvar_real
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_temp
 !***********************************************************************
       t2dist2decl = 0
 
-      Version_temp = 'temp_dist2.f90 2017-09-27 14:04:00Z'
+      Version_temp = 'temp_dist2.f90 2020-04-28 14:04:00Z'
       CALL print_module(Version_temp, 'Temperature Distribution    ', 90)
       MODNAME = 'temp_dist2'
 
-      IF ( Ntemp<2 .AND. Model/=99 ) THEN
-        PRINT *, 'ERROR, temp_dist2 requires at least 2 air-temperature-measurement stations'
-        STOP
-      ENDIF
+      IF ( Ntemp<2 .AND. Model/=99 ) CALL error_stop('temp_dist2 requires at least 2 air-temperature-measurement stations')
 
 ! added by Mastin 5/8/98
       ALLOCATE ( Elfac(Nhru,Ntemp), Delv(Ntemp,Ntemp), Dist(Nhru,Ntemp), N_tsta(Nhru) )
@@ -391,9 +388,8 @@
         ENDDO
       ENDDO
       IF ( allmissing==0 ) THEN
-        PRINT *,'ERROR, all temperature stations have missing data'
         CALL print_date(1)
-        STOP
+        CALL error_stop('all temperature stations have missing data')
       ENDIF
 
       IF ( ntotx>0 ) THEN

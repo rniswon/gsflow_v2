@@ -67,7 +67,7 @@
 !***********************************************************************
       routingdecl = 0
 
-      Version_routing = 'routing.f90 2019-11-27 14:54:00Z'
+      Version_routing = 'routing.f90 2020-04-27 14:54:00Z'
       CALL print_module(Version_routing, 'Routing Initialization      ', 90)
       MODNAME = 'routing'
 
@@ -497,7 +497,7 @@
         ENDDO
         IF ( ierr==1 ) THEN
           PRINT *, 'ERROR, circular segments involving', iseg, 'and', eseg
-          STOP
+          ERROR STOP -3
         ENDIF
       ENDDO
 !      IF ( Print_debug==20 ) THEN

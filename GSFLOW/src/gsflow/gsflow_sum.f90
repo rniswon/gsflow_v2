@@ -108,7 +108,7 @@
 !***********************************************************************
       gsfsumdecl = 0
 
-      Version_gsflow_sum = 'gsflow_sum.f90 2019-10-31 13:26:00Z'
+      Version_gsflow_sum = 'gsflow_sum.f90 2020-04-30 16:45:00Z'
       CALL print_module(Version_gsflow_sum, 'GSFLOW Output CSV Summary   ', 90)
       MODNAME = 'gsflow_sum'
 
@@ -571,8 +571,8 @@
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       USE PRMS_FLOWVARS, ONLY: Basin_perv_et, Basin_swale_et, &
      &    Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_actet, &
-     &    Basin_soil_moist, Basin_ssstor, Basin_cfs
-      USE PRMS_SRUNOFF, ONLY: Basin_imperv_evap, Basin_sroff, Basin_hortonian, &
+     &    Basin_soil_moist, Basin_ssstor, Basin_cfs, Basin_sroff
+      USE PRMS_SRUNOFF, ONLY: Basin_imperv_evap, Basin_hortonian, &
      &    Basin_hortonian_lakes, Basin_infil
       USE PRMS_DPRST, ONLY: Basin_dprst_evap, Basin_dprst_volop, Basin_dprst_volcl
       USE PRMS_SNOW, ONLY: Basin_snowevap, Basin_snowmelt
@@ -915,7 +915,7 @@
      &       Csv_output_file(:1)==CHAR(0) ) Csv_output_file = 'gsflow.csv'
 
         CALL PRMS_open_output_file(Balance_unt, Csv_output_file, 'csv_output_file', 0, ios)
-        IF ( ios/=0 ) STOP
+        IF ( ios/=0 ) ERROR STOP -1
       ENDIF
  
 ! Open the GSF volumetric balance report file
@@ -927,7 +927,7 @@
       IF ( Gsflow_output_file(:1)==' ' .OR. Gsflow_output_file(:1)==CHAR(0) ) Gsflow_output_file = 'gsflow.out'
 
       CALL PRMS_open_output_file(Gsf_unt, Gsflow_output_file, 'gsflow_output_file', 0, ios)
-      IF ( ios/=0 ) STOP
+      IF ( ios/=0 ) ERROR STOP -1
       nc = numchars(Gsflow_output_file)
       IF ( Print_debug>-1 ) PRINT 9001, 'Writing GSFLOW Water Budget File: ', Gsflow_output_file(:nc)
       IF ( Print_debug>-2 ) WRITE ( Logunt, 9001 ) 'Writing GSFLOW Water Budget File: ', Gsflow_output_file(:nc)

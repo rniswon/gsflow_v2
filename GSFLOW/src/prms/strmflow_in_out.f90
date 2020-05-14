@@ -8,11 +8,10 @@
       USE PRMS_GWFLOW, ONLY: Basin_gwflow
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_cfs, Basin_cms, Basin_stflow_in, &
      &    Basin_sroff_cfs, Basin_ssflow_cfs, Basin_gwflow_cfs, Basin_stflow_out, &
-     &    Seg_inflow, Seg_outflow, Seg_upstream_inflow, Seg_lateral_inflow, Flow_out
+     &    Seg_inflow, Seg_outflow, Seg_upstream_inflow, Seg_lateral_inflow, Flow_out, Basin_sroff
       USE PRMS_ROUTING, ONLY: Obsin_segment, Segment_order, Tosegment, Obsout_segment, Segment_type, &
      &    Flow_to_lakes, Flow_to_ocean, Flow_to_great_lakes, Flow_out_region, Flow_replacement, &
      &    Flow_out_NHM, Flow_terminus, Flow_in_region, Flow_in_nation, Flow_headwater, Flow_in_great_lakes
-      USE PRMS_SRUNOFF, ONLY: Basin_sroff
       USE PRMS_OBS, ONLY: Streamflow_cfs
       IMPLICIT NONE
 ! Functions
@@ -101,7 +100,7 @@
         Basin_ssflow_cfs = Basin_ssflow*area_fac
         Basin_gwflow_cfs = Basin_gwflow*area_fac
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_strmflow = 'strmflow_in_out.f90 2017-03-20 16:41:00Z'
+        Version_strmflow = 'strmflow_in_out.f90 2020-04-21 16:43:00Z'
         CALL print_module(Version_strmflow, 'Streamflow Routing          ', 90)
       ENDIF
 

@@ -75,7 +75,7 @@
       INTEGER :: i
       CHARACTER(LEN=80), SAVE :: Version_nsub_summary
 !***********************************************************************
-      Version_nsub_summary = 'nsub_summary.f90 2018-05-25 13:36:00Z'
+      Version_nsub_summary = 'nsub_summary.f90 2020-04-28 13:36:00Z'
       CALL print_module(Version_nsub_summary, 'Subbasin Output Summary     ', 90)
       MODNAME = 'nsub_summary'
 
@@ -120,7 +120,7 @@
       IMPLICIT NONE
       INTRINSIC ABS
       INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam
-      EXTERNAL read_error, PRMS_open_output_file
+      EXTERNAL read_error, PRMS_open_output_file, error_stop
 ! Local Variables
       INTEGER :: ios, ierr, jj, j, i, k
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
@@ -168,7 +168,7 @@
           ierr = 1
         ENDIF
       ENDDO
-      IF ( ierr==1 ) STOP
+      IF ( ierr==1 ) ERROR STOP -1
 
       IF ( Nhru_vars==1 ) THEN
         IF ( Nhru_double_vars==1 ) THEN
@@ -229,18 +229,18 @@
           fileName = NsubOutBaseFileName(:numchars(NsubOutBaseFileName))//NsubOutVar_names(jj)(:Nc_vars(jj))//'.csv'
           !print *, fileName
           CALL PRMS_open_output_file(Dailyunit(jj), fileName, 'xxx', 0, ios)
-          IF ( ios/=0 ) STOP 'in nsub_summary, daily'
+          IF ( ios/=0 ) CALL error_stop('in nsub_summary, daily')
           WRITE ( Dailyunit(jj), Output_fmt2 ) (j, j=1,Nsub)
         ENDIF
         IF ( NsubOut_freq==5 ) THEN
           fileName = NsubOutBaseFileName(:numchars(NsubOutBaseFileName))//NsubOutVar_names(jj)(:Nc_vars(jj))//'_meanyearly.csv'
           CALL PRMS_open_output_file(Yearlyunit(jj), fileName, 'xxx', 0, ios)
-          IF ( ios/=0 ) STOP 'in nsub_summary, mean yearly'
+          IF ( ios/=0 ) CALL error_stop('in nsub_summary, mean yearly')
           WRITE ( Yearlyunit(jj), Output_fmt2 ) (j, j=1,Nsub)
         ELSEIF ( NsubOut_freq==6 ) THEN
           fileName = NsubOutBaseFileName(:numchars(NsubOutBaseFileName))//NsubOutVar_names(jj)(:Nc_vars(jj))//'_yearly.csv'
           CALL PRMS_open_output_file(Yearlyunit(jj), fileName, 'xxx', 0, ios)
-          IF ( ios/=0 ) STOP 'in nsub_summary, yearly'
+          IF ( ios/=0 ) CALL error_stop('in nsub_summary, yearly')
           WRITE ( Yearlyunit(jj), Output_fmt2 ) (j, j=1,Nsub)
         ELSEIF ( Monthly_flag==1 ) THEN
           IF ( NsubOut_freq==4 ) THEN
@@ -251,7 +251,7 @@
           ENDIF
           !print *, fileName
           CALL PRMS_open_output_file(Monthlyunit(jj), fileName, 'xxx', 0, ios)
-          IF ( ios/=0 ) STOP 'in nsub_summary, monthly'
+          IF ( ios/=0 ) CALL error_stop('in nsub_summary, monthly')
           WRITE ( Monthlyunit(jj), Output_fmt2 ) (j, j=1,Nsub)
         ENDIF
       ENDDO

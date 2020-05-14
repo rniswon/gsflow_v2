@@ -82,7 +82,7 @@
 !***********************************************************************
       cascdecl = 0
 
-      Version_cascade = 'cascade.f90 2019-09-25 12:31:00Z'
+      Version_cascade = 'cascade.f90 2020-04-27 08:47:00Z'
       CALL print_module(Version_cascade, 'Cascading Flow              ', 90)
       MODNAME = 'cascade'
 
@@ -224,7 +224,7 @@
 !        ALLOCATE ( Gwr_down_fracwt(Ndown,Ngw) )
         IF ( Cascadegw_flag==1 ) THEN
           CALL initgw_cascade(iret)
-          IF ( iret==1 ) STOP
+          IF ( iret==1 ) ERROR STOP -2
         ELSE ! cascadegw_flag=2 so GWR cascades set to HRU cascades
           Gwr_type = Hru_type
           Active_gwrs = Active_hrus
@@ -248,7 +248,7 @@
           ENDDO
         ENDIF
       ENDIF
-      IF ( itest/=0 .OR. iret/=0 ) STOP
+      IF ( itest/=0 .OR. iret/=0 ) ERROR STOP -2
 
       IF ( Print_debug==13 ) THEN
         IF ( Cascade_flag>0 ) THEN

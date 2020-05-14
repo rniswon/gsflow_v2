@@ -58,7 +58,7 @@
 !***********************************************************************
       gsfbuddecl = 0
 
-      Version_gsflow_budget = 'gsflow_budget.f90 2019-10-30 15:07:00Z'
+      Version_gsflow_budget = 'gsflow_budget.f90 2020-04-30 16:45:00Z'
       CALL print_module(Version_gsflow_budget, 'GSFLOW Output Budget Summary', 90)
       MODNAME = 'gsflow_budget'
 
@@ -195,7 +195,7 @@
 
       IF ( Nreach/=NSTRM ) THEN
         PRINT *, 'ERROR, nreach must equal to NSTRM', Nreach, NSTRM
-        STOP
+        ERROR STOP -1
       ENDIF
 
       Reach_cfs = 0.0 ! dimension NSTRM
@@ -253,11 +253,10 @@
 !                  Basin_ssflow_cfs, Basin_sroff_cfs
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Active_area, &
      &    Basin_area_inv, Hru_area, NEARZERO, Lake_hru_id, Lake_area, CLOSEZERO
-      USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Hru_actet, &
+      USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Hru_actet, Basin_sroff, &
      &    Basin_actet, Basin_ssstor, Ssres_stor, Slow_stor, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_gwflow_cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv
 !Warning, modifies Basin_soil_moist, Basin_ssstor
-      USE PRMS_SRUNOFF, ONLY: Basin_sroff
 !Warning, modifies Gw2sm_grav
       USE PRMS_SOILZONE, ONLY: Pref_flow_stor, Gravity_stor_res, Hrucheck, Gvr_hru_id, &
      &    Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted

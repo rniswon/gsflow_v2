@@ -63,12 +63,12 @@
       ! soilzone
       DOUBLE PRECISION, SAVE :: Basin_ssflow, Basin_soil_to_gw
       DOUBLE PRECISION, SAVE :: Basin_actet, Basin_lakeevap
-      DOUBLE PRECISION, SAVE :: Basin_swale_et, Basin_perv_et
-      DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor
+      DOUBLE PRECISION, SAVE :: Basin_swale_et, Basin_perv_et, Basin_sroff
+      DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor, Basin_recharge
       REAL, SAVE, ALLOCATABLE :: Hru_actet(:), Soil_moist(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_ssr(:), Ssres_in(:)
-      REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:)
+      REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:), Recharge(:)
       REAL, SAVE, ALLOCATABLE :: Ssres_stor(:), Ssres_flow(:), Soil_rechr(:)
       ! srunoff
       REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:)
@@ -425,6 +425,14 @@
      &     'Basin average excess flow to capillary reservoirs that drains to GWRs', &
      &     'inches', Basin_soil_to_gw)
 
+      CALL declvar_dble(Soilzone_module, 'basin_recharge', 'one', 1, 'double', &
+     &     'Basin area-weighted average recharge to GWRs', &
+     &     'inches', Basin_recharge)
+
+      ALLOCATE ( Recharge(Nhru) )
+      CALL declvar_real(Soilzone_module, 'recharge', 'nhru', Nhru, 'real', &
+     &     'Recharge to the associated GWR as sum of soil_to_gw, ssr_to_gw, and dprst_seep_hru for each HRU', &
+     &     'inches', Recharge)
 ! gwflow
       IF ( GSFLOW_flag==0 ) THEN
         ALLOCATE ( Gwres_stor(Nhru) )
@@ -448,6 +456,10 @@
       CALL declvar_real(Srunoff_module, 'sroff', 'nhru', Nhru, 'real', &
      &     'Surface runoff to the stream network for each HRU', &
      &     'inches', Sroff)
+
+      CALL declvar_dble(Srunoff_module, 'basin_sroff', 'one', 1, 'double', &
+     &     'Basin area-weighted average surface runoff to the stream network', &
+     &     'inches', Basin_sroff)
 
 ! stream flow
       CALL declvar_dble(Strmflow_module, 'basin_cfs', 'one', 1, 'double', &
@@ -479,8 +491,10 @@
      &     'cfs', Basin_gwflow_cfs)
 
       IF ( Call_cascade==1 .OR. Stream_order_flag==1 ) THEN
-        IF ( Nsegment==0 .AND. Model/=DOCUMENTATION ) &
-     &       STOP 'ERROR, nsegment=0, must be > 0 for selected module options'
+        IF ( Nsegment==0 .AND. Model/=DOCUMENTATION ) THEN
+          PRINT *, 'ERROR, nsegment=0, must be > 0 for selected module options'
+          ERROR STOP -1
+        ENDIF
       ENDIF
 
       IF ( Stream_order_flag==1 ) THEN
@@ -1121,6 +1135,7 @@
       Slow_flow = 0.0
       Soil_to_gw = 0.0
       Soil_to_ssr = 0.0
+      Recharge = 0.0
       Hru_actet = 0.0
       Infil = 0.0
       Sroff = 0.0
@@ -1173,6 +1188,8 @@
       Basin_ssflow = 0.0D0
       Basin_soil_moist = 0.0D0
       Basin_ssstor = 0.0D0
+      Basin_recharge = 0.0D0
+      Basin_sroff = 0.0D0
       Basin_lake_stor = 0.0D0
       Solrad_tmax = 0.0
       Solrad_tmin = 0.0
@@ -1227,7 +1244,6 @@
 !***********************************************************************
       SUBROUTINE temp_set(Ihru, Tmax, Tmin, Tmaxf, Tminf, Tavgf, Tmaxc, Tminc, Tavgc, Hru_area)
       USE PRMS_CLIMATEVARS, ONLY: Basin_temp, Basin_tmax, Basin_tmin, Temp_units, Tmax_hru, Tmin_hru
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: MINTEMP, MAXTEMP
       IMPLICIT NONE
 ! Arguments
@@ -1237,6 +1253,7 @@
 ! Functions
       INTRINSIC DBLE
       REAL, EXTERNAL :: c_to_f, f_to_c
+      EXTERNAL :: print_date
 !***********************************************************************
       IF ( Temp_units==0 ) THEN
 !       degrees Fahrenheit
@@ -1259,8 +1276,9 @@
       ENDIF
 
       IF ( Tminf<MINTEMP .OR. Tmaxf>MAXTEMP ) THEN
-        PRINT *, 'ERROR, invalid temperature value for HRU:', Ihru, Tminf, Tmaxf, ' Date:', Nowyear, Nowmonth, Nowday
-        STOP
+        PRINT '(A,I0,1X,F0.4,1X,F0.4,/)', ' ERROR, invalid temperature value for HRU: ', Ihru, Tminf, Tmaxf
+        CALL print_date(1)
+        ERROR STOP -3
       ENDIF
       Tmax_hru(Ihru) = Tmax ! in units temp_units
       Tmin_hru(Ihru) = Tmin ! in units temp_units
@@ -1362,7 +1380,8 @@
      &          Basin_swrad, Orad, Flow_out, Basin_potsw, Basin_humidity
         WRITE ( Restart_outunit ) Basin_cfs, Basin_cms, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_stflow_in, &
      &          Basin_gwflow_cfs, Basin_stflow_out, Basin_ssflow, Basin_soil_to_gw, Basin_actet, &
-     &          Basin_swale_et, Basin_perv_et, Basin_soil_moist, Basin_ssstor, Basin_lakeevap, Basin_lake_stor
+     &          Basin_swale_et, Basin_perv_et, Basin_soil_moist, Basin_ssstor, Basin_lakeevap, Basin_lake_stor, &
+     &          Basin_sroff, Basin_recharge
         WRITE ( Restart_outunit ) Transp_on
         WRITE ( Restart_outunit ) Pkwater_equiv
         WRITE ( Restart_outunit ) Soil_moist
@@ -1388,7 +1407,8 @@
      &         Basin_swrad, Orad, Flow_out, Basin_potsw, Basin_humidity
         READ ( Restart_inunit ) Basin_cfs, Basin_cms, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_stflow_in, &
      &         Basin_gwflow_cfs, Basin_stflow_out, Basin_ssflow, Basin_soil_to_gw, Basin_actet, &
-     &         Basin_swale_et, Basin_perv_et, Basin_soil_moist, Basin_ssstor, Basin_lakeevap, Basin_lake_stor
+     &         Basin_swale_et, Basin_perv_et, Basin_soil_moist, Basin_ssstor, Basin_lakeevap, Basin_lake_stor, &
+     &         Basin_sroff, Basin_recharge
         READ ( Restart_inunit ) Transp_on
         READ ( Restart_inunit ) Pkwater_equiv
         READ ( Restart_inunit ) Soil_moist

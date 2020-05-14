@@ -75,7 +75,7 @@
 !***********************************************************************
       basdecl = 0
 
-      Version_basin = 'basin.f90 2019-11-14 15:58:00Z'
+      Version_basin = 'basin.f90 2020-04-27 08:41:00Z'
       CALL print_module(Version_basin, 'Basin Definition            ', 90)
       MODNAME = 'basin'
 
@@ -438,7 +438,7 @@
         ENDDO
       ENDIF
 
-      IF ( basinit==1 ) STOP
+      IF ( basinit==1 ) ERROR STOP -2
 
       Active_hrus = j
       Active_area = Land_area + Water_area

@@ -62,7 +62,7 @@
       IF ( Process(:3)=='run' ) THEN
         dynamic_param_read = dynparamrun()
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_dynamic_param_read = 'dynamic_param_read.f90 2020-04-15 17:47:00Z'
+        Version_dynamic_param_read = 'dynamic_param_read.f90 2020-04-27 08:47:00Z'
         CALL print_module(Version_dynamic_param_read, 'Time Series Data            ', 90)
         !MODNAME = 'dynamic_param_read'
       ELSEIF ( Process(:4)=='init' ) THEN
@@ -82,7 +82,7 @@
      &    Dyn_springfrost_flag, Dyn_snareathresh_flag, Print_debug, PRMS4_flag
       IMPLICIT NONE
       INTEGER, EXTERNAL :: control_string, numchars
-      EXTERNAL read_error, find_header_end, find_current_file_time, PRMS_open_output_file
+      EXTERNAL read_error, find_header_end, find_current_file_time, PRMS_open_output_file, error_stop
       INTRINSIC ABS
 ! Local Variables
       INTEGER :: year, month, day, istop, ierr
@@ -386,7 +386,7 @@
      &                     dynamic_param_log_file(:numchars(dynamic_param_log_file))
       ENDIF
 
-      IF ( istop==1 .OR. ierr/=0 ) STOP 'ERROR in dynamic_param_read initialize procedure'
+      IF ( istop==1 .OR. ierr/=0 ) CALL error_stop('in dynamic_param_read initialize procedure')
 
       END FUNCTION dynparaminit
 
@@ -858,7 +858,7 @@
         ENDIF
       ENDIF
 
-      IF ( istop==1 ) STOP
+      IF ( istop==1 ) ERROR STOP
 
  9001 FORMAT (/, 'ERROR, dynamic parameter', A, ' <', F0.7, ' for HRU:', I0, /, 9X, 'value:', F0.7) !, ' set to', F0.7)
  9002 FORMAT (/, 'ERROR, dynamic parameter causes soil_rechr_max:', F0.7, ' > soil_moist_max:', F0.7, ' for HRU:', I0)

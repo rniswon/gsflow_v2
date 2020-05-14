@@ -86,7 +86,7 @@
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Outflow_ts(:), Inflow_ts(:)
-      CHARACTER(LEN=14), SAVE :: MODNAME
+      CHARACTER(LEN=9), SAVE :: MODNAME
       END MODULE PRMS_MUSKINGUM
 
 !***********************************************************************
@@ -131,7 +131,7 @@
 !***********************************************************************
       muskingum_decl = 0
 
-      Version_muskingum = 'muskingum.f90 2019-09-26 17:18:00Z'
+      Version_muskingum = 'muskingum.f90 2020-04-28 19:02:00Z'
       IF ( Strmflow_flag==4 ) THEN
         MODNAME = 'muskingum'
       ELSE
@@ -184,18 +184,18 @@
       USE PRMS_BASIN, ONLY: CFS2CMS_CONV, Basin_area_inv
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_cms, Basin_gwflow_cfs, Basin_ssflow_cfs, &
      &    Basin_stflow_out, Basin_cfs, Basin_stflow_in, Basin_sroff_cfs, Seg_inflow, Seg_outflow, &
-     &    Seg_upstream_inflow, Seg_lateral_inflow, Flow_out
+     &    Seg_upstream_inflow, Seg_lateral_inflow, Flow_out, Basin_sroff
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_ROUTING, ONLY: Use_transfer_segment, Segment_delta_flow, Basin_segment_storage, &
      &    Obsin_segment, Segment_order, Tosegment, C0, C1, C2, Ts, Ts_i, Obsout_segment, &
      &    Flow_to_ocean, Flow_to_great_lakes, Flow_out_region, Flow_out_NHM, Segment_type, Flow_terminus, &
      &    Flow_to_lakes, Flow_replacement, Flow_in_region, Flow_in_nation, Flow_headwater, Flow_in_great_lakes
-      USE PRMS_SRUNOFF, ONLY: Basin_sroff
       USE PRMS_GWFLOW, ONLY: Basin_gwflow
       IMPLICIT NONE
 ! Functions
       INTRINSIC MOD
+      EXTERNAL error_stop
 ! Local Variables
       INTEGER :: i, j, iorder, toseg, imod, tspd, segtype
       DOUBLE PRECISION :: area_fac, segout, currin
@@ -283,7 +283,7 @@
               PRINT *, 'ERROR, outflow from segment:', iorder, ' is negative:', Outflow_ts(iorder)
               PRINT *, '       routing parameters may be invalid'
             ENDIF
-            STOP
+            CALL error_stop('in muskingum')
           ENDIF
 
           ! Seg_outflow (the mean daily flow rate for each segment) will be the average of the hourly values.

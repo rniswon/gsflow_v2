@@ -57,7 +57,7 @@
       INTEGER :: i
       CHARACTER(LEN=80), SAVE :: Version_basin_summary
 !***********************************************************************
-      Version_basin_summary = 'basin_summary.f90 2018-04-05 14:02:00Z'
+      Version_basin_summary = 'basin_summary.f90 2020-04-27 08:33:00Z'
       CALL print_module(Version_basin_summary, 'Basin Output Summary        ', 90)
       MODNAME = 'basin_summary'
 
@@ -121,7 +121,7 @@
           ierr = 1
         ENDIF
       ENDDO
-      IF ( ierr==1 ) STOP
+      IF ( ierr==1 ) ERROR STOP -2
       ALLOCATE ( Basin_var_daily(BasinOutVars) )
       Basin_var_daily = 0.0D0
 
@@ -147,20 +147,19 @@
 
       IF ( Daily_flag==1 ) THEN
         fileName = BasinOutBaseFileName(:numchars(BasinOutBaseFileName))//'.csv'
-        !print *, fileName
-        CALL PRMS_open_output_file(Dailyunit, fileName, 'xxx', 0, ios)
-        IF ( ios/=0 ) STOP 'in basin_summary, daily'
+        CALL PRMS_open_output_file(Dailyunit, fileName, 'basin_summary, daily', 0, ios)
+        IF ( ios/=0 ) ierr = 1
         WRITE ( Dailyunit, Output_fmt2 ) (BasinOutVar_names(jj)(:Nc_vars(jj)), jj=1, BasinOutVars)
       ENDIF
       IF ( BasinOut_freq==5 ) THEN
         fileName = BasinOutBaseFileName(:numchars(BasinOutBaseFileName))//'_meanyearly.csv'
-        CALL PRMS_open_output_file(Yearlyunit, fileName, 'xxx', 0, ios)
-        IF ( ios/=0 ) STOP 'in basin_summary, mean yearly'
+        CALL PRMS_open_output_file(Yearlyunit, fileName, 'basin_summary, mean yearly', 0, ios)
+        IF ( ios/=0 ) ierr = 1
         WRITE ( Yearlyunit, Output_fmt2 ) (BasinOutVar_names(jj)(:Nc_vars(jj)), jj=1, BasinOutVars)
       ELSEIF ( BasinOut_freq==6 ) THEN
         fileName = BasinOutBaseFileName(:numchars(BasinOutBaseFileName))//'_yearly.csv'
-        CALL PRMS_open_output_file(Yearlyunit, fileName, 'xxx', 0, ios)
-        IF ( ios/=0 ) STOP 'in basin_summary, yearly'
+        CALL PRMS_open_output_file(Yearlyunit, fileName, 'basin_summary, yearly', 0, ios)
+        IF ( ios/=0 ) ierr = 1
         WRITE ( Yearlyunit, Output_fmt2 ) (BasinOutVar_names(jj)(:Nc_vars(jj)), jj=1, BasinOutVars)
       ELSEIF ( Monthly_flag==1 ) THEN
         IF ( BasinOut_freq==4 ) THEN
@@ -168,11 +167,12 @@
         ELSE
           fileName = BasinOutBaseFileName(:numchars(BasinOutBaseFileName))//'_monthly.csv'
         ENDIF
-        !print *, fileName
-        CALL PRMS_open_output_file(Monthlyunit, fileName, 'xxx', 0, ios)
-        IF ( ios/=0 ) STOP 'in basin_summary, monthly'
+        CALL PRMS_open_output_file(Monthlyunit, fileName, 'basin_summary, monthly', 0, ios)
+        IF ( ios/=0 ) ierr = 1
         WRITE ( Monthlyunit, Output_fmt2 ) (BasinOutVar_names(jj)(:Nc_vars(jj)), jj=1, BasinOutVars)
       ENDIF
+
+      IF ( ierr==1 ) ERROR STOP -2
 
  9001 FORMAT ('(I4, 2(''-'',I2.2),',I6,'('',''ES10.3))')
  9002 FORMAT ('("Date"',I0,'('', ''A))')

@@ -72,7 +72,7 @@
       INTEGER :: i
       CHARACTER(LEN=80), SAVE :: Version_nsegment_summary
 !***********************************************************************
-      Version_nsegment_summary = 'nsegment_summary.f90 2018-06-11 11:10:00Z'
+      Version_nsegment_summary = 'nsegment_summary.f90 2020-04-28 11:10:00Z'
       CALL print_module(Version_nsegment_summary, 'Nsegment Output Summary     ', 90)
       MODNAME = 'nsegment_summary'
 
@@ -117,7 +117,7 @@
       IMPLICIT NONE
       INTRINSIC ABS
       INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam
-      EXTERNAL read_error, PRMS_open_output_file
+      EXTERNAL read_error, PRMS_open_output_file, error_stop
 ! Local Variables
       INTEGER :: ios, ierr, size, jj, j
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
@@ -157,7 +157,7 @@
           ierr = 1
         ENDIF
       ENDDO
-      IF ( ierr==1 ) STOP
+      IF ( ierr==1 ) ERROR STOP -1
       IF ( Double_vars==1 ) THEN
         ALLOCATE ( Nsegment_var_dble(Nsegment, NsegmentOutVars) )
         Nsegment_var_dble = 0.0D0
@@ -208,7 +208,7 @@
           fileName = NsegmentOutBaseFileName(:numchars(NsegmentOutBaseFileName))//NsegmentOutVar_names(jj)(:Nc_vars(jj))//'.csv'
           !print *, fileName
           CALL PRMS_open_output_file(Dailyunit(jj), fileName, 'xxx', 0, ios)
-          IF ( ios/=0 ) STOP 'in nsegment_summary, daily'
+          IF ( ios/=0 ) CALL error_stop('in nsegment_summary, daily')
           IF ( NsegmentOutON_OFF==1 ) THEN
             WRITE ( Dailyunit(jj), Output_fmt2 ) (j, j=1,Nsegment)
           ELSE
@@ -220,12 +220,12 @@
             fileName = NsegmentOutBaseFileName(:numchars(NsegmentOutBaseFileName))//NsegmentOutVar_names(jj)(:Nc_vars(jj))// &
       &                 '_meanyearly.csv'
             CALL PRMS_open_output_file(Yearlyunit(jj), fileName, 'xxx', 0, ios)
-            IF ( ios/=0 ) STOP 'in nsegment_summary, mean yearly'
+            IF ( ios/=0 ) CALL error_stop('in nsegment_summary, mean yearly')
           ELSE  !IF ( NsegmentOut_freq==6 ) THEN
             fileName = NsegmentOutBaseFileName(:numchars(NsegmentOutBaseFileName))//NsegmentOutVar_names(jj)(:Nc_vars(jj))// &
       &                 '_yearly.csv'
             CALL PRMS_open_output_file(Yearlyunit(jj), fileName, 'xxx', 0, ios)
-            IF ( ios/=0 ) STOP 'in nsegment_summary, yearly'
+            IF ( ios/=0 )CALL error_stop('in nsegment_summary, yearly')
           ENDIF
           IF ( NsegmentOutON_OFF==1 ) THEN
             WRITE ( Yearlyunit(jj), Output_fmt2 ) (j, j=1,Nsegment)
@@ -238,12 +238,12 @@
             fileName = NsegmentOutBaseFileName(:numchars(NsegmentOutBaseFileName))//NsegmentOutVar_names(jj)(:Nc_vars(jj))// &
      &                 '_meanmonthly.csv'
             CALL PRMS_open_output_file(Monthlyunit(jj), fileName, 'xxx', 0, ios)
-            IF ( ios/=0 ) STOP 'in nsegment_summary, mean monthly'
+            IF ( ios/=0 ) CALL error_stop('in nsegment_summary, mean monthly')
           ELSE
             fileName = NsegmentOutBaseFileName(:numchars(NsegmentOutBaseFileName))//NsegmentOutVar_names(jj)(:Nc_vars(jj))// &
      &                  '_monthly.csv'
             CALL PRMS_open_output_file(Monthlyunit(jj), fileName, 'xxx', 0, ios)
-            IF ( ios/=0 ) STOP 'in nsegment_summary, monthly'
+            IF ( ios/=0 ) CALL error_stop('in nsegment_summary, monthly')
           ENDIF
           IF ( NsegmentOutON_OFF==1 ) THEN
             WRITE ( Monthlyunit(jj), Output_fmt2 ) (j, j=1,Nsegment)

@@ -95,7 +95,7 @@
 !***********************************************************************
       sumbdecl = 0
 
-      Version_basin_sum = 'basin_sum.f90 2020-04-15 17:18:00Z'
+      Version_basin_sum = 'basin_sum.f90 2020-04-21 16:40:00Z'
       CALL print_module(Version_basin_sum, 'Summary                     ', 90)
       MODNAME = 'basin_sum'
 
@@ -477,7 +477,7 @@
       USE PRMS_MODULE, ONLY: Print_debug, Nobs, End_year, Strmflow_flag
       USE PRMS_BASIN, ONLY: Active_area, Active_hrus, Hru_route_order
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, &
-     &    Basin_actet, Basin_perv_et, Basin_swale_et, Hru_actet, &
+     &    Basin_actet, Basin_perv_et, Basin_swale_et, Hru_actet, Basin_sroff, &
      &    Basin_ssstor, Basin_soil_moist, Basin_cfs, Basin_stflow_out, Basin_lake_stor
       USE PRMS_CLIMATEVARS, ONLY: Basin_swrad, Basin_ppt, Basin_potet, Basin_tmax, Basin_tmin
       USE PRMS_SET_TIME, ONLY: Jday, Modays, Yrdays, Julwater, Nowyear, Nowmonth, Nowday, Cfs2inches
@@ -485,7 +485,7 @@
       USE PRMS_GWFLOW, ONLY: Basin_gwflow, Basin_gwstor, Basin_gwsink, Basin_gwstor_minarea_wb
       USE PRMS_INTCP, ONLY: Basin_intcp_evap, Basin_intcp_stor, Basin_net_ppt
       USE PRMS_SNOW, ONLY: Basin_snowmelt, Basin_pweqv, Basin_snowevap
-      USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_imperv_evap, Basin_sroff
+      USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_imperv_evap
       USE PRMS_DPRST, ONLY: Basin_dprst_evap, Basin_dprst_volcl, Basin_dprst_volop
       USE PRMS_ROUTING, ONLY: Basin_segment_storage
       IMPLICIT NONE

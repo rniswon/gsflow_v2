@@ -29,14 +29,14 @@
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_soil_to_gw, &
      &    Basin_lakeevap, Basin_perv_et, Basin_actet, Basin_lake_stor, &
      &    Basin_gwflow_cfs, Basin_sroff_cfs, Basin_ssflow_cfs, Basin_cfs, Basin_stflow_in, &
-     &    Basin_stflow_out, Seg_outflow
+     &    Basin_stflow_out, Seg_outflow, Basin_recharge
       USE PRMS_SET_TIME, ONLY : Nowyear, Nowmonth, Nowday
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_INTCP, ONLY: Basin_intcp_evap, Basin_intcp_stor
       USE PRMS_SNOW, ONLY: Basin_pweqv, Basin_snowevap, Basin_snowmelt, Basin_snowcov, Basin_pk_precip
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_imperv_evap, Basin_hortonian
       USE PRMS_DPRST, ONLY: Basin_dprst_evap, Basin_dprst_seep, Basin_dprst_volop, Basin_dprst_volcl
-      USE PRMS_SOILZONE, ONLY: Basin_capwaterin, Basin_pref_flow_infil, Basin_prefflow, Basin_recharge, Basin_slowflow, &
+      USE PRMS_SOILZONE, ONLY: Basin_capwaterin, Basin_pref_flow_infil, Basin_prefflow, Basin_slowflow, &
      &    Basin_pref_stor, Basin_slstor, Basin_soil_rechr, Basin_sz2gw, Basin_dunnian
       USE PRMS_GWFLOW, ONLY: Basin_gwstor, Basin_gwin, Basin_gwsink, Basin_gwflow, &
      &    Basin_gwstor_minarea_wb, Basin_dnflow
@@ -89,7 +89,7 @@
 
 ! Declare procedure
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_prms_summary = 'prms_summary.f90 2020-04-15 17:10:00Z'
+        Version_prms_summary = 'prms_summary.f90 2020-04-27 08:10:00Z'
         CALL print_module(Version_prms_summary, 'Output Summary              ', 90)
         MODNAME = 'prms_summary'
 
@@ -97,7 +97,7 @@
         IF ( control_string(Csv_output_file, 'csv_output_file')/=0 ) CALL read_error(5, 'csv_output_file')
         IF ( Model/=99 ) THEN
           CALL PRMS_open_output_file(Iunit, Csv_output_file, 'csv_output_file', 0, ios)
-          IF ( ios/=0 ) STOP
+          IF ( ios/=0 ) ERROR STOP -1
         ENDIF
 
         CALL declvar_dble(MODNAME, 'basin_total_storage', 'one', 1, 'double', &
@@ -250,7 +250,7 @@
       USE PRMS_MODULE, ONLY: MAXFILE_LENGTH
       IMPLICIT NONE
       INTEGER, EXTERNAL :: control_string, numchars
-      EXTERNAL PRMS_open_input_file, PRMS_open_output_file
+      EXTERNAL PRMS_open_input_file, PRMS_open_output_file, error_stop
       ! Local Variable
       INTEGER :: inunit, numvariables, ios, i, outunit, ts, yr, mo, day, hr, mn, sec, num
       INTEGER, ALLOCATABLE :: varindex(:), nc(:)
@@ -264,15 +264,15 @@
 !***********************************************************************
       IF ( control_string(statvar_file, 'stat_var_file')/=0 ) CALL read_error(5, 'stat_var_file')
       CALL PRMS_open_input_file(inunit, statvar_file, 'stat_var_file', 0, ios)
-      IF ( ios/=0 ) STOP 'ERROR, opening statvar file'
+      IF ( ios/=0 ) CALL error_stop('opening statvar file')
       statvar_file_csv = statvar_file(:numchars(statvar_file))//'.csv'
       CALL PRMS_open_output_file(outunit, statvar_file_csv, 'statvar_csv', 0, ios)
-      IF ( ios/=0 ) STOP 'ERROR, opening statvar CSV file'
+      IF ( ios/=0 ) CALL error_stop('opening statvar CSV file')
       READ ( inunit, * ) numvariables
       ALLOCATE ( varname(numvariables), varindex(numvariables), values(numvariables), nc(numvariables) )
       DO i = 1, numvariables
         READ ( inunit, '(A)', IOSTAT=ios ) varname(i)
-        IF ( ios/=0 ) STOP 'ERROR, reading statvar file'
+        IF ( ios/=0 ) CALL error_stop('reading statvar file')
         num = numchars(varname(i))
         READ ( varname(i)(num+1:32), '(I5)' ) varindex(i)
         WRITE ( varname(i), '(A,I0)' ) varname(i)(:num)//'_', varindex(i)
@@ -290,7 +290,7 @@
           PRINT *, 'ERROR, reading statvar file values, IOSTAT:', ios
           PRINT *, ts, yr, mo, day, hr, 'number of variables:', numvariables
           PRINT *, (values(i), i = 1, numvariables )
-          STOP 
+          ERROR STOP  -3
         ENDIF
         WRITE ( chardate, '(I0,2("-",I2.2))' )  yr, mo, day
         WRITE ( outunit, fmt2 ) chardate, (values(i), i = 1, numvariables )
