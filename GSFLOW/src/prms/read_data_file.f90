@@ -26,7 +26,7 @@
       REAL, ALLOCATABLE :: var(:)
       CHARACTER(LEN=80), SAVE :: Version_read_data_file
 !***********************************************************************
-      Version_read_data_file = 'read_data_file.f90 2019-12-02 14:20:00Z'
+      Version_read_data_file = 'read_data_file.f90 2020-05-27 15:52:00Z'
       CALL print_module(Version_read_data_file, 'Read Data File              ', 90)
 
       IF ( control_string(data_filename, 'data_file')/=0 ) CALL read_error(5, 'data_file')
