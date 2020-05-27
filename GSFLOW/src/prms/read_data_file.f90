@@ -94,6 +94,12 @@
       DO
         READ ( Datafile_unit, '(A)', IOSTAT=ios ) dmy
         IF ( ios==-1 ) EXIT ! found end of file
+        IF ( dmy(:4)=='    ' ) THEN ! assume a blank line is the end of the Data File
+          BACKSPACE Datafile_unit
+          BACKSPACE Datafile_unit
+          READ ( Datafile_unit, '(A)', IOSTAT=ios ) data_line
+          EXIT
+        ENDIF
         IF ( ios/=0 ) CALL read_error(13, 'data line')
         data_line = dmy
       ENDDO
