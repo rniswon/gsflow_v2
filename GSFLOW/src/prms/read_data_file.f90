@@ -47,7 +47,7 @@
         IF ( ios==-1 ) CALL read_error(13, 'invalid Data File, end of file reached')
         IF ( ios/=0 ) CALL read_error(13, 'comment')
         IF ( line(:4)=='    ' ) CYCLE
-        IF ( line(:2)=='//' ) CALL write_outfile(TRIM(line))
+        IF ( line(:2)=='//' .OR. line(:1)=='"' ) CALL write_outfile(TRIM(line))
         num_vars = num_vars + 1
         IF ( line(:4)=='####' ) EXIT
       ENDDO
@@ -66,7 +66,7 @@
       ierr = 0
       DO
         READ ( Datafile_unit, FMT='(A)' ) line
-        IF ( line(:4)=='    ' .OR. line(:2)=='//' ) CYCLE
+        IF ( line(:4)=='    ' .OR. line(:2)=='//' .OR. line(:1)=='"' ) CYCLE
         IF ( line(:4)=='####' ) EXIT
         length = LEN_TRIM(line)
         CALL write_outfile(line(:length))
