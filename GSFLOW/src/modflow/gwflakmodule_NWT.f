@@ -8,7 +8,7 @@ C------MINOR UPDATES JAN. 2013 (LFK)
      +'gwf2lak7_NWT.f 2016-07-21 11:42:00Z'
         INTEGER,SAVE,POINTER   ::NLAKES,NLAKESAR,ILKCB,NSSITR,LAKUNIT
         INTEGER,SAVE,POINTER   ::MXLKND,LKNODE,ICMX,NCLS,LWRT,NDV,NTRB,
-     +                           IRDTAB
+     +                           IRDTAB,ISTARTLAK
         REAL,   SAVE,POINTER   ::THETA,SSCNCR,SURFDEPTH
         DOUBLE PRECISION,   SAVE,POINTER   ::RAMP
         REAL,   SAVE, DIMENSION(:),  POINTER :: DEADPOOLVOL,MXLKVOLF,
@@ -81,7 +81,7 @@ Crsr    Allocate arrays in BD subroutine
       TYPE GWFLAKTYPE
         INTEGER,      POINTER   ::NLAKES,NLAKESAR,ILKCB,NSSITR,LAKUNIT
         INTEGER,      POINTER   ::MXLKND,LKNODE,ICMX,NCLS,LWRT,NDV,NTRB,
-     +                            IRDTAB
+     +                            IRDTAB,ISTARTLAK
 Cdep    Added SURFDEPTH 3/3/2009
         REAL,         POINTER   ::THETA,SSCNCR,SURFDEPTH
         DOUBLE PRECISION,         POINTER   ::RAMP

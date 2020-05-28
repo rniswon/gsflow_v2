@@ -14,7 +14,7 @@ Cdep  Streamflow-Routing Package. The Streamflow-Routing (sfr7) Package
 Cdep  was also modified to remain compatible with the modifications in
 Cdep  the Lake Package.
 C     Modifications made February and March 21, 2004; DEP
-C     Last change:  MLM & LFK  10 Oct 2003;  LFK 21 Jan 2004
+C     Last change:  MLM & LFK  10 Oct 2003;  LFK 21 Jan 2004F
 C     Previous change:  ERB  13 Sep 2002    9:22 am
 C
 C
@@ -67,7 +67,7 @@ C
 Cdep added SURFDEPTH 3/3/2009
         ALLOCATE (ILKCB, NSSITR, SSCNCR, SURFDEPTH,RAMP)
         ALLOCATE (MXLKND, LKNODE, ICMX, NCLS, LWRT, NDV, NTRB)
-        ALLOCATE (IRDTAB)
+        ALLOCATE (IRDTAB,ISTARTLAK)
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE LKNODE.
       WRITE(IOUT,1) IN
@@ -81,6 +81,7 @@ Cdep  initialize number of iterations and closure criteria to zero.
 !
       lloc = 1
       IRDTAB = 0
+      ISTARTLAK = 0
       NPP = 0
       MXVL = 0
       CALL URDCOM(In, IOUT, line)
@@ -1111,7 +1112,7 @@ C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFLAKMODULE, ONLY: NLAKES, LKNODE, FLOB, STAGES,
      +                        STGNEW, STGOLD, VOLOLDD, VOLOLD, VOLINIT,
-     +                        BOTTMS, IDIV, STGOLD2, NDV
+     +                        BOTTMS, IDIV, STGOLD2, NDV, ISTARTLAK
       USE GWFSFRMODULE, ONLY: DLKSTAGE
       USE GLOBAL,       ONLY: IOUT
 C     ------------------------------------------------------------------
@@ -1128,7 +1129,8 @@ C1 --- COPY INITIAL LAKE STAGES TO STGOLD.
 ! RGN COMBINED IF AND ADDED VOLOLDD 4/17/09
 Cdep  initialized VOLINIT and VOLOLD to VOLOLDD 6/4/2009
       DO I=1,NLAKES
-        IF(KKPER.EQ.1.AND.KKSTP.EQ.1) THEN
+        IF( ISTARTLAK==0 ) THEN
+          IF ( I==NLAKES ) ISTARTLAK = 1
           STGOLD(I)=STAGES(I)
           VOLOLDD(I)=VOLTERP(STGOLD(I),I)
           VOLOLD(I) = VOLOLDD(I)
@@ -4223,6 +4225,7 @@ C
       DEALLOCATE (GWFLAKDAT(IGRID)%ILKCB)
       DEALLOCATE (GWFLAKDAT(IGRID)%LAKTAB)
       DEALLOCATE (GWFLAKDAT(IGRID)%IRDTAB)
+      DEALLOCATE (GWFLAKDAT(IGRID)%ISTARTLAK)
       DEALLOCATE (GWFLAKDAT(IGRID)%NSSITR)
 Cdep  deallocate SURFDEPTH 3/3/2009
       DEALLOCATE (GWFLAKDAT(IGRID)%SURFDEPTH)
@@ -4357,6 +4360,7 @@ C
       ILKCB=>GWFLAKDAT(IGRID)%ILKCB
       LAKTAB=>GWFLAKDAT(IGRID)%LAKTAB
       IRDTAB=>GWFLAKDAT(IGRID)%IRDTAB
+      ISTARTLAK=>GWFLAKDAT(IGRID)%ISTARTLAK
       NSSITR=>GWFLAKDAT(IGRID)%NSSITR
       MXLKND=>GWFLAKDAT(IGRID)%MXLKND
       LKNODE=>GWFLAKDAT(IGRID)%LKNODE
@@ -4513,6 +4517,7 @@ C
       GWFLAKDAT(IGRID)%ICMX=>ICMX
       GWFLAKDAT(IGRID)%LAKTAB=>LAKTAB
       GWFLAKDAT(IGRID)%IRDTAB=>IRDTAB
+      GWFLAKDAT(IGRID)%ISTARTLAK=>ISTARTLAK
       GWFLAKDAT(IGRID)%NCLS=>NCLS
       GWFLAKDAT(IGRID)%LWRT=>LWRT
       GWFLAKDAT(IGRID)%NDV=>NDV
