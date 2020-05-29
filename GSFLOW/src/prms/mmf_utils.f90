@@ -674,12 +674,12 @@
         IF ( Parameter_check_flag==1 ) THEN
           DO i = 1, Numvalues
             IF ( Parameter_data(param_id)%values(i) > Parameter_data(param_id)%maximum ) THEN
-              PRINT *, 'WARNING, value > maximum value for parameter: ', Paramname, '; index:', param_id
-              PRINT *, '         value:', Parameter_data(param_id)%values(i), '; maximum value:', Parameter_data(param_id)%maximum
+              PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
+              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; maximum value: ', Parameter_data(param_id)%maximum
             ENDIF
             IF ( Parameter_data(param_id)%values(i) < Parameter_data(param_id)%minimum ) THEN
-              PRINT *, 'WARNING, value < minimum value for parameter: ', Paramname, '; index:', param_id
-              PRINT *, '         value:', Parameter_data(param_id)%values(i), '; minimum value:', Parameter_data(param_id)%minimum
+              PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
+              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; minimum value: ', Parameter_data(param_id)%minimum
             ENDIF
           ENDDO
         ENDIF

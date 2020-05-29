@@ -20,7 +20,7 @@
       CHARACTER(LEN=24) :: dimstring
       INTEGER nchars, ios, dimen_value
 !***********************************************************************
-      Version_read_parameter_file = 'read_parameter_file.f90 2017-09-27 12:10:00Z'
+      Version_read_parameter_file = 'read_parameter_file.f90 2020-05-27 17:42:00Z'
       CALL PRMS_open_input_file(Param_unit, Param_file, 'param_file', 0, ios)
       IF ( ios/=0 ) STOP
       IF ( Print_debug>-1 ) THEN
@@ -165,8 +165,7 @@
           ENDIF
         ENDDO
         IF ( found==0 ) then
-          PRINT '(/)'
-          PRINT *, 'Values for parameter: ', TRIM(paramstring), ' are ignored as the parameter is not used'
+          PRINT '(/,3A)', 'Values for parameter: ', TRIM(paramstring), ' are ignored as the parameter is not used'
           CYCLE
         ENDIF
         IF ( param_type==1 ) THEN

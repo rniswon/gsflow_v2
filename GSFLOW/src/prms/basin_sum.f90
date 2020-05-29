@@ -95,7 +95,7 @@
 !***********************************************************************
       sumbdecl = 0
 
-      Version_basin_sum = 'basin_sum.f90 2020-04-21 16:40:00Z'
+      Version_basin_sum = 'basin_sum.f90 2020-05-29 14:00:00Z'
       CALL print_module(Version_basin_sum, 'Summary                     ', 90)
       MODNAME = 'basin_sum'
 
@@ -314,8 +314,7 @@
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_lake_stor
       USE PRMS_INTCP, ONLY: Basin_intcp_stor
       USE PRMS_SNOW, ONLY: Basin_pweqv
-      USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor
-      USE PRMS_DPRST, ONLY: Basin_dprst_volop, Basin_dprst_volcl
+      USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_dprst_volop, Basin_dprst_volcl
       USE PRMS_GWFLOW, ONLY: Basin_gwstor
       IMPLICIT NONE
       INTRINSIC MAX, MOD
@@ -485,8 +484,8 @@
       USE PRMS_GWFLOW, ONLY: Basin_gwflow, Basin_gwstor, Basin_gwsink, Basin_gwstor_minarea_wb
       USE PRMS_INTCP, ONLY: Basin_intcp_evap, Basin_intcp_stor, Basin_net_ppt
       USE PRMS_SNOW, ONLY: Basin_snowmelt, Basin_pweqv, Basin_snowevap
-      USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_imperv_evap
-      USE PRMS_DPRST, ONLY: Basin_dprst_evap, Basin_dprst_volcl, Basin_dprst_volop
+      USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_imperv_evap, &
+    &     Basin_dprst_evap, Basin_dprst_volcl, Basin_dprst_volop
       USE PRMS_ROUTING, ONLY: Basin_segment_storage
       IMPLICIT NONE
 ! Functions

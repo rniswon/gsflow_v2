@@ -28,12 +28,9 @@
 !   GSFLOW variables
       INTEGER, SAVE, ALLOCATABLE :: Hru_gvr_count(:), Hru_gvr_index(:, :), Hrucheck(:)
       REAL, SAVE, ALLOCATABLE :: Replenish_frac(:)
-      REAL, SAVE, ALLOCATABLE :: It0_soil_rechr(:), It0_soil_moist(:)
       REAL, SAVE, ALLOCATABLE :: It0_pref_flow_stor(:), It0_ssres_stor(:)
-      REAL, SAVE, ALLOCATABLE :: It0_gravity_stor_res(:), It0_sroff(:)
-      REAL, SAVE, ALLOCATABLE :: It0_slow_stor(:), It0_potet(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_strm_seg_in(:)
-      DOUBLE PRECISION, SAVE :: It0_basin_soil_moist, It0_basin_ssstor, Basin_sz_gwin
+      REAL, SAVE, ALLOCATABLE :: It0_gravity_stor_res(:), It0_slow_stor(:)
+      DOUBLE PRECISION, SAVE :: Basin_sz_gwin
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gvr_hru_pct_adjusted(:)
 !   Declared Variables
       DOUBLE PRECISION, SAVE :: Basin_sz2gw, Basin_cap_infil_tot
@@ -113,7 +110,7 @@
 !***********************************************************************
       INTEGER FUNCTION szdecl()
       USE PRMS_SOILZONE
-      USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Nhrucell, Print_debug, Cascade_flag, &
+      USE PRMS_MODULE, ONLY: Model, Nhru, Nlake, Nhrucell, Print_debug, Cascade_flag, &
      &    GSFLOW_flag, DOCUMENTATION
       IMPLICIT NONE
 ! Functions
@@ -124,7 +121,7 @@
 !***********************************************************************
       szdecl = 0
 
-      Version_soilzone = 'soilzone.f90 2020-04-28 17:04:00Z'
+      Version_soilzone = 'soilzone.f90 2020-05-29 14:00:00Z'
       CALL print_module(Version_soilzone, 'Soil Zone Computations      ', 90 )
       MODNAME = 'soilzone'
 
@@ -480,11 +477,10 @@
      &       'inches', Grav_gwin)
 
         ALLOCATE ( Gvr_hru_pct_adjusted(Nhrucell) )
-        ALLOCATE ( Hru_gvr_count(Nhru), Hrucheck(Nhru) )
-        ALLOCATE ( It0_pref_flow_stor(Nhru), It0_ssres_stor(Nhru), It0_soil_rechr(Nhru), It0_soil_moist(Nhru) )
-        ALLOCATE ( It0_gravity_stor_res(Nhrucell), It0_sroff(Nhru), It0_slow_stor(Nhru) )
-        ALLOCATE ( It0_strm_seg_in(Nsegment), It0_potet(Nhru), Replenish_frac(Nhru) )
-      ENDIF
+        ALLOCATE ( Hru_gvr_count(Nhru), Hrucheck(Nhru), Replenish_frac(Nhru) )
+        ALLOCATE ( It0_pref_flow_stor(Nhru), It0_ssres_stor(Nhru) )
+        ALLOCATE ( It0_gravity_stor_res(Nhrucell), It0_slow_stor(Nhru) )
+       ENDIF
 
 ! Allocate arrays for local and variables from other modules
       ALLOCATE ( Soil2gw(Nhru), Gvr2pfr(Nhru), Swale_limit(Nhru), Pref_flow_flag(Nhru) )
@@ -857,7 +853,7 @@
       USE PRMS_SET_TIME, ONLY: Nowmonth !, Nowday
       USE PRMS_INTCP, ONLY: Hru_intcpevap
       USE PRMS_SNOW, ONLY: Snowcov_area, Snow_evap
-      USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Frozen
+      USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Frozen
 !      USE PRMS_WATER_USE, ONLY: Soilzone_gain
       IMPLICIT NONE
 ! Functions
@@ -880,36 +876,16 @@
       IF ( GSFLOW_flag==1 ) THEN
         IF ( Kkiter==1 ) THEN
 ! It0 variables used with MODFLOW integration to save iteration states.
-          DO k = 1, Active_hrus
-            i = Hru_route_order(k)
-            It0_soil_rechr(i) = Soil_rechr(i)
-            It0_soil_moist(i) = Soil_moist(i)
-            It0_ssres_stor(i) = Ssres_stor(i)
-            It0_pref_flow_stor(i) = Pref_flow_stor(i)
-            It0_slow_stor(i) = Slow_stor(i)
-            It0_sroff(i) = Sroff(i)
-            It0_potet(i) = Potet(i)
-          ENDDO
-          It0_basin_soil_moist = Basin_soil_moist
-          It0_basin_ssstor = Basin_ssstor
+          It0_ssres_stor = Ssres_stor
+          It0_pref_flow_stor = Pref_flow_stor
+          It0_slow_stor = Slow_stor
           It0_gravity_stor_res = Gravity_stor_res
-          It0_strm_seg_in = Strm_seg_in
           Gw2sm_grav = 0.0
         ELSE
-          DO k = 1, Active_hrus
-            i = Hru_route_order(k)
-            Soil_rechr(i) = It0_soil_rechr(i)
-            Soil_moist(i) = It0_soil_moist(i)
-            Ssres_stor(i) = It0_ssres_stor(i)
-            Pref_flow_stor(i) = It0_pref_flow_stor(i)
-            Slow_stor(i) = It0_slow_stor(i)
-            Sroff(i) = It0_sroff(i)
-            Potet(i) = It0_potet(i)
-          ENDDO
-          Basin_soil_moist = It0_basin_soil_moist
-          Basin_ssstor = It0_basin_ssstor
+          Ssres_stor = It0_ssres_stor
+          Pref_flow_stor = It0_pref_flow_stor
+          Slow_stor = It0_slow_stor
           Gravity_stor_res = It0_gravity_stor_res
-          Strm_seg_in = It0_strm_seg_in
         ENDIF
         Sm2gw_grav = 0.0
       ENDIF
