@@ -108,7 +108,7 @@
 !***********************************************************************
       gsfsumdecl = 0
 
-      Version_gsflow_sum = 'gsflow_sum.f90 2020-04-30 16:45:00Z'
+      Version_gsflow_sum = 'gsflow_sum.f90 2020-05-29 14:01:00Z'
       CALL print_module(Version_gsflow_sum, 'GSFLOW Output CSV Summary   ', 90)
       MODNAME = 'gsflow_sum'
 
@@ -413,7 +413,7 @@
       USE PRMS_MODULE, ONLY: Init_vars_from_file
       USE PRMS_BASIN, ONLY: Active_area
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor
-      USE PRMS_DPRST, ONLY: Basin_dprst_volop, Basin_dprst_volcl
+      USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop, Basin_dprst_volcl
       IMPLICIT NONE
       INTEGER, EXTERNAL :: getparam
       EXTERNAL GSF_PRINT, gsflow_sum_restart, MODFLOW_SFR_GET_STORAGE
@@ -573,8 +573,7 @@
      &    Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_actet, &
      &    Basin_soil_moist, Basin_ssstor, Basin_cfs, Basin_sroff
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_evap, Basin_hortonian, &
-     &    Basin_hortonian_lakes, Basin_infil
-      USE PRMS_DPRST, ONLY: Basin_dprst_evap, Basin_dprst_volop, Basin_dprst_volcl
+     &    Basin_hortonian_lakes, Basin_infil, Basin_dprst_evap, Basin_dprst_volop, Basin_dprst_volcl
       USE PRMS_SNOW, ONLY: Basin_snowevap, Basin_snowmelt
       USE PRMS_INTCP, ONLY: Basin_intcp_evap
       USE PRMS_SOILZONE, ONLY: Basin_lakeprecip, Basin_dunnian, &

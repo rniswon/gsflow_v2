@@ -8,11 +8,10 @@
       CHARACTER(LEN=68), PARAMETER :: &
      &  EQULS = '===================================================================='
       CHARACTER(LEN=11), PARAMETER :: MODNAME = 'gsflow_prms'
-      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.2.0 05/27/2020'
+      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.2.0 06/01/2020'
       CHARACTER(LEN=8), SAVE :: Process, Arg
-      !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
-      INTEGER, PARAMETER :: GSFLOW = 0, PRMS = 1, MODFLOW = 2
-      INTEGER, PARAMETER :: DOCUMENTATION = 99
+      ! model_mode
+      INTEGER, PARAMETER :: GSFLOW = 0, PRMS = 1, MODFLOW = 2, DOCUMENTATION = 99
       CHARACTER(LEN=80), SAVE :: PRMS_versn
 ! Dimensions
       INTEGER, SAVE :: Ncascade, Ncascdgw
@@ -84,7 +83,7 @@
       INTEGER, EXTERNAL :: ddsolrad, ccsolrad
       INTEGER, EXTERNAL :: potet_pan, potet_jh, potet_hamon, potet_hs, potet_pt, potet_pm
       INTEGER, EXTERNAL :: intcp, snowcomp, gwflow
-      INTEGER, EXTERNAL :: srunoff, soilzone, depression_storage
+      INTEGER, EXTERNAL :: srunoff, soilzone
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, write_climate_hru
       INTEGER, EXTERNAL :: strmflow_in_out, muskingum, muskingum_lake, numchars
       INTEGER, EXTERNAL :: water_use_read, dynamic_param_read, potet_pm_sta
@@ -112,7 +111,7 @@
           CALL DATE_AND_TIME(VALUES=Elapsed_time_start)
           Execution_time_start = Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
      &                           Elapsed_time_start(7) + Elapsed_time_start(8)*0.001
-          PRMS_versn = 'gsflow_prms.f90 2020-05-01 10:10:00Z'
+          PRMS_versn = 'gsflow_prms.f90 2020-05-20 14:10:00Z'
         ! Note, MODFLOW-only doesn't leave setdims
         CALL setdims()
       ELSEIF ( Process_flag==1 ) THEN  ! after setdims finished
@@ -148,7 +147,6 @@
      &        '      Interception: intcp', /, &
      &        '     Snow Dynamics: snowcomp', /, &
      &        '    Surface Runoff: srunoff_smidx, srunoff_carea', /, &
-     &        'Surface Depression: depression_storage', /, &
      &        '         Soil Zone: soilzone', /, &
      &        '       Groundwater: gwflow', /, &
      &        'Streamflow Routing: strmflow, strmflow_in_out, muskingum,', /, &
@@ -444,15 +442,10 @@
       call_modules = snowcomp()
       IF ( call_modules/=0 ) CALL module_error('snowcomp', Arg, call_modules)
 
-      call_modules = srunoff()
-      IF ( call_modules/=0 ) CALL module_error(Srunoff_module, Arg, call_modules)
-
 ! for PRMS-only simulations
       IF ( Model==PRMS ) THEN
-        IF ( Dprst_flag==1 ) THEN
-          call_modules = depression_storage()
-          IF ( call_modules/=0 ) CALL module_error('depression_storage', Arg, call_modules)
-        ENDIF
+        call_modules = srunoff()
+        IF ( call_modules/=0 ) CALL module_error(Srunoff_module, Arg, call_modules)
 
         call_modules = soilzone()
         IF ( call_modules/=0 ) CALL module_error(Soilzone_module, Arg, call_modules)
@@ -500,10 +493,8 @@
 
 ! SOILZONE for GSFLOW is in the MODFLOW iteration loop,
 ! only call for declare, initialize, and cleanup.
-          IF ( Dprst_flag==1 ) THEN
-            call_modules = depression_storage()
-            IF ( call_modules/=0 ) CALL module_error('depression_storage', Arg, call_modules)
-          ENDIF
+          call_modules = srunoff()
+          IF ( call_modules/=0 ) CALL module_error(Srunoff_module, Arg, call_modules)
 
           call_modules = soilzone()
           IF ( call_modules/=0 ) CALL module_error(Soilzone_module, Arg, call_modules)
@@ -630,7 +621,7 @@
       INTEGER, EXTERNAL :: precip_dist2, xyz_dist, ide_dist
       INTEGER, EXTERNAL :: ddsolrad, ccsolrad
       INTEGER, EXTERNAL :: potet_pan, potet_jh, potet_hamon, potet_hs, potet_pt, potet_pm
-      INTEGER, EXTERNAL :: intcp, snowcomp, gwflow, srunoff, soilzone, depression_storage
+      INTEGER, EXTERNAL :: intcp, snowcomp, gwflow, srunoff, soilzone
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, strmflow_in_out
       INTEGER, EXTERNAL :: write_climate_hru, muskingum, muskingum_lake
       INTEGER, EXTERNAL :: stream_temp
@@ -674,7 +665,6 @@
       test = intcp()
       test = snowcomp()
       test = srunoff()
-      test = depression_storage()
       test = soilzone()
       test = gsflow_prms2mf()
       test = gsflow_mf2prms()
