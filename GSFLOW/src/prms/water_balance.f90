@@ -251,9 +251,7 @@
           ENDIF
           bsnobal = bsnobal + DBLE(hrubal)*harea
         ENDIF
-    if (nowyear==1988.and.nowday==1.and.nowmonth==10.and.i==194) then
-        print *, 'here'
-        endif
+
         robal = Snowmelt(i) - Hortonian_flow(i) & !includes dprst runoff, if any
      &          - Infil(i)*perv_frac - Hru_impervevap(i) + Imperv_stor_ante(i) - Hru_impervstor(i) + Intcp_changeover(i)
         IF ( Use_sroff_transfer==1 ) robal = robal + Net_apply(i)*perv_frac

@@ -633,7 +633,6 @@
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Hru_intcpevap, Net_apply, Intcp_changeover
       USE PRMS_SNOW, ONLY: Snow_evap, Snowcov_area, Snowmelt, Pk_depth
-            USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
       INTRINSIC SNGL, DBLE
       EXTERNAL imperv_et, compute_infil, run_cascade_sroff, dprst_comp, perv_comp
@@ -644,9 +643,6 @@
       REAL :: cfgi_k, depth_cm !frozen ground
 !***********************************************************************
       srunoffrun = 0
-    if (nowyear==1988.and.nowday==1.and.nowmonth==10) then
-        print *, 'here, sroff'
-        endif
 
       IF ( Print_debug==1 ) THEN
         Imperv_stor_ante = Hru_impervstor
@@ -704,9 +700,7 @@
       dprst_chk = 0
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
-        if (i==194) then
-            print *, i
-            endif
+
         Hruarea = Hru_area(i)
         Hruarea_dble = Hru_area_dble(i)
         Ihru = i
@@ -716,9 +710,6 @@
 ! HRU is a lake
 !     eventually add code for lake area less than hru_area
 !     that includes soil_moist for fraction of hru_area that is dry bank
-          ! Sanity check
-!          IF ( Infil(i)+Sroff(i)+Imperv_stor(i)+Imperv_evap(i)>0.0 ) &
-!     &         PRINT *, 'srunoff lake ERROR', Infil(i), Sroff(i), Imperv_stor(i), Imperv_evap(i), i
           IF ( Cascade_flag>0 ) THEN
             Hortonian_lakes(i) = Upslope_hortonian(i)
             Basin_hortonian_lakes = Basin_hortonian_lakes + Hortonian_lakes(i)*Hruarea_dble
@@ -845,8 +836,6 @@
             !IF ( Hru_impervevap(i)<0.0 ) Hru_impervevap(i) = 0.0
             avail_et = avail_et - Hru_impervevap(i)
             IF ( avail_et<0.0 ) THEN
-               ! sanity check
-!              IF ( avail_et<-NEARZERO ) PRINT*, 'avail_et<0 in srunoff imperv', i, Nowmonth, Nowday, avail_et
               Hru_impervevap(i) = Hru_impervevap(i) + avail_et
               IF ( Hru_impervevap(i)<0.0 ) Hru_impervevap(i) = 0.0
               Imperv_evap(i) = Hru_impervevap(i)/Imperv_frac
@@ -917,11 +906,6 @@
         IF ( Imperv_evap*Imperv_frac>Avail_et ) Imperv_evap = Avail_et/Imperv_frac
         Imperv_stor = Imperv_stor - Imperv_evap
       ENDIF
-      !rsr, sanity check
-!      IF ( Imperv_stor<0.0 ) THEN
-!        PRINT *, 'imperv_stor<0', Imperv_stor
-!        Imperv_stor = 0.0
-!      ENDIF
 
       END SUBROUTINE imperv_et
 
@@ -1055,10 +1039,6 @@
       IF ( ca_fraction>Carea_max(Ihru) ) ca_fraction = Carea_max(Ihru)
       srpp = ca_fraction*Pptp
       Contrib_fraction(Ihru) = ca_fraction
-!      IF ( srpp<0.0 ) THEN
-!        PRINT *, 'negative srp', srpp
-!        srpp = 0.0
-!      ENDIF
       Infil = Infil - srpp
       Srp = Srp + srpp
       !IF ( Srp<CLOSEZERO ) Srp = 0.0
@@ -1069,8 +1049,6 @@
 !     Compute cascading runoff (runoff in inche*acre/dt)
 !***********************************************************************
       SUBROUTINE run_cascade_sroff(Ncascade_hru, Runoff, Hru_sroff_down)
-!      USE PRMS_BASIN, ONLY: NEARZERO
-!      USE PRMS_MODULE, ONLY: Print_debug
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_SRUNOFF, ONLY: Ihru, Upslope_hortonian, Strm_seg_in
       USE PRMS_CASCADE, ONLY: Hru_down, Hru_down_frac, Hru_down_fracwt, Cascade_area
@@ -1100,23 +1078,6 @@
 
 ! reset Sroff as it accumulates flow to streams
       Runoff = Runoff - SNGL( Hru_sroff_down )
-!      IF ( Runoff<0.0 ) THEN
-!        IF ( Runoff<-NEARZERO ) THEN
-!          IF ( Print_debug>-1 ) PRINT *, 'runoff < NEARZERO', Runoff
-!          IF ( Hru_sroff_down>ABS(Runoff) ) THEN
-!            Hru_sroff_down = Hru_sroff_down - Runoff
-!          ELSE
-!            DO k = 1, Ncascade_hru
-!              j = Hru_down(k, Ihru)
-!              IF ( Strm_seg_in(j)>ABS(Runoff) ) THEN
-!                Strm_seg_in(j) = Strm_seg_in(j) - Runoff
-!                EXIT
-!              ENDIF
-!            ENDDO
-!          ENDIF
-!        ENDIF
-!        Runoff = 0.0
-!      ENDIF
 
       END SUBROUTINE run_cascade_sroff
 
@@ -1378,11 +1339,6 @@
           Dprst_vol_clos = Dprst_vol_clos + DBLE( dprst_srp_clos )
         ENDIF
         Srp = Srp - dprst_srp/Perv_frac
-        IF ( Srp<0.0 ) THEN
-          IF ( Srp<-NEARZERO ) PRINT *, 'dprst srp<0.0', Srp, dprst_srp
-          ! may need to adjust dprst_srp and volumes
-          Srp = 0.0
-        ENDIF
       ENDIF
 
       IF ( Sri>0.0 ) THEN
@@ -1398,11 +1354,6 @@
           Dprst_vol_clos = Dprst_vol_clos + DBLE( dprst_sri_clos )
         ENDIF
         Sri = Sri - dprst_sri/Imperv_frac
-        IF ( Sri<0.0 ) THEN
-          IF ( Sri<-NEARZERO ) PRINT *, 'dprst sri<0.0', Sri, dprst_sri
-          ! may need to adjust dprst_sri and volumes
-          Sri = 0.0
-        ENDIF
       ENDIF
 
       Dprst_insroff_hru(Ihru) = dprst_srp + dprst_sri
@@ -1451,31 +1402,14 @@
         dprst_evap_clos = 0.0
         IF ( Dprst_area_open>0.0 ) THEN
           dprst_evap_open = MIN(Dprst_area_open*dprst_avail_et, SNGL(Dprst_vol_open))
-          IF ( dprst_evap_open/Hruarea>unsatisfied_et ) THEN
-            !IF ( Print_debug>-1 ) THEN
-            !  PRINT *, 'Warning, open dprst evaporation > available ET, HRU:, ', Ihru, &
-!    &                  unsatisfied_et, dprst_evap_open*DBLE(Dprst_frac_open(Ihru))
-            !  PRINT *, 'Set to available ET, perhaps dprst_et_coef specified too large'
-            !  PRINT *, 'Set print_debug to -1 to turn off message'
-            !ENDIF
-            dprst_evap_open = unsatisfied_et*Hruarea
-          ENDIF
-          !IF ( dprst_evap_open>SNGL(Dprst_vol_open) ) print *, '>', dprst_evap_open, dprst_vol_open
+          IF ( dprst_evap_open/Hruarea>unsatisfied_et ) dprst_evap_open = unsatisfied_et*Hruarea
           IF ( dprst_evap_open>SNGL(Dprst_vol_open) ) dprst_evap_open = SNGL( Dprst_vol_open )
           unsatisfied_et = unsatisfied_et - dprst_evap_open/Hruarea
           Dprst_vol_open = Dprst_vol_open - DBLE( dprst_evap_open )
         ENDIF
         IF ( Dprst_area_clos>0.0 ) THEN
           dprst_evap_clos = MIN(Dprst_area_clos*dprst_avail_et, SNGL(Dprst_vol_clos))
-          IF ( dprst_evap_clos/Hruarea>unsatisfied_et ) THEN
-            !IF ( Print_debug>-1 ) THEN
-            !  PRINT *, 'Warning, closed dprst evaporation > available ET, HRU:, ', Ihru, &
-!      &                 unsatisfied_et, dprst_evap_clos*Dprst_frac_clos(Ihru)
-            !  PRINT *, 'Set to available ET, perhaps dprst_et_coef specified too large'
-            !  PRINT *, 'Set print_debug to -1 to turn off message'
-            !ENDIF
-            dprst_evap_clos = unsatisfied_et*Hruarea
-          ENDIF
+          IF ( dprst_evap_clos/Hruarea>unsatisfied_et ) dprst_evap_clos = unsatisfied_et*Hruarea
           IF ( dprst_evap_clos>SNGL(Dprst_vol_clos) ) dprst_evap_clos = SNGL( Dprst_vol_clos )
           Dprst_vol_clos = Dprst_vol_clos - DBLE( dprst_evap_clos )
         ENDIF
@@ -1488,7 +1422,6 @@
         seep_open = Dprst_vol_open*DBLE( Dprst_seep_rate_open(Ihru) )
         Dprst_vol_open = Dprst_vol_open - seep_open
         IF ( Dprst_vol_open<0.0D0 ) THEN
-!          IF ( Dprst_vol_open<-DNEARZERO ) PRINT *, 'negative dprst_vol_open:', Dprst_vol_open, ' HRU:', Ihru
           seep_open = seep_open + Dprst_vol_open
           Dprst_vol_open = 0.0D0
         ENDIF
@@ -1503,11 +1436,6 @@
      &                    MAX( 0.0D0, (Dprst_vol_open-Dprst_sroff_hru-Dprst_vol_thres_open(Ihru))*DBLE(Dprst_flow_coef(Ihru)) )
         Dprst_vol_open = Dprst_vol_open - Dprst_sroff_hru
         Dprst_sroff_hru = Dprst_sroff_hru/Hruarea_dble
-        ! sanity checks
-        IF ( Dprst_vol_open<0.0D0 ) THEN
-!          IF ( Dprst_vol_open<-DNEARZERO ) PRINT *, 'issue, dprst_vol_open<0.0', Dprst_vol_open
-          Dprst_vol_open = 0.0D0
-        ENDIF
       ENDIF
 
       IF ( Dprst_area_clos_max>0.0 ) THEN
@@ -1515,14 +1443,12 @@
           seep_clos = Dprst_vol_clos*DBLE( Dprst_seep_rate_clos(Ihru) )
           Dprst_vol_clos = Dprst_vol_clos - seep_clos
           IF ( Dprst_vol_clos<0.0D0 ) THEN
-!            IF ( Dprst_vol_clos<-DNEARZERO ) PRINT *, 'issue, dprst_vol_clos<0.0', Dprst_vol_clos
             seep_clos = seep_clos + Dprst_vol_clos
             Dprst_vol_clos = 0.0D0
           ENDIF
           Dprst_seep_hru = Dprst_seep_hru + seep_clos/Hruarea_dble
         ENDIF
         IF ( Dprst_vol_clos<0.0D0 ) THEN
-!          IF ( Dprst_vol_clos<-DNEARZERO ) PRINT *, 'issue, dprst_vol_clos<0.0', Dprst_vol_clos
           Dprst_vol_clos = 0.0D0
         ENDIF
       ENDIF
