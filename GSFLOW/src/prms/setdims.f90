@@ -30,11 +30,6 @@
       ! 9=snowcomp; 13=cascade; 14=subbasin tree
       IF ( control_integer(Print_debug, 'print_debug')/=0 ) Print_debug = 0
       IF ( Print_debug>-1 ) PRINT 3
-      IF ( Print_debug>-2 ) THEN
-        CALL PRMS_open_output_file(Logunt, 'gsflow.log', 'gsflow.log', 0, iret)
-        IF ( iret/=0 ) ERROR STOP -1
-        WRITE ( Logunt, 3 )
-      ENDIF
     3 FORMAT (//, 26X, 'U.S. Geological Survey', /, 8X, &
      &        'Coupled Groundwater and Surface-water FLOW model (GSFLOW)', /, &
      &        25X, 'Version 2.2.0 05/01/2020', //, &
@@ -126,7 +121,6 @@
         test = gsfinit()
         IF ( test/=0 ) CALL module_error(MODNAME, 'initialize', test)
         PRINT *, ' '
-        IF ( Print_debug>-2 ) WRITE (Logunt, '(1X)')
         If ( ISSFLG(Kper_mfo) == 1 .and. nper == 1) THEN
         ELSE
           Process_flag = 0

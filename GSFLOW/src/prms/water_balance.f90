@@ -6,7 +6,7 @@
 !   Local Variables
         INTEGER, SAVE :: BALUNT, SZUNIT, GWUNIT, INTCPUNT, SROUNIT, SNOWUNIT
         REAL, PARAMETER :: TOOSMALL = 3.1E-05, SMALL = 1.0E-04, BAD = 1.0E-03
-        DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 5.0D-05
+        DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 1.0D-05
         DOUBLE PRECISION, SAVE :: Last_basin_gwstor, Basin_dprst_wb
         DOUBLE PRECISION, ALLOCATABLE, SAVE :: Hru_storage_ante(:), Gwstor_ante(:)
         CHARACTER(LEN=13), SAVE :: MODNAME_WB
@@ -53,7 +53,7 @@
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_water_balance
 !***********************************************************************
-      Version_water_balance = 'water_balance.f90 2020-05-29 13:57:00Z'
+      Version_water_balance = 'water_balance.f90 2020-06-05 12:57:00Z'
       CALL print_module(Version_water_balance, 'Water Balance Computations  ', 90 )
       MODNAME_WB = 'water_balance'
 
@@ -165,12 +165,12 @@
       USE PRMS_SNOW, ONLY: Snowmelt, Pptmix_nopack, Snow_evap, Snowcov_area, Basin_pweqv, &
      &    Basin_snowmelt, Basin_snowevap, Basin_snowcov, Pkwater_ante
       USE PRMS_SRUNOFF, ONLY: Basin_infil, Hru_hortn_cascflow, Upslope_hortonian, Hru_impervstor, &
-     &    Basin_sroffp, Basin_sroffi, Basin_sroff_down, Use_sroff_transfer, Basin_cfgi_sroff, &
+     &    Dprst_stor_hru, Basin_sroffp, Basin_sroffi, Basin_dprst_sroff, Basin_sroff_down, &
      &    Basin_hortonian_lakes, Basin_imperv_evap, Basin_imperv_stor, &
-     &    Hru_impervevap, Hortonian_flow, Hru_sroffp, Hru_sroffi, Imperv_stor_ante, &
-     &    Dprst_stor_hru, Basin_dprst_sroff, Basin_dprst_evap, Basin_dprst_seep, &
-     &    Dprst_evap_hru, Dprst_sroff_hru, Dprst_insroff_hru, Sro_to_dprst_perv, Dprst_seep_hru, &
-     &    Dprst_area_clos, Dprst_in, Dprst_stor_ante, Upslope_dprst_hortonian
+     &    Basin_dprst_evap, Basin_dprst_seep, Hru_impervevap, Dprst_seep_hru, &
+     &    Dprst_evap_hru, Dprst_sroff_hru, Dprst_insroff_hru, Sro_to_dprst_perv, &
+     &    Dprst_area_clos, Hortonian_flow, Dprst_in, Hru_sroffp, Hru_sroffi, Imperv_stor_ante, &
+     &    Dprst_stor_ante, Use_sroff_transfer, Upslope_dprst_hortonian, Basin_cfgi_sroff
       USE PRMS_SOILZONE, ONLY: Swale_actet, Dunnian_flow, Basin_sz2gw, &
      &    Perv_actet, Cap_infil_tot, Pref_flow_infil, Cap_waterin, Upslope_interflow, &
      &    Upslope_dunnianflow, Pref_flow, Pref_flow_stor, Soil_lower, Gvr2pfr, Basin_ssin, &
@@ -251,16 +251,12 @@
           ENDIF
           bsnobal = bsnobal + DBLE(hrubal)*harea
         ENDIF
-
-        robal = Snowmelt(i) - Hortonian_flow(i) - Infil(i)*perv_frac & ! Hortonian_flow includes in DPRST runoff
-     &          - Hru_impervevap(i) + Imperv_stor_ante(i) - Hru_impervstor(i) + Intcp_changeover(i)
+    if (nowyear==1988.and.nowday==1.and.nowmonth==10.and.i==194) then
+        print *, 'here'
+        endif
+        robal = Snowmelt(i) - Hortonian_flow(i) & !includes dprst runoff, if any
+     &          - Infil(i)*perv_frac - Hru_impervevap(i) + Imperv_stor_ante(i) - Hru_impervstor(i) + Intcp_changeover(i)
         IF ( Use_sroff_transfer==1 ) robal = robal + Net_apply(i)*perv_frac
-        IF ( Cascade_flag>0 ) THEN
-          robal = robal + SNGL( Upslope_hortonian(i) - Hru_hortn_cascflow(i) )
-          IF ( Dprst_flag==1 ) robal = robal + SNGL( Upslope_dprst_hortonian(i) )
-        ENDIF
-        IF ( Dprst_flag==1 ) robal = robal - Dprst_evap_hru(i) + &
-     &                               SNGL( Dprst_stor_ante(i) - Dprst_stor_hru(i) - Dprst_seep_hru(i) )
         IF ( Net_ppt(i)>0.0 ) THEN
           IF ( Pptmix_nopack(i)==1 ) THEN
             robal = robal + Net_rain(i)
@@ -271,8 +267,14 @@
               robal = robal + Net_rain(i)
             ENDIF
             !IF ( Net_snow(i)<NEARZERO ) robal = robal + Net_rain(i)
-           ENDIF
-         ENDIF
+          ENDIF
+        ENDIF
+        IF ( Cascade_flag>0 ) THEN
+          robal = robal + SNGL( Upslope_hortonian(i) - Hru_hortn_cascflow(i) )
+          IF ( Dprst_flag==1 ) robal = robal + SNGL( Upslope_dprst_hortonian(i) )
+        ENDIF
+        IF ( Dprst_flag==1 ) robal = robal - Dprst_evap_hru(i) + &
+     &                               SNGL( Dprst_stor_ante(i) - Dprst_stor_hru(i) - Dprst_seep_hru(i) )
         basin_robal = basin_robal + DBLE( robal )
         IF ( ABS(robal)>TOOSMALL ) THEN
           IF ( Dprst_flag==1 ) THEN
@@ -386,7 +388,7 @@
         IF ( DABS(wbal)>DTOOSMALL ) THEN
           WRITE ( BALUNT, * ) 'Possible HRU water balance issue:', wbal, '; HRU:', i, ' hru_type:', Hru_type(i), '; area:', harea
           WRITE ( BALUNT, * ) Sroff(i), Gwres_flow(i), Ssres_flow(i), Hru_actet(i), Gwres_sink(i), &
-     &            Hru_storage_ante(i), Hru_storage(i), Hru_type(i),  Pfr_dunnian_flow(i), Intcp_changeover(i), Snowmelt(i)
+     &            Hru_storage_ante(i), Hru_storage(i), Hru_type(i),  Pfr_dunnian_flow(i), Intcp_changeover(i), Snowmelt(i), Hru_ppt(i)
           !WRITE ( BALUNT, * ) Gwstor_minarea_wb(i)
           WRITE ( BALUNT, * ) Soil_moist_tot(i), Hru_intcpstor(i), Gwres_stor(i), Pkwater_equiv(i), Hru_impervstor(i)
           IF ( Cascade_flag>0 ) THEN

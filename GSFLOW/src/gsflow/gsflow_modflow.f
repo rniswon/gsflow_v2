@@ -71,8 +71,7 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       ! Model (0=integrated; 1=PRMS-only; 2=MODFLOW-only)
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, GSFLOW_flag, Logunt,
-     &    Print_debug
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, GSFLOW_flag, Print_debug
       IMPLICIT NONE
 !***********************************************************************
       gsfdecl = 0
@@ -80,10 +79,8 @@ C
       Version_gsflow_modflow = 'gsflow_modflow.f 2020-04-30 14:00:00Z'
 C
 C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
-      IF ( Print_debug>-2 ) THEN
-        WRITE (*,1) MFVNAM,VERSION(:15),VERSION2(:17),VERSION3(:17)
-        WRITE (Logunt,1) MFVNAM,VERSION(:15),VERSION2(:17),VERSION3(:17)
-      ENDIF
+      IF ( Print_debug>-2 )
+     1     WRITE (*,1) MFVNAM,VERSION(:15),VERSION2(:17),VERSION3(:17)
     1 FORMAT (/,28X,'MODFLOW',A,/,
      &2X,'U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE',
      &' GROUNDWATER-FLOW MODEL',/,25X,'WITH NEWTON FORMULATION',
@@ -92,7 +89,6 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 
       IF ( GSFLOW_flag==1 ) THEN
         IF ( Print_debug>-1 ) WRITE ( *, 8 )
-        IF ( Print_debug>-2 ) WRITE ( Logunt, 8 )
     8 FORMAT (14X, 'PROCESSES: GWF and OBS', /, 14X,
      &        'PACKAGES:  BAS, BCF, CHD, DE4, FHB, GAG, GHB,',
      &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT,',
@@ -115,7 +111,7 @@ C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Model, Mxsziter, Print_debug,
-     &    EQULS, Logunt, Init_vars_from_file, Kper_mfo, GSFLOW_flag,
+     &    EQULS, Init_vars_from_file, Kper_mfo, GSFLOW_flag,
      &    MODFLOW, Diversion2soil_flag, Have_lakes, NLAKES_MF
 C1------USE package modules.
       USE GLOBAL
@@ -189,11 +185,8 @@ C4------OPEN NAME FILE.
 C
 C5------Get current date and time, assign to IBDT, and write to screen
       CALL DATE_AND_TIME(VALUES=IBDT)
-      IF ( Model==MODFLOW ) THEN
-        WRITE(*,2) (IBDT(I),I=1,3),(IBDT(I),I=5,7)
-        IF ( Print_debug>-2 )
-     &       WRITE (Logunt, 2) (IBDT(I),I=1,3),(IBDT(I),I=5,7)
-      ENDIF
+      IF ( Model==MODFLOW )
+     1     WRITE(*,2) (IBDT(I),I=1,3),(IBDT(I),I=5,7)
     2 FORMAT(1X,'Run start date and time (yyyy/mm/dd hh:mm:ss): ',
      &I4,'/',I2.2,'/',I2.2,1X,I2,':',I2.2,':',I2.2,/)
 C
@@ -398,8 +391,6 @@ C7------SIMULATE EACH STRESS PERIOD.
      &                  'GSFLOW MODFLOW main         ', 77)
       IF ( Print_debug>-2 )
      &     PRINT '(A,/A,/A)', EQULS, 'MODFLOW Packages', EQULS
-      IF ( Print_debug>-2 ) WRITE ( Logunt, '(A,/A,/A)') EQULS,
-     &                              'MODFLOW Packages', EQULS
       CALL print_module(Version_uzf,
      &                  'UZF-NWT Package             ', 77)
       CALL print_module(Version_sfr,
@@ -407,11 +398,6 @@ C7------SIMULATE EACH STRESS PERIOD.
       IF ( Have_lakes==1 )
      &     CALL print_module(Version_lak,
      &                      'LAK-NWT Package             ', 77)
-
-      IF ( Print_debug>-2 ) THEN
-        WRITE ( Logunt, '(A,/)') EQULS
-        WRITE ( Logunt, 490 ) 'Using NAME file: ', FNAME(1:NC)
-      ENDIF
 
       IF ( IUNIT(63)>0 ) solver = 'NWT'
       IF ( IUNIT(13)>0 ) solver = 'PCG'
@@ -424,7 +410,6 @@ C7------SIMULATE EACH STRESS PERIOD.
         WRITE(*,490)'Using NAME file: ', FNAME(1:NC)
         PRINT 14, solver
       ENDIF
-      IF ( Print_debug>-2 ) WRITE ( Logunt, 14 ) solver
    14 FORMAT (/, 'Using Solver Package: ', A)
       Sziters = 0
       Convfail_cnt = 0
@@ -477,7 +462,7 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Model, Kper_mfo, Print_debug, Kkiter,
-     &    Timestep, Logunt, Init_vars_from_file, Mxsziter, MODFLOW
+     &    Timestep, Init_vars_from_file, Mxsziter, MODFLOW
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
 C1------USE package modules.
       USE GLOBAL
@@ -600,10 +585,8 @@ C---------INDICATE IN PRINTOUT THAT SOLUTION IS FOR HEADS
             CALL UMESPR('SOLVING FOR HEAD',' ',IOUT)
             IF ( Print_debug>-1 ) THEN
               IF ( iprt==0 ) THEN
-                IF ( Print_debug>-2 ) WRITE (Logunt, 25) KPER, KSTP
                 WRITE(*,25)KPER,KSTP
               ELSE
-                IF ( Print_debug>-2 ) WRITE( Logunt, 26 )KPER,KSTP
                 WRITE (*, 26) KPER, KSTP
               ENDIF
             ENDIF
@@ -970,8 +953,6 @@ C7C6---JUMP TO END OF PROGRAM IF CONVERGENCE WAS NOT ACHIEVED.
             Convfail_cnt = Convfail_cnt + 1
             IF ( Print_debug>-1 )
      &           PRINT 9004, Nowyear, Nowmonth, Nowday, Convfail_cnt
-            IF ( Print_debug>-2 ) WRITE ( Logunt, 9004) Nowyear,
-     &                                    Nowmonth, Nowday, Convfail_cnt
           ENDIF
 C
 C-----END OF TIME STEP (KSTP) AND STRESS PERIOD (KPER) LOOPS
@@ -998,8 +979,6 @@ C
      &                  Timestep, KKITER, Maxgziter
           ENDIF
         ENDIF
-        IF ( Print_debug>-2 ) WRITE (Logunt, 9002) Nowyear, Nowmonth,
-     &       Nowday, KKPER, KKSTP, Timestep, KKITER, Maxgziter
       ENDIF
 
  9001 FORMAT ('ERROR in ', A, ' module, arg = run.',
@@ -1020,7 +999,7 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Model, Timestep, Logunt, Save_vars_to_file,
+      USE PRMS_MODULE, ONLY: Model, Timestep, Save_vars_to_file,
      &    GSFLOW_flag, Print_debug
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
 !gsf  USE PCGN
@@ -1118,33 +1097,15 @@ C
         PRINT 9001, Timestep, Convfail_cnt, Iterations, Sziters,
      &            FLOAT(Iterations)/FLOAT(Timestep),
      &            FLOAT(Sziters)/FLOAT(Timestep), Max_iters, Max_sziters
-        IF ( Print_debug>-2 ) WRITE ( Logunt, 9001 ) Timestep,
-     &       Convfail_cnt, Iterations,
-     &       Sziters, FLOAT(Iterations)/FLOAT(Timestep),
-     &       FLOAT(Sziters)/FLOAT(Timestep), Max_iters, Max_sziters
-        IF ( Stopcount>0 ) THEN
-          PRINT 9005, Stopcount
-          IF ( Print_debug>-2 ) WRITE (Logunt, 9005) Stopcount
-        ENDIF
-        IF ( Print_debug>-2 ) THEN
-          WRITE (Logunt, 9003) 'MF iteration distribution:', Mfiter_cnt
-          WRITE (Logunt, '(/)')
-          WRITE (Logunt, 9007) 'SZ computation distribution:', Iter_cnt
-          WRITE (Logunt, '(/)')
-        ENDIF
+        IF ( Stopcount>0 ) PRINT 9005, Stopcount
       ENDIF
 
 C10-----END OF PROGRAM.
       IF(NCVGERR.GT.0) THEN
         WRITE(*,*) 'FAILED TO MEET SOLVER CONVERGENCE CRITERIA ',
      1          NCVGERR,' TIME(S)'
-        IF ( Print_debug>-2 ) WRITE (Logunt, *)
-     1       'FAILED TO MEET SOLVER CONVERGENCE CRITERIA ',
-     1        NCVGERR,' TIME(S)'
       ELSE
         WRITE(*,*) ' Normal termination of simulation'
-        IF ( Print_debug>-2 ) WRITE (Logunt, '(A)')
-     1       'Normal termination of simulation'
       END IF
 
 !gsf  CALL USTOP(' ')
@@ -1226,7 +1187,7 @@ C
 C     ******************************************************************
 C     Get end time and calculate elapsed time
 C     ******************************************************************
-      USE PRMS_MODULE, ONLY: Logunt, Print_debug
+      USE PRMS_MODULE, ONLY: Print_debug
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
@@ -1238,8 +1199,6 @@ C
 C     Get current date and time, assign to IEDT, and write.
       CALL DATE_AND_TIME(VALUES=IEDT)
       WRITE(*,1000) (IEDT(I),I=1,3),(IEDT(I),I=5,7)
-      IF ( Print_debug>-2 ) WRITE (Logunt, 1000)
-     &     (IEDT(I),I=1,3), (IEDT(I),I=5,7)
  1000 FORMAT(/,1X,'Run end date and time (yyyy/mm/dd hh:mm:ss): ',
      &I4,'/',I2.2,'/',I2.2,1X,I2,':',I2.2,':',I2.2)
       IF(IPRTIM.GT.0) THEN
@@ -1302,26 +1261,18 @@ C
 C     Write elapsed time to screen
         IF (NDAYS.GT.0) THEN
           WRITE(*,1010) NDAYS,NHOURS,NMINS,NRSECS
-          IF ( Print_debug>-2 )
-     &         WRITE (Logunt, 1010) NDAYS, NHOURS, NMINS, NRSECS
  1010     FORMAT(1X,'Elapsed run time: ',I3,' Days, ',I2,' Hours, ',I2,
      &      ' Minutes, ',I2,' Seconds',/)
         ELSEIF (NHOURS.GT.0) THEN
           WRITE(*,1020) NHOURS,NMINS,NRSECS
-          IF ( Print_debug>-2 )
-     &         WRITE (Logunt, 1020) NHOURS, NMINS, NRSECS
  1020     FORMAT(1X,'Elapsed run time: ',I2,' Hours, ',I2,
      &      ' Minutes, ',I2,' Seconds',/)
         ELSEIF (NMINS.GT.0) THEN
           WRITE(*,1030) NMINS,NSECS,MSECS
-          IF ( Print_debug>-2 )
-     &         WRITE (Logunt, 1030) NMINS, NSECS, MSECS
  1030     FORMAT(1X,'Elapsed run time: ',I2,' Minutes, ',
      &      I2,'.',I3.3,' Seconds',/)
         ELSE
           WRITE(*,1040) NSECS,MSECS
-          IF ( Print_debug>-2 )
-     &         WRITE (Logunt, 1040) NSECS, MSECS
  1040     FORMAT(1X,'Elapsed run time: ',I2,'.',I3.3,' Seconds',/)
         ENDIF
 C
@@ -1469,7 +1420,7 @@ C
      &    Steady_state, ICNVG, KPER, KSTP, Mft_to_days, KPERSTART,
      &    Modflow_skip_time_step, IGRID
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Kkiter, Model,
-     &    Start_year, Start_month, Start_day, Logunt,
+     &    Start_year, Start_month, Start_day,
      &    Print_debug, MODFLOW, Modflow_time_zero
       USE GWFBASMODULE, ONLY: TOTIM
       USE OBSBASMODULE, ONLY: OBSTART,ITS
@@ -1531,10 +1482,8 @@ C
             TOTIM = PERLEN(i)  !RGN 9/4/2018 TOTIM needs to stay in MF time units
             IF ( ICNVG==0 ) THEN
               PRINT 222, KKITER
-              IF ( Print_debug>-2 ) WRITE ( Logunt, 222 ) KKITER
             ELSE
               PRINT 223, KKITER
-              IF ( Print_debug>-2 ) WRITE ( Logunt, 223 ) KKITER
             ENDIF
           ELSE ! call OC as SS is skipped
             CALL GWF2BAS7OC(1,1,1,IUNIT(12),IGRID)  !assumes only SP1 can be SS
@@ -1599,7 +1548,6 @@ C
       ! read restart files to Modflow_time_in_stress
       IF ( Init_vars_from_file>0 ) THEN
         IF ( Iunit(69)==0 ) THEN
-          IF ( Print_debug>-2 ) WRITE(Logunt,111)
           PRINT 111
           CALL error_stop('Restart option active and no restart file'//
      +         'listed in Name File. Model stopping')
@@ -1619,7 +1567,7 @@ C
       SUBROUTINE ZERO_SPECIFIED_FLOWS(Iunitlak,Iunitsfr)
       USE GWFSFRMODULE, ONLY: NSTRM, STRM
       USE GWFLAKMODULE, ONLY: PRCPLK,EVAPLK,RNF,WTHDRW,NLAKES
-      USE PRMS_MODULE, ONLY: Logunt, Print_debug
+      USE PRMS_MODULE, ONLY: Print_debug
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Iunitlak, Iunitsfr
@@ -1640,7 +1588,6 @@ C
         END DO
         IF ( TESTSFR.GT.1.0D0 ) THEN
           IF ( Print_debug>-2 ) THEN
-            WRITE (Logunt, 10)
             WRITE (*, 10)
           ENDIF
         END IF
@@ -1658,7 +1605,6 @@ C
         WTHDRW = ZERO
         IF ( TESTLAK.GT.1.0D0 ) THEN
           IF ( Print_debug>-2 ) THEN
-            WRITE (Logunt, 11)
             WRITE (*, 11)
           ENDIF
         END IF

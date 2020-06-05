@@ -8,10 +8,11 @@
       CHARACTER(LEN=68), PARAMETER :: &
      &  EQULS = '===================================================================='
       CHARACTER(LEN=11), PARAMETER :: MODNAME = 'gsflow_prms'
-      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.2.0 06/01/2020'
+      CHARACTER(LEN=24), PARAMETER :: PRMS_VERSION = 'Version 5.2.0 06/04/2020'
       CHARACTER(LEN=8), SAVE :: Process, Arg
       ! model_mode
-      INTEGER, PARAMETER :: GSFLOW = 0, PRMS = 1, MODFLOW = 2, DOCUMENTATION = 99
+      INTEGER, PARAMETER :: GSFLOW = 0, PRMS = 1, MODFLOW = 2
+      INTEGER, PARAMETER :: DOCUMENTATION = 99
       CHARACTER(LEN=80), SAVE :: PRMS_versn
 ! Dimensions
       INTEGER, SAVE :: Ncascade, Ncascdgw
@@ -28,8 +29,7 @@
       INTEGER, SAVE :: Precip_combined_flag, Temp_combined_flag, Muskingum_flag
       INTEGER, SAVE :: Inputerror_flag, Timestep
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag
-      INTEGER, SAVE :: Grid_flag, Logunt
-      INTEGER, SAVE :: PRMS_flag, GSFLOW_flag
+      INTEGER, SAVE :: Grid_flag, PRMS_flag, GSFLOW_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Nwateruse, Nexternal, Nconsumed, Npoigages, Prms_warmup
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
@@ -111,7 +111,7 @@
           CALL DATE_AND_TIME(VALUES=Elapsed_time_start)
           Execution_time_start = Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
      &                           Elapsed_time_start(7) + Elapsed_time_start(8)*0.001
-          PRMS_versn = 'gsflow_prms.f90 2020-05-20 14:10:00Z'
+          PRMS_versn = 'gsflow_prms.f90 2020-06-04 11:10:00Z'
         ! Note, MODFLOW-only doesn't leave setdims
         CALL setdims()
       ELSEIF ( Process_flag==1 ) THEN  ! after setdims finished
@@ -128,7 +128,6 @@
         IF ( Print_debug>-2 ) THEN
           PRINT 10, PRMS_VERSION
           WRITE ( PRMS_output_unit, 10 ) PRMS_VERSION
-          WRITE ( Logunt, 10 ) PRMS_VERSION
         ENDIF
   10  FORMAT (/, 15X, 'Precipitation-Runoff Modeling System (PRMS)', /, 23X, A)
       15  FORMAT (/, 8X, 'Process',  12X, 'Available Modules', /, 68('-'), /, &
@@ -171,8 +170,6 @@
           WRITE ( PRMS_output_unit, 15 )
           PRINT 16, EQULS
           WRITE ( PRMS_output_unit, 16 ) EQULS
-          WRITE ( Logunt, 15 )
-          WRITE ( Logunt, 16 ) EQULS
         ENDIF
         CALL print_module(PRMS_versn, 'GSFLOW Computation Order    ', 90)
         CALL print_module(Version_read_control_file, 'Read Control File           ', 90)
@@ -264,33 +261,24 @@
 
         nc = numchars(Model_control_file)
         IF ( Print_debug>-1 ) PRINT 9004, 'Using Control File: ', Model_control_file(:nc)
-        IF ( Print_debug>-2 ) THEN
-          WRITE ( PRMS_output_unit, 9004 ) 'Using Control File: ', Model_control_file(:nc)
-          WRITE ( Logunt, 9004 ) 'Using Control File: ', Model_control_file(:nc)
-        ENDIF
+        IF ( Print_debug>-2 ) WRITE ( PRMS_output_unit, 9004 ) 'Using Control File: ', Model_control_file(:nc)
 
         nc = numchars(Param_file)
         IF ( Print_debug>-1 ) PRINT 9004, 'Using Parameter File: ', Param_file(:nc)
-        IF ( Print_debug>-2 ) THEN
-          WRITE ( PRMS_output_unit, 9004 ) 'Using Parameter File: ', Param_file(:nc)
-          WRITE ( Logunt, 9004 ) 'Using Parameter File: ', Param_file(:nc)
-        ENDIF
+        IF ( Print_debug>-2 ) WRITE ( PRMS_output_unit, 9004 ) 'Using Parameter File: ', Param_file(:nc)
 
         IF ( Init_vars_from_file>0 ) THEN
           nc = numchars(Var_init_file)
           IF ( Print_debug>-1 ) PRINT 9004, 'Using var_init_file: ', Var_init_file(:nc)
-          IF ( Print_debug>-2 ) WRITE ( Logunt, 9004 ) 'Writing var_init_file: ', Var_init_file(:nc)
         ENDIF
         IF ( Save_vars_to_file==1 ) THEN
           nc = numchars(Var_save_file)
           IF ( Print_debug>-1 ) PRINT 9004, 'Using var_save_file: ', Var_save_file(:nc)
-          IF ( Print_debug>-2 ) WRITE ( Logunt, 9004 ) 'Writing var_save_file: ', Var_save_file(:nc)
         ENDIF
 
         IF ( Print_debug>-2 ) THEN
           nc = numchars(Model_output_file)
           PRINT 9004, 'Writing PRMS Water Budget File: ', Model_output_file(:nc)
-          WRITE ( Logunt, 9004 ) 'Writing PRMS Water Budget File: ', Model_output_file(:nc)
         ENDIF
 
       ELSEIF ( Process_flag==3 ) THEN
@@ -555,12 +543,7 @@
      &         WRITE ( PRMS_output_unit,'(A,I5,A,F6.2,A,/)') 'Execution elapsed time', Elapsed_time_minutes, ' minutes', &
      &                                                       Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
         ENDIF
-        IF ( Print_debug>-2 ) THEN
-          CLOSE ( PRMS_output_unit )
-          WRITE ( Logunt,'(A,I5,A,F6.2,A,/)') 'Execution elapsed time', Elapsed_time_minutes, ' minutes', &
-     &                                        Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
-          CLOSE ( Logunt )
-        ENDIF
+        IF ( Print_debug>-2 ) CLOSE ( PRMS_output_unit )
         IF ( Save_vars_to_file>0 ) CLOSE ( Restart_outunit )
         STOP 0
       ELSEIF ( Process_flag==1 ) THEN
@@ -568,7 +551,6 @@
         IF ( Print_debug>-2 ) THEN
           PRINT '(A)', EQULS
           WRITE ( PRMS_output_unit, '(A)' ) EQULS
-          WRITE ( Logunt, '(A)' ) EQULS
         ENDIF
         IF ( Model==25 ) CALL convert_params()
         Process_flag = 2  ! next is init
@@ -590,10 +572,8 @@
           CALL convert_params()
           STOP 0
         ENDIF
-        IF ( Print_debug>-2 ) THEN
-          PRINT 4, 'Simulation time period:', Start_year, Start_month, Start_day, ' -', End_year, End_month, End_day, EQULS
-          WRITE ( Logunt, 4 ) 'Simulation time period:', Start_year, Start_month, Start_day, ' -', End_year,End_month,End_day,EQULS
-        ENDIF
+        IF ( Print_debug>-2 ) &
+     &       PRINT 4, 'Simulation time period:', Start_year, Start_month, Start_day, ' -', End_year, End_month, End_day, EQULS
         Process_flag = 0  ! next is run
       ENDIF
 
