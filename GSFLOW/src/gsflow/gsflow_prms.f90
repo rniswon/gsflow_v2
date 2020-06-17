@@ -111,7 +111,7 @@
           CALL DATE_AND_TIME(VALUES=Elapsed_time_start)
           Execution_time_start = Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
      &                           Elapsed_time_start(7) + Elapsed_time_start(8)*0.001
-          PRMS_versn = 'gsflow_prms.f90 2020-06-04 11:10:00Z'
+          PRMS_versn = 'gsflow_prms.f90 2020-06-17 10:00:00Z'
         ! Note, MODFLOW-only doesn't leave setdims
         CALL setdims()
       ELSEIF ( Process_flag==1 ) THEN  ! after setdims finished
@@ -200,13 +200,6 @@
      &         'none')/=0 ) CALL read_error(1, 'gvr_cell_id')
         ENDIF
 
-        IF ( Diversion2soil_flag==1 ) THEN
-          ! Allocate variable for adding irrigation water to HRU from AG Package
-          ALLOCATE ( Hru_ag_irr(Nhru) )
-          CALL declvar_real(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real', &
-     &         'Irrigation added to soilzone from MODFLOW wells', 'inches', Hru_ag_irr)
-          Hru_ag_irr = 0.0
-        ENDIF
         Have_lakes = 0 ! set for modes when MODFLOW is not active
         Kkiter = 1 ! set for PRMS-only mode
 
@@ -247,6 +240,13 @@
           ENDIF
           call_modules = gsfinit()
           IF ( call_modules/=0 ) CALL module_error(MODNAME, Arg, call_modules)
+          IF ( Diversion2soil_flag==1 ) THEN
+            ! Allocate variable for adding irrigation water to HRU from AG Package
+            ALLOCATE ( Hru_ag_irr(Nhru) )
+            CALL declvar_real(MODNAME, 'hru_ag_irr', 'nhru', Nhru, &
+     &           'Irrigation added to soilzone from MODFLOW wells', 'inches', Hru_ag_irr)
+            Hru_ag_irr = 0.0
+          ENDIF
           IF ( Have_lakes==1 .AND. Nlake/=NLAKES_MF ) THEN
             PRINT *, 'ERROR, NLAKES not equal to Nlake'
             PRINT *, '       NLAKES=', NLAKES_MF, '; Nlake=', Nlake
@@ -547,11 +547,12 @@
         IF ( Save_vars_to_file>0 ) CLOSE ( Restart_outunit )
         STOP 0
       ELSEIF ( Process_flag==1 ) THEN
-        CALL read_parameter_file_params()
         IF ( Print_debug>-2 ) THEN
           PRINT '(A)', EQULS
           WRITE ( PRMS_output_unit, '(A)' ) EQULS
         ENDIF
+        CALL read_parameter_file_params()
+        IF ( Print_debug>-2 ) PRINT '(A)', EQULS
         IF ( Model==25 ) CALL convert_params()
         Process_flag = 2  ! next is init
       ELSEIF ( Process_flag==2 ) THEN
