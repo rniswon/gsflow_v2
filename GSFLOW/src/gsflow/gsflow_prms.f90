@@ -104,7 +104,7 @@
 
         Process_flag = 1
 
-        PRMS_versn = 'gsflow_prms.f90 2020-03-04 17:00:00Z'
+        PRMS_versn = 'gsflow_prms.f90 2020-06-17 17:00:00Z'
 
         IF ( PRMS_flag==1 ) THEN ! PRMS is active, GSFLOW, PRMS
           IF ( check_dims()/=0 ) STOP
@@ -183,6 +183,11 @@
      &         'Corresponding grid cell id associated with each GVR', &
      &         'Index of the grid cell associated with each gravity reservoir', &
      &         'none')/=0 ) CALL read_error(1, 'gvr_cell_id')
+            ! Allocate variable for adding irrigation water to HRU from AG Package, always declare for now
+            ALLOCATE ( Hru_ag_irr(Nhru) )
+            IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real', &
+     &           'Irrigation added to soilzone from MODFLOW wells', 'inches', Hru_ag_irr)/=0 ) CALL read_error(3, 'hru_ag_irr')
+            Hru_ag_irr = 0.0
         ENDIF
 
         Kkiter = 1 ! set for PRMS-only mode
@@ -225,13 +230,13 @@
 !            PRINT *, '       NSS=', NSS, '; nsegment=', Nsegment
 !            STOP
 !          ENDIF
-          IF ( Diversion2soil_flag==1 ) THEN
-            ! Allocate variable for adding irrigation water to HRU from AG Package
-            ALLOCATE ( Hru_ag_irr(Nhru) )
-            IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real', &
-     &           'Irrigation added to soilzone from MODFLOW wells', 'inches', Hru_ag_irr)/=0 ) CALL read_error(3, 'hru_ag_irr')
-            Hru_ag_irr = 0.0
-          ENDIF
+     !     IF ( Diversion2soil_flag==1 ) THEN
+     !       ! Allocate variable for adding irrigation water to HRU from AG Package
+     !       ALLOCATE ( Hru_ag_irr(Nhru) )
+     !       IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real', &
+     !&           'Irrigation added to soilzone from MODFLOW wells', 'inches', Hru_ag_irr)/=0 ) CALL read_error(3, 'hru_ag_irr')
+     !       Hru_ag_irr = 0.0
+     !     ENDIF
         ENDIF
 
         nc = numchars(Model_control_file)
