@@ -58,7 +58,6 @@
 		<File RelativePath="..\GSFLOW\src\prms\convert_params.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\ddsolrad.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\de47_NWT.f"/>
-		<File RelativePath="..\GSFLOW\src\prms\depression_storage.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\dynamic_param_read.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\frost_date.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_budget.f90"/>
@@ -67,7 +66,7 @@
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms2mf.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_sum.f90"/>
-		<File RelativePath="..\GSFLOW\src\modflow\gwf2ag1_NWT.f"/>
+		<File RelativePath="..\GSFLOW\src\modflow\gwf2ag1_NWT_ponds.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwf2bas7_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwf2bcf7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwf2chd7.f"/>
