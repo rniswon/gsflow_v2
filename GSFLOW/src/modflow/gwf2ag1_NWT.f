@@ -1661,7 +1661,7 @@
      +                  RHS
       USE GWFBASMODULE, ONLY: TOTIM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: IDIVAR, SEG, STRM
+      USE GWFSFRMODULE, ONLY: IDIVAR, SEG, STRM, DVRSFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -1752,8 +1752,10 @@
             IF (NUMSEGS(L) > 0) THEN
                DO I = 1, NUMSEGS(L)
                   J = DIVERSIONSEG(I, L)
-                  k = IDIVAR(1, J)
-                  QSW = STRM(9, LASTREACH(K))
+                  !k = IDIVAR(1, J)
+                  !QSW = STRM(9, LASTREACH(K))
+                  QSW = demand(J)
+                  If ( kkiter > 1 ) QSW = DVRSFLW(J)
                   IF (ETDEMANDFLAG > 0) THEN
                      FMIN = SUPACT(J)
                   ELSE IF (TRIGGERFLAG > 0) then
@@ -1783,7 +1785,7 @@
                   IF (GSFLOW_flag == 0) THEN
                      QQ = demandgw_uzf(l, kkper, kkstp, kkiter, time)
                   ELSE
-                     QQ = demandgw_prms(l, kkiter)
+                     QQ = demandgw_prms(l, kkper, kkstp, kkiter)
                   END IF
                ELSEIF (TRIGGERFLAG > 0) then
                   QQ = demandtrigger_gw(Q, kkper, kkstp, kkiter, l)   
@@ -2333,7 +2335,7 @@
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE, VKS
-      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, IDIVAR, STRM
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, STRM
       USE GWFAGMODULE
       USE GLOBAL, ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
@@ -2393,7 +2395,7 @@
         sup = DVRSFLW(iseg) + ACTUAL(ISEG)
         supold = SUPACTOLD(ISEG) + ACTUALOLD(ISEG)
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
-     +           supold, kiter)
+     +           supold, kper, kstp, kiter)
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
@@ -2404,8 +2406,9 @@
         !
         !1 - -----limit diversion to water right and flow in river
         !
-        k = IDIVAR(1, ISEG)
-        fmaxflow = STRM(9, LASTREACH(K))
+!        k = IDIVAR(1, ISEG)
+!        fmaxflow = STRM(9, LASTREACH(K))
+        fmaxflow = DVRSFLW(ISEG)
         IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
 300   CONTINUE
@@ -2419,7 +2422,7 @@
 !     demandconjunctive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
 !     SPECIFICATIONS:
-      USE GWFSFRMODULE, ONLY: SEG, IDIVAR, STRM, DVRSFLW
+      USE GWFSFRMODULE, ONLY: SEG, STRM, DVRSFLW
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: HRU_PERV
@@ -2436,7 +2439,7 @@
       double precision :: zerod7, done, dzero, pettotal,
      +                    aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup !, etdif
-      real :: fmaxflow
+      real :: fmaxflow, etdif
       integer :: k, iseg, hru_id, i
       external :: set_factor
       double precision :: set_factor
@@ -2471,7 +2474,7 @@
         sup = DVRSFLW(iseg) + ACTUAL(ISEG)
         supold = SUPACTOLD(ISEG) + ACTUALOLD(ISEG)
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
-     +           supold, kiter)
+     +           supold, kper, kstp, kiter)
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
@@ -2484,11 +2487,13 @@
         !1 - -----limit diversion to water right
         !
 ! NEED to check IPRIOR value here
-        k = IDIVAR(1, ISEG)
-        fmaxflow = STRM(9, LASTREACH(K))
+!        k = IDIVAR(1, ISEG)
+!        fmaxflow = STRM(9, LASTREACH(K))
+        fmaxflow = demand(ISEG)
+        If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
         IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
-  !      if(iseg==18)then
+  !      if(iseg==18.and.kper==23.and.kstp==5)then
   !    etdif = pettotal - aettotal
   !        write(999,33)kper,kstp,kiter,SEG(2, iseg),fmaxflow,
   !   +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
@@ -2504,7 +2509,7 @@
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GLOBAL, ONLY: DELR, DELC
-      USE GWFSFRMODULE, ONLY: SEG, IDIVAR, STRM, NSS
+      USE GWFSFRMODULE, ONLY: SEG, STRM, NSS, DVRSFLW
       USE GWFAGMODULE
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
       USE GWFBASMODULE, ONLY: DELT
@@ -2575,8 +2580,10 @@
          !
          !1 - -----limit diversion to supply
          !
-         k = IDIVAR(1, ISEG)
-         fmaxflow = STRM(9, LASTREACH(K))
+!         k = IDIVAR(1, ISEG)
+!         fmaxflow = STRM(9, LASTREACH(K))
+        fmaxflow = demand(ISEG)
+        If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
          IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
 300    continue
        deallocate (petseg, aetseg)
@@ -2698,8 +2705,8 @@
       aetold = AETITERGW(l)
       sup = QONLY(l)
       supold = QONLYOLD(l)
-      factor = set_factor(l, aetold, pettotal, aettotal, sup, supold,
-     +                    kiter)
+      factor = set_factor(l, aetold, pettotal, aettotal, sup, supold, 
+     +                    kper, kstp, kiter)
       QONLYOLD(l) = QONLY(l)
       AETITERGW(l) = sngl(aettotal)
       QONLY(L) = QONLY(L) + sngl(factor)
@@ -2710,7 +2717,7 @@
       end function demandgw_uzf
 !
 !
-      double precision function demandgw_prms(l, kiter)
+      double precision function demandgw_prms(l, kper, kstp, kiter)
 !     ******************************************************************
 !     demandgw---- sums up irrigation demand using ET deficit for gw
 !     ******************************************************************
@@ -2727,7 +2734,7 @@
 ! --------------------------------------
       !modules
       !arguments
-      integer, intent(in) :: l, kiter
+      integer, intent(in) :: l, kper, kstp, kiter
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, prms_inch2mf_q,
      +                    aetold, areafactor,
@@ -2760,7 +2767,7 @@
       sup = QONLY(l)
       supold = QONLYOLD(l)
       factor = set_factor(l, aetold, pettotal, aettotal, sup, supold,
-     +                    kiter)
+     +                    kper, kstp, kiter)
       QONLYOLD(l) = QONLY(L)
       AETITERGW(l) = sngl(aettotal)
       QONLY(L) = QONLY(L) + sngl(factor)
@@ -2769,7 +2776,8 @@
       end function demandgw_prms
 !
       double precision function set_factor(l,aetold, pettotal, 
-     +                                     aettotal,sup,supold,kiter)
+     +                                     aettotal, sup, supold, 
+     +                                     kper, kstp, kiter)
 !     ******************************************************************
 !     updates diversion or pumping rate based on ET deficit
 !     ******************************************************************
@@ -2781,7 +2789,7 @@
       !arguments
       double precision, intent(in) :: aetold, pettotal, aettotal,
      +                                sup, supold
-      integer, intent(in) :: kiter, l
+      integer, intent(in) :: l, kper, kstp, kiter
       !dummy
       DOUBLE PRECISION :: factor, zerod5, dzero, etdif, det, dq
 ! -----------------------------------------
@@ -2802,9 +2810,10 @@
       if( factor > accel*etdif ) factor = accel*etdif
       if( factor < etdif ) factor = etdif
       if( factor < dzero ) factor = dzero
-!      open(222,file='debug.out')
-!      if(l==18)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
+!      if(l==18.and.kper==23.and.kstp==5)then
+!      write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
 !     +aetold,factor,sup
+!      end if
 !333   format(i5,8e20.10)
       set_factor = factor
       end function set_factor
