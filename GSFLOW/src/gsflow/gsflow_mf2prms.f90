@@ -8,7 +8,7 @@
 !     ******************************************************************
       INTEGER FUNCTION gsflow_mf2prms()
       USE GSFMODFLOW, ONLY: Mfq2inch_conv, Gwc_col, Gwc_row, &
-                            Mfl2_to_acre, Mfl_to_inch
+                            Mfl2_to_acre, Mfl_to_inch, KKPER, KKSTP
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Gw2sm_grav
       USE GWFUZFMODULE, ONLY: SEEPOUT
       USE PRMS_MODULE, ONLY: Process, Nhrucell, Gvr_cell_id, Hru_ag_irr

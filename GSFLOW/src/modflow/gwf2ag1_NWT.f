@@ -1661,7 +1661,7 @@
      +                  RHS
       USE GWFBASMODULE, ONLY: TOTIM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: IDIVAR, SEG, STRM, DVRSFLW
+      USE GWFSFRMODULE, ONLY: IDIVAR, SEG, STRM, DVRSFLW, SGOTFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -1752,9 +1752,7 @@
             IF (NUMSEGS(L) > 0) THEN
                DO I = 1, NUMSEGS(L)
                   J = DIVERSIONSEG(I, L)
-                  !k = IDIVAR(1, J)
-                  !QSW = STRM(9, LASTREACH(K))
-                  QSW = demand(J)
+                  QSW = SEG(2, J)
                   If ( kkiter > 1 ) QSW = DVRSFLW(J)
                   IF (ETDEMANDFLAG > 0) THEN
                      FMIN = SUPACT(J)
@@ -1853,11 +1851,6 @@
                   SUBVOL = -(DONE - IRRFACT(I, L))*Qp*IRRFIELDFACT(I, L)
                   ! Keep irrigation for PRMS as volumetric rate
                   WELLIRRPRMS(I, L) = WELLIRRPRMS(I, L) + SUBVOL
-!                  if ( i==1 .and. l==122 ) then
-!                    print *, 'SUBVOL',SUBVOL, DONE, IRRFACT(I, L), Qp
-!                    print *, IRRFIELDFACT(I, L), WELLIRRPRMS(I, L)
-!                    print *, Qonly(L), DONENEG, Q
-!                    endif
                END DO
             END IF
          END IF
@@ -1869,8 +1862,8 @@
             DO icount = 1, DVRCH(istsg)   !THESE VARS COULD BE DIMENSIONED NUMIRRDIVERSION TO SAVE MEMORY
                irr = IRRROW_SW(icount, istsg)
                icc = IRRCOL_SW(icount, istsg)
-              !dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-               dvt = seg(2, istsg)*DVRPERC(ICOUNT, istsg)
+               dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
+               !dvt = seg(2, istsg)*DVRPERC(ICOUNT, istsg)
                if (dvt < zero) dvt = 0.0
                dvt = dvt/(DELR(icc)*DELC(irr))
                DIVERSIONIRRUZF(icc, irr) = DIVERSIONIRRUZF(icc, irr) +
@@ -1878,8 +1871,7 @@
             END DO
          ELSE
             DO icount = 1, DVRCH(istsg)
-               dvt = (seg(2, istsg) - actual(istsg))*
-     +                DVRPERC(ICOUNT, istsg)
+               dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT, istsg)
                dvt = (1.0 - DVEFF(ICOUNT, istsg))*dvt
          ! Keep irrigation for PRMS as volume
                DIVERSIONIRRPRMS(icount, istsg) = 
@@ -2371,7 +2363,7 @@
         !
         !1b - ------Update demand as max flow in segment
         !
-        IF (DEMAND(iseg) < zerod7) goto 300
+!        IF (DEMAND(iseg) < zerod7) goto 300
         aetold = dzero
         aetnew = dzero
         pettotal = dzero
@@ -2408,8 +2400,9 @@
         !
 !        k = IDIVAR(1, ISEG)
 !        fmaxflow = STRM(9, LASTREACH(K))
-        fmaxflow = DVRSFLW(ISEG)
-        IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
+!        fmaxflow = demand(ISEG)
+!        If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
+!        IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
 300   CONTINUE
       RETURN
@@ -2457,7 +2450,7 @@
         aettotal = DZERO
         factor = DZERO
         iseg = IRRSEG(i)
-        IF (DEMAND(iseg) < zerod7) goto 300
+!        IF (DEMAND(iseg) < zerod7) goto 300
         !
         !1 - -----loop over hrus irrigated by diversion
         !
@@ -2489,11 +2482,11 @@
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
 !        fmaxflow = STRM(9, LASTREACH(K))
-        fmaxflow = demand(ISEG)
-        If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
-        IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
+!        fmaxflow = demand(ISEG)
+!        If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
+!        IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
-  !      if(iseg==18.and.kper==23.and.kstp==5)then
+  !      if(iseg==18.and.kper==22.and.kstp==21)then
   !    etdif = pettotal - aettotal
   !        write(999,33)kper,kstp,kiter,SEG(2, iseg),fmaxflow,
   !   +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
@@ -2541,7 +2534,7 @@
       !
       do 300 i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
-         IF (DEMAND(iseg) < zerod30) goto 300
+!         IF (DEMAND(iseg) < zerod30) goto 300
          aet = dzero
          pet = dzero
          !
@@ -2582,9 +2575,9 @@
          !
 !         k = IDIVAR(1, ISEG)
 !         fmaxflow = STRM(9, LASTREACH(K))
-        fmaxflow = demand(ISEG)
-        If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
-         IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
+        !fmaxflow = demand(ISEG)
+        !If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
+        ! IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
 300    continue
        deallocate (petseg, aetseg)
        return
@@ -2810,7 +2803,7 @@
       if( factor > accel*etdif ) factor = accel*etdif
       if( factor < etdif ) factor = etdif
       if( factor < dzero ) factor = dzero
-!      if(l==18.and.kper==23.and.kstp==5)then
+!      if(l==18.and.kper==22.and.kstp==21)then
 !      write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
 !     +aetold,factor,sup
 !      end if
