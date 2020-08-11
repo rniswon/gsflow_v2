@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2020-08-04'
+      character(len=*), parameter :: Version_basin = '2020-08-11'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -472,7 +472,7 @@
       Active_hrus = j
       Active_area = Land_area + Water_area
 
-      IF ( GSFLOW_flag==0 .OR. Cascadegw_flag>0 ) THEN
+      IF ( GSFLOW_flag==OFF .OR. Cascadegw_flag>0 ) THEN
         Active_gwrs = Active_hrus
         Gwr_type = Hru_type
         Gwr_route_order = Hru_route_order

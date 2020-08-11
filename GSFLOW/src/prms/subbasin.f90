@@ -19,7 +19,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'subbasin'
-      character(len=*), parameter :: Version_subbasin = '2020-08-04'
+      character(len=*), parameter :: Version_subbasin = '2020-08-11'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Qsub(:), Sub_area(:), Laststor(:)
       INTEGER, SAVE, ALLOCATABLE :: Tree(:, :)
 !   Declared Variables
@@ -582,7 +582,7 @@
         Subinc_szstor_frac(j) = Subinc_szstor_frac(j)/subarea
         Subinc_capstor_frac(j) = Subinc_capstor_frac(j)/subarea
         Subinc_deltastor(j) = Laststor(j) - Subinc_stor(j)
-        IF ( GSFLOW_flag==0 ) THEN
+        IF ( GSFLOW_flag==OFF ) THEN
           dmy1 = Subinc_gwflow(j)/subarea
           Subinc_gwflow(j) = Subinc_gwflow(j)*Cfs_conv
         ENDIF
@@ -598,7 +598,7 @@
         Sub_interflow(j) = Subinc_interflow(j)
         DO k = 1, Nsub
           IF ( Tree(j,k)/=0 ) THEN
-            IF ( GSFLOW_flag==0 ) Sub_gwflow(j) = Sub_gwflow(j) + Subinc_gwflow(k)
+            IF ( GSFLOW_flag==OFF ) Sub_gwflow(j) = Sub_gwflow(j) + Subinc_gwflow(k)
             Sub_sroff(j) = Sub_sroff(j) + Subinc_sroff(k)
             Sub_interflow(j) = Sub_interflow(j) + Subinc_interflow(k)
           ENDIF

@@ -4,6 +4,9 @@
       MODULE GSFPRMS2MF
       IMPLICIT NONE
 !   Module Variables
+      character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
+      character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2020-08-11'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -11,7 +14,6 @@
       INTEGER, SAVE, ALLOCATABLE :: Numreach_segment(:)
       REAL, SAVE, ALLOCATABLE :: Excess(:)
       DOUBLE PRECISION, SAVE :: Totalarea
-      CHARACTER(LEN=14), SAVE :: MODNAME
 !   Declared Variables
       DOUBLE PRECISION, SAVE :: Basin_reach_latflow, Net_sz2gw
 !     INTEGER, SAVE, ALLOCATABLE :: Reach_id(:,:)
@@ -60,14 +62,10 @@
       IMPLICIT NONE
       INTEGER, EXTERNAL :: declparam, declvar
       EXTERNAL read_error, print_module
-! Save Variables
-      CHARACTER(LEN=80), SAVE :: Version_gsflow_prms2mf
 !***********************************************************************
       prms2mfdecl = 0
 
-      Version_gsflow_prms2mf = 'gsflow_prms2mf.f90 2019-10-30 14:24:00Z'
-      CALL print_module(Version_gsflow_prms2mf, 'GSFLOW PRMS to MODFLOW      ', 90)
-      MODNAME = 'gsflow_prms2mf'
+      CALL print_module(MODDESC, MODNAME, Version_gsflow_prms2mf)
 
 ! Declared Variables
       IF ( declvar(MODNAME, 'net_sz2gw', 'one', 1, 'double', &
@@ -89,7 +87,7 @@
       ALLOCATE (Cell_drain_rate(Ngwcell))
       IF ( declvar(MODNAME, 'cell_drain_rate', 'ngwcell', Ngwcell, 'real', &
      &     'Recharge rate for each cell', &
-     &     'L/T', Cell_drain_rate)/=0 ) CALL read_error(3, 'Cell_drain_rate')
+     &     'L/T', Cell_drain_rate)/=0 ) CALL read_error(3, 'cell_drain_rate')
 
       IF ( declvar(MODNAME, 'basin_reach_latflow', 'one', 1, 'double', &
      &     'Lateral flow into all reaches in basin', &
@@ -114,7 +112,7 @@
         ! new parameter segment_reach_fraction or reach_carea or change cascade
         ! procedure to cascade flow to reaches instead of segments
 !        ALLOCATE (Segment_reach_fraction(Nreach))
-!        IF ( declparam(MODNAME, 'segment_reach_fraction', 'nreach', 'read', &
+!        IF ( declparam(MODNAME, 'segment_reach_fraction', 'nreach', 'real', &
 !      &      '0.0', '0.0', '1.0', &
 !      &      'Proportion of each segment that contributes flow to a stream reach', &
 !      &      'Proportion of each segment that contributes flow to a stream reach', &
@@ -149,13 +147,14 @@
 !     prms2mfinit - Initialize PRMS2MF module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION prms2mfinit()
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less
       USE GSFPRMS2MF
       USE GWFUZFMODULE, ONLY: NTRAIL, NWAV
       USE GWFSFRMODULE, ONLY: ISEG, NSS
       USE GWFLAKMODULE, ONLY: NLAKES
-      USE GSFMODFLOW, ONLY: Gwc_row, Gwc_col, Have_lakes
+      USE GSFMODFLOW, ONLY: Gwc_row, Gwc_col
       USE PRMS_MODULE, ONLY: Nhru, Nsegment, Nlake, Print_debug, &
-     &    Nhrucell, Ngwcell, Gvr_cell_id, Logunt, Mxsziter
+     &    Nhrucell, Ngwcell, Gvr_cell_id, Have_lakes
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, &
      &    Basin_area_inv, Hru_area
       USE PRMS_SOILZONE, ONLY: Gvr_hru_id, Gvr_hru_pct_adjusted
@@ -198,11 +197,6 @@
         ierr = 1
       ENDIF
 
-      IF ( Print_debug>-2 ) THEN
-        WRITE (Logunt, '(/, A,I4,/)') 'mxsziter =', Mxsziter
-        WRITE (Logunt, '(A,D15.7)') 'Tolerance check for gvr_hru_pct:', PCT_CHK
-      ENDIF
-
       IF ( Nhru/=Nhrucell ) THEN
         IF ( getparam('prms2mf', 'gvr_hru_pct', Nhrucell, 'real', Gvr_hru_pct)/=0 ) CALL read_error(2, 'gvr_hru_pct')
       ENDIF
@@ -217,7 +211,7 @@
           Segment_pct_area(i) = 1.0D0 / DBLE( Numreach_segment(i) )
         ENDIF
       ENDDO
-      IF ( ierr==1 ) STOP
+      IF ( ierr==1 ) ERROR STOP 4
 
 !     IF ( get param(MODNAME, 'reach_segment', Nreach, 'integer', Reach_segment)/=0 ) CALL read_error(2, 'reach_segment')
 
@@ -271,8 +265,6 @@
 !      DO i = 1, Nsegment
 !        IF ( nseg_rch(i)/=Numreach_segment(i) ) PRINT *, 'Problem with number of reaches in a segment', i,
 !    &        nseg_rch(i), Numreach_segment(i)
-!        IF ( ABS(seg_area(i)-1.0D0)>PCT_CHK .AND. Print_debug>-2 ) WRITE (Logunt, *) &
-!    &        'Possible issue with segment area percentages', i, seg_area(i)
 !       ENDDO
 
 ! way to adjust segment_pct_area, rsr
@@ -310,7 +302,7 @@
 !        IF ( icell==0 ) CYCLE ! don't need as icell must be > 0
         irow = Gwc_row(icell)
         icol = Gwc_col(icell)
-        IF ( Print_debug>-1 ) THEN
+        IF ( Print_debug>DEBUG_less ) THEN
           IF ( Hru_type(ihru)==0 ) THEN
             IF ( IUZFBND(icol, irow)/=0 ) &
      &           PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
@@ -321,7 +313,7 @@
           ENDIF
         ENDIF
       ENDDO
-      IF ( ierr==1 ) STOP
+      IF ( ierr==1 ) ERROR STOP 4
 
       IF ( Nhru/=Nhrucell ) THEN
 ! way to adjust gvr_hru_pct, rsr
@@ -336,7 +328,7 @@
       ELSE
         Gvr_hru_pct_adjusted = 1.0D0
       ENDIF
-!      STOP
+!      ERROR STOP 4
 
       Totalarea = 0.0D0
       DO ii = 1, Active_hrus
@@ -347,20 +339,16 @@
           IF ( pct<0.99D0 ) THEN
             ierr = 1
             PRINT *, 'ERROR, portion of HRU not included in mapping to cells', i, pct
-            IF ( Print_debug>-2 ) WRITE ( Logunt, * ) &
-     &           'ERROR, Portion of HRU not included in mapping to cells', i, pct
           ELSEIF ( pct>1.00001D0 ) THEN
             IF ( pct>1.0001D0 ) THEN
               ierr = 1
               PRINT *, 'ERROR, extra portion of HRU included in mapping to cells', i, pct
-              IF ( Print_debug>-2 ) WRITE ( Logunt, * ) &
-     &             'ERROR, extra portion of HRU included in mapping to cells', i, pct
             ENDIF
           ELSEIF ( pct<0.0D0 ) THEN
             PRINT *, 'ERROR, HRU to cell mapping is < 0.0', i, pct
             ierr = 1
           ELSEIF ( pct<PCT_CHK ) THEN
-            PRINT *, 'WARNING, active HRU is not mapped to any cell', i, pct
+            IF ( Print_debug>DEBUG_less ) PRINT *, 'WARNING, active HRU is not mapped to any cell', i, pct
           ENDIF
           Totalarea = Totalarea + pct*DBLE( Hru_area(i) )
         ELSE
@@ -372,14 +360,14 @@
             WRITE (*, 9001) i
             ierr = 1
 ! must separate condition as lake_hru_id not allocated if have_lakes=0
+            ! rsr, need to check that lake_hru_id not 0
           ENDIF
         ENDIF
       ENDDO
-      IF ( ierr==1 ) STOP
+      IF ( ierr==1 ) ERROR STOP 4
 
       Totalarea = Totalarea*Basin_area_inv
-      IF ( Print_debug>-2 ) WRITE ( Logunt, 9003 ) (Totalarea-1.0D0)*100.0D0
-      IF ( Print_debug>-1 ) PRINT 9003, (Totalarea-1.0D0)*100.0D0
+      IF ( Print_debug>DEBUG_less ) PRINT 9003, (Totalarea-1.0D0)*100.0D0
 
       IF ( Nhru/=Nhrucell ) DEALLOCATE ( hru_pct, newpct, temp_pct )
       !DEALLOCATE ( nseg_rch, seg_area )
@@ -406,14 +394,15 @@
 !***********************************************************************
       INTEGER FUNCTION prms2mfrun()
       USE GSFPRMS2MF
+      USE PRMS_CONSTANTS, ONLY: NEARZERO
       USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, &
-     &    Inch_to_mfl_t, Gwc_row, Gwc_col, Have_lakes, Mft_to_days
+     &    Inch_to_mfl_t, Gwc_row, Gwc_col, Mft_to_days
       USE GLOBAL, ONLY: IBOUND
 !     USE GLOBAL, ONLY: IOUT
       USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, IGSFLOW, FINF
       USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK, NLAKES
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_area, Lake_hru_id, NEARZERO
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_area, Lake_hru_id
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Hru_actet
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes

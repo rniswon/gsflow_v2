@@ -3,11 +3,13 @@
 !***********************************************************************
       MODULE GSFBUDGET
 !   Local Variables
+      character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
+      character(len=13), parameter :: MODNAME = 'gsflow_budget'
+      character(len=*), parameter :: Version_gsflow_budget = '2020-08-11'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
       REAL, SAVE, ALLOCATABLE :: Fluxchange(:)
-      CHARACTER(LEN=13), SAVE :: MODNAME
 !   Declared Variables
       DOUBLE PRECISION, SAVE :: Total_pump, Total_pump_cfs, StreamExchng2Sat_Q, Stream2Unsat_Q, Sat_S
       DOUBLE PRECISION, SAVE :: Stream_inflow, Basin_gw2sm, NetBoundaryFlow2Sat_Q
@@ -53,14 +55,10 @@
       IMPLICIT NONE
       INTEGER, EXTERNAL :: declvar, getdim
       EXTERNAL :: print_module, read_error
-! Save Variables
-      CHARACTER(LEN=80), SAVE :: Version_gsflow_budget
 !***********************************************************************
       gsfbuddecl = 0
 
-      Version_gsflow_budget = 'gsflow_budget.f90 2019-10-30 15:07:00Z'
-      CALL print_module(Version_gsflow_budget, 'GSFLOW Output Budget Summary', 90)
-      MODNAME = 'gsflow_budget'
+      CALL print_module(MODDESC, MODNAME, Version_gsflow_budget)
 
       Nreach = getdim('nreach')
       IF ( Nreach==-1 ) CALL read_error(6, 'nreach')
@@ -195,7 +193,7 @@
 
       IF ( Nreach/=NSTRM ) THEN
         PRINT *, 'ERROR, nreach must equal to NSTRM', Nreach, NSTRM
-        STOP
+        ERROR STOP 3
       ENDIF
 
       Reach_cfs = 0.0 ! dimension NSTRM
@@ -241,24 +239,23 @@
       INTEGER FUNCTION gsfbudrun()
       USE GSFBUDGET
       USE GSFMODFLOW, ONLY: Mfq2inch_conv, Mfl2_to_acre, & !, Cellarea, &
-     &    Mfvol2inch_conv, Mfl3t_to_cfs, Mfl_to_inch, Gwc_col, Gwc_row, Have_lakes
+     &    Mfvol2inch_conv, Mfl3t_to_cfs, Mfl_to_inch, Gwc_col, Gwc_row
 !      USE GLOBAL, ONLY: IUNIT
 !Warning, modifies Gw_rejected_grav
       USE GSFPRMS2MF, ONLY: Excess, Gw_rejected_grav
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id !, Gvr_cell_pct, Print_debug
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes !, Gvr_cell_pct, Print_debug
       USE GWFBASMODULE, ONLY: VBVL, DELT
       USE GWFUZFMODULE, ONLY: SEEPOUT, UZFETOUT, UZTSRAT, REJ_INF, GWET !, UZOLSFLX, UZFLWT
       USE GWFLAKMODULE, ONLY: EVAP, SURFA
 !Warning, modifies Basin_gwflow_cfs, Basin_cfs, Basin_cms, Basin_stflow,
 !                  Basin_ssflow_cfs, Basin_sroff_cfs
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, CLOSEZERO
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Active_area, &
-     &    Basin_area_inv, Hru_area, NEARZERO, Lake_hru_id, Lake_area, CLOSEZERO
-      USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Hru_actet, &
+     &    Basin_area_inv, Hru_area, Lake_hru_id, Lake_area
+      USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Hru_actet, Basin_sroff, &
      &    Basin_actet, Basin_ssstor, Ssres_stor, Slow_stor, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_gwflow_cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv
-!Warning, modifies Basin_soil_moist, Basin_ssstor
-      USE PRMS_SRUNOFF, ONLY: Basin_sroff
-!Warning, modifies Gw2sm_grav
+!Warning, modifies Basin_ssstor and Gw2sm_grav
       USE PRMS_SOILZONE, ONLY: Pref_flow_stor, Gravity_stor_res, Hrucheck, Gvr_hru_id, &
      &    Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
       IMPLICIT NONE
@@ -602,7 +599,6 @@
 !***********************************************************************
       SUBROUTINE MODFLOW_GET_STORAGE_UPW()
       USE GSFBUDGET, ONLY: Sat_S
-      USE PRMS_BASIN, ONLY: NEARZERO
       USE GLOBAL, ONLY: NCOL, NROW, NLAY, IBOUND, BOTM, HNEW, LBOTM, HOLD
       USE GWFBASMODULE, ONLY: DELT
       USE GWFUPWMODULE, ONLY: SC1, SC2UPW, Sn
@@ -687,7 +683,7 @@
       USE GWFSFRMODULE, ONLY: STRM, IOTSG, NSS, SGOTFLW, SFRRATOUT, &
      &    TOTSPFLOW, NSTRM, SFRRATIN
       USE PRMS_FLOWVARS, ONLY: Basin_cfs, Basin_cms, Basin_stflow_out
-      USE PRMS_BASIN, ONLY: CFS2CMS_CONV
+      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
       USE PRMS_SET_TIME, ONLY: Cfs2inches
       USE GLOBAL, ONLY : IUNIT
       USE GWFAGMODULE, ONLY:  NUMIRRDIVERSIONSP,IRRSEG

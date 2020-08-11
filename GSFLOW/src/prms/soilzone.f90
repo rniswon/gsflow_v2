@@ -24,7 +24,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2020-08-04'
+      character(len=*), parameter :: Version_soilzone = '2020-08-11'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag, Is_land
       INTEGER, SAVE, ALLOCATABLE :: Soil2gw(:), Pref_flow_flag(:)
@@ -1814,7 +1814,7 @@
         WRITE ( Restart_outunit ) Basin_prefflow, Basin_pref_flow_infil, Basin_pref_stor, Basin_gvr2pfr, Basin_dunnian_pfr
         WRITE ( Restart_outunit ) Basin_dndunnianflow, Basin_dninterflow, Basin_dncascadeflow, Basin_lakeinsz, Basin_lakeprecip
         WRITE ( Restart_outunit ) Pref_flow_stor
-        IF ( GSFLOW_flag==1 ) WRITE ( Restart_outunit ) Gravity_stor_res
+        IF ( GSFLOW_flag==ON ) WRITE ( Restart_outunit ) Gravity_stor_res
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
@@ -1824,6 +1824,6 @@
         READ ( Restart_inunit ) Basin_prefflow, Basin_pref_flow_infil, Basin_pref_stor, Basin_gvr2pfr, Basin_dunnian_pfr
         READ ( Restart_inunit ) Basin_dndunnianflow, Basin_dninterflow, Basin_dncascadeflow, Basin_lakeinsz, Basin_lakeprecip
         READ ( Restart_inunit ) Pref_flow_stor
-        IF ( GSFLOW_flag==1 ) READ ( Restart_inunit ) Gravity_stor_res
+        IF ( GSFLOW_flag==ON ) READ ( Restart_inunit ) Gravity_stor_res
       ENDIF
       END SUBROUTINE soilzone_restart

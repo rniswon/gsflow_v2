@@ -8,7 +8,7 @@
 !     ******************************************************************
       INTEGER FUNCTION gsflow_mf2prms()
       USE GSFMODFLOW, ONLY: Mfq2inch_conv, Gwc_col, Gwc_row, &
-                            Mfl2_to_acre, Mfl_to_inch, KKPER, KKSTP
+                            Mfl2_to_acre, Mfl_to_inch
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Gw2sm_grav
       USE GWFUZFMODULE, ONLY: SEEPOUT
       USE PRMS_MODULE, ONLY: Process, Nhrucell, Gvr_cell_id, Hru_ag_irr
@@ -22,12 +22,12 @@
 ! Functions
       EXTERNAL print_module
 ! Local Variables
+      character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW to PRMS'
+      character(len=*), parameter :: MODNAME = 'gsflow_mf2prms'
+      character(len=*), parameter :: Version_gsflow_mf2prms = '2020-08-11'
       INTEGER :: i, j, k, ihru
       integer :: IRWL,NMCL,SGNM
       DOUBLE PRECISION :: mf_q2prms_inch !, firr
-!      CHARACTER(LEN=14) :: MODNAME
-! Save Variables
-      CHARACTER(LEN=80), SAVE :: Version_gsflow_mf2prms
 !***********************************************************************
       gsflow_mf2prms = 0
 
@@ -68,9 +68,7 @@
         END IF
 
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_gsflow_mf2prms = 'gsflow_mf2prms.f90 2017-11-15 09:58:00Z'
-        CALL print_module(Version_gsflow_mf2prms, 'GSFLOW MODFLOW to PRMS      ', 90)
-!        MODNAME = 'gsflow_mf2prms'
+        CALL print_module(MODDESC, MODNAME, Version_gsflow_mf2prms)
       ENDIF
 
       END FUNCTION gsflow_mf2prms

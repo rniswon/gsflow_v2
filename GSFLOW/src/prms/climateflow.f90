@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2020-08-03'
+      character(len=*), parameter :: Version_climateflow = '2020-08-11'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -1414,7 +1414,7 @@
      &          Basin_sroff, Basin_recharge
         WRITE ( Restart_outunit ) Transp_on
         WRITE ( Restart_outunit ) Pkwater_equiv
-        IF ( Glacier_flag==1 ) THEN
+        IF ( Glacier_flag==ON ) THEN
           WRITE ( Restart_outunit) Glacier_frac
           WRITE ( Restart_outunit) Glrette_frac
           WRITE ( Restart_outunit) Alt_above_ela
@@ -1424,12 +1424,12 @@
         WRITE ( Restart_outunit ) Ssres_stor
         WRITE ( Restart_outunit ) Soil_rechr
         WRITE ( Restart_outunit ) Imperv_stor
-        IF ( GSFLOW_flag==0 ) WRITE ( Restart_outunit ) Gwres_stor
-        IF ( Dprst_flag==1 ) THEN
+        IF ( GSFLOW_flag==OFF ) WRITE ( Restart_outunit ) Gwres_stor
+        IF ( Dprst_flag==ON ) THEN
           WRITE ( Restart_outunit ) Dprst_vol_open
           WRITE ( Restart_outunit ) Dprst_vol_clos
         ENDIF
-        IF ( Stream_order_flag==1 ) THEN
+        IF ( Stream_order_flag==ON ) THEN
           WRITE ( Restart_outunit ) Seg_inflow
           WRITE ( Restart_outunit ) Seg_outflow
         ENDIF
@@ -1446,7 +1446,7 @@
      &         Basin_sroff, Basin_recharge
         READ ( Restart_inunit ) Transp_on
         READ ( Restart_inunit ) Pkwater_equiv
-        IF ( Glacier_flag==1 ) THEN
+        IF ( Glacier_flag==ON ) THEN
           READ ( Restart_inunit) Glacier_frac
           READ ( Restart_inunit) Glrette_frac
           READ ( Restart_inunit) Alt_above_ela
@@ -1456,12 +1456,12 @@
         READ ( Restart_inunit ) Ssres_stor
         READ ( Restart_inunit ) Soil_rechr
         READ ( Restart_inunit ) Imperv_stor
-        IF ( GSFLOW_flag==0 ) READ ( Restart_inunit ) Gwres_stor
-        IF ( Dprst_flag==1 ) THEN
+        IF ( GSFLOW_flag==OFF ) READ ( Restart_inunit ) Gwres_stor
+        IF ( Dprst_flag==ON ) THEN
           READ ( Restart_inunit ) Dprst_vol_open
           READ ( Restart_inunit ) Dprst_vol_clos
         ENDIF
-        IF ( Stream_order_flag==1 ) THEN
+        IF ( Stream_order_flag==ON ) THEN
           READ ( Restart_inunit ) Seg_inflow
           READ ( Restart_inunit ) Seg_outflow
         ENDIF

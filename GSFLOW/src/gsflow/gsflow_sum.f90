@@ -4,8 +4,13 @@
 !***********************************************************************
 
       MODULE GSFSUM
+      USE PRMS_CONSTANTS, ONLY: DEBUG_WB, DEBUG_less
+      USE PRMS_MODULE, ONLY: Print_debug
       IMPLICIT NONE
 !   Local Variables
+      character(len=*), parameter :: MODDESC = 'GSFLOW Output CSV Summary'
+      character(len=10), parameter :: MODNAME = 'gsflow_sum'
+      character(len=*), parameter :: Version_gsflow_sum = '2020-08-11'
       INTEGER, SAVE :: BALUNT
       DOUBLE PRECISION, PARAMETER :: ERRCHK = 0.0001D0
       INTEGER, SAVE :: Balance_unt, Vbnm_index(14), Gsf_unt, Rpt_count
@@ -25,7 +30,6 @@
       DOUBLE PRECISION, SAVE :: Basin_gsfstor, Last_Pref_S
       DOUBLE PRECISION, SAVE :: Last_Dprst_S, Rate_Dprst_S
       DOUBLE PRECISION, SAVE :: Lake2Unsat_Q, LakeExchng2Sat_Q, Stream2Unsat_Q
-      CHARACTER(LEN=10), SAVE :: MODNAME
 !      DOUBLE PRECISION, SAVE :: Cumvol_lakeppt, Cumvol_lakeevap, Cumvol_uzfet
 ! Added lake variables
       DOUBLE PRECISION, SAVE :: Rate_lakin, Rate_lakot, Cumvol_lakin
@@ -99,20 +103,15 @@
 !***********************************************************************
       INTEGER FUNCTION gsfsumdecl()
       USE GSFSUM
-      USE PRMS_MODULE, ONLY: Print_debug
       IMPLICIT NONE
       INTEGER, EXTERNAL :: declparam, declvar
       EXTERNAL :: print_module, PRMS_open_module_file
-! Local Variables
-      CHARACTER(LEN=80), SAVE :: Version_gsflow_sum
 !***********************************************************************
       gsfsumdecl = 0
 
-      Version_gsflow_sum = 'gsflow_sum.f90 2019-10-31 13:26:00Z'
-      CALL print_module(Version_gsflow_sum, 'GSFLOW Output CSV Summary   ', 90)
-      MODNAME = 'gsflow_sum'
+      CALL print_module(MODDESC, MODNAME, Version_gsflow_sum)
 
-      IF ( Print_debug==1 ) THEN
+      IF ( Print_debug==DEBUG_WB ) THEN
         CALL PRMS_open_module_file(BALUNT, 'gsflow_sum.wbal')
         WRITE ( BALUNT, 9001 )
       ENDIF
@@ -554,7 +553,7 @@
 !***********************************************************************
       INTEGER FUNCTION gsfsumrun()
       USE GSFSUM
-      USE GSFMODFLOW, ONLY: Mfl3t_to_cfs, KKSTP, KKPER, Have_lakes, Maxgziter
+      USE GSFMODFLOW, ONLY: Mfl3t_to_cfs, KKSTP, KKPER, Maxgziter
       USE GSFBUDGET, ONLY: NetBoundaryFlow2Sat_Q, Gw_bnd_in, Gw_bnd_out, Well_in, Basin_szreject, &
      &    Well_out, Stream_inflow, Basin_gw2sm, Sat_dS, StreamExchng2Sat_Q, Unsat_S, Sat_S, Basin_actetgw, Basin_fluxchange
 !      USE GSFPRMS2MF, ONLY: Basin_reach_latflow
@@ -564,16 +563,16 @@
      &    TOTSTOR_LAK, TOTWTHDRW_LAK, TOTRUNF_LAK, TOTSURFIN_LAK, &
      &    TOTSURFOT_LAK, TOTEVAP_LAK, TOTPPT_LAK
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_MODULE, ONLY: Print_debug, KKITER, Nobs, Timestep, Dprst_flag
+      USE PRMS_MODULE, ONLY: KKITER, Nobs, Timestep, Dprst_flag, Have_lakes
       USE PRMS_OBS, ONLY: Runoff, Runoff_units
-      USE PRMS_BASIN, ONLY: CFS2CMS_CONV
+      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       USE PRMS_FLOWVARS, ONLY: Basin_perv_et, Basin_swale_et, &
      &    Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_actet, &
-     &    Basin_soil_moist, Basin_ssstor, Basin_cfs
+     &    Basin_soil_moist, Basin_ssstor, Basin_cfs, Basin_sroff
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_evap, &
-     &    Basin_sroff, Basin_hortonian, Basin_hortonian_lakes, &
+     &    Basin_hortonian, Basin_hortonian_lakes, &
      &    Basin_infil, Basin_dprst_evap, Basin_dprst_volop, Basin_dprst_volcl
       USE PRMS_SNOW, ONLY: Basin_snowevap, Basin_snowmelt
       USE PRMS_INTCP, ONLY: Basin_intcp_evap
@@ -624,6 +623,7 @@
 
 ! convert basin_cfs from cfs over to modflow l3/t (volume per time step)
       StreamOut_Q = Basin_cfs/Mfl3t_to_cfs
+!      print *, basin_cfs, mfl3t_to_cfs, streamout_q
 
       IF ( Nobs<1 ) THEN
         obsq_cfs = -1.0D0
@@ -728,7 +728,7 @@
       Rate_wellot = Well_out
       NetWellFlow_Q = Rate_wellin - Rate_wellot
 
-      IF ( Print_debug==1 ) THEN
+      IF ( Print_debug==DEBUG_WB ) THEN
         et = Basin_perv_et + Basin_snowevap + Basin_imperv_evap + &
      &       Basin_intcp_evap + Basin_lakeevap + Basin_swale_et + &
      &       Basin_actetgw
@@ -780,6 +780,7 @@
      &            + Interflow2Stream_Q + Sroff2Stream_Q + DunnInterflow2Lake_Q + HortSroff2Lake_Q + SoilDrainage2Unsat_Q &
      &            + CapET_Q + ImpervEvap_Q + CanopyEvap_Q + SnowEvap_Q + SwaleEvap_Q + DprstEvap_Q
         IF ( ABS(hru_bal)/Cap_S>ERRCHK ) WRITE (BALUNT, *) 'Possible HRU water balance problem', hru_bal
+!        print *, hru_bal, Last_Canopy_S, Imperv_S, Last_Imperv_S, Dprst_S, Last_Dprst_S, lake_s, boundarystreamflow_q
         WRITE (BALUNT, 9002) Nowyear, Nowmonth, Nowday, hru_bal, Cap_S, Last_Cap_S, Grav_S, Last_Grav_S, SnowPweqv_S, &
      &                       Last_SnowPweqv_S, Canopy_S, Last_Canopy_S, Imperv_S, Last_Imperv_S, Dprst_S, Last_Dprst_S, &
      &                       Sat2Grav_Q, Precip_Q, &
@@ -788,6 +789,7 @@
       ENDIF
 
       IF ( Gsf_rpt==1 ) THEN
+!          print *, StreamOut_q, Unsat_S, Sat_S, UnsatStream_S, lake_s, NetWellFlow_Q
         WRITE ( Balance_unt, 9001 ) Nowmonth, Nowday, Nowyear, StreamOut_Q, &
      &          HortSroff2Stream_Q, DunnSroff2Stream_Q, Interflow2Stream_Q, Stream2Unsat_Q, StreamExchng2Sat_Q, &
      &          Canopy_S, SnowPweqv_S, Imperv_S, Dprst_S, Cap_S, Grav_S, Unsat_S, Sat_S, UnsatStream_S, Lake_S, Stream_s, &
@@ -877,19 +879,18 @@
       Last_Dprst_S = Dprst_S
 
  9001 FORMAT (2(I2.2, '/'), I4, 38(',', E15.7), ',', I5)
- 9002 FORMAT (I5, 2('/', I2.2), F12.3, 27(F11.0))
+ 9002 FORMAT (I5, 2('/', I2.2), 1X, F0.3, 27(1X,F0.1))
       END FUNCTION gsfsumrun
 
 !***********************************************************************
 !     gsfsumclean - Computes summary values
 !***********************************************************************
       INTEGER FUNCTION gsfsumclean()
-      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Gsf_rpt, BALUNT
-      USE PRMS_MODULE, ONLY: Print_debug
+      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Gsf_rpt, BALUNT, Print_debug, DEBUG_WB
       IMPLICIT NONE
 !***********************************************************************
       gsfsumclean = 0
-      IF ( Print_debug==1 ) CLOSE (BALUNT)
+      IF ( Print_debug==DEBUG_WB ) CLOSE (BALUNT)
       IF ( Gsf_rpt==1 ) CLOSE (Balance_unt)
       CLOSE (Gsf_unt)
       END FUNCTION gsfsumclean
@@ -899,8 +900,7 @@
 !***********************************************************************
       SUBROUTINE GSF_PRINT()
       USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Csv_output_file, Rpt_days, &
-     &    Gsflow_output_file, Gsf_rpt
-      USE PRMS_MODULE, ONLY: Print_debug, Logunt
+     &    Gsflow_output_file, Gsf_rpt, Print_debug, DEBUG_less
       IMPLICIT NONE
       INTEGER, EXTERNAL :: control_integer, control_string, numchars
       EXTERNAL GSF_HEADERS, read_error, PRMS_open_output_file
@@ -915,26 +915,23 @@
      &       Csv_output_file(:1)==CHAR(0) ) Csv_output_file = 'gsflow.csv'
 
         CALL PRMS_open_output_file(Balance_unt, Csv_output_file, 'csv_output_file', 0, ios)
-        IF ( ios/=0 ) STOP
+        IF ( ios/=0 ) ERROR STOP -3
       ENDIF
  
 ! Open the GSF volumetric balance report file
 
       IF ( control_integer(Rpt_days, 'rpt_days')/=0 ) CALL read_error(5, 'rpt_days')
-      IF ( Print_debug>-1 ) PRINT '(/,A,I4)', 'Water Budget print frequency is:', Rpt_days
-      IF ( Print_debug>-2 ) WRITE (Logunt, '(/,A,I4)') 'Water Budget print frequency is:', Rpt_days
+      IF ( Print_debug>DEBUG_less ) PRINT '(/,A,I4)', 'Water Budget print frequency is:', Rpt_days
       IF ( control_string(Gsflow_output_file, 'gsflow_output_file')/=0 ) CALL read_error(5, 'gsflow_output_file')
       IF ( Gsflow_output_file(:1)==' ' .OR. Gsflow_output_file(:1)==CHAR(0) ) Gsflow_output_file = 'gsflow.out'
 
       CALL PRMS_open_output_file(Gsf_unt, Gsflow_output_file, 'gsflow_output_file', 0, ios)
-      IF ( ios/=0 ) STOP
+      IF ( ios/=0 ) ERROR STOP -3
       nc = numchars(Gsflow_output_file)
-      IF ( Print_debug>-1 ) PRINT 9001, 'Writing GSFLOW Water Budget File: ', Gsflow_output_file(:nc)
-      IF ( Print_debug>-2 ) WRITE ( Logunt, 9001 ) 'Writing GSFLOW Water Budget File: ', Gsflow_output_file(:nc)
+      IF ( Print_debug>DEBUG_less ) PRINT 9001, 'Writing GSFLOW Water Budget File: ', Gsflow_output_file(:nc)
       IF ( Gsf_rpt==1 ) THEN
         nc = numchars(Csv_output_file)
-        IF ( Print_debug>-1 ) PRINT 9001, 'Writing GSFLOW CSV File: ', Csv_output_file(:nc)
-        IF ( Print_debug>-2 ) WRITE ( Logunt, 9001 ) 'Writing GSFLOW CSV File: ', Csv_output_file(:nc)
+        IF ( Print_debug>DEBUG_less ) PRINT 9001, 'Writing GSFLOW CSV File: ', Csv_output_file(:nc)
         CALL GSF_HEADERS()
       ENDIF
 
@@ -998,8 +995,7 @@
 !***********************************************************************
       USE GSFSUM
       USE GWFSFRMODULE, ONLY: STRMDELSTOR_RATE, STRMDELSTOR_CUM, IRTFLG
-      USE PRMS_MODULE, ONLY: KKITER
-      USE GSFMODFLOW, ONLY: Have_lakes
+      USE PRMS_MODULE, ONLY: KKITER, Have_lakes
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
       INTRINSIC ABS

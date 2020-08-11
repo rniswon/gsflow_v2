@@ -105,6 +105,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: SETDIMENS = 4
 
     ! Error Codes
+    integer, parameter :: ERROR_modflow = -5
     integer, parameter :: ERROR_read = -4
     integer, parameter :: ERROR_open_out = -3
     integer, parameter :: ERROR_open_in = -2
@@ -127,6 +128,13 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: ERROR_module = 16
     integer, parameter :: ERROR_lake = 17
     integer, parameter :: ERROR_soilzone = 18
+
+      ! debug print flag:
+      ! -2=DEBUG_minimum
+      ! -1=DEBUG_less
+      ! 0=DEBUG_normal; 1=DEBUG_WB (water balances); 2=basin;
+      ! 4=basin_sum; 5=DEBUG_SOLTAB; 7=soil zone;
+      ! 9=snowcomp; 13=cascade; 14=subbasin tree
     integer, parameter :: DEBUG_minimum = -2
     integer, parameter :: DEBUG_less = -1
     integer, parameter :: DEBUG_normal = 0

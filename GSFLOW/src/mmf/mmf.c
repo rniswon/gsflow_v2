@@ -142,7 +142,7 @@ int main (int argc, char *argv[]) {
     if (stat (*control_svar("param_file"), &stbuf) != -1) {
        if (stbuf.st_size) {
       } else {
-	     (void)fprintf (stderr,buf, "Parameter File: %s is empty.",
+	     (void)fprintf (stderr, "Parameter File: %s is empty.",
 		               *control_svar("param_file"));
         exit (1);
 	   }
@@ -176,7 +176,7 @@ int main (int argc, char *argv[]) {
 		if (stat (fname[i], &stbuf) != -1) {
 		   if (stbuf.st_size) {
 		  } else {
-			  (void)fprintf (stderr,buf, "ERROR: Parameter file: %s is empty.",
+			  (void)fprintf (stderr, "ERROR: Parameter file: %s is empty.",
 						   fname[i]);
 			  exit (1);
 		   }
@@ -197,7 +197,7 @@ int main (int argc, char *argv[]) {
 		if (stat (fname[i], &stbuf) != -1) {
 		   if (stbuf.st_size) {
 		  } else {
-			  (void)fprintf (stderr,buf, "ERROR: Parameter file: %s is empty.",
+			  (void)fprintf (stderr, "ERROR: Parameter file: %s is empty.",
 						   fname[i]);
 			  exit (1);
 		   }
