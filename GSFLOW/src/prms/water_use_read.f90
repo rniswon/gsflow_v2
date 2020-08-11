@@ -3,8 +3,17 @@
 ! from files pre-processed Data Files available for other PRMS modules
 !***********************************************************************
       MODULE PRMS_WATER_USE
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, MAXFILE_LENGTH, ON, OFF, &
+     &    RUN, DECL, INIT, CLEAN, ERROR_water_use
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nsegment, Nwateruse, Nexternal, Nconsumed, &
+     &    Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
+     &    External_transferON_OFF, Dprst_transferON_OFF, Dprst_flag, Strmflow_flag, &
+     &    Model, Starttime, Endtime, Inputerror_flag
+      IMPLICIT NONE
       ! Local Variables
-      CHARACTER(LEN=14), SAVE :: MODNAME
+      character(len=*), parameter :: MODDESC = 'Time Series Data'
+      character(len=*), parameter :: MODNAME = 'water_use_read'
+      character(len=*), parameter :: Version_water_use_read = '2020-08-03'
       ! Declared Variables
       DOUBLE PRECISION, SAVE :: Total_external_transfer, Total_external_gain
       REAL, ALLOCATABLE, SAVE :: External_transfer(:), External_gain(:), External_transfer_tot(:), External_gain_tot(:)
@@ -33,17 +42,14 @@
 
       INTEGER FUNCTION water_use_read()
       USE PRMS_WATER_USE
-      USE PRMS_MODULE, ONLY: Process, Nhru, Nsegment, Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
-     &    External_transferON_OFF, Dprst_transferON_OFF, Dprst_flag, Nwateruse, Strmflow_flag, &
-     &    Model, Starttime, Endtime, Nexternal, Nconsumed, Inputerror_flag, MAXFILE_LENGTH
       USE PRMS_BASIN, ONLY: Hru_perv !, Hru_area_dble
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowday, Nowmonth, Cfs_conv
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Soil_rechr_max, Dprst_vol_open !, Gwres_stor
       IMPLICIT NONE
 ! Functions
-      INTRINSIC SNGL, DBLE
+      INTRINSIC :: SNGL, DBLE
       INTEGER, EXTERNAL :: control_string, declvar, decldim, getdim
-      EXTERNAL read_error, find_header_end, find_current_file_time, read_event, print_module, PRMS_open_module_file
+      EXTERNAL :: read_error, find_header_end, find_current_file_time, read_event, print_module, PRMS_open_module_file, error_stop
 ! Control Parameters
       CHARACTER(LEN=MAXFILE_LENGTH) :: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file
       CHARACTER(LEN=MAXFILE_LENGTH) :: External_transfer_file, Lake_transfer_file
@@ -56,7 +62,6 @@
       INTEGER, SAVE :: segment_next_year, segment_next_month, segment_next_day
       INTEGER, SAVE :: lake_next_year, lake_next_month, lake_next_day
       DOUBLE PRECISION :: cfs_value, diversion_inches, transfer_rate_dble !, factor
-      CHARACTER(LEN=80), SAVE :: Version_water_use_read
 !***********************************************************************
       ! Types
       ! (1) stream segments; (2) groundwater reservoirs; (3) surface-depression storage;
@@ -65,58 +70,58 @@
 !***********************************************************************
       water_use_read = 0
 
-      IF ( Process(:3)=='run' ) THEN
-        IF ( External_transferON_OFF==1 ) THEN
+      IF ( Process_flag==RUN ) THEN
+        IF ( External_transferON_OFF==ON ) THEN
           CALL read_event(external_unit, 4, external_next_year, external_next_month, external_next_day)
           Total_external_transfer = 0.0D0
           External_transfer = 0.0
         ENDIF
-        IF ( External_transfers_on==1 ) THEN
+        IF ( External_transfers_on==ON ) THEN
           Total_external_gain = 0.0D0
           External_gain = 0.0
         ENDIF
 
-        IF ( Gwr_transferON_OFF==1 ) THEN
+        IF ( Gwr_transferON_OFF==ON ) THEN
           CALL read_event(gwr_unit, 2, gwr_next_year, gwr_next_month, gwr_next_day)
           Total_gwr_transfer = 0.0D0
           Gwr_transfer = 0.0
         ENDIF
-        IF ( Gwr_transfers_on==1 ) THEN
+        IF ( Gwr_transfers_on==ON ) THEN
           Total_gwr_gain = 0.0D0
           Gwr_gain = 0.0
         ENDIF
 
-        IF ( Dprst_transferON_OFF==1 ) THEN
+        IF ( Dprst_transferON_OFF==ON ) THEN
           CALL read_event(dprst_unit, 3, dprst_next_year, dprst_next_month, dprst_next_day)
           Total_dprst_transfer = 0.0D0
           Dprst_transfer = 0.0
         ENDIF
-        IF ( Dprst_transfers_on==1 ) THEN
+        IF ( Dprst_transfers_on==ON ) THEN
           Total_dprst_gain = 0.0D0
           Dprst_gain = 0.0
         ENDIF
 
-        IF ( Segment_transferON_OFF==1 ) THEN
+        IF ( Segment_transferON_OFF==ON ) THEN
           CALL read_event(segment_unit, 1, segment_next_year, segment_next_month, segment_next_day)
           Total_segment_transfer = 0.0D0
           Segment_transfer = 0.0
         ENDIF
-        IF ( Segment_transfers_on==1 ) THEN
+        IF ( Segment_transfers_on==ON ) THEN
           Total_segment_gain = 0.0D0
           Segment_gain = 0.0
         ENDIF
           
-        IF ( Lake_transferON_OFF==1 ) THEN
+        IF ( Lake_transferON_OFF==ON ) THEN
           CALL read_event(lake_unit, 5, lake_next_year, lake_next_month, lake_next_day)
           Total_lake_transfer = 0.0D0
           Lake_transfer = 0.0
         ENDIF
-        IF ( Lake_transfers_on==1 ) THEN
+        IF ( Lake_transfers_on==ON ) THEN
           Total_lake_gain = 0.0D0
           Lake_gain = 0.0
         ENDIF
 
-        IF ( Consumed_transfers_on==1 ) THEN
+        IF ( Consumed_transfers_on==ON ) THEN
           Total_consumed_gain = 0.0D0
           Consumed_gain = 0.0
         ENDIF
@@ -134,7 +139,7 @@
           transfer_rate_dble = DBLE( Transfer_rate(i) )
           Total_transfers = Total_transfers + transfer_rate_dble
 
-          IF ( Gwr_transfers_on==1 ) THEN
+          IF ( Gwr_transfers_on==ON ) THEN
             IF ( Source_type(i)==2 ) THEN
               Gwr_transfer(id_src) = Gwr_transfer(id_src) + Transfer_rate(i)
               Gwr_transfer_tot(id_src) = Gwr_transfer_tot(id_src) + Transfer_rate(i)
@@ -144,7 +149,7 @@
 !              cfs_value = Gwres_stor(id_src)*factor
 !              IF ( cfs_value<transfer_rate_dble ) THEN
 !                PRINT *, 'ERROR, not enough storage for transfer in GWR:', id_src, ' Date:', Nowyear, Nowmonth, Nowday
-!                STOP
+!                ERROR STOP ERROR_water_use
 !              ENDIF
 !              Gwres_stor(id_src) = Gwres_stor(id_src) - transfer_rate_dble/factor
             ENDIF
@@ -157,7 +162,7 @@
             ENDIF
           ENDIF
 
-          IF ( Dprst_transfers_on==1 ) THEN
+          IF ( Dprst_transfers_on==ON ) THEN
             ! WARNING, dprst transfers only apply to open depressions
             IF ( Source_type(i)==3 ) THEN
               Dprst_transfer(id_src) = Dprst_transfer(id_src) + Transfer_rate(i)
@@ -167,7 +172,7 @@
               IF ( cfs_value<transfer_rate_dble ) THEN
                 PRINT *, 'ERROR, not enough storage for transfer in surface-depression storage:', &
      &                   id_src, ' Date:', Nowyear, Nowmonth, Nowday
-                STOP
+                ERROR STOP ERROR_water_use
               ENDIF
               Dprst_vol_open(id_src) = Dprst_vol_open(id_src) - transfer_rate_dble/Cfs_conv
             ENDIF
@@ -179,7 +184,7 @@
             ENDIF
           ENDIF
 
-          IF ( Segment_transfers_on==1 ) THEN
+          IF ( Segment_transfers_on==ON ) THEN
             IF ( Source_type(i)==1 ) THEN
               Segment_transfer(id_src) = Segment_transfer(id_src) + Transfer_rate(i)
               Segment_transfer_tot(id_src) = Segment_transfer_tot(id_src) + Transfer_rate(i)
@@ -192,7 +197,7 @@
             ENDIF
           ENDIF
 
-          IF ( Lake_transfers_on==1 ) THEN
+          IF ( Lake_transfers_on==ON ) THEN
             IF ( Source_type(i)==5 ) THEN
               Lake_transfer(id_src) = Lake_transfer(id_src) + Transfer_rate(i)
               Lake_transfer_tot(id_src) = Lake_transfer_tot(id_src) + Transfer_rate(i)
@@ -201,7 +206,7 @@
 !             IF ( cfs_value<transfer_rate_dble ) THEN
 !               PRINT *, 'ERROR, not enough storage for transfer in lake:', &
 !    &                   id_src, ' Date:', Nowyear, Nowmonth, Nowday
-!               STOP
+!               ERROR STOP ERROR_water_use
 !             ENDIF
               !Lake_vol(id_src) = Lake_vol(id_src) - transfer_rate_dble
             ENDIF
@@ -213,7 +218,7 @@
             ENDIF
           ENDIF
 
-          IF ( External_transfers_on==1 ) THEN
+          IF ( External_transfers_on==ON ) THEN
             IF ( Source_type(i)==4 ) THEN
               External_transfer(id_src) = External_transfer(id_src) + Transfer_rate(i)
               External_transfer_tot(id_src) = External_transfer_tot(id_src) + Transfer_rate(i)
@@ -226,7 +231,7 @@
             ENDIF
           ENDIF
 
-          IF ( Consumed_transfers_on==1 ) THEN
+          IF ( Consumed_transfers_on==ON ) THEN
             IF ( Destination_type(i)==7 ) THEN
               Consumed_gain(id_dest) = Consumed_gain(id_dest) + Transfer_rate(i)
               Consumed_gain_tot(id_dest) = Consumed_gain_tot(id_dest) + Transfer_rate(i)
@@ -251,15 +256,13 @@
           ENDIF
         ENDDO
 
-      ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_water_use_read = 'water_use_read.f90 2017-03-21 10:26:00Z'
-        CALL print_module(Version_water_use_read, 'Time Series Data            ', 90)
-        MODNAME = 'water_use_read'
+      ELSEIF ( Process_flag==DECL ) THEN
+        CALL print_module(MODDESC, MODNAME, Version_water_use_read)
 
-        Dprst_transfers_on = 0
-        IF ( Dprst_flag==1 .OR. Model==99 ) THEN
-          IF ( Dprst_transferON_OFF==1 .OR. Model==99 ) THEN
-            Dprst_transfers_on = 1
+        Dprst_transfers_on = OFF
+        IF ( Dprst_flag==ON .OR. Model==DOCUMENTATION ) THEN
+          IF ( Dprst_transferON_OFF==ON .OR. Model==DOCUMENTATION ) THEN
+            Dprst_transfers_on = ON
             ALLOCATE ( Dprst_transfer(Nhru) )
             IF ( declvar(MODNAME, 'dprst_transfer', 'nhru', Nhru, 'real', &
      &           'Transfer flow rate from surface-depression storage for each HRU for each time step', &
@@ -283,15 +286,15 @@
           IF ( declvar(MODNAME, 'total_dprst_gain', 'one', 1, 'double', &
      &         'Transfer gains to all surface-depression storage for each time step', &
      &         'cfs', Total_dprst_gain)/=0 ) CALL read_error(1, 'total_dprst_gain')
-        ELSEIF ( Dprst_transferON_OFF==1 .AND. Model/=99 ) THEN
+        ELSEIF ( Dprst_transferON_OFF==ON .AND. Model/=DOCUMENTATION ) THEN
           PRINT *, 'ERROR, specified to transfer water from surface-depression storage when dprst_flag = 0'
           Inputerror_flag = 1
         ENDIF
 
-        Segment_transfers_on = 0
-        IF ( Strmflow_flag>1 .OR. Model==99 ) THEN
-          IF ( Segment_transferON_OFF==1 .OR. Model==99 ) THEN
-            Segment_transfers_on = 1
+        Segment_transfers_on = OFF
+        IF ( Strmflow_flag>1 .OR. Model==DOCUMENTATION ) THEN
+          IF ( Segment_transferON_OFF==ON .OR. Model==DOCUMENTATION ) THEN
+            Segment_transfers_on = ON
             ALLOCATE ( Segment_transfer(Nsegment) )
             IF ( declvar(MODNAME, 'segment_transfer', 'nsegment', Nsegment, 'real', &
      &           'Transfer flow rate from each stream segment for each time step', &
@@ -315,14 +318,14 @@
           IF ( declvar(MODNAME, 'total_segment_gain', 'one', 1, 'double', &
      &         'Transfer gains to all stream segments for each time step', &
      &         'cfs', Total_segment_gain)/=0 ) CALL read_error(1, 'total_segment_gain')
-        ELSEIF ( Segment_transferON_OFF==1 .AND. Model/=99 ) THEN
+        ELSEIF ( Segment_transferON_OFF==ON .AND. Model/=DOCUMENTATION ) THEN
           PRINT *, 'ERROR, specified to transfer water from stream segments when they are not present'
           Inputerror_flag = 1
         ENDIF
 
-        Gwr_transfers_on = 0
-        IF ( Gwr_transferON_OFF==1 .OR. Model==99 ) THEN
-          Gwr_transfers_on = 1
+        Gwr_transfers_on = OFF
+        IF ( Gwr_transferON_OFF==ON .OR. Model==DOCUMENTATION ) THEN
+          Gwr_transfers_on = ON
           ALLOCATE ( Gwr_transfer(Nhru) )
           IF ( declvar(MODNAME, 'gwr_transfer', 'nhru', Nhru, 'real', &
      &         'Transfer flow rate from the groundwater reservoir of each HRU for each time step', &
@@ -347,10 +350,10 @@
      &       'Flow to all groundwater reservoirs for each time step', &
      &       'cfs', Total_gwr_gain)/=0 ) CALL read_error(1, 'total_gwr_gain')
 
-        Lake_transfers_on = 0
-        IF ( Strmflow_flag==3 .OR. Model==99 ) THEN
-          IF ( Lake_transferON_OFF==1 .OR. Model==99 ) THEN
-            Lake_transfers_on = 1
+        Lake_transfers_on = OFF
+        IF ( Strmflow_flag==3 .OR. Model==DOCUMENTATION ) THEN
+          IF ( Lake_transferON_OFF==ON .OR. Model==DOCUMENTATION ) THEN
+            Lake_transfers_on = ON
             ALLOCATE ( Lake_transfer(Nhru) )
             IF ( declvar(MODNAME, 'lake_transfer', 'nhru', Nhru, 'real', &
      &           'Transfer flow rate from each lake HRU for each time step', &
@@ -374,14 +377,14 @@
           IF ( declvar(MODNAME, 'total_lake_gain', 'one', 1, 'double', &
      &         'Transfer gains to all lake HRUs for each time step', &
      &         'cfs', Total_lake_gain)/=0 ) CALL read_error(1, 'total_lake_gain')
-        ELSEIF ( Lake_transferON_OFF==1 .AND. Model/=99 ) THEN
+        ELSEIF ( Lake_transferON_OFF==ON .AND. Model/=DOCUMENTATION ) THEN
           PRINT *, 'ERROR, specified to transfer water from lakes when lake module is not active'
           Inputerror_flag = 1
         ENDIF
 
-        External_transfers_on = 0
-        IF ( (External_transferON_OFF==1.AND.Nexternal>0) .OR. Model==99 ) THEN
-          External_transfers_on = 1
+        External_transfers_on = OFF
+        IF ( (External_transferON_OFF==ON.AND.Nexternal>0) .OR. Model==DOCUMENTATION ) THEN
+          External_transfers_on = ON
           ALLOCATE ( External_transfer(Nexternal) )
           IF ( declvar(MODNAME, 'external_transfer', 'nexternal', Nexternal, 'real', &
      &         'Transfer flow rate from each external source for each time step', &
@@ -408,9 +411,9 @@
      &       'Transfer gains to all external locations for each time step', &
      &       'cfs', Total_external_gain)/=0 ) CALL read_error(1, 'total_external_gain')
 
-        Consumed_transfers_on = 0
+        Consumed_transfers_on = OFF
         IF ( Nconsumed>0 ) THEN
-          Consumed_transfers_on = 1
+          Consumed_transfers_on = ON
           ALLOCATE ( Consumed_gain(Nconsumed) )
           IF ( declvar(MODNAME, 'consumed_gain', 'nconsumed', Nconsumed, 'real', &
      &         'Transfer flow rate to each water-use comsumption destination for each time step', &
@@ -457,7 +460,7 @@
      &           'Transfer of each water-use transfer for each time step', &
      &           'cfs', Transfer_rate)/=0 ) CALL read_error(1, 'transfer_rate')
         
-      ELSEIF ( Process(:4)=='init' ) THEN
+      ELSEIF ( Process_flag==INIT ) THEN
         Ndiversions = 0
         year = Starttime(1)
         month = Starttime(2)
@@ -468,7 +471,7 @@
 10      FORMAT ( 'Water Use Summary File', /, 2(A, I5, 2('/',I2.2)), / ) 
 
         istop = 0
-        IF ( Segment_transferON_OFF==1 ) THEN ! type 1
+        IF ( Segment_transferON_OFF==ON ) THEN ! type 1
           IF ( control_string(Segment_transfer_file, 'segment_transfer_file')/=0 ) &
      &         CALL read_error(5, 'segment_transfer_file')
           CALL find_header_end(segment_unit, Segment_transfer_file, 'segment_transfer_file', ierr, 0, 0)
@@ -487,7 +490,7 @@
           Segment_gain_tot = 0.0
         ENDIF
 
-        IF ( Gwr_transferON_OFF==1 ) THEN ! type 2
+        IF ( Gwr_transferON_OFF==ON ) THEN ! type 2
           IF ( control_string(Gwr_transfer_file, 'gwr_transfer_file')/=0 ) &
      &         CALL read_error(5, 'gwr_transfer_file')
           CALL find_header_end(gwr_unit, Gwr_transfer_file, 'gwr_transfer_file', ierr, 0, 0)
@@ -505,7 +508,7 @@
         Gwr_gain_tot = 0.0
         Total_gwr_gain = 0.0D0
 
-        IF ( Dprst_transferON_OFF==1 ) THEN ! type 3
+        IF ( Dprst_transferON_OFF==ON ) THEN ! type 3
           IF ( control_string(Dprst_transfer_file, 'dprst_transfer_file')/=0 ) CALL read_error(5, 'dprst_transfer_file')
           CALL find_header_end(dprst_unit, Dprst_transfer_file, 'dprst_transfer_file', ierr, 0, 0)
           IF ( ierr==0 ) THEN
@@ -517,13 +520,13 @@
             istop = 1
           ENDIF
         ENDIF
-        IF ( Dprst_flag==1 ) THEN
+        IF ( Dprst_flag==ON ) THEN
           Dprst_gain = 0.0
           Dprst_gain_tot = 0.0
           Total_dprst_gain = 0.0D0
         ENDIF
 
-        IF ( External_transferON_OFF==1 ) THEN ! type 4
+        IF ( External_transferON_OFF==ON ) THEN ! type 4
           IF ( control_string(External_transfer_file, 'external_transfer_file')/=0 ) &
      &         CALL read_error(5, 'external_transfer_file')
           CALL find_header_end(external_unit, External_transfer_file, 'external_transfer_file', ierr, 0, 0)
@@ -543,7 +546,7 @@
           Total_external_gain = 0.0D0
         ENDIF
 
-        IF ( Lake_transferON_OFF==1 ) THEN ! Type 5
+        IF ( Lake_transferON_OFF==ON ) THEN ! Type 5
           IF ( control_string(Lake_transfer_file, 'lake_transfer_file')/=0 ) CALL read_error(5, 'lake_transfer_file')
           CALL find_header_end(lake_unit, Lake_transfer_file, 'lake_transfer_file', ierr, 0, 0)
           IF ( ierr==0 ) THEN
@@ -561,14 +564,14 @@
           Lake_gain_tot = 0.0
         ENDIF
 
-        IF ( istop==1 ) STOP 'ERROR in water_use_read module'
+        IF ( istop==1 ) CALL error_stop('in water_use_read module', ERROR_water_use)
 
         ! type 6
         Soilzone_gain = 0.0
         Soilzone_gain_tot = 0.0
         Total_soilzone_gain = 0.0D0
 
-        IF ( Consumed_transfers_on==1 ) THEN ! type 7
+        IF ( Consumed_transfers_on==ON ) THEN ! type 7
           Consumed_gain = 0.0
           Consumed_gain_tot = 0.0
           Total_consumed_gain = 0.0D0
@@ -594,31 +597,32 @@
 !*****************************
       SUBROUTINE read_event(Iunit, Src_type, Next_yr, Next_mo, Next_day)
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_WATER_USE, ONLY: ERROR_water_use, ON, OFF
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Iunit, Src_type
       INTEGER, INTENT (INOUT) :: Next_yr, Next_mo, Next_day
 ! Funcions
-      EXTERNAL check_event, set_transfers, is_eof
+      EXTERNAL :: check_event, set_transfers, is_eof
 ! Local Variables
       INTEGER src_id, dest_type, dest_id, keep_reading, ignore
       REAL transfer
 !*******************************************************************************
       IF ( Next_mo==0 ) RETURN ! already found end of file
-      keep_reading = 1
-      DO WHILE ( keep_reading==1 )
+      keep_reading = ON
+      DO WHILE ( keep_reading==ON )
         IF ( Next_yr==Nowyear .AND. Next_mo==Nowmonth .AND. Next_day==Nowday ) THEN
           READ ( Iunit, * ) Next_yr, Next_mo, Next_day, src_id, dest_type, dest_id, transfer
           IF ( dest_type>8 ) THEN
             PRINT *, 'ERROR, destination flag>8 for date:', Next_yr, Next_mo, Next_day, ' destination:', dest_type
-            STOP
+            ERROR STOP ERROR_water_use
           ENDIF
           CALL check_event(Src_type, dest_type, src_id, dest_id, ignore)
           IF ( ignore==0 ) CALL set_transfers(Src_type, src_id, dest_type, dest_id, transfer)
           CALL is_eof(Iunit, Next_yr, Next_mo, Next_day)
           IF ( Next_mo==0 ) keep_reading = 0
         ELSE
-          keep_reading = 0
+          keep_reading = OFF
         ENDIF
       ENDDO
       END SUBROUTINE read_event
@@ -628,11 +632,13 @@
 ! ****************************
       SUBROUTINE check_event(Src_type, Dest_type, Src_id, Dest_id, Ignore)
       USE PRMS_WATER_USE, ONLY: Outunit, Segment_transfers_on, Dprst_transfers_on, Lake_transfers_on, &
-     &    Consumed_transfers_on, External_transfers_on, Gwr_transfers_on
+     &    Consumed_transfers_on, External_transfers_on, Gwr_transfers_on, ERROR_water_use, ON, OFF
       USE PRMS_MODULE, ONLY: Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
      &    Dprst_transferON_OFF, External_transferON_OFF, Strmflow_flag, Nexternal, Dprst_flag
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
+! Functions
+      EXTERNAL :: error_stop
 ! Arguments
       INTEGER, INTENT(IN) :: Src_type, Dest_type, Src_id, Dest_id
       INTEGER, INTENT(OUT) :: Ignore
@@ -641,22 +647,22 @@
 
       Ignore = 0
        IF ( Src_type>5 ) THEN
-        PRINT *, 'ERROR, invalid src_type:', Src_type
-        STOP 'Valid src_type values are 1 to 5'
+        PRINT *, 'Invalid src_type:', Src_type
+        CALL error_stop('Valid src_type values are 1 to 5', ERROR_water_use)
       ENDIF
       IF ( Src_type==1 ) THEN
         IF ( Segment_transferON_OFF==0 ) THEN
           PRINT *, 'Warning, specified a stream segment transfer, but segment_transferON_OFF=0, transfer ignored'
           Ignore = 1
         ELSEIF ( Segment_transfers_on==0 ) THEN
-          STOP 'ERROR, specified a stream segment transfer, but stream segments not present in model'
+          CALL error_stop('specified a stream segment transfer, but stream segments not present in model', ERROR_water_use)
         ENDIF
       ENDIF
       IF ( Dest_type==1 ) THEN
         IF ( Strmflow_flag<2 ) THEN
-          STOP 'ERROR, specified a transfer to stream segment, but stream segments not present in model'
+          CALL error_stop('specified a transfer to stream segment, but stream segments not present in model', ERROR_water_use)
         ELSE
-         Segment_transfers_on = 1
+         Segment_transfers_on = ON
         ENDIF
       ENDIF
       IF ( Src_type==4 ) THEN
@@ -664,55 +670,55 @@
           PRINT *, 'Warning, specified a external transfer, but external_transferON_OFF=0, transfer ignored'
           Ignore = 1
         ELSEIF ( External_transfers_on==0 ) THEN
-          STOP 'ERROR, specified a external transfer, but external locations not present in model'
+          CALL error_stop('specified a external transfer, but external locations not present in model', ERROR_water_use)
         ENDIF
       ENDIF
       IF ( Dest_type==4 ) THEN
         IF ( Nexternal==0 ) THEN
-          STOP 'ERROR, specified a transfer to external location, but nexternal = 0'
+          CALL error_stop('specified a transfer to external location, but nexternal = 0', ERROR_water_use)
         ELSE
-          External_transfers_on = 1
+          External_transfers_on = ON
         ENDIF
       ENDIF
       IF ( Dest_type==7 ) THEN
-        IF ( Consumed_transfers_on==0 ) &
-     &       STOP 'ERROR, specified a consumption-use transfer, but consumption locations not present in model'
+        IF ( Consumed_transfers_on==OFF ) &
+     &       CALL error_stop('specified a consumption-use transfer, but consumption locations not present in model', ERROR_water_use)
       ENDIF
       IF ( Src_type==2 ) THEN
-        IF ( Gwr_transferON_OFF==0 ) THEN
+        IF ( Gwr_transferON_OFF==OFF ) THEN
           PRINT *, 'Warning, specified a groundwater transfer, but gwr_transferON_OFF=0, transfer ignored'
           Ignore = 1
         ENDIF
       ENDIF
-      IF ( Dest_type==2 ) Gwr_transfers_on = 1
+      IF ( Dest_type==2 ) Gwr_transfers_on = ON
       IF ( Src_type==3 ) THEN
-        IF ( Dprst_transferON_OFF==0 ) THEN
+        IF ( Dprst_transferON_OFF==OFF ) THEN
           PRINT *, 'Warning, specified a external transfer, but dprst_transferON_OFF=0, transfer ignored'
           Ignore = 1
-        ELSEIF ( Dprst_transfers_on==0 ) THEN
-          STOP 'ERROR, specified a surface-depression transfer, but dprst_flag=0'
+        ELSEIF ( Dprst_transfers_on==OFF ) THEN
+          CALL error_stop('specified a surface-depression transfer, but dprst_flag=0', ERROR_water_use)
         ENDIF
       ENDIF
       IF ( Dest_type==3 ) THEN
-        IF ( Dprst_flag==0 ) THEN
-          STOP 'ERROR, specified a transfer to depression storage, but dprst_flag = 0'
+        IF ( Dprst_flag==OFF ) THEN
+          CALL error_stop('specified a transfer to depression storage, but dprst_flag = 0', ERROR_water_use)
         ELSE
-          Dprst_transfers_on = 1
+          Dprst_transfers_on = ON
         ENDIF
       ENDIF
       IF ( Src_type==5 ) THEN
-        IF ( Lake_transferON_OFF==0 ) THEN
+        IF ( Lake_transferON_OFF==OFF ) THEN
           PRINT *, 'Warning, specified a lake transfer, but lake_transferON_OFF=0, transfer ignored'
           Ignore = 1
-        ELSEIF ( Lake_transfers_on==0 ) THEN
-          STOP 'ERROR, specified a lake transfer, but lake module is not active'
+        ELSEIF ( Lake_transfers_on==OFF ) THEN
+          CALL error_stop('specified a lake transfer, but lake module is not active', ERROR_water_use)
         ENDIF
       ENDIF
       IF ( Dest_type==5 ) THEN
         IF ( Strmflow_flag/=3 ) THEN
-          STOP 'ERROR, specified a transfer to lake, but lake simulation is inactive'
+          CALL error_stop('specified a transfer to lake, but lake simulation is inactive', ERROR_water_use)
         ELSE
-          Lake_transfers_on = 1
+          Lake_transfers_on = ON
         ENDIF
       ENDIF
       IF ( Src_type==Dest_type .AND. Dest_id==Src_id ) THEN
@@ -732,7 +738,7 @@
       INTEGER, INTENT(IN) :: Src_type, Src_id, Dest_type, Dest_id
       REAL, INTENT(IN) :: Diversion
 ! Functions
-      EXTERNAL check_transfer
+      EXTERNAL :: check_transfer
 !*******************************************************************************
       IF ( Src_type==4 ) THEN
         CALL check_transfer('external location', Src_type, Src_id, Dest_type, Dest_id, Diversion)
@@ -746,7 +752,7 @@
         CALL check_transfer('lake storage', Src_type, Src_id, Dest_type, Dest_id, Diversion)
       ELSE
         PRINT *, 'ERROR, invalid src_type:', Src_type
-        STOP
+        ERROR STOP ERROR_water_use
       ENDIF
       END SUBROUTINE set_transfers
 
@@ -758,7 +764,7 @@
       USE PRMS_MODULE, ONLY: Nwateruse
       IMPLICIT NONE
       ! Functions
-      EXTERNAL nwateruse_error
+      EXTERNAL :: nwateruse_error
       ! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: Ctype
       INTEGER, INTENT(IN) :: Src_type, Src_id, Dest_type, Dest_id
@@ -809,6 +815,7 @@
       END SUBROUTINE check_transfer
 
       SUBROUTINE nwateruse_error(ctype)
+      USE PRMS_CONSTANTS, ONLY: ERROR_water_use
       USE PRMS_MODULE, ONLY: Nwateruse
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
@@ -818,5 +825,5 @@
       PRINT ('(3A, I5)'), 'ERROR, too many water-use ', ctype, ': specified nwateruse=', Nwateruse
       PRINT *, '       increase nwateruse to number of unique transfers'
       PRINT *, Nowyear, Nowmonth, Nowday
-      STOP
+      ERROR STOP ERROR_water_use
       END SUBROUTINE nwateruse_error
