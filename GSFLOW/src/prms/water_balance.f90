@@ -53,32 +53,32 @@
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_water_balance
 !***********************************************************************
-      Version_water_balance = 'water_balance.f90 2020-06-05 12:57:00Z'
+      Version_water_balance = 'water_balance.f90 2020-06-10 10:00:00Z'
       CALL print_module(Version_water_balance, 'Water Balance Computations  ', 90 )
       MODNAME_WB = 'water_balance'
 
 ! Declare Variables
-      CALL declvar_dble(MODNAME_WB, 'basin_capillary_wb', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME_WB, 'basin_capillary_wb', 'one', 1, &
      &     'Basin area-weighted average capillary reservoir storage', &
      &     'inches', Basin_capillary_wb)
 
-      CALL declvar_dble(MODNAME_WB, 'basin_gravity_wb', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME_WB, 'basin_gravity_wb', 'one', 1, &
      &     'Basin area-weighted average gravity reservoir storage', &
      &     'inches', Basin_gravity_wb)
 
-      CALL declvar_dble(MODNAME_WB, 'basin_soilzone_wb', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME_WB, 'basin_soilzone_wb', 'one', 1, &
      &     'Basin area-weighted average storage in soilzone reservoirs', &
      &     'inches', Basin_soilzone_wb)
 
 !      ALLOCATE ( Hru_runoff(Nhru) )
-!      CALL declvar_dble(MODNAME, 'hru_runoff', 'nhru', Nhru, 'double', &
+!      CALL declvar_dble(MODNAME, 'hru_runoff', 'nhru', Nhru, &
 !     &     'Total lateral flow leaving each HRU (includes cascading flow)', &
 !     &     'inches', Hru_runoff)
 
       ALLOCATE ( Hru_storage_ante(Nhru) )
 
       IF ( Dprst_flag==1 ) THEN
-        CALL declvar_dble(MODNAME_WB, 'basin_dprst_wb', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME_WB, 'basin_dprst_wb', 'one', 1, &
      &       'Basin area-weighted average surface-depression storage water balance', &
      &       'inches', Basin_dprst_wb)
       ENDIF

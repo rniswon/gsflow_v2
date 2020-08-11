@@ -89,7 +89,7 @@
 
 ! Declare procedure
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_prms_summary = 'prms_summary.f90 2020-05-29 13:58:00Z'
+        Version_prms_summary = 'prms_summary.f90 2020-06-10 10:00:00Z'
         CALL print_module(Version_prms_summary, 'Output Summary              ', 90)
         MODNAME = 'prms_summary'
 
@@ -100,10 +100,10 @@
           IF ( ios/=0 ) ERROR STOP -1
         ENDIF
 
-        CALL declvar_dble(MODNAME, 'basin_total_storage', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_total_storage', 'one', 1, &
      &       'Basin area-weighted average storage in all water storage reservoirs', &
      &       'inches', Basin_total_storage)
-        CALL declvar_dble(MODNAME, 'basin_surface_storage', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_surface_storage', 'one', 1, &
      &       'Basin area-weighted average storage in all surface water storage reservoirs', &
      &       'inches', Basin_surface_storage)
 

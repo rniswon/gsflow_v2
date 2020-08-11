@@ -346,17 +346,17 @@
 !***********************************************************************
 ! declvar_dble - set up memory for double precision variables
 !***********************************************************************
-      SUBROUTINE declvar_dble(Modname, Varname, Dimenname, Numvalues, Data_type, Desc, Units, Values)
+      SUBROUTINE declvar_dble(Modname, Varname, Dimenname, Numvalues, Desc, Units, Values)
       USE PRMS_MMFAPI, ONLY: Num_variables, Variable_data
       IMPLICIT NONE
       ! Arguments
-      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Dimenname, Data_type, Desc, Units
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Dimenname, Desc, Units
       INTEGER, INTENT(IN) :: Numvalues
       DOUBLE PRECISION, TARGET :: Values(*)
       ! Functions
       EXTERNAL declvar
 !***********************************************************************
-      CALL declvar( Modname, Varname, Dimenname, Numvalues, Data_type, Desc, Units )
+      CALL declvar( Modname, Varname, Dimenname, Numvalues, 'double', Desc, Units )
       ALLOCATE ( Variable_data(Num_variables)%values_dble(Numvalues) )
       Variable_data(Num_variables)%values_dble => Values(:Numvalues)
       END SUBROUTINE declvar_dble
@@ -364,17 +364,17 @@
 !***********************************************************************
 ! declvar_real - set up memory for real variables
 !***********************************************************************
-      SUBROUTINE declvar_real(Modname, Varname, Dimenname, Numvalues, Data_type, Desc, Units, Values)
+      SUBROUTINE declvar_real(Modname, Varname, Dimenname, Numvalues, Desc, Units, Values)
       USE PRMS_MMFAPI, ONLY: Num_variables, Variable_data
       IMPLICIT NONE
       ! Arguments
-      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Dimenname, Data_type, Desc, Units
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Dimenname, Desc, Units
       INTEGER, INTENT(IN) :: Numvalues
       REAL, TARGET :: Values(*)
       ! Functions
       EXTERNAL declvar
 !***********************************************************************
-      CALL declvar( Modname, Varname, Dimenname, Numvalues, Data_type, Desc, Units )
+      CALL declvar( Modname, Varname, Dimenname, Numvalues, 'real', Desc, Units )
       ALLOCATE ( Variable_data(Num_variables)%values_real(Numvalues) )
       Variable_data(Num_variables)%values_real => Values(:Numvalues)
       END SUBROUTINE declvar_real
@@ -382,17 +382,17 @@
 !***********************************************************************
 ! declvar_int - set up memory for integer variables
 !***********************************************************************
-      SUBROUTINE declvar_int(Modname, Varname, Dimenname, Numvalues, Data_type, Desc, Units, Values)
+      SUBROUTINE declvar_int(Modname, Varname, Dimenname, Numvalues, Desc, Units, Values)
       USE PRMS_MMFAPI, ONLY: Num_variables, Variable_data
       IMPLICIT NONE
       ! Arguments
-      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Dimenname, Data_type, Desc, Units
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Dimenname, Desc, Units
       INTEGER, INTENT(IN) :: Numvalues
       INTEGER, TARGET :: Values(*)
       ! Functions
       EXTERNAL declvar
 !***********************************************************************
-      CALL declvar( Modname, Varname, Dimenname, Numvalues, Data_type, Desc, Units )
+      CALL declvar( Modname, Varname, Dimenname, Numvalues, 'integer', Desc, Units )
       ALLOCATE ( Variable_data(Num_variables)%values_int(Numvalues) )
       Variable_data(Num_variables)%values_int => Values(:Numvalues)
       END SUBROUTINE declvar_int

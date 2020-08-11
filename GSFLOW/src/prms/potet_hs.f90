@@ -5,32 +5,34 @@
 ! evapotranspiration from temperature. Transaction of ASAE 1(2):96-99.
 !***********************************************************************
       MODULE PRMS_POTET_HS
+        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR
+        USE PRMS_MODULE, ONLY: Process_flag, Nhru
         IMPLICIT NONE
         ! Local Variables
-        CHARACTER(LEN=8), SAVE :: MODNAME
+        character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
+        character(len=*), parameter :: MODNAME = 'potet_hs'
+        character(len=*), parameter :: Version_potet = '2020-08-03'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Hs_krs(:, :)
       END MODULE PRMS_POTET_HS
 
       INTEGER FUNCTION potet_hs()
       USE PRMS_POTET_HS
-      USE PRMS_MODULE, ONLY: Process, Nhru
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv
+      USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Tminc, Tmaxc, Swrad
       USE PRMS_SET_TIME, ONLY: Nowmonth
       IMPLICIT NONE
 ! Functions
-      INTRINSIC SQRT, DBLE, ABS
+      INTRINSIC :: SQRT, DBLE, ABS
       INTEGER, EXTERNAL :: declparam, getparam
-      EXTERNAL read_error, print_module
+      EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
       REAL :: temp_diff, swrad_inch_day !, coef_kt
-      CHARACTER(LEN=80), SAVE :: Version_potet
 !***********************************************************************
       potet_hs = 0
 
-      IF ( Process(:3)=='run' ) THEN
+      IF ( Process_flag==RUN ) THEN
         Basin_potet = 0.0D0
         DO j = 1, Active_hrus
           i = Hru_route_order(j)
@@ -51,12 +53,11 @@
         ENDDO
         Basin_potet = Basin_potet*Basin_area_inv
 
-      ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_potet = 'potet_hs.f90 2016-07-20 15:30:00Z'
-        CALL print_module(Version_potet, 'Potential Evapotranspiration', 90)
-        MODNAME = 'potet_hs'
+!******Declare parameters
+      ELSEIF ( Process_flag==DECL ) THEN
+        CALL print_module(MODDESC, MODNAME, Version_potet)
 
-        ALLOCATE ( Hs_krs(Nhru,12) )
+        ALLOCATE ( Hs_krs(Nhru,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'hs_krs', 'nhru,nmonths', 'real', &
      &       '0.0135', '0.01', '0.24', &
      &       'Potential ET adjustment factor - Hargreaves-Samani', &
@@ -64,8 +65,8 @@
      &       'decimal fraction')/=0 ) CALL read_error(1, 'hs_krs')
 
 !******Get parameters
-      ELSEIF ( Process(:4)=='init' ) THEN
-        IF ( getparam(MODNAME, 'hs_krs', Nhru*12, 'real', Hs_krs)/=0 ) CALL read_error(2, 'hs_krs')
+      ELSEIF ( Process_FLAG==INIT ) THEN
+        IF ( getparam(MODNAME, 'hs_krs', Nhru*MONTHS_PER_YEAR, 'real', Hs_krs)/=0 ) CALL read_error(2, 'hs_krs')
       ENDIF
 
       END FUNCTION potet_hs

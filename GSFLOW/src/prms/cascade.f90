@@ -82,7 +82,7 @@
 !***********************************************************************
       cascdecl = 0
 
-      Version_cascade = 'cascade.f90 2020-04-27 08:47:00Z'
+      Version_cascade = 'cascade.f90 2020-06-10 10:00:00Z'
       CALL print_module(Version_cascade, 'Cascading Flow              ', 90)
       MODNAME = 'cascade'
 
@@ -168,8 +168,8 @@
      &       'Index of GWR containing cascade area', &
      &       'none')/=0 ) CALL read_error(1, 'gw_up_id')
 
-        IF ( declparam(MODNAME, 'gw_strmseg_down_id', 'ncascdgw', &
-     &       'integer', '0', 'bounded', 'nsegment', &
+        IF ( declparam(MODNAME, 'gw_strmseg_down_id', 'ncascdgw', 'integer', &
+     &       '0', 'bounded', 'nsegment', &
      &       'Stream segment index that cascade area contributes flow', &
      &       'Index number of the stream segment that cascade area contributes flow', &
      &       'none')/=0 ) CALL read_error(1, 'gw_strmseg_down_id')

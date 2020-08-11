@@ -177,7 +177,7 @@
         CALL read_prms_data_file()
 
         IF ( GSFLOW_flag==1 .OR. Model==DOCUMENTATION ) THEN
-          CALL declvar_int(MODNAME, 'KKITER', 'one', 1, 'integer', &
+          CALL declvar_int(MODNAME, 'KKITER', 'one', 1, &
      &         'Current iteration in GSFLOW simulation', 'none', KKITER)
           IF ( declparam(MODNAME, 'mxsziter', 'one', 'integer', &
      &         '0', '0', '5000', &

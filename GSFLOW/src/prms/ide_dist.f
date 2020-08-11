@@ -71,21 +71,21 @@
       idedecl = 0
 
       Version_ide_dist =
-     +'ide_dist.f 2020-04-27 09:09:00Z'
+     +'ide_dist.f 2020-06-10 10:00:00Z'
       CALL print_module(Version_ide_dist,
      +                  'Temp & Precip Distribution  ', 77)
       MODNAME = 'ide_dist'
 
       IF ( Model/=99 ) THEN
         ALLOCATE ( Tmax_rain_sta(Nrain) )
-        CALL declvar_real(MODNAME, 'tmax_rain_sta','nrain',Nrain,'real',
+        CALL declvar_real(MODNAME, 'tmax_rain_sta', 'nrain', Nrain,
      +       'Maximum temperature distributed to the precipitation'//
      +       ' measurement stations',
      +       'degrees Fahrenheit',
      +       Tmax_rain_sta)
 
         ALLOCATE ( Tmin_rain_sta(Nrain) )
-        CALL declvar_real(MODNAME, 'tmin_rain_sta','nrain',Nrain,'real',
+        CALL declvar_real(MODNAME, 'tmin_rain_sta', 'nrain', Nrain,
      +       'Minimum temperature distributed to the precipitation'//
      +       ' measurement stations',
      +       'degrees Fahrenheit',

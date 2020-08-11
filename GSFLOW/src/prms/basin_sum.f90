@@ -95,107 +95,107 @@
 !***********************************************************************
       sumbdecl = 0
 
-      Version_basin_sum = 'basin_sum.f90 2020-05-29 14:00:00Z'
+      Version_basin_sum = 'basin_sum.f90 2020-06-10 10:00:00Z'
       CALL print_module(Version_basin_sum, 'Summary                     ', 90)
       MODNAME = 'basin_sum'
 
-      CALL declvar_dble(MODNAME, 'last_basin_stor', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'last_basin_stor', 'one', 1, &
      &     'Basin area-weighted average storage in all water storage reservoirs from previous time step', &
      &     'inches', Last_basin_stor)
-      CALL declvar_dble(MODNAME, 'watbal_sum', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'watbal_sum', 'one', 1, &
      &     'Water balance aggregate', &
      &     'inches', Watbal_sum)
-      CALL declvar_dble(MODNAME, 'obs_runoff_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'obs_runoff_mo', 'one', 1, &
      &     'Monthly measured streamflow at basin outlet', &
      &     'cfs', Obs_runoff_mo)
-      CALL declvar_dble(MODNAME, 'basin_cfs_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_cfs_mo', 'one', 1, &
      &     'Monthly total streamflow to stream network', &
      &     'cfs', Basin_cfs_mo)
-      CALL declvar_dble(MODNAME, 'obs_runoff_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'obs_runoff_yr', 'one', 1, &
      &     'Yearly measured streamflow at basin outlet', &
      &     'cfs', Obs_runoff_yr)
-      CALL declvar_dble(MODNAME, 'basin_cfs_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_cfs_yr', 'one', 1, &
      &     'Yearly total streamflow to stream network', &
      &     'cfs', Basin_cfs_yr)
-      CALL declvar_dble(MODNAME, 'basin_net_ppt_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_net_ppt_yr', 'one', 1, &
      &     'Yearly basin area-weighted average net precipitation', &
      &     'inches', Basin_net_ppt_yr)
-      CALL declvar_dble(MODNAME, 'basin_max_temp_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_max_temp_yr', 'one', 1, &
      &     'Yearly basin area-weighted average maximum temperature', &
      &     'temp_units', Basin_max_temp_yr)
-      CALL declvar_dble(MODNAME, 'basin_min_temp_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_min_temp_yr', 'one', 1, &
      &     'Yearly basin area-weighted average minimum temperature', &
      &     'temp_units', Basin_min_temp_yr)
-      CALL declvar_dble(MODNAME, 'basin_potet_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_potet_yr', 'one', 1, &
      &     'Yearly basin area-weighted average potential ET', &
      &     'temp_units', Basin_potet_yr)
-      CALL declvar_dble(MODNAME, 'basin_actet_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_actet_yr', 'one', 1, &
      &     'Yearly basin area-weighted average actual ET', &
      &     'inches', Basin_actet_yr)
-      CALL declvar_dble(MODNAME, 'basin_snowmelt_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_snowmelt_yr', 'one', 1, &
      &     'Yearly basin area-weighted average snowmelt', &
      &     'inches', Basin_snowmelt_yr)
-      CALL declvar_dble(MODNAME, 'basin_gwflow_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_gwflow_yr', 'one', 1, &
      &     'Yearly basin area-weighted average groundwater discharge', &
      &     'inches', Basin_gwflow_yr)
-      CALL declvar_dble(MODNAME, 'basin_ssflow_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_ssflow_yr', 'one', 1, &
      &     'Yearly basin area-weighted average interflow', &
      &     'inches', Basin_ssflow_yr)
-      CALL declvar_dble(MODNAME, 'basin_sroff_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_sroff_yr', 'one', 1, &
      &     'Yearly basin area-weighted average overland runoff', &
      &     'inches', Basin_sroff_yr)
-      CALL declvar_dble(MODNAME, 'basin_ppt_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_ppt_yr', 'one', 1, &
      &     'Yearly basin area-weighted average precipitation', &
      &     'inches', Basin_ppt_yr)
-      CALL declvar_dble(MODNAME, 'basin_stflow_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_stflow_yr', 'one', 1, &
      &     'Yearly basin area-weighted average streamflow', &
      &     'inches', Basin_stflow_yr)
-      CALL declvar_dble(MODNAME, 'obsq_inches_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'obsq_inches_yr', 'one', 1, &
      &     'Yearly measured streamflow at specified outlet station', &
      &     'inches', Obsq_inches_yr)
-      CALL declvar_dble(MODNAME, 'basin_intcp_evap_yr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_intcp_evap_yr', 'one', 1, &
      &     'Yearly basin area-weighted average canopy evaporation', &
      &     'inches', Basin_intcp_evap_yr)
-      CALL declvar_dble(MODNAME, 'obs_runoff_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'obs_runoff_tot', 'one', 1, &
      &     'Total simulation measured streamflow at basin outlet', &
      &     'cfs', Obs_runoff_tot)
-      CALL declvar_dble(MODNAME, 'basin_cfs_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_cfs_tot', 'one', 1, &
      &     'Total simulation basin area-weighted average streamflow', &
      &     'inches', Basin_cfs_tot)
-      CALL declvar_dble(MODNAME, 'basin_ppt_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_ppt_tot', 'one', 1, &
      &     'Total simulation basin area-weighted average precipitation', &
      &     'inches', Basin_ppt_tot)
-      CALL declvar_dble(MODNAME, 'basin_max_temp_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_max_temp_tot', 'one', 1, &
      &     'Total simulation basin area-weighted average maximum temperature', &
      &     'temp_units', Basin_max_temp_tot)
-      CALL declvar_dble(MODNAME, 'basin_min_temp_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_min_temp_tot', 'one', 1, &
      &     'Total simulation basin area-weighted average minimum temperature', &
      &     'temp_units', Basin_min_temp_tot)
-      CALL declvar_dble(MODNAME, 'basin_potet_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_potet_tot', 'one', 1, &
      &     'Total simulation basin area-weighted average potential ET', &
      &     'inches', Basin_potet_tot)
-      CALL declvar_dble(MODNAME, 'basin_actet_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_actet_tot', 'one', 1, &
      &     'Total simulation basin area-weighted average actual ET', &
      &     'inches', Basin_actet_tot)
-      CALL declvar_dble(MODNAME, 'basin_snowmelt_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_snowmelt_tot', 'one', 1, &
      &     'Total simulation basin area-weighted average snowmelt', &
      &     'inches', Basin_snowmelt_tot)
-      CALL declvar_dble(MODNAME, 'basin_gwflow_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_gwflow_tot', 'one', 1, &
      &     'Total simulation basin area-weighted average groundwater discharge' , &
      &     'inches', Basin_gwflow_tot)
-      CALL declvar_dble(MODNAME, 'basin_ssflow_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_ssflow_tot', 'one', 1, &
      &     'Total simulation basin area-weighted average interflow', &
      &     'inches', Basin_ssflow_tot)
-      CALL declvar_dble(MODNAME, 'basin_sroff_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_sroff_tot', 'one', 1, &
      &     'Total simulation basin area-weighted average overland flow', &
      &     'inches', Basin_sroff_tot)
-      CALL declvar_dble(MODNAME, 'basin_stflow_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_stflow_tot', 'one', 1, &
      &     'Total simulation basin area-weighted average streamflow', &
      &     'inches', Basin_stflow_tot)
-      CALL declvar_dble(MODNAME, 'obsq_inches_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'obsq_inches_tot', 'one', 1, &
      &     'Total simulation basin area-weighted average measured streamflow at specified outlet station', &
      &     'inches', Obsq_inches_tot)
-      CALL declvar_dble(MODNAME, 'basin_intcp_evap_tot', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_intcp_evap_tot', 'one', 1, &
      &     'Total simulation basin area-weighted average canopy evaporation', &
      &     'inches', Basin_intcp_evap_tot)
 
@@ -225,81 +225,81 @@
      &     ' 4=monthly; 8=daily; or additive combinations)', &
      &     'none')/=0 ) CALL read_error(1, 'print_freq')
 
-      CALL declvar_dble(MODNAME, 'basin_intcp_evap_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_intcp_evap_mo', 'one', 1, &
      &     'Monthly basin area-weighted average interception evaporation', &
      &     'inches', Basin_intcp_evap_mo)
 
-      CALL declvar_dble(MODNAME, 'basin_storage', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_storage', 'one', 1, &
      &     'Basin area-weighted average storage in all water storage reservoirs', &
      &     'inches', Basin_storage)
 
 !******************basin_storage volume:
-      CALL declvar_dble(MODNAME, 'basin_storvol', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_storvol', 'one', 1, &
      &     'Basin area-weighted average storage volume in all water storage reservoirs', &
      &     'acre-inches', Basin_storvol)
 
-      CALL declvar_dble(MODNAME, 'obsq_inches', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'obsq_inches', 'one', 1, &
      &     'Measured streamflow at specified outlet station', &
      &     'inches', Obsq_inches)
 
-      CALL declvar_dble(MODNAME, 'basin_ppt_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_ppt_mo', 'one', 1, &
      &     'Monthly basin area-weighted average precipitation', &
      &     'inches', Basin_ppt_mo)
 
-      CALL declvar_dble(MODNAME, 'basin_net_ppt_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_net_ppt_mo', 'one', 1, &
      &     'Monthly area-weighted average net precipitation', &
      &     'inches', Basin_net_ppt_mo)
 
-      CALL declvar_dble(MODNAME, 'basin_max_temp_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_max_temp_mo', 'one', 1, &
      &     'Monthly basin area-weighted average maximum air temperature', &
      &     'temp_units', Basin_max_temp_mo)
 
-      CALL declvar_dble(MODNAME, 'basin_min_temp_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_min_temp_mo', 'one', 1, &
      &     'Monthly basin area-weighted average minimum air temperature', &
      &     'temp_units', Basin_min_temp_mo)
 
-      CALL declvar_dble(MODNAME, 'basin_potet_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_potet_mo', 'one', 1, &
      &     'Monthly basin area-weighted average potential ET', &
      &     'inches', Basin_potet_mo)
 
-      CALL declvar_dble(MODNAME, 'basin_actet_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_actet_mo', 'one', 1, &
      &     'Monthly basin area-weighted average actual ET', &
      &     'inches', Basin_actet_mo)
 
-      CALL declvar_dble(MODNAME, 'basin_snowmelt_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_snowmelt_mo', 'one', 1, &
      &     'Monthly basin area-weighted average snowmelt', &
      &     'inches', Basin_snowmelt_mo)
 
-      CALL declvar_dble(MODNAME, 'basin_gwflow_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_gwflow_mo', 'one', 1, &
      &     'Monthly basin area-weighted average groundwater discharge', &
      &     'inches', Basin_gwflow_mo)
 
-      CALL declvar_dble(MODNAME, 'basin_ssflow_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_ssflow_mo', 'one', 1, &
      &     'Monthly basin area-weighted average interflow', &
      &     'inches', Basin_ssflow_mo)
 
-      CALL declvar_dble(MODNAME, 'basin_sroff_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_sroff_mo', 'one', 1, &
      &     'Monthly basin area-weighted average surface runoff', &
      &     'inches', Basin_sroff_mo)
 
-      CALL declvar_dble(MODNAME, 'basin_stflow_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_stflow_mo', 'one', 1, &
      &     'Monthly basin area-weighted average simulated streamflow', &
      &     'inches', Basin_stflow_mo)
 
-      CALL declvar_dble(MODNAME, 'obsq_inches_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'obsq_inches_mo', 'one', 1, &
      &     'Monthly measured streamflow at specified outlet station', &
      &     'inches', Obsq_inches_mo)
 
       ALLOCATE ( Hru_et_yr(Nhru) )
-      CALL declvar_dble(MODNAME, 'hru_et_yr', 'nhru', Nhru, 'double', &
+      CALL declvar_dble(MODNAME, 'hru_et_yr', 'nhru', Nhru, &
      &     'Yearly area-weighted average actual ET for each HRU', &
      &     'inches', Hru_et_yr)
 
-      CALL declvar_dble(MODNAME, 'basin_runoff_ratio_mo', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_runoff_ratio_mo', 'one', 1, &
      &     'Monthly area-weighted average discharge/precipitation', &
      &     'decimal fraction', Basin_runoff_ratio_mo)
 
-      CALL declvar_dble(MODNAME, 'basin_runoff_ratio', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_runoff_ratio', 'one', 1, &
      &     'Basin area-weighted average discharge/precipitation', &
      &     'decimal fraction', Basin_runoff_ratio)
 

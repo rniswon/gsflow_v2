@@ -73,7 +73,7 @@
       INTEGER :: i
       CHARACTER(LEN=80), SAVE :: Version_nhru_summary
 !***********************************************************************
-      Version_nhru_summary = 'nhru_summary.f90 2020-04-28 12:57:00Z'
+      Version_nhru_summary = 'nhru_summary.f90 2020-06-10 10:00:00Z'
       CALL print_module(Version_nhru_summary, 'Nhru Output Summary         ', 90)
       MODNAME = 'nhru_summary'
 

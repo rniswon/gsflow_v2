@@ -86,7 +86,7 @@
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Outflow_ts(:), Inflow_ts(:)
-      CHARACTER(LEN=9), SAVE :: MODNAME
+      CHARACTER(LEN=14), SAVE :: MODNAME
       END MODULE PRMS_MUSKINGUM
 
 !***********************************************************************
@@ -124,14 +124,13 @@
       USE PRMS_MODULE, ONLY: Nsegment, Strmflow_flag
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam
       EXTERNAL read_error, print_module
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_muskingum
 !***********************************************************************
       muskingum_decl = 0
 
-      Version_muskingum = 'muskingum.f90 2020-04-28 19:02:00Z'
+      Version_muskingum = 'muskingum.f90 2020-06-10 10:00:00Z'
       IF ( Strmflow_flag==4 ) THEN
         MODNAME = 'muskingum'
       ELSE
@@ -378,7 +377,7 @@
       ! Function
       EXTERNAL :: check_restart
       ! Local Variable
-      CHARACTER(LEN=9) :: module_name
+      CHARACTER(LEN=14) :: module_name
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME

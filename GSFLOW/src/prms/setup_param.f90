@@ -8,14 +8,14 @@
 !     Main setup routine
 !***********************************************************************
       INTEGER FUNCTION setup()
-      USE PRMS_MODULE, ONLY: Process
+      USE PRMS_MODULE, ONLY: Process_flag, DECL
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: setupdecl
 !***********************************************************************
       setup = 0
 
-      IF ( Process(:4)=='decl' ) setup = setupdecl()
+      IF ( Process_flag==DECL ) setup = setupdecl()
       END FUNCTION setup
 
 !***********************************************************************
@@ -26,17 +26,16 @@
 !***********************************************************************
       INTEGER FUNCTION setupdecl()
       IMPLICIT NONE
+      character(len=*), parameter :: MODDESC = 'Parameter Setup'
+      character(len=*), parameter :: MODNAME = 'setup_param'
+      character(len=*), parameter :: Version_setup = '2020-08-03'
 ! Functions
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL read_error, print_module
-      CHARACTER(LEN=5), SAVE :: MODNAME
-      CHARACTER(LEN=80), SAVE :: Version_setup
+      EXTERNAL :: read_error, print_module
 !***********************************************************************
       setupdecl = 0
 
-      Version_setup = 'setup_param.f90 2019-09-26 10:24:00Z'
-      CALL print_module(Version_setup, 'Parameter Setup             ', 90)
-      MODNAME = 'setup'
+      CALL print_module(MODDESC, MODNAME, Version_setup)
 
       IF (declparam(MODNAME, 'tosegment_nhm', 'nsegment', 'integer', &
      &     '0', '0', '9999999', &
@@ -53,10 +52,10 @@
      &     'National Hydrologic Model HRU ID', 'National Hydrologic Model HRU ID', &
      &     'none') /= 0 ) CALL read_error(1, 'nhm_id')
 
-!      IF ( declparam(MODNAME, 'poi_gage_id', 'npoigages', 'string', &
-!     &     '0', '0', '9999999', &
-!     &     'POI Gage ID', 'USGS stream gage for each POI gage', &
-!     &     'none')/=0 ) CALL read_error(1, 'poi_gage_id')
+      IF ( declparam(MODNAME, 'poi_gage_id', 'npoigages', 'string', &
+     &     '0', '0', '9999999', &
+     &     'POI Gage ID', 'USGS stream gage for each POI gage', &
+     &     'none')/=0 ) CALL read_error(1, 'poi_gage_id')
 
       IF ( declparam(MODNAME, 'poi_gage_segment', 'npoigages', 'integer', &
      &     '0', 'bounded', 'nsegment', &
@@ -74,7 +73,7 @@
      &     'Type code for each POI gage', 'Type code for each POI gage', &
      &     'none')/=0 ) CALL read_error(1, 'poi_type')
 
-      IF ( declparam(MODNAME, 'parent_poigages', 'npoigages','integer', &
+      IF ( declparam(MODNAME, 'parent_poigages', 'npoigages', 'integer', &
      &     '0', '0', '9999999', &
      &     'Lumen index in parent model for each POI gage','Lumen index in parent model for each POI gage', &
      &     'none')/=0 ) CALL read_error(1, 'parent_poigages')

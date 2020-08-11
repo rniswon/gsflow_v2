@@ -273,7 +273,7 @@
         IF ( Windspeed_cbh_flag==1 ) Basin_windspeed = Basin_windspeed*Basin_area_inv
 
       ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_climate_hru = 'climate_hru.f90 2020-04-27 08:56:00Z'
+        Version_climate_hru = 'climate_hru.f90 2020-06-10 10:00:00Z'
         MODNAME = 'climate_hru'
 
         IF ( control_integer(Cbh_check_flag, 'cbh_check_flag')/=0 ) Cbh_check_flag = 1
@@ -286,16 +286,16 @@
         IF ( Climate_transp_flag==1 .OR. Model==99 ) CALL print_module(Version_climate_hru, 'Transpiration Distribution  ', 90)
         IF ( Humidity_cbh_flag==1 .OR. Model==99 ) THEN
           ALLOCATE ( Humidity_hru(Nhru) )
-          CALL declvar_real(MODNAME, 'humidity_hru', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'humidity_hru', 'nhru', Nhru, &
      &         'Relative humidity of each HRU', &
      &         'percentage', Humidity_hru)
         ENDIF
         IF ( Windspeed_cbh_flag==1 .OR. Model==99 ) THEN
-          CALL declvar_dble(MODNAME, 'basin_windspeed', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'basin_windspeed', 'one', 1, &
      &         'Basin area-weighted average wind speed', &
      &         'meters/second', Basin_windspeed)
           ALLOCATE ( Windspeed_hru(Nhru) )
-          CALL declvar_real(MODNAME, 'windspeed_hru', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'windspeed_hru', 'nhru', Nhru, &
      &         'Area of HRU that is impervious', &
      &         'meters/second', Windspeed_hru)
         ENDIF

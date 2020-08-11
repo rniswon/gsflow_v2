@@ -65,12 +65,12 @@
 !***********************************************************************
       prms2mfdecl = 0
 
-      Version_gsflow_prms2mf = 'gsflow_prms2mf.f90 2020-40-30 14:24:00Z'
+      Version_gsflow_prms2mf = 'gsflow_prms2mf.f90 2020-06-10 10:00:00Z'
       CALL print_module(Version_gsflow_prms2mf, 'GSFLOW PRMS to MODFLOW      ', 90)
       MODNAME = 'gsflow_prms2mf'
 
 ! Declared Variables
-      CALL declvar_dble(MODNAME, 'net_sz2gw', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'net_sz2gw', 'one', 1, &
      &     'Net volumetric flow rate of gravity drainage from the'// &
      &     ' soil zone to the unsaturated and saturated zones', &
      &     'L3/T', Net_sz2gw)
@@ -87,22 +87,22 @@
 !    &     'none', Reach_id)/=0 ) CALL read_error(3, 'reach_id')
 
       ALLOCATE (Cell_drain_rate(Ngwcell))
-      CALL declvar_real(MODNAME, 'cell_drain_rate', 'ngwcell', Ngwcell, 'real', &
+      CALL declvar_real(MODNAME, 'cell_drain_rate', 'ngwcell', Ngwcell, &
      &     'Recharge rate for each cell', &
      &     'L/T', Cell_drain_rate)
 
-      CALL declvar_dble(MODNAME, 'basin_reach_latflow', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_reach_latflow', 'one', 1, &
      &     'Lateral flow into all reaches in basin', &
      &     'cfs', Basin_reach_latflow)
 
       ALLOCATE (Gw_rejected_grav(Nhrucell))
-      CALL declvar_real(MODNAME, 'gw_rejected_grav', 'nhrucell', Nhrucell, 'real', &
+      CALL declvar_real(MODNAME, 'gw_rejected_grav', 'nhrucell', Nhrucell, &
      &   'Recharge rejected by UZF for each gravity-flow reservoir', &
      &   'inches', Gw_rejected_grav)
 
       !rsr, all reaches receive same precentage of flow to each segment
       ALLOCATE (Segment_pct_area(Nsegment))
-!      CALL declvar_dble(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, 'double', &
+!      CALL declvar_dble(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, &
 !     &     'Proportion of each segment that contributes flow to a stream reach', &
 !     &     'decimal fraction', Segment_pct_area)
 
@@ -114,7 +114,7 @@
         ! new parameter segment_reach_fraction or reach_carea or change cascade
         ! procedure to cascade flow to reaches instead of segments
 !        ALLOCATE (Segment_reach_fraction(Nreach))
-!        IF ( declparam(MODNAME, 'segment_reach_fraction', 'nreach', 'read', &
+!        IF ( declparam(MODNAME, 'segment_reach_fraction', 'nreach', 'real', &
 !      &      '0.0', '0.0', '1.0', &
 !      &      'Proportion of each segment that contributes flow to a stream reach', &
 !      &      'Proportion of each segment that contributes flow to a stream reach', &

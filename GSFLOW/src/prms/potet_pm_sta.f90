@@ -7,10 +7,13 @@
 !   central Nebraska-USA: Journal of Hydrology, V. 420-421, p. 228-244
 !***********************************************************************
       MODULE PRMS_POTET_PM_STA
+        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR, INCH2MM
+        USE PRMS_MODULE, ONLY: Process_flag, Nhru, Parameter_check_flag, Inputerror_flag
         IMPLICIT NONE
         ! Local Variables
-        CHARACTER(LEN=12), SAVE :: MODNAME
-        !REAL, SAVE, ALLOCATABLE :: Tavgc_ante(:) ! if Tavgc_ante is used in future, need to add save in restart file
+        character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
+        character(len=*), parameter :: MODNAME = 'potet_pm_sta'
+        character(len=*), parameter :: Version_potet = '2020-08-03'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Pm_n_coef(:, :), Pm_d_coef(:, :), Crop_coef(:, :)
         INTEGER, SAVE, ALLOCATABLE :: Hru_windspeed_sta(:), Hru_humidity_sta(:)
@@ -19,8 +22,7 @@
 !***********************************************************************
       INTEGER FUNCTION potet_pm_sta()
       USE PRMS_POTET_PM_STA
-      USE PRMS_MODULE, ONLY: Process, Nhru, Parameter_check_flag, Inputerror_flag
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Hru_elev_meters
+      USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Swrad, Tminc, Tmaxc, &
      &    Tempc_dewpt, Vp_actual, Lwrad_net, Vp_slope, Vp_sat, Basin_humidity
       USE PRMS_OBS, ONLY: Humidity, Wind_speed, Nwind, Nhumid
@@ -28,19 +30,18 @@
       USE PRMS_SET_TIME, ONLY: Nowmonth, Jday
       IMPLICIT NONE
 ! Functions
-      INTRINSIC SQRT, DBLE, LOG, SNGL
+      INTRINSIC :: DBLE, LOG, SNGL
       INTEGER, EXTERNAL :: declparam, getparam
       REAL, EXTERNAL :: sat_vapor_press
-      EXTERNAL read_error, print_module, checkdim_param_limits
+      EXTERNAL :: read_error, print_module, checkdim_param_limits
 ! Local Variables
       INTEGER :: i, j
       REAL :: elh, prsr, psycnst, heat_flux, net_rad, vp_deficit, a, b, c 
       REAL :: A1, B1, t1, num, den, stab, sw
-      CHARACTER(LEN=80), SAVE :: Version_potet
 !***********************************************************************
       potet_pm_sta = 0
 
-      IF ( Process(:3)=='run' ) THEN
+      IF ( Process_flag==RUN ) THEN
         Basin_potet = 0.0D0
         Basin_humidity = 0.0D0
         DO j = 1, Active_hrus
@@ -127,7 +128,7 @@
 !  PM equation with crop_coef in mm/day
 !          Potet(i) = (a + b)/c
           Potet(i) = Crop_coef(i, Nowmonth) * (a + b)/c
-          Potet(i) = Potet(i) / 25.4
+          Potet(i) = Potet(i) / INCH2MM
 
 ! may be able to use intrinsic ISNAN
 !          if (potet(i) .ne. potet(i)) then
@@ -137,32 +138,30 @@
           IF ( Potet(i)<0.0 ) Potet(i) = 0.0
           Basin_potet = Basin_potet + DBLE( Potet(i)*Hru_area(i) )
           Basin_humidity = Basin_humidity + DBLE( Hru_humidity_sta(i)*Hru_area(i) )
-!          Tavgc_ante(i) = Tavgc(i)
         ENDDO
         Basin_potet = Basin_potet*Basin_area_inv
         Basin_humidity = Basin_humidity*Basin_area_inv
 
-      ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_potet = 'potet_pm_sta.f90 2018-04-18 11:10:00Z'
-        CALL print_module(Version_potet, 'Potential Evapotranspiration', 90)
-        MODNAME = 'potet_pm_sta'
+!******Declare parameters
+      ELSEIF ( Process_flag==DECL ) THEN
+        CALL print_module(MODDESC, MODNAME, Version_potet)
 
         ! Declare Parameters
-        ALLOCATE ( Pm_n_coef(Nhru,12) )
+        ALLOCATE ( Pm_n_coef(Nhru,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'pm_n_coef', 'nhru,nmonths', 'real', &
      &       '900.0', '850.0', '950.0', &
      &       'Penman-Monteith coefficient', &
      &       'Monthly (January to December) Penman-Monteith potential ET N temperauture coefficient for each HRU', &
      &       'degrees Celsius per day')/=0 ) CALL read_error(1, 'pm_n_coef')
 
-        ALLOCATE ( Pm_d_coef(Nhru,12) )
+        ALLOCATE ( Pm_d_coef(Nhru,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'pm_d_coef', 'nhru,nmonths', 'real', &
      &       '0.34', '0.25', '0.45', &
      &       'Penman-Monteith coefficient', &
      &       'Monthly (January to December) Penman-Monteith potential ET D wind-speed coefficient for each HRU', &
      &       'seconds/meters')/=0 ) CALL read_error(1, 'pm_d_coef')
 
-        ALLOCATE ( Crop_coef(Nhru,12) )
+        ALLOCATE ( Crop_coef(Nhru,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'crop_coef', 'nhru,nmonths', 'real', &
      &       '1.0', '0.0', '2.0', &
      &       'Crop coefficient for each HRU', &
@@ -184,11 +183,11 @@
      &       'none')/=0 ) CALL read_error(1, 'hru_humidity_sta')
 
 !******Get parameters
-      ELSEIF ( Process(:4)=='init' ) THEN
+      ELSEIF ( Process_flag==INIT ) THEN
         Vp_sat = 0.0
-        IF ( getparam(MODNAME, 'pm_n_coef', Nhru*12, 'real', Pm_n_coef)/=0 ) CALL read_error(2, 'pm_n_coef')
-        IF ( getparam(MODNAME, 'pm_d_coef', Nhru*12, 'real', Pm_d_coef)/=0 ) CALL read_error(2, 'pm_d_coef')
-        IF ( getparam(MODNAME, 'crop_coef', Nhru*12, 'real', Crop_coef)/=0 ) CALL read_error(2, 'crop_coef')
+        IF ( getparam(MODNAME, 'pm_n_coef', Nhru*MONTHS_PER_YEAR, 'real', Pm_n_coef)/=0 ) CALL read_error(2, 'pm_n_coef')
+        IF ( getparam(MODNAME, 'pm_d_coef', Nhru*MONTHS_PER_YEAR, 'real', Pm_d_coef)/=0 ) CALL read_error(2, 'pm_d_coef')
+        IF ( getparam(MODNAME, 'crop_coef', Nhru*MONTHS_PER_YEAR, 'real', Crop_coef)/=0 ) CALL read_error(2, 'crop_coef')
         IF ( getparam(MODNAME, 'hru_windspeed_sta', Nhru, 'integer', Hru_windspeed_sta)/=0 ) CALL read_error(2,'hru_windspeed_sta')
         IF ( getparam(MODNAME, 'hru_humidity_sta', Nhru, 'integer', Hru_humidity_sta)/=0 ) CALL read_error(2, 'hru_humidity_sta')
         IF ( Parameter_check_flag>0 ) THEN
@@ -198,9 +197,6 @@
             CALL checkdim_param_limits(i, 'hru_humidity_sta', 'nhru', Hru_humidity_sta(i), 1, Nhumid, Inputerror_flag)
           ENDDO
         ENDIF
-
-        !ALLOCATE ( Tavgc_ante(Nhru) )
-        !Tavgc_ante = Tavgc
 
       ENDIF
 

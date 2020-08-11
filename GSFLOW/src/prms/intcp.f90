@@ -63,13 +63,13 @@
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL read_error, print_module, declvar_real, declvar_dble, declvar_int
+      EXTERNAL read_error, print_module, declvar_real, declvar_int, declvar_dble
 ! Local Variables
       CHARACTER(LEN=80), SAVE :: Version_intcp
 !***********************************************************************
       intdecl = 0
 
-      Version_intcp = 'intcp.f90 2020-04-27 19:05:00Z'
+      Version_intcp = 'intcp.f90 2020-06-10 10:00:00Z'
       CALL print_module(Version_intcp, 'Canopy Interception         ', 90)
       MODNAME = 'intcp'
 
@@ -78,14 +78,14 @@
       IF ( Water_use_flag==1 .OR. Model==99 ) THEN
         Use_transfer_intcp = 1
         ALLOCATE ( Gain_inches(Nhru) )
-        CALL declvar_dble(MODNAME, 'basin_net_apply', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_net_apply', 'one', 1, &
      &       'Basin area-weighted average net_apply', &
      &       'inches', Basin_net_apply)
-        CALL declvar_dble(MODNAME, 'basin_hru_apply', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_hru_apply', 'one', 1, &
      &       'Basin area-weighted average canopy_gain', &
      &       'inches', Basin_hru_apply)
         ALLOCATE ( Net_apply(Nhru) )
-        CALL declvar_real(MODNAME, 'net_apply', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'net_apply', 'nhru', Nhru, &
      &       'canopy_gain minus interception', &
      &       'inches', Net_apply)
         ALLOCATE ( Irr_type(Nhru) )
@@ -98,81 +98,81 @@
       ENDIF
 
       ALLOCATE ( Hru_intcpevap(Nhru) )
-      CALL declvar_real(MODNAME, 'hru_intcpevap', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_intcpevap', 'nhru', Nhru, &
      &     'HRU area-weighted average evaporation from the canopy for each HRU', &
      &     'inches', Hru_intcpevap)
 
       ALLOCATE ( Net_rain(Nhru) )
-      CALL declvar_real(MODNAME, 'net_rain', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'net_rain', 'nhru', Nhru, &
      &     'Rain that falls through canopy for each HRU', &
      &     'inches', Net_rain)
 
       ALLOCATE ( Net_snow(Nhru) )
-      CALL declvar_real(MODNAME, 'net_snow', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'net_snow', 'nhru', Nhru, &
      &     'Snow that falls through canopy for each HRU', &
      &     'inches', Net_snow)
 
       ALLOCATE ( Net_ppt(Nhru) )
-      CALL declvar_real(MODNAME, 'net_ppt', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'net_ppt', 'nhru', Nhru, &
      &     'Precipitation (rain and/or snow) that falls through the canopy for each HRU', &
      &     'inches', Net_ppt)
 
-      CALL declvar_dble(MODNAME, 'basin_net_ppt', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_net_ppt', 'one', 1, &
      &     'Basin area-weighted average throughfall', &
      &     'inches', Basin_net_ppt)
 
-      CALL declvar_dble(MODNAME, 'basin_net_snow', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_net_snow', 'one', 1, &
      &     'Basin area-weighted average snow throughfall', &
      &     'inches', Basin_net_snow)
 
-      CALL declvar_dble(MODNAME, 'basin_net_rain', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_net_rain', 'one', 1, &
      &     'Basin area-weighted average rain throughfall', &
      &     'inches', Basin_net_rain)
 
       ALLOCATE ( Intcp_stor(Nhru) )
-      CALL declvar_real(MODNAME, 'intcp_stor', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'intcp_stor', 'nhru', Nhru, &
      &     'Interception storage in canopy for cover density for each HRU', &
      &     'inches', Intcp_stor)
 
-      CALL declvar_dble(MODNAME, 'basin_intcp_stor', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_intcp_stor', 'one', 1, &
      &     'Basin area-weighted average interception storage', &
      &     'inches', Basin_intcp_stor)
 
       ALLOCATE ( Intcp_evap(Nhru) )
-      CALL declvar_real(MODNAME, 'intcp_evap', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'intcp_evap', 'nhru', Nhru, &
      &     'Evaporation from the canopy for each HRU', &
      &     'inches', Intcp_evap)
 
-      CALL declvar_dble(MODNAME, 'basin_intcp_evap', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_intcp_evap', 'one', 1, &
      &     'Basin area-weighted evaporation from the canopy', &
      &     'inches', Basin_intcp_evap)
 
       ALLOCATE ( Hru_intcpstor(Nhru) )
-      CALL declvar_real(MODNAME, 'hru_intcpstor', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_intcpstor', 'nhru', Nhru, &
      &     'HRU area-weighted average Interception storage in the canopy for each HRU', &
      &     'inches', Hru_intcpstor)
 
       ALLOCATE ( Intcp_form(Nhru) )
-      CALL declvar_int(MODNAME, 'intcp_form', 'nhru', Nhru, 'integer', &
+      CALL declvar_int(MODNAME, 'intcp_form', 'nhru', Nhru, &
      &     'Form (rain or snow) of interception for each HRU', &
      &     'none', Intcp_form)
 
       ALLOCATE ( Intcp_on(Nhru) )
-      CALL declvar_int(MODNAME, 'intcp_on', 'nhru', Nhru, 'integer', &
+      CALL declvar_int(MODNAME, 'intcp_on', 'nhru', Nhru, &
      &     'Flag indicating interception storage for each HRU (0=no; 1=yes)', &
      &     'none', Intcp_on)
 
       ALLOCATE ( Canopy_covden(Nhru) )
-      CALL declvar_real(MODNAME, 'canopy_covden', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'canopy_covden', 'nhru', Nhru, &
      &     'Canopy cover density for each HRU', &
      &     'decimal fraction', Canopy_covden)
 
       ALLOCATE ( Intcp_changeover(Nhru) )
-      CALL declvar_real(MODNAME, 'intcp_changeover', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'intcp_changeover', 'nhru', Nhru, &
      &     'Water released from a change over of canopy cover type for each HRU', &
      &     'inches', Intcp_changeover)
 
-      CALL declvar_dble(MODNAME, 'basin_changeover', 'nhru', Nhru, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_changeover', 'nhru', Nhru, &
      &     'Basin area-weighted average water released from a change over of canopy cover type', &
      &     'inches', Basin_changeover)
 

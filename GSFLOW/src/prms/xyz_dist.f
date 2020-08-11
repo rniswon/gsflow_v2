@@ -130,25 +130,25 @@
       xyzdecl = 0
 
       Version_xyz_dist =
-     +'xyz_dist.f 2018-04-18 11:09:00Z'
+     +'xyz_dist.f 2020-06-10 10:00:00Z'
       CALL print_module(Version_xyz_dist,
      +                  'Temp & Precip Distribution  ', 77)
       MODNAME = 'xyz_dist'
 
-      CALL declvar_int(MODNAME, 'is_rain_day', 'one', 1, 'integer',
+      CALL declvar_int(MODNAME, 'is_rain_day', 'one', 1,
      +     'Flag to indicate if it is raining anywhere in the basin',
      +     'none',
      +     Is_rain_day)
 
       ALLOCATE ( Tmax_rain_sta(Nrain) )
-      CALL declvar_real(MODNAME, 'tmax_rain_sta', 'nrain', Nrain,'real',
+      CALL declvar_real(MODNAME, 'tmax_rain_sta', 'nrain', Nrain,
      +     'Maximum temperature distributed to the precipitation'//
      +     ' measurement stations',
      +     'degrees Fahrenheit',
      +     Tmax_rain_sta)
 
       ALLOCATE ( Tmin_rain_sta(Nrain) )
-      CALL declvar_real(MODNAME, 'tmin_rain_sta', 'nrain', Nrain,'real',
+      CALL declvar_real(MODNAME, 'tmin_rain_sta', 'nrain', Nrain,
      +     'Minimum temperature distributed to the precipitation'//
      +     ' measurement stations',
      +     'degrees Fahrenheit',

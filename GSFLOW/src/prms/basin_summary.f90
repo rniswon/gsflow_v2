@@ -51,13 +51,13 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC CHAR
-      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string, declparam
+      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string
       EXTERNAL read_error, print_module
 ! Local Variables
       INTEGER :: i
       CHARACTER(LEN=80), SAVE :: Version_basin_summary
 !***********************************************************************
-      Version_basin_summary = 'basin_summary.f90 2020-04-27 08:33:00Z'
+      Version_basin_summary = 'basin_summary.f90 2020-06-10 10:00:00Z'
       CALL print_module(Version_basin_summary, 'Basin Output Summary        ', 90)
       MODNAME = 'basin_summary'
 

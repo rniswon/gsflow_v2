@@ -99,7 +99,7 @@
 !***********************************************************************
       stream_temp_decl = 0
 
-      Version_stream_temp = 'stream_temp.f90 2020-04-28 12:36:00Z'
+      Version_stream_temp = 'stream_temp.f90 2020-06-10 10:00:00Z'
       CALL print_module(Version_stream_temp, 'Stream Temperature          ', 90)
       MODNAME = 'stream_temp'
 
@@ -108,77 +108,77 @@
 
 ! Declared Variables
       ALLOCATE ( Seg_width(Nsegment) )
-      CALL declvar_real( MODNAME, 'seg_width', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real( MODNAME, 'seg_width', 'nsegment', Nsegment, &
      &     'Width of each segment', &
      &     'meters', Seg_width )
 
       ALLOCATE (Seg_tave_water(Nsegment) ) ! previous ??
-      CALL declvar_real( MODNAME, 'seg_tave_water', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real( MODNAME, 'seg_tave_water', 'nsegment', Nsegment, &
      &     'Computed daily mean stream temperature for each segment', &
      &     'degrees Celsius', Seg_tave_water )
 
       ALLOCATE ( seg_tave_upstream(Nsegment) )
-      CALL declvar_real( MODNAME, 'seg_tave_upstream', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real( MODNAME, 'seg_tave_upstream', 'nsegment', Nsegment, &
      &     'Temperature of streamflow entering each segment', &
      &     'degrees Celsius', seg_tave_upstream )
 
       ALLOCATE ( Seg_humid(Nsegment) )
-      CALL declvar_real( MODNAME, 'seg_humid', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real( MODNAME, 'seg_humid', 'nsegment', Nsegment, &
      &     'Area-weighted average relative humidity for each segment from HRUs contributing flow to the segment', &
      &     'decimal fraction', Seg_humid )
 
       ALLOCATE ( Seg_melt(Nsegment) )
-      CALL declvar_real( MODNAME, 'seg_melt', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real( MODNAME, 'seg_melt', 'nsegment', Nsegment, &
      &     'Area-weighted average snowmelt for each segment from HRUs contributing flow to the segment', &
      &     'inches', Seg_melt )
 
       ALLOCATE ( Seg_rain(Nsegment) )
-      CALL declvar_real( MODNAME, 'seg_rain', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real( MODNAME, 'seg_rain', 'nsegment', Nsegment, &
      &     'Area-weighted average rainfall for each segment from HRUs contributing flow to the segment', &
      &     'inches', Seg_rain )
 
       ALLOCATE ( Seg_tave_air(Nsegment) )
-      CALL declvar_real( MODNAME, 'seg_tave_air', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real( MODNAME, 'seg_tave_air', 'nsegment', Nsegment, &
      &     'Area-weighted average air temperature for each segment from HRUs contributing flow to the segment', &
      &     'degrees Celsius', Seg_tave_air )
 
       ALLOCATE ( Seg_potet(Nsegment) )
-      CALL declvar_dble( MODNAME, 'seg_potet', 'nsegment', Nsegment, 'double', &
+      CALL declvar_dble( MODNAME, 'seg_potet', 'nsegment', Nsegment, &
      &     'HRU area-weighted average potential ET for each segment', &
      &     'inches', Seg_potet )
 
       ALLOCATE ( Seg_ccov(Nsegment) )
-      CALL declvar_real( MODNAME, 'seg_ccov', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real( MODNAME, 'seg_ccov', 'nsegment', Nsegment, &
      &     'Area-weighted average cloud cover fraction for each segment from HRUs contributing flow to the segment', &
      &     'decimal fraction', Seg_ccov )
 
       ALLOCATE(Seg_shade(Nsegment))
-      CALL declvar_real(MODNAME, 'seg_shade', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real(MODNAME, 'seg_shade', 'nsegment', Nsegment, &
      &     'Area-weighted average shade fraction for each segment', &
      &     'decimal fraction', seg_shade )
 
       ALLOCATE ( Seg_daylight(Nsegment) )
-      CALL declvar_real( MODNAME, 'seg_daylight', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real( MODNAME, 'seg_daylight', 'nsegment', Nsegment, &
      &     'Hours of daylight', &
      &     'hours', Seg_daylight )
 
       ALLOCATE(seg_tave_gw(Nsegment))
-      CALL declvar_real( MODNAME, 'seg_tave_gw', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real( MODNAME, 'seg_tave_gw', 'nsegment', Nsegment, &
      &     'groundwater temperature', &
      &     'degrees Celsius', seg_tave_gw )
 
       ALLOCATE(seg_tave_ss(Nsegment))
-      CALL declvar_real( MODNAME, 'seg_tave_ss', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real( MODNAME, 'seg_tave_ss', 'nsegment', Nsegment, &
      &     'subsurface temperature', &
      &     'degrees Celsius', seg_tave_ss )
 
       ALLOCATE(seg_tave_sroff(Nsegment))
-      CALL declvar_real( MODNAME, 'seg_tave_sroff', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real( MODNAME, 'seg_tave_sroff', 'nsegment', Nsegment, &
      &     'surface runoff temperature', &
      &     'degrees Celsius', seg_tave_sroff )
 
       ALLOCATE(seg_tave_lat(Nsegment))
-      CALL declvar_real( MODNAME, 'seg_tave_lat', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real( MODNAME, 'seg_tave_lat', 'nsegment', Nsegment, &
      &     'lateral flow temperature', &
      &     'degrees Celsius', seg_tave_lat )
 

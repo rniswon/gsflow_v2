@@ -75,39 +75,39 @@
 !***********************************************************************
       basdecl = 0
 
-      Version_basin = 'basin.f90 2020-04-27 08:41:00Z'
+      Version_basin = 'basin.f90 2020-06-10 10:00:00Z'
       CALL print_module(Version_basin, 'Basin Definition            ', 90)
       MODNAME = 'basin'
 
 ! Declared Variables
       ALLOCATE ( Hru_imperv(Nhru) )
-      CALL declvar_real(MODNAME, 'hru_imperv', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_imperv', 'nhru', Nhru, &
      &     'Area of HRU that is impervious', &
      &     'acres', Hru_imperv)
 
       ALLOCATE ( Hru_perv(Nhru) )
-      CALL declvar_real(MODNAME, 'hru_perv', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_perv', 'nhru', Nhru, &
      &     'Area of HRU that is pervious', &
      &     'acres', Hru_perv)
 
       ALLOCATE ( Hru_frac_perv(Nhru) )
-      CALL declvar_real(MODNAME, 'hru_frac_perv', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_frac_perv', 'nhru', Nhru, &
      &     'Fraction of HRU that is pervious', &
      &     'decimal fraction', Hru_frac_perv)
 
       IF ( Dprst_flag==1 .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Dprst_area_max(Nhru) )
-        CALL declvar_real(MODNAME, 'dprst_area_max', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_max', 'nhru', Nhru, &
      &       'Aggregate sum of surface-depression storage areas of each HRU', &
      &       'acres', Dprst_area_max)
 
         ALLOCATE ( Dprst_area_open_max(Nhru) )
-        CALL declvar_real(MODNAME, 'dprst_area_open_max', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_open_max', 'nhru', Nhru, &
      &       'Aggregate sum of open surface-depression storage areas of each HRU', &
      &       'acres', Dprst_area_open_max)
 
         ALLOCATE ( Dprst_area_clos_max(Nhru) )
-        CALL declvar_real(MODNAME, 'dprst_area_clos_max', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_clos_max', 'nhru', Nhru, &
      &       'Aggregate sum of closed surface-depression storage areas of each HRU', &
      &       'acres', Dprst_area_clos_max)
 
@@ -275,11 +275,12 @@
       IF ( Dprst_flag==1 ) THEN
         IF ( getparam(MODNAME, 'dprst_frac_open', Nhru, 'real', Dprst_frac_open)/=0 ) CALL read_error(2, 'dprst_frac_open')
         IF ( PRMS4_flag==1 ) THEN
-          IF ( getparam(MODNAME, 'dprst_area', Nhru, 'real', Dprst_area)/=0 ) CALL read_error(2, 'dprst_area')
           IF ( getparam(MODNAME, 'dprst_frac_hru', Nhru, 'real', Dprst_frac)/=0 ) CALL read_error(2, 'dprst_frac_hru')
           IF ( Dprst_frac(1)>-1.0 ) THEN
             IF ( Print_debug>-1 ) PRINT *, 'Using dprst_frac_hru instead of dprst_area'
             dprst_frac_flag = 1
+          ELSE
+            IF ( getparam(MODNAME, 'dprst_area', Nhru, 'real', Dprst_area)/=0 ) CALL read_error(2, 'dprst_area')
           ENDIF
         ELSE
           IF ( getparam(MODNAME, 'dprst_frac', Nhru, 'real', Dprst_frac)/=0 ) CALL read_error(2, 'Dprst_frac')
