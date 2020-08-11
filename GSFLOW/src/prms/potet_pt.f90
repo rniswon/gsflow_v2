@@ -7,10 +7,13 @@
 !   central Nebraska-USA: Journal of Hydrology, V. 420-421, p. 228-244
 !***********************************************************************
       MODULE PRMS_POTET_PT
+        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR, OFF, INCH2CM
+        USE PRMS_MODULE, ONLY: Process_flag, Nhru, Humidity_cbh_flag
         IMPLICIT NONE
         ! Local Variables
-        CHARACTER(LEN=8), SAVE :: MODNAME
-        !REAL, SAVE, ALLOCATABLE :: Tavgc_ante(:) ! if Tavgc_ante is used in future, need to add save in restart file
+        character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
+        character(len=*), parameter :: MODNAME = 'potet_pt'
+        character(len=*), parameter :: Version_potet = '2020-08-03'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Pt_alpha(:, :)
       END MODULE PRMS_POTET_PT
@@ -18,8 +21,7 @@
 !***********************************************************************
       INTEGER FUNCTION potet_pt()
       USE PRMS_POTET_PT
-      USE PRMS_MODULE, ONLY: Process, Nhru, Humidity_cbh_flag
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Hru_elev_meters
+      USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Swrad, Tminc, Tmaxc, &
      &    Tempc_dewpt, Vp_actual, Lwrad_net, Vp_slope, Basin_humidity, Humidity_percent
       USE PRMS_CLIMATE_HRU, ONLY: Humidity_hru
@@ -27,24 +29,23 @@
       USE PRMS_SET_TIME, ONLY: Nowmonth, Jday
       IMPLICIT NONE
 ! Functions
-      INTRINSIC SQRT, DBLE, LOG, SNGL
+      INTRINSIC :: DBLE, LOG, SNGL
       INTEGER, EXTERNAL :: declparam, getparam
       REAL, EXTERNAL :: sat_vapor_press
-      EXTERNAL read_error, print_module
+      EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
-      REAL :: elh, satvapor, prsr, psycnst, ratio, eeq, heat_flux, net_rad
-      REAL :: stab, A1, B1, t1, num, den, sw
-      CHARACTER(LEN=80), SAVE :: Version_potet
+      REAL :: elh, prsr, psycnst, heat_flux, net_rad, satvapor, ratio, eeq
+      REAL :: A1, B1, t1, num, den, stab, sw
 !***********************************************************************
       potet_pt = 0
 
-      IF ( Process(:3)=='run' ) THEN
+      IF ( Process_flag==RUN ) THEN
 !***********************************************************************
 !******Compute "EQUIVALENT" EVAPOTRANSPIRATION, EEQ (IN./DAY),
 !...USING PRIESTLY-TAYLOR METHOD. THE VARIBLES ARE CALCULATED
 !...USING FORMULAS GIVEN IN JENSEN, 1990.
-        IF ( Humidity_cbh_flag==0 ) Humidity_hru = Humidity_percent(1, Nowmonth)
+        IF ( Humidity_cbh_flag==OFF ) Humidity_hru = Humidity_percent(1, Nowmonth)
         ! next three lines were in loop, moved out since just setting constants
         A1 = 17.625
         B1 = 243.04
@@ -139,24 +140,22 @@
 !  eeq is in cm
           eeq = ratio*net_rad/elh * 100.0 ! if eeq<0, the Potet will be set to 0.0 below
 !...CONVERT TO INCHES/DAY
-          eeq = eeq/2.54
+          eeq = eeq / INCH2CM
 
           Potet(i) = Pt_alpha(i, Nowmonth)*eeq
           IF ( Potet(i)<0.0 ) Potet(i) = 0.0
           Basin_potet = Basin_potet + DBLE( Potet(i)*Hru_area(i) )
           Basin_humidity = Basin_humidity + DBLE( Humidity_hru(i)*Hru_area(i) )
-!          Tavgc_ante(i) = Tavgc(i)
         ENDDO
         Basin_potet = Basin_potet*Basin_area_inv
         Basin_humidity = Basin_humidity*Basin_area_inv
 
-      ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_potet = 'potet_pt.f90 2018-04-18 11:10:00Z'
-        CALL print_module(Version_potet, 'Potential Evapotranspiration', 90)
-        MODNAME = 'potet_pt'
+!******Declare parameters
+      ELSEIF ( Process_flag==DECL ) THEN
+        CALL print_module(MODDESC, MODNAME, Version_potet)
 
         ! Declare Parameters
-        ALLOCATE ( Pt_alpha(Nhru,12) )
+        ALLOCATE ( Pt_alpha(Nhru,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'pt_alpha', 'nhru,nmonths', 'real', &
      &       '1.26', '1.0', '2.0', &
      &       'Potential ET adjustment factor - Priestly-Taylor', &
@@ -164,11 +163,8 @@
      &       'decimal fraction')/=0 ) CALL read_error(1, 'pt_alpha')
 
 !******Get parameters
-      ELSEIF ( Process(:4)=='init' ) THEN
-        IF ( getparam(MODNAME, 'pt_alpha', Nhru*12, 'real', Pt_alpha)/=0 ) CALL read_error(2, 'pt_alpha')
-
-        !ALLOCATE ( Tavgc_ante(Nhru) )
-        !Tavgc_ante = Tavgc
+      ELSEIF ( Process_flag==INIT ) THEN
+        IF ( getparam(MODNAME, 'pt_alpha', Nhru*MONTHS_PER_YEAR, 'real', Pt_alpha)/=0 ) CALL read_error(2, 'pt_alpha')
 
       ENDIF
 

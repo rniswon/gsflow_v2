@@ -1,26 +1,20 @@
-# prms library makefile
+# PRMS V makefile
 
 include ../makelist
-
-PRMSLIB = $(LIBDIR)/libprms.a
-MMFLIB	 = $(LIBDIR)/libmmf.a
-LIBS	= $(PRMSLIB) $(MMFLIB) $(FLIBS)
+TARGET 	= ../$(BINDIR)/prms
 
 ####################################################
 # Rules for targets
 ####################################################
-all: $(PRMSLIB)
-
-$(TARGET): $(PRMSLIB)
-	$(RM) $(TARGET)
-
-$(MMFLIB):
-	$(CD) $(MMFDIR);make
+all: $(TARGET)
 
 #
 # Define all object files which make up the library
 #
-LIBOBJS = \
+
+
+OBJS = \
+        call_modules.o \
         basin.o \
         climateflow.o \
         cascade.o \
@@ -41,12 +35,14 @@ LIBOBJS = \
         ide_dist.o \
         xyz_dist.o \
         precip_1sta_laps.o \
+        precip_temp_grid.o \
         precip_dist2.o \
         temp_1sta_laps.o \
         temp_dist2.o \
         transp_frost.o \
         transp_tindex.o \
         frost_date.o \
+        glacr_melt.o \
         intcp.o \
         snowcomp.o \
         srunoff.o \
@@ -70,20 +66,21 @@ LIBOBJS = \
         write_climate_hru.o \
         prms_summary.o \
         basin_sum.o \
-        utils_prms.o
+        utils_prms_linux.o
 
-install: lib
-
-lib: $(PRMSLIB)
-
-$(PRMSLIB): $(LIBOBJS)
-	$(RM) $(PRMSLIB)
-	$(AR) $(PRMSLIB) $(LIBOBJS)
-	$(RANLIB) $(PRMSLIB)
+$(TARGET): $(OBJS)
+	$(RM) $(TARGET)
+	$(FC) $(LDFLAGS) -o $(TARGET) $(OBJS) $(MMFLIB) $(FLIBS)
 
 clean:
-	$(RM) $(PRMSLIB)
 	$(RM) *.o *.mod *~
+
+#
+# Define all object files which make up the library
+#
+
+call_modules.o: call_modules.f90
+	$(FC) -c $(FFLAGS) call_modules.f90
 
 basin_sum.o: basin_sum.f90 prms_module.mod prms_flowvars.mod prms_intcp.mod prms_snow.mod prms_srunoff.mod prms_gwflow.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod prms_obs.mod prms_muskingum.mod
 	$(FC) -c $(FFLAGS) basin_sum.f90
@@ -103,8 +100,8 @@ snowcomp.o: snowcomp.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_c
 gwflow.o: gwflow.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_intcp.mod prms_srunoff.mod prms_soilzone.mod prms_cascade.mod prms_set_time.mod
 	$(FC) -c $(FFLAGS) gwflow.f90
 
-utils_prms.o: utils_prms.f90 prms_module.mod prms_basin.mod prms_set_time.mod
-	$(FC) -c $(FFLAGS) utils_prms.f90
+utils_prms_linux.o: utils_prms_linux.f90 prms_module.mod prms_basin.mod prms_set_time.mod
+	$(FC) -c $(FFLAGS) utils_prms_linux.f90
 
 prms_summary.o: prms_summary.f90 prms_module.mod prms_climatevars.mod prms_flowvars.mod prms_set_time.mod prms_obs.mod prms_intcp.mod prms_snow.mod prms_srunoff.mod prms_soilzone.mod prms_gwflow.mod
 	$(FC) -c $(FFLAGS) prms_summary.f90
@@ -138,6 +135,10 @@ frost_date.o: frost_date.f90 prms_module.mod prms_basin.mod prms_climatevars.mod
 
 precip_1sta_laps.o: precip_1sta_laps.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod prms_obs.mod
 	$(FC) -c $(FFLAGS) precip_1sta_laps.f90
+
+
+precip_temp_grid.o: precip_temp_grid.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod prms_obs.mod
+	$(FC) -c $(FFLAGS) precip_temp_grid.f90
 
 transp_tindex.o: transp_tindex.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod
 	$(FC) -c $(FFLAGS) transp_tindex.f90
@@ -235,6 +236,9 @@ water_use_read.o: water_use_read.f90 prms_module.mod prms_basin.mod prms_set_tim
 convert_params.o: convert_params.f90 prms_module.mod
 	$(FC) -c $(FFLAGS) convert_params.f90
 
+glacr_melt.o: glacr_melt.f90 prms_snow.mod prms_intcp.mod prms_soltab.mod
+	$(FC) -c $(FFLAGS) glacr_melt.f90
+
 prms_climatevars.mod: climateflow.o
 prms_flowvars.mod: climateflow.o
 prms_gwflow.mod: gwflow.o
@@ -254,3 +258,4 @@ prms_snowcomp.mod: snowcomp.o
 prms_routing.mod: routing.o
 prms_water_use.mod: water_use_read.o
 prms_set_time.mod: prms_time.o
+prms_glacr.mod: glacr_melt.o

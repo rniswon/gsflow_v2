@@ -5,15 +5,19 @@
 ! Declared Parameters: frost_temp
 !***********************************************************************
       INTEGER FUNCTION frost_date()
-      USE PRMS_MODULE, ONLY: Process, Nhru
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ON, OFF, DAYS_PER_YEAR, NORTHERN
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Hemisphere
       USE PRMS_CLIMATEVARS, ONLY: Tmin_hru
       USE PRMS_SET_TIME, ONLY: Jsol
       IMPLICIT NONE
+      character(len=*), parameter :: MODDESC = 'Preprocessing'
+      character(len=*), parameter :: MODNAME = 'frost_date'
+      character(len=*), parameter :: Version_frost_date = '2020-08-03'
 ! Functions
-      INTRINSIC NINT, DBLE
+      INTRINSIC :: NINT, DBLE
       INTEGER, EXTERNAL :: declparam, getparam, get_season
-      EXTERNAL read_error, write_integer_param, PRMS_open_module_file, print_module
+      EXTERNAL :: read_error, write_integer_param, PRMS_open_module_file, print_module
 ! Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Frost_temp(:)
 ! Local Variables
@@ -32,25 +36,23 @@
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: fallFrostSum(:), springFrostSum(:)
       INTEGER, SAVE, ALLOCATABLE :: currentFallFrost(:), currentSpringFrost(:)
       INTEGER :: season, j, jj, basin_fall(1), basin_spring(1)
-      CHARACTER(LEN=10), SAVE :: MODNAME
-      CHARACTER(LEN=80), SAVE :: Version_frost_date
 !***********************************************************************
       frost_date = 0
 
-      IF ( Process(:3)=='run' ) THEN
+      IF ( Process_flag==RUN ) THEN
         season = get_season()
 
 ! Figure out if the season changes on this timestep. Putting this
 ! check here makes the blocks below easier to understand.
         IF ( oldSeason/=season ) THEN
           IF ( season==1 ) THEN
-            switchToSpringToday = 1
+            switchToSpringToday = ON
           ELSE
-            switchToFallToday = 1
+            switchToFallToday = ON
           ENDIF
         ELSE
-          switchToSpringToday = 0
-          switchToFallToday = 0
+          switchToSpringToday = OFF
+          switchToFallToday = OFF
         ENDIF
         oldSeason = season
 
@@ -58,7 +60,7 @@
 ! variable. Also since we are finished looking for spring frosts,
 ! add the CurrentSpringFrost dates to the spring_frost variable
 ! (average date of the spring frost for each HRU).
-        IF ( switchToFallToday==1 ) THEN
+        IF ( switchToFallToday==ON ) THEN
           fallFrostCount = fallFrostCount + 1
           DO jj = 1, Active_hrus
             j = Hru_route_order(jj)
@@ -71,7 +73,7 @@
 ! CurrentSpringFrost variable. Also since we are finished looking
 ! for fall frosts, add the CurrentFallFrost dates to the fall_frost
 ! variable (average date of the fall frost for each HRU).
-        ELSEIF ( switchToSpringToday==1 ) THEN
+        ELSEIF ( switchToSpringToday==ON ) THEN
           springFrostCount = springFrostCount + 1
           DO jj = 1, Active_hrus
             j = Hru_route_order(jj)
@@ -96,10 +98,8 @@
           ENDDO
         ENDIF
 
-      ELSEIF ( Process(:4)=='decl' ) THEN
-        Version_frost_date = 'frost_date.f90 2016-03-04 17:57:51Z'
-        CALL print_module(Version_frost_date, 'Preprocessing               ', 90)
-        MODNAME = 'frost_date'
+      ELSEIF ( Process_flag==DECL ) THEN
+        CALL print_module(MODDESC, MODNAME, Version_frost_date)
 
         ALLOCATE ( Frost_temp(Nhru) )
         IF ( declparam(MODNAME, 'frost_temp', 'nhru', 'real', &
@@ -112,7 +112,7 @@
         ALLOCATE ( fallFrostSum(Nhru), springFrostSum(Nhru) )
         ALLOCATE ( currentFallFrost(Nhru), currentSpringFrost(Nhru) )
 
-      ELSEIF ( Process(:4)=='init' ) THEN
+      ELSEIF ( Process_flag==INIT ) THEN
         IF ( getparam(MODNAME, 'frost_temp', Nhru, 'real', Frost_temp)/=0 ) CALL read_error(2, 'frost_temp')
         fall_frost = 0
         spring_frost = 0
@@ -124,15 +124,15 @@
         springFrostCount = 0
         CALL PRMS_open_module_file(Iunit, 'frost_date.param')
         oldSeason = get_season()
-        IF ( Hemisphere==0 ) THEN ! Northern Hemisphere
+        IF ( Hemisphere==NORTHERN ) THEN
           spring1 = 1
-          fall1 = 365
+          fall1 = DAYS_PER_YEAR
         ELSE
-          spring1 = 365
+          spring1 = DAYS_PER_YEAR
           fall1 = 1
         ENDIF
 
-      ELSEIF ( Process(:5)=='clean' ) THEN
+      ELSEIF ( Process_flag==CLEAN ) THEN
         basin_fall_frost = 0.0D0
         basin_spring_frost = 0.0D0
         DO jj = 1, Active_hrus
@@ -142,9 +142,9 @@
           IF ( fallFrostCount==0 ) fallFrostCount = 1
           spring_frost(j) = NINT( springFrostSum(j)/DBLE( springFrostCount ) )
           fall_frost(j) = fall_frost(j) + 10
-          IF ( fall_frost(j)>365 ) fall_frost(j) = 365
+          IF ( fall_frost(j)>DAYS_PER_YEAR ) fall_frost(j) = DAYS_PER_YEAR
           spring_frost(j) = spring_frost(j) + 10
-          IF ( spring_frost(j)>365 ) spring_frost(j) = spring_frost(j) - 365
+          IF ( spring_frost(j)>DAYS_PER_YEAR ) spring_frost(j) = spring_frost(j) - DAYS_PER_YEAR
           basin_fall_frost = basin_fall_frost + fall_frost(j)*Hru_area(j)
           basin_spring_frost = basin_spring_frost + spring_frost(j)*Hru_area(j)
         ENDDO
@@ -165,11 +165,12 @@
 ! Figure out if the current solar day is in "spring" or "fall"
 !*************************************************************
       INTEGER FUNCTION get_season()
+      USE PRMS_CONSTANTS, ONLY: NORTHERN
       USE PRMS_BASIN, ONLY: Hemisphere
       USE PRMS_SET_TIME, ONLY: Jsol
 !*************************************************************
       get_season = 2 ! default is fall frost
-      IF ( Hemisphere==0 ) THEN ! Northern Hemisphere
+      IF ( Hemisphere==NORTHERN ) THEN
         IF ( Jsol>0 .AND. Jsol<183 ) get_season = 1 ! This is the spring phase
       ELSE ! Southern Hemisphere
         IF ( Jsol>182 .AND. Jsol<367 ) get_season = 1 ! This is the spring phase

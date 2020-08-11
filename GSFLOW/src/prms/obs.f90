@@ -2,9 +2,15 @@
 ! Reads and stores observed data from all specified measurement stations
 !***********************************************************************
       MODULE PRMS_OBS
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ON, OFF, xyz_dist_module, &
+     &    MONTHS_PER_YEAR, CMS, CFS, CFS2CMS_CONV, RUN, SETDIMENS, DECL, INIT
+      USE PRMS_MODULE, ONLY: Process_flag, Model, Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, &
+     &    Precip_flag
       IMPLICIT NONE
 !   Local Variables
-      CHARACTER(LEN=3), SAVE :: MODNAME
+      character(len=*), parameter :: MODDESC = 'Time Series Data'
+      character(len=*), parameter :: MODNAME = 'obs'
+      character(len=*), parameter :: Version_obs = '2020-08-03'
       INTEGER, SAVE :: Nsnow, Nlakeelev, Nwind, Nhumid, Rain_flag
 !   Declared Variables
       INTEGER, SAVE :: Rain_day
@@ -15,27 +21,27 @@
       ! Lake Module Variables
       REAL, SAVE, ALLOCATABLE :: Gate_ht(:), Lake_elev(:)
 !   Declared Parameters
-      INTEGER, SAVE :: Runoff_units, Rain_code(12)
+      INTEGER, SAVE :: Runoff_units, Rain_code(MONTHS_PER_YEAR)
       END MODULE PRMS_OBS
 
 !***********************************************************************
 !     main obs routine
 !***********************************************************************
       INTEGER FUNCTION obs()
-      USE PRMS_MODULE, ONLY: Process
+      USE PRMS_OBS, ONLY: Process_flag, RUN, SETDIMENS, DECL, INIT
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: obsdecl, obsinit, obsrun, obssetdims
 !***********************************************************************
       obs = 0
 
-      IF ( Process(:3)=='run' ) THEN
+      IF ( Process_flag==RUN ) THEN
         obs = obsrun()
-      ELSEIF ( Process(:7)=='setdims' ) THEN
+      ELSEIF ( Process_flag==SETDIMENS ) THEN
         obs = obssetdims()
-      ELSEIF ( Process(:4)=='decl' ) THEN
+      ELSEIF ( Process_flag==DECL ) THEN
         obs = obsdecl()
-      ELSEIF ( Process(:4)=='init' ) THEN
+      ELSEIF ( Process_flag==INIT ) THEN
         obs = obsinit()
       ENDIF
 
@@ -45,7 +51,7 @@
 !     obssetdims - declares obs module specific dimensions
 !***********************************************************************
       INTEGER FUNCTION obssetdims()
-      USE PRMS_MODULE, ONLY: MAXDIM
+      USE PRMS_CONSTANTS, ONLY: MAXDIM
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: decldim
@@ -68,19 +74,14 @@
 !***********************************************************************
       INTEGER FUNCTION obsdecl()
       USE PRMS_OBS
-      USE PRMS_MODULE, ONLY: Precip_flag, Model, Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declvar, getdim, declparam
-      EXTERNAL read_error, print_module
-! Local Variable
-      CHARACTER(LEN=80), SAVE :: Version_obs
+      EXTERNAL :: read_error, print_module
 !***********************************************************************
       obsdecl = 0
 
-      Version_obs = 'obs.f90 2020-01-09 14:38:00Z'
-      CALL print_module(Version_obs, 'Time Series Data            ', 90)
-      MODNAME = 'obs'
+      CALL print_module(MODDESC, MODNAME, Version_obs)
 
 !   Declared Variables
       IF ( Nobs>0 ) THEN
@@ -136,7 +137,7 @@
       Nlakeelev = getdim('nlakeelev')
       IF ( Nlakeelev==-1 ) CALL read_error(6, 'nlakeelev')
 
-      IF ( Model==99 ) THEN
+      IF ( Model==DOCUMENTATION ) THEN
         IF ( Nsnow==0 ) Nsnow = 1
         IF ( Nhumid==0 ) Nhumid = 1
         IF ( Nwind==0 ) Nwind = 1
@@ -172,9 +173,9 @@
       ENDIF
 
 !   Declared Parameters
-      Rain_flag = 0
-      IF ( Precip_flag==6 ) Rain_flag = 1
-      IF ( Rain_flag==1 .OR. Model==99 ) THEN
+      Rain_flag = OFF
+      IF ( Precip_flag==xyz_dist_module ) Rain_flag = ON
+      IF ( Rain_flag==ON .OR. Model==DOCUMENTATION ) THEN
         IF ( declvar(MODNAME, 'rain_day', 'one', 1, 'integer', &
      &       'Flag to set the form of any precipitation to rain (0=determine form; 1=rain)', &
      &       'none', Rain_day)/=0 ) CALL read_error(8, 'rain_day')
@@ -214,21 +215,20 @@
 !***********************************************************************
       INTEGER FUNCTION obsinit()
       USE PRMS_OBS
-      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: getparam
-      EXTERNAL read_error
+      EXTERNAL :: read_error
 !***********************************************************************
       obsinit = 0
 
-      Runoff_units = 0
+      Runoff_units = CFS
       IF ( Nobs>0 ) THEN
         IF ( getparam(MODNAME, 'runoff_units', 1, 'integer', Runoff_units)/=0 ) CALL read_error(2, 'runoff_units')
       ENDIF
 
-      IF ( Rain_flag==1 ) THEN
-        IF ( getparam(MODNAME, 'rain_code', 12, 'integer', Rain_code)/=0 ) CALL read_error(2, 'rain_code')
+      IF ( Rain_flag==ON ) THEN
+        IF ( getparam(MODNAME, 'rain_code', MONTHS_PER_YEAR, 'integer', Rain_code)/=0 ) CALL read_error(2, 'rain_code')
       ENDIF
 
       IF ( Nobs>0 ) THEN
@@ -237,7 +237,7 @@
         Streamflow_cms = 0.0D0
       ENDIF
       IF ( Nrain>0 ) Precip = 0.0
-      Rain_day = 0
+      Rain_day = OFF
       IF ( Ntemp>0 ) THEN
         Tmax = 0.0
         Tmin = 0.0
@@ -257,8 +257,6 @@
 ! **********************************************************************
       INTEGER FUNCTION obsrun()
       USE PRMS_OBS
-      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap
-      USE PRMS_BASIN, ONLY: CFS2CMS_CONV
       USE PRMS_SET_TIME, ONLY: Nowmonth
       USE PRMS_CLIMATEVARS, ONLY: Ppt_zero_thresh
       IMPLICIT NONE
@@ -273,7 +271,7 @@
 
       IF ( Nobs>0 ) THEN
         IF ( readvar(MODNAME, 'runoff')/=0 ) CALL read_error(9, 'runoff')
-        IF ( Runoff_units==1 ) THEN
+        IF ( Runoff_units==CMS ) THEN
           DO i = 1, Nobs
             Streamflow_cms(i) = DBLE( Runoff(i) )
             Streamflow_cfs(i) = Streamflow_cms(i)/CFS2CMS_CONV
