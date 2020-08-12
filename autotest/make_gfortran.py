@@ -51,7 +51,7 @@ if __name__ == "__main__":
     srcdir = cleanup(srcdir, "./stemp")
 
     optlevel = "-O -Bstatic"
-    fflags = optlevel  + " -fno-second-underscore"
+    fflags = optlevel  + " -fno-second-underscore" + " -ffree-line-length-512"
     if platform.system().lower() == 'windows':
         cflags = optlevel + " -D WINDOWS -Wall"
     else:
