@@ -2456,6 +2456,11 @@
         !
         do k = 1, DVRCH(iseg)
            hru_id = IRRROW_SW(k, iseg)
+           IF ( Nhru==Nhrucell ) THEN
+             icell = Gvr_cell_id(hru_id)
+             irow = Gwc_row(icell)
+             icol = Gwc_col(icell)
+           END IF
            area = HRU_PERV(hru_id)
            pet = potet(hru_id)*area*prms_inch2mf_q
            aet = hru_actet(hru_id)*area*prms_inch2mf_q
