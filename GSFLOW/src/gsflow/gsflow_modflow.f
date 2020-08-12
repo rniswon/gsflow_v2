@@ -4,13 +4,13 @@
       MODULE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ON, OFF,
      +    MODFLOW, ERROR_restart, ERROR_modflow, ERROR_time,
-     +    ERROR_control, ERROR_param
+     +    ERROR_control, ERROR_param, GSFLOW
       USE PRMS_MODULE, ONLY: Print_debug, Model, GSFLOW_flag, Have_lakes
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2020-08-11'
+      character(len=*), parameter :: Version_gsflow_modflow='2020-08-12'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -195,8 +195,8 @@ C4------OPEN NAME FILE.
 C
 C5------Get current date and time, assign to IBDT, and write to screen
       CALL DATE_AND_TIME(VALUES=IBDT)
-      IF ( Model==MODFLOW )
-     1     WRITE(*,2) (IBDT(I),I=1,3),(IBDT(I),I=5,7)
+      IF ( Model>GSFLOW )
+     &     WRITE(*,2) (IBDT(I),I=1,3),(IBDT(I),I=5,7)
     2 FORMAT(1X,'Run start date and time (yyyy/mm/dd hh:mm:ss): ',
      &I4,'/',I2.2,'/',I2.2,1X,I2,':',I2.2,':',I2.2,/)
 C
@@ -504,7 +504,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       IF ( Steady_state.EQ.1 ) THEN
         Kkper_new = 1
         Kper_mfo = 2
-      ELSEIF ( GSFLOW_flag==ON ) THEN
+      ELSEIF ( Model==GSFLOW ) THEN
         Kkper_new = GET_KPER()
       ELSE
         Kkper_new = Kper_mfo
@@ -530,7 +530,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       ENDIF
       iss = ISSFLG(KKPER)
       gsflag = OFF
-      IF ( GSFLOW_flag==OFF .AND. iss==0 ) gsflag = ON
+      IF ( Model==GSFLOW .AND. iss==0 ) gsflag = ON
 C
 C7C-----SIMULATE EACH TIME STEP.
 !gsf    DO 90 KSTP = 1, NSTP(KPER)
@@ -943,7 +943,7 @@ C7C6---JUMP TO END OF PROGRAM IF CONVERGENCE WAS NOT ACHIEVED.
             WRITE(IOUT,87) BUDPERC
    87       FORMAT(1X,'FAILURE TO MEET SOLVER CONVERGENCE CRITERIA',/
      1             1X,'BUDGET PERCENT DISCREPANCY IS',F10.4)
-            IF ( gsflag==ON ) THEN
+            IF ( gsflag==OFF ) THEN
               IF ( IUNIT(63).GT.0 ) THEN
                 IF ( ICNVGFLG.EQ.0 ) THEN
                   WRITE(IOUT,*) 'STOPPING SIMULATION'
@@ -1427,7 +1427,7 @@ C
      &    Modflow_time_in_stress, Stress_dates,
      &    Steady_state, ICNVG, KPER, KSTP, Mft_to_days, KPERSTART,
      &    Modflow_skip_time_step, IGRID, ERROR_time, ERROR_modflow
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ERROR_restart
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW,GSFLOW,ERROR_restart
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Kkiter, Model,
      &    Starttime, Start_year, Start_month, Start_day,
      &    Print_debug, Modflow_time_zero
@@ -1474,7 +1474,7 @@ C
 
       IF ( Mft_to_days>1.0 ) PRINT *, 'CAUTION, MF time step /= 1 day'
 
-      IF ( Model==MODFLOW ) PRINT *, ' '
+      IF ( Model>GSFLOW ) PRINT *, ' '
       TOTIM = 0.0
       KPER = 0
       KSTP = 0
