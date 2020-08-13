@@ -12,14 +12,14 @@
 
       MODULE PRMS_SUBBASIN
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, ON, OFF, CFS2CMS_CONV, LAKE, DOCUMENTATION, &
-     &    DNEARZERO, ERROR_dim
+     &    DNEARZERO, ERROR_dim, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Process_flag, Model, Nsub, Nhru, Print_debug, GSFLOW_flag, &
      &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'subbasin'
-      character(len=*), parameter :: Version_subbasin = '2020-08-11'
+      character(len=*), parameter :: Version_subbasin = '2020-08-13'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Qsub(:), Sub_area(:), Laststor(:)
       INTEGER, SAVE, ALLOCATABLE :: Tree(:, :)
 !   Declared Variables
@@ -520,7 +520,7 @@
               landstor = Lake_vol(Lake_hru_id(j))*12.0D0
               srq = Lake_outcfs(Lake_hru_id(j))*Cfs2inches
               ssq = 0.0D0
-            ELSEIF ( Cascade_flag>0 ) THEN
+            ELSEIF ( Cascade_flag>CASCADE_OFF ) THEN
               srq = Hortonian_lakes(j)*harea
               ssq = Lakein_sz(j)*harea
             ELSE
