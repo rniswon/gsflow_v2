@@ -81,19 +81,25 @@
 !
 !***********************************************************************
       MODULE PRMS_MUSKINGUM
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ON, NEARZERO, CFS2CMS_CONV, &
+     &    OUTFLOW_SEGMENT, ERROR_streamflow, strmflow_muskingum_module
+      USE PRMS_MODULE, ONLY: Nsegment, Process_flag, Save_vars_to_file, Init_vars_from_file, &
+     &    Strmflow_flag, Glacier_flag
       IMPLICIT NONE
+      character(len=*), parameter :: MODDESC = 'Streamflow Routing'
+      character(len=14), parameter :: MODNAME = 'muskingum_mann'
+      character(len=*), parameter :: Version_muskingum = '2020-08-03'
 !   Local Variables
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Outflow_ts(:), Inflow_ts(:)
-      CHARACTER(LEN=14), SAVE :: MODNAME
       END MODULE PRMS_MUSKINGUM
 
 !***********************************************************************
 !     Main muskingum routine
 !***********************************************************************
       INTEGER FUNCTION muskingum()
-      USE PRMS_MODULE, ONLY: Process, Save_vars_to_file, Init_vars_from_file
+      USE PRMS_MUSKINGUM
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: muskingum_decl, muskingum_init, muskingum_run
@@ -101,15 +107,15 @@
 !***********************************************************************
       muskingum = 0
 
-      IF ( Process(:3)=='run' ) THEN
-        muskingum  = muskingum_run()
-      ELSEIF ( Process(:4)=='decl' ) THEN
-        muskingum  = muskingum_decl()
-      ELSEIF ( Process(:4)=='init' ) THEN
+      IF ( Process_flag==RUN ) THEN
+        muskingum = muskingum_run()
+      ELSEIF ( Process_flag==DECL ) THEN
+        muskingum = muskingum_decl()
+      ELSEIF ( Process_flag==INIT ) THEN
         IF ( Init_vars_from_file>0 ) CALL muskingum_restart(1)
         muskingum = muskingum_init()
-      ELSEIF ( Process(:5)=='clean' ) THEN
-        IF ( Save_vars_to_file==1 ) CALL muskingum_restart(0)
+      ELSEIF ( Process_flag==CLEAN ) THEN
+        IF ( Save_vars_to_file==ON ) CALL muskingum_restart(0)
       ENDIF
 
       END FUNCTION muskingum
@@ -121,22 +127,17 @@
 !***********************************************************************
       INTEGER FUNCTION muskingum_decl()
       USE PRMS_MUSKINGUM
-      USE PRMS_MODULE, ONLY: Nsegment, Strmflow_flag
       IMPLICIT NONE
 ! Functions
-      EXTERNAL read_error, print_module
-! Local Variables
-      CHARACTER(LEN=80), SAVE :: Version_muskingum
+      EXTERNAL :: print_module
 !***********************************************************************
       muskingum_decl = 0
 
-      Version_muskingum = 'muskingum.f90 2020-06-10 10:00:00Z'
-      IF ( Strmflow_flag==4 ) THEN
-        MODNAME = 'muskingum'
-      ELSE
-        MODNAME = 'muskingum_mann'
+      IF ( Strmflow_flag==strmflow_muskingum_module ) THEN
+        CALL print_module(MODDESC, MODNAME(:9), Version_muskingum)
+      ELSE ! muskingum_mann
+        CALL print_module(MODDESC, MODNAME, Version_muskingum)
       ENDIF
-      CALL print_module(Version_muskingum, 'Streamflow Routing          ', 90)
 
       ALLOCATE ( Currinsum(Nsegment) )
       ALLOCATE ( Pastin(Nsegment), Pastout(Nsegment) )
@@ -149,15 +150,11 @@
 !***********************************************************************
       INTEGER FUNCTION muskingum_init()
       USE PRMS_MUSKINGUM
-      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file
-      USE PRMS_BASIN, ONLY: NEARZERO, Basin_area_inv
+      USE PRMS_BASIN, ONLY: Basin_area_inv
       USE PRMS_FLOWVARS, ONLY: Seg_outflow
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_ROUTING, ONLY: Basin_segment_storage
       IMPLICIT NONE
-! Functions
-      EXTERNAL :: read_error
-      INTEGER, EXTERNAL :: getparam
 ! Local Variables
       INTEGER :: i
 !***********************************************************************
@@ -179,8 +176,7 @@
 !***********************************************************************
       INTEGER FUNCTION muskingum_run()
       USE PRMS_MUSKINGUM
-      USE PRMS_MODULE, ONLY: Nsegment
-      USE PRMS_BASIN, ONLY: CFS2CMS_CONV, Basin_area_inv
+      USE PRMS_BASIN, ONLY: Basin_area_inv, Basin_gl_cfs, Basin_gl_ice_cfs
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_cms, Basin_gwflow_cfs, Basin_ssflow_cfs, &
      &    Basin_stflow_out, Basin_cfs, Basin_stflow_in, Basin_sroff_cfs, Seg_inflow, Seg_outflow, &
      &    Seg_upstream_inflow, Seg_lateral_inflow, Flow_out, Basin_sroff
@@ -190,11 +186,12 @@
      &    Obsin_segment, Segment_order, Tosegment, C0, C1, C2, Ts, Ts_i, Obsout_segment, &
      &    Flow_to_ocean, Flow_to_great_lakes, Flow_out_region, Flow_out_NHM, Segment_type, Flow_terminus, &
      &    Flow_to_lakes, Flow_replacement, Flow_in_region, Flow_in_nation, Flow_headwater, Flow_in_great_lakes
+      USE PRMS_GLACR, ONLY: Basin_gl_top_melt, Basin_gl_ice_melt
       USE PRMS_GWFLOW, ONLY: Basin_gwflow
       IMPLICIT NONE
 ! Functions
-      INTRINSIC MOD
-      EXTERNAL error_stop
+      INTRINSIC :: MOD
+      EXTERNAL :: error_stop
 ! Local Variables
       INTEGER :: i, j, iorder, toseg, imod, tspd, segtype
       DOUBLE PRECISION :: area_fac, segout, currin
@@ -239,7 +236,7 @@
 
 ! current inflow to the segment is the time weighted average of the outflow
 ! of the upstream segments plus the lateral HRU inflow plus any gains.
-          currin = Seg_lateral_inflow(iorder)
+          currin = Seg_lateral_inflow(iorder) !note, this routes to inlet
           IF ( Obsin_segment(iorder)>0 ) Seg_upstream_inflow(iorder) = Streamflow_cfs(Obsin_segment(iorder))
           currin = currin + Seg_upstream_inflow(iorder)
           Seg_inflow(iorder) = Seg_inflow(iorder) + currin
@@ -282,7 +279,7 @@
               PRINT *, 'ERROR, outflow from segment:', iorder, ' is negative:', Outflow_ts(iorder)
               PRINT *, '       routing parameters may be invalid'
             ENDIF
-            CALL error_stop('in muskingum')
+            CALL error_stop('negative streamflow in muskingum', ERROR_streamflow)
           ENDIF
 
           ! Seg_outflow (the mean daily flow rate for each segment) will be the average of the hourly values.
@@ -347,7 +344,7 @@
         ELSEIF ( segtype==11 ) THEN
           Flow_to_great_lakes = Flow_to_great_lakes + segout
         ENDIF
-        IF ( Tosegment(i)==0 ) Flow_out = Flow_out + segout
+        IF ( Tosegment(i)==OUTFLOW_SEGMENT ) Flow_out = Flow_out + segout
         Segment_delta_flow(i) = Segment_delta_flow(i) + Seg_inflow(i) - segout
 !        IF ( Segment_delta_flow(i) < 0.0D0 ) PRINT *, 'negative delta flow', Segment_delta_flow(i)
         Basin_segment_storage = Basin_segment_storage + Segment_delta_flow(i)
@@ -358,6 +355,11 @@
       Basin_cfs = Flow_out
       Basin_stflow_out = Basin_cfs / area_fac
       Basin_cms = Basin_cfs*CFS2CMS_CONV
+      IF ( Glacier_flag==ON ) THEN
+        Basin_stflow_in = Basin_stflow_in + Basin_gl_top_melt
+        Basin_gl_ice_cfs = Basin_gl_ice_melt*area_fac
+        Basin_gl_cfs = Basin_gl_top_melt*area_fac
+      ENDIF
       Basin_sroff_cfs = Basin_sroff*area_fac
       Basin_ssflow_cfs = Basin_ssflow*area_fac
       Basin_gwflow_cfs = Basin_gwflow*area_fac
