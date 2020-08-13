@@ -5,7 +5,7 @@
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ON, OFF, FT2_PER_ACRE, &
      &    NEARZERO, DNEARZERO, OUTFLOW_SEGMENT, ERROR_param, RUN, DECL, INIT, CLEAN, &
      &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
-     &    strmflow_muskingum_module, strmflow_in_out_module
+     &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nsegment, Model, Init_vars_from_file, &
      &    Save_vars_to_file, Strmflow_flag, Cascade_flag, Stream_temp_flag, &
      &    Water_use_flag, Segment_transferON_OFF, Inputerror_flag, Parameter_check_flag, &
@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2020-08-04'
+      character(len=*), parameter :: Version_routing = '2020-08-13'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades
@@ -187,7 +187,7 @@
      &     ' streamflow flows, for segments that do not flow to another segment enter 0', &
      &     'none')/=0 ) CALL read_error(1, 'tosegment')
 
-      IF ( Cascade_flag==0 .OR. Cascade_flag==2 .OR. Model==DOCUMENTATION ) THEN
+      IF ( Cascade_flag==CASCADE_OFF .OR. Cascade_flag==CASCADE_HRU_SEGMENT .OR. Model==DOCUMENTATION ) THEN
         Hru_seg_cascades = ON
         ALLOCATE ( Hru_segment(Nhru) )
         IF ( declparam(MODNAME, 'hru_segment', 'nhru', 'integer', &
@@ -689,9 +689,9 @@
         Seg_sroff = 0.0D0
         Seg_ssflow = 0.0D0
       ENDIF
-      IF ( Cascade_flag==0 ) THEN
+      IF ( Cascade_flag==CASCADE_OFF ) THEN
         Seg_lateral_inflow = 0.0D0
-      ELSE ! use strm_seg_in for cascade_flag = 1 or 2
+      ELSE ! use strm_seg_in for cascade_flag = 1 (CASCADE_NORMAL) or 2 (CASCADE_HRU_SEGMENT)
         Seg_lateral_inflow = Strm_seg_in
       ENDIF
 
@@ -708,8 +708,8 @@
             Seg_gwflow(i) = Seg_gwflow(i) + Gwres_flow(j)
             Seg_sroff(i) = Seg_sroff(i) + Sroff(j)
             Seg_ssflow(i) = Seg_ssflow(i) + Ssres_flow(j)
-            ! if cascade_flag = 2, seg_lateral_inflow set with strm_seg_in
-            IF ( Cascade_flag==0 ) Seg_lateral_inflow(i) = Seg_lateral_inflow(i) + Hru_outflow(j)
+            ! if cascade_flag = CASCADE_HRU_SEGMENT, seg_lateral_inflow set with strm_seg_in
+            IF ( Cascade_flag==CASCADE_OFF ) Seg_lateral_inflow(i) = Seg_lateral_inflow(i) + Hru_outflow(j)
             Seginc_sroff(i) = Seginc_sroff(i) + DBLE( Sroff(j) )*tocfs
             Seginc_ssflow(i) = Seginc_ssflow(i) + DBLE( Ssres_flow(j) )*tocfs
             Seginc_gwflow(i) = Seginc_gwflow(i) + DBLE( Gwres_flow(j) )*tocfs
@@ -725,7 +725,7 @@
         ENDDO
       ENDIF
 
-      IF ( Cascade_flag>0 ) RETURN
+      IF ( Cascade_flag>CASCADE_OFF ) RETURN
 
 ! Divide solar radiation and PET by sum of HRU area to get avarage
       IF ( Noarea_flag==OFF ) THEN

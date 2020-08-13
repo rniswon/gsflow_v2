@@ -14,7 +14,7 @@
 !***********************************************************************
       MODULE PRMS_GWFLOW
       USE PRMS_CONSTANTS, ONLY: ON, OFF, LAKE, SWALE, DEBUG_less, DNEARZERO, &
-     &    RUN, DECL, INIT, CLEAN, DOCUMENTATION
+     &    RUN, DECL, INIT, CLEAN, DOCUMENTATION, CASCADEGW_OFF
       USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Ngw, Nlake, Print_debug, Init_vars_from_file, &
      &    Save_vars_to_file, Dprst_flag, Cascadegw_flag, Lake_route_flag, Inputerror_flag, Gwr_swale_flag
       IMPLICIT NONE
@@ -87,7 +87,7 @@
       CALL print_module(MODDESC, MODNAME, Version_gwflow)
 
 ! cascading variables and parameters
-      IF ( Cascadegw_flag>OFF .OR. Model==DOCUMENTATION ) THEN
+      IF ( Cascadegw_flag>CASCADEGW_OFF .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Gw_upslope(Ngw) )
         IF ( declvar(MODNAME, 'gw_upslope', 'ngw', Ngw, 'double', &
      &       'Groundwater flow received from upslope GWRs for each GWR', &
@@ -377,7 +377,7 @@
         Basin_lake_seep = 0.0D0
       ENDIF
 ! do only once, so restart uses saved values
-      IF ( Cascadegw_flag>OFF ) THEN
+      IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         Gw_upslope = 0.0D0
         Hru_gw_cascadeflow = 0.0
         IF ( Nlake>0 ) Lakein_gwflow = 0.0D0
@@ -418,7 +418,7 @@
 !***********************************************************************
       gwflowrun = 0
 
-      IF ( Cascadegw_flag>OFF ) THEN
+      IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         Gw_upslope = 0.0D0
         Basin_dnflow = 0.0D0
         Basin_gw_upslope = 0.0D0
@@ -491,7 +491,7 @@
         Gw_in_soil(i) = Soil_to_gw(i)*Hru_area(i)
         Gw_in_ssr(i) = Ssr_to_gw(i)*Hru_area(i)
         gwin = Gw_in_soil(i) + Gw_in_ssr(i)
-        IF ( Cascadegw_flag>OFF ) THEN
+        IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
           gwin = gwin + Gw_upslope(i)
           Basin_gw_upslope = Basin_gw_upslope + Gw_upslope(i)
         ENDIF
@@ -555,7 +555,7 @@
         Basin_gwstor = Basin_gwstor + gwstor
 
         Gwres_flow(i) = SNGL( gwflow/gwarea )
-        IF ( Cascadegw_flag>OFF ) THEN
+        IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
           IF ( Ncascade_gwr(i)>0 ) THEN
             CALL rungw_cascade(i, Ncascade_gwr(i), Gwres_flow(i), dnflow)
             Hru_gw_cascadeflow(i) = dnflow

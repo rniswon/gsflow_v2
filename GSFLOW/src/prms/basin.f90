@@ -2,7 +2,7 @@
 ! Defines shared watershed and HRU physical parameters and variables
 !***********************************************************************
       MODULE PRMS_BASIN
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ON, OFF, DECL, INIT, &
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ON, OFF, DECL, INIT, CASCADEGW_OFF, &
      &    INACTIVE, LAKE, SWALE, FEET, ERROR_basin, DEBUG_minimum, &
      &    NORTHERN, SOUTHERN, DOCUMENTATION, FEET2METERS, METERS2FEET, DNEARZERO, &
      &    ide_dist_module, potet_pt_module, potet_pm_module, potet_pm_sta_module
@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2020-08-11'
+      character(len=*), parameter :: Version_basin = '2020-08-13'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -161,7 +161,7 @@
       ALLOCATE ( Hru_route_order(Nhru) )
 ! gwflow inactive for GSFLOW mode so arrays not allocated
 ! when GSFLOW can run in multi-mode will need these arrays
-      IF ( GSFLOW_flag==OFF .OR. Cascadegw_flag>0 ) ALLOCATE ( Gwr_route_order(Nhru), Gwr_type(Nhru) )
+      IF ( GSFLOW_flag==OFF .OR. Cascadegw_flag>CASCADEGW_OFF ) ALLOCATE ( Gwr_route_order(Nhru), Gwr_type(Nhru) )
       ! potet_pm, potet_pm_sta, or potet_pt
       IF ( Et_flag==potet_pt_module .OR. Et_flag==potet_pm_module .OR. Et_flag==potet_pm_sta_module &
      &     .OR. Glacier_flag==ON ) ALLOCATE ( Hru_elev_feet(Nhru) )
@@ -472,7 +472,7 @@
       Active_hrus = j
       Active_area = Land_area + Water_area
 
-      IF ( GSFLOW_flag==OFF .OR. Cascadegw_flag>0 ) THEN
+      IF ( GSFLOW_flag==OFF .OR. Cascadegw_flag>CASCADEGW_OFF ) THEN
         Active_gwrs = Active_hrus
         Gwr_type = Hru_type
         Gwr_route_order = Hru_route_order

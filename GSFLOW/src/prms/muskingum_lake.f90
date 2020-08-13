@@ -94,7 +94,7 @@
       MODULE PRMS_MUSKINGUM_LAKE
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, SETDIMENS, ON, OFF, NEARZERO, CFS2CMS_CONV, &
      &    OUTFLOW_SEGMENT, DOCUMENTATION, NEARZERO, DNEARZERO, CFS2CMS_CONV, LAKE, &
-     &    ERROR_streamflow, ERROR_dim, ERROR_lake, DEBUG_less
+     &    ERROR_streamflow, ERROR_dim, ERROR_lake, DEBUG_less, CASCADE_OFF, CASCADE_HRU_SEGMENT
       USE PRMS_MODULE, ONLY: Model, Nsegment, Nhru, Nratetbl, Nlake, Process_flag, &
      &    Print_debug, Save_vars_to_file, Init_vars_from_file, Strmflow_flag, Cascade_flag, Inputerror_flag, &
      &    Glacier_flag
@@ -103,7 +103,7 @@
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       character(len=*), parameter :: MODDESC = 'Streamflow & Lake Routing'
       character(len=14), parameter :: MODNAME = 'muskingum_lake'
-      character(len=*), parameter :: Version_muskingum_lake = '2020-08-04'
+      character(len=*), parameter :: Version_muskingum_lake = '2020-08-13'
       INTEGER, SAVE :: Obs_flag, Linear_flag, Weir_flag, Gate_flag, Puls_flag
       INTEGER, SAVE :: Secondoutflow_flag
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
@@ -332,7 +332,7 @@
      &     'Total precipitation into each lake', &
      &     'cfs', Lake_precip)/=0 ) CALL read_error(3, 'lake_precip')
 
-      IF ( Cascade_flag>0 .OR. Model==DOCUMENTATION ) THEN
+      IF ( Cascade_flag>CASCADE_OFF .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Lake_lateral_inflow(Nlake) )
         IF ( declvar(MODNAME, 'lake_lateral_inflow', 'nlake', Nlake, 'double', &
      &       'Lateral inflow to each lake', &
@@ -396,7 +396,7 @@
 
 ! Declared Parameters
       ALLOCATE ( Lake_segment_id(Nsegment) )
-      IF ( Cascade_flag>0 ) THEN
+      IF ( Cascade_flag>CASCADE_OFF ) THEN
         IF ( declparam(MODNAME, 'lake_segment_id', 'nsegment', 'integer', &
      &       '0', 'bounded', 'nlake', &
      &       'Index of lake associated with a segment', &
@@ -686,14 +686,14 @@
       Basin_2ndstflow = 0.0D0
       Lake_stream_in = 0.0D0
       Basin_lake_stor = 0.0D0
-      IF ( Cascade_flag>0 ) THEN
+      IF ( Cascade_flag>CASCADE_OFF ) THEN
         Lake_lateral_inflow = 0.0D0
         Lake_sroff = 0.0D0
         Lake_interflow = 0.0D0
         Lake_gwflow = 0.0D0
       ENDIF
 
-      IF ( Cascade_flag==0 .OR. Cascade_flag==2 ) THEN ! when cascades are active, hru_segment is not used
+      IF ( Cascade_flag==CASCADE_OFF .OR. Cascade_flag==CASCADE_HRU_SEGMENT ) THEN
         Lake_segment_id = 0
         DO jjj = 1, Active_hrus
           j = Hru_route_order(jjj)
@@ -943,7 +943,7 @@
       Lake_outflow = 0.0D0
       Lake_stream_in = 0.0D0
       Lake_precip = 0.0D0
-      IF ( Cascade_flag>0 ) THEN
+      IF ( Cascade_flag>CASCADE_OFF ) THEN
         Lake_lateral_inflow = 0.0D0
         Lake_sroff = 0.0D0
         Lake_interflow = 0.0D0
@@ -962,7 +962,7 @@
         tocfs = Hru_area_dble(k)*Cfs_conv
         lakeid = Lake_hru_id(k)
         Lake_precip(lakeid) = Lake_precip(lakeid) + tocfs*DBLE(Hru_ppt(k))
-        IF ( Cascade_flag>0 ) THEN
+        IF ( Cascade_flag>CASCADE_OFF ) THEN
           Lake_sroff(lakeid) = Lake_sroff(lakeid) + tocfs*(Hortonian_lakes(k)+Upslope_dunnianflow(k))
           Lake_interflow(lakeid) = Lake_interflow(lakeid) + tocfs*Upslope_interflow(k)
           Lake_gwflow(lakeid) = Lake_gwflow(lakeid) + tocfs*Gw_upslope(k)
@@ -971,7 +971,7 @@
       ENDDO
       DO lakeid = 1, Nlake
         Lake_inflow(lakeid) = Lake_precip(lakeid)
-        IF ( Cascade_flag>0 ) THEN
+        IF ( Cascade_flag>CASCADE_OFF ) THEN
           Lake_lateral_inflow(lakeid) = Lake_sroff(lakeid) + Lake_interflow(lakeid) + Lake_gwflow(lakeid)
           Lake_inflow(lakeid) = Lake_inflow(lakeid) + Lake_lateral_inflow(lakeid)
         ENDIF
