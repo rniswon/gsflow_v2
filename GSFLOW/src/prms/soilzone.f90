@@ -891,7 +891,6 @@
           It0_basin_ssstor = Basin_ssstor
           It0_gravity_stor_res = Gravity_stor_res
           It0_strm_seg_in = Strm_seg_in
-          Gw2sm_grav = 0.0
         ELSE
           DO k = 1, Active_hrus
             i = Hru_route_order(k)
@@ -909,6 +908,7 @@
           Strm_seg_in = It0_strm_seg_in
         ENDIF
         Sm2gw_grav = 0.0
+        Gw2sm_grav = 0.0
       ENDIF
 
       IF ( Cascade_flag>CASCADE_OFF ) THEN
@@ -1091,6 +1091,8 @@
           ! adjust soil moisture with replenish amount
           IF ( Gvr2sm(i)>0.0 ) THEN
             Soil_moist(i) = Soil_moist(i) + Gvr2sm(i)/perv_frac
+!            IF ( Soil_moist(i)>Soil_moist_max(i) ) &
+!     &           PRINT *, 'sm>max', Soil_moist(i), Soil_moist_max(i), i
             IF ( Soilzone_aet_flag==ON ) THEN
               Soil_lower(i) = Soil_lower(i) + Gvr2sm(i)/perv_frac
               excess = Soil_lower(i) - Soil_lower_stor_max(i)
@@ -1100,6 +1102,9 @@
               Soil_rechr(i) = MIN( Soil_rechr_max(i), Soil_rechr(i) )
             ENDIF
             Basin_gvr2sm = Basin_gvr2sm + DBLE( Gvr2sm(i)*harea )
+!          ELSEIF ( Gvr2sm(i)<-NEARZERO ) THEN
+!            PRINT *, 'negative gvr2sm, HRU:', i, Gvr2sm(i)
+!            Gvr2sm(i) = 0.0
           ENDIF
           Grav_gwin(i) = SNGL( gwin )
           Basin_sz_gwin = Basin_sz_gwin + gwin*DBLE( harea )
@@ -1168,8 +1173,35 @@
         ENDIF
 !        Perv_avail_et(i) = avail_potet
 
+        ! sanity check
+!        IF ( Soil_moist(i)<0.0 ) THEN
+!          IF ( Print_debug>-1 ) PRINT *, i, Soil_moist(i), ' negative'
+!          IF ( pervactet>=ABS(Soil_moist(i)) ) THEN
+!            pervactet = pervactet + Soil_moist(i)
+!            Soil_moist(i) = 0.0
+!          ENDIF
+!          IF ( Soil_moist(i)<-NEARZERO ) THEN
+!            IF ( Print_debug>-1 ) PRINT *, 'HRU:', i, ' soil_moist<0.0', Soil_moist(i)
+!          ENDIF
+!          Soil_moist(i) = 0.0
+!        ENDIF
+
         Hru_actet(i) = Hru_actet(i) + pervactet*perv_frac
         avail_potet = Potet(i) - Hru_actet(i)
+        ! sanity check
+!        IF ( avail_potet<0.0 ) THEN
+!          IF ( Print_debug>-1 ) THEN
+!            IF ( avail_potet<-NEARZERO ) PRINT *, 'hru_actet>potet', i, &
+!     &           Nowmonth, Nowday, Hru_actet(i), Potet(i), avail_potet
+!          ENDIF
+!          Hru_actet(i) = Potet(i)
+!          tmp = avail_potet/perv_frac
+!          pervactet = pervactet + tmp
+!          Soil_moist(i) = Soil_moist(i) - tmp
+!          Soil_rechr(i) = Soil_rechr(i) - tmp
+!          IF ( Soil_rechr(i)<0.0 ) Soil_rechr(i) = 0.0
+!          IF ( Soil_moist(i)<0.0 ) Soil_moist(i) = 0.0
+!        ENDIF
         Perv_actet(i) = pervactet
 
 ! soil_moist & soil_rechr multiplied by perv_area instead of harea
@@ -1364,6 +1396,13 @@
           Infil = 0.0
         ELSE
           Infil = Infil - excs/Perv_frac         !???? what if Infil<0 ??? might happen with dynamic and small values, maybe ABS < NEARZERO = 0.0
+!          IF ( Infil<0.0 ) THEN
+!            IF ( Infil<-0.0001 ) THEN
+!              PRINT *, 'negative infil', infil, soil_moist, excs
+!              Soil_moist = Soil_moist + Infil
+!            ENDIF
+!            Infil = 0.0
+!          ENDIF
         ENDIF
 
         Soil_to_ssr = excs
@@ -1523,7 +1562,7 @@
 !     Compute subsurface lateral flow
 !***********************************************************************
       SUBROUTINE compute_interflow(Coef_lin, Coef_sq, Ssres_in, Storage, Inter_flow)
-      USE PRMS_SOILZONE, ONLY: ERROR_soilzone
+      USE PRMS_SOILZONE, ONLY: ERROR_soilzone !,NEARZERO, CLOSEZERO
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, SQRT
@@ -1565,6 +1604,15 @@
         Inter_flow = Storage
       ENDIF
       Storage = Storage - Inter_flow
+!      IF ( Storage<0.0 ) THEN
+!        IF ( Storage<-CLOSEZERO ) PRINT *, 'Sanity check, ssres_stor<0.0', Storage
+!        Storage = 0.0
+! rsr, if very small storage, add it to interflow
+!      ELSEIF ( Storage>0.0 .AND. Storage<NEARZERO ) THEN
+!        print *, 'small storage', storage, inter_flow
+!        Inter_flow = Inter_flow + Storage
+!        Storage = 0.0
+!      ENDIF
 
       END SUBROUTINE compute_interflow
 
@@ -1692,6 +1740,9 @@
             Sm2gw_grav(igvr) = perc
             togw = togw + DBLE( perc )*frac
           ENDIF
+!        ELSE ! GVRs can go negative if flux change in MODFLOW final iteration decreases, so don't set to 0
+!          if(depth<0.0) print *, 'depth<0', depth, ihru
+!          depth = 0.0
         ENDIF
 
         Gravity_stor_res(igvr) = depth
@@ -1719,6 +1770,7 @@
 !     and preferential-flow threshold (Pref_flow_thrsh)
 !***********************************************************************
       SUBROUTINE check_gvr_sm(Capacity, Depth, Frac, Gvr2sm, Input)
+!      USE PRMS_CONSTANTS, ONLY: CLOSEZERO
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MAX, ABS, SNGL
@@ -1746,6 +1798,8 @@
       ENDIF
       Gvr2sm = Gvr2sm + to_sm*frac_sngl
       Depth = Depth - to_sm
+      !IF ( Depth<0.0 ) PRINT *, 'depth<0', depth
+!      IF ( Depth<CLOSEZERO ) Depth = 0.0
       Input = Input - to_sm*frac_sngl
 
       END SUBROUTINE check_gvr_sm

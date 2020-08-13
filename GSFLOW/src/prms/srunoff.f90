@@ -22,7 +22,8 @@
 !***********************************************************************
       MODULE PRMS_SRUNOFF
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, NEARZERO, DNEARZERO, ON, OFF, &
-     &    DEBUG_WB, smidx_module, carea_module, LAND, LAKE, GLACIER, RUN, DECL, INIT, CLEAN, ON
+     &    DEBUG_WB, smidx_module, carea_module, LAND, LAKE, GLACIER, &
+     &    RUN, DECL, INIT, CLEAN, ON, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Print_debug, Init_vars_from_file, &
      &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, Water_use_flag, &
      &    Frozen_flag, GSFLOW_flag, Save_vars_to_file, Process_flag, Inputerror_flag, Glacier_flag !, Parameter_check_flag
@@ -30,7 +31,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2020-08-04'
+      character(len=*), parameter :: Version_srunoff = '2020-08-13'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -262,7 +263,7 @@
      &     'inches', Hortonian_flow)/=0 ) CALL read_error(3, 'hortonian_flow')
 
 ! cascading variables and parameters
-      IF ( Cascade_flag>OFF .OR. Model==DOCUMENTATION ) THEN
+      IF ( Cascade_flag>CASCADE_OFF .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Upslope_hortonian(Nhru) )
         IF ( declvar(MODNAME, 'upslope_hortonian', 'nhru', Nhru, 'double', &
      &       'Hortonian surface runoff received from upslope HRUs', &
@@ -505,7 +506,7 @@
       Contrib_fraction = 0.0
       Hru_impervevap = 0.0
       IF ( Call_cascade==ON ) Strm_seg_in = 0.0D0
-      IF ( Cascade_flag>OFF ) THEN
+      IF ( Cascade_flag>CASCADE_OFF ) THEN
         Upslope_hortonian = 0.0D0
         Hru_hortn_cascflow = 0.0D0
         IF ( Nlake>0 ) Hortonian_lakes = 0.0D0
@@ -613,7 +614,7 @@
       Basin_apply_sroff = 0.0D0
 
       IF ( Call_cascade==ON ) Strm_seg_in = 0.0D0
-      IF ( Cascade_flag>0 ) THEN
+      IF ( Cascade_flag>CASCADE_OFF ) THEN
         Basin_sroff_down = 0.0D0
         Basin_sroff_upslope = 0.0D0
         Basin_hortonian_lakes = 0.0D0
@@ -660,7 +661,7 @@
           ! Sanity check
 !          IF ( Infil(i)+Sroff(i)+Imperv_stor(i)+Imperv_evap(i)>0.0 ) &
 !     &         PRINT *, 'srunoff lake ERROR', Infil(i), Sroff(i), Imperv_stor(i), Imperv_evap(i), i
-          IF ( Cascade_flag>0 ) THEN
+          IF ( Cascade_flag>CASCADE_OFF ) THEN
             Hortonian_lakes(i) = Upslope_hortonian(i)
             Basin_hortonian_lakes = Basin_hortonian_lakes + Hortonian_lakes(i)*Hruarea_dble
           ENDIF
@@ -703,7 +704,7 @@
           IF ( Cfgi(i)>=Cfgi_thrshld ) THEN
             frzen = 1
             ! depression storage states are not changed if frozen
-            IF ( Cascade_flag>OFF ) THEN
+            IF ( Cascade_flag>CASCADE_OFF ) THEN
               cfgi_sroff = (Snowmelt(i) + availh2o + Upslope_hortonian(i) + glcrmltb)*Hruarea
             ELSE
               cfgi_sroff = (Snowmelt(i) + availh2o + glcrmltb)*Hruarea
@@ -771,7 +772,7 @@
           srunoff = SNGL( runoff/Hruarea_dble )
 
 !******Compute HRU weighted average (to units of inches/dt)
-          IF ( Cascade_flag>OFF ) THEN
+          IF ( Cascade_flag>CASCADE_OFF ) THEN
             hru_sroff_down = 0.0D0
             IF ( srunoff>0.0 ) THEN
               IF ( Ncascade_hru(i)>0 ) CALL run_cascade_sroff(Ncascade_hru(i), srunoff, hru_sroff_down)
@@ -836,7 +837,7 @@
       Basin_sroffi = Basin_sroffi*Basin_area_inv
       Basin_hortonian = Basin_hortonian*Basin_area_inv
       Basin_contrib_fraction = Basin_contrib_fraction*Basin_area_inv
-      IF ( Cascade_flag>OFF ) THEN
+      IF ( Cascade_flag>CASCADE_OFF ) THEN
         Basin_hortonian_lakes = Basin_hortonian_lakes*Basin_area_inv
         Basin_sroff_down = Basin_sroff_down*Basin_area_inv
         Basin_sroff_upslope = Basin_sroff_upslope*Basin_area_inv
@@ -886,7 +887,7 @@
       SUBROUTINE compute_infil(Net_rain, Net_ppt, Imperv_stor, Imperv_stor_max, Snowmelt, &
      &                         Snowinfil_max, Net_snow, Pkwater_equiv, Infil, Hru_type, Intcp_changeover)
       USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp, Isglacier, &
-     &    LAND, ON, OFF, NEARZERO, DNEARZERO
+     &    LAND, ON, OFF, NEARZERO, DNEARZERO, CASCADE_OFF
       USE PRMS_SNOW, ONLY: Pptmix_nopack
       USE PRMS_MODULE, ONLY: Cascade_flag
       IMPLICIT NONE
@@ -906,7 +907,7 @@
       hru_flag = 0
       IF ( Hru_type==LAND .OR. Isglacier==ON ) hru_flag = 1 ! land or glacier
 ! compute runoff from cascading Hortonian flow
-      IF ( Cascade_flag>0 ) THEN
+      IF ( Cascade_flag>CASCADE_OFF ) THEN
         avail_water = SNGL( Upslope_hortonian(Ihru) )
         IF ( avail_water>0.0 ) THEN
           Infil = Infil + avail_water
