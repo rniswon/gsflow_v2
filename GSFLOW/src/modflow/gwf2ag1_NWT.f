@@ -2418,10 +2418,11 @@
       USE GWFSFRMODULE, ONLY: SEG, STRM, DVRSFLW
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
       USE PRMS_BASIN, ONLY: HRU_PERV
       USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
       IMPLICIT NONE
 ! --------------------------------------------------
       !modules
@@ -2433,7 +2434,7 @@
      +                    aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup !, etdif
       real :: fmaxflow, etdif
-      integer :: k, iseg, hru_id, i
+      integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
       double precision :: set_factor
 ! --------------------------------------------------
