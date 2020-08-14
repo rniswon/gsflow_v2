@@ -3,11 +3,13 @@
 !***********************************************************************
       MODULE GSFBUDGET
 !   Local Variables
+      character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
+      character(len=13), parameter :: MODNAME = 'gsflow_budget'
+      character(len=*), parameter :: Version_gsflow_budget = '2020-08-11'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
       REAL, SAVE, ALLOCATABLE :: Fluxchange(:)
-      CHARACTER(LEN=13), SAVE :: MODNAME
 !   Declared Variables
       DOUBLE PRECISION, SAVE :: Total_pump, Total_pump_cfs, StreamExchng2Sat_Q, Stream2Unsat_Q, Sat_S
       DOUBLE PRECISION, SAVE :: Stream_inflow, Basin_gw2sm, NetBoundaryFlow2Sat_Q
@@ -51,131 +53,127 @@
       USE GSFBUDGET
       USE PRMS_MODULE, ONLY: Nhru, Nsegment
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getdim
-      EXTERNAL :: print_module, read_error, declvar_dble, declvar_real
-! Save Variables
-      CHARACTER(LEN=80), SAVE :: Version_gsflow_budget
+      INTEGER, EXTERNAL :: declvar, getdim
+      EXTERNAL :: print_module, read_error
 !***********************************************************************
       gsfbuddecl = 0
 
-      Version_gsflow_budget = 'gsflow_budget.f90 2020-06-10 10:00:00Z'
-      CALL print_module(Version_gsflow_budget, 'GSFLOW Output Budget Summary', 90)
-      MODNAME = 'gsflow_budget'
+      CALL print_module(MODDESC, MODNAME, Version_gsflow_budget)
 
       Nreach = getdim('nreach')
       IF ( Nreach==-1 ) CALL read_error(6, 'nreach')
 
 ! Declared Variables
-      CALL declvar_dble(MODNAME, 'NetBoundaryFlow2Sat_Q', 'one', 1, &
+      IF ( declvar(MODNAME, 'NetBoundaryFlow2Sat_Q', 'one', 1, 'double', &
      &     'Volumetric flow rate to the saturated zone along the external boundary'// &
      &     ' (negative value is flow out of model domain)', &
-     &     'L3/T', NetBoundaryFlow2Sat_Q)
+     &     'L3/T', NetBoundaryFlow2Sat_Q)/=0 ) CALL read_error(3, 'NetBoundaryFlow2Sat_Q')
 
-      CALL declvar_dble(MODNAME, 'StreamExchng2Sat_Q', 'one', 1, &
+      IF ( declvar(MODNAME, 'StreamExchng2Sat_Q', 'one', 1, 'double', &
      &     'Volumetric flow rate of exchange betweeen streams and the saturated'// &
      &     ' zone (value is equal to Strm2UZGW minus SatDisch2Stream_Q, where a'// &
      &     ' negative value indicates a net loss from streams)', &
-     &     'L3/T', StreamExchng2Sat_Q)
+     &     'L3/T', StreamExchng2Sat_Q)/=0 ) CALL read_error(3, 'StreamExchng2Sat_Q')
 
-      CALL declvar_dble(MODNAME, 'Stream2Unsat_Q', 'one', 1, &
+      IF ( declvar(MODNAME, 'Stream2Unsat_Q', 'one', 1, 'double', &
      &     'Volumetric flow rate betweeen streams and the unsaturated'// &
      &     ' zone (value is equal to Strm2UZGW minus SatDisch2Stream_Q, where a'// &
      &     ' negative value indicates a net loss from streams)', &
-     &     'L3/T', Stream2Unsat_Q)
+     &     'L3/T', Stream2Unsat_Q)/=0 ) CALL read_error(3, 'Stream2Unsat_Q')
 
-      CALL declvar_dble(MODNAME, 'LakeExchng2Sat_Q', 'one', 1, &
+      IF ( declvar(MODNAME, 'LakeExchng2Sat_Q', 'one', 1, 'double', &
      &     'Volumetric flow rate of exchange betweeen lakes and the saturated'// &
      &     ' zone (value is equal to Strm2UZGW minus SatDisch2Stream_Q, where a'// &
      &     ' negative value indicates a net loss from streams)', &
-     &     'L3/T', LakeExchng2Sat_Q)
+     &     'L3/T', LakeExchng2Sat_Q)/=0 ) CALL read_error(3, 'LakeExchng2Sat_Q')
 
-      CALL declvar_dble(MODNAME, 'Lake2Unsat_Q', 'one', 1, &
+      IF ( declvar(MODNAME, 'Lake2Unsat_Q', 'one', 1, 'double', &
      &     'Volumetric flow rate betweeen lakes and the unsaturated'// &
      &     ' zone (value is equal to Strm2UZGW minus SatDisch2Stream_Q, where a'// &
      &     ' negative value indicates a net loss from streams)', &
-     &     'L3/T', Lake2Unsat_Q)
+     &     'L3/T', Lake2Unsat_Q)/=0 ) CALL read_error(3, 'Lake2Unsat_Q')
 
-      CALL declvar_dble(MODNAME, 'stream_inflow', 'one', 1, &
+      IF ( declvar(MODNAME, 'stream_inflow', 'one', 1, 'double', &
      &     'Specified volumetric stream inflow rate into model ', &
-     &     'L3/T', Stream_inflow)
+     &     'L3/T', Stream_inflow)/=0 ) CALL read_error(3, 'stream_inflow')
 
-      CALL declvar_dble(MODNAME, 'Unsat_S', 'one', 1, &
+      IF ( declvar(MODNAME, 'Unsat_S', 'one', 1, 'double', &
      &     'Volume of water in the unsaturated zone', &
-     &     'L3', Unsat_S)
+     &     'L3', Unsat_S)/=0 ) CALL read_error(3, 'Unsat_S')
 
-      CALL declvar_dble(MODNAME, 'Sat_S', 'one', 1, &
+      IF ( declvar(MODNAME, 'Sat_S', 'one', 1, 'double', &
      &     'Volume of water in the saturated zone', &
-     &     'L3', Sat_S)
+     &     'L3', Sat_S)/=0 ) CALL read_error(3, 'Sat_S')
 
-      CALL declvar_dble(MODNAME, 'Sat_dS', 'one', 1, &
+      IF ( declvar(MODNAME, 'Sat_dS', 'one', 1, 'double', &
      &     'Change in saturated-zone storage', &
-     &     'L3', Sat_dS)
+     &     'L3', Sat_dS)/=0 ) CALL read_error(3, 'Sat_dS')
 
-      CALL declvar_dble(MODNAME, 'total_pump', 'one', 1, &
+      IF ( declvar(MODNAME, 'total_pump', 'one', 1, 'double', &
      &     'Total pumpage from all cells', &
-     &     'L3', Total_pump)
+     &     'L3', Total_pump)/=0 ) CALL read_error(3, 'total_pump')
 
-      CALL declvar_dble(MODNAME, 'total_pump_cfs', 'one', 1, &
+      IF ( declvar(MODNAME, 'total_pump_cfs', 'one', 1, 'double', &
      &     'Total pumpage from all cells', &
-     &     'cfs', Total_pump_cfs)
+     &     'cfs', Total_pump_cfs)/=0 ) CALL read_error(3, 'total_pump_cfs')
 
       ALLOCATE (Reach_cfs(Nreach))
-      CALL declvar_real(MODNAME, 'reach_cfs', 'nreach', Nreach, &
+      IF ( declvar(MODNAME, 'reach_cfs', 'nreach', Nreach, 'real', &
      &     'Stream flow leaving each stream reach', &
-     &     'cfs', Reach_cfs)
+     &     'cfs', Reach_cfs)/=0 ) CALL read_error(3, 'reach_cfs')
 
       ALLOCATE (Reach_wse(Nreach))
-      CALL declvar_real(MODNAME, 'reach_wse', 'nreach', Nreach, &
+      IF ( declvar(MODNAME, 'reach_wse', 'nreach', Nreach, 'real', &
      &     'Water surface elevation in each stream reach', &
-     &     'L', Reach_wse)
+     &     'L', Reach_wse)/=0 ) CALL read_error(3, 'reach_wse')
 
-      CALL declvar_dble(MODNAME, 'basin_gw2sm', 'one', 1, &
+      IF ( declvar(MODNAME, 'basin_gw2sm', 'one', 1, 'double', &
      &     'Basin average water exfiltrated from unsaturated and saturated zones and added to soil zone', &
-     &     'inches', Basin_gw2sm)
+     &     'inches', Basin_gw2sm)/=0) CALL read_error(3, 'basin_gw2sm')
 
-      CALL declvar_dble(MODNAME, 'basin_szreject', 'one', 1, &
+      IF ( declvar(MODNAME, 'basin_szreject', 'one', 1, 'double', &
      &     'Basin average recharge from SZ and rejected by UZF', &
-     &     'inches', Basin_szreject)
+     &     'inches', Basin_szreject)/=0) CALL read_error(3, 'basin_szreject')
 
       ALLOCATE (Gw2sm(Nhru))
-      CALL declvar_real(MODNAME, 'gw2sm', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'gw2sm', 'nhru', Nhru, 'real', &
      &     'HRU average water exfiltrated from groundwater model and added back to soil zone', &
-     &     'inches', Gw2sm)
+     &     'inches', Gw2sm)/=0 ) CALL read_error(3, 'gw2sm')
 
       ALLOCATE (Actet_gw(Nhru))
-      CALL declvar_real(MODNAME, 'actet_gw', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'actet_gw', 'nhru', Nhru, 'real', &
      &     'Actual ET from each GW cell', &
-     &     'inches', Actet_gw)
+     &     'inches', Actet_gw)/=0 ) CALL read_error(3, 'actet_gw')
 
       ALLOCATE (Actet_tot_gwsz(Nhru))
-      CALL declvar_real(MODNAME, 'actet_tot_gwsz', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'actet_tot_gwsz', 'nhru', Nhru, 'real', &
      &     'Total actual ET from each GW cell and PRMS soil zone', &
-     &     'inches', Actet_tot_gwsz)
+     &     'inches', Actet_tot_gwsz)/=0 ) CALL read_error(3, 'actet_tot_gwsz')
 
       ALLOCATE (Streamflow_sfr(Nsegment))
-      CALL declvar_real(MODNAME, 'streamflow_sfr', 'nsegment', Nsegment, &
+      IF ( declvar(MODNAME, 'streamflow_sfr', 'nsegment', Nsegment, 'real', &
      &     'Streamflow as computed by SFR for each segment', &
-     &     'cfs', Streamflow_sfr)
+     &     'cfs', Streamflow_sfr)/=0 ) CALL read_error(3, 'streamflow_sfr')
 
       ALLOCATE ( Gw_rejected(Nhru) )
-      CALL declvar_real(MODNAME, 'gw_rejected', 'nhru', Nhru, &
-     &     'HRU average recharge rejected by UZF', &
-     &     'inches', Gw_rejected)
+      IF ( declvar(MODNAME, 'gw_rejected', 'nhru', Nhru, 'real', &
+     &     'HRU average recharge rejected by UZF', 'inches', &
+     &     Gw_rejected)/=0 ) CALL read_error(3, 'gw_rejected')
 
 !      ALLOCATE ( Uzf_infil_map(Nhru) )
-!      CALL declvar_real(MODNAME, 'uzf_infil_map', 'nhru', Nhru, &
+!      IF ( declvar(MODNAME, 'uzf_infil_map', 'nhru', Nhru, 'real', &
 !     &     'HRU total gravity drainage to UZF cells', 'L3', &
-!     &     Uzf_infil_map)
+!     &     Uzf_infil_map)/=0 ) CALL read_error(3, 'uzf_infil_map')
 
 !      ALLOCATE ( Sat_recharge(Nhru) )
-!      CALL declvar_real(MODNAME, 'sat_recharge', 'nhru', Nhru, &
+!      IF ( declvar(MODNAME, 'sat_recharge', 'nhru', Nhru, 'real', &
 !     &     'HRU total recharge to the saturated zone', 'L3', &
-!     &     Sat_recharge)
+!     &     Sat_recharge)/=0 ) CALL read_error(3, 'sat_recharge')
 
 !      ALLOCATE ( Mfoutflow_to_gvr(Nhru) )
-!      CALL declvar_real(MODNAME, 'mfoutflow_to_gvr', 'nhru', Nhru, &
+!      IF ( declvar(MODNAME, 'mfoutflow_to_gvr', 'nhru', Nhru, 'real', &
 !     &     'MODFLOW total discharge and ET to each HRU', 'L3', &
-!     &     Mfoutflow_to_gvr)
+!     &     Mfoutflow_to_gvr)/=0 ) CALL read_error(3, 'mfoutflow_to_gvr')
 
       END FUNCTION gsfbuddecl
 
@@ -195,7 +193,7 @@
 
       IF ( Nreach/=NSTRM ) THEN
         PRINT *, 'ERROR, nreach must equal to NSTRM', Nreach, NSTRM
-        ERROR STOP -1
+        ERROR STOP 3
       ENDIF
 
       Reach_cfs = 0.0 ! dimension NSTRM
@@ -251,13 +249,13 @@
       USE GWFLAKMODULE, ONLY: EVAP, SURFA
 !Warning, modifies Basin_gwflow_cfs, Basin_cfs, Basin_cms, Basin_stflow,
 !                  Basin_ssflow_cfs, Basin_sroff_cfs
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, CLOSEZERO
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Active_area, &
-     &    Basin_area_inv, Hru_area, NEARZERO, Lake_hru_id, Lake_area, CLOSEZERO
+     &    Basin_area_inv, Hru_area, Lake_hru_id, Lake_area
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Hru_actet, Basin_sroff, &
      &    Basin_actet, Basin_ssstor, Ssres_stor, Slow_stor, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_gwflow_cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv
-!Warning, modifies Basin_soil_moist, Basin_ssstor
-!Warning, modifies Gw2sm_grav
+!Warning, modifies Basin_ssstor and Gw2sm_grav
       USE PRMS_SOILZONE, ONLY: Pref_flow_stor, Gravity_stor_res, Hrucheck, Gvr_hru_id, &
      &    Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
       IMPLICIT NONE
@@ -601,7 +599,6 @@
 !***********************************************************************
       SUBROUTINE MODFLOW_GET_STORAGE_UPW()
       USE GSFBUDGET, ONLY: Sat_S
-      USE PRMS_BASIN, ONLY: NEARZERO
       USE GLOBAL, ONLY: NCOL, NROW, NLAY, IBOUND, BOTM, HNEW, LBOTM, HOLD
       USE GWFBASMODULE, ONLY: DELT
       USE GWFUPWMODULE, ONLY: SC1, SC2UPW, Sn
@@ -686,7 +683,7 @@
       USE GWFSFRMODULE, ONLY: STRM, IOTSG, NSS, SGOTFLW, SFRRATOUT, &
      &    TOTSPFLOW, NSTRM, SFRRATIN
       USE PRMS_FLOWVARS, ONLY: Basin_cfs, Basin_cms, Basin_stflow_out
-      USE PRMS_BASIN, ONLY: CFS2CMS_CONV
+      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
       USE PRMS_SET_TIME, ONLY: Cfs2inches
       USE GLOBAL, ONLY : IUNIT
       USE GWFAGMODULE, ONLY:  NUMIRRDIVERSIONSP,IRRSEG
