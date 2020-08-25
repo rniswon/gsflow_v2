@@ -25,7 +25,7 @@
 				<Tool Name="VFPostBuildEventTool"/>
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
 		<Configuration Name="Debug|x64">
-				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" EnableRecursion="true" FloatingPointExceptionHandling="fpe0" FloatingPointModel="source" FloatingPointExceptionsModel="enable" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" Traceback="true" BoundsCheck="true" ImproveFloatingPointConsistency="true"/>
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" EnableRecursion="true" LocalSavedScalarsZero="true" FloatingPointExceptionHandling="fpe0" FloatingPointModel="source" FloatingPointExceptionsModel="enable" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" Traceback="true" BoundsCheck="true" ImproveFloatingPointConsistency="true"/>
 				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
@@ -60,6 +60,7 @@
 		<File RelativePath="..\GSFLOW\src\modflow\de47_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\dynamic_param_read.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\frost_date.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\glacr_melt.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_budget.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_mf2prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_modflow.f"/>
@@ -109,6 +110,8 @@
 		<File RelativePath="..\GSFLOW\src\modflow\Irestart.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\lmt8_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\mach_mod.f90"/>
+		<File RelativePath="..\GSFLOW\src\modflow\Makefile"/>
+		<File RelativePath="..\GSFLOW\src\prms\Makefile"/>
 		<File RelativePath="..\GSFLOW\src\prms\map_results.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\mhc7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\modules.f90"/>
@@ -131,6 +134,7 @@
 		<File RelativePath="..\GSFLOW\src\modflow\obs2ghb7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\obs2riv7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\obs2str7.f"/>
+		<File RelativePath="..\GSFLOW\src\modflow\openspec.inc"/>
 		<File RelativePath="..\GSFLOW\src\modflow\parutl7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\pcg7_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\potet_hamon.f90"/>
@@ -142,6 +146,8 @@
 		<File RelativePath="..\GSFLOW\src\prms\potet_pt.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\precip_1sta_laps.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\precip_dist2.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\precip_temp_grid.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\prms_constants.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_summary.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_time.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\routing.f90"/>
