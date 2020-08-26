@@ -158,7 +158,6 @@ C     ------------------------------------------------------------------
       DATA aname(8)/'   INITIAL WATER CONTENT'/
       DATA aname(9)/' LAND SURFACE VERTICAL K'/
 C     ------------------------------------------------------------------
-      Version_uzf = 'gwf2uzf1_NWT.f 2019-09-10 09:56:00Z'
       ALLOCATE(NUMCELLS, TOTCELLS, Iseepsupress, IPRCNT, Isavefinf)
       ALLOCATE(Isurfkreject, Ireadsurfk, Iseepreject,ETOFH_FLAG)
       Iseepsupress = 0   ! Iseepsupress = 1 means seepout not calculated

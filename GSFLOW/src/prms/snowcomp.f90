@@ -13,7 +13,8 @@
      &    INCH2M, FEET2METERS, DNEARZERO, DOCUMENTATION, ON, OFF, &
      &    MONTHS_PER_YEAR, DEBUG_less, DAYS_YR, CLOSEZERO, INCH2CM
       USE PRMS_MODULE, ONLY: Model, Process_flag, Nhru, Ndepl, Print_debug, &
-     &    Save_vars_to_file, Init_vars_from_file, Snarea_curve_flag, Glacier_flag, Start_year
+     &    Save_vars_to_file, Init_vars_from_file, Snarea_curve_flag, Glacier_flag, Start_year, &
+     &    Gsflow_flag, Kkiter
       IMPLICIT NONE
       !****************************************************************
       !   Local Constants
@@ -25,7 +26,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2020-08-04'
+      character(len=*), parameter :: Version_snowcomp = '2020-08-25'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -57,6 +58,11 @@
       REAL, SAVE, ALLOCATABLE :: Glacr_5avsnow1(:), Glacr_5avsnow(:),Glacr_delsnow(:), Glacr_freeh2o_capm(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Glacr_pkwater_ante(:), Glacr_pkwater_equiv(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Glacr_pk_depth(:), Glacr_pss(:), Glacr_pst(:)
+      INTEGER, SAVE, ALLOCATABLE :: It0_iasw(:)
+      REAL, SAVE, ALLOCATABLE :: It0_snowcov_area(:), It0_snowcov_areasv(:), It0_albedo(:), It0_pk_depth(:)
+      REAL, SAVE, ALLOCATABLE :: It0_pk_temp(:), It0_pk_def(:), It0_pk_ice(:), It0_pk_den(:), It0_freeh2o(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:), It0_scrv(:), It0_pksv(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pst(:), It0_pss(:)
       !****************************************************************
       !   Declared Parameters
 
@@ -117,6 +123,13 @@
       snodecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_snowcomp)
+
+      IF ( Gsflow_flag==ON ) THEN
+        ALLOCATE ( It0_snowcov_area(Nhru), It0_snowcov_areasv(Nhru), It0_pkwater_equiv(Nhru) )
+        ALLOCATE ( It0_albedo(Nhru), It0_pk_depth(Nhru), It0_iasw(Nhru), It0_pst(Nhru) )
+        ALLOCATE ( It0_pksv(Nhru), It0_scrv(Nhru), It0_pk_temp(Nhru), It0_pss(Nhru) )
+        ALLOCATE ( It0_pk_def(Nhru), It0_pk_ice(Nhru), It0_pk_den(Nhru), It0_freeh2o(Nhru) )
+      ENDIF
 
 ! declare variables
       ALLOCATE ( Scrv(Nhru) )
@@ -688,7 +701,7 @@
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: DBLE, ATAN, SNGL
+      INTRINSIC :: DBLE, ATAN, SNGL, MIN
       INTEGER, EXTERNAL :: getparam
       EXTERNAL :: read_error, snowcomp_restart, sca_deplcrv, glacr_states_to_zero
 ! Local Variables
@@ -782,6 +795,13 @@
             Freeh2o(i) = Pk_ice(i)*Freeh2o_cap(i)
             Ai(i) = Pkwater_equiv(i) ! [inches]
             IF ( Ai(i)>Snarea_thresh(i) ) Ai(i) = DBLE( Snarea_thresh(i) ) ! [inches]
+            IF ( Ai(i)>DNEARZERO ) THEN
+              Frac_swe(i) = SNGL( Pkwater_equiv(i)/Ai(i) ) ! [fraction]
+              Frac_swe(i) = MIN( 1.0, Frac_swe(i) )
+            ELSE
+!              print *, ai(i), snarea_thresh
+              Frac_swe(i) = 0.0
+            ENDIF
             Frac_swe(i) = SNGL( Pkwater_equiv(i)/Ai(i) ) ! [fraction]
             CALL sca_deplcrv(Snowcov_area(i), Snarea_curve(1,Hru_deplcrv(i)), Frac_swe(i))
             Basin_snowcov = Basin_snowcov + DBLE(Snowcov_area(i))*Hru_area_dble(i)
@@ -910,6 +930,42 @@
       DOUBLE PRECISION :: dpt1, dpt_before_settle
 !***********************************************************************
       snorun = 0
+
+      IF ( Gsflow_flag==ON ) THEN
+        IF ( Kkiter>1 ) THEN
+          Pkwater_equiv = It0_pkwater_equiv
+          Snowcov_area = It0_snowcov_area
+          Snowcov_areasv = It0_snowcov_areasv
+          Albedo = It0_albedo
+          Pk_depth = It0_pk_depth
+          Iasw = It0_iasw
+          Pst = It0_pst
+          Scrv = It0_scrv
+          Pksv = It0_pksv
+          Pk_temp = It0_pk_temp
+          Pk_def = It0_pk_def
+          Pk_ice = It0_pk_ice
+          Pk_den = It0_pk_den
+          Pss = It0_pss
+          Freeh2o = It0_freeh2o
+        ELSE
+          It0_pkwater_equiv = Pkwater_equiv
+          It0_snowcov_area = Snowcov_area
+          It0_albedo = It0_albedo
+          It0_pk_depth = Pk_depth
+          It0_snowcov_areasv = Snowcov_areasv
+          It0_iasw = Iasw
+          It0_pst = Pst
+          It0_scrv = Scrv
+          It0_pksv = Pksv
+          It0_pk_temp = Pk_temp
+          It0_pk_def = Pk_def
+          It0_pk_ice = Pk_ice
+          It0_pk_den = Pk_den
+          It0_pss = Pss
+          It0_freeh2o = Freeh2o
+        ENDIF
+      ENDIF
 
       ! Set the basin totals to 0
       ! (recalculated at the end of the time step)
@@ -2614,6 +2670,7 @@
       SUBROUTINE snowcov(Iasw, Newsnow, Snowcov_area, Snarea_curve, &
      &                   Pkwater_equiv, Pst, Snarea_thresh, Net_snow, &
      &                   Scrv, Pksv, Snowcov_areasv, Ai, Frac_swe)
+      USE PRMS_SNOW, ONLY: DNEARZERO
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Newsnow
@@ -2626,7 +2683,7 @@
       DOUBLE PRECISION, INTENT(INOUT) :: Pst, Scrv, Pksv
       REAL, INTENT(OUT) :: Frac_swe
 ! Functions
-      INTRINSIC DBLE, SNGL
+      INTRINSIC DBLE, SNGL, MIN
       EXTERNAL :: sca_deplcrv
 ! Local Variables
       REAL :: snowcov_area_ante
@@ -2647,7 +2704,13 @@
 
       ! calculate the ratio of the current packwater equivalent to
       ! the maximum packwater equivalent for the given snowpack
-      Frac_swe = SNGL( Pkwater_equiv/Ai ) ! [fraction]
+      IF ( Ai>DNEARZERO ) THEN
+        Frac_swe = SNGL( Pkwater_equiv/Ai ) ! [fraction]
+        Frac_swe = MIN( 1.0, Frac_swe )
+      ELSE
+!        print *, ai, snarea_thresh
+        Frac_swe = 0.0
+      ENDIF
 
       ! There are 3 potential conditions for the snow area curve:
       ! A. snow is accumulating and the pack is currently at its
