@@ -13,7 +13,7 @@
       USE GWFUZFMODULE, ONLY: SEEPOUT
       USE PRMS_MODULE, ONLY: Process, Nhrucell, Gvr_cell_id, Hru_ag_irr
       USE GLOBAL,       ONLY:IUNIT
-      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_BASIN, ONLY: Hru_area_ag
       USE GWFBASMODULE, ONLY:DELT
       USE GWFAGMODULE, ONLY: NUMIRRWELSP,IRRWELVAR,NUMCELLS,WELLIRRPRMS,  &
                               NUMIRRDIVERSIONSP,IRRSEG,DVRCH,DIVERSIONIRRPRMS,IRRROW_GW,  &
@@ -24,7 +24,7 @@
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW to PRMS'
       character(len=*), parameter :: MODNAME = 'gsflow_mf2prms'
-      character(len=*), parameter :: Version_gsflow_mf2prms = '2020-08-11'
+      character(len=*), parameter :: Version_gsflow_mf2prms = '2020-08-14'
       INTEGER :: i, j, k, ihru
       integer :: IRWL,NMCL,SGNM
       DOUBLE PRECISION :: mf_q2prms_inch !, firr
@@ -50,7 +50,7 @@
             IF ( IRWL > 0 ) NMCL = NUMCELLS(IRWL)
             DO K = 1, NMCL
               ihru = IRRROW_GW(K,IRWL)
-              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + WELLIRRPRMS(k,IRWL)*mf_q2prms_inch/HRU_PERV(IHRU)
+              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + WELLIRRPRMS(k,IRWL)*mf_q2prms_inch/Hru_area_ag(IHRU)
             END DO
           END DO
 !
@@ -62,7 +62,7 @@
             IF ( SGNM>0 ) NMCL = DVRCH(SGNM)
             DO K=1,NMCL        
               ihru = IRRROW_SW(K,SGNM)
-              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + DIVERSIONIRRPRMS(k,SGNM)*mf_q2prms_inch/HRU_PERV(ihru)
+              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + DIVERSIONIRRPRMS(k,SGNM)*mf_q2prms_inch/Hru_area_ag(ihru)
             END DO
           END DO
         END IF

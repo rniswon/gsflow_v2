@@ -19,7 +19,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'ide_dist'
-      character(len=*), parameter :: Version_ide_dist = '2020-08-03'
+      character(len=*), parameter :: Version_ide_dist = '2020-08-19'
       INTEGER, SAVE :: Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Dalr
@@ -98,7 +98,7 @@
 ! declare parameters
       ALLOCATE ( Adjust_snow(Nrain,MONTHS_PER_YEAR) )
       IF ( declparam(MODNAME, 'adjust_snow', 'nrain,nmonths', 'real',
-     +     '-0.4', '-0.5', '2.0',
+     +     '-0.4', '-0.5', '3.0',
      +     'Monthly (January to December) snow downscaling adjustment'//
      +     ' factor for each precipitation measurement station',
      +     'Monthly (January to December) snow downscaling adjustment'//
@@ -107,7 +107,7 @@
 
       ALLOCATE ( Adjust_rain(Nrain,MONTHS_PER_YEAR) )
       IF ( declparam(MODNAME, 'adjust_rain', 'nrain,nmonths', 'real',
-     +     '-0.4', '-0.5', '2.0',
+     +     '-0.4', '-0.5', '3.0',
      +     'Monthly (January to December) rain downscaling adjustment'//
      +     ' factor for each precipitation measurement station',
      +     'Monthly (January to December) rain downscaling adjustment'//

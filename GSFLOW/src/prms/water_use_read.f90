@@ -682,7 +682,8 @@
       ENDIF
       IF ( Dest_type==7 ) THEN
         IF ( Consumed_transfers_on==OFF ) &
-     &       CALL error_stop('specified a consumption-use transfer, but consumption locations not present in model', ERROR_water_use)
+     &       CALL error_stop('specified a consumption-use transfer, but consumption locations not present in model', &
+     &       ERROR_water_use)
       ENDIF
       IF ( Src_type==2 ) THEN
         IF ( Gwr_transferON_OFF==OFF ) THEN

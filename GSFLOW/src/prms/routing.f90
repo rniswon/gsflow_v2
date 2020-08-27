@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2020-08-13'
+      character(len=*), parameter :: Version_routing = '2020-08-19'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades
@@ -136,17 +136,17 @@
       IF ( Strmflow_flag==strmflow_muskingum_mann_module .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Mann_n(Nsegment) )
         IF ( declparam( MODNAME, 'mann_n', 'nsegment', 'real', &
-     &     '0.04', '0.001', '0.15', &
-     &     'Mannings roughness coefficient', &
-     &     'Mannings roughness coefficient for each segment', &
-     &     'dimensionless')/=0 ) CALL read_error(1, 'mann_n')
+     &       '0.04', '0.001', '0.15', &
+     &       'Mannings roughness coefficient', &
+     &       'Mannings roughness coefficient for each segment', &
+     &       'dimensionless')/=0 ) CALL read_error(1, 'mann_n')
 
         ALLOCATE ( Seg_length(Nsegment) )
         IF ( declparam( MODNAME, 'seg_length', 'nsegment', 'real', &
-     &     '1000.0', '0.001', '200000.0', &
-     &     'Length of each segment', &
-     &     'Length of each segment including vertical drop, bounds based on CONUS', &
-     &     'meters')/=0 ) CALL read_error(1, 'seg_length')
+     &       '1000.0', '1.0', '100000.0', &
+     &       'Length of each segment', &
+     &       'Length of each segment', &
+     &       'meters')/=0 ) CALL read_error(1, 'seg_length')
 
         ALLOCATE ( Seg_depth(Nsegment) )
         IF ( declparam(MODNAME, 'seg_depth', 'nsegment', 'real', &
@@ -161,10 +161,10 @@
      &     .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Seg_slope(Nsegment) )
         IF ( declparam( MODNAME, 'seg_slope', 'nsegment', 'real', &
-     &     '0.0001', '0.0000001', '2.0', &
-     &     'Surface slope of each segment', &
-     &     'Surface slope of each segment as approximation for bed slope of stream', &
-     &     'decimal fraction')/=0 ) CALL read_error(1, 'seg_slope')
+     &       '0.0001', '0.0000001', '2.0', &
+     &       'Surface slope of each segment', &
+     &       'Surface slope of each segment as approximation for bed slope of stream', &
+     &       'decimal fraction')/=0 ) CALL read_error(1, 'seg_slope')
       ENDIF
 
       ALLOCATE ( Segment_type(Nsegment) )

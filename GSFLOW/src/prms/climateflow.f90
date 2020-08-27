@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2020-08-11'
+      character(len=*), parameter :: Version_climateflow = '2020-08-19'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -790,7 +790,7 @@
      &     'inches')/=0 ) CALL read_error(1, 'soil_moist_max')
 
       ALLOCATE ( Soil_rechr_max(Nhru) )
-      IF ( PRMS4_flag==ON ) THEN
+      IF ( PRMS4_flag==ON .OR. Model==DOCUMENTATION ) THEN
         IF ( declparam(Soilzone_module, 'soil_rechr_max', 'nhru', 'real', &
      &       '1.5', '0.00001', '20.0', &
      &       'Maximum storage for soil recharge zone', &
@@ -798,7 +798,8 @@
      &       ' capillary reservoir where losses occur as both'// &
      &       ' evaporation and transpiration); must be less than or equal to soil_moist_max', &
      &       'inches')/=0 ) CALL read_error(1, 'soil_rechr_max')
-      ELSE
+      ENDIF
+      IF ( PRMS4_flag==OFF .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Soil_rechr_max_frac(Nhru) )
         IF ( declparam(Soilzone_module, 'soil_rechr_max_frac', 'nhru', 'real', &
      &       '1.0', '0.00001', '1.0', &
@@ -1008,7 +1009,8 @@
         ENDIF
         IF ( getparam(Solrad_module, 'radj_sppt', Nhru, 'real', Radj_sppt)/=0 ) CALL read_error(2, 'radj_sppt')
         IF ( getparam(Solrad_module, 'radj_wppt', Nhru, 'real', Radj_wppt)/=0 ) CALL read_error(2, 'radj_wppt')
-        IF ( getparam(Solrad_module, 'ppt_rad_adj', Nhru*MONTHS_PER_YEAR, 'real', Ppt_rad_adj)/=0 ) CALL read_error(2, 'ppt_rad_adj')
+        IF ( getparam(Solrad_module, 'ppt_rad_adj', Nhru*MONTHS_PER_YEAR, 'real', Ppt_rad_adj)/=0 ) &
+     &       CALL read_error(2, 'ppt_rad_adj')
         IF ( getparam(Solrad_module, 'radmax', Nhru*MONTHS_PER_YEAR, 'real', Radmax)/=0 ) CALL read_error(2, 'radmax')
       ELSE
         Basin_solsta = 0

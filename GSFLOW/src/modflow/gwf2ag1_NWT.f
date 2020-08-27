@@ -1661,7 +1661,7 @@
      +                  RHS
       USE GWFBASMODULE, ONLY: TOTIM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: IDIVAR, SEG, STRM
+      USE GWFSFRMODULE, ONLY: IDIVAR, SEG, STRM, DVRSFLW, SGOTFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -1752,8 +1752,8 @@
             IF (NUMSEGS(L) > 0) THEN
                DO I = 1, NUMSEGS(L)
                   J = DIVERSIONSEG(I, L)
-                  k = IDIVAR(1, J)
-                  QSW = STRM(9, LASTREACH(K))
+                  QSW = SEG(2, J)
+                  If ( kkiter > 1 ) QSW = DVRSFLW(J)
                   IF (ETDEMANDFLAG > 0) THEN
                      FMIN = SUPACT(J)
                   ELSE IF (TRIGGERFLAG > 0) then
@@ -1783,7 +1783,7 @@
                   IF (GSFLOW_flag == 0) THEN
                      QQ = demandgw_uzf(l, kkper, kkstp, kkiter, time)
                   ELSE
-                     QQ = demandgw_prms(l, kkiter)
+                     QQ = demandgw_prms(l, kkper, kkstp, kkiter)
                   END IF
                ELSEIF (TRIGGERFLAG > 0) then
                   QQ = demandtrigger_gw(Q, kkper, kkstp, kkiter, l)   
@@ -1851,11 +1851,6 @@
                   SUBVOL = -(DONE - IRRFACT(I, L))*Qp*IRRFIELDFACT(I, L)
                   ! Keep irrigation for PRMS as volumetric rate
                   WELLIRRPRMS(I, L) = WELLIRRPRMS(I, L) + SUBVOL
-!                  if ( i==1 .and. l==122 ) then
-!                    print *, 'SUBVOL',SUBVOL, DONE, IRRFACT(I, L), Qp
-!                    print *, IRRFIELDFACT(I, L), WELLIRRPRMS(I, L)
-!                    print *, Qonly(L), DONENEG, Q
-!                    endif
                END DO
             END IF
          END IF
@@ -1867,8 +1862,8 @@
             DO icount = 1, DVRCH(istsg)   !THESE VARS COULD BE DIMENSIONED NUMIRRDIVERSION TO SAVE MEMORY
                irr = IRRROW_SW(icount, istsg)
                icc = IRRCOL_SW(icount, istsg)
-              !dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-               dvt = seg(2, istsg)*DVRPERC(ICOUNT, istsg)
+               dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
+               !dvt = seg(2, istsg)*DVRPERC(ICOUNT, istsg)
                if (dvt < zero) dvt = 0.0
                dvt = dvt/(DELR(icc)*DELC(irr))
                DIVERSIONIRRUZF(icc, irr) = DIVERSIONIRRUZF(icc, irr) +
@@ -1876,8 +1871,7 @@
             END DO
          ELSE
             DO icount = 1, DVRCH(istsg)
-               dvt = (seg(2, istsg) - actual(istsg))*
-     +                DVRPERC(ICOUNT, istsg)
+               dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT, istsg)
                dvt = (1.0 - DVEFF(ICOUNT, istsg))*dvt
          ! Keep irrigation for PRMS as volume
                DIVERSIONIRRPRMS(icount, istsg) = 
@@ -2333,7 +2327,7 @@
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE, VKS
-      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, IDIVAR, STRM
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, STRM
       USE GWFAGMODULE
       USE GLOBAL, ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
@@ -2369,7 +2363,7 @@
         !
         !1b - ------Update demand as max flow in segment
         !
-        IF (DEMAND(iseg) < zerod7) goto 300
+!        IF (DEMAND(iseg) < zerod7) goto 300
         aetold = dzero
         aetnew = dzero
         pettotal = dzero
@@ -2393,7 +2387,7 @@
         sup = DVRSFLW(iseg) + ACTUAL(ISEG)
         supold = SUPACTOLD(ISEG) + ACTUALOLD(ISEG)
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
-     +           supold, kiter)
+     +           supold, kper, kstp, kiter)
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
@@ -2404,9 +2398,11 @@
         !
         !1 - -----limit diversion to water right and flow in river
         !
-        k = IDIVAR(1, ISEG)
-        fmaxflow = STRM(9, LASTREACH(K))
-        IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
+!        k = IDIVAR(1, ISEG)
+!        fmaxflow = STRM(9, LASTREACH(K))
+!        fmaxflow = demand(ISEG)
+!        If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
+!        IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
 300   CONTINUE
       RETURN
@@ -2419,13 +2415,14 @@
 !     demandconjunctive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
 !     SPECIFICATIONS:
-      USE GWFSFRMODULE, ONLY: SEG, IDIVAR, STRM, DVRSFLW
+      USE GWFSFRMODULE, ONLY: SEG, STRM, DVRSFLW
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_BASIN, ONLY: HRU_PERV
-      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
-      USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
+      USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
+      USE PRMS_BASIN, ONLY: Hru_area_ag
+      USE PRMS_FLOWVARS, ONLY: Hru_actet
+      USE PRMS_CLIMATEVARS, ONLY: Potet
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
       IMPLICIT NONE
 ! --------------------------------------------------
       !modules
@@ -2436,8 +2433,8 @@
       double precision :: zerod7, done, dzero, pettotal,
      +                    aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup !, etdif
-      real :: fmaxflow
-      integer :: k, iseg, hru_id, i
+      real :: fmaxflow, etdif
+      integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
       double precision :: set_factor
 ! --------------------------------------------------
@@ -2454,15 +2451,20 @@
         aettotal = DZERO
         factor = DZERO
         iseg = IRRSEG(i)
-        IF (DEMAND(iseg) < zerod7) goto 300
+!        IF (DEMAND(iseg) < zerod7) goto 300
         !
         !1 - -----loop over hrus irrigated by diversion
         !
         do k = 1, DVRCH(iseg)
            hru_id = IRRROW_SW(k, iseg)
-           area = HRU_PERV(hru_id)
-           pet = potet(hru_id)*area*prms_inch2mf_q
-           aet = hru_actet(hru_id)*area*prms_inch2mf_q
+           IF ( Nhru==Nhrucell ) THEN
+             icell = Gvr_cell_id(hru_id)
+             irow = Gwc_row(icell)
+             icol = Gwc_col(icell)
+           END IF
+           area = Hru_area_ag(hru_id)
+           pet = Potet(hru_id)*area*prms_inch2mf_q
+           aet = Hru_actet(hru_id)*area*prms_inch2mf_q
            pettotal = pettotal + pet
            aettotal = aettotal + aet
         end do
@@ -2471,7 +2473,7 @@
         sup = DVRSFLW(iseg) + ACTUAL(ISEG)
         supold = SUPACTOLD(ISEG) + ACTUALOLD(ISEG)
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
-     +           supold, kiter)
+     +           supold, kper, kstp, kiter)
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
@@ -2484,11 +2486,13 @@
         !1 - -----limit diversion to water right
         !
 ! NEED to check IPRIOR value here
-        k = IDIVAR(1, ISEG)
-        fmaxflow = STRM(9, LASTREACH(K))
-        IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
+!        k = IDIVAR(1, ISEG)
+!        fmaxflow = STRM(9, LASTREACH(K))
+!        fmaxflow = demand(ISEG)
+!        If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
+!        IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
-  !      if(iseg==18)then
+  !      if(iseg==18.and.kper==22.and.kstp==21)then
   !    etdif = pettotal - aettotal
   !        write(999,33)kper,kstp,kiter,SEG(2, iseg),fmaxflow,
   !   +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
@@ -2504,12 +2508,12 @@
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GLOBAL, ONLY: DELR, DELC
-      USE GWFSFRMODULE, ONLY: SEG, IDIVAR, STRM, NSS
+      USE GWFSFRMODULE, ONLY: SEG, STRM, NSS, DVRSFLW
       USE GWFAGMODULE
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
-      USE PRMS_CLIMATEVARS, ONLY: POTET
+      USE PRMS_FLOWVARS, ONLY: Hru_actet
+      USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
 ! --------------------------------------------
@@ -2536,7 +2540,7 @@
       !
       do 300 i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
-         IF (DEMAND(iseg) < zerod30) goto 300
+!         IF (DEMAND(iseg) < zerod30) goto 300
          aet = dzero
          pet = dzero
          !
@@ -2552,8 +2556,8 @@
                aet = aet + (gwet(ic, ir) + uzet)/area
             else
                hru_id = IRRROW_SW(k, iseg)
-               pet = pet + potet(hru_id)
-               aet = aet + hru_actet(hru_id)
+               pet = pet + Potet(hru_id)
+               aet = aet + Hru_actet(hru_id)
             end if
          end do
          petseg(iseg) = petseg(iseg) + pet
@@ -2575,9 +2579,11 @@
          !
          !1 - -----limit diversion to supply
          !
-         k = IDIVAR(1, ISEG)
-         fmaxflow = STRM(9, LASTREACH(K))
-         IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
+!         k = IDIVAR(1, ISEG)
+!         fmaxflow = STRM(9, LASTREACH(K))
+        !fmaxflow = demand(ISEG)
+        !If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
+        ! IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
 300    continue
        deallocate (petseg, aetseg)
        return
@@ -2593,8 +2599,8 @@
       USE GWFAGMODULE
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
-      USE PRMS_CLIMATEVARS, ONLY: POTET
+      USE PRMS_FLOWVARS, ONLY: Hru_actet
+      USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
 ! --------------------------------------------
@@ -2627,8 +2633,8 @@
             aettotal = aettotal + (gwet(ic, ir) + uzet)/area
           else
             hru_id = IRRROW_GW(i, l)
-            pettotal = pettotal + potet(hru_id)
-            aettotal = aettotal + hru_actet(hru_id)
+            pettotal = pettotal + Potet(hru_id)
+            aettotal = aettotal + Hru_actet(hru_id)
           end if
       end do
       factor = done
@@ -2698,8 +2704,8 @@
       aetold = AETITERGW(l)
       sup = QONLY(l)
       supold = QONLYOLD(l)
-      factor = set_factor(l, aetold, pettotal, aettotal, sup, supold,
-     +                    kiter)
+      factor = set_factor(l, aetold, pettotal, aettotal, sup, supold, 
+     +                    kper, kstp, kiter)
       QONLYOLD(l) = QONLY(l)
       AETITERGW(l) = sngl(aettotal)
       QONLY(L) = QONLY(L) + sngl(factor)
@@ -2710,16 +2716,16 @@
       end function demandgw_uzf
 !
 !
-      double precision function demandgw_prms(l, kiter)
+      double precision function demandgw_prms(l, kper, kstp, kiter)
 !     ******************************************************************
 !     demandgw---- sums up irrigation demand using ET deficit for gw
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_BASIN, ONLY: HRU_PERV, HRU_AREA
-      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
-      USE PRMS_CLIMATEVARS, ONLY: POTET
+      USE PRMS_BASIN, ONLY: Hru_area_ag, Hru_area
+      USE PRMS_FLOWVARS, ONLY: Hru_actet
+      USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_SOILZONE, ONLY: Soil_saturated
 
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
@@ -2727,7 +2733,7 @@
 ! --------------------------------------
       !modules
       !arguments
-      integer, intent(in) :: l, kiter
+      integer, intent(in) :: l, kper, kstp, kiter
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, prms_inch2mf_q,
      +                    aetold, areafactor,
@@ -2747,10 +2753,10 @@
       prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       DO I = 1, NUMCELLS(L)
          ihru = IRRROW_GW(I, L)
-         area = HRU_PERV(ihru)
-         areafactor = HRU_AREA(ihru) - area
-         pet = potet(ihru)*area*prms_inch2mf_q
-         aet = hru_actet(ihru)*area*prms_inch2mf_q
+         area = Hru_area_ag(ihru)
+         areafactor = Hru_area(ihru) - area
+         pet = Potet(ihru)*area*prms_inch2mf_q
+         aet = Hru_actet(ihru)*area*prms_inch2mf_q
          if ( Soil_saturated(ihru) == 1 ) aet = pet
          pettotal = pettotal + pet
          aettotal = aettotal + aet
@@ -2760,7 +2766,7 @@
       sup = QONLY(l)
       supold = QONLYOLD(l)
       factor = set_factor(l, aetold, pettotal, aettotal, sup, supold,
-     +                    kiter)
+     +                    kper, kstp, kiter)
       QONLYOLD(l) = QONLY(L)
       AETITERGW(l) = sngl(aettotal)
       QONLY(L) = QONLY(L) + sngl(factor)
@@ -2769,7 +2775,8 @@
       end function demandgw_prms
 !
       double precision function set_factor(l,aetold, pettotal, 
-     +                                     aettotal,sup,supold,kiter)
+     +                                     aettotal, sup, supold, 
+     +                                     kper, kstp, kiter)
 !     ******************************************************************
 !     updates diversion or pumping rate based on ET deficit
 !     ******************************************************************
@@ -2781,7 +2788,7 @@
       !arguments
       double precision, intent(in) :: aetold, pettotal, aettotal,
      +                                sup, supold
-      integer, intent(in) :: kiter, l
+      integer, intent(in) :: l, kper, kstp, kiter
       !dummy
       DOUBLE PRECISION :: factor, zerod5, dzero, etdif, det, dq
 ! -----------------------------------------
@@ -2802,9 +2809,10 @@
       if( factor > accel*etdif ) factor = accel*etdif
       if( factor < etdif ) factor = etdif
       if( factor < dzero ) factor = dzero
-!      open(222,file='debug.out')
-!      if(l==18)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
+!      if(l==18.and.kper==22.and.kstp==21)then
+!      write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
 !     +aetold,factor,sup
+!      end if
 !333   format(i5,8e20.10)
       set_factor = factor
       end function set_factor
@@ -2819,9 +2827,9 @@
       USE GWFAGMODULE
       USE GLOBAL, ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_BASIN, ONLY: HRU_PERV
-      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
-      USE PRMS_CLIMATEVARS, ONLY: POTET
+      USE PRMS_BASIN, ONLY: Hru_area_ag
+      USE PRMS_FLOWVARS, ONLY: Hru_actet
+      USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
       IMPLICIT NONE
@@ -2877,10 +2885,10 @@
                      aet = gwet(ic, ir) + uzet  !vol rate
                   ELSE
                      hru_id = IRRROW_SW(k, iseg)
-                     area = HRU_PERV(hru_id)
-                  prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
-                     pet = potet(hru_id)*area*prms_inch2mf_q
-                     aet = hru_actet(hru_id)*area*prms_inch2mf_q
+                     area = Hru_area_ag(hru_id)
+                   prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
+                     pet = Potet(hru_id)*area*prms_inch2mf_q
+                     aet = Hru_actet(hru_id)*area*prms_inch2mf_q
                   end if
                   aettot = aettot + aet
                   pettot = pettot + pet
@@ -2935,10 +2943,10 @@
                            aet = gwet(ic, ir) + uzet
                         ELSE
                            hru_id = IRRROW_GW(J, L)
-                           area = HRU_PERV(hru_id)
+                           area = Hru_area_ag(hru_id)
                   prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
-                           pet = potet(hru_id)*area*prms_inch2mf_q
-                           aet = hru_actet(hru_id)*area*prms_inch2mf_q
+                           pet = Potet(hru_id)*area*prms_inch2mf_q
+                           aet = Hru_actet(hru_id)*area*prms_inch2mf_q
                         END IF
                         pettot = pettot + pet
                         aettot = aettot + aet
@@ -2979,9 +2987,9 @@
                   ELSE
                   prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
                      hru_id = IRRROW_GW(J, L)
-                     area = HRU_PERV(hru_id)
-                     pet = potet(hru_id)*area*prms_inch2mf_q
-                     aet = hru_actet(hru_id)*area*prms_inch2mf_q
+                     area = Hru_area_ag(hru_id)
+                     pet = Potet(hru_id)*area*prms_inch2mf_q
+                     aet = Hru_actet(hru_id)*area*prms_inch2mf_q
                   END IF
                   pettot = pettot + pet
                   aettot = aettot + aet

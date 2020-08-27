@@ -628,6 +628,8 @@
         ENDIF
       ENDIF
 
+!RSR ??? need to cascade to Ag portion
+
       Basin_sroffi = 0.0D0
       Basin_sroffp = 0.0D0
       Basin_sroff = 0.0D0
@@ -912,7 +914,7 @@
 !***********************************************************************
       SUBROUTINE compute_infil(Net_rain, Net_ppt, Imperv_stor, Imperv_stor_max, Snowmelt, &
      &                         Snowinfil_max, Net_snow, Pkwater_equiv, Infil, Hru_type, Intcp_changeover)
-      USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp, Perv_frac, Isglacier, &
+      USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp, Isglacier, &
      &    LAND, ON, OFF, NEARZERO, DNEARZERO, CASCADE_OFF
       USE PRMS_SNOW, ONLY: Pptmix_nopack
       USE PRMS_MODULE, ONLY: Cascade_flag
@@ -932,9 +934,9 @@
 !***********************************************************************
       hru_flag = 0
       IF ( Hru_type==LAND .OR. Isglacier==ON ) hru_flag = 1 ! land or glacier
-! compute runoff from cascading Hortonian flow, put all water in pervious portion
-      IF ( Cascade_flag>CASCADE_OFF ) THEN
-        avail_water = SNGL( Upslope_hortonian(Ihru)/Perv_frac )
+! compute runoff from cascading Hortonian flow
+      IF ( Cascade_flag>0 ) THEN
+        avail_water = SNGL( Upslope_hortonian(Ihru) )
         IF ( avail_water>0.0 ) THEN
           Infil = Infil + avail_water
           IF ( hru_flag==1 ) CALL perv_comp(avail_water, avail_water, Infil, Srp)
@@ -1262,10 +1264,10 @@
      &           Avail_et, Net_rain, Dprst_in)
       USE PRMS_SRUNOFF, ONLY: Srp, Sri, Ihru, Perv_frac, Imperv_frac, Hruarea, Dprst_et_coef, &
      &    Dprst_seep_rate_open, Dprst_seep_rate_clos, Va_clos_exp, Va_open_exp, Dprst_flow_coef, &
-     &    Dprst_vol_thres_open, Dprst_vol_clos_max, Dprst_insroff_hru, &
+     &    Dprst_vol_thres_open, Dprst_vol_clos_max, Dprst_insroff_hru, Upslope_hortonian, &
      &    Basin_dprst_volop, Basin_dprst_volcl, Basin_dprst_evap, Basin_dprst_seep, Basin_dprst_sroff, &
      &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, Dprst_stor_hru, Hruarea_dble, &
-     &    ON, OFF, NEARZERO, DNEARZERO !, Print_debug, DEBUG_less
+     &    ON, OFF, NEARZERO, DNEARZERO, Cascade_flag !, Print_debug, DEBUG_less
       USE PRMS_BASIN, ONLY: Dprst_frac_open, Dprst_frac_clos
       USE PRMS_INTCP, ONLY: Net_snow
       USE PRMS_CLIMATEVARS, ONLY: Potet
@@ -1291,7 +1293,11 @@
       DOUBLE PRECISION :: seep_open, seep_clos, tmp1
 !***********************************************************************
 !     add the hortonian flow to the depression storage volumes:
-      inflow = 0.0
+      IF ( Cascade_flag>0 ) THEN
+        inflow = SNGL( Upslope_hortonian(Ihru) )
+      ELSE
+        inflow = 0.0
+      ENDIF
 
       IF ( Pptmix_nopack(Ihru)==ON ) inflow = inflow + Net_rain
 
