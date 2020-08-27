@@ -36,6 +36,7 @@
      &    Basin_ppt, Basin_snow, Basin_rain, Basin_obs_ppt, Tmax_allsnow_f
       USE PRMS_SET_TIME, ONLY: Nowmonth
 ! Functions
+      INTRINSIC :: SNGL
       INTEGER, EXTERNAL :: declparam, getparam, getdim, decldim, control_string
       EXTERNAL :: read_error, precip_form, temp_set, find_header_end, find_current_time
       EXTERNAL :: read_cbh_date, print_module, print_date
@@ -113,7 +114,7 @@
           Basin_tmax = Basin_tmax*Basin_area_inv
           Basin_tmin = Basin_tmin*Basin_area_inv
           Basin_temp = Basin_temp*Basin_area_inv
-          Solrad_tmax = Basin_tmax
+          Solrad_tmax = SNGL( Basin_tmax )
           Solrad_tmin = Basin_tmin
         ENDIF
 
@@ -250,8 +251,5 @@
         IF ( istop==1 ) STOP 'ERROR in precip_temp_map module'
 
       ENDIF
-
- 9002 FORMAT (/, 'WARNING: negative precipitation value:', F0.4, 'specified for module ', A, /, &
-     &        'precipitation station:', I0, '; Time:', I5, 2('/', I2.2), I3, 2(':', I2.2), '; value set to 0.0')
 
       END SUBROUTINE precip_temp_map
