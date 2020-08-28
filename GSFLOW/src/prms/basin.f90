@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2020-08-13'
+      character(len=*), parameter :: Version_basin = '2020-08-19'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -240,7 +240,7 @@
      &       'Identification number of the lake associated with an HRU;'// &
      &       ' more than one HRU can be associated with each lake', &
      &       'none')/=0 ) CALL read_error(1, 'lake_hru_id')
-        IF ( (Lake_route_flag==1 .AND. GSFLOW_flag==0 ) .OR. Model==DOCUMENTATION ) THEN
+        IF ( (Lake_route_flag==ON .AND. GSFLOW_flag==0 ) .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Lake_type(Nlake) )
           IF ( declparam(MODNAME, 'lake_type', 'nlake', 'integer', &
      &         '1', '1', '6', &
@@ -444,7 +444,7 @@
           IF ( Dprst_area_open_max(i)>0.0 ) Dprst_open_flag = ON
         ENDIF
       ENDDO
-      IF ( Dprst_flag==1 .AND. PRMS4_flag==1 ) DEALLOCATE ( Dprst_area )
+      IF ( Dprst_flag==ON .AND. PRMS4_flag==ON ) DEALLOCATE ( Dprst_area )
 
       IF ( Nlake>0 ) THEN
 !        IF ( Numlake_hrus/=Nlake_hrus ) THEN

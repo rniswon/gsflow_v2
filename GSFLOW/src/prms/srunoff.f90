@@ -26,7 +26,7 @@
      &    RUN, DECL, INIT, CLEAN, ON, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Print_debug, Init_vars_from_file, &
      &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, Water_use_flag, &
-     &    Frozen_flag, GSFLOW_flag, Save_vars_to_file, Process_flag, Inputerror_flag, Glacier_flag !, Parameter_check_flag
+     &    Frozen_flag, Save_vars_to_file, Process_flag, Inputerror_flag, Glacier_flag !, Parameter_check_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
@@ -37,7 +37,6 @@
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
       REAL, SAVE, ALLOCATABLE :: Carea_dif(:), Imperv_stor_ante(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_stor_ante(:)
-      DOUBLE PRECISION, SAVE :: Basin_dprst_hortonian_lakes
       REAL, SAVE :: Srp, Sri, Perv_frac, Imperv_frac, Hruarea_imperv, Hruarea
       DOUBLE PRECISION, SAVE :: Hruarea_dble, Basin_apply_sroff, Basin_cfgi_sroff
       INTEGER, SAVE :: Use_sroff_transfer, Isglacier
@@ -1239,7 +1238,7 @@
      &    Dprst_vol_thres_open, Dprst_vol_clos_max, Dprst_insroff_hru, Upslope_hortonian, &
      &    Basin_dprst_volop, Basin_dprst_volcl, Basin_dprst_evap, Basin_dprst_seep, Basin_dprst_sroff, &
      &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, Dprst_stor_hru, Hruarea_dble, &
-     &    Cascade_flag, ON, OFF, NEARZERO, DNEARZERO !, Print_debug, DEBUG_less
+     &    ON, OFF, NEARZERO, DNEARZERO, Cascade_flag !, Print_debug, DEBUG_less
       USE PRMS_BASIN, ONLY: Dprst_frac_open, Dprst_frac_clos
       USE PRMS_INTCP, ONLY: Net_snow
       USE PRMS_CLIMATEVARS, ONLY: Potet

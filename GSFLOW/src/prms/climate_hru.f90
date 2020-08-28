@@ -411,7 +411,8 @@
         ENDIF
 
         IF ( Climate_potet_flag==ON ) THEN
-          IF ( getparam(MODNAME, 'potet_cbh_adj', Nhru*MONTHS_PER_YEAR, 'real', Potet_cbh_adj)/=0 ) CALL read_error(2, 'potet_cbh_adj')
+          IF ( getparam(MODNAME, 'potet_cbh_adj', Nhru*MONTHS_PER_YEAR, 'real', Potet_cbh_adj)/=0 ) &
+     &         CALL read_error(2, 'potet_cbh_adj')
           IF ( control_string(Potet_day, 'potet_day')/=0 ) CALL read_error(5, 'potet_day')
           CALL find_header_end(Et_unit, Potet_day, 'potet_day', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN

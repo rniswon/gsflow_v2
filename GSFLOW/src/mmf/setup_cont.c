@@ -44,7 +44,7 @@ void setup_cont (void) {
 /*
 **	GSFLOW control variables
 */
-        decl_control_string ("model_mode", "PRMS");
+        decl_control_string ("model_mode", "GSFLOW");
         decl_control_string ("modflow_name", "modflow.nam");
         decl_control_string ("precip_module", "precip_1sta");
         decl_control_string ("temp_module", "temp_1sta");
@@ -97,6 +97,10 @@ void setup_cont (void) {
 		lval[0] = 0;
 		decl_control_int_array ("frozen_flag", 1, lval);
 
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("agriculture_flag", 1, lval);
+		
         lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
 		decl_control_int_array ("dprst_flag", 1, lval);
@@ -180,6 +184,10 @@ void setup_cont (void) {
 		lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
 		decl_control_int_array ("dyn_dprst_flag", 1, lval);
+
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("dyn_ag_flag", 1, lval);
 
 		lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
@@ -306,6 +314,7 @@ void setup_cont (void) {
         decl_control_string ("dprst_area_dynamic", "dyndprst_area");
         decl_control_string ("dprst_depth_dynamic", "dyndprst_depth");
         decl_control_string ("dprst_frac_dynamic", "dyndprst_frac");
+		decl_control_string ("dprst_ag_dynamic", "dynAg_frac");
 		decl_control_string ("snow_intcp_dynamic", "dynsnowintcp");
 		decl_control_string ("srain_intcp_dynamic", "dynsrainintcp");
 		decl_control_string ("wrain_intcp_dynamic", "dynwrainintcp");
