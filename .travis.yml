@@ -42,6 +42,7 @@ install:
 - export CXX="g++"
 - pip install -r requirements.travis.txt
 - pip install --upgrade numpy
+- pip install requests
 - pip install https://github.com/modflowpy/pymake/zipball/master
 - pip install shapely[vectorize]
 - pip install nose-timer

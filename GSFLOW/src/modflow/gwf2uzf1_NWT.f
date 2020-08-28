@@ -2327,6 +2327,7 @@ C7------CALCULATE ET DEMAND LEFT FOR GROUND WATER.
             hh = H
             IF ( c.LT.0.0d0 ) c = 0.0d0
             call simuzet(etopt,smoothet,hh,s,x,c,trhs,thcof,dET,etgw)
+            GWET(ic, ir) = etgw          !RGN 8/24/2020
             RHS(ic, ir, il) = RHS(ic, ir, il) + trhs
             HCOF(ic, ir, il) = HCOF(ic, ir, il) + thcof
 ! Derivative for RHS
