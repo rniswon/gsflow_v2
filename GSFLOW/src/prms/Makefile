@@ -158,7 +158,7 @@ precip_dist2.o: precip_dist2.f90 prms_module.mod prms_basin.mod prms_climatevars
 strmflow.o: strmflow.f90 prms_module.mod prms_basin.mod prms_obs.mod prms_flowvars.mod prms_gwflow.mod prms_srunoff.mod prms_set_time.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) strmflow.f90
 
-strmflow_in_out.o: strmflow_in_out.f90 prms_module.mod prms_basin.mod prms_obs.mod prms_flowvars.mod prms_gwflow.mod prms_srunoff.mod prms_set_time.mod prms prms_constants.mod_routing.mod
+strmflow_in_out.o: strmflow_in_out.f90 prms_module.mod prms_basin.mod prms_obs.mod prms_flowvars.mod prms_gwflow.mod prms_srunoff.mod prms_set_time.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) strmflow_in_out.f90
 
 stream_temp.o: stream_temp.f90 prms_module.mod prms_basin.mod prms_obs.mod prms_flowvars.mod prms_routing.mod prms_set_time.mod prms_snow.mod prms_soltab.mod prms_constants.mod

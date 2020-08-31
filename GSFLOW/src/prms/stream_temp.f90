@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2020-08-28'
+      character(len=*), parameter :: Version_stream_temp = '2020-08-31'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -422,7 +422,8 @@
       stream_temp_init = 0
 
       IF ( getparam( MODNAME, 'albedo', 1, 'real', Albedo)/=0 ) CALL read_error(2, 'albedo')
-      IF ( getparam( MODNAME, 'lat_temp_adj', Nsegment*MONTHS_PER_YEAR, 'real', lat_temp_adj)/=0 ) CALL read_error(2, 'lat_temp_adj')
+      IF ( getparam( MODNAME, 'lat_temp_adj', Nsegment*MONTHS_PER_YEAR, 'real', lat_temp_adj)/=0 ) &
+     &     CALL read_error(2, 'lat_temp_adj')
       IF ( getparam( MODNAME, 'seg_length', Nsegment, 'real', Seg_length)/=0 ) CALL read_error(2, 'seg_length')
 
       IF (getparam(MODNAME, 'seg_lat', Nsegment, 'real', Seg_lat)/=0 ) CALL read_error(2, 'seg_lat')
@@ -505,7 +506,8 @@
          ALLOCATE ( Sin_lat_decl(MAX_DAYS_PER_YEAR,Nsegment), Cos_lat_decl(MAX_DAYS_PER_YEAR,Nsegment) )
          ALLOCATE ( Max_solar_altitude(MAX_DAYS_PER_YEAR,Nsegment), Level_sunset_azimuth(MAX_DAYS_PER_YEAR,Nsegment) )
          ALLOCATE ( Local_sunset_hour_angle(MAX_DAYS_PER_YEAR,Nsegment), Local_sunrise_hour_angle(MAX_DAYS_PER_YEAR,Nsegment) )
-         ALLOCATE ( Shade_jday(Nsegment, MAX_DAYS_PER_YEAR), Svi_jday(Nsegment, MAX_DAYS_PER_YEAR), Sin_alrs(MAX_DAYS_PER_YEAR,Nsegment) )
+         ALLOCATE ( Shade_jday(Nsegment, MAX_DAYS_PER_YEAR), Svi_jday(Nsegment, MAX_DAYS_PER_YEAR) )
+         ALLOCATE ( Sin_alrs(MAX_DAYS_PER_YEAR,Nsegment) )
          Shade_jday = 0.0
          Svi_jday = 0.0
          Seg_lat = 0.0
