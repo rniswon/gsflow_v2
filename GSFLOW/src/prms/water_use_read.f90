@@ -56,8 +56,6 @@
       INTEGER FUNCTION water_use_read()
       USE PRMS_WATER_USE
       USE PRMS_MODULE, ONLY: Soilzone_add_water_use
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowday, Nowmonth, Cfs_conv
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open !, Gwres_stor
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL, DBLE
@@ -74,7 +72,7 @@
       INTEGER, SAVE :: gwr_next_year, gwr_next_month, gwr_next_day
       INTEGER, SAVE :: segment_next_year, segment_next_month, segment_next_day
       INTEGER, SAVE :: lake_next_year, lake_next_month, lake_next_day
-      DOUBLE PRECISION :: cfs_value, transfer_rate_dble !, factor
+      DOUBLE PRECISION :: transfer_rate_dble !, factor
 !***********************************************************************
       water_use_read = 0
 
