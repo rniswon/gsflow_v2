@@ -15,7 +15,7 @@
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'water_use_read'
-      character(len=*), parameter :: Version_water_use_read = '2020-08-29'
+      character(len=*), parameter :: Version_water_use_read = '2020-08-31'
 
       ! transfer type
       integer, parameter :: STREAM = 1
@@ -55,9 +55,9 @@
 
       INTEGER FUNCTION water_use_read()
       USE PRMS_WATER_USE
-      USE PRMS_BASIN, ONLY: Hru_perv !, Hru_area_dble
+      USE PRMS_MODULE, ONLY: Soilzone_add_water_use
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowday, Nowmonth, Cfs_conv
-      USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Soil_rechr_max, Dprst_vol_open !, Gwres_stor
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open !, Gwres_stor
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL, DBLE
@@ -74,7 +74,7 @@
       INTEGER, SAVE :: gwr_next_year, gwr_next_month, gwr_next_day
       INTEGER, SAVE :: segment_next_year, segment_next_month, segment_next_day
       INTEGER, SAVE :: lake_next_year, lake_next_month, lake_next_day
-      DOUBLE PRECISION :: cfs_value, diversion_inches, transfer_rate_dble !, factor
+      DOUBLE PRECISION :: cfs_value, transfer_rate_dble !, factor
 !***********************************************************************
       water_use_read = 0
 
@@ -251,10 +251,7 @@
             Soilzone_gain(id_dest) = Soilzone_gain(id_dest) + Transfer_rate(i)
             Soilzone_gain_tot(id_dest) = Soilzone_gain_tot(id_dest) + Transfer_rate(i)
             Total_soilzone_gain = Total_soilzone_gain + transfer_rate_dble
-            diversion_inches = transfer_rate_dble/Cfs_conv/DBLE(Hru_perv(id_dest))
-            Soil_moist(id_dest) = Soil_moist(id_dest) + SNGL( diversion_inches )
-            Soil_rechr(id_dest) = Soil_rechr(id_dest) + SNGL( diversion_inches )
-            IF ( Soil_rechr(id_dest)>Soil_rechr_max(id_dest) ) Soil_rechr(id_dest) = Soil_rechr_max(id_dest)
+            Soilzone_add_water_use = ON
           ENDIF
 
           IF ( Destination_type(i)==CANOPY ) THEN

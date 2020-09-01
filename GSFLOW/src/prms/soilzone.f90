@@ -19,12 +19,12 @@
      &    ERROR_soilzone, SAND, CLAY, LOAM, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Nssr, Nsegment, Nlake, Nhrucell, Print_debug, Dprst_flag, &
      &    Init_vars_from_file, Save_vars_to_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag, &
-     &    Kkiter, Soilzone_aet_flag, Frozen_flag, Hru_ag_irr, Diversion2soil_flag
+     &    Kkiter, Soilzone_aet_flag, Frozen_flag, Hru_ag_irr, Diversion2soil_flag, Soilzone_add_water_use
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2020-08-19'
+      character(len=*), parameter :: Version_soilzone = '2020-08-31'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag, Is_land
       INTEGER, SAVE, ALLOCATABLE :: Soil2gw(:), Pref_flow_flag(:)
@@ -851,8 +851,9 @@
      &    Basin_soil_moist, Basin_ssstor, Slow_stor, Slow_flow, &
      &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_lake_stor, &
      &    Basin_recharge, Recharge, Basin_sroff
+      USE PRMS_WATER_USE, ONLY: Soilzone_gain
       USE PRMS_CASCADE, ONLY: Ncascade_hru
-      USE PRMS_SET_TIME, ONLY: Nowmonth !, Nowday
+      USE PRMS_SET_TIME, ONLY: Nowmonth, Cfs_conv !, Nowday
       USE PRMS_INTCP, ONLY: Hru_intcpevap
       USE PRMS_SNOW, ONLY: Snowcov_area, Snow_evap
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen
@@ -1005,8 +1006,12 @@
         ! perv_frac has to be > 0.001
         ! infil for pervious portion of HRU
         cap_water_maxin = Infil(i)
-        IF ( Diversion2soil_flag==ON ) cap_water_maxin = cap_water_maxin + Hru_ag_irr(i)
-
+        IF ( Diversion2soil_flag==ON ) THEN
+          IF ( Hru_ag_irr(i)>0.0 ) cap_water_maxin = cap_water_maxin + Hru_ag_irr(i)/perv_area
+        ENDIF
+        IF ( Soilzone_add_water_use==ON ) THEN
+          IF ( Soilzone_gain(i)>0.0 ) cap_water_maxin = cap_water_maxin + Soilzone_gain(i)/perv_area/DBLE(Cfs_conv)
+        ENDIF
         cfgi_frozen_hru = OFF
         !Frozen is HRU variable that says if frozen gravity reservoir
         ! For CFGI all inflow is assumed to be Dunnian Flow when frozen
