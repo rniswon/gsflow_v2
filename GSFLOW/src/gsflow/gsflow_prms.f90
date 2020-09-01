@@ -17,7 +17,7 @@
    &    smidx_module, carea_module
       IMPLICIT NONE
       character(LEN=*), parameter :: &
-     &  EQULS = '===================================================================='
+     &          EQULS = '===================================================================='
     character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
     character(len=11), parameter :: MODNAME = 'gsflow_prms'
     character(len=*), parameter :: PRMS_versn = '2020-09-01'
@@ -38,11 +38,11 @@
       INTEGER, SAVE :: Inputerror_flag, Timestep
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag
       INTEGER, SAVE :: Grid_flag, PRMS_flag, GSFLOW_flag, PRMS4_flag
-      INTEGER, SAVE :: Kper_mfo, Kkstp_mfo
+      INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Prms_warmup
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
-      INTEGER, SAVE :: Diversion2soil_flag, Have_lakes, Soilzone_add_water_use
+      INTEGER, SAVE :: Diversion2soil_flag, Soilzone_add_water_use, Dprst_add_water_use, Dprst_transfer_water_use
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
@@ -51,8 +51,8 @@
       INTEGER, SAVE :: Mxsziter
       INTEGER, SAVE, ALLOCATABLE :: Gvr_cell_id(:)
       REAL, SAVE, ALLOCATABLE :: Gvr_cell_pct(:)
-! Precip_flag (1=precip_1sta; 2=precip_laps; 3=precip_dist2; 5=ide_dist; 6=xyz_dist; 7=climate_hru; 9=precip_temp_map
-! Temp_flag (1=temp_1sta; 2=temp_laps; 3=temp_dist2; 5=ide_dist; 6=xyz_dist; 7=climate_hru; 8=temp_sta; 9=precip_temp_map
+! Precip_flag (1=precip_1sta; 2=precip_laps; 3=precip_dist2; 5=ide_dist; 6=xyz_dist; 7=climate_hru; 9=precip_map
+! Temp_flag (1=temp_1sta; 2=temp_laps; 3=temp_dist2; 5=ide_dist; 6=xyz_dist; 7=climate_hru; 8=temp_sta; 9=temp_map
 ! Control parameters
       INTEGER, SAVE :: Starttime(6), Endtime(6), Modflow_time_zero(6)
       INTEGER, SAVE :: Print_debug, MapOutON_OFF, CsvON_OFF, Dprst_flag, Subbasin_flag, Parameter_check_flag
@@ -112,6 +112,8 @@
       IF ( Process(:3)=='run' ) THEN
         Process_flag = RUN !(0=run, 1=declare, 2=init, 3=clean, 4=setdims)
         Soilzone_add_water_use = OFF
+        Dprst_add_water_use = OFF
+        Dprst_transfer_water_use = OFF
 
       ELSEIF ( Process(:4)=='decl' ) THEN
         CALL DATE_AND_TIME(VALUES=Elapsed_time_start)
@@ -144,7 +146,7 @@
      &        '      Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,', /, &
      &        '                    potet_hs, potet_pt, potet_pm, potet_pm_sta', /, &
      &        '      Interception: intcp', /, &
-     &        'Snow & Glacr Dynam: snowcomp, glacr', /, &
+     &        'Snow & Glacr Dynam: snowcomp, glacr_melt', /, &
      &        '    Surface Runoff: srunoff_smidx, srunoff_carea', /, &
      &        '         Soil Zone: soilzone', /, &
      &        '       Groundwater: gwflow', /, &

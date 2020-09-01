@@ -10,7 +10,7 @@
      &    Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
      &    External_transferON_OFF, Dprst_transferON_OFF, Dprst_flag, Strmflow_flag, &
      &    Model, Inputerror_flag, Start_year, Start_month, Start_day, &
-     &    End_year, End_month, End_day 
+     &    End_year, End_month, End_day, Dprst_transfer_water_use, Dprst_add_water_use
       IMPLICIT NONE
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
@@ -176,19 +176,13 @@
               Dprst_transfer(id_src) = Dprst_transfer(id_src) + Transfer_rate(i)
               Dprst_transfer_tot(id_src) = Dprst_transfer_tot(id_src) + Transfer_rate(i)
               Total_dprst_transfer = Total_dprst_transfer + transfer_rate_dble
-              cfs_value = Dprst_vol_open(id_src)*Cfs_conv
-              IF ( cfs_value<transfer_rate_dble ) THEN
-                PRINT *, 'ERROR, not enough storage for transfer in surface-depression storage:', &
-     &                   id_src, ' Date:', Nowyear, Nowmonth, Nowday
-                ERROR STOP ERROR_water_use
-              ENDIF
-              Dprst_vol_open(id_src) = Dprst_vol_open(id_src) - transfer_rate_dble/Cfs_conv
+              Dprst_transfer_water_use = ON
             ENDIF
             IF ( Destination_type(i)==DPRST ) THEN
               Dprst_gain(id_dest) = Dprst_gain(id_dest) + Transfer_rate(i)
               Dprst_gain_tot(id_dest) = Dprst_gain_tot(id_dest) + Transfer_rate(i)
               Total_dprst_gain = Total_dprst_gain + transfer_rate_dble
-              Dprst_vol_open(id_dest) = Dprst_vol_open(id_dest) + transfer_rate_dble/Cfs_conv
+              Dprst_add_water_use = ON
             ENDIF
           ENDIF
 
