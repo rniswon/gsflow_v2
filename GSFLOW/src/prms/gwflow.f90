@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Groundwater'
       character(len=6), parameter :: MODNAME = 'gwflow'
-      character(len=*), parameter :: Version_gwflow = '2020-08-03'
+      character(len=*), parameter :: Version_gwflow = '2020-08-28'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea(:), Gwin_dprst(:)
       DOUBLE PRECISION, SAVE :: Basin_gw_upslope
       INTEGER, SAVE :: Gwminarea_flag
@@ -98,7 +98,7 @@
      &       'Cascading groundwater flow from each GWR', &
      &       'inches', Hru_gw_cascadeflow)/=0 ) CALL read_error(3, 'hru_gw_cascadeflow')
 
-        IF ( Nlake>0 .OR. Model==DOCUMENTATION ) THEN
+        IF ( (Nlake>0.AND.Cascadegw_flag>CASCADEGW_OFF) .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Lakein_gwflow(Nlake) )
           IF ( declvar(MODNAME, 'lakein_gwflow', 'nlake', Nlake, 'double', &
      &         'Groundwater flow received from upslope GWRs for each Lake GWR', &

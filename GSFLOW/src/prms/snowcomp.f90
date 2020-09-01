@@ -25,7 +25,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2020-08-04'
+      character(len=*), parameter :: Version_snowcomp = '2020-08-31'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -688,7 +688,7 @@
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: DBLE, ATAN, SNGL
+      INTRINSIC :: DBLE, ATAN, SNGL, MIN
       INTEGER, EXTERNAL :: getparam
       EXTERNAL :: read_error, snowcomp_restart, sca_deplcrv, glacr_states_to_zero
 ! Local Variables
@@ -731,7 +731,8 @@
           DO j = 1, 11
             Snarea_curve(j,i) = (Snarea_a(i) - Snarea_d(i)) / (1 + (x**Snarea_b(i) / Snarea_c(i))) + Snarea_d(i)
             IF ( Snarea_curve(j,i)>1.0 ) THEN
-              IF ( Print_debug>DEBUG_less ) PRINT *, 'WARNING, snarea_curve computed > 1.0 for HRU:', i, '; value:', Snarea_curve(j,i)
+              IF ( Print_debug>DEBUG_less ) PRINT *, 'WARNING, snarea_curve computed > 1.0 for HRU:', i, &
+     &                                               '; value:', Snarea_curve(j,i)
               Snarea_curve(j,i) = 1.0
             ENDIF
 !            write (777,*) snarea_curve(j,i), x
@@ -782,7 +783,13 @@
             Freeh2o(i) = Pk_ice(i)*Freeh2o_cap(i)
             Ai(i) = Pkwater_equiv(i) ! [inches]
             IF ( Ai(i)>Snarea_thresh(i) ) Ai(i) = DBLE( Snarea_thresh(i) ) ! [inches]
-            Frac_swe(i) = SNGL( Pkwater_equiv(i)/Ai(i) ) ! [fraction]
+            IF ( Ai(i)>DNEARZERO ) THEN
+              Frac_swe(i) = SNGL( Pkwater_equiv(i)/Ai(i) ) ! [fraction]
+              Frac_swe(i) = MIN( 1.0, Frac_swe(i) )
+            ELSE
+!              print *, ai(i), snarea_thresh
+              Frac_swe(i) = 0.0
+            ENDIF
             CALL sca_deplcrv(Snowcov_area(i), Snarea_curve(1,Hru_deplcrv(i)), Frac_swe(i))
             Basin_snowcov = Basin_snowcov + DBLE(Snowcov_area(i))*Hru_area_dble(i)
             Basin_snowdepth = Basin_snowdepth + Pk_depth(i)*Hru_area_dble(i)
@@ -2614,6 +2621,7 @@
       SUBROUTINE snowcov(Iasw, Newsnow, Snowcov_area, Snarea_curve, &
      &                   Pkwater_equiv, Pst, Snarea_thresh, Net_snow, &
      &                   Scrv, Pksv, Snowcov_areasv, Ai, Frac_swe)
+      USE PRMS_SNOW, ONLY: DNEARZERO
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Newsnow
@@ -2626,7 +2634,7 @@
       DOUBLE PRECISION, INTENT(INOUT) :: Pst, Scrv, Pksv
       REAL, INTENT(OUT) :: Frac_swe
 ! Functions
-      INTRINSIC DBLE, SNGL
+      INTRINSIC DBLE, SNGL, MIN
       EXTERNAL :: sca_deplcrv
 ! Local Variables
       REAL :: snowcov_area_ante
@@ -2647,7 +2655,13 @@
 
       ! calculate the ratio of the current packwater equivalent to
       ! the maximum packwater equivalent for the given snowpack
-      Frac_swe = SNGL( Pkwater_equiv/Ai ) ! [fraction]
+      IF ( Ai>DNEARZERO ) THEN
+        Frac_swe = SNGL( Pkwater_equiv/Ai ) ! [fraction]
+        Frac_swe = MIN( 1.0, Frac_swe )
+      ELSE
+!        print *, ai, snarea_thresh
+        Frac_swe = 0.0
+      ENDIF
 
       ! There are 3 potential conditions for the snow area curve:
       ! A. snow is accumulating and the pack is currently at its

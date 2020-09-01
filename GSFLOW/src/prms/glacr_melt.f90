@@ -313,7 +313,7 @@
      &     'none', Keep_gl)/=0 ) CALL read_error(3, 'keep_gl')
 
       ALLOCATE ( Ikeep_gl(Nhru,Four) )
-      IF ( declvar(MODNAME, 'ikeep_gl', 'nhru,four', Nhru*Four, 'real', &
+      IF ( declvar(MODNAME, 'ikeep_gl', 'nhru,four', Nhru*Four, 'integer', &
      &     'Glacier integer variables keeping from first year', &
      &     'none', Ikeep_gl)/=0 ) CALL read_error(3, 'ikeep_gl')
 

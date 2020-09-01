@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2020-07-01'
+      character(len=*), parameter :: Version_stream_temp = '2020-08-31'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -422,7 +422,8 @@
       stream_temp_init = 0
 
       IF ( getparam( MODNAME, 'albedo', 1, 'real', Albedo)/=0 ) CALL read_error(2, 'albedo')
-      IF ( getparam( MODNAME, 'lat_temp_adj', Nsegment*MONTHS_PER_YEAR, 'real', lat_temp_adj)/=0 ) CALL read_error(2, 'lat_temp_adj')
+      IF ( getparam( MODNAME, 'lat_temp_adj', Nsegment*MONTHS_PER_YEAR, 'real', lat_temp_adj)/=0 ) &
+     &     CALL read_error(2, 'lat_temp_adj')
       IF ( getparam( MODNAME, 'seg_length', Nsegment, 'real', Seg_length)/=0 ) CALL read_error(2, 'seg_length')
 
       IF (getparam(MODNAME, 'seg_lat', Nsegment, 'real', Seg_lat)/=0 ) CALL read_error(2, 'seg_lat')
@@ -505,7 +506,8 @@
          ALLOCATE ( Sin_lat_decl(MAX_DAYS_PER_YEAR,Nsegment), Cos_lat_decl(MAX_DAYS_PER_YEAR,Nsegment) )
          ALLOCATE ( Max_solar_altitude(MAX_DAYS_PER_YEAR,Nsegment), Level_sunset_azimuth(MAX_DAYS_PER_YEAR,Nsegment) )
          ALLOCATE ( Local_sunset_hour_angle(MAX_DAYS_PER_YEAR,Nsegment), Local_sunrise_hour_angle(MAX_DAYS_PER_YEAR,Nsegment) )
-         ALLOCATE ( Shade_jday(Nsegment, MAX_DAYS_PER_YEAR), Svi_jday(Nsegment, MAX_DAYS_PER_YEAR), Sin_alrs(MAX_DAYS_PER_YEAR,Nsegment) )
+         ALLOCATE ( Shade_jday(Nsegment, MAX_DAYS_PER_YEAR), Svi_jday(Nsegment, MAX_DAYS_PER_YEAR) )
+         ALLOCATE ( Sin_alrs(MAX_DAYS_PER_YEAR,Nsegment) )
          Shade_jday = 0.0
          Svi_jday = 0.0
          Seg_lat = 0.0
@@ -896,7 +898,8 @@
      &        sngl(fs * seg_tave_upstream(i))) / fs2
         else
            t_o = -99.9
-         endif
+        endif
+
 
          ! Compute flow-dependent water-in-segment width value
          if (seg_outflow(i) > NEARZERO) then
@@ -904,6 +907,7 @@
          else
             Seg_width(i) = 0.0
          endif
+
 
          ! Compute the shade on the segment. Either set by value in the parameter file or computed
          IF ( Stream_temp_shade_flag==1 ) THEN
@@ -1109,8 +1113,7 @@
 !        2. DETERMINE THE MAXIMUM DAILY EQUILIBRIUM WATER TEMPERATURE PARAMETERS
 
       USE PRMS_STRMTEMP, ONLY: ZERO_C, Seg_width, Seg_humid, Press, MPS_CONVERT, &
-     &    Seg_ccov, Seg_potet, Albedo, seg_tave_gw
-      USE PRMS_STRMTEMP, ONLY: NEARZERO, CFS2CMS_CONV
+     &    Seg_ccov, Seg_potet, Albedo, seg_tave_gw, NEARZERO, CFS2CMS_CONV
       USE PRMS_FLOWVARS, ONLY: Seg_inflow
       USE PRMS_ROUTING, ONLY: Seginc_swrad, Seg_slope
       IMPLICIT NONE
@@ -1323,8 +1326,7 @@
       USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_STRMTEMP, ONLY: Azrh, Alte, Altw, Seg_daylight, Seg_width, &
      &    PI, HALF_PI, Cos_seg_lat, Sin_seg_lat, Cos_lat_decl, Horizontal_hour_angle, &
-     &    Level_sunset_azimuth, Max_solar_altitude, Sin_alrs, Sin_declination, Sin_lat_decl, Total_shade
-      USE PRMS_STRMTEMP, ONLY: CFS2CMS_CONV
+     &    Level_sunset_azimuth, Max_solar_altitude, Sin_alrs, Sin_declination, Sin_lat_decl, Total_shade, CFS2CMS_CONV
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: COS, SIN, TAN, ACOS, ASIN, ATAN, ABS, MAX, SNGL
