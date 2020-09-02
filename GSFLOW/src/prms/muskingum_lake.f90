@@ -93,17 +93,17 @@
 !***********************************************************************
       MODULE PRMS_MUSKINGUM_LAKE
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, SETDIMENS, ON, OFF, NEARZERO, CFS2CMS_CONV, &
-     &    OUTFLOW_SEGMENT, DOCUMENTATION, NEARZERO, DNEARZERO, CFS2CMS_CONV, LAKE, &
+     &    OUTFLOW_SEGMENT, DOCUMENTATION, NEARZERO, DNEARZERO, CFS2CMS_CONV, LAKE, ERROR_water_use, &
      &    ERROR_streamflow, ERROR_dim, ERROR_lake, DEBUG_less, CASCADE_OFF, CASCADE_HRU_SEGMENT
       USE PRMS_MODULE, ONLY: Model, Nsegment, Nhru, Nratetbl, Nlake, Process_flag, &
      &    Print_debug, Save_vars_to_file, Init_vars_from_file, Strmflow_flag, Cascade_flag, Inputerror_flag, &
-     &    Glacier_flag
+     &    Glacier_flag, Lake_transfer_water_use, Lake_add_water_use
       IMPLICIT NONE
 !   Local Variables
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       character(len=*), parameter :: MODDESC = 'Streamflow & Lake Routing'
       character(len=14), parameter :: MODNAME = 'muskingum_lake'
-      character(len=*), parameter :: Version_muskingum_lake = '2020-08-13'
+      character(len=*), parameter :: Version_muskingum_lake = '2020-09-01'
       INTEGER, SAVE :: Obs_flag, Linear_flag, Weir_flag, Gate_flag, Puls_flag
       INTEGER, SAVE :: Secondoutflow_flag
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
@@ -886,7 +886,8 @@
      &    Basin_stflow_out, Basin_cfs, Basin_stflow_in, Basin_sroff_cfs, Seg_inflow, Seg_outflow, &
      &    Seg_upstream_inflow, Seg_lateral_inflow, Flow_out, Basin_lake_stor, Hru_actet, Lake_vol, Basin_sroff
       USE PRMS_OBS, ONLY: Streamflow_cfs
-      USE PRMS_SET_TIME, ONLY: Cfs_conv
+      USE PRMS_SET_TIME, ONLY: Cfs_conv, Nowyear, Nowmonth, Nowday
+      USE PRMS_WATER_USE, ONLY: Lake_transfer, Lake_gain
       USE PRMS_ROUTING, ONLY: Use_transfer_segment, Segment_delta_flow, Basin_segment_storage, &
      &    Obsin_segment, Segment_order, Tosegment, C0, C1, C2, Ts, Ts_i, Obsout_segment, &
      &    Flow_to_ocean, Flow_to_great_lakes, Flow_out_region, Flow_out_NHM, Segment_type, Flow_terminus, &
@@ -975,7 +976,13 @@
           Lake_lateral_inflow(lakeid) = Lake_sroff(lakeid) + Lake_interflow(lakeid) + Lake_gwflow(lakeid)
           Lake_inflow(lakeid) = Lake_inflow(lakeid) + Lake_lateral_inflow(lakeid)
         ENDIF
+        IF ( Lake_add_water_use==ON ) THEN
+          IF ( Lake_gain(lakeid)>0.0 ) Lake_inflow(lakeid) = Lake_inflow(lakeid) + Lake_gain(lakeid)
+        ENDIF
         Lake_outflow(lakeid) = Lake_evap(lakeid)
+        IF ( Lake_transfer_water_use==ON ) THEN
+          IF ( Lake_gain(lakeid)>0.0 ) Lake_outflow(lakeid) = Lake_outflow(lakeid) + Lake_transfer(lakeid)
+        ENDIF
         IF ( Weir_gate_flag==ON ) THEN
           tocfs = Lake_area(lakeid)*Cfs_conv
           Lake_seep_in(lakeid) = tocfs*Gw_seep_lakein(lakeid)
@@ -995,6 +1002,7 @@
 ! current inflow to the segment is the time weighted average of the outflow
 ! of the upstream segments plus the lateral HRU inflow plus any gains.
           currin = Seg_lateral_inflow(iorder) !note, this routes to inlet
+
           IF ( Obsin_segment(iorder)>0 ) Seg_upstream_inflow(iorder) = Streamflow_cfs(Obsin_segment(iorder))
           currin = currin + Seg_upstream_inflow(iorder)
           Seg_inflow(iorder) = Seg_inflow(iorder) + currin
@@ -1006,12 +1014,24 @@
           imod = MOD( j, tspd )
           IF ( imod==0 ) THEN
             Inflow_ts(iorder) = (Inflow_ts(iorder) / Ts(iorder))
-            IF ( Segment_type(iorder)==2 ) THEN ! TS must equal 24
+            IF ( Segment_type(iorder)==LAKE ) THEN ! TS must equal 24
               lakeid = Lake_segment_id(iorder)
               lake_in_ts = Lake_inflow(lakeid) + currin
 ! what about water use?
               CALL route_lake(lakeid, Lake_type(lakeid), Lake_area(lakeid), lake_in_ts, &
      &                        Lake_outvol_ts(lakeid), Lake_vol(lakeid))
+
+              IF ( Lake_transfer_water_use==ON ) THEN
+                IF ( Lake_transfer(lakeid)>0.0 ) THEN
+                  IF ( Lake_vol(lakeid)<0.0 ) THEN
+                    PRINT *, 'ERROR, not enough storage for transfer from Lake storage:', &
+     &                       lakeid, ' Date:', Nowyear, Nowmonth, Nowday
+                    PRINT *, '       storage: ', Lake_vol(lakeid), '; transfer: ', Lake_transfer(lakeid)/Cfs_conv
+                    ERROR STOP ERROR_water_use
+                  ENDIF
+                ENDIF
+              ENDIF
+
               Outflow_ts(iorder) = Lake_outcfs(lakeid)
               Seg_outflow(iorder) = Lake_outcfs(lakeid)
               Lake_stream_in(lakeid) = Seg_upstream_inflow(iorder)

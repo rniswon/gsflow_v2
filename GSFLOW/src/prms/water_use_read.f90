@@ -10,7 +10,8 @@
      &    Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
      &    External_transferON_OFF, Dprst_transferON_OFF, Dprst_flag, Strmflow_flag, &
      &    Model, Inputerror_flag, Start_year, Start_month, Start_day, &
-     &    End_year, End_month, End_day, Dprst_transfer_water_use, Dprst_add_water_use
+     &    End_year, End_month, End_day, Dprst_transfer_water_use, Dprst_add_water_use, &
+     &    Gwr_transfer_water_use, Gwr_add_water_use, Lake_transfer_water_use, Lake_add_water_use
       IMPLICIT NONE
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
@@ -150,26 +151,17 @@
               Gwr_transfer(id_src) = Gwr_transfer(id_src) + Transfer_rate(i)
               Gwr_transfer_tot(id_src) = Gwr_transfer_tot(id_src) + Transfer_rate(i)
               Total_gwr_transfer = Total_gwr_transfer + transfer_rate_dble
-              !!!!!! remove transfer in gwflow so that recharge and gwstor_min are applied 3/20/2017
-!              factor = Cfs_conv*Hru_area_dble(id_src)
-!              cfs_value = Gwres_stor(id_src)*factor
-!              IF ( cfs_value<transfer_rate_dble ) THEN
-!                PRINT *, 'ERROR, not enough storage for transfer in GWR:', id_src, ' Date:', Nowyear, Nowmonth, Nowday
-!                ERROR STOP ERROR_water_use
-!              ENDIF
-!              Gwres_stor(id_src) = Gwres_stor(id_src) - transfer_rate_dble/factor
+              Gwr_transfer_water_use = ON
             ENDIF
             IF ( Destination_type(i)==GROUNDWATER ) THEN
               Gwr_gain(id_dest) = Gwr_gain(id_dest) + Transfer_rate(i)
               Gwr_gain_tot(id_dest) = Gwr_gain_tot(id_dest) + Transfer_rate(i)
               Total_gwr_gain = Total_gwr_gain + transfer_rate_dble
-              !!!!!! remove transfer in gwflow so that recharge and gwstor_min are applied 3/20/2017
-!              Gwres_stor(id_dest) = Gwres_stor(id_dest) + transfer_rate_dble/Cfs_conv/Hru_area_dble(id_dest)
+              Gwr_add_water_use = ON
             ENDIF
           ENDIF
 
           IF ( Dprst_transfers_on==ON ) THEN
-            ! WARNING, dprst transfers only apply to open depressions
             IF ( Source_type(i)==DPRST ) THEN
               Dprst_transfer(id_src) = Dprst_transfer(id_src) + Transfer_rate(i)
               Dprst_transfer_tot(id_src) = Dprst_transfer_tot(id_src) + Transfer_rate(i)
@@ -202,19 +194,13 @@
               Lake_transfer(id_src) = Lake_transfer(id_src) + Transfer_rate(i)
               Lake_transfer_tot(id_src) = Lake_transfer_tot(id_src) + Transfer_rate(i)
               Total_lake_transfer = Total_lake_transfer + transfer_rate_dble
-!             cfs_value = Lake_vol(id_src)*Cfs_conv ! rsr, need to fix
-!             IF ( cfs_value<transfer_rate_dble ) THEN
-!               PRINT *, 'ERROR, not enough storage for transfer in lake:', &
-!    &                   id_src, ' Date:', Nowyear, Nowmonth, Nowday
-!               ERROR STOP ERROR_water_use
-!             ENDIF
-              !Lake_vol(id_src) = Lake_vol(id_src) - transfer_rate_dble
+              Lake_transfer_water_use = ON
             ENDIF
             IF ( Destination_type(i)==STREAM ) THEN
               Lake_gain(id_dest) = Lake_gain(id_dest) + Transfer_rate(i)
               Lake_gain_tot(id_dest) = Lake_gain_tot(id_dest) + Transfer_rate(i)
               Total_lake_gain = Total_lake_gain + transfer_rate_dble
-              !lake_stor(id_dest) = lake_stor(id_dest) + transfer_rate_dble
+              Lake_add_water_use = ON
             ENDIF
           ENDIF
 

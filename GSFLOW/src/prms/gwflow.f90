@@ -14,9 +14,10 @@
 !***********************************************************************
       MODULE PRMS_GWFLOW
       USE PRMS_CONSTANTS, ONLY: ON, OFF, LAKE, SWALE, DEBUG_less, DNEARZERO, &
-     &    RUN, DECL, INIT, CLEAN, DOCUMENTATION, CASCADEGW_OFF
+     &    RUN, DECL, INIT, CLEAN, DOCUMENTATION, CASCADEGW_OFF, ERROR_water_use
       USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Ngw, Nlake, Print_debug, Init_vars_from_file, &
-     &    Save_vars_to_file, Dprst_flag, Cascadegw_flag, Lake_route_flag, Inputerror_flag, Gwr_swale_flag
+     &    Save_vars_to_file, Dprst_flag, Cascadegw_flag, Lake_route_flag, Inputerror_flag, Gwr_swale_flag, &
+     &    Gwr_add_water_use, Gwr_transfer_water_use
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Groundwater'
@@ -402,7 +403,7 @@
      &    Basin_area_inv, Hru_area, Gwr_type, Lake_hru_id, Weir_gate_flag, Hru_area_dble
       USE PRMS_FLOWVARS, ONLY: Soil_to_gw, Ssr_to_gw, Sroff, Ssres_flow, Gwres_stor, Pkwater_equiv, Lake_vol
       USE PRMS_CASCADE, ONLY: Ncascade_gwr
-      USE PRMS_SET_TIME, ONLY: Cfs_conv
+      USE PRMS_SET_TIME, ONLY: Cfs_conv, Nowyear, Nowmonth, Nowday
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru, Hru_impervstor, Dprst_stor_hru
       USE PRMS_INTCP, ONLY: Hru_intcpstor
       USE PRMS_SOILZONE, ONLY: Soil_moist_tot
@@ -500,7 +501,9 @@
           Gwin_dprst(i) = Dprst_seep_hru(i)*gwarea
           gwin = gwin + Gwin_dprst(i)
         ENDIF
-        IF ( Gwr_transfers_on==ON ) gwin = gwin + (Gwr_gain(i)-Gwr_transfer(i))/Cfs_conv
+        IF ( Gwr_add_water_use==ON ) THEN
+          IF ( Gwr_gain(i)>0.0 ) gwin = gwin + DBLE(Gwr_gain(i))/Cfs_conv
+        ENDIF
         gwstor = gwstor + gwin
         Basin_gwin = Basin_gwin + gwin
         IF ( Gwminarea_flag==ON ) THEN
@@ -524,6 +527,18 @@
           ENDIF
         ENDIF
 
+        IF ( Gwr_transfer_water_use==ON ) THEN
+          IF ( Gwr_transfer(i)>0.0 ) THEN
+            IF ( SNGL(gwstor*Cfs_conv)<Gwr_transfer(i) ) THEN
+              PRINT *, 'ERROR, not enough storage for transfer from groundwater reservoir storage:', &
+     &                  i, ' Date:', Nowyear, Nowmonth, Nowday
+              PRINT *, '       storage: ', gwstor, '; transfer: ', Gwr_transfer(i)/Cfs_conv
+              ERROR STOP ERROR_water_use
+            ENDIF
+            gwstor = gwstor - DBLE( Gwr_transfer(i) ) / Cfs_conv 
+          ENDIF
+        ENDIF
+ 
         gwsink = 0.0D0
         IF ( gwstor<0.0D0 ) THEN ! could happen with water use
           IF ( Print_debug>DEBUG_less ) PRINT *, 'Warning, groundwater reservoir for HRU:', i, ' is < 0.0', gwstor
