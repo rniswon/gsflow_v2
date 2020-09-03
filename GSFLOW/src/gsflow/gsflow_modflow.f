@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2020-08-12'
+      character(len=*), parameter :: Version_gsflow_modflow='2020-09-03'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -469,7 +469,7 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
-     &    Init_vars_from_file, Mxsziter
+     &    Init_vars_from_file, Mxsziter, Glacier_flag
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
 C1------USE package modules.
       USE GLOBAL
@@ -489,6 +489,7 @@ c     USE LMGMODULE
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: soilzone, GET_KPER
+      INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsfclean
       EXTERNAL READ_STRESS
       INTRINSIC MIN
@@ -659,8 +660,30 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ON ) THEN
+              retval = intcp()
+              IF ( retval/=0 ) THEN
+                PRINT 9001, 'intcp', retval
+                RETURN
+              ENDIF
+              retval = snowcomp()
+              IF ( retval/=0 ) THEN
+                PRINT 9001, 'snowcomp', retval
+                RETURN
+              ENDIF
+              IF ( Glacier_flag==ON ) THEN
+                retval = glacr()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'glacr_melt', retval
+                  RETURN
+                ENDIF
+              ENDIF
+              retval = srunoff()
+              IF ( retval/=0 ) THEN
+                PRINT 9001, 'srunoff', retval
+                RETURN
+              ENDIF
               retval = soilzone()
-              IF ( retval.NE.0 ) THEN
+              IF ( retval/=0 ) THEN
                 PRINT 9001, 'soilzone', retval
                 RETURN
               ENDIF

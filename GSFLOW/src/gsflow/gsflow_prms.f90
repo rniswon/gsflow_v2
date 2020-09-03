@@ -387,7 +387,7 @@
         call_modules = frost_date()
         IF ( call_modules/=0 ) CALL module_error('frost_date', Arg, call_modules)
         IF ( Process_flag==RUN ) RETURN
-        IF ( Process_flag==CLEAN ) STOP 0
+        IF ( Process_flag==CLEAN ) STOP
       ENDIF
 
       IF ( Climate_swrad_flag==0 ) THEN
@@ -439,23 +439,23 @@
         IF ( Process_flag==RUN ) RETURN
       ENDIF
 
-      call_modules = intcp()
-      IF ( call_modules/=0 ) CALL module_error('intcp', Arg, call_modules)
-
-      ! rsr, need to do something if snow_cbh_flag=1
-      call_modules = snowcomp()
-      IF ( call_modules/=0 ) CALL module_error('snowcomp', Arg, call_modules)
-
-      IF ( Glacier_flag==ON ) THEN
-        call_modules = glacr()
-        IF ( call_modules/=0 ) CALL module_error('glacr', Arg, call_modules)
-      ENDIF
-
-      call_modules = srunoff()
-      IF ( call_modules/=0 ) CALL module_error(Srunoff_module, Arg, call_modules)
-
 ! for PRMS-only simulations
       IF ( Model==PRMS ) THEN
+        call_modules = intcp()
+        IF ( call_modules/=0 ) CALL module_error('intcp', Arg, call_modules)
+
+        ! rsr, need to do something if snow_cbh_flag=1
+        call_modules = snowcomp()
+        IF ( call_modules/=0 ) CALL module_error('snowcomp', Arg, call_modules)
+
+        IF ( Glacier_flag==ON ) THEN
+          call_modules = glacr()
+          IF ( call_modules/=0 ) CALL module_error('glacr', Arg, call_modules)
+        ENDIF
+
+        call_modules = srunoff()
+        IF ( call_modules/=0 ) CALL module_error(Srunoff_module, Arg, call_modules)
+
         call_modules = soilzone()
         IF ( call_modules/=0 ) CALL module_error(Soilzone_module, Arg, call_modules)
 
@@ -499,9 +499,23 @@
 ! (contained in gsflow_modflow.f).
 ! They still need to be called for declare, initialize and cleanup
         ELSE !IF ( Process_flag/=RUN ) THEN
-
-! SOILZONE for GSFLOW is in the MODFLOW iteration loop,
+! intcp, snowcomp, glacr, soilzone, and srunoff for GSFLOW is in the MODFLOW iteration loop,
 ! only call for declare, initialize, and cleanup.
+          call_modules = intcp()
+          IF ( call_modules/=0 ) CALL module_error('intcp', Arg, call_modules)
+
+          ! rsr, need to do something if snow_cbh_flag=1
+          call_modules = snowcomp()
+          IF ( call_modules/=0 ) CALL module_error('snowcomp', Arg, call_modules)
+
+          IF ( Glacier_flag==ON ) THEN
+            call_modules = glacr()
+            IF ( call_modules/=0 ) CALL module_error('glacr', Arg, call_modules)
+          ENDIF
+
+          call_modules = srunoff()
+          IF ( call_modules/=0 ) CALL module_error(Srunoff_module, Arg, call_modules)
+
           call_modules = soilzone()
           IF ( call_modules/=0 ) CALL module_error(Soilzone_module, Arg, call_modules)
 
@@ -519,7 +533,7 @@
         IF ( call_modules/=0 ) CALL module_error('gsflow_sum', Arg, call_modules)
       ENDIF
 
-      IF ( MapOutON_OFF>0 ) THEN
+      IF ( MapOutON_OFF>OFF ) THEN
         call_modules = map_results()
         IF ( call_modules/=0 ) CALL module_error('map_results', Arg, call_modules)
       ENDIF
@@ -561,7 +575,7 @@
         ENDIF
         IF ( Print_debug>DEBUG_minimum ) CLOSE ( PRMS_output_unit )
         IF ( Save_vars_to_file==ON ) CLOSE ( Restart_outunit )
-        STOP 0
+        STOP
       ELSEIF ( Process_flag==DECL ) THEN
         IF ( Print_debug>DEBUG_minimum ) THEN
           PRINT '(A)', EQULS(:62)
@@ -580,11 +594,11 @@
      &          'parameter_check_flag to 1 to verify that those calibration', &
      &          'parameters have valid and compatible values.'
         ENDIF
-        IF ( Parameter_check_flag==2 ) STOP 0
+        IF ( Parameter_check_flag==2 ) STOP
         IF ( Inputerror_flag==1 ) ERROR STOP ERROR_param
         IF ( Model==25 ) THEN
           CALL convert_params()
-          STOP 0
+          STOP
         ENDIF
         IF ( Print_debug>DEBUG_minimum ) &
      &       PRINT 4, 'Simulation time period:', Start_year, Start_month, Start_day, ' -', End_year, End_month, End_day, EQULS
@@ -640,7 +654,7 @@
       PRMS_flag = ON
       GSFLOW_flag = OFF
       ! Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
-      IF ( Model_mode(:4)=='PRMS' .OR. Model_mode(:5)=='DAILY' )THEN
+      IF ( Model_mode(:4)=='PRMS' .OR. Model_mode(:4)=='prms' .OR. Model_mode(:5)=='DAILY' ) THEN
         Model = PRMS
       ELSEIF ( Model_mode(:6)=='GSFLOW' .OR. Model_mode(:4)=='    ' .OR. Model_mode(:4)=='gsflow' ) THEN
         Model = GSFLOW
