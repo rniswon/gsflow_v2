@@ -381,7 +381,8 @@
         IF ( DABS(wbal)>DTOOSMALL ) THEN
           WRITE ( BALUNT, * ) 'Possible HRU water balance issue:', wbal, '; HRU:', i, ' hru_type:', Hru_type(i), '; area:', harea
           WRITE ( BALUNT, * ) Sroff(i), Gwres_flow(i), Ssres_flow(i), Hru_actet(i), Gwres_sink(i), &
-     &            Hru_storage_ante(i), Hru_storage(i), Hru_type(i),  Pfr_dunnian_flow(i), Intcp_changeover(i), Snowmelt(i), Hru_ppt(i)
+     &            Hru_storage_ante(i), Hru_storage(i), Hru_type(i),  Pfr_dunnian_flow(i), Intcp_changeover(i), &
+     &            Snowmelt(i), Hru_ppt(i)
           !WRITE ( BALUNT, * ) Gwstor_minarea_wb(i)
           WRITE ( BALUNT, * ) Soil_moist_tot(i), Hru_intcpstor(i), Gwres_stor(i), Pkwater_equiv(i), Hru_impervstor(i)
           IF ( Cascade_flag>CASCADE_OFF ) THEN

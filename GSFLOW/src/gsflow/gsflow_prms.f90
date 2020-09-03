@@ -17,10 +17,10 @@
    &    smidx_module, carea_module
       IMPLICIT NONE
       character(LEN=*), parameter :: &
-     &  EQULS = '===================================================================='
+     &          EQULS = '===================================================================='
     character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
     character(len=11), parameter :: MODNAME = 'gsflow_prms'
-    character(len=*), parameter :: PRMS_versn = '2020-08-26'
+    character(len=*), parameter :: PRMS_versn = '2020-09-01'
     character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 09/01/2020'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
@@ -39,10 +39,14 @@
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag
       INTEGER, SAVE :: PRMS_flag, GSFLOW_flag, PRMS4_flag
       INTEGER, SAVE :: Grid_flag, Kper_mfo, Kkstp_mfo
+      INTEGER, SAVE :: Have_lakes, Agriculture_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Prms_warmup
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
-      INTEGER, SAVE :: Diversion2soil_flag, Have_lakes, Agriculture_flag
+      INTEGER, SAVE :: Diversion2soil_flag, Soilzone_add_water_use
+      INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
+      INTEGER, SAVE :: Gwr_transfer_water_use, Gwr_add_water_use
+      INTEGER, SAVE :: Lake_transfer_water_use, Lake_add_water_use
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
@@ -111,6 +115,13 @@
 
       IF ( Process(:3)=='run' ) THEN
         Process_flag = RUN !(0=run, 1=declare, 2=init, 3=clean, 4=setdims)
+        Soilzone_add_water_use = OFF
+        Dprst_add_water_use = OFF
+        Dprst_transfer_water_use = OFF
+        Gwr_add_water_use = OFF
+        Gwr_transfer_water_use = OFF
+        Lake_add_water_use = OFF
+        Lake_transfer_water_use = OFF
 
       ELSEIF ( Process(:4)=='decl' ) THEN
         CALL DATE_AND_TIME(VALUES=Elapsed_time_start)

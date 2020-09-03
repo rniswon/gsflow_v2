@@ -23,15 +23,16 @@
       MODULE PRMS_SRUNOFF
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, NEARZERO, DNEARZERO, ON, OFF, &
      &    DEBUG_WB, smidx_module, carea_module, LAND, LAKE, GLACIER, &
-     &    RUN, DECL, INIT, CLEAN, ON, CASCADE_OFF
+     &    RUN, DECL, INIT, CLEAN, ON, CASCADE_OFF, ERROR_water_use
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Print_debug, Init_vars_from_file, &
      &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, Water_use_flag, &
-     &    Frozen_flag, GSFLOW_flag, Save_vars_to_file, Process_flag, Inputerror_flag, Glacier_flag, Kkiter !, Parameter_check_flag
+     &    Frozen_flag, Save_vars_to_file, Process_flag, Inputerror_flag, Glacier_flag, &
+     &    Dprst_add_water_use, Dprst_transfer_water_use, GSFLOW_flag !, Parameter_check_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2020-08-13'
+      character(len=*), parameter :: Version_srunoff = '2020-08-31'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -935,7 +936,7 @@
       hru_flag = 0
       IF ( Hru_type==LAND .OR. Isglacier==ON ) hru_flag = 1 ! land or glacier
 ! compute runoff from cascading Hortonian flow
-      IF ( Cascade_flag>0 ) THEN
+      IF ( Cascade_flag>CASCADE_OFF ) THEN
         avail_water = SNGL( Upslope_hortonian(Ihru) )
         IF ( avail_water>0.0 ) THEN
           Infil = Infil + avail_water
@@ -1267,8 +1268,11 @@
      &    Dprst_vol_thres_open, Dprst_vol_clos_max, Dprst_insroff_hru, Upslope_hortonian, &
      &    Basin_dprst_volop, Basin_dprst_volcl, Basin_dprst_evap, Basin_dprst_seep, Basin_dprst_sroff, &
      &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, Dprst_stor_hru, Hruarea_dble, &
-     &    ON, OFF, NEARZERO, DNEARZERO, Cascade_flag !, Print_debug, DEBUG_less
+     &    ON, OFF, NEARZERO, DNEARZERO, Cascade_flag, Dprst_add_water_use, Dprst_transfer_water_use, &
+     &    ERROR_water_use !, Print_debug, DEBUG_less
       USE PRMS_BASIN, ONLY: Dprst_frac_open, Dprst_frac_clos
+      USE PRMS_WATER_USE, ONLY: Dprst_transfer, Dprst_gain
+      USE PRMS_SET_TIME, ONLY: Cfs_conv, Nowyear, Nowmonth, Nowday
       USE PRMS_INTCP, ONLY: Net_snow
       USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv
@@ -1293,7 +1297,7 @@
       DOUBLE PRECISION :: seep_open, seep_clos, tmp1
 !***********************************************************************
 !     add the hortonian flow to the depression storage volumes:
-      IF ( Cascade_flag>0 ) THEN
+      IF ( Cascade_flag>OFF ) THEN
         inflow = SNGL( Upslope_hortonian(Ihru) )
       ELSE
         inflow = 0.0
@@ -1319,11 +1323,16 @@
         ENDIF
       ENDIF
 
+      IF ( Dprst_add_water_use==ON ) THEN
+        IF ( Dprst_gain(Ihru)>0.0 ) inflow = inflow + Dprst_gain(Ihru) / SNGL( Cfs_conv )
+      ENDIF
+
       Dprst_in = 0.0D0
       IF ( Dprst_area_open_max>0.0 ) THEN
         Dprst_in = DBLE( inflow*Dprst_area_open_max ) ! inch-acres
         Dprst_vol_open = Dprst_vol_open + Dprst_in
       ENDIF
+
       IF ( Dprst_area_clos_max>0.0 ) THEN
         tmp1 = DBLE( inflow*Dprst_area_clos_max ) ! inch-acres
         Dprst_vol_clos = Dprst_vol_clos + tmp1
@@ -1373,8 +1382,32 @@
 !          Sri = 0.0
 !        ENDIF
       ENDIF
-
       Dprst_insroff_hru(Ihru) = dprst_srp + dprst_sri
+
+      IF ( Dprst_transfer_water_use==ON ) THEN
+        IF ( Dprst_area_open_max>0.0 ) THEN
+          IF ( Dprst_transfer(Ihru)>0.0 ) THEN
+            IF ( SNGL(Dprst_vol_open*Cfs_conv)<Dprst_transfer(Ihru) ) THEN
+              PRINT *, 'ERROR, not enough storage for transfer from open surface-depression storage:', &
+     &                  Ihru, ' Date:', Nowyear, Nowmonth, Nowday
+              PRINT *, '       storage: ', Dprst_vol_open, '; transfer: ', Dprst_transfer(Ihru)/Cfs_conv
+              ERROR STOP ERROR_water_use
+            ENDIF
+            Dprst_vol_open = Dprst_vol_open - DBLE( Dprst_transfer(Ihru)*Dprst_area_open_max ) / Cfs_conv 
+          ENDIF
+        ENDIF
+        IF ( Dprst_area_clos_max>0.0 ) THEN
+          IF ( Dprst_transfer(Ihru)>0.0 ) THEN
+            IF ( SNGL(Dprst_area_clos_max*Cfs_conv)<Dprst_transfer(Ihru) ) THEN
+              PRINT *, 'ERROR, not enough storage for transfer from closed surface-depression storage:', &
+     &                  Ihru, ' Date:', Nowyear, Nowmonth, Nowday
+              PRINT *, '       storage: ', Dprst_vol_clos, '; transfer: ', Dprst_transfer(Ihru)/Cfs_conv
+              ERROR STOP ERROR_water_use
+            ENDIF
+            Dprst_vol_clos = Dprst_vol_clos - DBLE( Dprst_transfer(Ihru)*Dprst_area_clos_max ) / Cfs_conv
+          ENDIF
+        ENDIF
+      ENDIF
 
 !     Open depression surface area for each HRU:
       Dprst_area_open = 0.0

@@ -26,7 +26,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2020-08-25'
+      character(len=*), parameter :: Version_snowcomp = '2020-08-31'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -744,7 +744,8 @@
           DO j = 1, 11
             Snarea_curve(j,i) = (Snarea_a(i) - Snarea_d(i)) / (1 + (x**Snarea_b(i) / Snarea_c(i))) + Snarea_d(i)
             IF ( Snarea_curve(j,i)>1.0 ) THEN
-              IF ( Print_debug>DEBUG_less ) PRINT *, 'WARNING, snarea_curve computed > 1.0 for HRU:', i, '; value:', Snarea_curve(j,i)
+              IF ( Print_debug>DEBUG_less ) PRINT *, 'WARNING, snarea_curve computed > 1.0 for HRU:', i, &
+     &                                               '; value:', Snarea_curve(j,i)
               Snarea_curve(j,i) = 1.0
             ENDIF
 !            write (777,*) snarea_curve(j,i), x
