@@ -7,12 +7,12 @@
       USE PRMS_CONSTANTS, ONLY: ON, OFF, DEBUG_WB, DOCUMENTATION, NEARZERO, DNEARZERO, &
      &    RUN, DECL, INIT, CLEAN, ON, DEBUG_WB, DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
       USE PRMS_MODULE, ONLY: Nhru, Model, Process_flag, Save_vars_to_file, Init_vars_from_file, &
-     &    Print_debug, Water_use_flag, Gsflow_flag, Kkiter
+     &    Print_debug, Water_use_flag, Kkiter, PRMS_iteration_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2020-08-24'
+      character(len=*), parameter :: Version_intcp = '2020-09-03'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -77,7 +77,7 @@
 
       CALL print_module(MODDESC, MODNAME, Version_intcp)
 
-      IF ( Gsflow_flag==ON ) THEN
+      IF ( PRMS_iteration_flag==ON ) THEN
         ALLOCATE ( It0_intcp_stor(Nhru), It0_intcp_transp_on(Nhru) )
         ALLOCATE ( It0_hru_intcpstor(Nhru) )
       ENDIF
@@ -289,7 +289,7 @@
       intrun = 0
 
       ! pkwater_equiv is from last time step
-      IF ( Gsflow_flag==ON ) THEN
+      IF ( PRMS_iteration_flag==ON ) THEN
         IF ( Kkiter>1 ) THEN
           Intcp_stor = It0_intcp_stor
           Hru_intcpstor = It0_hru_intcpstor
