@@ -101,6 +101,10 @@ void setup_cont (void) {
 		lval[0] = 0;
 		decl_control_int_array ("dprst_flag", 1, lval);
 
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("PRMS_iteration_flag", 1, lval);
+
         lval = (long *)umalloc (sizeof (long));
 		lval[0] = 1;
 		decl_control_int_array ("parameter_check_flag", 1, lval);

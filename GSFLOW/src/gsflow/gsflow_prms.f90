@@ -73,7 +73,7 @@
       CHARACTER(LEN=8), SAVE :: Soilzone_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
       INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF
-      INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag
+      INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag, PRMS_iteration_flag
       INTEGER, SAVE :: Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, Dyn_springfrost_flag
       INTEGER, SAVE :: Gwr_transferON_OFF, External_transferON_OFF, Segment_transferON_OFF, Lake_transferON_OFF
       END MODULE PRMS_MODULE
@@ -289,7 +289,6 @@
 
       ELSE  !IF ( Process(:5)=='clean' ) THEN
         Process_flag = CLEAN
-
         IF ( Init_vars_from_file>0 ) CLOSE ( Restart_inunit )
         IF ( Save_vars_to_file==ON ) THEN
           CALL PRMS_open_output_file(Restart_outunit, Var_save_file, 'var_save_file', 1, iret)
@@ -309,7 +308,7 @@
           call_modules = 0
           RETURN
         ELSE
-          STOP 0
+          STOP
         ENDIF
       ENDIF
 
@@ -439,8 +438,7 @@
         IF ( Process_flag==RUN ) RETURN
       ENDIF
 
-! for PRMS-only simulations
-      IF ( Model==PRMS ) THEN
+      IF ( PRMS_iteration_flag==OFF ) THEN
         call_modules = intcp()
         IF ( call_modules/=0 ) CALL module_error('intcp', Arg, call_modules)
 
@@ -455,7 +453,10 @@
 
         call_modules = srunoff()
         IF ( call_modules/=0 ) CALL module_error(Srunoff_module, Arg, call_modules)
+      ENDIF
 
+! for PRMS-only simulations
+      IF ( Model==PRMS ) THEN
         call_modules = soilzone()
         IF ( call_modules/=0 ) CALL module_error(Soilzone_module, Arg, call_modules)
 
@@ -499,22 +500,25 @@
 ! (contained in gsflow_modflow.f).
 ! They still need to be called for declare, initialize and cleanup
         ELSE !IF ( Process_flag/=RUN ) THEN
-! intcp, snowcomp, glacr, soilzone, and srunoff for GSFLOW is in the MODFLOW iteration loop,
+! intcp, snowcomp, glacr, soilzone, and srunoff for GSFLOW is in the MODFLOW iteration loop
+! when PRMS_iteration_flag = ON
 ! only call for declare, initialize, and cleanup.
-          call_modules = intcp()
-          IF ( call_modules/=0 ) CALL module_error('intcp', Arg, call_modules)
+          IF ( PRMS_iteration_flag==ON ) THEN
+            call_modules = intcp()
+            IF ( call_modules/=0 ) CALL module_error('intcp', Arg, call_modules)
 
-          ! rsr, need to do something if snow_cbh_flag=1
-          call_modules = snowcomp()
-          IF ( call_modules/=0 ) CALL module_error('snowcomp', Arg, call_modules)
+            ! rsr, need to do something if snow_cbh_flag=1
+            call_modules = snowcomp()
+            IF ( call_modules/=0 ) CALL module_error('snowcomp', Arg, call_modules)
 
-          IF ( Glacier_flag==ON ) THEN
-            call_modules = glacr()
-            IF ( call_modules/=0 ) CALL module_error('glacr', Arg, call_modules)
+            IF ( Glacier_flag==ON ) THEN
+              call_modules = glacr()
+              IF ( call_modules/=0 ) CALL module_error('glacr', Arg, call_modules)
+            ENDIF
+
+            call_modules = srunoff()
+            IF ( call_modules/=0 ) CALL module_error(Srunoff_module, Arg, call_modules)
           ENDIF
-
-          call_modules = srunoff()
-          IF ( call_modules/=0 ) CALL module_error(Srunoff_module, Arg, call_modules)
 
           call_modules = soilzone()
           IF ( call_modules/=0 ) CALL module_error(Soilzone_module, Arg, call_modules)
@@ -642,7 +646,7 @@
       IF ( Print_debug>DEBUG_less ) PRINT 3
     3 FORMAT (//, 26X, 'U.S. Geological Survey', /, 8X, &
      &        'Coupled Groundwater and Surface-water FLOW model (GSFLOW)', /, &
-     &        25X, 'Version 2.2.0 09/01/2020', //, &
+     &        25X, 'Version 2.2.0 09/09/2020', //, &
      &        '    An integration of the Precipitation-Runoff Modeling System (PRMS)', /, &
      &        '    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)', /)
 
@@ -948,6 +952,8 @@
       IF ( decldim('nsub', 0, MAXDIM, 'Number of internal subbasins')/=0 ) CALL read_error(7, 'nsub')
 
       IF ( control_integer(Dprst_flag, 'dprst_flag')/=0 ) Dprst_flag = OFF
+      IF ( control_integer(PRMS_iteration_flag, 'PRMS_iteration_flag')/=0 ) PRMS_iteration_flag = OFF
+      IF ( Model==PRMS ) PRMS_iteration_flag = OFF
       ! 0 = off, 1 = on, 2 = lauren version
       IF ( control_integer(CsvON_OFF, 'csvON_OFF')/=0 ) CsvON_OFF = OFF
 
@@ -1055,7 +1061,7 @@
       IF ( call_modules('setdims')/=0 ) Inputerror_flag = 1
 
       IF ( Inputerror_flag==1 ) PRINT '(//,A,/,A,/ )', '**FIX input errors in your Control File to continue**', &
-     &     'NOTE: some errors may be due to use of defalut values'
+     &        'NOTE: some errors may be due to use of defalut values'
 
       setdims = Inputerror_flag
       END FUNCTION setdims

@@ -147,7 +147,7 @@
 !     prms2mfinit - Initialize PRMS2MF module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION prms2mfinit()
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_param
       USE GSFPRMS2MF
       USE GWFUZFMODULE, ONLY: NTRAIL, NWAV
       USE GWFSFRMODULE, ONLY: ISEG, NSS
@@ -211,7 +211,7 @@
           Segment_pct_area(i) = 1.0D0 / DBLE( Numreach_segment(i) )
         ENDIF
       ENDDO
-      IF ( ierr==1 ) ERROR STOP 4
+      IF ( ierr==1 ) ERROR STOP ERROR_param
 
 !     IF ( get param(MODNAME, 'reach_segment', Nreach, 'integer', Reach_segment)/=0 ) CALL read_error(2, 'reach_segment')
 
@@ -313,7 +313,7 @@
           ENDIF
         ENDIF
       ENDDO
-      IF ( ierr==1 ) ERROR STOP 4
+      IF ( ierr==1 ) ERROR STOP ERROR_param
 
       IF ( Nhru/=Nhrucell ) THEN
 ! way to adjust gvr_hru_pct, rsr
@@ -328,7 +328,7 @@
       ELSE
         Gvr_hru_pct_adjusted = 1.0D0
       ENDIF
-!      ERROR STOP 4
+!      ERROR STOP ERROR_param
 
       Totalarea = 0.0D0
       DO ii = 1, Active_hrus
@@ -364,7 +364,7 @@
           ENDIF
         ENDIF
       ENDDO
-      IF ( ierr==1 ) ERROR STOP 4
+      IF ( ierr==1 ) ERROR STOP ERROR_param
 
       Totalarea = Totalarea*Basin_area_inv
       IF ( Print_debug>DEBUG_less ) PRINT 9003, (Totalarea-1.0D0)*100.0D0

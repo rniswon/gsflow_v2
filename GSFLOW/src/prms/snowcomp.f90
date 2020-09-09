@@ -14,7 +14,7 @@
      &    MONTHS_PER_YEAR, DEBUG_less, DAYS_YR, CLOSEZERO, INCH2CM
       USE PRMS_MODULE, ONLY: Model, Process_flag, Nhru, Ndepl, Print_debug, &
      &    Save_vars_to_file, Init_vars_from_file, Snarea_curve_flag, Glacier_flag, Start_year, &
-     &    Gsflow_flag, Kkiter
+     &    PRMS_iteration_flag, Kkiter
       IMPLICIT NONE
       !****************************************************************
       !   Local Constants
@@ -27,6 +27,7 @@
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
       character(len=*), parameter :: Version_snowcomp = '2020-09-03'
+      integer, parameter :: not_a_glacier_hru = -1
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -124,7 +125,7 @@
 
       CALL print_module(MODDESC, MODNAME, Version_snowcomp)
 
-      IF ( Gsflow_flag==ON ) THEN
+      IF ( PRMS_iteration_flag==ON ) THEN
         ALLOCATE ( It0_snowcov_area(Nhru), It0_snowcov_areasv(Nhru), It0_pkwater_equiv(Nhru) )
         ALLOCATE ( It0_albedo(Nhru), It0_pk_depth(Nhru), It0_iasw(Nhru), It0_pst(Nhru) )
         ALLOCATE ( It0_pksv(Nhru), It0_scrv(Nhru), It0_pk_temp(Nhru), It0_pss(Nhru) )
@@ -930,7 +931,7 @@
 !***********************************************************************
       snorun = 0
 
-      IF ( Gsflow_flag==ON ) THEN
+      IF ( PRMS_iteration_flag==ON ) THEN
         IF ( Kkiter>1 ) THEN
           Pkwater_equiv = It0_pkwater_equiv
           Snowcov_area = It0_snowcov_area
@@ -1162,7 +1163,7 @@
      &            Pk_temp(i), Pk_ice(i), Freeh2o(i), Snowcov_area(i), &
      &            Snowmelt(i), Pk_depth(i), Pss(i), Pst(i), Net_snow(i), &
      &            Pk_den(i), Pptmix_nopack(i), Pk_precip(i), Tmax_allsnow_c(i,Nowmonth), &
-     &            Freeh2o_cap(i), Den_max(i), -1)
+     &            Freeh2o_cap(i), Den_max(i), not_a_glacier_hru)
         IF ( Active_glacier>0 ) THEN
            IF ( Glacrcov_area(i)>0.0.AND.Glacr_pkwater_ante(i)>0.0D0.AND.Net_ppt(i)>0.0 &
      &          .AND.Pptmix(i)==0.AND.Net_snow(i)==0.0 ) THEN
@@ -1177,8 +1178,8 @@
 
 ! FOLLOWING does basal melt on glacier
 !Paterson 2010 says 12 mm/yr for friction and geothermal heating
-        IF ( Active_glacier==1 ) Glacrb_melt(i) = 12.0*0.03937/365.242*Glacier_frac(i)
-        IF ( Active_glacier==2 ) Glacrb_melt(i) = 12.0*0.03937/365.242*Glrette_frac(i) !since not moving much, maybe =0
+        IF ( Active_glacier==1 ) Glacrb_melt(i) = 12.0*0.03937/DAYS_YR*Glacier_frac(i)
+        IF ( Active_glacier==2 ) Glacrb_melt(i) = 12.0*0.03937/DAYS_YR*Glrette_frac(i) !since not moving much, maybe =0
 
         ! If there is still a snowpack
         IF ( Pkwater_equiv(i)>0.0D0 ) THEN
@@ -1376,7 +1377,7 @@
      &                     Glacr_pk_def(i), Glacr_pk_temp(i), Glacr_pk_ice(i), Glacr_freeh2o(i), &
      &                     Glacrcov_area(i), Glacrmelt(i), Glacr_pk_depth(i), &
      &                     Glacr_pss(i), Glacr_pst(i), Glacr_pk_den(i), icst, icals, isw, &
-     &                     Glacr_freeh2o_capm(i), Den_max(i),i)
+     &                     Glacr_freeh2o_capm(i), Den_max(i), i)
             ENDIF
           ENDIF
 
@@ -1395,7 +1396,8 @@
      &                   Canopy_covden(i), cec, Pkwater_equiv(i), &
      &                   Pk_def(i), Pk_temp(i), Pk_ice(i), Freeh2o(i), &
      &                   Snowcov_area(i), Snowmelt(i), Pk_depth(i), &
-     &                   Pss(i), Pst(i), Pk_den(i), cst, cals, sw, Freeh2o_cap(i), Den_max(i), -1)
+     &                   Pss(i), Pst(i), Pk_den(i), cst, cals, sw, &
+     &                   Freeh2o_cap(i), Den_max(i), not_a_glacier_hru)
             ! track total heat flux from both night and day periods
             Tcal(i) = Tcal(i) + cals ! [cal/cm^2] or [Langleys]
           ENDIF
@@ -2682,7 +2684,7 @@
       DOUBLE PRECISION, INTENT(INOUT) :: Pst, Scrv, Pksv
       REAL, INTENT(OUT) :: Frac_swe
 ! Functions
-      INTRINSIC DBLE, SNGL, MIN
+      INTRINSIC :: DBLE, SNGL, MIN
       EXTERNAL :: sca_deplcrv
 ! Local Variables
       REAL :: snowcov_area_ante
