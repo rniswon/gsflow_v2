@@ -69,7 +69,7 @@
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Temp_module, Srunoff_module, Et_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Strmflow_module, Transp_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Model_mode, Precip_module, Solrad_module
-      CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Modflow_name
+      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
       CHARACTER(LEN=8), SAVE :: Soilzone_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
       INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF
