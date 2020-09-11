@@ -146,7 +146,7 @@
 		<File RelativePath="..\GSFLOW\src\prms\potet_pt.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\precip_1sta_laps.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\precip_dist2.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\precip_temp_grid.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\precip_temp_map.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_constants.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_summary.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_time.f90"/>
