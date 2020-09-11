@@ -407,7 +407,7 @@
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru, Hru_impervstor, Dprst_stor_hru
       USE PRMS_INTCP, ONLY: Hru_intcpstor
       USE PRMS_SOILZONE, ONLY: Soil_moist_tot
-      USE PRMS_WATER_USE, ONLY: Gwr_transfers_on, Gwr_transfer, Gwr_gain
+      USE PRMS_WATER_USE, ONLY: Gwr_transfer, Gwr_gain
       IMPLICIT NONE
 ! Functions
       EXTERNAL :: rungw_cascade, print_date

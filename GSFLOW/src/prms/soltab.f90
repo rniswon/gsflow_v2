@@ -235,7 +235,7 @@
       EXTERNAL compute_t
 !     Functions
       DOUBLE PRECISION, EXTERNAL :: func3
-      INTRINSIC ASIN, SIN, COS, ATAN
+      INTRINSIC ASIN, SIN, COS, ATAN, ABS
 !     Arguments
       INTEGER, INTENT(IN) :: Hru_type, Id
       DOUBLE PRECISION, INTENT(IN), DIMENSION(MAX_DAYS_PER_YEAR) :: Obliquity, Solar_declination

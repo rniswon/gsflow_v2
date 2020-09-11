@@ -1661,7 +1661,7 @@
      +                  RHS
       USE GWFBASMODULE, ONLY: TOTIM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: IDIVAR, SEG, STRM, DVRSFLW, SGOTFLW
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, SGOTFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -1682,7 +1682,6 @@
       DOUBLE PRECISION :: Qp, Hh, Ttop, Bbot, dQp, SMOOTHQ
       DOUBLE PRECISION :: QSW, NEARZERO, QQ, demandtrigger_gw
       DOUBLE PRECISION :: demandgw_uzf, demandgw_prms
-      INTEGER :: k
       !
       ! - -----------------------------------------------------------------
       !
@@ -2327,7 +2326,7 @@
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE, VKS
-      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, STRM
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW !, STRM, IDIVAR
       USE GWFAGMODULE
       USE GLOBAL, ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
@@ -2341,7 +2340,7 @@
       double precision :: zerod7, done, dzero, pettotal,
      +                    aettotal, aetold, aetnew, etdif, 
      +                    ettest, supold, sup, sumvks
-      real :: fmaxflow
+!      real :: fmaxflow
       integer :: k, iseg, ic, ir, i
       external :: set_factor
       double precision :: set_factor
@@ -2415,7 +2414,7 @@
 !     demandconjunctive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
 !     SPECIFICATIONS:
-      USE GWFSFRMODULE, ONLY: SEG, STRM, DVRSFLW
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW !, STRM
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
@@ -2434,10 +2433,10 @@
       double precision :: zerod7, done, dzero, pettotal,
      +                    aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup !, etdif
-      real :: fmaxflow, etdif
+!      real :: fmaxflow
       integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
-      double precision :: set_factor, area_mf
+      double precision :: set_factor
 ! --------------------------------------------------
 !
       zerod7 = 1.0d-7
@@ -2512,7 +2511,7 @@
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GLOBAL, ONLY: DELR, DELC
-      USE GWFSFRMODULE, ONLY: SEG, STRM, NSS, DVRSFLW
+      USE GWFSFRMODULE, ONLY: SEG, NSS !, STRM, DVRSFLW
       USE GWFAGMODULE
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
       USE GWFBASMODULE, ONLY: DELT
@@ -2531,7 +2530,7 @@
       DOUBLE PRECISION :: factor, area, aet, pet, uzet
       double precision :: zerod30, done, dzero, prms_inch2mf_q
       double precision, allocatable, dimension(:) :: petseg, aetseg
-      real :: fmaxflow
+!      real :: fmaxflow
       integer :: k, iseg, hru_id, i, ic, ir, icell, irow, icol
 ! --------------------------------------------
 !
@@ -2755,7 +2754,7 @@
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: HRU_PERV
-      USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
+      USE GWFUZFMODULE, ONLY: GWET, UZFETOUT
       USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_SOILZONE, ONLY: Soil_saturated
@@ -2909,6 +2908,7 @@
       ! - ----Total ET for all cells irrigated by each diversion
       !
       if (TSACTIVESWET) then
+         prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
          do I = 1, NUMSWET
             aettot = 0.0
             pettot = 0.0
@@ -2926,8 +2926,6 @@
                   ELSE
                      hru_id = IRRROW_SW(k, iseg)
                      area = HRU_PERV(hru_id)
-                     prms_inch2mf_q = done/
-     +                         (DELT*Mfl2_to_acre*Mfl_to_inch)
                      pet = potet(hru_id)*area*prms_inch2mf_q
                      aet = hru_actet(hru_id)*area*prms_inch2mf_q
                      if ( Nhru==Nhrucell ) then
@@ -2975,6 +2973,7 @@
          aettot = 0.0
          pettot = 0.0
          IF (TSACTIVEGWET) THEN
+            prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
             DO I = 1, NUMGWET
                pettot = 0.0
                aettot = 0.0
@@ -2992,8 +2991,6 @@
                         ELSE
                            hru_id = IRRROW_GW(J, L)
                            area = HRU_PERV(hru_id)
-                           prms_inch2mf_q = done/
-     +                             (DELT*Mfl2_to_acre*Mfl_to_inch)
                            pet = potet(hru_id)*area*prms_inch2mf_q
                            aet = hru_actet(hru_id)*area*prms_inch2mf_q
                            if ( Nhru==Nhrucell ) then
@@ -3029,6 +3026,7 @@
       aettot = 0.0
       pettot = 0.0
       IF (TSGWETALLUNIT > 0) THEN
+         prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
          DO L = 1, NWELLS
             UNIT = TSGWETALLUNIT
             do J = 1, NUMCELLS(L)
@@ -3041,7 +3039,6 @@
                      uzet = uzfetout(ic, ir)/DELT
                      aet = gwet(ic, ir) + uzet
                   ELSE
-                  prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
                      hru_id = IRRROW_GW(J, L)
                      area = HRU_PERV(hru_id)
                      pet = potet(hru_id)*area*prms_inch2mf_q

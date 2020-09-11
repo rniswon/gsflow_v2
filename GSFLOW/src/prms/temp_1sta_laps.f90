@@ -91,7 +91,7 @@
               ELSE
                 PRINT 9002, 'tmin', Tmin(i), i
                 CALL print_date(0)
-                ERROR STOP -3
+                ERROR STOP ERROR_temp
               ENDIF
             ELSE
               Tmin_prev(i) = Tmin(i)

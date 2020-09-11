@@ -3,23 +3,23 @@
 !***********************************************************************
       MODULE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ON, OFF,
-     +    MODFLOW, ERROR_restart, ERROR_modflow, ERROR_time,
-     +    ERROR_control, ERROR_param, GSFLOW
+     +    MODFLOW, GSFLOW, ERROR_restart, ERROR_modflow, ERROR_time,
+     +    ERROR_control, ERROR_param
       USE PRMS_MODULE, ONLY: Print_debug, Model, GSFLOW_flag, Have_lakes
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2020-08-12'
+      character(len=*), parameter :: Version_gsflow_modflow='2020-09-01'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
       character(len=*), parameter :: MODNAME_UZF = 'gwf2uzf1_NWT'
       character(len=*), parameter :: MODNAME_SFR = 'gwf2sfr7_NWT'
       character(len=*), parameter :: MODNAME_LAK = 'gwf2lak7_NWT'
-      character(len=*), parameter :: Version_uzf = '2020-08-11'
-      character(len=*), parameter :: Version_sfr = '2020-08-11'
-      character(len=*), parameter :: Version_lak = '2020-08-11'
+      character(len=*), parameter :: Version_uzf = '2019-09-10'
+      character(len=*), parameter :: Version_sfr = '2018-04-01'
+      character(len=*), parameter :: Version_lak = '2018-04-01'
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
       INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS,KPERSTART
@@ -44,7 +44,7 @@
 C-------ASSIGN VERSION NUMBER AND DATE
       CHARACTER*40 VERSION,VERSION2,VERSION3
       CHARACTER*10 MFVNAM
-      PARAMETER (VERSION='1.1.4 4/01/2018')
+      PARAMETER (VERSION='1.2.0 03/01/2020')
       PARAMETER (VERSION2='1.12.0 02/03/2017')
       PARAMETER (VERSION3='1.04.0 09/15/2016')
       PARAMETER (MFVNAM='-NWT-SWR1')
@@ -54,7 +54,7 @@ C-------ASSIGN VERSION NUMBER AND DATE
 C     ******************************************************************
 C     MAIN CODE FOR U.S. GEOLOGICAL SURVEY MODULAR MODEL -- MODFLOW-NWT
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.4, 4/01/2018
+!rgn------NEW VERSION NUMBER 1.2.0 03/01/2020
 C     ******************************************************************
 C
       INTEGER FUNCTION gsflow_modflow()
@@ -469,7 +469,8 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
-     &    Init_vars_from_file, Mxsziter
+     &    Init_vars_from_file, Mxsziter, Glacier_flag,
+     &    PRMS_iteration_flag
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
 C1------USE package modules.
       USE GLOBAL
@@ -489,6 +490,7 @@ c     USE LMGMODULE
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: soilzone, GET_KPER
+      INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsfclean
       EXTERNAL READ_STRESS
       INTRINSIC MIN
@@ -659,8 +661,32 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ON ) THEN
+              IF ( PRMS_iteration_flag==1 ) THEN
+                retval = intcp()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'intcp', retval
+                  RETURN
+                ENDIF
+                retval = snowcomp()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'snowcomp', retval
+                  RETURN
+                ENDIF
+                IF ( Glacier_flag==ON ) THEN
+                  retval = glacr()
+                  IF ( retval/=0 ) THEN
+                    PRINT 9001, 'glacr_melt', retval
+                    RETURN
+                  ENDIF
+                ENDIF
+                retval = srunoff()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'srunoff', retval
+                  RETURN
+                ENDIF
+              ENDIF
               retval = soilzone()
-              IF ( retval.NE.0 ) THEN
+              IF ( retval/=0 ) THEN
                 PRINT 9001, 'soilzone', retval
                 RETURN
               ENDIF
@@ -1311,7 +1337,7 @@ C
       USE GLOBAL, ONLY: IUNIT, ISSFLG, IOUT
       USE PRMS_SET_TIME, ONLY: Timestep_seconds
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, ON
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, ON, ERROR_time
       IMPLICIT NONE
       INTRINSIC ABS
 !***********************************************************************
@@ -1327,7 +1353,7 @@ C7------SIMULATE EACH STRESS PERIOD.
           IF ( ABS(Timestep_seconds-DELT*Mft_to_sec)>NEARZERO ) THEN
             WRITE (IOUT, 9003) Timestep_seconds, DELT, Mft_to_sec
             PRINT 9003, Timestep_seconds, DELT, Mft_to_sec
-            ERROR STOP 6
+            ERROR STOP ERROR_time
           ENDIF
         ENDIF
 C
@@ -1426,8 +1452,9 @@ C
       USE GSFMODFLOW, ONLY: Modflow_skip_time, Modflow_skip_stress,
      &    Modflow_time_in_stress, Stress_dates,
      &    Steady_state, ICNVG, KPER, KSTP, Mft_to_days, KPERSTART,
-     &    Modflow_skip_time_step, IGRID, ERROR_time, ERROR_modflow
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW,GSFLOW,ERROR_restart
+     &    Modflow_skip_time_step, IGRID
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, GSFLOW,
+     &    ERROR_restart, ERROR_time, ERROR_modflow
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Kkiter, Model,
      &    Starttime, Start_year, Start_month, Start_day,
      &    Print_debug, Modflow_time_zero
@@ -1464,7 +1491,7 @@ C
       IF ( mfstrt_jul>start_jul ) THEN
         PRINT *, 'ERROR, modflow_time_zero > start_time',
      &           mfstrt_jul, start_jul
-        ERROR STOP -5
+        ERROR STOP ERROR_time
       ENDIF
 
       IF ( mfstrt_jul==start_jul .AND. Init_vars_from_file==1 .AND.
@@ -1770,12 +1797,13 @@ C
      &       j, 'modflow_time_zero')/=0 ) THEN
           PRINT *, 'ERROR, modflow_time_zero, index:', j,
      &             'value: ', Modflow_time_zero(j)
-          ERROR STOP 1
+          ERROR STOP ERROR_control
         ENDIF
         IF ( j==1 ) THEN
           IF ( Modflow_time_zero(1)<0 ) THEN
       !     CALL error_stop
-      !&    ('control parameter modflow_time_zero must be specified', ERROR_control)
+      !&    ('control parameter modflow_time_zero must be specified',
+      !&     ERROR_control)
             Modflow_time_zero = Starttime
             PRINT '(/, A)',
      &     'WARNING, modflow_time_zero not specified, set to start_time'
@@ -1812,11 +1840,13 @@ C
       USE GLOBAL, ONLY: ITMUNI, LENUNI, IOUT
       USE GWFBASMODULE, ONLY: DELT
       USE GSFMODFLOW, ONLY: Mft_to_sec, Cellarea,
-     &    Mfl2_to_acre, Mfl3_to_ft3, Mfl_to_inch, Sfr_conv, OFF,
+     &    Mfl2_to_acre, Mfl3_to_ft3, Mfl_to_inch, Sfr_conv,
      &    Acre_inches_to_mfl3, Inch_to_mfl_t, Mfl3t_to_cfs, Model,
-     &    Mfvol2inch_conv, Gvr2cell_conv, Mfq2inch_conv, GSFLOW_flag
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Gvr_cell_pct
-      USE PRMS_CONSTANTS, ONLY: FT2_PER_ACRE, MODFLOW, ERROR_modflow
+     &    Mfvol2inch_conv, Gvr2cell_conv, Mfq2inch_conv
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Gvr_cell_pct,
+     &    GSFLOW_flag
+      USE PRMS_CONSTANTS, ONLY: FT2_PER_ACRE, MODFLOW, ERROR_modflow,
+     &    OFF
       IMPLICIT NONE
       EXTERNAL error_stop
 ! Local Variables
@@ -1827,7 +1857,7 @@ C
         IF ( Model==MODFLOW .AND. (LENUNI==0.OR.ITMUNI==0) ) RETURN
         WRITE ( IOUT, 9001 ) LENUNI, ITMUNI
         PRINT 9001, LENUNI, ITMUNI
-        ERROR STOP 10
+        ERROR STOP ERROR_modflow
       ENDIF
 
       IF ( LENUNI==1 ) THEN
@@ -1881,8 +1911,8 @@ C
 !***********************************************************************
       SUBROUTINE gsflow_modflow_restart(In_out)
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit,
-     &    Modflow_time_zero
-      USE GSFMODFLOW, ONLY: MODNAME, DEBUG_minimum, Print_debug
+     &    Modflow_time_zero, Print_debug
+      USE GSFMODFLOW, ONLY: MODNAME, DEBUG_minimum
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
       ! Argument

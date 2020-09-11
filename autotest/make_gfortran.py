@@ -33,52 +33,71 @@ def cleanup(srcdir, tempdir):
     os.makedirs(tempdir)
     copytree(srcdir, "./stemp")
     os.remove(os.path.join('stemp', 'merge', "CSV_merge.f90"))
+
     try:
         if platform.system().lower() == "windows":
-            os.remove(os.path.join('stemp','prms', 'utils_prms_linux.f90'))
+            os.remove(os.path.join('stemp', 'prms', 'utils_prms_linux.f90'))
         else:
             os.remove(os.path.join('stemp', 'prms', 'utils_prms.f90'))
     except:
         pass
+    
     return tempdir
 
 
 if __name__ == "__main__":
+    debug = False
+    if debug:
+        srcdir = os.path.join("..", "GSFLOW", "src")
+        target = "gsflow.exe"
+        fc = "gfortran"
+        cc = "gcc"
+        sd = True
+        double = False
+        makefile = False
+        debug = False
+        expedite = False
+        makeclean = True
+        dryrun = False
+        arch = "intel64"
+    else:
+        args = pymake.parser()
+        srcdir = args.srcdir
+        target = args.target
+        fc = args.fc
+        cc = args.cc
+        sd = args.subdirs
+        double = False
+        makefile = False
+        debug = args.debug
+        expedite = args.expedite
+        makeclean = args.makeclean
+        dryrun = args.dryrun
+        arch = args.arch
 
-    args = pymake.parser()
-
-    srcdir = args.srcdir
     srcdir = cleanup(srcdir, "./stemp")
 
     optlevel = "-O -Bstatic"
     fflags = optlevel  + " -fno-second-underscore" + " -ffree-line-length-512"
     if platform.system().lower() == 'windows':
-        cflags = optlevel + " -D WINDOWS -Wall"
+        cflags = optlevel + " -DWINDOWS -Wall"
     else:
-        cflags = optlevel + " -D LINUX -Wall"
+        cflags = optlevel + " -DLINUX -Wall"
     syslibs = ["-lgfortran", "-lgcc", "-lm"]
-    args.double = False
-    args.makefile = False
 
     exclude_files = []
-    # exclude_files = [os.path.join('temp', 'merge', "CSV_merge.f90")]
-    # if platform.system().lower() == "windows":
-    #     exclude_files.append(os.path.join('temp','prms',
-    #                                       'utils_prms_linux.f90'))
-    # else:
-    #     exclude_files.append(os.path.join('temp', 'prms', 'utils_prms.f90'))
 
     try:
-        pymake.main(srcdir, args.target, args.fc, args.cc, args.makeclean,
-                           args.expedite, args.dryrun, args.double, args.debug,
-                           args.subdirs, fflags, cflags, syslibs=syslibs,
-                           arch=args.arch, makefile=args.makefile,
-                           excludefiles=exclude_files)
+        pymake.main(srcdir, target, fc, cc, makeclean,
+                    expedite, dryrun, double, debug,
+                    sd, fflags, cflags, syslibs=syslibs,
+                    arch=arch, makefile=makefile,
+                    excludefiles=exclude_files)
     except AttributeError:
-        pymake.main(srcdir, args.target, args.fc, args.cc, args.makeclean,
-                           args.expedite, args.dryrun, args.double, args.debug,
-                           args.subdirs, fflags, cflags, syslibs=syslibs,
-                           arch=args.arch, makefile=args.makefile,
-                           excludefiles=exclude_files)
+        pymake.main(srcdir, target, fc, cc, makeclean,
+                    expedite, dryrun, double, debug,
+                    sd, fflags, cflags, syslibs=syslibs,
+                    arch=arch, makefile=makefile,
+                    excludefiles=exclude_files)
 
     shutil.rmtree(srcdir)

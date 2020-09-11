@@ -27,17 +27,20 @@
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Print_debug, Init_vars_from_file, &
      &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, Water_use_flag, &
      &    Frozen_flag, Save_vars_to_file, Process_flag, Inputerror_flag, Glacier_flag, &
-     &    Dprst_add_water_use, Dprst_transfer_water_use !, Parameter_check_flag
+     &    Dprst_add_water_use, Dprst_transfer_water_use, PRMS_iteration_flag, Kkiter !, Parameter_check_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2020-08-31'
+      character(len=*), parameter :: Version_srunoff = '2020-09-01'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
       REAL, SAVE, ALLOCATABLE :: Carea_dif(:), Imperv_stor_ante(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_stor_ante(:)
+      REAL, SAVE, ALLOCATABLE :: It0_soil_rechr(:), It0_soil_moist(:), It0_Imperv_stor(:)
+      DOUBLE PRECISION, SAVE :: Basin_dprst_hortonian_lakes
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_dprst_vol_open(:), It0_dprst_vol_clos(:)
       REAL, SAVE :: Srp, Sri, Perv_frac, Imperv_frac, Hruarea_imperv, Hruarea
       DOUBLE PRECISION, SAVE :: Hruarea_dble, Basin_apply_sroff, Basin_cfgi_sroff
       INTEGER, SAVE :: Use_sroff_transfer, Isglacier
@@ -255,7 +258,9 @@
      &      'decimal fraction', Dprst_vol_frac)/=0 ) CALL read_error(3, 'dprst_vol_frac')
 
         ALLOCATE ( Dprst_vol_open_max(Nhru), Dprst_vol_clos_max(Nhru), Dprst_vol_thres_open(Nhru), Dprst_in(Nhru) )
+        IF ( PRMS_iteration_flag==ON ) ALLOCATE ( It0_dprst_vol_open(Nhru), It0_dprst_vol_clos(Nhru) )
       ENDIF
+      IF ( PRMS_iteration_flag==ON ) ALLOCATE ( It0_imperv_stor(Nhru), It0_soil_moist(Nhru), It0_soil_rechr(Nhru) )
 
       ALLOCATE ( Hortonian_flow(Nhru) )
       IF ( declvar(MODNAME, 'hortonian_flow', 'nhru', Nhru, 'real', &
@@ -581,7 +586,7 @@
      &    Dprst_area_clos_max, Dprst_area_open_max, Hru_area_dble
       USE PRMS_CLIMATEVARS, ONLY: Potet, Tavgc
       USE PRMS_FLOWVARS, ONLY: Sroff, Infil, Imperv_stor, Pkwater_equiv, Dprst_vol_open, Dprst_vol_clos, &
-     &    Imperv_stor_max, Snowinfil_max, Basin_sroff, Glacier_frac
+     &    Imperv_stor_max, Snowinfil_max, Soil_moist, Soil_rechr, Basin_sroff, Glacier_frac
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Hru_intcpevap, Net_apply, Intcp_changeover
       USE PRMS_SNOW, ONLY: Snow_evap, Snowcov_area, Snowmelt, Pk_depth, Glacrb_melt
@@ -602,6 +607,28 @@
         Imperv_stor_ante = Hru_impervstor
         IF ( Dprst_flag==ON ) Dprst_stor_ante = Dprst_stor_hru
       ENDIF
+
+      IF ( PRMS_iteration_flag==ON ) THEN
+        IF ( Kkiter>1 ) THEN
+          Imperv_stor = It0_imperv_stor
+          Soil_moist = It0_soil_moist
+          Soil_rechr = It0_soil_rechr
+          IF ( Dprst_flag==ON ) THEN
+            Dprst_vol_open = It0_dprst_vol_open
+            Dprst_vol_clos = It0_dprst_vol_clos
+          ENDIF
+        ELSE
+! It0 variables used with MODFLOW integration to save iteration states.
+          It0_imperv_stor = Imperv_stor
+          It0_soil_moist = Soil_moist
+          It0_soil_rechr = Soil_rechr
+          IF ( Dprst_flag==ON ) THEN
+            It0_dprst_vol_open = Dprst_vol_open
+            It0_dprst_vol_clos = Dprst_vol_clos
+          ENDIF
+        ENDIF
+      ENDIF
+
       Basin_sroffi = 0.0D0
       Basin_sroffp = 0.0D0
       Basin_sroff = 0.0D0
@@ -1029,6 +1056,8 @@
 !     Compute cascading runoff (runoff in inche*acre/dt)
 !***********************************************************************
       SUBROUTINE run_cascade_sroff(Ncascade_hru, Runoff, Hru_sroff_down)
+!      USE PRMS_BASIN, ONLY: NEARZERO
+!      USE PRMS_MODULE, ONLY: Print_debug
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_SRUNOFF, ONLY: Ihru, Upslope_hortonian, Strm_seg_in
       USE PRMS_CASCADE, ONLY: Hru_down, Hru_down_frac, Hru_down_fracwt, Cascade_area
@@ -1058,6 +1087,23 @@
 
 ! reset Sroff as it accumulates flow to streams
       Runoff = Runoff - SNGL( Hru_sroff_down )
+!      IF ( Runoff<0.0 ) THEN
+!        IF ( Runoff<-NEARZERO ) THEN
+!          IF ( Print_debug>-1 ) PRINT *, 'runoff < NEARZERO', Runoff
+!          IF ( Hru_sroff_down>ABS(Runoff) ) THEN
+!            Hru_sroff_down = Hru_sroff_down - Runoff
+!          ELSE
+!            DO k = 1, Ncascade_hru
+!              j = Hru_down(k, Ihru)
+!              IF ( Strm_seg_in(j)>ABS(Runoff) ) THEN
+!                Strm_seg_in(j) = Strm_seg_in(j) - Runoff
+!                EXIT
+!              ENDIF
+!            ENDDO
+!          ENDIF
+!        ENDIF
+!        Runoff = 0.0
+!      ENDIF
 
       END SUBROUTINE run_cascade_sroff
 
