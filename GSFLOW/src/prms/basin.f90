@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2020-08-19'
+      character(len=*), parameter :: Version_basin = '2020-09-14'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -341,6 +341,9 @@
       Land_area = 0.0D0
       Active_area = 0.0D0
       Basin_lat = 0.0D0
+      Hru_frac_perv = 1.0
+      Hru_imperv = 0.0
+      Hru_perv = Hru_area
       Hru_route_order = 0
       j = 0
       DO i = 1, Nhru
@@ -368,9 +371,6 @@
             basinit = 1
             CYCLE
           ENDIF
-          Hru_frac_perv(i) = 1.0
-          Hru_imperv(i) = 0.0
-          Hru_perv(i) = harea
         ELSE
           Land_area = Land_area + harea_dble ! swale or land or glacier
           IF ( Lake_hru_id(i)>0 ) THEN
@@ -407,8 +407,15 @@
 
         IF ( Hru_type(i)==LAKE ) CYCLE
 
-        Hru_imperv(i) = Hru_percent_imperv(i)*harea
-        Hru_perv(i) = harea - Hru_imperv(i)
+        IF ( Hru_percent_imperv(i)>0.0 ) THEN
+          IF ( Hru_percent_imperv(i)>0.999 ) THEN
+            PRINT *, 'ERROR, Hru_percent_imperv > 0.999 for HRU:', i, ', value:', Hru_percent_imperv(i)
+            basinit = 1
+          ENDIF
+          Hru_imperv(i) = Hru_percent_imperv(i)*harea
+          Hru_perv(i) = harea - Hru_imperv(i)
+          basin_imperv = basin_imperv + DBLE( Hru_imperv(i) )
+        ENDIF
 
         IF ( Dprst_flag==ON ) THEN
           IF ( dprst_frac_flag==1 .OR. PRMS4_flag==OFF ) THEN
@@ -437,7 +444,6 @@
 
         Hru_frac_perv(i) = Hru_perv(i)/harea
         basin_perv = basin_perv + DBLE( Hru_perv(i) )
-        basin_imperv = basin_imperv + DBLE( Hru_imperv(i) )
         IF ( Dprst_flag==ON ) THEN
           basin_dprst = basin_dprst + DBLE( Dprst_area_max(i) )
           IF ( Dprst_area_clos_max(i)>0.0 ) Dprst_clos_flag = ON

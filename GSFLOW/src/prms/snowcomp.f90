@@ -26,7 +26,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2020-09-01'
+      character(len=*), parameter :: Version_snowcomp = '2020-09-15'
       integer, parameter :: not_a_glacier_hru = -1
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
@@ -59,11 +59,12 @@
       REAL, SAVE, ALLOCATABLE :: Glacr_5avsnow1(:), Glacr_5avsnow(:),Glacr_delsnow(:), Glacr_freeh2o_capm(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Glacr_pkwater_ante(:), Glacr_pkwater_equiv(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Glacr_pk_depth(:), Glacr_pss(:), Glacr_pst(:)
-      INTEGER, SAVE, ALLOCATABLE :: It0_iasw(:)
+      INTEGER, SAVE, ALLOCATABLE :: It0_iasw(:), It0_iso(:), It0_mso(:), It0_lso(:), It0_int_alb(:), It0_lst(:)
       REAL, SAVE, ALLOCATABLE :: It0_snowcov_area(:), It0_snowcov_areasv(:), It0_albedo(:), It0_pk_depth(:)
       REAL, SAVE, ALLOCATABLE :: It0_pk_temp(:), It0_pk_def(:), It0_pk_ice(:), It0_pk_den(:), It0_freeh2o(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:), It0_scrv(:), It0_pksv(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pst(:), It0_pss(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pst(:), It0_pss(:), It0_ai(:)
+       REAL, SAVE, ALLOCATABLE :: It0_snsv(:), It0_salb(:), It0_slst(:)
       !****************************************************************
       !   Declared Parameters
 
@@ -128,8 +129,10 @@
       IF ( PRMS_iteration_flag==ON ) THEN
         ALLOCATE ( It0_snowcov_area(Nhru), It0_snowcov_areasv(Nhru), It0_pkwater_equiv(Nhru) )
         ALLOCATE ( It0_albedo(Nhru), It0_pk_depth(Nhru), It0_iasw(Nhru), It0_pst(Nhru) )
-        ALLOCATE ( It0_pksv(Nhru), It0_scrv(Nhru), It0_pk_temp(Nhru), It0_pss(Nhru) )
+        ALLOCATE ( It0_pksv(Nhru), It0_scrv(Nhru), It0_pk_temp(Nhru), It0_pss(Nhru), It0_ai(Nhru) )
         ALLOCATE ( It0_pk_def(Nhru), It0_pk_ice(Nhru), It0_pk_den(Nhru), It0_freeh2o(Nhru) )
+        ALLOCATE ( It0_iso(Nhru),  It0_mso(Nhru), It0_lso(Nhru), It0_int_alb(Nhru), It0_lst(Nhru) )
+        ALLOCATE ( It0_snsv(Nhru), It0_salb(Nhru), It0_slst(Nhru) )
       ENDIF
 ! declare variables
       ALLOCATE ( Scrv(Nhru) )
@@ -768,26 +771,35 @@
       Snow_evap = 0.0
       Pptmix_nopack = OFF
       Tcal = 0.0
-      Frac_swe = 0.0
       Acum = acum_init
       Amlt = amlt_init
+      Basin_tcal = 0.0D0
+      Basin_snowmelt = 0.0D0
+      Basin_snowevap = 0.0D0
+      Basin_pk_precip = 0.0D0
+      Basin_glacrb_melt = 0.0D0
+      Basin_glacrevap = 0.0D0
+      Yrdays5 = 0
 
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==3 ) THEN
         IF ( getparam(MODNAME, 'snowpack_init', Nhru, 'real', Snowpack_init)/=0 ) CALL read_error(2, 'snowpack_init')
-        Pkwater_equiv = 0.0D0
+        Pkwater_equiv = DBLE( Snowpack_init )
+        DEALLOCATE ( Snowpack_init )
+      ENDIF
+      IF ( Init_vars_from_file==0 ) THEN
         Pk_depth = 0.0D0
         Pk_den = 0.0
         Pk_ice = 0.0
         Freeh2o = 0.0
         Ai = 0.0D0
         Snowcov_area = 0.0
+        Frac_swe = 0.0
         Basin_pweqv = 0.0D0
         Basin_snowdepth = 0.0D0
         Basin_snowcov = 0.0D0
         Basin_snowicecov = 0.0D0
         DO j = 1, Active_hrus
           i = Hru_route_order(j)
-          Pkwater_equiv(i) = DBLE( Snowpack_init(i) )
           IF ( Pkwater_equiv(i)>0.0D0 ) THEN
             Basin_pweqv = Basin_pweqv + Pkwater_equiv(i)*Hru_area_dble(i)
             Pk_depth(i) = Pkwater_equiv(i)/DBLE(Den_init(i))
@@ -800,7 +812,6 @@
               Frac_swe(i) = SNGL( Pkwater_equiv(i)/Ai(i) ) ! [fraction]
               Frac_swe(i) = MIN( 1.0, Frac_swe(i) )
             ELSE
-!              print *, ai(i), snarea_thresh
               Frac_swe(i) = 0.0
             ENDIF
             CALL sca_deplcrv(Snowcov_area(i), Snarea_curve(1,Hru_deplcrv(i)), Frac_swe(i))
@@ -808,13 +819,27 @@
             Basin_snowdepth = Basin_snowdepth + Pk_depth(i)*Hru_area_dble(i)
           ENDIF
         ENDDO
+
         Basin_pweqv = Basin_pweqv*Basin_area_inv
         Basin_snowcov = Basin_snowcov*Basin_area_inv
         Basin_snowdepth = Basin_snowdepth*Basin_area_inv
-        DEALLOCATE ( Snowpack_init )
-        Pkwater_ante = Pkwater_equiv
         Pss = Pkwater_equiv
         Pst = Pkwater_equiv
+        Iasw = 0
+        Iso = 1
+        Mso = 1
+        Lso = 0
+        Pk_def = 0.0
+        Pk_temp = 0.0
+        Albedo = 0.0
+        Snsv = 0.0
+        Lst = 0
+        Int_alb = 1
+        Salb = 0.0
+        Slst = 0.0
+        Snowcov_areasv = Snowcov_area
+        Scrv = 0.0D0
+        Pksv = 0.0D0
 
         IF ( Glacier_flag==ON ) THEN ! do here when not a restart simulation
           IF ( getparam(MODNAME, 'glacier_frac_init', Nhru, 'real', Glacier_frac_init)/=0 ) CALL read_error(2, 'glacier_frac_init')
@@ -848,62 +873,38 @@
             ENDIF
           ENDDO
           DEALLOCATE ( Glacier_frac_init )
+
+          Alt_above_ela = 0.0
+          Ann_tempc = 0.0
+          Glacr_air_5avtemp = 0.0
+          Glacr_air_5avtemp1 = 0.0
+          Glacr_air_deltemp = 0.0
+          Glacr_5avsnow = 0.0
+          Glacr_5avsnow1 = 0.0
+          Glacr_delsnow = 0.0
+          Glacrb_melt = 0.0
+          Glacrmelt = 0.0
+          Glacr_pk_den = 0.0
+          Glacr_pk_temp = 0.0
+          Glacr_pk_ice = 0.0
+          Glacr_pk_def = 0.0
+          Glacr_pkwater_equiv = 0.0D0
+          Glacr_pkwater_ante = 0.0D0
+          Glacr_evap = 0.0
+          Glacr_freeh2o = 0.0
+          Glacr_pk_depth = 0.0D0
+          Glacr_pst = 0.0D0
+          Glacr_pss = 0.0D0
+          Glacrcov_area = 0.0
+          Glacr_freeh2o_capm = Glacr_freeh2o_cap
+          DO j = 1, Active_hrus
+            i = Hru_route_order(j)
+            IF ( Glacier_frac(i)>0.0 .AND. Hru_type(i)==GLACIER ) CALL glacr_states_to_zero(i,1)
+          ENDDO
         ENDIF
       ENDIF
 
-      IF ( Init_vars_from_file>0 ) RETURN
-      Basin_tcal = 0.0D0
-      Iasw = 0
-      Iso = 1
-      Mso = 1
-      Lso = 0
-      Pk_def = 0.0
-      Pk_temp = 0.0
-      Albedo = 0.0
-      Snsv = 0.0
-      Lst = 0
-      Int_alb = 1
-      Salb = 0.0
-      Slst = 0.0
-      Snowcov_areasv = 0.0
-      Scrv = 0.0D0
-      Pksv = 0.0D0
-      Basin_snowmelt = 0.0D0
-      Basin_snowevap = 0.0D0
-      Basin_pk_precip = 0.0D0
-
-      Yrdays5 = 0
-      Basin_glacrb_melt = 0.0D0
-      Basin_glacrevap = 0.0D0
-      IF ( Glacier_flag==ON ) THEN
-        Alt_above_ela = 0.0
-        Ann_tempc = 0.0
-        Glacr_air_5avtemp = 0.0
-        Glacr_air_5avtemp1 = 0.0
-        Glacr_air_deltemp = 0.0
-        Glacr_5avsnow = 0.0
-        Glacr_5avsnow1 = 0.0
-        Glacr_delsnow = 0.0
-        Glacrb_melt = 0.0
-        Glacrmelt = 0.0
-        Glacr_pk_den = 0.0
-        Glacr_pk_temp = 0.0
-        Glacr_pk_ice = 0.0
-        Glacr_pk_def = 0.0
-        Glacr_pkwater_equiv = 0.0D0
-        Glacr_pkwater_ante = 0.0D0
-        Glacr_evap = 0.0
-        Glacr_freeh2o = 0.0
-        Glacr_pk_depth = 0.0D0
-        Glacr_pst = 0.0D0
-        Glacr_pss = 0.0D0
-        Glacrcov_area = 0.0
-        Glacr_freeh2o_capm = Glacr_freeh2o_cap
-        DO j = 1, Active_hrus
-          i = Hru_route_order(j)
-          IF ( Glacier_frac(i)>0.0 .AND. Hru_type(i)==GLACIER ) CALL glacr_states_to_zero(i,1)
-        ENDDO
-      ENDIF
+      Pkwater_ante = Pkwater_equiv
 
       END FUNCTION snoinit
 
@@ -933,21 +934,32 @@
 
       IF ( PRMS_iteration_flag==ON ) THEN
         IF ( Kkiter>1 ) THEN
-          Pkwater_equiv = It0_pkwater_equiv
-          Snowcov_area = It0_snowcov_area
-          Snowcov_areasv = It0_snowcov_areasv
-          Albedo = It0_albedo
-          Pk_depth = It0_pk_depth
-          Iasw = It0_iasw
-          Pst = It0_pst
-          Scrv = It0_scrv
-          Pksv = It0_pksv
-          Pk_temp = It0_pk_temp
-          Pk_def = It0_pk_def
-          Pk_ice = It0_pk_ice
-          Pk_den = It0_pk_den
-          Pss = It0_pss
-          Freeh2o = It0_freeh2o
+          DO j = 1, Active_hrus
+            i = Hru_route_order(j)
+            Snowcov_area = It0_snowcov_area(i)
+            Snowcov_areasv = It0_snowcov_areasv(i)
+            Albedo(i) = It0_albedo(i)
+            Pk_depth(i) = It0_pk_depth(i)
+            Iasw(i) = It0_iasw(i)
+            Pst(i) = It0_pst(i)
+            Scrv(i) = It0_scrv(i)
+            Pksv(i) = It0_pksv(i)
+            Pk_temp(i) = It0_pk_temp(i)
+            Pk_def(i) = It0_pk_def(i)
+            Pk_ice(i) = It0_pk_ice(i)
+            Pk_den(i) = It0_pk_den(i)
+            Pss(i) = It0_pss(i)
+            Ai(i) = It0_ai(i)
+            Freeh2o(i) = It0_freeh2o(i)
+            Iso(i) = It0_iso(i)
+            Mso(i) = It0_mso(i)
+            Lso(i) = It0_lso(i)
+            Snsv(i) = It0_snsv(i)
+            Lst(i) = It0_lst(i)
+            Int_alb(i) = It0_int_alb(i)
+            Salb(i) = It0_salb(i)
+            Slst(i) = It0_slst(i)
+          ENDDO
         ELSE
           It0_pkwater_equiv = Pkwater_equiv
           It0_snowcov_area = Snowcov_area
@@ -963,7 +975,16 @@
           It0_pk_ice = Pk_ice
           It0_pk_den = Pk_den
           It0_pss = Pss
+          It0_ai = Ai
           It0_freeh2o = Freeh2o
+          It0_iso = Iso
+          It0_mso = Mso
+          It0_iso = Lso
+          It0_snsv = Snsv
+          It0_lst = Lst
+          It0_int_alb = Int_alb
+          It0_salb = Salb
+          It0_slst = Slst
         ENDIF
       ENDIF
 
@@ -976,7 +997,6 @@
       Basin_snowicecov = 0.0D0
       Basin_pk_precip = 0.0D0
       Basin_snowdepth = 0.0D0
-      Basin_tcal = 0.0D0
       IF ( Glacier_flag==ON ) THEN
         Basin_glacrb_melt = 0.0D0
         Basin_glacrevap = 0.0D0
@@ -1114,8 +1134,6 @@
         Pk_precip(i) = 0.0 ! [inches]
         Snowmelt(i) = 0.0 ! [inches]
         Snow_evap(i) = 0.0 ! [inches]
-        Frac_swe(i) = 0.0
-        Ai(i) = 0.0D0
         Tcal(i) = 0.0
 
         ! By default, there has not been a mixed event without a
@@ -1158,8 +1176,9 @@
         ! there is any net snow, add the incoming water (or ice) and
         ! heat (or heat deficit) to the snowpack
         IF ( (Pkwater_equiv(i)>0.0D0.AND.Net_ppt(i)>0.0) .OR. Net_snow(i)>0.0 ) &
-     &       CALL ppt_to_pack(Pptmix(i), Iasw(i), Tmaxc(i), Tminc(i), &
-     &            Tavgc(i), Pkwater_equiv(i), Net_rain(i), Pk_def(i), &
+     &       CALL ppt_to_pack(Pptmix(i), Iasw(i), Tmaxc(i), Tminc(i), Tavgc(i), &
+     &            Ai(i), Frac_swe(i), Pksv(i), Scrv(i), &
+     &            Pkwater_equiv(i), Net_rain(i), Pk_def(i), &
      &            Pk_temp(i), Pk_ice(i), Freeh2o(i), Snowcov_area(i), &
      &            Snowmelt(i), Pk_depth(i), Pss(i), Pst(i), Net_snow(i), &
      &            Pk_den(i), Pptmix_nopack(i), Pk_precip(i), Tmax_allsnow_c(i,Nowmonth), &
@@ -1167,12 +1186,13 @@
         IF ( Active_glacier>0 ) THEN
            IF ( Glacrcov_area(i)>0.0.AND.Glacr_pkwater_ante(i)>0.0D0.AND.Net_ppt(i)>0.0 &
      &          .AND.Pptmix(i)==0.AND.Net_snow(i)==0.0 ) THEN
-              CALL ppt_to_pack(0, Iasw(i), Tmaxc(i), Tminc(i), &
-     &              Tavgc(i), Glacr_Pkwater_equiv(i), Net_rain(i), Glacr_pk_def(i), &
-     &              Glacr_pk_temp(i), Glacr_pk_ice(i), Glacr_freeh2o(i), Glacrcov_area(i), &
-     &              Glacrmelt(i), Glacr_pk_depth(i), Glacr_pss(i), Glacr_pst(i), 0.0, &
-     &              Glacr_pk_den(i), Pptmix_nopack(i), Pk_precip(i), Tmax_allsnow_c(i,Nowmonth), &
-     &              Glacr_freeh2o_capm(i), Den_max(i), i)
+              CALL ppt_to_pack(0, Iasw(i), Tmaxc(i), Tminc(i), Tavgc(i), &
+     &             Ai(i), Frac_swe(i), Pksv(i), Scrv(i), &
+     &             Glacr_Pkwater_equiv(i), Net_rain(i), Glacr_pk_def(i), &
+     &             Glacr_pk_temp(i), Glacr_pk_ice(i), Glacr_freeh2o(i), Glacrcov_area(i), &
+     &             Glacrmelt(i), Glacr_pk_depth(i), Glacr_pss(i), Glacr_pst(i), 0.0, &
+     &             Glacr_pk_den(i), Pptmix_nopack(i), Pk_precip(i), Tmax_allsnow_c(i,Nowmonth), &
+     &             Glacr_freeh2o_capm(i), Den_max(i), i)
           ENDIF
         ENDIF
 
@@ -1338,8 +1358,8 @@
                                                  ! or [Langleys / degC]
 
             ! calculate the night time energy balance
-            CALL snowbal(niteda, Tstorm_mo(i,Nowmonth), Iasw(i), &
-     &                   temp, esv, Hru_ppt(i), trd, Emis_noppt(i), &
+            CALL snowbal(niteda, Tstorm_mo(i,Nowmonth), Iasw(i), temp, esv, Hru_ppt(i), &
+     &                   Ai(i), Frac_swe(i), Scrv(i), Pksv(i), trd, Emis_noppt(i), &
      &                   Canopy_covden(i), cec, Pkwater_equiv(i), &
      &                   Pk_def(i), Pk_temp(i), Pk_ice(i), Freeh2o(i), &
      &                   Snowcov_area(i), Snowmelt(i), Pk_depth(i), &
@@ -1371,8 +1391,8 @@
               icst = Glacr_pk_den(i)*(SQRT(ieffk*13751.0)) ! [cal/(cm^2 degC)]
                                                            ! or [Langleys / degC]
               isw = 0.0 ! [cal / cm^2] or [Langleys]
-              CALL snowbal(niteda, Tstorm_mo(i,Nowmonth), Iasw(i), &
-     &                     temp, esv, Hru_ppt(i), trd, Emis_noppt(i), &
+              CALL snowbal(niteda, Tstorm_mo(i,Nowmonth), Iasw(i), temp, esv, Hru_ppt(i), &
+     &                     Ai(i), Frac_swe(i), Scrv(i), Pksv(i), trd, Emis_noppt(i), &
      &                     Canopy_covden(i), cec, Glacr_pkwater_equiv(i), &
      &                     Glacr_pk_def(i), Glacr_pk_temp(i), Glacr_pk_ice(i), Glacr_freeh2o(i), &
      &                     Glacrcov_area(i), Glacrmelt(i), Glacr_pk_depth(i), &
@@ -1391,8 +1411,8 @@
           IF ( Pkwater_equiv(i)>0.0D0 ) THEN !(if the snowpack still exists)
             ! set shortwave radiation as calculated earlier
             sw = swn ! [cal/cm^2] or [Langleys]
-            CALL snowbal(niteda, Tstorm_mo(i,Nowmonth), Iasw(i), &
-     &                   temp, esv, Hru_ppt(i), trd, Emis_noppt(i), &
+            CALL snowbal(niteda, Tstorm_mo(i,Nowmonth), Iasw(i), temp, esv, Hru_ppt(i), &
+     &                   Ai(i), Frac_swe(i), Scrv(i), Pksv(i), trd, Emis_noppt(i), &
      &                   Canopy_covden(i), cec, Pkwater_equiv(i), &
      &                   Pk_def(i), Pk_temp(i), Pk_ice(i), Freeh2o(i), &
      &                   Snowcov_area(i), Snowmelt(i), Pk_depth(i), &
@@ -1406,8 +1426,8 @@
             IF ( Glacrcov_area(i)>0.0 ) THEN
               ! set shortwave radiation as calculated earlier
               isw = iswn ! [cal/cm^2] or [Langleys]
-              CALL snowbal(niteda, Tstorm_mo(i,Nowmonth), Iasw(i), &
-     &                     temp, esv, Hru_ppt(i), trd, Emis_noppt(i), &
+              CALL snowbal(niteda, Tstorm_mo(i,Nowmonth), Iasw(i), temp, esv, Hru_ppt(i), &
+     &                     Ai(i), Frac_swe(i), Scrv(i), Pksv(i), trd, Emis_noppt(i), &
      &                     Canopy_covden(i), cec, Glacr_pkwater_equiv(i), &
      &                     Glacr_pk_def(i), Glacr_pk_temp(i), Glacr_pk_ice(i), Glacr_freeh2o(i), &
      &                     Glacrcov_area(i), Glacrmelt(i), Glacr_pk_depth(i), &
@@ -1500,6 +1520,8 @@
           Snowcov_areasv(i) = 0.0 ! rsr, not in original code
           Ai(i) = 0.0D0
           Frac_swe(i) = 0.0
+          Scrv(i) = 0.0D0
+          Pksv(i) = 0.0D0
         ENDIF
         IF ( Active_glacier>0 ) THEN
           IF ( Glacr_pkwater_equiv(i)>0.0D0 ) THEN
@@ -1552,7 +1574,7 @@
 !***********************************************************************
 !      Subroutine to add rain and/or snow to snowpack
 !***********************************************************************
-      SUBROUTINE ppt_to_pack(Pptmix, Iasw, Tmaxc, Tminc, Tavgc, &
+      SUBROUTINE ppt_to_pack(Pptmix, Iasw, Tmaxc, Tminc, Tavgc, Ai, Frac_swe, Pksv, Scrv, &
      &           Pkwater_equiv, Net_rain, Pk_def, Pk_temp, Pk_ice, &
      &           Freeh2o, Snowcov_area, Snowmelt, Pk_depth, Pss, Pst, &
      &           Net_snow, Pk_den, Pptmix_nopack, Pk_precip, Tmax_allsnow_c, Freeh2o_cap, Den_max, Ihru_gl)
@@ -1567,9 +1589,9 @@
       INTEGER, INTENT(INOUT) :: Iasw, Pptmix_nopack
       REAL, INTENT(IN) :: Tmaxc, Tminc, Tavgc, Net_rain, Net_snow
       REAL, INTENT(IN) :: Freeh2o_cap, Tmax_allsnow_c, Den_max
-      REAL, INTENT(INOUT) :: Snowmelt, Freeh2o, Pk_precip
+      REAL, INTENT(INOUT) :: Snowmelt, Freeh2o, Pk_precip, Frac_swe
       REAL, INTENT(INOUT) :: Pk_def, Pk_ice, Pk_den, Snowcov_area, Pk_temp
-      DOUBLE PRECISION, INTENT(INOUT) :: Pkwater_equiv, Pk_depth, Pst, Pss
+      DOUBLE PRECISION, INTENT(INOUT) :: Pkwater_equiv, Pk_depth, Pst, Pss, Pksv, Ai, Scrv
 ! Local Variables
       REAL :: train, tsnow, caln, pndz, calpr, calps
 !***********************************************************************
@@ -1713,7 +1735,7 @@
               ! Add the new heat to the snow pack
               ! (the heat in this excess rain will melt some of the
               ! pack ice when the water cools to 0 degC)
-              CALL calin(calpr, Pkwater_equiv, Pk_def, Pk_temp, &
+              CALL calin(calpr, Pkwater_equiv, Pk_def, Pk_temp, Ai, Frac_swe, Pksv, Scrv, &
      &                   Pk_ice, Freeh2o, Snowcov_area, Snowmelt, &
      &                   Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap, Den_max, Ihru_gl)
             ENDIF
@@ -1730,7 +1752,7 @@
             ! Add the new heat to the snow pack
             ! (the heat in rain will melt some of the pack ice when
             ! the water cools to 0 degC)
-            CALL calin(calpr, Pkwater_equiv, Pk_def, Pk_temp, &
+            CALL calin(calpr, Pkwater_equiv, Pk_def, Pk_temp, Ai, Frac_swe, Pksv, Scrv, &
      &                 Pk_ice, Freeh2o, Snowcov_area, Snowmelt, &
      &                 Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap, Den_max, Ihru_gl)
           ENDIF
@@ -1883,7 +1905,7 @@
 !      Subroutine to compute changes in snowpack when a net gain in
 !        heat energy has occurred.
 !***********************************************************************
-      SUBROUTINE calin(Cal, Pkwater_equiv, Pk_def, Pk_temp, &
+      SUBROUTINE calin(Cal, Pkwater_equiv, Pk_def, Pk_temp, Ai, Frac_swe, Pksv, Scrv, &
      &                 Pk_ice, Freeh2o, Snowcov_area, Snowmelt, &
      &                 Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap, Den_max, Ihru_gl)
       USE PRMS_SNOW, ONLY: Active_glacier, Print_debug, DEBUG_less, OFF
@@ -1894,8 +1916,8 @@
       REAL, INTENT(IN) :: Cal, Freeh2o_cap, Snowcov_area, Den_max
       REAL, INTENT(INOUT) :: Freeh2o
       DOUBLE PRECISION, INTENT(INOUT) :: Pkwater_equiv
-      REAL, INTENT(INOUT) :: Pk_def, Pk_temp, Pk_ice, Pk_den, Snowmelt
-      DOUBLE PRECISION, INTENT(INOUT) :: Pss, Pst, Pk_depth
+      REAL, INTENT(INOUT) :: Pk_def, Pk_temp, Pk_ice, Pk_den, Snowmelt, Frac_swe
+      DOUBLE PRECISION, INTENT(INOUT) :: Pss, Pst, Pk_depth, Pksv, Ai, Scrv
 ! Functions
       INTRINSIC :: SNGL, DBLE
       EXTERNAL :: print_date, glacr_states_to_zero
@@ -1989,6 +2011,10 @@
           Pss = 0.0D0      ! [inches]
           Pst = 0.0D0      ! [inches]
           Pk_den = 0.0     ! [fraction of depth]
+          Ai = 0.0D0
+          Frac_swe = 0.0
+          Scrv = 0.0D0
+          Pksv = 0.0D0
 
         ! (3.2) Heat only melts part of the ice in the snow pack...
         ELSE
@@ -2312,7 +2338,7 @@
 !      Subroutine to compute energy balance of snowpack
 !        1st call is for night period, 2nd call for day period
 !***********************************************************************
-      SUBROUTINE snowbal(Niteda, Tstorm_mo, Iasw, Temp, Esv, Hru_ppt, &
+      SUBROUTINE snowbal(Niteda, Tstorm_mo, Iasw, Temp, Esv, Hru_ppt, Ai, Frac_swe, Scrv, Pksv, &
      &           Trd, Emis_noppt, Canopy_covden, Cec, Pkwater_equiv, &
      &           Pk_def, Pk_temp, Pk_ice, Freeh2o, Snowcov_area, &
      &           Snowmelt, Pk_depth, Pss, Pst, Pk_den, Cst, Cal, Sw, Freeh2o_cap, Den_max, Ihru_gl)
@@ -2327,11 +2353,11 @@
       REAL, INTENT(IN) :: Temp, Esv, Trd, Cec, Cst, Canopy_covden
       REAL, INTENT(IN) :: Emis_noppt, Sw, Freeh2o_cap
       REAL, INTENT(IN) :: Hru_ppt, Snowcov_area, Den_max
-      DOUBLE PRECISION, INTENT(OUT) :: Pst, Pss
+      DOUBLE PRECISION, INTENT(INOUT) :: Pss, Pst, Pksv, Ai
       REAL, INTENT(OUT) :: Cal
       REAL, INTENT(INOUT) :: Pk_den, Pk_def, Pk_temp, Pk_ice
-      REAL, INTENT(INOUT) :: Freeh2o, Snowmelt
-      DOUBLE PRECISION, INTENT(INOUT) :: Pkwater_equiv, Pk_depth
+      REAL, INTENT(INOUT) :: Freeh2o, Snowmelt, Frac_swe
+      DOUBLE PRECISION, INTENT(INOUT) :: Pkwater_equiv, Pk_depth, Scrv
 ! Local Variables
       REAL :: air, ts, emis, sno, sky, can, cecsub, qcond, pk_defsub, pkt, pks
       REAL, PARAMETER :: ONETHIRD = 1.0/3.0
@@ -2432,7 +2458,7 @@
       ! snowpack and subroutine terminates
       IF ( ts>=0.0 ) THEN
         IF ( Cal>0.0 ) THEN
-          CALL calin(Cal, Pkwater_equiv, Pk_def, Pk_temp, &
+          CALL calin(Cal, Pkwater_equiv, Pk_def, Pk_temp, Ai, Frac_swe, Pksv, Scrv, &
      &               Pk_ice, Freeh2o, Snowcov_area, Snowmelt, &
      &               Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap, Den_max, Ihru_gl)
           RETURN
@@ -2495,7 +2521,7 @@
           ! conditions are true, then the code for surface temperature=0
           ! and cal=positive number would have run and the subroutine
           ! will have terminated
-          IF ( Cal>0.0 ) CALL calin(Cal, Pkwater_equiv, Pk_def, Pk_temp, &
+          IF ( Cal>0.0 ) CALL calin(Cal, Pkwater_equiv, Pk_def, Pk_temp, Ai, Frac_swe, Pksv, Scrv, &
      &                              Pk_ice, Freeh2o, Snowcov_area, &
      &                              Snowmelt, Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap, Den_max, Ihru_gl)
         ENDIF
@@ -2957,9 +2983,7 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Basin_snowmelt, Basin_pweqv, Basin_snowcov, &
-     &          Basin_snowevap, Basin_snowdepth, Basin_pk_precip, Basin_tcal, Basin_glacrb_melt, &
-     &          Basin_snowicecov, Basin_glacrevap
+        WRITE ( Restart_outunit ) Basin_pweqv, Basin_snowcov, Basin_snowdepth, Basin_snowicecov
         WRITE ( Restart_outunit ) Int_alb
         WRITE ( Restart_outunit ) Scrv
         WRITE ( Restart_outunit ) Pksv
@@ -2983,6 +3007,7 @@
         WRITE ( Restart_outunit ) Snsv
         WRITE ( Restart_outunit ) Pk_depth
         WRITE ( Restart_outunit ) Pkwater_ante
+        WRITE ( Restart_outunit ) Ai
         IF ( Glacier_flag==ON ) THEN
           WRITE ( Restart_outunit ) Glacrmelt
           WRITE ( Restart_outunit ) Glacr_evap
@@ -3007,9 +3032,7 @@
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Basin_snowmelt, Basin_pweqv, Basin_snowcov, &
-     &         Basin_snowevap, Basin_snowdepth, Basin_pk_precip, Basin_tcal, Basin_glacrb_melt, &
-     &         Basin_snowicecov, Basin_glacrevap
+        READ ( Restart_inunit ) Basin_pweqv, Basin_snowcov, Basin_snowdepth, Basin_snowicecov
         READ ( Restart_inunit ) Int_alb
         READ ( Restart_inunit ) Scrv
         READ ( Restart_inunit ) Pksv
@@ -3033,6 +3056,7 @@
         READ ( Restart_inunit ) Snsv
         READ ( Restart_inunit ) Pk_depth
         READ ( Restart_inunit ) Pkwater_ante
+        READ ( Restart_inunit ) Ai
         IF ( Glacier_flag==ON ) THEN
           READ ( Restart_inunit ) Glacrmelt
           READ ( Restart_inunit ) Glacr_evap

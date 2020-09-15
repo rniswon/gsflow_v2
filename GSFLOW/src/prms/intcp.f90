@@ -12,7 +12,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2020-09-01'
+      character(len=*), parameter :: Version_intcp = '2020-09-14'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -248,15 +248,15 @@
         Intcp_stor = 0.0
         Intcp_on = 0
         Hru_intcpstor = 0.0
-        Basin_changeover = 0.0D0
-        Basin_net_ppt = 0.0D0
-        Basin_net_snow = 0.0D0
-        Basin_net_rain = 0.0D0
-        Basin_intcp_evap = 0.0D0
-        Basin_intcp_stor = 0.0D0
-        Basin_net_apply = 0.0D0
-        Basin_hru_apply = 0.0D0
       ENDIF
+      Basin_changeover = 0.0D0
+      Basin_net_ppt = 0.0D0
+      Basin_net_snow = 0.0D0
+      Basin_net_rain = 0.0D0
+      Basin_intcp_evap = 0.0D0
+      Basin_intcp_stor = 0.0D0
+      Basin_net_apply = 0.0D0
+      Basin_hru_apply = 0.0D0
       IF ( Print_debug==DEBUG_WB ) ALLOCATE ( Intcp_stor_ante(Nhru) )
 
       END FUNCTION intinit
@@ -592,8 +592,6 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Basin_net_ppt, Basin_intcp_stor, Basin_intcp_evap, Basin_changeover, &
-     &                            Basin_net_snow, Basin_net_rain, Basin_net_apply, Basin_hru_apply
         WRITE ( Restart_outunit ) Intcp_transp_on
         WRITE ( Restart_outunit ) Intcp_on
         WRITE ( Restart_outunit ) Intcp_stor
@@ -601,8 +599,6 @@
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Basin_net_ppt, Basin_intcp_stor, Basin_intcp_evap, Basin_changeover, &
-     &                          Basin_net_snow, Basin_net_rain, Basin_net_apply, Basin_hru_apply
         READ ( Restart_inunit ) Intcp_transp_on
         READ ( Restart_inunit ) Intcp_on
         READ ( Restart_inunit ) Intcp_stor

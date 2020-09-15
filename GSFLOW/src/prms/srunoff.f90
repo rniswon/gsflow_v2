@@ -49,8 +49,7 @@
       DOUBLE PRECISION, SAVE :: Basin_sroffi, Basin_sroffp
       DOUBLE PRECISION, SAVE :: Basin_imperv_stor, Basin_imperv_evap, Basin_infil
       DOUBLE PRECISION, SAVE :: Basin_hortonian, Basin_hortonian_lakes, Basin_contrib_fraction
-      REAL, SAVE, ALLOCATABLE :: Contrib_fraction(:)
-      REAL, SAVE, ALLOCATABLE :: Imperv_evap(:)
+      REAL, SAVE, ALLOCATABLE :: Contrib_fraction(:), Imperv_evap(:)
       REAL, SAVE, ALLOCATABLE :: Hru_sroffp(:), Hru_sroffi(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Upslope_hortonian(:)
       REAL, SAVE, ALLOCATABLE :: Hortonian_flow(:)
@@ -1575,11 +1574,6 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Basin_sroff_down, Basin_sroff_upslope, Basin_sroffi, Basin_sroffp, &
-     &                            Basin_imperv_stor, Basin_imperv_evap, Basin_infil, Basin_hortonian, &
-     &                            Sri, Srp, Basin_hortonian_lakes
-        WRITE ( Restart_outunit ) Basin_dprst_sroff, Basin_dprst_evap, Basin_dprst_seep, &
-     &                            Basin_dprst_volop, Basin_dprst_volcl, Basin_contrib_fraction
         WRITE ( Restart_outunit ) Hru_impervstor
         IF ( Dprst_flag==ON ) THEN
           WRITE ( Restart_outunit ) Dprst_area_open
@@ -1595,11 +1589,6 @@
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Basin_sroff_down, Basin_sroff_upslope, Basin_sroffi, Basin_sroffp, &
-     &                          Basin_imperv_stor, Basin_imperv_evap, Basin_infil, Basin_hortonian, &
-     &                          Sri, Srp, Basin_hortonian_lakes
-        READ ( Restart_inunit ) Basin_dprst_sroff, Basin_dprst_evap, Basin_dprst_seep, &
-     &                          Basin_dprst_volop, Basin_dprst_volcl, Basin_contrib_fraction
         READ ( Restart_inunit ) Hru_impervstor
         IF ( Dprst_flag==ON ) THEN
           READ ( Restart_inunit ) Dprst_area_open

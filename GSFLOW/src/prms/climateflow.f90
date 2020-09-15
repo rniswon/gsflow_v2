@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2020-08-19'
+      character(len=*), parameter :: Version_climateflow = '2020-09-14'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -1155,8 +1155,6 @@
       Tavgc = 0.0
       Tmax_hru = 0.0
       Tmin_hru = 0.0
-      Pptmix = OFF
-      Newsnow = OFF
       Prmx = 0.0
       Hru_ppt = 0.0
       Hru_rain = 0.0
@@ -1193,8 +1191,6 @@
         Seg_upstream_inflow = 0.0D0
         Seg_lateral_inflow = 0.0D0
       ENDIF
-
-      IF ( Init_vars_from_file>0 .OR. ierr>0 ) RETURN
 
 ! initialize scalers
       Basin_temp = 0.0D0
@@ -1233,12 +1229,17 @@
       Basin_gwflow_cfs = 0.0D0
       Flow_out = 0.0D0
       Orad = 0.0
+      Transp_on = OFF
+
+      IF ( Init_vars_from_file>0 .OR. ierr>0 ) RETURN
+
+      Pptmix = OFF
+      Newsnow = OFF
 ! initialize arrays (dimensioned Nsegment)
       IF ( Stream_order_flag==ON ) THEN
         Seg_inflow = 0.0D0
         Seg_outflow = 0.0D0
       ENDIF
-      Transp_on = OFF
 ! initialize storage variables
       Imperv_stor = 0.0
       Pkwater_equiv = 0.0D0
@@ -1407,14 +1408,6 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Basin_ppt, Basin_rain, Basin_snow, Basin_obs_ppt, Basin_temp, Basin_orad, &
-     &          Basin_tmax, Basin_tmin, Solrad_tmax, Solrad_tmin, Basin_transp_on, Basin_potet, Basin_horad, &
-     &          Basin_swrad, Orad, Flow_out, Basin_potsw, Basin_humidity
-        WRITE ( Restart_outunit ) Basin_cfs, Basin_cms, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_stflow_in, &
-     &          Basin_gwflow_cfs, Basin_stflow_out, Basin_ssflow, Basin_soil_to_gw, Basin_actet, &
-     &          Basin_swale_et, Basin_perv_et, Basin_soil_moist, Basin_ssstor, Basin_lakeevap, Basin_lake_stor, &
-     &          Basin_sroff, Basin_recharge
-        WRITE ( Restart_outunit ) Transp_on
         WRITE ( Restart_outunit ) Pkwater_equiv
         IF ( Glacier_flag==ON ) THEN
           WRITE ( Restart_outunit) Glacier_frac
@@ -1426,6 +1419,8 @@
         WRITE ( Restart_outunit ) Ssres_stor
         WRITE ( Restart_outunit ) Soil_rechr
         WRITE ( Restart_outunit ) Imperv_stor
+        WRITE ( Restart_outunit ) Newsnow
+        WRITE ( Restart_outunit ) Pptmix
         IF ( GSFLOW_flag==OFF ) WRITE ( Restart_outunit ) Gwres_stor
         IF ( Dprst_flag==ON ) THEN
           WRITE ( Restart_outunit ) Dprst_vol_open
@@ -1439,14 +1434,6 @@
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Basin_ppt, Basin_rain, Basin_snow, Basin_obs_ppt, Basin_temp, Basin_orad, &
-     &         Basin_tmax, Basin_tmin, Solrad_tmax, Solrad_tmin, Basin_transp_on, Basin_potet, Basin_horad, &
-     &         Basin_swrad, Orad, Flow_out, Basin_potsw, Basin_humidity
-        READ ( Restart_inunit ) Basin_cfs, Basin_cms, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_stflow_in, &
-     &         Basin_gwflow_cfs, Basin_stflow_out, Basin_ssflow, Basin_soil_to_gw, Basin_actet, &
-     &         Basin_swale_et, Basin_perv_et, Basin_soil_moist, Basin_ssstor, Basin_lakeevap, Basin_lake_stor, &
-     &         Basin_sroff, Basin_recharge
-        READ ( Restart_inunit ) Transp_on
         READ ( Restart_inunit ) Pkwater_equiv
         IF ( Glacier_flag==ON ) THEN
           READ ( Restart_inunit) Glacier_frac
@@ -1458,6 +1445,8 @@
         READ ( Restart_inunit ) Ssres_stor
         READ ( Restart_inunit ) Soil_rechr
         READ ( Restart_inunit ) Imperv_stor
+        READ ( Restart_inunit ) Newsnow
+        READ ( Restart_inunit ) Pptmix
         IF ( GSFLOW_flag==OFF ) READ ( Restart_inunit ) Gwres_stor
         IF ( Dprst_flag==ON ) THEN
           READ ( Restart_inunit ) Dprst_vol_open

@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2020-09-01'
+      character(len=*), parameter :: Version_soilzone = '2020-09-14'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag, Is_land
       INTEGER, SAVE, ALLOCATABLE :: Soil2gw(:), Pref_flow_flag(:)
@@ -628,14 +628,16 @@
       ENDIF
 
       IF ( GSFLOW_flag==ON ) THEN
-        IF ( Nhru/=Nhrucell ) THEN
-          IF ( getparam(MODNAME, 'gvr_hru_id', Nhrucell, 'integer', Gvr_hru_id)/=0 ) CALL read_error(2, 'gvr_hru_id')
-          IF ( Parameter_check_flag==1 ) &
-     &         CALL checkdim_bounded_limits('gvr_hru_id', 'nhru', Gvr_hru_id, Nhrucell, 1, Nhru, Inputerror_flag)
-        ELSE
-          DO i = 1, Nhru
-            Gvr_hru_id(i) = i
-          ENDDO
+        IF ( Init_vars_from_file==0 ) THEN
+          IF ( Nhru/=Nhrucell ) THEN
+            IF ( getparam(MODNAME, 'gvr_hru_id', Nhrucell, 'integer', Gvr_hru_id)/=0 ) CALL read_error(2, 'gvr_hru_id')
+            IF ( Parameter_check_flag==1 ) &
+     &           CALL checkdim_bounded_limits('gvr_hru_id', 'nhru', Gvr_hru_id, Nhrucell, 1, Nhru, Inputerror_flag)
+          ELSE
+            DO i = 1, Nhru
+              Gvr_hru_id(i) = i
+            ENDDO
+          ENDIF
         ENDIF
         Grav_gwin = 0.0 ! dimension nhru
         Gw2sm_grav = 0.0
@@ -785,7 +787,7 @@
 !      Snowevap_aet_frac = 0.0
 
       ! initialize scalers
-      IF ( Init_vars_from_file==0 ) CALL init_basin_vars()
+      CALL init_basin_vars()
 
 ! initialize GSFLOW arrays
       IF ( GSFLOW_flag==ON ) THEN
@@ -1819,7 +1821,8 @@
       SUBROUTINE init_basin_vars()
       USE PRMS_SOILZONE
       USE PRMS_FLOWVARS, ONLY: Basin_actet, Basin_perv_et, Basin_recharge, &
-     &    Basin_swale_et, Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_sroff
+     &    Basin_swale_et, Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_sroff, &
+     &    Basin_soil_moist, Basin_ssstor
       IMPLICIT NONE
 !***********************************************************************
       Basin_lakeinsz = 0.0D0
@@ -1852,6 +1855,15 @@
       Basin_soil_to_gw = 0.0D0
       Basin_ssflow = 0.0D0
       Basin_sroff = 0.0D0
+      Basin_soil_moist = 0.0D0
+      Basin_slstor = 0.0D0
+      Basin_ssstor = 0.0D0
+      Basin_pref_stor = 0.0D0
+      Basin_soil_rechr = 0.0D0
+      Basin_soil_moist_tot = 0.0D0
+      Basin_cpr_stor_frac = 0.0D0
+      Basin_gvr_stor_frac = 0.0D0
+      Basin_pfr_stor_frac = 0.0D0
 
       END SUBROUTINE init_basin_vars
 
@@ -1871,22 +1883,18 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Basin_sz_gwin, Basin_sz2gw, Basin_interflow_max, Basin_sm2gvr_max, Basin_cap_infil_tot, &
-     &          Basin_soil_rechr, Basin_dunnian_gvr, Basin_ssin, Basin_sm2gvr, Basin_capwaterin, Basin_dunnian, &
-     &          Basin_slowflow, Basin_slstor, Basin_cap_up_max, Basin_soil_moist_tot, Basin_gvr2sm, Et_type, Basin_lakeprecip
-        WRITE ( Restart_outunit ) Basin_prefflow, Basin_pref_flow_infil, Basin_pref_stor, Basin_gvr2pfr, Basin_dunnian_pfr
-        WRITE ( Restart_outunit ) Basin_dndunnianflow, Basin_dninterflow, Basin_dncascadeflow, Basin_lakeinsz, Basin_lakeprecip
         WRITE ( Restart_outunit ) Pref_flow_stor
-        IF ( GSFLOW_flag==ON ) WRITE ( Restart_outunit ) Gravity_stor_res
+        IF ( GSFLOW_flag==ON ) THEN
+          WRITE ( Restart_outunit ) Gravity_stor_res
+          WRITE ( Restart_outunit ) Gvr_hru_id
+        ENDIF
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Basin_sz_gwin, Basin_sz2gw, Basin_interflow_max, Basin_sm2gvr_max, Basin_cap_infil_tot, &
-     &         Basin_soil_rechr, Basin_dunnian_gvr, Basin_ssin, Basin_sm2gvr, Basin_capwaterin, Basin_dunnian, &
-     &         Basin_slowflow, Basin_slstor, Basin_cap_up_max, Basin_soil_moist_tot, Basin_gvr2sm, Et_type, Basin_lakeprecip
-        READ ( Restart_inunit ) Basin_prefflow, Basin_pref_flow_infil, Basin_pref_stor, Basin_gvr2pfr, Basin_dunnian_pfr
-        READ ( Restart_inunit ) Basin_dndunnianflow, Basin_dninterflow, Basin_dncascadeflow, Basin_lakeinsz, Basin_lakeprecip
         READ ( Restart_inunit ) Pref_flow_stor
-        IF ( GSFLOW_flag==ON ) READ ( Restart_inunit ) Gravity_stor_res
+        IF ( GSFLOW_flag==ON ) THEN
+          READ ( Restart_outunit ) Gravity_stor_res
+          READ ( Restart_inunit ) Gvr_hru_id
+        ENDIF
       ENDIF
       END SUBROUTINE soilzone_restart

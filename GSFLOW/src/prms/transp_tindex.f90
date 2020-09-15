@@ -10,9 +10,9 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Transpiration Distribution'
         character(len=13), parameter :: MODNAME = 'transp_tindex'
-        character(len=*), parameter :: Version_transp = '2020-08-03'
-        INTEGER, SAVE, ALLOCATABLE :: Transp_check(:), Transp_beg_restart(:), Transp_end_restart(:)
-        REAL, SAVE, ALLOCATABLE :: Tmax_sum(:), Transp_tmax_f(:), Transp_tmax_restart(:)
+        character(len=*), parameter :: Version_transp = '2020-09-14'
+        INTEGER, SAVE, ALLOCATABLE :: Transp_check(:)
+        REAL, SAVE, ALLOCATABLE :: Tmax_sum(:), Transp_tmax_f(:)
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Transp_beg(:), Transp_end(:)
         REAL, SAVE, ALLOCATABLE :: Transp_tmax(:)
@@ -29,7 +29,7 @@
       REAL, EXTERNAL :: c_to_f
       EXTERNAL :: read_error, print_module, transp_tindex_restart
 ! Local Variables
-      INTEGER :: i, j, motmp, new_values
+      INTEGER :: i, j, motmp
 !***********************************************************************
       transp_tindex = 0
 
@@ -108,20 +108,7 @@
         IF ( getparam(MODNAME, 'transp_end', Nhru, 'integer', Transp_end)/=0 ) CALL read_error(2, 'transp_end')
         IF ( getparam(MODNAME, 'transp_tmax', Nhru, 'real', Transp_tmax)/=0 ) CALL read_error(2, 'transp_tmax')
 
-        new_values = OFF
-        IF ( Init_vars_from_file>0 ) THEN
-          ALLOCATE ( Transp_beg_restart(Nhru), Transp_end_restart(Nhru), Transp_tmax_restart(Nhru) )
-          CALL transp_tindex_restart(1)
-          DO j = 1, Active_hrus
-            i = Hru_route_order(j)
-            IF ( new_values==ON ) EXIT
-            IF ( Transp_beg(i)/=Transp_beg_restart(i) ) new_values = ON
-            IF ( Transp_end(i)/=Transp_end_restart(i) ) new_values = ON
-            IF ( Transp_tmax(i)/=Transp_tmax_restart(i) ) new_values = ON
-          ENDDO
-          DEALLOCATE ( Transp_beg_restart, Transp_end_restart, Transp_tmax_restart )
-        ENDIF
-
+        IF ( Init_vars_from_file>0 ) CALL transp_tindex_restart(1)
         IF ( Temp_units==FAHRENHEIT ) THEN
           Transp_tmax_f = Transp_tmax
         ELSE
@@ -131,29 +118,28 @@
         ENDIF
         !DEALLOCATE ( Transp_tmax )
 
-        IF ( Init_vars_from_file==0 .OR. new_values==ON ) THEN
-          motmp = Start_month + MONTHS_PER_YEAR
-          Tmax_sum = 0.0
-          Transp_check = OFF
-          Basin_transp_on = OFF
-          DO j = 1, Active_hrus
-            i = Hru_route_order(j)
-            IF ( Start_month==Transp_beg(i) ) THEN
-              IF ( Start_day>10 ) THEN ! rsr, why 10? if transp_tmax < 300, should be < 10
-                Transp_on(i) = ON
-              ELSE
-                Transp_check(i) = ON
-              ENDIF
-            ELSEIF ( Transp_end(i)>Transp_beg(i) ) THEN
-              IF ( Start_month>Transp_beg(i) .AND. Start_month<Transp_end(i) ) Transp_on(i) = ON
+        IF ( Init_vars_from_file==0 ) Tmax_sum = 0.0
+
+        motmp = Start_month + MONTHS_PER_YEAR
+        Transp_check = OFF
+        Basin_transp_on = OFF
+        DO j = 1, Active_hrus
+          i = Hru_route_order(j)
+          IF ( Start_month==Transp_beg(i) ) THEN
+            IF ( Start_day>10 ) THEN ! rsr, why 10? if transp_tmax < 300, should be < 10
+              Transp_on(i) = ON
             ELSE
-              IF ( Start_month>Transp_beg(i) .OR. motmp<Transp_end(i)+MONTHS_PER_YEAR ) Transp_on(i) = ON
+              Transp_check(i) = ON
             ENDIF
-            IF ( Basin_transp_on==OFF ) THEN
-              IF ( Transp_on(i)==ON ) Basin_transp_on = ON
-            ENDIF
-          ENDDO
-        ENDIF
+          ELSEIF ( Transp_end(i)>Transp_beg(i) ) THEN
+            IF ( Start_month>Transp_beg(i) .AND. Start_month<Transp_end(i) ) Transp_on(i) = ON
+          ELSE
+            IF ( Start_month>Transp_beg(i) .OR. motmp<Transp_end(i)+MONTHS_PER_YEAR ) Transp_on(i) = ON
+          ENDIF
+          IF ( Basin_transp_on==OFF ) THEN
+            IF ( Transp_on(i)==ON ) Basin_transp_on = ON
+          ENDIF
+        ENDDO
 
       ELSEIF ( Process_flag==CLEAN ) THEN
         IF ( Save_vars_to_file==ON ) CALL transp_tindex_restart(0)
@@ -177,18 +163,10 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Transp_check
         WRITE ( Restart_outunit ) Tmax_sum
-        WRITE ( Restart_outunit ) Transp_beg
-        WRITE ( Restart_outunit ) Transp_end
-        WRITE ( Restart_outunit ) Transp_tmax
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Transp_check
         READ ( Restart_inunit ) Tmax_sum
-        READ ( Restart_inunit ) Transp_beg_restart
-        READ ( Restart_inunit ) Transp_end_restart
-        READ ( Restart_inunit ) Transp_tmax_restart
       ENDIF
       END SUBROUTINE transp_tindex_restart
