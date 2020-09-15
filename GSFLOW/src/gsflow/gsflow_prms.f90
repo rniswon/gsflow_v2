@@ -20,8 +20,8 @@
      &          EQULS = '===================================================================='
     character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
     character(len=11), parameter :: MODNAME = 'gsflow_prms'
-    character(len=*), parameter :: PRMS_versn = '2020-09-01'
-    character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 09/01/2020'
+    character(len=*), parameter :: PRMS_versn = '2020-09-15'
+    character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 09/15/2020'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -560,12 +560,12 @@
       IF ( Process_flag==RUN ) THEN
         RETURN
       ELSEIF ( Process_flag==CLEAN ) THEN
+        CALL DATE_AND_TIME(VALUES=Elapsed_time_end)
+        Execution_time_end = Elapsed_time_end(5)*3600 + Elapsed_time_end(6)*60 + &
+     &                       Elapsed_time_end(7) + Elapsed_time_end(8)*0.001
+        Elapsed_time = Execution_time_end - Execution_time_start
+        Elapsed_time_minutes = INT(Elapsed_time/60.0)
         IF ( Model==PRMS ) THEN
-          CALL DATE_AND_TIME(VALUES=Elapsed_time_end)
-          Execution_time_end = Elapsed_time_end(5)*3600 + Elapsed_time_end(6)*60 + &
-     &                         Elapsed_time_end(7) + Elapsed_time_end(8)*0.001
-          Elapsed_time = Execution_time_end - Execution_time_start
-          Elapsed_time_minutes = INT(Elapsed_time/60.0)
           IF ( Print_debug>DEBUG_less ) THEN
             PRINT 9001
             PRINT 9003, 'start', (Elapsed_time_start(i),i=1,3), (Elapsed_time_start(i),i=5,7)
@@ -573,7 +573,9 @@
             PRINT '(A,I5,A,F6.2,A,/)', 'Execution elapsed time', Elapsed_time_minutes, ' minutes', &
      &                                 Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
           ENDIF
-          IF ( Print_debug>DEBUG_minimum ) &
+        ENDIF
+        IF ( Print_debug>DEBUG_minimum ) THEN
+          IF ( Model==PRMS .OR. Model==GSFLOW ) &
      &         WRITE ( PRMS_output_unit,'(A,I5,A,F6.2,A,/)') 'Execution elapsed time', Elapsed_time_minutes, ' minutes', &
      &                                                       Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
         ENDIF
