@@ -628,16 +628,14 @@
       ENDIF
 
       IF ( GSFLOW_flag==ON ) THEN
-        IF ( Init_vars_from_file==0 ) THEN
-          IF ( Nhru/=Nhrucell ) THEN
-            IF ( getparam(MODNAME, 'gvr_hru_id', Nhrucell, 'integer', Gvr_hru_id)/=0 ) CALL read_error(2, 'gvr_hru_id')
-            IF ( Parameter_check_flag==1 ) &
-     &           CALL checkdim_bounded_limits('gvr_hru_id', 'nhru', Gvr_hru_id, Nhrucell, 1, Nhru, Inputerror_flag)
-          ELSE
-            DO i = 1, Nhru
-              Gvr_hru_id(i) = i
-            ENDDO
-          ENDIF
+        IF ( Nhru/=Nhrucell ) THEN
+          IF ( getparam(MODNAME, 'gvr_hru_id', Nhrucell, 'integer', Gvr_hru_id)/=0 ) CALL read_error(2, 'gvr_hru_id')
+          IF ( Parameter_check_flag==1 ) &
+     &         CALL checkdim_bounded_limits('gvr_hru_id', 'nhru', Gvr_hru_id, Nhrucell, 1, Nhru, Inputerror_flag)
+        ELSE
+          DO i = 1, Nhru
+            Gvr_hru_id(i) = i
+          ENDDO
         ENDIF
         Grav_gwin = 0.0 ! dimension nhru
         Gw2sm_grav = 0.0
@@ -652,18 +650,9 @@
       Soil_lower_ratio = 0.0
       Pref_flow_thrsh = 0.0
 
-      Basin_soil_moist = 0.0D0
-      Basin_slstor = 0.0D0
-      Basin_ssstor = 0.0D0
-      Basin_pref_stor = 0.0D0
-      Basin_soil_rechr = 0.0D0
-      Basin_soil_moist_tot = 0.0D0
-      Basin_soil_lower_stor_frac = 0.0D0
-      Basin_soil_rechr_stor_frac = 0.0D0
-      Basin_sz_stor_frac = 0.0D0
-      Basin_cpr_stor_frac = 0.0D0
-      Basin_gvr_stor_frac = 0.0D0
-      Basin_pfr_stor_frac = 0.0D0
+      ! initialize scalers
+      CALL init_basin_vars()
+
 !      Pfr_stor_frac = 0.0
 !      Gvr_stor_frac = 0.0
 !      Cpr_stor_frac = 0.0
@@ -785,9 +774,6 @@
       Soil_saturated = OFF
 !      Interflow_max = 0.0
 !      Snowevap_aet_frac = 0.0
-
-      ! initialize scalers
-      CALL init_basin_vars()
 
 ! initialize GSFLOW arrays
       IF ( GSFLOW_flag==ON ) THEN
@@ -1864,6 +1850,9 @@
       Basin_cpr_stor_frac = 0.0D0
       Basin_gvr_stor_frac = 0.0D0
       Basin_pfr_stor_frac = 0.0D0
+      Basin_soil_lower_stor_frac = 0.0D0
+      Basin_soil_rechr_stor_frac = 0.0D0
+      Basin_sz_stor_frac = 0.0D0
 
       END SUBROUTINE init_basin_vars
 
@@ -1884,17 +1873,11 @@
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Pref_flow_stor
-        IF ( GSFLOW_flag==ON ) THEN
-          WRITE ( Restart_outunit ) Gravity_stor_res
-          WRITE ( Restart_outunit ) Gvr_hru_id
-        ENDIF
+        IF ( GSFLOW_flag==ON ) WRITE ( Restart_outunit ) Gravity_stor_res
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Pref_flow_stor
-        IF ( GSFLOW_flag==ON ) THEN
-          READ ( Restart_outunit ) Gravity_stor_res
-          READ ( Restart_inunit ) Gvr_hru_id
-        ENDIF
+        IF ( GSFLOW_flag==ON ) READ ( Restart_inunit ) Gravity_stor_res
       ENDIF
       END SUBROUTINE soilzone_restart
