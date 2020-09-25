@@ -12,7 +12,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2020-09-14'
+      character(len=*), parameter :: Version_intcp = '2020-09-21'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -372,8 +372,10 @@
                 changeover = 0.0
               ENDIF
             ELSE
-              IF ( Print_debug>DEBUG_less ) PRINT *, 'covden_win=0 at winter change over with canopy storage, HRU:', i, &
-     &                                               'intcp_stor:', intcpstor, ' covden_sum:', Covden_sum(i)
+              IF ( Print_debug>DEBUG_less ) THEN
+                PRINT *, 'covden_win=0 at winter change over with canopy storage, HRU:', i, Nowyear, Nowmonth, Nowday
+                PRINT *, 'intcp_stor:', intcpstor, ' covden_sum:', Covden_sum(i)
+              ENDIF
               intcpstor = 0.0
             ENDIF
           ENDIF
@@ -391,8 +393,10 @@
                 changeover = 0.0
               ENDIF
             ELSE
-              IF ( Print_debug>DEBUG_less ) PRINT *, 'covden_sum=0 at summer change over with canopy storage, HRU:', i, &
-     &                                               'intcp_stor:', intcpstor, ' covden_win:', Covden_win(i)
+              IF ( Print_debug>DEBUG_less ) THEN
+                PRINT *, 'covden_sum=0 at summer change over with canopy storage, HRU:', i, Nowyear, Nowmonth, Nowday
+                PRINT *, 'intcp_stor:', intcpstor, ' covden_win:', Covden_win(i)
+              ENDIF
               intcpstor = 0.0
             ENDIF
           ENDIF
@@ -536,7 +540,8 @@
         Basin_intcp_stor = Basin_intcp_stor + DBLE( intcpstor*cov*harea )
         Basin_intcp_evap = Basin_intcp_evap + DBLE( intcpevap*cov*harea )
         IF ( Intcp_changeover(i)>0.0 ) THEN
-          IF ( Print_debug>DEBUG_less ) PRINT *, 'Change over storage:', Intcp_changeover(i), '; HRU:', i
+          IF ( Print_debug>DEBUG_less ) PRINT '(A,F0.5,A,4(1X,I0))', 'Change over storage:', Intcp_changeover(i), '; HRU:', i, &
+     &                                                               Nowyear, Nowmonth, Nowday
           Basin_changeover = Basin_changeover + DBLE( Intcp_changeover(i)*harea )
         ENDIF
 

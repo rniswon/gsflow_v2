@@ -149,7 +149,7 @@
       INTEGER FUNCTION prms2mfinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_param
       USE GSFPRMS2MF
-      USE GWFUZFMODULE, ONLY: NTRAIL, NWAV
+      USE GWFUZFMODULE, ONLY: NTRAIL, NWAV, IUZFBND
       USE GWFSFRMODULE, ONLY: ISEG, NSS
       USE GWFLAKMODULE, ONLY: NLAKES
       USE GSFMODFLOW, ONLY: Gwc_row, Gwc_col
@@ -159,7 +159,6 @@
      &    Basin_area_inv, Hru_area
       USE PRMS_SOILZONE, ONLY: Gvr_hru_id, Gvr_hru_pct_adjusted
       USE GLOBAL, ONLY: NLAY, NROW, NCOL
-      USE GWFUZFMODULE, ONLY: IUZFBND
       IMPLICIT NONE
       INTEGER, EXTERNAL :: getparam
       EXTERNAL read_error

@@ -25,9 +25,9 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2020-09-14'
+      character(len=*), parameter :: Version_soilzone = '2020-09-22'
       INTEGER, SAVE :: DBGUNT
-      INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag, Is_land
+      INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       INTEGER, SAVE, ALLOCATABLE :: Soil2gw(:), Pref_flow_flag(:)
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
       REAL, SAVE, ALLOCATABLE :: Soil_lower_stor_max(:)
@@ -898,8 +898,8 @@
           IF ( Nlake>0 ) It0_potet = Potet
           It0_basin_soil_moist = Basin_soil_moist
           It0_basin_ssstor = Basin_ssstor
-        Gw2sm_grav = 0.0
         ENDIF
+        Gw2sm_grav = 0.0
         Sm2gw_grav = 0.0
       ENDIF
 
@@ -975,9 +975,6 @@
         IF ( avail_potet<0.0 ) avail_potet = 0.0
 !        Snowevap_aet_frac(i) = 0.0
 
-        Is_land = 0
-        IF ( Hru_type(i)==LAND .OR. Hru_type(i)==GLACIER ) Is_land = 1
-
 !******Add infiltration to soil and compute excess
         ! note, perv_area has to be > 0.0
         dunnianflw = 0.0
@@ -998,12 +995,14 @@
         ! perv_frac has to be > 0.001
         ! infil for pervious portion of HRU
         capwater_maxin = Infil(i)
+
         IF ( Diversion2soil_flag==ON ) THEN
           IF ( Hru_ag_irr(i)>0.0 ) capwater_maxin = capwater_maxin + Hru_ag_irr(i)/perv_area
         ENDIF
         IF ( Soilzone_add_water_use==ON ) THEN
           IF ( Soilzone_gain(i)>0.0 ) capwater_maxin = capwater_maxin + Soilzone_gain(i)/perv_area/DBLE(Cfs_conv)
         ENDIF
+
         cfgi_frozen_hru = OFF
         !Frozen is HRU variable that says if frozen gravity reservoir
         ! For CFGI all inflow is assumed to be Dunnian Flow when frozen
@@ -1209,7 +1208,7 @@
 
 ! if HRU cascades,
 ! compute interflow and excess flow to each HRU or stream
-        IF ( Is_land==1 ) THEN
+        IF ( Hru_type(i)==LAND .OR. Hru_type(i)==GLACIER ) THEN
           interflow = Slow_flow(i) + prefflow
 !          Interflow_max(i) = interflow
           Basin_interflow_max = Basin_interflow_max + interflow*harea

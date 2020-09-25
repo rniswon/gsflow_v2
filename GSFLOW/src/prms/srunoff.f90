@@ -32,7 +32,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2020-09-01'
+      character(len=*), parameter :: Version_srunoff = '2020-09-22'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -490,6 +490,7 @@
       INTEGER FUNCTION srunoffinit()
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
+!      USE PRMS_FLOWVARS, ONLY: Soil_moist_max
       USE PRMS_FLOWVARS, ONLY: Basin_sroff
       IMPLICIT NONE
 ! Functions
@@ -497,6 +498,7 @@
       EXTERNAL :: read_error
 ! Local Variables
       INTEGER :: i, j !, k, num_hrus
+!      REAL :: frac
 !***********************************************************************
       srunoffinit = 0
 
@@ -559,6 +561,40 @@
           Carea_dif(i) = Carea_max(i) - Carea_min(i)
         ENDDO
       ENDIF
+
+!      num_hrus = 0
+!      DO j = 1, Active_hrus
+!        i = Hru_route_order(j)
+!        IF ( Sroff_flag==carea_module ) THEN
+!          Carea_dif(i) = Carea_max(i) - Carea_min(i)
+!        ELSEIF ( Parameter_check_flag>0 ) THEN
+!          frac = Smidx_coef(i)*10**(Soil_moist_max(i)*Smidx_exp(i))
+!          k = 0
+!          IF ( frac>2.0 ) k = 1
+!          IF ( frac>Carea_max(i)*2.0 ) k = k + 2
+!          IF ( k>0 ) THEN
+!            num_hrus = num_hrus + 1
+            !IF ( Print_debug>-1 ) THEN
+            !  PRINT *, ' '
+            !  PRINT *, 'WARNING'
+            !  PRINT *, 'Contributing area based on smidx parameters and soil_moist_max:', frac
+            !  IF ( k==1 .OR. k==3 ) PRINT *, 'Maximum contributing area > 200%'
+            !  IF ( k>1 ) PRINT *, 'Maximum contributing area > carea_max:', Carea_max(i)
+            !  PRINT *, 'HRU:', i, '; soil_moist_max:', Soil_moist_max(i)
+            !  PRINT *, 'smidx_coef:', Smidx_coef(i), '; smidx_exp:', Smidx_exp(i)
+            !  PRINT *, 'This can make smidx parameters insensitive and carea_max very sensitive'
+            !ENDIF
+!          ENDIF
+!        ENDIF
+!      ENDDO
+!      IF ( num_hrus>0 .AND. Print_debug>-1 ) THEN
+!        WRITE (*, '(/,A,/,9X,A,/,9X,A,I7,/,9X,A,/,9X,A,/)') &
+!     &         'WARNING, maximum contributing area based on smidx coefficents and', &
+!     &         'soil_moist_max are > 200% of the HRU area and/or > 2*carea_max', &
+!     &         'number of HRUs for which this condition exists:', num_hrus, &
+!     &         'This means the smidx parameters are insensitive and', &
+!     &         'carea_max very sensitive for those HRUs'
+!      ENDIF
 
 ! Depression Storage parameters and variables:
       IF ( Dprst_flag==ON ) CALL dprst_init()
@@ -1018,9 +1054,8 @@
 !***********************************************************************
       SUBROUTINE perv_comp(Pptp, Ptc, Infil, Srp)
       USE PRMS_SRUNOFF, ONLY: Ihru, Smidx_coef, Smidx_exp, &
-     &    Carea_max, Carea_min, Carea_dif, Contrib_fraction, smidx_module
+     &    Carea_max, Carea_min, Carea_dif, Contrib_fraction, smidx_module !, CLOSEZERO
       USE PRMS_MODULE, ONLY: Sroff_flag
-!      USE PRMS_CONSTANTS, ONLY: CLOSEZERO
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Soil_rechr_max
       IMPLICIT NONE
 ! Arguments
@@ -1505,11 +1540,11 @@
       IF ( Dprst_vol_open>0.0D0 ) THEN
         seep_open = Dprst_vol_open*DBLE( Dprst_seep_rate_open(Ihru) )
         Dprst_vol_open = Dprst_vol_open - seep_open
-        IF ( Dprst_vol_open<0.0D0 ) THEN
+!        IF ( Dprst_vol_open<0.0D0 ) THEN
 !          IF ( Dprst_vol_open<-DNEARZERO ) PRINT *, 'negative dprst_vol_open:', Dprst_vol_open, ' HRU:', Ihru
-          seep_open = seep_open + Dprst_vol_open
-          Dprst_vol_open = 0.0D0
-        ENDIF
+!          seep_open = seep_open + Dprst_vol_open
+!          Dprst_vol_open = 0.0D0
+!        ENDIF
         Dprst_seep_hru = seep_open/Hruarea_dble
       ENDIF
 
@@ -1532,16 +1567,12 @@
         IF ( Dprst_area_clos>NEARZERO ) THEN
           seep_clos = Dprst_vol_clos*DBLE( Dprst_seep_rate_clos(Ihru) )
           Dprst_vol_clos = Dprst_vol_clos - seep_clos
-          IF ( Dprst_vol_clos<0.0D0 ) THEN
+!          IF ( Dprst_vol_clos<0.0D0 ) THEN
 !            IF ( Dprst_vol_clos<-DNEARZERO ) PRINT *, 'issue, dprst_vol_clos<0.0', Dprst_vol_clos
-            seep_clos = seep_clos + Dprst_vol_clos
-            Dprst_vol_clos = 0.0D0
-          ENDIF
+!            seep_clos = seep_clos + Dprst_vol_clos
+!            Dprst_vol_clos = 0.0D0
+!          ENDIF
           Dprst_seep_hru = Dprst_seep_hru + seep_clos/Hruarea_dble
-        ENDIF
-        IF ( Dprst_vol_clos<0.0D0 ) THEN
-!          IF ( Dprst_vol_clos<-DNEARZERO ) PRINT *, 'issue, dprst_vol_clos<0.0', Dprst_vol_clos
-          Dprst_vol_clos = 0.0D0
         ENDIF
       ENDIF
 

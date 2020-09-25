@@ -382,7 +382,7 @@ C---------READ DATASET 2A - SOLVER DATA FOR BOTH SOLVERS
         CALL URWORD(line, lloc, istart, istop, 2, IPRSOL, r, IOUT, In)
         CALL URWORD(line, lloc, istart, istop, 2, MUTSOL, r, IOUT, In)
         IF ( NSOLVER.LT.1 .OR. NSOLVER.GT.2 ) THEN
-          WRITE (IOUT,2210) (i,csolver(i),i=1,3)
+          WRITE (IOUT,2210) (i,csolver(i),i=1,2)
           CALL USTOP('SWI2 ERROR: INVALID NSOLVER SPECIFIED')
         END IF
         IF ( IPRSOL.LT.1 ) IPRSOL = 999

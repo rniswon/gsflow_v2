@@ -20,8 +20,8 @@
      &          EQULS = '===================================================================='
     character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
     character(len=11), parameter :: MODNAME = 'gsflow_prms'
-    character(len=*), parameter :: PRMS_versn = '2020-09-15'
-    character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 09/15/2020'
+    character(len=*), parameter :: PRMS_versn = '2020-09-22'
+    character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 09/22/2020'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -1063,7 +1063,7 @@
       IF ( call_modules('setdims')/=0 ) Inputerror_flag = 1
 
       IF ( Inputerror_flag==1 ) PRINT '(//,A,/,A,/ )', '**FIX input errors in your Control File to continue**', &
-     &        'NOTE: some errors may be due to use of defalut values'
+     &     'NOTE: some errors may be due to use of defalut values'
 
       setdims = Inputerror_flag
       END FUNCTION setdims

@@ -5,7 +5,6 @@
       MODULE PRMS_TRANSP_FROST
         USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, ON, OFF
         USE PRMS_MODULE, ONLY: Process_flag, Nhru
-        USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Transpiration Distribution'
@@ -17,6 +16,7 @@
 
       INTEGER FUNCTION transp_frost()
       USE PRMS_TRANSP_FROST
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Transp_on, Basin_transp_on
       USE PRMS_SET_TIME, ONLY: Jsol
       IMPLICIT NONE
@@ -36,7 +36,8 @@
 ! Basin_transp_on is set to 1 (ON).
         Basin_transp_on = OFF
         Transp_on = OFF
-        DO i = 1, Nhru
+        DO j = 1, Active_hrus
+          i = Hru_route_order(j)
           IF ( Jsol>=Spring_frost(i) .AND. Jsol<=Fall_frost(i) ) THEN
             Transp_on(i) = ON
             Basin_transp_on = ON

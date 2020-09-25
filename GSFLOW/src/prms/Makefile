@@ -1,19 +1,31 @@
-# PRMS V makefile
+# PRMS library makefile
 
 include ../makelist
-TARGET 	= ../$(BINDIR)/prms
+PRMSLIB = $(LIBDIR)/libprms.a
+MMFLIB	 = $(LIBDIR)/libmmf.a
+LIBS	= $(PRMSLIB) $(MMFLIB) $(FLIBS)
 
 ####################################################
 # Rules for targets
 ####################################################
-all: $(TARGET)
+all: $(PRMSLIB)
+
+$(TARGET): $(PRMSLIB)
+	$(RM) $(TARGET)
+
+$(MMFLIB):
+	$(CD) $(MMFDIR);make
+
+####################################################
+# Rules for targets
+####################################################
 
 #
 # Define all object files which make up the library
 #
 
 
-OBJS = \
+LIBOBJS = \
         basin.o \
         climateflow.o \
         cascade.o \
@@ -69,9 +81,12 @@ OBJS = \
 
 install: lib
 
-$(TARGET): $(OBJS)
-	$(RM) $(TARGET)
-	$(FC) $(LDFLAGS) -o $(TARGET) $(OBJS) $(MMFLIB) $(FLIBS)
+lib: $(PRMSLIB)
+
+$(PRMSLIB): $(LIBOBJS)
+	$(RM) $(PRMSLIB)
+	$(AR) $(PRMSLIB) $(LIBOBJS)
+	$(RANLIB) $(PRMSLIB)
 
 clean:
 	$(RM) *.o *.mod *~

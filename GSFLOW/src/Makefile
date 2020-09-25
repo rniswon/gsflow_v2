@@ -12,6 +12,7 @@ MMF      = ./mmf
 PRMS     = ./prms
 GSFLOW   = ./gsflow
 MODFLOW  = ./modflow
+LIB		 = ./lib
 
 #
 # Standard Targets for Users
@@ -26,10 +27,9 @@ standard:
 	cd $(GSFLOW); $(MAKE)
 
 clean:
-	cd $(MMF); $(MAKE) clean;
-	cd $(MODFLOW); $(MAKE) clean;
-	cd $(PRMS); $(MAKE) clean;
-	cd $(GSFLOW); $(MAKE) clean;
+	cd $(MMF); $(RM) *.o *.mod *~;
+	cd $(MODFLOW); $(RM) *.o *.mod *~;
+	cd $(PRMS); $(RM) *.o *.mod *~;
+	cd $(GSFLOW); $(RM) *.o *.mod *~;
 	cd $(LIB); rm -f *.a;
-	cd $(BIN); rm -f gsflow
 

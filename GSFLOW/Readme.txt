@@ -1,6 +1,6 @@
 
 
-                      GSFLOW - Version: 2.1.0
+                      GSFLOW - Version: 2.2.0
           Coupled Groundwater and Surface-water FLOW model
 
 
@@ -14,20 +14,20 @@ shall the fact of release constitute any such warranty. Furthermore, the softwar
 released on condition that neither the USGS nor the U.S. Government shall be held liable 
 for any damages resulting from its authorized or unauthorized use.
 
-GSFLOW version 2.1.0 is packaged for personal computers using one of the Linux or 
+GSFLOW version 2.2.0 is packaged for personal computers using one of the Linux or 
 Microsoft Windows operating systems. An executable file compiled for 64-bit operating 
-systems is provided. The Linux executable was compiled on a personal computer using the
-Intel Fortran (ifort) and C (icc) compilers version: 18.0.3 20180410. The Windows 
-executable was compiled on a personal computer with the Intel(R) Xeon(R) E-2186M CPU, 
-running the Microsoft Windows 10 Enterprise, Version 1809, 64-bit operating system, 
-using the Microsoft Visual Studio 2019 Version 16.3.7, development environment and 
-the Intel® Parallel Studio XE 2019 Update 5 Composer Edition for Fortran Windows* 
+systems is provided. The Linux executable was compiled on a personal computer using
+gfortran and gcc compilers MinGW GCC-8.2.0-3 version. The Windows executable was 
+compiled using the Microsoft Visual Studio 2019 Version 16.3.7, development environment 
+and the Intel® Parallel Studio XE 2019 Update 5 Composer Edition for Fortran Windows* 
 Integration for Microsoft Visual Studio* 2019 and Microsoft Visual C++ 2019 compilers.
+Both executables were compiled on a personal computer with the Intel(R) Xeon(R) E-2186M CPU, 
+running the Microsoft Windows 10 Enterprise, Version 1809, 64-bit operating system
 
 The source code and Linux Makefiles are provided to aid users in compilation
 on other computers. However, no support is provided for compilation.
 
-IMPORTANT: Users should review the file 'GSFLOW_Release_Notes_2.1.0.pdf' for a 
+IMPORTANT: Users should review the file 'GSFLOW_Release_Notes_2.2.0.pdf' for a 
 description of, and references for, this software. Changes that have been 
 introduced into GSFLOW with each official release also are described in this 
 file; these changes may substantially affect users.
@@ -50,8 +50,8 @@ A. DISTRIBUTION FILE
 
 The following distribution files are for use on personal computers:
 
-         gsflow_2.1.0.zip for Windows-based personal computers
-         gsflow_2.1.0_linux.zip for Linux-based personal computers
+         gsflow_2.2.0.zip for Windows-based personal computers
+         gsflow_2.2.0_linux.zip for Linux-based personal computers
 
 The distribution file contains:
 
@@ -66,12 +66,12 @@ several subdirectories. The following directory structure will be created in the
 installation directory:
 
    |
-   |--GSFLOW_2.1.0
+   |--gsflow_2.2.0
    |    |--bin           ; Compiled GSFLOW executable for personal computers
    |    |--data          ; Seven example GSFLOW application models described
-                            in USGS reports TM6-D1 and TM6-D3.
+                           in USGS reports TM6-D1 and TM6-D3.
    |    |--doc           ; Documentation reports for GSFLOW and related
-                            software.
+                           software.
 			|--Related reports	; Additional reports and information files
    |    |--src
    |        |--gsflow           ; Source code for GSFLOW Modules
@@ -83,8 +83,8 @@ installation directory:
    |    |--water-budget utility ; Utility program for analysis of GSFLOW output
 
 
-It is recommended that no user files be kept in the GSFLOW_2.1.0 directory
-structure.  If you do plan to put your own files in the GSFLOW_2.1.0
+It is recommended that no user files be kept in the gsflow_2.2.0 directory
+structure.  If you do plan to put your own files in the gsflow_2.2.0
 directory structure, do so only by creating additional subdirectories of
 the "data" subdirectory.
 
@@ -97,8 +97,8 @@ available from the following World Wide Web site: http://www.adobe.com/
 B. INSTALLING
 
 To make the executable version of GSFLOW accessible from any directory, the 
-directory containing the executable (GSFLOW_2.1.0\bin on Linux-based computers or 
-GSFLOW_2.1.0\bin on Windows-based computers) should be included in the PATH
+directory containing the executable (gsflow_2.2.0\bin on Linux-based computers or 
+gsflow_2.2.0\bin on Windows-based computers) should be included in the PATH
 environment variable. Also, if a prior release of GSFLOW is installed on your 
 system, the directory containing the executable for the prior release should be 
 removed from the PATH environment variable.

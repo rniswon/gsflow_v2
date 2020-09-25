@@ -54,7 +54,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2020-08-04'
+      character(len=*), parameter :: Version_glacr = '2020-09-21'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -871,7 +871,7 @@
 !***********************************************************************
       INTEGER FUNCTION comp_glsurf(glacr_exist, glrette_exist)
       USE PRMS_GLACR
-      USE PRMS_MODULE, ONLY: Nhru, Starttime
+      USE PRMS_MODULE, ONLY: Nhru, Start_year
       USE PRMS_BASIN, ONLY: Hru_type, Hru_elev_ts, Basin_area_inv, Active_hrus, &
      &    Hru_route_order, Elev_units, Hru_elev
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Julwater
@@ -935,7 +935,7 @@
       gl_gain = 0.D0
 !
 ! Start of year calculations after have a year of data
-      IF ( Julwater==1 .AND. Nowyear>=Starttime(1)+1) THEN
+      IF ( Julwater==1 .AND. Nowyear>=Start_year+1) THEN
         IF (glacr_exist==1 ) THEN !have glaciers
 ! Save year ending values from previous year
           DO jj = 1, Active_hrus
@@ -961,7 +961,7 @@
             frawt(i) = fraw0(i)/divu !in km
           ENDDO
 ! Have a year of mass balance, compute bottom so can do Hru_elev_ts
-          IF ( Nowyear==Starttime(1)+1) THEN ! do bottom calcs and get ca
+          IF ( Nowyear==Start_year+1) THEN ! do bottom calcs and get ca
             ALL_unit = get_ftnunit(735)
             Output_unit = get_ftnunit(All_unit)
             IF (botwrite==1) OPEN ( Output_unit, FILE='output.dat' )
@@ -1060,7 +1060,7 @@
 !
 !After first year estimate Glacrva_coef based on ODE volume and area, ca = Vol/(Area**Glacrva_exp)
 ! ca = (Glacrva_coef*39.37**(3.0-2.0*Glacrva_exp))*(Av_fgrad(p)**(0.2))*(Av_basal_slope(p)**(-0.4))
-          IF ( Nowyear==Starttime(1)+1) THEN ! do bottom calcs and get ca
+          IF ( Nowyear==Start_year+1) THEN ! do bottom calcs and get ca
             IF (botwrite==1) WRITE ( Output_unit, '(A6,A11,A15)' ) 'Glacr', 'Term_HRU_i', 'Gl_area_init'
             DO o = 1, Ngl
               p = Glacr_tag(Term(o)) !index by Glacr_tag
@@ -1355,7 +1355,7 @@
 !Snowfield area change uses Baumann and Winkler 2010 to change area every 10 years;
 ! technically each snowfield should have own ablation elevation range.
         IF (glrette_exist==1) THEN !have snowfields,
-          IF ( MOD(Nowyear-Starttime(1),10)==0 ) THEN !change them
+          IF ( MOD(Nowyear-Start_year,10)==0 ) THEN !change them
             DO i = 1, Active_hrus
               j = Hru_route_order(i)
               IF ( Hru_type(j)==LAND .AND. Glrette_frac(j)>NEARZERO) THEN

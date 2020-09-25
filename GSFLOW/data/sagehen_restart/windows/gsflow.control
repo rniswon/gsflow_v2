@@ -92,7 +92,7 @@ gsf_rpt
 csv_output_file
 1
 4
-../output/sagehen_gsflow_cont.csv
+../output/gsflow_cont.csv
 ####
 temp_module
 1
@@ -118,6 +118,11 @@ srunoff_module
 1
 4
 srunoff_smidx
+####
+strmflow_module
+1
+4
+strmflow
 ####
 statsON_OFF
 1

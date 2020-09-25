@@ -229,6 +229,10 @@ void setup_cont (void) {
 		lval[0] = 0;
 		decl_control_int_array ("canopy_transferON_OFF", 1, lval);
 
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("outputSelectDatesON_OFF", 1, lval);
+
 		lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
 		decl_control_int_array ("seg2hru_flag", 1, lval);
@@ -336,6 +340,7 @@ void setup_cont (void) {
 		decl_control_string ("basinOutBaseFileName", "basinout_path");
 		decl_control_string("nsegmentOutBaseFileName", "nsegmentout_path");
 		decl_control_string("dynamic_param_log_file", "dynamic_parameter.out");
+		decl_control_string("selectDatesFileName", "selectDates.in");
 /*
 **	run start and end times
 */
