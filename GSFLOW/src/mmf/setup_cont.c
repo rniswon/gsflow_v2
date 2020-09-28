@@ -233,10 +233,6 @@ void setup_cont (void) {
 		lval[0] = 0;
 		decl_control_int_array("outputSelectDatesON_OFF", 1, lval);
 
-		lval = (long*)umalloc(sizeof(long));
-		lval[0] = 0;
-		decl_control_int_array("PRMS_iteration_flag", 1, lval);
-
 		lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
 		decl_control_int_array ("seg2hru_flag", 1, lval);
