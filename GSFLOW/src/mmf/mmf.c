@@ -44,7 +44,6 @@ int main (int argc, char *argv[]) {
    long *lptr;
    char **cpt;
    struct stat stbuf;
-   char	buf[512];
    char	*err;
    static int      num_param_files = 0;
    char   **fname;
