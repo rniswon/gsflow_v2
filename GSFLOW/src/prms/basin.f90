@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2020-08-19'
+      character(len=*), parameter :: Version_basin = '2020-09-30'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag, Ag_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -358,6 +358,9 @@
       Land_area = 0.0D0
       Active_area = 0.0D0
       Basin_lat = 0.0D0
+      Hru_frac_perv = 1.0
+      Hru_imperv = 0.0
+      Hru_perv = Hru_area
       Hru_route_order = 0
       j = 0
       DO i = 1, Nhru
@@ -385,9 +388,6 @@
             basinit = 1
             CYCLE
           ENDIF
-          Hru_frac_perv(i) = 1.0
-          Hru_imperv(i) = 0.0
-          Hru_perv(i) = harea
         ELSE
           Land_area = Land_area + harea_dble ! swale or land or glacier
           IF ( Lake_hru_id(i)>0 ) THEN
@@ -424,8 +424,15 @@
 
         IF ( Hru_type(i)==LAKE ) CYCLE
 
-        Hru_imperv(i) = Hru_percent_imperv(i)*harea
-        Hru_perv(i) = harea - Hru_imperv(i)
+        IF ( Hru_percent_imperv(i)>0.0 ) THEN
+          IF ( Hru_percent_imperv(i)>0.999 ) THEN
+            PRINT *, 'ERROR, Hru_percent_imperv > 0.999 for HRU:', i, ', value:', Hru_percent_imperv(i)
+            basinit = 1
+          ENDIF
+          Hru_imperv(i) = Hru_percent_imperv(i)*harea
+          basin_imperv = basin_imperv + DBLE( Hru_imperv(i) )
+          Hru_perv(i) = Hru_perv(i) - Hru_imperv(i)
+        ENDIF
 
         IF ( Dprst_flag==ON ) THEN
           IF ( dprst_frac_flag==1 .OR. PRMS4_flag==OFF ) THEN
@@ -443,10 +450,16 @@
             Dprst_area_open_max(i) = Dprst_area_max(i)*Dprst_frac_open(i)
             Dprst_frac_clos(i) = 1.0 - Dprst_frac_open(i)
             Dprst_area_clos_max(i) = Dprst_area_max(i) - Dprst_area_open_max(i)
+            IF ( Hru_percent_imperv(i)+Dprst_frac(i)>0.999 ) THEN
+              PRINT *, 'ERROR, impervious plus depression fraction > 0.999 for HRU:', i
+              PRINT *, '       value:', Hru_percent_imperv(i) + Dprst_frac(i)
+              basinit = 1
+            ENDIF
+            basin_dprst = basin_dprst + DBLE( Dprst_area_max(i) )
+            IF ( Dprst_area_clos_max(i)>0.0 ) Dprst_clos_flag = ON
+            IF ( Dprst_area_open_max(i)>0.0 ) Dprst_open_flag = ON
+            Hru_perv(i) = Hru_perv(i) - Dprst_area_max(i)
           ENDIF
-          basin_dprst = basin_dprst + DBLE( Dprst_area_max(i) )
-          IF ( Dprst_area_clos_max(i)>0.0 ) Dprst_clos_flag = ON
-          IF ( Dprst_area_open_max(i)>0.0 ) Dprst_open_flag = ON
         ENDIF
 
         IF ( Ag_frac(i)>0.0 ) THEN
@@ -460,9 +473,6 @@
           Hru_perv(i) = Hru_perv(i) - Ag_frac(i)
         ENDIF
 
-        Hru_perv(i) = harea - Hru_imperv(i)
-        IF ( Dprst_flag==ON ) Hru_perv(i) = Hru_perv(i) - Dprst_area_max(i)
-        IF ( Ag_flag==ON ) Hru_perv(i) = Hru_perv(i) - Hru_area_ag(i)
         Hru_frac_perv(i) = Hru_perv(i)/harea
         IF ( Hru_frac_perv(i)<0.999 ) THEN
           PRINT *, 'ERROR, pervious fraction must be >= 0.001 for HRU:', i, '; fraction:', Hru_frac_perv(i)
@@ -474,7 +484,6 @@
         ENDIF
         Hru_frac_perv(i) = Hru_perv(i)/harea
         basin_perv = basin_perv + DBLE( Hru_perv(i) )
-        basin_imperv = basin_imperv + DBLE( Hru_imperv(i) )
       ENDDO
       IF ( Dprst_flag==ON .AND. PRMS4_flag==ON ) DEALLOCATE ( Dprst_area )
 

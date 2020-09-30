@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2020-08-19'
+      character(len=*), parameter :: Version_routing = '2020-09-14'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades
@@ -246,6 +246,13 @@
      &       ' Muskingum routing weighting factor; enter 0.0 for'// &
      &       ' reservoirs, diversions, and segment(s) flowing out of the basin', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'x_coef')
+        IF ( declvar(MODNAME, 'basin_segment_storage', 'one', 1, 'double', &
+     &       'Basin area-weighted average storage in the stream network', &
+     &       'inches', Basin_segment_storage)/=0 ) CALL read_error(3, 'basin_segment_storage')
+        ALLOCATE ( Segment_delta_flow(Nsegment) )
+        IF ( declvar(MODNAME, 'segment_delta_flow', 'nsegment', Nsegment, 'double', &
+     &       'Cummulative flow in minus flow out for each stream segment', &
+     &       'cfs', Segment_delta_flow)/=0 ) CALL read_error(3, 'segment_delta_flow')
       ENDIF
 
       IF ( Hru_seg_cascades==ON .OR. Model==DOCUMENTATION ) THEN
@@ -298,15 +305,6 @@
      &       'inches', Seg_sroff)/=0 ) CALL read_error(3, 'seg_sroff')
       ENDIF
 
-      IF ( declvar(MODNAME, 'basin_segment_storage', 'one', 1, 'double', &
-     &     'Basin area-weighted average storage in the stream network', &
-     &     'inches', Basin_segment_storage)/=0 ) CALL read_error(3, 'basin_segment_storage')
-
-      ALLOCATE ( Segment_delta_flow(Nsegment) )
-      IF ( declvar(MODNAME, 'segment_delta_flow', 'nsegment', Nsegment, 'double', &
-     &     'Cummulative flow in minus flow out for each stream segment', &
-     &     'cfs', Segment_delta_flow)/=0 ) CALL read_error(3, 'segment_delta_flow')
-
       ! local arrays
       ALLOCATE ( Segment_order(Nsegment), Segment_up(Nsegment), Segment_hruarea(Nsegment) )
 
@@ -336,11 +334,6 @@
       Use_transfer_segment = OFF
       IF ( Water_use_flag==ON .AND. Segment_transferON_OFF==ON ) Use_transfer_segment = ON
 
-      IF ( Init_vars_from_file==0 ) THEN
-        Basin_segment_storage = 0.0D0
-        Segment_delta_flow = 0.0D0
-      ENDIF
-
       IF ( Hru_seg_cascades==ON ) THEN
         Seginc_potet = 0.0D0
         Seginc_gwflow = 0.0D0
@@ -351,6 +344,7 @@
         Seg_ssflow = 0.0D0
         Seg_sroff = 0.0D0
       ENDIF
+      Basin_segment_storage = 0.0D0
       Hru_outflow = 0.0D0
       Flow_to_ocean = 0.0D0
       Flow_to_great_lakes = 0.0D0
@@ -380,15 +374,15 @@
 ! find segments that are too short and print them out as they are found
         ierr = 0
         DO i = 1, Nsegment
-          IF ( Seg_length(i)<NEARZERO ) THEN
-            PRINT *, 'ERROR, seg_length too small for segment:', i, ', value:', Seg_length(i)
-            ierr = 1
-          ENDIF
+           IF ( Seg_length(i)<NEARZERO ) THEN
+              PRINT *, 'ERROR, seg_length too small for segment:', i, ', value:', Seg_length(i)
+              ierr = 1
+           ENDIF
         ENDDO
 ! exit if there are any segments that are too short
         IF ( ierr==1 ) THEN
-          Inputerror_flag = ierr
-          RETURN
+           Inputerror_flag = ierr
+           RETURN
         ENDIF
         IF ( getparam(MODNAME, 'seg_depth', Nsegment, 'real', seg_depth)/=0 ) CALL read_error(2, 'seg_depth')
       ENDIF
@@ -401,6 +395,7 @@
      &     Strmflow_flag==strmflow_muskingum_mann_module ) THEN
         IF ( getparam(MODNAME, 'x_coef', Nsegment, 'real', X_coef)/=0 ) CALL read_error(2, 'x_coef')
         ALLOCATE ( C1(Nsegment), C2(Nsegment), C0(Nsegment), Ts(Nsegment), Ts_i(Nsegment) )
+        IF ( Init_vars_from_file==0 ) Segment_delta_flow = 0.0D0
         IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module ) THEN
           IF ( getparam(MODNAME, 'K_coef', Nsegment, 'real', K_coef)/=0 ) CALL read_error(2, 'K_coef')
         ENDIF
@@ -821,12 +816,12 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Basin_segment_storage
-        WRITE ( Restart_outunit ) Segment_delta_flow
+      IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
+     &     Strmflow_flag==strmflow_muskingum_mann_module ) WRITE ( Restart_outunit ) Segment_delta_flow
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Basin_segment_storage
-        READ ( Restart_inunit ) Segment_delta_flow
+        IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
+     &     Strmflow_flag==strmflow_muskingum_mann_module ) READ ( Restart_inunit ) Segment_delta_flow
       ENDIF
       END SUBROUTINE routing_restart

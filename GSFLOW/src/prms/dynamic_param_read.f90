@@ -9,7 +9,7 @@
      &      ERROR_dynamic, DEBUG_minimum, DEBUG_less, INACTIVE, LAKE, NEARZERO, &
      &      potet_jh_module, potet_pan_module, potet_hamon_module, potet_hs_module, &
      &      potet_pt_module, potet_pm_module, climate_hru_module
-        USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Print_debug, Starttime, &
+        USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Print_debug, Start_year, Start_month, Start_day, &
      &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, &
      &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
@@ -18,7 +18,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2020-09-03'
+        character(len=*), parameter :: Version_dynamic_param_read = '2020-09-30'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -91,9 +91,9 @@
 !***********************************************************************
       dynparaminit = 0
 
-      year = Starttime(1)
-      month = Starttime(2)
-      day = Starttime(3)
+      year = Start_year
+      month = Start_month
+      day = Start_day
 
       ALLOCATE ( Temp(Nhru), Itemp(Nhru), Updated_hrus(Nhru) )
 

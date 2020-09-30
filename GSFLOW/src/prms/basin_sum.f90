@@ -4,14 +4,14 @@
 !***********************************************************************
       MODULE PRMS_BASINSUM
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ON, DOCUMENTATION, &
-     &    strmflow_muskingum_module, strmflow_muskingum_lake_module
+     &    strmflow_muskingum_module, strmflow_muskingum_lake_module, strmflow_muskingum_mann_module
       USE PRMS_MODULE, ONLY: Nhru, Nobs, Model, Process_flag, Init_vars_from_file, &
      &    Save_vars_to_file, Print_debug, End_year, Strmflow_flag, Glacier_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=9), parameter :: MODNAME = 'basin_sum'
-      character(len=*), parameter :: Version_basin_sum = '2020-08-03'
+      character(len=*), parameter :: Version_basin_sum = '2020-09-14'
 
       INTEGER, SAVE :: BALUNT, Totdays
       INTEGER, SAVE :: Header_prt, Endjday
@@ -361,7 +361,6 @@
         Basin_sroff_mo = 0.0D0
         Basin_stflow_mo = 0.0D0
         Obsq_inches_mo = 0.0D0
-        Basin_runoff_ratio = 0.0D0
         Basin_runoff_ratio_mo = 0.0D0
         Basin_lakeevap_mo = 0.0D0
 
@@ -401,10 +400,10 @@
         Obsq_inches_tot = 0.0D0
         Hru_et_yr = 0.0D0
         Totdays = 0
-        Obsq_inches = 0.0D0
-        Basin_storage = 0.0D0
-        Basin_storvol = 0.0D0
       ENDIF
+      Obsq_inches = 0.0D0
+      Basin_runoff_ratio = 0.0D0
+      Basin_storvol = 0.0D0
 
 !******Set daily print switch
       IF ( Print_freq>7 ) THEN
@@ -518,8 +517,8 @@
 ! In glacier module, Basin_gl_storstart is an estimate for starting glacier volume, but only
 !   includes glaciers that have depth estimates and these are known to be iffy
       IF ( Glacier_flag==ON ) Basin_storage = Basin_storage + Basin_gl_storage
-      IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module ) &
-     &     Basin_storage = Basin_storage + Basin_segment_storage
+      IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module &
+     &     .OR. Strmflow_flag==strmflow_muskingum_mann_module) Basin_storage = Basin_storage + Basin_segment_storage
 
 ! volume calculation for storage
       Basin_storvol = Basin_storage*Active_area
@@ -891,8 +890,7 @@
         WRITE ( Restart_outunit ) Basin_intcp_evap_yr, Basin_intcp_evap_tot, Obsq_inches_yr, Obsq_inches_tot, Basin_lakeevap_yr
         WRITE ( Restart_outunit ) Basin_net_ppt_mo, Obsq_inches_mo, Basin_max_temp_mo, Basin_min_temp_mo, Basin_actet_mo
         WRITE ( Restart_outunit ) Basin_snowmelt_mo, Basin_gwflow_mo, Basin_sroff_mo, Basin_stflow_mo
-        WRITE ( Restart_outunit ) Basin_intcp_evap_mo, Basin_storage, Basin_storvol, Basin_potet_mo
-        WRITE ( Restart_outunit ) Basin_ssflow_mo, Basin_ppt_mo, Obsq_inches, Basin_runoff_ratio, Basin_runoff_ratio_mo
+        WRITE ( Restart_outunit ) Basin_intcp_evap_mo, Basin_potet_mo, Basin_ssflow_mo, Basin_ppt_mo, Basin_runoff_ratio_mo
         WRITE ( Restart_outunit ) Hru_et_yr
       ELSE
         READ ( Restart_inunit ) module_name
@@ -907,8 +905,7 @@
         READ ( Restart_inunit ) Basin_intcp_evap_yr, Basin_intcp_evap_tot, Obsq_inches_yr, Obsq_inches_tot, Basin_lakeevap_yr
         READ ( Restart_inunit ) Basin_net_ppt_mo, Obsq_inches_mo, Basin_max_temp_mo, Basin_min_temp_mo, Basin_actet_mo
         READ ( Restart_inunit ) Basin_snowmelt_mo, Basin_gwflow_mo, Basin_sroff_mo, Basin_stflow_mo
-        READ ( Restart_inunit ) Basin_intcp_evap_mo, Basin_storage, Basin_storvol, Basin_potet_mo
-        READ ( Restart_inunit ) Basin_ssflow_mo, Basin_ppt_mo, Obsq_inches, Basin_runoff_ratio, Basin_runoff_ratio_mo
+        READ ( Restart_inunit ) Basin_intcp_evap_mo, Basin_potet_mo, Basin_ssflow_mo, Basin_ppt_mo, Basin_runoff_ratio_mo
         READ ( Restart_inunit ) Hru_et_yr
       ENDIF
       END SUBROUTINE basin_sum_restart

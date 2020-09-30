@@ -22,7 +22,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Groundwater'
       character(len=6), parameter :: MODNAME = 'gwflow'
-      character(len=*), parameter :: Version_gwflow = '2020-08-28'
+      character(len=*), parameter :: Version_gwflow = '2020-09-14'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea(:), Gwin_dprst(:)
       DOUBLE PRECISION, SAVE :: Basin_gw_upslope
       INTEGER, SAVE :: Gwminarea_flag
@@ -299,9 +299,7 @@
       Basin_gwstor_minarea_wb = 0.0D0
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==6 ) THEN
         IF ( getparam(MODNAME, 'gwstor_init', Ngw, 'real', Gwstor_init)/=0 ) CALL read_error(2, 'gwstor_init')
-        DO i = 1, Ngw
-          Gwres_stor(i) = DBLE( Gwstor_init(i) )
-        ENDDO
+        Gwres_stor = DBLE( Gwstor_init )
         DEALLOCATE ( Gwstor_init )
       ENDIF
       Hru_storage = 0.0D0
@@ -351,11 +349,9 @@
           DEALLOCATE ( Elevlake_init )
         ENDIF
         Lake_seepage_max = 0.0D0
-        IF ( Init_vars_from_file==0 ) THEN
-          Lake_seepage_gwr = 0.0D0
-          Lake_seepage = 0.0D0
-          Gw_seep_lakein = 0.0D0
-        ENDIF
+        Lake_seepage_gwr = 0.0D0
+        Lake_seepage = 0.0D0
+        Gw_seep_lakein = 0.0D0
         DO i = 1, Active_gwrs
           j = Gwr_route_order(i)
           IF ( Gwr_type(j)==LAKE ) THEN
@@ -369,14 +365,12 @@
         ENDDO
       ENDIF
 
-      IF ( Init_vars_from_file==0 ) THEN
-        Basin_gwflow = 0.0D0
-        Basin_gwsink = 0.0D0
-        Basin_gwin = 0.0D0
-        Basin_gw_upslope = 0.0D0
-        Basin_dnflow = 0.0D0
-        Basin_lake_seep = 0.0D0
-      ENDIF
+      Basin_gwflow = 0.0D0
+      Basin_gwsink = 0.0D0
+      Basin_gwin = 0.0D0
+      Basin_gw_upslope = 0.0D0
+      Basin_dnflow = 0.0D0
+      Basin_lake_seep = 0.0D0
 ! do only once, so restart uses saved values
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         Gw_upslope = 0.0D0
@@ -407,7 +401,7 @@
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru, Hru_impervstor, Dprst_stor_hru
       USE PRMS_INTCP, ONLY: Hru_intcpstor
       USE PRMS_SOILZONE, ONLY: Soil_moist_tot
-      USE PRMS_WATER_USE, ONLY: Gwr_transfers_on, Gwr_transfer, Gwr_gain
+      USE PRMS_WATER_USE, ONLY: Gwr_transfer, Gwr_gain
       IMPLICIT NONE
 ! Functions
       EXTERNAL :: rungw_cascade, print_date
@@ -658,12 +652,10 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Basin_gwflow, Basin_gwsink, Basin_gwin, Basin_dnflow, Basin_gw_upslope, Basin_lake_seep
         IF ( Weir_gate_flag==1 ) WRITE ( Restart_outunit ) Elevlake
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Basin_gwflow, Basin_gwsink, Basin_gwin, Basin_dnflow, Basin_gw_upslope, Basin_lake_seep
         IF ( Weir_gate_flag==1 ) READ ( Restart_inunit ) Elevlake ! could be error if someone turns off weirs for restart
       ENDIF
       END SUBROUTINE gwflow_restart

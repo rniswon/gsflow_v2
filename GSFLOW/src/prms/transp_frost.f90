@@ -9,7 +9,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Transpiration Distribution'
         character(len=*), parameter :: MODNAME = 'transp_frost'
-        character(len=*), parameter :: Version_transp = '2020-08-03'
+        character(len=*), parameter :: Version_transp = '2020-09-14'
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Fall_frost(:), Spring_frost(:)
       END MODULE PRMS_TRANSP_FROST
@@ -35,13 +35,12 @@
 ! is on for the HRU. If any HRU is transpiring, then
 ! Basin_transp_on is set to 1 (ON).
         Basin_transp_on = OFF
+        Transp_on = OFF
         DO j = 1, Active_hrus
           i = Hru_route_order(j)
           IF ( Jsol>=Spring_frost(i) .AND. Jsol<=Fall_frost(i) ) THEN
             Transp_on(i) = ON
             Basin_transp_on = ON
-          ELSE
-            Transp_on(i) = OFF
           ENDIF
         ENDDO
 

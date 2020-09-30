@@ -135,10 +135,10 @@
         IF ( Temp_flag==temp_map_module .OR. Model==DOCUMENTATION ) CALL print_module(MODDESC2, MODNAME, Version_precip_temp_map)
         IF ( Precip_flag==precip_map_module .OR. Model==DOCUMENTATION ) CALL print_module(MODDESC, MODNAME, Version_precip_temp_map)
 
-        Nmap2hru = getdim('Nmap2hru')
-        IF ( Nmap2hru==-1 ) CALL read_error(6, 'Nmap2hru')
-        Nmap = getdim('Nmap')
-        IF ( Nmap==-1 ) CALL read_error(6, 'Nmap')
+        Nmap2hru = getdim('nmap2hru')
+        IF ( Nmap2hru==-1 ) CALL read_error(6, 'nmap2hru')
+        Nmap = getdim('nmap')
+        IF ( Nmap==-1 ) CALL read_error(6, 'nmap')
         IF ( Model==DOCUMENTATION ) THEN
           IF ( Nmap2hru==0 ) Nmap2hru = 1
           IF ( Nmap==0 ) Nmap = 1
@@ -176,7 +176,7 @@
         ENDIF
 
         ALLOCATE ( Hru2map_id(Nmap2hru) )
-        IF ( declparam(MODNAME, 'hru2map_id', 'Nmap2hru', 'integer', &
+        IF ( declparam(MODNAME, 'hru2map_id', 'nmap2hru', 'integer', &
      &       '1', 'bounded', 'nhru', &
      &       'HRU identification number for HRU to mapped spatial units intersection', &
      &       'HRU identification number for HRU to mapped spatial units intersection', &
@@ -185,7 +185,7 @@
         !rsr, bounded value could be a problem if number of mapped spatial units > nhru
         ALLOCATE ( Map2hru_id(Nmap2hru) )
         IF ( declparam(MODNAME, 'map2hru_id', 'nmap2hru', 'integer', &
-     &       '0', 'bounded', 'Nmap', &
+     &       '0', 'bounded', 'nmap', &
      &       'Mapped spatial unit identification number for HRU to map intersection', &
      &       'Mapped spatial unit identification number for HRU to map intersection', &
      &       'none')/=0 ) CALL read_error(1, 'map2hru_id')
@@ -207,11 +207,13 @@
         ierr = 0
 
         IF ( Temp_flag==temp_map_module ) THEN
-          IF ( getparam(MODNAME, 'Tmax_map_adj', Nmap*12, 'real', Tmax_map_adj)/=0 ) CALL read_error(2, 'Tmax_map_adj')
-          IF ( getparam(MODNAME, 'Tmin_map_adj', Nmap*12, 'real', Tmin_map_adj)/=0 ) CALL read_error(2, 'Tmin_map_adj')
-          IF ( control_string(Tmax_map, 'Tmax_map')/=0 ) CALL read_error(5, 'Tmax_map')
-          IF ( control_string(Tmin_map, 'Tmin_map')/=0 ) CALL read_error(5, 'Tmin_map')
-          CALL find_header_end(Tmax_unit, Tmax_map, 'Tmax_map', ierr, 1, 0)
+          IF ( getparam(MODNAME, 'tmax_map_adj', Nmap*MONTHS_PER_YEAR, 'real', Tmax_map_adj)/=0 ) &
+     &         CALL read_error(2, 'tmax_map_adj')
+          IF ( getparam(MODNAME, 'tmin_map_adj', Nmap*MONTHS_PER_YEAR, 'real', Tmin_map_adj)/=0 ) &
+     &         CALL read_error(2, 'tmin_map_adj')
+          IF ( control_string(Tmax_map, 'tmax_map')/=0 ) CALL read_error(5, 'tmax_map')
+          IF ( control_string(Tmin_map, 'tmin_map')/=0 ) CALL read_error(5, 'tmin_map')
+          CALL find_header_end(Tmax_unit, Tmax_map, 'tmax_map', ierr, 1, 0)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
@@ -221,7 +223,7 @@
               istop = 1
             ENDIF
           ENDIF
-          CALL find_header_end(Tmin_unit, Tmin_map, 'Tmin_map', ierr, 1, 0)
+          CALL find_header_end(Tmin_unit, Tmin_map, 'tmin_map', ierr, 1, 0)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
@@ -234,21 +236,24 @@
         ENDIF
 
         IF ( Precip_flag==precip_map_module ) THEN
-          IF ( getparam(MODNAME, 'Precip_map_adj', Nmap*12, 'real', Precip_map_adj)/=0 ) CALL read_error(2, 'Precip_map_adj')
-          IF ( control_string(Precip_map, 'Precip_map')/=0 ) CALL read_error(5, 'Precip_map')
-          CALL find_header_end(Precip_unit, Precip_map, 'Precip_map', ierr, 1, 0)
+          IF ( getparam(MODNAME, 'precip_map_adj', Nmap*MONTHS_PER_YEAR, 'real', Precip_map_adj)/=0 ) &
+     &         CALL read_error(2, 'precip_map_adj')
+          IF ( control_string(Precip_map, 'precip_map')/=0 ) CALL read_error(5, 'precip_map')
+          CALL find_header_end(Precip_unit, Precip_map, 'precip_map', ierr, 1, 0)
           IF ( ierr==1 ) THEN
-            istop = 1
+            istop = istop + 2
           ELSE
             CALL find_current_time(Precip_unit, Start_year, Start_month, Start_day, ierr, 0)
             IF ( ierr==-1 ) THEN
               PRINT *, 'for first time step, Precip Map File: ', Precip_map
-              istop = 1
+              istop = istop + 2
             ENDIF
           ENDIF
         ENDIF
 
-        IF ( istop==1 ) STOP 'ERROR in precip_temp_map module'
+        IF ( istop==1 ) STOP 'ERROR in temp_map module'
+        IF ( istop==2 ) STOP 'ERROR in precip_map module'
+        IF ( istop==3 ) STOP 'ERROR in precip_map and temp_map modules'
 
       ENDIF
 

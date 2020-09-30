@@ -16,7 +16,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Solar Radiation Distribution'
         character(len=*), parameter :: MODNAME = 'ddsolrad'
-        character(len=*), parameter :: Version_ddsolrad = '2020-08-03'
+        character(len=*), parameter :: Version_ddsolrad = '2020-09-14'
         INTEGER, SAVE :: Observed_flag
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Radadj_slope(:, :), Radadj_intcp(:, :)
@@ -76,7 +76,7 @@
             IF ( Tmax_hru(j)<Tmax_index(j,Nowmonth) ) THEN
               pptadj = Radj_sppt(j)
               IF ( Tmax_hru(j)>=Tmax_allrain(j,Nowmonth) ) THEN
-                IF ( Summer_flag==0 ) pptadj = Radj_wppt(j) ! Winter
+                IF ( Summer_flag==OFF ) pptadj = Radj_wppt(j) ! Winter
               ELSE
                 pptadj = Radj_wppt(j)
               ENDIF

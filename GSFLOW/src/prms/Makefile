@@ -1,4 +1,4 @@
-# prms library makefile
+# PRMS library makefile
 
 include ../makelist
 PRMSLIB = $(LIBDIR)/libprms.a
@@ -15,6 +15,10 @@ $(TARGET): $(PRMSLIB)
 
 $(MMFLIB):
 	$(CD) $(MMFDIR);make
+
+####################################################
+# Rules for targets
+####################################################
 
 #
 # Define all object files which make up the library
@@ -84,13 +88,12 @@ $(PRMSLIB): $(LIBOBJS)
 	$(AR) $(PRMSLIB) $(LIBOBJS)
 	$(RANLIB) $(PRMSLIB)
 
+clean:
+	$(RM) *.o *.mod *~
+
 #
 # Define all object files which make up the library
 #
-
-clean:
-	$(RM) $(PRMSLIB)
-	$(RM) *.o *.mod *~
 
 basin_sum.o: basin_sum.f90 prms_module.mod prms_flowvars.mod prms_intcp.mod prms_snow.mod prms_srunoff.mod prms_gwflow.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod prms_obs.mod prms_muskingum.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) basin_sum.f90

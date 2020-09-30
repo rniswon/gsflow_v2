@@ -20,8 +20,8 @@
      &          EQULS = '===================================================================='
     character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
     character(len=11), parameter :: MODNAME = 'gsflow_prms'
-    character(len=*), parameter :: PRMS_versn = '2020-09-01'
-    character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 09/01/2020'
+    character(len=*), parameter :: PRMS_versn = '2020-09-30'
+    character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 09/30/2020'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -37,9 +37,8 @@
       INTEGER, SAVE :: Precip_combined_flag, Temp_combined_flag, Muskingum_flag
       INTEGER, SAVE :: Inputerror_flag, Timestep
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag
-      INTEGER, SAVE :: PRMS_flag, GSFLOW_flag, PRMS4_flag
-      INTEGER, SAVE :: Grid_flag, Kper_mfo, Kkstp_mfo
-      INTEGER, SAVE :: Have_lakes, Agriculture_flag
+      INTEGER, SAVE :: Grid_flag, PRMS_flag, GSFLOW_flag, PRMS4_flag
+      INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Agriculture_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Prms_warmup
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
@@ -50,7 +49,7 @@
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
-      REAL, SAVE, ALLOCATABLE :: Hru_ag_irr(:)    !Ag irrigation added to HRU
+      REAL, SAVE, ALLOCATABLE :: Agriculture_irrigation(:)    !Ag irrigation added to HRU
 !   Declared Parameters
       INTEGER, SAVE :: Mxsziter
       INTEGER, SAVE, ALLOCATABLE :: Gvr_cell_id(:)
@@ -70,11 +69,11 @@
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Temp_module, Srunoff_module, Et_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Strmflow_module, Transp_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Model_mode, Precip_module, Solrad_module
-      CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Modflow_name
+      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
       CHARACTER(LEN=8), SAVE :: Soilzone_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
-      INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF
-      INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag, Dyn_ag_flag
+      INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF, Dyn_ag_flag
+      INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag, PRMS_iteration_flag
       INTEGER, SAVE :: Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, Dyn_springfrost_flag
       INTEGER, SAVE :: Gwr_transferON_OFF, External_transferON_OFF, Segment_transferON_OFF, Lake_transferON_OFF
       END MODULE PRMS_MODULE
@@ -206,12 +205,13 @@
      &         'Index of the grid cell associated with each gravity reservoir', &
      &         'none')/=0 ) CALL read_error(1, 'gvr_cell_id')
             ! Allocate variable for adding irrigation water to HRU from AG Package, always declare for now
-            ALLOCATE ( Hru_ag_irr(Nhru) )
+            ALLOCATE ( Agriculture_irrigation(Nhru) )
             IF ( Diversion2soil_flag==ON ) THEN
-              IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real', &
-     &             'Irrigation added to soilzone from MODFLOW wells', 'inches', Hru_ag_irr)/=0 ) CALL read_error(3, 'hru_ag_irr')
+              IF ( declvar(MODNAME, 'agriculture_irrigation', 'nhru', Nhru, 'real', &
+     &             'Irrigation added to soilzone from MODFLOW wells', 'inches', Agriculture_irrigation)/=0 ) &
+     &             CALL read_error(3, 'agriculture_irrigation')
             ENDIF
-            Hru_ag_irr = 0.0
+            Agriculture_irrigation = 0.0
         ENDIF
 
         Have_lakes = OFF ! set for modes when MODFLOW is not active
@@ -289,7 +289,6 @@
 
       ELSE  !IF ( Process(:5)=='clean' ) THEN
         Process_flag = CLEAN
-
         IF ( Init_vars_from_file>0 ) CLOSE ( Restart_inunit )
         IF ( Save_vars_to_file==ON ) THEN
           CALL PRMS_open_output_file(Restart_outunit, Var_save_file, 'var_save_file', 1, iret)
@@ -439,9 +438,7 @@
         IF ( Process_flag==RUN ) RETURN
       ENDIF
 
-
-! for PRMS-only simulations
-      IF ( Model==PRMS ) THEN
+      IF ( PRMS_iteration_flag==OFF ) THEN
         call_modules = intcp()
         IF ( call_modules/=0 ) CALL module_error('intcp', Arg, call_modules)
 
@@ -456,7 +453,10 @@
 
         call_modules = srunoff()
         IF ( call_modules/=0 ) CALL module_error(Srunoff_module, Arg, call_modules)
+      ENDIF
 
+! for PRMS-only simulations
+      IF ( Model==PRMS ) THEN
         call_modules = soilzone()
         IF ( call_modules/=0 ) CALL module_error(Soilzone_module, Arg, call_modules)
 
@@ -500,22 +500,25 @@
 ! (contained in gsflow_modflow.f).
 ! They still need to be called for declare, initialize and cleanup
         ELSE !IF ( Process_flag/=RUN ) THEN
-! intcp, snowcomp, glacr, soilzone, and srunoff for GSFLOW is in the MODFLOW iteration loop,
+! intcp, snowcomp, glacr, soilzone, and srunoff for GSFLOW is in the MODFLOW iteration loop
+! when PRMS_iteration_flag = ON
 ! only call for declare, initialize, and cleanup.
-          call_modules = intcp()
-          IF ( call_modules/=0 ) CALL module_error('intcp', Arg, call_modules)
+          IF ( PRMS_iteration_flag==ON ) THEN
+            call_modules = intcp()
+            IF ( call_modules/=0 ) CALL module_error('intcp', Arg, call_modules)
 
-          ! rsr, need to do something if snow_cbh_flag=1
-          call_modules = snowcomp()
-          IF ( call_modules/=0 ) CALL module_error('snowcomp', Arg, call_modules)
+            ! rsr, need to do something if snow_cbh_flag=1
+            call_modules = snowcomp()
+            IF ( call_modules/=0 ) CALL module_error('snowcomp', Arg, call_modules)
 
-          IF ( Glacier_flag==ON ) THEN
-            call_modules = glacr()
-            IF ( call_modules/=0 ) CALL module_error('glacr', Arg, call_modules)
+            IF ( Glacier_flag==ON ) THEN
+              call_modules = glacr()
+              IF ( call_modules/=0 ) CALL module_error('glacr', Arg, call_modules)
+            ENDIF
+
+            call_modules = srunoff()
+            IF ( call_modules/=0 ) CALL module_error(Srunoff_module, Arg, call_modules)
           ENDIF
-
-          call_modules = srunoff()
-          IF ( call_modules/=0 ) CALL module_error(Srunoff_module, Arg, call_modules)
 
           call_modules = soilzone()
           IF ( call_modules/=0 ) CALL module_error(Soilzone_module, Arg, call_modules)
@@ -557,12 +560,12 @@
       IF ( Process_flag==RUN ) THEN
         RETURN
       ELSEIF ( Process_flag==CLEAN ) THEN
+        CALL DATE_AND_TIME(VALUES=Elapsed_time_end)
+        Execution_time_end = Elapsed_time_end(5)*3600 + Elapsed_time_end(6)*60 + &
+     &                       Elapsed_time_end(7) + Elapsed_time_end(8)*0.001
+        Elapsed_time = Execution_time_end - Execution_time_start
+        Elapsed_time_minutes = INT(Elapsed_time/60.0)
         IF ( Model==PRMS ) THEN
-          CALL DATE_AND_TIME(VALUES=Elapsed_time_end)
-          Execution_time_end = Elapsed_time_end(5)*3600 + Elapsed_time_end(6)*60 + &
-     &                         Elapsed_time_end(7) + Elapsed_time_end(8)*0.001
-          Elapsed_time = Execution_time_end - Execution_time_start
-          Elapsed_time_minutes = INT(Elapsed_time/60.0)
           IF ( Print_debug>DEBUG_less ) THEN
             PRINT 9001
             PRINT 9003, 'start', (Elapsed_time_start(i),i=1,3), (Elapsed_time_start(i),i=5,7)
@@ -570,7 +573,9 @@
             PRINT '(A,I5,A,F6.2,A,/)', 'Execution elapsed time', Elapsed_time_minutes, ' minutes', &
      &                                 Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
           ENDIF
-          IF ( Print_debug>DEBUG_minimum ) &
+        ENDIF
+        IF ( Print_debug>DEBUG_minimum ) THEN
+          IF ( Model==PRMS .OR. Model==GSFLOW ) &
      &         WRITE ( PRMS_output_unit,'(A,I5,A,F6.2,A,/)') 'Execution elapsed time', Elapsed_time_minutes, ' minutes', &
      &                                                       Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
         ENDIF
@@ -949,6 +954,8 @@
       IF ( decldim('nsub', 0, MAXDIM, 'Number of internal subbasins')/=0 ) CALL read_error(7, 'nsub')
 
       IF ( control_integer(Dprst_flag, 'dprst_flag')/=0 ) Dprst_flag = OFF
+      IF ( control_integer(PRMS_iteration_flag, 'PRMS_iteration_flag')/=0 ) PRMS_iteration_flag = OFF
+      IF ( Model==PRMS ) PRMS_iteration_flag = OFF
       IF ( control_integer(Agriculture_flag, 'agriculture_flag')/=0 ) Agriculture_flag = OFF
       ! 0 = off, 1 = on, 2 = lauren version
       IF ( control_integer(CsvON_OFF, 'csvON_OFF')/=0 ) CsvON_OFF = OFF

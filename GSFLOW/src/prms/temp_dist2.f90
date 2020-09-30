@@ -20,7 +20,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Temperature Distribution'
       character(len=10), parameter :: MODNAME = 'temp_dist2'
-      character(len=*), parameter :: Version_temp = '2020-08-04'
+      character(len=*), parameter :: Version_temp = '2020-09-14'
       INTEGER, SAVE, ALLOCATABLE :: N_tsta(:), Nuse_tsta(:, :)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dist(:, :)
       REAL, SAVE, ALLOCATABLE :: Delv(:, :), Elfac(:, :)
@@ -248,9 +248,9 @@
       IF ( getparam(MODNAME, 'hru_ylat', Nhru, 'real', Hru_ylat) &
      &     /=0 ) CALL read_error(2, 'hru_ylat')
 
+      Basin_lapse_max = 0.0
+      Basin_lapse_min = 0.0
       IF ( Init_vars_from_file==0 ) THEN
-        Basin_lapse_max = 0.0
-        Basin_lapse_min = 0.0
         Solrad_tmax_good = 0.0
         Solrad_tmin_good = 0.0
       ENDIF
@@ -488,10 +488,10 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Basin_lapse_max, Basin_lapse_min, Solrad_tmax_good, Solrad_tmin_good
+        WRITE ( Restart_outunit ) Solrad_tmax_good, Solrad_tmin_good
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Basin_lapse_max, Basin_lapse_min, Solrad_tmax_good, Solrad_tmin_good
+        READ ( Restart_inunit ) Solrad_tmax_good, Solrad_tmin_good
       ENDIF
       END SUBROUTINE temp_dist2_restart

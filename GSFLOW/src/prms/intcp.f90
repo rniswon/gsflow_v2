@@ -7,12 +7,12 @@
       USE PRMS_CONSTANTS, ONLY: ON, OFF, DEBUG_WB, DOCUMENTATION, NEARZERO, DNEARZERO, &
      &    RUN, DECL, INIT, CLEAN, ON, DEBUG_WB, DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
       USE PRMS_MODULE, ONLY: Nhru, Model, Process_flag, Save_vars_to_file, Init_vars_from_file, &
-     &    Print_debug, Water_use_flag, Gsflow_flag, Kkiter
+     &    Print_debug, Water_use_flag, Kkiter, PRMS_iteration_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2020-08-24'
+      character(len=*), parameter :: Version_intcp = '2020-09-21'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -77,7 +77,7 @@
 
       CALL print_module(MODDESC, MODNAME, Version_intcp)
 
-      IF ( Gsflow_flag==ON ) THEN
+      IF ( PRMS_iteration_flag==ON ) THEN
         ALLOCATE ( It0_intcp_stor(Nhru), It0_intcp_transp_on(Nhru) )
         ALLOCATE ( It0_hru_intcpstor(Nhru) )
       ENDIF
@@ -248,15 +248,15 @@
         Intcp_stor = 0.0
         Intcp_on = 0
         Hru_intcpstor = 0.0
-        Basin_changeover = 0.0D0
-        Basin_net_ppt = 0.0D0
-        Basin_net_snow = 0.0D0
-        Basin_net_rain = 0.0D0
-        Basin_intcp_evap = 0.0D0
-        Basin_intcp_stor = 0.0D0
-        Basin_net_apply = 0.0D0
-        Basin_hru_apply = 0.0D0
       ENDIF
+      Basin_changeover = 0.0D0
+      Basin_net_ppt = 0.0D0
+      Basin_net_snow = 0.0D0
+      Basin_net_rain = 0.0D0
+      Basin_intcp_evap = 0.0D0
+      Basin_intcp_stor = 0.0D0
+      Basin_net_apply = 0.0D0
+      Basin_hru_apply = 0.0D0
       IF ( Print_debug==DEBUG_WB ) ALLOCATE ( Intcp_stor_ante(Nhru) )
 
       END FUNCTION intinit
@@ -289,7 +289,7 @@
       intrun = 0
 
       ! pkwater_equiv is from last time step
-      IF ( Gsflow_flag==ON ) THEN
+      IF ( PRMS_iteration_flag==ON ) THEN
         IF ( Kkiter>1 ) THEN
           Intcp_stor = It0_intcp_stor
           Hru_intcpstor = It0_hru_intcpstor
@@ -372,8 +372,10 @@
                 changeover = 0.0
               ENDIF
             ELSE
-              IF ( Print_debug>DEBUG_less ) PRINT *, 'covden_win=0 at winter change over with canopy storage, HRU:', i, &
-     &                                               'intcp_stor:', intcpstor, ' covden_sum:', Covden_sum(i)
+              IF ( Print_debug>DEBUG_less ) THEN
+                PRINT *, 'covden_win=0 at winter change over with canopy storage, HRU:', i, Nowyear, Nowmonth, Nowday
+                PRINT *, 'intcp_stor:', intcpstor, ' covden_sum:', Covden_sum(i)
+              ENDIF
               intcpstor = 0.0
             ENDIF
           ENDIF
@@ -391,8 +393,10 @@
                 changeover = 0.0
               ENDIF
             ELSE
-              IF ( Print_debug>DEBUG_less ) PRINT *, 'covden_sum=0 at summer change over with canopy storage, HRU:', i, &
-     &                                               'intcp_stor:', intcpstor, ' covden_win:', Covden_win(i)
+              IF ( Print_debug>DEBUG_less ) THEN
+                PRINT *, 'covden_sum=0 at summer change over with canopy storage, HRU:', i, Nowyear, Nowmonth, Nowday
+                PRINT *, 'intcp_stor:', intcpstor, ' covden_win:', Covden_win(i)
+              ENDIF
               intcpstor = 0.0
             ENDIF
           ENDIF
@@ -536,7 +540,8 @@
         Basin_intcp_stor = Basin_intcp_stor + DBLE( intcpstor*cov*harea )
         Basin_intcp_evap = Basin_intcp_evap + DBLE( intcpevap*cov*harea )
         IF ( Intcp_changeover(i)>0.0 ) THEN
-          IF ( Print_debug>DEBUG_less ) PRINT *, 'Change over storage:', Intcp_changeover(i), '; HRU:', i
+          IF ( Print_debug>DEBUG_less ) PRINT '(A,F0.5,A,4(1X,I0))', 'Change over storage:', Intcp_changeover(i), '; HRU:', i, &
+     &                                                               Nowyear, Nowmonth, Nowday
           Basin_changeover = Basin_changeover + DBLE( Intcp_changeover(i)*harea )
         ENDIF
 
@@ -592,8 +597,6 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Basin_net_ppt, Basin_intcp_stor, Basin_intcp_evap, Basin_changeover, &
-     &                            Basin_net_snow, Basin_net_rain, Basin_net_apply, Basin_hru_apply
         WRITE ( Restart_outunit ) Intcp_transp_on
         WRITE ( Restart_outunit ) Intcp_on
         WRITE ( Restart_outunit ) Intcp_stor
@@ -601,8 +604,6 @@
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Basin_net_ppt, Basin_intcp_stor, Basin_intcp_evap, Basin_changeover, &
-     &                          Basin_net_snow, Basin_net_rain, Basin_net_apply, Basin_hru_apply
         READ ( Restart_inunit ) Intcp_transp_on
         READ ( Restart_inunit ) Intcp_on
         READ ( Restart_inunit ) Intcp_stor
