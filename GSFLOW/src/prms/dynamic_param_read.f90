@@ -18,7 +18,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2020-09-30'
+        character(len=*), parameter :: Version_dynamic_param_read = '2020-10-09'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -152,7 +152,7 @@
       ENDIF
 
       Ag_frac_flag = OFF
-      IF ( Agriculture_flag==ON ) THEN
+      IF ( Agriculture_flag>OFF ) THEN
         IF ( Dyn_ag_flag==1 .OR. Dyn_ag_flag==3 ) THEN
           IF ( control_string(ag_frac_dynamic, 'ag_frac_dynamic')/=0 ) CALL read_error(5, 'ag_frac_dynamic')
           CALL find_header_end(Ag_frac_unit, ag_frac_dynamic, 'ag_frac_dynamic', ierr, 0, 0)
@@ -417,7 +417,7 @@
       USE PRMS_BASIN, ONLY: Hru_type, Hru_area, Dprst_clos_flag, &
      &    Hru_percent_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Dprst_frac, Dprst_open_flag, &
      &    Dprst_area_max, Dprst_area_open_max, Dprst_area_clos_max, Dprst_frac_open, &
-     &    Cov_type, Basin_area_inv, Covden_win, Covden_sum, Hru_area_ag, Ag_frac
+     &    Cov_type, Basin_area_inv, Covden_win, Covden_sum, Ag_area, Ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Transp_on, Epan_coef
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Soil_moist, Soil_rechr, Imperv_stor, Sat_threshold, &
      &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor
@@ -443,7 +443,7 @@
       EXTERNAL :: write_dynparam_potet
 ! Local Variables
       INTEGER :: i, istop, check_dprst_depth_flag, check_sm_max_flag, check_srechr_max_flag
-      REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj, agfrac
+      REAL :: harea, frac_imperv, tmp, perv_area, dprstfrac, soil_adj, agfrac
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       dynparamrun = 0
@@ -493,7 +493,7 @@
           ENDIF
         ENDIF
 
-        IF ( Agriculture_flag==ON ) THEN
+        IF ( Agriculture_flag>OFF ) THEN
           IF ( Ag_frac_next_mo/=0 ) THEN
             IF ( Ag_frac_next_yr==Nowyear .AND. Ag_frac_next_mo==Nowmonth .AND. Ag_frac_next_day==Nowday ) THEN
               READ ( Ag_frac_unit, * ) Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day, Temp4
@@ -536,7 +536,7 @@
               ! Temp4 has new values with negative values set to the old value, Ag_frac has old values
               Ag_frac(i) = Temp4(i)
             ENDIF
-            IF ( Agriculture_flag==ON ) Hru_area_ag(i) = Ag_frac(i) * Hru_area(i)
+            IF ( Agriculture_flag>OFF ) Ag_area(i) = Ag_frac(i) * Hru_area(i)
 
             IF ( Check_dprst_frac==ON .OR. check_dprst_depth_flag==ON ) THEN
               ! CAUTION: other DPRST parameters need to have valid values as related to any dynamic parameter updates
@@ -592,37 +592,40 @@
             ENDIF
 
             ! check sum of imperv ag, and dprst if either are updated!!!!!!
-            hruperv = harea - Hru_imperv(i)
-            IF ( Agriculture_flag==ON ) THEN
-              hruperv = hruperv - Hru_area_ag(i)
+            perv_area = harea - Hru_imperv(i)
+            IF ( Agriculture_flag>OFF ) THEN
+              perv_area = perv_area - Ag_area(i)
               agfrac = Ag_frac(i)
             ELSE
               agfrac = 0.0
             ENDIF
 
             IF ( Dprst_flag==ON ) THEN
-              hruperv = hruperv - Dprst_area_max(i)
+              perv_area = perv_area - Dprst_area_max(i)
               dprstfrac = Dprst_frac(i)
             ELSE
               dprstfrac = 0.0
             ENDIF
-            IF ( Hru_percent_imperv(i)+dprstfrac+agfrac > 0.999 ) THEN
+            IF ( Hru_percent_imperv(i)+dprstfrac > 0.999 ) THEN
               istop = 1
-              PRINT *, 'ERROR, fraction impervious + fraction dprst + agriculture fraction > 0.999 for HRU:', i
-              PRINT *, '       fraction impervious + dprst + ag_frac:', Hru_percent_imperv(i) + dprstfrac + agfrac
+              PRINT *, 'ERROR, fraction impervious + fraction dprst > 0.999 for HRU:', i
+              PRINT *, '       fraction impervious + dprst:', Hru_percent_imperv(i) + dprstfrac
               PRINT *, '       hru_percent_imperv:', Hru_percent_imperv(i), '; dprst_frac:', dprstfrac, '; ag_frac:', agfrac
               CYCLE
             ENDIF
             ! adjust pervious area and capillary storage for dynamic parameters
             Soil_moist(i) = Soil_moist(i) + soil_adj
             Soil_rechr(i) = Soil_rechr(i) + soil_adj
-            IF ( Hru_perv(i) /= hruperv ) THEN
-              tmp = Hru_perv(i)/hruperv
-              Soil_moist(i) = Soil_moist(i)*tmp
-              Soil_rechr(i) = Soil_rechr(i)*tmp
-              Hru_perv(i) = hruperv
-              Hru_frac_perv(i) = Hru_perv(i)/harea
+            IF ( perv_area>0.0 ) THEN
+              IF ( Hru_perv(i)/=perv_area ) THEN
+                tmp = Hru_perv(i)/perv_area
+                Soil_moist(i) = Soil_moist(i)*tmp
+                Soil_rechr(i) = Soil_rechr(i)*tmp
+               ENDIF
+            ELSE
+              Hru_perv(i) = 0.0
             ENDIF
+            Hru_frac_perv(i) = perv_area/harea
             Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*Hru_perv(i) )
             Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(i)*Hru_perv(i) )
             Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*Hru_frac_perv(i)

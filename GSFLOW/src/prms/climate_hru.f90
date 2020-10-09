@@ -9,21 +9,22 @@
      &      MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, CELSIUS, MONTHS_PER_YEAR
         USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Climate_transp_flag, Orad_flag, &
      &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
-     &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag
+     &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
+     &    Climate_irrigated_area_flag, Climate_aet_flag
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2020-08-03'
+        character(len=*), parameter :: Version_climate_hru = '2020-10-07'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
-        INTEGER, SAVE :: Humidity_unit, Windspeed_unit
+        INTEGER, SAVE :: Humidity_unit, Windspeed_unit, Aet_unit, Irrigated_area_unit
         ! Control Parameters
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Tmin_day, Tmax_day, Precip_day, Potet_day, Swrad_day, Transp_day
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Humidity_day, Windspeed_day
         INTEGER, SAVE :: Cbh_check_flag, Cbh_binary_flag
         ! Declared Variables
-        DOUBLE PRECISION, SAVE :: Basin_windspeed
-        REAL, ALLOCATABLE :: Humidity_hru(:), Windspeed_hru(:)
+        DOUBLE PRECISION, SAVE :: Basin_windspeed, Basin_aet_external, Basin_irrigated_area
+        REAL, ALLOCATABLE :: Humidity_hru(:), Windspeed_hru(:), Aet_external(:), Irrigated_area(:)
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Rain_cbh_adj(:, :), Snow_cbh_adj(:, :), Potet_cbh_adj(:, :)
         REAL, SAVE, ALLOCATABLE :: Tmax_cbh_adj(:, :), Tmin_cbh_adj(:, :)
@@ -64,7 +65,7 @@
           IF ( ios/=0 ) THEN
             ierr = 1
           ELSEIF ( Cbh_check_flag==ON ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'Tmaxf', ios, ierr)
+            CALL read_cbh_date(yr, mo, dy, 'tmaxf', ios, ierr)
           ENDIF
           IF ( Cbh_binary_flag==OFF ) THEN
             READ ( Tmin_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Tminf(i), i=1,Nhru)
@@ -74,7 +75,7 @@
           IF ( ios/=0 ) THEN
             ierr = 1
           ELSEIF ( Cbh_check_flag==ON ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'Tminf', ios, ierr)
+            CALL read_cbh_date(yr, mo, dy, 'tminf', ios, ierr)
           ENDIF
           Basin_tmax = 0.0D0
           Basin_tmin = 0.0D0
@@ -112,9 +113,37 @@
           IF ( ios/=0 ) THEN
             ierr = 1
           ELSEIF ( Cbh_check_flag==ON ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'Potet', ios, ierr)
+            CALL read_cbh_date(yr, mo, dy, 'potet', ios, ierr)
           ENDIF
           Basin_potet = 0.0D0
+        ENDIF
+
+        IF ( Climate_aet_flag==ON ) THEN
+          IF ( Cbh_binary_flag==OFF ) THEN
+            READ ( Aet_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Aet_external(i), i=1,Nhru)
+          ELSE
+            READ ( Aet_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Aet_external(i), i=1,Nhru)
+          ENDIF
+          IF ( ios/=0 ) THEN
+            ierr = 1
+          ELSEIF ( Cbh_check_flag==ON ) THEN
+            CALL read_cbh_date(yr, mo, dy, 'aet_external', ios, ierr)
+          ENDIF
+          Basin_aet_external = 0.0D0
+        ENDIF
+
+        IF ( Climate_irrigated_area_flag==ON ) THEN
+          IF ( Cbh_binary_flag==OFF ) THEN
+            READ ( Irrigated_area_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Irrigated_area(i), i=1,Nhru)
+          ELSE
+            READ ( Irrigated_area_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Irrigated_area(i), i=1,Nhru)
+          ENDIF
+          IF ( ios/=0 ) THEN
+            ierr = 1
+          ELSEIF ( Cbh_check_flag==ON ) THEN
+            CALL read_cbh_date(yr, mo, dy, 'irrigated_area', ios, ierr)
+          ENDIF
+          Basin_irrigated_area = 0.0D0
         ENDIF
 
         IF ( Climate_swrad_flag==ON ) THEN
@@ -134,7 +163,7 @@
           IF ( ios/=0 ) THEN
             ierr = 1
           ELSEIF ( Cbh_check_flag==ON ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'Swrad', ios, ierr)
+            CALL read_cbh_date(yr, mo, dy, 'swrad', ios, ierr)
           ENDIF
           Basin_swrad = 0.0D0
         ENDIF
@@ -148,7 +177,7 @@
           IF ( ios/=0 ) THEN
             ierr = 1
           ELSEIF ( Cbh_check_flag==ON ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'Transp_on', ios, ierr)
+            CALL read_cbh_date(yr, mo, dy, 'transp_on', ios, ierr)
           ENDIF
           Basin_transp_on = OFF
         ENDIF
@@ -159,7 +188,7 @@
           ELSE
             READ ( Humidity_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Humidity_hru(i), i=1,Nhru)
           ENDIF
-          IF ( Cbh_check_flag==ON ) CALL read_cbh_date(yr, mo, dy, 'Humidity_hru', ios, ierr)
+          IF ( Cbh_check_flag==ON ) CALL read_cbh_date(yr, mo, dy, 'humidity_hru', ios, ierr)
           Basin_humidity = 0.0D0
         ENDIF
 
@@ -172,23 +201,47 @@
           IF ( ios/=0 ) THEN
             ierr = 1
           ELSEIF ( Cbh_check_flag==ON ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'Windspeed_hru', ios, ierr)
+            CALL read_cbh_date(yr, mo, dy, 'windspeed_hru', ios, ierr)
           ENDIF
           Basin_windspeed = 0.0D0
         ENDIF
 
         IF ( ierr/=0 ) ERROR STOP ERROR_cbh
 
-        missing = 0
+        IF ( Cbh_check_flag==ON ) THEN
+          missing = 0
+          IF ( Climate_temp_flag==ON ) THEN
+            CALL check_cbh_value('tmaxf', Tmaxf, MINTEMP, MAXTEMP, missing)
+            CALL check_cbh_value('tminf', Tminf, MINTEMP, MAXTEMP, missing)
+          ENDIF
+          IF ( Climate_potet_flag==ON ) CALL check_cbh_value('potet', Potet, 0.0, 50.0, missing)
+          IF ( Climate_aet_flag==ON ) CALL check_cbh_value('aet_external', Aet_external, 0.0, 50.0, missing)
+          IF ( Climate_irrigated_area_flag==ON ) CALL check_cbh_value('irrigated_area', Irrigated_area, 0.0, 9999.0, missing)
+          IF ( Climate_swrad_flag==ON ) CALL check_cbh_value('swrad', Swrad, 0.0, 1000.0, missing)
+          IF ( Climate_transp_flag==ON ) CALL check_cbh_intvalue('transp_on', Transp_on, 0, 1, missing)
+          IF ( Climate_precip_flag==ON ) CALL check_cbh_value('hru_ppt', Hru_ppt, 0.0, 30.0, missing)
+          IF ( Humidity_cbh_flag==ON ) CALL check_cbh_value('humidity_hru', Humidity_hru, 0.0, 100.0, missing)
+          IF ( Windspeed_cbh_flag==ON ) CALL check_cbh_value('windspeed_hru', Windspeed_hru, 0.0, 400.0, missing)
+          IF ( missing==1 ) THEN
+            CALL print_date(0)
+            ERROR STOP ERROR_cbh
+          ENDIF
+        ENDIF
+
+        IF ( Climate_precip_flag==ON ) THEN
+!******Initialize HRU variables
+          Pptmix = OFF
+          Newsnow = OFF
+          Prmx = 0.0
+          Hru_rain = 0.0
+          Hru_snow = 0.0
+        ENDIF
+
         DO jj = 1, Active_hrus
           i = Hru_route_order(jj)
           harea = Hru_area(i)
 
           IF ( Climate_temp_flag==ON ) THEN
-            IF ( Cbh_check_flag==ON ) THEN
-              CALL check_cbh_value('Tmaxf', Tmaxf(i), MINTEMP, MAXTEMP, missing)
-              CALL check_cbh_value('Tminf', Tminf(i), MINTEMP, MAXTEMP, missing)
-            ENDIF
             tmax_hru = Tmaxf(i) + Tmax_cbh_adj(i, Nowmonth)
             tmin_hru = Tminf(i) + Tmin_cbh_adj(i, Nowmonth)
             CALL temp_set(i, tmax_hru, tmin_hru, Tmaxf(i), Tminf(i), &
@@ -196,31 +249,11 @@
           ENDIF
 
           IF ( Climate_potet_flag==ON ) THEN
-            IF ( Cbh_check_flag==ON ) CALL check_cbh_value('Potet', Potet(i), 0.0, 50.0, missing)
             Potet(i) = Potet(i)*Potet_cbh_adj(i, Nowmonth)
             Basin_potet = Basin_potet + DBLE( Potet(i)*harea )
           ENDIF
 
-          IF ( Climate_swrad_flag==ON ) THEN
-            IF ( Cbh_check_flag==1 ) CALL check_cbh_value('Swrad', Swrad(i), 0.0, 1000.0, missing)
-            Basin_swrad = Basin_swrad + DBLE( Swrad(i)*harea )
-          ENDIF
-
-          IF ( Climate_transp_flag==ON ) THEN
-            IF ( Cbh_check_flag==ON ) CALL check_cbh_intvalue('Transp_on', Transp_on(i), 0, 1, missing)
-            IF ( Transp_on(i)==ON ) Basin_transp_on = 1
-          ENDIF
-
           IF ( Climate_precip_flag==ON ) THEN
-            IF ( Cbh_check_flag==ON ) CALL check_cbh_value('Hru_ppt', Hru_ppt(i), 0.0, 30.0, missing)
-
-!******Initialize HRU variables
-            Pptmix(i) = OFF
-            Newsnow(i) = OFF
-            Prmx(i) = 0.0
-            Hru_rain(i) = 0.0
-            Hru_snow(i) = 0.0
-
             IF ( Hru_ppt(i)>0.0 ) THEN
               IF ( Precip_units==CELSIUS ) Hru_ppt(i) = Hru_ppt(i)*MM2INCH
               ppt = Hru_ppt(i)
@@ -234,19 +267,17 @@
               ierr = 1
             ENDIF
           ENDIF
-
-          IF ( Humidity_cbh_flag==ON ) THEN
-            IF ( Cbh_check_flag==ON ) CALL check_cbh_value('Humidity_hru', Humidity_hru(i), 0.0, 100.0, missing)
-            Basin_humidity = Basin_humidity + DBLE( Humidity_hru(i)*harea )
+          IF ( Climate_transp_flag==ON ) THEN
+            IF ( Transp_on(i)==ON ) Basin_transp_on = 1
           ENDIF
-
-          IF ( Windspeed_cbh_flag==ON ) THEN
-            IF ( Cbh_check_flag==ON ) CALL check_cbh_value('Windspeed_hru', Windspeed_hru(i), 0.0, 400.0, missing)
-            Basin_windspeed = Basin_windspeed + DBLE( Windspeed_hru(i)*harea )
-          ENDIF
+          IF ( Climate_swrad_flag==ON ) Basin_swrad = Basin_swrad + DBLE( Swrad(i)*harea )
+          IF ( Humidity_cbh_flag==ON ) Basin_humidity = Basin_humidity + DBLE( Humidity_hru(i)*harea )
+          IF ( Windspeed_cbh_flag==ON ) Basin_windspeed = Basin_windspeed + DBLE( Windspeed_hru(i)*harea )
+          IF ( Climate_aet_flag==ON ) Basin_aet_external = Basin_aet_external + DBLE( Aet_external(i)*harea )
+          IF ( Climate_irrigated_area_flag==ON ) Basin_irrigated_area = Basin_irrigated_area + DBLE( Irrigated_area(i)*harea )
         ENDDO
 
-        IF ( missing==1 .OR. ierr==1 ) THEN
+        IF ( ierr==1 ) THEN
           CALL print_date(0)
           ERROR STOP ERROR_cbh
         ENDIF
@@ -274,7 +305,8 @@
         ENDIF
         IF ( Humidity_cbh_flag==ON ) Basin_humidity = Basin_humidity*Basin_area_inv
         IF ( Windspeed_cbh_flag==ON ) Basin_windspeed = Basin_windspeed*Basin_area_inv
-
+        IF ( Climate_aet_flag==ON ) Basin_aet_external = Basin_aet_external*Basin_area_inv
+        IF ( Climate_irrigated_area_flag==ON ) Basin_irrigated_area = Basin_irrigated_area*Basin_area_inv
       ELSEIF ( Process_flag==DECL ) THEN
 
         IF ( control_integer(Cbh_check_flag, 'cbh_check_flag')/=0 ) Cbh_check_flag = ON
@@ -303,8 +335,28 @@
      &         'meters/second', Basin_windspeed)/=0 ) CALL read_error(3, 'basin_windspeed')
           ALLOCATE ( Windspeed_hru(Nhru) )
           IF ( declvar(MODNAME, 'windspeed_hru', 'nhru', Nhru, 'real', &
-     &         'Area of HRU that is impervious', &
+     &         'Wind speed for each HRU', &
      &         'meters/second', Windspeed_hru)/=0 ) CALL read_error(3, 'windspeed_hru')
+        ENDIF
+
+        IF ( Climate_aet_flag==ON .OR. Model==DOCUMENTATION ) THEN
+          IF ( declvar(MODNAME, 'basin_aet_external', 'one', 1, 'double', &
+     &         'Basin area-weighted average aet read from CBH File', &
+     &         'inches', Basin_aet_external)/=0 ) CALL read_error(3, 'basin_aet_external')
+          ALLOCATE ( Aet_external(Nhru) )
+          IF ( declvar(MODNAME, 'aet_external', 'nhru', Nhru, 'real', &
+     &         'Actual evapotranspiration for each HRU that is read from a CBH File', &
+     &         'inches', Aet_external)/=0 ) CALL read_error(3, 'aet_external')
+        ENDIF
+
+        IF ( Climate_irrigated_area_flag==ON .OR. Model==DOCUMENTATION ) THEN
+          IF ( declvar(MODNAME, 'basin_irrigated_area', 'one', 1, 'double', &
+     &         'Basin area-weighted average irrigation area read from CBH File', &
+     &         'acres', Basin_irrigated_area)/=0 ) CALL read_error(3, 'basin_irrigated_area')
+          ALLOCATE ( Irrigated_area(Nhru) )
+          IF ( declvar(MODNAME, 'irrigated_area', 'nhru', Nhru, 'real', &
+     &         'Irrigated area for each HRU that is read from a CBH File', &
+     &         'acres', Irrigated_area)/=0 ) CALL read_error(3, 'irrigated_area')
         ENDIF
 
 !   Declared Parameters
@@ -525,39 +577,51 @@
 !     Check CBH value limits
 !***********************************************************************
       SUBROUTINE check_cbh_value(Var, Var_value, Lower_val, Upper_val, Missing)
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
 ! Argument
-      REAL, INTENT(IN) :: Lower_val, Upper_val
-      REAL, INTENT(INOUT) :: Var_value
+      REAL, INTENT(IN) :: Var_value(*), Lower_val, Upper_val
       CHARACTER(LEN=*), INTENT(IN) :: Var
       INTEGER, INTENT(INOUT) :: Missing
 ! Functions
-      !INTRINSIC ::ISNAN
+      !INTRINSIC :: ISNAN
+      !EXTERNAL :: print_date
+! Local Variables
+      INTEGER :: i, j
 !***********************************************************************
-      !IF ( ISNAN(Var_value) ) THEN
-      !  PRINT *, 'ERROR, NaN value found for variable: ', Var
-      !  Var_value = 0.0
-      !  Missing = 1
-      !  CALL print_date(0)
-      !ELSEIF ( Var_value<Lower_val .OR. Var_value>Upper_val ) THEN
-      IF ( Var_value<Lower_val .OR. Var_value>Upper_val ) THEN
-        PRINT *, 'ERROR, bad value, variable: ', Var, ' Value:', Var_value
-        PRINT *, '       lower bound:', Lower_val, ' upper bound:', Upper_val
-        Missing = 1
-      ENDIF
+      DO j = 1, Active_hrus
+        i = Hru_route_order(j)
+        !IF ( ISNAN(Var_value(i)) ) THEN
+        !  PRINT *, 'ERROR, NaN value found for variable: ', Var
+        !  Var_value(i) = 0.0
+        !  Missing = 1
+        !  CALL print_date(0)
+        !ELSEIF ( Var_value(i)<Lower_val .OR. Var_value(i)>Upper_val ) THEN
+        IF ( Var_value(i)<Lower_val .OR. Var_value(i)>Upper_val ) THEN
+          PRINT '(3A,F0.8, A, I0)', 'ERROR, bad value, variable: ', Var, ' Value:', Var_value(i), ' HRU: ', i
+          PRINT *,                  '       lower bound:', Lower_val, ' upper bound:', Upper_val
+          Missing = 1
+        ENDIF
+      ENDDO
       END SUBROUTINE check_cbh_value
 
 !***********************************************************************
 !     Check CBH integer value limits
 !***********************************************************************
       SUBROUTINE check_cbh_intvalue(Var, Var_value, Lower_val, Upper_val, Missing)
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
 ! Argument
-      INTEGER, INTENT(IN) :: Var_value, Lower_val, Upper_val
+      INTEGER, INTENT(IN) :: Var_value(*), Lower_val, Upper_val
       CHARACTER(LEN=*), INTENT(IN) :: Var
       INTEGER, INTENT(INOUT) :: Missing
+      ! Local Variables
+      INTEGER :: i, j
 !***********************************************************************
-      IF ( Var_value<Lower_val .OR. Var_value>Upper_val ) THEN
-        PRINT *, 'ERROR, bad value, variable: ', Var, ' Value:', Var_value
-        PRINT *, '       lower bound:', Lower_val, ' upper bound:', Upper_val
-        Missing = 1
-      ENDIF
+      DO j = 1, Active_hrus
+        i = Hru_route_order(j)
+        IF ( Var_value(i)<Lower_val .OR. Var_value(i)>Upper_val ) THEN
+          PRINT '(3A,I0, A, I0)', 'ERROR, bad value, variable: ', Var, ' Value:', Var_value(i), ', HRU: ', i
+          PRINT *,                '       lower bound:', Lower_val, ' upper bound:', Upper_val
+          Missing = 1
+        ENDIF
+      ENDDO
       END SUBROUTINE check_cbh_intvalue

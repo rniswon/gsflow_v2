@@ -58,6 +58,8 @@ void setup_cont (void) {
         decl_control_string ("gsflow_output_file", "gsflow.out");
         decl_control_string ("gsflow_csv_file", "gsflow.csv");
 		decl_control_string ("creator_email", "unknown");
+		decl_control_string ("aet_module", "unknown");
+		decl_control_string ("irrigation_area_module", "unknown");
 
 /*
         cval = (char *)umalloc (sizeof (long));

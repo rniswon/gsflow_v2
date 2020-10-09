@@ -108,6 +108,10 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: LOAM = 2
     integer, parameter :: CLAY = 3
 
+    ! agriculture_flag
+    integer, parameter :: CAPILLARY = 1
+    integer, parameter :: CANOPY = 2
+
     ! Hemisphere
     integer, parameter :: NORTHERN = 0
     integer, parameter :: SOUTHERN = 1

@@ -26,7 +26,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2020-09-22'
+      character(len=*), parameter :: Version_snowcomp = '2020-10-07'
       integer, parameter :: not_a_glacier_hru = -1
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
@@ -818,8 +818,6 @@
           IF ( Ai(i)>DNEARZERO ) THEN
             Frac_swe(i) = SNGL( Pkwater_equiv(i)/Ai(i) ) ! [fraction]
             Frac_swe(i) = MIN( 1.0, Frac_swe(i) )
-          ELSE
-            Frac_swe(i) = 0.0
           ENDIF
           CALL sca_deplcrv(Snowcov_area(i), Snarea_curve(1,Hru_deplcrv(i)), Frac_swe(i))
           Basin_snowcov = Basin_snowcov + DBLE(Snowcov_area(i))*Hru_area_dble(i)

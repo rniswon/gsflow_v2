@@ -20,8 +20,8 @@
      &          EQULS = '===================================================================='
     character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
     character(len=11), parameter :: MODNAME = 'gsflow_prms'
-    character(len=*), parameter :: PRMS_versn = '2020-09-30'
-    character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 09/30/2020'
+    character(len=*), parameter :: PRMS_versn = '2020-10-10'
+    character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 10/10/2020'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -32,6 +32,7 @@
       INTEGER, SAVE :: Start_year, Start_month, Start_day, End_year, End_month, End_day
       INTEGER, SAVE :: Transp_flag, Sroff_flag, Solrad_flag, Et_flag
       INTEGER, SAVE :: Climate_temp_flag, Climate_precip_flag, Climate_potet_flag, Climate_transp_flag
+      INTEGER, SAVE :: Climate_irrigated_area_flag, Climate_aet_flag
       INTEGER, SAVE :: Lake_route_flag, Strmflow_flag, Stream_order_flag
       INTEGER, SAVE :: Temp_flag, Precip_flag, Climate_hru_flag, Climate_swrad_flag
       INTEGER, SAVE :: Precip_combined_flag, Temp_combined_flag, Muskingum_flag
@@ -69,6 +70,7 @@
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Temp_module, Srunoff_module, Et_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Strmflow_module, Transp_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Model_mode, Precip_module, Solrad_module
+      CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Irrigation_area_module, Aet_module
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
       CHARACTER(LEN=8), SAVE :: Soilzone_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
@@ -783,6 +785,13 @@
       IF ( control_string(Solrad_module, 'solrad_module')/=0 ) CALL read_error(5, 'solrad_module')
       Strmflow_module = 'strmflow'
       IF ( control_string(Strmflow_module, 'strmflow_module')/=0 ) CALL read_error(5, 'strmflow_module')
+      Irrigation_area_module = ' '
+      IF ( control_string(Irrigation_area_module, 'irrigation_area_module')/=0 ) CALL read_error(5, 'irrigation_area_module')
+      Aet_module = ' '
+      IF ( control_string(Aet_module, 'aet_module')/=0 ) CALL read_error(5, 'aet_module')
+      IF ( Irrigation_area_module(:11)=='climate_hru' ) Climate_irrigated_area_flag = ON
+      IF ( Aet_module(:11)=='climate_hru' ) Climate_aet_flag = ON
+ 
 
       IF ( Parameter_check_flag>0 ) CALL check_module_names(Inputerror_flag)
 
@@ -791,6 +800,8 @@
       Climate_transp_flag = OFF
       Climate_potet_flag = OFF
       Climate_swrad_flag = OFF
+      Climate_irrigated_area_flag = OFF
+      Climate_aet_flag = OFF
 
       IF ( Precip_module(:11)=='precip_1sta' .OR. Precip_module(:11)=='precip_prms') THEN
         Precip_flag = precip_1sta_module
@@ -917,6 +928,7 @@
       IF ( Climate_temp_flag==ON .OR. Climate_precip_flag==ON .OR. Climate_potet_flag==ON .OR. &
      &     Climate_swrad_flag==ON .OR. Climate_transp_flag==ON .OR. &
      &     Humidity_cbh_flag==ON .OR. Windspeed_cbh_flag==ON .OR. &
+     &     Climate_irrigated_area_flag==ON .OR. Climate_aet_flag==ON .OR. &
      &     Gwflow_cbh_flag==1 .OR. Snow_cbh_flag==1 ) Climate_hru_flag = ON
 
       Muskingum_flag = OFF
@@ -956,6 +968,7 @@
       IF ( control_integer(Dprst_flag, 'dprst_flag')/=0 ) Dprst_flag = OFF
       IF ( control_integer(PRMS_iteration_flag, 'PRMS_iteration_flag')/=0 ) PRMS_iteration_flag = OFF
       IF ( Model==PRMS ) PRMS_iteration_flag = OFF
+      ! 0 = off, 1 = apply irrigation in soilzone, 2 = apply irrigation to canopy
       IF ( control_integer(Agriculture_flag, 'agriculture_flag')/=0 ) Agriculture_flag = OFF
       ! 0 = off, 1 = on, 2 = lauren version
       IF ( control_integer(CsvON_OFF, 'csvON_OFF')/=0 ) CsvON_OFF = OFF

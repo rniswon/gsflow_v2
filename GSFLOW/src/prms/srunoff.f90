@@ -27,12 +27,12 @@
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Print_debug, Init_vars_from_file, &
      &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, Water_use_flag, &
      &    Frozen_flag, Save_vars_to_file, Process_flag, Inputerror_flag, Glacier_flag, &
-     &    Dprst_add_water_use, Dprst_transfer_water_use, PRMS_iteration_flag, Kkiter !, Parameter_check_flag
+     &    Dprst_add_water_use, Dprst_transfer_water_use, PRMS_iteration_flag, Kkiter, Agriculture_flag !, Parameter_check_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2020-09-30'
+      character(len=*), parameter :: Version_srunoff = '2020-10-08'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -506,7 +506,6 @@
       IF ( Water_use_flag==ON ) Use_sroff_transfer = ON
 
       Imperv_evap = 0.0
-      Hortonian_flow = 0.0
       Hru_sroffi = 0.0
       Hru_sroffp = 0.0
       Contrib_fraction = 0.0
@@ -618,7 +617,7 @@
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, &
      &    Hru_perv, Hru_imperv, Hru_percent_imperv, Hru_frac_perv, &
      &    Dprst_area_max, Hru_area, Hru_type, Basin_area_inv, &
-     &    Dprst_area_clos_max, Dprst_area_open_max, Hru_area_dble
+     &    Dprst_area_clos_max, Dprst_area_open_max, Hru_area_dble, Ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Potet, Tavgc
       USE PRMS_FLOWVARS, ONLY: Sroff, Infil, Imperv_stor, Pkwater_equiv, Dprst_vol_open, Dprst_vol_clos, &
      &    Imperv_stor_max, Snowinfil_max, Soil_moist, Soil_rechr, Basin_sroff, Glacier_frac
@@ -631,7 +630,7 @@
       EXTERNAL :: imperv_et, compute_infil, run_cascade_sroff, dprst_comp, perv_comp
 ! Local Variables
       INTEGER :: i, k, dprst_chk, frzen, active_glacier
-      REAL :: srunoff, avail_et, hperv, sra, availh2o
+      REAL :: srunoff, avail_et, perv_area, sra, availh2o
       DOUBLE PRECISION :: hru_sroff_down, runoff, apply_sroff, cfgi_sroff
       REAL :: cfgi_k, depth_cm !frozen ground
       REAL :: glcrmltb, temp, temp2 ! glaciers
@@ -694,6 +693,8 @@
       ENDIF
 
       dprst_chk = 0
+      Hortonian_flow = 0.0
+      Infil = 0.0
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 
@@ -732,8 +733,7 @@
           CYCLE
         ENDIF
 
-        Infil(i) = 0.0
-        hperv = Hru_perv(i)
+        perv_area = Hru_perv(i)
         Perv_frac = Hru_frac_perv(i)
         Srp = 0.0
         Sri = 0.0
@@ -791,7 +791,7 @@
             IF ( Hru_type(i)==LAND ) THEN
               CALL perv_comp(Net_apply(i), Net_apply(i), Infil(i), sra)
 ! ** ADD in water from irrigation application and water-use transfer for pervious portion - sra (if any)
-              apply_sroff = DBLE( sra*hperv )
+              apply_sroff = DBLE( sra*perv_area )
               Basin_apply_sroff = Basin_apply_sroff + apply_sroff
               runoff = runoff + apply_sroff
             ENDIF
@@ -832,7 +832,7 @@
         srunoff = 0.0
         IF ( Hru_type(i)==LAND .OR. active_glacier==OFF ) THEN ! could be an glacier-capable HRU with no ice
 !******Compute runoff for pervious and impervious area, and depression storage area
-          runoff = runoff + DBLE( Srp*hperv + Sri*Hruarea_imperv )
+          runoff = runoff + DBLE( Srp*perv_area + Sri*Hruarea_imperv )
           srunoff = SNGL( runoff/Hruarea_dble )
 
 !******Compute HRU weighted average (to units of inches/dt)
@@ -850,11 +850,12 @@
             ENDIF
           ENDIF
           Hru_sroffp(i) = Srp*Perv_frac
-          Basin_sroffp = Basin_sroffp + Srp*hperv
+          Basin_sroffp = Basin_sroffp + Srp*perv_area
         ENDIF
 
-        Basin_infil = Basin_infil + DBLE( Infil(i)*hperv )
-        Basin_contrib_fraction = Basin_contrib_fraction + DBLE( Contrib_fraction(i)*hperv )
+        Basin_infil = Basin_infil + DBLE( Infil(i)*perv_area )
+        IF ( Agriculture_flag==ON ) Basin_infil = Basin_infil + DBLE( Infil(i)*Ag_frac(i) )
+        Basin_contrib_fraction = Basin_contrib_fraction + DBLE( Contrib_fraction(i)*perv_area )
 
 !******Compute evaporation from impervious area
         IF ( frzen==OFF ) THEN
