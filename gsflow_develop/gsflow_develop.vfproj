@@ -5,7 +5,7 @@
 		<Platform Name="x64"/></Platforms>
 	<Configurations>
 		<Configuration Name="Debug|Win32">
-				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" EnableRecursion="true" F77IntegerConstants="true" WarnUnusedVariables="true" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" Traceback="true" RuntimeChecks="rtChecksAll" NullPointerCheck="true" BoundsCheck="true" UninitializedVariablesCheck="true" RuntimeLibrary="rtMultiThreadedDebug" ImproveFloatingPointConsistency="true"/>
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" EnableRecursion="true" F77IntegerConstants="true" WarnUnusedVariables="true" WarnInterfaces="true" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" Traceback="true" RuntimeChecks="rtChecksAll" NullPointerCheck="true" BoundsCheck="true" UninitializedVariablesCheck="true" RuntimeLibrary="rtMultiThreadedDebug" ImproveFloatingPointConsistency="true"/>
 				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalYes" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
@@ -25,8 +25,8 @@
 				<Tool Name="VFPostBuildEventTool"/>
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
 		<Configuration Name="Debug|x64">
-				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" EnableRecursion="true" F77IntegerConstants="true" FloatingPointExceptionHandling="fpe0" FloatingPointModel="source" FloatingPointExceptionsModel="enable" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" Traceback="true" RuntimeChecks="rtChecksAll" NullPointerCheck="true" BoundsCheck="true" UninitializedVariablesCheck="true" RuntimeLibrary="rtMultiThreadedDebug" ImproveFloatingPointConsistency="true"/>
-				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalYes" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" EnableRecursion="true" LocalSavedScalarsZero="true" FloatingPointExceptionHandling="fpe0" FloatingPointModel="source" FloatingPointExceptionsModel="enable" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" Traceback="true" BoundsCheck="true" ImproveFloatingPointConsistency="true"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
 				<Tool Name="VFCustomBuildTool"/>
@@ -60,13 +60,14 @@
 		<File RelativePath="..\GSFLOW\src\modflow\de47_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\dynamic_param_read.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\frost_date.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\glacr_melt.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_budget.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_mf2prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_modflow.f"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms2mf.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_sum.f90"/>
-		<File RelativePath="..\GSFLOW\src\modflow\gwf2ag1_NWT_ponds.f"/>
+		<File RelativePath="..\GSFLOW\src\modflow\gwf2ag1_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwf2bas7_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwf2bcf7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwf2chd7.f"/>
@@ -111,7 +112,6 @@
 		<File RelativePath="..\GSFLOW\src\modflow\mach_mod.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\map_results.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\mhc7.f"/>
-		<File RelativePath="..\GSFLOW\src\prms\mmf_utils.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\modules.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\muskingum.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\muskingum_lake.f90"/>
@@ -132,6 +132,7 @@
 		<File RelativePath="..\GSFLOW\src\modflow\obs2ghb7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\obs2riv7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\obs2str7.f"/>
+		<File RelativePath="..\GSFLOW\src\modflow\openspec.inc"/>
 		<File RelativePath="..\GSFLOW\src\modflow\parutl7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\pcg7_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\potet_hamon.f90"/>
@@ -143,15 +144,11 @@
 		<File RelativePath="..\GSFLOW\src\prms\potet_pt.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\precip_1sta_laps.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\precip_dist2.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\precip_temp_grid.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\precip_temp_map.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\prms_constants.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_summary.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_time.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\read_control_file.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\read_data_file.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\read_parameter_file.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\routing.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\setdims.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\setup_param.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\sip7_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\snowcomp.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\soilzone.f90"/>
@@ -165,7 +162,7 @@
 		<File RelativePath="..\GSFLOW\src\prms\temp_dist2.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\transp_frost.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\transp_tindex.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\utils_prms_windows.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\utils_prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\utl7.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\water_balance.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\water_use_read.f90"/>
