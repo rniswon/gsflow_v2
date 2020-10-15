@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.1.0 03/04/2020
+                       Version 5.2.0 09/30/2020
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -8,16 +8,17 @@
     Cascading Flow: cascade
   Time Series Data: obs, water_use_read, dynamic_param_read
    Potet Solar Rad: soltab
-  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru
+  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,
+                    temp_map
        Precip Dist: precip_1sta, precip_laps, precip_dist2,
-                    climate_hru
+                    climate_hru, precip_map
 Temp & Precip Dist: xyz_dist, ide_dist
     Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
 Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
                     potet_hs, potet_pt, potet_pm, potet_pm_sta
       Interception: intcp
-     Snow Dynamics: snowcomp
+Snow & Glacr Dynam: snowcomp, glacr_melt
     Surface Runoff: srunoff_smidx, srunoff_carea
          Soil Zone: soilzone
        Groundwater: gwflow
@@ -33,30 +34,30 @@ Stream Temperature: stream_temp
 
     Active modules listed in the order in which they are called
 
-        Process                   Module                Version Date
-====================================================================
-GSFLOW Computation Order       gsflow_prms                2020-03-04
-Basin Definition               basin                      2019-11-14
-Cascading Flow                 cascade                    2019-09-25
-Common States and Fluxes       climateflow                2020-01-10
-Potential Solar Radiation      soltab                     2016-09-09
-PRMS Set Time Variables        prms_time                  2015-03-31
-Time Series Data               obs                        2020-01-09
-Temperature Distribution       climate_hru                2019-10-23
-Precipitation Distribution     climate_hru                2019-10-23
-Solar Radiation Distribution   climate_hru                2019-10-23
-Potential Evapotranspiration   climate_hru                2019-10-23
-Transpiration Distribution     transp_tindex              2015-01-06
-Canopy Interception            intcp                      2020-03-03
-Snow Dynamics                  snowcomp                   2019-11-27
-Surface Runoff                 srunoff_smidx              2020-03-03
-Soil Zone Computations         soilzone                   2020-01-10
-Groundwater                    gwflow                     2019-04-04
-Streamflow Routing             strmflow                   2014-12-02
-Summary                        basin_sum                  2017-10-21
-Output Summary                 subbasin                   2019-12-02
-Nhru Output Summary            nhru_summary               2019-10-25
-====================================================================
+        Process                    Module         Version Date
+==============================================================
+PRMS Computation Order          gsflow_prms         2020-09-30
+Basin Definition                basin               2020-10-05
+Cascading Flow                  cascade             2020-08-13
+Common States and Fluxes        climateflow         2020-09-14
+Potential Solar Radiation       soltab              2020-08-04
+Timestep Control                prms_time           2020-08-03
+Time Series Data                obs                 2020-08-03
+Temperature Distribution        climate_hru         2020-08-03
+Precipitation Distribution      climate_hru         2020-08-03
+Solar Radiation Distribution    climate_hru         2020-08-03
+Potential Evapotranspiration    climate_hru         2020-08-03
+Transpiration Distribution      transp_tindex       2020-09-14
+Canopy Interception             intcp               2020-09-21
+Snow Dynamics                   snowcomp            2020-09-22
+Surface Runoff                  srunoff_smidx       2020-09-30
+Soilzone Computations           soilzone            2020-09-30
+Groundwater                     gwflow              2020-09-14
+Streamflow Routing              strmflow            2020-08-03
+Output Summary                  basin_sum           2020-09-14
+Output Summary                  subbasin            2020-08-13
+Output Summary                  nhru_summary        2020-09-21
+==============================================================
 
 Using Control File: .\prms_climate_hru.control
 
@@ -96,5 +97,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  *************************************************************
  Total for run     668.938  388.458    8.959  274.620  260.348
  *************************************************************
-Execution elapsed time    0 minutes  1.11 seconds
+Execution elapsed time    0 minutes  1.47 seconds
 

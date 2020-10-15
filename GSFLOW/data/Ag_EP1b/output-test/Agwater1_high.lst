@@ -1,6 +1,6 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                             VERSION 1.1.4 4/01/2018
+                            VERSION 1.2.0 03/01/2020
                     BASED ON MODFLOW-2005 VERSION 1.12.00 02/03/2017
 
  LIST FILE: ./output/Agwater1_high.lst
@@ -40996,6 +40996,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/03/12 13:37:32
- Elapsed run time:  4.124 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/10/06 10:18:59
+ Elapsed run time:  4.627 Seconds
 
