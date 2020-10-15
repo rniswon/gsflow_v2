@@ -225,7 +225,7 @@
       ALLOCATE ( Cov_type(Nhru) )
       IF ( declparam(MODNAME, 'cov_type', 'nhru', 'integer', &
      &     '3', '0', '4', &
-     &     'Cover type designation for HRU', &
+     &     'Cover type designation for each HRU', &
      &     'Vegetation cover type for each HRU (0=bare soil;'// &
      &     ' 1=grasses; 2=shrubs; 3=trees; 4=coniferous)', &
      &     'none')/=0 ) CALL read_error(1, 'cov_type')
@@ -363,6 +363,7 @@
       Basin_lat = 0.0D0
       Hru_frac_perv = 1.0
       Hru_imperv = 0.0
+      Hru_perv = Hru_area
       Hru_route_order = 0
       j = 0
       DO i = 1, Nhru
@@ -463,9 +464,9 @@
         Hru_frac_perv(i) = perv_area/harea
         IF ( Hru_frac_perv(i)<0.001 ) THEN
           PRINT *, 'ERROR, pervious plus agriculture fraction must be >= 0.001 for HRU:', i
-          PRINT *, '       pervious protion is HRU area - (impervious + depression + agriculture)'
-          PRINT *, '       pervious fraction:', Hru_frac_perv(i) 
-          PRINT *, '       impervious fraction:', Hru_percent_imperv(i)    
+          PRINT *, '       pervious portion is HRU fraction - impervious fraction - depression fraction - agriculture fraction'
+          PRINT *, '       pervious fraction:', Hru_frac_perv(i)
+          PRINT *, '       impervious fraction:', Hru_percent_imperv(i)
           IF ( Dprst_flag==ON ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
           IF ( Agriculture_flag>OFF )    PRINT *, '       agriculture fraction:', Ag_frac(i)
           basinit = 1

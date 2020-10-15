@@ -127,15 +127,15 @@
      &     'inches', Net_ppt)/=0 ) CALL read_error(3, 'net_ppt')
 
       IF ( declvar(MODNAME, 'basin_net_ppt', 'one', 1, 'double', &
-     &     'Basin area-weighted average throughfall', &
+     &     'Basin area-weighted average net precipitation', &
      &     'inches', Basin_net_ppt)/=0 ) CALL read_error(3, 'basin_net_ppt')
 
       IF ( declvar(MODNAME, 'basin_net_snow', 'one', 1, 'double', &
-     &     'Basin area-weighted average snow throughfall', &
+     &     'Basin area-weighted average snow net precipitation', &
      &     'inches', Basin_net_snow)/=0 ) CALL read_error(3, 'basin_net_snow')
 
       IF ( declvar(MODNAME, 'basin_net_rain', 'one', 1, 'double', &
-     &     'Basin area-weighted average rain throughfall', &
+     &     'Basin area-weighted average rain net precipitation', &
      &     'inches', Basin_net_rain)/=0 ) CALL read_error(3, 'basin_net_rain')
 
       ALLOCATE ( Intcp_stor(Nhru) )
@@ -163,7 +163,7 @@
 
       ALLOCATE ( Intcp_form(Nhru) )
       IF ( declvar(MODNAME, 'intcp_form', 'nhru', Nhru, 'integer', &
-     &     'Form (rain or snow) of interception for each HRU', &
+     &     'Form of interception for each HRU (0=rain; 1=snow)', &
      &     'none', Intcp_form)/=0 ) CALL read_error(3, 'intcp_form')
 
       ALLOCATE ( Intcp_on(Nhru) )

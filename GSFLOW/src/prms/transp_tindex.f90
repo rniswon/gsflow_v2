@@ -90,7 +90,7 @@
         IF ( declparam(MODNAME, 'transp_end', 'nhru', 'integer', &
      &       '13', '1', '13', &
      &       'Month to stop transpiration period', &
-     &       'Month to stop transpiration computations; transpiration is computed thru end of previous month', &
+     &       'Month to stop transpiration computations; transpiration is computed through the end of previous month', &
      &       'month')/=0 ) CALL read_error(1, 'transp_end')
 
         ALLOCATE ( Transp_tmax(Nhru) )

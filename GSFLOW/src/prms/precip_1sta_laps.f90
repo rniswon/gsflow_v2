@@ -117,7 +117,7 @@
         ALLOCATE ( Hru_psta(Nhru) )
         IF ( declparam(MODNAME, 'hru_psta', 'nhru', 'integer', &
      &       '0', 'bounded', 'nrain', &
-     &       'Index of base precipitation station for HRU', &
+     &       'Index of base precipitation station for each HRU', &
      &       'Index of the base precipitation station used for lapse'// &
      &       ' rate calculations for each HRU', &
      &       'none')/=0 ) CALL read_error(1, 'hru_psta')

@@ -178,16 +178,16 @@
         ALLOCATE ( Hru2map_id(Nmap2hru) )
         IF ( declparam(MODNAME, 'hru2map_id', 'nmap2hru', 'integer', &
      &       '1', 'bounded', 'nhru', &
-     &       'HRU identification number for HRU to mapped spatial units intersection', &
-     &       'HRU identification number for HRU to mapped spatial units intersection', &
+     &       'HRU identification number for each HRU to mapped spatial units intersection', &
+     &       'HRU identification number for each HRU to mapped spatial units intersection', &
      &       'none')/=0 ) CALL read_error(1, 'hru2map_id')
 
         !rsr, bounded value could be a problem if number of mapped spatial units > nhru
         ALLOCATE ( Map2hru_id(Nmap2hru) )
         IF ( declparam(MODNAME, 'map2hru_id', 'nmap2hru', 'integer', &
      &       '0', 'bounded', 'nmap', &
-     &       'Mapped spatial unit identification number for HRU to map intersection', &
-     &       'Mapped spatial unit identification number for HRU to map intersection', &
+     &       'Mapped spatial unit identification number for each HRU to map intersection', &
+     &       'Mapped spatial unit identification number for each HRU to map intersection', &
      &       'none')/=0 ) CALL read_error(1, 'map2hru_id')
 
         ALLOCATE ( Hru2map_pct(Nmap2hru) )

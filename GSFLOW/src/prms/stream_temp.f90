@@ -381,7 +381,7 @@
       IF ( declparam( MODNAME, 'seg_lat', 'nsegment', 'real', &
      &     '40.0', '-90.0', '90.0', &
      &     'Segment latitude', &
-     &     'Latitiude of each segment', &
+     &     'Latitude of each segment', &
      &     'degrees North')/=0 ) CALL read_error(1, 'seg_lat')
 
       ALLOCATE (seg_elev(nsegment))
@@ -763,7 +763,7 @@
       ! Compute segment lateral inflow temperatures and segment meteorological values
       DO k = 1, Active_hrus
          j = Hru_route_order(k)
-         ccov = 1.0 - (Swrad(j) / sngl(Soltab_potsw(jday, j)) * sngl(Hru_cossl(j)))
+         ccov = 1.0 - (Swrad(j) / SNGL(Soltab_potsw(jday, j)) * SNGL(Hru_cossl(j)))
          IF ( ccov<NEARZERO ) THEN
             ccov = 0.0
          ELSEIF ( ccov>1.0 ) THEN
@@ -892,10 +892,10 @@
 
 ! Add the lateral temperature to the upstream temperature 
 ! Compute t_o
-        fs2 = sngl(Seg_lateral_inflow(i) * CFS2CMS_CONV + fs)
+        fs2 = SNGL(Seg_lateral_inflow(i) * CFS2CMS_CONV + fs)
         if (fs2 > 0.0) then
-           t_o = (sngl(seg_tave_lat(i) * Seg_lateral_inflow(i) * CFS2CMS_CONV) + &
-     &        sngl(fs * seg_tave_upstream(i))) / fs2
+           t_o = (SNGL(seg_tave_lat(i) * Seg_lateral_inflow(i) * CFS2CMS_CONV) + &
+     &        SNGL(fs * seg_tave_upstream(i))) / fs2
         else
            t_o = -99.9
         endif
@@ -903,7 +903,7 @@
 
          ! Compute flow-dependent water-in-segment width value
          if (seg_outflow(i) > NEARZERO) then
-            Seg_width(i) = width_alpha(i) * sngl(Seg_outflow(i)) ** width_m(i)
+            Seg_width(i) = width_alpha(i) * SNGL(Seg_outflow(i)) ** width_m(i)
          else
             Seg_width(i) = 0.0
          endif
@@ -951,7 +951,7 @@
 
           else
 !             This block computes the value for seg_tave_water
-!             Compute the equilibrium temerature
+!             Compute the equilibrium temperature
               ! Out: te, ak1, ak2
               ! In: seg_shade, svi, i, t_o
               CALL equilb(te, ak1, ak2, seg_shade(i), svi, i, t_o)
@@ -1033,7 +1033,7 @@
       REAL :: tep, b, r, rexp, tw, delt, q_init, denom, Ql
 !***************************************************************************************************
 ! DETERMINE EQUATION PARAMETERS
-      q_init = sngl(qup  * CFS2CMS_CONV)
+      q_init = SNGL(qup  * CFS2CMS_CONV)
       Ql = SNGL( Qlat )
 
 ! This is confused logic coment out here and compute the terms as needed below
@@ -1144,9 +1144,9 @@
       IF ( q_init < NEARZERO ) q_init = NEARZERO
 
       ! sw_power should be in watts / m2
-      ! seginc_swrad is in langly / day
+      ! seginc_swrad is in Langley / day
       ! Used to use RAD_CONVERT, the conversion I'm using now is a slightly different number.
-      sw_power = 11.63 / 24.0 * sngl(seginc_swrad(seg_id))
+      sw_power = 11.63 / 24.0 * SNGL(seginc_swrad(seg_id))
 
       del_ht = 2.36E06   ! could multiple by 10E6 for this and other terms later to reduce round-off
       ltnt_ht = 2495.0E06

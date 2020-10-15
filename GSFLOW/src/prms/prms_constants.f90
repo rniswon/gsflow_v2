@@ -73,6 +73,9 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: SHRUBS = 2
     integer, parameter :: TREES = 3
     integer, parameter :: CONIFEROUS = 4
+! Vaccaro, J.J., 2007, A deep percolation model for estimating ground-water recharge:
+! Documentation of modules for the modular modeling system of the U.S. Geological Survey: 
+! U.S. Geological Survey Scientific Investigations Report 2006-5318, 30 p.
     integer, parameter :: WINTER_WHEAT_SUMMER = 5
     integer, parameter :: WINTER_WHEAT_FALLOW = 5
     integer, parameter :: ORCHARD = 7
@@ -99,10 +102,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: BEAN = 29
     integer, parameter :: PEA = 30
     integer, parameter :: ASPARAGUS = 31
-    
-! Vaccaro, J.J., 2007, A deep percolation model for estimating ground-water recharge:
-! Documentation of modules for the modular modeling system of the U.S. Geological Survey: 
-! U.S. Geological Survey Scientific Investigations Report 2006-5318, 30 p.
+
     ! soil_type
     integer, parameter :: SAND = 1
     integer, parameter :: LOAM = 2
@@ -126,7 +126,7 @@ MODULE PRMS_CONSTANTS
     ! seg_type
     integer, parameter :: OUTFLOW_SEGMENT = 0
 
-    ! soil_type
+    ! cascade flags
     integer, parameter :: CASCADE_OFF = 0
     integer, parameter :: CASCADE_NORMAL = 1
     integer, parameter :: CASCADE_HRU_SEGMENT = 2

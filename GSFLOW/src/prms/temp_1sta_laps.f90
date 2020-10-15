@@ -208,7 +208,7 @@
           ALLOCATE ( Hru_tlaps(Nhru) )
           IF ( declparam(MODNAME, 'hru_tlaps', 'nhru', 'integer', &
      &         '0', 'bounded', 'ntemp', &
-     &         'Index of lapse temperature station for HRU', &
+     &         'Index of lapse temperature station for each HRU', &
      &         'Index of the lapse temperature station used for lapse rate calculations', &
      &         'none')/=0 ) CALL read_error(1, 'hru_tlaps')
         ENDIF

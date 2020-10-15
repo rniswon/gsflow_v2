@@ -260,11 +260,11 @@
           ENDIF
           ALLOCATE ( Dprst_gain(Nhru) )
           IF ( declvar(MODNAME, 'dprst_gain', 'nhru', Nhru, 'real', &
-     &         'Transfer gain to surface-depression storage for each HRU for each time step', &
+     &         'Transfer gains to surface-depression storage for each HRU for each time step', &
      &         'cfs', Dprst_gain)/=0 ) CALL read_error(1, 'dprst_gain')
           ALLOCATE ( Dprst_gain_tot(Nhru) )
           IF ( declvar(MODNAME, 'dprst_gain_tot', 'nhru', Nhru, 'real', &
-     &         'Transfer gain to surface-depression storage for each HRU for the simulation', &
+     &         'Transfer gains to surface-depression storage for each HRU for the simulation', &
      &         'cfs', Dprst_gain_tot)/=0 ) CALL read_error(1, 'dprst_gain_tot')
           IF ( declvar(MODNAME, 'total_dprst_gain', 'one', 1, 'double', &
      &         'Transfer gains to all surface-depression storage for each time step', &
@@ -292,11 +292,11 @@
           ENDIF
           ALLOCATE ( Segment_gain(Nsegment) )
           IF ( declvar(MODNAME, 'segment_gain', 'nsegment', Nsegment, 'real', &
-     &         'Transfer gain for each stream segment for each time step', &
+     &         'Transfer gains for each stream segment for each time step', &
      &         'cfs', Segment_gain)/=0 ) CALL read_error(1, 'segment_gain')
           ALLOCATE ( Segment_gain_tot(Nsegment) )
           IF ( declvar(MODNAME, 'segment_gain_tot', 'nsegment', Nsegment, 'real', &
-     &         'Transfer gain for each stream segment for the simulation', &
+     &         'Transfer gains for each stream segment for the simulation', &
      &         'cfs', Segment_gain_tot)/=0 ) CALL read_error(1, 'segment_gain_tot')
           IF ( declvar(MODNAME, 'total_segment_gain', 'one', 1, 'double', &
      &         'Transfer gains to all stream segments for each time step', &
@@ -323,11 +323,11 @@
         ENDIF
         ALLOCATE ( Gwr_gain(Nhru) )
         IF ( declvar(MODNAME, 'gwr_gain', 'nhru', Nhru, 'real', &
-     &       'Transfer gain to the groundwater reservoir of each HRU for each time step', &
+     &       'Transfer gains to the groundwater reservoir of each HRU for each time step', &
      &       'cfs', Gwr_gain)/=0 ) CALL read_error(1, 'gwr_gain')
         ALLOCATE ( Gwr_gain_tot(Nhru) )
         IF ( declvar(MODNAME, 'gwr_gain_tot', 'nhru', Nhru, 'real', &
-     &       'Transfer gain to the groundwater reservoir of each HRU for the simulation', &
+     &       'Transfer gains to the groundwater reservoir of each HRU for the simulation', &
      &       'cfs', Gwr_gain_tot)/=0 ) CALL read_error(1, 'gwr_gain_tot')
         IF ( declvar(MODNAME, 'total_gwr_gain', 'one', 1, 'double', &
      &       'Flow to all groundwater reservoirs for each time step', &
@@ -351,11 +351,11 @@
           ENDIF
           ALLOCATE ( Lake_gain(Nhru) )
           IF ( declvar(MODNAME, 'lake_gain', 'nhru', Nhru, 'real', &
-     &         'Transfer gain to each lake HRU for each time step', &
+     &         'Transfer gains to each lake HRU for each time step', &
      &         'cfs', Lake_gain)/=0 ) CALL read_error(1, 'lake_gain')
           ALLOCATE ( Lake_gain_tot(Nhru) )
           IF ( declvar(MODNAME, 'lake_gain_tot', 'nhru', Nhru, 'real', &
-     &         'Transfer gain to each lake HRU for the simulation', &
+     &         'Transfer gains to each lake HRU for the simulation', &
      &         'cfs', Lake_gain_tot)/=0 ) CALL read_error(1, 'lake_gain_tot')
           IF ( declvar(MODNAME, 'total_lake_gain', 'one', 1, 'double', &
      &         'Transfer gains to all lake HRUs for each time step', &
@@ -383,11 +383,11 @@
         IF ( Nexternal>0 ) THEN
           ALLOCATE ( External_gain(Nexternal) )
           IF ( declvar(MODNAME, 'external_gain', 'nexternal', Nexternal, 'real', &
-     &         'Transfer gain to each external location for each time step', &
+     &         'Transfer gains to each external location for each time step', &
      &         'cfs', External_gain)/=0 ) CALL read_error(1, 'external_gain')
           ALLOCATE ( External_gain_tot(Nexternal) )
           IF ( declvar(MODNAME, 'external_gain_tot', 'nexternal', Nexternal, 'real', &
-     &         'Transfer gain to each external location for each time step', &
+     &         'Transfer gains to each external location for each time step', &
      &         'cfs', External_gain_tot)/=0 ) CALL read_error(1, 'external_gain_tot')
         ENDIF
         IF ( declvar(MODNAME, 'total_external_gain', 'one', 1, 'double', &
@@ -412,11 +412,11 @@
 
         ALLOCATE ( Soilzone_gain(Nhru) )
         IF ( declvar(MODNAME, 'soilzone_gain', 'nhru', Nhru, 'real', &
-     &       'Transfer gain to the capillary reservoir within the soilzone for each HRU for each time step', &
+     &       'Transfer gains to the capillary reservoir within the soilzone for each HRU for each time step', &
      &       'cfs', Soilzone_gain)/=0 ) CALL read_error(1, 'soilzone_gain')
         ALLOCATE ( Soilzone_gain_tot(Nhru) )
         IF ( declvar(MODNAME, 'soilzone_gain_tot', 'nhru', Nhru, 'real', &
-     &       'Transfer gain to the capillary reservoir within the soilzone for each HRU for the simulation', &
+     &       'Transfer gains to the capillary reservoir within the soilzone for each HRU for the simulation', &
      &       'cfs', Soilzone_gain_tot)/=0 ) CALL read_error(1, 'soilzone_gain_tot')
         IF ( declvar(MODNAME, 'total_soilzone_gain', 'one', 1, 'double', &
      &       'Transfer gains to all capillary reservoirs for each time step', &
@@ -424,11 +424,11 @@
 
         ALLOCATE ( Canopy_gain(Nhru) )
         IF ( declvar(MODNAME, 'canopy_gain', 'nhru', Nhru, 'real', &
-     &       'Transfer gain to the canopy reservoir for each HRU for each time step', &
+     &       'Transfer gains to the canopy reservoir for each HRU for each time step', &
      &       'cfs', Canopy_gain)/=0 ) CALL read_error(1, 'canopy_gain')
         ALLOCATE ( Canopy_gain_tot(Nhru) )
         IF ( declvar(MODNAME, 'canopy_gain_tot', 'nhru', Nhru, 'real', &
-     &       'Transfer gain to the canopy reservoir for each HRU for the simulation', &
+     &       'Transfer gains to the canopy reservoir for each HRU for the simulation', &
      &       'cfs', Canopy_gain_tot)/=0 ) CALL read_error(1, 'canopy_gain_tot')
         IF ( declvar(MODNAME, 'total_canopy_gain', 'one', 1, 'double', &
      &       'Transfer gains to all canopy reservoirs for each time step', &

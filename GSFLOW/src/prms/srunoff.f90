@@ -324,8 +324,8 @@
 
         IF ( declparam(MODNAME, 'cfgi_decay', 'one', 'real', &
      &       '0.97', '0.01', '1.0', &
-     &       'CFGI daily decay of index, value of 1.0 is no decay', &
-     &       'CFGI daily decay of index, value of 1.0 is no decay', &
+     &       'CFGI daily decay of index; value of 1.0 is no decay', &
+     &       'CFGI daily decay of index; value of 1.0 is no decay', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'cfgi_decay')
 
         IF ( declparam(MODNAME, 'cfgi_thrshld', 'one', 'real', &
@@ -506,6 +506,7 @@
       IF ( Water_use_flag==ON ) Use_sroff_transfer = ON
 
       Imperv_evap = 0.0
+      Hortonian_flow = 0.0
       Hru_sroffi = 0.0
       Hru_sroffp = 0.0
       Contrib_fraction = 0.0

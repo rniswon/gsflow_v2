@@ -32,7 +32,7 @@
       INTEGER, SAVE :: Start_year, Start_month, Start_day, End_year, End_month, End_day
       INTEGER, SAVE :: Transp_flag, Sroff_flag, Solrad_flag, Et_flag
       INTEGER, SAVE :: Climate_temp_flag, Climate_precip_flag, Climate_potet_flag, Climate_transp_flag
-      INTEGER, SAVE :: Climate_irrigated_area_flag, Climate_aet_flag
+      INTEGER, SAVE :: Climate_irrigated_area_flag, Aet_cbh_flag
       INTEGER, SAVE :: Lake_route_flag, Strmflow_flag, Stream_order_flag
       INTEGER, SAVE :: Temp_flag, Precip_flag, Climate_hru_flag, Climate_swrad_flag
       INTEGER, SAVE :: Precip_combined_flag, Temp_combined_flag, Muskingum_flag
@@ -790,7 +790,7 @@
       Aet_module = ' '
       IF ( control_string(Aet_module, 'aet_module')/=0 ) CALL read_error(5, 'aet_module')
       IF ( Irrigation_area_module(:11)=='climate_hru' ) Climate_irrigated_area_flag = ON
-      IF ( Aet_module(:11)=='climate_hru' ) Climate_aet_flag = ON
+      IF ( Aet_module(:11)=='climate_hru' ) Aet_cbh_flag = ON
  
 
       IF ( Parameter_check_flag>0 ) CALL check_module_names(Inputerror_flag)
@@ -801,7 +801,7 @@
       Climate_potet_flag = OFF
       Climate_swrad_flag = OFF
       Climate_irrigated_area_flag = OFF
-      Climate_aet_flag = OFF
+      Aet_cbh_flag = OFF
 
       IF ( Precip_module(:11)=='precip_1sta' .OR. Precip_module(:11)=='precip_prms') THEN
         Precip_flag = precip_1sta_module
@@ -928,7 +928,7 @@
       IF ( Climate_temp_flag==ON .OR. Climate_precip_flag==ON .OR. Climate_potet_flag==ON .OR. &
      &     Climate_swrad_flag==ON .OR. Climate_transp_flag==ON .OR. &
      &     Humidity_cbh_flag==ON .OR. Windspeed_cbh_flag==ON .OR. &
-     &     Climate_irrigated_area_flag==ON .OR. Climate_aet_flag==ON .OR. &
+     &     Climate_irrigated_area_flag==ON .OR. Aet_cbh_flag==ON .OR. &
      &     Gwflow_cbh_flag==1 .OR. Snow_cbh_flag==1 ) Climate_hru_flag = ON
 
       Muskingum_flag = OFF

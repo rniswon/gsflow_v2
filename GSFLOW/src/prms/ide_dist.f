@@ -118,14 +118,16 @@
       IF ( declparam(MODNAME, 'hru_x', 'nhru', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
      +     'X for each HRU (albers)',
-     +     'Longitude (X) for each HRU in albers projection',
+     +     'Longitude (X) of each HRU for the centroid in albers'//
+     +     ' projection',
      +     'meters')/=0 ) CALL read_error(1, 'hru_x')
 
       ALLOCATE ( Hru_y(Nhru) )
       IF ( declparam(MODNAME, 'hru_y', 'nhru', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
      +     'Y for each HRU (albers)',
-     +     'Latitude (Y) for each HRU in albers projection',
+     +     'Latitude (Y) of each HRU for the centroid in albers'//
+     +     ' projection',
      +     'meters')/=0 ) CALL read_error(1, 'hru_y')
 
       ALLOCATE ( Tsta_x(Ntemp) )
@@ -229,8 +231,7 @@
      +     'Precipitation is rain if HRU max temperature >= this value',
      +     'Monthly (January to December) maximum air temperature'//
      +     ' when precipitation is assumed to be rain; if'//
-     +     ' precipitation measurement station air'//
-     +     ' temperature is greater than or equal to this value,'//
+     +     ' air temperature is greater than or equal to this value,'//
      +     ' precipitation is rain',
      +     'temp_units')/=0 ) CALL read_error(1, 'tmax_allrain_sta')
 
@@ -240,8 +241,7 @@
      +     'Maximum temperature when precipitation is all snow',
      +     'Monthly (January to December) maximum air temperature'//
      +     ' when precipitation is assumed to be snow; if'//
-     +     ' precipitation measurement station air'//
-     +     ' temperature is less than or equal to this value,'//
+     +     ' air temperature is less than or equal to this value,'//
      +     ' precipitation is snow',
      +     'temp_units')/=0 ) CALL read_error(1, 'tmax_allsnow_sta')
 

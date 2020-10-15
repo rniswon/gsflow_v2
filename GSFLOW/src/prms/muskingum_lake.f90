@@ -347,7 +347,7 @@
      &       'cfs', Lake_interflow)/=0 ) CALL read_error(3, 'lake_interflow')
         ALLOCATE ( Lake_gwflow(Nlake) )
         IF ( declvar(MODNAME, 'lake_gwflow', 'nlake', Nlake,'double', &
-     &       'Total groundflow into each lake', &
+     &       'Total groundwater flow into each lake', &
      &       'cfs', Lake_gwflow)/=0 ) CALL read_error(3, 'lake_gwflow')
       ENDIF
 

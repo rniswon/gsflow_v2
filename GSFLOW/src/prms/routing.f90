@@ -120,7 +120,7 @@
      &     'cfs', Flow_headwater)/=0 ) CALL read_error(3, 'flow_headwater')
 
       IF ( declvar(MODNAME, 'flow_in_great_lakes', 'one', 1, 'double', &
-     &     'Total flow out into model domain from Great Lakes (segment_type=10)', &
+     &     'Total flow into model domain from Great Lakes (segment_type=10)', &
      &     'cfs', Flow_in_great_lakes)/=0 ) CALL read_error(3, 'flow_in_great_lakes')
 
       IF ( declvar(MODNAME, 'flow_replacement', 'one', 1, 'double', &
@@ -152,7 +152,7 @@
         IF ( declparam(MODNAME, 'seg_depth', 'nsegment', 'real', &
      &       '1.0', '0.03', '250.0', &
      &       'Segment river depth', &
-     &       'Segment river depth at bankfull, shallowest from Blackburn-Lynch 2017,'//&
+     &       'Segment river depth at bankfull; shallowest depth from Blackburn-Lynch (2017);'//&
      &       'Congo is deepest at 250 m but in the US it is probably the Hudson at 66 m', &
      &       'meters')/=0 ) CALL read_error(1, 'seg_depth')
       ENDIF
@@ -177,11 +177,9 @@
      &     'none')/=0 ) CALL read_error(1, 'segment_type')
 
       ! user updated values if different than tosegment_orig
-      ! -5 = outbound from NHM; -6 = inbound from region; -7 = outbound from region;
-      ! -8 = drains to ocean; -11 = drains to Great Lake
       ALLOCATE ( Tosegment(Nsegment) )
       IF ( declparam(MODNAME, 'tosegment', 'nsegment', 'integer', &
-     &     '0', '-11', '1000000', &
+     &     '0', '0', '9999999', &
      &     'The index of the downstream segment', &
      &     'Index of downstream segment to which the segment'// &
      &     ' streamflow flows, for segments that do not flow to another segment enter 0', &
@@ -251,7 +249,7 @@
      &       'inches', Basin_segment_storage)/=0 ) CALL read_error(3, 'basin_segment_storage')
         ALLOCATE ( Segment_delta_flow(Nsegment) )
         IF ( declvar(MODNAME, 'segment_delta_flow', 'nsegment', Nsegment, 'double', &
-     &       'Cummulative flow in minus flow out for each stream segment', &
+     &       'Cumulative flow in minus flow out for each stream segment', &
      &       'cfs', Segment_delta_flow)/=0 ) CALL read_error(3, 'segment_delta_flow')
       ENDIF
 

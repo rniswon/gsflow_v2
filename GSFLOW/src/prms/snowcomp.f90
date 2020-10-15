@@ -170,7 +170,7 @@
 ! Glacier declares
       IF ( Glacier_flag==ON .OR. Model==DOCUMENTATION ) THEN
         IF ( declvar(MODNAME, 'yrdays5', 'one', 1, 'integer', &
-     &     'Number of days since last 5 year mark', &
+     &     'Number of days since last 5-year mark', &
      &     'none', Yrdays5)/=0 ) CALL read_error(3, 'yrdays5')
 
         ALLOCATE ( Glacr_freeh2o_capm(Nhru) )
@@ -185,37 +185,37 @@
 
         ALLOCATE ( Ann_tempc(Nhru) )
         IF ( declvar(MODNAME, 'ann_tempc', 'nhru', Nhru, 'real', &
-     &       'Current average year air temperature overs HRU', &
+     &       'Current average year air temperature over each HRU', &
      &       'degrees Celsius', Ann_tempc)/=0 ) CALL read_error(3, 'ann_tempc')
 
        ALLOCATE ( Glacr_air_5avtemp(Nhru) )
         IF ( declvar(MODNAME, 'glacr_air_5avtemp', 'nhru', Nhru, 'real', &
-     &       'Current 5-yr average summer (June July Aug) air temperature over glacier or glrette HRU', &
+     &       'Current 5-yr average summer (June July Aug) air temperature over glacier or glacierette HRUs', &
      &       'degrees Celsius', Glacr_air_5avtemp)/=0 ) CALL read_error(3, 'glacr_air_5avtemp')
 
         ALLOCATE ( Glacr_air_5avtemp1(Nhru) )
         IF ( declvar(MODNAME, 'glacr_air_5avtemp1', 'nhru', Nhru, 'real', &
-     &       'First 5-yr average summer temperature over glacier or glrette HRU', &
+     &       'First 5-yr average summer temperature over glacier or glacierette HRUs', &
      &       'degrees Celsius', Glacr_air_5avtemp1)/=0 ) CALL read_error(3, 'glacr_air_5avtemp1')
 
         ALLOCATE ( Glacr_air_deltemp(Nhru) )
         IF ( declvar(MODNAME, 'glacr_air_deltemp', 'nhru', Nhru, 'real', &
-     &       'Change in 5-yr average air temperature over glacier or glrette HRU from first', &
+     &       'Change in 5-yr average air temperature over glacier or glacierette HRUs from first', &
      &       'degrees Celsius', Glacr_air_deltemp)/=0 ) CALL read_error(3, 'glacr_air_deltemp')
 
        ALLOCATE ( Glacr_5avsnow(Nhru) )
         IF ( declvar(MODNAME, 'glacr_5avsnow', 'nhru', Nhru, 'real', &
-     &       'Current 5-yr average snow over glacier or glrette HRU', &
+     &       'Current 5-yr average snow over glacier or glacierette HRUs', &
      &       'inches/yr', Glacr_5avsnow)/=0 ) CALL read_error(3, 'glacr_5avsnow')
 
         ALLOCATE ( Glacr_5avsnow1(Nhru) )
         IF ( declvar(MODNAME, 'glacr_5avsnow1', 'nhru', Nhru, 'real', &
-     &       'First 5-yr average snow over glacier or glrette HRU', &
+     &       'First 5-yr average snow over glacier or glacierette HRUs', &
      &       'inches/yr', Glacr_5avsnow1)/=0 ) CALL read_error(3, 'glacr_5avsnow1')
 
         ALLOCATE ( Glacr_delsnow(Nhru) )
         IF ( declvar(MODNAME, 'glacr_delsnow', 'nhru', Nhru, 'real', &
-     &       'Change in 5-yr average snow over glacier or glrette HRU from first', &
+     &       'Change in 5-yr average snow over glacier or glacierette HRUs from first', &
      &       'inches/yr', Glacr_delsnow)/=0 ) CALL read_error(3, 'glacr_delsnow')
 
         ALLOCATE ( Glacr_pk_temp(Nhru) )
@@ -230,7 +230,7 @@
 
         ALLOCATE ( Glacr_pk_den(Nhru) )
         IF ( declvar(MODNAME, 'glacr_pk_den', 'nhru', Nhru, 'real', &
-     &       'Density of the icepack on each glacier HRU, hard-coded to equal 0.917', &
+     &       'Density of the icepack on each glacier HRU, hard coded to equal 0.917', &
      &       'gm/cm3', Glacr_pk_den)/=0 ) CALL read_error(3, 'glacr_pk_den')
 
         ALLOCATE ( Glacr_albedo(Nhru) )
@@ -285,11 +285,11 @@
 
         ALLOCATE ( Glacr_pst(Nhru) )
         IF ( declvar(MODNAME, 'glacr_pst', 'nhru', Nhru, 'double', &
-     &       'While a icepack exists, glacr_pst tracks the maximum ice water equivalent of that icepack', &
+     &       'While an icepack exists, glacr_pst tracks the maximum ice water equivalent of that icepack', &
      &       'inches', Glacr_pst)/=0 ) CALL read_error(3, 'glacr_pst')
 
         IF ( declvar(MODNAME, 'basin_snowicecov', 'one', 1, 'double', &
-     &       'Basin area-weighted average snow and glacier and glrette covered area', &
+     &       'Basin area-weighted average snow and glacier and glacierette covered area', &
      &       'decimal fraction', Basin_snowicecov)/=0 ) CALL read_error(3, 'basin_snowicecov')
 
         ALLOCATE ( Glacr_freeh2o_cap(Nhru) )
@@ -312,8 +312,8 @@
           ALLOCATE ( Glacier_frac_init(Nhru) )
           IF ( declparam(MODNAME, 'glacier_frac_init', 'nhru', 'real', &
      &       '0.0', '0.0', '1.0', &
-     &       'Inital fraction of glaciation (0=none; 1=100%)', &
-     &       'Inital fraction of glaciation (0=none; 1=100%)', &
+     &       'Initial fraction of glaciation (0=none; 1=100%)', &
+     &       'Initial fraction of glaciation (0=none; 1=100%)', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'glacier_frac_init')
 
           ALLOCATE ( Glrette_frac_init(Nhru) )

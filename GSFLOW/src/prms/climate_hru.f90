@@ -10,7 +10,7 @@
         USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Climate_transp_flag, Orad_flag, &
      &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
      &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
-     &    Climate_irrigated_area_flag, Climate_aet_flag
+     &    Climate_irrigated_area_flag, Aet_cbh_flag
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
@@ -20,7 +20,7 @@
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit, Aet_unit, Irrigated_area_unit
         ! Control Parameters
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Tmin_day, Tmax_day, Precip_day, Potet_day, Swrad_day, Transp_day
-        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Humidity_day, Windspeed_day
+        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Humidity_day, Windspeed_day, Aet_file
         INTEGER, SAVE :: Cbh_check_flag, Cbh_binary_flag
         ! Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_windspeed, Basin_aet_external, Basin_irrigated_area
@@ -118,12 +118,13 @@
           Basin_potet = 0.0D0
         ENDIF
 
-        IF ( Climate_aet_flag==ON ) THEN
+        IF ( Aet_cbh_flag==ON ) THEN
           IF ( Cbh_binary_flag==OFF ) THEN
             READ ( Aet_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Aet_external(i), i=1,Nhru)
           ELSE
             READ ( Aet_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Aet_external(i), i=1,Nhru)
           ENDIF
+          Aet_external = Aet_external*0.25 ! temporary testing value
           IF ( ios/=0 ) THEN
             ierr = 1
           ELSEIF ( Cbh_check_flag==ON ) THEN
@@ -215,7 +216,7 @@
             CALL check_cbh_value('tminf', Tminf, MINTEMP, MAXTEMP, missing)
           ENDIF
           IF ( Climate_potet_flag==ON ) CALL check_cbh_value('potet', Potet, 0.0, 50.0, missing)
-          IF ( Climate_aet_flag==ON ) CALL check_cbh_value('aet_external', Aet_external, 0.0, 50.0, missing)
+          IF ( Aet_cbh_flag==ON ) CALL check_cbh_value('aet_external', Aet_external, 0.0, 50.0, missing)
           IF ( Climate_irrigated_area_flag==ON ) CALL check_cbh_value('irrigated_area', Irrigated_area, 0.0, 9999.0, missing)
           IF ( Climate_swrad_flag==ON ) CALL check_cbh_value('swrad', Swrad, 0.0, 1000.0, missing)
           IF ( Climate_transp_flag==ON ) CALL check_cbh_intvalue('transp_on', Transp_on, 0, 1, missing)
@@ -273,7 +274,7 @@
           IF ( Climate_swrad_flag==ON ) Basin_swrad = Basin_swrad + DBLE( Swrad(i)*harea )
           IF ( Humidity_cbh_flag==ON ) Basin_humidity = Basin_humidity + DBLE( Humidity_hru(i)*harea )
           IF ( Windspeed_cbh_flag==ON ) Basin_windspeed = Basin_windspeed + DBLE( Windspeed_hru(i)*harea )
-          IF ( Climate_aet_flag==ON ) Basin_aet_external = Basin_aet_external + DBLE( Aet_external(i)*harea )
+          IF ( Aet_cbh_flag==ON ) Basin_aet_external = Basin_aet_external + DBLE( Aet_external(i)*harea )
           IF ( Climate_irrigated_area_flag==ON ) Basin_irrigated_area = Basin_irrigated_area + DBLE( Irrigated_area(i)*harea )
         ENDDO
 
@@ -305,8 +306,9 @@
         ENDIF
         IF ( Humidity_cbh_flag==ON ) Basin_humidity = Basin_humidity*Basin_area_inv
         IF ( Windspeed_cbh_flag==ON ) Basin_windspeed = Basin_windspeed*Basin_area_inv
-        IF ( Climate_aet_flag==ON ) Basin_aet_external = Basin_aet_external*Basin_area_inv
+        IF ( Aet_cbh_flag==ON ) Basin_aet_external = Basin_aet_external*Basin_area_inv
         IF ( Climate_irrigated_area_flag==ON ) Basin_irrigated_area = Basin_irrigated_area*Basin_area_inv
+
       ELSEIF ( Process_flag==DECL ) THEN
 
         IF ( control_integer(Cbh_check_flag, 'cbh_check_flag')/=0 ) Cbh_check_flag = ON
@@ -339,7 +341,7 @@
      &         'meters/second', Windspeed_hru)/=0 ) CALL read_error(3, 'windspeed_hru')
         ENDIF
 
-        IF ( Climate_aet_flag==ON .OR. Model==DOCUMENTATION ) THEN
+        IF ( Aet_cbh_flag==ON .OR. Model==DOCUMENTATION ) THEN
           IF ( declvar(MODNAME, 'basin_aet_external', 'one', 1, 'double', &
      &         'Basin area-weighted average aet read from CBH File', &
      &         'inches', Basin_aet_external)/=0 ) CALL read_error(3, 'basin_aet_external')
@@ -477,6 +479,20 @@
             ENDIF
           ENDIF
         ENDIF
+
+       IF ( Climate_potet_flag==ON ) THEN
+          IF ( control_string(Aet_file, 'aet_file')/=0 ) CALL read_error(5, 'aet_file')
+          CALL find_header_end(Aet_unit, Aet_file, 'aet_file', ierr, 1, Cbh_binary_flag)
+          IF ( ierr==1 ) THEN
+            istop = 1
+          ELSE
+            CALL find_current_time(Aet_unit, Start_year, Start_month, Start_day, ierr, Cbh_binary_flag)
+            IF ( ierr==-1 ) THEN
+              PRINT *, 'for first time step, CBH File: ', Aet_file
+              istop = 1
+            ENDIF
+          ENDIF
+       ENDIF
 
         IF ( Climate_transp_flag==ON ) THEN
           IF ( control_string(Transp_day, 'transp_day')/=0 ) CALL read_error(5, 'transp_day')

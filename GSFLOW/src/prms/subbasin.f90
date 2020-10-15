@@ -206,7 +206,7 @@
 
       ALLOCATE ( Subinc_stor(Nsub) )
       IF ( declvar(MODNAME, 'subinc_stor', 'nsub', Nsub, 'double', &
-     &     'Area-weighted average total water content in storage reservoirs associated HRUs of each subbasin', &
+     &     'Area-weighted average total water content in storage reservoirs for associated HRUs of each subbasin', &
      &     'inches', subinc_stor)/=0 ) CALL read_error(3, 'subinc_stor')
 
       ALLOCATE ( Qsub(Nsub), Tree(Nsub, Nsub), Sub_inq(Nsub) )
@@ -413,7 +413,7 @@
       ENDDO
 
 ! allow for possible restart
-      !get cummulative subbasin flows
+      !get cumulative subbasin flows
       DO j = 1, Nsub
         IF ( GSFLOW_flag==OFF ) Sub_gwflow(j) = Subinc_gwflow(j)
         Sub_sroff(j) = Subinc_sroff(j)
@@ -588,7 +588,7 @@
      &                 dmy - dmy1 - dmy2 + Subinc_deltastor(j)
       ENDDO
 
-      !get cummulative subbasin flows
+      !get cumulative subbasin flows
       IF ( GSFLOW_flag==OFF ) Sub_gwflow = Subinc_gwflow
       DO j = 1, Nsub
         Sub_sroff(j) = Subinc_sroff(j)
