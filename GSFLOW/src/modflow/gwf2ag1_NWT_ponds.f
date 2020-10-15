@@ -3088,7 +3088,7 @@
         !1 - -----loop over HRUs irrigated by pond
         !
         do k = 1, NUMCELLSPOND(i)
-           hru_id = IRRHRU_POND(K, ipond)
+           hru_id = IRRHRU_POND(K, ipond)    !ponds are IDed as HRU_id
            area = HRU_PERV(hru_id)
            pet = potet(hru_id)*area*prms_inch2mf_q
            aet = hru_actet(hru_id)*area*prms_inch2mf_q
