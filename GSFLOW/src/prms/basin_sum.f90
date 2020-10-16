@@ -298,11 +298,11 @@
      &     'inches', Hru_et_yr)/=0 ) CALL read_error(3, 'hru_et_yr')
 
       IF ( declvar(MODNAME, 'basin_runoff_ratio_mo', 'one', 1, 'double', &
-     &     'Monthly area-weighted average discharge/precipitation', &
+     &     'Monthly area-weighted average discharge/precipitation ratio', &
      &     'decimal fraction', Basin_runoff_ratio_mo)/=0 ) CALL read_error(3, 'basin_runoff_ratio_mo')
 
       IF ( declvar(MODNAME, 'basin_runoff_ratio', 'one', 1, 'double', &
-     &     'Basin area-weighted average discharge/precipitation', &
+     &     'Basin area-weighted average discharge/precipitation ratio', &
      &     'decimal fraction', Basin_runoff_ratio)/=0 ) CALL read_error(3, 'basin_runoff_ratio')
 
       END FUNCTION sumbdecl

@@ -5,18 +5,20 @@
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, RUN, DECL, INIT, CLEAN, ON, OFF, &
      &    DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, DAILY, YEARLY, MONTHLY, &
      &    DOCUMENTATION, DBLE_TYPE, ERROR_control, ERROR_open_out, ERROR_control
-      USE PRMS_MODULE, ONLY: Process_flag, Model, Inputerror_flag, Start_year, Prms_warmup
+      USE PRMS_MODULE, ONLY: Process_flag, Model, Inputerror_flag, Start_year, Prms_warmup, BasinOutON_OFF, Nhru
       IMPLICIT NONE
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'basin_summary'
-      character(len=*), parameter :: Version_basin_summary = '2020-08-03'
+      character(len=*), parameter :: Version_basin_summary = '2020-10-07'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear, Dailyunit, Monthlyunit, Yearlyunit, Basin_var_type
       INTEGER, SAVE, ALLOCATABLE :: Nc_vars(:)
       CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2, Output_fmt3
       INTEGER, SAVE :: Daily_flag, Yeardays, Monthly_flag
       DOUBLE PRECISION, SAVE :: Monthdays
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Basin_var_daily(:), Basin_var_monthly(:), Basin_var_yearly(:)
+! Paramters
+      INTEGER, SAVE, ALLOCATABLE :: Nhm_id(:)
 ! Control Parameters
       INTEGER, SAVE :: BasinOutVars, BasinOut_freq
       CHARACTER(LEN=36), SAVE, ALLOCATABLE :: BasinOutVar_names(:)
@@ -53,7 +55,7 @@
       USE PRMS_BASIN_SUMMARY
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string
+      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string, declparam
       EXTERNAL read_error, print_module, error_stop
 ! Local Variables
       INTEGER :: i
@@ -76,6 +78,15 @@
         IF ( control_string(BasinOutBaseFileName, 'basinOutBaseFileName')/=0 ) CALL read_error(5, 'basinOutBaseFileName')
       ENDIF
 
+! Declared Parameters
+      IF ( BasinOutON_OFF==2 .OR. Model==DOCUMENTATION ) THEN
+        ALLOCATE ( Nhm_id(Nhru) )
+        IF ( declparam(MODNAME, 'nhm_id', 'nhru', 'integer', &
+     &       '1', '1', '9999999', &
+     &       'National Hydrologic Model HRU ID', 'National Hydrologic Model HRU ID', &
+     &       'none') /= 0 ) CALL read_error(1, 'nhm_id')
+      ENDIF
+
       END SUBROUTINE basin_summarydecl
 
 !***********************************************************************
@@ -85,7 +96,7 @@
       USE PRMS_BASIN_SUMMARY
       IMPLICIT NONE
       INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam
-      EXTERNAL :: PRMS_open_output_file, error_stop
+      EXTERNAL :: PRMS_open_output_file, error_stop, read_error
 ! Local Variables
       INTEGER :: ios, ierr, size, dum, jj
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
@@ -137,21 +148,28 @@
 
       WRITE ( Output_fmt2, 9002 ) BasinOutVars
 
+      IF ( BasinOutON_OFF==2 ) THEN
+        IF ( getparam(MODNAME, 'nhm_id', Nhru, 'integer', Nhm_id)/=0 ) CALL read_error(2, 'nhm_id')
+      ENDIF
+
       IF ( Daily_flag==ON ) THEN
         fileName = BasinOutBaseFileName(:numchars(BasinOutBaseFileName))//'.csv'
         CALL PRMS_open_output_file(Dailyunit, fileName, 'basin_summary, daily', 0, ios)
         IF ( ios/=0 ) CALL error_stop('in basin_summary, daily', ERROR_open_out)
+        IF ( BasinOutON_OFF==2 ) WRITE ( Dailyunit, '(A, 1X, I0)') 'nhm_id:', Nhm_id(1)
         WRITE ( Dailyunit, Output_fmt2 ) (BasinOutVar_names(jj)(:Nc_vars(jj)), jj=1, BasinOutVars)
       ENDIF
       IF ( BasinOut_freq==MEAN_YEARLY ) THEN
         fileName = BasinOutBaseFileName(:numchars(BasinOutBaseFileName))//'_meanyearly.csv'
         CALL PRMS_open_output_file(Yearlyunit, fileName, 'basin_summary, mean yearly', 0, ios)
         IF ( ios/=0 ) CALL error_stop('in basin_summary, mean yearly', ERROR_open_out)
+        IF ( BasinOutON_OFF==2 ) WRITE ( Yearlyunit, '(A, 1X, I0)') 'nhm_id:', Nhm_id(1)
         WRITE ( Yearlyunit, Output_fmt2 ) (BasinOutVar_names(jj)(:Nc_vars(jj)), jj=1, BasinOutVars)
       ELSEIF ( BasinOut_freq==MEAN_YEARLY ) THEN
         fileName = BasinOutBaseFileName(:numchars(BasinOutBaseFileName))//'_yearly.csv'
         CALL PRMS_open_output_file(Yearlyunit, fileName, 'basin_summary, yearly', 0, ios)
         IF ( ios/=0 ) CALL error_stop('in basin_summary, yearly', ERROR_open_out)
+        IF ( BasinOutON_OFF==2 ) WRITE ( Yearlyunit, '(A, 1X, I0)') 'nhm_id:', Nhm_id(1)
         WRITE ( Yearlyunit, Output_fmt2 ) (BasinOutVar_names(jj)(:Nc_vars(jj)), jj=1, BasinOutVars)
       ELSEIF ( Monthly_flag==1 ) THEN
         IF ( BasinOut_freq==MEAN_MONTHLY ) THEN
@@ -161,6 +179,7 @@
         ENDIF
         CALL PRMS_open_output_file(Monthlyunit, fileName, 'basin_summary, monthly', 0, ios)
         IF ( ios/=0 ) CALL error_stop('in basin_summary, monthly', ERROR_open_out)
+        IF ( BasinOutON_OFF==2 ) WRITE ( Monthlyunit, '(A, 1X, I0)') 'nhm_id:', Nhm_id(1)
         WRITE ( Monthlyunit, Output_fmt2 ) (BasinOutVar_names(jj)(:Nc_vars(jj)), jj=1, BasinOutVars)
       ENDIF
 

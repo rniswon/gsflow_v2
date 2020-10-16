@@ -93,7 +93,7 @@ MODULE PRMS_CONSTANTS
     ! seg_type
     integer, parameter :: OUTFLOW_SEGMENT = 0
 
-    ! soil_type
+    ! cascade flags
     integer, parameter :: CASCADE_OFF = 0
     integer, parameter :: CASCADE_NORMAL = 1
     integer, parameter :: CASCADE_HRU_SEGMENT = 2

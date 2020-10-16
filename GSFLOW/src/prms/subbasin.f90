@@ -19,7 +19,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'subbasin'
-      character(len=*), parameter :: Version_subbasin = '2020-08-13'
+      character(len=*), parameter :: Version_subbasin = '2020-10-07'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Qsub(:), Sub_area(:), Laststor(:)
       INTEGER, SAVE, ALLOCATABLE :: Tree(:, :)
 !   Declared Variables
@@ -206,7 +206,7 @@
 
       ALLOCATE ( Subinc_stor(Nsub) )
       IF ( declvar(MODNAME, 'subinc_stor', 'nsub', Nsub, 'double', &
-     &     'Area-weighted average total water content in storage reservoirs associated HRUs of each subbasin', &
+     &     'Area-weighted average total water content in storage reservoirs for associated HRUs of each subbasin', &
      &     'inches', subinc_stor)/=0 ) CALL read_error(3, 'subinc_stor')
 
       ALLOCATE ( Qsub(Nsub), Tree(Nsub, Nsub), Sub_inq(Nsub) )
@@ -413,7 +413,7 @@
       ENDDO
 
 ! allow for possible restart
-      !get cummulative subbasin flows
+      !get cumulative subbasin flows
       DO j = 1, Nsub
         IF ( GSFLOW_flag==OFF ) Sub_gwflow(j) = Subinc_gwflow(j)
         Sub_sroff(j) = Subinc_sroff(j)
@@ -469,30 +469,27 @@
 !   Daily time step.
 !   Compute reservoir routing and basin outflow
 
-      !rsr, not getting groundwater storage and flow for GSFLOW mode
-
-      DO j = 1, Nsub
-        Qsub(j) = 0.0D0
-        Sub_inq(j) = 0.0D0
-        Subinc_interflow(j) = 0.0D0
-        Subinc_sroff(j) = 0.0D0
-        Subinc_precip(j) = 0.0D0
-        Subinc_rain(j) = 0.0D0
-        Subinc_snow(j) = 0.0D0
-        Subinc_snowmelt(j) = 0.0D0
-        Subinc_pkweqv(j) = 0.0D0
-        Subinc_actet(j) = 0.0D0
-        Subinc_snowcov(j) = 0.0D0
-        Subinc_swrad(j) = 0.0D0
-        Subinc_tminc(j) = 0.0D0
-        Subinc_tmaxc(j) = 0.0D0
-        Subinc_tavgc(j) = 0.0D0
-        Subinc_potet(j) = 0.0D0
-        Subinc_wb(j) = 0.0D0
-        Subinc_recharge(j) = 0.0D0
-        Subinc_szstor_frac(j) = 0.0D0
-        Subinc_capstor_frac(j) = 0.0D0
-      ENDDO
+      Qsub = 0.0D0
+      Subinc_interflow = 0.0D0
+      Subinc_sroff = 0.0D0
+      Subinc_precip = 0.0D0
+      Subinc_rain = 0.0D0
+      Subinc_snow = 0.0D0
+      Subinc_snowmelt = 0.0D0
+      Subinc_pkweqv = 0.0D0
+      Subinc_actet = 0.0D0
+      Subinc_snowcov = 0.0D0
+      Subinc_swrad = 0.0D0
+      Subinc_tminc = 0.0D0
+      Subinc_tmaxc = 0.0D0
+      Subinc_tavgc = 0.0D0
+      Subinc_potet = 0.0D0
+      Subinc_wb = 0.0D0
+      Subinc_recharge = 0.0D0
+      Subinc_deltastor = 0.0D0
+      Subinc_recharge = 0.0D0
+      Subinc_szstor_frac = 0.0D0
+      Subinc_capstor_frac = 0.0D0
       IF ( GSFLOW_flag==OFF ) Subinc_gwflow = 0.0D0
 
       Laststor = Subinc_stor
@@ -591,7 +588,7 @@
      &                 dmy - dmy1 - dmy2 + Subinc_deltastor(j)
       ENDDO
 
-      !get cummulative subbasin flows
+      !get cumulative subbasin flows
       IF ( GSFLOW_flag==OFF ) Sub_gwflow = Subinc_gwflow
       DO j = 1, Nsub
         Sub_sroff(j) = Subinc_sroff(j)
