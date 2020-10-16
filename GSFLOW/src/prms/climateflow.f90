@@ -439,7 +439,7 @@
 
       ALLOCATE ( Recharge(Nhru) )
       IF ( declvar(Soilzone_module, 'recharge', 'nhru', Nhru, 'real', &
-     &     'Recharge to the associated GWR as sum of soil_to_gw, ssr_to_gw, and dprst_seep_hru for each HRU', &
+     &     'Recharge to the associated GWR as the sum of soil_to_gw, ssr_to_gw, and dprst_seep_hru for each HRU', &
      &     'inches', Recharge)/=0 ) CALL read_error(3, 'recharge')
 
 ! gwflow
@@ -600,7 +600,7 @@
         ALLOCATE ( Hru_tsta(Nhru) )
         IF ( declparam(Temp_module, 'hru_tsta', 'nhru', 'integer', &
      &       '0', 'bounded', 'ntemp', &
-     &       'Index of base temperature station for HRU', &
+     &       'Index of base temperature station for each HRU', &
      &       'Index of the base temperature station used for lapse rate calculations', &
      &       'none')/=0 ) CALL read_error(1, 'hru_tsta')
       ENDIF

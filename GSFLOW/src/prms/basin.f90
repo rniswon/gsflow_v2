@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2020-09-14'
+      character(len=*), parameter :: Version_basin = '2020-10-09'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -210,7 +210,7 @@
       ALLOCATE ( Cov_type(Nhru) )
       IF ( declparam(MODNAME, 'cov_type', 'nhru', 'integer', &
      &     '3', '0', '4', &
-     &     'Cover type designation for HRU', &
+     &     'Cover type designation for each HRU', &
      &     'Vegetation cover type for each HRU (0=bare soil;'// &
      &     ' 1=grasses; 2=shrubs; 3=trees; 4=coniferous)', &
      &     'none')/=0 ) CALL read_error(1, 'cov_type')
@@ -269,7 +269,7 @@
 ! Local Variables
       CHARACTER(LEN=69) :: buffer
       INTEGER :: i, j, dprst_frac_flag, lakeid
-      REAL :: harea
+      REAL :: harea, perv_area
       DOUBLE PRECISION :: basin_imperv, basin_perv, basin_dprst, harea_dble
 !**********************************************************************
       basinit = 0
@@ -351,6 +351,7 @@
         harea_dble = DBLE( harea )
         Hru_area_dble(i) = harea_dble
         Totarea = Totarea + harea_dble
+        perv_area = harea
 
         IF ( Hru_type(i)==INACTIVE ) CYCLE
 ! ????????? need to fix for lakes with multiple HRUs and PRMS lake routing ????????
@@ -408,24 +409,15 @@
         IF ( Hru_type(i)==LAKE ) CYCLE
 
         IF ( Hru_percent_imperv(i)>0.0 ) THEN
-          IF ( Hru_percent_imperv(i)>0.999 ) THEN
-            PRINT *, 'ERROR, Hru_percent_imperv > 0.999 for HRU:', i, ', value:', Hru_percent_imperv(i)
-            basinit = 1
-          ENDIF
           Hru_imperv(i) = Hru_percent_imperv(i)*harea
-          Hru_perv(i) = harea - Hru_imperv(i)
           basin_imperv = basin_imperv + DBLE( Hru_imperv(i) )
+          perv_area = perv_area - Hru_imperv(i)
         ENDIF
 
         IF ( Dprst_flag==ON ) THEN
           IF ( dprst_frac_flag==1 .OR. PRMS4_flag==OFF ) THEN
             Dprst_area_max(i) = Dprst_frac(i)*harea
           ELSE
-            IF ( Dprst_area(i)>0.999*harea ) THEN
-              PRINT *, 'ERROR, dprst_area > 0.999*hru_area for HRU:', i, ', value:', Dprst_area(i)
-              PRINT *, '       hru_area:', harea, '; fraction', 0.999*harea
-              basinit = 1
-            ENDIF
             Dprst_area_max(i) = Dprst_area(i)
             Dprst_frac(i) = Dprst_area_max(i)/harea
           ENDIF
@@ -433,22 +425,25 @@
             Dprst_area_open_max(i) = Dprst_area_max(i)*Dprst_frac_open(i)
             Dprst_frac_clos(i) = 1.0 - Dprst_frac_open(i)
             Dprst_area_clos_max(i) = Dprst_area_max(i) - Dprst_area_open_max(i)
-            IF ( Hru_percent_imperv(i)+Dprst_frac(i)>0.999 ) THEN
-              PRINT *, 'ERROR, impervious plus depression fraction > 0.999 for HRU:', i
-              PRINT *, '       value:', Hru_percent_imperv(i) + Dprst_frac(i)
-              basinit = 1
-            ENDIF
-            Hru_perv(i) = harea - Hru_imperv(i) - Dprst_area_max(i)
+            basin_dprst = basin_dprst + DBLE( Dprst_area_max(i) )
+            IF ( Dprst_area_clos_max(i)>0.0 ) Dprst_clos_flag = ON
+            IF ( Dprst_area_open_max(i)>0.0 ) Dprst_open_flag = ON
+            perv_area = perv_area - Dprst_area_max(i)
           ENDIF
         ENDIF
 
+        Hru_perv(i) = perv_area
+        Hru_frac_perv(i) = perv_area/harea
+        IF ( Hru_frac_perv(i)<0.001 ) THEN
+          PRINT *, 'ERROR, pervious fraction must be >= 0.001 for HRU:', i
+          PRINT *, '       pervious portion is HRU fraction - impervious fraction - depression fraction'
+          PRINT *, '       pervious fraction:', Hru_frac_perv(i)
+          PRINT *, '       impervious fraction:', Hru_percent_imperv(i)
+          IF ( Dprst_flag==ON ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
+          basinit = 1
+        ENDIF
         Hru_frac_perv(i) = Hru_perv(i)/harea
         basin_perv = basin_perv + DBLE( Hru_perv(i) )
-        IF ( Dprst_flag==ON ) THEN
-          basin_dprst = basin_dprst + DBLE( Dprst_area_max(i) )
-          IF ( Dprst_area_clos_max(i)>0.0 ) Dprst_clos_flag = ON
-          IF ( Dprst_area_open_max(i)>0.0 ) Dprst_open_flag = ON
-        ENDIF
       ENDDO
       IF ( Dprst_flag==ON .AND. PRMS4_flag==ON ) DEALLOCATE ( Dprst_area )
 
