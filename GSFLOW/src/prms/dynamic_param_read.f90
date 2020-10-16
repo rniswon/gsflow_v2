@@ -110,7 +110,7 @@
         ENDIF
       ENDIF
 
-      IF ( Dyn_imperv_flag>OFF ) THEN
+      IF ( Dyn_imperv_flag>1 ) THEN
         IF ( control_string(imperv_stor_dynamic, 'imperv_stor_dynamic')/=0 ) CALL read_error(5, 'imperv_stor_dynamic')
         CALL find_header_end(Imperv_stor_unit, imperv_stor_dynamic, 'imperv_stor_dynamic', ierr, 0, 0)
         IF ( ierr==0 ) THEN
@@ -302,7 +302,7 @@
         ENDIF
       ENDIF
 
-      IF ( Dyn_soil_flag>OFF ) THEN
+      IF ( Dyn_soil_flag>1 ) THEN
         IF ( PRMS4_flag==OFF ) ALLOCATE ( Soil_rechr_max_frac(Nhru) )
         IF ( control_string(soilrechr_dynamic, 'soilrechr_dynamic')/=0 ) CALL read_error(5, 'soilrechr_dynamic')
         CALL find_header_end(Soil_rechr_unit, soilrechr_dynamic, 'soilrechr_dynamic', ierr, 0, 0)
