@@ -18,9 +18,6 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\GSFLOW\src\mmf\alloc_space.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\GSFLOW\src\mmf\batch_run.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -169,6 +166,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\GSFLOW\src\mmf\write_vstats.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GSFLOW\src\mmf\alloc_space.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

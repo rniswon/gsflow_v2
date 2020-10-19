@@ -8,7 +8,7 @@ Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "gsflow_develop", "gsflow_de
 		{9E8144B7-970A-436B-8BEC-AD857C3D7D89} = {9E8144B7-970A-436B-8BEC-AD857C3D7D89}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mmf", "..\mmf_5\mmf.vcxproj", "{9E8144B7-970A-436B-8BEC-AD857C3D7D89}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mmf", "..\mmf\mmf.vcxproj", "{9E8144B7-970A-436B-8BEC-AD857C3D7D89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
