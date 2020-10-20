@@ -1074,7 +1074,7 @@
       ! check parameters
       DO i = 1, Nhru
         IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE ) CYCLE
-        ! hru_type = 1 or 3
+        ! hru_type = 1 or 3 or 4
         IF ( Soil_moist_max(i)<0.00001 ) THEN
           IF ( Parameter_check_flag>0 ) THEN
             PRINT 9006, i, Soil_moist_max(i)

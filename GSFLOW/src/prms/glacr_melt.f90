@@ -167,15 +167,15 @@
      &     'decimal fraction', Hru_slope_ts)/=0 ) CALL read_error(3, 'hru_slope_ts')
 
       IF ( declvar(MODNAME, 'basin_gl_top_melt', 'one', 1, 'double',     &
-     &     'Basin area-weighted glacier surface melt (snow, ice and rain) coming out of termini of all glaciers and glrettes', &
+     &     'Basin area-weighted glacier surface melt (snow, ice and rain) coming out of termini of all glaciers and glacierettes', &
      &     'inches', Basin_gl_top_melt)/=0 ) CALL read_error(3, 'basin_gl_top_melt')
 
       IF ( declvar(MODNAME, 'basin_gl_top_gain', 'one', 1, 'double', &
-     &     'Basin area-weighted glacier surface gain (snow and rain minus evap) for all glaciers and glrettes', &
+     &     'Basin area-weighted glacier surface gain (snow and rain minus evaporation) for all glaciers and glacierettes', &
      &     'inches', Basin_gl_top_gain)/=0 ) CALL read_error(3, 'basin_gl_top_gain')
 
       IF ( declvar(MODNAME, 'basin_gl_ice_melt', 'one', 1, 'double',    &
-     &     'Basin area-weighted glacier ice (firn) melt coming out of termini of all glaciers and glrettes', &
+     &     'Basin area-weighted glacier ice (firn) melt coming out of termini of all glaciers and glacierettes', &
      &     'inches', Basin_gl_ice_melt)/=0 ) CALL read_error(3, 'basin_gl_ice_melt')
 
       ALLOCATE ( Gl_mb_yrcumul(Nhru) )
@@ -219,17 +219,17 @@
 
       ALLOCATE ( Top_tag(Nhru) )
       IF ( declvar(MODNAME, 'top_tag', 'nhru', Nhru, 'integer',         &
-     &     'Identifies which glacier top this HRU is fed by. If =-1, then has multiple feeders', &
+     &     'Identifies which glacier top each HRU is fed by. If =-1, then has multiple feeders', &
      &     'none', Top_tag)/=0 ) CALL read_error(3, 'top_tag')
 
       ALLOCATE ( Glacr_tag(Nhru) )
       IF ( declvar(MODNAME, 'glacr_tag', 'nhru', Nhru, 'integer',       &
-     &     'Identifies which glacier this HRU belongs to',              &
+     &     'Identifies which glacier each HRU belongs to',              &
      &     'none', Glacr_tag)/=0 ) CALL read_error(3, 'glacr_tag')
 
       ALLOCATE ( Prev_area(Nhru) )
       IF ( declvar(MODNAME, 'prev_area', 'nhru', Nhru, 'double',        &
-     &     'Previous year glacier-covered area above this HRU where all branches of the glacier are included', &
+     &     'Previous year glacier-covered area above each HRU where all branches of the glacier are included', &
      &     'inches squared', Prev_area)/=0 ) CALL read_error(3, 'prev_area')
 
       ALLOCATE ( Prev_vol(Nhru) )
@@ -249,7 +249,7 @@
 
       ALLOCATE ( Order_flowline(Nhru) )
       IF ( declvar(MODNAME, 'order_flowline', 'nhru', Nhru, 'integer',  &
-     &     'Order flowlines belong together as glaciers, Ntp of these', &
+     &     'Order of flowlines that belong together as glaciers, Ntp of these', &
      &     'none', Order_flowline)/=0 ) CALL read_error(3, 'order_flowline')
 
       ALLOCATE ( Ode_glacrva_coef(Nhru) )
@@ -319,7 +319,7 @@
 
       ALLOCATE ( Basal_slope(Nhru) )
       IF ( declvar(MODNAME, 'basal_slope', 'nhru', Nhru, 'real',        &
-     &     'Glacier basal slope down flowline mean over HRU', &
+     &     'Glacier basal slope down flowline mean over each HRU', &
      &     'decimal fraction', Basal_slope)/=0 ) CALL read_error(3, 'basal_slope')
 
       ALLOCATE ( Av_basal_slope(Nhru) )
@@ -380,14 +380,14 @@
       IF ( declparam(MODNAME, 'glacrva_coef', 'nhru', 'real', &
            '0.28', '0.01', '2.0', &
            'Volume area scaling coefficient for glaciers with Luthi 2009', &
-           'Volume area scaling coefficient for glaciers make average by region', &
+           'Volume area scaling coefficient for glaciers, average value by region', &
            'm**(3-2*glacrva_exp)')/=0 ) CALL read_error(1, 'glacrva_coef')
 
       ALLOCATE ( Glacrva_exp(Nhru) )
       IF ( declparam(MODNAME, 'glacrva_exp', 'nhru', 'real', &
            '1.375', '1.0', '2.0', &
            'Volume area exponential coefficient for glaciers', &
-           'Volume area exponential coefficient for glaciers make average by region', &
+           'Volume area exponential coefficient for glaciers, average value by region', &
            'none')/=0 ) CALL read_error(1, 'glacrva_exp')
 
       ALLOCATE ( Stor_ice(Nhru,MONTHS_PER_YEAR) )

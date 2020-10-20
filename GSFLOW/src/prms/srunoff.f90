@@ -32,7 +32,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2020-09-22'
+      character(len=*), parameter :: Version_srunoff = '2020-10-08'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -324,8 +324,8 @@
 
         IF ( declparam(MODNAME, 'cfgi_decay', 'one', 'real', &
      &       '0.97', '0.01', '1.0', &
-     &       'CFGI daily decay of index, value of 1.0 is no decay', &
-     &       'CFGI daily decay of index, value of 1.0 is no decay', &
+     &       'CFGI daily decay of index; value of 1.0 is no decay', &
+     &       'CFGI daily decay of index; value of 1.0 is no decay', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'cfgi_decay')
 
         IF ( declparam(MODNAME, 'cfgi_thrshld', 'one', 'real', &
@@ -631,7 +631,7 @@
       EXTERNAL :: imperv_et, compute_infil, run_cascade_sroff, dprst_comp, perv_comp
 ! Local Variables
       INTEGER :: i, k, dprst_chk, frzen, active_glacier
-      REAL :: srunoff, avail_et, hperv, sra, availh2o
+      REAL :: srunoff, avail_et, perv_area, sra, availh2o
       DOUBLE PRECISION :: hru_sroff_down, runoff, apply_sroff, cfgi_sroff
       REAL :: cfgi_k, depth_cm !frozen ground
       REAL :: glcrmltb, temp, temp2 ! glaciers
@@ -692,6 +692,7 @@
       ENDIF
 
       dprst_chk = 0
+      Infil = 0.0
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 
@@ -720,9 +721,6 @@
 ! HRU is a lake
 !     eventually add code for lake area less than hru_area
 !     that includes soil_moist for fraction of hru_area that is dry bank
-          ! Sanity check
-!          IF ( Infil(i)+Sroff(i)+Imperv_stor(i)+Imperv_evap(i)>0.0 ) &
-!     &         PRINT *, 'srunoff lake ERROR', Infil(i), Sroff(i), Imperv_stor(i), Imperv_evap(i), i
           IF ( Cascade_flag>CASCADE_OFF ) THEN
             Hortonian_lakes(i) = Upslope_hortonian(i)
             Basin_hortonian_lakes = Basin_hortonian_lakes + Hortonian_lakes(i)*Hruarea_dble
@@ -730,8 +728,7 @@
           CYCLE
         ENDIF
 
-        Infil(i) = 0.0
-        hperv = Hru_perv(i)
+        perv_area = Hru_perv(i)
         Perv_frac = Hru_frac_perv(i)
         Srp = 0.0
         Sri = 0.0
@@ -789,7 +786,7 @@
             IF ( Hru_type(i)==LAND ) THEN
               CALL perv_comp(Net_apply(i), Net_apply(i), Infil(i), sra)
 ! ** ADD in water from irrigation application and water-use transfer for pervious portion - sra (if any)
-              apply_sroff = DBLE( sra*hperv )
+              apply_sroff = DBLE( sra*perv_area )
               Basin_apply_sroff = Basin_apply_sroff + apply_sroff
               runoff = runoff + apply_sroff
             ENDIF
@@ -830,7 +827,7 @@
         srunoff = 0.0
         IF ( Hru_type(i)==LAND .OR. active_glacier==OFF ) THEN ! could be an glacier-capable HRU with no ice
 !******Compute runoff for pervious and impervious area, and depression storage area
-          runoff = runoff + DBLE( Srp*hperv + Sri*Hruarea_imperv )
+          runoff = runoff + DBLE( Srp*perv_area + Sri*Hruarea_imperv )
           srunoff = SNGL( runoff/Hruarea_dble )
 
 !******Compute HRU weighted average (to units of inches/dt)
@@ -848,11 +845,11 @@
             ENDIF
           ENDIF
           Hru_sroffp(i) = Srp*Perv_frac
-          Basin_sroffp = Basin_sroffp + Srp*hperv
+          Basin_sroffp = Basin_sroffp + Srp*perv_area
         ENDIF
 
-        Basin_infil = Basin_infil + DBLE( Infil(i)*hperv )
-        Basin_contrib_fraction = Basin_contrib_fraction + DBLE( Contrib_fraction(i)*hperv )
+        Basin_infil = Basin_infil + DBLE( Infil(i)*perv_area )
+        Basin_contrib_fraction = Basin_contrib_fraction + DBLE( Contrib_fraction(i)*perv_area )
 
 !******Compute evaporation from impervious area
         IF ( frzen==OFF ) THEN
@@ -1605,6 +1602,7 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
+        WRITE ( Restart_outunit ) Basin_dprst_volop, Basin_dprst_volcl
         WRITE ( Restart_outunit ) Hru_impervstor
         IF ( Dprst_flag==ON ) THEN
           WRITE ( Restart_outunit ) Dprst_area_open
@@ -1620,6 +1618,7 @@
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
+        READ ( Restart_inunit ) Basin_dprst_volop, Basin_dprst_volcl
         READ ( Restart_inunit ) Hru_impervstor
         IF ( Dprst_flag==ON ) THEN
           READ ( Restart_inunit ) Dprst_area_open
