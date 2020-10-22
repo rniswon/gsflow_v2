@@ -646,7 +646,6 @@
       Grav_dunnian_flow = 0.0
       Soil_lower_ratio = 0.0
       Pref_flow_thrsh = 0.0
-      Pref_flow_stor = 0.0
       Pref_flow_max = 0.0
       Soil_lower = 0.0
       Soil_lower_stor_max = 0.0
@@ -672,12 +671,16 @@
           Soil_moist(i) = 0.0
           Ssres_stor(i) = 0.0
           Slow_stor(i) = 0.0
+          Pref_flow_stor(i) = 0.0
 !          Soil_rechr_ratio(i) = 0.0
+          Sat_threshold(i) = 0.0 ! allow modification of parameter value for lake and inactive HRUs
+          Pref_flow_den(i) = 0.0 ! allow modification of parameter value for lake and inactive HRUs
           CYCLE
         ENDIF
 
         IF ( Hru_type(i)==SWALE ) THEN ! swale
           Swale_limit(i) = 3.0*Sat_threshold(i)
+          Pref_flow_den(i) = 0.0 ! allow modification of parameter value for lake and inactive HRUs
           Pref_flow_thrsh(i) = Sat_threshold(i)
         ELSE ! land or glacier
           Pref_flow_thrsh(i) = Sat_threshold(i)*(1.0-Pref_flow_den(i))

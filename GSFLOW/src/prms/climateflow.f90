@@ -1069,6 +1069,7 @@
           ENDDO
         ENDIF
         DEALLOCATE ( Soil_moist_init_frac, Soil_rechr_init_frac, Ssstor_init_frac )
+        Slow_stor = Ssres_stor
       ENDIF
 
       ! check parameters
@@ -1155,6 +1156,8 @@
       Tavgc = 0.0
       Tmax_hru = 0.0
       Tmin_hru = 0.0
+      Pptmix = 0
+      Newsnow = 0
       Prmx = 0.0
       Hru_ppt = 0.0
       Hru_rain = 0.0
@@ -1217,7 +1220,6 @@
       Basin_ssstor = 0.0D0
       Basin_recharge = 0.0D0
       Basin_sroff = 0.0D0
-      Basin_lake_stor = 0.0D0
       Solrad_tmax = 0.0
       Solrad_tmin = 0.0
       Basin_cfs = 0.0D0
@@ -1229,21 +1231,19 @@
       Basin_gwflow_cfs = 0.0D0
       Flow_out = 0.0D0
       Orad = 0.0
-      Transp_on = OFF
 
       IF ( Init_vars_from_file>0 .OR. ierr>0 ) RETURN
 
-      Pptmix = OFF
-      Newsnow = OFF
+      Basin_lake_stor = 0.0D0
 ! initialize arrays (dimensioned Nsegment)
       IF ( Stream_order_flag==ON ) THEN
         Seg_inflow = 0.0D0
         Seg_outflow = 0.0D0
       ENDIF
+      Transp_on = OFF
 ! initialize storage variables
       Imperv_stor = 0.0
       Pkwater_equiv = 0.0D0
-      Slow_stor = 0.0
       IF ( GSFLOW_flag==OFF ) Gwres_stor = 0.0D0 ! not needed for GSFLOW
       IF ( Dprst_flag==ON ) THEN
         Dprst_vol_open = 0.0D0
@@ -1395,7 +1395,7 @@
 !     Write or read restart file
 !***********************************************************************
       SUBROUTINE climateflow_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Stream_order_flag, Dprst_flag, Nlake, GSFLOW_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       IMPLICIT NONE
@@ -1408,6 +1408,8 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
+        WRITE ( Restart_outunit )  Basin_lake_stor
+        WRITE ( Restart_outunit ) Transp_on
         WRITE ( Restart_outunit ) Pkwater_equiv
         IF ( Glacier_flag==ON ) THEN
           WRITE ( Restart_outunit) Glacier_frac
@@ -1419,9 +1421,7 @@
         WRITE ( Restart_outunit ) Ssres_stor
         WRITE ( Restart_outunit ) Soil_rechr
         WRITE ( Restart_outunit ) Imperv_stor
-        WRITE ( Restart_outunit ) Newsnow
-        WRITE ( Restart_outunit ) Pptmix
-        IF ( GSFLOW_flag==OFF ) WRITE ( Restart_outunit ) Gwres_stor
+        IF ( GSFLOW_flag==0 ) WRITE ( Restart_outunit ) Gwres_stor
         IF ( Dprst_flag==ON ) THEN
           WRITE ( Restart_outunit ) Dprst_vol_open
           WRITE ( Restart_outunit ) Dprst_vol_clos
@@ -1434,6 +1434,8 @@
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
+        READ ( Restart_inunit ) Basin_lake_stor
+        READ ( Restart_inunit ) Transp_on
         READ ( Restart_inunit ) Pkwater_equiv
         IF ( Glacier_flag==ON ) THEN
           READ ( Restart_inunit) Glacier_frac
@@ -1445,8 +1447,6 @@
         READ ( Restart_inunit ) Ssres_stor
         READ ( Restart_inunit ) Soil_rechr
         READ ( Restart_inunit ) Imperv_stor
-        READ ( Restart_inunit ) Newsnow
-        READ ( Restart_inunit ) Pptmix
         IF ( GSFLOW_flag==OFF ) READ ( Restart_inunit ) Gwres_stor
         IF ( Dprst_flag==ON ) THEN
           READ ( Restart_inunit ) Dprst_vol_open

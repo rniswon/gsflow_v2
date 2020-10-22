@@ -827,6 +827,7 @@
       Basin_pweqv = Basin_pweqv*Basin_area_inv
       Basin_snowcov = Basin_snowcov*Basin_area_inv
       Basin_snowdepth = Basin_snowdepth*Basin_area_inv
+      Pkwater_ante = Pkwater_equiv
       Pss = Pkwater_equiv
       Pst = Pkwater_equiv
       Iasw = 0
@@ -1351,7 +1352,7 @@
             cst = Pk_den(i)*(SQRT(effk*13751.0)) ! [cal/(cm^2 degC)]
                                                  ! or [Langleys / degC]
 
-            ! calculate the night time energy balance
+          ! calculate the night time energy balance
             CALL snowbal(niteda, Tstorm_mo(i,Nowmonth), Iasw(i), temp, esv, Hru_ppt(i), &
      &                   Ai(i), Frac_swe(i), Scrv(i), Pksv(i), trd, Emis_noppt(i), &
      &                   Canopy_covden(i), cec, Pkwater_equiv(i), &
@@ -1396,11 +1397,11 @@
           ENDIF
 
           ! Compute energy balance for day period
-          ! set the flag indicating daytime
-          niteda = 2 ! [flag]
-          ! temparature is halfway between the maximum and average
-          ! temperature for the day
-          temp = (Tmaxc(i)+Tavgc(i))*0.5 ! [degrees C]
+            ! set the flag indicating daytime
+            niteda = 2 ! [flag]
+            ! temparature is halfway between the maximum and average
+            ! temperature for the day
+            temp = (Tmaxc(i)+Tavgc(i))*0.5 ! [degrees C]
 
           IF ( Pkwater_equiv(i)>0.0D0 ) THEN !(if the snowpack still exists)
             ! set shortwave radiation as calculated earlier
@@ -3000,6 +3001,7 @@
         WRITE ( Restart_outunit ) Pst
         WRITE ( Restart_outunit ) Snsv
         WRITE ( Restart_outunit ) Pk_depth
+        WRITE ( Restart_outunit ) Pkwater_ante
         WRITE ( Restart_outunit ) Ai
         IF ( Glacier_flag==ON ) THEN
           WRITE ( Restart_outunit ) Glacr_albedo
@@ -3045,6 +3047,7 @@
         READ ( Restart_inunit ) Pst
         READ ( Restart_inunit ) Snsv
         READ ( Restart_inunit ) Pk_depth
+        READ ( Restart_inunit ) Pkwater_ante
         READ ( Restart_inunit ) Ai
         IF ( Glacier_flag==ON ) THEN
           READ ( Restart_inunit ) Glacr_albedo

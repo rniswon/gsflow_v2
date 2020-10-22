@@ -332,6 +332,12 @@
       Use_transfer_segment = OFF
       IF ( Water_use_flag==ON .AND. Segment_transferON_OFF==ON ) Use_transfer_segment = ON
 
+      IF ( Init_vars_from_file==0 ) THEN
+        Basin_segment_storage = 0.0D0
+        IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
+     &       Strmflow_flag==strmflow_muskingum_mann_module ) Segment_delta_flow = 0.0D0
+      ENDIF
+
       IF ( Hru_seg_cascades==ON ) THEN
         Seginc_potet = 0.0D0
         Seginc_gwflow = 0.0D0
@@ -342,7 +348,6 @@
         Seg_ssflow = 0.0D0
         Seg_sroff = 0.0D0
       ENDIF
-      Basin_segment_storage = 0.0D0
       Hru_outflow = 0.0D0
       Flow_to_ocean = 0.0D0
       Flow_to_great_lakes = 0.0D0
@@ -814,10 +819,12 @@
 !***********************************************************************
       IF ( In_out==0 ) THEN
         WRITE ( Restart_outunit ) MODNAME
+        WRITE ( Restart_outunit ) Basin_segment_storage
       IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
      &     Strmflow_flag==strmflow_muskingum_mann_module ) WRITE ( Restart_outunit ) Segment_delta_flow
       ELSE
         READ ( Restart_inunit ) module_name
+        READ ( Restart_inunit ) Basin_segment_storage
         CALL check_restart(MODNAME, module_name)
         IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
      &     Strmflow_flag==strmflow_muskingum_mann_module ) READ ( Restart_inunit ) Segment_delta_flow

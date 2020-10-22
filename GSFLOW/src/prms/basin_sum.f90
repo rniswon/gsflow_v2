@@ -400,10 +400,11 @@
         Obsq_inches_tot = 0.0D0
         Hru_et_yr = 0.0D0
         Totdays = 0
+        Basin_storage = 0.0D0
+        Basin_storvol = 0.0D0
       ENDIF
       Obsq_inches = 0.0D0
       Basin_runoff_ratio = 0.0D0
-      Basin_storvol = 0.0D0
 
 !******Set daily print switch
       IF ( Print_freq>7 ) THEN
@@ -890,7 +891,8 @@
         WRITE ( Restart_outunit ) Basin_intcp_evap_yr, Basin_intcp_evap_tot, Obsq_inches_yr, Obsq_inches_tot, Basin_lakeevap_yr
         WRITE ( Restart_outunit ) Basin_net_ppt_mo, Obsq_inches_mo, Basin_max_temp_mo, Basin_min_temp_mo, Basin_actet_mo
         WRITE ( Restart_outunit ) Basin_snowmelt_mo, Basin_gwflow_mo, Basin_sroff_mo, Basin_stflow_mo
-        WRITE ( Restart_outunit ) Basin_intcp_evap_mo, Basin_potet_mo, Basin_ssflow_mo, Basin_ppt_mo, Basin_runoff_ratio_mo
+        WRITE ( Restart_outunit ) Basin_intcp_evap_mo, Basin_storage, Basin_storvol, Basin_potet_mo
+        WRITE ( Restart_outunit ) Basin_ssflow_mo, Basin_ppt_mo, Basin_runoff_ratio_mo
         WRITE ( Restart_outunit ) Hru_et_yr
       ELSE
         READ ( Restart_inunit ) module_name
@@ -905,7 +907,8 @@
         READ ( Restart_inunit ) Basin_intcp_evap_yr, Basin_intcp_evap_tot, Obsq_inches_yr, Obsq_inches_tot, Basin_lakeevap_yr
         READ ( Restart_inunit ) Basin_net_ppt_mo, Obsq_inches_mo, Basin_max_temp_mo, Basin_min_temp_mo, Basin_actet_mo
         READ ( Restart_inunit ) Basin_snowmelt_mo, Basin_gwflow_mo, Basin_sroff_mo, Basin_stflow_mo
-        READ ( Restart_inunit ) Basin_intcp_evap_mo, Basin_potet_mo, Basin_ssflow_mo, Basin_ppt_mo, Basin_runoff_ratio_mo
+        READ ( Restart_inunit ) Basin_intcp_evap_mo, Basin_storage, Basin_storvol, Basin_potet_mo
+        READ ( Restart_inunit ) Basin_ssflow_mo, Basin_ppt_mo, Basin_runoff_ratio_mo
         READ ( Restart_inunit ) Hru_et_yr
       ENDIF
       END SUBROUTINE basin_sum_restart
