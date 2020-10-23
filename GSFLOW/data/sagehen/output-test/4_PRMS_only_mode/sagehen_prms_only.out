@@ -37,7 +37,7 @@ Stream Temperature: stream_temp
         Process                    Module         Version Date
 ==============================================================
 PRMS Computation Order          gsflow_prms         2020-09-22
-Basin Definition                basin               2020-09-14
+Basin Definition                basin               2020-10-09
 Cascading Flow                  cascade             2020-08-13
 Common States and Fluxes        climateflow         2020-09-14
 Potential Solar Radiation       soltab              2020-08-04
@@ -49,16 +49,16 @@ Solar Radiation Distribution    ddsolrad            2020-09-14
 Transpiration Distribution      transp_tindex       2020-09-14
 Potential Evapotranspiration    potet_jh            2020-08-03
 Canopy Interception             intcp               2020-09-21
-Snow Dynamics                   snowcomp            2020-09-22
-Surface Runoff                  srunoff_smidx       2020-09-22
-Soilzone Computations           soilzone            2020-09-22
+Snow Dynamics                   snowcomp            2020-10-07
+Surface Runoff                  srunoff_smidx       2020-10-08
+Soilzone Computations           soilzone            2020-10-09
 Groundwater                     gwflow              2020-09-14
 Streamflow Routing Init         routing             2020-09-14
 Streamflow Routing              strmflow_in_out     2020-08-03
 Output Summary                  basin_sum           2020-09-14
-Output Summary                  subbasin            2020-08-13
+Output Summary                  subbasin            2020-10-07
 Output Summary                  nhru_summary        2020-09-21
-Output Summary                  basin_summary       2020-08-03
+Output Summary                  basin_summary       2020-10-07
 ==============================================================
 
 Using Control File: .\prms.control
@@ -99,5 +99,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  *************************************************************
  Total for run     668.938  378.199    9.262  284.576  260.348
  *************************************************************
-Execution elapsed time    0 minutes  1.04 seconds
+Execution elapsed time    0 minutes  1.52 seconds
 

@@ -18,22 +18,22 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =         177091.20     EVAPOTRANSPIRATION =          34915.13
-           STREAMFLOW =          28867.23             STREAMFLOW =           3971.46
+   EVAPOTRANSPIRATION =         177090.50     EVAPOTRANSPIRATION =          34914.98
+           STREAMFLOW =          28867.20             STREAMFLOW =           3971.46
      GW BOUNDARY FLOW =           5020.66       GW BOUNDARY FLOW =            717.21
                 WELLS =           8838.22                  WELLS =           1252.48
 
-   INFLOWS - OUTFLOWS =        -219660.84     INFLOWS - OUTFLOWS =         -40834.37
+   INFLOWS - OUTFLOWS =        -219660.12     INFLOWS - OUTFLOWS =         -40834.21
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        -219642.43         STORAGE CHANGE =         -40831.61
+ TOTAL STORAGE CHANGE =        -219641.70         STORAGE CHANGE =         -40831.45
        --------------                             --------------
          LAND SURFACE =         -10287.80           LAND SURFACE =          -4160.76
-            SOIL ZONE =        -100191.75              SOIL ZONE =         -21060.79
-     UNSATURATED ZONE =         -41548.90       UNSATURATED ZONE =          -6029.06
-       SATURATED ZONE =         -67613.98         SATURATED ZONE =          -9581.00
+            SOIL ZONE =        -100191.24              SOIL ZONE =         -21060.66
+     UNSATURATED ZONE =         -41548.69       UNSATURATED ZONE =          -6029.11
+       SATURATED ZONE =         -67613.97         SATURATED ZONE =          -9580.92
 
- OVERALL BUDGET ERROR =            -18.41           BUDGET ERROR =             -2.76
+ OVERALL BUDGET ERROR =            -18.42           BUDGET ERROR =             -2.76
 
 
   PERCENT DISCREPANCY =             -0.01    PERCENT DISCREPANCY =             -0.01

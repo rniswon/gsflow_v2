@@ -18,22 +18,22 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =         230349.57     EVAPOTRANSPIRATION =          66383.08
-           STREAMFLOW =          91677.95             STREAMFLOW =          21762.63
+   EVAPOTRANSPIRATION =         230349.51     EVAPOTRANSPIRATION =          66383.08
+           STREAMFLOW =          91677.91             STREAMFLOW =          21762.61
      GW BOUNDARY FLOW =           5028.67       GW BOUNDARY FLOW =            719.48
                 WELLS =           3545.82                  WELLS =            504.44
 
-   INFLOWS - OUTFLOWS =        2025760.62     INFLOWS - OUTFLOWS =         -89342.21
+   INFLOWS - OUTFLOWS =        2025760.73     INFLOWS - OUTFLOWS =         -89342.19
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        2025778.52         STORAGE CHANGE =         -89339.81
+ TOTAL STORAGE CHANGE =        2025778.64         STORAGE CHANGE =         -89339.78
        --------------                             --------------
          LAND SURFACE =         971630.40           LAND SURFACE =        -249926.41
-            SOIL ZONE =        1144509.19              SOIL ZONE =         171805.70
-     UNSATURATED ZONE =         -31190.57       UNSATURATED ZONE =          -3256.90
-       SATURATED ZONE =         -59170.51         SATURATED ZONE =          -7962.20
+            SOIL ZONE =        1144509.14              SOIL ZONE =         171805.70
+     UNSATURATED ZONE =         -31189.17       UNSATURATED ZONE =          -3255.56
+       SATURATED ZONE =         -59171.74         SATURATED ZONE =          -7963.52
 
- OVERALL BUDGET ERROR =            -17.89           BUDGET ERROR =             -2.40
+ OVERALL BUDGET ERROR =            -17.90           BUDGET ERROR =             -2.41
 
 
   PERCENT DISCREPANCY =             -0.00    PERCENT DISCREPANCY =             -0.00

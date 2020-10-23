@@ -37,25 +37,25 @@ Stream Temperature: stream_temp
         Process                    Module         Version Date
 ==============================================================
 PRMS Computation Order          gsflow_prms         2020-09-22
-Basin Definition                basin               2020-09-14
+Basin Definition                basin               2020-10-09
 Cascading Flow                  cascade             2020-08-13
 Common States and Fluxes        climateflow         2020-09-14
 Potential Solar Radiation       soltab              2020-08-04
 Timestep Control                prms_time           2020-08-03
 Time Series Data                obs                 2020-08-03
-Temperature Distribution        climate_hru         2020-08-03
-Precipitation Distribution      climate_hru         2020-08-03
+Temperature Distribution        climate_hru         2020-10-07
+Precipitation Distribution      climate_hru         2020-10-07
 Solar Radiation Distribution    ddsolrad            2020-09-14
 Transpiration Distribution      transp_tindex       2020-09-14
 Potential Evapotranspiration    potet_jh            2020-08-03
 Canopy Interception             intcp               2020-09-21
-Snow Dynamics                   snowcomp            2020-09-22
-Surface Runoff                  srunoff_smidx       2020-09-22
-Soilzone Computations           soilzone            2020-09-22
+Snow Dynamics                   snowcomp            2020-10-07
+Surface Runoff                  srunoff_smidx       2020-10-08
+Soilzone Computations           soilzone            2020-10-09
 Groundwater                     gwflow              2020-09-14
 Streamflow Routing              strmflow            2020-08-03
 Output Summary                  basin_sum           2020-09-14
-Output Summary                  subbasin            2020-08-13
+Output Summary                  subbasin            2020-10-07
 ==============================================================
 
 Using Control File: .\prms.control
@@ -1294,5 +1294,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
    1984    1   28    0.000    0.066   39.756    0.018    0.035    0.000    0.000
    1984    1   29    0.000    0.064   39.674    0.018    0.035   -0.000    0.000
    1984    1   30    0.000    0.073   39.583    0.018    0.035   -0.000    0.000
-Execution elapsed time    0 minutes  0.25 seconds
+Execution elapsed time    0 minutes  0.24 seconds
 

@@ -18,26 +18,25 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =         398814.23     EVAPOTRANSPIRATION =          88503.92
-           STREAMFLOW =          62221.66             STREAMFLOW =           6949.64
+   EVAPOTRANSPIRATION =         398816.21     EVAPOTRANSPIRATION =          88505.48
+           STREAMFLOW =          62221.58             STREAMFLOW =           6949.63
      GW BOUNDARY FLOW =           5024.80       GW BOUNDARY FLOW =            717.71
                 WELLS =           9380.34                  WELLS =           1687.91
 
-   INFLOWS - OUTFLOWS =        -351944.71     INFLOWS - OUTFLOWS =         -97858.86
+   INFLOWS - OUTFLOWS =        -351946.61     INFLOWS - OUTFLOWS =         -97860.41
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        -313636.43         STORAGE CHANGE =         -97856.85
+ TOTAL STORAGE CHANGE =        -351931.82         STORAGE CHANGE =         -97858.40
        --------------                             --------------
-         LAND SURFACE =         -34328.37           LAND SURFACE =          -7173.38
-            SOIL ZONE =        -183695.62              SOIL ZONE =         -76170.82
-     UNSATURATED ZONE =         -29062.19       UNSATURATED ZONE =          -4572.65
-       SATURATED ZONE =         -66550.25         SATURATED ZONE =          -9940.00
+         LAND SURFACE =         -72621.86           LAND SURFACE =          -7173.38
+            SOIL ZONE =        -183697.76              SOIL ZONE =         -76172.41
+     UNSATURATED ZONE =         -29062.58       UNSATURATED ZONE =          -4572.73
+       SATURATED ZONE =         -66549.62         SATURATED ZONE =          -9939.89
 
- OVERALL BUDGET ERROR =         -38308.28           BUDGET ERROR =             -2.00
+ OVERALL BUDGET ERROR =            -14.79           BUDGET ERROR =             -2.01
 
-  ***WARNING, CUMULATIVE VOLUME OFF > 5%
 
-  PERCENT DISCREPANCY =             -8.40    PERCENT DISCREPANCY =             -0.00
+  PERCENT DISCREPANCY =             -0.00    PERCENT DISCREPANCY =             -0.00
 
 
 

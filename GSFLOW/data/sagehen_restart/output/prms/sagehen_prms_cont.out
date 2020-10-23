@@ -37,26 +37,26 @@ Stream Temperature: stream_temp
         Process                    Module         Version Date
 ==============================================================
 PRMS Computation Order          gsflow_prms         2020-09-22
-Basin Definition                basin               2020-09-14
+Basin Definition                basin               2020-10-09
 Cascading Flow                  cascade             2020-08-13
 Common States and Fluxes        climateflow         2020-09-14
 Potential Solar Radiation       soltab              2020-08-04
 Timestep Control                prms_time           2020-08-03
 Time Series Data                obs                 2020-08-03
-Temperature Distribution        climate_hru         2020-08-03
-Precipitation Distribution      climate_hru         2020-08-03
+Temperature Distribution        climate_hru         2020-10-07
+Precipitation Distribution      climate_hru         2020-10-07
 Solar Radiation Distribution    ddsolrad            2020-09-14
 Transpiration Distribution      transp_tindex       2020-09-14
 Potential Evapotranspiration    potet_jh            2020-08-03
 Canopy Interception             intcp               2020-09-21
-Snow Dynamics                   snowcomp            2020-09-22
-Surface Runoff                  srunoff_smidx       2020-09-22
-Soilzone Computations           soilzone            2020-09-22
+Snow Dynamics                   snowcomp            2020-10-07
+Surface Runoff                  srunoff_smidx       2020-10-08
+Soilzone Computations           soilzone            2020-10-09
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2020-08-11
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2020-08-31
 GSFLOW Output Budget Summary    gsflow_budget       2020-08-11
 GSFLOW Output CSV Summary       gsflow_sum          2020-08-11
-Output Summary                  subbasin            2020-08-13
+Output Summary                  subbasin            2020-10-07
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2020-09-01
 UZF-NWT Package                 gwf2uzf1_NWT        2019-09-10
@@ -75,5 +75,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    3 minutes 20.92 seconds
+Execution elapsed time    3 minutes 19.45 seconds
 
