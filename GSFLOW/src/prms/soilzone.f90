@@ -988,7 +988,7 @@
           IF ( Hru_ag_irr(i)>0.0 ) capwater_maxin = capwater_maxin + Hru_ag_irr(i)/perv_area
         ENDIF
         IF ( Soilzone_add_water_use==ON ) THEN
-          IF ( Soilzone_gain(i)>0.0 ) capwater_maxin = capwater_maxin + Soilzone_gain(i)/perv_area/DBLE(Cfs_conv) ! ??? is this harea
+          IF ( Soilzone_gain(i)>0.0 ) capwater_maxin = capwater_maxin + Soilzone_gain(i)/perv_area/SNGL(Cfs_conv) ! ??? is this harea
         ENDIF
 
         cfgi_frozen_hru = OFF

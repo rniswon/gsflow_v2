@@ -115,7 +115,7 @@
           Basin_tmin = Basin_tmin*Basin_area_inv
           Basin_temp = Basin_temp*Basin_area_inv
           Solrad_tmax = SNGL( Basin_tmax )
-          Solrad_tmin = Basin_tmin
+          Solrad_tmin = SNGL( Basin_tmin )
         ENDIF
 
         IF ( Precip_flag==precip_map_module ) THEN
