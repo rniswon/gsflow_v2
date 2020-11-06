@@ -637,6 +637,7 @@ static char *READ_param_head (PARAM **param_ptr, int map_flag) {
 	char *temp, *npos, *tempfmt;
 	int tempwidth, i, param_size, type;
 	static long silent_flag;
+	silent_flag = *control_lvar("print_debug");
 	int badFlag;
 	char *line_p;
   
@@ -827,7 +828,6 @@ static char *READ_param_head (PARAM **param_ptr, int map_flag) {
   
 	} else {
 		if (!map_flag) {
-			silent_flag = *control_lvar("print_debug");
 			if (silent_flag > -2) {
 				snprintf (buf, 256, "parameter '%s' is not required", key);
 				fprintf (stderr,"\n%s\n", warning_string (buf));
