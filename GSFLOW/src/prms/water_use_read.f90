@@ -75,6 +75,11 @@
       INTEGER, SAVE :: lake_next_year, lake_next_month, lake_next_day
       DOUBLE PRECISION :: transfer_rate_dble !, factor
 !***********************************************************************
+      ! Types
+      ! (1) stream segments; (2) groundwater reservoirs; (3) surface-depression storage;
+      ! (4) external locations; (5) lakes; (6) capillary reservoir of the soil zone;
+      ! (7) internal consumptive-use locations; and (8) plant canopy. 
+!***********************************************************************
       water_use_read = 0
 
       IF ( Process_flag==RUN ) THEN

@@ -18,7 +18,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2020-09-21'
+        character(len=*), parameter :: Version_dynamic_param_read = '2020-10-13'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -491,7 +491,8 @@
                 IF ( frac_imperv>0.0 ) THEN
                   Imperv_stor(i) = Imperv_stor(i)*Hru_percent_imperv(i)/frac_imperv
                 ELSE
-                  tmp = Imperv_stor(i)*Hru_percent_imperv(i)/Hru_frac_perv(i) ! not sure this is correct???
+                  IF ( Hru_frac_perv(i)>0.0 ) &
+     &                 tmp = Imperv_stor(i)*Hru_percent_imperv(i)/Hru_frac_perv(i) ! not sure this is correct???
                   PRINT *, 'WARNING, dynamic impervious changed to 0 when impervious storage > 0'
                   PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
                   PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
@@ -511,7 +512,7 @@
                 ! Temp3 has new values with negative values set to the old value, Dprst_frac has old values
                 dprstfrac = Temp3(i)
                 IF ( dprstfrac==0.0 .AND. tmp>0.0 ) THEN
-                  tmp = tmp/(Dprst_frac(i)*harea)/Hru_frac_perv(i) ! not sure this is correct???
+                  IF ( Hru_frac_perv(i)>0.0 ) tmp = tmp/(Dprst_frac(i)*harea)/Hru_frac_perv(i) ! not sure this is correct???
                   PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0'
                   PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
                   PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
@@ -565,9 +566,9 @@
             ELSE
               dprstfrac = 0.0
             ENDIF
-            IF ( Hru_percent_imperv(i)+dprstfrac > 0.999 ) THEN
+            IF ( Hru_percent_imperv(i)+dprstfrac > 1.0 ) THEN
               istop = 1
-              PRINT *, 'ERROR, fraction impervious + fraction dprst > 0.999 for HRU:', i
+              PRINT *, 'ERROR, fraction impervious + fraction dprst > 1.0 for HRU:', i
               PRINT *, '       fraction impervious + dprst:', Hru_percent_imperv(i) + dprstfrac
               PRINT *, '       hru_percent_imperv:', Hru_percent_imperv(i), '; dprst_frac:', dprstfrac
               CYCLE
@@ -576,9 +577,14 @@
             Soil_moist(i) = Soil_moist(i) + soil_adj
             Soil_rechr(i) = Soil_rechr(i) + soil_adj
             IF ( Hru_perv(i) /= hruperv ) THEN
-              tmp = Hru_perv(i)/hruperv
-              Soil_moist(i) = Soil_moist(i)*tmp
-              Soil_rechr(i) = Soil_rechr(i)*tmp
+              IF ( hruperv>0.0 ) THEN
+                tmp = Hru_perv(i)/hruperv
+                Soil_moist(i) = Soil_moist(i)*tmp
+                Soil_rechr(i) = Soil_rechr(i)*tmp
+              ELSE
+                Soil_moist(i) = 0.0
+                Soil_rechr(i) = 0.0
+              ENDIF
               Hru_perv(i) = hruperv
               Hru_frac_perv(i) = Hru_perv(i)/harea
             ENDIF
@@ -775,11 +781,11 @@
         DO i = 1, Nhru
           IF ( Hru_type(i)==LAKE .OR. Hru_type(i)==INACTIVE ) CYCLE ! skip lake and inactive HRUs
 
-          IF ( Soil_moist_max(i)<0.00001 ) THEN
-            istop = 1
-            PRINT 9001, 'soil_moist_max', 0.00001, i, Soil_moist_max(i), 0.00001
-            CYCLE
-          ENDIF
+          !IF ( Soil_moist_max(i)<0.00001 ) THEN
+          !  istop = 1
+          !  PRINT 9001, 'soil_moist_max', 0.00001, i, Soil_moist_max(i), 0.00001
+          !  CYCLE
+          !ENDIF
           IF ( PRMS4_flag==0 ) Soil_rechr_max(i) = Soil_moist_max(i)*Soil_rechr_max_frac(i)
           IF ( Soil_rechr_max(i)<0.00001 ) THEN
             istop = 1
@@ -794,7 +800,7 @@
           Soil_zone_max(i) = Sat_threshold(i) + Soil_moist_max(i)*Hru_frac_perv(i)
           Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*Hru_frac_perv(i)
           Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
-          Replenish_frac(i) = Soil_rechr_max(i)/Soil_moist_max(i)
+          IF ( Soil_moist_max(i)>0.0 ) Replenish_frac(i) = Soil_rechr_max(i)/Soil_moist_max(i)
           Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*Hru_perv(i) )
           Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(i)*Hru_perv(i) )
         ENDDO

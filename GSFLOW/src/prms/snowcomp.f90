@@ -21,13 +21,13 @@
       INTRINSIC :: ACOS
       INTEGER, PARAMETER :: MAXALB = 15
       REAL, PARAMETER :: PI = ACOS(-1.0)
+      INTEGER, PARAMETER :: not_a_glacier_hru = -1
 
       !****************************************************************
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2020-10-07'
-      integer, parameter :: not_a_glacier_hru = -1
+      character(len=*), parameter :: Version_snowcomp = '2020-11-06'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -64,7 +64,7 @@
       REAL, SAVE, ALLOCATABLE :: It0_pk_temp(:), It0_pk_def(:), It0_pk_ice(:), It0_pk_den(:), It0_freeh2o(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:), It0_scrv(:), It0_pksv(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pst(:), It0_pss(:), It0_ai(:)
-       REAL, SAVE, ALLOCATABLE :: It0_snsv(:), It0_salb(:), It0_slst(:)
+      REAL, SAVE, ALLOCATABLE :: It0_snsv(:), It0_salb(:), It0_slst(:)
       !****************************************************************
       !   Declared Parameters
 
@@ -827,6 +827,7 @@
       Basin_pweqv = Basin_pweqv*Basin_area_inv
       Basin_snowcov = Basin_snowcov*Basin_area_inv
       Basin_snowdepth = Basin_snowdepth*Basin_area_inv
+      Pkwater_ante = Pkwater_equiv
       Pss = Pkwater_equiv
       Pst = Pkwater_equiv
       Iasw = 0
@@ -932,38 +933,36 @@
 
       IF ( PRMS_iteration_flag==ON ) THEN
         IF ( Kkiter>1 ) THEN
-          DO j = 1, Active_hrus
-            i = Hru_route_order(j)
-            Snowcov_area = It0_snowcov_area(i)
-            Snowcov_areasv = It0_snowcov_areasv(i)
-            Albedo(i) = It0_albedo(i)
-            Pk_depth(i) = It0_pk_depth(i)
-            Iasw(i) = It0_iasw(i)
-            Pst(i) = It0_pst(i)
-            Scrv(i) = It0_scrv(i)
-            Pksv(i) = It0_pksv(i)
-            Pk_temp(i) = It0_pk_temp(i)
-            Pk_def(i) = It0_pk_def(i)
-            Pk_ice(i) = It0_pk_ice(i)
-            Pk_den(i) = It0_pk_den(i)
-            Pss(i) = It0_pss(i)
-            Ai(i) = It0_ai(i)
-            Freeh2o(i) = It0_freeh2o(i)
-            Iso(i) = It0_iso(i)
-            Mso(i) = It0_mso(i)
-            Lso(i) = It0_lso(i)
-            Snsv(i) = It0_snsv(i)
-            Lst(i) = It0_lst(i)
-            Int_alb(i) = It0_int_alb(i)
-            Salb(i) = It0_salb(i)
-            Slst(i) = It0_slst(i)
-          ENDDO
+          Pkwater_equiv = It0_pkwater_equiv
+          Snowcov_area = It0_snowcov_area
+          Snowcov_areasv = It0_snowcov_areasv
+          Albedo = It0_albedo
+          Pk_depth = It0_pk_depth
+          Iasw = It0_iasw
+          Pst = It0_pst
+          Scrv = It0_scrv
+          Pksv = It0_pksv
+          Pk_temp = It0_pk_temp
+          Pk_def = It0_pk_def
+          Pk_ice = It0_pk_ice
+          Pk_den = It0_pk_den
+          Pss = It0_pss
+          Ai = It0_ai
+          Freeh2o = It0_freeh2o
+          Iso = It0_iso
+          Mso = It0_mso
+          Lso = It0_lso
+          Snsv = It0_snsv
+          Lst = It0_lst
+          Int_alb = It0_int_alb
+          Salb = It0_salb
+          Slst = It0_slst
         ELSE
           It0_pkwater_equiv = Pkwater_equiv
           It0_snowcov_area = Snowcov_area
+          It0_snowcov_areasv = Snowcov_areasv
           It0_albedo = It0_albedo
           It0_pk_depth = Pk_depth
-          It0_snowcov_areasv = Snowcov_areasv
           It0_iasw = Iasw
           It0_pst = Pst
           It0_scrv = Scrv
@@ -1180,15 +1179,15 @@
      &            Pk_den(i), Pptmix_nopack(i), Pk_precip(i), Tmax_allsnow_c(i,Nowmonth), &
      &            Freeh2o_cap(i), Den_max(i), not_a_glacier_hru)
         IF ( Active_glacier>0 ) THEN
-           IF ( Glacrcov_area(i)>0.0.AND.Glacr_pkwater_ante(i)>0.0D0.AND.Net_ppt(i)>0.0 &
-     &          .AND.Pptmix(i)==0.AND.Net_snow(i)==0.0 ) THEN
-              CALL ppt_to_pack(0, Iasw(i), Tmaxc(i), Tminc(i), Tavgc(i), &
-     &             Ai(i), Frac_swe(i), Pksv(i), Scrv(i), &
-     &             Glacr_Pkwater_equiv(i), Net_rain(i), Glacr_pk_def(i), &
-     &             Glacr_pk_temp(i), Glacr_pk_ice(i), Glacr_freeh2o(i), Glacrcov_area(i), &
-     &             Glacrmelt(i), Glacr_pk_depth(i), Glacr_pss(i), Glacr_pst(i), 0.0, &
-     &             Glacr_pk_den(i), Pptmix_nopack(i), Pk_precip(i), Tmax_allsnow_c(i,Nowmonth), &
-     &             Glacr_freeh2o_capm(i), Den_max(i), i)
+          IF ( Glacrcov_area(i)>0.0.AND.Glacr_pkwater_ante(i)>0.0D0.AND.Net_ppt(i)>0.0 &
+     &         .AND.Pptmix(i)==0.AND.Net_snow(i)==0.0 ) THEN
+             CALL ppt_to_pack(0, Iasw(i), Tmaxc(i), Tminc(i), Tavgc(i), &
+     &            Ai(i), Frac_swe(i), Pksv(i), Scrv(i), &
+     &            Glacr_Pkwater_equiv(i), Net_rain(i), Glacr_pk_def(i), &
+     &            Glacr_pk_temp(i), Glacr_pk_ice(i), Glacr_freeh2o(i), Glacrcov_area(i), &
+     &            Glacrmelt(i), Glacr_pk_depth(i), Glacr_pss(i), Glacr_pst(i), 0.0, &
+     &            Glacr_pk_den(i), Pptmix_nopack(i), Pk_precip(i), Tmax_allsnow_c(i,Nowmonth), &
+     &            Glacr_freeh2o_capm(i), Den_max(i), i)
           ENDIF
         ENDIF
 
@@ -1456,7 +1455,7 @@
           ENDIF
           IF ( Active_glacier>0 ) THEN
             IF ( Glacrcov_area(i)>0.0 ) &
-     &            CALL snowevap(Potet_sublim(i), Potet(i), Glacrcov_area(i), &
+     &           CALL snowevap(Potet_sublim(i), Potet(i), Glacrcov_area(i), &
      &                         Glacr_evap(i), Glacr_pkwater_equiv(i), Glacr_pk_ice(i), &
      &                         Glacr_pk_def(i), Glacr_freeh2o(i), Glacr_pk_temp(i), Hru_intcpevap(i))
           ENDIF
@@ -3002,6 +3001,7 @@
         WRITE ( Restart_outunit ) Pst
         WRITE ( Restart_outunit ) Snsv
         WRITE ( Restart_outunit ) Pk_depth
+        WRITE ( Restart_outunit ) Pkwater_ante
         WRITE ( Restart_outunit ) Ai
         IF ( Glacier_flag==ON ) THEN
           WRITE ( Restart_outunit ) Glacr_albedo
@@ -3047,6 +3047,7 @@
         READ ( Restart_inunit ) Pst
         READ ( Restart_inunit ) Snsv
         READ ( Restart_inunit ) Pk_depth
+        READ ( Restart_inunit ) Pkwater_ante
         READ ( Restart_inunit ) Ai
         IF ( Glacier_flag==ON ) THEN
           READ ( Restart_inunit ) Glacr_albedo
