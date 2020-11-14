@@ -2158,7 +2158,7 @@
      +                  RHS
       USE GWFBASMODULE, ONLY: TOTIM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: IDIVAR, SEG, STRM, SGOTFLW
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, SGOTFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -2253,8 +2253,8 @@
             IF (NUMSEGS(L) > 0) THEN
                DO I = 1, NUMSEGS(L)
                   J = DIVERSIONSEG(I, L)
-                  k = IDIVAR(1, J)
-                  QSW = STRM(9, LASTREACH(K))
+                  QSW = SEG(2, J)
+                  If ( kkiter > 1 ) QSW = DVRSFLW(J)
                   IF (ETDEMANDFLAG > 0) THEN
                      FMIN = SUPACT(J)
                   ELSE IF (TRIGGERFLAG > 0) then
@@ -3533,6 +3533,7 @@
       ! - ----Total ET for all cells irrigated by each diversion
       !
       if (TSACTIVESWET) then
+         prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
          do I = 1, NUMSWET
             aettot = 0.0
             pettot = 0.0
@@ -3550,8 +3551,6 @@
                   ELSE
                      hru_id = IRRROW_SW(k, iseg)
                      area = HRU_PERV(hru_id)
-                     prms_inch2mf_q = done/
-     +                         (DELT*Mfl2_to_acre*Mfl_to_inch)
                      pet = potet(hru_id)*area*prms_inch2mf_q
                      aet = hru_actet(hru_id)*area*prms_inch2mf_q
                      if ( Nhru==Nhrucell ) then
@@ -3599,6 +3598,7 @@
          aettot = 0.0
          pettot = 0.0
          IF (TSACTIVEGWET) THEN
+            prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
             DO I = 1, NUMGWET
                pettot = 0.0
                aettot = 0.0
@@ -3616,8 +3616,6 @@
                         ELSE
                            hru_id = IRRROW_GW(J, L)
                            area = HRU_PERV(hru_id)
-                           prms_inch2mf_q = done/
-     +                             (DELT*Mfl2_to_acre*Mfl_to_inch)
                            pet = potet(hru_id)*area*prms_inch2mf_q
                            aet = hru_actet(hru_id)*area*prms_inch2mf_q
                            if ( Nhru==Nhrucell ) then
@@ -3653,6 +3651,7 @@
       aettot = 0.0
       pettot = 0.0
       IF (TSGWETALLUNIT > 0) THEN
+         prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
          DO L = 1, NWELLS
             UNIT = TSGWETALLUNIT
             do J = 1, NUMCELLS(L)
@@ -3665,7 +3664,6 @@
                      uzet = uzfetout(ic, ir)/DELT
                      aet = gwet(ic, ir) + uzet
                   ELSE
-                  prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
                      hru_id = IRRROW_GW(J, L)
                      area = HRU_PERV(hru_id)
                      pet = potet(hru_id)*area*prms_inch2mf_q
