@@ -45,10 +45,16 @@ data_file
 4
 ..\input\prms\sagehen.data
 ####
+dprst_flag
+1
+1
+1
+####
 param_file
-5
+6
 4
 ..\input\prms\sagehen_grid_v5_highKc.params
+..\input\prms\dprst.params
 ..\input\prms\sagehen_grid_constant.params
 ..\input\prms\sagehen_grid_fixed.params
 ..\input\prms\cascade.param
