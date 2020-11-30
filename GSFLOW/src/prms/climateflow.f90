@@ -13,12 +13,13 @@
      &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, &
-     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, Glacier_flag
+     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, Glacier_flag, &
+     &    Agriculture_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2020-11-13'
+      character(len=*), parameter :: Version_climateflow = '2020-11-27'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -78,8 +79,8 @@
       DOUBLE PRECISION, SAVE :: Basin_ssflow, Basin_soil_to_gw
       DOUBLE PRECISION, SAVE :: Basin_actet, Basin_lakeevap
       DOUBLE PRECISION, SAVE :: Basin_swale_et, Basin_perv_et, Basin_sroff
-      DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor, Basin_recharge
-      REAL, SAVE, ALLOCATABLE :: Hru_actet(:), Soil_moist(:)
+      DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ag_soil_moist, Basin_ssstor, Basin_recharge
+      REAL, SAVE, ALLOCATABLE :: Hru_actet(:), Soil_moist(:), Ag_soil_moist(:), Ag_soil_rechr(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_ssr(:), Ssres_in(:)
       REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:), Recharge(:)
@@ -103,8 +104,9 @@
 !   Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Soil_moist_max(:), Soil_rechr_max(:), Sat_threshold(:)
       REAL, SAVE, ALLOCATABLE :: Snowinfil_max(:), Imperv_stor_max(:)
-      REAL, SAVE, ALLOCATABLE :: Soil_rechr_init_frac(:), Soil_moist_init_frac(:)
-      REAL, SAVE, ALLOCATABLE :: Ssstor_init_frac(:), Soil_rechr_max_frac(:)
+      ! REAL, SAVE, ALLOCATABLE :: Soil_rechr_init_frac(:), Soil_moist_init_frac(:) ! don't need to allocate as using associated arrays
+      ! REAL, SAVE, ALLOCATABLE :: Ssstor_init_frac(:), Soil_rechr_max_frac(:), Ag_soil_moist_init_frac(:) ! don't need to allocate as using associated arrays
+      REAL, SAVE, ALLOCATABLE :: Ag_soil_moist_max(:), Ag_soil_rechr_max(:)
       END MODULE PRMS_FLOWVARS
 
 !***********************************************************************
@@ -458,7 +460,7 @@
 
       ALLOCATE ( Infil(Nhru) )
       IF ( declvar(Srunoff_module, 'infil', 'nhru', Nhru, 'real', &
-     &     'Infiltration to the capillary and preferential-flow reservoirs for each HRU', &
+     &     'Infiltration to the capillary reservoirs for each HRU', &
      &     'inches', Infil)/=0 ) CALL read_error(3, 'infil')
 
       ALLOCATE ( Sroff(Nhru) )
@@ -800,7 +802,6 @@
      &       'inches')/=0 ) CALL read_error(1, 'soil_rechr_max')
       ENDIF
       IF ( PRMS4_flag==OFF .OR. Model==DOCUMENTATION ) THEN
-        ALLOCATE ( Soil_rechr_max_frac(Nhru) )
         IF ( declparam(Soilzone_module, 'soil_rechr_max_frac', 'nhru', 'real', &
      &       '1.0', '0.0', '1.0', &
      &       'Fraction of capillary reservoir where losses occur as both evaporation and transpiration (soil recharge zone)', &
@@ -824,7 +825,6 @@
      &     'inches')/=0 ) CALL read_error(1, 'imperv_stor_max')
 
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 .OR. Model==DOCUMENTATION) THEN
-        ALLOCATE ( Soil_rechr_init_frac(Nhru), Soil_moist_init_frac(Nhru), Ssstor_init_frac(Nssr) )
         IF ( PRMS4_flag==ON .OR. Model==DOCUMENTATION ) THEN
           IF ( declparam(MODNAME, 'soil_rechr_init', 'nhru', 'real', &
      &         '1.0', '0.0', '20.0', &
@@ -864,6 +864,35 @@
      &         ' (fraction of sat_threshold) for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'ssstor_init_frac')
         ENDIF
+      ENDIF
+
+      IF ( Agriculture_flag>OFF .OR. Model==DOCUMENTATION ) THEN
+        IF ( declvar(Soilzone_module, 'basin_ag_soil_moist', 'one', 1, 'double', &
+     &       'Basin area-weighted average soil agriculture reservoir storage', &
+     &       'inches', Basin_ag_soil_moist)/=0 ) CALL read_error(3, 'basin_ag_soil_moist')
+        ALLOCATE ( Ag_soil_moist(Nhru) )
+        IF ( declvar(Soilzone_module, 'ag_soil_moist', 'nhru', Nhru, 'real', &
+     &       'Storage of soil agriculture reservoir for each HRU', &
+     &       'inches', Ag_soil_moist)/=0 ) CALL read_error(3, 'ag_soil_moist')
+        ALLOCATE ( Ag_soil_rechr(Nhru) )
+        IF ( declvar(Soilzone_module, 'ag_soil_rechr', 'nhru', Nhru, 'real', &
+     &     'Storage for upper portion of the soil agriculture reservoir that is available for both'// &
+     &     ' evaporation and transpiration', &
+     &     'inches', Ag_soil_rechr)/=0 ) CALL read_error(3, 'ag_soil_rechr')
+        ALLOCATE ( Ag_soil_moist_max(Nhru) )
+        IF ( declparam(Soilzone_module, 'ag_soil_moist_max', 'nhru', 'real', &
+     &       '2.0', '0.0', '20.0', &
+     &       'Maximum value of water content for agriculture fraction of the soilzone', &
+     &       'Maximum available water holding capacity of the agriculture'// &
+     &       ' reservoir from land surface to rooting depth of the'// &
+     &       ' crop type of each HRU', &
+     &       'inches')/=0 ) CALL read_error(1, 'ag_soil_moist_max')
+          IF ( declparam(Soilzone_module, 'ag_soil_moist_init_frac', 'nhru', 'real', &
+     &         '0.0', '0.0', '1.0', &
+     &         'Initial fraction available water in the soil agriculture reservoir', &
+     &         'Initial fraction of available water in the soil agriculture reservoir'// &
+     &         ' (fraction of ag_soil_moist_max for each HRU', &
+     &         'decimal fraction')/=0 ) CALL read_error(1, 'ag_soil_moist_init_frac')
       ENDIF
 
       END FUNCTION climateflow_decl
@@ -1033,43 +1062,50 @@
       IF ( PRMS4_flag==ON ) THEN
         IF ( getparam(Soilzone_module, 'soil_rechr_max', Nhru, 'real', Soil_rechr_max)/=0 ) CALL read_error(2, 'soil_rechr_max')
       ELSE
-        IF ( getparam(Soilzone_module, 'soil_rechr_max_frac', Nhru, 'real', Soil_rechr_max_frac)/=0 ) &
+        IF ( getparam(Soilzone_module, 'soil_rechr_max_frac', Nhru, 'real', Soil_rechr_max)/=0 ) &
      &       CALL read_error(2, 'soil_rechr_max_frac')
-        DO i = 1, Nhru
-          Soil_rechr_max(i) = Soil_rechr_max_frac(i)*Soil_moist_max(i)
-        ENDDO
-        DEALLOCATE ( Soil_rechr_max_frac )
+        Soil_rechr_max = Soil_rechr_max*Soil_moist_max
       ENDIF
 
       ierr = 0
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
         IF ( PRMS4_flag==ON ) THEN
           ! use PRMS4 parameters
-          IF ( getparam(Soilzone_module, 'soil_moist_init', Nhru, 'real', Soil_moist_init_frac)/=0 ) &
+          IF ( getparam(Soilzone_module, 'soil_moist_init', Nhru, 'real', Soil_moist)/=0 ) &
      &         CALL read_error(2, 'soil_moist_init')
-          IF ( getparam(Soilzone_module, 'soil_rechr_init', Nhru, 'real', Soil_rechr_init_frac)/=0 ) &
+          IF ( getparam(Soilzone_module, 'soil_rechr_init', Nhru, 'real', Soil_rechr)/=0 ) &
      &         CALL read_error(2, 'soil_rechr_init')
-          IF ( getparam(Soilzone_module, 'ssstor_init', Nssr, 'real', Ssstor_init_frac)/=0 ) &
+          IF ( getparam(Soilzone_module, 'ssstor_init', Nssr, 'real', Ssres_stor)/=0 ) &
      &         CALL read_error(2, 'ssstor_init')
-          Soil_rechr = Soil_rechr_init_frac
-          Soil_moist = Soil_moist_init_frac
-          Ssres_stor = Ssstor_init_frac
 ! PRMS 5 parameters
         ELSE
-          IF ( getparam(Soilzone_module, 'soil_moist_init_frac', Nhru, 'real', Soil_moist_init_frac)/=0 ) &
+          IF ( getparam(Soilzone_module, 'soil_moist_init_frac', Nhru, 'real', Soil_moist)/=0 ) &
      &         CALL read_error(2, 'soil_moist_init_frac')
-          IF ( getparam(Soilzone_module, 'soil_rechr_init_frac', Nhru, 'real', Soil_rechr_init_frac)/=0 ) &
+          IF ( getparam(Soilzone_module, 'soil_rechr_init_frac', Nhru, 'real', Soil_rechr)/=0 ) &
      &         CALL read_error(2, 'soil_rechr_init_frac')
-          IF ( getparam(Soilzone_module, 'ssstor_init_frac', Nssr, 'real', Ssstor_init_frac)/=0 ) &
-     &         CALL read_error(2, 'ssstor_init_frac')
-          DO i = 1, Nhru
-            Soil_rechr(i) = Soil_rechr_init_frac(i)*Soil_rechr_max(i)
-            Soil_moist(i) = Soil_moist_init_frac(i)*Soil_moist_max(i)
-            Ssres_stor(i) = Ssstor_init_frac(i)*Sat_threshold(i)
-          ENDDO
+          IF ( getparam(Soilzone_module, 'ssstor_init_frac', Nssr, 'real', Ssres_stor)/=0 ) &
+          Soil_rechr = Soil_rechr*Soil_rechr_max
+          Soil_moist = Soil_moist*Soil_moist_max
+          Ssres_stor = Ssres_stor*Sat_threshold
         ENDIF
-        DEALLOCATE ( Soil_moist_init_frac, Soil_rechr_init_frac, Ssstor_init_frac )
         Slow_stor = Ssres_stor
+      ENDIF
+
+      IF ( Agriculture_flag>OFF ) THEN
+        IF ( getparam(Soilzone_module, 'ag_soil_moist_max', Nhru, 'real', Ag_soil_moist_max)/=0 ) &
+     &       CALL read_error(2, 'soil_moist_max')
+        IF ( getparam(Soilzone_module, 'ag_soil_rechr_max_frac', Nhru, 'real', Ag_soil_rechr_max)/=0 ) &
+     &       CALL read_error(2, 'ag_soil_rechr_max_frac')
+        Ag_soil_rechr_max = Ag_soil_rechr_max*Ag_soil_moist_max
+        ierr = 0
+        IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
+          IF ( getparam(Soilzone_module, 'ag_soil_moist_init_frac', Nhru, 'real', Ag_soil_moist)/=0 ) &
+     &         CALL read_error(2, 'ag_soil_moist_init_frac')
+          IF ( getparam(Soilzone_module, 'ag_soil_rechr_init_frac', Nhru, 'real', Ag_soil_rechr)/=0 ) &
+     &         CALL read_error(2, 'ag_soil_rechr_init_frac')
+          Ag_soil_rechr = Ag_soil_rechr*Ag_soil_rechr_max
+          Ag_soil_moist = Ag_soil_moist*Ag_soil_moist_max
+        ENDIF
       ENDIF
 
       ! check parameters
@@ -1403,7 +1439,8 @@
 !     Write or read restart file
 !***********************************************************************
       SUBROUTINE climateflow_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Stream_order_flag, Dprst_flag, Nlake, GSFLOW_flag
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Stream_order_flag, &
+     &    Dprst_flag, Nlake, GSFLOW_flag, Agriculture_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       IMPLICIT NONE
@@ -1439,6 +1476,10 @@
           WRITE ( Restart_outunit ) Seg_outflow
         ENDIF
         IF ( Nlake>0 ) WRITE ( Restart_outunit ) Lake_vol
+        IF ( Agriculture_flag>OFF ) THEN
+          WRITE ( Restart_outunit ) Ag_soil_moist
+          WRITE ( Restart_outunit ) Ag_soil_rechr
+        ENDIF
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
@@ -1465,5 +1506,9 @@
           READ ( Restart_inunit ) Seg_outflow
         ENDIF
         IF ( Nlake>0 ) READ ( Restart_inunit ) Lake_vol
+        IF ( Agriculture_flag>OFF ) THEN
+          READ ( Restart_inunit ) Ag_soil_moist
+          READ ( Restart_inunit ) Ag_soil_rechr
+        ENDIF
       ENDIF
       END SUBROUTINE climateflow_restart

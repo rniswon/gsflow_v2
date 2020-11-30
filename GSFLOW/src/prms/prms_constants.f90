@@ -108,10 +108,6 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: LOAM = 2
     integer, parameter :: CLAY = 3
 
-    ! agriculture_flag
-    integer, parameter :: CAPILLARY = 1
-    integer, parameter :: CANOPY = 2
-
     ! Hemisphere
     integer, parameter :: NORTHERN = 0
     integer, parameter :: SOUTHERN = 1
@@ -137,12 +133,15 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: GSFLOW = 0
     integer, parameter :: PRMS = 1
     integer, parameter :: MODFLOW = 2
+    integer, parameter :: GSFLOW_AG = 3
+    integer, parameter :: PRMS_AG = 4
     integer, parameter :: DOCUMENTATION = 99
     integer, parameter :: RUN = 0
     integer, parameter :: DECL = 1
     integer, parameter :: INIT = 2
     integer, parameter :: CLEAN = 3
     integer, parameter :: SETDIMENS = 4
+    integer, parameter :: WRITE_CLIMATE=24, CONVERT=25, CLIMATE=26, POTET=27, TRANSPIRE=28, FROST=29
 
     ! Error Codes
     integer, parameter :: ERROR_modflow = -5

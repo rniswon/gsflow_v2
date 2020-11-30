@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2020-11-10'
+      character(len=*), parameter :: Version_basin = '2020-11-17'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -468,7 +468,7 @@
         !  PRINT *, '       pervious fraction:', Hru_frac_perv(i)
         !  PRINT *, '       impervious fraction:', Hru_percent_imperv(i)
         !  IF ( Dprst_flag==ON ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
-        !  IF ( Agriculture_flag>OFF )    PRINT *, '       agriculture fraction:', Ag_frac(i)
+        !  IF ( Agriculture_flag>OFF ) PRINT *, '       agriculture fraction:', Ag_frac(i)
         !  basinit = 1
         !ENDIF
         Hru_frac_perv(i) = Hru_perv(i)/harea

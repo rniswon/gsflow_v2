@@ -5,12 +5,16 @@
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ON, OFF,
      +    MODFLOW, GSFLOW, ERROR_restart, ERROR_modflow, ERROR_time,
      +    ERROR_control, ERROR_param
-      USE PRMS_MODULE, ONLY: Print_debug, Model, GSFLOW_flag, Have_lakes
+      USE PRMS_MODULE, ONLY: Print_debug, Model, GSFLOW_flag,
+     +    Have_lakes, Kper_mfo, Kkiter, Timestep, Init_vars_from_file,
+     +    Mxsziter, Glacier_flag, PRMS_land_iteration_flag, Soil_iter,
+     +    Canopy_iter, Keep_iterating_PRMS, Process, Timestep,
+     +    Save_vars_to_file
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2020-09-30'
+      character(len=*), parameter :: Version_gsflow_modflow='2020-11-25'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -477,9 +481,6 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
-     &    Init_vars_from_file, Mxsziter, Glacier_flag,
-     &    PRMS_iteration_flag
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
 C1------USE package modules.
       USE GLOBAL
@@ -498,10 +499,9 @@ c     USE LMGMODULE
       INTEGER I
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
-      INTEGER, EXTERNAL :: soilzone, GET_KPER
-      INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
+      INTEGER, EXTERNAL :: GET_KPER
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsfclean
-      EXTERNAL READ_STRESS
+      EXTERNAL READ_STRESS, PRMS_land_modules, PRMS_land_modules_all
       INTRINSIC MIN
 ! Local Variables
       INTEGER :: retval, II, KITER, IBDRET, iss
@@ -669,34 +669,11 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ON ) THEN
-              IF ( PRMS_iteration_flag==1 ) THEN
-                retval = intcp()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'intcp', retval
-                  RETURN
-                ENDIF
-                retval = snowcomp()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'snowcomp', retval
-                  RETURN
-                ENDIF
-                IF ( Glacier_flag==ON ) THEN
-                  retval = glacr()
-                  IF ( retval/=0 ) THEN
-                    PRINT 9001, 'glacr_melt', retval
-                    RETURN
-                  ENDIF
-                ENDIF
-                retval = srunoff()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'srunoff', retval
-                  RETURN
-                ENDIF
-              ENDIF
-              retval = soilzone()
-              IF ( retval/=0 ) THEN
-                PRINT 9001, 'soilzone', retval
-                RETURN
+              IF ( Model==GSFLOW ) THEN
+                CALL PRMS_land_modules(Process, Canopy_iter, Soil_iter,
+     1                                 Keep_iterating_PRMS, retval)
+              ELSE ! GSFLOW_AG
+                CALL PRMS_land_modules_all(Process, retval)
               ENDIF
               retval = gsflow_prms2mf()
               IF ( retval.NE.0 ) THEN
@@ -705,7 +682,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
               ENDIF
               Sziters = Sziters + 1
               Maxgziter = KKITER
-              IF ( KKITER==Mxsziter ) Szcheck = OFF ! stop calling soilzone in iteration loop
+              IF ( KKITER==Mxsziter ) Szcheck = OFF ! stop calling PRMS in iteration loop
             ELSEIF ( iss==0 ) THEN
               IF ( KKITER==Mxsziter+1 ) Stopcount = Stopcount + 1
             ENDIF
@@ -1045,7 +1022,6 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
 !gsf  USE PCGN
       USE GWFNWTMODULE, ONLY:LINMETH

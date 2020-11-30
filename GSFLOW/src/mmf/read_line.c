@@ -63,8 +63,8 @@ long read_line (void) {
 /*
 **   get initial delta-t from control data base
 */
-   initial_deltat = *control_fvar("initial_deltat");
-   data_eof_flag = *control_lvar ("ignore_data_file_end");
+ //  initial_deltat = *control_fvar("initial_deltat");
+ //  data_eof_flag = *control_lvar("ignore_data_file_end");
 
    if (Mnsteps == 0) {
       start_of_data = TRUE;
@@ -148,9 +148,9 @@ cur_fd->time = {year = 1956, month = 2, day = 19, hour = 0, min = 0, sec = 0,
 		 */
 		  *Mnowtime = prevtime;
 		 //(void)fprintf (stderr,"nowtime=endtime\n");
-		 if (data_eof_flag == 1) {
+//		 if (data_eof_flag == 1) {
 			Mendtime = Mnowtime;
-			return (0); }
+			return (0); // }
 		 //(void)fprintf (stderr,"nowtime=endtime 2\n");
          return ENDOFDATA;
       }
@@ -158,7 +158,8 @@ cur_fd->time = {year = 1956, month = 2, day = 19, hour = 0, min = 0, sec = 0,
       if (Mnowtime->jt >= Mstrttime->jt) {
          if (start_of_data) {
             start_of_data = 0;
-            Mprevjt = Mnowtime->jt - (double)(initial_deltat / 24.0);
+            //Mprevjt = Mnowtime->jt - (double)(initial_deltat / 24.0);
+			Mprevjt = Mnowtime->jt - (double)(1.0);
          }
 
          (void)strncpy (line, cur_fd->start_of_data, max_data_ln_len);

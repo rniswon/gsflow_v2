@@ -66,7 +66,7 @@ typedef struct {
   char *key;
   long size;
   long type;
-  void *start_ptr;
+  char *start_ptr;
   long set_in_file;
 } CONTROL;                 /* control variable pointer structure */
 

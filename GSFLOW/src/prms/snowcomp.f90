@@ -14,7 +14,7 @@
      &    MONTHS_PER_YEAR, DEBUG_less, DAYS_YR, CLOSEZERO, INCH2CM
       USE PRMS_MODULE, ONLY: Model, Process_flag, Nhru, Ndepl, Print_debug, &
      &    Save_vars_to_file, Init_vars_from_file, Snarea_curve_flag, Glacier_flag, Start_year, &
-     &    PRMS_iteration_flag, Kkiter
+     &    PRMS_land_iteration_flag, Kkiter
       IMPLICIT NONE
       !****************************************************************
       !   Local Constants
@@ -126,7 +126,7 @@
 
       CALL print_module(MODDESC, MODNAME, Version_snowcomp)
 
-      IF ( PRMS_iteration_flag==ON ) THEN
+      IF ( PRMS_land_iteration_flag==ON ) THEN
         ALLOCATE ( It0_snowcov_area(Nhru), It0_snowcov_areasv(Nhru), It0_pkwater_equiv(Nhru) )
         ALLOCATE ( It0_albedo(Nhru), It0_pk_depth(Nhru), It0_iasw(Nhru), It0_pst(Nhru) )
         ALLOCATE ( It0_pksv(Nhru), It0_scrv(Nhru), It0_pk_temp(Nhru), It0_pss(Nhru), It0_ai(Nhru) )
@@ -931,7 +931,7 @@
 !***********************************************************************
       snorun = 0
 
-      IF ( PRMS_iteration_flag==ON ) THEN
+      IF ( PRMS_land_iteration_flag==ON ) THEN
         IF ( Kkiter>1 ) THEN
           Pkwater_equiv = It0_pkwater_equiv
           Snowcov_area = It0_snowcov_area

@@ -7,12 +7,12 @@
       USE PRMS_CONSTANTS, ONLY: ON, OFF, DEBUG_WB, DOCUMENTATION, NEARZERO, DNEARZERO, &
      &    RUN, DECL, INIT, CLEAN, ON, DEBUG_WB, DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
       USE PRMS_MODULE, ONLY: Nhru, Model, Process_flag, Save_vars_to_file, Init_vars_from_file, &
-     &    Print_debug, Water_use_flag, Kkiter, PRMS_iteration_flag
+     &    Print_debug, Water_use_flag, Kkiter, PRMS_land_iteration_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2020-09-21'
+      character(len=*), parameter :: Version_intcp = '2020-11-30'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -46,7 +46,7 @@
       EXTERNAL :: intcp_restart
 !***********************************************************************
       intcp = 0
-
+print *, 'in intcp', process_flag, intcp
       IF ( Process_flag==RUN ) THEN
         intcp = intrun()
       ELSEIF ( Process_flag==DECL ) THEN
@@ -56,8 +56,10 @@
         intcp = intinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
         IF ( Save_vars_to_file==ON ) CALL intcp_restart(0)
+      ELSEIF ( Process_flag==4 ) THEN
+          print *, 'intcp setdim'
       ENDIF
-
+print *, 'leaving intcp'
       END FUNCTION intcp
 
 !***********************************************************************
@@ -77,12 +79,13 @@
 
       CALL print_module(MODDESC, MODNAME, Version_intcp)
 
-      IF ( PRMS_iteration_flag==ON ) THEN
+      IF ( PRMS_land_iteration_flag==ON ) THEN
         ALLOCATE ( It0_intcp_stor(Nhru), It0_intcp_transp_on(Nhru) )
         ALLOCATE ( It0_hru_intcpstor(Nhru) )
       ENDIF
 
 ! NEW VARIABLES and PARAMETERS for APPLICATION RATES
+      print *, 'intcp decl'
       Use_transfer_intcp = OFF
       IF ( Water_use_flag==ON .OR. Model==DOCUMENTATION ) THEN
         Use_transfer_intcp = ON
@@ -120,7 +123,7 @@
       IF ( declvar(MODNAME, 'net_snow', 'nhru', Nhru, 'real', &
      &     'Snow that falls through canopy for each HRU', &
      &     'inches', Net_snow)/=0 ) CALL read_error(3, 'net_snow')
-
+print *, 'after net_snow'
       ALLOCATE ( Net_ppt(Nhru) )
       IF ( declvar(MODNAME, 'net_ppt', 'nhru', Nhru, 'real', &
      &     'Precipitation (rain and/or snow) that falls through the canopy for each HRU', &
@@ -186,7 +189,7 @@
      &     'inches', Basin_changeover)/=0 ) CALL read_error(3, 'basin_changeover')
 
       ALLOCATE ( Intcp_transp_on(Nhru) )
-
+ print *, 'before params'
 ! declare parameters
       ALLOCATE ( Snow_intcp(Nhru) )
       IF ( declparam(MODNAME, 'snow_intcp', 'nhru', 'real', &
@@ -269,7 +272,7 @@
       USE PRMS_INTCP
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_type, Covden_win, Covden_sum, &
      &    Hru_route_order, Hru_area, Cov_type
-      USE PRMS_WATER_USE, ONLY: Canopy_gain
+      USE PRMS_WATER_USE, ONLY: Canopy_gain ! need to add ag apply ???
 ! Newsnow and Pptmix can be modfied, WARNING!!!
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, &
      &    Hru_snow, Transp_on, Potet, Use_pandata, Hru_pansta, Epan_coef, Potet_sublim
@@ -289,7 +292,7 @@
       intrun = 0
 
       ! pkwater_equiv is from last time step
-      IF ( PRMS_iteration_flag==ON ) THEN
+      IF ( PRMS_land_iteration_flag==ON ) THEN
         IF ( Kkiter>1 ) THEN
           Intcp_stor = It0_intcp_stor
           Hru_intcpstor = It0_hru_intcpstor

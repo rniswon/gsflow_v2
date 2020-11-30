@@ -57,7 +57,7 @@ void setup_cont (void) {
         decl_control_string ("transp_module", "transp_tindex");
         decl_control_string ("gsflow_output_file", "gsflow.out");
         decl_control_string ("gsflow_csv_file", "gsflow.csv");
-		decl_control_string ("creator_email", "unknown");
+		//decl_control_string ("creator_email", "unknown");
 		decl_control_string ("aet_module", "unknown");
 		decl_control_string ("irrigation_area_module", "unknown");
 
@@ -101,15 +101,19 @@ void setup_cont (void) {
 
 		lval = (long*)umalloc(sizeof(long));
 		lval[0] = 0;
-		decl_control_int_array("agriculture_flag", 1, lval);
-		
+		decl_control_int_array("agriculture_soil_flag", 1, lval);
+
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("agriculture_canopy_flag", 1, lval);
+
         lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
 		decl_control_int_array ("dprst_flag", 1, lval);
 
 		lval = (long*)umalloc(sizeof(long));
 		lval[0] = 0;
-		decl_control_int_array("PRMS_iteration_flag", 1, lval);
+		decl_control_int_array("PRMS_land_iteration_flag", 1, lval);
 
         lval = (long *)umalloc (sizeof (long));
 		lval[0] = 1;
@@ -263,13 +267,13 @@ void setup_cont (void) {
 		lval[0] = 0;
 		decl_control_int_array ("orad_flag", 1, lval);
 
-		lval = (long *)umalloc (sizeof (long));
-		lval[0] = 0;
-		decl_control_int_array ("snow_cbh_flag", 1, lval);
+		//lval = (long *)umalloc (sizeof (long));
+		//lval[0] = 0;
+		//decl_control_int_array ("snow_cbh_flag", 1, lval);
 
-		lval = (long *)umalloc (sizeof (long));
-		lval[0] = 0;
-		decl_control_int_array ("gwflow_cbh_flag", 1, lval);
+		//lval = (long *)umalloc (sizeof (long));
+		//lval[0] = 0;
+		//decl_control_int_array ("gwflow_cbh_flag", 1, lval);
 
 		lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
@@ -353,6 +357,8 @@ void setup_cont (void) {
 		decl_control_string("nsegmentOutBaseFileName", "nsegmentout_path");
 		decl_control_string("dynamic_param_log_file", "dynamic_parameter.out");
 		decl_control_string("selectDatesFileName", "selectDates.in");
+		decl_control_string("precip_map_file", "precip_map.dat");
+		decl_control_string("temp_map_file", "temp_map.dat");
 /*
 **	run start and end times
 */
