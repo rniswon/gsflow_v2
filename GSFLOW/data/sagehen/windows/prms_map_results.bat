@@ -1,6 +1,6 @@
 @ECHO OFF
 
-..\..\..\bin\gsflow_2.3 .\prms_map_results.control
+..\..\..\bin\gsflow .\prms_map_results.control
 ECHO.
 ECHO Run complete. Please press enter when you want to continue.
 PAUSE>NUL
