@@ -720,7 +720,8 @@
       IF ( getparam(MODNAME, 'slowcoef_lin', Nhru, 'real', Slowcoef_lin)/=0 ) CALL read_error(2, 'slowcoef_lin')
       IF ( getparam(MODNAME, 'slowcoef_sq', Nhru, 'real', Slowcoef_sq)/=0 ) CALL read_error(2, 'slowcoef_sq')
       IF ( getparam(MODNAME, 'pref_flow_den', Nhru, 'real', Pref_flow_den)/=0 ) CALL read_error(2, 'pref_flow_den')
-      IF ( getparam(MODNAME, 'pref_flow_infil_frac', Nhru, 'real', Pref_flow_infil_frac)/=0 ) CALL read_error(2, 'pref_flow_infil_frac')
+      IF ( getparam(MODNAME, 'pref_flow_infil_frac', Nhru, 'real', Pref_flow_infil_frac)/=0 ) &
+     &     CALL read_error(2, 'pref_flow_infil_frac')
       IF ( Pref_flow_infil_frac(1)<0.0 ) Pref_flow_infil_frac = Pref_flow_den ! should pref_flow_infil_frac be set to 0 if pref_flow_den = 0 ???
       IF ( getparam(MODNAME, 'fastcoef_lin', Nhru, 'real', Fastcoef_lin)/=0 ) CALL read_error(2, 'fastcoef_lin')
       IF ( getparam(MODNAME, 'fastcoef_sq', Nhru, 'real', Fastcoef_sq)/=0 ) CALL read_error(2, 'fastcoef_sq')

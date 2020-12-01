@@ -1275,11 +1275,11 @@ C
 C     CONVERT SECONDS TO DAYS, HOURS, MINUTES, AND SECONDS
       NDAYS = ELSEC/NSPD
       RSECS = MOD(ELSEC,86400.0)
-      NHOURS = RSECS/3600.0
+      NHOURS = NINT(RSECS/3600.0)
       RSECS = MOD(RSECS,3600.0)
-      NMINS = RSECS/60.0
+      NMINS = NINT(RSECS/60.0)
       RSECS = MOD(RSECS,60.0)
-      NSECS = RSECS
+      NSECS = NINT(RSECS)
       RSECS = MOD(RSECS,1.0)
       MSECS = NINT(RSECS*1000.0)
       NRSECS = NSECS
@@ -1552,7 +1552,7 @@ C
           KPER = 1
           IF ( ISSFLG(1)==0 ) CALL READ_STRESS()
         ELSE
-          nstress = Modflow_skip_stress - ISSFLG(1)
+          nstress = INT(Modflow_skip_stress) - ISSFLG(1)
           DO i = 1, nstress   !RGN because SP1 already read if SS during first period.
             KPER = KPER + 1 ! set to next stress period
             IF ( ISSFLG(i) == 0 ) CALL READ_STRESS()
@@ -1565,7 +1565,7 @@ C
 !        print *, nstress, n, Modflow_time_in_stress, Modflow_skip_stress
         ENDIF
         KPERSTART = KPER
-        TOTIM = TOTIM + Modflow_skip_time/Mft_to_days ! TOTIM includes SS time as set above, rsr
+        TOTIM = TOTIM + NINT(Modflow_skip_time/Mft_to_days) ! TOTIM includes SS time as set above, rsr
       ELSEIF ( Init_vars_from_file==0 .AND. ISSFLG(1)/=1) THEN
         !start with TR and no restart and no skip time
         KPER = KPER + 1 ! set to next stress period

@@ -469,7 +469,7 @@ long declparam_p_ (char *mname, char *pname, char *pdimen, char *ptype,
 	retval = declparam_p(module, name, dimen, type, value,
 	    minimum, maximum, descr, help, units, val);
 
-	return(0);
+	return(retval);
 }
 
 /*--------------------------------------------------------------------*\

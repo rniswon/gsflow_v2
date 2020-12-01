@@ -47,10 +47,10 @@ long read_line (void) {
    /*static char err[80];*/
 
    char   *start_point, *end_point;
-   float   initial_deltat;
+   //float   initial_deltat;
    long   i,j;
    static int   start_of_data;
-   static long	data_eof_flag;
+   //static long	data_eof_flag;
    DATETIME   prevtime;
    FILE_DATA   *cur_fd;
    char   *err_ptr;

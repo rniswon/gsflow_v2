@@ -14,7 +14,7 @@
       DOUBLE PRECISION, SAVE :: Total_pump, Total_pump_cfs, StreamExchng2Sat_Q, Stream2Unsat_Q, Sat_S
       DOUBLE PRECISION, SAVE :: Stream_inflow, Basin_gw2sm, NetBoundaryFlow2Sat_Q
       DOUBLE PRECISION, SAVE :: Unsat_S, Sat_dS, LakeExchng2Sat_Q, Lake2Unsat_Q, Basin_szreject
-      REAL, SAVE, ALLOCATABLE :: Reach_cfs(:), Reach_wse(:), Streamflow_sfr(:)
+      REAL, SAVE, ALLOCATABLE :: Reach_cfs(:), Reach_wse(:), Streamflow_sfr(:), Seepage_reach_sfr(:), Seepage_segment_sfr(:)
       REAL, SAVE, ALLOCATABLE :: Gw2sm(:), Actet_gw(:), Actet_tot_gwsz(:), Gw_rejected(:)
 !      REAL, SAVE, ALLOCATABLE :: Uzf_infil_map(:), Sat_recharge(:), Mfoutflow_to_gvr(:)
       END MODULE GSFBUDGET
@@ -155,6 +155,16 @@
      &     'Streamflow as computed by SFR for each segment', &
      &     'cfs', Streamflow_sfr)/=0 ) CALL read_error(3, 'streamflow_sfr')
 
+      ALLOCATE (Seepage_reach_sfr(Nreach))
+      IF ( declvar(MODNAME, 'seepage_reach_sfr', 'nreach', Nreach, 'real', &
+     &     'Seepage as computed by SFR for each reach', &
+     &     'cfs', Seepage_reach_sfr)/=0 ) CALL read_error(3, 'seepage_reach_sfr')
+
+      ALLOCATE (Seepage_segment_sfr(Nreach))
+      IF ( declvar(MODNAME, 'seepage_segment_sfr', 'nsegment', Nsegment, 'real', &
+     &     'Seepage as computed by SFR for each segment', &
+     &     'cfs', Seepage_segment_sfr)/=0 ) CALL read_error(3, 'seepage_segment_sfr')
+
       ALLOCATE ( Gw_rejected(Nhru) )
       IF ( declvar(MODNAME, 'gw_rejected', 'nhru', Nhru, 'real', &
      &     'HRU average recharge rejected by UZF', 'inches', &
@@ -220,6 +230,8 @@
       Actet_gw = 0.0 ! dimension nhru
       Actet_tot_gwsz = 0.0 ! dimension nhru
       Streamflow_sfr = 0.0 ! dimension nsegment
+      Seepage_reach_sfr = 0.0 ! dimension nreach
+      Seepage_segment_sfr = 0.0 ! dimension nsegment
 
 !  Set the volume budget indicies to -1 anytime "init" is called.
 !  This will make "run" figure out the vbnm order.
@@ -288,6 +300,8 @@
         Fluxchange(i) = 0.0
       ENDDO
       Streamflow_sfr = 0.0
+      Seepage_reach_sfr = 0.0
+      Seepage_segment_sfr = 0.0
 
       DO i = 1, Nhrucell
         ihru = Gvr_hru_id(i)
@@ -678,10 +692,10 @@
 !***********************************************************************
       SUBROUTINE getStreamFlow()
       USE GSFBUDGET, ONLY: Reach_cfs, Reach_wse, StreamExchng2Sat_Q, &
-     &    Stream_inflow, Streamflow_sfr
+     &    Stream_inflow, Streamflow_sfr, Seepage_reach_sfr, Seepage_segment_sfr
       USE GSFMODFLOW, ONLY: Mfl3t_to_cfs
       USE GWFSFRMODULE, ONLY: STRM, IOTSG, NSS, SGOTFLW, SFRRATOUT, &
-     &    TOTSPFLOW, NSTRM, SFRRATIN
+     &    TOTSPFLOW, NSTRM, SFRRATIN, ISTRM
       USE PRMS_FLOWVARS, ONLY: Basin_cfs, Basin_cms, Basin_stflow_out
       USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
       USE PRMS_SET_TIME, ONLY: Cfs2inches
@@ -690,7 +704,7 @@
       IMPLICIT NONE
       INTRINSIC DBLE
 ! Local Variables
-      INTEGER :: i, itemp, j
+      INTEGER :: i, itemp, j, first_reach, nrch
 !***********************************************************************
       DO i = 1, NSTRM
 ! Reach_cfs and reach_wse are not used except to be available for output
@@ -703,6 +717,7 @@
 ! Ignore segments that are used for irrigation
       Basin_cfs = 0.0D0
       Stream_inflow = 0.0D0
+      first_reach = 1
       DO i = 1, NSS
         itemp = 0
         IF ( IUNIT(66) > 0 ) THEN
@@ -711,7 +726,13 @@
           END DO
         END IF
         IF ( IOTSG(i)==0 .and. itemp == 0 ) Basin_cfs = Basin_cfs + SGOTFLW(i)
-        Streamflow_sfr(i) = DBLE( SGOTFLW(i) )*Mfl3t_to_cfs
+        Streamflow_sfr(i) = SGOTFLW(i)*SNGL( Mfl3t_to_cfs )
+        nrch = ISTRM(5, i)
+        DO j = first_reach, nrch + first_reach - 1
+          Seepage_reach_sfr(i) = Seepage_reach_sfr(i) + STRM(11,j)*SNGL( Mfl3t_to_cfs )
+        ENDDO
+        Seepage_segment_sfr(i) = Seepage_reach_sfr(i)/FLOAT(nrch)
+        first_reach = first_reach + nrch
       ENDDO 
       IF ( TOTSPFLOW<0.0 ) THEN
         Basin_cfs = Basin_cfs + TOTSPFLOW

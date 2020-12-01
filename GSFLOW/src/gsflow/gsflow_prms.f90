@@ -1499,10 +1499,7 @@
       INTEGER, EXTERNAL :: intcp, snowcomp, glacr, srunoff, soilzone
       EXTERNAL :: module_error
 !***********************************************************************
-      print *, 'in land modules'
       Return_code = intcp()
-      print *, '???'
-      print *, 'after intcp', Return_code
       IF ( Return_code/=0 ) CALL module_error('intcp', Arg, Return_code)
 
       Return_code = snowcomp()
@@ -1515,10 +1512,10 @@
 
       Return_code = srunoff() ! call once for PRMS-only and GSFLOW mode, more if agriculture_flag>0 and PRMS_land_iteration_flag>0
       IF ( Return_code/=0 ) CALL module_error(Srunoff_module, Arg, Return_code)
-print *, 'after sro'
+
       Return_code = soilzone()
       IF ( Return_code/=0 ) CALL module_error(Soilzone_module, Arg, Return_code)
-print *, 'after sz'
+
       END SUBROUTINE PRMS_land_modules_all
 
 !***********************************************************************

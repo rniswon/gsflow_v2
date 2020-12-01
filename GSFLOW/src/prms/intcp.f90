@@ -46,7 +46,7 @@
       EXTERNAL :: intcp_restart
 !***********************************************************************
       intcp = 0
-print *, 'in intcp', process_flag, intcp
+
       IF ( Process_flag==RUN ) THEN
         intcp = intrun()
       ELSEIF ( Process_flag==DECL ) THEN
@@ -56,10 +56,7 @@ print *, 'in intcp', process_flag, intcp
         intcp = intinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
         IF ( Save_vars_to_file==ON ) CALL intcp_restart(0)
-      ELSEIF ( Process_flag==4 ) THEN
-          print *, 'intcp setdim'
       ENDIF
-print *, 'leaving intcp'
       END FUNCTION intcp
 
 !***********************************************************************
@@ -85,7 +82,6 @@ print *, 'leaving intcp'
       ENDIF
 
 ! NEW VARIABLES and PARAMETERS for APPLICATION RATES
-      print *, 'intcp decl'
       Use_transfer_intcp = OFF
       IF ( Water_use_flag==ON .OR. Model==DOCUMENTATION ) THEN
         Use_transfer_intcp = ON
@@ -123,7 +119,7 @@ print *, 'leaving intcp'
       IF ( declvar(MODNAME, 'net_snow', 'nhru', Nhru, 'real', &
      &     'Snow that falls through canopy for each HRU', &
      &     'inches', Net_snow)/=0 ) CALL read_error(3, 'net_snow')
-print *, 'after net_snow'
+
       ALLOCATE ( Net_ppt(Nhru) )
       IF ( declvar(MODNAME, 'net_ppt', 'nhru', Nhru, 'real', &
      &     'Precipitation (rain and/or snow) that falls through the canopy for each HRU', &
@@ -189,7 +185,7 @@ print *, 'after net_snow'
      &     'inches', Basin_changeover)/=0 ) CALL read_error(3, 'basin_changeover')
 
       ALLOCATE ( Intcp_transp_on(Nhru) )
- print *, 'before params'
+
 ! declare parameters
       ALLOCATE ( Snow_intcp(Nhru) )
       IF ( declparam(MODNAME, 'snow_intcp', 'nhru', 'real', &
