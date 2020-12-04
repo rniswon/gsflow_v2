@@ -10,13 +10,13 @@
 !RSR:          Northern hemisphere and Julian day 265 to 79 in Southern
 !***********************************************************************
       MODULE PRMS_DDSOLRAD
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, DEBUG_less, MONTHS_PER_YEAR, ON, OFF
+        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, DEBUG_less, MONTHS_PER_YEAR, ACTIVE, OFF
         USE PRMS_MODULE, ONLY: Process_flag, Print_debug, Nhru, Nsol
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Solar Radiation Distribution'
         character(len=*), parameter :: MODNAME = 'ddsolrad'
-        character(len=*), parameter :: Version_ddsolrad = '2020-09-14'
+        character(len=*), parameter :: Version_ddsolrad = '2020-12-02'
         INTEGER, SAVE :: Observed_flag
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Radadj_slope(:, :), Radadj_intcp(:, :)
@@ -163,7 +163,7 @@
         IF ( getparam(MODNAME, 'radadj_intcp', Nhru*MONTHS_PER_YEAR, 'real', Radadj_intcp)/=0 ) CALL read_error(2, 'radadj_intcp')
         IF ( getparam(MODNAME, 'tmax_index', Nhru*MONTHS_PER_YEAR, 'real', Tmax_index)/=0 ) CALL read_error(2, 'tmax_index')
         Observed_flag = OFF
-        IF ( Nsol>0 .AND. Basin_solsta>0 ) Observed_flag = ON
+        IF ( Nsol>0 .AND. Basin_solsta>0 ) Observed_flag = ACTIVE
 
       ENDIF
 

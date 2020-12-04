@@ -192,7 +192,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: smidx_module = 1, carea_module = 2
 
     integer, parameter :: OFF = 0
-    integer, parameter :: ON = 1
+    integer, parameter :: ACTIVE = 1
     integer, parameter :: INT_TYPE = 1
     integer, parameter :: REAL_TYPE = 2
     integer, parameter :: DBLE_TYPE = 3

@@ -3,15 +3,15 @@
 ! reservoirs for routing flow downslope
 !***********************************************************************
       MODULE PRMS_CASCADE
-      USE PRMS_CONSTANTS, ONLY: ON, OFF, DEBUG_less, INACTIVE, LAND, LAKE, SWALE, GLACIER, &
-     &    ERROR_cascades, DECL, INIT, CLEAN, DOCUMENTATION, CASCADE_OFF, CASCADE_HRU_SEGMENT, &
-     &    CASCADE_NORMAL, CASCADEGW_OFF
-      USE PRMS_MODULE, ONLY: Nhru, Ngw, Nsegment, Ncascade, Ncascdgw, Model, Print_debug, Process_flag
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_less, INACTIVE, LAND, LAKE, SWALE, GLACIER, &
+     &    ERROR_cascades, DOCUMENTATION, CASCADE_OFF, CASCADE_HRU_SEGMENT, CASCADE_NORMAL, CASCADEGW_OFF
+      USE PRMS_MODULE, ONLY: Nhru, Ngw, Nsegment, Ncascade, Ncascdgw, Model, Print_debug, &
+     &    Cascade_flag, Cascadegw_flag, Gwr_swale_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Cascading Flow'
       character(len=*), parameter :: MODNAME = 'cascade'
-      character(len=*), parameter :: Version_cascade = '2020-08-13'
+      character(len=*), parameter :: Version_cascade = '2020-12-02'
       INTEGER, SAVE :: MSGUNT
       INTEGER, SAVE :: Iorder, Igworder, Ndown
 !   Computed Variables
@@ -51,7 +51,8 @@
 !     Main cascade routine
 !***********************************************************************
       INTEGER FUNCTION cascade()
-      USE PRMS_CASCADE, ONLY: Process_flag, DECL, INIT, CLEAN
+      USE PRMS_CONSTANTS, ONLY: DECL, INIT, CLEAN
+      USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: cascdecl, cascinit, cascclean
@@ -77,7 +78,6 @@
 !***********************************************************************
       INTEGER FUNCTION cascdecl()
       USE PRMS_CASCADE
-      USE PRMS_MODULE, ONLY: Cascade_flag, Cascadegw_flag
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: INDEX
@@ -127,7 +127,7 @@
      &       ' to a downslope HRU or stream segment for cascade area', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'hru_pct_up')
       ENDIF
-      IF ( Cascade_flag==CASCADE_HRU_SEGMENT .OR. Model==DOCUMENTATION ) THEN
+      IF ( Cascade_flag==CASCADE_HRU_SEGMENT .OR. Model==DOCUMENTATION ) THEN ! use hru_segment to define simple cascades
         ALLOCATE ( Hru_segment(Nhru) )
         IF ( declparam(MODNAME, 'hru_segment', 'nhru', 'integer', &
      &       '0', 'bounded', 'nsegment', &
@@ -197,7 +197,6 @@
 !***********************************************************************
       INTEGER FUNCTION cascinit()
       USE PRMS_CASCADE
-      USE PRMS_MODULE, ONLY: Cascade_flag, Cascadegw_flag, Gwr_swale_flag
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Gwr_route_order, Active_gwrs, Gwr_type, Hru_type
       IMPLICIT NONE
 ! Functions
@@ -308,8 +307,8 @@
 !***********************************************************************
       SUBROUTINE init_cascade(Iret)
       USE PRMS_CASCADE
-      USE PRMS_MODULE, ONLY: Cascadegw_flag, Cascade_flag
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area
+      IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: getparam
       EXTERNAL :: order_hrus, read_error
@@ -543,8 +542,11 @@
 ! order hrus allowing many to 1
 !***********************************************************************
       SUBROUTINE order_hrus(Iret)
-      USE PRMS_CASCADE
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, INACTIVE, LAND, LAKE, SWALE, GLACIER
+      USE PRMS_CASCADE, ONLY: Hru_down, Iorder, MSGUNT, Circle_switch, Ncascade_hru
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type
+      IMPLICIT NONE
 ! Functions
       EXTERNAL :: up_tree, PRMS_open_module_file
 !     Arguments
@@ -635,7 +637,7 @@
 
       Iret = 0
 ! check for circles when circle_switch = 1
-      IF ( Circle_switch==ON ) THEN
+      IF ( Circle_switch==ACTIVE ) THEN
         circle_flg = 0
         DO i = 1, nroots
           ihru = roots(i)
@@ -746,8 +748,8 @@
 !***********************************************************************
       SUBROUTINE initgw_cascade(Iret)
       USE PRMS_CASCADE
-      USE PRMS_MODULE, ONLY: Gwr_swale_flag
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, Gwr_type, Hru_area
+      IMPLICIT NONE
 ! Functions
       EXTERNAL :: order_gwrs
       INTRINSIC :: ABS, DBLE
@@ -935,9 +937,10 @@
 ! order GWRs allowing many to 1
 !***********************************************************************
       SUBROUTINE order_gwrs(Iret)
-      USE PRMS_CASCADE
-      USE PRMS_MODULE, ONLY: Gwr_swale_flag
+      USE PRMS_CASCADE, ONLY: Gwr_down, Igworder, MSGUNT, Circle_switch, Ncascade_gwr, &
+      &   Ngw, Print_debug, Gwr_swale_flag
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, Gwr_type
+      IMPLICIT NONE
 ! Functions
       EXTERNAL :: up_tree
 !     Arguments

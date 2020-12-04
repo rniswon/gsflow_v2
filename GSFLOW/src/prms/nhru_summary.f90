@@ -3,7 +3,7 @@
 !***********************************************************************
       MODULE PRMS_NHRU_SUMMARY
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, &
-     &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ON, OFF, &
+     &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, &
      &    REAL_TYPE, DBLE_TYPE, INT_TYPE, DNEARZERO, RUN, DECL, INIT, CLEAN, DOCUMENTATION
       USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Nsub, NhruOutON_OFF, Prms_warmup, &
      &    Start_year, Start_month, Start_day, End_year, End_month, End_day
@@ -11,7 +11,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nhru_summary'
-      character(len=*), parameter :: Version_nhru_summary = '2020-09-21'
+      character(len=*), parameter :: Version_nhru_summary = '2020-12-02'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nhru_var_type(:), Nhru_var_int(:, :)
       REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
@@ -50,13 +50,13 @@
         CALL nhru_summaryinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
         DO i = 1, NhruOutVars
-          IF ( Daily_flag==ON ) THEN
+          IF ( Daily_flag==ACTIVE ) THEN
             IF ( Dailyunit(i)>0 ) CLOSE ( Dailyunit(i) )
           ENDIF
           IF ( NhruOut_freq>MEAN_MONTHLY ) THEN
             IF ( Yearlyunit(i)>0 ) CLOSE ( Yearlyunit(i) )
           ENDIF
-          IF ( Monthly_flag==ON ) THEN
+          IF ( Monthly_flag==ACTIVE ) THEN
             IF ( Monthlyunit(i)>0 ) CLOSE ( Monthlyunit(i) )
           ENDIF
         ENDDO
@@ -88,7 +88,7 @@
       IF ( control_integer(NhruOutNcol, 'nhruOutNcol')/=0 ) NhruOutNcol = 0
 
       IF ( control_integer(outputSelectDatesON_OFF, 'outputSelectDatesON_OFF')/=0 ) outputSelectDatesON_OFF = OFF
-      IF ( outputSelectDatesON_OFF==ON ) THEN
+      IF ( outputSelectDatesON_OFF==ACTIVE ) THEN
         IF ( control_string(selectDatesFileName, 'selectDatesFileName')/=0 ) CALL read_error(5, 'selectDatesFileName')
       ENDIF
 
@@ -119,7 +119,6 @@
 !***********************************************************************
       SUBROUTINE nhru_summaryinit()
       USE PRMS_NHRU_SUMMARY
-      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam
@@ -128,12 +127,12 @@
       INTEGER :: ios, ierr, size, dim, jj, j
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
 !***********************************************************************
-      Begin_results = ON
+      Begin_results = ACTIVE
       IF ( Prms_warmup>0 ) Begin_results = OFF
       Begyr = Start_year + Prms_warmup
       Lastyear = Begyr
 
-      IF ( outputSelectDatesON_OFF==ON ) THEN
+      IF ( outputSelectDatesON_OFF==ACTIVE ) THEN
         CALL find_header_end(selectDates_unit, selectDatesFileName, 'selectDatesFileName', ierr, 0, 0)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(selectDates_unit, Start_year, Start_month, Start_day, &
@@ -171,8 +170,8 @@
       DO jj = 1, NhruOutVars
         Nc_vars(jj) = numchars(NhruOutVar_names(jj))
         Nhru_var_type(jj) = getvartype(NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru_var_type(jj) )
-        IF ( Nhru_var_type(jj)==DBLE_TYPE ) Double_vars = ON
-        IF ( Nhru_var_type(jj)==INT_TYPE ) Integer_vars = ON
+        IF ( Nhru_var_type(jj)==DBLE_TYPE ) Double_vars = ACTIVE
+        IF ( Nhru_var_type(jj)==INT_TYPE ) Integer_vars = ACTIVE
         IF ( Nhru_var_type(jj)/=REAL_TYPE .AND. Nhru_var_type(jj)/=DBLE_TYPE .AND. Nhru_var_type(jj)/=INT_TYPE ) THEN
           PRINT *, 'ERROR, invalid nhru_summary variable:', NhruOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only integer, real or double variables allowed'
@@ -186,24 +185,24 @@
         ENDIF
       ENDDO
       IF ( ierr==1 ) ERROR STOP ERROR_control
-      IF ( Double_vars==ON ) THEN
+      IF ( Double_vars==ACTIVE ) THEN
         ALLOCATE ( Nhru_var_dble(Nhru, NhruOutVars) )
         Nhru_var_dble = 0.0D0
       ENDIF
-      IF ( Integer_vars==ON ) THEN
+      IF ( Integer_vars==ACTIVE ) THEN
         ALLOCATE ( Nhru_var_int(Nhru, NhruOutVars) )
         Nhru_var_int = 0
       ENDIF
 
       Daily_flag = OFF
       IF ( NhruOut_freq==DAILY .OR. NhruOut_freq==DAILY_MONTHLY ) THEN
-        Daily_flag = ON
+        Daily_flag = ACTIVE
         ALLOCATE ( Dailyunit(NhruOutVars) )
         Dailyunit = 0
       ENDIF
 
       Monthly_flag = OFF
-      IF ( NhruOut_freq==MONTHLY .OR. NhruOut_freq==DAILY_MONTHLY .OR. NhruOut_freq==MEAN_MONTHLY ) Monthly_flag = ON
+      IF ( NhruOut_freq==MONTHLY .OR. NhruOut_freq==DAILY_MONTHLY .OR. NhruOut_freq==MEAN_MONTHLY ) Monthly_flag = ACTIVE
 
       IF ( NhruOut_freq>MEAN_MONTHLY ) THEN
         Yeardays = 0
@@ -223,7 +222,7 @@
         ENDIF
         WRITE ( Output_date_fmt3, "(A)" ) '(I0)'
         WRITE ( Output_fmt3int, 9019 ) NhruOutNcol - 1
-      ELSEIF ( Monthly_flag==ON ) THEN
+      ELSEIF ( Monthly_flag==ACTIVE ) THEN
         Monthdays = 0.0D0
         ALLOCATE ( Nhru_var_monthly(Nhru, NhruOutVars), Monthlyunit(NhruOutVars) )
         Nhru_var_monthly = 0.0D0
@@ -237,7 +236,7 @@
       ALLOCATE ( Nhru_var_daily(Nhru, NhruOutVars) )
       Nhru_var_daily = 0.0
       DO jj = 1, NhruOutVars
-        IF ( Daily_flag==ON ) THEN
+        IF ( Daily_flag==ACTIVE ) THEN
           fileName = NhruOutBaseFileName(:numchars(NhruOutBaseFileName))//NhruOutVar_names(jj)(:Nc_vars(jj))//'.csv'
           CALL PRMS_open_output_file(Dailyunit(jj), fileName, 'xxx', 0, ios)
           IF ( ios/=0 ) CALL error_stop('in nhru_summary, daily', ERROR_open_out)
@@ -263,7 +262,7 @@
             WRITE ( Yearlyunit(jj), Output_fmt2 ) (Nhm_id(j), j=1,Nhru)
           ENDIF
         ENDIF
-        IF ( Monthly_flag==ON ) THEN
+        IF ( Monthly_flag==ACTIVE ) THEN
           IF ( NhruOut_freq==MEAN_MONTHLY ) THEN
             fileName = NhruOutBaseFileName(:numchars(NhruOutBaseFileName))//NhruOutVar_names(jj)(:Nc_vars(jj))// &
      &                 '_meanmonthly.csv'
@@ -321,7 +320,7 @@
 !***********************************************************************
       IF ( Begin_results==OFF ) THEN
         IF ( Nowyear==Begyr .AND. Nowmonth==Start_month .AND. Nowday==Start_day ) THEN
-          Begin_results = ON
+          Begin_results = ACTIVE
         ELSE
           RETURN
         ENDIF
@@ -350,9 +349,9 @@
             ENDDO
           ENDIF
         ENDIF
-        IF ( Daily_flag==ON ) THEN
+        IF ( Daily_flag==ACTIVE ) THEN
           write_date = 1
-          IF ( outputSelectDatesON_OFF==ON ) THEN
+          IF ( outputSelectDatesON_OFF==ACTIVE ) THEN
             write_date = 0
             IF ( Nowyear==dates_next_year .AND. Nowmonth==dates_next_month.AND. Nowday==dates_next_day ) write_date = 1
           ENDIF
@@ -375,8 +374,8 @@
           ENDIF
         ENDIF
       ENDDO
-      IF ( outputSelectDatesON_OFF==ON ) THEN
-        IF ( Daily_flag==ON ) THEN
+      IF ( outputSelectDatesON_OFF==ACTIVE ) THEN
+        IF ( Daily_flag==ACTIVE ) THEN
           IF ( write_date==1 ) CALL read_event_date(selectDates_unit, dates_next_year, dates_next_month, dates_next_day)
         ENDIF
       ENDIF
@@ -384,9 +383,9 @@
       write_month = OFF
       IF ( NhruOut_freq>MEAN_MONTHLY ) THEN
         last_day = OFF
-        IF ( Nowyear==End_year .AND. Nowmonth==End_month .AND. Nowday==End_day ) last_day = ON
-        IF ( Lastyear/=Nowyear .OR. last_day==ON ) THEN
-          IF ( (Nowmonth==Start_month .AND. Nowday==Start_day) .OR. last_day==ON ) THEN
+        IF ( Nowyear==End_year .AND. Nowmonth==End_month .AND. Nowday==End_day ) last_day = ACTIVE
+        IF ( Lastyear/=Nowyear .OR. last_day==ACTIVE ) THEN
+          IF ( (Nowmonth==Start_month .AND. Nowday==Start_day) .OR. last_day==ACTIVE ) THEN
             DO jj = 1, NhruOutVars
               IF ( NhruOut_freq==MEAN_YEARLY ) THEN
                 DO j = 1, Active_hrus
@@ -419,13 +418,13 @@
           ENDIF
         ENDIF
         Yeardays = Yeardays + 1
-      ELSEIF ( Monthly_flag==ON ) THEN
+      ELSEIF ( Monthly_flag==ACTIVE ) THEN
         ! check for last day of month and simulation
         IF ( Nowday==Modays(Nowmonth) ) THEN
-          write_month = ON
+          write_month = ACTIVE
         ELSEIF ( Nowyear==End_year ) THEN
           IF ( Nowmonth==End_month ) THEN
-            IF ( Nowday==End_day ) write_month = ON
+            IF ( Nowday==End_day ) write_month = ACTIVE
           ENDIF
         ENDIF
         Monthdays = Monthdays + 1.0D0
@@ -441,19 +440,19 @@
         RETURN
       ENDIF
 
-      IF ( Monthly_flag==ON ) THEN
+      IF ( Monthly_flag==ACTIVE ) THEN
         DO jj = 1, NhruOutVars
           DO j = 1, Active_hrus
             i = Hru_route_order(j)
             Nhru_var_monthly(i, jj) = Nhru_var_monthly(i, jj) + DBLE( Nhru_var_daily(i, jj) )
-            IF ( write_month==ON ) THEN
+            IF ( write_month==ACTIVE ) THEN
               IF ( NhruOut_freq==MEAN_MONTHLY ) Nhru_var_monthly(i, jj) = Nhru_var_monthly(i, jj)/Monthdays
             ENDIF
           ENDDO
         ENDDO
       ENDIF
 
-      IF ( write_month==ON ) THEN
+      IF ( write_month==ACTIVE ) THEN
         DO jj = 1, NhruOutVars
           IF ( Nhru_var_type(jj)/=INT_TYPE ) THEN
             IF ( NhruOutNcol==Nhru) THEN
@@ -485,7 +484,7 @@
 !*****************************
       SUBROUTINE read_event_date(Iunit, Next_yr, Next_mo, Next_day)
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
-      USE PRMS_WATER_USE, ONLY: ERROR_water_use, ON, OFF
+      USE PRMS_CONSTANTS, ONLY: ERROR_water_use, ACTIVE, OFF
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Iunit
@@ -496,8 +495,8 @@
       INTEGER keep_reading
 !*******************************************************************************
       IF ( Next_mo==0 ) RETURN ! already found end of file
-      keep_reading = ON
-      DO WHILE ( keep_reading==ON )
+      keep_reading = ACTIVE
+      DO WHILE ( keep_reading==ACTIVE )
         IF ( Next_yr==Nowyear .AND. Next_mo==Nowmonth .AND. Next_day==Nowday ) THEN
           READ ( Iunit, * ) Next_yr, Next_mo, Next_day
           CALL is_eof(Iunit, Next_yr, Next_mo, Next_day)

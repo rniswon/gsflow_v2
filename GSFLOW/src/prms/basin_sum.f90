@@ -3,15 +3,15 @@
 ! and flows for all HRUs
 !***********************************************************************
       MODULE PRMS_BASINSUM
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ON, DOCUMENTATION, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, DOCUMENTATION, &
      &    strmflow_muskingum_module, strmflow_muskingum_lake_module, strmflow_muskingum_mann_module
-      USE PRMS_MODULE, ONLY: Nhru, Nobs, Model, Process_flag, Init_vars_from_file, &
-     &    Save_vars_to_file, Print_debug, End_year, Strmflow_flag, Glacier_flag
+      USE PRMS_MODULE, ONLY: Nhru, Nobs, Model, Init_vars_from_file, &
+     &    Print_debug, End_year, Strmflow_flag, Glacier_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=9), parameter :: MODNAME = 'basin_sum'
-      character(len=*), parameter :: Version_basin_sum = '2020-09-14'
+      character(len=*), parameter :: Version_basin_sum = '2020-12-02'
 
       INTEGER, SAVE :: BALUNT, Totdays
       INTEGER, SAVE :: Header_prt, Endjday
@@ -65,7 +65,8 @@
 !     Main basin_sum routine
 !***********************************************************************
       INTEGER FUNCTION basin_sum()
-      USE PRMS_BASINSUM
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE
+      USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: sumbdecl, sumbinit, sumbrun
@@ -80,7 +81,7 @@
       ELSEIF ( Process_flag==INIT ) THEN
         basin_sum = sumbinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ON ) CALL basin_sum_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL basin_sum_restart(0)
       ENDIF
 
       END FUNCTION basin_sum
@@ -517,7 +518,7 @@
 ! Basin_storage doesn't include any processes on glacier
 ! In glacier module, Basin_gl_storstart is an estimate for starting glacier volume, but only
 !   includes glaciers that have depth estimates and these are known to be iffy
-      IF ( Glacier_flag==ON ) Basin_storage = Basin_storage + Basin_gl_storage
+      IF ( Glacier_flag==ACTIVE ) Basin_storage = Basin_storage + Basin_gl_storage
       IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module &
      &     .OR. Strmflow_flag==strmflow_muskingum_mann_module) Basin_storage = Basin_storage + Basin_segment_storage
 

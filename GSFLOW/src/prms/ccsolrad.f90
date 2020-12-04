@@ -9,13 +9,13 @@
 !RSR:          Northern hemisphere and Julian day 265 to 79 in Southern
 !***********************************************************************
       MODULE PRMS_CCSOLRAD
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, DEBUG_less, MONTHS_PER_YEAR, ON, OFF
+        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, DEBUG_less, MONTHS_PER_YEAR, ACTIVE, OFF
         USE PRMS_MODULE, ONLY: Process_flag, Print_debug, Nhru, Nsol
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Solar Radiation Distribution'
         character(len=*), parameter :: MODNAME = 'ccsolrad'
-        character(len=*), parameter :: Version_ccsolrad = '2020-08-03'
+        character(len=*), parameter :: Version_ccsolrad = '2020-12-02'
         INTEGER, SAVE :: Observed_flag
         ! Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_radadj, Basin_cloud_cover
@@ -57,7 +57,7 @@
 
           ! determine radiation adjustment due to precipitation
           IF ( Hru_ppt(j)>Ppt_rad_adj(j,Nowmonth) ) THEN
-            IF ( Summer_flag==ON ) THEN
+            IF ( Summer_flag==ACTIVE ) THEN
               pptadj = Radj_sppt(j)
             ELSE
               pptadj = Radj_wppt(j) ! Winter
@@ -83,7 +83,7 @@
 
           Orad_hru(j) = Cloud_radadj(j)*SNGL( Soltab_horad_potsw(Jday,j) )
           Basin_orad = Basin_orad + DBLE( Orad_hru(j)*Hru_area(j) )
-          IF ( Solsta_flag==ON ) THEN
+          IF ( Solsta_flag==ACTIVE ) THEN
             k = Hru_solsta(j)
             IF ( k>0 ) THEN
               IF ( Solrad(k)<0.0 .OR. Solrad(k)>10000.0 ) THEN
@@ -103,7 +103,7 @@
         ENDDO
         Basin_orad = Basin_orad*Basin_area_inv
         Basin_radadj = Basin_radadj*Basin_area_inv
-        IF ( Observed_flag==ON ) THEN
+        IF ( Observed_flag==ACTIVE ) THEN
           Orad = Solrad(Basin_solsta)*Rad_conv
         ELSE
           Orad = SNGL( Basin_orad )
@@ -175,7 +175,7 @@
         Cloud_cover_hru = 0.0
 
         Observed_flag = OFF
-        IF ( Nsol>0 .AND. Basin_solsta>0 ) Observed_flag = ON
+        IF ( Nsol>0 .AND. Basin_solsta>0 ) Observed_flag = ACTIVE
 
       ENDIF
 

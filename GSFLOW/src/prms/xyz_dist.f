@@ -17,10 +17,8 @@
 ! rain_nuse (rain_nsta) - indicies of rain stations used
 !***********************************************************************
       MODULE PRMS_XYZ_DIST
-      USE PRMS_CONSTANTS, ONLY: RUN, SETDIMENS, DECL, INIT,
-     +    MONTHS_PER_YEAR, ON, OFF, FEET2METERS, NEARZERO, DNEARZERO,
-     +    MM2INCH, CELSIUS, GLACIER
-      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nrain, Ntemp,
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, FEET2METERS
+      USE PRMS_MODULE, ONLY: Nhru, Nrain, Ntemp,
      +    Inputerror_flag, Glacier_flag
       IMPLICIT NONE
 !   Local Variables
@@ -28,7 +26,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'xyz_dist'
-      character(len=*), parameter :: Version_xyz_dist = '2020-08-03'
+      character(len=*), parameter :: Version_xyz_dist = '2020-12-02'
       INTEGER, SAVE :: Nlapse, Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Basin_centroid_x, Basin_centroid_y
@@ -79,7 +77,8 @@
 !     Main xyz_dist routine
 !***********************************************************************
       INTEGER FUNCTION xyz_dist()
-      USE PRMS_XYZ_DIST
+      USE PRMS_CONSTANTS, ONLY: RUN, SETDIMENS, DECL, INIT
+      USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: xyzdecl, xyzinit, xyzrun, xyzsetdims
@@ -598,7 +597,7 @@
 !
 ! convert elevations from feet to meters
 !
-      IF ( Conv_flag==ON ) THEN
+      IF ( Conv_flag==ACTIVE ) THEN
         DO i = 1, Nhru
           MRUelev(i) = Hru_elev_ts(i)*FEET2METERS
         ENDDO
@@ -716,12 +715,13 @@
 !***********************************************************************
       SUBROUTINE xyz_temp_run(Max_lapse, Min_lapse, Meantmax, Meantmin,
      +                        Temp_meanx, Temp_meany, Temp_meanz)
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, DNEARZERO, ACTIVE, GLACIER
+      USE PRMS_MODULE, ONLY: Glacier_flag, Nrain
       USE PRMS_XYZ_DIST, ONLY: MRUx, MRUy, Tmax_rain_sta, Solradelev,
      +    Tmin_rain_sta, Temp_nuse, Tmin_add, Tmin_div, Tmax_add,
      +    Tmax_div, Temp_nsta, X_div, Y_div, Z_div, X_add, Y_add, Z_add,
      +    Temp_STAx, Temp_STAy, Basin_centroid_y, Basin_centroid_x,
-     +    MAXLAPSE, Pstaelev, Pstax, Pstay, MRUelev, Temp_STAelev,
-     +    Nrain, DNEARZERO, GLACIER, ON, Glacier_flag
+     +    MAXLAPSE, Pstaelev, Pstax, Pstay, MRUelev, Temp_STAelev
       USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_area, Active_hrus,
      +    Hru_route_order, Hru_type, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp,
@@ -904,7 +904,7 @@
 
       DO ii = 1, Active_hrus
         i = Hru_route_order(ii)
-        IF ( Glacier_flag==ON ) THEN
+        IF ( Glacier_flag==ACTIVE ) THEN
           ! glacier module may have changed Hru_elev_meters
           IF ( Hru_type(i)==GLACIER )
      +         MRUelev(i) = (Hru_elev_meters(i)+Z_add)/Z_div
@@ -955,12 +955,14 @@
 
       SUBROUTINE xyz_rain_run(Ppt_lapse, Rain_meanx, Rain_meany,
      +                        Rain_meanz, Meanppt, Rain_code)
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, DNEARZERO,
+     +    MM2INCH, CELSIUS
       USE PRMS_XYZ_DIST, ONLY: MRUx, MRUy, Rain_STAx, Rain_STAy,
      +    Rain_nuse, Ppt_add, Ppt_div, Rain_nsta, Tmax_rain_sta,
      +    Tmin_rain_sta, Is_rain_day, Psta_freq_nuse, X_div, Y_div,
      +    Z_div, X_add, Y_add, Z_add, Precip_xyz, MAXLAPSE, MRUelev,
-     +    Tmax_allsnow_dist, Tmax_allrain_dist, Adjust_snow,Adjust_rain,
-     +    Nrain, NEARZERO, DNEARZERO, MM2INCH, CELSIUS, OFF, ON
+     +    Tmax_allsnow_dist, Tmax_allrain_dist, Adjust_snow,
+     +    Adjust_rain, Nrain
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus,
      +    Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Tminf, Newsnow, Pptmix,
@@ -999,24 +1001,24 @@
       IF ( Rain_code==1 ) THEN
         DO j = 1, Rain_nsta
           i = Rain_nuse(j)
-          IF ( Precip(i)>0.0 ) Is_rain_day = ON
+          IF ( Precip(i)>0.0 ) Is_rain_day = ACTIVE
         ENDDO
 
       ELSEIF ( Rain_code==2 ) THEN
         DO i = 1, Nrain
-          IF ( Precip(i)>0.0 ) Is_rain_day = ON
+          IF ( Precip(i)>0.0 ) Is_rain_day = ACTIVE
         ENDDO
 
       ELSEIF ( Rain_code==3 ) THEN
-        Is_rain_day = ON
+        Is_rain_day = ACTIVE
 
       ELSEIF ( Rain_code==4 ) THEN
-        IF ( Rain_day==1 ) Is_rain_day = ON
+        IF ( Rain_day==1 ) Is_rain_day = ACTIVE
 
       ELSEIF ( Rain_code==5 ) THEN
         DO i = 1, Nrain
           IF ( Psta_freq_nuse(i)==1 ) THEN
-            IF ( Precip(i)>0.0 ) Is_rain_day = ON
+            IF ( Precip(i)>0.0 ) Is_rain_day = ACTIVE
           ENDIF
         ENDDO
       ENDIF
@@ -1143,7 +1145,7 @@
         Hru_snow(i) = 0.0
         Prmx(i) = 0.0
 
-        IF ( Is_rain_day==ON ) THEN
+        IF ( Is_rain_day==ACTIVE ) THEN
           ppt = (Ppt_lapse(1)*MRUx(i)) + (Ppt_lapse(2)*MRUy(i)) +
      +          (Ppt_lapse(3)*MRUelev(i)) + SNGL( intppt )
 

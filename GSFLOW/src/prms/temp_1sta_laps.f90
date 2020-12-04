@@ -15,7 +15,7 @@
 !     hru_tlaps
 !***********************************************************************
       MODULE PRMS_TEMP_1STA_LAPS
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ON, OFF, &
+        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, &
      &      GLACIER, DEBUG_less, MONTHS_PER_YEAR, ERROR_temp, DOCUMENTATION, &
      &      MINTEMP, MAXTEMP, NEARZERO, temp_1sta_module, temp_laps_module
         USE PRMS_MODULE, ONLY: Process_flag, Nhru, Ntemp, Model, &
@@ -25,7 +25,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Temperature Distribution'
         character(len=9), SAVE :: MODNAME
-        character(len=*), parameter :: Version_temp = '2020-08-03'
+        character(len=*), parameter :: Version_temp = '2020-12-02'
         INTEGER, SAVE, ALLOCATABLE :: Tmax_cnt(:), Tmin_cnt(:), Nuse_tsta(:)
         REAL, SAVE, ALLOCATABLE :: Elfac(:), Tmax_prev(:), Tmin_prev(:)
         REAL, SAVE, ALLOCATABLE :: Tcrn(:), Tcrx(:) ! temp_1sta
@@ -111,7 +111,7 @@
             j = Hru_route_order(jj)
             k = Hru_tsta(j)
             IF ( Nowday==1 ) THEN
-              IF ( Glacier_flag==ON ) THEN
+              IF ( Glacier_flag==ACTIVE ) THEN
                 ! Hru_elev_ts is the antecedent glacier elevation
                 IF ( Hru_type(j)==GLACIER ) Elfac(j) = (Hru_elev_ts(j) - Tsta_elev(k))/1000.0
               ENDIF
@@ -128,7 +128,7 @@
             j = Hru_route_order(jj)
             k = Hru_tsta(j)
             l = Hru_tlaps(j)
-            IF ( Glacier_flag==ON ) THEN
+            IF ( Glacier_flag==ACTIVE ) THEN
               ! Hru_elev_ts is the antecedent glacier elevation
               IF ( Hru_type(j)==GLACIER ) CALL compute_temp_laps(Elfac(j), Hru_elev_ts(j), Tsta_elev(l), Tsta_elev(k))
             ENDIF
@@ -256,7 +256,7 @@
             CALL checkdim_param_limits(j, 'hru_tlaps', 'ntemp', Hru_tlaps(j), 1, Ntemp, ierr)
             IF ( ierr==1 ) CYCLE ! if one error found no need to compute values
             k = Hru_tsta(j)
-            Nuse_tsta(k) = ON
+            Nuse_tsta(k) = ACTIVE
             l = Hru_tlaps(j)
             ! Hru_elev_ts is the current glacier elevation, either hru_elev or for restart Hru_elev_ts
             CALL compute_temp_laps(Elfac(j), Hru_elev_ts(j), Tsta_elev(l), Tsta_elev(k))
@@ -280,7 +280,7 @@
         ENDIF
 
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ON ) CALL temp_1sta_laps_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL temp_1sta_laps_restart(0)
 
       ENDIF
 

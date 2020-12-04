@@ -2,15 +2,15 @@
 !     Output a set of declared basin variables as CSV file
 !***********************************************************************
       MODULE PRMS_BASIN_SUMMARY
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, RUN, DECL, INIT, CLEAN, ON, OFF, &
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ACTIVE, OFF, &
      &    DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, DAILY, YEARLY, MONTHLY, &
-     &    DOCUMENTATION, DBLE_TYPE, ERROR_control, ERROR_open_out, ERROR_control
-      USE PRMS_MODULE, ONLY: Process_flag, Model, Inputerror_flag, Start_year, Prms_warmup, BasinOutON_OFF, Nhru
+     &    DOCUMENTATION, DBLE_TYPE, ERROR_control, ERROR_open_out
+      USE PRMS_MODULE, ONLY: Model, Inputerror_flag, Start_year, Prms_warmup, BasinOutON_OFF, Nhru
       IMPLICIT NONE
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'basin_summary'
-      character(len=*), parameter :: Version_basin_summary = '2020-10-07'
+      character(len=*), parameter :: Version_basin_summary = '2020-12-02'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear, Dailyunit, Monthlyunit, Yearlyunit, Basin_var_type
       INTEGER, SAVE, ALLOCATABLE :: Nc_vars(:)
       CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2, Output_fmt3
@@ -29,7 +29,9 @@
 !     Basin results module
 !     ******************************************************************
       SUBROUTINE basin_summary()
-      USE PRMS_BASIN_SUMMARY
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, MEAN_MONTHLY
+      USE PRMS_MODULE, ONLY: Process_flag
+      USE PRMS_BASIN_SUMMARY, ONLY: Dailyunit, Monthlyunit, Yearlyunit, Daily_flag, Monthly_flag, BasinOut_freq
       IMPLICIT NONE
 ! Functions
       EXTERNAL :: basin_summarydecl, basin_summaryinit, basin_summaryrun
@@ -41,9 +43,9 @@
       ELSEIF ( Process_flag==INIT ) THEN
         CALL basin_summaryinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Daily_flag==ON ) CLOSE ( Dailyunit )
+        IF ( Daily_flag==ACTIVE ) CLOSE ( Dailyunit )
         IF ( BasinOut_freq>MEAN_MONTHLY ) CLOSE ( Yearlyunit )
-        IF ( Monthly_flag==ON ) CLOSE ( Monthlyunit )
+        IF ( Monthly_flag==ACTIVE ) CLOSE ( Monthlyunit )
       ENDIF
 
       END SUBROUTINE basin_summary
@@ -101,7 +103,7 @@
       INTEGER :: ios, ierr, size, dum, jj
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
 !***********************************************************************
-      Begin_results = ON
+      Begin_results = ACTIVE
       IF ( Prms_warmup>0 ) Begin_results = OFF
       Begyr = Start_year + Prms_warmup
       Lastyear = Begyr
@@ -129,10 +131,10 @@
       Basin_var_daily = 0.0D0
 
       Daily_flag = OFF
-      IF ( BasinOut_freq==DAILY .OR. BasinOut_freq==DAILY_MONTHLY ) Daily_flag = ON
+      IF ( BasinOut_freq==DAILY .OR. BasinOut_freq==DAILY_MONTHLY ) Daily_flag = ACTIVE
 
       Monthly_flag = OFF
-      IF ( BasinOut_freq==MONTHLY .OR. BasinOut_freq==DAILY_MONTHLY .OR. BasinOut_freq==MEAN_MONTHLY ) Monthly_flag = ON
+      IF ( BasinOut_freq==MONTHLY .OR. BasinOut_freq==DAILY_MONTHLY .OR. BasinOut_freq==MEAN_MONTHLY ) Monthly_flag = ACTIVE
 
       IF ( BasinOut_freq>MEAN_MONTHLY ) THEN
         Yeardays = 0
@@ -140,7 +142,7 @@
         Basin_var_yearly = 0.0D0
         WRITE ( Output_fmt3, 9003 ) BasinOutVars
       ENDIF
-      IF ( Monthly_flag==ON ) THEN
+      IF ( Monthly_flag==ACTIVE ) THEN
         Monthdays = 0.0D0
         ALLOCATE ( Basin_var_monthly(BasinOutVars) )
         Basin_var_monthly = 0.0D0
@@ -152,7 +154,7 @@
         IF ( getparam(MODNAME, 'nhm_id', Nhru, 'integer', Nhm_id)/=0 ) CALL read_error(2, 'nhm_id')
       ENDIF
 
-      IF ( Daily_flag==ON ) THEN
+      IF ( Daily_flag==ACTIVE ) THEN
         fileName = BasinOutBaseFileName(:numchars(BasinOutBaseFileName))//'.csv'
         CALL PRMS_open_output_file(Dailyunit, fileName, 'basin_summary, daily', 0, ios)
         IF ( ios/=0 ) CALL error_stop('in basin_summary, daily', ERROR_open_out)
@@ -205,7 +207,7 @@
 !***********************************************************************
       IF ( Begin_results==OFF ) THEN
         IF ( Nowyear==Begyr .AND. Nowmonth==Start_month .AND. Nowday==Start_day ) THEN
-          Begin_results = ON
+          Begin_results = ACTIVE
         ELSE
           RETURN
         ENDIF
@@ -221,9 +223,9 @@
       write_month = OFF
       IF ( BasinOut_freq>MEAN_MONTHLY ) THEN
         last_day = OFF
-        IF ( Nowyear==End_year .AND. Nowmonth==End_month .AND. Nowday==End_day ) last_day = ON
-        IF ( Lastyear/=Nowyear .OR. last_day==ON ) THEN
-          IF ( (Nowmonth==Start_month .AND. Nowday==Start_day) .OR. last_day==ON ) THEN
+        IF ( Nowyear==End_year .AND. Nowmonth==End_month .AND. Nowday==End_day ) last_day = ACTIVE
+        IF ( Lastyear/=Nowyear .OR. last_day==ACTIVE ) THEN
+          IF ( (Nowmonth==Start_month .AND. Nowday==Start_day) .OR. last_day==ACTIVE ) THEN
             DO jj = 1, BasinOutVars
               IF ( BasinOut_freq==YEARLY ) Basin_var_yearly(jj) = Basin_var_yearly(jj)/Yeardays
             ENDDO
@@ -234,13 +236,13 @@
           ENDIF
         ENDIF
         Yeardays = Yeardays + 1
-      ELSEIF ( Monthly_flag==ON ) THEN
+      ELSEIF ( Monthly_flag==ACTIVE ) THEN
         ! check for last day of month and simulation
         IF ( Nowday==Modays(Nowmonth) ) THEN
-          write_month = ON
+          write_month = ACTIVE
         ELSEIF ( Nowyear==End_year ) THEN
           IF ( Nowmonth==End_month ) THEN
-            IF ( Nowday==End_day ) write_month = ON
+            IF ( Nowday==End_day ) write_month = ACTIVE
           ENDIF
         ENDIF
         Monthdays = Monthdays + 1.0D0
@@ -253,17 +255,17 @@
         RETURN
       ENDIF
 
-      IF ( Monthly_flag==ON ) THEN
+      IF ( Monthly_flag==ACTIVE ) THEN
         DO jj = 1, BasinOutVars
           Basin_var_monthly(jj) = Basin_var_monthly(jj) + Basin_var_daily(jj)
-          IF ( write_month==ON ) THEN
+          IF ( write_month==ACTIVE ) THEN
             IF ( BasinOut_freq==MEAN_MONTHLY ) Basin_var_monthly(jj) = Basin_var_monthly(jj)/Monthdays
           ENDIF
         ENDDO
       ENDIF
 
-      IF ( Daily_flag==ON ) WRITE ( Dailyunit, Output_fmt) Nowyear, Nowmonth, Nowday, (Basin_var_daily(jj), jj=1,BasinOutVars)
-      IF ( write_month==ON ) THEN
+      IF ( Daily_flag==ACTIVE ) WRITE ( Dailyunit, Output_fmt) Nowyear, Nowmonth, Nowday, (Basin_var_daily(jj), jj=1,BasinOutVars)
+      IF ( write_month==ACTIVE ) THEN
         WRITE ( Monthlyunit, Output_fmt) Nowyear, Nowmonth, Nowday, (Basin_var_monthly(jj), jj=1,BasinOutVars)
         Monthdays = 0.0D0
         Basin_var_monthly = 0.0D0

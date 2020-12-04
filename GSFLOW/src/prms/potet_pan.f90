@@ -4,13 +4,13 @@
 !   Declared Parameters: hru_pansta, epan_coef
 !***********************************************************************
       MODULE PRMS_POTET_PAN
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ON, MONTHS_PER_YEAR, DEBUG_less, ERROR_dim
+        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, MONTHS_PER_YEAR, DEBUG_less, ERROR_dim
         USE PRMS_MODULE, ONLY: Process_flag, Nevap, Print_debug, Save_vars_to_file, Init_vars_from_file
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=9), parameter :: MODNAME = 'potet_pan'
-        character(len=*), parameter :: Version_potet = '2020-08-03'
+        character(len=*), parameter :: Version_potet = '2020-12-02'
         REAL, SAVE, ALLOCATABLE :: Last_pan_evap(:)
       END MODULE PRMS_POTET_PAN
 
@@ -67,7 +67,7 @@
         ENDIF
 
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ON ) CALL potet_pan_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL potet_pan_restart(0)
 
       ENDIF
 

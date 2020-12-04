@@ -4,14 +4,14 @@
       MODULE PRMS_SET_TIME
         USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, RUN, DECL, INIT,&
      &      YEAR, MONTH, DAY, HOUR, MINUTE, MAX_DAYS_PER_YEAR, DAYS_PER_YEAR, &
-     &      ON, OFF, NORTHERN, FT2_PER_ACRE, SECS_PER_HOUR, &
-     &      INCHES_PER_FOOT, SECS_PER_DAY, ERROR_time, FT2_PER_ACRE
+     &      ACTIVE, OFF, NORTHERN, FT2_PER_ACRE, SECS_PER_HOUR, &
+     &      INCHES_PER_FOOT, SECS_PER_DAY, ERROR_time
         USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime
         IMPLICIT NONE
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Timestep Control'
         character(len=*), parameter :: MODNAME = 'prms_time'
-        character(len=*), parameter :: Version_prms_time = '2020-08-03'
+        character(len=*), parameter :: Version_prms_time = '2020-12-02'
         INTEGER, SAVE :: Modays(MONTHS_PER_YEAR), Yrdays, Summer_flag, Jday, Jsol, Julwater
         INTEGER, SAVE :: Nowtime(6), Nowday, Nowmonth, Nowyear, Nowhour, Nowminute, Julian_day_absolute
         REAL, SAVE :: Timestep_hours, Timestep_days, Timestep_minutes
@@ -84,7 +84,7 @@
         ! Summer is based on equinox:
         !   Julian days 79 to 265 for Northern hemisphere
         !   Julian day 265 to 79 in Southern hemisphere
-        Summer_flag = ON ! 1 = summer, 0 = winter
+        Summer_flag = ACTIVE ! 1 = summer, 0 = winter
         IF ( Hemisphere==NORTHERN ) THEN
           IF ( Jday<79 .OR. Jday>265 ) Summer_flag = OFF ! Equinox
         ELSE ! Southern Hemisphere

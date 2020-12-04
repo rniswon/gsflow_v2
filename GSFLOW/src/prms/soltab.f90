@@ -11,24 +11,23 @@
 !   50 pp.
 !***********************************************************************
       MODULE PRMS_SOLTAB
-      USE PRMS_CONSTANTS, ONLY: DAYS_IN_YEAR, MAX_DAYS_PER_YEAR, DEBUG_SOLTAB, DNEARZERO, &
-     &    DECL, INIT, DAYS_IN_YEAR, OFF
-      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Print_debug, Glacier_flag
+      USE PRMS_CONSTANTS, ONLY: DAYS_IN_YEAR, MAX_DAYS_PER_YEAR, DEBUG_SOLTAB, OFF
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Potential Solar Radiation'
       character(len=*), parameter :: MODNAME = 'soltab'
-      character(len=*), parameter :: Version_soltab = '2020-08-04'
+      character(len=*), parameter :: Version_soltab = '2020-12-02'
       DOUBLE PRECISION, PARAMETER :: PI=3.1415926535898D0
       DOUBLE PRECISION, PARAMETER :: RADIANS=PI/180.0D0, TWOPI=2.0D0*PI
       DOUBLE PRECISION, PARAMETER :: PI_12=12.0D0/PI
-! TWOPI ~ 6.2831853071786
-! RADIANS ~ 0.017453292519943
-! PI_12 ~ 3.8197186342055
+! TWOPI = 6.2831853071786
+! RADIANS = 0.017453292519943
+! PI_12 = 3.8197186342055
       DOUBLE PRECISION, PARAMETER :: ECCENTRICY = 0.01671D0
       ! 0.016723401  daily change -1.115E-09, eccen = 0.016723401 + (julhour-julhour(1966,1,0,18))+dmin/60)/24*-1.115E-09
       ! julday(1966,1,0.75 UT) = 2439126.25
-      ! eccen = 0.01675104-0.00004180*T-0.000000126*T^2  T is julian centuries (days time from epoch, is GMT from Jan 0.0
+      ! eccen = 0.01675104-0.00004180*T-0.000000126*T**2  T is julian centuries (days time from epoch, is GMT from Jan 0.0
       DOUBLE PRECISION, PARAMETER :: DEGDAY = 360.0D0/DAYS_IN_YEAR
       DOUBLE PRECISION, PARAMETER :: DEGDAYRAD = DEGDAY*RADIANS ! about 0.00143356672
 ! DEGDAY = 360 degrees/days in year
@@ -44,7 +43,8 @@
 !     Main soltab routine
 !***********************************************************************
       INTEGER FUNCTION soltab()
-      USE PRMS_SOLTAB, ONLY: Process_flag, DECL, INIT
+      USE PRMS_CONSTANTS, ONLY: DECL, INIT
+      USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: sthdecl, sthinit
@@ -228,7 +228,8 @@
 !***********************************************************************
       SUBROUTINE compute_soltab(Obliquity, Solar_declination, Slope, Aspect, &
      &                          Latitude, Cossl, Soltab, Sunhrs, Hru_type, Id)
-      USE PRMS_SOLTAB, ONLY: PI, TWOPI, RADIANS, PI_12, MAX_DAYS_PER_YEAR, DNEARZERO
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, DNEARZERO
+      USE PRMS_SOLTAB, ONLY: PI, TWOPI, RADIANS, PI_12
       IMPLICIT NONE
       EXTERNAL compute_t
 !     Functions
