@@ -55,7 +55,9 @@ long read_line (void) {
    FILE_DATA   *cur_fd;
    char   *err_ptr;
    static char *line = NULL;
-  
+   static long silent_flag;
+   silent_flag = *control_lvar("print_debug");
+
    if (line == NULL) {
 	   line = (char *) umalloc(max_data_ln_len * sizeof(char));
    }
@@ -87,8 +89,10 @@ long read_line (void) {
 **  9999 in the year field is the code for EOF. 
 */
       if (cur_fd->time.year == 9999) {
-		  (void)fprintf (stderr,"\nWARNING, date of end_time reached the last date in the Data File \n");
-		  (void)fprintf(stderr, "         simulation stopped on: %ld %ld %ld \n", Mnowtime->year, Mnowtime->month, Mnowtime->day);
+		  if (silent_flag > -2) {
+			  (void)fprintf(stderr, "\nWARNING, date of end_time reached the last date in the Data File \n");
+			  (void)fprintf(stderr, "         simulation stopped on: %ld %ld %ld \n", Mnowtime->year, Mnowtime->month, Mnowtime->day);
+		  }
 	      return ENDOFFILE;
 	  }
 

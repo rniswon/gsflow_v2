@@ -100,7 +100,8 @@ long getparam (char *module, char *name, int maxsize, char *type, double *pval) 
 	int var_type;
 	PARAM *param;
 	char *pkey;
-
+	static long silent_flag;
+	silent_flag = *control_lvar("print_debug");
 	pkey = strdup (name);
 
 // convert fortran types to C types
@@ -129,8 +130,10 @@ long getparam (char *module, char *name, int maxsize, char *type, double *pval) 
 
 //  Check to see if the parameter values were set in the Parameter File
 	if (param->read_in == 0) {
-		(void)fprintf(stderr,"\nWARNING: parameter %s is used by module %s but values are not\n", pkey, module);
-		(void)fprintf(stderr,"         set in the Parameter File. Module default values are being used.\n");
+		if (silent_flag > -2) {
+			(void)fprintf(stderr, "\nWARNING: parameter %s is used by module %s but values are not\n", pkey, module);
+			(void)fprintf(stderr, "         set in the Parameter File. Module default values are being used.\n");
+		}
 	}
 
 // check that there is enough space allocated in the calling routine
@@ -432,7 +435,8 @@ long getparamstring_ (char *mname, char *pname, ftnint *pmaxsize, char *ptype, f
   char *module, *name, *type;
   //int maxsize;
   PARAM *param;
-
+  static long silent_flag;
+  silent_flag = *control_lvar("print_debug");
   /*
    * copy maxsize to local long int
    */
@@ -468,8 +472,10 @@ long getparamstring_ (char *mname, char *pname, ftnint *pmaxsize, char *ptype, f
   **  Check to see if the parameter values were set in the Parameter File
   */
   if (param->read_in == 0) {
-		(void)fprintf(stderr,"\nWARNING: parameter %s is used by module %s but values are not\n", name, module);
-		(void)fprintf(stderr,"         set in the Parameter File. Module default values are being used.\n");
+	  if (silent_flag > -2) {
+		(void)fprintf(stderr, "\nWARNING: parameter %s is used by module %s but values are not\n", name, module);
+		(void)fprintf(stderr, "         set in the Parameter File. Module default values are being used.\n");
+		}
 //	  (void)fprintf(stderr,
 //	    "getparamstring - parameter %s is used but values are not set in the Parameter File.  Module default values are being used.\n", name);
   }

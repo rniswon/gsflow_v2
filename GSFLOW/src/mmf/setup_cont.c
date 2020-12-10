@@ -44,7 +44,7 @@ void setup_cont (void) {
 /*
 **	GSFLOW control variables
 */
-        decl_control_string ("model_mode", "GSFLOW");
+        decl_control_string ("model_mode", "GSFLOW5");
         decl_control_string ("modflow_name", "modflow.nam");
         decl_control_string ("precip_module", "precip_1sta");
         decl_control_string ("temp_module", "temp_1sta");
@@ -267,13 +267,13 @@ void setup_cont (void) {
 		lval[0] = 0;
 		decl_control_int_array ("orad_flag", 1, lval);
 
-		//lval = (long *)umalloc (sizeof (long));
-		//lval[0] = 0;
-		//decl_control_int_array ("snow_cbh_flag", 1, lval);
+		lval = (long *)umalloc (sizeof (long));
+		lval[0] = 0;
+		decl_control_int_array ("snow_cbh_flag", 1, lval);
 
-		//lval = (long *)umalloc (sizeof (long));
-		//lval[0] = 0;
-		//decl_control_int_array ("gwflow_cbh_flag", 1, lval);
+		lval = (long *)umalloc (sizeof (long));
+		lval[0] = 0;
+		decl_control_int_array ("gwflow_cbh_flag", 1, lval);
 
 		lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
