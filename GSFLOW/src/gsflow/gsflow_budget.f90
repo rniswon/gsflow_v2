@@ -5,7 +5,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2020-08-11'
+      character(len=*), parameter :: Version_gsflow_budget = '2020-12-02'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -192,6 +192,7 @@
 !***********************************************************************
       INTEGER FUNCTION gsfbudinit()
       USE GSFBUDGET
+      USE PRMS_CONSTANTS, ONLY: ERROR_dim
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru
       USE GWFSFRMODULE, ONLY: NSTRM
       USE GLOBAL, ONLY: IUNIT
@@ -203,7 +204,7 @@
 
       IF ( Nreach/=NSTRM ) THEN
         PRINT *, 'ERROR, nreach must equal to NSTRM', Nreach, NSTRM
-        ERROR STOP 3
+        ERROR STOP ERROR_dim
       ENDIF
 
       Reach_cfs = 0.0 ! dimension NSTRM

@@ -4,13 +4,13 @@
 !***********************************************************************
 
       MODULE GSFSUM
-      USE PRMS_CONSTANTS, ONLY: DEBUG_WB, DEBUG_less
+      USE PRMS_CONSTANTS, ONLY: DEBUG_WB, DEBUG_less, ERROR_open_out
       USE PRMS_MODULE, ONLY: Print_debug
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output CSV Summary'
       character(len=10), parameter :: MODNAME = 'gsflow_sum'
-      character(len=*), parameter :: Version_gsflow_sum = '2020-08-11'
+      character(len=*), parameter :: Version_gsflow_sum = '2020-12-02'
       INTEGER, SAVE :: BALUNT
       DOUBLE PRECISION, PARAMETER :: ERRCHK = 0.0001D0
       INTEGER, SAVE :: Balance_unt, Vbnm_index(14), Gsf_unt, Rpt_count
@@ -900,7 +900,7 @@
 !***********************************************************************
       SUBROUTINE GSF_PRINT()
       USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Csv_output_file, Rpt_days, &
-     &    Gsflow_output_file, Gsf_rpt, Print_debug, DEBUG_less
+     &    Gsflow_output_file, Gsf_rpt, Print_debug, DEBUG_less, ERROR_open_out
       IMPLICIT NONE
       INTEGER, EXTERNAL :: control_integer, control_string, numchars
       EXTERNAL GSF_HEADERS, read_error, PRMS_open_output_file
@@ -915,7 +915,7 @@
      &       Csv_output_file(:1)==CHAR(0) ) Csv_output_file = 'gsflow.csv'
 
         CALL PRMS_open_output_file(Balance_unt, Csv_output_file, 'csv_output_file', 0, ios)
-        IF ( ios/=0 ) ERROR STOP -3
+        IF ( ios/=0 ) ERROR STOP ERROR_open_out
       ENDIF
  
 ! Open the GSF volumetric balance report file
