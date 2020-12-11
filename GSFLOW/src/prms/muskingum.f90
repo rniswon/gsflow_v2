@@ -81,14 +81,13 @@
 !
 !***********************************************************************
       MODULE PRMS_MUSKINGUM
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ON, NEARZERO, CFS2CMS_CONV, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, NEARZERO, CFS2CMS_CONV, &
      &    OUTFLOW_SEGMENT, ERROR_streamflow, strmflow_muskingum_module
-      USE PRMS_MODULE, ONLY: Nsegment, Process_flag, Save_vars_to_file, Init_vars_from_file, &
-     &    Strmflow_flag, Glacier_flag
+      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmflow_flag, Glacier_flag
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Streamflow Routing'
       character(len=14), parameter :: MODNAME = 'muskingum_mann'
-      character(len=*), parameter :: Version_muskingum = '2020-08-03'
+      character(len=*), parameter :: Version_muskingum = '2020-12-02'
 !   Local Variables
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
@@ -99,7 +98,8 @@
 !     Main muskingum routine
 !***********************************************************************
       INTEGER FUNCTION muskingum()
-      USE PRMS_MUSKINGUM
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE
+      USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: muskingum_decl, muskingum_init, muskingum_run
@@ -115,7 +115,7 @@
         IF ( Init_vars_from_file>0 ) CALL muskingum_restart(1)
         muskingum = muskingum_init()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ON ) CALL muskingum_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL muskingum_restart(0)
       ENDIF
 
       END FUNCTION muskingum
@@ -355,7 +355,7 @@
       Basin_cfs = Flow_out
       Basin_stflow_out = Basin_cfs / area_fac
       Basin_cms = Basin_cfs*CFS2CMS_CONV
-      IF ( Glacier_flag==ON ) THEN
+      IF ( Glacier_flag==ACTIVE ) THEN
         Basin_stflow_in = Basin_stflow_in + Basin_gl_top_melt
         Basin_gl_ice_cfs = Basin_gl_ice_melt*area_fac
         Basin_gl_cfs = Basin_gl_top_melt*area_fac

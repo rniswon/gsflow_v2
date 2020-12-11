@@ -110,6 +110,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: INIT = 2
     integer, parameter :: CLEAN = 3
     integer, parameter :: SETDIMENS = 4
+    integer, parameter :: WRITE_CLIMATE=24, CONVERT=25, CLIMATE=26, POTET=27, TRANSPIRE=28, FROST=29
 
     ! Error Codes
     integer, parameter :: ERROR_modflow = -5
@@ -160,7 +161,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: smidx_module = 1, carea_module = 2
 
     integer, parameter :: OFF = 0
-    integer, parameter :: ON = 1
+    integer, parameter :: ACTIVE = 1
     integer, parameter :: INT_TYPE = 1
     integer, parameter :: REAL_TYPE = 2
     integer, parameter :: DBLE_TYPE = 3

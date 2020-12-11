@@ -5,7 +5,7 @@
 ! Declared Parameters: frost_temp
 !***********************************************************************
       INTEGER FUNCTION frost_date()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ON, OFF, DAYS_PER_YEAR, NORTHERN
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, DAYS_PER_YEAR, NORTHERN
       USE PRMS_MODULE, ONLY: Process_flag, Nhru
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Hemisphere
       USE PRMS_CLIMATEVARS, ONLY: Tmin_hru
@@ -13,7 +13,7 @@
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Preprocessing'
       character(len=*), parameter :: MODNAME = 'frost_date'
-      character(len=*), parameter :: Version_frost_date = '2020-08-03'
+      character(len=*), parameter :: Version_frost_date = '2020-12-02'
 ! Functions
       INTRINSIC :: NINT, DBLE
       INTEGER, EXTERNAL :: declparam, getparam, get_season
@@ -46,9 +46,9 @@
 ! check here makes the blocks below easier to understand.
         IF ( oldSeason/=season ) THEN
           IF ( season==1 ) THEN
-            switchToSpringToday = ON
+            switchToSpringToday = ACTIVE
           ELSE
-            switchToFallToday = ON
+            switchToFallToday = ACTIVE
           ENDIF
         ELSE
           switchToSpringToday = OFF
@@ -60,7 +60,7 @@
 ! variable. Also since we are finished looking for spring frosts,
 ! add the CurrentSpringFrost dates to the spring_frost variable
 ! (average date of the spring frost for each HRU).
-        IF ( switchToFallToday==ON ) THEN
+        IF ( switchToFallToday==ACTIVE ) THEN
           fallFrostCount = fallFrostCount + 1
           DO jj = 1, Active_hrus
             j = Hru_route_order(jj)
@@ -73,7 +73,7 @@
 ! CurrentSpringFrost variable. Also since we are finished looking
 ! for fall frosts, add the CurrentFallFrost dates to the fall_frost
 ! variable (average date of the fall frost for each HRU).
-        ELSEIF ( switchToSpringToday==ON ) THEN
+        ELSEIF ( switchToSpringToday==ACTIVE ) THEN
           springFrostCount = springFrostCount + 1
           DO jj = 1, Active_hrus
             j = Hru_route_order(jj)

@@ -2,15 +2,15 @@
 ! Reads and stores observed data from all specified measurement stations
 !***********************************************************************
       MODULE PRMS_OBS
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ON, OFF, xyz_dist_module, &
-     &    MONTHS_PER_YEAR, CMS, CFS, CFS2CMS_CONV, RUN, SETDIMENS, DECL, INIT
-      USE PRMS_MODULE, ONLY: Process_flag, Model, Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, &
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, xyz_dist_module, &
+     &    MONTHS_PER_YEAR, CMS, CFS, CFS2CMS_CONV
+      USE PRMS_MODULE, ONLY: Model, Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, &
      &    Precip_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'obs'
-      character(len=*), parameter :: Version_obs = '2020-08-03'
+      character(len=*), parameter :: Version_obs = '2020-12-02'
       INTEGER, SAVE :: Nsnow, Nlakeelev, Nwind, Nhumid, Rain_flag
 !   Declared Variables
       INTEGER, SAVE :: Rain_day
@@ -28,7 +28,8 @@
 !     main obs routine
 !***********************************************************************
       INTEGER FUNCTION obs()
-      USE PRMS_OBS, ONLY: Process_flag, RUN, SETDIMENS, DECL, INIT
+      USE PRMS_CONSTANTS, ONLY: RUN, SETDIMENS, DECL, INIT
+      USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: obsdecl, obsinit, obsrun, obssetdims
@@ -174,8 +175,8 @@
 
 !   Declared Parameters
       Rain_flag = OFF
-      IF ( Precip_flag==xyz_dist_module ) Rain_flag = ON
-      IF ( Rain_flag==ON .OR. Model==DOCUMENTATION ) THEN
+      IF ( Precip_flag==xyz_dist_module ) Rain_flag = ACTIVE
+      IF ( Rain_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         IF ( declvar(MODNAME, 'rain_day', 'one', 1, 'integer', &
      &       'Flag to set the form of any precipitation to rain (0=determine form; 1=rain)', &
      &       'none', Rain_day)/=0 ) CALL read_error(8, 'rain_day')
@@ -227,7 +228,7 @@
         IF ( getparam(MODNAME, 'runoff_units', 1, 'integer', Runoff_units)/=0 ) CALL read_error(2, 'runoff_units')
       ENDIF
 
-      IF ( Rain_flag==ON ) THEN
+      IF ( Rain_flag==ACTIVE ) THEN
         IF ( getparam(MODNAME, 'rain_code', MONTHS_PER_YEAR, 'integer', Rain_code)/=0 ) CALL read_error(2, 'rain_code')
       ENDIF
 

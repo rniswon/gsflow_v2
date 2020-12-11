@@ -13,14 +13,14 @@
 !      adjust total precip
 !***********************************************************************
       MODULE PRMS_PRECIP_DIST2
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, DOCUMENTATION, MONTHS_PER_YEAR, ON, OFF, &
+        USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, MONTHS_PER_YEAR, ACTIVE, OFF, &
      &      NEARZERO, DNEARZERO, ERROR_dim, ERROR_data, CELSIUS, INCH2MM
-        USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Nrain
+        USE PRMS_MODULE, ONLY: Model, Nhru, Nrain
         IMPLICIT NONE
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=*), parameter :: MODNAME = 'precip_dist2'
-        character(len=*), parameter :: Version_precip = '2020-08-03'
+        character(len=*), parameter :: Version_precip = '2020-12-02'
         INTEGER, SAVE, ALLOCATABLE :: N_psta(:), Nuse_psta(:, :)
         DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dist2(:, :)
 !   Declared Parameters
@@ -37,7 +37,8 @@
 !     Main precipitation routine
 !***********************************************************************
       INTEGER FUNCTION precip_dist2()
-      USE PRMS_PRECIP_DIST2
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT
+      USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: pptdist2decl, pptdist2init, pptdist2run
@@ -338,7 +339,7 @@
 !???rsr, pcor should only be used for portion of precipitation that is rain
           IF ( Precip(k)>=0.0 .AND. Precip(k)<=Maxday_prec ) THEN
 !     +         Precip(k)<Maxmon_prec(Nowmonth) ) THEN
-            allmissing = ON
+            allmissing = ACTIVE
             !rsr, if all rain use rain adjustment
             IF ( iform==2 ) THEN
               pcor = Rain_mon(i, Nowmonth)/Psta_mon(k, Nowmonth)
@@ -377,7 +378,7 @@
 
         ELSEIF ( iform==1 ) THEN
           Hru_snow(i) = ppt
-          Newsnow(i) = ON
+          Newsnow(i) = ACTIVE
 
        ! precipitation is a mixture of rain and snow
         ELSE
@@ -389,10 +390,10 @@
 !******greater than or equal to 1.0 in which case it all rain
 !******If not, it is a rain/snow mixture
           IF ( Prmx(i)<1.0 ) THEN
-            Pptmix(i) = ON
+            Pptmix(i) = ACTIVE
             Hru_rain(i) = Prmx(i)*ppt
             Hru_snow(i) = ppt - Hru_rain(i)
-            Newsnow(i) = ON
+            Newsnow(i) = ACTIVE
           ELSE
             Hru_rain(i) = ppt
             Prmx(i) = 1.0

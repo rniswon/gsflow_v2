@@ -3,13 +3,13 @@
 ! on time between the last spring and the first fall killing frost.
 !***********************************************************************
       MODULE PRMS_TRANSP_FROST
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, ON, OFF
+        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, ACTIVE, OFF
         USE PRMS_MODULE, ONLY: Process_flag, Nhru
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Transpiration Distribution'
         character(len=*), parameter :: MODNAME = 'transp_frost'
-        character(len=*), parameter :: Version_transp = '2020-09-14'
+        character(len=*), parameter :: Version_transp = '2020-12-02'
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Fall_frost(:), Spring_frost(:)
       END MODULE PRMS_TRANSP_FROST
@@ -33,14 +33,14 @@
 ! If the current solar day is between the last frost of the
 ! spring and the first frost of the fall, then transpiration
 ! is on for the HRU. If any HRU is transpiring, then
-! Basin_transp_on is set to 1 (ON).
+! Basin_transp_on is set to 1 (ACTIVE).
         Basin_transp_on = OFF
         Transp_on = OFF
         DO j = 1, Active_hrus
           i = Hru_route_order(j)
           IF ( Jsol>=Spring_frost(i) .AND. Jsol<=Fall_frost(i) ) THEN
-            Transp_on(i) = ON
-            Basin_transp_on = ON
+            Transp_on(i) = ACTIVE
+            Basin_transp_on = ACTIVE
           ENDIF
         ENDDO
 
@@ -68,8 +68,8 @@
         DO j = 1, Active_hrus
           i = Hru_route_order(j)
           IF ( Jsol>=Spring_frost(i) .AND. Jsol<=Fall_frost(i) ) THEN
-            Transp_on(i) = ON
-            Basin_transp_on = ON
+            Transp_on(i) = ACTIVE
+            Basin_transp_on = ACTIVE
           ENDIF
         ENDDO
       ENDIF

@@ -17,15 +17,15 @@
 ! Needs computed variables tmaxf and tminf set in the temperature module
 !***********************************************************************
       MODULE PRMS_PRECIP_1STA_LAPS
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, ON, OFF, GLACIER, &
-     &      DEBUG_less, MM, MM2INCH, MONTHS_PER_YEAR, DOCUMENTATION, NEARZERO, precip_1sta_module
+        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, ACTIVE, OFF, GLACIER, &
+     &      DEBUG_less, MM, MM2INCH, MONTHS_PER_YEAR, DOCUMENTATION, precip_1sta_module, precip_laps_module
         USE PRMS_MODULE, ONLY: Nhru, Nrain, Model, Process_flag, Inputerror_flag, Precip_flag, &
-     &      Print_debug, Glacier_flag, precip_1sta_module, precip_laps_module, precip_1sta_module
+     &      Print_debug, Glacier_flag
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=11) :: MODNAME
-        character(len=*), parameter :: Version_precip = '2020-08-03'
+        character(len=*), parameter :: Version_precip = '2020-12-02'
         INTEGER, SAVE, ALLOCATABLE :: Psta_nuse(:)
         REAL, SAVE, ALLOCATABLE :: Rain_adj_lapse(:, :), Snow_adj_lapse(:, :), Precip_local(:)
         ! Declared Parameters
@@ -59,7 +59,7 @@
       IF ( Process_flag==RUN ) THEN
         Precip_local = Precip
         DO i = 1, Nrain
-          IF ( Psta_nuse(i)==ON ) THEN
+          IF ( Psta_nuse(i)==ACTIVE ) THEN
             IF ( Precip_local(i)<0.0 ) THEN
               IF ( Print_debug>DEBUG_less ) THEN
                 PRINT 9002, Precip_local(i), MODNAME, i
@@ -86,7 +86,7 @@
           Newsnow(i) = OFF
           Pptmix(i) = OFF
           ppt = Precip_local(Hru_psta(i))
-          IF ( Glacier_flag==ON ) THEN
+          IF ( Glacier_flag==ACTIVE ) THEN
             IF ( Hru_type(i)==GLACIER ) THEN
               ! Hru_elev_ts is the antecedent glacier elevation
               IF ( Precip_flag==precip_laps_module ) CALL compute_precip_laps(i, Hru_plaps(i), Hru_psta(i), Hru_elev_ts(i))
@@ -228,8 +228,8 @@
 !     Compute lapse rate for an HRU
 !***********************************************************************
       SUBROUTINE compute_precip_laps(Ihru, Hru_plaps, Hru_psta, Hru_elev)
-      USE PRMS_PRECIP_1STA_LAPS, ONLY: Pmn_mo, Padj_sn, Padj_rn, Snow_adj_lapse, Rain_adj_lapse, &
-     &    NEARZERO, MONTHS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, MONTHS_PER_YEAR
+      USE PRMS_PRECIP_1STA_LAPS, ONLY: Pmn_mo, Padj_sn, Padj_rn, Snow_adj_lapse, Rain_adj_lapse
       USE PRMS_CLIMATEVARS, ONLY: Psta_elev
       IMPLICIT NONE
 ! Arguments

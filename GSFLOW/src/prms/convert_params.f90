@@ -2,12 +2,12 @@
 ! Convert PRMS IV parameters to PRMS 5
 !***********************************************************************
       SUBROUTINE convert_params()
-      USE PRMS_CONSTANTS, ONLY: DECL, INIT, MONTHS_PER_YEAR, ON
+      USE PRMS_CONSTANTS, ONLY: DECL, INIT, MONTHS_PER_YEAR, ACTIVE
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Dprst_flag, Model_mode
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Convert PRMS parameters'
       character(len=*), parameter :: MODNAME = 'convert_params'
-      character(len=*), parameter :: Version_convert_params = '2020-08-03'
+      character(len=*), parameter :: Version_convert_params = '2020-12-02'
 ! Functions
       EXTERNAL :: print_module, PRMS_open_module_file, read_error
       INTEGER, EXTERNAL :: declparam, getparam
@@ -45,7 +45,7 @@
           Soil_moist_init = Soil_moist_init_frac*Soil_moist_max
           Ssstor_init = Ssstor_init_frac*Sat_threshold
           Tmax_allrain = Tmax_allsnow + Tmax_allrain_offset
-          IF ( Dprst_flag==ON ) THEN
+          IF ( Dprst_flag==ACTIVE ) THEN
 !            IF ( getparam(MODNAME, 'sro_to_dprst_perv', Nhru, 'real', Sro_to_dprst)/=0 ) CALL read_error(2, 'sro_to_dprst_perv')
 !            IF ( getparam(MODNAME, 'dprst_frac', Nhru, 'real', Dprst_frac)/=0 ) CALL read_error(2, 'dprst_frac')
             PRINT *, 'Change parameter names sro_to_dprst_perv to sro_to_dprst and dprst_frac to dprst_frac_hru'
@@ -62,7 +62,7 @@
           WRITE ( ounit, 110 ) 'ssstor_init', Nhru
           WRITE ( ounit, 300 ) ( Ssstor_init(i), i = 1, Nhru )
 
-!          IF ( Dprst_flag==ON ) THEN
+!          IF ( Dprst_flag==ACTIVE ) THEN
 !            WRITE ( ounit, 100 ) 'sro_to_dprst_perv', Nhru
 !            WRITE ( ounit, 300 ) ( Sro_to_dprst(i), i = 1, Nhru )
 !            WRITE ( ounit, 100 ) 'dprst_frac', Nhru
@@ -97,7 +97,7 @@
           ENDDO
 
           Tmax_allrain_offset = Tmax_allrain - Tmax_allsnow
-          IF ( Dprst_flag==ON ) THEN
+          IF ( Dprst_flag==ACTIVE ) THEN
             IF ( getparam(MODNAME, 'hru_area', Nhru, 'real', Hru_area)/=0 ) CALL read_error(2, 'hru_area')
 !              IF ( getparam(MODNAME, 'sro_to_dprst', Nhru, 'real', Sro_to_dprst)/=0 ) CALL read_error(2, 'sro_to_dprst')
               PRINT *, 'Change parameter name sro_to_dprst to sro_to_dprst_perv'
@@ -130,7 +130,7 @@
           WRITE ( ounit, 110 ) 'ssstor_init_frac', Nhru
           WRITE ( ounit, 300 ) ( Ssstor_init_frac(i), i = 1, Nhru )
 
-          IF ( Dprst_flag==ON ) THEN
+          IF ( Dprst_flag==ACTIVE ) THEN
 !            WRITE ( ounit, 100 ) 'sro_to_dprst_perv', Nhru
 !            WRITE ( ounit, 300 ) ( Sro_to_dprst(i), i = 1, Nhru )
 
@@ -258,7 +258,7 @@
      &         'Initial storage of the gravity and preferential-flow reservoirs for each HRU', &
      &         'inches')/=0 ) CALL read_error(1, 'ssstor_init')
 
-           IF ( Dprst_flag==ON ) THEN
+           IF ( Dprst_flag==ACTIVE ) THEN
 !            ALLOCATE ( Sro_to_dprst(Nhru) )
 !            IF ( declparam(MODNAME, 'sro_to_dprst', 'nhru', 'real', &
 !     &           '0.2', '0.0', '1.0', &
