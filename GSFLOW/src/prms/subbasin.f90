@@ -11,15 +11,15 @@
 !***********************************************************************
 
       MODULE PRMS_SUBBASIN
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, ON, OFF, CFS2CMS_CONV, LAKE, DOCUMENTATION, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, DOCUMENTATION, &
      &    DNEARZERO, ERROR_dim, CASCADE_OFF
-      USE PRMS_MODULE, ONLY: Process_flag, Model, Nsub, Nhru, Print_debug, GSFLOW_flag, &
+      USE PRMS_MODULE, ONLY: Model, Nsub, Nhru, Print_debug, GSFLOW_flag, &
      &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'subbasin'
-      character(len=*), parameter :: Version_subbasin = '2020-10-07'
+      character(len=*), parameter :: Version_subbasin = '2020-12-02'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Qsub(:), Sub_area(:), Laststor(:)
       INTEGER, SAVE, ALLOCATABLE :: Tree(:, :)
 !   Declared Variables
@@ -41,7 +41,8 @@
 !     Main daily stream flow routine
 !***********************************************************************
       INTEGER FUNCTION subbasin()
-      USE PRMS_SUBBASIN, ONLY: Process_flag, RUN, DECL, INIT
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT
+      USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: subdecl, subinit, subrun
@@ -371,13 +372,13 @@
             soilstor = DBLE(Soil_moist(j)*Hru_frac_perv(j) + Ssres_stor(j))*harea
             snowstor = Pkwater_equiv(j)*harea
             landstor = DBLE(Hru_intcpstor(j)+Hru_impervstor(j))*harea
-            IF ( Dprst_flag==1 ) landstor = landstor + Dprst_stor_hru(j)*harea
+            IF ( Dprst_flag==ACTIVE ) landstor = landstor + Dprst_stor_hru(j)*harea
           ELSE
             soilstor = 0.0D0
             snowstor = 0.0D0
             landstor = 0.0D0
             ! wrong if multiple HRUs for any lake
-            IF ( Lake_route_flag==ON ) THEN
+            IF ( Lake_route_flag==ACTIVE ) THEN
               landstor = Lake_vol(Lake_hru_id(j))*12.0D0
               srq = Lake_outcfs(Lake_hru_id(j))*Cfs2inches
               ssq = 0.0D0
@@ -487,7 +488,6 @@
       Subinc_wb = 0.0D0
       Subinc_recharge = 0.0D0
       Subinc_deltastor = 0.0D0
-      Subinc_recharge = 0.0D0
       Subinc_szstor_frac = 0.0D0
       Subinc_capstor_frac = 0.0D0
       IF ( GSFLOW_flag==OFF ) Subinc_gwflow = 0.0D0
@@ -507,13 +507,13 @@
             soilstor = DBLE(Soil_moist(j)*Hru_frac_perv(j) + Ssres_stor(j))*harea
             snowstor = Pkwater_equiv(j)*harea
             landstor = DBLE(Hru_intcpstor(j)+Hru_impervstor(j))*harea
-            IF ( Dprst_flag==1 ) landstor = landstor + Dprst_stor_hru(j)*harea
+            IF ( Dprst_flag==ACTIVE ) landstor = landstor + Dprst_stor_hru(j)*harea
           ELSE
             soilstor = 0.0D0
             snowstor = 0.0D0
             landstor = 0.0D0
             ! wrong if multiple HRUs for any lake
-            IF ( Lake_route_flag==ON ) THEN
+            IF ( Lake_route_flag==ACTIVE ) THEN
               landstor = Lake_vol(Lake_hru_id(j))*12.0D0
               srq = Lake_outcfs(Lake_hru_id(j))*Cfs2inches
               ssq = 0.0D0
