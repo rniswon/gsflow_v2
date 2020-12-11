@@ -47,7 +47,7 @@ long read_line (void) {
    /*static char err[80];*/
 
    char   *start_point, *end_point;
-   float   initial_deltat;
+   //float   initial_deltat;
    long   i,j;
    static int   start_of_data;
    static long	data_eof_flag;
@@ -65,7 +65,7 @@ long read_line (void) {
 /*
 **   get initial delta-t from control data base
 */
-   initial_deltat = *control_fvar("initial_deltat");
+ //  initial_deltat = *control_fvar("initial_deltat");
    data_eof_flag = *control_lvar ("ignore_data_file_end");
 
    if (Mnsteps == 0) {
@@ -162,7 +162,8 @@ cur_fd->time = {year = 1956, month = 2, day = 19, hour = 0, min = 0, sec = 0,
       if (Mnowtime->jt >= Mstrttime->jt) {
          if (start_of_data) {
             start_of_data = 0;
-            Mprevjt = Mnowtime->jt - (double)(initial_deltat / 24.0);
+            //Mprevjt = Mnowtime->jt - (double)(initial_deltat / 24.0);
+			Mprevjt = Mnowtime->jt - (double)(1.0);
          }
 
          (void)strncpy (line, cur_fd->start_of_data, max_data_ln_len);

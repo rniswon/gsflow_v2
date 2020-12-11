@@ -850,17 +850,17 @@ static char *READ_param_values (long size, long type, char *name,
 				int bound_status) {
 	int i, j;
     int  done;
-	int	desc_count = 0;
+	//int	desc_count = 0;
 	int repeat_count;
 	char delims[] = " ";
 	char *result = NULL;
 	char *comp_ptr = NULL;
 	static char *crap = NULL;
 	static char *crap2 = NULL;
-	float foo;
-	double d, min_d, max_d;
+	//float foo;
+	double d, min_d = 0.0, max_d = 1.0;
 	char *endp;
-	long l, min_l, max_l;
+	long l, min_l = 0, max_l = 1;
 	char *line_p;
 	
 	if (crap == NULL) {
@@ -903,7 +903,7 @@ static char *READ_param_values (long size, long type, char *name,
 			done = TRUE;
 
 		} else {
-			desc_count = 0;
+			//desc_count = 0;
 			result = NULL;
 			strncpy (crap, line, max_data_ln_len);
 
@@ -918,7 +918,7 @@ static char *READ_param_values (long size, long type, char *name,
 					*comp_ptr = '\0';
 					repeat_count = atol(crap2);
 					comp_ptr++;
-					foo = (float) atof(comp_ptr);
+					//foo = (float) atof(comp_ptr);
 				}
 
 				for (j = 0; j < repeat_count && !done; j++) {
@@ -1010,6 +1010,7 @@ static int checkForValidDimensions (PARAM *param_ptr) {
 		return 1;
 
 	} else if (param_ptr->pf_ndimen == param_ptr->ndimen ) {
+		badFlag = 1;
 		for (i = 0; i < param_ptr->pf_ndimen; i++) {  // check each dimension for compatiblilty
 //printf ("   1 comparing %s to %s\n", param_ptr->pf_dimNames[i], param_ptr->dimen[i]->name);
 			badFlag = isDimensionIncompatable (param_ptr->pf_dimNames[i], param_ptr->dimen[i]->name); // 0 = good;  1 = bad
@@ -1324,7 +1325,7 @@ static void bad_param_value_l (long l, int i, char *name, long min_l, long max_l
 	static char buf[256];
 
 	if (*control_lvar("parameter_check_flag") > 0) {
-		snprintf (buf, 256, "%s[%d] = %d is out of range (%d to %d)", name, i, (int)l, (int)min_l, (int)max_l);
+		snprintf (buf, 256, "%s[%d] = %ld is out of range (%ld to %ld)", name, i, (long)l, (long)min_l, (long)max_l);
 		fprintf (stderr, "%s\n", warning_string(buf));
 	}
 }

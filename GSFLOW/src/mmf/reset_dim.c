@@ -195,18 +195,18 @@ void reset_dim (DIMEN *dim, long nnew) {
 \*--------------------------------------------------------------------*/
 static void resize_param (PARAM *param, long dimen_num, long nold, long nnew, long size_new) {
 
-	char *aptr_prev, *aptr_new;
+	char *aptr_prev = NULL, *aptr_new = NULL;
 
 	long i, j, iframe, inew, iold, icase;
 	long nframes;
 	long blocksize;
 	long new_framesize, old_framesize;
 	long new_index, old_index;
-	long *lptr_prev, *lptr_new;
+	long *lptr_prev = NULL, *lptr_new = NULL;
 
-	float *fptr_prev, *fptr_new;
+	float *fptr_prev = NULL, *fptr_new = NULL;
 
-	double *dptr_prev, *dptr_new;
+	double *dptr_prev = NULL, *dptr_new = NULL;
 
 /*
 * compute the number of frames

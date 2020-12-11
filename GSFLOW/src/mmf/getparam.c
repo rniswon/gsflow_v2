@@ -433,7 +433,7 @@ long getparamstring_ (char *mname, char *pname, ftnint *pmaxsize, char *ptype, f
 	       ftnlen mnamelen, ftnlen pnamelen, ftnlen ptypelen, ftnlen pslen) {
 
   char *module, *name, *type;
-  int maxsize;
+  //int maxsize;
   PARAM *param;
   static long silent_flag;
   silent_flag = *control_lvar("print_debug");
@@ -441,7 +441,7 @@ long getparamstring_ (char *mname, char *pname, ftnint *pmaxsize, char *ptype, f
    * copy maxsize to local long int
    */
 
-  maxsize = *pmaxsize;
+  //maxsize = *pmaxsize;
 
   /*
    * copy args to new strings, and terminate
