@@ -470,8 +470,6 @@
 !   Daily time step.
 !   Compute reservoir routing and basin outflow
 
-      !rsr, not getting groundwater storage and flow for GSFLOW mode
-
       Qsub = 0.0D0
       Subinc_interflow = 0.0D0
       Subinc_sroff = 0.0D0

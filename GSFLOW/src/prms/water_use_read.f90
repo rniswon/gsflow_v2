@@ -56,7 +56,6 @@
 
       INTEGER FUNCTION water_use_read()
       USE PRMS_WATER_USE
-      USE PRMS_MODULE, ONLY: Soilzone_add_water_use
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL, DBLE

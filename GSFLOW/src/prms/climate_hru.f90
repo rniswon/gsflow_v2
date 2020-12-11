@@ -255,12 +255,6 @@
             Basin_potet = Basin_potet + DBLE( Potet(i)*harea )
           ENDIF
 
-          IF ( Climate_swrad_flag==ACTIVE ) Basin_swrad = Basin_swrad + DBLE( Swrad(i)*harea )
-
-          IF ( Climate_transp_flag==ACTIVE ) THEN
-            IF ( Transp_on(i)==ACTIVE ) Basin_transp_on = ACTIVE
-          ENDIF
-
           IF ( Climate_precip_flag==ACTIVE ) THEN
             IF ( Hru_ppt(i)>0.0 ) THEN
               IF ( Precip_units==CELSIUS ) Hru_ppt(i) = Hru_ppt(i)*MM2INCH
@@ -276,7 +270,10 @@
 !              Hru_ppt(i) = 0.0
             ENDIF
           ENDIF
-
+          IF ( Climate_transp_flag==ACTIVE ) THEN
+            IF ( Transp_on(i)==ACTIVE ) Basin_transp_on = ACTIVE
+          ENDIF
+          IF ( Climate_swrad_flag==ACTIVE ) Basin_swrad = Basin_swrad + DBLE( Swrad(i)*harea )
           IF ( Humidity_cbh_flag==ACTIVE ) Basin_humidity = Basin_humidity + DBLE( Humidity_hru(i)*harea )
           IF ( Windspeed_cbh_flag==ACTIVE ) Basin_windspeed = Basin_windspeed + DBLE( Windspeed_hru(i)*harea )
           IF ( Aet_cbh_flag==ACTIVE ) Basin_aet_external = Basin_aet_external + DBLE( Aet_external(i)*harea )

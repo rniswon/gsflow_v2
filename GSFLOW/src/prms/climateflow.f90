@@ -77,7 +77,7 @@
       DOUBLE PRECISION, SAVE :: Basin_ssflow, Basin_soil_to_gw
       DOUBLE PRECISION, SAVE :: Basin_actet, Basin_lakeevap
       DOUBLE PRECISION, SAVE :: Basin_swale_et, Basin_perv_et, Basin_sroff
-      DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ag_soil_moist, Basin_ssstor, Basin_recharge
+      DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor, Basin_recharge, Basin_ag_soil_moist
       REAL, SAVE, ALLOCATABLE :: Hru_actet(:), Soil_moist(:), Ag_soil_moist(:), Ag_soil_rechr(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_ssr(:), Ssres_in(:)
