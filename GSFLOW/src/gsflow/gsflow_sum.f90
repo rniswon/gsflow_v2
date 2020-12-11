@@ -715,6 +715,7 @@
         SatDisch2Lake_Q = TOTGWIN_LAK 
         Lake2Sat_Q = TOTGWOT_LAK
         Lake_dS = TOTDELSTOR_LAK
+        LakeExchng2Sat_Q = -Lake2Sat_Q - SatDisch2Lake_Q
       ENDIF
 
       IF ( IRTFLG>0 ) CALL MODFLOW_SFR_GET_STORAGE
