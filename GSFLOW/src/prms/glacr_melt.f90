@@ -45,16 +45,15 @@
 !***********************************************************************
 
       MODULE PRMS_GLACR
-      USE PRMS_CONSTANTS, ONLY: ON, OFF, DOCUMENTATION, MONTHS_PER_YEAR, GLACIER, LAND, &
-     &    FEET2METERS, METERS2FEET, DNEARZERO, NEARZERO, FEET, METERS, MAX_DAYS_PER_YEAR, &
-     &    RUN, SETDIMENS, DECL, INIT, CLEAN, ON
-      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Model, Init_vars_from_file, Save_vars_to_file
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, MONTHS_PER_YEAR, GLACIER, LAND, &
+     &    FEET2METERS, METERS2FEET, DNEARZERO, NEARZERO, FEET, METERS, MAX_DAYS_PER_YEAR
+      USE PRMS_MODULE, ONLY: Nhru, Model, Init_vars_from_file
       IMPLICIT NONE
       !****************************************************************
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2020-09-21'
+      character(len=*), parameter :: Version_glacr = '2020-12-02'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -97,7 +96,8 @@
 !     Main glacr routine
 !***********************************************************************
       INTEGER FUNCTION glacr()
-      USE PRMS_GLACR
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, RUN, SETDIMENS, DECL, INIT, CLEAN
+      USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: glacrdecl, glacrinit, glacrrun, glacrsetdims
@@ -114,7 +114,7 @@
       ELSEIF ( Process_flag==INIT ) THEN
         glacr = glacrinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ON ) CALL glacr_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL glacr_restart(0)
       ENDIF
 
       END FUNCTION GLACR
@@ -432,7 +432,7 @@
            'Average HRU snowfield ablation zones elevation range or ~ median-min elev', &
            'elev_units')/=0 ) CALL read_error(1, 'abl_elev_range')
 
-       END FUNCTION glacrdecl
+      END FUNCTION glacrdecl
 
 !***********************************************************************
 !     glacrinit - Initialize glacr module - get parameter values
@@ -446,7 +446,7 @@
 ! Functions
       INTEGER, EXTERNAL :: getparam, get_ftnunit, compute_ela_aar
       INTRINSIC :: ABS, SQRT, SNGL, REAL
-      EXTERNAL :: read_error, tag_count, sort5
+      EXTERNAL :: read_error, tag_count, sort5, glacr_restart
 ! Local Variables
       INTEGER :: i, j, ii, jj, o, p, hru_flowline(Nhru), toflowline(Nhru), doela, termh, len_str
       INTEGER :: iwksp(Nhru), is(Nhru), ie(Nhru), n_inline(Nhru), cell_id(Nhru), str_id(Nhru), prev

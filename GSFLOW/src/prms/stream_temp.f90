@@ -2,15 +2,15 @@
 ! stream temperature module
 !***********************************************************************
       MODULE PRMS_STRMTEMP
-      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, MONTHS_PER_YEAR, DOCUMENTATION, ON, OFF, &
-     &    NEARZERO, ERROR_param, CFS2CMS_CONV, DAYS_YR, DAYS_PER_YEAR
-      USE PRMS_MODULE, ONLY: Process_flag, Nsegment, Model, Save_vars_to_file, Init_vars_from_file, &
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, MONTHS_PER_YEAR, DOCUMENTATION, ACTIVE, OFF, &
+     &    NEARZERO, ERROR_param, CFS2CMS_CONV, DAYS_YR, DAYS_PER_YEAR, DAYS_YR
+      USE PRMS_MODULE, ONLY: Process_flag, Nsegment, Model, Init_vars_from_file, &
      &    Print_debug, Strmtemp_humidity_flag, Model, Inputerror_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2020-08-31'
+      character(len=*), parameter :: Version_stream_temp = '2020-12-02'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -37,7 +37,7 @@
       DOUBLE PRECISION, ALLOCATABLE :: Seg_potet(:)
 !   Segment Parameters
       REAL, SAVE, ALLOCATABLE :: Seg_length(:) !, Mann_n(:)
-      REAL, SAVE, ALLOCATABLE :: Width_values(:, :)
+      REAL, SAVE, ALLOCATABLE :: Seg_slope(:), Width_values(:, :)
       REAL, SAVE, ALLOCATABLE :: width_alpha(:), width_m(:), Stream_tave_init(:)
       INTEGER, SAVE:: Width_dim, Maxiter_sntemp
       REAL, SAVE, ALLOCATABLE :: Seg_humidity(:, :)
@@ -67,8 +67,8 @@
 !     Main stream temperature routine
 !***********************************************************************
       INTEGER FUNCTION stream_temp()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ON
-      USE PRMS_STRMTEMP, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE
+      USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: stream_temp_decl, stream_temp_init, stream_temp_run, stream_temp_setdims
@@ -84,7 +84,7 @@
          IF ( Init_vars_from_file>0 ) CALL stream_temp_restart(1)
          stream_temp  = stream_temp_init()
       ELSEIF ( Process_flag==CLEAN ) THEN
-         IF ( Save_vars_to_file==ON ) CALL stream_temp_restart(0)
+         IF ( Save_vars_to_file==ACTIVE ) CALL stream_temp_restart(0)
       ENDIF
 
       END FUNCTION stream_temp
@@ -212,6 +212,13 @@
      &     'Length of each segment', &
      &     'meters')/=0 ) CALL read_error(1, 'seg_length')
 
+      ALLOCATE ( Seg_slope(Nsegment) )
+      IF ( declparam( MODNAME, 'seg_slope', 'nsegment', 'real', &
+     &     '0.015', '0.0001', '2.0', &
+     &     'Bed slope of each segment', &
+     &     'Bed slope of each segment', &
+     &     'decimal fraction')/=0 ) CALL read_error(1, 'seg_slope')
+
       ALLOCATE ( width_alpha(Nsegment) )
       IF ( declparam( MODNAME, 'width_alpha', 'nsegment', 'real', &
      &     '0.015', '0.0001', '2.0', &
@@ -319,7 +326,7 @@
      &       'meters')/=0 ) CALL read_error(1, 'vow')
       ENDIF
 
-      IF ( Stream_temp_shade_flag==ON .OR. Model==DOCUMENTATION ) THEN
+      IF ( Stream_temp_shade_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
          ALLOCATE ( Segshade_sum(Nsegment) )
          IF ( declparam( MODNAME, 'segshade_sum', 'nsegment', 'real', &
      &       '0.0', '0.0', '1.0.', &
@@ -361,7 +368,7 @@
      &     'Maximum number of Newton-Raphson iterations to compute stream temperature', &
      &     'none')/=0 ) CALL read_error(1, 'maxiter_sntemp')
 
-      IF ( Strmtemp_humidity_flag==1 .OR. Model==DOCUMENTATION ) THEN  ! specified constant
+      IF ( Strmtemp_humidity_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN  ! specified constant
          ALLOCATE ( Seg_humidity(Nsegment, MONTHS_PER_YEAR) )
          IF ( declparam( MODNAME, 'seg_humidity', 'nsegment,nmonths', 'real', &
      &       '0.7', '0.0', '1.0', &
@@ -435,6 +442,7 @@
 ! convert stream length in meters to km
       Seg_length = Seg_length / 1000.0
 
+      IF ( getparam( MODNAME, 'seg_slope', Nsegment, 'real', Seg_slope)/=0 ) CALL read_error(2, 'seg_slope')
       IF ( getparam( MODNAME, 'width_alpha', Nsegment, 'real', width_alpha)/=0 ) CALL read_error(2, 'width_alpha')
       IF ( getparam( MODNAME, 'width_m', Nsegment, 'real', width_m)/=0 ) CALL read_error(2, 'width_m')
 
@@ -705,7 +713,6 @@
 
       END FUNCTION stream_temp_init
 
-
 !***********************************************************************
 !     stream_temp_run - Computes stream temperatures
 !***********************************************************************
@@ -775,7 +782,6 @@
          if (ccov .ne. ccov) then
              write(*,*) "ccov is nan", j, Swrad(j), Soltab_potsw(jday, j), Hru_cossl(j)
          endif
-      
 
          IF ( ccov<NEARZERO ) THEN
             ccov = 0.0
@@ -1071,7 +1077,8 @@
 ! Compute the flow-weighted average temperature and a total sum of lateral inflows
 !*********************************************************************************
       SUBROUTINE lat_inflow(Qlat, Tl_avg, id, tave_gw, tave_air, tave_ss, melt, rain)
-      USE PRMS_STRMTEMP, ONLY: Melt_temp, CFS2CMS_CONV, NEARZERO
+      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV, NEARZERO
+      USE PRMS_STRMTEMP, ONLY: Melt_temp
       USE PRMS_FLOWVARS, ONLY: Seg_lateral_inflow
       USE PRMS_ROUTING, ONLY: Seginc_sroff, Seginc_ssflow, Seginc_gwflow
       IMPLICIT NONE
@@ -1125,7 +1132,7 @@
 !     PURPOSE:
 !        1. TO PREDICT THE AVERAGE DAILY WATER TEMPERATURE USING A SECOND-ORDER
 !           CLOSED-FORM SOLUTION TO THE STEADY-STATE HEAT TRANSPORT EQUATION.
-      USE PRMS_STRMTEMP, ONLY: NEARZERO, CFS2CMS_CONV
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, CFS2CMS_CONV
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, EXP, ALOG, SNGL, SIGN
@@ -1215,10 +1222,11 @@
 !        1. DETERMINE THE AVERAGE DAILY EQUILIBRIUM WATER TEMPERATURE PARAMETERS
 !        2. DETERMINE THE MAXIMUM DAILY EQUILIBRIUM WATER TEMPERATURE PARAMETERS
 
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, CFS2CMS_CONV
       USE PRMS_STRMTEMP, ONLY: ZERO_C, Seg_width, Seg_humid, Press, MPS_CONVERT, &
-     &    Seg_ccov, Seg_potet, Albedo, seg_tave_gw, NEARZERO, CFS2CMS_CONV
+     &    Seg_ccov, Seg_potet, Albedo, seg_tave_gw, Seg_slope
       USE PRMS_FLOWVARS, ONLY: Seg_inflow
-      USE PRMS_ROUTING, ONLY: Seginc_swrad, Seg_slope
+      USE PRMS_ROUTING, ONLY: Seginc_swrad
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, SQRT, ABS, SNGL, DBLE
@@ -1435,7 +1443,7 @@
       USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_STRMTEMP, ONLY: Azrh, Alte, Altw, Seg_daylight, Seg_width, &
      &    PI, HALF_PI, Cos_seg_lat, Sin_seg_lat, Cos_lat_decl, Horizontal_hour_angle, &
-     &    Level_sunset_azimuth, Max_solar_altitude, Sin_alrs, Sin_declination, Sin_lat_decl, Total_shade, CFS2CMS_CONV
+     &    Level_sunset_azimuth, Max_solar_altitude, Sin_alrs, Sin_declination, Sin_lat_decl, Total_shade
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: COS, SIN, TAN, ACOS, ASIN, ATAN, ABS, MAX, SNGL
@@ -1602,7 +1610,8 @@
 !     THIS SUBPROGRAM DETERMINES THE LOCAL SOLAR SUNRISE/SET
 ! AZIMUTH, ALTITUDE, AND HOUR ANGLE
 !
-      USE PRMS_STRMTEMP, ONLY: Azrh, PI, Maxiter_sntemp, NEARZERO
+      USE PRMS_CONSTANTS, ONLY: NEARZERO
+      USE PRMS_STRMTEMP, ONLY: Azrh, PI, Maxiter_sntemp
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: TAN, SIN, COS, ACOS, ASIN, ABS
@@ -1705,7 +1714,8 @@
 !      FPPAL  = SECOND DERIVATIVE OF FAL
 !      Sin_d   = SIN(DECL)
 !      Sino   = SIN(XLAT)
-      USE PRMS_STRMTEMP, ONLY: HALF_PI, Maxiter_sntemp, NEARZERO
+      USE PRMS_CONSTANTS, ONLY: NEARZERO
+      USE PRMS_STRMTEMP, ONLY: HALF_PI, Maxiter_sntemp
       IMPLICIT NONE
 ! Functions
       INTRINSIC ASIN, ABS, COS, SIN
@@ -1766,8 +1776,9 @@
 !      THIS SUBPROGRAM IS TO COMPUTE THE RIPARIAN VEGETATION SHADE
 !  SEGMENT BETWEEN THE TWO HOUR ANGLES HRSR & HRSS.
 !
+      USE PRMS_CONSTANTS, ONLY: NEARZERO
       USE PRMS_STRMTEMP, ONLY: Azrh, Vce, Vdemx, Vhe, Voe, Vcw, Vdwmx, Vhw, Vow, Seg_width, &
-     &    Vdemn, Vdwmn, HALF_PI, NEARZERO
+     &    Vdemn, Vdwmn, HALF_PI
       USE PRMS_SET_TIME, ONLY: Summer_flag
       IMPLICIT NONE
 ! Functions
