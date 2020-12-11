@@ -18,22 +18,22 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =         283515.66     EVAPOTRANSPIRATION =          36592.79
-           STREAMFLOW =          34903.71             STREAMFLOW =           4813.47
-     GW BOUNDARY FLOW =           5021.77       GW BOUNDARY FLOW =            717.47
-                WELLS =           5046.25                  WELLS =            509.53
+   EVAPOTRANSPIRATION =         283308.48     EVAPOTRANSPIRATION =          36594.98
+           STREAMFLOW =          34972.73             STREAMFLOW =           4827.44
+     GW BOUNDARY FLOW =           5021.83       GW BOUNDARY FLOW =            717.48
+                WELLS =           5046.24                  WELLS =            509.53
 
-   INFLOWS - OUTFLOWS =         -40210.76     INFLOWS - OUTFLOWS =         -42604.55
+   INFLOWS - OUTFLOWS =         -40072.65     INFLOWS - OUTFLOWS =         -42620.72
              --------                                   --------
 
- TOTAL STORAGE CHANGE =         -40192.38         STORAGE CHANGE =         -42602.08
+ TOTAL STORAGE CHANGE =         -40054.25         STORAGE CHANGE =         -42618.27
        --------------                             --------------
          LAND SURFACE =         -46670.17           LAND SURFACE =          -2455.80
-            SOIL ZONE =         109166.60              SOIL ZONE =         -25617.99
-     UNSATURATED ZONE =         -39223.86       UNSATURATED ZONE =          -5382.14
-       SATURATED ZONE =         -63464.96         SATURATED ZONE =          -9146.14
+            SOIL ZONE =         109285.85              SOIL ZONE =         -25635.79
+     UNSATURATED ZONE =         -39224.00       UNSATURATED ZONE =          -5383.20
+       SATURATED ZONE =         -63445.93         SATURATED ZONE =          -9143.49
 
- OVERALL BUDGET ERROR =            -18.38           BUDGET ERROR =             -2.47
+ OVERALL BUDGET ERROR =            -18.40           BUDGET ERROR =             -2.45
 
 
   PERCENT DISCREPANCY =             -0.01    PERCENT DISCREPANCY =             -0.01
