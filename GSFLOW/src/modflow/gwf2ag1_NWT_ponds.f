@@ -587,14 +587,14 @@
             WRITE (IOUT, 37) IRRSFRCB
             WRITE (IOUT, *)
             !
-            !8 - --- Option to output list for irrigation wells
+            !8 - --- Option to output list for irrigation ponds
          case ('PONDIRRLIST')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRRWELLCB, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
             WRITE (IOUT, 44) IRRPONDCB
             WRITE (IOUT, *)
-            !8 - --- Option to output list for irrigation ponds
+            !9 - --- Option to output list for irrigation wells
          case ('WELLIRRLIST')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRRWELLCB, 
      +                  R, IOUT, IN)
@@ -602,14 +602,14 @@
             WRITE (IOUT, 37) IRRWELLCB
             WRITE (IOUT, *)
             !
-            !9 - --- Option to output time series by SW right
+            !10 - --- Option to output time series by SW right
          case ('TIMESERIES_DIVERSION')
             TSACTIVESW = .TRUE.
             WRITE (IOUT, *)
             WRITE (IOUT, 39)
             WRITE (IOUT, *)
             !
-            !10 - --- Option to output time series by GW right
+            !11 - --- Option to output time series by GW right
          case ('TIMESERIES_WELL')
             TSACTIVEGW = .TRUE.
             WRITE (IOUT, *)
