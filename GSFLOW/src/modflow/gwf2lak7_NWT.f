@@ -14,7 +14,7 @@ Cdep  Streamflow-Routing Package. The Streamflow-Routing (sfr7) Package
 Cdep  was also modified to remain compatible with the modifications in
 Cdep  the Lake Package.
 C     Modifications made February and March 21, 2004; DEP
-C     Last change:  MLM & LFK  10 Oct 2003;  LFK 21 Jan 2004
+C     Last change:  MLM & LFK  10 Oct 2003;  LFK 21 Jan 2004F
 C     Previous change:  ERB  13 Sep 2002    9:22 am
 C
 C

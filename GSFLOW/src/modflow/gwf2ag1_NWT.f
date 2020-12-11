@@ -1085,7 +1085,7 @@
       RETURN
       END
 !
-      SUBROUTINE GWF2AG7AD(IN,KPER)
+      SUBROUTINE GWF2AG7AD(IN, KPER)
       !******************************************************************
       ! UPDATE DEMANDS FOR NEW TIME STEP
       !******************************************************************
@@ -1099,7 +1099,7 @@
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS:
-      INTEGER, INTENT(IN)::IN,KPER
+      INTEGER, INTENT(IN)::IN, KPER
       !
       INTEGER ISEG, i
       DOUBLE PRECISION :: TOTAL

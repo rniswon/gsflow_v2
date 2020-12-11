@@ -61,6 +61,7 @@ C     ******************************************************************
       double precision, intent(inout) :: trhs,thcof,dET
 ! local
       double precision depth,smint,etgw,detdh
+!     double precision gwet
       external smoothuz
       double precision smoothuz
 !
@@ -970,6 +971,7 @@ C     PARSE KEYWORD OPTIONS
 C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: IOUT
+!      USE GLOBAL,       ONLY: IUNIT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -1871,6 +1873,7 @@ C     VERSION 1.1.4:  April 29, 2018
 C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NLAY, IOUT, IBOUND, HNEW, BOTM
+!      USE GLOBAL,       ONLY: NCOL, NROW, ISSFLG
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -1881,6 +1884,7 @@ C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
       INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP, ILACTIVE
+      INTEGER :: IBND2
       DOUBLE PRECISION :: S1, S2
 C     -----------------------------------------------------------------
 C      
@@ -1937,9 +1941,7 @@ C     ******************************************************************
       USE GLOBAL,       ONLY: NLAY, HNEW, ISSFLG, DELR,
      +                        DELC, BOTM, IBOUND, HCOF, RHS,
      +                        ITMUNI, IUNIT
-!!      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, HNEW, ISSFLG, DELR,
-!!     +                        DELC, BOTM, IBOUND, HCOF, RHS,
-!!     +                        ITMUNI, LENUNI, IOUT
+!!      USE GLOBAL,       ONLY: NCOL, NROW
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
@@ -1964,15 +1966,14 @@ C     -----------------------------------------------------------------
       INTEGER ic, il, ill, ir, iset, iss, iwav, l, numwaves,
      +        land, idelt, ik, ll
       INTEGER lakflg, lakid, ibnd, ij, nlayp1, lakflginf
+!     INTEGER idr, i
       DOUBLE PRECISION oldsflx, surflux, dlength, h, celtop, deltinc,
      +                 zoldist, totflux, etact, rateud, hld, htest1,
      +                 htest2, flength, width, thr, cellarea, fact,
      +                 totfluxtot, totetact, csep, csepmx,seepoutcheck,
      +                 rhsnew, hcofold, hcofnew, rhsold, fkseep, 
      +                 fkreject, zero
-!!     +                 dcsep
-!!     +                 rhsnew, hcofold, hcofnew, rhsold, bbot, ttop, 
-!!     +                 dcsep
+!!    DOUBLE PRECISION  bbot, ttop, dcsep, etdp
       DOUBLE PRECISION s, x, c, etgw, trhs, thcof, hh, dET
 C     -----------------------------------------------------------------
 C
@@ -2508,7 +2509,8 @@ C     -----------------------------------------------------------------
       REAL rin, rootdp, rout, ths, ratout2, fmax, totbet
       REAL csepmx, csep, finfact, finfhold, gcumapl, gaplinfltr
       REAL totalwc, totrin, totrot, totvin, totvot, volet, volflwtb, 
-     +     volinflt, wiltwc, zero, celthick
+     +     volinflt, wiltwc, zero, celthick, error
+!      REAL etdp
       INTEGER ibd, ibduzf, ic, ick, iftunit, igflg, ii, il, ill,
      +        iog, ir, iset, iss, iuzcol, iuzn, iuzopt, iuzrat, iuzrow, 
      +        j, jj, jk, land, nwavm1, nwaves, idelt, ik, ll, ibnd, iret
@@ -5637,9 +5639,11 @@ C     ******************************************************************
 C     AVEARGE WATER CONTENT AND FLUX FOR MT3DMS
 C     ******************************************************************
       USE GLOBAL,       ONLY: BOTM, NLAY
+!     USE GLOBAL,       ONLY: IOUT
       USE GWFBASMODULE, ONLY: DELT
       USE GWFUZFMODULE, ONLY: NWAV, CLOSEZERO, IUZFBND, NWAVST,
      +                        GRIDSTOR, GRIDET, IUZFOPT
+!     USE GWUZFMODULE, ONLY: RTSOLUTE
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
