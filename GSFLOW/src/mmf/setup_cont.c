@@ -44,7 +44,7 @@ void setup_cont (void) {
 /*
 **	GSFLOW control variables
 */
-        decl_control_string ("model_mode", "PRMS5");
+        decl_control_string ("model_mode", "GSFLOW5");
         decl_control_string ("modflow_name", "modflow.nam");
         decl_control_string ("precip_module", "precip_1sta");
         decl_control_string ("temp_module", "temp_1sta");
@@ -101,8 +101,12 @@ void setup_cont (void) {
 
 		lval = (long*)umalloc(sizeof(long));
 		lval[0] = 0;
-		decl_control_int_array("agriculture_flag", 1, lval);
-		
+		decl_control_int_array("agriculture_soil_flag", 1, lval);
+
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("agriculture_canopy_flag", 1, lval);
+
         lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
 		decl_control_int_array ("dprst_flag", 1, lval);

@@ -31,7 +31,7 @@
 ** Translated from the algol original in Collected Algorithms of CACM
 ** (This and jdate are algorithm 199).
 */
-double getjulday(int mon, int day, int year, int h, int mi, int se) {
+double getjulday(int mon, int day, int year, int h, int mi, double se) {
 	DATETIME datetime;
 
 	datetime.year = year;
@@ -52,7 +52,7 @@ double getjulday(int mon, int day, int year, int h, int mi, int se) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-double getjulday_(int *mon, int *day, int *year, int *h, int *mi, int *se) {
+double getjulday_(int *mon, int *day, int *year, int *h, int *mi, double *se) {
    return getjulday (*mon, *day, *year, *h, *mi, *se);
 }
 

@@ -31,8 +31,7 @@ int julday (DATETIME *datetime) {
   //datetime->jt = foo;
 
   long jul;
-  int jy, jm, iyyy, mm, id;
-  double ja;
+  int ja,jy,jm, iyyy, mm, id;
 
   iyyy = datetime->year;
   mm = datetime->month;
@@ -54,7 +53,7 @@ int julday (DATETIME *datetime) {
   jul = (long) (floor(365.25*jy)+floor(30.6001*jm)+id+1720995);
   if (id+31L*(mm+12L*iyyy) >= IGREG) {
     ja=0.01*jy;
-    jul += (int) (2.0 - ja + (0.25*ja));
+    jul += 2-ja+(int) (0.25*ja);
   }
   datetime->jd = jul;
   datetime->jt = (double) jul + (double) datetime->hour / 24.0
