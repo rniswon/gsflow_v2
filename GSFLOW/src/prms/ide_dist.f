@@ -229,7 +229,8 @@
      +     'Precipitation is rain if HRU max temperature >= this value',
      +     'Monthly (January to December) maximum air temperature'//
      +     ' when precipitation is assumed to be rain; if'//
-     +     ' air temperature is greater than or equal to this value,'//
+     +     ' precipitation measurement station air'//
+     +     ' temperature is greater than or equal to this value,'//
      +     ' precipitation is rain',
      +     'temp_units')/=0 ) CALL read_error(1, 'tmax_allrain_sta')
 
@@ -239,7 +240,8 @@
      +     'Maximum temperature when precipitation is all snow',
      +     'Monthly (January to December) maximum air temperature'//
      +     ' when precipitation is assumed to be snow; if'//
-     +     ' air temperature is less than or equal to this value,'//
+     +     ' precipitation measurement station air'//
+     +     ' temperature is less than or equal to this value,'//
      +     ' precipitation is snow',
      +     'temp_units')/=0 ) CALL read_error(1, 'tmax_allsnow_sta')
 

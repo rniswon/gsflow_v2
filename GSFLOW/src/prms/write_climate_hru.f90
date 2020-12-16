@@ -4,7 +4,7 @@
 ! the climate_hru module
 !***********************************************************************
       INTEGER FUNCTION write_climate_hru()
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, RUN, DECL, INIT, CLEAN, OFF
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, RUN, DECL, INIT, CLEAN, OFF, ERROR_write
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Climate_temp_flag, Climate_precip_flag, &
      &    Climate_swrad_flag, Climate_potet_flag, Climate_transp_flag
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
@@ -16,7 +16,7 @@
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'Preprocessing'
       character(len=*), parameter :: MODNAME = 'write_climate_hru'
-      character(len=*), parameter :: Version_write_climate_hru = '2020-08-03'
+      character(len=*), parameter :: Version_write_climate_hru = '2020-12-15'
       INTEGER, SAVE :: tmax_unit, tmin_unit, precip_unit, potet_unit, swrad_unit, transp_unit
       INTEGER :: i, ios, ierr
       CHARACTER(LEN=32), SAVE :: fmt1, fmt2, fmt3
@@ -110,7 +110,7 @@
           ENDIF
         ENDIF
         
-        IF ( ierr==1 ) ERROR STOP -1
+        IF ( ierr==1 ) ERROR STOP ERROR_write
 
 !***Clean-up Procedure***
       ELSEIF ( Process_flag==CLEAN ) THEN
