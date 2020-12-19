@@ -441,8 +441,10 @@
         ENDDO
       ENDIF
       DO jj = 1, NsubOutVars
-        IF ( Daily_flag==ACTIVE ) WRITE ( Dailyunit(jj), Output_fmt) Nowyear, Nowmonth, Nowday, (Nsub_var_dble(j,jj), j=1,Nsub)
-        IF ( write_month==ACTIVE ) WRITE ( Monthlyunit(jj), Output_fmt) Nowyear, Nowmonth, Nowday, (Nsub_var_monthly(j,jj), j=1,Nsub)
+        IF ( Daily_flag==ACTIVE ) WRITE ( Dailyunit(jj), Output_fmt) Nowyear, &
+     &       Nowmonth, Nowday, (Nsub_var_dble(j,jj), j=1,Nsub)
+        IF ( write_month==ACTIVE ) WRITE ( Monthlyunit(jj), Output_fmt) Nowyear, &
+     &       Nowmonth, Nowday, (Nsub_var_monthly(j,jj), j=1,Nsub)
       ENDDO
       IF ( write_month==ACTIVE ) THEN
         Monthdays = 0.0D0

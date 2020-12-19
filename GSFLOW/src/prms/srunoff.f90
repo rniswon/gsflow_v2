@@ -257,9 +257,9 @@
      &      'decimal fraction', Dprst_vol_frac)/=0 ) CALL read_error(3, 'dprst_vol_frac')
 
         ALLOCATE ( Dprst_vol_open_max(Nhru), Dprst_vol_clos_max(Nhru), Dprst_vol_thres_open(Nhru), Dprst_in(Nhru) )
-        IF ( PRMS_land_iteration_flag==ON ) ALLOCATE ( It0_dprst_vol_open(Nhru), It0_dprst_vol_clos(Nhru) )
+        IF ( PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_dprst_vol_open(Nhru), It0_dprst_vol_clos(Nhru) )
       ENDIF
-      IF ( PRMS_land_iteration_flag==ON ) ALLOCATE ( It0_imperv_stor(Nhru), It0_soil_moist(Nhru), It0_soil_rechr(Nhru) )
+      IF ( PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_imperv_stor(Nhru), It0_soil_moist(Nhru), It0_soil_rechr(Nhru) )
 
       ALLOCATE ( Hortonian_flow(Nhru) )
       IF ( declvar(MODNAME, 'hortonian_flow', 'nhru', Nhru, 'real', &
@@ -490,7 +490,6 @@
       INTEGER FUNCTION srunoffinit()
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
-!      USE PRMS_FLOWVARS, ONLY: Soil_moist_max
       USE PRMS_FLOWVARS, ONLY: Basin_sroff
       IMPLICIT NONE
 ! Functions
@@ -518,27 +517,27 @@
         IF ( Nlake>0 ) Hortonian_lakes = 0.0D0
       ENDIF
 
-      Basin_sroffi = 0.0D0
-      Basin_sroffp = 0.0D0
-      Basin_infil = 0.0D0
-      Basin_sroff = 0.0D0
-      Basin_imperv_evap = 0.0D0
-      Basin_hortonian = 0.0D0
-      Basin_dprst_sroff = 0.0D0
-      Basin_dprst_evap = 0.0D0
-      Basin_dprst_seep = 0.0D0
-      Basin_sroff_upslope = 0.0D0
-      Basin_sroff_down = 0.0D0
-      Basin_hortonian_lakes = 0.0D0
-      Basin_contrib_fraction = 0.0D0
-      Srp = 0.0
-      Sri = 0.0
-
       IF ( Init_vars_from_file==0 ) THEN
+        Basin_sroffi = 0.0D0
+        Basin_sroffp = 0.0D0
+        Basin_infil = 0.0D0
+        Basin_sroff = 0.0D0
+        Basin_imperv_evap = 0.0D0
         Basin_imperv_stor = 0.0D0
+        Basin_hortonian = 0.0D0
+        Basin_dprst_sroff = 0.0D0
+        Basin_dprst_evap = 0.0D0
+        Basin_dprst_seep = 0.0D0
         Basin_dprst_volop = 0.0D0
         Basin_dprst_volcl = 0.0D0
+        Basin_sroff_upslope = 0.0D0
+        Basin_sroff_down = 0.0D0
+        Basin_hortonian_lakes = 0.0D0
+        Basin_contrib_fraction = 0.0D0
         Hru_impervstor = 0.0
+        Srp = 0.0
+        Sri = 0.0
+
         Frozen = OFF
         IF ( Frozen_flag==ACTIVE ) THEN
           Cfgi = 0.0
@@ -636,29 +635,30 @@
 !***********************************************************************
       srunoffrun = 0
 
-      IF ( Print_debug==DEBUG_WB ) THEN
-        Imperv_stor_ante = Hru_impervstor
-        IF ( Dprst_flag==ACTIVE ) Dprst_stor_ante = Dprst_stor_hru
-      ENDIF
-
-      IF ( PRMS_land_iteration_flag==ON ) THEN
+! It0 variables used with MODFLOW integration to save iteration states.
+      IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
         IF ( Kkiter>1 ) THEN
           Imperv_stor = It0_imperv_stor
           Soil_moist = It0_soil_moist
           Soil_rechr = It0_soil_rechr
-          IF ( Dprst_flag==ON ) THEN
+          IF ( Dprst_flag==ACTIVE ) THEN
             Dprst_vol_open = It0_dprst_vol_open
             Dprst_vol_clos = It0_dprst_vol_clos
           ENDIF
         ELSE
-! It0 variables used with MODFLOW integration to save iteration states.
           It0_imperv_stor = Imperv_stor
           It0_soil_moist = Soil_moist
           It0_soil_rechr = Soil_rechr
-          IF ( Dprst_flag==ON ) THEN
+          IF ( Dprst_flag==ACTIVE ) THEN
             It0_dprst_vol_open = Dprst_vol_open
             It0_dprst_vol_clos = Dprst_vol_clos
           ENDIF
+        ENDIF
+      ENDIF
+      IF ( Kkiter==1 ) THEN
+        IF ( Print_debug==DEBUG_WB ) THEN
+          Imperv_stor_ante = Hru_impervstor
+          IF ( Dprst_flag==ACTIVE ) Dprst_stor_ante = Dprst_stor_hru
         ENDIF
       ENDIF
 
@@ -758,7 +758,18 @@
           ENDIF
           IF ( Cfgi(i)<0.0 ) Cfgi(i) = 0.0
           Cfgi_prev(i) = Cfgi(i)
-          IF ( Cfgi(i)>=Cfgi_thrshld ) frzen = ACTIVE
+          IF ( Cfgi(i)>=Cfgi_thrshld ) THEN
+            frzen = 1
+            ! depression storage states are not changed if frozen
+            IF ( Cascade_flag>CASCADE_OFF ) THEN
+              cfgi_sroff = (Snowmelt(i) + availh2o + Upslope_hortonian(i) + glcrmltb)*Hruarea
+            ELSE
+              cfgi_sroff = (Snowmelt(i) + availh2o + glcrmltb)*Hruarea
+            ENDIF
+            IF ( Use_sroff_transfer==ACTIVE ) cfgi_sroff = cfgi_sroff + Net_apply(i)*Hruarea
+            runoff = runoff + cfgi_sroff
+            Basin_cfgi_sroff = Basin_cfgi_sroff + cfgi_sroff
+          ENDIF
           Frozen(i) = frzen
         ENDIF
 
@@ -787,18 +798,6 @@
             CALL compute_infil(temp2, Net_ppt(i), Imperv_stor(i), Imperv_stor_max(i), temp, &
      &                         Snowinfil_max(i), Net_snow(i), Pkwater_equiv(i), Infil(i), Hru_type(i), Intcp_changeover(i))
           ENDIF
-        ELSE ! soil is frozen
-          ! depression storage and impervious states are not changed if frozen, all water runs off
-          IF ( Cascade_flag>CASCADE_OFF ) THEN
-            cfgi_sroff = DBLE( (Snowmelt(i) + availh2o + Upslope_hortonian(i) + glcrmltb)*Hruarea )
-          ELSE
-            cfgi_sroff = DBLE( (Snowmelt(i) + availh2o + glcrmltb)*Hruarea )
-          ENDIF
-          IF ( Use_sroff_transfer==ACTIVE ) THEN
-            IF ( Net_apply(i)>0.0 ) cfgi_sroff = cfgi_sroff + DBLE( Net_apply(i)*Hruarea )
-          ENDIF
-          runoff = runoff + cfgi_sroff
-          Basin_cfgi_sroff = Basin_cfgi_sroff + cfgi_sroff
         ENDIF
 
         IF ( Dprst_flag==ACTIVE ) THEN
@@ -818,7 +817,7 @@
           ENDIF
         ENDIF
 
-!        **********************************************************
+!       **********************************************************
 
         srunoff = 0.0
         IF ( Hru_type(i)==LAND .OR. active_glacier==OFF ) THEN ! could be an glacier-capable HRU with no ice
@@ -941,10 +940,10 @@
 !***********************************************************************
       SUBROUTINE compute_infil(Net_rain, Net_ppt, Imperv_stor, Imperv_stor_max, Snowmelt, &
      &                         Snowinfil_max, Net_snow, Pkwater_equiv, Infil, Hru_type, Intcp_changeover)
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, DNEARZERO, LAND, ACTIVE, OFF, CASCADE_OFF
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, DNEARZERO, LAND, ACTIVE, CASCADE_OFF
+      USE PRMS_MODULE, ONLY: Cascade_flag
       USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp, Isglacier
       USE PRMS_SNOW, ONLY: Pptmix_nopack
-      USE PRMS_MODULE, ONLY: Cascade_flag
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Hru_type
@@ -1046,9 +1045,10 @@
 
 !***********************************************************************
       SUBROUTINE perv_comp(Pptp, Ptc, Infil, Srp)
-      USE PRMS_SRUNOFF, ONLY: Ihru, Smidx_coef, Smidx_exp, &
-     &    Carea_max, Carea_min, Carea_dif, Contrib_fraction, smidx_module !, CLOSEZERO
+      USE PRMS_CONSTANTS, ONLY: smidx_module !, CLOSEZERO
       USE PRMS_MODULE, ONLY: Sroff_flag
+      USE PRMS_SRUNOFF, ONLY: Ihru, Smidx_coef, Smidx_exp, &
+     &    Carea_max, Carea_min, Carea_dif, Contrib_fraction
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Soil_rechr_max
       IMPLICIT NONE
 ! Arguments
@@ -1300,13 +1300,13 @@
      &           Dprst_vol_open_max, Dprst_vol_open, Dprst_area_open_max, Dprst_area_open, &
      &           Dprst_sroff_hru, Dprst_seep_hru, Sro_to_dprst_perv, Sro_to_dprst_imperv, Dprst_evap_hru, &
      &           Avail_et, Net_rain, Dprst_in)
+      USE PRMS_CONSTANTS, ONLY: ERROR_water_use, NEARZERO, DNEARZERO, OFF, ACTIVE ! , DEBUG_less
+      USE PRMS_MODULE, ONLY: Cascade_flag, Dprst_add_water_use, Dprst_transfer_water_use !, Print_debug
       USE PRMS_SRUNOFF, ONLY: Srp, Sri, Ihru, Perv_frac, Imperv_frac, Hruarea, Dprst_et_coef, &
      &    Dprst_seep_rate_open, Dprst_seep_rate_clos, Va_clos_exp, Va_open_exp, Dprst_flow_coef, &
      &    Dprst_vol_thres_open, Dprst_vol_clos_max, Dprst_insroff_hru, Upslope_hortonian, &
      &    Basin_dprst_volop, Basin_dprst_volcl, Basin_dprst_evap, Basin_dprst_seep, Basin_dprst_sroff, &
-     &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, Dprst_stor_hru, Hruarea_dble, &
-     &    Cascade_flag, Dprst_add_water_use, Dprst_transfer_water_use
-      USE PRMS_CONSTANTS, ONLY: ERROR_water_use, ACTIVE, OFF, NEARZERO, DNEARZERO !, Print_debug, DEBUG_less
+     &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, Dprst_stor_hru, Hruarea_dble
       USE PRMS_BASIN, ONLY: Dprst_frac_open, Dprst_frac_clos
       USE PRMS_WATER_USE, ONLY: Dprst_transfer, Dprst_gain
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Nowyear, Nowmonth, Nowday

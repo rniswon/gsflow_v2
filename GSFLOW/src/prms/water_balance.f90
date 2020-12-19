@@ -255,7 +255,8 @@
 
         robal = Snowmelt(i) - Hortonian_flow(i) & !includes dprst runoff, if any
      &          - Infil(i)*perv_frac - Hru_impervevap(i) + Imperv_stor_ante(i) - Hru_impervstor(i) + Intcp_changeover(i)
-        IF ( Use_sroff_transfer==ACTIVE ) robal = robal + Net_apply(i)*perv_frac
+        ! need to account for AG in water balance
+        IF ( Use_sroff_transfer==ACTIVE ) robal = robal + Net_apply(i)*perv_frac !??? is net_apply for whole HRU (also for ag, impervious, dprst)
         IF ( Net_ppt(i)>0.0 ) THEN
           IF ( Pptmix_nopack(i)==ACTIVE ) THEN
             robal = robal + Net_rain(i)
