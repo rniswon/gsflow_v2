@@ -48,7 +48,7 @@
             IF ( IRWL > 0 ) NMCL = NUMCELLS(IRWL)
             DO K = 1, NMCL
               ihru = IRRROW_GW(K,IRWL)
-              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + WELLIRRPRMS(k,IRWL)*mf_q2prms_inchacres
+              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + WELLIRRPRMS(k,IRWL)*SNGL(mf_q2prms_inchacres)
             END DO
           END DO
 !
@@ -60,7 +60,7 @@
             IF ( SGNM>0 ) NMCL = DVRCH(SGNM)
             DO K=1,NMCL        
               ihru = IRRROW_SW(K,SGNM)
-              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + DIVERSIONIRRPRMS(k,SGNM)*mf_q2prms_inchacres
+              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + DIVERSIONIRRPRMS(k,SGNM)*SNGL(mf_q2prms_inchacres)
             END DO
           END DO
         END IF

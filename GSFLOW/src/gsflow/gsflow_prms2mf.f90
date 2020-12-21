@@ -433,8 +433,8 @@
           j = Hru_route_order(ii)
           IF ( Hru_type(j)==2 ) THEN
             ilake = Lake_hru_id(j)
-            RNF(ilake) = RNF(ilake) + (Lakein_sz(j)+Hortonian_lakes(j)) &
-     &                   *Hru_area(j)*Acre_inches_to_mfl3*Mft_to_days   !RGN 7/15/2015 added *Mft_to_days
+            RNF(ilake) = RNF(ilake) + SNGL( (Lakein_sz(j)+Hortonian_lakes(j)) &
+     &                   *DBLE(Hru_area(j))*Acre_inches_to_mfl3*Mft_to_days )   !RGN 7/15/2015 added *Mft_to_days
             PRCPLK(ilake) = PRCPLK(ilake) + Hru_ppt(j)*Inch_to_mfl_t*Hru_area(j)
             EVAPLK(ilake) = EVAPLK(ilake) + Hru_actet(j)*Inch_to_mfl_t*Hru_area(j)
           ENDIF
@@ -488,7 +488,7 @@
 !-----------------------------------------------------------------------
         IF ( Unused_potet(ihru)>NEARZERO ) THEN
           PETRATE(icol, irow) = PETRATE(icol, irow) + Unused_potet(ihru)*Gvr2cell_conv(j)
-          Unused_potet(ihru) = Unused_potet(ihru) - Unused_potet(ihru)*Gvr_hru_pct_adjusted(j)
+          Unused_potet(ihru) = Unused_potet(ihru) - Unused_potet(ihru)*SNGL(Gvr_hru_pct_adjusted(j))
           IF ( Unused_potet(ihru)<0.0 ) Unused_potet(ihru) = 0.0
         ENDIF
       ENDDO

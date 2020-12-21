@@ -343,8 +343,8 @@
             lake = Lake_hru_id(i)
             !EVAP in mfl3/dt   SURFA in MFL2/dt
             IF ( SURFA(lake)>NEARZERO ) THEN
-              inches_on_lake = EVAP(lake)*DELT/SURFA(lake)*Mfl_to_inch                            !RGN 5/23/15 added *DELT for time units other than days.         
-              Hru_actet(i) = inches_on_lake*SURFA(lake)*Mfl2_to_acre/Lake_area(lake)
+              inches_on_lake = SNGL(EVAP(lake))*DELT/SNGL(SURFA(lake)*Mfl_to_inch)                         !RGN 5/23/15 added *DELT for time units other than days.         
+              Hru_actet(i) = inches_on_lake*SNGL(SURFA(lake)*Mfl2_to_acre/Lake_area(lake))
             ELSE
               Hru_actet(i) = 0.0
             ENDIF
@@ -689,13 +689,15 @@
       USE GLOBAL, ONLY : IUNIT
       USE GWFAGMODULE, ONLY:  NUMIRRDIVERSIONSP,IRRSEG
       IMPLICIT NONE
-      INTRINSIC DBLE
+      INTRINSIC :: SNGL
 ! Local Variables
       INTEGER :: i, itemp, j
+      REAL :: Mfl3t_to_cfs_sngl
 !***********************************************************************
+      Mfl3t_to_cfs_sngl = SNGL(Mfl3t_to_cfs)
       DO i = 1, NSTRM
 ! Reach_cfs and reach_wse are not used except to be available for output
-        Reach_cfs(i) = DBLE( STRM(9, i) )*Mfl3t_to_cfs
+        Reach_cfs(i) = STRM(9, i)*Mfl3t_to_cfs_sngl
         Reach_wse(i) = STRM(15, i)
       ENDDO
 
@@ -712,7 +714,7 @@
           END DO
         END IF
         IF ( IOTSG(i)==0 .and. itemp == 0 ) Basin_cfs = Basin_cfs + SGOTFLW(i)
-        Streamflow_sfr(i) = DBLE( SGOTFLW(i) )*Mfl3t_to_cfs
+        Streamflow_sfr(i) = SGOTFLW(i)*Mfl3t_to_cfs_sngl
       ENDDO 
       IF ( TOTSPFLOW<0.0 ) THEN
         Basin_cfs = Basin_cfs + TOTSPFLOW
