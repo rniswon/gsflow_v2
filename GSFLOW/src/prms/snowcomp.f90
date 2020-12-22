@@ -232,8 +232,8 @@
 
         ALLOCATE ( Glacr_pk_den(Nhru) )
         IF ( declvar(MODNAME, 'glacr_pk_den', 'nhru', Nhru, 'real', &
-     &       ' Density of the icepack on each glacier or glacierette HRU,'// &
-     &       'hard coded to equal 0.917', &
+     &       'Density of the icepack on each glacier or glacierette HRU,'// &
+     &       ' hard coded to equal 0.917', &
      &       'gm/cm3', Glacr_pk_den)/=0 ) CALL read_error(3, 'glacr_pk_den')
 
         ALLOCATE ( Glacr_albedo(Nhru) )
