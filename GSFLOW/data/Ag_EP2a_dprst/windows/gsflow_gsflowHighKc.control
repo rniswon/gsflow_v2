@@ -219,7 +219,7 @@ print_debug
 parameter_check_flag
 1
 1
-1
+0
 ####
 prms_warmup
 1

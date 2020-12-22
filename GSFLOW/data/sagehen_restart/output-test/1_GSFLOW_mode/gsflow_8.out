@@ -13,27 +13,27 @@
         PRECIPITATION =                            PRECIPITATION =                  
            STREAMFLOW =                               STREAMFLOW =                  
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
-                WELLS =            156.47                  WELLS =             21.91
+                WELLS =            171.75                  WELLS =             23.52
 
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =         177090.50     EVAPOTRANSPIRATION =          34914.98
-           STREAMFLOW =          28867.20             STREAMFLOW =           3971.46
-     GW BOUNDARY FLOW =           5020.66       GW BOUNDARY FLOW =            717.21
-                WELLS =           8838.22                  WELLS =           1252.48
+   EVAPOTRANSPIRATION =         177294.59     EVAPOTRANSPIRATION =          35283.70
+           STREAMFLOW =          28929.03             STREAMFLOW =           4020.53
+     GW BOUNDARY FLOW =           5021.00       GW BOUNDARY FLOW =            717.27
+                WELLS =           7721.25                  WELLS =            881.84
 
-   INFLOWS - OUTFLOWS =        -219660.12     INFLOWS - OUTFLOWS =         -40834.21
+   INFLOWS - OUTFLOWS =        -218794.13     INFLOWS - OUTFLOWS =         -40879.81
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        -219641.70         STORAGE CHANGE =         -40831.45
+ TOTAL STORAGE CHANGE =        -218775.69         STORAGE CHANGE =         -40877.07
        --------------                             --------------
          LAND SURFACE =         -10287.80           LAND SURFACE =          -4160.76
-            SOIL ZONE =        -100191.24              SOIL ZONE =         -21060.66
-     UNSATURATED ZONE =         -41548.69       UNSATURATED ZONE =          -6029.11
-       SATURATED ZONE =         -67613.97         SATURATED ZONE =          -9580.92
+            SOIL ZONE =        -100293.84              SOIL ZONE =         -21411.22
+     UNSATURATED ZONE =         -41683.45       UNSATURATED ZONE =          -6049.98
+       SATURATED ZONE =         -66510.60         SATURATED ZONE =          -9255.11
 
- OVERALL BUDGET ERROR =            -18.42           BUDGET ERROR =             -2.76
+ OVERALL BUDGET ERROR =            -18.44           BUDGET ERROR =             -2.75
 
 
   PERCENT DISCREPANCY =             -0.01    PERCENT DISCREPANCY =             -0.01
