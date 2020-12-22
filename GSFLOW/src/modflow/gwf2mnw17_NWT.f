@@ -53,7 +53,7 @@ c     ------------------------------------------------------------------
       USE SIPMODULE,ONLY:HCLOSE
       USE DE4MODULE,ONLY:HCLOSEDE4
       USE PCGMODULE,ONLY:HCLOSEPCG
-      USE GMGMODULE,ONLY:HCLOSEGMG
+!      USE GMGMODULE,ONLY:HCLOSEGMG
       USE GWFNWTMODULE,ONLY:Tol
       IMPLICIT NONE
 c     ------------------------------------------------------------------
@@ -255,7 +255,7 @@ C-------SET SMALL DEPENDING ON CLOSURE CRITERIA OF THE SOLVER
 !     IF ( Iusor.NE.0 ) SMALL = HCLOSESOR
       IF ( Iupcg.NE.0 ) SMALL = HCLOSEPCG
       IF ( Iulmg.NE.0 ) SMALL = 0.0D0  !LMG SETS HCLOSE TO ZERO
-      IF ( Iugmg.NE.0 ) SMALL = HCLOSEGMG
+!      IF ( Iugmg.NE.0 ) SMALL = HCLOSEGMG
       IF ( Iunwt.NE.0 ) SMALL = TOL
 c
 c-----SAVE POINTERS FOR GRID AND RETURN
