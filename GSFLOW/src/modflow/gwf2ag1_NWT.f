@@ -1730,9 +1730,9 @@
       !3 - -----SET MAX PUMPING RATE OR IRR DEMAND FOR GW.
       DO L = 1, NWELLS
          IF (NUMTAB .LE. 0) THEN
-            IR = WELL(2, L)
-            IC = WELL(3, L)
-            IL = WELL(1, L)
+            IR = INT( WELL(2, L) )
+            IC = INT( WELL(3, L) )
+            IL = INT( WELL(1, L) )
             Q = WELL(4, L)
          ELSE
             IR = TABROW(L)
@@ -1752,7 +1752,7 @@
                DO I = 1, NUMSEGS(L)
                   J = DIVERSIONSEG(I, L)
                   QSW = SEG(2, J)
-                  If ( kkiter > 1 ) QSW = DVRSFLW(J)
+                  IF ( kkiter > 1 ) QSW = DVRSFLW(J)
                   IF (ETDEMANDFLAG > 0) THEN
                      FMIN = SUPACT(J)
                   ELSE IF (TRIGGERFLAG > 0) then
@@ -1789,7 +1789,7 @@
                END IF
                IF (QQ < Q) QQ = Q
                Q = QQ
-               QONLY(L) = DONENEG*Q
+               QONLY(L) = SNGL( DONENEG*Q )
             END IF
             !
             !8 - -----IF THE CELL IS VARIABLE HEAD THEN SUBTRACT Q FROM
@@ -1828,12 +1828,12 @@
             DO I = 1, NUMSEGS(L)  ! need to test when multiple segs supported by single well
                J = DIVERSIONSEG(I, L)
                SUP = SUP - Qp
-               ACTUAL(J) = ACTUAL(J) + SUP
+               ACTUAL(J) = ACTUAL(J) + SNGL( SUP )
             END DO
             !
             !9b - -----SET ACTUAL PUMPING FOR NON SUP IRRIGATION WELLS.
             !
-            Qonly(L) = DONENEG*Q
+            Qonly(L) = SNGL( DONENEG*Q )
             !
             !10------APPLY IRRIGATION FROM WELLS
             !
@@ -1843,13 +1843,14 @@
                   SUBRATE = SUBVOL/(DELR(IRRCOL_GW(I, L))*
      +                      DELC(IRRROW_GW(I, L)))
                   WELLIRRUZF(IRRCOL_GW(I, L), IRRROW_GW(I, L)) =
-     +            WELLIRRUZF(IRRCOL_GW(I, L), IRRROW_GW(I, L)) + SUBRATE
+     +            WELLIRRUZF(IRRCOL_GW(I, L), IRRROW_GW(I, L)) +
+     +            SNGL( SUBRATE )
                END DO
             ELSE
                DO I = 1, NUMCELLS(L)
                   SUBVOL = -(DONE - IRRFACT(I, L))*Qp*IRRFIELDFACT(I, L)
                   ! Keep irrigation for PRMS as volumetric rate
-                  WELLIRRPRMS(I, L) = WELLIRRPRMS(I, L) + SUBVOL
+                  WELLIRRPRMS(I, L) = WELLIRRPRMS(I, L) + SNGL( SUBVOL )
                END DO
             END IF
          END IF
@@ -1863,18 +1864,18 @@
                icc = IRRCOL_SW(icount, istsg)
                dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
                !dvt = seg(2, istsg)*DVRPERC(ICOUNT, istsg)
-               if (dvt < zero) dvt = 0.0
+               if (dvt < zero) dvt = 0.0D0
                dvt = dvt/(DELR(icc)*DELC(irr))
                DIVERSIONIRRUZF(icc, irr) = DIVERSIONIRRUZF(icc, irr) +
-     +                                dvt*(1.0 - DVEFF(ICOUNT, istsg))
+     +                        SNGL( dvt*(1.0D0 - DVEFF(ICOUNT, istsg)) )
             END DO
          ELSE
             DO icount = 1, DVRCH(istsg)
                dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT, istsg)
-               dvt = (1.0 - DVEFF(ICOUNT, istsg))*dvt
+               dvt = (1.0D0 - DVEFF(ICOUNT, istsg))*dvt
          ! Keep irrigation for PRMS as volume
                DIVERSIONIRRPRMS(icount, istsg) = 
-     +         DIVERSIONIRRPRMS(icount, istsg) + dvt
+     +         DIVERSIONIRRPRMS(icount, istsg) + SNGL( dvt )
             END DO
          END IF
       END DO
@@ -1904,15 +1905,15 @@
       INTEGER, INTENT(IN):: KKSTP, KKPER, Iunitnwt
       ! VARIABLES:
       ! - -----------------------------------------------------------------
-      CHARACTER*22 TEXT2, TEXT7, TEXT8, TEXT1, TEXT3, TEXT4
-!      CHARACTER*22  TEXT5, TEXT6
+      CHARACTER*22 TEXT2, TEXT6, TEXT7, TEXT8, TEXT1, TEXT3, TEXT4, 
+     +             TEXT5
       CHARACTER*16 TEXT9
-!     CHARACTER*19 TEXT10, TEXT11
+      CHARACTER*19 TEXT10, TEXT11
       DOUBLE PRECISION :: RATIN, RATOUT, ZERO, DVT, RIN, ROUT
       DOUBLE PRECISION :: SUP, SUBVOL, RATINAG, RATOUTAG, AREA
       DOUBLE PRECISION :: QSW, QSWIRR, QWELL, QWELLIRR, QWELLET
       DOUBLE PRECISION :: QSWGL, DONE
-      REAL :: Q, TIME, RATETERPQ, QIRR, BUDPERC
+      REAL :: Q, TIME, RATETERPQ, QIRR, BUDPERC, RIN_SNGL, ROUT_SNGL
       INTEGER :: NWELLSTEMP, L, I, J, ISTSG, ICOUNT, IL
       INTEGER :: IC, IR, IBDLBL, IW1
       INTEGER :: IBD1, IBD2, IBD3, IBD4, IBD5
@@ -1925,13 +1926,13 @@
       DATA TEXT2/'  DIVERSION SEGMENTS'/
       DATA TEXT3/'       SW IRRIGATION'/
       DATA TEXT4/'       GW IRRIGATION'/
-!      DATA TEXT5/'       SW RETURN FLOW'/
-!      DATA TEXT6/'       GW RETURN FLOW'/
+      DATA TEXT5/'       SW RETURN FLOW'/
+      DATA TEXT6/'       GW RETURN FLOW'/
       DATA TEXT7/'    SYSTEM LOSSES SW'/
       DATA TEXT8/'    SYSTEM LOSSES GW'/
       DATA TEXT9/'       AG WELLS'/
-!      DATA TEXT10/'CROP CONSUMPTION SW'/
-!      DATA TEXT11/'CROP CONSUMPTION GW'/
+      DATA TEXT10/'CROP CONSUMPTION SW'/
+      DATA TEXT11/'CROP CONSUMPTION GW'/
       ! - -----------------------------------------------------------------
       ZERO = 0.0D0
       DONE = 1.0D0
@@ -2016,9 +2017,9 @@
       !5 - -----CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
       DO L = 1, NWELLSTEMP
          IF (NUMTAB .LE. 0) THEN
-            IR = WELL(2, L)
-            IC = WELL(3, L)
-            IL = WELL(1, L)
+            IR = INT( WELL(2, L) )
+            IC = INT( WELL(3, L) )
+            IL = INT( WELL(1, L) )
             Q = WELL(4, L)
          ELSE
             IR = TABROW(L)
@@ -2043,7 +2044,7 @@
             ELSE
                !
                !6b - -----NOT SUPPLEMENTAL WELL SET DEMAND
-               Q = DONENEG*QONLY(L)
+               Q = SNGL(DONENEG*QONLY(L))
             END IF
             QSAVE = Q
             !
@@ -2053,12 +2054,12 @@
             IF (Iunitnwt .NE. 0) THEN
                IF (LAYTYPUPW(il) .GT. 0) THEN
                   Qp = smoothQ(Hh, Ttop, Bbot, dQp)
-                  Q = Q*Qp
+                  Q = Q*SNGL(Qp)
                ELSE
-                  Q = Qsave
+                  Q = SNGL( Qsave )
                END IF
             ELSE
-               Q = Qsave
+               Q = SNGL( Qsave )
             END IF
             QQ = Q
             !8 - -----SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
@@ -2066,8 +2067,8 @@
             DO I = 1, NUMSEGS(L)
                J = DIVERSIONSEG(I, L)
                SUP = SUP - Q
-               ACTUAL(J) = ACTUAL(J) + SUP
-               SUPSEG(J) = SUPSEG(J) - Q/dble(NUMSEGS(L))
+               ACTUAL(J) = ACTUAL(J) + SNGL( SUP )
+               SUPSEG(J) = SUPSEG(J) - SNGL( Q/NUMSEGS(L) )
             END DO
             !
             !9 - -----CALCULATE IRRIGATION FROM WELLS
@@ -2091,7 +2092,7 @@
          END IF
          !
          !11A - ----ADD FLOW RATE TO BUFFER.
-         BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + QQ
+         BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + SNGL( QQ )
          !
          !11D-----FLOW RATE IS ALWAYS NEGATIVE(DISCHARGE) .ADD IT TO RATOUT.
          RATOUT = RATOUT - QQ
@@ -2102,7 +2103,7 @@
      +                     Q,WELL(:, L), NWELVL, NAUX, 5, IBOUND, NLAY)
          !
          ! - -------COPY FLOW TO WELL LIST.
-         WELL(NWELVL, L) = QQ
+         WELL(NWELVL, L) = SNGL( QQ )
          END IF
       END DO
       !
@@ -2141,9 +2142,9 @@
          WRITE (IBD1, 61) TEXT1, KKPER, KKSTP
          DO L = 1, NWELLSTEMP
             IF (NUMTAB .LE. 0) THEN
-               IR = WELL(2, L)
-               IC = WELL(3, L)
-               IL = WELL(1, L)
+               IR = INT( WELL(2, L) )
+               IC = INT( WELL(3, L) )
+               IL = INT( WELL(1, L) )
             ELSE
                IR = TABROW(L)
                IC = TABCOL(L)
@@ -2222,10 +2223,12 @@
       !15 - -----MOVE RATES, VOLUMES&LABELS INTO ARRAYS FOR PRINTING.
       RIN = RATIN
       ROUT = RATOUT
-      VBVL(3, MSUM) = sngl(RIN)
-      VBVL(4, MSUM) = sngl(ROUT)
-      VBVL(1, MSUM) = VBVL(1, MSUM) + RIN*DELT
-      VBVL(2, MSUM) = VBVL(2, MSUM) + ROUT*DELT
+      RIN_SNGL = SNGL(RIN)
+      ROUT_SNGL = SNGL(ROUT)
+      VBVL(3, MSUM) = RIN_SNGL
+      VBVL(4, MSUM) = ROUT_SNGL
+      VBVL(1, MSUM) = VBVL(1, MSUM) + RIN_SNGL*DELT
+      VBVL(2, MSUM) = VBVL(2, MSUM) + ROUT_SNGL*DELT
       VBNM(MSUM) = TEXT9
       !
       !16 - -----INCREMENT BUDGET TERM COUNTER(MSUM) .
@@ -2233,12 +2236,14 @@
       !
       !18 - -----MOVE RATES, VOLUMES&LABELS INTO ARRAYS FOR PRINTING
       ! GW PUMPING (NEGATIVE OUT OF GW)
-      RIN = -QWELL   
+      RIN = -QWELL
       ROUT = ZERO
-      VBVLAG(3, MSUMAG) = sngl(RIN)
-      VBVLAG(4, MSUMAG) = sngl(ROUT)
-      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
-      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
+      RIN_SNGL = SNGL(RIN)
+      ROUT_SNGL = SNGL(ROUT)
+      VBVLAG(3, MSUMAG) = RIN_SNGL
+      VBVLAG(4, MSUMAG) = ROUT_SNGL
+      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN_SNGL*DELT
+      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT_SNGL*DELT
       VBNMAG(MSUMAG) = TEXT1
       MSUMAG = MSUMAG + 1
       !
@@ -2247,38 +2252,44 @@
       ROUT = ZERO
       VBVLAG(3, MSUMAG) = sngl(RIN)
       VBVLAG(4, MSUMAG) = sngl(ROUT)
-      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
-      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
+      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + SNGL(RIN)*DELT
+      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + SNGL(ROUT)*DELT
       VBNMAG(MSUMAG) = TEXT2
       MSUMAG = MSUMAG + 1
       !
       !18 - ------GW IRRIGATION
       RIN = ZERO
       ROUT = QWELLIRR
-      VBVLAG(3, MSUMAG) = sngl(RIN)
-      VBVLAG(4, MSUMAG) = sngl(ROUT)
-      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
-      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
+      RIN_SNGL = SNGL(RIN)
+      ROUT_SNGL = SNGL(ROUT)
+      VBVLAG(3, MSUMAG) = RIN_SNGL
+      VBVLAG(4, MSUMAG) = ROUT_SNGL
+      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN_SNGL*DELT
+      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT_SNGL*DELT
       VBNMAG(MSUMAG) = TEXT4
       MSUMAG = MSUMAG + 1
       !
       !18 - ------SW IRRIGATION
       RIN = ZERO
       ROUT = QSWIRR
-      VBVLAG(3, MSUMAG) = sngl(RIN)
-      VBVLAG(4, MSUMAG) = sngl(ROUT)
-      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
-      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
+      RIN_SNGL = SNGL(RIN)
+      ROUT_SNGL = SNGL(ROUT)
+      VBVLAG(3, MSUMAG) = RIN_SNGL
+      VBVLAG(4, MSUMAG) = ROUT_SNGL
+      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN_SNGL*DELT
+      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT_SNGL*DELT
       VBNMAG(MSUMAG) = TEXT3
       MSUMAG = MSUMAG + 1
       !
       !18 - ------GW EFFICIENCY ET
       RIN = ZERO
       ROUT = QWELLET
-      VBVLAG(3, MSUMAG) = sngl(RIN)
-      VBVLAG(4, MSUMAG) = sngl(ROUT)
-      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
-      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
+      RIN_SNGL = SNGL(RIN)
+      ROUT_SNGL = SNGL(ROUT)
+      VBVLAG(3, MSUMAG) = RIN_SNGL
+      VBVLAG(4, MSUMAG) = ROUT_SNGL
+      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN_SNGL*DELT
+      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT_SNGL*DELT
       VBNMAG(MSUMAG) = TEXT8
       MSUMAG = MSUMAG + 1
       !
@@ -2290,10 +2301,12 @@
          RIN = -DONE*QSWGL
          ROUT = ZERO
       END IF
-      VBVLAG(3, MSUMAG) = sngl(RIN)
-      VBVLAG(4, MSUMAG) = sngl(ROUT)
-      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
-      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
+      RIN_SNGL = SNGL(RIN)
+      ROUT_SNGL = SNGL(ROUT)
+      VBVLAG(3, MSUMAG) = RIN_SNGL
+      VBVLAG(4, MSUMAG) = ROUT_SNGL
+      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN_SNGL*DELT
+      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT_SNGL*DELT
       VBNMAG(MSUMAG) = TEXT7
       MSUMAG = MSUMAG + 1
       IF (IBUDFL .NE. 0)

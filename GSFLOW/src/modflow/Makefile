@@ -9,7 +9,6 @@ LIBOBJS = \
         mach_mod.o \
         NWT1_module.o \
         gwf2bas7_NWT.o \
-		nogmg.o \
         pcg7_NWT.o \
         sip7_NWT.o \
         de47_NWT.o \
@@ -25,8 +24,8 @@ LIBOBJS = \
         gwf2ets7.o \
         gwf2evt7.o \
         gwf2rch7.o \
-		obs2bas7.o \
-		gwf2ibs7.o \
+        obs2bas7.o \
+        gwf2ibs7.o \
         hufutl7.o \
         gwf2gag7.o \
         gwf2upw1.o \
@@ -35,7 +34,7 @@ LIBOBJS = \
         gwflakmodule_NWT.o \
         gwf2lak7_NWT.o \
         gwf2sfr7_NWT.o \
-	gwf2ag1_NWT.o \
+        gwf2ag1_NWT.o \
         gwf2wel7_NWT.o \
         gwf2uzf1_NWT.o \
         gwf2ghb7_NWT.o \
@@ -57,14 +56,16 @@ LIBOBJS = \
         lmt8_NWT.o \
         parutl7.o \
         gwf2hydmod7.o \
-		obs2chd7.o \
-		obs2ghb7.o \
-		obs2riv7.o \
-		obs2str7.o \
-		obs2drn7.o \
+        obs2chd7.o \
+        obs2ghb7.o \
+        obs2riv7.o \
+        obs2str7.o \
+        obs2drn7.o \
         Irestart.o
 
 all: lib
+	$(RM) openspec.inc
+	$(CP) openspec_linux.inc openspec.inc
 	echo made $(MFNWTLIB)
 
 install: lib
