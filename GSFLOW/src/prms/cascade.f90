@@ -938,7 +938,7 @@
 !***********************************************************************
       SUBROUTINE order_gwrs(Iret)
       USE PRMS_CASCADE, ONLY: Gwr_down, Igworder, MSGUNT, Circle_switch, Ncascade_gwr, &
-      &   Ngw, Print_debug, Gwr_swale_flag
+     &    Ngw, Print_debug, Gwr_swale_flag
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, Gwr_type
       IMPLICIT NONE
 ! Functions

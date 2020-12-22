@@ -170,11 +170,13 @@
       ENDIF
 
       Monthly_flag = OFF
-      IF ( NsegmentOut_freq==MONTHLY .OR. NsegmentOut_freq==DAILY_MONTHLY .OR. NsegmentOut_freq==MEAN_MONTHLY ) Monthly_flag = ACTIVE
+      IF ( NsegmentOut_freq==MONTHLY .OR. NsegmentOut_freq==DAILY_MONTHLY &
+     &     .OR. NsegmentOut_freq==MEAN_MONTHLY ) Monthly_flag = ACTIVE
 
       IF ( NsegmentOut_freq>MEAN_MONTHLY ) THEN
         Yeardays = 0
-        ALLOCATE ( Nsegment_var_yearly(Nsegment, NsegmentOutVars), Yearlyunit(NsegmentOutVars) )
+        ALLOCATE ( Nsegment_var_yearly(Nsegment, NsegmentOutVars), &
+     &             Yearlyunit(NsegmentOutVars) )
         Nsegment_var_yearly = 0.0D0
         Yearlyunit = 0
         IF ( NsegmentOut_format==1 ) THEN
