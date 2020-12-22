@@ -20,14 +20,14 @@ C  FORM specifier --
 C
 C    Standard Fortran, which results in vender dependent (non-portable)
 C    files.  Use unless there is a reason to do otherwise.
-       DATA FORM/'UNFORMATTED'/
+C      DATA FORM/'UNFORMATTED'/
 C
 C    Non-standard Fortran that causes code compiled by Compaq (Digital)
 C    Fortran on personal computers to use unstructured non-formatted
 C    files.  This may make it possible for the non-formatted files used
 C    by MODFLOW to be used with programs that are compiled by other
 C    compilers.
-C     DATA FORM/'BINARY'/
+      DATA FORM/'BINARY'/
 C
 C
 C  OPEN-statement specifiers related to file-sharing.
