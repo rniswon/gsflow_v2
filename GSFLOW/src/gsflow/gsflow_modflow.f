@@ -451,6 +451,7 @@ C  Observation allocate and read    rgn 5/4/2018 MOVED IN ORDER TO SKIP STEPS FO
       !  IF(IUNIT(21).GT.0) CALL GWF2HFB7UPW(IGRID)
       !END IF
 C
+      KSTP = 0
       KPER = 1
       KPERSTART = 1
       ! run SS if needed, read to current stress period, read restart if needed

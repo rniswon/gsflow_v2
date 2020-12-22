@@ -29,7 +29,7 @@
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus, NLAKES_MF, Nreach
       INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval, Nmap2hru, Nmap
 ! Global
-      INTEGER, SAVE :: Model, Process_flag, Call_cascade !, Logunt
+      INTEGER, SAVE :: Model, Process_flag, Call_cascade
       INTEGER, SAVE :: Start_year, Start_month, Start_day, End_year, End_month, End_day
       INTEGER, SAVE :: Transp_flag, Sroff_flag, Solrad_flag, Et_flag
       INTEGER, SAVE :: Climate_temp_flag, Climate_precip_flag, Climate_potet_flag, Climate_transp_flag
@@ -117,7 +117,6 @@
         Process_flag = RUN !(0=run, 1=declare, 2=init, 3=clean, 4=setdims)
 
       ELSEIF ( Process(:4)=='decl' ) THEN
-!        logunt = 721
         CALL DATE_AND_TIME(VALUES=Elapsed_time_start)
         Execution_time_start = Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
      &                         Elapsed_time_start(7) + Elapsed_time_start(8)*0.001
