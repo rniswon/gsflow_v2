@@ -7,17 +7,18 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, DOCUMENTATION, NEARZERO, DNEARZERO, &
      &    DEBUG_WB, DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
       USE PRMS_MODULE, ONLY: Nhru, Model, Init_vars_from_file, &
-     &    Print_debug, Water_use_flag, Kkiter, PRMS_land_iteration_flag
+     &    Print_debug, Water_use_flag, PRMS_land_iteration_flag, Kkiter
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2020-12-03'
+      character(len=*), parameter :: Version_intcp = '2020-12-22'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
       INTEGER, SAVE :: Use_transfer_intcp
       REAL, SAVE, ALLOCATABLE :: Gain_inches(:)
+      INTEGER, PARAMETER :: RAIN = 0, SNOW = 1
 !   Declared Variables
       INTEGER, SAVE, ALLOCATABLE :: Intcp_on(:), Intcp_form(:)
       DOUBLE PRECISION, SAVE :: Basin_net_ppt, Basin_intcp_stor, Basin_changeover
@@ -237,7 +238,7 @@
       ENDIF
 
       Intcp_changeover = 0.0
-      Intcp_form = 0
+      Intcp_form = RAIN
       Intcp_evap = 0.0
       Net_rain = 0.0
       Net_snow = 0.0
@@ -247,7 +248,7 @@
       IF ( Init_vars_from_file==0 ) THEN
         Intcp_transp_on = Transp_on
         Intcp_stor = 0.0
-        Intcp_on = 0
+        Intcp_on = OFF
         Hru_intcpstor = 0.0
         Basin_intcp_stor = 0.0D0
       ENDIF
@@ -336,8 +337,8 @@
           Canopy_covden(i) = Covden_win(i)
         ENDIF
         cov = Canopy_covden(i)
-        Intcp_form(i) = 0
-        IF ( Hru_snow(i)>0.0 ) Intcp_form(i) = 1
+        Intcp_form(i) = RAIN
+        IF ( Hru_snow(i)>0.0 ) Intcp_form(i) = SNOW
 
         intcpstor = Intcp_stor(i)
         intcpevap = 0.0
@@ -466,8 +467,8 @@
                 IF ( netsnow<NEARZERO ) THEN   !rsr, added 3/9/2006
                   netrain = netrain + netsnow
                   netsnow = 0.0
-                  Newsnow(i) = 0
-                  Pptmix(i) = 0   ! reset to be sure it is zero
+                  Newsnow(i) = OFF
+                  Pptmix(i) = OFF   ! reset to be sure it is zero
                 ENDIF
               ENDIF
             ENDIF
@@ -490,7 +491,7 @@
 
 !******Compute snow interception loss
 
-            IF ( Intcp_form(i)==1 ) THEN
+            IF ( Intcp_form(i)==SNOW ) THEN
               z = intcpstor - evsn
               IF ( z>0.0 ) THEN
                 intcpstor = z
@@ -499,7 +500,7 @@
                 intcpevap = intcpstor
                 intcpstor = 0.0
               ENDIF
-!           ELSEIF ( Intcp_form(i)==0 ) THEN
+!           ELSEIF ( Intcp_form(i)==RAIN ) THEN
             ELSE
               d = intcpstor - evrn
               IF ( d>0.0 ) THEN

@@ -17,7 +17,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2020-12-08'
+      character(len=*), parameter :: Version_climateflow = '2020-12-22'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -77,11 +77,11 @@
       DOUBLE PRECISION, SAVE :: Basin_ssflow, Basin_soil_to_gw
       DOUBLE PRECISION, SAVE :: Basin_actet, Basin_lakeevap
       DOUBLE PRECISION, SAVE :: Basin_swale_et, Basin_perv_et, Basin_sroff
-      DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor, Basin_recharge, Basin_ag_soil_moist
+      DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor, Basin_ag_soil_moist
       REAL, SAVE, ALLOCATABLE :: Hru_actet(:), Soil_moist(:), Ag_soil_moist(:), Ag_soil_rechr(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_ssr(:), Ssres_in(:)
-      REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:), Recharge(:)
+      REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:)
       REAL, SAVE, ALLOCATABLE :: Ssres_stor(:), Ssres_flow(:), Soil_rechr(:)
       ! srunoff
       REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:)
@@ -431,15 +431,6 @@
       IF ( declvar(Soilzone_module, 'basin_soil_to_gw', 'one', 1, 'double', &
      &     'Basin average excess flow to capillary reservoirs that drains to GWRs', &
      &     'inches', Basin_soil_to_gw)/=0 ) CALL read_error(3, 'basin_soil_to_gw')
-
-      IF ( declvar(Soilzone_module, 'basin_recharge', 'one', 1, 'double', &
-     &     'Basin area-weighted average recharge to GWRs', &
-     &     'inches', Basin_recharge)/=0 ) CALL read_error(3, 'basin_recharge')
-
-      ALLOCATE ( Recharge(Nhru) )
-      IF ( declvar(Soilzone_module, 'recharge', 'nhru', Nhru, 'real', &
-     &     'Recharge to the associated GWR as the sum of soil_to_gw, ssr_to_gw, and dprst_seep_hru for each HRU', &
-     &     'inches', Recharge)/=0 ) CALL read_error(3, 'recharge')
 
 ! gwflow
       IF ( GSFLOW_flag==OFF .OR. Model==DOCUMENTATION ) THEN
@@ -1208,7 +1199,6 @@
       Slow_flow = 0.0
       Soil_to_gw = 0.0
       Soil_to_ssr = 0.0
-      Recharge = 0.0
       Hru_actet = 0.0
       Infil = 0.0
       Sroff = 0.0
@@ -1256,7 +1246,6 @@
       Basin_swale_et = 0.0D0
       Basin_soil_to_gw = 0.0D0
       Basin_ssflow = 0.0D0
-      Basin_recharge = 0.0D0
       Basin_sroff = 0.0D0
       Solrad_tmax = 0.0
       Solrad_tmin = 0.0
@@ -1285,6 +1274,7 @@
 ! initialize storage variables
       Imperv_stor = 0.0
       Pkwater_equiv = 0.0D0
+      Slow_stor = 0.0
       IF ( GSFLOW_flag==OFF ) Gwres_stor = 0.0D0 ! not needed for GSFLOW
       IF ( Dprst_flag==ACTIVE ) THEN
         Dprst_vol_open = 0.0D0
@@ -1479,7 +1469,7 @@
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        WRITE ( Restart_outunit ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
+        READ ( Restart_inunit ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
         READ ( Restart_inunit ) Transp_on
         READ ( Restart_inunit ) Pkwater_equiv
         IF ( Glacier_flag==ACTIVE ) THEN

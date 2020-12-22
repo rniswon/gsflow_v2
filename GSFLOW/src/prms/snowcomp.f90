@@ -9,11 +9,11 @@
 ! PRMS_SNOW module for defining stateful variables
 
       MODULE PRMS_SNOW
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, LAKE, LAND, GLACIER, SHRUBS, FEET, &
+      USE PRMS_CONSTANTS, ONLY: LAKE, LAND, GLACIER, SHRUBS, FEET, &
      &    INCH2M, FEET2METERS, DNEARZERO, DOCUMENTATION, ACTIVE, OFF, &
      &    MONTHS_PER_YEAR, DEBUG_less, DAYS_YR, CLOSEZERO, INCH2CM
-      USE PRMS_MODULE, ONLY: Model, Process_flag, Nhru, Ndepl, Print_debug, &
-     &    Save_vars_to_file, Init_vars_from_file, Snarea_curve_flag, Glacier_flag, Start_year, &
+      USE PRMS_MODULE, ONLY: Model, Nhru, Ndepl, Print_debug, &
+     &    Init_vars_from_file, Snarea_curve_flag, Glacier_flag, Start_year, &
      &    PRMS_land_iteration_flag, Kkiter
       IMPLICIT NONE
       !****************************************************************
@@ -27,7 +27,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2020-12-10'
+      character(len=*), parameter :: Version_snowcomp = '2020-12-17'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -56,14 +56,14 @@
       REAL, SAVE, ALLOCATABLE :: Glacr_pk_ice(:), Glacr_freeh2o(:), Glacrcov_area(:)
       REAL, SAVE, ALLOCATABLE :: Glacrb_melt(:), Glacr_pk_def(:), Glacr_pk_temp(:), Ann_tempc(:)
       REAL, SAVE, ALLOCATABLE :: Glacr_air_5avtemp1(:), Glacr_air_deltemp(:), Glacr_air_5avtemp(:)
-      REAL, SAVE, ALLOCATABLE :: Glacr_5avsnow1(:), Glacr_5avsnow(:),Glacr_delsnow(:), Glacr_freeh2o_capm(:)
+      REAL, SAVE, ALLOCATABLE :: Glacr_5avsnow1(:), Glacr_5avsnow(:), Glacr_delsnow(:), Glacr_freeh2o_capm(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Glacr_pkwater_ante(:), Glacr_pkwater_equiv(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Glacr_pk_depth(:), Glacr_pss(:), Glacr_pst(:)
       INTEGER, SAVE, ALLOCATABLE :: It0_iasw(:), It0_iso(:), It0_mso(:), It0_lso(:), It0_int_alb(:), It0_lst(:)
-      REAL, SAVE, ALLOCATABLE :: It0_snowcov_area(:), It0_snowcov_areasv(:), It0_albedo(:), It0_pk_depth(:)
+      REAL, SAVE, ALLOCATABLE :: It0_snowcov_area(:), It0_snowcov_areasv(:), It0_albedo(:)
       REAL, SAVE, ALLOCATABLE :: It0_pk_temp(:), It0_pk_def(:), It0_pk_ice(:), It0_pk_den(:), It0_freeh2o(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:), It0_scrv(:), It0_pksv(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pst(:), It0_pss(:), It0_ai(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pst(:), It0_pss(:), It0_pk_depth(:)
       REAL, SAVE, ALLOCATABLE :: It0_snsv(:), It0_salb(:), It0_slst(:)
       !****************************************************************
       !   Declared Parameters
@@ -85,7 +85,8 @@
 !     Main snowcomp routine
 !***********************************************************************
       INTEGER FUNCTION snowcomp()
-      USE PRMS_SNOW
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE
+      USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: snodecl, snoinit, snorun
@@ -129,7 +130,7 @@
       IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
         ALLOCATE ( It0_snowcov_area(Nhru), It0_snowcov_areasv(Nhru), It0_pkwater_equiv(Nhru) )
         ALLOCATE ( It0_albedo(Nhru), It0_pk_depth(Nhru), It0_iasw(Nhru), It0_pst(Nhru) )
-        ALLOCATE ( It0_pksv(Nhru), It0_scrv(Nhru), It0_pk_temp(Nhru), It0_pss(Nhru), It0_ai(Nhru) )
+        ALLOCATE ( It0_pksv(Nhru), It0_scrv(Nhru), It0_pk_temp(Nhru), It0_pss(Nhru) )
         ALLOCATE ( It0_pk_def(Nhru), It0_pk_ice(Nhru), It0_pk_den(Nhru), It0_freeh2o(Nhru) )
         ALLOCATE ( It0_iso(Nhru),  It0_mso(Nhru), It0_lso(Nhru), It0_int_alb(Nhru), It0_lst(Nhru) )
         ALLOCATE ( It0_snsv(Nhru), It0_salb(Nhru), It0_slst(Nhru) )
@@ -225,17 +226,20 @@
 
         ALLOCATE ( Glacr_pk_def(Nhru) )
         IF ( declvar(MODNAME, 'glacr_pk_def', 'nhru', Nhru, 'real', &
-     &       'Heat deficit, amount of heat necessary to make the glacier or or glacierette snowpack isothermal at 0 degrees Celsius', &
+     &       'Heat deficit, amount of heat necessary to make the glacier'// &
+     &       ' or or glacierette snowpack isothermal at 0 degrees Celsius', &
      &       'Langleys', Glacr_pk_def)/=0 ) CALL read_error(3, 'glacr_pk_def')
 
         ALLOCATE ( Glacr_pk_den(Nhru) )
         IF ( declvar(MODNAME, 'glacr_pk_den', 'nhru', Nhru, 'real', &
-     &       'Density of the icepack on each glacier or glacierette HRU, hard coded to equal 0.917', &
+     &       'Density of the icepack on each glacier or glacierette HRU,'// &
+     &       ' hard coded to equal 0.917', &
      &       'gm/cm3', Glacr_pk_den)/=0 ) CALL read_error(3, 'glacr_pk_den')
 
         ALLOCATE ( Glacr_albedo(Nhru) )
         IF ( declvar(MODNAME, 'glacr_albedo', 'nhru', Nhru, 'real', &
-     &       'Ice surface albedo or the fraction of radiation reflected from the icepack surface for each glacier or glacierette HRU', &
+     &       'Ice surface albedo or the fraction of radiation reflected from'// &
+     &       ' the icepack surface for each glacier or glacierette HRU', &
      &       'decimal fraction', Glacr_albedo)/=0 ) CALL read_error(3, 'glacr_albedo')
 
         ALLOCATE ( Glacr_evap(Nhru) )
@@ -945,7 +949,6 @@
           Pk_ice = It0_pk_ice
           Pk_den = It0_pk_den
           Pss = It0_pss
-          Ai = It0_ai
           Freeh2o = It0_freeh2o
           Iso = It0_iso
           Mso = It0_mso
@@ -970,7 +973,6 @@
           It0_pk_ice = Pk_ice
           It0_pk_den = Pk_den
           It0_pss = Pss
-          It0_ai = Ai
           It0_freeh2o = Freeh2o
           It0_iso = Iso
           It0_mso = Mso
@@ -1575,7 +1577,7 @@
      &           Freeh2o, Snowcov_area, Snowmelt, Pk_depth, Pss, Pst, &
      &           Net_snow, Pk_den, Pptmix_nopack, Pk_precip, Tmax_allsnow_c, &
      &           Freeh2o_cap, Den_max, Ihru_gl)
-      USE PRMS_SNOW, ONLY: CLOSEZERO, INCH2CM, ACTIVE !, DNEARZERO
+      USE PRMS_CONSTANTS, ONLY: CLOSEZERO, INCH2CM, ACTIVE !, DNEARZERO
       IMPLICIT NONE
 ! Functions
       REAL, EXTERNAL :: f_to_c
@@ -1824,7 +1826,7 @@
 !        heat energy has occurred.
 !***********************************************************************
       SUBROUTINE caloss(Cal, Pkwater_equiv, Pk_def, Pk_temp, Pk_ice, Freeh2o, Ihru_gl)
-      USE PRMS_SNOW, ONLY: CLOSEZERO !, DNEARZERO
+      USE PRMS_CONSTANTS, ONLY: CLOSEZERO !, DNEARZERO
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL
@@ -1834,7 +1836,7 @@
       DOUBLE PRECISION, INTENT(INOUT) :: Pkwater_equiv
       REAL, INTENT(INOUT) :: Pk_def, Pk_ice, Freeh2o, Pk_temp
 ! Functions
-      EXTERNAL glacr_states_to_zero
+      EXTERNAL :: glacr_states_to_zero
 ! Local Variables
       REAL :: calnd, dif
 !***********************************************************************
@@ -1907,7 +1909,9 @@
       SUBROUTINE calin(Cal, Pkwater_equiv, Pk_def, Pk_temp, &
      &                 Pk_ice, Freeh2o, Snowcov_area, Snowmelt, &
      &                 Pk_depth, Pss, Pst, Iasw, Pk_den, Freeh2o_cap, Den_max, Ihru_gl)
-      USE PRMS_SNOW, ONLY: Active_glacier, Print_debug, DEBUG_less, OFF
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, OFF
+      USE PRMS_MODULE, ONLY: Print_debug
+      USE PRMS_SNOW, ONLY: Active_glacier
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(INOUT) :: Iasw
@@ -1982,17 +1986,19 @@
         !       to melt all the ice in that snow pack...
         ! if on snow over glacier or active_layer and have excess energy from day over
         !        depth can melt from layer thickness, add depth to that layer
-        IF ( pmlt>apk_ice .AND. Active_glacier>OFF ) THEN
-          !fractionate density with snow/active layer melting vs extra ice underneath melting
-          Pk_den = Pk_den*SNGL(apk_ice/pmlt) + 0.917*SNGL((pmlt-apk_ice)/pmlt)
-          apk_ice = pmlt
-          Pk_ice =  apmlt
-          Pkwater_equiv = apmlt
-          Freeh2o = 0.0 ! [inches]
-          Iasw = 0
-          Pk_def = 0.0   ! [cal / cm^2]
-          Pk_temp = 0.0  ! [degreees C]
-          Pst = 0.0D0      ! [inches]
+        IF ( Active_glacier>OFF ) THEN
+          IF ( pmlt>apk_ice ) THEN
+            !fractionate density with snow/active layer melting vs extra ice underneath melting
+            Pk_den = Pk_den*SNGL(apk_ice/pmlt) + 0.917*SNGL((pmlt-apk_ice)/pmlt)
+            apk_ice = pmlt
+            Pk_ice =  apmlt
+            Pkwater_equiv = apmlt
+            Freeh2o = 0.0 ! [inches]
+            Iasw = 0
+            Pk_def = 0.0   ! [cal / cm^2]
+            Pk_temp = 0.0  ! [degreees C]
+            Pst = 0.0D0      ! [inches]
+          ENDIF
         ENDIF
 
         IF ( pmlt>apk_ice ) THEN ! will not happen if Active_glacier>OFF because of above
@@ -2075,7 +2081,8 @@
       SUBROUTINE snalbedo(Newsnow, Iso, Lst, Snsv, Prmx, Pptmix, Albset_rnm, &
      &                    Net_snow, Albset_snm, Albset_rna, Albset_sna, Albedo, &
      &                    Int_alb, Salb, Slst)
-      USE PRMS_SNOW, ONLY: MAXALB, Acum, Amlt, OFF
+      USE PRMS_CONSTANTS, ONLY: OFF
+      USE PRMS_SNOW, ONLY: MAXALB, Acum, Amlt
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: INT
@@ -2339,7 +2346,7 @@
      &           Trd, Emis_noppt, Canopy_covden, Cec, Pkwater_equiv, &
      &           Pk_def, Pk_temp, Pk_ice, Freeh2o, Snowcov_area, &
      &           Snowmelt, Pk_depth, Pss, Pst, Pk_den, Cst, Cal, Sw, Freeh2o_cap, Den_max, Ihru_gl)
-      USE PRMS_SNOW, ONLY: CLOSEZERO
+      USE PRMS_CONSTANTS, ONLY: CLOSEZERO
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL
@@ -2590,7 +2597,9 @@
 !***********************************************************************
       SUBROUTINE snowevap(Potet_sublim, Potet, Snowcov_area, Snow_evap, &
      &                    Pkwater_equiv, Pk_ice, Pk_def, Freeh2o, Pk_temp, Hru_intcpevap)
-      USE PRMS_SNOW, ONLY: Active_glacier, Print_debug, CLOSEZERO, DNEARZERO, DEBUG_less, OFF
+      USE PRMS_CONSTANTS, ONLY: CLOSEZERO, DNEARZERO, DEBUG_less, OFF
+      USE PRMS_MODULE, ONLY: Print_debug
+      USE PRMS_SNOW, ONLY: Active_glacier
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
@@ -2697,7 +2706,7 @@
       SUBROUTINE snowcov(Iasw, Newsnow, Snowcov_area, Snarea_curve, &
      &                   Pkwater_equiv, Pst, Snarea_thresh, Net_snow, &
      &                   Scrv, Pksv, Snowcov_areasv, Ai, Frac_swe)
-      USE PRMS_SNOW, ONLY: DNEARZERO
+      USE PRMS_CONSTANTS, ONLY: DNEARZERO
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Newsnow
@@ -3006,7 +3015,6 @@
         WRITE ( Restart_outunit ) Pst
         WRITE ( Restart_outunit ) Snsv
         WRITE ( Restart_outunit ) Pk_depth
-        WRITE ( Restart_outunit ) Ai
         IF ( Glacier_flag==ACTIVE ) THEN
           WRITE ( Restart_outunit ) Glacr_albedo
           WRITE ( Restart_outunit ) Glacr_pk_den
@@ -3050,7 +3058,6 @@
         READ ( Restart_inunit ) Pst
         READ ( Restart_inunit ) Snsv
         READ ( Restart_inunit ) Pk_depth
-        READ ( Restart_inunit ) Ai
         IF ( Glacier_flag==ACTIVE ) THEN
           READ ( Restart_inunit ) Glacr_albedo
           READ ( Restart_inunit ) Glacr_pk_den
