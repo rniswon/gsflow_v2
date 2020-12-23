@@ -2,10 +2,11 @@
 !     Perform the MODFLOW budget procedure for PRMS soil zone
 !***********************************************************************
       MODULE GSFBUDGET
+      USE PRMS_CONSTANTS, ONLY: ERROR_dim, NEARZERO, CLOSEZERO, ACTIVE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2020-12-02'
+      character(len=*), parameter :: Version_gsflow_budget = '2020-12-23'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -192,7 +193,6 @@
 !***********************************************************************
       INTEGER FUNCTION gsfbudinit()
       USE GSFBUDGET
-      USE PRMS_CONSTANTS, ONLY: ERROR_dim
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru
       USE GWFSFRMODULE, ONLY: NSTRM
       USE GLOBAL, ONLY: IUNIT
@@ -262,13 +262,12 @@
       USE GWFLAKMODULE, ONLY: EVAP, SURFA
 !Warning, modifies Basin_gwflow_cfs, Basin_cfs, Basin_cms, Basin_stflow,
 !                  Basin_ssflow_cfs, Basin_sroff_cfs
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, CLOSEZERO
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Active_area, &
      &    Basin_area_inv, Hru_area, Lake_hru_id, Lake_area
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Hru_actet, Basin_sroff, &
      &    Basin_actet, Basin_ssstor, Ssres_stor, Slow_stor, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_gwflow_cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv
-!Warning, modifies Basin_ssstor and Gw2sm_grav
+!Warning, modifies Basin_soil_moist, Basin_ssstor, and Gw2sm_grav
       USE PRMS_SOILZONE, ONLY: Pref_flow_stor, Gravity_stor_res, Hrucheck, Gvr_hru_id, &
      &    Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
       IMPLICIT NONE
@@ -350,7 +349,7 @@
       DO ii = 1, Active_hrus
         i = Hru_route_order(ii)
         harea = Hru_area(i)
-        IF ( Have_lakes==1 ) THEN
+        IF ( Have_lakes==ACTIVE ) THEN
 !-----------------------------------------------------------------------
 ! Get actual et from lakes
 !-----------------------------------------------------------------------
@@ -358,8 +357,8 @@
             lake = Lake_hru_id(i)
             !EVAP in mfl3/dt   SURFA in MFL2/dt
             IF ( SURFA(lake)>NEARZERO ) THEN
-              inches_on_lake = EVAP(lake)*DELT/SURFA(lake)*Mfl_to_inch                            !RGN 5/23/15 added *DELT for time units other than days.         
-              Hru_actet(i) = inches_on_lake*SURFA(lake)*Mfl2_to_acre/Lake_area(lake)
+              inches_on_lake = SNGL(EVAP(lake))*DELT/SNGL(SURFA(lake)*Mfl_to_inch)                         !RGN 5/23/15 added *DELT for time units other than days.         
+              Hru_actet(i) = inches_on_lake*SNGL(SURFA(lake)*Mfl2_to_acre/Lake_area(lake))
             ELSE
               Hru_actet(i) = 0.0
             ENDIF
@@ -614,6 +613,7 @@
 !***********************************************************************
       SUBROUTINE MODFLOW_GET_STORAGE_UPW()
       USE GSFBUDGET, ONLY: Sat_S
+      USE PRMS_CONSTANTS, ONLY: NEARZERO
       USE GLOBAL, ONLY: NCOL, NROW, NLAY, IBOUND, BOTM, HNEW, LBOTM, HOLD
       USE GWFBASMODULE, ONLY: DELT
       USE GWFUPWMODULE, ONLY: SC1, SC2UPW, Sn
@@ -703,13 +703,15 @@
       USE GLOBAL, ONLY : IUNIT
       USE GWFAGMODULE, ONLY:  NUMIRRDIVERSIONSP,IRRSEG
       IMPLICIT NONE
-      INTRINSIC DBLE
+      INTRINSIC :: SNGL
 ! Local Variables
       INTEGER :: i, itemp, j, first_reach, nrch
+      REAL :: Mfl3t_to_cfs_sngl
 !***********************************************************************
+      Mfl3t_to_cfs_sngl = SNGL(Mfl3t_to_cfs)
       DO i = 1, NSTRM
 ! Reach_cfs and reach_wse are not used except to be available for output
-        Reach_cfs(i) = DBLE( STRM(9, i) )*Mfl3t_to_cfs
+        Reach_cfs(i) = STRM(9, i)*Mfl3t_to_cfs_sngl
         Reach_wse(i) = STRM(15, i)
       ENDDO
 
@@ -727,7 +729,7 @@
           END DO
         END IF
         IF ( IOTSG(i)==0 .and. itemp == 0 ) Basin_cfs = Basin_cfs + SGOTFLW(i)
-        Streamflow_sfr(i) = SGOTFLW(i)*SNGL( Mfl3t_to_cfs )
+        Streamflow_sfr(i) = SGOTFLW(i)*Mfl3t_to_cfs_sngl
         nrch = ISTRM(5, i)
         DO j = first_reach, nrch + first_reach - 1
           Seepage_reach_sfr(i) = Seepage_reach_sfr(i) + STRM(11,j)*SNGL( Mfl3t_to_cfs )

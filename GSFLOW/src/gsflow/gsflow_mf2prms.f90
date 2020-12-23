@@ -22,10 +22,10 @@
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW to PRMS'
       character(len=*), parameter :: MODNAME = 'gsflow_mf2prms'
-      character(len=*), parameter :: Version_gsflow_mf2prms = '2020-12-11'
+      character(len=*), parameter :: Version_gsflow_mf2prms = '2020-12-16'
       INTEGER :: i, j, k, ihru
       integer :: IRWL,NMCL,SGNM
-      DOUBLE PRECISION :: mf_q2prms_inch !, firr
+      DOUBLE PRECISION :: mf_q2prms_inchacres
 !***********************************************************************
       gsflow_mf2prms = 0
 
@@ -40,7 +40,7 @@
 ! From irrigation wells
 !
         IF ( Iunit(66) > 0 ) then
-          mf_q2prms_inch = DELT*Mfl2_to_acre*Mfl_to_inch
+          mf_q2prms_inchacres = DELT*Mfl2_to_acre*Mfl_to_inch
           Hru_ag_irr = 0.0
           DO J = 1, NUMIRRWELSP
             IRWL = IRRWELVAR(J)
@@ -48,7 +48,7 @@
             IF ( IRWL > 0 ) NMCL = NUMCELLS(IRWL)
             DO K = 1, NMCL
               ihru = IRRROW_GW(K,IRWL)
-              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + WELLIRRPRMS(k,IRWL)*mf_q2prms_inch
+              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + WELLIRRPRMS(k,IRWL)*SNGL(mf_q2prms_inchacres)
             END DO
           END DO
 !
@@ -60,7 +60,7 @@
             IF ( SGNM>0 ) NMCL = DVRCH(SGNM)
             DO K=1,NMCL        
               ihru = IRRROW_SW(K,SGNM)
-              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + DIVERSIONIRRPRMS(k,SGNM)*mf_q2prms_inch
+              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + DIVERSIONIRRPRMS(k,SGNM)*SNGL(mf_q2prms_inchacres)
             END DO
           END DO
         END IF

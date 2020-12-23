@@ -32,11 +32,6 @@ clean:
 ####################################################
 # Rules for the modules
 ###################################################
-# if on windows comment out next 3 lines
-openspec.inc:
-	$(RM) openspec.inc
-	$(CP) openspec_linux.inc openspec.inc
-
 global.mod: 
 	$(RM) global.mod
 	$(CD) $(MODFLOWDIR);make global.mod

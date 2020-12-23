@@ -4,7 +4,7 @@
 !***********************************************************************
 
       MODULE GSFSUM
-      USE PRMS_CONSTANTS, ONLY: DEBUG_WB, DEBUG_less, ERROR_open_out
+      USE PRMS_CONSTANTS, ONLY: DEBUG_WB, DEBUG_less, ERROR_open_out, CFS2CMS_CONV, ACTIVE
       USE PRMS_MODULE, ONLY: Print_debug
       IMPLICIT NONE
 !   Local Variables
@@ -565,12 +565,11 @@
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: KKITER, Nobs, Timestep, Dprst_flag, Have_lakes
       USE PRMS_OBS, ONLY: Runoff, Runoff_units
-      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       USE PRMS_FLOWVARS, ONLY: Basin_perv_et, Basin_swale_et, &
      &    Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_actet, &
-     &    Basin_soil_moist, Basin_ssstor, Basin_cfs, Basin_sroff
+     &    Basin_sroff, Basin_soil_moist, Basin_ssstor, Basin_cfs
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_evap, &
      &    Basin_hortonian, Basin_hortonian_lakes, &
      &    Basin_infil, Basin_dprst_evap, Basin_dprst_volop, Basin_dprst_volcl
@@ -610,9 +609,9 @@
       SnowEvap_Q = Basin_snowevap*Basin_convert
       LakeEvap_Q = Basin_lakeevap*Basin_convert
       DprstEvap_Q = Basin_dprst_evap*Basin_convert
-!      IF ( Have_lakes==1 ) LakeEvap_Q = TOTEVAP_LAK
+!      IF ( Have_lakes==ACTIVE ) LakeEvap_Q = TOTEVAP_LAK
       ! sanity check
-!      IF ( Have_lakes==1 ) THEN
+!      IF ( Have_lakes==ACTIVE ) THEN
 !        IF ( ABS(LakeEvap_Q+TOTEVAP_LAK)>0.0001 ) PRINT *, &
 !     &       'LAKE EVAP PROBLEM, MF lake evap not equal PRMS lake evap', &
 !     &       LakeEvap_Q+TOTEVAP_LAK, LakeEvap_Q, TOTEVAP_LAK
@@ -623,7 +622,6 @@
 
 ! convert basin_cfs from cfs over to modflow l3/t (volume per time step)
       StreamOut_Q = Basin_cfs/Mfl3t_to_cfs
-!      print *, basin_cfs, mfl3t_to_cfs, streamout_q
 
       IF ( Nobs<1 ) THEN
         obsq_cfs = -1.0D0
@@ -710,11 +708,12 @@
       ENDIF
       Ave_SoilDrainage2Unsat_Q = Ave_SoilDrainage2Unsat_Q/Timestep
 
-      IF ( Have_lakes==1 ) THEN
+      IF ( Have_lakes==ACTIVE ) THEN
         Lake_S = TOTSTOR_LAK
         SatDisch2Lake_Q = TOTGWIN_LAK 
         Lake2Sat_Q = TOTGWOT_LAK
         Lake_dS = TOTDELSTOR_LAK
+        LakeExchng2Sat_Q = -Lake2Sat_Q - SatDisch2Lake_Q
       ENDIF
 
       IF ( IRTFLG>0 ) CALL MODFLOW_SFR_GET_STORAGE
@@ -780,7 +779,6 @@
      &            + Interflow2Stream_Q + Sroff2Stream_Q + DunnInterflow2Lake_Q + HortSroff2Lake_Q + SoilDrainage2Unsat_Q &
      &            + CapET_Q + ImpervEvap_Q + CanopyEvap_Q + SnowEvap_Q + SwaleEvap_Q + DprstEvap_Q
         IF ( ABS(hru_bal)/Cap_S>ERRCHK ) WRITE (BALUNT, *) 'Possible HRU water balance problem', hru_bal
-!        print *, hru_bal, Last_Canopy_S, Imperv_S, Last_Imperv_S, Dprst_S, Last_Dprst_S, lake_s, boundarystreamflow_q
         WRITE (BALUNT, 9002) Nowyear, Nowmonth, Nowday, hru_bal, Cap_S, Last_Cap_S, Grav_S, Last_Grav_S, SnowPweqv_S, &
      &                       Last_SnowPweqv_S, Canopy_S, Last_Canopy_S, Imperv_S, Last_Imperv_S, Dprst_S, Last_Dprst_S, &
      &                       Sat2Grav_Q, Precip_Q, &
@@ -789,7 +787,6 @@
       ENDIF
 
       IF ( Gsf_rpt==1 ) THEN
-!          print *, StreamOut_q, Unsat_S, Sat_S, UnsatStream_S, lake_s, NetWellFlow_Q
         WRITE ( Balance_unt, 9001 ) Nowmonth, Nowday, Nowyear, StreamOut_Q, &
      &          HortSroff2Stream_Q, DunnSroff2Stream_Q, Interflow2Stream_Q, Stream2Unsat_Q, StreamExchng2Sat_Q, &
      &          Canopy_S, SnowPweqv_S, Imperv_S, Dprst_S, Cap_S, Grav_S, Unsat_S, Sat_S, UnsatStream_S, Lake_S, Stream_s, &
@@ -815,7 +812,7 @@
       Cumvol_gwbndot = Cumvol_gwbndot + Gw_bnd_out*DELT
       Rate_gwbndot = Gw_bnd_out
  ! RGN added specified lake inflow/outflow and storage change
-      IF ( Have_lakes==1 ) THEN
+      IF ( Have_lakes==ACTIVE ) THEN
 !        IF ( TOTWTHDRW_LAK>0.0 ) THEN
 !          Rate_lakin = 0.0D0
 !          Rate_lakot = TOTWTHDRW_LAK
@@ -886,7 +883,9 @@
 !     gsfsumclean - Computes summary values
 !***********************************************************************
       INTEGER FUNCTION gsfsumclean()
-      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Gsf_rpt, BALUNT, Print_debug, DEBUG_WB
+      USE PRMS_CONSTANTS, ONLY: DEBUG_WB
+      USE PRMS_MODULE, ONLY: Print_debug
+      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Gsf_rpt, BALUNT
       IMPLICIT NONE
 !***********************************************************************
       gsfsumclean = 0
@@ -899,8 +898,10 @@
 ! Print headers for tables
 !***********************************************************************
       SUBROUTINE GSF_PRINT()
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_open_out
+      USE PRMS_MODULE, ONLY: Print_debug
       USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Csv_output_file, Rpt_days, &
-     &    Gsflow_output_file, Gsf_rpt, Print_debug, DEBUG_less, ERROR_open_out
+     &    Gsflow_output_file, Gsf_rpt
       IMPLICIT NONE
       INTEGER, EXTERNAL :: control_integer, control_string, numchars
       EXTERNAL GSF_HEADERS, read_error, PRMS_open_output_file
@@ -1045,7 +1046,7 @@
         WRITE (Gsf_unt, 9003) text4, val1, text4, val2
       ENDIF
 !1E-----LAKES.
-      !IF ( Have_lakes==1 ) THEN
+      !IF ( Have_lakes==ACTIVE ) THEN
       !  CALL GSFFMTNUM(Cumvol_lakin, val1)
       !  CALL GSFFMTNUM(Rate_lakin, val2)
       !  WRITE (Gsf_unt, 9003) text10, val1, text10, val2
@@ -1073,7 +1074,7 @@
         WRITE (Gsf_unt, 9003) text4, val1, text4, val2
       ENDIF
 !2E-----LAKES.
-      !IF ( Have_lakes==1 ) THEN
+      !IF ( Have_lakes==ACTIVE ) THEN
       !  CALL GSFFMTNUM(Cumvol_lakot, val1)
       !  CALL GSFFMTNUM(Rate_lakot, val2)
       !  WRITE (Gsf_unt, 9003) text10, val1, text10, val2
@@ -1129,7 +1130,7 @@
       WRITE (Gsf_unt, 9003) text9, val1, text9, val2
 !
 !6E----LAKE STORAGE CHANGE.
-      IF ( Have_lakes==1 ) THEN
+      IF ( Have_lakes==ACTIVE ) THEN
         CALL GSFFMTNUM(Cum_lakestor, val1)
         CALL GSFFMTNUM(Rate_lakestor, val2)
         WRITE (Gsf_unt, 9003) text10, val1, text10, val2
