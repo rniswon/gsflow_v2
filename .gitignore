@@ -2,5 +2,3 @@ GSFLOW/bin/gsflow.exe
 *.mod
 *.o
 *.a
-
-git config core.ignorecase false
