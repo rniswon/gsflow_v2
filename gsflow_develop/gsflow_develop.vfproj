@@ -116,7 +116,6 @@
 		<File RelativePath="..\GSFLOW\src\prms\muskingum.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\muskingum_lake.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\nhru_summary.f90"/>
-		<File RelativePath="..\GSFLOW\src\modflow\nogmg.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\nsegment_summary.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\nsub_summary.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\NWT1_gmres.f90"/>
@@ -144,7 +143,7 @@
 		<File RelativePath="..\GSFLOW\src\prms\potet_pt.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\precip_1sta_laps.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\precip_dist2.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\precip_temp_map.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\precip_map.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_constants.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_summary.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_time.f90"/>
