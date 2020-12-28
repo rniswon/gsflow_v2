@@ -5782,54 +5782,6 @@ C
       END IF 
       END FUNCTION CAPH
 ! ----------------------------------------------------------------------
-
-      function unsat_stor(d1,uzthst,uzdpst,ic,ir,nwav)
-!     ******************************************************************
-!     unsat_stor---- sums up mobile water over depth interval
-!     ******************************************************************
-!     SPECIFICATIONS:
-      USE GWFUZFMODULE, ONLY:NWAVST
-! ----------------------------------------------------------------------
-      !modules
-      !arguments
-      INTEGER, intent(in) :: NWAV, ic, ir
-      DOUBLE PRECISION, intent(inout) :: d1
-      DOUBLE PRECISION, intent(inout) :: uzthst(NWAV), uzdpst(NWAV)
-      ! -- dummy
-      DOUBLE PRECISION :: fm, unsat_stor
-      integer :: j, k,nwavm1,jj, numwaves
-      DOUBLE PRECISION, PARAMETER :: DEM30 = 1.0d-30
-! ----------------------------------------------------------------------
-      fm = 0.0d0
-      numwaves = NWAVST(ic, ir)
-      j = numwaves + 1
-      k = numwaves
-      nwavm1 = k-1
-      if ( d1 > uzdpst(1) ) d1 = uzdpst(1)
-      !
-      !find deepest wave above depth d1, counter held as j
-      do while ( k > 0 )
-        if ( uzdpst(k) - d1 < -DEM30) j = k
-          k = k - 1
-      end do
-      if ( j > numwaves ) then
-        fm = fm + (uzthst(numwaves)-thtr)*d1
-      elseif ( numwaves > 1 ) then
-        if ( j > 1 ) then
-          fm = fm + (uzthst(j-1)-thtr)*(d1-uzdpst(j))
-        end if
-        do jj = j, nwavm1
-          fm = fm + (uzthst(jj)-thtr)*(uzdpst(jj)-uzdpst(jj+1))
-        end do
-        fm = fm + (uzthst(numwaves)-thtr)*(uzdpst(numwaves))
-      else
-        fm = fm + (uzthst(1)-thtr)*d1
-      end if
-      unsat_stor = fm
-      end function unsat_stor
-!
-C
-! ----------------------------------------------------------------------
 C-------SUBROUTINE GWF2UZF1DA
       SUBROUTINE GWF2UZF1DA(Igrid)
 C    Deallocate UZF DATA. 
