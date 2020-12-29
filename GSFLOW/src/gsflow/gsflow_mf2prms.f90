@@ -15,7 +15,8 @@
       USE GLOBAL,       ONLY: IUNIT
       USE GWFBASMODULE, ONLY: DELT
       USE GWFAGMODULE, ONLY: NUMIRRWELSP, IRRWELVAR, NUMCELLS, WELLIRRPRMS, IRRROW_SW, &
-     &                       NUMIRRDIVERSIONSP, IRRSEG, DVRCH, DIVERSIONIRRPRMS, IRRROW_GW
+     &                       NUMIRRDIVERSIONSP, IRRSEG, DVRCH, DIVERSIONIRRPRMS, IRRROW_GW, &
+     &                       NUMIRRPONDSP, NUMCELLSPOND, IRRHRU_POND, PONDIRRPRMS
       IMPLICIT NONE
 ! Functions
       EXTERNAL print_module
@@ -61,6 +62,15 @@
             DO K=1,NMCL        
               ihru = IRRROW_SW(K,SGNM)
               Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + DIVERSIONIRRPRMS(k,SGNM)*SNGL(mf_q2prms_inchacres)
+            END DO
+          END DO
+!
+! From open depression storage reservoirs
+!
+          DO i = 1, NUMIRRPONDSP
+            DO k = 1, NUMCELLSPOND(i)
+              ihru = IRRHRU_POND(k, i)
+              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + PONDIRRPRMS(k, i)*SNGL(mf_q2prms_inchacres)
             END DO
           END DO
         END IF

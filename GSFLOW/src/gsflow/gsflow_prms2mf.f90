@@ -73,7 +73,7 @@
      &     'Net volumetric flow rate of gravity drainage from the'// &
      &     ' soil zone to the unsaturated and saturated zones', &
      &     'L3/T', Net_sz2gw)/=0 ) CALL read_error(3, 'net_sz2gw')
-
+      
 !     ALLOCATE (Reach_latflow(Nreach))
 !     IF ( decl var(MODNAME, 'reach_latflow', 'nreach', Nreach, 'double', &
 !    &     'Lateral flow (surface runoff and interflow) into each stream reach', &
@@ -409,6 +409,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: toStream
+      INTEGER, EXTERNAL :: toIrr
       EXTERNAL Bin_percolation
 ! Local Variables
       INTEGER :: irow, icol, ik, jk, ii, ilake
@@ -420,6 +421,10 @@
 ! Add runoff to stream reaches
 !-----------------------------------------------------------------------
       IF ( toStream()/=0 ) RETURN
+!-----------------------------------------------------------------------
+! Remove open dprst storage for irrigation
+!-----------------------------------------------------------------------
+      IF ( toIrr()/=0 ) RETURN
 
 !-----------------------------------------------------------------------
 ! Add runoff and precip to lakes
@@ -549,7 +554,36 @@
 
       toStream = 0
 
-      END FUNCTION toStream
+    END FUNCTION toStream
+    
+!***********************************************************************
+!***********************************************************************
+      INTEGER FUNCTION toIrr()
+      
+      USE GWFAGMODULE, ONLY: NUMIRRPONDSP, IRRPONDVAR, PONDFLOW
+      USE PRMS_WATER_USE, ONLY: Dprst_transfer
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
+      USE GSFMODFLOW, ONLY: Mfl3_to_ft3, Mft_to_sec
+      IMPLICIT NONE
+      INTRINSIC :: SNGL
+! Local Variables
+      INTEGER :: i, hru_id
+      REAL :: conversion, demand_cfs
+!***********************************************************************
+      toIrr = 1
+! Calculate conversion for MF units to cfs
+      conversion = Mfl3_to_ft3/Mft_to_sec
+      do i = 1, NUMIRRPONDSP
+        hru_id = IRRPONDVAR(i)
+        demand_cfs = PONDFLOW(hru_id)*conversion
+        Dprst_transfer(hru_id) = demand_cfs
+        IF ( Dprst_transfer(hru_id) > SNGL(Dprst_vol_open(hru_id))) Dprst_transfer(hru_id) = SNGL(Dprst_vol_open(hru_id))
+        PONDFLOW(hru_id) = Dprst_transfer(hru_id)/conversion
+      end do
+
+      toIrr = 0
+
+      END FUNCTION toIrr
 
 !***********************************************************************
 ! Bin percolation to reduce waves

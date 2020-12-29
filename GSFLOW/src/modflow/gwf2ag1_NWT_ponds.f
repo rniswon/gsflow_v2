@@ -3082,13 +3082,13 @@
         pettotal = DZERO
         aettotal = DZERO
         factor = DZERO
-        ipond = IRRPONDVAR(i)
+        ipond = IRRPONDVAR(i)  !these are hru ids for ponds
         IF (DEMAND(ipond) < zerod7) goto 300   !check this because demand is not correct
         !
         !1 - -----loop over HRUs irrigated by pond
         !
         do k = 1, NUMCELLSPOND(i)
-           hru_id = IRRHRU_POND(K, ipond)    !ponds are IDed as HRU_id
+           hru_id = IRRHRU_POND(K, ipond)    !these are HRUs irrigated by ponds
            area = HRU_PERV(hru_id)
            pet = potet(hru_id)*area*prms_inch2mf_q
            aet = hru_actet(hru_id)*area*prms_inch2mf_q
