@@ -20,9 +20,9 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.2.0 12/21/2020'
-      character(len=*), parameter :: PRMS_versn = '2020-12-21'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 12/21/2020'
+      character(len=*), parameter :: GSFLOW_versn = '2.2.0 01/20/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-01-20'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 01/20/2021'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -49,7 +49,6 @@
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
-      REAL, SAVE, ALLOCATABLE :: Hru_ag_irr(:)    !Ag irrigation added to HRU
 !   Declared Parameters
       INTEGER, SAVE :: Mxsziter
       INTEGER, SAVE, ALLOCATABLE :: Gvr_cell_id(:)
@@ -199,13 +198,6 @@
      &         'Index of the grid cell associated with each gravity reservoir', &
      &         'none')/=0 ) CALL read_error(1, 'gvr_cell_id')
             ! Allocate variable for adding irrigation water to HRU from AG Package, always declare for now
-            ALLOCATE ( Hru_ag_irr(Nhru) )
-            IF ( Diversion2soil_flag==ACTIVE ) THEN
-              IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real', &
-     &             'Irrigation added to soilzone from MODFLOW wells', 'inches', Hru_ag_irr)/=0 ) &
-     &             CALL read_error(3, 'hru_ag_irr')
-            ENDIF
-            Hru_ag_irr = 0.0
         ENDIF
 
         Timestep = 0
@@ -1493,6 +1485,7 @@
         ierr = 1
       ENDIF
       IF ( ierr==1 ) ERROR STOP ERROR_control
+
       END SUBROUTINE check_module_names
 
 !***********************************************************************
