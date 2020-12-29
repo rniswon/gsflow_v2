@@ -3226,23 +3226,23 @@
       !
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
+      INTEGER, INTENT(IN) :: MSUM, IOUT, KSTP, KPER
       CHARACTER*22 VBNMAG(MSUM)
       DIMENSION VBVLAG(4, MSUM)
       CHARACTER*17 VAL1, VAL2
+      INTEGER MSUM1, L
+      REAL BUDPERC, TOTRIN, TOTROT, TOTVIN, TOTVOT, VBVLAG
+      REAL DIFFR, ADIFFR, PDIFFR, AVGRAT, DIFFV, ADIFFV, PDIFFV, AVGVOL
+      REAL, PARAMETER :: ZERO = 0.0, TWO = 2.0, SMALL = 0.1, HUND = 100.
+      REAL, PARAMETER :: BIGVL1 = 9.99999E11, BIGVL2 = 9.99999E10
       ! - -----------------------------------------------------------------
       !
       !1 - -----DETERMINE NUMBER OF INDIVIDUAL BUDGET ENTRIES.
       BUDPERC = 0.
       MSUM1 = MSUM - 1
-      IF (MSUM1 .LE. 0) RETURN
+      IF (MSUM1 < 1) RETURN
       !
       !2 - -----CLEAR RATE AND VOLUME ACCUMULATORS.
-      ZERO = 0.
-      TWO = 2.
-      HUND = 100.
-      BIGVL1 = 9.99999E11
-      BIGVL2 = 9.99999E10
-      SMALL = 0.1
       TOTRIN = ZERO
       TOTROT = ZERO
       TOTVIN = ZERO

@@ -4333,7 +4333,7 @@ C         WHEN UNSATRATED FLOW IS ACTIVE.
            END IF
          END IF
 C43B----SAVE SEEPAGE TO ARRAY FOR PRINTING NET SEEPAGE IN UZF
-          FNETSEEP(IC,IR) = FNETSEEP(IC,IR) + gwflow    !RGN multiple reaches in a cell
+         FNETSEEP(IC,IR) = FNETSEEP(IC,IR) + gwflow    !RGN multiple reaches in a cell
 C
 C44-----SAVE FLOW TO AND FROM GROUND WATER IN A LIST FILE WHEN 
 C         IBD IS EQUAL TO 2. revised dep 5/10/2006--fixed 9/15/2006
