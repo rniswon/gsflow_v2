@@ -32,7 +32,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2020-12-10'
+      character(len=*), parameter :: Version_srunoff = '2020-12-28'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -517,27 +517,27 @@
         IF ( Nlake>0 ) Hortonian_lakes = 0.0D0
       ENDIF
 
+      Basin_sroffi = 0.0D0
+      Basin_sroffp = 0.0D0
+      Basin_infil = 0.0D0
+      Basin_sroff = 0.0D0
+      Basin_imperv_evap = 0.0D0
+      Basin_hortonian = 0.0D0
+      Basin_dprst_sroff = 0.0D0
+      Basin_dprst_evap = 0.0D0
+      Basin_dprst_seep = 0.0D0
+      Basin_sroff_upslope = 0.0D0
+      Basin_sroff_down = 0.0D0
+      Basin_hortonian_lakes = 0.0D0
+      Basin_contrib_fraction = 0.0D0
+      Srp = 0.0
+      Sri = 0.0
+
       IF ( Init_vars_from_file==0 ) THEN
-        Basin_sroffi = 0.0D0
-        Basin_sroffp = 0.0D0
-        Basin_infil = 0.0D0
-        Basin_sroff = 0.0D0
-        Basin_imperv_evap = 0.0D0
         Basin_imperv_stor = 0.0D0
-        Basin_hortonian = 0.0D0
-        Basin_dprst_sroff = 0.0D0
-        Basin_dprst_evap = 0.0D0
-        Basin_dprst_seep = 0.0D0
         Basin_dprst_volop = 0.0D0
         Basin_dprst_volcl = 0.0D0
-        Basin_sroff_upslope = 0.0D0
-        Basin_sroff_down = 0.0D0
-        Basin_hortonian_lakes = 0.0D0
-        Basin_contrib_fraction = 0.0D0
         Hru_impervstor = 0.0
-        Srp = 0.0
-        Sri = 0.0
-
         Frozen = OFF
         IF ( Frozen_flag==ACTIVE ) THEN
           Cfgi = 0.0
@@ -629,13 +629,13 @@
 ! Local Variables
       INTEGER :: i, k, dprst_chk, frzen, active_glacier
       REAL :: srunoff, avail_et, perv_area, sra, availh2o
-      DOUBLE PRECISION :: hru_sroff_down, runoff, apply_sroff, cfgi_sroff
+      DOUBLE PRECISION :: hru_sroff_down, runoff, apply_sroff, cfgi_sroff, upslope
       REAL :: cfgi_k, depth_cm !frozen ground
       REAL :: glcrmltb, temp, temp2 ! glaciers
 !***********************************************************************
       srunoffrun = 0
 
-! It0 variables used with MODFLOW integration to save iteration states.
+! It0 variables used with MODFLOW integration and PRMS iteration to save states.
       IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
         IF ( Kkiter>1 ) THEN
           Imperv_stor = It0_imperv_stor
@@ -696,6 +696,8 @@
 
         Hruarea = Hru_area(i)
         Hruarea_dble = Hru_area_dble(i)
+        upslope = 0.0D0
+        IF ( Cascade_flag>CASCADE_OFF ) upslope = Upslope_hortonian(i)
         Ihru = i
         runoff = 0.0D0
         glcrmltb = 0.0 ! glacier
@@ -719,10 +721,8 @@
 ! HRU is a lake
 !     eventually add code for lake area less than hru_area
 !     that includes soil_moist for fraction of hru_area that is dry bank
-          IF ( Cascade_flag>CASCADE_OFF ) THEN
-            Hortonian_lakes(i) = Upslope_hortonian(i)
-            Basin_hortonian_lakes = Basin_hortonian_lakes + Hortonian_lakes(i)*Hruarea_dble
-          ENDIF
+          Hortonian_lakes(i) = upslope
+          Basin_hortonian_lakes = Basin_hortonian_lakes + Hortonian_lakes(i)*Hruarea_dble
           CYCLE
         ENDIF
 
@@ -761,11 +761,7 @@
           IF ( Cfgi(i)>=Cfgi_thrshld ) THEN
             frzen = 1
             ! depression storage states are not changed if frozen
-            IF ( Cascade_flag>CASCADE_OFF ) THEN
-              cfgi_sroff = (Snowmelt(i) + availh2o + Upslope_hortonian(i) + glcrmltb)*Hruarea
-            ELSE
-              cfgi_sroff = (Snowmelt(i) + availh2o + glcrmltb)*Hruarea
-            ENDIF
+            cfgi_sroff = (Snowmelt(i) + availh2o + SNGL(upslope) + glcrmltb)*Hruarea
             IF ( Use_sroff_transfer==ACTIVE ) cfgi_sroff = cfgi_sroff + Net_apply(i)*Hruarea
             runoff = runoff + cfgi_sroff
             Basin_cfgi_sroff = Basin_cfgi_sroff + cfgi_sroff

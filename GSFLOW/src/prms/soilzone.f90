@@ -19,12 +19,13 @@
      &    ERROR_soilzone, SAND, CLAY, LOAM, CASCADE_OFF, ERROR_param
       USE PRMS_MODULE, ONLY: Model, Nhru, Nssr, Nsegment, Nlake, Nhrucell, Print_debug, Dprst_flag, &
      &    Init_vars_from_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag, &
-     &    Kkiter, Soilzone_aet_flag, Frozen_flag, Diversion2soil_flag, Soilzone_add_water_use
+     &    Kkiter, Soilzone_aet_flag, Frozen_flag, Diversion2soil_flag, Soilzone_add_water_use, &
+     &    Call_cascade, PRMS_land_iteration_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2020-12-11'
+      character(len=*), parameter :: Version_soilzone = '2020-12-28'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -497,9 +498,15 @@
 
         ALLOCATE ( Gvr_hru_pct_adjusted(Nhrucell), Replenish_frac(Nhru) )
         ALLOCATE ( Hru_gvr_count(Nhru), Hrucheck(Nhru) )
-        ALLOCATE ( It0_pref_flow_stor(Nhru), It0_ssres_stor(Nhru), It0_soil_rechr(Nhru), It0_soil_moist(Nhru) )
-        ALLOCATE ( It0_gravity_stor_res(Nhrucell), It0_sroff(Nhru), It0_slow_stor(Nhru), It0_strm_seg_in(Nsegment) )
+      ENDIF
+      IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE ) THEN
+        ALLOCATE ( It0_ssres_stor(Nhru), It0_slow_stor(Nhru) )
+        IF ( GSFLOW_flag==ACTIVE ) ALLOCATE ( It0_gravity_stor_res(Nhrucell) )
         IF ( Nlake>0 ) ALLOCATE ( It0_potet(Nhru) )
+      ENDIF
+      IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
+        ALLOCATE ( It0_soil_rechr(Nhru), It0_soil_moist(Nhru), It0_sroff(Nhru) )
+        IF ( Call_cascade==ACTIVE ) ALLOCATE ( It0_strm_seg_in(Nsegment) )
       ENDIF
 
 ! Allocate arrays for local and variables from other modules
@@ -698,7 +705,11 @@
         ! hru_type = land, swale, or glacier
         IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
           Slow_stor(i) = MIN( Ssres_stor(i), Pref_flow_thrsh(i) )
-          Pref_flow_stor(i) = Ssres_stor(i) - Slow_stor(i)
+          IF ( Pref_flow_den(i)>0.0 ) THEN
+            Pref_flow_stor(i) = Ssres_stor(i) - Slow_stor(i)
+          ELSE
+            Pref_flow_stor(i) = 0.0
+          ENDIF
         ENDIF
 
         hruarea = Hru_area(i)
@@ -775,6 +786,9 @@
       Potet_rechr = 0.0
       Unused_potet = 0.0 ! dimension nhru
       Soil_saturated = OFF
+      IF ( Pref_flag==ACTIVE ) THEN
+        IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_pref_flow_stor(Nhru) )
+      ENDIF
 !      Interflow_max = 0.0
 !      Snowevap_aet_frac = 0.0
 
@@ -862,7 +876,7 @@
       INTEGER :: i, k, update_potet, compute_lateral
       REAL :: dunnianflw, interflow, perv_area, harea
       REAL :: dnslowflow, dnpreflow, dndunn, availh2o, avail_potet
-      REAL :: gvr_maxin, topfr, excess !, tmp
+      REAL :: gvr_maxin, topfr !, tmp
       REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin
       REAL :: perv_frac, capacity, capwater_maxin, ssresin
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
@@ -871,36 +885,45 @@
 !***********************************************************************
       szrun = 0
 
-!! rsr ??? what about PRMS_land_iteration = ACTIVE ???
 ! It0 variables used with MODFLOW integration to save iteration states.
-      IF ( GSFLOW_flag==ACTIVE ) THEN
+      IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE ) THEN
         IF ( Kkiter>1 ) THEN
-          Soil_rechr = It0_soil_rechr
-          Soil_moist = It0_soil_moist
           Ssres_stor = It0_ssres_stor
-          Pref_flow_stor = It0_pref_flow_stor
           Slow_stor = It0_slow_stor
-          Sroff = It0_sroff
-          IF ( Nlake>0 ) Potet = It0_potet ! possible that potet is increased if lake_evap_adj > 1.0
-          Basin_soil_moist = It0_basin_soil_moist
-          Basin_ssstor = It0_basin_ssstor
-          Gravity_stor_res = It0_gravity_stor_res
-          Strm_seg_in = It0_strm_seg_in
+          IF ( GSFLOW_flag==ACTIVE ) Gravity_stor_res = It0_gravity_stor_res
+          IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
+          IF ( Nlake>0 ) Potet = It0_potet
         ELSE
-          It0_soil_rechr = Soil_rechr
-          It0_soil_moist = Soil_moist
           It0_ssres_stor = Ssres_stor
-          It0_pref_flow_stor = Pref_flow_stor
           It0_slow_stor = Slow_stor
-          It0_sroff = Sroff
+          IF ( GSFLOW_flag==ACTIVE ) It0_gravity_stor_res = Gravity_stor_res
+          IF ( Pref_flag==ACTIVE ) It0_pref_flow_stor = Pref_flow_stor
           IF ( Nlake>0 ) It0_potet = Potet
-          It0_basin_soil_moist = Basin_soil_moist
-          It0_basin_ssstor = Basin_ssstor
-          It0_gravity_stor_res = Gravity_stor_res
-          It0_strm_seg_in = Strm_seg_in
           Gw2sm_grav = 0.0
         ENDIF
         Sm2gw_grav = 0.0
+      ENDIF
+      IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
+        IF ( Kkiter>1 ) THEN
+          ! states saved in srunoff when PRMS_land_iteration_flag = ACTIVE
+          Soil_rechr = It0_soil_rechr
+          Soil_moist = It0_soil_moist
+          ! computed in srunoff
+          Sroff = It0_sroff
+          IF ( Call_cascade==ACTIVE ) Strm_seg_in = It0_strm_seg_in
+        ELSE
+          It0_soil_rechr = Soil_rechr
+          It0_soil_moist = Soil_moist
+          It0_sroff = Sroff
+          IF ( Call_cascade==ACTIVE ) It0_strm_seg_in = Strm_seg_in
+        ENDIF
+      ENDIF
+      IF ( Kkiter>1 ) THEN
+        Basin_soil_moist = It0_basin_soil_moist
+        Basin_ssstor = It0_basin_ssstor
+      ELSE
+        It0_basin_soil_moist = Basin_soil_moist
+        It0_basin_ssstor = Basin_ssstor
       ENDIF
 
       IF ( Cascade_flag>CASCADE_OFF ) THEN
@@ -1090,7 +1113,7 @@
             IF ( Soilzone_aet_flag==ACTIVE ) THEN
               Soil_lower(i) = MIN ( Soil_lower_stor_max(i), Soil_moist(i) - Soil_rechr(i) + Gvr2sm(i)/perv_frac )
               Soil_rechr(i) = Soil_moist(i) - Soil_lower(i)
-              excess = MAX( 0.0, Soil_lower(i) - Soil_lower_stor_max(i) )
+!              excess = MAX( 0.0, Soil_lower(i) - Soil_lower_stor_max(i) )
 !              if ( abs(soil_lower(i) + soil_rechr(i) - soil_moist(i))>NEARZERO ) THEN
 !                print *, 'excess', excess, Soil_lower_stor_max(i), soil_lower(i) + soil_rechr(i)-soil_moist(i)
 !                print *, soil_lower(i), soil_rechr(i), soil_moist(i)
@@ -1375,7 +1398,8 @@
       INTRINSIC :: MIN
 ! Arguments
       REAL, INTENT(IN) :: Perv_frac, Soil_moist_max, Soil_rechr_max, Soil2gw_max
-      REAL, INTENT(INOUT) :: Infil, Soil_moist, Soil_rechr, Soil_to_gw, Soil_to_ssr
+      REAL, INTENT(INOUT) :: Infil, Soil_moist, Soil_rechr, Soil_to_gw
+      REAL, INTENT(OUT) :: Soil_to_ssr
 ! Local Variables
       REAL :: excs
 !***********************************************************************
