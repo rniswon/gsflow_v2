@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.0 12/21/2020
+                       Version 5.2.0 01/20/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,7 +36,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2020-12-21
+PRMS Computation Order          gsflow_prms         2021-01-20
 Basin Definition                basin               2020-12-02
 Cascading Flow                  cascade             2020-12-02
 Common States and Fluxes        climateflow         2020-12-16
@@ -50,11 +50,11 @@ Transpiration Distribution      transp_tindex       2020-12-02
 Potential Evapotranspiration    potet_jh            2020-08-03
 Canopy Interception             intcp               2020-12-03
 Snow Dynamics                   snowcomp            2020-12-17
-Surface Runoff                  srunoff_smidx       2020-12-10
-Soilzone Computations           soilzone            2020-12-11
+Surface Runoff                  srunoff_smidx       2020-12-28
+Soilzone Computations           soilzone            2020-12-28
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2020-12-16
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2020-12-16
-GSFLOW Output Budget Summary    gsflow_budget       2020-08-11
+GSFLOW Output Budget Summary    gsflow_budget       2020-12-23
 GSFLOW Output CSV Summary       gsflow_sum          2020-12-02
 Output Summary                  nhru_summary        2020-12-02
 Output Summary                  basin_summary       2020-12-02
@@ -66,7 +66,7 @@ SFR-NWT Package                 gwf2sfr7_NWT        2020-09-30
 
 Using Control File: .\gsflow_gsflowHighKc.control
 
-Using Parameter File: ..\input\prms\sagehen_grid_v5_HighKc.params
+Using Parameter File: ..\input\prms\sagehen_grid_v5_highKc.params
 
 
 Start time: 1990/10/01 00:00:00
@@ -77,5 +77,5 @@ Model domain area:        11226.32    Active basin area:      6740.99
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    3 minutes 11.95 seconds
+Execution elapsed time    3 minutes 32.52 seconds
 

@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.0 12/21/2020
+                       Version 5.2.0 01/20/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,7 +36,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2020-12-21
+PRMS Computation Order          gsflow_prms         2021-01-20
 Basin Definition                basin               2020-12-02
 Cascading Flow                  cascade             2020-12-02
 Common States and Fluxes        climateflow         2020-12-16
@@ -50,11 +50,11 @@ Transpiration Distribution      transp_tindex       2020-12-02
 Potential Evapotranspiration    potet_jh            2020-08-03
 Canopy Interception             intcp               2020-12-03
 Snow Dynamics                   snowcomp            2020-12-17
-Surface Runoff                  srunoff_smidx       2020-12-10
-Soilzone Computations           soilzone            2020-12-11
+Surface Runoff                  srunoff_smidx       2020-12-28
+Soilzone Computations           soilzone            2020-12-28
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2020-12-16
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2020-12-16
-GSFLOW Output Budget Summary    gsflow_budget       2020-08-11
+GSFLOW Output Budget Summary    gsflow_budget       2020-12-23
 GSFLOW Output CSV Summary       gsflow_sum          2020-12-02
 Output Summary                  subbasin            2020-12-02
 ==============================================================
@@ -77,5 +77,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time    0 minutes  7.73 seconds
+Execution elapsed time    0 minutes  5.98 seconds
 
