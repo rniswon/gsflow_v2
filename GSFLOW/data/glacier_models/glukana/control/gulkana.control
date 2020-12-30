@@ -38,7 +38,7 @@ dispGraphsBuffSize
 executable_model
 1
 4
-..\..\bin\prms
+..\..\bin\gsflow
 ####
 aniOutON_OFF
 1
@@ -237,7 +237,7 @@ dispVar_element
 executable_desc
 1
 4
-PRMS version 5.2.0
+GSFLOW version 2.2.0
 ####
 glacier_flag
 1
@@ -250,6 +250,16 @@ mbInit_flag
 1
 ####
 frozen_flag
+1
+1
+1
+####
+csv_output_file
+1
+4
+./output/prms_summary.csv
+####
+csvON_OFF
 1
 1
 1

@@ -55,6 +55,7 @@ Groundwater                     gwflow              2020-12-02
 Streamflow Routing Init         routing             2020-12-02
 Streamflow Routing              muskingum           2020-12-02
 Output Summary                  basin_sum           2020-12-02
+Output Summary                  prms_summary        2020-12-02
 ==============================================================
 
 Using Control File: .\control\gulkana.control
@@ -123,5 +124,5 @@ Fraction impervious:        0.0687    Fraction pervious:       0.9313
  *************************************************************
  Total for run     418.200  279.046    1.062  152.102 -286.767
  *************************************************************
-Execution elapsed time    0 minutes  1.35 seconds
+Execution elapsed time    0 minutes  2.05 seconds
 
