@@ -88,6 +88,7 @@
         REAL, SAVE, DIMENSION(:), POINTER :: SUPSEG
         INTEGER, SAVE, DIMENSION(:), POINTER :: IRRWELVAR
         INTEGER, SAVE, DIMENSION(:), POINTER :: IRRPONDVAR   !DS
+        INTEGER, SAVE, DIMENSION(:), POINTER :: IRRPONDSEG   !DS
         REAL, SAVE, DIMENSION(:, :), POINTER :: FRACSUP
         REAL, SAVE, DIMENSION(:, :), POINTER :: FRACSUPMAX
         INTEGER, SAVE, POINTER :: NUMSUP
@@ -1711,7 +1712,7 @@
       ! VARIABLES:
       CHARACTER(LEN=200)::LINE
       INTEGER :: IERR, LLOC, ISTART, ISTOP, J, IDUM
-      INTEGER :: K, IRWL, NMCL, IP, I
+      INTEGER :: K, IRWL, NMCL, IP, I, IRSG
       REAL :: R, IPRW, TRPW
       logical :: TEST
       ! - -----------------------------------------------------------------
@@ -1722,6 +1723,7 @@
       !
       !2 - --INITIALIZE AG VARIABLES TO ZERO.
       IRRPONDVAR = 0
+      IRRPONDSEG = 0
       NUMCELLSPOND = 0
       IRRFACTPOND = 0.0
       IRRFIELDFACTPOND = 0.0
@@ -1747,6 +1749,7 @@
          CALL URDCOM(IN, IOUT, LINE)
          LLOC = 1
          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRWL, R, IOUT, IN)
+         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRSG, R, IOUT, IN)
          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, NMCL, R, IOUT, IN)
          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, i, IPRW, IOUT, In)
          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, i, TRPW, IOUT, In)
@@ -1757,9 +1760,10 @@
      +                 'PONDS')
          END IF
          IRRPONDVAR(J) = IRWL
-         NUMCELLSPOND(IRWL) = NMCL
-         IRRPERIODPOND(IRWL) = IPRW
-         TRIGGERPERIODPOND(IRWL) = TRPW 
+         IRRPONDVAR(J) = IRSG
+         NUMCELLSPOND(J) = NMCL
+         IRRPERIODPOND(J) = IPRW
+         TRIGGERPERIODPOND(J) = TRPW 
          TEST = .TRUE.
          DO IP = 1, MXPOND 
            IF ( POND(1,IP) == IRRPONDVAR(J) ) TEST = .FALSE.
@@ -3055,6 +3059,7 @@
       USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
       IMPLICIT NONE
 ! --------------------------------------------------
       !modules
@@ -3083,12 +3088,12 @@
         aettotal = DZERO
         factor = DZERO
         ipond = IRRPONDVAR(i)  !these are hru ids for ponds
-        IF (DEMAND(ipond) < zerod7) goto 300   !check this because demand is not correct
+        IF (Dprst_vol_open(ipond) < zerod7) goto 300   !check this because demand is not correct
         !
         !1 - -----loop over HRUs irrigated by pond
         !
         do k = 1, NUMCELLSPOND(i)
-           hru_id = IRRHRU_POND(K, ipond)    !these are HRUs irrigated by ponds
+           hru_id = IRRHRU_POND(K, i)    !these are HRUs irrigated by ponds
            area = HRU_PERV(hru_id)
            pet = potet(hru_id)*area*prms_inch2mf_q
            aet = hru_actet(hru_id)*area*prms_inch2mf_q
@@ -3096,15 +3101,15 @@
            aettotal = aettotal + aet
         end do
         ! convert PRMS ET deficit to MODFLOW flow
-        aetold = AETITERPOND(IPOND)
-        sup = PONDFLOW(IPOND)
-        supold = PONDFLOWOLD(IPOND)
+        aetold = AETITERPOND(i)
+        sup = PONDFLOW(i)
+        supold = PONDFLOWOLD(i)
         factor = set_factor(ipond, aetold, pettotal, aettotal, sup,
      +           supold, kiter)
-        AETITERPOND(IPOND) = SNGL(aettotal)
-        PONDFLOWOLD(IPOND) = PONDFLOW(IPOND)
-        PONDFLOW(IPOND) = PONDFLOW(IPOND) + SNGL(factor)
-!        IF ( PONDFLOW(IPOND)
+        AETITERPOND(i) = SNGL(aettotal)
+        PONDFLOWOLD(i) = PONDFLOW(i)
+        PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
+!        IF ( PONDFLOW(i)
         !
         !1 - -----limit pond irrigation to storage
         !
