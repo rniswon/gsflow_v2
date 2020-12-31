@@ -309,3 +309,14 @@ nhruOutBaseFileName
 1
 4
 ../output/nhru_out_HighKc_
+####
+dprst_add_water_use
+1
+1
+1
+#### 
+soilzone_aet_flag
+1
+1
+1
+

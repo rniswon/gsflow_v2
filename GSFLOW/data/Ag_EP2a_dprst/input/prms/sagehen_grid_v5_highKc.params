@@ -58,6 +58,12 @@ nhru
 ####
 ncol
 1
+####
+nexternal
+2
+####
+nwateruse
+14
 ** Parameters **
 ####
 mapvars_freq
