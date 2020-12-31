@@ -1944,6 +1944,7 @@
       SUBROUTINE TSREAD(IN, IOUT)
       ! READ SEGMENTS, PONDS, AND WELLS WITH TIME SERIES OUTPUT
       USE GWFAGMODULE
+      USE PRMS_MODULE, ONLY: Nhru
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS
@@ -2016,9 +2017,10 @@
                IF (UNIT == TSPONDUNIT(I)) ITEST = 1
             END DO
             IF (ITEST /= 1) CALL WRITE_HEADER('PND', NUMPOND)
-            IF (PDNM > MXPOND) THEN
-               WRITE (IOUT, *) 'Bad pond number for AG time series. '
-               CALL USTOP('Bad pond number for AG time series.')
+            IF (PDNM > Nhru) THEN
+              WRITE (IOUT, *) 'Invalid HRU ID for depression storage ',
+     +                         'reservoir for AG time series. '
+              CALL USTOP('Invalid HRU ID for AG reservoir time series.')
             END IF
          case ('DIVERSIONET')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, SGNM, R, IOUT, IN)
