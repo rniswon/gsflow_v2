@@ -147,7 +147,7 @@
       INTEGER :: MXACTWSUP, MXACTWIRR, NUMSUPHOLD, NUMIRRHOLD
       INTEGER :: MAXSEGSHOLD, NUMCOLS, NUMROWS, MAXCELLSHOLD
       INTEGER :: NUMCELLSHOLD
-      INTEGER :: NUMTABHOLD
+      INTEGER :: NUMTABHOLD, max
       ! - -----------------------------------------------------------------
       !
       !1 - --- ALLOCATE ALLOCATE CONSTANTS AND FLAGS
@@ -301,11 +301,15 @@
       !6 - --- ALLOCATE VARIABLES FOR TIME SERIES WELL INPUT RATES
       NUMTABHOLD = NUMTABWELL
       IF (NUMTABHOLD .EQ. 0) NUMTABHOLD = 1
-      ALLOCATE (TABTIMEWELL(MAXVALWELL, NUMTABHOLD))
-      ALLOCATE (TABRATEWELL(MAXVALWELL, NUMTABHOLD))
-      ALLOCATE (TABLAYWELL(MXWELL), TABROWWELL(MXWELL))
-      ALLOCATE (TABVALWELL(MXWELL), TABIDWELL(MXWELL))
-      ALLOCATE (TABCOLWELL(MXWELL),TABUNITWELL(MXWELL))
+      max = MAXVALWELL
+      IF ( max<1 ) max = 1
+      ALLOCATE (TABTIMEWELL(max, NUMTABHOLD))
+      ALLOCATE (TABRATEWELL(max, NUMTABHOLD))
+      max = max
+      IF ( max<1 ) max = 1
+      ALLOCATE (TABLAYWELL(max), TABROWWELL(max))
+      ALLOCATE (TABVALWELL(max), TABIDWELL(max))
+      ALLOCATE (TABCOLWELL(max),TABUNITWELL(max))
       TABTIMEWELL = 0.0
       TABRATEWELL = 0.0
       TABLAYWELL = 0
@@ -318,10 +322,14 @@
       !6B - --- ALLOCATE VARIABLES FOR TIME SERIES POND INPUT RATES
       NUMTABHOLD = NUMTABPOND
       IF (NUMTABHOLD .EQ. 0) NUMTABHOLD = 1
-      ALLOCATE (TABTIMEPOND(MAXVALPOND, NUMTABHOLD))
-      ALLOCATE (TABRATEPOND(MAXVALPOND, NUMTABHOLD))
-      ALLOCATE (TABVALPOND(MXPOND),TABIDPOND(MXPOND))
-      ALLOCATE (TABPONDHRU(MXPOND),TABUNITPOND(MXPOND))
+      max = MAXVALPOND
+      IF ( max<1 ) max = 1
+      ALLOCATE (TABTIMEPOND(max, NUMTABHOLD))
+      ALLOCATE (TABRATEPOND(max, NUMTABHOLD))
+      max = MXPOND
+      IF ( max<1 ) max = 1
+      ALLOCATE (TABVALPOND(max),TABIDPOND(max))
+      ALLOCATE (TABPONDHRU(max),TABUNITPOND(max))
       TABTIMEPOND = 0.0
       TABRATEPOND = 0.0
       TABPONDHRU = 0
@@ -2875,7 +2883,7 @@
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE, VKS
-      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, STRM
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW !, STRM
       USE GWFAGMODULE
       USE GLOBAL, ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
@@ -2889,7 +2897,7 @@
       double precision :: zerod7, done, dzero, pettotal,
      +                    aettotal, aetold, aetnew, etdif, 
      +                    ettest, supold, sup, sumvks
-      real :: fmaxflow
+!      real :: fmaxflow
       integer :: k, iseg, ic, ir, i
       external :: set_factor
       double precision :: set_factor
@@ -2963,7 +2971,7 @@
 !     demandconjunctive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
 !     SPECIFICATIONS:
-      USE GWFSFRMODULE, ONLY: SEG, STRM, DVRSFLW
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW !, STRM
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
@@ -2982,10 +2990,10 @@
       double precision :: zerod7, done, dzero, pettotal,
      +                    aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup !, etdif
-      real :: fmaxflow, etdif
+!      real :: fmaxflow, etdif
       integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
-      double precision :: set_factor, area_mf
+      double precision :: set_factor !, area_mf
 ! --------------------------------------------------
 !
       zerod7 = 1.0d-7
@@ -3077,7 +3085,7 @@
       double precision :: zerod7, done, dzero, pettotal,
      +                    aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup
-      real :: fmaxflow
+!      real :: fmaxflow
       integer :: k, ipond, hru_id, i
       external :: set_factor
       double precision :: set_factor
@@ -3136,7 +3144,7 @@
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GLOBAL, ONLY: DELR, DELC
-      USE GWFSFRMODULE, ONLY: SEG, STRM, NSS, DVRSFLW
+      USE GWFSFRMODULE, ONLY: SEG, NSS !, STRM, DVRSFLW
       USE GWFAGMODULE
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
       USE GWFBASMODULE, ONLY: DELT
@@ -3155,7 +3163,7 @@
       DOUBLE PRECISION :: factor, area, aet, pet, uzet
       double precision :: zerod30, done, dzero, prms_inch2mf_q
       double precision, allocatable, dimension(:) :: petseg, aetseg
-      real :: fmaxflow
+!      real :: fmaxflow
       integer :: k, iseg, hru_id, i, ic, ir, icell, irow, icol
 ! --------------------------------------------
 !
@@ -3379,7 +3387,7 @@
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: HRU_PERV
-      USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
+      USE GWFUZFMODULE, ONLY: GWET, UZFETOUT !, PETRATE
       USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_SOILZONE, ONLY: Soil_saturated
@@ -3853,6 +3861,10 @@
       !
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
+      INTEGER MSUM, MSUM1
+      REAL BUDPERC, TOTRIN, TOTROT, TOTVIN, TOTVOT
+      REAL, PARAMETER :: ZERO=0.0,TWO=0.0, HUND=100.0, SMALL=0.1
+      REAL, PARAMETER :: BIGVL1=9.99999E11, BIGVL2=9.99999E10
       CHARACTER*22 VBNMAG(MSUM)
       DIMENSION VBVLAG(4, MSUM)
       CHARACTER*17 VAL1, VAL2
@@ -3864,12 +3876,6 @@
       IF (MSUM1 .LE. 0) RETURN
       !
       !2 - -----CLEAR RATE AND VOLUME ACCUMULATORS.
-      ZERO = 0.
-      TWO = 2.
-      HUND = 100.
-      BIGVL1 = 9.99999E11
-      BIGVL2 = 9.99999E10
-      SMALL = 0.1
       TOTRIN = ZERO
       TOTROT = ZERO
       TOTVIN = ZERO

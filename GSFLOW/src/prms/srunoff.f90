@@ -32,16 +32,16 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2020-12-28'
+      character(len=*), parameter :: Version_srunoff = '2020-12-30'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
       REAL, SAVE, ALLOCATABLE :: Carea_dif(:), Imperv_stor_ante(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_stor_ante(:)
-      REAL, SAVE :: Srp, Sri, Perv_frac, Imperv_frac, Hruarea_imperv, Hruarea, Sroff_ag
-      REAL, SAVE, ALLOCATABLE :: It0_soil_rechr(:), It0_soil_moist(:), It0_Imperv_stor(:), It0_dprst_stor_hru(:)
-      REAL, SAVE, ALLOCATABLE :: It0_ag_soil_moist(:), It0_ag_soil_rechr(:)
+      REAL, SAVE, ALLOCATABLE :: It0_soil_rechr(:), It0_soil_moist(:), It0_Imperv_stor(:)
+      REAL, SAVE, ALLOCATABLE :: It0_ag_soil_moist(:), It0_ag_soil_rechr(:), Infil_ag(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_dprst_vol_open(:), It0_dprst_vol_clos(:)
+      REAL, SAVE :: Srp, Sri, Perv_frac, Imperv_frac, Hruarea_imperv, Hruarea, Sroff_ag
       DOUBLE PRECISION, SAVE :: Hruarea_dble, Basin_apply_sroff, Basin_cfgi_sroff
       INTEGER, SAVE :: Use_sroff_transfer, Isglacier
 !   Declared Variables
@@ -52,7 +52,7 @@
       REAL, SAVE, ALLOCATABLE :: Contrib_fraction(:), Imperv_evap(:)
       REAL, SAVE, ALLOCATABLE :: Hru_sroffp(:), Hru_sroffi(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Upslope_hortonian(:)
-      REAL, SAVE, ALLOCATABLE :: Hortonian_flow(:), Infil_ag(:)
+      REAL, SAVE, ALLOCATABLE :: Hortonian_flow(:)
       REAL, SAVE, ALLOCATABLE :: Hru_impervevap(:), Hru_impervstor(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Strm_seg_in(:), Hortonian_lakes(:), Hru_hortn_cascflow(:)
 !   Declared Parameters
@@ -262,7 +262,6 @@
       ENDIF
       IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
         ALLOCATE ( It0_imperv_stor(Nhru), It0_soil_moist(Nhru), It0_soil_rechr(Nhru) )
-        IF ( Dprst_flag==ACTIVE ) ALLOCATE ( It0_dprst_stor_hru(Nhru) )
         IF ( Agriculture_flag>OFF ) ALLOCATE ( It0_ag_soil_rechr(Nhru), It0_ag_soil_moist(Nhru) )
       ENDIF
 
@@ -642,8 +641,8 @@
      &    Dprst_area_clos_max, Dprst_area_open_max, Hru_area_dble, Ag_area
       USE PRMS_CLIMATEVARS, ONLY: Potet, Tavgc
       USE PRMS_FLOWVARS, ONLY: Sroff, Infil, Imperv_stor, Pkwater_equiv, Dprst_vol_open, Dprst_vol_clos, &
-     &    Imperv_stor_max, Snowinfil_max, Basin_sroff, Glacier_frac, &
-     &    Soil_moist, Soil_rechr, Ag_soil_moist, Ag_soil_rechr
+     &    Imperv_stor_max, Snowinfil_max, Basin_sroff, Glacier_frac, Soil_moist, Soil_rechr, &
+     &    Ag_soil_moist, Ag_soil_rechr
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Hru_intcpevap, Net_apply, Intcp_changeover
       USE PRMS_SNOW, ONLY: Snow_evap, Snowcov_area, Snowmelt, Pk_depth, Glacrb_melt
@@ -659,12 +658,6 @@
       REAL :: glcrmltb, temp, temp2 ! glaciers
 !***********************************************************************
       srunoffrun = 0
-      IF ( Kkiter==1 ) THEN
-        IF ( Print_debug==DEBUG_WB ) THEN
-          Imperv_stor_ante = Hru_impervstor
-          IF ( Dprst_flag==ACTIVE ) Dprst_stor_ante = Dprst_stor_hru
-        ENDIF
-      ENDIF
 
 ! It0 variables used with MODFLOW integration and PRMS iteration to save states.
       IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
@@ -673,7 +666,6 @@
           Soil_moist = It0_soil_moist
           Soil_rechr = It0_soil_rechr
           IF ( Dprst_flag==ACTIVE ) THEN
-            Dprst_stor_hru = It0_dprst_stor_hru
             Dprst_vol_open = It0_dprst_vol_open
             Dprst_vol_clos = It0_dprst_vol_clos
           ENDIF
@@ -686,7 +678,6 @@
           It0_soil_moist = Soil_moist
           It0_soil_rechr = Soil_rechr
           IF ( Dprst_flag==ACTIVE ) THEN
-            It0_dprst_stor_hru = Dprst_stor_hru
             It0_dprst_vol_open = Dprst_vol_open
             It0_dprst_vol_clos = Dprst_vol_clos
           ENDIF
@@ -694,6 +685,12 @@
             It0_ag_soil_moist = Ag_soil_moist
             It0_ag_soil_rechr = Ag_soil_rechr
           ENDIF
+        ENDIF
+      ENDIF
+      IF ( Kkiter==1 ) THEN
+        IF ( Print_debug==DEBUG_WB ) THEN
+          Imperv_stor_ante = Hru_impervstor
+          IF ( Dprst_flag==ACTIVE ) Dprst_stor_ante = Dprst_stor_hru
         ENDIF
       ENDIF
 
@@ -732,10 +729,6 @@
 
         Hruarea = Hru_area(i)
         Hruarea_dble = Hru_area_dble(i)
-        perv_area = Hru_perv(i)
-        Perv_frac = Hru_frac_perv(i)
-        perv_on = OFF
-        IF ( perv_area>0.0 ) perv_on = ACTIVE
         upslope = 0.0D0
         IF ( Cascade_flag>CASCADE_OFF ) upslope = Upslope_hortonian(i)
         ag_on = OFF
@@ -770,6 +763,10 @@
           CYCLE
         ENDIF
 
+        perv_area = Hru_perv(i)
+        Perv_frac = Hru_frac_perv(i)
+        perv_on = OFF
+        IF ( perv_area>0.0 ) perv_on = ACTIVE
         Srp = 0.0
         Sri = 0.0
         Sroff_ag = 0.0
@@ -1260,7 +1257,6 @@
       ENDIF
 
       END SUBROUTINE check_capacity
-
 
 !***********************************************************************
 ! fill soil to ag_soil_moist_max, if more than capacity restrict
