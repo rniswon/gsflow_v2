@@ -10,13 +10,16 @@
       USE GSFMODFLOW, ONLY: Mfq2inch_conv, Gwc_col, Gwc_row, &
                             Mfl2_to_acre, Mfl_to_inch
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Gw2sm_grav, Hru_ag_irr
+      USE PRMS_WATER_USE, ONLY: Dprst_gain
       USE GWFUZFMODULE, ONLY: SEEPOUT
       USE PRMS_MODULE, ONLY: Process, Nhrucell, Gvr_cell_id
       USE GLOBAL,       ONLY: IUNIT
       USE GWFBASMODULE, ONLY: DELT
+      USE GSFMODFLOW, ONLY: Mfl3_to_ft3, Mft_to_sec
       USE GWFAGMODULE, ONLY: NUMIRRWELSP, IRRWELVAR, NUMCELLS, WELLIRRPRMS, IRRROW_SW, &
      &                       NUMIRRDIVERSIONSP, IRRSEG, DVRCH, DIVERSIONIRRPRMS, IRRROW_GW, &
-     &                       NUMIRRPONDSP, NUMCELLSPOND, IRRHRU_POND, PONDIRRPRMS
+     &                       NUMIRRPONDSP, NUMCELLSPOND, IRRHRU_POND, PONDIRRPRMS, PONDSEGFLOW, &
+     &                       IRRPONDVAR
       IMPLICIT NONE
 ! Functions
       EXTERNAL print_module
@@ -27,6 +30,7 @@
       INTEGER :: i, j, k, ihru
       integer :: IRWL,NMCL,SGNM
       DOUBLE PRECISION :: mf_q2prms_inchacres
+      real :: conversion
 !***********************************************************************
       gsflow_mf2prms = 0
 
@@ -65,16 +69,18 @@
             END DO
           END DO
 !
-! From open depression storage reservoirs
+! From open depression storage reservoirs and streams to storage reservoirs
 !
           DO i = 1, NUMIRRPONDSP
+            J = IRRPONDVAR(i)
+            conversion = Mfl3_to_ft3/Mft_to_sec
+            dprst_gain(J) = PONDSEGFLOW(J)*conversion   !need to check that depression storage is active
             DO k = 1, NUMCELLSPOND(i)
               ihru = IRRHRU_POND(k, i)
               Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + PONDIRRPRMS(k, i)*SNGL(mf_q2prms_inchacres)
             END DO
           END DO
         END IF
-
       ELSEIF ( Process(:4)=='decl' ) THEN
         CALL print_module(MODDESC, MODNAME, Version_gsflow_mf2prms)
       ENDIF
