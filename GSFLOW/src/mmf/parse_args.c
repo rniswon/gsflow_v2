@@ -73,7 +73,7 @@ void parse_args (int argc, char **argv, int *set_count, char **set_name, char **
          } else if (!strncmp(argv[i],"-set",4)){
 
             if ((*set_count) >= set_size) {
-               printf("parse_args: Overflow. Too many command line arguements set with -set flag.\n\n\n");
+               printf("parse_args: Overflow. Too many command line arguments set with -set flag.\n\n\n");
                exit(1);
             }
 
