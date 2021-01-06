@@ -397,7 +397,6 @@
       USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, &
      &    Inch_to_mfl_t, Gwc_row, Gwc_col, Mft_to_days
       USE GLOBAL, ONLY: IBOUND
-!     USE GLOBAL, ONLY: IOUT
       USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, IGSFLOW, FINF
       USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK, NLAKES
       USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes
@@ -427,8 +426,8 @@
 !-----------------------------------------------------------------------
       IF ( Have_lakes==ACTIVE ) THEN
         RNF = 0.0
-        PRCPLK = 0.0
-        EVAPLK = 0.0
+        PRCPLK = 0.0D0
+        EVAPLK = 0.0D0
         DO ii = 1, Active_hrus
           j = Hru_route_order(ii)
           IF ( Hru_type(j)==2 ) THEN

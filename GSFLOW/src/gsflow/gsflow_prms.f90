@@ -402,7 +402,7 @@
         IF ( Process_flag==RUN ) RETURN
       ENDIF
 
-      IF ( Climate_potet_flag==0 ) THEN
+      IF ( Climate_potet_flag==OFF ) THEN
         IF ( Et_flag==potet_jh_module ) THEN
           call_modules = potet_jh()
         ELSEIF ( Et_flag==potet_hamon_module ) THEN
@@ -567,11 +567,9 @@
      &                                 Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
           ENDIF
         ENDIF
-        IF ( Print_debug>DEBUG_minimum ) THEN
-          IF ( Model==PRMS .OR. Model==GSFLOW ) &
-     &         WRITE ( PRMS_output_unit,'(A,I5,A,F6.2,A,/)') 'Execution elapsed time', Elapsed_time_minutes, ' minutes', &
-     &                                                       Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
-        ENDIF
+        IF ( Print_debug>DEBUG_minimum ) &
+     &       WRITE ( PRMS_output_unit,'(A,I5,A,F6.2,A,/)') 'Execution elapsed time', Elapsed_time_minutes, ' minutes', &
+     &                                                     Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
         IF ( Print_debug>DEBUG_minimum ) CLOSE ( PRMS_output_unit )
         IF ( Save_vars_to_file==ACTIVE ) CLOSE ( Restart_outunit )
         STOP
@@ -656,7 +654,7 @@
       ! Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
       IF ( Model_mode(:4)=='PRMS' .OR. Model_mode(:4)=='prms' .OR. Model_mode(:5)=='DAILY' ) THEN
         Model = PRMS
-      ELSEIF ( Model_mode(:6)=='GSFLOW' .OR. Model_mode(:4)=='    ' .OR. Model_mode(:4)=='gsflow' ) THEN
+      ELSEIF ( Model_mode(:6)=='GSFLOW' .OR. Model_mode(:4)=='gsflow' ) THEN
         Model = GSFLOW
         GSFLOW_flag = ACTIVE
       ELSEIF ( Model_mode(:7)=='MODFLOW' .OR. Model_mode(:7)=='modflow' ) THEN
@@ -1176,8 +1174,12 @@
 
       Water_use_flag = OFF
       IF ( Nwateruse>0 ) THEN
-        IF ( Segment_transferON_OFF==1 .OR. Gwr_transferON_OFF==1 .OR. External_transferON_OFF==1 .OR. &
-     &       Dprst_transferON_OFF==1 .OR. Lake_transferON_OFF==1 .OR. Nconsumed>0 .OR. Nwateruse>0 ) Water_use_flag = 1
+        IF ( Segment_transferON_OFF==ACTIVE .OR. Gwr_transferON_OFF==ACTIVE .OR. External_transferON_OFF==ACTIVE .OR. &
+     &       Dprst_transferON_OFF==ACTIVE .OR. Lake_transferON_OFF==ACTIVE ) Water_use_flag = ACTIVE
+        IF ( Water_use_flag==OFF ) THEN
+          PRINT *, 'WARNING, nwateruse specified > 0 without transfers active'
+          Nwateruse = 0
+        ENDIF
       ENDIF
 
       IF ( Segment_transferON_OFF==ACTIVE .OR. Gwr_transferON_OFF==ACTIVE .OR. External_transferON_OFF==ACTIVE .OR. &
