@@ -66,8 +66,9 @@
       REAL, SAVE, ALLOCATABLE :: Dprst_depth_avg(:), Sro_to_dprst_imperv(:), Dprst_et_coef(:)
 !   Declared Variables for Depression Storage
       DOUBLE PRECISION, SAVE :: Basin_dprst_sroff, Basin_dprst_evap, Basin_dprst_seep
-      DOUBLE PRECISION, SAVE :: Basin_dprst_volop, Basin_dprst_volcl
+      DOUBLE PRECISION, SAVE :: Basin_dprst_volop, Basin_dprst_volcl !, Basin_dprst_hortonian_lakes
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_stor_hru(:), Dprst_sroff_hru(:), Dprst_seep_hru(:)
+!      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Upslope_dprst_hortonian(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_area_open(:), Dprst_area_clos(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_insroff_hru(:), Dprst_evap_hru(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_vol_frac(:), Dprst_vol_open_frac(:), Dprst_vol_clos_frac(:)
@@ -226,6 +227,11 @@
         IF ( declvar(MODNAME, 'dprst_area_clos', 'nhru', Nhru, 'real', &
      &       'Surface area of closed surface depressions based on storage volume for each HRU', &
      &       'acres', Dprst_area_clos)/=0 ) CALL read_error(3, 'dprst_area_clos')
+
+!        ALLOCATE ( Upslope_dprst_hortonian(Nhru) )
+!        IF ( declvar(MODNAME, 'upslope_dprst_hortonian', 'nhru', Nhru, 'double', &
+!     &       'Upslope surface-depression spillage and interflow for each HRU',   &
+!     &       'inches', Upslope_dprst_hortonian)/=0 ) CALL read_error(3,'upslope_dprst_hortonian')
 
         ALLOCATE ( Dprst_stor_hru(Nhru) )
         IF ( declvar(MODNAME, 'dprst_stor_hru', 'nhru', Nhru, 'double', &

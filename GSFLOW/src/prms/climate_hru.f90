@@ -15,7 +15,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2020-12-02'
+        character(len=*), parameter :: Version_climate_hru = '2020-01-06'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit, Aet_unit, Irrigated_area_unit
         ! Control Parameters
@@ -124,7 +124,7 @@
           ELSE
             READ ( Aet_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Aet_external(i), i=1,Nhru)
           ENDIF
-          Aet_external = Aet_external*0.25 ! temporary testing value
+          Aet_external = Aet_external
           IF ( ios/=0 ) THEN
             ierr = 1
           ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
@@ -482,7 +482,7 @@
           ENDIF
         ENDIF
 
-       IF ( Climate_potet_flag==ACTIVE ) THEN
+       IF ( Aet_cbh_flag==ACTIVE ) THEN
           IF ( control_string(Aet_file, 'aet_file')/=0 ) CALL read_error(5, 'aet_file')
           CALL find_header_end(Aet_unit, Aet_file, 'aet_file', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN

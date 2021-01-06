@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2020-12-28'
+      character(len=*), parameter :: Version_soilzone = '2021-01-06'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -822,10 +822,6 @@
 !      Gvr_stor_frac = 0.0
 !      Cpr_stor_frac = 0.0
 !      Soil_moist_frac = 0.0
-      IF ( Agriculture_flag>OFF ) THEN
-        Ag_soil_rechr = 0.0
-        Ag_soil_moist = 0.0
-      ENDIF
       Snow_free = 1.0 - Snowcov_area
 
       DO i = 1, Nhru
