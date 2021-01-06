@@ -7,7 +7,7 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2020-12-16'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-01-06'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -73,7 +73,7 @@
      &     'Net volumetric flow rate of gravity drainage from the'// &
      &     ' soil zone to the unsaturated and saturated zones', &
      &     'L3/T', Net_sz2gw)/=0 ) CALL read_error(3, 'net_sz2gw')
-      
+
 !     ALLOCATE (Reach_latflow(Nreach))
 !     IF ( decl var(MODNAME, 'reach_latflow', 'nreach', Nreach, 'double', &
 !    &     'Lateral flow (surface runoff and interflow) into each stream reach', &
@@ -396,11 +396,12 @@
       USE GSFPRMS2MF
       USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, &
      &    Inch_to_mfl_t, Gwc_row, Gwc_col, Mft_to_days
-      USE GLOBAL, ONLY: IBOUND
-!     USE GLOBAL, ONLY: IOUT
+      USE GLOBAL, ONLY: IBOUND, IUNIT
+      USE GWFAGMODULE, ONLY: NUMIRRPONDSP
       USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, IGSFLOW, FINF
       USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK, NLAKES
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes
+      USE PRMS_CONSTANTS, ONLY: Active
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Dprst_flag
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_area, Lake_hru_id
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Hru_actet
@@ -408,8 +409,7 @@
       USE PRMS_SOILZONE, ONLY: Sm2gw_grav, Lakein_sz, Hrucheck, Gvr_hru_id, Unused_potet, Gvr_hru_pct_adjusted
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
-      INTEGER, EXTERNAL :: toStream
-      INTEGER, EXTERNAL :: toIrr
+      INTEGER, EXTERNAL :: toStream, toIrr
       EXTERNAL Bin_percolation
 ! Local Variables
       INTEGER :: irow, icol, ik, jk, ii, ilake
@@ -424,7 +424,11 @@
 !-----------------------------------------------------------------------
 ! Remove open dprst storage for irrigation
 !-----------------------------------------------------------------------
-      IF ( toIrr()/=0 ) RETURN
+       IF ( IUNIT(66)>0 .AND. Dprst_flag==Active ) THEN
+         IF ( NUMIRRPONDSP>0 ) THEN
+           IF ( toIrr()/=0 ) RETURN
+         ENDIF
+       ENDIF
 
 !-----------------------------------------------------------------------
 ! Add runoff and precip to lakes
@@ -432,8 +436,8 @@
 !-----------------------------------------------------------------------
       IF ( Have_lakes==ACTIVE ) THEN
         RNF = 0.0
-        PRCPLK = 0.0
-        EVAPLK = 0.0
+        PRCPLK = 0.0D0
+        EVAPLK = 0.0D0
         DO ii = 1, Active_hrus
           j = Hru_route_order(ii)
           IF ( Hru_type(j)==2 ) THEN
@@ -554,12 +558,12 @@
 
       toStream = 0
 
-    END FUNCTION toStream
-    
+      END FUNCTION toStream
+
 !***********************************************************************
 !***********************************************************************
       INTEGER FUNCTION toIrr()
-      
+
       USE GWFAGMODULE, ONLY: NUMIRRPONDSP, IRRPONDVAR, PONDFLOW
       USE PRMS_WATER_USE, ONLY: Dprst_transfer
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open

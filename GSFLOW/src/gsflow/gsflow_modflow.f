@@ -4,12 +4,12 @@
       MODULE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE, OFF,
      +    MODFLOW, GSFLOW, ERROR_modflow, ERROR_time
-      USE PRMS_MODULE, ONLY: Print_debug, Model, GSFLOW_flag, Have_lakes
+      USE PRMS_MODULE, ONLY: Print_debug, Model, GSFLOW_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2020-12-23'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-01-05'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -97,17 +97,17 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
       IF ( Print_debug>DEBUG_minimum )
      &     WRITE (*,1) MFVNAM,VERSION(:15),VERSION2(:17),VERSION3(:17)
     1 FORMAT (/,28X,'MODFLOW',A,/,
-     &2X,'U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE',
-     &' GROUNDWATER-FLOW MODEL',/,25X,'WITH NEWTON FORMULATION',
-     &  /,25X,'Version ',A/,14X,'BASED ON MODFLOW-2005 Version ',A,
-     &  /,22X,'SWR1 Version ',A/)
+     &        '  U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE',
+     &        ' GROUNDWATER-FLOW MODEL',/,25X,'WITH NEWTON FORMULATION',
+     &        /,25X,'Version ',A,/,14X,'BASED ON MODFLOW-2005 Version ',
+     &        A,/,22X,'SWR1 Version ',A,/)
 
       IF ( GSFLOW_flag==ACTIVE ) THEN
         IF ( Print_debug>DEBUG_less ) WRITE ( *, 8 )
     8 FORMAT (14X, 'PROCESSES: GWF and OBS', /, 14X,
      &        'PACKAGES:  BAS, BCF, CHD, DE4, FHB, GAG, GHB,',
-     &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT,',
-     &        /, 25X, 'PCG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
+     &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,',
+     &        /, 25X, 'AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
 
         ! Allocate local module variables
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
@@ -126,12 +126,11 @@ C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
-     &    Kper_mfo, Diversion2soil_flag, NLAKES_MF
+     &    Kper_mfo, Diversion2soil_flag, Have_lakes, NLAKES_MF
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
       USE GWFLAKMODULE, ONLY: NLAKES
-!gsf  USE PCGN
       IMPLICIT NONE
       INTEGER :: I
       INCLUDE 'openspec.inc'
@@ -143,12 +142,10 @@ C1------USE package modules.
       EXTERNAL :: gsflow_modflow_restart, set_cell_values, error_stop
 ! Local Variables
       INTEGER :: MAXUNIT, NC
-!     INTEGER :: kkper_new
 C
       CHARACTER*80 HEADNG(2)
       CHARACTER*200 FNAME
       CHARACTER*4 solver
-!gsf  INTEGER IBDT(8)
 C
       CHARACTER*4 CUNIT(NIUNIT)
       DATA CUNIT/'BCF6', 'WEL ', 'DRN ', 'RIV ', 'EVT ', 'gfd ', 'GHB ',  !  7
@@ -166,13 +163,6 @@ C     ------------------------------------------------------------------
       gsfinit = 0
 C
 C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
-!gsf  WRITE (*,1) MFVNAM,VERSION,VERSION2,VERSION3  !rsr moved to declare procedure
-!gsf1 FORMAT (/,34X,'MODFLOW',A,/,
-!gsf &4X,'U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE',
-!gsf &' GROUNDWATER-FLOW MODEL',/,29X,'WITH NEWTON FORMULATION',
-!gsf &  /,29X,'Version ',A/,20X,'BASED ON MODFLOW-2005 Version ',A/,
-!gsf &  /,20X,'SWR1 Version ',A/)
-!rsr ?? what should IOUTS be
       IOUTS = 432
       IGRID=1
       NSOL=1
@@ -188,16 +178,14 @@ C
 C4------OPEN NAME FILE.
       NC = numchars(FNAME)
       OPEN (UNIT=INUNIT,FILE=FNAME(1:NC),STATUS='OLD',ACTION=ACTION(1))
-!gsf  NC=INDEX(FNAME,' ') !rsr, moved below
-!gsf  WRITE(*,490)' Using NAME file: ',FNAME(1:NC)
   490 FORMAT(A,A)
 C
 C5------Get current date and time, assign to IBDT, and write to screen
       CALL DATE_AND_TIME(VALUES=IBDT)
       IF ( Model>GSFLOW )
      &     WRITE(*,2) (IBDT(I),I=1,3),(IBDT(I),I=5,7)
-    2 FORMAT(1X,'Run start date and time (yyyy/mm/dd hh:mm:ss): ',
-     &I4,'/',I2.2,'/',I2.2,1X,I2,':',I2.2,':',I2.2,/)
+    2 FORMAT(' Run start date and time (yyyy/mm/dd hh:mm:ss): ',
+     &       I0,'/',I2.2,'/',I2.2,I3,2(':',I2.2),/)
 C
 C6------ALLOCATE AND READ (AR) PROCEDURE
       IGRID=1
@@ -247,82 +235,71 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
 
 ! Packages available in NWT but not in GSFLOW
       IF ( GSFLOW_flag==ACTIVE ) THEN
-      IF ( IUNIT(3)>0 ) THEN
-        PRINT *, 'DRN Package not supported'
-        ierr = 1
-      ENDIF
-      IF ( IUNIT(4)>0 ) THEN
-        PRINT *, 'RIV Package not supported'
-        ierr = 1
-      ENDIF
-      IF ( IUNIT(5)>0 ) THEN
-        PRINT *, 'EVT Package not supported'
-        ierr = 1
-      ENDIF
-      IF ( IUNIT(8)>0 ) THEN
-        PRINT *, 'RCH Package not supported'
-        ierr = 1
-      ENDIF
-      IF ( IUNIT(17)>0 ) THEN
-        PRINT *, 'RES Package not supported'
-        ierr = 1
-      ENDIF
-      IF ( IUNIT(18)>0 ) THEN
-        PRINT *, 'STR Package not supported'
-        ierr = 1
-      ENDIF
-      IF ( IUNIT(19)>0 ) THEN
-        PRINT *, 'IBS Package not supported'
-        ierr = 1
-      ENDIF
-      IF ( IUNIT(33)>0 ) THEN
-        PRINT *, 'OBS DRN Package not supported'
-        ierr = 1
-      ENDIF
-      IF ( IUNIT(34)>0 ) THEN
-        PRINT *, 'OBS RIV Package not supported'
-        ierr = 1
-      ENDIF
-      IF ( IUNIT(36)>0 ) THEN
-        PRINT *, 'OBS STR Package not supported'
-        ierr = 1
-      ENDIF
-      IF ( IUNIT(39)>0 ) THEN
-        PRINT *, 'ETS Package not supported'
-        ierr = 1
-      ENDIF
-      IF ( IUNIT(40)>0 ) THEN
-        PRINT *, 'DRT Package not supported'
-        ierr = 1
-      ENDIF
-      IF ( IUNIT(43)>0 ) THEN
-        PRINT *, 'HYD Package not supported'
-        ierr = 1
-      ENDIF
-!      IF ( IUNIT(49)>0 ) THEN
-!        PRINT *, 'LMT Package not supported'
-!        ierr = 1
-!      ENDIF
-      IF ( IUNIT(54)>0 ) THEN
-        PRINT *, 'SUB Package not supported'
-        ierr = 1
-      ENDIF
-!      IF ( IUNIT(57)>0 ) THEN
-!        PRINT *, 'SWT Package not supported'
-!        ierr = 1
-!      ENDIF
-      IF ( IUNIT(64)>0 ) THEN
-        PRINT *, 'SWR Package not supported'
-        ierr = 1
-      ENDIF
-!      IF ( IUNIT(65)>0 ) THEN
-!        PRINT *, 'SWI Package not supported'
-!        ierr = 1
-!      ENDIF
+        IF ( IUNIT(3)>0 ) THEN
+          PRINT *, 'DRN Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(4)>0 ) THEN
+          PRINT *, 'RIV Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(5)>0 ) THEN
+          PRINT *, 'EVT Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(8)>0 ) THEN
+          PRINT *, 'RCH Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(17)>0 ) THEN
+          PRINT *, 'RES Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(18)>0 ) THEN
+          PRINT *, 'STR Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(19)>0 ) THEN
+          PRINT *, 'IBS Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(33)>0 ) THEN
+          PRINT *, 'OBS DRN Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(34)>0 ) THEN
+          PRINT *, 'OBS RIV Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(36)>0 ) THEN
+          PRINT *, 'OBS STR Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(39)>0 ) THEN
+          PRINT *, 'ETS Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(40)>0 ) THEN
+          PRINT *, 'DRT Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(43)>0 ) THEN
+          PRINT *, 'HYD Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(54)>0 ) THEN
+          PRINT *, 'SUB Package not supported'
+          ierr = 1
+        ENDIF
+        IF ( IUNIT(64)>0 ) THEN
+          PRINT *, 'SWR Package not supported'
+          ierr = 1
+        ENDIF
       ENDIF
       IF ( ierr==1 ) CALL error_stop('INVALID PACKAGE SELECTION',
      &                               ERROR_modflow)
 
+      Have_lakes = OFF
       IF ( IUNIT(22).GT.0 ) Have_lakes = ACTIVE
       IF(IUNIT(1).GT.0) CALL GWF2BCF7AR(IUNIT(1),IGRID)
       IF(IUNIT(23).GT.0) CALL GWF2LPF7AR(IUNIT(23),IGRID)
@@ -369,7 +346,6 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
       IF(IUNIT(13).GT.0) CALL PCG7AR(IUNIT(13),MXITER,IGRID)
 c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
 !      IF(IUNIT(42).GT.0) CALL GMG7AR(IUNIT(42),MXITER,IGRID)
-!      IF(IUNIT(59).GT.0) CALL PCGN2AR(IUNIT(59),IFREFM,MXITER,IGRID)
       IF(IUNIT(50).GT.0) CALL GWF2MNW27AR(IUNIT(50),IGRID)
       IF(IUNIT(51).GT.0) CALL GWF2MNW2I7AR(IUNIT(51),IUNIT(50),IGRID)
       IF(IUNIT(52).GT.0) CALL GWF2MNW17AR(IUNIT(52),IUNIT(9),
@@ -412,7 +388,6 @@ C7------SIMULATE EACH STRESS PERIOD.
 
       IF ( IUNIT(63)>0 ) solver = 'NWT'
       IF ( IUNIT(13)>0 ) solver = 'PCG'
-!      IF ( IUNIT(42)>0 ) solver = 'PCGN'
       IF ( IUNIT(9)>0 ) solver = 'SIP'
       IF ( IUNIT(10)>0 ) solver = 'DE47'
 !      IF ( IUNIT(42)>0 ) solver = 'GMG'
@@ -492,7 +467,6 @@ c     USE LMGMODULE
       USE SIPMODULE
       USE DE4MODULE
 !gsf  USE GMGMODULE
-!gsf  USE PCGN
       USE GWFNWTMODULE, ONLY:ITREAL, ICNVGFLG
       IMPLICIT NONE
       INTEGER I
@@ -738,7 +712,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF(IUNIT(57).GT.0) CALL GWF2SWT7FM(KKPER,IGRID)
             IF(IUNIT(64).GT.0) CALL GWF2SWR7FM(KKITER,KKPER,KKSTP,IGRID)  !SWR - JDH
             IF(IUNIT(66).GT.0 ) 
-     +         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63))
+     1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63))
 !            IF(IUNIT(66).GT.0) CALL GWF2GFB7FM(IGRID)
 C-------------SWI2 FORMULATE (GWF2SWI2FM) NEEDS TO BE THE LAST PACKAGE
 C             ENTRY SINCE SWI2 SAVES THE RHS (RHSFRESH) PRIOR TO ADDING SWI TERMS
@@ -791,10 +765,6 @@ c            END IF
 !     4                         IOUT,GMGID,
 !     5                         IUNITMHC,DUP,DLOW,CHGLIMIT,
 !     6                         BIGHEADCHG,HNEWLAST)
-!            ENDIF
-!            IF (IUNIT(59).GT.0) THEN
-!              CALL PCGN2AP(HNEW,RHS,CR,CC,CV,HCOF,IBOUND,
-!     1              KKITER,KKSTP,KKPER,ICNVG,HNOFLO,IGRID)
 !            ENDIF
 ! Calculate new heads using Newton solver
           IF(IUNIT(63).GT.0 ) 
@@ -904,7 +874,6 @@ C7C4----CALCULATE BUDGET TERMS. SAVE CELL-BY-CELL FLOW TERMS.
           IF(IUNIT(8).GT.0) THEN
              IF(IUNIT(22).GT.0.AND.NRCHOP.EQ.3) CALL GWF2LAK7ST(
      1                                                     0,IGRID)
-!             CALL GWF2RCH7BD(KKSTP,KKPER,IUNIT(44),IGRID)
              CALL GWF2RCH7BD(KKSTP,KKPER,IGRID) 
              IF(IUNIT(22).GT.0.AND.NRCHOP.EQ.3) CALL GWF2LAK7ST(
      1                                                     1,IGRID)
@@ -1028,12 +997,12 @@ C
       ENDIF
 
  9001 FORMAT ('ERROR in ', A, ' module, arg = run.',
-     &        ' Called from gsfrun.', /, 'Return val =', I2)
- 9002 FORMAT('Date:', I5, 2('/',I2.2), '; Stress:', I3, '; Step:', I6,
-     &       '; Simulation step:', I5, /, 18X, 'MF iterations:', I9,
-     &       '; SZ iterations:', I7, /)
+     &        ' Called from gsfrun.', /, 'Return val = ', I0)
+ 9002 FORMAT('Date: ', I0, 2('/',I2.2), '; Stress: ', I0, '; Step: ',I0,
+     &       '; Simulation step: ', I0, /, 18X, 'MF iterations: ', I0,
+     &       '; SZ iterations: ', I0, /)
  9004 FORMAT('***TIME STEP FAILED TO CONVERGE - Date:', I5, 2('/',I2.2),
-     &       ' number:', I6, /)
+     &       ' number: ', I0, /)
 
       END FUNCTION gsfrun
 !
@@ -1047,7 +1016,6 @@ C
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
-!gsf  USE PCGN
       USE GWFNWTMODULE, ONLY:LINMETH
       IMPLICIT NONE
       EXTERNAL :: RESTART1WRITE, gsflow_modflow_restart
@@ -1153,7 +1121,7 @@ C10-----END OF PROGRAM.
         WRITE(*,*) 'FAILED TO MEET SOLVER CONVERGENCE CRITERIA ',
      1          NCVGERR,' TIME(S)'
       ELSE
-        WRITE(*,*) ' Normal termination of simulation'
+        PRINT '(A,/)', ' Normal termination of simulation'
       END IF
 
 !gsf  CALL USTOP(' ')
@@ -1167,7 +1135,7 @@ C10-----END OF PROGRAM.
      &        ' Maximum MF iterations:', I6,
      &        ';  Maximum SZ iterations:', I8, /)
  9003 FORMAT (A, 2X, 10I5, /, 10(28X, 10I5, /), /)
- 9005 FORMAT ('mxsziter reached:', I4, /)
+ 9005 FORMAT ('mxsziter reached: ', I0, /)
  9007 FORMAT (A, 10I5, /, 10(28X, 10I5, /))
 
 C
@@ -1235,7 +1203,6 @@ C
 C     ******************************************************************
 C     Get end time and calculate elapsed time
 C     ******************************************************************
-C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       INTRINSIC :: INT
@@ -1248,7 +1215,7 @@ C     Get current date and time, assign to IEDT, and write.
       CALL DATE_AND_TIME(VALUES=IEDT)
       WRITE(*,1000) (IEDT(I),I=1,3),(IEDT(I),I=5,7)
  1000 FORMAT(/,1X,'Run end date and time (yyyy/mm/dd hh:mm:ss): ',
-     &I4,'/',I2.2,'/',I2.2,1X,I2,':',I2.2,':',I2.2)
+     &       I4,2('/',I2.2),I3,2(':',I2.2))
       IF(IPRTIM.GT.0) THEN
         WRITE(IOUT,'(1X)')
         WRITE(IOUT,1000) (IEDT(I),I=1,3),(IEDT(I),I=5,7)
@@ -1309,19 +1276,19 @@ C
 C     Write elapsed time to screen
         IF (NDAYS.GT.0) THEN
           WRITE(*,1010) NDAYS,NHOURS,NMINS,NRSECS
- 1010     FORMAT(1X,'Elapsed run time: ',I3,' Days, ',I2,' Hours, ',I2,
-     &      ' Minutes, ',I2,' Seconds',/)
+ 1010     FORMAT(' Elapsed run time: ',I0,' Days, ',I0,' Hours, ',I0,
+     &           ' Minutes, ',I0,' Seconds',/)
         ELSEIF (NHOURS.GT.0) THEN
           WRITE(*,1020) NHOURS,NMINS,NRSECS
- 1020     FORMAT(1X,'Elapsed run time: ',I2,' Hours, ',I2,
-     &      ' Minutes, ',I2,' Seconds',/)
+ 1020     FORMAT(' Elapsed run time: ',I0,' Hours, ',I0,
+     &           ' Minutes, ',I0,' Seconds',/)
         ELSEIF (NMINS.GT.0) THEN
           WRITE(*,1030) NMINS,NSECS,MSECS
- 1030     FORMAT(1X,'Elapsed run time: ',I2,' Minutes, ',
-     &      I2,'.',I3.3,' Seconds',/)
+ 1030     FORMAT(' Elapsed run time: ',I0,' Minutes, ',
+     &      I0,'.',I3.3,' Seconds',/)
         ELSE
           WRITE(*,1040) NSECS,MSECS
- 1040     FORMAT(1X,'Elapsed run time: ',I2,'.',I3.3,' Seconds',/)
+ 1040     FORMAT(' Elapsed run time: ',I0,'.',I3.3,' Seconds',/)
         ENDIF
 C
 C     Write times to file if requested
@@ -1444,11 +1411,11 @@ C
         now = getjulday(Start_month, Start_day, Start_year,
      &                  Starttime(4), Starttime(5), seconds)
       ENDIF
-      IF ( now.LT.Stress_dates(KPERTEST) )
+      IF ( now<Stress_dates(KPERTEST) )
      &     STOP 'ERROR, now<stress period time'
-      IF ( now.GT.Stress_dates(NPER) ) THEN
+      IF ( now>Stress_dates(NPER) ) THEN
         GET_KPER = NPER
-      ELSEIF ( now.LT.Stress_dates(KPER+1) ) THEN
+      ELSEIF ( now<Stress_dates(KPER+1) ) THEN
         GET_KPER = KPER
       ELSE
         GET_KPER = KPER + 1
@@ -1544,12 +1511,10 @@ C
           ENDIF
         ENDIF
         Stress_dates(i+1) = Stress_dates(i) + plen
-!        print *, 'PERLEN', PERLEN(i), plen, Mft_to_days
       ENDDO
  222  FORMAT ( /, 'Steady state simulation did not converge ', I0)
  223  FORMAT ( /, 'Steady state simulation successful, used ', I0,
      &         ' iterations')
-!      print *, 'stress dates:', Stress_dates
 
       Modflow_skip_stress = 0
       Modflow_skip_time_step = 0
@@ -1587,7 +1552,6 @@ C
               CALL GWF2BAS7OC(KSTP,KPER,1,IUNIT(12),IGRID)  !RGN 4/4/2018 skip through OC file
             END DO
           ENDDO
-!        print *, nstress, n, Modflow_time_in_stress, Modflow_skip_stress
         ENDIF
         KPERSTART = KPER
         TOTIM = TOTIM + INT(Modflow_skip_time/Mft_to_days) ! TOTIM includes SS time as set above, rsr
@@ -1621,57 +1585,47 @@ C
 !***********************************************************************
       SUBROUTINE ZERO_SPECIFIED_FLOWS(Iunitlak,Iunitsfr)
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum
-      USE PRMS_MODULE, ONLY: Print_debug !, Logunt
+      USE PRMS_MODULE, ONLY: Print_debug
       USE GWFSFRMODULE, ONLY: NSTRM, STRM
       USE GWFLAKMODULE, ONLY: PRCPLK, EVAPLK, RNF, WTHDRW, NLAKES
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Iunitlak, Iunitsfr
-      INTRINSIC :: SNGL
+      INTRINSIC :: ABS, SNGL
 ! Local Variables
       INTEGER :: i, j 
-      REAL :: ZERO, TESTSFR, TESTLAK
+      REAL :: TESTSFR, TESTLAK
 !***********************************************************************
 ! Zero SFR flows (RUNOFF, ETSW, and PPTSW)
-      ZERO = 0.0
       TESTSFR = 0.0
       TESTLAK = 0.0
-      IF ( Iunitsfr.GT.0 ) THEN
-        DO i =1, NSTRM
-          DO j=12,14
+      IF ( Iunitsfr>0 ) THEN
+        DO i = 1, NSTRM
+          DO j = 12,14
             TESTSFR = TESTSFR + ABS(STRM(j,i))
-            STRM(j,i) = ZERO
+            STRM(j,i) = 0.0
           END DO
         END DO
-        IF ( TESTSFR.GT.1.0D0 ) THEN
-          IF ( Print_debug>DEBUG_minimum ) THEN
-!            WRITE (Logunt, 10)
-            WRITE (*, 10)
-          ENDIF
+        IF ( TESTSFR>1.0 ) THEN
+          IF ( Print_debug>DEBUG_minimum ) PRINT 10
         END IF
       END IF
 ! Zero LAK flows (PPT, EVAP, RUNOFF, SP.WITHDRAWL).
-      IF ( Iunitlak.GT.0 ) THEN
+      IF ( Iunitlak>0 ) THEN
         DO i = 1, NLAKES
           TESTLAK = TESTLAK + SNGL(ABS(PRCPLK(i)) + ABS(EVAPLK(i))) + 
      +              ABS(RNF(i)) + ABS(WTHDRW(i))
-          IF ( TESTLAK.GT.1.0 ) EXIT
+          IF ( TESTLAK>1.0 ) EXIT
         END DO
-        PRCPLK = ZERO
-        EVAPLK = ZERO
-        RNF = ZERO
-        WTHDRW = ZERO
-        IF ( TESTLAK.GT.1.0 ) THEN
-          IF ( Print_debug>DEBUG_minimum ) THEN
-!            WRITE (Logunt, 11)
-            WRITE (*, 11)
-          ENDIF
+        PRCPLK = 0.0D0
+        EVAPLK = 0.0D0
+        RNF = 0.0
+        WTHDRW = 0.0
+        IF ( TESTLAK>1.0 ) THEN
+          IF ( Print_debug>DEBUG_minimum ) PRINT 11
         END IF
       END IF
-!      IF ( Print_debug>DEBUG_minimum ) THEN
-!        IF ( TESTSFR.GT.1.0 ) PRINT 10
-!        IF ( TESTLAK.GT.1.0 ) PRINT 11
-!      END IF
+
    10 FORMAT(/, '***WARNING***', /,
      +       'Non-zero values were specified for precipitation,',/,
      +       'streamflow, and ET for streams in MODFLOW input files.',/,
@@ -1682,7 +1636,7 @@ C
      +       'streamflow, ET, and Sp.Flow for lakes in MODFLOW',/,
      +       'input files. These values are set to zero',/,
      +       'for GSFLOW simulations.', /)
-      RETURN
+
       END SUBROUTINE ZERO_SPECIFIED_FLOWS
 
 !***********************************************************************

@@ -26,7 +26,7 @@
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW to PRMS'
       character(len=*), parameter :: MODNAME = 'gsflow_mf2prms'
-      character(len=*), parameter :: Version_gsflow_mf2prms = '2020-12-16'
+      character(len=*), parameter :: Version_gsflow_mf2prms = '2021-01-06'
       INTEGER :: i, j, k, ihru
       integer :: IRWL,NMCL,SGNM
       DOUBLE PRECISION :: mf_q2prms_inchacres
