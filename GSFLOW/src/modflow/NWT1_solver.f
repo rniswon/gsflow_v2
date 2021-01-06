@@ -1413,7 +1413,6 @@ C-----SET HNEW TO HDRY IF IPHRY>0
 !     Return value of groundwater flow equation
       DOUBLE PRECISION FUNCTION GW_func(Ic, Ir, Il)
       USE GWFNWTMODULE
-      USE GLOBAL,      ONLY:iout, ibound
       USE GWFBASMODULE, ONLY:HNOFLO
       IMPLICIT NONE
 !     ------------------------------------------------------------------
@@ -1426,7 +1425,7 @@ C-----SET HNEW TO HDRY IF IPHRY>0
 !     -----------------------------------------------------------------
 !     LOCAL VARIABLES
 !     -----------------------------------------------------------------
-      DOUBLE PRECISION term1, term2, term3, sum
+      DOUBLE PRECISION term1, term2, term3
 !     -----------------------------------------------------------------   
       GW_func = 0.0D0
       IF ( H==HNOFLO ) RETURN    
@@ -1589,8 +1588,6 @@ C-----SET HNEW TO HDRY IF IPHRY>0
 !
       SUBROUTINE Jacobian(kkiter,kper,kstp)
       USE GLOBAL, ONLY:Ibound, Hnew, Botm
-!!      USE GLOBAL, ONLY:Ncol, Nrow, Nlay, Ibound, Iout, Hnew, Botm,
-!!     +                 Lbotm, CR, CC, CV
       USE GWFNWTMODULE
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       IMPLICIT NONE
