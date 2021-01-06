@@ -408,7 +408,7 @@
         IF ( Process_flag==RUN ) RETURN
       ENDIF
 
-      IF ( Climate_potet_flag==0 ) THEN
+      IF ( Climate_potet_flag==OFF ) THEN
         IF ( Et_flag==potet_jh_module ) THEN
           call_modules = potet_jh()
         ELSEIF ( Et_flag==potet_hamon_module ) THEN
@@ -1202,8 +1202,12 @@
 
       Water_use_flag = OFF
       IF ( Nwateruse>0 ) THEN
-        IF ( Segment_transferON_OFF==1 .OR. Gwr_transferON_OFF==1 .OR. External_transferON_OFF==1 .OR. &
-     &       Dprst_transferON_OFF==1 .OR. Lake_transferON_OFF==1 .OR. Nconsumed>0 .OR. Nwateruse>0 ) Water_use_flag = 1
+        IF ( Segment_transferON_OFF==ACTIVE .OR. Gwr_transferON_OFF==ACTIVE .OR. External_transferON_OFF==ACTIVE .OR. &
+     &       Dprst_transferON_OFF==ACTIVE .OR. Lake_transferON_OFF==ACTIVE ) Water_use_flag = ACTIVE
+        IF ( Water_use_flag==OFF ) THEN
+          PRINT *, 'WARNING, nwateruse specified > 0 without transfers active'
+          Nwateruse = 0
+        ENDIF
       ENDIF
 
       IF ( Segment_transferON_OFF==ACTIVE .OR. Gwr_transferON_OFF==ACTIVE .OR. External_transferON_OFF==ACTIVE .OR. &
