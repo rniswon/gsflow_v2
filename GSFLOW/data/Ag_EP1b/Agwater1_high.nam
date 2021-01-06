@@ -11,7 +11,7 @@ GAGE                 32 ./input/Agwater1.gag
 data                 55 ./input/seg1.tab
 data                 56 ./input/seg9.tab
 AG                   57 ./input/Agwater1.ag
-data                 62 ./output/Agwater1_high.hed     
+data                 62 ./output/EP1b_Agwater1_high.hed     
 data                 105 ./output/Agwater1GW_high.ts5 
 data                 106 ./output/Agwater1GW_high_ET.ts5    
 data                 107 ./output/Agwater1GW_high_ET.all
