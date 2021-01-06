@@ -1,6 +1,10 @@
 @ECHO OFF
 
-..\..\..\bin\gsflow .\gsflow.control -set init_vars_from_file 0
+rm ../output/*.csv
+rm ../output/*.out
+rm ../output/prms/*
+
+..\..\..\bin\gsflow .\gsflow.control -set init_vars_from_file 0 -set save_vars_to_file 0
 
 ..\..\..\bin\gsflow .\gsflow.control -set end_time 1983,9,1,0,0,0 -set modflow_name ../input/modflow/sagehen_1.nam -set gsflow_output_file ../output/gsflow_1.out -set model_output_file ../output/prms/prms1.out -set csv_output_file ../output/gsflow_1.csv -set init_vars_from_file 0 -set var_save_file ../output/prms/prms_ic_1 
 ..\..\..\bin\gsflow .\gsflow.control -set start_time 1983,09,02,0,0 -set end_time 1983,09,08,0,0,0 -set modflow_name ../input/modflow/sagehen_2.nam -set gsflow_output_file ../output/gsflow_2.out -set model_output_file ../output/prms/prms2.out -set csv_output_file ../output/gsflow_2.csv -set var_init_file ../output/prms/prms_ic_1 -set var_save_file ../output/prms/prms_ic_2

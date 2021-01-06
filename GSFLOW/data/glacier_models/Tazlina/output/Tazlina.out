@@ -1,0 +1,149 @@
+
+               Precipitation-Runoff Modeling System (PRMS)
+                       Version 5.2.0 01/20/2021
+
+        Process            Available Modules
+--------------------------------------------------------------------
+  Basin Definition: basin
+    Cascading Flow: cascade
+  Time Series Data: obs, water_use_read, dynamic_param_read
+   Potet Solar Rad: soltab
+  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,
+                    temp_map
+       Precip Dist: precip_1sta, precip_laps, precip_dist2,
+                    climate_hru, precip_map
+Temp & Precip Dist: xyz_dist, ide_dist
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
+Transpiration Dist: transp_tindex, climate_hru, transp_frost
+      Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
+                    potet_hs, potet_pt, potet_pm, potet_pm_sta
+      Interception: intcp
+Snow & Glacr Dynam: snowcomp, glacr_melt
+    Surface Runoff: srunoff_smidx, srunoff_carea
+         Soil Zone: soilzone
+       Groundwater: gwflow
+Streamflow Routing: strmflow, strmflow_in_out, muskingum,
+                    muskingum_lake, muskingum_mann
+Stream Temperature: stream_temp
+    Output Summary: basin_sum, subbasin, map_results, prms_summary,
+                    nhru_summary, nsub_summary, water_balance
+                    basin_summary, nsegment_summary
+     Preprocessing: write_climate_hru, frost_date
+--------------------------------------------------------------------
+
+
+    Active modules listed in the order in which they are called
+
+        Process                    Module         Version Date
+==============================================================
+PRMS Computation Order          gsflow_prms         2021-01-20
+Basin Definition                basin               2020-12-22
+Common States and Fluxes        climateflow         2020-12-22
+Potential Solar Radiation       soltab              2020-12-02
+Timestep Control                prms_time           2020-12-02
+Time Series Data                obs                 2020-12-02
+Temp & Precip Distribution      xyz_dist            2020-12-02
+Solar Radiation Distribution    ccsolrad            2020-12-02
+Transpiration Distribution      transp_tindex       2020-12-02
+Potential Evapotranspiration    potet_jh            2020-08-03
+Canopy Interception             intcp               2020-12-22
+Snow Dynamics                   snowcomp            2020-12-17
+Glacier Dynamics                glacr_melt          2020-12-02
+Surface Runoff                  srunoff_smidx       2020-12-30
+Soilzone Computations           soilzone            2021-01-06
+Groundwater                     gwflow              2020-12-02
+Streamflow Routing Init         routing             2020-12-02
+Streamflow Routing              muskingum           2020-12-02
+Output Summary                  basin_sum           2020-12-02
+Output Summary                  prms_summary        2020-12-02
+==============================================================
+
+Using Control File: .\control\Tazlina.control
+
+Using Parameter File: ./input/Tazlina.par
+
+
+Start time: 1950/10/01 00:00:00
+End time:   2015/09/30 00:00:00
+
+
+Model domain area:      1698328.18    Active basin area:   1698328.18
+Fraction impervious:        0.0473    Fraction pervious:       0.9527
+
+
+
+
+   Year Month Day   Precip     ET    Storage S-Runoff M-Runoff
+                  (inches) (inches) (inches) (inches) (inches)
+ -------------------------------------------------------------
+ initial                               2.000
+   1951             14.613    3.707  -25.726   38.498   -5.110
+   1952             14.416    4.668  -49.667   33.453   -5.124
+   1953             11.556    4.684  -85.594   42.477   -5.110
+   1954             15.403    5.642 -114.030   37.989   -5.110
+   1955             12.223    4.138 -141.687   35.407   -5.110
+   1956             16.838    4.979 -167.734   37.868   -5.124
+   1957             17.442    5.057 -194.847   39.760   -5.110
+   1958             13.400    4.765 -224.659   37.894   -5.110
+   1959             18.898    5.212 -246.597   35.300   -5.110
+   1960             20.149    6.209 -268.431   35.801   -5.124
+   1961             20.058    6.239 -291.085   36.196   -5.110
+   1962             20.646    6.427 -311.731   34.557   -5.110
+   1963             15.801    5.005 -335.419   34.280   -5.110
+   1964             20.188    5.842 -352.112   31.026   -5.124
+   1965             18.096    5.974 -374.478   34.446   -5.110
+   1966             19.156    6.349 -395.289   33.269   -5.110
+   1967             20.266    6.033 -416.847   35.477   -5.110
+   1968             20.908    7.129 -436.321   33.423   -5.124
+   1969             15.742    6.065 -460.381   33.369   -5.110
+   1970             20.367    6.614 -478.656   32.077   -5.110
+   1971             20.830    5.982 -496.222   32.141   -5.110
+   1972             20.367    6.441 -515.066   32.584   -5.124
+   1973             18.569    7.696 -535.388   30.721   -5.110
+   1974             16.725    6.671 -557.314   31.581   -5.110
+   1975             22.274    8.020 -575.054   31.794   -5.110
+   1976             16.890    6.805 -597.108   31.851   -5.124
+   1977             21.754    7.617 -616.410   34.055   -5.110
+   1978             17.025    7.147 -637.534   30.691   -5.110
+   1979             21.512    7.627 -657.522   33.591   -5.110
+   1980             23.978    7.480 -674.905   33.910   -5.124
+   1981             19.997    7.494 -692.544   30.410   -5.110
+   1982             18.323    5.988 -709.458   28.930   -5.110
+   1983             16.635    5.850 -728.181   29.199   -5.110
+   1984             17.031    7.397 -746.580   27.778   -5.124
+   1985             14.477    6.610 -762.896   23.936   -5.110
+   1986             12.622    5.189 -782.565   27.366   -5.110
+   1987             18.641    7.547 -798.224   26.746   -5.110
+   1988             20.060    8.604 -815.421   28.291   -5.124
+   1989             15.590    5.790 -835.511   29.557   -5.110
+   1990             16.042    6.067 -855.288   29.504   -5.110
+   1991             15.447    7.146 -873.875   26.827   -5.110
+   1992             16.814    6.430 -887.222   23.593   -5.124
+   1993             13.822    6.091 -904.798   25.278   -5.110
+   1994             11.626    5.847 -922.928   23.587   -5.110
+   1995             14.030    6.380 -939.042   23.554   -5.110
+   1996              7.496    3.401 -956.483   21.454   -5.124
+   1997             12.110    6.506 -972.392   21.127   -5.110
+   1998              9.631    4.432 -987.411   20.129   -5.110
+   1999             13.182    6.750-1001.102   20.255   -5.110
+   2000             14.048    5.346-1011.643   20.181   -5.124
+   2001             10.822    5.059-1027.067   20.755   -5.110
+   2002             10.945    4.702-1040.193   19.085   -4.630
+   2003              6.477    3.266-1057.247   20.135    0.153
+   2004              4.229    0.854-1073.843   19.935    0.096
+   2005             14.113    5.765-1084.562   18.938    0.200
+   2006             13.858    5.364-1095.672   19.329   -5.110
+   2007             18.799    6.714-1106.870   22.734   -5.110
+   2008             18.374    6.568-1116.486   21.047   -5.124
+   2009             17.731    6.631-1128.645   22.895   -5.110
+   2010             18.779    7.536-1139.996   21.896   -5.110
+   2011             18.026    7.221-1150.992   21.239   -5.110
+   2012             11.057    4.833-1162.855   17.643   -5.124
+   2013             10.516    3.414-1172.391   16.274   -5.110
+   2014             11.825    4.575-1183.678   18.361   -5.110
+   2015              9.307    3.993-1194.676   16.100   -5.110
+ *************************************************************
+ Total for run    1038.569  383.580-1194.676 1839.556 -316.118
+ *************************************************************
+Execution elapsed time    0 minutes  4.20 seconds
+

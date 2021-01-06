@@ -119,6 +119,11 @@ srunoff_module
 4
 srunoff_smidx
 ####
+strmflow_module
+1
+4
+strmflow
+####
 statsON_OFF
 1
 1
@@ -211,4 +216,4 @@ cbh_check_flag
 soilzone_aet_flag
 1
 1
-1
+0

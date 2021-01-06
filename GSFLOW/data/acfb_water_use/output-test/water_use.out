@@ -1,0 +1,903 @@
+Water Use Summary File
+Simulation Start Date: 1980/01/01   End Date: 1999/12/31
+
+
+Event date: 1998/01/01
+Source: external location: 1
+Destination: stream segment: 2
+Transfer flow rate: 1.160
+
+Event date: 1998/01/01
+Source: external location: 1
+Destination: stream segment: 4
+Transfer flow rate: .310
+
+Event date: 1998/01/01
+Source: external location: 1
+Destination: stream segment: 5
+Transfer flow rate: .500
+
+Event date: 1998/01/01
+Source: external location: 1
+Destination: stream segment: 7
+Transfer flow rate: .570
+
+Event date: 1998/01/01
+Source: external location: 1
+Destination: stream segment: 8
+Transfer flow rate: 2.050
+
+Event date: 1998/01/01
+Source: external location: 1
+Destination: stream segment: 9
+Transfer flow rate: .000
+
+Event date: 1998/01/01
+Source: external location: 1
+Destination: stream segment: 10
+Transfer flow rate: 6.980
+
+Event date: 1998/01/01
+Source: external location: 1
+Destination: stream segment: 11
+Transfer flow rate: .030
+
+Event date: 1998/01/01
+Source: external location: 1
+Destination: stream segment: 12
+Transfer flow rate: 1.860
+
+Event date: 1998/01/01
+Source: stream segment: 4
+Destination: external location: 1
+Transfer flow rate: .520
+
+Event date: 1998/01/01
+Source: stream segment: 5
+Destination: external location: 1
+Transfer flow rate: .820
+
+Event date: 1998/01/01
+Source: stream segment: 7
+Destination: external location: 1
+Transfer flow rate: 2.600
+
+Event date: 1998/01/01
+Source: stream segment: 9
+Destination: external location: 1
+Transfer flow rate: .050
+
+Event date: 1998/01/01
+Source: stream segment: 10
+Destination: external location: 1
+Transfer flow rate: 99.280
+
+Event date: 1998/01/01
+Source: stream segment: 11
+Destination: external location: 1
+Transfer flow rate: .000
+
+Event date: 1998/02/01
+Source: external location: 1
+Destination: stream segment: 2
+Transfer flow rate: 1.290
+
+Event date: 1998/02/01
+Source: external location: 1
+Destination: stream segment: 4
+Transfer flow rate: .390
+
+Event date: 1998/02/01
+Source: external location: 1
+Destination: stream segment: 5
+Transfer flow rate: .560
+
+Event date: 1998/02/01
+Source: external location: 1
+Destination: stream segment: 7
+Transfer flow rate: .600
+
+Event date: 1998/02/01
+Source: external location: 1
+Destination: stream segment: 8
+Transfer flow rate: 2.500
+
+Event date: 1998/02/01
+Source: external location: 1
+Destination: stream segment: 9
+Transfer flow rate: .000
+
+Event date: 1998/02/01
+Source: external location: 1
+Destination: stream segment: 10
+Transfer flow rate: 7.890
+
+Event date: 1998/02/01
+Source: external location: 1
+Destination: stream segment: 11
+Transfer flow rate: .130
+
+Event date: 1998/02/01
+Source: external location: 1
+Destination: stream segment: 12
+Transfer flow rate: 1.910
+
+Event date: 1998/02/01
+Source: stream segment: 4
+Destination: external location: 1
+Transfer flow rate: .440
+
+Event date: 1998/02/01
+Source: stream segment: 5
+Destination: external location: 1
+Transfer flow rate: .770
+
+Event date: 1998/02/01
+Source: stream segment: 7
+Destination: external location: 1
+Transfer flow rate: 2.470
+
+Event date: 1998/02/01
+Source: stream segment: 9
+Destination: external location: 1
+Transfer flow rate: .040
+
+Event date: 1998/02/01
+Source: stream segment: 10
+Destination: external location: 1
+Transfer flow rate: 97.720
+
+Event date: 1998/02/01
+Source: stream segment: 11
+Destination: external location: 1
+Transfer flow rate: .000
+
+Event date: 1998/03/01
+Source: external location: 1
+Destination: stream segment: 2
+Transfer flow rate: 1.270
+
+Event date: 1998/03/01
+Source: external location: 1
+Destination: stream segment: 4
+Transfer flow rate: .420
+
+Event date: 1998/03/01
+Source: external location: 1
+Destination: stream segment: 5
+Transfer flow rate: .540
+
+Event date: 1998/03/01
+Source: external location: 1
+Destination: stream segment: 7
+Transfer flow rate: .620
+
+Event date: 1998/03/01
+Source: external location: 1
+Destination: stream segment: 8
+Transfer flow rate: 2.050
+
+Event date: 1998/03/01
+Source: external location: 1
+Destination: stream segment: 9
+Transfer flow rate: .000
+
+Event date: 1998/03/01
+Source: external location: 1
+Destination: stream segment: 10
+Transfer flow rate: 7.980
+
+Event date: 1998/03/01
+Source: external location: 1
+Destination: stream segment: 11
+Transfer flow rate: .140
+
+Event date: 1998/03/01
+Source: external location: 1
+Destination: stream segment: 12
+Transfer flow rate: 1.880
+
+Event date: 1998/03/01
+Source: stream segment: 4
+Destination: external location: 1
+Transfer flow rate: .380
+
+Event date: 1998/03/01
+Source: stream segment: 5
+Destination: external location: 1
+Transfer flow rate: .720
+
+Event date: 1998/03/01
+Source: stream segment: 7
+Destination: external location: 1
+Transfer flow rate: 2.430
+
+Event date: 1998/03/01
+Source: stream segment: 9
+Destination: external location: 1
+Transfer flow rate: .040
+
+Event date: 1998/03/01
+Source: stream segment: 10
+Destination: external location: 1
+Transfer flow rate: 98.570
+
+Event date: 1998/03/01
+Source: stream segment: 11
+Destination: external location: 1
+Transfer flow rate: .000
+
+Event date: 1998/04/01
+Source: external location: 1
+Destination: stream segment: 2
+Transfer flow rate: 1.150
+
+Event date: 1998/04/01
+Source: external location: 1
+Destination: stream segment: 4
+Transfer flow rate: .300
+
+Event date: 1998/04/01
+Source: external location: 1
+Destination: stream segment: 5
+Transfer flow rate: .480
+
+Event date: 1998/04/01
+Source: external location: 1
+Destination: stream segment: 7
+Transfer flow rate: .670
+
+Event date: 1998/04/01
+Source: external location: 1
+Destination: stream segment: 8
+Transfer flow rate: 2.590
+
+Event date: 1998/04/01
+Source: external location: 1
+Destination: stream segment: 9
+Transfer flow rate: .000
+
+Event date: 1998/04/01
+Source: external location: 1
+Destination: stream segment: 10
+Transfer flow rate: 8.070
+
+Event date: 1998/04/01
+Source: external location: 1
+Destination: stream segment: 11
+Transfer flow rate: .150
+
+Event date: 1998/04/01
+Source: external location: 1
+Destination: stream segment: 12
+Transfer flow rate: 1.910
+
+Event date: 1998/04/01
+Source: stream segment: 4
+Destination: external location: 1
+Transfer flow rate: .490
+
+Event date: 1998/04/01
+Source: stream segment: 5
+Destination: external location: 1
+Transfer flow rate: .770
+
+Event date: 1998/04/01
+Source: stream segment: 7
+Destination: external location: 1
+Transfer flow rate: 2.460
+
+Event date: 1998/04/01
+Source: stream segment: 9
+Destination: external location: 1
+Transfer flow rate: .030
+
+Event date: 1998/04/01
+Source: stream segment: 10
+Destination: external location: 1
+Transfer flow rate: 101.480
+
+Event date: 1998/04/01
+Source: stream segment: 11
+Destination: external location: 1
+Transfer flow rate: .020
+
+Event date: 1998/05/01
+Source: external location: 1
+Destination: stream segment: 2
+Transfer flow rate: 1.170
+
+Event date: 1998/05/01
+Source: external location: 1
+Destination: stream segment: 4
+Transfer flow rate: .010
+
+Event date: 1998/05/01
+Source: external location: 1
+Destination: stream segment: 5
+Transfer flow rate: .410
+
+Event date: 1998/05/01
+Source: external location: 1
+Destination: stream segment: 7
+Transfer flow rate: .540
+
+Event date: 1998/05/01
+Source: external location: 1
+Destination: stream segment: 8
+Transfer flow rate: 2.340
+
+Event date: 1998/05/01
+Source: external location: 1
+Destination: stream segment: 9
+Transfer flow rate: .000
+
+Event date: 1998/05/01
+Source: external location: 1
+Destination: stream segment: 10
+Transfer flow rate: 8.180
+
+Event date: 1998/05/01
+Source: external location: 1
+Destination: stream segment: 11
+Transfer flow rate: .000
+
+Event date: 1998/05/01
+Source: external location: 1
+Destination: stream segment: 12
+Transfer flow rate: 1.940
+
+Event date: 1998/05/01
+Source: stream segment: 4
+Destination: external location: 1
+Transfer flow rate: .480
+
+Event date: 1998/05/01
+Source: stream segment: 5
+Destination: external location: 1
+Transfer flow rate: .750
+
+Event date: 1998/05/01
+Source: stream segment: 7
+Destination: external location: 1
+Transfer flow rate: 2.480
+
+Event date: 1998/05/01
+Source: stream segment: 9
+Destination: external location: 1
+Transfer flow rate: .040
+
+Event date: 1998/05/01
+Source: stream segment: 10
+Destination: external location: 1
+Transfer flow rate: 108.870
+
+Event date: 1998/05/01
+Source: stream segment: 11
+Destination: external location: 1
+Transfer flow rate: .030
+
+Event date: 1998/06/01
+Source: external location: 1
+Destination: stream segment: 2
+Transfer flow rate: 1.120
+
+Event date: 1998/06/01
+Source: external location: 1
+Destination: stream segment: 4
+Transfer flow rate: .640
+
+Event date: 1998/06/01
+Source: external location: 1
+Destination: stream segment: 5
+Transfer flow rate: .420
+
+Event date: 1998/06/01
+Source: external location: 1
+Destination: stream segment: 7
+Transfer flow rate: .330
+
+Event date: 1998/06/01
+Source: external location: 1
+Destination: stream segment: 8
+Transfer flow rate: 1.980
+
+Event date: 1998/06/01
+Source: external location: 1
+Destination: stream segment: 9
+Transfer flow rate: .000
+
+Event date: 1998/06/01
+Source: external location: 1
+Destination: stream segment: 10
+Transfer flow rate: 7.790
+
+Event date: 1998/06/01
+Source: external location: 1
+Destination: stream segment: 11
+Transfer flow rate: .100
+
+Event date: 1998/06/01
+Source: external location: 1
+Destination: stream segment: 12
+Transfer flow rate: 1.620
+
+Event date: 1998/06/01
+Source: stream segment: 4
+Destination: external location: 1
+Transfer flow rate: .550
+
+Event date: 1998/06/01
+Source: stream segment: 5
+Destination: external location: 1
+Transfer flow rate: .840
+
+Event date: 1998/06/01
+Source: stream segment: 7
+Destination: external location: 1
+Transfer flow rate: 2.580
+
+Event date: 1998/06/01
+Source: stream segment: 9
+Destination: external location: 1
+Transfer flow rate: .060
+
+Event date: 1998/06/01
+Source: stream segment: 10
+Destination: external location: 1
+Transfer flow rate: 120.690
+
+Event date: 1998/06/01
+Source: stream segment: 11
+Destination: external location: 1
+Transfer flow rate: .140
+
+Event date: 1998/07/01
+Source: external location: 1
+Destination: stream segment: 2
+Transfer flow rate: 1.120
+
+Event date: 1998/07/01
+Source: external location: 1
+Destination: stream segment: 4
+Transfer flow rate: .250
+
+Event date: 1998/07/01
+Source: external location: 1
+Destination: stream segment: 5
+Transfer flow rate: .430
+
+Event date: 1998/07/01
+Source: external location: 1
+Destination: stream segment: 7
+Transfer flow rate: .510
+
+Event date: 1998/07/01
+Source: external location: 1
+Destination: stream segment: 8
+Transfer flow rate: 2.380
+
+Event date: 1998/07/01
+Source: external location: 1
+Destination: stream segment: 9
+Transfer flow rate: .060
+
+Event date: 1998/07/01
+Source: external location: 1
+Destination: stream segment: 10
+Transfer flow rate: 8.120
+
+Event date: 1998/07/01
+Source: external location: 1
+Destination: stream segment: 11
+Transfer flow rate: .100
+
+Event date: 1998/07/01
+Source: external location: 1
+Destination: stream segment: 12
+Transfer flow rate: 1.670
+
+Event date: 1998/07/01
+Source: stream segment: 4
+Destination: external location: 1
+Transfer flow rate: .530
+
+Event date: 1998/07/01
+Source: stream segment: 5
+Destination: external location: 1
+Transfer flow rate: .760
+
+Event date: 1998/07/01
+Source: stream segment: 7
+Destination: external location: 1
+Transfer flow rate: 2.550
+
+Event date: 1998/07/01
+Source: stream segment: 9
+Destination: external location: 1
+Transfer flow rate: .070
+
+Event date: 1998/07/01
+Source: stream segment: 10
+Destination: external location: 1
+Transfer flow rate: 116.520
+
+Event date: 1998/07/01
+Source: stream segment: 11
+Destination: external location: 1
+Transfer flow rate: .100
+
+Event date: 1998/08/01
+Source: external location: 1
+Destination: stream segment: 2
+Transfer flow rate: 1.350
+
+Event date: 1998/08/01
+Source: external location: 1
+Destination: stream segment: 4
+Transfer flow rate: .010
+
+Event date: 1998/08/01
+Source: external location: 1
+Destination: stream segment: 5
+Transfer flow rate: 1.100
+
+Event date: 1998/08/01
+Source: external location: 1
+Destination: stream segment: 7
+Transfer flow rate: .700
+
+Event date: 1998/08/01
+Source: external location: 1
+Destination: stream segment: 8
+Transfer flow rate: 2.240
+
+Event date: 1998/08/01
+Source: external location: 1
+Destination: stream segment: 9
+Transfer flow rate: .080
+
+Event date: 1998/08/01
+Source: external location: 1
+Destination: stream segment: 10
+Transfer flow rate: 8.210
+
+Event date: 1998/08/01
+Source: external location: 1
+Destination: stream segment: 11
+Transfer flow rate: .110
+
+Event date: 1998/08/01
+Source: external location: 1
+Destination: stream segment: 12
+Transfer flow rate: 1.780
+
+Event date: 1998/08/01
+Source: stream segment: 4
+Destination: external location: 1
+Transfer flow rate: .560
+
+Event date: 1998/08/01
+Source: stream segment: 5
+Destination: external location: 1
+Transfer flow rate: .840
+
+Event date: 1998/08/01
+Source: stream segment: 7
+Destination: external location: 1
+Transfer flow rate: 2.620
+
+Event date: 1998/08/01
+Source: stream segment: 9
+Destination: external location: 1
+Transfer flow rate: .070
+
+Event date: 1998/08/01
+Source: stream segment: 10
+Destination: external location: 1
+Transfer flow rate: 119.220
+
+Event date: 1998/08/01
+Source: stream segment: 11
+Destination: external location: 1
+Transfer flow rate: .110
+
+Event date: 1998/09/01
+Source: external location: 1
+Destination: stream segment: 2
+Transfer flow rate: 1.310
+
+Event date: 1998/09/01
+Source: external location: 1
+Destination: stream segment: 4
+Transfer flow rate: .240
+
+Event date: 1998/09/01
+Source: external location: 1
+Destination: stream segment: 5
+Transfer flow rate: .410
+
+Event date: 1998/09/01
+Source: external location: 1
+Destination: stream segment: 7
+Transfer flow rate: .590
+
+Event date: 1998/09/01
+Source: external location: 1
+Destination: stream segment: 8
+Transfer flow rate: 2.130
+
+Event date: 1998/09/01
+Source: external location: 1
+Destination: stream segment: 9
+Transfer flow rate: .060
+
+Event date: 1998/09/01
+Source: external location: 1
+Destination: stream segment: 10
+Transfer flow rate: 7.700
+
+Event date: 1998/09/01
+Source: external location: 1
+Destination: stream segment: 11
+Transfer flow rate: .930
+
+Event date: 1998/09/01
+Source: external location: 1
+Destination: stream segment: 12
+Transfer flow rate: 1.600
+
+Event date: 1998/09/01
+Source: stream segment: 4
+Destination: external location: 1
+Transfer flow rate: .490
+
+Event date: 1998/09/01
+Source: stream segment: 5
+Destination: external location: 1
+Transfer flow rate: .800
+
+Event date: 1998/09/01
+Source: stream segment: 7
+Destination: external location: 1
+Transfer flow rate: 2.870
+
+Event date: 1998/09/01
+Source: stream segment: 9
+Destination: external location: 1
+Transfer flow rate: .050
+
+Event date: 1998/09/01
+Source: stream segment: 10
+Destination: external location: 1
+Transfer flow rate: 113.350
+
+Event date: 1998/09/01
+Source: stream segment: 11
+Destination: external location: 1
+Transfer flow rate: .080
+
+Event date: 1998/10/01
+Source: external location: 1
+Destination: stream segment: 2
+Transfer flow rate: 1.330
+
+Event date: 1998/10/01
+Source: external location: 1
+Destination: stream segment: 4
+Transfer flow rate: .270
+
+Event date: 1998/10/01
+Source: external location: 1
+Destination: stream segment: 5
+Transfer flow rate: .480
+
+Event date: 1998/10/01
+Source: external location: 1
+Destination: stream segment: 7
+Transfer flow rate: .600
+
+Event date: 1998/10/01
+Source: external location: 1
+Destination: stream segment: 8
+Transfer flow rate: 1.730
+
+Event date: 1998/10/01
+Source: external location: 1
+Destination: stream segment: 9
+Transfer flow rate: .000
+
+Event date: 1998/10/01
+Source: external location: 1
+Destination: stream segment: 10
+Transfer flow rate: 7.660
+
+Event date: 1998/10/01
+Source: external location: 1
+Destination: stream segment: 11
+Transfer flow rate: .680
+
+Event date: 1998/10/01
+Source: external location: 1
+Destination: stream segment: 12
+Transfer flow rate: 1.800
+
+Event date: 1998/10/01
+Source: stream segment: 4
+Destination: external location: 1
+Transfer flow rate: .450
+
+Event date: 1998/10/01
+Source: stream segment: 5
+Destination: external location: 1
+Transfer flow rate: .790
+
+Event date: 1998/10/01
+Source: stream segment: 7
+Destination: external location: 1
+Transfer flow rate: 2.530
+
+Event date: 1998/10/01
+Source: stream segment: 9
+Destination: external location: 1
+Transfer flow rate: .040
+
+Event date: 1998/10/01
+Source: stream segment: 10
+Destination: external location: 1
+Transfer flow rate: 108.530
+
+Event date: 1998/10/01
+Source: stream segment: 11
+Destination: external location: 1
+Transfer flow rate: .020
+
+Event date: 1998/11/01
+Source: external location: 1
+Destination: stream segment: 2
+Transfer flow rate: 1.290
+
+Event date: 1998/11/01
+Source: external location: 1
+Destination: stream segment: 4
+Transfer flow rate: .250
+
+Event date: 1998/11/01
+Source: external location: 1
+Destination: stream segment: 5
+Transfer flow rate: .440
+
+Event date: 1998/11/01
+Source: external location: 1
+Destination: stream segment: 7
+Transfer flow rate: .550
+
+Event date: 1998/11/01
+Source: external location: 1
+Destination: stream segment: 8
+Transfer flow rate: 2.080
+
+Event date: 1998/11/01
+Source: external location: 1
+Destination: stream segment: 9
+Transfer flow rate: .040
+
+Event date: 1998/11/01
+Source: external location: 1
+Destination: stream segment: 10
+Transfer flow rate: 7.070
+
+Event date: 1998/11/01
+Source: external location: 1
+Destination: stream segment: 11
+Transfer flow rate: .640
+
+Event date: 1998/11/01
+Source: external location: 1
+Destination: stream segment: 12
+Transfer flow rate: 1.820
+
+Event date: 1998/11/01
+Source: stream segment: 4
+Destination: external location: 1
+Transfer flow rate: .450
+
+Event date: 1998/11/01
+Source: stream segment: 5
+Destination: external location: 1
+Transfer flow rate: .720
+
+Event date: 1998/11/01
+Source: stream segment: 7
+Destination: external location: 1
+Transfer flow rate: 2.510
+
+Event date: 1998/11/01
+Source: stream segment: 9
+Destination: external location: 1
+Transfer flow rate: .020
+
+Event date: 1998/11/01
+Source: stream segment: 10
+Destination: external location: 1
+Transfer flow rate: 103.800
+
+Event date: 1998/11/01
+Source: stream segment: 11
+Destination: external location: 1
+Transfer flow rate: .010
+
+Event date: 1998/12/01
+Source: external location: 1
+Destination: stream segment: 2
+Transfer flow rate: .000
+
+Event date: 1998/12/01
+Source: external location: 1
+Destination: stream segment: 4
+Transfer flow rate: .380
+
+Event date: 1998/12/01
+Source: external location: 1
+Destination: stream segment: 5
+Transfer flow rate: .480
+
+Event date: 1998/12/01
+Source: external location: 1
+Destination: stream segment: 7
+Transfer flow rate: .510
+
+Event date: 1998/12/01
+Source: external location: 1
+Destination: stream segment: 8
+Transfer flow rate: 2.110
+
+Event date: 1998/12/01
+Source: external location: 1
+Destination: stream segment: 9
+Transfer flow rate: .110
+
+Event date: 1998/12/01
+Source: external location: 1
+Destination: stream segment: 10
+Transfer flow rate: 7.850
+
+Event date: 1998/12/01
+Source: external location: 1
+Destination: stream segment: 11
+Transfer flow rate: .440
+
+Event date: 1998/12/01
+Source: external location: 1
+Destination: stream segment: 12
+Transfer flow rate: 1.840
+
+Event date: 1998/12/01
+Source: stream segment: 4
+Destination: external location: 1
+Transfer flow rate: .420
+
+Event date: 1998/12/01
+Source: stream segment: 5
+Destination: external location: 1
+Transfer flow rate: .620
+
+Event date: 1998/12/01
+Source: stream segment: 7
+Destination: external location: 1
+Transfer flow rate: 2.360
+
+Event date: 1998/12/01
+Source: stream segment: 9
+Destination: external location: 1
+Transfer flow rate: .020
+
+Event date: 1998/12/01
+Source: stream segment: 10
+Destination: external location: 1
+Transfer flow rate: 98.170
+
+Event date: 1998/12/01
+Source: stream segment: 11
+Destination: external location: 1
+Transfer flow rate: .000

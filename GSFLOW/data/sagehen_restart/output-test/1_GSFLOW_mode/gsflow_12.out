@@ -1,7 +1,7 @@
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
  DATE: 11 17 1983              CUMULATIVE TIME STEP:    1142
- MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:       7     ITERATIONS:      13
+ MODFLOW STRESS PERIOD      2     CURRENT TIME STEP:       7     ITERATIONS:       8
 
  -----------------------------------------------------------------------------------
 
@@ -13,27 +13,27 @@
         PRECIPITATION =        5385118.56          PRECIPITATION =        1589238.37
            STREAMFLOW =                               STREAMFLOW =                  
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
-                WELLS =            163.13                  WELLS =              9.52
+                WELLS =            168.60                  WELLS =             23.14
 
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =          80630.96     EVAPOTRANSPIRATION =          12983.43
-           STREAMFLOW =         344026.36             STREAMFLOW =          51711.46
-     GW BOUNDARY FLOW =           5064.62       GW BOUNDARY FLOW =            723.43
-                WELLS =           3000.44                  WELLS =              9.52
+   EVAPOTRANSPIRATION =          80630.47     EVAPOTRANSPIRATION =          12983.43
+           STREAMFLOW =         348273.53             STREAMFLOW =          52110.91
+     GW BOUNDARY FLOW =           5065.30       GW BOUNDARY FLOW =            723.51
+                WELLS =           3948.49                  WELLS =            954.50
 
-   INFLOWS - OUTFLOWS =        4952559.32     INFLOWS - OUTFLOWS =        1523820.05
+   INFLOWS - OUTFLOWS =        4947369.37     INFLOWS - OUTFLOWS =        1522489.16
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        4952573.42         STORAGE CHANGE =        1523821.85
+ TOTAL STORAGE CHANGE =        4947383.36         STORAGE CHANGE =        1522490.95
        --------------                             --------------
-         LAND SURFACE =        4987854.26           LAND SURFACE =        1524162.66
-            SOIL ZONE =         -26144.32              SOIL ZONE =            119.95
-     UNSATURATED ZONE =          44436.18       UNSATURATED ZONE =           6742.39
-       SATURATED ZONE =         -53572.71         SATURATED ZONE =          -7203.15
+         LAND SURFACE =        4987854.28           LAND SURFACE =        1524162.66
+            SOIL ZONE =         -32520.79              SOIL ZONE =           -434.87
+     UNSATURATED ZONE =          46405.61       UNSATURATED ZONE =           6864.85
+       SATURATED ZONE =         -54355.74         SATURATED ZONE =          -8101.70
 
- OVERALL BUDGET ERROR =            -14.10           BUDGET ERROR =             -1.80
+ OVERALL BUDGET ERROR =            -13.99           BUDGET ERROR =             -1.79
 
 
   PERCENT DISCREPANCY =             -0.00    PERCENT DISCREPANCY =             -0.00

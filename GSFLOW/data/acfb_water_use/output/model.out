@@ -1,0 +1,107 @@
+
+               Precipitation-Runoff Modeling System (PRMS)
+                       Version 5.2.0 01/20/2021
+
+        Process            Available Modules
+--------------------------------------------------------------------
+  Basin Definition: basin
+    Cascading Flow: cascade
+  Time Series Data: obs, water_use_read, dynamic_param_read
+   Potet Solar Rad: soltab
+  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,
+                    temp_map
+       Precip Dist: precip_1sta, precip_laps, precip_dist2,
+                    climate_hru, precip_map
+Temp & Precip Dist: xyz_dist, ide_dist
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
+Transpiration Dist: transp_tindex, climate_hru, transp_frost
+      Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
+                    potet_hs, potet_pt, potet_pm, potet_pm_sta
+      Interception: intcp
+Snow & Glacr Dynam: snowcomp, glacr_melt
+    Surface Runoff: srunoff_smidx, srunoff_carea
+         Soil Zone: soilzone
+       Groundwater: gwflow
+Streamflow Routing: strmflow, strmflow_in_out, muskingum,
+                    muskingum_lake, muskingum_mann
+Stream Temperature: stream_temp
+    Output Summary: basin_sum, subbasin, map_results, prms_summary,
+                    nhru_summary, nsub_summary, water_balance
+                    basin_summary, nsegment_summary
+     Preprocessing: write_climate_hru, frost_date
+--------------------------------------------------------------------
+
+
+    Active modules listed in the order in which they are called
+
+        Process                    Module         Version Date
+==============================================================
+PRMS Computation Order          gsflow_prms         2021-01-20
+Basin Definition                basin               2020-12-22
+Common States and Fluxes        climateflow         2020-12-22
+Potential Solar Radiation       soltab              2020-12-02
+Timestep Control                prms_time           2020-12-02
+Time Series Data                obs                 2020-12-02
+Time Series Data                water_use_read      2020-12-02
+Temperature Distribution        climate_hru         2020-01-06
+Precipitation Distribution      climate_hru         2020-01-06
+Solar Radiation Distribution    climate_hru         2020-01-06
+Potential Evapotranspiration    climate_hru         2020-01-06
+Transpiration Distribution      transp_tindex       2020-12-02
+Canopy Interception             intcp               2020-12-22
+Snow Dynamics                   snowcomp            2020-12-17
+Surface Runoff                  srunoff_smidx       2020-12-30
+Soilzone Computations           soilzone            2021-01-06
+Groundwater                     gwflow              2020-12-02
+Streamflow Routing Init         routing             2020-12-02
+Streamflow Routing              muskingum           2020-12-02
+Output Summary                  basin_sum           2020-12-02
+Output Summary                  nhru_summary        2020-12-02
+Output Summary                  prms_summary        2020-12-02
+==============================================================
+
+Using Control File: .\Control\control
+
+Using Parameter File: ./input/params
+
+
+Start time: 1980/01/01 00:00:00
+End time:   1999/12/31 00:00:00
+
+
+Model domain area:       749508.57    Active basin area:    749508.57
+Fraction impervious:        0.0310    Fraction pervious:       0.8664
+DPRST area:               76833.59    Fraction DPRST:          0.1025
+
+
+
+
+   Year Month Day   Precip     ET    Storage S-Runoff M-Runoff
+                  (inches) (inches) (inches) (inches) (inches)
+ -------------------------------------------------------------
+ initial                              31.824
+   1980             50.492   20.572   14.836   46.909   -8.693
+   1981             36.476   24.842    6.166   20.304   -6.454
+   1982             53.278   23.741    8.142   27.562    1.270
+   1983             58.857   24.020    8.753   34.226    2.090
+   1984             68.655   24.714    9.076   43.617    2.016
+   1985             47.006   26.556    8.610   20.916    1.000
+   1986             33.959   25.220    5.620   11.730    0.790
+   1987             55.549   24.881    5.962   30.325    1.274
+   1988             43.376   23.841    7.963   17.533    0.772
+   1989             64.192   26.110   15.978   30.067    1.682
+   1990             57.834   27.045    9.577   37.190    2.017
+   1991             62.933   29.202   11.034   32.275    1.979
+   1992             55.188   24.891   13.364   27.967    1.587
+   1993             60.054   24.109    5.909   43.400    2.159
+   1994             63.330   23.963   12.556   32.720    1.640
+   1995             53.742   26.685    9.363   30.250    1.522
+   1996             68.484   24.683   10.856   42.307    1.877
+   1997             55.724   25.731   11.176   29.674    1.762
+   1998             63.457   25.341    7.028   41.417    1.816
+   1999             45.071   27.058    6.400   17.608    1.094
+ *************************************************************
+ Total for run    1110.775  507.925   10.154  622.382   13.445
+ *************************************************************
+Execution elapsed time    0 minutes  1.38 seconds
+

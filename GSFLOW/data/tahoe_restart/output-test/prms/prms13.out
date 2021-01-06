@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.1.0 03/04/2020
+                       Version 5.2.0 01/20/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -8,16 +8,17 @@
     Cascading Flow: cascade
   Time Series Data: obs, water_use_read, dynamic_param_read
    Potet Solar Rad: soltab
-  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru
+  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,
+                    temp_map
        Precip Dist: precip_1sta, precip_laps, precip_dist2,
-                    climate_hru
+                    climate_hru, precip_map
 Temp & Precip Dist: xyz_dist, ide_dist
     Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
 Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
                     potet_hs, potet_pt, potet_pm, potet_pm_sta
       Interception: intcp
-     Snow Dynamics: snowcomp
+Snow & Glacr Dynam: snowcomp, glacr_melt
     Surface Runoff: srunoff_smidx, srunoff_carea
          Soil Zone: soilzone
        Groundwater: gwflow
@@ -33,38 +34,38 @@ Stream Temperature: stream_temp
 
     Active modules listed in the order in which they are called
 
-        Process                   Module                Version Date
-====================================================================
-GSFLOW Computation Order       gsflow_prms                2020-03-04
-Basin Definition               basin                      2019-11-14
-Cascading Flow                 cascade                    2019-09-25
-Common States and Fluxes       climateflow                2020-01-10
-Potential Solar Radiation      soltab                     2016-09-09
-PRMS Set Time Variables        prms_time                  2015-03-31
-Time Series Data               obs                        2020-01-09
-Temperature Distribution       temp_laps                  2018-01-16
-Precipitation Distribution     precip_1sta                2016-10-21
-Solar Radiation Distribution   ddsolrad                   2019-04-04
-Transpiration Distribution     transp_tindex              2015-01-06
-Potential Evapotranspiration   potet_jh                   2019-04-04
-Canopy Interception            intcp                      2020-03-03
-Snow Dynamics                  snowcomp                   2019-11-27
-Surface Runoff                 srunoff_smidx              2020-03-03
-Soil Zone Computations         soilzone                   2020-01-10
-GSFLOW PRMS to MODFLOW         gsflow_prms2mf             2019-10-30
-GSFLOW MODFLOW to PRMS         gsflow_mf2prms             2017-11-15
-GSFLOW Output Budget Summary   gsflow_budget              2019-10-30
-GSFLOW Output CSV Summary      gsflow_sum                 2019-10-31
-Output Summary                 subbasin                   2019-12-02
-====================================================================
-GSFLOW MODFLOW main            gsflow_modflow             2019-10-30
-UZF-NWT Package                gwf2uzf1_NWT               2019-09-10
-SFR-NWT Package                gwf2sfr7_NWT               2017-03-08
-LAK-NWT Package                gwf2lak7_NWT               2016-07-21
+        Process                    Module         Version Date
+==============================================================
+PRMS Computation Order          gsflow_prms         2021-01-20
+Basin Definition                basin               2020-12-22
+Cascading Flow                  cascade             2020-12-02
+Common States and Fluxes        climateflow         2020-12-22
+Potential Solar Radiation       soltab              2020-12-02
+Timestep Control                prms_time           2020-12-02
+Time Series Data                obs                 2020-12-02
+Temperature Distribution        temp_laps           2020-12-02
+Precipitation Distribution      precip_1sta         2020-12-02
+Solar Radiation Distribution    ddsolrad            2020-12-02
+Transpiration Distribution      transp_tindex       2020-12-02
+Potential Evapotranspiration    potet_jh            2020-08-03
+Canopy Interception             intcp               2020-12-22
+Snow Dynamics                   snowcomp            2020-12-17
+Surface Runoff                  srunoff_smidx       2020-12-30
+Soilzone Computations           soilzone            2021-01-06
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-01-06
+GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-01-06
+GSFLOW Output Budget Summary    gsflow_budget       2020-12-23
+GSFLOW Output CSV Summary       gsflow_sum          2020-12-02
+Output Summary                  subbasin            2020-12-02
+==============================================================
+GSFLOW MODFLOW main             gsflow_modflow      2021-01-05
+UZF-NWT Package                 gwf2uzf1_NWT        2020-12-28
+SFR-NWT Package                 gwf2sfr7_NWT        2020-09-30
+LAK-NWT Package                 gwf2lak7_NWT        2020-09-30
 
 Using Control File: .\Tahoe.control
 
-Using Parameter File: ../input/PRMS/tahoe.param_v8_rgn
+Using Parameter File: ../input/prms/tahoe.param_v8_rgn
 
 
 Start time: 1983/11/18 00:00:00
@@ -75,4 +76,6 @@ Model domain area:       577870.77    Active basin area:    325452.62
 Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
+
+Execution elapsed time    0 minutes  5.69 seconds
 
