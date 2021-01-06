@@ -173,7 +173,6 @@ C     ------------------------------------------------------------------
       USE PCGMODULE,ONLY:HCLOSEPCG
       USE GWFNWTMODULE,ONLY:Tol
 !      USE GMGMODULE,ONLY:HCLOSEGMG
-!      USE PCGN,ONLY:HCLOSEPCGN
 C     ------------------------------------------------------------------
       INTEGER Qlimit,QCUT,firstnode,lastnode,
      & PUMPLAY,PUMPROW,PUMPCOL,PUMPLOC,PPFLAG,PUMPCAP
@@ -241,7 +240,6 @@ C-------SET SMALL DEPENDING ON CLOSURE CRITERIA OF THE SOLVER
 !      IF ( Iulmg.NE.0 ) SMALL = 0.0D0  !LMG SETS HCLOSE TO ZERO
       IF ( Iunwt.NE.0 ) SMALL = TOL
 !      IF ( Iugmg.NE.0 ) SMALL = HCLOSEGMG
-!      IF ( Iupcgn.NE.0 ) SMALL = HCLOSEPCGN
 c     initialize
       WELLID=' '
       MNW2=0.0D0
