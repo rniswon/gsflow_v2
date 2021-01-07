@@ -782,14 +782,16 @@
           IF ( Hru_type(i)==LAKE .OR. Hru_type(i)==INACTIVE ) CYCLE ! skip lake and inactive HRUs
 
           IF ( Soil_moist_max(i)<0.00001 ) THEN
-            istop = 1
+            ! istop = 1
             PRINT 9001, 'soil_moist_max', 0.00001, i, Soil_moist_max(i), 0.00001
+            Soil_moist_max(i) = 0.00001
             CYCLE
           ENDIF
           IF ( PRMS4_flag==0 ) Soil_rechr_max(i) = Soil_moist_max(i)*Soil_rechr_max_frac(i)
           IF ( Soil_rechr_max(i)<0.00001 ) THEN
-            istop = 1
+            !istop = 1
             PRINT 9001, 'soil_rechr_max', 0.00001, i, Soil_rechr_max(i), 0.00001
+            Soil_rechr_max(i) = 0.00001
             CYCLE
           ENDIF
           IF ( Soil_rechr_max(i)>Soil_moist_max(i) ) THEN
@@ -860,7 +862,7 @@
 
       IF ( istop==1 ) ERROR STOP ERROR_dynamic
 
- 9001 FORMAT (/, 'ERROR, dynamic parameter', A, ' <', F0.7, ' for HRU: ', I0, /, 9X, 'value: ', F0.7, ' set to ', F0.7)
+ 9001 FORMAT (/, 'WARNING, dynamic parameter', A, ' <', F0.7, ' for HRU: ', I0, /, 9X, 'value: ', F0.7, ' set to ', F0.7)
  9002 FORMAT (/, 'ERROR, dynamic parameter causes soil_rechr_max: ', F0.7, ' > soil_moist_max: ', F0.7, ' for HRU: ', I0)
 
       END FUNCTION dynparamrun
