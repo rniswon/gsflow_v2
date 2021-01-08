@@ -42,7 +42,7 @@ Common States and Fluxes        climateflow         2020-12-22
 Potential Solar Radiation       soltab              2020-12-02
 Timestep Control                prms_time           2020-12-02
 Time Series Data                obs                 2020-12-02
-Time Series Data                dynamic_param_read  2020-12-02
+Time Series Data                dynamic_param_read  2021-01-06
 Temperature Distribution        climate_hru         2020-01-06
 Precipitation Distribution      climate_hru         2020-01-06
 Solar Radiation Distribution    climate_hru         2020-01-06
@@ -103,5 +103,5 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
  *************************************************************
  Total for run    1110.775  440.179    8.439  693.981   13.445
  *************************************************************
-Execution elapsed time    0 minutes  1.30 seconds
+Execution elapsed time    0 minutes  1.35 seconds
 
