@@ -2,3 +2,6 @@ GSFLOW/bin/gsflow.exe
 *.mod
 *.o
 *.a
+create_Ag_input/create_Ag_input.sln
+create_Ag_input/create_Ag_input/create_Ag_input.u2d
+mmf/mmf.vcxproj.user
