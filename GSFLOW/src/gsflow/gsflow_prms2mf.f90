@@ -7,7 +7,7 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-01-06'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-01-08'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -482,7 +482,13 @@
 ! the soilzone
 !-----------------------------------------------------------------------
         IF ( Sm2gw_grav(j)>0.0 ) THEN
-          IF ( NWAVST(icol, irow)<NTRAIL_CHK ) THEN
+
+          IF ( IUZFOPT==0 ) THEN !ERIC 20210107: NWAVST is dimensioned (1, 1) if IUZFOPT == 0.
+            Cell_drain_rate(icell) = Cell_drain_rate(icell) + Sm2gw_grav(j)*Gvr2cell_conv(j)
+            Gw_rejected_grav(j) = 0.0
+            is_draining = 1            
+
+          ELSEIF ( NWAVST(icol, irow)<NTRAIL_CHK ) THEN
 !-----------------------------------------------------------------------
 ! Convert drainage from inches to MF Length/Time
 !-----------------------------------------------------------------------
