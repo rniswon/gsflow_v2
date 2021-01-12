@@ -200,5 +200,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: INT_TYPE = 1
     integer, parameter :: REAL_TYPE = 2
     integer, parameter :: DBLE_TYPE = 3
+    integer, parameter :: SAVE_INIT = 0
+    integer, parameter :: READ_INIT = 1
 
 END MODULE PRMS_CONSTANTS

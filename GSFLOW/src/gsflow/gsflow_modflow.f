@@ -3,7 +3,7 @@
 !***********************************************************************
       MODULE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE, OFF,
-     +    MODFLOW, GSFLOW, ERROR_modflow, ERROR_time
+     +    MODFLOW, GSFLOW, ERROR_modflow, ERROR_time, MAXFILE_LENGTH
       USE PRMS_MODULE, ONLY: Print_debug, Model, GSFLOW_flag
       IMPLICIT NONE
 !   Local Variables
@@ -50,7 +50,7 @@ C-------ASSIGN VERSION NUMBER AND DATE
       INTEGER, SAVE :: IBDT(8)
 !   Control Parameters
       INTEGER, SAVE :: Modflow_time_zero(6)
-      CHARACTER(LEN=200), SAVE :: Modflow_name
+      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
       END MODULE GSFMODFLOW
 
 C     ******************************************************************
@@ -369,7 +369,7 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
       IF(IUNIT(49).GT.0) CALL LMT8BAS7AR(INUNIT,CUNIT,IGRID)
       IF(IUNIT(66).GT.0) THEN
         CALL GWF2AG7AR(IUNIT(66),IUNIT(44),IUNIT(63))
-        Diversion2soil_flag = 1
+        Diversion2soil_flag = ACTIVE
       ENDIF
 !      IF(IUNIT(61).GT.0) THEN
 !        CALL FMP2AR(

@@ -57,12 +57,11 @@
 ! Precip_flag (1=precip_1sta; 2=precip_laps; 3=precip_dist2; 5=ide_dist; 6=xyz_dist; 7=climate_hru; 9=precip_map
 ! Temp_flag (1=temp_1sta; 2=temp_laps; 3=temp_dist2; 5=ide_dist; 6=xyz_dist; 7=climate_hru; 8=temp_sta; 9=temp_map
 ! Control parameters
-      INTEGER, SAVE :: Starttime(6), Endtime(6), Modflow_time_zero(6)
+      INTEGER, SAVE :: Starttime(6), Endtime(6)
       INTEGER, SAVE :: Print_debug, MapOutON_OFF, CsvON_OFF, Dprst_flag, Subbasin_flag, Parameter_check_flag
       INTEGER, SAVE :: Init_vars_from_file, Save_vars_to_file, Orad_flag, Cascade_flag, Cascadegw_flag
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
-      INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF
       INTEGER, SAVE :: Prms_warmup, Diversion2soil_flag, PRMS_land_iteration_flag
       INTEGER, SAVE :: Agriculture_soil_flag, Agriculture_canopy_flag, Dyn_ag_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
@@ -73,7 +72,6 @@
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Strmflow_module, Transp_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Model_mode, Precip_module, Solrad_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Irrigation_area_module, Aet_module
-      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
       CHARACTER(LEN=8), SAVE :: Soilzone_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
       INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF
@@ -888,9 +886,6 @@
       IF ( control_integer(Stream_temp_flag, 'stream_temp_flag')/=0 ) Stream_temp_flag = OFF
       ! 0 = CBH File; 1 = specified constant; 2 = Stations
       IF ( control_integer(Strmtemp_humidity_flag, 'strmtemp_humidity_flag')/=0 ) Strmtemp_humidity_flag = OFF
-
-      IF ( control_integer(Snarea_curve_flag, 'snarea_curve_flag')/=0 ) Snarea_curve_flag = OFF
-      IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
 
       Humidity_cbh_flag = OFF
       Windspeed_cbh_flag = OFF

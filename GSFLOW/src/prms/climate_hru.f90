@@ -15,12 +15,12 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2020-01-06'
+        character(len=*), parameter :: Version_climate_hru = '2021-01-08'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit, Aet_unit, Irrigated_area_unit
         ! Control Parameters
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Tmin_day, Tmax_day, Precip_day, Potet_day, Swrad_day, Transp_day
-        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Humidity_day, Windspeed_day, Aet_file
+        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Humidity_day, Windspeed_day, Aet_cbh_file
         INTEGER, SAVE :: Cbh_check_flag, Cbh_binary_flag
         ! Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_windspeed, Basin_aet_external, Basin_irrigated_area
@@ -483,14 +483,14 @@
         ENDIF
 
        IF ( Aet_cbh_flag==ACTIVE ) THEN
-          IF ( control_string(Aet_file, 'aet_file')/=0 ) CALL read_error(5, 'aet_file')
-          CALL find_header_end(Aet_unit, Aet_file, 'aet_file', ierr, 1, Cbh_binary_flag)
+          IF ( control_string(Aet_cbh_file, 'aet_cbh_file')/=0 ) CALL read_error(5, 'aet_cbh_file')
+          CALL find_header_end(Aet_unit, Aet_cbh_file, 'aet_cbh_file', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
             CALL find_current_time(Aet_unit, Start_year, Start_month, Start_day, ierr, Cbh_binary_flag)
             IF ( ierr==-1 ) THEN
-              PRINT *, 'for first time step, CBH File: ', Aet_file
+              PRINT *, 'for first time step, CBH File: ', Aet_cbh_file
               istop = 1
             ENDIF
           ENDIF

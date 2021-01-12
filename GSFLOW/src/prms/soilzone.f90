@@ -19,13 +19,13 @@
      &    ERROR_soilzone, SAND, CLAY, LOAM, CASCADE_OFF, ERROR_param
       USE PRMS_MODULE, ONLY: Model, Nhru, Nssr, Nsegment, Nlake, Nhrucell, Print_debug, Dprst_flag, &
      &    Init_vars_from_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag, &
-     &    Kkiter, Soilzone_aet_flag, Frozen_flag, Diversion2soil_flag, Soilzone_add_water_use, &
-     &    Call_cascade, PRMS_land_iteration_flag, Agriculture_flag
+     &    Kkiter, Frozen_flag, Diversion2soil_flag, Soilzone_add_water_use, &
+     &    Call_cascade, PRMS_land_iteration_flag, Agriculture_flag, Keep_iterating_PRMS, Soil_iter
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-01-06'
+      character(len=*), parameter :: Version_soilzone = '2021-01-11'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -78,6 +78,8 @@
       DOUBLE PRECISION, SAVE :: Basin_gvr2sm
       REAL, SAVE, ALLOCATABLE :: Sm2gw_grav(:), Gw2sm_grav(:)
       REAL, SAVE, ALLOCATABLE :: Gravity_stor_res(:), Gvr2sm(:), Grav_gwin(:)
+!   Control Parameters
+      INTEGER, SAVE :: Soilzone_aet_flag
 !   Declared Parameters
       INTEGER, SAVE, ALLOCATABLE :: Soil_type(:), Gvr_hru_id(:)
       REAL, SAVE, ALLOCATABLE :: Pref_flow_den(:), Pref_flow_infil_frac(:)
@@ -147,12 +149,14 @@
       USE PRMS_SOILZONE
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar, getdim
+      INTEGER, EXTERNAL :: declparam, declvar, getdim, control_integer
       EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop
 !***********************************************************************
       szdecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_soilzone)
+
+      IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
 
 ! Declare Variables
       IF ( declvar(MODNAME, 'basin_capwaterin', 'one', 1, 'double', &
@@ -513,7 +517,7 @@
      &       'Groundwater discharge to gravity-flow reservoirs for each HRU', &
      &       'inches', Grav_gwin)/=0 ) CALL read_error(3, 'grav_gwin')
 
-        ALLOCATE ( Hru_ag_irr(Nhru) )
+        ALLOCATE ( Hru_ag_irr(Nhru) ) ! ??? should this be in flowvars? apply to canopy and soil??
         IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real', &
      &       'Irrigation added to soilzone from MODFLOW wells', 'inches', Hru_ag_irr)/=0 ) &
      &       CALL read_error(3, 'hru_ag_irr')
@@ -637,8 +641,13 @@
 ! Agriculture variables and parameters
       IF ( Agriculture_flag>OFF .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Ag_soil_to_gw(Nhru), Ag_soil_to_ssr(Nhru) )
-        ALLOCATE ( Ag_actet(Nhru), Ag_dunnian(Nhru), Ag_hortonian(Nhru) )
+        ALLOCATE ( Ag_actet(Nhru), Ag_dunnian(Nhru) )
         IF ( Cascade_flag>OFF ) ALLOCATE ( Ag_upslope_dunnian(Nhru) )
+
+      ALLOCATE (  Ag_hortonian(Nhru) )
+      IF ( declvar(MODNAME, 'ag_hortonian', 'nhru', Nhru, 'real', &
+     &     'Hortonian surface runoff that flows to the stream network from the agricultural fraction of each HRU', &
+     &     'inches', Ag_hortonian)/=0 ) CALL read_error(3, 'ag_hortonian')
 
       IF ( declvar(MODNAME, 'basin_agwaterin', 'one', 1, 'double', &
      &     'Basin area-weighted average infiltration,'// &
@@ -840,6 +849,10 @@
           Slow_stor(i) = 0.0
           Pref_flow_stor(i) = 0.0
 !          Soil_rechr_ratio(i) = 0.0
+          IF ( Agriculture_flag>OFF ) THEN
+            Ag_soil_rechr(i) = 0.0
+            Ag_soil_moist(i) = 0.0
+          ENDIF
           CYCLE
         ENDIF
 
@@ -849,7 +862,7 @@
         ELSE ! land or glacier
           Pref_flow_thrsh(i) = Sat_threshold(i)*(1.0-Pref_flow_den(i))
           Pref_flow_max(i) = Sat_threshold(i) - Pref_flow_thrsh(i)
-          IF ( Pref_flow_den(i)>0.0 ) Pref_flag = ACTIVE
+          IF ( Pref_flow_den(i)>0.0 ) Pref_flag = ACTIVE ! ??? what if pref_flow_infil_frac > 0 and pref_flow_den = 0 ??
         ENDIF
 
         ! hru_type = land, swale, or glacier
@@ -1137,7 +1150,7 @@
       Cap_waterin = 0.0
       Soil_saturated = OFF
       update_potet = OFF
-!      Keep_iterating_PRMS = OFF
+      Keep_iterating_PRMS = OFF
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 
@@ -1579,7 +1592,7 @@
 !        Basin_cpr_stor_frac = Basin_cpr_stor_frac + Cpr_stor_frac(i)*perv_area
 !        Basin_gvr_stor_frac = Basin_gvr_stor_frac + Gvr_stor_frac(i)*harea
 !        Basin_sz_stor_frac = Basin_sz_stor_frac + Soil_moist_frac(i)*harea
-        Basin_cpr_stor_frac = Basin_cpr_stor_frac + Soil_moist(i)/Soil_moist_max(i)*perv_area
+        IF ( Soil_moist_max(i)>0.0 ) Basin_cpr_stor_frac = Basin_cpr_stor_frac + Soil_moist(i)/Soil_moist_max(i)*perv_area
         IF ( Pref_flow_thrsh(i)>0.0 ) Basin_gvr_stor_frac = Basin_gvr_stor_frac + Slow_stor(i)/Pref_flow_thrsh(i)*harea
         Basin_sz_stor_frac = Basin_sz_stor_frac + Soil_moist_tot(i)/Soil_zone_max(i)*harea
         Basin_soil_lower_stor_frac = Basin_soil_lower_stor_frac + Soil_lower_ratio(i)*perv_area
@@ -1593,7 +1606,7 @@
         IF ( ag_on_flag==ACTIVE ) THEN
           !agriculture_external(i)
           IF ( Unused_potet(i)>0.0 ) THEN
-!            Keep_iterating_PRMS = ON
+            Keep_iterating_PRMS = ACTIVE
             Ag_irrigation_add(i) = Unused_potet(i) / Ag_frac(i)
           ELSE
             Ag_irrigation_add(i) = 0.0
@@ -1603,6 +1616,15 @@
 !        IF ( Hru_actet(i)>0.0 ) Snowevap_aet_frac(i) = Snow_evap(i)/Hru_actet(i)
 
       ENDDO
+
+      IF ( Agriculture_flag==OFF ) THEN
+        Keep_iterating_PRMS = OFF
+        Soil_iter = 0
+      ELSE
+        Soil_iter = Soil_iter + 1
+        IF ( Soil_iter>10 ) Keep_iterating_PRMS = OFF
+      ENDIF
+
       Basin_actet = Basin_actet*Basin_area_inv
       Basin_perv_et = Basin_perv_et*Basin_area_inv
       Basin_swale_et = Basin_swale_et*Basin_area_inv
@@ -1703,7 +1725,7 @@
         ENDIF
 
         Soil_to_ssr = excs
-        IF ( Soil_to_ssr<0.0 ) Soil_to_ssr = 0.0
+!        IF ( Soil_to_ssr<0.0 ) Soil_to_ssr = 0.0
       ENDIF
 
       END SUBROUTINE compute_soilmoist
@@ -1716,8 +1738,7 @@
      &           Soil_moist, Soil_rechr, Perv_actet, Avail_potet, &
      &           Snow_free, Potet_rechr, Potet_lower, Potet, Perv_frac, Soil_saturated)
       USE PRMS_CONSTANTS, ONLY: NEARZERO, BARESOIL, SAND, LOAM, CLAY, ACTIVE, OFF
-      USE PRMS_MODULE, ONLY: Soilzone_aet_flag
-      USE PRMS_SOILZONE, ONLY: Et_type
+      USE PRMS_SOILZONE, ONLY: Et_type, Soilzone_aet_flag
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Transp_on, Cov_type, Soil_type
@@ -1965,11 +1986,12 @@
       SUBROUTINE compute_gravflow(Ihru, Capacity, Slowcoef_lin, &
      &           Slowcoef_sq, Ssr2gw_rate, Ssr2gw_exp, Gvr_maxin, &
      &           Pref_flow_thrsh, Gvr2pfr, Ssr_to_gw, &
-     &           Slow_flow, Slow_stor, Gvr2sm, Soil_to_gw, Gwin, Compute_lateral, Ag_capacity, Ag_on_flag)
+     &           Slow_flow, Slow_stor, Gvr2sm, Soil_to_gw, Gwin, Compute_lateral, &
+     &           Ag_capacity, Ag_on_flag)
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE
       USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug
       USE PRMS_SOILZONE, ONLY: Gravity_stor_res, Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, &
-     &    Gw2sm_grav, Gvr_hru_pct_adjusted, Print_debug, DEBUG_less, Dprst_flag, ACTIVE, Ag_gvr2sm
+     &    Gw2sm_grav, Gvr_hru_pct_adjusted, Print_debug, DEBUG_less, Dprst_flag, Ag_gvr2sm
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
       IMPLICIT NONE
 ! Functions
