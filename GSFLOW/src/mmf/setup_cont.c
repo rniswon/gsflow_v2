@@ -331,7 +331,7 @@ void setup_cont (void) {
         decl_control_string ("transp_day", "transp.day");
         decl_control_string ("windspeed_day", "windspeed.day");
         decl_control_string ("humidity_day", "humidity.day");
-		decl_control_string ("aet_file", "aet.input");
+		decl_control_string ("aet_cbh_file", "aet.input");
 		decl_control_string ("pkwater_equiv_day", "pkwater_equiv.day");
         decl_control_string ("pk_depth_day", "pk_depth.day");
         decl_control_string ("snow_evap_day", "snow_evap.day");
