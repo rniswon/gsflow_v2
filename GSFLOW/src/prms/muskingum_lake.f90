@@ -134,7 +134,7 @@
 !     Main muskingum_lake routine
 !***********************************************************************
       INTEGER FUNCTION muskingum_lake()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, SETDIMENS, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, SETDIMENS, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
@@ -150,10 +150,10 @@
       ELSEIF ( Process_flag==DECL ) THEN
         muskingum_lake  = muskingum_lake_decl()
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( Init_vars_from_file>0 ) CALL muskingum_lake_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL muskingum_lake_restart(READ_INIT)
         muskingum_lake = muskingum_lake_init()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ACTIVE ) CALL muskingum_lake_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL muskingum_lake_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION muskingum_lake
@@ -1448,7 +1448,7 @@
 !     muskingum_lake_restart - write or read restart file
 !***********************************************************************
       SUBROUTINE muskingum_lake_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: ACTIVE
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_BASIN, ONLY: Puls_lin_flag
       USE PRMS_MUSKINGUM_LAKE
@@ -1460,7 +1460,7 @@
       ! Local Variable
       CHARACTER(LEN=14) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Outflow_ts
         IF ( Puls_lin_flag==ACTIVE ) THEN

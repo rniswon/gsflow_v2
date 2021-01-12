@@ -3,7 +3,8 @@
 !***********************************************************************
       MODULE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE, OFF,
-     +    MODFLOW, GSFLOW, ERROR_modflow, ERROR_time
+     +    MODFLOW, GSFLOW, ERROR_modflow, ERROR_time, MAXFILE_LENGTH,
+     +    READ_INIT
       USE PRMS_MODULE, ONLY: Print_debug, Model, GSFLOW_flag
       IMPLICIT NONE
 !   Local Variables
@@ -50,7 +51,7 @@ C-------ASSIGN VERSION NUMBER AND DATE
       INTEGER, SAVE :: IBDT(8)
 !   Control Parameters
       INTEGER, SAVE :: Modflow_time_zero(6)
-      CHARACTER(LEN=200), SAVE :: Modflow_name
+      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
       END MODULE GSFMODFLOW
 
 C     ******************************************************************
@@ -87,6 +88,7 @@ C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
+      USE PRMS_CONSTANTS, ONLY: READ_INIT
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell
       IMPLICIT NONE
@@ -369,7 +371,7 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
       IF(IUNIT(49).GT.0) CALL LMT8BAS7AR(INUNIT,CUNIT,IGRID)
       IF(IUNIT(66).GT.0) THEN
         CALL GWF2AG7AR(IUNIT(66),IUNIT(44),IUNIT(63))
-        Diversion2soil_flag = 1
+        Diversion2soil_flag = ACTIVE
       ENDIF
 !      IF(IUNIT(61).GT.0) THEN
 !        CALL FMP2AR(
@@ -407,7 +409,8 @@ C7------SIMULATE EACH STRESS PERIOD.
       CALL SETMFTIME()
       IF ( GSFLOW_flag==ACTIVE ) THEN
         CALL set_cell_values()
-        IF ( Init_vars_from_file>0 ) CALL gsflow_modflow_restart(1)
+        IF ( Init_vars_from_file>OFF )
+     &       CALL gsflow_modflow_restart(READ_INIT)
         CALL check_gvr_cell_pct()
         ! make the default number of soilzone iterations equal to the
         ! maximum MF iterations, which is a good practice using NWT and cells=nhru
@@ -1014,6 +1017,7 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
       USE GWFNWTMODULE, ONLY:LINMETH
@@ -1028,7 +1032,7 @@ C-------SAVE RESTART RECORDS FOR SUB PACKAGE
 C-------WRITE RESTART INFORMATION FOR HEADS, SFR, AND UZF
       IF ( Save_vars_to_file==ACTIVE ) THEN
         CALL RESTART1WRITE()
-        IF ( GSFLOW_flag==ACTIVE ) CALL gsflow_modflow_restart(0)
+        IF ( GSFLOW_flag==ACTIVE )CALL gsflow_modflow_restart(SAVE_INIT)
       ENDIF
 C
 C  Observation output
@@ -1883,7 +1887,7 @@ C
 !     gsflow_modflow_restart - write or read restart file
 !***********************************************************************
       SUBROUTINE gsflow_modflow_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum
+      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit,Print_debug
       USE GSFMODFLOW, ONLY: MODNAME, Modflow_time_zero
       USE GWFBASMODULE, ONLY: DELT
@@ -1895,7 +1899,7 @@ C
       CHARACTER(LEN=14) :: module_name
       INTEGER :: MF_time_zero(6)
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) DELT, Modflow_time_zero
       ELSE

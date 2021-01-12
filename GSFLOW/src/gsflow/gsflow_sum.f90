@@ -4,7 +4,7 @@
 !***********************************************************************
 
       MODULE GSFSUM
-      USE PRMS_CONSTANTS, ONLY: DEBUG_WB, DEBUG_less, ERROR_open_out, CFS2CMS_CONV, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: DEBUG_WB, DEBUG_less, ERROR_open_out, CFS2CMS_CONV, ACTIVE, READ_INIT, OFF
       USE PRMS_MODULE, ONLY: Print_debug
       IMPLICIT NONE
 !   Local Variables
@@ -73,6 +73,7 @@
 !     Main gsflow_sum routine
 !***********************************************************************
       INTEGER FUNCTION gsflow_sum()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process, Save_vars_to_file
       IMPLICIT NONE
 ! Functions
@@ -88,7 +89,7 @@
       ELSEIF ( Process(:4)=='init' ) THEN
         gsflow_sum = gsfsuminit()
       ELSEIF ( Process(:5)=='clean' ) THEN
-        IF ( Save_vars_to_file==1 ) CALL gsflow_sum_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL gsflow_sum_restart(SAVE_INIT)
         gsflow_sum = gsfsumclean()
       ENDIF
 
@@ -473,8 +474,8 @@
       Dprst_S = (Basin_dprst_volop + Basin_dprst_volcl) * Basin_convert
       Last_Dprst_S = Dprst_S ! need to deal with restart
 
-      IF ( Init_vars_from_file>0 ) THEN
-        CALL gsflow_sum_restart(1)
+      IF ( Init_vars_from_file>OFF ) THEN
+        CALL gsflow_sum_restart(READ_INIT)
         RETURN
       ENDIF
 

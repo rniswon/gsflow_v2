@@ -98,7 +98,7 @@
 !     Main muskingum routine
 !***********************************************************************
       INTEGER FUNCTION muskingum()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
@@ -112,10 +112,10 @@
       ELSEIF ( Process_flag==DECL ) THEN
         muskingum = muskingum_decl()
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( Init_vars_from_file>0 ) CALL muskingum_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL muskingum_restart(READ_INIT)
         muskingum = muskingum_init()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ACTIVE ) CALL muskingum_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL muskingum_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION muskingum
@@ -371,6 +371,7 @@
 !     muskingum_restart - write or read restart file
 !***********************************************************************
       SUBROUTINE muskingum_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_MUSKINGUM
       IMPLICIT NONE
@@ -381,7 +382,7 @@
       ! Local Variable
       CHARACTER(LEN=14) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Outflow_ts
       ELSE

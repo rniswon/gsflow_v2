@@ -158,12 +158,14 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: potet_pt_module = 5, potet_pm_sta_module = 6, potet_hs_module = 10, potet_pm_module = 11
     integer, parameter :: strmflow_muskingum_module = 4, strmflow_muskingum_mann_module = 7
     integer, parameter :: strmflow_muskingum_lake_module = 3, strmflow_in_out_module = 5, strmflow_noroute_module = 1
-    integer, parameter :: smidx_module = 1, carea_module = 2
+    integer, parameter :: smidx_module = 1, carea_module = 2, ddsolrad_module = 1, ccsolrad_module = 2
 
     integer, parameter :: OFF = 0
     integer, parameter :: ACTIVE = 1
     integer, parameter :: INT_TYPE = 1
     integer, parameter :: REAL_TYPE = 2
     integer, parameter :: DBLE_TYPE = 3
+    integer, parameter :: SAVE_INIT = 0
+    integer, parameter :: READ_INIT = 1
 
 END MODULE PRMS_CONSTANTS

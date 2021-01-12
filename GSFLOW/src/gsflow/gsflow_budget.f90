@@ -24,6 +24,7 @@
 !     Budget module to convert PRMS & MODFLOW states for use by GSFLOW
 !     ******************************************************************
       INTEGER FUNCTION gsflow_budget()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, SAVE_INIT, READ_INIT
       USE PRMS_MODULE, ONLY: Process, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
@@ -37,10 +38,10 @@
       ELSEIF ( Process(:4)=='decl' ) THEN
         gsflow_budget = gsfbuddecl()
       ELSEIF ( Process(:4)=='init' ) THEN
-        IF ( Init_vars_from_file>0 ) CALL gsflow_budget_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL gsflow_budget_restart(READ_INIT)
         gsflow_budget = gsfbudinit()
       ELSEIF ( Process(:5)=='clean' ) THEN
-        IF ( Save_vars_to_file==1 ) CALL gsflow_budget_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL gsflow_budget_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION gsflow_budget
@@ -789,6 +790,7 @@
 !     gsflow_budget_restart - write to or read from restart file
 !***********************************************************************
       SUBROUTINE gsflow_budget_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE GSFBUDGET
       ! Argument
@@ -797,7 +799,7 @@
       ! Local Variable
       CHARACTER(LEN=13) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Total_pump, Total_pump_cfs, Unsat_S, Sat_S, &
      &          Sat_dS, StreamExchng2Sat_Q, Stream2Unsat_Q, Stream_inflow, &

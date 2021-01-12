@@ -32,7 +32,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2020-12-28'
+      character(len=*), parameter :: Version_srunoff = '2021-01-11'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -81,7 +81,7 @@
 !     Main srunoff routine
 !***********************************************************************
       INTEGER FUNCTION srunoff()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, READ_INIT, SAVE_INIT, OFF
       USE PRMS_MODULE, ONLY: Process_flag, Init_vars_from_file, Save_vars_to_file
       IMPLICIT NONE
 ! Functions
@@ -95,10 +95,10 @@
       ELSEIF ( Process_flag==DECL ) THEN
         srunoff = srunoffdecl()
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( Init_vars_from_file>0 ) CALL srunoff_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL srunoff_restart(READ_INIT)
         srunoff = srunoffinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ACTIVE ) CALL srunoff_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL srunoff_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION srunoff
@@ -259,7 +259,9 @@
         ALLOCATE ( Dprst_vol_open_max(Nhru), Dprst_vol_clos_max(Nhru), Dprst_vol_thres_open(Nhru), Dprst_in(Nhru) )
         IF ( PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_dprst_vol_open(Nhru), It0_dprst_vol_clos(Nhru) )
       ENDIF
-      IF ( PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_imperv_stor(Nhru), It0_soil_moist(Nhru), It0_soil_rechr(Nhru) )
+      IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+        ALLOCATE ( It0_imperv_stor(Nhru), It0_soil_moist(Nhru), It0_soil_rechr(Nhru) )
+      ENDIF
 
       ALLOCATE ( Hortonian_flow(Nhru) )
       IF ( declvar(MODNAME, 'hortonian_flow', 'nhru', Nhru, 'real', &
@@ -533,7 +535,7 @@
       Srp = 0.0
       Sri = 0.0
 
-      IF ( Init_vars_from_file==0 ) THEN
+      IF ( Init_vars_from_file==OFF ) THEN
         Basin_imperv_stor = 0.0D0
         Basin_dprst_volop = 0.0D0
         Basin_dprst_volcl = 0.0D0
@@ -1575,7 +1577,8 @@
 !     srunoff_restart - write or read srunoff restart file
 !***********************************************************************
       SUBROUTINE srunoff_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Dprst_flag, Frozen_flag
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_SRUNOFF
       IMPLICIT NONE
       ! Argument
@@ -1585,7 +1588,7 @@
       ! Local Variable
       CHARACTER(LEN=13) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_imperv_stor, Basin_dprst_volop, Basin_dprst_volcl
         WRITE ( Restart_outunit ) Hru_impervstor

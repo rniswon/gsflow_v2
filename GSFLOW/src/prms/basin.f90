@@ -105,9 +105,9 @@
      &     'acres', Hru_perv)/=0 ) CALL read_error(3, 'hru_perv')
 
       ALLOCATE ( Hru_frac_perv(Nhru) )
-      IF ( declvar(MODNAME, 'hru_frac_perv', 'nhru', Nhru, 'real', &
-     &     'Fraction of HRU that is pervious', &
-     &     'decimal fraction', Hru_frac_perv)/=0 ) CALL read_error(3, 'hru_frac_perv')
+     ! IF ( declvar(MODNAME, 'hru_frac_perv', 'nhru', Nhru, 'real', &
+     !&     'Fraction of HRU that is pervious', &
+     !&     'decimal fraction', Hru_frac_perv)/=0 ) CALL read_error(3, 'hru_frac_perv')
 
       IF ( Dprst_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Dprst_area_max(Nhru) )
@@ -341,7 +341,7 @@
       Land_area = 0.0D0
       Active_area = 0.0D0
       Basin_lat = 0.0D0
-      Hru_frac_perv = 1.0
+      Hru_frac_perv = 0.0
       Hru_imperv = 0.0
       Hru_perv = 0.0
       Hru_route_order = 0

@@ -6,7 +6,7 @@
      &    potet_pt_module, potet_pm_module, potet_pm_sta_module, climate_hru_module, &
      &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
      &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
-     &    FEET, FEET2METERS, METERS2FEET, FAHRENHEIT, INACTIVE, LAKE
+     &    FEET, FEET2METERS, METERS2FEET, FAHRENHEIT, INACTIVE, LAKE, ddsolrad_module, ccsolrad_module
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Ngw, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, &
      &    Model, Print_debug, Init_vars_from_file, Temp_flag, Precip_flag, &
      &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, &
@@ -17,7 +17,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2020-12-16'
+      character(len=*), parameter :: Version_climateflow = '2021-01-11'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -108,7 +108,7 @@
 !     Main climateflow routine
 !***********************************************************************
       INTEGER FUNCTION climateflow()
-      USE PRMS_CONSTANTS, ONLY: DECL, INIT, CLEAN, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
@@ -120,10 +120,10 @@
       IF ( Process_flag==DECL ) THEN
         climateflow = climateflow_decl()
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( Init_vars_from_file>0 ) CALL climateflow_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL climateflow_restart(READ_INIT)
         climateflow = climateflow_init()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ACTIVE ) CALL climateflow_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL climateflow_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION climateflow
@@ -270,7 +270,7 @@
      &     'Basin area-weighted average shortwave radiation', &
      &     'Langleys', Basin_potsw)/=0 ) CALL read_error(3, 'basin_potsw')
 
-      IF ( Solrad_flag==1 .OR. Solrad_flag==2 .OR. Model==DOCUMENTATION ) THEN
+      IF ( Solrad_flag==ddsolrad_module .OR. Solrad_flag==ccsolrad_module .OR. Model==DOCUMENTATION ) THEN
         IF ( declvar(Solrad_module, 'basin_orad', 'one', 1, 'double', &
      &       'Basin area-weighted average solar radiation on a horizontal surface', &
      &       'Langleys', Basin_orad)/=0 ) CALL read_error(3, 'basin_orad')
@@ -447,7 +447,7 @@
 
       ALLOCATE ( Infil(Nhru) )
       IF ( declvar(Srunoff_module, 'infil', 'nhru', Nhru, 'real', &
-     &     'Infiltration to the capillary reservoirs for each HRU', &
+     &     'Infiltration to the capillary and preferential-flow for each HRU', &
      &     'inches', Infil)/=0 ) CALL read_error(3, 'infil')
 
       ALLOCATE ( Sroff(Nhru) )
@@ -690,7 +690,7 @@
      &     'Units for measured precipitation (0=inches; 1=mm)', &
      &     'none')/=0 ) CALL read_error(1, 'precip_units')
 
-      IF ( Solrad_flag==1 .OR. Solrad_flag==2 .OR. Model==DOCUMENTATION ) THEN
+      IF ( Solrad_flag==ddsolrad_module .OR. Solrad_flag==ccsolrad_module .OR. Model==DOCUMENTATION ) THEN
         IF ( Nsol>0 ) THEN
           IF ( declparam(Solrad_module, 'rad_conv', 'one', 'real', &
      &         '1.0', '0.1', '100.0', &
@@ -972,7 +972,7 @@
         ENDDO
       ENDIF
 
-      IF ( Solrad_flag==1 .OR. Solrad_flag==2 ) THEN
+      IF ( Solrad_flag==ddsolrad_module .OR. Solrad_flag==ccsolrad_module ) THEN
         Solsta_flag = OFF
         IF ( Nsol>0 ) THEN
           IF ( getparam(Solrad_module, 'basin_solsta', 1, 'integer', Basin_solsta)/=0 ) CALL read_error(2, 'basin_solsta')
@@ -1026,7 +1026,7 @@
       ENDIF
 
       ierr = 0
-      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
+      IF ( Init_vars_from_file==OFF .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
         IF ( PRMS4_flag==ACTIVE ) THEN
           ! use PRMS4 parameters
           IF ( getparam(Soilzone_module, 'soil_moist_init', Nhru, 'real', Soil_moist)/=0 ) &
@@ -1133,8 +1133,8 @@
       Tavgc = 0.0
       Tmax_hru = 0.0
       Tmin_hru = 0.0
-      Pptmix = 0
-      Newsnow = 0
+      Pptmix = OFF
+      Newsnow = OFF
       Prmx = 0.0
       Hru_ppt = 0.0
       Hru_rain = 0.0
@@ -1151,7 +1151,7 @@
       Ssr_to_gw = 0.0
       Ssres_in = 0.0
       Ssres_flow = 0.0
-      IF ( Solrad_flag==1 .OR. Solrad_flag==2 ) Orad_hru = 0.0
+      IF ( Solrad_flag==ddsolrad_module .OR. Solrad_flag==ccsolrad_module ) Orad_hru = 0.0
       IF ( Et_flag==potet_pt_module .OR. Et_flag==potet_pm_module .OR. Et_flag==potet_pm_sta_module ) THEN
         Tempc_dewpt = 0.0
         Vp_actual = 0.0
@@ -1371,6 +1371,7 @@
 !     Write or read restart file
 !***********************************************************************
       SUBROUTINE climateflow_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
@@ -1382,7 +1383,7 @@
       ! Local Variable
       CHARACTER(LEN=11) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
         WRITE ( Restart_outunit ) Transp_on

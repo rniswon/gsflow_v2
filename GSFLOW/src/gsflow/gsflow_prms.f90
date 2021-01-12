@@ -14,7 +14,7 @@
    &    strmflow_noroute_module, strmflow_muskingum_mann_module, &
    &    strmflow_muskingum_module, precip_1sta_module, precip_laps_module, &
    &    climate_hru_module, precip_map_module, temp_1sta_module, temp_laps_module, temp_sta_module, &
-   &    smidx_module, carea_module
+   &    smidx_module, carea_module, ddsolrad_module, ccsolrad_module, SAVE_INIT, READ_INIT
       IMPLICIT NONE
       character(LEN=*), parameter :: &
      &          EQULS = '===================================================================='
@@ -43,7 +43,6 @@
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Soilzone_add_water_use
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
-      INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Gwr_transfer_water_use, Gwr_add_water_use
       INTEGER, SAVE :: Lake_transfer_water_use, Lake_add_water_use
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
@@ -56,20 +55,19 @@
 ! Precip_flag (1=precip_1sta; 2=precip_laps; 3=precip_dist2; 5=ide_dist; 6=xyz_dist; 7=climate_hru; 9=precip_map
 ! Temp_flag (1=temp_1sta; 2=temp_laps; 3=temp_dist2; 5=ide_dist; 6=xyz_dist; 7=climate_hru; 8=temp_sta; 9=temp_map
 ! Control parameters
-      INTEGER, SAVE :: Starttime(6), Endtime(6), Modflow_time_zero(6)
+      INTEGER, SAVE :: Starttime(6), Endtime(6)
       INTEGER, SAVE :: Print_debug, MapOutON_OFF, CsvON_OFF, Dprst_flag, Subbasin_flag, Parameter_check_flag
       INTEGER, SAVE :: Init_vars_from_file, Save_vars_to_file, Orad_flag, Cascade_flag, Cascadegw_flag
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
-      INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF
       INTEGER, SAVE :: Prms_warmup, Diversion2soil_flag, PRMS_land_iteration_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
+      INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Csv_output_file, Model_control_file, Param_file
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Temp_module, Srunoff_module, Et_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Strmflow_module, Transp_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Model_mode, Precip_module, Solrad_module
-      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
       CHARACTER(LEN=8), SAVE :: Soilzone_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
       INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF
@@ -201,7 +199,7 @@
         ENDIF
 
         Timestep = 0
-        IF ( Init_vars_from_file>0 ) CALL call_modules_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL call_modules_restart(READ_INIT)
 
       ELSEIF ( Process(:4)=='init' ) THEN
         Process_flag = INIT
@@ -286,7 +284,7 @@
         IF ( Save_vars_to_file==ACTIVE ) THEN
           CALL PRMS_open_output_file(Restart_outunit, Var_save_file, 'var_save_file', 1, iret)
           IF ( iret/=0 ) ERROR STOP ERROR_open_out
-          CALL call_modules_restart(0)
+          CALL call_modules_restart(SAVE_INIT)
         ENDIF
         IF ( Model==GSFLOW ) THEN
           call_modules = gsflow_modflow()
@@ -383,9 +381,9 @@
       ENDIF
 
       IF ( Climate_swrad_flag==0 ) THEN
-        IF ( Solrad_flag==1 ) THEN
+        IF ( Solrad_flag==ddsolrad_module ) THEN
           call_modules = ddsolrad()
-        ELSE !IF ( Solrad_flag==2 ) THEN
+        ELSE !IF ( Solrad_flag==ccsolrad_module ) THEN
           call_modules = ccsolrad()
         ENDIF
         IF ( call_modules/=0 ) CALL module_error(Solrad_module, Arg, call_modules)
@@ -869,9 +867,6 @@
       ! 0 = CBH File; 1 = specified constant; 2 = Stations
       IF ( control_integer(Strmtemp_humidity_flag, 'strmtemp_humidity_flag')/=0 ) Strmtemp_humidity_flag = OFF
 
-      IF ( control_integer(Snarea_curve_flag, 'snarea_curve_flag')/=0 ) Snarea_curve_flag = OFF
-      IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
-
       Humidity_cbh_flag = OFF
       Windspeed_cbh_flag = OFF
       IF ( Et_flag==potet_pm_module .OR. Et_flag==potet_pt_module .OR. &
@@ -891,12 +886,12 @@
 
       IF ( control_integer(Orad_flag, 'orad_flag')/=0 ) Orad_flag = OFF
       IF ( Solrad_module(:8)=='ddsolrad' ) THEN
-        Solrad_flag = 1
+        Solrad_flag = ddsolrad_module
       ELSEIF ( Solrad_module(:11)=='climate_hru' ) THEN
         Solrad_flag = climate_hru_module
         Climate_swrad_flag = ACTIVE
       ELSEIF ( Solrad_module(:8)=='ccsolrad' ) THEN
-        Solrad_flag = 2
+        Solrad_flag = ccsolrad_module
       ELSE
         PRINT '(/,2A)', 'ERROR, invalid solrad_module value: ', Solrad_module
         Inputerror_flag = 1
@@ -948,6 +943,8 @@
       IF ( decldim('nsub', 0, MAXDIM, 'Number of internal subbasins')/=0 ) CALL read_error(7, 'nsub')
 
       IF ( control_integer(Dprst_flag, 'dprst_flag')/=0 ) Dprst_flag = OFF
+      IF ( control_integer(Dprst_transfer_water_use, 'dprst_transfer_water_use')/=0 ) Dprst_transfer_water_use = OFF
+      IF ( control_integer(Dprst_add_water_use, 'dprst_add_water_use')/=0 ) Dprst_add_water_use = OFF
       IF ( control_integer(PRMS_land_iteration_flag, 'PRMS_land_iteration_flag')/=0 ) PRMS_land_iteration_flag = OFF
       IF ( Model==PRMS ) PRMS_land_iteration_flag = OFF
       ! 0 = off, 1 = on, 2 = lauren version
