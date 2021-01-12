@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2020-12-23'
+      character(len=*), parameter :: Version_gsflow_budget = '2021-01-12'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -193,6 +193,7 @@
 !     gsfbudinit - Initialize GSFBUDGET module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION gsfbudinit()
+      USE PRMS_CONSTANTS, ONLY: OFF
       USE GSFBUDGET
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru
       USE GWFSFRMODULE, ONLY: NSTRM
@@ -210,9 +211,7 @@
 
       Reach_cfs = 0.0 ! dimension NSTRM
       Reach_wse = 0.0 ! dimension NSTRM
-      Total_pump = 0.0D0
-      Total_pump_cfs = 0.0D0
-      IF ( Init_vars_from_file==0 ) THEN
+      IF ( Init_vars_from_file==OFF ) THEN
         Unsat_S = UZTSRAT(6)
         IF ( IUNIT(1)>0 ) CALL MODFLOW_GET_STORAGE_BCF()
         IF ( IUNIT(23)>0 ) CALL MODFLOW_GET_STORAGE_LPF()
@@ -224,6 +223,8 @@
         Lake2Unsat_Q = 0.0D0
         Stream_inflow = 0.0D0
         Basin_gw2sm = 0.0D0
+        Total_pump = 0.0D0
+        Total_pump_cfs = 0.0D0
       ENDIF
 !      Uzf_infil_map = 0.0 ! dimension nhru
 !      Sat_recharge = 0.0 ! dimension nhru
