@@ -3,7 +3,7 @@ options
 etdemand 10.0
 irrigation_pond 14 5
 maxponds 14  
-pondlist -2 
+pondirrlist -2 
 timeseries_pond
 timeseries_pondirr
 end

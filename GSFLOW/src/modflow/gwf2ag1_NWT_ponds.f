@@ -165,6 +165,7 @@
       ALLOCATE (TSACTIVEPOND, TSACTIVEPONDIRR)
       ALLOCATE (TSGWALLUNIT, TSGWETALLUNIT, NSEGDIMTEMP)
       ALLOCATE (MXPOND, NUMPOND, NUMPONDIRR, NUMTABPOND, MAXVALPOND)
+      ALLOCATE (NUMIRRPONDSP)
       MXPOND = 0
       NUMPOND = 0
       VBVLAG = 0.0
@@ -189,6 +190,7 @@
       NUMGWET = 0
       NUMPOND = 0
       NUMPONDIRR = 0
+      NUMIRRPONDSP = 0
       TSGWETALLUNIT = 0
       TSGWALLUNIT = 0
       WELAUX = ''
@@ -974,19 +976,18 @@
       character(len=16)  :: char1 = 'WELL LIST'
       character(len=16)  :: char2 = 'SEGMENT LIST'
       character(len=16)  :: char3 = 'POND LIST'
+      character(len=16)  :: char = 'SOURCE LIST'
       CHARACTER(LEN=200)::LINE
       INTEGER I, ITMP
       INTEGER LLOC, ISTART, ISTOP, ISTARTSAVE
       INTEGER J, II, KPER2, L, MATCH, NUMTABS, is, ip, nseg
       INTEGER istsg, istsgold, ISEG, IPOND
       logical :: FOUND
-      logical :: found1, found2, found3, found4, found5, found6, found7
+      logical :: found1, found2, found3, found4, found7
       REAL :: R, TTIME, TRATE, QPOND
       CHARACTER*6 CWELL
       ! - -----------------------------------------------------------------
       found4 = .false.
-      found5 = .false.
-      found6 = .false.
       found7 = .false.
       is = 0
       ISEG = 0
@@ -997,14 +998,15 @@
       !
       !1 - ---READ SEGMENT, POND, AND WELL LIST DATA
       IF (KPER .EQ. 1) THEN
-         CALL URDCOM(In, IOUT, line)
-         LLOC = 1
-         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-         ISTARTSAVE = ISTART
-         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-         select case (LINE(ISTARTSAVE:ISTOP))
-         case ('SEGMENT LIST')
-            found5 = .true.
+        do
+          CALL URDCOM(In, IOUT, line)
+          LLOC = 1
+          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
+          ISTARTSAVE = ISTART
+          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
+          select case (LINE(ISTARTSAVE:ISTOP))
+          case ('SEGMENT LIST')
+            CHAR = CHAR2
             write (iout, '(/1x,a)') 'PROCESSING '//
      +             trim(adjustl(CHAR2))//''
             nseg = 0
@@ -1046,19 +1048,9 @@
                   end if
                end select
             end do
-         end select
          !2 - ---READ POND LIST
-         if ( found5 ) then
-            CALL URDCOM(In, IOUT, line)
-            LLOC = 1
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-            ISTARTSAVE = ISTART
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-         end if
-         do
-            select case (LINE(ISTARTSAVE:ISTOP))
-            case ('POND LIST')
-               found6 = .true.
+          case ('POND LIST')
+               CHAR = CHAR3
                write (iout, '(/1x,a)') 'PROCESSING '//
      +                         trim(adjustl(CHAR3))//''
                IF (NUMTABPOND .EQ. 0) THEN
@@ -1124,35 +1116,35 @@
                      END DO
                   END DO
                END IF
-            case ('END')
-!               found6 = .false.
-               write (iout, '(/1x,a)') 'FINISHED READING '//
-     +          trim(adjustl(char3))
-               exit
-            case default
-               WRITE (IOUT, *) 'Invalid AG Input: '//LINE(ISTART:ISTOP)
-     +           //' Should be: '//trim(adjustl(CHAR3))
-               CALL USTOP('Invalid AG Input: '//LINE(ISTART:ISTOP)
-     +          //' Should be: '//trim(adjustl(CHAR3)))
-            end select
-            if (found6) then
-               CALL URDCOM(In, IOUT, line)
-               LLOC = 1
-               CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-            end if
-         end do
+!            case ('END')
+!!               found6 = .false.
+!               write (iout, '(/1x,a)') 'FINISHED READING '//
+!     +          trim(adjustl(char3))
+!               exit
+!            case default
+!               WRITE (IOUT, *) 'Invalid AG Input: '//LINE(ISTART:ISTOP)
+!     +           //' Should be: '//trim(adjustl(CHAR3))
+!               CALL USTOP('Invalid AG Input: '//LINE(ISTART:ISTOP)
+!     +          //' Should be: '//trim(adjustl(CHAR3)))
+!            end select
+            !if (found6) then
+            !   CALL URDCOM(In, IOUT, line)
+            !   LLOC = 1
+            !   CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
+            !end if
          !2 - ---READ WELL LIST
-         if (found5 .or. found6) then
-            CALL URDCOM(In, IOUT, line)
-            LLOC = 1
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-            ISTARTSAVE = ISTART
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-         end if
-         do
-            select case (LINE(ISTARTSAVE:ISTOP))
-            case ('WELL LIST')
+         !if (found5 .or. found6) then
+         !   CALL URDCOM(In, IOUT, line)
+         !   LLOC = 1
+         !   CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
+         !   ISTARTSAVE = ISTART
+         !   CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
+         !end if
+         !do
+          !  select case (LINE(ISTARTSAVE:ISTOP))
+          case ('WELL LIST')
                found4 = .true.
+               CHAR = CHAR1
                write (iout, '(/1x,a)') 'PROCESSING '//
      +                         trim(adjustl(CHAR1))//''
                IF (NUMTABWELL .EQ. 0) THEN
@@ -1218,26 +1210,28 @@
             case ('END')
                found4 = .false.
                write (iout, '(/1x,a)') 'FINISHED READING '//
-     +          trim(adjustl(char1))
+     +          trim(adjustl(char))
                exit
             case default
                WRITE (IOUT, *) 'Invalid AG Input: '//LINE(ISTART:ISTOP)
-     +           //' Should be: '//trim(adjustl(CHAR1))
+     +           //' Should be: '//trim(adjustl(CHAR))
                CALL USTOP('Invalid AG Input: '//LINE(ISTART:ISTOP)
-     +          //' Should be: '//trim(adjustl(CHAR1)))
+     +          //' Should be: '//trim(adjustl(CHAR)))
             end select
-            if (found4) then
-               CALL URDCOM(In, IOUT, line)
-               LLOC = 1
-               CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-            end if
-         end do
+            !if (found4) then
+            !   CALL URDCOM(In, IOUT, line)
+            !   LLOC = 1
+            !   CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
+            !end if
+      end do
          !
          !3 - ---PRINT NUMBER OF WELLS USED FOR SUP OR IRR.
-         NWELLS = MXWELL
-         CWELL = ' WELLS'
-         IF (NWELLS .EQ. 1) CWELL = ' WELL '
-         WRITE (IOUT, 101) NWELLS, CWELL
+         IF ( found4 ) THEN
+           NWELLS = MXWELL
+           CWELL = ' WELLS'
+           IF (NWELLS .EQ. 1) CWELL = ' WELL '
+           WRITE (IOUT, 101) NWELLS, CWELL
+         END IF
 101      FORMAT(1X, /1X, I6, A)
 100      FORMAT(1X, /1X, '****MODEL STOPPING**** ',
      +      'UNIT NUMBER FOR TABULAR INPUT FILE SPECIFIED AS ZERO.')
