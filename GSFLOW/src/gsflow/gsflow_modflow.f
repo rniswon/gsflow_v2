@@ -9,7 +9,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-01-05'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-01-19'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -48,6 +48,8 @@ C-------ASSIGN VERSION NUMBER AND DATE
       PARAMETER (VERSION3='1.04.0 09/15/2016')
       PARAMETER (MFVNAM='-NWT-SWR1')
       INTEGER, SAVE :: IBDT(8)
+!   Declared Variables
+      REAL, SAVE, ALLOCATABLE :: Hru_ag_irr(:)
 !   Control Parameters
       INTEGER, SAVE :: Modflow_time_zero(6)
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
@@ -125,8 +127,9 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
-     &    Kper_mfo, Diversion2soil_flag, Have_lakes, NLAKES_MF
+     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package_active, Nhru
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -136,10 +139,11 @@ C1------USE package modules.
       INCLUDE 'openspec.inc'
 ! Functions
       INTRINSIC DBLE
-      INTEGER, EXTERNAL :: numchars, GET_KPER
+      INTEGER, EXTERNAL :: numchars, GET_KPER, declvar
       EXTERNAL :: SET_STRESS_DATES, print_module, SETMFTIME
       EXTERNAL :: SETCONVFACTORS, check_gvr_cell_pct
       EXTERNAL :: gsflow_modflow_restart, set_cell_values, error_stop
+      EXTERNAL :: read_error
 ! Local Variables
       INTEGER :: MAXUNIT, NC
 C
@@ -157,7 +161,7 @@ C
      &           'HYD ', 'SFR ', '    ', 'GAGE', 'LVDA', '    ', 'LMT6',  ! 49
      &           'MNW2', 'MNWI', 'MNW1', 'KDEP', 'SUB ', 'UZF ', 'gwm ',  ! 56
      &           'SWT ', 'cfp ', 'pcgn', '    ', 'fmp ', 'UPW ', 'NWT ',  ! 63
-     &           'SWR ', 'SWI2', 'AG  ', '    ', 'IWRT', 'IRED', '    ',  ! 70     - SWR - JDH 
+     &           'SWR ', 'SWI2', 'AG  ', 'GFB ', 'IWRT', 'IRED', '    ',  ! 70     - SWR - JDH 
      &           30*'    '/                                               ! 71-100 - SWR - JDH
 C     ------------------------------------------------------------------
       gsfinit = 0
@@ -358,7 +362,7 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
       IF(IUNIT(65).GT.0) CALL GWF2SWI2AR(IUNIT(65),
      2                        IUNIT(1),IUNIT(23),IUNIT(37),IUNIT(62),
      3                        IGRID)   !SWI2  - JDH
-!     IF(IUNIT(66).GT.0) CALL GWF2GFB7AR(IUNIT(66),IGRID)
+!     IF(IUNIT(67).GT.0) CALL GWF2GFB7AR(IUNIT(66),IGRID)
       IF(IUNIT(43).GT.0) THEN
         CALL GWF2HYD7BAS7AR(IUNIT(43),IGRID)
         IF(IUNIT(19).GT.0) CALL GWF2HYD7IBS7AR(IUNIT(43),IGRID)
@@ -367,9 +371,20 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
         IF(IUNIT(44).GT.0) CALL GWF2HYD7SFR7AR(IUNIT(43),IGRID)
       ENDIF
       IF(IUNIT(49).GT.0) CALL LMT8BAS7AR(INUNIT,CUNIT,IGRID)
+      Ag_package_active = OFF
       IF(IUNIT(66).GT.0) THEN
+        IF (GSFLOW_flag==ACTIVE) THEN
+          Ag_package_active = ACTIVE
+          IF (Ag_package_active==ACTIVE .OR. Model==DOCUMENTATION) THEN
+            ALLOCATE ( Hru_ag_irr(Nhru) )
+            IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real',
+     &           'Irrigation added to soilzone from MODFLOW wells',
+     &           'inches', Hru_ag_irr)/=0 )
+     &           CALL read_error(3, 'hru_ag_irr')
+            Hru_ag_irr = 0.0
+          ENDIF
+        ENDIF
         CALL GWF2AG7AR(IUNIT(66),IUNIT(44),IUNIT(63))
-        Diversion2soil_flag = ACTIVE
       ENDIF
 !      IF(IUNIT(61).GT.0) THEN
 !        CALL FMP2AR(
@@ -454,7 +469,7 @@ C
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
      &    Init_vars_from_file, Mxsziter, Glacier_flag,
-     &    PRMS_land_iteration_flag
+     &    PRMS_land_iteration_flag, Process
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
 C1------USE package modules.
       USE GLOBAL
@@ -473,9 +488,8 @@ c     USE LMGMODULE
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: soilzone, GET_KPER
-      INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsfclean
-      EXTERNAL :: READ_STRESS
+      EXTERNAL :: READ_STRESS, PRMS_land_modules
       INTRINSIC MIN
 ! Local Variables
       INTEGER :: retval, II, KITER, IBDRET, iss
@@ -643,30 +657,8 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ACTIVE ) THEN
-              IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
-                retval = intcp()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'intcp', retval
-                  RETURN
-                ENDIF
-                retval = snowcomp()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'snowcomp', retval
-                  RETURN
-                ENDIF
-                IF ( Glacier_flag==ACTIVE ) THEN
-                  retval = glacr()
-                  IF ( retval/=0 ) THEN
-                    PRINT 9001, 'glacr_melt', retval
-                    RETURN
-                  ENDIF
-                ENDIF
-                retval = srunoff()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'srunoff', retval
-                  RETURN
-                ENDIF
-              ENDIF
+              IF ( PRMS_land_iteration_flag==ACTIVE )
+     &             CALL PRMS_land_modules(Process, retval)
               retval = soilzone()
               IF ( retval/=0 ) THEN
                 PRINT 9001, 'soilzone', retval
@@ -713,7 +705,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF(IUNIT(64).GT.0) CALL GWF2SWR7FM(KKITER,KKPER,KKSTP,IGRID)  !SWR - JDH
             IF(IUNIT(66).GT.0 ) 
      1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63))
-!            IF(IUNIT(66).GT.0) CALL GWF2GFB7FM(IGRID)
+!            IF(IUNIT(67).GT.0) CALL GWF2GFB7FM(IGRID)
 C-------------SWI2 FORMULATE (GWF2SWI2FM) NEEDS TO BE THE LAST PACKAGE
 C             ENTRY SINCE SWI2 SAVES THE RHS (RHSFRESH) PRIOR TO ADDING SWI TERMS
 C             RHSFRESH IS USED TO CALCULATE BOUNDARY CONDITION FLUXES
@@ -900,7 +892,7 @@ C7C4----CALCULATE BUDGET TERMS. SAVE CELL-BY-CELL FLOW TERMS.
           IF(IUNIT(54).GT.0) CALL GWF2SUB7BD(KKSTP,KKPER,IGRID)
           IF(IUNIT(57).GT.0) CALL GWF2SWT7BD(KKSTP,KKPER,IGRID)     
           IF(IUNIT(64).GT.0) CALL GWF2SWR7BD(KKSTP,KKPER,IGRID)  !SWR - JDH
-!         IF(IUNIT(66).GT.0) CALL GWF2GFB7BD(KKSTP,KKPER,IGRID) 
+!         IF(IUNIT(67).GT.0) CALL GWF2GFB7BD(KKSTP,KKPER,IGRID) 
           IF(IUNIT(65).GT.0) CALL GWF2SWI2BD(KKSTP,KKPER,IGRID)  !SWI2 - JDH
           IF(IUNIT(66).GT.0) CALL GWF2AG7BD(KKSTP,KKPER,IUNIT(63))
 CLMT
@@ -1092,7 +1084,7 @@ c      IF(IUNIT(14).GT.0) CALL LMG7DA(IGRID)
       IF(IUNIT(57).GT.0) CALL GWF2SWT7DA(IGRID)
       IF(IUNIT(64).GT.0) CALL GWF2SWR7DA(IGRID)  !SWR - JDH
       IF(IUNIT(65).GT.0) CALL GWF2SWI2DA(IGRID)  !SW12 - JDH
-!      IF(IUNIT(66).GT.0) CALL GWF2GFB7DA(IGRID)
+!      IF(IUNIT(67).GT.0) CALL GWF2GFB7DA(IGRID)
       CALL OBS2BAS7DA(IUNIT(28),IGRID)
       IF(IUNIT(33).GT.0) CALL OBS2DRN7DA(IGRID)
       IF(IUNIT(34).GT.0) CALL OBS2RIV7DA(IGRID)
@@ -1496,8 +1488,8 @@ C
           CALL READ_STRESS()
           IF ( Init_vars_from_file==0 ) THEN
             Steady_state = 1
-            IF ( gsfrun()/=0 ) CALL error_stop('steady state failed',
-     &                                         ERROR_modflow)
+            IF ( gsfrun()/=0 )
+     &           CALL error_stop('steady state failed', ERROR_modflow)
             Steady_state = 0
  !           TOTIM = plen !RGN 9/4/2018 TOTIM needs to stay in MF time units
             TOTIM = PERLEN(i)  !RGN 9/4/2018 TOTIM needs to stay in MF time units

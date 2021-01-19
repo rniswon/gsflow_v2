@@ -7,13 +7,13 @@
 !     gvr_hru_id, gvr_cell_id
 !     ******************************************************************
       INTEGER FUNCTION gsflow_mf2prms()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE
       USE GSFMODFLOW, ONLY: Mfq2inch_conv, Gwc_col, Gwc_row, &
-                            Mfl2_to_acre, Mfl_to_inch
-      USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Gw2sm_grav, Hru_ag_irr
+                            Mfl2_to_acre, Mfl_to_inch, Hru_ag_irr
+      USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Gw2sm_grav
       USE PRMS_WATER_USE, ONLY: Dprst_gain
       USE GWFUZFMODULE, ONLY: SEEPOUT
-      USE PRMS_MODULE, ONLY: Process, Nhrucell, Gvr_cell_id
-      USE GLOBAL,       ONLY: IUNIT
+      USE PRMS_MODULE, ONLY: Process, Nhrucell, Gvr_cell_id, Ag_package_active
       USE GWFBASMODULE, ONLY: DELT
       USE GSFMODFLOW, ONLY: Mfl3_to_ft3, Mft_to_sec
       USE GWFAGMODULE, ONLY: NUMIRRWELSP, IRRWELVAR, NUMCELLS, WELLIRRPRMS, IRRROW_SW, &
@@ -26,7 +26,7 @@
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW to PRMS'
       character(len=*), parameter :: MODNAME = 'gsflow_mf2prms'
-      character(len=*), parameter :: Version_gsflow_mf2prms = '2021-01-06'
+      character(len=*), parameter :: Version_gsflow_mf2prms = '2021-01-14'
       INTEGER :: i, j, k, ihru
       integer :: IRWL,NMCL,SGNM
       DOUBLE PRECISION :: mf_q2prms_inchacres
@@ -44,7 +44,7 @@
 !
 ! From irrigation wells
 !
-        IF ( Iunit(66) > 0 ) then
+        IF ( Ag_package_active==ACTIVE ) then
           mf_q2prms_inchacres = DELT*Mfl2_to_acre*Mfl_to_inch
           Hru_ag_irr = 0.0
           DO J = 1, NUMIRRWELSP
