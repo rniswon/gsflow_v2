@@ -17,7 +17,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2020-12-22'
+      character(len=*), parameter :: Version_climateflow = '2021-01-11'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -109,7 +109,7 @@
 !     Main climateflow routine
 !***********************************************************************
       INTEGER FUNCTION climateflow()
-      USE PRMS_CONSTANTS, ONLY: DECL, INIT, CLEAN, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
@@ -121,10 +121,10 @@
       IF ( Process_flag==DECL ) THEN
         climateflow = climateflow_decl()
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( Init_vars_from_file>0 ) CALL climateflow_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL climateflow_restart(READ_INIT)
         climateflow = climateflow_init()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ACTIVE ) CALL climateflow_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL climateflow_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION climateflow
@@ -448,7 +448,7 @@
 
       ALLOCATE ( Infil(Nhru) )
       IF ( declvar(Srunoff_module, 'infil', 'nhru', Nhru, 'real', &
-     &     'Infiltration to the capillary reservoirs for each HRU', &
+     &     'Infiltration to the capillary, preferential-flow, and agriculture reservoirs for each HRU', &
      &     'inches', Infil)/=0 ) CALL read_error(3, 'infil')
 
       ALLOCATE ( Sroff(Nhru) )
@@ -1188,8 +1188,8 @@
       Tavgc = 0.0
       Tmax_hru = 0.0
       Tmin_hru = 0.0
-      Pptmix = 0
-      Newsnow = 0
+      Pptmix = OFF
+      Newsnow = OFF
       Prmx = 0.0
       Hru_ppt = 0.0
       Hru_rain = 0.0
@@ -1426,6 +1426,7 @@
 !     Write or read restart file
 !***********************************************************************
       SUBROUTINE climateflow_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
@@ -1437,7 +1438,7 @@
       ! Local Variable
       CHARACTER(LEN=11) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
         WRITE ( Restart_outunit ) Transp_on

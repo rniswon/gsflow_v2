@@ -11,9 +11,9 @@
       MODULE PRMS_SNOW
       USE PRMS_CONSTANTS, ONLY: LAKE, LAND, GLACIER, SHRUBS, FEET, &
      &    INCH2M, FEET2METERS, DNEARZERO, DOCUMENTATION, ACTIVE, OFF, &
-     &    MONTHS_PER_YEAR, DEBUG_less, DAYS_YR, CLOSEZERO, INCH2CM
+     &    MONTHS_PER_YEAR, DEBUG_less, DAYS_YR, CLOSEZERO, INCH2CM, SAVE_INIT
       USE PRMS_MODULE, ONLY: Model, Nhru, Ndepl, Print_debug, &
-     &    Init_vars_from_file, Snarea_curve_flag, Glacier_flag, Start_year, &
+     &    Init_vars_from_file, Glacier_flag, Start_year, &
      &    PRMS_land_iteration_flag, Kkiter
       IMPLICIT NONE
       !****************************************************************
@@ -27,7 +27,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2020-12-17'
+      character(len=*), parameter :: Version_snowcomp = '2021-01-11'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -79,14 +79,17 @@
       REAL, SAVE, ALLOCATABLE :: Glacr_layer(:), Albedo_coef(:), Albedo_ice(:)
       REAL, SAVE, ALLOCATABLE :: Glacr_freeh2o_cap(:), Glacier_frac_init(:), Glrette_frac_init(:)
 
+      !   Control Parameters
+      INTEGER, SAVE :: Snarea_curve_flag
+
       END MODULE PRMS_SNOW
 
 !***********************************************************************
 !     Main snowcomp routine
 !***********************************************************************
       INTEGER FUNCTION snowcomp()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE
-      USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
+      USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: snodecl, snoinit, snorun
@@ -99,9 +102,10 @@
       ELSEIF ( Process_flag==DECL ) THEN
         snowcomp = snodecl()
       ELSEIF ( Process_flag==INIT ) THEN
+        IF ( Init_vars_from_file>OFF ) CALL snowcomp_restart(READ_INIT)
         snowcomp = snoinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ACTIVE ) CALL snowcomp_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL snowcomp_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION snowcomp
@@ -120,12 +124,14 @@
       USE PRMS_SNOW
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar
+      INTEGER, EXTERNAL :: declparam, declvar, control_integer
       EXTERNAL :: read_error, print_module
 !***********************************************************************
       snodecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_snowcomp)
+
+      IF ( control_integer(Snarea_curve_flag, 'snarea_curve_flag')/=0 ) Snarea_curve_flag = OFF
 
       IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
         ALLOCATE ( It0_snowcov_area(Nhru), It0_snowcov_areasv(Nhru), It0_pkwater_equiv(Nhru) )
@@ -510,7 +516,7 @@
      &       ' melts will set daily glacr_pk_temp to 0',  &
      &       'inches')/=0 ) CALL read_error(1, 'glacr_layer')
 
-        IF ( Init_vars_from_file==0 ) THEN
+        IF ( Init_vars_from_file==OFF ) THEN
           ALLOCATE ( Glacier_frac_init(Nhru) )
           IF ( declparam(MODNAME, 'glacier_frac_init', 'nhru', 'real', &
      &       '0.0', '0.0', '1.0', &
@@ -684,7 +690,7 @@
      &     ' type for each HRU (0=frontal storms; 1=convective storms)', &
      &     'none')/=0 ) CALL read_error(1, 'tstorm_mo')
 
-      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==3 ) THEN
+      IF ( Init_vars_from_file==OFF .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==3 ) THEN
         ALLOCATE ( Snowpack_init(Nhru) )
         IF ( declparam(MODNAME, 'snowpack_init', 'nhru', 'real', &
      &       '0.0', '0.0', '5000.0', &
@@ -708,7 +714,7 @@
 ! Functions
       INTRINSIC :: DBLE, ATAN, SNGL, MIN
       INTEGER, EXTERNAL :: getparam
-      EXTERNAL :: read_error, snowcomp_restart, sca_deplcrv, glacr_states_to_zero
+      EXTERNAL :: read_error, sca_deplcrv, glacr_states_to_zero
 ! Local Variables
       INTEGER :: i, j
       REAL :: x
@@ -718,8 +724,6 @@
       DATA amlt_init/.72, .65, .60, .58, .56, .54, .52, .50, .48, .46, .44, .43, .42, .41, .40/
 !***********************************************************************
       snoinit = 0
-
-      IF ( Init_vars_from_file>0 ) CALL snowcomp_restart(1)
 
       IF ( Glacier_flag==ACTIVE ) THEN
         IF ( getparam(MODNAME, 'glacr_freeh2o_cap', Nhru, 'real', Glacr_freeh2o_cap)/=0 ) CALL read_error(2, 'glacr_freeh2o_cap')
@@ -2990,7 +2994,7 @@
       ! Local Variable
       CHARACTER(LEN=8) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_pweqv, Basin_snowcov, Basin_snowdepth, Basin_snowicecov
         WRITE ( Restart_outunit ) Int_alb

@@ -361,7 +361,7 @@
       Land_area = 0.0D0
       Active_area = 0.0D0
       Basin_lat = 0.0D0
-      Hru_frac_perv = 1.0
+      Hru_frac_perv = 0.0
       Hru_imperv = 0.0
       Hru_perv = 0.0
       Hru_route_order = 0
@@ -461,11 +461,10 @@
         ENDIF
 
         Hru_perv(i) = perv_area
-        Hru_frac_perv(i) = perv_area/harea
-        !IF ( Hru_frac_perv(i)<0.001 ) THEN
+        !IF ( perv_area/harea<0.001 ) THEN
         !  PRINT *, 'ERROR, pervious plus agriculture fraction must be >= 0.001 for HRU:', i
         !  PRINT *, '       pervious portion is HRU fraction - impervious fraction - depression fraction - agriculture fraction'
-        !  PRINT *, '       pervious fraction:', Hru_frac_perv(i)
+        !  PRINT *, '       pervious fraction:', perv_area/harea
         !  PRINT *, '       impervious fraction:', Hru_percent_imperv(i)
         !  IF ( Dprst_flag==ON ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
         !  IF ( Agriculture_flag>OFF ) PRINT *, '       agriculture fraction:', Ag_frac(i)
@@ -552,7 +551,7 @@
           WRITE (buffer, 9004) 'Lake area:            ', Water_area, '    Fraction lakes:    ', Water_area*Basin_area_inv
           CALL write_outfile(buffer)
         ENDIF
-        IF ( Dprst_flag==Active ) THEN
+        IF ( Dprst_flag==ACTIVE ) THEN
           WRITE (buffer, 9005) 'DPRST area:          ', basin_dprst, '    Fraction DPRST:   ', basin_dprst*Basin_area_inv
           CALL write_outfile(buffer)
         ENDIF

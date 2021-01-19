@@ -22,8 +22,7 @@
 !***********************************************************************
       MODULE PRMS_SRUNOFF
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, NEARZERO, DNEARZERO, ACTIVE, OFF, &
-     &    DEBUG_WB, smidx_module, carea_module, LAND, LAKE, GLACIER, &
-     &    CASCADE_OFF, ERROR_water_use
+     &    DEBUG_WB, smidx_module, carea_module, LAND, LAKE, GLACIER, CASCADE_OFF, ERROR_water_use
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Print_debug, Init_vars_from_file, &
      &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, Water_use_flag, &
      &    Frozen_flag, Inputerror_flag, Glacier_flag, Agriculture_flag, &
@@ -32,7 +31,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2020-12-30'
+      character(len=*), parameter :: Version_srunoff = '2021-01-11'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -83,7 +82,7 @@
 !     Main srunoff routine
 !***********************************************************************
       INTEGER FUNCTION srunoff()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, READ_INIT, SAVE_INIT, OFF
       USE PRMS_MODULE, ONLY: Process_flag, Init_vars_from_file, Save_vars_to_file
       IMPLICIT NONE
 ! Functions
@@ -97,10 +96,10 @@
       ELSEIF ( Process_flag==DECL ) THEN
         srunoff = srunoffdecl()
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( Init_vars_from_file>0 ) CALL srunoff_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL srunoff_restart(READ_INIT)
         srunoff = srunoffinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ACTIVE ) CALL srunoff_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL srunoff_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION srunoff
@@ -452,14 +451,13 @@
           IF ( declvar(MODNAME, 'infil_ag', 'nhru', Nhru, 'real', &
      &         'Infiltration to the agriculture reservoirs for each HRU', &
      &         'inches', Infil_ag)/=0 ) CALL read_error(3, 'infil_ag')
-            ALLOCATE ( Sro_to_dprst_ag(Nhru) )
-            IF ( declparam(MODNAME, 'sro_to_dprst_ag', 'nhru', 'real', &
-     &           '0.2', '0.0', '1.0', &
-     &           'Fraction of agricultural surface runoff that flows into surface-depression storage', &
-     &           'Fraction of agricultural surface runoff that'// &
-     &           ' flows into surface-depression storage; the remainder'// &
-     &           ' flows to a stream network for each HRU', &
-     &           'decimal fraction')/=0 ) CALL read_error(1, 'sro_to_dprst_ag')
+          ALLOCATE ( Sro_to_dprst_ag(Nhru) )
+          IF ( declparam(MODNAME, 'sro_to_dprst_ag', 'nhru', 'real', &
+     &         '0.2', '0.0', '1.0', &
+     &         'Fraction of agricultural surface runoff that flows into surface-depression storage', &
+     &         'Fraction of agricultural surface runoff that flows into'// &
+     &         ' surface-depression storage; the remainder flows to a stream network for each HRU', &
+     &         'decimal fraction')/=0 ) CALL read_error(1, 'sro_to_dprst_ag')
         ENDIF
 
         ALLOCATE ( Dprst_et_coef(Nhru) )
@@ -559,7 +557,7 @@
       Sri = 0.0
       Sroff_ag = 0.0
 
-      IF ( Init_vars_from_file==0 ) THEN
+      IF ( Init_vars_from_file==OFF ) THEN
         Basin_imperv_stor = 0.0D0
         Basin_dprst_volop = 0.0D0
         Basin_dprst_volcl = 0.0D0
@@ -1118,8 +1116,7 @@
       SUBROUTINE perv_comp(Pptp, Ptc, Infil, Srp)
       USE PRMS_CONSTANTS, ONLY: smidx_module !, CLOSEZERO
       USE PRMS_MODULE, ONLY: Sroff_flag
-      USE PRMS_SRUNOFF, ONLY: Ihru, Smidx_coef, Smidx_exp, &
-     &    Carea_max, Carea_min, Carea_dif, Contrib_fraction
+      USE PRMS_SRUNOFF, ONLY: Ihru, Smidx_coef, Smidx_exp, Carea_max, Carea_min, Carea_dif, Contrib_fraction
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Soil_rechr_max
       IMPLICIT NONE
 ! Arguments
@@ -1736,7 +1733,8 @@
 !     srunoff_restart - write or read srunoff restart file
 !***********************************************************************
       SUBROUTINE srunoff_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Dprst_flag, Frozen_flag
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_SRUNOFF
       IMPLICIT NONE
       ! Argument
@@ -1746,7 +1744,7 @@
       ! Local Variable
       CHARACTER(LEN=13) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_imperv_stor, Basin_dprst_volop, Basin_dprst_volcl
         WRITE ( Restart_outunit ) Hru_impervstor
