@@ -630,9 +630,8 @@
             Soil_moist(i) = Soil_moist(i) + soil_adj
             Soil_rechr(i) = Soil_rechr(i) + soil_adj
             IF ( Hru_perv(i) /= hruperv ) THEN
-              frac = Hru_frac_perv(i) + agfrac
-              IF ( frac>0.0 ) THEN
-                tmp = Hru_perv(i)/frac
+              IF ( hruperv>0.0 ) THEN
+                tmp = Hru_perv(i)/hruperv
                 Soil_moist(i) = Soil_moist(i)*tmp
                 Soil_rechr(i) = Soil_rechr(i)*tmp
               ELSE
