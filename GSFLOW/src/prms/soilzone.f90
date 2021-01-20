@@ -1710,44 +1710,36 @@
      &           Soil_rechr, Soil_to_gw, Perv_frac)
       IMPLICIT NONE
 ! Function
-      INTRINSIC :: MIN
+      INTRINSIC :: MIN, ABS
 ! Arguments
       REAL, INTENT(IN) :: Perv_frac, Soil_moist_max, Soil_rechr_max, Soil2gw_max
-      REAL, INTENT(INOUT) :: Infil, Soil_moist, Soil_rechr, Soil_to_gw
-      REAL, INTENT(OUT) :: Soil_to_ssr
+      REAL, INTENT(INOUT) :: Infil, Soil_moist, Soil_rechr, Soil_to_gw, Soil_to_ssr
 ! Local Variables
-      REAL :: excs
+      REAL :: excs, deficit, extra_soilwater
 !***********************************************************************
       Soil_rechr = MIN( (Soil_rechr+Infil), Soil_rechr_max )
       ! soil_moist_max from previous time step or soil_moist_max has
       ! changed for a restart simulation
-      excs = Soil_moist + Infil
-      Soil_moist = MIN( excs, Soil_moist_max )
-      excs = (excs - Soil_moist_max)*Perv_frac
-      !IF ( excs>Infil*Perv_frac ) excs = excs - (excs-Infil*Perv_frac)
+      extra_soilwater = 0.0
+      deficit = Soil_moist_max - Soil_moist
+      IF ( deficit<0.0 ) THEN
+        extra_soilwater = ABS( deficit ) ! added as dynamic sm_max could be less than current sm
+        deficit = 0.0
+      ENDIF
+      IF ( Infil<deficit ) THEN
+        Soil_moist = Soil_moist + Infil
+        excs = 0.0
+      ELSE
+        Soil_moist = Soil_moist_max + extra_soilwater
+        excs = (Infil - deficit) * Perv_frac
+        Infil = deficit
+      ENDIF
       IF ( excs>0.0 ) THEN
         IF ( Soil2gw_max>0.0 ) THEN
           Soil_to_gw = MIN( Soil2gw_max, excs )
           excs = excs - Soil_to_gw
         ENDIF
-        IF ( excs>Infil*Perv_frac ) THEN ! this happens alot due to round off error
-!          print *, 'WARNING, compute_soilmoist problem', excs, Infil*Perv_frac, excs-(Infil*Perv_frac)
-!          print *, Infil, Perv_frac, Soil_to_gw
-          Infil = 0.0
-!         excs = excs - (excs-Infil*Perv_frac)
-        ELSE
-          Infil = Infil - excs/Perv_frac         !???? what if Infil<0 ??? might happen with dynamic and small values, maybe ABS < NEARZERO = 0.0
-!          IF ( Infil<0.0 ) THEN
-!            IF ( Infil<-0.0001 ) THEN
-!              PRINT *, 'negative infil', infil, soil_moist, excs
-!              Soil_moist = Soil_moist + Infil
-!            ENDIF
-!            Infil = 0.0
-!          ENDIF
-        ENDIF
-
         Soil_to_ssr = excs
-!        IF ( Soil_to_ssr<0.0 ) Soil_to_ssr = 0.0
       ENDIF
 
       END SUBROUTINE compute_soilmoist
