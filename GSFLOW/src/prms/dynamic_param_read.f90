@@ -18,7 +18,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2021-01-11'
+        character(len=*), parameter :: Version_dynamic_param_read = '2021-01-20'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -113,7 +113,7 @@
         ENDIF
       ENDIF
 
-      IF ( Dyn_imperv_flag>OFF ) THEN
+      IF ( Dyn_imperv_flag>1 ) THEN
         IF ( control_string(imperv_stor_dynamic, 'imperv_stor_dynamic')/=0 ) CALL read_error(5, 'imperv_stor_dynamic')
         CALL find_header_end(Imperv_stor_unit, imperv_stor_dynamic, 'imperv_stor_dynamic', ierr, 0, 0)
         IF ( ierr==0 ) THEN
