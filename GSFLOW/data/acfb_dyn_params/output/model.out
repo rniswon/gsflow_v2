@@ -38,20 +38,20 @@ Stream Temperature: stream_temp
 ==============================================================
 PRMS Computation Order          gsflow_prms         2021-01-20
 Basin Definition                basin               2020-12-22
-Common States and Fluxes        climateflow         2020-12-22
+Common States and Fluxes        climateflow         2021-01-11
 Potential Solar Radiation       soltab              2020-12-02
 Timestep Control                prms_time           2020-12-02
 Time Series Data                obs                 2020-12-02
-Time Series Data                dynamic_param_read  2021-01-06
-Temperature Distribution        climate_hru         2020-01-06
-Precipitation Distribution      climate_hru         2020-01-06
-Solar Radiation Distribution    climate_hru         2020-01-06
-Potential Evapotranspiration    climate_hru         2020-01-06
+Time Series Data                dynamic_param_read  2021-01-20
+Temperature Distribution        climate_hru         2021-01-08
+Precipitation Distribution      climate_hru         2021-01-08
+Solar Radiation Distribution    climate_hru         2021-01-08
+Potential Evapotranspiration    climate_hru         2021-01-08
 Transpiration Distribution      transp_tindex       2020-12-02
 Canopy Interception             intcp               2020-12-22
-Snow Dynamics                   snowcomp            2020-12-17
-Surface Runoff                  srunoff_smidx       2020-12-30
-Soilzone Computations           soilzone            2021-01-06
+Snow Dynamics                   snowcomp            2021-01-11
+Surface Runoff                  srunoff_smidx       2021-01-11
+Soilzone Computations           soilzone            2021-01-20
 Groundwater                     gwflow              2020-12-02
 Streamflow Routing Init         routing             2020-12-02
 Streamflow Routing              muskingum           2020-12-02
@@ -82,26 +82,26 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
  initial                              31.824
    1980             50.492   20.572   14.836   46.909   -8.693
    1981             36.476   24.842    6.166   20.304   -6.454
-   1982             53.278   23.751    8.130   27.563    1.270
-   1983             58.857   24.024    8.746   34.218    2.090
-   1984             68.655   24.052    8.959   44.390    2.016
-   1985             47.006   25.716    8.467   21.782    1.000
-   1986             33.959   23.836    5.468   13.122    0.790
-   1987             55.549   23.340    5.827   31.850    1.274
-   1988             43.376   21.421    7.541   20.240    0.772
-   1989             64.192   23.192   15.292   33.249    1.682
-   1990             57.834   22.970    8.848   41.308    2.017
-   1991             62.933   24.460   10.193   37.128    1.979
-   1992             55.188   20.022   12.004   33.355    1.587
-   1993             60.054   19.307    5.494   47.257    2.159
-   1994             63.330   18.327   11.052   39.444    1.640
+   1982             53.278   23.751    8.130   27.564    1.270
+   1983             58.857   24.024    8.746   34.217    2.090
+   1984             68.655   24.052    8.958   44.390    2.016
+   1985             47.006   25.716    8.467   21.781    1.000
+   1986             33.959   23.836    5.470   13.120    0.790
+   1987             55.549   23.340    5.827   31.852    1.274
+   1988             43.376   21.421    7.545   20.237    0.772
+   1989             64.192   23.192   15.292   33.253    1.682
+   1990             57.834   22.970    8.847   41.309    2.017
+   1991             62.933   24.460   10.193   37.127    1.979
+   1992             55.188   20.022   12.007   33.353    1.587
+   1993             60.054   19.307    5.494   47.259    2.159
+   1994             63.330   18.327   11.051   39.444    1.640
    1995             53.742   20.538    8.240   36.015    1.522
-   1996             68.484   18.458    9.521   48.745    1.877
-   1997             55.724   19.088    9.749   36.409    1.762
-   1998             63.457   18.715    6.481   48.008    1.816
+   1996             68.484   18.458    9.520   48.747    1.877
+   1997             55.724   19.088    9.749   36.408    1.762
+   1998             63.457   18.715    6.481   48.009    1.816
    1999             45.071   20.064    5.762   25.726    1.094
  *************************************************************
  Total for run    1110.775  440.179    8.439  693.981   13.445
  *************************************************************
-Execution elapsed time    0 minutes  1.35 seconds
+Execution elapsed time    0 minutes  1.03 seconds
 
