@@ -39,7 +39,7 @@ Stream Temperature: stream_temp
 PRMS Computation Order          gsflow_prms         2021-01-20
 Basin Definition                basin               2020-12-22
 Cascading Flow                  cascade             2020-12-02
-Common States and Fluxes        climateflow         2020-12-22
+Common States and Fluxes        climateflow         2021-01-11
 Potential Solar Radiation       soltab              2020-12-02
 Timestep Control                prms_time           2020-12-02
 Time Series Data                obs                 2020-12-02
@@ -49,16 +49,16 @@ Solar Radiation Distribution    ddsolrad            2020-12-02
 Transpiration Distribution      transp_tindex       2020-12-02
 Potential Evapotranspiration    potet_jh            2020-08-03
 Canopy Interception             intcp               2020-12-22
-Snow Dynamics                   snowcomp            2020-12-17
-Surface Runoff                  srunoff_smidx       2020-12-30
-Soilzone Computations           soilzone            2021-01-06
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-01-06
-GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-01-06
+Snow Dynamics                   snowcomp            2021-01-11
+Surface Runoff                  srunoff_smidx       2021-01-11
+Soilzone Computations           soilzone            2021-01-20
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-01-08
+GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-01-14
 GSFLOW Output Budget Summary    gsflow_budget       2020-12-23
 GSFLOW Output CSV Summary       gsflow_sum          2020-12-02
 Output Summary                  subbasin            2020-12-02
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2021-01-05
+GSFLOW MODFLOW main             gsflow_modflow      2021-01-19
 UZF-NWT Package                 gwf2uzf1_NWT        2020-12-28
 SFR-NWT Package                 gwf2sfr7_NWT        2020-09-30
 LAK-NWT Package                 gwf2lak7_NWT        2020-09-30
@@ -77,5 +77,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time    0 minutes  8.76 seconds
+Execution elapsed time    0 minutes  9.12 seconds
 
