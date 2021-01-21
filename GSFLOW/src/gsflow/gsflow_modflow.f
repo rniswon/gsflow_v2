@@ -468,7 +468,7 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
-     &    Init_vars_from_file, Mxsziter, Glacier_flag,
+     &    Init_vars_from_file, Mxsziter,
      &    PRMS_land_iteration_flag, Process
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
 C1------USE package modules.
