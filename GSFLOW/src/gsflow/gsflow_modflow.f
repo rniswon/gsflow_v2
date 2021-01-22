@@ -795,6 +795,7 @@ C7C2C---IF CONVERGENCE CRITERION HAS BEEN MET STOP ITERATING.
           KITER = MXITER
 C
    33     CONTINUE
+          kkiter = itreal
           IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(2,Igrid)
 C
 C7C3----DETERMINE WHICH OUTPUT IS NEEDED.
@@ -984,10 +985,10 @@ C
         II = MIN(ITDIM, Maxgziter)
         Iter_cnt(II) = Iter_cnt(II) + 1
         IF ( Maxgziter.GT.Max_sziters ) Max_sziters = Maxgziter
-        II = MIN(ITDIM, KKITER)
+        II = MIN(ITDIM, ITREAL2)
         Mfiter_cnt(II) = Mfiter_cnt(II) + 1
-        Iterations = Iterations + KKITER
-        IF ( KKITER.GT.Max_iters ) Max_iters = KKITER
+        Iterations = Iterations + ITREAL2
+        IF ( KKITER.GT.Max_iters ) Max_iters = ITREAL2
         IF ( Print_debug>DEBUG_less ) THEN
           IF ( Nowday.EQ.1 ) THEN
             PRINT 9002, Nowyear, Nowmonth, Nowday, KKPER, KKSTP,
