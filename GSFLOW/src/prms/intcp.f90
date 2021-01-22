@@ -12,7 +12,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2020-12-22'
+      character(len=*), parameter :: Version_intcp = '2020-12-03'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -40,7 +40,7 @@
 !     Main intcp routine
 !***********************************************************************
       INTEGER FUNCTION intcp()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, RUN, DECL, INIT, CLEAN
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, RUN, DECL, INIT, CLEAN, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
@@ -54,10 +54,10 @@
       ELSEIF ( Process_flag==DECL ) THEN
         intcp = intdecl()
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( Init_vars_from_file>0 ) CALL intcp_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL intcp_restart(READ_INIT)
         intcp = intinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ACTIVE ) CALL intcp_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL intcp_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION intcp
@@ -587,6 +587,7 @@
 !     intcp_restart - write or read intcp restart file
 !***********************************************************************
       SUBROUTINE intcp_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_INTCP
       IMPLICIT NONE
@@ -597,7 +598,7 @@
       ! Local Variable
       CHARACTER(LEN=5) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_intcp_stor
         WRITE ( Restart_outunit ) Intcp_transp_on

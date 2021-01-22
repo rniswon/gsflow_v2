@@ -17,7 +17,7 @@
       MODULE PRMS_TEMP_1STA_LAPS
         USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, &
      &      GLACIER, DEBUG_less, MONTHS_PER_YEAR, ERROR_temp, DOCUMENTATION, &
-     &      MINTEMP, MAXTEMP, NEARZERO, temp_1sta_module, temp_laps_module
+     &      MINTEMP, MAXTEMP, NEARZERO, temp_1sta_module, temp_laps_module, READ_INIT, SAVE_INIT
         USE PRMS_MODULE, ONLY: Process_flag, Nhru, Ntemp, Model, &
      &      Print_debug, Init_vars_from_file, Save_vars_to_file, &
      &      Temp_flag, Inputerror_flag, Start_month, Glacier_flag
@@ -223,7 +223,7 @@
      &       'none')/=0 ) CALL read_error(1, 'max_missing')
 
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( Init_vars_from_file>0 ) CALL temp_1sta_laps_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL temp_1sta_laps_restart(READ_INIT)
 
         ! Initialize variables, get parameter values, compute Elfac
         IF ( Temp_flag==temp_1sta_module ) THEN
@@ -280,7 +280,7 @@
         ENDIF
 
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ACTIVE ) CALL temp_1sta_laps_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL temp_1sta_laps_restart(SAVE_INIT)
 
       ENDIF
 
@@ -315,6 +315,7 @@
 !     Write to or read from restart file
 !***********************************************************************
       SUBROUTINE temp_1sta_laps_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_TEMP_1STA_LAPS
       IMPLICIT NONE
@@ -324,7 +325,7 @@
       ! Local Variable
       CHARACTER(LEN=9) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Solrad_tmax_good, Solrad_tmin_good
         WRITE ( Restart_outunit ) Tmax_cnt

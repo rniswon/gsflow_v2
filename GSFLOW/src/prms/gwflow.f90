@@ -49,7 +49,7 @@
 !     Main gwflow routine
 !***********************************************************************
       INTEGER FUNCTION gwflow()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Init_vars_from_file, Save_vars_to_file
       IMPLICIT NONE
 ! Functions
@@ -63,10 +63,10 @@
       ELSEIF ( Process_flag==DECL ) THEN
         gwflow = gwflowdecl()
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( Init_vars_from_file>0 ) CALL gwflow_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL gwflow_restart(READ_INIT)
         gwflow = gwflowinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ACTIVE ) CALL gwflow_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL gwflow_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION gwflow
@@ -641,6 +641,7 @@
 !     gwflow_restart - write or read gwflow restart file
 !***********************************************************************
       SUBROUTINE gwflow_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_BASIN, ONLY: Weir_gate_flag
       USE PRMS_GWFLOW
@@ -651,12 +652,12 @@
       ! Local Variable
       CHARACTER(LEN=6) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
-        IF ( Weir_gate_flag==1 ) WRITE ( Restart_outunit ) Elevlake
+        IF ( Weir_gate_flag==ACTIVE ) WRITE ( Restart_outunit ) Elevlake
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
-        IF ( Weir_gate_flag==1 ) READ ( Restart_inunit ) Elevlake ! could be error if someone turns off weirs for restart
+        IF ( Weir_gate_flag==ACTIVE ) READ ( Restart_inunit ) Elevlake ! could be error if someone turns off weirs for restart
       ENDIF
       END SUBROUTINE gwflow_restart

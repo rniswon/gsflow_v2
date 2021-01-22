@@ -3,7 +3,7 @@
 ! and flows for all HRUs
 !***********************************************************************
       MODULE PRMS_BASINSUM
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, DOCUMENTATION, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, &
      &    strmflow_muskingum_module, strmflow_muskingum_lake_module, strmflow_muskingum_mann_module
       USE PRMS_MODULE, ONLY: Nhru, Nobs, Model, Init_vars_from_file, &
      &    Print_debug, End_year, Strmflow_flag, Glacier_flag
@@ -65,8 +65,8 @@
 !     Main basin_sum routine
 !***********************************************************************
       INTEGER FUNCTION basin_sum()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE
-      USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, SAVE_INIT, READ_INIT
+      USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: sumbdecl, sumbinit, sumbrun
@@ -79,9 +79,10 @@
       ELSEIF ( Process_flag==DECL ) THEN
         basin_sum = sumbdecl()
       ELSEIF ( Process_flag==INIT ) THEN
+        IF ( Init_vars_from_file>OFF ) CALL basin_sum_restart(READ_INIT)
         basin_sum = sumbinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ACTIVE ) CALL basin_sum_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL basin_sum_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION basin_sum
@@ -322,7 +323,7 @@
 ! Functions
       INTRINSIC :: MAX, MOD
       INTEGER, EXTERNAL :: getparam, julian_day
-      EXTERNAL :: header_print, read_error, write_outfile, basin_sum_restart, PRMS_open_module_file
+      EXTERNAL :: header_print, read_error, write_outfile, PRMS_open_module_file
 ! Local Variables
       INTEGER :: pftemp
 !***********************************************************************
@@ -340,9 +341,7 @@
       IF ( getparam(MODNAME, 'print_freq', 1, 'integer', Print_freq) &
      &     /=0 ) CALL read_error(2, 'print_freq')
 
-      IF ( Init_vars_from_file>0 ) THEN
-        CALL basin_sum_restart(1)
-      ELSE
+      IF ( Init_vars_from_file==OFF ) THEN
 !  Zero stuff out when Timestep = 0
         Watbal_sum = 0.0D0
 
@@ -870,6 +869,7 @@
 !     Write or read restart file
 !***********************************************************************
       SUBROUTINE basin_sum_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_BASINSUM
       IMPLICIT NONE
@@ -880,7 +880,7 @@
       ! Local Variable
       CHARACTER(LEN=9) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Totdays, Obs_runoff_mo, Obs_runoff_yr, Obs_runoff_tot, Watbal_sum
         WRITE ( Restart_outunit ) Basin_cfs_mo, Basin_cfs_yr, Basin_cfs_tot, Basin_net_ppt_yr, Basin_net_ppt_tot

@@ -41,7 +41,7 @@
 !     Main routing routine
 !***********************************************************************
       INTEGER FUNCTION routing()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Init_vars_from_file, Save_vars_to_file
       IMPLICIT NONE
 ! Functions
@@ -55,10 +55,10 @@
       ELSEIF ( Process_flag==DECL ) THEN
         routing = routingdecl()
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( Init_vars_from_file>0 ) CALL routing_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL routing_restart(READ_INIT)
         routing = routinginit()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ACTIVE ) CALL routing_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL routing_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION routing
@@ -806,6 +806,7 @@
 !     routing_restart - write or read restart file
 !***********************************************************************
       SUBROUTINE routing_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_ROUTING
       IMPLICIT NONE
@@ -816,7 +817,7 @@
       ! Local Variables
       CHARACTER(LEN=7) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_segment_storage
         IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &

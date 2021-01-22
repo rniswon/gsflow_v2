@@ -3,7 +3,8 @@
 ! based on a temperature index method.
 !***********************************************************************
       MODULE PRMS_TRANSP_TINDEX
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, FAHRENHEIT, MONTHS_PER_YEAR
+        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, FAHRENHEIT, MONTHS_PER_YEAR, &
+     &      READ_INIT, SAVE_INIT       
         USE PRMS_MODULE, ONLY: Process_flag, Nhru, Save_vars_to_file, Init_vars_from_file, &
      &      Start_month, Start_day
         IMPLICIT NONE
@@ -108,7 +109,7 @@
         IF ( getparam(MODNAME, 'transp_end', Nhru, 'integer', Transp_end)/=0 ) CALL read_error(2, 'transp_end')
         IF ( getparam(MODNAME, 'transp_tmax', Nhru, 'real', Transp_tmax)/=0 ) CALL read_error(2, 'transp_tmax')
 
-        IF ( Init_vars_from_file>0 ) CALL transp_tindex_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL transp_tindex_restart(READ_INIT)
         IF ( Temp_units==FAHRENHEIT ) THEN
           Transp_tmax_f = Transp_tmax
         ELSE
@@ -142,7 +143,7 @@
         ENDDO
 
       ELSEIF ( Process_flag==CLEAN ) THEN
-        IF ( Save_vars_to_file==ACTIVE ) CALL transp_tindex_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL transp_tindex_restart(SAVE_INIT)
 
       ENDIF
 
@@ -161,7 +162,7 @@
       ! Local Variable
       CHARACTER(LEN=13) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Tmax_sum
       ELSE
