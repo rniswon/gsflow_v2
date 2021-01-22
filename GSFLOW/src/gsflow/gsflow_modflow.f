@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-01-05'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-01-19'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -128,7 +128,7 @@ C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
-     &    Kper_mfo, Diversion2soil_flag, Have_lakes, NLAKES_MF
+     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package_active
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -360,7 +360,7 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
       IF(IUNIT(65).GT.0) CALL GWF2SWI2AR(IUNIT(65),
      2                        IUNIT(1),IUNIT(23),IUNIT(37),IUNIT(62),
      3                        IGRID)   !SWI2  - JDH
-!     IF(IUNIT(66).GT.0) CALL GWF2GFB7AR(IUNIT(66),IGRID)
+!     IF(IUNIT(67).GT.0) CALL GWF2GFB7AR(IUNIT(67),IGRID)
       IF(IUNIT(43).GT.0) THEN
         CALL GWF2HYD7BAS7AR(IUNIT(43),IGRID)
         IF(IUNIT(19).GT.0) CALL GWF2HYD7IBS7AR(IUNIT(43),IGRID)
@@ -369,9 +369,10 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
         IF(IUNIT(44).GT.0) CALL GWF2HYD7SFR7AR(IUNIT(43),IGRID)
       ENDIF
       IF(IUNIT(49).GT.0) CALL LMT8BAS7AR(INUNIT,CUNIT,IGRID)
+      Ag_package_active = OFF
       IF(IUNIT(66).GT.0) THEN
+        IF (GSFLOW_flag==ACTIVE) Ag_package_active = ACTIVE
         CALL GWF2AG7AR(IUNIT(66),IUNIT(44),IUNIT(63))
-        Diversion2soil_flag = ACTIVE
       ENDIF
 !      IF(IUNIT(61).GT.0) THEN
 !        CALL FMP2AR(
@@ -716,7 +717,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF(IUNIT(64).GT.0) CALL GWF2SWR7FM(KKITER,KKPER,KKSTP,IGRID)  !SWR - JDH
             IF(IUNIT(66).GT.0 ) 
      1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63))
-!            IF(IUNIT(66).GT.0) CALL GWF2GFB7FM(IGRID)
+!            IF(IUNIT(67).GT.0) CALL GWF2GFB7FM(IGRID)
 C-------------SWI2 FORMULATE (GWF2SWI2FM) NEEDS TO BE THE LAST PACKAGE
 C             ENTRY SINCE SWI2 SAVES THE RHS (RHSFRESH) PRIOR TO ADDING SWI TERMS
 C             RHSFRESH IS USED TO CALCULATE BOUNDARY CONDITION FLUXES
@@ -904,7 +905,7 @@ C7C4----CALCULATE BUDGET TERMS. SAVE CELL-BY-CELL FLOW TERMS.
           IF(IUNIT(54).GT.0) CALL GWF2SUB7BD(KKSTP,KKPER,IGRID)
           IF(IUNIT(57).GT.0) CALL GWF2SWT7BD(KKSTP,KKPER,IGRID)     
           IF(IUNIT(64).GT.0) CALL GWF2SWR7BD(KKSTP,KKPER,IGRID)  !SWR - JDH
-!         IF(IUNIT(66).GT.0) CALL GWF2GFB7BD(KKSTP,KKPER,IGRID) 
+!         IF(IUNIT(67).GT.0) CALL GWF2GFB7BD(KKSTP,KKPER,IGRID) 
           IF(IUNIT(65).GT.0) CALL GWF2SWI2BD(KKSTP,KKPER,IGRID)  !SWI2 - JDH
           IF(IUNIT(66).GT.0) CALL GWF2AG7BD(KKSTP,KKPER,IUNIT(63))
 CLMT
@@ -1097,7 +1098,7 @@ c      IF(IUNIT(14).GT.0) CALL LMG7DA(IGRID)
       IF(IUNIT(57).GT.0) CALL GWF2SWT7DA(IGRID)
       IF(IUNIT(64).GT.0) CALL GWF2SWR7DA(IGRID)  !SWR - JDH
       IF(IUNIT(65).GT.0) CALL GWF2SWI2DA(IGRID)  !SW12 - JDH
-!      IF(IUNIT(66).GT.0) CALL GWF2GFB7DA(IGRID)
+!      IF(IUNIT(67).GT.0) CALL GWF2GFB7DA(IGRID)
       CALL OBS2BAS7DA(IUNIT(28),IGRID)
       IF(IUNIT(33).GT.0) CALL OBS2DRN7DA(IGRID)
       IF(IUNIT(34).GT.0) CALL OBS2RIV7DA(IGRID)
@@ -1501,8 +1502,8 @@ C
           CALL READ_STRESS()
           IF ( Init_vars_from_file==0 ) THEN
             Steady_state = 1
-            IF ( gsfrun()/=0 ) CALL error_stop('steady state failed',
-     &                                         ERROR_modflow)
+            IF ( gsfrun()/=0 )
+     &           CALL error_stop('steady state failed', ERROR_modflow)
             Steady_state = 0
  !           TOTIM = plen !RGN 9/4/2018 TOTIM needs to stay in MF time units
             TOTIM = PERLEN(i)  !RGN 9/4/2018 TOTIM needs to stay in MF time units
