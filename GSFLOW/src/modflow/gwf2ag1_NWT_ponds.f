@@ -236,7 +236,6 @@
       !
       !4 - --- ALLOCATE ARRAYS FOR TIME SERIES OUTPUT
       IF (IUNITSFR > 0) NSEGDIMTEMP = NSEGDIM
-      ALLOCATE (WELL(4,MXWELL))
       ALLOCATE (TSSWUNIT(NSEGDIMTEMP), TSGWUNIT(MXWELL), QONLY(MXWELL))
       ALLOCATE (QONLYOLD(MXWELL))
       ALLOCATE (TSGWNUM(MXWELL), TSSWNUM(NSEGDIMTEMP))
@@ -266,7 +265,6 @@
       ALLOCATE (IRRHRU_POND(MAXCELLSPOND,NUMIRRPOND))
       NUMIRRPONDSP = 0
       IRRFIELDFACTPOND = 0.0
-      WELL = 0.0
       IRRFACTPOND = 0.0
       IRRHRU_POND = 0
       TSSWNUM = 0
@@ -319,7 +317,6 @@
       IF ( max<1 ) max = 1
       ALLOCATE (TABTIMEWELL(max, NUMTABHOLD))
       ALLOCATE (TABRATEWELL(max, NUMTABHOLD))
-      max = max
       IF ( max<1 ) max = 1
       ALLOCATE (TABLAYWELL(max), TABROWWELL(max))
       ALLOCATE (TABVALWELL(max), TABIDWELL(max))
@@ -362,6 +359,8 @@
      +        'No wells active in the AG Package')
          MXWELL = 1
       END IF
+      ALLOCATE (WELL(NWELVL, MXWELL))
+      WELL = 0.0
       IF (MXPOND .LT. 1) THEN
          WRITE (IOUT, 18)
 18       FORMAT(1X,
@@ -1218,7 +1217,7 @@
                   END DO
                END IF
             case ('END')
-               found4 = .false.
+               !found4 = .false.
                write (iout, '(/1x,a)') 'FINISHED READING '//
      +          trim(adjustl(char))
                exit
@@ -1448,7 +1447,7 @@
       ! ARGUMENTS:
       INTEGER, INTENT(IN)::IN, KPER
       !
-      INTEGER ISEG, i, L
+      INTEGER ISEG, i, L, ID
       DOUBLE PRECISION :: TOTAL
       EXTERNAL :: RATETERPQ
       REAL :: RATETERPQ, TIME
@@ -1485,13 +1484,27 @@
       IF ( MXPOND > 0 ) THEN
           IF (NUMTABPOND > 0) THEN
             DO L = 1, MXPOND
+              ID = TABIDPOND(L)
               POND(1,L) = TABPONDHRU(L)
-              POND(2,L) = RATETERPQ(TIME, TABTIMEPOND, TABRATEPOND, 
-     +                              TABIDPOND(L), TABVALPOND(L))
+              POND(2,L) = RATETERPQ(TIME, TABTIMEPOND(:,ID), 
+     +                              TABRATEPOND(:,ID), TABVALPOND(L))
             END DO
           END IF
       END IF
-      !4 - -----RESET SAVED AET FROM LAST ITERATION
+!
+!4 - -----SET MAXIMUM POND DIVERSION RATES WHEN TABFILES ARE USED
+      DO L = 1, NWELLS
+         IF (NUMTABWELL > 0) THEN
+            WELL(1, L) = TABLAYWELL(L)
+            WELL(2, L) = TABROWWELL(L)
+            WELL(3, L) = TABCOLWELL(L)
+            ID = TABIDWELL(l)
+            WELL(4, L) = RATETERPQ(TIME, TABTIMEWELL(:,ID), 
+     +                    TABRATEWELL(:,ID), TABVALWELL(L))
+         END IF
+      END DO
+!
+!5 - -----RESET SAVED AET FROM LAST ITERATION
       DIVERSIONIRRUZF = 0.0
       DIVERSIONIRRPRMS = 0.0
       WELLIRRUZF = 0.0
@@ -2204,12 +2217,12 @@
       !
       ! VARIABLES:
       ! - -----------------------------------------------------------------
-      INTEGER :: L, I, J, ISTSG, ICOUNT, IRR, ICC, IC, IR, IL, IJ
+      INTEGER :: L, I, J, ISTSG, ICOUNT, IRR, ICC, IC, IR, IL, IJ, ID
       DOUBLE PRECISION :: ZERO, DONE, SUP, FMIN, Q, SUBVOL, SUBRATE, DVT
       DOUBLE PRECISION :: DONENEG
-      EXTERNAL :: SMOOTHQ, RATETERPQ, demandgw_uzf, demandgw_prms
+      EXTERNAL :: SMOOTHQ, demandgw_uzf, demandgw_prms
       EXTERNAL :: demandtrigger_gw
-      REAL :: RATETERPQ, TIME
+      REAL :: TIME
       DOUBLE PRECISION :: Qp, Hh, Ttop, Bbot, dQp, SMOOTHQ
       DOUBLE PRECISION :: QSW, NEARZERO, QQ, demandtrigger_gw
       DOUBLE PRECISION :: demandgw_uzf, demandgw_prms
@@ -2264,18 +2277,10 @@
       !
       !3 - -----SET MAX PUMPING RATE OR IRR DEMAND FOR GW.
       DO L = 1, NWELLS
-         IF (NUMTABWELL .LE. 0) THEN
-            IR = WELL(2, L)
-            IC = WELL(3, L)
-            IL = WELL(1, L)
-            Q = WELL(4, L)
-         ELSE
-            IR = TABROWWELL(L)
-            IC = TABCOLWELL(L)
-            IL = TABLAYWELL(L)
-            Q = RATETERPQ(TIME, TABTIMEWELL, TABRATEWELL, 
-     +                    TABIDWELL(L), TABVALWELL(L))
-         END IF
+         IR = WELL(2, L)
+         IC = WELL(3, L)
+         IL = WELL(1, L)
+         Q = WELL(4, L)
          IF (NUMIRRDIVERSIONSP + NUMIRRWELSP == 0) Q = 0.0
          QQ=Q
          !
@@ -2418,14 +2423,8 @@
       !  - -----SET MAX POND IRRIGATION RATE.
       !
       DO L = 1, MXPOND
-         IF (NUMTABPOND .LE. 0) THEN
-            PONDID = POND(1, L)
-            Q = POND(2, L)
-         ELSE
-            PONDID = TABPONDHRU(L)
-            Q = RATETERPQ(TIME, TABTIMEPOND, TABRATEPOND, 
-     +                    TABIDPOND(L), TABVALPOND(L))
-         END IF
+         PONDID = POND(1, L)
+         Q = POND(2, L)
          DO 33 icount = 1, NUMIRRPONDSP
            IF ( IRRPONDVAR(icount) == PONDID ) THEN
                   IF ( PONDFLOW(icount) > Q ) PONDFLOW(icount) = Q
@@ -2481,13 +2480,13 @@
       DOUBLE PRECISION :: SUP, SUBVOL, RATINAG, RATOUTAG, AREA
       DOUBLE PRECISION :: QSW, QSWIRR, QWELL, QWELLIRR, QWELLET
       DOUBLE PRECISION :: QSWGL, DONE, QPOND, QPONDIRR
-      REAL :: Q, TIME, RATETERPQ, QIRR, BUDPERC
-      INTEGER :: NWELLSTEMP, L, I, J, ISTSG, ICOUNT, IL
+      REAL :: Q, TIME, QIRR, BUDPERC
+      INTEGER :: NWELLSTEMP, L, I, J, ISTSG, ICOUNT, IL, ID
       INTEGER :: IC, IR, IBDLBL, IW1, IHRU
       INTEGER :: IBD1, IBD2, IBD3, IBD4, IBD5, IBD6, IBD7
 !      INTEGER :: TOTWELLCELLS, TOTDIVERSIONCELLS
 !      INTEGER :: TOTPONDCELLS
-      EXTERNAL :: SMOOTHQ, RATETERPQ
+      EXTERNAL :: SMOOTHQ
       DOUBLE PRECISION :: SMOOTHQ, bbot, ttop, hh
       DOUBLE PRECISION :: Qp, QQ, Qsave, dQp
       DOUBLE PRECISION :: DONENEG
@@ -2600,18 +2599,10 @@
       !
       !5 - -----CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
       DO L = 1, NWELLSTEMP
-         IF (NUMTABWELL .LE. 0) THEN
-            IR = WELL(2, L)
-            IC = WELL(3, L)
-            IL = WELL(1, L)
-            Q = WELL(4, L)
-         ELSE
-            IR = TABROWWELL(L)
-            IC = TABCOLWELL(L)
-            IL = TABLAYWELL(L)
-            Q = RATETERPQ(TIME, TABTIMEWELL, TABRATEWELL, 
-     +                    TABIDWELL(L), TABVALWELL(L))
-         END IF
+        IL = WELL(1, L)
+        IR = WELL(2, L)
+        IC = WELL(3, L)
+        Q = WELL(4, L)
          !
          !6 - -----IF TRIGGER ACTIVE THEN IMCREMENT IRRIGATION PERIOD FOR WELL
          if (TRIGGERFLAG > 0) then
@@ -2726,16 +2717,10 @@
          WRITE (IBD1, *)
          WRITE (IBD1, 61) TEXT1, KKPER, KKSTP
          DO L = 1, NWELLSTEMP
-            IF (NUMTABWELL .LE. 0) THEN
-               IR = WELL(2, L)
-               IC = WELL(3, L)
-               IL = WELL(1, L)
-            ELSE
-               IR = TABROWWELL(L)
-               IC = TABCOLWELL(L)
-               IL = TABLAYWELL(L)
-            END IF
-            WRITE (IBD1, 62) L, IL, IR, IC, WELL(NWELVL, L)
+           IR = WELL(2, L)
+           IC = WELL(3, L)
+           IL = WELL(1, L)
+           WRITE (IBD1, 62) L, IL, IR, IC, WELL(NWELVL, L)
          END DO
          WRITE (IBD1, *)
       END IF
@@ -3825,7 +3810,7 @@
       smoothQ = Qp
       END FUNCTION smoothQ
       !
-      REAL FUNCTION RATETERPQ(TIME, TABTIME, TABRATE, INUM, NVAL)
+      REAL FUNCTION RATETERPQ(TIME, TABTIME, TABRATE, NVAL)
       !******************************************************************
       ! LINEARLY INTERPOLATE PUMPING RATE FROM TABFILE
       !******************************************************************
@@ -3835,30 +3820,28 @@
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
       !ARGUMENTS
-      INTEGER, INTENT(IN):: INUM
       REAL, INTENT(IN):: TIME
       REAL CLOSEZERO
       REAL FLOW, TIMEBEG, TIMEND, TIMESTART, SUMFLOW, TOLF2
       INTEGER IEND, ISTM1, ISTART, iflg, NVAL, I
-      REAL, DIMENSION(:,:), POINTER :: TABTIME, TABRATE
+      REAL :: TABTIME(NVAL), TABRATE(NVAL)
       TOLF2 = 1.0E-4
       CLOSEZERO = 1.0E-15
       FLOW = 0.0
-!      NVAL = TABVAL(INUM)
       IFLG = 0
       SUMFLOW = 0.0
       I = 1
       TIMEBEG = TIME - DELT
-      IF (TIMEBEG - TABTIME(1, INUM) .LT. 0.0) THEN
-         RATETERPQ = TABRATE(1, INUM)
-      ELSEIF (TIMEBEG - TABTIME(NVAL, INUM) .GE. 0.0) THEN
-         RATETERPQ = TABRATE(NVAL, INUM)
+      IF (TIMEBEG - TABTIME(1) .LT. 0.0) THEN
+         RATETERPQ = TABRATE(1)
+      ELSEIF (TIMEBEG - TABTIME(NVAL) .GE. 0.0) THEN
+         RATETERPQ = TABRATE(NVAL)
       ELSE
          ! Find table value before beginning of time step.
          DO WHILE (I .LE. NVAL - 1)
-            IF (TIMEBEG - TABTIME(I, INUM) .LE. CLOSEZERO) THEN
+            IF (TIMEBEG - TABTIME(I) .LE. CLOSEZERO) THEN
                EXIT
-            ELSEIF (TIMEBEG - TABTIME(I + 1, INUM) .LE. 
+            ELSEIF (TIMEBEG - TABTIME(I + 1) .LE. 
      +              CLOSEZERO) THEN
                EXIT
             ELSE
@@ -3870,7 +3853,7 @@
          IF (I .GT. 1) ISTM1 = ISTM1 - 1
          ! Find table value after end of time step
          DO WHILE (I .LE. NVAL)
-            IF (TIME - TABTIME(I, INUM) .LE. 0.0) THEN
+            IF (TIME - TABTIME(I) .LE. 0.0) THEN
                EXIT
             ELSE
                I = I + 1
@@ -3879,12 +3862,12 @@
          IEND = I
          IF (IEND .GT. NVAL) IEND = NVAL
          DO I = ISTART, IEND - 1
-            TIMESTART = TABTIME(I, INUM)
-            TIMEND = TABTIME(I + 1, INUM)
+            TIMESTART = TABTIME(I)
+            TIMEND = TABTIME(I + 1)
             IF (TIMEBEG - TIMESTART .GT. 0.0) TIMESTART = TIMEBEG
             IF (TIME - TIMEND .LT. 0.0) TIMEND = TIME
             SUMFLOW = SUMFLOW + (TIMEND - TIMESTART)*
-     +                TABRATE(I, INUM)
+     +                TABRATE(I)
          END DO
          RATETERPQ = SUMFLOW/DELT
       END IF
