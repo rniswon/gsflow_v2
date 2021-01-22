@@ -39,7 +39,7 @@ Stream Temperature: stream_temp
 PRMS Computation Order          gsflow_prms         2021-01-20
 Basin Definition                basin               2020-12-02
 Cascading Flow                  cascade             2020-12-02
-Common States and Fluxes        climateflow         2020-12-16
+Common States and Fluxes        climateflow         2021-01-11
 Potential Solar Radiation       soltab              2020-12-02
 Timestep Control                prms_time           2020-12-02
 Time Series Data                obs                 2020-12-02
@@ -49,17 +49,17 @@ Solar Radiation Distribution    climate_hru         2020-12-02
 Potential Evapotranspiration    climate_hru         2020-12-02
 Transpiration Distribution      transp_tindex       2020-12-02
 Canopy Interception             intcp               2020-12-03
-Snow Dynamics                   snowcomp            2020-12-17
-Surface Runoff                  srunoff_smidx       2020-12-28
-Soilzone Computations           soilzone            2020-12-28
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2020-12-16
+Snow Dynamics                   snowcomp            2021-01-11
+Surface Runoff                  srunoff_smidx       2021-01-11
+Soilzone Computations           soilzone            2021-01-11
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-01-08
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2020-12-16
-GSFLOW Output Budget Summary    gsflow_budget       2020-12-23
+GSFLOW Output Budget Summary    gsflow_budget       2021-01-12
 GSFLOW Output CSV Summary       gsflow_sum          2020-12-02
 Output Summary                  subbasin            2020-12-02
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2020-12-21
-UZF-NWT Package                 gwf2uzf1_NWT        2020-09-30
+GSFLOW MODFLOW main             gsflow_modflow      2021-01-05
+UZF-NWT Package                 gwf2uzf1_NWT        2020-12-28
 SFR-NWT Package                 gwf2sfr7_NWT        2020-09-30
 
 Using Control File: .\gsflow_climate_hru.control
@@ -75,5 +75,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time   14 minutes 25.68 seconds
+Execution elapsed time   15 minutes  3.16 seconds
 
