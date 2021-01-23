@@ -44,7 +44,7 @@
 !
 ! From irrigation wells
 !
-        IF ( Ag_package_active==ACTIVE ) then
+        IF ( Ag_package_active==ACTIVE ) THEN
           mf_q2prms_inchacres = DELT*Mfl2_to_acre*Mfl_to_inch
           Hru_ag_irr = 0.0
           DO J = 1, NUMIRRWELSP
@@ -81,6 +81,7 @@
             END DO
           END DO
         END IF
+
       ELSEIF ( Process(:4)=='decl' ) THEN
         CALL print_module(MODDESC, MODNAME, Version_gsflow_mf2prms)
       ENDIF

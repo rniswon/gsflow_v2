@@ -525,7 +525,7 @@
                 IF ( frac_imperv>0.0 ) THEN
                   Imperv_stor(i) = Imperv_stor(i)*Hru_percent_imperv(i)/frac_imperv
                 ELSE
-                  frac = Hru_frac_perv(i) + agfrac
+                  frac = Hru_frac_perv(i) !+ agfrac
                   IF ( frac>0.0 ) THEN
                     tmp = Imperv_stor(i)*Hru_percent_imperv(i)/frac ! not sure this is correct???
                     PRINT *, 'WARNING, dynamic impervious changed to 0 when impervious storage > 0'
@@ -555,7 +555,7 @@
                 dprstfrac = Temp3(i)
                 IF ( dprstfrac==0.0 .AND. tmp>0.0 ) THEN
                   frac = Hru_frac_perv(i)
-                  IF ( Agriculture_flag==ACTIVE ) frac = frac + Ag_frac(i)
+!                  IF ( Agriculture_flag==ACTIVE ) frac = frac + Ag_frac(i)
                   IF ( frac>0.0 ) THEN
                     tmp = tmp/(Dprst_frac(i)*harea)/frac ! not sure this is correct???
                     PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0'

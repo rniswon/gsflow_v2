@@ -461,16 +461,16 @@
         ENDIF
 
         Hru_perv(i) = perv_area
+        Hru_frac_perv(i) = perv_area/harea
         !IF ( perv_area/harea<0.001 ) THEN
         !  PRINT *, 'ERROR, pervious plus agriculture fraction must be >= 0.001 for HRU:', i
         !  PRINT *, '       pervious portion is HRU fraction - impervious fraction - depression fraction - agriculture fraction'
-        !  PRINT *, '       pervious fraction:', perv_area/harea
+        !  PRINT *, '       pervious fraction:', Hru_frac_perv(i)
         !  PRINT *, '       impervious fraction:', Hru_percent_imperv(i)
         !  IF ( Dprst_flag==ON ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
         !  IF ( Agriculture_flag>OFF ) PRINT *, '       agriculture fraction:', Ag_frac(i)
         !  basinit = 1
         !ENDIF
-        Hru_frac_perv(i) = Hru_perv(i)/harea
         basin_perv = basin_perv + DBLE( Hru_perv(i) )
       ENDDO
       IF ( Dprst_flag==ACTIVE .AND. PRMS4_flag==ACTIVE ) DEALLOCATE ( Dprst_area )

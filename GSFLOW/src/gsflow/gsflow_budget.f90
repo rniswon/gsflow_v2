@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2020-12-23'
+      character(len=*), parameter :: Version_gsflow_budget = '2021-01-12'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -24,6 +24,7 @@
 !     Budget module to convert PRMS & MODFLOW states for use by GSFLOW
 !     ******************************************************************
       INTEGER FUNCTION gsflow_budget()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, SAVE_INIT, READ_INIT
       USE PRMS_MODULE, ONLY: Process, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
@@ -37,10 +38,10 @@
       ELSEIF ( Process(:4)=='decl' ) THEN
         gsflow_budget = gsfbuddecl()
       ELSEIF ( Process(:4)=='init' ) THEN
-        IF ( Init_vars_from_file>0 ) CALL gsflow_budget_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL gsflow_budget_restart(READ_INIT)
         gsflow_budget = gsfbudinit()
       ELSEIF ( Process(:5)=='clean' ) THEN
-        IF ( Save_vars_to_file==1 ) CALL gsflow_budget_restart(0)
+        IF ( Save_vars_to_file==ACTIVE ) CALL gsflow_budget_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION gsflow_budget
@@ -192,6 +193,7 @@
 !     gsfbudinit - Initialize GSFBUDGET module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION gsfbudinit()
+      USE PRMS_CONSTANTS, ONLY: OFF
       USE GSFBUDGET
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru
       USE GWFSFRMODULE, ONLY: NSTRM
@@ -209,9 +211,7 @@
 
       Reach_cfs = 0.0 ! dimension NSTRM
       Reach_wse = 0.0 ! dimension NSTRM
-      Total_pump = 0.0D0
-      Total_pump_cfs = 0.0D0
-      IF ( Init_vars_from_file==0 ) THEN
+      IF ( Init_vars_from_file==OFF ) THEN
         Unsat_S = UZTSRAT(6)
         IF ( IUNIT(1)>0 ) CALL MODFLOW_GET_STORAGE_BCF()
         IF ( IUNIT(23)>0 ) CALL MODFLOW_GET_STORAGE_LPF()
@@ -223,6 +223,8 @@
         Lake2Unsat_Q = 0.0D0
         Stream_inflow = 0.0D0
         Basin_gw2sm = 0.0D0
+        Total_pump = 0.0D0
+        Total_pump_cfs = 0.0D0
       ENDIF
 !      Uzf_infil_map = 0.0 ! dimension nhru
 !      Sat_recharge = 0.0 ! dimension nhru
@@ -789,6 +791,7 @@
 !     gsflow_budget_restart - write to or read from restart file
 !***********************************************************************
       SUBROUTINE gsflow_budget_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE GSFBUDGET
       ! Argument
@@ -797,7 +800,7 @@
       ! Local Variable
       CHARACTER(LEN=13) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Total_pump, Total_pump_cfs, Unsat_S, Sat_S, &
      &          Sat_dS, StreamExchng2Sat_Q, Stream2Unsat_Q, Stream_inflow, &

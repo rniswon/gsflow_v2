@@ -14,13 +14,13 @@
    &    strmflow_noroute_module, strmflow_muskingum_mann_module, &
    &    strmflow_muskingum_module, precip_1sta_module, precip_laps_module, &
    &    climate_hru_module, precip_map_module, temp_1sta_module, temp_laps_module, temp_sta_module, &
-   &    smidx_module, carea_module, PRMS_AG, GSFLOW_AG
+   &    smidx_module, carea_module, ddsolrad_module, ccsolrad_module, SAVE_INIT, READ_INIT
       IMPLICIT NONE
       character(LEN=*), parameter :: &
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/05/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/22/2021'
       character(len=*), parameter :: PRMS_versn = '2021-01-20'
       character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 01/20/2021'
       CHARACTER(LEN=8), SAVE :: Process
@@ -202,7 +202,7 @@
         ENDIF
 
         Timestep = 0
-        IF ( Init_vars_from_file>0 ) CALL call_modules_restart(1)
+        IF ( Init_vars_from_file>OFF ) CALL call_modules_restart(READ_INIT)
 
       ELSEIF ( Process(:4)=='init' ) THEN
         Process_flag = INIT
@@ -290,7 +290,7 @@
         IF ( Save_vars_to_file==ACTIVE ) THEN
           CALL PRMS_open_output_file(Restart_outunit, Var_save_file, 'var_save_file', 1, iret)
           IF ( iret/=0 ) ERROR STOP ERROR_open_out
-          CALL call_modules_restart(0)
+          CALL call_modules_restart(SAVE_INIT)
         ENDIF
         IF ( Model==GSFLOW ) THEN
           ierr = gsflow_modflow()
@@ -374,8 +374,8 @@
         IF ( ierr/=0 ) CALL module_error(Precip_module, Arg, ierr)
       ENDIF
 
-      call_modules = ierr ! set in case of the following RETURNs
       IF ( Model==CLIMATE ) THEN
+        call_modules = ierr
         IF ( Process_flag==RUN ) RETURN
       ENDIF
 
@@ -383,14 +383,15 @@
       IF ( Model==FROST ) THEN
         ierr = frost_date()
         IF ( ierr/=0 ) CALL module_error('frost_date', Arg, ierr)
+        call_modules = ierr
         IF ( Process_flag==RUN ) RETURN
         IF ( Process_flag==CLEAN ) STOP
       ENDIF
 
       IF ( Climate_swrad_flag==0 ) THEN
-        IF ( Solrad_flag==1 ) THEN
+        IF ( Solrad_flag==ddsolrad_module ) THEN
           ierr = ddsolrad()
-        ELSE !IF ( Solrad_flag==2 ) THEN
+        ELSE !IF ( Solrad_flag==ccsolrad_module ) THEN
           ierr = ccsolrad()
         ENDIF
         IF ( ierr/=0 ) CALL module_error(Solrad_module, Arg, ierr)
@@ -404,7 +405,7 @@
       IF ( ierr/=0 ) CALL module_error(Transp_module, Arg, ierr)
 
       IF ( Model==TRANSPIRE ) THEN
-        call_modules = ierr ! set in case of the following RETURNs
+        call_modules = ierr
         IF ( Process_flag==RUN ) RETURN
       ENDIF
 
@@ -430,12 +431,12 @@
       IF ( Model==WRITE_CLIMATE ) THEN
         ierr = write_climate_hru()
         IF ( ierr/=0 ) CALL module_error('write_climate_hru', Arg, ierr)
-        call_modules = ierr ! set in case of the following RETURNs
+        call_modules = ierr
         IF ( Process_flag==RUN ) RETURN
       ENDIF
 
       IF ( Model==POTET ) THEN
-        call_modules = ierr ! set in case of the following RETURNs
+        call_modules = ierr
         IF ( Process_flag==RUN ) RETURN
       ENDIF
 
@@ -592,6 +593,7 @@
 !     declare the dimensions
 !***********************************************************************
       INTEGER FUNCTION setdims()
+      USE PRMS_CONSTANTS, ONLY: GSFLOW_AG, PRMS_AG
       USE PRMS_MODULE
       USE GLOBAL, ONLY: NSTP, NPER, ISSFLG
       IMPLICIT NONE
@@ -765,7 +767,6 @@
       IF ( control_string(Aet_module, 'aet_module')/=0 ) CALL read_error(5, 'aet_module')
       IF ( Irrigation_area_module(:11)=='climate_hru' ) Climate_irrigated_area_flag = ACTIVE
       IF ( Aet_module(:11)=='climate_hru' ) Aet_cbh_flag = ACTIVE
- 
 
       IF ( Parameter_check_flag>0 ) CALL check_module_names()
 
@@ -881,12 +882,12 @@
 
       IF ( control_integer(Orad_flag, 'orad_flag')/=0 ) Orad_flag = OFF
       IF ( Solrad_module(:8)=='ddsolrad' ) THEN
-        Solrad_flag = 1
+        Solrad_flag = ddsolrad_module
       ELSEIF ( Solrad_module(:11)=='climate_hru' ) THEN
         Solrad_flag = climate_hru_module
         Climate_swrad_flag = ACTIVE
       ELSEIF ( Solrad_module(:8)=='ccsolrad' ) THEN
-        Solrad_flag = 2
+        Solrad_flag = ccsolrad_module
       ELSE
         PRINT '(/,2A)', 'ERROR, invalid solrad_module value: ', Solrad_module
         Inputerror_flag = 1
