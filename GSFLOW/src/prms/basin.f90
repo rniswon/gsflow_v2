@@ -442,7 +442,6 @@
           IF ( Dprst_flag==ACTIVE ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
           basinit = 1
         ENDIF
-        Hru_frac_perv(i) = Hru_perv(i)/harea
         basin_perv = basin_perv + DBLE( Hru_perv(i) )
       ENDDO
       IF ( Dprst_flag==ACTIVE .AND. PRMS4_flag==ACTIVE ) DEALLOCATE ( Dprst_area )
