@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-01-19'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-01-25'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -91,8 +91,10 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru
       IMPLICIT NONE
+      ! Functions
+      INTEGER, EXTERNAL :: declvar
 !***********************************************************************
       gsfdecl = 0
 C
@@ -116,6 +118,12 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
         ALLOCATE ( Gvr2cell_conv(Nhrucell), Cellarea(Ngwcell) )
         ALLOCATE ( Gwc_row(Ngwcell), Gwc_col(Ngwcell) )
+        ALLOCATE ( Hru_ag_irr(Nhru) )
+        IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real',
+     &       'Irrigation added to soilzone from MODFLOW wells',
+     &       'inches', Hru_ag_irr)/=0 )
+     &       CALL read_error(3, 'hru_ag_irr')
+        Hru_ag_irr = 0.0
       ENDIF
 
       END FUNCTION gsfdecl
@@ -130,7 +138,7 @@ C     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
-     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package_active, Nhru
+     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package_active
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -140,7 +148,7 @@ C1------USE package modules.
       INCLUDE 'openspec.inc'
 ! Functions
       INTRINSIC DBLE
-      INTEGER, EXTERNAL :: numchars, GET_KPER, declvar
+      INTEGER, EXTERNAL :: numchars, GET_KPER
       EXTERNAL :: SET_STRESS_DATES, print_module, SETMFTIME
       EXTERNAL :: SETCONVFACTORS, check_gvr_cell_pct
       EXTERNAL :: gsflow_modflow_restart, set_cell_values, error_stop
@@ -374,17 +382,7 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
       IF(IUNIT(49).GT.0) CALL LMT8BAS7AR(INUNIT,CUNIT,IGRID)
       Ag_package_active = OFF
       IF(IUNIT(66).GT.0) THEN
-        IF (GSFLOW_flag==ACTIVE) THEN
-          Ag_package_active = ACTIVE
-          IF (Ag_package_active==ACTIVE .OR. Model==DOCUMENTATION) THEN
-            ALLOCATE ( Hru_ag_irr(Nhru) )
-            IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real',
-     &           'Irrigation added to soilzone from MODFLOW wells',
-     &           'inches', Hru_ag_irr)/=0 )
-     &           CALL read_error(3, 'hru_ag_irr')
-            Hru_ag_irr = 0.0
-          ENDIF
-        ENDIF
+        IF (GSFLOW_flag==ACTIVE) Ag_package_active = ACTIVE
         CALL GWF2AG7AR(IUNIT(66),IUNIT(44),IUNIT(63))
       ENDIF
 !      IF(IUNIT(61).GT.0) THEN
