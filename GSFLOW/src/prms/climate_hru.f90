@@ -124,7 +124,6 @@
           ELSE
             READ ( Aet_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Aet_external(i), i=1,Nhru)
           ENDIF
-          Aet_external = Aet_external
           IF ( ios/=0 ) THEN
             ierr = 1
           ELSEIF ( Cbh_check_flag==ACTIVE ) THEN

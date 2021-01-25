@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-01-20'
+      character(len=*), parameter :: Version_soilzone = '2021-01-25'
       INTEGER, SAVE :: DBGUNT, Iter_aet
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -1047,6 +1047,7 @@
      &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_sroff, Basin_lake_stor, &
      &    Ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr_max, Ag_soil_moist_max, Basin_ag_soil_moist
       USE PRMS_WATER_USE, ONLY: Soilzone_gain
+      USE PRMS_CLIMATE_HRU, ONLY: Aet_external
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_SET_TIME, ONLY: Nowmonth, Cfs_conv !, Nowday
       USE PRMS_INTCP, ONLY: Hru_intcpevap
@@ -1068,7 +1069,7 @@
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
       REAL :: ag_upflow_max, ag_capacity, excess
       DOUBLE PRECISION :: gwin
-      INTEGER :: cfgi_frozen_hru, ag_on_flag, keep_iterating, iterate_num
+      INTEGER :: cfgi_frozen_hru, ag_on_flag, keep_iterating, iterate_num, add_estimated_irrigation
 !***********************************************************************
       szrun = 0
 
@@ -1079,6 +1080,7 @@
         Last_ssstor = Basin_ssstor
       ENDIF
 
+      IF ( Iter_aet==ACTIVE ) Ag_irrigation_add = 0.0
       keep_iterating = ACTIVE
       iterate_num = 0
       DO WHILE ( keep_iterating==ACTIVE )
@@ -1142,7 +1144,6 @@
         Ag_actet = 0.0
         Ag_dunnian = 0.0
         Ag_hortonian = 0.0
-        IF ( Iter_aet==ACTIVE ) Ag_irrigation_add = 0.0
         IF ( Cascade_flag>CASCADE_OFF ) Ag_upslope_dunnian = 0.0D0
       ENDIF
 
@@ -1168,6 +1169,7 @@
       Cap_waterin = 0.0
       Soil_saturated = OFF
       update_potet = OFF
+      add_estimated_irrigation = OFF
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 
@@ -1625,10 +1627,14 @@
         IF ( ag_on_flag==ACTIVE ) THEN
           IF ( Iter_aet==ACTIVE ) THEN
             !agriculture_external(i)
-            IF ( Unused_potet(i)>0.0 ) THEN
-              Ag_irrigation_add(i) = Unused_potet(i) / Ag_frac(i)
-            ELSE
-              Ag_irrigation_add(i) = 0.0
+            !IF ( Unused_potet(i)>0.0 ) THEN
+            IF ( Unused_potet(i)>NEARZERO ) THEN
+              Ag_irrigation_add(i) = Ag_irrigation_add(i) + Unused_potet(i) / Ag_frac(i)
+              keep_iterating = ACTIVE
+              add_estimated_irrigation = ACTIVE
+            ELSEIF ( Aet_external(i)<Hru_actet(i) ) THEN
+              PRINT *, 'WARNING, exteranal AET from CBH File < computeted AET'
+              PRINT '(2(A,F0.4))', '         Aet_external: ', Aet_external(i), '; hru_actet: ', Hru_actet(i)
             ENDIF
           ENDIF
         ENDIF
@@ -1637,10 +1643,8 @@
       ENDDO ! end HRU loop
 
       IF ( Iter_aet==OFF ) keep_iterating = OFF
-      IF ( Agriculture_flag==ACTIVE ) THEN
-        Soil_iter = Soil_iter + 1
-        IF ( Soil_iter>10 ) keep_iterating = OFF
-      ENDIF
+      Soil_iter = Soil_iter + 1
+      IF ( Soil_iter>10 .OR. add_estimated_irrigation==OFF ) keep_iterating = OFF
       ENDDO ! end iteration while loop
 
       Basin_actet = Basin_actet*Basin_area_inv

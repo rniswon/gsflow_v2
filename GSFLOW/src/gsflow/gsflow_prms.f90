@@ -20,7 +20,7 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/22/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/25/2021'
       character(len=*), parameter :: PRMS_versn = '2021-01-20'
       character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 01/20/2021'
       CHARACTER(LEN=8), SAVE :: Process
@@ -948,6 +948,7 @@
       IF ( control_integer(Agriculture_soil_flag, 'agriculture_soil_flag')/=0 ) Agriculture_soil_flag = OFF
       IF ( control_integer(Agriculture_canopy_flag, 'agriculture_canopy_flag')/=0 ) Agriculture_canopy_flag = OFF
       Agriculture_flag = Agriculture_soil_flag + Agriculture_canopy_flag
+      IF ( Model==PRMS_AG ) Agriculture_flag = Agriculture_flag + 1
       ! 0 = off, 1 = on, 2 = lauren version
       IF ( control_integer(CsvON_OFF, 'csvON_OFF')/=0 ) CsvON_OFF = OFF
 
