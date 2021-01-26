@@ -2323,7 +2323,7 @@
                   IF (GSFLOW_flag == 0) THEN
                      QQ = demandgw_uzf(l, kkper, kkstp, kkiter, time)
                   ELSE
-                     QQ = demandgw_prms(l, kkiter)
+                     QQ = demandgw_prms(l, kkper, kkstp, kkiter)
                   END IF
                ELSEIF (TRIGGERFLAG > 0) then
                   QQ = demandtrigger_gw(Q, kkper, kkstp, kkiter, l)   
@@ -2966,7 +2966,7 @@
         sup = DVRSFLW(iseg) + ACTUAL(ISEG)
         supold = SUPACTOLD(ISEG) + ACTUALOLD(ISEG)
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
-     +           supold, kiter)
+     +           supold, kper, kstp, kiter)
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
@@ -3056,7 +3056,7 @@
         sup = DVRSFLW(iseg) + ACTUAL(ISEG)
         supold = SUPACTOLD(ISEG) + ACTUALOLD(ISEG)
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
-     +           supold, kiter)
+     +           supold, kper, kstp, kiter)
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
@@ -3143,7 +3143,7 @@
         sup = PONDFLOW(i)
         supold = PONDFLOWOLD(i)
         factor = set_factor(ipond, aetold, pettotal, aettotal, sup,
-     +           supold, kiter)
+     +           supold, kper, kstp, kiter)
         AETITERPOND(i) = SNGL(aettotal)
         PONDFLOWOLD(i) = PONDFLOW(i)
         PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
@@ -3391,7 +3391,7 @@
       sup = QONLY(l)
       supold = QONLYOLD(l)
       factor = set_factor(l, aetold, pettotal, aettotal, sup, supold,
-     +                    kiter)
+     +                    kper, kstp, kiter)
       QONLYOLD(l) = QONLY(l)
       AETITERGW(l) = sngl(aettotal)
       QONLY(L) = QONLY(L) + sngl(factor)
@@ -3402,7 +3402,7 @@
       end function demandgw_uzf
 !
 !
-      double precision function demandgw_prms(l, kiter)
+      double precision function demandgw_prms(l, kper, kstp, kiter)
 !     ******************************************************************
 !     demandgw---- sums up irrigation demand using ET deficit for gw
 !     ******************************************************************
@@ -3420,7 +3420,7 @@
 ! --------------------------------------
       !modules
       !arguments
-      integer, intent(in) :: l, kiter
+      integer, intent(in) :: l, kiter, kper, kstp
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, prms_inch2mf_q,
      +                    aetold, supold, sup, aettotal, pettotal
@@ -3459,7 +3459,7 @@
       sup = QONLY(l)
       supold = QONLYOLD(l)
       factor = set_factor(l, aetold, pettotal, aettotal, sup, supold,
-     +                    kiter)
+     +                    kper, kstp, kiter)
       QONLYOLD(l) = QONLY(L)
       AETITERGW(l) = sngl(aettotal)
       QONLY(L) = QONLY(L) + sngl(factor)
@@ -3468,7 +3468,8 @@
       end function demandgw_prms
 !
       double precision function set_factor(l,aetold, pettotal, 
-     +                                     aettotal,sup,supold,kiter)
+     +                                     aettotal, sup, supold,
+     +                                     kper, kstp, kiter)
 !     ******************************************************************
 !     updates diversion or pumping rate based on ET deficit
 !     ******************************************************************
@@ -3480,7 +3481,7 @@
       !arguments
       double precision, intent(in) :: aetold, pettotal, aettotal,
      +                                sup, supold
-      integer, intent(in) :: kiter, l
+      integer, intent(in) :: kiter, l, kper, kstp
       !dummy
       DOUBLE PRECISION :: factor, zerod5, dzero, etdif, det, dq
 ! -----------------------------------------
@@ -3501,10 +3502,10 @@
       if( factor > accel*etdif ) factor = accel*etdif
       if( factor < etdif ) factor = etdif
       if( factor < dzero ) factor = dzero
-!      open(222,file='debug.out')
-!      if(l==18)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
-!     +aetold,factor,sup
-!333   format(i5,8e20.10)
+      open(222,file='debug.out')
+      if(l==18)write(222,333)kper, kstp, kiter,pettotal,aettotal,dq,det,
+     +aettotal,aetold,factor,sup
+333   format(3i5,8e20.10)
       set_factor = factor
       end function set_factor
 !
