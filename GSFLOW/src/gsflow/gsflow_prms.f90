@@ -20,7 +20,7 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/25/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/26/2021'
       character(len=*), parameter :: PRMS_versn = '2021-01-20'
       character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 01/20/2021'
       CHARACTER(LEN=8), SAVE :: Process
@@ -527,7 +527,7 @@
 
       IF ( NsegmentOutON_OFF>OFF ) CALL nsegment_summary()
 
-      IF ( CsvON_OFF>OFF .AND. Model==PRMS ) CALL prms_summary()
+      IF ( CsvON_OFF>OFF .AND. PRMS_only==ACTIVE ) CALL prms_summary()
 
       call_modules = ierr ! set in case of the following RETURNs
       IF ( Process_flag==RUN ) THEN
