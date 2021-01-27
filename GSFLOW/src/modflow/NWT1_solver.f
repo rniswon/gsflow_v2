@@ -46,7 +46,8 @@
       ALLOCATE (RMSAVE)
       ALLOCATE (Numnonzero, Numactive, Numcell, II)
       ALLOCATE (Akappa,Gamma,Amomentum,Btrack,Breduc,Numtrack)
-      ALLOCATE (Nonmeth, Linmeth, IPRNWT, Itreal, Ibt)
+!      ALLOCATE (Nonmeth, Linmeth, IPRNWT, Itreal, Ibt) ! removed Itreal
+      ALLOCATE (Nonmeth, Linmeth, IPRNWT, Ibt)
       ALLOCATE (IBOTAV)
 !1------IDENTIFY PACKAGE AND INITIALIZE.
       WRITE (Iout, 9001) In
@@ -54,7 +55,7 @@
      +    'VERSION 1.1.4, 4/01/2018', /, 9X, 'INPUT READ FROM UNIT',
      +        I3,/)
       i = 1
-      Itreal = 0
+!      Itreal = 0
       Ibt = 0
       RMS2 = 0.0D0
       RMS1 = 0.0D0
@@ -860,7 +861,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 !
 !     -----------------------------------------------------------------
       SUBROUTINE GWF2NWT1FM(Kkiter, ICNVG, KSTP, KPER, Maxiter, 
-     +                      Iunitchd, Igrid)
+     +                      Iunitchd, Itreal, Igrid)
 ! Builds and Solves Jacobian
 ! Calls various unstructured linear solvers to solve Jacobian
       USE GLOBAL, ONLY:Iout,ISSFLG
@@ -889,7 +890,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 !     LOCAL VARIABLES
 !     -----------------------------------------------------------------
       DOUBLE PRECISION R_norm_gmres, r_norm, fheadsave2
-      INTEGER ic, ir, il, ITER, ippn
+      INTEGER ic, ir, il, ITER, ippn, Itreal
       INTEGER ij, jj, ichld, irhld, ilhld, itertot
       INTEGER n_iter, n, icfld, irfld, ilfld
 !!      DOUBLE PRECISION h2
