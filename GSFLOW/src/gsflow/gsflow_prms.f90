@@ -20,9 +20,9 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/26/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-01-20'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 01/20/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/28/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-01-28'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 01/28/2021'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -39,9 +39,9 @@
       INTEGER, SAVE :: Inputerror_flag, Timestep
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag
       INTEGER, SAVE :: PRMS_flag, GSFLOW_flag, PRMS4_flag
-      INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Grid_flag
+      INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Grid_flag, Ag_package_active
       INTEGER, SAVE :: Agriculture_flag, Canopy_iter, Soil_iter, Keep_iterating_PRMS
-      INTEGER, SAVE :: Climate_irrigated_area_flag, Aet_cbh_flag
+      INTEGER, SAVE :: Climate_irrigated_area_flag, AET_cbh_flag, PET_cbh_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Soilzone_add_water_use
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
@@ -62,7 +62,7 @@
       INTEGER, SAVE :: Init_vars_from_file, Save_vars_to_file, Orad_flag, Cascade_flag, Cascadegw_flag
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
-      INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, Ag_package_active
+      INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, max_soilzone_ag_iter
       INTEGER, SAVE :: Agriculture_soil_flag, Agriculture_canopy_flag, Dyn_ag_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
@@ -71,7 +71,7 @@
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Temp_module, Srunoff_module, Et_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Strmflow_module, Transp_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Model_mode, Precip_module, Solrad_module
-      CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Irrigation_area_module, Aet_module
+      CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: irrigation_area_module, AET_module, PET_ag_module
       CHARACTER(LEN=8), SAVE :: Soilzone_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
       INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF
@@ -765,10 +765,12 @@
       Strmflow_module = 'strmflow'
       IF ( control_string(Strmflow_module, 'strmflow_module')/=0 ) CALL read_error(5, 'strmflow_module')
       Irrigation_area_module = ' '
-      IF ( control_string(Irrigation_area_module, 'irrigation_area_module')/=0 ) CALL read_error(5, 'irrigation_area_module')
-      IF ( control_string(Aet_module, 'aet_module')/=0 ) CALL read_error(5, 'aet_module')
+      IF ( control_string(irrigation_area_module, 'irrigation_area_module')/=0 ) CALL read_error(5, 'irrigation_area_module')
+      IF ( control_string(AET_module, 'AET_module')/=0 ) CALL read_error(5, 'AET_module')
+      IF ( control_string(PET_ag_module, 'PET_ag_module')/=0 ) CALL read_error(5, 'PET_ag_module')
       IF ( Irrigation_area_module(:11)=='climate_hru' ) Climate_irrigated_area_flag = ACTIVE
-      IF ( Aet_module(:11)=='climate_hru' ) Aet_cbh_flag = ACTIVE
+      IF ( AET_module(:11)=='climate_hru' ) AET_cbh_flag = ACTIVE
+      IF ( PET_ag_module(:11)=='climate_hru' ) PET_cbh_flag = ACTIVE
 
       IF ( Parameter_check_flag>0 ) CALL check_module_names()
 
@@ -903,7 +905,7 @@
       IF ( Climate_temp_flag==ACTIVE .OR. Climate_precip_flag==ACTIVE .OR. Climate_potet_flag==ACTIVE .OR. &
      &     Climate_swrad_flag==ACTIVE .OR. Climate_transp_flag==ACTIVE .OR. &
      &     Humidity_cbh_flag==ACTIVE .OR. Windspeed_cbh_flag==ACTIVE .OR. &
-     &     Climate_irrigated_area_flag==ACTIVE .OR. Aet_cbh_flag==ACTIVE .OR. &
+     &     Climate_irrigated_area_flag==ACTIVE .OR. AET_cbh_flag==ACTIVE .OR. PET_cbh_flag==ACTIVE .OR. &
      &     Gwflow_cbh_flag==ACTIVE .OR. Snow_cbh_flag==ACTIVE ) Climate_hru_flag = ACTIVE
 
       Muskingum_flag = OFF
@@ -1018,6 +1020,8 @@
           Inputerror_flag = 1
         ENDIF
       ENDIF
+
+      IF ( control_integer(max_soilzone_ag_iter, 'max_soilzone_ag_iter')/=0 ) max_soilzone_ag_iter = 25
 
 ! cascade
       ! if cascade_flag = 2 (CASCADE_HRU_SEGMENT), use hru_segment parameter for cascades, ncascade=ncascdgw=nhru (typical polygon HRUs)
