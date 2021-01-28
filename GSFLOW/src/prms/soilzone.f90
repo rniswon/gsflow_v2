@@ -20,13 +20,13 @@
       USE PRMS_MODULE, ONLY: Model, Nhru, Nssr, Nsegment, Nlake, Nhrucell, Print_debug, Dprst_flag, &
      &    Init_vars_from_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Ag_package_active, &
-     &    Call_cascade, PRMS_land_iteration_flag, Agriculture_flag, Soil_iter, max_soilzone_ag_iter
+     &    Call_cascade, PRMS_land_iteration_flag, Agriculture_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
       character(len=*), parameter :: Version_soilzone = '2021-01-28'
-      INTEGER, SAVE :: DBGUNT, Iter_aet
+      INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
       REAL, SAVE, ALLOCATABLE :: Soil_lower_stor_max(:)
@@ -79,7 +79,7 @@
       REAL, SAVE, ALLOCATABLE :: Sm2gw_grav(:), Gw2sm_grav(:)
       REAL, SAVE, ALLOCATABLE :: Gravity_stor_res(:), Gvr2sm(:), Grav_gwin(:)
 !   Control Parameters
-      INTEGER, SAVE :: Soilzone_aet_flag
+      INTEGER, SAVE :: Soilzone_aet_flag, max_soilzone_ag_iter
 !   Declared Parameters
       INTEGER, SAVE, ALLOCATABLE :: Soil_type(:), Gvr_hru_id(:)
       REAL, SAVE, ALLOCATABLE :: Pref_flow_den(:), Pref_flow_infil_frac(:)
@@ -156,6 +156,7 @@
       CALL print_module(MODDESC, MODNAME, Version_soilzone)
 
       IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
+      IF ( control_integer(max_soilzone_ag_iter, 'max_soilzone_ag_iter')/=0 ) max_soilzone_ag_iter = 25
 
 ! Declare Variables
       IF ( declvar(MODNAME, 'basin_capwaterin', 'one', 1, 'double', &
@@ -787,6 +788,7 @@
         Gw2sm_grav = 0.0
       ENDIF
 
+      Soil_iter = 1
 !??? figure out what to save in restart file ???
       IF ( Agriculture_flag>OFF ) THEN
 !        IF ( getparam(MODNAME, 'ag_soil_type', Nhru, 'integer', Ag_soil_type)/=0 ) CALL read_error(2, 'ag_soil_type')
@@ -1085,7 +1087,7 @@
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
       REAL :: ag_upflow_max, ag_capacity, excess, agfrac, ag_soil2gw, ag_soil2gvr, ag_avail_potet, ag_potet
       DOUBLE PRECISION :: gwin
-      INTEGER :: cfgi_frozen_hru, ag_on_flag, keep_iterating, iterate_num, add_estimated_irrigation, num_hrus_ag_iter
+      INTEGER :: cfgi_frozen_hru, ag_on_flag, keep_iterating, add_estimated_irrigation, num_hrus_ag_iter
 !***********************************************************************
       szrun = 0
 
@@ -1101,7 +1103,7 @@
         Unused_ag_et = 0.0
       ENDIF
       keep_iterating = ACTIVE
-      iterate_num = 0
+      Soil_iter = 1
       DO WHILE ( keep_iterating==ACTIVE )
 
 ! It0 variables used with MODFLOW integration to save iteration states.
@@ -1685,13 +1687,14 @@
         Basin_actet = Basin_actet + DBLE( Hru_actet(i)*harea )
 !        IF ( Hru_actet(i)>0.0 ) Snowevap_aet_frac(i) = Snow_evap(i)/Hru_actet(i)
       ENDDO ! end HRU loop
-!     print *, 'number of hrus still iterating on AET', num_hrus_ag_iter
 
       IF ( Iter_aet==OFF ) keep_iterating = OFF
       Soil_iter = Soil_iter + 1
       IF ( Soil_iter>max_soilzone_ag_iter .OR. add_estimated_irrigation==OFF ) keep_iterating = OFF
       ENDDO ! end iteration while loop
       IF ( Iter_aet==ACTIVE ) Ag_irrigation_add = Ag_irrigation_add*Ag_area
+      print '(2(A,I0))', 'number of hrus still iterating on AET: ', num_hrus_ag_iter, ', iterations: ', Soil_iter
+      print *, NOWTIME
 
       Basin_actet = Basin_actet*Basin_area_inv
       Basin_perv_et = Basin_perv_et*Basin_area_inv

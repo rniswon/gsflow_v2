@@ -62,7 +62,7 @@
       INTEGER, SAVE :: Init_vars_from_file, Save_vars_to_file, Orad_flag, Cascade_flag, Cascadegw_flag
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
-      INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, max_soilzone_ag_iter
+      INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag
       INTEGER, SAVE :: Agriculture_soil_flag, Agriculture_canopy_flag, Dyn_ag_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
@@ -1020,8 +1020,6 @@
           Inputerror_flag = 1
         ENDIF
       ENDIF
-
-      IF ( control_integer(max_soilzone_ag_iter, 'max_soilzone_ag_iter')/=0 ) max_soilzone_ag_iter = 25
 
 ! cascade
       ! if cascade_flag = 2 (CASCADE_HRU_SEGMENT), use hru_segment parameter for cascades, ncascade=ncascdgw=nhru (typical polygon HRUs)
