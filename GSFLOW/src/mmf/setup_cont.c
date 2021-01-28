@@ -58,7 +58,8 @@ void setup_cont (void) {
         decl_control_string ("gsflow_output_file", "gsflow.out");
         decl_control_string ("gsflow_csv_file", "gsflow.csv");
 		//decl_control_string ("creator_email", "unknown");
-		decl_control_string ("aet_module", "unknown");
+		decl_control_string ("AET_module", "unknown");
+		decl_control_string ("PET_ag_module", "unknown");
 		decl_control_string ("irrigation_area_module", "unknown");
 
 /*
@@ -331,7 +332,8 @@ void setup_cont (void) {
         decl_control_string ("transp_day", "transp.day");
         decl_control_string ("windspeed_day", "windspeed.day");
         decl_control_string ("humidity_day", "humidity.day");
-		decl_control_string ("aet_cbh_file", "aet.input");
+		decl_control_string ("AET_cbh_file", "AET.input");
+		decl_control_string ("PET_cbh_file", "PET.input");
 		decl_control_string ("pkwater_equiv_day", "pkwater_equiv.day");
         decl_control_string ("pk_depth_day", "pk_depth.day");
         decl_control_string ("snow_evap_day", "snow_evap.day");
@@ -451,6 +453,9 @@ void setup_cont (void) {
 		lval[0] = 1;
 		decl_control_int_array("prms_warmup", 1, lval);
 
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 25;
+		decl_control_int_array("max_soilzone_ag_iter", 1, lval);
 
 		/*
 		**	nsub_summary
