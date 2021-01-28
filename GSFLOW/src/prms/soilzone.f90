@@ -20,12 +20,12 @@
       USE PRMS_MODULE, ONLY: Model, Nhru, Nssr, Nsegment, Nlake, Nhrucell, Print_debug, Dprst_flag, &
      &    Init_vars_from_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Ag_package_active, &
-     &    Call_cascade, PRMS_land_iteration_flag, Agriculture_flag, Soil_iter
+     &    Call_cascade, PRMS_land_iteration_flag, Agriculture_flag, Soil_iter, max_soilzone_ag_iter
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-01-25'
+      character(len=*), parameter :: Version_soilzone = '2021-01-28'
       INTEGER, SAVE :: DBGUNT, Iter_aet
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -93,7 +93,7 @@
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr, Basin_agwaterin
       !DOUBLE PRECISION, SAVE :: Basin_ag_ssstor, Basin_ag_recharge, Basin_ag_ssflow
-      REAL, SAVE, ALLOCATABLE :: Ag_soil_to_gw(:), Ag_soil_to_ssr(:), Ag_hortonian(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_soil_to_gw(:), Ag_soil_to_ssr(:), Ag_hortonian(:), Unused_ag_et(:)
       REAL, SAVE, ALLOCATABLE :: Ag_actet(:), Ag_dunnian(:), Ag_irrigation_add(:), Ag_gvr2sm(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Ag_upslope_dunnian(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_lower(:), Ag_soil_lower_stor_max(:), Ag_potet_rechr(:), Ag_potet_lower(:)
@@ -635,8 +635,18 @@
       Iter_aet = OFF
       IF ( Agriculture_flag>OFF .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Ag_soil_to_gw(Nhru), Ag_soil_to_ssr(Nhru) )
-        ALLOCATE ( Ag_actet(Nhru), Ag_dunnian(Nhru) )
+        ALLOCATE ( Ag_dunnian(Nhru) )
         IF ( Cascade_flag>OFF ) ALLOCATE ( Ag_upslope_dunnian(Nhru) )
+
+        ALLOCATE ( Ag_actet(Nhru) )
+        IF ( declvar(MODNAME, 'ag_actet', 'nhru', Nhru, 'real', &
+     &       'Actual ET for agriculture reservoir for each HRU', &
+     &       'inches', Ag_actet)/=0 ) CALL read_error(3, 'ag_actet')
+
+        ALLOCATE ( Unused_ag_et(Nhru) )
+        IF ( declvar(MODNAME, 'unused_ag_et', 'nhru', Nhru, 'real', &
+     &       'Actual ET for agriculture reservoir for each HRU', &
+     &       'inches', Unused_ag_et)/=0 ) CALL read_error(3, 'unused_ag_et')
 
         ALLOCATE (  Ag_hortonian(Nhru) )
         IF ( declvar(MODNAME, 'ag_hortonian', 'nhru', Nhru, 'real', &
@@ -652,8 +662,8 @@
           Iter_aet = ACTIVE
           ALLOCATE ( Ag_irrigation_add(Nhru) )
           IF ( declvar(MODNAME, 'ag_irrigation_add', 'nhru', Nhru, 'real', &
-     &         'Irrigation water added to agriculture fraction when hru_actet < potet for each HRU', &
-     &         'inches', Ag_irrigation_add)/=0 ) CALL read_error(3, 'ag_irrigation_add')
+     &         'Irrigation water added to agriculture fraction when ag_actet < PET_external for each HRU', &
+     &         'inche-acres', Ag_irrigation_add)/=0 ) CALL read_error(3, 'ag_irrigation_add')
         ENDIF
 
         ALLOCATE ( Ag_soil_lower(Nhru), Ag_soil_lower_stor_max(Nhru) )
@@ -716,6 +726,8 @@
      !&       'Winter vegetation cover density for crop type', &
      !&       'Winter vegetation cover density for the crop type in each HRU', &
      !&       'decimal fraction')/=0 ) CALL read_error(1, 'ag_covden_win')
+      ELSE
+        ALLOCATE ( Ag_actet(1) )
       ENDIF
 
       END FUNCTION szdecl
@@ -788,10 +800,12 @@
         ! dimensioned nhru
         Ag_soil_to_gw = 0.0
         Ag_soil_to_ssr = 0.0
-        Ag_actet = 0.0
         Ag_dunnian = 0.0
         Ag_hortonian = 0.0
-        IF ( Iter_aet==ACTIVE ) Ag_irrigation_add = 0.0 
+        IF ( Iter_aet==ACTIVE ) THEN
+          Ag_irrigation_add = 0.0 
+          Unused_ag_et = 0.0
+        ENDIF
         Ag_soil_lower_stor_max = 0.0
         Ag_potet_lower = 0.0
         Ag_potet_rechr = 0.0
@@ -820,6 +834,7 @@
         Last_ag_soil_moist = Basin_ag_soil_moist
       ENDIF
       IF ( Ag_package_active==ACTIVE ) ALLOCATE ( It0_ag_soil_rechr(Nhru), It0_ag_soil_moist(Nhru) )
+      Ag_actet = 0.0 ! if no ag, dimension 1
 
       Swale_limit = 0.0
       Pref_flag = OFF
@@ -1047,13 +1062,14 @@
      &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_sroff, Basin_lake_stor, &
      &    Ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr_max, Ag_soil_moist_max, Basin_ag_soil_moist
       USE PRMS_WATER_USE, ONLY: Soilzone_gain
-      USE PRMS_CLIMATE_HRU, ONLY: Aet_external
+      USE PRMS_CLIMATE_HRU, ONLY: AET_external, PET_external
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_SET_TIME, ONLY: Nowmonth, Cfs_conv !, Nowday
       USE PRMS_INTCP, ONLY: Hru_intcpevap
       USE PRMS_SNOW, ONLY: Snowcov_area, Snow_evap
-      USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen
+      USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen, Infil_ag
       USE GSFMODFLOW, ONLY: Hru_ag_irr
+      USE PRMS_SET_TIME, ONLY: Nowtime
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
@@ -1067,9 +1083,9 @@
       REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin
       REAL :: perv_frac, capacity, capwater_maxin, ssresin
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
-      REAL :: ag_upflow_max, ag_capacity, excess
+      REAL :: ag_upflow_max, ag_capacity, excess, agfrac, ag_soil2gw, ag_soil2gvr, ag_avail_potet, ag_potet
       DOUBLE PRECISION :: gwin
-      INTEGER :: cfgi_frozen_hru, ag_on_flag, keep_iterating, iterate_num, add_estimated_irrigation
+      INTEGER :: cfgi_frozen_hru, ag_on_flag, keep_iterating, iterate_num, add_estimated_irrigation, num_hrus_ag_iter
 !***********************************************************************
       szrun = 0
 
@@ -1080,14 +1096,17 @@
         Last_ssstor = Basin_ssstor
       ENDIF
 
-      IF ( Iter_aet==ACTIVE ) Ag_irrigation_add = 0.0
+      IF ( Iter_aet==ACTIVE ) THEN
+        Ag_irrigation_add = 0.0 
+        Unused_ag_et = 0.0
+      ENDIF
       keep_iterating = ACTIVE
       iterate_num = 0
       DO WHILE ( keep_iterating==ACTIVE )
 
 ! It0 variables used with MODFLOW integration to save iteration states.
-      IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE ) THEN
-        IF ( Kkiter>1 ) THEN
+      IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE .OR. Iter_aet==ACTIVE ) THEN
+        IF ( Kkiter>1 .OR. Soil_iter>1 ) THEN
           Ssres_stor = It0_ssres_stor
           Slow_stor = It0_slow_stor
           IF ( GSFLOW_flag==ACTIVE ) Gravity_stor_res = It0_gravity_stor_res
@@ -1096,14 +1115,16 @@
         ELSE
           It0_ssres_stor = Ssres_stor
           It0_slow_stor = Slow_stor
-          IF ( GSFLOW_flag==ACTIVE ) It0_gravity_stor_res = Gravity_stor_res
+          IF ( GSFLOW_flag==ACTIVE ) THEN
+            It0_gravity_stor_res = Gravity_stor_res
+            Gw2sm_grav = 0.0
+          ENDIF
           IF ( Pref_flag==ACTIVE ) It0_pref_flow_stor = Pref_flow_stor
           IF ( Nlake>0 ) It0_potet = Potet
-          Gw2sm_grav = 0.0
         ENDIF
       ENDIF
-      IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
-        IF ( Kkiter>1 ) THEN
+      IF ( (GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet==ACTIVE ) THEN
+        IF ( Kkiter>1 .OR. Soil_iter>1 ) THEN
           ! states saved in srunoff when PRMS_land_iteration_flag = ACTIVE
           Soil_rechr = It0_soil_rechr
           Soil_moist = It0_soil_moist
@@ -1129,7 +1150,7 @@
       IF ( Kkiter>1 ) THEN
         Basin_soil_moist = It0_basin_soil_moist
         Basin_ssstor = It0_basin_ssstor
-      ELSE
+      ELSE ! don't need for iter_aet
         It0_basin_soil_moist = Basin_soil_moist
         It0_basin_ssstor = Basin_ssstor
       ENDIF
@@ -1170,6 +1191,7 @@
       Soil_saturated = OFF
       update_potet = OFF
       add_estimated_irrigation = OFF
+      num_hrus_ag_iter = 0
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 
@@ -1212,7 +1234,9 @@
         IF ( Agriculture_flag>OFF ) THEN
           IF ( Ag_area(i)>0.0 ) THEN
             ag_on_flag = ACTIVE
-            ag_water_maxin = Infil(i)*Ag_frac(i)
+            agfrac = Ag_frac(i)
+            ag_water_maxin = Infil_ag(i)
+            ag_avail_potet = PET_external(i) - Hru_actet(i)
           ENDIF
         ENDIF
 
@@ -1268,7 +1292,6 @@
             ag_water_maxin = ag_water_maxin - excess
           ENDIF
         ENDIF
-        capwater_maxin = capwater_maxin + ag_water_maxin
 
         cfgi_frozen_hru = OFF
         !Frozen is HRU variable that says if frozen gravity reservoir
@@ -1296,11 +1319,9 @@
             pref_flow_maxin = pref_flow_maxin*perv_frac
           ENDIF
           IF ( ag_water_maxin>0.0 ) THEN
-            IF ( Agriculture_flag>OFF ) THEN
-              ag_water_maxin = ag_water_maxin*Pref_flow_infil_frac(i)*Ag_frac(i)
-            ELSE
-              ag_water_maxin = ag_water_maxin*Pref_flow_infil_frac(i)*perv_frac
-            ENDIF
+            pref_flow_maxin = ag_water_maxin*Pref_flow_infil_frac(i)
+            ag_water_maxin = ag_water_maxin - pref_flow_maxin
+            pref_flow_maxin = pref_flow_maxin*agfrac
           ENDIF
           IF ( pref_flow_maxin>0.0 ) THEN
             IF ( cfgi_frozen_hru==ACTIVE ) THEN
@@ -1324,7 +1345,7 @@
 
         IF ( Cascade_flag>CASCADE_OFF ) THEN
           IF ( ag_on_flag==ACTIVE ) THEN
-            ag_upflow_max = SNGL(Upslope_dunnianflow(i)+Upslope_interflow(i))/Ag_frac(i)
+            ag_upflow_max = SNGL(Upslope_dunnianflow(i)+Upslope_interflow(i))/agfrac
             Basin_ag_up_max = Basin_ag_up_max + ag_upflow_max*Ag_area(i)
             ag_water_maxin = ag_water_maxin + ag_upflow_max
           ENDIF
@@ -1354,10 +1375,23 @@
      &           Soil_moist(i), Soil_rechr(i), Soil_to_gw(i), perv_frac)
             Cap_waterin(i) = Cap_waterin(i)*perv_frac
             Basin_capwaterin = Basin_capwaterin + DBLE( Cap_waterin(i)*harea )
-            Basin_soil_to_gw = Basin_soil_to_gw + DBLE( Soil_to_gw(i)*harea )
-            Basin_sm2gvr_max = Basin_sm2gvr_max + DBLE( gvr_maxin*harea )
-            Soil_to_ssr(i) = gvr_maxin
           ENDIF
+          IF ( ag_on_flag==ACTIVE ) THEN
+            IF ( ag_water_maxin+Ag_soil_moist(i)>0.0 ) THEN
+              ag_soil2gw = 0.0
+              ag_soil2gvr = 0.0
+              CALL compute_soilmoist(ag_water_maxin, Ag_soil_moist_max(i), &
+     &             Ag_soil_rechr_max(i), Soil2gw_max(i), ag_soil2gvr, &
+     &             Ag_soil_moist(i), Ag_soil_rechr(i), ag_soil2gw, agfrac)
+              ag_water_maxin = ag_water_maxin*agfrac
+              Basin_agwaterin = Basin_agwaterin + DBLE( ag_water_maxin*harea )
+              Soil_to_gw(i) = Soil_to_gw(i) + ag_soil2gw
+              gvr_maxin = gvr_maxin + ag_soil2gvr
+            ENDIF
+          ENDIF
+          Basin_soil_to_gw = Basin_soil_to_gw + DBLE( Soil_to_gw(i)*harea )
+          Basin_sm2gvr_max = Basin_sm2gvr_max + DBLE( gvr_maxin*harea )
+          Soil_to_ssr(i) = gvr_maxin
         ENDIF
 
 ! compute slow interflow and ssr_to_gw
@@ -1365,7 +1399,7 @@
         IF ( GSFLOW_flag==ACTIVE ) THEN
           ! capacity for whole HRU
           ag_capacity = 0.0
-          IF ( ag_on_flag==ACTIVE ) ag_capacity = (Ag_soil_moist_max(i) - Ag_soil_moist(i))*Ag_frac(i)
+          IF ( ag_on_flag==ACTIVE ) ag_capacity = (Ag_soil_moist_max(i) - Ag_soil_moist(i))*agfrac
           capacity = (Soil_moist_max(i) - Soil_moist(i))*perv_frac
           CALL compute_gravflow(i, capacity, Slowcoef_lin(i), &
      &                          Slowcoef_sq(i), Ssr2gw_rate(i), Ssr2gw_exp(i), &
@@ -1394,7 +1428,7 @@
           ENDIF
           IF ( ag_on_flag==ACTIVE ) THEN
             IF ( Ag_gvr2sm(i)>0.0 ) THEN
-              Ag_soil_moist(i) = Ag_soil_moist(i) + Ag_gvr2sm(i)/Ag_frac(i)
+              Ag_soil_moist(i) = Ag_soil_moist(i) + Ag_gvr2sm(i)/agfrac
 !              IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) &
 !     &             PRINT *, 'AG sm>max', Ag_soil_moist(i), Ag_soil_moist_max(i), i
               IF ( Soilzone_aet_flag==ACTIVE ) THEN
@@ -1402,7 +1436,7 @@
                 Ag_soil_rechr(i) = Ag_soil_moist(i) - Ag_soil_lower(i)
 !                if ( Ag_soil_lower(i) + Ag_soil_rechr(i) > Ag_soil_moist(i) ) print *, 'excess', excess, Ag_soil_lower(i) + Ag_soil_rechr(i)-Ag_soil_moist(i), Ag_soil_lower(i), Ag_soil_rechr(i), Ag_soil_moist(i)
               ELSE
-                Ag_soil_rechr(i) = MIN( Ag_soil_rechr_max(i), Ag_soil_rechr(i) + Ag_gvr2sm(i)/Ag_frac(i)*Ag_replenish_frac(i))
+                Ag_soil_rechr(i) = MIN( Ag_soil_rechr_max(i), Ag_soil_rechr(i) + Ag_gvr2sm(i)/agfrac*Ag_replenish_frac(i))
               ENDIF
               Basin_gvr2sm = Basin_gvr2sm + DBLE( Ag_gvr2sm(i)*harea )
             ENDIF
@@ -1476,14 +1510,19 @@
         ENDIF
         IF ( ag_on_flag==ACTIVE ) THEN
           IF ( Ag_soil_moist(i)>0.0 .AND. cfgi_frozen_hru==OFF ) THEN
+            IF ( Iter_aet==ACTIVE ) THEN
+              ag_potet = PET_external(i)
+            ELSE
+              ag_potet = Potet(i)
+            ENDIF
             CALL compute_szactet(Ag_soil_moist_max(i), Ag_soil_rechr_max(i), Transp_on(i), Cov_type(i), &
-     &                           Soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_actet(i), avail_potet, & !??
+     &                           Soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_actet(i), ag_avail_potet, & !??
      &                           Snow_free(i), Ag_potet_rechr(i), Ag_potet_lower(i), &
-     &                           Potet(i), Ag_frac(i), Soil_saturated(i))
+     &                           ag_potet, agfrac, Soil_saturated(i))
           ENDIF
           ! sanity check
-          IF ( Ag_actet(i)>Avail_potet ) PRINT *, 'ag_actet problem', Ag_actet(i), Avail_potet
-          Hru_actet(i) = Hru_actet(i) + Ag_actet(i)*Ag_frac(i)
+!          IF ( Ag_actet(i)>ag_avail_potet ) PRINT *, 'ag_actet problem', Ag_actet(i), ag_avail_potet
+          Hru_actet(i) = Hru_actet(i) + Ag_actet(i)*agfrac
         ENDIF
 !        Perv_avail_et(i) = avail_potet
 
@@ -1500,8 +1539,8 @@
 !          Soil_moist(i) = 0.0
 !        ENDIF
 
-        avail_potet = Potet(i) - Hru_actet(i)
         ! sanity check
+!        avail_potet = Potet(i) - Hru_actet(i)
 !        IF ( avail_potet<0.0 .AND. perv_on_flag==ACTIVE ) THEN
 !          IF ( Print_debug>-1 ) THEN
 !            IF ( avail_potet<-NEARZERO ) PRINT *, 'hru_actet>potet', i, &
@@ -1526,7 +1565,7 @@
           Ag_soil_lower(i) = Ag_soil_moist(i) - Ag_soil_rechr(i)
           Basin_ag_soil_moist = Basin_ag_soil_moist + DBLE( Ag_soil_moist(i)*Ag_area(i) )
           Basin_ag_soil_rechr = Basin_ag_soil_rechr + DBLE( Ag_soil_rechr(i)*Ag_area(i) )
-!          Basin_ag_et = Basin_ag_et + DBLE( Ag_actet(i)*Ag_area(i) )
+          Basin_ag_actet = Basin_ag_actet + DBLE( Ag_actet(i)*Ag_area(i) )
         ENDIF
 
 ! if HRU cascades,
@@ -1603,7 +1642,7 @@
         Basin_ssstor = Basin_ssstor + DBLE( Ssres_stor(i)*harea )
         Basin_slstor = Basin_slstor + DBLE( Slow_stor(i)*harea )
         Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*perv_frac
-        IF ( ag_on_flag==ACTIVE ) Soil_moist_tot(i) = Soil_moist_tot(i) + Ag_soil_moist(i)*Ag_frac(i)
+        IF ( ag_on_flag==ACTIVE ) Soil_moist_tot(i) = Soil_moist_tot(i) + Ag_soil_moist(i)*agfrac
         Basin_soil_moist_tot = Basin_soil_moist_tot + DBLE( Soil_moist_tot(i)*harea )
 !        IF ( perv_on_flag==ACTIVE ) THEN
 !          Soil_moist_frac(i) = Soil_moist_tot(i)/Soil_zone_max(i)
@@ -1628,24 +1667,31 @@
           IF ( Iter_aet==ACTIVE ) THEN
             !agriculture_external(i)
             !IF ( Unused_potet(i)>0.0 ) THEN
-            IF ( Unused_potet(i)>NEARZERO ) THEN
-              Ag_irrigation_add(i) = Ag_irrigation_add(i) + Unused_potet(i) / Ag_frac(i)
+            unsatisfied_et = AET_external(i) - Ag_actet(i)
+            IF ( unsatisfied_et>0.000005 ) THEN
+              Ag_irrigation_add(i) = Ag_irrigation_add(i) + unsatisfied_et
+!if(i==90) print *, unsatisfied_et, 'unsatisfied_et', i, Ag_irrigation_add(i), Soil_iter, ag_soil_moist_max(i) - ag_soil_moist(i)
               keep_iterating = ACTIVE
               add_estimated_irrigation = ACTIVE
-            ELSEIF ( Aet_external(i)<Hru_actet(i) ) THEN
-              PRINT *, 'WARNING, exteranal AET from CBH File < computeted AET'
-              PRINT '(2(A,F0.4))', '         Aet_external: ', Aet_external(i), '; hru_actet: ', Hru_actet(i)
+              num_hrus_ag_iter = num_hrus_ag_iter + 1
+            ELSEIF ( AET_external(i)<Ag_actet(i) ) THEN
+              PRINT *, 'WARNING, exteranal agriculture AET from CBH File < computeted AET'
+              PRINT '(2(A,F0.4))', '         AET_external: ', AET_external(i), '; hru_actet: ', Hru_actet(i)
             ENDIF
+!print *, i, AET_external(i), Ag_actet(i), unsatisfied_et, Ag_irrigation_add(i) 
           ENDIF
+          Unused_ag_et(i) = PET_external(i) - Ag_actet(i)
         ENDIF
         Basin_actet = Basin_actet + DBLE( Hru_actet(i)*harea )
 !        IF ( Hru_actet(i)>0.0 ) Snowevap_aet_frac(i) = Snow_evap(i)/Hru_actet(i)
       ENDDO ! end HRU loop
+!     print *, 'number of hrus still iterating on AET', num_hrus_ag_iter
 
       IF ( Iter_aet==OFF ) keep_iterating = OFF
       Soil_iter = Soil_iter + 1
-      IF ( Soil_iter>10 .OR. add_estimated_irrigation==OFF ) keep_iterating = OFF
+      IF ( Soil_iter>max_soilzone_ag_iter .OR. add_estimated_irrigation==OFF ) keep_iterating = OFF
       ENDDO ! end iteration while loop
+      IF ( Iter_aet==ACTIVE ) Ag_irrigation_add = Ag_irrigation_add*Ag_area
 
       Basin_actet = Basin_actet*Basin_area_inv
       Basin_perv_et = Basin_perv_et*Basin_area_inv
