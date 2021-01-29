@@ -17,7 +17,7 @@ for any damages resulting from its authorized or unauthorized use.
 GSFLOW version 2.2.0 is packaged for personal computers using one of the Linux or 
 Microsoft Windows operating systems. An executable file compiled for 64-bit operating 
 systems is provided. The Linux executable was compiled on a personal computer using
-gfortran and gcc compilers MinGW GCC-8.2.0-3 version. The Windows executable was 
+gfortran and gcc compilers GCC-8.3.0 version. The Windows executable was 
 compiled using the Microsoft Visual Studio 2019 Version 16.3.7, development environment 
 and the Intel® Parallel Studio XE 2019 Update 5 Composer Edition for Fortran Windows* 
 Integration for Microsoft Visual Studio* 2019 and Microsoft Visual C++ 2019 compilers.
