@@ -2,7 +2,7 @@
                             GSFLOW Sample Problems
                                  March 2020
  
-Seven sample problems with GSFLOW data sets are provided in this subdirectory
+Nine sample problems with GSFLOW data sets are provided in this subdirectory
 to verify that GSFLOW is correctly installed and running on the user's system.
 The sample problems also may be looked at as examples of how to use the 
 program. 
@@ -10,32 +10,44 @@ program.
 Sample problems:
 
 1. sagehen: This sample GSFLOW model is for the Sagehen Creek Watershed and 
-is described in the original GSFLOW documentation (Markstrom and others, 2008,
-USGS TM 6-D1).
+   is described in the original GSFLOW documentation (Markstrom and others, 2008,
+   USGS TM 6-D1).
 
 2. sagehen_restart: This sample is also for the Sagehen Creek Watershed and 
-demonstrates use of the GSFLOW restart option. The problem is described in
-Regan and others (2015, USGS TM 6-D3).
+   demonstrates use of the GSFLOW restart option. The problem is described in
+   Regan and others (2015, USGS TM 6-D3).
 
 3. tahoe_restart: This sample GSFLOW model is for the Lake Tahoe watershed
-and demonstrates use of the GSFLOW restart option. The problem is described
-in Regan and others (2015, USGS TM 6-D3).
+   and demonstrates use of the GSFLOW restart option. The problem is described
+   in Regan and others (2015, USGS TM 6-D3).
 
 4. Ag_EP1a: This sample GSFLOW model is for the Sagehen Creek watershed
-and demonstrates use of the MODFLOW AG Package. The problem is described
-in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
+   and demonstrates use of the MODFLOW AG Package. The problem is described
+   in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
 
 5. Ag_EP1b: This sample GSFLOW model is for the Sagehen Creek watershed
-and demonstrates use of the MODFLOW AG Package. The problem is described
-in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
+   and demonstrates use of the MODFLOW AG Package. The problem is described
+   in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
 
 6. Ag_EP2a: This sample GSFLOW model is for the Sagehen Creek watershed
-and demonstrates use of the MODFLOW AG Package. The problem is described
-in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
+   and demonstrates use of the MODFLOW AG Package. The problem is described
+   in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
 
 7. Ag_EP2b: This sample GSFLOW model is for the Sagehen Creek watershed
-and demonstrates use of the MODFLOW AG Package. The problem is described
-in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
+   and demonstrates use of the MODFLOW AG Package. The problem is described
+   in Niswonger (2020, AG_Package_EM&S.pdf) included in the "doc" directory.
+
+8. acfb_dyn_params: This sample model is for the Apalachicola-Chattahoochee-Flint 
+   River Basin the watershed above the Chattahoochee River near Norcross, 
+   Georgia and is described in LaFontaine and others (2013). This sample 
+   illustrates running PRMS with a time-series of dynamic parameters input 
+   to the dynamic_param_read module that is described in Regan and LaFontaine (2017).
+   
+9. acfb_water_use: This sample model is for the Apalachicola-Chattahoochee-Flint 
+   River Basin the watershed above the Chattahoochee River near Norcross, 
+   Georgia and is described in LaFontaine and others (2013). This sample 
+   illustrates running PRMS with a time-series of water-use input to the 
+   water_use_read module that is described in Regan and LaFontaine (2017).
 
 References:
 
