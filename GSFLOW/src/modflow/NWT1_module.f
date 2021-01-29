@@ -19,7 +19,7 @@
       DOUBLE PRECISION, SAVE, POINTER :: Ccc, Crr, Cvv, H               
       DOUBLE PRECISION, SAVE, POINTER :: Hcoff, Rhss, Fflux, Fhead
       DOUBLE PRECISION, SAVE, POINTER :: Fheadsave
-      INTEGER, SAVE, POINTER :: Numnonzero, II, Itreal, Ibt, NJA
+      INTEGER, SAVE, POINTER :: Numnonzero, II, Ibt, NJA
       INTEGER, SAVE, POINTER :: IFDPARAM, ICNVGFLG
       INTEGER, SAVE, POINTER :: Btrack, Iierr
       DOUBLE PRECISION, SAVE, POINTER :: Tol, Ftol, RELAX, RMS2, RMS1
@@ -48,7 +48,7 @@
         DOUBLE PRECISION, POINTER :: Akappa, Gamma, Amomentum           
         DOUBLE PRECISION, POINTER :: Hcoff, Rhss, Fflux, Fhead
         DOUBLE PRECISION, POINTER :: Fheadsave
-        INTEGER, POINTER :: Numnonzero, II, Itreal, Ibt, NJA
+        INTEGER, POINTER :: Numnonzero, II, Ibt, NJA
         INTEGER, POINTER :: IFDPARAM, ICNVGFLG
         DOUBLE PRECISION, POINTER :: Tol, Ftol, RMS2, RMS1
         DOUBLE PRECISION, POINTER :: Thickfact, Breduc, Btol, RMSAVE
@@ -88,7 +88,6 @@
       DEALLOCATE (Gwfnwtdat(Igrid)%Hchange)
       DEALLOCATE (Gwfnwtdat(Igrid)%Numnonzero)
       DEALLOCATE (Gwfnwtdat(Igrid)%NJA)
-      DEALLOCATE (Gwfnwtdat(Igrid)%Itreal)
       DEALLOCATE (Gwfnwtdat(Igrid)%Ibt)
       DEALLOCATE (Gwfnwtdat(Igrid)%II)
       DEALLOCATE (Gwfnwtdat(Igrid)%IFDPARAM) 
@@ -161,7 +160,6 @@
       Hchange => Gwfnwtdat(Igrid)%Hchange
       Numnonzero => Gwfnwtdat(Igrid)%Numnonzero
       NJA => Gwfnwtdat(Igrid)%NJA
-      Itreal => Gwfnwtdat(Igrid)%Itreal
       Ibt => Gwfnwtdat(Igrid)%Ibt
       II => Gwfnwtdat(Igrid)%II
       IFDPARAM => Gwfnwtdat(Igrid)%IFDPARAM   
@@ -233,7 +231,6 @@
       Gwfnwtdat(Igrid)%Hchange => Hchange
       Gwfnwtdat(Igrid)%Numnonzero => Numnonzero
       Gwfnwtdat(Igrid)%NJA => NJA
-      Gwfnwtdat(Igrid)%Itreal => Itreal
       Gwfnwtdat(Igrid)%Ibt => Ibt
       Gwfnwtdat(Igrid)%II => II
       Gwfnwtdat(Igrid)%IFDPARAM => IFDPARAM   

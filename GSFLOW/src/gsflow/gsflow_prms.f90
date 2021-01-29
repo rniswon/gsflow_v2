@@ -20,7 +20,7 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/28/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/29/2021'
       character(len=*), parameter :: PRMS_versn = '2021-01-28'
       character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 01/28/2021'
       CHARACTER(LEN=8), SAVE :: Process
@@ -40,7 +40,7 @@
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag
       INTEGER, SAVE :: PRMS_flag, GSFLOW_flag, PRMS4_flag
       INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Grid_flag, Ag_package_active
-      INTEGER, SAVE :: Agriculture_flag, Canopy_iter, Soil_iter, Keep_iterating_PRMS
+      INTEGER, SAVE :: Agriculture_flag, Canopy_iter, Keep_iterating_PRMS
       INTEGER, SAVE :: Climate_irrigated_area_flag, AET_cbh_flag, PET_cbh_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Soilzone_add_water_use
@@ -274,7 +274,6 @@
         Kkiter = 1 ! set for PRMS-only mode
         Ag_package_active = OFF
         Canopy_iter = 1
-        Soil_iter = 1
         Soilzone_add_water_use = OFF
         Dprst_add_water_use = OFF
         Dprst_transfer_water_use = OFF

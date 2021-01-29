@@ -173,6 +173,7 @@ C     ------------------------------------------------------------------
       USE PCGMODULE,ONLY:HCLOSEPCG
       USE GWFNWTMODULE,ONLY:Tol
 !      USE GMGMODULE,ONLY:HCLOSEGMG
+!      USE PCGN,ONLY:HCLOSEPCGN
 C     ------------------------------------------------------------------
       INTEGER Qlimit,QCUT,firstnode,lastnode,
      & PUMPLAY,PUMPROW,PUMPCOL,PUMPLOC,PPFLAG,PUMPCAP
@@ -240,6 +241,7 @@ C-------SET SMALL DEPENDING ON CLOSURE CRITERIA OF THE SOLVER
 !      IF ( Iulmg.NE.0 ) SMALL = 0.0D0  !LMG SETS HCLOSE TO ZERO
       IF ( Iunwt.NE.0 ) SMALL = TOL
 !      IF ( Iugmg.NE.0 ) SMALL = HCLOSEGMG
+!      IF ( Iupcgn.NE.0 ) SMALL = HCLOSEPCGN
 c     initialize
       WELLID=' '
       MNW2=0.0D0
@@ -2305,7 +2307,8 @@ c   Loop over nodes in well
           do INODE=firstnode,lastnode
             il=MNWNOD(1,INODE)              
             ir=MNWNOD(2,INODE)              
-            ic=MNWNOD(3,INODE)              
+            ic=MNWNOD(3,INODE)    
+            hhnew=hnew(ic,ir,il)
             if(IBOUND(ic,ir,il).ne.0) then
               qact = MNWNOD(4,INODE)
               cond = MNWNOD(14,INODE)
@@ -2376,7 +2379,16 @@ C                                      !! or bottom of cell if seepage face cell
                    IF ( hlim.LT.BOTM(ic,ir,lbotm(il)) ) 
      +                  hlim = BOTM(ic,ir,lbotm(il))
 ! Always limit hwel for unconfined conditions
-                   IF ( hwel.LT.hlim ) hwel = hlim
+                   IF ( mnw2(5,iw) < 0.0 ) THEN
+                     !IF ( hwel.LT.hlim ) hwel = hlim !RGN
+                     IF ( hwel.LT.hlim ) then !RGN                  
+                       IF ( hlim.LT.hhnew ) hwel = hlim !RGN
+                     END IF !RGN
+                   ELSE
+                     IF ( hwel.GT.hlim ) then !RGN                  
+                       IF ( hlim.GT.hhnew ) hwel = hlim !RGN
+                     END IF !RGN
+                   END IF
                  END IF
                  iqslv = 1
                END IF
@@ -2385,7 +2397,7 @@ c   Modify HCOF and RHS arrays
 cdebug replace below line with this if debugging with No Mo Iter
 cdebug              if(iqslv.ne.0.and.kiter.gt.1.and.kiter.lt.NoMoIter) then
               if(iqslv.ne.0.and.kiter.gt.1) then
-                hhnew=hnew(ic,ir,il)
+                !hhnew=hnew(ic,ir,il)  ! RGN set above
                 qact = ( hlim - hhnew) * cond
                 if ( mnw2(5,iw) < 0.0 .and. abs(MNW2(2,iw)).eq.1) then  !RGN 1/15/16
                   if ( qact > 0.0 ) then
@@ -2508,7 +2520,8 @@ c   Loop over nodes in well
           do INODE=firstnode,lastnode
             il=MNWNOD(1,INODE)              
             ir=MNWNOD(2,INODE)              
-            ic=MNWNOD(3,INODE)              
+            ic=MNWNOD(3,INODE) 
+            hcell=hnew(ic,ir,il)
             nd=INODE-firstnode+1
             DryTest = Hnew(ic,ir,il) - Hdry
             IF(IBOUND(IC,IR,IL).EQ.0) DryTest=0D0                       !seb ADDED IBOUND CHECK FOR DRYCELL TEST
@@ -2559,9 +2572,18 @@ c
                  IF ( LAYHDT(IL).GT.0 .AND. MNW2(6,iw).NE.0 ) THEN
                    IF ( hlim.LT.BOTM(ic,ir,lbotm(il)) ) 
      +                  hlim = BOTM(ic,ir,lbotm(il))
-                   if ( hwell.LT.hlim ) hwell = hlim
+                   !if ( hwell.LT.hlim ) hwell = hlim  !rgn
+                    IF ( mnw2(5,iw) < 0.0 ) THEN  !RGN
+                     IF ( hwel.LT.hlim ) then !RGN                  
+                       IF ( hlim.LT.hcell ) hwel = hlim !RGN
+                     END IF !RGN
+                   ELSE
+                     IF ( hwel.GT.hlim ) then !RGN                  
+                       IF ( hlim.GT.hcell ) hwel = hlim !RGN
+                     END IF !RGN
+                   END IF   !RGN
                  END IF
-              hcell=hnew(ic,ir,il)
+              !hcell=hnew(ic,ir,il)  ! moved above
               cond = MNWNOD(14,INODE)
               q = cond*(hwell-hcell)    !RGN 1/15/16
               if ( mnw2(5,iw) < 0.0 .and. abs(MNW2(2,iw)).eq.1) then

@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-01-25'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-01-29'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -23,7 +23,7 @@
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
       INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS,KPERSTART
-      INTEGER, SAVE :: KSTP, KKSTP, IERR, Max_iters
+      INTEGER, SAVE :: KSTP, KKSTP, IERR, Max_iters, Itreal
       INTEGER, SAVE :: Mfiter_cnt(ITDIM), Iter_cnt(ITDIM), Iterations
       INTEGER, SAVE :: Szcheck, Sziters, INUNIT, KPER, NCVGERR
       INTEGER, SAVE :: Max_sziters, Maxgziter
@@ -484,7 +484,8 @@ c     USE LMGMODULE
       USE SIPMODULE
       USE DE4MODULE
 !gsf  USE GMGMODULE
-      USE GWFNWTMODULE, ONLY:ITREAL, ICNVGFLG
+!      USE GWFNWTMODULE, ONLY:ITREAL, ICNVGFLG  !ITREAL removed from NWT module and added to PRMS_MODULE
+      USE GWFNWTMODULE, ONLY:ICNVGFLG
       IMPLICIT NONE
       INTEGER I
       INCLUDE 'openspec.inc'
@@ -611,11 +612,15 @@ C7C2----ITERATIVELY FORMULATE AND SOLVE THE FLOW EQUATIONS.
 !          DO 30 KITER = 1, MXITER
            KITER = 0
            ITREAL2 = 0
-           IF ( IUNIT(63).GT.0 ) ITREAL = 0
+!           IF ( IUNIT(63).GT.0 ) ITREAL = 0
+           ITREAL = 0
            DO WHILE (ITREAL2.LT.MXITER)
             KITER = KITER + 1
             KKITER = KITER
-            IF ( IUNIT(63).EQ.0 ) ITREAL2 = KITER
+            IF ( IUNIT(63).EQ.0 ) THEN
+                ITREAL2 = KITER
+                ITREAL = KITER
+            END IF
             IF(IUNIT(62).GT.0) CALL GWF2UPWUPDATE(2,Igrid)
       
 C
@@ -763,7 +768,7 @@ c            END IF
 ! Calculate new heads using Newton solver
           IF(IUNIT(63).GT.0 ) 
      1          CALL GWF2NWT1FM(KKITER,ICNVG,KSTP,KPER,Mxiter,
-     2                          IUNIT(22),IGRID)
+     2                          IUNIT(22),Itreal,IGRID)
           IF ( IUNIT(63).GT.0 )ITREAL2 = ITREAL
           IF(IERR.EQ.1) CALL USTOP(' ')
 C
