@@ -2,7 +2,7 @@ LIST            7    ..\output\modflow\sagehen_HighTrig.list
 BAS6            8    ..\input\modflow\sagehen.bas
 oc              9    ..\input\modflow\sagehen.oc
 dis            11    ..\input\modflow\sagehen.dis
-upw            12    ..\input\modflow\sagehen.UPW
+upw            12    ..\input\modflow\sagehen.upw
 uzf            14    ..\input\modflow\sagehen.uzf
 sfr            15    ..\input\modflow\sagehen.sfr
 nwt            17    ..\input\modflow\sagehen.nwt
