@@ -391,7 +391,7 @@ C     ------------------------------------------------------------------
 !     CHARACTER*200 CNTRL
       CHARACTER*16 TEXT
 !     CHARACTER*200 FNAME
-      INCLUDE 'openspec.inc'
+!      INCLUDE 'openspec.inc'
       INTEGER LOCAT, I, J, KSTP, KPER, NCOL, NROW, ILAY
       REAL CNSTNT, PERTIM, TOTIM
 C     ------------------------------------------------------------------
@@ -478,7 +478,7 @@ C     ------------------------------------------------------------------
       USE GSFMODFLOW, ONLY: KKPER, KKSTP
 C
       INTEGER, INTENT(IN) :: IHEDFM
-!      INTEGER K, KL, I, J, IFIRST, KK, IHEDUN
+      INTEGER K, IFIRST, KK, IHEDUN
       CHARACTER*16 TEXT
       DATA TEXT /'            HEAD'/
 C     ------------------------------------------------------------------
@@ -507,9 +507,9 @@ C4------IF SO THEN CALL ULAPRS OR ULAPRW TO PRINT HEAD.
 !           DO 69 K=1,NLAY
 !           KK=K
 !           IF(IOFLG(K,1).EQ.0) GO TO 69
-!           IF(IHEDFM.LT.0) CALL ULAPRS(BUFF(:,:,K),TEXT,KSTP,KPER,
+!           IF(IHEDFM.LT.0) CALL ULAPRS(BUFF(:,:,K),TEXT,KKSTP,KKPER,
 !     1               NCOL,NROW,KK,-IHEDFM,IOUT)
-!           IF(IHEDFM.GE.0) CALL ULAPRW(BUFF(:,:,K),TEXT,KSTP,KPER,
+!           IF(IHEDFM.GE.0) CALL ULAPRW(BUFF(:,:,K),TEXT,KKSTP,KKPER,
 !     1               NCOL,NROW,KK,IHEDFM,IOUT)
 !           IPFLG=1
 !   69      CONTINUE
@@ -517,9 +517,9 @@ C
 C4A-----PRINT HEAD FOR CROSS SECTION.
 !         ELSE
 !           IF(IOFLG(1,1).NE.0) THEN
-!             IF(IHEDFM.LT.0) CALL ULAPRS(BUFF,TEXT,KSTP,KPER,
+!             IF(IHEDFM.LT.0) CALL ULAPRS(BUFF,TEXT,KKSTP,KKPER,
 !     1                 NCOL,NLAY,-1,-IHEDFM,IOUT)
-!             IF(IHEDFM.GE.0) CALL ULAPRW(BUFF,TEXT,KSTP,KPER,
+!             IF(IHEDFM.GE.0) CALL ULAPRW(BUFF,TEXT,KSKTP,KKPER,
 !     1                 NCOL,NLAY,-1,IHEDFM,IOUT)
 !             IPFLG=1
 !           END IF
@@ -534,15 +534,15 @@ C5------IF SO THEN CALL ULASAV OR ULASV2 TO SAVE HEAD.
         DO 79 K=1,NLAY
           KK=K
 !        IF(IOFLG(K,3).EQ.0) GO TO 79
-!        IF(IFIRST.EQ.1) WRITE(IOUT,74) IHEDUN,KSTP,KPER
+!        IF(IFIRST.EQ.1) WRITE(IOUT,74) IHEDUN,KKSTP,KKPER
 !   74   FORMAT(1X,/1X,'HEAD WILL BE SAVED ON UNIT ',I4,
 !     1      ' AT END OF TIME STEP',I6,', STRESS PERIOD ',I4) !gsf
 !        IFIRST=0
 !        IF(CHEDFM.EQ.' ') THEN   !RGN UNFORMATTED ONLY
-          CALL ULASAV(BUFF(:,:,K),TEXT,KSTP,KPER,PERTIM,TOTIM,NCOL,
+          CALL ULASAV(BUFF(:,:,K),TEXT,KKSTP,KKPER,PERTIM,TOTIM,NCOL,
      1                NROW,KK,IHEDUN)
 !        ELSE
-!           CALL ULASV2(BUFF(:,:,K),TEXT,KSTP,KPER,PERTIM,TOTIM,NCOL,
+!           CALL ULASV2(BUFF(:,:,K),TEXT,KKSTP,KKPER,PERTIM,TOTIM,NCOL,
 !     1                NROW,KK,IHEDUN,CHEDFM,LBHDSV,IBOUND(:,:,K))
 !        END IF
    79   CONTINUE
@@ -550,12 +550,12 @@ C
 C5A-----SAVE HEAD FOR CROSS SECTION.
       ELSE
         IF(IOFLG(1,3).NE.0) THEN
-!          WRITE(IOUT,74) IHEDUN,KSTP,KPER
+!          WRITE(IOUT,74) IHEDUN,KKSTP,KKPER
           IF(CHEDFM.EQ.' ') THEN
-             CALL ULASAV(BUFF,TEXT,KSTP,KPER,PERTIM,TOTIM,NCOL,
+             CALL ULASAV(BUFF,TEXT,KKSTP,KKPER,PERTIM,TOTIM,NCOL,
      1                NLAY,-1,IHEDUN)
 !          ELSE
-!             CALL ULASV2(BUFF,TEXT,KSTP,KPER,PERTIM,TOTIM,NCOL,
+!             CALL ULASV2(BUFF,TEXT,KKSTP,KKPER,PERTIM,TOTIM,NCOL,
 !     1                  NLAY,-1,IHEDUN,CHEDFM,LBHDSV,IBOUND)
           END IF
         END IF

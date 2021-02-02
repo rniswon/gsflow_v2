@@ -38,20 +38,20 @@ Stream Temperature: stream_temp
 ==============================================================
 PRMS Computation Order          gsflow_prms         2021-01-20
 Basin Definition                basin               2020-12-02
-Common States and Fluxes        climateflow         2020-12-16
+Common States and Fluxes        climateflow         2021-01-11
 Potential Solar Radiation       soltab              2020-12-02
 Timestep Control                prms_time           2020-12-02
 Time Series Data                obs                 2020-12-02
-Time Series Data                dynamic_param_read  2020-12-02
+Time Series Data                dynamic_param_read  2021-01-06
 Temperature Distribution        climate_hru         2020-12-02
 Precipitation Distribution      climate_hru         2020-12-02
 Solar Radiation Distribution    climate_hru         2020-12-02
 Potential Evapotranspiration    climate_hru         2020-12-02
 Transpiration Distribution      transp_tindex       2020-12-02
 Canopy Interception             intcp               2020-12-03
-Snow Dynamics                   snowcomp            2020-12-17
-Surface Runoff                  srunoff_smidx       2020-12-28
-Soilzone Computations           soilzone            2020-12-28
+Snow Dynamics                   snowcomp            2021-01-11
+Surface Runoff                  srunoff_smidx       2021-01-11
+Soilzone Computations           soilzone            2021-01-11
 Groundwater                     gwflow              2020-12-02
 Streamflow Routing Init         routing             2020-12-02
 Streamflow Routing              muskingum           2020-12-02
@@ -103,5 +103,5 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
  *************************************************************
  Total for run    1110.775  440.179    8.439  693.981   13.445
  *************************************************************
-Execution elapsed time    0 minutes  1.27 seconds
+Execution elapsed time    0 minutes  1.03 seconds
 

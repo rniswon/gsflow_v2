@@ -16,11 +16,10 @@
       MODULE PRMS_SOILZONE
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ERROR_dim, ACTIVE, OFF, DEBUG_WB, NEARZERO, &
      &    LAND, LAKE, SWALE, INACTIVE, GLACIER, BARESOIL, DEBUG_less, &
-     &    ERROR_soilzone, SAND, CLAY, LOAM, CASCADE_OFF, ERROR_param
+     &    ERROR_soilzone, SAND, CLAY, LOAM, CASCADE_OFF, ERROR_param, MONTHS_PER_YEAR
       USE PRMS_MODULE, ONLY: Model, Nhru, Nssr, Nsegment, Nlake, Nhrucell, Print_debug, Dprst_flag, &
      &    Init_vars_from_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag, &
-     &    Kkiter, Frozen_flag, Diversion2soil_flag, Soilzone_add_water_use, &
-     &    Call_cascade, PRMS_land_iteration_flag
+     &    Kkiter, Frozen_flag, Soilzone_add_water_use, Call_cascade, PRMS_land_iteration_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
@@ -532,8 +531,8 @@
       IF ( Print_debug==7 ) CALL PRMS_open_module_file(DBGUNT, 'soilzone.dbg')
 
 ! Declare Parameters
-      IF ( Nlake>0 ) THEN
-        ALLOCATE ( Lake_evap_adj(12,Nlake) )
+      IF ( Nlake>0 .OR. Model==DOCUMENTATION ) THEN
+        ALLOCATE ( Lake_evap_adj(MONTHS_PER_YEAR,Nlake) )
         IF ( declparam(MODNAME, 'lake_evap_adj', 'nmonths,nlake', 'real', &
      &       '1.0', '0.5', '1.5', &
      &       'Monthly potet factor to adjust potet on lakes', &
@@ -616,7 +615,7 @@
 !***********************************************************************
       INTEGER FUNCTION szinit()
       USE PRMS_SOILZONE
-      USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, &
+      USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Active_hrus, Hru_route_order, &
      &    Basin_area_inv, Hru_area, Hru_frac_perv, Numlake_hrus
       USE PRMS_FLOWVARS, ONLY: Soil_moist_max, Soil_rechr_max, &
      &    Ssres_stor, Basin_ssstor, Basin_soil_moist, Slow_stor, &
@@ -628,7 +627,7 @@
       INTEGER, EXTERNAL :: getparam
       INTRINSIC :: MIN, DBLE
 ! Local Variables
-      INTEGER :: i, ii, ihru, icnt
+      INTEGER :: i, ii, ihru, icnt, j
       REAL :: hruarea, perv_area
 !***********************************************************************
       szinit = 0
@@ -643,7 +642,8 @@
       IF ( getparam(MODNAME, 'soil_type', Nhru, 'integer', Soil_type)/=0 ) CALL read_error(2, 'soil_type')
       IF ( getparam(MODNAME, 'soil2gw_max', Nhru, 'real', Soil2gw_max)/=0 ) CALL read_error(2, 'soil2gw_max')
       IF ( Nlake>0 ) THEN
-        IF ( getparam(MODNAME, 'lake_evap_adj', 12*Nlake, 'real', Lake_evap_adj)/=0 ) CALL read_error(2, 'lake_evap_adj')
+        IF ( getparam(MODNAME, 'lake_evap_adj', MONTHS_PER_YEAR*Nlake, 'real', Lake_evap_adj)/=0 ) &
+     &       CALL read_error(2, 'lake_evap_adj')
       ENDIF
 
       IF ( GSFLOW_flag==ACTIVE ) THEN
@@ -805,12 +805,12 @@
         Max_gvrs = 1
         Hrucheck = 1
         Hru_gvr_count = 0
+        Replenish_frac = 0.0
         DO i = 1, Nhrucell
           ihru = Gvr_hru_id(i)
           IF ( Hru_type(ihru)==INACTIVE .OR. Hru_type(ihru)==LAKE ) THEN
             Gravity_stor_res(i) = 0.0
             Hrucheck(ihru) = 0
-            Replenish_frac(ihru) = 0.0
           ELSE
             ! set only for cold start simulations
             IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) &
@@ -821,16 +821,19 @@
           ENDIF
         ENDDO
         ALLOCATE ( Hru_gvr_index(Max_gvrs, Nhru) )
+        Hru_gvr_index = 0
         IF ( Nhru==Nhrucell ) THEN
           IF ( Max_gvrs/=1 ) &
      &         CALL error_stop('nhru=nhrucell, but, gvr_hru_id array specifies more than one GVR for an HRU', ERROR_dim)
-          DO i = 1, Nhru
+          DO j = 1, Active_hrus
+            i = Hru_route_order(j)
+            IF ( Hru_type(i)==LAKE ) CYCLE
             Hru_gvr_index(1, i) = i
           ENDDO
         ELSE
-          Hru_gvr_index = 0
-          DO i = 1, Nhru
-            IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE ) CYCLE
+          DO j = 1, Active_hrus
+            i = Hru_route_order(j)
+            IF ( Hru_type(i)==LAKE ) CYCLE
             icnt = 0
             DO ii = 1, Nhrucell
               IF ( Gvr_hru_id(ii)==i ) THEN
@@ -1112,10 +1115,10 @@
      &                          Gvr2sm(i), Soil_to_gw(i), gwin, compute_lateral)
           ! adjust soil moisture with replenish amount
           IF ( Gvr2sm(i)>0.0 ) THEN
-            Soil_moist(i) = Soil_moist(i) + Gvr2sm(i)/perv_frac
+            Soil_moist(i) = Soil_moist(i) + Gvr2sm(i)/perv_frac ! ??? could this be bigger than soil_moist_max ??? (add to Dunnian)
 !            IF ( Soil_moist(i)>Soil_moist_max(i) ) PRINT *, 'CAP sm>max', Soil_moist(i), Soil_moist_max(i), i
             IF ( Soilzone_aet_flag==ACTIVE ) THEN
-              Soil_lower(i) = MIN ( Soil_lower_stor_max(i), Soil_moist(i) - Soil_rechr(i) + Gvr2sm(i)/perv_frac )
+              Soil_lower(i) = MIN( Soil_lower_stor_max(i), Soil_moist(i) - Soil_rechr(i) + Gvr2sm(i)/perv_frac )
               Soil_rechr(i) = Soil_moist(i) - Soil_lower(i)
 !              excess = MAX( 0.0, Soil_lower(i) - Soil_lower_stor_max(i) )
 !              if ( abs(soil_lower(i) + soil_rechr(i) - soil_moist(i))>NEARZERO ) THEN
@@ -1123,8 +1126,7 @@
 !                print *, soil_lower(i), soil_rechr(i), soil_moist(i)
 !              endif
             ELSE
-              Soil_rechr(i) = Soil_rechr(i) + Gvr2sm(i)/perv_frac*Replenish_frac(i)
-              Soil_rechr(i) = MIN( Soil_rechr_max(i), Soil_rechr(i) )
+              Soil_rechr(i) = MIN( Soil_rechr_max(i), Soil_rechr(i) + Gvr2sm(i)/perv_frac*Replenish_frac(i) )
             ENDIF
             Basin_gvr2sm = Basin_gvr2sm + DBLE( Gvr2sm(i)*harea )
 !          ELSEIF ( Gvr2sm(i)<-NEARZERO ) THEN

@@ -442,7 +442,6 @@
           IF ( Dprst_flag==ACTIVE ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
           basinit = 1
         ENDIF
-        Hru_frac_perv(i) = Hru_perv(i)/harea
         basin_perv = basin_perv + DBLE( Hru_perv(i) )
       ENDDO
       IF ( Dprst_flag==ACTIVE .AND. PRMS4_flag==ACTIVE ) DEALLOCATE ( Dprst_area )
@@ -521,7 +520,7 @@
           WRITE (buffer, 9004) 'Lake area:            ', Water_area, '    Fraction lakes:    ', Water_area*Basin_area_inv
           CALL write_outfile(buffer)
         ENDIF
-        IF ( Dprst_flag==Active ) THEN
+        IF ( Dprst_flag==ACTIVE ) THEN
           WRITE (buffer, 9005) 'DPRST area:          ', basin_dprst, '    Fraction DPRST:   ', basin_dprst*Basin_area_inv
           CALL write_outfile(buffer)
         ENDIF
