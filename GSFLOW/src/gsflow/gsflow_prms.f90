@@ -548,7 +548,7 @@
         ENDIF
         IF ( Print_debug>DEBUG_minimum ) &
      &       WRITE ( PRMS_output_unit,'(A,I5,A,F6.2,A,/)') 'Execution elapsed time', Elapsed_time_minutes, ' minutes', &
-     &                                                     Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
+     &       Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
         IF ( Print_debug>DEBUG_minimum ) CLOSE ( PRMS_output_unit )
         IF ( Save_vars_to_file==ACTIVE ) CLOSE ( Restart_outunit )
         STOP

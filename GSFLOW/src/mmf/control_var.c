@@ -146,6 +146,24 @@ long control_integer_ (int *retval, char *key, ftnlen len) {
 }
 
 /*--------------------------------------------------------------------*\
+ | FUNCTION     : control_real_
+ | COMMENT		: returns a float variable value
+ | PARAMETERS   :
+ | RETURN VALUE :
+ | RESTRICTIONS :
+\*--------------------------------------------------------------------*/
+long control_real_(float* retval, char* key, ftnlen len) {
+	char* foo;
+
+	foo = (char*)umalloc(len + 1);
+	strncpy(foo, key, len);
+	foo[len] = '\0';
+
+	*retval = *control_fvar(foo);
+	return 0;
+}
+
+/*--------------------------------------------------------------------*\
  | FUNCTION     : control_integer_array_
  | COMMENT		: called from fortran
  | PARAMETERS   :

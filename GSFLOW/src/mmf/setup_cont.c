@@ -457,6 +457,10 @@ void setup_cont (void) {
 		lval[0] = 25;
 		decl_control_int_array("max_soilzone_ag_iter", 1, lval);
 
+		fval = (float*)umalloc(sizeof(float));
+		fval[0] = 0.001;
+		decl_control_float_array("soilzone_aet_converge", 1, fval);
+
 		/*
 		**	nsub_summary
 		*/
