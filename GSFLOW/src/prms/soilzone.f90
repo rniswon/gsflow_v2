@@ -103,6 +103,7 @@
       !REAL, SAVE, ALLOCATABLE :: Ag_ssr_to_gw(:), Ag_slow_stor(:), Ag_recharge(:)
       !REAL, SAVE, ALLOCATABLE :: Ag_ssres_stor(:), Ag_ssres_flow(:)
       INTEGER, SAVE, ALLOCATABLE :: Hrus_iterating(:)
+      integer, save :: total_iters
       ! parameters
 ! have covden a monthly, later
       !INTEGER, SAVE, ALLOCATABLE :: Ag_soil_type(:), Ag_crop_type(:), Ag_covden_sum(:), Ag_covden_win(:)
@@ -151,18 +152,21 @@
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam, declvar, getdim, control_integer
-      REAL, EXTERNAL :: control_real
+      !REAL, EXTERNAL :: control_real
       EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop
       real :: test
 !***********************************************************************
       szdecl = 0
+      total_iters = 0
 
       CALL print_module(MODDESC, MODNAME, Version_soilzone)
 
       IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
       IF ( control_integer(max_soilzone_ag_iter, 'max_soilzone_ag_iter')/=0 ) max_soilzone_ag_iter = 25
-      IF ( control_real(soilzone_aet_converge, 'soilzone_aet_converge')/=0 ) test = 0.001
-      test = control_real(soilzone_aet_converge, 'soilzone_aet_converge')
+!       IF ( control_real(soilzone_aet_converge, 'soilzone_aet_converge')/=0 ) test = 0.001
+!      test = control_real(soilzone_aet_converge, 'soilzone_aet_converge')
+      print *, test, max_soilzone_ag_iter, 500
+      pause
 
 ! Declare Variables
       IF ( declvar(MODNAME, 'basin_capwaterin', 'one', 1, 'double', &
@@ -1706,9 +1710,11 @@
       Soil_iter = Soil_iter + 1
       IF ( Soil_iter>max_soilzone_ag_iter .OR. add_estimated_irrigation==OFF ) keep_iterating = OFF
       ENDDO ! end iteration while loop
+      Soil_iter = Soil_iter - 1
       IF ( Iter_aet==ACTIVE ) Ag_irrigation_add = Ag_irrigation_add*Ag_area
-!      print '(2(A,I0))', 'number of hrus still iterating on AET: ', num_hrus_ag_iter, ', iterations: ', Soil_iter
-!      print *, NOWTIME, unsatisfied_big, unsatisfied_big/basin_potet
+      IF ( num_hrus_ag_iter>0 ) print '(2(A,I0))', 'number of hrus still iterating on AET: ', num_hrus_ag_iter, ', iterations: ', Soil_iter
+      total_iters = total_iters + Soil_iter
+      print *, NOWTIME, unsatisfied_big, unsatisfied_big/basin_potet, total_iters
 
       Basin_actet = Basin_actet*Basin_area_inv
       Basin_perv_et = Basin_perv_et*Basin_area_inv
