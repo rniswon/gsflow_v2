@@ -217,13 +217,13 @@ basin.o: basin.f90 prms_module.mod prms_constants.mod
 obs.o: obs.f90 prms_module.mod prms_set_time.mod prms_basin.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) obs.f90
 
-srunoff.o: srunoff.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_climatevars.mod prms_cascade.mod prms_intcp.mod prms_snow.mod prms_set_time.mod prms_constants.mod
+srunoff.o: srunoff.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_climatevars.mod prms_cascade.mod prms_intcp.mod prms_snow.mod prms_set_time.mod prms_constants.mod prms_climate_hru.mod
 	$(FC) -c $(FFLAGS) srunoff.f90
 
 climateflow.o: climateflow.f90 prms_module.mod prms_basin.mod prms_set_time.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) climateflow.f90
 
-soilzone.o: soilzone.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod
+soilzone.o: soilzone.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod gsfmodflow.mod
 	$(FC) -c $(FFLAGS) soilzone.f90
 
 routing.o: routing.f90 prms_module.mod prms_basin.mod prms_gwflow.mod prms_flowvars.mod prms_set_time.mod prms_srunoff.mod prms_climatevars.mod prms_water_use.mod prms_constants.mod
@@ -277,3 +277,8 @@ prms_set_time.mod: prms_time.o
 prms_glacr.mod: glacr_melt.o
 prms_constants.mod: prms_constants.f90
 	$(FC) -c $(FFLAGS) prms_constants.f90
+prms_climate_hru.mod: climate_hru.o
+gsfmodflow.mod: $(GSFLOWDIR)/gsfmodflow.mod
+	$(RM) gsfmodflow.mod
+	$(LN) $(GSFLOWDIR)/gsfmodflow.mod gsfmodflow.mod
+	

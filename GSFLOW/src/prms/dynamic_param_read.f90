@@ -510,7 +510,8 @@
           ENDIF
         ENDIF
 
-        IF ( Check_imperv==ACTIVE .OR. Check_dprst_frac==ACTIVE .OR. check_dprst_depth_flag==ACTIVE .OR. Check_ag_frac==ACTIVE ) THEN
+        IF ( Check_imperv==ACTIVE .OR. Check_dprst_frac==ACTIVE .OR. check_dprst_depth_flag==ACTIVE .OR. &
+     &       Check_ag_frac==ACTIVE ) THEN
           Basin_soil_moist = 0.0D0
           Basin_soil_rechr = 0.0D0
           DO i = 1, Nhru

@@ -1724,7 +1724,8 @@
       ENDDO ! end iteration while loop
       Soil_iter = Soil_iter - 1
       IF ( Iter_aet==ACTIVE ) Ag_irrigation_add = Ag_irrigation_add*Ag_area
-!      IF ( num_hrus_ag_iter>0 ) print '(2(A,I0))', 'number of hrus still iterating on AET: ', num_hrus_ag_iter, ', iterations: ', Soil_iter
+!      IF ( num_hrus_ag_iter>0 ) print '(2(A,I0))', 'number of hrus still iterating on AET: ', &
+!     &     num_hrus_ag_iter, ', iterations: ', Soil_iter
       total_iters = total_iters + Soil_iter
 !      print *, NOWTIME, unsatisfied_big, unsatisfied_big/basin_potet, total_iters
 

@@ -143,6 +143,10 @@ prms_constants.mod:
 	$(CD) $(PRMSDIR);make prms_constants.mod
 	$(LN) $(PRMSDIR)/prms_constants.mod .
 	
+prms_water_use.mod:
+	$(CD) $(PRMSDIR);make prms_water_use.mod
+	$(LN) $(PRMSDIR)/prms_water_use.mod .
+
 gwfupwmodule.mod: $(MODFLOWDIR)/gwfupwmodule.mod
 	$(RM) gwfupwmodule.mod
 	$(LN) $(MODFLOWDIR)/gwfupwmodule.mod gwfupwmodule.mod
@@ -152,7 +156,7 @@ gsfmf2prms.mod: gsflow_mf2prms.o
 gsfmodflow.mod: gsflow_modflow.o
 prms_module.mod: gsflow_prms.o
 
-gsflow_prms2mf.o: gsflow_prms2mf.f90 prms_module.mod prms_constants.mod gwfuzfmodule.mod gwfsfrmodule.mod gwflakmodule.mod gsfmodflow.mod prms_basin.mod prms_soilzone.mod global.mod prms_climatevars.mod prms_flowvars.mod prms_srunoff.mod
+gsflow_prms2mf.o: gsflow_prms2mf.f90 prms_module.mod prms_constants.mod gwfuzfmodule.mod gwfsfrmodule.mod gwflakmodule.mod gsfmodflow.mod prms_basin.mod prms_soilzone.mod global.mod prms_climatevars.mod prms_flowvars.mod prms_srunoff.mod gwfagmodule.mod prms_water_use.mod
 	$(FC) -c $(FFLAGS) gsflow_prms2mf.f90
 
 gsflow_modflow.o: gsflow_modflow.f openspec.inc prms_constants.mod prms_module.mod prms_set_time.mod global.mod gwfbasmodule.mod gwfsfrmodule.mod gwflakmodule.mod gwfuzfmodule.mod gwfhufmodule.mod gwfevtmodule.mod gwfbcfmodule.mod gwfnwtmodule.mod pcgmodule.mod sipmodule.mod de4module.mod prms_basin.mod gwfrchmodule.mod obsbasmodule.mod gwflpfmodule.mod gwfupwmodule.mod
