@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-01-28'
+      character(len=*), parameter :: Version_soilzone = '2021-02-02'
       INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -79,8 +79,7 @@
       REAL, SAVE, ALLOCATABLE :: Sm2gw_grav(:), Gw2sm_grav(:)
       REAL, SAVE, ALLOCATABLE :: Gravity_stor_res(:), Gvr2sm(:), Grav_gwin(:)
 !   Control Parameters
-      INTEGER, SAVE :: Soilzone_aet_flag, max_soilzone_ag_iter
-      REAL, SAVE :: soilzone_aet_converge
+      INTEGER, SAVE :: Soilzone_aet_flag
 !   Declared Parameters
       INTEGER, SAVE, ALLOCATABLE :: Soil_type(:), Gvr_hru_id(:)
       REAL, SAVE, ALLOCATABLE :: Pref_flow_den(:), Pref_flow_infil_frac(:)
@@ -89,6 +88,8 @@
       REAL, SAVE, ALLOCATABLE :: Ssr2gw_rate(:), Ssr2gw_exp(:)
       REAL, SAVE, ALLOCATABLE :: Soil2gw_max(:)
       REAL, SAVE, ALLOCATABLE :: Lake_evap_adj(:, :)
+      INTEGER, SAVE :: max_soilzone_ag_iter
+      REAL, SAVE :: soilzone_aet_converge
       ! AG variables and parameters
       ! variables
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max
@@ -162,11 +163,6 @@
       CALL print_module(MODDESC, MODNAME, Version_soilzone)
 
       IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
-      IF ( control_integer(max_soilzone_ag_iter, 'max_soilzone_ag_iter')/=0 ) max_soilzone_ag_iter = 25
-!       IF ( control_real(soilzone_aet_converge, 'soilzone_aet_converge')/=0 ) test = 0.001
-!      test = control_real(soilzone_aet_converge, 'soilzone_aet_converge')
-      print *, test, max_soilzone_ag_iter, 500
-      pause
 
 ! Declare Variables
       IF ( declvar(MODNAME, 'basin_capwaterin', 'one', 1, 'double', &
@@ -700,6 +696,18 @@
      &       'Potential ET in the recharge zone of the agriculture reservoir for each HRU', &
      &       'inches', Ag_potet_rechr)/=0 ) CALL read_error(3, 'ag_potet_rechr')
 
+        IF ( declparam(MODNAME, 'max_soilzone_ag_iter', 'one', 'integer', &
+     &       '10', '1', '9999', &
+     &       'Maximum number of iterations to optimize computed AET and input AET', &
+     &       'Maximum number of iterations to optimize computed AET and input AET', &
+     &       'none')/=0 ) CALL read_error(1, 'max_soilzone_ag_iter')
+
+        IF ( declparam(MODNAME, 'soilzone_aet_converge', 'one', 'real', &
+     &       '0.01', '0.0', '1.0', &
+     &       'Convergence criteria to iterate computed AET compared to input AET', &
+     &       'Convergence criteria to iterate computed AET compared to input AET', &
+     &       'decimal fraction')/=0 ) CALL read_error(1, 'soilzone_aet_converge')
+
      !   ALLOCATE ( Ag_soil_type(Nhru) )
      !   IF ( declparam(MODNAME, 'ag_soil_type', 'nhru', 'integer', &
      !&       '2', '1', '3', &
@@ -801,6 +809,10 @@
       Soil_iter = 1
 !??? figure out what to save in restart file ???
       IF ( Agriculture_flag>OFF ) THEN
+        IF ( getparam(MODNAME, 'max_soilzone_ag_iter', 1, 'integer', max_soilzone_ag_iter)/=0 ) &
+     &       CALL read_error(2, 'max_soilzone_ag_iter')
+        IF ( getparam(MODNAME, 'soilzone_aet_converge', 1, 'real', soilzone_aet_converge)/=0 ) &
+     &       CALL read_error(2, 'soilzone_aet_converge')
 !        IF ( getparam(MODNAME, 'ag_soil_type', Nhru, 'integer', Ag_soil_type)/=0 ) CALL read_error(2, 'ag_soil_type')
 !        IF ( getparam(MODNAME, 'ag_crop_type', Nhru, 'integer', Ag_crop_type)/=0 ) CALL read_error(2, 'ag_crop_type')
 !        IF ( getparam(MODNAME, 'ag_covden_sum', Nhru, 'real', Ag_covden_sum)/=0 ) CALL read_error(2, 'ag_covden_sum')
@@ -1712,9 +1724,9 @@
       ENDDO ! end iteration while loop
       Soil_iter = Soil_iter - 1
       IF ( Iter_aet==ACTIVE ) Ag_irrigation_add = Ag_irrigation_add*Ag_area
-      IF ( num_hrus_ag_iter>0 ) print '(2(A,I0))', 'number of hrus still iterating on AET: ', num_hrus_ag_iter, ', iterations: ', Soil_iter
+!      IF ( num_hrus_ag_iter>0 ) print '(2(A,I0))', 'number of hrus still iterating on AET: ', num_hrus_ag_iter, ', iterations: ', Soil_iter
       total_iters = total_iters + Soil_iter
-      print *, NOWTIME, unsatisfied_big, unsatisfied_big/basin_potet, total_iters
+!      print *, NOWTIME, unsatisfied_big, unsatisfied_big/basin_potet, total_iters
 
       Basin_actet = Basin_actet*Basin_area_inv
       Basin_perv_et = Basin_perv_et*Basin_area_inv

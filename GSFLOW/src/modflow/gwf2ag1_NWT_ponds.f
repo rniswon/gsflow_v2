@@ -1749,8 +1749,8 @@
       ! VARIABLES:
       CHARACTER(LEN=200)::LINE
       INTEGER :: IERR, LLOC, ISTART, ISTOP, J, IDUM
-      INTEGER :: K, IRWL, NMCL, IP, I, IRSG, SGFC
-      REAL :: R, IPRW, TRPW
+      INTEGER :: K, IRWL, NMCL, IP, I, IRSG
+      REAL :: R, IPRW, TRPW, SGFC
       logical :: TEST
       ! - -----------------------------------------------------------------
       !
