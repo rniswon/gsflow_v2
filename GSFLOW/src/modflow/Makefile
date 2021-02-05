@@ -64,8 +64,6 @@ LIBOBJS = \
         Irestart.o
 
 all: lib
-	$(RM) openspec.inc
-	$(CP) openspec_linux.inc openspec.inc
 	echo made $(MFNWTLIB)
 
 install: lib
@@ -81,9 +79,9 @@ clean:
 	$(RM) *.o *.mod *~ $(MFNWTLIB)
 
 # on Windows machines comment out next 3 lines
-openspec.inc:
-	$(RM) openspec.inc
-	$(CP) openspec_linux.inc openspec.inc
+#openspec.inc:
+#	$(RM) openspec.inc
+#	$(CP) openspec_linux.inc openspec.inc
 
 modules.o: modules.f90 mach_mod.o
 	$(FC) $(FFLAGS) -c modules.f90

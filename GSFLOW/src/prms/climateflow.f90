@@ -6,7 +6,8 @@
      &    potet_pt_module, potet_pm_module, potet_pm_sta_module, climate_hru_module, &
      &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
      &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
-     &    FEET, FEET2METERS, METERS2FEET, FAHRENHEIT, INACTIVE, LAKE, ddsolrad_module, ccsolrad_module
+     &    FEET, FEET2METERS, METERS2FEET, FAHRENHEIT, INACTIVE, LAKE, ERROR_PARAM, &
+     &    ddsolrad_module, ccsolrad_module
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Ngw, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, &
      &    Model, Print_debug, Init_vars_from_file, Temp_flag, Precip_flag, &
      &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, &
@@ -447,7 +448,7 @@
 
       ALLOCATE ( Infil(Nhru) )
       IF ( declvar(Srunoff_module, 'infil', 'nhru', Nhru, 'real', &
-     &     'Infiltration to the capillary and preferential-flow for each HRU', &
+     &     'Infiltration to the capillary and preferential-flow reservoirs for each HRU', &
      &     'inches', Infil)/=0 ) CALL read_error(3, 'infil')
 
       ALLOCATE ( Sroff(Nhru) )
@@ -1042,6 +1043,7 @@
           IF ( getparam(Soilzone_module, 'soil_rechr_init_frac', Nhru, 'real', Soil_rechr)/=0 ) &
      &         CALL read_error(2, 'soil_rechr_init_frac')
           IF ( getparam(Soilzone_module, 'ssstor_init_frac', Nssr, 'real', Ssres_stor)/=0 ) &
+     &         CALL read_error(2, 'ssstor_init_frac')
           Soil_rechr = Soil_rechr*Soil_rechr_max
           Soil_moist = Soil_moist*Soil_moist_max
           Ssres_stor = Ssres_stor*Sat_threshold
@@ -1118,7 +1120,7 @@
         ENDIF
       ENDDO
 
-      IF ( ierr>0 ) Inputerror_flag = 1
+      IF ( ierr>0 ) STOP ERROR_PARAM
 
       IF ( getparam(Srunoff_module, 'snowinfil_max', Nhru, 'real', Snowinfil_max)/=0 ) CALL read_error(2, 'snowinfil_max')
 

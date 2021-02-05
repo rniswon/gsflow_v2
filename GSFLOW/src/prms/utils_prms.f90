@@ -1017,6 +1017,6 @@
       CHARACTER(LEN=*), INTENT(IN) :: Msg
       INTEGER, INTENT(IN) :: Ierr
 !***********************************************************************
-      PRINT '(/,A,I0,2A)', 'ERROR ', Ierr, ', ', Msg
+      PRINT '(/,A,I0,2A,/)', 'ERROR ', Ierr, ', ', Msg
       ERROR STOP -1
       END SUBROUTINE error_stop

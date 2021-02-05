@@ -1018,5 +1018,5 @@
       INTEGER, INTENT(IN) :: Ierr
 !***********************************************************************
       PRINT '(/,A,I0,2A,/)', 'ERROR ', Ierr, ', ', Msg
-      ERROR STOP -99
+      ERROR STOP -1
       END SUBROUTINE error_stop
