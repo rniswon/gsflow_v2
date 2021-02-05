@@ -43,7 +43,7 @@ Common States and Fluxes        climateflow         2021-01-11
 Potential Solar Radiation       soltab              2020-12-02
 Timestep Control                prms_time           2020-12-02
 Time Series Data                obs                 2020-12-02
-Temperature Distribution        temp_laps           2020-12-02
+Temperature Distribution        temp_1sta           2020-12-02
 Precipitation Distribution      precip_1sta         2020-12-02
 Solar Radiation Distribution    ddsolrad            2020-12-02
 Transpiration Distribution      transp_tindex       2020-12-02
@@ -56,26 +56,26 @@ GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-01-08
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-01-14
 GSFLOW Output Budget Summary    gsflow_budget       2021-01-12
 GSFLOW Output CSV Summary       gsflow_sum          2020-12-02
-Output Summary                  subbasin            2020-12-02
+Output Summary                  nhru_summary        2020-12-02
+Output Summary                  basin_summary       2020-12-02
+Output Summary                  nsegment_summary    2020-12-02
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2021-01-19
 UZF-NWT Package                 gwf2uzf1_NWT        2020-12-28
 SFR-NWT Package                 gwf2sfr7_NWT        2020-09-30
-LAK-NWT Package                 gwf2lak7_NWT        2020-09-30
 
-Using Control File: .\Tahoe.control
+Using Control File: .\gsflow_gsflowLowKc.control
 
-Using Parameter File: ../input/prms/tahoe.param_v8_rgn
-
-
-Start time: 1983/12/02 00:00:00
-End time:   1984/01/30 00:00:00
+Using Parameter File: ..\input\prms\sagehen_grid_v5_LowKc.params
 
 
-Model domain area:       577870.77    Active basin area:    325452.62
-Fraction impervious:        0.0022    Fraction pervious:       0.6180
-Lake area:             123607.0564    Fraction lakes:          0.3798
+Start time: 1990/10/01 00:00:00
+End time:   1995/10/31 00:00:00
 
 
-Execution elapsed time    0 minutes 31.91 seconds
+Model domain area:        11226.32    Active basin area:      6740.99
+Fraction impervious:        0.0000    Fraction pervious:       1.0000
+
+
+Execution elapsed time    2 minutes 57.70 seconds
 

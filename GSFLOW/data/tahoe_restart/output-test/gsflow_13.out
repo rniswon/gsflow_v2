@@ -17,25 +17,25 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        1235155.20     EVAPOTRANSPIRATION =         281692.56
+   EVAPOTRANSPIRATION =        1234770.16     EVAPOTRANSPIRATION =         281715.75
            STREAMFLOW =        2.9240D+07             STREAMFLOW =        4453044.50
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
    INFLOWS - OUTFLOWS =        1.3106D+08     INFLOWS - OUTFLOWS =        4.0496D+07
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        1.2922D+08         STORAGE CHANGE =        4.0097D+07
+ TOTAL STORAGE CHANGE =        1.2937D+08         STORAGE CHANGE =        4.0097D+07
        --------------                             --------------
          LAND SURFACE =        1.1908D+08           LAND SURFACE =        3.3650D+07
-            SOIL ZONE =        -671968.81              SOIL ZONE =         -63015.31
-     UNSATURATED ZONE =         613167.54       UNSATURATED ZONE =          60222.76
-       SATURATED ZONE =       -1386533.94         SATURATED ZONE =        -179783.98
-                LAKES =        1.1579D+07                  LAKES =        6628828.00
+            SOIL ZONE =        -670962.27              SOIL ZONE =         -63017.02
+     UNSATURATED ZONE =         582013.41       UNSATURATED ZONE =          59793.37
+       SATURATED ZONE =       -1338767.53         SATURATED ZONE =        -181672.06
+                LAKES =        1.1716D+07                  LAKES =        6631953.00
 
- OVERALL BUDGET ERROR =        1845463.24           BUDGET ERROR =         399040.20
+ OVERALL BUDGET ERROR =        1691834.58           BUDGET ERROR =         398211.19
 
 
-  PERCENT DISCREPANCY =              1.15    PERCENT DISCREPANCY =              0.89
+  PERCENT DISCREPANCY =              1.05    PERCENT DISCREPANCY =              0.88
 
 
 
