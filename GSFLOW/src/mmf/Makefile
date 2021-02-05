@@ -15,7 +15,7 @@ SRCS = 	mmf.c parse_args.c alloc_space.c build_lists.c \
 	save_params.c load_param.c check_vars.c \
 	create_vstats.c free_vstats.c write_vstats.c \
 	call_modules.c call_setdims.c \
-	read_datainfo.c putvar.c print_params.c print_vars.c \
+	read_datainfo.c print_params.c print_vars.c \
 	print_model_info.c batch_run_functions.c graph_single_run.c \
 	control_array.c call_setdims.c call_modules.c
 

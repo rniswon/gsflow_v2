@@ -23,25 +23,25 @@
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-void getdimname_ (char *name, ftnint *i, char *idxname, ftnlen namelen, ftnlen idxlen) {
+//void getdimname_ (char *name, ftnint *i, char *idxname, ftnlen namelen, ftnlen idxlen) {
   /*
    * local copies
    */
 
-  char * lname;
+//  char * lname;
 
-  lname = (char *)malloc(namelen+1);
-  strncpy(lname, name, namelen);
-  lname[namelen] = '\0';
+//  lname = (char *)malloc(namelen+1);
+//  strncpy(lname, name, namelen);
+//  lname[namelen] = '\0';
 
   /*
    * call c version
    */
- getdimname(lname, (*i) - 1, idxname, idxlen);
+// getdimname(lname, (*i) - 1, idxname, idxlen);
   
-  idxlen = strlen(idxname);
+//  idxlen = strlen(idxname);
 
-}
+//}
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : getdimdesc_
@@ -50,23 +50,23 @@ void getdimname_ (char *name, ftnint *i, char *idxname, ftnlen namelen, ftnlen i
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-void getdimdesc_ (char *name, ftnint *i, char *desc, ftnlen namelen, ftnlen desclen) {
+//void getdimdesc_ (char *name, ftnlen *i, char *desc, ftnlen namelen, ftnlen desclen) {
   /*
    * local copies
    */
 
-  char * lname;
+//  char * lname;
 
-  lname = (char *)malloc(namelen+1);
-  strncpy(lname, name, namelen);
-  lname[namelen] = '\0';
+//  lname = (char *)malloc(namelen+1);
+//  strncpy(lname, name, namelen);
+//  lname[namelen] = '\0';
 
 /*
 **	call c version
 */
-	getdimdesc (lname, (*i) - 1, desc, namelen+1);
-	desclen = strlen (desc);
-}
+//	getdimdesc (lname, (*i) - 1, desc, namelen+1);
+//	desclen = strlen (desc);
+//}
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : getdimnameint_
@@ -75,26 +75,26 @@ void getdimdesc_ (char *name, ftnint *i, char *desc, ftnlen namelen, ftnlen desc
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-void getdimnameint_ (char *name, ftnint *i, ftnint *idx, ftnlen namelen) {
+//void getdimnameint_ (char *name, ftnint *i, ftnint *idx, ftnlen namelen) {
   /*
    * local copies
    */
 
-  char * lname;
-  char idxname[80];
+//  char * lname;
+//  char idxname[80];
 
-  lname = (char *)malloc(namelen+1);
-  strncpy(lname, name, namelen);
-  lname[namelen] = '\0';
+//  lname = (char *)malloc(namelen+1);
+//  strncpy(lname, name, namelen);
+//  lname[namelen] = '\0';
 
   /*
    * call c version
    */
- getdimname(lname, (*i) - 1, idxname, 80);
+// getdimname(lname, (*i) - 1, idxname, 80);
   
-  *idx = atoi(idxname);
+//  *idx = atoi(idxname);
 
-}
+//}
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : getdimname
@@ -103,7 +103,7 @@ void getdimnameint_ (char *name, ftnint *i, ftnint *idx, ftnlen namelen) {
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-void getdimname (char *name, long i, char *idxname, int idxlen) {
+/* void getdimname (char *name, ftnlen i, char *idxname, ftnlen idxlen) {
   DIMEN *dim;
 
   dim = dim_addr(name);
@@ -117,7 +117,7 @@ void getdimname (char *name, long i, char *idxname, int idxlen) {
       return;
     }
   (void)strncpy(idxname, dim->names[i], idxlen);
-}
+} */
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : getdimdesc
@@ -126,7 +126,7 @@ void getdimname (char *name, long i, char *idxname, int idxlen) {
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-void getdimdesc (char *name, long i, char *descname, int deslen) {
+/* void getdimdesc (char *name, ftnlen i, char *descname, ftnlen deslen) {
 	DIMEN *dim;
 
 	dim = dim_addr(name);
@@ -147,4 +147,4 @@ void getdimdesc (char *name, long i, char *descname, int deslen) {
 	else
 		(void)strncpy (descname, "", deslen);
 
-}
+} */

@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-02-02'
+      character(len=*), parameter :: Version_soilzone = '2021-02-04'
       INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -104,7 +104,8 @@
       !REAL, SAVE, ALLOCATABLE :: Ag_ssr_to_gw(:), Ag_slow_stor(:), Ag_recharge(:)
       !REAL, SAVE, ALLOCATABLE :: Ag_ssres_stor(:), Ag_ssres_flow(:)
       INTEGER, SAVE, ALLOCATABLE :: Hrus_iterating(:)
-      integer, save :: total_iters
+      integer, save :: total_iters, iter_nonconverge
+      real, save :: unsatisfied_big
       ! parameters
 ! have covden a monthly, later
       !INTEGER, SAVE, ALLOCATABLE :: Ag_soil_type(:), Ag_crop_type(:), Ag_covden_sum(:), Ag_covden_win(:)
@@ -155,7 +156,6 @@
       INTEGER, EXTERNAL :: declparam, declvar, getdim, control_integer
       !REAL, EXTERNAL :: control_real
       EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop
-      real :: test
 !***********************************************************************
       szdecl = 0
       total_iters = 0
@@ -1060,6 +1060,8 @@
           ENDDO
         ENDIF
       ENDIF
+      iter_nonconverge = 0
+      unsatisfied_big = 0.0
 
       END FUNCTION szinit
 
@@ -1105,11 +1107,12 @@
       REAL :: dnslowflow, dnpreflow, dndunn, availh2o, avail_potet
       REAL :: gvr_maxin, topfr !, tmp
       REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin
-      REAL :: perv_frac, capacity, capwater_maxin, ssresin, unsatisfied_big
+      REAL :: perv_frac, capacity, capwater_maxin, ssresin
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
       REAL :: ag_upflow_max, ag_capacity, excess, agfrac, ag_soil2gw, ag_soil2gvr, ag_avail_potet, ag_potet
       DOUBLE PRECISION :: gwin
-      INTEGER :: cfgi_frozen_hru, ag_on_flag, keep_iterating, add_estimated_irrigation, num_hrus_ag_iter
+      INTEGER :: cfgi_frozen_hru, ag_on_flag, keep_iterating, add_estimated_irrigation
+      INTEGER :: num_hrus_ag_iter
 !***********************************************************************
       szrun = 0
 
@@ -1207,7 +1210,6 @@
       ! Soil_to_gw and Soil_to_ssr for whole HRU
       Soil_to_gw = 0.0
       Soil_to_ssr = 0.0
-      unsatisfied_big = 0.0
 !      Snowevap_aet_frac = 0.0
       ! gravity reservoir variables for whole HRU
       Ssr_to_gw = 0.0
@@ -1701,7 +1703,6 @@
             IF ( unsatisfied_et>soilzone_aet_converge ) THEN
               IF ( Cascade_flag==CASCADE_OFF ) Hrus_iterating(i) = 1
               Ag_irrigation_add(i) = Ag_irrigation_add(i) + unsatisfied_et
-!if(i==90) print *, unsatisfied_et, 'unsatisfied_et', i, Ag_irrigation_add(i), Soil_iter, ag_soil_moist_max(i) - ag_soil_moist(i)
               keep_iterating = ACTIVE
               add_estimated_irrigation = ACTIVE
               num_hrus_ag_iter = num_hrus_ag_iter + 1
@@ -1725,7 +1726,9 @@
       Soil_iter = Soil_iter - 1
       IF ( Iter_aet==ACTIVE ) Ag_irrigation_add = Ag_irrigation_add*Ag_area
 !      IF ( num_hrus_ag_iter>0 ) print '(2(A,I0))', 'number of hrus still iterating on AET: ', &
-!     &     num_hrus_ag_iter, ', iterations: ', Soil_iter
+!     &     num_hrus_ag_iter
+!      if ( soil_iter==max_soilzone_ag_iter ) iter_nonconverge = iter_nonconverge + 1
+!      print *, 'iterations: ', Soil_iter, '; nonconverged', iter_nonconverge
       total_iters = total_iters + Soil_iter
 !      print *, NOWTIME, unsatisfied_big, unsatisfied_big/basin_potet, total_iters
 

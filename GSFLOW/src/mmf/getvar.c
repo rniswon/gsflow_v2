@@ -25,7 +25,7 @@
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getvar_ (char *mname, char *vname, ftnint *vmaxsize, char *vtype, double *value, ftnlen mnamelen, ftnlen vnamelen, ftnlen vtypelen) {
+ftnlen getvar_ (char *mname, char *vname, ftnlen *vmaxsize, char *vtype, double *value, ftnlen mnamelen, ftnlen vnamelen, ftnlen vtypelen) {
 	char module[80], name[80], type[80];
 	long maxsize, retval;
   
@@ -49,7 +49,7 @@ long getvar_ (char *mname, char *vname, ftnint *vmaxsize, char *vtype, double *v
 */
 	retval =  getvar (module, name, maxsize, type, value);
   
-	return (retval);
+	return ((ftnlen)retval);
 }
 
 /*--------------------------------------------------------------------*\
@@ -206,7 +206,7 @@ long getvar (char *module, char *name, long maxsize, char *type, double *value) 
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getvartype_ (char *vname, ftnlen vnamelen) {
+ftnlen getvartype_ (char *vname, ftnlen vnamelen) {
 	char vkey[128];
 	PUBVAR *var;
   
@@ -230,7 +230,7 @@ long getvartype_ (char *vname, ftnlen vnamelen) {
  | RETURN VALUE : size of the array for input variable
  | RESTRICTIONS : variable must be declared
 \*--------------------------------------------------------------------*/
-long getvarsize_ (char *vname, ftnlen vnamelen) {
+ftnlen getvarsize_ (char *vname, ftnlen vnamelen) {
 	char vkey[128];
 	PUBVAR *var;
   

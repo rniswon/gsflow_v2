@@ -17,9 +17,9 @@
 #include <string.h>
 #include "mms.h"
 
-#define LONG 1
-#define FLOAT 2
-#define DOUBLE 3
+//define LONG 1
+//#define FLOAT 2
+//#define DOUBLE 3
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : declvar_
@@ -28,7 +28,7 @@
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long declvar_ (char *mname, char *vname, char *vdimen, ftnint *maxsizeptr,
+ftnlen declvar_ (char *mname, char *vname, char *vdimen, ftnlen *maxsizeptr,
 	char *vtype, char *hstr, char *ustr, char *value, ftnlen mnamelen,
 	ftnlen vnamelen, ftnlen vdimenlen, ftnlen vtypelen, ftnlen hlen, ftnlen ulen) {
 
@@ -75,7 +75,7 @@ long declvar_ (char *mname, char *vname, char *vdimen, ftnint *maxsizeptr,
 
   retval = declvar(module, name, dimen, maxsize, type, help, units, value);
 
-  return(retval);
+  return((ftnlen)retval);
 
 }
 
@@ -271,44 +271,44 @@ long declvar (char *module, char *name, char *dimen, long maxsize, char *type,
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long declpri_ (char *vname, ftnint *maxsizeptr,
+/*ftnlen declpri_ (char *vname, ftnlen *maxsizeptr,
 	char *vtype, char *value,
 	ftnlen vnamelen, ftnlen vtypelen) {
 
   char *name, *type;
-  long maxsize, retval;
+  ftnlen maxsize, retval; */
 
   /*
    * copy maxsize to local long int
    */
 
-  maxsize = *maxsizeptr;
+//  maxsize = *maxsizeptr;
 
   /*
    * copy args to new strings, and terminate correctly
    */
 
-  name = (char *) umalloc((unsigned int)(vnamelen + 1));
+/*  name = (char *) umalloc((unsigned int)(vnamelen + 1));
   strncpy(name, vname, (int)vnamelen);
   name[vnamelen] = '\0';
 
   type = (char *) umalloc((unsigned int)(vtypelen + 1));
   strncpy(type, vtype, (int)vtypelen);
-  type[vtypelen] = '\0';
+  type[vtypelen] = '\0'; */
 
   /*
    * call C version of declpri()
    */
 
-  retval = declpri(name, maxsize, type, value);
+//  retval = (ftnlen)declpri(name, maxsize, type, value);
 
   /*
    * free up allocated strings
    */
 
-  return(retval);
+//  return(retval);
 
-}
+//}
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : declpri()
@@ -317,88 +317,88 @@ long declpri_ (char *vname, ftnint *maxsizeptr,
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long declpri (char *name, long size, char *type, char *value) {
+/* long declpri (char *name, long size, char *type, char *value) {
   int var_type;
 
   char *vkey;
 
-  PUBVAR **vars, *var;
+  PUBVAR **vars, *var; */
 
   /*
    * realloc if too large
    */
 
-  if(Mnvars >= max_vars -1) {
+/*  if(Mnvars >= max_vars -1) {
 	max_vars += 100;
   	Mvarbase = (PUBVAR **)urealloc ((char *)Mvarbase,
 		max_vars * sizeof(PUBVAR *));
-  }
+  } */
 
   /*
    * compute the key
    */
 
-  vkey = strdup (name);
+/*  vkey = strdup (name);
 
   if (var_addr(vkey) != NULL) {
     (void)fprintf(stderr,
 	    "ERROR - declvar - key '%s' already exists.\n", vkey);
     return(1);
-  }
+  } */
 
   /*
    * convert fortran types to C equivalents
    */
 
-  var_type = M_LONG;
+/*  var_type = M_LONG;
   if (!strcmp(type, "real") || !strcmp(type, "float"))
     var_type = M_FLOAT;
   else if (!strcmp(type, "double precision") || !strcmp(type, "double"))
-    var_type = M_DOUBLE;
+    var_type = M_DOUBLE; */
 
   /*
    * check that type is possible
    */
 
-	if((var_type != M_LONG) && (var_type != M_FLOAT) && (var_type != M_DOUBLE))
+/*	if((var_type != M_LONG) && (var_type != M_FLOAT) && (var_type != M_DOUBLE))
 		{
     	(void)fprintf(stderr,
 	    	"ERROR - declvar - type '%s' is illegal.\n", type);
     	(void)fprintf(stderr, "Key is '%s'.\n", vkey);
     	(void)fprintf(stderr, "Type is '%s'.\n", type);
     	return(1);
-  		}
+  		} */
 
   /*  
    * get vars from Mvarbase, the global pointer
    */
 
 
-  if (Mdebuglevel >= M_FULLDEBUG) {
-    (void)fprintf(stderr, "Declaring private variable '%s'\n", vkey);
-  }
+//  if (Mdebuglevel >= M_FULLDEBUG) {
+//    (void)fprintf(stderr, "Declaring private variable '%s'\n", vkey);
+//  }
 
   /*
    * allocate space for a structure, and store pointer in vars
    */
-  Mnvars += 1;
+//  Mnvars += 1;
 
-  vars = Mvarbase;
+//  vars = Mvarbase;
 
-  var = (PUBVAR *) umalloc (sizeof(PUBVAR));
-  vars[Mnvars-1] = var; /* copy address into vars array */
+//  var = (PUBVAR *) umalloc (sizeof(PUBVAR));
+//  vars[Mnvars-1] = var; /* copy address into vars array */
 
   /*
    * get the size of the variable
    */
   
-  var->size = size;
+//  var->size = size;
 
   /*
    * allocate space, and store variable properties
    */
 
-  var->key = vkey;
+/*  var->key = vkey;
   var->module = NULL;
   var->name = strdup (name);
 
@@ -414,5 +414,5 @@ long declpri (char *name, long size, char *type, char *value) {
    sort_vars();
 
    return(0);
-}
+} */
 

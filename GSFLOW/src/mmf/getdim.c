@@ -24,7 +24,7 @@
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getdim_ (char *dname, ftnlen namelen) {
+ftnlen getdim_ (char *dname, ftnlen namelen) {
   char *name;
   long retval;
 

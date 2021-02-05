@@ -26,7 +26,7 @@
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long putvar_ (char *mname, char *vname, ftnint *vmaxsize, char *vtype, double *value, 
+long putvar_ (char *mname, char *vname, ftnlen *vmaxsize, char *vtype, double *value, 
 	     ftnlen mnamelen, ftnlen vnamelen, ftnlen vtypelen) {
 
 //  char *module, *name, *type;

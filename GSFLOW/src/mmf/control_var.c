@@ -93,7 +93,7 @@ char **control_svar (char *key) {
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long control_string_ (char *retval, char *tag, ftnlen len, ftnlen tlen) {
+ftnlen control_string_ (char *retval, char *tag, ftnlen len, ftnlen tlen) {
 	char *foo;
 
 	foo = (char *) umalloc(tlen + 1);
@@ -112,7 +112,7 @@ long control_string_ (char *retval, char *tag, ftnlen len, ftnlen tlen) {
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long control_string_array_ (char *retval, char *tag, int *index, ftnlen len, ftnlen tlen) {
+ftnlen control_string_array_ (char *retval, char *tag, ftnlen *index, ftnlen len, ftnlen tlen) {
 	char *foo;
     char **strings;
     int i;
@@ -134,7 +134,7 @@ long control_string_array_ (char *retval, char *tag, int *index, ftnlen len, ftn
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long control_integer_ (int *retval, char *key, ftnlen len) {
+ftnlen control_integer_ (ftnlen *retval, char *key, ftnlen len) {
 	char *foo;
 	long *longs, intVal;
 
@@ -144,7 +144,7 @@ long control_integer_ (int *retval, char *key, ftnlen len) {
 
 	longs = (long *) control_var(foo);
 	intVal = *(longs);
-	*retval = (int)intVal;
+	*retval = (ftnlen)intVal;
 	return 0;
 }
 
@@ -173,7 +173,7 @@ long control_real_(float* retval, char* key, ftnlen len) {
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long control_integer_array_ (int *retval, int *index, char *key, ftnlen tlen) {
+ftnlen control_integer_array_ (ftnlen *retval, ftnlen *index, char *key, ftnlen tlen) {
 	char *foo;
 	long intVal;
     long *longs;
@@ -186,7 +186,7 @@ long control_integer_array_ (int *retval, int *index, char *key, ftnlen tlen) {
     longs = (long *) control_var(foo);
     i = *index - 1;
 	intVal = *(longs+i);
-	*retval = (int)intVal;
+	*retval = (ftnlen)intVal;
 	return 0;
 }
 

@@ -329,8 +329,8 @@ EXTERN void write_vstats (FILE *);
 
 EXTERN double getjulday(int, int, int, int, int, int);
 EXTERN int dayofweek(double);
-EXTERN long isleap_ (ftnint *);
-EXTERN int isleap (int);
+//EXTERN ftnlen isleap_ (ftnlen *);
+//EXTERN int isleap (int);
 
 /***  build_lists.c  **************************************************/
 #undef EXTERN
@@ -353,8 +353,8 @@ EXTERN void ADD_to_list (LIST *, void *);
 #define EXTERN extern
 #endif
 
-EXTERN char *PRMS_sens (void);
-EXTERN int IN_obj_period (int, int, int);
+//EXTERN char *PRMS_sens (void);
+//EXTERN int IN_obj_period (int, int, int);
 
 /***  control_addr.c  **************************************************/
 #undef EXTERN
@@ -402,13 +402,13 @@ EXTERN char **control_svar (char *);
 #define EXTERN extern
 #endif
 
-EXTERN long decldim_ (char *, ftnint *, ftnint *, char *, ftnlen, ftnlen);
+EXTERN ftnlen decldim_ (char *, ftnlen *, ftnlen *, char *, ftnlen, ftnlen);
 EXTERN long decldim (char *, long, long, char *);
 EXTERN long declfix (char *, long, long, char *);
-EXTERN long declfix_ (char *, ftnint *, ftnint *, char *, ftnlen, ftnlen);
+EXTERN ftnlen declfix_ (char *, ftnlen *, ftnlen *, char *, ftnlen, ftnlen);
 
 /***  declmodule.c    **************************************************/
-EXTERN long declmodule (char *, char *, char *);
+//EXTERN long declmodule (char *, char *, char *);
 
 /***  decl_control.c  **************************************************/
 #undef EXTERN
@@ -429,21 +429,21 @@ EXTERN CONTROL *add_control (char *, long, long);
 #define EXTERN extern
 #endif
 
-EXTERN long declparam_ (char *, char *, char *, char *, char *,
+EXTERN ftnlen declparam_ (char *, char *, char *, char *, char *,
 	char *, char *, char *, char *, char *, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen);
 EXTERN long declparam (char *, char *, char *, char *, char *,
 	char *, char *, char *, char *, char *);
 
-EXTERN long declparam_u_ (char *, char *, char *, char *, char *,
-	char *, char *, char *, char *, char *, char *, long *,
-       	ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen);
-EXTERN long declparam_u (char *, char *, char *, char *, char *,
-	char *, char *, char *, char *, char *, char *, long *);
+//EXTERN long declparam_u_ (char *, char *, char *, char *, char *,
+//	char *, char *, char *, char *, char *, char *, long *,
+//       	ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen);
+//EXTERN long declparam_u (char *, char *, char *, char *, char *,
+//	char *, char *, char *, char *, char *, char *, long *);
 
-EXTERN long declparam_p_ (char *, char *, char *, char *, char *,
-	char *, char *, char *, char *, char *, char *, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen);
-EXTERN long declparam_p (char *, char *, char *, char *, char *,
-	char *, char *, char *, char *, char *, char *);
+//EXTERN long declparam_p_ (char *, char *, char *, char *, char *,
+//	char *, char *, char *, char *, char *, char *, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen);
+//EXTERN long declparam_p (char *, char *, char *, char *, char *,
+//	char *, char *, char *, char *, char *, char *);
 
 /***  declvar.c  **************************************************/
 #undef EXTERN
@@ -453,12 +453,12 @@ EXTERN long declparam_p (char *, char *, char *, char *, char *,
 #define EXTERN extern
 #endif
 
-EXTERN long declvar_ (char *, char *, char *, ftnint *, char *,
+EXTERN ftnlen declvar_ (char *, char *, char *, ftnlen *, char *,
 	char *, char *, char *, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen, ftnlen);
 EXTERN long declvar (char *, char *, char *, long, char *,
 	char *, char *, char *);
-EXTERN long declpri_ (char *, ftnint *, char *, char *, ftnlen, ftnlen);
-EXTERN long declpri (char *, long, char *, char *);
+//EXTERN ftnlen declpri_ (char *, ftnlen *, char *, char *, ftnlen, ftnlen);
+//EXTERN long declpri (char *, long, char *, char *);
 
 /***  dim_addr.c  **************************************************/
 #undef EXTERN
@@ -479,21 +479,21 @@ EXTERN char *dim_notes (char *);
 #define EXTERN extern
 #endif
 
-EXTERN long getdim_ (char *, ftnlen);
+EXTERN ftnlen getdim_ (char *, ftnlen);
 EXTERN long getdim (char *);
 
 /***  getdimname.c  **************************************************/
-#undef EXTERN
+/*#undef EXTERN
 #ifdef GETDIMNAME_C
 #define EXTERN
 #else
 #define EXTERN extern
 #endif
 
-EXTERN void getdimname_ (char *, ftnint *, char *, ftnlen, ftnlen);
+EXTERN void getdimname_ (char *, ftnlen *, char *, ftnlen, ftnlen);
 EXTERN void getdimname (char *, long, char *, int);
-EXTERN void getdimdesc_ (char *, ftnint *, char *, ftnlen, ftnlen);
-EXTERN void getdimdesc (char *, long, char *, int);
+EXTERN void getdimdesc_ (char *, ftnlen *, char *, ftnlen, ftnlen);
+EXTERN void getdimdesc (char *, long, char *, int); */
 
 /***  getparam.c  **************************************************/
 #undef EXTERN
@@ -504,18 +504,18 @@ EXTERN void getdimdesc (char *, long, char *, int);
 #endif
 
 EXTERN long updateparam (char *);
-EXTERN long getparam_ (char *, char *, ftnint *, char *, double *, ftnlen, ftnlen, ftnlen);
+EXTERN ftnlen getparam_ (char *, char *, ftnlen *, char *, double *, ftnlen, ftnlen, ftnlen);
 EXTERN long getparam (char *, char *, int, char *, double *);
-EXTERN long getdatainfo_ (char *, ftnlen);
-EXTERN long getdatainfo (char *, ftnlen);
-EXTERN long getoutname_ (char *, char *, ftnlen, ftnlen);
-EXTERN long getoutname (char *, int, char *);
-EXTERN long getdataname_ (char *, char *, ftnlen, ftnlen);
-EXTERN long getdataname (char *, int, char *);
-EXTERN long getoutdirfile_ (char *, char *, ftnlen, ftnlen);
-EXTERN long getoutdirfile (char *, int, char *);
-EXTERN long getuserdirfile_ (char *, char *, ftnlen, ftnlen);
-EXTERN long getuserdirfile (char *, int, char *);
+//EXTERN ftnlen getdatainfo_ (char *, ftnlen);
+//EXTERN long getdatainfo (char *, ftnlen);
+//EXTERN ftnlen getoutname_ (char *, char *, ftnlen, ftnlen);
+//EXTERN long getoutname (char *, int, char *);
+//EXTERN ftnlen getdataname_ (char *, char *, ftnlen, ftnlen);
+//EXTERN long getdataname (char *, int, char *);
+//EXTERN ftnlen getoutdirfile_ (char *, char *, ftnlen, ftnlen);
+//EXTERN long getoutdirfile (char *, int, char *);
+//EXTERN ftnlen getuserdirfile_ (char *, char *, ftnlen, ftnlen);
+//EXTERN long getuserdirfile (char *, int, char *);
 
 /***  getvar.c  **************************************************/
 #undef EXTERN
@@ -525,7 +525,7 @@ EXTERN long getuserdirfile (char *, int, char *);
 #define EXTERN extern
 #endif
 
-EXTERN long getvar_ (char *, char *, ftnint *, char *, double *,
+EXTERN ftnlen getvar_ (char *, char *, ftnlen *, char *, double *,
 	ftnlen, ftnlen, ftnlen);
 EXTERN long getvar (char *, char *, long, char *, double *);
 
@@ -570,16 +570,16 @@ EXTERN int print_params (void);
 EXTERN int print_vars (void);
 
 /***  putvar.c  **************************************************/
-#undef EXTERN
-#ifdef PUTVAR_C
-#define EXTERN
-#else
-#define EXTERN extern
-#endif
+//#undef EXTERN
+//#ifdef PUTVAR_C
+//#define EXTERN
+//#else
+//#define EXTERN extern
+//#endif
 
-EXTERN long putvar_ (char *, char *, ftnint *, char *, double *value,
-	     ftnlen, ftnlen, ftnlen);
-EXTERN long putvar (char *, char *, long, char *, double *);
+//EXTERN ftnlen putvar_ (char *, char *, ftnlen *, char *, double *value,
+//	     ftnlen, ftnlen, ftnlen);
+//EXTERN long putvar (char *, char *, long, char *, double *);
 
 /***  read_control.c  **************************************************/
 #undef EXTERN
@@ -712,16 +712,18 @@ EXTERN long str_to_vals (char *, long, long, char *);
 #define EXTERN extern
 #endif
 
-EXTERN void dattim_ (char *, ftnint *, ftnlen);
+EXTERN void dattim_ (char *, ftnlen *, ftnlen);
 EXTERN void dattim (char *, long *);
-EXTERN long julian_ (char *, char *, ftnlen, ftnlen);
+EXTERN ftnlen julian_ (char *, char *, ftnlen, ftnlen);
 EXTERN long julian (char *, char *);
 EXTERN double deltim (void);
-EXTERN double delnex (void);
-EXTERN long getstep_ (void);
+EXTERN double deltim_ (void);
+//EXTERN double delnex (void);
+//EXTERN double delnex_ (void);
+EXTERN ftnlen getstep_ (void);
 EXTERN long getstep (void);
-EXTERN double djulian_ (char *, char *, ftnlen, ftnlen);
-EXTERN double djulian (char *, char *);
+//EXTERN double djulian_ (char *, char *, ftnlen, ftnlen);
+//EXTERN double djulian (char *, char *);
 
 /***  var_addr.c  **************************************************/
 #undef EXTERN
@@ -777,34 +779,34 @@ EXTERN void ufree (char *);
 EXTERN int julday (DATETIME *);
 
 /***  matinv.c  **************************************************/
-#undef EXTERN
-#ifdef MATINV_C
-#define EXTERN
-#else
-#define EXTERN extern
-#endif
+//#undef EXTERN
+//#ifdef MATINV_C
+//#define EXTERN
+//#else
+//#define EXTERN extern
+//#endif
 
 EXTERN int matinv (float *, float *, int *, int *);
 
 /***  matind.c  **************************************************/
-#undef EXTERN
-#ifdef MATIND_C
-#define EXTERN
-#else
-#define EXTERN extern
-#endif
+//#undef EXTERN
+//#ifdef MATIND_C
+//#define EXTERN
+//#else
+//#define EXTERN extern
+//#endif
 
-EXTERN int matind (double *, double *, int *);
+//EXTERN int matind (double *, double *, int *);
 
 /***  snort.c  **************************************************/
-#undef EXTERN
-#ifdef SNORT_C
-#define EXTERN
-#else
-#define EXTERN extern
-#endif
+//#undef EXTERN
+//#ifdef SNORT_C
+//#define EXTERN
+//#else
+//#define EXTERN extern
+//#endif
 
-EXTERN int snort (float *, int *, int *, int *);
+//EXTERN int snort (float *, int *, int *, int *);
 
 /***  print_model_info.c  **************************************************/
 #undef EXTERN

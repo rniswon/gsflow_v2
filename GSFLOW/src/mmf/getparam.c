@@ -60,7 +60,7 @@ long updateparam (char *name) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getparam_ (char *mname, char *pname, ftnint *pmaxsize, char *ptype, double *pval,
+ftnlen getparam_ (char *mname, char *pname, ftnlen *pmaxsize, char *ptype, double *pval,
 	       ftnlen mnamelen, ftnlen pnamelen, ftnlen ptypelen) {
 
 	char *module, *name, *type;
@@ -86,7 +86,7 @@ long getparam_ (char *mname, char *pname, ftnint *pmaxsize, char *ptype, double 
 // call C version of getparam()
 	retval = getparam(module, name, maxsize, type, pval);
 
-	return(retval);
+	return((ftnlen)retval);
 }
 
 /*--------------------------------------------------------------------*\
@@ -249,11 +249,11 @@ static long paramcopy (PARAM *param, double *pval, int maxsize) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getdatainfo_ (char *dinfo, ftnlen len) {
+/* long getdatainfo_ (char *dinfo, ftnlen len) {
 	long retval;
 	retval = getdatainfo (dinfo, len);
 	return(retval);
-}
+} */
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : getdatainfo
@@ -262,10 +262,10 @@ long getdatainfo_ (char *dinfo, ftnlen len) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getdatainfo (char *dinfo, ftnlen len) {
+/* long getdatainfo (char *dinfo, ftnlen len) {
 	strncpy (dinfo, Mdatainfo, len);
 	return(0);
-}
+} */
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : getoutname_
@@ -274,7 +274,7 @@ long getdatainfo (char *dinfo, ftnlen len) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getoutname_ (char *dinfo, char *ext, ftnlen len, ftnlen elen) {
+/* long getoutname_ (char *dinfo, char *ext, ftnlen len, ftnlen elen) {
   char *foo;
   long ret;
 
@@ -289,7 +289,7 @@ long getoutname_ (char *dinfo, char *ext, ftnlen len, ftnlen elen) {
         ret = 1;
 	}
     return(ret);
-}
+} */
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : getoutname
@@ -298,10 +298,10 @@ long getoutname_ (char *dinfo, char *ext, ftnlen len, ftnlen elen) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getoutname (char *dinfo, int dinlen, char *ext) {
+/* long getoutname (char *dinfo, int dinlen, char *ext) {
 	snprintf(dinfo, dinlen, "%s\\%s", *control_svar("model_output_file"), ext);
 	return(0);
-}
+} */
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : getdataname_
@@ -310,7 +310,7 @@ long getoutname (char *dinfo, int dinlen, char *ext) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getdataname_ (char *dinfo, char *ext, ftnlen len, ftnlen elen) {
+/* long getdataname_ (char *dinfo, char *ext, ftnlen len, ftnlen elen) {
 	char *foo;
 	long retval;
 
@@ -320,7 +320,7 @@ long getdataname_ (char *dinfo, char *ext, ftnlen len, ftnlen elen) {
 
 	retval = getdataname (dinfo, len, foo);
 	return(retval);
-}
+} */
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : getdataname
@@ -329,10 +329,10 @@ long getdataname_ (char *dinfo, char *ext, ftnlen len, ftnlen elen) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getdataname (char *dinfo, int dinlen, char *ext) {
+/* long getdataname (char *dinfo, int dinlen, char *ext) {
 	snprintf(dinfo, dinlen, "%s%s", *control_svar("data_file"), ext);
 	return(0);
-}
+} */
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : getoutdirfile_
@@ -403,10 +403,10 @@ long getdataname (char *dinfo, int dinlen, char *ext) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getparamfile (char *dinfo, int dinlen) {
+/* long getparamfile (char *dinfo, int dinlen) {
 	snprintf(dinfo, dinlen, "%s", *control_svar("param_file"));
 	return (0);
-}
+} */
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : getparamfile_
@@ -415,11 +415,11 @@ long getparamfile (char *dinfo, int dinlen) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-long getparamfile_ (char *dinfo, ftnlen len) {
+/* ftnlen getparamfile_ (char *dinfo, ftnlen len) {
 	long retval;
 	retval = getparamfile (dinfo, len);
-	return(retval);
-}
+	return((ftnlen)retval);
+} */
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : getparamstring_
@@ -429,7 +429,7 @@ long getparamfile_ (char *dinfo, ftnlen len) {
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
 
-long getparamstring_ (char *mname, char *pname, ftnint *pmaxsize, char *ptype, ftnint *pindex, char *pstring,
+ftnlen getparamstring_ (char *mname, char *pname, ftnlen *pmaxsize, char *ptype, ftnlen *pindex, char *pstring,
 	       ftnlen mnamelen, ftnlen pnamelen, ftnlen ptypelen, ftnlen pslen) {
 
   char *module, *name, *type;

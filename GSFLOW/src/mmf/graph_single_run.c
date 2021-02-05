@@ -44,7 +44,7 @@ int initializeRuntimeGraphs (void) {
 
    //dattim("start", datetime);
    //zero_time = getjulday((int)datetime[1],(int)datetime[2],(int)datetime[0],
-			//(int)datetime[3], (int)datetime[4], datetime[5]);
+			//(int)datetime[3], (int)datetime[4], (int)datetime[5]);
 
       starttime_copy.year =Mstrttime->year;
    starttime_copy.month =Mstrttime->month;
