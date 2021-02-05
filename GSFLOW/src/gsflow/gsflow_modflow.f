@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-01-29'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-02-04'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -1397,7 +1397,7 @@ C
       INTRINSIC DBLE
       DOUBLE PRECISION, EXTERNAL :: nowjt, getjulday
 ! Local Variables
-      DOUBLE PRECISION :: now, seconds
+      DOUBLE PRECISION :: now
       INTEGER :: KPERTEST
 !     ------------------------------------------------------------------
       GET_KPER = -1
@@ -1407,11 +1407,9 @@ C
 !
 !     If called from init, then "now" isn't set yet.
 !     Set "now" to model start date.
-      IF ( now.LE.1.0D0 ) THEN
-        seconds = DBLE(Starttime(6))
-        now = getjulday(Start_month, Start_day, Start_year,
-     &                  Starttime(4), Starttime(5), seconds)
-      ENDIF
+      IF ( now.LE.1.0D0 )
+     &     now = getjulday(Start_month, Start_day, Start_year,
+     &                  Starttime(4), Starttime(5), Starttime(6))
       IF ( now<Stress_dates(KPERTEST) )
      &     STOP 'ERROR, now<stress period time'
       IF ( now>Stress_dates(NPER) ) THEN
@@ -1447,25 +1445,23 @@ C
       DOUBLE PRECISION, EXTERNAL :: getjulday
 ! Local Variables
       INTEGER :: i, n, nstress
-      DOUBLE PRECISION :: seconds, start_jul, mfstrt_jul, plen, time
+      DOUBLE PRECISION :: start_jul, mfstrt_jul, plen, time
       DOUBLE PRECISION :: kstpskip
 !***********************************************************************
       IF ( Print_debug>DEBUG_less )
      &     PRINT ( '(/, A, I5,2("/",I2.2))' ), 'modflow_time_zero:',
      &  Modflow_time_zero(1), Modflow_time_zero(2), Modflow_time_zero(3)
-      seconds = Modflow_time_zero(6)
       ALLOCATE ( Stress_dates(NPER+1) )
       Stress_dates = 0.0D0
       Stress_dates(1) =
      &          getjulday(Modflow_time_zero(2), Modflow_time_zero(3),
      &                    Modflow_time_zero(1), Modflow_time_zero(4),
-     &                    Modflow_time_zero(5), seconds)
+     &                    Modflow_time_zero(5), Modflow_time_zero(6))
       mfstrt_jul = Stress_dates(1)
 
       ! determine julian day
-      seconds = Starttime(6)
       start_jul = getjulday(Start_month, Start_day, Start_year,
-     &                      Starttime(4), Starttime(5), seconds)
+     &                      Starttime(4), Starttime(5), Starttime(6))
 
       IF ( mfstrt_jul>start_jul ) THEN
         PRINT *, 'ERROR, modflow_time_zero > start_time',
