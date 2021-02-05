@@ -36,7 +36,7 @@ static char *types[] = {"long (or integer)", "real (or float)", "double", "strin
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-/* long declparam_u_ (char *mname, char *pname, char *pdimen, char *ptype,
+long declparam_u_ (char *mname, char *pname, char *pdimen, char *ptype,
 	char *pvalstr, char *minstr, char *maxstr, char *dstr, char *hstr,
 	char *ustr, char *var, long *update, ftnlen mnamelen,
 	ftnlen pnamelen, ftnlen pdimenlen, ftnlen ptypelen,
@@ -45,13 +45,13 @@ static char *types[] = {"long (or integer)", "real (or float)", "double", "strin
 
 	char *module, *name, *dimen, *type, *value;
 	char *minimum, *maximum, *descr, *help, *units;
-	long retval; */
+	long retval;
 
 /*
 * copy args to new strings, and terminate correctly
 */
 
-/*	module = (char *) umalloc(mnamelen + 1);
+	module = (char *) umalloc(mnamelen + 1);
 	strncpy(module, mname, mnamelen);
 	module[mnamelen] = '\0';
 
@@ -89,17 +89,17 @@ static char *types[] = {"long (or integer)", "real (or float)", "double", "strin
 
 	units = (char *) umalloc(ulen + 1);
 	strncpy(units, ustr, ulen);
-	units[ulen] = '\0'; */
+	units[ulen] = '\0';
 
 /*
 * call C version of declparam_u()
 */
 
-/*	retval = declparam_u(module, name, dimen, type, value,
+	retval = declparam_u(module, name, dimen, type, value,
 	    minimum, maximum, descr, help, units, var, update);
 
 	return(retval);
-} */
+}
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : declparam_u
@@ -108,18 +108,18 @@ static char *types[] = {"long (or integer)", "real (or float)", "double", "strin
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-/* long declparam_u (char *module, char *name, char *dimen, char *type, char *value,
+long declparam_u (char *module, char *name, char *dimen, char *type, char *value,
 	char *minimum, char *maximum, char *descr, char *help, char *units, char *var,
 	long *update) {
 
 	PARAM *param;
 
-	*update = 0; */
+	*update = 0;
 /*
 * get pointer to parameter with key
 */
 
-/*	param = param_addr(name);
+	param = param_addr(name);
 
 	if (param == NULL) {  // Parameter has not been declared, do so now. Set up array for pointers to local arrays of values.
 		declparam (module, name, dimen, type, value, minimum, maximum, descr, help, units);
@@ -127,12 +127,12 @@ static char *types[] = {"long (or integer)", "real (or float)", "double", "strin
 		param->num_references = 0;
 		param->size_references = 100;
 		param->references = (void **)umalloc (param->size_references * sizeof(void *));
-	} */
+	}
 
 /*
 **	 realloc if too large
 */
-/*	if (param->num_references >= param->size_references - 1) {
+	if (param->num_references >= param->size_references - 1) {
 		param->size_references += 100;
 		param->references = (void **) urealloc ((char *)(param->references),
 			param->size_references * sizeof(void *));
@@ -141,7 +141,7 @@ static char *types[] = {"long (or integer)", "real (or float)", "double", "strin
 	param->references[param->num_references++] = var;
 
 	return 0;
-} */
+}
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : declparam_
@@ -151,7 +151,7 @@ static char *types[] = {"long (or integer)", "real (or float)", "double", "strin
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-ftnlen declparam_ (char *mname, char *pname, char *pdimen, char *ptype,
+long declparam_ (char *mname, char *pname, char *pdimen, char *ptype,
 	char *pvalstr, char *minstr, char *maxstr, char *dstr, char *hstr,
 	char *ustr, ftnlen mnamelen, ftnlen pnamelen, ftnlen pdimenlen, ftnlen ptypelen,
 	ftnlen pvallen, ftnlen minlen, ftnlen maxlen, ftnlen dlen, ftnlen hlen, ftnlen ulen) {
@@ -211,7 +211,7 @@ ftnlen declparam_ (char *mname, char *pname, char *pdimen, char *ptype,
 	retval = declparam(module, name, dimen, type, value,
 	    minimum, maximum, descr, help, units);
 
-	return((ftnlen)retval);
+	return(retval);
 }
 
 /*--------------------------------------------------------------------*\
@@ -408,7 +408,7 @@ long declparam (char *module, char *name, char *dimen, char *type, char *value,
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-/* long declparam_p_ (char *mname, char *pname, char *pdimen, char *ptype,
+long declparam_p_ (char *mname, char *pname, char *pdimen, char *ptype,
 	char *pvalstr, char *minstr, char *maxstr, char *dstr, char *hstr,
 	char *ustr, char *val, ftnlen mnamelen, ftnlen pnamelen,
 	ftnlen pdimenlen, ftnlen ptypelen, ftnlen pvallen, ftnlen minlen,
@@ -416,13 +416,13 @@ long declparam (char *module, char *name, char *dimen, char *type, char *value,
 
 	char *module, *name, *dimen, *type, *value;
 	char *minimum, *maximum, *descr, *help, *units;
-	long retval; */
+	long retval;
 
 /*
 * copy args to new strings, and terminate correctly
 */
 
-/*	module = (char *) umalloc(mnamelen + 1);
+	module = (char *) umalloc(mnamelen + 1);
 	strncpy(module, mname, mnamelen);
 	module[mnamelen] = '\0';
 
@@ -460,17 +460,17 @@ long declparam (char *module, char *name, char *dimen, char *type, char *value,
 
 	units = (char *) umalloc(ulen + 1);
 	strncpy(units, ustr, ulen);
-	units[ulen] = '\0'; */
+	units[ulen] = '\0';
 
 /*
 * call C version of declparam_p()
 */
 
-/* 	retval = declparam_p(module, name, dimen, type, value,
+	retval = declparam_p(module, name, dimen, type, value,
 	    minimum, maximum, descr, help, units, val);
 
 	return(retval);
-} */
+}
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : declparam_p
@@ -479,20 +479,20 @@ long declparam (char *module, char *name, char *dimen, char *type, char *value,
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-/* long declparam_p (char *module, char *name, char *dimen, char *type, char *value,
+long declparam_p (char *module, char *name, char *dimen, char *type, char *value,
 	char *minimum, char *maximum, char *descr, char *help, char *units, char *var) {
 	PARAM *param;
 
 	// If the -preprocess command line arguement is not set, don't allow declaration of any "preprocess parameters."
 	if (!preprocess_on) {
 		return 0;
-	} */
+	}
 
 /*
 * get pointer to parameter with key
 */
 
-/* 	param = param_addr(name);
+	param = param_addr(name);
 
 	if (param == NULL) {  // Parameter has not been declared, do so now. Set up array for pointers to local arrays of values.
 		declparam (module, name, dimen, type, value, minimum, maximum, descr, help, units);
@@ -501,13 +501,13 @@ long declparam (char *module, char *name, char *dimen, char *type, char *value,
 		param->size_references = 100;
 		param->references = (void **)umalloc (param->size_references * sizeof(void *));
 		param->preprocess = TRUE;
-	} */
+	}
 
 /*
 **	 realloc if too large
 **  LOOK AT THIS!
 */
-/*	if (param->num_references >= param->size_references - 1) {
+	if (param->num_references >= param->size_references - 1) {
 		param->size_references += 100;
 		param->references = (void **) urealloc ((char *)(param->references),
 			param->size_references * sizeof(void *));
@@ -516,7 +516,7 @@ long declparam (char *module, char *name, char *dimen, char *type, char *value,
 	param->references[param->num_references++] = var;
 
 	return 0;
-} */
+}
 
 /**7****************** LOCAL FUNCTION DEFINITIONS *********************/
 /*--------------------------------------------------------------------*\

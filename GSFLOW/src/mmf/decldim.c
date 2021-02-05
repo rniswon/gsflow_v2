@@ -26,7 +26,7 @@
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-ftnlen decldim_ (char *dname, ftnlen *dval, ftnlen *dmax, char *ddescr, ftnlen namelen, ftnlen descrlen) {
+long decldim_ (char *dname, ftnint *dval, ftnint *dmax, char *ddescr, ftnlen namelen, ftnlen descrlen) {
 	long value, max;
 	char *name, *descr;
 	long retval;
@@ -56,7 +56,7 @@ ftnlen decldim_ (char *dname, ftnlen *dval, ftnlen *dmax, char *ddescr, ftnlen n
 
 	retval = decldim(name, value, max, descr);
 
-	return((ftnlen)retval);
+	return(retval);
 }
 
 /*--------------------------------------------------------------------*\
@@ -158,8 +158,8 @@ long declfix (char *name, long value, long max, char *descr) {
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-ftnlen declfix_ (char *dname, ftnlen *dval, ftnlen *dmax, char *ddescr, ftnlen namelen, ftnlen descrlen) {
-	ftnlen	ret;
+long declfix_ (char *dname, ftnint *dval, ftnint *dmax, char *ddescr, ftnlen namelen, ftnlen descrlen) {
+	long	ret;
 
 	ret = decldim_ (dname, dval, dmax, ddescr, namelen, descrlen);
 	((DIMEN *)(dim_db->itm[dim_db->count - 1]))->fixed = TRUE;

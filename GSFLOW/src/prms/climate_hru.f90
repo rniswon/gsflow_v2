@@ -508,7 +508,7 @@
           ENDIF
         ENDIF
 
-       IF ( AET_cbh_flag==ACTIVE ) THEN
+        IF ( AET_cbh_flag==ACTIVE ) THEN
           IF ( control_string(AET_cbh_file, 'AET_cbh_file')/=0 ) CALL read_error(5, 'AET_cbh_file')
           CALL find_header_end(AET_unit, AET_cbh_file, 'AET_cbh_file', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
@@ -523,17 +523,17 @@
        ENDIF
 
        IF ( PET_cbh_flag==ACTIVE ) THEN
-          IF ( control_string(PET_cbh_file, 'PET_cbh_file')/=0 ) CALL read_error(5, 'PET_cbh_file')
-          CALL find_header_end(PET_unit, PET_cbh_file, 'PET_cbh_file', ierr, 1, Cbh_binary_flag)
-          IF ( ierr==1 ) THEN
-            istop = 1
-          ELSE
-            CALL find_current_time(PET_unit, Start_year, Start_month, Start_day, ierr, Cbh_binary_flag)
-            IF ( ierr==-1 ) THEN
-              PRINT *, 'for first time step, CBH File: ', PET_cbh_file
-              istop = 1
-            ENDIF
-          ENDIF
+         IF ( control_string(PET_cbh_file, 'PET_cbh_file')/=0 ) CALL read_error(5, 'PET_cbh_file')
+         CALL find_header_end(PET_unit, PET_cbh_file, 'PET_cbh_file', ierr, 1, Cbh_binary_flag)
+         IF ( ierr==1 ) THEN
+           istop = 1
+         ELSE
+           CALL find_current_time(PET_unit, Start_year, Start_month, Start_day, ierr, Cbh_binary_flag)
+           IF ( ierr==-1 ) THEN
+             PRINT *, 'for first time step, CBH File: ', PET_cbh_file
+             istop = 1
+           ENDIF
+         ENDIF
        ENDIF
 
        IF ( Climate_transp_flag==ACTIVE ) THEN

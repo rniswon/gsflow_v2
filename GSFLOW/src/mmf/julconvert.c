@@ -52,7 +52,7 @@ double getjulday(int mon, int day, int year, int h, int mi, int se) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-double getjulday_(ftnlen *mon, ftnlen *day, ftnlen *year, ftnlen *h, ftnlen *mi, ftnlen *se) {
+double getjulday_(int *mon, int *day, int *year, int *h, int *mi, int *se) {
    return getjulday (*mon, *day, *year, *h, *mi, *se);
 }
 
@@ -68,9 +68,9 @@ int dayofweek(double j) {
  | RETURN VALUE : see below
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-//ftnlen isleap_ (ftnlen *year) {
-//   return ((ftnlen)isleap((int)(*year)));
-//}
+long isleap_ (ftnint *year) {
+   return ((long)isleap((int)(*year)));
+}
 
 /*--------------------------------------------------------------------*\
  | FUNCTION     : isleap
@@ -79,33 +79,33 @@ int dayofweek(double j) {
  | RETURN VALUE : Returns 1 if year is a leap year, 0 if not.
  | RESTRICTIONS : Called from C.
 \*--------------------------------------------------------------------*/
-//int isleap (int year) {
+int isleap (int year) {
 
-//   double nptr;
+   double nptr;
 
 /*
 **  Check if leapyear - Start by identifying all years not
 **       divisible by 4
 */
-//   if (modf ((double)year/4.0, &nptr)!=0) {
-//      return(0);
+   if (modf ((double)year/4.0, &nptr)!=0) {
+      return(0);
 /*
 **  Identify leap years that are not century years
  */
-//   } else if (modf((double)year/4.0, &nptr)==0 && modf(year/100.0, &nptr)!=0 ) {
-//      return(1);
+   } else if (modf((double)year/4.0, &nptr)==0 && modf(year/100.0, &nptr)!=0 ) {
+      return(1);
 
 /*
 **  century years are not leap years unless divisible by 400
 */
-//   } else if (modf((double)year/400.0, &nptr)!=0 ) {
-//      return(0);
+   } else if (modf((double)year/400.0, &nptr)!=0 ) {
+      return(0);
 
 /*
 **  all that's left are century years divisible by 400 which
 **         are also leap years
 */
-//   } else {
-//      return(1);
-//   }
-//}
+   } else {
+      return(1);
+   }
+}

@@ -35,7 +35,7 @@
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-void dattim_ (char *dwhen, ftnlen *timearray, ftnlen dwhenlen) {
+void dattim_ (char *dwhen, ftnint *timearray, ftnlen dwhenlen) {
 
 //  char *when;
   char when[80];
@@ -140,7 +140,7 @@ double nowjt_ () {
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-ftnlen julian_ (char *jwhen, char *jtype, ftnlen jwhenlen, ftnlen jtypelen) {
+long julian_ (char *jwhen, char *jtype, ftnlen jwhenlen, ftnlen jtypelen) {
 
 //  char *when, *type;
   char when[80], type[80];
@@ -168,7 +168,7 @@ ftnlen julian_ (char *jwhen, char *jtype, ftnlen jwhenlen, ftnlen jtypelen) {
 
   retval = julian(when, type);
 
-  return (ftnlen)retval;
+  return retval;
 
 }
 
@@ -293,7 +293,7 @@ double deltim (void) {
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-ftnlen getstep_ (void) {
+long getstep_ (void) {
   return getstep();
 }
 
@@ -329,28 +329,28 @@ long getstep (void) {
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-//double djulian_ (char *jwhen, char *jtype, ftnlen jwhenlen, ftnlen jtypelen) {
+double djulian_ (char *jwhen, char *jtype, ftnlen jwhenlen, ftnlen jtypelen) {
 
-//  char *when, *type;
-//  double retval;
+  char *when, *type;
+  double retval;
 
   /*
    * copy strings and terminate
    */
 
-/*  when = (char *) umalloc(jwhenlen + 1);
+  when = (char *) umalloc(jwhenlen + 1);
   strncpy(when, jwhen, jwhenlen);
   when[jwhenlen] = '\0';
 
   type = (char *) umalloc(jtypelen + 1);
   strncpy(type, jtype, jtypelen);
-  type[jtypelen] = '\0'; */
+  type[jtypelen] = '\0';
 
   /*
    * call C version of djulian()
    */
 
-//  retval = djulian(when, type);
+  retval = djulian(when, type);
 
   /*
    * free up arrays
@@ -359,9 +359,9 @@ long getstep (void) {
 //ufree(when);
 //ufree(type);
 
-//  return retval;
+  return retval;
 
-//}
+}
 
 /**************************************************************************
  * julian() is called from C
@@ -374,15 +374,15 @@ long getstep (void) {
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-//double djulian (char *when, char *type) {
+double djulian (char *when, char *type) {
 
-//  DATETIME *time, reftime;
+  DATETIME *time, reftime;
 
   /*
    * set time according to when argument
    */
 
-/*  if (!strcmp(when, "start"))
+  if (!strcmp(when, "start"))
     time = Mstrttime;
   else if(!strcmp(when, "end"))
     time = Mendtime;
@@ -392,13 +392,13 @@ long getstep (void) {
     (void)fprintf(stderr,
 	    "ERROR - julian - illegal argument '%s'.\n", when);
     exit(1);
-  } */
+  }
 
   /*
    * set reftime depending on type arg
    */
 
-/*  if (!strcmp(type, "calendar")) {
+  if (!strcmp(type, "calendar")) {
     reftime.year = time->year - 1;
     reftime.month = 12;
     reftime.day = 31;
@@ -427,29 +427,29 @@ long getstep (void) {
 
   reftime.hour = 0;
   reftime.min = 0;
-  reftime.sec = 0; */
+  reftime.sec = 0;
 
   /*
    * compute the julian dates
    */
 
-/*  julday(time);
+  julday(time);
   julday(&reftime);
 
   return (time->jt - reftime.jt);
 
-} */
+}
 
 /**************************************************************************
  * delnex_() is called from Fortran, delnex()
  */
 
-/* double delnex_(void) {
+double delnex_(void) {
 
 /* printf ("from deltim:  %f\n", deltim()); */
-//  return delnex();
+  return delnex();
 
-//}
+}
 
 /**************************************************************************
  * delnex() is called from C
@@ -461,7 +461,7 @@ long getstep (void) {
  | RETURN VALUE : 
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-//double delnex (void) {
-//  return (double) Mdeltanext * 24.0;
-//}
+double delnex (void) {
+  return (double) Mdeltanext * 24.0;
+}
 

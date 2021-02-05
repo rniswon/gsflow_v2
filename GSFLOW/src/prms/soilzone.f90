@@ -15,17 +15,17 @@
 !***********************************************************************
       MODULE PRMS_SOILZONE
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ERROR_dim, ACTIVE, OFF, DEBUG_WB, NEARZERO, &
-     &    LAND, LAKE, SWALE, INACTIVE, GLACIER, BARESOIL, DEBUG_less, MONTHS_PER_YEAR, &
-     &    ERROR_soilzone, SAND, CLAY, LOAM, CASCADE_OFF, ERROR_param, PRMS_AG, GSFLOW_AG
+     &    LAND, LAKE, SWALE, INACTIVE, GLACIER, BARESOIL, DEBUG_less, PRMS_AG, GSFLOW_AG, &
+     &    ERROR_soilzone, SAND, CLAY, LOAM, CASCADE_OFF, ERROR_param, MONTHS_PER_YEAR
       USE PRMS_MODULE, ONLY: Model, Nhru, Nssr, Nsegment, Nlake, Nhrucell, Print_debug, Dprst_flag, &
      &    Init_vars_from_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag, &
-     &    Kkiter, Frozen_flag, Soilzone_add_water_use, Ag_package_active, &
-     &    Call_cascade, PRMS_land_iteration_flag, Agriculture_flag
+     &    Kkiter, Frozen_flag, Soilzone_add_water_use, Call_cascade, PRMS_land_iteration_flag, &
+     &    Ag_package_active, Agriculture_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-02-04'
+      character(len=*), parameter :: Version_soilzone = '2021-02-05'
       INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -555,7 +555,7 @@
       IF ( Print_debug==7 ) CALL PRMS_open_module_file(DBGUNT, 'soilzone.dbg')
 
 ! Declare Parameters
-      IF ( Nlake>0 .OR. Model==DOCUMENTATION ) THEN
+      IF ( Nlake>0 ) THEN
         ALLOCATE ( Lake_evap_adj(MONTHS_PER_YEAR,Nlake) )
         IF ( declparam(MODNAME, 'lake_evap_adj', 'nmonths,nlake', 'real', &
      &       '1.0', '0.5', '1.5', &
@@ -757,8 +757,8 @@
 !***********************************************************************
       INTEGER FUNCTION szinit()
       USE PRMS_SOILZONE
-      USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Ag_area, Ag_frac, &
-     &    Basin_area_inv, Hru_area, Hru_frac_perv, Numlake_hrus, Active_hrus, Hru_route_order
+      USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Active_hrus, Hru_route_order, &
+     &    Basin_area_inv, Hru_area, Hru_frac_perv, Numlake_hrus, Ag_area, Ag_frac
       USE PRMS_FLOWVARS, ONLY: Soil_moist_max, Soil_rechr_max, &
      &    Ssres_stor, Basin_ssstor, Basin_soil_moist, Slow_stor, &
      &    Soil_moist, Sat_threshold, Soil_rechr, &
@@ -1073,7 +1073,6 @@
 !             and groundwater reservoirs
 !***********************************************************************
       INTEGER FUNCTION szrun()
-      USE PRMS_MODULE, ONLY: Ag_package_active
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Hru_frac_perv, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -1111,8 +1110,8 @@
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
       REAL :: ag_upflow_max, ag_capacity, excess, agfrac, ag_soil2gw, ag_soil2gvr, ag_avail_potet, ag_potet
       DOUBLE PRECISION :: gwin
-      INTEGER :: cfgi_frozen_hru, ag_on_flag, keep_iterating, add_estimated_irrigation
-      INTEGER :: num_hrus_ag_iter
+      INTEGER :: cfgi_frozen_hru
+      INTEGER :: num_hrus_ag_iter, ag_on_flag, keep_iterating, add_estimated_irrigation
 !***********************************************************************
       szrun = 0
 
@@ -1274,6 +1273,7 @@
 
         avail_potet = Potet(i) - Hru_actet(i)
         IF ( avail_potet<0.0 ) avail_potet = 0.0
+!        Snowevap_aet_frac(i) = 0.0
 
         !Hru_type can be 1 (land) or 3 (swale) or 4 (glacier)
 
@@ -1437,7 +1437,8 @@
      &                          Slowcoef_sq(i), Ssr2gw_rate(i), Ssr2gw_exp(i), &
      &                          gvr_maxin, Pref_flow_thrsh(i), topfr, &
      &                          Ssr_to_gw(i), Slow_flow(i), Slow_stor(i), &
-     &                          Gvr2sm(i), Soil_to_gw(i), gwin, compute_lateral, ag_capacity, ag_on_flag)
+     &                          Gvr2sm(i), Soil_to_gw(i), gwin, compute_lateral, &
+     &                          ag_capacity, ag_on_flag)
           ! adjust soil moisture with replenish amount
           IF ( Gvr2sm(i)>0.0 ) THEN
             Soil_moist(i) = Soil_moist(i) + Gvr2sm(i)/perv_frac ! ??? could this be bigger than soil_moist_max ??? (add to Dunnian)

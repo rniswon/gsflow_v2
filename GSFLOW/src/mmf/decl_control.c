@@ -171,23 +171,23 @@ void decl_control_double_array (char *key, long size, double *valstr) {
  | RETURN VALUE :
  | RESTRICTIONS :
 \*--------------------------------------------------------------------*/
-//void decl_control_ (char *ckey, ftnlen *ctype, ftnlen *csize, void *value, ftnlen klen) {
-//	char *key;
-//	long type, size;
+void decl_control_ (char *ckey, ftnint *ctype, ftnint *csize, void *value, ftnlen klen) {
+	char *key;
+	long type, size;
 
   /*
    * copy ctype and csize to local long int
    */
-//	type = *ctype;
-//	size = *csize;
+	type = *ctype;
+	size = *csize;
 
   /*
    * copy args to new strings, and terminate correctly
    */
-/*	key = (char *) umalloc((unsigned ftnlen)(klen + 1));
-	strncpy(key, ckey, (ftnlen)klen);
+	key = (char *) umalloc((unsigned int)(klen + 1));
+	strncpy(key, ckey, (int)klen);
 	key[klen] = '\0';
 
 	decl_control(key, type, size, value);
 	return;
-} */
+}

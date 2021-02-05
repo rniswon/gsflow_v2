@@ -62,7 +62,7 @@ int main (int argc, char *argv[]) {
 
 	/*
 	**  List of modules that are used by the model. This is
-	**  determined by calls to declmodule //rsr declmodule no longer exists
+	**  determined by calls to declmodule
 	*/
 	module_db = ALLOC_list ("Module Data Base", 0, 100);
 

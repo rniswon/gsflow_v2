@@ -1116,7 +1116,8 @@
       SUBROUTINE perv_comp(Pptp, Ptc, Infil, Srp)
       USE PRMS_CONSTANTS, ONLY: smidx_module !, CLOSEZERO
       USE PRMS_MODULE, ONLY: Sroff_flag
-      USE PRMS_SRUNOFF, ONLY: Ihru, Smidx_coef, Smidx_exp, Carea_max, Carea_min, Carea_dif, Contrib_fraction
+      USE PRMS_SRUNOFF, ONLY: Ihru, Smidx_coef, Smidx_exp, &
+     &    Carea_max, Carea_min, Carea_dif, Contrib_fraction
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Soil_rechr_max
       IMPLICIT NONE
 ! Arguments
