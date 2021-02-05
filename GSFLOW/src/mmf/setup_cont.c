@@ -440,7 +440,7 @@ void setup_cont (void) {
 		decl_control_int_array("nhruOutNcol", 1, lval);
 
         lval = (long*)umalloc(sizeof(long));
-		lval[0] = 1;
+		lval[0] = 0;
 		decl_control_int_array("prms_warmup", 1, lval);
 
 

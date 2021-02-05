@@ -136,12 +136,33 @@ long control_string_array_ (char *retval, char *tag, int *index, ftnlen len, ftn
 \*--------------------------------------------------------------------*/
 long control_integer_ (int *retval, char *key, ftnlen len) {
 	char *foo;
+	long *longs, intVal;
 
 	foo = (char *) umalloc(len + 1);
 	strncpy(foo, key, len);
 	foo[len] = '\0';
 
-	*retval = *control_var(foo);
+	longs = (long *) control_var(foo);
+	intVal = *(longs);
+	*retval = (int)intVal;
+	return 0;
+}
+
+/*--------------------------------------------------------------------*\
+ | FUNCTION     : control_real_
+ | COMMENT		: returns a float variable value
+ | PARAMETERS   :
+ | RETURN VALUE :
+ | RESTRICTIONS :
+\*--------------------------------------------------------------------*/
+long control_real_(float* retval, char* key, ftnlen len) {
+	char* foo;
+
+	foo = (char*)umalloc(len + 1);
+	strncpy(foo, key, len);
+	foo[len] = '\0';
+
+	*retval = *control_fvar(foo);
 	return 0;
 }
 
