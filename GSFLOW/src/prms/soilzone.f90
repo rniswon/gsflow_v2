@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-02-05'
+      character(len=*), parameter :: Version_soilzone = '2021-02-08'
       INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -833,10 +833,12 @@
         Ag_soil_lower_stor_max = 0.0
         Ag_potet_lower = 0.0
         Ag_potet_rechr = 0.0
-        IF ( Agriculture_flag>0 ) Ag_gvr2sm = 0.0
         Basin_ag_soil_moist = 0.0D0
         Basin_ag_soil_rechr = 0.0D0
-        IF ( GSFLOW_flag==ACTIVE ) Ag_replenish_frac = 0.0
+        IF ( GSFLOW_flag==ACTIVE ) THEN
+          Ag_replenish_frac = 0.0
+          Ag_gvr2sm = 0.0
+        ENDIF
         DO ihru = 1, Nhru
           ! make sure LAKE, INACTIVE, GLACIER have agriculture values of 0
           IF ( Hru_type(ihru)==LAKE .OR. Hru_type(ihru)==INACTIVE .OR. Hru_type(ihru)==GLACIER ) Ag_area(ihru) = 0.0
