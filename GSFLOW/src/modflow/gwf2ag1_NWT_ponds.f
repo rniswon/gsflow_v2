@@ -3012,11 +3012,12 @@
       DOUBLE PRECISION :: factor, area, aet, pet, uzet
       double precision :: zerod7, done, dzero, pettotal,
      +                    aettotal, prms_inch2mf_q,
-     +                    aetold, supold, sup !, etdif
+     +                    aetold, supold, sup, etdif
 !      real :: fmaxflow, etdif
       integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
       double precision :: set_factor !, area_mf
+      INTRINSIC :: ABS
 ! --------------------------------------------------
 !
       zerod7 = 1.0d-7
@@ -3053,10 +3054,14 @@
         end do
         ! convert PRMS ET deficit to MODFLOW flow
         aetold = AETITERSW(ISEG)
+        etdif = abs(aettotal - aetold)
         sup = DVRSFLW(iseg) + ACTUAL(ISEG)
         supold = SUPACTOLD(ISEG) + ACTUALOLD(ISEG)
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
      +           supold, kper, kstp, kiter)
+        if ( kiter > 2 ) then
+          if ( etdif < zerod7*aettotal ) factor = dzero
+        end if
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
@@ -3075,12 +3080,12 @@
 !        If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
 !        IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
-  !      if(iseg==18)then
-  !    etdif = pettotal - aettotal
-  !        write(999,33)kper,kstp,kiter,SEG(2, iseg),fmaxflow,
-  !   +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
-  !      endif
-  !33  format(3i5,7e20.10)
+        if(iseg==19.and.kper==10.and.kstp==20)then
+!      etdif = pettotal - aettotal
+          write(999,33)kper,kstp,kiter,SEG(2, iseg),
+     +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
+        endif
+  33  format(3i5,6e20.10)
 300   continue
       return
       end subroutine demandconjunctive_prms

@@ -682,7 +682,8 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             ELSEIF ( iss==0 ) THEN
               IF ( KKITER==Mxsziter+1 ) Stopcount = Stopcount + 1
             ENDIF
-
+            IF(IUNIT(66).GT.0 ) 
+     1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63))
             IF(IUNIT(55).GT.0) CALL GWF2UZF1FM(KKPER,KKSTP,KKITER,
      1                           IUNIT(44),IUNIT(22),IUNIT(63),
      2                           IUNIT(64),IGRID)  !SWR - JDH ADDED IUNIT(64)
@@ -710,8 +711,6 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
      1                                         IUNIT(9),IGRID)
             IF(IUNIT(57).GT.0) CALL GWF2SWT7FM(KKPER,IGRID)
             IF(IUNIT(64).GT.0) CALL GWF2SWR7FM(KKITER,KKPER,KKSTP,IGRID)  !SWR - JDH
-            IF(IUNIT(66).GT.0 ) 
-     1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63))
 !            IF(IUNIT(67).GT.0) CALL GWF2GFB7FM(IGRID)
 C-------------SWI2 FORMULATE (GWF2SWI2FM) NEEDS TO BE THE LAST PACKAGE
 C             ENTRY SINCE SWI2 SAVES THE RHS (RHSFRESH) PRIOR TO ADDING SWI TERMS
