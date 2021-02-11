@@ -7,13 +7,13 @@
 !     gvr_hru_id, gvr_cell_id
 !     ******************************************************************
       INTEGER FUNCTION gsflow_mf2prms()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, RUN, DECL
       USE GSFMODFLOW, ONLY: Mfq2inch_conv, Gwc_col, Gwc_row, &
                             Mfl2_to_acre, Mfl_to_inch, Hru_ag_irr
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Gw2sm_grav
       USE PRMS_WATER_USE, ONLY: Dprst_gain
       USE GWFUZFMODULE, ONLY: SEEPOUT
-      USE PRMS_MODULE, ONLY: Process, Nhrucell, Gvr_cell_id, Ag_package_active
+      USE PRMS_MODULE, ONLY: Process_flag, Nhrucell, Gvr_cell_id, Ag_package_active
       USE GWFBASMODULE, ONLY: DELT
       USE GSFMODFLOW, ONLY: Mfl3_to_ft3, Mft_to_sec
       USE GWFAGMODULE, ONLY: NUMIRRWELSP, IRRWELVAR, NUMCELLS, WELLIRRPRMS, IRRROW_SW, &
@@ -34,7 +34,7 @@
 !***********************************************************************
       gsflow_mf2prms = 0
 
-      IF ( Process(:3)=='run' ) THEN
+      IF ( Process_flag==RUN ) THEN
         DO i = 1, Nhrucell
           IF ( Hrucheck(Gvr_hru_id(i))==1 ) &
      &         Gw2sm_grav(i) = SEEPOUT(Gwc_col(Gvr_cell_id(i)), Gwc_row(Gvr_cell_id(i)))*Mfq2inch_conv(i)
@@ -82,7 +82,7 @@
           END DO
         END IF
 
-      ELSEIF ( Process(:4)=='decl' ) THEN
+      ELSEIF ( Process_flag==DECL ) THEN
         CALL print_module(MODDESC, MODNAME, Version_gsflow_mf2prms)
       ENDIF
 
