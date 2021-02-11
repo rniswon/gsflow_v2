@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.0 01/20/2021
+                       Version 5.3.0 01/28/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,10 +36,10 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-01-20
+PRMS Computation Order          gsflow_prms         2021-01-28
 Basin Definition                basin               2020-12-22
 Cascading Flow                  cascade             2020-12-02
-Common States and Fluxes        climateflow         2021-01-11
+Common States and Fluxes        climateflow         2021-02-05
 Potential Solar Radiation       soltab              2020-12-02
 Timestep Control                prms_time           2020-12-02
 Time Series Data                obs                 2020-12-02
@@ -48,10 +48,10 @@ Precipitation Distribution      precip_1sta         2020-12-02
 Solar Radiation Distribution    ddsolrad            2020-12-02
 Transpiration Distribution      transp_tindex       2020-12-02
 Potential Evapotranspiration    potet_jh            2020-08-03
-Canopy Interception             intcp               2020-12-22
+Canopy Interception             intcp               2020-12-03
 Snow Dynamics                   snowcomp            2021-01-11
-Surface Runoff                  srunoff_smidx       2021-01-11
-Soilzone Computations           soilzone            2021-01-20
+Surface Runoff                  srunoff_smidx       2021-02-03
+Soilzone Computations           soilzone            2021-02-05
 Groundwater                     gwflow              2020-12-02
 Streamflow Routing Init         routing             2020-12-02
 Streamflow Routing              strmflow_in_out     2020-08-03
@@ -99,5 +99,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  *************************************************************
  Total for run     668.938  378.199    9.262  284.576  260.348
  *************************************************************
-Execution elapsed time    0 minutes  1.41 seconds
+Execution elapsed time    0 minutes  3.51 seconds
 

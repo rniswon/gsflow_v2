@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.0 01/20/2021
+                       Version 5.3.0 01/28/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,9 +36,9 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-01-20
+PRMS Computation Order          gsflow_prms         2021-01-28
 Basin Definition                basin               2020-12-22
-Common States and Fluxes        climateflow         2021-01-11
+Common States and Fluxes        climateflow         2021-02-05
 Potential Solar Radiation       soltab              2020-12-02
 Timestep Control                prms_time           2020-12-02
 Time Series Data                obs                 2020-12-02
@@ -48,10 +48,10 @@ Precipitation Distribution      climate_hru         2021-01-08
 Solar Radiation Distribution    climate_hru         2021-01-08
 Potential Evapotranspiration    climate_hru         2021-01-08
 Transpiration Distribution      transp_tindex       2020-12-02
-Canopy Interception             intcp               2020-12-22
+Canopy Interception             intcp               2020-12-03
 Snow Dynamics                   snowcomp            2021-01-11
-Surface Runoff                  srunoff_smidx       2021-01-11
-Soilzone Computations           soilzone            2021-01-20
+Surface Runoff                  srunoff_smidx       2021-02-03
+Soilzone Computations           soilzone            2021-02-05
 Groundwater                     gwflow              2020-12-02
 Streamflow Routing Init         routing             2020-12-02
 Streamflow Routing              muskingum           2020-12-02
@@ -80,8 +80,8 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
                   (inches) (inches) (inches) (inches) (inches)
  -------------------------------------------------------------
  initial                              31.824
-   1980             50.492   20.572   14.836   46.909   -8.693
-   1981             36.476   24.842    6.166   20.304   -6.454
+   1980             50.492   20.614   14.833   46.869   -8.693
+   1981             36.476   24.842    6.166   20.301   -6.454
    1982             53.278   23.751    8.130   27.564    1.270
    1983             58.857   24.024    8.746   34.217    2.090
    1984             68.655   24.052    8.958   44.390    2.016
@@ -101,7 +101,7 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
    1998             63.457   18.715    6.481   48.009    1.816
    1999             45.071   20.064    5.762   25.726    1.094
  *************************************************************
- Total for run    1110.775  440.179    8.439  693.981   13.445
+ Total for run    1110.775  440.221    8.439  693.939   13.445
  *************************************************************
-Execution elapsed time    0 minutes  1.03 seconds
+Execution elapsed time    0 minutes  3.08 seconds
 
