@@ -34,18 +34,19 @@
 !           Produces cell_drain in MODFLOW units.
 !     ******************************************************************
       INTEGER FUNCTION gsflow_prms2mf()
-      USE PRMS_MODULE, ONLY: Process
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT
+      USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: prms2mfdecl, prms2mfinit, prms2mfrun
 !***********************************************************************
       gsflow_prms2mf = 0
 
-      IF ( Process(:3)=='run' ) THEN
+      IF ( Process_flag==RUN ) THEN
         gsflow_prms2mf = prms2mfrun()
-      ELSEIF ( Process(:4)=='decl' ) THEN
+      ELSEIF ( Process_flag==DECL ) THEN
         gsflow_prms2mf = prms2mfdecl()
-      ELSEIF ( Process(:4)=='init' ) THEN
+      ELSEIF ( Process_flag==INIT ) THEN
         gsflow_prms2mf = prms2mfinit()
       ENDIF
 
@@ -139,7 +140,7 @@
      &       '0.0', '0.0', '1.0', &
      &       'Proportion of the HRU associated with each GVR', &
      &       'Proportion of the HRU area associated with each gravity reservoir', &
-     &       'decimal fraction').NE.0 ) RETURN
+     &       'decimal fraction')/=0 ) RETURN
       ENDIF
 
       END FUNCTION prms2mfdecl

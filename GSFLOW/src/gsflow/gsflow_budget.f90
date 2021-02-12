@@ -24,8 +24,8 @@
 !     Budget module to convert PRMS & MODFLOW states for use by GSFLOW
 !     ******************************************************************
       INTEGER FUNCTION gsflow_budget()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, SAVE_INIT, READ_INIT
-      USE PRMS_MODULE, ONLY: Process, Save_vars_to_file, Init_vars_from_file
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, SAVE_INIT, READ_INIT, RUN, DECL, INIT, CLEAN
+      USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: gsfbuddecl, gsfbudinit, gsfbudrun
@@ -33,14 +33,14 @@
 !***********************************************************************
       gsflow_budget = 0
 
-      IF ( Process(:3)=='run' ) THEN
+      IF ( Process_flag==RUN ) THEN
         gsflow_budget = gsfbudrun()
-      ELSEIF ( Process(:4)=='decl' ) THEN
+      ELSEIF ( Process_flag==DECL ) THEN
         gsflow_budget = gsfbuddecl()
-      ELSEIF ( Process(:4)=='init' ) THEN
+      ELSEIF ( Process_flag==INIT ) THEN
         IF ( Init_vars_from_file>OFF ) CALL gsflow_budget_restart(READ_INIT)
         gsflow_budget = gsfbudinit()
-      ELSEIF ( Process(:5)=='clean' ) THEN
+      ELSEIF ( Process_flag==CLEAN ) THEN
         IF ( Save_vars_to_file==ACTIVE ) CALL gsflow_budget_restart(SAVE_INIT)
       ENDIF
 
@@ -700,9 +700,9 @@
       USE GWFSFRMODULE, ONLY: STRM, IOTSG, NSS, SGOTFLW, SFRRATOUT, &
      &    TOTSPFLOW, NSTRM, SFRRATIN, ISTRM
       USE PRMS_FLOWVARS, ONLY: Basin_cfs, Basin_cms, Basin_stflow_out
-      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
+      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV, ACTIVE
+      USE PRMS_MODULE, ONLY: Ag_package_active
       USE PRMS_SET_TIME, ONLY: Cfs2inches
-      USE GLOBAL, ONLY : IUNIT
       USE GWFAGMODULE, ONLY:  NUMIRRDIVERSIONSP,IRRSEG
       IMPLICIT NONE
       INTRINSIC :: SNGL
@@ -725,7 +725,7 @@
       first_reach = 1
       DO i = 1, NSS
         itemp = 0
-        IF ( IUNIT(66) > 0 ) THEN
+        IF ( Ag_package_active==ACTIVE ) THEN
           DO j = 1, NUMIRRDIVERSIONSP
             IF ( i == IRRSEG(J) ) itemp = IRRSEG(J)
           END DO

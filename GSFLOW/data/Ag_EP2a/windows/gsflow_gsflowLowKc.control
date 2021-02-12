@@ -73,7 +73,7 @@ param_file
 ..\input\prms\sagehen_grid_v5_LowKc.params
 ..\input\prms\sagehen_grid_constant.params
 ..\input\prms\sagehen_grid_fixed.params
-..\input\prms\cascade.params
+..\input\prms\cascade.param
 ..\input\prms\sagehen_grid_gsflow.params
 ####
 modflow_name

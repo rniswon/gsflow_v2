@@ -100,7 +100,7 @@
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, write_climate_hru
       INTEGER, EXTERNAL :: strmflow_in_out, muskingum, muskingum_lake, numchars
       INTEGER, EXTERNAL :: water_use_read, dynamic_param_read, potet_pm_sta
-      INTEGER, EXTERNAL :: stream_temp, glacr
+      INTEGER, EXTERNAL :: stream_temp
       EXTERNAL :: module_error, print_module, PRMS_open_output_file, precip_map, temp_map
       EXTERNAL :: call_modules_restart, water_balance, basin_summary, nsegment_summary, PRMS_land_modules
       EXTERNAL :: prms_summary, nhru_summary, module_doc, convert_params, read_error, nsub_summary, error_stop
@@ -198,7 +198,6 @@
      &         'Corresponding grid cell id associated with each GVR', &
      &         'Index of the grid cell associated with each gravity reservoir', &
      &         'none')/=0 ) CALL read_error(1, 'gvr_cell_id')
-            ! Allocate variable for adding irrigation water to HRU from AG Package, always declare for now
         ENDIF
 
         Timestep = 0
@@ -1490,7 +1489,7 @@
       ENDIF
       IF ( ierr==1 ) ERROR STOP ERROR_control
 
-    END SUBROUTINE check_module_names
+      END SUBROUTINE check_module_names
 
 !***********************************************************************
 !     Call PRMS land modules intcp, snowcomp, glacr, srunoff
