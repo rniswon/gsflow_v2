@@ -963,6 +963,7 @@
       USE GLOBAL, ONLY: IOUT, NCOL, NROW, NLAY, IFREFM
       USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS
+      USE PRMS_MODULE, ONLY: Nhru
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS:
@@ -1070,16 +1071,35 @@
      +                           IOUT, IN)
                      CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
      +                           QPOND, IOUT,IN)
-                     POND(1,L) = IPOND
-                     POND(2,L) = QPOND
+                     CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ISEG, R,
+     +                           IOUT, IN)
+                     POND(1,L) = IPOND   !check that this is less than NRHU
+                     POND(2,L) = QPOND   
+                     POND(3,L) = ISEG    !check that this is less than NSEG
                      IF (POND(2, L) < 0.0) THEN
                         WRITE (IOUT, *)
-                        WRITE (IOUT, *) 'ERROR: MAX AG POND DIVERSION '
+                        WRITE (IOUT, *) 'ERROR: MAX AG POND IRRIGATION '
      +                        ,'IN LIST',
      +                        ' IS NEGATIVE AND SHOULD BE POSITIVE.',
-     +                        ' MODEL STOPPING'
+     +                        ' MODEL STOPPING.'
                         WRITE (IOUT, *)
-                  CALL USTOP('ERROR: MAX AG DIVERSION RATE IS NEGATIVE')
+                CALL USTOP('ERROR: MAX AG IRRIGATION RATE IS NEGATIVE')
+                     END IF
+                     IF (POND(1,L) > Nhru) THEN
+                        WRITE (IOUT, *)
+                        WRITE (IOUT, *) 'ERROR: HRUID for Pond > NHRU ',
+     +                        ' Check HRU ID set for Pond.',
+     +                        ' MODEL STOPPING.'
+                        WRITE (IOUT, *)
+                        CALL USTOP('ERROR: HRUID for Pond > NHRU')
+                     END IF
+                     IF (POND(3,L) > NSEG) THEN
+                        WRITE (IOUT, *)
+                        WRITE (IOUT, *) 'ERROR: SEGID for Pond > NSEG.',
+     +                        ' Check SEGID set for Pond.',
+     +                        ' MODEL STOPPING.'
+                        WRITE (IOUT, *)
+                        CALL USTOP('ERROR: SEGID for Pond > NSEG')
                      END IF
                   END DO
                ELSE
@@ -1087,7 +1107,7 @@
                   MATCH = 0
                   DO J = 1, MXPOND    
                      READ (IN, *) TABUNITPOND(J), TABVALPOND(J), 
-     +                            TABPONDHRU(J)
+     +                            TABPONDHRU(J), IRRPONDSEG(J)
                      DO I = 1, J - 1
                         IF (TABUNITPOND(I) == TABUNITPOND(J)) THEN
                            MATCH = 1
@@ -1491,8 +1511,14 @@
             END DO
           END IF
       END IF
+      !
+      !4 - -----ADD SFR DIVERSION FLOWS TO PONDS
+!      CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRSG, R, IOUT, IN)
+!         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, i, SGFC, IOUT, In)
+!         IRRPONDSEG(J) = IRSG
+!         PONDSEGFRAC(J) = SGFC
 !
-!4 - -----SET MAXIMUM POND DIVERSION RATES WHEN TABFILES ARE USED
+!5 - -----SET MAXIMUM POND DIVERSION RATES WHEN TABFILES ARE USED
       DO L = 1, NWELLS
          IF (NUMTABWELL > 0) THEN
             WELL(1, L) = TABLAYWELL(L)
@@ -1504,7 +1530,7 @@
          END IF
       END DO
 !
-!5 - -----RESET SAVED AET FROM LAST ITERATION
+!6 - -----RESET SAVED AET FROM LAST ITERATION
       DIVERSIONIRRUZF = 0.0
       DIVERSIONIRRPRMS = 0.0
       WELLIRRUZF = 0.0
@@ -1787,8 +1813,6 @@
          CALL URDCOM(IN, IOUT, LINE)
          LLOC = 1
          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRWL, R, IOUT, IN)
-         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRSG, R, IOUT, IN)
-         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, i, SGFC, IOUT, In)
          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, NMCL, R, IOUT, IN)
          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, i, IPRW, IOUT, In)
          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, i, TRPW, IOUT, In)
@@ -1799,8 +1823,6 @@
      +                 'PONDS')
          END IF
          IRRPONDVAR(J) = IRWL
-         IRRPONDSEG(J) = IRSG
-         PONDSEGFRAC(J) = SGFC
          NUMCELLSPOND(J) = NMCL
          IRRPERIODPOND(J) = IPRW
          TRIGGERPERIODPOND(J) = TRPW 
@@ -2422,22 +2444,20 @@
       !
       !  - -----SET MAX POND IRRIGATION RATE.
       !
-      DO L = 1, MXPOND
-         PONDID = POND(1, L)
-         Q = POND(2, L)
-         DO 33 icount = 1, NUMIRRPONDSP
-           IF ( IRRPONDVAR(icount) == PONDID ) THEN
-                  IF ( PONDFLOW(icount) > Q ) PONDFLOW(icount) = Q
-             EXIT       
-           END IF
-33       END DO
+      DO icount = 1, NUMIRRPONDSP
+        DO 33 L = 1, MXPOND
+          PONDID = POND(1, L)
+          Q = POND(2, L)        
+          IF ( IRRPONDVAR(icount) == PONDID ) THEN
+            IF ( PONDFLOW(icount) > Q ) PONDFLOW(icount) = Q
+            EXIT       
+          END IF
+33      END DO
       END DO
       !
       ! divide pond water into irrigated HRUs
       ! divide segment diversion into pond inflows
       DO icount = 1, NUMIRRPONDSP
-        istsg = IRRPONDSEG(icount)
-        PONDSEGFLOW(icount) = PONDSEGFRAC(icount)*SGOTFLW(istsg)
         K = NUMCELLSPOND(icount)
         SUBVOL = PONDFLOW(icount)
         DO L = 1, K
@@ -2963,10 +2983,14 @@
            aettotal = aettotal + aet
         end do
         aetold = AETITERSW(ISEG)
+        etdif = abs(aettotal - aetold)
         sup = DVRSFLW(iseg) + ACTUAL(ISEG)
         supold = SUPACTOLD(ISEG) + ACTUALOLD(ISEG)
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
      +           supold, kper, kstp, kiter)
+        if ( kiter > 2 ) then
+          if ( etdif < zerod7*aettotal ) factor = dzero
+        end if
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
@@ -2977,11 +3001,12 @@
         !
         !1 - -----limit diversion to water right and flow in river
         !
-!        k = IDIVAR(1, ISEG)
-!        fmaxflow = STRM(9, LASTREACH(K))
-!        fmaxflow = demand(ISEG)
-!        If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
-!        IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
+      if(iseg==9.and.kper==8.and.kstp==1)then
+!      etdif = pettotal - aettotal
+          write(999,33)kper,kstp,kiter,SEG(2, iseg),
+     +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
+        endif
+  33  format(3i5,6e20.10)
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
 300   CONTINUE
       RETURN
