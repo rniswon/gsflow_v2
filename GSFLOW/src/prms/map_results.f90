@@ -371,8 +371,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getvar
-      EXTERNAL :: read_error, write_results
+      EXTERNAL :: write_results, getvar_real, getvar_dble
 ! Local Variables
       INTEGER :: j, i, k, jj, last_day
       DOUBLE PRECISION :: factor, map_var_double
@@ -445,13 +444,9 @@
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NmapOutVars
         IF ( Map_var_type(jj)==REAL_TYPE ) THEN
-          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), &
-     &         Nhru, 'real', Map_var(1, jj))/=0 ) &
-     &         CALL read_error(4, MapOutVar_names(jj)(:Nc_vars(jj)))
+          CALL getvar_real(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var(1, jj))
         ELSEIF ( Map_var_type(jj)==DBLE_TYPE ) THEN
-          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), &
-     &         Nhru, 'double', Map_var_dble(1, jj))/=0 ) &
-     &         CALL read_error(4, MapOutVar_names(jj)(:Nc_vars(jj)))
+          CALL getvar_dble(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var_dble(1, jj))
         ENDIF
       ENDDO
 

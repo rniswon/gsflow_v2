@@ -33,6 +33,9 @@ LIBOBJS = \
         convert_params.o \
         prms_time.o \
         obs.o \
+        read_control_file.o \
+        read_data_file.o \
+        read_parameter_file.o \
         climate_hru.o \
         potet_jh.o \
         potet_pt.o \
@@ -255,6 +258,18 @@ convert_params.o: convert_params.f90 prms_module.mod
 
 glacr_melt.o: glacr_melt.f90 prms_snow.mod prms_intcp.mod prms_soltab.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) glacr_melt.f90
+
+stream_temp.o: stream_temp.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_set_time.mod prms_obs.mod prms_routing.mod prms_soltab.mod prms_snow.mod prms_climate_hru.mod
+	$(FC) -c $(FFLAGS) stream_temp.f90
+
+read_control_file.o: read_control_file.f90 prms_module.mod
+	$(FC) -c $(FFLAGS) read_control_file.f90
+
+read_data_file.o: read_data_file.f90 prms_module.mod
+	$(FC) -c $(FFLAGS) read_data_file.f90
+
+read_parameter_file.o: read_parameter_file.f90 prms_module.mod
+	$(FC) -c $(FFLAGS) read_parameter_file.f90
 
 prms_climatevars.mod: climateflow.o
 prms_flowvars.mod: climateflow.o

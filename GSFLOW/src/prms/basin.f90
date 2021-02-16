@@ -72,8 +72,8 @@
       USE PRMS_BASIN
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar
-      EXTERNAL :: read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL :: read_error, print_module, declvar_real
 !***********************************************************************
       basdecl = 0
 
@@ -82,49 +82,49 @@
 ! Declared Variables
       ALLOCATE ( Hru_elev_ts(Nhru) )
       IF ( Glacier_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-        IF ( declvar(MODNAME, 'hru_elev_ts', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'hru_elev_ts', 'nhru', Nhru, 'real', &
      &       'HRU elevation for timestep, which can change for glaciers', &
-     &       'elev_units', Hru_elev_ts)/=0 ) CALL read_error(3, 'hru_elev_ts')
+     &       'elev_units', Hru_elev_ts)
 
-        IF ( declvar(MODNAME, 'basin_gl_ice_cfs', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_gl_ice_cfs', 'one', 1, 'double', &
      &       'Basin glacier ice (firn) melt leaving the basin through the stream network', &
-     &       'cfs', Basin_gl_ice_cfs)/=0 ) CALL read_error(3, 'basin_gl_ice_cfs')
+     &       'cfs', Basin_gl_ice_cfs)
 
-        IF ( declvar(MODNAME, 'basin_gl_cfs', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_gl_cfs', 'one', 1, 'double', &
      &       'Basin glacier surface melt (rain, snow, ice) leaving the basin through the stream network', &
-     &       'cfs', Basin_gl_cfs)/=0 ) CALL read_error(3, 'basin_gl_cfs')
+     &       'cfs', Basin_gl_cfs)
       ENDIF
 
       ALLOCATE ( Hru_imperv(Nhru) )
-      IF ( declvar(MODNAME, 'hru_imperv', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_imperv', 'nhru', Nhru, 'real', &
      &     'Area of HRU that is impervious', &
-     &     'acres', Hru_imperv)/=0 ) CALL read_error(3, 'hru_imperv')
+     &     'acres', Hru_imperv)
 
       ALLOCATE ( Hru_perv(Nhru) )
-      IF ( declvar(MODNAME, 'hru_perv', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_perv', 'nhru', Nhru, 'real', &
      &     'Area of HRU that is pervious', &
-     &     'acres', Hru_perv)/=0 ) CALL read_error(3, 'hru_perv')
+     &     'acres', Hru_perv)
 
       ALLOCATE ( Hru_frac_perv(Nhru) )
-     ! IF ( declvar(MODNAME, 'hru_frac_perv', 'nhru', Nhru, 'real', &
-     !&     'Fraction of HRU that is pervious', &
-     !&     'decimal fraction', Hru_frac_perv)/=0 ) CALL read_error(3, 'hru_frac_perv')
+      CALL declvar_real(MODNAME, 'hru_frac_perv', 'nhru', Nhru, 'real', &
+     &     'Fraction of HRU that is pervious', &
+     &     'decimal fraction', Hru_frac_perv)
 
       IF ( Dprst_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Dprst_area_max(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_area_max', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_max', 'nhru', Nhru, 'real', &
      &       'Aggregate sum of surface-depression storage areas of each HRU', &
-     &       'acres', Dprst_area_max)/=0 ) CALL read_error(1, 'dprst_area_max')
+     &       'acres', Dprst_area_max)
 
         ALLOCATE ( Dprst_area_open_max(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_area_open_max', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_open_max', 'nhru', Nhru, 'real', &
      &       'Aggregate sum of open surface-depression storage areas of each HRU', &
-     &       'acres', Dprst_area_open_max)/=0 ) CALL read_error(1, 'dprst_area_open_max')
+     &       'acres', Dprst_area_open_max)
 
         ALLOCATE ( Dprst_area_clos_max(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_area_clos_max', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_clos_max', 'nhru', Nhru, 'real', &
      &       'Aggregate sum of closed surface-depression storage areas of each HRU', &
-     &       'acres', Dprst_area_clos_max)/=0 ) CALL read_error(1, 'dprst_area_clos_max')
+     &       'acres', Dprst_area_clos_max)
 
         ALLOCATE ( Dprst_frac(Nhru) )
         IF ( PRMS4_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
@@ -204,9 +204,9 @@
 
       IF ( Agriculture_flag>OFF .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Ag_area(Nhru) )
-        IF ( declvar(MODNAME, 'ag_area', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'ag_area', 'nhru', Nhru, 'real', &
      &       'Area of HRU that is used for agriculture', &
-     &       'acres', Ag_area)/=0 ) CALL read_error(3, 'ag_area')
+     &       'acres', Ag_area)
 
         ALLOCATE ( Ag_frac(Nhru) )
         IF ( declparam(MODNAME, 'ag_frac', 'nhru', 'real', &

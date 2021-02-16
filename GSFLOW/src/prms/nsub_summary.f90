@@ -289,8 +289,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: SNGL, DBLE
-      INTEGER, EXTERNAL :: getvar
-      EXTERNAL :: read_error
+      EXTERNAL :: read_error, getvar_real, getvar_dble
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day, k
 !***********************************************************************
@@ -307,19 +306,15 @@
       DO jj = 1, NsubOutVars
         IF ( Nsub_var_type(jj)==REAL_TYPE ) THEN
           IF ( Nsub_var_size(jj)==Nhru ) THEN
-            IF ( getvar(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'real', Nhru_var_daily(1, jj))/=0 ) &
-     &           CALL read_error(4, NsubOutVar_names(jj)(:Nc_vars(jj)))
+            CALL getvar_real(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'real', Nhru_var_daily(1, jj))
           ELSE
-            IF ( getvar(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub, 'real', Nsub_var_single(1, jj))/=0 ) &
-     &           CALL read_error(4, NsubOutVar_names(jj)(:Nc_vars(jj)))
+            CALL getvar_real(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub, 'real', Nsub_var_single(1, jj))
           ENDIF
         ELSEIF ( Nsub_var_type(jj)==DBLE_TYPE ) THEN
           IF ( Nsub_var_size(jj)==Nhru ) THEN
-            IF ( getvar(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'double', Nhru_var_dble(1, jj))/=0 ) &
-     &           CALL read_error(4, NsubOutVar_names(jj)(:Nc_vars(jj)))
+            CALL getvar_dble(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'double', Nhru_var_dble(1, jj))
           ELSE
-            IF ( getvar(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub, 'double', Nsub_var_dble(1, jj))/=0 ) &
-     &           CALL read_error(4, NsubOutVar_names(jj)(:Nc_vars(jj)))
+            CALL getvar_dble(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub, 'double', Nsub_var_dble(1, jj))
           ENDIF
         ENDIF
       ENDDO

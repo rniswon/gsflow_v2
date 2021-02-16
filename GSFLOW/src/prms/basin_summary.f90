@@ -200,8 +200,7 @@
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday, Modays
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getvar
-      EXTERNAL :: read_error
+      EXTERNAL :: getvar_dble
 ! Local Variables
       INTEGER :: jj, write_month, last_day
 !***********************************************************************
@@ -216,8 +215,7 @@
 !-----------------------------------------------------------------------
 ! need getvars for each variable (only can have short string)
       DO jj = 1, BasinOutVars
-        IF ( getvar(MODNAME, BasinOutVar_names(jj)(:Nc_vars(jj)), 1, 'double', Basin_var_daily(jj))/=0 ) &
-     &       CALL read_error(4, BasinOutVar_names(jj)(:Nc_vars(jj)))
+        CALL getvar_dble( MODNAME, BasinOutVar_names(jj)(:Nc_vars(jj)), 1, Basin_var_daily(jj) )
       ENDDO
 
       write_month = OFF

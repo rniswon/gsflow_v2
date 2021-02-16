@@ -76,14 +76,14 @@
       CALL print_module(MODDESC, MODNAME, Version_soltab)
 
       ALLOCATE ( Soltab_potsw(MAX_DAYS_PER_YEAR, Nhru) )
-!      IF ( declvar(MODNAME, 'soltab_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, 'double', &
+!      CALL declvar_dble(MODNAME, 'soltab_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, 'double', &
 !     &     'Potential solar radiation for each Julian Day, for each HRU', &
-!     &     'Langleys', Soltab_potsw)/=0 ) CALL read_error(3, 'soltab_potsw')
+!     &     'Langleys', Soltab_potsw)
 
       ALLOCATE ( Soltab_horad_potsw(MAX_DAYS_PER_YEAR, Nhru) )
-!      IF ( declvar(MODNAME, 'soltab_horad_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, 'double', &
+!      CALL declvar_dble(MODNAME, 'soltab_horad_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, 'double', &
 !     &     'Potential solar radiation on a horizontal plane for each Julian Day, for each HRU', &
-!     &     'Langleys', Soltab_horad_potsw)/=0 ) CALL read_error(3, 'soltab_horad_potsw')
+!     &     'Langleys', Soltab_horad_potsw)
 
       ALLOCATE ( Hru_cossl(Nhru), Soltab_sunhrs(MAX_DAYS_PER_YEAR, Nhru) )
 

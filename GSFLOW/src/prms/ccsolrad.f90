@@ -37,8 +37,8 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam, getparam, declvar
-      EXTERNAL :: read_error, print_module, print_date
+      INTEGER, EXTERNAL :: declparam, getparam
+      EXTERNAL :: read_error, print_module, print_date, declvar_real, declvar_dble
 ! Local Variables
       INTEGER :: j, jj, k
       REAL :: pptadj, radadj, ccov
@@ -116,22 +116,22 @@
         CALL print_module(MODDESC, MODNAME, Version_ccsolrad)
 
         ALLOCATE ( Cloud_radadj(Nhru) )
-        IF ( declvar(MODNAME, 'cloud_radadj', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'cloud_radadj', 'nhru', Nhru, 'real', &
      &       'Radiation adjustment for cloud cover of each HRU', &
-     &       'decimal fraction', Cloud_radadj)/=0 ) CALL read_error(3, 'cloud_radadj')
+     &       'decimal fraction', Cloud_radadj)
 
-        IF ( declvar(MODNAME, 'basin_radadj', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_radadj', 'one', 1, 'double', &
      &       'Basin area-weighted average radiation adjustment for cloud cover', &
-     &       'decimal fraction', Basin_radadj)/=0 ) CALL read_error(3, 'basin_radadj')
+     &       'decimal fraction', Basin_radadj)
 
         ALLOCATE ( Cloud_cover_hru(Nhru) )
-        IF ( declvar(MODNAME, 'cloud_cover_hru', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'cloud_cover_hru', 'nhru', Nhru, 'real', &
      &       'Cloud cover proportion of each HRU', &
-     &       'decimal fraction', Cloud_cover_hru)/=0 ) CALL read_error(3, 'cloud_cover_hru')
+     &       'decimal fraction', Cloud_cover_hru)
 
-        IF ( declvar(MODNAME, 'basin_cloud_cover', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_cloud_cover', 'one', 1, 'double', &
      &       'Basin area-weighted average cloud cover proportion', &
-     &       'decimal fraction', Basin_cloud_cover)/=0 ) CALL read_error(3, 'basin_cloud_cover')
+     &       'decimal fraction', Basin_cloud_cover)
 
         ! Declare Parameters
         ALLOCATE ( Crad_coef(Nhru,MONTHS_PER_YEAR) )

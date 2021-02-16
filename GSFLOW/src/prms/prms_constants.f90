@@ -139,6 +139,10 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: MODFLOW = 2
     integer, parameter :: GSFLOW_AG = 3
     integer, parameter :: PRMS_AG = 4
+	integer, parameter :: MODSIM_GSFLOW = 10
+	integer, parameter :: MODSIM_PRMS = 11
+	integer, parameter :: MODSIM_MODFLOW = 12
+	integer, parameter :: MODSIM = 13
     integer, parameter :: DOCUMENTATION = 99
     integer, parameter :: RUN = 0
     integer, parameter :: DECL = 1
@@ -200,6 +204,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: INT_TYPE = 1
     integer, parameter :: REAL_TYPE = 2
     integer, parameter :: DBLE_TYPE = 3
+    integer, parameter :: CHAR_TYPE = 3
     integer, parameter :: SAVE_INIT = 0
     integer, parameter :: READ_INIT = 1
 
