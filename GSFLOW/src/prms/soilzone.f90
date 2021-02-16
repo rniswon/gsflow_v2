@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-02-08'
+      character(len=*), parameter :: Version_soilzone = '2021-02-16'
       INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -1157,7 +1157,7 @@
           ! states saved in srunoff when PRMS_land_iteration_flag = ACTIVE
           Soil_rechr = It0_soil_rechr
           Soil_moist = It0_soil_moist
-          IF ( Ag_package_active==ACTIVE ) THEN
+          IF ( Agriculture_flag>OFF ) THEN
             Ag_soil_rechr = It0_ag_soil_rechr
             Ag_soil_moist = It0_ag_soil_moist
           ENDIF
@@ -1305,7 +1305,7 @@
               PRINT *, 'ag_frac=0.0 for HRU:', i
               CALL error_stop('irrigation specified and ag_frac=0', ERROR_param)
             ENDIF
-            ag_water_maxin = Hru_ag_irr(i) ! Hru_ag_irr is in inches over Ag_area
+            ag_water_maxin = Hru_ag_irr(i)/perv_area ! Hru_ag_irr is in inches over Ag_area
           ENDIF
         ENDIF
         IF ( Iter_aet==ACTIVE ) ag_water_maxin = ag_water_maxin + Ag_irrigation_add(i) ! units of inches over Ag_area
