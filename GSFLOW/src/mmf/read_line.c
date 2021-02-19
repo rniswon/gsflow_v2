@@ -191,7 +191,7 @@ cur_fd->time = {year = 1956, month = 2, day = 19, hour = 0, min = 0, sec = 0,
 /*
 ** DANGER This hack is to come out of the storm
 */
-            (void)fprintf (stderr,"read_line:  comming out of storm. dt = 1 day\n");
+            (void)fprintf (stderr,"read_line:  coming out of storm. dt = 1 day\n");
             Mdeltat = 1.0;
             Mprevjt = Mnowtime->jt - Mdeltat;
 
