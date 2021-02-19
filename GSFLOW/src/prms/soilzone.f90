@@ -24,7 +24,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-01-11'
+      character(len=*), parameter :: Version_soilzone = '2021-02-18'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -68,7 +68,7 @@
       REAL, SAVE, ALLOCATABLE :: Pref_flow_max(:), Snow_free(:)
       REAL, SAVE, ALLOCATABLE :: Cap_waterin(:), Soil_lower(:), Soil_zone_max(:)
       REAL, SAVE, ALLOCATABLE :: Potet_lower(:), Potet_rechr(:), Soil_lower_ratio(:)
-      REAL, SAVE, ALLOCATABLE :: Unused_potet(:), Hru_ag_irr(:)
+      REAL, SAVE, ALLOCATABLE :: Unused_potet(:), Hru_ag_irr(:), Soilzone_gain_hru(:)
       INTEGER, SAVE, ALLOCATABLE :: Soil_saturated(:)
 !      REAL, SAVE, ALLOCATABLE :: Cascade_interflow(:), Cascade_dunnianflow(:), Interflow_max(:)
 !      REAL, SAVE, ALLOCATABLE :: Cpr_stor_frac(:), Pfr_stor_frac(:), Gvr_stor_frac(:), Soil_moist_frac(:)
@@ -137,6 +137,12 @@
       IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
 
 ! Declare Variables
+      IF ( Soilzone_add_water_use==ACTIVE ) THEN
+        ALLOCATE ( Soilzone_gain_hru(Nhru) )
+        IF ( declvar(MODNAME, 'soilzone_gain_hru', 'nhru', Nhru, 'real', &
+     &       'Irrigation added to soilzone from water-use module for each HRU', &
+     &       'inches', Soilzone_gain_hru)/=0 ) CALL read_error(3, 'soilzone_gain_hru')
+      ENDIF
       IF ( declvar(MODNAME, 'basin_capwaterin', 'one', 1, 'double', &
      &     'Basin area-weighted average infiltration,'// &
      &     ' cascading interflow and Dunnian flow added to capillary reservoir storage', &
@@ -614,6 +620,7 @@
 !              set initial values and check parameter values
 !***********************************************************************
       INTEGER FUNCTION szinit()
+      USE PRMS_MODULE, ONLY: Soilzone_add_water_use
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Active_hrus, Hru_route_order, &
      &    Basin_area_inv, Hru_area, Hru_frac_perv, Numlake_hrus
@@ -790,6 +797,7 @@
       Potet_rechr = 0.0
       Unused_potet = 0.0 ! dimension nhru
       Soil_saturated = OFF
+      IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
       IF ( Pref_flag==ACTIVE ) THEN
         IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_pref_flow_stor(Nhru) )
       ENDIF
@@ -961,6 +969,7 @@
       Cap_waterin = 0.0
       Soil_saturated = OFF
       update_potet = OFF
+      IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 
@@ -1030,7 +1039,10 @@
           ENDIF
         ENDIF
         IF ( Soilzone_add_water_use==ACTIVE ) THEN
-          IF ( Soilzone_gain(i)>0.0 ) ag_water_maxin = ag_water_maxin + Soilzone_gain(i)/perv_area/SNGL(Cfs_conv) ! ??? is this harea
+          IF ( Soilzone_gain(i)>0.0 ) THEN
+            Soilzone_gain_hru(i) = Soilzone_gain(i)/perv_area/SNGL(Cfs_conv) ! ??? is this harea
+            ag_water_maxin = ag_water_maxin + Soilzone_gain_hru(i)
+          ENDIF
         ENDIF
         capwater_maxin = capwater_maxin + ag_water_maxin
 

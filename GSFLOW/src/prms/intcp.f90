@@ -12,7 +12,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2020-12-03'
+      character(len=*), parameter :: Version_intcp = '2021-02-18'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -437,12 +437,13 @@
           IF ( Use_transfer_intcp==ACTIVE ) THEN
             Gain_inches(i) = 0.0
             IF ( Canopy_gain(i)>0.0 ) THEN
-              IF ( cov>0.0 ) THEN
+!              IF ( cov>0.0 ) THEN
                 IF ( Irr_type(i)==2 ) THEN
                   PRINT *, 'WARNING, water-use transfer > 0, but irr_type = 2 (ignore), HRU:', i, ', transfer:', Canopy_gain(i)
                   Canopy_gain(i) = 0.0
                 ELSE
-                  Gain_inches(i) = Canopy_gain(i)/SNGL(Cfs_conv)/cov/harea
+!                  Gain_inches(i) = Canopy_gain(i)/SNGL(Cfs_conv)/cov/harea
+                  Gain_inches(i) = Canopy_gain(i)/SNGL(Cfs_conv)/harea
                   IF ( Irr_type(i)==0 ) THEN
                     CALL intercept(Gain_inches(i), stor, cov, intcpstor, Net_apply(i))
                   ELSE ! Hrumeth=1
@@ -451,9 +452,9 @@
                 ENDIF
                 Basin_hru_apply = Basin_hru_apply + DBLE( Gain_inches(i)*harea )
                 Basin_net_apply = Basin_net_apply + DBLE( Net_apply(i)*harea )
-              ELSE
-                CALL error_stop('canopy transfer attempted to HRU with cov_den = 0.0', ERROR_param)
-              ENDIF
+!              ELSE
+!                CALL error_stop('canopy transfer attempted to HRU with cov_den = 0.0', ERROR_param)
+!              ENDIF
             ENDIF
           ENDIF
 
