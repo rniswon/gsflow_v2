@@ -89,7 +89,7 @@
         REAL, SAVE, DIMENSION(:), POINTER :: SUPSEG
         INTEGER, SAVE, DIMENSION(:), POINTER :: IRRWELVAR
         INTEGER, SAVE, DIMENSION(:), POINTER :: IRRPONDVAR   !DS
-        INTEGER, SAVE, DIMENSION(:), POINTER :: IRRPONDSEG   !DS
+        INTEGER, SAVE, DIMENSION(:), POINTER :: TABPONDSEG   !DS
         REAL, SAVE, DIMENSION(:), POINTER :: PONDSEGFRAC !DS
         REAL, SAVE, DIMENSION(:, :), POINTER :: FRACSUP
         REAL, SAVE, DIMENSION(:, :), POINTER :: FRACSUPMAX
@@ -256,7 +256,7 @@
       ALLOCATE (PONDIRRPRMS(MAXCELLSPOND,NUMIRRPOND))
       ALLOCATE (TSPONDUNIT(MXPOND),TSPONDNUM(MXPOND))
       ALLOCATE (TSPONDIRRUNIT(MXPOND),TSPONDIRRNUM(MXPOND))
-      ALLOCATE (IRRPONDVAR(NUMIRRPOND),IRRPONDSEG(NUMIRRPOND))
+      ALLOCATE (IRRPONDVAR(NUMIRRPOND),TABPONDSEG(NUMIRRPOND))
       ALLOCATE (PONDSEGFRAC(NUMIRRPOND))
       ALLOCATE (NUMCELLSPOND(NUMIRRPOND),IRRPERIODPOND(NUMIRRPOND))
       ALLOCATE (TRIGGERPERIODPOND(NUMIRRPOND))
@@ -299,7 +299,7 @@
       SEGLIST = 0
       NUMSEGLIST = 0
       IRRPONDVAR = 0
-      IRRPONDSEG = 0
+      TABPONDSEG = 0
       PONDSEGFRAC = 0.0
       NUMCELLSPOND = 0
       IRRPERIODPOND = 0
@@ -367,7 +367,7 @@
      +        'No ponds active in the AG Package')
          MXPOND = 1
       END IF
-      ALLOCATE (POND(2, MXPOND))
+      ALLOCATE (POND(3, MXPOND))
       !
       !9 - --- ALLOCATE SUPPLEMENTAL AND IRRIGATION WELL ARRAYS
       NUMSUPHOLD = NUMSUP
@@ -1107,7 +1107,7 @@
                   MATCH = 0
                   DO J = 1, MXPOND    
                      READ (IN, *) TABUNITPOND(J), TABVALPOND(J), 
-     +                            TABPONDHRU(J), IRRPONDSEG(J)
+     +                            TABPONDHRU(J), TABPONDSEG(J)
                      DO I = 1, J - 1
                         IF (TABUNITPOND(I) == TABUNITPOND(J)) THEN
                            MATCH = 1
@@ -1145,32 +1145,6 @@
                      END DO
                   END DO
                END IF
-!            case ('END')
-!!               found6 = .false.
-!               write (iout, '(/1x,a)') 'FINISHED READING '//
-!     +          trim(adjustl(char3))
-!               exit
-!            case default
-!               WRITE (IOUT, *) 'Invalid AG Input: '//LINE(ISTART:ISTOP)
-!     +           //' Should be: '//trim(adjustl(CHAR3))
-!               CALL USTOP('Invalid AG Input: '//LINE(ISTART:ISTOP)
-!     +          //' Should be: '//trim(adjustl(CHAR3)))
-!            end select
-            !if (found6) then
-            !   CALL URDCOM(In, IOUT, line)
-            !   LLOC = 1
-            !   CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-            !end if
-         !2 - ---READ WELL LIST
-         !if (found5 .or. found6) then
-         !   CALL URDCOM(In, IOUT, line)
-         !   LLOC = 1
-         !   CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-         !   ISTARTSAVE = ISTART
-         !   CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-         !end if
-         !do
-          !  select case (LINE(ISTARTSAVE:ISTOP))
           case ('WELL LIST')
                found4 = .true.
                CHAR = CHAR1
@@ -1247,11 +1221,6 @@
                CALL USTOP('Invalid AG Input: '//LINE(ISTART:ISTOP)
      +          //' Should be: '//trim(adjustl(CHAR)))
             end select
-            !if (found4) then
-            !   CALL URDCOM(In, IOUT, line)
-            !   LLOC = 1
-            !   CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-            !end if
       end do
          !
          !3 - ---PRINT NUMBER OF WELLS USED FOR SUP OR IRR.
@@ -1468,7 +1437,7 @@
       INTEGER, INTENT(IN)::IN, KPER
       !
       INTEGER ISEG, i, L, ID
-      DOUBLE PRECISION :: TOTAL
+      DOUBLE PRECISION :: TOTAL, Qpond
       EXTERNAL :: RATETERPQ
       REAL :: RATETERPQ, TIME
       ! - -----------------------------------------------------------------
@@ -1506,16 +1475,20 @@
             DO L = 1, MXPOND
               ID = TABIDPOND(L)
               POND(1,L) = TABPONDHRU(L)
+              POND(3,L) = TABPONDSEG(L)
               POND(2,L) = RATETERPQ(TIME, TABTIMEPOND(:,ID), 
      +                              TABRATEPOND(:,ID), TABVALPOND(L))
             END DO
+          END IF
+          IF ( POND(3,L) > 0 ) THEN
+            PONDSEGFLOW(L) = SEG(2,POND(3,L))
           END IF
       END IF
       !
       !4 - -----ADD SFR DIVERSION FLOWS TO PONDS
 !      CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRSG, R, IOUT, IN)
 !         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, i, SGFC, IOUT, In)
-!         IRRPONDSEG(J) = IRSG
+!         TABPONDSEG(J) = IRSG
 !         PONDSEGFRAC(J) = SGFC
 !
 !5 - -----SET MAXIMUM POND DIVERSION RATES WHEN TABFILES ARE USED
@@ -1786,7 +1759,7 @@
       !
       !2 - --INITIALIZE AG VARIABLES TO ZERO.
       IRRPONDVAR = 0
-      IRRPONDSEG = 0
+      TABPONDSEG = 0
       NUMCELLSPOND = 0
       IRRFACTPOND = 0.0
       IRRFIELDFACTPOND = 0.0
@@ -2199,8 +2172,8 @@
         case ('PND')
            UNIT = TSPONDUNIT(NUM)
            WLNM = TSPONDNUM(NUM)
-           WRITE (UNIT, *) 'TIME KPER KSTP POND-HRU POND-INFLOWS ',
-     +                     'NULL NULL'
+           WRITE (UNIT, *) 'TIME KPER KSTP POND-HRU SEGMENT-INFLOWS ',
+     +                     'POND-IRRIGATION NULL'
         case ('PET')
            UNIT = TSPONDIRRUNIT(NUM)
            WLNM = TSPONDIRRNUM(NUM)
@@ -3589,14 +3562,14 @@
          END DO
       END IF
       !
-      ! - -------OUTPUT TIME SERIES FOR PONDS
+      ! - -------OUTPUT TIME SERIES FOR INFLOWS TO PONDS
       !
       IF (TSACTIVEPOND) THEN
          DO I = 1, NUMPOND
             UNIT = TSPONDUNIT(I)
             L = TSPONDNUM(I)
             Q = PONDSEGFLOW(L)
-            QQ = 0.0
+            QQ = PONDFLOW(L)
             QQQ = 0.0
             CALL timeseries(unit, Kkper, Kkstp, TOTIM, L,
      +                      Q, QQ, QQQ)
@@ -4179,7 +4152,7 @@
       DEALLOCATE(TSPONDIRRNUM)
       DEALLOCATE(NUMPOND)
       DEALLOCATE(NUMPONDIRR)
-      DEALLOCATE(IRRPONDSEG)
+      DEALLOCATE(TABPONDSEG)
       DEALLOCATE(PONDSEGFRAC)
       RETURN
       END
