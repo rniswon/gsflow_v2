@@ -22,7 +22,7 @@
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
       character(len=*), parameter :: GSFLOW_versn = '2.2.0 02/18/2021'
       character(len=*), parameter :: PRMS_versn = '2021-01-20'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 02/18/2021'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.0 01/20/2021'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -99,8 +99,8 @@
       INTEGER, EXTERNAL :: water_use_read, dynamic_param_read, potet_pm_sta
       INTEGER, EXTERNAL :: stream_temp, glacr
       EXTERNAL :: module_error, print_module, PRMS_open_output_file, precip_map, temp_map
-      EXTERNAL :: call_modules_restart, water_balance, basin_summary, nsegment_summary
-      EXTERNAL :: prms_summary, nhru_summary, module_doc, convert_params, read_error, nsub_summary, error_stop
+      EXTERNAL :: call_modules_restart, water_balance, summary_output
+      EXTERNAL :: prms_summary, module_doc, convert_params, read_error, error_stop
       INTEGER, EXTERNAL :: gsflow_modflow, gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
       INTEGER, EXTERNAL :: declparam, getparam, declvar
 ! Local Variables
@@ -371,7 +371,10 @@
 
       IF ( Model==CLIMATE ) THEN
         call_modules = ierr
-        IF ( Process_flag==RUN ) RETURN
+        IF ( Process_flag==RUN ) THEN
+          CALL summary_output()
+          RETURN
+        ENDIF
       ENDIF
 
 ! frost_date is a pre-process module
@@ -379,7 +382,10 @@
         ierr = frost_date()
         IF ( ierr/=0 ) CALL module_error('frost_date', Arg, ierr)
         call_modules = ierr
-        IF ( Process_flag==RUN ) RETURN
+        IF ( Process_flag==RUN ) THEN
+          CALL summary_output()
+          RETURN
+        ENDIF
         IF ( Process_flag==CLEAN ) STOP
       ENDIF
 
@@ -401,7 +407,10 @@
 
       IF ( Model==TRANSPIRE ) THEN
         call_modules = ierr
-        IF ( Process_flag==RUN ) RETURN
+        IF ( Process_flag==RUN ) THEN
+          CALL summary_output()
+          RETURN
+        ENDIF
       ENDIF
 
       IF ( Climate_potet_flag==OFF ) THEN
@@ -432,7 +441,10 @@
 
       IF ( Model==POTET ) THEN
         call_modules = ierr
-        IF ( Process_flag==RUN ) RETURN
+        IF ( Process_flag==RUN ) THEN
+          CALL summary_output()
+          RETURN
+        ENDIF
       ENDIF
 
       IF ( PRMS_land_iteration_flag==OFF ) THEN
@@ -544,13 +556,7 @@
         IF ( ierr/=0 ) CALL module_error('subbasin', Arg, ierr)
       ENDIF
 
-      IF ( NhruOutON_OFF>OFF ) CALL nhru_summary()
-
-      IF ( NsubOutON_OFF==ACTIVE ) CALL nsub_summary()
-
-      IF ( BasinOutON_OFF==ACTIVE ) CALL basin_summary()
-
-      IF ( NsegmentOutON_OFF>OFF ) CALL nsegment_summary()
+      CALL summary_output()
 
       IF ( CsvON_OFF>OFF .AND. Model==PRMS ) CALL prms_summary()
 
@@ -1292,6 +1298,26 @@
       ENDIF
 
       END SUBROUTINE check_dimens
+
+!***********************************************************************
+!     Call output summary routines
+!***********************************************************************
+      SUBROUTINE summary_output()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: NhruOutON_OFF, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
+      IMPLICIT NONE
+      ! Functions
+      EXTERNAL :: nhru_summary, nsub_summary, basin_summary, nsegment_summary
+!***********************************************************************
+      IF ( NhruOutON_OFF>OFF ) CALL nhru_summary()
+
+      IF ( NsubOutON_OFF==ACTIVE ) CALL nsub_summary()
+
+      IF ( BasinOutON_OFF==ACTIVE ) CALL basin_summary()
+
+      IF ( NsegmentOutON_OFF>OFF ) CALL nsegment_summary()
+
+      END SUBROUTINE summary_output
 
 !**********************************************************************
 !     Module documentation

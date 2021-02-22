@@ -48,17 +48,17 @@ Precipitation Distribution      climate_hru         2020-12-02
 Solar Radiation Distribution    ddsolrad            2020-12-02
 Transpiration Distribution      transp_tindex       2020-12-02
 Potential Evapotranspiration    potet_jh            2020-08-03
-Canopy Interception             intcp               2020-12-03
+Canopy Interception             intcp               2021-02-18
 Snow Dynamics                   snowcomp            2021-01-11
 Surface Runoff                  srunoff_smidx       2021-01-11
-Soilzone Computations           soilzone            2021-01-11
+Soilzone Computations           soilzone            2021-02-18
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-01-08
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-01-14
 GSFLOW Output Budget Summary    gsflow_budget       2021-01-12
 GSFLOW Output CSV Summary       gsflow_sum          2020-12-02
 Output Summary                  subbasin            2020-12-02
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2021-01-19
+GSFLOW MODFLOW main             gsflow_modflow      2021-02-18
 UZF-NWT Package                 gwf2uzf1_NWT        2020-12-28
 SFR-NWT Package                 gwf2sfr7_NWT        2020-09-30
 
@@ -75,5 +75,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    0 minutes  2.06 seconds
+Execution elapsed time    0 minutes  1.98 seconds
 

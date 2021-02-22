@@ -48,10 +48,10 @@ Precipitation Distribution      climate_hru         2020-12-02
 Solar Radiation Distribution    climate_hru         2020-12-02
 Potential Evapotranspiration    climate_hru         2020-12-02
 Transpiration Distribution      transp_tindex       2020-12-02
-Canopy Interception             intcp               2020-12-03
+Canopy Interception             intcp               2021-02-18
 Snow Dynamics                   snowcomp            2021-01-11
 Surface Runoff                  srunoff_smidx       2021-01-11
-Soilzone Computations           soilzone            2021-01-11
+Soilzone Computations           soilzone            2021-02-18
 Groundwater                     gwflow              2020-12-02
 Streamflow Routing Init         routing             2020-12-02
 Streamflow Routing              muskingum           2020-12-02
@@ -103,5 +103,5 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
  *************************************************************
  Total for run    1110.775  440.221    8.439  693.939   13.445
  *************************************************************
-Execution elapsed time    0 minutes  1.43 seconds
+Execution elapsed time    0 minutes  0.86 seconds
 

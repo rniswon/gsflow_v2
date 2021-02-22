@@ -46,10 +46,10 @@ Temp & Precip Distribution      ide_dist            2020-12-02
 Solar Radiation Distribution    ddsolrad            2020-12-02
 Transpiration Distribution      transp_tindex       2020-12-02
 Potential Evapotranspiration    potet_jh            2020-08-03
-Canopy Interception             intcp               2020-12-03
+Canopy Interception             intcp               2021-02-18
 Snow Dynamics                   snowcomp            2021-01-11
 Surface Runoff                  srunoff_smidx       2021-01-11
-Soilzone Computations           soilzone            2021-01-11
+Soilzone Computations           soilzone            2021-02-18
 Groundwater                     gwflow              2020-12-02
 Streamflow Routing Init         routing             2020-12-02
 Streamflow Routing              muskingum           2020-12-02
@@ -186,5 +186,5 @@ Fraction impervious:        0.0110    Fraction pervious:       0.9890
   2011  7   551.9 88.9 74.0   2.17   2.16         0.0   8.27   4.70  1.68  0.00   0.00  0.43  0.04   0.43   0.23   0.06      1.2  4408.90 205.61   0.00
   2011  8   443.9 85.1 66.7   1.78   1.78         0.0   5.96   1.63  1.62  0.00   0.00  0.22  0.06   0.21   0.15   0.03      0.5  1766.15  38.60   0.00
   2011  9   280.6 73.0 54.0   2.08   2.07         0.0   3.84   1.84  1.62  0.00   0.00  0.11  0.02   0.11   0.24   0.05      0.4  1611.76  10.51   0.00
-Execution elapsed time    0 minutes  7.03 seconds
+Execution elapsed time    0 minutes  4.54 seconds
 
