@@ -861,7 +861,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 !
 !     -----------------------------------------------------------------
       SUBROUTINE GWF2NWT1FM(Kkiter, ICNVG, KSTP, KPER, Maxiter, 
-     +                      Iunitchd, Itreal, Igrid)
+     +                      Iunitchd, Itreal, agconverge, Igrid)
 ! Builds and Solves Jacobian
 ! Calls various unstructured linear solvers to solve Jacobian
       USE GLOBAL, ONLY:Iout,ISSFLG
@@ -886,6 +886,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 !     ARGUMENTS
 !     ------------------------------------------------------------------
       INTEGER Iss, Igrid, Kkiter, Icnvg, Maxiter, KSTP, KPER, Iunitchd
+      INTEGER agconverge
 !     -----------------------------------------------------------------
 !     LOCAL VARIABLES
 !     -----------------------------------------------------------------
@@ -1101,6 +1102,7 @@ C--Update heads.
  !     end do
  !     end if
       END IF
+      IF ( AGCONVERGE.EQ.0 ) ICNVG = 0
  ! 888 format(256E20.10)
 !
 !  Calculate maximum head change and residuals
