@@ -950,7 +950,8 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
       RMS1 = RMS_func(icfld,irfld,ilfld)
       Icnvg = 0
       IF ( RMS1.GT.FTOL .OR. ABS(Fheadsave).GT.Tol .OR. 
-     +                           kkiter.LT.2 ) THEN
+     +                           kkiter.LT.2 .or.
+     +                           agconverge == 0 ) THEN
         Ibt = 1
         IF ( BTRACK.EQ.0 .OR. II.GE.Numtrack ) Ibt = 0
         IF ( RMS1.LT.Btol*rmsave .OR. Kkiter.EQ.1 ) Ibt = 0
