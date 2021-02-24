@@ -955,6 +955,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
         IF ( BTRACK.EQ.0 .OR. II.GE.Numtrack ) Ibt = 0
         IF ( RMS1.LT.Btol*rmsave .OR. Kkiter.EQ.1 ) Ibt = 0
         IF ( II.GT.0 .AND. RMS1.GT.RMS2 ) Ibt = 0
+        IF ( agconverge == 0 ) Ibt = 0
         IF ( Ibt.EQ.0 ) THEN
           II = 0
           jj = 1
