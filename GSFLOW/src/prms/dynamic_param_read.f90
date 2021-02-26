@@ -13,7 +13,7 @@
      &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, &
      &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
-     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag, Agriculture_flag, Dyn_ag_flag
+     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag, Agriculture_flag, Dyn_ag_frac_flag
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
@@ -155,7 +155,7 @@
 
       Ag_frac_flag = OFF
       IF ( Agriculture_flag==ACTIVE ) THEN
-        IF ( Dyn_ag_flag==1 .OR. Dyn_ag_flag==3 ) THEN
+        IF ( Dyn_ag_frac_flag==ACTIVE ) THEN
           IF ( control_string(ag_frac_dynamic, 'ag_frac_dynamic')/=0 ) CALL read_error(5, 'ag_frac_dynamic')
           CALL find_header_end(Ag_frac_unit, ag_frac_dynamic, 'ag_frac_dynamic', ierr, 0, 0)
           IF ( ierr==0 ) THEN
