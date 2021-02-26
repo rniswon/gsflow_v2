@@ -2007,7 +2007,7 @@
             DO I = 1, NUMSW - 1
                IF (UNIT == TSSWUNIT(I)) ITEST = 1
             END DO
-            IF (ITEST /= 1) CALL WRITE_HEADER('DIV', NUMSW)
+            IF (ITEST /= 1) CALL WRITE_AG_HEADER('DIV', NUMSW)
             IF (SGNM > NSEGDIMTEMP) THEN
                WRITE (IOUT, *) 'Bad segment number for AG time series. '
                CALL USTOP('Bad segment number for AG time series.')
@@ -2022,7 +2022,7 @@
             DO I = 1, NUMGW - 1
                IF (UNIT == TSGWUNIT(I)) ITEST = 1
             END DO
-            IF (ITEST /= 1) CALL WRITE_HEADER('WEL', NUMGW)
+            IF (ITEST /= 1) CALL WRITE_AG_HEADER('WEL', NUMGW)
             IF (WLNM > MXWELL) THEN
                WRITE (IOUT, *) 'Bad well number for AG time series. '
                CALL USTOP('Bad well number for AG time series.')
@@ -2037,7 +2037,7 @@
             DO I = 1, NUMPOND - 1
                IF (UNIT == TSPONDUNIT(I)) ITEST = 1
             END DO
-            IF (ITEST /= 1) CALL WRITE_HEADER('PND', NUMPOND)
+            IF (ITEST /= 1) CALL WRITE_AG_HEADER('PND', NUMPOND)
             IF (PDNM > Nhru) THEN
               WRITE (IOUT, *) 'Invalid HRU ID for depression storage ',
      +                         'reservoir for AG time series. '
@@ -2053,7 +2053,7 @@
             DO I = 1, NUMSWET - 1
                IF (UNIT == TSSWUNIT(I)) ITEST = 1
             END DO
-            IF (ITEST /= 1) CALL WRITE_HEADER('SET', NUMSWET)
+            IF (ITEST /= 1) CALL WRITE_AG_HEADER('SET', NUMSWET)
             IF (SGNM > NSEGDIMTEMP) THEN
                WRITE (IOUT, *) 'Bad segment number for AG time series. '
                CALL USTOP('Bad segment number for AG time series.')
@@ -2068,7 +2068,7 @@
             DO I = 1, NUMGWET - 1
                IF (UNIT == TSGWETUNIT(I)) ITEST = 1
             END DO
-            IF (ITEST /= 1) CALL WRITE_HEADER('GET', NUMGWET)
+            IF (ITEST /= 1) CALL WRITE_AG_HEADER('GET', NUMGWET)
             IF (WLNM > MXWELL) THEN
                WRITE (IOUT, *) 'Bad well number for AG ET time series. '
                CALL USTOP('Bad well number for AG ET time series.')
@@ -2083,7 +2083,7 @@
             DO I = 1, NUMPONDIRR - 1
                IF (UNIT == TSPONDIRRUNIT(I)) ITEST = 1
             END DO
-            IF (ITEST /= 1) CALL WRITE_HEADER('PIR', NUMPONDIRR)
+            IF (ITEST /= 1) CALL WRITE_AG_HEADER('PIR', NUMPONDIRR)
             IF (PDNM > MXPOND) THEN
                WRITE (IOUT, *) 'Bad pond number for AG ET time series. '
                CALL USTOP('Bad pond number for AG ET time series.')
@@ -2091,12 +2091,12 @@
          case ('WELLETALL')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
             TSGWETALLUNIT = UNIT
-            CALL WRITE_HEADER('AL1', NUMGWET)
+            CALL WRITE_AG_HEADER('AL1', NUMGWET)
             NUMGWETALL = 1
          case ('WELLALL')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
             TSGWALLUNIT = UNIT
-            CALL WRITE_HEADER('AL2', NUMGWET)
+            CALL WRITE_AG_HEADER('AL2', NUMGWET)
             NUMGWALL = 1
          case ('END')
             write (iout, '(/1x,a)') 'FINISHED READING '//
@@ -2134,8 +2134,8 @@
       RETURN
       END
       !
-      ! - ------SUBROUTINE WRITE_HEADER
-      SUBROUTINE WRITE_HEADER(TSTYPE, NUM)
+      ! - ------SUBROUTINE WRITE_AG_HEADER
+      SUBROUTINE WRITE_AG_HEADER(TSTYPE, NUM)
         ! READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
         USE GWFAGMODULE
         IMPLICIT NONE
@@ -2186,10 +2186,10 @@
            WRITE (UNIT, *) 'TIME KPER KSTP NULL GW-DEMAND GW-PUMPED ',
      +                     'NULL'
         end select
-      END SUBROUTINE WRITE_HEADER
+      END SUBROUTINE WRITE_AG_HEADER
 
       !
-      SUBROUTINE GWF2AG7FM(Kkper, Kkstp, Kkiter, Iunitnwt)
+      SUBROUTINE GWF2AG7FM(Kkper, Kkstp, Kkiter, Iunitnwt, agconverge)
       !******************************************************************
       ! CALCULATE APPLIED IRRIGATION, DIVERISONS, AND PUMPING
       !******************************************************************
@@ -2209,6 +2209,7 @@
       ! ARGUMENTS:
       ! - -----------------------------------------------------------------
       INTEGER, INTENT(IN) :: KKPER, KKSTP, KKITER, Iunitnwt
+      INTEGER, INTENT(INOUT) :: agconverge
       !
       ! VARIABLES:
       ! - -----------------------------------------------------------------
@@ -2245,6 +2246,7 @@
       QQ = ZERO
       QSW = ZERO
       TIME = TOTIM
+      agconverge = 1
       !
       !2 - -----IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF (ETDEMANDFLAG > 0) THEN
@@ -2288,7 +2290,7 @@
                DO I = 1, NUMSEGS(L)
                   J = DIVERSIONSEG(I, L)
                   QSW = SEG(2, J)
-                  If ( kkiter > 1 ) QSW = DVRSFLW(J)
+                  IF ( kkiter > 1 ) QSW = DVRSFLW(J)
                   IF (ETDEMANDFLAG > 0) THEN
                      FMIN = SUPACT(J)
                   ELSE IF (TRIGGERFLAG > 0) then
@@ -2325,7 +2327,7 @@
                END IF
                IF (QQ < Q) QQ = Q
                Q = QQ
-               QONLY(L) = DONENEG*Q
+               QONLY(L) = SNGL( DONENEG*Q )
             END IF
             !
             !8 - -----IF THE CELL IS VARIABLE HEAD THEN SUBTRACT Q FROM
@@ -2364,12 +2366,12 @@
             DO I = 1, NUMSEGS(L)  ! need to test when multiple segs supported by single well
                J = DIVERSIONSEG(I, L)
                SUP = SUP - Qp
-               ACTUAL(J) = ACTUAL(J) + SUP
+               ACTUAL(J) = ACTUAL(J) + SNGL( SUP )
             END DO
             !
             !9b - -----SET ACTUAL PUMPING FOR NON SUP IRRIGATION WELLS.
             !
-            Qonly(L) = DONENEG*Q
+            Qonly(L) = SNGL( DONENEG*Q )
             !
             !10------APPLY IRRIGATION FROM WELLS
             !
@@ -2379,13 +2381,14 @@
                   SUBRATE = SUBVOL/(DELR(IRRCOL_GW(I, L))*
      +                      DELC(IRRROW_GW(I, L)))
                   WELLIRRUZF(IRRCOL_GW(I, L), IRRROW_GW(I, L)) =
-     +            WELLIRRUZF(IRRCOL_GW(I, L), IRRROW_GW(I, L)) + SUBRATE
+     +            WELLIRRUZF(IRRCOL_GW(I, L), IRRROW_GW(I, L)) +
+     +            SNGL( SUBRATE )
                END DO
             ELSE
                DO I = 1, NUMCELLS(L)
                   SUBVOL = -(DONE - IRRFACT(I, L))*Qp*IRRFIELDFACT(I, L)
                   ! Keep irrigation for PRMS as volumetric rate
-                  WELLIRRPRMS(I, L) = WELLIRRPRMS(I, L) + SUBVOL
+                  WELLIRRPRMS(I, L) = WELLIRRPRMS(I, L) + SNGL( SUBVOL )
                END DO
             END IF
          END IF
@@ -2592,9 +2595,9 @@
       !
       !5 - -----CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
       DO L = 1, NWELLSTEMP
-        IL = WELL(1, L)
-        IR = WELL(2, L)
-        IC = WELL(3, L)
+        IL = INT( WELL(1, L) )
+        IR = INT( WELL(2, L) )
+        IC = INT( WELL(3, L) )
         Q = WELL(4, L)
          !
          !6 - -----IF TRIGGER ACTIVE THEN IMCREMENT IRRIGATION PERIOD FOR WELL
@@ -2613,7 +2616,7 @@
             ELSE
                !
                !6b - -----NOT SUPPLEMENTAL WELL SET DEMAND
-               Q = DONENEG*QONLY(L)
+               Q = SNGL(DONENEG*QONLY(L))
             END IF
             QSAVE = Q
             !
@@ -2623,12 +2626,12 @@
             IF (Iunitnwt .NE. 0) THEN
                IF (LAYTYPUPW(il) .GT. 0) THEN
                   Qp = smoothQ(Hh, Ttop, Bbot, dQp)
-                  Q = Q*Qp
+                  Q = Q*SNGL(Qp)
                ELSE
-                  Q = Qsave
+                  Q = SNGL( Qsave )
                END IF
             ELSE
-               Q = Qsave
+               Q = SNGL( Qsave )
             END IF
             QQ = Q
             !8 - -----SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
@@ -2636,8 +2639,8 @@
             DO I = 1, NUMSEGS(L)
                J = DIVERSIONSEG(I, L)
                SUP = SUP - Q
-               ACTUAL(J) = ACTUAL(J) + SUP
-               SUPSEG(J) = SUPSEG(J) - Q/dble(NUMSEGS(L))
+               ACTUAL(J) = ACTUAL(J) + SNGL( SUP )
+               SUPSEG(J) = SUPSEG(J) - SNGL( Q/NUMSEGS(L) )
             END DO
             !
             !9 - -----CALCULATE IRRIGATION FROM WELLS
@@ -2661,7 +2664,7 @@
          END IF
          !
          !11A - ----ADD FLOW RATE TO BUFFER.
-         BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + QQ
+         BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + SNGL( QQ )
          !
          !11D-----FLOW RATE IS ALWAYS NEGATIVE(DISCHARGE) ADD IT TO RATOUT.
          RATOUT = RATOUT - QQ
@@ -2672,7 +2675,7 @@
      +                Q, WELL(:, L), NWELVL, NAUXWELL, 5, IBOUND, NLAY)
          !
          ! - -------COPY FLOW TO WELL LIST.
-         WELL(NWELVL, L) = QQ
+         WELL(NWELVL, L) = SNGL( QQ )
          END IF
       END DO
       !
@@ -2710,14 +2713,14 @@
          WRITE (IBD1, *)
          WRITE (IBD1, 61) TEXT1, KKPER, KKSTP
          DO L = 1, NWELLSTEMP
-           IR = WELL(2, L)
-           IC = WELL(3, L)
-           IL = WELL(1, L)
+           IR = INT( WELL(2, L) )
+           IC = INT( WELL(3, L) )
+           IL = INT( WELL(1, L) )
            WRITE (IBD1, 62) L, IL, IR, IC, WELL(NWELVL, L)
          END DO
          WRITE (IBD1, *)
       END IF
-      !
+!
       !13 - ----PRINT IRRIGATION DIVERSION RATE IF REQUESTED.
       IF (IBD2 .GT. 0) THEN
          WRITE (IBD2, *)
@@ -2728,7 +2731,7 @@
          END DO
          WRITE (IBD2, *)
       END IF
-      !
+!
       !13 - ----PRINT APPLIED SW IRRIGATION FOR EACH CELL
       IF (IBD3 .GT. 0) THEN
          WRITE (IBD3, *)
@@ -2797,7 +2800,7 @@
       !
       !18 - -----MOVE RATES, VOLUMES&LABELS INTO ARRAYS FOR PRINTING
       ! GW PUMPING (NEGATIVE OUT OF GW)
-      RIN = -QWELL   
+      RIN = -QWELL
       ROUT = ZERO
       VBVLAG(3, MSUMAG) = sngl(RIN)
       VBVLAG(4, MSUMAG) = sngl(ROUT)
@@ -2997,7 +3000,8 @@
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
       USE PRMS_BASIN, ONLY: HRU_PERV
-      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
+!      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
+      USE PRMS_SOILZONE, ONLY: PERV_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
       USE GWFUZFMODULE, ONLY: UZFETOUT, GWET
@@ -3011,11 +3015,11 @@
       double precision :: zerod7, done, dzero, pettotal,
      +                    aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup, etdif
-!      real :: fmaxflow, etdif
+!      real :: fmaxflow
       integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
       double precision :: set_factor !, area_mf
-      INTRINSIC :: ABS
+      INTRINSIC :: SQRT
 ! --------------------------------------------------
 !
       zerod7 = 1.0d-7
@@ -3038,7 +3042,7 @@
            hru_id = IRRROW_SW(k, iseg)
            area = HRU_PERV(hru_id)
            pet = potet(hru_id)*area*prms_inch2mf_q
-           aet = hru_actet(hru_id)*area*prms_inch2mf_q
+           aet = perv_actet(hru_id)*area*prms_inch2mf_q
            pettotal = pettotal + pet
            aettotal = aettotal + aet
            if ( Nhru==Nhrucell ) then
@@ -3174,7 +3178,8 @@
       USE GWFAGMODULE
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
+!      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
+      USE PRMS_SOILZONE, ONLY: PERV_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE PRMS_BASIN, ONLY: HRU_PERV
@@ -3224,7 +3229,7 @@
                hru_id = IRRROW_SW(k, iseg)
                area = HRU_PERV(hru_id)
                pet = potet(hru_id)*area*prms_inch2mf_q
-               aet = hru_actet(hru_id)*area*prms_inch2mf_q
+               aet = perv_actet(hru_id)*area*prms_inch2mf_q
                if ( Nhru==Nhrucell ) then
                  icell = Gvr_cell_id(hru_id)
                  irow = Gwc_row(icell)
@@ -3273,7 +3278,8 @@
       USE GWFAGMODULE
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
+!      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
+      USE PRMS_SOILZONE, ONLY: PERV_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
@@ -3314,7 +3320,7 @@
             hru_id = IRRROW_GW(i, l)
             area = HRU_PERV(hru_id)
             pet = potet(hru_id)*area*prms_inch2mf_q
-            aet = hru_actet(hru_id)*area*prms_inch2mf_q
+            aet = perv_actet(hru_id)*area*prms_inch2mf_q
             if ( Nhru==Nhrucell ) then
               icell = Gvr_cell_id(hru_id)
               irow = Gwc_row(icell)
@@ -3413,10 +3419,10 @@
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: HRU_PERV
-      USE GWFUZFMODULE, ONLY: GWET, UZFETOUT !, PETRATE
-      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
+      USE GWFUZFMODULE, ONLY: GWET, UZFETOUT
+!      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE PRMS_SOILZONE, ONLY: Soil_saturated
+      USE PRMS_SOILZONE, ONLY: Soil_saturated, PERV_ACTET
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
       IMPLICIT NONE
@@ -3444,7 +3450,7 @@
          hru_id = IRRROW_GW(I, L)
          area = HRU_PERV(hru_id)
          pet = potet(hru_id)*area*prms_inch2mf_q
-         aet = hru_actet(hru_id)*area*prms_inch2mf_q
+         aet = perv_actet(hru_id)*area*prms_inch2mf_q
          if ( Soil_saturated(hru_id) == 1 ) aet = pet
          pettotal = pettotal + pet
          aettotal = aettotal + aet
@@ -3523,7 +3529,8 @@
       USE GLOBAL, ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: HRU_PERV
-      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
+!      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
+      USE PRMS_SOILZONE, ONLY: PERV_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
@@ -3599,7 +3606,7 @@
                      hru_id = IRRROW_SW(k, iseg)
                      area = HRU_PERV(hru_id)
                      pet = potet(hru_id)*area*prms_inch2mf_q
-                     aet = hru_actet(hru_id)*area*prms_inch2mf_q
+                     aet = perv_actet(hru_id)*area*prms_inch2mf_q
                      if ( Nhru==Nhrucell ) then
                        icell = Gvr_cell_id(hru_id)
                        irow = Gwc_row(icell)
@@ -3664,7 +3671,7 @@
                            hru_id = IRRROW_GW(J, L)
                            area = HRU_PERV(hru_id)
                            pet = potet(hru_id)*area*prms_inch2mf_q
-                           aet = hru_actet(hru_id)*area*prms_inch2mf_q
+                           aet = perv_actet(hru_id)*area*prms_inch2mf_q
                            if ( Nhru==Nhrucell ) then
                              icell = Gvr_cell_id(hru_id)
                              irow = Gwc_row(icell)
@@ -3714,7 +3721,7 @@
                      hru_id = IRRROW_GW(J, L)
                      area = HRU_PERV(hru_id)
                      pet = potet(hru_id)*area*prms_inch2mf_q
-                     aet = hru_actet(hru_id)*area*prms_inch2mf_q
+                     aet = perv_actet(hru_id)*area*prms_inch2mf_q
                      if ( Nhru==Nhrucell ) then
                        icell = Gvr_cell_id(hru_id)
                        irow = Gwc_row(icell)
@@ -3898,7 +3905,7 @@
       !1 - -----DETERMINE NUMBER OF INDIVIDUAL BUDGET ENTRIES.
       BUDPERC = 0.
       MSUM1 = MSUM - 1
-      IF (MSUM1 .LE. 0) RETURN
+      IF (MSUM1 < 1) RETURN
       !
       !2 - -----CLEAR RATE AND VOLUME ACCUMULATORS.
       TOTRIN = ZERO

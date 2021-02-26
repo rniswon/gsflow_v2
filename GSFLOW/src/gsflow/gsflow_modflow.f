@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-02-04'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-02-26'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -23,16 +23,17 @@
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
       INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS,KPERSTART
+      INTEGER, SAVE :: AGCONVERGE
       INTEGER, SAVE :: KSTP, KKSTP, IERR, Max_iters, Itreal
       INTEGER, SAVE :: Mfiter_cnt(ITDIM), Iter_cnt(ITDIM), Iterations
       INTEGER, SAVE :: Szcheck, Sziters, INUNIT, KPER, NCVGERR
       INTEGER, SAVE :: Max_sziters, Maxgziter
       INTEGER, SAVE, ALLOCATABLE :: Gwc_col(:), Gwc_row(:)
       REAL, SAVE :: Delt_save
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Stress_dates(:)
+      INTEGER, SAVE, ALLOCATABLE :: Stress_dates(:)
       INTEGER, SAVE :: Modflow_skip_stress, Kkper_new, 
      +                 Modflow_skip_time_step
-      DOUBLE PRECISION, SAVE :: Modflow_time_in_stress,Modflow_skip_time
+      REAL, SAVE :: Modflow_time_in_stress, Modflow_skip_time
       DOUBLE PRECISION, SAVE :: Mft_to_sec, Totalarea_mf
       DOUBLE PRECISION, SAVE :: Mfl2_to_acre, Mfl3_to_ft3, Sfr_conv
       DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs
@@ -183,6 +184,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
       INUNIT = 200
       NCVGERR=0
       ICNVG=1
+      AGCONVERGE=1
 C
 C3------GET THE NAME OF THE NAME FILE
       CALL GETNAMFIL(FNAME)
@@ -683,7 +685,8 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
               IF ( KKITER==Mxsziter+1 ) Stopcount = Stopcount + 1
             ENDIF
             IF(IUNIT(66).GT.0 ) 
-     1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63))
+     1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
+
             IF(IUNIT(55).GT.0) CALL GWF2UZF1FM(KKPER,KKSTP,KKITER,
      1                           IUNIT(44),IUNIT(22),IUNIT(63),
      2                           IUNIT(64),IGRID)  !SWR - JDH ADDED IUNIT(64)
@@ -767,7 +770,7 @@ c            END IF
 ! Calculate new heads using Newton solver
           IF(IUNIT(63).GT.0 ) 
      1          CALL GWF2NWT1FM(KKITER,ICNVG,KSTP,KPER,Mxiter,
-     2                          IUNIT(22),Itreal,IGRID)
+     2                          IUNIT(22),Itreal,AGCONVERGE,IGRID)
           IF ( IUNIT(63).GT.0 )ITREAL2 = ITREAL
           IF(IERR.EQ.1) CALL USTOP(' ')
 C
@@ -777,6 +780,7 @@ C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
             END IF
 C
 C7C2C---IF CONVERGENCE CRITERION HAS BEEN MET STOP ITERATING.
+C
             IF (ICNVG.EQ.1) GOTO 33
             IF ( Szcheck==ACTIVE ) THEN
               retval = gsflow_mf2prms()
@@ -1390,14 +1394,13 @@ C
       INTEGER FUNCTION GET_KPER()
       USE GLOBAL, ONLY: NPER
       USE GSFMODFLOW, ONLY: Stress_dates, KPER
-      USE PRMS_MODULE, ONLY: Starttime, Start_year, Start_month,
-     &                       Start_day
+      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day
       IMPLICIT NONE
       INTRINSIC DBLE
-      DOUBLE PRECISION, EXTERNAL :: nowjt, getjulday
+      DOUBLE PRECISION, EXTERNAL :: nowjt
+      INTEGER, EXTERNAL :: compute_julday
 ! Local Variables
-      DOUBLE PRECISION :: now
-      INTEGER :: KPERTEST
+      INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
       now = nowjt()
@@ -1406,9 +1409,8 @@ C
 !
 !     If called from init, then "now" isn't set yet.
 !     Set "now" to model start date.
-      IF ( now.LE.1.0D0 )
-     &     now = getjulday(Start_month, Start_day, Start_year,
-     &                  Starttime(4), Starttime(5), Starttime(6))
+      IF ( now<2 )
+     &     now = compute_julday(Start_year, Start_month, Start_day)
       IF ( now<Stress_dates(KPERTEST) )
      &     STOP 'ERROR, now<stress period time'
       IF ( now>Stress_dates(NPER) ) THEN
@@ -1428,7 +1430,7 @@ C
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, GSFLOW,
      &    ERROR_restart, ERROR_time, ERROR_modflow
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Kkiter, Model,
-     &    Starttime, Start_year, Start_month, Start_day, Print_debug
+     &    Start_year, Start_month, Start_day, Print_debug
       USE GLOBAL, ONLY: NPER, ISSFLG, PERLEN, IUNIT, NSTP
       USE GSFMODFLOW, ONLY: Modflow_skip_time, Modflow_skip_stress,
      &    Modflow_time_in_stress, Stress_dates, Modflow_time_zero,
@@ -1439,28 +1441,23 @@ C
       IMPLICIT NONE
       ! Functions
       EXTERNAL :: READ_STRESS, RESTART1READ, error_stop
-      INTEGER, EXTERNAL :: gsfrun
-      INTRINSIC :: INT
-      DOUBLE PRECISION, EXTERNAL :: getjulday
+      INTEGER, EXTERNAL :: gsfrun, compute_julday
+      INTRINSIC :: INT, FLOAT
 ! Local Variables
-      INTEGER :: i, n, nstress
-      DOUBLE PRECISION :: start_jul, mfstrt_jul, plen, time
-      DOUBLE PRECISION :: kstpskip
+      INTEGER :: i, n, nstress, start_jul, mfstrt_jul
+      REAL :: plen, time, kstpskip
 !***********************************************************************
       IF ( Print_debug>DEBUG_less )
      &     PRINT ( '(/, A, I5,2("/",I2.2))' ), 'modflow_time_zero:',
      &  Modflow_time_zero(1), Modflow_time_zero(2), Modflow_time_zero(3)
       ALLOCATE ( Stress_dates(NPER+1) )
-      Stress_dates = 0.0D0
-      Stress_dates(1) =
-     &          getjulday(Modflow_time_zero(2), Modflow_time_zero(3),
-     &                    Modflow_time_zero(1), Modflow_time_zero(4),
-     &                    Modflow_time_zero(5), Modflow_time_zero(6))
+      Stress_dates = 0
+      Stress_dates(1) = compute_julday(Modflow_time_zero(1),
+     &                  Modflow_time_zero(2), Modflow_time_zero(3))
       mfstrt_jul = Stress_dates(1)
 
       ! determine julian day
-      start_jul = getjulday(Start_month, Start_day, Start_year,
-     &                      Starttime(4), Starttime(5), Starttime(6))
+      start_jul = compute_julday(Start_year, Start_month, Start_day)
 
       IF ( mfstrt_jul>start_jul ) THEN
         PRINT *, 'ERROR, modflow_time_zero > start_time',
@@ -1487,7 +1484,7 @@ C
           IF ( i/=1 )
      &         CALL error_stop('only first time step can be SS',
      &                         ERROR_time)
-          Stress_dates(i) = Stress_dates(i) - plen
+          Stress_dates(i) = Stress_dates(i) - INT( plen )
           KPER = 1
           CALL READ_STRESS()
           IF ( Init_vars_from_file==0 ) THEN
@@ -1506,7 +1503,7 @@ C
             CALL GWF2BAS7OC(1,1,1,IUNIT(12),IGRID)  !assumes only SP1 can be SS
           ENDIF
         ENDIF
-        Stress_dates(i+1) = Stress_dates(i) + plen
+        Stress_dates(i+1) = Stress_dates(i) + INT( plen )
       ENDDO
  222  FORMAT ( /, 'Steady state simulation did not converge ', I0)
  223  FORMAT ( /, 'Steady state simulation successful, used ', I0,
@@ -1514,11 +1511,11 @@ C
 
       Modflow_skip_stress = 0
       Modflow_skip_time_step = 0
-      Modflow_skip_time = start_jul - mfstrt_jul
+      Modflow_skip_time = FLOAT( start_jul - mfstrt_jul )
       Modflow_time_in_stress = Modflow_skip_time
-      IF ( Modflow_skip_time>0.0D0 ) THEN
-        kstpskip = 0.0D0
-        time = 0.0D0
+      IF ( Modflow_skip_time>0.0 ) THEN
+        kstpskip = 0.0
+        time = 0.0
         DO i = 1, NPER
           IF ( ISSFLG(i)/=1 ) time = time + PERLEN(i)*Mft_to_days
           IF ( time<=Modflow_skip_time ) THEN     !RGN
@@ -1532,7 +1529,7 @@ C
         ENDDO
 !        Modflow_time_in_stress = Modflow_time_in_stress - time   !RGN
         Modflow_time_in_stress = Modflow_skip_time - kstpskip
-        IF ( Modflow_time_in_stress<0.0D0 ) Modflow_time_in_stress=0.0D0
+        IF ( Modflow_time_in_stress<0.0 ) Modflow_time_in_stress=0.0
         ! skip stress periods from modflow_time_zero to start_time
         IF ( Modflow_skip_stress - ISSFLG(1) == 0 ) THEN
           KPER = 1

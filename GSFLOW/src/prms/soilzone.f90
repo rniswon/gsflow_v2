@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-02-16'
+      character(len=*), parameter :: Version_soilzone = '2021-02-26'
       INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -69,7 +69,7 @@
       REAL, SAVE, ALLOCATABLE :: Pref_flow_max(:), Snow_free(:)
       REAL, SAVE, ALLOCATABLE :: Cap_waterin(:), Soil_lower(:), Soil_zone_max(:)
       REAL, SAVE, ALLOCATABLE :: Potet_lower(:), Potet_rechr(:), Soil_lower_ratio(:)
-      REAL, SAVE, ALLOCATABLE :: Unused_potet(:)
+      REAL, SAVE, ALLOCATABLE :: Unused_potet(:), Soilzone_gain_hru(:)
       INTEGER, SAVE, ALLOCATABLE :: Soil_saturated(:)
 !      REAL, SAVE, ALLOCATABLE :: Cascade_interflow(:), Cascade_dunnianflow(:), Interflow_max(:)
 !      REAL, SAVE, ALLOCATABLE :: Cpr_stor_frac(:), Pfr_stor_frac(:), Gvr_stor_frac(:), Soil_moist_frac(:)
@@ -150,6 +150,7 @@
 !     hru_area, slowcoef_sq, gvr_hru_id
 !***********************************************************************
       INTEGER FUNCTION szdecl()
+      USE PRMS_MODULE, ONLY: Soilzone_add_water_use
       USE PRMS_SOILZONE
       IMPLICIT NONE
 ! Functions
@@ -165,6 +166,12 @@
       IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
 
 ! Declare Variables
+      IF ( Soilzone_add_water_use==ACTIVE ) THEN
+        ALLOCATE ( Soilzone_gain_hru(Nhru) )
+        IF ( declvar(MODNAME, 'soilzone_gain_hru', 'nhru', Nhru, 'real', &
+     &       'Irrigation added to soilzone from water-use module for each HRU', &
+     &       'inches', Soilzone_gain_hru)/=0 ) CALL read_error(3, 'soilzone_gain_hru')
+      ENDIF
       IF ( declvar(MODNAME, 'basin_capwaterin', 'one', 1, 'double', &
      &     'Basin area-weighted average infiltration,'// &
      &     ' cascading interflow and Dunnian flow added to capillary reservoir storage', &
@@ -756,6 +763,7 @@
 !              set initial values and check parameter values
 !***********************************************************************
       INTEGER FUNCTION szinit()
+      USE PRMS_MODULE, ONLY: Soilzone_add_water_use
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Active_hrus, Hru_route_order, &
      &    Basin_area_inv, Hru_area, Hru_frac_perv, Numlake_hrus, Ag_area, Ag_frac
@@ -1008,6 +1016,7 @@
       Potet_rechr = 0.0
       Unused_potet = 0.0 ! dimension nhru
       Soil_saturated = OFF
+      IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
       IF ( Pref_flag==ACTIVE ) THEN
         IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_pref_flow_stor(Nhru) )
       ENDIF
@@ -1075,6 +1084,7 @@
 !             and groundwater reservoirs
 !***********************************************************************
       INTEGER FUNCTION szrun()
+      USE PRMS_MODULE, ONLY: Soilzone_add_water_use
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Hru_frac_perv, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -1096,7 +1106,6 @@
       USE PRMS_SNOW, ONLY: Snowcov_area, Snow_evap
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen, Infil_ag
       USE GSFMODFLOW, ONLY: Hru_ag_irr
-      USE PRMS_SET_TIME, ONLY: Nowtime
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
@@ -1221,6 +1230,7 @@
       update_potet = OFF
       add_estimated_irrigation = OFF
       num_hrus_ag_iter = 0
+      IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 
