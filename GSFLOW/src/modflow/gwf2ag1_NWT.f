@@ -1514,7 +1514,7 @@
             DO I = 1, NUMSW - 1
                IF (UNIT == TSSWUNIT(I)) ITEST = 1
             END DO
-            IF (ITEST /= 1) CALL WRITE_HEADER('DIV', NUMSW)
+            IF (ITEST /= 1) CALL WRITE_AG_HEADER('DIV', NUMSW)
             IF (SGNM > NSEGDIMTEMP) THEN
                WRITE (IOUT, *) 'Bad segment number for AG time series. '
                CALL USTOP('Bad segment number for AG time series.')
@@ -1529,7 +1529,7 @@
             DO I = 1, NUMGW - 1
                IF (UNIT == TSGWUNIT(I)) ITEST = 1
             END DO
-            IF (ITEST /= 1) CALL WRITE_HEADER('WEL', NUMGW)
+            IF (ITEST /= 1) CALL WRITE_AG_HEADER('WEL', NUMGW)
             IF (WLNM > MXWELL) THEN
                WRITE (IOUT, *) 'Bad well number for AG time series. '
                CALL USTOP('Bad well number for AG time series.')
@@ -1544,7 +1544,7 @@
             DO I = 1, NUMSWET - 1
                IF (UNIT == TSSWUNIT(I)) ITEST = 1
             END DO
-            IF (ITEST /= 1) CALL WRITE_HEADER('SET', NUMSWET)
+            IF (ITEST /= 1) CALL WRITE_AG_HEADER('SET', NUMSWET)
             IF (SGNM > NSEGDIMTEMP) THEN
                WRITE (IOUT, *) 'Bad segment number for AG time series. '
                CALL USTOP('Bad segment number for AG time series.')
@@ -1559,7 +1559,7 @@
             DO I = 1, NUMGWET - 1
                IF (UNIT == TSGWETUNIT(I)) ITEST = 1
             END DO
-            IF (ITEST /= 1) CALL WRITE_HEADER('GET', NUMGWET)
+            IF (ITEST /= 1) CALL WRITE_AG_HEADER('GET', NUMGWET)
             IF (WLNM > MXWELL) THEN
                WRITE (IOUT, *) 'Bad well number for AG ET time series. '
                CALL USTOP('Bad well number for AG ET time series.')
@@ -1567,12 +1567,12 @@
          case ('WELLETALL')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
             TSGWETALLUNIT = UNIT
-            CALL WRITE_HEADER('AL1', NUMGWET)
+            CALL WRITE_AG_HEADER('AL1', NUMGWET)
             NUMGWETALL = 1
          case ('WELLALL')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
             TSGWALLUNIT = UNIT
-            CALL WRITE_HEADER('AL2', NUMGWET)
+            CALL WRITE_AG_HEADER('AL2', NUMGWET)
             NUMGWALL = 1
          case ('END')
             write (iout, '(/1x,a)') 'FINISHED READING '//
@@ -1606,8 +1606,8 @@
       RETURN
       END
       !
-      ! - ------SUBROUTINE WRITE_HEADER
-      SUBROUTINE WRITE_HEADER(TSTYPE, NUM)
+      ! - ------SUBROUTINE WRITE_AG_HEADER
+      SUBROUTINE WRITE_AG_HEADER(TSTYPE, NUM)
         ! READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
         USE GWFAGMODULE
         IMPLICIT NONE
@@ -1649,7 +1649,7 @@
            WRITE (UNIT, *) 'TIME KPER KSTP NULL GW-DEMAND GW-PUMPED ',
      +                     'NULL'
         end select
-      END SUBROUTINE WRITE_HEADER
+      END SUBROUTINE WRITE_AG_HEADER
 
       !
       SUBROUTINE GWF2AG7FM(Kkper, Kkstp, Kkiter, Iunitnwt, agconverge)
