@@ -73,8 +73,8 @@
 !     Main gsflow_sum routine
 !***********************************************************************
       INTEGER FUNCTION gsflow_sum()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, SAVE_INIT
-      USE PRMS_MODULE, ONLY: Process, Save_vars_to_file
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, SAVE_INIT, RUN, DECL, INIT, CLEAN
+      USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: gsfsumdecl, gsfsuminit, gsfsumrun, gsfsumclean
@@ -82,13 +82,13 @@
 !***********************************************************************
       gsflow_sum = 0
 
-      IF ( Process(:3)=='run' ) THEN
+      IF ( Process_flag==RUN ) THEN
         gsflow_sum = gsfsumrun()
-      ELSEIF ( Process(:4)=='decl' ) THEN
+      ELSEIF ( Process_flag==DECL ) THEN
         gsflow_sum = gsfsumdecl()
-      ELSEIF ( Process(:4)=='init' ) THEN
+      ELSEIF ( Process_flag==INIT ) THEN
         gsflow_sum = gsfsuminit()
-      ELSEIF ( Process(:5)=='clean' ) THEN
+      ELSEIF ( Process_flag==CLEAN ) THEN
         IF ( Save_vars_to_file==ACTIVE ) CALL gsflow_sum_restart(SAVE_INIT)
         gsflow_sum = gsfsumclean()
       ENDIF

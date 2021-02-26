@@ -89,7 +89,6 @@ C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
-      USE PRMS_CONSTANTS, ONLY: READ_INIT
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell
       IMPLICIT NONE
@@ -787,7 +786,7 @@ C
 C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
             IF(IUNIT(64).GT.0) THEN
               CALL GWF2SWR7CV(KKITER,IGRID,ICNVG,MXITER)
-      END IF
+            END IF
 C
 C7C2C---IF CONVERGENCE CRITERION HAS BEEN MET STOP ITERATING.
 C
@@ -1404,15 +1403,13 @@ C
       INTEGER FUNCTION GET_KPER()
       USE GLOBAL, ONLY: NPER
       USE GSFMODFLOW, ONLY: Stress_dates, KPER
-      USE PRMS_MODULE, ONLY: Starttime, Start_year, Start_month,
-     &                       Start_day
+      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day
       IMPLICIT NONE
       INTRINSIC DBLE
       DOUBLE PRECISION, EXTERNAL :: nowjt
       INTEGER, EXTERNAL :: compute_julday
 ! Local Variables
-      INTEGER :: now
-      INTEGER :: KPERTEST
+      INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
       now = nowjt()
@@ -1421,9 +1418,8 @@ C
 !
 !     If called from init, then "now" isn't set yet.
 !     Set "now" to model start date.
-      IF ( now.LE.1.0D0 ) THEN
-        now = compute_julday(Start_year, Start_month, Start_day)
-      ENDIF
+      IF ( now<2 )
+     &     now = compute_julday(Start_year, Start_month, Start_day)
       IF ( now<Stress_dates(KPERTEST) )
      &     STOP 'ERROR, now<stress period time'
       IF ( now>Stress_dates(NPER) ) THEN
@@ -1443,7 +1439,7 @@ C
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, GSFLOW,
      &    ERROR_restart, ERROR_time, ERROR_modflow
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Kkiter, Model,
-     &    Starttime, Start_year, Start_month, Start_day, Print_debug
+     &    Start_year, Start_month, Start_day, Print_debug
       USE GLOBAL, ONLY: NPER, ISSFLG, PERLEN, IUNIT, NSTP
       USE GSFMODFLOW, ONLY: Modflow_skip_time, Modflow_skip_stress,
      &    Modflow_time_in_stress, Stress_dates, Modflow_time_zero,
@@ -1819,7 +1815,7 @@ C
       SUBROUTINE SETCONVFACTORS()
       USE PRMS_CONSTANTS, ONLY: FT2_PER_ACRE, MODFLOW, ERROR_modflow,OFF
       USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Model, Gvr_cell_pct,
-     &    Gsflow_flag
+     &    GSFLOW_flag
       USE GLOBAL, ONLY: ITMUNI, LENUNI, IOUT
       USE GWFBASMODULE, ONLY: DELT
       USE GSFMODFLOW, ONLY: Mft_to_sec, Cellarea,
