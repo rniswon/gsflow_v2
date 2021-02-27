@@ -23,6 +23,7 @@
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
       INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS,KPERSTART
+      INTEGER, SAVE :: AGCONVERGE
       INTEGER, SAVE :: KSTP, KKSTP, IERR, Max_iters, Itreal
       INTEGER, SAVE :: Mfiter_cnt(ITDIM), Iter_cnt(ITDIM), Iterations
       INTEGER, SAVE :: Szcheck, Sziters, INUNIT, KPER, NCVGERR
@@ -183,6 +184,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
       INUNIT = 200
       NCVGERR=0
       ICNVG=1
+      AGCONVERGE=1
 C
 C3------GET THE NAME OF THE NAME FILE
       CALL GETNAMFIL(FNAME)
@@ -683,7 +685,8 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
               IF ( KKITER==Mxsziter+1 ) Stopcount = Stopcount + 1
             ENDIF
             IF(IUNIT(66).GT.0 ) 
-     1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63))
+     1      CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
+
             IF(IUNIT(55).GT.0) CALL GWF2UZF1FM(KKPER,KKSTP,KKITER,
      1                           IUNIT(44),IUNIT(22),IUNIT(63),
      2                           IUNIT(64),IGRID)  !SWR - JDH ADDED IUNIT(64)
@@ -767,7 +770,7 @@ c            END IF
 ! Calculate new heads using Newton solver
           IF(IUNIT(63).GT.0 ) 
      1          CALL GWF2NWT1FM(KKITER,ICNVG,KSTP,KPER,Mxiter,
-     2                          IUNIT(22),Itreal,IGRID)
+     2                          IUNIT(22),Itreal,AGCONVERGE,IGRID)
           IF ( IUNIT(63).GT.0 )ITREAL2 = ITREAL
           IF(IERR.EQ.1) CALL USTOP(' ')
 C

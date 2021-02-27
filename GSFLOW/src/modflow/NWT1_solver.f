@@ -861,7 +861,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 !
 !     -----------------------------------------------------------------
       SUBROUTINE GWF2NWT1FM(Kkiter, ICNVG, KSTP, KPER, Maxiter, 
-     +                      Iunitchd, Itreal, Igrid)
+     +                      Iunitchd, Itreal, agconverge, Igrid)
 ! Builds and Solves Jacobian
 ! Calls various unstructured linear solvers to solve Jacobian
       USE GLOBAL, ONLY:Iout,ISSFLG
@@ -886,12 +886,12 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 !     ARGUMENTS
 !     ------------------------------------------------------------------
       INTEGER Iss, Igrid, Kkiter, Icnvg, Maxiter, KSTP, KPER, Iunitchd
-      INTEGER Itreal
+      INTEGER agconverge
 !     -----------------------------------------------------------------
 !     LOCAL VARIABLES
 !     -----------------------------------------------------------------
       DOUBLE PRECISION R_norm_gmres, r_norm, fheadsave2
-      INTEGER ic, ir, il, ITER, ippn
+      INTEGER ic, ir, il, ITER, ippn, Itreal
       INTEGER ij, jj, ichld, irhld, ilhld, itertot
       INTEGER n_iter, n, icfld, irfld, ilfld
 !!      DOUBLE PRECISION h2
@@ -950,11 +950,13 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
       RMS1 = RMS_func(icfld,irfld,ilfld)
       Icnvg = 0
       IF ( RMS1.GT.FTOL .OR. ABS(Fheadsave).GT.Tol .OR. 
-     +                           kkiter.LT.2 ) THEN
+     +                           kkiter.LT.2 .or.
+     +                           agconverge == 0 ) THEN
         Ibt = 1
         IF ( BTRACK.EQ.0 .OR. II.GE.Numtrack ) Ibt = 0
         IF ( RMS1.LT.Btol*rmsave .OR. Kkiter.EQ.1 ) Ibt = 0
         IF ( II.GT.0 .AND. RMS1.GT.RMS2 ) Ibt = 0
+        IF ( agconverge == 0 ) Ibt = 0
         IF ( Ibt.EQ.0 ) THEN
           II = 0
           jj = 1
@@ -1102,6 +1104,7 @@ C--Update heads.
  !     end do
  !     end if
       END IF
+      IF ( AGCONVERGE.EQ.0 ) ICNVG = 0
  ! 888 format(256E20.10)
 !
 !  Calculate maximum head change and residuals
@@ -1415,6 +1418,7 @@ C-----SET HNEW TO HDRY IF IPHRY>0
 !     Return value of groundwater flow equation
       DOUBLE PRECISION FUNCTION GW_func(Ic, Ir, Il)
       USE GWFNWTMODULE
+      USE GLOBAL,      ONLY:iout, ibound
       USE GWFBASMODULE, ONLY:HNOFLO
       IMPLICIT NONE
 !     ------------------------------------------------------------------
@@ -1427,7 +1431,7 @@ C-----SET HNEW TO HDRY IF IPHRY>0
 !     -----------------------------------------------------------------
 !     LOCAL VARIABLES
 !     -----------------------------------------------------------------
-      DOUBLE PRECISION term1, term2, term3
+      DOUBLE PRECISION term1, term2, term3, sum
 !     -----------------------------------------------------------------   
       GW_func = 0.0D0
       IF ( H==HNOFLO ) RETURN    
