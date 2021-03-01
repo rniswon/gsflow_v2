@@ -206,7 +206,7 @@ void setup_cont (void) {
 
 		lval = (long*)umalloc(sizeof(long));
 		lval[0] = 0;
-		decl_control_int_array("dyn_ag_flag", 1, lval);
+		decl_control_int_array("dyn_ag_frac_flag", 1, lval);
 
 		lval = (long*)umalloc(sizeof(long));
 		lval[0] = 0;

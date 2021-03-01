@@ -20,9 +20,9 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/29/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-01-28'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 01/28/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 02/26/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-02-26'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 02/26/2021'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -63,7 +63,7 @@
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag
-      INTEGER, SAVE :: Agriculture_soil_flag, Agriculture_canopy_flag, Dyn_ag_flag
+      INTEGER, SAVE :: Agriculture_soil_flag, Agriculture_canopy_flag, Dyn_ag_frac_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file
@@ -102,8 +102,8 @@
       INTEGER, EXTERNAL :: water_use_read, dynamic_param_read, potet_pm_sta
       INTEGER, EXTERNAL :: stream_temp
       EXTERNAL :: module_error, print_module, PRMS_open_output_file, precip_map, temp_map
-      EXTERNAL :: call_modules_restart, water_balance, basin_summary, nsegment_summary, PRMS_land_modules
-      EXTERNAL :: prms_summary, nhru_summary, module_doc, convert_params, read_error, nsub_summary, error_stop
+      EXTERNAL :: call_modules_restart, water_balance, summary_output
+      EXTERNAL :: prms_summary, module_doc, convert_params, read_error, error_stop
       INTEGER, EXTERNAL :: gsflow_modflow, gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
       INTEGER, EXTERNAL :: declparam, getparam, declvar
 ! Local Variables
@@ -374,7 +374,10 @@
 
       IF ( Model==CLIMATE ) THEN
         call_modules = ierr
-        IF ( Process_flag==RUN ) RETURN
+        IF ( Process_flag==RUN ) THEN
+          CALL summary_output()
+          RETURN
+        ENDIF
       ENDIF
 
 ! frost_date is a pre-process module
@@ -382,7 +385,10 @@
         ierr = frost_date()
         IF ( ierr/=0 ) CALL module_error('frost_date', Arg, ierr)
         call_modules = ierr
-        IF ( Process_flag==RUN ) RETURN
+        IF ( Process_flag==RUN ) THEN
+          CALL summary_output()
+          RETURN
+        ENDIF
         IF ( Process_flag==CLEAN ) STOP
       ENDIF
 
@@ -404,7 +410,10 @@
 
       IF ( Model==TRANSPIRE ) THEN
         call_modules = ierr
-        IF ( Process_flag==RUN ) RETURN
+        IF ( Process_flag==RUN ) THEN
+          CALL summary_output()
+          RETURN
+        ENDIF
       ENDIF
 
       IF ( Climate_potet_flag==OFF ) THEN
@@ -435,7 +444,10 @@
 
       IF ( Model==POTET ) THEN
         call_modules = ierr
-        IF ( Process_flag==RUN ) RETURN
+        IF ( Process_flag==RUN ) THEN
+          CALL summary_output()
+          RETURN
+        ENDIF
       ENDIF
 
       IF ( PRMS_land_iteration_flag==OFF ) CALL PRMS_land_modules(Arg, ierr)
@@ -517,15 +529,9 @@
         IF ( ierr/=0 ) CALL module_error('subbasin', Arg, ierr)
       ENDIF
 
-      IF ( NhruOutON_OFF>OFF ) CALL nhru_summary()
+      CALL summary_output()
 
-      IF ( NsubOutON_OFF==ACTIVE ) CALL nsub_summary()
-
-      IF ( BasinOutON_OFF==ACTIVE ) CALL basin_summary()
-
-      IF ( NsegmentOutON_OFF>OFF ) CALL nsegment_summary()
-
-      IF ( CsvON_OFF>OFF .AND. PRMS_only==ACTIVE ) CALL prms_summary()
+      IF ( CsvON_OFF>OFF .AND. Model==PRMS ) CALL prms_summary()
 
       call_modules = ierr ! set in case of the following RETURNs
       IF ( Process_flag==RUN ) THEN
@@ -547,7 +553,7 @@
         ENDIF
         IF ( Print_debug>DEBUG_minimum ) &
      &       WRITE ( PRMS_output_unit,'(A,I5,A,F6.2,A,/)') 'Execution elapsed time', Elapsed_time_minutes, ' minutes', &
-     &       Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
+     &                                                     Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
         IF ( Print_debug>DEBUG_minimum ) CLOSE ( PRMS_output_unit )
         IF ( Save_vars_to_file==ACTIVE ) CLOSE ( Restart_outunit )
         STOP
@@ -985,13 +991,13 @@
       IF ( control_integer(Dyn_springfrost_flag, 'dyn_springfrost_flag')/=0 ) Dyn_springfrost_flag = OFF
       IF ( control_integer(Dyn_snareathresh_flag, 'dyn_snareathresh_flag')/=0 ) Dyn_snareathresh_flag = OFF
       IF ( control_integer(Dyn_transp_on_flag, 'dyn_transp_on_flag')/=0 ) Dyn_transp_on_flag = OFF
-      IF ( control_integer(Dyn_ag_flag, 'dyn_ag_flag')/=0 ) Dyn_ag_flag = OFF
+      IF ( control_integer(Dyn_ag_frac_flag, 'dyn_ag_frac_flag')/=0 ) Dyn_ag_frac_flag = OFF
       Dynamic_flag = 0
       IF ( Dyn_imperv_flag/=OFF .OR. Dyn_intcp_flag/=0 .OR. Dyn_covden_flag/=0 .OR. Dyn_dprst_flag/=OFF .OR. &
      &     Dyn_potet_flag/=OFF .OR. Dyn_covtype_flag/=0 .OR. Dyn_transp_flag/=0 .OR. Dyn_soil_flag /=OFF .OR. &
      &     Dyn_radtrncf_flag/=OFF .OR. Dyn_sro2dprst_perv_flag/=0 .OR. Dyn_sro2dprst_imperv_flag/=OFF .OR. &
      &     Dyn_fallfrost_flag/=OFF .OR. Dyn_springfrost_flag/=0 .OR. Dyn_snareathresh_flag/=0 .OR. &
-     &     Dyn_transp_on_flag/=OFF ) Dynamic_flag = ACTIVE
+     &     Dyn_transp_on_flag/=OFF .OR. Dyn_ag_frac_flag==ACTIVE ) Dynamic_flag = ACTIVE
       IF ( control_integer(Gwr_transferON_OFF, 'gwr_transferON_OFF')/=0) Gwr_transferON_OFF = OFF
       IF ( control_integer(External_transferON_OFF, 'external_transferON_OFF')/=0 ) External_transferON_OFF = OFF
       IF ( control_integer(Dprst_transferON_OFF, 'dprst_transferON_OFF')/=0 ) Dprst_transferON_OFF = OFF
@@ -1291,6 +1297,26 @@
       ENDIF
 
       END SUBROUTINE check_dimens
+
+!***********************************************************************
+!     Call output summary routines
+!***********************************************************************
+      SUBROUTINE summary_output()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: NhruOutON_OFF, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
+      IMPLICIT NONE
+      ! Functions
+      EXTERNAL :: nhru_summary, nsub_summary, basin_summary, nsegment_summary
+!***********************************************************************
+      IF ( NhruOutON_OFF>OFF ) CALL nhru_summary()
+
+      IF ( NsubOutON_OFF==ACTIVE ) CALL nsub_summary()
+
+      IF ( BasinOutON_OFF==ACTIVE ) CALL basin_summary()
+
+      IF ( NsegmentOutON_OFF>OFF ) CALL nsegment_summary()
+
+      END SUBROUTINE summary_output
 
 !**********************************************************************
 !     Module documentation
