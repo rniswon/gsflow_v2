@@ -190,6 +190,7 @@
       NUMPONDIRR = 0
       TSGWETALLUNIT = 0
       TSGWALLUNIT = 0
+      WELAUX = ' '
       ALLOCATE (NUMSUP, NUMIRRWEL, UNITSUP, MAXCELLSWEL)
       ALLOCATE (NUMSUPSP, MAXSEGS, NUMIRRWELSP)
       ALLOCATE (ETDEMANDFLAG, NUMIRRDIVERSION, NUMIRRDIVERSIONSP)
@@ -1435,7 +1436,7 @@
       INTEGER, INTENT(IN)::IN, KPER
       !
       INTEGER ISEG, i, L, ID
-      DOUBLE PRECISION :: TOTAL, Qpond
+      DOUBLE PRECISION :: TOTAL !, Qpond
       EXTERNAL :: RATETERPQ
       REAL :: RATETERPQ, TIME
       ! - -----------------------------------------------------------------
@@ -1749,8 +1750,8 @@
       ! VARIABLES:
       CHARACTER(LEN=200)::LINE
       INTEGER :: IERR, LLOC, ISTART, ISTOP, J, IDUM
-      INTEGER :: K, IRWL, NMCL, IP, I, IRSG, IPOND
-      REAL :: R, IPRW, TRPW, SGFC
+      INTEGER :: K, IRWL, NMCL, IP, I, IPOND ! , IRSG
+      REAL :: R, IPRW, TRPW !, SGFC
       logical :: TEST
       ! - -----------------------------------------------------------------
       !
@@ -2141,7 +2142,7 @@
       RETURN
       END
       !
-      ! - ------SUBROUTINE WRITE_HEADER
+      ! - ------SUBROUTINE WRITE_HEADER_AG
       SUBROUTINE WRITE_HEADER_AG(TSTYPE, NUM)
         ! READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
         USE GWFAGMODULE
@@ -2220,7 +2221,7 @@
       !
       ! VARIABLES:
       ! - -----------------------------------------------------------------
-      INTEGER :: L, I, J, ISTSG, ICOUNT, IRR, ICC, IC, IR, IL, IJ, ID
+      INTEGER :: L, I, J, ISTSG, ICOUNT, IRR, ICC, IC, IR, IL, IJ !, ID
       DOUBLE PRECISION :: ZERO, DONE, SUP, FMIN, Q, SUBVOL, SUBRATE, DVT
       DOUBLE PRECISION :: DONENEG
       EXTERNAL :: SMOOTHQ, demandgw_uzf, demandgw_prms
@@ -2229,7 +2230,7 @@
       DOUBLE PRECISION :: Qp, Hh, Ttop, Bbot, dQp, SMOOTHQ
       DOUBLE PRECISION :: QSW, NEARZERO, QQ, demandtrigger_gw
       DOUBLE PRECISION :: demandgw_uzf, demandgw_prms
-      INTEGER :: k, PONDID, ipc
+      INTEGER :: k, ipc !, PONDID
       !
       ! - -----------------------------------------------------------------
       !
@@ -2263,7 +2264,7 @@
            CALL demandconjunctive_uzf(kkper, kkstp, kkiter, agconverge)
          ELSE
            CALL demandconjunctive_prms(kkper, kkstp, kkiter, agconverge)
-           CALL demandpond_prms(kkper, kkstp, kkiter, agconverge)
+           CALL demandpond_prms(kkper, kkstp, kkiter)
          END IF
       END IF
       IF (TRIGGERFLAG > 0) THEN
@@ -2299,7 +2300,7 @@
                DO I = 1, NUMSEGS(L)
                   J = DIVERSIONSEG(I, L)
                   QSW = SEG(2, J)
-                  If ( kkiter > 1 ) QSW = DVRSFLW(J)
+                  IF ( kkiter > 1 ) QSW = DVRSFLW(J)
                   IF (ETDEMANDFLAG > 0) THEN
                      FMIN = SUPACT(J)
                   ELSE IF (TRIGGERFLAG > 0) then
@@ -2482,12 +2483,13 @@
       DOUBLE PRECISION :: QSW, QSWIRR, QWELL, QWELLIRR, QWELLET
       DOUBLE PRECISION :: QSWGL, DONE, QPOND, QPONDIRR
       REAL :: Q, TIME, QIRR, BUDPERC, RIN_SNGL, ROUT_SNGL
-      INTEGER :: NWELLSTEMP, L, I, J, ISTSG, ICOUNT, IL, ID
+      INTEGER :: NWELLSTEMP, L, I, J, ISTSG, ICOUNT, IL !, ID
       INTEGER :: IC, IR, IBDLBL, IW1, IHRU
       INTEGER :: IBD1, IBD2, IBD3, IBD4, IBD5, IBD6, IBD7
 !      INTEGER :: TOTWELLCELLS, TOTDIVERSIONCELLS
 !      INTEGER :: TOTPONDCELLS
       EXTERNAL :: SMOOTHQ
+      INTRINSIC :: INT, SNGL
       DOUBLE PRECISION :: SMOOTHQ, bbot, ttop, hh
       DOUBLE PRECISION :: Qp, QQ, Qsave, dQp
       DOUBLE PRECISION :: DONENEG
@@ -2600,9 +2602,9 @@
       !
       !5 - -----CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
       DO L = 1, NWELLSTEMP
-        IL = WELL(1, L)
-        IR = WELL(2, L)
-        IC = WELL(3, L)
+        IL = INT( WELL(1, L) )
+        IR = INT( WELL(2, L) )
+        IC = INT( WELL(3, L) )
         Q = WELL(4, L)
          !
          !6 - -----IF TRIGGER ACTIVE THEN IMCREMENT IRRIGATION PERIOD FOR WELL
@@ -2718,14 +2720,14 @@
          WRITE (IBD1, *)
          WRITE (IBD1, 61) TEXT1, KKPER, KKSTP
          DO L = 1, NWELLSTEMP
-           IR = WELL(2, L)
-           IC = WELL(3, L)
-           IL = WELL(1, L)
+           IR = INT( WELL(2, L) )
+           IC = INT( WELL(3, L) )
+           IL = INT( WELL(1, L) )
            WRITE (IBD1, 62) L, IL, IR, IC, WELL(NWELVL, L)
          END DO
          WRITE (IBD1, *)
       END IF
-      !
+!
       !13 - ----PRINT IRRIGATION DIVERSION RATE IF REQUESTED.
       IF (IBD2 .GT. 0) THEN
          WRITE (IBD2, *)
@@ -2736,7 +2738,7 @@
          END DO
          WRITE (IBD2, *)
       END IF
-      !
+!
       !13 - ----PRINT APPLIED SW IRRIGATION FOR EACH CELL
       IF (IBD3 .GT. 0) THEN
          WRITE (IBD3, *)
@@ -2807,7 +2809,7 @@
       !
       !18 - -----MOVE RATES, VOLUMES&LABELS INTO ARRAYS FOR PRINTING
       ! GW PUMPING (NEGATIVE OUT OF GW)
-      RIN = -QWELL   
+      RIN = -QWELL
       ROUT = ZERO
       RIN_SNGL = SNGL(RIN)
       ROUT_SNGL = SNGL(ROUT)
