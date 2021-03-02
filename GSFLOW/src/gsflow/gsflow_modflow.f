@@ -14,12 +14,15 @@
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
+      character(len=*), parameter :: MODDESC_AG =  'AG-NWT Package'
       character(len=*), parameter :: MODNAME_UZF = 'gwf2uzf1_NWT'
       character(len=*), parameter :: MODNAME_SFR = 'gwf2sfr7_NWT'
       character(len=*), parameter :: MODNAME_LAK = 'gwf2lak7_NWT'
-      character(len=*), parameter :: Version_uzf = '2020-12-28'
+      character(len=*), parameter :: MODNAME_AG =  'gwf2ag1_NWT_ponds'
+      character(len=*), parameter :: Version_uzf = '2021-03-02'
       character(len=*), parameter :: Version_sfr = '2020-09-30'
       character(len=*), parameter :: Version_lak = '2020-09-30'
+      character(len=*), parameter :: Version_ag =  '2021-03-02'
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
       INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS,KPERSTART
@@ -52,6 +55,7 @@ C-------ASSIGN VERSION NUMBER AND DATE
       INTEGER, SAVE :: IBDT(8)
 !   Declared Variables
       REAL, SAVE, ALLOCATABLE :: Hru_ag_irr(:)
+      REAL, SAVE, ALLOCATABLE :: Dprst_ag_transfer(:), Dprst_ag_gain(:)
 !   Control Parameters
       INTEGER, SAVE :: Modflow_time_zero(6)
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
@@ -92,7 +96,7 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Agriculture_flag
       IMPLICIT NONE
       ! Functions
       INTEGER, EXTERNAL :: declvar
@@ -119,12 +123,26 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
         ALLOCATE ( Gvr2cell_conv(Nhrucell), Cellarea(Ngwcell) )
         ALLOCATE ( Gwc_row(Ngwcell), Gwc_col(Ngwcell) )
-        ALLOCATE ( Hru_ag_irr(Nhru) )
-        IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real',
-     &       'Irrigation added to soilzone from MODFLOW wells',
-     &       'inches', Hru_ag_irr)/=0 )
-     &       CALL read_error(3, 'hru_ag_irr')
-        Hru_ag_irr = 0.0
+        IF ( Agriculture_flag>OFF ) THEN
+          ALLOCATE ( Hru_ag_irr(Nhru) )
+          IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real',
+     &         'Irrigation added to soilzone from MODFLOW wells',
+     &         'inches', Hru_ag_irr)/=0 )
+     &         CALL read_error(3, 'hru_ag_irr')
+          Dprst_ag_gain = 0.0
+          IF ( declvar(MODNAME, 'dprst_ag_gain', 'nhru', Nhru, 'real',
+     &         'Irrigation added to surface depression storage from'//
+     &         ' MODFLOW ponds',
+     &         'inches', Dprst_ag_gain)/=0 )
+     &         CALL read_error(3, 'dprst_ag_gain')
+          Dprst_ag_gain = 0.0
+          ALLOCATE ( Dprst_ag_transfer(Nhru) )
+          IF ( declvar(MODNAME, 'dprst_ag_transfer', 'nhru',Nhru,'real',
+     &         'Surface depression storage transfer to MODFLOW cells',
+     &         'cfs', Dprst_ag_transfer)/=0 )
+     &         CALL read_error(3, 'dprst_ag_transfer')
+          Dprst_ag_transfer = 0.0
+        ENDIF
       ENDIF
 
       END FUNCTION gsfdecl
@@ -403,6 +421,8 @@ C7------SIMULATE EACH STRESS PERIOD.
       CALL print_module(MODDESC_SFR, MODNAME_SFR, Version_sfr)
       IF ( Have_lakes==ACTIVE )
      &     CALL print_module(MODDESC_LAK, MODNAME_LAK, Version_lak)
+      IF ( Ag_package_active==ACTIVE )
+     &     CALL print_module(MODDESC_AG, MODNAME_AG, Version_ag)
 
       IF ( IUNIT(63)>0 ) solver = 'NWT'
       IF ( IUNIT(13)>0 ) solver = 'PCG'
@@ -1209,7 +1229,7 @@ C     Get end time and calculate elapsed time
 C     ******************************************************************
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      INTRINSIC :: INT
+      INTRINSIC :: INT, NINT, MOD
       INTEGER IBDT(8), IEDT(8), IDPM(12)
       DATA IDPM/31,28,31,30,31,30,31,31,30,31,30,31/ ! Days per month
       DATA NSPD/86400/  ! Seconds per day

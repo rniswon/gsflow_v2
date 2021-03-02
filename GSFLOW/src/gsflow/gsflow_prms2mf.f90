@@ -7,7 +7,7 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-01-08'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-02-03'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -284,7 +284,7 @@
 !      WRITE (839,'(f15.13)') seg_area
 !      STOP
 
-        Cell_drain_rate = 0.0 ! dimension ngwcell
+      Cell_drain_rate = 0.0 ! dimension ngwcell
 
       ierr = 0
       IF ( Nhru/=Nhrucell ) THEN
@@ -410,8 +410,8 @@
       USE PRMS_SOILZONE, ONLY: Sm2gw_grav, Lakein_sz, Hrucheck, Gvr_hru_id, Unused_potet, Gvr_hru_pct_adjusted
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
-      INTEGER, EXTERNAL :: toStream, toIrr
-      EXTERNAL Bin_percolation
+      INTEGER, EXTERNAL :: toStream
+      EXTERNAL Bin_percolation, toIrr
 ! Local Variables
       INTEGER :: irow, icol, ik, jk, ii, ilake
       INTEGER :: j, icell, ihru, is_draining
@@ -425,10 +425,8 @@
 !-----------------------------------------------------------------------
 ! Remove open dprst storage for irrigation
 !-----------------------------------------------------------------------
-       IF ( Ag_package_active==ACTIVE .AND. Dprst_flag==Active ) THEN
-         IF ( NUMIRRPOND>0 ) THEN
-           IF ( toIrr()/=0 ) RETURN
-         ENDIF
+       IF ( Ag_package_active==ACTIVE .AND. Dprst_flag==ACTIVE ) THEN
+         IF ( NUMIRRPOND>0 ) CALL toIrr()
        ENDIF
 
 !-----------------------------------------------------------------------
@@ -569,34 +567,30 @@
 
 !***********************************************************************
 !***********************************************************************
-      INTEGER FUNCTION toIrr()
+      SUBROUTINE toIrr()
 
       USE GWFAGMODULE, ONLY: NUMIRRPOND, IRRPONDVAR, PONDFLOW
-      USE PRMS_WATER_USE, ONLY: Dprst_transfer
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
-      USE GSFMODFLOW, ONLY: Mfl3_to_ft3, Mft_to_sec
+      USE GSFMODFLOW, ONLY: Mfl3_to_ft3, Mft_to_sec, Dprst_ag_transfer
       IMPLICIT NONE
       INTRINSIC :: SNGL
 ! Local Variables
       INTEGER :: i, hru_id
       REAL :: conversion, demand_cfs
 !***********************************************************************
-      toIrr = 1
 ! Calculate conversion for MF units to cfs
       conversion = Mfl3_to_ft3/Mft_to_sec
       do i = 1, NUMIRRPOND
         hru_id = IRRPONDVAR(i)
         IF ( hru_id > 0 ) THEN
           demand_cfs = PONDFLOW(i)*conversion
-          Dprst_transfer(hru_id) = demand_cfs
-          IF ( Dprst_transfer(hru_id) > SNGL(Dprst_vol_open(hru_id))) Dprst_transfer(hru_id) = SNGL(Dprst_vol_open(hru_id))
-          PONDFLOW(i) = Dprst_transfer(hru_id)/conversion
+          Dprst_ag_transfer(hru_id) = demand_cfs
+          IF ( Dprst_ag_transfer(hru_id) > SNGL(Dprst_vol_open(hru_id))) Dprst_ag_transfer(hru_id) = SNGL(Dprst_vol_open(hru_id))
+          PONDFLOW(i) = Dprst_ag_transfer(hru_id)/conversion
         END IF
       end do
 
-      toIrr = 0
-
-      END FUNCTION toIrr
+      END SUBROUTINE toIrr
 
 !***********************************************************************
 ! Bin percolation to reduce waves
