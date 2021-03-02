@@ -5614,7 +5614,7 @@ nhru
 0.0
 0.0
 ####
-dprst_frac_hru
+dprst_frac
 1
 nhru
 5609
@@ -56149,7 +56149,7 @@ nhru
 0.0
 0.0
 ####
-sro_to_dprst
+sro_to_dprst_perv
 1
 nhru
 5609

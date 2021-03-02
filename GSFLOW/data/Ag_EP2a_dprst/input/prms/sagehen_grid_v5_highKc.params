@@ -213475,6 +213475,13 @@ one
 2
 0.05
 ####
+pref_flow_infil_frac
+1
+one
+1
+2
+0.05
+####
 tstorm_mo
 1
 nmonths

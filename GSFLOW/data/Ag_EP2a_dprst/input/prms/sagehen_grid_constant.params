@@ -6,7 +6,7 @@ one
 2
 2.00148257973
 ####
-ncol 0
+ncol
 1
 one
 1
@@ -239,6 +239,13 @@ nmonths
 10.700243
 ####
 snowpack_init
+1
+one
+1
+2
+0.0
+####
+ppt_zero_thresh
 1
 one
 1
