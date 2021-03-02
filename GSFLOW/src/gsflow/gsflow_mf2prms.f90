@@ -74,9 +74,9 @@
             IF ( Dprst_flag==ACTIVE ) THEN
               Dprst_ag_gain = 0.0
               DO i = 1, NUMIRRPOND
-                J = IRRPONDVAR(i)
+                ihru = IRRPONDVAR(i)
                 DO k = 1, MXPOND
-                  Dprst_ag_gain(J) = Dprst_ag_gain(J) + PONDSEGFLOW(k)*conversion
+                  Dprst_ag_gain(ihru) = Dprst_ag_gain(ihru) + PONDSEGFLOW(k)*conversion
                 ENDDO
               ENDDO
             ENDIF

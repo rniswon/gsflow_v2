@@ -20,7 +20,7 @@
       USE PRMS_MODULE, ONLY: Model, Nhru, Nssr, Nsegment, Nlake, Nhrucell, Print_debug, Dprst_flag, &
      &    Init_vars_from_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Call_cascade, PRMS_land_iteration_flag, &
-     &    Ag_package_active, Agriculture_flag
+     &    Ag_package_active, Agriculture_flag, Ag_frac_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
@@ -518,7 +518,7 @@
         IF ( declvar(MODNAME, 'gvr2sm', 'nhru', Nhru, 'real', &
      &       'Gravity flow to soil moist replenishment for each HRU', &
      &       'inches', Gvr2sm)/=0 ) CALL read_error(3, 'gvr2sm')
-        IF ( PRMS_land_iteration_flag==ACTIVE .OR. Agriculture_flag==ACTIVE ) ALLOCATE ( Ag_gvr2sm(Nhru) )
+        IF ( PRMS_land_iteration_flag==ACTIVE .OR. Ag_frac_flag==ACTIVE ) ALLOCATE ( Ag_gvr2sm(Nhru) )
 
         ALLOCATE ( Gw2sm_grav(Nhrucell) )
         IF ( declvar(MODNAME, 'gw2sm_grav', 'nhrucell', Nhrucell, 'real', &
@@ -647,7 +647,7 @@
 
 ! Agriculture variables and parameters
       Iter_aet = OFF
-      IF ( Agriculture_flag>OFF .OR. Model==DOCUMENTATION ) THEN
+      IF ( Ag_frac_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Ag_soil_to_gw(Nhru), Ag_soil_to_ssr(Nhru) )
         ALLOCATE ( Ag_dunnian(Nhru) )
         IF ( Cascade_flag>OFF ) ALLOCATE ( Ag_upslope_dunnian(Nhru) )
@@ -816,7 +816,7 @@
 
       Soil_iter = 1
 !??? figure out what to save in restart file ???
-      IF ( Agriculture_flag>OFF ) THEN
+      IF ( Ag_frac_flag==ACTIVE ) THEN
         IF ( getparam(MODNAME, 'max_soilzone_ag_iter', 1, 'integer', max_soilzone_ag_iter)/=0 ) &
      &       CALL read_error(2, 'max_soilzone_ag_iter')
         IF ( getparam(MODNAME, 'soilzone_aet_converge', 1, 'real', soilzone_aet_converge)/=0 ) &
@@ -907,7 +907,7 @@
           Slow_stor(i) = 0.0
           Pref_flow_stor(i) = 0.0
 !          Soil_rechr_ratio(i) = 0.0
-          IF ( Agriculture_flag>OFF ) THEN
+          IF ( Ag_frac_flag==ACTIVE ) THEN
             Ag_soil_rechr(i) = 0.0
             Ag_soil_moist(i) = 0.0
           ENDIF
@@ -937,7 +937,7 @@
         perv_area = Hru_perv(i)
         Soil_zone_max(i) = Sat_threshold(i) + Soil_moist_max(i)*Hru_frac_perv(i)
         Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*Hru_frac_perv(i)
-        IF ( Agriculture_flag>OFF ) THEN
+        IF ( Ag_frac_flag==ACTIVE ) THEN
           Soil_zone_max(i) = Soil_zone_max(i) + Ag_soil_moist_max(i)*Ag_frac(i)
           Soil_moist_tot(i) = Soil_moist_tot(i) + Ag_soil_moist(i)*Ag_frac(i)
           Ag_soil_lower(i) = Ag_soil_moist(i) - Ag_soil_rechr(i)
@@ -1000,7 +1000,7 @@
 !        Cascade_interflow = 0.0
 !        Cascade_dunnianflow = 0.0
         IF ( Numlake_hrus>0 ) Lakein_sz = 0.0D0
-        IF ( Agriculture_flag>OFF ) Ag_upslope_dunnian = 0.0D0
+        IF ( Ag_frac_flag==ACTIVE ) Ag_upslope_dunnian = 0.0D0
       ENDIF
       Cap_infil_tot = 0.0
       Pref_flow_infil = 0.0
@@ -1084,7 +1084,7 @@
 !             and groundwater reservoirs
 !***********************************************************************
       INTEGER FUNCTION szrun()
-      USE PRMS_MODULE, ONLY: Soilzone_add_water_use
+      USE PRMS_MODULE, ONLY: Soilzone_add_water_use, Agriculture_soil_flag
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Hru_frac_perv, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -1166,7 +1166,7 @@
           ! states saved in srunoff when PRMS_land_iteration_flag = ACTIVE
           Soil_rechr = It0_soil_rechr
           Soil_moist = It0_soil_moist
-          IF ( Agriculture_flag>OFF ) THEN
+          IF ( Ag_frac_flag==ACTIVE .AND. Ag_package_active==ACTIVE ) THEN
             Ag_soil_rechr = It0_ag_soil_rechr
             Ag_soil_moist = It0_ag_soil_moist
           ENDIF
@@ -1176,7 +1176,7 @@
         ELSE
           It0_soil_rechr = Soil_rechr
           It0_soil_moist = Soil_moist
-          IF ( Agriculture_flag>OFF ) THEN
+          IF ( Ag_frac_flag==ACTIVE .AND. Ag_package_active==ACTIVE ) THEN
             It0_ag_soil_rechr = Ag_soil_rechr
             It0_ag_soil_moist = Ag_soil_moist
           ENDIF
@@ -1193,7 +1193,7 @@
         It0_basin_ssstor = Basin_ssstor
       ENDIF
 
-      IF ( Agriculture_flag>OFF ) THEN
+      IF ( Ag_frac_flag==ACTIVE ) THEN
         Basin_ag_soil_moist = 0.0D0
         Basin_ag_soil_to_gw = 0.0D0
         Basin_ag_up_max = 0.0D0
@@ -1274,7 +1274,7 @@
         IF ( perv_area>0.0 ) perv_on_flag = ACTIVE
         ag_water_maxin = 0.0
         ag_on_flag = OFF
-        IF ( Agriculture_flag>OFF ) THEN
+        IF ( Ag_frac_flag==ACTIVE ) THEN
           IF ( Ag_area(i)>0.0 ) THEN
             ag_on_flag = ACTIVE
             agfrac = Ag_frac(i)
@@ -1309,9 +1309,9 @@
         capwater_maxin = Infil(i)
 
         ag_water_maxin = 0.0
-        IF ( Ag_package_active==ACTIVE ) THEN
+        IF ( Agriculture_soil_flag==ACTIVE ) THEN
           IF ( Hru_ag_irr(i)>0.0 ) THEN
-            IF ( ag_on_flag==OFF .AND. Agriculture_flag>OFF ) THEN
+            IF ( ag_on_flag==OFF .AND. Ag_frac_flag==ACTIVE ) THEN
               PRINT *, 'ag_frac=0.0 for HRU:', i
               CALL error_stop('irrigation specified and ag_frac=0', ERROR_param)
             ENDIF
@@ -2320,13 +2320,13 @@
         WRITE ( Restart_outunit ) Basin_soil_rechr, Basin_slstor, Basin_soil_moist_tot, Basin_pref_stor
         WRITE ( Restart_outunit ) Pref_flow_stor
         IF ( GSFLOW_flag==ACTIVE ) WRITE ( Restart_outunit ) Gravity_stor_res
-        IF ( Agriculture_flag>OFF ) WRITE ( Restart_outunit ) Ag_soil_lower
+        IF ( Ag_frac_flag==ACTIVE ) WRITE ( Restart_outunit ) Ag_soil_lower
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Basin_soil_rechr, Basin_slstor, Basin_soil_moist_tot, Basin_pref_stor
         READ ( Restart_inunit ) Pref_flow_stor
         IF ( GSFLOW_flag==ACTIVE ) READ ( Restart_inunit ) Gravity_stor_res
-        IF ( Agriculture_flag>OFF ) READ ( Restart_inunit ) Ag_soil_lower
+        IF ( Ag_frac_flag==ACTIVE ) READ ( Restart_inunit ) Ag_soil_lower
       ENDIF
       END SUBROUTINE soilzone_restart

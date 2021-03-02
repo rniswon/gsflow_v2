@@ -13,7 +13,7 @@
      &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, &
-     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, Glacier_flag, Agriculture_flag
+     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, Glacier_flag, Ag_frac_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
@@ -855,7 +855,7 @@
         ENDIF
       ENDIF
 
-      IF ( Agriculture_flag>OFF .OR. Model==DOCUMENTATION ) THEN
+      IF ( Ag_frac_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         IF ( declvar(Soilzone_module, 'basin_ag_soil_moist', 'one', 1, 'double', &
      &       'Basin area-weighted average soil agriculture reservoir storage', &
      &       'inches', Basin_ag_soil_moist)/=0 ) CALL read_error(3, 'basin_ag_soil_moist')
@@ -1094,7 +1094,7 @@
         Slow_stor = Ssres_stor
       ENDIF
 
-      IF ( Agriculture_flag>OFF ) THEN
+      IF ( Ag_frac_flag==ACTIVE ) THEN
         IF ( getparam(Soilzone_module, 'ag_soil_moist_max', Nhru, 'real', Ag_soil_moist_max)/=0 ) &
      &       CALL read_error(2, 'soil_moist_max')
         IF ( getparam(Soilzone_module, 'ag_soil_rechr_max_frac', Nhru, 'real', Ag_soil_rechr_max)/=0 ) &
@@ -1478,7 +1478,7 @@
           WRITE ( Restart_outunit ) Seg_outflow
         ENDIF
         IF ( Nlake>0 ) WRITE ( Restart_outunit ) Lake_vol
-        IF ( Agriculture_flag>OFF ) THEN
+        IF ( Ag_frac_flag==ACTIVE ) THEN
           WRITE ( Restart_outunit ) Ag_soil_moist
           WRITE ( Restart_outunit ) Ag_soil_rechr
         ENDIF
@@ -1508,7 +1508,7 @@
           READ ( Restart_inunit ) Seg_outflow
         ENDIF
         IF ( Nlake>0 ) READ ( Restart_inunit ) Lake_vol
-        IF ( Agriculture_flag>OFF ) THEN
+        IF ( Ag_frac_flag==ACTIVE ) THEN
           READ ( Restart_inunit ) Ag_soil_moist
           READ ( Restart_inunit ) Ag_soil_rechr
         ENDIF

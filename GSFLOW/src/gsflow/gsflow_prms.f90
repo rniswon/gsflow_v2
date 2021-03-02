@@ -40,7 +40,7 @@
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag
       INTEGER, SAVE :: PRMS_flag, GSFLOW_flag, PRMS4_flag
       INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Grid_flag, Ag_package_active
-      INTEGER, SAVE :: Agriculture_flag, Canopy_iter, Keep_iterating_PRMS
+      INTEGER, SAVE :: Agriculture_flag, Canopy_iter, Keep_iterating_PRMS, Ag_frac_flag
       INTEGER, SAVE :: Climate_irrigated_area_flag, AET_cbh_flag, PET_cbh_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Soilzone_add_water_use
@@ -63,7 +63,7 @@
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag
-      INTEGER, SAVE :: Agriculture_soil_flag, Agriculture_canopy_flag, Dyn_ag_frac_flag
+      INTEGER, SAVE :: Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, Dyn_ag_frac_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file
@@ -671,6 +671,8 @@
         PRINT '(/,2A)', 'ERROR, invalid model_mode value: ', Model_mode
         Inputerror_flag = 1
       ENDIF
+      Ag_frac_flag = OFF
+      IF ( Model==GSFLOW_AG .OR. Model==PRMS_AG ) Ag_frac_flag = ACTIVE
 
       ! get simulation start_time and end_time
       Starttime = -1
@@ -951,11 +953,14 @@
       IF ( control_integer(Dprst_add_water_use, 'dprst_add_water_use')/=0 ) Dprst_add_water_use = OFF
       IF ( control_integer(PRMS_land_iteration_flag, 'PRMS_land_iteration_flag')/=0 ) PRMS_land_iteration_flag = OFF
       IF ( PRMS_only==ACTIVE ) PRMS_land_iteration_flag = OFF
+
       ! 0 = off, 1 = apply irrigation in soilzone, 2 = apply irrigation to canopy
+      ! these are for GSFLOW5 with AG package ACTIVE
       IF ( control_integer(Agriculture_soil_flag, 'agriculture_soil_flag')/=0 ) Agriculture_soil_flag = OFF
       IF ( control_integer(Agriculture_canopy_flag, 'agriculture_canopy_flag')/=0 ) Agriculture_canopy_flag = OFF
-      Agriculture_flag = Agriculture_soil_flag + Agriculture_canopy_flag
-      IF ( Model==PRMS_AG ) Agriculture_flag = Agriculture_flag + 1
+      IF ( control_integer(Agriculture_dprst_flag, 'agriculture_dprst_flag')/=0 ) Agriculture_dprst_flag = OFF
+      Agriculture_flag = Agriculture_soil_flag + Agriculture_canopy_flag + Agriculture_dprst_flag
+
       ! 0 = off, 1 = on, 2 = lauren version
       IF ( control_integer(CsvON_OFF, 'csvON_OFF')/=0 ) CsvON_OFF = OFF
 

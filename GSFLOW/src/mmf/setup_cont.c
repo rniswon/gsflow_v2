@@ -108,6 +108,10 @@ void setup_cont (void) {
 		lval[0] = 0;
 		decl_control_int_array("agriculture_canopy_flag", 1, lval);
 
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("agriculture_dprst_flag", 1, lval);
+
         lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
 		decl_control_int_array ("dprst_flag", 1, lval);

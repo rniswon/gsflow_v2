@@ -96,7 +96,8 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Agriculture_flag
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru,
+     &    Agriculture_soil_flag, Agriculture_dprst_flag
       IMPLICIT NONE
       ! Functions
       INTEGER, EXTERNAL :: declvar
@@ -123,13 +124,16 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
         ALLOCATE ( Gvr2cell_conv(Nhrucell), Cellarea(Ngwcell) )
         ALLOCATE ( Gwc_row(Ngwcell), Gwc_col(Ngwcell) )
-        IF ( Agriculture_flag>OFF ) THEN
+        IF ( Agriculture_soil_flag==ACTIVE ) THEN
           ALLOCATE ( Hru_ag_irr(Nhru) )
           IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real',
      &         'Irrigation added to soilzone from MODFLOW wells',
      &         'inches', Hru_ag_irr)/=0 )
      &         CALL read_error(3, 'hru_ag_irr')
-          Dprst_ag_gain = 0.0
+          Hru_ag_irr = 0.0
+        ENDIF
+        IF ( Agriculture_dprst_flag==ACTIVE ) THEN
+          ALLOCATE ( Dprst_ag_gain(Nhru) )
           IF ( declvar(MODNAME, 'dprst_ag_gain', 'nhru', Nhru, 'real',
      &         'Irrigation added to surface depression storage from'//
      &         ' MODFLOW ponds',
@@ -400,12 +404,10 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
         IF(IUNIT(44).GT.0) CALL GWF2HYD7SFR7AR(IUNIT(43),IGRID)
       ENDIF
       IF(IUNIT(49).GT.0) CALL LMT8BAS7AR(INUNIT,CUNIT,IGRID)
+      Ag_package_active = OFF
       IF(IUNIT(66).GT.0) THEN
         IF (GSFLOW_flag==ACTIVE) Ag_package_active = ACTIVE
         CALL GWF2AG7AR(IUNIT(66),IUNIT(44),IUNIT(63))
-      ELSE
-        Ag_package_active = OFF
-        DEALLOCATE ( Hru_ag_irr )
       ENDIF
 !      IF(IUNIT(61).GT.0) THEN
 !        CALL FMP2AR(

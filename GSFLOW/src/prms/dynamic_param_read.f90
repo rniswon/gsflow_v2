@@ -29,7 +29,7 @@
         INTEGER, SAVE :: Soil_moist_next_yr, Soil_moist_next_mo, Soil_moist_next_day, Soil_moist_unit
         INTEGER, SAVE :: Dprst_depth_next_yr, Dprst_depth_next_mo, Dprst_depth_next_day, Dprst_depth_unit, Dprst_depth_flag
         INTEGER, SAVE :: Dprst_frac_next_yr, Dprst_frac_next_mo, Dprst_frac_next_day, Dprst_frac_unit, Dprst_frac_flag
-        INTEGER, SAVE :: Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day, Ag_frac_unit, Ag_frac_flag
+        INTEGER, SAVE :: Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day, Ag_frac_unit
         INTEGER, SAVE :: Covtype_unit, Covtype_next_yr, Covtype_next_mo, Covtype_next_day
         INTEGER, SAVE :: Covden_sum_unit, Covden_sum_next_yr, Covden_sum_next_mo, Covden_sum_next_day, Covden_sum_flag
         INTEGER, SAVE :: Covden_win_unit, Covden_win_next_yr, Covden_win_next_mo, Covden_win_next_day, Covden_win_flag
@@ -153,7 +153,6 @@
         ENDIF
       ENDIF
 
-      Ag_frac_flag = OFF
       IF ( Dyn_ag_frac_flag==ACTIVE ) THEN
         IF ( control_string(ag_frac_dynamic, 'ag_frac_dynamic')/=0 ) CALL read_error(5, 'ag_frac_dynamic')
         CALL find_header_end(Ag_frac_unit, ag_frac_dynamic, 'ag_frac_dynamic', ierr, 0, 0)
@@ -161,7 +160,6 @@
           CALL find_current_file_time(Ag_frac_unit, year, month, day, &
      &                                Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day)
           ALLOCATE ( Temp4(Nhru) )
-          Ag_frac_flag = ACTIVE
         ELSE
           istop = 1
         ENDIF
@@ -417,6 +415,7 @@
 !***********************************************************************
       INTEGER FUNCTION dynparamrun()
       USE PRMS_DYNAMIC_PARAM_READ
+      USE PRMS_MODULE, ONLY: Ag_frac_flag
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: Hru_type, Hru_area, Dprst_clos_flag, &
      &    Hru_percent_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Dprst_frac, Dprst_open_flag, &
@@ -555,7 +554,7 @@
                 dprstfrac = Temp3(i)
                 IF ( dprstfrac==0.0 .AND. tmp>0.0 ) THEN
                   frac = Hru_frac_perv(i)
-!                  IF ( Agriculture_flag==ACTIVE ) frac = frac + Ag_frac(i)
+!                  IF ( Ag_frac_flag==ACTIVE ) frac = frac + Ag_frac(i)
                   IF ( frac>0.0 ) THEN
                     tmp = tmp/(Dprst_frac(i)*harea)/frac ! not sure this is correct???
                     PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0'

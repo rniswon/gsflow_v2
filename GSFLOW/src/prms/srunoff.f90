@@ -25,7 +25,7 @@
      &    DEBUG_WB, smidx_module, carea_module, LAND, LAKE, GLACIER, CASCADE_OFF, ERROR_water_use
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Print_debug, Init_vars_from_file, &
      &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, Water_use_flag, &
-     &    Frozen_flag, Inputerror_flag, Glacier_flag, Agriculture_flag, &
+     &    Frozen_flag, Inputerror_flag, Glacier_flag, Ag_frac_flag, Ag_package_active, &
      &    Dprst_add_water_use, Dprst_transfer_water_use, PRMS_land_iteration_flag, Kkiter !, Parameter_check_flag
       IMPLICIT NONE
 !   Local Variables
@@ -267,7 +267,7 @@
       ENDIF
       IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
         ALLOCATE ( It0_imperv_stor(Nhru), It0_soil_moist(Nhru), It0_soil_rechr(Nhru) )
-        IF ( Agriculture_flag>OFF ) ALLOCATE ( It0_ag_soil_rechr(Nhru), It0_ag_soil_moist(Nhru) )
+        IF ( Ag_frac_flag==ACTIVE .AND. Ag_package_active==ACTIVE ) ALLOCATE ( It0_ag_soil_rechr(Nhru), It0_ag_soil_moist(Nhru) )
       ENDIF
 
       ALLOCATE ( Hortonian_flow(Nhru) )
@@ -446,7 +446,7 @@
      &       ' flows to a stream network for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'sro_to_dprst_imperv')
 
-        IF ( Agriculture_flag>OFF .OR. Model==DOCUMENTATION ) THEN
+        IF ( Ag_frac_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Infil_ag(Nhru) )
           IF ( declvar(MODNAME, 'infil_ag', 'nhru', Nhru, 'real', &
      &         'Infiltration to the agriculture reservoirs for each HRU', &
@@ -629,7 +629,7 @@
       ENDIF
 
 ! Agriculture variables
-      IF ( Agriculture_flag>OFF ) Infil_ag = 0.0
+      IF ( Ag_frac_flag==ACTIVE ) Infil_ag = 0.0
 
       END FUNCTION srunoffinit
 
@@ -673,7 +673,7 @@
             Dprst_vol_open = It0_dprst_vol_open
             Dprst_vol_clos = It0_dprst_vol_clos
           ENDIF
-          IF ( Agriculture_flag>OFF ) THEN
+          IF ( Ag_frac_flag==ACTIVE .AND. Ag_package_active==ACTIVE ) THEN
             Ag_soil_moist = It0_ag_soil_moist
             Ag_soil_rechr = It0_ag_soil_rechr
           ENDIF
@@ -685,7 +685,7 @@
             It0_dprst_vol_open = Dprst_vol_open
             It0_dprst_vol_clos = Dprst_vol_clos
           ENDIF
-          IF ( Agriculture_flag>OFF ) THEN
+          IF ( Ag_frac_flag==ACTIVE .AND. Ag_package_active==ACTIVE ) THEN
             It0_ag_soil_moist = Ag_soil_moist
             It0_ag_soil_rechr = Ag_soil_rechr
           ENDIF
@@ -727,7 +727,7 @@
 
       dprst_chk = 0
       Infil = 0.0
-      IF ( Agriculture_flag>OFF ) Infil_ag = 0.0
+      IF ( Ag_frac_flag==ACTIVE ) Infil_ag = 0.0
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 
@@ -736,7 +736,7 @@
         upslope = 0.0D0
         IF ( Cascade_flag>CASCADE_OFF ) upslope = Upslope_hortonian(i)
         ag_on = OFF
-        IF ( Agriculture_flag>OFF ) THEN
+        IF ( Ag_frac_flag==ACTIVE ) THEN
           IF ( Ag_area(i)>0.0 ) ag_on = ACTIVE
         ENDIF
         Ihru = i
@@ -866,7 +866,7 @@
         IF ( Hru_type(i)==LAND .OR. active_glacier==OFF ) THEN ! could be an glacier-capable HRU with no ice
 !******Compute runoff for pervious and impervious area, and depression storage area
           runoff = runoff + DBLE( Srp*perv_area + Sri*Hruarea_imperv )
-          IF ( Agriculture_flag>OFF ) runoff = runoff + DBLE( Sroff_ag*Ag_area(i) )
+          IF ( Ag_frac_flag==ACTIVE ) runoff = runoff + DBLE( Sroff_ag*Ag_area(i) )
           srunoff = SNGL( runoff/Hruarea_dble )
 
 !******Compute HRU weighted average (to units of inches/dt)
@@ -888,7 +888,7 @@
         ENDIF
 
         Basin_infil = Basin_infil + DBLE( Infil(i)*perv_area )
-        IF ( Agriculture_flag>OFF ) Basin_infil = Basin_infil + DBLE( Infil_ag(i)*Ag_area(i) )
+        IF ( Ag_frac_flag==ACTIVE ) Basin_infil = Basin_infil + DBLE( Infil_ag(i)*Ag_area(i) )
         Basin_contrib_fraction = Basin_contrib_fraction + DBLE( Contrib_fraction(i)*perv_area )
 
 !******Compute evaporation from impervious area
@@ -1350,7 +1350,7 @@
       ENDIF
       IF ( getparam(MODNAME, 'sro_to_dprst_imperv', Nhru, 'real', Sro_to_dprst_imperv)/=0 ) &
      &     CALL read_error(2, 'sro_to_dprst_imperv')
-      IF ( Agriculture_flag>OFF ) THEN
+      IF ( Ag_frac_flag==ACTIVE ) THEN
         IF ( getparam(MODNAME, 'sro_to_dprst_ag', Nhru, 'real', Sro_to_dprst_ag)/=0 ) &
      &       CALL read_error(2, 'sro_to_dprst_ag')
       ENDIF
