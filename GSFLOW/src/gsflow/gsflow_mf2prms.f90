@@ -69,7 +69,7 @@
 !
 ! From open depression storage reservoirs and streams to storage reservoirs
 !
-          IF ( NUMIRRPONDSP>0 ) THEN
+          !IF ( NUMIRRPONDSP>0 ) THEN
             conversion = Mfl3_to_ft3/Mft_to_sec
             IF ( Dprst_flag==ACTIVE ) THEN
               Dprst_ag_gain = 0.0
@@ -86,7 +86,7 @@
                 Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + PONDIRRPRMS(k, i)*mf_q2prms_inchacres
               END DO
             END DO
-          END IF
+          !END IF
         END IF
       ELSEIF ( Process_flag==DECL ) THEN
         CALL print_module(MODDESC, MODNAME, Version_gsflow_mf2prms)
