@@ -18,7 +18,7 @@
       USE GWFAGMODULE, ONLY: NUMIRRWELSP, IRRWELVAR, NUMCELLS, WELLIRRPRMS, IRRROW_SW, &
      &                       NUMIRRDIVERSIONSP, IRRSEG, DVRCH, DIVERSIONIRRPRMS, IRRROW_GW, &
      &                       NUMIRRPONDSP, NUMCELLSPOND, IRRHRU_POND, PONDIRRPRMS, PONDSEGFLOW, &
-     &                       IRRPONDVAR
+     &                       IRRPONDVAR, MXPOND
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL
@@ -55,7 +55,7 @@
             END DO
           END DO
 !
-! From segment diversions     
+! From segment diversions
 !
           DO J = 1, NUMIRRDIVERSIONSP
             SGNM = IRRSEG(J)
@@ -69,18 +69,24 @@
 !
 ! From open depression storage reservoirs and streams to storage reservoirs
 !
-          IF ( Dprst_flag==ACTIVE ) THEN
+          IF ( NUMIRRPOND>0 ) THEN
             conversion = Mfl3_to_ft3/Mft_to_sec
-            DO i = 1, NUMIRRPONDSP
-              J = IRRPONDVAR(i)
-              ihru = J  ! rsr, IRRPONDVAR(i) needs to be HRU id
-              Dprst_ag_gain(ihru) = PONDSEGFLOW(J)*conversion
-              DO k = 1, NUMCELLSPOND(i)
-                ihru = IRRHRU_POND(k, i)
-                Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + PONDIRRPRMS(k, i)*mf_q2prms_inchacres
-              END DO
-            END DO
+            IF ( Dprst_flag==ACTIVE ) THEN
+              Dprst_ag_gain = 0.0
+              DO i = 1, NUMIRRPOND
+                J = IRRPONDVAR(i)
+                DO k = 1, MXPOND
+                  Dprst_ag_gain(J) = Dprst_ag_gain(J) + PONDSEGFLOW(k)*conversion
+                ENDDO
+              ENDDO
+            ENDIF
           ENDIF
+          DO i = 1, NUMIRRPONDSP
+            DO k = 1, NUMCELLSPOND(i)
+              ihru = IRRHRU_POND(k, i)
+              Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + PONDIRRPRMS(k, i)*mf_q2prms_inchacres
+            END DO
+          END DO
         END IF
 
       ELSEIF ( Process_flag==DECL ) THEN
