@@ -20,7 +20,7 @@ C     ******************************************************************
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Print_debug,
-     &    GSFLOW_flag
+     &    GSFLOW_flag, Agriculture_flag
       IMPLICIT NONE
       ! Functions
       EXTERNAL :: declvar_real
@@ -47,11 +47,24 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
         ALLOCATE ( Gvr2cell_conv(Nhrucell), Cellarea(Ngwcell) )
         ALLOCATE ( Gwc_row(Ngwcell), Gwc_col(Ngwcell) )
-        ALLOCATE ( Hru_ag_irr(Nhru) )                      !??? don't need all the time
-        CALL declvar_real(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real',
-     &       'Irrigation added to soilzone from MODFLOW wells',
-     &       'inches', Hru_ag_irr)
-        Hru_ag_irr = 0.0
+        IF ( Agriculture_flag>OFF ) THEN
+          ALLOCATE ( Hru_ag_irr(Nhru) )
+          CALL declvar_real(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real',
+     &         'Irrigation added to soilzone from MODFLOW wells',
+     &         'inches', Hru_ag_irr)
+          Dprst_ag_gain = 0.0
+          CALL declvar_real(MODNAME, 'dprst_ag_gain','nhru',Nhru,'real',
+     &         'Irrigation added to surface depression storage from'//
+     &         ' MODFLOW ponds',
+     &         'inches', Dprst_ag_gain)
+          Dprst_ag_gain = 0.0
+          ALLOCATE ( Dprst_ag_transfer(Nhru) )
+          CALL declvar_real(MODNAME, 'dprst_ag_transfer', 'nhru', Nhru,
+     &         'real',
+     &         'Surface depression storage transfer to MODFLOW cells',
+     &         'cfs', Dprst_ag_transfer)
+          Dprst_ag_transfer = 0.0
+        ENDIF
       ENDIF
 
       END FUNCTION gsfdecl
@@ -120,6 +133,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
       INUNIT = 200
       NCVGERR=0
       ICNVG=1
+      AGCONVERGE=1
 C
 C3------GET THE NAME OF THE NAME FILE
       CALL GETNAMFIL(FNAME)
@@ -339,6 +353,8 @@ C7------SIMULATE EACH STRESS PERIOD.
       CALL print_module(MODDESC_SFR, MODNAME_SFR, Version_sfr)
       IF ( Have_lakes==ACTIVE )
      &     CALL print_module(MODDESC_LAK, MODNAME_LAK, Version_lak)
+      IF ( Ag_package_active==ACTIVE )
+     &     CALL print_module(MODDESC_AG, MODNAME_AG, Version_ag)
 
       IF ( IUNIT(63)>0 ) solver = 'NWT'
       IF ( IUNIT(13)>0 ) solver = 'PCG'
@@ -639,7 +655,8 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
               IF ( KKITER==Mxsziter+1 ) Stopcount = Stopcount + 1
             ENDIF
             IF(IUNIT(66).GT.0 ) 
-     1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63))
+     1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
+
             IF(IUNIT(55).GT.0) CALL GWF2UZF1FM(KKPER,KKSTP,KKITER,
      1                           IUNIT(44),IUNIT(22),IUNIT(63),
      2                           IUNIT(64),IGRID)  !SWR - JDH ADDED IUNIT(64)
@@ -723,7 +740,7 @@ c            END IF
 ! Calculate new heads using Newton solver
           IF(IUNIT(63).GT.0 ) 
      1          CALL GWF2NWT1FM(KKITER,ICNVG,KSTP,KPER,Mxiter,
-     2                          IUNIT(22),Itreal,IGRID)
+     2                          IUNIT(22),Itreal,AGCONVERGE,IGRID)
           IF ( IUNIT(63).GT.0 )ITREAL2 = ITREAL
           IF(IERR.EQ.1) CALL USTOP(' ')
 C
@@ -733,6 +750,7 @@ C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
             END IF
 C
 C7C2C---IF CONVERGENCE CRITERION HAS BEEN MET STOP ITERATING.
+C
             IF (ICNVG.EQ.1) GOTO 33
             IF ( Szcheck==ACTIVE ) THEN
               retval = gsflow_mf2prms()
@@ -1241,7 +1259,7 @@ C     Get end time and calculate elapsed time
 C     ******************************************************************
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      INTRINSIC :: INT
+      INTRINSIC :: INT, NINT, MOD
       INTEGER IBDT(8), IEDT(8), IDPM(12)
       DATA IDPM/31,28,31,30,31,30,31,31,30,31,30,31/ ! Days per month
       DATA NSPD/86400/  ! Seconds per day
@@ -1511,8 +1529,7 @@ C
       INTRINSIC DBLE
       INTEGER, EXTERNAL :: compute_julday
 ! Local Variables
-      DOUBLE PRECISION :: now
-      INTEGER :: KPERTEST
+      INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
       now = compute_julday(Nowyear, Nowmonth, Nowday)
@@ -1521,8 +1538,8 @@ C
 !
 !     If called from init, then "now" isn't set yet.
 !     Set "now" to model start date.
-      IF ( now.LE.1.0D0 ) now =
-     &     DBLE( compute_julday(Start_year, Start_month, Start_day) )
+      IF ( now<2 )
+     &     now = compute_julday(Start_year, Start_month, Start_day)
       IF ( now<Stress_dates(KPERTEST) )
      &     STOP 'ERROR, now<stress period time'
       IF ( now>Stress_dates(NPER) ) THEN
@@ -1565,22 +1582,20 @@ C
       EXTERNAL :: RESTART1READ, error_stop
       INTEGER, EXTERNAL :: compute_julday, control_integer_array
 ! Local Variables
-      INTEGER :: i, n, nstress
-      DOUBLE PRECISION :: seconds, start_jul, mfstrt_jul, plen, time
-      DOUBLE PRECISION :: kstpskip
+      INTEGER :: i, n, nstress, start_jul, mfstrt_jul
+      REAL :: plen, time, kstpskip
 !***********************************************************************
       IF ( Print_debug>DEBUG_less )
      &     PRINT ( '(/, A, I5,2("/",I2.2))' ), 'modflow_time_zero:',
      &  Modflow_time_zero(1), Modflow_time_zero(2), Modflow_time_zero(3)
-      seconds = DBLE( Modflow_time_zero(6) )
       ALLOCATE ( Stress_dates(NPER+1) )
-      Stress_dates = 0.0D0
-      Stress_dates(1) = DBLE( compute_julday(Modflow_time_zero(1),
-     &                  Modflow_time_zero(2), Modflow_time_zero(3)) )
+      Stress_dates = 0
+      Stress_dates(1) = compute_julday(Modflow_time_zero(1),
+     &                  Modflow_time_zero(2), Modflow_time_zero(3))
       mfstrt_jul = Stress_dates(1)
 
       ! determine julian day
-      start_jul=DBLE(compute_julday(Start_year, Start_month, Start_day))
+      start_jul = compute_julday(Start_year, Start_month, Start_day)
 
       IF ( mfstrt_jul>start_jul ) THEN
         PRINT *, 'ERROR, modflow_time_zero > start_time',
@@ -1607,7 +1622,7 @@ C
           IF ( i/=1 )
      &         CALL error_stop('only first time step can be SS',
      &                         ERROR_time)
-          Stress_dates(i) = Stress_dates(i) - plen
+          Stress_dates(i) = Stress_dates(i) - INT( plen )
           KPER = 1
           CALL MFNWT_RDSTRESS()
           IF ( Init_vars_from_file==0 ) THEN
@@ -1627,7 +1642,7 @@ C
             CALL GWF2BAS7OC(1,1,1,IUNIT(12),IGRID)  !assumes only SP1 can be SS
           ENDIF
         ENDIF
-        Stress_dates(i+1) = Stress_dates(i) + plen
+        Stress_dates(i+1) = Stress_dates(i) + INT( plen )
       ENDDO
  222  FORMAT ( /, 'Steady state simulation did not converge ', I0)
  223  FORMAT ( /, 'Steady state simulation successful, used ', I0,
@@ -1635,11 +1650,11 @@ C
 
       Modflow_skip_stress = 0
       Modflow_skip_time_step = 0
-      Modflow_skip_time = start_jul - mfstrt_jul
+      Modflow_skip_time = FLOAT( start_jul - mfstrt_jul )
       Modflow_time_in_stress = Modflow_skip_time
-      IF ( Modflow_skip_time>0.0D0 ) THEN
-        kstpskip = 0.0D0
-        time = 0.0D0
+      IF ( Modflow_skip_time>0.0 ) THEN
+        kstpskip = 0.0
+        time = 0.0
         DO i = 1, NPER
           IF ( ISSFLG(i)/=1 ) time = time + PERLEN(i)*Mft_to_days
           IF ( time<=Modflow_skip_time ) THEN     !RGN
@@ -1653,7 +1668,7 @@ C
         ENDDO
 !        Modflow_time_in_stress = Modflow_time_in_stress - time   !RGN
         Modflow_time_in_stress = Modflow_skip_time - kstpskip
-        IF ( Modflow_time_in_stress<0.0D0 ) Modflow_time_in_stress=0.0D0
+        IF ( Modflow_time_in_stress<0.0 ) Modflow_time_in_stress=0.0
         ! skip stress periods from modflow_time_zero to start_time
         IF ( Modflow_skip_stress - ISSFLG(1) == 0 ) THEN
           KPER = 1

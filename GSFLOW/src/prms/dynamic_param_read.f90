@@ -13,12 +13,12 @@
      &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, &
      &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
-     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag, Agriculture_flag, Dyn_ag_flag
+     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag, Dyn_ag_frac_flag
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2021-01-20'
+        character(len=*), parameter :: Version_dynamic_param_read = '2021-03-02'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -154,18 +154,16 @@
       ENDIF
 
       Ag_frac_flag = OFF
-      IF ( Agriculture_flag==ACTIVE ) THEN
-        IF ( Dyn_ag_flag==1 .OR. Dyn_ag_flag==3 ) THEN
-          IF ( control_string(ag_frac_dynamic, 'ag_frac_dynamic')/=0 ) CALL read_error(5, 'ag_frac_dynamic')
-          CALL find_header_end(Ag_frac_unit, ag_frac_dynamic, 'ag_frac_dynamic', ierr, 0, 0)
-          IF ( ierr==0 ) THEN
-            CALL find_current_file_time(Ag_frac_unit, year, month, day, &
-     &                                  Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day)
-            ALLOCATE ( Temp4(Nhru) )
-            Ag_frac_flag = ACTIVE
-          ELSE
-            istop = 1
-          ENDIF
+      IF ( Dyn_ag_frac_flag==ACTIVE ) THEN
+        IF ( control_string(ag_frac_dynamic, 'ag_frac_dynamic')/=0 ) CALL read_error(5, 'ag_frac_dynamic')
+        CALL find_header_end(Ag_frac_unit, ag_frac_dynamic, 'ag_frac_dynamic', ierr, 0, 0)
+        IF ( ierr==0 ) THEN
+          CALL find_current_file_time(Ag_frac_unit, year, month, day, &
+     &                                Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day)
+          ALLOCATE ( Temp4(Nhru) )
+          Ag_frac_flag = ACTIVE
+        ELSE
+          istop = 1
         ENDIF
       ENDIF
 
@@ -449,7 +447,7 @@
       EXTERNAL :: write_dynparam_potet
 ! Local Variables
       INTEGER :: i, istop, check_dprst_depth_flag, check_sm_max_flag, check_srechr_max_flag
-      REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj, agfrac, frac
+      REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj, frac
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       dynparamrun = 0
@@ -457,10 +455,11 @@
       check_srechr_max_flag = OFF
       check_sm_max_flag = OFF
 
-      IF ( Imperv_frac_flag==ACTIVE .OR. Dprst_frac_flag==ACTIVE .OR. Dprst_depth_flag==ACTIVE ) THEN
+      IF ( Imperv_frac_flag==ACTIVE .OR. Dprst_frac_flag==ACTIVE .OR. Dprst_depth_flag==ACTIVE .OR. Ag_frac_flag==ACTIVE ) THEN
         Check_imperv = OFF
         Check_dprst_frac = OFF
         check_dprst_depth_flag = OFF
+        Check_ag_frac = OFF
 
         IF ( Dprst_depth_flag==ACTIVE ) THEN
           IF ( Dprst_depth_next_mo/=0 ) THEN
@@ -499,7 +498,7 @@
           ENDIF
         ENDIF
 
-        IF ( Agriculture_flag==ACTIVE ) THEN
+        IF ( Ag_frac_flag==ACTIVE ) THEN
           IF ( Ag_frac_next_mo/=0 ) THEN
             IF ( Ag_frac_next_yr==Nowyear .AND. Ag_frac_next_mo==Nowmonth .AND. Ag_frac_next_day==Nowday ) THEN
               READ ( Ag_frac_unit, * ) Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day, Temp4
@@ -545,8 +544,8 @@
             IF ( Check_ag_frac==ACTIVE ) THEN
               ! Temp4 has new values with negative values set to the old value, Ag_frac has old values
               Ag_frac(i) = Temp4(i)
+              Ag_area(i) = Ag_frac(i) * Hru_area(i)
             ENDIF
-            IF ( Agriculture_flag==ACTIVE ) Ag_area(i) = Ag_frac(i) * Hru_area(i)
 
             IF ( Check_dprst_frac==ACTIVE .OR. check_dprst_depth_flag==ACTIVE ) THEN
               ! CAUTION: other DPRST parameters need to have valid values as related to any dynamic parameter updates
@@ -607,12 +606,7 @@
 
             ! check sum of imperv ag, and dprst if either are updated!!!!!!
             hruperv = harea - Hru_imperv(i)
-            IF ( Agriculture_flag==ACTIVE ) THEN
-              hruperv = hruperv - Ag_area(i)
-              agfrac = Ag_frac(i)
-            ELSE
-              agfrac = 0.0
-            ENDIF
+            IF ( Ag_frac_flag==ACTIVE ) hruperv = hruperv - Ag_area(i)
 
             IF ( Dprst_flag==ACTIVE ) THEN
               hruperv = hruperv - Dprst_area_max(i)
@@ -620,11 +614,11 @@
             ELSE
               dprstfrac = 0.0
             ENDIF
-            IF ( Hru_percent_imperv(i)+dprstfrac+agfrac > 0.999 ) THEN
+            IF ( Hru_percent_imperv(i)+dprstfrac > 0.999 ) THEN
               istop = 1
-              PRINT *, 'ERROR, fraction impervious + fraction dprst + agriculture fraction > 0.999 for HRU:', i
-              PRINT *, '       fraction impervious + dprst + ag_frac:', Hru_percent_imperv(i) + dprstfrac + agfrac
-              PRINT *, '       hru_percent_imperv:', Hru_percent_imperv(i), '; dprst_frac:', dprstfrac, '; ag_frac:', agfrac
+              PRINT *, 'ERROR, fraction impervious + fraction dprst > 0.999 for HRU:', i
+              PRINT *, '       fraction impervious + dprst:', Hru_percent_imperv(i) + dprstfrac
+              PRINT *, '       hru_percent_imperv:', Hru_percent_imperv(i), '; dprst_frac:', dprstfrac
               CYCLE
             ENDIF
             ! adjust pervious area and capillary storage for dynamic parameters

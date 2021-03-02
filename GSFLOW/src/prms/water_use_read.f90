@@ -16,7 +16,7 @@
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'water_use_read'
-      character(len=*), parameter :: Version_water_use_read = '2020-12-02'
+      character(len=*), parameter :: Version_water_use_read = '2021-02-18'
 
       ! transfer type
       integer, parameter :: STREAM = 1
@@ -805,7 +805,7 @@
       ELSEIF ( Dest_type==CANOPY ) THEN
         WRITE ( Outunit, '(A,1X,I0)' ) 'Canopy storage, HRU:', Dest_id
       ENDIF
-      WRITE ( Outunit, '(A,1X,F0.3)' ) 'Transfer flow rate:', Diversion
+      WRITE ( Outunit, '(A,1X,F0.5)' ) 'Transfer flow rate:', Diversion
       END SUBROUTINE check_transfer
 
       SUBROUTINE nwateruse_error(ctype)

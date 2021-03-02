@@ -139,7 +139,7 @@
      &     'Basin area-weighted average infiltration to the capillary reservoirs', &
      &     'inches', Basin_infil)
 
-     CALL declvar_dble(MODNAME, 'basin_hortonian', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_hortonian', 'one', 1, 'double', &
      &     'Basin area-weighted average Hortonian runoff', &
      &     'inches', Basin_hortonian)
 

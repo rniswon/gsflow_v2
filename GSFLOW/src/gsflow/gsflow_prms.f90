@@ -36,8 +36,8 @@
       INTEGER, EXTERNAL :: water_use_read, dynamic_param_read, potet_pm_sta
       INTEGER, EXTERNAL :: stream_temp
       EXTERNAL :: module_error, print_module, PRMS_open_output_file, precip_map, temp_map
-      EXTERNAL :: call_modules_restart, water_balance, basin_summary, nsegment_summary, PRMS_land_modules
-      EXTERNAL :: prms_summary, nhru_summary, module_doc, convert_params, read_error, nsub_summary, error_stop
+      EXTERNAL :: call_modules_restart, water_balance, summary_output, PRMS_land_modules
+      EXTERNAL :: prms_summary, module_doc, convert_params, read_error, error_stop
       INTEGER, EXTERNAL :: gsflow_prms2modsim, gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
       INTEGER, EXTERNAL :: declparam, getparam
       EXTERNAL :: setdims, declvar_int, declvar_real, check_parameters
@@ -276,7 +276,7 @@
       IF ( Model==DOCUMENTATION ) THEN
         IF ( Process_flag==SETDIMENS .OR. Process_flag==DECL ) THEN
           Init_vars_from_file = 0 ! make sure this is set so all variables and parameters are declared
-          CALL module_doc(AFR)
+          CALL module_doc()
           RETURN
         ELSE
           STOP
@@ -350,14 +350,20 @@
       ENDIF
 
       IF ( Model==CLIMATE ) THEN
-        IF ( Process_flag==RUN ) RETURN
+        IF ( Process_flag==RUN ) THEN
+          CALL summary_output()
+          RETURN
+        ENDIF
       ENDIF
 
 ! frost_date is a pre-process module
       IF ( Model==FROST ) THEN
         ierr = frost_date()
         IF ( ierr/=0 ) CALL module_error('frost_date', Arg, ierr)
-        IF ( Process_flag==RUN ) RETURN
+        IF ( Process_flag==RUN ) THEN
+          CALL summary_output()
+          RETURN
+        ENDIF
         IF ( Process_flag==CLEAN ) STOP
       ENDIF
 
@@ -378,7 +384,10 @@
       IF ( ierr/=0 ) CALL module_error(Transp_module, Arg, ierr)
 
       IF ( Model==TRANSPIRE ) THEN
-        IF ( Process_flag==RUN ) RETURN
+        IF ( Process_flag==RUN ) THEN
+          CALL summary_output()
+          RETURN
+        ENDIF
       ENDIF
 
       IF ( Climate_potet_flag==OFF ) THEN
@@ -407,7 +416,10 @@
       ENDIF
 
       IF ( Model==POTET ) THEN
-        IF ( Process_flag==RUN ) RETURN
+        IF ( Process_flag==RUN ) THEN
+          CALL summary_output()
+          RETURN
+        ENDIF
       ENDIF
 
       IF ( PRMS_land_iteration_flag==OFF ) CALL PRMS_land_modules(Arg, ierr)
@@ -464,7 +476,6 @@
 ! (contained in gsflow_modflow.f).
 ! They still need to be called for declare, initialize and cleanup
         ELSE !IF ( Process_flag/=RUN ) THEN
-
 ! intcp, snowcomp, glacr, soilzone, and srunoff for GSFLOW is in the MODFLOW iteration loop
 ! when PRMS_land_iteration_flag = ACTIVE
 ! only call for declare, initialize, and cleanup.
@@ -516,13 +527,7 @@
         IF ( ierr/=0 ) CALL module_error('subbasin', Arg, ierr)
       ENDIF
 
-      IF ( NhruOutON_OFF>OFF ) CALL nhru_summary()
-
-      IF ( NsubOutON_OFF==ACTIVE ) CALL nsub_summary()
-
-      IF ( BasinOutON_OFF==ACTIVE ) CALL basin_summary()
-
-      IF ( NsegmentOutON_OFF>OFF ) CALL nsegment_summary()
+      CALL summary_output()
 
       IF ( CsvON_OFF>OFF .AND. PRMS_only==ACTIVE ) CALL prms_summary()
 
@@ -1030,13 +1035,13 @@
       IF ( control_integer(Dyn_springfrost_flag, 'dyn_springfrost_flag')/=0 ) Dyn_springfrost_flag = OFF
       IF ( control_integer(Dyn_snareathresh_flag, 'dyn_snareathresh_flag')/=0 ) Dyn_snareathresh_flag = OFF
       IF ( control_integer(Dyn_transp_on_flag, 'dyn_transp_on_flag')/=0 ) Dyn_transp_on_flag = OFF
-      IF ( control_integer(Dyn_ag_flag, 'dyn_ag_flag')/=0 ) Dyn_ag_flag = OFF
+      IF ( control_integer(Dyn_ag_frac_flag, 'dyn_ag_frac_flag')/=0 ) Dyn_ag_frac_flag = OFF
       Dynamic_flag = 0
       IF ( Dyn_imperv_flag/=OFF .OR. Dyn_intcp_flag/=0 .OR. Dyn_covden_flag/=0 .OR. Dyn_dprst_flag/=OFF .OR. &
      &     Dyn_potet_flag/=OFF .OR. Dyn_covtype_flag/=0 .OR. Dyn_transp_flag/=0 .OR. Dyn_soil_flag /=OFF .OR. &
      &     Dyn_radtrncf_flag/=OFF .OR. Dyn_sro2dprst_perv_flag/=0 .OR. Dyn_sro2dprst_imperv_flag/=OFF .OR. &
      &     Dyn_fallfrost_flag/=OFF .OR. Dyn_springfrost_flag/=0 .OR. Dyn_snareathresh_flag/=0 .OR. &
-     &     Dyn_transp_on_flag/=OFF ) Dynamic_flag = ACTIVE
+     &     Dyn_transp_on_flag/=OFF .OR. Dyn_ag_frac_flag==ACTIVE ) Dynamic_flag = ACTIVE
       IF ( control_integer(Gwr_transferON_OFF, 'gwr_transferON_OFF')/=0) Gwr_transferON_OFF = OFF
       IF ( control_integer(External_transferON_OFF, 'external_transferON_OFF')/=0 ) External_transferON_OFF = OFF
       IF ( control_integer(Dprst_transferON_OFF, 'dprst_transferON_OFF')/=0 ) Dprst_transferON_OFF = OFF
@@ -1339,6 +1344,26 @@
       ENDIF
 
       END SUBROUTINE check_dimens
+
+!***********************************************************************
+!     Call output summary routines
+!***********************************************************************
+      SUBROUTINE summary_output()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: NhruOutON_OFF, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
+      IMPLICIT NONE
+      ! Functions
+      EXTERNAL :: nhru_summary, nsub_summary, basin_summary, nsegment_summary
+!***********************************************************************
+      IF ( NhruOutON_OFF>OFF ) CALL nhru_summary()
+
+      IF ( NsubOutON_OFF==ACTIVE ) CALL nsub_summary()
+
+      IF ( BasinOutON_OFF==ACTIVE ) CALL basin_summary()
+
+      IF ( NsegmentOutON_OFF>OFF ) CALL nsegment_summary()
+
+      END SUBROUTINE summary_output
 
 !**********************************************************************
 !     Module documentation

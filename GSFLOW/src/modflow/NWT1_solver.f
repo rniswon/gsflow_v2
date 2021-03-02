@@ -861,7 +861,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 !
 !     -----------------------------------------------------------------
       SUBROUTINE GWF2NWT1FM(Kkiter, ICNVG, KSTP, KPER, Maxiter, 
-     +                      Iunitchd, Itreal, Igrid)
+     +                      Iunitchd, Itreal, agconverge, Igrid)
 ! Builds and Solves Jacobian
 ! Calls various unstructured linear solvers to solve Jacobian
       USE GLOBAL, ONLY:Iout,ISSFLG
@@ -886,7 +886,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 !     ARGUMENTS
 !     ------------------------------------------------------------------
       INTEGER Iss, Igrid, Kkiter, Icnvg, Maxiter, KSTP, KPER, Iunitchd
-      INTEGER Itreal
+      INTEGER agconverge, Itreal
 !     -----------------------------------------------------------------
 !     LOCAL VARIABLES
 !     -----------------------------------------------------------------
@@ -950,11 +950,13 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
       RMS1 = RMS_func(icfld,irfld,ilfld)
       Icnvg = 0
       IF ( RMS1.GT.FTOL .OR. ABS(Fheadsave).GT.Tol .OR. 
-     +                           kkiter.LT.2 ) THEN
+     +                           kkiter.LT.2 .or.
+     +                           agconverge == 0 ) THEN
         Ibt = 1
         IF ( BTRACK.EQ.0 .OR. II.GE.Numtrack ) Ibt = 0
         IF ( RMS1.LT.Btol*rmsave .OR. Kkiter.EQ.1 ) Ibt = 0
         IF ( II.GT.0 .AND. RMS1.GT.RMS2 ) Ibt = 0
+        IF ( agconverge == 0 ) Ibt = 0
         IF ( Ibt.EQ.0 ) THEN
           II = 0
           jj = 1
@@ -1102,6 +1104,7 @@ C--Update heads.
  !     end do
  !     end if
       END IF
+      IF ( AGCONVERGE.EQ.0 ) ICNVG = 0
  ! 888 format(256E20.10)
 !
 !  Calculate maximum head change and residuals
@@ -1415,6 +1418,7 @@ C-----SET HNEW TO HDRY IF IPHRY>0
 !     Return value of groundwater flow equation
       DOUBLE PRECISION FUNCTION GW_func(Ic, Ir, Il)
       USE GWFNWTMODULE
+!      USE GLOBAL,      ONLY:iout
       USE GWFBASMODULE, ONLY:HNOFLO
       IMPLICIT NONE
 !     ------------------------------------------------------------------
