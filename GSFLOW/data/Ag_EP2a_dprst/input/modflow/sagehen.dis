@@ -1,4 +1,4 @@
-#Sagehen Simulation -- Example problem for MODFLOW with PSZ
+#Sagehen Simulation -- Example problem for MODFLOW
 #  (File modified for version 1.1.00 release)
 2    71     79     223     4      2                NLAY  NROW   NCOL  NPER   ITMUNI  LENUNI
 0  0                                             LAYCBD

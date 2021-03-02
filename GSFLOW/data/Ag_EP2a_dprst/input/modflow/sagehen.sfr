@@ -3,7 +3,7 @@
 #KRCH IRCH JRCH ISEG IREACH       RCHLEN [STRTOP]       [SLOPE] [STRTHICK] [STRHC1] [THTS] [THTI] [EPS] [UHC]
 OPTIONS
  REACHINPUT
- tabfiles 2 10075
+ tabfiles 2 1857
 END
 191 19 0 0 8.640000000000E+004 1.000000000000E-004 -1 0 3 8 1 40 0
 1 18 62 1 1 127.27922 2073 0.078567421 1 5 0.3 0.2 3.5 0.3
@@ -255,8 +255,8 @@ END
 19 1 0 6 0 0.0 0.0 0.0 0.0 0.04         # NSEG ICALC OUTSEG IUPSEG IPRIOR FLOW RUNOFF ETSW PPTSW ROUGHCH  
 3.0                                    #  This segment is used to divert flow for agriculture (AG Package).     
 3.0                                    #  It represents a lined canal and flow is evenly dist to ponds
-18 10075 53                             
-19 10075 54                            
+18 1857 53                             
+19 1857 54                            
 -1 0 0
 -1 0 0
 -1 0 0

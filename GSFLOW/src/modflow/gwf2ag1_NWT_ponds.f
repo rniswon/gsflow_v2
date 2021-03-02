@@ -2435,6 +2435,8 @@
       DO L = 1, MXPOND
         Q = POND(2, L)        
         IF ( PONDFLOW(L) > Q ) PONDFLOW(L) = Q
+        Q = PONDFLOW(L)  !delete
+        Q = PONDFLOW(L)  !delete
       END DO
       !
       ! divide pond water into irrigated HRUs
