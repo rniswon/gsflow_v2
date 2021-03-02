@@ -72,6 +72,11 @@ dprst_flag
 1
 1
 ####
+dprst_transferON_OFF
+1
+1
+1
+####
 param_file
 6
 4
