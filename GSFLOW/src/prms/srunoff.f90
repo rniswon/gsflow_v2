@@ -1470,7 +1470,7 @@
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv
       USE PRMS_SNOW, ONLY: Snowmelt, Pptmix_nopack, Snowcov_area
       USE GSFMODFLOW, ONLY: Dprst_ag_gain
-      USE GWFAGMODULE, ONLY: NUMIRRPONDSP
+      USE GWFAGMODULE, ONLY: NUMIRRPOND
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, LOG, MAX, DBLE, SNGL
@@ -1519,7 +1519,7 @@
 
       IF ( Dprst_add_water_use==ACTIVE ) inflow = inflow + Dprst_gain(Ihru) / SNGL( Cfs_conv )
       IF ( Ag_package_active==ACTIVE ) THEN
-        IF ( Dprst_area_open_max>0.0 .AND. NUMIRRPONDSP>0 ) inflow = inflow + Dprst_ag_gain(Ihru)
+        IF ( NUMIRRPOND>0 ) inflow = inflow + Dprst_ag_gain(Ihru)
       ENDIF
 
       Dprst_in = 0.0D0
