@@ -69,20 +69,16 @@
 !
 ! From open depression storage reservoirs and streams to storage reservoirs
 !
-          IF ( NUMIRRPONDSP>0 ) THEN
             conversion = Mfl3_to_ft3/Mft_to_sec
             IF ( Dprst_flag==ACTIVE ) THEN
               Dprst_ag_gain = 0.0
-              DO i = 1, NUMIRRPONDSP
+              DO i = 1, NUMIRRPOND
 !                print *, irrpondvar
                 ihru = IRRPONDVAR(i)
                 IF ( ihru>0 ) THEN
-                  DO k = 1, MXPOND
-                    Dprst_ag_gain(ihru) = Dprst_ag_gain(ihru) + PONDSEGFLOW(k)*conversion
-                  ENDDO
+                    Dprst_ag_gain(ihru) = Dprst_ag_gain(ihru) + PONDSEGFLOW(i)*conversion
                 ENDIF
               ENDDO
-            ENDIF
             DO i = 1, NUMIRRPOND
               DO k = 1, NUMCELLSPOND(i)
                 ihru = IRRHRU_POND(k, i)

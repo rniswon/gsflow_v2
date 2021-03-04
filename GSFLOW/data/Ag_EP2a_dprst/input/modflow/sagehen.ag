@@ -5,12 +5,12 @@ irrigation_pond 14 5
 maxponds 14  
 pondirrlist -2 
 timeseries_pond
-timeseries_pondirr
+timeseries_pondET
 end
 # AG time series
 time series
 pond 2735 103
-pondirr 2735 104
+pondet 2735 104
 end
 # AG pond list    
 pond list
