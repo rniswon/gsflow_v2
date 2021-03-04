@@ -1456,7 +1456,7 @@
      &           Dprst_sroff_hru, Dprst_seep_hru, Sro_to_dprst_perv, Sro_to_dprst_imperv, Dprst_evap_hru, &
      &           Avail_et, Net_rain, Dprst_in)
       USE PRMS_CONSTANTS, ONLY: ERROR_water_use, NEARZERO, DNEARZERO, OFF, ACTIVE ! , DEBUG_less
-      USE PRMS_MODULE, ONLY: Cascade_flag, Dprst_add_water_use, Dprst_transfer_water_use !, Print_debug
+      USE PRMS_MODULE, ONLY: Cascade_flag, Dprst_add_water_use, Dprst_transfer_water_use, Ag_package_active !, Print_debug
       USE PRMS_SRUNOFF, ONLY: Srp, Sri, Ihru, Perv_frac, Imperv_frac, Hruarea, Dprst_et_coef, &
      &    Dprst_seep_rate_open, Dprst_seep_rate_clos, Va_clos_exp, Va_open_exp, Dprst_flow_coef, &
      &    Dprst_vol_thres_open, Dprst_vol_clos_max, Dprst_insroff_hru, Upslope_hortonian, &
@@ -1469,6 +1469,8 @@
       USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv
       USE PRMS_SNOW, ONLY: Snowmelt, Pptmix_nopack, Snowcov_area
+      USE GSFMODFLOW, ONLY: Dprst_ag_gain
+      USE GWFAGMODULE, ONLY: NUMIRRPONDSP
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, LOG, MAX, DBLE, SNGL
@@ -1515,8 +1517,9 @@
         ENDIF
       ENDIF
 
-      IF ( Dprst_add_water_use==ACTIVE ) THEN
-        IF ( Dprst_gain(Ihru)>0.0 ) inflow = inflow + Dprst_gain(Ihru) / SNGL( Cfs_conv )
+      IF ( Dprst_add_water_use==ACTIVE ) inflow = inflow + Dprst_gain(Ihru) / SNGL( Cfs_conv )
+      IF ( Ag_package_active==ACTIVE ) THEN
+        IF ( Dprst_area_open_max>0.0 .AND. NUMIRRPONDSP>0 ) inflow = inflow + Dprst_ag_gain(Ihru)
       ENDIF
 
       Dprst_in = 0.0D0
