@@ -283,7 +283,7 @@
       EXTERNAL :: intercept, error_stop
       INTRINSIC :: DBLE, SNGL
 ! Local Variables
-      INTEGER :: i, j
+      INTEGER :: i, j, iskip
       REAL :: last, evrn, evsn, cov, intcpstor, diff, changeover, stor, intcpevap, z, d, harea
       REAL :: netrain, netsnow, extra_water
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
@@ -432,29 +432,41 @@
             ENDIF
           ENDIF
 
-! NEXT intercept application of irrigation water, but only if
-!  irrigation method (irr_type=hrumeth) is =0 for sprinkler method
+!  canopy application of irrigation water based on irr_type
           IF ( Use_transfer_intcp==ACTIVE ) THEN
             Gain_inches(i) = 0.0
             IF ( Canopy_gain(i)>0.0 ) THEN
-!              IF ( cov>0.0 ) THEN
-                IF ( Irr_type(i)==2 ) THEN
-                  PRINT *, 'WARNING, water-use transfer > 0, but irr_type = 2 (ignore), HRU:', i, ', transfer:', Canopy_gain(i)
-                  Canopy_gain(i) = 0.0
-                ELSE
-!                  Gain_inches(i) = Canopy_gain(i)/SNGL(Cfs_conv)/cov/harea
+              IF ( Irr_type(i)/=2 ) THEN
+                ! irr_type = 0 (interception, sprinkler), 1 (no interception, furrow),
+                ! 3 (interception and throughfall over whole HRU)
+                IF ( Irr_type(i)==3 .OR. (Irr_type(i)==1.AND.cov<NEARZERO) ) THEN ! apply to whole HRU
                   Gain_inches(i) = Canopy_gain(i)/SNGL(Cfs_conv)/harea
-                  IF ( Irr_type(i)==0 ) THEN
-                    CALL intercept(Gain_inches(i), stor, cov, intcpstor, Net_apply(i))
-                  ELSE ! Hrumeth=1
-                    Net_apply(i) = Gain_inches(i)
+                ELSE
+                  iskip = 0
+                  IF ( cov>0.0 ) THEN
+                    Gain_inches(i) = Canopy_gain(i)/SNGL(Cfs_conv)/cov/harea ! all water added to canopy
+                  ELSE
+                    iskip = 1
+                    PRINT *, 'WARNING, ignoring water-use transfer > 0 with covden = 0'
+                    PRINT *, '         irr_type =', Irr_type(i), ', HRU:', i, ', transfer:', Canopy_gain(i)
                   ENDIF
                 ENDIF
-                Basin_hru_apply = Basin_hru_apply + DBLE( Gain_inches(i)*harea )
-                Basin_net_apply = Basin_net_apply + DBLE( Net_apply(i)*harea )
-!              ELSE
-!                CALL error_stop('canopy transfer attempted to HRU with cov_den = 0.0', ERROR_param)
-!              ENDIF
+                IF ( iskip==0 ) THEN
+                  IF ( Irr_type(i)==1 ) THEN
+                    Net_apply(i) = Gain_inches(i)
+                  ELSEIF ( Irr_type(i)==0 ) THEN
+                    CALL intercept(Gain_inches(i), stor, 1.0, intcpstor, Net_apply(i))
+                  ELSE !IF ( Irr_type(i)==3 ) THEN
+                    CALL intercept(Gain_inches(i), stor, cov, intcpstor, Net_apply(i))
+                    Gain_inches(i) = Gain_inches(i)/cov ! convert back to gain over the HRU
+                  ENDIF
+                  Basin_hru_apply = Basin_hru_apply + DBLE( Gain_inches(i)*harea )
+                  Basin_net_apply = Basin_net_apply + DBLE( Net_apply(i)*harea )
+                ENDIF
+              ELSE ! irr_type = 2
+                PRINT *, 'WARNING, water-use transfer > 0, but irr_type = 2 (ignore), HRU:', i, ', transfer:', Canopy_gain(i)
+                Canopy_gain(i) = 0.0
+              ENDIF
             ENDIF
           ENDIF
 
