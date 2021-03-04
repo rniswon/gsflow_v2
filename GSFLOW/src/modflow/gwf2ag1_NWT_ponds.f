@@ -7,9 +7,9 @@
         INTEGER, SAVE, POINTER :: IRRWELLCB, IRRSFRCB, IRRPONDCB
         LOGICAL, SAVE, POINTER :: TSACTIVEGW, TSACTIVESW
         LOGICAL, SAVE, POINTER :: TSACTIVEGWET, TSACTIVESWET
-        LOGICAL, SAVE, POINTER :: TSACTIVEPOND, TSACTIVEPONDIRR  !DS
+        LOGICAL, SAVE, POINTER :: TSACTIVEPOND, TSACTIVEPONDET  !DS
         INTEGER, SAVE, POINTER :: NUMSW, NUMGW, NUMSWET, NUMGWET
-        INTEGER, SAVE, POINTER :: NUMPOND, NUMPONDIRR
+        INTEGER, SAVE, POINTER :: NUMPOND, NUMPONDET
         INTEGER, SAVE, POINTER :: TSGWETALLUNIT, TSGWALLUNIT
         INTEGER, SAVE, POINTER :: NSEGDIMTEMP
         CHARACTER(LEN=16), SAVE, DIMENSION(:), POINTER :: WELAUX
@@ -47,8 +47,8 @@
         INTEGER, SAVE, DIMENSION(:), POINTER :: TSGWETNUM
         INTEGER, SAVE, DIMENSION(:), POINTER :: TSPONDUNIT
         INTEGER, SAVE, DIMENSION(:), POINTER :: TSPONDNUM
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TSPONDIRRUNIT
-        INTEGER, SAVE, DIMENSION(:), POINTER :: TSPONDIRRNUM
+        INTEGER, SAVE, DIMENSION(:), POINTER :: TSPONDETUNIT
+        INTEGER, SAVE, DIMENSION(:), POINTER :: TSPONDETNUM
         INTEGER, SAVE, DIMENSION(:), POINTER :: LASTREACH
         INTEGER, SAVE, DIMENSION(:), POINTER :: SEGLIST
         INTEGER, SAVE, POINTER :: NUMSEGLIST
@@ -77,7 +77,7 @@
         REAL, SAVE, DIMENSION(:), POINTER :: TIMEINPERIODPOND  !DS
         REAL, SAVE, DIMENSION(:), POINTER :: AETITERSW, RMSESW
         REAL, SAVE, DIMENSION(:), POINTER :: AETITERGW, RMSEGW
-        REAL, SAVE, DIMENSION(:), POINTER :: AETITERPOND
+        REAL, SAVE, DIMENSION(:), POINTER :: AETITERPOND, PETPOND
         REAL, SAVE, DIMENSION(:, :), POINTER :: WELLIRRUZF
         REAL, SAVE, DIMENSION(:, :), POINTER :: WELLIRRPRMS
         REAL, SAVE, DIMENSION(:, :), POINTER :: IRRFACT
@@ -162,9 +162,9 @@
       ALLOCATE (NUMTABWELL, MAXVALWELL, NPWEL, NNPWEL, IPRWEL)
       ALLOCATE (TSACTIVEGW, TSACTIVESW, NUMSW, NUMGW)
       ALLOCATE (TSACTIVEGWET, TSACTIVESWET, NUMSWET, NUMGWET)
-      ALLOCATE (TSACTIVEPOND, TSACTIVEPONDIRR)
+      ALLOCATE (TSACTIVEPOND, TSACTIVEPONDET)
       ALLOCATE (TSGWALLUNIT, TSGWETALLUNIT, NSEGDIMTEMP)
-      ALLOCATE (MXPOND, NUMPOND, NUMPONDIRR, NUMTABPOND, MAXVALPOND)
+      ALLOCATE (MXPOND, NUMPOND, NUMPONDET, NUMTABPOND, MAXVALPOND)
       MXPOND = 1
       VBVLAG = 0.0
       MSUMAG = 0
@@ -181,13 +181,13 @@
       TSACTIVEGWET = .FALSE.
       TSACTIVESWET = .FALSE.
       TSACTIVEPOND = .FALSE.
-      TSACTIVEPONDIRR = .FALSE.
+      TSACTIVEPONDET = .FALSE.
       NUMSW = 0
       NUMGW = 0
       NUMSWET = 0
       NUMGWET = 0
       NUMPOND = 0
-      NUMPONDIRR = 0
+      NUMPONDET = 0
       TSGWETALLUNIT = 0
       TSGWALLUNIT = 0
       WELAUX = ' '
@@ -249,12 +249,12 @@
       ALLOCATE (SEGLIST(NSEGDIMTEMP), NUMSEGLIST)
       ALLOCATE (IRRPERIODPOND(MXPOND),TRIGGERPERIODPOND(MXPOND))
       ALLOCATE (TIMEINPERIODPOND(MXPOND))
-      ALLOCATE (AETITERPOND(MXPOND))
+      ALLOCATE (AETITERPOND(MXPOND),PETPOND(MXPOND))
       ALLOCATE (PONDFLOW(MXPOND),PONDFLOWOLD(MXPOND))
       ALLOCATE (PONDFLOWMAX(MXPOND), PONDSEGFLOW(MXPOND))
       ALLOCATE (PONDIRRPRMS(MAXCELLSPOND,MXPOND))
       ALLOCATE (TSPONDUNIT(MXPOND),TSPONDNUM(MXPOND))
-      ALLOCATE (TSPONDIRRUNIT(MXPOND),TSPONDIRRNUM(MXPOND))
+      ALLOCATE (TSPONDETUNIT(MXPOND),TSPONDETNUM(MXPOND))
       ALLOCATE (IRRPONDVAR(MXPOND),TABPONDSEG(MXPOND))
       ALLOCATE (PONDSEGFRAC(MXPOND))
       ALLOCATE (NUMCELLSPOND(MXPOND),IRRPERIODPOND(MXPOND))
@@ -276,8 +276,8 @@
       TSGWETNUM = 0
       TSPONDUNIT = 0
       TSPONDNUM = 0
-      TSPONDIRRUNIT = 0
-      TSPONDIRRNUM = 0
+      TSPONDETUNIT = 0
+      TSPONDETNUM = 0
       SUPSEG = 0.0
       LASTREACH = 0
       IRRPERIODWELL = 0.0
@@ -290,6 +290,7 @@
       TRIGGERPERIODPOND = 0.0
       IRRPERIODPOND = 0.0
       AETITERPOND = 0.0
+      PETPOND = 0.0
       PONDFLOW = 0.0
       PONDSEGFLOW = 0.0
       PONDFLOWOLD = 0.0
@@ -306,7 +307,7 @@
       !
       !5 - --- ALLOCATE TIME SERIES VARIABLES
       IF (TSACTIVEGW .OR. TSACTIVESW .OR. TSACTIVEGWET .OR.
-     +    TSACTIVESWET .OR. TSACTIVEPONDIRR .OR. TSACTIVEPOND ) 
+     +    TSACTIVESWET .OR. TSACTIVEPONDET .OR. TSACTIVEPOND ) 
      +    CALL TSREAD(IN, IOUT)
       !
       !6 - --- ALLOCATE VARIABLES FOR TIME SERIES WELL INPUT RATES
@@ -667,8 +668,8 @@
             WRITE (IOUT, 40)
             WRITE (IOUT, *)
            !12 - --- Option to output time series by IRR pond
-         case ('TIMESERIES_PONDIRR')
-            TSACTIVEPONDIRR = .TRUE.
+         case ('TIMESERIES_PONDET')
+            TSACTIVEPONDET = .TRUE.
             WRITE (IOUT, *)
             WRITE (IOUT, 45)
             WRITE (IOUT, *)
@@ -1073,6 +1074,7 @@
                      CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ISEG, R,
      +                           IOUT, IN)
                      POND(1,L) = IPOND   !check that this is less than NRHU
+                     IRRPONDVAR(L) = IPOND
                      POND(2,L) = QPOND   
                      POND(3,L) = ISEG    !check that this is less than NSEG
                      IF (POND(2, L) < 0.0) THEN
@@ -1107,6 +1109,7 @@
                   DO J = 1, MXPOND    
                      READ (IN, *) TABUNITPOND(J), TABVALPOND(J), 
      +                            TABPONDHRU(J), TABPONDSEG(J)
+                     IRRPONDVAR(J) = TABPONDHRU(J)
                      DO I = 1, J - 1
                         IF (TABUNITPOND(I) == TABUNITPOND(J)) THEN
                            MATCH = 1
@@ -1481,7 +1484,7 @@
           END IF
           DO L = 1, MXPOND
             IF ( POND(3,L) > 0 ) THEN
-              PONDSEGFLOW(L) = SEG(2,POND(3,L))
+              PONDSEGFLOW(L) = SEG(2,int(POND(3,L)))
             END IF
           END DO
       END IF
@@ -1760,7 +1763,7 @@
       IF (ITMP < 0) RETURN
       !
       !2 - --INITIALIZE AG VARIABLES TO ZERO.
-      IRRPONDVAR = 0
+      !IRRPONDVAR = 0  This is read at beginning of simulation and is constant
       TABPONDSEG = 0
       NUMCELLSPOND = 0
       IRRFACTPOND = 0.0
@@ -1806,7 +1809,6 @@
               EXIT
            END IF
  200     END DO
-         IRRPONDVAR(IPOND) = IRWL
          NUMCELLSPOND(IPOND) = NMCL
          IRRPERIODPOND(IPOND) = IPRW
          TRIGGERPERIODPOND(IPOND) = TRPW 
@@ -2081,17 +2083,17 @@
                WRITE (IOUT, *) 'Bad well number for AG ET time series. '
                CALL USTOP('Bad well number for AG ET time series.')
             END IF
-         case ('PONDIRR')
+         case ('PONDET')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, PDNM, R, IOUT, IN)
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
-            NUMPONDIRR = NUMPONDIRR + 1
-            TSPONDIRRUNIT(NUMPONDIRR) = UNIT
-            TSPONDIRRNUM(NUMPONDIRR) = PDNM
+            NUMPONDET = NUMPONDET + 1
+            TSPONDETUNIT(NUMPONDET) = UNIT
+            TSPONDETNUM(NUMPONDET) = PDNM
             ITEST = 0
-            DO I = 1, NUMPONDIRR - 1
-               IF (UNIT == TSPONDIRRUNIT(I)) ITEST = 1
+            DO I = 1, NUMPONDET - 1
+               IF (UNIT == TSPONDETUNIT(I)) ITEST = 1
             END DO
-            IF (ITEST /= 1) CALL WRITE_HEADER_AG('PIR', NUMPONDIRR)
+            IF (ITEST /= 1) CALL WRITE_HEADER_AG('PIR', NUMPONDET)
             IF (PDNM > NHRU) THEN
                WRITE (IOUT, *) 'Bad pond number for AG ET time series. '
                CALL USTOP('Bad pond number for AG ET time series.')
@@ -2183,8 +2185,8 @@
            WRITE (UNIT, *) 'TIME KPER KSTP POND-HRU SEGMENT-INFLOWS ',
      +                     'POND-IRRIGATION NULL'
         case ('PET')
-           UNIT = TSPONDIRRUNIT(NUM)
-           WLNM = TSPONDIRRNUM(NUM)
+           UNIT = TSPONDETUNIT(NUM)
+           WLNM = TSPONDETNUM(NUM)
            WRITE (UNIT, *) 'TIME KPER KSTP POND-HRU ETww ETa NULL'
         case ('AL1')
            UNIT = TSGWETALLUNIT
@@ -2435,8 +2437,6 @@
       DO L = 1, MXPOND
         Q = POND(2, L)        
         IF ( PONDFLOW(L) > Q ) PONDFLOW(L) = Q
-        Q = PONDFLOW(L)  !delete
-        Q = PONDFLOW(L)  !delete
       END DO
       !
       ! divide pond water into irrigated HRUs
@@ -3169,6 +3169,7 @@
         end do
         ! convert PRMS ET deficit to MODFLOW flow
         aetold = AETITERPOND(i)
+        PETPOND(i) = pettotal
         sup = PONDFLOW(i)
         supold = PONDFLOWOLD(i)
         factor = set_factor(ipond, aetold, pettotal, aettotal, sup,
@@ -3602,15 +3603,41 @@
       ! - -------OUTPUT TIME SERIES FOR INFLOWS TO PONDS
       !
       IF (TSACTIVEPOND) THEN
-         DO I = 1, NUMPOND
-            UNIT = TSPONDUNIT(I)
-            Q = PONDSEGFLOW(I)
-            QQ = PONDFLOW(I)
-            QQQ = 0.0
-            CALL timeseries(unit, Kkper, Kkstp, TOTIM, I,
-     +                      Q, QQ, QQQ)
+         DO j = 1, NUMPOND
+            k = TSPONDNUM(j)
+            DO i = 1, NUMIRRPOND
+              hru_id = IRRPONDVAR(i)  !these are hru ids for ponds
+              IF ( hru_id == k ) THEN
+                UNIT = TSPONDUNIT(j)
+                Q = PONDSEGFLOW(I)
+                QQ = PONDFLOW(I)
+                QQQ = 0.0
+                CALL timeseries(unit, Kkper, Kkstp, TOTIM, I,
+     +                          Q, QQ, QQQ)
+              END IF
+           END DO
          END DO
       END IF
+            !
+      ! - ----Output time series of ET irrigated by ponds
+      ! - ----Total ET for all cells irrigated by each pond
+      !
+      if (TSACTIVEPONDET) then
+        do j = 1, NUMPONDET
+          k = TSPONDETNUM(j)
+          do i = 1, NUMIRRPOND
+             hru_id = IRRPONDVAR(i)  !these are hru ids for ponds
+             if ( hru_id == k ) then
+               Q = PETPOND(i)
+               QQ = AETITERPOND(i)
+               QQQ = 0.0
+               unit = TSPONDETUNIT(j)
+               CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
+     +                         Q, QQ, QQQ)
+             end if
+          end do
+        end do
+      end if
       !
       ! - ----Output time series of ET irrigated by diversions
       ! - ----Total ET for all cells irrigated by each diversion
@@ -4174,7 +4201,7 @@
       DEALLOCATE(IPONDCBU)
       DEALLOCATE(IRRPONDCB)
       DEALLOCATE(TSACTIVEPOND)
-      DEALLOCATE(TSACTIVEPONDIRR)
+      DEALLOCATE(TSACTIVEPONDET)
       DEALLOCATE(IRRHRU_POND)
       DEALLOCATE(IRRPERIODPOND)
       DEALLOCATE(TRIGGERPERIODPOND)
@@ -4186,10 +4213,10 @@
       DEALLOCATE(PONDFLOWMAX)
       DEALLOCATE(TSPONDUNIT)
       DEALLOCATE(TSPONDNUM)
-      DEALLOCATE(TSPONDIRRUNIT)
-      DEALLOCATE(TSPONDIRRNUM)
+      DEALLOCATE(TSPONDETUNIT)
+      DEALLOCATE(TSPONDETNUM)
       DEALLOCATE(NUMPOND)
-      DEALLOCATE(NUMPONDIRR)
+      DEALLOCATE(NUMPONDET)
       DEALLOCATE(TABPONDSEG)
       DEALLOCATE(PONDSEGFRAC)
       DEALLOCATE(AETITERGW)
