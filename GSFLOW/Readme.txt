@@ -66,7 +66,7 @@ several subdirectories. The following directory structure will be created in the
 installation directory:
 
    |
-   |--gsflow_2.2.0
+   |--gsflow_2.2.0       ; Release notes and Readme
    |    |--bin           ; Compiled GSFLOW executable for personal computers
    |    |--data          ; Seven example GSFLOW application models described
                            in USGS reports TM6-D1 and TM6-D3.
