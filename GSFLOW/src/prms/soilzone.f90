@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-02-26'
+      character(len=*), parameter :: Version_soilzone = '2021-03-05'
       INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -1308,14 +1308,17 @@
         ! infil for pervious and agriculture portion of HRU
         capwater_maxin = Infil(i)
 
-        ag_water_maxin = 0.0
         IF ( Agriculture_soil_flag==ACTIVE ) THEN
           IF ( Hru_ag_irr(i)>0.0 ) THEN
             IF ( ag_on_flag==OFF .AND. Ag_frac_flag==ACTIVE ) THEN
               PRINT *, 'ag_frac=0.0 for HRU:', i
               CALL error_stop('irrigation specified and ag_frac=0', ERROR_param)
             ENDIF
-            ag_water_maxin = Hru_ag_irr(i)/perv_area ! Hru_ag_irr is in inches over Ag_area
+            IF ( ag_on_flag==OFF ) THEN
+              ag_water_maxin = ag_water_maxin + Hru_ag_irr(i)/perv_area ! Hru_ag_irr is in inches
+            ELSE
+              ag_water_maxin = ag_water_maxin + Hru_ag_irr(i)/Ag_area(i)
+            ENDIF
           ENDIF
         ENDIF
         IF ( Iter_aet==ACTIVE ) ag_water_maxin = ag_water_maxin + Ag_irrigation_add(i) ! units of inches over Ag_area
@@ -1336,6 +1339,7 @@
             ag_water_maxin = ag_water_maxin - excess
           ENDIF
         ENDIF
+        IF ( Agriculture_soil_flag==ACTIVE .AND. ag_on_flag== OFF ) capwater_maxin = capwater_maxin + ag_water_maxin
 
         cfgi_frozen_hru = OFF
         !Frozen is HRU variable that says if frozen gravity reservoir
@@ -1362,7 +1366,7 @@
             capwater_maxin = capwater_maxin - pref_flow_maxin
             pref_flow_maxin = pref_flow_maxin*perv_frac
           ENDIF
-          IF ( ag_water_maxin>0.0 ) THEN
+          IF ( ag_water_maxin>0.0 .AND. ag_on_flag==ACTIVE ) THEN
             pref_flow_maxin = ag_water_maxin*Pref_flow_infil_frac(i)
             ag_water_maxin = ag_water_maxin - pref_flow_maxin
             pref_flow_maxin = pref_flow_maxin*agfrac
@@ -1551,8 +1555,8 @@
 !            pervactet = avail_potet
 !            PRINT *, 'perv_et problem', pervactet, Avail_potet
 !          ENDIF
-          Hru_actet(i) = Hru_actet(i) + pervactet*perv_frac
         ENDIF
+        Hru_actet(i) = Hru_actet(i) + pervactet*perv_frac
         IF ( ag_on_flag==ACTIVE ) THEN
           IF ( Ag_soil_moist(i)>0.0 .AND. cfgi_frozen_hru==OFF ) THEN
             IF ( Iter_aet==ACTIVE ) THEN
