@@ -102,13 +102,12 @@
         ALLOCATE ( Irr_type(Nhru) )
         IF ( declparam(MODNAME, 'irr_type', 'nhru', 'integer', &
      &       '0', '0', '2', &
-     &       'Method of application of water for each application', &
-     &       'Method of application of water for each application time-series,'// &
-     &       ' the amount of transferred water is applied as an HRU area average value,'// &
-     &       ' i.e., not based on the canopy cover density'// &
-     &       ' (0=sprinkler (interception applies); 1=furrow/drip (no interception); 2=ignore;'// &
-     &       ' 3=apply water across whole HRU (interception and throughfall);'// &
-     &       ' 4=amount of water based on cover density (living filter) )', &
+     &       'Application method of irrigation water', &
+     &       'Application method of irrigation water for each HRU (0 = sprinkler method with interception only;'// &
+     &       ' 1=ditch/drip method with no interception; 2=ignore; 3=sprinkler across whole HRU with interception'// &
+     &       ' and throughfall; 4=sprinkler method with amount of water applied on the basis of cover density,'// &
+     &       ' such as a living filter), for options 1, 2, and 3 irrigation water is specified as an'// &
+     &       ' HRU-area weighted average value', &
      &       'none')/=0 ) CALL read_error(1, 'irr_type')
       ENDIF
 
