@@ -379,7 +379,6 @@
       NUMCOLS = NCOL
       NUMROWS = NROW
       MAXCELLSHOLD = MAXCELLSWEL
-      ALLOCATE (IRRFIELDFACTPOND(MAXCELLSHOLD, MXPOND))
       IF (NUMSUPHOLD .EQ. 0) THEN
          NUMSUPHOLD = 1
          MXACTWSUP = 1
@@ -1507,12 +1506,13 @@
          END IF
       END DO
 !
-!6 - -----RESET SAVED AET FROM LAST ITERATION
+!6 - -----RESET SAVED IRR AND AET FROM LAST TIME STEP
       DIVERSIONIRRUZF = 0.0
       DIVERSIONIRRPRMS = 0.0
       WELLIRRUZF = 0.0
       WELLIRRPRMS = 0.0
       QONLY = 0.0
+      PONDFLOW = 0.0
       RETURN
       END
 !
@@ -2249,7 +2249,6 @@
       WELLIRRPRMS = 0.0
       PONDIRRPRMS = 0.0
       SUPFLOW = 0.0
-      PONDFLOW = 0.0
       Qp = ZERO
 !      print *, 'qp', qp, totim, zero
       Q = ZERO
@@ -3135,7 +3134,7 @@
       DOUBLE PRECISION :: factor, area, aet, pet
       double precision :: zerod7, done, dzero, pettotal,
      +                    aettotal, prms_inch2mf_q,
-     +                    aetold, supold, sup
+     +                    aetold, supold, sup, etdif
 !      real :: fmaxflow
       integer :: k, ipond, hru_id, i
       external :: set_factor
@@ -3155,7 +3154,6 @@
         factor = DZERO
         ipond = IRRPONDVAR(i)  !these are hru ids for ponds
         IF ( ipond == 0 ) goto 300
-        IF (Dprst_vol_open(ipond) < zerod7) goto 300   !check this because demand is not correct
         !
         !1 - -----loop over HRUs irrigated by pond
         !
@@ -3181,12 +3179,12 @@
         !
         !1 - -----limit pond irrigation to storage
         !
-  !      if(ipond==18)then
-  !    etdif = pettotal - aettotal
-  !        write(999,33)kper,kstp,kiter,PONDFLOW(IPOND),
-  !   +                 pettotal,aettotal,etdif
-  !      endif
-  !33  format(3i5,4e20.10)
+        if(i==1)then
+      etdif = pettotal - aettotal
+          write(999,33)kper,kstp,kiter,PONDFLOW(I),
+     +                 pettotal,aettotal,etdif,Dprst_vol_open(ipond)
+        endif
+  33  format(3i5,5e20.10)
 300   continue
       return
       end subroutine demandpond_prms
