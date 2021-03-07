@@ -3179,13 +3179,13 @@
         !
         !1 - -----limit pond irrigation to storage
         !
-        if(i==1)then
-      etdif = pettotal - aettotal
-          write(999,33)kper,kstp,kiter,PONDFLOW(I),
-     +                 pettotal,aettotal,etdif,Dprst_vol_open(ipond)
-        endif
-  33  format(3i5,5e20.10)
-300   continue
+!        if(i==1)then
+!      etdif = pettotal - aettotal
+!          write(999,33)kper,kstp,kiter,PONDFLOW(I),
+!     +                 pettotal,aettotal,etdif,Dprst_vol_open(ipond)
+!        endif
+!  33  format(3i5,5e20.10)
+!300   continue
       return
       end subroutine demandpond_prms
 
