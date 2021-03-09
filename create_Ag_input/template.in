@@ -83,26 +83,14 @@ IRRPOND
 2897 0 1 0.2     
 END        
 stress period 11            #July 1981
-IRRDIVERSION
--1
-IRRWELL
--1
-SUPWELL
+IRRPOND
 -1
 END
 stress period 12            #August 1981
-IRRDIVERSION
--1
-IRRWELL
--1
-SUPWELL
+IRRPOND
 -1
 END
 stress period 13            #Sept 1981
-IRRDIVERSION
-0
-IRRWELL
-0
-SUPWELL
+IRRPOND
 0
 END

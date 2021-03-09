@@ -90,7 +90,7 @@
         INTEGER, SAVE, DIMENSION(:), POINTER :: IRRWELVAR
         INTEGER, SAVE, DIMENSION(:), POINTER :: IRRPONDVAR   !DS
         INTEGER, SAVE, DIMENSION(:), POINTER :: TABPONDSEG   !DS
-        REAL, SAVE, DIMENSION(:), POINTER :: PONDSEGFRAC !DS
+        REAL, SAVE, DIMENSION(:), POINTER :: TABPONDFRAC !DS
         REAL, SAVE, DIMENSION(:, :), POINTER :: FRACSUP
         REAL, SAVE, DIMENSION(:, :), POINTER :: FRACSUPMAX
         INTEGER, SAVE, POINTER :: NUMSUP
@@ -256,7 +256,7 @@
       ALLOCATE (TSPONDUNIT(MXPOND),TSPONDNUM(MXPOND))
       ALLOCATE (TSPONDETUNIT(MXPOND),TSPONDETNUM(MXPOND))
       ALLOCATE (IRRPONDVAR(MXPOND),TABPONDSEG(MXPOND))
-      ALLOCATE (PONDSEGFRAC(MXPOND))
+      ALLOCATE (TABPONDFRAC(MXPOND))
       ALLOCATE (NUMCELLSPOND(MXPOND),IRRPERIODPOND(MXPOND))
       ALLOCATE (TRIGGERPERIODPOND(MXPOND))
       ALLOCATE (NUMIRRPONDSP,IRRFIELDFACTPOND(MAXCELLSPOND,MXPOND)) 
@@ -300,7 +300,7 @@
       NUMSEGLIST = 0
       IRRPONDVAR = 0
       TABPONDSEG = 0
-      PONDSEGFRAC = 0.0
+      TABPONDFRAC = 0.0
       NUMCELLSPOND = 0
       IRRPERIODPOND = 0
       TRIGGERPERIODPOND = 0
@@ -367,7 +367,7 @@
      +        'No ponds active in the AG Package')
          MXPOND = 1
       END IF
-      ALLOCATE (POND(3, MXPOND))
+      ALLOCATE (POND(4, MXPOND))
       !
       !9 - --- ALLOCATE SUPPLEMENTAL AND IRRIGATION WELL ARRAYS
       NUMSUPHOLD = NUMSUP
@@ -993,7 +993,7 @@
       INTEGER istsg, istsgold, ISEG, IPOND
       logical :: FOUND
       logical :: found1, found2, found3, found4, found7
-      REAL :: R, TTIME, TRATE, QPOND
+      REAL :: R, TTIME, TRATE, QPOND, QFRAC
       CHARACTER*6 CWELL
       ! - -----------------------------------------------------------------
       found4 = .false.
@@ -1004,6 +1004,7 @@
       QPOND = 0.0
       TTIME = 0.0
       TRATE = 0.0
+      QFRAC = 0.0
       !
       !1 - ---READ SEGMENT, POND, AND WELL LIST DATA
       IF (KPER .EQ. 1) THEN
@@ -1072,10 +1073,13 @@
      +                           QPOND, IOUT,IN)
                      CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ISEG, R,
      +                           IOUT, IN)
+                     CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
+     +                           QFRAC, IOUT,IN)
                      POND(1,L) = IPOND   !check that this is less than NRHU
                      IRRPONDVAR(L) = IPOND
                      POND(2,L) = QPOND   
                      POND(3,L) = ISEG    !check that this is less than NSEG
+                     POND(4,L) = QFRAC
                      IF (POND(2, L) < 0.0) THEN
                         WRITE (IOUT, *)
                         WRITE (IOUT, *) 'ERROR: MAX AG POND IRRIGATION '
@@ -1107,7 +1111,8 @@
                   MATCH = 0
                   DO J = 1, MXPOND    
                      READ (IN, *) TABUNITPOND(J), TABVALPOND(J), 
-     +                            TABPONDHRU(J), TABPONDSEG(J)
+     +                            TABPONDHRU(J), TABPONDSEG(J),
+     +                            TABPONDFRAC(J)
                      IRRPONDVAR(J) = TABPONDHRU(J)
                      DO I = 1, J - 1
                         IF (TABUNITPOND(I) == TABUNITPOND(J)) THEN
@@ -1447,6 +1452,7 @@
       DEMAND = 0.0
       TOTAL = 0.0
       TIME = TOTIM
+      PONDSEGFLOW = 0.0
       DO i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
          if (iseg > 0) then
@@ -1477,22 +1483,18 @@
               ID = TABIDPOND(L)
               POND(1,L) = TABPONDHRU(L)
               POND(3,L) = TABPONDSEG(L)
+              POND(4,L) = TABPONDFRAC(L)
               POND(2,L) = RATETERPQ(TIME, TABTIMEPOND(:,ID), 
      +                              TABRATEPOND(:,ID), TABVALPOND(L))
             END DO
           END IF
           DO L = 1, MXPOND
             IF ( POND(3,L) > 0 ) THEN
-              PONDSEGFLOW(L) = SEG(2,int(POND(3,L)))
+              PONDSEGFLOW(L) = POND(4,L)*SEG(2,int(POND(3,L)))
             END IF
           END DO
       END IF
-      !
-      !4 - -----ADD SFR DIVERSION FLOWS TO PONDS
-!      CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRSG, R, IOUT, IN)
-!         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, i, SGFC, IOUT, In)
-!         TABPONDSEG(J) = IRSG
-!         PONDSEGFRAC(J) = SGFC
+!
 !
 !5 - -----SET MAXIMUM POND DIVERSION RATES WHEN TABFILES ARE USED
       DO L = 1, NWELLS
@@ -1764,11 +1766,9 @@
       !
       !2 - --INITIALIZE AG VARIABLES TO ZERO.
       !IRRPONDVAR = 0  This is read at beginning of simulation and is constant
-      TABPONDSEG = 0
       NUMCELLSPOND = 0
       IRRFACTPOND = 0.0
       IRRFIELDFACTPOND = 0.0
-      PONDSEGFRAC = 0.0
       IRRHRU_POND = 0
       IPOND = 1
       !
@@ -2183,7 +2183,7 @@
            UNIT = TSPONDUNIT(NUM)
            WLNM = TSPONDNUM(NUM)
            WRITE (UNIT, *) 'TIME KPER KSTP POND-HRU SEGMENT-INFLOWS ',
-     +                     'POND-IRRIGATION NULL'
+     +                     'POND-IRRIGATION POND-STORAGE'
         case ('PET')
            UNIT = TSPONDETUNIT(NUM)
            WLNM = TSPONDETNUM(NUM)
@@ -3141,6 +3141,7 @@
       double precision :: set_factor
 ! --------------------------------------------------
 !
+      if ( NUMIRRPONDSP == 0 ) return
       zerod7 = 1.0d-7
       done = 1.0d0
       dzero = 0.0d0
@@ -3179,12 +3180,12 @@
         !
         !1 - -----limit pond irrigation to storage
         !
-!        if(i==1)then
-!      etdif = pettotal - aettotal
-!          write(999,33)kper,kstp,kiter,PONDFLOW(I),
-!     +                 pettotal,aettotal,etdif,Dprst_vol_open(ipond)
-!        endif
-!  33  format(3i5,5e20.10)
+  !      if(i==1)then
+  !    etdif = pettotal - aettotal
+  !        write(999,33)kper,kstp,kiter,PONDFLOW(I),
+  !   +                 pettotal,aettotal,etdif,Dprst_vol_open(ipond)
+  !      endif
+  !33  format(3i5,5e20.10)
 300   continue
       return
       end subroutine demandpond_prms
@@ -3540,10 +3541,10 @@
       if( factor > accel*etdif ) factor = accel*etdif
       if( factor < etdif ) factor = etdif
       if( factor < dzero ) factor = dzero
-      open(222,file='debug.out')
-      if(l==18)write(222,333)kper, kstp, kiter,pettotal,aettotal,dq,det,
-     +aettotal,aetold,factor,sup
-333   format(3i5,8e20.10)
+!      open(222,file='debug.out')
+!      if(l==18)write(222,333)kper, kstp, kiter,pettotal,aettotal,dq,det,
+!     +aettotal,aetold,factor,sup
+!333   format(3i5,8e20.10)
       set_factor = factor
       end function set_factor
 !
@@ -3561,9 +3562,11 @@
 !      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_SOILZONE, ONLY: PERV_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
-      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row,
+     +                      Mfl3_to_ft3, Mft_to_sec
       IMPLICIT NONE
 ! --------------------------------------
       !arguments
@@ -3574,6 +3577,7 @@
       DOUBLE PRECISION :: Q, QQ, QQQ, DVT, prms_inch2mf_q, done
       integer :: k, iseg, ic, ir, i, l, UNIT, J, hru_id
       integer :: icell, irow, icol
+      real :: conversion
 ! --------------------------------------
 !
       !
@@ -3582,6 +3586,7 @@
       QQQ = 0.0
       prms_inch2mf_q = 0.0
       done = 1.0d0
+      conversion = Mfl3_to_ft3/Mft_to_sec
                       
       !
       ! - -------OUTPUT TIME SERIES FOR SEGMENTS DIVERSIONS
@@ -3609,7 +3614,7 @@
                 UNIT = TSPONDUNIT(j)
                 Q = PONDSEGFLOW(I)
                 QQ = PONDFLOW(I)
-                QQQ = 0.0
+                QQQ = Dprst_vol_open(hru_id)/conversion
                 CALL timeseries(unit, Kkper, Kkstp, TOTIM, I,
      +                          Q, QQ, QQQ)
               END IF
@@ -4216,7 +4221,7 @@
       DEALLOCATE(NUMPOND)
       DEALLOCATE(NUMPONDET)
       DEALLOCATE(TABPONDSEG)
-      DEALLOCATE(PONDSEGFRAC)
+      DEALLOCATE(TABPONDFRAC)
       DEALLOCATE(AETITERGW)
       DEALLOCATE(AETITERSW)
       DEALLOCATE(RMSESW)
