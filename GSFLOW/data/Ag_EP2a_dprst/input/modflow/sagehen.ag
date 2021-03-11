@@ -9,8 +9,8 @@ timeseries_pondET
 end
 # AG time series
 time series
-pond 2735 103
-pondet 2735 104
+pondall 103
+pondetall 104
 end
 # AG pond list    
 pond list

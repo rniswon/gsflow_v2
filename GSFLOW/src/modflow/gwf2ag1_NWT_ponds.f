@@ -8,9 +8,11 @@
         LOGICAL, SAVE, POINTER :: TSACTIVEGW, TSACTIVESW
         LOGICAL, SAVE, POINTER :: TSACTIVEGWET, TSACTIVESWET
         LOGICAL, SAVE, POINTER :: TSACTIVEPOND, TSACTIVEPONDET  !DS
+        LOGICAL, SAVE, POINTER :: TSACTIVEALLPOND, TSACTIVEALLPONDET  !DS
         INTEGER, SAVE, POINTER :: NUMSW, NUMGW, NUMSWET, NUMGWET
         INTEGER, SAVE, POINTER :: NUMPOND, NUMPONDET
         INTEGER, SAVE, POINTER :: TSGWETALLUNIT, TSGWALLUNIT
+        INTEGER, SAVE, POINTER :: TSPONDETALLUNIT, TSPONDALLUNIT
         INTEGER, SAVE, POINTER :: NSEGDIMTEMP
         CHARACTER(LEN=16), SAVE, DIMENSION(:), POINTER :: WELAUX
         CHARACTER(LEN=16), SAVE, DIMENSION(:), POINTER :: PONDAUX
@@ -163,7 +165,9 @@
       ALLOCATE (TSACTIVEGW, TSACTIVESW, NUMSW, NUMGW)
       ALLOCATE (TSACTIVEGWET, TSACTIVESWET, NUMSWET, NUMGWET)
       ALLOCATE (TSACTIVEPOND, TSACTIVEPONDET)
+      ALLOCATE (TSACTIVEALLPOND, TSACTIVEALLPONDET)
       ALLOCATE (TSGWALLUNIT, TSGWETALLUNIT, NSEGDIMTEMP)
+      ALLOCATE (TSPONDALLUNIT, TSPONDETALLUNIT)
       ALLOCATE (MXPOND, NUMPOND, NUMPONDET, NUMTABPOND, MAXVALPOND)
       MXPOND = 1
       VBVLAG = 0.0
@@ -182,6 +186,8 @@
       TSACTIVESWET = .FALSE.
       TSACTIVEPOND = .FALSE.
       TSACTIVEPONDET = .FALSE.
+      TSACTIVEALLPOND = .FALSE.
+      TSACTIVEALLPONDET = .FALSE.
       NUMSW = 0
       NUMGW = 0
       NUMSWET = 0
@@ -190,6 +196,8 @@
       NUMPONDET = 0
       TSGWETALLUNIT = 0
       TSGWALLUNIT = 0
+      TSPONDALLUNIT = 0
+      TSPONDETALLUNIT = 0
       WELAUX = ' '
       ALLOCATE (NUMSUP, NUMIRRWEL, UNITSUP, MAXCELLSWEL)
       ALLOCATE (NUMSUPSP, MAXSEGS, NUMIRRWELSP)
@@ -1477,9 +1485,9 @@
       END IF
       !
       !3 - -----SET MAXIMUM POND DIVERSION RATES WHEN TABFILES ARE USED
-      IF ( NUMPOND > 0 ) THEN
+      IF ( MXPOND > 0 ) THEN
           IF (NUMTABPOND > 0) THEN
-            DO L = 1, MXPOND
+            DO L = 1, NUMIRRPOND
               ID = TABIDPOND(L)
               POND(1,L) = TABPONDHRU(L)
               POND(3,L) = TABPONDSEG(L)
@@ -1488,7 +1496,7 @@
      +                              TABRATEPOND(:,ID), TABVALPOND(L))
             END DO
           END IF
-          DO L = 1, MXPOND
+          DO L = 1, NUMIRRPOND
             IF ( POND(3,L) > 0 ) THEN
               PONDSEGFLOW(L) = POND(4,L)*SEG(2,int(POND(3,L)))
             END IF
@@ -1802,7 +1810,7 @@
      +                 'PONDS')
          END IF
          TEST = .TRUE.
-         DO 200 IP = 1, MXPOND 
+         DO 200 IP = 1, NUMIRRPOND
            IF ( POND(1,IP) == IRWL ) THEN
               TEST = .FALSE.
               IPOND = IP
@@ -1984,7 +1992,8 @@
       ! - -----------------------------------------------------------------
       INTEGER LLOC, ISTART, ISTOP, I, SGNM, UNIT, WLNM
       INTEGER PDNM
-      INTEGER ISTARTSAVE, ITEST, NUMGWETALL, NUMGWALL
+      INTEGER ISTARTSAVE, ITEST, NUMGWETALL, NUMGWALL, NUMPONDETALL
+      INTEGER NUMPONDALL
       real :: R
       !character(len=16)  :: text = 'AG'
       character(len=17)  :: char1 = 'TIME SERIES'
@@ -1994,6 +2003,9 @@
       !
       NUMGWETALL = 0
       NUMGWALL = 0
+      NUMPONDETALL = 0
+      NUMPONDALL = 0
+      NUMPONDET = 0
       WLNM = 0
       TEST = .FALSE.
       CALL URDCOM(In, IOUT, line)
@@ -2101,13 +2113,25 @@
          case ('WELLETALL')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
             TSGWETALLUNIT = UNIT
-            CALL WRITE_HEADER_AG('AL1', NUMGWET)
             NUMGWETALL = 1
+            CALL WRITE_HEADER_AG('AL1', NUMGWET)
          case ('WELLALL')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
             TSGWALLUNIT = UNIT
-            CALL WRITE_HEADER_AG('AL2', NUMGWET)
             NUMGWALL = 1
+            CALL WRITE_HEADER_AG('AL2', NUMGWET)
+         case ('PONDETALL')
+            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
+            TSPONDETALLUNIT = UNIT
+            TSACTIVEALLPONDET = .TRUE.
+            NUMPONDETALL = 1
+            CALL WRITE_HEADER_AG('PA1', NUMPONDETALL)
+         case ('PONDALL')
+            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
+            TSPONDALLUNIT = UNIT
+            TSACTIVEALLPOND = .TRUE.
+            NUMPONDALL = 1
+            CALL WRITE_HEADER_AG('PA2', NUMPONDALL)
          case ('END')
             write (iout, '(/1x,a)') 'FINISHED READING '//
      +             trim(adjustl(char1))
@@ -2127,7 +2151,9 @@
         write (iout, 6) NUMSW
         write (iout, 7) NUMGW + NUMGWALL
         write (iout, 8) NUMSWET
-        write (iout, 9) NUMGWET + NUMGWETALL
+        write (iout, 9) NUMGWET + NUMGWETALL        
+        write (iout, 10) NUMPONDET + NUMPONDETALL
+        write (iout, 11) NUMPOND + NUMPONDALL
       ELSE
         BACKSPACE(IN)
       END IF
@@ -2139,6 +2165,10 @@
      +       'were activated for SURFACE WATER ET')
 9     FORMAT(' A total number of ', i10, ' AG output time series files '
      +       'were activated for GROUNDWATER ET')
+10    FORMAT(' A total number of ', i10, ' AG output time series files '
+     +       'were activated for POND ET')
+11    FORMAT(' A total number of ', i10, ' AG output time series files '
+     +       'were activated for POND IRRIGATION')
 
       !11 - ----RETURN.
       RETURN
@@ -2195,6 +2225,13 @@
            UNIT = TSGWALLUNIT
            WRITE (UNIT, *) 'TIME KPER KSTP NULL GW-DEMAND GW-PUMPED ',
      +                     'NULL'
+        case ('PA1')
+           UNIT = TSPONDETALLUNIT
+           WRITE (UNIT, *) 'TIME KPER KSTP NULL ETww ETa NULL'
+        case ('PA2')
+           UNIT = TSPONDALLUNIT
+        WRITE (UNIT, *) 'TIME KPER KSTP NULL SEG-INFLOW POND-OUTFLOW ',
+     +                     'POND-STORAGE'
         end select
       END SUBROUTINE WRITE_HEADER_AG
 
@@ -2433,7 +2470,7 @@
       !
       !  - -----SET MAX POND IRRIGATION RATE.
       !
-      DO L = 1, MXPOND
+      DO L = 1, NUMIRRPOND
         Q = POND(2, L)        
         IF ( PONDFLOW(L) > Q ) PONDFLOW(L) = Q
       END DO
@@ -2486,7 +2523,7 @@
       DOUBLE PRECISION :: QSWGL, DONE, QPOND, QPONDIRR
       REAL :: Q, TIME, QIRR, BUDPERC, RIN_SNGL, ROUT_SNGL
       INTEGER :: NWELLSTEMP, L, I, J, ISTSG, ICOUNT, IL !, ID
-      INTEGER :: IC, IR, IBDLBL, IW1, IHRU
+      INTEGER :: IC, IR, IBDLBL, IW1, IHRU, K, IPC
       INTEGER :: IBD1, IBD2, IBD3, IBD4, IBD5, IBD6, IBD7
 !      INTEGER :: TOTWELLCELLS, TOTDIVERSIONCELLS
 !      INTEGER :: TOTPONDCELLS
@@ -2825,19 +2862,36 @@
       !18 - ------SW DIVERSIONS
       RIN = QSW
       ROUT = ZERO
-      VBVLAG(3, MSUMAG) = sngl(RIN)
-      VBVLAG(4, MSUMAG) = sngl(ROUT)
+      RIN_SNGL = SNGL(RIN)
+      ROUT_SNGL = SNGL(ROUT)
+      VBVLAG(3, MSUMAG) = RIN_SNGL
+      VBVLAG(4, MSUMAG) = ROUT_SNGL
       VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + SNGL(RIN)*DELT
       VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + SNGL(ROUT)*DELT
       VBNMAG(MSUMAG) = TEXT2
       MSUMAG = MSUMAG + 1
       !19 - ------POND RELEASES
+      QPOND = ZERO
+      DO L = 1, NUMIRRPOND
+        QPOND = QPOND + PONDFLOW(L)
+      END DO
       RIN = QPOND
-      ROUT = ZERO
-      VBVLAG(3, MSUMAG) = sngl(RIN)
-      VBVLAG(4, MSUMAG) = sngl(ROUT)
-      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN*DELT
-      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT*DELT
+      QPOND = ZERO
+      !19b ------POND IRRIGATION
+      DO L = 1, NUMIRRPOND
+        K = NUMCELLSPOND(L)
+        SUBVOL = PONDFLOW(L)
+        DO IPC = 1, K
+          QPOND = QPOND + PONDIRRPRMS(IPC, L)
+        END DO
+      END DO
+      ROUT = QPOND
+      RIN_SNGL = SNGL(RIN)
+      ROUT_SNGL = SNGL(ROUT)
+      VBVLAG(3, MSUMAG) = RIN_SNGL
+      VBVLAG(4, MSUMAG) = ROUT_SNGL
+      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN_SNGL*DELT
+      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT_SNGL*DELT
       VBNMAG(MSUMAG) = TEXT13
       MSUMAG = MSUMAG + 1
       !
@@ -3141,11 +3195,14 @@
       double precision :: set_factor
 ! --------------------------------------------------
 !
-      if ( NUMIRRPONDSP == 0 ) return
       zerod7 = 1.0d-7
       done = 1.0d0
       dzero = 0.0d0
       prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
+      if ( NUMIRRPONDSP == 0 ) THEN
+          PONDFLOW = DZERO
+          return
+      end if
       !
       !1 - -----loop over HRUs with ponds that supply irrigation
       !
@@ -3176,7 +3233,6 @@
         AETITERPOND(i) = SNGL(aettotal)
         PONDFLOWOLD(i) = PONDFLOW(i)
         PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
-!        IF ( PONDFLOW(i)
         !
         !1 - -----limit pond irrigation to storage
         !
@@ -3573,24 +3629,27 @@
       INTEGER, INTENT(IN) :: KKPER, KKSTP
       REAL, INTENT(IN) :: TOTIM
       !dummy
-      DOUBLE PRECISION :: area, uzet, aet, pet, aettot, pettot
+      DOUBLE PRECISION :: area, uzet, aet, pet, aettot, pettot, sub
       DOUBLE PRECISION :: Q, QQ, QQQ, DVT, prms_inch2mf_q, done
       integer :: k, iseg, ic, ir, i, l, UNIT, J, hru_id
       integer :: icell, irow, icol
-      real :: conversion
+      real :: mf_q2prms_inchacres
 ! --------------------------------------
 !
       !
       aettot = 0.0
       pettot = 0.0
-      QQQ = 0.0
       prms_inch2mf_q = 0.0
       done = 1.0d0
-      conversion = Mfl3_to_ft3/Mft_to_sec
+      mf_q2prms_inchacres = SNGL( DELT*Mfl2_to_acre*Mfl_to_inch )
+      sub = 0.0
                       
       !
       ! - -------OUTPUT TIME SERIES FOR SEGMENTS DIVERSIONS
       !
+      Q = 0.0
+      QQ = 0.0
+      QQQ = 0.0
       IF (TSACTIVESW) THEN
          DO I = 1, NUMSW
             UNIT = TSSWUNIT(I)
@@ -3603,8 +3662,11 @@
          END DO
       END IF
       !
-      ! - -------OUTPUT TIME SERIES FOR INFLOWS TO PONDS
+      ! - -------OUTPUT TIME SERIES FOR INFLOWS AND OUTFLOWS TO PONDS
       !
+      Q = 0.0
+      QQ = 0.0
+      QQQ = 0.0
       IF (TSACTIVEPOND) THEN
          DO j = 1, NUMPOND
             k = TSPONDNUM(j)
@@ -3614,8 +3676,10 @@
                 UNIT = TSPONDUNIT(j)
                 Q = PONDSEGFLOW(I)
                 QQ = PONDFLOW(I)
-                QQQ = Dprst_vol_open(hru_id)/conversion
-                CALL timeseries(unit, Kkper, Kkstp, TOTIM, I,
+                QQQ = 0.0
+                if ( mf_q2prms_inchacres > 0 ) 
+     +               QQQ = Dprst_vol_open(hru_id)/mf_q2prms_inchacres
+                CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
      +                          Q, QQ, QQQ)
               END IF
            END DO
@@ -3625,6 +3689,9 @@
       ! - ----Output time series of ET irrigated by ponds
       ! - ----Total ET for all cells irrigated by each pond
       !
+      Q = 0.0
+      QQ = 0.0
+      QQQ = 0.0
       if (TSACTIVEPONDET) then
         do j = 1, NUMPONDET
           k = TSPONDETNUM(j)
@@ -3641,10 +3708,56 @@
           end do
         end do
       end if
+            !
+      ! - -------OUTPUT TIME SERIES FOR INFLOWS AND OUTFLOWS TO PONDS
+      !
+      Q = 0.0
+      QQ = 0.0
+      QQQ = 0.0
+      IF (TSACTIVEALLPOND) THEN
+         UNIT = TSPONDALLUNIT
+         hru_id = 0  !use dummy value for all HRUs
+         DO i = 1, NUMIRRPOND
+           k = TSPONDNUM(I)
+           Q = Q + PONDSEGFLOW(I)
+           QQ = QQ + PONDFLOW(I)
+           hru_id = IRRPONDVAR(I)
+           if ( mf_q2prms_inchacres > 0 ) then
+             sub = Dprst_vol_open(hru_id)/mf_q2prms_inchacres
+             if ( sub < 0.0 ) sub = 0.0
+             QQQ = QQQ + sub
+           end if
+         END DO
+         hru_id = 0
+         CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
+     +                          Q, QQ, QQQ)
+       END IF
+            !
+      ! - ----Output time series of ET irrigated by ponds
+      ! - ----Total ET for all cells irrigated by each pond
+      !
+      Q = 0.0
+      QQ = 0.0
+      QQQ = 0.0
+      if (TSACTIVEALLPONDET) then
+        unit = TSPONDETALLUNIT
+        hru_id = 0  !dummy value for all ponds
+        do i = 1, NUMIRRPOND
+          Q = Q + PETPOND(i)
+          QQ = QQ + AETITERPOND(i)
+          QQQ = 0.0
+        end do
+        CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
+     +                         Q, QQ, QQQ)
+      end if
+      
       !
       ! - ----Output time series of ET irrigated by diversions
       ! - ----Total ET for all cells irrigated by each diversion
       !
+      Q = 0.0
+      QQ = 0.0
+      QQQ = 0.0
       if (TSACTIVESWET) then
          prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
          do I = 1, NUMSWET
@@ -3692,6 +3805,9 @@
       !
       ! - -------OUTPUT TIME SERIES FOR WELL
       !
+      Q = 0.0
+      QQ = 0.0
+      QQQ = 0.0
       DO L = 1, NWELLS
          IF (TSACTIVEGW) THEN
             DO I = 1, NUMGW
@@ -3708,6 +3824,9 @@
          !
          ! - ----Total ET for all cells irrigated by each well
          !
+         Q = 0.0
+         QQ = 0.0
+         QQQ = 0.0
          aettot = 0.0
          pettot = 0.0
          IF (TSACTIVEGWET) THEN
@@ -3761,6 +3880,9 @@
       !
       ! - ------TOTAL ET FOR ALL WELLS USED FOR IRRIGATION
       !
+      Q = 0.0
+      QQ = 0.0
+      QQQ = 0.0
       aettot = 0.0
       pettot = 0.0
       IF (TSGWETALLUNIT > 0) THEN
@@ -3808,6 +3930,9 @@
       !
       !----TOTAL GW USED BY ALL WELLS FOR IRRIGATION
       !
+      Q = 0.0
+      QQ = 0.0
+      QQQ = 0.0
       IF (TSGWALLUNIT > 0) THEN
          Q = 0.0
          QQ = 0.0
