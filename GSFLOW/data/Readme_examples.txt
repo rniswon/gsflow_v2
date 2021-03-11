@@ -2,10 +2,16 @@
                             GSFLOW Sample Problems
                                  March 2020
  
-Nine sample problems with GSFLOW data sets are provided in this subdirectory
+Ten sample problems with GSFLOW data sets are provided in this subdirectory
 to verify that GSFLOW is correctly installed and running on the user's system.
-The sample problems also may be looked at as examples of how to use the 
-program. 
+The sample problems also may be looked at as examples of how to use various
+simulation, input, and ouput options. The Data and Parameter Files can 
+be found in 'input' subdirectories. Files ending in 'day' refer to 
+pre-processed climate-data files used with the PRMS climate_by_hru module.
+Results for simulations can be found in 'output' subdirectories. Results run from
+the development computer for simulations can be found in 'output-test' 
+subdirectories and are intended for comparison purposes of results in the 
+'output' subdirectories.
 
 Sample problems:
 
@@ -49,7 +55,23 @@ Sample problems:
    illustrates running PRMS with a time-series of water-use input to the 
    water_use_read module that is described in Regan and LaFontaine (2017).
 
+10. Tazlina: A model of the Tazlina Basin in Alaske is provided for illustrative
+   and educational purposes only. The glacier dynamics simulation method  is
+   described in Van Beusekom and Viger (2015).
+
 References:
+
+LaFontaine, J.H., Hay, L.E., Viger, R.J., Markstrom, S.L., Regan, R.S., 
+Elliott, C.M., and Jones, J.W., 2013, Application of the Precipitation-
+Runoff Modeling System (PRMS) in the Apalachicola–Chattahoochee–Flint 
+River Basin in the southeastern United States: U.S. Geological Survey 
+Scientific Investigations Report 2013–5162, 118 p., accessed October 13, 
+2016, at https://pubs.usgs.gov/sir/2013/5162/.
+
+Markstrom, S.L., Regan, R.S., Hay, L.E., Viger, R.J., Webb, R.M.T., 
+Payn, R.A., and LaFontaine, J.H., 2015, PRMS-IV, the precipitation-
+runoff modeling system, version 4: U.S. Geological Survey Techniques 
+and Methods, book 6, chap. B7, 158 p., http://dx.doi.org/10.3133/tm6B7.
 
 Markstrom, S.L., Niswonger, R.G., Regan, R.S., Prudic, D.E., and
 Barlow, P.M., 2008, GSFLOW--Coupled Ground-water and Surface-water
@@ -66,10 +88,13 @@ parameter, water-use, stream and lake flow routing, and two summary
 output modules and updates to surface-depression storage simulation and 
 initial conditions specification options with the Precipitation-Runoff 
 Modeling System (PRMS): U.S. Geological Survey Techniques and Methods, 
-book 6, chap. B8, 60 p.
+book 6, chap. B8, 60 p., https://doi.org/10.3133/tm6B8.
 
 Regan, R.S., Niswonger, R.G., Markstrom, S.L., and Barlow, P.M., 2015, 
 Documentation of a restart option for the U.S. Geological Survey coupled 
 groundwater and surface-water flow (GSFLOW) model: U.S. Geological Survey 
-Techniques and Methods, book 6, chap. D3, 19 p., 
-http://dx.doi.org/10.3133/tm6D3/.
+Techniques and Methods, book 6, chap. D3, 19 p., http://dx.doi.org/10.3133/tm6D3.
+
+Van Beusekom, A.E., and Viger, R.J., 2015, A glacier runoff extension to the
+Precipitation Runoff Modeling System, Journal of Geophysical Research: Earth 
+Science, 21 p., https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015JF003789. 

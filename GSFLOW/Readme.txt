@@ -16,13 +16,10 @@ for any damages resulting from its authorized or unauthorized use.
 
 GSFLOW version 2.2.0 is packaged for personal computers using one of the Linux or 
 Microsoft Windows operating systems. An executable file compiled for 64-bit operating 
-systems is provided. The Linux executable was compiled on a personal computer using
-gfortran and gcc compilers GCC-8.3.0 version. The Windows executable was 
-compiled using the Microsoft Visual Studio 2019 Version 16.3.7, development environment 
-and the Intel® Parallel Studio XE 2019 Update 5 Composer Edition for Fortran Windows* 
-Integration for Microsoft Visual Studio* 2019 and Microsoft Visual C++ 2019 compilers.
-Both executables were compiled on a personal computer with the Intel(R) Xeon(R) E-2186M CPU, 
-running the Microsoft Windows 10 Enterprise, Version 1809, 64-bit operating system
+systems is provided. The Linux executable was compiled using the gfortran and gcc
+compilers (8.3.0 version). The Windows executable was compiled using the Microsoft
+Visual Studio Community 2019, Version 16.3.7 and the Intel Parallel Studio XE 2019
+Update 5 Composer Edition and Microsoft Visual C++ 2019 compilers.
 
 The source code and Linux Makefiles are provided to aid users in compilation
 on other computers. However, no support is provided for compilation.
@@ -68,11 +65,11 @@ installation directory:
    |
    |--gsflow_2.2.0       ; Release notes and Readme
    |    |--bin           ; Compiled GSFLOW executable for personal computers
-   |    |--data          ; Seven example GSFLOW application models described
-                           in USGS reports TM6-D1 and TM6-D3.
+   |    |--data          ; Ten example GSFLOW application models described
+                           in USGS reports.
    |    |--doc           ; Documentation reports for GSFLOW and related
                            software.
-			|--Related reports	; Additional reports and information files
+           |--Related reports	; Additional reports and information files
    |    |--src
    |        |--gsflow           ; Source code for GSFLOW Modules
    |        |--mmf              ; Source code for MMF software
@@ -84,9 +81,8 @@ installation directory:
 
 
 It is recommended that no user files be kept in the gsflow_2.2.0 directory
-structure.  If you do plan to put your own files in the gsflow_2.2.0
-directory structure, do so only by creating additional subdirectories of
-the "data" subdirectory.
+structure.  If you do plan to put your own files in the directory structure, 
+do so only by creating additional subdirectories of the "data" subdirectory.
 
 Included with the release are several documents that use the Portable Document 
 Format (PDF) file structure. The PDF files are readable and printable on various 
