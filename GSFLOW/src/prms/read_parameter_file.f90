@@ -92,7 +92,7 @@
       IMPLICIT NONE
       ! Functions
       EXTERNAL read_error, PRMS_open_input_file, setparam
-      INTEGER, EXTERNAL :: control_string, numchars, getdim
+      INTEGER, EXTERNAL :: numchars, getdim
       INTRINSIC :: TRIM
       ! Local Variables
       CHARACTER(LEN=16) :: string
@@ -198,7 +198,7 @@
       IMPLICIT NONE
       ! Functions
       EXTERNAL read_error, PRMS_open_input_file, setparam
-      INTEGER, EXTERNAL :: control_string, numchars, getdim
+      INTEGER, EXTERNAL :: numchars, getdim
       INTRINSIC :: TRIM
       ! Local Variables
       INTEGER :: i
