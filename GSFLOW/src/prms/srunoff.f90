@@ -1519,7 +1519,8 @@
 
       IF ( Dprst_add_water_use==ACTIVE ) inflow = inflow + Dprst_gain(Ihru) / SNGL( Cfs_conv )
       IF ( Ag_package_active==ACTIVE ) THEN
-        IF ( NUMIRRPOND>0 ) inflow = inflow + Dprst_ag_gain(Ihru)
+          ! dprst_ag_gain is in CFS
+        IF ( NUMIRRPOND>0 ) inflow = inflow + Dprst_ag_gain(Ihru) / SNGL( Cfs_conv )
       ENDIF
 
       Dprst_in = 0.0D0
