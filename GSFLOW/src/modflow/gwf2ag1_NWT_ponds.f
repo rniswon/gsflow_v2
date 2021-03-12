@@ -3178,7 +3178,6 @@
       USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
       IMPLICIT NONE
 ! --------------------------------------------------
       !modules
@@ -3619,10 +3618,10 @@
       USE PRMS_SOILZONE, ONLY: PERV_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
-      USE PRMS_MODULE, ONLY: GSFLOW_flag
-      USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
+      USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id,
+     +    Agriculture_dprst_flag
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row,
-     +                      Mfl3_to_ft3, Mft_to_sec
+     +                      Mfq_to_inch_acres
       IMPLICIT NONE
 ! --------------------------------------
       !arguments
@@ -3633,7 +3632,6 @@
       DOUBLE PRECISION :: Q, QQ, QQQ, DVT, prms_inch2mf_q, done
       integer :: k, iseg, ic, ir, i, l, UNIT, J, hru_id
       integer :: icell, irow, icol
-      real :: mf_q2prms_inchacres
 ! --------------------------------------
 !
       !
@@ -3641,7 +3639,6 @@
       pettot = 0.0
       prms_inch2mf_q = 0.0
       done = 1.0d0
-      mf_q2prms_inchacres = SNGL( DELT*Mfl2_to_acre*Mfl_to_inch )
       sub = 0.0
                       
       !
@@ -3677,8 +3674,8 @@
                 Q = PONDSEGFLOW(I)
                 QQ = PONDFLOW(I)
                 QQQ = 0.0
-                if ( mf_q2prms_inchacres > 0 ) 
-     +               QQQ = Dprst_vol_open(hru_id)/mf_q2prms_inchacres
+                if ( Agriculture_dprst_flag == 1 ) 
+     +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
                 CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
      +                          Q, QQ, QQQ)
               END IF
@@ -3722,8 +3719,8 @@
            Q = Q + PONDSEGFLOW(I)
            QQ = QQ + PONDFLOW(I)
            hru_id = IRRPONDVAR(I)
-           if ( mf_q2prms_inchacres > 0 ) then
-             sub = Dprst_vol_open(hru_id)/mf_q2prms_inchacres
+           if ( Agriculture_dprst_flag == 1 ) then
+             sub = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
              if ( sub < 0.0 ) sub = 0.0
              QQQ = QQQ + sub
            end if

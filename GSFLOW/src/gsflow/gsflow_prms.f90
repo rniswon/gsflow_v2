@@ -597,6 +597,7 @@
 !     declare the dimensions
 !***********************************************************************
       INTEGER FUNCTION setdims()
+      USE PRMS_CONSTANTS, ONLY: ERROR_control
       USE PRMS_MODULE
       USE GLOBAL, ONLY: NSTP, NPER, ISSFLG
       IMPLICIT NONE
@@ -959,6 +960,8 @@
       IF ( control_integer(Agriculture_soil_flag, 'agriculture_soil_flag')/=0 ) Agriculture_soil_flag = OFF
       IF ( control_integer(Agriculture_canopy_flag, 'agriculture_canopy_flag')/=0 ) Agriculture_canopy_flag = OFF
       IF ( control_integer(Agriculture_dprst_flag, 'agriculture_dprst_flag')/=0 ) Agriculture_dprst_flag = OFF
+      IF ( Dprst_flag==OFF .AND. Agriculture_dprst_flag==ACTIVE ) &
+     &     CALL error_stop('agriculture_dprst_flag = 1, but dprst_flag = 0', ERROR_control)
       Agriculture_flag = Agriculture_soil_flag + Agriculture_canopy_flag + Agriculture_dprst_flag
 
       ! 0 = off, 1 = on, 2 = lauren version

@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-02-26'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-03-12'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -41,6 +41,7 @@
       DOUBLE PRECISION, SAVE :: Mfl2_to_acre, Mfl3_to_ft3, Sfr_conv
       DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs
       REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t
+      REAL, SAVE :: MFQ_to_inch_acres
       DOUBLE PRECISION, SAVE :: mfstrt_jul  !RGN to get MF to stop at End_time for MODFLOW only
       REAL, SAVE, ALLOCATABLE :: Mfq2inch_conv(:), Cellarea(:)
       REAL, SAVE, ALLOCATABLE :: Gvr2cell_conv(:), Mfvol2inch_conv(:)
@@ -1831,11 +1832,12 @@ C
      &    GSFLOW_flag
       USE GLOBAL, ONLY: ITMUNI, LENUNI, IOUT
       USE GWFBASMODULE, ONLY: DELT
-      USE GSFMODFLOW, ONLY: Mft_to_sec, Cellarea,
+      USE GSFMODFLOW, ONLY: Mft_to_sec, Cellarea, MFQ_to_inch_acres,
      &    Mfl2_to_acre, Mfl3_to_ft3, Mfl_to_inch, Sfr_conv,
      &    Acre_inches_to_mfl3, Inch_to_mfl_t, Mfl3t_to_cfs,
      &    Mfvol2inch_conv, Gvr2cell_conv, Mfq2inch_conv
       IMPLICIT NONE
+      
       EXTERNAL :: error_stop
 ! Local Variables
       REAL :: inch_to_mfl
@@ -1871,6 +1873,7 @@ C
       Mfl_to_inch = 1.0/inch_to_mfl
       Mfl2_to_acre = Mfl2_to_acre/FT2_PER_ACRE
       Inch_to_mfl_t = inch_to_mfl/DELT  ! will need to move if DELT allowed to change
+      MFQ_to_inch_acres = SNGL( DELT*Mfl2_to_acre*Mfl_to_inch )
 
       Sfr_conv = Mft_to_sec/Mfl3_to_ft3
       Mfl3t_to_cfs = Mfl3_to_ft3/Mft_to_sec

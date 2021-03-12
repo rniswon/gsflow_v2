@@ -31,7 +31,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2021-02-03'
+      character(len=*), parameter :: Version_srunoff = '2021-03-12'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -1518,14 +1518,16 @@
       ENDIF
 
       IF ( Dprst_add_water_use==ACTIVE ) inflow = inflow + Dprst_gain(Ihru) / SNGL( Cfs_conv )
-      IF ( Ag_package_active==ACTIVE ) THEN
-          ! dprst_ag_gain is in CFS
-        IF ( NUMIRRPOND>0 ) inflow = inflow + Dprst_ag_gain(Ihru) / SNGL( Cfs_conv )
-      ENDIF
 
       Dprst_in = 0.0D0
       IF ( Dprst_area_open_max>0.0 ) THEN
         Dprst_in = DBLE( inflow*Dprst_area_open_max ) ! inch-acres
+        IF ( Ag_package_active==ACTIVE ) THEN
+          IF ( NUMIRRPOND>0 ) THEN
+            ! dprst_ag_gain units are inch-acres
+            IF ( Dprst_ag_gain(Ihru)>0.0 ) Dprst_in = Dprst_in + Dprst_ag_gain(Ihru)
+          ENDIF
+        ENDIF
         Dprst_vol_open = Dprst_vol_open + Dprst_in
       ENDIF
 
