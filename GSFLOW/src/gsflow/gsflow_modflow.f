@@ -144,7 +144,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
           ALLOCATE ( Dprst_ag_transfer(Nhru) )
           IF ( declvar(MODNAME, 'dprst_ag_transfer', 'nhru',Nhru,'real',
      &         'Surface depression storage transfer to MODFLOW cells',
-     &         'cfs', Dprst_ag_transfer)/=0 )
+     &         'inch-acres', Dprst_ag_transfer)/=0 )
      &         CALL read_error(3, 'dprst_ag_transfer')
           Dprst_ag_transfer = 0.0
         ENDIF
