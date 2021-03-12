@@ -96,7 +96,7 @@
       INTEGER, EXTERNAL :: precip_dist2, xyz_dist, ide_dist
       INTEGER, EXTERNAL :: ddsolrad, ccsolrad
       INTEGER, EXTERNAL :: potet_pan, potet_jh, potet_hamon, potet_hs, potet_pt, potet_pm
-      INTEGER, EXTERNAL :: gwflow, soilzone
+      INTEGER, EXTERNAL :: gwflow, soilzone, srunoff
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, write_climate_hru
       INTEGER, EXTERNAL :: strmflow_in_out, muskingum, muskingum_lake, numchars
       INTEGER, EXTERNAL :: water_use_read, dynamic_param_read, potet_pm_sta
@@ -497,10 +497,12 @@
 ! (contained in gsflow_modflow.f).
 ! They still need to be called for declare, initialize and cleanup
         ELSE !IF ( Process_flag/=RUN ) THEN
-! intcp, snowcomp, glacr, soilzone, and srunoff for GSFLOW is in the MODFLOW iteration loop
-! when PRMS_land_iteration_flag = ACTIVE
+! intcp, snowcomp, glacr, srunoff, and soilzone for GSFLOW are in the MODFLOW iteration loop
+! when PRMS_land_iteration_flag = 2
+! runoff and soilzone for GSFLOW are in the MODFLOW iteration loop
+! when PRMS_land_iteration_flag = 1
 ! only call for declare, initialize, and cleanup.
-          IF ( PRMS_land_iteration_flag==ACTIVE ) CALL PRMS_land_modules(Arg, ierr)
+          IF ( PRMS_land_iteration_flag>OFF ) CALL PRMS_land_modules(Arg, ierr)
 
           ierr = soilzone()
           IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
@@ -953,7 +955,7 @@
       IF ( control_integer(Dprst_transfer_water_use, 'dprst_transfer_water_use')/=0 ) Dprst_transfer_water_use = OFF
       IF ( control_integer(Dprst_add_water_use, 'dprst_add_water_use')/=0 ) Dprst_add_water_use = OFF
       IF ( control_integer(PRMS_land_iteration_flag, 'PRMS_land_iteration_flag')/=0 ) PRMS_land_iteration_flag = OFF
-      IF ( PRMS_only==ACTIVE ) PRMS_land_iteration_flag = OFF
+      IF ( PRMS_only==ACTIVE ) PRMS_land_iteration_flag = OFF ! srunoff in iteration loop, 2 = land modules in iteration loop
 
       ! 0 = off, 1 = apply irrigation in soilzone, 2 = apply irrigation to canopy
       ! these are for GSFLOW5 with AG package ACTIVE

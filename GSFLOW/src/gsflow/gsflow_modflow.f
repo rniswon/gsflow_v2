@@ -515,7 +515,7 @@ c     USE LMGMODULE
       INTEGER I
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
-      INTEGER, EXTERNAL :: soilzone, GET_KPER
+      INTEGER, EXTERNAL :: soilzone, srunoff, GET_KPER
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsfclean
       EXTERNAL :: READ_STRESS, PRMS_land_modules
       INTRINSIC MIN
@@ -689,8 +689,15 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ACTIVE ) THEN
-              IF ( PRMS_land_iteration_flag==ACTIVE )
-     &             CALL PRMS_land_modules(Process, retval)
+              IF ( PRMS_land_iteration_flag==2 ) THEN
+                CALL PRMS_land_modules(Process, retval)
+              ELSEIF ( PRMS_land_iteration_flag==1 ) THEN
+                retval = srunoff()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'srunoff', retval
+                  RETURN
+                ENDIF
+              ENDIF
               retval = soilzone()
               IF ( retval/=0 ) THEN
                 PRINT 9001, 'soilzone', retval
