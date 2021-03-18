@@ -942,6 +942,7 @@
 !***********************************************************************
       SUBROUTINE set_control_parameter(Paramname, Numvalues, Paramval_int, Paramval_real, Paramval_char) ! allow arrays
       USE PRMS_CONTROL_FILE
+      USE PRMS_CONSTANTS, only: ERROR_CONTROL
       IMPLICIT NONE
       ! Arguments
       CHARACTER(LEN=MAXCONTROL_LENGTH), INTENT(IN) :: Paramname
@@ -969,7 +970,7 @@
               DEALLOCATE ( Control_parameter_data(i)%values_character )
               ALLOCATE ( Control_parameter_data(i)%values_character(Numvalues) )
             ELSE
-              CALL error_stop('allocatable control parameter that is real')
+              CALL error_stop('allocatable control parameter that is real', ERROR_CONTROL)
             ENDIF
           ENDIF
           Control_parameter_data(i)%read_flag = 1
