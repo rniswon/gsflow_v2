@@ -15,7 +15,8 @@
      &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Dyn_covden_flag, Segment_transferON_OFF, Gwr_transferON_OFF, &
      &      Lake_transferON_OFF, External_transferON_OFF, Dprst_transferON_OFF, BasinOutON_OFF, &
      &      xyFileName, mappingFileName, Dprst_transfer_water_use, Dprst_add_water_use, PRMS_land_iteration_flag, &
-     &      Agriculture_soil_flag, Agriculture_canopy_flag, AET_module, PET_module, AET_cbh_file, PET_cbh_file
+     &      Agriculture_soil_flag, Agriculture_canopy_flag, AET_module, PET_ag_module, Dyn_ag_frac_flag, Model_control_file
+        USE PRMS_CLIMATE_HRU, ONLY: AET_cbh_file, PET_cbh_file
         USE GSFMODFLOW, ONLY: Modflow_name, Modflow_time_zero
         USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, &
      &      Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day
@@ -64,7 +65,6 @@
       SUBROUTINE read_control_file()
       USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH, MAXFILE_LENGTH
       USE PRMS_CONTROL_FILE
-      USE PRMS_MODULE, ONLY: Model_control_file
       IMPLICIT NONE
       ! Functions
       INTRINSIC TRIM
@@ -948,7 +948,7 @@
 ! Get Control File set arguments from command line.
 !***********************************************************************
       SUBROUTINE get_control_arguments()
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MAXFILE_LENGTH
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MAXFILE_LENGTH, ERROR_control
       USE PRMS_CONTROL_FILE, ONLY: PlotsON_OFF, Num_control_parameters, Control_parameter_data
       USE PRMS_MODULE, ONLY: Print_debug, EQULS
       IMPLICIT NONE

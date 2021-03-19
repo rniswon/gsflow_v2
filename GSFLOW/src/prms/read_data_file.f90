@@ -2,7 +2,7 @@
 ! Read PRMS Data File
 !***********************************************************************
       MODULE PRMS_DATA_FILE
-        USE PRMS_CONSTANTS, ONLY: ERROR_read, ERROR_time
+        USE PRMS_CONSTANTS, ONLY: ERROR_read, ERROR_time, ERROR_open_in
         INTEGER, SAVE :: Num_datafile_types, Num_datafile_columns, Datafile_unit
         CHARACTER(LEN=16), ALLOCATABLE, SAVE :: Data_varname(:)
         INTEGER, ALLOCATABLE, SAVE :: Data_varnum(:)

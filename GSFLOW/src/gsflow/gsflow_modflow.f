@@ -19,7 +19,8 @@ C     ******************************************************************
 !     ------------------------------------------------------------------
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Agriculture_flag, &
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru,
+     &    Agriculture_soil_flag, Agriculture_dprst_flag,
      &    Print_debug, GSFLOW_flag
       IMPLICIT NONE
       ! Functions
@@ -47,22 +48,26 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
         ALLOCATE ( Gvr2cell_conv(Nhrucell), Cellarea(Ngwcell) )
         ALLOCATE ( Gwc_row(Ngwcell), Gwc_col(Ngwcell) )
-        IF ( Agriculture_flag>OFF ) THEN
+        IF ( Agriculture_soil_flag==ACTIVE ) THEN
           ALLOCATE ( Hru_ag_irr(Nhru) )
           CALL declvar_real(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real',
      &         'Irrigation added to soilzone from MODFLOW wells',
      &         'inches', Hru_ag_irr)
-          Dprst_ag_gain = 0.0
+          Hru_ag_irr = 0.0
+
+        ENDIF
+        IF ( Agriculture_dprst_flag==ACTIVE ) THEN
+          ALLOCATE ( Dprst_ag_gain(Nhru) )
           CALL declvar_real(MODNAME, 'dprst_ag_gain','nhru',Nhru,'real',
      &         'Irrigation added to surface depression storage from'//
      &         ' MODFLOW ponds',
-     &         'inches', Dprst_ag_gain)
+     &         'inch-acres', Dprst_ag_gain)
           Dprst_ag_gain = 0.0
           ALLOCATE ( Dprst_ag_transfer(Nhru) )
           CALL declvar_real(MODNAME, 'dprst_ag_transfer', 'nhru', Nhru,
      &         'real',
      &         'Surface depression storage transfer to MODFLOW cells',
-     &         'cfs', Dprst_ag_transfer)
+     &         'inch-acres', Dprst_ag_transfer)
           Dprst_ag_transfer = 0.0
         ENDIF
       ENDIF
@@ -333,12 +338,10 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
         IF(IUNIT(44).GT.0) CALL GWF2HYD7SFR7AR(IUNIT(43),IGRID)
       ENDIF
       IF(IUNIT(49).GT.0) CALL LMT8BAS7AR(INUNIT,CUNIT,IGRID)
+      Ag_package_active = OFF
       IF(IUNIT(66).GT.0) THEN
         IF (GSFLOW_flag==ACTIVE) Ag_package_active = ACTIVE
         CALL GWF2AG7AR(IUNIT(66),IUNIT(44),IUNIT(63))
-      ELSE
-        Ag_package_active = OFF
-        DEALLOCATE ( Hru_ag_irr )
       ENDIF
 !      IF(IUNIT(61).GT.0) THEN
 !        CALL FMP2AR(
@@ -432,8 +435,8 @@ C
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, GSFLOW, ACTIVE,
      &    OFF, ERROR_MODFLOW, ERROR_time
-      USE PRMS_MODULE, ONLY: Model, Kper_mfo, Print_debug, Kkiter,
-     &    Timestep, Init_vars_from_file, Mxsziter,
+      USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
+     &    Init_vars_from_file, Mxsziter, Model, Print_debug,
      &    PRMS_land_iteration_flag, Process
 C1------USE package modules.
       USE GLOBAL
@@ -459,6 +462,7 @@ c     USE LMGMODULE
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: soilzone, gsflow_prms2mf, gsflow_mf2prms
+      INTEGER, EXTERNAL :: srunoff
       EXTERNAL :: MODSIM2SFR, SFR2MODSIM, LAK2MODSIM
       EXTERNAL :: PRMS_land_modules
       INTRINSIC MIN
@@ -637,8 +641,15 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ACTIVE ) THEN
-              IF ( PRMS_land_iteration_flag==ACTIVE )
-     &             CALL PRMS_land_modules(Process, retval)
+              IF ( PRMS_land_iteration_flag==2 ) THEN
+                CALL PRMS_land_modules(Process, retval)
+              ELSEIF ( PRMS_land_iteration_flag==1 ) THEN
+                retval = srunoff()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'srunoff', retval
+                  RETURN
+                ENDIF
+              ENDIF
               retval = soilzone()
               IF ( retval/=0 ) THEN
                 PRINT 9001, 'soilzone', retval
@@ -1580,7 +1591,7 @@ C
      &                                   LAKEVOL(Nlakeshold)
       ! Functions
       EXTERNAL :: RESTART1READ, error_stop
-      INTEGER, EXTERNAL :: compute_julday, control_integer_array
+      INTEGER, EXTERNAL :: compute_julday
       INTRINSIC :: INT, FLOAT
 ! Local Variables
       INTEGER :: i, n, nstress, start_jul, mfstrt_jul
@@ -1949,11 +1960,12 @@ C
      &    GSFLOW_flag
       USE GLOBAL, ONLY: ITMUNI, LENUNI, IOUT
       USE GWFBASMODULE, ONLY: DELT
-      USE GSFMODFLOW, ONLY: Mft_to_sec, Cellarea,
+      USE GSFMODFLOW, ONLY: Mft_to_sec, Cellarea, MFQ_to_inch_acres,
      &    Mfl2_to_acre, Mfl3_to_ft3, Mfl_to_inch, Sfr_conv,
      &    Acre_inches_to_mfl3, Inch_to_mfl_t, Mfl3t_to_cfs,
      &    Mfvol2inch_conv, Gvr2cell_conv, Mfq2inch_conv
       IMPLICIT NONE
+      
       EXTERNAL :: error_stop
 ! Local Variables
       REAL :: inch_to_mfl
@@ -1989,6 +2001,7 @@ C
       Mfl_to_inch = 1.0/inch_to_mfl
       Mfl2_to_acre = Mfl2_to_acre/FT2_PER_ACRE
       Inch_to_mfl_t = inch_to_mfl/DELT  ! will need to move if DELT allowed to change
+      MFQ_to_inch_acres = SNGL( DELT*Mfl2_to_acre*Mfl_to_inch )
 
       Sfr_conv = Mft_to_sec/Mfl3_to_ft3
       Mfl3t_to_cfs = Mfl3_to_ft3/Mft_to_sec

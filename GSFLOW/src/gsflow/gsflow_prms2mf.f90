@@ -7,7 +7,7 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-02-09'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-03-12'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -570,22 +570,23 @@
 
       USE GWFAGMODULE, ONLY: NUMIRRPOND, IRRPONDVAR, PONDFLOW
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
-      USE GSFMODFLOW, ONLY: Mfl3_to_ft3, Mft_to_sec, Dprst_ag_transfer
+      USE GSFMODFLOW, ONLY: Dprst_ag_transfer, MFQ_to_inch_acres
       IMPLICIT NONE
       INTRINSIC :: SNGL
 ! Local Variables
       INTEGER :: i, hru_id
-      REAL :: conversion, demand_cfs
+      REAL :: demand_inch_acres
 !***********************************************************************
-! Calculate conversion for MF units to cfs
-      conversion = Mfl3_to_ft3/Mft_to_sec
+! Calculate conversion for MF units to inch_acres
+      Dprst_ag_transfer = 0.0
       do i = 1, NUMIRRPOND
         hru_id = IRRPONDVAR(i)
         IF ( hru_id > 0 ) THEN
-          demand_cfs = PONDFLOW(i)*conversion
-          Dprst_ag_transfer(hru_id) = demand_cfs
-          IF ( Dprst_ag_transfer(hru_id) > SNGL(Dprst_vol_open(hru_id))) Dprst_ag_transfer(hru_id) = SNGL(Dprst_vol_open(hru_id))
-          PONDFLOW(i) = Dprst_ag_transfer(hru_id)/conversion
+          demand_inch_acres = PONDFLOW(i)*MFQ_to_inch_acres
+          IF ( demand_inch_acres > SNGL(Dprst_vol_open(hru_id))) demand_inch_acres = SNGL(Dprst_vol_open(hru_id))
+          PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
+          Dprst_ag_transfer(hru_id) = Dprst_ag_transfer(hru_id) + demand_inch_acres
+          Dprst_vol_open(hru_id) = Dprst_vol_open(hru_id) - demand_inch_acres
         END IF
       end do
 
