@@ -618,7 +618,8 @@
 ! Local Variables
       ! Maximum values are no longer limits
 ! Local Variables
-      INTEGER :: idim, iret, j, test
+      INTEGER :: idim, iret, j
+      INTEGER :: test
 !***********************************************************************
       Inputerror_flag = 0
 

@@ -2,7 +2,7 @@
 ! Read PRMS Data File
 !***********************************************************************
       MODULE PRMS_DATA_FILE
-        USE PRMS_CONSTANTS, ONLY: ERROR_open_in, ERROR_read
+        USE PRMS_CONSTANTS, ONLY: ERROR_read, ERROR_time
         INTEGER, SAVE :: Num_datafile_types, Num_datafile_columns, Datafile_unit
         CHARACTER(LEN=16), ALLOCATABLE, SAVE :: Data_varname(:)
         INTEGER, ALLOCATABLE, SAVE :: Data_varnum(:)
@@ -22,7 +22,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Read Data File'
         character(len=*), parameter :: MODNAME = 'read_data_file'
-        character(len=*), parameter :: Version_read_data_file = '2021-02-09'
+        character(len=*), parameter :: Version_read_data_file = '2021-03-19'
       CHARACTER(LEN=MAXFILE_LENGTH) :: data_filename, data_line, dmy
       CHARACTER(LEN=80) :: line
       INTEGER n, ierr, ios, numchrs, length
@@ -54,7 +54,7 @@
         num_vars = num_vars + 1
         IF ( line(:4)=='####' ) EXIT
       ENDDO
-      IF ( line(:4)/='####' ) CALL error_stop('invalid Data File, data section not found')
+      IF ( line(:4)/='####' ) CALL error_stop('invalid Data File, data section not found', ERROR_read)
       CALL write_outfile(EQULS)
       CALL write_outfile('measured variables')
 
@@ -124,7 +124,7 @@
           ierr = 1
         ENDIF
       ENDIF
-      IF ( ierr==1 ) CALL error_stop('simulation time begins before Data File')
+      IF ( ierr==1 ) CALL error_stop('simulation time begins before Data File', ERROR_time)
 
       ierr = 0
       IF ( Endtime(1)>endyr ) THEN
@@ -136,7 +136,7 @@
           ierr = 1
         ENDIF
       ENDIF
-      IF ( ierr==1 ) CALL error_stop('simulation end time exceeds Data File')
+      IF ( ierr==1 ) CALL error_stop('simulation end time exceeds Data File', ERROR_time)
       
       ! read to start of data
       REWIND Datafile_unit

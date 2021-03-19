@@ -449,7 +449,7 @@
 
       ALLOCATE ( Infil(Nhru) )
       CALL declvar_real(Srunoff_module, 'infil', 'nhru', Nhru, 'real', &
-     &     'Infiltration to the capillary and preferential-flow reservoirs for each HRU', &
+     &     'Infiltration to the capillary, preferential-flow, and agriculture reservoirs for each HRU', &
      &     'inches', Infil)
 
       ALLOCATE ( Sroff(Nhru) )

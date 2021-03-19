@@ -19,8 +19,8 @@ C     ******************************************************************
 !     ------------------------------------------------------------------
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Print_debug,
-     &    GSFLOW_flag, Agriculture_flag
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Agriculture_flag, &
+     &    Print_debug, GSFLOW_flag
       IMPLICIT NONE
       ! Functions
       EXTERNAL :: declvar_real
@@ -81,9 +81,9 @@ C     ------------------------------------------------------------------
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, MODFLOW, MODSIM_MODFLOW,
      &    GSFLOW, ACTIVE, OFF, DEBUG_minimum, DEBUG_less, ERROR_modflow,
      &    READ_INIT
-      USE PRMS_MODULE, ONLY: Model, Mxsziter, Print_debug,
-     &    EQULS, Init_vars_from_file, Kper_mfo, GSFLOW_flag,
-     &    Have_lakes, NLAKES_MF, Ag_package_active
+      USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
+     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package_active,
+     &    Model, Print_debug, GSFLOW_flag
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -103,7 +103,8 @@ C1------USE package modules.
 ! Functions
       INTRINSIC DBLE
       INTEGER, EXTERNAL :: numchars
-      EXTERNAL :: print_module, error_stop, read_error
+      EXTERNAL :: print_module, error_stop
+      EXTERNAL :: read_error
 ! Local Variables
       INTEGER :: MAXUNIT, NC
 C
@@ -1578,9 +1579,9 @@ C
      &                                   DELTAVOL(Nlakeshold),
      &                                   LAKEVOL(Nlakeshold)
       ! Functions
-      INTRINSIC :: INT, DBLE
       EXTERNAL :: RESTART1READ, error_stop
       INTEGER, EXTERNAL :: compute_julday, control_integer_array
+      INTRINSIC :: INT, FLOAT
 ! Local Variables
       INTEGER :: i, n, nstress, start_jul, mfstrt_jul
       REAL :: plen, time, kstpskip

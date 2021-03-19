@@ -112,6 +112,7 @@
 !***********************************************************************
       INTEGER FUNCTION declparam(Modname, Paramname, Dimenname, Datatype, &
      &                           Defvalue, Minvalue, Maxvalue, Descshort, Desclong, Units)
+      USE PRMS_CONSTANTS, ONLY: ERROR_param
       USE PRMS_MMFAPI
       IMPLICIT NONE
       ! Arguments
@@ -214,7 +215,7 @@
           Parameter_data(Num_parameters)%maximum_int = nvals
           Parameter_data(Num_parameters)%minimum_int = Parameter_data(Num_parameters)%default_int
         ELSE
-          CALL error_stop('bounded parameter not real type')
+          CALL error_stop('bounded parameter not real type', ERROR_param)
         ENDIF
       ELSE
         IF ( type_flag==1 ) THEN
@@ -321,7 +322,7 @@
       Num_variables = Num_variables + 1
       IF ( Num_variables>MAXVARIABLES ) THEN
         PRINT '(A,I0)', 'PRMS ERROR, maximum number of declared variables exceeded: ', MAXVARIABLES
-        CALL error_stop('maximum number of declared variables exceeded')
+        CALL error_stop('maximum number of declared variables exceeded', ERROR_var)
       ENDIF
       Variable_data(Num_variables)%get_flag = 0
       Variable_data(Num_variables)%decl_flag = 1
@@ -627,6 +628,7 @@
 ! getparam - get parameter values
 !***********************************************************************
       INTEGER FUNCTION getparam(Modname, Paramname, Numvalues, Data_type, Values)
+      USE PRMS_CONSTANTS, ONLY: ERROR_param
       USE PRMS_MMFAPI
       USE PRMS_MODULE, ONLY: Parameter_check_flag
       IMPLICIT NONE
@@ -689,7 +691,7 @@
         CALL getvalues_int(param_id, Numvalues, Values)
       ELSE
         PRINT *, 'Paramname: ', Paramname, ' type: ', type_flag
-        CALL error_stop('Parameter type not implemented')
+        CALL error_stop('Parameter type not implemented', ERROR_param)
       ENDIF
 
       getparam = 0
@@ -761,6 +763,7 @@
 ! dattim - get start, end, or current date and time
 !***********************************************************************
       SUBROUTINE dattim(String, Datetime)
+      USE PRMS_CONSTANTS, ONLY: ERROR_time
       USE PRMS_MODULE, ONLY: Endtime, Starttime
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday, Julian_day_absolute
       IMPLICIT NONE
@@ -785,7 +788,7 @@
         IF ( String(:5)=='start' ) THEN
           Datetime = Starttime
         ELSE
-          CALL error_stop('invalid call to dattim')
+          CALL error_stop('invalid call to dattim', ERROR_time)
         ENDIF
       ENDIF
       END SUBROUTINE dattim
@@ -795,6 +798,7 @@
 ! declare dimensions and set values in dimension data structure
 !***********************************************************************
       INTEGER FUNCTION decldim(Dimname, Defval, Maxval, Desc)
+      USE PRMS_CONSTANTS, ONLY: ERROR_dim
       USE PRMS_MMFAPI, ONLY: MAXDIMENSIONS, Num_dimensions, Dimension_data
       IMPLICIT NONE
       ! Arguments
@@ -805,7 +809,8 @@
       EXTERNAL :: error_stop
 !***********************************************************************
       Num_dimensions = Num_dimensions + 1
-      IF ( Num_dimensions>MAXDIMENSIONS ) CALL error_stop('hard-coded number of dimensions exceeded, report to developers')
+      IF ( Num_dimensions>MAXDIMENSIONS ) &
+     &     CALL error_stop('hard-coded number of dimensions exceeded, report to developers', ERROR_dim)
       Dimension_data(Num_dimensions)%name = Dimname
       Dimension_data(Num_dimensions)%default = Defval
       Dimension_data(Num_dimensions)%maximum = Maxval
@@ -894,6 +899,7 @@
 ! data base and checks to be sure a required parameter has a value (read or default)
 !***********************************************************************
       INTEGER FUNCTION control_integer(Parmval, Paramname)
+      USE PRMS_CONSTANTS, ONLY: ERROR_control
       USE PRMS_CONTROL_FILE, ONLY: Num_control_parameters, Control_parameter_data, Max_num_control_parameters
       IMPLICIT NONE
       ! Arguments
@@ -915,7 +921,8 @@
       ENDDO
       IF ( found==0 ) THEN
         Num_control_parameters = Num_control_parameters + 1
-        IF ( Num_control_parameters > Max_num_control_parameters ) CALL error_stop('exceeded maximum number of control parameters')
+        IF ( Num_control_parameters > Max_num_control_parameters ) &
+     &       CALL error_stop('exceeded maximum number of control parameters', ERROR_control)
         PRINT *, 'WARNING, control parameter not in Control File: ', TRIM(Paramname), ', set to 0'
         Control_parameter_data(Num_control_parameters)%read_flag = 2 ! set to default
         Control_parameter_data(Num_control_parameters)%data_type = 1
@@ -933,6 +940,7 @@
 ! function checks to be sure a required parameter has a value (read or default)
 !***********************************************************************
       INTEGER FUNCTION control_integer_array(Parmval, Array_index, Paramname)
+      USE PRMS_CONSTANTS, ONLY: ERROR_control
       USE PRMS_CONTROL_FILE, ONLY: Control_parameter_data, Num_control_parameters
       IMPLICIT NONE
       ! Arguments
@@ -955,7 +963,7 @@
       ENDDO
       IF ( found==0 ) THEN
         PRINT *, 'invalid array control parameter: ', TRIM(Paramname)
-        CALL error_stop('execution terminated')
+        CALL error_stop('execution terminated', ERROR_control)
       ENDIF
 
       control_integer_array = 0
@@ -1004,6 +1012,7 @@
 ! function checks to be sure a required parameter has a value (read or default)
 !***********************************************************************
       INTEGER FUNCTION control_string_array(Parmval, Paramname, Array_index)
+      USE PRMS_CONSTANTS, ONLY: ERROR_control
       USE PRMS_CONTROL_FILE, ONLY: Control_parameter_data, Num_control_parameters
       IMPLICIT NONE
       ! Arguments
@@ -1026,7 +1035,7 @@
       ENDDO
       IF ( found==0 ) THEN
         PRINT *, 'invalid array control parameter: ', TRIM(Paramname)
-        CALL error_stop('execution terminated')
+        CALL error_stop('execution terminated', ERROR_control)
       ENDIF
 
       control_string_array = 0

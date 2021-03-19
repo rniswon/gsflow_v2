@@ -447,7 +447,7 @@
         CALL declvar_dble(MODNAME, 'transfer_rate', 'nwateruse', nwateruse, 'double', &
      &           'Transfer of each water-use transfer for each time step', &
      &           'cfs', Transfer_rate)
-
+        
       ELSEIF ( Process_flag==INIT ) THEN
         Ndiversions = 0
         year = Start_year

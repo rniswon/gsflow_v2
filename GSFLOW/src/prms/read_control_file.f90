@@ -62,6 +62,7 @@
       END MODULE PRMS_CONTROL_FILE
 
       SUBROUTINE read_control_file()
+      USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH, MAXFILE_LENGTH
       USE PRMS_CONTROL_FILE
       USE PRMS_MODULE, ONLY: Model_control_file
       IMPLICIT NONE
@@ -127,6 +128,7 @@
 ! setup_cont - Set control parameter value defaults
 !***********************************************************************
       SUBROUTINE setup_cont()
+      USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag
       USE PRMS_CONTROL_FILE
       IMPLICIT NONE
       ! Local Variables
@@ -927,7 +929,7 @@
       ELSE
         IF ( TRIM(command_line_arg)=='-C' ) THEN
           CALL GET_COMMAND_ARGUMENT(2, Model_control_file, nchars, status)
-          IF ( status/=0 ) CALL error_stop('bad argment value after -C argument')
+          IF ( status/=0 ) CALL error_stop('bad argment value after -C argument', ERROR_control)
         ELSE
           Model_control_file = TRIM(command_line_arg)
         ENDIF
@@ -966,7 +968,7 @@
       DO WHILE ( i < numargs )
         i = i + 1
         CALL GET_COMMAND_ARGUMENT(i, command_line_arg, nchars, status)
-        IF ( status/=0 ) CALL error_stop('setting control parameters from command line')
+        IF ( status/=0 ) CALL error_stop('setting control parameters from command line', ERROR_control)
         IF ( TRIM(command_line_arg)=='-C' ) THEN
           i = i + 2
           CYCLE
@@ -979,7 +981,7 @@
             ! find control file parameter and reset it, need type and number of values
             i = i + 1
             CALL GET_COMMAND_ARGUMENT(i, command_line_arg, nchars, status)
-            IF ( status/=0 ) CALL error_stop('bad argment value after -set argument')
+            IF ( status/=0 ) CALL error_stop('bad argment value after -set argument', ERROR_control)
             IF ( Print_debug>-1 ) PRINT *, 'PRMS command line argument,', i, ': ', TRIM(command_line_arg)
             index = 0
             DO j = 1, Num_control_parameters
@@ -990,25 +992,25 @@
                 EXIT
               ENDIF
             ENDDO
-            IF ( index==0 ) CALL error_stop('control parameter argument not found')
+            IF ( index==0 ) CALL error_stop('control parameter argument not found', ERROR_control)
             DO j = 1, num_param_values
               i = i + 1
               CALL GET_COMMAND_ARGUMENT(i, command_line_arg, nchars, status)
-              IF ( status/=0 ) CALL error_stop('bad value after -set argument')
+              IF ( status/=0 ) CALL error_stop('bad value after -set argument', ERROR_control)
               IF ( Print_debug>-1 ) PRINT *, 'PRMS command line argument,', i, ': ', TRIM(command_line_arg)
               IF ( param_type==1 ) THEN
                 READ ( command_line_arg, *, IOSTAT=status ) Control_parameter_data(index)%values_int(j)
-                IF ( status/=0 ) CALL error_stop('reading integer command line argument')
+                IF ( status/=0 ) CALL error_stop('reading integer command line argument', ERROR_control)
               ELSEIF ( param_type==4 ) THEN
                 Control_parameter_data(index)%values_character(j) = command_line_arg
               ELSEIF ( param_type==2 ) THEN
                 READ ( command_line_arg, * ) Control_parameter_data(index)%values_real(j)
               ELSE
-                CALL error_stop('control parameter type not implemented')
+                CALL error_stop('control parameter type not implemented', ERROR_control)
               ENDIF
             ENDDO
           ELSE
-            CALL error_stop('command line argument invalid')
+            CALL error_stop('command line argument invalid', ERROR_control)
           ENDIF
         ENDIF
       ENDDO

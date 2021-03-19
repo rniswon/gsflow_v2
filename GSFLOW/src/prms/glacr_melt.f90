@@ -539,10 +539,10 @@
           count = 1 !has at least one glacier
           glacier_frac_use(j) = 1.0
           !should be end of extensions or branches-- will fail if don't set up with indices stacked
-          IF ( Glac_HRUnum_down==1 ) THEN
-            IF ( Tohru(j)/=j-1 ) glacier_frac_use(j) = 0.999
-          ELSEIF ( Glac_HRUnum_down==0 ) THEN
-            IF ( Tohru(j)/=j+1 ) glacier_frac_use(j) = 0.999
+          IF ( Glac_HRUnum_down==1) THEN
+            IF (Tohru(j)/=j-1 ) glacier_frac_use(j) = 0.999
+          ELSEIF ( Glac_HRUnum_down==0) THEN
+            IF (Tohru(j)/=j+1 ) glacier_frac_use(j) = 0.999
           ENDIF
         ENDIF
       ENDDO

@@ -870,6 +870,7 @@
  
       ENDDO
 
+
 ! Compute the running averages for groundwater and subsurface temperatures.
       if (gw_index >= gw_tau(i)) then
          gw_index = 1
