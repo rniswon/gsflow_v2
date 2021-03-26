@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-03-05'
+      character(len=*), parameter :: Version_soilzone = '2021-03-26'
       INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -96,7 +96,7 @@
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr, Basin_agwaterin
       !DOUBLE PRECISION, SAVE :: Basin_ag_ssstor, Basin_ag_recharge, Basin_ag_ssflow
       REAL, SAVE, ALLOCATABLE :: Ag_soil_to_gw(:), Ag_soil_to_ssr(:), Ag_hortonian(:), Unused_ag_et(:)
-      REAL, SAVE, ALLOCATABLE :: Ag_actet(:), Ag_dunnian(:), Ag_irrigation_add(:), Ag_gvr2sm(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_actet(:), Ag_dunnian(:), Ag_irrigation_add(:), Ag_gvr2sm(:), Ag_irrigation_add_vol(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Ag_upslope_dunnian(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_lower(:), Ag_soil_lower_stor_max(:), Ag_potet_rechr(:), Ag_potet_lower(:)
       REAL, SAVE, ALLOCATABLE :: It0_ag_soil_rechr(:), It0_ag_soil_moist(:)
@@ -677,7 +677,11 @@
           ALLOCATE ( Ag_irrigation_add(Nhru), Hrus_iterating(Nhru) )
           IF ( declvar(MODNAME, 'ag_irrigation_add', 'nhru', Nhru, 'real', &
      &         'Irrigation water added to agriculture fraction when ag_actet < PET_external for each HRU', &
-     &         'inche-acres', Ag_irrigation_add)/=0 ) CALL read_error(3, 'ag_irrigation_add')
+     &         'inches', Ag_irrigation_add)/=0 ) CALL read_error(3, 'ag_irrigation_add')
+          ALLOCATE ( Ag_irrigation_add_vol(Nhru) )
+          IF ( declvar(MODNAME, 'ag_irrigation_add_vol', 'nhru', Nhru, 'real', &
+     &         'Irrigation water added to agriculture fraction when ag_actet < PET_external for each HRU', &
+     &         'acre-inches', Ag_irrigation_add_vol)/=0 ) CALL read_error(3, 'ag_irrigation_add_vol')
         ENDIF
 
         ALLOCATE ( Ag_soil_lower(Nhru), Ag_soil_lower_stor_max(Nhru) )
@@ -835,7 +839,8 @@
         Ag_dunnian = 0.0
         Ag_hortonian = 0.0
         IF ( Iter_aet==ACTIVE ) THEN
-          Ag_irrigation_add = 0.0 
+          Ag_irrigation_add = 0.0
+          Ag_irrigation_add_vol = 0.0
           Unused_ag_et = 0.0
         ENDIF
         Ag_soil_lower_stor_max = 0.0
@@ -1134,7 +1139,8 @@
       ENDIF
 
       IF ( Iter_aet==ACTIVE ) THEN
-        Ag_irrigation_add = 0.0 
+        Ag_irrigation_add = 0.0
+        Ag_irrigation_add_vol = 0.0
         Unused_ag_et = 0.0
         Hrus_iterating = 0
       ENDIF
@@ -1741,7 +1747,7 @@
       IF ( Soil_iter>max_soilzone_ag_iter .OR. add_estimated_irrigation==OFF ) keep_iterating = OFF
       ENDDO ! end iteration while loop
       Soil_iter = Soil_iter - 1
-      IF ( Iter_aet==ACTIVE ) Ag_irrigation_add = Ag_irrigation_add*Ag_area
+      IF ( Iter_aet==ACTIVE ) Ag_irrigation_add_vol = Ag_irrigation_add*Ag_area
 !      IF ( num_hrus_ag_iter>0 ) print '(2(A,I0))', 'number of hrus still iterating on AET: ', &
 !     &     num_hrus_ag_iter
 !      if ( soil_iter==max_soilzone_ag_iter ) iter_nonconverge = iter_nonconverge + 1
