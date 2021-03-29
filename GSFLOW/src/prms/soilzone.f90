@@ -59,7 +59,7 @@
       DOUBLE PRECISION, SAVE :: Basin_soil_moist_tot
       DOUBLE PRECISION, SAVE :: Basin_soil_lower_stor_frac, Basin_soil_rechr_stor_frac, Basin_sz_stor_frac
       DOUBLE PRECISION, SAVE :: Basin_cpr_stor_frac, Basin_gvr_stor_frac, Basin_pfr_stor_frac
-      REAL, SAVE, ALLOCATABLE :: Perv_actet(:), Pref_flow_thrsh(:)
+      REAL, SAVE, ALLOCATABLE :: Pref_flow_thrsh(:)
       REAL, SAVE, ALLOCATABLE :: Soil_moist_tot(:), Recharge(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Upslope_interflow(:), Upslope_dunnianflow(:), Lakein_sz(:)
       REAL, SAVE, ALLOCATABLE :: Dunnian_flow(:), Cap_infil_tot(:)
@@ -70,7 +70,6 @@
       REAL, SAVE, ALLOCATABLE :: Cap_waterin(:), Soil_lower(:), Soil_zone_max(:)
       REAL, SAVE, ALLOCATABLE :: Potet_lower(:), Potet_rechr(:), Soil_lower_ratio(:)
       REAL, SAVE, ALLOCATABLE :: Unused_potet(:), Soilzone_gain_hru(:)
-      INTEGER, SAVE, ALLOCATABLE :: Soil_saturated(:)
 !      REAL, SAVE, ALLOCATABLE :: Cascade_interflow(:), Cascade_dunnianflow(:), Interflow_max(:)
 !      REAL, SAVE, ALLOCATABLE :: Cpr_stor_frac(:), Pfr_stor_frac(:), Gvr_stor_frac(:), Soil_moist_frac(:)
 !      REAL, SAVE, ALLOCATABLE :: Soil_rechr_ratio(:), Snowevap_aet_frac(:), Perv_avail_et(:), Cap_upflow_max(:)
@@ -314,11 +313,6 @@
      &     'Basin area-weighted average maximum interflow that flows from gravity reservoirs', &
      &     'inches', Basin_interflow_max)/=0 ) CALL read_error(3, 'basin_interflow_max')
 
-      ALLOCATE ( Perv_actet(Nhru) )
-      IF ( declvar(MODNAME, 'perv_actet', 'nhru', Nhru, 'real', &
-     &     'Actual ET from the capillary reservoir of each HRU', &
-     &     'inches', Perv_actet)/=0 ) CALL read_error(3, 'perv_actet')
-
 !      ALLOCATE ( Perv_avail_et(Nhru) )
 !      IF ( declvar(MODNAME, 'perv_avail_et', 'nhru', Nhru, 'real', &
 !     &     'Unsatisfied ET available to the capillary reservoir of each HRU', &
@@ -487,11 +481,6 @@
       IF ( declvar(MODNAME, 'unused_potet', 'nhru', Nhru, 'real', &
      &     'Unsatisfied potential evapotranspiration', &
      &     'inches', Unused_potet)/=0 ) CALL read_error(3, 'unused_potet')
-
-      ALLOCATE ( Soil_saturated(Nhru) )
-      IF ( declvar(MODNAME, 'soil_saturated', 'nhru', Nhru, 'integer', &
-     &     'Flag set if infiltration saturates capillary reservoir (0=no, 1=yes)', &
-     &     'none', Soil_saturated)/=0 ) CALL read_error(3, 'soil_saturated')
 
 !      ALLOCATE ( Snowevap_aet_frac(Nhru) )
 !      IF ( declvar(MODNAME, 'snowevap_aet_frac', 'nhru', Nhru, 'double', &
@@ -1013,14 +1002,12 @@
       Pref_flow = 0.0
       Gvr2pfr = 0.0
       Swale_actet = 0.0
-      Perv_actet = 0.0
 !      Perv_avail_et = 0.0
       Recharge = 0.0
       Cap_waterin = 0.0
       Potet_lower = 0.0
       Potet_rechr = 0.0
       Unused_potet = 0.0 ! dimension nhru
-      Soil_saturated = OFF
       IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
       IF ( Pref_flag==ACTIVE ) THEN
         IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_pref_flow_stor(Nhru) )
@@ -1098,9 +1085,9 @@
 ! WARNING!!! Sroff, Basin_sroff, and Strm_seg_in can be updated
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_actet, Hru_actet, &
      &    Ssres_flow, Soil_to_gw, Basin_soil_to_gw, Ssr_to_gw, &
-     &    Soil_to_ssr, Basin_lakeevap, Basin_perv_et, Basin_swale_et, &
+     &    Soil_to_ssr, Basin_lakeevap, Basin_perv_et, Basin_swale_et, Perv_actet, &
      &    Sroff, Soil_moist_max, Infil, Soil_rechr_max, Ssres_in, &
-     &    Basin_soil_moist, Basin_ssstor, Slow_stor, Slow_flow, &
+     &    Basin_soil_moist, Basin_ssstor, Slow_stor, Slow_flow, Soil_saturated, &
      &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_sroff, Basin_lake_stor, &
      &    Ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr_max, Ag_soil_moist_max, Basin_ag_soil_moist
       USE PRMS_WATER_USE, ONLY: Soilzone_gain

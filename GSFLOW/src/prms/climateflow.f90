@@ -80,10 +80,11 @@
       DOUBLE PRECISION, SAVE :: Basin_swale_et, Basin_perv_et, Basin_sroff
       DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor, Basin_ag_soil_moist
       REAL, SAVE, ALLOCATABLE :: Hru_actet(:), Soil_moist(:), Ag_soil_moist(:), Ag_soil_rechr(:)
-      REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:)
+      REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:), Perv_actet(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_ssr(:), Ssres_in(:)
       REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:)
       REAL, SAVE, ALLOCATABLE :: Ssres_stor(:), Ssres_flow(:), Soil_rechr(:)
+      INTEGER, SAVE, ALLOCATABLE :: Soil_saturated(:)
       ! srunoff
       REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:)
       ! Surface-Depression Storage
@@ -103,7 +104,7 @@
 !   Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Soil_moist_max(:), Soil_rechr_max(:), Sat_threshold(:)
       REAL, SAVE, ALLOCATABLE :: Snowinfil_max(:), Imperv_stor_max(:)
-      REAL, SAVE, ALLOCATABLE :: Ag_soil_moist_max(:), Ag_soil_rechr_max(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_soil_moist_max(:), Ag_soil_rechr_max(:), Ag_soil_rechr_max_frac(:)
       END MODULE PRMS_FLOWVARS
 
 !***********************************************************************
@@ -399,6 +400,16 @@
       IF ( declvar(Soilzone_module, 'hru_actet', 'nhru', Nhru, 'real', &
      &     'Actual ET for each HRU', &
      &     'inches', Hru_actet)/=0 ) CALL read_error(3, 'hru_actet')
+
+      ALLOCATE ( Perv_actet(Nhru) )
+      IF ( declvar(Soilzone_module, 'perv_actet', 'nhru', Nhru, 'real', &
+     &     'Actual ET from the capillary reservoir of each HRU', &
+     &     'inches', Perv_actet)/=0 ) CALL read_error(3, 'perv_actet')
+
+      ALLOCATE ( Soil_saturated(Nhru) )
+      IF ( declvar(Soilzone_module, 'soil_saturated', 'nhru', Nhru, 'integer', &
+     &     'Flag set if infiltration saturates capillary reservoir (0=no, 1=yes)', &
+     &     'none', Soil_saturated)/=0 ) CALL read_error(3, 'soil_saturated')
 
       IF ( declvar(Soilzone_module, 'basin_actet', 'one', 1, 'double', &
      &     'Basin area-weighted average actual ET', &
@@ -876,7 +887,7 @@
      &       ' reservoir from land surface to rooting depth of the'// &
      &       ' crop type of each HRU', &
      &       'inches')/=0 ) CALL read_error(1, 'ag_soil_moist_max')
-        ALLOCATE ( Ag_soil_rechr_max(Nhru) )
+        ALLOCATE ( Ag_soil_rechr_max_frac(Nhru), Ag_soil_rechr_max(Nhru) )
         IF ( declparam(Soilzone_module, 'ag_soil_rechr_max_frac', 'nhru', 'real', &
      &       '1.0', '0.0', '1.0', &
      &       'Fraction of agriculture reservoir where losses occur as both evaporation and transpiration (soil recharge zone)', &
@@ -1097,9 +1108,9 @@
       IF ( Ag_frac_flag==ACTIVE ) THEN
         IF ( getparam(Soilzone_module, 'ag_soil_moist_max', Nhru, 'real', Ag_soil_moist_max)/=0 ) &
      &       CALL read_error(2, 'soil_moist_max')
-        IF ( getparam(Soilzone_module, 'ag_soil_rechr_max_frac', Nhru, 'real', Ag_soil_rechr_max)/=0 ) &
+        IF ( getparam(Soilzone_module, 'ag_soil_rechr_max_frac', Nhru, 'real', Ag_soil_rechr_max_frac)/=0 ) &
      &       CALL read_error(2, 'ag_soil_rechr_max_frac')
-        Ag_soil_rechr_max = Ag_soil_rechr_max*Ag_soil_moist_max
+        Ag_soil_rechr_max = Ag_soil_rechr_max_frac*Ag_soil_moist_max
         ierr = 0
         IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
           IF ( getparam(Soilzone_module, 'ag_soil_moist_init_frac', Nhru, 'real', Ag_soil_moist)/=0 ) &
@@ -1215,6 +1226,8 @@
       Soil_to_gw = 0.0
       Soil_to_ssr = 0.0
       Hru_actet = 0.0
+      Perv_actet = 0.0
+      Soil_saturated = OFF
       Infil = 0.0
       Sroff = 0.0
 ! initialize arrays (dimensioned Nssr)

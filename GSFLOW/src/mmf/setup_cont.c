@@ -188,6 +188,10 @@ void setup_cont (void) {
 		lval[0] = 0;
 		decl_control_int_array ("dyn_soil_flag", 1, lval);
 
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("dyn_ag_soil_flag", 1, lval);
+
         lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
 		decl_control_int_array ("dyn_radtrncf_flag", 1, lval);
@@ -348,6 +352,8 @@ void setup_cont (void) {
         decl_control_string ("dprst_depth_dynamic", "dyndprst_depth");
         decl_control_string ("dprst_frac_dynamic", "dyndprst_frac");
 		decl_control_string ("ag_frac_dynamic", "dynAg_frac");
+		decl_control_string("ag_soilmoist_dynamic", "dynAg_soilmoist");
+		decl_control_string("ag_soilrechr_dynamic", "dynAg_soilrechr");
 		decl_control_string("sro_to_dprst_ag_dynamic", "dynSro2dprst_ag.dyn");
 		decl_control_string ("snow_intcp_dynamic", "dynsnowintcp");
 		decl_control_string ("srain_intcp_dynamic", "dynsrainintcp");
