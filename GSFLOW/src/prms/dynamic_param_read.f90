@@ -10,7 +10,7 @@
      &      potet_jh_module, potet_pan_module, potet_hamon_module, potet_hs_module, &
      &      potet_pt_module, potet_pm_module, climate_hru_module
         USE PRMS_MODULE, ONLY: Model, Nhru, Print_debug, Start_year, Start_month, Start_day, &
-     &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, &
+     &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_ag_soil_flag, &
      &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
      &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag, Dyn_ag_frac_flag
@@ -18,7 +18,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2021-03-02'
+        character(len=*), parameter :: Version_dynamic_param_read = '2021-03-29'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -27,6 +27,8 @@
         INTEGER, SAVE :: Imperv_stor_next_yr, Imperv_stor_next_mo, Imperv_stor_next_day, Imperv_stor_unit
         INTEGER, SAVE :: Soil_rechr_next_yr, Soil_rechr_next_mo, Soil_rechr_next_day, Soil_rechr_unit
         INTEGER, SAVE :: Soil_moist_next_yr, Soil_moist_next_mo, Soil_moist_next_day, Soil_moist_unit
+        INTEGER, SAVE :: Ag_soil_rechr_next_yr, Ag_soil_rechr_next_mo, Ag_soil_rechr_next_day, Ag_soil_rechr_unit
+        INTEGER, SAVE :: Ag_soil_moist_next_yr, Ag_soil_moist_next_mo, Ag_soil_moist_next_day, Ag_soil_moist_unit
         INTEGER, SAVE :: Dprst_depth_next_yr, Dprst_depth_next_mo, Dprst_depth_next_day, Dprst_depth_unit, Dprst_depth_flag
         INTEGER, SAVE :: Dprst_frac_next_yr, Dprst_frac_next_mo, Dprst_frac_next_day, Dprst_frac_unit, Dprst_frac_flag
         INTEGER, SAVE :: Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day, Ag_frac_unit
@@ -42,7 +44,7 @@
         INTEGER, SAVE :: Sro_to_dprst_unit, Sro_to_dprst_next_yr, Sro_to_dprst_next_mo, Sro_to_dprst_next_day
         INTEGER, SAVE :: Sro_to_imperv_unit, Sro_to_imperv_next_yr, Sro_to_imperv_next_mo, Sro_to_imperv_next_day
         INTEGER, SAVE :: Check_imperv, Wrainintcp_flag, Srainintcp_flag, Snowintcp_flag, Check_dprst_frac, Check_ag_frac
-        INTEGER, SAVE :: Soilmoist_flag, Soilrechr_flag, Output_unit
+        INTEGER, SAVE :: Soilmoist_flag, Soilrechr_flag, Ag_soilmoist_flag, Ag_soilrechr_flag, Output_unit
         INTEGER, SAVE :: Snarea_thresh_unit, Snarea_thresh_next_yr, Snarea_thresh_next_mo, Snarea_thresh_next_day
         INTEGER, SAVE, ALLOCATABLE :: Itemp(:), Updated_hrus(:)
         REAL, SAVE, ALLOCATABLE :: Temp(:), Temp3(:), Temp4(:), Potet_coef(:, :), Soil_rechr_max_frac(:)
@@ -51,6 +53,7 @@
         CHARACTER(LEN=MAXFILE_LENGTH) :: wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, ag_frac_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, dynamic_param_log_file
+        CHARACTER(LEN=MAXFILE_LENGTH) :: ag_soilmoist_dynamic, ag_soilrechr_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, snareathresh_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn
       END MODULE PRMS_DYNAMIC_PARAM_READ
@@ -344,6 +347,32 @@
         ENDIF
       ENDIF
 
+      Ag_soilrechr_flag = OFF
+      IF ( Dyn_ag_soil_flag>1 ) THEN
+        Ag_soilrechr_flag = ACTIVE
+        IF ( control_string(ag_soilrechr_dynamic, 'ag_soilrechr_dynamic')/=0 ) CALL read_error(5, 'ag_soilrechr_dynamic')
+        CALL find_header_end(Ag_soil_rechr_unit, ag_soilrechr_dynamic, 'ag_soilrechr_dynamic', ierr, 0, 0)
+        IF ( ierr==0 ) THEN
+          CALL find_current_file_time(Ag_soil_rechr_unit, year, month, day, &
+     &                                Ag_soil_rechr_next_yr, Ag_soil_rechr_next_mo, Ag_soil_rechr_next_day)
+        ELSE
+          istop = 1
+        ENDIF
+      ENDIF
+
+      Ag_soilmoist_flag = OFF
+      IF ( Dyn_Ag_soil_flag==1 .OR. Dyn_Ag_soil_flag==3 ) THEN
+        Ag_soilmoist_flag = ACTIVE
+        IF ( control_string(ag_soilmoist_dynamic, 'ag_soilmoist_dynamic')/=0 ) CALL read_error(5, 'ag_soilmoist_dynamic')
+        CALL find_header_end(Ag_soil_moist_unit, Ag_soilmoist_dynamic, 'Ag_soilmoist_dynamic', ierr, 0, 0)
+        IF ( ierr==0 ) THEN
+          CALL find_current_file_time(Ag_soil_moist_unit, year, month, day, &
+     &                                Ag_soil_moist_next_yr, Ag_soil_moist_next_mo, Ag_soil_moist_next_day)
+        ELSE
+          istop = 1
+        ENDIF
+      ENDIF
+      
       IF ( Dyn_radtrncf_flag==ACTIVE ) THEN
         IF ( control_string(radtrncf_dynamic, 'radtrncf_dynamic')/=0 ) CALL read_error(5, 'radtrncf_dynamic')
         CALL find_header_end(Rad_trncf_unit, radtrncf_dynamic, 'radtrncf_dynamic', ierr, 0, 0)
@@ -423,8 +452,9 @@
      &    Cov_type, Basin_area_inv, Covden_win, Covden_sum, Ag_area, Ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Transp_on, Epan_coef
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Soil_moist, Soil_rechr, Imperv_stor, Sat_threshold, &
-     &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor
-      USE PRMS_POTET_JH, ONLY: Jh_coef, Jh_coef_hru
+     &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor, &
+     &    Basin_ag_soil_moist, Ag_soil_moist, Ag_soil_rechr
+          USE PRMS_POTET_JH, ONLY: Jh_coef, Jh_coef_hru
       USE PRMS_POTET_PM, ONLY: Pm_n_coef, Pm_d_coef
       USE PRMS_POTET_PT, ONLY: Pt_alpha
       USE PRMS_POTET_HS, ONLY: Hs_krs
@@ -446,7 +476,7 @@
       EXTERNAL :: write_dynparam_potet
 ! Local Variables
       INTEGER :: i, istop, check_dprst_depth_flag, check_sm_max_flag, check_srechr_max_flag
-      REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj, frac
+      REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj, frac, frac_ag
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       dynparamrun = 0
@@ -512,6 +542,7 @@
      &       Check_ag_frac==ACTIVE ) THEN
           Basin_soil_moist = 0.0D0
           Basin_soil_rechr = 0.0D0
+          IF ( Check_ag_frac==ACTIVE ) Basin_ag_soil_moist = 0.0D0
           DO i = 1, Nhru
             IF ( Hru_type(i)==LAKE .OR. Hru_type(i)==INACTIVE ) CYCLE ! skip lake and inactive HRUs
             harea = Hru_area(i)
@@ -524,7 +555,7 @@
                 IF ( frac_imperv>0.0 ) THEN
                   Imperv_stor(i) = Imperv_stor(i)*Hru_percent_imperv(i)/frac_imperv
                 ELSE
-                  frac = Hru_frac_perv(i) !+ agfrac
+                  frac = Hru_frac_perv(i)
                   IF ( frac>0.0 ) THEN
                     tmp = Imperv_stor(i)*Hru_percent_imperv(i)/frac ! not sure this is correct???
                     PRINT *, 'WARNING, dynamic impervious changed to 0 when impervious storage > 0'
@@ -542,8 +573,28 @@
 
             IF ( Check_ag_frac==ACTIVE ) THEN
               ! Temp4 has new values with negative values set to the old value, Ag_frac has old values
-              Ag_frac(i) = Temp4(i)
+              frac_ag = Temp4(i)
+              IF ( Ag_soil_moist(i)>0.0 ) THEN
+                IF ( frac_ag>0.0 ) THEN
+                  Ag_soil_moist(i) = Ag_soil_moist(i)*Ag_frac(i)/frac_ag
+                ELSE
+                  frac = Hru_frac_perv(i)
+                  IF ( frac>0.0 ) THEN
+                    tmp = Ag_soil_moist(i)*Ag_frac(i)/frac ! not sure this is correct???
+                    PRINT *, 'WARNING, dynamic agriculture storage changed to 0 when storage > 0'
+                    PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
+                    PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
+                  ENDIF
+                  soil_adj = soil_adj + tmp
+                  Ag_soil_moist(i) = 0.0
+                  Ag_soil_rechr(i) = 0.0
+                ENDIF
+                Ag_soil_moist(i) = Ag_soil_moist(i)*frac_ag   !?? why here
+                Ag_soil_rechr(i) = Ag_soil_rechr(i)*frac_ag
+              ENDIF
+              Ag_frac(i) = frac_ag
               Ag_area(i) = Ag_frac(i) * Hru_area(i)
+              Basin_ag_soil_moist = Basin_ag_soil_moist + Ag_soil_moist(i)*Hru_area(i)
             ENDIF
 
             IF ( Check_dprst_frac==ACTIVE .OR. check_dprst_depth_flag==ACTIVE ) THEN
@@ -641,6 +692,7 @@
           ENDDO
           Basin_soil_moist = Basin_soil_moist*Basin_area_inv
           Basin_soil_rechr = Basin_soil_rechr*Basin_area_inv
+          IF ( Check_ag_frac==ACTIVE ) Basin_ag_soil_moist = Basin_ag_soil_moist*Basin_area_inv
         ENDIF
       ENDIF
 

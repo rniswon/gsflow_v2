@@ -70,7 +70,7 @@
 !                print *, irrpondvar
                 ihru = IRRPONDVAR(i)
                 IF ( ihru>0 ) THEN
-                  IF ( PONDSEGFLOW(i)>0.0 ) Dprst_ag_gain(ihru) = Dprst_ag_gain(ihru) + PONDSEGFLOW(i)
+                  IF ( PONDSEGFLOW(i)>0.0 ) Dprst_ag_gain(ihru) = Dprst_ag_gain(ihru) + PONDSEGFLOW(i)*MFQ_to_inch_acres
                 ENDIF
               ENDDO
             DO i = 1, NUMIRRPOND

@@ -138,7 +138,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
           IF ( declvar(MODNAME, 'dprst_ag_gain', 'nhru', Nhru, 'real',
      &         'Irrigation added to surface depression storage from'//
      &         ' MODFLOW ponds',
-     &         'inches', Dprst_ag_gain)/=0 )
+     &         'inch-acres', Dprst_ag_gain)/=0 )
      &         CALL read_error(3, 'dprst_ag_gain')
           Dprst_ag_gain = 0.0
           ALLOCATE ( Dprst_ag_transfer(Nhru) )
