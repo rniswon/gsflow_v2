@@ -584,8 +584,9 @@
         hru_id = IRRPONDVAR(i)
         IF ( hru_id > 0 ) THEN
           demand_inch_acres = PONDFLOW(i)*MFQ_to_inch_acres
-          IF ( demand_inch_acres > SNGL(Dprst_vol_open(hru_id))) demand_inch_acres = SNGL(Dprst_vol_open(hru_id))
-          PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
+! next 2 lines moved to ag package
+          !IF ( demand_inch_acres > SNGL(Dprst_vol_open(hru_id))) demand_inch_acres = SNGL(Dprst_vol_open(hru_id))
+          !PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
           Dprst_ag_transfer(hru_id) = Dprst_ag_transfer(hru_id) + demand_inch_acres
           Dprst_vol_open(hru_id) = Dprst_vol_open(hru_id) - demand_inch_acres
         END IF

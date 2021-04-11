@@ -3177,7 +3177,9 @@
       USE PRMS_BASIN, ONLY: HRU_PERV
       USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
+     +                      Dprst_ag_transfer, MFQ_to_inch_acres
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
       IMPLICIT NONE
 ! --------------------------------------------------
       !modules
@@ -3189,6 +3191,7 @@
      +                    aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup, etdif
 !      real :: fmaxflow
+      real :: demand_inch_acres
       integer :: k, ipond, hru_id, i
       external :: set_factor
       double precision :: set_factor
@@ -3232,6 +3235,13 @@
         AETITERPOND(i) = SNGL(aettotal)
         PONDFLOWOLD(i) = PONDFLOW(i)
         PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
+        !
+        !1 limit pond outflow to pond storage
+        !
+        demand_inch_acres = PONDFLOW(i)*MFQ_to_inch_acres
+        IF ( demand_inch_acres > SNGL(Dprst_vol_open(ipond))) 
+     +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
+        PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
         !
         !1 - -----limit pond irrigation to storage
         !
