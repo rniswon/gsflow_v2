@@ -1498,7 +1498,7 @@
           END IF
           DO L = 1, NUMIRRPOND
             IF ( POND(3,L) > 0 ) THEN
-              PONDSEGFLOW(L) = POND(4,L)*SEG(2,int(POND(3,L)))
+              PONDSEGFLOW(L) = POND(4,L)*SEG(2,int(POND(3,L)))   !RGN 4/11/2021 check that factor sum to 1.
             END IF
           END DO
       END IF
@@ -2468,13 +2468,6 @@
          END IF
       END DO
       !
-      !  - -----SET MAX POND IRRIGATION RATE.
-      !
-      DO L = 1, NUMIRRPOND
-        Q = POND(2, L)        
-        IF ( PONDFLOW(L) > Q ) PONDFLOW(L) = Q
-      END DO
-      !
       ! divide pond water into irrigated HRUs
       ! divide segment diversion into pond inflows
       DO L = 1, NUMIRRPOND
@@ -3194,7 +3187,7 @@
       real :: demand_inch_acres
       integer :: k, ipond, hru_id, i
       external :: set_factor
-      double precision :: set_factor
+      double precision :: set_factor, Q
 ! --------------------------------------------------
 !
       zerod7 = 1.0d-7
@@ -3203,6 +3196,9 @@
       prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       if ( NUMIRRPONDSP == 0 ) THEN
           PONDFLOW = DZERO
+          PETPOND = DZERO
+          PONDFLOWOLD = DZERO
+          AETITERPOND = DZERO
           return
       end if
       !
@@ -3236,9 +3232,14 @@
         PONDFLOWOLD(i) = PONDFLOW(i)
         PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
         !
+        !  - -----SET MAX POND IRRIGATION RATE.
+        !
+        Q = POND(2, i)        
+        IF ( PONDFLOW(i) > Q ) PONDFLOW(i) = Q        !
         !1 limit pond outflow to pond storage
         !
         demand_inch_acres = PONDFLOW(i)*MFQ_to_inch_acres
+        IF ( demand_inch_acres < dzero ) demand_inch_acres = dzero
         IF ( demand_inch_acres > SNGL(Dprst_vol_open(ipond))) 
      +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
         PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
