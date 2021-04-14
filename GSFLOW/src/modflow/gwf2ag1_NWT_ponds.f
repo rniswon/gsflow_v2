@@ -1087,7 +1087,7 @@
                      IRRPONDVAR(L) = IPOND
                      POND(2,L) = QPOND   
                      POND(3,L) = ISEG    !check that this is less than NSEG
-                     POND(4,L) = QFRAC
+                     POND(4,L) = QFRAC   !check that sum of QFRAC for a SEG sums to 1.
                      IF (POND(2, L) < 0.0) THEN
                         WRITE (IOUT, *)
                         WRITE (IOUT, *) 'ERROR: MAX AG POND IRRIGATION '
@@ -3228,11 +3228,12 @@
         supold = PONDFLOWOLD(i)
         factor = set_factor(ipond, aetold, pettotal, aettotal, sup,
      +           supold, kper, kstp, kiter)
+        if ( factor < dzero ) factor = dzero
         AETITERPOND(i) = SNGL(aettotal)
         PONDFLOWOLD(i) = PONDFLOW(i)
         PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
         !
-        !  - -----SET MAX POND IRRIGATION RATE.
+        !set max pond irrigation rate
         !
         Q = POND(2, i)        
         IF ( PONDFLOW(i) > Q ) PONDFLOW(i) = Q        !
@@ -3243,15 +3244,13 @@
         IF ( demand_inch_acres > SNGL(Dprst_vol_open(ipond))) 
      +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
         PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
-        !
-        !1 - -----limit pond irrigation to storage
-        !
-  !      if(i==1)then
-  !    etdif = pettotal - aettotal
-  !        write(999,33)kper,kstp,kiter,PONDFLOW(I),
-  !   +                 pettotal,aettotal,etdif,Dprst_vol_open(ipond)
-  !      endif
-  !33  format(3i5,5e20.10)
+        if(i==1)then
+      etdif = pettotal - aettotal
+          write(999,33)kper,kstp,kiter,PONDFLOW(I),
+     +                 pettotal,aettotal,etdif,
+     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres
+        endif
+  33  format(3i5,5e20.10)
 300   continue
       return
       end subroutine demandpond_prms
@@ -3721,7 +3720,6 @@
       QQQ = 0.0
       IF (TSACTIVEALLPOND) THEN
          UNIT = TSPONDALLUNIT
-         hru_id = 0  !use dummy value for all HRUs
          DO i = 1, NUMIRRPOND
            k = TSPONDNUM(I)
            Q = Q + PONDSEGFLOW(I)

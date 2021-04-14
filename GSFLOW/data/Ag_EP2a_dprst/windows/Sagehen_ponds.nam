@@ -7,6 +7,7 @@ uzf            14    ..\input\modflow\sagehen.uzf
 sfr            15    ..\input\modflow\sagehen.sfr
 nwt            17    ..\input\modflow\sagehen.nwt
 AG            20    ..\input\modflow\sagehen.ag
+GAGE            21    ..\input\modflow\sagehen.gag
 #
 # TabFiles
 #
@@ -18,8 +19,8 @@ DATA           54    ..\input\modflow\seg19_tab.txt
 # Output
 #
 data           58   ..\output\modflow\head_sagehen_pond.out
-data           65   ..\output\modflow\sagehen_seg19.out
-data           66   ..\output\modflow\usagehen_seg19.out
+data           65   ..\output\modflow\sagehen_seg18.out
+data           66   ..\output\modflow\sagehen_seg19.out
 data           68   ..\output\modflow\uz_tot_sagehen_pond.out
 data           103   ..\output\modflow\sagehen_pond.out
 data           104   ..\output\modflow\sagehen_pondET.out
