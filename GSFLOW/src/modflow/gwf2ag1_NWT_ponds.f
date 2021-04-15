@@ -1087,7 +1087,7 @@
                      IRRPONDVAR(L) = IPOND
                      POND(2,L) = QPOND   
                      POND(3,L) = ISEG    !check that this is less than NSEG
-                     POND(4,L) = QFRAC
+                     POND(4,L) = QFRAC   !check that sum of QFRAC for a SEG sums to 1.
                      IF (POND(2, L) < 0.0) THEN
                         WRITE (IOUT, *)
                         WRITE (IOUT, *) 'ERROR: MAX AG POND IRRIGATION '
@@ -1498,7 +1498,7 @@
           END IF
           DO L = 1, NUMIRRPOND
             IF ( POND(3,L) > 0 ) THEN
-              PONDSEGFLOW(L) = POND(4,L)*SEG(2,int(POND(3,L)))
+              PONDSEGFLOW(L) = POND(4,L)*SEG(2,int(POND(3,L)))   !RGN 4/11/2021 check that factor sum to 1.
             END IF
           END DO
       END IF
@@ -2468,13 +2468,6 @@
          END IF
       END DO
       !
-      !  - -----SET MAX POND IRRIGATION RATE.
-      !
-      DO L = 1, NUMIRRPOND
-        Q = POND(2, L)        
-        IF ( PONDFLOW(L) > Q ) PONDFLOW(L) = Q
-      END DO
-      !
       ! divide pond water into irrigated HRUs
       ! divide segment diversion into pond inflows
       DO L = 1, NUMIRRPOND
@@ -3177,7 +3170,9 @@
       USE PRMS_BASIN, ONLY: HRU_PERV
       USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
+     +                      Dprst_ag_transfer, MFQ_to_inch_acres
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
       IMPLICIT NONE
 ! --------------------------------------------------
       !modules
@@ -3189,9 +3184,10 @@
      +                    aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup, etdif
 !      real :: fmaxflow
+      real :: demand_inch_acres
       integer :: k, ipond, hru_id, i
       external :: set_factor
-      double precision :: set_factor
+      double precision :: set_factor, Q
 ! --------------------------------------------------
 !
       zerod7 = 1.0d-7
@@ -3200,6 +3196,9 @@
       prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       if ( NUMIRRPONDSP == 0 ) THEN
           PONDFLOW = DZERO
+          PETPOND = DZERO
+          PONDFLOWOLD = DZERO
+          AETITERPOND = DZERO
           return
       end if
       !
@@ -3229,18 +3228,29 @@
         supold = PONDFLOWOLD(i)
         factor = set_factor(ipond, aetold, pettotal, aettotal, sup,
      +           supold, kper, kstp, kiter)
+        if ( factor < dzero ) factor = dzero
         AETITERPOND(i) = SNGL(aettotal)
         PONDFLOWOLD(i) = PONDFLOW(i)
         PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
         !
-        !1 - -----limit pond irrigation to storage
+        !set max pond irrigation rate
         !
-  !      if(i==1)then
-  !    etdif = pettotal - aettotal
-  !        write(999,33)kper,kstp,kiter,PONDFLOW(I),
-  !   +                 pettotal,aettotal,etdif,Dprst_vol_open(ipond)
-  !      endif
-  !33  format(3i5,5e20.10)
+        Q = POND(2, i)        
+        IF ( PONDFLOW(i) > Q ) PONDFLOW(i) = Q        !
+        !1 limit pond outflow to pond storage
+        !
+        demand_inch_acres = PONDFLOW(i)*MFQ_to_inch_acres
+        IF ( demand_inch_acres < dzero ) demand_inch_acres = dzero
+        IF ( demand_inch_acres > SNGL(Dprst_vol_open(ipond))) 
+     +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
+        PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
+        if(i==1)then
+      etdif = pettotal - aettotal
+          write(999,33)kper,kstp,kiter,PONDFLOW(I),
+     +                 pettotal,aettotal,etdif,
+     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres
+        endif
+  33  format(3i5,5e20.10)
 300   continue
       return
       end subroutine demandpond_prms
@@ -3710,7 +3720,6 @@
       QQQ = 0.0
       IF (TSACTIVEALLPOND) THEN
          UNIT = TSPONDALLUNIT
-         hru_id = 0  !use dummy value for all HRUs
          DO i = 1, NUMIRRPOND
            k = TSPONDNUM(I)
            Q = Q + PONDSEGFLOW(I)
