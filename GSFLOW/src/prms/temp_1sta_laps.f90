@@ -177,7 +177,7 @@
         ELSEIF ( Temp_flag==temp_laps_module ) THEN
           MODNAME = 'temp_laps'
         ELSE ! Temp_flag = temp_sta_module
-          MODNAME = 'temp_sta '
+          MODNAME = 'temp_sta'
         ENDIF
         CALL print_module(MODDESC, MODNAME, Version_temp)
 

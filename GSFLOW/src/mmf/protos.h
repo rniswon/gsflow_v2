@@ -327,7 +327,7 @@ EXTERN void write_vstats (FILE *);
 #define EXTERN extern
 #endif
 
-EXTERN double getjulday(int, int, int, int, int, int);
+EXTERN double getjulday(int, int, int, int, int, double);
 EXTERN int dayofweek(double);
 EXTERN long isleap_ (ftnint *);
 EXTERN int isleap (int);

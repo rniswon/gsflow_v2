@@ -67,7 +67,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: CFS = 0
     integer, parameter :: CMS = 1
 
-    ! cov_type
+    ! cov_type and ag_cov_type
     integer, parameter :: BARESOIL = 0
     integer, parameter :: GRASSES = 1
     integer, parameter :: SHRUBS = 2
@@ -103,7 +103,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: PEA = 30
     integer, parameter :: ASPARAGUS = 31
 
-    ! soil_type
+    ! soil_type and ag_soil_type
     integer, parameter :: SAND = 1
     integer, parameter :: LOAM = 2
     integer, parameter :: CLAY = 3

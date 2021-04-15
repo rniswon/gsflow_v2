@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2021-02-26'
+      character(len=*), parameter :: Version_basin = '2021-04-14'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -33,7 +33,7 @@
       DOUBLE PRECISION, SAVE :: Basin_gl_cfs, Basin_gl_ice_cfs
 !   Declared Parameters
       INTEGER, SAVE :: Elev_units
-      INTEGER, SAVE, ALLOCATABLE :: Hru_type(:), Cov_type(:)
+      INTEGER, SAVE, ALLOCATABLE :: Hru_type(:), Cov_type(:), Ag_cov_type(:)
       INTEGER, SAVE, ALLOCATABLE :: Lake_hru_id(:), Lake_type(:) !not needed if no lakes
       REAL, SAVE, ALLOCATABLE :: Hru_area(:), Hru_percent_imperv(:), Hru_elev(:), Hru_lat(:)
       REAL, SAVE, ALLOCATABLE :: Covden_sum(:), Covden_win(:)
@@ -66,7 +66,7 @@
 !   Declared Parameters
 !     print_debug, hru_area, hru_percent_imperv, hru_type, hru_elev,
 !     cov_type, hru_lat, dprst_frac_open, dprst_frac, basin_area
-!     lake_hru_id, ag_frac
+!     lake_hru_id, ag_frac, ag_cov_type
 !***********************************************************************
       INTEGER FUNCTION basdecl()
       USE PRMS_BASIN
@@ -214,6 +214,14 @@
      &       'Fraction of each HRU area that has agriculture', &
      &       'Fraction of each HRU area that has agriculture', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_frac')
+
+      ALLOCATE ( Ag_cov_type(Nhru) )
+      IF ( declparam(MODNAME, 'ag_cov_type', 'nhru', 'integer', &
+     &     '3', '0', '4', &
+     &     'Cover type designation for agriculture area of each HRU', &
+     &     'Vegetation cover type for agriculture area of each HRU (0=bare soil;'// &
+     &     ' 1=grasses; 2=shrubs; 3=trees; 4=coniferous)', &
+     &     'none')/=0 ) CALL read_error(1, 'ag_cov_type')
       ENDIF
 
       ALLOCATE ( Hru_type(Nhru) )
@@ -301,6 +309,8 @@
       IF ( getparam(MODNAME, 'hru_percent_imperv', Nhru, 'real', Hru_percent_imperv)/=0 ) CALL read_error(2, 'hru_percent_imperv')
       IF ( Ag_frac_flag==ACTIVE ) THEN
         IF ( getparam(MODNAME, 'ag_frac', Nhru, 'real', Ag_frac)/=0 ) CALL read_error(2, 'ag_frac')
+        IF ( getparam(MODNAME, 'ag_cov_type', Nhru, 'integer', Ag_cov_type)/=0 ) CALL read_error(2, 'ag_cov_type')
+        Ag_cov_type = 1 ! for now set all ag to grasses
       ENDIF
 
       dprst_frac_flag = 0
