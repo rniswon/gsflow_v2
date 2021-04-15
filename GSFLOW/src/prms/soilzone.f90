@@ -94,7 +94,7 @@
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr, Basin_agwaterin
       !DOUBLE PRECISION, SAVE :: Basin_ag_ssstor, Basin_ag_recharge, Basin_ag_ssflow
-      REAL, SAVE, ALLOCATABLE :: Ag_soil_to_gw(:), Ag_soil_to_ssr(:), Ag_hortonian(:), Unused_ag_et(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_soil_to_gw(:), Ag_soil_to_ssr(:), Ag_hortonian(:), Unused_ag_et(:), Ag_soil2gvr(:)
       REAL, SAVE, ALLOCATABLE :: Ag_actet(:), Ag_dunnian(:), Ag_irrigation_add(:), Ag_gvr2sm(:), Ag_irrigation_add_vol(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Ag_upslope_dunnian(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_lower(:), Ag_soil_lower_stor_max(:), Ag_potet_rechr(:), Ag_potet_lower(:)
@@ -656,6 +656,11 @@
      &       'Hortonian surface runoff that flows to the stream network from the agricultural fraction of each HRU', &
      &       'inches', Ag_hortonian)/=0 ) CALL read_error(3, 'ag_hortonian')
 
+        ALLOCATE (  Ag_soil2gvr(Nhru) )
+        IF ( declvar(MODNAME, 'ag_soil2gvr', 'nhru', Nhru, 'real', &
+     &       'Excess capillary water that flows to the gravity reservoir from the agricultural fraction of each HRU', &
+     &       'inches', Ag_soil2gvr)/=0 ) CALL read_error(3, 'ag_soil2gvr')
+
         IF ( declvar(MODNAME, 'basin_agwaterin', 'one', 1, 'double', &
      &       'Basin area-weighted average infiltration,'// &
      &       ' cascading interflow and Dunnian flow added to agriculture reservoir storage', &
@@ -828,6 +833,7 @@
         Ag_soil_to_ssr = 0.0
         Ag_dunnian = 0.0
         Ag_hortonian = 0.0
+        Ag_soil2gvr = 0.0
         IF ( Iter_aet==ACTIVE ) THEN
           Ag_irrigation_add = 0.0
           Ag_irrigation_add_vol = 0.0
@@ -1116,7 +1122,7 @@
       REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin
       REAL :: perv_frac, capacity, capwater_maxin, ssresin
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin, agactet
-      REAL :: ag_upflow_max, ag_capacity, excess, agfrac, ag_soil2gw, ag_soil2gvr, ag_avail_potet, ag_potet
+      REAL :: ag_upflow_max, ag_capacity, excess, agfrac, ag_soil2gw, ag_avail_potet, ag_potet
       DOUBLE PRECISION :: gwin
       INTEGER :: cfgi_frozen_hru
       INTEGER :: num_hrus_ag_iter, ag_on_flag, keep_iterating, add_estimated_irrigation
@@ -1201,6 +1207,7 @@
         Ag_actet = 0.0
         Ag_dunnian = 0.0
         Ag_hortonian = 0.0
+        Ag_soil2gvr = 0.0
         IF ( Cascade_flag>CASCADE_OFF ) Ag_upslope_dunnian = 0.0D0
       ENDIF
 
@@ -1428,14 +1435,13 @@
           IF ( ag_on_flag==ACTIVE ) THEN
             IF ( ag_water_maxin+Ag_soil_moist(i)>0.0 ) THEN
               ag_soil2gw = 0.0
-              ag_soil2gvr = 0.0
               CALL compute_soilmoist(ag_water_maxin, Ag_soil_moist_max(i), &
-     &             Ag_soil_rechr_max(i), 0.0, ag_soil2gvr, &
+     &             Ag_soil_rechr_max(i), 0.0, Ag_soil2gvr(i), &
      &             Ag_soil_moist(i), Ag_soil_rechr(i), ag_soil2gw, agfrac)
               ag_water_maxin = ag_water_maxin*agfrac
               Basin_agwaterin = Basin_agwaterin + DBLE( ag_water_maxin*harea )
               Soil_to_gw(i) = Soil_to_gw(i) + ag_soil2gw
-              gvr_maxin = gvr_maxin + ag_soil2gvr
+              gvr_maxin = gvr_maxin + Ag_soil2gvr(i)
             ENDIF
           ENDIF
           Basin_soil_to_gw = Basin_soil_to_gw + DBLE( Soil_to_gw(i)*harea )
