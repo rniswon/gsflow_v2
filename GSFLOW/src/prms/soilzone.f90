@@ -844,10 +844,8 @@
         Ag_potet_rechr = 0.0
         Basin_ag_soil_moist = 0.0D0
         Basin_ag_soil_rechr = 0.0D0
-        IF ( GSFLOW_flag==ACTIVE .OR. Ag_frac_flag==ACTIVE ) THEN
-          Ag_replenish_frac = 0.0
-          Ag_gvr2sm = 0.0
-        ENDIF
+        Ag_replenish_frac = 0.0
+        Ag_gvr2sm = 0.0
         DO ihru = 1, Nhru
           ! make sure LAKE, INACTIVE, GLACIER have agriculture values of 0
           IF ( Hru_type(ihru)==LAKE .OR. Hru_type(ihru)==INACTIVE .OR. Hru_type(ihru)==GLACIER ) Ag_area(ihru) = 0.0
@@ -1206,6 +1204,7 @@
         Basin_agwaterin = 0.0D0
         DO k = 1, Active_hrus
           i = Hru_route_order(k)
+          IF ( .NOT.(Ag_frac(i)>0.0) ) CYCLE
           IF ( Hrus_iterating(i)==0 ) THEN
             Basin_ag_actet = Basin_ag_actet + Ag_actet(i)*Ag_area(i)
             Basin_ag_gvr2sm = Basin_ag_gvr2sm + Ag_gvr2sm(i)*Ag_area(i)
