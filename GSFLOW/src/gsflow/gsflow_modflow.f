@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-03-12'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-04-19'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -952,7 +952,7 @@ C  Observation simulated equivalents
           IF(IUNIT(34).GT.0) CALL OBS2RIV7SE(IGRID)
           IF(IUNIT(35).GT.0) CALL OBS2GHB7SE(IGRID)
           IF(IUNIT(36).GT.0) CALL OBS2STR7SE(IGRID)
-          IF(IUNIT(38).GT.0) CALL OBS2CHD7SE(KKPER,IGRID)
+          IF(IUNIT(38).GT.0) CALL OBS2CHD7SE(KKPER,IUNIT(62),IGRID)
           IF(IUNIT(43).GT.0) THEN
             CALL GWF2HYD7BAS7SE(1,IGRID)
             IF(IUNIT(19).GT.0) CALL GWF2HYD7IBS7SE(1,IGRID)

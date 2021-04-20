@@ -918,12 +918,15 @@
 !***********************************************************************
       INTEGER FUNCTION snorun()
       USE PRMS_SNOW
+      USE PRMS_MODULE, ONLY: Albedo_cbh_flag
+      USE PRMS_SOLTAB, ONLY: Soltab_basinpotsw
       USE PRMS_BASIN, ONLY: Hru_area, Active_hrus, Hru_type, &
      &    Basin_area_inv, Hru_route_order, Cov_type, Elev_units
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Orad, Basin_horad, Potet_sublim, &
      &    Hru_ppt, Prmx, Tmaxc, Tminc, Tavgc, Swrad, Potet, Transp_on, Tmax_allsnow_c
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
       USE PRMS_SET_TIME, ONLY: Jday, Nowmonth, Julwater, Nowyear
+      USE PRMS_CLIMATE_HRU, ONLY: Albedo_hru
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Canopy_covden, Hru_intcpevap
       IMPLICIT NONE
 ! Functions
@@ -1008,7 +1011,7 @@
 
       ! Calculate the ratio of measured radiation to potential radiation
       ! (used as a cumulative indicator of cloud cover)
-      trd = Orad/SNGL(Basin_horad) ! [dimensionless ratio]
+      trd = Orad/SNGL(Soltab_basinpotsw(Jday)) ! [dimensionless ratio]
       Frac_swe = 0.0
       ! By default, the precipitation added to snowpack, snowmelt,
       ! and snow evaporation are 0
@@ -1230,9 +1233,14 @@
           IF ( Active_glacier==1 ) Glacrcov_area(i) =(1.0-Snowcov_area(i))*Glacier_frac(i)
           IF ( Active_glacier==2 ) Glacrcov_area(i) =(1.0-Snowcov_area(i))*Glrette_frac(i)
 ! Albedo so transition snow to ice smooothly, see Oerlemans 1992, this is albedo if snowcovered ice too
-          Albedo(i) = Albedo(i) - (Albedo(i)-Glacr_albedo(i))*EXP(-5.0*SNGL(Pkwater_equiv(i))*INCH2M)
-          IF ( Albedo(i)<0.08 ) Albedo(i)=0.08 !See Brock 2000
-          IF ( Albedo(i)>0.92 ) Albedo(i)=0.92 !See Brock 2000
+! Albedo can be input in a CBH File when albedo_cbh_flag = ACTIVE
+          IF ( Albedo_cbh_flag==OFF ) THEN
+            Albedo(i) = Albedo(i) - (Albedo(i)-Glacr_albedo(i))*EXP(-5.0*SNGL(Pkwater_equiv(i))*INCH2M)
+            IF ( Albedo(i)<0.08 ) Albedo(i)=0.08 !See Brock 2000
+            IF ( Albedo(i)>0.92 ) Albedo(i)=0.92 !See Brock 2000
+          ELSE
+            Albedo(i) = Albedo_hru(i)
+          ENDIF
         ENDIF
 
         ! If there is still a snowpack or glacier

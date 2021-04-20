@@ -92,6 +92,12 @@
           Orad_hru(j) = radadj*SNGL( Soltab_horad_potsw(Jday,j) )
           Basin_orad = Basin_orad + DBLE( Orad_hru(j)*Hru_area(j) )
 
+          ! https://www.omnicalculator.com/physics/cloud-base
+!         cloud base = (temperature - dew point) / 4.4 * 1000 + elevation, altitude of clouds
+!In this formula, the temperature and dew point are expressed in degrees Fahrenheits and the elevation and cloud base altitude are expressed in feet. 
+!Make sure to adjust the result afterwards if you're using the SI units!
+          
+          
           IF ( Solsta_flag==1 ) THEN
             k = Hru_solsta(j)
             IF ( k>0 ) THEN
