@@ -589,12 +589,10 @@
                   Ag_soil_moist(i) = 0.0
                   Ag_soil_rechr(i) = 0.0
                 ENDIF
-                Ag_soil_moist(i) = Ag_soil_moist(i)*frac_ag   !?? why here
-                Ag_soil_rechr(i) = Ag_soil_rechr(i)*frac_ag
               ENDIF
               Ag_frac(i) = frac_ag
               Ag_area(i) = Ag_frac(i) * Hru_area(i)
-              Basin_ag_soil_moist = Basin_ag_soil_moist + Ag_soil_moist(i)*Hru_area(i)
+              Basin_ag_soil_moist = Basin_ag_soil_moist + Ag_soil_moist(i)*Ag_area(i)
             ENDIF
 
             IF ( Check_dprst_frac==ACTIVE .OR. check_dprst_depth_flag==ACTIVE ) THEN
