@@ -29,6 +29,7 @@
         REAL, SAVE, DIMENSION(:), POINTER :: PONDSEGFLOW
         REAL, SAVE, DIMENSION(:), POINTER :: PONDFLOWOLD
         REAL, SAVE, DIMENSION(:), POINTER :: PONDFLOWMAX
+        REAL, SAVE, DIMENSION(:), POINTER :: PONDSEGFRAC
         INTEGER, SAVE, DIMENSION(:), POINTER :: TABLAYWELL
         INTEGER, SAVE, DIMENSION(:), POINTER :: TABROWWELL
         INTEGER, SAVE, DIMENSION(:), POINTER :: TABCOLWELL
@@ -80,6 +81,7 @@
         REAL, SAVE, DIMENSION(:), POINTER :: AETITERSW, RMSESW
         REAL, SAVE, DIMENSION(:), POINTER :: AETITERGW, RMSEGW
         REAL, SAVE, DIMENSION(:), POINTER :: AETITERPOND, PETPOND
+        REAL, SAVE, DIMENSION(:), POINTER :: RMSEPOND
         REAL, SAVE, DIMENSION(:, :), POINTER :: WELLIRRUZF
         REAL, SAVE, DIMENSION(:, :), POINTER :: WELLIRRPRMS
         REAL, SAVE, DIMENSION(:, :), POINTER :: IRRFACT
@@ -180,6 +182,7 @@
       MAXVALPOND = 1
       IPRWEL = 1
       NAUXWELL = 0
+      NSEGDIMTEMP = 1
       TSACTIVEGW = .FALSE.
       TSACTIVESW = .FALSE.
       TSACTIVEGWET = .FALSE.
@@ -270,6 +273,8 @@
       ALLOCATE (NUMIRRPONDSP,IRRFIELDFACTPOND(MAXCELLSPOND,MXPOND)) 
       ALLOCATE (IRRFACTPOND(MAXCELLSPOND,MXPOND))
       ALLOCATE (IRRHRU_POND(MAXCELLSPOND,MXPOND))
+      ALLOCATE (RMSEPOND(MXPOND))
+      IF ( NUMIRRPOND > 0 ) ALLOCATE(PONDSEGFRAC(NSEGDIMTEMP))
       NUMIRRPONDSP = 0
       IRRFIELDFACTPOND = 0.0
       IRRFACTPOND = 0.0
@@ -312,6 +317,7 @@
       NUMCELLSPOND = 0
       IRRPERIODPOND = 0
       TRIGGERPERIODPOND = 0
+      RMSEPOND = 0.0
       !
       !5 - --- ALLOCATE TIME SERIES VARIABLES
       IF (TSACTIVEGW .OR. TSACTIVESW .OR. TSACTIVEGWET .OR.
@@ -999,13 +1005,16 @@
       INTEGER LLOC, ISTART, ISTOP, ISTARTSAVE
       INTEGER J, II, KPER2, L, MATCH, NUMTABS, is, ip, nseg
       INTEGER istsg, istsgold, ISEG, IPOND
-      logical :: FOUND
+      logical :: FOUND, ierror
       logical :: found1, found2, found3, found4, found7
       REAL :: R, TTIME, TRATE, QPOND, QFRAC
+      DOUBLE PRECISION :: DONEP
       CHARACTER*6 CWELL
       ! - -----------------------------------------------------------------
       found4 = .false.
       found7 = .false.
+      ierror = .false.
+      DONEP = 1.00001d0
       is = 0
       ISEG = 0
       ip = 0
@@ -1087,6 +1096,7 @@
                      IRRPONDVAR(L) = IPOND
                      POND(2,L) = QPOND   
                      POND(3,L) = ISEG    !check that this is less than NSEG
+                     PONDSEGFRAC(ISEG) = PONDSEGFRAC(ISEG) + QFRAC
                      POND(4,L) = QFRAC   !check that sum of QFRAC for a SEG sums to 1.
                      IF (POND(2, L) < 0.0) THEN
                         WRITE (IOUT, *)
@@ -1159,6 +1169,20 @@
                      END DO
                   END DO
                END IF
+               DO I = 1, NSEGDIMTEMP
+                 IF ( PONDSEGFRAC(I) > DONEP ) THEN
+                     IF ( .NOT. ierror)
+     +                       WRITE (IOUT, *) 'ERROR: SEGMENT INFLOW ',
+     +                          ' FRACTION FOR ALL IRR PONDS SUMS TO',
+     +                          ' GREATER THAN ONE. MODEL STOPPING'
+                           WRITE (IOUT, *)'SEGMENT= ',I,'SUM= ',
+     +                                     PONDSEGFRAC(I)
+                   ierror = .true.
+                 END IF
+               END DO
+               IF ( ierror )  CALL USTOP('ERROR: SEGMENT INFLOW FRACTION
+     +                     TO PONDS IS GREATER THAN ONE.
+     +                     MODEL STOPPING')
           case ('WELL LIST')
                found4 = .true.
                CHAR = CHAR1
@@ -2294,6 +2318,7 @@
       TIME = TOTIM
       RMSESW = ZERO
       RMSEGW = ZERO
+      RMSEPOND = ZERO
       agconverge = 1
       !
       !2 - -----IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
@@ -2302,7 +2327,7 @@
            CALL demandconjunctive_uzf(kkper, kkstp, kkiter, agconverge)
          ELSE
            CALL demandconjunctive_prms(kkper, kkstp, kkiter, agconverge)
-           CALL demandpond_prms(kkper, kkstp, kkiter)
+           CALL demandpond_prms(kkper, kkstp, kkiter, agconverge)
          END IF
       END IF
       IF (TRIGGERFLAG > 0) THEN
@@ -3160,7 +3185,7 @@
       end subroutine demandconjunctive_prms
 !
 !
-      subroutine demandpond_prms(kper, kstp, kiter)
+      subroutine demandpond_prms(kper, kstp, kiter, agconverge)
 !     ******************************************************************
 !     demandpond----sums up pond irrigation demand using ET deficit
 !     ******************************************************************
@@ -3178,19 +3203,23 @@
       !modules
       !arguments
       integer, intent(in) :: kper, kstp, kiter
+      integer, intent(inout) :: agconverge
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet
       double precision :: zerod7, done, dzero, pettotal,
      +                    aettotal, prms_inch2mf_q,
-     +                    aetold, supold, sup, etdif
+     +                    aetold, supold, sup, etdif, zerod2,
+     +                    dtwo
 !      real :: fmaxflow
       real :: demand_inch_acres
       integer :: k, ipond, hru_id, i
       external :: set_factor
-      double precision :: set_factor, Q
+      double precision :: set_factor, Q, saveflow
 ! --------------------------------------------------
 !
       zerod7 = 1.0d-7
+      zerod2 = 1.0d-2
+      dtwo = 2.0d0
       done = 1.0d0
       dzero = 0.0d0
       prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
@@ -3229,7 +3258,10 @@
         factor = set_factor(ipond, aetold, pettotal, aettotal, sup,
      +           supold, kper, kstp, kiter)
         if ( factor < dzero ) factor = dzero
+        RMSEPOND(I) = SQRT((aetold - aettotal)**dtwo)
+        IF ( RMSEPOND(I) > zerod2*pettotal ) AGCONVERGE = 0
         AETITERPOND(i) = SNGL(aettotal)
+        saveflow = PONDFLOW(i)
         PONDFLOWOLD(i) = PONDFLOW(i)
         PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
         !
@@ -3244,13 +3276,14 @@
         IF ( demand_inch_acres > SNGL(Dprst_vol_open(ipond))) 
      +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
         PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
-        if(i==1)then
-      etdif = pettotal - aettotal
-          write(999,33)kper,kstp,kiter,PONDFLOW(I),
-     +                 pettotal,aettotal,etdif,
-     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres
-        endif
-  33  format(3i5,5e20.10)
+        IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
+        !if(i==1)then
+  !    etdif = pettotal - aettotal
+  !        write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
+  !   +                 pettotal,aettotal,etdif,
+  !   +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
+  !     ! endif
+  !33  format(4i5,6e20.10)
 300   continue
       return
       end subroutine demandpond_prms
@@ -4354,5 +4387,7 @@
       DEALLOCATE(AETITERSW)
       DEALLOCATE(RMSESW)
       DEALLOCATE(RMSEGW)
+      DEALLOCATE(RMSEPOND)
+      DEALLOCATE(PONDSEGFRAC)
       RETURN
       END
