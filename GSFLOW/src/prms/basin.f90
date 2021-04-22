@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2021-04-14'
+      character(len=*), parameter :: Version_basin = '2021-04-21'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -310,7 +310,6 @@
       IF ( Ag_frac_flag==ACTIVE ) THEN
         IF ( getparam(MODNAME, 'ag_frac', Nhru, 'real', Ag_frac)/=0 ) CALL read_error(2, 'ag_frac')
         IF ( getparam(MODNAME, 'ag_cov_type', Nhru, 'integer', Ag_cov_type)/=0 ) CALL read_error(2, 'ag_cov_type')
-        Ag_cov_type = 1 ! for now set all ag to grasses
       ENDIF
 
       dprst_frac_flag = 0
