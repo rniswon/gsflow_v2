@@ -26,7 +26,7 @@
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
       character(len=*), parameter :: Version_soilzone = '2021-04-22'
-      INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter
+      INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter, HRU_id
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
       REAL, SAVE, ALLOCATABLE :: Soil_lower_stor_max(:)
@@ -1306,6 +1306,7 @@
       IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
+        HRU_id = i
 
         IF ( Soil_iter>1 ) THEN
           IF ( Hrus_iterating(i)==0 ) CYCLE
@@ -1555,7 +1556,7 @@
 !     &             PRINT *, 'AG sm>max', Ag_soil_moist(i), Ag_soil_moist_max(i), i
               Ag_soil_rechr(i) = MIN( Ag_soil_rechr_max(i), Ag_soil_rechr(i) + (Ag_gvr2sm(i)/agfrac)*Ag_replenish_frac(i))
               Ag_soil_lower(i) = MIN( Ag_soil_lower_stor_max(i), Ag_soil_rechr(i) )
-              excess = MAX( 0.0, Ag_soil_lower(i) + Ag_soil_rechr(i) - Ag_soil_moist(i) )
+!              excess = MAX( 0.0, Ag_soil_lower(i) + Ag_soil_rechr(i) - Ag_soil_moist(i) )
 !              if ( excess>0.0 ) print *, 'excess 2', excess, &
 !     &             Ag_soil_lower(i), Ag_soil_rechr(i), Ag_soil_moist(i), Ag_soil_moist_max(i)
               Basin_ag_gvr2sm = Basin_ag_gvr2sm + DBLE( Ag_gvr2sm(i)*harea )
@@ -1590,7 +1591,7 @@
 !     &             PRINT *, 'AG sm>max', Ag_soil_moist(i), Ag_soil_moist_max(i), i
               Ag_soil_rechr(i) = MIN( Ag_soil_rechr_max(i), Ag_soil_rechr(i) + (Ag_gvr2sm(i)/agfrac)*Ag_replenish_frac(i))
               Ag_soil_lower(i) = MIN( Ag_soil_lower_stor_max(i), Ag_soil_rechr(i) )
-              excess = Ag_soil_lower(i) + Ag_soil_rechr(i) - Ag_soil_moist(i)
+!              excess = Ag_soil_lower(i) + Ag_soil_rechr(i) - Ag_soil_moist(i)
 !              if ( excess>NEARZERO ) print *, 'excess', excess, Ag_soil_lower(i) &
 !      &        + Ag_soil_rechr(i)-Ag_soil_moist(i), Ag_soil_lower(i), Ag_soil_rechr(i), Ag_soil_moist(i), i
               Basin_ag_gvr2sm = Basin_ag_gvr2sm + DBLE( Ag_gvr2sm(i)*harea )
@@ -1652,24 +1653,26 @@
         Hru_actet(i) = Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i) + pervactet*perv_frac
         IF ( Dprst_flag==ACTIVE ) Hru_actet(i) = Hru_actet(i) + Dprst_evap_hru(i)
         IF ( ag_on_flag==ACTIVE ) THEN
-          hruactet = Hru_intcpevap(i) ! assume no snowevap or impervious evap on ag area
+          hruactet = Hru_intcpevap(i) - Snow_evap(i) ! assume no impervious evap on ag area
           IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
-          ag_avail_potet = PET_external(i) - hruactet ! ??? maybe assume no imperv, dprst, snow
+          IF ( Iter_aet==ACTIVE ) THEN
+            ag_potet = PET_external(i)
+          ELSE
+            ag_potet = Potet(i)
+          ENDIF
+          ag_avail_potet = ag_potet - hruactet ! ??? maybe assume no imperv, dprst, snow
           IF ( Ag_soil_moist(i)>0.0 .AND. cfgi_frozen_hru==OFF ) THEN
-            IF ( Iter_aet==ACTIVE ) THEN
-              ag_potet = PET_external(i)
-            ELSE
-              ag_potet = Potet(i)
-            ENDIF
             idmy = 0
+!            print *, Ag_soil_moist(i), Ag_soil_rechr(i)
             CALL compute_szactet(Ag_soil_moist_max(i), Ag_soil_rechr_max(i), Transp_on(i), Ag_cov_type(i), &
-     &                           Ag_soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_actet(i), AET_external(i), & !?? instead of ag_avail_potet use AET_external
-     &                           Snow_free(i), Ag_potet_rechr(i), Ag_potet_lower(i), &
+     &                           Ag_soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_actet(i), ag_avail_potet, & !?? instead of ag_avail_potet use AET_external
+     &                           Snow_free(i)*0.9, Ag_potet_rechr(i), Ag_potet_lower(i), &
      &                           ag_potet, 1.0, idmy) ! soil_saturated only for pervious area
             ! sanity check
- !           IF ( Ag_actet(i)-ag_avail_potet>NEARZERO ) THEN
- !               PRINT *, 'ag_actet problem', Ag_actet(i), ag_avail_potet, agfrac
- !               endif
+            IF ( Ag_actet(i)-AET_external(i)>NEARZERO ) THEN
+                PRINT *, 'ag_actet problem', Ag_actet(i), ag_avail_potet, agfrac, AET_external(i), ag_potet, i
+                PRINT *, Ag_soil_moist(i), Ag_soil_rechr(i)
+                endif
             Hru_actet(i) = Hru_actet(i) + Ag_actet(i)*agfrac
           ENDIF
         ENDIF
@@ -1834,10 +1837,13 @@
                 print *, Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), ag_avail_potet
               ENDIF
             ENDIF
+          ELSE
+            Hrus_iterating(i) = 0
 !print *, i, AET_external(i), Ag_actet(i), unsatisfied_et, Ag_irrigation_add(i) 
           ENDIF
           Unused_ag_et(i) = PET_external(i) - Ag_actet(i)
           Unused_potet(i) = Unused_potet(i) - Unused_ag_et(i)
+!          if ( i==36) print *, Ag_irrigation_add(i), i, num_hrus_ag_iter, transp_on(i)
         ENDIF
         Basin_actet = Basin_actet + DBLE( Hru_actet(i)*harea )
 !        IF ( Hru_actet(i)>0.0 ) Snowevap_aet_frac(i) = Snow_evap(i)/Hru_actet(i)
@@ -1970,7 +1976,7 @@
      &           Soil_moist, Soil_rechr, Perv_actet, Avail_potet, &
      &           Snow_free, Potet_rechr, Potet_lower, Potet, Perv_frac, Soil_saturated)
       USE PRMS_CONSTANTS, ONLY: NEARZERO, BARESOIL, SAND, LOAM, CLAY, ACTIVE, OFF
-      USE PRMS_SOILZONE, ONLY: Et_type, Soilzone_aet_flag
+      USE PRMS_SOILZONE, ONLY: Et_type, Soilzone_aet_flag, HRU_id
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Transp_on, Cov_type, Soil_type
@@ -2086,7 +2092,9 @@
       IF ( Perv_actet*Perv_frac>Potet ) THEN
         PRINT *, 'perv_et PET problem', Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
       ENDIF
-
+if ( HRU_id==36 .and. Transp_on==OFF ) then
+print *, Et_type, snow_free, HRU_id, et
+endif
       END SUBROUTINE compute_szactet
 
 !***********************************************************************
