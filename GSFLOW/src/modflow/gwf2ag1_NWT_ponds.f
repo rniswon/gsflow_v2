@@ -69,6 +69,7 @@
         INTEGER, SAVE, DIMENSION(:, :), POINTER :: IRRROW_GW
         INTEGER, SAVE, DIMENSION(:, :), POINTER :: IRRCOL_GW
         INTEGER, SAVE, DIMENSION(:, :), POINTER :: IRRHRU_POND   !DS
+        INTEGER, SAVE, DIMENSION(:), POINTER :: FLOWTHROUGH_POND   !DS
         REAL, SAVE, DIMENSION(:), POINTER :: IRRPERIODWELL
         REAL, SAVE, DIMENSION(:), POINTER :: IRRPERIODPOND   !DS
         REAL, SAVE, DIMENSION(:), POINTER :: IRRPERIODSEG
@@ -258,7 +259,6 @@
       ALLOCATE (TRIGGERPERIODSEG(NSEGDIMTEMP))
       ALLOCATE (TIMEINPERIODWELL(MXWELL), TIMEINPERIODSEG(NSEGDIMTEMP))
       ALLOCATE (SEGLIST(NSEGDIMTEMP), NUMSEGLIST)
-      ALLOCATE (IRRPERIODPOND(MXPOND),TRIGGERPERIODPOND(MXPOND))
       ALLOCATE (TIMEINPERIODPOND(MXPOND))
       ALLOCATE (AETITERPOND(MXPOND),PETPOND(MXPOND))
       ALLOCATE (PONDFLOW(MXPOND),PONDFLOWOLD(MXPOND))
@@ -270,6 +270,7 @@
       ALLOCATE (TABPONDFRAC(MXPOND))
       ALLOCATE (NUMCELLSPOND(MXPOND),IRRPERIODPOND(MXPOND))
       ALLOCATE (TRIGGERPERIODPOND(MXPOND))
+      ALLOCATE (FLOWTHROUGH_POND(MXPOND))
       ALLOCATE (NUMIRRPONDSP,IRRFIELDFACTPOND(MAXCELLSPOND,MXPOND)) 
       ALLOCATE (IRRFACTPOND(MAXCELLSPOND,MXPOND))
       ALLOCATE (IRRHRU_POND(MAXCELLSPOND,MXPOND))
@@ -301,6 +302,7 @@
       TIMEINPERIODSEG = 1E30
       TIMEINPERIODPOND = 1E30
       TRIGGERPERIODPOND = 0.0
+      FLOWTHROUGH_POND = 0
       IRRPERIODPOND = 0.0
       AETITERPOND = 0.0
       PETPOND = 0.0
@@ -1521,8 +1523,10 @@
             END DO
           END IF
           DO L = 1, NUMIRRPOND
-            IF ( POND(3,L) > 0 ) THEN
-              PONDSEGFLOW(L) = POND(4,L)*SEG(2,int(POND(3,L)))   !RGN 4/11/2021 check that factor sum to 1.
+            IF ( FLOWTHROUGH_POND(L) == 0 ) THEN
+              IF ( POND(3,L) > 0 ) THEN
+                PONDSEGFLOW(L) = POND(4,L)*SEG(2,int(POND(3,L)))
+              END IF
             END IF
           END DO
       END IF
@@ -1787,7 +1791,7 @@
       ! VARIABLES:
       CHARACTER(LEN=200)::LINE
       INTEGER :: IERR, LLOC, ISTART, ISTOP, J, IDUM
-      INTEGER :: K, IRWL, NMCL, IP, I, IPOND ! , IRSG
+      INTEGER :: K, IRWL, NMCL, IP, I, IPOND, IFLTHRU ! , IRSG
       REAL :: R, IPRW, TRPW !, SGFC
       logical :: TEST
       ! - -----------------------------------------------------------------
@@ -1827,6 +1831,7 @@
          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, NMCL, R, IOUT, IN)
          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, i, IPRW, IOUT, In)
          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, i, TRPW, IOUT, In)
+         CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IFLTHRU, R, IOUT, IN)
          IF (NMCL > MAXCELLSPOND) THEN
             WRITE (IOUT, *)
             WRITE (IOUT, 105) MAXCELLSPOND, NMCL
@@ -1844,6 +1849,14 @@
          NUMCELLSPOND(IPOND) = NMCL
          IRRPERIODPOND(IPOND) = IPRW
          TRIGGERPERIODPOND(IPOND) = TRPW 
+         IF ( IFLTHRU < 0 ) IFLTHRU = 0
+         FLOWTHROUGH_POND(IPOND) = IFLTHRU
+         IF ( ETDEMANDFLAG < 1 .AND. IFLTHRU > 0 ) THEN
+          WRITE(IOUT,*)'**ERROR** IFLOWTHROUGH_POND > 0, ETDEMAND = 0.',
+     +     ' MODEL STOPPING.'
+           CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
+     +                 'PONDS')  
+         END IF
          IF (TEST) THEN
            WRITE(IOUT,107)IRWL 
            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
@@ -2319,7 +2332,12 @@
       RMSESW = ZERO
       RMSEGW = ZERO
       RMSEPOND = ZERO
-      agconverge = 1
+      agconverge = 1    
+      DO L = 1, NUMIRRPOND
+        IF ( FLOWTHROUGH_POND(L) == 0 ) THEN
+          PONDSEGFLOW(L) = ZERO
+        END IF
+      END DO
       !
       !2 - -----IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF (ETDEMANDFLAG > 0) THEN
@@ -3265,12 +3283,16 @@
         PONDFLOWOLD(i) = PONDFLOW(i)
         PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
         !
+        !set pond inflow using demand.
+        IF ( FLOWTHROUGH_POND(i) == 0 ) THEN
+          PONDSEGFLOW(i) = PONDSEGFLOW(i) + PONDFLOW(i)
+        END IF
+        !
         !set max pond irrigation rate
         !
         Q = POND(2, i)        
         IF ( PONDFLOW(i) > Q ) PONDFLOW(i) = Q        !
         !1 limit pond outflow to pond storage
-        !
         demand_inch_acres = PONDFLOW(i)*MFQ_to_inch_acres
         IF ( demand_inch_acres < dzero ) demand_inch_acres = dzero
         IF ( demand_inch_acres > SNGL(Dprst_vol_open(ipond))) 
@@ -4389,5 +4411,6 @@
       DEALLOCATE(RMSEGW)
       DEALLOCATE(RMSEPOND)
       DEALLOCATE(PONDSEGFRAC)
+      DEALLOCATE(FLOWTHROUGH_POND)
       RETURN
       END
