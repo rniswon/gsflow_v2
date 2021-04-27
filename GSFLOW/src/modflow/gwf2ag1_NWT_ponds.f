@@ -1850,6 +1850,7 @@
          IRRPERIODPOND(IPOND) = IPRW
          TRIGGERPERIODPOND(IPOND) = TRPW 
          IF ( IFLTHRU < 0 ) IFLTHRU = 0
+         IF ( IFLTHRU > 1 ) IFLTHRU = 1
          FLOWTHROUGH_POND(IPOND) = IFLTHRU
          IF ( ETDEMANDFLAG < 1 .AND. IFLTHRU > 0 ) THEN
           WRITE(IOUT,*)'**ERROR** IFLOWTHROUGH_POND > 0, ETDEMAND = 0.',
@@ -2334,7 +2335,7 @@
       RMSEPOND = ZERO
       agconverge = 1    
       DO L = 1, NUMIRRPOND
-        IF ( FLOWTHROUGH_POND(L) == 0 ) THEN
+        IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
           PONDSEGFLOW(L) = ZERO
         END IF
       END DO
@@ -3234,13 +3235,8 @@
       external :: set_factor
       double precision :: set_factor, Q, saveflow
 ! --------------------------------------------------
+!     check if there are active irrigation ponds for this stress period.
 !
-      zerod7 = 1.0d-7
-      zerod2 = 1.0d-2
-      dtwo = 2.0d0
-      done = 1.0d0
-      dzero = 0.0d0
-      prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       if ( NUMIRRPONDSP == 0 ) THEN
           PONDFLOW = DZERO
           PETPOND = DZERO
@@ -3248,6 +3244,12 @@
           AETITERPOND = DZERO
           return
       end if
+      zerod7 = 1.0d-7
+      zerod2 = 1.0d-2
+      dtwo = 2.0d0
+      done = 1.0d0
+      dzero = 0.0d0
+      prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       !
       !1 - -----loop over HRUs with ponds that supply irrigation
       !
@@ -3284,7 +3286,7 @@
         PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
         !
         !set pond inflow using demand.
-        IF ( FLOWTHROUGH_POND(i) == 0 ) THEN
+        IF ( FLOWTHROUGH_POND(i) == 1 ) THEN
           PONDSEGFLOW(i) = PONDSEGFLOW(i) + PONDFLOW(i)
         END IF
         !
