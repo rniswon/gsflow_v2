@@ -531,7 +531,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       IF ( Steady_state.EQ.1 ) THEN
         Kkper_new = 1
         Kper_mfo = 2
-      ELSEIF ( Model==GSFLOW ) THEN
+      ELSEIF ( GSFLOW==ACTIVE ) THEN
         Kkper_new = GET_KPER()
       ELSE
         Kkper_new = Kper_mfo
@@ -557,7 +557,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       ENDIF
       iss = ISSFLG(KKPER)
       gsflag = OFF
-      IF ( Model==GSFLOW .AND. iss==0 ) gsflag = ACTIVE
+      IF ( GSFLOW==ACTIVE .AND. iss==0 ) gsflag = ACTIVE
 C
 C7C-----SIMULATE EACH TIME STEP.
 !gsf    DO 90 KSTP = 1, NSTP(KPER)

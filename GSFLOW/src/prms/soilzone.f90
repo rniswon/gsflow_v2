@@ -1161,8 +1161,8 @@
         Ag_irrigation_add = 0.0
         Ag_irrigation_add_vol = 0.0
         Unused_ag_et = 0.0
-        Hrus_iterating = 1
       ENDIF
+      IF ( Ag_frac_flag==ACTIVE ) Hrus_iterating = 1
       keep_iterating = ACTIVE
       Soil_iter = 1
       DO WHILE ( keep_iterating==ACTIVE )

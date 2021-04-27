@@ -290,7 +290,7 @@
           IF ( iret/=0 ) ERROR STOP ERROR_open_out
           CALL call_modules_restart(SAVE_INIT)
         ENDIF
-        IF ( Model==GSFLOW ) THEN
+        IF ( GSFLOW==ACTIVE ) THEN
           ierr = gsflow_modflow()
           IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
         ENDIF
@@ -1141,7 +1141,7 @@
       ELSE
         Call_cascade = OFF
       ENDIF
-      IF ( Model==GSFLOW .AND. Call_cascade==OFF ) THEN
+      IF ( GSFLOW==ACTIVE .AND. Call_cascade==OFF ) THEN
         PRINT *, 'ERROR, GSFLOW requires that PRMS cascade routing is active'
         Inputerror_flag = 1
       ENDIF
