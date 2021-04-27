@@ -1832,8 +1832,10 @@
             ELSE
               Hrus_iterating(i) = 0
               IF ( AET_external(i)<Ag_actet(i) ) THEN
-                PRINT *, 'WARNING, external agriculture AET from CBH File < computeted AET', i, Nowyear, Nowmonth, Nowday, num_hrus_ag_iter
-                PRINT '(3(A,F0.6))', '         AET_external: ', AET_external(i), '; ag_actet: ', Ag_actet(i), ' PET_external:', PET_external(i)
+                PRINT *, 'WARNING, external agriculture AET from CBH File < computeted AET', i, &
+     &                Nowyear, Nowmonth, Nowday, num_hrus_ag_iter
+                PRINT '(3(A,F0.6))', '         AET_external: ', AET_external(i), '; ag_actet: ', &
+     &                Ag_actet(i), ' PET_external:', PET_external(i)
                 print *, Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), ag_avail_potet
               ENDIF
             ENDIF
