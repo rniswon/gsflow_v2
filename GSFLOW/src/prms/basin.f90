@@ -202,13 +202,13 @@
      &     'HRU percent impervious', 'Fraction of each HRU area that is impervious', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'hru_percent_imperv')
 
+      ALLOCATE ( Ag_frac(Nhru) )
       IF ( Ag_frac_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Ag_area(Nhru) )
         IF ( declvar(MODNAME, 'ag_area', 'nhru', Nhru, 'real', &
      &       'Area of HRU that is used for agriculture', &
      &       'acres', Ag_area)/=0 ) CALL read_error(3, 'ag_area')
 
-        ALLOCATE ( Ag_frac(Nhru) )
         IF ( declparam(MODNAME, 'ag_frac', 'nhru', 'real', &
      &       '0.0', '0.0', '0.999', &
      &       'Fraction of each HRU area that has agriculture', &
@@ -310,6 +310,8 @@
       IF ( Ag_frac_flag==ACTIVE ) THEN
         IF ( getparam(MODNAME, 'ag_frac', Nhru, 'real', Ag_frac)/=0 ) CALL read_error(2, 'ag_frac')
         IF ( getparam(MODNAME, 'ag_cov_type', Nhru, 'integer', Ag_cov_type)/=0 ) CALL read_error(2, 'ag_cov_type')
+      ELSE
+        Ag_frac = 0.0
       ENDIF
 
       dprst_frac_flag = 0

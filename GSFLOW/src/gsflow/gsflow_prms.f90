@@ -20,9 +20,9 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 04/19/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-04-19'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 04/19/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 04/27/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-04-27'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 04/27/2021'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -290,7 +290,7 @@
           IF ( iret/=0 ) ERROR STOP ERROR_open_out
           CALL call_modules_restart(SAVE_INIT)
         ENDIF
-        IF ( GSFLOW==ACTIVE ) THEN
+        IF ( GSFLOW_flag==ACTIVE ) THEN
           ierr = gsflow_modflow()
           IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
         ENDIF
@@ -1141,7 +1141,7 @@
       ELSE
         Call_cascade = OFF
       ENDIF
-      IF ( GSFLOW==ACTIVE .AND. Call_cascade==OFF ) THEN
+      IF ( GSFLOW_flag==ACTIVE .AND. Call_cascade==OFF ) THEN
         PRINT *, 'ERROR, GSFLOW requires that PRMS cascade routing is active'
         Inputerror_flag = 1
       ENDIF

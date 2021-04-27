@@ -637,6 +637,7 @@
      &     'none')/=0 ) CALL read_error(1, 'ssr2gw_exp')
 
 ! Agriculture variables and parameters
+      ALLOCATE ( Hrus_iterating(Nhru) )
       IF ( Ag_frac_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Ag_soil_to_gw(Nhru), Ag_soil_to_ssr(Nhru) )
         ALLOCATE ( Ag_dunnian(Nhru) )
@@ -667,7 +668,6 @@
      &       ' cascading interflow and Dunnian flow added to agriculture reservoir storage', &
      &       'inches', Basin_agwaterin)/=0 ) CALL read_error(3, 'basin_agwaterin')
 
-        ALLOCATE ( Hrus_iterating(Nhru) )
         IF ( Model==PRMS_AG .OR. Model==GSFLOW_AG .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Ag_irrigation_add(Nhru) )
           IF ( declvar(MODNAME, 'ag_irrigation_add', 'nhru', Nhru, 'real', &
@@ -1162,7 +1162,7 @@
         Ag_irrigation_add_vol = 0.0
         Unused_ag_et = 0.0
       ENDIF
-      IF ( Ag_frac_flag==ACTIVE ) Hrus_iterating = 1
+      Hrus_iterating = 1
       keep_iterating = ACTIVE
       Soil_iter = 1
       DO WHILE ( keep_iterating==ACTIVE )
@@ -1844,6 +1844,8 @@
           Unused_ag_et(i) = PET_external(i) - Ag_actet(i)
           Unused_potet(i) = Unused_potet(i) - Unused_ag_et(i)
 !          if ( i==36) print *, Ag_irrigation_add(i), i, num_hrus_ag_iter, transp_on(i)
+        ELSE
+          Hrus_iterating(i) = 0
         ENDIF
         Basin_actet = Basin_actet + DBLE( Hru_actet(i)*harea )
 !        IF ( Hru_actet(i)>0.0 ) Snowevap_aet_frac(i) = Snow_evap(i)/Hru_actet(i)
