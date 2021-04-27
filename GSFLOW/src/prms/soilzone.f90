@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-04-22'
+      character(len=*), parameter :: Version_soilzone = '2021-04-26'
       INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter, HRU_id
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -1161,8 +1161,8 @@
         Ag_irrigation_add = 0.0
         Ag_irrigation_add_vol = 0.0
         Unused_ag_et = 0.0
+        Hrus_iterating = 1
       ENDIF
-      Hrus_iterating = 1
       keep_iterating = ACTIVE
       Soil_iter = 1
       DO WHILE ( keep_iterating==ACTIVE )
