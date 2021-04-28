@@ -25,8 +25,8 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-04-26'
-      INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter, HRU_id
+      character(len=*), parameter :: Version_soilzone = '2021-04-28'
+      INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter, HRU_id, Iter_aet_PRMS_flag
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
       REAL, SAVE, ALLOCATABLE :: Soil_lower_stor_max(:)
@@ -534,7 +534,9 @@
       ENDIF
 
       Iter_aet = OFF
+      Iter_aet_PRMS_flag = OFF
       IF ( Model==PRMS_AG .OR. Model==GSFLOW_AG ) Iter_aet = ACTIVE
+      IF ( Iter_aet==ACTIVE .AND. Model==PRMS_AG ) Iter_aet_PRMS_flag = ACTIVE
       IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE .OR. Iter_aet==ACTIVE ) THEN
         ALLOCATE ( It0_ssres_stor(Nhru), It0_slow_stor(Nhru) )
         IF ( GSFLOW_flag==ACTIVE ) ALLOCATE ( It0_gravity_stor_res(Nhrucell) )
@@ -1289,7 +1291,6 @@
               ENDIF
               ! computed in srunoff
               Sroff(i) = It0_sroff(i)
-              IF ( Call_cascade==ACTIVE ) Strm_seg_in(i) = It0_strm_seg_in(i)
             ENDIF
           ENDIF
           IF ( Kkiter>1 ) THEN
@@ -1298,6 +1299,9 @@
           ENDIF
         ENDIF
       ENDDO
+      IF ( (GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet==ACTIVE ) THEN
+        IF ( (Kkiter>1 .OR. Soil_iter>1) .AND. Call_cascade==ACTIVE ) Strm_seg_in = It0_strm_seg_in
+      ENDIF
 
       gwin = 0.0D0
       update_potet = OFF
@@ -1655,7 +1659,7 @@
         IF ( ag_on_flag==ACTIVE ) THEN
           hruactet = Hru_intcpevap(i) - Snow_evap(i) ! assume no impervious evap on ag area
           IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
-          IF ( Iter_aet==ACTIVE .and. MODEL == PRMS_AG ) THEN
+          IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN
             ag_potet = PET_external(i)
           ELSE
             ag_potet = Potet(i)
@@ -1669,10 +1673,12 @@
      &                           Snow_free(i)*0.9, Ag_potet_rechr(i), Ag_potet_lower(i), &
      &                           ag_potet, 1.0, idmy) ! soil_saturated only for pervious area
             ! sanity check
-            IF ( Ag_actet(i)-AET_external(i)>NEARZERO ) THEN
-                PRINT *, 'ag_actet problem', Ag_actet(i), ag_avail_potet, agfrac, AET_external(i), ag_potet, i
-                PRINT *, Ag_soil_moist(i), Ag_soil_rechr(i)
-                endif
+!            IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN 
+!              IF ( Ag_actet(i)-AET_external(i)>NEARZERO ) THEN
+!                PRINT *, 'ag_actet problem', Ag_actet(i), ag_avail_potet, agfrac, AET_external(i), ag_potet, i
+!                PRINT *, Ag_soil_moist(i), Ag_soil_rechr(i)
+!              endif
+!           endif
             Hru_actet(i) = Hru_actet(i) + Ag_actet(i)*agfrac
           ENDIF
         ENDIF
@@ -1817,7 +1823,7 @@
         Grav_dunnian_flow(i) = dunnianflw_gvr
         Unused_potet(i) = Potet(i) - Hru_actet(i)
         IF ( ag_on_flag==ACTIVE ) THEN
-          IF ( Iter_aet==ACTIVE .AND.Transp_on(i)==ACTIVE .and. MODEL == PRMS_AG ) THEN
+          IF ( Iter_aet_PRMS_flag==ACTIVE .AND.Transp_on(i)==ACTIVE ) THEN
             !agriculture_external(i)
             !IF ( Unused_potet(i)>0.0 ) THEN
             unsatisfied_et = AET_external(i) - Ag_actet(i)
@@ -1843,8 +1849,12 @@
             Hrus_iterating(i) = 0
 !print *, i, AET_external(i), Ag_actet(i), unsatisfied_et, Ag_irrigation_add(i) 
           ENDIF
-          !Unused_ag_et(i) = PET_external(i) - Ag_actet(i)  !RGN 4/28/2021 commented out
-          !Unused_potet(i) = Unused_potet(i) - Unused_ag_et(i) !RGN 4/28/2021 commented out
+          IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN
+            Unused_ag_et(i) = PET_external(i) - Ag_actet(i)
+          ELSE
+            Unused_ag_et(i) = Potet(i) - Ag_actet(i)
+          ENDIF
+          Unused_potet(i) = Unused_potet(i) - Unused_ag_et(i)
 !          if ( i==36) print *, Ag_irrigation_add(i), i, num_hrus_ag_iter, transp_on(i)
         ELSE
           Hrus_iterating(i) = 0
