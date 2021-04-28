@@ -1154,7 +1154,7 @@
           It0_sroff = Sroff
           IF ( Call_cascade==ACTIVE ) It0_strm_seg_in = Strm_seg_in
         ENDIF
-        Sm2gw_grav = 0.0
+        IF ( GSFLOW_flag==ACTIVE ) Sm2gw_grav = 0.0
       ENDIF
 
       IF ( Iter_aet==ACTIVE ) THEN
