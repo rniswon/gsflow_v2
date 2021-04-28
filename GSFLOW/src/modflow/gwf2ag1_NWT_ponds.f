@@ -3237,6 +3237,7 @@
 ! --------------------------------------------------
 !     check if there are active irrigation ponds for this stress period.
 !
+      DZERO = 0.0D0
       if ( NUMIRRPONDSP == 0 ) THEN
           PONDFLOW = DZERO
           PETPOND = DZERO
