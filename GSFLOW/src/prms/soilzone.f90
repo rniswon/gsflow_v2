@@ -1660,7 +1660,7 @@
           ELSE
             ag_potet = Potet(i)
           ENDIF
-          ag_avail_potet = ag_potet - hruactet ! ??? maybe assume no imperv, dprst, snow
+          ag_avail_potet = ag_potet - hruactet ! ??? maybe assume no imperv and dprst
           IF ( Ag_soil_moist(i)>0.0 .AND. cfgi_frozen_hru==OFF ) THEN
             idmy = 0
 !            print *, Ag_soil_moist(i), Ag_soil_rechr(i)
