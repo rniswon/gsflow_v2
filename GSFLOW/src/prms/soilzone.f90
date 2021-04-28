@@ -1655,7 +1655,7 @@
         IF ( ag_on_flag==ACTIVE ) THEN
           hruactet = Hru_intcpevap(i) - Snow_evap(i) ! assume no impervious evap on ag area
           IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
-          IF ( Iter_aet==ACTIVE ) THEN
+          IF ( Iter_aet==ACTIVE .and. MODEL == PRMS_AG ) THEN
             ag_potet = PET_external(i)
           ELSE
             ag_potet = Potet(i)
@@ -1817,7 +1817,7 @@
         Grav_dunnian_flow(i) = dunnianflw_gvr
         Unused_potet(i) = Potet(i) - Hru_actet(i)
         IF ( ag_on_flag==ACTIVE ) THEN
-          IF ( Iter_aet==ACTIVE .AND.Transp_on(i)==ACTIVE ) THEN
+          IF ( Iter_aet==ACTIVE .AND.Transp_on(i)==ACTIVE .and. MODEL == PRMS_AG ) THEN
             !agriculture_external(i)
             !IF ( Unused_potet(i)>0.0 ) THEN
             unsatisfied_et = AET_external(i) - Ag_actet(i)
@@ -1843,8 +1843,8 @@
             Hrus_iterating(i) = 0
 !print *, i, AET_external(i), Ag_actet(i), unsatisfied_et, Ag_irrigation_add(i) 
           ENDIF
-          Unused_ag_et(i) = PET_external(i) - Ag_actet(i)
-          Unused_potet(i) = Unused_potet(i) - Unused_ag_et(i)
+          !Unused_ag_et(i) = PET_external(i) - Ag_actet(i)  !RGN 4/28/2021 commented out
+          !Unused_potet(i) = Unused_potet(i) - Unused_ag_et(i) !RGN 4/28/2021 commented out
 !          if ( i==36) print *, Ag_irrigation_add(i), i, num_hrus_ag_iter, transp_on(i)
         ELSE
           Hrus_iterating(i) = 0
