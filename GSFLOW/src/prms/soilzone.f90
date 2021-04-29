@@ -1658,7 +1658,7 @@
         IF ( Dprst_flag==ACTIVE ) Hru_actet(i) = Hru_actet(i) + Dprst_evap_hru(i)
         IF ( ag_on_flag==ACTIVE ) THEN
           hruactet = Hru_intcpevap(i) - Snow_evap(i) ! assume no impervious evap on ag area
-          IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
+          IF ( Dprst_flag==ACTIVE ) hruactet = hruactet - Dprst_evap_hru(i)
           IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN
             ag_potet = PET_external(i)
           ELSE
@@ -1672,13 +1672,19 @@
      &                           Ag_soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_actet(i), ag_avail_potet, & !?? instead of ag_avail_potet use AET_external
      &                           Snow_free(i)*0.9, Ag_potet_rechr(i), Ag_potet_lower(i), &
      &                           ag_potet, 1.0, idmy) ! soil_saturated only for pervious area
-            ! sanity check
-!            IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN 
-!              IF ( Ag_actet(i)-AET_external(i)>NEARZERO ) THEN
-!                PRINT *, 'ag_actet problem', Ag_actet(i), ag_avail_potet, agfrac, AET_external(i), ag_potet, i
-!                PRINT *, Ag_soil_moist(i), Ag_soil_rechr(i)
-!              endif
-!           endif
+            ! sanity checks
+            IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN 
+              IF ( Ag_actet(i)-AET_external(i)>NEARZERO ) THEN
+                PRINT *, 'ag_actet problem', Ag_actet(i), ag_avail_potet, agfrac, AET_external(i), ag_potet, i, hruactet
+                PRINT *, AET_external(i)-Ag_actet(i), Ag_soil_moist(i), Ag_soil_rechr(i)
+              endif
+            endif
+            IF ( MODEL==GSFLOW_AG ) THEN 
+              IF ( Ag_actet(i)-Potet(i)>NEARZERO ) THEN
+                PRINT *, 'ag_actet problem', Ag_actet(i), ag_avail_potet, agfrac, Potet(i), ag_potet, i, hruactet
+                PRINT *, Potet(i)-Ag_actet(i), Ag_soil_moist(i), Ag_soil_rechr(i)
+              endif
+            endif
             Hru_actet(i) = Hru_actet(i) + Ag_actet(i)*agfrac
           ENDIF
         ENDIF
@@ -1990,7 +1996,7 @@
      &           Soil_moist, Soil_rechr, Perv_actet, Avail_potet, &
      &           Snow_free, Potet_rechr, Potet_lower, Potet, Perv_frac, Soil_saturated)
       USE PRMS_CONSTANTS, ONLY: NEARZERO, BARESOIL, SAND, LOAM, CLAY, ACTIVE, OFF
-      USE PRMS_SOILZONE, ONLY: Et_type, Soilzone_aet_flag, HRU_id
+      USE PRMS_SOILZONE, ONLY: Et_type, Soilzone_aet_flag !, HRU_id
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Transp_on, Cov_type, Soil_type
@@ -2106,9 +2112,9 @@
       IF ( Perv_actet*Perv_frac>Potet ) THEN
         PRINT *, 'perv_et PET problem', Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
       ENDIF
-if ( HRU_id==36 .and. Transp_on==OFF ) then
-print *, Et_type, snow_free, HRU_id, et
-endif
+!if ( HRU_id==36 .and. Transp_on==OFF ) then
+!print *, Et_type, snow_free, HRU_id, et
+!endif
       END SUBROUTINE compute_szactet
 
 !***********************************************************************
