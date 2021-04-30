@@ -1657,8 +1657,8 @@
         Hru_actet(i) = Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i) + pervactet*perv_frac
         IF ( Dprst_flag==ACTIVE ) Hru_actet(i) = Hru_actet(i) + Dprst_evap_hru(i)
         IF ( ag_on_flag==ACTIVE ) THEN
-          hruactet = Hru_intcpevap(i) - Snow_evap(i) ! assume no impervious evap on ag area
-          IF ( Dprst_flag==ACTIVE ) hruactet = hruactet - Dprst_evap_hru(i)
+          hruactet = Hru_intcpevap(i) + Snow_evap(i) ! assume no impervious evap on ag area
+          IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
           IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN
             ag_potet = PET_external(i)
           ELSE
