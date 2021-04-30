@@ -2431,11 +2431,7 @@
                   Hh = HNEW(ic, ir, il)
                   bbot = Botm(IC, IR, Lbotm(IL))
                   ttop = Botm(IC, IR, Lbotm(IL) - 1)
- !                 print *, 'qp', 1, Qp
                   Qp = Q*smoothQ(Hh, Ttop, Bbot, dQp)
- !                 print *, 'qp', 2, Qp, dQp
- !                 print *, ic,ir,il, Hh, Ttop, Bbot, Hh, Q
- !                 print *, 'HNEW', HNEW(ic, ir, il), kkiter
                   RHS(IC, IR, IL) = RHS(IC, IR, IL) - Qp
                   !
                   !8 - -----Derivative for RHS
@@ -2445,18 +2441,15 @@
                ELSE
                   RHS(IC, IR, IL) = RHS(IC, IR, IL) - Q
                   Qp = Q
- !                 print *, 'qp', 3, Qp
                END IF
             ELSE
                RHS(IC, IR, IL) = RHS(IC, IR, IL) - Q
                Qp = Q
- !              print *, 4, Qp
             END IF
             !
             !9 - -----SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
             !
             SUP = ZERO
-!             print *, Qp, 'Qp'
             DO I = 1, NUMSEGS(L)  ! need to test when multiple segs supported by single well
                J = DIVERSIONSEG(I, L)
                SUP = SUP - Qp
@@ -2495,7 +2488,6 @@
                irr = IRRROW_SW(icount, istsg)
                icc = IRRCOL_SW(icount, istsg)
                dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-               !dvt = seg(2, istsg)*DVRPERC(ICOUNT, istsg)
                if (dvt < zero) dvt = 0.0D0
                dvt = dvt/(DELR(icc)*DELC(irr))
                DIVERSIONIRRUZF(icc, irr) = DIVERSIONIRRUZF(icc, irr) +
@@ -3302,13 +3294,13 @@
      +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
         PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
-        !if(i==1)then
-  !    etdif = pettotal - aettotal
-  !        write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
-  !   +                 pettotal,aettotal,etdif,
-  !   +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
-  !     ! endif
-  !33  format(4i5,6e20.10)
+        if(i==1)then
+      etdif = pettotal - aettotal
+          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
+     +                 pettotal,aettotal,etdif,
+     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
+        endif
+  33  format(4i5,6e20.10)
 300   continue
       return
       end subroutine demandpond_prms

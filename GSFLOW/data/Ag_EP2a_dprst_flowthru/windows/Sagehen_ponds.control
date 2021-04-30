@@ -31,6 +31,11 @@ PRMS_land_iteration_flag
 1
 1
 ####
+Soilzone_aet_flag
+1
+1
+0
+####
 model_mode
 1
 4
@@ -355,9 +360,3 @@ agriculture_soil_flag
 1
 1
 1
-#### 
-soilzone_aet_flag
-1
-1
-0
-
