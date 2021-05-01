@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-04-28'
+      character(len=*), parameter :: Version_soilzone = '2021-04-30'
       INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter, HRU_id, Iter_aet_PRMS_flag
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -1119,7 +1119,7 @@
       REAL :: gvr_maxin, topfr, depth !, tmp
       REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin
       REAL :: perv_frac, capacity, capwater_maxin, ssresin
-      REAL :: unsatisfied_et, pervactet, prefflow, ag_watermaxin
+      REAL :: unsatisfied_et, pervactet, prefflow, ag_watermaxin, ag_AETtarget, ag_avail_targetAET
       REAL :: ag_upflow_max, ag_capacity, excess, agfrac, ag_soil2gw, ag_avail_potet, ag_potet
       DOUBLE PRECISION :: gwin, frac
       INTEGER :: cfgi_frozen_hru, idmy
@@ -1660,29 +1660,24 @@
           hruactet = Hru_intcpevap(i) + Snow_evap(i) ! assume no impervious evap on ag area
           IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
           IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN
-            ag_potet = PET_external(i)
+              !soilwater_deficit = MAX( sz_deficit_param, ag_soil_moist(i)/ag_soil_moist_max(i) ) irrigation happens at a deficit threshold
+            ag_AETtarget = AET_external(i) 
           ELSE
-            ag_potet = Potet(i)
+            ag_AETtarget = Potet(i)
           ENDIF
-          ag_avail_potet = ag_potet - hruactet ! ??? maybe assume no imperv and dprst
+          ag_avail_targetAET = ag_AETtarget - hruactet ! ??? maybe assume no imperv and dprst
           IF ( Ag_soil_moist(i)>0.0 .AND. cfgi_frozen_hru==OFF ) THEN
             idmy = 0
 !            print *, Ag_soil_moist(i), Ag_soil_rechr(i)
             CALL compute_szactet(Ag_soil_moist_max(i), Ag_soil_rechr_max(i), Transp_on(i), Ag_cov_type(i), &
-     &                           Ag_soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_actet(i), ag_avail_potet, & !?? instead of ag_avail_potet use AET_external
+     &                           Ag_soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_actet(i), ag_avail_targetAET, & !?? instead of ag_avail_potet use AET_external
      &                           Snow_free(i)*0.9, Ag_potet_rechr(i), Ag_potet_lower(i), &
-     &                           ag_potet, 1.0, idmy) ! soil_saturated only for pervious area
+     &                           ag_AETtarget, 1.0, idmy) ! soil_saturated only for pervious area
             ! sanity checks
             IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN 
-              IF ( Ag_actet(i)-AET_external(i)>NEARZERO ) THEN
+              IF ( Ag_actet(i)-ag_AETtarget>NEARZERO ) THEN
                 PRINT *, 'ag_actet problem', Ag_actet(i), ag_avail_potet, agfrac, AET_external(i), ag_potet, i, hruactet
-                PRINT *, AET_external(i)-Ag_actet(i), Ag_soil_moist(i), Ag_soil_rechr(i)
-              endif
-            endif
-            IF ( MODEL==GSFLOW_AG ) THEN 
-              IF ( Ag_actet(i)-Potet(i)>NEARZERO ) THEN
-                PRINT *, 'ag_actet problem', Ag_actet(i), ag_avail_potet, agfrac, Potet(i), ag_potet, i, hruactet
-                PRINT *, Potet(i)-Ag_actet(i), Ag_soil_moist(i), Ag_soil_rechr(i)
+                PRINT *, ag_AETtarget-Ag_actet(i), Ag_soil_moist(i), Ag_soil_rechr(i)
               endif
             endif
             Hru_actet(i) = Hru_actet(i) + Ag_actet(i)*agfrac
@@ -1832,8 +1827,8 @@
           IF ( Iter_aet_PRMS_flag==ACTIVE .AND.Transp_on(i)==ACTIVE ) THEN
             !agriculture_external(i)
             !IF ( Unused_potet(i)>0.0 ) THEN
-            unsatisfied_et = AET_external(i) - Ag_actet(i)
- !           if ( unsatisfied_et<0.0 ) print *, unsatisfied_et, i, 'unsat', soilzone_aet_converge
+            unsatisfied_et = ag_AETtarget - Ag_actet(i)
+            if ( unsatisfied_et<0.0 ) print *, unsatisfied_et, i, 'unsat', soilzone_aet_converge, ag_AETtarget, Ag_actet(i)
             IF ( unsatisfied_et>soilzone_aet_converge ) THEN
               IF ( Cascade_flag==CASCADE_OFF ) Hrus_iterating(i) = 1
               Ag_irrigation_add(i) = Ag_irrigation_add(i) + unsatisfied_et
@@ -1843,23 +1838,19 @@
               IF ( unsatisfied_et>unsatisfied_big ) unsatisfied_big = unsatisfied_et
             ELSE
               Hrus_iterating(i) = 0
-              IF ( AET_external(i)<Ag_actet(i) ) THEN
-                PRINT *, 'WARNING, external agriculture AET from CBH File < computeted AET', i, &
+              IF ( ag_AETtarget<Ag_actet(i) ) THEN
+                PRINT *, 'WARNING, external agriculture available target AET from CBH File < computeted AET', i, &
      &                Nowyear, Nowmonth, Nowday, num_hrus_ag_iter
-                PRINT '(3(A,F0.6))', '         AET_external: ', AET_external(i), '; ag_actet: ', &
-     &                Ag_actet(i), ' PET_external:', PET_external(i)
-                print *, Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), ag_avail_potet
+                PRINT '(4(A,F0.6))', '         AET_external: ', ag_AETtarget, '; ag_actet: ', &
+     &                Ag_actet(i), ' PET_external: ', PET_external(i), ' AET_external: ', AET_external(i)
+                print *, Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i)
               ENDIF
             ENDIF
           ELSE
             Hrus_iterating(i) = 0
 !print *, i, AET_external(i), Ag_actet(i), unsatisfied_et, Ag_irrigation_add(i) 
           ENDIF
-          IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN
-            Unused_ag_et(i) = PET_external(i) - Ag_actet(i)
-          ELSE
-            Unused_ag_et(i) = Potet(i) - Ag_actet(i)
-          ENDIF
+          Unused_ag_et(i) = ag_AETtarget - Ag_actet(i)
           Unused_potet(i) = Unused_potet(i) - Unused_ag_et(i)
 !          if ( i==36) print *, Ag_irrigation_add(i), i, num_hrus_ag_iter, transp_on(i)
         ELSE
