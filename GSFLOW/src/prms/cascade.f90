@@ -11,7 +11,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Cascading Flow'
       character(len=*), parameter :: MODNAME = 'cascade'
-      character(len=*), parameter :: Version_cascade = '2020-12-02'
+      character(len=*), parameter :: Version_cascade = '2021-05-03'
       INTEGER, SAVE :: MSGUNT
       INTEGER, SAVE :: Iorder, Igworder, Ndown
 !   Computed Variables
@@ -354,7 +354,7 @@
 
       IF ( Cascadegw_flag==CASCADE_NORMAL ) THEN
         IF ( Cascade_flag==CASCADE_HRU_SEGMENT ) THEN
-          Gw_up_id = Hru_up_id(i)
+          Gw_up_id = Hru_up_id
           Gw_strmseg_down_id =  Hru_strmseg_down_id
           Gw_down_id = 0
           Gw_pct_up = 1.0
