@@ -99,7 +99,7 @@
       REAL, SAVE, ALLOCATABLE :: Ag_actet(:), Ag_dunnian(:), Ag_irrigation_add(:), Ag_gvr2sm(:), Ag_irrigation_add_vol(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Ag_upslope_dunnian(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_lower(:), Ag_soil_lower_stor_max(:), Ag_potet_rechr(:), Ag_potet_lower(:)
-      REAL, SAVE, ALLOCATABLE :: It0_ag_soil_rechr(:), It0_ag_soil_moist(:), Ag_water_maxin(:)
+      REAL, SAVE, ALLOCATABLE :: It0_ag_soil_rechr(:), It0_ag_soil_moist(:), Ag_water_maxin(:), Ag_soilwater_deficit(:)
       !REAL, SAVE, ALLOCATABLE :: Ag_slow_flow(:), Ag_ssres_in(:)
       !REAL, SAVE, ALLOCATABLE :: Ag_ssr_to_gw(:), Ag_slow_stor(:), Ag_recharge(:)
       !REAL, SAVE, ALLOCATABLE :: Ag_ssres_stor(:), Ag_ssres_flow(:)
@@ -108,7 +108,7 @@
       real, save :: unsatisfied_big
       ! parameters
 ! have covden a monthly, later
-      INTEGER, SAVE, ALLOCATABLE :: Ag_soil_type(:) !, Ag_crop_type(:), Ag_covden_sum(:), Ag_covden_win(:)
+      INTEGER, SAVE, ALLOCATABLE :: Ag_soil_type(:), Ag_soilwater_deficit_min(:) !, Ag_crop_type(:), Ag_covden_sum(:), Ag_covden_win(:)
 !      REAL, SAVE, ALLOCATABLE :: Ag_sat_threshold(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_rechr_max_frac(:) ! Ag_crop_coef later, will specify PET
       !REAL, SAVE, ALLOCATABLE :: Ag_snowinfil_max(:), Ag_ssstor_init_frac(:)
@@ -144,7 +144,7 @@
 !     szdecl - set up parameters for soil zone computations
 !   Declared Parameters
 !     sat_threshold, ssstor_init_frac fastcoef_lin, fastcoef_sq
-!     ssr2gw_rate, ssr2gw_exp, soil2gw_max, soil_type, ag_soil_type
+!     ssr2gw_rate, ssr2gw_exp, soil2gw_max, soil_type, ag_soil_type, ag_soilwater_deficit_min
 !     soil_rechr_max_frac, soil_rechr_init_frac, soil_moist_max, soil_moist_init_frac
 !     pref_flow_den, slowcoef_lin
 !     hru_area, slowcoef_sq, gvr_hru_id
@@ -675,6 +675,10 @@
           IF ( declvar(MODNAME, 'ag_irrigation_add', 'nhru', Nhru, 'real', &
      &         'Irrigation water added to agriculture fraction when ag_actet < PET_external for each HRU', &
      &         'inches', Ag_irrigation_add)/=0 ) CALL read_error(3, 'ag_irrigation_add')
+          ALLOCATE ( Ag_soilwater_deficit(Nhru) )
+          IF ( declvar(MODNAME, 'ag_soilwater_deficit', 'nhru', Nhru, 'real', &
+     &         'Soil-water deficit of agriculture fraction for each HRU', &
+     &         'inches', Ag_soilwater_deficit)/=0 ) CALL read_error(3, 'ag_soilwater_deficit')
           ALLOCATE ( Ag_irrigation_add_vol(Nhru) )
           IF ( declvar(MODNAME, 'ag_irrigation_add_vol', 'nhru', Nhru, 'real', &
      &         'Irrigation water added to agriculture fraction when ag_actet < PET_external for each HRU', &
@@ -721,6 +725,13 @@
      &       '2', '1', '3', &
      &       'Agriculture soil type', 'Soil type of agriculture in each HRU (1=sand; 2=loam; 3=clay)', &
      &       'none')/=0 ) CALL read_error(1, 'ag_soil_type')
+
+        ALLOCATE ( Ag_soilwater_deficit_min(Nhru) )
+        IF ( declparam(MODNAME, 'ag_soilwater_deficit_min', 'nhru', 'real', &
+     &       '0.0', '0.0', '1.0', &
+     &       'Minimum soil-water deficit to begin agriculture irrigaition', &
+     &       'Minimum soil-water deficit fraction to begin agriculture irrigaition', &
+     &       'fraction')/=0 ) CALL read_error(1, 'ag_soilwater_deficit_min')
 
      !   ALLOCATE ( Ag_sat_threshold(Nhru) )
      !   IF ( declparam(MODNAME, 'ag_sat_threshold', 'nhru', 'real', &
@@ -823,6 +834,8 @@
         IF ( getparam(MODNAME, 'soilzone_aet_converge', 1, 'real', soilzone_aet_converge)/=0 ) &
      &       CALL read_error(2, 'soilzone_aet_converge')
         IF ( getparam(MODNAME, 'ag_soil_type', Nhru, 'integer', Ag_soil_type)/=0 ) CALL read_error(2, 'ag_soil_type')
+        IF ( getparam(MODNAME, 'ag_soilwater_deficit_min', Nhru, 'real', Ag_soilwater_deficit_min)/=0 ) &
+     &       CALL read_error(2, 'ag_soilwater_deficit_min')
 !        IF ( getparam(MODNAME, 'ag_crop_type', Nhru, 'integer', Ag_crop_type)/=0 ) CALL read_error(2, 'ag_crop_type')
 !        IF ( getparam(MODNAME, 'ag_covden_sum', Nhru, 'real', Ag_covden_sum)/=0 ) CALL read_error(2, 'ag_covden_sum')
 !        IF ( getparam(MODNAME, 'ag_covden_win', Nhru, 'real', Ag_covden_win)/=0 ) CALL read_error(2, 'ag_covden_win')
@@ -841,6 +854,7 @@
           Ag_irrigation_add = 0.0
           Ag_irrigation_add_vol = 0.0
           Unused_ag_et = 0.0
+          Ag_soilwater_deficit = 0.0
         ENDIF
         Ag_soil_lower_stor_max = 0.0
         Ag_potet_lower = 0.0
@@ -1163,6 +1177,7 @@
         Ag_irrigation_add = 0.0
         Ag_irrigation_add_vol = 0.0
         Unused_ag_et = 0.0
+        Ag_soilwater_deficit = 0.0
       ENDIF
       Hrus_iterating = 1
       keep_iterating = ACTIVE
@@ -1410,6 +1425,7 @@
           ENDIF
         ENDIF
         IF ( ag_on_flag==ACTIVE ) THEN
+          Ag_soilwater_deficit(i) = ag_soil_moist_max(i) - ag_soil_moist(i)
           excess = ag_watermaxin + ag_soil_moist(i) - ag_soil_moist_max(i)
           IF ( excess>0.0 ) THEN
             WRITE(531,333) Nowyear, Nowmonth, Nowday, i, excess, Ag_soil_moist(i), Ag_soil_moist_max(i), Ag_irrigation_add(i)
@@ -1831,7 +1847,8 @@
             if ( unsatisfied_et<0.0 ) print *, unsatisfied_et, i, 'unsat', soilzone_aet_converge, ag_AETtarget, Ag_actet(i)
             IF ( unsatisfied_et>soilzone_aet_converge ) THEN
               IF ( Cascade_flag==CASCADE_OFF ) Hrus_iterating(i) = 1
-              Ag_irrigation_add(i) = Ag_irrigation_add(i) + unsatisfied_et
+              IF ( .NOT.(Ag_soilwater_deficit(i)>Ag_soilwater_deficit_min(i)) ) &
+     &             Ag_irrigation_add(i) = Ag_irrigation_add(i) + unsatisfied_et
               keep_iterating = ACTIVE
               add_estimated_irrigation = ACTIVE
               num_hrus_ag_iter = num_hrus_ag_iter + 1
