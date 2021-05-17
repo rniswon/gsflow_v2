@@ -536,14 +536,14 @@
       IF ( Print_debug==2 ) THEN
         PRINT *, ' HRU     Area'
         PRINT ('(I7, F14.5)'), (i, Hru_area(i), i=1, Nhru)
-        PRINT *,                           'Model domain area          = ', Totarea
-        PRINT *,                           'Active basin area          = ', Active_area
-        IF ( Water_area>0.0D0 ) PRINT *,   'Lake area                  = ', Water_area
-        PRINT *,                           'Fraction impervious        = ', basin_imperv
-        PRINT *,                           'Fraction pervious          = ', basin_perv
-        IF ( Water_area>0.0D0 ) PRINT *,   'Fraction lakes             = ', Water_area*Basin_area_inv
-        IF ( Dprst_flag==ACTIVE ) PRINT *, 'Depression storage fraction =', basin_dprst
-        IF ( Ag_frac_flag==ACTIVE ) PRINT *, 'Agriculture area            =', basin_ag
+        PRINT *,                           'Model domain area           = ', Totarea
+        PRINT *,                           'Active basin area           = ', Active_area
+        IF ( Water_area>0.0D0 ) PRINT *,   'Lake area                   = ', Water_area
+        PRINT *,                           'Fraction impervious         = ', basin_imperv
+        PRINT *,                           'Fraction pervious           = ', basin_perv
+        IF ( Water_area>0.0D0 ) PRINT *,   'Fraction lakes              = ', Water_area*Basin_area_inv
+        IF ( Dprst_flag==ACTIVE ) PRINT *, 'Depression storage fraction = ', basin_dprst
+        IF ( Ag_frac_flag==ACTIVE ) PRINT *, 'Agriculture area            = ', basin_ag
         PRINT *, ' '
       ENDIF
 
