@@ -11,7 +11,7 @@
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Timestep Control'
         character(len=*), parameter :: MODNAME = 'prms_time'
-        character(len=*), parameter :: Version_prms_time = '2020-12-02'
+        character(len=*), parameter :: Version_prms_time = '2021-05-06'
         INTEGER, SAVE :: Modays(MONTHS_PER_YEAR), Yrdays, Summer_flag, Jday, Jsol, Julwater
         INTEGER, SAVE :: Nowtime(6), Nowday, Nowmonth, Nowyear, Nowhour, Nowminute, Julian_day_absolute
         REAL, SAVE :: Timestep_hours, Timestep_days, Timestep_minutes
@@ -28,7 +28,7 @@
       INTRINSIC :: SNGL
       INTEGER, EXTERNAL :: leap_day, julian_day, compute_julday
       DOUBLE PRECISION, EXTERNAL :: deltim
-      EXTERNAL :: dattim, print_module
+      EXTERNAL :: dattim, print_module, read_data_line
 ! Local Variables
       INTEGER :: startday
       DOUBLE PRECISION :: dt
@@ -45,6 +45,7 @@
           Jsol = julian_day('now', 'solar')
           Julwater = julian_day('now', 'water')
           Julian_day_absolute = Julian_day_absolute + 1
+          CALL read_data_line()
 
         ELSE ! initialize
           Modays(1) = 31

@@ -8,7 +8,8 @@
 !     Main setup routine
 !***********************************************************************
       INTEGER FUNCTION setup()
-      USE PRMS_MODULE, ONLY: Process_flag, DECL
+      USE PRMS_CONSTANTS, ONLY: DECL
+      USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: setupdecl
@@ -28,7 +29,7 @@
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Parameter Setup'
       character(len=*), parameter :: MODNAME = 'setup_param'
-      character(len=*), parameter :: Version_setup = '2020-08-03'
+      character(len=*), parameter :: Version_setup = '2021-05-10'
 ! Functions
       INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module
@@ -52,10 +53,10 @@
      &     'National Hydrologic Model HRU ID', 'National Hydrologic Model HRU ID', &
      &     'none') /= 0 ) CALL read_error(1, 'nhm_id')
 
-      IF ( declparam(MODNAME, 'poi_gage_id', 'npoigages', 'string', &
-     &     '0', '0', '9999999', &
-     &     'POI Gage ID', 'USGS stream gage for each POI gage', &
-     &     'none')/=0 ) CALL read_error(1, 'poi_gage_id')
+!      IF ( declparam(MODNAME, 'poi_gage_id', 'npoigages', 'string', &
+!     &     '0', '0', '9999999', &
+!     &     'POI Gage ID', 'USGS stream gage for each POI gage', &
+!     &     'none')/=0 ) CALL read_error(1, 'poi_gage_id')
 
       IF ( declparam(MODNAME, 'poi_gage_segment', 'npoigages', 'integer', &
      &     '0', 'bounded', 'nsegment', &

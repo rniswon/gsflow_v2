@@ -60,7 +60,7 @@ C     ******************************************************************
       double precision, intent(in) :: hh,s,x,c,smoothet
       double precision, intent(inout) :: trhs,thcof,dET
 ! local
-      double precision depth,gwet,smint,etgw,detdh
+      double precision depth,smint,etgw,detdh !,gwet 
       external smoothuz
       double precision smoothuz
 !
@@ -139,15 +139,15 @@ C     ------------------------------------------------------------------
       INTEGER istart, istop, lloc, ivol, numactive, ic, ir
       INTEGER ibndflg, ichld, iflgbnd, igage, igunit, irhld, isyflg, 
      +        iuzcol, iuzflg, iuzlay, iuzopt, iuzrow, l, ncck, ncth, 
-     +        nlth, nrck, nrnc, nrth, i, icheck, kkrch, k, NPP, MXVL,
-     +        llocsave, icheck2
+     +        nlth, nrck, nrnc, nrth, i, icheck, kkrch, k, NPP, MXVL !,
+!     +        llocsave, icheck2
       REAL r, sy, fkmin, fkmax, range, finc, thick, smooth
-      INTEGER intchk, Iostat
+!      INTEGER intchk, Iostat
       CHARACTER(LEN=200) line
       CHARACTER(LEN=24) aname(9)
       character(len=16)  :: text        = 'UZF'
-      logical :: found
-      character(len=40) :: keyvalue
+!      logical :: found
+!      character(len=40) :: keyvalue
       DATA aname(1)/' AREAL EXTENT OF UZ FLOW'/
       DATA aname(2)/' ROUTING OVERLAND RUNOFF'/
       DATA aname(3)/' SATURATED WATER CONTENT'/
@@ -970,7 +970,7 @@ C     ******************************************************************
 C     PARSE KEYWORD OPTIONS
 C     ******************************************************************
       USE GWFUZFMODULE
-      USE GLOBAL,       ONLY: IUNIT, IOUT
+      USE GLOBAL,       ONLY: IOUT !, IUNIT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -983,7 +983,7 @@ C     ------------------------------------------------------------------
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
-      DOUBLE PRECISION test
+!      DOUBLE PRECISION test
       INTEGER istart, istop, lloc, iheader, i
       REAL r, SMOOTH
       INTEGER intchk, Iostat
@@ -1837,8 +1837,8 @@ C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
 C     VERSION 1.1.4:  April 29, 2018
 C     ******************************************************************
       USE GWFUZFMODULE
-      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
-     +                        HNEW, BOTM, LBOTM
+!      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
+!     +                        HNEW, BOTM, LBOTM
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -1849,8 +1849,8 @@ C     -----------------------------------------------------------------
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
-      DOUBLE PRECISION h
-      INTEGER :: IC, IR, IL, ILL, LL, IBND
+!      DOUBLE PRECISION h
+!      INTEGER :: IC, IR, IL, ILL, LL, IBND
 C     -----------------------------------------------------------------
 C
       IF ( NUZTOP.NE.4 ) RETURN
@@ -1871,8 +1871,10 @@ C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
 C     VERSION 1.1.4:  April 29, 2018
 C     ******************************************************************
       USE GWFUZFMODULE
-      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
-     +                        HNEW, BOTM, LBOTM
+!      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
+!     +                        HNEW, BOTM, LBOTM
+      USE GLOBAL,       ONLY: NLAY, IOUT, IBOUND, 
+     +                        HNEW, BOTM
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -1882,7 +1884,7 @@ C     -----------------------------------------------------------------
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
-      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP, IBND2, ILACTIVE
+      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP, ILACTIVE
       DOUBLE PRECISION :: S1, S2
 C     -----------------------------------------------------------------
 C      
@@ -1936,7 +1938,7 @@ C     SURFACE LEAKAGE AND ADD OR SUBTRACT TERMS RHS AND HCOF
 C     VERSION 1.0.5:  April 5, 2012
 C     ******************************************************************
       USE GWFUZFMODULE
-      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, HNEW, ISSFLG, DELR,
+      USE GLOBAL,       ONLY: NLAY, HNEW, ISSFLG, DELR,
      +                        DELC, BOTM, IBOUND, HCOF, RHS,
      +                        ITMUNI, IUNIT
 !!      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, HNEW, ISSFLG, DELR,
@@ -1964,8 +1966,8 @@ C     -----------------------------------------------------------------
       REAL epsilon, fks, rootdp, ths, wiltwc,celthick, finfact, finfhold
       REAL finfsaveadd
       INTEGER ic, il, ill, ir, iset, iss, iwav, l, numwaves,
-     +        land, idelt, ik, ll, idr
-      INTEGER lakflg, lakid, ibnd, i, ij, nlayp1, lakflginf
+     +        land, idelt, ik, ll !, idr, i
+      INTEGER lakflg, lakid, ibnd, ij, nlayp1, lakflginf
       DOUBLE PRECISION oldsflx, surflux, dlength, h, celtop, deltinc,
      +                 zoldist, totflux, etact, rateud, hld, htest1,
      +                 htest2, flength, width, thr, cellarea, fact,
@@ -1975,7 +1977,7 @@ C     -----------------------------------------------------------------
 !!     +                 dcsep
 !!     +                 rhsnew, hcofold, hcofnew, rhsold, bbot, ttop, 
 !!     +                 dcsep
-      DOUBLE PRECISION s, x, c, etdp, etgw, trhs, thcof, hh, dET
+      DOUBLE PRECISION s, x, c, etgw, trhs, thcof, hh, dET ! , etdp
 C     -----------------------------------------------------------------
 C
 C1------SET POINTERS FOR THE CURRENT GRID.
@@ -2503,7 +2505,7 @@ C     -----------------------------------------------------------------
      +                 deltinc, fkseep, trhs, thcof, hh, dET, s, x, c, 
      +                 etgw, fkreject
       REAL avdpt, avwat, bigvl1, bigvl2, depthinc, epsilon, 
-     +     etdp, eps_m1, ftheta1, ftheta2, finfsaveadd
+     +     eps_m1, ftheta1, ftheta2, finfsaveadd ! , etdp
       REAL fhold, fks, fminn, gcumin, gcumrch, gdelstor, gdlstr, ghdif, 
      +     ghnw, ginfltr, grchr, gseep, gseepr, guzstore, prcntercum,
      +     prcnterrat, ratin, ratout, cumapplinf, dum1, dum2
@@ -2511,18 +2513,18 @@ C     -----------------------------------------------------------------
       REAL csepmx, csep, finfact, finfhold, gcumapl, gaplinfltr
       REAL totalwc, totrin, totrot, totvin, totvot, volet, volflwtb, 
      +     volinflt, wiltwc, zero, celthick
-      REAL error
+!      REAL error
       INTEGER ibd, ibduzf, ic, ick, iftunit, igflg, ii, il, ill,
      +        iog, ir, iset, iss, iuzcol, iuzn, iuzopt, iuzrat, iuzrow, 
      +        j, jj, jk, land, nwavm1, nwaves, idelt, ik, ll, ibnd, iret
       INTEGER k, kknt, l, loop, numwaves, numwavhld, nuzc, nuzr, jm1
       INTEGER lakflg, lakid, nlayp1, lakflginf
-      CHARACTER(LEN=16) textrch, textet, textexfl, textinf, textinf2
+      CHARACTER(LEN=16) textrch, textet, textexfl, textinf !, textinf2
       CHARACTER(LEN=16) uzsttext, uzettext, uzinftxt, txthold,textrej
       CHARACTER(LEN=16) netrchtext, netdistext
       CHARACTER(LEN=17) val1, val2
       DATA textinf/'    UZF INFILTR.'/
-      DATA textinf2/'SFR-DIV. INFLTR.'/
+!      DATA textinf2/'SFR-DIV. INFLTR.'/
       DATA textrch/'    UZF RECHARGE'/
       DATA textet/'           GW ET'/
       DATA textexfl/' SURFACE LEAKAGE'/
@@ -5638,10 +5640,10 @@ C--------SUBROUTINE CELL_AVERAGE
 C     ******************************************************************
 C     AVEARGE WATER CONTENT AND FLUX FOR MT3DMS
 C     ******************************************************************
-      USE GLOBAL,       ONLY: BOTM, IOUT, NLAY
+      USE GLOBAL,       ONLY: BOTM, NLAY !, IOUT
       USE GWFBASMODULE, ONLY: DELT
       USE GWFUZFMODULE, ONLY: NWAV, CLOSEZERO, IUZFBND, NWAVST,
-     +                        RTSOLUTE, GRIDSTOR, GRIDET, IUZFOPT
+     +                        GRIDSTOR, GRIDET, IUZFOPT !, RTSOLUTE
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     SPECIFICATIONS:

@@ -10,7 +10,7 @@
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Water Balance Computations'
         character(len=*), parameter :: MODNAME_WB = 'water_balance'
-        character(len=*), parameter :: Version_water_balance = '2020-12-02'
+        character(len=*), parameter :: Version_water_balance = '2021-05-10'
         INTEGER, SAVE :: BALUNT, SZUNIT, GWUNIT, INTCPUNT, SROUNIT, SNOWUNIT
         REAL, PARAMETER :: TOOSMALL = 3.1E-05, SMALL = 1.0E-04, BAD = 1.0E-03
         DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 1.0D-05
@@ -53,35 +53,34 @@
       USE PRMS_SRUNOFF, ONLY: MODNAME
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declvar
-      EXTERNAL :: read_error, print_module, PRMS_open_module_file
+      EXTERNAL :: read_error, print_module, PRMS_open_module_file, declvar_dble
 !***********************************************************************
       CALL print_module(MODDESC, MODNAME_WB, Version_water_balance)
 
 ! Declare Variables
-      IF ( declvar(MODNAME_WB, 'basin_capillary_wb', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME_WB, 'basin_capillary_wb', 'one', 1, &
      &     'Basin area-weighted average capillary reservoir storage', &
-     &     'inches', Basin_capillary_wb)/=0 ) CALL read_error(3, 'basin_capillary_wb')
+     &     'inches', Basin_capillary_wb)
 
-      IF ( declvar(MODNAME_WB, 'basin_gravity_wb', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME_WB, 'basin_gravity_wb', 'one', 1, &
      &     'Basin area-weighted average gravity reservoir storage', &
-     &     'inches', Basin_gravity_wb)/=0 ) CALL read_error(3, 'basin_gravity_wb')
+     &     'inches', Basin_gravity_wb)
 
-      IF ( declvar(MODNAME_WB, 'basin_soilzone_wb', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME_WB, 'basin_soilzone_wb', 'one', 1, &
      &     'Basin area-weighted average storage in soilzone reservoirs', &
-     &     'inches', Basin_soilzone_wb)/=0 ) CALL read_error(3, 'basin_soilzone_wb')
+     &     'inches', Basin_soilzone_wb)
 
 !      ALLOCATE ( Hru_runoff(Nhru) )
-!      IF ( declvar(MODNAME, 'hru_runoff', 'nhru', Nhru, 'double', &
+!      CALL declvar_dble(MODNAME, 'hru_runoff', 'nhru', Nhru, &
 !     &     'Total lateral flow leaving each HRU (includes cascading flow)', &
-!     &     'inches', Hru_runoff)/=0 ) CALL read_error(3, 'hru_runoff')
+!     &     'inches', Hru_runoff)
 
       ALLOCATE ( Hru_storage_ante(Nhru) )
 
       IF ( Dprst_flag==ACTIVE ) THEN
-        IF ( declvar(MODNAME_WB, 'basin_dprst_wb', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME_WB, 'basin_dprst_wb', 'one', 1, &
      &       'Basin area-weighted average surface-depression storage water balance', &
-     &       'inches', Basin_dprst_wb)/=0 ) CALL read_error(3, 'basin_dprst_wb')
+     &       'inches', Basin_dprst_wb)
       ENDIF
 
       ALLOCATE ( Gwstor_ante(Nhru) )
@@ -175,7 +174,7 @@
       USE PRMS_SOILZONE, ONLY: Swale_actet, Dunnian_flow, Basin_sz2gw, &
      &    Perv_actet, Cap_infil_tot, Pref_flow_infil, Cap_waterin, Upslope_interflow, &
      &    Upslope_dunnianflow, Pref_flow, Pref_flow_stor, Soil_lower, Gvr2pfr, Basin_ssin, &
-     &    Basin_lakeinsz, Basin_dunnian, Pref_flow_max, Pref_flow_den, Pref_flow_thrsh, &
+     &    Basin_lakeinsz, Basin_dunnian, Pref_flow_max, Pref_flow_infil_frac, Pref_flow_thrsh, &
      &    Basin_sm2gvr_max, Basin_cap_infil_tot, Basin_slowflow, &
      &    Basin_dunnian_gvr, Basin_pref_flow_infil, Basin_dninterflow, Basin_pref_stor, Basin_dunnian_pfr, &
      &    Basin_dncascadeflow, Basin_capwaterin, Basin_sm2gvr, Basin_prefflow, Basin_slstor, Basin_gvr2pfr, &
@@ -333,7 +332,7 @@
           WRITE ( BALUNT, * ) gvrbal, last_ss, Ssres_stor(i), Ssr_to_gw(i), Swale_actet(i), &
      &            Dunnian_flow(i), Ssres_flow(i), Pfr_dunnian_flow(i), Pref_flow_thrsh(i), Ssres_in(i), &
      &            Pref_flow_infil(i), Grav_dunnian_flow(i), Slow_flow(i), Pref_flow(i), Soil_to_ssr(i), Gvr2pfr(i), &
-     &            perv_frac, Slow_stor(i), Pref_flow_stor(i), Infil(i), Pref_flow_max(i), Pref_flow_den(i)
+     &            perv_frac, Slow_stor(i), Pref_flow_stor(i), Infil(i), Pref_flow_max(i), Pref_flow_infil_frac(i)
           IF ( Cascade_flag>CASCADE_OFF ) WRITE ( BALUNT, * ) 'sz cascade', Hru_sz_cascadeflow(i)
         ENDIF
 
@@ -361,7 +360,7 @@
      &            Soil_lower(i), Soil_to_ssr(i), Ssres_flow(i), waterin, Swale_actet(i)
           IF ( Cascade_flag>CASCADE_OFF ) WRITE ( BALUNT, * ) 'cascade', Upslope_dunnianflow(i), Upslope_interflow(i), &
      &                                                        Hru_sz_cascadeflow(i), Ncascade_hru(i)
-          WRITE ( BALUNT, * ) Hru_perv(i), perv_frac, Pref_flow_den(i), (Infil(i)*perv_frac), Cap_infil_tot(i)
+          WRITE ( BALUNT, * ) Hru_perv(i), perv_frac, Pref_flow_infil_frac(i), (Infil(i)*perv_frac), Cap_infil_tot(i)
           WRITE ( BALUNT, * ) Dunnian_flow(i), Pfr_dunnian_flow(i)
 !          ENDIF
         ENDIF

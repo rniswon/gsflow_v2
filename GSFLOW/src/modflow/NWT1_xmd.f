@@ -93,7 +93,7 @@ cmi
 !     ------------------------------------------------------------------
 !     LOCAL VARIABLES
 !     ------------------------------------------------------------------
-      INTEGER lloc, istart, istop, i, n,ISTORXMD,IREDSYS, Icomb
+      INTEGER lloc, istart, istop, i, IREDSYS !. n,ISTORXMD, Icomb
       CHARACTER(LEN=200) line
       REAL R,RRCTOLS,EPSRNS,HCLOSEXMDDUM
 !     LOCAL VARIABLES FOR XMD SOLVER
@@ -232,7 +232,7 @@ C-------------------------------------------------------------------------------
 C  DEALLOCATE GLOBAL DATA
       use xmdcmn
       use xmdmatrix
-      INTEGER ALLOC_ERR
+      INTEGER ALLOC_ERR, IGRID
 C
       DEALLOCATE(icolour, STAT = ALLOC_ERR)
       DEALLOCATE(RBorder, STAT = ALLOC_ERR)

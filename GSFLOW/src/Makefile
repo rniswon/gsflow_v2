@@ -8,7 +8,6 @@
 #-------------------------------------------------------------------
 
 include ./makelist
-MMF      = ./mmf
 PRMS     = ./prms
 GSFLOW   = ./gsflow
 MODFLOW  = ./modflow
@@ -21,13 +20,11 @@ LIB		 = ./lib
 all: standard
 
 standard:
-	cd $(MMF); $(MAKE);
 	cd $(MODFLOW); $(MAKE);
 	cd $(PRMS); $(MAKE);
 	cd $(GSFLOW); $(MAKE)
 
 clean:
-	cd $(MMF); $(RM) *.o *.mod *~;
 	cd $(MODFLOW); $(RM) *.o *.mod *~;
 	cd $(PRMS); $(RM) *.o *.mod *~;
 	cd $(GSFLOW); $(RM) *.o *.mod *~;

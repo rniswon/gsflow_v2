@@ -26,7 +26,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'xyz_dist'
-      character(len=*), parameter :: Version_xyz_dist = '2020-12-02'
+      character(len=*), parameter :: Version_xyz_dist = '2021-05-06'
       INTEGER, SAVE :: Nlapse, Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Basin_centroid_x, Basin_centroid_y
@@ -133,31 +133,28 @@
       USE PRMS_XYZ_DIST
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar
-      EXTERNAL :: read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL :: read_error, print_module, declvar_int, declvar_real
 !***********************************************************************
       xyzdecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_xyz_dist)
 
-      IF ( declvar(MODNAME, 'is_rain_day', 'one', 1, 'integer',
+      CALL declvar_int(MODNAME, 'is_rain_day', 'one', 1,
      +     'Flag to indicate if it is raining anywhere in the basin',
-     +     'none',
-     +     Is_rain_day)/=0 ) CALL read_error(3, 'is_rain_day')
+     +     'none', Is_rain_day)
 
       ALLOCATE ( Tmax_rain_sta(Nrain) )
-      IF ( declvar(MODNAME, 'tmax_rain_sta', 'nrain', Nrain, 'real',
+      CALL declvar_real(MODNAME, 'tmax_rain_sta', 'nrain', Nrain,
      +     'Maximum temperature distributed to the precipitation'//
      +     ' measurement stations',
-     +     'degrees Fahrenheit',
-     +     Tmax_rain_sta)/=0 ) CALL read_error(3, 'tmax_rain_sta')
+     +     'degrees Fahrenheit', Tmax_rain_sta)
 
       ALLOCATE ( Tmin_rain_sta(Nrain) )
-      IF ( declvar(MODNAME, 'tmin_rain_sta', 'nrain', Nrain, 'real',
+      CALL declvar_real(MODNAME, 'tmin_rain_sta', 'nrain', Nrain,
      +     'Minimum temperature distributed to the precipitation'//
      +     ' measurement stations',
-     +     'degrees Fahrenheit',
-     +     Tmin_rain_sta)/=0 ) CALL read_error(3, 'tmin_rain_sta')
+     +     'degrees Fahrenheit', Tmin_rain_sta)
 
 ! declare parameters
       ALLOCATE ( Adjust_snow(Nrain,MONTHS_PER_YEAR) )

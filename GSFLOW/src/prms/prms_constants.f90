@@ -73,11 +73,44 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: SHRUBS = 2
     integer, parameter :: TREES = 3
     integer, parameter :: CONIFEROUS = 4
+! Vaccaro, J.J., 2007, A deep percolation model for estimating ground-water recharge:
+! Documentation of modules for the modular modeling system of the U.S. Geological Survey: 
+! U.S. Geological Survey Scientific Investigations Report 2006-5318, 30 p.
+    integer, parameter :: WINTER_WHEAT_SUMMER = 5
+    integer, parameter :: WINTER_WHEAT_FALLOW = 5
+    integer, parameter :: ORCHARD = 7
+    integer, parameter :: ALFALFA = 8
+    integer, parameter :: ROW_CROPS = 9
+    integer, parameter :: WATER = 10
+    integer, parameter :: CORN = 11
+    integer, parameter :: POTATO = 12
+    integer, parameter :: LENTIL = 14
+    integer, parameter :: SPRING_WHEAT = 15
+    integer, parameter :: IMPERVIOUS = 16
+    integer, parameter :: VEGETABLES_SMALL = 17
+    integer, parameter :: COTTON = 18
+    integer, parameter :: MINT = 19
+    integer, parameter :: GRAPE_CA = 20
+    integer, parameter :: GRAPE_WA = 21
+    integer, parameter :: HOPS = 22
+    integer, parameter :: OLIVE_TREE = 23
+    integer, parameter :: CITRUS = 24
+    integer, parameter :: SOYBEAN = 25
+    integer, parameter :: APPLE_TREE = 26
+    integer, parameter :: SORGHUM = 27 ! May 20 with 140-day growing season
+    integer, parameter :: PASTURE = 28 ! irrigated April 1 to Sept 15
+    integer, parameter :: BEAN = 29
+    integer, parameter :: PEA = 30
+    integer, parameter :: ASPARAGUS = 31
 
     ! soil_type
     integer, parameter :: SAND = 1
     integer, parameter :: LOAM = 2
     integer, parameter :: CLAY = 3
+
+    ! agriculture_flag
+    integer, parameter :: CAPILLARY = 1
+    integer, parameter :: CANOPY = 2
 
     ! Hemisphere
     integer, parameter :: NORTHERN = 0
@@ -104,6 +137,12 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: GSFLOW = 0
     integer, parameter :: PRMS = 1
     integer, parameter :: MODFLOW = 2
+    integer, parameter :: GSFLOW_AG = 3
+    integer, parameter :: PRMS_AG = 4
+    integer, parameter :: MODSIM_GSFLOW = 10
+    integer, parameter :: MODSIM_PRMS = 11
+    integer, parameter :: MODSIM_MODFLOW = 12
+    integer, parameter :: MODSIM = 13
     integer, parameter :: DOCUMENTATION = 99
     integer, parameter :: RUN = 0
     integer, parameter :: DECL = 1
@@ -165,6 +204,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: INT_TYPE = 1
     integer, parameter :: REAL_TYPE = 2
     integer, parameter :: DBLE_TYPE = 3
+    integer, parameter :: CHAR_TYPE = 4
     integer, parameter :: SAVE_INIT = 0
     integer, parameter :: READ_INIT = 1
 
