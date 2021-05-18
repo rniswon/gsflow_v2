@@ -345,16 +345,6 @@ nhruOutBaseFileName
 1
 4
 ../output/nhru_out_HighKc_
-####
-agriculture_dprst_flag
-1
-1
-1
-####
-agriculture_soil_flag
-1
-1
-1
 #### 
 soilzone_aet_flag
 1
