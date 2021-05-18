@@ -502,7 +502,6 @@
 ! runoff and soilzone for GSFLOW are in the MODFLOW iteration loop
 ! when PRMS_land_iteration_flag = 1
 ! only call for declare, initialize, and cleanup.
-          IF ( PRMS_land_iteration_flag>OFF ) CALL PRMS_land_modules(Arg, ierr)
 
           ierr = soilzone()
           IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)

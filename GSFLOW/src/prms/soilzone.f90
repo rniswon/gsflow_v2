@@ -1374,6 +1374,7 @@
             ag_on_flag = ACTIVE
             agfrac = Ag_frac(i)
             ag_watermaxin = Infil_ag(i)
+            print *, i, ag_area(i), ag_frac(i)
           ENDIF
         ENDIF
 
@@ -1882,7 +1883,7 @@
       IF ( Iter_aet==OFF ) keep_iterating = OFF
       Soil_iter = Soil_iter + 1
       IF ( Soil_iter>max_soilzone_ag_iter .OR. add_estimated_irrigation==OFF ) keep_iterating = OFF
-      if (ag_actet(i)>potet(i)) print *, 'ag_actet>potet', ag_actet(i), potet(i)
+!      if (ag_actet(i)>potet(i)) print *, 'ag_actet>potet', ag_actet(i), potet(i)
       if (unused_potet(i)<0.00) print *, 'unused', unused_potet(i), potet(i)
       if ( hru_actet(i)>potet(i)) print *, 'hru_actet', hru_actet(i), potet(i)
       ENDDO ! end iteration while loop
