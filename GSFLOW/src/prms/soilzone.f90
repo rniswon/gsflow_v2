@@ -108,7 +108,7 @@
       real, save :: unsatisfied_big
       ! parameters
 ! have covden a monthly, later
-      INTEGER, SAVE, ALLOCATABLE :: Ag_soil_type(:), Ag_soilwater_deficit_min(:) !, Ag_crop_type(:), Ag_covden_sum(:), Ag_covden_win(:)
+      INTEGER, SAVE, ALLOCATABLE :: Ag_soil_type(:), Ag_soilwater_deficit_min(:), Ag_covden_sum(:), Ag_covden_win(:) !, Ag_crop_type(:)
 !      REAL, SAVE, ALLOCATABLE :: Ag_sat_threshold(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_rechr_max_frac(:) ! Ag_crop_coef later, will specify PET
       !REAL, SAVE, ALLOCATABLE :: Ag_snowinfil_max(:), Ag_ssstor_init_frac(:)
@@ -751,19 +751,19 @@
 !     &       'none')/=0 ) CALL read_error(1, 'ag_crop_type')
 
         ! use existing covden_sum, covden_win
-     !   ALLOCATE ( Ag_covden_sum(Nhru) )
-     !   IF ( declparam(MODNAME, 'ag_covden_sum', 'nhru', 'real', &
-     !&       '0.5', '0.0', '1.0', &
-     !&       'Summer vegetation cover density for agriculture crop type', &
-     !&       'Summer vegetation cover density for the agriculture crop type in each HRU', &
-     !&       'decimal fraction')/=0 ) CALL read_error(1, 'ag_covden_sum')
-     !
-     !   ALLOCATE ( Ag_covden_win(Nhru) )
-     !   IF ( declparam(MODNAME, 'ag_covden_win', 'nhru', 'real', &
-     !&       '0.5', '0.0', '1.0', &
-     !&       'Winter vegetation cover density for crop type', &
-     !&       'Winter vegetation cover density for the crop type in each HRU', &
-     !&       'decimal fraction')/=0 ) CALL read_error(1, 'ag_covden_win')
+        ALLOCATE ( Ag_covden_sum(Nhru) )
+        IF ( declparam(MODNAME, 'ag_covden_sum', 'nhru', 'real', &
+     &       '-1.0', '-1.0', '1.0', &
+     &       'Summer vegetation cover density for agriculture crop type', &
+     &       'Summer vegetation cover density for the agriculture crop type in each HRU', &
+     &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_covden_sum')
+
+        ALLOCATE ( Ag_covden_win(Nhru) )
+        IF ( declparam(MODNAME, 'ag_covden_win', 'nhru', 'real', &
+     &       '-1.0', '-1.0', '1.0', &
+     &       'Winter vegetation cover density for crop type', &
+     &       'Winter vegetation cover density for the crop type in each HRU', &
+     &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_covden_win')
       ELSE
         ALLOCATE ( Ag_actet(1) )
       ENDIF
@@ -778,7 +778,7 @@
       USE PRMS_MODULE, ONLY: Soilzone_add_water_use
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Active_hrus, Hru_route_order, &
-     &    Basin_area_inv, Hru_area, Hru_frac_perv, Numlake_hrus, Ag_area, Ag_frac
+     &    Basin_area_inv, Hru_area, Hru_frac_perv, Numlake_hrus, Ag_area, Ag_frac, Covden_win, Covden_sum
       USE PRMS_FLOWVARS, ONLY: Soil_moist_max, Soil_rechr_max, &
      &    Ssres_stor, Basin_ssstor, Basin_soil_moist, Slow_stor, &
      &    Soil_moist, Sat_threshold, Soil_rechr, &
@@ -837,8 +837,10 @@
         IF ( getparam(MODNAME, 'ag_soilwater_deficit_min', Nhru, 'real', Ag_soilwater_deficit_min)/=0 ) &
      &       CALL read_error(2, 'ag_soilwater_deficit_min')
 !        IF ( getparam(MODNAME, 'ag_crop_type', Nhru, 'integer', Ag_crop_type)/=0 ) CALL read_error(2, 'ag_crop_type')
-!        IF ( getparam(MODNAME, 'ag_covden_sum', Nhru, 'real', Ag_covden_sum)/=0 ) CALL read_error(2, 'ag_covden_sum')
-!        IF ( getparam(MODNAME, 'ag_covden_win', Nhru, 'real', Ag_covden_win)/=0 ) CALL read_error(2, 'ag_covden_win')
+        IF ( getparam(MODNAME, 'ag_covden_sum', Nhru, 'real', Ag_covden_sum)/=0 ) CALL read_error(2, 'ag_covden_sum')
+        IF ( Ag_covden_sum(1)<0.0 ) Ag_covden_sum = Covden_sum
+        IF ( getparam(MODNAME, 'ag_covden_win', Nhru, 'real', Ag_covden_win)/=0 ) CALL read_error(2, 'ag_covden_win')
+        IF ( Ag_covden_win(1)<0.0 ) Ag_covden_win = Covden_win
         IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) Ag_soil_lower = 0.0
         Basin_agwaterin = 0.0D0
         Basin_ag_soil_to_gw = 0.0D0
@@ -1880,6 +1882,9 @@
       IF ( Iter_aet==OFF ) keep_iterating = OFF
       Soil_iter = Soil_iter + 1
       IF ( Soil_iter>max_soilzone_ag_iter .OR. add_estimated_irrigation==OFF ) keep_iterating = OFF
+      if (ag_actet(i)>potet(i)) print *, 'ag_actet>potet', ag_actet(i), potet(i)
+      if (unused_potet(i)<0.00) print *, 'unused', unused_potet(i), potet(i)
+      if ( hru_actet(i)>potet(i)) print *, 'hru_actet', hru_actet(i), potet(i)
       ENDDO ! end iteration while loop
       Soil_iter = Soil_iter - 1
       IF ( Iter_aet==ACTIVE ) Ag_irrigation_add_vol = Ag_irrigation_add*Ag_area
