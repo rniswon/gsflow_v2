@@ -3101,7 +3101,7 @@
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
-      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_BASIN, ONLY: Ag_area
 !      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_FLOWVARS, ONLY: PERV_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
@@ -3145,7 +3145,7 @@
         !
         do k = 1, DVRCH(iseg)
            hru_id = IRRROW_SW(k, iseg)
-           area = HRU_PERV(hru_id)
+           area = Ag_area(hru_id)
            pet = potet(hru_id)*area*prms_inch2mf_q
            aet = perv_actet(hru_id)*area*prms_inch2mf_q
            pettotal = pettotal + pet
@@ -3203,7 +3203,7 @@
 !     SPECIFICATIONS:
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_BASIN, ONLY: Ag_area
       USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
@@ -3257,7 +3257,7 @@
         !
         do k = 1, NUMCELLSPOND(i)
            hru_id = IRRHRU_POND(K, i)    !these are HRUs irrigated by ponds
-           area = HRU_PERV(hru_id)
+           area = Ag_area(hru_id)
            pet = potet(hru_id)*area*prms_inch2mf_q
            aet = hru_actet(hru_id)*area*prms_inch2mf_q
            pettotal = pettotal + pet
@@ -3318,7 +3318,7 @@
 !      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_FLOWVARS, ONLY: PERV_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_BASIN, ONLY: Ag_area
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id, GSFLOW_flag
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
       IMPLICIT NONE
@@ -3363,7 +3363,7 @@
                aet = aet + gwet(ic, ir) + uzet
             else
                hru_id = IRRROW_SW(k, iseg)
-               area = HRU_PERV(hru_id)
+               area = Ag_area(hru_id)
                pet = potet(hru_id)*area*prms_inch2mf_q
                aet = perv_actet(hru_id)*area*prms_inch2mf_q
                if ( Nhru==Nhrucell ) then
@@ -3419,7 +3419,7 @@
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
-      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_BASIN, ONLY: Ag_area
       IMPLICIT NONE
 ! --------------------------------------------
       !arguments
@@ -3453,7 +3453,7 @@
             aettotal = aettotal + (gwet(ic, ir) + uzet)
           else
             hru_id = IRRROW_GW(i, l)
-            area = HRU_PERV(hru_id)
+            area = Ag_area(hru_id)
             pet = potet(hru_id)*area*prms_inch2mf_q
             aet = perv_actet(hru_id)*area*prms_inch2mf_q
             if ( Nhru==Nhrucell ) then
@@ -3556,7 +3556,7 @@
 !     SPECIFICATIONS:
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_BASIN, ONLY: Ag_area
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT
 !      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
@@ -3589,7 +3589,7 @@
       prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       DO I = 1, NUMCELLS(L)
          hru_id = IRRROW_GW(I, L)
-         area = HRU_PERV(hru_id)
+         area = Ag_area(hru_id)
          pet = potet(hru_id)*area*prms_inch2mf_q
          aet = perv_actet(hru_id)*area*prms_inch2mf_q
          if ( Soil_saturated(hru_id) == 1 ) aet = pet
@@ -3671,7 +3671,7 @@
       USE GWFAGMODULE
       USE GLOBAL, ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_BASIN, ONLY: Ag_area
 !      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, PERV_ACTET
@@ -3829,7 +3829,7 @@
                      aet = gwet(ic, ir) + uzet  !vol rate
                   ELSE
                      hru_id = IRRROW_SW(k, iseg)
-                     area = HRU_PERV(hru_id)
+                     area = Ag_area(hru_id)
                      pet = potet(hru_id)*area*prms_inch2mf_q
                      aet = perv_actet(hru_id)*area*prms_inch2mf_q
                      if ( Nhru==Nhrucell ) then
@@ -3900,7 +3900,7 @@
                            aet = gwet(ic, ir) + uzet
                         ELSE
                            hru_id = IRRROW_GW(J, L)
-                           area = HRU_PERV(hru_id)
+                           area = Ag_area(hru_id)
                            pet = potet(hru_id)*area*prms_inch2mf_q
                            aet = perv_actet(hru_id)*area*prms_inch2mf_q
                            if ( Nhru==Nhrucell ) then
@@ -3953,7 +3953,7 @@
                      aet = gwet(ic, ir) + uzet
                   ELSE
                      hru_id = IRRROW_GW(J, L)
-                     area = HRU_PERV(hru_id)
+                     area = Ag_area(hru_id)
                      pet = potet(hru_id)*area*prms_inch2mf_q
                      aet = perv_actet(hru_id)*area*prms_inch2mf_q
                      if ( Nhru==Nhrucell ) then
