@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2021-05-17'
+      character(len=*), parameter :: Version_basin = '2021-05-18'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -210,18 +210,18 @@
      &       'acres', Ag_area)/=0 ) CALL read_error(3, 'ag_area')
 
         IF ( declparam(MODNAME, 'ag_frac', 'nhru', 'real', &
-     &       '0.0', '0.0', '0.999', &
+     &       '0.0', '0.0', '1.0', &
      &       'Fraction of each HRU area that has agriculture', &
      &       'Fraction of each HRU area that has agriculture', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_frac')
 
-      ALLOCATE ( Ag_cov_type(Nhru) )
-      IF ( declparam(MODNAME, 'ag_cov_type', 'nhru', 'integer', &
-     &     '3', '0', '4', &
-     &     'Cover type designation for agriculture area of each HRU', &
-     &     'Vegetation cover type for agriculture area of each HRU (0=bare soil;'// &
-     &     ' 1=grasses; 2=shrubs; 3=trees; 4=coniferous)', &
-     &     'none')/=0 ) CALL read_error(1, 'ag_cov_type')
+        ALLOCATE ( Ag_cov_type(Nhru) )
+        IF ( declparam(MODNAME, 'ag_cov_type', 'nhru', 'integer', &
+     &       '1', '0', '4', &
+     &       'Cover type designation for agriculture area of each HRU', &
+     &       'Vegetation cover type for agriculture area of each HRU (0=bare soil;'// &
+     &       ' 1=grasses; 2=shrubs; 3=trees; 4=coniferous)', &
+     &       'none')/=0 ) CALL read_error(1, 'ag_cov_type')
       ENDIF
 
       ALLOCATE ( Hru_type(Nhru) )

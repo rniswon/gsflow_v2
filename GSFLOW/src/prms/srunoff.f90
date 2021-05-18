@@ -31,7 +31,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2021-03-12'
+      character(len=*), parameter :: Version_srunoff = '2021-05-18'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -447,10 +447,6 @@
      &       'decimal fraction')/=0 ) CALL read_error(1, 'sro_to_dprst_imperv')
 
         IF ( Ag_frac_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-          ALLOCATE ( Infil_ag(Nhru) )
-          IF ( declvar(MODNAME, 'infil_ag', 'nhru', Nhru, 'real', &
-     &         'Infiltration to the agriculture reservoirs for each HRU', &
-     &         'inches', Infil_ag)/=0 ) CALL read_error(3, 'infil_ag')
           ALLOCATE ( Sro_to_dprst_ag(Nhru) )
           IF ( declparam(MODNAME, 'sro_to_dprst_ag', 'nhru', 'real', &
      &         '0.2', '0.0', '1.0', &
@@ -498,6 +494,13 @@
      &       ' depressions are full to compute current surface area for each HRU;'// &
      &       ' 0.001 is an approximate cylinder; 1.0 is a cone', &
      &       'none')/=0 ) CALL read_error(1, 'va_clos_exp')
+      ENDIF
+
+      IF ( Ag_frac_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        ALLOCATE ( Infil_ag(Nhru) )
+        IF ( declvar(MODNAME, 'infil_ag', 'nhru', Nhru, 'real', &
+     &       'Infiltration to the agriculture reservoirs for each HRU', &
+     &       'inches', Infil_ag)/=0 ) CALL read_error(3, 'infil_ag')
       ENDIF
 
       IF ( Print_debug==DEBUG_WB ) THEN

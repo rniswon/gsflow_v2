@@ -20,9 +20,9 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 04/27/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-04-27'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 04/27/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 05/18/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-05-18'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 05/18/2021'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -450,7 +450,7 @@
         ENDIF
       ENDIF
 
-      IF ( PRMS_land_iteration_flag==OFF ) CALL PRMS_land_modules(Arg, ierr)
+      IF ( Process_flag/=RUN ) CALL PRMS_land_modules(Arg, ierr)
 
 ! for PRMS-only simulations
       IF ( PRMS_only==ACTIVE ) THEN
