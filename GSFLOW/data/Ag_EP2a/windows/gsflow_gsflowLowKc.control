@@ -265,12 +265,12 @@ basinOutVar_names
 7
 4
 basin_potet
+basin_actet
 basin_swrad
 basin_recharge
 basin_cfs
 basin_ssflow
 basin_sroff
-basin_aet
 ####
 basinOutBaseFileName
 1
