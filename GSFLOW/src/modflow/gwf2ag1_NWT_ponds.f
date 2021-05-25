@@ -3107,7 +3107,7 @@
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
       USE PRMS_BASIN, ONLY: Ag_area
 !      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
-      USE PRMS_FLOWVARS, ONLY: PERV_ACTET
+      USE PRMS_FLOWVARS, ONLY: hru_actet
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
       USE GWFUZFMODULE, ONLY: UZFETOUT, GWET
@@ -3122,16 +3122,17 @@
       double precision :: zerod7, done, dzero, pettotal,
      +                    aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup, dtwo, zerod2 !, etdif
-!      real :: fmaxflow
+      real :: sone
       integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
-      double precision :: set_factor !, area_mf
+      double precision :: set_factor, etdif
       INTRINSIC :: ABS
 ! --------------------------------------------------
 !
       zerod7 = 1.0d-7
       zerod2 = 1.0d-2
       done = 1.0d0
+      sone = 1.0e0
       dtwo = 2.0d0
       dzero = 0.0d0
       prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
@@ -3151,7 +3152,7 @@
            hru_id = IRRROW_SW(k, iseg)
            area = Ag_area(hru_id)
            pet = potet(hru_id)*area*prms_inch2mf_q
-           aet = perv_actet(hru_id)*area*prms_inch2mf_q
+           aet = hru_actet(hru_id)*area*prms_inch2mf_q
            pettotal = pettotal + pet
            aettotal = aettotal + aet
            if ( Nhru==Nhrucell ) then
@@ -3173,7 +3174,8 @@
         IF ( RMSESW(ISEG) > zerod2*pettotal ) AGCONVERGE = 0
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
-        SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
+        SUPACT(iseg) = SUPACT(iseg) + 
+     +                 (sone - SNGL(AGCONVERGE))*SNGL(factor)
 !        if (SUPACT(iseg) < 0.0) SUPACT(iseg) = 0.0
         !
         !1 - -----set diversion to demand
@@ -3189,12 +3191,13 @@
 !        If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
 !        IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
-!        if(kper==10.and.kstp==1)then
-!      etdif = pettotal - aettotal
-!          write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),
-!     +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG)
-!        endif
-!  33  format(4i5,5e20.10)
+        if(iseg==19)then
+      etdif = pettotal - aettotal
+          write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),
+     +                 SUPACT(iseg),etdif,RMSESW(ISEG),zerod2*pettotal,
+     +                 AGCONVERGE
+        endif
+  33  format(4i5,5e20.10,i5)
 300   continue
       return
       end subroutine demandconjunctive_prms
@@ -3226,7 +3229,7 @@
      +                    aetold, supold, sup, etdif, zerod2,
      +                    dtwo
 !      real :: fmaxflow
-      real :: demand_inch_acres
+      real :: demand_inch_acres, sone
       integer :: k, ipond, hru_id, i
       external :: set_factor
       double precision :: set_factor, Q, saveflow
@@ -3245,6 +3248,7 @@
       zerod2 = 1.0d-2
       dtwo = 2.0d0
       done = 1.0d0
+      sone = 1.0e0
       dzero = 0.0d0
       prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       !
@@ -3280,7 +3284,8 @@
         AETITERPOND(i) = SNGL(aettotal)
         saveflow = PONDFLOW(i)
         PONDFLOWOLD(i) = PONDFLOW(i)
-        PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
+        PONDFLOW(i) = PONDFLOW(i) + 
+     +                (sone - SNGL(AGCONVERGE))*SNGL(factor)
         !
         !set pond inflow using demand.
         IF ( FLOWTHROUGH_POND(i) == 1 ) THEN
@@ -3320,7 +3325,7 @@
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
       USE GWFBASMODULE, ONLY: DELT
 !      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
-      USE PRMS_FLOWVARS, ONLY: PERV_ACTET
+      USE PRMS_FLOWVARS, ONLY: hru_actet
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_BASIN, ONLY: Ag_area
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id, GSFLOW_flag
@@ -3369,7 +3374,7 @@
                hru_id = IRRROW_SW(k, iseg)
                area = Ag_area(hru_id)
                pet = potet(hru_id)*area*prms_inch2mf_q
-               aet = perv_actet(hru_id)*area*prms_inch2mf_q
+               aet = hru_actet(hru_id)*area*prms_inch2mf_q
                if ( Nhru==Nhrucell ) then
                  icell = Gvr_cell_id(hru_id)
                  irow = Gwc_row(icell)
@@ -3419,7 +3424,7 @@
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
       USE GWFBASMODULE, ONLY: DELT
 !      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
-      USE PRMS_FLOWVARS, ONLY: PERV_ACTET
+      USE PRMS_FLOWVARS, ONLY: hru_actet
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
@@ -3459,7 +3464,7 @@
             hru_id = IRRROW_GW(i, l)
             area = Ag_area(hru_id)
             pet = potet(hru_id)*area*prms_inch2mf_q
-            aet = perv_actet(hru_id)*area*prms_inch2mf_q
+            aet = hru_actet(hru_id)*area*prms_inch2mf_q
             if ( Nhru==Nhrucell ) then
               icell = Gvr_cell_id(hru_id)
               irow = Gwc_row(icell)
@@ -3564,7 +3569,7 @@
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT
 !      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE PRMS_FLOWVARS, ONLY: Soil_saturated, PERV_ACTET
+      USE PRMS_FLOWVARS, ONLY: Soil_saturated, hru_actet
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
       IMPLICIT NONE
@@ -3595,7 +3600,7 @@
          hru_id = IRRROW_GW(I, L)
          area = Ag_area(hru_id)
          pet = potet(hru_id)*area*prms_inch2mf_q
-         aet = perv_actet(hru_id)*area*prms_inch2mf_q
+         aet = hru_actet(hru_id)*area*prms_inch2mf_q
          if ( Soil_saturated(hru_id) == 1 ) aet = pet
          pettotal = pettotal + pet
          aettotal = aettotal + aet
@@ -3678,7 +3683,7 @@
       USE PRMS_BASIN, ONLY: Ag_area
 !      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, PERV_ACTET
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, hru_actet
       USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id,
      +    Agriculture_dprst_flag
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row,
@@ -3835,7 +3840,7 @@
                      hru_id = IRRROW_SW(k, iseg)
                      area = Ag_area(hru_id)
                      pet = potet(hru_id)*area*prms_inch2mf_q
-                     aet = perv_actet(hru_id)*area*prms_inch2mf_q
+                     aet = hru_actet(hru_id)*area*prms_inch2mf_q
                      if ( Nhru==Nhrucell ) then
                        icell = Gvr_cell_id(hru_id)
                        irow = Gwc_row(icell)
@@ -3906,7 +3911,7 @@
                            hru_id = IRRROW_GW(J, L)
                            area = Ag_area(hru_id)
                            pet = potet(hru_id)*area*prms_inch2mf_q
-                           aet = perv_actet(hru_id)*area*prms_inch2mf_q
+                           aet = hru_actet(hru_id)*area*prms_inch2mf_q
                            if ( Nhru==Nhrucell ) then
                              icell = Gvr_cell_id(hru_id)
                              irow = Gwc_row(icell)
@@ -3959,7 +3964,7 @@
                      hru_id = IRRROW_GW(J, L)
                      area = Ag_area(hru_id)
                      pet = potet(hru_id)*area*prms_inch2mf_q
-                     aet = perv_actet(hru_id)*area*prms_inch2mf_q
+                     aet = hru_actet(hru_id)*area*prms_inch2mf_q
                      if ( Nhru==Nhrucell ) then
                        icell = Gvr_cell_id(hru_id)
                        irow = Gwc_row(icell)
