@@ -1,4 +1,15 @@
       MODULE GWFAGMODULE
+        DOUBLE PRECISION, PARAMETER :: zerod30 = 1.0d-30
+        DOUBLE PRECISION, PARAMETER :: NEARZERO = 1.0D-17
+        DOUBLE PRECISION, PARAMETER :: zerod7 = 1.0d-7
+        DOUBLE PRECISION, PARAMETER :: done = 1.0d0
+        DOUBLE PRECISION, PARAMETER :: DONEP = 1.00001d0
+        REAL, PARAMETER :: sone = 1.0e0
+        REAL, PARAMETER :: szero = 0.0e0
+        DOUBLE PRECISION, PARAMETER :: dtwo = 2.0d0
+        DOUBLE PRECISION, PARAMETER :: doneneg = -1.0d0
+        DOUBLE PRECISION, PARAMETER :: zerod2 = 1.0d-2
+        DOUBLE PRECISION, PARAMETER :: dzero = 0.0d0
         INTEGER, SAVE, POINTER :: NWELLS, MXWELL, NWELVL, NPWEL, IPRWEL
         INTEGER, SAVE, POINTER :: MXPOND
         INTEGER, SAVE, POINTER :: IWELLCB, IRDPSI, NNPWEL, NAUXWELL
@@ -173,10 +184,10 @@
       ALLOCATE (TSPONDALLUNIT, TSPONDETALLUNIT)
       ALLOCATE (MXPOND, NUMPOND, NUMPONDET, NUMTABPOND, MAXVALPOND)
       MXPOND = 1
-      VBVLAG = 0.0
+      VBVLAG = szero
       MSUMAG = 0
       PSIRAMP = 0.10
-      ACCEL = 1.0
+      ACCEL = sone
       NUMTABWELL = 0
       NUMTABPOND = 0
       MAXVALWELL = 1
@@ -281,13 +292,13 @@
         ALLOCATE(PONDSEGFRAC(1))
       ENDIF
       NUMIRRPONDSP = 0
-      IRRFIELDFACTPOND = 0.0
-      IRRFACTPOND = 0.0
+      IRRFIELDFACTPOND = szero
+      IRRFACTPOND = szero
       IRRHRU_POND = 0
       TSSWNUM = 0
       TSGWNUM = 0
-      QONLY = 0.0
-      QONLYOLD = 0.0
+      QONLY = szero
+      QONLYOLD = szero
       TSSWETUNIT = 0
       TSGWETUNIT = 0
       TSSWETNUM = 0
@@ -296,34 +307,34 @@
       TSPONDNUM = 0
       TSPONDETUNIT = 0
       TSPONDETNUM = 0
-      SUPSEG = 0.0
+      SUPSEG = szero
       LASTREACH = 0
-      IRRPERIODWELL = 0.0
-      IRRPERIODSEG = 0.0
-      TRIGGERPERIODWELL = 0.0
-      TRIGGERPERIODSEG = 0.0
+      IRRPERIODWELL = szero
+      IRRPERIODSEG = szero
+      TRIGGERPERIODWELL = szero
+      TRIGGERPERIODSEG = szero
       TIMEINPERIODWELL = 1E30
       TIMEINPERIODSEG = 1E30
       TIMEINPERIODPOND = 1E30
-      TRIGGERPERIODPOND = 0.0
+      TRIGGERPERIODPOND = szero
       FLOWTHROUGH_POND = 0
-      IRRPERIODPOND = 0.0
-      AETITERPOND = 0.0
-      PETPOND = 0.0
-      PONDFLOW = 0.0
-      PONDSEGFLOW = 0.0
-      PONDFLOWOLD = 0.0
-      PONDFLOWMAX = 0.0
-      PONDIRRPRMS = 0.0
+      IRRPERIODPOND = szero
+      AETITERPOND = szero
+      PETPOND = szero
+      PONDFLOW = szero
+      PONDSEGFLOW = szero
+      PONDFLOWOLD = szero
+      PONDFLOWMAX = szero
+      PONDIRRPRMS = szero
       SEGLIST = 0
       NUMSEGLIST = 0
       IRRPONDVAR = 0
       TABPONDSEG = 0
-      TABPONDFRAC = 0.0
+      TABPONDFRAC = szero
       NUMCELLSPOND = 0
       IRRPERIODPOND = 0
       TRIGGERPERIODPOND = 0
-      RMSEPOND = 0.0
+      RMSEPOND = szero
       !
       !5 - --- ALLOCATE TIME SERIES VARIABLES
       IF (TSACTIVEGW .OR. TSACTIVESW .OR. TSACTIVEGWET .OR.
@@ -341,8 +352,8 @@
       ALLOCATE (TABLAYWELL(max), TABROWWELL(max))
       ALLOCATE (TABVALWELL(max), TABIDWELL(max))
       ALLOCATE (TABCOLWELL(max),TABUNITWELL(max))
-      TABTIMEWELL = 0.0
-      TABRATEWELL = 0.0
+      TABTIMEWELL = szero
+      TABRATEWELL = szero
       TABLAYWELL = 0
       TABROWWELL = 0
       TABCOLWELL = 0
@@ -361,8 +372,8 @@
       IF ( max<1 ) max = 1
       ALLOCATE (TABVALPOND(max),TABIDPOND(max))
       ALLOCATE (TABPONDHRU(max),TABUNITPOND(max))
-      TABTIMEPOND = 0.0
-      TABRATEPOND = 0.0
+      TABTIMEPOND = szero
+      TABRATEPOND = szero
       TABPONDHRU = 0
       TABVALPOND = 0
       TABIDPOND = 0
@@ -436,18 +447,18 @@
       IRRCOL_GW = 0
       SUPWELVAR = 0
       IRRWELVAR = 0
-      WELLIRRUZF = 0.0
-      WELLIRRPRMS = 0.0
+      WELLIRRUZF = szero
+      WELLIRRPRMS = szero
       NUMCELLS = 0
-      IRRFACT = 0.0
-      IRRFIELDFACT = 0.0
+      IRRFACT = szero
+      IRRFIELDFACT = szero
       NUMSEGS = 0
-      FRACSUP = 0.0
-      FRACSUPMAX = 0.0
-      SUPFLOW = 0.0
-      AETITERGW = 0.0
-      RMSEGW = 0.0
-      KCROPWELL = 0.0
+      FRACSUP = szero
+      FRACSUPMAX = szero
+      SUPFLOW = szero
+      AETITERGW = szero
+      RMSEGW = szero
+      KCROPWELL = szero
       NUMSUPWELLSEG = 0
       !
       !10 - --- ALLOCATE VARIABLES FOR DIVERSIONS
@@ -470,22 +481,22 @@
          ALLOCATE (IRRSEG(1), AETITERSW(1),RMSESW(1))
       END IF
       DVRCH = 0
-      DVEFF = 0.0
-      KCROPDIVERSION = 0.0
+      DVEFF = szero
+      KCROPDIVERSION = szero
       IRRROW_SW = 0
       IRRCOL_SW = 0
-      AETITERSW = 0.0
-      RMSESW = 0.0
-      DIVERSIONIRRUZF = 0.0
-      DIVERSIONIRRPRMS = 0.0
-      DVRPERC = 0.0
+      AETITERSW = szero
+      RMSESW = szero
+      DIVERSIONIRRUZF = szero
+      DIVERSIONIRRPRMS = szero
+      DVRPERC = szero
       ALLOCATE (IDVFLG)
       IDVFLG = 0
-      DEMAND = 0.0
-      SUPACT = 0.0
-      SUPACTOLD = 0.0
-      ACTUAL = 0.0
-      ACTUALOLD = 0.0
+      DEMAND = szero
+      SUPACT = szero
+      SUPACTOLD = szero
+      ACTUAL = szero
+      ACTUALOLD = szero
       RETURN
       END SUBROUTINE
       !
@@ -1014,20 +1025,18 @@
       logical :: FOUND, ierror
       logical :: found1, found2, found3, found4, found7
       REAL :: R, TTIME, TRATE, QPOND, QFRAC
-      DOUBLE PRECISION :: DONEP
       CHARACTER*6 CWELL
       ! - -----------------------------------------------------------------
       found4 = .false.
       found7 = .false.
       ierror = .false.
-      DONEP = 1.00001d0
       is = 0
       ISEG = 0
       ip = 0
-      QPOND = 0.0
-      TTIME = 0.0
-      TRATE = 0.0
-      QFRAC = 0.0
+      QPOND = szero
+      TTIME = szero
+      TRATE = szero
+      QFRAC = szero
       !
       !1 - ---READ SEGMENT, POND, AND WELL LIST DATA
       IF (KPER .EQ. 1) THEN
@@ -1487,10 +1496,10 @@
       ! - -----------------------------------------------------------------
       !
       !1 - ------RESET DEMAND IF IT CHANGES
-      DEMAND = 0.0
-      TOTAL = 0.0
+      DEMAND = szero
+      TOTAL = szero
       TIME = TOTIM
-      PONDSEGFLOW = 0.0
+      PONDSEGFLOW = szero
       DO i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
          if (iseg > 0) then
@@ -1499,18 +1508,18 @@
                ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
                ! contains the TABFILE values at this point.
                DEMAND(ISEG) = SEG(2, ISEG)
-               IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
+               IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = szero
                TOTAL = TOTAL + DEMAND(ISEG)
             elseif (GSFLOW_flag == 1) then
             end if
-            SUPACT(ISEG) = 0.0
-            ACTUAL(ISEG) = 0.0
+            SUPACT(ISEG) = szero
+            ACTUAL(ISEG) = szero
          END IF
       END DO
       !2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
       IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
          DO i = 1, NUMSEGLIST
-            SEG(2, SEGLIST(i)) = 0.0
+            SEG(2, SEGLIST(i)) = szero
          END DO
       END IF
       !
@@ -1549,12 +1558,12 @@
       END DO
 !
 !6 - -----RESET SAVED IRR AND AET FROM LAST TIME STEP
-      DIVERSIONIRRUZF = 0.0
-      DIVERSIONIRRPRMS = 0.0
-      WELLIRRUZF = 0.0
-      WELLIRRPRMS = 0.0
-      QONLY = 0.0
-      PONDFLOW = 0.0
+      DIVERSIONIRRUZF = szero
+      DIVERSIONIRRPRMS = szero
+      WELLIRRUZF = szero
+      WELLIRRPRMS = szero
+      QONLY = szero
+      PONDFLOW = szero
       RETURN
       END
 !
@@ -1589,8 +1598,8 @@
          SUPWELVAR = 0
          NUMSEGS = 0
          DIVERSIONSEG = 0
-         FRACSUP = 0.0
-         FRACSUPMAX = 0.0
+         FRACSUP = szero
+         FRACSUPMAX = szero
          RETURN
       END IF
       !
@@ -1692,8 +1701,8 @@
       !2 - --INITIALIZE AG VARIABLES TO ZERO.
       IRRWELVAR = 0
       NUMCELLS = 0
-      IRRFACT = 0.0
-      IRRFIELDFACT = 0.0
+      IRRFACT = szero
+      IRRFIELDFACT = szero
       IRRROW_GW = 0
       IRRCOL_GW = 0
       !
@@ -1807,8 +1816,8 @@
       !2 - --INITIALIZE AG VARIABLES TO ZERO.
       !IRRPONDVAR = 0  This is read at beginning of simulation and is constant
       NUMCELLSPOND = 0
-      IRRFACTPOND = 0.0
-      IRRFIELDFACTPOND = 0.0
+      IRRFACTPOND = szero
+      IRRFIELDFACTPOND = szero
       IRRHRU_POND = 0
       IPOND = 1
       !
@@ -1922,8 +1931,8 @@
       IF (ITMP < 0) RETURN
       !
       !2 - ---INITIALIZE AG VARIABLES TO ZERO.
-      DVRPERC = 0.0
-      DVEFF = 0.0
+      DVRPERC = szero
+      DVEFF = szero
       IRRSEG = 0
       IRRROW_SW = 0
       IRRCOL_SW = 0
@@ -1968,7 +1977,7 @@
                   READ (IN, *) IRRROW_SW(K, SGNM), idum, DVEFF(K, SGNM),
      +                         DVRPERC(K, SGNM)           
                END DO
-               totdum = 0.0
+               totdum = szero
                DO K = 1, NMCL
                   IF (IRRROW_SW(K, SGNM) == 0) THEN
                      totdum = totdum + DVRPERC(NMCL, SGNM)
@@ -1984,7 +1993,7 @@
                   READ (IN, *) IRRROW_SW(K, SGNM), IRRCOL_SW(K, SGNM),
      +                        DVEFF(K, SGNM), DVRPERC(K, SGNM)
                END DO
-               totdum = 0.0
+               totdum = szero
                DO K = 1, NMCL
                   IF (IRRROW_SW(K, SGNM) == 0 .OR. 
      +                IRRCOL_SW(K, SGNM) == 0) THEN
@@ -2303,44 +2312,40 @@
       ! VARIABLES:
       ! - -----------------------------------------------------------------
       INTEGER :: L, I, J, ISTSG, ICOUNT, IRR, ICC, IC, IR, IL, IJ !, ID
-      DOUBLE PRECISION :: ZERO, DONE, SUP, FMIN, Q, SUBVOL, SUBRATE, DVT
-      DOUBLE PRECISION :: DONENEG
+      DOUBLE PRECISION :: SUP, FMIN, Q, SUBVOL, SUBRATE, DVT
       EXTERNAL :: SMOOTHQ, demandgw_uzf, demandgw_prms
       EXTERNAL :: demandtrigger_gw
       REAL :: TIME
       DOUBLE PRECISION :: Qp, Hh, Ttop, Bbot, dQp, SMOOTHQ
-      DOUBLE PRECISION :: QSW, NEARZERO, QQ, demandtrigger_gw
+      DOUBLE PRECISION :: QSW, QQ, demandtrigger_gw
       DOUBLE PRECISION :: demandgw_uzf, demandgw_prms
       INTEGER :: k, ipc !, PONDID
       !
       ! - -----------------------------------------------------------------
       !
       !1 - ----INITIALIZE LOCAL VARIABLES
-      ZERO = 0.0D0
-      DONE = 1.0D0
-      DONENEG = -1.0D0*DONE
-      NEARZERO = 1.0D-17
+      
       TIME = TOTIM
-      SUP = ZERO
-      DIVERSIONIRRUZF = 0.0
-      DIVERSIONIRRPRMS = 0.0
-      WELLIRRUZF = 0.0
-      WELLIRRPRMS = 0.0
-      PONDIRRPRMS = 0.0
-      SUPFLOW = 0.0
-      Qp = ZERO
+      SUP = DZERO
+      DIVERSIONIRRUZF = DZERO
+      DIVERSIONIRRPRMS = DZERO
+      WELLIRRUZF = DZERO
+      WELLIRRPRMS = DZERO
+      PONDIRRPRMS = DZERO
+      SUPFLOW = DZERO
+      Qp = DZERO
 !      print *, 'qp', qp, totim, zero
-      Q = ZERO
-      QQ = ZERO
-      QSW = ZERO
+      Q = DZERO
+      QQ = DZERO
+      QSW = DZERO
       TIME = TOTIM
-      RMSESW = ZERO
-      RMSEGW = ZERO
-      RMSEPOND = ZERO
+      RMSESW = DZERO
+      RMSEGW = DZERO
+      RMSEPOND = DZERO
       agconverge = 1    
       DO L = 1, NUMIRRPOND
         IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
-          PONDSEGFLOW(L) = ZERO
+          PONDSEGFLOW(L) = DZERO
         END IF
       END DO
       !
@@ -2366,7 +2371,7 @@
       END DO
       !
       !2C - ---SET CUMULATIVE SUP PUMPING TO ZERO EACH ITERATION
-      ACTUAL = 0.0
+      ACTUAL = DZERO
       !
       !3 - -----SET MAX PUMPING RATE OR IRR DEMAND FOR GW.
       DO L = 1, NWELLS
@@ -2381,7 +2386,7 @@
          IF (IBOUND(IC, IR, IL) > 0) THEN
             !
             !5 - -----CALCULATE SUPPLEMENTAL PUMPING IF SUP WELL.
-            SUP = ZERO
+            SUP = DZERO
             IF (NUMSEGS(L) > 0) THEN
                DO I = 1, NUMSEGS(L)
                   J = DIVERSIONSEG(I, L)
@@ -2390,8 +2395,8 @@
                   IF (ETDEMANDFLAG > 0) THEN
                      FMIN = SUPACT(J)
                   ELSE IF (TRIGGERFLAG > 0) then
-                     QSW = ZERO
-                     FMIN = ZERO
+                     QSW = DZERO
+                     FMIN = DZERO
                      IF (TIMEINPERIODSEG(J) < IRRPERIODSEG(J)) THEN
                         FMIN = Q
                      END IF
@@ -2399,7 +2404,7 @@
                      FMIN = DEMAND(J)
                   END IF
                   FMIN = FRACSUP(I, L)*(FRACSUPMAX(I, L)*FMIN - QSW)
-                  IF (FMIN < ZERO) FMIN = ZERO
+                  IF (FMIN < DZERO) FMIN = DZERO
                   SUP = SUP + FMIN
                END DO
                SUPFLOW(L) = SUPFLOW(L)-sngl(SUP/dble(NUMSUPWELLSEG(L)))
@@ -2409,7 +2414,7 @@
                IF (SUPFLOW(L) < Q) SUPFLOW(L) = SNGL(Q)
                Q = SUPFLOW(L)
                QONLY(L) = SNGL(DONENEG*Q)
-            ELSEIF (Q < ZERO) THEN
+            ELSEIF (Q < DZERO) THEN
                !
                !7 - -----CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
                IF (ETDEMANDFLAG > 0) THEN
@@ -2453,7 +2458,7 @@
             !
             !9 - -----SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
             !
-            SUP = ZERO
+            SUP = DZERO
             DO I = 1, NUMSEGS(L)  ! need to test when multiple segs supported by single well
                J = DIVERSIONSEG(I, L)
                SUP = SUP - Qp
@@ -2492,15 +2497,15 @@
                irr = IRRROW_SW(icount, istsg)
                icc = IRRCOL_SW(icount, istsg)
                dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-               if (dvt < zero) dvt = 0.0D0
+               if (dvt < dzero) dvt = dzero
                dvt = dvt/(DELR(icc)*DELC(irr))
                DIVERSIONIRRUZF(icc, irr) = DIVERSIONIRRUZF(icc, irr) +
-     +                        SNGL( dvt*(1.0D0 - DVEFF(ICOUNT, istsg)) )
+     +                        SNGL( dvt*(done - DVEFF(ICOUNT, istsg)) )
             END DO
          ELSE
             DO icount = 1, DVRCH(istsg)
                dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT, istsg)
-               dvt = (1.0D0 - DVEFF(ICOUNT, istsg))*dvt
+               dvt = (done - DVEFF(ICOUNT, istsg))*dvt
          ! Keep irrigation for PRMS as volume
                DIVERSIONIRRPRMS(icount, istsg) = 
      +         DIVERSIONIRRPRMS(icount, istsg) + SNGL( dvt )
@@ -2553,7 +2558,7 @@
       DOUBLE PRECISION :: RATIN, RATOUT, ZERO, DVT, RIN, ROUT
       DOUBLE PRECISION :: SUP, SUBVOL, RATINAG, RATOUTAG, AREA
       DOUBLE PRECISION :: QSW, QSWIRR, QWELL, QWELLIRR, QWELLET
-      DOUBLE PRECISION :: QSWGL, DONE, QPOND, QPONDIRR
+      DOUBLE PRECISION :: QSWGL, QPOND, QPONDIRR
       REAL :: Q, TIME, QIRR, BUDPERC, RIN_SNGL, ROUT_SNGL
       INTEGER :: NWELLSTEMP, L, I, J, ISTSG, ICOUNT, IL !, ID
       INTEGER :: IC, IR, IBDLBL, IW1, IHRU, K, IPC
@@ -2564,7 +2569,6 @@
       INTRINSIC :: INT, SNGL
       DOUBLE PRECISION :: SMOOTHQ, bbot, ttop, hh
       DOUBLE PRECISION :: Qp, QQ, Qsave, dQp
-      DOUBLE PRECISION :: DONENEG
       DATA TEXT1/'           AG WELLS'/
       DATA TEXT2/'  DIVERSION SEGMENTS'/
       DATA TEXT13/'   IRRIGATION PONDS'/
@@ -2582,30 +2586,24 @@
       DATA TEXT11/'CROP CONSUMPTION GW'/
       DATA TEXT12/'CROP CONSUMPTION POND'/
       ! - -----------------------------------------------------------------
-      ZERO = 0.0D0
-      DONE = 1.0D0
-      DONENEG = -1.0D0
-      RATIN = ZERO
-      RATOUT = ZERO
-      RATINAG = ZERO
-      RATOUTAG = ZERO
-      QSW = ZERO
-      QSWIRR = ZERO
-      QSWGL = ZERO
-      QWELLIRR = ZERO
-      QWELLET = ZERO
-      QWELL = ZERO
-      QIRR = 0.0
-      QPOND = 0.0
-      QPONDIRR = 0.0
-      SUPSEG = 0.0
-!      TOTWELLCELLS = 0
-!      TOTDIVERSIONCELLS = 0
-!      TOTPONDCELLS = 0
+      RATIN = DZERO
+      RATOUT = DZERO
+      RATINAG = DZERO
+      RATOUTAG = DZERO
+      QSW = DZERO
+      QSWIRR = DZERO
+      QSWGL = DZERO
+      QWELLIRR = DZERO
+      QWELLET = DZERO
+      QWELL = DZERO
+      QIRR = DZERO
+      QPOND = DZERO
+      QPONDIRR = DZERO
+      SUPSEG = DZERO
       TIME = TOTIM
-      ACTUAL = 0.0
-      ACTUALOLD = 0.0
-      SUP = ZERO
+      ACTUAL = DZERO
+      ACTUALOLD = DZERO
+      SUP = DZERO
       MSUMAG = 1
       IBD1 = 0
       IBD2 = 0
@@ -2614,7 +2612,7 @@
       IBD5 = 0
       IBD6 = 0
       IBD7 = 0
-      Qp = 1.0
+      Qp = DONE
       NWELLSTEMP = NWELLS
       IBDLBL = 0
       iw1 = 1
@@ -2653,7 +2651,7 @@
       DO 50 IL = 1, NLAY
       DO 50 IR = 1, NROW
       DO 50 IC = 1, NCOL
-      BUFF(IC, IR, IL) = 0.0
+      BUFF(IC, IR, IL) = SZERO
 50    CONTINUE
       !
       !
@@ -2714,7 +2712,7 @@
             END IF
             QQ = Q
             !8 - -----SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
-            SUP = ZERO
+            SUP = DZERO
             DO I = 1, NUMSEGS(L)
                J = DIVERSIONSEG(I, L)
                SUP = SUP - Q
@@ -2725,7 +2723,7 @@
             !9 - -----CALCULATE IRRIGATION FROM WELLS
             IF (NUMCELLS(L) > 0) QWELL = QWELL + QQ
             DO I = 1, NUMCELLS(L)
-               SUBVOL = -(1.0 - IRRFACT(I, L))*QQ*IRRFIELDFACT(I, L)
+               SUBVOL = -(DONE - IRRFACT(I, L))*QQ*IRRFIELDFACT(I, L)
                QWELLIRR = QWELLIRR + SUBVOL
                QWELLET = QWELLET - IRRFACT(I, L)*QQ*IRRFIELDFACT(I, L)
             END DO
@@ -2894,7 +2892,7 @@
       !
       !18 - ------SW DIVERSIONS
       RIN = QSW
-      ROUT = ZERO
+      ROUT = DZERO
       RIN_SNGL = SNGL(RIN)
       ROUT_SNGL = SNGL(ROUT)
       VBVLAG(3, MSUMAG) = RIN_SNGL
@@ -2904,12 +2902,12 @@
       VBNMAG(MSUMAG) = TEXT2
       MSUMAG = MSUMAG + 1
       !19 - ------POND RELEASES
-      QPOND = ZERO
+      QPOND = DZERO
       DO L = 1, NUMIRRPOND
         QPOND = QPOND + PONDFLOW(L)
       END DO
       RIN = QPOND
-      QPOND = ZERO
+      QPOND = DZERO
       !19b ------POND IRRIGATION
       DO L = 1, NUMIRRPOND
         K = NUMCELLSPOND(L)
@@ -2929,7 +2927,7 @@
       MSUMAG = MSUMAG + 1
       !
       !18 - ------GW IRRIGATION
-      RIN = ZERO
+      RIN = DZERO
       ROUT = QWELLIRR
       RIN_SNGL = SNGL(RIN)
       ROUT_SNGL = SNGL(ROUT)
@@ -2941,7 +2939,7 @@
       MSUMAG = MSUMAG + 1
       !
       !18 - ------SW IRRIGATION
-      RIN = ZERO
+      RIN = DZERO
       ROUT = QSWIRR
       RIN_SNGL = SNGL(RIN)
       ROUT_SNGL = SNGL(ROUT)
@@ -2953,7 +2951,7 @@
       MSUMAG = MSUMAG + 1
       !
       !18 - ------GW EFFICIENCY ET
-      RIN = ZERO
+      RIN = DZERO
       ROUT = QWELLET
       RIN_SNGL = SNGL(RIN)
       ROUT_SNGL = SNGL(ROUT)
@@ -2965,12 +2963,12 @@
       MSUMAG = MSUMAG + 1
       !
       !18 - ------SW EFFICIENCY(GAINS/LOSSES)
-      IF (QSWGL > ZERO) THEN
-         RIN = ZERO
+      IF (QSWGL > DZERO) THEN
+         RIN = DZERO
          ROUT = QSWGL
       ELSE
-         RIN = -DONE*QSWGL
-         ROUT = ZERO
+         RIN = DONENEG*QSWGL
+         ROUT = DZERO
       END IF
       RIN_SNGL = SNGL(RIN)
       ROUT_SNGL = SNGL(ROUT)
@@ -3022,18 +3020,14 @@
       integer, intent(inout) :: agconverge
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet
-      double precision :: zerod7, done, dzero, pettotal,
-     +                    aettotal, aetold, aetnew, etdif, 
-     +                    ettest, supold, sup, sumvks
+      double precision :: pettotal, aettotal, aetold, aetnew, 
+     +                    etdif, ettest, supold, sup, sumvks
 !      real :: fmaxflow
       integer :: k, iseg, ic, ir, i
       external :: set_factor
       double precision :: set_factor
 ! ---------------------------------------------------------------------
 !
-      zerod7 = 1.0d-7
-      done = 1.0d0
-      dzero = 0.0d0
       etdif = dzero
       ettest = dzero
       supold = dzero
@@ -3119,22 +3113,14 @@
       integer, intent(inout) :: agconverge
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, uzet
-      double precision :: zerod7, done, dzero, pettotal,
-     +                    aettotal, prms_inch2mf_q,
-     +                    aetold, supold, sup, dtwo, zerod2 !, etdif
-      real :: sone
+      double precision :: pettotal,aettotal, prms_inch2mf_q,
+     +                    aetold, supold, sup
       integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
       double precision :: set_factor, etdif
       INTRINSIC :: ABS
 ! --------------------------------------------------
 !
-      zerod7 = 1.0d-7
-      zerod2 = 1.0d-2
-      done = 1.0d0
-      sone = 1.0e0
-      dtwo = 2.0d0
-      dzero = 0.0d0
       prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       !
       !1 - -----loop over diversion segments that supply irrigation
@@ -3191,7 +3177,7 @@
 !        If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
 !        IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
-        if(iseg==19)then
+        if(iseg==18)then
       etdif = pettotal - aettotal
           write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),
      +                 SUPACT(iseg),etdif,RMSESW(ISEG),zerod2*pettotal,
@@ -3224,19 +3210,15 @@
       integer, intent(inout) :: agconverge
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet
-      double precision :: zerod7, done, dzero, pettotal,
-     +                    aettotal, prms_inch2mf_q,
-     +                    aetold, supold, sup, etdif, zerod2,
-     +                    dtwo
-!      real :: fmaxflow
-      real :: demand_inch_acres, sone
+      double precision :: pettotal,aettotal, prms_inch2mf_q,
+     +                    aetold, supold, sup, etdif
+      real :: demand_inch_acres
       integer :: k, ipond, hru_id, i
       external :: set_factor
       double precision :: set_factor, Q, saveflow
 ! --------------------------------------------------
 !     check if there are active irrigation ponds for this stress period.
 !
-      DZERO = 0.0D0
       if ( NUMIRRPONDSP == 0 ) THEN
           PONDFLOW = DZERO
           PETPOND = DZERO
@@ -3244,12 +3226,6 @@
           AETITERPOND = DZERO
           return
       end if
-      zerod7 = 1.0d-7
-      zerod2 = 1.0d-2
-      dtwo = 2.0d0
-      done = 1.0d0
-      sone = 1.0e0
-      dzero = 0.0d0
       prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       !
       !1 - -----loop over HRUs with ponds that supply irrigation
@@ -3337,7 +3313,7 @@
       integer, intent(in) :: kper, kstp, kiter
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, uzet
-      double precision :: zerod30, done, dzero, prms_inch2mf_q
+      double precision :: prms_inch2mf_q
       double precision, allocatable, dimension(:) :: petseg, aetseg
 !      real :: fmaxflow
       integer :: k, iseg, hru_id, i, ic, ir, icell, irow, icol
@@ -3345,9 +3321,6 @@
 !
       if ( NUMIRRDIVERSIONSP == 0 ) return
       allocate (petseg(NSS), aetseg(NSS))
-      zerod30 = 1.0d-30
-      done = 1.0d0
-      dzero = 0.0d0
       aetseg = dzero
       petseg = dzero
       prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
@@ -3400,14 +3373,6 @@
          end if
          if (TIMEINPERIODSEG(ISEG) - DELT < IRRPERIODSEG(ISEG))
      +                              SEG(2, iseg) = DEMAND(iseg)
-         !
-         !1 - -----limit diversion to supply
-         !
-!         k = IDIVAR(1, ISEG)
-!         fmaxflow = STRM(9, LASTREACH(K))
-        !fmaxflow = demand(ISEG)
-        !If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
-        ! IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
 300    continue
        deallocate (petseg, aetseg)
        return
@@ -3435,19 +3400,14 @@
       integer, intent(in) :: kper, kstp, kiter, l
       DOUBLE PRECISION, INTENT(INOUT) :: Q
       !dummy
-      DOUBLE PRECISION :: factor, area, doneneg, prms_inch2mf_q
-      DOUBLE PRECISION :: zerod30, done, dzero, pettotal
-      DOUBLE PRECISION :: aettotal, uzet, zerod7, aet, pet
+      DOUBLE PRECISION :: factor, area, prms_inch2mf_q
+      DOUBLE PRECISION :: pettotal
+      DOUBLE PRECISION :: aettotal, uzet, aet, pet
       integer :: hru_id, i, ic, ir, icell, irow, icol
 ! --------------------------------------------
 !
-      dzero = 0.0d0
       demandtrigger_gw = dzero
       if ( NUMCELLS(L) == 0 ) return
-      zerod30 = 1.0d-30
-      zerod7 = 1.0d-7
-      done = 1.0d0
-      doneneg = -1.0d0
       pettotal = dzero
       aettotal = dzero
       aet = dzero
@@ -3485,7 +3445,7 @@
       if (TIMEINPERIODWELL(L) > IRRPERIODWELL(L)) then
           if (factor <= TRIGGERPERIODWELL(L)) then
               demandtrigger_gw = Q
-              TIMEINPERIODWELL(L) = 0.0
+              TIMEINPERIODWELL(L) = SZERO
           end if
       end if
       if (TIMEINPERIODWELL(L) - DELT < IRRPERIODWELL(L))
@@ -3511,20 +3471,13 @@
       real, intent(in) :: time
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet
-      double precision :: zerod30, done, dzero, doneneg,
-     +                    aetold, supold, sup, pettotal, 
+      double precision :: aetold, supold, sup, pettotal, 
      +                    aettotal, sumvks
-      double precision :: zerod7
       integer :: ic, ir, i
       external :: set_factor
       double precision :: set_factor
 ! --------------------------------------
 !
-      zerod30 = 1.0d-30
-      zerod7 = 1.0d-7
-      done = 1.0d0
-      doneneg = -1.0d0
-      dzero = 0.0d0
       pettotal = DZERO
       aettotal = DZERO
       demandgw_uzf = DZERO
@@ -3548,8 +3501,10 @@
       factor = set_factor(l, aetold, pettotal, aettotal, sup, supold,
      +                    kper, kstp, kiter)
       QONLYOLD(l) = QONLY(l)
+      RMSEGW(L) = SQRT((aetold - aettotal)**dtwo)
+      IF ( RMSEGW(L) > zerod2*pettotal ) AGCONVERGE = 0
       AETITERGW(l) = sngl(aettotal)
-      QONLY(L) = QONLY(L) + sngl(factor)
+      QONLY(L) = QONLY(L) + (sone - SNGL(AGCONVERGE))*SNGL(factor)
       if (QONLY(L) > sumvks) then
          QONLY(L) = sngl(sumvks)
       end if
@@ -3581,17 +3536,11 @@
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, prms_inch2mf_q,
      +                    aetold, supold, sup, aettotal, pettotal
-      double precision :: done, dzero, doneneg, dtwo, zerod2
       integer :: i, hru_id, icell, irow, icol 
       external :: set_factor
       double precision :: set_factor, uzet
 ! --------------------------------------
 !
-      dzero = 0.0d0
-      zerod2 = 1.0d-2
-      done = 1.0d0
-      dtwo = 2.0d0
-      doneneg = -1.0d0
       demandgw_prms = DZERO
       pettotal = DZERO
       aettotal = DZERO
@@ -3621,9 +3570,9 @@
      +                    kper, kstp, kiter)
       QONLYOLD(l) = QONLY(L)
       RMSEGW(L) = SQRT((aetold - aettotal)**dtwo)
-      IF ( RMSEGW(L) > zerod2*pettotal )AGCONVERGE = 0
+      IF ( RMSEGW(L) > zerod2*pettotal ) AGCONVERGE = 0
       AETITERGW(l) = sngl(aettotal)
-      QONLY(L) = QONLY(L) + sngl(factor)
+      QONLY(L) = QONLY(L) + (sone - SNGL(AGCONVERGE))*SNGL(factor)
       if (QONLY(L) < 0.0) QONLY(L) = 0.0
       demandgw_prms = doneneg*QONLY(L)
       end function demandgw_prms
@@ -3644,11 +3593,9 @@
      +                                sup, supold
       integer, intent(in) :: l, kper, kstp, kiter
       !dummy
-      DOUBLE PRECISION :: factor, zerod5, dzero, etdif, det, dq
+      DOUBLE PRECISION :: factor, etdif, det, dq
 ! -----------------------------------------
 !
-      dzero = 0.0d0
-      zerod5 = 1.0d-5
       set_factor = dzero
       factor = dzero
       etdif = pettotal - aettotal
@@ -3695,24 +3642,23 @@
       REAL, INTENT(IN) :: TOTIM
       !dummy
       DOUBLE PRECISION :: area, uzet, aet, pet, aettot, pettot, sub
-      DOUBLE PRECISION :: Q, QQ, QQQ, DVT, prms_inch2mf_q, done
+      DOUBLE PRECISION :: Q, QQ, QQQ, DVT, prms_inch2mf_q
       integer :: k, iseg, ic, ir, i, l, UNIT, J, hru_id
       integer :: icell, irow, icol
 ! --------------------------------------
 !
       !
-      aettot = 0.0
-      pettot = 0.0
-      prms_inch2mf_q = 0.0
-      done = 1.0d0
-      sub = 0.0
+      aettot = DZERO
+      pettot = DZERO
+      prms_inch2mf_q = DZERO
+      sub = DZERO
                       
       !
       ! - -------OUTPUT TIME SERIES FOR SEGMENTS DIVERSIONS
       !
-      Q = 0.0
-      QQ = 0.0
-      QQQ = 0.0
+      Q = DZERO
+      QQ = DZERO
+      QQQ = DZERO
       IF (TSACTIVESW) THEN
          DO I = 1, NUMSW
             UNIT = TSSWUNIT(I)
@@ -3727,9 +3673,9 @@
       !
       ! - -------OUTPUT TIME SERIES FOR INFLOWS AND OUTFLOWS TO PONDS
       !
-      Q = 0.0
-      QQ = 0.0
-      QQQ = 0.0
+      Q = DZERO
+      QQ = DZERO
+      QQQ = DZERO
       IF (TSACTIVEPOND) THEN
          DO j = 1, NUMPOND
             k = TSPONDNUM(j)
@@ -3752,9 +3698,9 @@
       ! - ----Output time series of ET irrigated by ponds
       ! - ----Total ET for all cells irrigated by each pond
       !
-      Q = 0.0
-      QQ = 0.0
-      QQQ = 0.0
+      Q = DZERO
+      QQ = DZERO
+      QQQ = DZERO
       if (TSACTIVEPONDET) then
         do j = 1, NUMPONDET
           k = TSPONDETNUM(j)
@@ -3763,7 +3709,7 @@
              if ( hru_id == k ) then
                Q = PETPOND(i)
                QQ = AETITERPOND(i)
-               QQQ = 0.0
+               QQQ = DZERO
                unit = TSPONDETUNIT(j)
                CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
      +                         Q, QQ, QQQ)
@@ -3774,9 +3720,9 @@
             !
       ! - -------OUTPUT TIME SERIES FOR INFLOWS AND OUTFLOWS TO PONDS
       !
-      Q = 0.0
-      QQ = 0.0
-      QQQ = 0.0
+      Q = DZERO
+      QQ = DZERO
+      QQQ = DZERO
       IF (TSACTIVEALLPOND) THEN
          UNIT = TSPONDALLUNIT
          DO i = 1, NUMIRRPOND
@@ -3786,7 +3732,7 @@
            hru_id = IRRPONDVAR(I)
            if ( Agriculture_dprst_flag == 1 ) then
              sub = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
-             if ( sub < 0.0 ) sub = 0.0
+             if ( sub < DZERO ) sub = DZERO
              QQQ = QQQ + sub
            end if
          END DO
@@ -3798,16 +3744,16 @@
       ! - ----Output time series of ET irrigated by ponds
       ! - ----Total ET for all cells irrigated by each pond
       !
-      Q = 0.0
-      QQ = 0.0
-      QQQ = 0.0
+      Q = DZERO
+      QQ = DZERO
+      QQQ = DZERO
       if (TSACTIVEALLPONDET) then
         unit = TSPONDETALLUNIT
         hru_id = 0  !dummy value for all ponds
         do i = 1, NUMIRRPOND
           Q = Q + PETPOND(i)
           QQ = QQ + AETITERPOND(i)
-          QQQ = 0.0
+          QQQ = DZERO
         end do
         CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
      +                         Q, QQ, QQQ)
@@ -3817,14 +3763,14 @@
       ! - ----Output time series of ET irrigated by diversions
       ! - ----Total ET for all cells irrigated by each diversion
       !
-      Q = 0.0
-      QQ = 0.0
-      QQQ = 0.0
+      Q = DZERO
+      QQ = DZERO
+      QQQ = DZERO
       if (TSACTIVESWET) then
          prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
          do I = 1, NUMSWET
-            aettot = 0.0
-            pettot = 0.0
+            aettot = DZERO
+            pettot = DZERO
             UNIT = TSSWETUNIT(I)
             iseg = TSSWETNUM(I)
             do k = 1, DVRCH(iseg)  !cells per segement
@@ -3859,7 +3805,7 @@
             end do
             Q = pettot
             QQ = aettot
-            QQQ = 0.0
+            QQQ = DZERO
             CALL timeseries(unit, Kkper, Kkstp, TOTIM, iseg,
      +                      Q, QQ, QQQ)
          end do
@@ -3867,9 +3813,9 @@
       !
       ! - -------OUTPUT TIME SERIES FOR WELL
       !
-      Q = 0.0
-      QQ = 0.0
-      QQQ = 0.0
+      Q = DZERO
+      QQ = DZERO
+      QQQ = DZERO
       DO L = 1, NWELLS
          IF (TSACTIVEGW) THEN
             DO I = 1, NUMGW
@@ -3886,16 +3832,16 @@
          !
          ! - ----Total ET for all cells irrigated by each well
          !
-         Q = 0.0
-         QQ = 0.0
-         QQQ = 0.0
-         aettot = 0.0
-         pettot = 0.0
+         Q = DZERO
+         QQ = DZERO
+         QQQ = DZERO
+         aettot = DZERO
+         pettot = DZERO
          IF (TSACTIVEGWET) THEN
             prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
             DO I = 1, NUMGWET
-               pettot = 0.0
-               aettot = 0.0
+               pettot = DZERO
+               aettot = DZERO
                IF (TSGWETNUM(I) == L) THEN
                   UNIT = TSGWETUNIT(I)
                   do J = 1, NUMCELLS(L)
@@ -3930,7 +3876,7 @@
      +                           QQ*IRRFIELDFACT(J, L)
                      END IF
                   end do
-                  QQQ = 0.0
+                  QQQ = DZERO
                   QQ = aettot
                   Q = pettot
                   CALL timeseries(unit, Kkper, Kkstp, TOTIM, L,
@@ -3942,11 +3888,11 @@
       !
       ! - ------TOTAL ET FOR ALL WELLS USED FOR IRRIGATION
       !
-      Q = 0.0
-      QQ = 0.0
-      QQQ = 0.0
-      aettot = 0.0
-      pettot = 0.0
+      Q = DZERO
+      QQ = DZERO
+      QQQ = DZERO
+      aettot = DZERO
+      pettot = DZERO
       IF (TSGWETALLUNIT > 0) THEN
          prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
          DO L = 1, NWELLS
@@ -3984,7 +3930,7 @@
          END DO
          QQ = aettot
          Q = pettot
-         QQQ = 0.0
+         QQQ = DZERO
          J = 0
          CALL timeseries(unit, Kkper, Kkstp, TOTIM, J,
      +                   Q, QQ, QQQ)
@@ -3992,18 +3938,18 @@
       !
       !----TOTAL GW USED BY ALL WELLS FOR IRRIGATION
       !
-      Q = 0.0
-      QQ = 0.0
-      QQQ = 0.0
+      Q = DZERO
+      QQ = DZERO
+      QQQ = DZERO
       IF (TSGWALLUNIT > 0) THEN
-         Q = 0.0
-         QQ = 0.0
+         Q = DZERO
+         QQ = DZERO
          J = 0
          DO L = 1, NWELLS
             UNIT = TSGWALLUNIT
             Q = Q + QONLY(L)
-            QQ = -1.0*WELL(NWELVL, L) + QQ
-            QQQ = 0.0
+            QQ = DONENEG*WELL(NWELVL, L) + QQ
+            QQQ = DZERO
          END DO
          CALL timeseries(unit, Kkper, Kkstp, TOTIM, J,
      +                   Q, QQ, QQQ)
@@ -4038,7 +3984,7 @@
 ! SMOOTHLY REDUCES PUMPING TO ZERO FOR DEWATERED CONDITIONS
 !******************************************************************
 ! h is the depth
-      USE GWFAGMODULE, ONLY: PSIRAMP
+      USE GWFAGMODULE
       IMPLICIT NONE
       DOUBLE PRECISION s, aa, bb, x
       DOUBLE PRECISION cof1, cof2, cof3, Qp
@@ -4046,7 +3992,7 @@
       DOUBLE PRECISION, INTENT(IN) :: T
       DOUBLE PRECISION, INTENT(IN) :: B
       DOUBLE PRECISION, INTENT(OUT) :: dQ
-      smoothQ = 0.0D0
+      smoothQ = DZERO
       s = PSIRAMP
       s = s*(T - B)   ! puming rate begins to be ramped down.
       x = (H - B)
@@ -4057,12 +4003,12 @@
       cof3 = 3.0D0/(s**2.0D0)
       Qp = cof1*(cof2 + cof3)
       dQ = (aa*x**2.0D0 - bb*x)
-      IF (x .LT. 0.0D0) THEN
-         Qp = 0.0D0
-         dQ = 0.0D0
+      IF (x .LT. DZERO) THEN
+         Qp = DZERO
+         dQ = DZERO
       ELSEIF (x - s .GT. -1.0e-14) THEN
-         Qp = 1.0D0
-         dQ = 0.0D0
+         Qp = DONE
+         dQ = DZERO
       END IF
       smoothQ = Qp
       END FUNCTION smoothQ
@@ -4078,28 +4024,26 @@
       IMPLICIT NONE
       !ARGUMENTS
       REAL, INTENT(IN):: TIME
-      REAL CLOSEZERO
       REAL FLOW, TIMEBEG, TIMEND, TIMESTART, SUMFLOW, TOLF2
       INTEGER IEND, ISTM1, ISTART, iflg, NVAL, I
       REAL :: TABTIME(NVAL), TABRATE(NVAL)
       TOLF2 = 1.0E-4
-      CLOSEZERO = 1.0E-15
-      FLOW = 0.0
+      FLOW = DZERO
       IFLG = 0
-      SUMFLOW = 0.0
+      SUMFLOW = DZERO
       I = 1
       TIMEBEG = TIME - DELT
-      IF (TIMEBEG - TABTIME(1) .LT. 0.0) THEN
+      IF (TIMEBEG - TABTIME(1) .LT. DZERO) THEN
          RATETERPQ = TABRATE(1)
-      ELSEIF (TIMEBEG - TABTIME(NVAL) .GE. 0.0) THEN
+      ELSEIF (TIMEBEG - TABTIME(NVAL) .GE. DZERO) THEN
          RATETERPQ = TABRATE(NVAL)
       ELSE
          ! Find table value before beginning of time step.
          DO WHILE (I .LE. NVAL - 1)
-            IF (TIMEBEG - TABTIME(I) .LE. CLOSEZERO) THEN
+            IF (TIMEBEG - TABTIME(I) .LE. NEARZERO) THEN
                EXIT
             ELSEIF (TIMEBEG - TABTIME(I + 1) .LE. 
-     +              CLOSEZERO) THEN
+     +              NEARZERO) THEN
                EXIT
             ELSE
                I = I + 1
@@ -4110,7 +4054,7 @@
          IF (I .GT. 1) ISTM1 = ISTM1 - 1
          ! Find table value after end of time step
          DO WHILE (I .LE. NVAL)
-            IF (TIME - TABTIME(I) .LE. 0.0) THEN
+            IF (TIME - TABTIME(I) .LE. DZERO) THEN
                EXIT
             ELSE
                I = I + 1
@@ -4121,8 +4065,8 @@
          DO I = ISTART, IEND - 1
             TIMESTART = TABTIME(I)
             TIMEND = TABTIME(I + 1)
-            IF (TIMEBEG - TIMESTART .GT. 0.0) TIMESTART = TIMEBEG
-            IF (TIME - TIMEND .LT. 0.0) TIMEND = TIME
+            IF (TIMEBEG - TIMESTART .GT. DZERO) TIMESTART = TIMEBEG
+            IF (TIME - TIMEND .LT. DZERO) TIMEND = TIME
             SUMFLOW = SUMFLOW + (TIMEND - TIMESTART)*
      +                TABRATE(I)
          END DO
