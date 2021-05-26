@@ -254,7 +254,7 @@ basinOutON_OFF
 basinOutVars
 1
 1
-6
+7
 ####
 basinOut_freq
 1
@@ -262,9 +262,10 @@ basinOut_freq
 1
 ####
 basinOutVar_names
-6
+7
 4
 basin_potet
+basin_actet
 basin_swrad
 basin_recharge
 basin_cfs
@@ -310,7 +311,7 @@ nhruOutON_OFF
 nhruOutVars
 1
 1
-4
+5
 ####
 nhruOut_freq
 1
@@ -318,16 +319,18 @@ nhruOut_freq
 5
 ####
 nhruOutVar_names
-4
+5
 4
 potet
 swrad
 tavgf
 hru_ppt
+hru_actet
 ####
 nhruOutBaseFileName
 1
 4
+../output/nhru_out_HighKc_
 ####
 agriculture_dprst_flag
 1
@@ -425,4 +428,3 @@ dispVar_plot
 7
 7
 8
-../output/nhru_out_HighKc_
