@@ -9,6 +9,7 @@
         DOUBLE PRECISION, PARAMETER :: dtwo = 2.0d0
         DOUBLE PRECISION, PARAMETER :: doneneg = -1.0d0
         DOUBLE PRECISION, PARAMETER :: zerod2 = 1.0d-2
+        DOUBLE PRECISION, PARAMETER :: zerod3 = 1.0d-3
         DOUBLE PRECISION, PARAMETER :: dzero = 0.0d0
         INTEGER, SAVE, POINTER :: NWELLS, MXWELL, NWELVL, NPWEL, IPRWEL
         INTEGER, SAVE, POINTER :: MXPOND
@@ -3157,7 +3158,7 @@
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
      +           supold, kper, kstp, kiter)
         RMSESW(ISEG) = SQRT((aetold - aettotal)**dtwo)
-        IF ( RMSESW(ISEG) > zerod2*pettotal ) AGCONVERGE = 0
+        IF ( RMSESW(ISEG) > zerod3*pettotal ) AGCONVERGE = 0
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + 
@@ -3172,12 +3173,8 @@
         !
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
-!        fmaxflow = STRM(9, LASTREACH(K))
-!        fmaxflow = demand(ISEG)
-!        If ( kiter > 1 ) fmaxflow = DVRSFLW(iseg)
-!        IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
-        if(iseg==18)then
+        if(iseg==19)then
       etdif = pettotal - aettotal
           write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),
      +                 SUPACT(iseg),etdif,RMSESW(ISEG),zerod2*pettotal,
