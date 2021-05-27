@@ -1374,7 +1374,7 @@
             ag_on_flag = ACTIVE
             agfrac = Ag_frac(i)
             ag_watermaxin = Infil_ag(i)
-            print *, i, ag_area(i), ag_frac(i)
+!            print *, i, ag_area(i), ag_frac(i)
           ENDIF
         ENDIF
 
