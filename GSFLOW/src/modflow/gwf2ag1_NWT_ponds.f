@@ -3162,7 +3162,6 @@
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + 
      +                 (sone - SNGL(AGCONVERGE))*SNGL(factor)
-!        if (SUPACT(iseg) < 0.0) SUPACT(iseg) = 0.0
         !
         !1 - -----set diversion to demand
         !
@@ -3173,13 +3172,13 @@
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
-        if(iseg==19)then
-      etdif = pettotal - aettotal
-          write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),
-     +                 SUPACT(iseg),etdif,RMSESW(ISEG),zerod2*pettotal,
-     +                 AGCONVERGE
-        endif
-  33  format(4i5,5e20.10,i5)
+  !      if(iseg==19)then
+  !      etdif = pettotal - aettotal
+  !        write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),
+  !   +                 SUPACT(iseg),etdif,RMSESW(ISEG),zerod2*pettotal,
+  !   +                 AGCONVERGE
+  !      endif
+  !33  format(4i5,5e20.10,i5)
 300   continue
       return
       end subroutine demandconjunctive_prms
@@ -3275,13 +3274,13 @@
      +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
         PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
-        if(i==1)then
-      etdif = pettotal - aettotal
-          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
-     +                 pettotal,aettotal,etdif,
-     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
-        endif
-  33  format(4i5,6e20.10)
+  !      if(i==1)then
+  !    etdif = pettotal - aettotal
+  !        write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
+  !   +                 pettotal,aettotal,etdif,
+  !   +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
+  !      endif
+  !33  format(4i5,6e20.10)
 300   continue
       return
       end subroutine demandpond_prms
