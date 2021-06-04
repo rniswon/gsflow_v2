@@ -562,7 +562,7 @@
       USE GWFSFRMODULE, ONLY: SFRUZBD, STRMDELSTOR_RATE, SFRRATIN, SFRRATOUT, IRTFLG, TOTSPFLOW
       USE GWFLAKMODULE, ONLY: TOTGWIN_LAK, TOTGWOT_LAK, TOTDELSTOR_LAK, &
      &    TOTSTOR_LAK, TOTWTHDRW_LAK, TOTRUNF_LAK, TOTSURFIN_LAK, &
-     &    TOTSURFOT_LAK, TOTEVAP_LAK, TOTPPT_LAK
+     &    TOTSURFOT_LAK, TOTEVAP_LAK, TOTPPT_LAK, NLAKES, EVAPLK
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: KKITER, Nobs, Timestep, Dprst_flag, Have_lakes
       USE PRMS_OBS, ONLY: Runoff, Runoff_units
@@ -586,6 +586,7 @@
       DOUBLE PRECISION :: obsq_cfs !, obsq_cms
 !     REAL :: gw_out, basinreachlatflowm3
       DOUBLE PRECISION :: sz_bal, et, rnf, gvf, szin, szout, szdstor, hru_bal
+      INTEGER :: ILAKE
 !***********************************************************************
       gsfsumrun = 0
 
@@ -608,7 +609,10 @@
       ImpervEvap_Q = Basin_imperv_evap*Basin_convert
       CanopyEvap_Q = Basin_intcp_evap*Basin_convert
       SnowEvap_Q = Basin_snowevap*Basin_convert
-      LakeEvap_Q = Basin_lakeevap*Basin_convert
+      LakeEvap_Q = 0.0    !this should just be lake package ET
+      DO ilake = 1, NLAKES
+          LakeEvap_Q = LakeEvap_Q + EVAPLK(ilake)
+      END DO
       DprstEvap_Q = Basin_dprst_evap*Basin_convert
 !      IF ( Have_lakes==ACTIVE ) LakeEvap_Q = TOTEVAP_LAK
       ! sanity check
