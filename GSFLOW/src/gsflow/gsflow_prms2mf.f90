@@ -402,7 +402,7 @@
       USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, IGSFLOW, FINF, IUZFOPT
       USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK, NLAKES
       USE PRMS_CONSTANTS, ONLY: Active
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Dprst_flag, Ag_package_active
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Dprst_flag, Ag_package
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_area, Lake_hru_id
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Hru_actet
@@ -425,7 +425,7 @@
 !-----------------------------------------------------------------------
 ! Remove open dprst storage for irrigation
 !-----------------------------------------------------------------------
-       IF ( Ag_package_active==ACTIVE .AND. Dprst_flag==ACTIVE ) THEN
+       IF ( Ag_package==ACTIVE .AND. Dprst_flag==ACTIVE ) THEN
          IF ( NUMIRRPOND>0 ) CALL toIrr()
        ENDIF
 
@@ -570,8 +570,9 @@
       SUBROUTINE toIrr()
 
       USE GWFAGMODULE, ONLY: NUMIRRPOND, IRRPONDVAR, PONDFLOW
+      USE PRMS_MODULE, ONLY: Dprst_ag_transfer
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
-      USE GSFMODFLOW, ONLY: Dprst_ag_transfer, MFQ_to_inch_acres
+      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
       IMPLICIT NONE
       INTRINSIC :: SNGL
 ! Local Variables

@@ -15,7 +15,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2021-03-31'
+        character(len=*), parameter :: Version_climate_hru = '2021-05-27'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit, AET_unit, PET_unit, Irrigated_area_unit
         INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit
@@ -252,7 +252,7 @@
           IF ( Climate_potet_flag==ACTIVE ) CALL check_cbh_value('potet', Potet, 0.0, 50.0, missing)
           IF ( Climate_swrad_flag==ACTIVE ) CALL check_cbh_value('swrad', Swrad, 0.0, 1000.0, missing)
           IF ( Climate_transp_flag==ACTIVE ) CALL check_cbh_intvalue('transp_on', Transp_on, 0, 1, missing)
-          IF ( Climate_precip_flag==ACTIVE ) CALL check_cbh_value('hru_ppt', Hru_ppt, 0.0, 30.0, missing)
+          IF ( Climate_precip_flag==ACTIVE ) CALL check_cbh_value('hru_ppt', Hru_ppt, 0.0, 300.0, missing)
           IF ( Humidity_cbh_flag==ACTIVE ) CALL check_cbh_value('humidity_hru', Humidity_hru, 0.0, 100.0, missing)
           IF ( Albedo_cbh_flag==ACTIVE ) CALL check_cbh_value('albedo_hru', Albedo_hru, 0.0, 100.0, missing)
           IF ( Cloud_cover_cbh_flag==ACTIVE ) CALL check_cbh_value('cloud_cover_cbh', Cloud_cover_cbh, 0.0, 100.0, missing)
@@ -571,7 +571,7 @@
          ENDIF
        ENDIF
 
-       IF ( Climate_transp_flag==ACTIVE ) THEN
+        IF ( Climate_transp_flag==ACTIVE ) THEN
           IF ( control_string(Transp_day, 'transp_day')/=0 ) CALL read_error(5, 'transp_day')
           CALL find_header_end(Transp_unit, Transp_day, 'transp_day', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN

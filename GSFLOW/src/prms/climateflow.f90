@@ -80,11 +80,10 @@
       DOUBLE PRECISION, SAVE :: Basin_swale_et, Basin_perv_et, Basin_sroff
       DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor, Basin_ag_soil_moist
       REAL, SAVE, ALLOCATABLE :: Hru_actet(:), Soil_moist(:), Ag_soil_moist(:), Ag_soil_rechr(:)
-      REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:), Perv_actet(:)
+      REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_ssr(:), Ssres_in(:)
       REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:)
       REAL, SAVE, ALLOCATABLE :: Ssres_stor(:), Ssres_flow(:), Soil_rechr(:)
-      INTEGER, SAVE, ALLOCATABLE :: Soil_saturated(:)
       ! srunoff
       REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:)
       ! Surface-Depression Storage
@@ -400,16 +399,6 @@
       IF ( declvar(Soilzone_module, 'hru_actet', 'nhru', Nhru, 'real', &
      &     'Actual ET for each HRU', &
      &     'inches', Hru_actet)/=0 ) CALL read_error(3, 'hru_actet')
-
-      ALLOCATE ( Perv_actet(Nhru) )
-      IF ( declvar(Soilzone_module, 'perv_actet', 'nhru', Nhru, 'real', &
-     &     'Actual ET from the capillary reservoir of each HRU', &
-     &     'inches', Perv_actet)/=0 ) CALL read_error(3, 'perv_actet')
-
-      ALLOCATE ( Soil_saturated(Nhru) )
-      IF ( declvar(Soilzone_module, 'soil_saturated', 'nhru', Nhru, 'integer', &
-     &     'Flag set if infiltration saturates capillary reservoir (0=no, 1=yes)', &
-     &     'none', Soil_saturated)/=0 ) CALL read_error(3, 'soil_saturated')
 
       IF ( declvar(Soilzone_module, 'basin_actet', 'one', 1, 'double', &
      &     'Basin area-weighted average actual ET', &
@@ -1226,8 +1215,6 @@
       Soil_to_gw = 0.0
       Soil_to_ssr = 0.0
       Hru_actet = 0.0
-      Perv_actet = 0.0
-      Soil_saturated = OFF
       Infil = 0.0
       Sroff = 0.0
 ! initialize arrays (dimensioned Nssr)

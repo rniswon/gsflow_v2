@@ -22,16 +22,17 @@
 !***********************************************************************
       MODULE PRMS_SRUNOFF
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, NEARZERO, DNEARZERO, ACTIVE, OFF, &
-     &    DEBUG_WB, smidx_module, carea_module, LAND, LAKE, GLACIER, CASCADE_OFF, ERROR_water_use
+     &    DEBUG_WB, smidx_module, carea_module, LAND, LAKE, GLACIER, &
+     &    CASCADE_OFF, ERROR_water_use
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Print_debug, Init_vars_from_file, &
      &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, Water_use_flag, &
-     &    Frozen_flag, Inputerror_flag, Glacier_flag, Ag_frac_flag, Ag_package_active, &
+     &    Frozen_flag, Inputerror_flag, Glacier_flag, Ag_frac_flag, Ag_package, &
      &    Dprst_add_water_use, Dprst_transfer_water_use, PRMS_land_iteration_flag, Kkiter !, Parameter_check_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2021-05-18'
+      character(len=*), parameter :: Version_srunoff = '2021-05-27'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -267,7 +268,7 @@
       ENDIF
       IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
         ALLOCATE ( It0_imperv_stor(Nhru), It0_soil_moist(Nhru), It0_soil_rechr(Nhru) )
-        IF ( Ag_frac_flag==ACTIVE .AND. Ag_package_active==ACTIVE ) ALLOCATE ( It0_ag_soil_rechr(Nhru), It0_ag_soil_moist(Nhru) )
+        IF ( Ag_frac_flag==ACTIVE .AND. Ag_package==ACTIVE ) ALLOCATE ( It0_ag_soil_rechr(Nhru), It0_ag_soil_moist(Nhru) )
       ENDIF
 
       ALLOCATE ( Hortonian_flow(Nhru) )
@@ -676,7 +677,7 @@
             Dprst_vol_open = It0_dprst_vol_open
             Dprst_vol_clos = It0_dprst_vol_clos
           ENDIF
-          IF ( Ag_frac_flag==ACTIVE .AND. Ag_package_active==ACTIVE ) THEN
+          IF ( Ag_frac_flag==ACTIVE .AND. Ag_package==ACTIVE ) THEN
             Ag_soil_moist = It0_ag_soil_moist
             Ag_soil_rechr = It0_ag_soil_rechr
           ENDIF
@@ -688,7 +689,7 @@
             It0_dprst_vol_open = Dprst_vol_open
             It0_dprst_vol_clos = Dprst_vol_clos
           ENDIF
-          IF ( Ag_frac_flag==ACTIVE .AND. Ag_package_active==ACTIVE ) THEN
+          IF ( Ag_frac_flag==ACTIVE .AND. Ag_package==ACTIVE ) THEN
             It0_ag_soil_moist = Ag_soil_moist
             It0_ag_soil_rechr = Ag_soil_rechr
           ENDIF
@@ -1459,7 +1460,7 @@
      &           Dprst_sroff_hru, Dprst_seep_hru, Sro_to_dprst_perv, Sro_to_dprst_imperv, Dprst_evap_hru, &
      &           Avail_et, Net_rain, Dprst_in)
       USE PRMS_CONSTANTS, ONLY: ERROR_water_use, NEARZERO, DNEARZERO, OFF, ACTIVE ! , DEBUG_less
-      USE PRMS_MODULE, ONLY: Cascade_flag, Dprst_add_water_use, Dprst_transfer_water_use, Ag_package_active !, Print_debug
+      USE PRMS_MODULE, ONLY: Cascade_flag, Dprst_add_water_use, Dprst_transfer_water_use !, Print_debug
       USE PRMS_SRUNOFF, ONLY: Srp, Sri, Ihru, Perv_frac, Imperv_frac, Hruarea, Dprst_et_coef, &
      &    Dprst_seep_rate_open, Dprst_seep_rate_clos, Va_clos_exp, Va_open_exp, Dprst_flow_coef, &
      &    Dprst_vol_thres_open, Dprst_vol_clos_max, Dprst_insroff_hru, Upslope_hortonian, &
@@ -1472,8 +1473,6 @@
       USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv
       USE PRMS_SNOW, ONLY: Snowmelt, Pptmix_nopack, Snowcov_area
-      USE GSFMODFLOW, ONLY: Dprst_ag_gain
-      USE GWFAGMODULE, ONLY: NUMIRRPOND
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, LOG, MAX, DBLE, SNGL
@@ -1520,17 +1519,13 @@
         ENDIF
       ENDIF
 
-      IF ( Dprst_add_water_use==ACTIVE ) inflow = inflow + Dprst_gain(Ihru) / SNGL( Cfs_conv )
+      IF ( Dprst_add_water_use==ACTIVE ) THEN
+        IF ( Dprst_gain(Ihru)>0.0 ) inflow = inflow + Dprst_gain(Ihru) / SNGL( Cfs_conv )
+      ENDIF
 
       Dprst_in = 0.0D0
       IF ( Dprst_area_open_max>0.0 ) THEN
         Dprst_in = DBLE( inflow*Dprst_area_open_max ) ! inch-acres
-        IF ( Ag_package_active==ACTIVE ) THEN
-          IF ( NUMIRRPOND>0 ) THEN
-            ! dprst_ag_gain units are inch-acres
-            IF ( Dprst_ag_gain(Ihru)>0.0 ) Dprst_in = Dprst_in + Dprst_ag_gain(Ihru)
-          ENDIF
-        ENDIF
         Dprst_vol_open = Dprst_vol_open + Dprst_in
       ENDIF
 

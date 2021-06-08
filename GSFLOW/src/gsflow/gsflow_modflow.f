@@ -54,9 +54,6 @@ C-------ASSIGN VERSION NUMBER AND DATE
       PARAMETER (VERSION3='1.04.0 09/15/2016')
       PARAMETER (MFVNAM='-NWT-SWR1')
       INTEGER, SAVE :: IBDT(8)
-!   Declared Variables
-      REAL, SAVE, ALLOCATABLE :: Hru_ag_irr(:)
-      REAL, SAVE, ALLOCATABLE :: Dprst_ag_transfer(:), Dprst_ag_gain(:)
 !   Control Parameters
       INTEGER, SAVE :: Modflow_time_zero(6)
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
@@ -97,11 +94,8 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru,
-     &    Agriculture_soil_flag, Agriculture_dprst_flag
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell
       IMPLICIT NONE
-      ! Functions
-      INTEGER, EXTERNAL :: declvar
 !***********************************************************************
       gsfdecl = 0
 C
@@ -125,29 +119,6 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
         ALLOCATE ( Gvr2cell_conv(Nhrucell), Cellarea(Ngwcell) )
         ALLOCATE ( Gwc_row(Ngwcell), Gwc_col(Ngwcell) )
-        IF ( Agriculture_soil_flag==ACTIVE ) THEN
-          ALLOCATE ( Hru_ag_irr(Nhru) )
-          IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real',
-     &         'Irrigation added to soilzone from MODFLOW wells',
-     &         'inches', Hru_ag_irr)/=0 )
-     &         CALL read_error(3, 'hru_ag_irr')
-          Hru_ag_irr = 0.0
-        ENDIF
-        IF ( Agriculture_dprst_flag==ACTIVE ) THEN
-          ALLOCATE ( Dprst_ag_gain(Nhru) )
-          IF ( declvar(MODNAME, 'dprst_ag_gain', 'nhru', Nhru, 'real',
-     &         'Irrigation added to surface depression storage from'//
-     &         ' MODFLOW ponds',
-     &         'inch-acres', Dprst_ag_gain)/=0 )
-     &         CALL read_error(3, 'dprst_ag_gain')
-          Dprst_ag_gain = 0.0
-          ALLOCATE ( Dprst_ag_transfer(Nhru) )
-          IF ( declvar(MODNAME, 'dprst_ag_transfer', 'nhru',Nhru,'real',
-     &         'Surface depression storage transfer to MODFLOW cells',
-     &         'inch-acres', Dprst_ag_transfer)/=0 )
-     &         CALL read_error(3, 'dprst_ag_transfer')
-          Dprst_ag_transfer = 0.0
-        ENDIF
       ENDIF
 
       END FUNCTION gsfdecl
@@ -160,9 +131,8 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
-     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package_active
+     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -176,7 +146,6 @@ C1------USE package modules.
       EXTERNAL :: SET_STRESS_DATES, print_module, SETMFTIME
       EXTERNAL :: SETCONVFACTORS, check_gvr_cell_pct
       EXTERNAL :: gsflow_modflow_restart, set_cell_values, error_stop
-      EXTERNAL :: read_error
 ! Local Variables
       INTEGER :: MAXUNIT, NC
 C
@@ -405,9 +374,9 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
         IF(IUNIT(44).GT.0) CALL GWF2HYD7SFR7AR(IUNIT(43),IGRID)
       ENDIF
       IF(IUNIT(49).GT.0) CALL LMT8BAS7AR(INUNIT,CUNIT,IGRID)
-      Ag_package_active = OFF
+      Ag_package = OFF
       IF(IUNIT(66).GT.0) THEN
-        IF (GSFLOW_flag==ACTIVE) Ag_package_active = ACTIVE
+        IF ( GSFLOW_flag==ACTIVE ) Ag_package = ACTIVE
         CALL GWF2AG7AR(IUNIT(66),IUNIT(44),IUNIT(63))
       ENDIF
 !      IF(IUNIT(61).GT.0) THEN
@@ -424,7 +393,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       CALL print_module(MODDESC_SFR, MODNAME_SFR, Version_sfr)
       IF ( Have_lakes==ACTIVE )
      &     CALL print_module(MODDESC_LAK, MODNAME_LAK, Version_lak)
-      IF ( Ag_package_active==ACTIVE )
+      IF ( Ag_package==ACTIVE )
      &     CALL print_module(MODDESC_AG, MODNAME_AG, Version_ag)
 
       IF ( IUNIT(63)>0 ) solver = 'NWT'
@@ -495,8 +464,8 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
-     &    Init_vars_from_file, Mxsziter,
-     &    PRMS_land_iteration_flag, Process
+     &    Init_vars_from_file, Mxsziter, Glacier_flag,
+     &    PRMS_land_iteration_flag
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
 C1------USE package modules.
       USE GLOBAL
@@ -515,9 +484,10 @@ c     USE LMGMODULE
       INTEGER I
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
-      INTEGER, EXTERNAL :: soilzone, srunoff, GET_KPER
+      INTEGER, EXTERNAL :: soilzone, GET_KPER
+      INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsfclean
-      EXTERNAL :: READ_STRESS, PRMS_land_modules
+      EXTERNAL :: READ_STRESS
       INTRINSIC MIN
 ! Local Variables
       INTEGER :: retval, II, KITER, IBDRET, iss
@@ -689,9 +659,24 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ACTIVE ) THEN
-              IF ( PRMS_land_iteration_flag==2 ) THEN
-                CALL PRMS_land_modules(Process, retval)
-              ELSEIF ( PRMS_land_iteration_flag==1 ) THEN
+              IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+                retval = intcp()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'intcp', retval
+                  RETURN
+                ENDIF
+                retval = snowcomp()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'snowcomp', retval
+                  RETURN
+                ENDIF
+                IF ( Glacier_flag==ACTIVE ) THEN
+                  retval = glacr()
+                  IF ( retval/=0 ) THEN
+                    PRINT 9001, 'glacr_melt', retval
+                    RETURN
+                  ENDIF
+                ENDIF
                 retval = srunoff()
                 IF ( retval/=0 ) THEN
                   PRINT 9001, 'srunoff', retval
@@ -1426,14 +1411,14 @@ C
       USE GSFMODFLOW, ONLY: Stress_dates, KPER
       USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day
       IMPLICIT NONE
-      INTRINSIC DBLE
+      INTRINSIC DBLE, INT
       DOUBLE PRECISION, EXTERNAL :: nowjt
       INTEGER, EXTERNAL :: compute_julday
 ! Local Variables
       INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
-      now = nowjt()
+      now = INT( nowjt() )
       KPERTEST = 1
       IF ( KPER > KPERTEST ) KPERTEST = KPER
 !
@@ -1535,7 +1520,6 @@ C
         ENDIF
         Stress_dates(i+1) = Stress_dates(i) + INT( plen )
       ENDDO
-      print *, Stress_dates
  222  FORMAT ( /, 'Steady state simulation did not converge ', I0)
  223  FORMAT ( /, 'Steady state simulation successful, used ', I0,
      &         ' iterations')
@@ -1845,7 +1829,6 @@ C
      &    Acre_inches_to_mfl3, Inch_to_mfl_t, Mfl3t_to_cfs,
      &    Mfvol2inch_conv, Gvr2cell_conv, Mfq2inch_conv
       IMPLICIT NONE
-      
       EXTERNAL :: error_stop
 ! Local Variables
       REAL :: inch_to_mfl

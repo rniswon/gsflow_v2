@@ -1498,7 +1498,7 @@
       !
       !1 - ------RESET DEMAND IF IT CHANGES
       DEMAND = szero
-      TOTAL = szero
+      TOTAL = dzero
       TIME = TOTIM
       PONDSEGFLOW = szero
       DO i = 1, NUMIRRDIVERSIONSP
@@ -1510,7 +1510,7 @@
                ! contains the TABFILE values at this point.
                DEMAND(ISEG) = SEG(2, ISEG)
                IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = szero
-               TOTAL = TOTAL + DEMAND(ISEG)
+               TOTAL = TOTAL + DBLE( DEMAND(ISEG) )
             elseif (GSFLOW_flag == 1) then
             end if
             SUPACT(ISEG) = szero
@@ -1978,7 +1978,7 @@
                   READ (IN, *) IRRROW_SW(K, SGNM), idum, DVEFF(K, SGNM),
      +                         DVRPERC(K, SGNM)           
                END DO
-               totdum = szero
+               totdum = dzero
                DO K = 1, NMCL
                   IF (IRRROW_SW(K, SGNM) == 0) THEN
                      totdum = totdum + DVRPERC(NMCL, SGNM)
@@ -1994,7 +1994,7 @@
                   READ (IN, *) IRRROW_SW(K, SGNM), IRRCOL_SW(K, SGNM),
      +                        DVEFF(K, SGNM), DVRPERC(K, SGNM)
                END DO
-               totdum = szero
+               totdum = dzero
                DO K = 1, NMCL
                   IF (IRRROW_SW(K, SGNM) == 0 .OR. 
      +                IRRCOL_SW(K, SGNM) == 0) THEN
@@ -2002,7 +2002,7 @@
                      WRITE (IOUT, 9007)
                      CALL USTOP('ERROR IN STRESS PERIOD INFORMATION '//
      +                 'FOR IRR DIVERSION')
-                     IF (totdum .GT. 1.000001 .OR. totdum .LT. 0.999)
+                     IF (totdum .GT. 1.000001d0 .OR. totdum < 0.999d0)
      +                  WRITE (Iout, 9006) totdum
                   END IF
                END DO
@@ -2328,25 +2328,25 @@
       
       TIME = TOTIM
       SUP = DZERO
-      DIVERSIONIRRUZF = DZERO
-      DIVERSIONIRRPRMS = DZERO
-      WELLIRRUZF = DZERO
-      WELLIRRPRMS = DZERO
-      PONDIRRPRMS = DZERO
-      SUPFLOW = DZERO
+      DIVERSIONIRRUZF = szero
+      DIVERSIONIRRPRMS = szero
+      WELLIRRUZF = szero
+      WELLIRRPRMS = szero
+      PONDIRRPRMS = szero
+      SUPFLOW = szero
       Qp = DZERO
 !      print *, 'qp', qp, totim, zero
       Q = DZERO
       QQ = DZERO
       QSW = DZERO
       TIME = TOTIM
-      RMSESW = DZERO
-      RMSEGW = DZERO
-      RMSEPOND = DZERO
+      RMSESW = szero
+      RMSEGW = szero
+      RMSEPOND = szero
       agconverge = 1    
       DO L = 1, NUMIRRPOND
         IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
-          PONDSEGFLOW(L) = DZERO
+          PONDSEGFLOW(L) = szero
         END IF
       END DO
       !
@@ -2372,7 +2372,7 @@
       END DO
       !
       !2C - ---SET CUMULATIVE SUP PUMPING TO ZERO EACH ITERATION
-      ACTUAL = DZERO
+      ACTUAL = szero
       !
       !3 - -----SET MAX PUMPING RATE OR IRR DEMAND FOR GW.
       DO L = 1, NWELLS
@@ -2555,8 +2555,8 @@
 !     +             TEXT5, TEXT13, TEXT14, TEXT15, TEXT16
       CHARACTER*22 TEXT2, TEXT7, TEXT8, TEXT1, TEXT3, TEXT4, TEXT13
       CHARACTER*16 TEXT9
-      CHARACTER*21 TEXT10, TEXT11, TEXT12
-      DOUBLE PRECISION :: RATIN, RATOUT, ZERO, DVT, RIN, ROUT
+!      CHARACTER*21 TEXT10, TEXT11, TEXT12
+      DOUBLE PRECISION :: RATIN, RATOUT, DVT, RIN, ROUT
       DOUBLE PRECISION :: SUP, SUBVOL, RATINAG, RATOUTAG, AREA
       DOUBLE PRECISION :: QSW, QSWIRR, QWELL, QWELLIRR, QWELLET
       DOUBLE PRECISION :: QSWGL, QPOND, QPONDIRR
@@ -2583,9 +2583,9 @@
       DATA TEXT7/'    SYSTEM LOSSES SW'/
       DATA TEXT8/'    SYSTEM LOSSES GW'/
       DATA TEXT9/'       AG WELLS'/
-      DATA TEXT10/'CROP CONSUMPTION SW'/
-      DATA TEXT11/'CROP CONSUMPTION GW'/
-      DATA TEXT12/'CROP CONSUMPTION POND'/
+!      DATA TEXT10/'CROP CONSUMPTION SW'/
+!      DATA TEXT11/'CROP CONSUMPTION GW'/
+!      DATA TEXT12/'CROP CONSUMPTION POND'/
       ! - -----------------------------------------------------------------
       RATIN = DZERO
       RATOUT = DZERO
@@ -2597,13 +2597,13 @@
       QWELLIRR = DZERO
       QWELLET = DZERO
       QWELL = DZERO
-      QIRR = DZERO
+      QIRR = szero
       QPOND = DZERO
       QPONDIRR = DZERO
       SUPSEG = DZERO
       TIME = TOTIM
-      ACTUAL = DZERO
-      ACTUALOLD = DZERO
+      ACTUAL = szero
+      ACTUALOLD = szero
       SUP = DZERO
       MSUMAG = 1
       IBD1 = 0
@@ -2731,7 +2731,7 @@
             !
             !10 - -----WRITE WELLS WITH REDUCED PUMPING
             IF (Qp .LT. 0.9999D0 .AND. Iunitnwt .NE. 0 .AND.
-     +              IPRWEL .NE. 0 .and. Qsave < ZERO) THEN
+     +              IPRWEL .NE. 0 .and. Qsave < DZERO) THEN
             IF (iw1 .EQ. 1) THEN
                WRITE (IUNITRAMP, *)
                WRITE (IUNITRAMP, 300) KKPER, KKSTP
@@ -2881,7 +2881,7 @@
       !18 - -----MOVE RATES, VOLUMES&LABELS INTO ARRAYS FOR PRINTING
       ! GW PUMPING (NEGATIVE OUT OF GW)
       RIN = -QWELL
-      ROUT = ZERO
+      ROUT = DZERO
       RIN_SNGL = SNGL(RIN)
       ROUT_SNGL = SNGL(ROUT)
       VBVLAG(3, MSUMAG) = RIN_SNGL
@@ -3101,7 +3101,6 @@
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
       USE PRMS_BASIN, ONLY: Ag_area
-!      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_FLOWVARS, ONLY: hru_actet
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
@@ -3162,7 +3161,7 @@
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + 
-     +                 (sone - SNGL(AGCONVERGE))*SNGL(factor)
+     +                 (sone - REAL(AGCONVERGE))*SNGL(factor)
 !        if (SUPACT(iseg) < 0.0) SUPACT(iseg) = 0.0
         !
         !1 - -----set diversion to demand
@@ -3197,7 +3196,7 @@
       USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
-     +                      Dprst_ag_transfer, MFQ_to_inch_acres
+     +                      MFQ_to_inch_acres
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
       IMPLICIT NONE
 ! --------------------------------------------------
@@ -3208,7 +3207,7 @@
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet
       double precision :: pettotal,aettotal, prms_inch2mf_q,
-     +                    aetold, supold, sup, etdif
+     +                    aetold, supold, sup !, etdif
       real :: demand_inch_acres
       integer :: k, ipond, hru_id, i
       external :: set_factor
@@ -3258,7 +3257,7 @@
         saveflow = PONDFLOW(i)
         PONDFLOWOLD(i) = PONDFLOW(i)
         PONDFLOW(i) = PONDFLOW(i) + 
-     +                (sone - SNGL(AGCONVERGE))*SNGL(factor)
+     +                (sone - REAL(AGCONVERGE))*SNGL(factor)
         !
         !set pond inflow using demand.
         IF ( FLOWTHROUGH_POND(i) == 1 ) THEN
@@ -3297,7 +3296,6 @@
       USE GWFAGMODULE
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
       USE GWFBASMODULE, ONLY: DELT
-!      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_FLOWVARS, ONLY: hru_actet
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_BASIN, ONLY: Ag_area
@@ -3385,7 +3383,6 @@
       USE GWFAGMODULE
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
       USE GWFBASMODULE, ONLY: DELT
-!      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_FLOWVARS, ONLY: hru_actet
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id
@@ -3501,7 +3498,7 @@
       RMSEGW(L) = SQRT((aetold - aettotal)**dtwo)
       IF ( RMSEGW(L) > zerod2*pettotal ) AGCONVERGE = 0
       AETITERGW(l) = sngl(aettotal)
-      QONLY(L) = QONLY(L) + (sone - SNGL(AGCONVERGE))*SNGL(factor)
+      QONLY(L) = QONLY(L) + (sone - REAL(AGCONVERGE))*SNGL(factor)
       if (QONLY(L) > sumvks) then
          QONLY(L) = sngl(sumvks)
       end if
@@ -3521,9 +3518,10 @@
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT
 !      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE PRMS_FLOWVARS, ONLY: Soil_saturated, hru_actet
+      USE PRMS_FLOWVARS, ONLY: hru_actet
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
+      USE PRMS_SOILZONE, ONLY: Ag_soil_saturated
       IMPLICIT NONE
 ! --------------------------------------
       !modules
@@ -3547,7 +3545,7 @@
          area = Ag_area(hru_id)
          pet = potet(hru_id)*area*prms_inch2mf_q
          aet = hru_actet(hru_id)*area*prms_inch2mf_q
-         if ( Soil_saturated(hru_id) == 1 ) aet = pet
+         if ( Ag_soil_saturated(hru_id) == 1 ) aet = pet
          pettotal = pettotal + pet
          aettotal = aettotal + aet
          if ( Nhru==Nhrucell ) then
@@ -3569,7 +3567,7 @@
       RMSEGW(L) = SQRT((aetold - aettotal)**dtwo)
       IF ( RMSEGW(L) > zerod2*pettotal ) AGCONVERGE = 0
       AETITERGW(l) = sngl(aettotal)
-      QONLY(L) = QONLY(L) + (sone - SNGL(AGCONVERGE))*SNGL(factor)
+      QONLY(L) = QONLY(L) + (sone - REAL(AGCONVERGE))*SNGL(factor)
       if (QONLY(L) < 0.0) QONLY(L) = 0.0
       demandgw_prms = doneneg*QONLY(L)
       end function demandgw_prms
@@ -3625,7 +3623,6 @@
       USE GLOBAL, ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: Ag_area
-!      USE PRMS_FLOWVARS, ONLY: HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, hru_actet
       USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id,
@@ -4021,26 +4018,28 @@
       IMPLICIT NONE
       !ARGUMENTS
       REAL, INTENT(IN):: TIME
+      REAL CLOSEZERO
       REAL FLOW, TIMEBEG, TIMEND, TIMESTART, SUMFLOW, TOLF2
       INTEGER IEND, ISTM1, ISTART, iflg, NVAL, I
       REAL :: TABTIME(NVAL), TABRATE(NVAL)
       TOLF2 = 1.0E-4
-      FLOW = DZERO
+      CLOSEZERO = 1.0E-15
+      FLOW = SZERO
       IFLG = 0
-      SUMFLOW = DZERO
+      SUMFLOW = SZERO
       I = 1
       TIMEBEG = TIME - DELT
-      IF (TIMEBEG - TABTIME(1) .LT. DZERO) THEN
+      IF (TIMEBEG - TABTIME(1) .LT. SZERO) THEN
          RATETERPQ = TABRATE(1)
-      ELSEIF (TIMEBEG - TABTIME(NVAL) .GE. DZERO) THEN
+      ELSEIF (TIMEBEG - TABTIME(NVAL) .GE. SZERO) THEN
          RATETERPQ = TABRATE(NVAL)
       ELSE
          ! Find table value before beginning of time step.
          DO WHILE (I .LE. NVAL - 1)
-            IF (TIMEBEG - TABTIME(I) .LE. NEARZERO) THEN
+            IF (TIMEBEG - TABTIME(I) .LE. CLOSEZERO) THEN
                EXIT
             ELSEIF (TIMEBEG - TABTIME(I + 1) .LE. 
-     +              NEARZERO) THEN
+     +              CLOSEZERO) THEN
                EXIT
             ELSE
                I = I + 1
@@ -4051,7 +4050,7 @@
          IF (I .GT. 1) ISTM1 = ISTM1 - 1
          ! Find table value after end of time step
          DO WHILE (I .LE. NVAL)
-            IF (TIME - TABTIME(I) .LE. DZERO) THEN
+            IF (TIME - TABTIME(I) .LE. SZERO) THEN
                EXIT
             ELSE
                I = I + 1
@@ -4062,8 +4061,8 @@
          DO I = ISTART, IEND - 1
             TIMESTART = TABTIME(I)
             TIMEND = TABTIME(I + 1)
-            IF (TIMEBEG - TIMESTART .GT. DZERO) TIMESTART = TIMEBEG
-            IF (TIME - TIMEND .LT. DZERO) TIMEND = TIME
+            IF (TIMEBEG - TIMESTART .GT. SZERO) TIMESTART = TIMEBEG
+            IF (TIME - TIMEND .LT. SZERO) TIMEND = TIME
             SUMFLOW = SUMFLOW + (TIMEND - TIMESTART)*
      +                TABRATE(I)
          END DO

@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2021-05-18'
+      character(len=*), parameter :: Version_basin = '2021-05-27'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -202,13 +202,13 @@
      &     'HRU percent impervious', 'Fraction of each HRU area that is impervious', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'hru_percent_imperv')
 
-      ALLOCATE ( Ag_frac(Nhru) )
       IF ( Ag_frac_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Ag_area(Nhru) )
         IF ( declvar(MODNAME, 'ag_area', 'nhru', Nhru, 'real', &
      &       'Area of HRU that is used for agriculture', &
      &       'acres', Ag_area)/=0 ) CALL read_error(3, 'ag_area')
 
+        ALLOCATE ( Ag_frac(Nhru) )
         IF ( declparam(MODNAME, 'ag_frac', 'nhru', 'real', &
      &       '0.0', '0.0', '1.0', &
      &       'Fraction of each HRU area that has agriculture', &
@@ -310,8 +310,6 @@
       IF ( Ag_frac_flag==ACTIVE ) THEN
         IF ( getparam(MODNAME, 'ag_frac', Nhru, 'real', Ag_frac)/=0 ) CALL read_error(2, 'ag_frac')
         IF ( getparam(MODNAME, 'ag_cov_type', Nhru, 'integer', Ag_cov_type)/=0 ) CALL read_error(2, 'ag_cov_type')
-      ELSE
-        Ag_frac = 0.0
       ENDIF
 
       dprst_frac_flag = 0

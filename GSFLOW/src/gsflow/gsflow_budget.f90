@@ -269,7 +269,7 @@
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Hru_actet, Basin_sroff, &
      &    Basin_actet, Basin_ssstor, Ssres_stor, Slow_stor, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_gwflow_cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv
-!Warning, modifies Basin_soil_moist, Basin_ssstor, and Gw2sm_grav
+!Warning, modifies Basin_ssstor, and Gw2sm_grav
       USE PRMS_SOILZONE, ONLY: Pref_flow_stor, Gravity_stor_res, Hrucheck, Gvr_hru_id, &
      &    Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
       IMPLICIT NONE
@@ -701,7 +701,7 @@
      &    TOTSPFLOW, NSTRM, SFRRATIN, ISTRM
       USE PRMS_FLOWVARS, ONLY: Basin_cfs, Basin_cms, Basin_stflow_out
       USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV, ACTIVE
-      USE PRMS_MODULE, ONLY: Ag_package_active
+      USE PRMS_MODULE, ONLY: Ag_package
       USE PRMS_SET_TIME, ONLY: Cfs2inches
       USE GWFAGMODULE, ONLY:  NUMIRRDIVERSIONSP,IRRSEG
       IMPLICIT NONE
@@ -725,7 +725,7 @@
       first_reach = 1
       DO i = 1, NSS
         itemp = 0
-        IF ( Ag_package_active==ACTIVE ) THEN
+        IF ( Ag_package==ACTIVE ) THEN
           DO j = 1, NUMIRRDIVERSIONSP
             IF ( i == IRRSEG(J) ) itemp = IRRSEG(J)
           END DO

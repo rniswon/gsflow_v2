@@ -47,7 +47,7 @@ void alloc_space (void) {
    * space for the public variable pointer array
    */
 
-  max_vars = 500;
+  max_vars = 600;
   Mvarbase = (PUBVAR **) umalloc (max_vars * sizeof(PUBVAR *));
   Mnvars = 0;
 
@@ -59,7 +59,7 @@ void alloc_space (void) {
    * space for the parameter pointer  array
    */
 
-  max_params = 500;
+  max_params = 600;
   Mparambase = (PARAM **) umalloc (max_params * sizeof(PARAM *));
   Mnparams = 0;
 /*
@@ -70,7 +70,7 @@ void alloc_space (void) {
    * space for the read check data base
    */
 
-  max_read_vars = 50;
+  max_read_vars = 600;
   Mcheckbase = (READCHECK **) umalloc (max_read_vars * sizeof(READCHECK *));
   Mnreads = 0;
 

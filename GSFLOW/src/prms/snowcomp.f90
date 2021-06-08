@@ -922,7 +922,7 @@
       USE PRMS_SOLTAB, ONLY: Soltab_basinpotsw
       USE PRMS_BASIN, ONLY: Hru_area, Active_hrus, Hru_type, &
      &    Basin_area_inv, Hru_route_order, Cov_type, Elev_units
-      USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Orad, Basin_horad, Potet_sublim, &
+      USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Orad, Potet_sublim, &
      &    Hru_ppt, Prmx, Tmaxc, Tminc, Tavgc, Swrad, Potet, Transp_on, Tmax_allsnow_c
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
       USE PRMS_SET_TIME, ONLY: Jday, Nowmonth, Julwater, Nowyear
