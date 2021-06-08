@@ -1196,9 +1196,9 @@
                    ierror = .true.
                  END IF
                END DO
-               IF ( ierror )  CALL USTOP('ERROR: SEGMENT INFLOW FRACTION
-     +                     TO PONDS IS GREATER THAN ONE.
-     +                     MODEL STOPPING')
+               IF ( ierror )  CALL USTOP('ERROR: SEGMENT INFLOW'//
+     +              ' FRACTION TO PONDS IS GREATER THAN ONE.'//
+     +              ' MODEL STOPPING')
           case ('WELL LIST')
                found4 = .true.
                CHAR = CHAR1
