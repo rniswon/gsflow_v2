@@ -292,6 +292,7 @@
       ELSE
         ALLOCATE(PONDSEGFRAC(1))
       ENDIF
+      PONDSEGFRAC = 0.0
       NUMIRRPONDSP = 0
       IRRFIELDFACTPOND = szero
       IRRFACTPOND = szero

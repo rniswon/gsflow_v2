@@ -1347,11 +1347,12 @@
           Ag_soilwater_deficit(i) = ag_soil_moist_max(i) - ag_soil_moist(i)
           excess = ag_water_maxin + ag_soil_moist(i) - ag_soil_moist_max(i)
           IF ( excess>0.0 ) THEN
-            WRITE(531,333) Nowyear, Nowmonth, Nowday, i, excess, Ag_soil_moist(i), Ag_soil_moist_max(i), Ag_irrigation_add(i)
-333 format (I4, 2(', ',i3), ', ', I0, 4(', ',F0.5))
+            ag_soil_moist(i) = ag_soil_moist(i) - excess
             Ag_hortonian(i) = excess
             Sroff(i) = Sroff(i) + excess
             ag_water_maxin = ag_water_maxin - excess
+            if(ag_soil_moist(i)>ag_soil_moist_max(i)) WRITE(531,333) Nowyear, Nowmonth, Nowday, i, excess, Ag_soil_moist(i), Ag_soil_moist_max(i), Ag_irrigation_add(i)
+333 format (I4, 2(', ',i3), ', ', I0, 4(', ',F0.5))
           ENDIF
         ENDIF
         capwater_maxin = capwater_maxin + ag_water_maxin
