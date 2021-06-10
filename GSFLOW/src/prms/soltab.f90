@@ -68,8 +68,8 @@
       USE PRMS_SOLTAB
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar
-      EXTERNAL :: read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL :: read_error, print_module !, declvar_dble
 !***********************************************************************
       sthdecl = 0
 

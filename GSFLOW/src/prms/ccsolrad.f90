@@ -116,20 +116,20 @@
         CALL print_module(MODDESC, MODNAME, Version_ccsolrad)
 
         ALLOCATE ( Cloud_radadj(Nhru) )
-        CALL declvar_real(MODNAME, 'cloud_radadj', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'cloud_radadj', 'nhru', Nhru, &
      &       'Radiation adjustment for cloud cover of each HRU', &
      &       'decimal fraction', Cloud_radadj)
 
-        CALL declvar_dble(MODNAME, 'basin_radadj', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_radadj', 'one', 1, &
      &       'Basin area-weighted average radiation adjustment for cloud cover', &
      &       'decimal fraction', Basin_radadj)
 
         ALLOCATE ( Cloud_cover_hru(Nhru) )
-        CALL declvar_real(MODNAME, 'cloud_cover_hru', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'cloud_cover_hru', 'nhru', Nhru, &
      &       'Cloud cover proportion of each HRU', &
      &       'decimal fraction', Cloud_cover_hru)
 
-        CALL declvar_dble(MODNAME, 'basin_cloud_cover', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_cloud_cover', 'one', 1, &
      &       'Basin area-weighted average cloud cover proportion', &
      &       'decimal fraction', Basin_cloud_cover)
 

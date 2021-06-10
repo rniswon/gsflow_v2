@@ -2,7 +2,7 @@
 ! Read PRMS Data File
 !***********************************************************************
       MODULE PRMS_DATA_FILE
-        USE PRMS_CONSTANTS, ONLY: ERROR_read, ERROR_time, ERROR_open_in
+        USE PRMS_CONSTANTS, ONLY: ERROR_open_in, ERROR_read
         INTEGER, SAVE :: Num_datafile_types, Num_datafile_columns, Datafile_unit
         CHARACTER(LEN=16), ALLOCATABLE, SAVE :: Data_varname(:)
         INTEGER, ALLOCATABLE, SAVE :: Data_varnum(:)
@@ -11,18 +11,17 @@
       END MODULE PRMS_DATA_FILE
 
       SUBROUTINE read_prms_data_file
+      USE PRMS_CONSTANTS, ONLY: ERROR_time, ERROR_read
       USE PRMS_DATA_FILE
       USE PRMS_MODULE, ONLY: PRMS_output_unit, MAXFILE_LENGTH, EQULS, Print_debug, Starttime, Endtime
       IMPLICIT NONE
       ! Functions
       INTRINSIC LEN_TRIM, TRIM
-      EXTERNAL read_error, write_outfile, PRMS_open_input_file, find_current_time, print_module, error_stop
+      EXTERNAL read_error, write_outfile, PRMS_open_input_file, find_current_time, error_stop
       INTEGER, EXTERNAL :: control_string, numchars, check_data_values
       ! Local Variables
-        ! Local Variables
         character(len=*), parameter :: MODDESC = 'Read Data File'
         character(len=*), parameter :: MODNAME = 'read_data_file'
-        character(len=*), parameter :: Version_read_data_file = '2021-03-19'
       CHARACTER(LEN=MAXFILE_LENGTH) :: data_filename, data_line, dmy
       CHARACTER(LEN=80) :: line
       INTEGER n, ierr, ios, numchrs, length
@@ -30,8 +29,6 @@
       INTEGER endyr, endmo, enddy, endhr, endmn, endsec, num_vars
       REAL, ALLOCATABLE :: var(:)
 !***********************************************************************
-      CALL print_module(MODDESC, MODNAME, Version_read_data_file)
-
       IF ( control_string(data_filename, 'data_file')/=0 ) CALL read_error(5, 'data_file')
       CALL PRMS_open_input_file(Datafile_unit, data_filename, 'data_file', 0, ios)
       IF ( ios/=0 ) ERROR STOP ERROR_open_in
@@ -206,7 +203,7 @@
       USE PRMS_OBS, ONLY: Nlakeelev, Nwind, Nhumid, Nsnow, &
      &    Tmin, Tmax, Precip, Snowdepth, Runoff, Pan_evap, Wind_speed, Humidity, Solrad, &
      &    Gate_ht, Lake_elev, Rain_day, Runoff_units, Streamflow_cfs, Streamflow_cms
-	  USE PRMS_CLIMATEVARS, ONLY: Ppt_zero_thresh
+      USE PRMS_CLIMATEVARS, ONLY: Ppt_zero_thresh
       IMPLICIT NONE
       ! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: Varname
@@ -376,8 +373,7 @@
 !***********************************************************************
       SUBROUTINE read_data_file_line(Iret)
       USE PRMS_DATA_FILE
-      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day, Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
       ! Functions
       INTEGER, EXTERNAL :: compute_julday

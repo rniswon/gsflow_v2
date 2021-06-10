@@ -86,15 +86,15 @@
 !   Declared Variables
       IF ( Nobs>0 ) THEN
         ALLOCATE ( Runoff(Nobs) )
-        CALL declvar_real(MODNAME, 'runoff', 'nobs', Nobs, 'real', &
+        CALL declvar_real(MODNAME, 'runoff', 'nobs', Nobs, &
      &       'Streamflow at each measurement station', &
      &       'runoff_units', Runoff)
         ALLOCATE ( Streamflow_cfs(Nobs) )
-        CALL declvar_dble(MODNAME, 'streamflow_cfs', 'nobs', Nobs, 'double', &
+        CALL declvar_dble(MODNAME, 'streamflow_cfs', 'nobs', Nobs, &
      &       'Streamflow at each measurement station', &
      &       'cfs', Streamflow_cfs)
         ALLOCATE ( Streamflow_cms(Nobs) )
-        CALL declvar_dble(MODNAME, 'streamflow_cms', 'nobs', Nobs, 'double', &
+        CALL declvar_dble(MODNAME, 'streamflow_cms', 'nobs', Nobs, &
      &       'Streamflow at each measurement station', &
      &       'cms', Streamflow_cms)
         IF ( declparam(MODNAME, 'runoff_units', 'one', 'integer', &
@@ -105,25 +105,25 @@
 
       IF ( Nrain>0 ) THEN
         ALLOCATE ( Precip(Nrain) )
-        CALL declvar_real(MODNAME, 'precip', 'nrain', Nrain, 'real', &
+        CALL declvar_real(MODNAME, 'precip', 'nrain', Nrain, &
      &       'Precipitation at each measurement station', &
      &       'precip_units', Precip)
       ENDIF
 
       IF ( Ntemp>0 ) THEN
         ALLOCATE ( Tmin(Ntemp) )
-        CALL declvar_real(MODNAME, 'tmin', 'ntemp', Ntemp, 'real', &
+        CALL declvar_real(MODNAME, 'tmin', 'ntemp', Ntemp, &
      &       'Minimum air temperature at each measurement station', &
      &       'temp_units', Tmin)
         ALLOCATE ( Tmax(Ntemp) )
-        CALL declvar_real(MODNAME, 'tmax', 'ntemp', Ntemp, 'real', &
+        CALL declvar_real(MODNAME, 'tmax', 'ntemp', Ntemp, &
      &       'Maximum air temperature at each measurement station', &
      &       'temp_units', Tmax)
       ENDIF
 
       IF ( Nsol>0 ) THEN
         ALLOCATE ( Solrad(Nsol) )
-        CALL declvar_real(MODNAME, 'solrad', 'nsol', Nsol, 'real', &
+        CALL declvar_real(MODNAME, 'solrad', 'nsol', Nsol, &
      &       'Solar radiation at each measurement station', &
      &       'Langleys', Solrad)
       ENDIF
@@ -146,28 +146,28 @@
 
       IF ( Nsnow>0 ) THEN
         ALLOCATE ( Snowdepth(Nsnow) )
-        CALL declvar_real(MODNAME, 'snowdepth', 'nsnow', Nsnow, 'real', &
+        CALL declvar_real(MODNAME, 'snowdepth', 'nsnow', Nsnow, &
      &       'Snow depth at each measurement station', &
      &       'inches', Snowdepth)
       ENDIF
 
       IF ( Nevap>0 ) THEN
         ALLOCATE ( Pan_evap(Nevap) )
-        CALL declvar_real(MODNAME, 'pan_evap', 'nevap', Nevap, 'real', &
+        CALL declvar_real(MODNAME, 'pan_evap', 'nevap', Nevap, &
      &       'Pan evaporation at each measurement station', &
      &       'inches', Pan_evap)
       ENDIF
 
       IF ( Nhumid>0 ) THEN
         ALLOCATE ( Humidity(Nhumid) )
-        CALL declvar_real(MODNAME, 'humidity', 'nhumid', Nhumid, 'real', &
+        CALL declvar_real(MODNAME, 'humidity', 'nhumid', Nhumid, &
      &       'Relative humidity at each measurement station', &
      &       'percentage', Humidity)
       ENDIF
 
       IF ( Nwind>0 ) THEN
         ALLOCATE ( Wind_speed(Nwind) )
-        CALL declvar_real(MODNAME, 'wind_speed', 'nwind', Nwind, 'real', &
+        CALL declvar_real(MODNAME, 'wind_speed', 'nwind', Nwind, &
      &       'Wind speed at each measurement station', &
      &       'meters per second', Wind_speed)
       ENDIF
@@ -176,7 +176,7 @@
       Rain_flag = OFF
       IF ( Precip_flag==xyz_dist_module ) Rain_flag = ACTIVE
       IF ( Rain_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-        CALL declvar_int(MODNAME, 'rain_day', 'one', 1, 'integer', &
+        CALL declvar_int(MODNAME, 'rain_day', 'one', 1, &
      &       'Flag to set the form of any precipitation to rain (0=determine form; 1=rain)', &
      &       'none', Rain_day)
         IF ( declparam(MODNAME, 'rain_code', 'nmonths', 'integer', &
@@ -196,14 +196,14 @@
 ! Lake Variables
       IF ( Nratetbl>0 ) THEN
         ALLOCATE ( Gate_ht(Nratetbl) )
-        CALL declvar_real(MODNAME, 'gate_ht', 'nratetbl', Nratetbl, 'real', &
+        CALL declvar_real(MODNAME, 'gate_ht', 'nratetbl', Nratetbl, &
      &       'Height of the gate opening at each dam with a gate', &
      &       'inches', Gate_ht)
       ENDIF
 
       IF ( Nlakeelev>0 ) THEN
         ALLOCATE ( Lake_elev(Nlakeelev) )
-        CALL declvar_real(MODNAME, 'lake_elev', 'nlakeelev', Nlakeelev, 'real', &
+        CALL declvar_real(MODNAME, 'lake_elev', 'nlakeelev', Nlakeelev, &
      &       'Elevation of each simulated lake surface', &
      &       'feet', Lake_elev)
       ENDIF

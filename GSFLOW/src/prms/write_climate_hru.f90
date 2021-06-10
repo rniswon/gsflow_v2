@@ -6,8 +6,7 @@
       INTEGER FUNCTION write_climate_hru()
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, RUN, DECL, INIT, CLEAN, OFF, ERROR_write
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Climate_temp_flag, Climate_precip_flag, &
-     &    Climate_swrad_flag, Climate_potet_flag, Climate_transp_flag
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+     &    Climate_swrad_flag, Climate_potet_flag, Climate_transp_flag, Nowyear, Nowmonth, Nowday
       USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Tminf, Hru_ppt, Potet, Swrad, Orad, Transp_on
       IMPLICIT NONE
 ! Functions
