@@ -14,32 +14,30 @@
      &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, NsegmentOutON_OFF, &
      &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Dyn_covden_flag, Segment_transferON_OFF, Gwr_transferON_OFF, &
      &      Lake_transferON_OFF, External_transferON_OFF, Dprst_transferON_OFF, BasinOutON_OFF, &
-     &      xyFileName, mappingFileName, Dprst_transfer_water_use, Dprst_add_water_use, PRMS_land_iteration_flag, &
-     &      Agriculture_soil_flag, Agriculture_canopy_flag, AET_module, PET_ag_module, Dyn_ag_frac_flag, Model_control_file
+     &      Snarea_curve_flag, Soilzone_aet_flag, Gsflow_output_file, &
+     &      Csv_output_file, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days
         USE PRMS_CLIMATE_HRU, ONLY: AET_cbh_file, PET_cbh_file
         USE GSFMODFLOW, ONLY: Modflow_name, Modflow_time_zero
         USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, &
      &      Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day
-        USE GSFSUM, ONLY: Gsf_rpt, Rpt_days, Gsflow_output_file, Csv_output_file
         USE PRMS_MAP_RESULTS, ONLY: NmapOutVars, MapOutVar_names
-        USE PRMS_NHRU_SUMMARY, ONLY: NhruOutVars, NhruOut_freq, NhruOutBaseFileName, NhruOutVar_names, NhruOut_format, &
-     &      NhruOutNcol, OutputSelectDatesON_OFF, SelectDatesFileName
+        USE PRMS_NHRU_SUMMARY, ONLY: NhruOutVars, NhruOut_freq, NhruOutBaseFileName, NhruOutVar_names, NhruOut_format, NhruOutNcol
         USE PRMS_NSUB_SUMMARY, ONLY: NsubOutVars, NsubOut_freq, NsubOutBaseFileName, NsubOutVar_names, NsubOut_format
         USE PRMS_BASIN_SUMMARY, ONLY: BasinOutVars, BasinOut_freq, BasinOutBaseFileName, BasinOutVar_names
         USE PRMS_NSEGMENT_SUMMARY, ONLY: NsegmentOutVars, NsegmentOut_freq, NsegmentOutBaseFileName, &
      &      NsegmentOutVar_names, NsegmentOut_format
         USE PRMS_DYNAMIC_PARAM_READ, ONLY: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
      &      wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
-     &      potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, Ag_frac_dynamic, &
-     &      soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, Dynamic_param_log_file, &
+     &      potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, &
+     &      soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, &
      &      fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, snareathresh_dynamic, &
      &      covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn, Dynamic_param_log_file
-        USE PRMS_SOILZONE, ONLY: Soilzone_aet_flag
-        USE PRMS_SNOW, ONLY: Snarea_curve_flag
+        character(len=*), parameter :: MODDESC = 'Read Control File'
+        character(len=*), parameter :: MODNAME = 'read_control_file'
         USE PRMS_GLACR, ONLY: Mbinit_flag
         USE PRMS_PRECIP_MAP, ONLY: Precip_map_file
         USE PRMS_TEMP_MAP, ONLY: Tmax_map_file, Tmin_map_file
-        INTEGER, PARAMETER :: Max_num_control_parameters = 220 ! WARNING, hard coded, DANGER, DANGER
+        INTEGER, PARAMETER :: Max_num_control_parameters = 2020 ! WARNING, hard coded, DANGER, DANGER
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Data_file, Var_init_file, Stat_var_file, Ani_out_file
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Executable_desc, Executable_model, Var_save_file
         CHARACTER(LEN=MAXFILE_LENGTH) :: Control_file, Ani_output_file, Control_description
@@ -63,8 +61,8 @@
       END MODULE PRMS_CONTROL_FILE
 
       SUBROUTINE read_control_file()
-      USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH, MAXFILE_LENGTH
       USE PRMS_CONTROL_FILE
+      USE PRMS_MODULE, ONLY: Print_debug, Model_output_file, Model_control_file
       IMPLICIT NONE
       ! Functions
       INTRINSIC TRIM
@@ -128,7 +126,6 @@
 ! setup_cont - Set control parameter value defaults
 !***********************************************************************
       SUBROUTINE setup_cont()
-      USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag
       USE PRMS_CONTROL_FILE
       IMPLICIT NONE
       ! Local Variables
@@ -232,7 +229,7 @@
       Snow_cbh_flag = 0
       i = i + 1
       Control_parameter_data(i)%name = 'gwflow_cbh_flag'
-      Gwflow_cbh_flag = 0
+       Gwflow_cbh_flag = 0
       i = i + 1
       Control_parameter_data(i)%name = 'humidity_cbh_flag'
       Humidity_cbh_flag = 0
@@ -262,7 +259,7 @@
       Mbinit_flag = 0
       i = i + 1
       Control_parameter_data(i)%name = 'outputSelectDatesON_OFF'
-      OutputSelectDatesON_OFF = 0
+      outputSelectDatesON_OFF = 0
       i = i + 1
       Control_parameter_data(i)%name = 'nhruOutON_OFF'
       NhruOutON_OFF = 0
@@ -492,8 +489,13 @@
       i = i + 1
 
       ! assign default value for character parameters
+      Control_parameter_data(i)%name = 'selectDatesFileName'
+      selectDatesFileName = 'dates'
+      Control_parameter_data(i)%values_character(1) = selectDatesFileName
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
       Control_parameter_data(i)%name = 'model_mode'
-      Model_mode = 'GSFLOW'
+      Model_mode = 'GSFLOW5'
       Control_parameter_data(i)%values_character(1) = Model_mode
       Control_parameter_data(i)%data_type = CHAR_TYPE
       i = i + 1
@@ -1022,8 +1024,8 @@
 ! check control parameter if in Control File
 !***********************************************************************
       SUBROUTINE set_control_parameter(Paramname, Numvalues, Paramval_int, Paramval_real, Paramval_char) ! allow arrays
+      USE PRMS_CONSTANTS, ONLY: ERROR_control
       USE PRMS_CONTROL_FILE
-      USE PRMS_CONSTANTS, only: ERROR_CONTROL
       IMPLICIT NONE
       ! Arguments
       CHARACTER(LEN=MAXCONTROL_LENGTH), INTENT(IN) :: Paramname
@@ -1051,7 +1053,7 @@
               DEALLOCATE ( Control_parameter_data(i)%values_character )
               ALLOCATE ( Control_parameter_data(i)%values_character(Numvalues) )
             ELSE
-              CALL error_stop('allocatable control parameter that is real', ERROR_CONTROL)
+              CALL error_stop('allocatable control parameter that is real', ERROR_control)
             ENDIF
           ENDIF
           Control_parameter_data(i)%read_flag = 1
