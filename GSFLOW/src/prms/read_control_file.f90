@@ -15,7 +15,10 @@
      &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Dyn_covden_flag, Segment_transferON_OFF, Gwr_transferON_OFF, &
      &      Lake_transferON_OFF, External_transferON_OFF, Dprst_transferON_OFF, BasinOutON_OFF, &
      &      Snarea_curve_flag, Soilzone_aet_flag, Gsflow_output_file, &
-     &      Csv_output_file, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days
+     &      Csv_output_file, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, &
+     &      Dprst_transfer_water_use, Dprst_add_water_use, PRMS_land_iteration_flag, &
+     &      Agriculture_soil_flag, Agriculture_canopy_flag, Dyn_ag_frac_flag, &
+     &      mappingFileName, xyFileName, PET_ag_module, AET_module
         USE PRMS_CLIMATE_HRU, ONLY: AET_cbh_file, PET_cbh_file
         USE GSFMODFLOW, ONLY: Modflow_name, Modflow_time_zero
         USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, &
@@ -28,15 +31,15 @@
      &      NsegmentOutVar_names, NsegmentOut_format
         USE PRMS_DYNAMIC_PARAM_READ, ONLY: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
      &      wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
-     &      potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, &
+     &      potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, Ag_frac_dynamic, &
      &      soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, &
      &      fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, snareathresh_dynamic, &
      &      covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn, Dynamic_param_log_file
-        character(len=*), parameter :: MODDESC = 'Read Control File'
-        character(len=*), parameter :: MODNAME = 'read_control_file'
         USE PRMS_GLACR, ONLY: Mbinit_flag
         USE PRMS_PRECIP_MAP, ONLY: Precip_map_file
         USE PRMS_TEMP_MAP, ONLY: Tmax_map_file, Tmin_map_file
+        character(len=*), parameter :: MODDESC = 'Read Control File'
+        character(len=*), parameter :: MODNAME = 'read_control_file'
         INTEGER, PARAMETER :: Max_num_control_parameters = 2020 ! WARNING, hard coded, DANGER, DANGER
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Data_file, Var_init_file, Stat_var_file, Ani_out_file
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Executable_desc, Executable_model, Var_save_file

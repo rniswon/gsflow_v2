@@ -156,197 +156,197 @@
 
       CALL print_module(MODDESC, MODNAME, Version_glacr)
 
-      CALL declvar_int(MODNAME, 'nhrugl', 'one', 1, 'integer',                &
+      CALL declvar_int(MODNAME, 'nhrugl', 'one', 1, &
            'Number of at least partially glacierized HRUs at initiation', &
            'none', Nhrugl)
 
 ! declare variables
       ALLOCATE ( Hru_slope_ts(Nhru) )
-      CALL declvar_real(MODNAME, 'hru_slope_ts', 'nhru', Nhru, 'real',   &
+      CALL declvar_real(MODNAME, 'hru_slope_ts', 'nhru', Nhru, &
      &     'HRU slope for timestep, which can change for glaciers', &
      &     'decimal fraction', Hru_slope_ts)
 
-      CALL declvar_dble(MODNAME, 'basin_gl_top_melt', 'one', 1, 'double',     &
+      CALL declvar_dble(MODNAME, 'basin_gl_top_melt', 'one', 1, &
      &     'Basin area-weighted glacier surface melt (snow, ice and rain) coming out of termini of all glaciers and glacierettes', &
      &     'inches', Basin_gl_top_melt)
 
-      CALL declvar_dble(MODNAME, 'basin_gl_top_gain', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_gl_top_gain', 'one', 1, &
      &     'Basin area-weighted glacier surface gain (snow and rain minus evaporation) for all glaciers and glacierettes', &
      &     'inches', Basin_gl_top_gain)
 
-      CALL declvar_dble(MODNAME, 'basin_gl_ice_melt', 'one', 1, 'double',    &
+      CALL declvar_dble(MODNAME, 'basin_gl_ice_melt', 'one', 1, &
      &     'Basin area-weighted glacier ice (firn) melt coming out of termini of all glaciers and glacierettes', &
      &     'inches', Basin_gl_ice_melt)
 
       ALLOCATE ( Gl_mb_yrcumul(Nhru) )
-      CALL declvar_dble(MODNAME, 'gl_mb_yrcumul', 'nhru', Nhru, 'double',     &
+      CALL declvar_dble(MODNAME, 'gl_mb_yrcumul', 'nhru', Nhru, &
      &     'Yearly mass balance for each glacier, indexed by Glacr_tag', &
      &     'inches', Gl_mb_yrcumul)
 
       ALLOCATE ( Gl_mb_cumul(Nhru) )
-      CALL declvar_dble(MODNAME, 'gl_mb_cumul', 'nhru', Nhru, 'double', &
+      CALL declvar_dble(MODNAME, 'gl_mb_cumul', 'nhru', Nhru, &
      &     'Cumulative mass balance for each glacier since start day, indexed by Glacr_tag', &
      &     'inches', Gl_mb_cumul)
 
-      CALL declvar_dble(MODNAME, 'basin_gl_area', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_gl_area', 'one', 1, &
      &     'Basin area-weighted average glacier-covered area',   &
      &     'decimal fraction', Basin_gl_area)
 
       ALLOCATE ( Gl_area(Nhru) )
-      CALL declvar_dble(MODNAME, 'gl_area', 'nhru', Nhru, 'double', &
-     &     'Area of each glacier, indexed by Glacr_tag',       &
+      CALL declvar_dble(MODNAME, 'gl_area', 'nhru', Nhru, &
+     &     'Area of each glacier, indexed by Glacr_tag',  &
      &     'acres', Gl_area)
 
       ALLOCATE ( Glnet_ar_delta(Nhru) )
-      CALL declvar_dble(MODNAME, 'glnet_ar_delta', 'nhru', Nhru, 'double',           &
+      CALL declvar_dble(MODNAME, 'glnet_ar_delta', 'nhru', Nhru, &
      &     'Sum of area change of each glacier since start year, indexed by Glacr_tag', &
      &     'acres', Glnet_ar_delta)
 
       ALLOCATE ( Glacr_flow(Nhru) )
-      CALL declvar_real(MODNAME, 'glacr_flow', 'nhru', Nhru, 'real',         &
+      CALL declvar_real(MODNAME, 'glacr_flow', 'nhru', Nhru, &
      &     'Glacier melt and rain from HRU to stream network, only nonzero at termini HRUs and snowfield HRUs',  &
      &     'inches cubed', Glacr_flow)
 
       ALLOCATE ( Delta_volyr(Nhru) )
-      CALL declvar_dble(MODNAME, 'delta_volyr', 'nhru', Nhru, 'double',      &
-     &     'Year total volume change for each glacier, indexed by Glacr_tag',          &
+      CALL declvar_dble(MODNAME, 'delta_volyr', 'nhru', Nhru, &
+     &     'Year total volume change for each glacier, indexed by Glacr_tag', &
      &     'inches cubed', Delta_volyr)
 
       ALLOCATE ( Hru_mb_yrcumul(Nhru) )
-      CALL declvar_dble(MODNAME, 'hru_mb_yrcumul', 'nhru', Nhru, 'double',        &
-     &     'Mass balance for a glacier HRU, cumulative for year',       &
+      CALL declvar_dble(MODNAME, 'hru_mb_yrcumul', 'nhru', Nhru, &
+     &     'Mass balance for a glacier HRU, cumulative for year', &
      &     'inches', Hru_mb_yrcumul)
 
       ALLOCATE ( Top_tag(Nhru) )
-      CALL declvar_int(MODNAME, 'top_tag', 'nhru', Nhru, 'integer',         &
+      CALL declvar_int(MODNAME, 'top_tag', 'nhru', Nhru, &
      &     'Identifies which glacier top each HRU is fed by. If =-1, then has multiple feeders', &
      &     'none', Top_tag)
 
       ALLOCATE ( Glacr_tag(Nhru) )
-      CALL declvar_int(MODNAME, 'glacr_tag', 'nhru', Nhru, 'integer',       &
-     &     'Identifies which glacier each HRU belongs to',              &
+      CALL declvar_int(MODNAME, 'glacr_tag', 'nhru', Nhru, &
+     &     'Identifies which glacier each HRU belongs to', &
      &     'none', Glacr_tag)
 
       ALLOCATE ( Prev_area(Nhru) )
-      CALL declvar_dble(MODNAME, 'prev_area', 'nhru', Nhru, 'double',        &
+      CALL declvar_dble(MODNAME, 'prev_area', 'nhru', Nhru, &
      &     'Previous year glacier-covered area above each HRU where all branches of the glacier are included', &
      &     'inches squared', Prev_area)
 
       ALLOCATE ( Prev_vol(Nhru) )
-      CALL declvar_dble(MODNAME, 'prev_vol', 'nhru', Nhru, 'double',         &
+      CALL declvar_dble(MODNAME, 'prev_vol', 'nhru', Nhru, &
      &     'Previous volume of each glacier, indexed by Glacr_tag', &
      &     'inches cubed', Prev_vol)
 
       ALLOCATE ( Prev_out(Nhru,Nglres) )
-      CALL declvar_real(MODNAME, 'prev_out', 'nhru,nglres', Nhru*Nglres, 'real',  &
+      CALL declvar_real(MODNAME, 'prev_out', 'nhru,nglres', Nhru*Nglres, &
      &     'Antecedent outflow of the 3 reservoirs in each glacier, indexed by Glacr_tag',&
      &     'inches cubed', Prev_out)
 
       ALLOCATE ( Prev_outi(Nhru,Nglres) )
-      CALL declvar_real(MODNAME, 'prev_outi', 'nhru,nglres', Nhru*Nglres, 'real',  &
+      CALL declvar_real(MODNAME, 'prev_outi', 'nhru,nglres', Nhru*Nglres, &
      &     'Antecedent outflow of the 3 reservoirs in each glacier for only ice (firn) melt, indexed by Glacr_tag',&
      &     'inches cubed', Prev_outi)
 
       ALLOCATE ( Order_flowline(Nhru) )
-      CALL declvar_int(MODNAME, 'order_flowline', 'nhru', Nhru, 'integer',  &
+      CALL declvar_int(MODNAME, 'order_flowline', 'nhru', Nhru, &
      &     'Order of flowlines that belong together as glaciers, Ntp of these', &
      &     'none', Order_flowline)
 
       ALLOCATE ( Ode_glacrva_coef(Nhru) )
-      CALL declvar_real(MODNAME, 'ode_glacrva_coef', 'nhru', Nhru, 'real',  &
+      CALL declvar_real(MODNAME, 'ode_glacrva_coef', 'nhru', Nhru, &
      &     'Estimate of glacrva_coef from ODE basal topography of each glacier, indexed by Glacr_tag', &
      &     'm**(3-2*glacrva_exp)', Ode_glacrva_coef)
 
       ALLOCATE ( Ela(Nhru) )
-      CALL declvar_int(MODNAME, 'ela', 'nhru', Nhru, 'integer',             &
+      CALL declvar_int(MODNAME, 'ela', 'nhru', Nhru, &
      &     'HRU number at ELA corresponding to each top in each glacier, Ntp of these', &
      &     'none', Ela)
 
       ALLOCATE ( Top(Nhru) )
-      CALL declvar_int(MODNAME, 'top', 'nhru', Nhru, 'integer',             &
-     &     'HRU number at tops of each glacier, Ntp of these',          &
+      CALL declvar_int(MODNAME, 'top', 'nhru', Nhru, &
+     &     'HRU number at tops of each glacier, Ntp of these', &
      &     'none', Top)
 
       ALLOCATE ( Term(Nhru) )
-      CALL declvar_int(MODNAME, 'term', 'nhru', Nhru, 'integer',            &
+      CALL declvar_int(MODNAME, 'term', 'nhru', Nhru, &
      &     'HRU number at terminus of each glacier, Ngl of these',&
      &     'none', Term)
 
       ALLOCATE ( Hru_mb_yrend(Nhru) )
-      CALL declvar_real(MODNAME, 'hru_mb_yrend', 'nhru', Nhru, 'real',       &
+      CALL declvar_real(MODNAME, 'hru_mb_yrend', 'nhru', Nhru, &
      &     'Glacier HRU mass balance at end of previous hydrological year', &
      &      'inches', Hru_mb_yrend)
 
       ALLOCATE ( Av_fgrad(Nhru) )
-      CALL declvar_real(MODNAME, 'av_fgrad', 'nhru', Nhru, 'real',           &
+      CALL declvar_real(MODNAME, 'av_fgrad', 'nhru', Nhru, &
      &     'Glacier average HRU mass balance gradient with elevation at flowline at end of each hydrological year, Ngl of these',&
      &     'decimal fraction', Av_fgrad)
 
       ALLOCATE ( Hru_glres_melt(Nhru) )
-      CALL declvar_real(MODNAME, 'hru_glres_melt', 'nhru', Nhru, 'real',     &
+      CALL declvar_real(MODNAME, 'hru_glres_melt', 'nhru', Nhru, &
      &     'Amount of glacier surface melt (snow, ice, rain) from an HRU that goes into reservoirs', &
      &     'inches', Hru_glres_melt)
 
       ALLOCATE ( Glrette_melt(Nhru) )
-      CALL declvar_real(MODNAME, 'glrette_melt', 'nhru', Nhru, 'real',     &
+      CALL declvar_real(MODNAME, 'glrette_melt', 'nhru', Nhru, &
      &     'Amount of glacierette surface melt (snow, ice, rain) from an HRU', &
      &     'inches', Glrette_melt)
 
       ALLOCATE ( Gl_top_melt(Nhru) )
-      CALL declvar_real(MODNAME, 'gl_top_melt', 'nhru', Nhru, 'real',        &
+      CALL declvar_real(MODNAME, 'gl_top_melt', 'nhru', Nhru, &
      &     'Amount of glacier surface melt (snow, ice, rain) coming out of terminus of glacier, indexed by Glacr_tag', &
      &     'inches', Gl_top_melt)
 
       ALLOCATE ( Gl_ice_melt(Nhru) )
-      CALL declvar_real(MODNAME, 'gl_ice_melt', 'nhru', Nhru, 'real',        &
+      CALL declvar_real(MODNAME, 'gl_ice_melt', 'nhru', Nhru, &
      &     'Amount of glacier ice (firn) melt coming out of terminus of glacier, indexed by Glacr_tag', &
      &     'inches', Gl_ice_melt)
 
       ALLOCATE ( Basal_elev(Nhru) )
-      CALL declvar_real(MODNAME, 'basal_elev', 'nhru', Nhru, 'real',         &
-     &     'Glacier basal elevation mean over HRU',                     &
+      CALL declvar_real(MODNAME, 'basal_elev', 'nhru', Nhru, &
+     &     'Glacier basal elevation mean over HRU',          &
      &     'elev_units', Basal_elev)
 
       ALLOCATE ( Keep_gl(Nhru,Seven) )
-      CALL declvar_real(MODNAME, 'keep_gl', 'nhru,seven', Nhru*Seven, 'real', &
+      CALL declvar_real(MODNAME, 'keep_gl', 'nhru,seven', Nhru*Seven, &
      &     'Glacier real variables keeping from first year', &
      &     'none', Keep_gl)
 
       ALLOCATE ( Ikeep_gl(Nhru,Four) )
-      CALL declvar_int(MODNAME, 'ikeep_gl', 'nhru,four', Nhru*Four, 'integer', &
+      CALL declvar_int(MODNAME, 'ikeep_gl', 'nhru,four', Nhru*Four, &
      &     'Glacier integer variables keeping from first year', &
      &     'none', Ikeep_gl)
 
       ALLOCATE ( Basal_slope(Nhru) )
-      CALL declvar_real(MODNAME, 'basal_slope', 'nhru', Nhru, 'real',        &
+      CALL declvar_real(MODNAME, 'basal_slope', 'nhru', Nhru, &
      &     'Glacier basal slope down flowline mean over each HRU', &
      &     'decimal fraction', Basal_slope)
 
       ALLOCATE ( Av_basal_slope(Nhru) )
-      CALL declvar_real(MODNAME, 'av_basal_slope', 'nhru', Nhru, 'real',      &
+      CALL declvar_real(MODNAME, 'av_basal_slope', 'nhru', Nhru, &
      &     'Glacier average basal slope at flowline location, indexed by Glacr_tag', &
      &     'decimal fraction', Av_basal_slope)
 
-      CALL declvar_dble(MODNAME, 'basin_gl_storage', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_gl_storage', 'one', 1, &
      &     'Basin area-weighted average storage change in glacier reservoirs', &
      &     'inches', Basin_gl_storage)
 
-      CALL declvar_dble(MODNAME, 'basin_gl_storstart', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_gl_storstart', 'one', 1, &
      &     'Basin area-weighted average storage estimated start in glacier reservoirs', &
      &     'inches', Basin_gl_storstart)
 
-      CALL declvar_dble(MODNAME, 'basin_gl_storvol', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_gl_storvol', 'one', 1, &
      &     'Basin storage volume in glacier storage reservoirs', &
      &     'acre-inches', Basin_gl_storvol)
 
       IF ( Init_vars_from_file==0 ) THEN
         ALLOCATE ( Glacr_elev_init(Nhru) )
-        CALL declvar_real(MODNAME, 'glacr_elev_init', 'nhru', Nhru, 'real',    &
+        CALL declvar_real(MODNAME, 'glacr_elev_init', 'nhru', Nhru, &
      &     'Glacier surface elevation mean over HRU at initiation extrapolating to 100% glacierized HRU', &
      &     'elev_units', Glacr_elev_init)
 
         ALLOCATE ( Glacr_slope_init(Nhru) )
-        CALL declvar_real(MODNAME, 'glacr_slope_init', 'nhru', Nhru, 'real',    &
+        CALL declvar_real(MODNAME, 'glacr_slope_init', 'nhru', Nhru, &
      &     'Glacier surface slope mean over HRU at initiation extrapolating to 100% glacierized HRU', &
      &     'elev_units', Glacr_slope_init)
       ENDIF
@@ -539,10 +539,10 @@
           count = 1 !has at least one glacier
           glacier_frac_use(j) = 1.0
           !should be end of extensions or branches-- will fail if don't set up with indices stacked
-          IF ( Glac_HRUnum_down==1) THEN
-            IF (Tohru(j)/=j-1 ) glacier_frac_use(j) = 0.999
-          ELSEIF ( Glac_HRUnum_down==0) THEN
-            IF (Tohru(j)/=j+1 ) glacier_frac_use(j) = 0.999
+          IF ( Glac_HRUnum_down==1 ) THEN
+            IF ( Tohru(j)/=j-1 ) glacier_frac_use(j) = 0.999
+          ELSEIF ( Glac_HRUnum_down==0 ) THEN
+            IF ( Tohru(j)/=j+1 ) glacier_frac_use(j) = 0.999
           ENDIF
         ENDIF
       ENDDO
@@ -871,10 +871,10 @@
 !***********************************************************************
       INTEGER FUNCTION comp_glsurf(glacr_exist, glrette_exist)
       USE PRMS_GLACR
-      USE PRMS_MODULE, ONLY: Nhru, Start_year
+      USE PRMS_MODULE, ONLY: Nhru, Start_year, Nowyear, Nowmonth
       USE PRMS_BASIN, ONLY: Hru_type, Hru_elev_ts, Basin_area_inv, Active_hrus, &
      &    Hru_route_order, Elev_units, Hru_elev
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Julwater
+      USE PRMS_SET_TIME, ONLY: Julwater
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow
       USE PRMS_SNOW, ONLY: Snowcov_area, Snowmelt, Glacrmelt, Glacr_air_deltemp, Glacr_delsnow, &
      &    Glrette_frac_init, Snowcov_area, Basin_snowicecov, Snow_evap, Glacr_evap, Basin_glacrb_melt

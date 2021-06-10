@@ -95,7 +95,7 @@
       INTEGER :: i
 !***********************************************************************
       ! allocate and initialize dimension data
-      ALLOCATE ( Dimension_data(MAXDIMENSIONS) ) ! allow for extra parameters being expected
+      ALLOCATE ( Dimension_data(MAXDIMENSIONS) ) ! allow for hard-coded maximum dimensions
       DO i = 1, MAXDIMENSIONS
         Dimension_data(i)%name = ' '
         Dimension_data(i)%value = 0
@@ -312,8 +312,9 @@
       ! Local Variables
       INTEGER :: type_flag
       INTEGER, SAVE :: init
+      DATA init/0/ ! does this work?
 !***********************************************************************
-      IF ( init==0 ) THEN !???, need to set init
+      IF ( init==0 ) THEN
         init = 1
         Num_variables = 0
         ALLOCATE ( Variable_data(MAXVARIABLES) ) ! don't know how many, need to read var_name file
@@ -764,8 +765,8 @@
 !***********************************************************************
       SUBROUTINE dattim(String, Datetime)
       USE PRMS_CONSTANTS, ONLY: ERROR_time
-      USE PRMS_MODULE, ONLY: Endtime, Starttime
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday, Julian_day_absolute
+      USE PRMS_MODULE, ONLY: Endtime, Starttime, Nowyear, Nowmonth, Nowday
+      USE PRMS_SET_TIME, ONLY: Julian_day_absolute
       IMPLICIT NONE
       ! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: String
@@ -809,8 +810,8 @@
       EXTERNAL :: error_stop
 !***********************************************************************
       Num_dimensions = Num_dimensions + 1
-      IF ( Num_dimensions>MAXDIMENSIONS ) &
-     &     CALL error_stop('hard-coded number of dimensions exceeded, report to developers', ERROR_dim)
+      IF ( Num_dimensions>MAXDIMENSIONS ) CALL error_stop('hard-coded number of dimensions exceeded, report to developers', &
+     &     ERROR_dim)
       Dimension_data(Num_dimensions)%name = Dimname
       Dimension_data(Num_dimensions)%default = Defval
       Dimension_data(Num_dimensions)%maximum = Maxval
