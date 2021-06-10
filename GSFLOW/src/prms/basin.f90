@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2021-02-26'
+      character(len=*), parameter :: Version_basin = '2021-05-24'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -73,7 +73,7 @@
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_real
+      EXTERNAL :: read_error, print_module, declvar_real, declvar_dble
 !***********************************************************************
       basdecl = 0
 
@@ -82,47 +82,47 @@
 ! Declared Variables
       ALLOCATE ( Hru_elev_ts(Nhru) )
       IF ( Glacier_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-        CALL declvar_real(MODNAME, 'hru_elev_ts', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'hru_elev_ts', 'nhru', Nhru, &
      &       'HRU elevation for timestep, which can change for glaciers', &
      &       'elev_units', Hru_elev_ts)
 
-        CALL declvar_dble(MODNAME, 'basin_gl_ice_cfs', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_gl_ice_cfs', 'one', 1, &
      &       'Basin glacier ice (firn) melt leaving the basin through the stream network', &
      &       'cfs', Basin_gl_ice_cfs)
 
-        CALL declvar_dble(MODNAME, 'basin_gl_cfs', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_gl_cfs', 'one', 1, &
      &       'Basin glacier surface melt (rain, snow, ice) leaving the basin through the stream network', &
      &       'cfs', Basin_gl_cfs)
       ENDIF
 
       ALLOCATE ( Hru_imperv(Nhru) )
-      CALL declvar_real(MODNAME, 'hru_imperv', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_imperv', 'nhru', Nhru, &
      &     'Area of HRU that is impervious', &
      &     'acres', Hru_imperv)
 
       ALLOCATE ( Hru_perv(Nhru) )
-      CALL declvar_real(MODNAME, 'hru_perv', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_perv', 'nhru', Nhru, &
      &     'Area of HRU that is pervious', &
      &     'acres', Hru_perv)
 
       ALLOCATE ( Hru_frac_perv(Nhru) )
-      CALL declvar_real(MODNAME, 'hru_frac_perv', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_frac_perv', 'nhru', Nhru, &
      &     'Fraction of HRU that is pervious', &
      &     'decimal fraction', Hru_frac_perv)
 
       IF ( Dprst_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Dprst_area_max(Nhru) )
-        CALL declvar_real(MODNAME, 'dprst_area_max', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_max', 'nhru', Nhru, &
      &       'Aggregate sum of surface-depression storage areas of each HRU', &
      &       'acres', Dprst_area_max)
 
         ALLOCATE ( Dprst_area_open_max(Nhru) )
-        CALL declvar_real(MODNAME, 'dprst_area_open_max', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_open_max', 'nhru', Nhru, &
      &       'Aggregate sum of open surface-depression storage areas of each HRU', &
      &       'acres', Dprst_area_open_max)
 
         ALLOCATE ( Dprst_area_clos_max(Nhru) )
-        CALL declvar_real(MODNAME, 'dprst_area_clos_max', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_clos_max', 'nhru', Nhru, &
      &       'Aggregate sum of closed surface-depression storage areas of each HRU', &
      &       'acres', Dprst_area_clos_max)
 
@@ -462,15 +462,15 @@
 
         Hru_perv(i) = perv_area
         Hru_frac_perv(i) = perv_area/harea
-        !IF ( perv_area/harea<0.001 ) THEN
-        !  PRINT *, 'ERROR, pervious plus agriculture fraction must be >= 0.001 for HRU:', i
-        !  PRINT *, '       pervious portion is HRU fraction - impervious fraction - depression fraction - agriculture fraction'
-        !  PRINT *, '       pervious fraction:', Hru_frac_perv(i)
-        !  PRINT *, '       impervious fraction:', Hru_percent_imperv(i)
-        !  IF ( Dprst_flag==ON ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
-        !  IF ( Agriculture_flag>OFF ) PRINT *, '       agriculture fraction:', Ag_frac(i)
-        !  basinit = 1
-        !ENDIF
+        IF ( Hru_frac_perv(i)<0.001 ) THEN
+          PRINT *, 'ERROR, pervious fraction must be >= 0.001 for HRU:', i
+          PRINT *, '       pervious portion is HRU fraction - impervious fraction - depression fraction'
+          PRINT *, '       pervious fraction:', Hru_frac_perv(i)
+          PRINT *, '       impervious fraction:', Hru_percent_imperv(i)
+          IF ( Dprst_flag==ACTIVE ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
+          IF ( Agriculture_flag>OFF ) PRINT *, '       agriculture fraction:', Ag_frac(i)
+          basinit = 1
+        ENDIF
         basin_perv = basin_perv + DBLE( Hru_perv(i) )
       ENDDO
       IF ( Dprst_flag==ACTIVE .AND. PRMS4_flag==ACTIVE ) DEALLOCATE ( Dprst_area )
@@ -545,10 +545,10 @@
         CALL write_outfile(' ')
         WRITE (buffer, 9003) 'Model domain area:   ', Totarea, '    Active basin area:', Active_area
         CALL write_outfile(buffer)
-        WRITE (buffer, 9004) 'Fraction impervious:', basin_imperv, '    Fraction pervious: ', basin_perv
+        WRITE (buffer, 9004) 'Fraction impervious:  ', basin_imperv, '    Fraction pervious: ', basin_perv
         CALL write_outfile(buffer)
         IF ( Water_area>0.0D0 ) THEN
-          WRITE (buffer, 9004) 'Lake area:          ', Water_area, '    Fraction lakes:    ', Water_area*Basin_area_inv
+          WRITE (buffer, 9004) 'Lake area:            ', Water_area, '    Fraction lakes:    ', Water_area*Basin_area_inv
           CALL write_outfile(buffer)
         ENDIF
         IF ( Dprst_flag==ACTIVE ) THEN
@@ -564,7 +564,7 @@
 
  9002 FORMAT (A, I4.2, 2('/', I2.2), I3.2, 2(':', I2.2))
  9003 FORMAT (2(A,F13.2))
- 9004 FORMAT (A, F14.4, A, F12.4)
+ 9004 FORMAT (2(A,F12.4))
  9005 FORMAT (A, F13.2, A, F13.4)
 
       END FUNCTION basinit

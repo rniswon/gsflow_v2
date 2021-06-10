@@ -1,6 +1,9 @@
       MODULE PRMS_READ_PARAM_FILE
+        USE PRMS_CONSTANTS, ONLY: MAXLINE_LENGTH, MAXCONTROL_LENGTH
         USE PRMS_MODULE, ONLY: Print_debug, EQULS, Param_file
-        INTEGER, SAVE :: Param_unit, Read_parameters
+        ! Local Variables
+        character(len=*), parameter :: MODDESC = 'Read values from Parameter File'
+         INTEGER, SAVE :: Param_unit, Read_parameters
       END MODULE PRMS_READ_PARAM_FILE
 
 !***********************************************************************
@@ -15,7 +18,7 @@
       INTEGER, EXTERNAL :: numchars
       ! Local Variables
       CHARACTER(LEN=16) :: string, dimname
-      CHARACTER(LEN=150) :: line
+      CHARACTER(LEN=MAXLINE_LENGTH) :: line
       CHARACTER(LEN=24) :: dimstring
       INTEGER nchars, ios, dimen_value
 !***********************************************************************
@@ -95,9 +98,9 @@
       INTEGER, EXTERNAL :: numchars, getdim
       INTRINSIC :: TRIM
       ! Local Variables
-      CHARACTER(LEN=16) :: string
-      CHARACTER(LEN=32) :: paramstring
-      CHARACTER(LEN=12) :: dim_string(2)
+      CHARACTER(LEN=MAXCONTROL_LENGTH) :: string
+      CHARACTER(LEN=MAXCONTROL_LENGTH) :: paramstring
+      CHARACTER(LEN=MAXCONTROL_LENGTH) :: dim_string(2)
       INTEGER nchars, ios, num_dims, num_param_values, i, j, k, param_type, num, inum, numfiles, ii, duplicate, found
       INTEGER, ALLOCATABLE :: idmy(:)
       REAL, ALLOCATABLE :: dmy(:)

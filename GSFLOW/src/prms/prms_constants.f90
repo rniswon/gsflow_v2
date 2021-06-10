@@ -12,6 +12,7 @@ MODULE PRMS_CONSTANTS
     real(REAL64), parameter :: DNEARZERO = EPSILON(0.0D0)
 
     integer, parameter :: MAXFILE_LENGTH = 256
+    integer, parameter :: MAXLINE_LENGTH = 256
     integer, parameter :: MAXCONTROL_LENGTH = 32
     integer, parameter :: MAXDIM = 500
     integer, parameter :: MONTHS_PER_YEAR = 12

@@ -252,26 +252,26 @@
           IF ( Dprst_transferON_OFF==ACTIVE .OR. Model==DOCUMENTATION ) THEN
             Dprst_transfers_on = ACTIVE
             ALLOCATE ( Dprst_transfer(Nhru) )
-            CALL declvar_real(MODNAME, 'dprst_transfer', 'nhru', Nhru, 'real', &
+            CALL declvar_real(MODNAME, 'dprst_transfer', 'nhru', Nhru, &
      &           'Transfer flow rate from surface-depression storage for each HRU for each time step', &
      &           'cfs', Dprst_transfer)
             ALLOCATE ( Dprst_transfer_tot(Nhru) )
-            CALL declvar_real(MODNAME, 'dprst_transfer_tot', 'nhru', Nhru, 'real', &
+            CALL declvar_real(MODNAME, 'dprst_transfer_tot', 'nhru', Nhru, &
      &           'Transfer flow rate from surface-depression storage for each HRU for the simulation', &
      &           'cfs', Dprst_transfer_tot)
-            CALL declvar_dble(MODNAME, 'total_dprst_transfer', 'one', 1, 'double', &
+            CALL declvar_dble(MODNAME, 'total_dprst_transfer', 'one', 1, &
      &           'Transfer flow rates from all surface-depression storage for each time step', &
      &           'cfs', Total_dprst_transfer)
           ENDIF
           ALLOCATE ( Dprst_gain(Nhru) )
-          CALL declvar_real(MODNAME, 'dprst_gain', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'dprst_gain', 'nhru', Nhru, &
      &         'Transfer gains to surface-depression storage for each HRU for each time step', &
      &         'cfs', Dprst_gain)
           ALLOCATE ( Dprst_gain_tot(Nhru) )
-          CALL declvar_real(MODNAME, 'dprst_gain_tot', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'dprst_gain_tot', 'nhru', Nhru, &
      &         'Transfer gains to surface-depression storage for each HRU for the simulation', &
      &         'cfs', Dprst_gain_tot)
-          CALL declvar_dble(MODNAME, 'total_dprst_gain', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'total_dprst_gain', 'one', 1, &
      &         'Transfer gains to all surface-depression storage for each time step', &
      &         'cfs', Total_dprst_gain)
         ELSEIF ( Dprst_transferON_OFF==ACTIVE .AND. Model/=DOCUMENTATION ) THEN
@@ -284,26 +284,26 @@
           IF ( Segment_transferON_OFF==ACTIVE .OR. Model==DOCUMENTATION ) THEN
             Segment_transfers_on = ACTIVE
             ALLOCATE ( Segment_transfer(Nsegment) )
-            CALL declvar_real(MODNAME, 'segment_transfer', 'nsegment', Nsegment, 'real', &
+            CALL declvar_real(MODNAME, 'segment_transfer', 'nsegment', Nsegment, &
      &           'Transfer flow rate from each stream segment for each time step', &
      &           'cfs', Segment_transfer)
             ALLOCATE ( Segment_transfer_tot(Nsegment) )
-            CALL declvar_real(MODNAME, 'segment_transfer_tot', 'nsegment', Nsegment, 'real', &
+            CALL declvar_real(MODNAME, 'segment_transfer_tot', 'nsegment', Nsegment, &
      &           'Transfer flow rate from each stream segment for the simulation', &
      &           'cfs', Segment_transfer_tot)
-            CALL declvar_dble(MODNAME, 'total_segment_transfer', 'one', 1, 'double', &
+            CALL declvar_dble(MODNAME, 'total_segment_transfer', 'one', 1, &
      &           'Transfer flow rates from all stream segments for each time step', &
      &           'cfs', Total_segment_transfer)
           ENDIF
           ALLOCATE ( Segment_gain(Nsegment) )
-          CALL declvar_real(MODNAME, 'segment_gain', 'nsegment', Nsegment, 'real', &
+          CALL declvar_real(MODNAME, 'segment_gain', 'nsegment', Nsegment, &
      &         'Transfer gains for each stream segment for each time step', &
      &         'cfs', Segment_gain)
           ALLOCATE ( Segment_gain_tot(Nsegment) )
-          CALL declvar_real(MODNAME, 'segment_gain_tot', 'nsegment', Nsegment, 'real', &
+          CALL declvar_real(MODNAME, 'segment_gain_tot', 'nsegment', Nsegment, &
      &         'Transfer gains for each stream segment for the simulation', &
      &         'cfs', Segment_gain_tot)
-          CALL declvar_dble(MODNAME, 'total_segment_gain', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'total_segment_gain', 'one', 1, &
      &         'Transfer gains to all stream segments for each time step', &
      &         'cfs', Total_segment_gain)
         ELSEIF ( Segment_transferON_OFF==ACTIVE .AND. Model/=DOCUMENTATION ) THEN
@@ -315,26 +315,26 @@
         IF ( Gwr_transferON_OFF==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           Gwr_transfers_on = ACTIVE
           ALLOCATE ( Gwr_transfer(Nhru) )
-          CALL declvar_real(MODNAME, 'gwr_transfer', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'gwr_transfer', 'nhru', Nhru, &
      &         'Transfer flow rate from the groundwater reservoir of each HRU for each time step', &
      &         'cfs', Gwr_transfer)
           ALLOCATE ( Gwr_transfer_tot(Nhru) )
-          CALL declvar_real(MODNAME, 'gwr_transfer_tot', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'gwr_transfer_tot', 'nhru', Nhru, &
      &         'Transfer flow rate from the groundwater reservoir of each HRU for the simulation', &
      &         'cfs', Gwr_transfer_tot)
-          CALL declvar_dble(MODNAME, 'total_gwr_transfer', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'total_gwr_transfer', 'one', 1, &
      &         'Transfer flow rates from all groundwater reservoirs for each time step', &
      &         'cfs', Total_gwr_transfer)
         ENDIF
         ALLOCATE ( Gwr_gain(Nhru) )
-        CALL declvar_real(MODNAME, 'gwr_gain', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'gwr_gain', 'nhru', Nhru, &
      &       'Transfer gains to the groundwater reservoir of each HRU for each time step', &
      &       'cfs', Gwr_gain)
         ALLOCATE ( Gwr_gain_tot(Nhru) )
-        CALL declvar_real(MODNAME, 'gwr_gain_tot', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'gwr_gain_tot', 'nhru', Nhru, &
      &       'Transfer gains to the groundwater reservoir of each HRU for the simulation', &
      &       'cfs', Gwr_gain_tot)
-        CALL declvar_dble(MODNAME, 'total_gwr_gain', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'total_gwr_gain', 'one', 1, &
      &       'Flow to all groundwater reservoirs for each time step', &
      &       'cfs', Total_gwr_gain)
 
@@ -343,26 +343,26 @@
           IF ( Lake_transferON_OFF==ACTIVE .OR. Model==DOCUMENTATION ) THEN
             Lake_transfers_on = ACTIVE
             ALLOCATE ( Lake_transfer(Nhru) )
-            CALL declvar_real(MODNAME, 'lake_transfer', 'nhru', Nhru, 'real', &
+            CALL declvar_real(MODNAME, 'lake_transfer', 'nhru', Nhru, &
      &           'Transfer flow rate from each lake HRU for each time step', &
      &           'cfs', Lake_transfer)
             ALLOCATE ( Lake_transfer_tot(Nhru) )
-            CALL declvar_real(MODNAME, 'lake_transfer_tot', 'nhru', Nhru, 'real', &
+            CALL declvar_real(MODNAME, 'lake_transfer_tot', 'nhru', Nhru, &
      &           'Transfer flow rate from each lake HRU for the simulation', &
      &           'cfs', Lake_transfer_tot)
-            CALL declvar_dble(MODNAME, 'total_lake_transfer', 'one', 1, 'double', &
+            CALL declvar_dble(MODNAME, 'total_lake_transfer', 'one', 1, &
      &           'Transfer flow rates from all lake HRUs for each time step', &
      &           'cfs', Total_lake_transfer)
           ENDIF
           ALLOCATE ( Lake_gain(Nhru) )
-          CALL declvar_real(MODNAME, 'lake_gain', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'lake_gain', 'nhru', Nhru, &
      &         'Transfer gains to each lake HRU for each time step', &
      &         'cfs', Lake_gain)
           ALLOCATE ( Lake_gain_tot(Nhru) )
-          CALL declvar_real(MODNAME, 'lake_gain_tot', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'lake_gain_tot', 'nhru', Nhru, &
      &         'Transfer gains to each lake HRU for the simulation', &
      &         'cfs', Lake_gain_tot)
-          CALL declvar_dble(MODNAME, 'total_lake_gain', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'total_lake_gain', 'one', 1, &
      &         'Transfer gains to all lake HRUs for each time step', &
      &         'cfs', Total_lake_gain)
         ELSEIF ( Lake_transferON_OFF==ACTIVE .AND. Model/=DOCUMENTATION ) THEN
@@ -374,28 +374,28 @@
         IF ( (External_transferON_OFF==ACTIVE.AND.Nexternal>0) .OR. Model==DOCUMENTATION ) THEN
           External_transfers_on = ACTIVE
           ALLOCATE ( External_transfer(Nexternal) )
-          CALL declvar_real(MODNAME, 'external_transfer', 'nexternal', Nexternal, 'real', &
+          CALL declvar_real(MODNAME, 'external_transfer', 'nexternal', Nexternal, &
      &         'Transfer flow rate from each external source for each time step', &
      &         'cfs', External_transfer)
           ALLOCATE ( External_transfer_tot(Nexternal) )
-          CALL declvar_real(MODNAME, 'external_transfer_tot', 'nexternal', Nexternal, 'real', &
+          CALL declvar_real(MODNAME, 'external_transfer_tot', 'nexternal', Nexternal, &
      &         'Transfer flow rate from each external source for the simulation', &
      &         'cfs', External_transfer_tot)
-          CALL declvar_dble(MODNAME, 'total_external_transfer', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'total_external_transfer', 'one', 1, &
      &         'Transfer flow rates from all external sources for each time step', &
      &         'cfs', Total_external_transfer)
         ENDIF
         IF ( Nexternal>0 ) THEN
           ALLOCATE ( External_gain(Nexternal) )
-          CALL declvar_real(MODNAME, 'external_gain', 'nexternal', Nexternal, 'real', &
+          CALL declvar_real(MODNAME, 'external_gain', 'nexternal', Nexternal, &
      &         'Transfer gains to each external location for each time step', &
      &         'cfs', External_gain)
           ALLOCATE ( External_gain_tot(Nexternal) )
-          CALL declvar_real(MODNAME, 'external_gain_tot', 'nexternal', Nexternal, 'real', &
+          CALL declvar_real(MODNAME, 'external_gain_tot', 'nexternal', Nexternal, &
      &         'Transfer gains to each external location for each time step', &
      &         'cfs', External_gain_tot)
         ENDIF
-        CALL declvar_dble(MODNAME, 'total_external_gain', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'total_external_gain', 'one', 1, &
      &       'Transfer gains to all external locations for each time step', &
      &       'cfs', Total_external_gain)
 
@@ -403,51 +403,51 @@
         IF ( Nconsumed>0 ) THEN
           Consumed_transfers_on = ACTIVE
           ALLOCATE ( Consumed_gain(Nconsumed) )
-          CALL declvar_real(MODNAME, 'consumed_gain', 'nconsumed', Nconsumed, 'real', &
+          CALL declvar_real(MODNAME, 'consumed_gain', 'nconsumed', Nconsumed, &
      &         'Transfer flow rate to each water-use comsumption destination for each time step', &
      &         'cfs', Consumed_gain)
           ALLOCATE ( Consumed_gain_tot(Nconsumed) )
-          CALL declvar_real(MODNAME, 'consumed_gain_tot', 'nconsumed', Nconsumed, 'real', &
+          CALL declvar_real(MODNAME, 'consumed_gain_tot', 'nconsumed', Nconsumed, &
      &         'Transfer flow rate to each water-use comsumption destination for the simulation', &
      &         'cfs', Consumed_gain_tot)
         ENDIF
-        CALL declvar_dble(MODNAME, 'total_consumed_gain', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'total_consumed_gain', 'one', 1, &
      &       'Transfer flow rates to all water-use comsumption destinations for each time step', &
      &       'cfs', Total_consumed_gain)
 
         ALLOCATE ( Soilzone_gain(Nhru) )
-        CALL declvar_real(MODNAME, 'soilzone_gain', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'soilzone_gain', 'nhru', Nhru, &
      &       'Transfer gains to the capillary reservoir within the soilzone for each HRU for each time step', &
      &       'cfs', Soilzone_gain)
         ALLOCATE ( Soilzone_gain_tot(Nhru) )
-        CALL declvar_real(MODNAME, 'soilzone_gain_tot', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'soilzone_gain_tot', 'nhru', Nhru, &
      &       'Transfer gains to the capillary reservoir within the soilzone for each HRU for the simulation', &
      &       'cfs', Soilzone_gain_tot)
-        CALL declvar_dble(MODNAME, 'total_soilzone_gain', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'total_soilzone_gain', 'one', 1, &
      &       'Transfer gains to all capillary reservoirs for each time step', &
      &       'cfs', Total_soilzone_gain)
 
         ALLOCATE ( Canopy_gain(Nhru) )
-        CALL declvar_real(MODNAME, 'canopy_gain', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'canopy_gain', 'nhru', Nhru, &
      &       'Transfer gains to the canopy reservoir for each HRU for each time step', &
      &       'cfs', Canopy_gain)
         ALLOCATE ( Canopy_gain_tot(Nhru) )
-        CALL declvar_real(MODNAME, 'canopy_gain_tot', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'canopy_gain_tot', 'nhru', Nhru, &
      &       'Transfer gains to the canopy reservoir for each HRU for the simulation', &
      &       'cfs', Canopy_gain_tot)
-        CALL declvar_dble(MODNAME, 'total_canopy_gain', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'total_canopy_gain', 'one', 1, &
      &       'Transfer gains to all canopy reservoirs for each time step', &
      &       'cfs', Total_canopy_gain)
 
         ALLOCATE ( Transfer_rate(Nwateruse), Source_id(Nwateruse), Source_type(Nwateruse) )
         ALLOCATE ( Destination_id(Nwateruse), Destination_type(Nwateruse) )
-        CALL declvar_real(MODNAME, 'total_transfers', 'one', 1, 'double', &
+        CALL declvar_real(MODNAME, 'total_transfers', 'one', 1, &
      &           'Transfer of all water-use transfers for each time step', &
      &           'cfs', Total_transfers)
-        CALL declvar_dble(MODNAME, 'transfer_rate', 'nwateruse', nwateruse, 'double', &
+        CALL declvar_dble(MODNAME, 'transfer_rate', 'nwateruse', nwateruse, &
      &           'Transfer of each water-use transfer for each time step', &
      &           'cfs', Transfer_rate)
-        
+
       ELSEIF ( Process_flag==INIT ) THEN
         Ndiversions = 0
         year = Start_year
@@ -587,7 +587,7 @@
       SUBROUTINE read_event(Iunit, Src_type, Next_yr, Next_mo, Next_day)
       USE PRMS_CONSTANTS, ONLY: ERROR_water_use, ACTIVE, OFF
       USE PRMS_WATER_USE, ONLY: CANOPY
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Iunit, Src_type

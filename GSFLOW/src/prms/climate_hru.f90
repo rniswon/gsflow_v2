@@ -345,42 +345,42 @@
 
         IF ( Humidity_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Humidity_hru(Nhru) )
-          CALL declvar_real(MODNAME, 'humidity_hru', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'humidity_hru', 'nhru', Nhru, &
      &         'Relative humidity of each HRU', &
      &         'percentage', Humidity_hru)
         ENDIF
         IF ( Windspeed_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-          CALL declvar_dble(MODNAME, 'basin_windspeed', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'basin_windspeed', 'one', 1, &
      &         'Basin area-weighted average wind speed', &
      &         'meters/second', Basin_windspeed)
           ALLOCATE ( Windspeed_hru(Nhru) )
-          CALL declvar_real(MODNAME, 'windspeed_hru', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'windspeed_hru', 'nhru', Nhru, &
      &         'Wind speed for each HRU', &
      &         'meters/second', Windspeed_hru)
         ENDIF
 
         IF ( AET_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-          CALL declvar_dble(MODNAME, 'basin_aet_external', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'basin_aet_external', 'one', 1, &
      &         'Basin area-weighted average PET read from CBH File', &
      &         'inches', Basin_aet_external)
           ALLOCATE ( AET_external(Nhru) )
-          CALL declvar_real(MODNAME, 'AET_external', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'AET_external', 'nhru', Nhru, &
      &         'Actual evapotranspiration for each HRU that is read from a CBH File', &
      &         'inches', AET_external)
         ENDIF
 
         IF ( PET_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-          CALL declvar_dble(MODNAME, 'basin_pet_external', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'basin_pet_external', 'one', 1, &
      &         'Basin area-weighted average PET read from CBH File', &
      &         'inches', Basin_pet_external)
           ALLOCATE ( PET_external(Nhru) )
-          CALL declvar_real(MODNAME, 'PET_external', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'PET_external', 'nhru', Nhru, &
      &         'Potential evapotranspiration for each HRU that is read from a CBH File', &
      &         'inches', PET_external)
         ENDIF
 
         IF ( Climate_irrigated_area_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-          CALL declvar_dble(MODNAME, 'basin_irrigated_area', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'basin_irrigated_area', 'one', 1, &
      &         'Basin area-weighted average irrigation area read from CBH File', &
      &         'acres', Basin_irrigated_area)
           ALLOCATE ( Irrigated_area(Nhru) )
@@ -536,7 +536,7 @@
          ENDIF
        ENDIF
 
-       IF ( Climate_transp_flag==ACTIVE ) THEN
+        IF ( Climate_transp_flag==ACTIVE ) THEN
           IF ( control_string(Transp_day, 'transp_day')/=0 ) CALL read_error(5, 'transp_day')
           CALL find_header_end(Transp_unit, Transp_day, 'transp_day', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
@@ -608,7 +608,7 @@
 !     Read a day in the CBH File
 !***********************************************************************
       SUBROUTINE read_cbh_date(Year, Month, Day, Var, Ios, Iret)
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
 ! Argument
       INTEGER, INTENT(IN) :: Year, Month, Day, Ios
       CHARACTER(LEN=*), INTENT(IN) :: Var

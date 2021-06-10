@@ -172,7 +172,7 @@
       INTEGER, EXTERNAL :: getparam, getvartype, numchars, getvarsize
       EXTERNAL :: read_error, PRMS_open_output_file, checkdim_bounded_limits
 ! Local Variables
-      INTEGER :: i, jj, is, ios, ierr, size, dim
+      INTEGER :: i, jj, is, ios, ierr, size
       REAL, ALLOCATABLE, DIMENSION(:) :: map_frac
 !***********************************************************************
       map_resultsinit = 0
@@ -215,13 +215,13 @@
       ierr = 0
       DO jj = 1, NmapOutVars
         Nc_vars(jj) = numchars(MapOutVar_names(jj))
-        Map_var_type(jj) = getvartype(MapOutVar_names(jj)(:Nc_vars(jj)), Map_var_type(jj) )
+        Map_var_type(jj) = getvartype(MapOutVar_names(jj)(:Nc_vars(jj)) )
         IF ( Map_var_type(jj)/=REAL_TYPE .AND. Map_var_type(jj)/=DBLE_TYPE ) THEN
           PRINT *, 'ERROR, invalid map_results variable:', MapOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only real or double variables allowed'
           ierr = 1
         ENDIF
-        size = getvarsize(MapOutVar_names(jj)(:Nc_vars(jj)), dim )
+        size = getvarsize(MapOutVar_names(jj)(:Nc_vars(jj)))
         IF ( size/=Nhru ) THEN
           PRINT *, 'ERROR, invalid map_results variable:', MapOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only variables with the number of values equal to nhru allowed'
@@ -365,9 +365,10 @@
 !                      mapped to a specified spatial resolution
 !***********************************************************************
       INTEGER FUNCTION map_resultsrun()
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_MAP_RESULTS
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, Basin_area_inv
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday, Modays
+      USE PRMS_SET_TIME, ONLY: Modays
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: DBLE
