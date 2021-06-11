@@ -8,8 +8,8 @@
 !     ******************************************************************
       INTEGER FUNCTION gsflow_mf2prms()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, RUN, DECL
-      USE PRMS_MODULE, ONLY: Process_flag, Nhrucell, Gvr_cell_id, Ag_package_active, Dprst_flag
-      USE GSFMODFLOW, ONLY: Mfq2inch_conv, Gwc_col, Gwc_row, Hru_ag_irr, Dprst_ag_gain, MFQ_to_inch_acres
+      USE PRMS_MODULE, ONLY: Process_flag, Nhrucell, Gvr_cell_id, Ag_package, Dprst_flag, Hru_ag_irr, Dprst_ag_gain
+      USE GSFMODFLOW, ONLY: Mfq2inch_conv, Gwc_col, Gwc_row, MFQ_to_inch_acres
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Gw2sm_grav
       USE GWFUZFMODULE, ONLY: SEEPOUT
       USE GWFAGMODULE, ONLY: NUMIRRWELSP, IRRWELVAR, NUMCELLS, WELLIRRPRMS, IRRROW_SW, &
@@ -23,7 +23,7 @@
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW to PRMS'
       character(len=*), parameter :: MODNAME = 'gsflow_mf2prms'
-      character(len=*), parameter :: Version_gsflow_mf2prms = '2021-03-12'
+      character(len=*), parameter :: Version_gsflow_mf2prms = '2021-06-10'
       integer :: i, j, k, ihru, IRWL, NMCL, SGNM
 !***********************************************************************
       gsflow_mf2prms = 0
@@ -38,7 +38,7 @@
 !
 ! From irrigation wells
 !
-        IF ( Ag_package_active==ACTIVE ) THEN
+        IF ( Ag_package==ACTIVE ) THEN
           Hru_ag_irr = 0.0
           DO J = 1, NUMIRRWELSP
             IRWL = IRRWELVAR(J)

@@ -66,126 +66,126 @@
       IF ( Nreach==-1 ) CALL read_error(6, 'nreach')
 
 ! Declared Variables
-      CALL declvar_dble(MODNAME, 'NetBoundaryFlow2Sat_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'NetBoundaryFlow2Sat_Q', 'one', 1, &
      &     'Volumetric flow rate to the saturated zone along the external boundary'// &
      &     ' (negative value is flow out of model domain)', &
      &     'L3/T', NetBoundaryFlow2Sat_Q)
 
-      CALL declvar_dble(MODNAME, 'StreamExchng2Sat_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'StreamExchng2Sat_Q', 'one', 1, &
      &     'Volumetric flow rate of exchange betweeen streams and the saturated'// &
      &     ' zone (value is equal to Strm2UZGW minus SatDisch2Stream_Q, where a'// &
      &     ' negative value indicates a net loss from streams)', &
      &     'L3/T', StreamExchng2Sat_Q)
 
-      CALL declvar_dble(MODNAME, 'Stream2Unsat_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Stream2Unsat_Q', 'one', 1, &
      &     'Volumetric flow rate betweeen streams and the unsaturated'// &
      &     ' zone (value is equal to Strm2UZGW minus SatDisch2Stream_Q, where a'// &
      &     ' negative value indicates a net loss from streams)', &
      &     'L3/T', Stream2Unsat_Q)
 
-      CALL declvar_dble(MODNAME, 'LakeExchng2Sat_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'LakeExchng2Sat_Q', 'one', 1, &
      &     'Volumetric flow rate of exchange betweeen lakes and the saturated'// &
      &     ' zone (value is equal to Strm2UZGW minus SatDisch2Stream_Q, where a'// &
      &     ' negative value indicates a net loss from streams)', &
      &     'L3/T', LakeExchng2Sat_Q)
 
-      CALL declvar_dble(MODNAME, 'Lake2Unsat_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Lake2Unsat_Q', 'one', 1, &
      &     'Volumetric flow rate betweeen lakes and the unsaturated'// &
      &     ' zone (value is equal to Strm2UZGW minus SatDisch2Stream_Q, where a'// &
      &     ' negative value indicates a net loss from streams)', &
      &     'L3/T', Lake2Unsat_Q)
 
-      CALL declvar_dble(MODNAME, 'stream_inflow', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'stream_inflow', 'one', 1, &
      &     'Specified volumetric stream inflow rate into model ', &
      &     'L3/T', Stream_inflow)
 
-      CALL declvar_dble(MODNAME, 'Unsat_S', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Unsat_S', 'one', 1, &
      &     'Volume of water in the unsaturated zone', &
      &     'L3', Unsat_S)
 
-      CALL declvar_dble(MODNAME, 'Sat_S', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Sat_S', 'one', 1, &
      &     'Volume of water in the saturated zone', &
      &     'L3', Sat_S)
 
-      CALL declvar_dble(MODNAME, 'Sat_dS', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Sat_dS', 'one', 1, &
      &     'Change in saturated-zone storage', &
      &     'L3', Sat_dS)
 
-      CALL declvar_dble(MODNAME, 'total_pump', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'total_pump', 'one', 1, &
      &     'Total pumpage from all cells', &
      &     'L3', Total_pump)
 
-      CALL declvar_dble(MODNAME, 'total_pump_cfs', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'total_pump_cfs', 'one', 1, &
      &     'Total pumpage from all cells', &
      &     'cfs', Total_pump_cfs)
 
       ALLOCATE (Reach_cfs(Nreach))
-      CALL declvar_real(MODNAME, 'reach_cfs', 'nreach', Nreach, 'real', &
+      CALL declvar_real(MODNAME, 'reach_cfs', 'nreach', Nreach, &
      &     'Stream flow leaving each stream reach', &
      &     'cfs', Reach_cfs)
 
       ALLOCATE (Reach_wse(Nreach))
-      CALL declvar_real(MODNAME, 'reach_wse', 'nreach', Nreach, 'real', &
+      CALL declvar_real(MODNAME, 'reach_wse', 'nreach', Nreach, &
      &     'Water surface elevation in each stream reach', &
      &     'L', Reach_wse)
 
-      CALL declvar_dble(MODNAME, 'basin_gw2sm', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_gw2sm', 'one', 1, &
      &     'Basin average water exfiltrated from unsaturated and saturated zones and added to soil zone', &
      &     'inches', Basin_gw2sm)
 
-      CALL declvar_dble(MODNAME, 'basin_szreject', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_szreject', 'one', 1, &
      &     'Basin average recharge from SZ and rejected by UZF', &
      &     'inches', Basin_szreject)
 
       ALLOCATE (Gw2sm(Nhru))
-      CALL declvar_real(MODNAME, 'gw2sm', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'gw2sm', 'nhru', Nhru, &
      &     'HRU average water exfiltrated from groundwater model and added back to soil zone', &
      &     'inches', Gw2sm)
 
       ALLOCATE (Actet_gw(Nhru))
-      CALL declvar_real(MODNAME, 'actet_gw', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'actet_gw', 'nhru', Nhru, &
      &     'Actual ET from each GW cell', &
      &     'inches', Actet_gw)
 
       ALLOCATE (Actet_tot_gwsz(Nhru))
-      CALL declvar_real(MODNAME, 'actet_tot_gwsz', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'actet_tot_gwsz', 'nhru', Nhru, &
      &     'Total actual ET from each GW cell and PRMS soil zone', &
      &     'inches', Actet_tot_gwsz)
 
       ALLOCATE (Streamflow_sfr(Nsegment))
-      CALL declvar_real(MODNAME, 'streamflow_sfr', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real(MODNAME, 'streamflow_sfr', 'nsegment', Nsegment, &
      &     'Streamflow as computed by SFR for each segment', &
      &     'cfs', Streamflow_sfr)
 
       ALLOCATE (Seepage_reach_sfr(Nreach))
-      CALL declvar_real(MODNAME, 'seepage_reach_sfr', 'nreach', Nreach, 'real', &
+      CALL declvar_real(MODNAME, 'seepage_reach_sfr', 'nreach', Nreach, &
      &     'Seepage as computed by SFR for each reach', &
      &     'cfs', Seepage_reach_sfr)
 
       ALLOCATE (Seepage_segment_sfr(Nreach))
-      CALL declvar_real(MODNAME, 'seepage_segment_sfr', 'nsegment', Nsegment, 'real', &
+      CALL declvar_real(MODNAME, 'seepage_segment_sfr', 'nsegment', Nsegment, &
      &     'Seepage as computed by SFR for each segment', &
      &     'cfs', Seepage_segment_sfr)
 
       ALLOCATE ( Gw_rejected(Nhru) )
-      CALL declvar_real(MODNAME, 'gw_rejected', 'nhru', Nhru, 'real', &
-     &     'HRU average recharge rejected by UZF', &
-     &     'inches', Gw_rejected)
+      CALL declvar_real(MODNAME, 'gw_rejected', 'nhru', Nhru, &
+     &     'HRU average recharge rejected by UZF', 'inches', &
+     &     Gw_rejected)
 
-!      ALLOCATE ( Uzf_infil_map(Nhru) )
-!      CALL declvar_real(MODNAME, 'uzf_infil_map', 'nhru', Nhru, 'real', &
-!     &     'HRU total gravity drainage to UZF cells', 'L3', &
-!     &     Uzf_infil_map)
+!       ALLOCATE ( Uzf_infil_map(Nhru) )
+!       CALL declvar_real(MODNAME, 'uzf_infil_map', 'nhru', Nhru, &
+!      &     'HRU total gravity drainage to UZF cells', 'L3', &
+!      &     Uzf_infil_map)
 
-!      ALLOCATE ( Sat_recharge(Nhru) )
-!      CALL declvar_real(MODNAME, 'sat_recharge', 'nhru', Nhru, 'real', &
-!     &     'HRU total recharge to the saturated zone', 'L3', &
-!     &     Sat_recharge)
+!       ALLOCATE ( Sat_recharge(Nhru) )
+!       CALL declvar_real(MODNAME, 'sat_recharge', 'nhru', Nhru, &
+!      &     'HRU total recharge to the saturated zone', 'L3', &
+!      &     Sat_recharge)
 
-!      ALLOCATE ( Mfoutflow_to_gvr(Nhru) )
-!      CALL declvar_real(MODNAME, 'mfoutflow_to_gvr', 'nhru', Nhru, 'real', &
-!     &     'MODFLOW total discharge and ET to each HRU', 'L3', &
-!     &     Mfoutflow_to_gvr)
+!       ALLOCATE ( Mfoutflow_to_gvr(Nhru) )
+!       CALL declvar_real(MODNAME, 'mfoutflow_to_gvr', 'nhru', Nhru, &
+!      &     'MODFLOW total discharge and ET to each HRU', 'L3', &
+!      &     Mfoutflow_to_gvr)
 
       END FUNCTION gsfbuddecl
 
@@ -269,7 +269,7 @@
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Hru_actet, Basin_sroff, &
      &    Basin_actet, Basin_ssstor, Ssres_stor, Slow_stor, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_gwflow_cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv
-!Warning, modifies Basin_soil_moist, Basin_ssstor, and Gw2sm_grav
+!Warning, modifies Basin_ssstor, and Gw2sm_grav
       USE PRMS_SOILZONE, ONLY: Pref_flow_stor, Gravity_stor_res, Hrucheck, Gvr_hru_id, &
      &    Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
       IMPLICIT NONE
@@ -701,7 +701,7 @@
      &    TOTSPFLOW, NSTRM, SFRRATIN, ISTRM
       USE PRMS_FLOWVARS, ONLY: Basin_cfs, Basin_cms, Basin_stflow_out
       USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV, ACTIVE
-      USE PRMS_MODULE, ONLY: Ag_package_active
+      USE PRMS_MODULE, ONLY: Ag_package
       USE PRMS_SET_TIME, ONLY: Cfs2inches
       USE GWFAGMODULE, ONLY:  NUMIRRDIVERSIONSP,IRRSEG
       IMPLICIT NONE
@@ -725,7 +725,7 @@
       first_reach = 1
       DO i = 1, NSS
         itemp = 0
-        IF ( Ag_package_active==ACTIVE ) THEN
+        IF ( Ag_package==ACTIVE ) THEN
           DO j = 1, NUMIRRDIVERSIONSP
             IF ( i == IRRSEG(J) ) itemp = IRRSEG(J)
           END DO

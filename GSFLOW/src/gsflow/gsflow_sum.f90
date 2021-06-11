@@ -4,13 +4,13 @@
 !***********************************************************************
 
       MODULE GSFSUM
-      USE PRMS_CONSTANTS, ONLY: DEBUG_WB, DEBUG_less, ERROR_open_out, CFS2CMS_CONV, ACTIVE, READ_INIT, OFF
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, DEBUG_WB, DEBUG_less, ERROR_open_out, CFS2CMS_CONV, ACTIVE, READ_INIT, OFF
       USE PRMS_MODULE, ONLY: Print_debug
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output CSV Summary'
       character(len=10), parameter :: MODNAME = 'gsflow_sum'
-      character(len=*), parameter :: Version_gsflow_sum = '2021-02-09'
+      character(len=*), parameter :: Version_gsflow_sum = '2021-06-08'
       INTEGER, SAVE :: BALUNT
       DOUBLE PRECISION, PARAMETER :: ERRCHK = 0.0001D0
       INTEGER, SAVE :: Balance_unt, Vbnm_index(14), Gsf_unt, Rpt_count
@@ -65,8 +65,7 @@
 !   Declared Parameters
       INTEGER, SAVE :: Id_obsrunoff
 !   Control Parameters
-      INTEGER, SAVE :: Rpt_days, Gsf_rpt
-      CHARACTER(LEN=256), SAVE :: Csv_output_file, Gsflow_output_file
+      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Csv_output_file, Gsflow_output_file
       END MODULE GSFSUM
 
 !***********************************************************************
@@ -117,274 +116,271 @@
         WRITE ( BALUNT, 9001 )
       ENDIF
 
-      CALL declvar_dble(MODNAME, 'CapDrainage2Sat_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'CapDrainage2Sat_Q', 'one', 1, &
      &     'Volumetric flow rate of direct gravity drainage from excess capillary water to the unsaturated zone', &
      &     'L3/T', CapDrainage2Sat_Q)
 
-      CALL declvar_dble(MODNAME, 'Precip_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Precip_Q', 'one', 1, &
      &     'Volumetric flow rate of precipitation', &
      &     'L3/T', Precip_Q)
 
-      CALL declvar_dble(MODNAME, 'basinsnow', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basinsnow', 'one', 1, &
      &     'Volumetric flow rate of snow', &
      &     'L3/T', Basinsnow)
 
-      CALL declvar_dble(MODNAME, 'basinrain', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basinrain', 'one', 1, &
      &     'Volumetric flow rate of rain', &
      &     'L3/T', Basinrain)
 
-      CALL declvar_dble(MODNAME, 'CapET_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'CapET_Q', 'one', 1, &
      &     'Volumetric flow rate of evapotranspiration from pervious areas ', &
      &     'L3/T', CapET_Q)
 
-      CALL declvar_dble(MODNAME, 'ImpervEvap_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'ImpervEvap_Q', 'one', 1, &
      &     'Volumetric flow rate of evaporation from impervious areas', &
      &     'L3/T', ImpervEvap_Q)
 
-      CALL declvar_dble(MODNAME, 'DprstEvap_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'DprstEvap_Q', 'one', 1, &
      &     'Volumetric flow rate of evaporation from surface depressions', &
      &     'L3/T', DprstEvap_Q)
 
-      CALL declvar_dble(MODNAME, 'CanopyEvap_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'CanopyEvap_Q', 'one', 1, &
      &     'Volumetric flow rate of evaporation of intercepted precipitation', &
      &     'L3/T', CanopyEvap_Q)
 
-      CALL declvar_dble(MODNAME, 'SnowEvap_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'SnowEvap_Q', 'one', 1, &
      &     'Volumetric flow rate of snowpack sublimation', &
      &     'L3/T', SnowEvap_Q)
 
-      CALL declvar_dble(MODNAME, 'LakeEvap_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'LakeEvap_Q', 'one', 1, &
      &     'Volumetric flow rate of evaporation from lakes', &
      &     'L3/T', LakeEvap_Q)
 
-      CALL declvar_dble(MODNAME, 'LakePrecip_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'LakePrecip_Q', 'one', 1, &
      &     'Volumetric flow rate of precipitation on lakes', &
      &     'L3/T', LakePrecip_Q)
 
-      CALL declvar_dble(MODNAME, 'StreamOut_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'StreamOut_Q', 'one', 1, &
      &     'Volumetric flow rate of streamflow leaving modeled region', &
      &     'L3/T', StreamOut_Q)
 
-      CALL declvar_dble(MODNAME, 'PotGravDrn2Unsat_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'PotGravDrn2Unsat_Q', 'one', 1, &
      &     'Potential volumetric flow rate of gravity drainage from'// &
      &     ' the soil zone to the unsaturated zone (before conditions of the unsaturated and saturated zones are applied)', &
      &     'L3/T', PotGravDrn2Unsat_Q)
 
-      CALL declvar_dble(MODNAME, 'Sat2Grav_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Sat2Grav_Q', 'one', 1, &
      &     'Volumetric flow rate of groundwater discharge from the saturated zone to the soil zone', &
      &     'L3/T', Sat2Grav_Q)
 
-      CALL declvar_dble(MODNAME, 'RechargeUnsat2Sat_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'RechargeUnsat2Sat_Q', 'one', 1, &
      &     'Volumetric flow rate of recharge from the unsaturated zone to the saturated zone', &
      &     'L3/T', RechargeUnsat2Sat_Q)
 
-      CALL declvar_dble(MODNAME, 'basinseepout', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basinseepout', 'one', 1, &
      &     'Volumetric flow rate of groundwater discharge from the saturated zone to the soil zone', &
      &     'L3/T', Basinseepout)
 
-      CALL declvar_dble(MODNAME, 'Cap_S', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Cap_S', 'one', 1, &
      &     'Volume of water in capillary reservoirs of the soil zone', &
      &     'L3', Cap_S)
 
-      CALL declvar_dble(MODNAME, 'Grav_S', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Grav_S', 'one', 1, &
      &     'Volume of water in gravity reservoirs of the soil zone', &
      &     'L3', Grav_S)
 
-      CALL declvar_dble(MODNAME, 'Canopy_S', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Canopy_S', 'one', 1, &
      &     'Volume of intercepted precipitation in plant-canopy reservoirs', &
      &     'L3', Canopy_S)
 
-      CALL declvar_dble(MODNAME, 'Imperv_S', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Imperv_S', 'one', 1, &
      &     'Volume of water in impervious reservoirs', &
      &     'L3', Imperv_S)
 
-      CALL declvar_dble(MODNAME, 'Interflow2Stream_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Interflow2Stream_Q', 'one', 1, &
      &     'Volumetric flow rate of slow plus fast interflow to streams', &
      &     'L3/T', Interflow2Stream_Q)
 
-      CALL declvar_dble(MODNAME, 'Sroff2Stream_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Sroff2Stream_Q', 'one', 1, &
      &     'Volumetric flow rate of surface runoff to streams', &
      &     'L3/T', Sroff2Stream_Q)
 
-      CALL declvar_dble(MODNAME, 'HortSroff2Lake_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'HortSroff2Lake_Q', 'one', 1, &
      &     'Volumetric flow rate of Hortonian surface runoff to lakes', &
      &     'L3/T', HortSroff2Lake_Q)
 
-      CALL declvar_dble(MODNAME, 'DunnInterflow2Lake_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'DunnInterflow2Lake_Q', 'one', 1, &
      &     'Volumetric flow rate of interflow and Dunnian surface runoff to lakes', &
      &     'L3/T', DunnInterflow2Lake_Q)
 
-      CALL declvar_dble(MODNAME, 'Stream_S', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Stream_S', 'one', 1, &
      &     'Volume of water in streams (non-zero only when transient routing option is used in SFR2)', &
      &     'L3', Stream_S)
 
-      CALL declvar_dble(MODNAME, 'Lake_S', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Lake_S', 'one', 1, &
      &     'Volume of water in lakes', &
      &     'L3', Lake_S)
 
-      CALL declvar_dble(MODNAME, 'obs_strmflow', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'obs_strmflow', 'one', 1, &
      &     'Volumetric flow rate of streamflow measured at a gaging station', &
      &     'L3/T', Obs_strmflow)
 
-      CALL declvar_dble(MODNAME, 'UnsatDrainageExcess_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'UnsatDrainageExcess_Q', 'one', 1, &
      &     'Volumetric flow rate of gravity drainage from the soil'// &
      &     ' zone not accepted due to conditions in the unsaturated and saturated zones', &
      &     'L3/T', UnsatDrainageExcess_Q)
 
-      CALL declvar_dble(MODNAME, 'Pref_S', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Pref_S', 'one', 1, &
      &     'Volume of water stored in preferential-flow reservoirs of the soil zone', &
      &     'L3', Pref_S)
 
-      CALL declvar_dble(MODNAME, 'Dprst_S', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Dprst_S', 'one', 1, &
      &     'Volume of water stored in surface-depression storage', &
      &     'L3', Dprst_S)
 
-      CALL declvar_dble(MODNAME, 'SwaleEvap_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'SwaleEvap_Q', 'one', 1, &
      &     'Volumetric flow rate of evaporation from swale HRUs', &
      &     'L3/T', SwaleEvap_Q)
 
-      CALL declvar_dble(MODNAME, 'uzf_et', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'uzf_et', 'one', 1, &
      &     'Volumetric flow rate of evapotranspiration from the unsaturated and saturated zones', &
      &     'L3/T', Uzf_et)
 
-      CALL declvar_dble(MODNAME, 'UnsatET_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'UnsatET_Q', 'one', 1, &
      &     'Volumetric flow rate of evapotranspiration from the unsaturated zone', &
      &     'L3/T', UnsatET_Q)
 
-      CALL declvar_dble(MODNAME, 'SatET_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'SatET_Q', 'one', 1, &
      &     'Volumetric flow rate of evapotranspiration from the saturated zone', &
      &     'L3/T', SatET_Q)
 
-      CALL declvar_dble(MODNAME, 'Unsat_dS', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Unsat_dS', 'one', 1, &
      &     'Change in unsaturated-zone storage', &
      &     'L3', Unsat_dS)
 
-      CALL declvar_dble(MODNAME, 'SoilDrainage2Unsat_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'SoilDrainage2Unsat_Q', 'one', 1, &
      &     'Volumetric flow rate of gravity drainage to the unsaturated and saturated zones', &
      &     'L3/T', SoilDrainage2Unsat_Q)
 
-      CALL declvar_dble(MODNAME, 'Stream2Sat_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Stream2Sat_Q', 'one', 1, &
      &     'Volumetric flow rate of stream leakage to the unsaturated and saturated zones', &
      &     'L3/T', Stream2Sat_Q)
 
-      CALL declvar_dble(MODNAME, 'UnsatStream_dS', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'UnsatStream_dS', 'one', 1, &
      &     'Change in unsaturated-zone storage under streams', &
      &     'L3', UnsatStream_dS)
 
-      CALL declvar_dble(MODNAME, 'SatDisch2Stream_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'SatDisch2Stream_Q', 'one', 1, &
      &     'Volumetric flow rate of groundwater discharge to streams', &
      &     'L3/T', SatDisch2Stream_Q)
 
-      CALL declvar_dble(MODNAME, 'UnsatStream_S', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'UnsatStream_S', 'one', 1, &
      &     'Volume of water in the unsaturated zone under streams', &
      &     'L3', UnsatStream_S)
 
-      CALL declvar_dble(MODNAME, 'Lake2Sat_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Lake2Sat_Q', 'one', 1, &
      &     'Volumetric flow rate of lake leakage to the unsaturated and saturated zones', &
      &     'L3/T', Lake2Sat_Q)
 
-      CALL declvar_dble(MODNAME, 'Lake_dS', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Lake_dS', 'one', 1, &
      &     'Change in lake storage', &
      &     'L3', Lake_dS)
 
-      CALL declvar_dble(MODNAME, 'SatDisch2Lake_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'SatDisch2Lake_Q', 'one', 1, &
      &     'Volumetric flow rate of groundwater discharge to lakes', &
      &     'L3/T', SatDisch2Lake_Q)
 
-      CALL declvar_dble(MODNAME, 'Infil2Soil_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Infil2Soil_Q', 'one', 1, &
      &     'Volumetric flow rate of soil infiltration (including precipitation, snowmelt, and cascading Hortonian flow)', &
      &     'L3/T', Infil2Soil_Q)
 
-      CALL declvar_dble(MODNAME, 'DunnSroff2Stream_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'DunnSroff2Stream_Q', 'one', 1, &
      &     'Volumetric flow rate of Dunnian runoff to streams', &
      &     'L3/T', DunnSroff2Stream_Q)
 
-      CALL declvar_dble(MODNAME, 'HortSroff2Stream_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'HortSroff2Stream_Q', 'one', 1, &
      &     'Volumetric flow rate of Hortonian runoff to streams', &
      &     'L3/T', HortSroff2Stream_Q)
 
-      CALL declvar_dble(MODNAME, 'basinsm2gvr', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basinsm2gvr', 'one', 1, &
      &     'Volumetric flow rate of flow from capillary reservoirs to gravity reservoirs', &
      &     'L3/T', Basinsm2gvr)
 
-      CALL declvar_dble(MODNAME, 'basingvr2sm', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basingvr2sm', 'one', 1, &
      &     'Volumetric flow rate of flow from gravity reservoirs to capillary reservoirs', &
      &     'L3/T', Basingvr2sm)
 
-      CALL declvar_dble(MODNAME, 'Infil2CapTotal_Q', 'one', 1, 'double', &
-     &     'Volumetric flow rate of soil infiltration into capillary'// &
-     &     ' reservoirs including precipitation, snowmelt, and'// &
-     &     ' cascading Hortonian and Dunnian runoff and interflow'// &
-     &     ' minus infiltration to preferential-flow reservoirs', &
+      CALL declvar_dble(MODNAME, 'Infil2CapTotal_Q', 'one', 1, &
+     &     'Volumetric flow rate of soil infiltration into capillary reservoirs including precipitation, snowmelt, and'// &
+     &     ' cascading Hortonian and Dunnian runoff and interflow minus infiltration to preferential-flow reservoirs', &
      &     'L3/T', Infil2CapTotal_Q)
 
-      CALL declvar_dble(MODNAME, 'Infil2Pref_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Infil2Pref_Q', 'one', 1, &
      &     'Volumetric flow rate of soil infiltration into'// &
-     &     ' preferential-flow reservoirs including precipitation,'// &
-     &     ' snowmelt, and cascading surface runoff', &
+     &     ' preferential-flow reservoirs including precipitation, snowmelt, and cascading surface runoff', &
      &     'L3/T', Infil2Pref_Q)
 
-      CALL declvar_dble(MODNAME, 'DunnInterflow2Cap_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'DunnInterflow2Cap_Q', 'one', 1, &
      &     'Volumetric flow rate of cascading Dunnian runoff and interflow to HRUs', &
      &     'L3/T', DunnInterflow2Cap_Q)
 
-      CALL declvar_dble(MODNAME, 'ActualET_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'ActualET_Q', 'one', 1, &
      &     'Volumetric flow rate of actual evaporation from HRUs', &
      &     'L3/T', ActualET_Q)
 
-      CALL declvar_dble(MODNAME, 'SnowMelt_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'SnowMelt_Q', 'one', 1, &
      &     'Volumetric flow rate of snowmelt', &
      &     'L3/T', SnowMelt_Q)
 
-      CALL declvar_dble(MODNAME, 'Ave_SoilDrainage2Unsat_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'Ave_SoilDrainage2Unsat_Q', 'one', 1, &
      &     'Running average gravity drainage to the unsaturated and saturated zones', &
      &     'L3', Ave_SoilDrainage2Unsat_Q)
 
-      CALL declvar_dble(MODNAME, 'cum_pweqv', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'cum_pweqv', 'one', 1, &
      &     'Cumulative change in snowpack storage', &
      &     'L3', Cum_pweqv)
 
-      CALL declvar_dble(MODNAME, 'cum_soilstor', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'cum_soilstor', 'one', 1, &
      &     'Cumulative change in soil storage', &
      &     'L3', Cum_soilstor)
 
-      CALL declvar_dble(MODNAME, 'cum_uzstor', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'cum_uzstor', 'one', 1, &
      &     'Cumulative change in unsaturated storage', &
      &     'L3', Cum_uzstor)
 
-      CALL declvar_dble(MODNAME, 'cum_satstor', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'cum_satstor', 'one', 1, &
      &     'Cumulative change in saturated storage', &
      &     'L3', Cum_satstor)
 
-      CALL declvar_dble(MODNAME, 'rate_pweqv', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'rate_pweqv', 'one', 1, &
      &     'Change in snow pack storage', &
      &     'L3', Rate_pweqv)
 
-      CALL declvar_dble(MODNAME, 'rate_soilstor', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'rate_soilstor', 'one', 1, &
      &     'Change in soil storage', &
      &     'L3', Rate_soilstor)
 
-      CALL declvar_dble(MODNAME, 'rate_uzstor', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'rate_uzstor', 'one', 1, &
      &     'Change in unsaturated storage', &
      &     'L3', Rate_uzstor)
 
-      CALL declvar_dble(MODNAME, 'rate_satstor', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'rate_satstor', 'one', 1, &
      &     'Change in saturated storage', &
      &     'L3', Rate_satstor)
 
-      CALL declvar_dble(MODNAME, 'SnowPweqv_S', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'SnowPweqv_S', 'one', 1, &
      &     'Volume of water in snowpack storage', &
      &     'L3', SnowPweqv_S)
 
-      CALL declvar_dble(MODNAME, 'basinsoilstor', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basinsoilstor', 'one', 1, &
      &     'Volume of soil moisture storage', &
      &     'L3', Basinsoilstor)
 
-      CALL declvar_dble(MODNAME, 'NetWellFlow_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'NetWellFlow_Q', 'one', 1, &
      &     'Net volumetric flow rate of groundwater injection or removal from wells ', &
      &     'L3/T', NetWellFlow_Q)
 
-      CALL declvar_dble(MODNAME, 'BoundaryStreamFlow_Q', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'BoundaryStreamFlow_Q', 'one', 1, &
      &     'Volumetric specified streamflow into the model domain to SFR', &
      &     'L3/T', BoundaryStreamFlow_Q)
 
@@ -564,7 +560,7 @@
      &    TOTSTOR_LAK, TOTWTHDRW_LAK, TOTRUNF_LAK, TOTSURFIN_LAK, &
      &    TOTSURFOT_LAK, TOTEVAP_LAK, TOTPPT_LAK
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_MODULE, ONLY: KKITER, Nobs, Timestep, Dprst_flag, Have_lakes
+      USE PRMS_MODULE, ONLY: KKITER, Nobs, Timestep, Dprst_flag, Have_lakes, Gsf_rpt, Rpt_days
       USE PRMS_OBS, ONLY: Runoff, Runoff_units
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
@@ -885,8 +881,8 @@
 !***********************************************************************
       INTEGER FUNCTION gsfsumclean()
       USE PRMS_CONSTANTS, ONLY: DEBUG_WB
-      USE PRMS_MODULE, ONLY: Print_debug
-      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Gsf_rpt, BALUNT
+      USE PRMS_MODULE, ONLY: Print_debug, Gsf_rpt
+      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, BALUNT
       IMPLICIT NONE
 !***********************************************************************
       gsfsumclean = 0
@@ -900,16 +896,14 @@
 !***********************************************************************
       SUBROUTINE GSF_PRINT()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_open_out
-      USE PRMS_MODULE, ONLY: Print_debug
-      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Csv_output_file, Rpt_days, &
-     &    Gsflow_output_file, Gsf_rpt
+      USE PRMS_MODULE, ONLY: Print_debug, Gsf_rpt, Rpt_days
+      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Csv_output_file, Gsflow_output_file
       IMPLICIT NONE
       INTEGER, EXTERNAL :: control_integer, control_string, numchars
       EXTERNAL GSF_HEADERS, read_error, PRMS_open_output_file
 ! Local Variables
       INTEGER :: nc, ios
 !***********************************************************************
-      IF ( control_integer(Gsf_rpt, 'gsf_rpt')/=0 ) CALL read_error(5, 'gsf_rpt')
       IF ( Gsf_rpt==1 ) THEN  !gsf_rpt default = 1
 
         IF ( control_string(Csv_output_file, 'csv_output_file')/=0 ) CALL read_error(5, 'csv_output_file')
@@ -922,7 +916,6 @@
  
 ! Open the GSF volumetric balance report file
 
-      IF ( control_integer(Rpt_days, 'rpt_days')/=0 ) CALL read_error(5, 'rpt_days')
       IF ( Print_debug>DEBUG_less ) PRINT '(/,A,I4)', 'Water Budget print frequency is:', Rpt_days
       IF ( control_string(Gsflow_output_file, 'gsflow_output_file')/=0 ) CALL read_error(5, 'gsflow_output_file')
       IF ( Gsflow_output_file(:1)==' ' .OR. Gsflow_output_file(:1)==CHAR(0) ) Gsflow_output_file = 'gsflow.out'
