@@ -6,7 +6,7 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODSIM'
       character(len=14), SAVE :: MODNAME = 'gsflow_prms2modsim'
-      character(len=*), parameter :: Version_gsflow_prms2modsim = '2021-02-12'
+      character(len=*), parameter :: Version_gsflow_prms2modsim = '2021-06-11'
       DOUBLE PRECISION, SAVE :: Acre_inches_to_MSl3
 !   Declared Variables
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Segment_latflow(:), Lake_In_flow(:)
@@ -70,19 +70,19 @@
 !      ENDIF
 
       ALLOCATE ( Segment_latflow(Nsegment) )
-      CALL declvar_dble(MODNAME, 'Segment_latflow', 'nsegment', Nsegment, 'double', &
+      CALL declvar_dble(MODNAME, 'Segment_latflow', 'nsegment', Nsegment, &
      &     'Lateral flow to each segment', &
      &     'acre-inches', Segment_latflow)
       ALLOCATE ( Lake_latflow(Nlake) )
-      CALL declvar_dble(MODNAME, 'Lake_latflow', 'nlake', Nlake, 'double', &
+      CALL declvar_dble(MODNAME, 'Lake_latflow', 'nlake', Nlake, &
      &     'Total lateral flow into each lake', &
      &     'acre-inches', Lake_latflow)
       ALLOCATE ( Lake_precip(Nlake) )
-      CALL declvar_dble(MODNAME, 'Lake_precip', 'nlake', Nlake, 'double', &
+      CALL declvar_dble(MODNAME, 'Lake_precip', 'nlake', Nlake, &
      &     'Precipitation into each lake', &
      &     'acre-inches', Lake_precip)
       ALLOCATE ( Lake_et(Nlake) )
-      CALL declvar_dble(MODNAME, 'Lake_et', 'nlake', Nlake, 'double', &
+      CALL declvar_dble(MODNAME, 'Lake_et', 'nlake', Nlake, &
      &     'Evaporation from each lake', &
      &     'acre-inches', Lake_et)
       ALLOCATE ( Lake_In_flow(Nlake) )
