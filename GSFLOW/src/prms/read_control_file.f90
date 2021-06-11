@@ -3,7 +3,7 @@
 !***********************************************************************
       MODULE PRMS_CONTROL_FILE
         USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH, MAXFILE_LENGTH, INT_TYPE, REAL_TYPE, CHAR_TYPE, ERROR_control
-        USE PRMS_MODULE, ONLY: Print_debug, EQULS, statsON_OFF, &
+        USE PRMS_MODULE, ONLY: Print_debug, EQULS, & !statsON_OFF, &
      &      Init_vars_from_file, Save_vars_to_file, Parameter_check_flag, Param_file, Model_output_file, &
      &      Precip_module, Temp_module, Et_module, Srunoff_module, Solrad_module, Gwr_swale_flag, &
      &      Strmflow_module, Transp_module, Soilzone_module, Print_debug, Dprst_flag, Subbasin_flag, Frozen_flag, &
@@ -299,9 +299,9 @@
       Control_parameter_data(i)%name = 'nsegmentOutVars'
       NsegmentOutVars = 0
       i = i + 1
-      Control_parameter_data(i)%name = 'statsON_OFF'
-      StatsON_OFF = 0
-      i = i + 1
+!      Control_parameter_data(i)%name = 'statsON_OFF'
+!      StatsON_OFF = 0
+!      i = i + 1
       Control_parameter_data(i)%name = 'csvON_OFF'
       CsvON_OFF = 0
       i = i + 1
