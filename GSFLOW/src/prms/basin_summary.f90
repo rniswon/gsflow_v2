@@ -100,7 +100,7 @@
       INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam
       EXTERNAL :: PRMS_open_output_file, error_stop, read_error
 ! Local Variables
-      INTEGER :: ios, ierr, size, dum, jj
+      INTEGER :: ios, ierr, size, jj
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
 !***********************************************************************
       Begin_results = ACTIVE
@@ -113,13 +113,13 @@
       ierr = 0
       DO jj = 1, BasinOutVars
         Nc_vars(jj) = numchars(BasinOutVar_names(jj))
-        Basin_var_type = getvartype(BasinOutVar_names(jj)(:Nc_vars(jj)), Basin_var_type )
+        Basin_var_type = getvartype(BasinOutVar_names(jj)(:Nc_vars(jj)) )
         IF ( Basin_var_type/=DBLE_TYPE ) THEN
           PRINT *, 'ERROR, invalid basin_summary variable:', BasinOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only double variables allowed'
           ierr = 1
         ENDIF
-        size = getvarsize(BasinOutVar_names(jj)(:Nc_vars(jj)), dum )
+        size = getvarsize(BasinOutVar_names(jj)(:Nc_vars(jj)))
         IF ( size/=1 ) THEN
           PRINT *, 'ERROR, invalid Basin_summary variable:', BasinOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only scalar variables are allowed'
@@ -196,8 +196,8 @@
 !***********************************************************************
       SUBROUTINE basin_summaryrun()
       USE PRMS_BASIN_SUMMARY
-      USE PRMS_MODULE, ONLY: Start_month, Start_day, End_year, End_month, End_day
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday, Modays
+      USE PRMS_MODULE, ONLY: Start_month, Start_day, End_year, End_month, End_day, Nowyear, Nowmonth, Nowday
+      USE PRMS_SET_TIME, ONLY: Modays
       IMPLICIT NONE
 ! Functions
       EXTERNAL :: getvar_dble

@@ -224,7 +224,7 @@
       IF ( Mxnsos==-1 ) CALL read_error(1, 'mxnsos')
       IF ( Model==DOCUMENTATION .AND. Mxnsos<1 ) Mxnsos = 1
 
-! Nlake_hrus set to nlake in gsflow_prms for 5.0.0, dimension nlake_hrus will be in 5.0.1
+! Nlake_hrus set to nlake in call_modules for 5.0.0, dimension nlake_hrus will be in 5.0.1
 ! 5.0.0 assumes lakes are 1 HRU
       IF ( Mxnsos>0 ) ALLOCATE ( Wvd(Mxnsos, Nlake), S24(Mxnsos, Nlake), C24(Mxnsos, Nlake) )
 
@@ -343,7 +343,7 @@
      &       'Total surface runoff into each lake', &
      &       'cfs', Lake_sroff)
         ALLOCATE ( Lake_interflow(Nlake) )
-        CALL declvar_dble(MODNAME, 'lake_interflow', 'nlake', Nlake,&
+        CALL declvar_dble(MODNAME, 'lake_interflow', 'nlake', Nlake, &
      &       'Total interflow into each lake', &
      &       'cfs', Lake_interflow)
         ALLOCATE ( Lake_gwflow(Nlake) )

@@ -13,7 +13,7 @@
      &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, &
      &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
-     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag, Dyn_ag_frac_flag
+     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
@@ -29,7 +29,6 @@
         INTEGER, SAVE :: Soil_moist_next_yr, Soil_moist_next_mo, Soil_moist_next_day, Soil_moist_unit
         INTEGER, SAVE :: Dprst_depth_next_yr, Dprst_depth_next_mo, Dprst_depth_next_day, Dprst_depth_unit, Dprst_depth_flag
         INTEGER, SAVE :: Dprst_frac_next_yr, Dprst_frac_next_mo, Dprst_frac_next_day, Dprst_frac_unit, Dprst_frac_flag
-        INTEGER, SAVE :: Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day, Ag_frac_unit, Ag_frac_dynflag
         INTEGER, SAVE :: Covtype_unit, Covtype_next_yr, Covtype_next_mo, Covtype_next_day
         INTEGER, SAVE :: Covden_sum_unit, Covden_sum_next_yr, Covden_sum_next_mo, Covden_sum_next_day, Covden_sum_flag
         INTEGER, SAVE :: Covden_win_unit, Covden_win_next_yr, Covden_win_next_mo, Covden_win_next_day, Covden_win_flag
@@ -41,15 +40,15 @@
         INTEGER, SAVE :: Rad_trncf_unit, Rad_trncf_next_yr, Rad_trncf_next_mo, Rad_trncf_next_day
         INTEGER, SAVE :: Sro_to_dprst_unit, Sro_to_dprst_next_yr, Sro_to_dprst_next_mo, Sro_to_dprst_next_day
         INTEGER, SAVE :: Sro_to_imperv_unit, Sro_to_imperv_next_yr, Sro_to_imperv_next_mo, Sro_to_imperv_next_day
-        INTEGER, SAVE :: Check_imperv, Wrainintcp_flag, Srainintcp_flag, Snowintcp_flag, Check_dprst_frac, Check_ag_frac
+        INTEGER, SAVE :: Check_imperv, Wrainintcp_flag, Srainintcp_flag, Snowintcp_flag, Check_dprst_frac
         INTEGER, SAVE :: Soilmoist_flag, Soilrechr_flag, Output_unit
         INTEGER, SAVE :: Snarea_thresh_unit, Snarea_thresh_next_yr, Snarea_thresh_next_mo, Snarea_thresh_next_day
         INTEGER, SAVE, ALLOCATABLE :: Itemp(:), Updated_hrus(:)
-        REAL, SAVE, ALLOCATABLE :: Temp(:), Temp3(:), Temp4(:), Potet_coef(:, :), Soil_rechr_max_frac(:)
+        REAL, SAVE, ALLOCATABLE :: Temp(:), Temp3(:), Potet_coef(:, :), Soil_rechr_max_frac(:)
 ! Control Parameters
         CHARACTER(LEN=MAXFILE_LENGTH) :: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic
-        CHARACTER(LEN=MAXFILE_LENGTH) :: potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, ag_frac_dynamic
+        CHARACTER(LEN=MAXFILE_LENGTH) :: potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, dynamic_param_log_file
         CHARACTER(LEN=MAXFILE_LENGTH) :: fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, snareathresh_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn
@@ -150,20 +149,6 @@
           ELSE
             istop = 1
           ENDIF
-        ENDIF
-      ENDIF
-
-      Ag_frac_dynflag = OFF
-      IF ( Dyn_ag_frac_flag==ACTIVE ) THEN
-        IF ( control_string(ag_frac_dynamic, 'ag_frac_dynamic')/=0 ) CALL read_error(5, 'ag_frac_dynamic')
-        CALL find_header_end(Ag_frac_unit, ag_frac_dynamic, 'ag_frac_dynamic', ierr, 0, 0)
-        IF ( ierr==0 ) THEN
-          CALL find_current_file_time(Ag_frac_unit, year, month, day, &
-     &                                Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day)
-          ALLOCATE ( Temp4(Nhru) )
-          Ag_frac_dynflag = ACTIVE
-        ELSE
-          istop = 1
         ENDIF
       ENDIF
 
@@ -417,12 +402,11 @@
 !***********************************************************************
       INTEGER FUNCTION dynparamrun()
       USE PRMS_DYNAMIC_PARAM_READ
-      USE PRMS_MODULE, ONLY: Ag_frac_flag
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: Hru_type, Hru_area, Dprst_clos_flag, &
      &    Hru_percent_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Dprst_frac, Dprst_open_flag, &
      &    Dprst_area_max, Dprst_area_open_max, Dprst_area_clos_max, Dprst_frac_open, &
-     &    Cov_type, Basin_area_inv, Covden_win, Covden_sum, Ag_area, Ag_frac
+     &    Cov_type, Basin_area_inv, Covden_win, Covden_sum
       USE PRMS_CLIMATEVARS, ONLY: Transp_on, Epan_coef
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Soil_moist, Soil_rechr, Imperv_stor, Sat_threshold, &
      &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor
@@ -448,7 +432,7 @@
       EXTERNAL :: write_dynparam_potet
 ! Local Variables
       INTEGER :: i, istop, check_dprst_depth_flag, check_sm_max_flag, check_srechr_max_flag
-      REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj, frac, agfrac
+      REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       dynparamrun = 0
@@ -456,11 +440,10 @@
       check_srechr_max_flag = OFF
       check_sm_max_flag = OFF
 
-      IF ( Imperv_frac_flag==ACTIVE .OR. Dprst_frac_flag==ACTIVE .OR. Dprst_depth_flag==ACTIVE .OR. Ag_frac_dynflag==ACTIVE ) THEN
+      IF ( Imperv_frac_flag==ACTIVE .OR. Dprst_frac_flag==ACTIVE .OR. Dprst_depth_flag==ACTIVE ) THEN
         Check_imperv = OFF
         Check_dprst_frac = OFF
         check_dprst_depth_flag = OFF
-        Check_ag_frac = OFF
 
         IF ( Dprst_depth_flag==ACTIVE ) THEN
           IF ( Dprst_depth_next_mo/=0 ) THEN
@@ -499,19 +482,7 @@
           ENDIF
         ENDIF
 
-        IF ( Ag_frac_dynflag==ACTIVE ) THEN
-          IF ( Ag_frac_next_mo/=0 ) THEN
-            IF ( Ag_frac_next_yr==Nowyear .AND. Ag_frac_next_mo==Nowmonth .AND. Ag_frac_next_day==Nowday ) THEN
-              READ ( Ag_frac_unit, * ) Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day, Temp4
-              CALL write_dynoutput(Output_unit, Nhru, Updated_hrus, Temp4, Ag_frac, 'ag_frac')
-              CALL is_eof(Ag_frac_unit, Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day)
-              Check_ag_frac = ACTIVE
-            ENDIF
-          ENDIF
-        ENDIF
-
-        IF ( Check_imperv==ACTIVE .OR. Check_dprst_frac==ACTIVE .OR. check_dprst_depth_flag==ACTIVE .OR. &
-     &       Check_ag_frac==ACTIVE ) THEN
+        IF ( Check_imperv==ACTIVE .OR. Check_dprst_frac==ACTIVE .OR. check_dprst_depth_flag==ACTIVE ) THEN
           Basin_soil_moist = 0.0D0
           Basin_soil_rechr = 0.0D0
           DO i = 1, Nhru
@@ -526,13 +497,10 @@
                 IF ( frac_imperv>0.0 ) THEN
                   Imperv_stor(i) = Imperv_stor(i)*Hru_percent_imperv(i)/frac_imperv
                 ELSE
-                  frac = Hru_frac_perv(i) !+ agfrac
-                  IF ( frac>0.0 ) THEN
-                    tmp = Imperv_stor(i)*Hru_percent_imperv(i)/frac ! not sure this is correct???
-                    PRINT *, 'WARNING, dynamic impervious changed to 0 when impervious storage > 0'
-                    PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
-                    PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
-                  ENDIF
+                  tmp = Imperv_stor(i)*Hru_percent_imperv(i)/Hru_frac_perv(i) ! not sure this is correct???
+                  PRINT *, 'WARNING, dynamic impervious changed to 0 when impervious storage > 0'
+                  PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
+                  PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
                   soil_adj = tmp
                   Imperv_stor(i) = 0.0
                 ENDIF
@@ -542,12 +510,6 @@
               Hru_imperv(i) = harea*frac_imperv
             ENDIF
 
-            IF ( Check_ag_frac==ACTIVE ) THEN
-              ! Temp4 has new values with negative values set to the old value, Ag_frac has old values
-              Ag_frac(i) = Temp4(i)
-              Ag_area(i) = Ag_frac(i) * Hru_area(i)
-            ENDIF
-
             IF ( Check_dprst_frac==ACTIVE .OR. check_dprst_depth_flag==ACTIVE ) THEN
               ! CAUTION: other DPRST parameters need to have valid values as related to any dynamic parameter updates
               tmp = SNGL( Dprst_vol_open(i) + Dprst_vol_clos(i) )
@@ -555,15 +517,11 @@
                 ! Temp3 has new values with negative values set to the old value, Dprst_frac has old values
                 dprstfrac = Temp3(i)
                 IF ( dprstfrac==0.0 .AND. tmp>0.0 ) THEN
-                  frac = Hru_frac_perv(i)
-!                  IF ( Ag_frac_flag==ACTIVE ) frac = frac + Ag_frac(i)
-                  IF ( frac>0.0 ) THEN
-                    tmp = tmp/(Dprst_frac(i)*harea)/frac ! not sure this is correct???
-                    PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0'
-                    PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
-                    PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
-                    soil_adj = soil_adj + tmp
-                  ENDIF
+                  tmp = tmp/(Dprst_frac(i)*harea)/Hru_frac_perv(i) ! not sure this is correct???
+                  PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0'
+                  PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
+                  PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
+                  soil_adj = soil_adj + tmp
                   Dprst_vol_open(i) = 0.0D0
                   Dprst_vol_clos(i) = 0.0D0
                   tmp = 0.0
@@ -605,40 +563,28 @@
               ENDIF
             ENDIF
 
-            ! check sum of imperv ag, and dprst if either are updated!!!!!!
+            ! check sum of imperv and dprst if either are updated!!!!!!
             hruperv = harea - Hru_imperv(i)
-            IF ( Ag_frac_flag==ACTIVE ) THEN
-              hruperv = hruperv - Ag_area(i)
-              agfrac = Ag_frac(i)
-            ELSE
-              agfrac = 0.0
-            ENDIF
-
             IF ( Dprst_flag==ACTIVE ) THEN
               hruperv = hruperv - Dprst_area_max(i)
               dprstfrac = Dprst_frac(i)
             ELSE
               dprstfrac = 0.0
             ENDIF
-            IF ( Hru_percent_imperv(i)+dprstfrac+agfrac > 1.0 ) THEN
+            IF ( Hru_percent_imperv(i)+dprstfrac > 0.999 ) THEN
               istop = 1
-              PRINT *, 'ERROR, fraction impervious + fraction dprst + agriculture fraction > 1.0 for HRU:', i
-              PRINT *, '       fraction impervious + dprst + ag_frac:', Hru_percent_imperv(i) + dprstfrac + agfrac
-              PRINT *, '       hru_percent_imperv:', Hru_percent_imperv(i), '; dprst_frac:', dprstfrac, '; ag_frac:', agfrac
+              PRINT *, 'ERROR, fraction impervious + fraction dprst > 0.999 for HRU:', i
+              PRINT *, '       fraction impervious + dprst:', Hru_percent_imperv(i) + dprstfrac
+              PRINT *, '       hru_percent_imperv:', Hru_percent_imperv(i), '; dprst_frac:', dprstfrac
               CYCLE
             ENDIF
             ! adjust pervious area and capillary storage for dynamic parameters
             Soil_moist(i) = Soil_moist(i) + soil_adj
             Soil_rechr(i) = Soil_rechr(i) + soil_adj
             IF ( Hru_perv(i) /= hruperv ) THEN
-              IF ( hruperv>0.0 ) THEN
-                tmp = Hru_perv(i)/hruperv
-                Soil_moist(i) = Soil_moist(i)*tmp
-                Soil_rechr(i) = Soil_rechr(i)*tmp
-              ELSE
-                Soil_moist(i) = 0.0 ! water balance problem
-                Soil_rechr(i) = 0.0
-              ENDIF
+              tmp = Hru_perv(i)/hruperv
+              Soil_moist(i) = Soil_moist(i)*tmp
+              Soil_rechr(i) = Soil_rechr(i)*tmp
               Hru_perv(i) = hruperv
               Hru_frac_perv(i) = Hru_perv(i)/harea
             ENDIF
@@ -926,9 +872,8 @@
 !***********************************************************************
       SUBROUTINE write_dynoutput(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: Hru_type
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -964,9 +909,8 @@
 !***********************************************************************
       SUBROUTINE write_dynparam_int(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: Hru_type
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -1002,9 +946,8 @@
 !***********************************************************************
       SUBROUTINE write_dynparam(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: Hru_type
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -1079,9 +1022,8 @@
 !***********************************************************************
       SUBROUTINE write_dynparam_potet(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: Hru_type
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim

@@ -74,15 +74,15 @@
      &     'Net volumetric flow rate of gravity drainage from the soil zone to the unsaturated and saturated zones', &
      &     'L3/T', Net_sz2gw)
 
-!     ALLOCATE (Reach_latflow(Nreach))
-!     IF ( declvar_dble(MODNAME, 'reach_latflow', 'nreach', Nreach, &
-!    &     'Lateral flow (surface runoff and interflow) into each stream reach', &
-!    &     'cfs', Reach_latflow)
+!      ALLOCATE (Reach_latflow(Nreach))
+!      CALL declvar_dble(MODNAME, 'reach_latflow', 'nreach', Nreach, &
+!     &     'Lateral flow (surface runoff and interflow) into each stream reach', &
+!     &     'cfs', Reach_latflow)
 
-!     ALLOCATE (Reach_id(Nreach, Nsegment))
-!     IF ( declvar_int(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, &
-!    &     'Mapping of reach id by segment id', &
-!    &     'none', Reach_id)
+!      ALLOCATE (Reach_id(Nreach, Nsegment))
+!      CALL declvar_int(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, &
+!     &     'Mapping of reach id by segment id', &
+!     &     'none', Reach_id)
 
       ALLOCATE (Cell_drain_rate(Ngwcell))
       CALL declvar_real(MODNAME, 'cell_drain_rate', 'ngwcell', Ngwcell, &
@@ -396,11 +396,9 @@
       USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, &
      &    Inch_to_mfl_t, Gwc_row, Gwc_col, Mft_to_days
       USE GLOBAL, ONLY: IBOUND
-      USE GWFAGMODULE, ONLY: NUMIRRPOND
       USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, IGSFLOW, FINF, IUZFOPT
       USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK, NLAKES
-      USE PRMS_CONSTANTS, ONLY: Active
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Dprst_flag, Ag_package_active
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_area, Lake_hru_id
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Hru_actet
@@ -409,7 +407,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: toStream
-      EXTERNAL Bin_percolation, toIrr
+      EXTERNAL Bin_percolation
 ! Local Variables
       INTEGER :: irow, icol, ik, jk, ii, ilake
       INTEGER :: j, icell, ihru, is_draining
@@ -420,12 +418,6 @@
 ! Add runoff to stream reaches
 !-----------------------------------------------------------------------
       IF ( toStream()/=0 ) RETURN
-!-----------------------------------------------------------------------
-! Remove open dprst storage for irrigation
-!-----------------------------------------------------------------------
-       IF ( Ag_package_active==ACTIVE .AND. Dprst_flag==ACTIVE ) THEN
-         IF ( NUMIRRPOND>0 ) CALL toIrr()
-       ENDIF
 
 !-----------------------------------------------------------------------
 ! Add runoff and precip to lakes
@@ -483,7 +475,7 @@
           IF ( IUZFOPT==0 ) THEN !ERIC 20210107: NWAVST is dimensioned (1, 1) if IUZFOPT == 0.
             Cell_drain_rate(icell) = Cell_drain_rate(icell) + Sm2gw_grav(j)*Gvr2cell_conv(j)
             Gw_rejected_grav(j) = 0.0
-            is_draining = 1            
+            is_draining = 1
 
           ELSEIF ( NWAVST(icol, irow)<NTRAIL_CHK ) THEN
 !-----------------------------------------------------------------------
@@ -562,34 +554,6 @@
       toStream = 0
 
       END FUNCTION toStream
-
-!***********************************************************************
-!***********************************************************************
-      SUBROUTINE toIrr()
-
-      USE GWFAGMODULE, ONLY: NUMIRRPOND, IRRPONDVAR, PONDFLOW
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
-      USE GSFMODFLOW, ONLY: Dprst_ag_transfer, MFQ_to_inch_acres
-      IMPLICIT NONE
-      INTRINSIC :: SNGL
-! Local Variables
-      INTEGER :: i, hru_id
-      REAL :: demand_inch_acres
-!***********************************************************************
-! Calculate conversion for MF units to inch_acres
-      Dprst_ag_transfer = 0.0
-      do i = 1, NUMIRRPOND
-        hru_id = IRRPONDVAR(i)
-        IF ( hru_id > 0 ) THEN
-          demand_inch_acres = PONDFLOW(i)*MFQ_to_inch_acres
-          IF ( demand_inch_acres > SNGL(Dprst_vol_open(hru_id))) demand_inch_acres = SNGL(Dprst_vol_open(hru_id))
-          PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
-          Dprst_ag_transfer(hru_id) = Dprst_ag_transfer(hru_id) + demand_inch_acres
-          Dprst_vol_open(hru_id) = Dprst_vol_open(hru_id) - demand_inch_acres
-        END IF
-      end do
-
-      END SUBROUTINE toIrr
 
 !***********************************************************************
 ! Bin percolation to reduce waves

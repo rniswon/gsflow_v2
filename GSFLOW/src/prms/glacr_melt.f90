@@ -871,10 +871,10 @@
 !***********************************************************************
       INTEGER FUNCTION comp_glsurf(glacr_exist, glrette_exist)
       USE PRMS_GLACR
-      USE PRMS_MODULE, ONLY: Nhru, Start_year
+      USE PRMS_MODULE, ONLY: Nhru, Start_year, Nowyear, Nowmonth
       USE PRMS_BASIN, ONLY: Hru_type, Hru_elev_ts, Basin_area_inv, Active_hrus, &
      &    Hru_route_order, Elev_units, Hru_elev
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Julwater
+      USE PRMS_SET_TIME, ONLY: Julwater
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow
       USE PRMS_SNOW, ONLY: Snowcov_area, Snowmelt, Glacrmelt, Glacr_air_deltemp, Glacr_delsnow, &
      &    Glrette_frac_init, Snowcov_area, Basin_snowicecov, Snow_evap, Glacr_evap, Basin_glacrb_melt

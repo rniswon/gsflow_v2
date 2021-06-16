@@ -6,14 +6,14 @@
      &      YEAR, MONTH, DAY, HOUR, MINUTE, MAX_DAYS_PER_YEAR, DAYS_PER_YEAR, &
      &      ACTIVE, OFF, NORTHERN, FT2_PER_ACRE, SECS_PER_HOUR, &
      &      INCHES_PER_FOOT, SECS_PER_DAY, ERROR_time
-        USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime
+        USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime, Nowyear, Nowmonth, Nowday
         IMPLICIT NONE
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Timestep Control'
         character(len=*), parameter :: MODNAME = 'prms_time'
-        character(len=*), parameter :: Version_prms_time = '2021-05-06'
+        character(len=*), parameter :: Version_prms_time = '2021-05-25'
         INTEGER, SAVE :: Modays(MONTHS_PER_YEAR), Yrdays, Summer_flag, Jday, Jsol, Julwater
-        INTEGER, SAVE :: Nowtime(6), Nowday, Nowmonth, Nowyear, Nowhour, Nowminute, Julian_day_absolute
+        INTEGER, SAVE :: Nowtime(6), Nowhour, Nowminute, Julian_day_absolute
         REAL, SAVE :: Timestep_hours, Timestep_days, Timestep_minutes
         DOUBLE PRECISION, SAVE :: Cfs2inches, Cfs_conv, Timestep_seconds
       END MODULE PRMS_SET_TIME

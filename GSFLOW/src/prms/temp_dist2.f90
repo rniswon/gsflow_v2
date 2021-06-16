@@ -89,11 +89,11 @@
 ! added by Mastin 5/8/98
       ALLOCATE ( Elfac(Nhru,Ntemp), Delv(Ntemp,Ntemp), Dist(Nhru,Ntemp), N_tsta(Nhru) )
 
-      CALL declvar_real(MODNAME, 'basin_lapse_max', 'one', 1, 'real', &
+      CALL declvar_real(MODNAME, 'basin_lapse_max', 'one', 1, &
      &     'Basin area-weighted average maximum air temperature lapse rate per 1000 feet', &
      &     'degrees', Basin_lapse_max)
 
-      CALL declvar_real(MODNAME, 'basin_lapse_min', 'one', 1, 'real', &
+      CALL declvar_real(MODNAME, 'basin_lapse_min', 'one', 1, &
      &     'Basin area-weighted average minimum air temperature lapse rate per 1000 feet', &
      &     'degrees', Basin_lapse_min)
 

@@ -12,8 +12,7 @@ C
       USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL:: gsfdecl, gsfinit, gsfrun
-      EXTERNAL :: gsfclean
+      INTEGER, EXTERNAL:: gsfdecl, gsfinit, gsfrun, gsfclean
 !***********************************************************************
       gsflow_modflow = 0
 
@@ -24,7 +23,7 @@ C
       ELSEIF ( Process_flag==INIT ) THEN
         gsflow_modflow = gsfinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
-        CALL gsfclean()
+        gsflow_modflow = gsfclean()
       ENDIF
 
       END FUNCTION gsflow_modflow
@@ -36,14 +35,10 @@ C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
-      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE,
-     &    GSFLOW_AG
+      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Print_debug,
-     &    GSFLOW_flag, Agriculture_dprst_flag, Model
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
       IMPLICIT NONE
-      ! Functions
-      EXTERNAL :: declvar_real
 !***********************************************************************
       gsfdecl = 0
 C
@@ -67,26 +62,6 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
         ALLOCATE ( Gvr2cell_conv(Nhrucell), Cellarea(Ngwcell) )
         ALLOCATE ( Gwc_row(Ngwcell), Gwc_col(Ngwcell) )
-        IF ( Model==GSFLOW_AG ) THEN
-          ALLOCATE ( Hru_ag_irr(Nhru) )
-          CALL declvar_real(MODNAME, 'hru_ag_irr', 'nhru', Nhru,
-     &         'Irrigation added to soilzone from MODFLOW wells',
-     &         'inches', Hru_ag_irr)
-          Hru_ag_irr = 0.0
-        ENDIF
-        IF ( Agriculture_dprst_flag==ACTIVE ) THEN
-          ALLOCATE ( Dprst_ag_gain(Nhru) )
-          CALL declvar_real(MODNAME, 'dprst_ag_gain', 'nhru', Nhru,
-     &         'Irrigation added to surface depression storage from'//
-     &         ' MODFLOW ponds',
-     &         'inch-acres', Dprst_ag_gain)
-          Dprst_ag_gain = 0.0
-          ALLOCATE ( Dprst_ag_transfer(Nhru) )
-          CALL declvar_real(MODNAME, 'dprst_ag_transfer', 'nhru', Nhru,
-     &         'Surface depression storage transfer to MODFLOW cells',
-     &         'inch-acres', Dprst_ag_transfer)
-          Dprst_ag_transfer = 0.0
-        ENDIF
       ENDIF
 
       END FUNCTION gsfdecl
@@ -102,7 +77,7 @@ C     ------------------------------------------------------------------
       USE PRMS_CONSTANTS, ONLY: MODFLOW, GSFLOW, ACTIVE, OFF,
      &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
-     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package_active
+     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -264,14 +239,26 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
           PRINT *, 'HYD Package not supported'
           ierr = 1
         ENDIF
+!        IF ( IUNIT(49)>0 ) THEN
+!          PRINT *, 'LMT Package not supported'
+!          ierr = 1
+!        ENDIF
         IF ( IUNIT(54)>0 ) THEN
           PRINT *, 'SUB Package not supported'
           ierr = 1
         ENDIF
+!        IF ( IUNIT(57)>0 ) THEN
+!          PRINT *, 'SWT Package not supported'
+!          ierr = 1
+!        ENDIF
         IF ( IUNIT(64)>0 ) THEN
           PRINT *, 'SWR Package not supported'
           ierr = 1
         ENDIF
+!        IF ( IUNIT(65)>0 ) THEN
+!          PRINT *, 'SWI Package not supported'
+!          ierr = 1
+!        ENDIF
       ENDIF
       IF ( ierr==1 ) CALL error_stop('INVALID PACKAGE SELECTION',
      &                               ERROR_modflow)
@@ -344,9 +331,9 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
         IF(IUNIT(44).GT.0) CALL GWF2HYD7SFR7AR(IUNIT(43),IGRID)
       ENDIF
       IF(IUNIT(49).GT.0) CALL LMT8BAS7AR(INUNIT,CUNIT,IGRID)
-      Ag_package_active = OFF
+      Ag_package = OFF
       IF(IUNIT(66).GT.0) THEN
-        IF (GSFLOW_flag==ACTIVE) Ag_package_active = ACTIVE
+        IF ( GSFLOW_flag==ACTIVE ) Ag_package = ACTIVE
         CALL GWF2AG7AR(IUNIT(66),IUNIT(44),IUNIT(63))
       ENDIF
 !      IF(IUNIT(61).GT.0) THEN
@@ -363,7 +350,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       CALL print_module(MODDESC_SFR, MODNAME_SFR, Version_sfr)
       IF ( Have_lakes==ACTIVE )
      &     CALL print_module(MODDESC_LAK, MODNAME_LAK, Version_lak)
-      IF ( Ag_package_active==ACTIVE )
+      IF ( Ag_package==ACTIVE )
      &     CALL print_module(MODDESC_AG, MODNAME_AG, Version_ag)
 
       IF ( IUNIT(63)>0 ) solver = 'NWT'
@@ -436,8 +423,7 @@ C
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, GSFLOW, ACTIVE,
      &    OFF, ERROR_time
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, Process,
-     &    Init_vars_from_file, Mxsziter, PRMS_land_iteration_flag
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+     &    Init_vars_from_file, Mxsziter, Nowyear, Nowmonth, Nowday
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -455,13 +441,13 @@ c     USE LMGMODULE
       INTEGER I
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
-      INTEGER, EXTERNAL :: soilzone, srunoff, GET_KPER
+      INTEGER, EXTERNAL :: soilzone, GET_KPER
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsfclean
-      EXTERNAL :: READ_STRESS, PRMS_land_modules
+      EXTERNAL :: READ_STRESS
       INTRINSIC MIN
 ! Local Variables
       INTEGER :: retval, II, KITER, IBDRET, iss
-      INTEGER :: IC1, IC2, IR1, IR2, IL1, IL2, IDIR, iprt
+      INTEGER :: IC1, IC2, IR1, IR2, IL1, IL2, IDIR, iprt, gsflag
       REAL :: BUDPERC
 !***********************************************************************
       gsfrun = 0
@@ -628,15 +614,6 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ACTIVE ) THEN
-              IF ( PRMS_land_iteration_flag==2 ) THEN
-                CALL PRMS_land_modules(Process, retval)
-              ELSEIF ( PRMS_land_iteration_flag==1 ) THEN
-                retval = srunoff()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'srunoff', retval
-                  RETURN
-                ENDIF
-              ENDIF
               retval = soilzone()
               IF ( retval/=0 ) THEN
                 PRINT 9001, 'soilzone', retval
@@ -890,7 +867,7 @@ C  Observation simulated equivalents
           IF(IUNIT(34).GT.0) CALL OBS2RIV7SE(IGRID)
           IF(IUNIT(35).GT.0) CALL OBS2GHB7SE(IGRID)
           IF(IUNIT(36).GT.0) CALL OBS2STR7SE(IGRID)
-          IF(IUNIT(38).GT.0) CALL OBS2CHD7SE(KKPER,IGRID)
+          IF(IUNIT(38).GT.0) CALL OBS2CHD7SE(KKPER,IUNIT(62),IGRID)
           IF(IUNIT(43).GT.0) THEN
             CALL GWF2HYD7BAS7SE(1,IGRID)
             IF(IUNIT(19).GT.0) CALL GWF2HYD7IBS7SE(1,IGRID)
@@ -980,7 +957,7 @@ C
 !***********************************************************************
 !     gsfclean - After GSFLOW is done
 !***********************************************************************
-      SUBROUTINE gsfclean()
+      INTEGER FUNCTION gsfclean()
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
@@ -993,6 +970,7 @@ C
       IMPLICIT NONE
       EXTERNAL :: RESTART1WRITE, gsflow_modflow_restart
 !***********************************************************************
+      gsfclean = 0
 C
 C8------END OF SIMULATION
 C-------SAVE RESTART RECORDS FOR SUB PACKAGE
@@ -1111,7 +1089,7 @@ C10-----END OF PROGRAM.
  9007 FORMAT (A, 10I5, /, 10(28X, 10I5, /))
 
 C
-      END SUBROUTINE gsfclean
+      END FUNCTION gsfclean
 !
       SUBROUTINE GETNAMFIL(FNAME)
 C     ******************************************************************
@@ -1189,6 +1167,7 @@ C     Get current date and time, assign to IEDT, and write.
       WRITE(*,1000) (IEDT(I),I=1,3),(IEDT(I),I=5,7)
  1000 FORMAT(/,1X,'Run end date and time (yyyy/mm/dd hh:mm:ss): ',
      &       I4,2('/',I2.2),I3,2(':',I2.2))
+      print *, iout
       IF(IPRTIM.GT.0) THEN
         WRITE(IOUT,'(1X)')
         WRITE(IOUT,1000) (IEDT(I),I=1,3),(IEDT(I),I=5,7)
@@ -1363,24 +1342,23 @@ C
       INTEGER FUNCTION GET_KPER()
       USE GLOBAL, ONLY: NPER
       USE GSFMODFLOW, ONLY: Stress_dates, KPER
-      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day
+      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day,
+     1    Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
       INTRINSIC DBLE
-!      DOUBLE PRECISION, EXTERNAL :: nowjt
       INTEGER, EXTERNAL :: compute_julday
 ! Local Variables
       INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
-!      now = nowjt()
+      now = compute_julday(Nowyear, Nowmonth, Nowday)
       KPERTEST = 1
       IF ( KPER > KPERTEST ) KPERTEST = KPER
 !
 !     If called from init, then "now" isn't set yet.
 !     Set "now" to model start date.
-!      IF ( now<2 )
-!     &     now = compute_julday(Start_year, Start_month, Start_day)
-      now = compute_julday(Start_year, Start_month, Start_day)
+      IF ( now<2 )
+     &     now = compute_julday(Start_year, Start_month, Start_day)
       IF ( now<Stress_dates(KPERTEST) )
      &     STOP 'ERROR, now<stress period time'
       IF ( now>Stress_dates(NPER) ) THEN

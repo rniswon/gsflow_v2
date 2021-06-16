@@ -7,7 +7,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, DOCUMENTATION, NEARZERO, DNEARZERO, &
      &    DEBUG_WB, DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
       USE PRMS_MODULE, ONLY: Nhru, Model, Init_vars_from_file, &
-     &    Print_debug, Water_use_flag, PRMS_land_iteration_flag, Kkiter
+     &    Print_debug, Water_use_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
@@ -28,9 +28,6 @@
       REAL, SAVE, ALLOCATABLE :: Hru_intcpstor(:), Hru_intcpevap(:), Canopy_covden(:)
       REAL, SAVE, ALLOCATABLE :: Net_apply(:), Intcp_changeover(:)
       DOUBLE PRECISION, SAVE :: Basin_net_apply, Basin_hru_apply
-      INTEGER, SAVE, ALLOCATABLE :: It0_intcp_transp_on(:)
-      REAL, SAVE, ALLOCATABLE :: It0_intcp_stor(:), It0_hru_intcpstor(:)
-      DOUBLE PRECISION, SAVE :: It0_basin_intcp_stor
 !   Declared Parameters
       INTEGER, SAVE, ALLOCATABLE :: Irr_type(:)
       REAL, SAVE, ALLOCATABLE :: Snow_intcp(:), Srain_intcp(:), Wrain_intcp(:)
@@ -78,11 +75,6 @@
       intdecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_intcp)
-
-      IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
-        ALLOCATE ( It0_intcp_stor(Nhru), It0_intcp_transp_on(Nhru) )
-        ALLOCATE ( It0_hru_intcpstor(Nhru) )
-      ENDIF
 
 ! NEW VARIABLES and PARAMETERS for APPLICATION RATES
       Use_transfer_intcp = OFF
@@ -271,15 +263,16 @@
 !              and evaporation for each HRU
 !***********************************************************************
       INTEGER FUNCTION intrun()
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_INTCP
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_type, Covden_win, Covden_sum, &
      &    Hru_route_order, Hru_area, Cov_type
-      USE PRMS_WATER_USE, ONLY: Canopy_gain ! need to add ag apply ???
+      USE PRMS_WATER_USE, ONLY: Canopy_gain
 ! Newsnow and Pptmix can be modfied, WARNING!!!
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, &
      &    Hru_snow, Transp_on, Potet, Use_pandata, Hru_pansta, Epan_coef, Potet_sublim
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv
-      USE PRMS_SET_TIME, ONLY: Nowmonth, Cfs_conv, Nowyear, Nowday
+      USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_OBS, ONLY: Pan_evap
       IMPLICIT NONE
 ! Functions
@@ -294,19 +287,6 @@
       intrun = 0
 
       ! pkwater_equiv is from last time step
-      IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
-        IF ( Kkiter>1 ) THEN
-          Intcp_stor = It0_intcp_stor
-          Hru_intcpstor = It0_hru_intcpstor
-          Intcp_transp_on = It0_intcp_transp_on
-          Basin_intcp_stor = It0_basin_intcp_stor
-        ELSE
-          It0_intcp_stor = Intcp_stor
-          It0_hru_intcpstor = Hru_intcpstor
-          It0_basin_intcp_stor = Basin_intcp_stor
-          It0_intcp_transp_on = Intcp_transp_on
-        ENDIF
-      ENDIF
 
       IF ( Print_debug==DEBUG_WB ) THEN
         Intcp_stor_ante = Hru_intcpstor

@@ -93,7 +93,7 @@ cmi
 !     ------------------------------------------------------------------
 !     LOCAL VARIABLES
 !     ------------------------------------------------------------------
-      INTEGER lloc, istart, istop, i, IREDSYS !. n,ISTORXMD, Icomb
+      INTEGER lloc, istart, istop, i, IREDSYS
       CHARACTER(LEN=200) line
       REAL R,RRCTOLS,EPSRNS,HCLOSEXMDDUM
 !     LOCAL VARIABLES FOR XMD SOLVER

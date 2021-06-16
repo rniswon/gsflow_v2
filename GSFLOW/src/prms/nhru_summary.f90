@@ -124,7 +124,7 @@
       INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam
       EXTERNAL read_error, PRMS_open_output_file, find_header_end, find_current_file_time
 ! Local Variables
-      INTEGER :: ios, ierr, size, dim, jj, j
+      INTEGER :: ios, ierr, size, jj, j
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
 !***********************************************************************
       Begin_results = ACTIVE
@@ -169,7 +169,7 @@
       ierr = 0
       DO jj = 1, NhruOutVars
         Nc_vars(jj) = numchars(NhruOutVar_names(jj))
-        Nhru_var_type(jj) = getvartype(NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru_var_type(jj) )
+        Nhru_var_type(jj) = getvartype(NhruOutVar_names(jj)(:Nc_vars(jj)))
         IF ( Nhru_var_type(jj)==DBLE_TYPE ) Double_vars = ACTIVE
         IF ( Nhru_var_type(jj)==INT_TYPE ) Integer_vars = ACTIVE
         IF ( Nhru_var_type(jj)/=REAL_TYPE .AND. Nhru_var_type(jj)/=DBLE_TYPE .AND. Nhru_var_type(jj)/=INT_TYPE ) THEN
@@ -177,7 +177,7 @@
           PRINT *, '       only integer, real or double variables allowed'
           ierr = 1
         ENDIF
-        size = getvarsize(NhruOutVar_names(jj)(:Nc_vars(jj)), dim )
+        size = getvarsize(NhruOutVar_names(jj)(:Nc_vars(jj)))
         IF ( size/=Nhru ) THEN
           PRINT *, 'ERROR, invalid nhru_summary variable:', NhruOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only variables dimensioned by nhru, nssr, or ngw allowed'
@@ -307,9 +307,10 @@
 !     Output set of declared variables in CSV format
 !***********************************************************************
       SUBROUTINE nhru_summaryrun()
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_NHRU_SUMMARY
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday, Modays
+      USE PRMS_SET_TIME, ONLY: Modays
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: SNGL, DBLE

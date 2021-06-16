@@ -13,8 +13,7 @@
      &    INCH2M, FEET2METERS, DNEARZERO, DOCUMENTATION, ACTIVE, OFF, &
      &    MONTHS_PER_YEAR, DEBUG_less, DAYS_YR, CLOSEZERO, INCH2CM, SAVE_INIT
       USE PRMS_MODULE, ONLY: Model, Nhru, Ndepl, Print_debug, &
-     &    Init_vars_from_file, Glacier_flag, Start_year, &
-     &    PRMS_land_iteration_flag, Kkiter
+     &    Init_vars_from_file, Glacier_flag, Start_year, Snarea_curve_flag
       IMPLICIT NONE
       !****************************************************************
       !   Local Constants
@@ -59,12 +58,6 @@
       REAL, SAVE, ALLOCATABLE :: Glacr_5avsnow1(:), Glacr_5avsnow(:), Glacr_delsnow(:), Glacr_freeh2o_capm(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Glacr_pkwater_ante(:), Glacr_pkwater_equiv(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Glacr_pk_depth(:), Glacr_pss(:), Glacr_pst(:)
-      INTEGER, SAVE, ALLOCATABLE :: It0_iasw(:), It0_iso(:), It0_mso(:), It0_lso(:), It0_int_alb(:), It0_lst(:)
-      REAL, SAVE, ALLOCATABLE :: It0_snowcov_area(:), It0_snowcov_areasv(:), It0_albedo(:)
-      REAL, SAVE, ALLOCATABLE :: It0_pk_temp(:), It0_pk_def(:), It0_pk_ice(:), It0_pk_den(:), It0_freeh2o(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:), It0_scrv(:), It0_pksv(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pst(:), It0_pss(:), It0_pk_depth(:)
-      REAL, SAVE, ALLOCATABLE :: It0_snsv(:), It0_salb(:), It0_slst(:)
       !****************************************************************
       !   Declared Parameters
 
@@ -78,9 +71,6 @@
       REAL, SAVE, ALLOCATABLE :: Snarea_a(:), Snarea_b(:), Snarea_c(:), Snarea_d(:)
       REAL, SAVE, ALLOCATABLE :: Glacr_layer(:), Albedo_coef(:), Albedo_ice(:)
       REAL, SAVE, ALLOCATABLE :: Glacr_freeh2o_cap(:), Glacier_frac_init(:), Glrette_frac_init(:)
-
-      !   Control Parameters
-      INTEGER, SAVE :: Snarea_curve_flag
 
       END MODULE PRMS_SNOW
 
@@ -124,23 +114,13 @@
       USE PRMS_SNOW
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, control_integer
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module, declvar_dble, declvar_real, declvar_int
 !***********************************************************************
       snodecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_snowcomp)
 
-      IF ( control_integer(Snarea_curve_flag, 'snarea_curve_flag')/=0 ) Snarea_curve_flag = OFF
-
-      IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
-        ALLOCATE ( It0_snowcov_area(Nhru), It0_snowcov_areasv(Nhru), It0_pkwater_equiv(Nhru) )
-        ALLOCATE ( It0_albedo(Nhru), It0_pk_depth(Nhru), It0_iasw(Nhru), It0_pst(Nhru) )
-        ALLOCATE ( It0_pksv(Nhru), It0_scrv(Nhru), It0_pk_temp(Nhru), It0_pss(Nhru) )
-        ALLOCATE ( It0_pk_def(Nhru), It0_pk_ice(Nhru), It0_pk_den(Nhru), It0_freeh2o(Nhru) )
-        ALLOCATE ( It0_iso(Nhru),  It0_mso(Nhru), It0_lso(Nhru), It0_int_alb(Nhru), It0_lst(Nhru) )
-        ALLOCATE ( It0_snsv(Nhru), It0_salb(Nhru), It0_slst(Nhru) )
-      ENDIF
 ! declare variables
       ALLOCATE ( Scrv(Nhru) )
       CALL declvar_dble(MODNAME, 'scrv', 'nhru', Nhru, &
@@ -909,13 +889,14 @@
 !     snorun - daily mode snow estimates
 !***********************************************************************
       INTEGER FUNCTION snorun()
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth
       USE PRMS_SNOW
       USE PRMS_BASIN, ONLY: Hru_area, Active_hrus, Hru_type, &
      &    Basin_area_inv, Hru_route_order, Cov_type, Elev_units
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Orad, Basin_horad, Potet_sublim, &
      &    Hru_ppt, Prmx, Tmaxc, Tminc, Tavgc, Swrad, Potet, Transp_on, Tmax_allsnow_c
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
-      USE PRMS_SET_TIME, ONLY: Jday, Nowmonth, Julwater, Nowyear
+      USE PRMS_SET_TIME, ONLY: Jday, Julwater
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Canopy_covden, Hru_intcpevap
       IMPLICIT NONE
 ! Functions
@@ -928,58 +909,6 @@
       DOUBLE PRECISION :: dpt1, dpt_before_settle
 !***********************************************************************
       snorun = 0
-
-      IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
-        IF ( Kkiter>1 ) THEN
-          Pkwater_equiv = It0_pkwater_equiv
-          Snowcov_area = It0_snowcov_area
-          Snowcov_areasv = It0_snowcov_areasv
-          Albedo = It0_albedo
-          Pk_depth = It0_pk_depth
-          Iasw = It0_iasw
-          Pst = It0_pst
-          Scrv = It0_scrv
-          Pksv = It0_pksv
-          Pk_temp = It0_pk_temp
-          Pk_def = It0_pk_def
-          Pk_ice = It0_pk_ice
-          Pk_den = It0_pk_den
-          Pss = It0_pss
-          Freeh2o = It0_freeh2o
-          Iso = It0_iso
-          Mso = It0_mso
-          Lso = It0_lso
-          Snsv = It0_snsv
-          Lst = It0_lst
-          Int_alb = It0_int_alb
-          Salb = It0_salb
-          Slst = It0_slst
-        ELSE
-          It0_pkwater_equiv = Pkwater_equiv
-          It0_snowcov_area = Snowcov_area
-          It0_snowcov_areasv = Snowcov_areasv
-          It0_albedo = It0_albedo
-          It0_pk_depth = Pk_depth
-          It0_iasw = Iasw
-          It0_pst = Pst
-          It0_scrv = Scrv
-          It0_pksv = Pksv
-          It0_pk_temp = Pk_temp
-          It0_pk_def = Pk_def
-          It0_pk_ice = Pk_ice
-          It0_pk_den = Pk_den
-          It0_pss = Pss
-          It0_freeh2o = Freeh2o
-          It0_iso = Iso
-          It0_mso = Mso
-          It0_iso = Lso
-          It0_snsv = Snsv
-          It0_lst = Lst
-          It0_int_alb = Int_alb
-          It0_salb = Salb
-          It0_slst = Slst
-        ENDIF
-      ENDIF
 
       ! Set the basin totals to 0
       ! (recalculated at the end of the time step)

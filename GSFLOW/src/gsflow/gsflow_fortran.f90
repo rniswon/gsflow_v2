@@ -16,7 +16,7 @@
       CALL gsflow_prms('init')
 
       DO i = 1, Number_timesteps
-        CALL gsflow_prms('run',)
+        CALL gsflow_prms('run')
       ENDDO
       CALL gsflow_prms('clean')
 
