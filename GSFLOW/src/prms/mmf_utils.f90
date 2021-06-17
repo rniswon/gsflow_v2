@@ -453,7 +453,7 @@
       ! Local Variables
       INTEGER :: var_id
 !***********************************************************************
-      var_id = find_variable(Modname, Varname, Numvalues, 'real')
+      var_id = find_variable(Modname, Varname, Numvalues, 'integer')
       Values = Variable_data(var_id)%values_int
       END SUBROUTINE getvar_int
 
