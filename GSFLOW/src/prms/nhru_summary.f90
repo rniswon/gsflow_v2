@@ -11,7 +11,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nhru_summary'
-      character(len=*), parameter :: Version_nhru_summary = '2020-12-02'
+      character(len=*), parameter :: Version_nhru_summary = '2021-05-06'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nhru_var_type(:), Nhru_var_int(:, :)
       REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
@@ -169,7 +169,7 @@
       ierr = 0
       DO jj = 1, NhruOutVars
         Nc_vars(jj) = numchars(NhruOutVar_names(jj))
-        Nhru_var_type(jj) = getvartype( NhruOutVar_names(jj)(:Nc_vars(jj)) )
+        Nhru_var_type(jj) = getvartype(NhruOutVar_names(jj)(:Nc_vars(jj)))
         IF ( Nhru_var_type(jj)==DBLE_TYPE ) Double_vars = ACTIVE
         IF ( Nhru_var_type(jj)==INT_TYPE ) Integer_vars = ACTIVE
         IF ( Nhru_var_type(jj)/=REAL_TYPE .AND. Nhru_var_type(jj)/=DBLE_TYPE .AND. Nhru_var_type(jj)/=INT_TYPE ) THEN

@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'obs'
-      character(len=*), parameter :: Version_obs = '2020-12-02'
+      character(len=*), parameter :: Version_obs = '2021-05-06'
       INTEGER, SAVE :: Nsnow, Nlakeelev, Nwind, Nhumid, Rain_flag
 !   Declared Variables
       INTEGER, SAVE :: Rain_day
@@ -77,7 +77,7 @@
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: getdim, declparam
-      EXTERNAL :: read_error, print_module, declvar_real, declvar_dble
+      EXTERNAL :: read_error, print_module, declvar_real, declvar_dble, declvar_int
 !***********************************************************************
       obsdecl = 0
 

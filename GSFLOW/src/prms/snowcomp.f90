@@ -13,7 +13,7 @@
      &    INCH2M, FEET2METERS, DNEARZERO, DOCUMENTATION, ACTIVE, OFF, &
      &    MONTHS_PER_YEAR, DEBUG_less, DAYS_YR, CLOSEZERO, INCH2CM, SAVE_INIT
       USE PRMS_MODULE, ONLY: Model, Nhru, Ndepl, Print_debug, &
-     &    Init_vars_from_file, Snarea_curve_flag, Glacier_flag, Start_year
+     &    Init_vars_from_file, Glacier_flag, Start_year, Snarea_curve_flag
       IMPLICIT NONE
       !****************************************************************
       !   Local Constants
@@ -218,8 +218,7 @@
 
         ALLOCATE ( Glacr_pk_den(Nhru) )
         CALL declvar_real(MODNAME, 'glacr_pk_den', 'nhru', Nhru, &
-     &       'Density of the icepack on each glacier or glacierette HRU,'// &
-     &       ' hard coded to equal 0.917', &
+     &       'Density of the icepack on each glacier or glacierette HRU, hard coded to equal 0.917', &
      &       'gm/cm3', Glacr_pk_den)
 
         ALLOCATE ( Glacr_albedo(Nhru) )
@@ -306,8 +305,7 @@
 
       ALLOCATE ( Albedo(Nhru) )
       CALL declvar_real(MODNAME, 'albedo', 'nhru', Nhru, &
-     &     'Snow surface albedo or the fraction of radiation reflected from the'// &
-     &     ' snowpack surface for each HRU', &
+     &     'Snow surface albedo or the fraction of radiation reflected from the snowpack surface for each HRU', &
      &     'decimal fraction', Albedo)
 
       ALLOCATE ( Pk_temp(Nhru) )
@@ -376,37 +374,32 @@
       ALLOCATE ( Iasw(Nhru) )
       CALL declvar_int(MODNAME, 'iasw', 'nhru', Nhru, &
      &     'Flag indicating that snow covered area is'// &
-     &     ' interpolated between previous location on curve and'// &
-     &     ' maximum (1), or is on the defined curve (0)', &
+     &     ' interpolated between previous location on curve and maximum (1), or is on the defined curve (0)', &
      &     'none', Iasw)
 
       !rpayn commented
       ALLOCATE ( Iso(Nhru) )
       CALL declvar_int(MODNAME, 'iso', 'nhru', Nhru, &
-     &     'Flag to indicate if time is before (1) or after (2)'// &
-     &     ' the day to force melt season (melt_force)', &
+     &     'Flag to indicate if time is before (1) or after (2) the day to force melt season (melt_force)', &
      &     'none', Iso)
 
       !rpayn commented
       ALLOCATE ( Mso(Nhru) )
       CALL declvar_int(MODNAME, 'mso', 'nhru', Nhru, &
-     &     'Flag to indicate if time is before (1) or after (2)'// &
-     &     ' the first potential day for melt season (melt_look)', &
+     &     'Flag to indicate if time is before (1) or after (2) the first potential day for melt season (melt_look)', &
      &     'none', Mso)
 
       !rpayn commented
       ALLOCATE ( Lso(Nhru) )
       CALL declvar_int(MODNAME, 'lso', 'nhru', Nhru, &
-     &     'Counter for tracking the number of days the snowpack'// &
-     &     ' is at or above 0 degrees Celsius', &
+     &     'Counter for tracking the number of days the snowpack is at or above 0 degrees Celsius', &
      &     'number of iterations', Lso)
 
       !rpayn commented
       ALLOCATE ( Lst(Nhru) )
       CALL declvar_int(MODNAME, 'lst', 'nhru', Nhru, &
      &     'Flag indicating whether there was new snow that'// &
-     &     ' was insufficient to reset the albedo curve (1)'// &
-     &     ' (albset_snm or albset_sna), otherwise (0)', &
+     &     ' was insufficient to reset the albedo curve (1) (albset_snm or albset_sna), otherwise (0)', &
      &     'none', Lst)
 
       !rpayn commented
@@ -443,8 +436,7 @@
       !rpayn commented
       ALLOCATE ( Pst(Nhru) )
       CALL declvar_dble(MODNAME, 'pst', 'nhru', Nhru, &
-     &     'While a snowpack exists, pst tracks the maximum'// &
-     &     ' snow water equivalent of that snowpack', &
+     &     'While a snowpack exists, pst tracks the maximum snow water equivalent of that snowpack', &
      &     'inches', Pst)
 
       !rpayn commented

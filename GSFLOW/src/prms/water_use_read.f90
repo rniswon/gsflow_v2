@@ -16,7 +16,7 @@
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'water_use_read'
-      character(len=*), parameter :: Version_water_use_read = '2021-02-18'
+      character(len=*), parameter :: Version_water_use_read = '2021-05-10'
 
       ! transfer type
       integer, parameter :: STREAM = 1
@@ -34,7 +34,7 @@
       DOUBLE PRECISION, SAVE ::  Total_consumed_gain
       REAL, ALLOCATABLE, SAVE :: Consumed_gain(:), Consumed_gain_tot(:)
       DOUBLE PRECISION, SAVE ::  Total_soilzone_gain
-      REAL, ALLOCATABLE, SAVE :: Soilzone_gain(:), Soilzone_gain_tot(:)
+      REAL, ALLOCATABLE, SAVE :: Soilzone_gain(:), Soilzone_gain_tot(:), Soilzone_gain_hru(:)
       DOUBLE PRECISION, SAVE :: Total_dprst_transfer, Total_dprst_gain
       REAL, ALLOCATABLE, SAVE :: Dprst_transfer(:), Dprst_gain(:), Dprst_transfer_tot(:), Dprst_gain_tot(:)
       DOUBLE PRECISION, SAVE :: Total_gwr_transfer, Total_gwr_gain
@@ -423,6 +423,10 @@
         CALL declvar_real(MODNAME, 'soilzone_gain_tot', 'nhru', Nhru, &
      &       'Transfer gains to the capillary reservoir within the soilzone for each HRU for the simulation', &
      &       'cfs', Soilzone_gain_tot)
+        ALLOCATE ( Soilzone_gain_hru(Nhru) )
+        CALL declvar_real(MODNAME, 'soilzone_gain_hru', 'nhru', Nhru, &
+     &       'Irrigation added to soilzone from water-use module for each HRU', &
+     &       'inches', Soilzone_gain_hru)
         CALL declvar_dble(MODNAME, 'total_soilzone_gain', 'one', 1, &
      &       'Transfer gains to all capillary reservoirs for each time step', &
      &       'cfs', Total_soilzone_gain)
@@ -558,6 +562,7 @@
         ! type CAPILLARY
         Soilzone_gain = 0.0
         Soilzone_gain_tot = 0.0
+        Soilzone_gain_hru = 0.0
         Total_soilzone_gain = 0.0D0
 
         IF ( Consumed_transfers_on==ACTIVE ) THEN ! type CONSUMPTIVE

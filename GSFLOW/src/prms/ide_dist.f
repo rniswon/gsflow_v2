@@ -16,7 +16,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'ide_dist'
-      character(len=*), parameter :: Version_ide_dist = '2020-12-02'
+      character(len=*), parameter :: Version_ide_dist = '2021-05-06'
       INTEGER, SAVE :: Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Dalr
@@ -82,15 +82,13 @@
         CALL declvar_real(MODNAME, 'tmax_rain_sta', 'nrain', Nrain,
      +       'Maximum temperature distributed to the precipitation'//
      +       ' measurement stations',
-     +       'degrees Fahrenheit',
-     +       Tmax_rain_sta)
+     +       'degrees Fahrenheit', Tmax_rain_sta)
 
         ALLOCATE ( Tmin_rain_sta(Nrain) )
         CALL declvar_real(MODNAME, 'tmin_rain_sta', 'nrain', Nrain,
      +       'Minimum temperature distributed to the precipitation'//
      +       ' measurement stations',
-     +       'degrees Fahrenheit',
-     +       Tmin_rain_sta)
+     +       'degrees Fahrenheit', Tmin_rain_sta)
       ENDIF
 
 ! declare parameters

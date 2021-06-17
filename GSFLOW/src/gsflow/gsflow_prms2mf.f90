@@ -7,7 +7,7 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-06-10'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-05-07'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -71,8 +71,7 @@
 
 ! Declared Variables
       CALL declvar_dble(MODNAME, 'net_sz2gw', 'one', 1, &
-     &     'Net volumetric flow rate of gravity drainage from the'// &
-     &     ' soil zone to the unsaturated and saturated zones', &
+     &     'Net volumetric flow rate of gravity drainage from the soil zone to the unsaturated and saturated zones', &
      &     'L3/T', Net_sz2gw)
 
 !      ALLOCATE (Reach_latflow(Nreach))
@@ -99,39 +98,39 @@
      &   'Recharge rejected by UZF for each gravity-flow reservoir', &
      &   'inches', Gw_rejected_grav)
 
-       !rsr, all reaches receive same precentage of flow to each segment
-       ALLOCATE (Segment_pct_area(Nsegment))
-!       CALL declvar_dble(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, &
-!      &     'Proportion of each segment that contributes flow to a stream reach', &
-!      &     'decimal fraction', Segment_pct_area)
+      !rsr, all reaches receive same precentage of flow to each segment
+      ALLOCATE (Segment_pct_area(Nsegment))
+!      CALL declvar_dble(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, &
+!     &     'Proportion of each segment that contributes flow to a stream reach', &
+!     &     'decimal fraction', Segment_pct_area)
 
       ! Allocate local arrays
       ALLOCATE ( Excess(Ngwcell) )
 
 ! Declared Parameters
-       ! should be change code so that flow to each reach is computed, either based on a
-       ! new parameter segment_reach_fraction or reach_carea or change cascade
-       ! procedure to cascade flow to reaches instead of segments
-!       ALLOCATE (Segment_reach_fraction(Nreach))
-!       IF ( declparam(MODNAME, 'segment_reach_fraction', 'nreach', 'real', &
-!     &      '0.0', '0.0', '1.0', &
-!     &      'Proportion of each segment that contributes flow to a stream reach', &
-!     &      'Proportion of each segment that contributes flow to a stream reach', &
-!     &      'decimal fraction')
+        ! should be change code so that flow to each reach is computed, either based on a
+        ! new parameter segment_reach_fraction or reach_carea or change cascade
+        ! procedure to cascade flow to reaches instead of segments
+!        ALLOCATE (Segment_reach_fraction(Nreach))
+!        IF ( declparam(MODNAME, 'segment_reach_fraction', 'nreach', 'real', &
+!      &      '0.0', '0.0', '1.0', &
+!      &      'Proportion of each segment that contributes flow to a stream reach', &
+!      &      'Proportion of each segment that contributes flow to a stream reach', &
+!      &      'decimal fraction')/=0 ) CALL read_error(1, 'segment_reach_fraction')
 
-!      ALLOCATE (Local_reachid(Nreach))
-!      IF ( declparam(MODNAME, 'local_reachid', 'nreach', 'integer', &
-!    &      '0', 'bounded', 'nreach', &
-!    &      'Map of the global reach ids to reach ids of each segment', &
-!    &      'Index of stream reach within a stream segment for each stream reach', &
-!    &      'none')
+!     ALLOCATE (Local_reachid(Nreach))
+!     IF ( decl param(MODNAME, 'local_reachid', 'nreach', 'integer', &
+!    &     '0', 'bounded', 'nreach', &
+!    &     'Map of the global reach ids to reach ids of each segment', &
+!    &     'Index of stream reach within a stream segment for each stream reach', &
+!    &     'none')/=0 ) CALL read_error(1, 'local_reachid')
 
-!      ALLOCATE (Reach_segment(Nreach))
-!      IF ( decl param(MODNAME, 'reach_segment', 'nreach', 'integer', &
-!    &      '0', 'bounded', 'nsegment', &
-!    &      'Map of the stream reaches to the stream segments', &
-!    &      'Index of stream segment associate with each stream reach', &
-!    &      'none')
+!     ALLOCATE (Reach_segment(Nreach))
+!     IF ( decl param(MODNAME, 'reach_segment', 'nreach', 'integer', &
+!    &     '0', 'bounded', 'nsegment', &
+!    &     'Map of the stream reaches to the stream segments', &
+!    &     'Index of stream segment associate with each stream reach', &
+!    &     'none')/=0 ) CALL read_error(1, 'reach_segment')
 
       IF ( Nhru/=Nhrucell .OR. Model==99 ) THEN
         ALLOCATE ( Gvr_hru_pct(Nhrucell) )
@@ -397,11 +396,9 @@
       USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, &
      &    Inch_to_mfl_t, Gwc_row, Gwc_col, Mft_to_days
       USE GLOBAL, ONLY: IBOUND
-      USE GWFAGMODULE, ONLY: NUMIRRPOND
       USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, IGSFLOW, FINF, IUZFOPT
       USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK, NLAKES
-      USE PRMS_CONSTANTS, ONLY: ACTIVE
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Dprst_flag, Ag_package
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_area, Lake_hru_id
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Hru_actet
@@ -410,7 +407,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: toStream
-      EXTERNAL Bin_percolation, toIrr
+      EXTERNAL Bin_percolation
 ! Local Variables
       INTEGER :: irow, icol, ik, jk, ii, ilake
       INTEGER :: j, icell, ihru, is_draining
@@ -421,12 +418,6 @@
 ! Add runoff to stream reaches
 !-----------------------------------------------------------------------
       IF ( toStream()/=0 ) RETURN
-!-----------------------------------------------------------------------
-! Remove open dprst storage for irrigation
-!-----------------------------------------------------------------------
-       IF ( Ag_package==ACTIVE .AND. Dprst_flag==ACTIVE ) THEN
-         IF ( NUMIRRPOND>0 ) CALL toIrr()
-       ENDIF
 
 !-----------------------------------------------------------------------
 ! Add runoff and precip to lakes
@@ -563,35 +554,6 @@
       toStream = 0
 
       END FUNCTION toStream
-
-!***********************************************************************
-!***********************************************************************
-      SUBROUTINE toIrr()
-
-      USE GWFAGMODULE, ONLY: NUMIRRPOND, IRRPONDVAR, PONDFLOW
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
-      USE PRMS_MODULE, ONLY: Dprst_ag_transfer
-      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
-      IMPLICIT NONE
-      INTRINSIC :: SNGL
-! Local Variables
-      INTEGER :: i, hru_id
-      REAL :: demand_inch_acres
-!***********************************************************************
-! Calculate conversion for MF units to inch_acres
-      Dprst_ag_transfer = 0.0
-      do i = 1, NUMIRRPOND
-        hru_id = IRRPONDVAR(i)
-        IF ( hru_id > 0 ) THEN
-          demand_inch_acres = PONDFLOW(i)*MFQ_to_inch_acres
-          IF ( demand_inch_acres > SNGL(Dprst_vol_open(hru_id))) demand_inch_acres = SNGL(Dprst_vol_open(hru_id))
-          PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
-          Dprst_ag_transfer(hru_id) = Dprst_ag_transfer(hru_id) + demand_inch_acres
-          Dprst_vol_open(hru_id) = Dprst_vol_open(hru_id) - demand_inch_acres
-        END IF
-      end do
-
-      END SUBROUTINE toIrr
 
 !***********************************************************************
 ! Bin percolation to reduce waves

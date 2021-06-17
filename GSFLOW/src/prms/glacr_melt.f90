@@ -53,7 +53,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2020-12-02'
+      character(len=*), parameter :: Version_glacr = '2021-05-06'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -189,12 +189,12 @@
      &     'inches', Gl_mb_cumul)
 
       CALL declvar_dble(MODNAME, 'basin_gl_area', 'one', 1, &
-     &     'Basin area-weighted average glacier-covered area',   &
+     &     'Basin area-weighted average glacier-covered area', &
      &     'decimal fraction', Basin_gl_area)
 
       ALLOCATE ( Gl_area(Nhru) )
       CALL declvar_dble(MODNAME, 'gl_area', 'nhru', Nhru, &
-     &     'Area of each glacier, indexed by Glacr_tag',  &
+     &     'Area of each glacier, indexed by Glacr_tag', &
      &     'acres', Gl_area)
 
       ALLOCATE ( Glnet_ar_delta(Nhru) )
@@ -204,7 +204,7 @@
 
       ALLOCATE ( Glacr_flow(Nhru) )
       CALL declvar_real(MODNAME, 'glacr_flow', 'nhru', Nhru, &
-     &     'Glacier melt and rain from HRU to stream network, only nonzero at termini HRUs and snowfield HRUs',  &
+     &     'Glacier melt and rain from HRU to stream network, only nonzero at termini HRUs and snowfield HRUs', &
      &     'inches cubed', Glacr_flow)
 
       ALLOCATE ( Delta_volyr(Nhru) )
@@ -275,7 +275,7 @@
       ALLOCATE ( Hru_mb_yrend(Nhru) )
       CALL declvar_real(MODNAME, 'hru_mb_yrend', 'nhru', Nhru, &
      &     'Glacier HRU mass balance at end of previous hydrological year', &
-     &      'inches', Hru_mb_yrend)
+     &     'inches', Hru_mb_yrend)
 
       ALLOCATE ( Av_fgrad(Nhru) )
       CALL declvar_real(MODNAME, 'av_fgrad', 'nhru', Nhru, &
@@ -304,7 +304,7 @@
 
       ALLOCATE ( Basal_elev(Nhru) )
       CALL declvar_real(MODNAME, 'basal_elev', 'nhru', Nhru, &
-     &     'Glacier basal elevation mean over HRU',          &
+     &     'Glacier basal elevation mean over HRU', &
      &     'elev_units', Basal_elev)
 
       ALLOCATE ( Keep_gl(Nhru,Seven) )

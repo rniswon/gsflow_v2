@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2021-02-09'
+      character(len=*), parameter :: Version_gsflow_budget = '2021-05-07'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -169,8 +169,8 @@
 
       ALLOCATE ( Gw_rejected(Nhru) )
       CALL declvar_real(MODNAME, 'gw_rejected', 'nhru', Nhru, &
-     &     'HRU average recharge rejected by UZF', 'inches', &
-     &     Gw_rejected)
+     &     'HRU average recharge rejected by UZF', &
+     &     'inches', Gw_rejected)
 
 !       ALLOCATE ( Uzf_infil_map(Nhru) )
 !       CALL declvar_real(MODNAME, 'uzf_infil_map', 'nhru', Nhru, &
