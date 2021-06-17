@@ -1167,7 +1167,6 @@ C     Get current date and time, assign to IEDT, and write.
       WRITE(*,1000) (IEDT(I),I=1,3),(IEDT(I),I=5,7)
  1000 FORMAT(/,1X,'Run end date and time (yyyy/mm/dd hh:mm:ss): ',
      &       I4,2('/',I2.2),I3,2(':',I2.2))
-      print *, iout
       IF(IPRTIM.GT.0) THEN
         WRITE(IOUT,'(1X)')
         WRITE(IOUT,1000) (IEDT(I),I=1,3),(IEDT(I),I=5,7)
