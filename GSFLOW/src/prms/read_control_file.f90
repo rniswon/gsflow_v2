@@ -27,6 +27,7 @@
         USE PRMS_BASIN_SUMMARY, ONLY: BasinOutVars, BasinOut_freq, BasinOutBaseFileName, BasinOutVar_names
         USE PRMS_NSEGMENT_SUMMARY, ONLY: NsegmentOutVars, NsegmentOut_freq, NsegmentOutBaseFileName, &
      &      NsegmentOutVar_names, NsegmentOut_format
+        USE PRMS_WATER_USE, ONLY: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file, External_transfer_file, Lake_transfer_file
         USE PRMS_DYNAMIC_PARAM_READ, ONLY: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
      &      wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
      &      potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, &
@@ -576,6 +577,31 @@
       Control_parameter_data(i)%name = 'ani_output_file'
       Ani_output_file = 'animation.out'
       Control_parameter_data(i)%values_character(1) = Ani_output_file
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'segment_transfer_file'
+      Ani_output_file = 'segment_transfer.in'
+      Control_parameter_data(i)%values_character(1) = Segment_transfer_file
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'gwr_transfer_file'
+      Ani_output_file = 'gwr_transfer.in'
+      Control_parameter_data(i)%values_character(1) = Gwr_transfer_file
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'dprst_transfer_file'
+      Ani_output_file = 'dprst_transfer.in'
+      Control_parameter_data(i)%values_character(1) = Dprst_transfer_file
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'external_transfer_file'
+      Ani_output_file = 'external_transfer.in'
+      Control_parameter_data(i)%values_character(1) = External_transfer_file
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'lake_transfer_file'
+      Ani_output_file = 'lake_transfer.in'
+      Control_parameter_data(i)%values_character(1) = Lake_transfer_file
       Control_parameter_data(i)%data_type = CHAR_TYPE
       i = i + 1
       Control_parameter_data(i)%name = 'nhruOutBaseFileName'

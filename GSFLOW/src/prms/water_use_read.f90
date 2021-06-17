@@ -52,6 +52,9 @@
       INTEGER, SAVE :: Consumed_transfers_on, Lake_transfers_on, Segment_transfers_on
       INTEGER, SAVE :: External_transfers_on, Dprst_transfers_on, Gwr_transfers_on
       INTEGER, ALLOCATABLE, SAVE :: Source_id(:), Destination_id(:), Source_type(:), Destination_type(:)
+! Control Parameters
+      CHARACTER(LEN=MAXFILE_LENGTH) :: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file
+      CHARACTER(LEN=MAXFILE_LENGTH) :: External_transfer_file, Lake_transfer_file
       END MODULE PRMS_WATER_USE
 
       INTEGER FUNCTION water_use_read()
@@ -62,9 +65,6 @@
       INTEGER, EXTERNAL :: control_string, decldim, getdim
       EXTERNAL :: declvar_real, declvar_dble
       EXTERNAL :: read_error, find_header_end, find_current_file_time, read_event, print_module, PRMS_open_module_file, error_stop
-! Control Parameters
-      CHARACTER(LEN=MAXFILE_LENGTH) :: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file
-      CHARACTER(LEN=MAXFILE_LENGTH) :: External_transfer_file, Lake_transfer_file
 ! Local Variables
       INTEGER, SAVE :: external_unit, external_next_year, external_next_month, external_next_day
       INTEGER, SAVE :: segment_unit, dprst_unit, gwr_unit, lake_unit
