@@ -272,8 +272,9 @@
 !     Output set of declared variables in CSV format
 !***********************************************************************
       SUBROUTINE nsegment_summaryrun()
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_NSEGMENT_SUMMARY
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday, Modays
+      USE PRMS_SET_TIME, ONLY: Modays
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC SNGL, DBLE

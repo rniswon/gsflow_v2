@@ -480,7 +480,7 @@
 ! Read event for a source type
 !*****************************
       SUBROUTINE read_event_date(Iunit, Next_yr, Next_mo, Next_day)
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_CONSTANTS, ONLY: ERROR_water_use, ACTIVE, OFF
       IMPLICIT NONE
 ! Arguments
