@@ -12,7 +12,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-02-18'
+      character(len=*), parameter :: Version_intcp = '2021-05-06'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -94,7 +94,7 @@
         ALLOCATE ( Irr_type(Nhru) )
         IF ( declparam(MODNAME, 'irr_type', 'nhru', 'integer', &
      &       '0', '0', '2', &
-     &       'Method of application of water for each application', &
+     &       'Application method of irrigation water', &
      &       'Application method of irrigation water for each HRU (0 = sprinkler method with interception only;'// &
      &       ' 1=ditch/drip method with no interception; 2=ignore; 3=sprinkler across whole HRU with interception'// &
      &       ' and throughfall; 4=sprinkler method with amount of water applied on the basis of cover density,'// &

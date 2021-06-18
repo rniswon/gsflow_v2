@@ -25,7 +25,7 @@
      &    DEBUG_WB, smidx_module, carea_module, LAND, LAKE, GLACIER, CASCADE_OFF, ERROR_water_use
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Print_debug, Init_vars_from_file, &
      &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, Water_use_flag, &
-     &    Frozen_flag, Inputerror_flag, Glacier_flag, Agriculture_flag, &
+     &    Frozen_flag, Inputerror_flag, Glacier_flag, &
      &    Dprst_add_water_use, Dprst_transfer_water_use !, Parameter_check_flag
       IMPLICIT NONE
 !   Local Variables
@@ -62,8 +62,9 @@
       REAL, SAVE, ALLOCATABLE :: Dprst_depth_avg(:), Sro_to_dprst_imperv(:), Dprst_et_coef(:)
 !   Declared Variables for Depression Storage
       DOUBLE PRECISION, SAVE :: Basin_dprst_sroff, Basin_dprst_evap, Basin_dprst_seep
-      DOUBLE PRECISION, SAVE :: Basin_dprst_volop, Basin_dprst_volcl
+      DOUBLE PRECISION, SAVE :: Basin_dprst_volop, Basin_dprst_volcl !, Basin_dprst_hortonian_lakes
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_stor_hru(:), Dprst_sroff_hru(:), Dprst_seep_hru(:)
+!      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Upslope_dprst_hortonian(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_area_open(:), Dprst_area_clos(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_insroff_hru(:), Dprst_evap_hru(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_vol_frac(:), Dprst_vol_open_frac(:), Dprst_vol_clos_frac(:)
@@ -222,6 +223,11 @@
         CALL declvar_real(MODNAME, 'dprst_area_clos', 'nhru', Nhru, &
      &       'Surface area of closed surface depressions based on storage volume for each HRU', &
      &       'acres', Dprst_area_clos)
+
+!        ALLOCATE ( Upslope_dprst_hortonian(Nhru) )
+!        CALL declvar_dble(MODNAME, 'upslope_dprst_hortonian', 'nhru', Nhru, &
+!     &       'Upslope surface-depression spillage and interflow for each HRU',   &
+!     &       'inches', Upslope_dprst_hortonian)
 
         ALLOCATE ( Dprst_stor_hru(Nhru) )
         CALL declvar_dble(MODNAME, 'dprst_stor_hru', 'nhru', Nhru, &
@@ -610,7 +616,7 @@
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, &
      &    Hru_perv, Hru_imperv, Hru_percent_imperv, Hru_frac_perv, &
      &    Dprst_area_max, Hru_area, Hru_type, Basin_area_inv, &
-     &    Dprst_area_clos_max, Dprst_area_open_max, Hru_area_dble, Ag_area
+     &    Dprst_area_clos_max, Dprst_area_open_max, Hru_area_dble
       USE PRMS_CLIMATEVARS, ONLY: Potet, Tavgc
       USE PRMS_FLOWVARS, ONLY: Sroff, Infil, Imperv_stor, Pkwater_equiv, Dprst_vol_open, Dprst_vol_clos, &
      &    Imperv_stor_max, Snowinfil_max, Basin_sroff, Glacier_frac
@@ -741,7 +747,7 @@
           Frozen(i) = frzen
         ENDIF
 
-!******Compute runoff for pervious, agriculture, impervious, and depression storage area, only if not frozen ground
+!******Compute runoff for pervious, impervious, and depression storage area, only if not frozen ground
         IF ( frzen==OFF ) THEN
 ! DO IRRIGATION APPLICATION, ONLY DONE HERE, ASSUMES NO SNOW and
 ! only for pervious areas (just like infiltration)
