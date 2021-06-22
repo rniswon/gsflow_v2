@@ -42,7 +42,7 @@ CONTAINS
     ! Gaussian elimination without pivoting.                      
     !----------------------------------------------------------------------
     USE machine_constants, ONLY: kdp
-    USE GLOBAL, ONLY: iout
+!    USE GLOBAL, ONLY: iout
     IMPLICIT NONE
     INTEGER, INTENT(IN) :: n    ! ... The row dimension of A
     DOUBLE PRECISION, DIMENSION(:), INTENT(IN) :: a     ! ... Matrix A in compressed
@@ -87,7 +87,7 @@ CONTAINS
     INTEGER :: a_err, da_err
     DOUBLE PRECISION :: fact, s, t, tnorm
     ! ... Set string for use with RCS ident command
-    CHARACTER(LEN=80) :: ident_string='$RCSfile: ilupc_mod.f90,v $//$Revision: 6461 $'
+!    CHARACTER(LEN=80) :: ident_string='$RCSfile: ilupc_mod.f90,v $//$Revision: 6461 $'
     !     ------------------------------------------------------------------
     !...
     IF (lfil < 0) THEN         ! ... illegal lfil entered.
@@ -303,7 +303,7 @@ CONTAINS
     ! All the diagonal elements of the A matrix must be  nonzero.
     !----------------------------------------------------------------------
     USE machine_constants, ONLY: kdp
-    USE global, only: iout
+!    USE global, only: iout
     IMPLICIT NONE
     INTEGER, INTENT(IN) :: n    ! ... The row dimension of A
     DOUBLE PRECISION, DIMENSION(:), INTENT(IN) :: a     ! ... Matrix A in compressed
@@ -347,7 +347,7 @@ CONTAINS
     INTEGER :: a_err, da_err
     DOUBLE PRECISION :: t, s, fact
     ! ... Set string for use with RCS ident command
-    CHARACTER(LEN=80) :: ident_string='$RCSfile: ilupc_mod.f90,v $//$Revision: 6461 $'
+!    CHARACTER(LEN=80) :: ident_string='$RCSfile: ilupc_mod.f90,v $//$Revision: 6461 $'
     ! ... ------------------------------------------------------------------
     !...
     IF (lfil < 0) THEN         ! ... illegal lfil entered
@@ -555,7 +555,7 @@ CONTAINS
     DOUBLE PRECISION :: tmp, abskey
     INTEGER :: itmp, first, last
     ! ... Set string for use with RCS ident command
-    CHARACTER(LEN=80) :: ident_string='$RCSfile: ilupc_mod.f90,v $//$Revision: 6461 $'
+!    CHARACTER(LEN=80) :: ident_string='$RCSfile: ilupc_mod.f90,v $//$Revision: 6461 $'
     ! ... ------------------------------------------------------------------
     !...
     first = 1
@@ -614,7 +614,7 @@ CONTAINS
     INTEGER :: a_err, da_err, bw, bwl, bwu, ffmin, i, j, jp, jpt, k, t, tp 
     !
     ! ... Set string for use with RCS ident command
-    CHARACTER(LEN=80) :: ident_string='$RCSfile: ilupc_mod.f90,v $//$Revision: 6461 $'
+!    CHARACTER(LEN=80) :: ident_string='$RCSfile: ilupc_mod.f90,v $//$Revision: 6461 $'
     ! ... ------------------------------------------------------------------
     !...
     ! ... Determine bandwidth and allocate ff array
