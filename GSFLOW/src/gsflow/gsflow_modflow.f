@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-06-10'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-06-22'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -22,7 +22,7 @@
       character(len=*), parameter :: Version_uzf = '2021-03-02'
       character(len=*), parameter :: Version_sfr = '2020-09-30'
       character(len=*), parameter :: Version_lak = '2020-09-30'
-      character(len=*), parameter :: Version_ag =  '2021-06-10'
+      character(len=*), parameter :: Version_ag =  '2021-06-21'
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
       INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS, KPERSTART
@@ -519,7 +519,6 @@ C7------SIMULATE EACH STRESS PERIOD.
       ELSEIF ( GSFLOW_flag==ACTIVE ) THEN
         Kkper_new = GET_KPER()
       ELSE
-          print *, kkper_new, kper_mfo
         Kkper_new = Kper_mfo
       ENDIF
 
@@ -625,7 +624,6 @@ C7C2----ITERATIVELY FORMULATE AND SOLVE THE FLOW EQUATIONS.
            ITREAL2 = 0
 !           IF ( IUNIT(63).GT.0 ) ITREAL = 0
            ITREAL = 0
-           print *, itreal2, mxiter
            DO WHILE (ITREAL2.LT.MXITER)
             KITER = KITER + 1
             KKITER = KITER
@@ -782,7 +780,6 @@ c            END IF
      2                       IUNIT(22),Itreal,AGCONVERGE,IGRID)
              ITREAL2 = ITREAL
           ENDIF
-      print *, itreal2, itreal, kkiter, kstp, kper
           IF(IERR.EQ.1) CALL USTOP(' ')
 C
 C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
@@ -1419,7 +1416,6 @@ C
       now = compute_julday(Nowyear, Nowmonth, Nowday)
       KPERTEST = 1
       IF ( KPER > KPERTEST ) KPERTEST = KPER
-             print *, nowyear, Nowmonth, nowday, now
 !
 !     If called from init, then "now" isn't set yet.
 !     Set "now" to model start date.

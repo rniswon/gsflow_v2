@@ -20,9 +20,9 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 06/27/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-06-11'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 06/11/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 06/22/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-06-22'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 06/22/2021'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -753,23 +753,18 @@
         ELSE
           Process_flag = RUN
           DO WHILE ( Kper_mfo<=Nper )
-              print *, mf_nowtime, endday, kper_mfo, nper
             IF ( mf_nowtime>endday ) EXIT
             test = gsflow_modflow()
             IF ( test/=0 ) CALL module_error(MODNAME, 'run', test)
-            print *, NSTP
             IF ( mf_timestep==NSTP(Kper_mfo) ) THEN
                 Kper_mfo = Kper_mfo + 1
                 mf_timestep = 0
             ENDIF
-!print *, mf_timestep, NSTP(Kper_mfo), kper_mfo
             mf_timestep = mf_timestep + 1
             mf_nowtime = mf_nowtime + 1
-!rsr            kper = Kper_mfo
-!rsr            kstp = mf_timestep
           ENDDO
         ENDIF
-         Process_flag = CLEAN
+        Process_flag = CLEAN
         test = gsflow_modflow()
         IF ( test/=0 ) CALL module_error(MODNAME, 'clean', test)
         STOP
