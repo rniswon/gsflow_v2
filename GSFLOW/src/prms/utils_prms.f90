@@ -918,7 +918,8 @@
 ! Print date
 !***********************************************************************
       SUBROUTINE print_date(Flag)
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday, Nowhour, Nowminute
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_SET_TIME, ONLY: Nowhour, Nowminute
       IMPLICIT NONE
       ! Arguments
       INTEGER, INTENT(IN) :: Flag

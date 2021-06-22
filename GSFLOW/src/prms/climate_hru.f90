@@ -643,7 +643,7 @@
 !     Read a day in the CBH File
 !***********************************************************************
       SUBROUTINE read_cbh_date(Year, Month, Day, Var, Ios, Iret)
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
 ! Argument
       INTEGER, INTENT(IN) :: Year, Month, Day, Ios
       CHARACTER(LEN=*), INTENT(IN) :: Var

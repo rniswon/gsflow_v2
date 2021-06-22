@@ -4,13 +4,13 @@
 !***********************************************************************
 
       MODULE GSFSUM
-      USE PRMS_CONSTANTS, ONLY: DEBUG_WB, DEBUG_less, ERROR_open_out, CFS2CMS_CONV, ACTIVE, READ_INIT, OFF
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, DEBUG_WB, DEBUG_less, ERROR_open_out, CFS2CMS_CONV, ACTIVE, READ_INIT, OFF
       USE PRMS_MODULE, ONLY: Print_debug
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output CSV Summary'
       character(len=10), parameter :: MODNAME = 'gsflow_sum'
-      character(len=*), parameter :: Version_gsflow_sum = '2020-12-02'
+      character(len=*), parameter :: Version_gsflow_sum = '2021-06-08'
       INTEGER, SAVE :: BALUNT
       DOUBLE PRECISION, PARAMETER :: ERRCHK = 0.0001D0
       INTEGER, SAVE :: Balance_unt, Vbnm_index(14), Gsf_unt, Rpt_count
@@ -65,8 +65,7 @@
 !   Declared Parameters
       INTEGER, SAVE :: Id_obsrunoff
 !   Control Parameters
-      INTEGER, SAVE :: Rpt_days, Gsf_rpt
-      CHARACTER(LEN=256), SAVE :: Csv_output_file, Gsflow_output_file
+      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Csv_output_file, Gsflow_output_file
       END MODULE GSFSUM
 
 !***********************************************************************
@@ -312,16 +311,14 @@
      &     'L3/T', Basingvr2sm)/=0 ) CALL read_error(3, 'basingvr2sm')
 
       IF ( declvar(MODNAME, 'Infil2CapTotal_Q', 'one', 1, 'double', &
-     &     'Volumetric flow rate of soil infiltration into capillary'// &
-     &     ' reservoirs including precipitation, snowmelt, and'// &
+     &     'Volumetric flow rate of soil infiltration into capillary reservoirs including precipitation, snowmelt, and'// &
      &     ' cascading Hortonian and Dunnian runoff and interflow'// &
      &     ' minus infiltration to preferential-flow reservoirs', &
      &     'L3/T', Infil2CapTotal_Q)/=0 ) CALL read_error(3, 'Infil2CapTotal_Q')
 
       IF ( declvar(MODNAME, 'Infil2Pref_Q', 'one', 1, 'double', &
      &     'Volumetric flow rate of soil infiltration into'// &
-     &     ' preferential-flow reservoirs including precipitation,'// &
-     &     ' snowmelt, and cascading surface runoff', &
+     &     ' preferential-flow reservoirs including precipitation, snowmelt, and cascading surface runoff', &
      &     'L3/T', Infil2Pref_Q)/=0 ) CALL read_error(3, 'Infil2Pref_Q')
 
       IF ( declvar(MODNAME, 'DunnInterflow2Cap_Q', 'one', 1, 'double', &
@@ -564,7 +561,7 @@
      &    TOTSTOR_LAK, TOTWTHDRW_LAK, TOTRUNF_LAK, TOTSURFIN_LAK, &
      &    TOTSURFOT_LAK, TOTEVAP_LAK, TOTPPT_LAK
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_MODULE, ONLY: KKITER, Nobs, Timestep, Dprst_flag, Have_lakes
+      USE PRMS_MODULE, ONLY: KKITER, Nobs, Timestep, Dprst_flag, Have_lakes, Gsf_rpt, Rpt_days
       USE PRMS_OBS, ONLY: Runoff, Runoff_units
       USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
@@ -885,8 +882,8 @@
 !***********************************************************************
       INTEGER FUNCTION gsfsumclean()
       USE PRMS_CONSTANTS, ONLY: DEBUG_WB
-      USE PRMS_MODULE, ONLY: Print_debug
-      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Gsf_rpt, BALUNT
+      USE PRMS_MODULE, ONLY: Print_debug, Gsf_rpt
+      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, BALUNT
       IMPLICIT NONE
 !***********************************************************************
       gsfsumclean = 0
@@ -900,16 +897,14 @@
 !***********************************************************************
       SUBROUTINE GSF_PRINT()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_open_out
-      USE PRMS_MODULE, ONLY: Print_debug
-      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Csv_output_file, Rpt_days, &
-     &    Gsflow_output_file, Gsf_rpt
+      USE PRMS_MODULE, ONLY: Print_debug, Gsf_rpt, Rpt_days
+      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Csv_output_file, Gsflow_output_file
       IMPLICIT NONE
       INTEGER, EXTERNAL :: control_integer, control_string, numchars
       EXTERNAL GSF_HEADERS, read_error, PRMS_open_output_file
 ! Local Variables
       INTEGER :: nc, ios
 !***********************************************************************
-      IF ( control_integer(Gsf_rpt, 'gsf_rpt')/=0 ) CALL read_error(5, 'gsf_rpt')
       IF ( Gsf_rpt==1 ) THEN  !gsf_rpt default = 1
 
         IF ( control_string(Csv_output_file, 'csv_output_file')/=0 ) CALL read_error(5, 'csv_output_file')
@@ -922,7 +917,6 @@
  
 ! Open the GSF volumetric balance report file
 
-      IF ( control_integer(Rpt_days, 'rpt_days')/=0 ) CALL read_error(5, 'rpt_days')
       IF ( Print_debug>DEBUG_less ) PRINT '(/,A,I4)', 'Water Budget print frequency is:', Rpt_days
       IF ( control_string(Gsflow_output_file, 'gsflow_output_file')/=0 ) CALL read_error(5, 'gsflow_output_file')
       IF ( Gsflow_output_file(:1)==' ' .OR. Gsflow_output_file(:1)==CHAR(0) ) Gsflow_output_file = 'gsflow.out'

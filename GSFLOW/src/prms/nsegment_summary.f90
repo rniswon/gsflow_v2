@@ -11,7 +11,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsegment_summary'
-      character(len=*), parameter :: Version_nsegment_summary = '2020-12-02'
+      character(len=*), parameter :: Version_nsegment_summary = '2021-05-06'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsegment_var_type(:)
       REAL, SAVE, ALLOCATABLE :: Nsegment_var_daily(:, :)
@@ -100,7 +100,7 @@
 
       IF ( NsegmentOutON_OFF==2 .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Nhm_seg(Nsegment) )
-        IF (declparam(MODNAME, 'nhm_seg', 'nsegment', 'integer', &
+        IF ( declparam(MODNAME, 'nhm_seg', 'nsegment', 'integer', &
      &       '0', '0', '9999999', &
      &       'National Hydrologic Model segment ID', 'National Hydrologic Model segment ID', &
      &       'none')/=0 ) CALL read_error(1, 'nhm_seg')
@@ -272,8 +272,9 @@
 !     Output set of declared variables in CSV format
 !***********************************************************************
       SUBROUTINE nsegment_summaryrun()
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_NSEGMENT_SUMMARY
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday, Modays
+      USE PRMS_SET_TIME, ONLY: Modays
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC SNGL, DBLE
@@ -304,7 +305,7 @@
           ENDDO
         ENDIF
         IF ( Daily_flag==ACTIVE ) WRITE ( Dailyunit(jj), Output_fmt) Nowyear, Nowmonth, Nowday, &
-     &                                                           (Nsegment_var_daily(j,jj), j=1,Nsegment)
+     &                                                               (Nsegment_var_daily(j,jj), j=1,Nsegment)
       ENDDO
 
       write_month = OFF

@@ -11,7 +11,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=9), parameter :: MODNAME = 'basin_sum'
-      character(len=*), parameter :: Version_basin_sum = '2020-12-02'
+      character(len=*), parameter :: Version_basin_sum = '2021-05-06'
 
       INTEGER, SAVE :: BALUNT, Totdays
       INTEGER, SAVE :: Header_prt, Endjday
@@ -475,13 +475,14 @@
 !     sumbrun - Computes summary values
 !***********************************************************************
       INTEGER FUNCTION sumbrun()
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_BASINSUM
       USE PRMS_BASIN, ONLY: Active_area, Active_hrus, Hru_route_order
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, &
      &    Basin_actet, Basin_perv_et, Basin_swale_et, Hru_actet, Basin_sroff, &
      &    Basin_ssstor, Basin_soil_moist, Basin_cfs, Basin_stflow_out, Basin_lake_stor
       USE PRMS_CLIMATEVARS, ONLY: Basin_swrad, Basin_ppt, Basin_potet, Basin_tmax, Basin_tmin
-      USE PRMS_SET_TIME, ONLY: Jday, Modays, Yrdays, Julwater, Nowyear, Nowmonth, Nowday, Cfs2inches
+      USE PRMS_SET_TIME, ONLY: Jday, Modays, Yrdays, Julwater, Cfs2inches
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_GWFLOW, ONLY: Basin_gwflow, Basin_gwstor, Basin_gwsink, Basin_gwstor_minarea_wb
       USE PRMS_INTCP, ONLY: Basin_intcp_evap, Basin_intcp_stor, Basin_net_ppt

@@ -13,7 +13,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2020-12-02'
+      character(len=*), parameter :: Version_routing = '2021-05-06'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades
@@ -257,38 +257,32 @@
       IF ( Hru_seg_cascades==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Seginc_potet(Nsegment) )
         IF ( declvar(MODNAME, 'seginc_potet', 'nsegment', Nsegment, 'double', &
-     &       'Area-weighted average potential ET for each segment'// &
-     &       ' from HRUs contributing flow to the segment', &
+     &       'Area-weighted average potential ET for each segment from HRUs contributing flow to the segment', &
      &       'inches', Seginc_potet)/=0 ) CALL read_error(3, 'seginc_potet')
 
         ALLOCATE ( Seginc_swrad(Nsegment) )
         IF ( declvar(MODNAME, 'seginc_swrad', 'nsegment', Nsegment, 'double', &
-     &       'Area-weighted average solar radiation for each segment'// &
-     &       ' from HRUs contributing flow to the segment', &
+     &       'Area-weighted average solar radiation for each segment from HRUs contributing flow to the segment', &
      &       'Langleys', Seginc_swrad)/=0 ) CALL read_error(3, 'seginc_swrad')
 
         ALLOCATE ( Seginc_ssflow(Nsegment) )
         IF ( declvar(MODNAME, 'seginc_ssflow', 'nsegment', Nsegment, 'double', &
-     &       'Area-weighted average interflow for each segment from'// &
-     &       ' HRUs contributing flow to the segment', &
+     &       'Area-weighted average interflow for each segment from HRUs contributing flow to the segment', &
      &       'cfs', Seginc_ssflow)/=0 ) CALL read_error(3, 'seginc_ssflow')
 
         ALLOCATE ( Seginc_gwflow(Nsegment) )
         IF ( declvar(MODNAME, 'seginc_gwflow', 'nsegment', Nsegment, 'double', &
-     &       'Area-weighted average groundwater discharge for each'// &
-     &       ' segment from HRUs contributing flow to the segment', &
+     &       'Area-weighted average groundwater discharge for each segment from HRUs contributing flow to the segment', &
      &       'cfs', Seginc_gwflow)/=0 ) CALL read_error(3, 'seginc_gwflow')
 
         ALLOCATE ( Seginc_sroff(Nsegment) )
         IF ( declvar(MODNAME, 'seginc_sroff', 'nsegment', Nsegment, 'double', &
-     &       'Area-weighted average surface runoff for each'// &
-     &       ' segment from HRUs contributing flow to the segment', &
+     &       'Area-weighted average surface runoff for each segment from HRUs contributing flow to the segment', &
      &       'cfs', Seginc_sroff)/=0 ) CALL read_error(3, 'seginc_sroff')
 
         ALLOCATE ( Seg_ssflow(Nsegment) )
         IF ( declvar(MODNAME, 'seg_ssflow', 'nsegment', Nsegment, 'double', &
-     &       'Area-weighted average interflow for each segment from'// &
-     &       ' HRUs contributing flow to the segment and upstream HRUs', &
+     &       'Area-weighted average interflow for each segment from HRUs contributing flow to the segment and upstream HRUs', &
      &       'inches', Seg_ssflow)/=0 ) CALL read_error(3, 'seg_ssflow')
 
         ALLOCATE ( Seg_gwflow(Nsegment) )

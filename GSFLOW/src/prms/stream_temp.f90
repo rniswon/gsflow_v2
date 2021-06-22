@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2020-12-02'
+      character(len=*), parameter :: Version_stream_temp = '2021-05-06'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -717,6 +717,7 @@
 !     stream_temp_run - Computes stream temperatures
 !***********************************************************************
       INTEGER FUNCTION stream_temp_run()
+      USE PRMS_MODULE, ONLY: Nowmonth !, Nowyear, Nowday
       USE PRMS_STRMTEMP
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area
       USE PRMS_SET_TIME, ONLY: Summer_flag, Nowmonth
@@ -726,7 +727,7 @@
       USE PRMS_SNOW, ONLY: Snowmelt
       USE PRMS_ROUTING, ONLY: Hru_segment, Segment_order, Seginc_swrad
       USE PRMS_OBS, ONLY: Humidity
-      USE PRMS_SET_TIME, ONLY: Nowmonth, Jday !, Nowyear, Nowday
+      USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_SOLTAB, ONLY: Soltab_potsw, Hru_cossl
 
       IMPLICIT NONE
@@ -869,7 +870,6 @@
 !         endif
  
       ENDDO
-
 
 ! Compute the running averages for groundwater and subsurface temperatures.
       if (gw_index >= gw_tau(i)) then

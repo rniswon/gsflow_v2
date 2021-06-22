@@ -22,7 +22,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Groundwater'
       character(len=6), parameter :: MODNAME = 'gwflow'
-      character(len=*), parameter :: Version_gwflow = '2020-12-02'
+      character(len=*), parameter :: Version_gwflow = '2021-05-06'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea(:), Gwin_dprst(:)
       DOUBLE PRECISION, SAVE :: Basin_gw_upslope
       INTEGER, SAVE :: Gwminarea_flag
@@ -120,8 +120,7 @@
 
       ALLOCATE ( Gwres_sink(Ngw) )
       IF ( declvar(MODNAME, 'gwres_sink', 'ngw', Ngw, 'real', &
-     &     'Outflow from GWRs to the groundwater sink; water is'// &
-     &     ' considered underflow or flow to deep aquifers and does'// &
+     &     'Outflow from GWRs to the groundwater sink; water is considered underflow or flow to deep aquifers and does'// &
      &     ' not flow to the stream network', &
      &     'inches', Gwres_sink)/=0 ) CALL read_error(3, 'gwres_sink')
 

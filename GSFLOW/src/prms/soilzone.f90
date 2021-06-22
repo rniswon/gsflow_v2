@@ -20,7 +20,7 @@
       USE PRMS_MODULE, ONLY: Model, Nhru, Nssr, Nsegment, Nlake, Nhrucell, Print_debug, Dprst_flag, &
      &    Init_vars_from_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Call_cascade, PRMS_land_iteration_flag, &
-     &    Ag_package, Agriculture_flag, Ag_frac_flag
+     &    Ag_package, Agriculture_flag, Ag_frac_flag, Soilzone_aet_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
@@ -78,8 +78,6 @@
       DOUBLE PRECISION, SAVE :: Basin_gvr2sm
       REAL, SAVE, ALLOCATABLE :: Sm2gw_grav(:), Gw2sm_grav(:)
       REAL, SAVE, ALLOCATABLE :: Gravity_stor_res(:), Gvr2sm(:), Grav_gwin(:)
-!   Control Parameters
-      INTEGER, SAVE :: Soilzone_aet_flag
 !   Declared Parameters
       INTEGER, SAVE, ALLOCATABLE :: Soil_type(:), Gvr_hru_id(:)
       REAL, SAVE, ALLOCATABLE :: Pref_flow_den(:), Pref_flow_infil_frac(:)
@@ -154,7 +152,7 @@
       USE PRMS_SOILZONE
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar, getdim, control_integer
+      INTEGER, EXTERNAL :: declparam, declvar, getdim
       !REAL, EXTERNAL :: control_real
       EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop
 !***********************************************************************
@@ -162,8 +160,6 @@
       total_iters = 0
 
       CALL print_module(MODDESC, MODNAME, Version_soilzone)
-
-      IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
 
 ! Declare Variables
       IF ( declvar(MODNAME, 'basin_capwaterin', 'one', 1, 'double', &
@@ -1925,7 +1921,8 @@
      &           Soil_moist, Soil_rechr, Perv_actet, Avail_potet, &
      &           Snow_free, Potet_rechr, Potet_lower, Potet, Perv_frac, Soil_saturated)
       USE PRMS_CONSTANTS, ONLY: NEARZERO, BARESOIL, SAND, LOAM, CLAY, ACTIVE, OFF
-      USE PRMS_SOILZONE, ONLY: Et_type, Soilzone_aet_flag !, HRU_id
+      USE PRMS_MODULE, ONLY: Soilzone_aet_flag
+      USE PRMS_SOILZONE, ONLY: Et_type !, HRU_id
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Transp_on, Cov_type, Soil_type

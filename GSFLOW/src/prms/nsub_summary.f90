@@ -11,7 +11,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsub_summary'
-      character(len=*), parameter :: Version_nsub_summary = '2020-12-02'
+      character(len=*), parameter :: Version_nsub_summary = '2021-05-06'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsub_var_type(:), Nsub_var_size(:)
       REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
@@ -283,9 +283,10 @@
 !     Output set of declared variables in CSV format
 !***********************************************************************
       SUBROUTINE nsub_summaryrun()
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_NSUB_SUMMARY
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area_dble
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday, Modays
+      USE PRMS_SET_TIME, ONLY: Modays
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: SNGL, DBLE

@@ -2077,7 +2077,7 @@ C     *****************************************************************
 !      USE GLOBAL,       ONLY: NLAY, IOUT, ISSFLG, IBOUND, HNEW, HCOF, 
 !     +                        RHS, BOTM, LBOTM
       USE GLOBAL,       ONLY: NLAY, IOUT, ISSFLG, IBOUND, HNEW, HCOF, 
-     +                        RHS, BOTM, LBOTM
+     +                        RHS, BOTM, LBOTM, DELR, DELC
       USE GWFBASMODULE, ONLY: DELT, TOTIM, HDRY
       USE GWFNWTMODULE, ONLY: Heps
 !!      USE GWFNWTMODULE, ONLY: Heps, A, IA, Icell
@@ -2126,7 +2126,7 @@ C     -----------------------------------------------------------------
       REAL areamax, avhc, errold, fks, ha, qcnst, seep, 
      +     stgon, strlen, roughch, roughbnk, widthch, deltinc, qlat, 
 !     +     fltest, Transient_bd
-     +     fltest, Transient_bd  !CJM
+     +     fltest, Transient_bd, dvt  !CJM
       INTEGER i, ibflg, ic, icalc, idivseg, iflg, iic, iic2, iic3, iic4,
      +        il, ilay, iprior, iprndpth, iprvsg, ir, istsg, itot,itrib,
      +        itstr, iwidthcheck, kerp, kss, l, lk, ll, nstrpts, nreach,
@@ -3596,7 +3596,7 @@ C     *****************************************************************
 !      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND,
 !     +                        HNEW, BUFF, BOTM, LBOTM, IUNIT
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND,
-     +                        HNEW, BUFF, BOTM, LBOTM, IUNIT
+     +                        HNEW, BUFF, BOTM, LBOTM, DELR, DELC, IUNIT
 !IFACE
       USE GWFBASMODULE, ONLY: MSUM, ICBCFL, IBUDFL, DELT, PERTIM, TOTIM,
      +                        VBVL, VBNM, HDRY, IAUXSV
@@ -3623,7 +3623,7 @@ C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
       REAL areamax, avhc, fks, ha, rin, rout, strlen,
      +     zero, sfrbudg_in, sfrbudg_out, qlat, deltinc, qcnst, rtime,
-     +     fltest, Transient_bd, Transient_bd_tot  !cjm (added dvt)
+     +     fltest, Transient_bd, Transient_bd_tot, dvt  !cjm (added dvt)
 !IFACE
       REAL xface(1)
       INTEGER naux
@@ -3632,6 +3632,7 @@ C     ------------------------------------------------------------------
      +        iwidthcheck, kss, l, lk, ll, nreach, numdelt, maxwav,
      +        icalccheck, iss, lsub, irt, itstr, imassroute, lfold
       INTEGER illake, LAKID
+      INTEGER irr, icc, icount  !cjm
       DOUBLE PRECISION h, hstr, sbot, cstr, ratin, ratout, flowin,
      +                 flobot, flow, flowot, sbdthk, upflw, trbflw,
      +                 width, wetperm, runof, runoff, precip, etstr,
@@ -5353,7 +5354,10 @@ C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
       INTEGER icalc, idum, ii, iqseg, isol, iupseg, jj, jk, lstend, n, 
-     +        noutseg, nseg, nstrpts
+     +        noutseg, nseg, nstrpts, i, k, istart, istop,sgnm,nmcl,
+     +        J,LLOC
+      REAL dum, totdum, R
+      CHARACTER(LEN=200)::LINE
 C     ------------------------------------------------------------------
 C
 C1------READ STREAM SEGMENT DATA.
@@ -8432,7 +8436,9 @@ C     CAUTION: DOES NOT WORK WITH TRANSIENT ROUTING.
 C-------- May 28, 2017
 C     ADDING CODE TO RETURN WATER-LIMITED RELEASES FROM RESERVOIRS
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM, ISEG
+      USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM, ISEG, IDIVAR,
+     1                        DVRSFLW, STRIN, STROUT
+      USE GWFLAKMODULE, ONLY: SURFOT
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 C     -------------------------------------------------------------------
@@ -8449,7 +8455,7 @@ C     -------------------------------------------------------------------
 C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
-      INTEGER :: ISTSG, L, ISTSGOLD, REACHNUMINSEG
+      INTEGER :: ISTSG, IRNUM, L, ISTSGOLD, REACHNUMINSEG, II
       DOUBLE PRECISION :: FLOWIN, FLOWOUT
 C     -------------------------------------------------------------------
 C
@@ -8505,8 +8511,8 @@ C     APPLY DIVERSIONS/LAKE RELEASES CALCULATED BY MODSIM TO DIVERSION
 C     SEGMENTS.
 !--------MARCH 8, 2017
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: NSS, SEG, IDIVAR, FXLKOT
-      USE GWFBASMODULE, ONLY: DELT
+      USE GWFSFRMODULE, ONLY: NSS, SEG, IDIVAR, FXLKOT, SGOTFLW
+      USE GWFBASMODULE, ONLY: DELT,TOTIM   !delete totim
 !      USE GWFAGMODULE, only:demand !delete this
       IMPLICIT NONE
 C     -------------------------------------------------------------------
