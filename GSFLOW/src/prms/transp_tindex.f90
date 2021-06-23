@@ -23,7 +23,7 @@
       USE PRMS_TRANSP_TINDEX
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Temp_units, Transp_on, Basin_transp_on 
-      USE PRMS_SET_TIME, ONLY: Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nowmonth, Nowday
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam, getparam

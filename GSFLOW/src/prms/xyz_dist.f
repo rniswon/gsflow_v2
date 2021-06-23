@@ -688,7 +688,7 @@
 !***********************************************************************
       INTEGER FUNCTION xyzrun()
       USE PRMS_XYZ_DIST
-      USE PRMS_SET_TIME, ONLY: Nowmonth
+      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_OBS, ONLY: Rain_code
       IMPLICIT NONE
 ! Functions
@@ -728,7 +728,7 @@
      +    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf,
      +    Tavgc, Tmin_aspect_adjust, Tmax_aspect_adjust
       USE PRMS_OBS, ONLY: Tmax, Tmin
-      USE PRMS_SET_TIME, ONLY: Nowmonth
+      USE PRMS_MODULE, ONLY: Nowmonth
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, SNGL, DBLE
@@ -969,7 +969,7 @@
      +    Hru_ppt, Hru_rain, Hru_snow, Basin_rain,
      +    Basin_ppt, Prmx, Basin_snow, Psta_elev, Basin_obs_ppt,
      +    Precip_units, Tmax_allsnow_f, Adjmix_rain, Tmax_allrain_f
-      USE PRMS_SET_TIME, ONLY: Nowmonth
+      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_OBS, ONLY: Precip, Rain_day
       IMPLICIT NONE
 ! Functions
