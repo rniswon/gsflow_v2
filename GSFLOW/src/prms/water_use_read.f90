@@ -632,7 +632,7 @@
      &    STREAM, GROUNDWATER, DPRST, EXTRNAL, LAKE, CAPILLARY, CONSUMPTIVE, CANOPY
       USE PRMS_MODULE, ONLY: Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
      &    Dprst_transferON_OFF, External_transferON_OFF, Strmflow_flag, Nexternal, Dprst_flag
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Functions
       EXTERNAL :: error_stop
@@ -814,8 +814,7 @@
 
       SUBROUTINE nwateruse_error(ctype)
       USE PRMS_CONSTANTS, ONLY: ERROR_water_use
-      USE PRMS_MODULE, ONLY: Nwateruse
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nwateruse, Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
       ! Argument
       CHARACTER(LEN=*), INTENT(IN) :: ctype
