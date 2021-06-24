@@ -655,6 +655,10 @@
             ! check sum of imperv ag, and dprst if either are updated!!!!!!
             hruperv = harea - Hru_imperv(i)
             IF ( Ag_frac_flag==ACTIVE ) hruperv = hruperv - Ag_area(i)
+            IF ( hruperv<0.0 ) THEN
+              print *, 'hruperv problem, < 0, set to 0 ', hruperv
+              hruperv = 0.0
+            ENDIF
 
             IF ( Dprst_flag==ACTIVE ) THEN
               hruperv = hruperv - Dprst_area_max(i)
@@ -1081,7 +1085,7 @@
 !      SUBROUTINE write_dynparam_dble(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
 !      USE PRMS_MODULE, ONLY: Print_debug, Nhru
 !      USE PRMS_BASIN, ONLY: Hru_type
-!      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+!      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
 !      IMPLICIT NONE
 ! Arguments
 !      INTEGER, INTENT(IN) :: Output_unit, Dim

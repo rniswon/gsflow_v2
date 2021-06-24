@@ -470,16 +470,15 @@
 
         Hru_perv(i) = perv_area
         Hru_frac_perv(i) = perv_area/harea
-!        if ( ag_area(i)>0 ) print *, i, Hru_frac_perv(i), ag_frac(i), dprst_frac(i)
-!        IF ( perv_area/harea<0.001 ) THEN
-!          PRINT *, 'ERROR, pervious plus agriculture fraction must be >= 0.001 for HRU:', i
-!          PRINT *, '       pervious portion is HRU fraction - impervious fraction - depression fraction - agriculture fraction'
-!          PRINT *, '       pervious fraction:', Hru_frac_perv(i)
-!          PRINT *, '       impervious fraction:', Hru_percent_imperv(i)
-!          IF ( Dprst_flag==ACTIVE ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
-!          IF ( Ag_frac_flag==ACTIVE ) PRINT *, '       agriculture fraction:', Ag_frac(i)
+        IF ( Hru_frac_perv(i)<0.001 .AND. Print_debug>DEBUG_less ) THEN
+          PRINT *, 'WARNING, pervious fraction must be >= 0.001 for HRU:', i
+          PRINT *, '         pervious portion is HRU fraction - impervious fraction - depression fraction'
+          PRINT *, '         pervious fraction:', Hru_frac_perv(i)
+          PRINT *, '         impervious fraction:', Hru_percent_imperv(i)
+          IF ( Dprst_flag==ACTIVE ) PRINT *, '         depression storage fraction:', Dprst_frac(i)
+          IF ( Ag_frac_flag==ACTIVE ) PRINT *, '         agriculture fraction:', Ag_frac(i)
 !          basinit = 1
-!        ENDIF
+        ENDIF
         basin_perv = basin_perv + DBLE( Hru_perv(i) )
       ENDDO
       IF ( Dprst_flag==ACTIVE .AND. PRMS4_flag==ACTIVE ) DEALLOCATE ( Dprst_area )
