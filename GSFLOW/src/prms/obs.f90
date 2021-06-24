@@ -256,7 +256,7 @@
 ! **********************************************************************
       INTEGER FUNCTION obsrun()
       USE PRMS_OBS
-      USE PRMS_SET_TIME, ONLY: Nowmonth
+      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_CLIMATEVARS, ONLY: Ppt_zero_thresh
       IMPLICIT NONE
 ! Functions

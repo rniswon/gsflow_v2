@@ -121,7 +121,7 @@
       USE PRMS_SNOW
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar, control_integer
+      INTEGER, EXTERNAL :: declparam, declvar
       EXTERNAL :: read_error, print_module
 !***********************************************************************
       snodecl = 0
