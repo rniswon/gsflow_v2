@@ -35,6 +35,7 @@
 
       INTEGER FUNCTION climate_hru()
       USE PRMS_CLIMATE_HRU
+      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
      &    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, &
@@ -43,7 +44,7 @@
      &    Basin_ppt, Basin_potet, Potet, Basin_snow, Basin_rain, &
      &    Basin_horad, Orad, Swrad, Basin_potsw, Basin_swrad, Basin_obs_ppt, &
      &    Transp_on, Basin_transp_on, Tmax_allsnow_f, Basin_humidity, Ppt_zero_thresh
-      USE PRMS_SET_TIME, ONLY: Nowmonth, Jday
+      USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_SOLTAB, ONLY: Soltab_basinpotsw, Hru_cossl, Soltab_potsw
       IMPLICIT NONE
 ! Functions
