@@ -102,13 +102,14 @@
       INTEGER, EXTERNAL :: precip_dist2, xyz_dist, ide_dist
       INTEGER, EXTERNAL :: ddsolrad, ccsolrad
       INTEGER, EXTERNAL :: potet_pan, potet_jh, potet_hamon, potet_hs, potet_pt, potet_pm
-      INTEGER, EXTERNAL :: gwflow, soilzone
+      INTEGER, EXTERNAL :: intcp, snowcomp, gwflow
+      INTEGER, EXTERNAL :: srunoff, soilzone
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, write_climate_hru
       INTEGER, EXTERNAL :: strmflow_in_out, muskingum, muskingum_lake, numchars
       INTEGER, EXTERNAL :: water_use_read, dynamic_param_read, potet_pm_sta
       INTEGER, EXTERNAL :: stream_temp, glacr
       EXTERNAL :: module_error, print_module, PRMS_open_output_file, precip_map, temp_map
-      EXTERNAL :: call_modules_restart, water_balance, summary_output, PRMS_land_modules
+      EXTERNAL :: call_modules_restart, water_balance, summary_output
       EXTERNAL :: prms_summary, module_doc, convert_params, read_error, error_stop
       INTEGER, EXTERNAL :: gsflow_modflow, gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
       INTEGER, EXTERNAL :: declparam, getparam, declvar
@@ -472,7 +473,22 @@
         ENDIF
       ENDIF
 
-      IF ( PRMS_land_iteration_flag==OFF ) CALL PRMS_land_modules(Arg, ierr)
+      IF ( PRMS_land_iteration_flag==OFF ) THEN
+        ierr = intcp()
+        IF ( ierr/=0 ) CALL module_error('intcp', Arg, ierr)
+
+        ! rsr, need to do something if snow_cbh_flag=1
+        ierr = snowcomp()
+        IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
+
+        IF ( Glacier_flag==ACTIVE ) THEN
+          ierr = glacr()
+          IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
+        ENDIF
+
+        ierr = srunoff()
+        IF ( ierr/=0 ) CALL module_error(Srunoff_module, Arg, ierr)
+      ENDIF
 
 ! for PRMS-only simulations
       IF ( PRMS_only==ACTIVE ) THEN
@@ -524,7 +540,22 @@
 ! runoff and soilzone for GSFLOW are in the MODFLOW iteration loop
 ! when PRMS_land_iteration_flag = 1
 ! only call for declare, initialize, and cleanup.
-          IF ( PRMS_land_iteration_flag>OFF ) CALL PRMS_land_modules(Arg, ierr)
+          IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+            ierr = intcp()
+            IF ( ierr/=0 ) CALL module_error('intcp', Arg, ierr)
+
+            ! rsr, need to do something if snow_cbh_flag=1
+            ierr = snowcomp()
+            IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
+
+            IF ( Glacier_flag==ACTIVE ) THEN
+              ierr = glacr()
+              IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
+            ENDIF
+
+            ierr = srunoff()
+            IF ( ierr/=0 ) CALL module_error(Srunoff_module, Arg, ierr)
+          ENDIF
 
           ierr = soilzone()
           IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
@@ -1566,37 +1597,6 @@
       IF ( ierr==1 ) ERROR STOP ERROR_control
 
       END SUBROUTINE check_module_names
-
-!***********************************************************************
-!     Call PRMS land modules intcp, snowcomp, glacr, srunoff
-!***********************************************************************
-      SUBROUTINE PRMS_land_modules(Arg, Iret)
-      USE PRMS_CONSTANTS, ONLY: ACTIVE
-      USE PRMS_MODULE, ONLY: Glacier_flag, Srunoff_module
-      IMPLICIT NONE
-! Arguments
-      CHARACTER(LEN=*), INTENT(IN) :: Arg
-      INTEGER, INTENT(INOUT) :: Iret
-      ! Functions
-      INTEGER, EXTERNAL :: intcp, snowcomp, glacr, srunoff
-      EXTERNAL :: module_error
-!***********************************************************************
-      Iret = intcp()
-      IF ( Iret/=0 ) CALL module_error('intcp', Arg, Iret)
-
-      ! rsr, need to do something if snow_cbh_flag=1
-      Iret = snowcomp()
-      IF ( Iret/=0 ) CALL module_error('snowcomp', Arg, Iret)
-
-      IF ( Glacier_flag==ACTIVE ) THEN
-        Iret = glacr()
-        IF ( Iret/=0 ) CALL module_error('glacr', Arg, Iret)
-      ENDIF
-
-      Iret = srunoff()
-      IF ( Iret/=0 ) CALL module_error(Srunoff_module, Arg, Iret)
-
-      END SUBROUTINE PRMS_land_modules
 
 !***********************************************************************
 !     call_modules_restart - write or read restart file

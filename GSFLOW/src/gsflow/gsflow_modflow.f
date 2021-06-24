@@ -481,8 +481,8 @@ C
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
      &    ERROR_time
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
-     &    Init_vars_from_file, Mxsziter, Nowyear, Nowmonth, Nowday,
-     &    PRMS_land_iteration_flag, Process
+     &    Init_vars_from_file, Mxsziter, Glacier_flag,
+     &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -501,6 +501,7 @@ c     USE LMGMODULE
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: soilzone, GET_KPER
+      INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsfclean
       EXTERNAL :: READ_STRESS, PRMS_land_modules
       INTRINSIC MIN
@@ -674,8 +675,30 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ACTIVE ) THEN
-              IF ( PRMS_land_iteration_flag==OFF )
-     1             CALL PRMS_land_modules(Process, ierr)
+              IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+                retval = intcp()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'intcp', retval
+                  RETURN
+                ENDIF
+                retval = snowcomp()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'snowcomp', retval
+                  RETURN
+                ENDIF
+                IF ( Glacier_flag==ACTIVE ) THEN
+                  retval = glacr()
+                  IF ( retval/=0 ) THEN
+                    PRINT 9001, 'glacr_melt', retval
+                    RETURN
+                  ENDIF
+                ENDIF
+                retval = srunoff()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'srunoff', retval
+                  RETURN
+                ENDIF
+              ENDIF
               retval = soilzone()
               IF ( retval/=0 ) THEN
                 PRINT 9001, 'soilzone', retval
