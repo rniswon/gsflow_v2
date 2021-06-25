@@ -503,7 +503,7 @@ c     USE LMGMODULE
       INTEGER, EXTERNAL :: soilzone, GET_KPER
       INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsfclean
-      EXTERNAL :: READ_STRESS, PRMS_land_modules
+      EXTERNAL :: READ_STRESS
       INTRINSIC MIN
 ! Local Variables
       INTEGER :: retval, II, KITER, IBDRET, iss
