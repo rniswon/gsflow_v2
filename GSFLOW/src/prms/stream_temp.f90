@@ -720,7 +720,7 @@
       USE PRMS_MODULE, ONLY: Nowmonth !, Nowyear, Nowday
       USE PRMS_STRMTEMP
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area
-      USE PRMS_SET_TIME, ONLY: Summer_flag, Nowmonth
+      USE PRMS_SET_TIME, ONLY: Summer_flag
       USE PRMS_CLIMATEVARS, ONLY: Tavgc, Potet, Hru_rain, Swrad
       USE PRMS_CLIMATE_HRU, ONLY: Humidity_hru
       USE PRMS_FLOWVARS, ONLY: Seg_outflow
@@ -1327,7 +1327,7 @@
 !           EQUATION BY ITERATING NEWTON'S METHOD
 !        2. TO DETERMINE THE 1ST THERMAL EXCHANGE COEFFICIENT.
       USE PRMS_STRMTEMP, ONLY: ZERO_C, Maxiter_sntemp
-!      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+!      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
       INTRINSIC :: ABS
 ! Arguments

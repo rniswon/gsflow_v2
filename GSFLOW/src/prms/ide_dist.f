@@ -399,7 +399,7 @@
 !***********************************************************************
       INTEGER FUNCTION iderun()
       USE PRMS_IDE
-      USE PRMS_SET_TIME, ONLY: Nowmonth
+      USE PRMS_MODULE, ONLY: Nowmonth
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: ide_temp_run, ide_rain_run
@@ -437,7 +437,7 @@
      +    Tavgc, Tmin_aspect_adjust, Tmax_aspect_adjust,
      +    Tsta_elev_meters, Temp_units, Psta_elev_meters
       USE PRMS_OBS, ONLY: Tmax, Tmin
-      USE PRMS_SET_TIME, ONLY: Nowmonth
+      USE PRMS_MODULE, ONLY: Nowmonth
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL
@@ -615,7 +615,7 @@
      +    Hru_ppt, Hru_rain, Hru_snow, Basin_rain,
      +    Basin_ppt, Prmx, Basin_snow, Psta_elev_meters, Basin_obs_ppt,
      +    Precip_units, Tmax_allsnow_f, Tmax_allrain_f, Adjmix_rain
-      USE PRMS_SET_TIME, ONLY: Nowmonth
+      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_OBS, ONLY: Precip
       IMPLICIT NONE
 ! Functions
