@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 01/28/2021
+                       Version 5.3.0 06/22/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,28 +36,28 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-01-28
-Basin Definition                basin               2020-12-22
-Common States and Fluxes        climateflow         2021-02-05
+PRMS Computation Order          gsflow_prms         2021-06-22
+Basin Definition                basin               2021-06-21
+Common States and Fluxes        climateflow         2021-05-24
 Potential Solar Radiation       soltab              2020-12-02
-Timestep Control                prms_time           2020-12-02
+Timestep Control                prms_time           2021-05-25
 Time Series Data                obs                 2020-12-02
-Temperature Distribution        climate_hru         2021-01-08
-Precipitation Distribution      climate_hru         2021-01-08
-Solar Radiation Distribution    climate_hru         2021-01-08
-Potential Evapotranspiration    climate_hru         2021-01-08
+Temperature Distribution        climate_hru         2021-05-27
+Precipitation Distribution      climate_hru         2021-05-27
+Solar Radiation Distribution    climate_hru         2021-05-27
+Potential Evapotranspiration    climate_hru         2021-05-27
 Transpiration Distribution      transp_tindex       2020-12-02
-Canopy Interception             intcp               2020-12-03
+Canopy Interception             intcp               2021-05-06
 Snow Dynamics                   snowcomp            2021-01-11
-Surface Runoff                  srunoff_smidx       2021-02-03
-Soilzone Computations           soilzone            2021-02-05
-Groundwater                     gwflow              2020-12-02
-Streamflow Routing Init         routing             2020-12-02
+Surface Runoff                  srunoff_smidx       2021-05-27
+Soilzone Computations           soilzone            2021-06-07
+Groundwater                     gwflow              2021-05-06
+Streamflow Routing Init         routing             2021-05-06
 Streamflow Routing              muskingum           2020-12-02
-Output Summary                  basin_sum           2020-12-02
-Output Summary                  nhru_summary        2020-12-02
-Output Summary                  basin_summary       2020-12-02
-Output Summary                  prms_summary        2020-12-02
+Output Summary                  basin_sum           2021-05-06
+Output Summary                  nhru_summary        2021-05-06
+Output Summary                  basin_summary       2021-05-10
+Output Summary                  prms_summary        2021-05-06
 ==============================================================
 
 Using Control File: .\control\acf.control
@@ -71,7 +71,7 @@ End time:   1990/09/30 00:00:00
 
 Model domain area:     12284006.30    Active basin area:  12284006.30
 Fraction impervious:        0.0207    Fraction pervious:       0.9637
-DPRST area:              192395.73    Fraction DPRST:          0.0157
+DPRST area:                   0.02    Fraction DPRST:          0.0000
 
 
 
@@ -258,7 +258,7 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1989    3   11     177.00    22365.31
    1989    3   12     170.00    22438.24
    1989    3   13     160.00    22034.97
-   1989    3   14     153.00    21298.30
+   1989    3   14     153.00    21298.29
    1989    3   15     150.00    20397.76
    1989    3   16     157.00    19390.26
    1989    3   17     141.00    18184.32
@@ -288,7 +288,7 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1989    4    7     199.00    14798.87
    1989    4    8     235.00    14680.39
    1989    4    9     247.00    16752.68
-   1989    4   10     204.00    21797.74
+   1989    4   10     204.00    21797.73
    1989    4   11     180.00    27906.05
    1989    4   12     168.00    32277.47
    1989    4   13     159.00    34651.46
@@ -297,12 +297,12 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1989    4   16     149.00    42128.49
    1989    4   17     141.00    41979.79
    1989    4   18     138.00    39351.72
-   1989    4   19     136.00    35697.50
+   1989    4   19     136.00    35697.51
    1989    4   20     132.00    32423.05
    1989    4   21     129.00    29896.84
    1989    4   22     126.00    27758.32
-   1989    4   23     124.00    25684.60
-   1989    4   24     122.00    23710.80
+   1989    4   23     124.00    25684.61
+   1989    4   24     122.00    23710.81
    1989    4   25     120.00    22021.80
    1989    4   26     118.00    20693.61
    1989    4   27     115.00    19715.76
@@ -312,7 +312,7 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
  ---------------------------------------
    1989    4          152.13    25429.67
  ---------------------------------------
-   1989    5    1     166.00    18776.85
+   1989    5    1     166.00    18776.86
    1989    5    2     135.00    18980.01
    1989    5    3     119.00    19164.01
    1989    5    4     119.00    19450.30
@@ -338,7 +338,7 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1989    5   24     127.00    13855.08
    1989    5   25     119.00    13449.24
    1989    5   26     114.00    13335.13
-   1989    5   27     111.00    13759.14
+   1989    5   27     111.00    13759.13
    1989    5   28     104.00    14626.55
    1989    5   29     102.00    15402.25
    1989    5   30     100.00    15633.99
@@ -382,7 +382,7 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1989    7    1     226.00    50381.99
    1989    7    2     213.00    45604.19
    1989    7    3     335.00    40945.80
-   1989    7    4     382.00    36804.40
+   1989    7    4     382.00    36804.39
    1989    7    5     309.00    33515.91
    1989    7    6     405.00    31368.70
    1989    7    7     507.00    31149.41
@@ -490,8 +490,8 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1989   10    5     227.00    32061.86
    1989   10    6     203.00    43816.97
    1989   10    7     184.00    57627.13
-   1989   10    8     170.00    68594.85
-   1989   10    9     159.00    73773.66
+   1989   10    8     170.00    68594.86
+   1989   10    9     159.00    73773.67
    1989   10   10     152.00    73464.12
    1989   10   11     147.00    69200.64
    1989   10   12     140.00    62297.64
@@ -501,7 +501,7 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1989   10   16     130.00    29771.35
    1989   10   17     155.00    24867.73
    1989   10   18     141.00    21773.80
-   1989   10   19     131.00    20177.54
+   1989   10   19     131.00    20177.53
    1989   10   20     125.00    19779.76
    1989   10   21     121.00    20459.75
    1989   10   22     117.00    22017.63
@@ -608,11 +608,11 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1990    1   22     211.00    34799.55
    1990    1   23     182.00    33349.75
    1990    1   24     196.00    32363.14
-   1990    1   25     364.00    32425.10
+   1990    1   25     364.00    32425.09
    1990    1   26     291.00    34101.83
    1990    1   27     235.00    37094.30
    1990    1   28     211.00    40439.01
-   1990    1   29     298.00    44348.43
+   1990    1   29     298.00    44348.42
    1990    1   30     292.00    49934.62
    1990    1   31     243.00    56318.36
  ---------------------------------------
@@ -640,7 +640,7 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1990    2   20     428.00    37468.59
    1990    2   21     383.00    39314.28
    1990    2   22     500.00    43821.34
-   1990    2   23     471.00    50931.57
+   1990    2   23     471.00    50931.58
    1990    2   24     397.00    58389.22
    1990    2   25     351.00    63322.77
    1990    2   26     325.00    64237.68
@@ -658,9 +658,9 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1990    3    7     283.00    30276.92
    1990    3    8     305.00    29991.89
    1990    3    9       0.10    30247.11
-   1990    3   10     303.00    30779.19
+   1990    3   10     303.00    30779.20
    1990    3   11     285.00    31309.73
-   1990    3   12     271.00    31640.37
+   1990    3   12     271.00    31640.38
    1990    3   13     260.00    31691.39
    1990    3   14     252.00    31409.63
    1990    3   15     245.00    30762.28
@@ -672,10 +672,10 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1990    3   21     450.00    71496.96
    1990    3   22     406.00   114720.11
    1990    3   23     375.00   148904.38
-   1990    3   24     356.00   159176.48
+   1990    3   24     356.00   159176.47
    1990    3   25     336.00   146484.36
    1990    3   26     327.00   122078.57
-   1990    3   27     305.00    96874.40
+   1990    3   27     305.00    96874.39
    1990    3   28     287.00    76158.84
    1990    3   29     286.00    60651.20
    1990    3   30     289.00    49398.93
@@ -890,5 +890,5 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
  ***************************************
  Total for run        159.12    22642.64
  ***************************************
-Execution elapsed time    0 minutes  1.48 seconds
+Execution elapsed time    0 minutes  0.86 seconds
 

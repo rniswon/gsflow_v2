@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 01/28/2021
+                       Version 5.3.0 06/22/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,24 +36,24 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-01-28
-Basin Definition                basin               2020-12-22
-Common States and Fluxes        climateflow         2021-02-05
+PRMS Computation Order          gsflow_prms         2021-06-22
+Basin Definition                basin               2021-06-21
+Common States and Fluxes        climateflow         2021-05-24
 Potential Solar Radiation       soltab              2020-12-02
-Timestep Control                prms_time           2020-12-02
+Timestep Control                prms_time           2021-05-25
 Time Series Data                obs                 2020-12-02
 Temp & Precip Distribution      ide_dist            2020-12-02
 Solar Radiation Distribution    ddsolrad            2020-12-02
 Transpiration Distribution      transp_tindex       2020-12-02
 Potential Evapotranspiration    potet_jh            2020-08-03
-Canopy Interception             intcp               2020-12-03
+Canopy Interception             intcp               2021-05-06
 Snow Dynamics                   snowcomp            2021-01-11
-Surface Runoff                  srunoff_smidx       2021-02-03
-Soilzone Computations           soilzone            2021-02-05
-Groundwater                     gwflow              2020-12-02
+Surface Runoff                  srunoff_smidx       2021-05-27
+Soilzone Computations           soilzone            2021-06-07
+Groundwater                     gwflow              2021-05-06
 Streamflow Routing              strmflow            2020-08-03
-Output Summary                  basin_sum           2020-12-02
-Output Summary                  prms_summary        2020-12-02
+Output Summary                  basin_sum           2021-05-06
+Output Summary                  prms_summary        2021-05-06
 ==============================================================
 
 Using Control File: .\control\mercdIDE.control
@@ -78,5 +78,5 @@ Fraction impervious:        0.0001    Fraction pervious:       0.9999
  *************************************************************
  Total for run     100.986   43.325    7.864   57.085   67.341
  *************************************************************
-Execution elapsed time    0 minutes  0.25 seconds
+Execution elapsed time    0 minutes  0.20 seconds
 

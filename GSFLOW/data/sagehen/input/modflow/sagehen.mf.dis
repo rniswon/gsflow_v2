@@ -227,4 +227,4 @@ INTERNAL 1.0 (FREE)  0                          BOTTOM ELEVATION OF LAYER 2
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2205 2175 2145 2125 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2215 2185 2155 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
     1    1  1.0 ss                           PERLEN   NSTP  TSMULT   Stress period 1 Steady state (1 day)
-    1    1  1.0 tr                           PERLEN   NSTP  TSMULT   Stress period 2 Transient    (1 day)
+   10  10  1.0 tr                           PERLEN   NSTP  TSMULT   Stress period 2 Transient    (10 days)

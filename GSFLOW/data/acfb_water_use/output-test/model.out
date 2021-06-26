@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 01/28/2021
+                       Version 5.3.0 06/22/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,28 +36,28 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-01-28
-Basin Definition                basin               2020-12-22
-Common States and Fluxes        climateflow         2021-02-05
+PRMS Computation Order          gsflow_prms         2021-06-22
+Basin Definition                basin               2021-06-21
+Common States and Fluxes        climateflow         2021-05-24
 Potential Solar Radiation       soltab              2020-12-02
-Timestep Control                prms_time           2020-12-02
+Timestep Control                prms_time           2021-05-25
 Time Series Data                obs                 2020-12-02
-Time Series Data                water_use_read      2020-12-02
-Temperature Distribution        climate_hru         2021-01-08
-Precipitation Distribution      climate_hru         2021-01-08
-Solar Radiation Distribution    climate_hru         2021-01-08
-Potential Evapotranspiration    climate_hru         2021-01-08
+Time Series Data                water_use_read      2021-05-10
+Temperature Distribution        climate_hru         2021-05-27
+Precipitation Distribution      climate_hru         2021-05-27
+Solar Radiation Distribution    climate_hru         2021-05-27
+Potential Evapotranspiration    climate_hru         2021-05-27
 Transpiration Distribution      transp_tindex       2020-12-02
-Canopy Interception             intcp               2020-12-03
+Canopy Interception             intcp               2021-05-06
 Snow Dynamics                   snowcomp            2021-01-11
-Surface Runoff                  srunoff_smidx       2021-02-03
-Soilzone Computations           soilzone            2021-02-05
-Groundwater                     gwflow              2020-12-02
-Streamflow Routing Init         routing             2020-12-02
+Surface Runoff                  srunoff_smidx       2021-05-27
+Soilzone Computations           soilzone            2021-06-07
+Groundwater                     gwflow              2021-05-06
+Streamflow Routing Init         routing             2021-05-06
 Streamflow Routing              muskingum           2020-12-02
-Output Summary                  basin_sum           2020-12-02
-Output Summary                  nhru_summary        2020-12-02
-Output Summary                  prms_summary        2020-12-02
+Output Summary                  basin_sum           2021-05-06
+Output Summary                  nhru_summary        2021-05-06
+Output Summary                  prms_summary        2021-05-06
 ==============================================================
 
 Using Control File: .\Control\control
@@ -71,7 +71,7 @@ End time:   1999/12/31 00:00:00
 
 Model domain area:       749508.57    Active basin area:    749508.57
 Fraction impervious:        0.0310    Fraction pervious:       0.8664
-DPRST area:               76833.59    Fraction DPRST:          0.1025
+DPRST area:                   0.10    Fraction DPRST:          0.0000
 
 
 
@@ -103,5 +103,5 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
  *************************************************************
  Total for run    1110.775  507.968   10.154  622.340   13.445
  *************************************************************
-Execution elapsed time    0 minutes  3.04 seconds
+Execution elapsed time    0 minutes  1.61 seconds
 
