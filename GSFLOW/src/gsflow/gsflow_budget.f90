@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2021-01-12'
+      character(len=*), parameter :: Version_gsflow_budget = '2021-05-07'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -172,20 +172,20 @@
      &     'HRU average recharge rejected by UZF', 'inches', &
      &     Gw_rejected)/=0 ) CALL read_error(3, 'gw_rejected')
 
-!      ALLOCATE ( Uzf_infil_map(Nhru) )
-!      IF ( declvar(MODNAME, 'uzf_infil_map', 'nhru', Nhru, 'real', &
-!     &     'HRU total gravity drainage to UZF cells', 'L3', &
-!     &     Uzf_infil_map)/=0 ) CALL read_error(3, 'uzf_infil_map')
+!       ALLOCATE ( Uzf_infil_map(Nhru) )
+!       IF ( declvar(MODNAME, 'uzf_infil_map', 'nhru', Nhru, 'real', &
+!     &      'HRU total gravity drainage to UZF cells', 'L3', &
+!     &      Uzf_infil_map)/=0 ) CALL read_error(3, 'uzf_infil_map')
 
-!      ALLOCATE ( Sat_recharge(Nhru) )
-!      IF ( declvar(MODNAME, 'sat_recharge', 'nhru', Nhru, 'real', &
-!     &     'HRU total recharge to the saturated zone', 'L3', &
-!     &     Sat_recharge)/=0 ) CALL read_error(3, 'sat_recharge')
+!       ALLOCATE ( Sat_recharge(Nhru) )
+!       IF ( declvar(MODNAME, 'sat_recharge', 'nhru', Nhru, 'real', &
+!      &     'HRU total recharge to the saturated zone', 'L3', &
+!      &     Sat_recharge)/=0 ) CALL read_error(3, 'sat_recharge')
 
-!      ALLOCATE ( Mfoutflow_to_gvr(Nhru) )
-!      IF ( declvar(MODNAME, 'mfoutflow_to_gvr', 'nhru', Nhru, 'real', &
-!     &     'MODFLOW total discharge and ET to each HRU', 'L3', &
-!     &     Mfoutflow_to_gvr)/=0 ) CALL read_error(3, 'mfoutflow_to_gvr')
+!       ALLOCATE ( Mfoutflow_to_gvr(Nhru) )
+!       IF ( declvar(MODNAME, 'mfoutflow_to_gvr', 'nhru', Nhru, 'real', &
+!      &     'MODFLOW total discharge and ET to each HRU', 'L3', &
+!      &     Mfoutflow_to_gvr)/=0 ) CALL read_error(3, 'mfoutflow_to_gvr')
 
       END FUNCTION gsfbuddecl
 

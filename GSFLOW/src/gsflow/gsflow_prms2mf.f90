@@ -7,7 +7,7 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-03-12'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-05-07'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -71,8 +71,7 @@
 
 ! Declared Variables
       IF ( declvar(MODNAME, 'net_sz2gw', 'one', 1, 'double', &
-     &     'Net volumetric flow rate of gravity drainage from the'// &
-     &     ' soil zone to the unsaturated and saturated zones', &
+     &     'Net volumetric flow rate of gravity drainage from the soil zone to the unsaturated and saturated zones', &
      &     'L3/T', Net_sz2gw)/=0 ) CALL read_error(3, 'net_sz2gw')
 
 !     ALLOCATE (Reach_latflow(Nreach))
@@ -81,8 +80,7 @@
 !    &     'cfs', Reach_latflow)/=0 ) CALL read_error(3, 'reach_latflow')
 
 !     ALLOCATE (Reach_id(Nreach, Nsegment))
-!     IF ( decl var(MODNAME, 'reach_id', 'nsegment,nreach', &
-!    &     Nsegment*Nreach, 'integer', &
+!     IF ( decl var(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, 'integer', &
 !    &     'Mapping of reach id by segment id', &
 !    &     'none', Reach_id)/=0 ) CALL read_error(3, 'reach_id')
 
@@ -485,7 +483,7 @@
           IF ( IUZFOPT==0 ) THEN !ERIC 20210107: NWAVST is dimensioned (1, 1) if IUZFOPT == 0.
             Cell_drain_rate(icell) = Cell_drain_rate(icell) + Sm2gw_grav(j)*Gvr2cell_conv(j)
             Gw_rejected_grav(j) = 0.0
-            is_draining = 1            
+            is_draining = 1
 
           ELSEIF ( NWAVST(icol, irow)<NTRAIL_CHK ) THEN
 !-----------------------------------------------------------------------
@@ -590,6 +588,7 @@
           !PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
           Dprst_ag_transfer(hru_id) = Dprst_ag_transfer(hru_id) + demand_inch_acres
           Dprst_vol_open(hru_id) = Dprst_vol_open(hru_id) - demand_inch_acres
+if (Dprst_vol_open(hru_id)<0.0D0) print *, 'dprst empty', Dprst_vol_open(hru_id)
         END IF
       end do
 

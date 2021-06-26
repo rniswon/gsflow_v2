@@ -53,7 +53,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2020-12-02'
+      character(len=*), parameter :: Version_glacr = '2021-05-06'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -156,17 +156,17 @@
 
       CALL print_module(MODDESC, MODNAME, Version_glacr)
 
-      IF ( declvar(MODNAME, 'nhrugl', 'one', 1, 'integer',                &
+      IF ( declvar(MODNAME, 'nhrugl', 'one', 1, 'integer', &
            'Number of at least partially glacierized HRUs at initiation', &
            'none', Nhrugl)/=0 ) CALL read_error(3, 'nhrugl')
 
 ! declare variables
       ALLOCATE ( Hru_slope_ts(Nhru) )
-      IF ( declvar(MODNAME, 'hru_slope_ts', 'nhru', Nhru, 'real',   &
+      IF ( declvar(MODNAME, 'hru_slope_ts', 'nhru', Nhru, 'real', &
      &     'HRU slope for timestep, which can change for glaciers', &
      &     'decimal fraction', Hru_slope_ts)/=0 ) CALL read_error(3, 'hru_slope_ts')
 
-      IF ( declvar(MODNAME, 'basin_gl_top_melt', 'one', 1, 'double',     &
+      IF ( declvar(MODNAME, 'basin_gl_top_melt', 'one', 1, 'double', &
      &     'Basin area-weighted glacier surface melt (snow, ice and rain) coming out of termini of all glaciers and glacierettes', &
      &     'inches', Basin_gl_top_melt)/=0 ) CALL read_error(3, 'basin_gl_top_melt')
 
@@ -174,12 +174,12 @@
      &     'Basin area-weighted glacier surface gain (snow and rain minus evaporation) for all glaciers and glacierettes', &
      &     'inches', Basin_gl_top_gain)/=0 ) CALL read_error(3, 'basin_gl_top_gain')
 
-      IF ( declvar(MODNAME, 'basin_gl_ice_melt', 'one', 1, 'double',    &
+      IF ( declvar(MODNAME, 'basin_gl_ice_melt', 'one', 1, 'double', &
      &     'Basin area-weighted glacier ice (firn) melt coming out of termini of all glaciers and glacierettes', &
      &     'inches', Basin_gl_ice_melt)/=0 ) CALL read_error(3, 'basin_gl_ice_melt')
 
       ALLOCATE ( Gl_mb_yrcumul(Nhru) )
-      IF ( declvar(MODNAME, 'gl_mb_yrcumul', 'nhru', Nhru, 'double',     &
+      IF ( declvar(MODNAME, 'gl_mb_yrcumul', 'nhru', Nhru, 'double', &
      &     'Yearly mass balance for each glacier, indexed by Glacr_tag', &
      &     'inches', Gl_mb_yrcumul)/=0 ) CALL read_error(3, 'gl_mb_yrcumul')
 
@@ -189,122 +189,122 @@
      &     'inches', Gl_mb_cumul)/=0 ) CALL read_error(3, 'gl_mb_cumul')
 
       IF ( declvar(MODNAME, 'basin_gl_area', 'one', 1, 'double', &
-     &     'Basin area-weighted average glacier-covered area',   &
+     &     'Basin area-weighted average glacier-covered area', &
      &     'decimal fraction', Basin_gl_area)/=0 ) CALL read_error(3, 'basin_gl_area')
 
       ALLOCATE ( Gl_area(Nhru) )
       IF ( declvar(MODNAME, 'gl_area', 'nhru', Nhru, 'double', &
-     &     'Area of each glacier, indexed by Glacr_tag',       &
+     &     'Area of each glacier, indexed by Glacr_tag', &
      &     'acres', Gl_area)/=0 ) CALL read_error(3, 'gl_area')
 
       ALLOCATE ( Glnet_ar_delta(Nhru) )
-      IF ( declvar(MODNAME, 'glnet_ar_delta', 'nhru', Nhru, 'double',           &
+      IF ( declvar(MODNAME, 'glnet_ar_delta', 'nhru', Nhru, 'double', &
      &     'Sum of area change of each glacier since start year, indexed by Glacr_tag', &
      &     'acres', Glnet_ar_delta)/=0 ) CALL read_error(3, 'glnet_ar_delta')
 
       ALLOCATE ( Glacr_flow(Nhru) )
-      IF ( declvar(MODNAME, 'glacr_flow', 'nhru', Nhru, 'real',         &
+      IF ( declvar(MODNAME, 'glacr_flow', 'nhru', Nhru, 'real', &
      &     'Glacier melt and rain from HRU to stream network, only nonzero at termini HRUs and snowfield HRUs',  &
      &     'inches cubed', Glacr_flow)/=0 ) CALL read_error(3, 'glacr_flow')
 
       ALLOCATE ( Delta_volyr(Nhru) )
-      IF ( declvar(MODNAME, 'delta_volyr', 'nhru', Nhru, 'double',      &
-     &     'Year total volume change for each glacier, indexed by Glacr_tag',          &
+      IF ( declvar(MODNAME, 'delta_volyr', 'nhru', Nhru, 'double', &
+     &     'Year total volume change for each glacier, indexed by Glacr_tag', &
      &     'inches cubed', Delta_volyr)/=0 ) CALL read_error(3, 'delta_volyr')
 
       ALLOCATE ( Hru_mb_yrcumul(Nhru) )
-      IF ( declvar(MODNAME, 'hru_mb_yrcumul', 'nhru', Nhru, 'double',        &
-     &     'Mass balance for a glacier HRU, cumulative for year',       &
+      IF ( declvar(MODNAME, 'hru_mb_yrcumul', 'nhru', Nhru, 'double', &
+     &     'Mass balance for a glacier HRU, cumulative for year', &
      &     'inches', Hru_mb_yrcumul)/=0 ) CALL read_error(3, 'hru_mb_yrcumul')
 
       ALLOCATE ( Top_tag(Nhru) )
-      IF ( declvar(MODNAME, 'top_tag', 'nhru', Nhru, 'integer',         &
+      IF ( declvar(MODNAME, 'top_tag', 'nhru', Nhru, 'integer', &
      &     'Identifies which glacier top each HRU is fed by. If =-1, then has multiple feeders', &
      &     'none', Top_tag)/=0 ) CALL read_error(3, 'top_tag')
 
       ALLOCATE ( Glacr_tag(Nhru) )
-      IF ( declvar(MODNAME, 'glacr_tag', 'nhru', Nhru, 'integer',       &
-     &     'Identifies which glacier each HRU belongs to',              &
+      IF ( declvar(MODNAME, 'glacr_tag', 'nhru', Nhru, 'integer', &
+     &     'Identifies which glacier each HRU belongs to', &
      &     'none', Glacr_tag)/=0 ) CALL read_error(3, 'glacr_tag')
 
       ALLOCATE ( Prev_area(Nhru) )
-      IF ( declvar(MODNAME, 'prev_area', 'nhru', Nhru, 'double',        &
+      IF ( declvar(MODNAME, 'prev_area', 'nhru', Nhru, 'double', &
      &     'Previous year glacier-covered area above each HRU where all branches of the glacier are included', &
      &     'inches squared', Prev_area)/=0 ) CALL read_error(3, 'prev_area')
 
       ALLOCATE ( Prev_vol(Nhru) )
-      IF ( declvar(MODNAME, 'prev_vol', 'nhru', Nhru, 'double',         &
+      IF ( declvar(MODNAME, 'prev_vol', 'nhru', Nhru, 'double', &
      &     'Previous volume of each glacier, indexed by Glacr_tag', &
      &     'inches cubed', Prev_vol)/=0 ) CALL read_error(3, 'prev_vol')
 
       ALLOCATE ( Prev_out(Nhru,Nglres) )
-      IF ( declvar(MODNAME, 'prev_out', 'nhru,nglres', Nhru*Nglres, 'real',  &
+      IF ( declvar(MODNAME, 'prev_out', 'nhru,nglres', Nhru*Nglres, 'real', &
      &     'Antecedent outflow of the 3 reservoirs in each glacier, indexed by Glacr_tag',&
      &     'inches cubed', Prev_out)/=0 ) CALL read_error(3, 'prev_out')
 
       ALLOCATE ( Prev_outi(Nhru,Nglres) )
-      IF ( declvar(MODNAME, 'prev_outi', 'nhru,nglres', Nhru*Nglres, 'real',  &
+      IF ( declvar(MODNAME, 'prev_outi', 'nhru,nglres', Nhru*Nglres, 'real', &
      &     'Antecedent outflow of the 3 reservoirs in each glacier for only ice (firn) melt, indexed by Glacr_tag',&
      &     'inches cubed', Prev_outi)/=0 ) CALL read_error(3, 'prev_outi')
 
       ALLOCATE ( Order_flowline(Nhru) )
-      IF ( declvar(MODNAME, 'order_flowline', 'nhru', Nhru, 'integer',  &
+      IF ( declvar(MODNAME, 'order_flowline', 'nhru', Nhru, 'integer', &
      &     'Order of flowlines that belong together as glaciers, Ntp of these', &
      &     'none', Order_flowline)/=0 ) CALL read_error(3, 'order_flowline')
 
       ALLOCATE ( Ode_glacrva_coef(Nhru) )
-      IF ( declvar(MODNAME, 'ode_glacrva_coef', 'nhru', Nhru, 'real',  &
+      IF ( declvar(MODNAME, 'ode_glacrva_coef', 'nhru', Nhru, 'real', &
      &     'Estimate of glacrva_coef from ODE basal topography of each glacier, indexed by Glacr_tag', &
      &     'm**(3-2*glacrva_exp)', Ode_glacrva_coef)/=0 ) CALL read_error(3, 'ode_glacrva_coef')
 
       ALLOCATE ( Ela(Nhru) )
-      IF ( declvar(MODNAME, 'ela', 'nhru', Nhru, 'integer',             &
+      IF ( declvar(MODNAME, 'ela', 'nhru', Nhru, 'integer', &
      &     'HRU number at ELA corresponding to each top in each glacier, Ntp of these', &
      &     'none', Ela)/=0 ) CALL read_error(3, 'ela')
 
       ALLOCATE ( Top(Nhru) )
-      IF ( declvar(MODNAME, 'top', 'nhru', Nhru, 'integer',             &
-     &     'HRU number at tops of each glacier, Ntp of these',          &
+      IF ( declvar(MODNAME, 'top', 'nhru', Nhru, 'integer', &
+     &     'HRU number at tops of each glacier, Ntp of these', &
      &     'none', Top)/=0 ) CALL read_error(3, 'top')
 
       ALLOCATE ( Term(Nhru) )
-      IF ( declvar(MODNAME, 'term', 'nhru', Nhru, 'integer',            &
+      IF ( declvar(MODNAME, 'term', 'nhru', Nhru, 'integer', &
      &     'HRU number at terminus of each glacier, Ngl of these',&
      &     'none', Term)/=0 ) CALL read_error(3, 'term')
 
       ALLOCATE ( Hru_mb_yrend(Nhru) )
-      IF ( declvar(MODNAME, 'hru_mb_yrend', 'nhru', Nhru, 'real',       &
+      IF ( declvar(MODNAME, 'hru_mb_yrend', 'nhru', Nhru, 'real', &
      &     'Glacier HRU mass balance at end of previous hydrological year', &
      &      'inches', Hru_mb_yrend)/=0 ) CALL read_error(3, 'hru_mb_yrend')
 
       ALLOCATE ( Av_fgrad(Nhru) )
-      IF ( declvar(MODNAME, 'av_fgrad', 'nhru', Nhru, 'real',           &
+      IF ( declvar(MODNAME, 'av_fgrad', 'nhru', Nhru, 'real', &
      &     'Glacier average HRU mass balance gradient with elevation at flowline at end of each hydrological year, Ngl of these',&
      &     'decimal fraction', Av_fgrad)/=0 ) CALL read_error(3, 'av_fgrad')
 
       ALLOCATE ( Hru_glres_melt(Nhru) )
-      IF ( declvar(MODNAME, 'hru_glres_melt', 'nhru', Nhru, 'real',     &
+      IF ( declvar(MODNAME, 'hru_glres_melt', 'nhru', Nhru, 'real', &
      &     'Amount of glacier surface melt (snow, ice, rain) from an HRU that goes into reservoirs', &
      &     'inches', Hru_glres_melt)/=0 ) CALL read_error(3, 'hru_glres_melt')
 
       ALLOCATE ( Glrette_melt(Nhru) )
-      IF ( declvar(MODNAME, 'glrette_melt', 'nhru', Nhru, 'real',     &
+      IF ( declvar(MODNAME, 'glrette_melt', 'nhru', Nhru, 'real', &
      &     'Amount of glacierette surface melt (snow, ice, rain) from an HRU', &
      &     'inches', Glrette_melt)/=0 ) CALL read_error(3, 'glrette_melt')
 
       ALLOCATE ( Gl_top_melt(Nhru) )
-      IF ( declvar(MODNAME, 'gl_top_melt', 'nhru', Nhru, 'real',        &
+      IF ( declvar(MODNAME, 'gl_top_melt', 'nhru', Nhru, 'real', &
      &     'Amount of glacier surface melt (snow, ice, rain) coming out of terminus of glacier, indexed by Glacr_tag', &
      &     'inches', Gl_top_melt)/=0 ) CALL read_error(3, 'gl_top_melt')
 
       ALLOCATE ( Gl_ice_melt(Nhru) )
-      IF ( declvar(MODNAME, 'gl_ice_melt', 'nhru', Nhru, 'real',        &
+      IF ( declvar(MODNAME, 'gl_ice_melt', 'nhru', Nhru, 'real', &
      &     'Amount of glacier ice (firn) melt coming out of terminus of glacier, indexed by Glacr_tag', &
      &     'inches', Gl_ice_melt)/=0 ) CALL read_error(3, 'gl_ice_melt')
 
       ALLOCATE ( Basal_elev(Nhru) )
-      IF ( declvar(MODNAME, 'basal_elev', 'nhru', Nhru, 'real',         &
-     &     'Glacier basal elevation mean over HRU',                     &
+      IF ( declvar(MODNAME, 'basal_elev', 'nhru', Nhru, 'real', &
+     &     'Glacier basal elevation mean over HRU', &
      &     'elev_units', Basal_elev)/=0 ) CALL read_error(3, 'basal_elev')
 
       ALLOCATE ( Keep_gl(Nhru,Seven) )
@@ -318,12 +318,12 @@
      &     'none', Ikeep_gl)/=0 ) CALL read_error(3, 'ikeep_gl')
 
       ALLOCATE ( Basal_slope(Nhru) )
-      IF ( declvar(MODNAME, 'basal_slope', 'nhru', Nhru, 'real',        &
+      IF ( declvar(MODNAME, 'basal_slope', 'nhru', Nhru, 'real', &
      &     'Glacier basal slope down flowline mean over each HRU', &
      &     'decimal fraction', Basal_slope)/=0 ) CALL read_error(3, 'basal_slope')
 
       ALLOCATE ( Av_basal_slope(Nhru) )
-      IF ( declvar(MODNAME, 'av_basal_slope', 'nhru', Nhru, 'real',      &
+      IF ( declvar(MODNAME, 'av_basal_slope', 'nhru', Nhru, 'real', &
      &     'Glacier average basal slope at flowline location, indexed by Glacr_tag', &
      &     'decimal fraction', Av_basal_slope)/=0 ) CALL read_error(3, 'av_basal_slope')
 
@@ -341,12 +341,12 @@
 
       IF ( Init_vars_from_file==0 ) THEN
         ALLOCATE ( Glacr_elev_init(Nhru) )
-        IF ( declvar(MODNAME, 'glacr_elev_init', 'nhru', Nhru, 'real',    &
+        IF ( declvar(MODNAME, 'glacr_elev_init', 'nhru', Nhru, 'real', &
      &     'Glacier surface elevation mean over HRU at initiation extrapolating to 100% glacierized HRU', &
      &     'elev_units', Glacr_elev_init)/=0 ) CALL read_error(3, 'glacr_elev_init')
 
         ALLOCATE ( Glacr_slope_init(Nhru) )
-        IF ( declvar(MODNAME, 'glacr_slope_init', 'nhru', Nhru, 'real',    &
+        IF ( declvar(MODNAME, 'glacr_slope_init', 'nhru', Nhru, 'real', &
      &     'Glacier surface slope mean over HRU at initiation extrapolating to 100% glacierized HRU', &
      &     'elev_units', Glacr_slope_init)/=0 ) CALL read_error(3, 'glacr_slope_init')
       ENDIF
@@ -539,10 +539,10 @@
           count = 1 !has at least one glacier
           glacier_frac_use(j) = 1.0
           !should be end of extensions or branches-- will fail if don't set up with indices stacked
-          IF ( Glac_HRUnum_down==1) THEN
-            IF (Tohru(j)/=j-1 ) glacier_frac_use(j) = 0.999
-          ELSEIF ( Glac_HRUnum_down==0) THEN
-            IF (Tohru(j)/=j+1 ) glacier_frac_use(j) = 0.999
+          IF ( Glac_HRUnum_down==1 ) THEN
+            IF ( Tohru(j)/=j-1 ) glacier_frac_use(j) = 0.999
+          ELSEIF ( Glac_HRUnum_down==0 ) THEN
+            IF ( Tohru(j)/=j+1 ) glacier_frac_use(j) = 0.999
           ENDIF
         ENDIF
       ENDDO
@@ -871,10 +871,10 @@
 !***********************************************************************
       INTEGER FUNCTION comp_glsurf(glacr_exist, glrette_exist)
       USE PRMS_GLACR
-      USE PRMS_MODULE, ONLY: Nhru, Start_year
+      USE PRMS_MODULE, ONLY: Nhru, Start_year, Nowyear, Nowmonth
       USE PRMS_BASIN, ONLY: Hru_type, Hru_elev_ts, Basin_area_inv, Active_hrus, &
      &    Hru_route_order, Elev_units, Hru_elev
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Julwater
+      USE PRMS_SET_TIME, ONLY: Julwater
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow
       USE PRMS_SNOW, ONLY: Snowcov_area, Snowmelt, Glacrmelt, Glacr_air_deltemp, Glacr_delsnow, &
      &    Glrette_frac_init, Snowcov_area, Basin_snowicecov, Snow_evap, Glacr_evap, Basin_glacrb_melt

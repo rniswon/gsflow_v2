@@ -23,8 +23,8 @@
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW to PRMS'
       character(len=*), parameter :: MODNAME = 'gsflow_mf2prms'
-      character(len=*), parameter :: Version_gsflow_mf2prms = '2021-05-27'
-      INTEGER :: i, j, k, ihru, IRWL, NMCL, SGNM
+      character(len=*), parameter :: Version_gsflow_mf2prms = '2021-06-10'
+      integer :: i, j, k, ihru, IRWL, NMCL, SGNM
 !***********************************************************************
       gsflow_mf2prms = 0
 
@@ -81,6 +81,7 @@
             END DO
           END IF
         END IF
+
       ELSEIF ( Process_flag==DECL ) THEN
         CALL print_module(MODDESC, MODNAME, Version_gsflow_mf2prms)
       ENDIF

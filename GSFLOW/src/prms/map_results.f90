@@ -365,9 +365,10 @@
 !                      mapped to a specified spatial resolution
 !***********************************************************************
       INTEGER FUNCTION map_resultsrun()
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_MAP_RESULTS
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, Basin_area_inv
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday, Modays
+      USE PRMS_SET_TIME, ONLY: Modays
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: DBLE
@@ -445,12 +446,10 @@
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NmapOutVars
         IF ( Map_var_type(jj)==REAL_TYPE ) THEN
-          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), &
-     &         Nhru, 'real', Map_var(1, jj))/=0 ) &
+          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'real', Map_var(1, jj))/=0 ) &
      &         CALL read_error(4, MapOutVar_names(jj)(:Nc_vars(jj)))
         ELSEIF ( Map_var_type(jj)==DBLE_TYPE ) THEN
-          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), &
-     &         Nhru, 'double', Map_var_dble(1, jj))/=0 ) &
+          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'double', Map_var_dble(1, jj))/=0 ) &
      &         CALL read_error(4, MapOutVar_names(jj)(:Nc_vars(jj)))
         ENDIF
       ENDDO

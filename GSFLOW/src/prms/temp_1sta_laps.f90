@@ -42,7 +42,7 @@
       USE PRMS_CLIMATEVARS, ONLY: Tmax_aspect_adjust, Tmin_aspect_adjust, Tsta_elev, &
      &    Hru_tsta, Solrad_tmax, Solrad_tmin, Basin_temp, Basin_tmax, &
      &    Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, Tavgc, Basin_tsta, Tmax_allrain
-      USE PRMS_SET_TIME, ONLY: Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nowmonth, Nowday
       USE PRMS_OBS, ONLY: Tmax, Tmin
       IMPLICIT NONE
 ! Functions
@@ -177,7 +177,7 @@
         ELSEIF ( Temp_flag==temp_laps_module ) THEN
           MODNAME = 'temp_laps'
         ELSE ! Temp_flag = temp_sta_module
-          MODNAME = 'temp_sta'
+          MODNAME = 'temp_sta '
         ENDIF
         CALL print_module(MODDESC, MODNAME, Version_temp)
 

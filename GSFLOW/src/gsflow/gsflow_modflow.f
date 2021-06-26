@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-04-27'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-06-22'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -22,10 +22,10 @@
       character(len=*), parameter :: Version_uzf = '2021-03-02'
       character(len=*), parameter :: Version_sfr = '2020-09-30'
       character(len=*), parameter :: Version_lak = '2020-09-30'
-      character(len=*), parameter :: Version_ag =  '2021-03-02'
+      character(len=*), parameter :: Version_ag =  '2021-06-21'
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
-      INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS,KPERSTART
+      INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS, KPERSTART
       INTEGER, SAVE :: AGCONVERGE
       INTEGER, SAVE :: KSTP, KKSTP, IERR, Max_iters, Itreal
       INTEGER, SAVE :: Mfiter_cnt(ITDIM), Iter_cnt(ITDIM), Iterations
@@ -93,8 +93,9 @@ C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
+      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
       IMPLICIT NONE
 !***********************************************************************
       gsfdecl = 0
@@ -131,6 +132,8 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
+      USE PRMS_CONSTANTS, ONLY: MODFLOW, GSFLOW, ACTIVE, OFF,
+     &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
      &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package
 C1------USE package modules.
@@ -294,14 +297,26 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
           PRINT *, 'HYD Package not supported'
           ierr = 1
         ENDIF
+!        IF ( IUNIT(49)>0 ) THEN
+!          PRINT *, 'LMT Package not supported'
+!          ierr = 1
+!        ENDIF
         IF ( IUNIT(54)>0 ) THEN
           PRINT *, 'SUB Package not supported'
           ierr = 1
         ENDIF
+!        IF ( IUNIT(57)>0 ) THEN
+!          PRINT *, 'SWT Package not supported'
+!          ierr = 1
+!        ENDIF
         IF ( IUNIT(64)>0 ) THEN
           PRINT *, 'SWR Package not supported'
           ierr = 1
         ENDIF
+!        IF ( IUNIT(65)>0 ) THEN
+!          PRINT *, 'SWI Package not supported'
+!          ierr = 1
+!        ENDIF
       ENDIF
       IF ( ierr==1 ) CALL error_stop('INVALID PACKAGE SELECTION',
      &                               ERROR_modflow)
@@ -463,10 +478,11 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
+     &    ERROR_time
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
      &    Init_vars_from_file, Mxsziter, Glacier_flag,
-     &    PRMS_land_iteration_flag
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+     &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -701,7 +717,6 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             ENDIF
             IF(IUNIT(66).GT.0 ) 
      1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
-
             IF(IUNIT(55).GT.0) CALL GWF2UZF1FM(KKPER,KKSTP,KKITER,
      1                           IUNIT(44),IUNIT(22),IUNIT(63),
      2                           IUNIT(64),IGRID)  !SWR - JDH ADDED IUNIT(64)
@@ -783,10 +798,11 @@ c            END IF
 !     6                         BIGHEADCHG,HNEWLAST)
 !            ENDIF
 ! Calculate new heads using Newton solver
-          IF(IUNIT(63).GT.0 ) 
-     1          CALL GWF2NWT1FM(KKITER,ICNVG,KSTP,KPER,Mxiter,
-     2                          IUNIT(22),Itreal,AGCONVERGE,IGRID)
-          IF ( IUNIT(63).GT.0 )ITREAL2 = ITREAL
+          IF(IUNIT(63).GT.0 ) THEN
+             CALL GWF2NWT1FM(KKITER,ICNVG,KSTP,KPER,Mxiter,
+     2                       IUNIT(22),Itreal,AGCONVERGE,IGRID)
+             ITREAL2 = ITREAL
+          ENDIF
           IF(IERR.EQ.1) CALL USTOP(' ')
 C
 C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
@@ -1032,8 +1048,9 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
-      USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, DEBUG_less, MODFLOW
+      USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file, GSFLOW_flag,
+     &    Print_debug, Model
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
       USE GWFNWTMODULE, ONLY:LINMETH
       IMPLICIT NONE
@@ -1217,7 +1234,8 @@ C        CALL GETCL(COMLIN)
         ENDIF
 C
       RETURN
-      END
+      END SUBROUTINE GETNAMFIL
+C
       SUBROUTINE GLO1BAS6ET(IOUT,IBDT,IPRTIM)
 C     ******************************************************************
 C     Get end time and calculate elapsed time
@@ -1409,16 +1427,16 @@ C
       INTEGER FUNCTION GET_KPER()
       USE GLOBAL, ONLY: NPER
       USE GSFMODFLOW, ONLY: Stress_dates, KPER
-      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day
+      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day,
+     1    Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
-      INTRINSIC DBLE, INT
-      DOUBLE PRECISION, EXTERNAL :: nowjt
+      INTRINSIC DBLE
       INTEGER, EXTERNAL :: compute_julday
 ! Local Variables
       INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
-      now = INT( nowjt() )
+      now = compute_julday(Nowyear, Nowmonth, Nowday)
       KPERTEST = 1
       IF ( KPER > KPERTEST ) KPERTEST = KPER
 !
@@ -1487,7 +1505,7 @@ C
 
       IF ( Mft_to_days>1.0 ) PRINT *, 'CAUTION, MF time step /= 1 day'
 
-      IF ( Model>GSFLOW ) PRINT *, ' '
+      IF ( Model==MODFLOW ) PRINT *, ' '
       TOTIM = 0.0
       KPER = 0
       KSTP = 0

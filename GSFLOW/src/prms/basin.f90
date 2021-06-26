@@ -14,7 +14,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2021-05-27'
+      character(len=*), parameter :: Version_basin = '2021-06-21'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -219,8 +219,7 @@
         IF ( declparam(MODNAME, 'ag_cov_type', 'nhru', 'integer', &
      &       '1', '0', '4', &
      &       'Cover type designation for agriculture area of each HRU', &
-     &       'Vegetation cover type for agriculture area of each HRU (0=bare soil;'// &
-     &       ' 1=grasses; 2=shrubs; 3=trees; 4=coniferous)', &
+     &       'Vegetation cover type for agriculture area of each HRU (0=bare soil; 1=grasses; 2=shrubs; 3=trees; 4=coniferous)', &
      &       'none')/=0 ) CALL read_error(1, 'ag_cov_type')
       ENDIF
 
@@ -471,16 +470,15 @@
 
         Hru_perv(i) = perv_area
         Hru_frac_perv(i) = perv_area/harea
-!        if ( ag_area(i)>0 ) print *, i, Hru_frac_perv(i), ag_frac(i), dprst_frac(i)
-!        IF ( perv_area/harea<0.001 ) THEN
-!          PRINT *, 'ERROR, pervious plus agriculture fraction must be >= 0.001 for HRU:', i
-!          PRINT *, '       pervious portion is HRU fraction - impervious fraction - depression fraction - agriculture fraction'
-!          PRINT *, '       pervious fraction:', Hru_frac_perv(i)
-!          PRINT *, '       impervious fraction:', Hru_percent_imperv(i)
-!          IF ( Dprst_flag==ACTIVE ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
-!          IF ( Ag_frac_flag==ACTIVE ) PRINT *, '       agriculture fraction:', Ag_frac(i)
+        IF ( Hru_frac_perv(i)<0.001 .AND. Print_debug>DEBUG_less ) THEN
+          PRINT *, 'WARNING, pervious fraction must be >= 0.001 for HRU:', i
+          PRINT *, '         pervious portion is HRU fraction - impervious fraction - depression fraction'
+          PRINT *, '         pervious fraction:', Hru_frac_perv(i)
+          PRINT *, '         impervious fraction:', Hru_percent_imperv(i)
+          IF ( Dprst_flag==ACTIVE ) PRINT *, '         depression storage fraction:', Dprst_frac(i)
+          IF ( Ag_frac_flag==ACTIVE ) PRINT *, '         agriculture fraction:', Ag_frac(i)
 !          basinit = 1
-!        ENDIF
+        ENDIF
         basin_perv = basin_perv + DBLE( Hru_perv(i) )
       ENDDO
       IF ( Dprst_flag==ACTIVE .AND. PRMS4_flag==ACTIVE ) DEALLOCATE ( Dprst_area )
@@ -556,10 +554,10 @@
         CALL write_outfile(' ')
         WRITE (buffer, 9003) 'Model domain area:   ', Totarea, '    Active basin area:', Active_area
         CALL write_outfile(buffer)
-        WRITE (buffer, 9004) 'Fraction impervious:', basin_imperv, '    Fraction pervious: ', basin_perv
+        WRITE (buffer, 9004)   'Fraction impervious:', basin_imperv, '    Fraction pervious: ', basin_perv
         CALL write_outfile(buffer)
         IF ( Water_area>0.0D0 ) THEN
-          WRITE (buffer, 9004) 'Lake area:          ', Water_area, '    Fraction lakes:    ', Water_area*Basin_area_inv
+          WRITE (buffer, 9004) 'Lake area:          ', Water_area,   '    Fraction lakes:    ', Water_area*Basin_area_inv
           CALL write_outfile(buffer)
         ENDIF
         IF ( Dprst_flag==ACTIVE ) THEN

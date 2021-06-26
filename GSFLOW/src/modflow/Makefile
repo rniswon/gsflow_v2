@@ -193,7 +193,7 @@ prms_climatevars.mod:
 prms_soilzone.mod:
 	$(CD) ../prms;make prms_soilzone.mod
 	$(CP) ../prms/prms_soilzone.mod .
-	
+
 de47_NWT.o: de47_NWT.f gwf2bas7_NWT.o
 	$(FC) $(FFLAGS) -c de47_NWT.f
 
