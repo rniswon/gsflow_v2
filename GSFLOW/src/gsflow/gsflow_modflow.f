@@ -1,90 +1,18 @@
+C
+      MODULE MF_DLL
+C
+      CONTAINS
+C
 !***********************************************************************
 !     GSFLOW module that replaces MF_NWT.f
 !***********************************************************************
-      MODULE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE, OFF,
-     +    MODFLOW, GSFLOW, ERROR_modflow, ERROR_time, MAXFILE_LENGTH,
-     +    READ_INIT
-      USE PRMS_MODULE, ONLY: Print_debug, Model, GSFLOW_flag
-      IMPLICIT NONE
-!   Local Variables
-      character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
-      character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-06-22'
-      character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
-      character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
-      character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
-      character(len=*), parameter :: MODDESC_AG =  'AG-NWT Package'
-      character(len=*), parameter :: MODNAME_UZF = 'gwf2uzf1_NWT'
-      character(len=*), parameter :: MODNAME_SFR = 'gwf2sfr7_NWT'
-      character(len=*), parameter :: MODNAME_LAK = 'gwf2lak7_NWT'
-      character(len=*), parameter :: MODNAME_AG =  'gwf2ag1_NWT_ponds'
-      character(len=*), parameter :: Version_uzf = '2021-03-02'
-      character(len=*), parameter :: Version_sfr = '2020-09-30'
-      character(len=*), parameter :: Version_lak = '2020-09-30'
-      character(len=*), parameter :: Version_ag =  '2021-06-21'
-      INTEGER, PARAMETER :: ITDIM = 80
-      INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
-      INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS, KPERSTART
-      INTEGER, SAVE :: AGCONVERGE
-      INTEGER, SAVE :: KSTP, KKSTP, IERR, Max_iters, Itreal
-      INTEGER, SAVE :: Mfiter_cnt(ITDIM), Iter_cnt(ITDIM), Iterations
-      INTEGER, SAVE :: Szcheck, Sziters, INUNIT, KPER, NCVGERR
-      INTEGER, SAVE :: Max_sziters, Maxgziter
-      INTEGER, SAVE, ALLOCATABLE :: Gwc_col(:), Gwc_row(:)
-      REAL, SAVE :: Delt_save
-      INTEGER, SAVE, ALLOCATABLE :: Stress_dates(:)
-      INTEGER, SAVE :: Modflow_skip_stress, Kkper_new, 
-     +                 Modflow_skip_time_step
-      REAL, SAVE :: Modflow_time_in_stress, Modflow_skip_time
-      DOUBLE PRECISION, SAVE :: Mft_to_sec, Totalarea_mf
-      DOUBLE PRECISION, SAVE :: Mfl2_to_acre, Mfl3_to_ft3, Sfr_conv
-      DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs
-      REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t
-      REAL, SAVE :: MFQ_to_inch_acres
-      DOUBLE PRECISION, SAVE :: mfstrt_jul  !RGN to get MF to stop at End_time for MODFLOW only
-      REAL, SAVE, ALLOCATABLE :: Mfq2inch_conv(:), Cellarea(:)
-      REAL, SAVE, ALLOCATABLE :: Gvr2cell_conv(:), Mfvol2inch_conv(:)
-      INTEGER, SAVE :: Stopcount
-C-------ASSIGN VERSION NUMBER AND DATE
-      CHARACTER*40 VERSION,VERSION2,VERSION3
-      CHARACTER*10 MFVNAM
-      PARAMETER (VERSION='1.2.0 03/01/2020')
-      PARAMETER (VERSION2='1.12.0 02/03/2017')
-      PARAMETER (VERSION3='1.04.0 09/15/2016')
-      PARAMETER (MFVNAM='-NWT-SWR1')
-      INTEGER, SAVE :: IBDT(8)
-!   Control Parameters
-      INTEGER, SAVE :: Modflow_time_zero(6)
-      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
-      END MODULE GSFMODFLOW
-
+ 
 C     ******************************************************************
 C     MAIN CODE FOR U.S. GEOLOGICAL SURVEY MODULAR MODEL -- MODFLOW-NWT
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
 !rgn------NEW VERSION NUMBER 1.2.0, 03/01/2020
+!rsr------MODIFIED for use in GSFLOW and MODSIM-GSFLOW
 C     ******************************************************************
-C
-      INTEGER FUNCTION gsflow_modflow()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN
-      USE PRMS_MODULE, ONLY: Process_flag
-      IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL:: gsfdecl, gsfinit, gsfrun, gsfclean
-!***********************************************************************
-      gsflow_modflow = 0
-
-      IF ( Process_flag==RUN ) THEN
-        gsflow_modflow = gsfrun()
-      ELSEIF ( Process_flag==DECL ) THEN
-        gsflow_modflow = gsfdecl()
-      ELSEIF ( Process_flag==INIT ) THEN
-        gsflow_modflow = gsfinit()
-      ELSEIF ( Process_flag==CLEAN ) THEN
-        gsflow_modflow = gsfclean()
-      ENDIF
-
-      END FUNCTION gsflow_modflow
 
 !***********************************************************************
 !     gsfdecl - set up parameters for GSFLOW computations
@@ -125,9 +53,10 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
       END FUNCTION gsfdecl
 
 !***********************************************************************
-!     gsfinit - Initialize MODFLOW module - get parameter values
+!     MFNWT_INIT - Initialize MODFLOW module - get parameter values
 !***********************************************************************
-      INTEGER FUNCTION gsfinit()
+      SUBROUTINE MFNWT_INIT(AFR, Diversions, Idivert,EXCHANGE,DELTAVOL,
+     &                      LAKEVOL, Nsegshold, Nlakeshold) 
 !     ------------------------------------------------------------------
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
@@ -143,12 +72,19 @@ C1------USE package modules.
       IMPLICIT NONE
       INTEGER :: I
       INCLUDE 'openspec.inc'
+! Arguments
+      LOGICAL, INTENT(IN) :: AFR
+      INTEGER, INTENT(IN) :: Nsegshold
+      INTEGER, INTENT(IN) :: Idivert(Nsegshold)
+      INTEGER, INTENT(INOUT) :: Nlakeshold
+      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
+      DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(Nsegshold), 
+     &                                   DELTAVOL(Nlakeshold),
+     &                                   LAKEVOL(Nlakeshold)
 ! Functions
       INTRINSIC DBLE
-      INTEGER, EXTERNAL :: numchars, GET_KPER
-      EXTERNAL :: SET_STRESS_DATES, print_module, SETMFTIME
-      EXTERNAL :: SETCONVFACTORS, check_gvr_cell_pct
-      EXTERNAL :: gsflow_modflow_restart, set_cell_values, error_stop
+      INTEGER, EXTERNAL :: numchars
+      EXTERNAL :: print_module, error_stop, read_error
 ! Local Variables
       INTEGER :: MAXUNIT, NC
 C
@@ -169,7 +105,6 @@ C
      &           'SWR ', 'SWI2', 'AG  ', '    ', 'IWRT', 'IRED', '    ',  ! 70     - SWR - JDH 
      &           30*'    '/                                               ! 71-100 - SWR - JDH
 C     ------------------------------------------------------------------
-      gsfinit = 0
 C
 C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
       IOUTS = 432
@@ -209,7 +144,7 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
       END IF
 
       ierr = 0
-! Packages not available in NWT or GSFLOW
+! Packages not available in NWT or GSFLOW, ??? what about MODSIM-GSFLOW ???
       IF ( IUNIT(14)>0 ) THEN
         PRINT *, 'lmg Package not supported'
         ierr = 1
@@ -356,6 +291,7 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
       IF(IUNIT(22).GT.0 .OR. IUNIT(44).GT.0) THEN
           CALL GWF2LAK7AR(
      1             IUNIT(22),IUNIT(44),IUNIT(15),IUNIT(55),NSOL,IGRID)
+          Nlakeshold = NLAKES
           NLAKES_MF = NLAKES
       END IF
       IF(IUNIT(46).GT.0) CALL GWF2GAG7AR(IUNIT(46),IUNIT(44),
@@ -456,37 +392,43 @@ C
       KPER = 1
       KPERSTART = 1
       ! run SS if needed, read to current stress period, read restart if needed
-      CALL SET_STRESS_DATES()
+      CALL SET_STRESS_DATES(AFR, Diversions, Idivert, EXCHANGE,DELTAVOL,
+     +                      LAKEVOL,Nsegshold, Nlakeshold)
       CALL SETCONVFACTORS()
 
       Delt_save = DELT
       IF ( ISSFLG(1).EQ.1 ) DELT = 1.0/Mft_to_days
 C
       KKPER = KPER
-      IF ( Model==MODFLOW ) THEN
+      IF ( Model==MODFLOW ) THEN ! ??? what about MODSIM-MODFLOW ???
         Kkper_new = GET_KPER()
         Kper_mfo = Kkper_new
       ENDIF
 C
-      END FUNCTION gsfinit
+      END SUBROUTINE MFNWT_INIT
 
 !***********************************************************************
-!     gsfrun - Run GSFLOW
+!     MFNWT_RUN = ADVANCE TIME AND RUN THE MODFLOW SOLVER ROUTINE WITH
+!                 THE LATEST VALUES OF ISEG UPDATED BY MODSIM.
 !***********************************************************************
-      INTEGER FUNCTION gsfrun()
+      SUBROUTINE MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, 
+     &                     DELTAVOL,LAKEVOL,Nsegshold, Nlakeshold)
+C
+      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_RUN
+C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
-     &    ERROR_time
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, GSFLOW, ACTIVE,
+     &    OFF, ERROR_time
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
      &    Init_vars_from_file, Mxsziter, Glacier_flag,
-     &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday
+     &    PRMS_land_iteration_flag !, Nowyear, Nowmonth, Nowday
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
-      USE GWFHUFMODULE, ONLY:IOHUFHDS,IOHUFFLWS
+!      USE GWFHUFMODULE, ONLY:IOHUFHDS,IOHUFFLWS
       USE GWFEVTMODULE, ONLY:NEVTOP
       USE GWFRCHMODULE, ONLY:NRCHOP
       USE PCGMODULE
@@ -495,23 +437,29 @@ c     USE LMGMODULE
       USE DE4MODULE
 !gsf  USE GMGMODULE
 !      USE GWFNWTMODULE, ONLY:ITREAL, ICNVGFLG  !ITREAL removed from NWT module and added to PRMS_MODULE
-      USE GWFNWTMODULE, ONLY:ICNVGFLG
+!      USE GWFNWTMODULE, ONLY:ICNVGFLG
       IMPLICIT NONE
+! Arguments
+      INTEGER, INTENT(IN) :: Nsegshold, Nlakeshold
+      LOGICAL, INTENT(IN) :: AFR
+      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold), 
+     &                                   EXCHANGE(Nsegshold)
+      DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(Nlakeshold), 
+     &                                   LAKEVOL(Nlakeshold)
+      INTEGER, INTENT(IN) :: Idivert(Nsegshold)
       INTEGER I
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
-      INTEGER, EXTERNAL :: soilzone, GET_KPER
-      INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
-      INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsfclean
-      EXTERNAL :: READ_STRESS
+      INTEGER, EXTERNAL :: soilzone, gsflow_prms2mf, gsflow_mf2prms
+      INTEGER, EXTERNAL :: intcp, snowcomp, glacr, srunoff
+      EXTERNAL :: MODSIM2SFR, SFR2MODSIM, LAK2MODSIM
       INTRINSIC MIN
 ! Local Variables
-      INTEGER :: retval, II, KITER, IBDRET, iss
-      INTEGER :: IC1, IC2, IR1, IR2, IL1, IL2, IDIR, iprt, gsflag
-      INTEGER :: ITREAL2
-      REAL :: BUDPERC
+      INTEGER :: retval, KITER, iss, iprt !, II, IBDRET
+!      INTEGER :: IC1, IC2, IR1, IR2, IL1, IL2, IDIR
+!      REAL :: BUDPERC
 !***********************************************************************
-      gsfrun = 0
+!     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 10=MODSIM-GSFLOW; 11=MODSIM-PRMS; 12=MODSIM-MODFLOW; 13=MODSIM)
 C
 C7------SIMULATE EACH STRESS PERIOD.
       IF ( Steady_state.EQ.1 ) THEN
@@ -531,7 +479,7 @@ C7------SIMULATE EACH STRESS PERIOD.
         ELSE
           KSTP = 0
         END IF
-        CALL READ_STRESS() ! second time in run, read restart
+        CALL MFNWT_RDSTRESS() ! second time in run, read restart
         IF ( Model/=MODFLOW ) THEN    !RGN added check for MF only mode 2/21/19
           IF ( ISSFLG(KKPER).EQ.1 ) CALL error_stop
      &         ('cannot run steady state after first stress period.',
@@ -546,12 +494,13 @@ C7------SIMULATE EACH STRESS PERIOD.
       IF ( GSFLOW_flag==ACTIVE .AND. iss==0 ) gsflag = ACTIVE
 C
 C7C-----SIMULATE EACH TIME STEP.
-!gsf    DO 90 KSTP = 1, NSTP(KPER)
+!gsf    DO 90 KSTP = 1, NSTP(KPER) ! maybe a problem, need loop for MFNWT and probably MODSIM
           KSTP = KSTP + 1
           KKSTP = KSTP
           IF ( IUNIT(63).GT.0 )itreal = 0
 C
 C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
+          IF (AFR) THEN
           IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(1,Igrid)
           CALL GWF2BAS7AD(KKPER,KKSTP,IGRID)
           IF(IUNIT(62).GT.0) CALL GWF2UPW1AD(IGRID)
@@ -568,6 +517,7 @@ C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
           IF(IUNIT(65).GT.0) CALL GWF2SWI2AD(KKSTP,KKPER,IGRID)  !SWI2
           IF( IUNIT(44).GT.0 ) CALL GWF2SFR7AD(IUNIT(44),IUNIT(22),
      1                                         KKSTP,KKPER,IGRID)
+          END IF
           IF(IUNIT(50).GT.0) THEN
             IF (IUNIT(1).GT.0) THEN
               CALL GWF2MNW27BCF(KPER,IGRID)
@@ -599,7 +549,7 @@ C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
      2                                       IGRID,IUNIT(54))  !SWR - JDH
           IF(IUNIT(66).GT.0) CALL GWF2AG7AD(IUNIT(66),KKPER)
 
-          IF ( Model==MODFLOW ) THEN
+          IF ( Model==MODFLOW ) THEN ! ??? what about MODSIM-MODFLOW ???
 C
 C---------INDICATE IN PRINTOUT THAT SOLUTION IS FOR HEADS
             iprt = 0
@@ -625,6 +575,12 @@ C7C2----ITERATIVELY FORMULATE AND SOLVE THE FLOW EQUATIONS.
            ITREAL2 = 0
 !           IF ( IUNIT(63).GT.0 ) ITREAL = 0
            ITREAL = 0
+C
+C0----Plug in MODSIM values before PRMS-MODFLOW iterations
+      IF ( Model>=10 ) THEN
+        IF(IUNIT(44).GT.0.AND.iss==0) CALL MODSIM2SFR(Diversions)
+      ENDIF
+C
            DO WHILE (ITREAL2.LT.MXITER)
             KITER = KITER + 1
             KKITER = KITER
@@ -699,7 +655,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                   RETURN
                 ENDIF
               ENDIF
-              retval = soilzone()
+              retval = soilzone(AFR)
               IF ( retval/=0 ) THEN
                 PRINT 9001, 'soilzone', retval
                 RETURN
@@ -826,9 +782,79 @@ C
 C
    33     CONTINUE
 !          kkiter = itreal
+      !move above and executed when AFR = TRUE
           IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(2,Igrid)
 C
-C7C3----DETERMINE WHICH OUTPUT IS NEEDED.
+ 9001 FORMAT ('ERROR in ', A, ' module, arg = run.',
+     &        ' Called from MFNWT_RUN.', /, 'Return val =', I2)
+
+      IF (Model>=10 .AND. iss==0) THEN
+        IF(IUNIT(44).GT.0) CALL SFR2MODSIM(EXCHANGE, Diversions, 
+     1                             Idivert, Nsegshold, Timestep,KITER)
+      ENDIF
+C
+      IF (Model>=10 .AND. iss==0) THEN
+        IF(IUNIT(44).GT.0) CALL LAK2MODSIM(DELTAVOL, LAKEVOL, 
+     1                              Diversions, Nsegshold)
+      ENDIF
+      END SUBROUTINE MFNWT_RUN
+C
+C     ************************************************************************
+C     ACCUMULATE ACCRETION/DEPLETIONS FOR ALL STREAM SEGMENETS AND LAKES THAT
+C     ARE MAPPED TO MODSIM NODES (OR LINKS)
+C     ************************************************************************
+      SUBROUTINE COMPUTE_EXCHG(EXCHG, ELAKVol, KPER) 
+     &                  BIND(C,NAME="COMPUTE_EXCHG")
+C      
+        !DEC$ ATTRIBUTES DLLEXPORT :: COMPUTE_EXCHG
+C
+        USE GWFLAKMODULE, ONLY: NLAKES, VOL 
+        IMPLICIT NONE
+        INTEGER I
+C
+C        REAL(8), DIMENSION(3,13), INTENT(inout) :: EXCHG  !From before switching to a 1D array 
+        REAL(8), DIMENSION(100), INTENT(inout) :: EXCHG    !Now a 1D array (5-16-14)
+        REAL(8), DIMENSION(1), INTENT(inout) :: ELAKVol
+        INTEGER, DIMENSION(1), INTENT(inout) :: KPER
+C        
+C      CALL RAD1_ACC_DEP(EXCHG)
+      !CALL RAD1_ACC_DEP2(EXCHG,KPER) ! rsr this routine is missing
+C
+      DO I=1,NLAKES    ! " - 1" Will need to adjust this between scenarios (Need to have it for 'dry up' scenario)
+          ELAKVol(I)=VOL(I)
+      ENDDO
+C
+      END SUBROUTINE COMPUTE_EXCHG
+C
+C
+C
+C     ************************************************************************
+C     Upon MODSIM-MODFLOW conversion,
+C     write the budget terms
+C     ************************************************************************
+      SUBROUTINE MFNWT_OCBUDGET()
+     &                  BIND(C,NAME="MFNWT_OCBUDGET")
+C      
+      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_OCBUDGET
+C
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, DEBUG_LESS, MODFLOW, OFF
+      USE GLOBAL
+      USE GWFBASMODULE
+      USE GWFHUFMODULE, ONLY:IOHUFHDS,IOHUFFLWS
+      USE GWFEVTMODULE, ONLY:NEVTOP
+      USE GWFRCHMODULE, ONLY:NRCHOP
+      USE GWFNWTMODULE, ONLY:ICNVGFLG
+      USE GSFMODFLOW
+      USE PRMS_MODULE, ONLY: Print_debug, Timestep, Kkiter
+      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday 
+      IMPLICIT NONE
+      INTRINSIC :: MIN
+      INTEGER :: IBDRET, IC1, IC2, IR1, IR2, IL1, IL2, IDIR, ii
+      REAL :: BUDPERC
+C     ************************************************************************
+      KKSTP = KSTP
+      KKPER = KPER
+
           CALL GWF2BAS7OC(KKSTP,KKPER,ICNVG,IUNIT(12),IGRID)
 C
 C7C4----CALCULATE BUDGET TERMS. SAVE CELL-BY-CELL FLOW TERMS.
@@ -987,13 +1013,13 @@ C7C6---JUMP TO END OF PROGRAM IF CONVERGENCE WAS NOT ACHIEVED.
               IF ( IUNIT(63).GT.0 ) THEN
                 IF ( ICNVGFLG.EQ.0 ) THEN
                   WRITE(IOUT,*) 'STOPPING SIMULATION'
-                  retval = gsfclean()
+                  CALL MFNWT_CLEAN()
                   CALL USTOP(' ')
                 END IF
               ELSE
                 IF(ABS(BUDPERC).GT.STOPER) THEN
                   WRITE(IOUT,*) 'STOPPING SIMULATION'
-                  retval = gsfclean()
+                  CALL MFNWT_CLEAN()
                   CALL USTOP(' ')
                 END IF
               END IF
@@ -1038,12 +1064,21 @@ C
  9004 FORMAT('***TIME STEP FAILED TO CONVERGE - Date:', I5, 2('/',I2.2),
      &       ' number: ', I0, /)
 
-      END FUNCTION gsfrun
+  110 RETURN  !rsr, may just call MFNWT_CLEAN for MODFLOW only or MODFLOW-MODSIM
+
+      END SUBROUTINE MFNWT_OCBUDGET
 !
 !***********************************************************************
-!     gsfclean - After GSFLOW is done
+!     MFNWT_CLEAN - After GSFLOW is done
 !***********************************************************************
-      INTEGER FUNCTION gsfclean()
+C
+C     ************************************************************************
+C     Close out MODFLOW
+C     ************************************************************************
+      SUBROUTINE MFNWT_CLEAN() BIND(C,NAME="MFNWT_CLEAN")
+C
+      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_CLEAN
+C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
@@ -1054,9 +1089,8 @@ C
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
       USE GWFNWTMODULE, ONLY:LINMETH
       IMPLICIT NONE
-      EXTERNAL :: RESTART1WRITE, gsflow_modflow_restart
+      EXTERNAL :: RESTART1WRITE
 !***********************************************************************
-      gsfclean = 0
 C
 C8------END OF SIMULATION
 C-------SAVE RESTART RECORDS FOR SUB PACKAGE
@@ -1175,7 +1209,7 @@ C10-----END OF PROGRAM.
  9007 FORMAT (A, 10I5, /, 10(28X, 10I5, /))
 
 C
-      END FUNCTION gsfclean
+      END SUBROUTINE MFNWT_CLEAN
 !
       SUBROUTINE GETNAMFIL(FNAME)
 C     ******************************************************************
@@ -1346,8 +1380,16 @@ C
 
 !***********************************************************************
 !     READ AND PREPARE INFORMATION FOR STRESS PERIOD.
+C     READ CURRENT STRESS PERIOD'S BOUNDARY PACKAGE INFORMATION
+C     REMEMBER THAT THE MODSIM-MODFLOW COUPLING IS GOING TO 
+C     REQUIRE THAT A MODSIM TIME STEP EQUAL A MODFLOW TIME STEP
+C     AND THAT MODFLOW WILL NEED TO BE RESTRICTED TO ONE TIME STEP
+C     PER MODFLOW STRESS PERIOD.
 !***********************************************************************
-      SUBROUTINE READ_STRESS()
+      SUBROUTINE MFNWT_RDSTRESS() BIND(C,NAME="MFNWT_RDSTRESS")
+C
+      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_RDSTRESS
+C
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, ERROR_time
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GSFMODFLOW, ONLY: IGRID, KKPER, KPER, NSOL, IOUTS, KKSTP,
@@ -1419,8 +1461,79 @@ C
      1                   CALL ZERO_SPECIFIED_FLOWS(IUNIT(22),IUNIT(44))
  9003 FORMAT (' Time steps must be equal: PRMS dtsec = ', F0.4,
      1        ' MODFLOW delt =', F12.4, ' Mft_to_sec = ', F0.4)
-      END SUBROUTINE READ_STRESS
+      END SUBROUTINE MFNWT_RDSTRESS
 
+C     ************************************************************************
+C     WRITE RASTERS OF GROUNDWATER/SURFACE-WATER INTERACTION
+C     
+C     ************************************************************************
+      SUBROUTINE MFNWT_WRITERAS(KPER) BIND(C,NAME="MFNWT_WRITERAS")
+C
+      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_WRITERAS
+C
+      USE GLOBAL,       ONLY: NROW,NCOL
+      USE GWFSFRMODULE, ONLY: NSTRM,ISTRM,STRM
+      IMPLICIT NONE
+      INTEGER, INTENT(in)  :: KPER
+      INTEGER I,N,IRCH,JRCH,I1
+!      CHARACTER*256 str1,str2
+!      INTEGER*4 Y,ls1,ls2
+      REAL    FLOBOT
+      REAL, DIMENSION(NROW*NCOL) :: GWSWI
+      CHARACTER OUTFILE*255,FMT*18,X1*20
+C
+C--INITIALIZE ARRAY THAT WILL STORE GROUNDWATER SURFACE WATER INTERACTION
+C  USE NODATA_VALUE TO INITIALIZE THE ARRAY
+      DO I=1,NROW*NCOL
+          GWSWI(I)=2446527.9909387
+      ENDDO
+C
+      DO I=1,NSTRM
+          IRCH=ISTRM(2,I)
+          JRCH=ISTRM(3,I)
+          FLOBOT=STRM(11,I)
+          N=(IRCH-1)*NCOL+JRCH
+          IF (GWSWI(N).NE.2446527.9909387) THEN
+            GWSWI(N) = GWSWI(N) + FLOBOT
+          ELSE
+            GWSWI(N)=FLOBOT
+          ENDIF
+      ENDDO
+C
+C--WRITE THE ARRAY TO A TEXT FILE BASED FOR THE CURRENT TIME STEP
+      FMT='(I4.4)'
+      I1=KPER
+      WRITE(X1,FMT) I1
+      OUTFILE='H:\\MODSIM_MODFLOW_New
+     &\\ET_Computation_For_MODSIM-MODFLOW_MIF_FullIrr_SAcc_NewHD
+     &\\Source_Code_Coupling\\MODSIMStreamAquifer\\GWSWI_Rasters
+     &\\GWSWI_'//TRIM(X1)//'.TXT'
+!C--REMOVE SPACES FROM THE LONG STRING
+!      ls1 = len_trim(OUTFILE)
+!      ls2 = 0
+!      DO Y = 1,ls1
+!        IF(OUTFILE(Y:Y).ne.' ') THEN
+!           ls2 = ls2 + 1
+!           str2(ls2:ls2) = OUTFILE(Y:Y)
+!        ENDIF
+!      ENDDO
+      
+      OPEN(201,FILE=OUTFILE)
+      WRITE(201,*) "ncols         133"
+      WRITE(201,*) "nrows         64"
+      WRITE(201,*) "xllcorner     278826.60355005"
+      WRITE(201,*) "yllcorner     4343615.4021448"
+      WRITE(201,*) "cellsize      400"
+      WRITE(201,*) "NODATA_value  -999.99"
+      DO I=1,NROW
+        WRITE(201,'(1000F11.2)') ((-1*GWSWI(N)*35.315/86400),
+     &                            N=(I-1)*NCOL+1,I*NCOL)
+      ENDDO
+      CLOSE(201)
+C
+      END SUBROUTINE MFNWT_WRITERAS
+C     
+C
 !     ******************************************************************
 !     DETERMINE THE STRESS PERIOD FOR THE CURRENT TIMESTEP
 !     ******************************************************************
@@ -1459,9 +1572,10 @@ C
 !***********************************************************************
 !     READ AND PREPARE INFORMATION FOR STRESS PERIOD.
 !***********************************************************************
-      SUBROUTINE SET_STRESS_DATES()
+      SUBROUTINE SET_STRESS_DATES(AFR, Diversions, Idivert, 
+     &    EXCHANGE, DELTAVOL, LAKEVOL,Nsegshold, Nlakeshold)
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, GSFLOW,
-     &    ERROR_restart, ERROR_time, ERROR_modflow
+     &    ERROR_restart, ERROR_time, ERROR_modflow, MODSIM_MODFLOW
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Kkiter, Model,
      &    Start_year, Start_month, Start_day, Print_debug
       USE GLOBAL, ONLY: NPER, ISSFLG, PERLEN, IUNIT, NSTP
@@ -1472,9 +1586,17 @@ C
       USE GWFBASMODULE, ONLY: TOTIM
       USE OBSBASMODULE, ONLY: OBSTART,ITS
       IMPLICIT NONE
+      ! Arguments
+      LOGICAL, INTENT(IN) :: AFR
+      INTEGER, INTENT(IN) :: Nsegshold, Nlakeshold
+      INTEGER, INTENT(IN) :: Idivert(Nsegshold)
+      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
+      DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(Nsegshold), 
+     &                                   DELTAVOL(Nlakeshold),
+     &                                   LAKEVOL(Nlakeshold)
       ! Functions
-      EXTERNAL :: READ_STRESS, RESTART1READ, error_stop
-      INTEGER, EXTERNAL :: gsfrun, compute_julday
+      EXTERNAL :: RESTART1READ, error_stop
+      INTEGER, EXTERNAL :: compute_julday
       INTRINSIC :: INT, FLOAT
 ! Local Variables
       INTEGER :: i, n, nstress, start_jul, mfstrt_jul
@@ -1505,7 +1627,7 @@ C
 
       IF ( Mft_to_days>1.0 ) PRINT *, 'CAUTION, MF time step /= 1 day'
 
-      IF ( Model==MODFLOW ) PRINT *, ' '
+      IF ( Model==MODFLOW .OR. Model==MODSIM_MODFLOW ) PRINT *, ' '
       TOTIM = 0.0
       KPER = 0
       KSTP = 0
@@ -1519,11 +1641,12 @@ C
      &                         ERROR_time)
           Stress_dates(i) = Stress_dates(i) - INT( plen )
           KPER = 1
-          CALL READ_STRESS()
+          CALL MFNWT_RDSTRESS()
           IF ( Init_vars_from_file==0 ) THEN
             Steady_state = 1
-            IF ( gsfrun()/=0 )
-     &           CALL error_stop('steady state failed', ERROR_modflow)
+            CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL,
+     +                     LAKEVOL,Nsegshold, Nlakeshold)            ! ITERATE TO SOLVE GW-SW SOLUTION FOR SS
+            CALL MFNWT_OCBUDGET()          ! CALCULATE BUDGET
             Steady_state = 0
  !           TOTIM = plen !RGN 9/4/2018 TOTIM needs to stay in MF time units
             TOTIM = PERLEN(i)  !RGN 9/4/2018 TOTIM needs to stay in MF time units
@@ -1566,12 +1689,12 @@ C
         ! skip stress periods from modflow_time_zero to start_time
         IF ( Modflow_skip_stress - ISSFLG(1) == 0 ) THEN
           KPER = 1
-          IF ( ISSFLG(1)==0 ) CALL READ_STRESS()
+          IF ( ISSFLG(1)==0 ) CALL MFNWT_RDSTRESS()
         ELSE
           nstress = INT(Modflow_skip_stress) - ISSFLG(1)
           DO i = 1, nstress   !RGN because SP1 already read if SS during first period.
             KPER = KPER + 1 ! set to next stress period
-            IF ( ISSFLG(i) == 0 ) CALL READ_STRESS()
+            IF ( ISSFLG(i) == 0 ) CALL MFNWT_RDSTRESS()
             n = NSTP(KPER)
             IF ( i==nstress ) n = INT( Modflow_time_in_stress )
             DO KSTP = 1, n
@@ -1584,7 +1707,7 @@ C
       ELSEIF ( Init_vars_from_file==0 .AND. ISSFLG(1)/=1) THEN
         !start with TR and no restart and no skip time
         KPER = KPER + 1 ! set to next stress period
-        CALL READ_STRESS()
+        CALL MFNWT_RDSTRESS()           !RGN need to read first SP or
       ENDIF
       KSTP = INT( Modflow_time_in_stress ) ! caution, in days
       Modflow_skip_time_step = Modflow_skip_time_step + KSTP ! caution, in days
@@ -1936,3 +2059,5 @@ C
     4   FORMAT (/, A, I5, 2('/',I2.2), I3.2, 2(':', I2.2) )
       ENDIF
       END SUBROUTINE gsflow_modflow_restart
+
+      END MODULE MF_DLL

@@ -33,6 +33,9 @@ LIBOBJS = \
         convert_params.o \
         prms_time.o \
         obs.o \
+        read_control_file.o \
+        read_data_file.o \
+        read_parameter_file.o \
         climate_hru.o \
         potet_jh.o \
         potet_pt.o \
@@ -217,13 +220,13 @@ basin.o: basin.f90 prms_module.mod prms_constants.mod
 obs.o: obs.f90 prms_module.mod prms_set_time.mod prms_basin.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) obs.f90
 
-srunoff.o: srunoff.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_climatevars.mod prms_cascade.mod prms_intcp.mod prms_snow.mod prms_set_time.mod prms_constants.mod
+srunoff.o: srunoff.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_climatevars.mod prms_cascade.mod prms_intcp.mod prms_snow.mod prms_set_time.mod prms_constants.mod prms_climate_hru.mod
 	$(FC) -c $(FFLAGS) srunoff.f90
 
 climateflow.o: climateflow.f90 prms_module.mod prms_basin.mod prms_set_time.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) climateflow.f90
 
-soilzone.o: soilzone.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod
+soilzone.o: soilzone.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod
 	$(FC) -c $(FFLAGS) soilzone.f90
 
 routing.o: routing.f90 prms_module.mod prms_basin.mod prms_gwflow.mod prms_flowvars.mod prms_set_time.mod prms_srunoff.mod prms_climatevars.mod prms_water_use.mod prms_constants.mod
@@ -256,6 +259,15 @@ convert_params.o: convert_params.f90 prms_module.mod
 glacr_melt.o: glacr_melt.f90 prms_snow.mod prms_intcp.mod prms_soltab.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) glacr_melt.f90
 
+read_control_file.o: read_control_file.f90 prms_module.mod
+	$(FC) -c $(FFLAGS) read_control_file.f90
+
+read_data_file.o: read_data_file.f90 prms_module.mod
+	$(FC) -c $(FFLAGS) read_data_file.f90
+
+read_parameter_file.o: read_parameter_file.f90 prms_module.mod
+	$(FC) -c $(FFLAGS) read_parameter_file.f90
+
 prms_climatevars.mod: climateflow.o
 prms_flowvars.mod: climateflow.o
 prms_gwflow.mod: gwflow.o
@@ -277,3 +289,5 @@ prms_set_time.mod: prms_time.o
 prms_glacr.mod: glacr_melt.o
 prms_constants.mod: prms_constants.f90
 	$(FC) -c $(FFLAGS) prms_constants.f90
+prms_climate_hru.mod: climate_hru.o
+

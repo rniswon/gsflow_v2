@@ -116,8 +116,8 @@
       USE PRMS_SRUNOFF
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declvar, declparam
-      EXTERNAL :: read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL :: read_error, print_module, declvar_dble, declvar_real, declvar_int
 !***********************************************************************
       srunoffdecl = 0
 
@@ -128,140 +128,140 @@
       ENDIF
       CALL print_module(MODDESC, MODNAME, Version_srunoff)
 
-      IF ( declvar(MODNAME, 'basin_imperv_evap', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_imperv_evap', 'one', 1, &
      &     'Basin area-weighted average evaporation from impervious area', &
-     &     'inches', Basin_imperv_evap)/=0 ) CALL read_error(3, 'basin_imperv_evap')
+     &     'inches', Basin_imperv_evap)
 
-      IF ( declvar(MODNAME, 'basin_imperv_stor', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_imperv_stor', 'one', 1, &
      &     'Basin area-weighted average storage on impervious area', &
-     &     'inches', Basin_imperv_stor)/=0 ) CALL read_error(3, 'basin_imperv_stor')
+     &     'inches', Basin_imperv_stor)
 
-      IF ( declvar(MODNAME, 'basin_infil', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_infil', 'one', 1, &
      &     'Basin area-weighted average infiltration to the capillary reservoirs', &
-     &     'inches', Basin_infil)/=0 ) CALL read_error(3, 'basin_infil')
+     &     'inches', Basin_infil)
 
-      IF ( declvar(MODNAME, 'basin_hortonian', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_hortonian', 'one', 1, &
      &     'Basin area-weighted average Hortonian runoff', &
-     &     'inches', Basin_hortonian)/=0 ) CALL read_error(3, 'basin_hortonian')
+     &     'inches', Basin_hortonian)
 
-      IF ( declvar(MODNAME, 'basin_contrib_fraction', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_contrib_fraction', 'one', 1, &
      &     'Basin area-weighted average contributing area of the pervious area of each HRU', &
-     &     'decimal fraction', Basin_contrib_fraction)/=0 ) CALL read_error(3, 'basin_contrib_fraction')
+     &     'decimal fraction', Basin_contrib_fraction)
 
       ALLOCATE ( Contrib_fraction(Nhru) )
-      IF ( declvar(MODNAME, 'contrib_fraction', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'contrib_fraction', 'nhru', Nhru, &
      &     'Contributing area of each HRU pervious area', &
-     &     'decimal fraction', Contrib_fraction)/=0 ) CALL read_error(3, 'contrib_fraction')
+     &     'decimal fraction', Contrib_fraction)
 
       ALLOCATE ( Hru_impervevap(Nhru) )
-      IF ( declvar(MODNAME, 'hru_impervevap', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_impervevap', 'nhru', Nhru, &
      &     'HRU area-weighted average evaporation from impervious area for each HRU', &
-     &     'inches', Hru_impervevap)/=0 ) CALL read_error(3, 'hru_impervevap')
+     &     'inches', Hru_impervevap)
 
       ALLOCATE ( Hru_impervstor(Nhru) )
-      IF ( declvar(MODNAME, 'hru_impervstor', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_impervstor', 'nhru', Nhru, &
      &     'HRU area-weighted average storage on impervious area for each HRU', &
-     &     'inches', Hru_impervstor)/=0 ) CALL read_error(3, 'hru_impervstor')
+     &     'inches', Hru_impervstor)
 
       ALLOCATE ( Imperv_evap(Nhru) )
-      IF ( declvar(MODNAME, 'imperv_evap', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'imperv_evap', 'nhru', Nhru, &
      &     'Evaporation from impervious area for each HRU', &
-     &     'inches', Imperv_evap)/=0 ) CALL read_error(3, 'imperv_evap')
+     &     'inches', Imperv_evap)
 
-      IF ( declvar(MODNAME, 'basin_sroffi', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_sroffi', 'one', 1, &
      &     'Basin area-weighted average surface runoff from impervious areas', &
-     &     'inches', Basin_sroffi)/=0 ) CALL read_error(3, 'basin_sroffi')
+     &     'inches', Basin_sroffi)
 
-      IF ( declvar(MODNAME, 'basin_sroffp', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_sroffp', 'one', 1, &
      &     'Basin area-weighted average surface runoff from pervious areas', &
-     &     'inches', Basin_sroffp)/=0 ) CALL read_error(3, 'basin_sroffp')
+     &     'inches', Basin_sroffp)
 
       ALLOCATE ( Hru_sroffp(Nhru) )
-      IF ( declvar(MODNAME, 'hru_sroffp', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_sroffp', 'nhru', Nhru, &
      &     'HRU area-weighted average surface runoff from pervious areas for each HRU', &
-     &     'inches', Hru_sroffp)/=0 ) CALL read_error(3, 'hru_sroffp')
+     &     'inches', Hru_sroffp)
 
       ALLOCATE ( Hru_sroffi(Nhru) )
-      IF ( declvar(MODNAME, 'hru_sroffi', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_sroffi', 'nhru', Nhru, &
      &     'HRU area-weighted average surface runoff from impervious areas for each HRU', &
-     &     'inches', Hru_sroffi)/=0 ) CALL read_error(3, 'hru_sroffi')
+     &     'inches', Hru_sroffi)
 
 ! Depression storage variables
       IF ( Dprst_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-        IF ( declvar(MODNAME, 'basin_dprst_sroff', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_dprst_sroff', 'one', 1, &
      &       'Basin area-weighted average surface runoff from open surface-depression storage', &
-     &       'inches', Basin_dprst_sroff)/=0 ) CALL read_error(3, 'basin_dprst_sroff')
+     &       'inches', Basin_dprst_sroff)
 
-        IF ( declvar(MODNAME, 'basin_dprst_evap', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_dprst_evap', 'one', 1, &
      &       'Basin area-weighted average evaporation from surface-depression storage', &
-     &       'inches', Basin_dprst_evap)/=0 ) CALL read_error(3, 'basin_dprst_evap')
+     &       'inches', Basin_dprst_evap)
 
-        IF ( declvar(MODNAME, 'basin_dprst_seep', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_dprst_seep', 'one', 1, &
      &       'Basin area-weighted average seepage from surface-depression storage', &
-     &       'inches', Basin_dprst_seep)/=0 ) CALL read_error(3, 'basin_dprst_seep')
+     &       'inches', Basin_dprst_seep)
 
-        IF ( declvar(MODNAME, 'basin_dprst_volop', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_dprst_volop', 'one', 1, &
      &       'Basin area-weighted average storage volume in open surface depressions', &
-     &       'inches', Basin_dprst_volop)/=0 ) CALL read_error(3, 'basin_dprst_volop')
+     &       'inches', Basin_dprst_volop)
 
-        IF ( declvar(MODNAME, 'basin_dprst_volcl', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_dprst_volcl', 'one', 1, &
      &       'Basin area-weighted average storage volume in closed surface depressions', &
-     &       'inches', Basin_dprst_volcl)/=0 ) CALL read_error(3, 'basin_dprst_volcl')
+     &       'inches', Basin_dprst_volcl)
 
         ALLOCATE ( Dprst_sroff_hru(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_sroff_hru', 'nhru', Nhru, 'double', &
+        CALL declvar_dble(MODNAME, 'dprst_sroff_hru', 'nhru', Nhru, &
      &       'Surface runoff from open surface-depression storage for each HRU', &
-     &       'inches', Dprst_sroff_hru)/=0 ) CALL read_error(3, 'dprst_sroff_hru')
+     &       'inches', Dprst_sroff_hru)
 
         ALLOCATE ( Dprst_insroff_hru(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_insroff_hru', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_insroff_hru', 'nhru', Nhru, &
      &       'Surface runoff from pervious and impervious portions into open and closed surface-depression storage for each HRU', &
-     &       'inches', Dprst_insroff_hru)/=0 ) CALL read_error(3, 'dprst_insroff_hru')
+     &       'inches', Dprst_insroff_hru)
 
         ALLOCATE ( Dprst_area_open(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_area_open', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_open', 'nhru', Nhru, &
      &       'Surface area of open surface depressions based on storage volume for each HRU', &
-     &       'acres', Dprst_area_open)/=0 ) CALL read_error(3, 'dprst_area_open')
+     &       'acres', Dprst_area_open)
 
         ALLOCATE ( Dprst_area_clos(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_area_clos', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_clos', 'nhru', Nhru, &
      &       'Surface area of closed surface depressions based on storage volume for each HRU', &
-     &       'acres', Dprst_area_clos)/=0 ) CALL read_error(3, 'dprst_area_clos')
+     &       'acres', Dprst_area_clos)
 
 !        ALLOCATE ( Upslope_dprst_hortonian(Nhru) )
-!        IF ( declvar(MODNAME, 'upslope_dprst_hortonian', 'nhru', Nhru, 'double', &
+!        CALL declvar_dble(MODNAME, 'upslope_dprst_hortonian', 'nhru', Nhru, &
 !     &       'Upslope surface-depression spillage and interflow for each HRU',   &
-!     &       'inches', Upslope_dprst_hortonian)/=0 ) CALL read_error(3,'upslope_dprst_hortonian')
+!     &       'inches', Upslope_dprst_hortonian)
 
         ALLOCATE ( Dprst_stor_hru(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_stor_hru', 'nhru', Nhru, 'double', &
+        CALL declvar_dble(MODNAME, 'dprst_stor_hru', 'nhru', Nhru, &
      &       'Surface-depression storage for each HRU', &
-     &       'inches', Dprst_stor_hru)/=0 ) CALL read_error(3, 'dprst_stor_hru')
+     &       'inches', Dprst_stor_hru)
 
         ALLOCATE ( Dprst_seep_hru(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_seep_hru', 'nhru', Nhru, 'double', &
+        CALL declvar_dble(MODNAME, 'dprst_seep_hru', 'nhru', Nhru, &
      &       'Seepage from surface-depression storage to associated GWR for each HRU', &
-     &       'inches', Dprst_seep_hru)/=0 ) CALL read_error(3, 'dprst_seep_hru')
+     &       'inches', Dprst_seep_hru)
 
         ALLOCATE ( Dprst_evap_hru(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_evap_hru', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_evap_hru', 'nhru', Nhru, &
      &       'Evaporation from surface-depression storage for each HRU', &
-     &       'inches', Dprst_evap_hru)/=0 ) CALL read_error(3, 'dprst_evap_hru')
+     &       'inches', Dprst_evap_hru)
 
         ALLOCATE ( Dprst_vol_open_frac(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_vol_open_frac', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_vol_open_frac', 'nhru', Nhru, &
      &      'Fraction of open surface-depression storage of the maximum storage for each HRU', &
-     &      'decimal fraction', Dprst_vol_open_frac)/=0 ) CALL read_error(3, 'dprst_vol_open_frac')
+     &      'decimal fraction', Dprst_vol_open_frac)
 
         ALLOCATE ( Dprst_vol_clos_frac(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_vol_clos_frac', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_vol_clos_frac', 'nhru', Nhru, &
      &      'Fraction of closed surface-depression storage of the maximum storage for each HRU', &
-     &      'decimal fraction', Dprst_vol_clos_frac)/=0 ) CALL read_error(3, 'dprst_vol_clos_frac')
+     &      'decimal fraction', Dprst_vol_clos_frac)
 
         ALLOCATE ( Dprst_vol_frac(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_vol_frac', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_vol_frac', 'nhru', Nhru, &
      &      'Fraction of surface-depression storage of the maximum storage for each HRU', &
-     &      'decimal fraction', Dprst_vol_frac)/=0 ) CALL read_error(3, 'dprst_vol_frac')
+     &      'decimal fraction', Dprst_vol_frac)
 
         ALLOCATE ( Dprst_vol_open_max(Nhru), Dprst_vol_clos_max(Nhru), Dprst_vol_thres_open(Nhru), Dprst_in(Nhru) )
         IF ( PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_dprst_vol_open(Nhru), It0_dprst_vol_clos(Nhru) )
@@ -272,65 +272,65 @@
       ENDIF
 
       ALLOCATE ( Hortonian_flow(Nhru) )
-      IF ( declvar(MODNAME, 'hortonian_flow', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hortonian_flow', 'nhru', Nhru, &
      &     'Hortonian surface runoff reaching stream network for each HRU', &
-     &     'inches', Hortonian_flow)/=0 ) CALL read_error(3, 'hortonian_flow')
+     &     'inches', Hortonian_flow)
 
 ! cascading variables and parameters
       IF ( Cascade_flag>CASCADE_OFF .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Upslope_hortonian(Nhru) )
-        IF ( declvar(MODNAME, 'upslope_hortonian', 'nhru', Nhru, 'double', &
+        CALL declvar_dble(MODNAME, 'upslope_hortonian', 'nhru', Nhru, &
      &       'Hortonian surface runoff received from upslope HRUs', &
-     &       'inches', Upslope_hortonian)/=0 ) CALL read_error(3, 'upslope_hortonian')
+     &       'inches', Upslope_hortonian)
 
-        IF ( declvar(MODNAME, 'basin_sroff_down', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_sroff_down', 'one', 1, &
      &       'Basin area-weighted average of cascading surface runoff', &
-     &       'inches', Basin_sroff_down)/=0 ) CALL read_error(3, 'basin_sroff_down')
+     &       'inches', Basin_sroff_down)
 
-        IF ( declvar(MODNAME, 'basin_sroff_upslope', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_sroff_upslope', 'one', 1, &
      &       'Basin area-weighted average of cascading surface runoff received from upslope HRUs', &
-     &       'inches', Basin_sroff_upslope)/=0 ) CALL read_error(3, 'basin_sroff_upslope')
+     &       'inches', Basin_sroff_upslope)
 
         ALLOCATE ( Hru_hortn_cascflow(Nhru) )
-        IF ( declvar(MODNAME, 'hru_hortn_cascflow', 'nhru', Nhru, 'double', &
+        CALL declvar_dble(MODNAME, 'hru_hortn_cascflow', 'nhru', Nhru, &
      &       'Cascading Hortonian surface runoff leaving each HRU', &
-     &       'inches', Hru_hortn_cascflow)/=0 ) CALL read_error(3, 'hru_hortn_cascflow')
+     &       'inches', Hru_hortn_cascflow)
 
         IF ( Nlake>0 ) THEN
-          IF ( declvar(MODNAME, 'basin_hortonian_lakes', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'basin_hortonian_lakes', 'one', 1, &
      &         'Basin area-weighted average Hortonian surface runoff to lakes', &
-     &         'inches', Basin_hortonian_lakes)/=0 ) CALL read_error(3, 'basin_hortonian_lakes')
+     &         'inches', Basin_hortonian_lakes)
 
           ALLOCATE ( Hortonian_lakes(Nhru) )
-          IF ( declvar(MODNAME, 'hortonian_lakes', 'nhru', Nhru, 'double', &
+          CALL declvar_dble(MODNAME, 'hortonian_lakes', 'nhru', Nhru, &
      &         'Surface runoff to lakes for each HRU', &
-     &         'inches', Hortonian_lakes)/=0 ) CALL read_error(3, 'hortonian_lakes')
+     &         'inches', Hortonian_lakes)
         ENDIF
       ENDIF
 
       IF ( Call_cascade==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Strm_seg_in(Nsegment) )
-        IF ( declvar(MODNAME, 'strm_seg_in', 'nsegment', Nsegment, 'double', &
+        CALL declvar_dble(MODNAME, 'strm_seg_in', 'nsegment', Nsegment, &
      &       'Flow in stream segments as a result of cascading flow in each stream segment', &
-     &       'cfs', Strm_seg_in)/=0 ) CALL read_error(3,'strm_seg_in')
+     &       'cfs', Strm_seg_in)
       ENDIF
 
 ! frozen ground variables and parameters
       ALLOCATE ( Frozen(Nhru) )
       IF ( Frozen_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-        IF ( declvar(MODNAME, 'frozen', 'nhru', Nhru, 'integer', &
+        CALL declvar_int(MODNAME, 'frozen', 'nhru', Nhru, &
      &       'Flag for frozen ground (0=no; 1=yes)', &
-     &       'none', Frozen)/=0 ) CALL read_error(3, 'frozen')
+     &       'none', Frozen)
 
         ALLOCATE ( Cfgi(Nhru) )
-        IF ( declvar(MODNAME, 'cfgi', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'cfgi', 'nhru', Nhru, &
      &       'Continuous Frozen Ground Index', &
-     &       'index', Cfgi)/=0 ) CALL read_error(3, 'cfgi')
+     &       'index', Cfgi)
 
         ALLOCATE ( Cfgi_prev(Nhru) )
-        IF ( declvar(MODNAME, 'cfgi_prev', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'cfgi_prev', 'nhru', Nhru, &
      &       'Continuous Frozen Ground Index from previous day', &
-     &       'index', Cfgi_prev)/=0 ) CALL read_error(3, 'cfgi_prev')
+     &       'index', Cfgi_prev)
 
         IF ( declparam(MODNAME, 'cfgi_decay', 'one', 'real', &
      &       '0.97', '0.01', '1.0', &
@@ -499,9 +499,9 @@
 
       IF ( Ag_frac_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Infil_ag(Nhru) )
-        IF ( declvar(MODNAME, 'infil_ag', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'infil_ag', 'nhru', Nhru, &
      &       'Infiltration to the agriculture reservoirs for each HRU', &
-     &       'inches', Infil_ag)/=0 ) CALL read_error(3, 'infil_ag')
+     &       'inches', Infil_ag)
       ENDIF
 
       IF ( Print_debug==DEBUG_WB ) THEN

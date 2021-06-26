@@ -16,7 +16,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'ide_dist'
-      character(len=*), parameter :: Version_ide_dist = '2020-12-02'
+      character(len=*), parameter :: Version_ide_dist = '2021-05-06'
       INTEGER, SAVE :: Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Dalr
@@ -70,8 +70,8 @@
       USE PRMS_IDE
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar
-      EXTERNAL :: read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL :: read_error, print_module, declvar_real
 !***********************************************************************
       idedecl = 0
 
@@ -79,18 +79,16 @@
 
       IF ( Model/=DOCUMENTATION ) THEN
         ALLOCATE ( Tmax_rain_sta(Nrain) )
-        IF ( declvar(MODNAME, 'tmax_rain_sta', 'nrain', Nrain, 'real',
+        CALL declvar_real(MODNAME, 'tmax_rain_sta', 'nrain', Nrain,
      +       'Maximum temperature distributed to the precipitation'//
      +       ' measurement stations',
-     +       'degrees Fahrenheit',
-     +       Tmax_rain_sta)/=0 ) CALL read_error(3, 'tmax_rain_sta')
+     +       'degrees Fahrenheit', Tmax_rain_sta)
 
         ALLOCATE ( Tmin_rain_sta(Nrain) )
-        IF ( declvar(MODNAME, 'tmin_rain_sta', 'nrain', Nrain, 'real',
+        CALL declvar_real(MODNAME, 'tmin_rain_sta', 'nrain', Nrain,
      +       'Minimum temperature distributed to the precipitation'//
      +       ' measurement stations',
-     +       'degrees Fahrenheit',
-     +       Tmin_rain_sta)/=0 ) CALL read_error(3, 'tmin_rain_sta')
+     +       'degrees Fahrenheit', Tmin_rain_sta)
       ENDIF
 
 ! declare parameters
