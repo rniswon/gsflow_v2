@@ -276,7 +276,7 @@
      &    Basin_rain, Basin_snow, Hru_ppt, Hru_rain, Hru_snow, &
      &    Basin_obs_ppt, Tmaxf, Tminf, Tmax_allsnow_f, Tmax_allrain_f, &
      &    Adjmix_rain, Precip_units
-      USE PRMS_SET_TIME, ONLY: Nowmonth
+      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_OBS, ONLY: Precip
       IMPLICIT NONE
 ! Functions
