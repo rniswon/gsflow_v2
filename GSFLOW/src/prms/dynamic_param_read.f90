@@ -13,7 +13,7 @@
      &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_ag_soil_flag, &
      &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
-     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag, Dyn_ag_frac_flag
+     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag, Dyn_ag_frac_flag, dynamic_param_log_file
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
@@ -53,7 +53,7 @@
         CHARACTER(LEN=MAXFILE_LENGTH) :: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic
-        CHARACTER(LEN=MAXFILE_LENGTH) :: soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, dynamic_param_log_file
+        CHARACTER(LEN=MAXFILE_LENGTH) :: soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: ag_soilmoist_dynamic, ag_soilrechr_dynamic, ag_frac_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, snareathresh_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn

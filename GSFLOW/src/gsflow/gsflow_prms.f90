@@ -153,6 +153,16 @@
           CALL declvar_real(MODNAME, 'hru_ag_irr', 'nhru', Nhru, &
      &         'Irrigation added to soilzone from MODFLOW wells', 'inches', Hru_ag_irr)
           Hru_ag_irr = 0.0
+          ALLOCATE ( Dprst_ag_gain(Nhru) )
+          CALL declvar_real(MODNAME, 'dprst_ag_gain', 'nhru', Nhru, &
+     &         'Irrigation added to surface depression storage from MODFLOW ponds', &
+     &         'inch-acres', Dprst_ag_gain)
+          Dprst_ag_gain = 0.0
+          ALLOCATE ( Dprst_ag_transfer(Nhru) )
+          CALL declvar_real(MODNAME, 'dprst_ag_transfer', 'nhru', Nhru, &
+     &         'Surface depression storage transfer to MODFLOW cells', &
+     &         'inch-acres', Dprst_ag_transfer)
+          Dprst_ag_transfer = 0.0
           IF ( declparam(MODNAME, 'mxsziter', 'one', 'integer', &
      &         '0', '0', '5000', &
      &         'Maximum number of iterations soilzone states are computed', &
@@ -246,6 +256,7 @@
         Have_lakes = OFF ! set for modes when MODFLOW is not active
         Kkiter = 1 ! set for PRMS-only mode
         Ag_package = OFF
+        Canopy_iter = 1
         Soilzone_add_water_use = OFF
         Dprst_add_water_use = OFF
         Dprst_transfer_water_use = OFF
@@ -426,20 +437,22 @@
         ENDIF
       ENDIF
 
-      ierr = intcp()
-      IF ( ierr/=0 ) CALL module_error('intcp', Arg, ierr)
+      IF ( PRMS_land_iteration_flag==OFF ) THEN
+        ierr = intcp()
+        IF ( ierr/=0 ) CALL module_error('intcp', Arg, ierr)
 
-      ! rsr, need to do something if snow_cbh_flag=1
-      ierr = snowcomp()
-      IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
+        ! rsr, need to do something if snow_cbh_flag=1
+        ierr = snowcomp()
+        IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
 
-      IF ( Glacier_flag==ACTIVE ) THEN
-        ierr = glacr()
-        IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
+        IF ( Glacier_flag==ACTIVE ) THEN
+          ierr = glacr()
+          IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
+        ENDIF
+
+        ierr = srunoff()
+        IF ( ierr/=0 ) CALL module_error(Srunoff_module, Arg, ierr)
       ENDIF
-
-      ierr = srunoff()
-      IF ( ierr/=0 ) CALL module_error(Srunoff_module, Arg, ierr)
 
 ! for PRMS-only and MODSIM-PRMS simulations
       IF ( Model==PRMS .OR. Model==MODSIM_PRMS ) THEN
@@ -493,8 +506,27 @@
 ! (contained in gsflow_modflow.f).
 ! They still need to be called for declare, initialize and cleanup
         ELSE !IF ( Process_flag/=RUN ) THEN
-! soilzone for GSFLOW is in the MODFLOW iteration loop
+! intcp, snowcomp, glacr, srunoff, and soilzone for GSFLOW are in the MODFLOW iteration loop
+! when PRMS_land_iteration_flag = 2
+! runoff and soilzone for GSFLOW are in the MODFLOW iteration loop
+! when PRMS_land_iteration_flag = 1
 ! only call for declare, initialize, and cleanup.
+          IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+            ierr = intcp()
+            IF ( ierr/=0 ) CALL module_error('intcp', Arg, ierr)
+
+            ! rsr, need to do something if snow_cbh_flag=1
+            ierr = snowcomp()
+            IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
+
+            IF ( Glacier_flag==ACTIVE ) THEN
+              ierr = glacr()
+              IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
+            ENDIF
+
+            ierr = srunoff()
+            IF ( ierr/=0 ) CALL module_error(Srunoff_module, Arg, ierr)
+          ENDIF
 
           ierr = soilzone(AFR)
           IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
@@ -717,6 +749,8 @@
         PRINT '(/,2A)', 'ERROR, invalid model_mode value: ', Model_mode
         Inputerror_flag = 1
       ENDIF
+      Ag_frac_flag = OFF
+      IF ( Model==GSFLOW_AG .OR. Model==PRMS_AG ) Ag_frac_flag = ACTIVE
 
       ! get simulation start_time and end_time
       Starttime = -1
@@ -828,6 +862,13 @@
       IF ( control_string(Solrad_module, 'solrad_module')/=0 ) CALL read_error(5, 'solrad_module')
       Strmflow_module = 'strmflow'
       IF ( control_string(Strmflow_module, 'strmflow_module')/=0 ) CALL read_error(5, 'strmflow_module')
+      Irrigation_area_module = ' '
+      IF ( control_string(irrigation_area_module, 'irrigation_area_module')/=0 ) CALL read_error(5, 'irrigation_area_module')
+      IF ( control_string(AET_module, 'AET_module')/=0 ) CALL read_error(5, 'AET_module')
+      IF ( control_string(PET_ag_module, 'PET_ag_module')/=0 ) CALL read_error(5, 'PET_ag_module')
+      IF ( Irrigation_area_module(:11)=='climate_hru' ) Climate_irrigated_area_flag = ACTIVE
+      IF ( AET_module(:11)=='climate_hru' ) AET_cbh_flag = ACTIVE
+      IF ( PET_ag_module(:11)=='climate_hru' ) PET_cbh_flag = ACTIVE
 
       IF ( Parameter_check_flag>0 ) CALL check_module_names()
 
@@ -836,6 +877,7 @@
       Climate_transp_flag = OFF
       Climate_potet_flag = OFF
       Climate_swrad_flag = OFF
+      Climate_irrigated_area_flag = OFF
 
       IF ( Precip_module(:11)=='precip_1sta' .OR. Precip_module(:11)=='precip_prms') THEN
         Precip_flag = precip_1sta_module
@@ -923,9 +965,12 @@
       IF ( control_integer(Strmtemp_humidity_flag, 'strmtemp_humidity_flag')/=0 ) Strmtemp_humidity_flag = OFF
 
       IF ( control_integer(Snarea_curve_flag, 'snarea_curve_flag')/=0 ) Snarea_curve_flag = OFF
+      IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
 
-      Humidity_cbh_flag = OFF
-      Windspeed_cbh_flag = OFF
+      IF ( control_integer(Humidity_cbh_flag, 'humidity_cbh_flag')/=0 ) Humidity_cbh_flag = OFF
+      IF ( control_integer(Windspeed_cbh_flag, 'windspeed_cbh_flag')/=0 ) Windspeed_cbh_flag = OFF
+      IF ( control_integer(Albedo_cbh_flag, 'albedo_cbh_flag')/=0 ) Albedo_cbh_flag = OFF
+      IF ( control_integer(Cloud_cover_cbh_flag, 'cloud_cover_cbh_flag')/=0 ) Cloud_cover_cbh_flag = OFF
       IF ( Et_flag==potet_pm_module .OR. Et_flag==potet_pt_module .OR. &
      &     (Stream_temp_flag==ACTIVE .AND. Strmtemp_humidity_flag==OFF) ) Humidity_cbh_flag = ACTIVE
       IF ( Et_flag==potet_pm_module ) Windspeed_cbh_flag = ACTIVE
@@ -963,6 +1008,8 @@
       IF ( Climate_temp_flag==ACTIVE .OR. Climate_precip_flag==ACTIVE .OR. Climate_potet_flag==ACTIVE .OR. &
      &     Climate_swrad_flag==ACTIVE .OR. Climate_transp_flag==ACTIVE .OR. &
      &     Humidity_cbh_flag==ACTIVE .OR. Windspeed_cbh_flag==ACTIVE .OR. &
+     &     Climate_irrigated_area_flag==ACTIVE .OR. AET_cbh_flag==ACTIVE .OR. PET_cbh_flag==ACTIVE .OR. &
+     &     Albedo_cbh_flag==ACTIVE .OR. Cloud_cover_cbh_flag==ACTIVE .OR. &
      &     Gwflow_cbh_flag==ACTIVE .OR. Snow_cbh_flag==ACTIVE ) Climate_hru_flag = ACTIVE
 
       Muskingum_flag = OFF
@@ -1000,6 +1047,19 @@
       IF ( decldim('nsub', 0, MAXDIM, 'Number of internal subbasins')/=0 ) CALL read_error(7, 'nsub')
 
       IF ( control_integer(Dprst_flag, 'dprst_flag')/=0 ) Dprst_flag = OFF
+      IF ( control_integer(Dprst_transfer_water_use, 'dprst_transfer_water_use')/=0 ) Dprst_transfer_water_use = OFF
+      IF ( control_integer(Dprst_add_water_use, 'dprst_add_water_use')/=0 ) Dprst_add_water_use = OFF
+      IF ( control_integer(PRMS_land_iteration_flag, 'PRMS_land_iteration_flag')/=0 ) PRMS_land_iteration_flag = OFF
+      IF ( PRMS_only==ACTIVE ) PRMS_land_iteration_flag = OFF ! srunoff in iteration loop, 2 = land modules in iteration loop
+
+      ! 0 = off, 1 = apply irrigation in soilzone, 2 = apply irrigation to canopy
+      ! these are for GSFLOW5 with AG package ACTIVE
+      IF ( control_integer(Agriculture_soil_flag, 'agriculture_soil_flag')/=0 ) Agriculture_soil_flag = OFF
+      IF ( control_integer(Agriculture_canopy_flag, 'agriculture_canopy_flag')/=0 ) Agriculture_canopy_flag = OFF
+      IF ( control_integer(Agriculture_dprst_flag, 'agriculture_dprst_flag')/=0 ) Agriculture_dprst_flag = OFF
+      IF ( Dprst_flag==OFF .AND. Agriculture_dprst_flag==ACTIVE ) &
+     &     CALL error_stop('agriculture_dprst_flag = 1, but dprst_flag = 0', ERROR_control)
+      Agriculture_flag = Agriculture_soil_flag + Agriculture_canopy_flag + Agriculture_dprst_flag
 
       ! 0 = off, 1 = on, 2 = lauren version
       IF ( control_integer(CsvON_OFF, 'csvON_OFF')/=0 ) CsvON_OFF = OFF
@@ -1036,12 +1096,14 @@
       IF ( control_integer(Dyn_springfrost_flag, 'dyn_springfrost_flag')/=0 ) Dyn_springfrost_flag = OFF
       IF ( control_integer(Dyn_snareathresh_flag, 'dyn_snareathresh_flag')/=0 ) Dyn_snareathresh_flag = OFF
       IF ( control_integer(Dyn_transp_on_flag, 'dyn_transp_on_flag')/=0 ) Dyn_transp_on_flag = OFF
+      IF ( control_integer(Dyn_ag_frac_flag, 'dyn_ag_frac_flag')/=0 ) Dyn_ag_frac_flag = OFF
+      IF ( control_integer(Dyn_ag_soil_flag, 'dyn_ag_soil_flag')/=0 ) Dyn_ag_soil_flag = OFF
       Dynamic_flag = 0
       IF ( Dyn_imperv_flag/=OFF .OR. Dyn_intcp_flag/=0 .OR. Dyn_covden_flag/=0 .OR. Dyn_dprst_flag/=OFF .OR. &
      &     Dyn_potet_flag/=OFF .OR. Dyn_covtype_flag/=0 .OR. Dyn_transp_flag/=0 .OR. Dyn_soil_flag /=OFF .OR. &
      &     Dyn_radtrncf_flag/=OFF .OR. Dyn_sro2dprst_perv_flag/=0 .OR. Dyn_sro2dprst_imperv_flag/=OFF .OR. &
      &     Dyn_fallfrost_flag/=OFF .OR. Dyn_springfrost_flag/=0 .OR. Dyn_snareathresh_flag/=0 .OR. &
-     &     Dyn_transp_on_flag/=OFF ) Dynamic_flag = ACTIVE
+     &     Dyn_transp_on_flag/=OFF .OR. Dyn_ag_frac_flag==ACTIVE .OR. Dyn_ag_soil_flag==ACTIVE ) Dynamic_flag = ACTIVE
       IF ( control_integer(Gwr_transferON_OFF, 'gwr_transferON_OFF')/=0) Gwr_transferON_OFF = OFF
       IF ( control_integer(External_transferON_OFF, 'external_transferON_OFF')/=0 ) External_transferON_OFF = OFF
       IF ( control_integer(Dprst_transferON_OFF, 'dprst_transferON_OFF')/=0 ) Dprst_transferON_OFF = OFF
@@ -1093,6 +1155,7 @@
       IF ( decldim('nevap', 0, MAXDIM, 'Number of pan-evaporation data sets')/=0 ) CALL read_error(7, 'nevap')
       IF ( decldim('nratetbl', 0, MAXDIM, 'Number of rating-table data sets for lake elevations') &
      &     /=0 ) CALL read_error(7, 'nratetbl')
+      IF ( decldim('nsnow', 0, MAXDIM, 'Number of snow-depth-measurement stations')/=0 ) CALL read_error(7, 'nsnow')
 
 ! depletion curves
       IF ( decldim('ndepl', 1, MAXDIM, 'Number of snow-depletion curves')/=0 ) CALL read_error(7, 'ndelp')

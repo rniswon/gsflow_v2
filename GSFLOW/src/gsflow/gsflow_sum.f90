@@ -560,9 +560,8 @@
      &    TOTSTOR_LAK, TOTWTHDRW_LAK, TOTRUNF_LAK, TOTSURFIN_LAK, &
      &    TOTSURFOT_LAK, TOTEVAP_LAK, TOTPPT_LAK
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_MODULE, ONLY: KKITER, Nobs, Timestep, Dprst_flag, Have_lakes, Gsf_rpt, Rpt_days
+      USE PRMS_MODULE, ONLY: KKITER, Nobs, Timestep, Dprst_flag, Have_lakes, Nowyear, Nowmonth, Nowday, Gsf_rpt, Rpt_days
       USE PRMS_OBS, ONLY: Runoff, Runoff_units
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       USE PRMS_FLOWVARS, ONLY: Basin_perv_et, Basin_swale_et, &
      &    Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_actet, &
@@ -899,7 +898,7 @@
       USE PRMS_MODULE, ONLY: Print_debug, Gsf_rpt, Rpt_days
       USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Csv_output_file, Gsflow_output_file
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: control_integer, control_string, numchars
+      INTEGER, EXTERNAL :: control_string, numchars
       EXTERNAL GSF_HEADERS, read_error, PRMS_open_output_file
 ! Local Variables
       INTEGER :: nc, ios
@@ -990,8 +989,7 @@
 !***********************************************************************
       USE GSFSUM
       USE GWFSFRMODULE, ONLY: STRMDELSTOR_RATE, STRMDELSTOR_CUM, IRTFLG
-      USE PRMS_MODULE, ONLY: KKITER, Have_lakes
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: KKITER, Have_lakes, Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
       INTRINSIC ABS
       EXTERNAL GSFFMTNUM

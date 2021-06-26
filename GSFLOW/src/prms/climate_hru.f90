@@ -416,7 +416,7 @@
         ENDIF
 
         IF ( Climate_irrigated_area_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-          CALL declvar_dble((MODNAME, 'basin_irrigated_area', 'one', 1, &
+          CALL declvar_dble(MODNAME, 'basin_irrigated_area', 'one', 1, &
      &         'Basin area-weighted average irrigation area read from CBH File', &
      &         'acres', Basin_irrigated_area)
           ALLOCATE ( Irrigated_area(Nhru) )

@@ -84,8 +84,7 @@ C1------USE package modules.
 ! Functions
       INTRINSIC DBLE
       INTEGER, EXTERNAL :: numchars
-      EXTERNAL :: print_module, error_stop
-      EXTERNAL :: read_error
+      EXTERNAL :: print_module, error_stop, read_error
 ! Local Variables
       INTEGER :: MAXUNIT, NC
 C
@@ -423,8 +422,9 @@ C
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, GSFLOW, ACTIVE,
      &    OFF, ERROR_time
-      USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, Process,
-     &    Init_vars_from_file, Mxsziter, Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
+     &    Init_vars_from_file, Mxsziter, Glacier_flag,
+     &    PRMS_land_iteration_flag !, Nowyear, Nowmonth, Nowday
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -451,10 +451,11 @@ c     USE LMGMODULE
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: soilzone, gsflow_prms2mf, gsflow_mf2prms
+      INTEGER, EXTERNAL :: intcp, snowcomp, glacr, srunoff
       EXTERNAL :: MODSIM2SFR, SFR2MODSIM, LAK2MODSIM
       INTRINSIC MIN
 ! Local Variables
-      INTEGER :: retval, II, KITER, IBDRET, iss, iprt
+      INTEGER :: retval, KITER, iss, iprt !, II, IBDRET
 !      INTEGER :: IC1, IC2, IR1, IR2, IL1, IL2, IDIR
 !      REAL :: BUDPERC
 !***********************************************************************
@@ -464,7 +465,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       IF ( Steady_state.EQ.1 ) THEN
         Kkper_new = 1
         Kper_mfo = 2
-      ELSEIF ( Model==GSFLOW ) THEN
+      ELSEIF ( GSFLOW_flag==ACTIVE ) THEN
         Kkper_new = GET_KPER()
       ELSE
         Kkper_new = Kper_mfo
@@ -490,7 +491,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       ENDIF
       iss = ISSFLG(KKPER)
       gsflag = OFF
-      IF ( Model==GSFLOW .AND. iss==0 ) gsflag = ACTIVE
+      IF ( GSFLOW_flag==ACTIVE .AND. iss==0 ) gsflag = ACTIVE
 C
 C7C-----SIMULATE EACH TIME STEP.
 !gsf    DO 90 KSTP = 1, NSTP(KPER) ! maybe a problem, need loop for MFNWT and probably MODSIM
@@ -630,6 +631,30 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ACTIVE ) THEN
+              IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+                retval = intcp()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'intcp', retval
+                  RETURN
+                ENDIF
+                retval = snowcomp()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'snowcomp', retval
+                  RETURN
+                ENDIF
+                IF ( Glacier_flag==ACTIVE ) THEN
+                  retval = glacr()
+                  IF ( retval/=0 ) THEN
+                    PRINT 9001, 'glacr_melt', retval
+                    RETURN
+                  ENDIF
+                ENDIF
+                retval = srunoff()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'srunoff', retval
+                  RETURN
+                ENDIF
+              ENDIF
               retval = soilzone(AFR)
               IF ( retval/=0 ) THEN
                 PRINT 9001, 'soilzone', retval
@@ -729,10 +754,11 @@ c            END IF
 !     6                         BIGHEADCHG,HNEWLAST)
 !            ENDIF
 ! Calculate new heads using Newton solver
-          IF(IUNIT(63).GT.0 ) 
-     1          CALL GWF2NWT1FM(KKITER,ICNVG,KSTP,KPER,Mxiter,
-     2                          IUNIT(22),Itreal,AGCONVERGE,IGRID)
-          IF ( IUNIT(63).GT.0 )ITREAL2 = ITREAL
+          IF(IUNIT(63).GT.0 ) THEN
+             CALL GWF2NWT1FM(KKITER,ICNVG,KSTP,KPER,Mxiter,
+     2                       IUNIT(22),Itreal,AGCONVERGE,IGRID)
+             ITREAL2 = ITREAL
+          ENDIF
           IF(IERR.EQ.1) CALL USTOP(' ')
 C
 C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
