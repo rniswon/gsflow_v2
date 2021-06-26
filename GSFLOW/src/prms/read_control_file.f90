@@ -82,7 +82,7 @@
 !***********************************************************************
 
       ! control filename cannot include blanks
-      CALL get_control_filename(Model_control_file, nchars)
+      CALL get_control_filename()
       CALL PRMS_open_input_file(control_unit, Model_control_file, 'model_control_file', 0, ios)
       IF ( ios/=0 ) CALL read_error(10, TRIM(Model_control_file))
       ! read header

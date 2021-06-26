@@ -43,7 +43,7 @@
       EXTERNAL :: setdims, declvar_int, declvar_real, check_parameters
       EXTERNAL :: read_control_file, read_parameter_file_dimens, read_prms_data_file
 ! Local Variables
-      INTEGER :: i, iret, nc, ierr
+      INTEGER :: i, iret, nc, ierr, dmy(1)
 !***********************************************************************
       ierr = 0
 
@@ -148,7 +148,8 @@
 
         IF ( GSFLOW_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           CALL declvar_int(MODNAME, 'KKITER', 'one', 1, &
-     &         'Current iteration in GSFLOW simulation', 'none', KKITER)
+     &         'Current iteration in GSFLOW simulation', 'none', dmy(1))
+          KKITER = dmy(1)
           ALLOCATE ( Hru_ag_irr(Nhru) )
           CALL declvar_real(MODNAME, 'hru_ag_irr', 'nhru', Nhru, &
      &         'Irrigation added to soilzone from MODFLOW wells', 'inches', Hru_ag_irr)
@@ -200,7 +201,8 @@
             IF ( getparam(MODNAME, 'gvr_cell_pct', Nhrucell, 'real', &
      &           Gvr_cell_pct)/=0 ) CALL read_error(2, 'gvr_cell_pct')
           ENDIF
-          IF ( getparam(MODNAME, 'mxsziter', 1, 'integer', Mxsziter)/=0 ) CALL read_error(2, 'mxsziter')
+          IF ( getparam(MODNAME, 'mxsziter', 1, 'integer', dmy(1))/=0 ) CALL read_error(2, 'mxsziter')
+          Mxsziter = dmy(1)
           IF ( getparam(MODNAME, 'gvr_cell_id', Nhrucell, 'integer', &
      &         Gvr_cell_id)/=0 ) CALL read_error(2, 'gvr_cell_id')
           IF ( Gvr_cell_id(1)==-1 ) THEN

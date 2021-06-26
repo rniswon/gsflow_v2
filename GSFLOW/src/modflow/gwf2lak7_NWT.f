@@ -4180,6 +4180,7 @@ C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
       INTEGER LAKE
+      DOUBLE PRECISION :: dmy(1)
 C     -------------------------------------------------------------------
 C
 C0----FILL A NEW VARIABLE CALLED MXLKVOLF CONTAINING THE MODSIM MAX LAKE STORAGE
@@ -4189,7 +4190,8 @@ C0----FILL A NEW VARIABLE CALLED MXLKVOLF CONTAINING THE MODSIM MAX LAKE STORAGE
 C
 C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
 C
-      CALL LAK2MODSIM(DELTAVOL,LAKEVOL, 0, -1) !,KITER,KSTP,KPER)
+      dmy(1) = 0.0D0
+      CALL LAK2MODSIM(DELTAVOL,LAKEVOL, dmy(1), -1) ! rsr, the 0 needs to be an array, values
 C
 C2------STUFF DELTAVOL WITH DEADPOOL INFORMATION CALCULATED BY MODFLOW
       DO LAKE=1, NLAKES
