@@ -21,12 +21,13 @@
 !***********************************************************************
       INTEGER FUNCTION potet_pt()
       USE PRMS_POTET_PT
+      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Swrad, Tminc, Tmaxc, &
      &    Tempc_dewpt, Vp_actual, Lwrad_net, Vp_slope, Basin_humidity, Humidity_percent
       USE PRMS_CLIMATE_HRU, ONLY: Humidity_hru
       USE PRMS_SOLTAB, ONLY: Soltab_potsw
-      USE PRMS_SET_TIME, ONLY: Nowmonth, Jday
+      USE PRMS_SET_TIME, ONLY: Jday
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, LOG, SNGL

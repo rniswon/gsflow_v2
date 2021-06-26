@@ -19,7 +19,7 @@
       USE PRMS_POTET_PAN
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Hru_pansta, Epan_coef
-      USE PRMS_SET_TIME, ONLY: Nowmonth
+      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_OBS, ONLY: Pan_evap
       IMPLICIT NONE
 ! Functions

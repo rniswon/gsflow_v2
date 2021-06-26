@@ -17,10 +17,11 @@
 
       INTEGER FUNCTION potet_hamon()
       USE PRMS_POTET_HAMON
+      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc
       USE PRMS_SOLTAB, ONLY: Soltab_sunhrs
-      USE PRMS_SET_TIME, ONLY: Nowmonth, Jday
+      USE PRMS_SET_TIME, ONLY: Jday
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, DBLE, SNGL
