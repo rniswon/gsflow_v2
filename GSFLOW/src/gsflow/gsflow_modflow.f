@@ -495,7 +495,9 @@ C7------SIMULATE EACH STRESS PERIOD.
 C
 C7C-----SIMULATE EACH TIME STEP.
 !gsf    DO 90 KSTP = 1, NSTP(KPER) ! maybe a problem, need loop for MFNWT and probably MODSIM
+        IF(AFR) THEN
           KSTP = KSTP + 1
+        ENDIF
           KKSTP = KSTP
           IF ( IUNIT(63).GT.0 )itreal = 0
 C
