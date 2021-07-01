@@ -2143,7 +2143,6 @@
       INTEGER :: j, k
       REAL :: frac, fracwt
 !***********************************************************************
-      Strm_seg_in = 0.0d0  !RGN likely want to move this 6/29/2021
       DO k = 1, Ncascade_hru
         j = Hru_down(k, Ihru)
         frac = Hru_down_frac(k, Ihru)
