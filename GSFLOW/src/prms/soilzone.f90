@@ -1154,13 +1154,13 @@
 
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE .OR. Iter_aet==ACTIVE ) THEN
-        IF ( Kkiter>1 .AND. (.NOT.AFR) ) THEN
+        IF ( Kkiter>1) THEN  
           Ssres_stor = It0_ssres_stor
           Slow_stor = It0_slow_stor
           IF ( GSFLOW_flag==ACTIVE ) Gravity_stor_res = It0_gravity_stor_res
           IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
           IF ( Nlake>0 ) Potet = It0_potet
-        ELSE
+        ELSE IF (AFR) THEN
           It0_ssres_stor = Ssres_stor
           It0_slow_stor = Slow_stor
           IF ( GSFLOW_flag==ACTIVE ) THEN
@@ -1172,14 +1172,14 @@
         ENDIF
       ENDIF
       IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
-        IF ( Kkiter>1 .AND. (.NOT.AFR) ) THEN
+        IF ( Kkiter>1) THEN  
           ! states saved in srunoff when PRMS_land_iteration_flag = ACTIVE
           Soil_rechr = It0_soil_rechr
           Soil_moist = It0_soil_moist
           ! computed in srunoff
           Sroff = It0_sroff
           IF ( Call_cascade==ACTIVE ) Strm_seg_in = It0_strm_seg_in
-        ELSE
+        ELSE  IF (AFR) THEN
           It0_soil_rechr = Soil_rechr
           It0_soil_moist = Soil_moist
           It0_sroff = Sroff
@@ -1187,10 +1187,10 @@
         ENDIF
       ENDIF
       IF ( GSFLOW_flag==ACTIVE ) Sm2gw_grav = 0.0
-      IF ( Kkiter>1 .AND. (.NOT.AFR) ) THEN
+      IF ( Kkiter>1) THEN   
         Basin_soil_moist = It0_basin_soil_moist
         Basin_ssstor = It0_basin_ssstor
-      ELSE
+      ELSE  IF (AFR) THEN
         It0_basin_soil_moist = Basin_soil_moist
         It0_basin_ssstor = Basin_ssstor
       ENDIF

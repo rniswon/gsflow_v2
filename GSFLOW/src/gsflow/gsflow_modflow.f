@@ -465,9 +465,6 @@ c     USE LMGMODULE
 !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 10=MODSIM-GSFLOW; 11=MODSIM-PRMS; 12=MODSIM-MODFLOW; 13=MODSIM)
 C
 C7------SIMULATE EACH STRESS PERIOD.
-      Strm_seg_in = 0.0d0  !RGN need to move this 6/29/2021
-      Cell_drain_rate = 0.0d0 !RGN need to move this 6/29/2021
-      Sm2gw_grav = 0.0d0 !RGN need to move this 6/29/2021
       IF ( Steady_state.EQ.1 ) THEN
         Kkper_new = 1
         Kper_mfo = 2

@@ -257,6 +257,7 @@
       ELSEIF ( Process_flag==SETDIMENS ) THEN
         Have_lakes = OFF ! set for modes when MODFLOW is not active
         Kkiter = 1 ! set for PRMS-only mode
+        AFR = .TRUE.
         Ag_package = OFF
         Canopy_iter = 1
         Soilzone_add_water_use = OFF
