@@ -24,7 +24,7 @@
       character(len=*), parameter :: GSFLOW_versn = '2.4.0 06/22/2021'
       character(len=*), parameter :: PRMS_versn = '2021-06-22'
       character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 06/22/2021'
-      character(len=*), parameter :: Version_read_control_file = '2021-06-10'
+      character(len=*), parameter :: Version_read_control_file = '2021-07-13'
       character(len=*), parameter :: Version_read_parameter_file = '2021-06-10'
       character(len=*), parameter :: Version_read_data_file = '2021-06-10'
       CHARACTER(LEN=8), SAVE :: Process, Arg
