@@ -866,7 +866,7 @@
       Strmflow_module = 'strmflow'
       IF ( control_string(Strmflow_module, 'strmflow_module')/=0 ) CALL read_error(5, 'strmflow_module')
       Irrigation_area_module = ' '
-      IF ( control_string(irrigation_area_module, 'irrigation_area_module')/=0 ) CALL read_error(5, 'irrigation_area_module')
+      IF ( control_string(Irrigation_area_module, 'irrigation_area_module')/=0 ) CALL read_error(5, 'irrigation_area_module')
       IF ( control_string(AET_module, 'AET_module')/=0 ) CALL read_error(5, 'AET_module')
       IF ( control_string(PET_ag_module, 'PET_ag_module')/=0 ) CALL read_error(5, 'PET_ag_module')
       IF ( Irrigation_area_module(:11)=='climate_hru' ) Climate_irrigated_area_flag = ACTIVE
