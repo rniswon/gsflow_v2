@@ -4129,7 +4129,7 @@ C-----LOOP OVER REACHES AND OVERRIDE LAKE RELEASES IF WATER LIMITED
           IF (IDIVAR(1,M).LT.0) THEN
             LAK_ID = ABS(IDIVAR(1,M))
             ! The following bit of code added to handle stress period 54
-            IF (VOL(LAK_ID).GT.MXLKVOLF(LAK_ID).AND.
+            IF (VOL(LAK_ID).GT.(MXLKVOLF(LAK_ID)+1.0).AND.
      &          .NOT.MXLKVOLF(LAK_ID).LT.0.0) THEN
               Diversions(M) = (VOL(LAK_ID) - MXLKVOLF(LAK_ID)) / DELT
             !INODE = IDIV(LAKE,IDV)
