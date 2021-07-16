@@ -570,7 +570,7 @@
         Hru_lateral_flow(i) = DBLE( Gwres_flow(i) + Sroff(i) + Ssres_flow(i) )
         ! Cfs_conv converts acre-inches per timestep to cfs
         Hru_streamflow_out(i) = gwarea*Cfs_conv*Hru_lateral_flow(i)
-        Hru_storage(i) = Hru_storage(i)
+        Hru_storage(i) = Hru_storage(i) + Gwres_stor(i)
       ENDDO
 
       Basin_gwflow = Basin_gwflow*Basin_area_inv
