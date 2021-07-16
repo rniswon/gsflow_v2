@@ -1,6 +1,33 @@
+====================================================================
+Using PRMS Parameter File: ..\input\prms\gsflow.params
+Description: Sagehen Parameter File with 128 HRUs, 201 reaches, segments, cascading flow
+====================================================================
+Comment lines:
+Version: 1.7
+====================================================================
+Using dimensions    number
+nrain                  2
+ncascade             317
+nsegment              15
+ntemp                  2
+ngw                  128
+ncascdgw             317
+nreach               201
+nobs                   1
+nhru                 128
+nssr                 128
+ngwcell             5913
+nhrucell            4691
+ndepl                  2
+ndeplval              22
+nsub                   2
+one                    1
+nmonths               12
+ndays                366
+====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 01/28/2021
+                       Version 5.3.0 06/22/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,30 +63,63 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-01-28
-Basin Definition                basin               2020-12-22
-Cascading Flow                  cascade             2020-12-02
-Common States and Fluxes        climateflow         2021-02-05
-Potential Solar Radiation       soltab              2020-12-02
-Timestep Control                prms_time           2020-12-02
-Time Series Data                obs                 2020-12-02
+PRMS Computation Order          gsflow_prms         2021-06-22
+Read Control File               read_control_file   2021-07-14
+Read Parameter File             read_parameter_file 2021-06-10
+
+
+====================================================================
+Using PRMS Data File: ..\input\prms\sagehen.data
+Title: Sagehen Data File: Independence Lake and Sagehen Creek data staions
+====================================================================
+Comment lines:
+// tmax stations are:
+//   INDEPENDENCE LAKE
+//   SAGEHEN CREEK
+// tmin stations are:
+//   INDEPENDENCE LAKE
+//   SAGEHEN CREEK
+// precip stations are:
+//   INDEPENDENCE LAKE
+//   SAGEHEN CREEK
+// runoff value is:
+//   10343500 	SAGEHEN C NR TRUCKEE C
+====================================================================
+measured variables
+tmax 2
+tmin 2
+precip 2
+runoff 1
+====================================================================
+ Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
+Simulation time period: 1980/10/01 00:00:00 to 1996/09/30 00:00:00
+====================================================================
+Basin Definition                basin               2021-06-21
+Cascading Flow                  cascade             2021-05-06
+Common States and Fluxes        climateflow         2021-05-24
+Potential Solar Radiation       soltab              2021-05-06
+Time Series Data                obs                 2021-05-06
+Timestep Control                prms_time           2021-05-25
 Temperature Distribution        temp_1sta           2020-12-02
 Precipitation Distribution      precip_1sta         2020-12-02
 Solar Radiation Distribution    ddsolrad            2020-12-02
 Transpiration Distribution      transp_tindex       2020-12-02
 Potential Evapotranspiration    potet_jh            2020-08-03
-Canopy Interception             intcp               2020-12-03
+Canopy Interception             intcp               2021-05-06
 Snow Dynamics                   snowcomp            2021-01-11
-Surface Runoff                  srunoff_smidx       2021-02-03
-Soilzone Computations           soilzone            2021-02-05
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-01-08
-GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-01-14
-GSFLOW Output Budget Summary    gsflow_budget       2021-01-12
-GSFLOW Output CSV Summary       gsflow_sum          2020-12-02
-Output Summary                  subbasin            2020-12-02
+Surface Runoff                  srunoff_smidx       2021-05-27
+Soilzone Computations           soilzone            2021-07-13
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-05-07
+GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-06-10
+GSFLOW Output Budget Summary    gsflow_budget       2021-05-07
+GSFLOW Output CSV Summary       gsflow_sum          2021-06-08
+Output Summary                  subbasin            2021-05-06
+Output Summary                  nhru_summary        2021-05-06
+Output Summary                  basin_summary       2021-05-10
+Output Summary                  nsegment_summary    2021-05-06
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2021-02-04
-UZF-NWT Package                 gwf2uzf1_NWT        2020-12-28
+GSFLOW MODFLOW main             gsflow_modflow      2021-06-22
+UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
 SFR-NWT Package                 gwf2sfr7_NWT        2020-09-30
 
 Using Control File: .\gsflow.control
@@ -75,5 +135,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time   15 minutes 44.71 seconds
+Execution elapsed time   18 minutes 35.70 seconds
 

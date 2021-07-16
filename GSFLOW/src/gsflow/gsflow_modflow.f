@@ -1,64 +1,6 @@
 !***********************************************************************
 !     GSFLOW module that replaces MF_NWT.f
 !***********************************************************************
-      MODULE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE, OFF,
-     +    MODFLOW, GSFLOW, ERROR_modflow, ERROR_time, MAXFILE_LENGTH,
-     +    READ_INIT
-      USE PRMS_MODULE, ONLY: Print_debug, Model, GSFLOW_flag
-      IMPLICIT NONE
-!   Local Variables
-      character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
-      character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-06-22'
-      character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
-      character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
-      character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
-      character(len=*), parameter :: MODDESC_AG =  'AG-NWT Package'
-      character(len=*), parameter :: MODNAME_UZF = 'gwf2uzf1_NWT'
-      character(len=*), parameter :: MODNAME_SFR = 'gwf2sfr7_NWT'
-      character(len=*), parameter :: MODNAME_LAK = 'gwf2lak7_NWT'
-      character(len=*), parameter :: MODNAME_AG =  'gwf2ag1_NWT_ponds'
-      character(len=*), parameter :: Version_uzf = '2021-03-02'
-      character(len=*), parameter :: Version_sfr = '2020-09-30'
-      character(len=*), parameter :: Version_lak = '2020-09-30'
-      character(len=*), parameter :: Version_ag =  '2021-06-21'
-      INTEGER, PARAMETER :: ITDIM = 80
-      INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
-      INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS, KPERSTART
-      INTEGER, SAVE :: AGCONVERGE
-      INTEGER, SAVE :: KSTP, KKSTP, IERR, Max_iters, Itreal
-      INTEGER, SAVE :: Mfiter_cnt(ITDIM), Iter_cnt(ITDIM), Iterations
-      INTEGER, SAVE :: Szcheck, Sziters, INUNIT, KPER, NCVGERR
-      INTEGER, SAVE :: Max_sziters, Maxgziter
-      INTEGER, SAVE, ALLOCATABLE :: Gwc_col(:), Gwc_row(:)
-      REAL, SAVE :: Delt_save
-      INTEGER, SAVE, ALLOCATABLE :: Stress_dates(:)
-      INTEGER, SAVE :: Modflow_skip_stress, Kkper_new, 
-     +                 Modflow_skip_time_step
-      REAL, SAVE :: Modflow_time_in_stress, Modflow_skip_time
-      DOUBLE PRECISION, SAVE :: Mft_to_sec, Totalarea_mf
-      DOUBLE PRECISION, SAVE :: Mfl2_to_acre, Mfl3_to_ft3, Sfr_conv
-      DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs
-      REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t
-      REAL, SAVE :: MFQ_to_inch_acres
-      DOUBLE PRECISION, SAVE :: mfstrt_jul  !RGN to get MF to stop at End_time for MODFLOW only
-      REAL, SAVE, ALLOCATABLE :: Mfq2inch_conv(:), Cellarea(:)
-      REAL, SAVE, ALLOCATABLE :: Gvr2cell_conv(:), Mfvol2inch_conv(:)
-      INTEGER, SAVE :: Stopcount
-C-------ASSIGN VERSION NUMBER AND DATE
-      CHARACTER*40 VERSION,VERSION2,VERSION3
-      CHARACTER*10 MFVNAM
-      PARAMETER (VERSION='1.2.0 03/01/2020')
-      PARAMETER (VERSION2='1.12.0 02/03/2017')
-      PARAMETER (VERSION3='1.04.0 09/15/2016')
-      PARAMETER (MFVNAM='-NWT-SWR1')
-      INTEGER, SAVE :: IBDT(8)
-!   Control Parameters
-      INTEGER, SAVE :: Modflow_time_zero(6)
-      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
-      END MODULE GSFMODFLOW
-
 C     ******************************************************************
 C     MAIN CODE FOR U.S. GEOLOGICAL SURVEY MODULAR MODEL -- MODFLOW-NWT
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
@@ -93,9 +35,8 @@ C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
-      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell
       IMPLICIT NONE
 !***********************************************************************
       gsfdecl = 0
@@ -132,8 +73,6 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: MODFLOW, GSFLOW, ACTIVE, OFF,
-     &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
      &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package
 C1------USE package modules.
@@ -478,8 +417,6 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
-     &    ERROR_time
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
      &    Init_vars_from_file, Mxsziter, Glacier_flag,
      &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday
@@ -508,7 +445,6 @@ c     USE LMGMODULE
 ! Local Variables
       INTEGER :: retval, II, KITER, IBDRET, iss
       INTEGER :: IC1, IC2, IR1, IR2, IL1, IL2, IDIR, iprt, gsflag
-      INTEGER :: ITREAL2
       REAL :: BUDPERC
 !***********************************************************************
       gsfrun = 0
@@ -1048,9 +984,8 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, DEBUG_less, MODFLOW
-      USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file, GSFLOW_flag,
-     &    Print_debug, Model
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
+      USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
       USE GWFNWTMODULE, ONLY:LINMETH
       IMPLICIT NONE
@@ -1425,10 +1360,11 @@ C
 !     DETERMINE THE STRESS PERIOD FOR THE CURRENT TIMESTEP
 !     ******************************************************************
       INTEGER FUNCTION GET_KPER()
+      USE PRMS_CONSTANTS, ONLY: MODFLOW
       USE GLOBAL, ONLY: NPER
       USE GSFMODFLOW, ONLY: Stress_dates, KPER
       USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day,
-     1    Nowyear, Nowmonth, Nowday
+     1    Nowyear, Nowmonth, Nowday, Model, mf_nowtime
       IMPLICIT NONE
       INTRINSIC DBLE
       INTEGER, EXTERNAL :: compute_julday
@@ -1436,7 +1372,11 @@ C
       INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
-      now = compute_julday(Nowyear, Nowmonth, Nowday)
+      IF ( Model==MODFLOW ) THEN
+        now = mf_nowtime
+      ELSE
+        now = compute_julday(Nowyear, Nowmonth, Nowday)
+      ENDIF
       KPERTEST = 1
       IF ( KPER > KPERTEST ) KPERTEST = KPER
 !

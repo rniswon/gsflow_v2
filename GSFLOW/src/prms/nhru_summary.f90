@@ -124,7 +124,7 @@
       INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam
       EXTERNAL read_error, PRMS_open_output_file, find_header_end, find_current_file_time
 ! Local Variables
-      INTEGER :: ios, ierr, size, dim, jj, j
+      INTEGER :: ios, ierr, size, jj, j
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
 !***********************************************************************
       Begin_results = ACTIVE
@@ -169,7 +169,7 @@
       ierr = 0
       DO jj = 1, NhruOutVars
         Nc_vars(jj) = numchars(NhruOutVar_names(jj))
-        Nhru_var_type(jj) = getvartype(NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru_var_type(jj) )
+        Nhru_var_type(jj) = getvartype(NhruOutVar_names(jj)(:Nc_vars(jj)))
         IF ( Nhru_var_type(jj)==DBLE_TYPE ) Double_vars = ACTIVE
         IF ( Nhru_var_type(jj)==INT_TYPE ) Integer_vars = ACTIVE
         IF ( Nhru_var_type(jj)/=REAL_TYPE .AND. Nhru_var_type(jj)/=DBLE_TYPE .AND. Nhru_var_type(jj)/=INT_TYPE ) THEN
@@ -177,7 +177,7 @@
           PRINT *, '       only integer, real or double variables allowed'
           ierr = 1
         ENDIF
-        size = getvarsize(NhruOutVar_names(jj)(:Nc_vars(jj)), dim )
+        size = getvarsize(NhruOutVar_names(jj)(:Nc_vars(jj)))
         IF ( size/=Nhru ) THEN
           PRINT *, 'ERROR, invalid nhru_summary variable:', NhruOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only variables dimensioned by nhru, nssr, or ngw allowed'
@@ -314,8 +314,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: SNGL, DBLE
-      INTEGER, EXTERNAL :: getvar
-      EXTERNAL :: read_error
+      EXTERNAL read_error, getvar_real, getvar_dble, getvar_int
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day, write_date
 !***********************************************************************
@@ -331,18 +330,15 @@
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NhruOutVars
         IF ( Nhru_var_type(jj)==REAL_TYPE ) THEN
-          IF ( getvar(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'real', Nhru_var_daily(1, jj))/=0 ) &
-     &         CALL read_error(4, NhruOutVar_names(jj)(:Nc_vars(jj)))
+          CALL getvar_real(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_daily(1, jj))
         ELSEIF ( Nhru_var_type(jj)==DBLE_TYPE ) THEN
-          IF ( getvar(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'double', Nhru_var_dble(1, jj))/=0 ) &
-     &         CALL read_error(4, NhruOutVar_names(jj)(:Nc_vars(jj)))
+          CALL getvar_dble(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_dble(1, jj))
           DO j = 1, Active_hrus
             i = Hru_route_order(j)
             Nhru_var_daily(i, jj) = SNGL( Nhru_var_dble(i, jj) )
           ENDDO
         ELSEIF ( Nhru_var_type(jj)==INT_TYPE ) THEN
-          IF ( getvar(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'integer', Nhru_var_int(1, jj))/=0 ) &
-     &         CALL read_error(4, NhruOutVar_names(jj)(:Nc_vars(jj)))
+          CALL getvar_int(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_int(1, jj))
           IF ( NhruOut_freq>DAILY ) THEN
             DO j = 1, Active_hrus
               i = Hru_route_order(j)

@@ -10,6 +10,7 @@ LIBS 		= -L$(LIBDIR) -lmfnwt -lprms -lmmf $(FLIBS)
 ###################################################
 
 MODOBJS =	\
+		gsflow_module.o \
 		gsflow_prms.o \
 		gsflow_modflow.o \
 		gsflow_prms2mf.o \
@@ -155,6 +156,9 @@ gsfprms2mf.mod: gsflow_prms2mf.o
 gsfmf2prms.mod: gsflow_mf2prms.o
 gsfmodflow.mod: gsflow_modflow.o
 prms_module.mod: gsflow_prms.o
+
+gsflow_module.o: gsflow_module.f90
+	$(FC) -c $(FFLAGS) gsflow_module.f90
 
 gsflow_prms2mf.o: gsflow_prms2mf.f90 prms_module.mod prms_constants.mod gwfuzfmodule.mod gwfsfrmodule.mod gwflakmodule.mod gsfmodflow.mod prms_basin.mod prms_soilzone.mod global.mod prms_climatevars.mod prms_flowvars.mod prms_srunoff.mod gwfagmodule.mod prms_water_use.mod
 	$(FC) -c $(FFLAGS) gsflow_prms2mf.f90

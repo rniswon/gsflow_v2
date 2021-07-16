@@ -49,9 +49,9 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam, control_integer, getparam, control_string, declvar
+      INTEGER, EXTERNAL :: declparam, control_integer, getparam, control_string
       EXTERNAL :: read_error, precip_form, temp_set, find_header_end, find_current_time
-      EXTERNAL :: read_cbh_date, check_cbh_value, check_cbh_intvalue, print_module
+      EXTERNAL :: read_cbh_date, check_cbh_value, check_cbh_intvalue, print_module, declvar_dble, declvar_real
 ! Local Variables
       INTEGER :: yr, mo, dy, i, hr, mn, sec, jj, ierr, istop, missing, ios
       DOUBLE PRECISION :: sum_obs
@@ -369,60 +369,60 @@
 
         IF ( Humidity_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Humidity_hru(Nhru) )
-          IF ( declvar(MODNAME, 'humidity_hru', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'humidity_hru', 'nhru', Nhru, &
      &         'Relative humidity of each HRU', &
-     &         'percentage', Humidity_hru)/=0 ) CALL read_error(3, 'humidity_hru')
+     &         'percentage', Humidity_hru)
         ENDIF
         IF ( Albedo_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Albedo_hru(Nhru) )
-          IF ( declvar(MODNAME, 'albedo_hru', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'albedo_hru', 'nhru', Nhru, &
      &         'Snowpack albedo of each HRU', &
-     &         'decimal fraction', Albedo_hru)/=0 ) CALL read_error(3, 'albedo_hru')
+     &         'decimal fraction', Albedo_hru)
         ENDIF
         IF ( Cloud_cover_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Cloud_cover_cbh(Nhru) )
-          IF ( declvar(MODNAME, 'cloud_cover_cbh', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'cloud_cover_cbh', 'nhru', Nhru, &
      &         'Cloud_cover of each HRU read from CBH File', &
-     &         'decimal fraction', Cloud_cover_cbh)/=0 ) CALL read_error(3, 'cloud_cover_cbh')
+     &         'decimal fraction', Cloud_cover_cbh)
         ENDIF
         IF ( Windspeed_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-          IF ( declvar(MODNAME, 'basin_windspeed', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'basin_windspeed', 'one', 1, &
      &         'Basin area-weighted average wind speed', &
-     &         'meters/second', Basin_windspeed)/=0 ) CALL read_error(3, 'basin_windspeed')
+     &         'meters/second', Basin_windspeed)
           ALLOCATE ( Windspeed_hru(Nhru) )
-          IF ( declvar(MODNAME, 'windspeed_hru', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'windspeed_hru', 'nhru', Nhru, &
      &         'Wind speed for each HRU', &
-     &         'meters/second', Windspeed_hru)/=0 ) CALL read_error(3, 'windspeed_hru')
+     &         'meters/second', Windspeed_hru)
         ENDIF
 
         IF ( AET_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-          IF ( declvar(MODNAME, 'basin_aet_external', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'basin_aet_external', 'one', 1, &
      &         'Basin area-weighted average PET read from CBH File', &
-     &         'inches', Basin_aet_external)/=0 ) CALL read_error(3, 'basin_aet_external')
+     &         'inches', Basin_aet_external)
           ALLOCATE ( AET_external(Nhru) )
-          IF ( declvar(MODNAME, 'AET_external', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'AET_external', 'nhru', Nhru, &
      &         'Actual evapotranspiration for each HRU that is read from a CBH File', &
-     &         'inches', AET_external)/=0 ) CALL read_error(3, 'AET_external')
+     &         'inches', AET_external)
         ENDIF
 
         IF ( PET_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-          IF ( declvar(MODNAME, 'basin_pet_external', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'basin_pet_external', 'one', 1, &
      &         'Basin area-weighted average PET read from CBH File', &
-     &         'inches', Basin_pet_external)/=0 ) CALL read_error(3, 'basin_pet_external')
+     &         'inches', Basin_pet_external)
           ALLOCATE ( PET_external(Nhru) )
-          IF ( declvar(MODNAME, 'PET_external', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'PET_external', 'nhru', Nhru, &
      &         'Potential evapotranspiration for each HRU that is read from a CBH File', &
-     &         'inches', PET_external)/=0 ) CALL read_error(3, 'PET_external')
+     &         'inches', PET_external)
         ENDIF
 
         IF ( Climate_irrigated_area_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-          IF ( declvar(MODNAME, 'basin_irrigated_area', 'one', 1, 'double', &
+          CALL declvar_dble(MODNAME, 'basin_irrigated_area', 'one', 1, &
      &         'Basin area-weighted average irrigation area read from CBH File', &
-     &         'acres', Basin_irrigated_area)/=0 ) CALL read_error(3, 'basin_irrigated_area')
+     &         'acres', Basin_irrigated_area)
           ALLOCATE ( Irrigated_area(Nhru) )
-          IF ( declvar(MODNAME, 'irrigated_area', 'nhru', Nhru, 'real', &
+          CALL declvar_real(MODNAME, 'irrigated_area', 'nhru', Nhru, &
      &         'Irrigated area for each HRU that is read from a CBH File', &
-     &         'acres', Irrigated_area)/=0 ) CALL read_error(3, 'irrigated_area')
+     &         'acres', Irrigated_area)
         ENDIF
 
 !   Declared Parameters

@@ -62,47 +62,47 @@
       USE GSFPRMS2MF
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Nsegment, Model
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: declparam, declvar
-      EXTERNAL read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL read_error, print_module, declvar_dble, declvar_real !, declvar_int
 !***********************************************************************
       prms2mfdecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_gsflow_prms2mf)
 
 ! Declared Variables
-      IF ( declvar(MODNAME, 'net_sz2gw', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'net_sz2gw', 'one', 1, &
      &     'Net volumetric flow rate of gravity drainage from the soil zone to the unsaturated and saturated zones', &
-     &     'L3/T', Net_sz2gw)/=0 ) CALL read_error(3, 'net_sz2gw')
+     &     'L3/T', Net_sz2gw)
 
-!     ALLOCATE (Reach_latflow(Nreach))
-!     IF ( decl var(MODNAME, 'reach_latflow', 'nreach', Nreach, 'double', &
-!    &     'Lateral flow (surface runoff and interflow) into each stream reach', &
-!    &     'cfs', Reach_latflow)/=0 ) CALL read_error(3, 'reach_latflow')
+!      ALLOCATE (Reach_latflow(Nreach))
+!      CALL declvar_dble(MODNAME, 'reach_latflow', 'nreach', Nreach, &
+!     &     'Lateral flow (surface runoff and interflow) into each stream reach', &
+!     &     'cfs', Reach_latflow)
 
-!     ALLOCATE (Reach_id(Nreach, Nsegment))
-!     IF ( decl var(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, 'integer', &
-!    &     'Mapping of reach id by segment id', &
-!    &     'none', Reach_id)/=0 ) CALL read_error(3, 'reach_id')
+!      ALLOCATE (Reach_id(Nreach, Nsegment))
+!      CALL declvar_int(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, &
+!     &     'Mapping of reach id by segment id', &
+!     &     'none', Reach_id)
 
       ALLOCATE (Cell_drain_rate(Ngwcell))
-      IF ( declvar(MODNAME, 'cell_drain_rate', 'ngwcell', Ngwcell, 'real', &
+      CALL declvar_real(MODNAME, 'cell_drain_rate', 'ngwcell', Ngwcell, &
      &     'Recharge rate for each cell', &
-     &     'L/T', Cell_drain_rate)/=0 ) CALL read_error(3, 'cell_drain_rate')
+     &     'L/T', Cell_drain_rate)
 
-      IF ( declvar(MODNAME, 'basin_reach_latflow', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_reach_latflow', 'one', 1, &
      &     'Lateral flow into all reaches in basin', &
-     &     'cfs', Basin_reach_latflow)/=0 ) CALL read_error(3, 'basin_reach_latflow')
+     &     'cfs', Basin_reach_latflow)
 
       ALLOCATE (Gw_rejected_grav(Nhrucell))
-      IF ( declvar(MODNAME, 'gw_rejected_grav', 'nhrucell', Nhrucell, 'real', &
+      CALL declvar_real(MODNAME, 'gw_rejected_grav', 'nhrucell', Nhrucell, &
      &   'Recharge rejected by UZF for each gravity-flow reservoir', &
-     &   'inches', Gw_rejected_grav)/=0 ) CALL read_error(3, 'gw_rejected_grav')
+     &   'inches', Gw_rejected_grav)
 
       !rsr, all reaches receive same precentage of flow to each segment
       ALLOCATE (Segment_pct_area(Nsegment))
-!      IF ( declvar(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, 'double', &
+!      CALL declvar_dble(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, &
 !     &     'Proportion of each segment that contributes flow to a stream reach', &
-!     &     'decimal fraction', Segment_pct_area)/=0 ) CALL read_error(3, 'segment_pct_area')
+!     &     'decimal fraction', Segment_pct_area)
 
       ! Allocate local arrays
       ALLOCATE ( Excess(Ngwcell) )

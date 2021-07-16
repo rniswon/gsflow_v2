@@ -1,6 +1,26 @@
+====================================================================
+Using PRMS Parameter File: ./input/params
+Description: ACF coarse-resolution model 2/2/2011
+====================================================================
+Comment lines:
+Flow substitution applied
+====================================================================
+Using dimensions    number
+nmonths               12
+nssr                  27
+ndays                366
+nsegment              12
+one                    1
+ndepl                  2
+nobs                   6
+ndeplval              22
+nhru                  27
+ngw                   27
+npoigages              6
+====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 01/28/2021
+                       Version 5.3.0 06/22/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,28 +56,56 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-01-28
-Basin Definition                basin               2020-12-22
-Common States and Fluxes        climateflow         2021-02-05
-Potential Solar Radiation       soltab              2020-12-02
-Timestep Control                prms_time           2020-12-02
-Time Series Data                obs                 2020-12-02
-Time Series Data                dynamic_param_read  2021-01-20
-Temperature Distribution        climate_hru         2021-01-08
-Precipitation Distribution      climate_hru         2021-01-08
-Solar Radiation Distribution    climate_hru         2021-01-08
-Potential Evapotranspiration    climate_hru         2021-01-08
+PRMS Computation Order          gsflow_prms         2021-06-22
+Read Control File               read_control_file   2021-07-14
+Read Parameter File             read_parameter_file 2021-06-10
+
+
+====================================================================
+Using PRMS Data File: ./input/data
+Title: Written by class gov.usgs.trinli.ft.point.writer.PrmsWriter
+====================================================================
+Comment lines:
+////////////////////////////////////////////////////////////
+// Station metadata (listed in the same order as the data):
+// ID				Type	Latitude	Longitude	Elevation
+// 02330450			runoff	34.7008		-83.7289		427.9514
+// 02331600			runoff	34.5407		-83.6228		343.976
+// 02333500			runoff	34.5281		-83.9397		343.9973
+// 02334430			runoff	34.1569		-84.0789		278.0081
+// 02334885			runoff	34.0323		-84.0894		277.3375
+// 02335000			runoff	33.9972		-84.2019		267.6754
+////////////////////////////////////////////////////////////
+// Unit: runoff = ft3 per sec, elevation = meters
+////////////////////////////////////////////////////////////
+====================================================================
+measured variables
+runoff 6
+====================================================================
+ Data File time period: 1950/01/01 00:00:00 to 1999/12/31 00:00:00
+Simulation time period: 1980/01/01 00:00:00 to 1999/12/31 00:00:00
+====================================================================
+Basin Definition                basin               2021-07-17
+Common States and Fluxes        climateflow         2021-05-24
+Potential Solar Radiation       soltab              2021-05-06
+Time Series Data                obs                 2021-05-06
+Timestep Control                prms_time           2021-05-25
+Time Series Data                dynamic_param_read  2021-05-10
+Temperature Distribution        climate_hru         2021-05-27
+Precipitation Distribution      climate_hru         2021-05-27
+Solar Radiation Distribution    climate_hru         2021-05-27
+Potential Evapotranspiration    climate_hru         2021-05-27
 Transpiration Distribution      transp_tindex       2020-12-02
-Canopy Interception             intcp               2020-12-03
+Canopy Interception             intcp               2021-05-06
 Snow Dynamics                   snowcomp            2021-01-11
-Surface Runoff                  srunoff_smidx       2021-02-03
-Soilzone Computations           soilzone            2021-02-05
-Groundwater                     gwflow              2020-12-02
-Streamflow Routing Init         routing             2020-12-02
+Surface Runoff                  srunoff_smidx       2021-05-27
+Soilzone Computations           soilzone            2021-07-17
+Groundwater                     gwflow              2021-07-17
+Streamflow Routing Init         routing             2021-05-06
 Streamflow Routing              muskingum           2020-12-02
-Output Summary                  basin_sum           2020-12-02
-Output Summary                  nhru_summary        2020-12-02
-Output Summary                  prms_summary        2020-12-02
+Output Summary                  basin_sum           2021-05-06
+Output Summary                  nhru_summary        2021-05-06
+Output Summary                  prms_summary        2021-05-06
 ==============================================================
 
 Using Control File: .\control\control
@@ -82,26 +130,26 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
  initial                              31.824
    1980             50.492   20.614   14.833   46.869   -8.693
    1981             36.476   24.842    6.166   20.301   -6.454
-   1982             53.278   23.751    8.130   27.564    1.270
-   1983             58.857   24.024    8.746   34.217    2.090
-   1984             68.655   24.052    8.958   44.390    2.016
-   1985             47.006   25.716    8.467   21.781    1.000
-   1986             33.959   23.836    5.470   13.120    0.790
-   1987             55.549   23.340    5.827   31.852    1.274
-   1988             43.376   21.421    7.545   20.237    0.772
-   1989             64.192   23.192   15.292   33.253    1.682
-   1990             57.834   22.970    8.847   41.309    2.017
-   1991             62.933   24.460   10.193   37.127    1.979
-   1992             55.188   20.022   12.007   33.353    1.587
-   1993             60.054   19.307    5.494   47.259    2.159
+   1982             53.278   23.751    8.130   27.563    1.270
+   1983             58.857   24.024    8.746   34.218    2.090
+   1984             68.655   24.052    8.959   44.390    2.016
+   1985             47.006   25.716    8.467   21.782    1.000
+   1986             33.959   23.836    5.468   13.122    0.790
+   1987             55.549   23.340    5.827   31.850    1.274
+   1988             43.376   21.421    7.541   20.240    0.772
+   1989             64.192   23.192   15.292   33.249    1.682
+   1990             57.834   22.970    8.848   41.308    2.017
+   1991             62.933   24.460   10.193   37.128    1.979
+   1992             55.188   20.022   12.004   33.355    1.587
+   1993             60.054   19.307    5.494   47.257    2.159
    1994             63.330   18.327   11.051   39.444    1.640
    1995             53.742   20.538    8.240   36.015    1.522
-   1996             68.484   18.458    9.520   48.747    1.877
-   1997             55.724   19.088    9.749   36.408    1.762
-   1998             63.457   18.715    6.481   48.009    1.816
+   1996             68.484   18.458    9.521   48.745    1.877
+   1997             55.724   19.088    9.749   36.409    1.762
+   1998             63.457   18.715    6.481   48.008    1.816
    1999             45.071   20.064    5.762   25.726    1.094
  *************************************************************
  Total for run    1110.775  440.221    8.439  693.939   13.445
  *************************************************************
-Execution elapsed time    0 minutes  3.08 seconds
+Execution elapsed time    0 minutes  2.00 seconds
 
