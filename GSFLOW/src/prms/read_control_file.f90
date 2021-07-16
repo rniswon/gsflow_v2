@@ -19,7 +19,7 @@
      &      Csv_output_file, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, &
      &      mappingFileName, xyFileName, Irrigation_area_module, AET_module, PET_ag_module, soilzone_aet_flag, &
      &      Albedo_cbh_flag, Cloud_cover_cbh_flag, Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
-     &      Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag
+     &      Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use
         USE GSFMODFLOW, ONLY: Modflow_name, Modflow_time_zero
         USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, &
      &      Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, AET_cbh_file, PET_cbh_file
@@ -179,6 +179,12 @@
       i = i + 1
       Control_parameter_data(i)%name = 'dprst_flag'
       Dprst_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'dprst_add_water_use'
+      Dprst_add_water_use = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'dprst_transfer_water_use'
+      Dprst_transfer_water_use = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'cascade_flag'
       Cascade_flag = ACTIVE

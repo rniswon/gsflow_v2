@@ -440,7 +440,7 @@
         ENDIF
       ENDIF
 
-      IF ( PRMS_land_iteration_flag==OFF ) THEN
+      IF ( PRMS_land_iteration_flag==OFF .OR. PRMS_only==ACTIVE) THEN
         ierr = intcp()
         IF ( ierr/=0 ) CALL module_error('intcp', Arg, ierr)
 
@@ -1673,7 +1673,7 @@
       END SUBROUTINE gsflow_prmsSettings
 
 !***********************************************************************
-!     call_modules_restart - write or read restart file
+!     gsflow_prms_restart - write or read restart file
 !***********************************************************************
       SUBROUTINE gsflow_prms_restart(In_out)
       USE PRMS_MODULE

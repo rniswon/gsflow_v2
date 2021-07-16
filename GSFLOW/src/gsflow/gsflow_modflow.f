@@ -21,9 +21,8 @@ C     ******************************************************************
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
-      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell
       IMPLICIT NONE
 !***********************************************************************
       gsfdecl = 0
@@ -61,8 +60,6 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: MODFLOW, GSFLOW, ACTIVE, OFF,
-     &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
      &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package
 C1------USE package modules.
@@ -435,9 +432,6 @@ C1------USE package modules.
 c     USE LMGMODULE
       USE SIPMODULE
       USE DE4MODULE
-      USE PRMS_SRUNOFF, ONLY: Strm_seg_in   !RGN need to move this 6/29/2021
-      USE GSFPRMS2MF, ONLY: Cell_drain_rate !RGN need to move this 6/29/2021
-      USE PRMS_SOILZONE, ONLY: Sm2gw_grav   !RGN need to move this 6/29/2021
 !gsf  USE GMGMODULE
 !      USE GWFNWTMODULE, ONLY:ITREAL, ICNVGFLG  !ITREAL removed from NWT module and added to PRMS_MODULE
 !      USE GWFNWTMODULE, ONLY:ICNVGFLG
@@ -1088,9 +1082,8 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, DEBUG_less, MODFLOW
-      USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file, GSFLOW_flag,
-     &    Print_debug, Model
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
+      USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
       USE GWFNWTMODULE, ONLY:LINMETH
       IMPLICIT NONE
@@ -1543,10 +1536,11 @@ C
 !     DETERMINE THE STRESS PERIOD FOR THE CURRENT TIMESTEP
 !     ******************************************************************
       INTEGER FUNCTION GET_KPER()
+      USE PRMS_CONSTANTS, ONLY: MODFLOW
       USE GLOBAL, ONLY: NPER
       USE GSFMODFLOW, ONLY: Stress_dates, KPER
       USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day,
-     1    Nowyear, Nowmonth, Nowday
+     1    Nowyear, Nowmonth, Nowday, Model, mf_nowtime
       IMPLICIT NONE
       INTRINSIC DBLE
       INTEGER, EXTERNAL :: compute_julday
@@ -1554,7 +1548,11 @@ C
       INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
-      now = compute_julday(Nowyear, Nowmonth, Nowday)
+      IF ( Model==MODFLOW ) THEN
+        now = mf_nowtime
+      ELSE
+        now = compute_julday(Nowyear, Nowmonth, Nowday)
+      ENDIF
       KPERTEST = 1
       IF ( KPER > KPERTEST ) KPERTEST = KPER
 !

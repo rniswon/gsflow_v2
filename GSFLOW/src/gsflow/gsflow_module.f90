@@ -121,7 +121,7 @@
       INTEGER, SAVE :: KSTP, KKSTP, IERR, Max_iters, Itreal
       INTEGER, SAVE :: Mfiter_cnt(ITDIM), Iter_cnt(ITDIM), Iterations
       INTEGER, SAVE :: Szcheck, Sziters, INUNIT, KPER, NCVGERR
-      INTEGER, SAVE :: Max_sziters, Maxgziter, ITREAL2
+      INTEGER, SAVE :: Max_sziters, Maxgziter, ITREAL2, mf_julday
       INTEGER, SAVE, ALLOCATABLE :: Gwc_col(:), Gwc_row(:)
       REAL, SAVE :: Delt_save
       INTEGER, SAVE, ALLOCATABLE :: Stress_dates(:)
