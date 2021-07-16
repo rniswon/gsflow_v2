@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-06-07'
+      character(len=*), parameter :: Version_soilzone = '2021-07-17'
       INTEGER, SAVE :: DBGUNT, Iter_aet, Soil_iter, HRU_id, Iter_aet_PRMS_flag
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -154,7 +154,7 @@
       USE PRMS_SOILZONE
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, getdim, control_integer
+      INTEGER, EXTERNAL :: declparam, getdim
       EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop, declvar_dble, declvar_real, declvar_int
 !***********************************************************************
       szdecl = 0
@@ -774,13 +774,15 @@
       INTEGER FUNCTION szinit()
       USE PRMS_MODULE, ONLY: Soilzone_add_water_use, Hru_ag_irr
       USE PRMS_SOILZONE
-      USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Active_hrus, Hru_route_order, &
+      USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Active_hrus, Hru_route_order, Hru_storage, &
      &    Basin_area_inv, Hru_area, Hru_frac_perv, Numlake_hrus, Ag_area, Ag_frac, Covden_win, Covden_sum
       USE PRMS_FLOWVARS, ONLY: Soil_moist_max, Soil_rechr_max, &
      &    Ssres_stor, Basin_ssstor, Basin_soil_moist, Slow_stor, &
-     &    Soil_moist, Sat_threshold, Soil_rechr, &
+     &    Soil_moist, Sat_threshold, Soil_rechr, Pkwater_equiv, &
      &    Basin_ag_soil_moist, Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, Ag_soil_rechr_max
       USE PRMS_SNOW, ONLY: Snowcov_area
+      USE PRMS_INTCP, ONLY: Hru_intcpstor
+      USE PRMS_SRUNOFF, ONLY: Hru_impervstor, Dprst_stor_hru
       IMPLICIT NONE
 ! Functions
       EXTERNAL :: init_basin_vars, checkdim_bounded_limits, error_stop
@@ -991,6 +993,8 @@
             Basin_gvr_stor_frac = Basin_gvr_stor_frac + DBLE( (Slow_stor(i)/Pref_flow_thrsh(i))*hruarea )
           ENDIF
         ENDIF
+        Hru_storage(i) = DBLE( Soil_moist_tot(i) + Hru_intcpstor(i) + Hru_impervstor(i) ) + Pkwater_equiv(i)
+        IF ( Dprst_flag==ACTIVE ) Hru_storage(i) = Hru_storage(i) + Dprst_stor_hru(i)
       ENDDO
       Basin_soil_rechr = Basin_soil_rechr*Basin_area_inv
       Basin_ssstor = Basin_ssstor*Basin_area_inv
@@ -1103,7 +1107,7 @@
       INTEGER FUNCTION szrun(AFR)
       USE PRMS_MODULE, ONLY: Hru_ag_irr, Nowyear, Nowmonth, Nowday
       USE PRMS_SOILZONE
-      USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Hru_frac_perv, &
+      USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
      &    Lake_hru_id, Cov_type, Numlake_hrus, Hru_area_dble, Ag_frac, Ag_area, Ag_cov_type
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Transp_on, Potet, Basin_potet
@@ -1112,9 +1116,11 @@
      &    Ssres_flow, Soil_to_gw, Basin_soil_to_gw, Ssr_to_gw, &
      &    Soil_to_ssr, Basin_lakeevap, Basin_perv_et, Basin_swale_et, &
      &    Sroff, Soil_moist_max, Infil, Soil_rechr_max, Ssres_in, &
-     &    Basin_soil_moist, Basin_ssstor, Slow_stor, Slow_flow, &
+     &    Basin_soil_moist, Basin_ssstor, Slow_stor, Slow_flow, Pkwater_equiv, &
      &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_sroff, Basin_lake_stor, &
      &    Ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr_max, Ag_soil_moist_max, Basin_ag_soil_moist
+      USE PRMS_INTCP, ONLY: Hru_intcpstor
+      USE PRMS_SRUNOFF, ONLY: Hru_impervstor, Dprst_stor_hru
       USE PRMS_WATER_USE, ONLY: Soilzone_gain, Soilzone_gain_hru
       USE PRMS_CLIMATE_HRU, ONLY: AET_external, PET_external
       USE PRMS_CASCADE, ONLY: Ncascade_hru
@@ -1154,7 +1160,7 @@
 
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE .OR. Iter_aet==ACTIVE ) THEN
-        IF ( Kkiter>1) THEN  
+        IF ( Kkiter>1 ) THEN
           Ssres_stor = It0_ssres_stor
           Slow_stor = It0_slow_stor
           IF ( GSFLOW_flag==ACTIVE ) Gravity_stor_res = It0_gravity_stor_res
@@ -1172,7 +1178,7 @@
         ENDIF
       ENDIF
       IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
-        IF ( Kkiter>1) THEN  
+        IF ( Kkiter>1 ) THEN
           ! states saved in srunoff when PRMS_land_iteration_flag = ACTIVE
           Soil_rechr = It0_soil_rechr
           Soil_moist = It0_soil_moist
@@ -1187,7 +1193,7 @@
         ENDIF
       ENDIF
       IF ( GSFLOW_flag==ACTIVE ) Sm2gw_grav = 0.0
-      IF ( Kkiter>1) THEN   
+      IF ( Kkiter>1 ) THEN
         Basin_soil_moist = It0_basin_soil_moist
         Basin_ssstor = It0_basin_ssstor
       ELSE  IF (AFR) THEN
@@ -1789,6 +1795,8 @@
         ENDIF
         Basin_actet = Basin_actet + DBLE( Hru_actet(i)*harea )
 !        IF ( Hru_actet(i)>0.0 ) Snowevap_aet_frac(i) = Snow_evap(i)/Hru_actet(i)
+        Hru_storage(i) = DBLE( Soil_moist_tot(i) + Hru_intcpstor(i) + Hru_impervstor(i) ) + Pkwater_equiv(i)
+        IF ( Dprst_flag==ACTIVE ) Hru_storage(i) = Hru_storage(i) + Dprst_stor_hru(i)
       ENDDO ! end HRU loop
 
       IF ( Iter_aet==OFF ) keep_iterating = OFF

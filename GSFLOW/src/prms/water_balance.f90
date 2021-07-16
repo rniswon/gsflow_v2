@@ -10,7 +10,7 @@
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Water Balance Computations'
         character(len=*), parameter :: MODNAME_WB = 'water_balance'
-        character(len=*), parameter :: Version_water_balance = '2021-05-10'
+        character(len=*), parameter :: Version_water_balance = '2021-07-17'
         INTEGER, SAVE :: BALUNT, SZUNIT, GWUNIT, INTCPUNT, SROUNIT, SNOWUNIT
         REAL, PARAMETER :: TOOSMALL = 3.1E-05, SMALL = 1.0E-04, BAD = 1.0E-03
         DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 1.0D-05
@@ -129,7 +129,8 @@
       SUBROUTINE water_balance_init()
       USE PRMS_WATER_BALANCE
       USE PRMS_FLOWVARS, ONLY: Gwres_stor
-      USE PRMS_GWFLOW, ONLY: Basin_gwstor, Hru_storage
+      USE PRMS_GWFLOW, ONLY: Basin_gwstor
+      USE PRMS_BASIN, ONLY: Hru_storage
 !***********************************************************************
       Basin_capillary_wb = 0.0D0
       Basin_gravity_wb = 0.0D0
@@ -149,7 +150,7 @@
       USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_WATER_BALANCE
       USE PRMS_BASIN, ONLY: Hru_route_order, Active_hrus, Hru_frac_perv, Hru_area_dble, Hru_perv, &
-     &    Hru_type, Basin_area_inv, Dprst_area_max, Hru_percent_imperv, Dprst_frac, Cov_type
+     &    Hru_type, Basin_area_inv, Dprst_area_max, Hru_percent_imperv, Dprst_frac, Cov_type, Hru_storage
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Basin_ppt, Hru_rain, Hru_snow, Newsnow, Pptmix
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Soil_to_gw, Soil_to_ssr, &
      &    Infil, Soil_moist_max, Ssr_to_gw, Ssres_flow, Basin_soil_to_gw, Soil_moist, Ssres_stor, &
@@ -183,7 +184,7 @@
      &    Soil_moist_tot, Soil_moist_ante, Ssres_stor_ante, Last_soil_moist, Last_ssstor
       USE PRMS_GWFLOW, ONLY: Basin_dnflow, Basin_gwsink, Basin_gwstor_minarea_wb, Gwres_flow, &
      &    Basin_gwstor, Basin_gwflow, Basin_gw_upslope, Basin_gwin, Gwres_sink, Hru_gw_cascadeflow, Gw_upslope, &
-     &    Gwminarea_flag, Gwstor_minarea_wb, Gwin_dprst, Gwres_in, Hru_storage
+     &    Gwminarea_flag, Gwstor_minarea_wb, Gwin_dprst, Gwres_in
       IMPLICIT NONE
 ! Functions
       INTRINSIC ABS, DBLE, SNGL, DABS
