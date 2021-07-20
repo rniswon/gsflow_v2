@@ -17,13 +17,14 @@
      &      Lake_transferON_OFF, External_transferON_OFF, Dprst_transferON_OFF, BasinOutON_OFF, &
      &      Snarea_curve_flag, Gsflow_output_file, Dynamic_param_log_file, PRMS_land_iteration_flag, &
      &      Csv_output_file, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, &
-     &      Irrigation_area_module, AET_module, PET_ag_module, soilzone_aet_flag, &
+     &      Irrigation_area_module, AET_module, PET_ag_module, soilzone_aet_flag, Stat_var_file, &
      &      Albedo_cbh_flag, Cloud_cover_cbh_flag, Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
      &      Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use
         USE GSFMODFLOW, ONLY: Modflow_name, Modflow_time_zero
         USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, &
      &      Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, AET_cbh_file, PET_cbh_file
         USE PRMS_MAP_RESULTS, ONLY: NmapOutVars, MapOutVar_names
+        USE PRMS_STATVAR_OUT, ONLY: statvarOut_format, nstatVars, statVar_element, statVar_names
         USE PRMS_NHRU_SUMMARY, ONLY: NhruOutVars, NhruOut_freq, NhruOutBaseFileName, NhruOutVar_names, NhruOut_format, &
      &      NhruOutNcol
         USE PRMS_NSUB_SUMMARY, ONLY: NsubOutVars, NsubOut_freq, NsubOutBaseFileName, NsubOutVar_names, NsubOut_format
@@ -44,16 +45,16 @@
         character(len=*), parameter :: MODDESC = 'Read Control File'
         character(len=*), parameter :: MODNAME = 'read_control_file'
         INTEGER, PARAMETER :: Max_num_control_parameters = 250 ! WARNING, hard coded, DANGER, DANGER
-        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Data_file, Var_init_file, Stat_var_file, Ani_out_file
+        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Data_file, Var_init_file, Ani_out_file
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Executable_desc, Executable_model, Var_save_file
         CHARACTER(LEN=MAXFILE_LENGTH) :: Control_file, Ani_output_file, Control_description
         INTEGER, SAVE :: PlotsON_OFF, Num_control_parameters, Glacier_flag, Stream_temp_shade_flag
-        INTEGER, SAVE :: NstatVars, AniOutON_OFF, NaniOutVars, NdispGraphs, DispGraphsBuffSize, Param_file_control_parameter_id
-        INTEGER, SAVE :: Num_statvar_elements, Num_statvar_names, NumdispVar_names, NumdispVar_elements
+        INTEGER, SAVE :: AniOutON_OFF, NaniOutVars, NdispGraphs, DispGraphsBuffSize, Param_file_control_parameter_id
+        INTEGER, SAVE :: NumdispVar_names, NumdispVar_elements
         INTEGER, SAVE :: Canopy_transferON_OFF, Soilzone_transferON_OFF, Consumed_transferON_OFF
         INTEGER, SAVE :: Dyn_sro_to_dprst_flag, Dyn_sro_to_imperv_flag
         REAL, SAVE :: Initial_deltat
-        CHARACTER(LEN=MAXCONTROL_LENGTH), ALLOCATABLE, SAVE :: statVar_element(:), statVar_names(:), param_file_names(:)
+        CHARACTER(LEN=MAXCONTROL_LENGTH), ALLOCATABLE, SAVE :: param_file_names(:)
         CHARACTER(LEN=MAXCONTROL_LENGTH), ALLOCATABLE, SAVE :: dispVar_element(:), dispVar_names(:)
         ! read_flag: 0 = not set, 1 = set from control file, 2 = set to default
         TYPE PRMS_control_parameter
@@ -270,6 +271,10 @@
       Control_parameter_data(i)%name = 'nhruOutVars'
       NhruOutVars = 0
       i = i + 1
+      Control_parameter_data(i)%name = 'statvarOut_format'
+      statvarOut_format = 1
+      Control_parameter_data(i)%values_int(1) = statvarOut_format
+      i = i + 1
       Control_parameter_data(i)%name = 'nsubOutON_OFF'
       NsubOutON_OFF = OFF
       i = i + 1
@@ -301,7 +306,7 @@
       MapOutON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'nstatVars'
-      NstatVars = 0
+      nstatVars = 0
       i = i + 1
       Control_parameter_data(i)%name = 'nmapOutVars'
       NmapOutVars = 0
