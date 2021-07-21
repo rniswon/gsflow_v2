@@ -2,13 +2,11 @@
 #-------------------------------------------------------------------
 #-------------------------------------------------------------------
 
-MMFDIR      = ./mmf
 PRMSDIR     = ../prms
 GSFLOWDIR   = ../gsflow
 MODFLOWDIR  = ../modflow
 BINDIR      = ../../bin
 LIBDIR      = ../lib
-MMFLIB      = $(LIBDIR)/libmmf.a
 
 #########################################################
 # Configure tags for each system

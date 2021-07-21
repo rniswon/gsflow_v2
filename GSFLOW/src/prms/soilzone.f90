@@ -1761,7 +1761,8 @@
         Grav_dunnian_flow(i) = dunnianflw_gvr
         Unused_potet(i) = Potet(i) - Hru_actet(i)
         IF ( ag_on_flag==ACTIVE ) THEN
-          IF ( Iter_aet_PRMS_flag==ACTIVE .AND.Transp_on(i)==ACTIVE ) THEN
+          !IF ( Iter_aet_PRMS_flag==ACTIVE .AND.Transp_on(i)==ACTIVE ) THEN
+          IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN
             !agriculture_external(i)
             !IF ( Unused_potet(i)>0.0 ) THEN
             unsatisfied_et = ag_AETtarget - Ag_actet(i)

@@ -586,7 +586,6 @@
       USE PRMS_CONSTANTS, ONLY: ERROR_control
       USE PRMS_MODULE
       USE GLOBAL, ONLY: NSTP, NPER, ISSFLG
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: decldim, declfix, control_integer_array !, control_file_name
