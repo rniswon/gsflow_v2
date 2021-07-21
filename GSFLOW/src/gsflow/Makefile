@@ -5,7 +5,7 @@
 include ../makelist
 TARGET		= $(BINDIR)/gsflow
 MFNWTLIB	= $(LIBDIR)/libmfnwt.a
-LIBS 		= -L$(LIBDIR) -lmfnwt -lprms -lmmf $(FLIBS)
+LIBS 		= -L$(LIBDIR) -lmfnwt -lprms $(FLIBS)
 
 ###################################################
 

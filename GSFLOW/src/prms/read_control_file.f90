@@ -31,7 +31,8 @@
         USE PRMS_BASIN_SUMMARY, ONLY: BasinOutVars, BasinOut_freq, BasinOutBaseFileName, BasinOutVar_names
         USE PRMS_NSEGMENT_SUMMARY, ONLY: NsegmentOutVars, NsegmentOut_freq, NsegmentOutBaseFileName, &
      &      NsegmentOutVar_names, NsegmentOut_format
-        USE PRMS_WATER_USE, ONLY: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file, External_transfer_file, Lake_transfer_file
+        USE PRMS_WATER_USE, ONLY: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file, &
+     &      External_transfer_file, Lake_transfer_file
         USE PRMS_DYNAMIC_PARAM_READ, ONLY: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
      &      wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
      &      potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, &
@@ -209,7 +210,7 @@
       i = i + 1
       Control_parameter_data(i)%name = 'stream_temp_flag'
       Stream_temp_flag = OFF
-	  i = i + 1
+      i = i + 1
       Control_parameter_data(i)%name = 'strmtemp_humidity_flag'
       Strmtemp_humidity_flag = OFF
       i = i + 1
@@ -262,7 +263,7 @@
       Control_parameter_data(i)%values_int(1) = NhruOut_freq
       i = i + 1
       Control_parameter_data(i)%name = 'nhruOutNcol'
-	  NhruOutNcol = 0
+      NhruOutNcol = 0
       i = i + 1
       Control_parameter_data(i)%name = 'nhruOut_format'
       NhruOut_format = 1
@@ -975,7 +976,7 @@
       USE PRMS_MODULE, ONLY: Print_debug, EQULS, Model_control_file
       IMPLICIT NONE
       ! Functions
-      INTRINSIC :: GET_COMMAND_ARGUMENT, COMMAND_ARGUMENT_COUNT, GET_COMMAND, TRIM
+      !INTRINSIC :: GET_COMMAND_ARGUMENT, COMMAND_ARGUMENT_COUNT, GET_COMMAND, TRIM
       EXTERNAL :: error_stop
       ! Local Variables
       CHARACTER(LEN=MAXFILE_LENGTH) command_line_arg, command_line

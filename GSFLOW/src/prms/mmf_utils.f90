@@ -128,6 +128,7 @@
       REAL :: temp
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: dimen1, dimen2
 !***********************************************************************
+      declparam = 0
       !!!!!!!!!!!! check to see if already in data structure
       ! doesn't check to see if declared the same, uses first values
       CALL check_parameters_declared(Paramname, Modname, declared)
@@ -643,6 +644,8 @@
       EXTERNAL :: error_stop
       ! Local Variables
       INTEGER :: type_flag, found, param_id, i, ierr
+      INTEGER, ALLOCATABLE :: values_int(:)
+      DOUBLE PRECISION, ALLOCATABLE :: values_dbl(:)
 !***********************************************************************
       Values = 0.0
       ierr = 0
@@ -673,23 +676,35 @@
       type_flag = Parameter_data(param_id)%data_flag
 
       IF ( type_flag==3 ) THEN
-        CALL getvalues_dbl(param_id, Numvalues, Values)
+        ALLOCATE ( values_dbl(Numvalues) )
+        DO i = 1, Numvalues
+          values_dbl(i) = DBLE( Values(i) )
+        ENDDO
+        CALL getvalues_dbl(param_id, Numvalues, values_dbl)
+        DEALLOCATE ( values_dbl )
       ELSEIF ( type_flag==2 ) THEN
         IF ( Parameter_check_flag==1 ) THEN
           DO i = 1, Numvalues
             IF ( Parameter_data(param_id)%values(i) > Parameter_data(param_id)%maximum ) THEN
               PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
-              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; maximum value: ', Parameter_data(param_id)%maximum
+              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; maximum value: ', &
+     &                                 Parameter_data(param_id)%maximum
             ENDIF
             IF ( Parameter_data(param_id)%values(i) < Parameter_data(param_id)%minimum ) THEN
               PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
-              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; minimum value: ', Parameter_data(param_id)%minimum
+              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; minimum value: ', &
+     &                                 Parameter_data(param_id)%minimum
             ENDIF
           ENDDO
         ENDIF
         Values = Parameter_data(param_id)%values
       ELSEIF ( type_flag==1 ) THEN
-        CALL getvalues_int(param_id, Numvalues, Values)
+        ALLOCATE ( values_int(Numvalues) )
+        DO i = 1, Numvalues
+          values_int(i) = INT( Values(i) )
+        ENDDO
+        CALL getvalues_int(param_id, Numvalues, values_int)
+        DEALLOCATE ( values_int )
       ELSE
         PRINT *, 'Paramname: ', Paramname, ' type: ', type_flag
         CALL error_stop('Parameter type not implemented', ERROR_param)
@@ -1001,7 +1016,7 @@
         Control_parameter_data(Num_control_parameters)%data_type = 4
         Control_parameter_data(Num_control_parameters)%numvals = 1
         Control_parameter_data(Num_control_parameters)%name = paramname
-        Control_parameter_data(Num_control_parameters)%values_int(1) = ' '
+        Control_parameter_data(Num_control_parameters)%values_character(1) = ' '
       ENDIF
 
       control_string = 0
