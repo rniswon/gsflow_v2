@@ -644,8 +644,6 @@
       EXTERNAL :: error_stop
       ! Local Variables
       INTEGER :: type_flag, found, param_id, i, ierr
-      INTEGER, ALLOCATABLE :: values_int(:)
-      DOUBLE PRECISION, ALLOCATABLE :: values_dbl(:)
 !***********************************************************************
       Values = 0.0
       ierr = 0
@@ -676,12 +674,7 @@
       type_flag = Parameter_data(param_id)%data_flag
 
       IF ( type_flag==3 ) THEN
-        ALLOCATE ( values_dbl(Numvalues) )
-        DO i = 1, Numvalues
-          values_dbl(i) = DBLE( Values(i) )
-        ENDDO
-        CALL getvalues_dbl(param_id, Numvalues, values_dbl)
-        DEALLOCATE ( values_dbl )
+        CALL getvalues_dbl(param_id, Numvalues, Values)
       ELSEIF ( type_flag==2 ) THEN
         IF ( Parameter_check_flag==1 ) THEN
           DO i = 1, Numvalues
@@ -699,12 +692,7 @@
         ENDIF
         Values = Parameter_data(param_id)%values
       ELSEIF ( type_flag==1 ) THEN
-        ALLOCATE ( values_int(Numvalues) )
-        DO i = 1, Numvalues
-          values_int(i) = INT( Values(i) )
-        ENDDO
-        CALL getvalues_int(param_id, Numvalues, values_int)
-        DEALLOCATE ( values_int )
+        CALL getvalues_int(param_id, Numvalues, Values)
       ELSE
         PRINT *, 'Paramname: ', Paramname, ' type: ', type_flag
         CALL error_stop('Parameter type not implemented', ERROR_param)
