@@ -17581,9 +17581,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =       16232.4902       SURFACE LEAKAGE     =       16232.4902
 
-               TOTAL OUT =       29891.9297                 TOTAL OUT =       29891.9297
+               TOTAL OUT =       29891.9316                 TOTAL OUT =       29891.9316
 
-                IN - OUT =          -1.2227                  IN - OUT =          -1.2227
+                IN - OUT =          -1.2246                  IN - OUT =          -1.2246
 
      PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
@@ -17921,7 +17921,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-                TOTAL IN =       59778.9297                  TOTAL IN =       29888.2188
+                TOTAL IN =       59778.9297                  TOTAL IN =       29888.2207
 
           OUT:                                     OUT:
           ----                                     ----
@@ -17932,9 +17932,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =       32464.9219       SURFACE LEAKAGE     =       16232.4326
 
-               TOTAL OUT =       59783.6406                 TOTAL OUT =       29891.7109
+               TOTAL OUT =       59783.6406                 TOTAL OUT =       29891.7148
 
-                IN - OUT =          -4.7109                  IN - OUT =          -3.4922
+                IN - OUT =          -4.7109                  IN - OUT =          -3.4941
 
      PERCENT DISCREPANCY =          -0.01         PERCENT DISCREPANCY =          -0.01
 
@@ -17952,6 +17952,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/07/16 12:27:22
- Elapsed run time: 1.955 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/07/23  9:51:07
+ Elapsed run time: 1.726 Seconds
 

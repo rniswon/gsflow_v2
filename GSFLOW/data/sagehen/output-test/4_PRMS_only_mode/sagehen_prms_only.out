@@ -54,7 +54,7 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
-                    basin_summary, nsegment_summary
+                    basin_summary, nsegment_summary, statvar_out
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
@@ -116,6 +116,7 @@ Output Summary                  basin_sum           2021-05-06
 Output Summary                  subbasin            2021-05-06
 Output Summary                  nhru_summary        2021-05-06
 Output Summary                  basin_summary       2021-05-10
+Statistics Variables Output     statvar_out         2021-07-19
 ==============================================================
 
 Using Control File: .\prms.control
@@ -156,5 +157,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  *************************************************************
  Total for run     668.938  378.199    9.262  284.576  260.348
  *************************************************************
-Execution elapsed time    0 minutes  2.60 seconds
+Execution elapsed time    0 minutes  1.29 seconds
 

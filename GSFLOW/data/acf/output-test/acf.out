@@ -48,7 +48,7 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
-                    basin_summary, nsegment_summary
+                    basin_summary, nsegment_summary, statvar_out
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
@@ -398,6 +398,7 @@ Streamflow Routing              muskingum           2020-12-02
 Output Summary                  basin_sum           2021-05-06
 Output Summary                  nhru_summary        2021-05-06
 Output Summary                  basin_summary       2021-05-10
+Statistics Variables Output     statvar_out         2021-07-19
 Output Summary                  prms_summary        2021-05-06
 ==============================================================
 
@@ -1231,5 +1232,5 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
  ***************************************
  Total for run        159.12    22642.64
  ***************************************
-Execution elapsed time    0 minutes  1.02 seconds
+Execution elapsed time    0 minutes  0.60 seconds
 

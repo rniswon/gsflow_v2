@@ -27,7 +27,7 @@ Streamflow Routing: strmflow, strmflow_in_out, muskingum,
 Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
-                    basin_summary, nsegment_summary
+                    basin_summary, nsegment_summary, statvar_out
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
@@ -157,6 +157,7 @@ Soilzone Computations           soilzone            2021-07-17
 Groundwater                     gwflow              2021-07-17
 Streamflow Routing              strmflow            2020-08-03
 Output Summary                  basin_sum           2021-05-06
+Statistics Variables Output     statvar_out         2021-07-19
 Output Summary                  prms_summary        2021-05-06
 ==============================================================
 
@@ -182,5 +183,5 @@ Fraction impervious:        0.0001    Fraction pervious:       0.9999
  *************************************************************
  Total for run      87.348   41.234    6.457   46.944   67.341
  *************************************************************
-Execution elapsed time    0 minutes  0.23 seconds
+Execution elapsed time    0 minutes  0.25 seconds
 
