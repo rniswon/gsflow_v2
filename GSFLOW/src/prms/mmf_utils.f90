@@ -128,6 +128,7 @@
       REAL :: temp
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: dimen1, dimen2
 !***********************************************************************
+      declparam = 0
       !!!!!!!!!!!! check to see if already in data structure
       ! doesn't check to see if declared the same, uses first values
       CALL check_parameters_declared(Paramname, Modname, declared)
@@ -679,11 +680,13 @@
           DO i = 1, Numvalues
             IF ( Parameter_data(param_id)%values(i) > Parameter_data(param_id)%maximum ) THEN
               PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
-              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; maximum value: ', Parameter_data(param_id)%maximum
+              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; maximum value: ', &
+     &                                 Parameter_data(param_id)%maximum
             ENDIF
             IF ( Parameter_data(param_id)%values(i) < Parameter_data(param_id)%minimum ) THEN
               PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
-              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; minimum value: ', Parameter_data(param_id)%minimum
+              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; minimum value: ', &
+     &                                 Parameter_data(param_id)%minimum
             ENDIF
           ENDDO
         ENDIF
@@ -1001,7 +1004,7 @@
         Control_parameter_data(Num_control_parameters)%data_type = 4
         Control_parameter_data(Num_control_parameters)%numvals = 1
         Control_parameter_data(Num_control_parameters)%name = paramname
-        Control_parameter_data(Num_control_parameters)%values_int(1) = ' '
+        Control_parameter_data(Num_control_parameters)%values_character(1) = ' '
       ENDIF
 
       control_string = 0

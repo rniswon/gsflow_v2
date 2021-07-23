@@ -2,8 +2,7 @@
 
 include ../makelist
 PRMSLIB = $(LIBDIR)/libprms.a
-MMFLIB	 = $(LIBDIR)/libmmf.a
-LIBS	= $(PRMSLIB) $(MMFLIB) $(FLIBS)
+LIBS	= $(PRMSLIB) $(FLIBS)
 
 ####################################################
 # Rules for targets
@@ -12,9 +11,6 @@ all: $(PRMSLIB)
 
 $(TARGET): $(PRMSLIB)
 	$(RM) $(TARGET)
-
-$(MMFLIB):
-	$(CD) $(MMFDIR);make
 
 ####################################################
 # Rules for targets
@@ -26,6 +22,7 @@ $(MMFLIB):
 
 
 LIBOBJS = \
+        prms_constants.o \
         basin.o \
         climateflow.o \
         cascade.o \
@@ -37,6 +34,7 @@ LIBOBJS = \
         read_data_file.o \
         read_parameter_file.o \
         climate_hru.o \
+        mmf_utils.o \
         potet_jh.o \
         potet_pt.o \
         potet_hs.o \
@@ -73,6 +71,7 @@ LIBOBJS = \
         muskingum_lake.o \
         subbasin.o \
         stream_temp.o \
+        statvar_out.o \
         map_results.o \
         nhru_summary.o \
         nsub_summary.o \
@@ -99,10 +98,13 @@ clean:
 # Define all object files which make up the library
 #
 
+prms_constants.o: prms_constants.f90
+	$(FC) -c $(FFLAGS) prms_constants.f90
+
 basin_sum.o: basin_sum.f90 prms_module.mod prms_flowvars.mod prms_intcp.mod prms_snow.mod prms_srunoff.mod prms_gwflow.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod prms_obs.mod prms_muskingum.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) basin_sum.f90
 
-subbasin.o: subbasin.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_soilzone.mod prms_gwflow.mod prms_snow.mod prms_climatevars.mod prms_muskingum_lake.mod prms_constants.mod
+subbasin.o: subbasin.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_soilzone.mod prms_gwflow.mod prms_snow.mod prms_climatevars.mod prms_muskingum_lake.mod prms_constants.mod prms_climate_hru.mod
 	$(FC) -c $(FFLAGS) subbasin.f90
 
 ddsolrad.o: ddsolrad.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_soltab.mod prms_set_time.mod prms_obs.mod prms_constants.mod
@@ -111,7 +113,7 @@ ddsolrad.o: ddsolrad.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prm
 ccsolrad.o: ccsolrad.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_soltab.mod prms_set_time.mod prms_obs.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) ccsolrad.f90
 
-snowcomp.o: snowcomp.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_climatevars.mod prms_set_time.mod prms_intcp.mod prms_constants.mod
+snowcomp.o: snowcomp.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_climatevars.mod prms_set_time.mod prms_intcp.mod prms_constants.mod prms_soltab.mod prms_climate_hru.mod
 	$(FC) -c $(FFLAGS) snowcomp.f90
 
 gwflow.o: gwflow.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_intcp.mod prms_srunoff.mod prms_soilzone.mod prms_cascade.mod prms_set_time.mod prms_constants.mod
@@ -152,7 +154,6 @@ frost_date.o: frost_date.f90 prms_module.mod prms_basin.mod prms_climatevars.mod
 
 precip_1sta_laps.o: precip_1sta_laps.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod prms_obs.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) precip_1sta_laps.f90
-
 
 temp_map.o: temp_map.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod prms_obs.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) temp_map.f90
@@ -232,7 +233,7 @@ soilzone.o: soilzone.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_s
 routing.o: routing.f90 prms_module.mod prms_basin.mod prms_gwflow.mod prms_flowvars.mod prms_set_time.mod prms_srunoff.mod prms_climatevars.mod prms_water_use.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) routing.f90
 
-prms_time.o: prms_time.f90 prms_module.mod prms_basin.mod prms_constants.mod
+prms_time.o: prms_time.f90 prms_basin.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) prms_time.f90
 
 water_balance.o: water_balance.f90 prms_module.mod prms_basin.mod prms_srunoff.mod prms_flowvars.mod prms_gwflow.mod prms_climatevars.mod prms_set_time.mod prms_cascade.mod prms_intcp.mod prms_snow.mod prms_soilzone.mod prms_constants.mod
@@ -259,14 +260,20 @@ convert_params.o: convert_params.f90 prms_module.mod
 glacr_melt.o: glacr_melt.f90 prms_snow.mod prms_intcp.mod prms_soltab.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) glacr_melt.f90
 
-read_control_file.o: read_control_file.f90 prms_module.mod
+read_control_file.o: read_control_file.f90 prms_module.mod prms_constants.mod prms_climate_hru.mod map_results.o statvar_out.o nhru_summary.o nsub_summary.o basin_summary.o nsegment_summary.o water_use_read.o dynamic_param_read.o glacr_melt.o precip_map.o temp_map.o gsfmodflow.mod
 	$(FC) -c $(FFLAGS) read_control_file.f90
 
-read_data_file.o: read_data_file.f90 prms_module.mod
+read_data_file.o: read_data_file.f90 prms_module.mod prms_constants.mod mmf_utils.o prms_set_time.mod obs.o climateflow.o
 	$(FC) -c $(FFLAGS) read_data_file.f90
 
-read_parameter_file.o: read_parameter_file.f90 prms_module.mod
+read_parameter_file.o: read_parameter_file.f90 prms_module.mod prms_constants.mod mmf_utils.o
 	$(FC) -c $(FFLAGS) read_parameter_file.f90
+
+mmf_utils.o: mmf_utils.f90 prms_module.mod prms_constants.mod
+	$(FC) -c $(FFLAGS) mmf_utils.f90
+
+statvar_out.o: statvar_out.f90 prms_module.mod prms_constants.mod prms_set_time.mod
+	$(FC) -c $(FFLAGS) statvar_out.f90
 
 prms_climatevars.mod: climateflow.o
 prms_flowvars.mod: climateflow.o
@@ -274,6 +281,9 @@ prms_gwflow.mod: gwflow.o
 prms_module.mod:
 	$(CD) ../gsflow;make prms_module.mod
 	$(CP) ../gsflow/prms_module.mod .
+gsfmodflow.mod:
+	$(CD) ../gsflow;make prms_module.mod
+	$(CP) ../gsflow/gsfmodflow.mod .
 prms_obs.mod: obs.o
 prms_basin.mod: basin.o
 prms_soltab.mod: soltab.o
@@ -287,7 +297,11 @@ prms_routing.mod: routing.o
 prms_water_use.mod: water_use_read.o
 prms_set_time.mod: prms_time.o
 prms_glacr.mod: glacr_melt.o
-prms_constants.mod: prms_constants.f90
-	$(FC) -c $(FFLAGS) prms_constants.f90
+prms_constants.mod: prms_constants.o
 prms_climate_hru.mod: climate_hru.o
+prms_potet_jh.mod: potet_jh.o
+prms_potet_pm.mod: potet_pm.o
+prms_potet_pt.mod: potet_pt.o
+prms_potet_hs.mod: potet_hs.o
+prms_potet_hamon.mod: potet_hamon.o
 
