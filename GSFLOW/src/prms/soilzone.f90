@@ -1469,7 +1469,7 @@
      &                          gvr_maxin, Pref_flow_thrsh(i), topfr, &
      &                          Ssr_to_gw(i), Slow_flow(i), Slow_stor(i), &
      &                          Gvr2sm(i), Soil_to_gw(i), gwin, compute_lateral, &
-     &                          ag_capacity, ag_on_flag)
+     &                          ag_capacity, ag_on_flag, Ag_gvr2sm(i))
           ! adjust soil moisture with replenish amount
           IF ( Gvr2sm(i)>0.0 ) THEN
             Soil_moist(i) = Soil_moist(i) + Gvr2sm(i)/perv_frac ! ??? could this be bigger than soil_moist_max ??? (add to Dunnian)
@@ -1929,7 +1929,7 @@
      &           Snow_free, Potet_rechr, Potet_lower, Potet, Perv_frac, Soil_saturated)
       USE PRMS_CONSTANTS, ONLY: NEARZERO, BARESOIL, SAND, LOAM, CLAY, ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Soilzone_aet_flag
-      USE PRMS_SOILZONE, ONLY: Et_type !, HRU_id
+      USE PRMS_SOILZONE, ONLY: Et_type, HRU_id
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Transp_on, Cov_type, Soil_type
@@ -2180,11 +2180,11 @@
      &           Slowcoef_sq, Ssr2gw_rate, Ssr2gw_exp, Gvr_maxin, &
      &           Pref_flow_thrsh, Gvr2pfr, Ssr_to_gw, &
      &           Slow_flow, Slow_stor, Gvr2sm, Soil_to_gw, Gwin, Compute_lateral, &
-     &           Ag_capacity, Ag_on_flag)
+     &           Ag_capacity, Ag_on_flag, Ag_Gvr2sm)
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE
       USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug
       USE PRMS_SOILZONE, ONLY: Gravity_stor_res, Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, &
-     &    Gw2sm_grav, Gvr_hru_pct_adjusted, Print_debug, DEBUG_less, Dprst_flag, Ag_gvr2sm
+     &    Gw2sm_grav, Gvr_hru_pct_adjusted, Print_debug, DEBUG_less, Dprst_flag
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
       IMPLICIT NONE
 ! Functions
@@ -2195,7 +2195,7 @@
       REAL, INTENT(IN) :: Slowcoef_lin, Slowcoef_sq, Ssr2gw_rate, Ssr2gw_exp
       REAL, INTENT(IN) :: Pref_flow_thrsh, Soil_to_gw, Gvr_maxin
       REAL, INTENT(INOUT) :: Capacity, Ag_capacity
-      REAL, INTENT(OUT) :: Ssr_to_gw, Slow_stor, Slow_flow, Gvr2pfr, Gvr2sm
+      REAL, INTENT(OUT) :: Ssr_to_gw, Slow_stor, Slow_flow, Gvr2pfr, Gvr2sm, Ag_Gvr2sm
       DOUBLE PRECISION, INTENT(OUT) :: Gwin
 ! Local Variables
       INTEGER :: j, igvr
@@ -2216,6 +2216,7 @@
       slflow = 0.0D0
       togw = 0.0D0
       slowstor = 0.0D0
+      IF ( Ag_on_flag==ACTIVE ) Ag_gvr2sm = 0.0
       DO j = 1, Hru_gvr_count(Ihru)
         igvr = Hru_gvr_index(j, Ihru)
         frac = Gvr_hru_pct_adjusted(igvr)
@@ -2224,7 +2225,7 @@
         depth = Gravity_stor_res(igvr) + input
         IF ( depth>0.0 ) THEN
           IF ( Capacity>0.0 ) CALL check_gvr_sm(Capacity, depth, frac, Gvr2sm, input)
-          IF ( Ag_on_flag==ACTIVE .AND. Ag_capacity>0.0 ) CALL check_gvr_sm(Ag_capacity, depth, frac, Ag_gvr2sm(igvr), input)
+          IF ( Ag_on_flag==ACTIVE .AND. Ag_capacity>0.0 ) CALL check_gvr_sm(Ag_capacity, depth, frac, Ag_gvr2sm, input)
         ENDIF
 
         IF ( Compute_lateral==ACTIVE ) THEN
