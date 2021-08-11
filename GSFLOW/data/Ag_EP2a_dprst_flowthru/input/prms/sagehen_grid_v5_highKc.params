@@ -213452,7 +213452,7 @@ soil_rechr_init_frac
 one
 1
 2
-0.0
+0.05
 ####
 soil2gw_max
 1
