@@ -1156,7 +1156,7 @@
 
 ! It0 variables used with MODFLOW integration to save antecedent states.
       IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE .OR. Iter_aet==ACTIVE ) THEN
-        IF ( Kkiter==0 ) THEN
+        IF ( Kkiter==1 ) THEN
           It0_ssres_stor = Ssres_stor
           It0_slow_stor = Slow_stor
           IF ( GSFLOW_flag==ACTIVE ) THEN
