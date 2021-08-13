@@ -3176,9 +3176,11 @@
         !
         !1 - -----limit diversion to water right
         !
+        
+        IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)  !need to check this, unintensional comment?
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
-  !      IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
+  
   !      if(iseg==19)then
   !      etdif = pettotal - aettotal
   !        write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),
@@ -3215,7 +3217,7 @@
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet
       double precision :: pettotal,aettotal, prms_inch2mf_q,
-     +                    aetold, supold, sup !, etdif
+     +                    aetold, supold, sup, etdif
       real :: demand_inch_acres
       integer :: k, ipond, hru_id, i
       external :: set_factor
@@ -3285,13 +3287,13 @@
      +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
         PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
-  !      if(i==1)then
-  !    etdif = pettotal - aettotal
-  !        write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
-  !   +                 pettotal,aettotal,etdif,
-  !   +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
-  !      endif
-  !33  format(4i5,6e20.10)
+        if(i==1)then
+      etdif = pettotal - aettotal
+          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
+     +                 pettotal,aettotal,etdif,
+     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
+        endif
+  33  format(4i5,6e20.10)
 300   continue
       return
       end subroutine demandpond_prms
