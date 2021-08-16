@@ -2,16 +2,12 @@
 !     Output a set of declared variables by HRU in CSV format
 !***********************************************************************
       MODULE PRMS_NHRU_SUMMARY
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, &
-     &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, &
-     &    REAL_TYPE, DBLE_TYPE, INT_TYPE, DNEARZERO, RUN, DECL, INIT, CLEAN, DOCUMENTATION
-      USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Nsub, NhruOutON_OFF, Prms_warmup, &
-     &    Start_year, Start_month, Start_day, End_year, End_month, End_day
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       IMPLICIT NONE
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nhru_summary'
-      character(len=*), parameter :: Version_nhru_summary = '2021-05-06'
+      character(len=*), parameter :: Version_nhru_summary = '2021-08-13'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nhru_var_type(:), Nhru_var_int(:, :)
       REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
@@ -35,6 +31,8 @@
 !     nhru results module
 !     ******************************************************************
       SUBROUTINE nhru_summary()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, RUN, DECL, INIT, CLEAN, MEAN_MONTHLY
+      USE PRMS_MODULE, ONLY: Process_flag
       USE PRMS_NHRU_SUMMARY
       IMPLICIT NONE
 ! Functions
@@ -68,6 +66,8 @@
 !     declare parameters and variables
 !***********************************************************************
       SUBROUTINE nhru_summarydecl()
+      USE PRMS_CONSTANTS, ONLY: ERROR_control, DAILY, YEARLY, ACTIVE, OFF, DOCUMENTATION
+      USE PRMS_MODULE, ONLY: Model, Nhru, NhruOutON_OFF
       USE PRMS_NHRU_SUMMARY
       IMPLICIT NONE
 ! Functions
@@ -118,6 +118,9 @@
 !     Initialize module values
 !***********************************************************************
       SUBROUTINE nhru_summaryinit()
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, &
+     &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, REAL_TYPE, DBLE_TYPE, INT_TYPE
+      USE PRMS_MODULE, ONLY: Nhru, NhruOutON_OFF, Prms_warmup, Start_year, Start_month, Start_day
       USE PRMS_NHRU_SUMMARY
       IMPLICIT NONE
 ! Functions
@@ -307,7 +310,8 @@
 !     Output set of declared variables in CSV format
 !***********************************************************************
       SUBROUTINE nhru_summaryrun()
-      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_CONSTANTS, ONLY: DAILY, MEAN_MONTHLY, MEAN_YEARLY, ACTIVE, OFF, REAL_TYPE, DBLE_TYPE, INT_TYPE
+      USE PRMS_MODULE, ONLY: Nhru, Start_month, Start_day, End_year, End_month, End_day, Nowyear, Nowmonth, Nowday
       USE PRMS_NHRU_SUMMARY
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_SET_TIME, ONLY: Modays

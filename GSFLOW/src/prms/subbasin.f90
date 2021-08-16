@@ -11,15 +11,11 @@
 !***********************************************************************
 
       MODULE PRMS_SUBBASIN
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, DOCUMENTATION, &
-     &    DNEARZERO, ERROR_dim, CASCADE_OFF
-      USE PRMS_MODULE, ONLY: Model, Nsub, Nhru, Print_debug, GSFLOW_flag, &
-     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'subbasin'
-      character(len=*), parameter :: Version_subbasin = '2021-05-06'
+      character(len=*), parameter :: Version_subbasin = '2021-08-13'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Qsub(:), Sub_area(:), Laststor(:)
       INTEGER, SAVE, ALLOCATABLE :: Tree(:, :)
 !   Declared Variables
@@ -66,6 +62,8 @@
 !     hru_area, subbasin_down, hru_subbasin
 !***********************************************************************
       INTEGER FUNCTION subdecl()
+      USE PRMS_CONSTANTS, ONLY: OFF, DOCUMENTATION, ERROR_dim
+      USE PRMS_MODULE, ONLY: Model, Nsub, Nhru, GSFLOW_flag
       USE PRMS_SUBBASIN
       IMPLICIT NONE
 ! Functions
@@ -242,6 +240,9 @@
 !               compute initial values
 !***********************************************************************
       INTEGER FUNCTION subinit()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, DNEARZERO
+      USE PRMS_MODULE, ONLY: Nsub, Nhru, Print_debug, GSFLOW_flag, &
+     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag
       USE PRMS_SUBBASIN
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
      &    Hru_type, Hru_frac_perv, Lake_hru_id
@@ -437,6 +438,8 @@
 !                  storage and outflows
 !***********************************************************************
       INTEGER FUNCTION subrun()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, CASCADE_OFF
+      USE PRMS_MODULE, ONLY: Nsub, GSFLOW_flag, Dprst_flag, Lake_route_flag, Cascade_flag
       USE PRMS_SUBBASIN
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
      &    Hru_type, Hru_frac_perv, Lake_hru_id

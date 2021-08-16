@@ -3,15 +3,11 @@
 ! reservoirs for routing flow downslope
 !***********************************************************************
       MODULE PRMS_CASCADE
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_less, INACTIVE, LAND, LAKE, SWALE, GLACIER, &
-     &    ERROR_cascades, DOCUMENTATION, CASCADE_OFF, CASCADE_HRU_SEGMENT, CASCADE_NORMAL, CASCADEGW_OFF
-      USE PRMS_MODULE, ONLY: Nhru, Ngw, Nsegment, Ncascade, Ncascdgw, Model, Print_debug, &
-     &    Cascade_flag, Cascadegw_flag, Gwr_swale_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Cascading Flow'
       character(len=*), parameter :: MODNAME = 'cascade'
-      character(len=*), parameter :: Version_cascade = '2021-05-06'
+      character(len=*), parameter :: Version_cascade = '2021-08-13'
       INTEGER, SAVE :: MSGUNT
       INTEGER, SAVE :: Iorder, Igworder, Ndown
 !   Computed Variables
@@ -77,6 +73,8 @@
 !     hru_area, cascade_tol, cascade_flg, circle_switch
 !***********************************************************************
       INTEGER FUNCTION cascdecl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, CASCADE_OFF, CASCADE_HRU_SEGMENT, CASCADE_NORMAL, CASCADEGW_OFF
+      USE PRMS_MODULE, ONLY: Nhru, Ngw, Ncascade, Ncascdgw, Model, Print_debug, Cascade_flag, Cascadegw_flag
       USE PRMS_CASCADE
       IMPLICIT NONE
 ! Functions
@@ -196,6 +194,8 @@
 !     cascinit - Initialize cascade module - get parameter values,
 !***********************************************************************
       INTEGER FUNCTION cascinit()
+      USE PRMS_CONSTANTS, ONLY: OFF, ERROR_cascades, CASCADE_OFF, CASCADE_HRU_SEGMENT, CASCADE_NORMAL, CASCADEGW_OFF
+      USE PRMS_MODULE, ONLY: Ngw, Print_debug, Cascade_flag, Cascadegw_flag, Gwr_swale_flag
       USE PRMS_CASCADE
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Gwr_route_order, Active_gwrs, Gwr_type, Hru_type
       IMPLICIT NONE
@@ -286,6 +286,7 @@
 !     cascclean - deallocation arrays
 !***********************************************************************
       INTEGER FUNCTION cascclean()
+      USE PRMS_MODULE, ONLY: CASCADE_OFF, CASCADEGW_OFF
       USE PRMS_CASCADE
       USE PRMS_MODULE, ONLY: Cascade_flag, Cascadegw_flag
       IMPLICIT NONE
@@ -306,6 +307,8 @@
 ! Initialize cascading flow variables
 !***********************************************************************
       SUBROUTINE init_cascade(Iret)
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, INACTIVE, LAKE, SWALE, CASCADE_HRU_SEGMENT, CASCADE_NORMAL
+      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Ncascade, Ncascdgw, Print_debug, Cascade_flag, Cascadegw_flag
       USE PRMS_CASCADE
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area
       IMPLICIT NONE
@@ -747,6 +750,8 @@
 ! Initialize cascading flow variables
 !***********************************************************************
       SUBROUTINE initgw_cascade(Iret)
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less
+      USE PRMS_MODULE, ONLY: Ngw, Nsegment, Ncascdgw, Print_debug, Gwr_swale_flag
       USE PRMS_CASCADE
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, Gwr_type, Hru_area
       IMPLICIT NONE
@@ -937,8 +942,8 @@
 ! order GWRs allowing many to 1
 !***********************************************************************
       SUBROUTINE order_gwrs(Iret)
-      USE PRMS_CASCADE, ONLY: Gwr_down, Igworder, MSGUNT, Circle_switch, Ncascade_gwr, &
-     &    Ngw, Print_debug, Gwr_swale_flag
+      USE PRMS_MODULE, ONLY: Ngw, Print_debug, Gwr_swale_flag
+      USE PRMS_CASCADE, ONLY: Gwr_down, Igworder, MSGUNT, Circle_switch, Ncascade_gwr
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, Gwr_type
       IMPLICIT NONE
 ! Functions
@@ -1192,7 +1197,8 @@
 ! check for circular path
 !***********************************************************************
       SUBROUTINE check_path(Npath, Path, Circle_flg, Nup)
-      USE PRMS_CASCADE, ONLY: MSGUNT, Print_debug
+      USE PRMS_MODULE, ONLY: Print_debug
+      USE PRMS_CASCADE, ONLY: MSGUNT
       IMPLICIT NONE
 !     Functions
       INTRINSIC :: MIN

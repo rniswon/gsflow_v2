@@ -13,16 +13,11 @@
 ! modified 10/1/2008 rsregan to include Vaccaro code
 !***********************************************************************
       MODULE PRMS_GWFLOW
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, LAKE, SWALE, DEBUG_less, DNEARZERO, &
-     &    DOCUMENTATION, CASCADEGW_OFF, ERROR_water_use
-      USE PRMS_MODULE, ONLY: Model, Nhru, Ngw, Nlake, Print_debug, Init_vars_from_file, &
-     &    Dprst_flag, Cascadegw_flag, Lake_route_flag, Inputerror_flag, Gwr_swale_flag, &
-     &    Gwr_add_water_use, Gwr_transfer_water_use
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Groundwater'
       character(len=6), parameter :: MODNAME = 'gwflow'
-      character(len=*), parameter :: Version_gwflow = '2021-07-17'
+      character(len=*), parameter :: Version_gwflow = '2021-08-13'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea(:), Gwin_dprst(:)
       DOUBLE PRECISION, SAVE :: Basin_gw_upslope
       INTEGER, SAVE :: Gwminarea_flag
@@ -78,6 +73,8 @@
 !     lake_seep_elev, elevlake_init, gw_seep_coef
 !***********************************************************************
       INTEGER FUNCTION gwflowdecl()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, DOCUMENTATION, CASCADEGW_OFF
+      USE PRMS_MODULE, ONLY: Model, Nhru, Ngw, Nlake, Init_vars_from_file, Dprst_flag, Cascadegw_flag, Lake_route_flag
       USE PRMS_GWFLOW
       IMPLICIT NONE
 ! Functions
@@ -267,6 +264,9 @@
 !                  compute initial values.
 !***********************************************************************
       INTEGER FUNCTION gwflowinit()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, LAKE, SWALE, DEBUG_less, CASCADEGW_OFF
+      USE PRMS_MODULE, ONLY: Ngw, Nlake, Print_debug, Init_vars_from_file, &
+     &    Dprst_flag, Cascadegw_flag, Inputerror_flag, Gwr_swale_flag
       USE PRMS_GWFLOW
       USE PRMS_BASIN, ONLY: Gwr_type, Hru_area, Basin_area_inv, Active_gwrs, Gwr_route_order, &
      &                      Lake_hru_id, Weir_gate_flag, Hru_storage
@@ -382,8 +382,10 @@
 !                 groundwater sink
 !***********************************************************************
       INTEGER FUNCTION gwflowrun()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, LAKE, SWALE, DEBUG_less, CASCADEGW_OFF, ERROR_water_use
+      USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascadegw_flag, Gwr_swale_flag, &
+     &    Gwr_add_water_use, Gwr_transfer_water_use, Nowyear, Nowmonth, Nowday
       USE PRMS_GWFLOW
-      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, Lake_type, &
      &    Basin_area_inv, Hru_area, Gwr_type, Lake_hru_id, Weir_gate_flag, Hru_area_dble, Hru_storage
       USE PRMS_FLOWVARS, ONLY: Soil_to_gw, Ssr_to_gw, Sroff, Ssres_flow, Gwres_stor, Lake_vol
@@ -627,7 +629,7 @@
 !     gwflow_restart - write or read gwflow restart file
 !***********************************************************************
       SUBROUTINE gwflow_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_BASIN, ONLY: Weir_gate_flag
       USE PRMS_GWFLOW

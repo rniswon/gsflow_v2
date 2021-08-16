@@ -17,16 +17,14 @@
 ! rain_nuse (rain_nsta) - indicies of rain stations used
 !***********************************************************************
       MODULE PRMS_XYZ_DIST
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, FEET2METERS
-      USE PRMS_MODULE, ONLY: Nhru, Nrain, Ntemp,
-     +    Inputerror_flag, Glacier_flag
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
       IMPLICIT NONE
 !   Local Variables
       INTEGER, PARAMETER :: MAXLAPSE = 3
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'xyz_dist'
-      character(len=*), parameter :: Version_xyz_dist = '2021-05-06'
+      character(len=*), parameter :: Version_xyz_dist = '2021-08-13'
       INTEGER, SAVE :: Nlapse, Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Basin_centroid_x, Basin_centroid_y
@@ -130,6 +128,8 @@
 !     hru_elev, hru_area
 !***********************************************************************
       INTEGER FUNCTION xyzdecl()
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
+      USE PRMS_MODULE, ONLY: Nhru, Nrain, Ntemp
       USE PRMS_XYZ_DIST
       IMPLICIT NONE
 ! Functions
@@ -457,6 +457,8 @@
 !     xyzinit - Initialize xyz_dist module - get parameter values,
 !***********************************************************************
       INTEGER FUNCTION xyzinit()
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, FEET2METERS
+      USE PRMS_MODULE, ONLY: Nhru, Nrain, Ntemp, Inputerror_flag
       USE PRMS_XYZ_DIST
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv,
      +    Hru_elev_ts, Active_hrus, Hru_route_order
@@ -684,8 +686,8 @@
 !               Outputs a daily max and min Temperature by HRU elevation
 !***********************************************************************
       INTEGER FUNCTION xyzrun()
-      USE PRMS_XYZ_DIST
       USE PRMS_MODULE, ONLY: Nowmonth
+      USE PRMS_XYZ_DIST
       USE PRMS_OBS, ONLY: Rain_code
       IMPLICIT NONE
 ! Functions
@@ -954,19 +956,19 @@
      +                        Rain_meanz, Meanppt, Rain_code)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, DNEARZERO,
      +    MM2INCH, CELSIUS
+      USE PRMS_MODULE, ONLY: Nowmonth, Nrain
       USE PRMS_XYZ_DIST, ONLY: MRUx, MRUy, Rain_STAx, Rain_STAy,
      +    Rain_nuse, Ppt_add, Ppt_div, Rain_nsta, Tmax_rain_sta,
      +    Tmin_rain_sta, Is_rain_day, Psta_freq_nuse, X_div, Y_div,
      +    Z_div, X_add, Y_add, Z_add, Precip_xyz, MAXLAPSE, MRUelev,
      +    Tmax_allsnow_dist, Tmax_allrain_dist, Adjust_snow,
-     +    Adjust_rain, Nrain
+     +    Adjust_rain
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus,
      +    Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Tminf, Newsnow, Pptmix,
      +    Hru_ppt, Hru_rain, Hru_snow, Basin_rain,
      +    Basin_ppt, Prmx, Basin_snow, Psta_elev, Basin_obs_ppt,
      +    Precip_units, Tmax_allsnow_f, Adjmix_rain, Tmax_allrain_f
-      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_OBS, ONLY: Precip, Rain_day
       IMPLICIT NONE
 ! Functions
@@ -1174,11 +1176,11 @@
      +                          Meantmax, Meantmin, Rain_meanx,
      +                          Rain_meany, Rain_meanz, Temp_meanx,
      +                          Temp_meany, Temp_meanz)
+      USE PRMS_MODULE, ONLY: Ntemp, Nrain
       USE PRMS_XYZ_DIST, ONLY: Rain_nsta, Rain_nuse, Temp_nsta,
      +    Temp_nuse, Rain_STAx, Rain_STAy, Temp_STAx, Tmax_div,
      +    Temp_STAy, Ppt_add, Ppt_div, Tmin_add, Tmin_div, Tmax_add,
-     +    X_div, Y_div, Z_div, X_add, Y_add, Z_add, Temp_STAelev,
-     +    Ntemp, Nrain
+     +    X_div, Y_div, Z_div, X_add, Y_add, Z_add, Temp_STAelev
       USE PRMS_CLIMATEVARS, ONLY: Psta_elev
       IMPLICIT NONE
 ! Functions

@@ -5,18 +5,18 @@
 ! evapotranspiration from temperature. Transaction of ASAE 1(2):96-99.
 !***********************************************************************
       MODULE PRMS_POTET_HS
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR
-        USE PRMS_MODULE, ONLY: Process_flag, Nhru
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_hs'
-        character(len=*), parameter :: Version_potet = '2020-08-03'
+        character(len=*), parameter :: Version_potet = '2021-08-13'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Hs_krs(:, :)
       END MODULE PRMS_POTET_HS
 
       INTEGER FUNCTION potet_hs()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru
       USE PRMS_POTET_HS
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Tminc, Tmaxc, Swrad

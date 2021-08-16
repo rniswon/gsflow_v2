@@ -2,15 +2,11 @@
 ! stream temperature module
 !***********************************************************************
       MODULE PRMS_STRMTEMP
-      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, MONTHS_PER_YEAR, DOCUMENTATION, ACTIVE, OFF, &
-     &    NEARZERO, ERROR_param, CFS2CMS_CONV, DAYS_YR, DAYS_PER_YEAR, DAYS_YR
-      USE PRMS_MODULE, ONLY: Process_flag, Nsegment, Model, Init_vars_from_file, &
-     &    Print_debug, Strmtemp_humidity_flag, Model, Inputerror_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2021-05-06'
+      character(len=*), parameter :: Version_stream_temp = '2021-08-13'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -94,6 +90,8 @@
 !   Declared Parameters
 !***********************************************************************
       INTEGER FUNCTION stream_temp_decl()
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DOCUMENTATION, ACTIVE, OFF, DAYS_PER_YEAR
+      USE PRMS_MODULE, ONLY: Nsegment, Model, Init_vars_from_file, Strmtemp_humidity_flag, Model
       USE PRMS_STRMTEMP
       IMPLICIT NONE
 ! Functions
@@ -412,6 +410,8 @@
 !    stream_temp_init - Initialize module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION stream_temp_init()
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, MONTHS_PER_YEAR, OFF, NEARZERO, ERROR_param, DAYS_YR
+      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag, Inputerror_flag
       USE PRMS_STRMTEMP
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_OBS, ONLY: Nhumid
@@ -717,17 +717,17 @@
 !     stream_temp_run - Computes stream temperatures
 !***********************************************************************
       INTEGER FUNCTION stream_temp_run()
-      USE PRMS_MODULE, ONLY: Nowmonth !, Nowyear, Nowday
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, CFS2CMS_CONV
+      USE PRMS_MODULE, ONLY: Nsegment, Strmtemp_humidity_flag, Nowmonth !, Nowyear, Nowday
       USE PRMS_STRMTEMP
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area
-      USE PRMS_SET_TIME, ONLY: Summer_flag
+      USE PRMS_SET_TIME, ONLY: Summer_flag, Jday
       USE PRMS_CLIMATEVARS, ONLY: Tavgc, Potet, Hru_rain, Swrad
       USE PRMS_CLIMATE_HRU, ONLY: Humidity_hru
       USE PRMS_FLOWVARS, ONLY: Seg_outflow
       USE PRMS_SNOW, ONLY: Snowmelt
       USE PRMS_ROUTING, ONLY: Hru_segment, Segment_order, Seginc_swrad
       USE PRMS_OBS, ONLY: Humidity
-      USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_SOLTAB, ONLY: Soltab_potsw, Hru_cossl
 
       IMPLICIT NONE

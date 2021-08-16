@@ -7,21 +7,20 @@
 !   central Nebraska-USA: Journal of Hydrology, V. 420-421, p. 228-244
 !***********************************************************************
       MODULE PRMS_POTET_PT
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR, OFF, INCH2CM
-        USE PRMS_MODULE, ONLY: Process_flag, Nhru, Humidity_cbh_flag
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_pt'
-        character(len=*), parameter :: Version_potet = '2020-08-03'
+        character(len=*), parameter :: Version_potet = '2021-08-13'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Pt_alpha(:, :)
       END MODULE PRMS_POTET_PT
 
 !***********************************************************************
       INTEGER FUNCTION potet_pt()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR, OFF, INCH2CM
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Humidity_cbh_flag, Nowmonth
       USE PRMS_POTET_PT
-      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Swrad, Tminc, Tmaxc, &
      &    Tempc_dewpt, Vp_actual, Lwrad_net, Vp_slope, Basin_humidity, Humidity_percent

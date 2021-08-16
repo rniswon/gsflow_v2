@@ -21,18 +21,11 @@
 ! rsr, 07/1/2013 combined smidx and carea into one module
 !***********************************************************************
       MODULE PRMS_SRUNOFF
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, NEARZERO, DNEARZERO, ACTIVE, OFF, &
-     &    DEBUG_WB, smidx_module, carea_module, LAND, LAKE, GLACIER, &
-     &    CASCADE_OFF, ERROR_water_use
-      USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Print_debug, Init_vars_from_file, &
-     &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, Water_use_flag, &
-     &    Frozen_flag, Inputerror_flag, Glacier_flag, Ag_frac_flag, Ag_package, &
-     &    Dprst_add_water_use, Dprst_transfer_water_use, PRMS_land_iteration_flag, Kkiter !, Parameter_check_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2021-05-27'
+      character(len=*), parameter :: Version_srunoff = '2021-08-13'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -113,6 +106,10 @@
 !     cfgi_thrshld, cfgi_decay
 !***********************************************************************
       INTEGER FUNCTION srunoffdecl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, DEBUG_WB, smidx_module, carea_module, CASCADE_OFF
+      USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Print_debug, Init_vars_from_file, &
+     &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, &
+     &    Frozen_flag, Ag_frac_flag, Ag_package, PRMS_land_iteration_flag
       USE PRMS_SRUNOFF
       IMPLICIT NONE
 ! Functions
@@ -515,6 +512,10 @@
 !     srunoffinit - Initialize srunoff module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION srunoffinit()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, smidx_module, carea_module, CASCADE_OFF
+      USE PRMS_MODULE, ONLY: Nhru, Nlake, Init_vars_from_file, &
+     &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, Water_use_flag, &
+     &    Frozen_flag, Ag_frac_flag !, Parameter_check_flag
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_FLOWVARS, ONLY: Basin_sroff
@@ -642,6 +643,9 @@
 !                  computations using antecedent soil moisture.
 !***********************************************************************
       INTEGER FUNCTION srunoffrun()
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF, DEBUG_WB, LAND, LAKE, GLACIER, CASCADE_OFF
+      USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Call_cascade, &
+     &    Frozen_flag, Glacier_flag, Ag_frac_flag, Ag_package, PRMS_land_iteration_flag, Kkiter
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, &
      &    Hru_perv, Hru_imperv, Hru_percent_imperv, Hru_frac_perv, &
@@ -992,7 +996,7 @@
      &                         Perv_on, Ag_on)
       USE PRMS_CONSTANTS, ONLY: NEARZERO, DNEARZERO, LAND, ACTIVE, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Cascade_flag
-      USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp, Isglacier, Infil_ag, Sroff_ag, Ihru
+      USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp, Isglacier, Infil_ag, Sroff_ag
       USE PRMS_SNOW, ONLY: Pptmix_nopack
       IMPLICIT NONE
 ! Arguments
@@ -1154,8 +1158,8 @@
 
 !***********************************************************************
       SUBROUTINE ag_comp(Pptp, Ptc, Infil_ag, Sroff_ag)
-      USE PRMS_SRUNOFF, ONLY: Ihru, Smidx_coef, Smidx_exp, &
-     &    Carea_max, Carea_min, Carea_dif, Contrib_fraction, smidx_module !, CLOSEZERO
+      USE PRMS_CONSTANTS, ONLY: smidx_module !, CLOSEZERO
+      USE PRMS_SRUNOFF, ONLY: Ihru, Smidx_coef, Smidx_exp, Carea_max, Carea_min, Carea_dif, Contrib_fraction
       USE PRMS_MODULE, ONLY: Sroff_flag
       USE PRMS_FLOWVARS, ONLY: Ag_soil_moist, Ag_soil_rechr, Ag_soil_rechr_max
       IMPLICIT NONE
@@ -1317,6 +1321,8 @@
 !***********************************************************************
       SUBROUTINE dprst_init()
       USE PRMS_SRUNOFF
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, NEARZERO
+      USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru, PRMS4_flag, Ag_frac_flag, Inputerror_flag
       USE PRMS_BASIN, ONLY: Dprst_clos_flag, Dprst_frac, &
      &    Dprst_area_clos_max, Dprst_area_open_max, Basin_area_inv, &
      &    Hru_area_dble, Active_hrus, Hru_route_order, Dprst_open_flag
@@ -1739,8 +1745,8 @@
 !     srunoff_restart - write or read srunoff restart file
 !***********************************************************************
       SUBROUTINE srunoff_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Dprst_flag, Frozen_flag
       USE PRMS_SRUNOFF
       IMPLICIT NONE
       ! Argument

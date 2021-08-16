@@ -3,12 +3,11 @@
 !***********************************************************************
       MODULE PRMS_STATVAR_OUT
         USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH
-        USE PRMS_MODULE, ONLY: StatsON_OFF, Stat_var_file
         IMPLICIT NONE
 ! Module Variables
         character(len=*), parameter :: MODDESC = 'Statistics Variables Output'
         character(len=*), parameter :: MODNAME = 'statvar_out'
-        character(len=*), parameter :: Version_statvar_out = '2021-07-19'
+        character(len=*), parameter :: Version_statvar_out = '2021-08-13'
         character(len=*), parameter :: stamp = '(7(I0,1X),'
         character(len=24) :: Output_fmt
         integer, save :: Statvar_unit
@@ -98,6 +97,7 @@
 !***********************************************************************
       SUBROUTINE statvar_outinit()
       USE PRMS_CONSTANTS, ONLY: ERROR_control, ERROR_open_out
+      USE PRMS_MODULE, ONLY: Stat_var_file
       USE PRMS_STATVAR_OUT
       IMPLICIT NONE
 ! Functions

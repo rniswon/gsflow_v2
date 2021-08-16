@@ -2,23 +2,11 @@
 ! Declares and initializes climate and flow parameters and variables
 !***********************************************************************
       MODULE PRMS_CLIMATEVARS
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, MONTHS_PER_YEAR, ERROR_dim, DEBUG_less, &
-     &    potet_pt_module, potet_pm_module, potet_pm_sta_module, climate_hru_module, &
-     &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
-     &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
-     &    FEET, FEET2METERS, METERS2FEET, FAHRENHEIT, INACTIVE, LAKE, ERROR_PARAM, &
-     &    ddsolrad_module, ccsolrad_module
-      USE PRMS_MODULE, ONLY: Nhru, Nssr, Ngw, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, &
-     &    Model, Print_debug, Init_vars_from_file, Temp_flag, Precip_flag, &
-     &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, &
-     &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
-     &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, &
-     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, Glacier_flag, Ag_frac_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2021-05-24'
+      character(len=*), parameter :: Version_climateflow = '2021-08-13'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -134,6 +122,16 @@
 !     climateflow_decl - declare climate and flow variables and parameters
 !***********************************************************************
       INTEGER FUNCTION climateflow_decl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, MONTHS_PER_YEAR, ERROR_dim, &
+     &    potet_pt_module, potet_pm_module, potet_pm_sta_module, climate_hru_module, &
+     &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
+     &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
+     &    ddsolrad_module, ccsolrad_module
+      USE PRMS_MODULE, ONLY: Nhru, Nssr, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, &
+     &    Model, Init_vars_from_file, Temp_flag, Precip_flag, Glacier_flag, Ag_frac_flag, &
+     &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, &
+     &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
+     &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       IMPLICIT NONE
@@ -894,6 +892,17 @@
 !                        set initial values and check parameter values
 !***********************************************************************
       INTEGER FUNCTION climateflow_init()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR, DEBUG_less, &
+     &    potet_pt_module, potet_pm_module, potet_pm_sta_module, climate_hru_module, &
+     &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
+     &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
+     &    FEET, FEET2METERS, METERS2FEET, FAHRENHEIT, INACTIVE, LAKE, ERROR_PARAM, ddsolrad_module, ccsolrad_module
+      USE PRMS_MODULE, ONLY: Nhru, Nssr, Nevap, Nlake, Ntemp, Nrain, Nsol, &
+     &    Print_debug, Init_vars_from_file, Temp_flag, Precip_flag, &
+     &    Temp_module, Stream_order_flag, GSFLOW_flag, &
+     &    Precip_module, Solrad_module, Et_module, PRMS4_flag, &
+     &    Soilzone_module, Srunoff_module, Et_flag, Dprst_flag, Solrad_flag, &
+     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, Ag_frac_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_type, Hru_perv
@@ -1430,8 +1439,9 @@
 !     Write or read restart file
 !***********************************************************************
       SUBROUTINE climateflow_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Glacier_flag, GSFLOW_flag, &
+     &    Dprst_flag, Stream_order_flag, Nlake, Ag_frac_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       IMPLICIT NONE

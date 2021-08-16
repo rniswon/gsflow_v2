@@ -5,17 +5,12 @@
 ! PRMS modules
 !***********************************************************************
       MODULE PRMS_CLIMATE_HRU
-        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ACTIVE, OFF, RUN, DECL, INIT, DOCUMENTATION, &
-     &      MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, CELSIUS, MONTHS_PER_YEAR
-        USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Climate_transp_flag, Orad_flag, &
-     &      Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
-     &      Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
-     &      Climate_irrigated_area_flag, AET_cbh_flag, PET_cbh_flag, Albedo_cbh_flag, Cloud_cover_cbh_flag
+        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2021-05-27'
+        character(len=*), parameter :: Version_climate_hru = '2021-08-13'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit, AET_unit, PET_unit, Irrigated_area_unit
         INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit
@@ -34,8 +29,13 @@
       END MODULE PRMS_CLIMATE_HRU
 
       INTEGER FUNCTION climate_hru()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, RUN, DECL, INIT, DOCUMENTATION, &
+     &    MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, CELSIUS, MONTHS_PER_YEAR
+      USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Climate_transp_flag, Orad_flag, &
+     &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
+     &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
+     &    Climate_irrigated_area_flag, AET_cbh_flag, PET_cbh_flag, Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth
       USE PRMS_CLIMATE_HRU
-      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
      &    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, &
@@ -556,21 +556,21 @@
               istop = 1
             ENDIF
           ENDIF
-       ENDIF
+        ENDIF
 
-       IF ( PET_cbh_flag==ACTIVE ) THEN
-         IF ( control_string(PET_cbh_file, 'PET_cbh_file')/=0 ) CALL read_error(5, 'PET_cbh_file')
-         CALL find_header_end(PET_unit, PET_cbh_file, 'PET_cbh_file', ierr, 1, Cbh_binary_flag)
-         IF ( ierr==1 ) THEN
-           istop = 1
-         ELSE
-           CALL find_current_time(PET_unit, Start_year, Start_month, Start_day, ierr, Cbh_binary_flag)
-           IF ( ierr==-1 ) THEN
-             PRINT *, 'for first time step, CBH File: ', PET_cbh_file
-             istop = 1
-           ENDIF
-         ENDIF
-       ENDIF
+        IF ( PET_cbh_flag==ACTIVE ) THEN
+          IF ( control_string(PET_cbh_file, 'PET_cbh_file')/=0 ) CALL read_error(5, 'PET_cbh_file')
+          CALL find_header_end(PET_unit, PET_cbh_file, 'PET_cbh_file', ierr, 1, Cbh_binary_flag)
+          IF ( ierr==1 ) THEN
+            istop = 1
+          ELSE
+            CALL find_current_time(PET_unit, Start_year, Start_month, Start_day, ierr, Cbh_binary_flag)
+            IF ( ierr==-1 ) THEN
+              PRINT *, 'for first time step, CBH File: ', PET_cbh_file
+              istop = 1
+            ENDIF
+          ENDIF
+        ENDIF
 
         IF ( Climate_transp_flag==ACTIVE ) THEN
           IF ( control_string(Transp_day, 'transp_day')/=0 ) CALL read_error(5, 'transp_day')

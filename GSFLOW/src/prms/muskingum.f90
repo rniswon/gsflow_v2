@@ -81,13 +81,10 @@
 !
 !***********************************************************************
       MODULE PRMS_MUSKINGUM
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, NEARZERO, CFS2CMS_CONV, &
-     &    OUTFLOW_SEGMENT, ERROR_streamflow, strmflow_muskingum_module
-      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmflow_flag, Glacier_flag
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Streamflow Routing'
       character(len=14), parameter :: MODNAME = 'muskingum_mann'
-      character(len=*), parameter :: Version_muskingum = '2020-12-02'
+      character(len=*), parameter :: Version_muskingum = '2021-08-13'
 !   Local Variables
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
@@ -126,6 +123,8 @@
 !     tosegment, hru_segment, obsin_segment, K_coef, x_coef
 !***********************************************************************
       INTEGER FUNCTION muskingum_decl()
+      USE PRMS_CONSTANTS, ONLY: strmflow_muskingum_module
+      USE PRMS_MODULE, ONLY: Nsegment, Strmflow_flag
       USE PRMS_MUSKINGUM
       IMPLICIT NONE
 ! Functions
@@ -149,6 +148,7 @@
 !    muskingum_init - Get and check parameter values and initialize variables
 !***********************************************************************
       INTEGER FUNCTION muskingum_init()
+      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file
       USE PRMS_MUSKINGUM
       USE PRMS_BASIN, ONLY: Basin_area_inv
       USE PRMS_FLOWVARS, ONLY: Seg_outflow
@@ -175,6 +175,8 @@
 !     muskingum_run - Compute routing summary values
 !***********************************************************************
       INTEGER FUNCTION muskingum_run()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, CFS2CMS_CONV, OUTFLOW_SEGMENT, ERROR_streamflow
+      USE PRMS_MODULE, ONLY: Nsegment, Glacier_flag
       USE PRMS_MUSKINGUM
       USE PRMS_BASIN, ONLY: Basin_area_inv, Basin_gl_cfs, Basin_gl_ice_cfs
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_cms, Basin_gwflow_cfs, Basin_ssflow_cfs, &

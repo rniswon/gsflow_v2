@@ -2,15 +2,11 @@
 ! Computes water balance for components of a PRMS model
 !***********************************************************************
       MODULE PRMS_WATER_BALANCE
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, NEARZERO, DNEARZERO, &
-     &      DOCUMENTATION, LAKE, CASCADE_OFF, CASCADEGW_OFF
-        USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Cascade_flag, Cascadegw_flag, &
-     &      Dprst_flag, Glacier_flag
         IMPLICIT NONE
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Water Balance Computations'
         character(len=*), parameter :: MODNAME_WB = 'water_balance'
-        character(len=*), parameter :: Version_water_balance = '2021-07-17'
+        character(len=*), parameter :: Version_water_balance = '2021-08-13'
         INTEGER, SAVE :: BALUNT, SZUNIT, GWUNIT, INTCPUNT, SROUNIT, SNOWUNIT
         REAL, PARAMETER :: TOOSMALL = 3.1E-05, SMALL = 1.0E-04, BAD = 1.0E-03
         DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 1.0D-05
@@ -24,6 +20,8 @@
 !***********************************************************************
 !***********************************************************************
       SUBROUTINE water_balance()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN
+      USE PRMS_MODULE, ONLY: Process_flag
       USE PRMS_WATER_BALANCE
       IMPLICIT NONE
 ! Functions
@@ -49,6 +47,8 @@
 !***********************************************************************
 !***********************************************************************
       SUBROUTINE water_balance_decl()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, DOCUMENTATION, CASCADE_OFF
+      USE PRMS_MODULE, ONLY: Model, Nhru, Cascade_flag, Dprst_flag
       USE PRMS_WATER_BALANCE
       USE PRMS_SRUNOFF, ONLY: MODNAME
       IMPLICIT NONE
@@ -147,7 +147,8 @@
 !     water_balance_run - Computes balance for each HRU and model domain
 !***********************************************************************
       SUBROUTINE water_balance_run()
-      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, NEARZERO, DNEARZERO, LAKE, CASCADE_OFF, CASCADEGW_OFF
+      USE PRMS_MODULE, ONLY: Cascade_flag, Cascadegw_flag, Dprst_flag, Glacier_flag, Nowyear, Nowmonth, Nowday
       USE PRMS_WATER_BALANCE
       USE PRMS_BASIN, ONLY: Hru_route_order, Active_hrus, Hru_frac_perv, Hru_area_dble, Hru_perv, &
      &    Hru_type, Basin_area_inv, Dprst_area_max, Hru_percent_imperv, Dprst_frac, Cov_type, Hru_storage

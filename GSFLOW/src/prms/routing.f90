@@ -2,18 +2,11 @@
 ! Defines stream and lake routing parameters and variables
 !***********************************************************************
       MODULE PRMS_ROUTING
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, FT2_PER_ACRE, &
-     &    NEARZERO, DNEARZERO, OUTFLOW_SEGMENT, ERROR_param, &
-     &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
-     &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
-      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Model, Init_vars_from_file, &
-     &    Strmflow_flag, Cascade_flag, Print_debug, Glacier_flag, &
-     &    Water_use_flag, Segment_transferON_OFF, Inputerror_flag, Parameter_check_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2021-05-06'
+      character(len=*), parameter :: Version_routing = '2021-08-13'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades
@@ -67,6 +60,9 @@
 !     routingdecl - set up parameters
 !***********************************************************************
       INTEGER FUNCTION routingdecl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
+     &    strmflow_muskingum_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
+      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Model, Init_vars_from_file, Strmflow_flag, Cascade_flag
       USE PRMS_ROUTING
       IMPLICIT NONE
 ! Functions
@@ -307,6 +303,11 @@
 !     routinginit - check for validity of parameters
 !**********************************************************************
       INTEGER FUNCTION routinginit()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, FT2_PER_ACRE, NEARZERO, DNEARZERO, OUTFLOW_SEGMENT, ERROR_param, &
+     &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
+     &    strmflow_muskingum_module, strmflow_in_out_module
+      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Init_vars_from_file, &
+     &    Strmflow_flag, Water_use_flag, Segment_transferON_OFF, Inputerror_flag, Parameter_check_flag
       USE PRMS_ROUTING
       USE PRMS_SET_TIME, ONLY: Timestep_seconds
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area_dble !, Active_area
@@ -647,6 +648,11 @@
 !     route_run - Computes segment flow states and fluxes
 !***********************************************************************
       INTEGER FUNCTION route_run()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, FT2_PER_ACRE, &
+     &    NEARZERO, DNEARZERO, OUTFLOW_SEGMENT, ERROR_param, &
+     &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
+     &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
+      USE PRMS_MODULE, ONLY: Nsegment, Cascade_flag, Glacier_flag
       USE PRMS_ROUTING
       USE PRMS_BASIN, ONLY: Hru_area, Hru_route_order, Active_hrus
       USE PRMS_CLIMATEVARS, ONLY: Swrad, Potet
@@ -800,8 +806,9 @@
 !     routing_restart - write or read restart file
 !***********************************************************************
       SUBROUTINE routing_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, strmflow_muskingum_lake_module, &
+     &    strmflow_muskingum_module, strmflow_muskingum_mann_module
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Strmflow_flag
       USE PRMS_ROUTING
       IMPLICIT NONE
       ! Argument

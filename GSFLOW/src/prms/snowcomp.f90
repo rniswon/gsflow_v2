@@ -9,12 +9,6 @@
 ! PRMS_SNOW module for defining stateful variables
 
       MODULE PRMS_SNOW
-      USE PRMS_CONSTANTS, ONLY: LAKE, LAND, GLACIER, SHRUBS, FEET, &
-     &    INCH2M, FEET2METERS, DNEARZERO, DOCUMENTATION, ACTIVE, OFF, &
-     &    MONTHS_PER_YEAR, DEBUG_less, DAYS_YR, CLOSEZERO, INCH2CM, SAVE_INIT
-      USE PRMS_MODULE, ONLY: Model, Nhru, Ndepl, Print_debug, &
-     &    Init_vars_from_file, Glacier_flag, Start_year, Snarea_curve_flag, &
-     &    PRMS_land_iteration_flag, Kkiter
       IMPLICIT NONE
       !****************************************************************
       !   Local Constants
@@ -27,7 +21,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2021-01-11'
+      character(len=*), parameter :: Version_snowcomp = '2021-08-13'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -118,6 +112,9 @@
 !     glacr_freeh2o_cap, glacr_layer
 !***********************************************************************
       INTEGER FUNCTION snodecl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, MONTHS_PER_YEAR
+      USE PRMS_MODULE, ONLY: Model, Nhru, Ndepl, &
+     &    Init_vars_from_file, Glacier_flag, Snarea_curve_flag, PRMS_land_iteration_flag
       USE PRMS_SNOW
       IMPLICIT NONE
 ! Functions
@@ -693,9 +690,10 @@
 !               compute initial values
 !***********************************************************************
       INTEGER FUNCTION snoinit()
+      USE PRMS_CONSTANTS, ONLY: LAND, GLACIER, FEET, FEET2METERS, DNEARZERO, ACTIVE, OFF, MONTHS_PER_YEAR, DEBUG_less
+      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Print_debug, Init_vars_from_file, Glacier_flag, Snarea_curve_flag
       USE PRMS_SNOW
-      USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_route_order, Active_hrus, Hru_area_dble, &
-     &    Elev_units, Hru_type
+      USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_route_order, Active_hrus, Hru_area_dble, Elev_units, Hru_type
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
       IMPLICIT NONE
 ! Functions
@@ -904,7 +902,10 @@
 !     snorun - daily mode snow estimates
 !***********************************************************************
       INTEGER FUNCTION snorun()
-      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Albedo_cbh_flag
+      USE PRMS_CONSTANTS, ONLY: LAKE, LAND, GLACIER, SHRUBS, FEET, &
+     &    INCH2M, FEET2METERS, DNEARZERO, ACTIVE, OFF, DEBUG_less, DAYS_YR
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag, Start_year, &
+     &    PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Albedo_cbh_flag
       USE PRMS_SNOW
       USE PRMS_SOLTAB, ONLY: Soltab_basinpotsw
       USE PRMS_CLIMATE_HRU, ONLY: Albedo_hru
@@ -1254,7 +1255,7 @@
                                            ! or [Langleys / degC]
           ! If the land cover is trees, reduce the convection-
           ! condensation parameter by half
-          IF ( Cov_type(i)>SHRUBS ) cec = cec*0.5 ! [cal/(cm^2 degC)] RSR: cov_type=4 is valid for trees (coniferous)
+          IF ( Cov_type(i)>SHRUBS ) cec = cec*0.5 ! [cal/(cm^2 degC)] cov_type>2 is valid for trees and coniferous)
                                                   ! or [Langleys / degC]
           ! Check whether to force spring melt
           ! Spring melt is forced if time is before the melt-force
@@ -1444,7 +1445,7 @@
             ! Snow can evaporate when transpiration is not occuring
             ! or when transpiration is occuring with cover types of
             ! bare soil or grass
-            IF ( Transp_on(i)==0 .OR. (Transp_on(i)==1 .AND. Cov_type(i)<SHRUBS) ) &
+            IF ( Transp_on(i)==0 .OR. (Transp_on(i)==1 .AND. Cov_type(i)<SHRUBS) ) & ! cov_type < 2
      &           CALL snowevap(Potet_sublim(i), Potet(i), Snowcov_area(i), &
      &                         Snow_evap(i), Pkwater_equiv(i), Pk_ice(i), &
      &                         Pk_def(i), Freeh2o(i), Pk_temp(i), Hru_intcpevap(i))
@@ -2979,7 +2980,8 @@
 !     snowcomp_restart - write or read snowcomp restart file
 !***********************************************************************
       SUBROUTINE snowcomp_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Glacier_flag
       USE PRMS_SNOW
       IMPLICIT NONE
       ! Argument

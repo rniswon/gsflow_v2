@@ -13,14 +13,12 @@
 ! Variables needed from DATA FILE: tmax, tmin
 !***********************************************************************
       MODULE PRMS_TEMP_DIST2
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, DOCUMENTATION, READ_INIT, SAVE_INIT, &
-     &    DNEARZERO, NEARZERO, MAXTEMP, MINTEMP, ERROR_data, GLACIER, ERROR_dim
-      USE PRMS_MODULE, ONLY: Model, Nhru, Ntemp, Init_vars_from_file, Glacier_flag
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Temperature Distribution'
       character(len=10), parameter :: MODNAME = 'temp_dist2'
-      character(len=*), parameter :: Version_temp = '2021-05-06'
+      character(len=*), parameter :: Version_temp = '2021-08-13'
       INTEGER, SAVE, ALLOCATABLE :: N_tsta(:), Nuse_tsta(:, :)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dist(:, :)
       REAL, SAVE, ALLOCATABLE :: Delv(:, :), Elfac(:, :)
@@ -72,6 +70,8 @@
 !     lapsemax_max, tsta_xlong, tsta_ylat, hru_ylat, hru_xlong, dist_max
 !***********************************************************************
       INTEGER FUNCTION t2dist2decl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ERROR_dim
+      USE PRMS_MODULE, ONLY: Model, Nhru, Ntemp
       USE PRMS_TEMP_DIST2
       IMPLICIT NONE
 ! Functions
@@ -201,6 +201,8 @@
 !                 - get parameter values, compute elfac, dist
 !***********************************************************************
       INTEGER FUNCTION t2dist2init()
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DNEARZERO, NEARZERO
+      USE PRMS_MODULE, ONLY:  Nhru, Ntemp, Init_vars_from_file
       USE PRMS_TEMP_DIST2
       USE PRMS_BASIN, ONLY: Hru_elev
       USE PRMS_CLIMATEVARS, ONLY: Tsta_elev
@@ -317,12 +319,13 @@
 !                  available period of record
 !***********************************************************************
       INTEGER FUNCTION t2dist2run()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, DNEARZERO, MAXTEMP, MINTEMP, ERROR_data, GLACIER
+      USE PRMS_MODULE, ONLY: Ntemp, Glacier_flag, Nowmonth
       USE PRMS_TEMP_DIST2
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, &
      &    Hru_elev_ts, Hru_type
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, Tmax_aspect_adjust, Tmin_aspect_adjust, &
      &    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, Tavgc, Basin_tsta, Tsta_elev
-      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_OBS, ONLY: Tmax, Tmin
       IMPLICIT NONE
 ! Functions
@@ -477,6 +480,7 @@
 !     temp_dist2_restart - write or read temp_dist2 restart file
 !***********************************************************************
       SUBROUTINE temp_dist2_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_TEMP_DIST2
       IMPLICIT NONE

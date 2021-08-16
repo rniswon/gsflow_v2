@@ -2,16 +2,12 @@
 ! Sets PRMS time variables
 !***********************************************************************
       MODULE PRMS_SET_TIME
-        USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, RUN, DECL, INIT,&
-     &      YEAR, MONTH, DAY, HOUR, MINUTE, MAX_DAYS_PER_YEAR, DAYS_PER_YEAR, &
-     &      ACTIVE, OFF, NORTHERN, FT2_PER_ACRE, SECS_PER_HOUR, &
-     &      INCHES_PER_FOOT, SECS_PER_DAY, ERROR_time
-        USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime, Nowyear, Nowmonth, Nowday
+        USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
         IMPLICIT NONE
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Timestep Control'
         character(len=*), parameter :: MODNAME = 'prms_time'
-        character(len=*), parameter :: Version_prms_time = '2021-05-25'
+        character(len=*), parameter :: Version_prms_time = '2021-08-13'
         INTEGER, SAVE :: Modays(MONTHS_PER_YEAR), Yrdays, Summer_flag, Jday, Jsol, Julwater
         INTEGER, SAVE :: Nowtime(6), Nowhour, Nowminute, Julian_day_absolute
         REAL, SAVE :: Timestep_hours, Timestep_days, Timestep_minutes
@@ -21,6 +17,9 @@
 !***********************************************************************
 !***********************************************************************
       INTEGER FUNCTION prms_time()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, YEAR, MONTH, DAY, HOUR, MINUTE, MAX_DAYS_PER_YEAR, DAYS_PER_YEAR, &
+     &    ACTIVE, OFF, NORTHERN, FT2_PER_ACRE, SECS_PER_HOUR, INCHES_PER_FOOT, SECS_PER_DAY, ERROR_time
+      USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime, Nowyear, Nowmonth, Nowday
       USE PRMS_SET_TIME
       USE PRMS_BASIN, ONLY: Hemisphere, Basin_area_inv
       IMPLICIT NONE

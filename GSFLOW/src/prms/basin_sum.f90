@@ -3,15 +3,11 @@
 ! and flows for all HRUs
 !***********************************************************************
       MODULE PRMS_BASINSUM
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, &
-     &    strmflow_muskingum_module, strmflow_muskingum_lake_module, strmflow_muskingum_mann_module
-      USE PRMS_MODULE, ONLY: Nhru, Nobs, Model, Init_vars_from_file, &
-     &    Print_debug, End_year, Strmflow_flag, Glacier_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=9), parameter :: MODNAME = 'basin_sum'
-      character(len=*), parameter :: Version_basin_sum = '2021-05-06'
+      character(len=*), parameter :: Version_basin_sum = '2021-08-13'
 
       INTEGER, SAVE :: BALUNT, Totdays
       INTEGER, SAVE :: Header_prt, Endjday
@@ -93,6 +89,8 @@
 !     print_type, print_freq, outlet_sta
 !***********************************************************************
       INTEGER FUNCTION sumbdecl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION
+      USE PRMS_MODULE, ONLY: Nhru, Nobs, Model
       USE PRMS_BASINSUM
       IMPLICIT NONE
 ! Functions
@@ -313,6 +311,8 @@
 !     sumbinit - Initialize basinsum module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION sumbinit()
+      USE PRMS_CONSTANTS, ONLY: OFF
+      USE PRMS_MODULE, ONLY: Nobs, Init_vars_from_file, Print_debug
       USE PRMS_BASINSUM
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_lake_stor
       USE PRMS_INTCP, ONLY: Basin_intcp_stor
@@ -475,7 +475,8 @@
 !     sumbrun - Computes summary values
 !***********************************************************************
       INTEGER FUNCTION sumbrun()
-      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, strmflow_muskingum_module, strmflow_muskingum_lake_module, strmflow_muskingum_mann_module
+      USE PRMS_MODULE, ONLY: Nobs, Print_debug, End_year, Strmflow_flag, Glacier_flag, Nowyear, Nowmonth, Nowday
       USE PRMS_BASINSUM
       USE PRMS_BASIN, ONLY: Active_area, Active_hrus, Hru_route_order
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, &

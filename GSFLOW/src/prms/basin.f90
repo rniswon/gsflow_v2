@@ -2,19 +2,11 @@
 ! Defines shared watershed and HRU physical parameters and variables
 !***********************************************************************
       MODULE PRMS_BASIN
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CASCADEGW_OFF, &
-     &    INACTIVE, LAKE, SWALE, FEET, ERROR_basin, DEBUG_minimum, &
-     &    NORTHERN, SOUTHERN, DOCUMENTATION, FEET2METERS, METERS2FEET, DNEARZERO, &
-     &    ide_dist_module, potet_pt_module, potet_pm_module, potet_pm_sta_module
-      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nlake, Print_debug, Model, &
-     &    Dprst_flag, Lake_route_flag, Et_flag, Precip_flag, Cascadegw_flag, &
-     &    Stream_temp_flag, PRMS4_flag, GSFLOW_flag, Glacier_flag, Frozen_flag, PRMS_VERSION, &
-     &    Starttime, Endtime, Parameter_check_flag, Ag_frac_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2021-07-17'
+      character(len=*), parameter :: Version_basin = '2021-08-13'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -70,6 +62,10 @@
 !     lake_hru_id, ag_frac, ag_cov_type
 !***********************************************************************
       INTEGER FUNCTION basdecl()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CASCADEGW_OFF, DOCUMENTATION, &
+     &    ide_dist_module, potet_pt_module, potet_pm_module, potet_pm_sta_module
+      USE PRMS_MODULE, ONLY: Nhru, Nlake, Model, Dprst_flag, Lake_route_flag, Et_flag, Precip_flag, Cascadegw_flag, &
+     &    Stream_temp_flag, PRMS4_flag, GSFLOW_flag, Glacier_flag, Ag_frac_flag
       USE PRMS_BASIN
       IMPLICIT NONE
 ! Functions
@@ -288,6 +284,14 @@
 !               and compute reservoir areas
 !**********************************************************************
       INTEGER FUNCTION basinit()
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CASCADEGW_OFF, &
+     &    INACTIVE, LAKE, SWALE, FEET, ERROR_basin, DEBUG_minimum, &
+     &    NORTHERN, SOUTHERN, FEET2METERS, METERS2FEET, DNEARZERO, &
+     &    ide_dist_module, potet_pt_module, potet_pm_module, potet_pm_sta_module
+      USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, &
+     &    Dprst_flag, Lake_route_flag, Et_flag, Precip_flag, Cascadegw_flag, &
+     &    Stream_temp_flag, PRMS4_flag, GSFLOW_flag, Glacier_flag, Frozen_flag, PRMS_VERSION, &
+     &    Starttime, Endtime, Parameter_check_flag, Ag_frac_flag
       USE PRMS_BASIN
       IMPLICIT NONE
 ! Functions
@@ -478,7 +482,7 @@
         Hru_perv(i) = perv_area
         Hru_frac_perv(i) = perv_area/harea
         IF ( Hru_frac_perv(i)<0.001 .AND. Print_debug>DEBUG_less ) THEN
-          PRINT *, 'WARNING, pervious fraction must be >= 0.001 for HRU:', i
+          PRINT *, 'WARNING, pervious fraction recommended to be >= 0.001 for HRU:', i
           PRINT *, '         pervious portion is HRU fraction - impervious fraction - depression fraction'
           PRINT *, '         pervious fraction:', Hru_frac_perv(i)
           PRINT *, '         impervious fraction:', Hru_percent_imperv(i)

@@ -2,16 +2,12 @@
 !     Output a set of declared variables by subbasin in CSV format
 !***********************************************************************
       MODULE PRMS_NSUB_SUMMARY
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, DNEARZERO, &
-     &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, &
-     &    REAL_TYPE, DBLE_TYPE, RUN, DECL, INIT, CLEAN, DOCUMENTATION
-      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nsub, Model, Inputerror_flag, &
-     &    Start_year, Start_month, Start_day, End_year, End_month, End_day, Prms_warmup
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       IMPLICIT NONE
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsub_summary'
-      character(len=*), parameter :: Version_nsub_summary = '2021-05-06'
+      character(len=*), parameter :: Version_nsub_summary = '2021-08-13'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsub_var_type(:), Nsub_var_size(:)
       REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
@@ -36,6 +32,8 @@
 !     subbasin results module
 !     ******************************************************************
       SUBROUTINE nsub_summary()
+      USE PRMS_CONSTANTS, ONLY: MEAN_MONTHLY, ACTIVE, RUN, DECL, INIT, CLEAN
+      USE PRMS_MODULE, ONLY: Process_flag
       USE PRMS_NSUB_SUMMARY
       IMPLICIT NONE
 ! Functions
@@ -69,6 +67,10 @@
 !     declare parameters and variables
 !***********************************************************************
       SUBROUTINE nsub_summarydecl()
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, DNEARZERO, &
+     &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, &
+     &    REAL_TYPE, DBLE_TYPE, RUN, DECL, INIT, CLEAN, DOCUMENTATION
+      USE PRMS_MODULE, ONLY: Nhru, Nsub, Model
       USE PRMS_NSUB_SUMMARY
       IMPLICIT NONE
 ! Functions
@@ -112,6 +114,9 @@
 !     Initialize module values
 !***********************************************************************
       SUBROUTINE nsub_summaryinit()
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, DNEARZERO, &
+     &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, REAL_TYPE, DBLE_TYPE
+      USE PRMS_MODULE, ONLY: Nhru, Nsub, Inputerror_flag, Start_year, Prms_warmup
       USE PRMS_NSUB_SUMMARY
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order
       IMPLICIT NONE
@@ -283,7 +288,8 @@
 !     Output set of declared variables in CSV format
 !***********************************************************************
       SUBROUTINE nsub_summaryrun()
-      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_CONSTANTS, ONLY: MEAN_MONTHLY, MEAN_YEARLY, ACTIVE, OFF, REAL_TYPE, DBLE_TYPE
+      USE PRMS_MODULE, ONLY: Nhru, Nsub, Start_month, Start_day, End_year, End_month, End_day, Nowyear, Nowmonth, Nowday
       USE PRMS_NSUB_SUMMARY
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area_dble
       USE PRMS_SET_TIME, ONLY: Modays
@@ -301,7 +307,6 @@
           RETURN
         ENDIF
       ENDIF
-
 !-----------------------------------------------------------------------
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NsubOutVars

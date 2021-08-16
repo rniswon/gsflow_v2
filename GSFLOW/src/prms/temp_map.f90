@@ -6,13 +6,12 @@
 ! measurement gage efficiency
 !***********************************************************************
       MODULE PRMS_TEMP_MAP
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MAXFILE_LENGTH, MONTHS_PER_YEAR, temp_map_module
-        USE PRMS_MODULE, ONLY: Model, Process_flag, Start_year, Start_month, Start_day, Nmap2hru, Nmap
+        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, MONTHS_PER_YEAR
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Temperature Distribution'
         character(len=*), parameter :: MODNAME = 'temp_map'
-        character(len=*), parameter :: Version_temp_map = '2020-11-20'
+        character(len=*), parameter :: Version_temp_map = '2021-08-13'
         INTEGER, SAVE :: Tmax_unit, Tmin_unit
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
@@ -25,11 +24,12 @@
       END MODULE PRMS_TEMP_MAP
 
       SUBROUTINE temp_map()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MAXFILE_LENGTH, MONTHS_PER_YEAR, temp_map_module
+      USE PRMS_MODULE, ONLY: Process_flag, Start_year, Start_month, Start_day, Nmap2hru, Nmap, Nowmonth
       USE PRMS_TEMP_MAP
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
      &    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, Tavgc
-      USE PRMS_MODULE, ONLY: Nowmonth
 ! Functions
       INTRINSIC :: SNGL
       INTEGER, EXTERNAL :: declparam, getparam, getdim, decldim, control_string

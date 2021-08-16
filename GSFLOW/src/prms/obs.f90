@@ -2,14 +2,12 @@
 ! Reads and stores observed data from all specified measurement stations
 !***********************************************************************
       MODULE PRMS_OBS
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, xyz_dist_module, &
-     &    MONTHS_PER_YEAR, CMS, CFS, CFS2CMS_CONV
-      USE PRMS_MODULE, ONLY: Model, Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Precip_flag
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'obs'
-      character(len=*), parameter :: Version_obs = '2021-05-06'
+      character(len=*), parameter :: Version_obs = '2021-08-13'
       INTEGER, SAVE :: Nlakeelev, Nwind, Nhumid, Rain_flag
 !   Declared Variables
       INTEGER, SAVE :: Rain_day
@@ -71,6 +69,8 @@
 !     rain_code
 !***********************************************************************
       INTEGER FUNCTION obsdecl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, xyz_dist_module
+      USE PRMS_MODULE, ONLY: Model, Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Precip_flag
       USE PRMS_OBS
       IMPLICIT NONE
 ! Functions
@@ -212,6 +212,8 @@
 !     obsinit - initializes obs module
 !***********************************************************************
       INTEGER FUNCTION obsinit()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR, CFS
+      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow
       USE PRMS_OBS
       IMPLICIT NONE
 ! Functions
