@@ -23,9 +23,9 @@
       character(len=*), parameter :: GSFLOW_versn = '2.4.0 07/14/2021'
       character(len=*), parameter :: PRMS_versn = '2021-06-22'
       character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 06/22/2021'
-      character(len=*), parameter :: Version_read_control_file = '2021-07-14'
-      character(len=*), parameter :: Version_read_parameter_file = '2021-06-10'
-      character(len=*), parameter :: Version_read_data_file = '2021-06-10'
+      character(len=*), parameter :: Version_read_control_file = '2021-08-14'
+      character(len=*), parameter :: Version_read_parameter_file = '2021-08-14'
+      character(len=*), parameter :: Version_read_data_file = '2021-08-14'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -92,14 +92,12 @@
       END MODULE PRMS_MODULE
 
       MODULE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE, OFF, &
-     &    MODFLOW, GSFLOW, ERROR_modflow, ERROR_time, MAXFILE_LENGTH, READ_INIT
-      USE PRMS_MODULE, ONLY: Print_debug, Model, GSFLOW_flag
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-06-22'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-08-13'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -128,8 +126,7 @@
       DOUBLE PRECISION, SAVE :: Mft_to_sec, Totalarea_mf
       DOUBLE PRECISION, SAVE :: Mfl2_to_acre, Mfl3_to_ft3, Sfr_conv
       DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs
-      REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t
-      REAL, SAVE :: MFQ_to_inch_acres
+      REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t, MFQ_to_inch_acres
       DOUBLE PRECISION, SAVE :: mfstrt_jul  !RGN to get MF to stop at End_time for MODFLOW only
       REAL, SAVE, ALLOCATABLE :: Mfq2inch_conv(:), Cellarea(:)
       REAL, SAVE, ALLOCATABLE :: Gvr2cell_conv(:), Mfvol2inch_conv(:)

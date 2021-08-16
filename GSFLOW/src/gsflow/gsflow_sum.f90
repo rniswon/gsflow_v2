@@ -4,13 +4,13 @@
 !***********************************************************************
 
       MODULE GSFSUM
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, DEBUG_WB, DEBUG_less, ERROR_open_out, CFS2CMS_CONV, ACTIVE, READ_INIT, OFF
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       USE PRMS_MODULE, ONLY: Print_debug
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output CSV Summary'
       character(len=10), parameter :: MODNAME = 'gsflow_sum'
-      character(len=*), parameter :: Version_gsflow_sum = '2021-06-08'
+      character(len=*), parameter :: Version_gsflow_sum = '2021-08-16'
       INTEGER, SAVE :: BALUNT
       DOUBLE PRECISION, PARAMETER :: ERRCHK = 0.0001D0
       INTEGER, SAVE :: Balance_unt, Vbnm_index(14), Gsf_unt, Rpt_count
@@ -102,6 +102,7 @@
 !     rpt_days, csv_output_file, gsflow_output_file, model_output_file
 !***********************************************************************
       INTEGER FUNCTION gsfsumdecl()
+      USE PRMS_CONSTANTS, ONLY: DEBUG_WB
       USE GSFSUM
       IMPLICIT NONE
       INTEGER, EXTERNAL :: declparam
@@ -401,12 +402,13 @@
 !                set to zero
 !***********************************************************************
       INTEGER FUNCTION gsfsuminit()
+      USE PRMS_CONSTANTS, ONLY: READ_INIT, OFF
+      USE PRMS_MODULE, ONLY: Init_vars_from_file
       USE GSFSUM
       USE GSFMODFLOW, ONLY: Acre_inches_to_mfl3, Mft_to_days
       USE GWFLAKMODULE, ONLY: TOTSTOR_LAK
       USE GWFSFRMODULE, ONLY: IRTFLG
       USE GLOBAL, ONLY: IUNIT
-      USE PRMS_MODULE, ONLY: Init_vars_from_file
       USE PRMS_BASIN, ONLY: Active_area
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor
       USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop, Basin_dprst_volcl
@@ -549,6 +551,8 @@
 !     gsfsumrun - Computes summary values
 !***********************************************************************
       INTEGER FUNCTION gsfsumrun()
+      USE PRMS_CONSTANTS, ONLY: DEBUG_WB, CFS2CMS_CONV, ACTIVE
+      USE PRMS_MODULE, ONLY: KKITER, Nobs, Timestep, Dprst_flag, Have_lakes, Nowyear, Nowmonth, Nowday, Gsf_rpt, Rpt_days
       USE GSFSUM
       USE GSFMODFLOW, ONLY: Mfl3t_to_cfs, KKSTP, KKPER, Maxgziter
       USE GSFBUDGET, ONLY: NetBoundaryFlow2Sat_Q, Gw_bnd_in, Gw_bnd_out, Well_in, Basin_szreject, &
@@ -560,7 +564,6 @@
      &    TOTSTOR_LAK, TOTWTHDRW_LAK, TOTRUNF_LAK, TOTSURFIN_LAK, &
      &    TOTSURFOT_LAK, TOTEVAP_LAK, TOTPPT_LAK
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_MODULE, ONLY: KKITER, Nobs, Timestep, Dprst_flag, Have_lakes, Nowyear, Nowmonth, Nowday, Gsf_rpt, Rpt_days
       USE PRMS_OBS, ONLY: Runoff, Runoff_units
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       USE PRMS_FLOWVARS, ONLY: Basin_perv_et, Basin_swale_et, &
@@ -988,8 +991,9 @@
 !     PRINTS VOLUMETRIC BUDGET FOR ENTIRE GSFLOW MODEL
 !***********************************************************************
       USE GSFSUM
-      USE GWFSFRMODULE, ONLY: STRMDELSTOR_RATE, STRMDELSTOR_CUM, IRTFLG
+      USE PRMS_CONSTANTS, ONLY: ACTIVE
       USE PRMS_MODULE, ONLY: KKITER, Have_lakes, Nowyear, Nowmonth, Nowday
+      USE GWFSFRMODULE, ONLY: STRMDELSTOR_RATE, STRMDELSTOR_CUM, IRTFLG
       IMPLICIT NONE
       INTRINSIC ABS
       EXTERNAL GSFFMTNUM

@@ -35,8 +35,9 @@ C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
+      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell
       IMPLICIT NONE
 !***********************************************************************
       gsfdecl = 0
@@ -73,8 +74,11 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
+      USE PRMS_CONSTANTS, ONLY: MODFLOW, GSFLOW, ACTIVE, OFF,
+     &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
-     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package
+     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package, Model,
+     &    GSFLOW_flag, Print_debug
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -416,9 +420,12 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
+     &    ERROR_time, ERROR_modflow
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
      &    Init_vars_from_file, Mxsziter, Glacier_flag,
-     &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday
+     &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday,
+     &    Model, GSFLOW_flag, Print_debug
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -983,8 +990,9 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
-      USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, DEBUG_less, MODFLOW
+      USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file, GSFLOW_flag,
+     &    Print_debug, Model
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
       USE GWFNWTMODULE, ONLY:LINMETH
       IMPLICIT NONE
@@ -1177,6 +1185,9 @@ C     ******************************************************************
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       INTRINSIC :: INT, NINT, MOD
+      REAL :: RSECS, ELSEC
+      INTEGER :: NSPD, I, IPRTIM, IOUT, NDAYS, LEAP, IBD, IED
+      INTEGER :: M, MB, MC, ME, NM, NHOURS, NMINS, NSECS, MSECS, NRSECS
       INTEGER IBDT(8), IEDT(8), IDPM(12)
       DATA IDPM/31,28,31,30,31,30,31,31,30,31,30,31/ ! Days per month
       DATA NSPD/86400/  ! Seconds per day
