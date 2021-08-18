@@ -1316,7 +1316,7 @@
 
         avail_potet = Potet(i) - hruactet
         IF ( avail_potet<0.0 ) THEN
-            print *, 'avail_potet<0', avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
+            print *, 'avail_potet<0', i, ag_frac(i), avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
             avail_potet = 0.0
         endif
 !        Snowevap_aet_frac(i) = 0.0
@@ -1633,6 +1633,7 @@
      &                           Ag_soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_actet(i), ag_avail_targetAET, & !?? instead of ag_avail_potet use AET_external
      &                           Snow_free(i)*0.9, Ag_potet_rechr(i), Ag_potet_lower(i), &
      &                           ag_AETtarget, 1.0, Ag_soil_saturated(i))
+            ag_actet(i) = ag_actet(i) + hru_intcpevap(i)*agfrac
             ! sanity checks
             IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN 
               IF ( Ag_actet(i)-ag_AETtarget>NEARZERO ) THEN

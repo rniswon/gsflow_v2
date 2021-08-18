@@ -1482,7 +1482,7 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SEG
+      USE GWFSFRMODULE, ONLY: SGOTFLW, SEG
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GLOBAL, ONLY: IUNIT
       USE GWFBASMODULE, ONLY: TOTIM
@@ -1525,7 +1525,7 @@
          END DO
       END IF
       !
-      !3 - -----SET MAXIMUM POND DIVERSION RATES WHEN TABFILES ARE USED
+      !3 - -----SET MAXIMUM POND OUTFLOW DIVERSION RATES WHEN TABFILES ARE USED
       IF ( MXPOND > 0 ) THEN
           IF (NUMTABPOND > 0) THEN
             DO L = 1, NUMIRRPOND
@@ -1537,13 +1537,6 @@
      +                              TABRATEPOND(:,ID), TABVALPOND(L))
             END DO
           END IF
-          DO L = 1, NUMIRRPOND
-            IF ( FLOWTHROUGH_POND(L) == 0 ) THEN
-              IF ( POND(3,L) > 0 ) THEN
-                PONDSEGFLOW(L) = POND(4,L)*SEG(2,int(POND(3,L)))
-              END IF
-            END IF
-          END DO
       END IF
 !
 !
@@ -2349,6 +2342,10 @@
       DO L = 1, NUMIRRPOND
         IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
           PONDSEGFLOW(L) = szero
+        ELSE
+          IF ( POND(3,L) > 0 ) THEN
+            PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))
+          END IF
         END IF
       END DO
       !
@@ -2526,6 +2523,22 @@
           dvt = IRRFACTPOND(IPC, L)*dvt
           PONDIRRPRMS(IPC, L) = dvt
         END DO
+      !
+      ! Set diversions rates to zero before summing up demands from
+      ! flow through ponds.
+      !
+        IF ( POND(3,L) > 0 .AND. FLOWTHROUGH_POND(L) == 1 ) THEN
+          SEG(2,int(POND(3,L))) = dzero
+        END IF
+      END DO
+      !
+      DO L = 1, NUMIRRPOND
+        IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
+          IF ( POND(3,L) > 0 ) THEN
+            SEG(2,int(POND(3,L))) = SEG(2,int(POND(3,L))) + 
+     +                              PONDSEGFLOW(L)
+          END IF
+        END IF
       END DO
       !
       !3 - -----RETURN
@@ -3232,10 +3245,10 @@
           AETITERPOND = DZERO
           return
       end if
-      prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       !
       !1 - -----loop over HRUs with ponds that supply irrigation
       !
+      prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       do 300 i = 1, NUMIRRPOND
         pettotal = DZERO
         aettotal = DZERO
@@ -3260,20 +3273,21 @@
         PETPOND(i) = pettotal
         sup = PONDFLOW(i)
         supold = PONDFLOWOLD(i)
+        PONDFLOWOLD(i) = PONDFLOW(i)
         factor = set_factor(ipond, aetold, pettotal, aettotal, sup,
-     +           supold, kper, kstp, kiter)
+     +                      supold, kper, kstp, kiter)
         if ( factor < dzero ) factor = dzero
         RMSEPOND(I) = SQRT((aetold - aettotal)**dtwo)
-        IF ( RMSEPOND(I) > zerod2*pettotal ) AGCONVERGE = 0
+        IF ( RMSEPOND(I) > zerod2*pettotal .and. kiter > 2 ) 
+     +                     AGCONVERGE = 0
         AETITERPOND(i) = SNGL(aettotal)
         saveflow = PONDFLOW(i)
-        PONDFLOWOLD(i) = PONDFLOW(i)
         PONDFLOW(i) = PONDFLOW(i) + 
      +                (sone - REAL(AGCONVERGE))*SNGL(factor)
         !
         !set pond inflow using demand.
         IF ( FLOWTHROUGH_POND(i) == 1 ) THEN
-          PONDSEGFLOW(i) = PONDSEGFLOW(i) + PONDFLOW(i)
+          PONDSEGFLOW(i) = PONDSEGFLOW(i) + PONDFLOW(i)  !need to constrain to available flow in segment
         END IF
         !
         !set max pond irrigation rate
@@ -3290,10 +3304,10 @@
         if(i==1)then
       etdif = pettotal - aettotal
           write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
-     +                 pettotal,aettotal,etdif,
+     +                 PONDFLOWOLD(I),pettotal,aettotal,etdif,
      +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
         endif
-  33  format(4i5,6e20.10)
+  33  format(4i5,7e20.10)
 300   continue
       return
       end subroutine demandpond_prms
