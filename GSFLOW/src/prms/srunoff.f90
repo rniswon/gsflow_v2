@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2021-08-13'
+      character(len=*), parameter :: Version_srunoff = '2021-08-18'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -494,8 +494,8 @@
      &       'none')/=0 ) CALL read_error(1, 'va_clos_exp')
       ENDIF
 
+      ALLOCATE ( Infil_ag(Nhru) )
       IF ( Ag_frac_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-        ALLOCATE ( Infil_ag(Nhru) )
         CALL declvar_real(MODNAME, 'infil_ag', 'nhru', Nhru, &
      &       'Infiltration to the agriculture reservoirs for each HRU', &
      &       'inches', Infil_ag)
@@ -515,7 +515,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, smidx_module, carea_module, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Init_vars_from_file, &
      &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, Water_use_flag, &
-     &    Frozen_flag, Ag_frac_flag !, Parameter_check_flag
+     &    Frozen_flag !, Parameter_check_flag
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_FLOWVARS, ONLY: Basin_sroff
@@ -634,7 +634,7 @@
       ENDIF
 
 ! Agriculture variables
-      IF ( Ag_frac_flag==ACTIVE ) Infil_ag = 0.0
+      Infil_ag = 0.0 ! always declared as passed to subroutine
 
       END FUNCTION srunoffinit
 
@@ -664,8 +664,8 @@
       EXTERNAL :: imperv_et, compute_infil, run_cascade_sroff, dprst_comp, perv_comp, ag_comp
 ! Local Variables
       INTEGER :: i, k, dprst_chk, frzen, active_glacier, perv_on, ag_on
-      REAL :: srunoff, avail_et, perv_area, sra, availh2o
-      DOUBLE PRECISION :: hru_sroff_down, runoff, apply_sroff, cfgi_sroff, upslope
+      REAL :: srunoff, avail_et, perv_area, availh2o
+      DOUBLE PRECISION :: hru_sroff_down, runoff, cfgi_sroff, upslope
       REAL :: cfgi_k, depth_cm !frozen ground
       REAL :: glcrmltb, temp, temp2 ! glaciers
 !***********************************************************************
@@ -744,6 +744,7 @@
         upslope = 0.0D0
         IF ( Cascade_flag>CASCADE_OFF ) upslope = Upslope_hortonian(i)
         ag_on = OFF
+        ag_area = 0.0
         IF ( Ag_frac_flag==ACTIVE ) THEN
           IF ( Ag_area(i)>0.0 ) ag_on = ACTIVE
         ENDIF
@@ -823,31 +824,16 @@
 
 !******Compute runoff for pervious, agriculture, impervious, and depression storage area, only if not frozen ground
         IF ( frzen==OFF ) THEN
-! DO IRRIGATION APPLICATION, ONLY DONE HERE, ASSUMES NO SNOW and
-! only for pervious areas (just like infiltration)
-          IF ( Use_sroff_transfer==ACTIVE ) THEN
-            IF ( Net_apply(i)>0.0 ) THEN
-              sra = 0.0
-              Infil(i) = Infil(i) + Net_apply(i)
-              IF ( perv_on==ACTIVE ) CALL perv_comp(Net_apply(i), Net_apply(i), Infil(i), sra)
-              IF ( ag_on==ACTIVE ) CALL ag_comp(Net_apply(i), Net_apply(i), Infil(i), sra)
-! ** ADD in water from irrigation application and water-use transfer for pervious portion - sra (if any)
-              apply_sroff = DBLE( sra*perv_area )
-              Basin_apply_sroff = Basin_apply_sroff + apply_sroff
-              runoff = runoff + apply_sroff
-            ENDIF
-          ENDIF
-
           IF ( Isglacier==OFF ) THEN
             CALL compute_infil(Net_rain(i), Net_ppt(i), Imperv_stor(i), Imperv_stor_max(i), Snowmelt(i), &
      &                         Snowinfil_max(i), Net_snow(i), Pkwater_equiv(i), Infil(i), Hru_type(i), &
-     &                         Intcp_changeover(i), perv_on, ag_on)
+     &                         Intcp_changeover(i), perv_on, ag_on, Infil_ag(i), Net_apply(i), perv_area, Ag_area(i))
           ELSE ! glacier
             temp = Snowmelt(i) + glcrmltb !Snowmelt or 0.0
             temp2 = availh2o*(1.0-Glacier_frac(i))
             CALL compute_infil(temp2, Net_ppt(i), Imperv_stor(i), Imperv_stor_max(i), temp, &
      &                         Snowinfil_max(i), Net_snow(i), Pkwater_equiv(i), Infil(i), Hru_type(i), &
-     &                         Intcp_changeover(i), perv_on, ag_on)
+     &                         Intcp_changeover(i), perv_on, ag_on, Infil_ag(i), Net_apply(i), perv_area, Ag_area(i))
           ENDIF
         ENDIF
 
@@ -873,8 +859,7 @@
         srunoff = 0.0
         IF ( Hru_type(i)==LAND .OR. active_glacier==OFF ) THEN ! could be an glacier-capable HRU with no ice
 !******Compute runoff for pervious and impervious area, and depression storage area
-          runoff = runoff + DBLE( Srp*perv_area + Sri*Hruarea_imperv )
-          IF ( Ag_frac_flag==ACTIVE ) runoff = runoff + DBLE( Sroff_ag*Ag_area(i) )
+          runoff = runoff + DBLE( Srp*perv_area + Sri*Hruarea_imperv + Sroff_ag*Ag_area(i) )
           srunoff = SNGL( runoff/Hruarea_dble )
 
 !******Compute HRU weighted average (to units of inches/dt)
@@ -944,6 +929,7 @@
       Basin_sroffi = Basin_sroffi*Basin_area_inv
       Basin_hortonian = Basin_hortonian*Basin_area_inv
       Basin_contrib_fraction = Basin_contrib_fraction*Basin_area_inv
+      Basin_apply_sroff = Basin_apply_sroff*Basin_area_inv
       IF ( Cascade_flag>CASCADE_OFF ) THEN
         Basin_hortonian_lakes = Basin_hortonian_lakes*Basin_area_inv
         Basin_sroff_down = Basin_sroff_down*Basin_area_inv
@@ -993,50 +979,67 @@
 !***********************************************************************
       SUBROUTINE compute_infil(Net_rain, Net_ppt, Imperv_stor, Imperv_stor_max, Snowmelt, &
      &                         Snowinfil_max, Net_snow, Pkwater_equiv, Infil, Hru_type, Intcp_changeover, &
-     &                         Perv_on, Ag_on)
+     &                         Perv_on, Ag_on, Infil_ag, Net_apply, Perv_area, Ag_area)
       USE PRMS_CONSTANTS, ONLY: NEARZERO, DNEARZERO, LAND, ACTIVE, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Cascade_flag
-      USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp, Isglacier, Infil_ag, Sroff_ag
+      USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp, Isglacier, Sroff_ag, Basin_apply_sroff
       USE PRMS_SNOW, ONLY: Pptmix_nopack
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Hru_type, Perv_on, Ag_on
-      REAL, INTENT(IN) :: Net_rain, Net_ppt, Imperv_stor_max
+      REAL, INTENT(IN) :: Net_rain, Net_ppt, Imperv_stor_max, Net_apply, Perv_area, Ag_area
       REAL, INTENT(IN) :: Snowmelt, Snowinfil_max, Net_snow, Intcp_changeover
       DOUBLE PRECISION, INTENT(IN) :: Pkwater_equiv
-      REAL, INTENT(INOUT) :: Imperv_stor, Infil
+      REAL, INTENT(INOUT) :: Imperv_stor, Infil, Infil_ag
 ! Functions
-      INTRINSIC :: SNGL
+      INTRINSIC :: SNGL, DBLE
       EXTERNAL :: perv_comp, check_capacity, ag_comp, ag_check_capacity
 ! Local Variables
       REAL :: avail_water
       INTEGER :: hru_flag
+      DOUBLE PRECISION :: apply_sroff
 !***********************************************************************
       hru_flag = 0
       IF ( Hru_type==LAND .OR. Isglacier==ACTIVE ) hru_flag = 1 ! land or glacier
+      avail_water = 0.0
+
+! DO IRRIGATION APPLICATION, ONLY DONE HERE, ASSUMES NO SNOW
+      IF ( Net_apply>0.0 ) THEN
+        avail_water = Net_apply
+        Srp = 0.0
+        Sroff_ag = 0.0
+        Infil = Infil + Net_apply
+        IF ( Perv_on==ACTIVE ) CALL perv_comp(Net_apply, Net_apply, Infil, Srp)
+        IF ( Ag_on==ACTIVE ) THEN
+          Infil_ag = Infil
+          CALL ag_comp(Net_apply, Net_apply, Infil_ag, Sroff_ag)
+        ENDIF
+! ** ADD in water from irrigation application and water-use transfer for pervious portion - sra (if any)
+        apply_sroff = DBLE( Srp*Perv_area + Sroff_ag*Ag_area ) ! may want apply_sroff be a declared variable
+        Basin_apply_sroff = Basin_apply_sroff + apply_sroff
+      ENDIF
+
 ! compute runoff from cascading Hortonian flow
       IF ( Cascade_flag>CASCADE_OFF ) THEN
-        avail_water = SNGL( Upslope_hortonian(Ihru) )
+        avail_water = avail_water + SNGL( Upslope_hortonian(Ihru) )
         IF ( avail_water>0.0 ) THEN
           Infil = Infil + avail_water
-          IF ( Ag_on==ACTIVE ) Infil_ag(Ihru) = Infil_ag(Ihru) + avail_water
+          IF ( Ag_on==ACTIVE ) Infil_ag= Infil_ag + avail_water
           IF ( hru_flag==1 ) THEN
             IF ( Perv_on==ACTIVE ) CALL perv_comp(avail_water, avail_water, Infil, Srp)
-            IF ( Ag_on==ACTIVE ) CALL ag_comp(avail_water, avail_water, Infil_ag(Ihru), Sroff_ag)
+            IF ( Ag_on==ACTIVE ) CALL ag_comp(avail_water, avail_water, Infil_ag, Sroff_ag)
           ENDIF
         ENDIF
-      ELSE
-        avail_water = 0.0
       ENDIF
 
 ! compute runoff from canopy changeover water
       IF ( Intcp_changeover>0.0 ) THEN
         avail_water = avail_water + Intcp_changeover
         Infil = Infil + Intcp_changeover
-        IF ( Ag_on==ACTIVE ) Infil_ag(Ihru) = Infil_ag(Ihru) + Intcp_changeover
+        IF ( Ag_on==ACTIVE ) Infil_ag = Infil_ag + Intcp_changeover
         IF ( hru_flag==1 ) THEN
           IF ( Perv_on==ACTIVE ) CALL perv_comp(Intcp_changeover, Intcp_changeover, Infil, Srp)
-          IF ( Ag_on==ACTIVE ) CALL ag_comp(Intcp_changeover, Intcp_changeover, Infil_ag(Ihru), Sroff_ag)
+          IF ( Ag_on==ACTIVE ) CALL ag_comp(Intcp_changeover, Intcp_changeover, Infil_ag, Sroff_ag)
         ENDIF
       ENDIF
 
@@ -1047,10 +1050,10 @@
       IF ( Pptmix_nopack(Ihru)==ACTIVE ) THEN
         avail_water = avail_water + Net_rain
         Infil = Infil + Net_rain
-        IF ( Ag_on==ACTIVE ) Infil_ag(Ihru) = Infil_ag(Ihru) + Net_rain
+        IF ( Ag_on==ACTIVE ) Infil_ag = Infil_ag + Net_rain
         IF ( hru_flag==1 ) THEN
           IF ( Perv_on==ACTIVE ) CALL perv_comp(Net_rain, Net_rain, Infil, Srp)
-          IF ( Ag_on==ACTIVE ) CALL ag_comp(Net_rain, Net_rain, Infil_ag(Ihru), Sroff_ag)
+          IF ( Ag_on==ACTIVE ) CALL ag_comp(Net_rain, Net_rain, Infil_ag, Sroff_ag)
         ENDIF
       ENDIF
 
@@ -1063,17 +1066,17 @@
       IF ( Snowmelt>0.0 ) THEN ! includes glacier melt, if any
         avail_water = avail_water + Snowmelt
         Infil = Infil + Snowmelt
-        IF ( Ag_on==ACTIVE ) Infil_ag(Ihru) = Infil_ag(Ihru) + Snowmelt
+        IF ( Ag_on==ACTIVE ) Infil_ag = Infil_ag + Snowmelt
         IF ( hru_flag==1 ) THEN
           IF ( Pkwater_equiv>0.0D0 .OR. Net_ppt-Net_snow<NEARZERO ) THEN
 !******Pervious and agriculture area computations
             IF ( Perv_on==ACTIVE ) CALL check_capacity(Snowinfil_max, Infil)
 !******agriculture area computations
-            IF ( Ag_on==ACTIVE ) CALL ag_check_capacity(Snowinfil_max, Infil_ag(Ihru))
+            IF ( Ag_on==ACTIVE ) CALL ag_check_capacity(Snowinfil_max, Infil_ag)
 !******Snowmelt occurred and depleted the snowpack
           ELSE
             IF ( Perv_on==ACTIVE ) CALL perv_comp(Snowmelt, Net_ppt, Infil, Srp)
-            IF ( Ag_on==ACTIVE ) CALL ag_comp(Snowmelt, Net_ppt, Infil_ag(Ihru), Sroff_ag)
+            IF ( Ag_on==ACTIVE ) CALL ag_comp(Snowmelt, Net_ppt, Infil_ag, Sroff_ag)
           ENDIF
         ENDIF
 
@@ -1089,10 +1092,10 @@
 ! no snow, some rain
           avail_water = avail_water + Net_rain
           Infil = Infil + Net_rain
-          IF ( Ag_on==ACTIVE ) Infil_ag(Ihru) = Infil_ag(Ihru) + Net_rain
+          IF ( Ag_on==ACTIVE ) Infil_ag = Infil_ag + Net_rain
           IF ( hru_flag==1 ) THEN
             IF ( Perv_on==ACTIVE ) CALL perv_comp(Net_rain, Net_rain, Infil, Srp)
-            IF ( Ag_on==ACTIVE ) CALL perv_comp(Net_rain, Net_rain, Infil_ag(Ihru), Sroff_ag)
+            IF ( Ag_on==ACTIVE ) CALL ag_comp(Net_rain, Net_rain, Infil_ag, Sroff_ag)
           ENDIF
         ENDIF
 
@@ -1103,7 +1106,7 @@
       ELSEIF ( Infil>0.0 ) THEN
         IF ( hru_flag==1 ) THEN
           IF ( Perv_on==ACTIVE ) CALL check_capacity(Snowinfil_max, Infil)
-          IF ( Ag_on==ACTIVE ) CALL ag_check_capacity(Snowinfil_max, Infil_ag(Ihru))
+          IF ( Ag_on==ACTIVE ) CALL ag_check_capacity(Snowinfil_max, Infil_ag)
         ENDIF
       ENDIF
 

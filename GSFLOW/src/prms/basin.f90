@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2021-08-13'
+      character(len=*), parameter :: Version_basin = '2021-08-18'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -204,8 +204,8 @@
      &     'HRU percent impervious', 'Fraction of each HRU area that is impervious', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'hru_percent_imperv')
 
+      ALLOCATE ( Ag_area(Nhru) )
       IF ( Ag_frac_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-        ALLOCATE ( Ag_area(Nhru) )
         CALL declvar_real(MODNAME, 'ag_area', 'nhru', Nhru, &
      &       'Area of HRU that is used for agriculture', &
      &       'acres', Ag_area)
@@ -369,7 +369,7 @@
         Dprst_area_max = 0.0
       ENDIF
       basin_ag = 0.0D0
-      IF ( Ag_frac_flag==ACTIVE ) Ag_area = 0.0
+      Ag_area = 0.0
       Dprst_clos_flag = OFF
       Dprst_open_flag = OFF
       basin_perv = 0.0D0
