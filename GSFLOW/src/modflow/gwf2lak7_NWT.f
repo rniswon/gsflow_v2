@@ -4097,7 +4097,7 @@ C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
       INTEGER LAKE, M, LAK_ID, INODE
-      DOUBLE PRECISION DELTAQ
+      DOUBLE PRECISION DELTAQ, start_vol, inflow, outflow, gwsw, dpool
 C     -------------------------------------------------------------------
 C
 C
@@ -4128,16 +4128,26 @@ C-----LOOP OVER REACHES AND OVERRIDE LAKE RELEASES IF WATER LIMITED
         DO M = 1, Nsegshold
           IF (IDIVAR(1,M).LT.0) THEN
             LAK_ID = ABS(IDIVAR(1,M))
+            ! Set some variables for readability of ELSEIF statement
+            start_vol = VOLOLDD(LAK_ID)
+            inflow = SURFIN(LAK_ID)
+            outflow = SURFOT(LAK_ID)
+            gwsw = DELTAVOL(LAK_ID)
+C            
             ! The following bit of code added to handle stress period 54
             IF (VOL(LAK_ID).GT.(MXLKVOLF(LAK_ID)+1.0).AND.
      &          .NOT.MXLKVOLF(LAK_ID).LT.0.0) THEN
               Diversions(M) = (VOL(LAK_ID) - MXLKVOLF(LAK_ID)) / DELT
+            ELSEIF((start_vol + inflow + gwsw).LT.
+     &              DEADPOOLVOL(LAK_ID)) THEN
+              Diversions(M) = 0.0001
             !INODE = IDIV(LAKE,IDV)
 C           THE FOLLOWING CONDITION WILL BE TRIGGERED WHEN NEAR DEADPOOL STORAGE
 C           CHECKS WHAT'S AVAILABLE AGAINST WHAT MODSIM IS ASKING FOR ("Diversions")
-            ELSEIF((RELEASABLE_STOR(LAK_ID)/DELT).LT.Diversions(M)) THEN
-              Diversions(M)=RELEASABLE_STOR(LAK_ID) / DELT
-             !Diversions(M)=MAX((RELEASABLE_STOR(LAK_ID)/DELT),FXLKOT(M))
+            ELSEIF((start_vol + inflow - outflow + gwsw).LT.
+     &              DEADPOOLVOL(LAK_ID)) THEN
+             !Diversions(M)=RELEASABLE_STOR(LAK_ID) / DELT
+             Diversions(M)=MAX((RELEASABLE_STOR(LAK_ID)/DELT),FXLKOT(M))
       ! NEED TODO: Look into "/ DELT", could be an issue in Deschutes where seconds are used.
       ! Need to check this calculation by hand to make sure units are as expected for MODSIM
    !          Diversions(M) = (RELEASABLE_STOR(LAK_ID) / DELT) + 

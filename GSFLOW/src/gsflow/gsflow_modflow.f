@@ -499,22 +499,22 @@ C7C-----SIMULATE EACH TIME STEP.
 C
 C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
           IF (AFR) THEN
-          IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(1,Igrid)
-          CALL GWF2BAS7AD(KKPER,KKSTP,IGRID)
-          IF(IUNIT(62).GT.0) CALL GWF2UPW1AD(IGRID)
-          IF(IUNIT(20).GT.0) CALL GWF2CHD7AD(KKPER,IGRID)
-          IF(IUNIT(1).GT.0) CALL GWF2BCF7AD(KKPER,IGRID)
-          IF(IUNIT(17).GT.0) CALL GWF2RES7AD(KKSTP,KKPER,IGRID)
-          IF(IUNIT(23).GT.0) CALL GWF2LPF7AD(KKPER,IGRID)
-          IF(IUNIT(37).GT.0) CALL GWF2HUF7AD(KKPER,IGRID)
-          IF(IUNIT(16).GT.0) CALL GWF2FHB7AD(IGRID)
-          IF(IUNIT(22).GT.0) CALL GWF2LAK7AD(KKPER,KKSTP,IUNIT(15),
-     1                                           IGRID)
-          IF(IUNIT(55).GT.0) CALL GWF2UZF1AD(IUNIT(55), KKPER, KKSTP, 
-     1                                       Igrid)
-          IF(IUNIT(65).GT.0) CALL GWF2SWI2AD(KKSTP,KKPER,IGRID)  !SWI2
-          IF( IUNIT(44).GT.0 ) CALL GWF2SFR7AD(IUNIT(44),IUNIT(22),
-     1                                         KKSTP,KKPER,IGRID)
+            IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(1,Igrid)
+            CALL GWF2BAS7AD(KKPER,KKSTP,IGRID)
+            IF(IUNIT(62).GT.0) CALL GWF2UPW1AD(IGRID)
+            IF(IUNIT(20).GT.0) CALL GWF2CHD7AD(KKPER,IGRID)
+            IF(IUNIT(1).GT.0) CALL GWF2BCF7AD(KKPER,IGRID)
+            IF(IUNIT(17).GT.0) CALL GWF2RES7AD(KKSTP,KKPER,IGRID)
+            IF(IUNIT(23).GT.0) CALL GWF2LPF7AD(KKPER,IGRID)
+            IF(IUNIT(37).GT.0) CALL GWF2HUF7AD(KKPER,IGRID)
+            IF(IUNIT(16).GT.0) CALL GWF2FHB7AD(IGRID)
+            IF(IUNIT(22).GT.0) CALL GWF2LAK7AD(KKPER,KKSTP,IUNIT(15),
+     1                                             IGRID)
+            IF(IUNIT(55).GT.0) CALL GWF2UZF1AD(IUNIT(55), KKPER, KKSTP, 
+     1                                         Igrid)
+            IF(IUNIT(65).GT.0) CALL GWF2SWI2AD(KKSTP,KKPER,IGRID)  !SWI2
+            IF( IUNIT(44).GT.0 ) CALL GWF2SFR7AD(IUNIT(44),IUNIT(22),
+     1                                           KKSTP,KKPER,IGRID)
           END IF
           IF(IUNIT(50).GT.0) THEN
             IF (IUNIT(1).GT.0) THEN
@@ -575,9 +575,9 @@ C7C2----ITERATIVELY FORMULATE AND SOLVE THE FLOW EQUATIONS.
            ITREAL = 0
 C
 C0----Plug in MODSIM values before PRMS-MODFLOW iterations
-      IF ( Model>=10 ) THEN
-        IF(IUNIT(44).GT.0.AND.iss==0) CALL MODSIM2SFR(Diversions)
-      ENDIF
+           IF ( Model>=10 ) THEN
+             IF(IUNIT(44).GT.0.AND.iss==0) CALL MODSIM2SFR(Diversions)
+           ENDIF
 C
            DO WHILE (ITREAL2.LT.MXITER)
             KITER = KITER + 1
