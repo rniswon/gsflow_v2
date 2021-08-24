@@ -2345,9 +2345,12 @@
         ELSE
           IF ( POND(3,L) > 0 ) THEN
             PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))
+      write(888,121)POND(3,L),kkper,kkstp,kkiter,POND(4,L),
+     +            SGOTFLW(int(POND(3,L))),seg(2,POND(3,L))
           END IF
         END IF
       END DO
+121   format(e20.10,3i6,3e20.10)
       !
       !2 - -----IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF (ETDEMANDFLAG > 0) THEN
@@ -3301,13 +3304,13 @@
      +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
         PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
-        if(i==1)then
-      etdif = pettotal - aettotal
-          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
-     +                 PONDFLOWOLD(I),pettotal,aettotal,etdif,
-     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
-        endif
-  33  format(4i5,7e20.10)
+  !      if(i==1)then
+  !    etdif = pettotal - aettotal
+  !        write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
+  !   +                 PONDFLOWOLD(I),pettotal,aettotal,etdif,
+  !   +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
+  !      endif
+  !33  format(4i5,7e20.10)
 300   continue
       return
       end subroutine demandpond_prms
