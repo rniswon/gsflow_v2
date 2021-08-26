@@ -179,7 +179,7 @@ C14-----RETURN.
       CALL SOBS2CHD7PSV(IGRID)
       RETURN
       END
-      SUBROUTINE OBS2CHD7SE(KKPER,IUNITUPW,IGRID)
+      SUBROUTINE OBS2CHD7SE(KKPER,IGRID)
 C     ******************************************************************
 C     CALCULATE SIMULATED EQUIVALENTS TO OBSERVED CONSTANT-HEAD FLOWS
 C     ******************************************************************
@@ -190,7 +190,6 @@ C     ------------------------------------------------------------------
       USE OBSCHDMODULE
 C
       DOUBLE PRECISION RATE
-      INTEGER KKPER,IUNITUPW,IGRID
 C     ------------------------------------------------------------------
       CALL SOBS2CHD7PNT(IGRID)
 C
@@ -228,7 +227,7 @@ C5------YES -- LOOP THROUGH CELLS.
               ENDIF
 C
 C6------CALL SUBROUTINE TO CALCULATE CONSTANT-HEAD FLOW FOR CELL
-              CALL SOBS2CHD7FFLW(J,I,K,RATE,IUNITUPW)
+              CALL SOBS2CHD7FFLW(J,I,K,RATE)
 C
 C7------SUM VALUES FROM INDIVIDUAL CELLS.
 C7------CALCULATE FACTOR FOR TEMPORAL INTERPOLATION
@@ -259,7 +258,7 @@ C
 C11-----RETURN.
       RETURN
       END
-      SUBROUTINE SOBS2CHD7FFLW(J,I,K,RATE,IUNITUPW)
+      SUBROUTINE SOBS2CHD7FFLW(J,I,K,RATE)
 C     ******************************************************************
 C     CALCULATE CONSTANT-HEAD BOUNDARY FLOW FOR A GIVEN CELL
 C     ******************************************************************
@@ -268,11 +267,8 @@ C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IBOUND,HNEW,CR,CC,CV,BOTM,NBOTM,
      1                       NCOL,NROW,NLAY,LAYHDT,LBOTM
       USE GWFBASMODULE, ONLY:ICHFLG
-      USE GWFUPWMODULE,ONLY:IUPWCB, Sn, LAYTYPUPW
-      USE GWFNWTMODULE,ONLY:Icell, Closezero
 C
       DOUBLE PRECISION HD,X1,X2,X3,X4,X5,X6,RATE
-      INTEGER IUNITUPW
 C     ------------------------------------------------------------------
 C
 C6------CLEAR VALUES FOR FLOW RATE THROUGH EACH FACE OF CELL.
@@ -283,8 +279,6 @@ C6------CLEAR VALUES FOR FLOW RATE THROUGH EACH FACE OF CELL.
       X4=ZERO
       X5=ZERO
       X6=ZERO
-      iltyp = 0
-      IF ( IUNITUPW.GT.0 ) iltyp = LAYTYPUPW(K)
 C
 C7------CALCULATE FLOW THROUGH THE LEFT FACE.
 C7------COMMENTS A-C APPEAR ONLY IN THE SECTION HEADED BY COMMENT 7,
@@ -300,107 +294,39 @@ C7A-----WHEN ICHFLG IS 0.
 C
 C7B-----CALCULATE FLOW THROUGH THIS FACE INTO THE ADJACENT CELL.
       HDIFF=HNEW(J,I,K)-HNEW(J-1,I,K)
-      IF ( HDIFF.GE.-Closezero ) THEN
-        IF ( iltyp.GT.0 .AND. IUNITUPW.GT.0 ) THEN
-          THICK = dble(BOTM(J,I,LBOTM(K)-1)) - dble(BOTM(J,I,LBOTM(K)))
-          ij = Icell(J,I,K)
-          X1=HDIFF*CR(J-1,I,K)*THICK*Sn(ij)
-        ELSE
-          X1=HDIFF*CR(J-1,I,K)
-        END IF
-      ELSE
-        IF ( iltyp.GT.0  .AND. IUNITUPW.GT.0 ) THEN
-          THICK = dble(BOTM(J-1,I,LBOTM(K)-1)) - 
-     +            dble(BOTM(J-1,I,LBOTM(K)))
-          ij = Icell(J-1,I,K)
-          X1=HDIFF*CR(J-1,I,K)*THICK*Sn(ij)
-        ELSE
-          X1=HDIFF*CR(J-1,I,K)
-        END IF
-      END IF
+      X1=HDIFF*CR(J-1,I,K)
 C
 C8------CALCULATE FLOW THROUGH THE RIGHT FACE.
    30 IF(J.EQ.NCOL) GO TO 60
       IF(IBOUND(J+1,I,K).EQ.0) GO TO 60
       IF(ICHFLG.EQ.0 .AND. IBOUND(J+1,I,K).LT.0) GO TO 60
       HDIFF=HNEW(J,I,K)-HNEW(J+1,I,K)
-      IF ( HDIFF.GE.-Closezero ) THEN
-        IF ( iltyp.GT.0  .AND. IUNITUPW.GT.0 ) THEN
-          THICK = dble(BOTM(J,I,LBOTM(K)-1)) - dble(BOTM(J,I,LBOTM(K)))
-          ij = Icell(J,I,K)
-          X2=HDIFF*CR(J,I,K)*THICK*Sn(ij)
-        ELSE 
-          X2=HDIFF*CR(J,I,K)
-        END IF
-      ELSE
-        IF ( iltyp.GT.0 .AND. IUNITUPW.GT.0 ) THEN
-          THICK = dble(BOTM(J+1,I,LBOTM(K)-1)) - 
-     +            dble(BOTM(J+1,I,LBOTM(K)))
-          ij = Icell(J+1,I,K)
-          X2=HDIFF*CR(J,I,K)*THICK*Sn(ij)
-        ELSE
-          X2=HDIFF*CR(J,I,K)
-        END IF
-      END IF
+      X2=HDIFF*CR(J,I,K)
 C
 C9------CALCULATE FLOW THROUGH THE BACK FACE.
    60 IF(I.EQ.1) GO TO 90
       IF (IBOUND(J,I-1,K).EQ.0) GO TO 90
       IF(ICHFLG.EQ.0 .AND. IBOUND(J,I-1,K).LT.0) GO TO 90
       HDIFF=HNEW(J,I,K)-HNEW(J,I-1,K)
-      IF ( HDIFF.GE.-Closezero ) THEN
-        IF ( iltyp.GT.0  .AND. IUNITUPW.GT.0 ) THEN
-          THICK = dble(BOTM(J,I,LBOTM(K)-1)) - dble(BOTM(J,I,LBOTM(K)))
-          ij =  Icell(J,I,K)
-          X3=HDIFF*CC(J,I-1,K)*THICK*Sn(ij)
-        ELSE
-          X3=HDIFF*CC(J,I-1,K)
-        END IF
-      ELSE
-        IF ( iltyp.GT.0  .AND. IUNITUPW.GT.0 ) THEN
-          THICK = dble(BOTM(J,I-1,LBOTM(K)-1)) - 
-     +            dble(BOTM(J,I-1,LBOTM(K)))
-          ij =  Icell(J,I-1,K)
-          X3=HDIFF*CC(J,I-1,K)*THICK*Sn(ij)
-        ELSE
-          X3=HDIFF*CC(J,I-1,K)
-        END IF
-      END IF
+      X3=HDIFF*CC(J,I-1,K)
+C
 C10-----CALCULATE FLOW THROUGH THE FRONT FACE.
    90 IF(I.EQ.NROW) GO TO 120
       IF(IBOUND(J,I+1,K).EQ.0) GO TO 120
       IF(ICHFLG.EQ.0 .AND. IBOUND(J,I+1,K).LT.0) GO TO 120
       HDIFF=HNEW(J,I,K)-HNEW(J,I+1,K)
-      IF ( HDIFF.GE.-Closezero ) THEN
-        IF ( iltyp.GT.0  .AND. IUNITUPW.GT.0 ) THEN
-          THICK = dble(BOTM(J,I,LBOTM(K)-1)) - dble(BOTM(J,I,LBOTM(K)))
-          ij = Icell(J,I,K)
-          X4=HDIFF*CC(J,I,K)*THICK*Sn(ij)
-        ELSE
-          X4=HDIFF*CC(J,I,K)
-        END IF
-      ELSE
-        IF ( iltyp.GT.0  .AND. IUNITUPW.GT.0 ) THEN
-          THICK = dble(BOTM(J,I+1,LBOTM(K)-1)) - 
-     +            dble(BOTM(J,I+1,LBOTM(K)))
-          ij = Icell(J,I+1,K)
-          X4=HDIFF*CC(J,I,K)*THICK*Sn(ij)
-        ELSE
-          X4=HDIFF*CC(J,I,K)
-        END IF
-      END IF
+      X4=HDIFF*CC(J,I,K)
 C
 C11-----CALCULATE FLOW THROUGH THE UPPER FACE.
   120 IF(K.EQ.1) GO TO 150
       IF (IBOUND(J,I,K-1).EQ.0) GO TO 150
       IF(ICHFLG.EQ.0 .AND. IBOUND(J,I,K-1).LT.0) GO TO 150
       HD=HNEW(J,I,K)
-  !    IF(LAYHDT(K).EQ.0) GO TO 122
-  !    TMP=HD
-  !    TOP=BOTM(J,I,LBOTM(K)-1)
-  !    IF(TMP.LT.TOP) HD=TOP
-  !122 HDIFF=HD-HNEW(J,I,K-1)
-      HDIFF=HD-HNEW(J,I,K-1)
+      IF(LAYHDT(K).EQ.0) GO TO 122
+      TMP=HD
+      TOP=BOTM(J,I,LBOTM(K)-1)
+      IF(TMP.LT.TOP) HD=TOP
+  122 HDIFF=HD-HNEW(J,I,K-1)
       X5=HDIFF*CV(J,I,K-1)
 C
 C12-----CALCULATE FLOW THROUGH THE LOWER FACE.
@@ -408,12 +334,11 @@ C12-----CALCULATE FLOW THROUGH THE LOWER FACE.
       IF(IBOUND(J,I,K+1).EQ.0) GO TO 180
       IF(ICHFLG.EQ.0 .AND. IBOUND(J,I,K+1).LT.0) GO TO 180
       HD=HNEW(J,I,K+1)
-  !    IF(LAYHDT(K+1).EQ.0) GO TO 152
-  !    TMP=HD
-  !    TOP=BOTM(J,I,LBOTM(K+1)-1)
-  !    IF(TMP.LT.TOP) HD=TOP
-  !152 HDIFF=HNEW(J,I,K)-HD
-      HDIFF=HNEW(J,I,K)-HD
+      IF(LAYHDT(K+1).EQ.0) GO TO 152
+      TMP=HD
+      TOP=BOTM(J,I,LBOTM(K+1)-1)
+      IF(TMP.LT.TOP) HD=TOP
+  152 HDIFF=HNEW(J,I,K)-HD
       X6=HDIFF*CV(J,I,K)
 C
 C13-----SUM THE FLOWS THROUGH SIX FACES OF CONSTANT HEAD CELL
