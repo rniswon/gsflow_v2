@@ -2,12 +2,11 @@
 !     Route PRMS gravity flow to MODFLOW cells
 !***********************************************************************
       MODULE GSFPRMS2MF
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF
       IMPLICIT NONE
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-01-08'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-08-26'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -71,8 +70,7 @@
 
 ! Declared Variables
       IF ( declvar(MODNAME, 'net_sz2gw', 'one', 1, 'double', &
-     &     'Net volumetric flow rate of gravity drainage from the'// &
-     &     ' soil zone to the unsaturated and saturated zones', &
+     &     'Net volumetric flow rate of gravity drainage from the soil zone to the unsaturated and saturated zones', &
      &     'L3/T', Net_sz2gw)/=0 ) CALL read_error(3, 'net_sz2gw')
 
 !     ALLOCATE (Reach_latflow(Nreach))
@@ -81,8 +79,7 @@
 !    &     'cfs', Reach_latflow)/=0 ) CALL read_error(3, 'reach_latflow')
 
 !     ALLOCATE (Reach_id(Nreach, Nsegment))
-!     IF ( decl var(MODNAME, 'reach_id', 'nsegment,nreach', &
-!    &     Nsegment*Nreach, 'integer', &
+!     IF ( declvar(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, 'integer', &
 !    &     'Mapping of reach id by segment id', &
 !    &     'none', Reach_id)/=0 ) CALL read_error(3, 'reach_id')
 
@@ -140,7 +137,7 @@
      &       '0.0', '0.0', '1.0', &
      &       'Proportion of the HRU associated with each GVR', &
      &       'Proportion of the HRU area associated with each gravity reservoir', &
-     &       'decimal fraction').NE.0 ) RETURN
+     &       'decimal fraction')/=0 ) RETURN
       ENDIF
 
       END FUNCTION prms2mfdecl
@@ -149,11 +146,11 @@
 !     prms2mfinit - Initialize PRMS2MF module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION prms2mfinit()
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_param
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_param, ACTIVE, OFF
       USE GSFPRMS2MF
       USE GWFUZFMODULE, ONLY: NTRAIL, NWAV, IUZFBND
       USE GWFSFRMODULE, ONLY: ISEG, NSS
-      USE GWFLAKMODULE, ONLY: NLAKES
+      USE GWFLAKMODULE, ONLY: NLAKES, IGSFLOWLAK
       USE GSFMODFLOW, ONLY: Gwc_row, Gwc_col
       USE PRMS_MODULE, ONLY: Nhru, Nsegment, Nlake, Print_debug, &
      &    Nhrucell, Ngwcell, Gvr_cell_id, Have_lakes
@@ -186,6 +183,7 @@
       ENDIF
 
       IF ( Have_lakes==ACTIVE ) THEN
+        IGSFLOWLAK = 1
         IF ( Nlake/=NLAKES ) THEN
           PRINT *, 'ERROR, PRMS dimension nlake must equal Lake Package NLAKES'
           PRINT *, '       nlake=', Nlake, ' NLAKES=', NLAKES
@@ -284,7 +282,7 @@
 !      WRITE (839,'(f15.13)') seg_area
 !      STOP
 
-        Cell_drain_rate = 0.0 ! dimension ngwcell
+      Cell_drain_rate = 0.0 ! dimension ngwcell
 
       ierr = 0
       IF ( Nhru/=Nhrucell ) THEN
@@ -394,13 +392,13 @@
 !        It produces cell_drain in MODFLOW units.
 !***********************************************************************
       INTEGER FUNCTION prms2mfrun()
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes
       USE GSFPRMS2MF
-      USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, &
-     &    Inch_to_mfl_t, Gwc_row, Gwc_col, Mft_to_days
+      USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, Inch_to_mfl_t, Gwc_row, Gwc_col, Mft_to_days
       USE GLOBAL, ONLY: IBOUND
       USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, IGSFLOW, FINF, IUZFOPT
       USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK, NLAKES
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_area, Lake_hru_id
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Hru_actet
@@ -435,14 +433,14 @@
             ilake = Lake_hru_id(j)
             RNF(ilake) = RNF(ilake) + SNGL( (Lakein_sz(j)+Hortonian_lakes(j)) &
      &                   *DBLE(Hru_area(j))*Acre_inches_to_mfl3*Mft_to_days )   !RGN 7/15/2015 added *Mft_to_days
-            PRCPLK(ilake) = PRCPLK(ilake) + Hru_ppt(j)*Inch_to_mfl_t*Hru_area(j)
-            EVAPLK(ilake) = EVAPLK(ilake) + Hru_actet(j)*Inch_to_mfl_t*Hru_area(j)
+            PRCPLK(ilake) = PRCPLK(ilake) + Hru_ppt(j)*Acre_inches_to_mfl3*Mft_to_days*Hru_area(j) !VOLUMES OF PRECIP
+            EVAPLK(ilake) = EVAPLK(ilake) + Hru_actet(j)*Acre_inches_to_mfl3*Mft_to_days*Hru_area(j) !VOLUMES OF EVAP
           ENDIF
         ENDDO
-        DO ilake = 1, NLAKES
-          PRCPLK(ilake) = PRCPLK(ilake)/Lake_area(ilake)
-          EVAPLK(ilake) = EVAPLK(ilake)/Lake_area(ilake)
-        ENDDO
+        !DO ilake = 1, NLAKES
+        !  PRCPLK(ilake) = PRCPLK(ilake)   !RGN 6/3/2021 send as volumes to lake
+        !  EVAPLK(ilake) = EVAPLK(ilake)
+        !ENDDO
       ENDIF
 
 !-----------------------------------------------------------------------
@@ -477,7 +475,7 @@
           IF ( IUZFOPT==0 ) THEN !ERIC 20210107: NWAVST is dimensioned (1, 1) if IUZFOPT == 0.
             Cell_drain_rate(icell) = Cell_drain_rate(icell) + Sm2gw_grav(j)*Gvr2cell_conv(j)
             Gw_rejected_grav(j) = 0.0
-            is_draining = 1            
+            is_draining = 1
 
           ELSEIF ( NWAVST(icol, irow)<NTRAIL_CHK ) THEN
 !-----------------------------------------------------------------------

@@ -2,42 +2,43 @@
 !     GSFLOW module that replaces MF_NWT.f
 !***********************************************************************
       MODULE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE, OFF,
-     +    MODFLOW, GSFLOW, ERROR_modflow, ERROR_time, MAXFILE_LENGTH,
-     +    READ_INIT
-      USE PRMS_MODULE, ONLY: Print_debug, Model, GSFLOW_flag
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-02-18'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-08-26'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
+      character(len=*), parameter :: MODDESC_AG =  'AG-NWT Package'
       character(len=*), parameter :: MODNAME_UZF = 'gwf2uzf1_NWT'
       character(len=*), parameter :: MODNAME_SFR = 'gwf2sfr7_NWT'
       character(len=*), parameter :: MODNAME_LAK = 'gwf2lak7_NWT'
-      character(len=*), parameter :: Version_uzf = '2020-12-28'
+      character(len=*), parameter :: MODNAME_AG =  'gwf2ag1_NWT'
+      character(len=*), parameter :: Version_uzf = '2021-03-02'
       character(len=*), parameter :: Version_sfr = '2020-09-30'
       character(len=*), parameter :: Version_lak = '2020-09-30'
+      character(len=*), parameter :: Version_ag =  '2021-06-21'
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
-      INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS,KPERSTART
+      INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS, KPERSTART
       INTEGER, SAVE :: AGCONVERGE
       INTEGER, SAVE :: KSTP, KKSTP, IERR, Max_iters, Itreal
       INTEGER, SAVE :: Mfiter_cnt(ITDIM), Iter_cnt(ITDIM), Iterations
       INTEGER, SAVE :: Szcheck, Sziters, INUNIT, KPER, NCVGERR
-      INTEGER, SAVE :: Max_sziters, Maxgziter
+      INTEGER, SAVE :: Max_sziters, Maxgziter, ITREAL2, mf_julday
       INTEGER, SAVE, ALLOCATABLE :: Gwc_col(:), Gwc_row(:)
       REAL, SAVE :: Delt_save
       INTEGER, SAVE, ALLOCATABLE :: Stress_dates(:)
-      INTEGER, SAVE :: Modflow_skip_stress, Kkper_new, 
-     +                 Modflow_skip_time_step
+      INTEGER, SAVE :: Modflow_skip_stress, Kkper_new
+      INTEGER, SAVE :: Modflow_skip_time_step
       REAL, SAVE :: Modflow_time_in_stress, Modflow_skip_time
       DOUBLE PRECISION, SAVE :: Mft_to_sec, Totalarea_mf
       DOUBLE PRECISION, SAVE :: Mfl2_to_acre, Mfl3_to_ft3, Sfr_conv
       DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs
       REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t
+      REAL, SAVE :: MFQ_to_inch_acres
       DOUBLE PRECISION, SAVE :: mfstrt_jul  !RGN to get MF to stop at End_time for MODFLOW only
       REAL, SAVE, ALLOCATABLE :: Mfq2inch_conv(:), Cellarea(:)
       REAL, SAVE, ALLOCATABLE :: Gvr2cell_conv(:), Mfvol2inch_conv(:)
@@ -89,8 +90,9 @@ C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
+      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
       USE GSFMODFLOW
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell
       IMPLICIT NONE
 !***********************************************************************
       gsfdecl = 0
@@ -127,8 +129,11 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
+      USE PRMS_CONSTANTS, ONLY: MODFLOW, GSFLOW, ACTIVE, OFF,
+     &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
-     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package_active
+     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package, Model,
+     &    GSFLOW_flag, Print_debug
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -191,8 +196,6 @@ C5------Get current date and time, assign to IBDT, and write to screen
      &       I0,'/',I2.2,'/',I2.2,I3,2(':',I2.2),/)
 C
 C6------ALLOCATE AND READ (AR) PROCEDURE
-      IGRID=1
-      NSOL=1
       CALL GWF2BAS7AR(INUNIT,CUNIT,VERSION,24,31,32,MAXUNIT,IGRID,12,
      1                HEADNG,26,MFVNAM)
       IF(IUNIT(50).GT.0 .AND. IUNIT(52).GT.0) THEN
@@ -290,14 +293,26 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
           PRINT *, 'HYD Package not supported'
           ierr = 1
         ENDIF
+!        IF ( IUNIT(49)>0 ) THEN
+!          PRINT *, 'LMT Package not supported'
+!          ierr = 1
+!        ENDIF
         IF ( IUNIT(54)>0 ) THEN
           PRINT *, 'SUB Package not supported'
           ierr = 1
         ENDIF
+!        IF ( IUNIT(57)>0 ) THEN
+!          PRINT *, 'SWT Package not supported'
+!          ierr = 1
+!        ENDIF
         IF ( IUNIT(64)>0 ) THEN
           PRINT *, 'SWR Package not supported'
           ierr = 1
         ENDIF
+!        IF ( IUNIT(65)>0 ) THEN
+!          PRINT *, 'SWI Package not supported'
+!          ierr = 1
+!        ENDIF
       ENDIF
       IF ( ierr==1 ) CALL error_stop('INVALID PACKAGE SELECTION',
      &                               ERROR_modflow)
@@ -370,9 +385,9 @@ c      IF(IUNIT(14).GT.0) CALL LMG7AR(IUNIT(14),MXITER,IGRID)
         IF(IUNIT(44).GT.0) CALL GWF2HYD7SFR7AR(IUNIT(43),IGRID)
       ENDIF
       IF(IUNIT(49).GT.0) CALL LMT8BAS7AR(INUNIT,CUNIT,IGRID)
-      Ag_package_active = OFF
+      Ag_package = OFF
       IF(IUNIT(66).GT.0) THEN
-        IF (GSFLOW_flag==ACTIVE) Ag_package_active = ACTIVE
+        IF ( GSFLOW_flag==ACTIVE ) Ag_package = ACTIVE
         CALL GWF2AG7AR(IUNIT(66),IUNIT(44),IUNIT(63))
       ENDIF
 !      IF(IUNIT(61).GT.0) THEN
@@ -389,6 +404,8 @@ C7------SIMULATE EACH STRESS PERIOD.
       CALL print_module(MODDESC_SFR, MODNAME_SFR, Version_sfr)
       IF ( Have_lakes==ACTIVE )
      &     CALL print_module(MODDESC_LAK, MODNAME_LAK, Version_lak)
+      IF ( Ag_package==ACTIVE )
+     &     CALL print_module(MODDESC_AG, MODNAME_AG, Version_ag)
 
       IF ( IUNIT(63)>0 ) solver = 'NWT'
       IF ( IUNIT(13)>0 ) solver = 'PCG'
@@ -434,12 +451,11 @@ C
       KSTP = 0
       KPER = 1
       KPERSTART = 1
-      ! run SS if needed, read to current stress period, read restart if needed
-      CALL SET_STRESS_DATES()
-      CALL SETCONVFACTORS()
-
       Delt_save = DELT
       IF ( ISSFLG(1).EQ.1 ) DELT = 1.0/Mft_to_days
+      ! run SS if needed, read to current stress period, read restart if needed
+      CALL SETCONVFACTORS()
+      CALL SET_STRESS_DATES()
 C
       KKPER = KPER
       IF ( Model==MODFLOW ) THEN
@@ -457,10 +473,12 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
+     &    ERROR_time, ERROR_modflow
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
      &    Init_vars_from_file, Mxsziter, Glacier_flag,
-     &    PRMS_land_iteration_flag
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+     &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday,
+     &    Model, GSFLOW_flag, Print_debug
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -486,7 +504,6 @@ c     USE LMGMODULE
 ! Local Variables
       INTEGER :: retval, II, KITER, IBDRET, iss
       INTEGER :: IC1, IC2, IR1, IR2, IL1, IL2, IDIR, iprt, gsflag
-      INTEGER :: ITREAL2
       REAL :: BUDPERC
 !***********************************************************************
       gsfrun = 0
@@ -495,7 +512,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       IF ( Steady_state.EQ.1 ) THEN
         Kkper_new = 1
         Kper_mfo = 2
-      ELSEIF ( Model==GSFLOW ) THEN
+      ELSEIF ( GSFLOW_flag==ACTIVE ) THEN
         Kkper_new = GET_KPER()
       ELSE
         Kkper_new = Kper_mfo
@@ -521,7 +538,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       ENDIF
       iss = ISSFLG(KKPER)
       gsflag = OFF
-      IF ( Model==GSFLOW .AND. iss==0 ) gsflag = ACTIVE
+      IF ( GSFLOW_flag==ACTIVE .AND. iss==0 ) gsflag = ACTIVE
 C
 C7C-----SIMULATE EACH TIME STEP.
 !gsf    DO 90 KSTP = 1, NSTP(KPER)
@@ -694,8 +711,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
               IF ( KKITER==Mxsziter+1 ) Stopcount = Stopcount + 1
             ENDIF
             IF(IUNIT(66).GT.0 ) 
-     1      CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
-
+     1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
             IF(IUNIT(55).GT.0) CALL GWF2UZF1FM(KKPER,KKSTP,KKITER,
      1                           IUNIT(44),IUNIT(22),IUNIT(63),
      2                           IUNIT(64),IGRID)  !SWR - JDH ADDED IUNIT(64)
@@ -777,10 +793,11 @@ c            END IF
 !     6                         BIGHEADCHG,HNEWLAST)
 !            ENDIF
 ! Calculate new heads using Newton solver
-          IF(IUNIT(63).GT.0 ) 
-     1          CALL GWF2NWT1FM(KKITER,ICNVG,KSTP,KPER,Mxiter,
-     2                          IUNIT(22),Itreal,AGCONVERGE,IGRID)
-          IF ( IUNIT(63).GT.0 )ITREAL2 = ITREAL
+          IF(IUNIT(63).GT.0 ) THEN
+             CALL GWF2NWT1FM(KKITER,ICNVG,KSTP,KPER,Mxiter,
+     2                       IUNIT(22),Itreal,AGCONVERGE,IGRID)
+             ITREAL2 = ITREAL
+          ENDIF
           IF(IERR.EQ.1) CALL USTOP(' ')
 C
 C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
@@ -931,7 +948,7 @@ C  Observation simulated equivalents
           IF(IUNIT(34).GT.0) CALL OBS2RIV7SE(IGRID)
           IF(IUNIT(35).GT.0) CALL OBS2GHB7SE(IGRID)
           IF(IUNIT(36).GT.0) CALL OBS2STR7SE(IGRID)
-          IF(IUNIT(38).GT.0) CALL OBS2CHD7SE(KKPER,IGRID)
+          IF(IUNIT(38).GT.0) CALL OBS2CHD7SE(KKPER,IUNIT(62),IGRID)
           IF(IUNIT(43).GT.0) THEN
             CALL GWF2HYD7BAS7SE(1,IGRID)
             IF(IUNIT(19).GT.0) CALL GWF2HYD7IBS7SE(1,IGRID)
@@ -1026,8 +1043,9 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
-      USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, DEBUG_less, MODFLOW
+      USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file, GSFLOW_flag,
+     &    Print_debug, Model
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
       USE GWFNWTMODULE, ONLY:LINMETH
       IMPLICIT NONE
@@ -1211,14 +1229,18 @@ C        CALL GETCL(COMLIN)
         ENDIF
 C
       RETURN
-      END
+      END SUBROUTINE GETNAMFIL
+C
       SUBROUTINE GLO1BAS6ET(IOUT,IBDT,IPRTIM)
 C     ******************************************************************
 C     Get end time and calculate elapsed time
 C     ******************************************************************
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      INTRINSIC :: INT
+      INTRINSIC :: INT, NINT, MOD
+      REAL :: RSECS, ELSEC
+      INTEGER :: NSPD, I, IPRTIM, IOUT, NDAYS, LEAP, IBD, IED
+      INTEGER :: M, MB, MC, ME, NM, NHOURS, NMINS, NSECS, MSECS, NRSECS
       INTEGER IBDT(8), IEDT(8), IDPM(12)
       DATA IDPM/31,28,31,30,31,30,31,31,30,31,30,31/ ! Days per month
       DATA NSPD/86400/  ! Seconds per day
@@ -1401,18 +1423,23 @@ C
 !     DETERMINE THE STRESS PERIOD FOR THE CURRENT TIMESTEP
 !     ******************************************************************
       INTEGER FUNCTION GET_KPER()
+      USE PRMS_CONSTANTS, ONLY: MODFLOW
       USE GLOBAL, ONLY: NPER
       USE GSFMODFLOW, ONLY: Stress_dates, KPER
-      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day
+      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day,
+     1    Nowyear, Nowmonth, Nowday, Model, mf_nowtime
       IMPLICIT NONE
       INTRINSIC DBLE
-      DOUBLE PRECISION, EXTERNAL :: nowjt
       INTEGER, EXTERNAL :: compute_julday
 ! Local Variables
       INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
-      now = nowjt()
+      IF ( Model==MODFLOW ) THEN
+        now = mf_nowtime
+      ELSE
+        now = compute_julday(Nowyear, Nowmonth, Nowday)
+      ENDIF
       KPERTEST = 1
       IF ( KPER > KPERTEST ) KPERTEST = KPER
 !
@@ -1481,7 +1508,7 @@ C
 
       IF ( Mft_to_days>1.0 ) PRINT *, 'CAUTION, MF time step /= 1 day'
 
-      IF ( Model>GSFLOW ) PRINT *, ' '
+      IF ( Model==MODFLOW ) PRINT *, ' '
       TOTIM = 0.0
       KPER = 0
       KSTP = 0
@@ -1818,7 +1845,7 @@ C
      &    GSFLOW_flag
       USE GLOBAL, ONLY: ITMUNI, LENUNI, IOUT
       USE GWFBASMODULE, ONLY: DELT
-      USE GSFMODFLOW, ONLY: Mft_to_sec, Cellarea,
+      USE GSFMODFLOW, ONLY: Mft_to_sec, Cellarea, MFQ_to_inch_acres,
      &    Mfl2_to_acre, Mfl3_to_ft3, Mfl_to_inch, Sfr_conv,
      &    Acre_inches_to_mfl3, Inch_to_mfl_t, Mfl3t_to_cfs,
      &    Mfvol2inch_conv, Gvr2cell_conv, Mfq2inch_conv
@@ -1858,6 +1885,7 @@ C
       Mfl_to_inch = 1.0/inch_to_mfl
       Mfl2_to_acre = Mfl2_to_acre/FT2_PER_ACRE
       Inch_to_mfl_t = inch_to_mfl/DELT  ! will need to move if DELT allowed to change
+      MFQ_to_inch_acres = SNGL( DELT*Mfl2_to_acre*Mfl_to_inch )
 
       Sfr_conv = Mft_to_sec/Mfl3_to_ft3
       Mfl3t_to_cfs = Mfl3_to_ft3/Mft_to_sec
