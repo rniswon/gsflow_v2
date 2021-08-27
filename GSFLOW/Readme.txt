@@ -69,7 +69,7 @@ installation directory:
                            in USGS reports.
    |    |--doc           ; Documentation reports for GSFLOW and related
                            software.
-           |--Related reports	; Additional reports and information files
+            |--Related reports	; Additional reports and information files
    |    |--src
    |        |--gsflow           ; Source code for GSFLOW Modules
    |        |--mmf              ; Source code for MMF software

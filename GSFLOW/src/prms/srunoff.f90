@@ -21,18 +21,11 @@
 ! rsr, 07/1/2013 combined smidx and carea into one module
 !***********************************************************************
       MODULE PRMS_SRUNOFF
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, NEARZERO, DNEARZERO, ACTIVE, OFF, &
-     &    DEBUG_WB, smidx_module, carea_module, LAND, LAKE, GLACIER, &
-     &    CASCADE_OFF, ERROR_water_use
-      USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Print_debug, Init_vars_from_file, &
-     &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, Water_use_flag, &
-     &    Frozen_flag, Inputerror_flag, Glacier_flag, &
-     &    Dprst_add_water_use, Dprst_transfer_water_use, PRMS_land_iteration_flag, Kkiter !, Parameter_check_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2021-01-11'
+      character(len=*), parameter :: Version_srunoff = '2021-08-18'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -42,7 +35,7 @@
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_dprst_vol_open(:), It0_dprst_vol_clos(:)
       REAL, SAVE :: Srp, Sri, Perv_frac, Imperv_frac, Hruarea_imperv, Hruarea
       DOUBLE PRECISION, SAVE :: Hruarea_dble, Basin_apply_sroff, Basin_cfgi_sroff
-      INTEGER, SAVE :: Use_sroff_transfer, Isglacier
+      INTEGER, SAVE :: Isglacier
 !   Declared Variables
       DOUBLE PRECISION, SAVE :: Basin_sroff_down, Basin_sroff_upslope
       DOUBLE PRECISION, SAVE :: Basin_sroffi, Basin_sroffp
@@ -65,8 +58,9 @@
       REAL, SAVE, ALLOCATABLE :: Dprst_depth_avg(:), Sro_to_dprst_imperv(:), Dprst_et_coef(:)
 !   Declared Variables for Depression Storage
       DOUBLE PRECISION, SAVE :: Basin_dprst_sroff, Basin_dprst_evap, Basin_dprst_seep
-      DOUBLE PRECISION, SAVE :: Basin_dprst_volop, Basin_dprst_volcl
+      DOUBLE PRECISION, SAVE :: Basin_dprst_volop, Basin_dprst_volcl !, Basin_dprst_hortonian_lakes
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_stor_hru(:), Dprst_sroff_hru(:), Dprst_seep_hru(:)
+!      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Upslope_dprst_hortonian(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_area_open(:), Dprst_area_clos(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_insroff_hru(:), Dprst_evap_hru(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_vol_frac(:), Dprst_vol_open_frac(:), Dprst_vol_clos_frac(:)
@@ -111,6 +105,10 @@
 !     cfgi_thrshld, cfgi_decay
 !***********************************************************************
       INTEGER FUNCTION srunoffdecl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, DEBUG_WB, smidx_module, carea_module, CASCADE_OFF
+      USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Print_debug, Init_vars_from_file, &
+     &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, &
+     &    Frozen_flag, PRMS_land_iteration_flag
       USE PRMS_SRUNOFF
       IMPLICIT NONE
 ! Functions
@@ -225,6 +223,11 @@
         IF ( declvar(MODNAME, 'dprst_area_clos', 'nhru', Nhru, 'real', &
      &       'Surface area of closed surface depressions based on storage volume for each HRU', &
      &       'acres', Dprst_area_clos)/=0 ) CALL read_error(3, 'dprst_area_clos')
+
+!        ALLOCATE ( Upslope_dprst_hortonian(Nhru) )
+!        IF ( declvar(MODNAME, 'upslope_dprst_hortonian', 'nhru', Nhru, 'double', &
+!     &       'Upslope surface-depression spillage and interflow for each HRU',   &
+!     &       'inches', Upslope_dprst_hortonian)/=0 ) CALL read_error(3, 'upslope_dprst_hortonian')
 
         ALLOCATE ( Dprst_stor_hru(Nhru) )
         IF ( declvar(MODNAME, 'dprst_stor_hru', 'nhru', Nhru, 'double', &
@@ -490,6 +493,9 @@
 !     srunoffinit - Initialize srunoff module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION srunoffinit()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, smidx_module, carea_module, CASCADE_OFF
+      USE PRMS_MODULE, ONLY: Nhru, Nlake, Init_vars_from_file, &
+     &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, Frozen_flag !, Parameter_check_flag
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_FLOWVARS, ONLY: Basin_sroff
@@ -502,9 +508,6 @@
 !      REAL :: frac
 !***********************************************************************
       srunoffinit = 0
-
-      Use_sroff_transfer = OFF
-      IF ( Water_use_flag==ACTIVE ) Use_sroff_transfer = ACTIVE
 
       Imperv_evap = 0.0
       Hortonian_flow = 0.0
@@ -613,6 +616,9 @@
 !                  computations using antecedent soil moisture.
 !***********************************************************************
       INTEGER FUNCTION srunoffrun()
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF, DEBUG_WB, LAND, LAKE, GLACIER, CASCADE_OFF
+      USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Call_cascade, &
+     &    Frozen_flag, Glacier_flag, PRMS_land_iteration_flag, Kkiter
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, &
      &    Hru_perv, Hru_imperv, Hru_percent_imperv, Hru_frac_perv, &
@@ -622,7 +628,7 @@
       USE PRMS_FLOWVARS, ONLY: Sroff, Infil, Imperv_stor, Pkwater_equiv, Dprst_vol_open, Dprst_vol_clos, &
      &    Imperv_stor_max, Snowinfil_max, Basin_sroff, Glacier_frac, Soil_moist, Soil_rechr
       USE PRMS_CASCADE, ONLY: Ncascade_hru
-      USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Hru_intcpevap, Net_apply, Intcp_changeover
+      USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Hru_intcpevap, Net_apply, Intcp_changeover, Use_transfer_intcp
       USE PRMS_SNOW, ONLY: Snow_evap, Snowcov_area, Snowmelt, Pk_depth, Glacrb_melt
       IMPLICIT NONE
 ! Functions
@@ -764,7 +770,7 @@
             frzen = 1
             ! depression storage states are not changed if frozen
             cfgi_sroff = (Snowmelt(i) + availh2o + SNGL(upslope) + glcrmltb)*Hruarea
-            IF ( Use_sroff_transfer==ACTIVE ) cfgi_sroff = cfgi_sroff + Net_apply(i)*Hruarea
+            IF ( Use_transfer_intcp==ACTIVE ) cfgi_sroff = cfgi_sroff + Net_apply(i)*Hruarea
             runoff = runoff + cfgi_sroff
             Basin_cfgi_sroff = Basin_cfgi_sroff + cfgi_sroff
           ENDIF
@@ -775,7 +781,7 @@
         IF ( frzen==OFF ) THEN
 ! DO IRRIGATION APPLICATION, ONLY DONE HERE, ASSUMES NO SNOW and
 ! only for pervious areas (just like infiltration)
-          IF ( Use_sroff_transfer==ACTIVE ) THEN
+          IF ( Use_transfer_intcp==ACTIVE ) THEN
             IF ( Net_apply(i)>0.0 ) THEN
               sra = 0.0
               Infil(i) = Infil(i) + Net_apply(i)
@@ -1160,6 +1166,8 @@
 !***********************************************************************
       SUBROUTINE dprst_init()
       USE PRMS_SRUNOFF
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, NEARZERO
+      USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru, PRMS4_flag, Inputerror_flag
       USE PRMS_BASIN, ONLY: Dprst_clos_flag, Dprst_frac, &
      &    Dprst_area_clos_max, Dprst_area_open_max, Basin_area_inv, &
      &    Hru_area_dble, Active_hrus, Hru_route_order, Dprst_open_flag
@@ -1299,7 +1307,8 @@
      &           Dprst_sroff_hru, Dprst_seep_hru, Sro_to_dprst_perv, Sro_to_dprst_imperv, Dprst_evap_hru, &
      &           Avail_et, Net_rain, Dprst_in)
       USE PRMS_CONSTANTS, ONLY: ERROR_water_use, NEARZERO, DNEARZERO, OFF, ACTIVE ! , DEBUG_less
-      USE PRMS_MODULE, ONLY: Cascade_flag, Dprst_add_water_use, Dprst_transfer_water_use !, Print_debug
+      USE PRMS_MODULE, ONLY: Cascade_flag, Dprst_add_water_use, Dprst_transfer_water_use, &
+     &    Nowyear, Nowmonth, Nowday !, Print_debug
       USE PRMS_SRUNOFF, ONLY: Srp, Sri, Ihru, Perv_frac, Imperv_frac, Hruarea, Dprst_et_coef, &
      &    Dprst_seep_rate_open, Dprst_seep_rate_clos, Va_clos_exp, Va_open_exp, Dprst_flow_coef, &
      &    Dprst_vol_thres_open, Dprst_vol_clos_max, Dprst_insroff_hru, Upslope_hortonian, &
@@ -1307,7 +1316,7 @@
      &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, Dprst_stor_hru, Hruarea_dble
       USE PRMS_BASIN, ONLY: Dprst_frac_open, Dprst_frac_clos
       USE PRMS_WATER_USE, ONLY: Dprst_transfer, Dprst_gain
-      USE PRMS_SET_TIME, ONLY: Cfs_conv, Nowyear, Nowmonth, Nowday
+      USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_INTCP, ONLY: Net_snow
       USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv
@@ -1577,8 +1586,8 @@
 !     srunoff_restart - write or read srunoff restart file
 !***********************************************************************
       SUBROUTINE srunoff_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Dprst_flag, Frozen_flag
       USE PRMS_SRUNOFF
       IMPLICIT NONE
       ! Argument
