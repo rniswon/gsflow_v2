@@ -1706,8 +1706,8 @@
       QQ = ZERO
       QSW = ZERO
       TIME = TOTIM
-      RMSESW = ZERO
-      RMSEGW = ZERO
+      RMSESW = 0.0
+      RMSEGW = 0.0
       agconverge = 1
       !
       !2 - -----IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
@@ -2503,8 +2503,8 @@
         supold = SUPACTOLD(ISEG) + ACTUALOLD(ISEG)
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
      +           supold, kper, kstp, kiter)
-        RMSESW(ISEG) = SQRT((aetold - aettotal)**dtwo)
-        IF ( RMSESW(ISEG) > zerod2*pettotal ) AGCONVERGE = 0
+        RMSESW(ISEG) = SNGL(SQRT((aetold - aettotal)**dtwo))
+        IF ( RMSESW(ISEG) > SNGL(zerod2*pettotal) ) AGCONVERGE = 0
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
@@ -2841,8 +2841,8 @@
       factor = set_factor(l, aetold, pettotal, aettotal, sup, supold,
      +                    kper, kstp, kiter)
       QONLYOLD(l) = QONLY(L)
-      RMSEGW(L) = SQRT((aetold - aettotal)**dtwo)
-      IF ( RMSEGW(L) > zerod2*pettotal )AGCONVERGE = 0
+      RMSEGW(L) = SNGL(SQRT((aetold - aettotal)**dtwo))
+      IF ( RMSEGW(L) > SNGL(zerod2*pettotal) ) AGCONVERGE = 0
       AETITERGW(l) = sngl(aettotal)
       QONLY(L) = QONLY(L) + sngl(factor)
       if (QONLY(L) < 0.0) QONLY(L) = 0.0
