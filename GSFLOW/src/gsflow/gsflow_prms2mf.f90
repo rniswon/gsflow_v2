@@ -395,11 +395,11 @@
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE
       USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes
       USE GSFPRMS2MF
-      USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, Inch_to_mfl_t, Gwc_row, Gwc_col, Mft_to_days
+      USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, Gwc_row, Gwc_col, Mft_to_days
       USE GLOBAL, ONLY: IBOUND
       USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, IGSFLOW, FINF, IUZFOPT
-      USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK, NLAKES
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_area, Lake_hru_id
+      USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_hru_id
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Hru_actet
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
