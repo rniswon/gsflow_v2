@@ -45,15 +45,12 @@
 !***********************************************************************
 
       MODULE PRMS_GLACR
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, MONTHS_PER_YEAR, GLACIER, LAND, &
-     &    FEET2METERS, METERS2FEET, DNEARZERO, NEARZERO, FEET, METERS, MAX_DAYS_PER_YEAR
-      USE PRMS_MODULE, ONLY: Nhru, Model, Init_vars_from_file
       IMPLICIT NONE
       !****************************************************************
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2020-12-02'
+      character(len=*), parameter :: Version_glacr = '2021-08-13'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -146,6 +143,8 @@
 !     glacrdecl - declare parameters and variables for glacier runoff
 !***********************************************************************
       INTEGER FUNCTION glacrdecl()
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file
       USE PRMS_GLACR
       IMPLICIT NONE
 ! Functions
@@ -156,17 +155,17 @@
 
       CALL print_module(MODDESC, MODNAME, Version_glacr)
 
-      IF ( declvar(MODNAME, 'nhrugl', 'one', 1, 'integer',                &
+      IF ( declvar(MODNAME, 'nhrugl', 'one', 1, 'integer', &
            'Number of at least partially glacierized HRUs at initiation', &
            'none', Nhrugl)/=0 ) CALL read_error(3, 'nhrugl')
 
 ! declare variables
       ALLOCATE ( Hru_slope_ts(Nhru) )
-      IF ( declvar(MODNAME, 'hru_slope_ts', 'nhru', Nhru, 'real',   &
+      IF ( declvar(MODNAME, 'hru_slope_ts', 'nhru', Nhru, 'real', &
      &     'HRU slope for timestep, which can change for glaciers', &
      &     'decimal fraction', Hru_slope_ts)/=0 ) CALL read_error(3, 'hru_slope_ts')
 
-      IF ( declvar(MODNAME, 'basin_gl_top_melt', 'one', 1, 'double',     &
+      IF ( declvar(MODNAME, 'basin_gl_top_melt', 'one', 1, 'double', &
      &     'Basin area-weighted glacier surface melt (snow, ice and rain) coming out of termini of all glaciers and glacierettes', &
      &     'inches', Basin_gl_top_melt)/=0 ) CALL read_error(3, 'basin_gl_top_melt')
 
@@ -438,6 +437,8 @@
 !     glacrinit - Initialize glacr module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION glacrinit()
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, GLACIER, LAND
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file
       USE PRMS_GLACR
       USE PRMS_BASIN, ONLY: Hru_area, Hru_elev_ts, Active_hrus, Hru_route_order, &
      &    Hru_type, Basin_area_inv, Hru_elev_meters
@@ -539,10 +540,10 @@
           count = 1 !has at least one glacier
           glacier_frac_use(j) = 1.0
           !should be end of extensions or branches-- will fail if don't set up with indices stacked
-          IF ( Glac_HRUnum_down==1) THEN
-            IF (Tohru(j)/=j-1 ) glacier_frac_use(j) = 0.999
-          ELSEIF ( Glac_HRUnum_down==0) THEN
-            IF (Tohru(j)/=j+1 ) glacier_frac_use(j) = 0.999
+          IF ( Glac_HRUnum_down==1 ) THEN
+            IF ( Tohru(j)/=j-1 ) glacier_frac_use(j) = 0.999
+          ELSEIF ( Glac_HRUnum_down==0 ) THEN
+            IF ( Tohru(j)/=j+1 ) glacier_frac_use(j) = 0.999
           ENDIF
         ENDIF
       ENDDO
@@ -793,9 +794,10 @@
 !                  computations
 !***********************************************************************
       INTEGER FUNCTION glacrrun()
+      USE PRMS_CONSTANTS, ONLY: GLACIER, LAND, FEET2METERS, METERS2FEET, NEARZERO, FEET
       USE PRMS_GLACR
       USE PRMS_BASIN, ONLY: Hru_elev_ts, Active_hrus, Hru_route_order, Hru_type, &
-     &                      Elev_units, Hru_elev_feet, Hru_elev_meters
+     &    Elev_units, Hru_elev_feet, Hru_elev_meters
       USE PRMS_FLOWVARS, ONLY: Alt_above_ela, Glrette_frac
       IMPLICIT NONE
 ! Functions
@@ -870,11 +872,12 @@
 !                   computations
 !***********************************************************************
       INTEGER FUNCTION comp_glsurf(glacr_exist, glrette_exist)
+      USE PRMS_CONSTANTS, ONLY: GLACIER, LAND, FEET2METERS, METERS2FEET, DNEARZERO, NEARZERO, FEET, METERS
+      USE PRMS_MODULE, ONLY: Nhru, Start_year, Nowyear, Nowmonth
       USE PRMS_GLACR
-      USE PRMS_MODULE, ONLY: Nhru, Start_year
       USE PRMS_BASIN, ONLY: Hru_type, Hru_elev_ts, Basin_area_inv, Active_hrus, &
      &    Hru_route_order, Elev_units, Hru_elev
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Julwater
+      USE PRMS_SET_TIME, ONLY: Julwater
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow
       USE PRMS_SNOW, ONLY: Snowcov_area, Snowmelt, Glacrmelt, Glacr_air_deltemp, Glacr_delsnow, &
      &    Glrette_frac_init, Snowcov_area, Basin_snowicecov, Snow_evap, Glacr_evap, Basin_glacrb_melt
@@ -1617,8 +1620,9 @@
 !                              last years MB, won't work first year
 !***********************************************************************
       INTEGER FUNCTION compute_ela_mb()
-      USE PRMS_GLACR, ONLY: Ntp, Ngl, Glacr_tag, Term, Top, Top_tag, Hru_mb_yrend, &
-     &    Ela, Nhru, GLACIER
+      USE PRMS_CONSTANTS, ONLY: GLACIER
+      USE PRMS_MODULE, ONLY: Nhru
+      USE PRMS_GLACR, ONLY: Ntp, Ngl, Glacr_tag, Term, Top, Top_tag, Hru_mb_yrend, Ela
       USE PRMS_BASIN, ONLY: Hru_type, Active_hrus, Hru_route_order
       IMPLICIT NONE
 ! Functions
@@ -1676,7 +1680,9 @@
 !                               from theoretical steady state AAR
 !***********************************************************************
       INTEGER FUNCTION compute_ela_aar()
-      USE PRMS_GLACR, ONLY: Ntp, Ngl, Glacr_tag, Term, Top, Top_tag, Prev_area, Ela, Nhru, GLACIER
+      USE PRMS_CONSTANTS, ONLY: GLACIER
+      USE PRMS_MODULE, ONLY: Nhru
+      USE PRMS_GLACR, ONLY: Ntp, Ngl, Glacr_tag, Term, Top, Top_tag, Prev_area, Ela
       USE PRMS_BASIN, ONLY: Hru_type, Active_hrus, Hru_route_order
       IMPLICIT NONE
 ! Functions
@@ -1745,10 +1751,10 @@
 ! of changing slope
 !***********************************************************************
       INTEGER FUNCTION recompute_soltab()
-      USE PRMS_GLACR, ONLY: Hru_slope_ts, MAX_DAYS_PER_YEAR, GLACIER
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, GLACIER
+      USE PRMS_GLACR, ONLY: Hru_slope_ts
       USE PRMS_SOLTAB, ONLY: Hru_aspect, Hru_cossl, PI, RADIANS, &
-     &    Soltab_potsw, Soltab_sunhrs, Solar_declination, &
-     &    ECCENTRICY, DEGDAY, DEGDAYRAD
+     &    Soltab_potsw, Soltab_sunhrs, Solar_declination, ECCENTRICY, DEGDAY, DEGDAYRAD
       USE PRMS_BASIN, ONLY: Hru_type, Active_hrus, Hru_route_order, Hru_lat
       IMPLICIT NONE
 ! Functions
@@ -1794,7 +1800,9 @@
 ! disapears.
 !***********************************************************************
       SUBROUTINE tag_count(do_init, hru_flowline, toflowline, glacier_frac_use)
-      USE PRMS_GLACR, ONLY: Ntp, Ngl, Glacr_tag, Term, Top, Top_tag, Tohru, Nhru, GLACIER
+      USE PRMS_CONSTANTS, ONLY: GLACIER
+      USE PRMS_MODULE, ONLY: Nhru
+      USE PRMS_GLACR, ONLY: Ntp, Ngl, Glacr_tag, Term, Top, Top_tag, Tohru
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type
       IMPLICIT NONE
 ! Arguments
@@ -2453,9 +2461,10 @@
 ! Don't have basal slope calculated there so would need to use something else.
 !***********************************************************************
       SUBROUTINE yearly_ca_coef(Frawt, Ela_elevt)
+      USE PRMS_CONSTANTS, ONLY: GLACIER
+      USE PRMS_MODULE, ONLY: Nhru
       USE PRMS_GLACR, ONLY: Ntp, Nhrugl, Ngl, Order_flowline, Keep_gl, Ikeep_gl, &
-     &    Hru_length, Av_basal_slope, Av_fgrad, Glacr_tag, Term, Glacr_slope_init, &
-     &    Hru_length, Nhru, GLACIER
+     &    Hru_length, Av_basal_slope, Av_fgrad, Glacr_tag, Term, Glacr_slope_init
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type
       USE PRMS_FLOWVARS, ONLY: Glacier_frac
       IMPLICIT NONE

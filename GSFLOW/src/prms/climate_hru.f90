@@ -5,31 +5,36 @@
 ! PRMS modules
 !***********************************************************************
       MODULE PRMS_CLIMATE_HRU
-        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ACTIVE, OFF, RUN, DECL, INIT, DOCUMENTATION, &
-     &      MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, CELSIUS, MONTHS_PER_YEAR
-        USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Climate_transp_flag, Orad_flag, &
-     &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
-     &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag
+        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2020-12-02'
+        character(len=*), parameter :: Version_climate_hru = '2021-08-13'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit
+        INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit
         ! Control Parameters
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Tmin_day, Tmax_day, Precip_day, Potet_day, Swrad_day, Transp_day
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Humidity_day, Windspeed_day
+        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Albedo_day, Cloud_cover_day
         INTEGER, SAVE :: Cbh_check_flag, Cbh_binary_flag
         ! Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_windspeed
         REAL, ALLOCATABLE :: Humidity_hru(:), Windspeed_hru(:)
+        REAL, ALLOCATABLE :: Albedo_hru(:), Cloud_cover_cbh(:)
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Rain_cbh_adj(:, :), Snow_cbh_adj(:, :), Potet_cbh_adj(:, :)
         REAL, SAVE, ALLOCATABLE :: Tmax_cbh_adj(:, :), Tmin_cbh_adj(:, :)
       END MODULE PRMS_CLIMATE_HRU
 
       INTEGER FUNCTION climate_hru()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, RUN, DECL, INIT, DOCUMENTATION, &
+     &    MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, CELSIUS, MONTHS_PER_YEAR
+      USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Climate_transp_flag, Orad_flag, &
+     &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
+     &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
+     &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth
       USE PRMS_CLIMATE_HRU
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
@@ -39,7 +44,7 @@
      &    Basin_ppt, Basin_potet, Potet, Basin_snow, Basin_rain, &
      &    Basin_horad, Orad, Swrad, Basin_potsw, Basin_swrad, Basin_obs_ppt, &
      &    Transp_on, Basin_transp_on, Tmax_allsnow_f, Basin_humidity, Ppt_zero_thresh
-      USE PRMS_SET_TIME, ONLY: Nowmonth, Jday
+      USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_SOLTAB, ONLY: Soltab_basinpotsw, Hru_cossl, Soltab_potsw
       IMPLICIT NONE
 ! Functions
@@ -163,6 +168,24 @@
           Basin_humidity = 0.0D0
         ENDIF
 
+        IF ( Albedo_cbh_flag==ACTIVE ) THEN
+          IF ( Cbh_binary_flag==OFF ) THEN
+            READ ( Albedo_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Albedo_hru(i), i=1,Nhru)
+          ELSE
+            READ ( Albedo_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Albedo_hru(i), i=1,Nhru)
+          ENDIF
+          IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'albedo_hru', ios, ierr)
+        ENDIF
+
+        IF ( Cloud_cover_cbh_flag==ACTIVE ) THEN
+          IF ( Cbh_binary_flag==OFF ) THEN
+            READ ( Cloud_cover_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Cloud_cover_cbh(i), i=1,Nhru)
+          ELSE
+            READ ( Cloud_cover_unit, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Cloud_cover_cbh(i), i=1,Nhru)
+          ENDIF
+          IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'cloud_cover_cbh', ios, ierr)
+        ENDIF
+
         IF ( Windspeed_cbh_flag==ACTIVE ) THEN
           IF ( Cbh_binary_flag==OFF ) THEN
             READ ( Windspeed_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Windspeed_hru(i), i=1,Nhru)
@@ -188,8 +211,10 @@
           IF ( Climate_potet_flag==ACTIVE ) CALL check_cbh_value('potet', Potet, 0.0, 50.0, missing)
           IF ( Climate_swrad_flag==ACTIVE ) CALL check_cbh_value('swrad', Swrad, 0.0, 1000.0, missing)
           IF ( Climate_transp_flag==ACTIVE ) CALL check_cbh_intvalue('transp_on', Transp_on, 0, 1, missing)
-          IF ( Climate_precip_flag==ACTIVE ) CALL check_cbh_value('hru_ppt', Hru_ppt, 0.0, 30.0, missing)
+          IF ( Climate_precip_flag==ACTIVE ) CALL check_cbh_value('hru_ppt', Hru_ppt, 0.0, 300.0, missing)
           IF ( Humidity_cbh_flag==ACTIVE ) CALL check_cbh_value('humidity_hru', Humidity_hru, 0.0, 100.0, missing)
+          IF ( Albedo_cbh_flag==ACTIVE ) CALL check_cbh_value('albedo_hru', Albedo_hru, 0.0, 100.0, missing)
+          IF ( Cloud_cover_cbh_flag==ACTIVE ) CALL check_cbh_value('cloud_cover_cbh', Cloud_cover_cbh, 0.0, 100.0, missing)
           IF ( Windspeed_cbh_flag==ACTIVE ) CALL check_cbh_value('windspeed_hru', Windspeed_hru, 0.0, 400.0, missing)
           IF ( missing==1 ) THEN
             CALL print_date(0)
@@ -295,6 +320,18 @@
           IF ( declvar(MODNAME, 'humidity_hru', 'nhru', Nhru, 'real', &
      &         'Relative humidity of each HRU', &
      &         'percentage', Humidity_hru)/=0 ) CALL read_error(3, 'humidity_hru')
+        ENDIF
+        IF ( Albedo_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+          ALLOCATE ( Albedo_hru(Nhru) )
+          IF ( declvar(MODNAME, 'albedo_hru', 'nhru', Nhru, 'real', &
+     &         'Snowpack albedo of each HRU', &
+     &         'decimal fraction', Albedo_hru)/=0 ) CALL read_error(3, 'albedo_hru')
+        ENDIF
+        IF ( Cloud_cover_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+          ALLOCATE ( Cloud_cover_cbh(Nhru) )
+          IF ( declvar(MODNAME, 'cloud_cover_cbh', 'nhru', Nhru, 'real', &
+     &         'Cloud_cover of each HRU read from CBH File', &
+     &         'decimal fraction', Cloud_cover_cbh)/=0 ) CALL read_error(3, 'cloud_cover_cbh')
         ENDIF
         IF ( Windspeed_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           IF ( declvar(MODNAME, 'basin_windspeed', 'one', 1, 'double', &
@@ -497,7 +534,7 @@
 !     Read a day in the CBH File
 !***********************************************************************
       SUBROUTINE read_cbh_date(Year, Month, Day, Var, Ios, Iret)
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
 ! Argument
       INTEGER, INTENT(IN) :: Year, Month, Day, Ios
       CHARACTER(LEN=*), INTENT(IN) :: Var

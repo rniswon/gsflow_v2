@@ -2,23 +2,11 @@
 ! Declares and initializes climate and flow parameters and variables
 !***********************************************************************
       MODULE PRMS_CLIMATEVARS
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, MONTHS_PER_YEAR, ERROR_dim, DEBUG_less, &
-     &    potet_pt_module, potet_pm_module, potet_pm_sta_module, climate_hru_module, &
-     &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
-     &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
-     &    FEET, FEET2METERS, METERS2FEET, FAHRENHEIT, INACTIVE, LAKE, ERROR_PARAM, &
-     &    ddsolrad_module, ccsolrad_module
-      USE PRMS_MODULE, ONLY: Nhru, Nssr, Ngw, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, &
-     &    Model, Print_debug, Init_vars_from_file, Temp_flag, Precip_flag, &
-     &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, &
-     &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
-     &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, &
-     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, Glacier_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2021-01-11'
+      character(len=*), parameter :: Version_climateflow = '2021-08-13'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -133,6 +121,16 @@
 !     climateflow_decl - declare climate and flow variables and parameters
 !***********************************************************************
       INTEGER FUNCTION climateflow_decl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, MONTHS_PER_YEAR, ERROR_dim, &
+     &    potet_pt_module, potet_pm_module, potet_pm_sta_module, climate_hru_module, &
+     &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
+     &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
+     &    ddsolrad_module, ccsolrad_module
+      USE PRMS_MODULE, ONLY: Nhru, Nssr, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, &
+     &    Model, Init_vars_from_file, Temp_flag, Precip_flag, Glacier_flag, &
+     &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, &
+     &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
+     &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       IMPLICIT NONE
@@ -197,8 +195,7 @@
 ! PRECIPITATION VARIABLES AND PARAMETERS
       ALLOCATE ( Pptmix(Nhru) )
       IF ( declvar(Precip_module, 'pptmix', 'nhru', Nhru, 'integer', &
-     &     'Flag to indicate if precipitation is a mixture of rain'// &
-     &     ' and snow for each HRU (0=no; 1=yes)', &
+     &     'Flag to indicate if precipitation is a mixture of rain and snow for each HRU (0=no; 1=yes)', &
      &     'none', Pptmix)/=0 ) CALL read_error(3, 'pptmix')
 
       ALLOCATE ( Newsnow(Nhru) )
@@ -341,8 +338,7 @@
       ALLOCATE ( Soil_rechr(Nhru) )
       IF ( declvar(Soilzone_module, 'soil_rechr', 'nhru', Nhru, 'real', &
      &     'Storage for recharge zone (upper portion) of the'// &
-     &     ' capillary reservoir that is available for both'// &
-     &     ' evaporation and transpiration', &
+     &     ' capillary reservoir that is available for both evaporation and transpiration', &
      &     'inches', Soil_rechr)/=0 ) CALL read_error(3, 'soil_rechr')
 
       ALLOCATE ( Ssr_to_gw(Nssr) )
@@ -357,19 +353,16 @@
 
       ALLOCATE ( Slow_flow(Nhru) )
       IF ( declvar(Soilzone_module, 'slow_flow', 'nhru', Nhru, 'real', &
-     &     'Interflow from gravity reservoir storage that flows to'// &
-     &     ' the stream network for each HRU', &
+     &     'Interflow from gravity reservoir storage that flows to the stream network for each HRU', &
      &     'inches', Slow_flow)/=0 ) CALL read_error(3, 'slow_flow')
 
       ALLOCATE ( Ssres_flow(Nssr) )
       IF ( declvar(Soilzone_module, 'ssres_flow', 'nssr', Nssr, 'real', &
-     &     'Interflow from gravity and preferential-flow reservoirs'// &
-     &     ' to the stream network for each HRU', &
+     &     'Interflow from gravity and preferential-flow reservoirs to the stream network for each HRU', &
      &     'inches', Ssres_flow)/=0 ) CALL read_error(3, 'ssres_flow')
 
       IF ( declvar(Soilzone_module, 'basin_ssflow', 'one', 1, 'double', &
-     &     'Basin area-weighted average interflow from gravity and'// &
-     &     ' preferential-flow reservoirs to the stream network', &
+     &     'Basin area-weighted average interflow from gravity and preferential-flow reservoirs to the stream network', &
      &     'inches', Basin_ssflow)/=0 ) CALL read_error(3, 'basin_ssflow')
 
       IF ( declvar(Soilzone_module, 'basin_swale_et', 'one', 1, 'double', &
@@ -418,14 +411,12 @@
 
       ALLOCATE ( Soil_to_gw(Nhru) )
       IF ( declvar(Soilzone_module, 'soil_to_gw', 'nhru', Nhru, 'real', &
-     &     'Portion of excess flow to the capillary reservoir that'// &
-     &     ' drains to the associated GWR for each HRU', &
+     &     'Portion of excess flow to the capillary reservoir that drains to the associated GWR for each HRU', &
      &     'inches', Soil_to_gw)/=0 ) CALL read_error(3, 'soil_to_gw')
 
       ALLOCATE ( Soil_to_ssr(Nhru) )
       IF ( declvar(Soilzone_module, 'soil_to_ssr', 'nhru', Nhru, 'real', &
-     &     'Portion of excess flow to the capillary reservoir that'// &
-     &     ' flows to the gravity reservoir for each HRU', &
+     &     'Portion of excess flow to the capillary reservoir that flows to the gravity reservoir for each HRU', &
      &     'inches', Soil_to_ssr)/=0 ) CALL read_error(3, 'soil_to_ssr')
 
       IF ( declvar(Soilzone_module, 'basin_soil_to_gw', 'one', 1, 'double', &
@@ -552,19 +543,19 @@
 ! glacier variables
       IF ( Glacier_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Glacier_frac(Nhru) )
-        IF ( declvar(MODNAME, 'glacier_frac', 'nhru', Nhru, 'real',       &
-             'Fraction of glaciation (0=none; 1=100%)',                   &
-             'decimal fraction', Glacier_frac)/=0 ) CALL read_error(3, 'glacier_frac')
+        IF ( declvar(MODNAME, 'glacier_frac', 'nhru', Nhru, 'real', &
+     &       'Fraction of glaciation (0=none; 1=100%)', &
+     &       'decimal fraction', Glacier_frac)/=0 ) CALL read_error(3, 'glacier_frac')
 
         ALLOCATE ( Glrette_frac(Nhru) )
-          IF ( declvar(MODNAME, 'glrette_frac', 'nhru', Nhru, 'real',     &
-             'Fraction of snow field (too small for glacier dynamics)',   &
-             'decimal fraction', Glrette_frac)/=0 ) CALL read_error(3, 'glrette_frac')
+          IF ( declvar(MODNAME, 'glrette_frac', 'nhru', Nhru, 'real', &
+     &       'Fraction of snow field (too small for glacier dynamics)', &
+     &       'decimal fraction', Glrette_frac)/=0 ) CALL read_error(3, 'glrette_frac')
 
         ALLOCATE ( Alt_above_ela(Nhru) )
-        IF ( declvar(MODNAME, 'alt_above_ela', 'nhru', Nhru, 'real',      &
-             'Altitude above equilibrium line altitude (ELA)',            &
-             'elev_units', Alt_above_ela)/=0 ) CALL read_error(3, 'alt_above_ela')
+        IF ( declvar(MODNAME, 'alt_above_ela', 'nhru', Nhru, 'real', &
+     &       'Altitude above equilibrium line altitude (ELA)', &
+     &       'elev_units', Alt_above_ela)/=0 ) CALL read_error(3, 'alt_above_ela')
       ENDIF
 
       ! Allocate local variables
@@ -766,8 +757,7 @@
      &     '999.0', '0.00001', '999.0', &
      &     'Soil saturation threshold, above field-capacity threshold', &
      &     'Water holding capacity of the gravity and preferential-'// &
-     &     'flow reservoirs; difference between field capacity and'// &
-     &     ' total soil saturation for each HRU', &
+     &     'flow reservoirs; difference between field capacity and total soil saturation for each HRU', &
      &     'inches')/=0 ) CALL read_error(1, 'sat_threshold')
 
       ALLOCATE ( Soil_moist_max(Nhru) )
@@ -775,8 +765,7 @@
      &     '2.0', '0.00001', '20.0', &
      &     'Maximum value of water for soil zone', &
      &     'Maximum available water holding capacity of capillary'// &
-     &     ' reservoir from land surface to rooting depth of the'// &
-     &     ' major vegetation type of each HRU', &
+     &     ' reservoir from land surface to rooting depth of the major vegetation type of each HRU', &
      &     'inches')/=0 ) CALL read_error(1, 'soil_moist_max')
 
       ALLOCATE ( Soil_rechr_max(Nhru) )
@@ -861,6 +850,17 @@
 !                        set initial values and check parameter values
 !***********************************************************************
       INTEGER FUNCTION climateflow_init()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR, DEBUG_less, &
+     &    potet_pt_module, potet_pm_module, potet_pm_sta_module, climate_hru_module, &
+     &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
+     &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
+     &    FEET, FEET2METERS, METERS2FEET, FAHRENHEIT, INACTIVE, LAKE, ERROR_PARAM, ddsolrad_module, ccsolrad_module
+      USE PRMS_MODULE, ONLY: Nhru, Nssr, Nevap, Nlake, Ntemp, Nrain, Nsol, &
+     &    Print_debug, Init_vars_from_file, Temp_flag, Precip_flag, &
+     &    Temp_module, Stream_order_flag, GSFLOW_flag, &
+     &    Precip_module, Solrad_module, Et_module, PRMS4_flag, &
+     &    Soilzone_module, Srunoff_module, Et_flag, Dprst_flag, Solrad_flag, &
+     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_type
@@ -1373,8 +1373,9 @@
 !     Write or read restart file
 !***********************************************************************
       SUBROUTINE climateflow_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Glacier_flag, GSFLOW_flag, &
+     &    Dprst_flag, Stream_order_flag, Nlake
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       IMPLICIT NONE

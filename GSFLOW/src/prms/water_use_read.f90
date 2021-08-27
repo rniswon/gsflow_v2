@@ -3,20 +3,12 @@
 ! from files pre-processed Data Files available for other PRMS modules
 !***********************************************************************
       MODULE PRMS_WATER_USE
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, MAXFILE_LENGTH, ACTIVE, OFF, &
-     &    RUN, DECL, INIT, CLEAN, ERROR_water_use, strmflow_noroute_module, &
-     &    strmflow_muskingum_lake_module
-      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nsegment, Nwateruse, Nexternal, Nconsumed, &
-     &    Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
-     &    External_transferON_OFF, Dprst_transferON_OFF, Dprst_flag, Strmflow_flag, &
-     &    Model, Inputerror_flag, Start_year, Start_month, Start_day, Soilzone_add_water_use, &
-     &    End_year, End_month, End_day, Dprst_transfer_water_use, Dprst_add_water_use, &
-     &    Gwr_transfer_water_use, Gwr_add_water_use, Lake_transfer_water_use, Lake_add_water_use
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       IMPLICIT NONE
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'water_use_read'
-      character(len=*), parameter :: Version_water_use_read = '2021-02-18'
+      character(len=*), parameter :: Version_water_use_read = '2021-08-13'
 
       ! transfer type
       integer, parameter :: STREAM = 1
@@ -55,6 +47,14 @@
       END MODULE PRMS_WATER_USE
 
       INTEGER FUNCTION water_use_read()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, &
+     &    RUN, DECL, INIT, CLEAN, ERROR_water_use, strmflow_noroute_module, strmflow_muskingum_lake_module
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nsegment, Nwateruse, Nexternal, Nconsumed, &
+     &    Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
+     &    External_transferON_OFF, Dprst_transferON_OFF, Dprst_flag, Strmflow_flag, &
+     &    Model, Inputerror_flag, Start_year, Start_month, Start_day, Soilzone_add_water_use, &
+     &    End_year, End_month, End_day, Dprst_transfer_water_use, Dprst_add_water_use, &
+     &    Gwr_transfer_water_use, Gwr_add_water_use, Lake_transfer_water_use, Lake_add_water_use
       USE PRMS_WATER_USE
       IMPLICIT NONE
 ! Functions
@@ -450,7 +450,7 @@
         IF ( declvar(MODNAME, 'transfer_rate', 'nwateruse', nwateruse, 'double', &
      &           'Transfer of each water-use transfer for each time step', &
      &           'cfs', Transfer_rate)/=0 ) CALL read_error(1, 'transfer_rate')
-        
+
       ELSEIF ( Process_flag==INIT ) THEN
         Ndiversions = 0
         year = Start_year
@@ -591,7 +591,7 @@
       SUBROUTINE read_event(Iunit, Src_type, Next_yr, Next_mo, Next_day)
       USE PRMS_CONSTANTS, ONLY: ERROR_water_use, ACTIVE, OFF
       USE PRMS_WATER_USE, ONLY: CANOPY
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Iunit, Src_type
@@ -632,7 +632,7 @@
      &    STREAM, GROUNDWATER, DPRST, EXTRNAL, LAKE, CAPILLARY, CONSUMPTIVE, CANOPY
       USE PRMS_MODULE, ONLY: Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
      &    Dprst_transferON_OFF, External_transferON_OFF, Strmflow_flag, Nexternal, Dprst_flag
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Functions
       EXTERNAL :: error_stop
@@ -730,6 +730,7 @@
 ! reset transfers when new event is found
 ! ****************************
       SUBROUTINE set_transfers(Src_type, Src_id, Dest_type, Dest_id, Diversion)
+      USE PRMS_CONSTANTS, ONLY: ERROR_water_use
       USE PRMS_WATER_USE
       IMPLICIT NONE
 ! Arguments
@@ -814,8 +815,7 @@
 
       SUBROUTINE nwateruse_error(ctype)
       USE PRMS_CONSTANTS, ONLY: ERROR_water_use
-      USE PRMS_MODULE, ONLY: Nwateruse
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nwateruse, Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
       ! Argument
       CHARACTER(LEN=*), INTENT(IN) :: ctype
