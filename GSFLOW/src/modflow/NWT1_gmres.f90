@@ -14,9 +14,9 @@
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
 !rgn------NEW VERSION NUMBER 1.1.4, 4/01/2018
 
-      USE GLOBAL, ONLY: IOUT,STRT,IBOUND
+      USE GLOBAL, ONLY: IOUT
       USE GMRESMODULE
-      USE GWFNWTMODULE, ONLY: IPRNWT,NUMACTIVE,IA,JA,NJA,IFDPARAM
+      USE GWFNWTMODULE, ONLY: NJA,IFDPARAM
       IMPLICIT NONE
 !     ------------------------------------------------------------------
 !     SPECIFICATIONS:
@@ -208,7 +208,7 @@
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: c, s, rs, mvy
   DOUBLE PRECISION, PARAMETER :: eps_a=1.e-16_kdp   ! *** make multiple of mach eps
   ! ... Set string for use with RCS ident command
-  CHARACTER(LEN=80) :: ident_string='$RCSfile: gmres.f90,v $//$Revision: 6960 $'
+!  CHARACTER(LEN=80) :: ident_string='$RCSfile: gmres.f90,v $//$Revision: 6960 $'
   !     ------------------------------------------------------------------
   !...
   ! ... comments follow Templates p.20 as closely as possible
@@ -403,7 +403,7 @@ CONTAINS
     !
     INTEGER :: i, k
     ! ... Set string for use with RCS ident command
-    CHARACTER(LEN=80) :: ident_string='$RCSfile: gmres.f90,v $//$Revision: 6960 $'
+!    CHARACTER(LEN=80) :: ident_string='$RCSfile: gmres.f90,v $//$Revision: 6960 $'
     !     ------------------------------------------------------------------
     !...
     ! ... forward solve
@@ -438,7 +438,7 @@ CONTAINS
     INTEGER :: i, k
     DOUBLE PRECISION :: t
     ! ... Set string for use with RCS ident command
-    CHARACTER(LEN=80) :: ident_string='$RCSfile: gmres.f90,v $//$Revision: 6960 $'
+!    CHARACTER(LEN=80) :: ident_string='$RCSfile: gmres.f90,v $//$Revision: 6960 $'
     !     ------------------------------------------------------------------
     !...
     DO  i = 1,n                ! ... n is known from host
