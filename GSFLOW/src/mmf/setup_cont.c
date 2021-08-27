@@ -58,7 +58,8 @@ void setup_cont (void) {
         decl_control_string ("gsflow_output_file", "gsflow.out");
         decl_control_string ("gsflow_csv_file", "gsflow.csv");
 		//decl_control_string ("creator_email", "unknown");
-		decl_control_string ("aet_module", "unknown");
+		decl_control_string ("AET_module", "unknown");
+		decl_control_string ("PET_ag_module", "unknown");
 		decl_control_string ("irrigation_area_module", "unknown");
 
 /*
@@ -241,6 +242,13 @@ void setup_cont (void) {
 
 		lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
+		decl_control_int_array ("dprst_transfer_water_use", 1, lval);
+
+		lval = (long *)umalloc (sizeof (long));
+		lval[0] = 0;
+		decl_control_int_array ("dprst_add_water_use", 1, lval);
+		lval = (long *)umalloc (sizeof (long));
+		lval[0] = 0;
 		decl_control_int_array ("soilzone_transferON_OFF", 1, lval);
 
 		lval = (long *)umalloc (sizeof (long));
@@ -287,6 +295,14 @@ void setup_cont (void) {
 		lval[0] = 0;
 		decl_control_int_array ("windspeed_cbh_flag", 1, lval);
 
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("albedo_cbh_flag", 1, lval);
+
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("cloud_cover_cbh_flag", 1, lval);
+
 		lval = (long *)umalloc (sizeof (long));
 		lval[0] = 0;
 		decl_control_int_array ("segmentOutON_OFF", 1, lval);
@@ -323,7 +339,8 @@ void setup_cont (void) {
         decl_control_string ("transp_day", "transp.day");
         decl_control_string ("windspeed_day", "windspeed.day");
         decl_control_string ("humidity_day", "humidity.day");
-		decl_control_string ("aet_file", "aet.input");
+		decl_control_string ("AET_cbh_file", "AET.input");
+		decl_control_string ("PET_cbh_file", "PET.input");
 		decl_control_string ("pkwater_equiv_day", "pkwater_equiv.day");
         decl_control_string ("pk_depth_day", "pk_depth.day");
         decl_control_string ("snow_evap_day", "snow_evap.day");
