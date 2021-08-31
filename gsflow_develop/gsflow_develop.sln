@@ -1,31 +1,31 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.30320.27
+VisualStudioVersion = 16.0.31613.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "gsflow_develop", "gsflow_develop.vfproj", "{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}"
+Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "gsflow_develop", "gsflow_develop.vfproj", "{B1E2D633-0EFC-4D7C-ABF0-F1E82FC1E197}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
-		Release|Win32 = Release|Win32
+		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}.Debug|Win32.ActiveCfg = Debug|Win32
-		{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}.Debug|Win32.Build.0 = Debug|Win32
-		{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}.Debug|x64.ActiveCfg = Debug|x64
-		{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}.Debug|x64.Build.0 = Debug|x64
-		{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}.Release|Win32.ActiveCfg = Release|Win32
-		{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}.Release|Win32.Build.0 = Release|Win32
-		{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}.Release|x64.ActiveCfg = Release|x64
-		{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}.Release|x64.Build.0 = Release|x64
+		{B1E2D633-0EFC-4D7C-ABF0-F1E82FC1E197}.Debug|x64.ActiveCfg = Debug|x64
+		{B1E2D633-0EFC-4D7C-ABF0-F1E82FC1E197}.Debug|x64.Build.0 = Debug|x64
+		{B1E2D633-0EFC-4D7C-ABF0-F1E82FC1E197}.Debug|x86.ActiveCfg = Debug|Win32
+		{B1E2D633-0EFC-4D7C-ABF0-F1E82FC1E197}.Debug|x86.Build.0 = Debug|Win32
+		{B1E2D633-0EFC-4D7C-ABF0-F1E82FC1E197}.Release|x64.ActiveCfg = Release|x64
+		{B1E2D633-0EFC-4D7C-ABF0-F1E82FC1E197}.Release|x64.Build.0 = Release|x64
+		{B1E2D633-0EFC-4D7C-ABF0-F1E82FC1E197}.Release|x86.ActiveCfg = Release|Win32
+		{B1E2D633-0EFC-4D7C-ABF0-F1E82FC1E197}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C1E557FB-3F0C-43E5-954D-E65D7D0332DC}
+		SolutionGuid = {DA8A83BF-16CB-4CDD-8F26-23B9ECDC8040}
 	EndGlobalSection
 EndGlobal
