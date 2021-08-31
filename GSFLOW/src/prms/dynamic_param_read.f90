@@ -5,20 +5,12 @@
 ! period. Associated states with each parameter are adjusted.
 !***********************************************************************
       MODULE PRMS_DYNAMIC_PARAM_READ
-        USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, MAXFILE_LENGTH, ACTIVE, OFF, &
-     &      ERROR_dynamic, DEBUG_minimum, DEBUG_less, INACTIVE, LAKE, NEARZERO, &
-     &      potet_jh_module, potet_pan_module, potet_hamon_module, potet_hs_module, &
-     &      potet_pt_module, potet_pm_module, climate_hru_module
-        USE PRMS_MODULE, ONLY: Model, Nhru, Print_debug, Start_year, Start_month, Start_day, &
-     &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, &
-     &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
-     &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
-     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag
+        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2021-01-06'
+        character(len=*), parameter :: Version_dynamic_param_read = '2021-08-13'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -82,6 +74,12 @@
 !     dynparaminit - open files, read to start time, initialize flags and arrays
 !***********************************************************************
       INTEGER FUNCTION dynparaminit()
+        USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, OFF, ERROR_dynamic, DEBUG_minimum
+        USE PRMS_MODULE, ONLY: Nhru, Print_debug, Start_year, Start_month, Start_day, &
+     &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, &
+     &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
+     &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
+     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, PRMS4_flag
       USE PRMS_DYNAMIC_PARAM_READ
       IMPLICIT NONE
 ! Functions
@@ -401,8 +399,14 @@
 !     dynparamrun - Read and set dynamic parameters
 !***********************************************************************
       INTEGER FUNCTION dynparamrun()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dynamic, INACTIVE, LAKE, &
+     &    potet_jh_module, potet_pan_module, potet_hamon_module, potet_hs_module, &
+     &    potet_pt_module, potet_pm_module, climate_hru_module
+      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, &
+     &    Dyn_imperv_flag, Dyn_covtype_flag, Dyn_potet_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
+     &    Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dprst_flag, &
+     &    Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag
       USE PRMS_DYNAMIC_PARAM_READ
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: Hru_type, Hru_area, Dprst_clos_flag, &
      &    Hru_percent_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Dprst_frac, Dprst_open_flag, &
      &    Dprst_area_max, Dprst_area_open_max, Dprst_area_clos_max, Dprst_frac_open, &
@@ -872,9 +876,8 @@
 !***********************************************************************
       SUBROUTINE write_dynoutput(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: Hru_type
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -910,9 +913,8 @@
 !***********************************************************************
       SUBROUTINE write_dynparam_int(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: Hru_type
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -948,9 +950,8 @@
 !***********************************************************************
       SUBROUTINE write_dynparam(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: Hru_type
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -987,7 +988,7 @@
 !      SUBROUTINE write_dynparam_dble(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
 !      USE PRMS_MODULE, ONLY: Print_debug, Nhru
 !      USE PRMS_BASIN, ONLY: Hru_type
-!      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+!      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
 !      IMPLICIT NONE
 ! Arguments
 !      INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -1025,9 +1026,8 @@
 !***********************************************************************
       SUBROUTINE write_dynparam_potet(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: Hru_type
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim

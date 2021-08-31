@@ -92,18 +92,12 @@
 !
 !***********************************************************************
       MODULE PRMS_MUSKINGUM_LAKE
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, CFS2CMS_CONV, &
-     &    OUTFLOW_SEGMENT, DOCUMENTATION, NEARZERO, DNEARZERO, CFS2CMS_CONV, LAKE, ERROR_water_use, &
-     &    ERROR_streamflow, ERROR_dim, CASCADE_OFF, CASCADE_HRU_SEGMENT
-      USE PRMS_MODULE, ONLY: Model, Nsegment, Nhru, Nratetbl, Nlake, &
-     &    Print_debug, Init_vars_from_file, Strmflow_flag, Cascade_flag, Inputerror_flag, &
-     &    Glacier_flag, Lake_transfer_water_use, Lake_add_water_use
       IMPLICIT NONE
 !   Local Variables
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       character(len=*), parameter :: MODDESC = 'Streamflow & Lake Routing'
       character(len=14), parameter :: MODNAME = 'muskingum_lake'
-      character(len=*), parameter :: Version_muskingum_lake = '2020-12-02'
+      character(len=*), parameter :: Version_muskingum_lake = '2021-08-13'
       INTEGER, SAVE :: Obs_flag, Linear_flag, Weir_flag, Gate_flag, Puls_flag
       INTEGER, SAVE :: Secondoutflow_flag
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
@@ -209,6 +203,8 @@
 !     lake_out2, lake_out2_a, lake_out2_b
 !***********************************************************************
       INTEGER FUNCTION muskingum_lake_decl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, CASCADE_OFF, ERROR_dim
+      USE PRMS_MODULE, ONLY: Model, Nsegment, Nratetbl, Nlake, Init_vars_from_file, Cascade_flag
       USE PRMS_MUSKINGUM_LAKE
       IMPLICIT NONE
 ! Functions
@@ -618,6 +614,8 @@
 !    muskingum_lake_init - Get and check parameter values and initialize variables
 !***********************************************************************
       INTEGER FUNCTION muskingum_lake_init()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, DNEARZERO, LAKE, ERROR_dim, CASCADE_OFF, CASCADE_HRU_SEGMENT
+      USE PRMS_MODULE, ONLY: Nsegment, Nhru, Nratetbl, Nlake, Init_vars_from_file, Cascade_flag, Inputerror_flag
       USE PRMS_MUSKINGUM_LAKE
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_route_order, Gwr_type, &
      &    Lake_hru_id, Weir_gate_flag, Lake_type, Puls_lin_flag
@@ -878,6 +876,9 @@
 !     muskingum_lake_run - Compute routing summary values
 !***********************************************************************
       INTEGER FUNCTION muskingum_lake_run()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, CFS2CMS_CONV, OUTFLOW_SEGMENT, LAKE, ERROR_water_use, ERROR_streamflow, CASCADE_OFF
+      USE PRMS_MODULE, ONLY: Nsegment, Nlake, Cascade_flag, Glacier_flag, Lake_transfer_water_use, Lake_add_water_use, &
+     &    Nowyear, Nowmonth, Nowday
       USE PRMS_MUSKINGUM_LAKE
       USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_route_order, Active_hrus, &
      &    Lake_area, Lake_type, Hru_area_dble, Lake_hru_id, Hru_type, Weir_gate_flag, &
@@ -887,7 +888,7 @@
      &    Basin_stflow_out, Basin_cfs, Basin_stflow_in, Basin_sroff_cfs, Seg_inflow, Seg_outflow, &
      &    Seg_upstream_inflow, Seg_lateral_inflow, Flow_out, Basin_lake_stor, Hru_actet, Lake_vol, Basin_sroff
       USE PRMS_OBS, ONLY: Streamflow_cfs
-      USE PRMS_SET_TIME, ONLY: Cfs_conv, Nowyear, Nowmonth, Nowday
+      USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_WATER_USE, ONLY: Lake_transfer, Lake_gain
       USE PRMS_ROUTING, ONLY: Use_transfer_segment, Segment_delta_flow, Basin_segment_storage, &
      &    Obsin_segment, Segment_order, Tosegment, C0, C1, C2, Ts, Ts_i, Obsout_segment, &

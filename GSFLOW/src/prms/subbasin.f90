@@ -11,15 +11,11 @@
 !***********************************************************************
 
       MODULE PRMS_SUBBASIN
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, DOCUMENTATION, &
-     &    DNEARZERO, ERROR_dim, CASCADE_OFF
-      USE PRMS_MODULE, ONLY: Model, Nsub, Nhru, Print_debug, GSFLOW_flag, &
-     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'subbasin'
-      character(len=*), parameter :: Version_subbasin = '2020-12-02'
+      character(len=*), parameter :: Version_subbasin = '2021-08-13'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Qsub(:), Sub_area(:), Laststor(:)
       INTEGER, SAVE, ALLOCATABLE :: Tree(:, :)
 !   Declared Variables
@@ -66,6 +62,8 @@
 !     hru_area, subbasin_down, hru_subbasin
 !***********************************************************************
       INTEGER FUNCTION subdecl()
+      USE PRMS_CONSTANTS, ONLY: OFF, DOCUMENTATION, ERROR_dim
+      USE PRMS_MODULE, ONLY: Model, Nsub, Nhru, GSFLOW_flag
       USE PRMS_SUBBASIN
       IMPLICIT NONE
 ! Functions
@@ -84,26 +82,23 @@
 ! Declared Variables
       ALLOCATE ( Sub_interflow(Nsub) )
       IF ( declvar(MODNAME, 'sub_interflow', 'nsub', Nsub, 'double', &
-     &     'Area-weighted average interflow to each subbasin from'// &
-     &     ' associated HRUs and from upstream subbasins', &
+     &     'Area-weighted average interflow to each subbasin from associated HRUs and from upstream subbasins', &
      &     'cfs', Sub_interflow)/=0 ) CALL read_error(3, 'sub_interflow')
 
       IF ( GSFLOW_flag==OFF .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Sub_gwflow(Nsub) )
         IF ( declvar(MODNAME, 'sub_gwflow', 'nsub', Nsub, 'double', &
-     &       'Area-weighted average groundwater discharge from'// &
-     &       ' associated GWRs to each subbasin and from upstream subbasins', &
+     &       'Area-weighted average groundwater discharge from associated GWRs to each subbasin and from upstream subbasins', &
      &       'cfs', Sub_gwflow)/=0 ) CALL read_error(3, 'sub_gwflow')
         ALLOCATE ( Subinc_gwflow(Nsub) )
         IF ( declvar(MODNAME, 'subinc_gwflow', 'nsub', Nsub, 'double', &
-     &       'Area-weighted average groundwater discharge from associated  GWRs to each subbasin', &
+     &       'Area-weighted average groundwater discharge from associated GWRs to each subbasin', &
      &       'cfs', Subinc_gwflow)/=0 ) CALL read_error(3, 'subinc_gwflow')
       ENDIF
 
       ALLOCATE ( Sub_sroff(Nsub) )
       IF ( declvar(MODNAME, 'sub_sroff', 'nsub', Nsub, 'double', &
-     &     'Area-weighted average surface runoff from associated HRUs'// &
-     &     ' to each subbasin and from upstream subbasins', &
+     &     'Area-weighted average surface runoff from associated HRUs to each subbasin and from upstream subbasins', &
      &     'cfs', Sub_sroff)/=0 ) CALL read_error(3, 'sub_sroff')
 
       ALLOCATE ( Subinc_snowcov(Nsub) )
@@ -148,20 +143,17 @@
 
       ALLOCATE ( Subinc_swrad(Nsub) )
       IF ( declvar(MODNAME, 'subinc_swrad', 'nsub', Nsub, 'double', &
-     &     'Area-weighted average shortwave radiation distributed'// &
-     &     ' to associated HRUs of each subbasin', &
+     &     'Area-weighted average shortwave radiation distributed to associated HRUs of each subbasin', &
      &     'Langleys', Subinc_swrad)/=0 ) CALL read_error(3, 'subinc_swrad')
 
       ALLOCATE ( Subinc_tminc(Nsub) )
       IF ( declvar(MODNAME, 'subinc_tminc', 'nsub', Nsub, 'double', &
-     &     'Area-weighted average minimum air temperature for'// &
-     &     ' associated HRUs to each subbasin', &
+     &     'Area-weighted average minimum air temperature for associated HRUs to each subbasin', &
      &     'degrees Celsius', Subinc_tminc)/=0 ) CALL read_error(3, 'subinc_tminc')
 
       ALLOCATE ( Subinc_tmaxc(Nsub) )
       IF ( declvar(MODNAME, 'subinc_tmaxc', 'nsub', Nsub, 'double', &
-     &     'Area-weighted average maximum air temperature for'// &
-     &     ' associated HRUs to each subbasin', &
+     &     'Area-weighted average maximum air temperature for associated HRUs to each subbasin', &
      &     'degrees Celsius', Subinc_tmaxc)/=0 ) CALL read_error(3, 'subinc_tmaxc')
 
       ALLOCATE ( Subinc_tavgc(Nsub) )
@@ -186,8 +178,7 @@
 
       ALLOCATE ( Subinc_pkweqv(Nsub) )
       IF ( declvar(MODNAME, 'subinc_pkweqv', 'nsub', Nsub, 'double', &
-     &     'Area-weighted average snowpack water equivalent from'// &
-     &     ' associated HRUs of each subbasin', &
+     &     'Area-weighted average snowpack water equivalent from associated HRUs of each subbasin', &
      &     'inches', Subinc_pkweqv)/=0 ) CALL read_error(3, 'subinc_pkweqv')
 
       ALLOCATE ( Subinc_recharge(Nsub) )
@@ -249,6 +240,9 @@
 !               compute initial values
 !***********************************************************************
       INTEGER FUNCTION subinit()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, DNEARZERO
+      USE PRMS_MODULE, ONLY: Nsub, Nhru, Print_debug, GSFLOW_flag, &
+     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag
       USE PRMS_SUBBASIN
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
      &    Hru_type, Hru_frac_perv, Lake_hru_id
@@ -444,6 +438,8 @@
 !                  storage and outflows
 !***********************************************************************
       INTEGER FUNCTION subrun()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, CASCADE_OFF
+      USE PRMS_MODULE, ONLY: Nsub, GSFLOW_flag, Dprst_flag, Lake_route_flag, Cascade_flag
       USE PRMS_SUBBASIN
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
      &    Hru_type, Hru_frac_perv, Lake_hru_id

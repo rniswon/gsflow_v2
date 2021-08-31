@@ -2,11 +2,10 @@
 !     Perform the MODFLOW budget procedure for PRMS soil zone
 !***********************************************************************
       MODULE GSFBUDGET
-      USE PRMS_CONSTANTS, ONLY: ERROR_dim, NEARZERO, CLOSEZERO, ACTIVE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2021-01-12'
+      character(len=*), parameter :: Version_gsflow_budget = '2021-08-13'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -193,7 +192,7 @@
 !     gsfbudinit - Initialize GSFBUDGET module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION gsfbudinit()
-      USE PRMS_CONSTANTS, ONLY: OFF
+      USE PRMS_CONSTANTS, ONLY: ERROR_dim, OFF
       USE GSFBUDGET
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru
       USE GWFSFRMODULE, ONLY: NSTRM
@@ -252,6 +251,7 @@
 ! adjust gravity flow storage with last gw2sm and gw_rejected
 !***********************************************************************
       INTEGER FUNCTION gsfbudrun()
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, CLOSEZERO, ACTIVE
       USE GSFBUDGET
       USE GSFMODFLOW, ONLY: Mfq2inch_conv, Mfl2_to_acre, & !, Cellarea, &
      &    Mfvol2inch_conv, Mfl3t_to_cfs, Mfl_to_inch, Gwc_col, Gwc_row
@@ -269,7 +269,7 @@
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Hru_actet, Basin_sroff, &
      &    Basin_actet, Basin_ssstor, Ssres_stor, Slow_stor, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_gwflow_cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv
-!Warning, modifies Basin_soil_moist, Basin_ssstor, and Gw2sm_grav
+!Warning, modifies Basin_ssstor, and Gw2sm_grav
       USE PRMS_SOILZONE, ONLY: Pref_flow_stor, Gravity_stor_res, Hrucheck, Gvr_hru_id, &
      &    Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
       IMPLICIT NONE
@@ -701,7 +701,7 @@
      &    TOTSPFLOW, NSTRM, SFRRATIN, ISTRM
       USE PRMS_FLOWVARS, ONLY: Basin_cfs, Basin_cms, Basin_stflow_out
       USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV, ACTIVE
-      USE PRMS_MODULE, ONLY: Ag_package_active
+      USE PRMS_MODULE, ONLY: Ag_package
       USE PRMS_SET_TIME, ONLY: Cfs2inches
       USE GWFAGMODULE, ONLY:  NUMIRRDIVERSIONSP,IRRSEG
       IMPLICIT NONE
@@ -725,7 +725,7 @@
       first_reach = 1
       DO i = 1, NSS
         itemp = 0
-        IF ( Ag_package_active==ACTIVE ) THEN
+        IF ( Ag_package==ACTIVE ) THEN
           DO j = 1, NUMIRRDIVERSIONSP
             IF ( i == IRRSEG(J) ) itemp = IRRSEG(J)
           END DO

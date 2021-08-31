@@ -6,14 +6,12 @@
 ! measurement gage efficiency
 !***********************************************************************
       MODULE PRMS_PRECIP_MAP
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, OFF, MAXFILE_LENGTH, &
-     &      MM, MM2INCH, MONTHS_PER_YEAR, precip_map_module
-        USE PRMS_MODULE, ONLY: Model, Process_flag, Start_year, Start_month, Start_day, Nmap2hru, Nmap
+        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=*), parameter :: MODNAME = 'precip_map'
-        character(len=*), parameter :: Version_precip_map = '2020-11-20'
+        character(len=*), parameter :: Version_precip_map = '2021-08-13'
         INTEGER, SAVE :: Precip_unit
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
@@ -26,12 +24,13 @@
       END MODULE PRMS_PRECIP_MAP
 
       SUBROUTINE precip_map()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, OFF, MM, MM2INCH, MONTHS_PER_YEAR, precip_map_module
+      USE PRMS_MODULE, ONLY: Process_flag, Start_year, Start_month, Start_day, Nmap2hru, Nmap, Nowmonth
       USE PRMS_PRECIP_MAP
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Hru_rain, Hru_snow, Prmx, Pptmix, Newsnow, &
      &    Precip_units, Tmax_allrain_f, Adjmix_rain, Tmaxf, Tminf, &
      &    Basin_ppt, Basin_snow, Basin_rain, Basin_obs_ppt, Tmax_allsnow_f
-      USE PRMS_SET_TIME, ONLY: Nowmonth
 ! Functions
       INTRINSIC :: SNGL
       INTEGER, EXTERNAL :: declparam, getparam, control_string

@@ -4,20 +4,15 @@
 ! snowpack
 !***********************************************************************
       MODULE PRMS_INTCP
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, DOCUMENTATION, NEARZERO, DNEARZERO, &
-     &    DEBUG_WB, DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
-      USE PRMS_MODULE, ONLY: Nhru, Model, Init_vars_from_file, &
-     &    Print_debug, Water_use_flag, PRMS_land_iteration_flag, Kkiter
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-02-18'
+      character(len=*), parameter :: Version_intcp = '2021-08-26'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
       INTEGER, SAVE :: Use_transfer_intcp
-      REAL, SAVE, ALLOCATABLE :: Gain_inches(:)
       INTEGER, PARAMETER :: RAIN = 0, SNOW = 1
 !   Declared Variables
       INTEGER, SAVE, ALLOCATABLE :: Intcp_on(:), Intcp_form(:)
@@ -27,6 +22,7 @@
       REAL, SAVE, ALLOCATABLE :: Intcp_stor(:), Intcp_evap(:)
       REAL, SAVE, ALLOCATABLE :: Hru_intcpstor(:), Hru_intcpevap(:), Canopy_covden(:)
       REAL, SAVE, ALLOCATABLE :: Net_apply(:), Intcp_changeover(:)
+      REAL, SAVE, ALLOCATABLE :: Gain_inches(:), Gain_inches_hru(:)
       DOUBLE PRECISION, SAVE :: Basin_net_apply, Basin_hru_apply
       INTEGER, SAVE, ALLOCATABLE :: It0_intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: It0_intcp_stor(:), It0_hru_intcpstor(:)
@@ -69,6 +65,8 @@
 !     covden_win, covden_sum, epan_coef, hru_area, hru_pansta
 !***********************************************************************
       INTEGER FUNCTION intdecl()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION
+      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, PRMS_land_iteration_flag
       USE PRMS_INTCP
       IMPLICIT NONE
 ! Functions
@@ -85,30 +83,41 @@
       ENDIF
 
 ! NEW VARIABLES and PARAMETERS for APPLICATION RATES
+      ALLOCATE ( Net_apply(Nhru) )
       Use_transfer_intcp = OFF
       IF ( Water_use_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         Use_transfer_intcp = ACTIVE
         ALLOCATE ( Gain_inches(Nhru) )
+        IF ( declvar(MODNAME, 'gain_inches', 'nhru', Nhru, 'real', &
+     &       'Canopy_gain in canopy as depth over the HRU', &
+     &       'inches', Gain_inches)/=0 ) CALL read_error(3, 'gain_inches')
+        ALLOCATE ( Gain_inches_hru(Nhru) )
+        IF ( declvar(MODNAME, 'gain_inches_hru', 'nhru', Nhru, 'real', &
+     &       'Canopy_gain in canopy as depth over the HRU', &
+     &       'inches', Gain_inches_hru)/=0 ) CALL read_error(3, 'gain_inches_hru')
         IF ( declvar(MODNAME, 'basin_net_apply', 'one', 1, 'double', &
-     &       'Basin area-weighted average net_apply', &
+     &       'Basin area-weighted average net application', &
      &       'inches', Basin_net_apply)/=0 ) CALL read_error(3, 'basin_net_apply')
         IF ( declvar(MODNAME, 'basin_hru_apply', 'one', 1, 'double', &
      &       'Basin area-weighted average canopy_gain', &
      &       'inches', Basin_hru_apply)/=0 ) CALL read_error(3, 'basin_hru_apply')
-        ALLOCATE ( Net_apply(Nhru) )
         IF ( declvar(MODNAME, 'net_apply', 'nhru', Nhru, 'real', &
      &       'canopy_gain minus interception', &
      &       'inches', Net_apply)/=0 ) CALL read_error(3, 'net_apply')
+
+!       Application method (0 = sprinkler method with interception only;
+!       1=ditch/drip method with no interception; 2=ignore; 3=sprinkler across whole HRU with interception
+!       and throughfall; 4=sprinkler method with amount of water applied on the basis of cover density,
+!       such as a living filter), for options 1, 2, and 3 irrigation water is specified as an
+!       HRU-area weighted average value
         ALLOCATE ( Irr_type(Nhru) )
         IF ( declparam(MODNAME, 'irr_type', 'nhru', 'integer', &
      &       '0', '0', '2', &
      &       'Application method of irrigation water', &
-     &       'Application method of irrigation water for each HRU (0 = sprinkler method with interception only;'// &
-     &       ' 1=ditch/drip method with no interception; 2=ignore; 3=sprinkler across whole HRU with interception'// &
-     &       ' and throughfall; 4=sprinkler method with amount of water applied on the basis of cover density,'// &
-     &       ' such as a living filter), for options 1, 2, and 3 irrigation water is specified as an'// &
-     &       ' HRU-area weighted average value', &
+     &       'Application method of irrigation water for each HRU (0 = sprinkler;'// &
+     &       ' 1=ditch/drip; 2=ignore; 3=sprinkler across HRU; 4=living filter', & 
      &       'none')/=0 ) CALL read_error(1, 'irr_type')
+
       ENDIF
 
       ALLOCATE ( Hru_intcpevap(Nhru) )
@@ -221,6 +230,8 @@
 !               set initial values.
 !***********************************************************************
       INTEGER FUNCTION intinit()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug
       USE PRMS_INTCP
       USE PRMS_CLIMATEVARS, ONLY: Transp_on
       IMPLICIT NONE
@@ -237,8 +248,9 @@
       IF ( Use_transfer_intcp==ACTIVE ) THEN
         IF ( getparam(MODNAME, 'irr_type', Nhru, 'integer', Irr_type)/=0 ) CALL read_error(1, 'irr_type')
         Gain_inches = 0.0
-        Net_apply = 0.0
+        Gain_inches_hru = 0.0
       ENDIF
+      Net_apply = 0.0
 
       Intcp_changeover = 0.0
       Intcp_form = RAIN
@@ -271,6 +283,10 @@
 !              and evaporation for each HRU
 !***********************************************************************
       INTEGER FUNCTION intrun()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, NEARZERO, DNEARZERO, &
+     &    DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
+      USE PRMS_MODULE, ONLY: Print_debug, PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Nowday, &
+     &    Ag_package, Hru_ag_irr
       USE PRMS_INTCP
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_type, Covden_win, Covden_sum, &
      &    Hru_route_order, Hru_area, Cov_type
@@ -279,16 +295,16 @@
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, &
      &    Hru_snow, Transp_on, Potet, Use_pandata, Hru_pansta, Epan_coef, Potet_sublim
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv
-      USE PRMS_SET_TIME, ONLY: Nowmonth, Cfs_conv, Nowyear, Nowday
+      USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_OBS, ONLY: Pan_evap
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: intercept, error_stop
+      EXTERNAL :: intercept
       INTRINSIC :: DBLE, SNGL
 ! Local Variables
       INTEGER :: i, j, iskip, irrigation_type
       REAL :: last, evrn, evsn, cov, intcpstor, diff, changeover, stor, intcpevap, z, d, harea
-      REAL :: netrain, netsnow, extra_water
+      REAL :: netrain, netsnow, extra_water, stor_max_rain
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       intrun = 0
@@ -324,6 +340,8 @@
         Basin_net_apply = 0.0D0
         Basin_hru_apply = 0.0D0
         Net_apply = 0.0
+        Gain_inches = 0.0
+        Gain_inches_hru = 0.0
       ENDIF
 
       DO j = 1, Active_hrus
@@ -348,7 +366,7 @@
         changeover = 0.0
         extra_water = 0.0
         ! Lake or bare ground HRUs
-        IF ( Hru_type(i)==LAKE .OR. Cov_type(i)==BARESOIL ) THEN
+        IF ( Hru_type(i)==LAKE .OR. Cov_type(i)==BARESOIL ) THEN ! cov_type = 0
           IF ( Cov_type(i)==BARESOIL .AND. intcpstor>0.0 ) THEN
             ! could happen if cov_type changed from > 0 to 0 with storage using dynamic parameters
             extra_water = Hru_intcpstor(i)
@@ -360,8 +378,6 @@
           ENDIF
           intcpstor = 0.0
         ENDIF
-
-!*****Determine the amount of interception from rain
 
 !***** go from summer to winter cover density
         IF ( Transp_on(i)==OFF .AND. Intcp_transp_on(i)==ACTIVE ) THEN
@@ -407,23 +423,24 @@
           ENDIF
         ENDIF
 
+        IF ( Transp_on(i)==ACTIVE ) THEN
+          stor_max_rain = Srain_intcp(i)
+        ELSE
+          stor_max_rain = Wrain_intcp(i)
+        ENDIF
+
 !*****Determine the amount of interception from rain
 
-        IF ( Hru_type(i)/=LAKE .AND. Cov_type(i)/=BARESOIL ) THEN         ! not a lake or bare ground HRU
-          IF ( Transp_on(i)==ACTIVE ) THEN
-            stor = Srain_intcp(i)
-          ELSE
-            stor = Wrain_intcp(i)
-          ENDIF
+        IF ( Hru_type(i)/=LAKE .AND. Cov_type(i)/=BARESOIL ) THEN  ! cov_type /= 0, not a lake or bare ground HRU
           IF ( Hru_rain(i)>0.0 ) THEN
             IF ( cov>0.0 ) THEN
-              IF ( Cov_type(i)>GRASSES ) THEN
-                CALL intercept(Hru_rain(i), stor, cov, intcpstor, netrain)
-              ELSEIF ( Cov_type(i)==GRASSES ) THEN
+              IF ( Cov_type(i)>GRASSES ) THEN ! cov_type > 1
+                CALL intercept(Hru_rain(i), stor_max_rain, cov, intcpstor, netrain)
+              ELSEIF ( Cov_type(i)==GRASSES ) THEN ! cov_type = 1
                 !rsr, 03/24/2008 intercept rain on snow-free grass,
                 !rsr             when not a mixed event
                 IF ( Pkwater_equiv(i)<DNEARZERO .AND. netsnow<NEARZERO ) THEN
-                  CALL intercept(Hru_rain(i), stor, cov, intcpstor, netrain)
+                  CALL intercept(Hru_rain(i), stor_max_rain, cov, intcpstor, netrain)
                   !rsr 03/24/2008
                   !it was decided to leave the water in intcpstor rather
                   !than put the water in the snowpack, as doing so for a
@@ -484,9 +501,8 @@
 
           IF ( Hru_snow(i)>0.0 ) THEN
             IF ( cov>0.0 ) THEN
-              IF ( Cov_type(i)>GRASSES ) THEN
-                stor = Snow_intcp(i)
-                CALL intercept(Hru_snow(i), stor, cov, intcpstor, netsnow)
+              IF ( Cov_type(i)>GRASSES ) THEN ! cov_type > 1
+                CALL intercept(Hru_snow(i), Snow_intcp(i), cov, intcpstor, netsnow)
                 IF ( netsnow<NEARZERO ) THEN   !rsr, added 3/9/2006
                   netrain = netrain + netsnow
                   netsnow = 0.0

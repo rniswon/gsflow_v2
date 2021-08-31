@@ -2,15 +2,11 @@
 !     WRITES NHM CSV SUMMARY FILE
 !***********************************************************************
       MODULE PRMS_PRMS_SUMMARY
-        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, RUN, DECL, INIT, CLEAN, ACTIVE, OFF, &
-     &      DOCUMENTATION, ERROR_open_out, ERROR_OPEN_IN, ERROR_READ, MAXDIM
-        USE PRMS_MODULE, ONLY: Model, Process_flag, Nobs, Nsegment, Npoigages, &
-     &      Csv_output_file, Inputerror_flag, Parameter_check_flag, CsvON_OFF
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Output Summary'
         character(len=*), parameter :: MODNAME = 'prms_summary'
-        character(len=*), parameter :: Version_prms_summary = '2020-12-02'
+        character(len=*), parameter :: Version_prms_summary = '2021-08-13'
         INTEGER, PARAMETER :: NVARS = 51
         INTEGER, SAVE :: Iunit
         INTEGER, SAVE, ALLOCATABLE :: Gageid_len(:)
@@ -28,13 +24,15 @@
       END MODULE PRMS_PRMS_SUMMARY
 
       SUBROUTINE prms_summary()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, ERROR_open_out, DOCUMENTATION, MAXDIM
+      USE PRMS_MODULE, ONLY: Model, Process_flag, Nobs, Nsegment, Npoigages, &
+     &    Csv_output_file, Inputerror_flag, Parameter_check_flag, CsvON_OFF, Nowyear, Nowmonth, Nowday
       USE PRMS_PRMS_SUMMARY
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Basin_tmax, Basin_tmin, Basin_swrad, Basin_ppt
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_soil_to_gw, &
      &    Basin_lakeevap, Basin_perv_et, Basin_actet, Basin_lake_stor, &
      &    Basin_gwflow_cfs, Basin_sroff_cfs, Basin_ssflow_cfs, Basin_cfs, Basin_stflow_in, &
      &    Basin_stflow_out, Seg_outflow
-      USE PRMS_SET_TIME, ONLY : Nowyear, Nowmonth, Nowday
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_INTCP, ONLY: Basin_intcp_evap, Basin_intcp_stor
       USE PRMS_SNOW, ONLY: Basin_pweqv, Basin_snowevap, Basin_snowmelt, Basin_snowcov, Basin_pk_precip
@@ -245,6 +243,7 @@
 !     statvar_to_csv - write a CSV file based on the statvar file
 !***********************************************************************
       SUBROUTINE statvar_to_csv()
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_open_in, ERROR_open_out, ERROR_read
       USE PRMS_PRMS_SUMMARY
       IMPLICIT NONE
 ! Functions

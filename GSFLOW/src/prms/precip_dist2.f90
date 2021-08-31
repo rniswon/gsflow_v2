@@ -13,14 +13,11 @@
 !      adjust total precip
 !***********************************************************************
       MODULE PRMS_PRECIP_DIST2
-        USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, MONTHS_PER_YEAR, ACTIVE, OFF, &
-     &      NEARZERO, DNEARZERO, ERROR_dim, ERROR_data, CELSIUS, INCH2MM
-        USE PRMS_MODULE, ONLY: Model, Nhru, Nrain
         IMPLICIT NONE
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=*), parameter :: MODNAME = 'precip_dist2'
-        character(len=*), parameter :: Version_precip = '2020-12-02'
+        character(len=*), parameter :: Version_precip = '2021-08-13'
         INTEGER, SAVE, ALLOCATABLE :: N_psta(:), Nuse_psta(:, :)
         DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dist2(:, :)
 !   Declared Parameters
@@ -64,6 +61,8 @@
 !     hru_ylat, hru_xlong, max_psta, dist_max, maxday_prec
 !***********************************************************************
       INTEGER FUNCTION pptdist2decl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, MONTHS_PER_YEAR, ERROR_dim
+      USE PRMS_MODULE, ONLY: Model, Nhru, Nrain
       USE PRMS_PRECIP_DIST2
       IMPLICIT NONE
 ! Functions
@@ -168,6 +167,8 @@
 !     pptdist2init - Initialize precipitation module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION pptdist2init()
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DNEARZERO
+      USE PRMS_MODULE, ONLY: Nhru, Nrain
       USE PRMS_PRECIP_DIST2
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       IMPLICIT NONE
@@ -270,13 +271,14 @@
 !                   depth for each HRU, and basin weighted avg. precip
 !***********************************************************************
       INTEGER FUNCTION pptdist2run()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, ERROR_data, CELSIUS, INCH2MM
+      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_PRECIP_DIST2
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Prmx, Basin_ppt, &
      &    Basin_rain, Basin_snow, Hru_ppt, Hru_rain, Hru_snow, &
      &    Basin_obs_ppt, Tmaxf, Tminf, Tmax_allsnow_f, Tmax_allrain_f, &
      &    Adjmix_rain, Precip_units
-      USE PRMS_SET_TIME, ONLY: Nowmonth
       USE PRMS_OBS, ONLY: Precip
       IMPLICIT NONE
 ! Functions

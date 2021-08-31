@@ -2,16 +2,12 @@
 !     Output a set of declared variables by segment in CSV format
 !***********************************************************************
       MODULE PRMS_NSEGMENT_SUMMARY
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, &
-     &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, &
-     &    ACTIVE, OFF, REAL_TYPE, DBLE_TYPE, DOCUMENTATION
-      USE PRMS_MODULE, ONLY: Model, Nsegment, Inputerror_flag, NsegmentOutON_OFF, &
-     &    Start_year, Start_month, Start_day, End_year, End_month, End_day, Prms_warmup
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       IMPLICIT NONE
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsegment_summary'
-      character(len=*), parameter :: Version_nsegment_summary = '2020-12-02'
+      character(len=*), parameter :: Version_nsegment_summary = '2021-08-13'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsegment_var_type(:)
       REAL, SAVE, ALLOCATABLE :: Nsegment_var_daily(:, :)
@@ -68,6 +64,8 @@
 !     declare parameters and variables
 !***********************************************************************
       SUBROUTINE nsegment_summarydecl()
+      USE PRMS_CONSTANTS, ONLY: ERROR_control, DAILY, YEARLY, DOCUMENTATION
+      USE PRMS_MODULE, ONLY: Model, Nsegment, NsegmentOutON_OFF
       USE PRMS_NSEGMENT_SUMMARY
       IMPLICIT NONE
 ! Functions
@@ -100,7 +98,7 @@
 
       IF ( NsegmentOutON_OFF==2 .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Nhm_seg(Nsegment) )
-        IF (declparam(MODNAME, 'nhm_seg', 'nsegment', 'integer', &
+        IF ( declparam(MODNAME, 'nhm_seg', 'nsegment', 'integer', &
      &       '0', '0', '9999999', &
      &       'National Hydrologic Model segment ID', 'National Hydrologic Model segment ID', &
      &       'none')/=0 ) CALL read_error(1, 'nhm_seg')
@@ -112,6 +110,9 @@
 !     Initialize module values
 !***********************************************************************
       SUBROUTINE nsegment_summaryinit()
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, &
+     &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, REAL_TYPE, DBLE_TYPE
+      USE PRMS_MODULE, ONLY: Nsegment, NsegmentOutON_OFF, Start_year, Prms_warmup
       USE PRMS_NSEGMENT_SUMMARY
       IMPLICIT NONE
 ! Functions
@@ -272,8 +273,10 @@
 !     Output set of declared variables in CSV format
 !***********************************************************************
       SUBROUTINE nsegment_summaryrun()
+      USE PRMS_CONSTANTS, ONLY: MEAN_MONTHLY, MEAN_YEARLY, ACTIVE, OFF, REAL_TYPE, DBLE_TYPE
+      USE PRMS_MODULE, ONLY: Nsegment, Start_month, Start_day, End_year, End_month, End_day, Nowyear, Nowmonth, Nowday
       USE PRMS_NSEGMENT_SUMMARY
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday, Modays
+      USE PRMS_SET_TIME, ONLY: Modays
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC SNGL, DBLE
@@ -304,7 +307,7 @@
           ENDDO
         ENDIF
         IF ( Daily_flag==ACTIVE ) WRITE ( Dailyunit(jj), Output_fmt) Nowyear, Nowmonth, Nowday, &
-     &                                                           (Nsegment_var_daily(j,jj), j=1,Nsegment)
+     &                                                               (Nsegment_var_daily(j,jj), j=1,Nsegment)
       ENDDO
 
       write_month = OFF
