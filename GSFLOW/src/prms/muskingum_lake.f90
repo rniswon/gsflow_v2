@@ -208,8 +208,8 @@
       USE PRMS_MUSKINGUM_LAKE
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, getdim
-      EXTERNAL :: read_error, print_module, error_stop, declvar_dble
+      INTEGER, EXTERNAL :: declparam, declvar, getdim
+      EXTERNAL :: read_error, print_module, error_stop
 !***********************************************************************
       muskingum_lake_decl = 0
 
@@ -289,106 +289,106 @@
 
       ! Lake declared variables
       ALLOCATE ( Lake_inflow(Nlake) )
-      CALL declvar_dble(MODNAME, 'lake_inflow', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'lake_inflow', 'nlake', Nlake, 'double', &
      &     'Total inflow to each lake', &
-     &     'cfs', Lake_inflow)
+     &     'cfs', Lake_inflow)/=0 ) CALL read_error(3, 'lake_inflow')
 
       ALLOCATE ( Lake_outflow(Nlake) )
-      CALL declvar_dble(MODNAME, 'lake_outflow', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'lake_outflow', 'nlake', Nlake, 'double', &
      &     'Evaporation and seepage from each lake', &
-     &     'cfs', Lake_outflow)
+     &     'cfs', Lake_outflow)/=0 ) CALL read_error(3, 'lake_outflow')
 
       ALLOCATE ( Lake_outcfs(Nlake) )
-      CALL declvar_dble(MODNAME, 'lake_outcfs', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'lake_outcfs', 'nlake', Nlake, 'double', &
      &     'Streamflow leaving each lake, includes any second outlet flow', &
-     &     'cfs', Lake_outcfs)
+     &     'cfs', Lake_outcfs)/=0 ) CALL read_error(3, 'lake_outcfs')
 
       ALLOCATE ( Lake_outcms(Nlake) )
-      CALL declvar_dble(MODNAME, 'lake_outcms', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'lake_outcms', 'nlake', Nlake, 'double', &
      &     'Streamflow leaving each lake, includes any second outlet flow', &
-     &     'cms', Lake_outcms)
+     &     'cms', Lake_outcms)/=0 ) CALL read_error(3, 'lake_outcms')
 
 ! Declared Variables for Puls or linear routing
       ALLOCATE ( Lake_sto(Nlake) )
-      CALL declvar_dble(MODNAME, 'lake_sto', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'lake_sto', 'nlake', Nlake, 'double', &
      &     'Storage in each lake using Puls or linear storage routing', &
-     &     'cfs-days', Lake_sto)
+     &     'cfs-days', Lake_sto)/=0 ) CALL read_error(3, 'lake_sto')
 
       ALLOCATE ( Din1(Nlake) )
-      CALL declvar_dble(MODNAME, 'din1', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'din1', 'nlake', Nlake, 'double', &
      &     'Inflow from the previous time step to each lake using Puls or linear storage routing', &
-     &     'cfs', Din1)
+     &     'cfs', Din1)/=0 ) CALL read_error(3, 'din1')
 
       ALLOCATE ( Lake_stream_in(Nlake) )
-      CALL declvar_dble(MODNAME, 'lake_stream_in', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'lake_stream_in', 'nlake', Nlake, 'double', &
      &     'Total streamflow into each lake', &
-     &     'cfs', Lake_stream_in)
+     &     'cfs', Lake_stream_in)/=0 ) CALL read_error(3, 'lake_stream_in')
 
       ALLOCATE ( Lake_precip(Nlake) )
-      CALL declvar_dble(MODNAME, 'lake_precip', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'lake_precip', 'nlake', Nlake, 'double', &
      &     'Total precipitation into each lake', &
-     &     'cfs', Lake_precip)
+     &     'cfs', Lake_precip)/=0 ) CALL read_error(3, 'lake_precip')
 
       IF ( Cascade_flag>CASCADE_OFF .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Lake_lateral_inflow(Nlake) )
-        CALL declvar_dble(MODNAME, 'lake_lateral_inflow', 'nlake', Nlake, &
+        IF ( declvar(MODNAME, 'lake_lateral_inflow', 'nlake', Nlake, 'double', &
      &       'Lateral inflow to each lake', &
-     &       'cfs', Lake_lateral_inflow)
+     &       'cfs', Lake_lateral_inflow)/=0 ) CALL read_error(3, 'lake_lateral_inflow')
         ALLOCATE ( Lake_sroff(Nlake) )
-        CALL declvar_dble(MODNAME, 'lake_sroff', 'nlake', Nlake, &
+        IF ( declvar(MODNAME, 'lake_sroff', 'nlake', Nlake, 'double', &
      &       'Total surface runoff into each lake', &
-     &       'cfs', Lake_sroff)
+     &       'cfs', Lake_sroff)/=0 ) CALL read_error(3, 'lake_sroff')
         ALLOCATE ( Lake_interflow(Nlake) )
-        CALL declvar_dble(MODNAME, 'lake_interflow', 'nlake', Nlake, &
+        IF ( declvar(MODNAME, 'lake_interflow', 'nlake', Nlake,'double', &
      &       'Total interflow into each lake', &
-     &       'cfs', Lake_interflow)
+     &       'cfs', Lake_interflow)/=0 ) CALL read_error(3, 'lake_interflow')
         ALLOCATE ( Lake_gwflow(Nlake) )
-        CALL declvar_dble(MODNAME, 'lake_gwflow', 'nlake', Nlake, &
+        IF ( declvar(MODNAME, 'lake_gwflow', 'nlake', Nlake,'double', &
      &       'Total groundwater flow into each lake', &
-     &       'cfs', Lake_gwflow)
+     &       'cfs', Lake_gwflow)/=0 ) CALL read_error(3, 'lake_gwflow')
       ENDIF
 
       ALLOCATE ( Lake_evap(Nlake) )
-      CALL declvar_dble(MODNAME, 'lake_evap', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'lake_evap', 'nlake', Nlake, 'double', &
      &     'Total evaporation from each lake', &
-     &     'cfs', Lake_evap)
+     &     'cfs', Lake_evap)/=0 ) CALL read_error(3, 'lake_evap')
 
 ! Declared Variables for broad-crested weir or gate opening routing
       ALLOCATE ( Lake_2gw(Nlake) )
-      CALL declvar_dble(MODNAME, 'lake_2gw', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'lake_2gw', 'nlake', Nlake, 'double', &
      &     'Total seepage from each lake using broad-crested weir or gate opening routing', &
-     &     'cfs', Lake_2gw)
+     &     'cfs', Lake_2gw)/=0 ) CALL read_error(3, 'lake_2gw')
 
       ALLOCATE ( Lake_seep_in(Nlake) )
-      CALL declvar_dble(MODNAME, 'lake_seep_in', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'lake_seep_in', 'nlake', Nlake, 'double', &
      &     'Total seepage into each lake using broad-crested weir or gate opening routing', &
-     &     'cfs', Lake_seep_in)
+     &     'cfs', Lake_seep_in)/=0 ) CALL read_error(3, 'lake_seep_in')
 
       ALLOCATE ( Lake_invol(Nlake) )
-      CALL declvar_dble(MODNAME, 'lake_invol', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'lake_invol', 'nlake', Nlake, 'double', &
      &     'Inflow to each lake using broad-crested weir or gate opening routing', &
-     &     'acre-feet', Lake_invol)
+     &     'acre-feet', Lake_invol)/=0 ) CALL read_error(3, 'lake_invol')
 
 ! Declared Variables for gate opening routing
       ALLOCATE ( Lake_outvol(Nlake) )
-      CALL declvar_dble(MODNAME, 'lake_outvol', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'lake_outvol', 'nlake', Nlake, 'double', &
      &     'Outflow from each lake using broad-crested weir or gate opening routing', &
-     &     'acre-inches', Lake_outvol)
+     &     'acre-inches', Lake_outvol)/=0 ) CALL read_error(3, 'lake_outvol')
 
       ALLOCATE ( Lake_outvol_ts(Nlake) )
-      CALL declvar_dble(MODNAME, 'lake_outvol_ts', 'nlake', Nlake, &
+      IF ( declvar(MODNAME, 'lake_outvol_ts', 'nlake', Nlake, 'double', &
      &     'Outflow from each lake using broad-crested weir or gate opening routing for the time step', &
-     &     'acre-inches', Lake_outvol_ts)
+     &     'acre-inches', Lake_outvol_ts)/=0 ) CALL read_error(3, 'lake_outvol_ts')
 
 ! Declared Variables for lakes with a second outlet and gate opening routing
       IF ( Nratetbl>0 .OR. Model==DOCUMENTATION ) THEN
-        CALL declvar_dble(MODNAME, 'basin_2ndstflow', 'one', 1, &
+        IF ( declvar(MODNAME, 'basin_2ndstflow', 'one', 1, 'double', &
      &       'Basin volume-weighted average streamflow from each lake with a second outlet', &
-     &       'inches', Basin_2ndstflow)
+     &       'inches', Basin_2ndstflow)/=0 ) CALL read_error(3, 'basin_2ndstflow')
         ALLOCATE ( Lake_outq2(Nlake) )
-        CALL declvar_dble(MODNAME, 'lake_outq2', 'nlake', Nlake, &
+        IF ( declvar(MODNAME, 'lake_outq2', 'nlake', Nlake, 'double', &
      &       'Streamflow from second outlet for each lake with a second outlet', &
-     &       'cfs', Lake_outq2)
+     &       'cfs', Lake_outq2)/=0 ) CALL read_error(3, 'lake_outq2')
       ENDIF
 
 ! Declared Parameters

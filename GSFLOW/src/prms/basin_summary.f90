@@ -102,7 +102,7 @@
       INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam
       EXTERNAL :: PRMS_open_output_file, error_stop, read_error
 ! Local Variables
-      INTEGER :: ios, ierr, size, jj
+      INTEGER :: ios, ierr, size, dum, jj
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
 !***********************************************************************
       Begin_results = ACTIVE
@@ -115,13 +115,13 @@
       ierr = 0
       DO jj = 1, BasinOutVars
         Nc_vars(jj) = numchars(BasinOutVar_names(jj))
-        Basin_var_type = getvartype(BasinOutVar_names(jj)(:Nc_vars(jj)) )
+        Basin_var_type = getvartype(BasinOutVar_names(jj)(:Nc_vars(jj)), Basin_var_type )
         IF ( Basin_var_type/=DBLE_TYPE ) THEN
           PRINT *, 'ERROR, invalid basin_summary variable:', BasinOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only double variables allowed'
           ierr = 1
         ENDIF
-        size = getvarsize(BasinOutVar_names(jj)(:Nc_vars(jj)))
+        size = getvarsize(BasinOutVar_names(jj)(:Nc_vars(jj)), dum )
         IF ( size/=1 ) THEN
           PRINT *, 'ERROR, invalid Basin_summary variable:', BasinOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only scalar variables are allowed'
@@ -203,7 +203,8 @@
       USE PRMS_SET_TIME, ONLY: Modays
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: getvar_dble
+      INTEGER, EXTERNAL :: getvar
+      EXTERNAL :: read_error
 ! Local Variables
       INTEGER :: jj, write_month, last_day
 !***********************************************************************
@@ -218,7 +219,8 @@
 !-----------------------------------------------------------------------
 ! need getvars for each variable (only can have short string)
       DO jj = 1, BasinOutVars
-        CALL getvar_dble( MODNAME, BasinOutVar_names(jj)(:Nc_vars(jj)), 1, Basin_var_daily(jj) )
+        IF ( getvar(MODNAME, BasinOutVar_names(jj)(:Nc_vars(jj)), 1, 'double', Basin_var_daily(jj))/=0 ) &
+     &       CALL read_error(4, BasinOutVar_names(jj)(:Nc_vars(jj)))
       ENDDO
 
       write_month = OFF

@@ -27,7 +27,7 @@
       INTRINSIC :: SNGL
       INTEGER, EXTERNAL :: leap_day, julian_day, compute_julday
       DOUBLE PRECISION, EXTERNAL :: deltim
-      EXTERNAL :: dattim, print_module, read_data_line
+      EXTERNAL :: dattim, print_module
 ! Local Variables
       INTEGER :: startday
       DOUBLE PRECISION :: dt
@@ -44,7 +44,6 @@
           Jsol = julian_day('now', 'solar')
           Julwater = julian_day('now', 'water')
           Julian_day_absolute = Julian_day_absolute + 1
-          CALL read_data_line()
 
         ELSE ! initialize
           Modays(1) = 31

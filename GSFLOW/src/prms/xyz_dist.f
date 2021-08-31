@@ -133,28 +133,31 @@
       USE PRMS_XYZ_DIST
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_int, declvar_real
+      INTEGER, EXTERNAL :: declparam, declvar
+      EXTERNAL :: read_error, print_module
 !***********************************************************************
       xyzdecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_xyz_dist)
 
-      CALL declvar_int(MODNAME, 'is_rain_day', 'one', 1,
+      IF ( declvar(MODNAME, 'is_rain_day', 'one', 1, 'integer',
      +     'Flag to indicate if it is raining anywhere in the basin',
-     +     'none', Is_rain_day)
+     +     'none',
+     +     Is_rain_day)/=0 ) CALL read_error(3, 'is_rain_day')
 
       ALLOCATE ( Tmax_rain_sta(Nrain) )
-      CALL declvar_real(MODNAME, 'tmax_rain_sta', 'nrain', Nrain,
+      IF ( declvar(MODNAME, 'tmax_rain_sta', 'nrain', Nrain, 'real',
      +     'Maximum temperature distributed to the precipitation'//
      +     ' measurement stations',
-     +     'degrees Fahrenheit', Tmax_rain_sta)
+     +     'degrees Fahrenheit',
+     +     Tmax_rain_sta)/=0 ) CALL read_error(3, 'tmax_rain_sta')
 
       ALLOCATE ( Tmin_rain_sta(Nrain) )
-      CALL declvar_real(MODNAME, 'tmin_rain_sta', 'nrain', Nrain,
+      IF ( declvar(MODNAME, 'tmin_rain_sta', 'nrain', Nrain, 'real',
      +     'Minimum temperature distributed to the precipitation'//
      +     ' measurement stations',
-     +     'degrees Fahrenheit', Tmin_rain_sta)
+     +     'degrees Fahrenheit',
+     +     Tmin_rain_sta)/=0 ) CALL read_error(3, 'tmin_rain_sta')
 
 ! declare parameters
       ALLOCATE ( Adjust_snow(Nrain,MONTHS_PER_YEAR) )

@@ -280,7 +280,8 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC SNGL, DBLE
-      EXTERNAL read_error, getvar_real, getvar_dble
+      INTEGER, EXTERNAL :: getvar
+      EXTERNAL :: read_error
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day
 !***********************************************************************
@@ -296,9 +297,11 @@
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NsegmentOutVars
         IF ( Nsegment_var_type(jj)==REAL_TYPE ) THEN
-          CALL getvar_real(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, Nsegment_var_daily(1, jj))
+          IF ( getvar(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, 'real', Nsegment_var_daily(1, jj))/=0 ) &
+     &         CALL read_error(4, NsegmentOutVar_names(jj)(:Nc_vars(jj)))
         ELSEIF ( Nsegment_var_type(jj)==DBLE_TYPE ) THEN
-          CALL getvar_dble(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, Nsegment_var_dble(1, jj))
+          IF ( getvar(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, 'double', Nsegment_var_dble(1, jj))/=0 ) &
+     &         CALL read_error(4, NsegmentOutVar_names(jj)(:Nc_vars(jj)))
           DO i = 1, Nsegment
             Nsegment_var_daily(i, jj) = SNGL( Nsegment_var_dble(i, jj) )
           ENDDO
