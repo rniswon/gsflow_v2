@@ -53,34 +53,35 @@
       USE PRMS_SRUNOFF, ONLY: MODNAME
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: read_error, print_module, PRMS_open_module_file, declvar_dble
+      INTEGER, EXTERNAL :: declvar
+      EXTERNAL :: read_error, print_module, PRMS_open_module_file
 !***********************************************************************
       CALL print_module(MODDESC, MODNAME_WB, Version_water_balance)
 
 ! Declare Variables
-      CALL declvar_dble(MODNAME_WB, 'basin_capillary_wb', 'one', 1, &
+      IF ( declvar(MODNAME_WB, 'basin_capillary_wb', 'one', 1, 'double', &
      &     'Basin area-weighted average capillary reservoir storage', &
-     &     'inches', Basin_capillary_wb)
+     &     'inches', Basin_capillary_wb)/=0 ) CALL read_error(3, 'basin_capillary_wb')
 
-      CALL declvar_dble(MODNAME_WB, 'basin_gravity_wb', 'one', 1, &
+      IF ( declvar(MODNAME_WB, 'basin_gravity_wb', 'one', 1, 'double', &
      &     'Basin area-weighted average gravity reservoir storage', &
-     &     'inches', Basin_gravity_wb)
+     &     'inches', Basin_gravity_wb)/=0 ) CALL read_error(3, 'basin_gravity_wb')
 
-      CALL declvar_dble(MODNAME_WB, 'basin_soilzone_wb', 'one', 1, &
+      IF ( declvar(MODNAME_WB, 'basin_soilzone_wb', 'one', 1, 'double', &
      &     'Basin area-weighted average storage in soilzone reservoirs', &
-     &     'inches', Basin_soilzone_wb)
+     &     'inches', Basin_soilzone_wb)/=0 ) CALL read_error(3, 'basin_soilzone_wb')
 
 !      ALLOCATE ( Hru_runoff(Nhru) )
-!      CALL declvar_dble(MODNAME, 'hru_runoff', 'nhru', Nhru, &
+!      IF ( declvar(MODNAME, 'hru_runoff', 'nhru', Nhru, 'double', &
 !     &     'Total lateral flow leaving each HRU (includes cascading flow)', &
-!     &     'inches', Hru_runoff)
+!     &     'inches', Hru_runoff)/=0 ) CALL read_error(3, 'hru_runoff')
 
       ALLOCATE ( Hru_storage_ante(Nhru) )
 
       IF ( Dprst_flag==ACTIVE ) THEN
-        CALL declvar_dble(MODNAME_WB, 'basin_dprst_wb', 'one', 1, &
+        IF ( declvar(MODNAME_WB, 'basin_dprst_wb', 'one', 1, 'double', &
      &       'Basin area-weighted average surface-depression storage water balance', &
-     &       'inches', Basin_dprst_wb)
+     &       'inches', Basin_dprst_wb)/=0 ) CALL read_error(3, 'basin_dprst_wb')
       ENDIF
 
       ALLOCATE ( Gwstor_ante(Nhru) )
@@ -173,11 +174,11 @@
      &    Basin_dprst_evap, Basin_dprst_seep, Hru_impervevap, Dprst_seep_hru, &
      &    Dprst_evap_hru, Dprst_sroff_hru, Dprst_insroff_hru, Sro_to_dprst_perv, &
      &    Dprst_area_clos, Hortonian_flow, Dprst_in, Hru_sroffp, Hru_sroffi, Imperv_stor_ante, &
-     &    Dprst_stor_ante, Use_sroff_transfer, Basin_cfgi_sroff
+     &    Dprst_stor_ante, Basin_cfgi_sroff
       USE PRMS_SOILZONE, ONLY: Swale_actet, Dunnian_flow, Basin_sz2gw, &
      &    Perv_actet, Cap_infil_tot, Pref_flow_infil, Cap_waterin, Upslope_interflow, &
      &    Upslope_dunnianflow, Pref_flow, Pref_flow_stor, Soil_lower, Gvr2pfr, Basin_ssin, &
-     &    Basin_lakeinsz, Basin_dunnian, Pref_flow_max, Pref_flow_infil_frac, Pref_flow_thrsh, &
+     &    Basin_lakeinsz, Basin_dunnian, Pref_flow_max, Pref_flow_den, Pref_flow_thrsh, &
      &    Basin_sm2gvr_max, Basin_cap_infil_tot, Basin_slowflow, &
      &    Basin_dunnian_gvr, Basin_pref_flow_infil, Basin_dninterflow, Basin_pref_stor, Basin_dunnian_pfr, &
      &    Basin_dncascadeflow, Basin_capwaterin, Basin_sm2gvr, Basin_prefflow, Basin_slstor, Basin_gvr2pfr, &
@@ -258,7 +259,7 @@
         robal = Snowmelt(i) - Hortonian_flow(i) & !includes dprst runoff, if any
      &          - Infil(i)*perv_frac - Hru_impervevap(i) + Imperv_stor_ante(i) - Hru_impervstor(i) + Intcp_changeover(i)
         ! need to account for AG in water balance
-        IF ( Use_sroff_transfer==ACTIVE ) robal = robal + Net_apply(i)*perv_frac !??? is net_apply for whole HRU (also for ag, impervious, dprst)
+        IF ( Use_transfer_intcp==ACTIVE ) robal = robal + Net_apply(i)*perv_frac !??? is net_apply for whole HRU (also for ag, impervious, dprst)
         IF ( Net_ppt(i)>0.0 ) THEN
           IF ( Pptmix_nopack(i)==ACTIVE ) THEN
             robal = robal + Net_rain(i)
@@ -335,7 +336,7 @@
           WRITE ( BALUNT, * ) gvrbal, last_ss, Ssres_stor(i), Ssr_to_gw(i), Swale_actet(i), &
      &            Dunnian_flow(i), Ssres_flow(i), Pfr_dunnian_flow(i), Pref_flow_thrsh(i), Ssres_in(i), &
      &            Pref_flow_infil(i), Grav_dunnian_flow(i), Slow_flow(i), Pref_flow(i), Soil_to_ssr(i), Gvr2pfr(i), &
-     &            perv_frac, Slow_stor(i), Pref_flow_stor(i), Infil(i), Pref_flow_max(i), Pref_flow_infil_frac(i)
+     &            perv_frac, Slow_stor(i), Pref_flow_stor(i), Infil(i), Pref_flow_max(i), Pref_flow_den(i)
           IF ( Cascade_flag>CASCADE_OFF ) WRITE ( BALUNT, * ) 'sz cascade', Hru_sz_cascadeflow(i)
         ENDIF
 
@@ -363,7 +364,7 @@
      &            Soil_lower(i), Soil_to_ssr(i), Ssres_flow(i), waterin, Swale_actet(i)
           IF ( Cascade_flag>CASCADE_OFF ) WRITE ( BALUNT, * ) 'cascade', Upslope_dunnianflow(i), Upslope_interflow(i), &
      &                                                        Hru_sz_cascadeflow(i), Ncascade_hru(i)
-          WRITE ( BALUNT, * ) Hru_perv(i), perv_frac, Pref_flow_infil_frac(i), (Infil(i)*perv_frac), Cap_infil_tot(i)
+          WRITE ( BALUNT, * ) Hru_perv(i), perv_frac, Pref_flow_den(i), (Infil(i)*perv_frac), Cap_infil_tot(i)
           WRITE ( BALUNT, * ) Dunnian_flow(i), Pfr_dunnian_flow(i)
 !          ENDIF
         ENDIF
@@ -418,7 +419,7 @@
 ! intcp
       delta_stor = Basin_intcp_stor - Last_intcp_stor
       pptbal = Basin_ppt - Basin_net_ppt - delta_stor - Basin_intcp_evap - Basin_changeover
-      IF ( Use_sroff_transfer==ACTIVE ) pptbal = pptbal + Basin_net_apply
+      IF ( Use_transfer_intcp==ACTIVE ) pptbal = pptbal + Basin_net_apply
       IF ( DABS(pptbal)>DSMALL ) THEN
         WRITE ( BALUNT, 9003 ) 'Possible basin interception water balance error', &
      &                         Nowyear, Nowmonth, Nowday, pptbal, Basin_changeover

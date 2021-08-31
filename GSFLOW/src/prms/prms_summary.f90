@@ -18,9 +18,9 @@
         ! Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_total_storage, Basin_surface_storage
         ! Declared Parameters
-        INTEGER, SAVE, ALLOCATABLE :: Poi_gage_segment(:), Poi_gage_id(:)
+        INTEGER, SAVE, ALLOCATABLE :: Poi_gage_segment(:)
 !        INTEGER, SAVE, ALLOCATABLE :: Parent_poigages(:)
-!        CHARACTER(LEN=16), SAVE, ALLOCATABLE :: Poi_gage_id(:)
+        CHARACTER(LEN=16), SAVE, ALLOCATABLE :: Poi_gage_id(:)
       END MODULE PRMS_PRMS_SUMMARY
 
       SUBROUTINE prms_summary()
@@ -45,11 +45,11 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: CHAR, INDEX, MAX
-      INTEGER, EXTERNAL :: declparam, getparam !, control_integer
-      EXTERNAL :: read_error, PRMS_open_output_file, print_module, statvar_to_csv, checkdim_bounded_limits, declvar_dble
+      INTEGER, EXTERNAL :: declparam, declvar, getparam !, control_integer
+      EXTERNAL :: read_error, PRMS_open_output_file, print_module, statvar_to_csv, checkdim_bounded_limits
       INTEGER, EXTERNAL :: getparamstring, control_string
 ! Local Variables
-      INTEGER :: i, ios, idim !, foo, statsON_OFF
+      INTEGER :: i, ios, foo, idim !, statsON_OFF
       DOUBLE PRECISION :: gageflow
       CHARACTER(LEN=10) :: chardate
 !***********************************************************************
@@ -99,12 +99,12 @@
           IF ( ios/=0 ) ERROR STOP ERROR_open_out
         ENDIF
 
-        CALL declvar_dble(MODNAME, 'basin_total_storage', 'one', 1, &
+        IF ( declvar(MODNAME, 'basin_total_storage', 'one', 1, 'double', &
      &       'Basin area-weighted average storage in all water storage reservoirs', &
-     &       'inches', Basin_total_storage)
-        CALL declvar_dble(MODNAME, 'basin_surface_storage', 'one', 1, &
+     &       'inches', Basin_total_storage)/=0 ) CALL read_error(3, 'basin_total_storage')
+        IF ( declvar(MODNAME, 'basin_surface_storage', 'one', 1, 'double', &
      &       'Basin area-weighted average storage in all surface water storage reservoirs', &
-     &       'inches', Basin_surface_storage)
+     &       'inches', Basin_surface_storage)/=0 ) CALL read_error(3, 'basin_surface_storage')
 
         IF ( Npoigages>0 .OR. Model==DOCUMENTATION ) THEN
 !          ALLOCATE ( Parent_poigages(Npoigages) )
@@ -119,7 +119,7 @@
      &         'Segment index for each POI gage', &
      &         'none')/=0 ) CALL read_error(1, 'poi_gage_segment')
           ALLOCATE ( Poi_gage_id(Npoigages) )
-          IF ( declparam(MODNAME, 'poi_gage_id', 'npoigages', 'integer', &
+          IF ( declparam(MODNAME, 'poi_gage_id', 'npoigages', 'string', &
      &         '0', '0', '9999999', &
      &         'POI Gage ID', 'USGS stream gage for each POI gage', &
      &         'none')/=0 ) CALL read_error(1, 'poi_gage_id')
@@ -149,31 +149,28 @@
           IF ( Parameter_check_flag>0 ) &
      &      CALL checkdim_bounded_limits('poi_gage_segment', 'nsegment', Poi_gage_segment, Npoigages, 1, Nsegment, Inputerror_flag)
           DO i = 1, Npoigages
-            Poi_gage_id(i) = 0
+            Poi_gage_id(i) = '                '
           ENDDO
 
-          IF ( getparam(MODNAME, 'poi_gage_id', Npoigages, 'integer', Poi_gage_id)/=0 ) &
-     &         CALL read_error(2, 'poi_gage_id')
-     !     DO i = 1, Npoigages
-     !       foo = getparamstring(MODNAME, 'poi_gage_id', Npoigages, 'string', &
-     !&            i-1, Poi_gage_id(i))
-     !     ENDDO
+          DO i = 1, Npoigages
+            foo = getparamstring(MODNAME, 'poi_gage_id', Npoigages, 'string', &
+     &            i-1, Poi_gage_id(i))
+          ENDDO
 
           DO i = 1, Npoigages
             IF ( Poi_gage_segment(i)<1 .OR. Poi_gage_segment(i)>Nsegment ) CYCLE
-            !Gageid_len(i) = INDEX( Poi_gage_id(i), ' ' ) - 1
-            Gageid_len(i) = 7
-            !IF ( Gageid_len(i)<0 ) Gageid_len(i) = INDEX( Poi_gage_id(i), CHAR(0) ) - 1
-!            PRINT *, 'gageid_len ', Gageid_len(i), ' : ', Poi_gage_id(i)
-            !IF ( Gageid_len(i)<1 ) Gageid_len(i) = 0
+            Gageid_len(i) = INDEX( Poi_gage_id(i), ' ' ) - 1
+            IF ( Gageid_len(i)<0 ) Gageid_len(i) = INDEX( Poi_gage_id(i), CHAR(0) ) - 1
+!            PRINT *, 'gageid_len ', Gageid_len(i), ' :', Poi_gage_id(i), ':'
+            IF ( Gageid_len(i)<1 ) Gageid_len(i) = 0
             IF ( Gageid_len(i)>0 ) THEN
               IF ( Gageid_len(i)>15 ) Gageid_len(i) = 15
               IF ( CsvON_OFF==ACTIVE ) THEN
-                WRITE (Streamflow_pairs(i), '(A,I0,A,I0)' ) ',seg_outflow_', Poi_gage_segment(i), '_gage_', &
-     &                                                      Poi_gage_id(i)
+                WRITE (Streamflow_pairs(i), '(A,I0,2A)' ) ',seg_outflow_', Poi_gage_segment(i), '_gage_', &
+     &                                                    Poi_gage_id(i)(:Gageid_len(i))
               ELSE
-                WRITE (Streamflow_pairs(i), '(A,I0,A,I0)' ) ' seg_outflow_', Poi_gage_segment(i), '_gage_', &
-     &                                                      Poi_gage_id(i)
+                WRITE (Streamflow_pairs(i), '(A,I0,2A)' ) ' seg_outflow_', Poi_gage_segment(i), '_gage_', &
+     &                                                    Poi_gage_id(i)(:Gageid_len(i))
               ENDIF
               IF ( Poi_gage_segment(i)>9 ) Gageid_len(i) = Gageid_len(i) + 1
               IF ( Poi_gage_segment(i)>99 ) Gageid_len(i) = Gageid_len(i) + 1
@@ -247,7 +244,6 @@
 !***********************************************************************
       SUBROUTINE statvar_to_csv()
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_open_in, ERROR_open_out, ERROR_read
-      USE PRMS_MODULE, ONLY: stat_var_file
       USE PRMS_PRMS_SUMMARY
       IMPLICIT NONE
 ! Functions
@@ -258,15 +254,16 @@
       INTEGER, ALLOCATABLE :: varindex(:), nc(:)
       REAL, ALLOCATABLE :: values(:)
       CHARACTER(LEN=32), ALLOCATABLE :: varname(:)
-      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: statvar_file_csv
+      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: statvar_file, statvar_file_csv
       CHARACTER(LEN=10) :: chardate
       CHARACTER(LEN=13) :: fmt5
       CHARACTER(LEN=17) :: fmt3
       CHARACTER(LEN=27) :: fmt6
 !***********************************************************************
-      CALL PRMS_open_input_file(inunit, stat_var_file, 'stat_var_file', 0, ios)
+      IF ( control_string(statvar_file, 'stat_var_file')/=0 ) CALL read_error(5, 'stat_var_file')
+      CALL PRMS_open_input_file(inunit, statvar_file, 'stat_var_file', 0, ios)
       IF ( ios/=0 ) CALL error_stop('opening statvar file', ERROR_open_in)
-      statvar_file_csv = stat_var_file(:numchars(stat_var_file))//'.csv'
+      statvar_file_csv = statvar_file(:numchars(statvar_file))//'.csv'
       CALL PRMS_open_output_file(outunit, statvar_file_csv, 'statvar_csv', 0, ios)
       IF ( ios/=0 ) CALL error_stop('opening statvar CSV file', ERROR_open_out)
       READ ( inunit, * ) numvariables

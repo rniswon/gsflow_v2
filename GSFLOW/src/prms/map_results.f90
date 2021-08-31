@@ -172,7 +172,7 @@
       INTEGER, EXTERNAL :: getparam, getvartype, numchars, getvarsize
       EXTERNAL :: read_error, PRMS_open_output_file, checkdim_bounded_limits
 ! Local Variables
-      INTEGER :: i, jj, is, ios, ierr, size
+      INTEGER :: i, jj, is, ios, ierr, size, dim
       REAL, ALLOCATABLE, DIMENSION(:) :: map_frac
 !***********************************************************************
       map_resultsinit = 0
@@ -215,13 +215,13 @@
       ierr = 0
       DO jj = 1, NmapOutVars
         Nc_vars(jj) = numchars(MapOutVar_names(jj))
-        Map_var_type(jj) = getvartype(MapOutVar_names(jj)(:Nc_vars(jj)) )
+        Map_var_type(jj) = getvartype(MapOutVar_names(jj)(:Nc_vars(jj)), Map_var_type(jj) )
         IF ( Map_var_type(jj)/=REAL_TYPE .AND. Map_var_type(jj)/=DBLE_TYPE ) THEN
           PRINT *, 'ERROR, invalid map_results variable:', MapOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only real or double variables allowed'
           ierr = 1
         ENDIF
-        size = getvarsize(MapOutVar_names(jj)(:Nc_vars(jj)))
+        size = getvarsize(MapOutVar_names(jj)(:Nc_vars(jj)), dim )
         IF ( size/=Nhru ) THEN
           PRINT *, 'ERROR, invalid map_results variable:', MapOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only variables with the number of values equal to nhru allowed'
@@ -374,7 +374,8 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: DBLE
-      EXTERNAL :: write_results, getvar_real, getvar_dble
+      INTEGER, EXTERNAL :: getvar
+      EXTERNAL :: read_error, write_results
 ! Local Variables
       INTEGER :: j, i, k, jj, last_day
       DOUBLE PRECISION :: factor, map_var_double
@@ -447,9 +448,13 @@
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NmapOutVars
         IF ( Map_var_type(jj)==REAL_TYPE ) THEN
-          CALL getvar_real(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var(1, jj))
+          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), &
+     &         Nhru, 'real', Map_var(1, jj))/=0 ) &
+     &         CALL read_error(4, MapOutVar_names(jj)(:Nc_vars(jj)))
         ELSEIF ( Map_var_type(jj)==DBLE_TYPE ) THEN
-          CALL getvar_dble(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var_dble(1, jj))
+          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), &
+     &         Nhru, 'double', Map_var_dble(1, jj))/=0 ) &
+     &         CALL read_error(4, MapOutVar_names(jj)(:Nc_vars(jj)))
         ENDIF
       ENDDO
 

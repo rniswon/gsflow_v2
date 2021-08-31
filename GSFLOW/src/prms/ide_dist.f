@@ -71,8 +71,8 @@
       USE PRMS_IDE
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_real
+      INTEGER, EXTERNAL :: declparam, declvar
+      EXTERNAL :: read_error, print_module
 !***********************************************************************
       idedecl = 0
 
@@ -80,16 +80,18 @@
 
       IF ( Model/=DOCUMENTATION ) THEN
         ALLOCATE ( Tmax_rain_sta(Nrain) )
-        CALL declvar_real(MODNAME, 'tmax_rain_sta', 'nrain', Nrain,
+        IF ( declvar(MODNAME, 'tmax_rain_sta', 'nrain', Nrain, 'real',
      +       'Maximum temperature distributed to the precipitation'//
      +       ' measurement stations',
-     +       'degrees Fahrenheit', Tmax_rain_sta)
+     +       'degrees Fahrenheit',
+     +       Tmax_rain_sta)/=0 ) CALL read_error(3, 'tmax_rain_sta')
 
         ALLOCATE ( Tmin_rain_sta(Nrain) )
-        CALL declvar_real(MODNAME, 'tmin_rain_sta', 'nrain', Nrain,
+        IF ( declvar(MODNAME, 'tmin_rain_sta', 'nrain', Nrain, 'real',
      +       'Minimum temperature distributed to the precipitation'//
      +       ' measurement stations',
-     +       'degrees Fahrenheit', Tmin_rain_sta)
+     +       'degrees Fahrenheit',
+     +       Tmin_rain_sta)/=0 ) CALL read_error(3, 'tmin_rain_sta')
       ENDIF
 
 ! declare parameters

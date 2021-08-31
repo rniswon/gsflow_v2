@@ -8,7 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-08-18'
+      character(len=*), parameter :: Version_intcp = '2021-08-26'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -70,8 +70,8 @@
       USE PRMS_INTCP
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_real, declvar_dble, declvar_int
+      INTEGER, EXTERNAL :: declparam, declvar
+      EXTERNAL :: read_error, print_module
 !***********************************************************************
       intdecl = 0
 
@@ -84,115 +84,120 @@
 
 ! NEW VARIABLES and PARAMETERS for APPLICATION RATES
       ALLOCATE ( Net_apply(Nhru) )
-      CALL declvar_real(MODNAME, 'net_apply', 'nhru', Nhru, &
-     &     'Canopy gain minus interception', &
-     &     'inches', Net_apply)
-      CALL declvar_dble(MODNAME, 'basin_net_apply', 'one', 1, &
-     &     'Basin area-weighted average net_apply', &
-     &     'inches', Basin_net_apply)
       Use_transfer_intcp = OFF
       IF ( Water_use_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         Use_transfer_intcp = ACTIVE
-        ALLOCATE ( Gain_inches(Nhru), Gain_inches_hru(Nhru) )
-        CALL declvar_real(MODNAME, 'gain_inches', 'nhru', Nhru, &
-     &       'Canopy_gain in canopy', &
-     &       'inches', Gain_inches)
-        CALL declvar_real(MODNAME, 'gain_inches_hru', 'nhru', Nhru, &
+        ALLOCATE ( Gain_inches(Nhru) )
+        IF ( declvar(MODNAME, 'gain_inches', 'nhru', Nhru, 'real', &
      &       'Canopy_gain in canopy as depth over the HRU', &
-     &       'inches', Gain_inches_hru)
-        CALL declvar_dble(MODNAME, 'basin_hru_apply', 'one', 1, &
+     &       'inches', Gain_inches)/=0 ) CALL read_error(3, 'gain_inches')
+        ALLOCATE ( Gain_inches_hru(Nhru) )
+        IF ( declvar(MODNAME, 'gain_inches_hru', 'nhru', Nhru, 'real', &
+     &       'Canopy_gain in canopy as depth over the HRU', &
+     &       'inches', Gain_inches_hru)/=0 ) CALL read_error(3, 'gain_inches_hru')
+        IF ( declvar(MODNAME, 'basin_net_apply', 'one', 1, 'double', &
+     &       'Basin area-weighted average net application', &
+     &       'inches', Basin_net_apply)/=0 ) CALL read_error(3, 'basin_net_apply')
+        IF ( declvar(MODNAME, 'basin_hru_apply', 'one', 1, 'double', &
      &       'Basin area-weighted average canopy_gain', &
-     &       'inches', Basin_hru_apply)
+     &       'inches', Basin_hru_apply)/=0 ) CALL read_error(3, 'basin_hru_apply')
+        IF ( declvar(MODNAME, 'net_apply', 'nhru', Nhru, 'real', &
+     &       'canopy_gain minus interception', &
+     &       'inches', Net_apply)/=0 ) CALL read_error(3, 'net_apply')
+
+!       Application method (0 = sprinkler method with interception only;
+!       1=ditch/drip method with no interception; 2=ignore; 3=sprinkler across whole HRU with interception
+!       and throughfall; 4=sprinkler method with amount of water applied on the basis of cover density,
+!       such as a living filter), for options 1, 2, and 3 irrigation water is specified as an
+!       HRU-area weighted average value
         ALLOCATE ( Irr_type(Nhru) )
         IF ( declparam(MODNAME, 'irr_type', 'nhru', 'integer', &
      &       '0', '0', '2', &
      &       'Application method of irrigation water', &
-     &       'Application method of irrigation water for each HRU (0 = sprinkler method with interception only;'// &
-     &       ' 1=ditch/drip method with no interception; 2=ignore; 3=sprinkler across whole HRU with interception'// &
-     &       ' and throughfall; 4=sprinkler method with amount of water applied on the basis of cover density,'// &
-     &       ' such as a living filter), for options 1, 2, and 3 irrigation water is specified as an'// &
-     &       ' HRU-area weighted average value', &
+     &       'Application method of irrigation water for each HRU (0 = sprinkler;'// &
+     &       ' 1=ditch/drip; 2=ignore; 3=sprinkler across HRU; 4=living filter', & 
      &       'none')/=0 ) CALL read_error(1, 'irr_type')
+
       ENDIF
 
       ALLOCATE ( Hru_intcpevap(Nhru) )
-      CALL declvar_real(MODNAME, 'hru_intcpevap', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'hru_intcpevap', 'nhru', Nhru, 'real', &
      &     'HRU area-weighted average evaporation from the canopy for each HRU', &
-     &     'inches', Hru_intcpevap)
+     &     'inches', Hru_intcpevap)/=0 ) CALL read_error(3, 'hru_intcpevap')
 
       ALLOCATE ( Net_rain(Nhru) )
-      CALL declvar_real(MODNAME, 'net_rain', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'net_rain', 'nhru', Nhru, 'real', &
      &     'Rain that falls through canopy for each HRU', &
-     &     'inches', Net_rain)
+     &     'inches', Net_rain)/=0 ) CALL read_error(3, 'net_rain')
 
       ALLOCATE ( Net_snow(Nhru) )
-      CALL declvar_real(MODNAME, 'net_snow', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'net_snow', 'nhru', Nhru, 'real', &
      &     'Snow that falls through canopy for each HRU', &
-     &     'inches', Net_snow)
+     &     'inches', Net_snow)/=0 ) CALL read_error(3, 'net_snow')
 
       ALLOCATE ( Net_ppt(Nhru) )
-      CALL declvar_real(MODNAME, 'net_ppt', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'net_ppt', 'nhru', Nhru, 'real', &
      &     'Precipitation (rain and/or snow) that falls through the canopy for each HRU', &
-     &     'inches', Net_ppt)
+     &     'inches', Net_ppt)/=0 ) CALL read_error(3, 'net_ppt')
 
-      CALL declvar_dble(MODNAME, 'basin_net_ppt', 'one', 1, &
+      IF ( declvar(MODNAME, 'basin_net_ppt', 'one', 1, 'double', &
      &     'Basin area-weighted average net precipitation', &
-     &     'inches', Basin_net_ppt)
+     &     'inches', Basin_net_ppt)/=0 ) CALL read_error(3, 'basin_net_ppt')
 
-      CALL declvar_dble(MODNAME, 'basin_net_snow', 'one', 1, &
+      IF ( declvar(MODNAME, 'basin_net_snow', 'one', 1, 'double', &
      &     'Basin area-weighted average snow net precipitation', &
-     &     'inches', Basin_net_snow)
+     &     'inches', Basin_net_snow)/=0 ) CALL read_error(3, 'basin_net_snow')
 
-      CALL declvar_dble(MODNAME, 'basin_net_rain', 'one', 1, &
+      IF ( declvar(MODNAME, 'basin_net_rain', 'one', 1, 'double', &
      &     'Basin area-weighted average rain net precipitation', &
-     &     'inches', Basin_net_rain)
+     &     'inches', Basin_net_rain)/=0 ) CALL read_error(3, 'basin_net_rain')
 
       ALLOCATE ( Intcp_stor(Nhru) )
-      CALL declvar_real(MODNAME, 'intcp_stor', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'intcp_stor', 'nhru', Nhru, 'real', &
      &     'Interception storage in canopy for cover density for each HRU', &
-     &     'inches', Intcp_stor)
+     &     'inches', Intcp_stor)/=0 ) CALL read_error(3, 'intcp_stor')
 
-      CALL declvar_dble(MODNAME, 'basin_intcp_stor', 'one', 1, &
+      IF ( declvar(MODNAME, 'basin_intcp_stor', 'one', 1, 'double', &
      &     'Basin area-weighted average interception storage', &
-     &     'inches', Basin_intcp_stor)
+     &     'inches', Basin_intcp_stor)/=0 ) CALL read_error(3, 'basin_intcp_stor')
 
       ALLOCATE ( Intcp_evap(Nhru) )
-      CALL declvar_real(MODNAME, 'intcp_evap', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'intcp_evap', 'nhru', Nhru, 'real', &
      &     'Evaporation from the canopy for each HRU', &
-     &     'inches', Intcp_evap)
+     &     'inches', Intcp_evap)/=0 ) CALL read_error(3, 'intcp_evap')
 
-      CALL declvar_dble(MODNAME, 'basin_intcp_evap', 'one', 1, &
+      IF ( declvar(MODNAME, 'basin_intcp_evap', 'one', 1, 'double', &
      &     'Basin area-weighted evaporation from the canopy', &
-     &     'inches', Basin_intcp_evap)
+     &     'inches', Basin_intcp_evap)/=0 ) CALL read_error(3, 'basin_intcp_evap')
 
       ALLOCATE ( Hru_intcpstor(Nhru) )
-      CALL declvar_real(MODNAME, 'hru_intcpstor', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'hru_intcpstor', 'nhru', Nhru, 'real', &
      &     'HRU area-weighted average Interception storage in the canopy for each HRU', &
-     &     'inches', Hru_intcpstor)
+     &     'inches', Hru_intcpstor)/=0 ) CALL read_error(3, 'hru_intcpstor')
 
       ALLOCATE ( Intcp_form(Nhru) )
-      CALL declvar_int(MODNAME, 'intcp_form', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'intcp_form', 'nhru', Nhru, 'integer', &
      &     'Form (0=rain; 1=snow) of interception for each HRU', &
-     &     'none', Intcp_form)
+     &     'none', Intcp_form)/=0 ) CALL read_error(3, 'intcp_form')
 
       ALLOCATE ( Intcp_on(Nhru) )
-      CALL declvar_int(MODNAME, 'intcp_on', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'intcp_on', 'nhru', Nhru, 'integer', &
      &     'Flag indicating interception storage for each HRU (0=no; 1=yes)', &
-     &     'none', Intcp_on)
+     &     'none', Intcp_on)/=0 ) CALL read_error(3, 'intcp_on')
 
       ALLOCATE ( Canopy_covden(Nhru) )
-      CALL declvar_real(MODNAME, 'canopy_covden', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'canopy_covden', 'nhru', Nhru, 'real', &
      &     'Canopy cover density for each HRU', &
-     &     'decimal fraction', Canopy_covden)
+     &     'decimal fraction', Canopy_covden)/=0 ) CALL read_error(3, 'canopy_covden')
 
       ALLOCATE ( Intcp_changeover(Nhru) )
-      CALL declvar_real(MODNAME, 'intcp_changeover', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'intcp_changeover', 'nhru', Nhru, 'real', &
      &     'Water released from a change over of canopy cover type for each HRU', &
-     &     'inches', Intcp_changeover)
+     &     'inches', Intcp_changeover)/=0 ) CALL read_error(3, 'intcp_changeover')
 
-      CALL declvar_dble(MODNAME, 'basin_changeover', 'nhru', Nhru, &
+      IF ( declvar(MODNAME, 'basin_changeover', 'nhru', Nhru, 'double', &
      &     'Basin area-weighted average water released from a change over of canopy cover type', &
-     &     'inches', Basin_changeover)
+     &     'inches', Basin_changeover)/=0 ) CALL read_error(3, 'basin_changeover')
 
       ALLOCATE ( Intcp_transp_on(Nhru) )
 
@@ -281,11 +286,11 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, NEARZERO, DNEARZERO, &
      &    DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
       USE PRMS_MODULE, ONLY: Print_debug, PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Nowday, &
-     &    Ag_package, Hru_ag_irr, Ag_frac_flag
+     &    Ag_package, Hru_ag_irr
       USE PRMS_INTCP
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_type, Covden_win, Covden_sum, &
-     &    Hru_route_order, Hru_area, Cov_type, Ag_frac !, Ag_cov_type
-      USE PRMS_WATER_USE, ONLY: Canopy_gain ! need to add ag apply ???
+     &    Hru_route_order, Hru_area, Cov_type
+      USE PRMS_WATER_USE, ONLY: Canopy_gain
 ! Newsnow and Pptmix can be modfied, WARNING!!!
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, &
      &    Hru_snow, Transp_on, Potet, Use_pandata, Hru_pansta, Epan_coef, Potet_sublim
@@ -297,9 +302,9 @@
       EXTERNAL :: intercept
       INTRINSIC :: DBLE, SNGL
 ! Local Variables
-      INTEGER :: i, j, irrigation_type
-      REAL :: last, evrn, evsn, cov, intcpstor, diff, changeover, stor_max_rain, intcpevap, z, d, harea
-      REAL :: netrain, netsnow, extra_water, ag_water_maxin
+      INTEGER :: i, j, iskip, irrigation_type
+      REAL :: last, evrn, evsn, cov, intcpstor, diff, changeover, stor, intcpevap, z, d, harea
+      REAL :: netrain, netsnow, extra_water, stor_max_rain
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       intrun = 0
@@ -331,7 +336,7 @@
       Basin_intcp_stor = 0.0D0
 
 ! zero application rate variables for today
-      IF ( Use_transfer_intcp==ACTIVE .OR. Ag_frac_flag==ACTIVE ) THEN
+      IF ( Use_transfer_intcp==ACTIVE ) THEN
         Basin_net_apply = 0.0D0
         Basin_hru_apply = 0.0D0
         Net_apply = 0.0
@@ -447,6 +452,51 @@
             ENDIF
           ENDIF
 
+!  canopy application of irrigation water based on irr_type
+          IF ( Use_transfer_intcp==ACTIVE ) THEN
+            Gain_inches(i) = 0.0
+            irrigation_type = Irr_type(i)
+            iskip = 0
+            IF ( Canopy_gain(i)>0.0 ) THEN
+              IF ( irrigation_type==2 ) THEN
+                iskip = 1
+              ELSE
+                ! irr_type = 0 (interception, sprinkler), 1 (no interception, furrow),
+                ! 3 (interception and throughfall over whole HRU),
+                ! 4 (amount of water based on cover density, living filter)
+                IF ( irrigation_type==3 .OR. (irrigation_type==1.AND.cov<NEARZERO) .OR. irrigation_type==4 ) THEN
+                  Gain_inches(i) = Canopy_gain(i)/SNGL(Cfs_conv)/harea
+                ELSEIF ( cov>0.0 ) THEN ! 0 or 1 and cov>0.0
+                  Gain_inches(i) = Canopy_gain(i)/SNGL(Cfs_conv)/cov/harea ! all water added to canopy
+                ELSE ! irr_type = 1 and cov = 0.0
+                  iskip = 1
+                ENDIF
+                IF ( iskip==0 ) THEN
+                  IF ( irrigation_type==1 .OR. ( irrigation_type==4.AND.cov<NEARZERO) ) THEN
+                    Net_apply(i) = Gain_inches(i)
+                  ELSEIF ( irrigation_type==0 ) THEN
+                    CALL intercept(Gain_inches(i), stor, cov, intcpstor, Net_apply(i))
+                    Gain_inches(i) = Gain_inches(i)/cov ! convert back to gain over the HRU
+                  ELSE !IF ( irrigation_type==4 .OR. irrigation_type==3 ) THEN
+                    CALL intercept(Gain_inches(i), stor, 1.0, intcpstor, Net_apply(i))
+                    Gain_inches(i) = Gain_inches(i)*cov
+                    Net_apply(i) = Net_apply(i)*cov
+                  ENDIF
+                  Basin_hru_apply = Basin_hru_apply + DBLE( Gain_inches(i)*harea )
+                  Basin_net_apply = Basin_net_apply + DBLE( Net_apply(i)*harea )
+                ELSE ! irr_type = 2 or = 4 and cover density = 0
+                  IF ( irrigation_type==2 ) THEN
+                    PRINT *, 'WARNING, water-use transfer > 0, but irr_type = 2 (ignore), HRU:', i, ', transfer:', Canopy_gain(i)
+                  ELSE
+                    PRINT *, 'WARNING, ignoring water-use transfer > 0 with cover density = 0.0'
+                    PRINT *, '         irr_type =', irrigation_type, ', HRU:', i, ', transfer:', Canopy_gain(i)
+                  ENDIF
+                  Canopy_gain(i) = 0.0
+                ENDIF
+              ENDIF
+            ENDIF
+          ENDIF
+
 !******Determine amount of interception from snow
 
           IF ( Hru_snow(i)>0.0 ) THEN
@@ -461,57 +511,6 @@
                 ENDIF
               ENDIF
             ENDIF
-          ENDIF
-        ENDIF
-
-! NEXT intercept application of irrigation water, but only if
-!  irrigation method (irr_type=hrumeth) is =0 for sprinkler method
-!  canopy application of irrigation water based on irr_type
-! irr_type = 0 (interception, sprinkler), 1 (no interception, furrow),
-!            2=ignore, 3 (interception and throughfall over whole HRU),
-!            4 (amount of water based on cover density, living filter)
-
-!  canopy_gain is water applied to whole HRU, gain_inches is water added to canopy
-        IF ( Use_transfer_intcp==ACTIVE .OR. Ag_frac_flag==ACTIVE ) THEN ! Ag_frac_flag active for GSFLOW_AG or PRMS_AG
-          IF ( Ag_package==ACTIVE ) THEN
-            IF ( Hru_ag_irr(i)>0.0 .AND. .NOT.(Ag_frac(i)>0.0) ) THEN
-              PRINT *, 'ag_frac=0.0 for HRU:', i
-              CALL error_stop('AG Package irrigation specified and ag_frac=0', ERROR_param)
-            ENDIF
-          ENDIF
-
-          ag_water_maxin = 0.0
-          IF ( Ag_package==ACTIVE ) ag_water_maxin = Hru_ag_irr(i)
-          IF ( Use_transfer_intcp==ACTIVE ) ag_water_maxin = ag_water_maxin + Canopy_gain(i)
-
-          IF ( ag_water_maxin>0.0 ) THEN
-            IF ( Hru_type(i)==LAKE ) CALL error_stop('irrigation specified and hru_type is lake', ERROR_param)
-            irrigation_type = Irr_type(i)
-            IF ( Cov_type(i)==BARESOIL ) THEN
-              PRINT *, 'WARNING, cov_type = bare soil and irr_type not equal 1, set to 1'
-              irrigation_type = 1
-            ENDIF
-
-            IF ( (irrigation_type==0 .OR. irrigation_type==4) .AND. cov>0.0 ) THEN
-              Gain_inches(i) = ag_water_maxin/SNGL(Cfs_conv)/cov/harea ! all water added to canopy
-              CALL intercept(Gain_inches(i), stor_max_rain, cov, intcpstor, Net_apply(i))
-            ELSEIF ( irrigation_type==3 ) THEN
-              Gain_inches(i) = ag_water_maxin/SNGL(Cfs_conv)/harea
-              CALL intercept(Gain_inches(i), stor_max_rain, 1.0, intcpstor, Net_apply(i))
-            ELSEIF ( irrigation_type==2 ) THEN
-              IF ( Use_transfer_intcp==ACTIVE ) PRINT *, 'WARNING, irrigation water > 0, but irr_type = 2 (ignore), HRU:', &
-     &                                                   i, ', application water:', ag_water_maxin
-              IF ( Ag_package==ACTIVE ) CALL error_stop('irrigation specified and irr_type = 2 (ignore)', ERROR_param)
-              Canopy_gain(i) = 0.0 ! remove ignored canopy gain from water budget
-            ELSEIF ( irrigation_type==1 .OR. .NOT.(cov>0.0) ) THEN ! irr_type = (0 or 4 and cov=0) bare ground
-              Net_apply(i) = ag_water_maxin
-            ELSE
-              CALL error_stop('irrigation specified and irr_type and/or cover density invalid', ERROR_param)
-            ENDIF
-            Gain_inches_hru(i) = Gain_inches(i)
-            IF ( cov>0.0 ) Gain_inches_hru(i) = Gain_inches_hru(i)/cov
-            Basin_hru_apply = Basin_hru_apply + DBLE( Gain_inches_hru(i)*harea )
-            Basin_net_apply = Basin_net_apply + DBLE( Net_apply(i)*harea )
           ENDIF
         ENDIF
 
