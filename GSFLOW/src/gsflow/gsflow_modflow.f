@@ -1,6 +1,61 @@
 !***********************************************************************
 !     GSFLOW module that replaces MF_NWT.f
 !***********************************************************************
+      MODULE GSFMODFLOW
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
+      IMPLICIT NONE
+!   Local Variables
+      character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
+      character(len=14), parameter :: MODNAME = 'gsflow_modflow'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-08-26'
+      character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
+      character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
+      character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
+      character(len=*), parameter :: MODDESC_AG =  'AG-NWT Package'
+      character(len=*), parameter :: MODNAME_UZF = 'gwf2uzf1_NWT'
+      character(len=*), parameter :: MODNAME_SFR = 'gwf2sfr7_NWT'
+      character(len=*), parameter :: MODNAME_LAK = 'gwf2lak7_NWT'
+      character(len=*), parameter :: MODNAME_AG =  'gwf2ag1_NWT'
+      character(len=*), parameter :: Version_uzf = '2021-03-02'
+      character(len=*), parameter :: Version_sfr = '2020-09-30'
+      character(len=*), parameter :: Version_lak = '2020-09-30'
+      character(len=*), parameter :: Version_ag =  '2021-06-21'
+      INTEGER, PARAMETER :: ITDIM = 80
+      INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
+      INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS, KPERSTART
+      INTEGER, SAVE :: AGCONVERGE
+      INTEGER, SAVE :: KSTP, KKSTP, IERR, Max_iters, Itreal
+      INTEGER, SAVE :: Mfiter_cnt(ITDIM), Iter_cnt(ITDIM), Iterations
+      INTEGER, SAVE :: Szcheck, Sziters, INUNIT, KPER, NCVGERR
+      INTEGER, SAVE :: Max_sziters, Maxgziter, ITREAL2, mf_julday
+      INTEGER, SAVE, ALLOCATABLE :: Gwc_col(:), Gwc_row(:)
+      REAL, SAVE :: Delt_save
+      INTEGER, SAVE, ALLOCATABLE :: Stress_dates(:)
+      INTEGER, SAVE :: Modflow_skip_stress, Kkper_new
+      INTEGER, SAVE :: Modflow_skip_time_step
+      REAL, SAVE :: Modflow_time_in_stress, Modflow_skip_time
+      DOUBLE PRECISION, SAVE :: Mft_to_sec, Totalarea_mf
+      DOUBLE PRECISION, SAVE :: Mfl2_to_acre, Mfl3_to_ft3, Sfr_conv
+      DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs
+      REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t
+      REAL, SAVE :: MFQ_to_inch_acres
+      DOUBLE PRECISION, SAVE :: mfstrt_jul  !RGN to get MF to stop at End_time for MODFLOW only
+      REAL, SAVE, ALLOCATABLE :: Mfq2inch_conv(:), Cellarea(:)
+      REAL, SAVE, ALLOCATABLE :: Gvr2cell_conv(:), Mfvol2inch_conv(:)
+      INTEGER, SAVE :: Stopcount
+C-------ASSIGN VERSION NUMBER AND DATE
+      CHARACTER*40 VERSION,VERSION2,VERSION3
+      CHARACTER*10 MFVNAM
+      PARAMETER (VERSION='1.2.0 03/01/2020')
+      PARAMETER (VERSION2='1.12.0 02/03/2017')
+      PARAMETER (VERSION3='1.04.0 09/15/2016')
+      PARAMETER (MFVNAM='-NWT-SWR1')
+      INTEGER, SAVE :: IBDT(8)
+!   Control Parameters
+      INTEGER, SAVE :: Modflow_time_zero(6)
+      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
+      END MODULE GSFMODFLOW
+
 C     ******************************************************************
 C     MAIN CODE FOR U.S. GEOLOGICAL SURVEY MODULAR MODEL -- MODFLOW-NWT
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
@@ -141,8 +196,6 @@ C5------Get current date and time, assign to IBDT, and write to screen
      &       I0,'/',I2.2,'/',I2.2,I3,2(':',I2.2),/)
 C
 C6------ALLOCATE AND READ (AR) PROCEDURE
-      IGRID=1
-      NSOL=1
       CALL GWF2BAS7AR(INUNIT,CUNIT,VERSION,24,31,32,MAXUNIT,IGRID,12,
      1                HEADNG,26,MFVNAM)
       IF(IUNIT(50).GT.0 .AND. IUNIT(52).GT.0) THEN

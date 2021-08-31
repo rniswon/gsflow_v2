@@ -448,11 +448,13 @@
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NmapOutVars
         IF ( Map_var_type(jj)==REAL_TYPE ) THEN
-          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'real', &
-     &         Map_var(1, jj))/=0 ) CALL read_error(4, MapOutVar_names(jj)(:Nc_vars(jj)))
+          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), &
+     &         Nhru, 'real', Map_var(1, jj))/=0 ) &
+     &         CALL read_error(4, MapOutVar_names(jj)(:Nc_vars(jj)))
         ELSEIF ( Map_var_type(jj)==DBLE_TYPE ) THEN
-          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'double', &
-     &         Map_var_dble(1, jj))/=0 ) CALL read_error(4, MapOutVar_names(jj)(:Nc_vars(jj)))
+          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), &
+     &         Nhru, 'double', Map_var_dble(1, jj))/=0 ) &
+     &         CALL read_error(4, MapOutVar_names(jj)(:Nc_vars(jj)))
         ENDIF
       ENDDO
 
