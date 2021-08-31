@@ -4137,7 +4137,7 @@ C
             ! The following bit of code added to handle stress period 54
             IF (VOL(LAK_ID).GT.(MXLKVOLF(LAK_ID)+1.0).AND.
      &          .NOT.MXLKVOLF(LAK_ID).LT.0.0) THEN
-              Diversions(M) = (VOL(LAK_ID) - MXLKVOLF(LAK_ID)) / DELT
+              !Diversions(M) = (VOL(LAK_ID) - MXLKVOLF(LAK_ID)) / DELT
             ELSEIF((start_vol + inflow + gwsw).LT.
      &              DEADPOOLVOL(LAK_ID)) THEN
               Diversions(M) = 0.0001
