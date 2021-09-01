@@ -332,6 +332,10 @@ void setup_cont (void) {
 		lval[0] = 0;
 		decl_control_int_array("dyn_ag_soil_flag", 1, lval);
 
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("snow_cloudcover_flag", 1, lval);
+
 /*
 **	file names
 */

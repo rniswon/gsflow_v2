@@ -21,7 +21,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2021-08-13'
+      character(len=*), parameter :: Version_snowcomp = '2021-09-01'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -904,14 +904,14 @@
       USE PRMS_CONSTANTS, ONLY: LAKE, LAND, GLACIER, SHRUBS, FEET, &
      &    INCH2M, FEET2METERS, DNEARZERO, ACTIVE, OFF, DEBUG_less, DAYS_YR
       USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag, Start_year, &
-     &    PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Albedo_cbh_flag
+     &    PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Albedo_cbh_flag, snow_cloudcover_flag
       USE PRMS_SNOW
       USE PRMS_SOLTAB, ONLY: Soltab_horad_potsw, Soltab_potsw, Hru_cossl
       USE PRMS_CLIMATE_HRU, ONLY: Albedo_hru
       USE PRMS_BASIN, ONLY: Hru_area, Active_hrus, Hru_type, &
      &    Basin_area_inv, Hru_route_order, Cov_type, Elev_units
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Potet_sublim, &
-     &    Hru_ppt, Prmx, Tmaxc, Tminc, Tavgc, Swrad, Potet, Transp_on, Tmax_allsnow_c
+     &    Hru_ppt, Prmx, Tmaxc, Tminc, Tavgc, Swrad, Potet, Transp_on, Tmax_allsnow_c, Orad, Basin_horad
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
       USE PRMS_SET_TIME, ONLY: Jday, Julwater
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Canopy_covden, Hru_intcpevap
@@ -996,6 +996,9 @@
         Glacr_pkwater_ante = Glacr_pkwater_equiv
       ENDIF
 
+      ! Calculate the ratio of measured radiation to potential radiation
+      ! (used as a cumulative indicator of cloud cover)
+      IF ( snow_cloudcover_flag==ACTIVE ) trd = Orad/SNGL(Basin_horad) ! [dimensionless ratio] ! old basin-wide equation
       Frac_swe = 0.0
       ! By default, the precipitation added to snowpack, snowmelt,
       ! and snow evaporation are 0
@@ -1350,10 +1353,13 @@
 
             ! no shortwave (solar) radiation at night
             sw = 0.0 ! [cal / cm^2] or [Langleys]
+! new equation for trd
             ! Calculate the ratio of measured radiation to potential radiation
             ! (used as a cumulative indicator of cloud cover)
-            orad_local = SNGL( (DBLE(Swrad(i))*Hru_cossl(i)*Soltab_horad_potsw(Jday,i))/Soltab_potsw(Jday,i) )
-            trd = orad_local/SNGL(Soltab_horad_potsw(Jday,i)) ! [dimensionless ratio]
+            IF ( snow_cloudcover_flag==2 ) THEN
+              orad_local = SNGL( (DBLE(Swrad(i))*Hru_cossl(i)*Soltab_horad_potsw(Jday,i))/Soltab_potsw(Jday,i) )
+              trd = orad_local/SNGL(Soltab_horad_potsw(Jday,i)) ! [dimensionless ratio]
+            ENDIF
             ! calculate the night time energy balance
             CALL snowbal(niteda, Tstorm_mo(i,Nowmonth), Iasw(i), &
      &                   temp, esv, Hru_ppt(i), trd, Emis_noppt(i), &
