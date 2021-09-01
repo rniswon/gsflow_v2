@@ -8,7 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-08-26'
+      character(len=*), parameter :: Version_intcp = '2021-08-30'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -117,7 +117,6 @@
      &       'Application method of irrigation water for each HRU (0 = sprinkler;'// &
      &       ' 1=ditch/drip; 2=ignore; 3=sprinkler across HRU; 4=living filter', & 
      &       'none')/=0 ) CALL read_error(1, 'irr_type')
-
       ENDIF
 
       ALLOCATE ( Hru_intcpevap(Nhru) )
@@ -303,7 +302,7 @@
       INTRINSIC :: DBLE, SNGL
 ! Local Variables
       INTEGER :: i, j, iskip, irrigation_type
-      REAL :: last, evrn, evsn, cov, intcpstor, diff, changeover, stor, intcpevap, z, d, harea
+      REAL :: last, evrn, evsn, cov, intcpstor, diff, changeover, intcpevap, z, d, harea
       REAL :: netrain, netsnow, extra_water, stor_max_rain
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
@@ -453,12 +452,28 @@
           ENDIF
 
 !  canopy application of irrigation water based on irr_type
+! irr_type = 0 (interception, sprinkler), 1 (no interception, furrow),
+!            2=ignore, 3 (interception and throughfall over whole HRU),
+!            4 (amount of water based on cover density, living filter)
+
+!  canopy_gain is water applied to whole HRU, gain_inches is water added to canopy
           IF ( Use_transfer_intcp==ACTIVE ) THEN
             Gain_inches(i) = 0.0
             irrigation_type = Irr_type(i)
             iskip = 0
+
             IF ( Canopy_gain(i)>0.0 ) THEN
+              IF ( Hru_type(i)==LAKE ) CALL error_stop('irrigation specified and hru_type is lake', ERROR_param)
+              IF ( Cov_type(i)==BARESOIL ) THEN
+                PRINT *, 'WARNING, cov_type = bare soil and irr_type not equal 1, set to 1'
+                irrigation_type = 1
+              ENDIF
               IF ( irrigation_type==2 ) THEN
+                IF ( Canopy_gain(i)>0.0 ) THEN
+                  PRINT *, 'WARNING, irrigation water > 0, but irr_type = 2 (ignore), HRU:', &
+     &                   i, ', application water:', Canopy_gain(i)
+                  Canopy_gain(i) = 0.0 ! remove ignored canopy gain from water budget
+                ENDIF
                 iskip = 1
               ELSE
                 ! irr_type = 0 (interception, sprinkler), 1 (no interception, furrow),
@@ -475,22 +490,20 @@
                   IF ( irrigation_type==1 .OR. ( irrigation_type==4.AND.cov<NEARZERO) ) THEN
                     Net_apply(i) = Gain_inches(i)
                   ELSEIF ( irrigation_type==0 ) THEN
-                    CALL intercept(Gain_inches(i), stor, cov, intcpstor, Net_apply(i))
+                  CALL intercept(Gain_inches(i), stor_max_rain, cov, intcpstor, Net_apply(i))
                     Gain_inches(i) = Gain_inches(i)/cov ! convert back to gain over the HRU
                   ELSE !IF ( irrigation_type==4 .OR. irrigation_type==3 ) THEN
-                    CALL intercept(Gain_inches(i), stor, 1.0, intcpstor, Net_apply(i))
+                  CALL intercept(Gain_inches(i), stor_max_rain, 1.0, intcpstor, Net_apply(i))
                     Gain_inches(i) = Gain_inches(i)*cov
                     Net_apply(i) = Net_apply(i)*cov
                   ENDIF
+                Gain_inches_hru(i) = Gain_inches(i)
+                IF ( cov>0.0 ) Gain_inches_hru(i) = Gain_inches_hru(i)/cov
                   Basin_hru_apply = Basin_hru_apply + DBLE( Gain_inches(i)*harea )
                   Basin_net_apply = Basin_net_apply + DBLE( Net_apply(i)*harea )
-                ELSE ! irr_type = 2 or = 4 and cover density = 0
-                  IF ( irrigation_type==2 ) THEN
-                    PRINT *, 'WARNING, water-use transfer > 0, but irr_type = 2 (ignore), HRU:', i, ', transfer:', Canopy_gain(i)
-                  ELSE
-                    PRINT *, 'WARNING, ignoring water-use transfer > 0 with cover density = 0.0'
-                    PRINT *, '         irr_type =', irrigation_type, ', HRU:', i, ', transfer:', Canopy_gain(i)
-                  ENDIF
+              ELSE ! irr_type = 4 and cover density = 0
+                PRINT *, 'WARNING, ignoring water-use transfer > 0 with cover density = 0.0'
+                PRINT *, '         irr_type =', irrigation_type, ', HRU:', i, ', transfer:', Canopy_gain(i)
                   Canopy_gain(i) = 0.0
                 ENDIF
               ENDIF
