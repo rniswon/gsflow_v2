@@ -319,6 +319,19 @@ void setup_cont (void) {
 		lval = (long*)umalloc(sizeof(long));
 		lval[0] = 0;
 		decl_control_int_array("soilzone_aet_flag", 1, lval);
+
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("agriculture_dprst_flag", 1, lval);
+
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("dyn_ag_frac_flag", 1, lval);
+
+		lval = (long*)umalloc(sizeof(long));
+		lval[0] = 0;
+		decl_control_int_array("dyn_ag_soil_flag", 1, lval);
+
 /*
 **	file names
 */

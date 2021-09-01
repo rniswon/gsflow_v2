@@ -105,18 +105,6 @@
      &         'Irrigation added to soilzone from MODFLOW wells', &
      &         'acre-inches', Hru_ag_irr)/=0 ) CALL read_error(3, 'hru_ag_irr')
           Hru_ag_irr = 0.0
-        ENDIF
-        IF ( AG_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-          ALLOCATE ( Dprst_ag_gain(Nhru) )
-          IF ( declvar(MODNAME, 'dprst_ag_gain', 'nhru', Nhru, 'real', &
-     &         'Irrigation added to surface depression storage from MODFLOW ponds', &
-     &         'acre-inches', Dprst_ag_gain)/=0 ) CALL read_error(3, 'dprst_ag_gain')
-          Dprst_ag_gain = 0.0
-          ALLOCATE ( Dprst_ag_transfer(Nhru) )
-          IF ( declvar(MODNAME, 'dprst_ag_transfer', 'nhru', Nhru, 'real', &
-     &         'Surface depression storage transfer to MODFLOW cells', &
-     &         'acre-inches', Dprst_ag_transfer)/=0 ) CALL read_error(3, 'dprst_ag_transfer')
-          Dprst_ag_transfer = 0.0
           IF ( declparam(MODNAME, 'mxsziter', 'one', 'integer', &
      &         '0', '0', '5000', &
      &         'Maximum number of iterations soilzone states are computed', &
@@ -136,6 +124,18 @@
      &         'Corresponding grid cell id associated with each GVR', &
      &         'Index of the grid cell associated with each gravity reservoir', &
      &         'none')/=0 ) CALL read_error(1, 'gvr_cell_id')
+        ENDIF
+        IF ( AG_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+          ALLOCATE ( Dprst_ag_gain(Nhru) )
+          IF ( declvar(MODNAME, 'dprst_ag_gain', 'nhru', Nhru, 'real', &
+     &         'Irrigation added to surface depression storage from MODFLOW ponds', &
+     &         'acre-inches', Dprst_ag_gain)/=0 ) CALL read_error(3, 'dprst_ag_gain')
+          Dprst_ag_gain = 0.0
+          ALLOCATE ( Dprst_ag_transfer(Nhru) )
+          IF ( declvar(MODNAME, 'dprst_ag_transfer', 'nhru', Nhru, 'real', &
+     &         'Surface depression storage transfer to MODFLOW cells', &
+     &         'acre-inches', Dprst_ag_transfer)/=0 ) CALL read_error(3, 'dprst_ag_transfer')
+          Dprst_ag_transfer = 0.0
         ENDIF
 
         Timestep = 0

@@ -20,9 +20,9 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 08/30/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-08-26'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.1 08/26/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 09/01/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-09-01'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.1 09/01/2021'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
