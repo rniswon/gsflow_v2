@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-08-18'
+      character(len=*), parameter :: Version_soilzone = '2021-09-01'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -34,7 +34,7 @@
       REAL, SAVE, ALLOCATABLE :: It0_gravity_stor_res(:), It0_sroff(:)
       REAL, SAVE, ALLOCATABLE :: It0_slow_stor(:), It0_potet(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_strm_seg_in(:)
-      DOUBLE PRECISION, SAVE :: It0_basin_soil_moist, It0_basin_ssstor, Basin_sz_gwin
+      DOUBLE PRECISION, SAVE :: Basin_sz_gwin
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gvr_hru_pct_adjusted(:)
 !   Declared Variables
       DOUBLE PRECISION, SAVE :: Basin_sz2gw, Basin_cap_infil_tot
@@ -919,13 +919,6 @@
         ENDIF
       ENDIF
       IF ( GSFLOW_flag==ACTIVE ) Sm2gw_grav = 0.0
-      IF ( Kkiter>1 ) THEN
-        Basin_soil_moist = It0_basin_soil_moist
-        Basin_ssstor = It0_basin_ssstor
-      ELSE
-        It0_basin_soil_moist = Basin_soil_moist
-        It0_basin_ssstor = Basin_ssstor
-      ENDIF
 
       IF ( Cascade_flag>CASCADE_OFF ) THEN
         Upslope_interflow = 0.0D0
@@ -956,6 +949,7 @@
       Soil_saturated = OFF
       update_potet = OFF
       IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
+
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 
@@ -1021,7 +1015,7 @@
         ag_water_maxin = 0.0
         IF ( Ag_package==ACTIVE ) THEN
           IF ( Hru_ag_irr(i)>0.0 ) THEN
-            ag_water_maxin = Hru_ag_irr(i)/perv_area ! Hru_ag_irr is in inches
+            ag_water_maxin = Hru_ag_irr(i)/perv_area ! Hru_ag_irr is in acre-inches
           ENDIF
         ENDIF
         IF ( Soilzone_add_water_use==ACTIVE ) THEN
@@ -1049,6 +1043,7 @@
         ! pref_flow for whole HRU
 ! ??? should cascading flow go to preferential flow fraction ???
         prefflow = 0.0
+        dunnianflw_pfr = 0.0
         IF ( Pref_flow_den(i)>0.0 ) THEN
           pref_flow_maxin = 0.0
           Pref_flow_infil(i) = 0.0
