@@ -284,8 +284,7 @@
       INTEGER FUNCTION intrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, NEARZERO, DNEARZERO, &
      &    DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
-      USE PRMS_MODULE, ONLY: Print_debug, PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Nowday, &
-     &    Ag_package, Hru_ag_irr
+      USE PRMS_MODULE, ONLY: Print_debug, PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Nowday
       USE PRMS_INTCP
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_type, Covden_win, Covden_sum, &
      &    Hru_route_order, Hru_area, Cov_type
