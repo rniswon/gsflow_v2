@@ -10,13 +10,11 @@
 !RSR:          Northern hemisphere and Julian day 265 to 79 in Southern
 !***********************************************************************
       MODULE PRMS_DDSOLRAD
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, DEBUG_less, MONTHS_PER_YEAR, ACTIVE, OFF
-        USE PRMS_MODULE, ONLY: Process_flag, Print_debug, Nhru, Nsol
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Solar Radiation Distribution'
         character(len=*), parameter :: MODNAME = 'ddsolrad'
-        character(len=*), parameter :: Version_ddsolrad = '2020-12-02'
+        character(len=*), parameter :: Version_ddsolrad = '2021-09-07'
         INTEGER, SAVE :: Observed_flag
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Radadj_slope(:, :), Radadj_intcp(:, :)
@@ -24,6 +22,8 @@
       END MODULE PRMS_DDSOLRAD
 
       INTEGER FUNCTION ddsolrad()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, DEBUG_less, MONTHS_PER_YEAR, ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: Process_flag, Print_debug, Nhru, Nsol, Nowmonth
       USE PRMS_DDSOLRAD
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv
       USE PRMS_CLIMATEVARS, ONLY: Swrad, Tmax_hru, Basin_orad, Orad_hru, &
@@ -31,12 +31,12 @@
      &    Basin_potsw, Basin_swrad, Basin_solsta, Orad, Hru_ppt, Tmax_allrain, &
      &    Solsta_flag, Radj_sppt, Radj_wppt, Ppt_rad_adj, Radmax
       USE PRMS_SOLTAB, ONLY: Soltab_potsw, Soltab_basinpotsw, Hru_cossl, Soltab_horad_potsw
-      USE PRMS_SET_TIME, ONLY: Jday, Nowmonth, Summer_flag
+      USE PRMS_SET_TIME, ONLY: Jday, Summer_flag
       USE PRMS_OBS, ONLY: Solrad
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: INT, FLOAT, DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam, getparam
+      INTEGER, EXTERNAL :: declparam_real, getparam_real
       EXTERNAL :: read_error, print_module, print_date
 ! Local Variables
       INTEGER :: j, jj, k, kp, kp1
@@ -92,6 +92,12 @@
           Orad_hru(j) = radadj*SNGL( Soltab_horad_potsw(Jday,j) )
           Basin_orad = Basin_orad + DBLE( Orad_hru(j)*Hru_area(j) )
 
+          ! https://www.omnicalculator.com/physics/cloud-base
+!         cloud base = (temperature - dew point) / 4.4 * 1000 + elevation, altitude of clouds
+!In this formula, the temperature and dew point are expressed in degrees Fahrenheits and the elevation and cloud base altitude are expressed in feet. 
+!Make sure to adjust the result afterwards if you're using the SI units!
+          
+          
           IF ( Solsta_flag==1 ) THEN
             k = Hru_solsta(j)
             IF ( k>0 ) THEN
@@ -124,31 +130,31 @@
 
         ! Declare Parameters
         ALLOCATE ( Dday_slope(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam(MODNAME, 'dday_slope', 'nhru,nmonths', 'real', &
+        IF ( declparam_real(MODNAME, 'dday_slope', 'nhru,nmonths', &
      &       '0.4', '0.1', '1.4', &
      &       'Slope in temperature degree-day relationship', &
      &       'Monthly (January to December) slope in degree-day equation for each HRU', &
      &       'dday/temp_units')/=0 ) CALL read_error(1, 'dday_slope')
         ALLOCATE ( Dday_intcp(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam(MODNAME, 'dday_intcp', 'nhru,nmonths', 'real', &
+        IF ( declparam_real(MODNAME, 'dday_intcp', 'nhru,nmonths', &
      &       '-40.0', '-60.0', '10.0', &
      &       'Intercept in temperature degree-day relationship', &
      &       'Monthly (January to December) intercept in degree-day equation for each HRU', &
      &       'dday')/=0 ) CALL read_error(1, 'dday_intcp')
         ALLOCATE ( Radadj_slope(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam(MODNAME, 'radadj_slope', 'nhru,nmonths', 'real', &
+        IF ( declparam_real(MODNAME, 'radadj_slope', 'nhru,nmonths', &
      &       '0.0', '0.0', '1.0', &
      &       'Slope in air temperature range adjustment to degree-day equation', &
      &       'Monthly (January to December) slope in air temperature range adjustment to degree-day equation for each HRU', &
      &       'dday/temp_units')/=0 ) CALL read_error(1, 'radadj_slope')
         ALLOCATE ( Radadj_intcp(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam(MODNAME, 'radadj_intcp', 'nhru,nmonths', 'real', &
+        IF ( declparam_real(MODNAME, 'radadj_intcp', 'nhru,nmonths', &
      &       '1.0', '0.0', '1.0', &
      &       'Intercept in air temperature range adjustment to degree-day equation', &
      &       'Monthly (January to December) intercept in air temperature range adjustment to degree-day equation for each HRU', &
      &       'dday')/=0 ) CALL read_error(1, 'radadj_intcp')
         ALLOCATE ( Tmax_index(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam(MODNAME, 'tmax_index', 'nhru,nmonths', 'real', &
+        IF ( declparam_real(MODNAME, 'tmax_index', 'nhru,nmonths', &
      &       '50.0', '-10.0', '110.0', &
      &       'Monthly index temperature', &
      &       'Monthly (January to December) index temperature used'// &
@@ -157,11 +163,11 @@
 
       ELSEIF ( Process_flag==INIT ) THEN
 ! Get parameters
-        IF ( getparam(MODNAME, 'dday_slope', Nhru*MONTHS_PER_YEAR, 'real', Dday_slope)/=0 ) CALL read_error(2, 'dday_slope')
-        IF ( getparam(MODNAME, 'dday_intcp', Nhru*MONTHS_PER_YEAR, 'real', Dday_intcp)/=0 ) CALL read_error(2, 'dday_intcp')
-        IF ( getparam(MODNAME, 'radadj_slope', Nhru*MONTHS_PER_YEAR, 'real', Radadj_slope)/=0 ) CALL read_error(2, 'radadj_slope')
-        IF ( getparam(MODNAME, 'radadj_intcp', Nhru*MONTHS_PER_YEAR, 'real', Radadj_intcp)/=0 ) CALL read_error(2, 'radadj_intcp')
-        IF ( getparam(MODNAME, 'tmax_index', Nhru*MONTHS_PER_YEAR, 'real', Tmax_index)/=0 ) CALL read_error(2, 'tmax_index')
+        IF ( getparam_real(MODNAME, 'dday_slope', Nhru*MONTHS_PER_YEAR, Dday_slope)/=0 ) CALL read_error(2, 'dday_slope')
+        IF ( getparam_real(MODNAME, 'dday_intcp', Nhru*MONTHS_PER_YEAR, Dday_intcp)/=0 ) CALL read_error(2, 'dday_intcp')
+        IF ( getparam_real(MODNAME, 'radadj_slope', Nhru*MONTHS_PER_YEAR, Radadj_slope)/=0 ) CALL read_error(2, 'radadj_slope')
+        IF ( getparam_real(MODNAME, 'radadj_intcp', Nhru*MONTHS_PER_YEAR, Radadj_intcp)/=0 ) CALL read_error(2, 'radadj_intcp')
+        IF ( getparam_real(MODNAME, 'tmax_index', Nhru*MONTHS_PER_YEAR, Tmax_index)/=0 ) CALL read_error(2, 'tmax_index')
         Observed_flag = OFF
         IF ( Nsol>0 .AND. Basin_solsta>0 ) Observed_flag = ACTIVE
 

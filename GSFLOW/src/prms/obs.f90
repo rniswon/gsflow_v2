@@ -2,16 +2,13 @@
 ! Reads and stores observed data from all specified measurement stations
 !***********************************************************************
       MODULE PRMS_OBS
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, xyz_dist_module, &
-     &    MONTHS_PER_YEAR, CMS, CFS, CFS2CMS_CONV
-      USE PRMS_MODULE, ONLY: Model, Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, &
-     &    Precip_flag
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'obs'
-      character(len=*), parameter :: Version_obs = '2021-05-06'
-      INTEGER, SAVE :: Nsnow, Nlakeelev, Nwind, Nhumid, Rain_flag
+      character(len=*), parameter :: Version_obs = '2021-09-07'
+      INTEGER, SAVE :: Nlakeelev, Nwind, Nhumid, Rain_flag
 !   Declared Variables
       INTEGER, SAVE :: Rain_day
       REAL, SAVE, ALLOCATABLE :: Pan_evap(:), Runoff(:), Precip(:)
@@ -59,7 +56,6 @@
 !***********************************************************************
       obssetdims = 0
 
-      IF ( decldim('nsnow', 0, MAXDIM, 'Number of snow-depth-measurement stations')/=0 ) CALL read_error(7, 'nsnow')
       IF ( decldim('nlakeelev', 0, MAXDIM, &
      &     'Maximum number of lake elevations for any rating table data set')/=0 ) CALL read_error(7, 'nlakeelev')
       IF ( decldim('nwind', 0, MAXDIM, 'Number of wind-speed measurement stations')/=0 ) CALL read_error(7, 'nwind')
@@ -73,10 +69,12 @@
 !     rain_code
 !***********************************************************************
       INTEGER FUNCTION obsdecl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, xyz_dist_module
+      USE PRMS_MODULE, ONLY: Model, Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Precip_flag
       USE PRMS_OBS
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getdim, declparam
+      INTEGER, EXTERNAL :: getdim, declparam_int
       EXTERNAL :: read_error, print_module, declvar_real, declvar_dble, declvar_int
 !***********************************************************************
       obsdecl = 0
@@ -97,7 +95,7 @@
         CALL declvar_dble(MODNAME, 'streamflow_cms', 'nobs', Nobs, &
      &       'Streamflow at each measurement station', &
      &       'cms', Streamflow_cms)
-        IF ( declparam(MODNAME, 'runoff_units', 'one', 'integer', &
+        IF ( declparam_int(MODNAME, 'runoff_units', 'one', &
      &       '0', '0', '1', &
      &       'Measured streamflow units', 'Measured streamflow units (0=cfs; 1=cms)', &
      &       'none')/=0 ) CALL read_error(1, 'runoff_units')
@@ -179,7 +177,7 @@
         CALL declvar_int(MODNAME, 'rain_day', 'one', 1, &
      &       'Flag to set the form of any precipitation to rain (0=determine form; 1=rain)', &
      &       'none', Rain_day)
-        IF ( declparam(MODNAME, 'rain_code', 'nmonths', 'integer', &
+        IF ( declparam_int(MODNAME, 'rain_code', 'nmonths', &
      &       '2', '1', '5', &
      &       'Flag indicating rule for precipitation station use', &
      &       'Monthly (January to December) flag indicating rule for'// &
@@ -214,21 +212,23 @@
 !     obsinit - initializes obs module
 !***********************************************************************
       INTEGER FUNCTION obsinit()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR, CFS
+      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow
       USE PRMS_OBS
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getparam
+      INTEGER, EXTERNAL :: getparam_int
       EXTERNAL :: read_error
 !***********************************************************************
       obsinit = 0
 
       Runoff_units = CFS
       IF ( Nobs>0 ) THEN
-        IF ( getparam(MODNAME, 'runoff_units', 1, 'integer', Runoff_units)/=0 ) CALL read_error(2, 'runoff_units')
+        IF ( getparam_int(MODNAME, 'runoff_units', 1, Runoff_units)/=0 ) CALL read_error(2, 'runoff_units')
       ENDIF
 
       IF ( Rain_flag==ACTIVE ) THEN
-        IF ( getparam(MODNAME, 'rain_code', MONTHS_PER_YEAR, 'integer', Rain_code)/=0 ) CALL read_error(2, 'rain_code')
+        IF ( getparam_int(MODNAME, 'rain_code', MONTHS_PER_YEAR, Rain_code)/=0 ) CALL read_error(2, 'rain_code')
       ENDIF
 
       IF ( Nobs>0 ) THEN

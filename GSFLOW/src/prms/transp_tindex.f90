@@ -3,15 +3,11 @@
 ! based on a temperature index method.
 !***********************************************************************
       MODULE PRMS_TRANSP_TINDEX
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, FAHRENHEIT, MONTHS_PER_YEAR, &
-     &      READ_INIT, SAVE_INIT       
-        USE PRMS_MODULE, ONLY: Process_flag, Nhru, Save_vars_to_file, Init_vars_from_file, &
-     &      Start_month, Start_day
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Transpiration Distribution'
         character(len=13), parameter :: MODNAME = 'transp_tindex'
-        character(len=*), parameter :: Version_transp = '2020-12-02'
+        character(len=*), parameter :: Version_transp = '2021-09-07'
         INTEGER, SAVE, ALLOCATABLE :: Transp_check(:)
         REAL, SAVE, ALLOCATABLE :: Tmax_sum(:), Transp_tmax_f(:)
         ! Declared Parameters
@@ -20,13 +16,14 @@
       END MODULE PRMS_TRANSP_TINDEX
 
       INTEGER FUNCTION transp_tindex()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, FAHRENHEIT, MONTHS_PER_YEAR, READ_INIT, SAVE_INIT
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Save_vars_to_file, Init_vars_from_file, Start_month, Start_day, Nowmonth, Nowday
       USE PRMS_TRANSP_TINDEX
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Temp_units, Transp_on, Basin_transp_on 
-      USE PRMS_SET_TIME, ONLY: Nowmonth, Nowday
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, getparam
+      INTEGER, EXTERNAL :: declparam_int, declparam_real, getparam_int, getparam_real
       REAL, EXTERNAL :: c_to_f
       EXTERNAL :: read_error, print_module, transp_tindex_restart
 ! Local Variables
@@ -80,7 +77,7 @@
         ALLOCATE ( Tmax_sum(Nhru), Transp_check(Nhru), Transp_tmax_f(Nhru) )
 
         ALLOCATE ( Transp_beg(Nhru) )
-        IF ( declparam(MODNAME, 'transp_beg', 'nhru', 'integer', &
+        IF ( declparam_int(MODNAME, 'transp_beg', 'nhru', &
      &       '1', '1', '12', &
      &       'Month to begin testing for transpiration', &
      &       'Month to begin summing the maximum air temperature for each HRU; when sum is greater than or'// &
@@ -88,14 +85,14 @@
      &       'month')/=0 ) CALL read_error(1, 'transp_beg')
 
         ALLOCATE ( Transp_end(Nhru) )
-        IF ( declparam(MODNAME, 'transp_end', 'nhru', 'integer', &
+        IF ( declparam_int(MODNAME, 'transp_end', 'nhru', &
      &       '13', '1', '13', &
      &       'Month to stop transpiration period', &
      &       'Month to stop transpiration computations; transpiration is computed through the end of previous month', &
      &       'month')/=0 ) CALL read_error(1, 'transp_end')
 
         ALLOCATE ( Transp_tmax(Nhru) )
-        IF ( declparam(MODNAME, 'transp_tmax', 'nhru', 'real', &
+        IF ( declparam_real(MODNAME, 'transp_tmax', 'nhru', &
      &       '1.0', '0.0', '1000.0', &
      &       'Tmax index to determine start of transpiration', &
      &       'Temperature index to determine the specific date of the start of the transpiration period;'// &
@@ -105,9 +102,9 @@
 
       ELSEIF ( Process_flag==INIT ) THEN
 
-        IF ( getparam(MODNAME, 'transp_beg', Nhru, 'integer', Transp_beg)/=0 ) CALL read_error(2, 'transp_beg')
-        IF ( getparam(MODNAME, 'transp_end', Nhru, 'integer', Transp_end)/=0 ) CALL read_error(2, 'transp_end')
-        IF ( getparam(MODNAME, 'transp_tmax', Nhru, 'real', Transp_tmax)/=0 ) CALL read_error(2, 'transp_tmax')
+        IF ( getparam_int(MODNAME, 'transp_beg', Nhru, Transp_beg)/=0 ) CALL read_error(2, 'transp_beg')
+        IF ( getparam_int(MODNAME, 'transp_end', Nhru, Transp_end)/=0 ) CALL read_error(2, 'transp_end')
+        IF ( getparam_real(MODNAME, 'transp_tmax', Nhru, Transp_tmax)/=0 ) CALL read_error(2, 'transp_tmax')
 
         IF ( Init_vars_from_file>OFF ) CALL transp_tindex_restart(READ_INIT)
         IF ( Temp_units==FAHRENHEIT ) THEN
@@ -153,6 +150,7 @@
 !     Write to or read from restart file
 !***********************************************************************
       SUBROUTINE transp_tindex_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_TRANSP_TINDEX
       IMPLICIT NONE

@@ -3,28 +3,28 @@
 ! formulation (Hamon, 1961)
 !***********************************************************************
       MODULE PRMS_POTET_HAMON
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR
-        USE PRMS_MODULE, ONLY: Process_flag, Nhru
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_hamon'
-        character(len=*), parameter :: Version_potet = '2020-08-03'
+        character(len=*), parameter :: Version_potet = '2021-08-13'
         DOUBLE PRECISION, PARAMETER :: ONE_12TH = 1.0D0/12.0D0
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Hamon_coef(:, :)
       END MODULE PRMS_POTET_HAMON
 
       INTEGER FUNCTION potet_hamon()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nowmonth
       USE PRMS_POTET_HAMON
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc
       USE PRMS_SOLTAB, ONLY: Soltab_sunhrs
-      USE PRMS_SET_TIME, ONLY: Nowmonth, Jday
+      USE PRMS_SET_TIME, ONLY: Jday
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam, getparam
+      INTEGER, EXTERNAL :: declparam_real, getparam_real
       EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
@@ -55,7 +55,7 @@
         CALL print_module(MODDESC, MODNAME, Version_potet)
 
         ALLOCATE ( Hamon_coef(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam(MODNAME, 'hamon_coef', 'nhru,nmonths', 'real', &
+        IF ( declparam_real(MODNAME, 'hamon_coef', 'nhru,nmonths', &
      &       '0.0055', '0.004', '0.008', &
      &       'Monthly air temperature coefficient - Hamon', &
      &       'Monthly (January to December) air temperature coefficient used in Hamon potential ET computations for each HRU', &
@@ -63,7 +63,7 @@
 
 !******Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam(MODNAME, 'hamon_coef', Nhru*MONTHS_PER_YEAR, 'real', Hamon_coef)/=0 ) CALL read_error(2, 'hamon_coef')
+        IF ( getparam_real(MODNAME, 'hamon_coef', Nhru*MONTHS_PER_YEAR, Hamon_coef)/=0 ) CALL read_error(2, 'hamon_coef')
       ENDIF
 
       END FUNCTION potet_hamon

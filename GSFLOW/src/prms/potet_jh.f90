@@ -4,26 +4,25 @@
 !     Potet = Coef_t_mean*(Tavgf-Temp_x_mean)*Swrad/elh
 !***********************************************************************
       MODULE PRMS_POTET_JH
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR, INCH2CM
-        USE PRMS_MODULE, ONLY: Process_flag, Nhru
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_jh'
-        character(len=*), parameter :: Version_potet = '2020-08-03'
+        character(len=*), parameter :: Version_potet = '2021-09-07'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Jh_coef(:, :), Jh_coef_hru(:)
       END MODULE PRMS_POTET_JH
 
       INTEGER FUNCTION potet_jh()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR, INCH2CM
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nowmonth
       USE PRMS_POTET_JH
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Tavgf, Swrad
-      USE PRMS_SET_TIME, ONLY: Nowmonth
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: declparam, getparam
+      INTEGER, EXTERNAL :: declparam_real, getparam_real
       EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
@@ -51,7 +50,7 @@
         CALL print_module(MODDESC, MODNAME, Version_potet)
 
         ALLOCATE ( Jh_coef(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam(MODNAME, 'jh_coef', 'nhru,nmonths', 'real', &
+        IF ( declparam_real(MODNAME, 'jh_coef', 'nhru,nmonths', &
      &       '0.014', '-0.5', '1.5', &
      &       'Monthly air temperature coefficient for each HRU - Jensen-Haise', &
      &       'Monthly (January to December) air temperature coefficient used in Jensen-Haise potential ET computations'// &
@@ -59,7 +58,7 @@
      &       'per degrees Fahrenheit')/=0 ) CALL read_error(1, 'jh_coef')
 
         ALLOCATE ( Jh_coef_hru(Nhru) )
-        IF ( declparam(MODNAME, 'jh_coef_hru', 'nhru', 'real', &
+        IF ( declparam_real(MODNAME, 'jh_coef_hru', 'nhru', &
      &       '13.0', '-99.0', '150.0', &
      &       'HRU air temperature coefficient - Jensen-Haise', &
      &       'Air temperature coefficient used in Jensen-Haise potential ET computations for each HRU', &
@@ -67,8 +66,8 @@
 
 !******Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam(MODNAME, 'jh_coef', Nhru*MONTHS_PER_YEAR, 'real', Jh_coef)/=0 ) CALL read_error(2, 'jh_coef')
-        IF ( getparam(MODNAME, 'jh_coef_hru', Nhru, 'real', Jh_coef_hru)/=0 ) CALL read_error(2, 'jh_coef_hru')
+        IF ( getparam_real(MODNAME, 'jh_coef', Nhru*MONTHS_PER_YEAR, Jh_coef)/=0 ) CALL read_error(2, 'jh_coef')
+        IF ( getparam_real(MODNAME, 'jh_coef_hru', Nhru, Jh_coef_hru)/=0 ) CALL read_error(2, 'jh_coef_hru')
 
       ENDIF
 
