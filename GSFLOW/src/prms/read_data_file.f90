@@ -20,8 +20,8 @@
       EXTERNAL read_error, write_outfile, PRMS_open_input_file, find_current_time, error_stop
       INTEGER, EXTERNAL :: control_string, numchars, check_data_values
       ! Local Variables
-        character(len=*), parameter :: MODDESC = 'Read Data File'
-        character(len=*), parameter :: MODNAME = 'read_data_file'
+      character(len=*), parameter :: MODDESC = 'Read Data File'
+      character(len=*), parameter :: MODNAME = 'read_data_file'
       CHARACTER(LEN=MAXFILE_LENGTH) :: data_filename, data_line, dmy
       CHARACTER(LEN=80) :: line
       INTEGER n, ierr, ios, numchrs, length
@@ -199,8 +199,8 @@
 !***********************************************************************
       SUBROUTINE check_data_variables(Varname, Numvalues, Values, Iflag, Iret)
       USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
-      USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nsol, Nobs, Nevap
-      USE PRMS_OBS, ONLY: Nlakeelev, Nwind, Nhumid, Nsnow, &
+      USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow
+      USE PRMS_OBS, ONLY: Nlakeelev, Nwind, Nhumid, &
      &    Tmin, Tmax, Precip, Snowdepth, Runoff, Pan_evap, Wind_speed, Humidity, Solrad, &
      &    Gate_ht, Lake_elev, Rain_day, Runoff_units, Streamflow_cfs, Streamflow_cms
       USE PRMS_CLIMATEVARS, ONLY: Ppt_zero_thresh

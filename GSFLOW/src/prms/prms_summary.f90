@@ -2,15 +2,11 @@
 !     WRITES NHM CSV SUMMARY FILE
 !***********************************************************************
       MODULE PRMS_PRMS_SUMMARY
-        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, RUN, DECL, INIT, CLEAN, ACTIVE, OFF, &
-     &      DOCUMENTATION, ERROR_open_out, ERROR_OPEN_IN, ERROR_READ, MAXDIM
-        USE PRMS_MODULE, ONLY: Model, Process_flag, Nobs, Nsegment, Npoigages, &
-     &      Csv_output_file, Inputerror_flag, Parameter_check_flag, CsvON_OFF
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Output Summary'
         character(len=*), parameter :: MODNAME = 'prms_summary'
-        character(len=*), parameter :: Version_prms_summary = '2021-05-06'
+        character(len=*), parameter :: Version_prms_summary = '2021-09-07'
         INTEGER, PARAMETER :: NVARS = 51
         INTEGER, SAVE :: Iunit
         INTEGER, SAVE, ALLOCATABLE :: Gageid_len(:)
@@ -24,17 +20,20 @@
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Poi_gage_segment(:)
 !        INTEGER, SAVE, ALLOCATABLE :: Parent_poigages(:)
-        CHARACTER(LEN=16), SAVE, ALLOCATABLE :: Poi_gage_id(:)
+!        CHARACTER(LEN=16), SAVE, ALLOCATABLE :: Poi_gage_id(:)
+        INTEGER, SAVE, ALLOCATABLE :: Poi_gage_id(:)
       END MODULE PRMS_PRMS_SUMMARY
 
       SUBROUTINE prms_summary()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, ERROR_open_out, DOCUMENTATION, MAXDIM
+      USE PRMS_MODULE, ONLY: Model, Process_flag, Nobs, Nsegment, Npoigages, &
+     &    Csv_output_file, Inputerror_flag, Parameter_check_flag, CsvON_OFF, Nowyear, Nowmonth, Nowday
       USE PRMS_PRMS_SUMMARY
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Basin_tmax, Basin_tmin, Basin_swrad, Basin_ppt
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_soil_to_gw, &
      &    Basin_lakeevap, Basin_perv_et, Basin_actet, Basin_lake_stor, &
      &    Basin_gwflow_cfs, Basin_sroff_cfs, Basin_ssflow_cfs, Basin_cfs, Basin_stflow_in, &
      &    Basin_stflow_out, Seg_outflow
-      USE PRMS_MODULE, ONLY : Nowyear, Nowmonth, Nowday
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_INTCP, ONLY: Basin_intcp_evap, Basin_intcp_stor
       USE PRMS_SNOW, ONLY: Basin_pweqv, Basin_snowevap, Basin_snowmelt, Basin_snowcov, Basin_pk_precip
@@ -46,12 +45,12 @@
      &    Basin_gwstor_minarea_wb, Basin_dnflow
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: CHAR, INDEX, MAX
-      INTEGER, EXTERNAL :: declparam, getparam !, control_integer
+      INTRINSIC :: MAX !, CHAR, INDEX
+      INTEGER, EXTERNAL :: declparam_int, getparam_int !, control_integer
       EXTERNAL :: read_error, PRMS_open_output_file, print_module, statvar_to_csv, checkdim_bounded_limits, declvar_dble
       INTEGER, EXTERNAL :: getparamstring, control_string
 ! Local Variables
-      INTEGER :: i, ios, foo, idim !, statsON_OFF
+      INTEGER :: i, ios, idim !, foo, statsON_OFF
       DOUBLE PRECISION :: gageflow
       CHARACTER(LEN=10) :: chardate
 !***********************************************************************
@@ -110,18 +109,18 @@
 
         IF ( Npoigages>0 .OR. Model==DOCUMENTATION ) THEN
 !          ALLOCATE ( Parent_poigages(Npoigages) )
-!          IF ( declparam(MODNAME, 'parent_poigages', 'npoigages', 'integer', &
+!          IF ( declparam_int(MODNAME, 'parent_poigages', 'npoigages', &
 !     &         '1', '1', '1000000', &
 !     &         'Lumen index in parent model','Lumen index in parent model',&
 !     &         'none')/=0 ) CALL read_error(1, 'parent_poigages')
           ALLOCATE ( Poi_gage_segment(Npoigages) )
-          IF ( declparam(MODNAME, 'poi_gage_segment', 'npoigages', 'integer', &
+          IF ( declparam_int(MODNAME, 'poi_gage_segment', 'npoigages', &
      &         '0', 'bounded', 'nsegment', &
      &         'Segment index for each POI gage', &
      &         'Segment index for each POI gage', &
      &         'none')/=0 ) CALL read_error(1, 'poi_gage_segment')
           ALLOCATE ( Poi_gage_id(Npoigages) )
-          IF ( declparam(MODNAME, 'poi_gage_id', 'npoigages', 'string', &
+          IF ( declparam_int(MODNAME, 'poi_gage_id', 'npoigages', &
      &         '0', '0', '9999999', &
      &         'POI Gage ID', 'USGS stream gage for each POI gage', &
      &         'none')/=0 ) CALL read_error(1, 'poi_gage_id')
@@ -144,35 +143,51 @@
         Basin_surface_storage = 0.0D0
 
         IF ( Npoigages>0 ) THEN
-!          IF ( getparam(MODNAME, 'parent_poigages', Npoigages, 'integer', Parent_poigages)/=0 ) &
+!          IF ( getparam_int(MODNAME, 'parent_poigages', Npoigages, Parent_poigages)/=0 ) &
 !     &         CALL read_error(2, 'parent_poigages')
-          IF ( getparam(MODNAME, 'poi_gage_segment', Npoigages, 'integer', Poi_gage_segment)/=0 ) &
+          IF ( getparam_int(MODNAME, 'poi_gage_segment', Npoigages, Poi_gage_segment)/=0 ) &
      &         CALL read_error(2, 'poi_gage_segment')
           IF ( Parameter_check_flag>0 ) &
      &      CALL checkdim_bounded_limits('poi_gage_segment', 'nsegment', Poi_gage_segment, Npoigages, 1, Nsegment, Inputerror_flag)
-          DO i = 1, Npoigages
-            Poi_gage_id(i) = '                '
-          ENDDO
+          IF ( getparam_int(MODNAME, 'poi_gage_id', Npoigages, Poi_gage_id)/=0 ) &
+     &         CALL read_error(2, 'poi_gage_id')
+!          DO i = 1, Npoigages
+!            Poi_gage_id(i) = '                '
+!          ENDDO
 
-          DO i = 1, Npoigages
-            foo = getparamstring(MODNAME, 'poi_gage_id', Npoigages, 'string', &
-     &            i-1, Poi_gage_id(i))
-          ENDDO
+!          DO i = 1, Npoigages
+!            foo = getparamstring(MODNAME, 'poi_gage_id', Npoigages, 'string', &
+!     &            i-1, Poi_gage_id(i))
+!          ENDDO
 
           DO i = 1, Npoigages
             IF ( Poi_gage_segment(i)<1 .OR. Poi_gage_segment(i)>Nsegment ) CYCLE
-            Gageid_len(i) = INDEX( Poi_gage_id(i), ' ' ) - 1
-            IF ( Gageid_len(i)<0 ) Gageid_len(i) = INDEX( Poi_gage_id(i), CHAR(0) ) - 1
+            Gageid_len(i) = 1
+            IF ( Poi_gage_id(i)>0 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>9 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>99 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>999 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>9999 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>99999 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>999999 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>9999999 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>99999999 ) Gageid_len(i) = Gageid_len(i) + 1
+!            Gageid_len(i) = INDEX( Poi_gage_id(i), ' ' ) - 1
+!            IF ( Gageid_len(i)<0 ) Gageid_len(i) = INDEX( Poi_gage_id(i), CHAR(0) ) - 1
 !            PRINT *, 'gageid_len ', Gageid_len(i), ' :', Poi_gage_id(i), ':'
-            IF ( Gageid_len(i)<1 ) Gageid_len(i) = 0
+!            IF ( Gageid_len(i)<1 ) Gageid_len(i) = 0
             IF ( Gageid_len(i)>0 ) THEN
-              IF ( Gageid_len(i)>15 ) Gageid_len(i) = 15
+!              IF ( Gageid_len(i)>15 ) Gageid_len(i) = 15
               IF ( CsvON_OFF==ACTIVE ) THEN
-                WRITE (Streamflow_pairs(i), '(A,I0,2A)' ) ',seg_outflow_', Poi_gage_segment(i), '_gage_', &
-     &                                                    Poi_gage_id(i)(:Gageid_len(i))
+!                WRITE (Streamflow_pairs(i), '(A,I0,2A)' ) ',seg_outflow_', Poi_gage_segment(i), '_gage_', &
+!     &                                                    Poi_gage_id(i)(:Gageid_len(i))
+                WRITE (Streamflow_pairs(i), '(A,I0,A,I0)' ) ',seg_outflow_', Poi_gage_segment(i), '_gage_', &
+     &                                                    Poi_gage_id(i)
               ELSE
-                WRITE (Streamflow_pairs(i), '(A,I0,2A)' ) ' seg_outflow_', Poi_gage_segment(i), '_gage_', &
-     &                                                    Poi_gage_id(i)(:Gageid_len(i))
+!                WRITE (Streamflow_pairs(i), '(A,I0,2A)' ) ' seg_outflow_', Poi_gage_segment(i), '_gage_', &
+!     &                                                    Poi_gage_id(i)(:Gageid_len(i))
+                WRITE (Streamflow_pairs(i), '(A,I0,A,I0)' ) ' seg_outflow_', Poi_gage_segment(i), '_gage_', &
+     &                                                    Poi_gage_id(i)
               ENDIF
               IF ( Poi_gage_segment(i)>9 ) Gageid_len(i) = Gageid_len(i) + 1
               IF ( Poi_gage_segment(i)>99 ) Gageid_len(i) = Gageid_len(i) + 1
@@ -245,6 +260,7 @@
 !     statvar_to_csv - write a CSV file based on the statvar file
 !***********************************************************************
       SUBROUTINE statvar_to_csv()
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_open_in, ERROR_open_out, ERROR_read
       USE PRMS_PRMS_SUMMARY
       IMPLICIT NONE
 ! Functions

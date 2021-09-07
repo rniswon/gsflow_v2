@@ -13,14 +13,11 @@
 !      adjust total precip
 !***********************************************************************
       MODULE PRMS_PRECIP_DIST2
-        USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, MONTHS_PER_YEAR, ACTIVE, OFF, &
-     &      NEARZERO, DNEARZERO, ERROR_dim, ERROR_data, CELSIUS, INCH2MM
-        USE PRMS_MODULE, ONLY: Model, Nhru, Nrain
         IMPLICIT NONE
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=*), parameter :: MODNAME = 'precip_dist2'
-        character(len=*), parameter :: Version_precip = '2020-12-02'
+        character(len=*), parameter :: Version_precip = '2021-09-07'
         INTEGER, SAVE, ALLOCATABLE :: N_psta(:), Nuse_psta(:, :)
         DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dist2(:, :)
 !   Declared Parameters
@@ -64,10 +61,12 @@
 !     hru_ylat, hru_xlong, max_psta, dist_max, maxday_prec
 !***********************************************************************
       INTEGER FUNCTION pptdist2decl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, MONTHS_PER_YEAR, ERROR_dim
+      USE PRMS_MODULE, ONLY: Model, Nhru, Nrain
       USE PRMS_PRECIP_DIST2
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam
+      INTEGER, EXTERNAL :: declparam_int, declparam_real
       EXTERNAL :: read_error, print_module, error_stop
 !***********************************************************************
       pptdist2decl = 0
@@ -80,26 +79,26 @@
       ALLOCATE ( N_psta(Nhru), Dist2(Nhru, Nrain) )
 
 ! declare parameters
-      IF ( declparam(MODNAME, 'dist_max', 'one', 'real', &
+      IF ( declparam_real(MODNAME, 'dist_max', 'one', &
      &     '1.0E9', '0.0', '1.0E9', &
      &     'Maximum distance from HRU to include a climate station', &
      &     'Maximum distance from an HRU to a measurement station for use in calcuations', &
      &     'feet')/=0 ) CALL read_error(1, 'dist_max')
 
-      IF ( declparam(MODNAME, 'max_psta', 'one', 'integer', &
+      IF ( declparam_int(MODNAME, 'max_psta', 'one', &
      &     '0', 'bounded', 'nrain', &
      &     'Maximum number of precipitation stations to distribute to an HRU', &
      &     'Maximum number of precipitation measurement stations to distribute to an HRU', &
      &     'none')/=0 ) CALL read_error(1, 'max_psta')
 
-      IF ( declparam(MODNAME, 'maxday_prec', 'one', 'real', &
+      IF ( declparam_real(MODNAME, 'maxday_prec', 'one', &
      &     '15.0', '0.0', '20.0', &
      &     'Maximum daily precipitation for any weather site', &
      &     'Maximum measured precipitation value above which precipitation is assumed to be in error', &
      &     'precip_units')/=0 ) CALL read_error(1, 'maxday_prec')
 
 !      ALLOCATE ( Maxmon_prec(MONTHS_PER_YEAR) )
-!      IF ( decl param(MODNAME, 'maxmon_prec', 'nmonths', 'real', &
+!      IF ( declparam_real(MODNAME, 'maxmon_prec', 'nmonths', &
 !     &     '5.0', '0.0', '15.0', &
 !     &     'Maximum monthly precipitation for any weather site', &
 !     &     'If measured monthly (January to December) precipitation'// &
@@ -108,7 +107,7 @@
 !     &     'precip_units')/=0 ) CALL read_error(1, 'maxmon_prec')
 
       ALLOCATE ( Rain_mon(Nhru, MONTHS_PER_YEAR) )
-      IF ( declparam(MODNAME, 'rain_mon', 'nhru,nmonths', 'real', &
+      IF ( declparam_real(MODNAME, 'rain_mon', 'nhru,nmonths', &
      &     '1.0', '0.0', '50.0', &
      &     'Rain adjustment factor, by month for each HRU', &
      &     'Monthly (January to December) factor to rain on each HRU'// &
@@ -117,7 +116,7 @@
      &     'precip_units')/=0 ) CALL read_error(1, 'rain_mon')
 
       ALLOCATE ( Snow_mon(Nhru, MONTHS_PER_YEAR) )
-      IF ( declparam(MODNAME, 'snow_mon', 'nhru,nmonths', 'real', &
+      IF ( declparam_real(MODNAME, 'snow_mon', 'nhru,nmonths', &
      &     '1.0', '0.0', '50.0', &
      &     'Rain adjustment factor, by month for each HRU', &
      &     'Monthly (January to December) factor to snow on each HRU'// &
@@ -126,7 +125,7 @@
      &     'precip_units')/=0 ) CALL read_error(1, 'snow_mon')
 
       ALLOCATE ( Psta_mon(Nrain, MONTHS_PER_YEAR) )
-      IF ( declparam(MODNAME, 'psta_mon', 'nrain,nmonths', 'real', &
+      IF ( declparam_real(MODNAME, 'psta_mon', 'nrain,nmonths', &
      &     '1.0', '0.0000001', '50.0', &
      &     'Monthly precipitation for each of the nrain precipitation measurement stations', &
      &     'Monthly (January to December) factor to precipitation'// &
@@ -135,28 +134,28 @@
      &     'precip_units')/=0 ) CALL read_error(1, 'psta_mon')
 
       ALLOCATE ( Psta_xlong(Nrain) )
-      IF ( declparam(MODNAME, 'psta_xlong', 'nrain', 'real', &
+      IF ( declparam_real(MODNAME, 'psta_xlong', 'nrain', &
      &     '0.0', '-1.0E9', '1.0E9', &
      &     'Precipitation station longitude, State Plane', &
      &     'Longitude of each precipitation measurement station, State Plane Coordinate System', &
      &     'feet')/=0 ) CALL read_error(1, 'psta_xlong')
 
       ALLOCATE ( Psta_ylat(Nrain) )
-      IF ( declparam(MODNAME, 'psta_ylat', 'nrain', 'real', &
+      IF ( declparam_real(MODNAME, 'psta_ylat', 'nrain', &
      &     '0.0', '-1.0E9', '1.0E9', &
      &     'Precipitation station latitude, State Plane', &
      &     'Latitude of each precipitation measurement station, State Plane Coordinate System', &
      &     'feet')/=0 ) CALL read_error(1, 'psta_ylat')
 
       ALLOCATE ( Hru_ylat(Nhru) )
-      IF ( declparam(MODNAME, 'hru_ylat', 'nhru', 'real', &
+      IF ( declparam_real(MODNAME, 'hru_ylat', 'nhru', &
      &     '0.0', '-1.0E9', '1.0E9', &
      &     'HRU latitude of centroid, State Plane', &
      &     'Latitude of each HRU for the centroid, State Plane Coordinate System', &
      &     'feet')/=0 ) CALL read_error(1, 'hru_ylat')
 
       ALLOCATE ( Hru_xlong(Nhru) )
-      IF ( declparam(MODNAME, 'hru_xlong', 'nhru', 'real', &
+      IF ( declparam_real(MODNAME, 'hru_xlong', 'nhru', &
      &     '0.0', '-1.0E9', '1.0E9', &
      &     'HRU longitude of centroid, State Plane', &
      &     'Longitude of each HRU for the centroid, State Plane Coordinate System', &
@@ -168,11 +167,13 @@
 !     pptdist2init - Initialize precipitation module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION pptdist2init()
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DNEARZERO
+      USE PRMS_MODULE, ONLY: Nhru, Nrain
       USE PRMS_PRECIP_DIST2
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getparam
+      INTEGER, EXTERNAL :: getparam_int, getparam_real
       EXTERNAL :: read_error
       INTRINSIC :: DSQRT, DABS, DBLE
 ! Local Variables
@@ -183,38 +184,38 @@
       pptdist2init = 0
 
 ! NEW PARAMETERS
-      IF ( getparam(MODNAME, 'maxday_prec', 1, 'real', Maxday_prec) &
+      IF ( getparam_real(MODNAME, 'maxday_prec', 1, Maxday_prec) &
      &     /=0 ) CALL read_error(2, 'maxday_prec')
 
-      IF ( getparam(MODNAME, 'dist_max', 1, 'real', Dist_max) &
+      IF ( getparam_real(MODNAME, 'dist_max', 1, Dist_max) &
      &     /=0 ) CALL read_error(2, 'dist_max')
 
-      IF ( getparam(MODNAME, 'max_psta', 1, 'real', Max_psta) &
+      IF ( getparam_int(MODNAME, 'max_psta', 1, Max_psta) &
      &     /=0 ) CALL read_error(2, 'max_psta')
       IF ( Max_psta==0 ) Max_psta = Nrain
 
-!      IF ( get param(MODNAME, 'maxmon_prec', MONTHS_PER_YEAR, 'real', Maxmon_prec) &
+!      IF ( getparam_real(MODNAME, 'maxmon_prec', MONTHS_PER_YEAR, Maxmon_prec) &
 !           /=0 ) CALL read_error(2, 'maxmon_prec')
 
-      IF ( getparam(MODNAME, 'rain_mon', Nhru*MONTHS_PER_YEAR, 'real', Rain_mon) &
+      IF ( getparam_real(MODNAME, 'rain_mon', Nhru*MONTHS_PER_YEAR, Rain_mon) &
      &     /=0 ) CALL read_error(2, 'rain_mon')
 
-      IF ( getparam(MODNAME, 'snow_mon', Nhru*MONTHS_PER_YEAR, 'real', Snow_mon) &
+      IF ( getparam_real(MODNAME, 'snow_mon', Nhru*MONTHS_PER_YEAR, Snow_mon) &
      &     /=0 ) CALL read_error(2, 'snow_mon')
 
-      IF ( getparam(MODNAME, 'psta_mon', Nrain*MONTHS_PER_YEAR, 'real', Psta_mon) &
+      IF ( getparam_real(MODNAME, 'psta_mon', Nrain*MONTHS_PER_YEAR, Psta_mon) &
      &     /=0 ) CALL read_error(2, 'psta_mon')
 
-      IF ( getparam(MODNAME, 'psta_xlong', Nrain, 'real', Psta_xlong) &
+      IF ( getparam_real(MODNAME, 'psta_xlong', Nrain, Psta_xlong) &
      &     /=0 ) CALL read_error(2, 'psta_xlong')
 
-      IF ( getparam(MODNAME, 'psta_ylat', Nrain, 'real', Psta_ylat) &
+      IF ( getparam_real(MODNAME, 'psta_ylat', Nrain, Psta_ylat) &
      &     /=0 ) CALL read_error(2, 'psta_ylat')
 
-      IF ( getparam(MODNAME, 'hru_xlong', Nhru, 'real', Hru_xlong) &
+      IF ( getparam_real(MODNAME, 'hru_xlong', Nhru, Hru_xlong) &
      &     /=0 ) CALL read_error(2, 'hru_xlong')
 
-      IF ( getparam(MODNAME, 'hru_ylat', Nhru, 'real', Hru_ylat) &
+      IF ( getparam_real(MODNAME, 'hru_ylat', Nhru, Hru_ylat) &
      &     /=0 ) CALL read_error(2, 'hru_ylat')
 ! END NEW
 
@@ -270,13 +271,14 @@
 !                   depth for each HRU, and basin weighted avg. precip
 !***********************************************************************
       INTEGER FUNCTION pptdist2run()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, ERROR_data, CELSIUS, INCH2MM
+      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_PRECIP_DIST2
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Prmx, Basin_ppt, &
      &    Basin_rain, Basin_snow, Hru_ppt, Hru_rain, Hru_snow, &
      &    Basin_obs_ppt, Tmaxf, Tminf, Tmax_allsnow_f, Tmax_allrain_f, &
      &    Adjmix_rain, Precip_units
-      USE PRMS_SET_TIME, ONLY: Nowmonth
       USE PRMS_OBS, ONLY: Precip
       IMPLICIT NONE
 ! Functions
