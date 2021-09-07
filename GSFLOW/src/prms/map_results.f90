@@ -3,16 +3,11 @@
 !     spatial resolution
 !***********************************************************************
       MODULE PRMS_MAP_RESULTS
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, REAL_TYPE, DBLE_TYPE, &
-     &    DOCUMENTATION, ERROR_dim, DEBUG_less
-      USE PRMS_MODULE, ONLY: Model, Nhru, Nhrucell, Ngwcell, MapOutON_OFF, &
-     &    Print_debug, Inputerror_flag, Start_year, Start_month, Start_day, Parameter_check_flag, &
-     &    Prms_warmup, End_year, End_month, End_day
       IMPLICIT NONE
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'map_results'
-      character(len=*), parameter :: Version_map_results = '2020-12-02'
+      character(len=*), parameter :: Version_map_results = '2021-09-07'
       INTEGER, SAVE :: Mapflg, Numvalues, Lastyear, Totdays
       INTEGER, SAVE :: Yrdays, Yrresults, Totresults, Monresults, Mondays
       INTEGER, SAVE :: Begin_results, Begyr, Dailyresults
@@ -67,10 +62,12 @@
 !     map_resultsdecl - declare parameters and variables
 !***********************************************************************
       INTEGER FUNCTION map_resultsdecl()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, ERROR_dim
+      USE PRMS_MODULE, ONLY: Model, Nhru, Nhrucell, Ngwcell, MapOutON_OFF
       USE PRMS_MAP_RESULTS
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, control_string_array, control_integer
+      INTEGER, EXTERNAL :: declparam_int, declparam_real, control_string_array, control_integer
       EXTERNAL :: read_error, print_module, error_stop
 ! Local Variables
       INTEGER :: i
@@ -117,41 +114,41 @@
       ENDIF
 
 ! Declared Parameters
-      IF ( declparam(MODNAME, 'mapvars_freq', 'one', 'integer', &
+      IF ( declparam_int(MODNAME, 'mapvars_freq', 'one', &
      &     '0', '0', '7', &
      &     'Mapped results frequency', &
      &     'Flag to specify the output frequency (0=none; 1=monthly; 2=yearly; 3=total; 4=monthly and yearly;'// &
      &     ' 5=monthly, yearly, and total; 6=weekly; 7=daily)', &
      &     'none')/=0 ) CALL read_error(1, 'mapvars_freq')
 
-      IF ( declparam(MODNAME, 'mapvars_units', 'one', 'integer', &
+      IF ( declparam_int(MODNAME, 'mapvars_units', 'one', &
      &     '0', '0', '3', &
      &     'Flag to specify the output units of mapped results', &
      &     'Flag to specify the output units of mapped results (0=units of the variable;'// &
      &     ' 1=inches to feet; 2=inches to centimeters; 3=inches to meters; as states or fluxes)', &
      &     'none')/=0 ) CALL read_error(1, 'mapvars_units')
 
-      IF ( declparam(MODNAME, 'ncol', 'one', 'integer', &
+      IF ( declparam_int(MODNAME, 'ncol', 'one', &
      &     '1', '1', '50000', &
      &     'Number of columns for each row of the mapped results', &
      &     'Number of columns for each row of the mapped results', &
      &     'none')/=0 ) CALL read_error(1, 'ncol')
 
       IF ( Mapflg==OFF .OR. Model==DOCUMENTATION ) THEN
-        IF ( declparam(MODNAME, 'gvr_cell_id', 'nhrucell', 'integer', &
+        IF ( declparam_int(MODNAME, 'gvr_cell_id', 'nhrucell', &
      &       '0', 'bounded', 'ngwcell', &
      &       'Corresponding grid cell id associated with each GVR', &
      &       'Index of the grid cell associated with each gravity reservoir', &
      &       'none')/=0 ) CALL read_error(1, 'gvr_cell_id')
         IF ( Nhrucell/=Ngwcell .OR. Model==DOCUMENTATION ) THEN
-          IF ( declparam(MODNAME, 'gvr_cell_pct', 'nhrucell', 'real', &
+          IF ( declparam_real(MODNAME, 'gvr_cell_pct', 'nhrucell', &
      &         '0.0', '0.0', '1.0', &
      &         'Proportion of the grid cell associated with each GVR', &
      &         'Proportion of the grid cell area associated with each gravity reservoir', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'gvr_cell_pct')
         ENDIF
         IF ( Nhru/=Nhrucell .OR. Model==DOCUMENTATION ) THEN
-          IF ( declparam(MODNAME, 'gvr_hru_id', 'nhrucell', 'integer', &
+          IF ( declparam_int(MODNAME, 'gvr_hru_id', 'nhrucell', &
      &         '0', 'bounded', 'nhru', &
      &         'Corresponding HRU id of each GVR', &
      &         'Index of the HRU associated with each gravity reservoir', &
@@ -165,11 +162,14 @@
 !     map_resultsinit - Initialize map_results module
 !***********************************************************************
       INTEGER FUNCTION map_resultsinit()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, REAL_TYPE, DBLE_TYPE, DEBUG_less
+      USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Ngwcell, MapOutON_OFF, &
+     &    Print_debug, Inputerror_flag, Start_year, Start_month, Start_day, Parameter_check_flag, Prms_warmup
       USE PRMS_MAP_RESULTS
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getparam, getvartype, numchars, getvarsize
+      INTEGER, EXTERNAL :: getparam_int, getparam_real, getvartype, numchars, getvarsize
       EXTERNAL :: read_error, PRMS_open_output_file, checkdim_bounded_limits
 ! Local Variables
       INTEGER :: i, jj, is, ios, ierr, size
@@ -182,15 +182,15 @@
       Begyr = Start_year + Prms_warmup
       Lastyear = Begyr
 
-      IF ( getparam(MODNAME, 'mapvars_freq', 1, 'integer', Mapvars_freq)/=0 ) CALL read_error(1, 'mapvars_freq')
+      IF ( getparam_int(MODNAME, 'mapvars_freq', 1, Mapvars_freq)/=0 ) CALL read_error(1, 'mapvars_freq')
       IF ( Mapvars_freq==0 ) THEN
         PRINT *, 'WARNING, map_results requested with mapvars_freq equal 0'
         PRINT *, 'no map_resultsults output is produced'
         MapOutON_OFF = OFF
         RETURN
       ENDIF
-      IF ( getparam(MODNAME, 'ncol', 1, 'integer', Ncol)/=0 ) CALL read_error(2, 'ncol')
-      IF ( getparam(MODNAME, 'mapvars_units', 1, 'integer', Mapvars_units)/=0 ) CALL read_error(2, 'Mapvars_units')
+      IF ( getparam_int(MODNAME, 'ncol', 1, Ncol)/=0 ) CALL read_error(2, 'ncol')
+      IF ( getparam_int(MODNAME, 'mapvars_units', 1, Mapvars_units)/=0 ) CALL read_error(2, 'Mapvars_units')
 
       WRITE ( Mapfmt, 9001 ) Ncol
 
@@ -300,9 +300,9 @@
       IF ( ierr==1 ) Inputerror_flag = 1
 
       IF ( Mapflg==OFF ) THEN
-        IF ( getparam(MODNAME, 'gvr_cell_id', Nhrucell, 'integer', Gvr_map_id)/=0 ) CALL read_error(2, 'gvr_cell_id')
+        IF ( getparam_int(MODNAME, 'gvr_cell_id', Nhrucell, Gvr_map_id)/=0 ) CALL read_error(2, 'gvr_cell_id')
         IF ( Nhru/=Nhrucell ) THEN
-          IF ( getparam(MODNAME, 'gvr_hru_id', Nhrucell, 'integer', Gvr_hru_id)/=0 ) CALL read_error(2, 'gvr_hru_id')
+          IF ( getparam_int(MODNAME, 'gvr_hru_id', Nhrucell, Gvr_hru_id)/=0 ) CALL read_error(2, 'gvr_hru_id')
           IF ( Parameter_check_flag>0 ) &
      &         CALL checkdim_bounded_limits('gvr_hru_id', 'nhru', Gvr_hru_id, Nhrucell, 1, Nhru, Inputerror_flag)
         ELSE
@@ -311,7 +311,7 @@
           ENDDO
         ENDIF
         IF ( Nhrucell/=Ngwcell ) THEN
-          IF ( getparam(MODNAME, 'gvr_cell_pct', Nhrucell, 'real', Gvr_map_frac)/=0 ) CALL read_error(2, 'gvr_cell_pct')
+          IF ( getparam_real(MODNAME, 'gvr_cell_pct', Nhrucell, Gvr_map_frac)/=0 ) CALL read_error(2, 'gvr_cell_pct')
         ELSE
           Gvr_map_frac = 1.0
         ENDIF
@@ -365,7 +365,9 @@
 !                      mapped to a specified spatial resolution
 !***********************************************************************
       INTEGER FUNCTION map_resultsrun()
-      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, REAL_TYPE, DBLE_TYPE
+      USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Start_month, Start_day, &
+     &    End_year, End_month, End_day, Nowyear, Nowmonth, Nowday
       USE PRMS_MAP_RESULTS
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, Basin_area_inv
       USE PRMS_SET_TIME, ONLY: Modays
@@ -617,6 +619,7 @@
 !     map_resultsclean - close files
 !***********************************************************************
       INTEGER FUNCTION map_resultsclean()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE
       USE PRMS_MAP_RESULTS
       IMPLICIT NONE
       INTEGER :: jj

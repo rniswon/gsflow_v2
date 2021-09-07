@@ -11,15 +11,11 @@
 !***********************************************************************
 
       MODULE PRMS_SUBBASIN
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, DOCUMENTATION, &
-     &    DNEARZERO, ERROR_dim, CASCADE_OFF
-      USE PRMS_MODULE, ONLY: Model, Nsub, Nhru, Print_debug, GSFLOW_flag, &
-     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'subbasin'
-      character(len=*), parameter :: Version_subbasin = '2021-05-06'
+      character(len=*), parameter :: Version_subbasin = '2021-09-07'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Qsub(:), Sub_area(:), Laststor(:)
       INTEGER, SAVE, ALLOCATABLE :: Tree(:, :)
 !   Declared Variables
@@ -66,10 +62,12 @@
 !     hru_area, subbasin_down, hru_subbasin
 !***********************************************************************
       INTEGER FUNCTION subdecl()
+      USE PRMS_CONSTANTS, ONLY: OFF, DOCUMENTATION, ERROR_dim
+      USE PRMS_MODULE, ONLY: Model, Nsub, Nhru, GSFLOW_flag
       USE PRMS_SUBBASIN
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam
+      INTEGER, EXTERNAL :: declparam_int
       EXTERNAL :: read_error, print_module, error_stop, declvar_dble
 !***********************************************************************
       subdecl = 0
@@ -219,14 +217,14 @@
      &     'cms', Sub_cms)
 
       ALLOCATE ( Subbasin_down(Nsub) )
-      IF ( declparam(MODNAME, 'subbasin_down', 'nsub', 'integer', &
+      IF ( declparam_int(MODNAME, 'subbasin_down', 'nsub', &
      &     '0', 'bounded', 'nsub', &
      &     'Downstream subbasin for each subbasin', &
      &     'Index number for the downstream subbasin whose inflow is outflow from this subbasin', &
      &     'none')/=0 ) CALL read_error(1, 'subbasin_down')
 
       ALLOCATE ( Hru_subbasin(Nhru) )
-      IF ( declparam(MODNAME, 'hru_subbasin', 'nhru', 'integer', &
+      IF ( declparam_int(MODNAME, 'hru_subbasin', 'nhru', &
      &     '0', 'bounded', 'nsub', &
      &     'Index of subbasin assigned to each HRU', &
      &     'Index of subbasin assigned to each HRU', &
@@ -242,6 +240,9 @@
 !               compute initial values
 !***********************************************************************
       INTEGER FUNCTION subinit()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, DNEARZERO
+      USE PRMS_MODULE, ONLY: Nsub, Nhru, Print_debug, GSFLOW_flag, &
+     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag
       USE PRMS_SUBBASIN
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
      &    Hru_type, Hru_frac_perv, Lake_hru_id
@@ -255,7 +256,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getparam
+      INTEGER, EXTERNAL :: getparam_int
       EXTERNAL :: read_error, PRMS_open_module_file
 ! Local Variables
       INTEGER :: i, j, k, kk, TREEUNIT
@@ -263,8 +264,8 @@
 !***********************************************************************
       subinit = 0
 
-      IF ( getparam(MODNAME, 'hru_subbasin', Nhru, 'integer', Hru_subbasin)/=0 ) CALL read_error(2, 'hru_subbasin')
-      IF ( getparam(MODNAME, 'subbasin_down', Nsub, 'integer', Subbasin_down)/=0 ) CALL read_error(2, 'subbasin_down')
+      IF ( getparam_int(MODNAME, 'hru_subbasin', Nhru, Hru_subbasin)/=0 ) CALL read_error(2, 'hru_subbasin')
+      IF ( getparam_int(MODNAME, 'subbasin_down', Nsub, Subbasin_down)/=0 ) CALL read_error(2, 'subbasin_down')
 
 ! Determine the tree structure for the internal nodes
       Tree = 0
@@ -437,6 +438,8 @@
 !                  storage and outflows
 !***********************************************************************
       INTEGER FUNCTION subrun()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, CASCADE_OFF
+      USE PRMS_MODULE, ONLY: Nsub, GSFLOW_flag, Dprst_flag, Lake_route_flag, Cascade_flag
       USE PRMS_SUBBASIN
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
      &    Hru_type, Hru_frac_perv, Lake_hru_id

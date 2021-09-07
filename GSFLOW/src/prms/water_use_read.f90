@@ -3,20 +3,12 @@
 ! from files pre-processed Data Files available for other PRMS modules
 !***********************************************************************
       MODULE PRMS_WATER_USE
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, MAXFILE_LENGTH, ACTIVE, OFF, &
-     &    RUN, DECL, INIT, CLEAN, ERROR_water_use, strmflow_noroute_module, &
-     &    strmflow_muskingum_lake_module
-      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nsegment, Nwateruse, Nexternal, Nconsumed, &
-     &    Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
-     &    External_transferON_OFF, Dprst_transferON_OFF, Dprst_flag, Strmflow_flag, &
-     &    Model, Inputerror_flag, Start_year, Start_month, Start_day, Soilzone_add_water_use, &
-     &    End_year, End_month, End_day, Dprst_transfer_water_use, Dprst_add_water_use, &
-     &    Gwr_transfer_water_use, Gwr_add_water_use, Lake_transfer_water_use, Lake_add_water_use
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       IMPLICIT NONE
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'water_use_read'
-      character(len=*), parameter :: Version_water_use_read = '2021-05-10'
+      character(len=*), parameter :: Version_water_use_read = '2021-09-07'
 
       ! transfer type
       integer, parameter :: STREAM = 1
@@ -52,12 +44,17 @@
       INTEGER, SAVE :: Consumed_transfers_on, Lake_transfers_on, Segment_transfers_on
       INTEGER, SAVE :: External_transfers_on, Dprst_transfers_on, Gwr_transfers_on
       INTEGER, ALLOCATABLE, SAVE :: Source_id(:), Destination_id(:), Source_type(:), Destination_type(:)
-! Control Parameters
-      CHARACTER(LEN=MAXFILE_LENGTH) :: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file
-      CHARACTER(LEN=MAXFILE_LENGTH) :: External_transfer_file, Lake_transfer_file
       END MODULE PRMS_WATER_USE
 
       INTEGER FUNCTION water_use_read()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, &
+     &    RUN, DECL, INIT, CLEAN, ERROR_water_use, strmflow_noroute_module, strmflow_muskingum_lake_module
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nsegment, Nwateruse, Nexternal, Nconsumed, &
+     &    Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
+     &    External_transferON_OFF, Dprst_transferON_OFF, Dprst_flag, Strmflow_flag, &
+     &    Model, Inputerror_flag, Start_year, Start_month, Start_day, Soilzone_add_water_use, &
+     &    End_year, End_month, End_day, Dprst_transfer_water_use, Dprst_add_water_use, &
+     &    Gwr_transfer_water_use, Gwr_add_water_use, Lake_transfer_water_use, Lake_add_water_use
       USE PRMS_WATER_USE
       IMPLICIT NONE
 ! Functions
@@ -65,6 +62,9 @@
       INTEGER, EXTERNAL :: control_string, decldim, getdim
       EXTERNAL :: declvar_real, declvar_dble
       EXTERNAL :: read_error, find_header_end, find_current_file_time, read_event, print_module, PRMS_open_module_file, error_stop
+! Control Parameters
+      CHARACTER(LEN=MAXFILE_LENGTH) :: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file
+      CHARACTER(LEN=MAXFILE_LENGTH) :: External_transfer_file, Lake_transfer_file
 ! Local Variables
       INTEGER, SAVE :: external_unit, external_next_year, external_next_month, external_next_day
       INTEGER, SAVE :: segment_unit, dprst_unit, gwr_unit, lake_unit
@@ -632,8 +632,7 @@
      &    Consumed_transfers_on, External_transfers_on, Gwr_transfers_on, &
      &    STREAM, GROUNDWATER, DPRST, EXTRNAL, LAKE, CAPILLARY, CONSUMPTIVE, CANOPY
       USE PRMS_MODULE, ONLY: Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
-     &    Dprst_transferON_OFF, External_transferON_OFF, Strmflow_flag, Nexternal, Dprst_flag
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+     &    Dprst_transferON_OFF, External_transferON_OFF, Strmflow_flag, Nexternal, Dprst_flag, Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
 ! Functions
       EXTERNAL :: error_stop
@@ -731,6 +730,7 @@
 ! reset transfers when new event is found
 ! ****************************
       SUBROUTINE set_transfers(Src_type, Src_id, Dest_type, Dest_id, Diversion)
+      USE PRMS_CONSTANTS, ONLY: ERROR_water_use
       USE PRMS_WATER_USE
       IMPLICIT NONE
 ! Arguments
@@ -815,8 +815,7 @@
 
       SUBROUTINE nwateruse_error(ctype)
       USE PRMS_CONSTANTS, ONLY: ERROR_water_use
-      USE PRMS_MODULE, ONLY: Nwateruse
-      USE PRMS_SET_TIME, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nwateruse, Nowyear, Nowmonth, Nowday
       IMPLICIT NONE
       ! Argument
       CHARACTER(LEN=*), INTENT(IN) :: ctype
