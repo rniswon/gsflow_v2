@@ -8,7 +8,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=9), parameter :: MODNAME = 'potet_pan'
-        character(len=*), parameter :: Version_potet = '2021-08-13'
+        character(len=*), parameter :: Version_potet = '2021-09-07'
         REAL, SAVE, ALLOCATABLE :: Last_pan_evap(:)
       END MODULE PRMS_POTET_PAN
 
@@ -22,7 +22,6 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: declparam, getparam
       EXTERNAL :: read_error, print_module, potet_pan_restart, print_date, error_stop
 ! Local Variables
       INTEGER :: i, j, k

@@ -232,7 +232,7 @@ soilzone.o: soilzone.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_s
 routing.o: routing.f90 prms_module.mod prms_basin.mod prms_gwflow.mod prms_flowvars.mod prms_set_time.mod prms_srunoff.mod prms_climatevars.mod prms_water_use.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) routing.f90
 
-prms_time.o: prms_time.f90 prms_basin.mod prms_constants.mod
+prms_time.o: prms_time.f90 prms_module.mod prms_basin.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) prms_time.f90
 
 water_balance.o: water_balance.f90 prms_module.mod prms_basin.mod prms_srunoff.mod prms_flowvars.mod prms_gwflow.mod prms_climatevars.mod prms_set_time.mod prms_cascade.mod prms_intcp.mod prms_snow.mod prms_soilzone.mod prms_constants.mod

@@ -8,7 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-08-30'
+      character(len=*), parameter :: Version_intcp = '2021-09-07'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -104,18 +104,15 @@
         IF ( declvar(MODNAME, 'net_apply', 'nhru', Nhru, 'real', &
      &       'canopy_gain minus interception', &
      &       'inches', Net_apply)/=0 ) CALL read_error(3, 'net_apply')
-
-!       Application method (0 = sprinkler method with interception only;
-!       1=ditch/drip method with no interception; 2=ignore; 3=sprinkler across whole HRU with interception
-!       and throughfall; 4=sprinkler method with amount of water applied on the basis of cover density,
-!       such as a living filter), for options 1, 2, and 3 irrigation water is specified as an
-!       HRU-area weighted average value
         ALLOCATE ( Irr_type(Nhru) )
         IF ( declparam(MODNAME, 'irr_type', 'nhru', 'integer', &
      &       '0', '0', '2', &
      &       'Application method of irrigation water', &
-     &       'Application method of irrigation water for each HRU (0 = sprinkler;'// &
-     &       ' 1=ditch/drip; 2=ignore; 3=sprinkler across HRU; 4=living filter', & 
+     &       'Application method of irrigation water for each HRU (0 = sprinkler method with interception only;'// &
+     &       ' 1=ditch/drip method with no interception; 2=ignore; 3=sprinkler across whole HRU with interception'// &
+     &       ' and throughfall; 4=sprinkler method with amount of water applied on the basis of cover density,'// &
+     &       ' such as a living filter), for options 1, 2, and 3 irrigation water is specified as an'// &
+     &       ' HRU-area weighted average value', &
      &       'none')/=0 ) CALL read_error(1, 'irr_type')
       ENDIF
 
@@ -297,7 +294,7 @@
       USE PRMS_OBS, ONLY: Pan_evap
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: intercept
+      EXTERNAL :: intercept, error_stop
       INTRINSIC :: DBLE, SNGL
 ! Local Variables
       INTEGER :: i, j, iskip, irrigation_type
@@ -489,10 +486,10 @@
                   IF ( irrigation_type==1 .OR. ( irrigation_type==4.AND.cov<NEARZERO) ) THEN
                     Net_apply(i) = Gain_inches(i)
                   ELSEIF ( irrigation_type==0 ) THEN
-                  CALL intercept(Gain_inches(i), stor_max_rain, cov, intcpstor, Net_apply(i))
+                    CALL intercept(Gain_inches(i), stor_max_rain, cov, intcpstor, Net_apply(i))
                     Gain_inches(i) = Gain_inches(i)/cov ! convert back to gain over the HRU
                   ELSE !IF ( irrigation_type==4 .OR. irrigation_type==3 ) THEN
-                  CALL intercept(Gain_inches(i), stor_max_rain, 1.0, intcpstor, Net_apply(i))
+                    CALL intercept(Gain_inches(i), stor_max_rain, 1.0, intcpstor, Net_apply(i))
                     Gain_inches(i) = Gain_inches(i)*cov
                     Net_apply(i) = Net_apply(i)*cov
                   ENDIF
@@ -500,9 +497,9 @@
                 IF ( cov>0.0 ) Gain_inches_hru(i) = Gain_inches_hru(i)/cov
                   Basin_hru_apply = Basin_hru_apply + DBLE( Gain_inches(i)*harea )
                   Basin_net_apply = Basin_net_apply + DBLE( Net_apply(i)*harea )
-              ELSE ! irr_type = 4 and cover density = 0
-                PRINT *, 'WARNING, ignoring water-use transfer > 0 with cover density = 0.0'
-                PRINT *, '         irr_type =', irrigation_type, ', HRU:', i, ', transfer:', Canopy_gain(i)
+                ELSE ! irr_type = 4 and cover density = 0
+                  PRINT *, 'WARNING, ignoring water-use transfer > 0 with cover density = 0.0'
+                  PRINT *, '         irr_type =', irrigation_type, ', HRU:', i, ', transfer:', Canopy_gain(i)
                   Canopy_gain(i) = 0.0
                 ENDIF
               ENDIF

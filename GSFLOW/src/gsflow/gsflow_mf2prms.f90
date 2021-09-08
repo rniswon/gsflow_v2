@@ -16,7 +16,6 @@
      &                       NUMIRRDIVERSIONSP, IRRSEG, DVRCH, DIVERSIONIRRPRMS, IRRROW_GW
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: SNGL
       EXTERNAL :: print_module
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW to PRMS'

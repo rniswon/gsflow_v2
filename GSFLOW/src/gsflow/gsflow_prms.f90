@@ -20,10 +20,10 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.2.1 08/26/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-08-26'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.1 08/26/2021'
-      CHARACTER(LEN=8), SAVE :: Process
+      character(len=*), parameter :: GSFLOW_versn = '2.2.1 09/07/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-09-07'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.1 09/07/2021'
+      CHARACTER(len=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus, NLAKES_MF, Nreach
@@ -167,7 +167,7 @@
 
         IF ( GSFLOW_flag==ACTIVE ) THEN
           ierr = gsflow_modflow()
-          IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
+          IF ( ierr/=0 ) CALL module_error('gsflow_modflow', Arg, ierr)
         ENDIF
 
         IF ( Print_debug>DEBUG_minimum ) THEN
@@ -238,8 +238,9 @@
               CALL error_stop('gvr_cell_id must be specified', ERROR_param)
             ENDIF
           ENDIF
+
           ierr = gsflow_modflow()
-          IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
+          IF ( ierr/=0 ) CALL module_error('gsflow_modflow', Arg, ierr)
           IF ( Have_lakes==ACTIVE .AND. Nlake/=NLAKES_MF ) THEN
             PRINT *, 'ERROR, NLAKES not equal to Nlake'
             PRINT *, '       NLAKES=', NLAKES_MF, '; Nlake=', Nlake
@@ -299,7 +300,7 @@
           ENDIF
           IF ( GSFLOW_flag==ACTIVE ) THEN
             ierr = gsflow_modflow()
-            IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
+            IF ( ierr/=0 ) CALL module_error('gsflow_modflow', Arg, ierr)
           ENDIF
         ENDIF
       ENDIF
@@ -308,7 +309,7 @@
         IF ( Process_flag==SETDIMENS .OR. Process_flag==DECL ) THEN
           Init_vars_from_file = 0 ! make sure this is set so all variables and parameters are declared
           CALL module_doc()
-          call_modules = ierr
+          IF ( ierr/=0 ) CALL module_error('DOCUMENTATION', Arg, ierr)
           RETURN
         ELSE
           STOP
@@ -381,7 +382,7 @@
       ENDIF
 
       IF ( Model==CLIMATE ) THEN
-        call_modules = ierr
+        IF ( ierr/=0 ) CALL module_error('CLIMATE', Arg, ierr)
         IF ( Process_flag==RUN ) THEN
           CALL summary_output()
           RETURN
@@ -451,7 +452,7 @@
       ENDIF
 
       IF ( Model==POTET ) THEN
-        call_modules = ierr
+        IF ( ierr/=0 ) CALL module_error('POTET', Arg, ierr)
         IF ( Process_flag==RUN ) THEN
           CALL summary_output()
           RETURN

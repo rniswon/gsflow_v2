@@ -17,7 +17,7 @@
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=*), parameter :: MODNAME = 'precip_dist2'
-        character(len=*), parameter :: Version_precip = '2021-08-13'
+        character(len=*), parameter :: Version_precip = '2021-09-07'
         INTEGER, SAVE, ALLOCATABLE :: N_psta(:), Nuse_psta(:, :)
         DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dist2(:, :)
 !   Declared Parameters
@@ -190,11 +190,11 @@
       IF ( getparam(MODNAME, 'dist_max', 1, 'real', Dist_max) &
      &     /=0 ) CALL read_error(2, 'dist_max')
 
-      IF ( getparam(MODNAME, 'max_psta', 1, 'real', Max_psta) &
+      IF ( getparam(MODNAME, 'max_psta', 1, 'integer', Max_psta) &
      &     /=0 ) CALL read_error(2, 'max_psta')
       IF ( Max_psta==0 ) Max_psta = Nrain
 
-!      IF ( get param(MODNAME, 'maxmon_prec', MONTHS_PER_YEAR, 'real', Maxmon_prec) &
+!      IF ( getparam(MODNAME, 'maxmon_prec', MONTHS_PER_YEAR, 'real', Maxmon_prec) &
 !           /=0 ) CALL read_error(2, 'maxmon_prec')
 
       IF ( getparam(MODNAME, 'rain_mon', Nhru*MONTHS_PER_YEAR, 'real', Rain_mon) &
