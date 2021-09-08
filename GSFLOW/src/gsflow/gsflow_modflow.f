@@ -36,8 +36,8 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
-      USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
+      USE GSFMODFLOW
       IMPLICIT NONE
 !***********************************************************************
       gsfdecl = 0
@@ -77,7 +77,8 @@ C     ------------------------------------------------------------------
       USE PRMS_CONSTANTS, ONLY: MODFLOW, GSFLOW, ACTIVE, OFF,
      &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
-     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package
+     &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package, Model,
+     &    GSFLOW_flag, Print_debug
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -140,8 +141,6 @@ C5------Get current date and time, assign to IBDT, and write to screen
      &       I0,'/',I2.2,'/',I2.2,I3,2(':',I2.2),/)
 C
 C6------ALLOCATE AND READ (AR) PROCEDURE
-      IGRID=1
-      NSOL=1
       CALL GWF2BAS7AR(INUNIT,CUNIT,VERSION,24,31,32,MAXUNIT,IGRID,12,
      1                HEADNG,26,MFVNAM)
       IF(IUNIT(50).GT.0 .AND. IUNIT(52).GT.0) THEN
@@ -397,12 +396,11 @@ C
       KSTP = 0
       KPER = 1
       KPERSTART = 1
-      ! run SS if needed, read to current stress period, read restart if needed
-      CALL SET_STRESS_DATES()
-      CALL SETCONVFACTORS()
-
       Delt_save = DELT
       IF ( ISSFLG(1).EQ.1 ) DELT = 1.0/Mft_to_days
+      ! run SS if needed, read to current stress period, read restart if needed
+      CALL SETCONVFACTORS()
+      CALL SET_STRESS_DATES()
 C
       KKPER = KPER
       IF ( Model==MODFLOW ) THEN
@@ -420,10 +418,12 @@ C
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, GSFLOW, ACTIVE,
-     &    OFF, ERROR_time
-      USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, Process,
-     &    Init_vars_from_file, Mxsziter, Nowyear, Nowmonth, Nowday
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
+     &    ERROR_time, ERROR_modflow
+      USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
+     &    Init_vars_from_file, Mxsziter, Glacier_flag,
+     &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday,
+     &    Model, GSFLOW_flag, Print_debug
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -442,6 +442,7 @@ c     USE LMGMODULE
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: soilzone, GET_KPER
+      INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsfclean
       EXTERNAL :: READ_STRESS
       INTRINSIC MIN
@@ -456,7 +457,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       IF ( Steady_state.EQ.1 ) THEN
         Kkper_new = 1
         Kper_mfo = 2
-      ELSEIF ( Model==GSFLOW ) THEN
+      ELSEIF ( GSFLOW_flag==ACTIVE ) THEN
         Kkper_new = GET_KPER()
       ELSE
         Kkper_new = Kper_mfo
@@ -482,7 +483,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       ENDIF
       iss = ISSFLG(KKPER)
       gsflag = OFF
-      IF ( Model==GSFLOW .AND. iss==0 ) gsflag = ACTIVE
+      IF ( GSFLOW_flag==ACTIVE .AND. iss==0 ) gsflag = ACTIVE
 C
 C7C-----SIMULATE EACH TIME STEP.
 !gsf    DO 90 KSTP = 1, NSTP(KPER)
@@ -614,6 +615,30 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ACTIVE ) THEN
+              IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+                retval = intcp()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'intcp', retval
+                  RETURN
+                ENDIF
+                retval = snowcomp()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'snowcomp', retval
+                  RETURN
+                ENDIF
+                IF ( Glacier_flag==ACTIVE ) THEN
+                  retval = glacr()
+                  IF ( retval/=0 ) THEN
+                    PRINT 9001, 'glacr_melt', retval
+                    RETURN
+                  ENDIF
+                ENDIF
+                retval = srunoff()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'srunoff', retval
+                  RETURN
+                ENDIF
+              ENDIF
               retval = soilzone()
               IF ( retval/=0 ) THEN
                 PRINT 9001, 'soilzone', retval
@@ -713,10 +738,11 @@ c            END IF
 !     6                         BIGHEADCHG,HNEWLAST)
 !            ENDIF
 ! Calculate new heads using Newton solver
-          IF(IUNIT(63).GT.0 ) 
-     1          CALL GWF2NWT1FM(KKITER,ICNVG,KSTP,KPER,Mxiter,
-     2                          IUNIT(22),Itreal,AGCONVERGE,IGRID)
-          IF ( IUNIT(63).GT.0 )ITREAL2 = ITREAL
+          IF(IUNIT(63).GT.0 ) THEN
+             CALL GWF2NWT1FM(KKITER,ICNVG,KSTP,KPER,Mxiter,
+     2                       IUNIT(22),Itreal,AGCONVERGE,IGRID)
+             ITREAL2 = ITREAL
+          ENDIF
           IF(IERR.EQ.1) CALL USTOP(' ')
 C
 C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
@@ -1157,6 +1183,9 @@ C     ******************************************************************
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       INTRINSIC :: INT, NINT, MOD
+      REAL :: RSECS, ELSEC
+      INTEGER :: NSPD, I, IPRTIM, IOUT, NDAYS, LEAP, IBD, IED
+      INTEGER :: M, MB, MC, ME, NM, NHOURS, NMINS, NSECS, MSECS, NRSECS
       INTEGER IBDT(8), IEDT(8), IDPM(12)
       DATA IDPM/31,28,31,30,31,30,31,31,30,31,30,31/ ! Days per month
       DATA NSPD/86400/  ! Seconds per day
@@ -1339,10 +1368,11 @@ C
 !     DETERMINE THE STRESS PERIOD FOR THE CURRENT TIMESTEP
 !     ******************************************************************
       INTEGER FUNCTION GET_KPER()
+      USE PRMS_CONSTANTS, ONLY: MODFLOW
       USE GLOBAL, ONLY: NPER
       USE GSFMODFLOW, ONLY: Stress_dates, KPER
       USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day,
-     1    Nowyear, Nowmonth, Nowday
+     1    Nowyear, Nowmonth, Nowday, Model, mf_nowtime
       IMPLICIT NONE
       INTRINSIC DBLE
       INTEGER, EXTERNAL :: compute_julday
@@ -1350,7 +1380,11 @@ C
       INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
-      now = compute_julday(Nowyear, Nowmonth, Nowday)
+      IF ( Model==MODFLOW ) THEN
+        now = mf_nowtime
+      ELSE
+        now = compute_julday(Nowyear, Nowmonth, Nowday)
+      ENDIF
       KPERTEST = 1
       IF ( KPER > KPERTEST ) KPERTEST = KPER
 !

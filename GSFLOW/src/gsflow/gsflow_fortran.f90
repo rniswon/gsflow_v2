@@ -2,10 +2,10 @@
 !***********************************************************************
 ! PRMS main that controls time loop
 !***********************************************************************
-      USE PRMS_MODULE, ONLY: Model, Number_timesteps
+      USE PRMS_MODULE, ONLY: Number_timesteps
       IMPLICIT NONE
 ! Functions
-      EXTERNAL gsflow_prms
+      EXTERNAL :: gsflow_prms
 ! Local Variables
       INTEGER :: i
 !***********************************************************************

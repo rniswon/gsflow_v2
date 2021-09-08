@@ -9,11 +9,6 @@
 ! PRMS_SNOW module for defining stateful variables
 
       MODULE PRMS_SNOW
-      USE PRMS_CONSTANTS, ONLY: LAKE, LAND, GLACIER, SHRUBS, FEET, &
-     &    INCH2M, FEET2METERS, DNEARZERO, DOCUMENTATION, ACTIVE, OFF, &
-     &    MONTHS_PER_YEAR, DEBUG_less, DAYS_YR, CLOSEZERO, INCH2CM, SAVE_INIT
-      USE PRMS_MODULE, ONLY: Model, Nhru, Ndepl, Print_debug, &
-     &    Init_vars_from_file, Glacier_flag, Start_year, Snarea_curve_flag
       IMPLICIT NONE
       !****************************************************************
       !   Local Constants
@@ -26,7 +21,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2021-01-11'
+      character(len=*), parameter :: Version_snowcomp = '2021-09-08'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -58,6 +53,12 @@
       REAL, SAVE, ALLOCATABLE :: Glacr_5avsnow1(:), Glacr_5avsnow(:), Glacr_delsnow(:), Glacr_freeh2o_capm(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Glacr_pkwater_ante(:), Glacr_pkwater_equiv(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Glacr_pk_depth(:), Glacr_pss(:), Glacr_pst(:)
+      INTEGER, SAVE, ALLOCATABLE :: It0_iasw(:), It0_iso(:), It0_mso(:), It0_lso(:), It0_int_alb(:), It0_lst(:)
+      REAL, SAVE, ALLOCATABLE :: It0_snowcov_area(:), It0_snowcov_areasv(:), It0_albedo(:)
+      REAL, SAVE, ALLOCATABLE :: It0_pk_temp(:), It0_pk_def(:), It0_pk_ice(:), It0_pk_den(:), It0_freeh2o(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:), It0_scrv(:), It0_pksv(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pst(:), It0_pss(:), It0_pk_depth(:)
+      REAL, SAVE, ALLOCATABLE :: It0_snsv(:), It0_salb(:), It0_slst(:)
       !****************************************************************
       !   Declared Parameters
 
@@ -111,16 +112,27 @@
 !     glacr_freeh2o_cap, glacr_layer
 !***********************************************************************
       INTEGER FUNCTION snodecl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, MONTHS_PER_YEAR
+      USE PRMS_MODULE, ONLY: Model, Nhru, Ndepl, &
+     &    Init_vars_from_file, Glacier_flag, Snarea_curve_flag, PRMS_land_iteration_flag
       USE PRMS_SNOW
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam
+      INTEGER, EXTERNAL :: declparam, control_integer
       EXTERNAL :: read_error, print_module, declvar_dble, declvar_real, declvar_int
 !***********************************************************************
       snodecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_snowcomp)
 
+      IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+        ALLOCATE ( It0_snowcov_area(Nhru), It0_snowcov_areasv(Nhru), It0_pkwater_equiv(Nhru) )
+        ALLOCATE ( It0_albedo(Nhru), It0_pk_depth(Nhru), It0_iasw(Nhru), It0_pst(Nhru) )
+        ALLOCATE ( It0_pksv(Nhru), It0_scrv(Nhru), It0_pk_temp(Nhru), It0_pss(Nhru) )
+        ALLOCATE ( It0_pk_def(Nhru), It0_pk_ice(Nhru), It0_pk_den(Nhru), It0_freeh2o(Nhru) )
+        ALLOCATE ( It0_iso(Nhru),  It0_mso(Nhru), It0_lso(Nhru), It0_int_alb(Nhru), It0_lst(Nhru) )
+        ALLOCATE ( It0_snsv(Nhru), It0_salb(Nhru), It0_slst(Nhru) )
+      ENDIF
 ! declare variables
       ALLOCATE ( Scrv(Nhru) )
       CALL declvar_dble(MODNAME, 'scrv', 'nhru', Nhru, &
@@ -405,8 +417,7 @@
       !rpayn commented
       ALLOCATE ( Pk_def(Nhru) )
       CALL declvar_real(MODNAME, 'pk_def', 'nhru', Nhru, &
-     &     'Heat deficit, amount of heat necessary to make'// &
-     &     ' the snowpack isothermal at 0 degrees Celsius', &
+     &     'Heat deficit, amount of heat necessary to make the snowpack isothermal at 0 degrees Celsius', &
      &     'Langleys', Pk_def)
 
       !rpayn commented
@@ -678,14 +689,15 @@
 !               compute initial values
 !***********************************************************************
       INTEGER FUNCTION snoinit()
+      USE PRMS_CONSTANTS, ONLY: LAND, GLACIER, FEET, FEET2METERS, DNEARZERO, ACTIVE, OFF, MONTHS_PER_YEAR, DEBUG_less
+      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Print_debug, Init_vars_from_file, Glacier_flag, Snarea_curve_flag
       USE PRMS_SNOW
-      USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_route_order, Active_hrus, Hru_area_dble, &
-     &    Elev_units, Hru_type
+      USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_route_order, Active_hrus, Hru_area_dble, Elev_units, Hru_type
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, ATAN, SNGL, MIN
-      INTEGER, EXTERNAL :: getparam
+      INTEGER, EXTERNAL :: getparam_real, getparam_int
       EXTERNAL :: read_error, sca_deplcrv, glacr_states_to_zero
 ! Local Variables
       INTEGER :: i, j
@@ -698,27 +710,27 @@
       snoinit = 0
 
       IF ( Glacier_flag==ACTIVE ) THEN
-        IF ( getparam(MODNAME, 'glacr_freeh2o_cap', Nhru, 'real', Glacr_freeh2o_cap)/=0 ) CALL read_error(2, 'glacr_freeh2o_cap')
-        IF ( getparam(MODNAME, 'albedo_ice', Nhru, 'real', Albedo_ice)/=0 ) CALL read_error(2, 'albedo_ice')
-        IF ( getparam(MODNAME, 'albedo_coef', Nhru, 'real', Albedo_coef)/=0 ) CALL read_error(2, 'albedo_coef')
-        IF ( getparam(MODNAME, 'glacr_layer', Nhru, 'real', Glacr_layer)/=0 ) CALL read_error(2, 'glacr_layer')
+        IF ( getparam_real(MODNAME, 'glacr_freeh2o_cap', Nhru, Glacr_freeh2o_cap)/=0 ) CALL read_error(2, 'glacr_freeh2o_cap')
+        IF ( getparam_real(MODNAME, 'albedo_ice', Nhru, Albedo_ice)/=0 ) CALL read_error(2, 'albedo_ice')
+        IF ( getparam_real(MODNAME, 'albedo_coef', Nhru, Albedo_coef)/=0 ) CALL read_error(2, 'albedo_coef')
+        IF ( getparam_real(MODNAME, 'glacr_layer', Nhru, Glacr_layer)/=0 ) CALL read_error(2, 'glacr_layer')
       ENDIF
 
-      IF ( getparam(MODNAME, 'den_init', Nhru, 'real', Den_init)/=0 ) CALL read_error(2, 'den_init')
-      IF ( getparam(MODNAME, 'den_max', Nhru, 'real', Den_max)/=0 ) CALL read_error(2, 'den_max')
-      IF ( getparam(MODNAME, 'settle_const', Nhru, 'real', Settle_const)/=0 ) CALL read_error(2, 'settle_const')
+      IF ( getparam_real(MODNAME, 'den_init', Nhru, Den_init)/=0 ) CALL read_error(2, 'den_init')
+      IF ( getparam_real(MODNAME, 'den_max', Nhru, Den_max)/=0 ) CALL read_error(2, 'den_max')
+      IF ( getparam_real(MODNAME, 'settle_const', Nhru, Settle_const)/=0 ) CALL read_error(2, 'settle_const')
 
-      IF ( getparam(MODNAME, 'melt_look', Nhru, 'integer', Melt_look)/=0 ) CALL read_error(2, 'melt_look')
-      IF ( getparam(MODNAME, 'melt_force', Nhru, 'integer', Melt_force)/=0 ) CALL read_error(2, 'melt_force')
-      IF ( getparam(MODNAME, 'rad_trncf', Nhru, 'real', Rad_trncf)/=0 ) CALL read_error(2, 'rad_trncf')
+      IF ( getparam_int(MODNAME, 'melt_look', Nhru, Melt_look)/=0 ) CALL read_error(2, 'melt_look')
+      IF ( getparam_int(MODNAME, 'melt_force', Nhru, Melt_force)/=0 ) CALL read_error(2, 'melt_force')
+      IF ( getparam_real(MODNAME, 'rad_trncf', Nhru, Rad_trncf)/=0 ) CALL read_error(2, 'rad_trncf')
       IF ( Snarea_curve_flag==OFF ) THEN
-        IF ( getparam(MODNAME, 'hru_deplcrv', Nhru, 'integer', Hru_deplcrv)/=0 ) CALL read_error(2, 'hru_deplcrv')
-        IF ( getparam(MODNAME, 'snarea_curve', Ndepl*11, 'real', Snarea_curve)/=0 ) CALL read_error(2, 'snarea_curve')
+        IF ( getparam_int(MODNAME, 'hru_deplcrv', Nhru, Hru_deplcrv)/=0 ) CALL read_error(2, 'hru_deplcrv')
+        IF ( getparam_real(MODNAME, 'snarea_curve', Ndepl*11, Snarea_curve)/=0 ) CALL read_error(2, 'snarea_curve')
       ELSE
-        IF ( getparam(MODNAME, 'snarea_a', Nhru, 'real', Snarea_a)/=0 ) CALL read_error(2, 'snarea_a')
-        IF ( getparam(MODNAME, 'snarea_b', Nhru, 'real', Snarea_b)/=0 ) CALL read_error(2, 'snarea_b')
-        IF ( getparam(MODNAME, 'snarea_c', Nhru, 'real', Snarea_c)/=0 ) CALL read_error(2, 'snarea_c')
-        IF ( getparam(MODNAME, 'snarea_d', Nhru, 'real', Snarea_d)/=0 ) CALL read_error(2, 'snarea_d')
+        IF ( getparam_real(MODNAME, 'snarea_a', Nhru, Snarea_a)/=0 ) CALL read_error(2, 'snarea_a')
+        IF ( getparam_real(MODNAME, 'snarea_b', Nhru, Snarea_b)/=0 ) CALL read_error(2, 'snarea_b')
+        IF ( getparam_real(MODNAME, 'snarea_c', Nhru, Snarea_c)/=0 ) CALL read_error(2, 'snarea_c')
+        IF ( getparam_real(MODNAME, 'snarea_d', Nhru, Snarea_d)/=0 ) CALL read_error(2, 'snarea_d')
         DO i = 1, Nhru
           Hru_deplcrv(i) = i
           x = 0.0
@@ -734,15 +746,15 @@
           ENDDO
         ENDDO
       ENDIF
-      IF ( getparam(MODNAME, 'snarea_thresh', Nhru, 'real', Snarea_thresh)/=0 ) CALL read_error(2, 'snarea_thresh')
-      IF ( getparam(MODNAME, 'albset_rnm', 1, 'real', Albset_rnm)/=0 ) CALL read_error(2, 'albset_rnm')
-      IF ( getparam(MODNAME, 'albset_rna', 1, 'real', Albset_rna)/=0 ) CALL read_error(2, 'albset_rna')
-      IF ( getparam(MODNAME, 'albset_sna', 1, 'real', Albset_sna)/=0 ) CALL read_error(2, 'albset_sna')
-      IF ( getparam(MODNAME, 'albset_snm', 1, 'real', Albset_snm)/=0 ) CALL read_error(2, 'albset_snm')
-      IF ( getparam(MODNAME, 'emis_noppt', Nhru, 'real', Emis_noppt)/=0 ) CALL read_error(2, 'emis_noppt')
-      IF ( getparam(MODNAME, 'cecn_coef', Nhru*MONTHS_PER_YEAR, 'real', Cecn_coef)/=0 ) CALL read_error(2, 'cecn_coef')
-      IF ( getparam(MODNAME, 'freeh2o_cap', Nhru, 'real', Freeh2o_cap)/=0 ) CALL read_error(2, 'freeh2o_cap')
-      IF ( getparam(MODNAME, 'tstorm_mo', Nhru*MONTHS_PER_YEAR, 'integer', Tstorm_mo)/=0 ) CALL read_error(2, 'tstorm_mo')
+      IF ( getparam_real(MODNAME, 'snarea_thresh', Nhru, Snarea_thresh)/=0 ) CALL read_error(2, 'snarea_thresh')
+      IF ( getparam_real(MODNAME, 'albset_rnm', 1, Albset_rnm)/=0 ) CALL read_error(2, 'albset_rnm')
+      IF ( getparam_real(MODNAME, 'albset_rna', 1, Albset_rna)/=0 ) CALL read_error(2, 'albset_rna')
+      IF ( getparam_real(MODNAME, 'albset_sna', 1, Albset_sna)/=0 ) CALL read_error(2, 'albset_sna')
+      IF ( getparam_real(MODNAME, 'albset_snm', 1, Albset_snm)/=0 ) CALL read_error(2, 'albset_snm')
+      IF ( getparam_real(MODNAME, 'emis_noppt', Nhru, Emis_noppt)/=0 ) CALL read_error(2, 'emis_noppt')
+      IF ( getparam_real(MODNAME, 'cecn_coef', Nhru*MONTHS_PER_YEAR, Cecn_coef)/=0 ) CALL read_error(2, 'cecn_coef')
+      IF ( getparam_real(MODNAME, 'freeh2o_cap', Nhru, Freeh2o_cap)/=0 ) CALL read_error(2, 'freeh2o_cap')
+      IF ( getparam_int(MODNAME, 'tstorm_mo', Nhru*MONTHS_PER_YEAR, Tstorm_mo)/=0 ) CALL read_error(2, 'tstorm_mo')
 
       Pk_precip = 0.0
       Snowmelt = 0.0
@@ -765,7 +777,7 @@
       ENDIF
 
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==3 ) THEN
-        IF ( getparam(MODNAME, 'snowpack_init', Nhru, 'real', Snowpack_init)/=0 ) CALL read_error(2, 'snowpack_init')
+        IF ( getparam_real(MODNAME, 'snowpack_init', Nhru, Snowpack_init)/=0 ) CALL read_error(2, 'snowpack_init')
         Pkwater_equiv = 0.0D0
         Pk_depth = 0.0D0
         Pk_den = 0.0
@@ -825,10 +837,10 @@
       Pksv = 0.0D0
 
       IF ( Glacier_flag==ACTIVE ) THEN ! do here when not a restart simulation
-        IF ( getparam(MODNAME, 'glacier_frac_init', Nhru, 'real', Glacier_frac_init)/=0 ) CALL read_error(2, 'glacier_frac_init')
+        IF ( getparam_real(MODNAME, 'glacier_frac_init', Nhru, Glacier_frac_init)/=0 ) CALL read_error(2, 'glacier_frac_init')
         Glacr_albedo = 0.0
         Glacier_frac = Glacier_frac_init
-        IF ( getparam(MODNAME, 'glrette_frac_init', Nhru, 'real', Glrette_frac_init)/=0 ) CALL read_error(2, 'glrette_frac_init')
+        IF ( getparam_real(MODNAME, 'glrette_frac_init', Nhru, Glrette_frac_init)/=0 ) CALL read_error(2, 'glrette_frac_init')
         Glrette_frac = Glrette_frac_init
         DO j = 1, Active_hrus
           i = Hru_route_order(j)
@@ -889,8 +901,12 @@
 !     snorun - daily mode snow estimates
 !***********************************************************************
       INTEGER FUNCTION snorun()
-      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth
+      USE PRMS_CONSTANTS, ONLY: LAKE, LAND, GLACIER, SHRUBS, FEET, &
+     &    INCH2M, FEET2METERS, DNEARZERO, ACTIVE, OFF, DEBUG_less, DAYS_YR
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag, Start_year, &
+     &    PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Albedo_cbh_flag
       USE PRMS_SNOW
+      USE PRMS_CLIMATE_HRU, ONLY: Albedo_hru
       USE PRMS_BASIN, ONLY: Hru_area, Active_hrus, Hru_type, &
      &    Basin_area_inv, Hru_route_order, Cov_type, Elev_units
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Orad, Basin_horad, Potet_sublim, &
@@ -909,6 +925,58 @@
       DOUBLE PRECISION :: dpt1, dpt_before_settle
 !***********************************************************************
       snorun = 0
+
+      IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+        IF ( Kkiter>1 ) THEN
+          Pkwater_equiv = It0_pkwater_equiv
+          Snowcov_area = It0_snowcov_area
+          Snowcov_areasv = It0_snowcov_areasv
+          Albedo = It0_albedo
+          Pk_depth = It0_pk_depth
+          Iasw = It0_iasw
+          Pst = It0_pst
+          Scrv = It0_scrv
+          Pksv = It0_pksv
+          Pk_temp = It0_pk_temp
+          Pk_def = It0_pk_def
+          Pk_ice = It0_pk_ice
+          Pk_den = It0_pk_den
+          Pss = It0_pss
+          Freeh2o = It0_freeh2o
+          Iso = It0_iso
+          Mso = It0_mso
+          Lso = It0_lso
+          Snsv = It0_snsv
+          Lst = It0_lst
+          Int_alb = It0_int_alb
+          Salb = It0_salb
+          Slst = It0_slst
+        ELSE
+          It0_pkwater_equiv = Pkwater_equiv
+          It0_snowcov_area = Snowcov_area
+          It0_snowcov_areasv = Snowcov_areasv
+          It0_albedo = It0_albedo
+          It0_pk_depth = Pk_depth
+          It0_iasw = Iasw
+          It0_pst = Pst
+          It0_scrv = Scrv
+          It0_pksv = Pksv
+          It0_pk_temp = Pk_temp
+          It0_pk_def = Pk_def
+          It0_pk_ice = Pk_ice
+          It0_pk_den = Pk_den
+          It0_pss = Pss
+          It0_freeh2o = Freeh2o
+          It0_iso = Iso
+          It0_mso = Mso
+          It0_iso = Lso
+          It0_snsv = Snsv
+          It0_lst = Lst
+          It0_int_alb = Int_alb
+          It0_salb = Salb
+          It0_slst = Slst
+        ENDIF
+      ENDIF
 
       ! Set the basin totals to 0
       ! (recalculated at the end of the time step)
@@ -1151,9 +1219,14 @@
           IF ( Active_glacier==1 ) Glacrcov_area(i) =(1.0-Snowcov_area(i))*Glacier_frac(i)
           IF ( Active_glacier==2 ) Glacrcov_area(i) =(1.0-Snowcov_area(i))*Glrette_frac(i)
 ! Albedo so transition snow to ice smooothly, see Oerlemans 1992, this is albedo if snowcovered ice too
-          Albedo(i) = Albedo(i) - (Albedo(i)-Glacr_albedo(i))*EXP(-5.0*SNGL(Pkwater_equiv(i))*INCH2M)
-          IF ( Albedo(i)<0.08 ) Albedo(i)=0.08 !See Brock 2000
-          IF ( Albedo(i)>0.92 ) Albedo(i)=0.92 !See Brock 2000
+! Albedo can be input in a CBH File when albedo_cbh_flag = ACTIVE
+          IF ( Albedo_cbh_flag==OFF ) THEN
+            Albedo(i) = Albedo(i) - (Albedo(i)-Glacr_albedo(i))*EXP(-5.0*SNGL(Pkwater_equiv(i))*INCH2M)
+            IF ( Albedo(i)<0.08 ) Albedo(i)=0.08 !See Brock 2000
+            IF ( Albedo(i)>0.92 ) Albedo(i)=0.92 !See Brock 2000
+          ELSE
+            Albedo(i) = Albedo_hru(i)
+          ENDIF
         ENDIF
 
         ! If there is still a snowpack or glacier
@@ -1180,7 +1253,7 @@
                                            ! or [Langleys / degC]
           ! If the land cover is trees, reduce the convection-
           ! condensation parameter by half
-          IF ( Cov_type(i)>SHRUBS ) cec = cec*0.5 ! [cal/(cm^2 degC)] RSR: cov_type=4 is valid for trees (coniferous)
+          IF ( Cov_type(i)>SHRUBS ) cec = cec*0.5 ! [cal/(cm^2 degC)] cov_type>2 is valid for trees and coniferous)
                                                   ! or [Langleys / degC]
           ! Check whether to force spring melt
           ! Spring melt is forced if time is before the melt-force
@@ -1370,7 +1443,7 @@
             ! Snow can evaporate when transpiration is not occuring
             ! or when transpiration is occuring with cover types of
             ! bare soil or grass
-            IF ( Transp_on(i)==0 .OR. (Transp_on(i)==1 .AND. Cov_type(i)<SHRUBS) ) &
+            IF ( Transp_on(i)==0 .OR. (Transp_on(i)==1 .AND. Cov_type(i)<SHRUBS) ) & ! cov_type < 2
      &           CALL snowevap(Potet_sublim(i), Potet(i), Snowcov_area(i), &
      &                         Snow_evap(i), Pkwater_equiv(i), Pk_ice(i), &
      &                         Pk_def(i), Freeh2o(i), Pk_temp(i), Hru_intcpevap(i))
@@ -2905,7 +2978,8 @@
 !     snowcomp_restart - write or read snowcomp restart file
 !***********************************************************************
       SUBROUTINE snowcomp_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Glacier_flag
       USE PRMS_SNOW
       IMPLICIT NONE
       ! Argument

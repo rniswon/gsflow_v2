@@ -2,11 +2,10 @@
 !     Perform the MODFLOW budget procedure for PRMS soil zone
 !***********************************************************************
       MODULE GSFBUDGET
-      USE PRMS_CONSTANTS, ONLY: ERROR_dim, NEARZERO, CLOSEZERO, ACTIVE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2021-05-07'
+      character(len=*), parameter :: Version_gsflow_budget = '2021-08-13'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -193,7 +192,7 @@
 !     gsfbudinit - Initialize GSFBUDGET module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION gsfbudinit()
-      USE PRMS_CONSTANTS, ONLY: OFF
+      USE PRMS_CONSTANTS, ONLY: ERROR_dim, OFF
       USE GSFBUDGET
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru
       USE GWFSFRMODULE, ONLY: NSTRM
@@ -252,6 +251,7 @@
 ! adjust gravity flow storage with last gw2sm and gw_rejected
 !***********************************************************************
       INTEGER FUNCTION gsfbudrun()
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, CLOSEZERO, ACTIVE
       USE GSFBUDGET
       USE GSFMODFLOW, ONLY: Mfq2inch_conv, Mfl2_to_acre, & !, Cellarea, &
      &    Mfvol2inch_conv, Mfl3t_to_cfs, Mfl_to_inch, Gwc_col, Gwc_row

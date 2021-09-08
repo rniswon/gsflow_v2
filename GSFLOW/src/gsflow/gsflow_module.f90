@@ -20,17 +20,17 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 06/11/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-06-11'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 06/11/2021'
-      character(len=*), parameter :: Version_read_control_file = '2021-06-10'
-      character(len=*), parameter :: Version_read_parameter_file = '2021-06-10'
-      character(len=*), parameter :: Version_read_data_file = '2021-06-10'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 09/07/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-09-07'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 09/07/2021'
+      character(len=*), parameter :: Version_read_control_file = '2021-09-07'
+      character(len=*), parameter :: Version_read_parameter_file = '2021-09-07'
+      character(len=*), parameter :: Version_read_data_file = '2021-09-07'
       CHARACTER(len=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus, NLAKES_MF, Nreach
-      INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval, Nmap2hru, Nmap
+      INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval, Nmap2hru, Nmap, Nsnow
 ! Global
       !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
       INTEGER, SAVE :: Model, Process_flag, Call_cascade, PRMS_only
@@ -67,17 +67,16 @@
       INTEGER, SAVE :: Init_vars_from_file, Save_vars_to_file, Orad_flag, Cascade_flag, Cascadegw_flag
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
-      INTEGER, SAVE :: Prms_warmup
+      INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
-      INTEGER, SAVE :: Snarea_curve_flag, statsON_OFF, outputSelectDatesON_OFF
-      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName
+      INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF, outputSelectDatesON_OFF
+      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName, Dynamic_param_log_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Csv_output_file, Model_control_file, Param_file
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Temp_module, Srunoff_module, Et_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Strmflow_module, Transp_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Model_mode, Precip_module, Solrad_module
-      CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: irrigation_area_module, AET_module, PET_ag_module
       CHARACTER(LEN=8), SAVE :: Soilzone_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
       INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF

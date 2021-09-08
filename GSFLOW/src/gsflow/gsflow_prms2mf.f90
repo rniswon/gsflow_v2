@@ -2,12 +2,11 @@
 !     Route PRMS gravity flow to MODFLOW cells
 !***********************************************************************
       MODULE GSFPRMS2MF
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF
       IMPLICIT NONE
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-05-07'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-09-08'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -147,11 +146,11 @@
 !     prms2mfinit - Initialize PRMS2MF module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION prms2mfinit()
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_param
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_param, ACTIVE, OFF
       USE GSFPRMS2MF
       USE GWFUZFMODULE, ONLY: NTRAIL, NWAV, IUZFBND
       USE GWFSFRMODULE, ONLY: ISEG, NSS
-      USE GWFLAKMODULE, ONLY: NLAKES
+      USE GWFLAKMODULE, ONLY: NLAKES, IGSFLOWLAK
       USE GSFMODFLOW, ONLY: Gwc_row, Gwc_col
       USE PRMS_MODULE, ONLY: Nhru, Nsegment, Nlake, Print_debug, &
      &    Nhrucell, Ngwcell, Gvr_cell_id, Have_lakes
@@ -160,7 +159,7 @@
       USE PRMS_SOILZONE, ONLY: Gvr_hru_id, Gvr_hru_pct_adjusted
       USE GLOBAL, ONLY: NLAY, NROW, NCOL
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getparam
+      INTEGER, EXTERNAL :: getparam_real
       EXTERNAL read_error
       INTRINSIC ABS, DBLE
 ! Local Variables
@@ -184,6 +183,7 @@
       ENDIF
 
       IF ( Have_lakes==ACTIVE ) THEN
+        IGSFLOWLAK = 1
         IF ( Nlake/=NLAKES ) THEN
           PRINT *, 'ERROR, PRMS dimension nlake must equal Lake Package NLAKES'
           PRINT *, '       nlake=', Nlake, ' NLAKES=', NLAKES
@@ -197,7 +197,7 @@
       ENDIF
 
       IF ( Nhru/=Nhrucell ) THEN
-        IF ( getparam('prms2mf', 'gvr_hru_pct', Nhrucell, 'real', Gvr_hru_pct)/=0 ) CALL read_error(2, 'gvr_hru_pct')
+        IF ( getparam_real('prms2mf', 'gvr_hru_pct', Nhrucell, Gvr_hru_pct)/=0 ) CALL read_error(2, 'gvr_hru_pct')
       ENDIF
 
       ALLOCATE ( Numreach_segment(Nsegment) )
@@ -392,14 +392,14 @@
 !        It produces cell_drain in MODFLOW units.
 !***********************************************************************
       INTEGER FUNCTION prms2mfrun()
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes
       USE GSFPRMS2MF
-      USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, &
-     &    Inch_to_mfl_t, Gwc_row, Gwc_col, Mft_to_days
+      USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, Gwc_row, Gwc_col, Mft_to_days
       USE GLOBAL, ONLY: IBOUND
       USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, IGSFLOW, FINF, IUZFOPT
-      USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK, NLAKES
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_area, Lake_hru_id
+      USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_hru_id
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Hru_actet
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
@@ -433,14 +433,14 @@
             ilake = Lake_hru_id(j)
             RNF(ilake) = RNF(ilake) + SNGL( (Lakein_sz(j)+Hortonian_lakes(j)) &
      &                   *DBLE(Hru_area(j))*Acre_inches_to_mfl3*Mft_to_days )   !RGN 7/15/2015 added *Mft_to_days
-            PRCPLK(ilake) = PRCPLK(ilake) + Hru_ppt(j)*Inch_to_mfl_t*Hru_area(j)
-            EVAPLK(ilake) = EVAPLK(ilake) + Hru_actet(j)*Inch_to_mfl_t*Hru_area(j)
+            PRCPLK(ilake) = PRCPLK(ilake) + Hru_ppt(j)*Acre_inches_to_mfl3*Mft_to_days*Hru_area(j) !VOLUMES OF PRECIP
+            EVAPLK(ilake) = EVAPLK(ilake) + Hru_actet(j)*Acre_inches_to_mfl3*Mft_to_days*Hru_area(j) !VOLUMES OF EVAP
           ENDIF
         ENDDO
-        DO ilake = 1, NLAKES
-          PRCPLK(ilake) = PRCPLK(ilake)/Lake_area(ilake)
-          EVAPLK(ilake) = EVAPLK(ilake)/Lake_area(ilake)
-        ENDDO
+        !DO ilake = 1, NLAKES
+        !  PRCPLK(ilake) = PRCPLK(ilake)   !RGN 6/3/2021 send as volumes to lake
+        !  EVAPLK(ilake) = EVAPLK(ilake)
+        !ENDDO
       ENDIF
 
 !-----------------------------------------------------------------------
