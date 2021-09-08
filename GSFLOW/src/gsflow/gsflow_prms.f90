@@ -80,7 +80,7 @@
      &        'Stream Temperature: stream_temp', /, &
      &        '    Output Summary: basin_sum, subbasin, map_results, prms_summary,', /, &
      &        '                    nhru_summary, nsub_summary, water_balance', /, &
-     &        '                    basin_summary, nsegment_summary', /, &
+     &        '                    basin_summary, nsegment_summary, statvar_out', /, &
      &        '     Preprocessing: write_climate_hru, frost_date', /, 68('-'))
   16  FORMAT (//, 4X, 'Active modules listed in the order in which they are called', //, 8X, 'Process', 20X, &
      &        'Module', 9X, 'Version Date', /, A)
@@ -143,7 +143,7 @@
           IF ( Nhru==Nhrucell ) THEN
             Gvr_cell_pct = 1.0
           ELSE
-            IF ( getparam_real(MODNAME, Nhrucell, Gvr_cell_pct)/=0 ) CALL read_error(2, 'gvr_cell_pct')
+            IF ( getparam_real(MODNAME, 'gvr_cell_pct', Nhrucell, Gvr_cell_pct)/=0 ) CALL read_error(2, 'gvr_cell_pct')
           ENDIF
           IF ( getparam_int(MODNAME, 'mxsziter', 1, Mxsziter)/=0 ) CALL read_error(2, 'mxsziter')
           IF ( getparam_int(MODNAME, 'gvr_cell_id', Nhrucell, Gvr_cell_id)/=0 ) CALL read_error(2, 'gvr_cell_id')
@@ -210,7 +210,7 @@
         Lake_add_water_use = OFF
         Lake_transfer_water_use = OFF
         ! Note, MODFLOW-only doesn't leave setdims
-        ierr = setdims() ! if MODFLOW only the execution stops in setdims
+        CALL setdims() ! if MODFLOW only the execution stops in setdims
         IF ( ierr/=0 ) CALL module_error('setdims', Arg, ierr)
         IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active
           CALL setup_params()
@@ -261,15 +261,15 @@
         ierr = soltab()
         IF ( ierr/=0 ) CALL module_error('soltab', Arg, ierr)
 
+        ierr = obs()
+        IF ( ierr/=0 ) CALL module_error('obs', Arg, ierr)
+
 !        ierr = setup()
 !        IF ( ierr/=0 ) CALL module_error('setup', Arg, ierr)
       ENDIF
 
       ierr = prms_time()
       IF ( ierr/=0 ) CALL module_error('prms_time', Arg, ierr)
-
-      ierr = obs()
-      IF ( ierr/=0 ) CALL module_error('obs', Arg, ierr)
 
       IF ( Water_use_flag==ACTIVE ) THEN
         ierr = water_use_read()
@@ -572,7 +572,7 @@
 ! Functions
       INTEGER, EXTERNAL :: decldim, declfix, control_integer_array !, control_file_name
       INTEGER, EXTERNAL :: control_string, control_integer, gsflow_modflow, compute_julday
-      EXTERNAL :: read_error, PRMS_open_output_file, PRMS_open_input_file, check_module_names, module_error, gsflow_prms
+      EXTERNAL :: read_error, PRMS_open_output_file, PRMS_open_input_file, check_module_names, module_error
       EXTERNAL :: read_control_file, setup_dimens, read_parameter_file_dimens, get_control_arguments
 ! Local Variables
       ! Maximum values are no longer limits
@@ -989,6 +989,12 @@
 ! nsegment_summary
       IF ( control_integer(NsegmentOutON_OFF, 'nsegmentOutON_OFF')/=0 ) NsegmentOutON_OFF = 0
 
+! statvar_out
+      IF ( control_integer(statsON_OFF, 'statsON_OFF')/=0 ) statsON_OFF = 0
+      IF ( statsON_OFF==ACTIVE ) THEN
+        IF ( control_string(stat_var_file, 'stat_var_file')/=0 ) CALL read_error(5, 'stat_var_file')
+      ENDIF
+
       IF ( control_integer(Prms_warmup, 'prms_warmup')/=0 ) Prms_warmup = 0
       IF ( NhruOutON_OFF>0 .OR. NsubOutON_OFF>0 .OR. BasinOutON_OFF>0 .OR. NsegmentOutON_OFF>0 ) THEN
         IF ( Start_year+Prms_warmup>End_year ) THEN ! change to start full date ???
@@ -1274,10 +1280,10 @@
 !***********************************************************************
       SUBROUTINE summary_output()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
-      USE PRMS_MODULE, ONLY: NhruOutON_OFF, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
+      USE PRMS_MODULE, ONLY: NhruOutON_OFF, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF, statsON_OFF
       IMPLICIT NONE
       ! Functions
-      EXTERNAL :: nhru_summary, nsub_summary, basin_summary, nsegment_summary
+      EXTERNAL :: nhru_summary, nsub_summary, basin_summary, nsegment_summary, statvar_out
 !***********************************************************************
       IF ( NhruOutON_OFF>OFF ) CALL nhru_summary()
 
@@ -1286,6 +1292,8 @@
       IF ( BasinOutON_OFF==ACTIVE ) CALL basin_summary()
 
       IF ( NsegmentOutON_OFF>OFF ) CALL nsegment_summary()
+
+      IF ( statsON_OFF==ACTIVE ) CALL statvar_out()
 
       END SUBROUTINE summary_output
 

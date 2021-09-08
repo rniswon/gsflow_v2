@@ -318,8 +318,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: SNGL, DBLE
-      INTEGER, EXTERNAL :: getvar
-      EXTERNAL :: read_error
+      EXTERNAL read_error, getvar_real, getvar_dble, getvar_int
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day, write_date
 !***********************************************************************
@@ -335,18 +334,15 @@
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NhruOutVars
         IF ( Nhru_var_type(jj)==REAL_TYPE ) THEN
-          IF ( getvar(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'real', Nhru_var_daily(1, jj))/=0 ) &
-     &         CALL read_error(4, NhruOutVar_names(jj)(:Nc_vars(jj)))
+          CALL getvar_real(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_daily(1, jj))
         ELSEIF ( Nhru_var_type(jj)==DBLE_TYPE ) THEN
-          IF ( getvar(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'double', Nhru_var_dble(1, jj))/=0 ) &
-     &         CALL read_error(4, NhruOutVar_names(jj)(:Nc_vars(jj)))
+          CALL getvar_dble(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_dble(1, jj))
           DO j = 1, Active_hrus
             i = Hru_route_order(j)
             Nhru_var_daily(i, jj) = SNGL( Nhru_var_dble(i, jj) )
           ENDDO
         ELSEIF ( Nhru_var_type(jj)==INT_TYPE ) THEN
-          IF ( getvar(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'integer', Nhru_var_int(1, jj))/=0 ) &
-     &         CALL read_error(4, NhruOutVar_names(jj)(:Nc_vars(jj)))
+          CALL getvar_int(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_int(1, jj))
           IF ( NhruOut_freq>DAILY ) THEN
             DO j = 1, Active_hrus
               i = Hru_route_order(j)

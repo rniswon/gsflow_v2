@@ -2,8 +2,7 @@
 
 include ../makelist
 PRMSLIB = $(LIBDIR)/libprms.a
-MMFLIB	 = $(LIBDIR)/libmmf.a
-LIBS	= $(PRMSLIB) $(MMFLIB) $(FLIBS)
+LIBS	= $(PRMSLIB) $(FLIBS)
 
 ####################################################
 # Rules for targets
@@ -12,9 +11,6 @@ all: $(PRMSLIB)
 
 $(TARGET): $(PRMSLIB)
 	$(RM) $(TARGET)
-
-$(MMFLIB):
-	$(CD) $(MMFDIR);make
 
 ####################################################
 # Rules for targets
@@ -75,6 +71,7 @@ LIBOBJS = \
         muskingum_lake.o \
         subbasin.o \
         stream_temp.o \
+        statvar_out.o \
         map_results.o \
         nhru_summary.o \
         nsub_summary.o \
@@ -266,14 +263,17 @@ convert_params.o: convert_params.f90 prms_module.mod
 glacr_melt.o: glacr_melt.f90 prms_snow.mod prms_intcp.mod prms_soltab.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) glacr_melt.f90
 
-read_control_file.o: read_control_file.f90 prms_module.mod gsfmodflow.mod map_results.o nhru_summary.o nsub_summary.o basin_summary.o nsegment_summary.o dynamic_param_read.o glacr_melt.o precip_map.o temp_map.o
+read_control_file.o: read_control_file.f90 prms_module.mod gsfmodflow.mod prms_constants.mod prms_climate_hru.mod map_results.o statvar_out.o nhru_summary.o nsub_summary.o basin_summary.o nsegment_summary.o water_use_read.o dynamic_param_read.o glacr_melt.o precip_map.o temp_map.o gsfmodflow.mod
 	$(FC) -c $(FFLAGS) read_control_file.f90
 
-read_data_file.o: read_data_file.f90 prms_module.mod mmf_utils.o
+read_data_file.o: read_data_file.f90 prms_module.mod prms_constants.mod mmf_utils.o prms_set_time.mod obs.o climateflow.o
 	$(FC) -c $(FFLAGS) read_data_file.f90
 
-read_parameter_file.o: read_parameter_file.f90 prms_module.mod
+read_parameter_file.o: read_parameter_file.f90 prms_module.mod prms_constants.mod mmf_utils.o
 	$(FC) -c $(FFLAGS) read_parameter_file.f90
+
+statvar_out.o: statvar_out.f90 prms_module.mod prms_constants.mod prms_set_time.mod
+	$(FC) -c $(FFLAGS) statvar_out.f90
 
 prms_climatevars.mod: climateflow.o
 prms_flowvars.mod: climateflow.o

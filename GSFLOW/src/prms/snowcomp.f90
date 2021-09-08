@@ -118,7 +118,7 @@
       USE PRMS_SNOW
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, control_integer
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module, declvar_dble, declvar_real, declvar_int
 !***********************************************************************
       snodecl = 0
@@ -906,6 +906,7 @@
       USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag, Start_year, &
      &    PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Albedo_cbh_flag
       USE PRMS_SNOW
+!      USE PRMS_SOLTAB, ONLY: Soltab_basinpotsw
       USE PRMS_CLIMATE_HRU, ONLY: Albedo_hru
       USE PRMS_BASIN, ONLY: Hru_area, Active_hrus, Hru_type, &
      &    Basin_area_inv, Hru_route_order, Cov_type, Elev_units
@@ -998,6 +999,7 @@
       ! Calculate the ratio of measured radiation to potential radiation
       ! (used as a cumulative indicator of cloud cover)
       trd = Orad/SNGL(Basin_horad) ! [dimensionless ratio]
+!      trd = Orad/SNGL(Soltab_basinpotsw(Jday)) ! [dimensionless ratio]
       Frac_swe = 0.0
       ! By default, the precipitation added to snowpack, snowmelt,
       ! and snow evaporation are 0

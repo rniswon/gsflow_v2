@@ -453,7 +453,7 @@
       ! Local Variables
       INTEGER :: var_id
 !***********************************************************************
-      var_id = find_variable(Modname, Varname, Numvalues, 'real')
+      var_id = find_variable(Modname, Varname, Numvalues, 'integer')
       Values = Variable_data(var_id)%values_int
       END SUBROUTINE getvar_int
 
@@ -664,6 +664,7 @@
       ENDDO
 
       IF ( found==0 ) THEN
+        print *, Modname
         PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' not declared'
         ierr = 1
       ENDIF
@@ -1053,7 +1054,7 @@
         Control_parameter_data(Num_control_parameters)%data_type = 4
         Control_parameter_data(Num_control_parameters)%numvals = 1
         Control_parameter_data(Num_control_parameters)%name = paramname
-        Control_parameter_data(Num_control_parameters)%values_int(1) = 0
+        Control_parameter_data(Num_control_parameters)%values_character(1) = ' '
       ENDIF
 
       control_string = 0

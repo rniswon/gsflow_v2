@@ -186,12 +186,12 @@
 !                WRITE (Streamflow_pairs(i), '(A,I0,2A)' ) ',seg_outflow_', Poi_gage_segment(i), '_gage_', &
 !     &                                                    Poi_gage_id(i)(:Gageid_len(i))
                 WRITE (Streamflow_pairs(i), '(A,I0,A,I0)' ) ',seg_outflow_', Poi_gage_segment(i), '_gage_', &
-     &                                                    Poi_gage_id(i)
+     &                                                      Poi_gage_id(i)
               ELSE
 !                WRITE (Streamflow_pairs(i), '(A,I0,2A)' ) ' seg_outflow_', Poi_gage_segment(i), '_gage_', &
 !     &                                                    Poi_gage_id(i)(:Gageid_len(i))
                 WRITE (Streamflow_pairs(i), '(A,I0,A,I0)' ) ' seg_outflow_', Poi_gage_segment(i), '_gage_', &
-     &                                                    Poi_gage_id(i)
+     &                                                      Poi_gage_id(i)
               ENDIF
               IF ( Poi_gage_segment(i)>9 ) Gageid_len(i) = Gageid_len(i) + 1
               IF ( Poi_gage_segment(i)>99 ) Gageid_len(i) = Gageid_len(i) + 1

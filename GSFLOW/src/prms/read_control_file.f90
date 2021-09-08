@@ -14,12 +14,13 @@
      &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, NsegmentOutON_OFF, &
      &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Dyn_covden_flag, Segment_transferON_OFF, Gwr_transferON_OFF, &
      &      Lake_transferON_OFF, External_transferON_OFF, Dprst_transferON_OFF, BasinOutON_OFF, &
-     &      Snarea_curve_flag, Gsflow_output_file, &
+     &      Snarea_curve_flag, Gsflow_output_file, Stat_var_file, &
      &      Csv_output_file, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days
         USE GSFMODFLOW, ONLY: Modflow_name, Modflow_time_zero
         USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, &
      &      Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day
         USE PRMS_MAP_RESULTS, ONLY: NmapOutVars, MapOutVar_names
+        USE PRMS_STATVAR_OUT, ONLY: statvarOut_format, nstatVars, statVar_element, statVar_names
         USE PRMS_NHRU_SUMMARY, ONLY: NhruOutVars, NhruOut_freq, NhruOutBaseFileName, NhruOutVar_names, NhruOut_format, &
      &      NhruOutNcol
         USE PRMS_NSUB_SUMMARY, ONLY: NsubOutVars, NsubOut_freq, NsubOutBaseFileName, NsubOutVar_names, NsubOut_format
@@ -39,16 +40,16 @@
         character(len=*), parameter :: MODDESC = 'Read Control File'
         character(len=*), parameter :: MODNAME = 'read_control_file'
         INTEGER, PARAMETER :: Max_num_control_parameters = 250 ! WARNING, hard coded, DANGER, DANGER
-        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Data_file, Var_init_file, Stat_var_file, Ani_out_file
+        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Data_file, Var_init_file, Ani_out_file
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Executable_desc, Executable_model, Var_save_file
         CHARACTER(LEN=MAXFILE_LENGTH) :: Control_file, Ani_output_file, Control_description
         INTEGER, SAVE :: PlotsON_OFF, Num_control_parameters, Glacier_flag, Stream_temp_shade_flag
-        INTEGER, SAVE :: NstatVars, AniOutON_OFF, NaniOutVars, NdispGraphs, DispGraphsBuffSize, Param_file_control_parameter_id
-        INTEGER, SAVE :: Num_statvar_elements, Num_statvar_names, NumdispVar_names, NumdispVar_elements
+        INTEGER, SAVE :: AniOutON_OFF, NaniOutVars, NdispGraphs, DispGraphsBuffSize, Param_file_control_parameter_id
+        INTEGER, SAVE :: NumdispVar_names, NumdispVar_elements
         INTEGER, SAVE :: Canopy_transferON_OFF, Soilzone_transferON_OFF, Consumed_transferON_OFF
         INTEGER, SAVE :: Dyn_sro_to_dprst_flag, Dyn_sro_to_imperv_flag
         REAL, SAVE :: Initial_deltat
-        CHARACTER(LEN=MAXCONTROL_LENGTH), ALLOCATABLE, SAVE :: statVar_element(:), statVar_names(:), param_file_names(:)
+        CHARACTER(LEN=MAXCONTROL_LENGTH), ALLOCATABLE, SAVE :: param_file_names(:)
         CHARACTER(LEN=MAXCONTROL_LENGTH), ALLOCATABLE, SAVE :: dispVar_element(:), dispVar_names(:)
         ! read_flag: 0 = not set, 1 = set from control file, 2 = set to default
         TYPE PRMS_control_parameter
@@ -62,7 +63,7 @@
       END MODULE PRMS_CONTROL_FILE
 
       SUBROUTINE read_control_file()
-      USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH, MAXFILE_LENGTH
+      USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH, MAXFILE_LENGTH, DEBUG_NORMAL, ACTIVE, OFF
       USE PRMS_CONTROL_FILE
       USE PRMS_MODULE, ONLY: Print_debug, Model_output_file, Model_control_file
       IMPLICIT NONE
@@ -73,7 +74,7 @@
       ! Local Variables
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: paramname
       CHARACTER(LEN=4) :: string
-      INTEGER nchars, ios, numvalues, param_type, control_unit, j
+      INTEGER ios, numvalues, param_type, control_unit, j
       INTEGER, ALLOCATABLE :: int_parameter_values(:)
       CHARACTER(LEN=MAXFILE_LENGTH), ALLOCATABLE :: parameter_values(:)
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: paramstring
@@ -81,7 +82,7 @@
 !***********************************************************************
 
       ! control filename cannot include blanks
-      CALL get_control_filename(Model_control_file, nchars)
+      CALL get_control_filename()
       CALL PRMS_open_input_file(control_unit, Model_control_file, 'model_control_file', 0, ios)
       IF ( ios/=0 ) CALL read_error(10, TRIM(Model_control_file))
       ! read header
@@ -104,10 +105,10 @@
         IF ( ios/=0 ) CALL read_error(5, 'invalid parameter type: '//TRIM(paramstring) )
         IF ( param_type<1 .OR. param_type>4 .OR. param_type==3 ) CALL read_error(5, 'invalid parameter type: '//TRIM(paramstring) )
         ALLOCATE ( int_parameter_values(numvalues), real_parameter_values(numvalues), parameter_values(numvalues) )
-        IF ( param_type==1 ) THEN
+        IF ( param_type==INT_TYPE ) THEN
           READ ( Control_unit, *, IOSTAT=ios ) (int_parameter_values(j),j=1,numvalues)
           IF ( ios/=0 ) CALL read_error(5, 'invalid integer value: '//TRIM(paramname) )
-        ELSEIF ( param_type==4 ) THEN
+        ELSEIF ( param_type==CHAR_TYPE ) THEN
           DO j = 1, numvalues
             READ ( Control_unit, '(A)', IOSTAT=ios ) parameter_values(j)
             IF ( ios/=0 ) CALL read_error(5, 'invalid character value: '//TRIM(paramname) )
@@ -128,7 +129,9 @@
 ! setup_cont - Set control parameter value defaults
 !***********************************************************************
       SUBROUTINE setup_cont()
-      USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag
+      USE PRMS_CONSTANTS, ONLY: DEBUG_normal, ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Soilzone_aet_flag, PRMS_land_iteration_flag, &
+     &    Albedo_cbh_flag, Cloud_cover_cbh_flag
       USE PRMS_CONTROL_FILE
       IMPLICIT NONE
       ! Local Variables
@@ -167,91 +170,91 @@
       numvalues = 1
       i = 1
       Control_parameter_data(i)%name = 'print_debug'
-      Print_debug = 0
+      Print_debug = DEBUG_normal
       i = i + 1
       Control_parameter_data(i)%name = 'parameter_check_flag'
-      Parameter_check_flag = 1
+      Parameter_check_flag = ACTIVE
       Control_parameter_data(i)%values_int(1) = Parameter_check_flag
       i = i + 1
       Control_parameter_data(i)%name = 'dprst_flag'
-      Dprst_flag = 0
+      Dprst_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'cascade_flag'
-      Cascade_flag = 1
+      Cascade_flag = ACTIVE
       Control_parameter_data(i)%values_int(1) = Cascade_flag
       i = i + 1
       Control_parameter_data(i)%name = 'cascadegw_flag'
-      Cascadegw_flag = 1
+      Cascadegw_flag = ACTIVE
       Control_parameter_data(i)%values_int(1) = Cascadegw_flag
       i = i + 1
       Control_parameter_data(i)%name = 'save_vars_to_file'
-      Save_vars_to_file = 0
+      Save_vars_to_file = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'init_vars_from_file'
-      Init_vars_from_file = 0
+      Init_vars_from_file = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'frozen_flag'
-      Frozen_flag = 0
+      Frozen_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'glacier_flag'
-      Glacier_flag = 0
+      Glacier_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'stream_temp_flag'
-      Stream_temp_flag = 0
-	  i = i + 1
+      Stream_temp_flag = OFF
+      i = i + 1
       Control_parameter_data(i)%name = 'strmtemp_humidity_flag'
-      Strmtemp_humidity_flag = 0
+      Strmtemp_humidity_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'stream_temp_shade_flag'
-      Stream_temp_shade_flag = 0
+      Stream_temp_shade_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'snarea_curve_flag'
-      Snarea_curve_flag = 0
+      Snarea_curve_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'orad_flag'
-      Orad_flag = 0
+      Orad_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'subbasin_flag'
-      Subbasin_flag = 1
+      Subbasin_flag = ACTIVE
       Control_parameter_data(i)%values_int(1) = Subbasin_flag
       i = i + 1
       Control_parameter_data(i)%name = 'cbh_check_flag'
-      Cbh_check_flag = 1
+      Cbh_check_flag = ACTIVE
       Control_parameter_data(i)%values_int(1) = Cbh_check_flag
       i = i + 1
       Control_parameter_data(i)%name = 'cbh_binary_flag'
-      Cbh_binary_flag = 0
+      Cbh_binary_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'gwr_swale_flag'
-      Gwr_swale_flag = 0
+      Gwr_swale_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'snow_cbh_flag'
-      Snow_cbh_flag = 0
+      Snow_cbh_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'gwflow_cbh_flag'
-      Gwflow_cbh_flag = 0
+      Gwflow_cbh_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'humidity_cbh_flag'
-      Humidity_cbh_flag = 0
+      Humidity_cbh_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'windspeed_cbh_flag'
-      Windspeed_cbh_flag = 0
+      Windspeed_cbh_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'mbinit_flag'
-      Mbinit_flag = 0
+      Mbinit_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'outputSelectDatesON_OFF'
-      outputSelectDatesON_OFF = 0
+      outputSelectDatesON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'nhruOutON_OFF'
-      NhruOutON_OFF = 0
+      NhruOutON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'nhruOut_freq'
       NhruOut_freq = 1
       Control_parameter_data(i)%values_int(1) = NhruOut_freq
       i = i + 1
       Control_parameter_data(i)%name = 'nhruOutNcol'
-	  NhruOutNcol = 0
+      NhruOutNcol = 0
       i = i + 1
       Control_parameter_data(i)%name = 'nhruOut_format'
       NhruOut_format = 1
@@ -260,38 +263,42 @@
       Control_parameter_data(i)%name = 'nhruOutVars'
       NhruOutVars = 0
       i = i + 1
+      Control_parameter_data(i)%name = 'statvarOut_format'
+      statvarOut_format = 1
+      Control_parameter_data(i)%values_int(1) = statvarOut_format
+      i = i + 1
       Control_parameter_data(i)%name = 'nsubOutON_OFF'
-      NsubOutON_OFF = 0
+      NsubOutON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'nsubOutVars'
       NsubOutVars = 0
       i = i + 1
       Control_parameter_data(i)%name = 'basinOutON_OFF'
-      BasinOutON_OFF = 0
+      BasinOutON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'basinOutVars'
       BasinOutVars = 0
       i = i + 1
       Control_parameter_data(i)%name = 'nsegmentOutON_OFF'
-      NsegmentOutON_OFF = 0
+      NsegmentOutON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'nsegmentOutVars'
       NsegmentOutVars = 0
       i = i + 1
       Control_parameter_data(i)%name = 'statsON_OFF'
-      StatsON_OFF = 0
+      StatsON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'csvON_OFF'
-      CsvON_OFF = 0
+      CsvON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'aniOutON_OFF'
-      AniOutON_OFF = 0
+      AniOutON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'mapOutON_OFF'
-      MapOutON_OFF = 0
+      MapOutON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'nstatVars'
-      NstatVars = 0
+      nstatVars = 0
       i = i + 1
       Control_parameter_data(i)%name = 'nmapOutVars'
       NmapOutVars = 0
@@ -327,83 +334,95 @@
       Control_parameter_data(i)%values_int(1) = Prms_warmup
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_imperv_flag'
-      Dyn_imperv_flag = 0
+      Dyn_imperv_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_intcp_flag'
-      Dyn_intcp_flag = 0
-       i = i + 1
+      Dyn_intcp_flag = OFF
+      i = i + 1
       Control_parameter_data(i)%name = 'dyn_covden_flag'
-      Dyn_covden_flag = 0
+      Dyn_covden_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'PRMS_land_iteration_flag'
+      PRMS_land_iteration_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'soilzone_aet_flag'
+      Soilzone_aet_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'albedo_cbh_flag'
+      Albedo_cbh_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'cloud_cover_cbh_flag'
+      Cloud_cover_cbh_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dispGraphsBuffSize'
       DispGraphsBuffSize = 50
       Control_parameter_data(i)%values_int(1) = DispGraphsBuffSize
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_transp_flag'
-      Dyn_transp_flag = 0
+      Dyn_transp_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_transp_on_flag'
-      Dyn_transp_on_flag = 0
+      Dyn_transp_on_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_sro2dprst_perv_flag'
-      Dyn_sro2dprst_perv_flag = 0
+      Dyn_sro2dprst_perv_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_sro2dprst_imperv_flag'
-      Dyn_sro2dprst_imperv_flag = 0
+      Dyn_sro2dprst_imperv_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_covtype_flag'
-      Dyn_covtype_flag = 0
+      Dyn_covtype_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_fallfrost_flag'
-      Dyn_fallfrost_flag = 0
+      Dyn_fallfrost_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_springfrost_flag'
-      Dyn_springfrost_flag = 0
+      Dyn_springfrost_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_potet_flag'
-      Dyn_potet_flag = 0
+      Dyn_potet_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_soil_flag'
-      Dyn_soil_flag = 0
+      Dyn_soil_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_radtrncf_flag'
-      Dyn_radtrncf_flag = 0
+      Dyn_radtrncf_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_snareathresh_flag'
-      Dyn_snareathresh_flag = 0
+      Dyn_snareathresh_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_sro_to_dprst_flag'
-      Dyn_sro_to_dprst_flag = 0
+      Dyn_sro_to_dprst_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_sro_to_imperv_flag'
-      Dyn_sro_to_imperv_flag = 0
+      Dyn_sro_to_imperv_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_dprst_flag'
-      Dyn_dprst_flag = 0
+      Dyn_dprst_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'segment_transferON_OFF'
-      Segment_transferON_OFF = 0
+      Segment_transferON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'gwr_transferON_OFF'
-      Gwr_transferON_OFF = 0
+      Gwr_transferON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'external_transferON_OFF'
-      External_transferON_OFF = 0
+      External_transferON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'consumed_transferON_OFF'
-      Consumed_transferON_OFF = 0
+      Consumed_transferON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'lake_transferON_OFF'
-      Lake_transferON_OFF = 0
+      Lake_transferON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dprst_transferON_OFF'
-      Dprst_transferON_OFF = 0
+      Dprst_transferON_OFF = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'soilzone_transferON_OFF'
-      Soilzone_transferON_OFF = 0
+      Soilzone_transferON_OFF = OFF
       i = i + 1      
       Control_parameter_data(i)%name = 'canopy_transferON_OFF'
-      Canopy_transferON_OFF = 0
+      Canopy_transferON_OFF = OFF
       i = i + 1 
 
       ! parameters that get allocated if in Control File
