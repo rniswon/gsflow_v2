@@ -18,8 +18,8 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-08-31'
-      INTEGER, SAVE :: DBGUNT, Soil_iter, HRU_id, Iter_aet_flag
+      character(len=*), parameter :: Version_soilzone = '2021-09-01'
+      INTEGER, SAVE :: DBGUNT, Soil_iter, Iter_aet_flag
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
       REAL, SAVE, ALLOCATABLE :: Soil_lower_stor_max(:)
@@ -1007,8 +1007,6 @@
       ENDIF
       IF ( GSFLOW_flag==ACTIVE ) Sm2gw_grav = 0.0
 
-      CALL init_basin_vars()
-
       IF ( Cascade_flag>CASCADE_OFF ) THEN
         Upslope_interflow = 0.0D0
         Upslope_dunnianflow = 0.0D0
@@ -1022,7 +1020,7 @@
         Ag_irrigation_add = 0.0
         Ag_irrigation_add_vol = 0.0
       ENDIF
-
+      CALL init_basin_vars()
       gwin = 0.0D0
       ! Soil_to_gw and Soil_to_ssr for whole HRU
       Soil_to_gw = 0.0
@@ -1041,7 +1039,6 @@
 
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
-        HRU_id = i
 
         hruactet = Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i)
         IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
@@ -1059,7 +1056,6 @@
           Unused_potet(i) = Potet(i) - hruactet
           Basin_actet = Basin_actet + DBLE( hruactet*harea )
           Basin_lakeevap = Basin_lakeevap + DBLE( hruactet*harea )
-          Hru_actet(i) = hruactet
           Basin_lakeprecip = Basin_lakeprecip + DBLE( Hru_ppt(i)*harea )
           IF ( Cascade_flag>CASCADE_OFF ) THEN
             ! if lake HRU doesn't cascade, should we limit ET to
@@ -1067,6 +1063,7 @@
             Lakein_sz(i) = Upslope_interflow(i) + Upslope_dunnianflow(i)
             Basin_lakeinsz = Basin_lakeinsz + Lakein_sz(i)*Hru_area_dble(i)
           ENDIF
+          Hru_actet(i) = hruactet
           CYCLE
         ENDIF
 
@@ -1108,7 +1105,7 @@
         ag_water_maxin = 0.0
         IF ( Ag_package==ACTIVE ) THEN
           IF ( Hru_ag_irr(i)>0.0 ) THEN
-            ag_water_maxin = Hru_ag_irr(i)/perv_area ! Hru_ag_irr is in inches - acres
+            ag_water_maxin = Hru_ag_irr(i)/perv_area ! Hru_ag_irr is in acre-inches
           ENDIF
         ENDIF
         IF ( Soilzone_add_water_use==ACTIVE ) THEN
@@ -1136,6 +1133,7 @@
         ! pref_flow for whole HRU
 ! ??? should cascading flow go to preferential flow fraction ???
         prefflow = 0.0
+        dunnianflw_pfr = 0.0
         IF ( Pref_flow_infil_frac(i)>0.0 ) THEN
           pref_flow_maxin = 0.0
           Pref_flow_infil(i) = 0.0
@@ -1144,8 +1142,6 @@
             pref_flow_maxin = capwater_maxin*Pref_flow_infil_frac(i)
             capwater_maxin = capwater_maxin - pref_flow_maxin
             pref_flow_maxin = pref_flow_maxin*perv_frac
-          ENDIF
-          IF ( pref_flow_maxin>0.0 ) THEN
             IF ( cfgi_frozen_hru==ACTIVE ) THEN
               dunnianflw_pfr = pref_flow_maxin
             ELSE
@@ -1159,8 +1155,8 @@
             ENDIF
             Pref_flow_infil(i) = pref_flow_maxin - dunnianflw_pfr
             Basin_pref_flow_infil = Basin_pref_flow_infil + DBLE( Pref_flow_infil(i)*harea )
-            Pfr_dunnian_flow(i) = dunnianflw_pfr
           ENDIF
+          Pfr_dunnian_flow(i) = dunnianflw_pfr
         ENDIF
 
 ! ??? should cascading flow go to preferential flow fraction ???
@@ -1305,6 +1301,7 @@
 !          ENDIF
 !          Soil_moist(i) = 0.0
 !        ENDIF
+
         Hru_actet(i) = hruactet + pervactet*perv_frac
         avail_potet = Potet(i) - Hru_actet(i)
         ! sanity check
@@ -1588,7 +1585,7 @@
      &           Snow_free, Potet_rechr, Potet_lower, Potet, Perv_frac, Soil_saturated)
       USE PRMS_CONSTANTS, ONLY: NEARZERO, BARESOIL, SAND, LOAM, CLAY, ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Soilzone_aet_flag
-      USE PRMS_SOILZONE, ONLY: Et_type !, HRU_id
+      USE PRMS_SOILZONE, ONLY: Et_type
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Transp_on, Cov_type, Soil_type
@@ -1704,9 +1701,7 @@
       IF ( Perv_actet*Perv_frac>Potet ) THEN
         PRINT *, 'perv_et PET problem', Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
       ENDIF
-!if ( HRU_id==36 .and. Transp_on==OFF ) then
-!print *, Et_type, snow_free, HRU_id, et
-!endif
+
       END SUBROUTINE compute_szactet
 
 !***********************************************************************
