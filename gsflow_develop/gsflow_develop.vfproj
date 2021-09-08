@@ -1,22 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<VisualStudioProject ProjectCreator="Intel Fortran" Keyword="Console Application" Version="11.0" ProjectIdGuid="{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}">
+<VisualStudioProject ProjectCreator="Intel Fortran" Keyword="Console Application" Version="11.0" ProjectIdGuid="{B1E2D633-0EFC-4D7C-ABF0-F1E82FC1E197}">
 	<Platforms>
 		<Platform Name="Win32"/>
 		<Platform Name="x64"/></Platforms>
 	<Configurations>
 		<Configuration Name="Debug|Win32">
-				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" EnableRecursion="true" F77IntegerConstants="true" WarnUnusedVariables="true" WarnInterfaces="true" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" Traceback="true" RuntimeChecks="rtChecksAll" NullPointerCheck="true" BoundsCheck="true" UninitializedVariablesCheck="true" RuntimeLibrary="rtMultiThreadedDebug" ImproveFloatingPointConsistency="true"/>
-				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalYes" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
-				<Tool Name="VFResourceCompilerTool"/>
-				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
-				<Tool Name="VFCustomBuildTool"/>
-				<Tool Name="VFPreLinkEventTool"/>
-				<Tool Name="VFPreBuildEventTool"/>
-				<Tool Name="VFPostBuildEventTool"/>
-				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
-		<Configuration Name="Release|Win32">
-				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" EnableRecursion="true" WarnUnusedVariables="true" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" GlobalOptimizations="true" ImproveFloatingPointConsistency="true"/>
-				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
 				<Tool Name="VFCustomBuildTool"/>
@@ -25,7 +15,7 @@
 				<Tool Name="VFPostBuildEventTool"/>
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
 		<Configuration Name="Debug|x64">
-				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" EnableRecursion="true" LocalSavedScalarsZero="true" FloatingPointExceptionHandling="fpe0" FloatingPointModel="source" FloatingPointExceptionsModel="enable" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" Traceback="true" BoundsCheck="true" ImproveFloatingPointConsistency="true"/>
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
 				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
@@ -34,8 +24,18 @@
 				<Tool Name="VFPreBuildEventTool"/>
 				<Tool Name="VFPostBuildEventTool"/>
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Release|Win32">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
 		<Configuration Name="Release|x64">
-				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" EnableRecursion="true" FloatingPointExceptionHandling="fpe0" FloatingPointModel="source" FloatingPointExceptionsModel="enable" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" GlobalOptimizations="true" ImproveFloatingPointConsistency="true"/>
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" RuntimeLibrary="rtMultiThreadedDLL"/>
 				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
@@ -45,7 +45,7 @@
 				<Tool Name="VFPostBuildEventTool"/>
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration></Configurations>
 	<Files>
-		<Filter Name="Header Files" Filter="fi;fd"/>
+		<Filter Name="Header Files" Filter="fi;fd;h;inc"/>
 		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
 		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
 		<File RelativePath="..\GSFLOW\src\prms\basin.f90"/>
@@ -62,10 +62,8 @@
 		<File RelativePath="..\GSFLOW\src\prms\frost_date.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\glacr_melt.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_budget.f90"/>
-		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_main.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_mf2prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_modflow.f"/>
-		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_module.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms2mf.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_sum.f90"/>
@@ -112,8 +110,6 @@
 		<File RelativePath="..\GSFLOW\src\modflow\Irestart.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\lmt8_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\mach_mod.f90"/>
-		<File RelativePath="..\GSFLOW\src\modflow\Makefile"/>
-		<File RelativePath="..\GSFLOW\src\prms\Makefile"/>
 		<File RelativePath="..\GSFLOW\src\prms\map_results.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\mhc7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\modules.f90"/>
@@ -135,7 +131,6 @@
 		<File RelativePath="..\GSFLOW\src\modflow\obs2ghb7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\obs2riv7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\obs2str7.f"/>
-		<File RelativePath="..\GSFLOW\src\modflow\openspec.inc"/>
 		<File RelativePath="..\GSFLOW\src\modflow\parutl7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\pcg7_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\potet_hamon.f90"/>
@@ -152,12 +147,12 @@
 		<File RelativePath="..\GSFLOW\src\prms\prms_summary.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_time.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\routing.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\setup_param.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\sip7_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\snowcomp.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\soilzone.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\soltab.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\srunoff.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\statvar_out.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\stream_temp.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\strmflow.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\strmflow_in_out.f90"/>
