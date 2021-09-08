@@ -45,7 +45,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: INDEX, ABS
-      INTEGER, EXTERNAL :: declparam_int, declparam_real, getparam_int, getparam_real
+      INTEGER, EXTERNAL :: declparam, getparam_int, getparam_real
       EXTERNAL :: read_error, temp_set, print_module, temp_1sta_laps_restart, print_date, checkdim_param_limits
       EXTERNAL :: compute_temp_laps
 ! Local Variables
@@ -185,7 +185,7 @@
         IF ( Temp_flag==temp_1sta_module .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Tcrn(Nhru), Tcrx(Nhru) )
           ALLOCATE ( Tmax_lapse(Nhru, MONTHS_PER_YEAR) )
-          IF ( declparam_real(MODNAME, 'tmax_lapse', 'nhru,nmonths', &
+          IF ( declparam(MODNAME, 'tmax_lapse', 'nhru,nmonths', 'real', &
      &         '3.0', '-20.0', '20.0', &
      &         'Monthly maximum temperature lapse rate for each HRU', &
      &         'Monthly (January to December) values representing the change in maximum air temperature per 1000 elev_units of'// &
@@ -194,7 +194,7 @@
 ! 3 degC/ 1000 ft is adiabatic, or 9.8 degC/ 1000 m, or 5.4 degF/ 1000 ft, or 17.64 degF /1000 m
 
           ALLOCATE ( Tmin_lapse(Nhru, MONTHS_PER_YEAR) )
-          IF ( declparam_real(MODNAME, 'tmin_lapse', 'nhru,nmonths', &
+          IF ( declparam(MODNAME, 'tmin_lapse', 'nhru,nmonths', 'real', &
      &         '3.0', '-20.0', '20.0', &
      &         'Monthly minimum temperature lapse rate for each HRU', &
      &         'Monthly (January to December) values representing the change in minimum air temperture per 1000 elev_units of'// &
@@ -204,19 +204,20 @@
 
         IF ( Temp_flag==temp_laps_module .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Hru_tlaps(Nhru) )
-          IF ( declparam_int(MODNAME, 'hru_tlaps', 'nhru', &
+          IF ( declparam(MODNAME, 'hru_tlaps', 'nhru', 'integer', &
      &         '0', 'bounded', 'ntemp', &
      &         'Index of lapse temperature station for each HRU', &
      &         'Index of the lapse temperature station used for lapse rate calculations', &
      &         'none')/=0 ) CALL read_error(1, 'hru_tlaps')
         ENDIF
 
-        IF ( declparam_int(MODNAME, 'max_missing', 'one', &
+        IF ( declparam(MODNAME, 'max_missing', 'one', 'integer', &
      &       '3', '0', '10', &
      &       'Maximum number of consecutive missing values allowed for'// &
      &       ' any air-temperature-measurement station; 0=unlimited', &
      &       'Maximum number of consecutive missing values allowed for'// &
-     &       ' any air-temperature-measurement station; missing value set to last valid value; 0=unlimited', &
+     &       ' any air-temperature-measurement station; missing value set'// &
+     &       ' to last valid value; 0=unlimited', &
      &       'none')/=0 ) CALL read_error(1, 'max_missing')
 
       ELSEIF ( Process_flag==INIT ) THEN

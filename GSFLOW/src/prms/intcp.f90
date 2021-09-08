@@ -70,7 +70,7 @@
       USE PRMS_INTCP
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam_real, declparam_int
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module, declvar_real, declvar_dble, declvar_int
 !***********************************************************************
       intdecl = 0
@@ -111,7 +111,7 @@
 !       such as a living filter), for options 1, 2, and 3 irrigation water is specified as an
 !       HRU-area weighted average value
         ALLOCATE ( Irr_type(Nhru) )
-        IF ( declparam_int(MODNAME, 'irr_type', 'nhru', &
+        IF ( declparam(MODNAME, 'irr_type', 'nhru', 'integer', &
      &       '0', '0', '2', &
      &       'Application method of irrigation water', &
      &       'Application method of irrigation water for each HRU (0 = sprinkler;'// &
@@ -202,21 +202,21 @@
 
 ! declare parameters
       ALLOCATE ( Snow_intcp(Nhru) )
-      IF ( declparam_real(MODNAME, 'snow_intcp', 'nhru', &
+      IF ( declparam(MODNAME, 'snow_intcp', 'nhru', 'real', &
      &     '0.1', '0.0', '1.0', &
      &     'Snow interception storage capacity', &
      &     'Snow interception storage capacity for the major vegetation type in each HRU', &
      &     'inches')/=0 ) CALL read_error(1, 'snow_intcp')
 
       ALLOCATE ( Srain_intcp(Nhru) )
-      IF ( declparam_real(MODNAME, 'srain_intcp', 'nhru', &
+      IF ( declparam(MODNAME, 'srain_intcp', 'nhru', 'real', &
      &     '0.1', '0.0', '1.0', &
      &     'Summer rain interception storage capacity', &
      &     'Summer rain interception storage capacity for the major vegetation type in each HRU', &
      &     'inches')/=0 ) CALL read_error(1, 'srain_intcp')
 
       ALLOCATE ( Wrain_intcp(Nhru) )
-      IF ( declparam_real(MODNAME, 'wrain_intcp', 'nhru', &
+      IF ( declparam(MODNAME, 'wrain_intcp', 'nhru', 'real', &
      &     '0.1', '0.0', '1.0', &
      &     'Winter rain interception storage capacity', &
      &     'Winter rain interception storage capacity for the major vegetation type in each HRU', &

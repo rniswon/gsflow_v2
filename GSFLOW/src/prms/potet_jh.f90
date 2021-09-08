@@ -22,7 +22,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: declparam_real, getparam_real
+      INTEGER, EXTERNAL :: declparam, getparam_real
       EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
@@ -50,7 +50,7 @@
         CALL print_module(MODDESC, MODNAME, Version_potet)
 
         ALLOCATE ( Jh_coef(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'jh_coef', 'nhru,nmonths', &
+        IF ( declparam(MODNAME, 'jh_coef', 'nhru,nmonths', 'real', &
      &       '0.014', '-0.5', '1.5', &
      &       'Monthly air temperature coefficient for each HRU - Jensen-Haise', &
      &       'Monthly (January to December) air temperature coefficient used in Jensen-Haise potential ET computations'// &
@@ -58,7 +58,7 @@
      &       'per degrees Fahrenheit')/=0 ) CALL read_error(1, 'jh_coef')
 
         ALLOCATE ( Jh_coef_hru(Nhru) )
-        IF ( declparam_real(MODNAME, 'jh_coef_hru', 'nhru', &
+        IF ( declparam(MODNAME, 'jh_coef_hru', 'nhru', 'real', &
      &       '13.0', '-99.0', '150.0', &
      &       'HRU air temperature coefficient - Jensen-Haise', &
      &       'Air temperature coefficient used in Jensen-Haise potential ET computations for each HRU', &

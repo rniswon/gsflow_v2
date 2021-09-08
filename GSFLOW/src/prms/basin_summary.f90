@@ -56,7 +56,7 @@
       USE PRMS_BASIN_SUMMARY
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string, declparam_int
+      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string, declparam
       EXTERNAL read_error, print_module, error_stop
 ! Local Variables
       INTEGER :: i
@@ -82,7 +82,7 @@
 ! Declared Parameters
       IF ( BasinOutON_OFF==2 .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Nhm_id(Nhru) )
-        IF ( declparam_int(MODNAME, 'nhm_id', 'nhru', &
+        IF ( declparam(MODNAME, 'nhm_id', 'nhru', 'integer', &
      &       '1', '1', '9999999', &
      &       'National Hydrologic Model HRU ID', 'National Hydrologic Model HRU ID', &
      &       'none') /= 0 ) CALL read_error(1, 'nhm_id')
@@ -99,7 +99,7 @@
       USE PRMS_MODULE, ONLY: Start_year, Prms_warmup, BasinOutON_OFF, Nhru
       USE PRMS_BASIN_SUMMARY
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam
+      INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam_int
       EXTERNAL :: PRMS_open_output_file, error_stop, read_error
 ! Local Variables
       INTEGER :: ios, ierr, size, jj
@@ -153,7 +153,7 @@
       WRITE ( Output_fmt2, 9002 ) BasinOutVars
 
       IF ( BasinOutON_OFF==2 ) THEN
-        IF ( getparam(MODNAME, 'nhm_id', Nhru, 'integer', Nhm_id)/=0 ) CALL read_error(2, 'nhm_id')
+        IF ( getparam_int(MODNAME, 'nhm_id', Nhru, Nhm_id)/=0 ) CALL read_error(2, 'nhm_id')
       ENDIF
 
       IF ( Daily_flag==ACTIVE ) THEN

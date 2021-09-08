@@ -76,7 +76,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: INDEX
-      INTEGER, EXTERNAL :: declparam_real, declparam_int
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module, error_stop, declvar_real
 !***********************************************************************
       t2dist2decl = 0
@@ -97,13 +97,13 @@
      &     'Basin area-weighted average minimum air temperature lapse rate per 1000 feet', &
      &     'degrees', Basin_lapse_min)
 
-      IF ( declparam_real(MODNAME, 'dist_max', 'one', &
+      IF ( declparam(MODNAME, 'dist_max', 'one', 'real', &
      &     '1.0E9', '0.0', '1.0E9', &
      &     'Maximum distance from HRU to include a climate station', &
      &     'Maximum distance from an HRU to a measurement station for use in calcuations', &
      &     'feet')/=0 ) CALL read_error(1, 'dist_max')
 
-      IF ( declparam_int(MODNAME, 'max_tsta', 'one', &
+      IF ( declparam(MODNAME, 'max_tsta', 'one', 'integer', &
      &     '0', 'bounded', 'ntemp', &
      &     'Maximum number of temperature stations to use for'// &
      &     ' distributing temperature to any HRU', &
@@ -114,7 +114,7 @@
 ! added THE FOLLOWING NEW PARAMETERS by J Vaccaro 7.98,
 !       various parameters to interpolate and constrain lapse rates for temperature
 
-      IF ( declparam_real(MODNAME, 'monmin', 'nmonths', &
+      IF ( declparam(MODNAME, 'monmin', 'nmonths', 'real', &
      &     '-60.0', '-60.0', '65.0', &
      &     'Daily minimum temperature', &
      &     'Monthly minimum air temperature to constrain lowest'// &
@@ -122,7 +122,7 @@
      &     ' on historical temperature for all measurement stations', &
      &     'temp_units')/=0 ) CALL read_error(1, 'monmin')
 
-      IF ( declparam_real(MODNAME, 'monmax', 'nmonths', &
+      IF ( declparam(MODNAME, 'monmax', 'nmonths', 'real', &
      &     '100.0', '0.0', '115.0', &
      &     'Daily maximum temperature', &
      &     'Monthly maximum air temperature to constrain lowest'// &
@@ -130,7 +130,7 @@
      &     ' on historical temperature for all measurement stations', &
      &     'temp_units')/=0 ) CALL read_error(1, 'monmax')
 
-      IF ( declparam_real(MODNAME, 'lapsemin_min', 'nmonths', &
+      IF ( declparam(MODNAME, 'lapsemin_min', 'nmonths', 'real', &
      &     '-4.0', '-7.0', '-3.0', &
      &     'Monthly minimum lapse rate for minimum temperature', &
      &     'Monthly (January to December) minimum lapse rate to'// &
@@ -138,7 +138,7 @@
      &     ' daily air temperatures for all air-temperature measurement stations', &
      &     'temp_units/feet')/=0 ) CALL read_error(1, 'lapsemin_min')
 
-      IF ( declparam_real(MODNAME, 'lapsemin_max', 'nmonths', &
+      IF ( declparam(MODNAME, 'lapsemin_max', 'nmonths', 'real', &
      &     '3.0', '-2.0', '4.0', &
      &     'Monthly maximum lapse rate for minimum temperature', &
      &     'Monthly (January to December) minimum lapse rate to'// &
@@ -146,7 +146,7 @@
      &     ' daily air temperatures for all air-temperature measurement stations', &
      &     'temp_units/feet')/=0 ) CALL read_error(1, 'lapsemin_max')
 
-      IF ( declparam_real(MODNAME, 'lapsemax_min', 'nmonths', &
+      IF ( declparam(MODNAME, 'lapsemax_min', 'nmonths', 'real', &
      &     '-6.5', '-7.0', '-3.0', &
      &     'Monthly minimum lapse rate for maximum temperature', &
      &     'Monthly (January to December) maximum lapse rate to'// &
@@ -154,7 +154,7 @@
      &     ' daily air temperatures for all air-temperature measurement stations', &
      &     'temp_units/feet')/=0 ) CALL read_error(1, 'lapsemax_min')
 
-      IF ( declparam_real(MODNAME, 'lapsemax_max', 'nmonths', &
+      IF ( declparam(MODNAME, 'lapsemax_max', 'nmonths', 'real', &
      &     '2.0', '-3.0', '3.0', &
      &     'Monthly maximum lapse rate for maximum temperature', &
      &     'Monthly (January to December) maximum lapse rate to'// &
@@ -163,7 +163,7 @@
      &     'temp_units/feet')/=0 ) CALL read_error(1, 'lapsemax_max')
 
       ALLOCATE ( Tsta_xlong(Ntemp) )
-      IF ( declparam_real(MODNAME, 'tsta_xlong', 'ntemp', &
+      IF ( declparam(MODNAME, 'tsta_xlong', 'ntemp', 'real', &
      &     '0.0', '-1.0E9', '1.0E9', &
      &     'Temperature station longitude, State Plane', &
      &     'Longitude of each air-temperature-measurement station,'// &
@@ -171,7 +171,7 @@
      &     'feet')/=0 ) CALL read_error(1, 'tsta_xlong')
 
       ALLOCATE ( Tsta_ylat(Ntemp) )
-      IF ( declparam_real(MODNAME, 'tsta_ylat', 'ntemp', &
+      IF ( declparam(MODNAME, 'tsta_ylat', 'ntemp', 'real', &
      &     '0.0', '-1.0E9', '1.0E9', &
      &     'Temperature station latitude, State Plane', &
      &     'Latitude of each air-temperature-measurement station,'// &
@@ -179,14 +179,14 @@
      &     'feet')/=0 ) CALL read_error(1, 'tsta_ylat')
 
       ALLOCATE ( Hru_ylat(Nhru) )
-      IF ( declparam_real(MODNAME, 'hru_ylat', 'nhru', &
+      IF ( declparam(MODNAME, 'hru_ylat', 'nhru', 'real', &
      &     '0.0', '-1.0E9', '1.0E9', &
      &     'HRU latitude of centroid, State Plane', &
      &     'Latitude of each HRU for the centroid, State Plane Coordinate System', &
      &     'feet')/=0 ) CALL read_error(1, 'hru_ylat')
 
       ALLOCATE ( Hru_xlong(Nhru) )
-      IF ( declparam_real(MODNAME, 'hru_xlong', 'nhru', &
+      IF ( declparam(MODNAME, 'hru_xlong', 'nhru', 'real', &
      &     '0.0', '-1.0E9', '1.0E9', &
      &     'HRU longitude of centroid, State Plane', &
      &     'Longitude of each HRU for the centroid, State Plane Coordinate System', &

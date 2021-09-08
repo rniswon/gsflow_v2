@@ -32,7 +32,7 @@
      &    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, Tavgc
 ! Functions
       INTRINSIC :: SNGL
-      INTEGER, EXTERNAL :: declparam_real, declparam_int, getparam_real, getparam_int, getdim, decldim, control_string
+      INTEGER, EXTERNAL :: declparam, getparam_real, getparam_int, getdim, decldim, control_string
       EXTERNAL :: read_error, precip_form, temp_set, find_header_end, find_current_time
       EXTERNAL :: read_cbh_date, print_module, print_date
 ! Local Variables
@@ -76,14 +76,14 @@
 
 ! Declare parameters
         ALLOCATE ( Tmax_map_adj(Nmap,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'tmax_map_adj', 'nmap,nmonths', &
+        IF ( declparam(MODNAME, 'tmax_map_adj', 'nmap,nmonths', 'real', &
      &       '0.0', '-10.0', '10.0', &
      &       'Monthly maximum temperature adjustment factor for each mapped spatial unit', &
      &       'Monthly (January to December) additive adjustment factor to maximum air temperature for each mapped,'// &
      &       ' spatial unit estimated on the basis of slope and aspect', &
      &       'temp_units')/=0 ) CALL read_error(1, 'tmax_map_adj')
         ALLOCATE ( Tmin_map_adj(Nmap,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'tmin_map_adj', 'nmap,nmonths', &
+        IF ( declparam(MODNAME, 'tmin_map_adj', 'nmap,nmonths', 'real', &
      &       '0.0', '-10.0', '10.0', &
      &       'Monthly minimum temperature adjustment factor for each mapped spatial unit', &
      &       'Monthly (January to December) additive adjustment factor to minimum air temperature for each'// &
@@ -91,7 +91,7 @@
      &       'temp_units')/=0 ) CALL read_error(1, 'tmin_map_adj')
 
         ALLOCATE ( Hru2map_id(Nmap2hru) )
-        IF ( declparam_int(MODNAME, 'hru2map_id', 'nmap2hru', &
+        IF ( declparam(MODNAME, 'hru2map_id', 'nmap2hru', 'integer', &
      &       '1', 'bounded', 'nhru', &
      &       'HRU identification number for each HRU to mapped spatial units intersection', &
      &       'HRU identification number for each HRU to mapped spatial units intersection', &
@@ -99,14 +99,14 @@
 
         !rsr, bounded value could be a problem if number of mapped spatial units > nhru
         ALLOCATE ( Map2hru_id(Nmap2hru) )
-        IF ( declparam_int(MODNAME, 'map2hru_id', 'nmap2hru', &
+        IF ( declparam(MODNAME, 'map2hru_id', 'nmap2hru', 'integer', &
      &       '0', 'bounded', 'nmap', &
      &       'Mapped spatial unit identification number for each HRU to map intersection', &
      &       'Mapped spatial unit identification number for each HRU to map intersection', &
      &       'none')/=0 ) CALL read_error(1, 'map2hru_id')
 
         ALLOCATE ( Hru2map_pct(Nmap2hru) )
-        IF ( declparam_real(MODNAME, 'hru2map_pct', 'nmap2hru', &
+        IF ( declparam(MODNAME, 'hru2map_pct', 'nmap2hru', 'real', &
      &       '0.0', '0.0', '1.0', &
      &       'Portion of HRU associated with each HRU to map intersection', &
      &       'Portion of HRU associated with each HRU to map intersection', &

@@ -23,7 +23,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SQRT, DBLE, ABS
-      INTEGER, EXTERNAL :: declparam_real, getparam_real
+      INTEGER, EXTERNAL :: declparam, getparam_real
       EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
@@ -57,7 +57,7 @@
         CALL print_module(MODDESC, MODNAME, Version_potet)
 
         ALLOCATE ( Hs_krs(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'hs_krs', 'nhru,nmonths', &
+        IF ( declparam(MODNAME, 'hs_krs', 'nhru,nmonths', 'real', &
      &       '0.0135', '0.01', '0.24', &
      &       'Potential ET adjustment factor - Hargreaves-Samani', &
      &       'Monthly (January to December) adjustment factor used in Hargreaves-Samani potential ET computations for each HRU', &

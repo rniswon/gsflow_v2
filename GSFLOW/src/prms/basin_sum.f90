@@ -94,7 +94,7 @@
       USE PRMS_BASINSUM
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam_int
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module, declvar_dble
 !***********************************************************************
       sumbdecl = 0
@@ -203,14 +203,14 @@
 
 ! declare parameters
       IF ( Nobs>0 .OR. Model==DOCUMENTATION ) THEN
-        IF ( declparam_int(MODNAME, 'outlet_sta', 'one', &
+        IF ( declparam(MODNAME, 'outlet_sta', 'one', 'integer', &
      &       '0', 'bounded', 'nobs', &
      &       'Index of measurement station to use for basin outlet', &
      &       'Index of measured streamflow station corresponding to the basin outlet', &
      &       'none')/=0 ) CALL read_error(1, 'outlet_sta')
       ENDIF
 
-      IF ( declparam_int(MODNAME, 'print_type', 'one', &
+      IF ( declparam(MODNAME, 'print_type', 'one', 'integer', &
      &     '1', '0', '2', &
      &     'Type of output written to output file', &
      &     'Flag to select the type of results written to the output'// &
@@ -218,7 +218,7 @@
      &     ' 1=water balance table; 2=detailed output)', &
      &     'none')/=0 ) CALL read_error(1, 'print_type')
 
-      IF ( declparam_int(MODNAME, 'print_freq', 'one', &
+      IF ( declparam(MODNAME, 'print_freq', 'one', 'integer', &
      &     '3', '0', '15', &
      &     'Frequency for the output frequency', &
      &     'Flag to select the output frequency; for combinations,'// &

@@ -68,7 +68,7 @@
       USE PRMS_BASIN
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam_real, declparam_int
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module, declvar_real, declvar_dble
 !***********************************************************************
       basdecl = 0
@@ -130,19 +130,19 @@
         ALLOCATE ( Dprst_frac(Nhru) )
         IF ( PRMS4_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Dprst_area(Nhru) )
-          IF ( declparam_real(MODNAME, 'dprst_area', 'nhru', &
+          IF ( declparam(MODNAME, 'dprst_area', 'nhru', 'real', &
      &         '0.0', '0.0', '1.0E9', &
      &         'Aggregate sum of surface-depression storage areas of each HRU', &
      &         'Aggregate sum of surface-depression storage areas of each HRU', &
      &         'acres')/=0 ) CALL read_error(1, 'dprst_area')
-          IF ( declparam_real(MODNAME, 'dprst_frac_hru', 'nhru', &
+          IF ( declparam(MODNAME, 'dprst_frac_hru', 'nhru', 'real', &
      &         '-1.0', '-1.0', '0.999', &
      &         'Fraction of each HRU area that has surface depressions', &
      &         'Fraction of each HRU area that has surface depressions', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'dprst_frac_hru')
         ENDIF
         IF ( PRMS4_flag==OFF .OR. Model==DOCUMENTATION ) THEN
-          IF ( declparam_real(MODNAME, 'dprst_frac', 'nhru', &
+          IF ( declparam(MODNAME, 'dprst_frac', 'nhru', 'real', &
      &         '0.0', '0.0', '0.999', &
      &         'Fraction of each HRU area that has surface depressions', &
      &         'Fraction of each HRU area that has surface depressions', &
@@ -150,7 +150,7 @@
         ENDIF
 
         ALLOCATE ( Dprst_frac_open(Nhru), Dprst_frac_clos(Nhru) )
-        IF ( declparam_real(MODNAME, 'dprst_frac_open', 'nhru', &
+        IF ( declparam(MODNAME, 'dprst_frac_open', 'nhru', 'real', &
      &       '1.0', '0.0', '1.0', &
      &       'Fraction of open surface-depression storage area within'// &
      &       ' an HRU that can generate surface runoff as a function of storage volume', &
@@ -174,43 +174,43 @@
 
       ! Declared Parameters
       ALLOCATE ( Hru_area(Nhru), Hru_area_dble(Nhru) )
-      IF ( declparam_real(MODNAME, 'hru_area', 'nhru', &
+      IF ( declparam(MODNAME, 'hru_area', 'nhru', 'real', &
      &     '1.0', '0.0001', '1.0E9', &
      &     'HRU area', 'Area of each HRU', &
      &     'acres')/=0 ) CALL read_error(1, 'hru_area')
 
-      IF ( declparam_int(MODNAME, 'elev_units', 'one', &
+      IF ( declparam(MODNAME, 'elev_units', 'one', 'integer', &
      &     '0', '0', '1', &
      &     'Elevation units flag', &
      &     'Flag to indicate the units of the elevation values (0=feet; 1=meters)', &
      &     'none')/=0 ) CALL read_error(1, 'elev_units')
 
       ALLOCATE ( Hru_elev(Nhru) )
-      IF ( declparam_real(MODNAME, 'hru_elev', 'nhru', &
+      IF ( declparam(MODNAME, 'hru_elev', 'nhru', 'real', &
      &     '0.0', '-1000.0', '30000.0', &
      &     'HRU mean elevation', 'Mean elevation for each HRU', &
      &     'elev_units')/=0 ) CALL read_error(1, 'hru_elev')
 
       ALLOCATE ( Hru_lat(Nhru) )
-      IF ( declparam_real(MODNAME, 'hru_lat', 'nhru', &
+      IF ( declparam(MODNAME, 'hru_lat', 'nhru', 'real', &
      &     '40.0', '-90.0', '90.0', &
      &     'HRU latitude', 'Latitude of each HRU', &
      &     'degrees North')/=0 ) CALL read_error(1, 'hru_lat')
 
       ALLOCATE ( Hru_percent_imperv(Nhru) )
-      IF ( declparam_real(MODNAME, 'hru_percent_imperv', 'nhru', &
+      IF ( declparam(MODNAME, 'hru_percent_imperv', 'nhru', 'real', &
      &     '0.0', '0.0', '0.999', &
      &     'HRU percent impervious', 'Fraction of each HRU area that is impervious', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'hru_percent_imperv')
 
       ALLOCATE ( Hru_type(Nhru) )
-      IF ( declparam_int(MODNAME, 'hru_type', 'nhru', &
+      IF ( declparam(MODNAME, 'hru_type', 'nhru', 'integer', &
      &     '1', '0', '4', &
      &     'HRU type', 'Type of each HRU (0=inactive; 1=land; 2=lake; 3=swale; 4=glacier)', &
      &     'none')/=0 ) CALL read_error(1, 'hru_type')
 
       ALLOCATE ( Cov_type(Nhru) )
-      IF ( declparam_int(MODNAME, 'cov_type', 'nhru', &
+      IF ( declparam(MODNAME, 'cov_type', 'nhru', 'integer', &
      &     '3', '0', '4', &
      &     'Cover type designation for each HRU', &
      &     'Vegetation cover type for each HRU (0=bare soil;'// &
@@ -218,14 +218,14 @@
      &     'none')/=0 ) CALL read_error(1, 'cov_type')
 
       ALLOCATE ( Covden_sum(Nhru) )
-      IF ( declparam_real(MODNAME, 'covden_sum', 'nhru', &
+      IF ( declparam(MODNAME, 'covden_sum', 'nhru', 'real', &
      &     '0.5', '0.0', '1.0', &
      &     'Summer vegetation cover density for major vegetation type', &
      &     'Summer vegetation cover density for the major vegetation type in each HRU', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'covden_sum')
 
       ALLOCATE ( Covden_win(Nhru) )
-      IF ( declparam_real(MODNAME, 'covden_win', 'nhru', &
+      IF ( declparam(MODNAME, 'covden_win', 'nhru', 'real', &
      &     '0.5', '0.0', '1.0', &
      &     'Winter vegetation cover density for major vegetation type', &
      &     'Winter vegetation cover density for the major vegetation type in each HRU', &
@@ -236,7 +236,7 @@
         ! Local array
         ALLOCATE ( Lake_area(Nlake) )
         ! parameters
-        IF ( declparam_int(MODNAME, 'lake_hru_id', 'nhru', &
+        IF ( declparam(MODNAME, 'lake_hru_id', 'nhru', 'integer', &
      &       '0', 'bounded', 'nlake', &
      &       'Identification number of the lake associated with an HRU', &
      &       'Identification number of the lake associated with an HRU;'// &
@@ -244,7 +244,7 @@
      &       'none')/=0 ) CALL read_error(1, 'lake_hru_id')
         IF ( (Lake_route_flag==ACTIVE .AND. GSFLOW_flag==0 ) .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Lake_type(Nlake) )
-          IF ( declparam_int(MODNAME, 'lake_type', 'nlake', &
+          IF ( declparam(MODNAME, 'lake_type', 'nlake', 'integer', &
      &         '1', '1', '6', &
      &         'Type of lake routing method', &
      &         'Type of lake routing method (1=Puls routing; 2=linear routing; 3=flow through;'// &

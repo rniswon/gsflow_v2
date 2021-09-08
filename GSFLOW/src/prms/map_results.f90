@@ -67,7 +67,7 @@
       USE PRMS_MAP_RESULTS
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam_int, declparam_real, control_string_array, control_integer
+      INTEGER, EXTERNAL :: declparam, control_string_array, control_integer
       EXTERNAL :: read_error, print_module, error_stop
 ! Local Variables
       INTEGER :: i
@@ -114,41 +114,41 @@
       ENDIF
 
 ! Declared Parameters
-      IF ( declparam_int(MODNAME, 'mapvars_freq', 'one', &
+      IF ( declparam(MODNAME, 'mapvars_freq', 'one', 'integer', &
      &     '0', '0', '7', &
      &     'Mapped results frequency', &
      &     'Flag to specify the output frequency (0=none; 1=monthly; 2=yearly; 3=total; 4=monthly and yearly;'// &
      &     ' 5=monthly, yearly, and total; 6=weekly; 7=daily)', &
      &     'none')/=0 ) CALL read_error(1, 'mapvars_freq')
 
-      IF ( declparam_int(MODNAME, 'mapvars_units', 'one', &
+      IF ( declparam(MODNAME, 'mapvars_units', 'one', 'integer', &
      &     '0', '0', '3', &
      &     'Flag to specify the output units of mapped results', &
      &     'Flag to specify the output units of mapped results (0=units of the variable;'// &
      &     ' 1=inches to feet; 2=inches to centimeters; 3=inches to meters; as states or fluxes)', &
      &     'none')/=0 ) CALL read_error(1, 'mapvars_units')
 
-      IF ( declparam_int(MODNAME, 'ncol', 'one', &
+      IF ( declparam(MODNAME, 'ncol', 'one', 'integer', &
      &     '1', '1', '50000', &
      &     'Number of columns for each row of the mapped results', &
      &     'Number of columns for each row of the mapped results', &
      &     'none')/=0 ) CALL read_error(1, 'ncol')
 
       IF ( Mapflg==OFF .OR. Model==DOCUMENTATION ) THEN
-        IF ( declparam_int(MODNAME, 'gvr_cell_id', 'nhrucell', &
+        IF ( declparam(MODNAME, 'gvr_cell_id', 'nhrucell', 'integer', &
      &       '0', 'bounded', 'ngwcell', &
      &       'Corresponding grid cell id associated with each GVR', &
      &       'Index of the grid cell associated with each gravity reservoir', &
      &       'none')/=0 ) CALL read_error(1, 'gvr_cell_id')
         IF ( Nhrucell/=Ngwcell .OR. Model==DOCUMENTATION ) THEN
-          IF ( declparam_real(MODNAME, 'gvr_cell_pct', 'nhrucell', &
+          IF ( declparam(MODNAME, 'gvr_cell_pct', 'nhrucell', 'real', &
      &         '0.0', '0.0', '1.0', &
      &         'Proportion of the grid cell associated with each GVR', &
      &         'Proportion of the grid cell area associated with each gravity reservoir', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'gvr_cell_pct')
         ENDIF
         IF ( Nhru/=Nhrucell .OR. Model==DOCUMENTATION ) THEN
-          IF ( declparam_int(MODNAME, 'gvr_hru_id', 'nhrucell', &
+          IF ( declparam(MODNAME, 'gvr_hru_id', 'nhrucell', 'integer', &
      &         '0', 'bounded', 'nhru', &
      &         'Corresponding HRU id of each GVR', &
      &         'Index of the HRU associated with each gravity reservoir', &

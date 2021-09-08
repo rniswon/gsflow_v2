@@ -30,7 +30,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, LOG, SNGL
-      INTEGER, EXTERNAL :: declparam_real, getparam_real
+      INTEGER, EXTERNAL :: declparam, getparam_real
       REAL, EXTERNAL :: sat_vapor_press
       EXTERNAL :: read_error, print_module
 ! Local Variables
@@ -156,7 +156,7 @@
 
         ! Declare Parameters
         ALLOCATE ( Pt_alpha(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'pt_alpha', 'nhru,nmonths', &
+        IF ( declparam(MODNAME, 'pt_alpha', 'nhru,nmonths', 'real', &
      &       '1.26', '1.0', '2.0', &
      &       'Potential ET adjustment factor - Priestly-Taylor', &
      &       'Monthly (January to December) adjustment factor used in Priestly-Taylor potential ET computations for each HRU', &

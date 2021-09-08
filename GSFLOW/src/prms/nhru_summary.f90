@@ -71,7 +71,7 @@
       USE PRMS_NHRU_SUMMARY
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string, declparam_int
+      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string, declparam
       EXTERNAL :: read_error, print_module, error_stop
 ! Local Variables
       INTEGER :: i
@@ -106,7 +106,7 @@
 ! Declared Parameters
       IF ( NhruOutON_OFF==2 .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Nhm_id(Nhru) )
-        IF ( declparam_int(MODNAME, 'nhm_id', 'nhru', &
+        IF ( declparam(MODNAME, 'nhm_id', 'nhru', 'integer', &
      &       '1', '1', '9999999', &
      &       'National Hydrologic Model HRU ID', 'National Hydrologic Model HRU ID', &
      &       'none') /= 0 ) CALL read_error(1, 'nhm_id')
@@ -127,7 +127,7 @@
       INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam_int
       EXTERNAL read_error, PRMS_open_output_file, find_header_end, find_current_file_time
 ! Local Variables
-      INTEGER :: ios, ierr, size, dim, jj, j
+      INTEGER :: ios, ierr, size, jj, j
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
 !***********************************************************************
       Begin_results = ACTIVE

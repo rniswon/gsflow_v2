@@ -79,7 +79,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: INDEX
-      INTEGER, EXTERNAL :: declparam_real, declparam_int
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module, PRMS_open_module_file
 !***********************************************************************
       cascdecl = 0
@@ -100,25 +100,25 @@
         ALLOCATE ( Hru_pct_up(Ncascade) )
       ENDIF
       IF ( Cascade_flag==CASCADE_NORMAL .OR. Model==DOCUMENTATION ) THEN
-        IF ( declparam_int(MODNAME, 'hru_up_id', 'ncascade', &
+        IF ( declparam(MODNAME, 'hru_up_id', 'ncascade', 'integer', &
      &       '0', 'bounded', 'nhru', &
      &       'Index of HRU containing cascade area', &
      &       'Index of HRU containing cascade area', &
      &       'none')/=0 ) CALL read_error(1, 'hru_up_id')
 
-        IF ( declparam_int(MODNAME, 'hru_strmseg_down_id', 'ncascade', &
+        IF ( declparam(MODNAME, 'hru_strmseg_down_id', 'ncascade', 'integer', &
      &       '0', 'bounded', 'nsegment', &
      &       'Stream segment index that cascade area contributes flow', &
      &       'Index number of the stream segment that cascade area contributes flow', &
      &       'none')/=0 ) CALL read_error(1, 'hru_strmseg_down_id')
 
-        IF ( declparam_int(MODNAME, 'hru_down_id', 'ncascade', &
+        IF ( declparam(MODNAME, 'hru_down_id', 'ncascade', 'integer', &
      &       '0', 'bounded', 'nhru', &
      &       'HRU index of downslope HRU', &
      &       'Index number of the downslope HRU to which the upslope HRU contributes flow', &
      &       'none')/=0 ) CALL read_error(1, 'hru_down_id')
 
-        IF ( declparam_real(MODNAME, 'hru_pct_up', 'ncascade', &
+        IF ( declparam(MODNAME, 'hru_pct_up', 'ncascade', 'real', &
      &       '1.0', '0.0', '1.0', &
      &       'Fraction of HRU area associated with cascade area', &
      &       'Fraction of HRU area used to compute flow contributed'// &
@@ -127,7 +127,7 @@
       ENDIF
       IF ( Cascade_flag==CASCADE_HRU_SEGMENT .OR. Model==DOCUMENTATION ) THEN ! use hru_segment to define simple cascades
         ALLOCATE ( Hru_segment(Nhru) )
-        IF ( declparam_int(MODNAME, 'hru_segment', 'nhru', &
+        IF ( declparam(MODNAME, 'hru_segment', 'nhru', 'integer', &
      &       '0', 'bounded', 'nsegment', &
      &       'Segment index for HRU lateral inflows', &
      &       'Segment index to which an HRU contributes lateral flows'// &
@@ -135,19 +135,19 @@
      &       'none')/=0 ) CALL read_error(1, 'hru_segment')
       ENDIF
       IF ( Cascade_flag/=CASCADE_HRU_SEGMENT .OR. Model==DOCUMENTATION ) THEN
-        IF ( declparam_real(MODNAME, 'cascade_tol', 'one', &
+        IF ( declparam(MODNAME, 'cascade_tol', 'one', 'real', &
      &       '5.0', '0.0', '99.0', &
      &       'Cascade area below which a cascade link is ignored', &
      &       'Cascade area below which a cascade link is ignored', &
      &       'acres')/=0 ) CALL read_error(1, 'cascade_tol')
 
-        IF ( declparam_int(MODNAME, 'cascade_flg', 'one', &
+        IF ( declparam(MODNAME, 'cascade_flg', 'one', 'integer', &
      &       '0', '0', '1', &
      &       'Flag to indicate cascade type (0=allow many to many; 1=force one to one)', &
      &       'Flag to indicate cascade type (0=allow many to many; 1=force one to one)', &
      &       'none')/=0 ) CALL read_error(1, 'cascade_flg')
 
-        IF ( declparam_int(MODNAME, 'circle_switch', 'one', &
+        IF ( declparam(MODNAME, 'circle_switch', 'one', 'integer', &
      &       '1', '0', '1', &
      &       'Switch to check for circles', &
      &       'Switch to check for circles (0=no check; 1=check)', &
@@ -162,25 +162,25 @@
       ENDIF
       IF ( Cascadegw_flag==CASCADE_NORMAL .OR. Model==DOCUMENTATION ) THEN
 ! declare GWR cascade parameters
-        IF ( declparam_int(MODNAME, 'gw_up_id', 'ncascdgw', &
+        IF ( declparam(MODNAME, 'gw_up_id', 'ncascdgw', 'integer', &
      &       '0', 'bounded', 'ngw', &
      &       'Index of GWR containing cascade area', &
      &       'Index of GWR containing cascade area', &
      &       'none')/=0 ) CALL read_error(1, 'gw_up_id')
 
-        IF ( declparam_int(MODNAME, 'gw_strmseg_down_id', 'ncascdgw', &
+        IF ( declparam(MODNAME, 'gw_strmseg_down_id', 'ncascdgw', 'integer', &
      &       '0', 'bounded', 'nsegment', &
      &       'Stream segment index that cascade area contributes flow', &
      &       'Index number of the stream segment that cascade area contributes flow', &
      &       'none')/=0 ) CALL read_error(1, 'gw_strmseg_down_id')
 
-        IF ( declparam_int(MODNAME, 'gw_down_id', 'ncascdgw', &
+        IF ( declparam(MODNAME, 'gw_down_id', 'ncascdgw', 'integer', &
      &       '0', 'bounded', 'ngw', &
      &       'GWR index of downslope GWR', &
      &       'Index number of the downslope GWR to which the upslope GWR contributes flow', &
      &       'none')/=0 ) CALL read_error(1, 'gw_down_id')
 
-        IF ( declparam_real(MODNAME, 'gw_pct_up', 'ncascdgw', &
+        IF ( declparam(MODNAME, 'gw_pct_up', 'ncascdgw', 'real', &
      &       '1.0', '0.0', '1.0', &
      &       'Fraction of GWR area associated with cascade area', &
      &       'Fraction of GWR area used to compute flow contributed'// &

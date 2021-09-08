@@ -38,7 +38,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam_real, getparam_real
+      INTEGER, EXTERNAL :: declparam, getparam_real
       EXTERNAL :: read_error, print_module, print_date, declvar_real, declvar_dble
 ! Local Variables
       INTEGER :: j, jj, k
@@ -140,28 +140,28 @@
 
         ! Declare Parameters
         ALLOCATE ( Crad_coef(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'crad_coef', 'nhru,nmonths', &
+        IF ( declparam(MODNAME, 'crad_coef', 'nhru,nmonths', 'real', &
      &       '0.4', '0.1', '0.7', &
      &       'Coefficient in cloud cover-solar radiation relationship', &
      &       'Coefficient(B) in Thompson(1976) equation;' // &
      &       ' varies by region, contour map of values in reference', &
      &       'none')/=0 ) CALL read_error(1, 'crad_coef')
         ALLOCATE ( Crad_exp(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'crad_exp', 'nhru,nmonths', &
+        IF ( declparam(MODNAME, 'crad_exp', 'nhru,nmonths', 'real', &
      &       '0.61', '0.2', '0.8', &
      &       'Exponent in cloud cover-solar radiation relationship', &
      &       'Exponent(P) in Thompson(1976) equation', &
      &       'none')/=0 ) CALL read_error(1, 'crad_exp')
 
         ALLOCATE ( Ccov_slope(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'ccov_slope', 'nhru,nmonths', &
+        IF ( declparam(MODNAME, 'ccov_slope', 'nhru,nmonths', 'real', &
      &       '-0.13', '-0.5', '-0.01', &
      &       'Slope in temperature cloud cover relationship', &
      &       'Monthly (January to December) coefficient in cloud-cover relationship', &
      &       'none')/=0 ) CALL read_error(1, 'ccov_slope')
 
         ALLOCATE ( Ccov_intcp(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'ccov_intcp', 'nhru,nmonths', &
+        IF ( declparam(MODNAME, 'ccov_intcp', 'nhru,nmonths', 'real', &
      &       '1.83', '0.0', '5.0', &
      &       'Intercept in temperature cloud cover relationship', &
      &       'Monthly (January to December) intercept in cloud-cover relationship', &

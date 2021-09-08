@@ -45,7 +45,7 @@
       USE PRMS_OBS, ONLY: Precip
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam_int, declparam_real, getparam_int, getparam_real
+      INTEGER, EXTERNAL :: declparam, getparam_int, getparam_real
       EXTERNAL :: read_error, precip_form, print_module, compute_precip_laps
       EXTERNAL :: print_date, checkdim_param_limits
 ! Local Variables
@@ -114,7 +114,7 @@
 
 ! Declare parameters
         ALLOCATE ( Hru_psta(Nhru) )
-        IF ( declparam_int(MODNAME, 'hru_psta', 'nhru', &
+        IF ( declparam(MODNAME, 'hru_psta', 'nhru', 'integer', &
      &       '0', 'bounded', 'nrain', &
      &       'Index of base precipitation station for each HRU', &
      &       'Index of the base precipitation station used for lapse rate calculations for each HRU', &
@@ -122,51 +122,51 @@
 
         ALLOCATE ( Rain_adj_lapse(Nhru, MONTHS_PER_YEAR), Snow_adj_lapse(Nhru, MONTHS_PER_YEAR) )
         IF ( Precip_flag==precip_1sta_module .OR. Model==DOCUMENTATION ) THEN
-          IF ( declparam_real(MODNAME, 'rain_adj', 'nhru,nmonths', &
+          IF ( declparam(MODNAME, 'rain_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '10.0', &
      &         'Monthly rain adjustment factor for each HRU', &
-     &         'Monthly (January to December) factor to adjust rain on each HRU', &
+     &         'Monthly (January to December) factor to adjust measured rain on each HRU'// &
+     &         ' to account for differences in elevation, and so forth', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'rain_adj')
 
-          IF ( declparam_real(MODNAME, 'snow_adj', 'nhru,nmonths', &
+          IF ( declparam(MODNAME, 'snow_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '2.5', &
      &         'Monthly snow adjustment factor for each HRU', &
-     &         'Monthly (January to December) factor to adjust snow on each HRU', &
+     &         'Monthly (January to December) factor to adjust measured snow on each HRU'// &
+     &         ' to account for differences in elevation, and so forth', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'snow_adj')
         ENDIF
 
         IF ( Precip_flag==precip_laps_module .OR. Model==DOCUMENTATION ) THEN
-!         Monthly (January to December) factor to adjust rain lapse rate computed between station hru_psta
-!         and station hru_plaps; positive factors are mutiplied times the lapse rate and negative factors are made
-!         positive and substituted for the computed lapse rate
           ALLOCATE ( Padj_rn(Nrain, MONTHS_PER_YEAR) )
-          IF ( declparam_real(MODNAME, 'padj_rn', 'nrain,nmonths', &
+          IF ( declparam(MODNAME, 'padj_rn', 'nrain,nmonths', 'real', &
      &         '1.0', '-2.0', '10.0', &
      &         'Rain adjustment factor, by month for each precipitation station', &
      &         'Monthly (January to December) factor to adjust rain lapse rate computed between station hru_psta'// &
-     &         ' and station hru_plaps', &
+     &         ' and station hru_plaps; positive factors are mutiplied'// &
+     &         ' times the lapse rate and negative factors are made'// &
+     &         ' positive and substituted for the computed lapse rate', &
      &         'precip_units')/=0 ) CALL read_error(1, 'padj_rn')
 
-!         Monthly (January to December) factor to adjust snow lapse rate computed between station hru_psta
-!         and station hru_plaps; positive factors are mutiplied times the lapse rate and negative factors are made
-!         positive and substituted for the computed lapse rate
           ALLOCATE ( Padj_sn(Nrain, MONTHS_PER_YEAR) )
-          IF ( declparam_real(MODNAME, 'padj_sn', 'nrain,nmonths', &
+          IF ( declparam(MODNAME, 'padj_sn', 'nrain,nmonths', 'real', &
      &         '1.0', '-2.0', '10.0', &
      &         'Snow adjustment factor, by month for each precipitation station', &
      &         'Monthly (January to December) factor to adjust snow lapse rate computed between station hru_psta'// &
-     &         ' and station hru_plaps', &
+     &         ' and station hru_plaps; positive factors are mutiplied'// &
+     &         ' times the lapse rate and negative factors are made'// &
+     &         ' positive and substituted for the computed lapse rate', &
      &         'precip_units')/=0 ) CALL read_error(1, 'padj_sn')
 
           ALLOCATE ( Pmn_mo(Nrain, MONTHS_PER_YEAR) )
-          IF ( declparam_real(MODNAME, 'pmn_mo', 'nrain,nmonths', &
+          IF ( declparam(MODNAME, 'pmn_mo', 'nrain,nmonths', 'real', &
      &         '1.0', '0.00001', '100.0', &
      &         'Mean monthly precipitation for each lapse precipitation station', &
      &         'Mean monthly (January to December) precipitation for each lapse precipitation measurement station', &
      &         'precip_units')/=0 ) CALL read_error(1, 'pmn_mo')
 
           ALLOCATE ( Hru_plaps(Nhru) )
-          IF ( declparam_int(MODNAME, 'hru_plaps', 'nhru', &
+          IF ( declparam(MODNAME, 'hru_plaps', 'nhru', 'integer', &
      &         '0', 'bounded', 'nrain', &
      &         'Index of precipitation station to lapse against hru_psta', &
      &         'Index of the lapse precipitation measurement station used for lapse rate calculations for each HRU', &

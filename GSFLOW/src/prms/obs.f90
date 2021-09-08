@@ -74,7 +74,7 @@
       USE PRMS_OBS
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getdim, declparam_int
+      INTEGER, EXTERNAL :: getdim, declparam
       EXTERNAL :: read_error, print_module, declvar_real, declvar_dble, declvar_int
 !***********************************************************************
       obsdecl = 0
@@ -95,7 +95,7 @@
         CALL declvar_dble(MODNAME, 'streamflow_cms', 'nobs', Nobs, &
      &       'Streamflow at each measurement station', &
      &       'cms', Streamflow_cms)
-        IF ( declparam_int(MODNAME, 'runoff_units', 'one', &
+        IF ( declparam(MODNAME, 'runoff_units', 'one', 'integer', &
      &       '0', '0', '1', &
      &       'Measured streamflow units', 'Measured streamflow units (0=cfs; 1=cms)', &
      &       'none')/=0 ) CALL read_error(1, 'runoff_units')
@@ -177,7 +177,7 @@
         CALL declvar_int(MODNAME, 'rain_day', 'one', 1, &
      &       'Flag to set the form of any precipitation to rain (0=determine form; 1=rain)', &
      &       'none', Rain_day)
-        IF ( declparam_int(MODNAME, 'rain_code', 'nmonths', &
+        IF ( declparam(MODNAME, 'rain_code', 'nmonths', 'integer', &
      &       '2', '1', '5', &
      &       'Flag indicating rule for precipitation station use', &
      &       'Monthly (January to December) flag indicating rule for'// &

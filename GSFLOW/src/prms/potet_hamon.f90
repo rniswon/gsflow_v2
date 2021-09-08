@@ -24,7 +24,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam_real, getparam_real
+      INTEGER, EXTERNAL :: declparam, getparam_real
       EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
@@ -55,7 +55,7 @@
         CALL print_module(MODDESC, MODNAME, Version_potet)
 
         ALLOCATE ( Hamon_coef(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'hamon_coef', 'nhru,nmonths', &
+        IF ( declparam(MODNAME, 'hamon_coef', 'nhru,nmonths', 'real', &
      &       '0.0055', '0.004', '0.008', &
      &       'Monthly air temperature coefficient - Hamon', &
      &       'Monthly (January to December) air temperature coefficient used in Hamon potential ET computations for each HRU', &

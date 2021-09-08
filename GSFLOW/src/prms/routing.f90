@@ -66,7 +66,7 @@
       USE PRMS_ROUTING
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam_real, declparam_int
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module, declvar_dble
 !***********************************************************************
       routingdecl = 0
@@ -131,21 +131,21 @@
 
       IF ( Strmflow_flag==strmflow_muskingum_mann_module .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Mann_n(Nsegment) )
-        IF ( declparam_real( MODNAME, 'mann_n', 'nsegment', &
+        IF ( declparam( MODNAME, 'mann_n', 'nsegment', 'real', &
      &       '0.04', '0.001', '0.15', &
      &       'Mannings roughness coefficient', &
      &       'Mannings roughness coefficient for each segment', &
      &       'dimensionless')/=0 ) CALL read_error(1, 'mann_n')
 
         ALLOCATE ( Seg_length(Nsegment) )
-        IF ( declparam_real( MODNAME, 'seg_length', 'nsegment', &
+        IF ( declparam( MODNAME, 'seg_length', 'nsegment', 'real', &
      &       '1000.0', '1.0', '100000.0', &
      &       'Length of each segment', &
      &       'Length of each segment', &
      &       'meters')/=0 ) CALL read_error(1, 'seg_length')
 
         ALLOCATE ( Seg_depth(Nsegment) )
-        IF ( declparam_real(MODNAME, 'seg_depth', 'nsegment', &
+        IF ( declparam(MODNAME, 'seg_depth', 'nsegment', 'real', &
      &       '1.0', '0.03', '250.0', &
      &       'Segment river depth', &
      &       'Segment river depth at bankfull; shallowest depth from Blackburn-Lynch (2017);'//&
@@ -155,7 +155,7 @@
 
       IF ( Strmflow_flag==strmflow_muskingum_mann_module .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Seg_slope(Nsegment) )
-        IF ( declparam_real( MODNAME, 'seg_slope', 'nsegment', &
+        IF ( declparam( MODNAME, 'seg_slope', 'nsegment', 'real', &
      &       '0.0001', '0.0000001', '2.0', &
      &       'Surface slope of each segment', &
      &       'Surface slope of each segment as approximation for bed slope of stream', &
@@ -163,7 +163,7 @@
       ENDIF
 
       ALLOCATE ( Segment_type(Nsegment) )
-      IF ( declparam_int(MODNAME, 'segment_type', 'nsegment', &
+      IF ( declparam(MODNAME, 'segment_type', 'nsegment', 'integer', &
      &     '0', '0', '111', &
      &     'Segment type', &
      &     'Segment type (0=segment; 1=headwater; 2=lake; 3=replace inflow; 4=inbound to NHM;'// &
@@ -175,7 +175,7 @@
       ! -5 = outbound from NHM; -6 = inbound from region; -7 = outbound from region;
       ! -8 = drains to ocean; -11 = drains to Great Lake
       ALLOCATE ( Tosegment(Nsegment) )
-      IF ( declparam_int(MODNAME, 'tosegment', 'nsegment', &
+      IF ( declparam(MODNAME, 'tosegment', 'nsegment', 'integer', &
      &     '0', '0', '9999999', &
      &     'The index of the downstream segment', &
      &     'Index of downstream segment to which the segment'// &
@@ -185,7 +185,7 @@
       IF ( Cascade_flag==CASCADE_OFF .OR. Cascade_flag==CASCADE_HRU_SEGMENT .OR. Model==DOCUMENTATION ) THEN
         Hru_seg_cascades = ACTIVE
         ALLOCATE ( Hru_segment(Nhru) )
-        IF ( declparam_int(MODNAME, 'hru_segment', 'nhru', &
+        IF ( declparam(MODNAME, 'hru_segment', 'nhru', 'integer', &
      &       '0', 'bounded', 'nsegment', &
      &       'Segment index for HRU lateral inflows', &
      &       'Segment index to which an HRU contributes lateral flows'// &
@@ -196,14 +196,14 @@
       ENDIF
 
       ALLOCATE ( Obsin_segment(Nsegment) )
-      IF ( declparam_int(MODNAME, 'obsin_segment', 'nsegment', &
+      IF ( declparam(MODNAME, 'obsin_segment', 'nsegment', 'integer', &
      &     '0', 'bounded', 'nobs', &
      &     'Index of measured streamflow station that replaces inflow to a segment', &
      &     'Index of measured streamflow station that replaces inflow to a segment', &
      &     'none')/=0 ) CALL read_error(1, 'obsin_segment')
 
       ALLOCATE ( Obsout_segment(Nsegment) )
-      IF ( declparam_int(MODNAME, 'obsout_segment', 'nsegment', &
+      IF ( declparam(MODNAME, 'obsout_segment', 'nsegment', 'integer', &
      &     '0', 'bounded', 'nobs', &
      &     'Index of measured streamflow station that replaces outflow from a segment', &
      &     'Index of measured streamflow station that replaces outflow from a segment', &
@@ -211,7 +211,7 @@
 
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 ) THEN
         ALLOCATE ( Segment_flow_init(Nsegment) )
-        IF ( declparam_real(MODNAME, 'segment_flow_init', 'nsegment', &
+        IF ( declparam(MODNAME, 'segment_flow_init', 'nsegment', 'real', &
      &       '0.0', '0.0', '1.0E7', &
      &       'Initial flow in each stream segment', &
      &       'Initial flow in each stream segment', &
@@ -222,7 +222,7 @@
      &     Strmflow_flag==strmflow_muskingum_mann_module ) ALLOCATE ( K_coef(Nsegment) )
       IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
      &     Model==DOCUMENTATION ) THEN
-        IF ( declparam_real(MODNAME, 'K_coef', 'nsegment', &
+        IF ( declparam(MODNAME, 'K_coef', 'nsegment', 'real', &
      &       '1.0', '0.01', '24.0', &
      &       'Muskingum storage coefficient', &
      &       'Travel time of flood wave from one segment to the next downstream segment,'// &
@@ -234,7 +234,7 @@
       IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
      &     Strmflow_flag==strmflow_muskingum_mann_module .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( X_coef(Nsegment) )
-        IF ( declparam_real(MODNAME, 'x_coef', 'nsegment', &
+        IF ( declparam(MODNAME, 'x_coef', 'nsegment', 'real', &
      &       '0.2', '0.0', '0.5', &
      &       'Routing weighting factor', &
      &       'The amount of attenuation of the flow wave, called the'// &

@@ -33,7 +33,7 @@
      &    Basin_ppt, Basin_snow, Basin_rain, Basin_obs_ppt, Tmax_allsnow_f
 ! Functions
       INTRINSIC :: SNGL
-      INTEGER, EXTERNAL :: declparam_int, declparam_real, getparam_int, getparam_real, control_string
+      INTEGER, EXTERNAL :: declparam, getparam_int, getparam_real, control_string
       EXTERNAL :: read_error, precip_form, find_header_end, find_current_time
       EXTERNAL :: read_cbh_date, print_module, print_date
 ! Local Variables
@@ -88,7 +88,7 @@
 
 ! Declare parameters
         ALLOCATE ( Precip_map_adj(Nmap,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'precip_map_adj', 'nmap,nmonths', &
+        IF ( declparam(MODNAME, 'precip_map_adj', 'nmap,nmonths', 'real', &
      &     '1.0', '0.5', '2.0', &
      &     'Monthly rain adjustment factor for each mapped spatial unit', &
      &     'Monthly (January to December) multiplicative adjustment factor to mapped precipitation to account for'// &
@@ -96,7 +96,7 @@
      &     'decimal fraction')/=0 ) CALL read_error(1, 'precip_map_adj')
 
         ALLOCATE ( Hru2map_id(Nmap2hru) )
-        IF ( declparam_int(MODNAME, 'hru2map_id', 'nmap2hru', &
+        IF ( declparam(MODNAME, 'hru2map_id', 'nmap2hru', 'integer', &
      &       '1', 'bounded', 'nhru', &
      &       'HRU identification number for each HRU to mapped spatial units intersection', &
      &       'HRU identification number for each HRU to mapped spatial units intersection', &
@@ -104,14 +104,14 @@
 
         !rsr, bounded value could be a problem if number of mapped spatial units > nhru
         ALLOCATE ( Map2hru_id(Nmap2hru) )
-        IF ( declparam_int(MODNAME, 'map2hru_id', 'nmap2hru', &
+        IF ( declparam(MODNAME, 'map2hru_id', 'nmap2hru', 'integer', &
      &       '0', 'bounded', 'nmap', &
      &       'Mapped spatial unit identification number for each HRU to map intersection', &
      &       'Mapped spatial unit identification number for each HRU to map intersection', &
      &       'none')/=0 ) CALL read_error(1, 'map2hru_id')
 
         ALLOCATE ( Hru2map_pct(Nmap2hru) )
-        IF ( declparam_real(MODNAME, 'hru2map_pct', 'nmap2hru', &
+        IF ( declparam(MODNAME, 'hru2map_pct', 'nmap2hru', 'real', &
      &       '0.0', '0.0', '1.0', &
      &       'Portion of HRU associated with each HRU to map intersection', &
      &       'Portion of HRU associated with each HRU to map intersection', &

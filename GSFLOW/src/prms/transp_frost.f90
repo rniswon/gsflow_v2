@@ -21,7 +21,7 @@
       USE PRMS_SET_TIME, ONLY: Jsol
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam_int, getparam_int
+      INTEGER, EXTERNAL :: declparam, getparam_int
       EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
@@ -48,14 +48,14 @@
         CALL print_module(MODDESC, MODNAME, Version_transp)
 
         ALLOCATE ( Spring_frost(Nhru) )
-        IF ( declparam_int(MODNAME, 'spring_frost', 'nhru', &
+        IF ( declparam(MODNAME, 'spring_frost', 'nhru', 'integer', &
      &       '111', '1', '366', &
      &       'The solar date (number of days after winter solstice) of the last killing frost of the spring', &
      &       'The solar date (number of days after winter solstice) of the last killing frost of the spring', &
      &       'Solar date')/=0 ) CALL read_error(1, 'spring_frost')
 
         ALLOCATE ( Fall_frost(Nhru) )
-        IF ( declparam_int(MODNAME, 'fall_frost', 'nhru', &
+        IF ( declparam(MODNAME, 'fall_frost', 'nhru', 'integer', &
      &       '264', '1', '366', &
      &       'The solar date (number of days after winter solstice) of the first killing frost of the fall', &
      &       'The solar date (number of days after winter solstice) of the first killing frost of the fall', &

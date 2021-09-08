@@ -10,7 +10,7 @@
       character(len=*), parameter :: Version_convert_params = '2021-09-07'
 ! Functions
       EXTERNAL :: print_module, PRMS_open_module_file, read_error
-      INTEGER, EXTERNAL :: declparam_real, getparam_real
+      INTEGER, EXTERNAL :: declparam, getparam_real
       INTRINSIC :: MIN
 ! Parameters
       REAL, SAVE, ALLOCATABLE :: Soil_rechr_init(:), Soil_moist_init(:), Soil_rechr_max(:)
@@ -156,7 +156,7 @@
         CALL print_module(MODDESC, MODNAME, Version_convert_params)
 
         ALLOCATE ( Tmax_allsnow(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'tmax_allsnow', 'nhru,nmonths', &
+        IF ( declparam(MODNAME, 'tmax_allsnow', 'nhru,nmonths', 'real', &
      &       '32.0', '-10.0', '40.0', &
      &       'Maximum temperature when precipitation is all snow', &
      &       'Maximum air temperature when precipitation is assumed'// &
@@ -164,7 +164,7 @@
      &       'temp_units')/=0 ) CALL read_error(1, 'tmax_allsnow')
 
         ALLOCATE ( Sat_threshold(Nhru) )
-        IF ( declparam_real(MODNAME, 'sat_threshold', 'nhru', &
+        IF ( declparam(MODNAME, 'sat_threshold', 'nhru', 'real', &
      &       '999.0', '0.00001', '999.0', &
      &       'Soil saturation threshold, above field-capacity threshold', &
      &       'Water holding capacity of the gravity and preferential-'// &
@@ -173,7 +173,7 @@
      &       'inches')/=0 ) CALL read_error(1, 'sat_threshold')
 
         ALLOCATE ( Soil_moist_max(Nhru) )
-        IF ( declparam_real(MODNAME, 'soil_moist_max', 'nhru', &
+        IF ( declparam(MODNAME, 'soil_moist_max', 'nhru', 'real', &
      &       '2.0', '0.00001', '20.0', &
      &       'Maximum value of water for soil zone', &
      &       'Maximum available water holding capacity of capillary'// &
@@ -186,7 +186,7 @@
         ALLOCATE ( Soil_rechr_init_frac(Nhru), Soil_rechr_max_frac(Nhru), Soil_moist_init_frac(Nhru), Ssstor_init_frac(Nhru) )
 
         IF ( Model_mode(:8)=='CONVERT4' ) THEN
-          IF ( declparam_real(MODNAME, 'tmax_allrain_offset', 'nhru,nmonths', &
+          IF ( declparam(MODNAME, 'tmax_allrain_offset', 'nhru,nmonths', 'real', &
      &         '1.0', '0.0', '50.0', &
      &         'Precipitation is rain if HRU max temperature >= tmax_allsnow + this value', &
      &         'Monthly (January to December) maximum air temperature'// &
@@ -194,34 +194,34 @@
      &         ' temperature is greater than or equal to tmax_allsnow plus this value, precipitation is rain', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_allrain_offset')
 
-          IF ( declparam_real(MODNAME, 'soil_rechr_max_frac', 'nhru', &
+          IF ( declparam(MODNAME, 'soil_rechr_max_frac', 'nhru', 'real', &
      &         '1.0', '0.00001', '1.0', &
      &         'Fraction of capillary reservoir where losses occur as both evaporation and transpiration (soil recharge zone)', &
      &         'Fraction of the capillary reservoir water-holding capacity (soil_moist_max) where losses occur as both'// &
      &         ' evaporation and transpiration (upper zone of capillary reservoir) for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'soil_rechr_max_frac')
 
-          IF ( declparam_real(MODNAME, 'soil_rechr_init_frac', 'nhru', &
+          IF ( declparam(MODNAME, 'soil_rechr_init_frac', 'nhru', 'real', &
      &         '0.0', '0.0', '1.0', &
      &         'Initial fraction of available water in the soil recharge zone within the capillary reservoir', &
      &         'Initial fraction of available water in the capillary reservoir where losses occur'// &
      &         ' as both evaporation and transpiration (upper zone of capillary reservoir) for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'soil_rechr_init_frac')
 
-          IF ( declparam_real(MODNAME, 'soil_moist_init_frac', 'nhru', &
+          IF ( declparam(MODNAME, 'soil_moist_init_frac', 'nhru', 'real', &
      &         '0.0', '0.0', '1.0', &
      &         'Initial fraction available water in the capillary reservoir', &
      &         'Initial fraction of available water in the capillary reservoir (fraction of soil_moist_max for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'soil_moist_init_frac')
 
-          IF ( declparam_real(MODNAME, 'ssstor_init_frac', 'nssr', &
+          IF ( declparam(MODNAME, 'ssstor_init_frac', 'nssr', 'real', &
      &         '0.0', '0.0', '1.0', &
      &         'Initial fraction of available water in the gravity plus preferential-flow reservoirs', &
      &         'Initial fraction of available water in the gravity plus preferential-flow reservoirs'// &
      &         ' (fraction of sat_threshold) for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'ssstor_init_frac')
         ELSE
-          IF ( declparam_real(MODNAME, 'tmax_allrain', 'nhru,nmonths', &
+          IF ( declparam(MODNAME, 'tmax_allrain', 'nhru,nmonths', 'real', &
      &         '38.0', '-8.0', '75.0', &
      &         'Precipitation is rain if HRU max temperature >= this value', &
      &         'Monthly (January to December) maximum air temperature'// &
@@ -229,7 +229,7 @@
      &         ' temperature is greater than or equal to this value, precipitation is rain', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_allrain')
 
-          IF ( declparam_real(MODNAME, 'soil_rechr_max', 'nhru', &
+          IF ( declparam(MODNAME, 'soil_rechr_max', 'nhru', 'real', &
      &         '1.5', '0.00001', '5.0', &
      &         'Maximum storage for soil recharge zone', &
      &         'Maximum storage for soil recharge zone (upper portion of'// &
@@ -237,7 +237,7 @@
      &         ' evaporation and transpiration); must be less than or equal to soil_moist_max', &
      &         'inches')/=0 ) CALL read_error(1, 'soil_rechr_max')
 
-          IF ( declparam_real(MODNAME, 'soil_rechr_init', 'nhru', &
+          IF ( declparam(MODNAME, 'soil_rechr_init', 'nhru', 'real', &
      &         '1.0', '0.0', '10.0', &
      &         'Initial storage of water for soil recharge zone', &
      &         'Initial storage for soil recharge zone (upper part of'// &
@@ -246,13 +246,13 @@
      &         ' less than or equal to soil_moist_init', &
      &         'inches')/=0 ) CALL read_error(1, 'soil_rechr_init')
 
-          IF ( declparam_real(MODNAME, 'soil_moist_init', 'nhru', &
+          IF ( declparam(MODNAME, 'soil_moist_init', 'nhru', 'real', &
      &         '3.0', '0.0', '10.0', &
      &         'Initial value of available water in capillary reservoir', &
      &         'Initial value of available water in capillary reservoir for each HRU', &
      &         'inches')/=0 ) CALL read_error(1, 'soil_moist_init')
 
-          IF ( declparam_real(MODNAME, 'ssstor_init', 'nssr', &
+          IF ( declparam(MODNAME, 'ssstor_init', 'nssr', 'real', &
      &         '0.0', '0.0', '5.0', &
      &         'Initial storage in each GVR and PFR', &
      &         'Initial storage of the gravity and preferential-flow reservoirs for each HRU', &
@@ -260,7 +260,7 @@
 
            IF ( Dprst_flag==ACTIVE ) THEN
 !            ALLOCATE ( Sro_to_dprst(Nhru) )
-!            IF ( declparam_real(MODNAME, 'sro_to_dprst', 'nhru', &
+!            IF ( declparam(MODNAME, 'sro_to_dprst', 'nhru', 'real', &
 !     &           '0.2', '0.0', '1.0', &
 !     &           'Fraction of pervious surface runoff that flows into surface-depression storage', &
 !     &           'Fraction of pervious surface runoff that'// &
@@ -268,19 +268,19 @@
 !     &           ' flows to a stream network for each HRU', &
 !     &           'decimal fraction')/=0 ) CALL read_error(1, 'sro_to_dprst')
             ALLOCATE ( Dprst_area(Nhru) )
-            IF ( declparam_real(MODNAME, 'dprst_area', 'nhru', &
+            IF ( declparam(MODNAME, 'dprst_area', 'nhru', 'real', &
      &           '0.0', '0.0', '1.0E9', &
      &           'Aggregate sum of surface-depression storage areas of each HRU', &
      &           'Aggregate sum of surface-depression storage areas of each HRU', &
      &           'acres')/=0 ) CALL read_error(1, 'dprst_area')
             ALLOCATE ( Dprst_frac(Nhru) )
-            IF ( declparam_real(MODNAME, 'dprst_frac_hru', 'nhru', &
+            IF ( declparam(MODNAME, 'dprst_frac_hru', 'nhru', 'real', &
      &           '-1.0', '-1.0', '0.999', &
      &           'Fraction of each HRU area that has surface depressions', &
      &           'Fraction of each HRU area that has surface depressions', &
      &           'decimal fraction')/=0 ) CALL read_error(1, 'dprst_frac_hru')
             ALLOCATE ( Hru_area(Nhru) )
-            IF ( declparam_real(MODNAME, 'hru_area', 'nhru', &
+            IF ( declparam(MODNAME, 'hru_area', 'nhru', 'real', &
      &           '1.0', '0.0001', '1.0E9', &
      &           'HRU area', 'Area of each HRU', &
      &           'acres')/=0 ) CALL read_error(1, 'hru_area')

@@ -67,7 +67,7 @@
       USE PRMS_SUBBASIN
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam_int
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module, error_stop, declvar_dble
 !***********************************************************************
       subdecl = 0
@@ -217,14 +217,14 @@
      &     'cms', Sub_cms)
 
       ALLOCATE ( Subbasin_down(Nsub) )
-      IF ( declparam_int(MODNAME, 'subbasin_down', 'nsub', &
+      IF ( declparam(MODNAME, 'subbasin_down', 'nsub', 'integer', &
      &     '0', 'bounded', 'nsub', &
      &     'Downstream subbasin for each subbasin', &
      &     'Index number for the downstream subbasin whose inflow is outflow from this subbasin', &
      &     'none')/=0 ) CALL read_error(1, 'subbasin_down')
 
       ALLOCATE ( Hru_subbasin(Nhru) )
-      IF ( declparam_int(MODNAME, 'hru_subbasin', 'nhru', &
+      IF ( declparam(MODNAME, 'hru_subbasin', 'nhru', 'integer', &
      &     '0', 'bounded', 'nsub', &
      &     'Index of subbasin assigned to each HRU', &
      &     'Index of subbasin assigned to each HRU', &

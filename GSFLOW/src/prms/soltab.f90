@@ -69,7 +69,7 @@
       USE PRMS_SOLTAB
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam_real
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module !, declvar_dble
 !***********************************************************************
       sthdecl = 0
@@ -90,14 +90,14 @@
 
 !   Declared Parameters
       ALLOCATE ( Hru_slope(Nhru) )
-      IF ( declparam_real(MODNAME, 'hru_slope', 'nhru', &
+      IF ( declparam(MODNAME, 'hru_slope', 'nhru', 'real', &
      &     '0.0', '0.0', '10.0', &
      &     'HRU slope', &
      &     'Slope of each HRU, specified as change in vertical length divided by change in horizontal length', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'hru_slope')
 
       ALLOCATE ( Hru_aspect(Nhru) )
-      IF ( declparam_real(MODNAME, 'hru_aspect', 'nhru', &
+      IF ( declparam(MODNAME, 'hru_aspect', 'nhru', 'real', &
      &     '0.0', '0.0', '360.0', &
      &     'HRU aspect', 'Aspect of each HRU', &
      &     'angular degrees')/=0 ) CALL read_error(1, 'hru_aspect')

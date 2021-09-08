@@ -69,7 +69,7 @@
       USE PRMS_NSEGMENT_SUMMARY
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string, declparam_int
+      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string, declparam
       EXTERNAL :: read_error, print_module, error_stop
 ! Local Variables
       INTEGER :: i
@@ -98,7 +98,7 @@
 
       IF ( NsegmentOutON_OFF==2 .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Nhm_seg(Nsegment) )
-        IF ( declparam_int(MODNAME, 'nhm_seg', 'nsegment', &
+        IF ( declparam(MODNAME, 'nhm_seg', 'nsegment', 'integer', &
      &       '0', '0', '9999999', &
      &       'National Hydrologic Model segment ID', 'National Hydrologic Model segment ID', &
      &       'none')/=0 ) CALL read_error(1, 'nhm_seg')

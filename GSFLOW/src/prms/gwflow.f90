@@ -78,7 +78,7 @@
       USE PRMS_GWFLOW
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam_real
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module, declvar_real, declvar_dble
 !***********************************************************************
       gwflowdecl = 0
@@ -188,7 +188,7 @@
 
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==6 ) THEN
         ALLOCATE ( Gwstor_init(Ngw) )
-        IF ( declparam_real(MODNAME, 'gwstor_init', 'ngw', &
+        IF ( declparam(MODNAME, 'gwstor_init', 'ngw', 'real', &
      &       '2.0', '0.0', '50.0', &
      &       'Initial storage in each GWR', &
      &       'Storage in each GWR at the beginning of a simulation', &
@@ -196,14 +196,14 @@
       ENDIF
 
       ALLOCATE ( Gwflow_coef(Ngw) )
-      IF ( declparam_real(MODNAME, 'gwflow_coef', 'ngw', &
+      IF ( declparam(MODNAME, 'gwflow_coef', 'ngw', 'real', &
      &     '0.015', '0.0', '0.5', &
      &     'Groundwater routing coefficient', &
      &     'Linear coefficient in the equation to compute groundwater discharge for each GWR', &
      &     'fraction/day')/=0 ) CALL read_error(1, 'gwflow_coef')
 
       ALLOCATE ( Gwsink_coef(Ngw) )
-      IF ( declparam_real(MODNAME, 'gwsink_coef', 'ngw', &
+      IF ( declparam(MODNAME, 'gwsink_coef', 'ngw', 'real', &
      &     '0.0', '0.0', '1.0', &
      &     'Groundwater sink coefficient', &
      &     'Linear coefficient in the equation to compute outflow'// &
@@ -212,7 +212,7 @@
 
       IF ( Lake_route_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Lake_seep_elev(Nlake) )
-        IF ( declparam_real(MODNAME, 'lake_seep_elev', 'nlake', &
+        IF ( declparam(MODNAME, 'lake_seep_elev', 'nlake', 'real', &
      &       '1.0', '-300.0', '10000.0', &
      &       'Elevation over which lakebed seepage to the GWR occurs', &
      &       'Elevation over which lakebed seepage to the GWR occurs for lake HRUs using broad-crested weir'// &
@@ -221,7 +221,7 @@
 
         IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==4 ) THEN
           ALLOCATE ( Elevlake_init(Nlake) )
-          IF ( declparam_real(MODNAME, 'elevlake_init', 'nlake', &
+          IF ( declparam(MODNAME, 'elevlake_init', 'nlake', 'real', &
      &         '1.0', '-300.0', '10000.0', &
      &         'Initial lake surface elevation', &
      &         'Initial lake surface elevation for each lake using broad-crested weir or gate opening routing', &
@@ -229,7 +229,7 @@
         ENDIF
 
         ALLOCATE ( Gw_seep_coef(Ngw) )
-        IF ( declparam_real(MODNAME, 'gw_seep_coef', 'ngw', &
+        IF ( declparam(MODNAME, 'gw_seep_coef', 'ngw', 'real', &
      &       '0.015', '0.001', '0.05', &
      &       'Linear coefficient to compute seepage and groundwater'// &
      &       ' discharge to and from associated lake HRUs', &
@@ -240,7 +240,7 @@
       ENDIF
 
       ALLOCATE ( Gwstor_min(Ngw) )
-      IF ( declparam_real(MODNAME, 'gwstor_min', 'ngw', &
+      IF ( declparam(MODNAME, 'gwstor_min', 'ngw', 'real', &
      &     '0.0', '0.0', '1.0', &
      &     'Minimum storage in each GWR', &
      &     'Minimum storage in each GWR to ensure storage is greater'// &

@@ -74,7 +74,7 @@
       USE PRMS_NSUB_SUMMARY
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string, declparam_real
+      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string, declparam
       EXTERNAL :: read_error, print_module, error_stop
 ! Local Variables
       INTEGER :: i
@@ -102,7 +102,7 @@
       ENDIF
 
       ALLOCATE ( Hru_subbasin(Nhru), Sub_area(Nsub) )
-      IF ( declparam_real(MODNAME, 'hru_subbasin', 'nhru', &
+      IF ( declparam(MODNAME, 'hru_subbasin', 'nhru', 'integer', &
      &     '0', 'bounded', 'nsub', &
      &     'Index of subbasin assigned to each HRU', &
      &     'Index of subbasin assigned to each HRU', &

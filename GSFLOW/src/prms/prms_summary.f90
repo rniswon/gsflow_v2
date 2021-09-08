@@ -46,7 +46,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MAX !, CHAR, INDEX
-      INTEGER, EXTERNAL :: declparam_int, getparam_int !, control_integer
+      INTEGER, EXTERNAL :: declparam, getparam_int !, control_integer
       EXTERNAL :: read_error, PRMS_open_output_file, print_module, statvar_to_csv, checkdim_bounded_limits, declvar_dble
       INTEGER, EXTERNAL :: getparamstring, control_string
 ! Local Variables
@@ -109,21 +109,25 @@
 
         IF ( Npoigages>0 .OR. Model==DOCUMENTATION ) THEN
 !          ALLOCATE ( Parent_poigages(Npoigages) )
-!          IF ( declparam_int(MODNAME, 'parent_poigages', 'npoigages', &
+!          IF ( declparam(MODNAME, 'parent_poigages', 'npoigages', 'integer', &
 !     &         '1', '1', '1000000', &
 !     &         'Lumen index in parent model','Lumen index in parent model',&
 !     &         'none')/=0 ) CALL read_error(1, 'parent_poigages')
           ALLOCATE ( Poi_gage_segment(Npoigages) )
-          IF ( declparam_int(MODNAME, 'poi_gage_segment', 'npoigages', &
+          IF ( declparam(MODNAME, 'poi_gage_segment', 'npoigages', 'integer', &
      &         '0', 'bounded', 'nsegment', &
      &         'Segment index for each POI gage', &
      &         'Segment index for each POI gage', &
      &         'none')/=0 ) CALL read_error(1, 'poi_gage_segment')
           ALLOCATE ( Poi_gage_id(Npoigages) )
-          IF ( declparam_int(MODNAME, 'poi_gage_id', 'npoigages', &
+          IF ( declparam(MODNAME, 'poi_gage_id', 'npoigages', 'integer', &
      &         '0', '0', '9999999', &
      &         'POI Gage ID', 'USGS stream gage for each POI gage', &
      &         'none')/=0 ) CALL read_error(1, 'poi_gage_id')
+!          IF ( declparam(MODNAME, 'poi_gage_id', 'npoigages', 'string', &
+!     &         '0', '0', '9999999', &
+!     &         'POI Gage ID', 'USGS stream gage for each POI gage', &
+!     &         'none')/=0 ) CALL read_error(1, 'poi_gage_id')
         ENDIF
 
 ! Initialize Procedure

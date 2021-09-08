@@ -49,7 +49,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam_real, control_integer, getparam_real, control_string
+      INTEGER, EXTERNAL :: declparam, control_integer, getparam_real, control_string
       EXTERNAL :: read_error, precip_form, temp_set, find_header_end, find_current_time
       EXTERNAL :: read_cbh_date, check_cbh_value, check_cbh_intvalue, print_module, declvar_dble, declvar_real
 ! Local Variables
@@ -346,7 +346,7 @@
 !   Declared Parameters
         IF ( Climate_temp_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Tmax_cbh_adj(Nhru,MONTHS_PER_YEAR) )
-          IF ( declparam_real(MODNAME, 'tmax_cbh_adj', 'nhru,nmonths', &
+          IF ( declparam(MODNAME, 'tmax_cbh_adj', 'nhru,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
      &         'Monthly maximum temperature adjustment factor for each HRU', &
      &         'Monthly (January to December) adjustment factor to maximum air temperature for each HRU,'// &
@@ -354,7 +354,7 @@
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_cbh_adj')
 
           ALLOCATE ( Tmin_cbh_adj(Nhru,MONTHS_PER_YEAR) )
-          IF ( declparam_real(MODNAME, 'tmin_cbh_adj', 'nhru,nmonths', &
+          IF ( declparam(MODNAME, 'tmin_cbh_adj', 'nhru,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
      &         'Monthly minimum temperature adjustment factor for each HRU', &
      &         'Monthly (January to December) adjustment factor to minimum air temperature for each HRU,'// &
@@ -364,7 +364,7 @@
 
         IF ( Climate_precip_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Rain_cbh_adj(Nhru,MONTHS_PER_YEAR) )
-          IF ( declparam_real(MODNAME, 'rain_cbh_adj', 'nhru,nmonths', &
+          IF ( declparam(MODNAME, 'rain_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '2.0', &
      &         'Rain adjustment factor, by month for each HRU', &
      &         'Monthly (January to December) adjustment factor to'// &
@@ -373,7 +373,7 @@
      &         'decimal fraction')/=0 ) CALL read_error(1, 'rain_cbh_adj')
 
           ALLOCATE ( Snow_cbh_adj(Nhru,MONTHS_PER_YEAR) )
-          IF ( declparam_real(MODNAME, 'snow_cbh_adj', 'nhru,nmonths', &
+          IF ( declparam(MODNAME, 'snow_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '2.0', &
      &         'Snow adjustment factor, by month for each HRU', &
      &         'Monthly (January to December) adjustment factor to'// &
@@ -384,7 +384,7 @@
 
         IF ( Climate_potet_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Potet_cbh_adj(Nhru,MONTHS_PER_YEAR) )
-          IF ( declparam_real(MODNAME, 'potet_cbh_adj', 'nhru,nmonths', &
+          IF ( declparam(MODNAME, 'potet_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '1.5', &
      &         'Potential ET adjustment factor, by month for each HRU', &
      &         'Monthly (January to December) adjustment factor to'// &

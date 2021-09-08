@@ -4,7 +4,7 @@
 !  control_string, control_integer, control_string_array, getvartype
 !***********************************************************************
       MODULE PRMS_MMFAPI
-        USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH, MAXFILE_LENGTH, ERROR_var
+        USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH, MAXFILE_LENGTH, MAXLINE_LENGTH, ERROR_var
         IMPLICIT NONE
         ! DANGER, DANGER, hard coded maximum number of paraemters and dimensions, DANGER, DANGER
         INTEGER, PARAMETER :: MAXDIMENSIONS = 50, MAXPARAMETERS = 240, MAXVARIABLES = 500
@@ -12,7 +12,7 @@
  
         TYPE PRMS_parameter
              CHARACTER(LEN=MAXCONTROL_LENGTH) :: param_name
-             CHARACTER(LEN=MAXFILE_LENGTH) :: short_description, long_description
+             CHARACTER(LEN=512) :: short_description, long_description
              INTEGER :: numvals, data_flag, decl_flag, read_flag, nchars, id_num
              INTEGER :: default_int, maximum_int, minimum_int, num_dimens
              CHARACTER(LEN=MAXCONTROL_LENGTH) :: max_value, min_value, def_value, data_type
@@ -31,10 +31,10 @@
         TYPE ( PRMS_dimension ), SAVE, ALLOCATABLE :: Dimension_data(:)
 
         TYPE PRMS_variable
-             CHARACTER(LEN=32) :: variable_name
-             CHARACTER(LEN=256) :: description
+             CHARACTER(LEN=MAXCONTROL_LENGTH) :: variable_name
+             CHARACTER(LEN=MAXLINE_LENGTH) :: description
              INTEGER :: numvals, data_flag, decl_flag, get_flag, var_name_nchars, id_num
-             CHARACTER(LEN=12) :: data_type, dimen_names, module_name, units
+             CHARACTER(LEN=MAXCONTROL_LENGTH) :: data_type, dimen_names, module_name, units
              INTEGER, POINTER :: values_int(:)
              REAL, POINTER :: values_real(:)
              DOUBLE PRECISION, POINTER :: values_dble(:)
@@ -453,7 +453,7 @@
       ! Local Variables
       INTEGER :: var_id
 !***********************************************************************
-      var_id = find_variable(Modname, Varname, Numvalues, 'integer')
+      var_id = find_variable(Modname, Varname, Numvalues, 'real')
       Values = Variable_data(var_id)%values_int
       END SUBROUTINE getvar_int
 
@@ -626,15 +626,14 @@
       END FUNCTION getvarnvals
 
 !***********************************************************************
-! getparam - get parameter values
+! getparam_real - get real parameter values
 !***********************************************************************
-      INTEGER FUNCTION getparam(Modname, Paramname, Numvalues, Data_type, Values)
-      USE PRMS_CONSTANTS, ONLY: ERROR_param
+      INTEGER FUNCTION getparam_real(Modname, Paramname, Numvalues, Values)
       USE PRMS_MMFAPI
       USE PRMS_MODULE, ONLY: Parameter_check_flag
       IMPLICIT NONE
       ! Arguments
-      CHARACTER(LEN=*), INTENT(IN) :: Modname, Paramname, Data_type
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Paramname
       INTEGER, INTENT(IN) :: Numvalues
       ! values could be any data type
       REAL, INTENT(OUT) :: Values(Numvalues)
@@ -642,7 +641,7 @@
       INTRINSIC :: TRIM
       EXTERNAL :: error_stop
       ! Local Variables
-      INTEGER :: type_flag, found, param_id, i, ierr
+      INTEGER :: found, param_id, i, ierr
 !***********************************************************************
       Values = 0.0
       ierr = 0
@@ -653,11 +652,11 @@
           IF ( Parameter_data(i)%numvals/=Numvalues ) THEN
             ierr = 1
             PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
-     &               ' number of values in getparam does not match declared number of values'
+     &               ' number of values in getparam_real does not match declared number of values'
           ENDIF
-          IF ( TRIM(Parameter_data(i)%data_type)/=Data_type ) THEN
+          IF ( TRIM(Parameter_data(i)%data_type)/='real' ) THEN
             ierr = 1
-            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' data type does in getparam not match declared data type'
+            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' data type does in getparam_real not match declared data type'
           ENDIF
           param_id = i
           EXIT
@@ -670,33 +669,86 @@
       ENDIF
       IF ( ierr==1 ) ERROR STOP ERROR_var
 
-      type_flag = Parameter_data(param_id)%data_flag
 
-      IF ( type_flag==3 ) THEN
-        CALL getvalues_dbl(param_id, Numvalues, Values)
-      ELSEIF ( type_flag==2 ) THEN
-        IF ( Parameter_check_flag==1 ) THEN
-          DO i = 1, Numvalues
-            IF ( Parameter_data(param_id)%values(i) > Parameter_data(param_id)%maximum ) THEN
-              PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
-              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; maximum value: ', Parameter_data(param_id)%maximum
-            ENDIF
-            IF ( Parameter_data(param_id)%values(i) < Parameter_data(param_id)%minimum ) THEN
-              PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
-              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; minimum value: ', Parameter_data(param_id)%minimum
-            ENDIF
-          ENDDO
+      IF ( Parameter_check_flag==1 ) THEN
+        DO i = 1, Numvalues
+          IF ( Parameter_data(param_id)%values(i) > Parameter_data(param_id)%maximum ) THEN
+            PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
+            PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; maximum value: ', Parameter_data(param_id)%maximum
+          ENDIF
+          IF ( Parameter_data(param_id)%values(i) < Parameter_data(param_id)%minimum ) THEN
+            PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
+            PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; minimum value: ', Parameter_data(param_id)%minimum
+          ENDIF
+        ENDDO
+      ENDIF
+      Values = Parameter_data(param_id)%values
+
+      getparam_real = 0
+      END FUNCTION getparam_real
+
+!***********************************************************************
+! getparam_int - integer get parameter values
+!***********************************************************************
+      INTEGER FUNCTION getparam_int(Modname, Paramname, Numvalues, Values)
+      USE PRMS_MMFAPI
+      USE PRMS_MODULE, ONLY: Parameter_check_flag
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Paramname
+      INTEGER, INTENT(IN) :: Numvalues
+      INTEGER, INTENT(OUT) :: Values(Numvalues)
+      ! Functions
+      INTRINSIC :: TRIM
+      EXTERNAL :: error_stop
+      ! Local Variables
+      INTEGER :: found, param_id, i, ierr
+!***********************************************************************
+      Values = 0
+      ierr = 0
+      found = 0
+      DO i = 1, Num_parameters
+        IF ( Paramname==TRIM(Parameter_data(i)%param_name) ) THEN
+          found = 1
+          IF ( Parameter_data(i)%numvals/=Numvalues ) THEN
+            ierr = 1
+            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
+     &               ' number of values in getparam_int does not match declared number of values'
+          ENDIF
+          IF ( TRIM(Parameter_data(i)%data_type)/='integer' ) THEN
+            ierr = 1
+            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' data type does in getparam_int not match declared data type'
+          ENDIF
+          param_id = i
+          EXIT
         ENDIF
-        Values = Parameter_data(param_id)%values
-      ELSEIF ( type_flag==1 ) THEN
-        CALL getvalues_int(param_id, Numvalues, Values)
-      ELSE
-        PRINT *, 'Paramname: ', Paramname, ' type: ', type_flag
-        CALL error_stop('Parameter type not implemented', ERROR_param)
+      ENDDO
+
+      IF ( found==0 ) THEN
+        PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' not declared'
+        ierr = 1
+      ENDIF
+      IF ( ierr==1 ) ERROR STOP ERROR_var
+
+      IF ( Parameter_check_flag==1 ) THEN
+        DO i = 1, Numvalues
+          IF ( Parameter_data(param_id)%int_values(i) > Parameter_data(param_id)%maximum_int ) THEN
+            PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
+            PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%int_values(i), '; maximum value: ', Parameter_data(param_id)%maximum_int
+          ENDIF
+          IF ( Parameter_data(param_id)%int_values(i) < Parameter_data(param_id)%minimum_int ) THEN
+            PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
+            PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%int_values(i), '; minimum value: ', Parameter_data(param_id)%minimum_int
+          ENDIF
+        ENDDO
       ENDIF
 
-      getparam = 0
-      END FUNCTION getparam
+
+
+      CALL getvalues_int(param_id, Numvalues, Values)
+
+      getparam_int = 0
+      END FUNCTION getparam_int
 
 !***********************************************************************
 ! getvar_values_int - get values from variable data structure
@@ -1001,7 +1053,7 @@
         Control_parameter_data(Num_control_parameters)%data_type = 4
         Control_parameter_data(Num_control_parameters)%numvals = 1
         Control_parameter_data(Num_control_parameters)%name = paramname
-        Control_parameter_data(Num_control_parameters)%values_int(1) = ' '
+        Control_parameter_data(Num_control_parameters)%values_int(1) = 0
       ENDIF
 
       control_string = 0

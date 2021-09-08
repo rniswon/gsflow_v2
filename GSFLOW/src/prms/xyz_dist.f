@@ -133,7 +133,7 @@
       USE PRMS_XYZ_DIST
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam_real, declparam_int
+      INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module, declvar_int, declvar_real
 !***********************************************************************
       xyzdecl = 0
@@ -158,7 +158,7 @@
 
 ! declare parameters
       ALLOCATE ( Adjust_snow(Nrain,MONTHS_PER_YEAR) )
-      IF ( declparam_real(MODNAME, 'adjust_snow', 'nrain,nmonths',
+      IF ( declparam(MODNAME, 'adjust_snow', 'nrain,nmonths', 'real',
      +     '-0.4', '-0.5', '3.0',
      +     'Monthly (January to December) snow downscaling adjustment'//
      +     ' factor for each precipitation measurement station',
@@ -167,7 +167,7 @@
      +     'decimal fraction')/=0 ) CALL read_error(1, 'adjust_snow')
 
       ALLOCATE ( Adjust_rain(Nrain,MONTHS_PER_YEAR) )
-      IF ( declparam_real(MODNAME, 'adjust_rain', 'nrain,nmonths',
+      IF ( declparam(MODNAME, 'adjust_rain', 'nrain,nmonths', 'real',
      +     '-0.4', '-0.5', '3.0',
      +     'Monthly (January to December) rain downscaling adjustment'//
      +     ' factor for each precipitation measurement station',
@@ -177,21 +177,21 @@
 
       ALLOCATE ( MRUelev(Nhru) )
       ALLOCATE ( MRUx(Nhru) )
-      IF ( declparam_real(MODNAME, 'hru_x', 'nhru',
+      IF ( declparam(MODNAME, 'hru_x', 'nhru', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
      +     'X for each HRU (albers)',
      +     'Longitude (X) for each HRU in albers projection',
      +     'meters')/=0 ) CALL read_error(1, 'hru_x')
 
       ALLOCATE ( MRUy(Nhru) )
-      IF ( declparam_real(MODNAME, 'hru_y', 'nhru',
+      IF ( declparam(MODNAME, 'hru_y', 'nhru', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
      +     'Y for each HRU (albers)',
      +     'Latitude (Y) for each HRU in albers projection',
      +     'meters')/=0 ) CALL read_error(1, 'hru_y')
 
       ALLOCATE ( Max_lapse(MAXLAPSE,MONTHS_PER_YEAR) )
-      IF ( declparam_real(MODNAME, 'max_lapse', 'nlapse,nmonths',
+      IF ( declparam(MODNAME, 'max_lapse', 'nlapse,nmonths', 'real',
      +     '0.0', '-100.0', '100.0',
      +     'Monthly maximum temperature lapse rate for each direction',
      +     'Monthly (January to December) maximum air temperature'//
@@ -199,7 +199,7 @@
      +     'none')/=0 ) CALL read_error(1, 'max_lapse')
 
       ALLOCATE ( Min_lapse(MAXLAPSE,MONTHS_PER_YEAR) )
-      IF ( declparam_real(MODNAME, 'min_lapse', 'nlapse,nmonths',
+      IF ( declparam(MODNAME, 'min_lapse', 'nlapse,nmonths', 'real',
      +     '0.0', '-100.0', '100.0',
      +     'Monthly minimum temperature lapse rate for each direction',
      +     'Monthly (January to December) minimum air temperature'//
@@ -207,7 +207,7 @@
      +     'none')/=0 ) CALL read_error(1, 'min_lapse')
 
       ALLOCATE ( Ppt_lapse(MAXLAPSE,MONTHS_PER_YEAR) )
-      IF ( declparam_real(MODNAME, 'ppt_lapse', 'nlapse,nmonths',
+      IF ( declparam(MODNAME, 'ppt_lapse', 'nlapse,nmonths', 'real',
      +     '0.0', '-10.0', '10.0',
      +     'Precipitation lapse rate',
      +     'Monthly (January to December) precipitation lapse rate'//
@@ -215,7 +215,7 @@
      +     'none')/=0 ) CALL read_error(1, 'ppt_lapse')
 
       ALLOCATE ( Temp_STAx(Ntemp), Temp_STAelev(Ntemp) )
-      IF ( declparam_real(MODNAME, 'tsta_x', 'ntemp',
+      IF ( declparam(MODNAME, 'tsta_x', 'ntemp', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
      +     'X for each temperature station (albers)',
      +     'Longitude (X) for each air-temperature-measurement'//
@@ -223,7 +223,7 @@
      +     'meters')/=0 ) CALL read_error(1, 'tsta_x')
 
       ALLOCATE ( Temp_STAy(Ntemp) )
-      IF ( declparam_real(MODNAME, 'tsta_y', 'ntemp',
+      IF ( declparam(MODNAME, 'tsta_y', 'ntemp', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
      +     'Y for each temperature station (albers)',
      +     'Latitude (Y) for each air-temperature-measurement'//
@@ -231,7 +231,7 @@
      +     'meters')/=0 ) CALL read_error(1, 'tsta_y')
 
       ALLOCATE ( Rain_STAx(Nrain), Pstaelev(Nrain) )
-      IF ( declparam_real(MODNAME, 'psta_x', 'nrain',
+      IF ( declparam(MODNAME, 'psta_x', 'nrain', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
      +     'X for each precipitation station (albers)',
      +     'Longitude (X) for each precipitation measurement station'//
@@ -239,7 +239,7 @@
      +     'meters')/=0 ) CALL read_error(1, 'psta_x')
 
       ALLOCATE ( Rain_STAy(Nrain) )
-      IF ( declparam_real(MODNAME, 'psta_y', 'nrain',
+      IF ( declparam(MODNAME, 'psta_y', 'nrain', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
      +     'Y for each precipitation station (albers)',
      +     'Latitude (Y) for each precipitation measurement station'//
@@ -247,7 +247,7 @@
      +     'meters')/=0 ) CALL read_error(1, 'psta_y')
 
       ALLOCATE ( Tsta_nuse(Ntemp), Temp_nuse(Ntemp) )
-      IF ( declparam_int(MODNAME, 'tsta_nuse', 'ntemp',
+      IF ( declparam(MODNAME, 'tsta_nuse', 'ntemp', 'integer',
      +     '1', '0', '1',
      +     '0 = station not used; 1 = station used',
      +     'The subset of temperature measurement stations used in'//
@@ -255,7 +255,7 @@
      +     ' 1=station used)',
      +     'none')/=0 ) CALL read_error(1, 'tsta_nuse')
 
-      IF ( declparam_real(MODNAME, 'solrad_elev', 'one',
+      IF ( declparam(MODNAME, 'solrad_elev', 'one', 'real',
      +     '0.0', '-300.0', '30000.0',
      +     'Elevation of the solrad station used for DD curves',
      +     'Elevation of the solar radiation station used for'//
@@ -263,7 +263,7 @@
      +     'meters')/=0 ) CALL read_error(1, 'solrad_elev')
 
       ALLOCATE ( Psta_nuse(Nrain), Rain_nuse(Nrain) )
-      IF ( declparam_int(MODNAME, 'psta_nuse', 'nrain',
+      IF ( declparam(MODNAME, 'psta_nuse', 'nrain', 'integer',
      +     '1', '0', '1',
      +     'The subset of precipitation stations used in the'//
      +     ' distribution regression (0=station not used;'//
@@ -274,7 +274,7 @@
      +     'none')/=0 ) CALL read_error(1, 'psta_nuse')
 
       ALLOCATE ( Psta_freq_nuse(Nrain) )
-      IF ( declparam_int(MODNAME, 'psta_freq_nuse', 'nrain',
+      IF ( declparam(MODNAME, 'psta_freq_nuse', 'nrain', 'integer',
      +     '1', '0', '1',
      +     'The subset of precipitation stations used to determine if'//
      +     ' there is distribution in the basin (0=station not used;'//
@@ -285,7 +285,8 @@
      +     'none')/=0 ) CALL read_error(1, 'psta_freq_nuse')
 
       ALLOCATE ( TmaxMTH(Ntemp, MONTHS_PER_YEAR) )
-      IF ( declparam_real(MODNAME, 'tsta_month_max', 'ntemp,nmonths',
+      IF ( declparam(MODNAME, 'tsta_month_max', 'ntemp,nmonths',
+     +     'real',
      +     '0.0', '-100.0', '100.0',
      +     'Average monthly (January to December) maximum air'//
      +     ' temperature at each station',
@@ -294,7 +295,8 @@
      +     'temp_units')/=0 ) CALL read_error(1, 'tsta_month_max')
 
       ALLOCATE ( TminMTH(Ntemp, MONTHS_PER_YEAR) )
-      IF ( declparam_real(MODNAME, 'tsta_month_min', 'ntemp,nmonths',
+      IF ( declparam(MODNAME, 'tsta_month_min', 'ntemp,nmonths',
+     +     'real',
      +     '0.0', '-100.0', '100.0',
      +     'Average monthly (January to December) minimum air'//
      +     ' temperature at each station',
@@ -303,56 +305,57 @@
      +     'temp_units')/=0 ) CALL read_error(1, 'tsta_month_min')
 
       ALLOCATE ( PptMTH(Nrain, MONTHS_PER_YEAR) )
-      IF ( declparam_real(MODNAME, 'psta_month_ppt', 'nrain,nmonths',
+      IF ( declparam(MODNAME, 'psta_month_ppt', 'nrain,nmonths',
+     +     'real',
      +     '0.0', '0.0', '20.0',
      +     'Average monthly precipitation at each station',
      +     'Average monthly (January to December) precipitation at'//
      +     ' each precipitation measurement station',
      +     'precip_units')/=0 ) CALL read_error(1, 'psta_month_ppt')
 
-      IF ( declparam_real(MODNAME, 'x_add', 'one',
+      IF ( declparam(MODNAME, 'x_add', 'one', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
      +     'X additive term for climate station transform',
      +     'Mean value for the climate station transformation'//
      +     ' equation for the longitude (X) coordinate',
      +     'meters')/=0 ) CALL read_error(1, 'x_add')
 
-      IF ( declparam_real(MODNAME, 'x_div', 'one',
+      IF ( declparam(MODNAME, 'x_div', 'one', 'real',
      +     '1.0', '-1.0E7', '1.0E7',
      +     'X divisor term for climate station transform',
      +     'Standard deviation for the climate station transformation'//
      +     ' equation for the longitude (X) coordinate (not 0.0)',
      +     'meters')/=0 ) CALL read_error(1, 'x_div')
 
-      IF ( declparam_real(MODNAME, 'y_add', 'one',
+      IF ( declparam(MODNAME, 'y_add', 'one', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
      +     'Y additive term for climate station transform',
      +     'Mean value for the climate station transformation'//
      +     ' equation for the latitude (Y) coordinate',
      +     'meters')/=0 ) CALL read_error(1, 'y_add')
 
-      IF ( declparam_real(MODNAME, 'y_div', 'one',
+      IF ( declparam(MODNAME, 'y_div', 'one', 'real',
      +     '1.0', '-1.0E7', '1.0E7',
      +     'Y divisor term for climate station transform',
      +     'Standard deviation for the climate station transformation'//
      +     ' equation for the latitude (Y) coordinate (not 0.0)',
      +     'meters')/=0 ) CALL read_error(1, 'y_div')
 
-      IF ( declparam_real(MODNAME, 'z_add', 'one',
+      IF ( declparam(MODNAME, 'z_add', 'one', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
      +     'Z additive term for climate station transform',
      +     'Mean value for the climate station transformation'//
      +     ' equation for the elevation (Z) coordinate',
      +     'meters')/=0 ) CALL read_error(1, 'z_add')
 
-      IF ( declparam_real(MODNAME, 'z_div', 'one',
+      IF ( declparam(MODNAME, 'z_div', 'one', 'real',
      +     '1.0', '-1.0E7', '1.0E7',
      +     'Z divisor term for climate station transform',
      +     'Standard deviation for the climate station transformation'//
      +     ' equation for the elevation (Z) coordinate (not 0.0)',
      +     'meters')/=0 ) CALL read_error(1, 'z_div')
 
-      IF ( declparam_real(MODNAME, 'tmax_add', 'one',
+      IF ( declparam(MODNAME, 'tmax_add', 'one', 'real',
      +     '0.0', '-100.0', '100.0',
      +     'Maximum temperature additive term for climate station'//
      +     ' transform',
@@ -360,7 +363,7 @@
      +     ' transformation equation for maximum temperature',
      +     'temp_units')/=0 ) CALL read_error(1, 'tmax_add')
 
-      IF ( declparam_real(MODNAME, 'tmax_div', 'one',
+      IF ( declparam(MODNAME, 'tmax_div', 'one', 'real',
      +     '1.0', '-100.0', '100.0',
      +     'Maximum temperature divisor term for climate station'//
      +     ' transform',
@@ -369,7 +372,7 @@
      +     ' equation for maximum temperature (not 0.0)',
      +     'temp_units')/=0 ) CALL read_error(1, 'tmax_div')
 
-      IF ( declparam_real(MODNAME, 'tmin_add', 'one',
+      IF ( declparam(MODNAME, 'tmin_add', 'one', 'real',
      +     '0.0', '-100.0', '100.0',
      +     'Minimum temperature additive term for the air-temperature'//
      +     '-measurement station transformation transform',
@@ -377,7 +380,7 @@
      +     ' transformation equation for minimum temperature',
      +     'temp_units')/=0 ) CALL read_error(1, 'tmin_add')
 
-      IF ( declparam_real(MODNAME, 'tmin_div', 'one',
+      IF ( declparam(MODNAME, 'tmin_div', 'one', 'real',
      +     '1.0', '-100.0', '100.0',
      +     'Minimum temperature divisor term for the air-temperature'//
      +     '-measurement station transformation transform',
@@ -386,7 +389,7 @@
      +     ' equation for minimum temperature (not 0.0)',
      +     'temp_units')/=0 ) CALL read_error(1, 'tmin_div')
 
-      IF ( declparam_real(MODNAME, 'ppt_add', 'one',
+      IF ( declparam(MODNAME, 'ppt_add', 'one', 'real',
      +     '0.0', '-10.0', '10.0',
      +     'Precipitation additive term for precipitation measurement'//
      +     ' station transform',
@@ -394,7 +397,7 @@
      +     ' transformation equation',
      +     'precip_units')/=0 ) CALL read_error(1, 'ppt_add')
 
-      IF ( declparam_real(MODNAME, 'ppt_div', 'one',
+      IF ( declparam(MODNAME, 'ppt_div', 'one', 'real',
      +     '1.0', '-10.0', '10.0',
      +     'Precipitation divisor term for precipitation measurement'//
      +     ' station transform',
@@ -402,7 +405,7 @@
      +     ' station transformation equation (not 0.0)',
      +     'precip_units')/=0 ) CALL read_error(1, 'ppt_div')
 
-      IF ( declparam_int(MODNAME, 'conv_flag', 'one',
+      IF ( declparam(MODNAME, 'conv_flag', 'one', 'integer',
      +     '0', '0', '2',
      +     'Elevation conversion flag',
      +     'Elevation conversion flag (0=none, 1=feet to meters,'//
@@ -410,8 +413,8 @@
      +     'none')/=0 ) CALL read_error(1, 'conv_flag')
 
       !ALLOCATE ( Tmax_allrain_sta(Nrain,MONTHS_PER_YEAR) )
-      ! IF ( declparam_real(MODNAME, 'tmax_allrain_sta', 'nrain,nmonths',
-      !+     '38.0', '-8.0', '45.0',
+      ! IF ( declparam(MODNAME, 'tmax_allrain_sta', 'nrain,nmonths',
+      !+     'real', '38.0', '-8.0', '45.0',
       !+     'Precipitation is rain if HRU max temperature >= this value',
       !+     'Monthly (January to December) maximum air temperature'//
       !+     ' when precipitation is assumed to be rain; if HRU air'//
@@ -420,15 +423,15 @@
       !+     'temp_units')/=0 ) CALL read_error(1, 'tmax_allrain_sta')
 
       !ALLOCATE ( Tmax_allsnow_sta(Nrain,MONTHS_PER_YEAR) )
-      ! IF ( declparam_real(MODNAME, 'tmax_allsnow_sta', 'nrain,nmonths',
-      !+     '32.0', '-10.0', '40.0',
+      ! IF ( declparam(MODNAME, 'tmax_allsnow_sta', 'nrain,nmonths',
+      !+     'real', '32.0', '-10.0', '40.0',
       !+     'Maximum temperature when precipitation is all snow',
       !+     'Maximum air temperature when precipitation is assumed'//
       !+     ' to be snow; if HRU air temperature is less than or'//
       !+     ' equal to this value, precipitation is snow',
       !+     'temp_units')/=0 ) CALL read_error(1, 'tmax_allsnow_sta')
 
-      IF ( declparam_real(MODNAME, 'tmax_allrain_dist', 'nmonths',
+      IF ( declparam(MODNAME, 'tmax_allrain_dist', 'nmonths', 'real',
      +     '38.0', '-8.0', '75.0',
      +     'Precipitation is rain if station mean max temperature >='//
      +     ' this value',
@@ -438,7 +441,7 @@
      +     ' precipitation is rain',
      +     'temp_units')/=0 ) CALL read_error(1, 'tmax_allrain_dist')
 
-      IF ( declparam_real(MODNAME, 'tmax_allsnow_dist', 'one',
+      IF ( declparam(MODNAME, 'tmax_allsnow_dist', 'one', 'real',
      +     '32.0', '-10.0', '40.0',
      +     'Maximum air temperature when precipitation is all snow',
      +     'Maximum air temperature when precipitation is assumed'//

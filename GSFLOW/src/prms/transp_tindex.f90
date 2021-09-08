@@ -23,7 +23,7 @@
       USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Temp_units, Transp_on, Basin_transp_on 
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam_int, declparam_real, getparam_int, getparam_real
+      INTEGER, EXTERNAL :: declparam, getparam_int, getparam_real
       REAL, EXTERNAL :: c_to_f
       EXTERNAL :: read_error, print_module, transp_tindex_restart
 ! Local Variables
@@ -77,7 +77,7 @@
         ALLOCATE ( Tmax_sum(Nhru), Transp_check(Nhru), Transp_tmax_f(Nhru) )
 
         ALLOCATE ( Transp_beg(Nhru) )
-        IF ( declparam_int(MODNAME, 'transp_beg', 'nhru', &
+        IF ( declparam(MODNAME, 'transp_beg', 'nhru', 'integer', &
      &       '1', '1', '12', &
      &       'Month to begin testing for transpiration', &
      &       'Month to begin summing the maximum air temperature for each HRU; when sum is greater than or'// &
@@ -85,14 +85,14 @@
      &       'month')/=0 ) CALL read_error(1, 'transp_beg')
 
         ALLOCATE ( Transp_end(Nhru) )
-        IF ( declparam_int(MODNAME, 'transp_end', 'nhru', &
+        IF ( declparam(MODNAME, 'transp_end', 'nhru', 'integer', &
      &       '13', '1', '13', &
      &       'Month to stop transpiration period', &
      &       'Month to stop transpiration computations; transpiration is computed through the end of previous month', &
      &       'month')/=0 ) CALL read_error(1, 'transp_end')
 
         ALLOCATE ( Transp_tmax(Nhru) )
-        IF ( declparam_real(MODNAME, 'transp_tmax', 'nhru', &
+        IF ( declparam(MODNAME, 'transp_tmax', 'nhru', 'real', &
      &       '1.0', '0.0', '1000.0', &
      &       'Tmax index to determine start of transpiration', &
      &       'Temperature index to determine the specific date of the start of the transpiration period;'// &

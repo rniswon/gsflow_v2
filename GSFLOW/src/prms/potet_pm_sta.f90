@@ -31,7 +31,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, LOG, SNGL
-      INTEGER, EXTERNAL :: declparam_real, declparam_int, getparam_real, getparam_int
+      INTEGER, EXTERNAL :: declparam, getparam_real, getparam_int
       REAL, EXTERNAL :: sat_vapor_press
       EXTERNAL :: read_error, print_module, checkdim_param_limits
 ! Local Variables
@@ -148,35 +148,35 @@
 
         ! Declare Parameters
         ALLOCATE ( Pm_n_coef(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'pm_n_coef', 'nhru,nmonths', &
+        IF ( declparam(MODNAME, 'pm_n_coef', 'nhru,nmonths', 'real', &
      &       '900.0', '850.0', '950.0', &
      &       'Penman-Monteith coefficient', &
      &       'Monthly (January to December) Penman-Monteith potential ET N temperauture coefficient for each HRU', &
      &       'degrees Celsius per day')/=0 ) CALL read_error(1, 'pm_n_coef')
 
         ALLOCATE ( Pm_d_coef(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'pm_d_coef', 'nhru,nmonths', &
+        IF ( declparam(MODNAME, 'pm_d_coef', 'nhru,nmonths', 'real', &
      &       '0.34', '0.25', '0.45', &
      &       'Penman-Monteith coefficient', &
      &       'Monthly (January to December) Penman-Monteith potential ET D wind-speed coefficient for each HRU', &
      &       'seconds/meters')/=0 ) CALL read_error(1, 'pm_d_coef')
 
         ALLOCATE ( Crop_coef(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam_real(MODNAME, 'crop_coef', 'nhru,nmonths', &
+        IF ( declparam(MODNAME, 'crop_coef', 'nhru,nmonths', 'real', &
      &       '1.0', '0.0', '2.0', &
      &       'Crop coefficient for each HRU', &
      &       'Monthly (January to December) crop coefficient for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'crop_coef')
 
         ALLOCATE ( Hru_windspeed_sta(Nhru) )
-        IF ( declparam_int(MODNAME, 'hru_windspeed_sta', 'nhru', &
+        IF ( declparam(MODNAME, 'hru_windspeed_sta', 'nhru', 'integer', &
      &       '0', 'bounded', 'nwind', &
      &       'Index of wind speed measurement station for each HRU', &
      &       'Index of wind speed measurement station for each HRU', &
      &       'none')/=0 ) CALL read_error(1, 'hru_windspeed_sta')
 
         ALLOCATE ( Hru_humidity_sta(Nhru) )
-        IF ( declparam_int(MODNAME, 'hru_humidity_sta', 'nhru', &
+        IF ( declparam(MODNAME, 'hru_humidity_sta', 'nhru', 'integer', &
      &       '0', 'bounded', 'nhumid', &
      &       'Index of humidity measurement station for each HRU', &
      &       'Index of humidity measurement station for each HRU', &
