@@ -393,13 +393,14 @@
 !***********************************************************************
       INTEGER FUNCTION prms2mfrun()
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Dprst_flag, Ag_package
       USE GSFPRMS2MF
       USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, Gwc_row, Gwc_col, Mft_to_days
       USE GLOBAL, ONLY: IBOUND
+      USE GWFAGMODULE, ONLY: NUMIRRPOND
       USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, IGSFLOW, FINF, IUZFOPT
-      USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_hru_id
+      USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK, NLAKES
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_hru_id !, Lake_area
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Hru_actet
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
@@ -407,7 +408,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: toStream
-      EXTERNAL Bin_percolation
+      EXTERNAL Bin_percolation, toIrr
 ! Local Variables
       INTEGER :: irow, icol, ik, jk, ii, ilake
       INTEGER :: j, icell, ihru, is_draining
@@ -418,6 +419,12 @@
 ! Add runoff to stream reaches
 !-----------------------------------------------------------------------
       IF ( toStream()/=0 ) RETURN
+!-----------------------------------------------------------------------
+! Remove open dprst storage for irrigation
+!-----------------------------------------------------------------------
+       IF ( Ag_package==ACTIVE .AND. Dprst_flag==ACTIVE ) THEN
+         IF ( NUMIRRPOND>0 ) CALL toIrr()
+       ENDIF
 
 !-----------------------------------------------------------------------
 ! Add runoff and precip to lakes
@@ -554,6 +561,40 @@
       toStream = 0
 
       END FUNCTION toStream
+
+!***********************************************************************
+!***********************************************************************
+      SUBROUTINE toIrr()
+      USE PRMS_CONSTANTS, ONLY: DNEARZERO
+      USE GWFAGMODULE, ONLY: NUMIRRPOND, IRRPONDVAR, PONDFLOW
+      USE PRMS_MODULE, ONLY: Dprst_ag_transfer
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
+      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
+      IMPLICIT NONE
+      INTRINSIC :: SNGL
+! Local Variables
+      INTEGER :: i, hru_id
+      REAL :: demand_inch_acres
+!***********************************************************************
+! Calculate conversion for MF units to inch_acres
+      Dprst_ag_transfer = 0.0
+      do i = 1, NUMIRRPOND
+        hru_id = IRRPONDVAR(i)
+        IF ( hru_id > 0 ) THEN
+          demand_inch_acres = PONDFLOW(i)*MFQ_to_inch_acres
+! next 2 lines moved to ag package
+          !IF ( demand_inch_acres > SNGL(Dprst_vol_open(hru_id))) demand_inch_acres = SNGL(Dprst_vol_open(hru_id))
+          !PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
+          Dprst_ag_transfer(hru_id) = Dprst_ag_transfer(hru_id) + demand_inch_acres
+          Dprst_vol_open(hru_id) = Dprst_vol_open(hru_id) - demand_inch_acres
+          if (Dprst_vol_open(hru_id)<0.0) THEN
+            if (Dprst_vol_open(hru_id)<1.0D-09) print *, 'dprst empty', Dprst_vol_open(hru_id)
+            Dprst_vol_open(hru_id) = 0.0D0
+          end if
+        END IF
+      end do
+
+      END SUBROUTINE toIrr
 
 !***********************************************************************
 ! Bin percolation to reduce waves

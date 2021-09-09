@@ -620,6 +620,9 @@
       PRMS_flag = ACTIVE
       GSFLOW_flag = OFF
       PRMS_only = OFF
+      AG_flag = OFF
+      IF ( Model_mode(:9)=='GSFLOW_AG' .OR. Model_mode(:9)=='gsflow_ag' .OR. Model_mode(:7)=='PRMS_AG' &
+     &     .OR. Model_mode(:7)=='prms_ag' ) AG_flag = ACTIVE
       ! Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 3=GSFLOW_AG; 4=PRMS_AG)
       IF ( Model_mode(:7)=='PRMS_AG' .OR. Model_mode(:7)=='prms_ag' ) THEN
         Model = PRMS_AG
@@ -655,7 +658,7 @@
         Inputerror_flag = 1
       ENDIF
       Ag_frac_flag = OFF
-      IF ( Model==GSFLOW_AG .OR. Model==PRMS_AG ) Ag_frac_flag = ACTIVE
+      IF ( AG_flag==ACTIVE ) Ag_frac_flag = ACTIVE
 
       ! get simulation start_time and end_time
       Starttime = -1

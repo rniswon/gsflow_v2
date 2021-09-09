@@ -2,7 +2,6 @@
 ! Read PRMS Data File
 !***********************************************************************
       MODULE PRMS_DATA_FILE
-        USE PRMS_CONSTANTS, ONLY: ERROR_open_in, ERROR_read
         INTEGER, SAVE :: Num_datafile_types, Num_datafile_columns, Datafile_unit
         CHARACTER(LEN=16), ALLOCATABLE, SAVE :: Data_varname(:)
         INTEGER, ALLOCATABLE, SAVE :: Data_varnum(:)
@@ -11,7 +10,7 @@
       END MODULE PRMS_DATA_FILE
 
       SUBROUTINE read_prms_data_file
-      USE PRMS_CONSTANTS, ONLY: ERROR_time, ERROR_read
+      USE PRMS_CONSTANTS, ONLY: ERROR_time, ERROR_read, ERROR_open_in
       USE PRMS_DATA_FILE
       USE PRMS_MODULE, ONLY: PRMS_output_unit, MAXFILE_LENGTH, EQULS, Print_debug, Starttime, Endtime
       IMPLICIT NONE
@@ -154,6 +153,7 @@
 ! Read PRMS Data File line
 !***********************************************************************
       SUBROUTINE read_data_line()
+      USE PRMS_CONSTANTS, ONLY: ERROR_read
       USE PRMS_DATA_FILE
       USE PRMS_MMFAPI
       USE PRMS_SET_TIME, ONLY: Nowtime
@@ -372,8 +372,9 @@
 ! read_data_file_line - Read next data line, check increment
 !***********************************************************************
       SUBROUTINE read_data_file_line(Iret)
-      USE PRMS_DATA_FILE
+      USE PRMS_CONSTANTS, ONLY: ERROR_read
       USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day, Nowyear, Nowmonth, Nowday
+      USE PRMS_DATA_FILE
       IMPLICIT NONE
       ! Functions
       INTEGER, EXTERNAL :: compute_julday

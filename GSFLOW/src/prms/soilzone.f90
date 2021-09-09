@@ -19,7 +19,7 @@
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
       character(len=*), parameter :: Version_soilzone = '2021-09-01'
-      INTEGER, SAVE :: DBGUNT
+      INTEGER, SAVE :: DBGUNT, Soil_iter, Iter_aet_PRMS_flag !, HRU_id
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
       REAL, SAVE, ALLOCATABLE :: Soil_lower_stor_max(:)
@@ -73,7 +73,7 @@
       REAL, SAVE, ALLOCATABLE :: Gravity_stor_res(:), Gvr2sm(:), Grav_gwin(:)
 !   Declared Parameters
       INTEGER, SAVE, ALLOCATABLE :: Soil_type(:), Gvr_hru_id(:)
-      REAL, SAVE, ALLOCATABLE :: Pref_flow_den(:)
+      REAL, SAVE, ALLOCATABLE :: Pref_flow_den(:), Pref_flow_infil_frac(:)
       REAL, SAVE, ALLOCATABLE :: Fastcoef_lin(:), Fastcoef_sq(:)
       REAL, SAVE, ALLOCATABLE :: Slowcoef_lin(:), Slowcoef_sq(:)
       REAL, SAVE, ALLOCATABLE :: Ssr2gw_rate(:), Ssr2gw_exp(:)
@@ -542,6 +542,13 @@
      &     'Fraction of the gravity reservoir in which preferential flow occurs for each HRU', &
      &     'decimal fraction')/=0 ) CALL read_error(1,'pref_flow_den')
 
+      ALLOCATE ( Pref_flow_infil_frac(Nhru) )
+      IF ( declparam(MODNAME, 'pref_flow_infil_frac', 'nhru', 'real', &
+     &     '-1.0', '-1.0', '1.0', &
+     &     'Fraction of the soilwater infiltration to the preferential flow occurs for each HRU', &
+     &     'Fraction of the soilwater infiltration to the preferential flow occurs for each HRU', &
+     &     'decimal fraction')/=0 ) CALL read_error(1,'pref_flow_infil_frac')
+
       ALLOCATE ( Soil2gw_max(Nhru) )
       IF ( declparam(MODNAME, 'soil2gw_max', 'nhru', 'real', &
      &     '0.0', '0.0', '5.0', &
@@ -621,6 +628,9 @@
       IF ( getparam_real(MODNAME, 'slowcoef_lin', Nhru, Slowcoef_lin)/=0 ) CALL read_error(2, 'slowcoef_lin')
       IF ( getparam_real(MODNAME, 'slowcoef_sq', Nhru, Slowcoef_sq)/=0 ) CALL read_error(2, 'slowcoef_sq')
       IF ( getparam_real(MODNAME, 'pref_flow_den', Nhru, Pref_flow_den)/=0 ) CALL read_error(2, 'pref_flow_den')
+      IF ( getparam_real(MODNAME, 'pref_flow_infil_frac', Nhru, Pref_flow_infil_frac)/=0 ) &
+     &     CALL read_error(2, 'pref_flow_infil_frac')
+      IF ( Pref_flow_infil_frac(1)<0.0 ) Pref_flow_infil_frac = Pref_flow_den ! should pref_flow_infil_frac be set to 0 if pref_flow_den = 0 ???
       IF ( getparam_real(MODNAME, 'fastcoef_lin', Nhru, Fastcoef_lin)/=0 ) CALL read_error(2, 'fastcoef_lin')
       IF ( getparam_real(MODNAME, 'fastcoef_sq', Nhru, Fastcoef_sq)/=0 ) CALL read_error(2, 'fastcoef_sq')
       IF ( getparam_real(MODNAME, 'ssr2gw_rate', Nssr, Ssr2gw_rate)/=0 ) CALL read_error(2, 'ssr2gw_rate')
@@ -669,8 +679,11 @@
 
       DO i = 1, Nhru
 
-! WARNING changing parameter value as invalid for these HRU types, need to be 0 for computations below
-        IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE .OR. Hru_type(i)==SWALE) Pref_flow_den(i) = 0.0
+! WARNING changing parameter values as invalid for these HRU types, need to be 0 for computations below
+        IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE .OR. Hru_type(i)==SWALE) THEN
+          Pref_flow_den(i) = 0.0
+          Pref_flow_infil_frac(i) = 0.0
+        ENDIF
 
         IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE ) THEN
           Sat_threshold(i) = 0.0 ! allow modification of parameter value for lake and inactive HRUs
@@ -804,7 +817,7 @@
       &          Gravity_stor_res(i) = Ssres_stor(ihru)
             Hru_gvr_count(ihru) = Hru_gvr_count(ihru) + 1
             IF ( Hru_gvr_count(ihru)>Max_gvrs ) Max_gvrs = Hru_gvr_count(ihru)
-            Replenish_frac(ihru) = Soil_rechr_max(ihru)/Soil_moist_max(ihru)
+            IF ( Soil_moist_max(ihru)>0.0 ) Replenish_frac(ihru) = Soil_rechr_max(ihru)/Soil_moist_max(ihru)
           ENDIF
         ENDDO
         ALLOCATE ( Hru_gvr_index(Max_gvrs, Nhru) )
@@ -952,6 +965,7 @@
 
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
+!        HRU_id = i
 
         hruactet = Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i)
         IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
@@ -1044,12 +1058,12 @@
 ! ??? should cascading flow go to preferential flow fraction ???
         prefflow = 0.0
         dunnianflw_pfr = 0.0
-        IF ( Pref_flow_den(i)>0.0 ) THEN
+        IF ( Pref_flow_infil_frac(i)>0.0 ) THEN
           pref_flow_maxin = 0.0
           Pref_flow_infil(i) = 0.0
           IF ( capwater_maxin>0.0 ) THEN
             ! pref_flow for whole HRU
-            pref_flow_maxin = capwater_maxin*Pref_flow_den(i)
+            pref_flow_maxin = capwater_maxin*Pref_flow_infil_frac(i)
             capwater_maxin = capwater_maxin - pref_flow_maxin
             pref_flow_maxin = pref_flow_maxin*perv_frac
             IF ( cfgi_frozen_hru==ACTIVE ) THEN

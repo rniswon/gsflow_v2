@@ -83,7 +83,7 @@
       ELSEIF ( statvarOut_format==5 ) THEN
         WRITE ( Output_fmt, 9005 ) stamp, nstatVars
       ENDIF
-      print *, output_fmt
+      !print *, output_fmt
  9001 FORMAT (A,I0,'(1X,ES10.3))')
  9002 FORMAT (A,I0,'(1X,F0.2))')
  9003 FORMAT (A,I0,'(1X,F0.3))')
