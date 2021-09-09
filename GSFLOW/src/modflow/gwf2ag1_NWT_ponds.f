@@ -3765,11 +3765,11 @@
            Q = Q + PONDSEGFLOW(I)
            QQ = QQ + PONDFLOW(I)
            hru_id = IRRPONDVAR(I)
-           if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
-             sub = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
-             if ( sub < DZERO ) sub = DZERO
-             QQQ = QQQ + sub
-           end if
+!           if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
+!             sub = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+!             if ( sub < DZERO ) sub = DZERO
+!             QQQ = QQQ + sub
+!           end if
          END DO
          hru_id = 0
          CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
