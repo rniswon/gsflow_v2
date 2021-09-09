@@ -1430,13 +1430,14 @@ C
      1    Nowyear, Nowmonth, Nowday, Model, mf_nowtime
       IMPLICIT NONE
       INTRINSIC DBLE
+      DOUBLE PRECISION, EXTERNAL :: nowjt
       INTEGER, EXTERNAL :: compute_julday
 ! Local Variables
       INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
       IF ( Model==MODFLOW ) THEN
-        now = mf_nowtime
+        now = nowjt()
       ELSE
         now = compute_julday(Nowyear, Nowmonth, Nowday)
       ENDIF

@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.0 01/20/2021
+                       Version 5.2.1 09/07/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,26 +36,26 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-01-20
-Basin Definition                basin               2020-12-02
-Common States and Fluxes        climateflow         2021-01-11
-Potential Solar Radiation       soltab              2020-12-02
-Timestep Control                prms_time           2020-12-02
-Time Series Data                obs                 2020-12-02
-Temp & Precip Distribution      xyz_dist            2020-12-02
-Solar Radiation Distribution    ccsolrad            2020-12-02
-Transpiration Distribution      transp_tindex       2020-12-02
-Potential Evapotranspiration    potet_jh            2020-08-03
-Canopy Interception             intcp               2021-02-18
-Snow Dynamics                   snowcomp            2021-01-11
-Glacier Dynamics                glacr_melt          2020-12-02
-Surface Runoff                  srunoff_smidx       2021-01-11
-Soilzone Computations           soilzone            2021-02-18
-Groundwater                     gwflow              2020-12-02
-Streamflow Routing Init         routing             2020-12-02
-Streamflow Routing              muskingum           2020-12-02
-Output Summary                  basin_sum           2020-12-02
-Output Summary                  prms_summary        2020-12-02
+PRMS Computation Order          gsflow_prms         2021-09-07
+Basin Definition                basin               2021-08-18
+Common States and Fluxes        climateflow         2021-08-13
+Potential Solar Radiation       soltab              2021-08-13
+Timestep Control                prms_time           2021-08-13
+Time Series Data                obs                 2021-08-13
+Temp & Precip Distribution      xyz_dist            2021-08-13
+Solar Radiation Distribution    ccsolrad            2021-08-13
+Transpiration Distribution      transp_tindex       2021-09-07
+Potential Evapotranspiration    potet_jh            2021-08-13
+Canopy Interception             intcp               2021-09-07
+Snow Dynamics                   snowcomp            2021-08-13
+Glacier Dynamics                glacr_melt          2021-08-13
+Surface Runoff                  srunoff_smidx       2021-08-18
+Soilzone Computations           soilzone            2021-09-08
+Groundwater                     gwflow              2021-08-13
+Streamflow Routing Init         routing             2021-08-13
+Streamflow Routing              muskingum           2021-08-13
+Output Summary                  basin_sum           2021-08-13
+Output Summary                  prms_summary        2021-08-13
 ==============================================================
 
 Using Control File: .\control\Tazlina.control
@@ -145,5 +145,5 @@ Fraction impervious:        0.0473    Fraction pervious:       0.9527
  *************************************************************
  Total for run    1038.569  383.580-1194.676 1839.556 -316.118
  *************************************************************
-Execution elapsed time    0 minutes  4.28 seconds
+Execution elapsed time    0 minutes  4.98 seconds
 
