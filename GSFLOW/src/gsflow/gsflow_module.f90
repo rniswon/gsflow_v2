@@ -5,7 +5,7 @@
     USE ISO_FORTRAN_ENV
     USE PRMS_CONSTANTS, ONLY: MODFLOW, MAX_DAYS_PER_YEAR, DEBUG_minimum, DEBUG_less, DEBUG_WB, &
    &    RUN, DECL, INIT, SETDIMENS, CLEAN, ACTIVE, OFF, ERROR_dim, ERROR_open_out, ERROR_param, ERROR_restart, &
-   &    ERROR_modflow, PRMS, GSFLOW, CASCADE_NORMAL, CASCADE_HRU_SEGMENT, CASCADE_OFF, &
+   &    ERROR_modflow, PRMS, GSFLOW, PRMS_AG, GSFLOW_AG, CASCADE_NORMAL, CASCADE_HRU_SEGMENT, CASCADE_OFF, &
    &    CASCADEGW_SAME, CASCADEGW_OFF, CLIMATE, FROST, TRANSPIRE, WRITE_CLIMATE, POTET, CONVERT, &
    &    xyz_dist_module, ide_dist_module, temp_dist2_module, temp_map_module, precip_dist2_module, &
    &    DOCUMENTATION, MAXDIM, MAXFILE_LENGTH, MAXCONTROL_LENGTH, &
@@ -20,9 +20,9 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 09/07/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-09-07'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 09/07/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 09/09/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-09-09'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 09/09/2021'
       character(len=*), parameter :: Version_read_control_file = '2021-09-07'
       character(len=*), parameter :: Version_read_parameter_file = '2021-09-07'
       character(len=*), parameter :: Version_read_data_file = '2021-09-07'
@@ -35,7 +35,7 @@
       !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
       INTEGER, SAVE :: Model, Process_flag, Call_cascade, PRMS_only
       INTEGER, SAVE :: Start_year, Start_month, Start_day, End_year, End_month, End_day
-      INTEGER, SAVE :: Transp_flag, Sroff_flag, Solrad_flag, Et_flag
+      INTEGER, SAVE :: Transp_flag, Sroff_flag, Solrad_flag, Et_flag, AG_flag
       INTEGER, SAVE :: Climate_temp_flag, Climate_precip_flag, Climate_potet_flag, Climate_transp_flag
       INTEGER, SAVE :: Lake_route_flag, Strmflow_flag, Stream_order_flag
       INTEGER, SAVE :: Temp_flag, Precip_flag, Climate_hru_flag, Climate_swrad_flag
@@ -44,6 +44,8 @@
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag, Albedo_cbh_flag, Cloud_cover_cbh_flag
       INTEGER, SAVE :: PRMS_flag, GSFLOW_flag, PRMS4_flag
       INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Grid_flag, Ag_package
+      INTEGER, SAVE :: Agriculture_flag, Canopy_iter, Keep_iterating_PRMS, Ag_frac_flag
+      INTEGER, SAVE :: Climate_irrigated_area_flag, AET_cbh_flag, PET_cbh_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Soilzone_add_water_use
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
@@ -54,7 +56,8 @@
       INTEGER, SAVE :: mf_timestep, startday, endday, mf_nowtime, Number_timesteps
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
-      REAL, SAVE, ALLOCATABLE :: Hru_ag_irr(:)
+!   Declared Variables for DPRST agriculture computations
+      REAL, SAVE, ALLOCATABLE :: Dprst_ag_transfer(:), Dprst_ag_gain(:), Hru_ag_irr(:)
 !   Declared Parameters
       INTEGER, SAVE :: Mxsziter
       INTEGER, SAVE, ALLOCATABLE :: Gvr_cell_id(:)
@@ -68,15 +71,17 @@
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag
-      INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
+      INTEGER, SAVE :: Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, Dyn_ag_frac_flag
+      INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag, Dyn_ag_soil_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF, outputSelectDatesON_OFF
-      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName, Dynamic_param_log_file
+      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Csv_output_file, Model_control_file, Param_file, Stat_var_file
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Temp_module, Srunoff_module, Et_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Strmflow_module, Transp_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Model_mode, Precip_module, Solrad_module
+      CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: irrigation_area_module, AET_module, PET_ag_module
       CHARACTER(LEN=8), SAVE :: Soilzone_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
       INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF
@@ -86,14 +91,12 @@
       END MODULE PRMS_MODULE
 
       MODULE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE, OFF, &
-     &    MODFLOW, GSFLOW, ERROR_modflow, ERROR_time, MAXFILE_LENGTH, READ_INIT
-      USE PRMS_MODULE, ONLY: Print_debug, Model, GSFLOW_flag
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-09-08'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-09-09'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -113,7 +116,7 @@
       INTEGER, SAVE :: KSTP, KKSTP, IERR, Max_iters, Itreal
       INTEGER, SAVE :: Mfiter_cnt(ITDIM), Iter_cnt(ITDIM), Iterations
       INTEGER, SAVE :: Szcheck, Sziters, INUNIT, KPER, NCVGERR
-      INTEGER, SAVE :: Max_sziters, Maxgziter, ITREAL2
+      INTEGER, SAVE :: Max_sziters, Maxgziter, ITREAL2, mf_julday
       INTEGER, SAVE, ALLOCATABLE :: Gwc_col(:), Gwc_row(:)
       REAL, SAVE :: Delt_save
       INTEGER, SAVE, ALLOCATABLE :: Stress_dates(:)
@@ -122,8 +125,7 @@
       DOUBLE PRECISION, SAVE :: Mft_to_sec, Totalarea_mf
       DOUBLE PRECISION, SAVE :: Mfl2_to_acre, Mfl3_to_ft3, Sfr_conv
       DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs
-      REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t
-      REAL, SAVE :: MFQ_to_inch_acres
+      REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t, MFQ_to_inch_acres
       DOUBLE PRECISION, SAVE :: mfstrt_jul  !RGN to get MF to stop at End_time for MODFLOW only
       REAL, SAVE, ALLOCATABLE :: Mfq2inch_conv(:), Cellarea(:)
       REAL, SAVE, ALLOCATABLE :: Gvr2cell_conv(:), Mfvol2inch_conv(:)

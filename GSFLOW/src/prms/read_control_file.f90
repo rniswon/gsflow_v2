@@ -8,17 +8,14 @@
      &      Precip_module, Temp_module, Et_module, Srunoff_module, Solrad_module, Gwr_swale_flag, &
      &      Strmflow_module, Transp_module, Soilzone_module, Print_debug, Dprst_flag, Subbasin_flag, Frozen_flag, &
      &      CsvON_OFF, MapOutON_OFF, Model_mode, Orad_flag, Endtime, Starttime, Snow_cbh_flag, Stream_temp_flag, &
-     &      Cascade_flag, Cascadegw_flag, Prms_warmup, Humidity_cbh_flag, Windspeed_cbh_flag, Strmtemp_humidity_flag, &
+     &      Cascadegw_flag, Prms_warmup, Humidity_cbh_flag, Windspeed_cbh_flag, Strmtemp_humidity_flag, &
      &      Gwflow_cbh_flag, NhruOutON_OFF, NsubOutON_OFF, BasinOutON_OFF, Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, &
      &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, NsegmentOutON_OFF, &
      &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Dyn_covden_flag, Segment_transferON_OFF, Gwr_transferON_OFF, &
      &      Lake_transferON_OFF, External_transferON_OFF, Dprst_transferON_OFF, BasinOutON_OFF, &
-     &      Snarea_curve_flag, Gsflow_output_file, Stat_var_file, &
-     &      Csv_output_file, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days
+     &      Snarea_curve_flag, Gsflow_output_file, Stat_var_file
         USE GSFMODFLOW, ONLY: Modflow_name, Modflow_time_zero
-        USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, &
-     &      Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day
         USE PRMS_MAP_RESULTS, ONLY: NmapOutVars, MapOutVar_names
         USE PRMS_STATVAR_OUT, ONLY: statvarOut_format, nstatVars, statVar_element, statVar_names
         USE PRMS_NHRU_SUMMARY, ONLY: NhruOutVars, NhruOut_freq, NhruOutBaseFileName, NhruOutVar_names, NhruOut_format, &
@@ -28,12 +25,6 @@
         USE PRMS_NSEGMENT_SUMMARY, ONLY: NsegmentOutVars, NsegmentOut_freq, NsegmentOutBaseFileName, &
      &      NsegmentOutVar_names, NsegmentOut_format
         USE PRMS_WATER_USE, ONLY: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file, External_transfer_file, Lake_transfer_file
-        USE PRMS_DYNAMIC_PARAM_READ, ONLY: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
-     &      wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
-     &      potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, &
-     &      soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, Dynamic_param_log_file, &
-     &      fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, snareathresh_dynamic, &
-     &      covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn
         USE PRMS_GLACR, ONLY: Mbinit_flag
         USE PRMS_PRECIP_MAP, ONLY: Precip_map_file
         USE PRMS_TEMP_MAP, ONLY: Tmax_map_file, Tmin_map_file
@@ -131,7 +122,19 @@
       SUBROUTINE setup_cont()
       USE PRMS_CONSTANTS, ONLY: DEBUG_normal, ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Soilzone_aet_flag, PRMS_land_iteration_flag, &
-     &    Albedo_cbh_flag, Cloud_cover_cbh_flag
+     &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, Irrigation_area_module, AET_module, PET_ag_module, &
+     &    selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, &
+     &    Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
+     &    Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use
+      USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, &
+     &    Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, AET_cbh_file, PET_cbh_file
+      USE PRMS_DYNAMIC_PARAM_READ, ONLY: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
+     &    wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
+     &    potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, Dynamic_param_log_file, &
+     &    soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, &
+     &    fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, snareathresh_dynamic, &
+     &    covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn !, &
+!     &    ag_soilmoist_dynamic, ag_soilrechr_dynamic
       USE PRMS_CONTROL_FILE
       IMPLICIT NONE
       ! Local Variables
@@ -178,6 +181,12 @@
       i = i + 1
       Control_parameter_data(i)%name = 'dprst_flag'
       Dprst_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'dprst_add_water_use'
+      Dprst_add_water_use = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'dprst_transfer_water_use'
+      Dprst_transfer_water_use = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'cascade_flag'
       Cascade_flag = ACTIVE
@@ -353,6 +362,27 @@
       i = i + 1
       Control_parameter_data(i)%name = 'cloud_cover_cbh_flag'
       Cloud_cover_cbh_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'agriculture_soil_flag'
+      Agriculture_soil_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'agriculture_canopy_flag'
+      Agriculture_canopy_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'agriculture_dprst_flag'
+      Agriculture_dprst_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'dyn_ag_frac_flag'
+      Dyn_ag_frac_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'dyn_ag_soil_flag'
+      Dyn_ag_soil_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'AET_cbh_flag'
+      AET_cbh_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'PET_cbh_flag'
+      PET_cbh_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dispGraphsBuffSize'
       DispGraphsBuffSize = 50
@@ -562,6 +592,16 @@
       Control_parameter_data(i)%values_character(1) = Model_output_file
       Control_parameter_data(i)%data_type = CHAR_TYPE
       i = i + 1
+      !Control_parameter_data(i)%name = 'mappingFileName'
+      !mappingFileName = 'MODSIM.map'
+      !Control_parameter_data(i)%values_character(1) = mappingFileName
+      !Control_parameter_data(i)%data_type = CHAR_TYPE
+      !i = i + 1
+      !Control_parameter_data(i)%name = 'xyFileName'
+      !xyFileName = 'MODSIM.xy'
+      !Control_parameter_data(i)%values_character(1) = xyFileName
+      !Control_parameter_data(i)%data_type = CHAR_TYPE
+      !i = i + 1
       Control_parameter_data(i)%name = 'csv_output_file'
       Csv_output_file = 'prms_summary.csv'
       Control_parameter_data(i)%values_character(1) = Csv_output_file
@@ -672,6 +712,41 @@
       Control_parameter_data(i)%values_character(1) = Humidity_day
       Control_parameter_data(i)%data_type = CHAR_TYPE
       i = i + 1
+      Control_parameter_data(i)%name = 'irrigation_area_module'
+      Irrigation_area_module = 'irrigation_area_module'
+      Control_parameter_data(i)%values_character(1) = Irrigation_area_module
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'PET_ag_module'
+      PET_ag_module = 'PET_ag_module'
+      Control_parameter_data(i)%values_character(1) = PET_ag_module
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'AET_module'
+      PET_ag_module = 'AET_module'
+      Control_parameter_data(i)%values_character(1) = AET_module
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'AET_cbh_file'
+      AET_cbh_file = 'AET_cbh_day'
+      Control_parameter_data(i)%values_character(1) = AET_cbh_file
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'PET_cbh_file'
+      PET_cbh_file = 'PET_cbh_day'
+      Control_parameter_data(i)%values_character(1) = PET_cbh_file
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+!      Control_parameter_data(i)%name = 'ag_soilmoist_dynamic'
+!      ag_soilmoist_dynamic = 'ag_soilmoist.dynamic'
+!      Control_parameter_data(i)%values_character(1) = ag_soilmoist_dynamic
+!      Control_parameter_data(i)%data_type = CHAR_TYPE
+!      i = i + 1
+!      Control_parameter_data(i)%name = 'ag_soilrechr_dynamic'
+!      ag_soilrechr_dynamic = 'ag_soilrechr.dynamic'
+!      Control_parameter_data(i)%values_character(1) = ag_soilrechr_dynamic
+!      Control_parameter_data(i)%data_type = CHAR_TYPE
+!      i = i + 1
       Control_parameter_data(i)%name = 'dynamic_param_log_file'
       Dynamic_param_log_file = 'dynamic_parameter.out'
       Control_parameter_data(i)%values_character(1) = Dynamic_param_log_file
