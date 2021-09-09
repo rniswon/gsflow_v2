@@ -770,6 +770,34 @@
      +                       //' SUP or IRR wells required')
             end if
             found = .true.
+                 !
+            !16 - --- SUPPORT PREVIOUS AG INPUT OPTIONS
+         case ('TABFILES')
+            if (found1) then
+               CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, NUMTABWELL, R, 
+     +                     IOUT, IN)
+               IF (NUMTABWELL .LT. 0) NUMTABWELL = 0
+               WRITE (IOUT, *)
+               WRITE (IOUT, 30) NUMTABWELL
+               WRITE (IOUT, *)
+               CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, MAXVALWELL, R, 
+     +                     IOUT, IN)
+               IF (MAXVALWELL .LT. 0) THEN
+                  MAXVALWELL = 1
+                  NUMTABWELL = 0
+               END IF
+               WRITE (IOUT, *)
+               WRITE (IOUT, 31) MAXVALWELL
+               WRITE (IOUT, *)
+            else
+               WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
+     +                       //' Option: '//LINE(ISTART:ISTOP)
+     +                       //' SUP or IRR wells required'
+               CALL USTOP('Invalid '//trim(adjustl(text))
+     +                       //' Option: '//LINE(ISTART:ISTOP)
+     +                       //' SUP or IRR wells required')
+            end if
+            found = .true.
       !
       !16b - --- SPEICYING POND DIVERSION RATES AS TIMES SERIES INPUT FILE FOR EACH POND
          case ('TABFILESPOND')
