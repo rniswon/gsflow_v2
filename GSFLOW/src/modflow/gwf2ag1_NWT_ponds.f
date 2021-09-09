@@ -3137,7 +3137,7 @@
      +                    aetold, supold, sup
       integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
-      double precision :: set_factor !, etdif
+      double precision :: set_factor, etdif
       INTRINSIC :: ABS
 ! --------------------------------------------------
 !
@@ -3233,7 +3233,7 @@
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet
       double precision :: pettotal,aettotal, prms_inch2mf_q,
-     +                    aetold, supold, sup !, etdif
+     +                    aetold, supold, sup, etdif
       real :: demand_inch_acres
       integer :: k, ipond, hru_id, i
       external :: set_factor
@@ -3666,8 +3666,8 @@
       USE PRMS_SOILZONE, ONLY: PERV_ACTET !(delete this)
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
-      USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id !, (uncomment this and next line)
-    ! +    Agriculture_dprst_flag
+      USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id !(uncomment this and next line)
+!     +    ,Agriculture_dprst_flag
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row,
      +                      Mfq_to_inch_acres
       IMPLICIT NONE
@@ -3721,10 +3721,10 @@
                 Q = PONDSEGFLOW(I)
                 QQ = PONDFLOW(I)
                 QQQ = 0.0
-!                if ( Agriculture_dprst_flag == 1 )   !uncommment this and next 3 lines
+!                if ( Agriculture_dprst_flag == 1 )   !uncommment this and next 2 lines
 !     +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
-!                CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
-!     +                          Q, QQ, QQQ)
+                CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
+     +                          Q, QQ, QQQ)
               END IF
            END DO
          END DO
@@ -3765,11 +3765,11 @@
            Q = Q + PONDSEGFLOW(I)
            QQ = QQ + PONDFLOW(I)
            hru_id = IRRPONDVAR(I)
-           !if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
-           !  sub = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
-           !  if ( sub < DZERO ) sub = DZERO
-           !  QQQ = QQQ + sub
-           !end if
+           if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
+             sub = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+             if ( sub < DZERO ) sub = DZERO
+             QQQ = QQQ + sub
+           end if
          END DO
          hru_id = 0
          CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
