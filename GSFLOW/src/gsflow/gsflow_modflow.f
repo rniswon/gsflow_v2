@@ -1371,27 +1371,25 @@ C
       USE PRMS_CONSTANTS, ONLY: MODFLOW
       USE GLOBAL, ONLY: NPER
       USE GSFMODFLOW, ONLY: Stress_dates, KPER
-      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day,
-     1    Nowyear, Nowmonth, Nowday, Model, mf_nowtime
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday, Model,
+     &    mf_nowtime
       IMPLICIT NONE
       INTRINSIC DBLE
+!      DOUBLE PRECISION, EXTERNAL :: nowjt ! an MMF routine
       INTEGER, EXTERNAL :: compute_julday
 ! Local Variables
       INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
-      IF ( Model==MODFLOW ) THEN
-        now = mf_nowtime
-      ELSE
+      IF ( Model/=MODFLOW ) THEN
         now = compute_julday(Nowyear, Nowmonth, Nowday)
+      ELSE
+!        now = nowjt()
+         now = mf_nowtime ! ?? need to set to julian day of year
       ENDIF
       KPERTEST = 1
       IF ( KPER > KPERTEST ) KPERTEST = KPER
 !
-!     If called from init, then "now" isn't set yet.
-!     Set "now" to model start date.
-      IF ( now<2 )
-     &     now = compute_julday(Start_year, Start_month, Start_day)
       IF ( now<Stress_dates(KPERTEST) )
      &     STOP 'ERROR, now<stress period time'
       IF ( now>Stress_dates(NPER) ) THEN
