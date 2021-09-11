@@ -1,0 +1,1 @@
+C:\Users\rniswon\AppData\Local\Continuum\miniconda2\Scripts\jupyter-notebook.exe

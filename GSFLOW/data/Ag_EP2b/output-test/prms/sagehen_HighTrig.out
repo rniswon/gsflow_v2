@@ -60,3 +60,23 @@ Output Summary                  nhru_summary        2021-08-13
 Output Summary                  basin_summary       2021-08-13
 Output Summary                  nsegment_summary    2021-08-13
 ==============================================================
+GSFLOW MODFLOW main             gsflow_modflow      2021-09-08
+UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
+SFR-NWT Package                 gwf2sfr7_NWT        2020-09-30
+AG-NWT Package                  gwf2ag1_NWT         2021-06-21
+
+Using Control File: gsflow_gsflow_HighTrig.control
+
+Using Parameter File: ..\input\prms\sagehen_grid_v5_highKc.params
+
+
+Start time: 1990/10/01 00:00:00
+End time:   2000/10/31 00:00:00
+
+
+Model domain area:        11226.32    Active basin area:      6740.99
+Fraction impervious:        0.0000    Fraction pervious:       1.0000
+
+
+Execution elapsed time    3 minutes 51.75 seconds
+

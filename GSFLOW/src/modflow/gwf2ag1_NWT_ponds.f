@@ -2426,10 +2426,11 @@
                   IF (ETDEMANDFLAG > 0) THEN
                      FMIN = SUPACT(J)
                   ELSE IF (TRIGGERFLAG > 0) then
-                     QSW = DZERO
-                     FMIN = DZERO
-                     IF (TIMEINPERIODSEG(J) < IRRPERIODSEG(J)) THEN
-                        FMIN = Q
+                     IF (TIMEINPERIODSEG(J) < IRRPERIODSEG(J)) THEN  
+                        FMIN = SEG(2, J)
+                     ELSE
+                       QSW = DZERO
+                       FMIN = DZERO
                      END IF
                   ELSE
                      FMIN = DEMAND(J)
@@ -3427,7 +3428,7 @@
                TIMEINPERIODSEG(ISEG) = 0.0
             end if
          end if
-         if (TIMEINPERIODSEG(ISEG) - DELT < IRRPERIODSEG(ISEG))
+         if (TIMEINPERIODSEG(ISEG) < IRRPERIODSEG(ISEG))
      +                              SEG(2, iseg) = DEMAND(iseg)
 300    continue
        deallocate (petseg, aetseg)
@@ -3507,7 +3508,7 @@
               TIMEINPERIODWELL(L) = SZERO
           end if
       end if
-      if (TIMEINPERIODWELL(L) - DELT < IRRPERIODWELL(L))
+      if (TIMEINPERIODWELL(L) < IRRPERIODWELL(L))
      +                                 demandtrigger_gw = Q
       end function demandtrigger_gw
       
