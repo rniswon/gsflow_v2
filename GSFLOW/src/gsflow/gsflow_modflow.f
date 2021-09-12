@@ -454,8 +454,8 @@ C
       Delt_save = DELT
       IF ( ISSFLG(1).EQ.1 ) DELT = 1.0/Mft_to_days
       ! run SS if needed, read to current stress period, read restart if needed
+      CALL SET_STRESS_DATES()  !rgn 9/12/21 moved the order of these two calls
       CALL SETCONVFACTORS()
-      CALL SET_STRESS_DATES()
 C
       KKPER = KPER
       IF ( Model==MODFLOW ) THEN
