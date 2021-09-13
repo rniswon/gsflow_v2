@@ -398,10 +398,9 @@ C
       KPERSTART = 1
       ! run SS if needed, read to current stress period, read restart if needed
       CALL SET_STRESS_DATES()
-      CALL SETCONVFACTORS()
-
       Delt_save = DELT
       IF ( ISSFLG(1).EQ.0 ) Delt_save = 1.0/Mft_to_days
+      CALL SETCONVFACTORS()
 C
       KKPER = KPER
       IF ( Model==MODFLOW ) THEN
@@ -463,7 +462,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       ELSE
         Kkper_new = Kper_mfo
       ENDIF
-      print *, Kkper_new, Kper_mfo, kkper, kper
+
       IF ( Kkper_new.NE.KKPER ) THEN
         KPER = Kkper_new
         KKPER = Kkper_new
@@ -477,7 +476,7 @@ C7------SIMULATE EACH STRESS PERIOD.
           IF ( ISSFLG(KKPER).EQ.1 ) CALL error_stop
      &         ('cannot run steady state after first stress period.',
      &          ERROR_modflow)
-          IF ( ISSFLG(1).EQ.1 ) Delt_save = DELT
+!          IF ( ISSFLG(1).EQ.0 ) Delt_save = DELT ! rsr, delt_save set in gsfinit
           IF ( DELT.NE.Delt_save )
      &         CALL error_stop('cannot change DELT', ERROR_time)
         END IF
@@ -1390,7 +1389,6 @@ C
       ENDIF
       KPERTEST = 1
       IF ( KPER > KPERTEST ) KPERTEST = KPER
-      print *, Stress_dates
 !
       IF ( now<Stress_dates(KPERTEST) )
      &     STOP 'ERROR, now<stress period time'

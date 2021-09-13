@@ -732,7 +732,7 @@
         END IF
         IF ( IOTSG(i)==0 .and. itemp == 0 ) Basin_cfs = Basin_cfs + SGOTFLW(i)
         Streamflow_sfr(i) = SGOTFLW(i)*Mfl3t_to_cfs_sngl
-        nrch = ISTRM(5, i)
+        nrch = ISTRM(5, first_reach)
         DO j = first_reach, nrch + first_reach - 1
           Seepage_reach_sfr(i) = Seepage_reach_sfr(i) + STRM(11,j)*SNGL( Mfl3t_to_cfs )
         ENDDO
