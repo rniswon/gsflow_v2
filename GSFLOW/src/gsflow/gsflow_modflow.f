@@ -396,11 +396,12 @@ C
       KSTP = 0
       KPER = 1
       KPERSTART = 1
-      Delt_save = DELT
-      IF ( ISSFLG(1).EQ.1 ) DELT = 1.0/Mft_to_days
       ! run SS if needed, read to current stress period, read restart if needed
-      CALL SETCONVFACTORS()
       CALL SET_STRESS_DATES()
+      CALL SETCONVFACTORS()
+
+      Delt_save = DELT
+      IF ( ISSFLG(1).EQ.0 ) Delt_save = 1.0/Mft_to_days
 C
       KKPER = KPER
       IF ( Model==MODFLOW ) THEN
@@ -462,7 +463,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       ELSE
         Kkper_new = Kper_mfo
       ENDIF
-
+      print *, Kkper_new, Kper_mfo, kkper, kper
       IF ( Kkper_new.NE.KKPER ) THEN
         KPER = Kkper_new
         KKPER = Kkper_new
@@ -1389,6 +1390,7 @@ C
       ENDIF
       KPERTEST = 1
       IF ( KPER > KPERTEST ) KPERTEST = KPER
+      print *, Stress_dates
 !
       IF ( now<Stress_dates(KPERTEST) )
      &     STOP 'ERROR, now<stress period time'
