@@ -575,6 +575,11 @@
       Control_parameter_data(i)%values_character(1) = Transp_module
       Control_parameter_data(i)%data_type = CHAR_TYPE
       i = i + 1
+      Control_parameter_data(i)%name = 'soilzone_module'
+      Soilzone_module = 'soilzone'
+      Control_parameter_data(i)%values_character(1) = Soilzone_module
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
       Control_parameter_data(i)%name = 'data_file'
       Data_file = 'prms.data'
       Control_parameter_data(i)%values_character(1) = Data_file

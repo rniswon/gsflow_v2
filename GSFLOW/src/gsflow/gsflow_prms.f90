@@ -3,6 +3,7 @@
 !***********************************************************************
 !***********************************************************************
       SUBROUTINE gsflow_prms(Arg)
+      USE PRMS_CONSTANTS, ONLY: Soilzone_ag_module
       USE PRMS_MODULE
       IMPLICIT NONE
 ! Arguments
@@ -18,7 +19,7 @@
       INTEGER, EXTERNAL :: ddsolrad, ccsolrad
       INTEGER, EXTERNAL :: potet_pan, potet_jh, potet_hamon, potet_hs, potet_pt, potet_pm
       INTEGER, EXTERNAL :: intcp, snowcomp, gwflow
-      INTEGER, EXTERNAL :: srunoff, soilzone
+      INTEGER, EXTERNAL :: srunoff, soilzone, soilzone_ag
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, write_climate_hru
       INTEGER, EXTERNAL :: strmflow_in_out, muskingum, muskingum_lake, numchars
       INTEGER, EXTERNAL :: water_use_read, dynamic_param_read, potet_pm_sta
@@ -73,7 +74,7 @@
      &        '      Interception: intcp', /, &
      &        'Snow & Glacr Dynam: snowcomp, glacr_melt', /, &
      &        '    Surface Runoff: srunoff_smidx, srunoff_carea', /, &
-     &        '         Soil Zone: soilzone', /, &
+     &        '         Soil Zone: soilzone, soilzone_ag', /, &
      &        '       Groundwater: gwflow', /, &
      &        'Streamflow Routing: strmflow, strmflow_in_out, muskingum,', /, &
      &        '                    muskingum_lake, muskingum_mann', /, &
@@ -415,7 +416,11 @@
 
 ! for PRMS-only simulations
       IF ( PRMS_only==ACTIVE ) THEN
-        ierr = soilzone()
+        IF ( Soilzone_ag_module==1 ) THEN
+          ierr = soilzone_ag()
+        ELSE
+          ierr = soilzone()
+        ENDIF
         IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
         ! rsr, need to do something if gwflow_cbh_flag=1
@@ -458,7 +463,7 @@
 ! (contained in gsflow_modflow.f).
 ! They still need to be called for declare, initialize and cleanup
         ELSE !IF ( Process_flag/=RUN ) THEN
-! intcp, snowcomp, glacr, srunoff, and soilzone for GSFLOW are in the MODFLOW iteration loop
+! intcp, snowcomp, glacr, srunoff, soilzone_ag, and soilzone for GSFLOW are in the MODFLOW iteration loop
 ! when PRMS_land_iteration_flag = 2
 ! runoff and soilzone for GSFLOW are in the MODFLOW iteration loop
 ! when PRMS_land_iteration_flag = 1
@@ -480,7 +485,11 @@
             IF ( ierr/=0 ) CALL module_error(Srunoff_module, Arg, ierr)
           ENDIF
 
-          ierr = soilzone()
+          IF ( Soilzone_ag_module==1 ) THEN
+            ierr = soilzone_ag()
+          ELSE
+            ierr = soilzone()
+          ENDIF
           IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
           ierr = gsflow_prms2mf()
@@ -756,18 +765,20 @@
         IF ( control_string(Var_save_file, 'var_save_file')/=0 ) CALL read_error(5, 'var_save_file')
       ENDIF
 
-      Temp_module = ' '
+      Temp_module = 'temp_1sta'
       IF ( control_string(Temp_module, 'temp_module')/=0 ) CALL read_error(5, 'temp_module')
-      Precip_module = ' '
+      Precip_module = 'precip_1sta'
       IF ( control_string(Precip_module, 'precip_module')/=0 ) CALL read_error(5, 'precip_module')
-      Transp_module = ' '
+      Transp_module = 'transp_index'
       IF ( control_string(Transp_module, 'transp_module')/=0 ) CALL read_error(5, 'transp_module')
-      Et_module = ' '
+      Et_module = 'potet_jh'
       IF ( control_string(Et_module, 'et_module')/=0 ) CALL read_error(5, 'et_module')
-      Srunoff_module = ' '
+      Srunoff_module = 'srunoff_smidx'
       IF ( control_string(Srunoff_module, 'srunoff_module')/=0 ) CALL read_error(5, 'srunoff_module')
-      Solrad_module = ' '
+      Solrad_module = 'ddsolrad'
       IF ( control_string(Solrad_module, 'solrad_module')/=0 ) CALL read_error(5, 'solrad_module')
+      Soilzone_module = 'soilzone'
+      IF ( control_string(Soilzone_module, 'soilzone_module')/=0 ) CALL read_error(5, 'soilzone_module')
       Strmflow_module = 'strmflow'
       IF ( control_string(Strmflow_module, 'strmflow_module')/=0 ) CALL read_error(5, 'strmflow_module')
       Irrigation_area_module = ' '
@@ -891,8 +902,6 @@
         PRINT '(/,2A)', 'ERROR, invalid srunoff_module value: ', Srunoff_module
         Inputerror_flag = 1
       ENDIF
-
-      Soilzone_module = 'soilzone'
 
       IF ( control_integer(Orad_flag, 'orad_flag')/=0 ) Orad_flag = OFF
       IF ( Solrad_module(:8)=='ddsolrad' ) THEN
@@ -1355,7 +1364,7 @@
       INTEGER, EXTERNAL :: precip_dist2, xyz_dist, ide_dist
       INTEGER, EXTERNAL :: ddsolrad, ccsolrad
       INTEGER, EXTERNAL :: potet_pan, potet_jh, potet_hamon, potet_hs, potet_pt, potet_pm
-      INTEGER, EXTERNAL :: intcp, snowcomp, gwflow, srunoff, soilzone
+      INTEGER, EXTERNAL :: intcp, snowcomp, gwflow, srunoff, soilzone_ag
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, strmflow_in_out
       INTEGER, EXTERNAL :: write_climate_hru, muskingum, muskingum_lake
       INTEGER, EXTERNAL :: stream_temp
@@ -1401,7 +1410,7 @@
       test = snowcomp()
       test = srunoff()
       test = glacr()
-      test = soilzone()
+      test = soilzone_ag()
       test = gsflow_prms2mf()
       test = gsflow_mf2prms()
       test = gsflow_budget()

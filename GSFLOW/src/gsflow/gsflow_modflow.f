@@ -419,11 +419,11 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
-     &    ERROR_time, ERROR_modflow
+     &    ERROR_time, ERROR_modflow, Soilzone_ag_module
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
      &    Init_vars_from_file, Mxsziter, Glacier_flag,
      &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday,
-     &    Model, GSFLOW_flag, Print_debug
+     &    Model, GSFLOW_flag, Print_debug, Soilzone_module
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -441,7 +441,7 @@ c     USE LMGMODULE
       INTEGER I
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
-      INTEGER, EXTERNAL :: soilzone, GET_KPER
+      INTEGER, EXTERNAL :: soilzone, soilzone_ag, GET_KPER
       INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsfclean
       EXTERNAL :: READ_STRESS
@@ -639,9 +639,13 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                   RETURN
                 ENDIF
               ENDIF
-              retval = soilzone()
+              IF ( Soilzone_ag_module==1 ) THEN
+                retval = soilzone_ag()
+              ELSE
+                retval = soilzone()
+              ENDIF
               IF ( retval/=0 ) THEN
-                PRINT 9001, 'soilzone', retval
+                PRINT 9001, Soilzone_module, retval
                 RETURN
               ENDIF
               retval = gsflow_prms2mf()

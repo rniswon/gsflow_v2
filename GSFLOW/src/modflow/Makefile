@@ -64,6 +64,8 @@ LIBOBJS = \
         Irestart.o
 
 all: lib
+#	$(RM) openspec.inc
+#	$(CP) openspec_linux.inc openspec.inc
 	echo made $(MFNWTLIB)
 
 install: lib
