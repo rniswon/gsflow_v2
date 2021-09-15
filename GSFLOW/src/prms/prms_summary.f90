@@ -6,7 +6,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Output Summary'
         character(len=*), parameter :: MODNAME = 'prms_summary'
-        character(len=*), parameter :: Version_prms_summary = '2021-09-07'
+        character(len=*), parameter :: Version_prms_summary = '2021-09-14'
         INTEGER, PARAMETER :: NVARS = 51
         INTEGER, SAVE :: Iunit
         INTEGER, SAVE, ALLOCATABLE :: Gageid_len(:)
@@ -18,10 +18,9 @@
         ! Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_total_storage, Basin_surface_storage
         ! Declared Parameters
-        INTEGER, SAVE, ALLOCATABLE :: Poi_gage_segment(:)
+        INTEGER, SAVE, ALLOCATABLE :: Poi_gage_segment(:), Poi_gage_id(:)
 !        INTEGER, SAVE, ALLOCATABLE :: Parent_poigages(:)
 !        CHARACTER(LEN=16), SAVE, ALLOCATABLE :: Poi_gage_id(:)
-        INTEGER, SAVE, ALLOCATABLE :: Poi_gage_id(:)
       END MODULE PRMS_PRMS_SUMMARY
 
       SUBROUTINE prms_summary()
@@ -265,6 +264,7 @@
 !***********************************************************************
       SUBROUTINE statvar_to_csv()
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_open_in, ERROR_open_out, ERROR_read
+      USE PRMS_MODULE, ONLY: stat_var_file
       USE PRMS_PRMS_SUMMARY
       IMPLICIT NONE
 ! Functions
@@ -275,17 +275,16 @@
       INTEGER, ALLOCATABLE :: varindex(:), nc(:)
       REAL, ALLOCATABLE :: values(:)
       CHARACTER(LEN=32), ALLOCATABLE :: varname(:)
-      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: statvar_file, statvar_file_csv
+      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: statvar_file_csv
       CHARACTER(LEN=10) :: chardate
       CHARACTER(LEN=13) :: fmt5
       CHARACTER(LEN=17) :: fmt3
       CHARACTER(LEN=27) :: fmt6
 !***********************************************************************
-      IF ( control_string(statvar_file, 'stat_var_file')/=0 ) CALL read_error(5, 'stat_var_file')
-      CALL PRMS_open_input_file(inunit, statvar_file, 'stat_var_file', 0, ios)
+      CALL PRMS_open_input_file(inunit, stat_var_file, 'stat_var_file', 0, ios)
       IF ( ios/=0 ) CALL error_stop('opening statvar file', ERROR_open_in)
-      statvar_file_csv = statvar_file(:numchars(statvar_file))//'.csv'
-      CALL PRMS_open_output_file(outunit, statvar_file_csv, 'statvar_csv', 0, ios)
+      statvar_file_csv = stat_var_file(:numchars(stat_var_file))//'.csv'
+      CALL PRMS_open_output_file(outunit, statvar_file_csv, 'statvar_file_csv', 0, ios)
       IF ( ios/=0 ) CALL error_stop('opening statvar CSV file', ERROR_open_out)
       READ ( inunit, * ) numvariables
       ALLOCATE ( varname(numvariables), varindex(numvariables), values(numvariables), nc(numvariables) )

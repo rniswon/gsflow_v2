@@ -10,7 +10,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2021-09-09'
+        character(len=*), parameter :: Version_dynamic_param_read = '2021-09-14'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -445,10 +445,10 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dynamic, INACTIVE, LAKE, &
      &    potet_jh_module, potet_pan_module, potet_hamon_module, potet_hs_module, &
      &    potet_pt_module, potet_pm_module, climate_hru_module
-      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, Ag_frac_flag, &
+      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, AG_flag, &
      &    Dyn_imperv_flag, Dyn_covtype_flag, Dyn_potet_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &    Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dprst_flag, &
-     &    Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag
+     &    Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag, Dyn_ag_frac_flag
       USE PRMS_DYNAMIC_PARAM_READ
       USE PRMS_BASIN, ONLY: Hru_type, Hru_area, Dprst_clos_flag, &
      &    Hru_percent_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Dprst_frac, Dprst_open_flag, &
@@ -488,7 +488,8 @@
       check_srechr_max_flag = OFF
       check_sm_max_flag = OFF
 
-      IF ( Imperv_frac_flag==ACTIVE .OR. Dprst_frac_flag==ACTIVE .OR. Dprst_depth_flag==ACTIVE .OR. Ag_frac_flag==ACTIVE ) THEN
+      IF ( Imperv_frac_flag==ACTIVE .OR. Dprst_frac_flag==ACTIVE .OR. Dprst_depth_flag==ACTIVE &
+     &     .OR. Dyn_ag_frac_flag==ACTIVE ) THEN
         Check_imperv = OFF
         Check_dprst_frac = OFF
         check_dprst_depth_flag = OFF
@@ -531,7 +532,7 @@
           ENDIF
         ENDIF
 
-        IF ( Ag_frac_flag==ACTIVE ) THEN
+        IF ( Dyn_ag_frac_flag==ACTIVE ) THEN
           IF ( Ag_frac_next_mo/=0 ) THEN
             IF ( Ag_frac_next_yr==Nowyear .AND. Ag_frac_next_mo==Nowmonth .AND. Ag_frac_next_day==Nowday ) THEN
               READ ( Ag_frac_unit, * ) Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day, Temp4
@@ -594,8 +595,8 @@
 !                  Ag_soil_rechr(i) = 0.0
 !                ENDIF
 !              ENDIF
-!              Ag_frac(i) = frac_ag
-!              Ag_area(i) = Ag_frac(i) * Hru_area(i)
+              Ag_frac(i) = frac_ag
+              Ag_area(i) = Ag_frac(i) * Hru_area(i)
 !              Basin_ag_soil_moist = Basin_ag_soil_moist + Ag_soil_moist(i)*Ag_area(i)
             ENDIF
 
@@ -607,7 +608,7 @@
                 dprstfrac = Temp3(i)
                 IF ( dprstfrac==0.0 .AND. tmp>0.0 ) THEN
                   frac = Hru_frac_perv(i)
-!                  IF ( Ag_frac_flag==ACTIVE ) frac = frac + Ag_frac(i)
+                  IF ( AG_flag==ACTIVE ) frac = frac + Ag_frac(i)
                   IF ( frac>0.0 ) THEN
                     tmp = tmp/(Dprst_frac(i)*harea)/frac ! not sure this is correct???
                     PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0'
@@ -658,7 +659,7 @@
 
             ! check sum of imperv ag, and dprst if either are updated!!!!!!
             hruperv = harea - Hru_imperv(i)
-            IF ( Ag_frac_flag==ACTIVE ) hruperv = hruperv - Ag_area(i)
+            IF ( AG_flag==ACTIVE ) hruperv = hruperv - Ag_area(i)
             IF ( hruperv<0.0 ) THEN
               print *, 'hruperv problem, < 0, set to 0 ', hruperv
               hruperv = 0.0

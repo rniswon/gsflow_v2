@@ -24,6 +24,7 @@ $(TARGET): $(PRMSLIB)
 LIBOBJS = \
         prms_constants.o \
         mmf_utils.o \
+        soilzone_module.o \
         basin.o \
         climateflow.o \
         cascade.o \
@@ -152,6 +153,9 @@ soltab.o: soltab.f90 prms_module.mod prms_basin.mod prms_constants.mod
 mmf_utils.o: mmf_utils.f90 prms_constants.mod
 	$(FC) -c $(FFLAGS) mmf_utils.f90
 
+soilzone_module.o: soilzone_module.f90
+	$(FC) -c $(FFLAGS) soilzone_module.f90
+
 frost_date.o: frost_date.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) frost_date.f90
 
@@ -230,8 +234,11 @@ srunoff.o: srunoff.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_cli
 climateflow.o: climateflow.f90 prms_module.mod prms_basin.mod prms_set_time.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) climateflow.f90
 
-soilzone.o: soilzone.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod
+soilzone.o: soilzone.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod prms_soilzone.mod
 	$(FC) -c $(FFLAGS) soilzone.f90
+
+soilzone_ag.o: soilzone_ag.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod
+	$(FC) -c $(FFLAGS) soilzone_ag.f90
 
 routing.o: routing.f90 prms_module.mod prms_basin.mod prms_gwflow.mod prms_flowvars.mod prms_set_time.mod prms_srunoff.mod prms_climatevars.mod prms_water_use.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) routing.f90

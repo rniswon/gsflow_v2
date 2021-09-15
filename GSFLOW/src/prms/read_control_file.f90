@@ -123,7 +123,7 @@
       USE PRMS_CONSTANTS, ONLY: DEBUG_normal, ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Soilzone_aet_flag, PRMS_land_iteration_flag, &
      &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, Irrigation_area_module, AET_module, PET_ag_module, &
-     &    selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, &
+     &    selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, &
      &    Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
      &    Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use
       USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, &
@@ -133,8 +133,8 @@
      &    potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, Dynamic_param_log_file, &
      &    soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, &
      &    fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, snareathresh_dynamic, &
-     &    covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn !, &
-!     &    ag_soilmoist_dynamic, ag_soilrechr_dynamic
+     &    covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn, &
+     &    ag_soilmoist_dynamic, ag_soilrechr_dynamic
       USE PRMS_CONTROL_FILE
       IMPLICIT NONE
       ! Local Variables
@@ -219,6 +219,9 @@
       i = i + 1
       Control_parameter_data(i)%name = 'snarea_curve_flag'
       Snarea_curve_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'snow_cloudcover_flag'
+      snow_cloudcover_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'orad_flag'
       Orad_flag = OFF
@@ -742,16 +745,16 @@
       Control_parameter_data(i)%values_character(1) = PET_cbh_file
       Control_parameter_data(i)%data_type = CHAR_TYPE
       i = i + 1
-!      Control_parameter_data(i)%name = 'ag_soilmoist_dynamic'
-!      ag_soilmoist_dynamic = 'ag_soilmoist.dynamic'
-!      Control_parameter_data(i)%values_character(1) = ag_soilmoist_dynamic
-!      Control_parameter_data(i)%data_type = CHAR_TYPE
-!      i = i + 1
-!      Control_parameter_data(i)%name = 'ag_soilrechr_dynamic'
-!      ag_soilrechr_dynamic = 'ag_soilrechr.dynamic'
-!      Control_parameter_data(i)%values_character(1) = ag_soilrechr_dynamic
-!      Control_parameter_data(i)%data_type = CHAR_TYPE
-!      i = i + 1
+      Control_parameter_data(i)%name = 'ag_soilmoist_dynamic'
+      ag_soilmoist_dynamic = 'ag_soilmoist.dynamic'
+      Control_parameter_data(i)%values_character(1) = ag_soilmoist_dynamic
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'ag_soilrechr_dynamic'
+      ag_soilrechr_dynamic = 'ag_soilrechr.dynamic'
+      Control_parameter_data(i)%values_character(1) = ag_soilrechr_dynamic
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
       Control_parameter_data(i)%name = 'dynamic_param_log_file'
       Dynamic_param_log_file = 'dynamic_parameter.out'
       Control_parameter_data(i)%values_character(1) = Dynamic_param_log_file

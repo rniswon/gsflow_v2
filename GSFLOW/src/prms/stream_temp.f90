@@ -1013,7 +1013,7 @@
              ! If there is no flow, set the temperature to -98.9
              ! -99.9 means that the segment never has any flow (determined up in init).
              ! -98.9 means that this a segment that could have flow, but doesn't
-            Seg_tave_water(i) = -98.9
+            Seg_tave_water(i) = NOFLOW_TEMP
             t_o = Seg_tave_water(i)
 
          elseif (fs .le. NEARZERO) then
@@ -1078,7 +1078,7 @@
 ! Compute the flow-weighted average temperature and a total sum of lateral inflows
 !*********************************************************************************
       SUBROUTINE lat_inflow(Qlat, Tl_avg, id, tave_gw, tave_air, tave_ss, melt, rain)
-      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV, NEARZERO
+      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
       USE PRMS_STRMTEMP, ONLY: Melt_temp
       USE PRMS_FLOWVARS, ONLY: Seg_lateral_inflow
       USE PRMS_ROUTING, ONLY: Seginc_sroff, Seginc_ssflow, Seginc_gwflow

@@ -419,9 +419,9 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
-     &    ERROR_time, ERROR_modflow, Soilzone_ag_module
+     &    ERROR_time, ERROR_modflow
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
-     &    Init_vars_from_file, Mxsziter, Glacier_flag,
+     &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
      &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday,
      &    Model, GSFLOW_flag, Print_debug, Soilzone_module
 C1------USE package modules.
@@ -639,7 +639,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                   RETURN
                 ENDIF
               ENDIF
-              IF ( Soilzone_ag_module==1 ) THEN
+              IF ( AG_flag==ACTIVE ) THEN
                 retval = soilzone_ag()
               ELSE
                 retval = soilzone()

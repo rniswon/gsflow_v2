@@ -3,7 +3,6 @@
 !***********************************************************************
 !***********************************************************************
       SUBROUTINE gsflow_prms(Arg)
-      USE PRMS_CONSTANTS, ONLY: Soilzone_ag_module
       USE PRMS_MODULE
       IMPLICIT NONE
 ! Arguments
@@ -416,7 +415,7 @@
 
 ! for PRMS-only simulations
       IF ( PRMS_only==ACTIVE ) THEN
-        IF ( Soilzone_ag_module==1 ) THEN
+        IF ( AG_flag==ACTIVE ) THEN
           ierr = soilzone_ag()
         ELSE
           ierr = soilzone()
@@ -485,7 +484,7 @@
             IF ( ierr/=0 ) CALL module_error(Srunoff_module, Arg, ierr)
           ENDIF
 
-          IF ( Soilzone_ag_module==1 ) THEN
+          IF ( AG_flag==ACTIVE ) THEN
             ierr = soilzone_ag()
           ELSE
             ierr = soilzone()
@@ -666,8 +665,6 @@
         PRINT '(/,2A)', 'ERROR, invalid model_mode value: ', Model_mode
         Inputerror_flag = 1
       ENDIF
-      Ag_frac_flag = OFF
-      IF ( AG_flag==ACTIVE ) Ag_frac_flag = ACTIVE
 
       ! get simulation start_time and end_time
       Starttime = -1
@@ -884,6 +881,7 @@
       IF ( control_integer(Strmtemp_humidity_flag, 'strmtemp_humidity_flag')/=0 ) Strmtemp_humidity_flag = OFF
 
       IF ( control_integer(Snarea_curve_flag, 'snarea_curve_flag')/=0 ) Snarea_curve_flag = OFF
+      IF ( control_integer(snow_cloudcover_flag, 'snow_cloudcover_flag')/=0 ) snow_cloudcover_flag = OFF
       IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
 
       IF ( control_integer(Humidity_cbh_flag, 'humidity_cbh_flag')/=0 ) Humidity_cbh_flag = OFF

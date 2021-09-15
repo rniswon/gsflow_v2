@@ -185,7 +185,7 @@
      &     'inches', Basin_sz2gw)
 
       ALLOCATE ( Pref_flow_in(Nhru) )
-      CALL declvar_real('soilzone', 'pref_flow_in', 'nhru', Nhru, &
+      CALL declvar_real(MODNAME, 'pref_flow_in', 'nhru', Nhru, &
      &     'Infiltration and flow from gravity reservoir to the preferential-flow reservoir', &
      &     'inches', Pref_flow_in)
 
@@ -651,25 +651,27 @@
         perv_area = Hru_perv(i)
         Soil_zone_max(i) = Sat_threshold(i) + Soil_moist_max(i)*Hru_frac_perv(i)
         Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*Hru_frac_perv(i)
-!        Soil_moist_frac(i) = Soil_moist_tot(i)/Soil_zone_max(i)
-!        Cpr_stor_frac(i) = Soil_moist(i)/Soil_moist_max(i)
-!        Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Cpr_stor_frac(i)*perv_area )
-        Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Soil_moist(i)/Soil_moist_max(i)*perv_area )
-        Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)
-        Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
-        IF ( Soil_lower_stor_max(i)>0.0 ) Soil_lower_ratio(i) = Soil_lower(i)/Soil_lower_stor_max(i)
-!        Soil_rechr_ratio(i) = Soil_rechr(i)/Soil_rechr_max(i)
-!        Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_frac(i)*hruarea )
-        Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_tot(i)/Soil_zone_max(i)*hruarea )
-        Basin_soil_lower_stor_frac = Basin_soil_lower_stor_frac + DBLE( Soil_lower_ratio(i)*perv_area )
-!        Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + DBLE( Soil_rechr_ratio(i)*perv_area )
-        Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + DBLE( Soil_rechr(i)/Soil_rechr_max(i)*perv_area )
-        Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*perv_area )
-        Basin_soil_moist_tot = Basin_soil_moist_tot + DBLE( Soil_moist_tot(i)*hruarea )
+        IF ( perv_area>0.0 ) THEN
+!          Soil_moist_frac(i) = Soil_moist_tot(i)/Soil_zone_max(i)
+!          Cpr_stor_frac(i) = Soil_moist(i)/Soil_moist_max(i)
+!          Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Cpr_stor_frac(i)*perv_area )
+          Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Soil_moist(i)/Soil_moist_max(i)*perv_area )
+          Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)
+          Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
+          Soil_lower_ratio(i) = Soil_lower(i)/Soil_lower_stor_max(i)
+!          Soil_rechr_ratio(i) = Soil_rechr(i)/Soil_rechr_max(i)
+!          Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_frac(i)*hruarea )
+          Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_tot(i)/Soil_zone_max(i)*hruarea )
+          Basin_soil_lower_stor_frac = Basin_soil_lower_stor_frac + DBLE( Soil_lower_ratio(i)*perv_area )
+!          Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + DBLE( Soil_rechr_ratio(i)*perv_area )
+          Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + DBLE( Soil_rechr(i)/Soil_rechr_max(i)*perv_area )
+          Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*perv_area )
+          Basin_soil_moist_tot = Basin_soil_moist_tot + DBLE( Soil_moist_tot(i)*hruarea )
+          Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(i)*perv_area )
+        ENDIF
         ! rsr, 6/12/2014 potential problem for GSFLOW if sum of slow_stor /= gravity_stor_res
         Basin_slstor = Basin_slstor + DBLE( Slow_stor(i)*hruarea )
         Basin_ssstor = Basin_ssstor + DBLE( Ssres_stor(i)*hruarea )
-        Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(i)*perv_area )
         IF ( Pref_flow_den(i)>0.0 ) THEN
           Basin_pref_stor = Basin_pref_stor + DBLE( Pref_flow_stor(i)*hruarea )
 !          Pfr_stor_frac(i) = Pref_flow_stor(i)/Pref_flow_max(i)
@@ -864,6 +866,13 @@
         ENDIF
       ENDIF
       IF ( GSFLOW_flag==ACTIVE ) Sm2gw_grav = 0.0
+      IF ( Kkiter>1 ) THEN
+        Basin_soil_moist = It0_basin_soil_moist
+        Basin_ssstor = It0_basin_ssstor
+      ELSE
+        It0_basin_soil_moist = Basin_soil_moist
+        It0_basin_ssstor = Basin_ssstor
+      ENDIF
 
       IF ( Cascade_flag>CASCADE_OFF ) THEN
         Upslope_interflow = 0.0D0
@@ -897,7 +906,6 @@
 
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
-!        HRU_id = i
 
         hruactet = Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i)
         IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
