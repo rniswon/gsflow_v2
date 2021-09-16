@@ -138,6 +138,7 @@ C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
       USE GWFLAKMODULE, ONLY: NLAKES
+      USE GWFUZFMODULE, ONLY: IGSFLOW
       IMPLICIT NONE
       INTEGER :: I
       INCLUDE 'openspec.inc'
@@ -427,6 +428,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       Iter_cnt = 0
       CALL SETMFTIME()
       IF ( GSFLOW_flag==ACTIVE ) THEN
+        IF(IUNIT(55).GT.0) IGSFLOW = 1
         CALL set_cell_values()
         IF ( Init_vars_from_file>OFF )
      &       CALL gsflow_modflow_restart(READ_INIT)

@@ -1362,6 +1362,7 @@ C        IRUNFLG IS NOT EQUAL TO ZERO.
               END IF
             END IF
             IF ( Isavefinf == 1 ) FINFSAVE(ncck, nrck)=FINF(ncck, nrck)
+            IF ( IGSFLOW == 1 ) FINF(ncck, nrck)=0.0
           END DO
         END DO
       END IF
@@ -2605,7 +2606,7 @@ CDEP 05/05/2006
         fks = VKS(ic, ir)
         fkreject = fks
         fkseep = fks
-        IF ( Iseepreject > 0 .and. IGSFLOW == 0 ) fkseep = surfk(ic,ir)
+        IF ( Iseepreject > 0 ) fkseep = surfk(ic,ir)
         IF ( Isurfkreject > 0 ) fkreject = surfk(ic, ir)
         volinflt = 0.0D0
         finfsaveadd = 0.0
