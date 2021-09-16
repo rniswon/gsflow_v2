@@ -67,7 +67,7 @@
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
-      INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, outputSelectDatesON_OFF
+      INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, outputSelectDatesON_OFF, snow_cloudcover_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName, Dynamic_param_log_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Csv_output_file, Model_control_file, Param_file
@@ -167,7 +167,7 @@
 
         IF ( GSFLOW_flag==ACTIVE ) THEN
           ierr = gsflow_modflow()
-          IF ( ierr/=0 ) CALL module_error('gsflow_modflow', Arg, ierr)
+          IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
         ENDIF
 
         IF ( Print_debug>DEBUG_minimum ) THEN
@@ -184,7 +184,8 @@
      &         'Current iteration in GSFLOW simulation', 'none', KKITER)/=0 ) CALL read_error(3, 'KKITER')
           ALLOCATE ( Hru_ag_irr(Nhru) )
           IF ( declvar(MODNAME, 'hru_ag_irr', 'nhru', Nhru, 'real', &
-     &         'Irrigation added to soilzone from MODFLOW wells', 'inches', Hru_ag_irr)/=0 ) CALL read_error(3, 'hru_ag_irr')
+     &         'Irrigation added to soilzone from MODFLOW wells', &
+     &         'acre-inches', Hru_ag_irr)/=0 ) CALL read_error(3, 'hru_ag_irr')
           Hru_ag_irr = 0.0
           IF ( declparam(MODNAME, 'mxsziter', 'one', 'integer', &
      &         '0', '0', '5000', &
@@ -240,7 +241,7 @@
           ENDIF
 
           ierr = gsflow_modflow()
-          IF ( ierr/=0 ) CALL module_error('gsflow_modflow', Arg, ierr)
+          IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
           IF ( Have_lakes==ACTIVE .AND. Nlake/=NLAKES_MF ) THEN
             PRINT *, 'ERROR, NLAKES not equal to Nlake'
             PRINT *, '       NLAKES=', NLAKES_MF, '; Nlake=', Nlake
@@ -300,7 +301,7 @@
           ENDIF
           IF ( GSFLOW_flag==ACTIVE ) THEN
             ierr = gsflow_modflow()
-            IF ( ierr/=0 ) CALL module_error('gsflow_modflow', Arg, ierr)
+            IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
           ENDIF
         ENDIF
       ENDIF
@@ -909,6 +910,7 @@
 
       IF ( control_integer(Snarea_curve_flag, 'snarea_curve_flag')/=0 ) Snarea_curve_flag = OFF
       IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
+      IF ( control_integer(snow_cloudcover_flag, 'snow_cloudcover_flag')/=0 ) snow_cloudcover_flag = OFF
 
       IF ( control_integer(Humidity_cbh_flag, 'humidity_cbh_flag')/=0 ) Humidity_cbh_flag = OFF
       IF ( control_integer(Windspeed_cbh_flag, 'windspeed_cbh_flag')/=0 ) Windspeed_cbh_flag = OFF
