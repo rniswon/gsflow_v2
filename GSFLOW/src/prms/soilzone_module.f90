@@ -6,9 +6,8 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
       character(len=*), parameter :: Version_soilzone = '2021-09-15'
-      INTEGER, SAVE :: DBGUNT, Soil_iter, Iter_aet_PRMS_flag !, HRU_id
+      INTEGER, SAVE :: DBGUNT, Iter_aet, HRU_id, Iter_aet_PRMS_flag
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
       REAL, SAVE, ALLOCATABLE :: Soil_lower_stor_max(:)

@@ -49,9 +49,9 @@
 !***********************************************************************
       INTEGER FUNCTION szdecl()
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ERROR_dim, ACTIVE, OFF, DEBUG_WB, &
-     &    CASCADE_OFF, MONTHS_PER_YEAR
+     &    CASCADE_OFF, MONTHS_PER_YEAR, PRMS_AG
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Nhrucell, Print_debug, &
-     &    Cascade_flag, GSFLOW_flag, Call_cascade, PRMS_land_iteration_flag
+     &    Cascade_flag, GSFLOW_flag, Call_cascade, PRMS_land_iteration_flag, AG_flag
       USE PRMS_SOILZONE
       IMPLICIT NONE
 ! Functions
@@ -425,12 +425,16 @@
         ENDIF
       ENDIF
 
-      IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE ) THEN
+      Iter_aet = OFF
+      Iter_aet_PRMS_flag = OFF
+      IF ( AG_flag==ACTIVE ) Iter_aet = ACTIVE
+      IF ( Iter_aet==ACTIVE .AND. Model==PRMS_AG ) Iter_aet_PRMS_flag = ACTIVE
+      IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE .OR. Iter_aet==ACTIVE ) THEN
         ALLOCATE ( It0_ssres_stor(Nhru), It0_slow_stor(Nhru) )
         IF ( GSFLOW_flag==ACTIVE ) ALLOCATE ( It0_gravity_stor_res(Nhrucell) )
         IF ( Nlake>0 ) ALLOCATE ( It0_potet(Nhru) )
       ENDIF
-      IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
+      IF ( (GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet==ACTIVE ) THEN
         ALLOCATE ( It0_soil_rechr(Nhru), It0_soil_moist(Nhru), It0_sroff(Nhru) )
         IF ( Call_cascade==ACTIVE ) ALLOCATE ( It0_strm_seg_in(Nsegment) )
       ENDIF
@@ -728,6 +732,7 @@
       IF ( Pref_flag==ACTIVE ) THEN
         IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_pref_flow_stor(Nhru) )
       ENDIF
+
 !      Interflow_max = 0.0
 !      Snowevap_aet_frac = 0.0
 

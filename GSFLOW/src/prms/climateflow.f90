@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2021-09-14'
+      character(len=*), parameter :: Version_climateflow = '2021-09-15'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -131,7 +131,7 @@
      &    Model, Init_vars_from_file, Temp_flag, Precip_flag, Glacier_flag, &
      &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
-     &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, AG_flag,
+     &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, AG_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       IMPLICIT NONE
@@ -902,7 +902,7 @@
      &    Temp_module, Stream_order_flag, GSFLOW_flag, &
      &    Precip_module, Solrad_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Et_flag, Dprst_flag, Solrad_flag, &
-     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag !, AG_flag
+     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, AG_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_type, Hru_perv
@@ -1093,22 +1093,22 @@
         Slow_stor = Ssres_stor
       ENDIF
 
-!      IF ( AG_flag==ACTIVE ) THEN
-!        IF ( getparam_real(Soilzone_module, 'ag_soil_moist_max', Nhru, Ag_soil_moist_max)/=0 ) &
-!     &       CALL read_error(2, 'soil_moist_max')
-!        IF ( getparam_real(Soilzone_module, 'ag_soil_rechr_max_frac', Nhru, Ag_soil_rechr_max_frac)/=0 ) &
-!     &       CALL read_error(2, 'ag_soil_rechr_max_frac')
-!        Ag_soil_rechr_max = Ag_soil_rechr_max_frac*Ag_soil_moist_max
-!        ierr = 0
-!        IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
-!          IF ( getparam_real(Soilzone_module, 'ag_soil_moist_init_frac', Nhru, Ag_soil_moist)/=0 ) &
-!     &         CALL read_error(2, 'ag_soil_moist_init_frac')
-!          IF ( getparam_real(Soilzone_module, 'ag_soil_rechr_init_frac', Nhru, Ag_soil_rechr)/=0 ) &
-!     &         CALL read_error(2, 'ag_soil_rechr_init_frac')
-!          Ag_soil_rechr = Ag_soil_rechr*Ag_soil_rechr_max
-!          Ag_soil_moist = Ag_soil_moist*Ag_soil_moist_max
-!        ENDIF
-!      ENDIF
+      IF ( AG_flag==ACTIVE ) THEN
+        IF ( getparam_real(Soilzone_module, 'ag_soil_moist_max', Nhru, Ag_soil_moist_max)/=0 ) &
+     &       CALL read_error(2, 'soil_moist_max')
+        IF ( getparam_real(Soilzone_module, 'ag_soil_rechr_max_frac', Nhru, Ag_soil_rechr_max_frac)/=0 ) &
+     &       CALL read_error(2, 'ag_soil_rechr_max_frac')
+        Ag_soil_rechr_max = Ag_soil_rechr_max_frac*Ag_soil_moist_max
+        ierr = 0
+        IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
+          IF ( getparam_real(Soilzone_module, 'ag_soil_moist_init_frac', Nhru, Ag_soil_moist)/=0 ) &
+     &         CALL read_error(2, 'ag_soil_moist_init_frac')
+          IF ( getparam_real(Soilzone_module, 'ag_soil_rechr_init_frac', Nhru, Ag_soil_rechr)/=0 ) &
+     &         CALL read_error(2, 'ag_soil_rechr_init_frac')
+          Ag_soil_rechr = Ag_soil_rechr*Ag_soil_rechr_max
+          Ag_soil_moist = Ag_soil_moist*Ag_soil_moist_max
+        ENDIF
+      ENDIF
 
       ! check parameters
       DO i = 1, Nhru
@@ -1441,7 +1441,7 @@
       SUBROUTINE climateflow_restart(In_out)
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Glacier_flag, GSFLOW_flag, &
-     &    Dprst_flag, Stream_order_flag, Nlake !, AG_flag
+     &    Dprst_flag, Stream_order_flag, Nlake, AG_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       IMPLICIT NONE
@@ -1477,10 +1477,10 @@
           WRITE ( Restart_outunit ) Seg_outflow
         ENDIF
         IF ( Nlake>0 ) WRITE ( Restart_outunit ) Lake_vol
-!        IF ( AG_flag==ACTIVE ) THEN
-!          WRITE ( Restart_outunit ) Ag_soil_moist
-!          WRITE ( Restart_outunit ) Ag_soil_rechr
-!        ENDIF
+        IF ( AG_flag==ACTIVE ) THEN
+          WRITE ( Restart_outunit ) Ag_soil_moist
+          WRITE ( Restart_outunit ) Ag_soil_rechr
+        ENDIF
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
@@ -1507,9 +1507,9 @@
           READ ( Restart_inunit ) Seg_outflow
         ENDIF
         IF ( Nlake>0 ) READ ( Restart_inunit ) Lake_vol
-!        IF ( AG_flag==ACTIVE ) THEN
-!          READ ( Restart_inunit ) Ag_soil_moist
-!          READ ( Restart_inunit ) Ag_soil_rechr
-!        ENDIF
+        IF ( AG_flag==ACTIVE ) THEN
+          READ ( Restart_inunit ) Ag_soil_moist
+          READ ( Restart_inunit ) Ag_soil_rechr
+        ENDIF
       ENDIF
       END SUBROUTINE climateflow_restart

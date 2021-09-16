@@ -66,7 +66,7 @@
 !***********************************************************************
       INTEGER FUNCTION intdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION
-      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, PRMS_land_iteration_flag, AG_flag
+      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, PRMS_land_iteration_flag, Ag_package
       USE PRMS_INTCP
       IMPLICIT NONE
 ! Functions
@@ -85,7 +85,7 @@
 ! NEW VARIABLES and PARAMETERS for APPLICATION RATES
       ALLOCATE ( Net_apply(Nhru) )
       Use_transfer_intcp = OFF
-      IF ( Water_use_flag==ACTIVE .OR. AG_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+      IF ( Water_use_flag==ACTIVE .OR. Ag_package==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         Use_transfer_intcp = ACTIVE
         ALLOCATE ( Gain_inches(Nhru) )
         CALL declvar_real(MODNAME, 'gain_inches', 'nhru', Nhru, &
@@ -282,7 +282,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, NEARZERO, DNEARZERO, &
      &    DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
       USE PRMS_MODULE, ONLY: Print_debug, PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Nowday, &
-     &    Ag_package, Hru_ag_irr, AG_flag
+     &    Ag_package, Hru_ag_irr
       USE PRMS_INTCP
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_type, Covden_win, Covden_sum, &
      &    Hru_route_order, Hru_area, Cov_type, Ag_frac !, Ag_cov_type
@@ -332,7 +332,7 @@
       Basin_intcp_stor = 0.0D0
 
 ! zero application rate variables for today
-      IF ( Use_transfer_intcp==ACTIVE .OR. AG_flag==ACTIVE ) THEN
+      IF ( Use_transfer_intcp==ACTIVE .OR. Ag_package==ACTIVE ) THEN
         Basin_net_apply = 0.0D0
         Basin_hru_apply = 0.0D0
         Net_apply = 0.0
@@ -473,7 +473,7 @@
 !            4 (amount of water based on cover density, living filter)
 
 !  canopy_gain is water applied to whole HRU, gain_inches is water added to canopy
-        IF ( Use_transfer_intcp==ACTIVE .OR. AG_flag==ACTIVE ) THEN ! AG_flag active for GSFLOW_AG or PRMS_AG
+        IF ( Use_transfer_intcp==ACTIVE .OR. Ag_package==ACTIVE ) THEN ! Ag_package active for GSFLOW_AG or PRMS_AG
           IF ( Ag_package==ACTIVE ) THEN
             IF ( Hru_ag_irr(i)>0.0 .AND. .NOT.(Ag_frac(i)>0.0) ) THEN
               PRINT *, 'ag_frac=0.0 for HRU:', i
