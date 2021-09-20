@@ -6,7 +6,7 @@ C------NEW VERSION NUMBER 1.1.4, 4/01/2018
 C------MINOR UPDATES JAN. 2013 (LFK)
         INTEGER,SAVE,POINTER   ::NLAKES,NLAKESAR,ILKCB,NSSITR,LAKUNIT
         INTEGER,SAVE,POINTER   ::MXLKND,LKNODE,ICMX,NCLS,LWRT,NDV,NTRB,
-     +                           IRDTAB,ISTARTLAK,IGSFLOWLAK
+     +                           IRDTAB,ISTARTLAK
         REAL,   SAVE,POINTER   ::THETA,SSCNCR,SURFDEPTH
         DOUBLE PRECISION,   SAVE,POINTER   ::RAMP
         REAL,   SAVE, DIMENSION(:),  POINTER :: DEADPOOLVOL,MXLKVOLF,
@@ -55,7 +55,7 @@ crgn        REAL,   SAVE, DIMENSION(:),  POINTER ::EVAP,PRECIP,SEEP,SEEP3
         REAL,   SAVE, DIMENSION(:,:),POINTER ::CAUG,CPPT,CLAKINIT
         REAL,   SAVE, DIMENSION(:,:,:),POINTER ::BDLKN1
 Cdep  Added arrays for tracking lake budgets for dry lakes
-        REAL,   SAVE, DIMENSION(:),  POINTER ::FLWIN
+        REAL,   SAVE, DIMENSION(:),  POINTER ::EVAPO,FLWIN
         REAL,   SAVE, DIMENSION(:),  POINTER ::GWRATELIM
 Cdep    Allocate arrays to add runoff from UZF Package
         REAL,   SAVE, DIMENSION(:),  POINTER ::OVRLNDRNF,CUMLNDRNF
@@ -79,7 +79,7 @@ Crsr    Allocate arrays in BD subroutine
       TYPE GWFLAKTYPE
         INTEGER,      POINTER   ::NLAKES,NLAKESAR,ILKCB,NSSITR,LAKUNIT
         INTEGER,      POINTER   ::MXLKND,LKNODE,ICMX,NCLS,LWRT,NDV,NTRB,
-     +                            IRDTAB,ISTARTLAK,IGSFLOWLAK
+     +                            IRDTAB,ISTARTLAK
 Cdep    Added SURFDEPTH 3/3/2009
         REAL,         POINTER   ::THETA,SSCNCR,SURFDEPTH
         DOUBLE PRECISION,         POINTER   ::RAMP
@@ -129,7 +129,7 @@ Crgn        REAL,         DIMENSION(:),  POINTER ::EVAP,PRECIP,SEEP,SEEP3
         REAL,         DIMENSION(:,:),POINTER ::CAUG,CPPT,CLAKINIT
         REAL,         DIMENSION(:,:,:),POINTER ::BDLKN1
 Cdep  Added arrays for tracking lake budgets for dry lakes
-        REAL,         DIMENSION(:),  POINTER ::FLWIN
+        REAL,         DIMENSION(:),  POINTER ::EVAPO,FLWIN
         REAL,         DIMENSION(:),  POINTER ::GWRATELIM
 Cdep    Allocate arrays to add runoff from UZF Package
         REAL,         DIMENSION(:),  POINTER ::OVRLNDRNF,CUMLNDRNF

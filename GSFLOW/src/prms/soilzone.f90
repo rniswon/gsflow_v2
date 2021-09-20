@@ -29,6 +29,7 @@
 !   GSFLOW variables
       INTEGER, SAVE, ALLOCATABLE :: Hru_gvr_count(:), Hru_gvr_index(:, :), Hrucheck(:)
       REAL, SAVE, ALLOCATABLE :: Replenish_frac(:)
+      REAL, SAVE :: It0_basin_soil_moist, It0_basin_ssstor
       REAL, SAVE, ALLOCATABLE :: It0_soil_rechr(:), It0_soil_moist(:)
       REAL, SAVE, ALLOCATABLE :: It0_pref_flow_stor(:), It0_ssres_stor(:)
       REAL, SAVE, ALLOCATABLE :: It0_gravity_stor_res(:), It0_sroff(:)
@@ -253,7 +254,7 @@
      &     'inches', Basin_sz2gw)/=0 ) CALL read_error(3, 'basin_sz2gw')
 
       ALLOCATE ( Pref_flow_in(Nhru) )
-      IF ( declvar('soilzone', 'pref_flow_in', 'nhru', Nhru, 'real', &
+      IF ( declvar(MODNAME, 'pref_flow_in', 'nhru', Nhru, 'real', &
      &     'Infiltration and flow from gravity reservoir to the preferential-flow reservoir', &
      &     'inches', Pref_flow_in)/=0 ) CALL read_error(3, 'pref_flow_in')
 
@@ -919,6 +920,13 @@
         ENDIF
       ENDIF
       IF ( GSFLOW_flag==ACTIVE ) Sm2gw_grav = 0.0
+      IF ( Kkiter>1 ) THEN
+        Basin_soil_moist = It0_basin_soil_moist
+        Basin_ssstor = It0_basin_ssstor
+      ELSE
+        It0_basin_soil_moist = Basin_soil_moist
+        It0_basin_ssstor = Basin_ssstor
+      ENDIF
 
       IF ( Cascade_flag>CASCADE_OFF ) THEN
         Upslope_interflow = 0.0D0
