@@ -501,10 +501,10 @@
 ! Bin precolation in cell_drain_rate
 !-----------------------------------------------------------------------
 ! Set flag for UZF when PRMS sets FINF
-      IGSFLOW = 1
+!      IGSFLOW = 1 this needs to be done in init
       Net_sz2gw = 0.0D0
       Excess = 0.0
-      FINF = 0.0
+      !FINF = 0.0  This is set to zero in UZF package, this could zero out lake seepage 9/15/2021
       IF ( is_draining==1 ) CALL Bin_percolation()
 
       END FUNCTION prms2mfrun
