@@ -677,7 +677,7 @@ SELECTED MODEL CELLS ARE:
 
 
 
- AG -- AG PACKAGE FOR NWT VERSION 1.1.3,  8/01/2017 INPUT READ FROM UNIT   57
+ AG -- AG PACKAGE FOR NWT VERSION 1.2.0,  3/03/2020 INPUT READ FROM UNIT   57
  # AG options
 
  PROCESSING AG OPTIONS
@@ -728,6 +728,8 @@ SELECTED MODEL CELLS ARE:
  A total number of          1 AG output time series files were activated for GROUNDWATER 
  A total number of          1 AG output time series files were activated for SURFACE WATER ET
  A total number of          0 AG output time series files were activated for GROUNDWATER ET
+ A total number of          0 AG output time series files were activated for POND ET
+ A total number of          0 AG output time series files were activated for POND IRRIGATION
 1
                             STRESS PERIOD NO.    1, LENGTH =   86400.00    
                             -----------------------------------------------
@@ -2630,6 +2632,8 @@ EXTINCTION WATER CONTENT FOR CELL AT ROW    15, COLUMN     6 IS LESS THAN RESIDU
 
  READING SUPPLEMENTAL WELL
 
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
+
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
  SOLVING FOR HEAD 
@@ -2751,7 +2755,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    1   STEP   1
+            AG WELLS      PERIOD    1   STEP   1
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -2780,8 +2784,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -2791,8 +2796,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -2939,6 +2945,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
  READING SUPPLEMENTAL WELL
 
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
+
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
  SOLVING FOR HEAD 
@@ -3056,7 +3064,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    2   STEP   1
+            AG WELLS      PERIOD    2   STEP   1
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -3085,8 +3093,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -3096,8 +3105,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -3680,8 +3690,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -3691,8 +3702,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -3815,6 +3827,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -4330,8 +4344,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -4341,8 +4356,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -4465,6 +4481,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -4980,8 +4998,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -4991,8 +5010,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -5115,6 +5135,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -5248,7 +5270,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     2 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    5   STEP   2
+            AG WELLS      PERIOD    5   STEP   2
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -5290,8 +5312,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     2 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =      654870.0000        DIVERSION SEGMENTS =       2.2132E-07
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -5301,8 +5324,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     2 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =      654883.0625             SW IRRIGATION =       2.2132E-07
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -5482,7 +5506,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     3 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    5   STEP   3
+            AG WELLS      PERIOD    5   STEP   3
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -5524,8 +5548,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     3 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =      980990.0000        DIVERSION SEGMENTS =           3.7200
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -5535,8 +5560,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     3 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =      981009.5625             SW IRRIGATION =           3.7201
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -5717,7 +5743,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     4 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    5   STEP   4
+            AG WELLS      PERIOD    5   STEP   4
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -5759,8 +5785,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     4 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =     1307109.8750        DIVERSION SEGMENTS =           3.7200
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -5770,8 +5797,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     4 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =     1307136.0000             SW IRRIGATION =           3.7201
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -5969,7 +5997,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     6 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    5   STEP   6
+            AG WELLS      PERIOD    5   STEP   6
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -6011,8 +6039,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     6 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =     1959349.2500        DIVERSION SEGMENTS =           3.7200
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -6022,8 +6051,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     6 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =     1959388.5000             SW IRRIGATION =           3.7201
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -6204,7 +6234,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     7 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    5   STEP   7
+            AG WELLS      PERIOD    5   STEP   7
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -6246,8 +6276,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     7 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =     2285469.0000        DIVERSION SEGMENTS =           3.7200
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -6257,8 +6288,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     7 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =     2285514.5000             SW IRRIGATION =           3.7201
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -6439,7 +6471,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     8 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    5   STEP   8
+            AG WELLS      PERIOD    5   STEP   8
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -6481,8 +6513,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     8 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =     2611588.5000        DIVERSION SEGMENTS =           3.7200
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -6492,8 +6525,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     8 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =     2611640.5000             SW IRRIGATION =           3.7201
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -6674,7 +6708,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     9 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    5   STEP   9
+            AG WELLS      PERIOD    5   STEP   9
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -6716,8 +6750,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     9 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =     2937708.0000        DIVERSION SEGMENTS =           3.7200
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -6727,8 +6762,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     9 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =     2937766.5000             SW IRRIGATION =           3.7201
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -6909,7 +6945,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    5   STEP  10
+            AG WELLS      PERIOD    5   STEP  10
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -6951,8 +6987,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =     3263827.2500        DIVERSION SEGMENTS =           3.7200
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -6962,8 +6999,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =     3263892.2500             SW IRRIGATION =           3.7201
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -7459,8 +7497,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =     9786225.0000        DIVERSION SEGMENTS =           3.7200
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -7470,8 +7509,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =     9786418.0000             SW IRRIGATION =           3.7201
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -7594,6 +7634,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -8198,8 +8240,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =    29660182.0000        DIVERSION SEGMENTS =           7.4436
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -8209,8 +8252,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =    29660776.0000             SW IRRIGATION =           7.4437
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -8333,6 +8377,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -8522,7 +8568,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    7   STEP   5
+            AG WELLS      PERIOD    7   STEP   5
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -8564,8 +8610,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =       13825.8740             AG WELLS      =           0.0000
+               AG WELLS  =       13825.8740                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =    39357800.0000        DIVERSION SEGMENTS =          22.4690
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -8575,8 +8622,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =       13825.8740             GW IRRIGATION =           0.0000
            SW IRRIGATION =    39358588.0000             SW IRRIGATION =          22.4695
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -8825,7 +8873,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    7   STEP  10
+            AG WELLS      PERIOD    7   STEP  10
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -8867,8 +8915,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =       13825.8740             AG WELLS      =           0.0000
+               AG WELLS  =       13825.8740                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =    49206720.0000        DIVERSION SEGMENTS =          22.4690
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -8878,8 +8927,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =       13825.8740             GW IRRIGATION =           0.0000
            SW IRRIGATION =    49207708.0000             SW IRRIGATION =          22.4695
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -9128,7 +9178,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    7   STEP  15
+            AG WELLS      PERIOD    7   STEP  15
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -9170,8 +9220,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =       13825.8740             AG WELLS      =           0.0000
+               AG WELLS  =       13825.8740                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =    59055640.0000        DIVERSION SEGMENTS =          22.4690
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -9181,8 +9232,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =       13825.8740             GW IRRIGATION =           0.0000
            SW IRRIGATION =    59056828.0000             SW IRRIGATION =          22.4695
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -9593,8 +9645,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =       13825.8740             AG WELLS      =           0.0000
+               AG WELLS  =       13825.8740                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =    88602432.0000        DIVERSION SEGMENTS =          22.4691
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -9604,8 +9657,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =       13825.8740             GW IRRIGATION =           0.0000
            SW IRRIGATION =    88604192.0000             SW IRRIGATION =          22.4695
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -9729,6 +9783,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
  READING SUPPLEMENTAL WELL
 
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
+
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
  SOLVING FOR HEAD 
@@ -9847,7 +9903,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    8   STEP   1
+            AG WELLS      PERIOD    8   STEP   1
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE    -7.72299    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE    -7.72299    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE    -7.72299    
@@ -9889,8 +9945,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =     4076119.5000             AG WELLS      =          46.3380
+               AG WELLS  =     4076119.5000                 AG WELLS  =          46.3380
       DIVERSION SEGMENTS =    93062792.0000        DIVERSION SEGMENTS =          50.8787
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -9900,8 +9957,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =     4076119.5000             GW IRRIGATION =          46.3380
            SW IRRIGATION =    93064640.0000             SW IRRIGATION =          50.8797
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -10136,7 +10194,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    8   STEP   5
+            AG WELLS      PERIOD    8   STEP   5
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE    -1.51357    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE    -1.51357    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE    -1.51357    
@@ -10178,8 +10236,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =     6219523.5000             AG WELLS      =           9.0814
+               AG WELLS  =     6219523.5000                 AG WELLS  =           9.0814
       DIVERSION SEGMENTS =   110036672.0000        DIVERSION SEGMENTS =          50.8787
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -10189,8 +10248,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =     6219523.5000             GW IRRIGATION =           9.0814
            SW IRRIGATION =   110038856.0000             SW IRRIGATION =          50.8797
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -10439,7 +10499,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    8   STEP  10
+            AG WELLS      PERIOD    8   STEP  10
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE    -1.51495    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE    -1.51495    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE    -1.51495    
@@ -10481,8 +10541,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    10203839.0000             AG WELLS      =           9.0897
+               AG WELLS  =    10203839.0000                 AG WELLS  =           9.0897
       DIVERSION SEGMENTS =   132338472.0000        DIVERSION SEGMENTS =          50.8787
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -10492,8 +10553,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    10203839.0000             GW IRRIGATION =           9.0897
            SW IRRIGATION =   132341096.0000             SW IRRIGATION =          50.8797
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -10742,7 +10804,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD    8   STEP  15
+            AG WELLS      PERIOD    8   STEP  15
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE    -1.51507    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE    -1.51507    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE    -1.51507    
@@ -10784,8 +10846,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    14188399.0000             AG WELLS      =           9.0904
+               AG WELLS  =    14188399.0000                 AG WELLS  =           9.0904
       DIVERSION SEGMENTS =   154640048.0000        DIVERSION SEGMENTS =          50.8780
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -10795,8 +10858,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    14188399.0000             GW IRRIGATION =           9.0904
            SW IRRIGATION =   154643152.0000             SW IRRIGATION =          50.8790
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -11207,8 +11271,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    26142386.0000             AG WELLS      =           9.0906
+               AG WELLS  =    26142386.0000                 AG WELLS  =           9.0906
       DIVERSION SEGMENTS =   221544608.0000        DIVERSION SEGMENTS =          50.8780
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -11218,8 +11283,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    26142386.0000             GW IRRIGATION =           9.0906
            SW IRRIGATION =   221549152.0000             SW IRRIGATION =          50.8790
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -11342,6 +11408,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -11945,8 +12013,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    47370184.0000             AG WELLS      =           8.0855
+               AG WELLS  =    47370184.0000                 AG WELLS  =           8.0855
       DIVERSION SEGMENTS =   328446656.0000        DIVERSION SEGMENTS =          40.6331
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -11956,8 +12025,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    47370184.0000             GW IRRIGATION =           8.0855
            SW IRRIGATION =   328453152.0000             SW IRRIGATION =          40.6339
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -12080,6 +12150,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -12683,8 +12755,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    47377968.0000             AG WELLS      =           0.0000
+               AG WELLS  =    47377968.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   357628832.0000        DIVERSION SEGMENTS =          11.2200
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -12694,8 +12767,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    47377968.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   357636256.0000             SW IRRIGATION =          11.2202
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -12818,6 +12892,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -13333,8 +13409,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    47377968.0000             AG WELLS      =           0.0000
+               AG WELLS  =    47377968.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   357628832.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -13344,8 +13421,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    47377968.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   357636256.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -13468,6 +13546,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -13983,8 +14063,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    47377968.0000             AG WELLS      =           0.0000
+               AG WELLS  =    47377968.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   357628832.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -13994,8 +14075,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    47377968.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   357636256.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -14118,6 +14200,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -14633,8 +14717,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    47377968.0000             AG WELLS      =           0.0000
+               AG WELLS  =    47377968.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   357628832.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -14644,8 +14729,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    47377968.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   357636256.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -14768,6 +14854,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -15283,8 +15371,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    47377968.0000             AG WELLS      =           0.0000
+               AG WELLS  =    47377968.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   357628832.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -15294,8 +15383,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    47377968.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   357636256.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -15418,6 +15508,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -15934,8 +16026,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    47377968.0000             AG WELLS      =           0.0000
+               AG WELLS  =    47377968.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   357628832.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -15945,8 +16038,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    47377968.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   357636256.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -16069,6 +16163,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -16587,8 +16683,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    47377968.0000             AG WELLS      =           0.0000
+               AG WELLS  =    47377968.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   357628832.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -16598,8 +16695,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    47377968.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   357636256.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -16722,6 +16820,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -17322,8 +17422,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    47377968.0000             AG WELLS      =           0.0000
+               AG WELLS  =    47377968.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   367414848.0000        DIVERSION SEGMENTS =           3.7199
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -17333,8 +17434,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    47377968.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   367422272.0000             SW IRRIGATION =           3.7200
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -17457,6 +17559,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -18061,8 +18165,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    47377968.0000             AG WELLS      =           0.0000
+               AG WELLS  =    47377968.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   387287744.0000        DIVERSION SEGMENTS =           7.4435
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -18072,8 +18177,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    47377968.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   387295680.0000             SW IRRIGATION =           7.4436
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -18197,6 +18303,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
  READING SUPPLEMENTAL WELL
 
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
+
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
  SOLVING FOR HEAD 
@@ -18315,7 +18423,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD   19   STEP   1
+            AG WELLS      PERIOD   19   STEP   1
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE     0.00000    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE     0.00000    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE     0.00000    
@@ -18357,8 +18465,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    47377968.0000             AG WELLS      =           0.0000
+               AG WELLS  =    47377968.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   390389600.0000        DIVERSION SEGMENTS =          35.3822
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -18368,8 +18477,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    47377968.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   390397568.0000             SW IRRIGATION =          35.3829
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -19022,8 +19132,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    47393888.0000             AG WELLS      =           0.0000
+               AG WELLS  =    47393888.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   446263456.0000        DIVERSION SEGMENTS =          22.4689
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -19033,8 +19144,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    47393888.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   446272640.0000             SW IRRIGATION =          22.4693
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -19158,6 +19270,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
  READING SUPPLEMENTAL WELL
 
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
+
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
  SOLVING FOR HEAD 
@@ -19278,7 +19392,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
  
 
-        AG WELLS          PERIOD   20   STEP   1
+            AG WELLS      PERIOD   20   STEP   1
  AG WELL      1   LAYER   1   ROW     6   COL     4   RATE    -10.2741    
  AG WELL      2   LAYER   1   ROW     6   COL     5   RATE    -10.2741    
  AG WELL      3   LAYER   1   ROW     7   COL     4   RATE    -10.2741    
@@ -19320,8 +19434,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =    52798068.0000             AG WELLS      =          61.6446
+               AG WELLS  =    52798068.0000                 AG WELLS  =          61.6446
       DIVERSION SEGMENTS =   449376704.0000        DIVERSION SEGMENTS =          35.5122
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -19331,8 +19446,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =    52798068.0000             GW IRRIGATION =          61.6446
            SW IRRIGATION =   449385952.0000             SW IRRIGATION =          35.5129
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -19985,8 +20101,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   113764440.0000             AG WELLS      =          32.4617
+               AG WELLS  =   113764440.0000                 AG WELLS  =          32.4617
       DIVERSION SEGMENTS =   538959040.0000        DIVERSION SEGMENTS =          27.5067
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -19996,8 +20113,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   113764440.0000             GW IRRIGATION =          32.4617
            SW IRRIGATION =   538970176.0000             SW IRRIGATION =          27.5073
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -20120,6 +20238,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -20723,8 +20843,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   181308880.0000             AG WELLS      =          25.6019
+               AG WELLS  =   181308880.0000                 AG WELLS  =          25.6019
       DIVERSION SEGMENTS =   599755840.0000        DIVERSION SEGMENTS =          23.1167
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -20734,8 +20855,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   181308880.0000             GW IRRIGATION =          25.6019
            SW IRRIGATION =   599768896.0000             SW IRRIGATION =          23.1172
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -20858,6 +20980,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -21461,8 +21585,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   181316528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   181316528.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   628937280.0000        DIVERSION SEGMENTS =          11.2200
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -21472,8 +21597,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   181316528.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   628950400.0000             SW IRRIGATION =          11.2202
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -21596,6 +21722,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -22141,8 +22269,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   181316528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   181316528.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   628937280.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -22152,8 +22281,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   181316528.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   628950400.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -22276,6 +22406,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -22802,8 +22934,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   181316528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   181316528.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   628937280.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -22813,8 +22946,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   181316528.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   628950400.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -22937,6 +23071,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -23452,8 +23588,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   181316528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   181316528.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   628937280.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -23463,8 +23600,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   181316528.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   628950400.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -23587,6 +23725,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -24102,8 +24242,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   181316528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   181316528.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   628937280.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -24113,8 +24254,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   181316528.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   628950400.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -24237,6 +24379,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -24752,8 +24896,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   181316528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   181316528.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   628937280.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -24763,8 +24908,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   181316528.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   628950400.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -24887,6 +25033,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -25402,8 +25550,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   181316528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   181316528.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   628937280.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -25413,8 +25562,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   181316528.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   628950400.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -25537,6 +25687,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -26052,8 +26204,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   181316528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   181316528.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   628937280.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -26063,8 +26216,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   181316528.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   628950400.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -26187,6 +26341,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -26788,8 +26944,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   181316528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   181316528.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   648585408.0000        DIVERSION SEGMENTS =           7.4700
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -26799,8 +26956,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   181316528.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   648600320.0000             SW IRRIGATION =           7.4701
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -26923,6 +27081,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -27527,8 +27687,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   181336112.0000             AG WELLS      =           0.0000
+               AG WELLS  =   181336112.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   707735936.0000        DIVERSION SEGMENTS =          22.4696
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -27538,8 +27699,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   181336112.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   707750976.0000             SW IRRIGATION =          22.4700
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -27662,6 +27824,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -28269,8 +28433,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   207394016.0000             AG WELLS      =           9.0918
+               AG WELLS  =   207394016.0000                 AG WELLS  =           9.0918
       DIVERSION SEGMENTS =   840754432.0000        DIVERSION SEGMENTS =          50.8768
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -28280,8 +28445,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   207394016.0000             GW IRRIGATION =           9.0918
            SW IRRIGATION =   840771456.0000             SW IRRIGATION =          50.8778
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -28404,6 +28570,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -29006,8 +29174,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   227949600.0000             AG WELLS      =           8.0865
+               AG WELLS  =   227949600.0000                 AG WELLS  =           8.0865
       DIVERSION SEGMENTS =   948329408.0000        DIVERSION SEGMENTS =          40.6321
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -29017,8 +29186,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   227949600.0000             GW IRRIGATION =           8.0865
            SW IRRIGATION =   948348416.0000             SW IRRIGATION =          40.6329
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -29141,6 +29311,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -29744,8 +29916,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   227957520.0000             AG WELLS      =           0.0000
+               AG WELLS  =   227957520.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   977512320.0000        DIVERSION SEGMENTS =          11.2200
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -29755,8 +29928,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   227957520.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   977531328.0000             SW IRRIGATION =          11.2202
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -29879,6 +30053,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -30452,8 +30628,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   227957520.0000             AG WELLS      =           0.0000
+               AG WELLS  =   227957520.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   979406336.0000        DIVERSION SEGMENTS =           0.7197
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -30463,8 +30640,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   227957520.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   979425344.0000             SW IRRIGATION =           0.7197
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -30587,6 +30765,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -31102,8 +31282,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   227957520.0000             AG WELLS      =           0.0000
+               AG WELLS  =   227957520.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   979406336.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -31113,8 +31294,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   227957520.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   979425344.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -31237,6 +31419,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -31752,8 +31936,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   227957520.0000             AG WELLS      =           0.0000
+               AG WELLS  =   227957520.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   979406336.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -31763,8 +31948,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   227957520.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   979425344.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -31887,6 +32073,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -32402,8 +32590,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   227957520.0000             AG WELLS      =           0.0000
+               AG WELLS  =   227957520.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   979406336.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -32413,8 +32602,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   227957520.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   979425344.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -32537,6 +32727,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -33053,8 +33245,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   227957520.0000             AG WELLS      =           0.0000
+               AG WELLS  =   227957520.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   979406336.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -33064,8 +33257,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   227957520.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   979425344.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -33188,6 +33382,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -33707,8 +33903,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   227957520.0000             AG WELLS      =           0.0000
+               AG WELLS  =   227957520.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   979406336.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -33718,8 +33915,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   227957520.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   979425344.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -33842,6 +34040,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -34357,8 +34557,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   227957520.0000             AG WELLS      =           0.0000
+               AG WELLS  =   227957520.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   979406336.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -34368,8 +34569,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   227957520.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   979425344.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -34492,6 +34694,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -35092,8 +35296,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   227957520.0000             AG WELLS      =           0.0000
+               AG WELLS  =   227957520.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =   999054464.0000        DIVERSION SEGMENTS =           7.4700
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -35103,8 +35308,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   227957520.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =   999075264.0000             SW IRRIGATION =           7.4701
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -35227,6 +35433,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -35831,8 +36039,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   227977104.0000             AG WELLS      =           0.0000
+               AG WELLS  =   227977104.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =  1058204992.0000        DIVERSION SEGMENTS =          22.4696
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -35842,8 +36051,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   227977104.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =  1058225920.0000             SW IRRIGATION =          22.4700
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -35966,6 +36176,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -36572,8 +36784,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   294504448.0000             AG WELLS      =          36.8531
+               AG WELLS  =   294504448.0000                 AG WELLS  =          36.8531
       DIVERSION SEGMENTS =  1150753280.0000        DIVERSION SEGMENTS =          23.1155
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -36583,8 +36796,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   294504448.0000             GW IRRIGATION =          36.8531
            SW IRRIGATION =  1150774656.0000             SW IRRIGATION =          23.1159
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -36707,6 +36921,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -37349,8 +37565,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   362182592.0000             AG WELLS      =          25.6029
+               AG WELLS  =   362182592.0000                 AG WELLS  =          25.6029
       DIVERSION SEGMENTS =  1211548160.0000        DIVERSION SEGMENTS =          23.1155
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -37360,8 +37577,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   362182592.0000             GW IRRIGATION =          25.6029
            SW IRRIGATION =  1211569536.0000             SW IRRIGATION =          23.1159
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -37484,6 +37702,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -38087,8 +38307,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   362191392.0000             AG WELLS      =           0.0000
+               AG WELLS  =   362191392.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =  1240369664.0000        DIVERSION SEGMENTS =          11.2200
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -38098,8 +38319,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   362191392.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =  1240391168.0000             SW IRRIGATION =          11.2202
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -38222,6 +38444,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -38796,8 +39020,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   362191392.0000             AG WELLS      =           0.0000
+               AG WELLS  =   362191392.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =  1242263936.0000        DIVERSION SEGMENTS =           0.7197
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -38807,8 +39032,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   362191392.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =  1242285440.0000             SW IRRIGATION =           0.7197
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -38931,6 +39157,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -39459,8 +39687,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   362191392.0000             AG WELLS      =           0.0000
+               AG WELLS  =   362191392.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =  1242263936.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -39470,8 +39699,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   362191392.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =  1242285440.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -39594,6 +39824,8 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
  READING IRRIGATION WELL
 
  READING SUPPLEMENTAL WELL
+
+ NO IRRPOND OR REUSING IRRPOND DATA FROM LAST STRESS PERIOD
 
  END PROCESSING AG STRESS PERIOD DATA OPTIONS
  
@@ -40109,8 +40341,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-           AG WELLS      =   362191392.0000             AG WELLS      =           0.0000
+               AG WELLS  =   362191392.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =  1242263936.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -40120,8 +40353,9 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
       DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000
+       IRRIGATION PONDS  =           0.0000         IRRIGATION PONDS  =           0.0000
            GW IRRIGATION =   362191392.0000             GW IRRIGATION =           0.0000
            SW IRRIGATION =  1242285440.0000             SW IRRIGATION =           0.0000
         SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000
@@ -40186,6 +40420,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/09/08 19:46:31
- Elapsed run time: 3.837 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/09/16 11:16:55
+ Elapsed run time: 3.867 Seconds
 
