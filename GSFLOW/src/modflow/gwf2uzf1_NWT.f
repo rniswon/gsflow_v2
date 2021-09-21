@@ -1362,7 +1362,6 @@ C        IRUNFLG IS NOT EQUAL TO ZERO.
               END IF
             END IF
             IF ( Isavefinf == 1 ) FINFSAVE(ncck, nrck)=FINF(ncck, nrck)
-            IF ( IGSFLOW == 1 ) FINF(ncck, nrck)=0.0
           END DO
         END DO
       END IF
