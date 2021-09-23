@@ -1,0 +1,10 @@
+# MODFLOW-NWT Name File
+# Problem 3 
+LIST  7 .\output\Pr3_MFNWT_lower.lst
+BAS6  1 .\input\Pr3.bas
+DIS  10 .\input\Pr3.dis
+UPW  11 .\input\Pr3.upw
+RCH  18 .\input\Pr3_lower.rch
+NWT  13 .\input\Pr3.nwt
+OC   22 .\input\Pr3.oc
+DATA 30 .\output\Pr3_MFNWT_lower.out

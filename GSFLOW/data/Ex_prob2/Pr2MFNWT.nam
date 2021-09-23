@@ -1,0 +1,9 @@
+LIST                  1 .\output\Pr2MFNWT.LST
+BAS6                  2 .\input\Pr2.BA6
+DIS                  10 .\input\Pr2.DIS
+RCH                  18 .\input\Pr2.RCH
+OC                   20 .\input\Pr2.OC
+DATA(BINARY)         32 .\output\Pr2MFNWT.BUD
+NWT                  34 .\input\Pr2.NWT
+UPW                  35 .\input\Pr2.UPW
+DATA                 51 .\output\Pr2.out
