@@ -1,0 +1,65 @@
+# Example input for specifying lake bathymetry information using external 
+# text files using key word option “TABLEINPUT”
+TABLEINPUT                            Item 1a: KEY WORD
+         1         0                  Item 1b: NLAKES,ILKCB
+      -0.80        50     0.0001 0.5       Item 2:  THETA,NSSITER,SSCNCR,SURFDEP     
+     1074.5     1074.5  1090.0 57                         Item 3:  STAGES,SSMN,SSMX,IUNITLAKTAB
+         1         0         0        Item 4:  ITMP,ITMP1,LWRT
+INTERNAL          1 (20I4)    6  IBOUND layer  1         3      Item 5: LKARR layer 1
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   1   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+INTERNAL          1 (20I4)    6  IBOUND layer  2         3       Item 5: LKARR layer 2
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0
+CONSTANT    0.05      LAKEBED LEAKANCE,LAYER 1
+CONSTANT    0.05      LAKEBED LEAKANCE,LAYER 2
+    0                                                     Item 7: NSLMS
+    0.0     4.0e-8           0.0       0.0                  Item 9: PRCPLK,EVAPLK,RNF,WTHDRW
+  -1        1         0                   ;ITMP, ITMP1,LWRT for SP2     
+       0.0     4.0e-8           0.0       0.0                  Item 9: PRCPLK,EVAPLK,RNF,WTHDRW
+  -1        1         0                   ;ITMP, ITMP1,LWRT for SP3
+      0.0     4.0e-8           0.0       0.0                  Item 9: PRCPLK,EVAPLK,RNF,WTHDRW
+  -1        1         0                   ;ITMP, ITMP1,LWRT for SP4  
+      0.0     4.0e-8           0.0       0.0                  Item 9: PRCPLK,EVAPLK,RNF,WTHDRW    
+  -1        1         0                   ;ITMP, ITMP1,LWRT for SP5
+      0.0     4.0e-8           0.0       0.0                  Item 9: PRCPLK,EVAPLK,RNF,WTHDRW
+    -1        1         0                   ;ITMP, ITMP1,LWRT for SP6    
+        0.0     4.0e-8          0.0       0.0                  Item 9: PRCPLK,EVAPLK,RNF,WTHDRW            
+    -1        1         0                   ;ITMP, ITMP1,LWRT for SP7   
+        0.0     4.0e-8           0.0       0.0                  Item 9: PRCPLK,EVAPLK,RNF,WTHDRW             
+    -1        1         0                   ;ITMP, ITMP1,LWRT for SP8  
+        0.0     4.0e-8           0.0       0.0                  Item 9: PRCPLK,EVAPLK,RNF,WTHDRW              
+    -1        1         0                   ;ITMP, ITMP1,LWRT for SP9 
+        0.0     4.0e-8           0.0       0.0                  Item 9: PRCPLK,EVAPLK,RNF,WTHDRW
+       -1        1         0                   ;ITMP, ITMP1,LWRT for SP10 
+           0.0     4.0e-8           0.0       0.0                  Item 9: PRCPLK,EVAPLK,RNF,WTHDRW              
+       -1        1         0                   ;ITMP, ITMP1,LWRT for SP11
+           0.0     4.0e-8           0.0       0.0                  Item 9: PRCPLK,EVAPLK,RNF,WTHDRW
+       -1        1         0                   ;ITMP, ITMP1,LWRT for SP12
+           0.0     4.0e-8           0.0       0.0                  Item 9: PRCPLK,EVAPLK,RNF,WTHDRW

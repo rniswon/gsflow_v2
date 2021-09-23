@@ -1,0 +1,27 @@
+# Name file for hypothetical test simulation
+# Test of SFR2 Package; revised 5/20/2006
+#
+# NOTE: Forward slashes (/) in pathnames may need to be converted
+#       to back slashes (\) in some computing environments
+#
+list            12  .\output\Sfr2weltab.lst
+dis             13  .\input\Sfr2weltab.dis
+ghb             15  .\input\Sfr2weltab.ghb
+bas6            41  .\input\Sfr2weltab.bs6
+upw             42  .\input\Sfr2weltab.upw
+nwt             43  .\input\Sfr2weltab.nwt
+oc              44  .\input\Sfr2weltab.oc
+sfr             45  .\input\Sfr2weltab.sfr
+wel             91  .\input\Sfr2weltab.wel
+data            51  .\output\Sfr2weltab.out
+data            92  .\input\weltab1.txt     
+data            93  .\input\weltab2.txt
+gage            46  .\input\Sfr2weltab.gag
+data            83  .\output\Sfr2weltab.gg1
+data            84  .\output\Sfr2weltab.gg2
+data            85  .\output\Sfr2weltab.gg3
+data            86  .\output\Sfr2weltab.gg4
+data            87  .\output\Sfr2weltab.gg5
+data            88  .\output\Sfr2weltab.gg6
+data            89  .\output\Sfr2weltab.gg7
+data            90  .\output\Sfr2weltab.gg8
