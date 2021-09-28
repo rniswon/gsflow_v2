@@ -359,7 +359,7 @@
             lake = Lake_hru_id(i)
             !EVAP in mfl3/dt   SURFA in MFL2/dt
             IF ( SURFA(lake)>NEARZERO ) THEN
-              inches_on_lake = SNGL(EVAP(lake))*DELT/SNGL(SURFA(lake)*Mfl_to_inch)                         !RGN 5/23/15 added *DELT for time units other than days.         
+              inches_on_lake = SNGL(EVAP(lake))*DELT/SNGL(SURFA(lake))*Mfl_to_inch                         !RGN 5/23/15 added *DELT for time units other than days.         
               Hru_actet(i) = inches_on_lake*SNGL(SURFA(lake)*Mfl2_to_acre/Lake_area(lake))
             ELSE
               Hru_actet(i) = 0.0

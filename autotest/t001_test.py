@@ -30,7 +30,15 @@ model_name = [os.path.join("Ag_EP1a", "gsflow_modflow_high.control"),
               os.path.join("Ag_EP2b", "windows", "gsflow_gsflow_HighTrig.control"),
               os.path.join("Ag_EP2b", "windows", "gsflow_gsflow_LowTrig.control"),
               os.path.join("sagehen", 'windows', 'gsflow.control'),
-              os.path.join("tahoe_restart", 'windows', 'Tahoe.control')]
+              os.path.join("tahoe_restart", 'windows', 'Tahoe.control'),
+              os.path.join("Ex_prob1a", 'gsflow_modflow_1a.control'),
+              os.path.join("Ex_prob1b", 'gsflow_modflow_1b.control'),
+              os.path.join("Ex_prob2", 'gsflow_modflow_2.control'),
+              os.path.join("Ex_prob3", 'gsflow_modflow_3.control'),
+              os.path.join("SFR_LAK_floodplain", 'gsflow_modflow_fp.control'),
+              os.path.join("Sfr2weltab", 'gsflow_modflow_wt.control'),
+              os.path.join("UZF_cap_ET", 'gsflow_modflow_cap.control'),
+              os.path.join("UZF_testproblem2", 'gsflow_modflow_uzfp2.control')]
 
 
 models = [os.path.join(data_dir, model) for model in model_name]
@@ -75,8 +83,25 @@ has_external = {"gsflow_modflow_high.control":
                      os.path.join("..", "input", "modflow", "Marlette_bath.txt"),
                      os.path.join("..", "input", "modflow", "Spooner_bath.txt"),
                      os.path.join("..", "input", "modflow", "Tahoe_bath.txt"),
-                     os.path.join("..", "input", "modflow", "Tahoe_outflow.txt"))
-                }
+                     os.path.join("..", "input", "modflow", "Tahoe_outflow.txt")),
+                'gsflow_modflow_fp.control':
+                    (os.path.join("..", "input", "SFR_LAK_floodplain.uzf"),
+                     os.path.join("..", "input", "SFR_LAK_floodplain.gag"),
+                     os.path.join("..", "input", "SFR_LAK_floodplain_bath.txt"),
+                     os.path.join("..", "input", "SFR_LAK_floodplain.tab")),
+                'gsflow_modflow_wt.control':
+                    (os.path.join("..", "input", "weltab1.txt"),
+                     os.path.join("..", "input", "weltab2.txt"),
+                     os.path.join("..", "input", "Sfr2weltab.gag")),
+                'gsflow_modflow_cap.control':
+                    (os.path.join("..", "input", "UZF_cap_ET.uzf"),
+                     os.path.join("..", "input", "UZF_cap_ET.gag"),
+                     os.path.join("..", "input", "seg1.tab"),
+                     os.path.join("..", "input", "seg9.tab")),
+                'gsflow_modflow_uzfp2.control':
+                    (os.path.join("..", "input", "UZFtest2.uzf"),
+                     os.path.join("..", "input", "UZFtest2.gag")),
+               }
 
 
 def external_files(model, ows, f):
@@ -190,7 +215,6 @@ def do_model(model):
     #     success = False
     assert success, ismfnwt
     """
-
 
 def test_pwd():
     wd = os.getcwd()

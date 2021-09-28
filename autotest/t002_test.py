@@ -17,7 +17,15 @@ formatted = ["Agwater1_high.hed",
              "head_sagehen_LowKc.out",
              "head_sagehen_HighTrig.out",
              "head_sagehen_LowTrig.out",
-             "head_sagehen.out"]
+             "head_sagehen.out",
+             "Pr1aMFNWT.out",
+             "Pr1bMFNWT.out",
+             "Pr2.out",
+             "Pr3_MFNWT_lower.out",
+             "SFR_LAK_floodplainhd.out",
+             "Sfr2weltab.out",
+             "UZF_cap_ET.hed",
+             "UZFtest2hd.out"]
 
 
 def validate(sim_array, valid_array):
@@ -88,7 +96,15 @@ def test_outputs_exist():
             if output in ("head_sagehen_HighTrig.out",
                           "head_sagehen_LowTrig.out",
                           "head_sagehen.out",
-                          "tahoe.hed"):
+                          "tahoe.hed",
+                          "Pr1aMFNWT.out",
+                          "Pr1bMFNWT.out",
+                          "Pr2.out",
+                          "Pr3_MFNWT_lower.out",
+                          "SFR_LAK_floodplainhd.out",
+                          "Sfr2weltab.out",
+                          "UZF_cap_ET.hed",
+                          "UZFtest2hd.out"):
                 pass
             else:
                 yield  do_check_outputs, output
@@ -103,7 +119,15 @@ def test_formatted_outputs():
             if output in ("head_sagehen_HighTrig.out",
                           "head_sagehen_LowTrig.out",
                           "head_sagehen.out",
-                          "tahoe.hed"):
+                          "tahoe.hed",
+                          "Pr1aMFNWT.out",
+                          "Pr1bMFNWT.out",
+                          "Pr2.out",
+                          "Pr3_MFNWT_lower.out",
+                          "SFR_LAK_floodplainhd.out",
+                          "Sfr2weltab.out",
+                          "UZF_cap_ET.hed",
+                          "UZFtest2hd.out"):
                 pass
             else:
                 yield do_compare_formatted_head_file, output
