@@ -7,7 +7,7 @@ import gsflow
 
 print(os.getcwd())
 
-gsflow_exe_name = 'gsflow'
+gsflow_exe_name = "gsflow"
 if platform.system().lower() == "windows":
     gsflow_exe_name = "gsflow.exe"
 
@@ -25,42 +25,42 @@ model_name = [os.path.join("Ag_EP1a", "gsflow_modflow_high.control"),
               os.path.join("Ag_EP1a", "gsflow_modflow_low.control"),
               os.path.join("Ag_EP1b", "gsflow_modflow_high.control"),
               os.path.join("Ag_EP1b", "gsflow_modflow_low.control"),
-              os.path.join("Ag_EP2a", 'windows', 'gsflow_gsflowHighKc.control'),
-              os.path.join("Ag_EP2a", 'windows', 'gsflow_gsflowLowKc.control'),
+              os.path.join("Ag_EP2a", "windows", "gsflow_gsflowHighKc.control"),
+              os.path.join("Ag_EP2a", "windows", "gsflow_gsflowLowKc.control"),
               os.path.join("Ag_EP2b", "windows", "gsflow_gsflow_HighTrig.control"),
               os.path.join("Ag_EP2b", "windows", "gsflow_gsflow_LowTrig.control"),
-              os.path.join("sagehen", 'windows', 'gsflow.control'),
-              os.path.join("tahoe_restart", 'windows', 'Tahoe.control'),
-              os.path.join("Ex_prob1a", 'gsflow_modflow_1a.control'),
-              os.path.join("Ex_prob1b", 'gsflow_modflow_1b.control'),
-              os.path.join("Ex_prob2", 'gsflow_modflow_2.control'),
-              os.path.join("Ex_prob3", 'gsflow_modflow_3.control'),
-              os.path.join("SFR_LAK_floodplain", 'gsflow_modflow_fp.control'),
-              os.path.join("Sfr2weltab", 'gsflow_modflow_wt.control'),
-              os.path.join("UZF_cap_ET", 'gsflow_modflow_cap.control'),
-              os.path.join("UZF_testproblem2", 'gsflow_modflow_uzfp2.control')]
+              os.path.join("sagehen", "windows", "gsflow.control"),
+              os.path.join("tahoe_restart", "windows", "Tahoe.control"),
+              os.path.join("Ex_prob1a", "gsflow_modflow_1a.control"),
+              os.path.join("Ex_prob1b", "gsflow_modflow_1b.control"),
+              os.path.join("Ex_prob2", "gsflow_modflow_2.control"),
+              os.path.join("Ex_prob3", "gsflow_modflow_3.control"),
+              os.path.join("SFR_LAK_floodplain", "gsflow_modflow_fp.control"),
+              os.path.join("Sfr2weltab", "gsflow_modflow_wt.control"),
+              os.path.join("UZF_cap_ET", "gsflow_modflow_cap.control"),
+              os.path.join("UZF_testproblem2", "gsflow_modflow_uzfp2.control")]
 
 
 models = [os.path.join(data_dir, model) for model in model_name]
 
 has_external = {"gsflow_modflow_high.control":
                     (os.path.join("input", "seg1_high.tab"),
-                     os.path.join('input', 'seg1.tab'),
+                     os.path.join("input", "seg1.tab"),
                      os.path.join("input", "seg9.tab"),
                      os.path.join("input", "Agwater1.uzf"),
                      os.path.join("input", "Agwater1.ag")),
                 "gsflow_modflow_low.control":
                     (os.path.join("input", "seg1_low.tab"),
-                     os.path.join("input", 'seg1.tab'),
+                     os.path.join("input", "seg1.tab"),
                      os.path.join("input", "seg9.tab"),
                      os.path.join("input", "Agwater1.uzf"),
                      os.path.join("input", "Agwater1.ag")),
                 "gsflow_gsflowHighKc.control":
-                    (os.path.join("..", 'input', 'modflow', "seg18_tab.txt"),
+                    (os.path.join("..", "input", "modflow", "seg18_tab.txt"),
                      os.path.join("..", "input", "modflow", "seg19_tab.txt"),
                      os.path.join("..", "input", "modflow", "well_tab.txt")),
                 "gsflow_gsflowLowKc.control":
-                    (os.path.join("..", 'input', 'modflow', "seg18_tab.txt"),
+                    (os.path.join("..", "input", "modflow", "seg18_tab.txt"),
                      os.path.join("..", "input", "modflow", "seg19_tab.txt"),
                      os.path.join("..", "input", "modflow", "well_tab.txt")),
                 "sagehen_gsflow_HighTrig.control":
@@ -71,11 +71,11 @@ has_external = {"gsflow_modflow_high.control":
                     (os.path.join("..", "input", "modflow", "seg18_tab.txt"),
                      os.path.join("..", "input", "modflow", "seg19_tab.txt"),
                      os.path.join("..", "input", "modflow", "well_tab.txt")),
-                'gsflow.control':
-                    (os.path.join("..", "input", "modflow", 'sagehen.uzf'),
+                "gsflow.control":
+                    (os.path.join("..", "input", "modflow", "sagehen.uzf"),
                      os.path.join("..", "input", "modflow", "sagehen.sfr"),
                      os.path.join("..", "input", "modflow", "sagehen.dis")),
-                'Tahoe.control':
+                "Tahoe.control":
                     (os.path.join("..", "input", "modflow", "Cascade_bath.txt"),
                      os.path.join("..", "input", "modflow", "Echo_bath.txt"),
                      os.path.join("..", "input", "modflow", "FallenLeaf_bath.txt"),
@@ -84,21 +84,21 @@ has_external = {"gsflow_modflow_high.control":
                      os.path.join("..", "input", "modflow", "Spooner_bath.txt"),
                      os.path.join("..", "input", "modflow", "Tahoe_bath.txt"),
                      os.path.join("..", "input", "modflow", "Tahoe_outflow.txt")),
-                'gsflow_modflow_fp.control':
+                "gsflow_modflow_fp.control":
                     (os.path.join("..", "input", "SFR_LAK_floodplain.uzf"),
                      os.path.join("..", "input", "SFR_LAK_floodplain.gag"),
                      os.path.join("..", "input", "SFR_LAK_floodplain_bath.txt"),
                      os.path.join("..", "input", "SFR_LAK_floodplain.tab")),
-                'gsflow_modflow_wt.control':
+                "gsflow_modflow_wt.control":
                     (os.path.join("..", "input", "weltab1.txt"),
                      os.path.join("..", "input", "weltab2.txt"),
                      os.path.join("..", "input", "Sfr2weltab.gag")),
-                'gsflow_modflow_cap.control':
+                "gsflow_modflow_cap.control":
                     (os.path.join("..", "input", "UZF_cap_ET.uzf"),
                      os.path.join("..", "input", "UZF_cap_ET.gag"),
                      os.path.join("..", "input", "seg1.tab"),
                      os.path.join("..", "input", "seg9.tab")),
-                'gsflow_modflow_uzfp2.control':
+                "gsflow_modflow_uzfp2.control":
                     (os.path.join("..", "input", "UZFtest2.uzf"),
                      os.path.join("..", "input", "UZFtest2.gag")),
                }
@@ -113,7 +113,7 @@ def external_files(model, ows, f):
 
 def do_model(model):
     model_ws, name = os.path.split(model)
-    if name in ('placeholder',):
+    if name in ("placeholder",):
         copyfile = False
     else:
         # need to trick flopy....
@@ -130,7 +130,7 @@ def do_model(model):
         with open(os.path.join(model_ws, name)) as foo:
             s = ""
             for line in foo:
-                if '.nam' in line.lower():
+                if ".nam" in line.lower():
                     mf_nam = line.strip().split()[0]
                     mf_nam = mf_nam.replace("\\", "/")
 
@@ -183,7 +183,7 @@ def do_model(model):
 
     # ml.write_input()
 
-    # fix the name files that we can't load a package with in flopy
+    # fix the name files that we can"t load a package with in flopy
     """
     if name in ("Sfr2Weltab.nam", "UZF_cap_ET.nam", "Prob1.nam",
                 "Agwater1_high.nam", "Agwater1_low.nam"):
@@ -236,7 +236,7 @@ def test_run_model():
 
 def test_run_long_model():
     for ix, model in enumerate(models[6:]):
-        if platform.system().lower() == 'windows':
+        if platform.system().lower() == "windows":
             yield do_model, model
         else:
             continue
