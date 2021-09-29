@@ -85,22 +85,22 @@ has_external = {"gsflow_modflow_high.control":
                      os.path.join("..", "input", "modflow", "Tahoe_bath.txt"),
                      os.path.join("..", "input", "modflow", "Tahoe_outflow.txt")),
                 "gsflow_modflow_fp.control":
-                    (os.path.join("..", "input", "SFR_LAK_floodplain.uzf"),
-                     os.path.join("..", "input", "SFR_LAK_floodplain.gag"),
-                     os.path.join("..", "input", "SFR_LAK_floodplain_bath.txt"),
-                     os.path.join("..", "input", "SFR_LAK_floodplain.tab")),
+                    (os.path.join(".", "input", "SFR_LAK_floodplain.uzf"),
+                     os.path.join(".", "input", "SFR_LAK_floodplain.gag"),
+                     os.path.join(".", "input", "SFR_LAK_floodplain_bath.txt"),
+                     os.path.join(".", "input", "SFR_LAK_floodplain.tab")),
                 "gsflow_modflow_wt.control":
-                    (os.path.join("..", "input", "weltab1.txt"),
-                     os.path.join("..", "input", "weltab2.txt"),
-                     os.path.join("..", "input", "Sfr2weltab.gag")),
+                    (os.path.join(".", "input", "weltab1.txt"),
+                     os.path.join(".", "input", "weltab2.txt"),
+                     os.path.join(".", "input", "Sfr2weltab.gag")),
                 "gsflow_modflow_cap.control":
-                    (os.path.join("..", "input", "UZF_cap_ET.uzf"),
-                     os.path.join("..", "input", "UZF_cap_ET.gag"),
-                     os.path.join("..", "input", "UZF_cap_ET_seg1.tab"),
-                     os.path.join("..", "input", "UZF_cap_ET_seg9.tab")),
+                    (os.path.join(".", "input", "UZF_cap_ET.uzf"),
+                     os.path.join(".", "input", "UZF_cap_ET.gag"),
+                     os.path.join(".", "input", "UZF_cap_ET_seg1.tab"),
+                     os.path.join(".", "input", "UZF_cap_ET_seg9.tab")),
                 "gsflow_modflow_uzfp2.control":
-                    (os.path.join("..", "input", "UZFtest2.uzf"),
-                     os.path.join("..", "input", "UZFtest2.gag")),
+                    (os.path.join(".", "input", "UZFtest2.uzf"),
+                     os.path.join(".", "input", "UZFtest2.gag")),
                }
 
 
