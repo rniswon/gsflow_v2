@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output CSV Summary'
       character(len=10), parameter :: MODNAME = 'gsflow_sum'
-      character(len=*), parameter :: Version_gsflow_sum = '2021-08-16'
+      character(len=*), parameter :: Version_gsflow_sum = '2021-09-28'
       INTEGER, SAVE :: BALUNT
       DOUBLE PRECISION, PARAMETER :: ERRCHK = 0.0001D0
       INTEGER, SAVE :: Balance_unt, Vbnm_index(14), Gsf_unt, Rpt_count
@@ -311,9 +311,10 @@
      &     'Volumetric flow rate of flow from gravity reservoirs to capillary reservoirs', &
      &     'L3/T', Basingvr2sm)/=0 ) CALL read_error(3, 'basingvr2sm')
 
-!     includes precipitation, snowmelt, and cascading Hortonian and Dunnian runoff and interflow
       IF ( declvar(MODNAME, 'Infil2CapTotal_Q', 'one', 1, 'double', &
-     &     'Volumetric flow rate of soil infiltration into capillary reservoirs'//&
+     &     'Volumetric flow rate of soil infiltration into capillary'// &
+     &     ' reservoirs including precipitation, snowmelt, and'// &
+     &     ' cascading Hortonian and Dunnian runoff and interflow'// &
      &     ' minus infiltration to preferential-flow reservoirs', &
      &     'L3/T', Infil2CapTotal_Q)/=0 ) CALL read_error(3, 'Infil2CapTotal_Q')
 

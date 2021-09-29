@@ -7,7 +7,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-09-08'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-09-28'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -33,12 +33,12 @@
       INTEGER, SAVE, ALLOCATABLE :: Stress_dates(:)
       INTEGER, SAVE :: Modflow_skip_stress, Kkper_new
       INTEGER, SAVE :: Modflow_skip_time_step
-      REAL, SAVE :: Modflow_time_in_stress, Modflow_skip_time
+      DOUBLE PRECISION, SAVE :: Modflow_time_in_stress,Modflow_skip_time
       DOUBLE PRECISION, SAVE :: Mft_to_sec, Totalarea_mf
       DOUBLE PRECISION, SAVE :: Mfl2_to_acre, Mfl3_to_ft3, Sfr_conv
       DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs
       REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t
-      REAL, SAVE :: MFQ_to_inch_acres
+      REAL, SAVE :: MFQ_to_inch_acres, Acre_inches_to_mfl3_sngl
       DOUBLE PRECISION, SAVE :: mfstrt_jul  !RGN to get MF to stop at End_time for MODFLOW only
       REAL, SAVE, ALLOCATABLE :: Mfq2inch_conv(:), Cellarea(:)
       REAL, SAVE, ALLOCATABLE :: Gvr2cell_conv(:), Mfvol2inch_conv(:)
@@ -533,7 +533,7 @@ C7------SIMULATE EACH STRESS PERIOD.
           IF ( ISSFLG(KKPER).EQ.1 ) CALL error_stop
      &         ('cannot run steady state after first stress period.',
      &          ERROR_modflow)
-          IF ( ISSFLG(1).EQ.0 ) Delt_save = DELT
+!          IF ( ISSFLG(1).EQ.0 ) Delt_save = DELT ! rsr, delt_save set in gsfinit
           IF ( DELT.NE.Delt_save )
      &         CALL error_stop('cannot change DELT', ERROR_time)
         END IF
@@ -1480,10 +1480,10 @@ C
       ! Functions
       EXTERNAL :: READ_STRESS, RESTART1READ, error_stop
       INTEGER, EXTERNAL :: gsfrun, compute_julday
-      INTRINSIC :: INT, FLOAT
+      INTRINSIC :: INT, DBLE
 ! Local Variables
       INTEGER :: i, n, nstress, start_jul, mfstrt_jul
-      REAL :: plen, time, kstpskip
+      DOUBLE PRECISION :: kstpskip, plen, time
 !***********************************************************************
       IF ( Print_debug>DEBUG_less )
      &     PRINT ( '(/, A, I5,2("/",I2.2))' ), 'modflow_time_zero:',
@@ -1549,17 +1549,17 @@ C
 
       Modflow_skip_stress = 0
       Modflow_skip_time_step = 0
-      Modflow_skip_time = FLOAT( start_jul - mfstrt_jul )
+      Modflow_skip_time = DBLE( start_jul - mfstrt_jul )
       Modflow_time_in_stress = Modflow_skip_time
-      IF ( Modflow_skip_time>0.0 ) THEN
-        kstpskip = 0.0
-        time = 0.0
+      IF ( Modflow_skip_time>0.0D0 ) THEN
+        kstpskip = 0.0D0
+        time = 0.0D0
         DO i = 1, NPER
-          IF ( ISSFLG(i)/=1 ) time = time + PERLEN(i)*Mft_to_days
+          IF ( ISSFLG(i)/=1 ) time = time + DBLE(PERLEN(i)*Mft_to_days)
           IF ( time<=Modflow_skip_time ) THEN     !RGN
 !          IF ( time<Modflow_skip_time ) THEN   !RGN
             Modflow_skip_stress = i
-            kstpskip = kstpskip + PERLEN(i)*Mft_to_days
+            kstpskip = kstpskip + DBLE( PERLEN(i)*Mft_to_days )
             Modflow_skip_time_step = Modflow_skip_time_step + NSTP(i)
           ELSE
             EXIT
@@ -1567,13 +1567,13 @@ C
         ENDDO
 !        Modflow_time_in_stress = Modflow_time_in_stress - time   !RGN
         Modflow_time_in_stress = Modflow_skip_time - kstpskip
-        IF ( Modflow_time_in_stress<0.0 ) Modflow_time_in_stress=0.0
+        IF ( Modflow_time_in_stress<0.0D0 ) Modflow_time_in_stress=0.0D0
         ! skip stress periods from modflow_time_zero to start_time
         IF ( Modflow_skip_stress - ISSFLG(1) == 0 ) THEN
           KPER = 1
           IF ( ISSFLG(1)==0 ) CALL READ_STRESS()
         ELSE
-          nstress = INT(Modflow_skip_stress) - ISSFLG(1)
+          nstress = INT( Modflow_skip_stress ) - ISSFLG(1)
           DO i = 1, nstress   !RGN because SP1 already read if SS during first period.
             KPER = KPER + 1 ! set to next stress period
             IF ( ISSFLG(i) == 0 ) CALL READ_STRESS()
@@ -1585,7 +1585,7 @@ C
           ENDDO
         ENDIF
         KPERSTART = KPER
-        TOTIM = TOTIM + INT(Modflow_skip_time/Mft_to_days) ! TOTIM includes SS time as set above, rsr
+        TOTIM = TOTIM + INT( Modflow_skip_time/Mft_to_days ) ! TOTIM includes SS time as set above, rsr
       ELSEIF ( Init_vars_from_file==0 .AND. ISSFLG(1)/=1) THEN
         !start with TR and no restart and no skip time
         KPER = KPER + 1 ! set to next stress period
@@ -1850,7 +1850,8 @@ C
       USE GSFMODFLOW, ONLY: Mft_to_sec, Cellarea, MFQ_to_inch_acres,
      &    Mfl2_to_acre, Mfl3_to_ft3, Mfl_to_inch, Sfr_conv,
      &    Acre_inches_to_mfl3, Inch_to_mfl_t, Mfl3t_to_cfs,
-     &    Mfvol2inch_conv, Gvr2cell_conv, Mfq2inch_conv
+     &    Mfvol2inch_conv, Gvr2cell_conv, Mfq2inch_conv,
+     &    Acre_inches_to_mfl3_sngl
       IMPLICIT NONE
       EXTERNAL :: error_stop
 ! Local Variables
@@ -1893,6 +1894,7 @@ C
       Mfl3t_to_cfs = Mfl3_to_ft3/Mft_to_sec
 ! inch over basin (acres) conversion to modflow length cubed
       Acre_inches_to_mfl3 = FT2_PER_ACRE/(Mfl3_to_ft3*12.0D0)
+      Acre_inches_to_mfl3_sngl = SNGL( Acre_inches_to_mfl3 )
 
       IF ( GSFLOW_flag==OFF ) RETURN
 

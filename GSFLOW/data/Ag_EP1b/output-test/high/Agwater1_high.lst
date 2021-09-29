@@ -710,8 +710,6 @@ SELECTED MODEL CELLS ARE:
  A total number of          2 AG output time series files were activated for GROUNDWATER 
  A total number of          0 AG output time series files were activated for SURFACE WATER ET
  A total number of          2 AG output time series files were activated for GROUNDWATER ET
- A total number of          0 AG output time series files were activated for POND ET
- A total number of          0 AG output time series files were activated for POND IRRIGATION
 1
                             STRESS PERIOD NO.    1, LENGTH =   86400.00    
                             -----------------------------------------------
@@ -38127,6 +38125,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/09/16 11:18:01
- Elapsed run time: 3.616 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/09/28 16:44:07
+ Elapsed run time: 3.627 Seconds
 

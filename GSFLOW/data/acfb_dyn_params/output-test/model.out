@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.1 09/07/2021
+                       Version 5.2.1 09/28/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,7 +36,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-09-07
+PRMS Computation Order          gsflow_prms         2021-09-28
 Basin Definition                basin               2021-08-18
 Common States and Fluxes        climateflow         2021-08-13
 Potential Solar Radiation       soltab              2021-08-13
@@ -103,5 +103,5 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
  *************************************************************
  Total for run    1110.775  440.221    8.439  693.939   13.445
  *************************************************************
-Execution elapsed time    0 minutes  0.91 seconds
+Execution elapsed time    0 minutes  0.88 seconds
 

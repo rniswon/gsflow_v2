@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.1 09/07/2021
+                       Version 5.2.1 09/28/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,7 +36,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-09-07
+PRMS Computation Order          gsflow_prms         2021-09-28
 Basin Definition                basin               2021-08-18
 Cascading Flow                  cascade             2021-08-13
 Common States and Fluxes        climateflow         2021-08-13
@@ -52,15 +52,15 @@ Canopy Interception             intcp               2021-09-07
 Snow Dynamics                   snowcomp            2021-09-15
 Surface Runoff                  srunoff_smidx       2021-08-18
 Soilzone Computations           soilzone            2021-09-08
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-08-26
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-09-28
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-06-10
-GSFLOW Output Budget Summary    gsflow_budget       2021-08-13
-GSFLOW Output CSV Summary       gsflow_sum          2021-08-16
+GSFLOW Output Budget Summary    gsflow_budget       2021-09-28
+GSFLOW Output CSV Summary       gsflow_sum          2021-09-28
 Output Summary                  nhru_summary        2021-08-13
 Output Summary                  basin_summary       2021-08-13
 Output Summary                  nsegment_summary    2021-08-13
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2021-09-08
+GSFLOW MODFLOW main             gsflow_modflow      2021-09-28
 UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
 SFR-NWT Package                 gwf2sfr7_NWT        2020-09-30
 AG-NWT Package                  gwf2ag1_NWT         2021-06-21
@@ -78,5 +78,5 @@ Model domain area:        11226.32    Active basin area:      6740.99
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    4 minutes 21.98 seconds
+Execution elapsed time    4 minutes 20.62 seconds
 

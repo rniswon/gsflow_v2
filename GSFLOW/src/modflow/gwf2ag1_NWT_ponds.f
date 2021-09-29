@@ -2226,8 +2226,8 @@
         write (iout, 7) NUMGW + NUMGWALL
         write (iout, 8) NUMSWET
         write (iout, 9) NUMGWET + NUMGWETALL        
-        write (iout, 10) NUMPONDET + NUMPONDETALL
-        write (iout, 11) NUMPOND + NUMPONDALL
+!        write (iout, 10) NUMPONDET + NUMPONDETALL
+!        write (iout, 11) NUMPOND + NUMPONDALL
       ELSE
         BACKSPACE(IN)
       END IF

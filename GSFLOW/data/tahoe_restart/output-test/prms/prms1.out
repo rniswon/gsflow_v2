@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.1 09/07/2021
+                       Version 5.2.1 09/28/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,7 +36,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-09-07
+PRMS Computation Order          gsflow_prms         2021-09-28
 Basin Definition                basin               2021-08-18
 Cascading Flow                  cascade             2021-08-13
 Common States and Fluxes        climateflow         2021-08-13
@@ -52,13 +52,13 @@ Canopy Interception             intcp               2021-09-07
 Snow Dynamics                   snowcomp            2021-09-15
 Surface Runoff                  srunoff_smidx       2021-08-18
 Soilzone Computations           soilzone            2021-09-08
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-08-26
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-09-28
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-06-10
-GSFLOW Output Budget Summary    gsflow_budget       2021-08-13
-GSFLOW Output CSV Summary       gsflow_sum          2021-08-16
+GSFLOW Output Budget Summary    gsflow_budget       2021-09-28
+GSFLOW Output CSV Summary       gsflow_sum          2021-09-28
 Output Summary                  subbasin            2021-08-13
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2021-09-08
+GSFLOW MODFLOW main             gsflow_modflow      2021-09-28
 UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
 SFR-NWT Package                 gwf2sfr7_NWT        2020-09-30
 LAK-NWT Package                 gwf2lak7_NWT        2020-09-30
@@ -77,5 +77,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time   16 minutes 51.72 seconds
+Execution elapsed time   16 minutes 44.93 seconds
 
