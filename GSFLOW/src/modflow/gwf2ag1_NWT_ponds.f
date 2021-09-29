@@ -770,6 +770,34 @@
      +                       //' SUP or IRR wells required')
             end if
             found = .true.
+                 !
+            !16 - --- SUPPORT PREVIOUS AG INPUT OPTIONS
+         case ('TABFILES')
+            if (found1) then
+               CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, NUMTABWELL, R, 
+     +                     IOUT, IN)
+               IF (NUMTABWELL .LT. 0) NUMTABWELL = 0
+               WRITE (IOUT, *)
+               WRITE (IOUT, 30) NUMTABWELL
+               WRITE (IOUT, *)
+               CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, MAXVALWELL, R, 
+     +                     IOUT, IN)
+               IF (MAXVALWELL .LT. 0) THEN
+                  MAXVALWELL = 1
+                  NUMTABWELL = 0
+               END IF
+               WRITE (IOUT, *)
+               WRITE (IOUT, 31) MAXVALWELL
+               WRITE (IOUT, *)
+            else
+               WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
+     +                       //' Option: '//LINE(ISTART:ISTOP)
+     +                       //' SUP or IRR wells required'
+               CALL USTOP('Invalid '//trim(adjustl(text))
+     +                       //' Option: '//LINE(ISTART:ISTOP)
+     +                       //' SUP or IRR wells required')
+            end if
+            found = .true.
       !
       !16b - --- SPEICYING POND DIVERSION RATES AS TIMES SERIES INPUT FILE FOR EACH POND
          case ('TABFILESPOND')
@@ -2398,10 +2426,11 @@
                   IF (ETDEMANDFLAG > 0) THEN
                      FMIN = SUPACT(J)
                   ELSE IF (TRIGGERFLAG > 0) then
-                     QSW = DZERO
-                     FMIN = DZERO
-                     IF (TIMEINPERIODSEG(J) < IRRPERIODSEG(J)) THEN
-                        FMIN = Q
+                     IF (TIMEINPERIODSEG(J) < IRRPERIODSEG(J)) THEN  
+                        FMIN = SEG(2, J)
+                     ELSE
+                       QSW = DZERO
+                       FMIN = DZERO
                      END IF
                   ELSE
                      FMIN = DEMAND(J)
@@ -3399,7 +3428,7 @@
                TIMEINPERIODSEG(ISEG) = 0.0
             end if
          end if
-         if (TIMEINPERIODSEG(ISEG) - DELT < IRRPERIODSEG(ISEG))
+         if (TIMEINPERIODSEG(ISEG) < IRRPERIODSEG(ISEG))
      +                              SEG(2, iseg) = DEMAND(iseg)
 300    continue
        deallocate (petseg, aetseg)
@@ -3479,7 +3508,7 @@
               TIMEINPERIODWELL(L) = SZERO
           end if
       end if
-      if (TIMEINPERIODWELL(L) - DELT < IRRPERIODWELL(L))
+      if (TIMEINPERIODWELL(L) < IRRPERIODWELL(L))
      +                                 demandtrigger_gw = Q
       end function demandtrigger_gw
       
