@@ -3483,7 +3483,7 @@
             !area = Ag_area(hru_id) !(uncomment this)
             area = HRU_PERV(hru_id) !delete this
             pet = potet(hru_id)*area*prms_inch2mf_q
-            !aet = ag_actet(hru_id)*area*prms_inch2mf_q !(uncomment)
+            aet = ag_actet(hru_id)*area*prms_inch2mf_q !(uncomment)
             !et = PERV_ACTET(hru_id)*area*prms_inch2mf_q !(delete)
             if ( Nhru==Nhrucell ) then
               icell = Gvr_cell_id(hru_id)
