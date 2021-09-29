@@ -8,8 +8,8 @@ SFR                  15 ./input/UZF_cap_ET.sfr
 GHB                  17 ./input/UZF_cap_ET.ghb
 UZF                  19 ./input/UZF_cap_ET.uzf
 GAGE                 32 ./input/UZF_cap_ET.gag
-data                 55 ./input/seg1.tab
-data                 56 ./input/seg9.tab
+data                 55 ./input/UZF_cap_ET_seg1.tab
+data                 56 ./input/UZF_cap_ET_seg9.tab
 data                 62 ./output/UZF_cap_ET.hed 
 DATA(BINARY)         61 ./output/UZF_cap_ET.uzfot
 DATA(BINARY)         102 ./output/UZF_cap_ET.unf

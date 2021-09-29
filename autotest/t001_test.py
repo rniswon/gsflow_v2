@@ -96,8 +96,8 @@ has_external = {"gsflow_modflow_high.control":
                 "gsflow_modflow_cap.control":
                     (os.path.join("..", "input", "UZF_cap_ET.uzf"),
                      os.path.join("..", "input", "UZF_cap_ET.gag"),
-                     os.path.join("..", "input", "seg1.tab"),
-                     os.path.join("..", "input", "seg9.tab")),
+                     os.path.join("..", "input", "UZF_cap_ET_seg1.tab"),
+                     os.path.join("..", "input", "UZF_cap_ET_seg9.tab")),
                 "gsflow_modflow_uzfp2.control":
                     (os.path.join("..", "input", "UZFtest2.uzf"),
                      os.path.join("..", "input", "UZFtest2.gag")),
