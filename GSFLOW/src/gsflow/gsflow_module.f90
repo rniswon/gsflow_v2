@@ -20,9 +20,9 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 09/14/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-09-14'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 09/14/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 09/30/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-09-30'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 09/30/2021'
       character(len=*), parameter :: Version_read_control_file = '2021-09-07'
       character(len=*), parameter :: Version_read_parameter_file = '2021-09-07'
       character(len=*), parameter :: Version_read_data_file = '2021-09-07'
@@ -71,8 +71,8 @@
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag
-      INTEGER, SAVE :: Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, Dyn_ag_frac_flag
-      INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag, Dyn_ag_soil_flag
+      INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
+      INTEGER, SAVE :: Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, Dyn_ag_frac_flag, Dyn_ag_soil_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF, outputSelectDatesON_OFF, snow_cloudcover_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName
@@ -96,7 +96,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-09-09'
+      character(len=*), parameter :: Version_gsflow_modflow='2021-09-29'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -107,7 +107,7 @@
       character(len=*), parameter :: MODNAME_AG =  'gwf2ag1_NWT_ponds'
       character(len=*), parameter :: Version_uzf = '2021-03-02'
       character(len=*), parameter :: Version_sfr = '2020-09-30'
-      character(len=*), parameter :: Version_lak = '2020-09-30'
+      character(len=*), parameter :: Version_lak = '2021-09-28'
       character(len=*), parameter :: Version_ag =  '2021-06-21'
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
@@ -120,12 +120,14 @@
       INTEGER, SAVE, ALLOCATABLE :: Gwc_col(:), Gwc_row(:)
       REAL, SAVE :: Delt_save
       INTEGER, SAVE, ALLOCATABLE :: Stress_dates(:)
-      INTEGER, SAVE :: Modflow_skip_stress, Kkper_new, Modflow_skip_time_step
-      REAL, SAVE :: Modflow_time_in_stress, Modflow_skip_time
+      INTEGER, SAVE :: Modflow_skip_stress, Kkper_new
+      INTEGER, SAVE :: Modflow_skip_time_step
+      DOUBLE PRECISION, SAVE :: Modflow_time_in_stress,Modflow_skip_time
       DOUBLE PRECISION, SAVE :: Mft_to_sec, Totalarea_mf
       DOUBLE PRECISION, SAVE :: Mfl2_to_acre, Mfl3_to_ft3, Sfr_conv
       DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs
-      REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t, MFQ_to_inch_acres
+      REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t
+      REAL, SAVE :: MFQ_to_inch_acres, Acre_inches_to_mfl3_sngl
       DOUBLE PRECISION, SAVE :: mfstrt_jul  !RGN to get MF to stop at End_time for MODFLOW only
       REAL, SAVE, ALLOCATABLE :: Mfq2inch_conv(:), Cellarea(:)
       REAL, SAVE, ALLOCATABLE :: Gvr2cell_conv(:), Mfvol2inch_conv(:)

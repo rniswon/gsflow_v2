@@ -3048,9 +3048,10 @@ C---   Account for multiple diversions out of a lake
           ENDIF
         ENDIF
         WRITE(IOUT,*)
-        WRITE(IOUT,9008)LAKE,V
+        WRITE(IOUT,9008)LAKE,LSEG,V
         WRITE(IOUT,*)
-9008  FORMAT(6X,'DEAD POOL STORAGE FOR LAKE ',I4,' IS EQUAL TO ',E20.10)
+9008    FORMAT(6X,'DEAD POOL STORAGE FOR LAKE ',I4,' BELOW SEGMENT ',
+     +         I4,' IS EQUAL TO ',E20.10)
       ENDIF
   100 CONTINUE
 C

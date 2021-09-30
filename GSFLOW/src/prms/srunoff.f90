@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2021-09-15'
+      character(len=*), parameter :: Version_srunoff = '2021-09-30'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -641,7 +641,7 @@
       INTEGER FUNCTION srunoffrun()
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF, DEBUG_WB, LAND, LAKE, GLACIER, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Call_cascade, &
-     &    Frozen_flag, Glacier_flag, PRMS_land_iteration_flag, Kkiter, AG_flag, Ag_package
+     &    Frozen_flag, Glacier_flag, PRMS_land_iteration_flag, Kkiter, AG_flag
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, &
      &    Hru_perv, Hru_imperv, Hru_percent_imperv, Hru_frac_perv, &
@@ -677,7 +677,7 @@
             Dprst_vol_open = It0_dprst_vol_open
             Dprst_vol_clos = It0_dprst_vol_clos
           ENDIF
-          IF ( AG_flag==ACTIVE .AND. Ag_package==ACTIVE ) THEN
+          IF ( AG_flag==ACTIVE ) THEN
             Ag_soil_moist = It0_ag_soil_moist
             Ag_soil_rechr = It0_ag_soil_rechr
           ENDIF
@@ -689,7 +689,7 @@
             It0_dprst_vol_open = Dprst_vol_open
             It0_dprst_vol_clos = Dprst_vol_clos
           ENDIF
-          IF ( Ag_frac_flag==ACTIVE .AND. Ag_package==ACTIVE ) THEN
+          IF ( Ag_flag==ACTIVE ) THEN
             It0_ag_soil_moist = Ag_soil_moist
             It0_ag_soil_rechr = Ag_soil_rechr
           ENDIF
@@ -821,14 +821,14 @@
         IF ( frzen==OFF ) THEN
           IF ( Isglacier==OFF ) THEN
             CALL compute_infil(Net_rain(i), Net_ppt(i), Imperv_stor(i), Imperv_stor_max(i), Snowmelt(i), &
-     &                         Snowinfil_max(i), Net_snow(i), Pkwater_equiv(i), Infil(i), Hru_type(i), &
-     &                         Intcp_changeover(i), perv_on, ag_on, Infil_ag(i), Net_apply(i), perv_area, Ag_area(i))
+     &                         Snowinfil_max(i), Net_snow(i), Pkwater_equiv(i), Infil(i), Hru_type(i), Intcp_changeover(i), &
+     &                         perv_on, ag_on, Infil_ag(i), Net_apply(i), perv_area, Ag_area(i))
           ELSE ! glacier
             temp = Snowmelt(i) + glcrmltb !Snowmelt or 0.0
             temp2 = availh2o*(1.0-Glacier_frac(i))
             CALL compute_infil(temp2, Net_ppt(i), Imperv_stor(i), Imperv_stor_max(i), temp, &
-     &                         Snowinfil_max(i), Net_snow(i), Pkwater_equiv(i), Infil(i), Hru_type(i), &
-     &                         Intcp_changeover(i), perv_on, ag_on, Infil_ag(i), Net_apply(i), perv_area, Ag_area(i))
+     &                         Snowinfil_max(i), Net_snow(i), Pkwater_equiv(i), Infil(i), Hru_type(i), Intcp_changeover(i), &
+     &                         perv_on, ag_on, Infil_ag(i), Net_apply(i), perv_area, Ag_area(i))
           ENDIF
         ENDIF
 
@@ -1340,10 +1340,6 @@
       ENDIF
       IF ( getparam_real(MODNAME, 'sro_to_dprst_imperv', Nhru, Sro_to_dprst_imperv)/=0 ) &
      &     CALL read_error(2, 'sro_to_dprst_imperv')
-      IF ( AG_flag==ACTIVE ) THEN
-        IF ( getparam_real(MODNAME, 'sro_to_dprst_ag', Nhru, Sro_to_dprst_ag)/=0 ) &
-     &       CALL read_error(2, 'sro_to_dprst_ag')
-      ENDIF
       IF ( getparam_real(MODNAME, 'dprst_depth_avg', Nhru, Dprst_depth_avg)/=0 ) CALL read_error(2, 'dprst_depth_avg')
       IF ( getparam_real(MODNAME, 'dprst_et_coef', Nhru, Dprst_et_coef)/=0 ) CALL read_error(2, 'dprst_et_coef')
       IF ( Dprst_clos_flag==ACTIVE ) THEN
@@ -1353,6 +1349,10 @@
       ELSE
         Dprst_seep_rate_clos = 0.0
         Va_clos_exp = 0.0
+      ENDIF
+      IF ( AG_flag==ACTIVE ) THEN
+        IF ( getparam_real(MODNAME, 'sro_to_dprst_ag', Nhru, Sro_to_dprst_ag)/=0 ) &
+     &       CALL read_error(2, 'sro_to_dprst_ag')
       ENDIF
       Dprst_in = 0.0D0
       Dprst_area_open = 0.0

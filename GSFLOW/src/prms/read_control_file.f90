@@ -132,9 +132,9 @@
      &    wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
      &    potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, Dynamic_param_log_file, &
      &    soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, &
-     &    fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, snareathresh_dynamic, &
+     &    fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, &
      &    covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn, &
-     &    ag_soilmoist_dynamic, ag_soilrechr_dynamic
+     &    ag_soilmoist_dynamic, ag_soilrechr_dynamic !, snareathresh_dynamic
       USE PRMS_CONTROL_FILE
       IMPLICIT NONE
       ! Local Variables

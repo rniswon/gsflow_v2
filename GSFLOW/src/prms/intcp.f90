@@ -8,7 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-09-14'
+      character(len=*), parameter :: Version_intcp = '2021-09-30'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -465,14 +465,13 @@
           ENDIF
         ENDIF
 
-! NEXT intercept application of irrigation water, but only if
-!  irrigation method (irr_type=hrumeth) is =0 for sprinkler method
-!  canopy application of irrigation water based on irr_type
+! canopy application of irrigation water based on irr_type
 ! irr_type = 0 (interception, sprinkler), 1 (no interception, furrow),
 !            2=ignore, 3 (interception and throughfall over whole HRU),
 !            4 (amount of water based on cover density, living filter)
+! irr_type = 0 or 3 are the same in terms of application rate
+! gain_inches_hru is water applied to whole HRU, gain_inches is water added to canopy
 
-!  canopy_gain is water applied to whole HRU, gain_inches is water added to canopy
         IF ( Use_transfer_intcp==ACTIVE .OR. Ag_package==ACTIVE ) THEN ! Ag_package active for GSFLOW_AG or PRMS_AG
           IF ( Ag_package==ACTIVE ) THEN
             IF ( Hru_ag_irr(i)>0.0 .AND. .NOT.(Ag_frac(i)>0.0) ) THEN
@@ -480,38 +479,37 @@
               CALL error_stop('AG Package irrigation specified and ag_frac=0', ERROR_param)
             ENDIF
           ENDIF
-
-          ag_water_maxin = 0.0
+          IF ( Hru_type(i)==LAKE ) CALL error_stop('irrigation specified and hru_type is lake', ERROR_param)
+          ag_water_maxin = 0.0  ! inches
           IF ( Ag_package==ACTIVE ) ag_water_maxin = Hru_ag_irr(i) ! Hru_ag_irr must be in inches
-          IF ( Use_transfer_intcp==ACTIVE ) ag_water_maxin = ag_water_maxin + Canopy_gain(i)
+          IF ( Use_transfer_intcp==ACTIVE ) ag_water_maxin = ag_water_maxin + Canopy_gain(i)/SNGL(Cfs_conv)/harea ! Canopy_gain in CFS, convert to inches
 
           IF ( ag_water_maxin>0.0 ) THEN
-            IF ( Hru_type(i)==LAKE ) CALL error_stop('irrigation specified and hru_type is lake', ERROR_param)
+            Gain_inches_hru(i) = ag_water_maxin
+            Gain_inches(i) = ag_water_maxin
+            IF ( cov>0.0 ) Gain_inches(i) = ag_water_maxin/cov
             irrigation_type = Irr_type(i)
-            IF ( Cov_type(i)==BARESOIL ) THEN
+            IF ( Cov_type(i)==BARESOIL .AND. irrigation_type/=1 ) THEN
               PRINT *, 'WARNING, cov_type = bare soil and irr_type not equal 1, set to 1'
               irrigation_type = 1
             ENDIF
 
-            IF ( (irrigation_type==0 .OR. irrigation_type==4) .AND. cov>0.0 ) THEN
-              Gain_inches(i) = ag_water_maxin/SNGL(Cfs_conv)/cov/harea ! all water added to canopy
-              CALL intercept(Gain_inches(i), stor_max_rain, cov, intcpstor, Net_apply(i))
-            ELSEIF ( irrigation_type==3 ) THEN
-              Gain_inches(i) = ag_water_maxin/SNGL(Cfs_conv)/harea
+            IF ( (irrigation_type==0 .OR. irrigation_type==3) .AND. cov>0.0 ) THEN
+              CALL intercept(ag_water_maxin, stor_max_rain, cov, intcpstor, Net_apply(i))
+            ELSEIF ( irrigation_type==4 ) THEN
               CALL intercept(Gain_inches(i), stor_max_rain, 1.0, intcpstor, Net_apply(i))
             ELSEIF ( irrigation_type==2 ) THEN
               IF ( Use_transfer_intcp==ACTIVE ) PRINT *, 'WARNING, irrigation water > 0, but irr_type = 2 (ignore), HRU:', &
-     &                                                   i, ', application water:', ag_water_maxin
+     &                                                   i, ', application water:', Canopy_gain(i)
               IF ( Ag_package==ACTIVE ) CALL error_stop('irrigation specified and irr_type = 2 (ignore)', ERROR_param)
               Canopy_gain(i) = 0.0 ! remove ignored canopy gain from water budget
-            ELSEIF ( irrigation_type==1 .OR. .NOT.(cov>0.0) ) THEN ! irr_type = (0 or 4 and cov=0) bare ground
+            ELSEIF ( irrigation_type==1 .OR. .NOT.(cov>0.0) ) THEN ! irr_type = 1 or (0 or 3 and cov=0) bare ground
               Net_apply(i) = ag_water_maxin
             ELSE
               CALL error_stop('irrigation specified and irr_type and/or cover density invalid', ERROR_param)
             ENDIF
-            Gain_inches_hru(i) = Gain_inches(i)
-            IF ( cov>0.0 ) Gain_inches_hru(i) = Gain_inches_hru(i)/cov
-            Basin_hru_apply = Basin_hru_apply + DBLE( Gain_inches_hru(i)*harea )
+
+            Basin_hru_apply = Basin_hru_apply + DBLE( ag_water_maxin*harea )
             Basin_net_apply = Basin_net_apply + DBLE( Net_apply(i)*harea )
           ENDIF
         ENDIF

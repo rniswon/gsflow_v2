@@ -83,6 +83,7 @@ C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
       USE GWFLAKMODULE, ONLY: NLAKES
+      USE GWFUZFMODULE, ONLY: IGSFLOW
       IMPLICIT NONE
       INTEGER :: I
       INCLUDE 'openspec.inc'
@@ -372,6 +373,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       Iter_cnt = 0
       CALL SETMFTIME()
       IF ( GSFLOW_flag==ACTIVE ) THEN
+        IF(IUNIT(55).GT.0) IGSFLOW = 1
         CALL set_cell_values()
         IF ( Init_vars_from_file>OFF )
      &       CALL gsflow_modflow_restart(READ_INIT)
@@ -661,14 +663,14 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             ENDIF
             IF(IUNIT(66).GT.0 ) 
      1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
+            IF(IUNIT(22).GT.0) CALL GWF2LAK7FM(KKITER,KKPER,KKSTP,
+     1                                     IUNIT(44),IUNIT(55),IGRID)  !RGN 9/21/2021 to keep seepage from lake in UZF
             IF(IUNIT(55).GT.0) CALL GWF2UZF1FM(KKPER,KKSTP,KKITER,
      1                           IUNIT(44),IUNIT(22),IUNIT(63),
      2                           IUNIT(64),IGRID)  !SWR - JDH ADDED IUNIT(64)
             IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,
      1                              IUNIT(22),IUNIT(63),IUNIT(8), 
      2                              IUNIT(55),IGRID)   !cjm (added IUNIT(8))
-            IF(IUNIT(22).GT.0) CALL GWF2LAK7FM(KKITER,KKPER,KKSTP,
-     1                                     IUNIT(44),IUNIT(55),IGRID)
             IF(IUNIT(50).GT.0) THEN
               IF (IUNIT(1).GT.0) THEN
                 CALL GWF2MNW27BCF(KPER,IGRID)
@@ -1375,25 +1377,27 @@ C
       USE PRMS_CONSTANTS, ONLY: MODFLOW
       USE GLOBAL, ONLY: NPER
       USE GSFMODFLOW, ONLY: Stress_dates, KPER
-      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday, Model,
-     &    mf_nowtime
+      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day,
+     1    Nowyear, Nowmonth, Nowday, Model, mf_nowtime
       IMPLICIT NONE
       INTRINSIC DBLE
-!      DOUBLE PRECISION, EXTERNAL :: nowjt ! an MMF routine
       INTEGER, EXTERNAL :: compute_julday
 ! Local Variables
       INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
-      IF ( Model/=MODFLOW ) THEN
-        now = compute_julday(Nowyear, Nowmonth, Nowday)
+      IF ( Model==MODFLOW ) THEN
+        now = mf_nowtime
       ELSE
-!        now = nowjt()
-         now = mf_nowtime ! ?? need to set to julian day of year
+        now = compute_julday(Nowyear, Nowmonth, Nowday)
       ENDIF
       KPERTEST = 1
       IF ( KPER > KPERTEST ) KPERTEST = KPER
 !
+!     If called from init, then "now" isn't set yet.
+!     Set "now" to model start date.
+      IF ( now<2 )
+     &     now = compute_julday(Start_year, Start_month, Start_day)
       IF ( now<Stress_dates(KPERTEST) )
      &     STOP 'ERROR, now<stress period time'
       IF ( now>Stress_dates(NPER) ) THEN
@@ -1425,10 +1429,10 @@ C
       ! Functions
       EXTERNAL :: READ_STRESS, RESTART1READ, error_stop
       INTEGER, EXTERNAL :: gsfrun, compute_julday
-      INTRINSIC :: INT, FLOAT
+      INTRINSIC :: INT, DBLE
 ! Local Variables
       INTEGER :: i, n, nstress, start_jul, mfstrt_jul
-      REAL :: plen, time, kstpskip
+      DOUBLE PRECISION :: kstpskip, plen, time
 !***********************************************************************
       IF ( Print_debug>DEBUG_less )
      &     PRINT ( '(/, A, I5,2("/",I2.2))' ), 'modflow_time_zero:',
@@ -1494,17 +1498,17 @@ C
 
       Modflow_skip_stress = 0
       Modflow_skip_time_step = 0
-      Modflow_skip_time = FLOAT( start_jul - mfstrt_jul )
+      Modflow_skip_time = DBLE( start_jul - mfstrt_jul )
       Modflow_time_in_stress = Modflow_skip_time
-      IF ( Modflow_skip_time>0.0 ) THEN
-        kstpskip = 0.0
-        time = 0.0
+      IF ( Modflow_skip_time>0.0D0 ) THEN
+        kstpskip = 0.0D0
+        time = 0.0D0
         DO i = 1, NPER
-          IF ( ISSFLG(i)/=1 ) time = time + PERLEN(i)*Mft_to_days
+          IF ( ISSFLG(i)/=1 ) time = time + DBLE(PERLEN(i)*Mft_to_days)
           IF ( time<=Modflow_skip_time ) THEN     !RGN
 !          IF ( time<Modflow_skip_time ) THEN   !RGN
             Modflow_skip_stress = i
-            kstpskip = kstpskip + PERLEN(i)*Mft_to_days
+            kstpskip = kstpskip + DBLE( PERLEN(i)*Mft_to_days )
             Modflow_skip_time_step = Modflow_skip_time_step + NSTP(i)
           ELSE
             EXIT
@@ -1512,13 +1516,13 @@ C
         ENDDO
 !        Modflow_time_in_stress = Modflow_time_in_stress - time   !RGN
         Modflow_time_in_stress = Modflow_skip_time - kstpskip
-        IF ( Modflow_time_in_stress<0.0 ) Modflow_time_in_stress=0.0
+        IF ( Modflow_time_in_stress<0.0D0 ) Modflow_time_in_stress=0.0D0
         ! skip stress periods from modflow_time_zero to start_time
         IF ( Modflow_skip_stress - ISSFLG(1) == 0 ) THEN
           KPER = 1
           IF ( ISSFLG(1)==0 ) CALL READ_STRESS()
         ELSE
-          nstress = INT(Modflow_skip_stress) - ISSFLG(1)
+          nstress = INT( Modflow_skip_stress ) - ISSFLG(1)
           DO i = 1, nstress   !RGN because SP1 already read if SS during first period.
             KPER = KPER + 1 ! set to next stress period
             IF ( ISSFLG(i) == 0 ) CALL READ_STRESS()
@@ -1530,7 +1534,7 @@ C
           ENDDO
         ENDIF
         KPERSTART = KPER
-        TOTIM = TOTIM + INT(Modflow_skip_time/Mft_to_days) ! TOTIM includes SS time as set above, rsr
+        TOTIM = TOTIM + INT( Modflow_skip_time/Mft_to_days ) ! TOTIM includes SS time as set above, rsr
       ELSEIF ( Init_vars_from_file==0 .AND. ISSFLG(1)/=1) THEN
         !start with TR and no restart and no skip time
         KPER = KPER + 1 ! set to next stress period
@@ -1795,7 +1799,8 @@ C
       USE GSFMODFLOW, ONLY: Mft_to_sec, Cellarea, MFQ_to_inch_acres,
      &    Mfl2_to_acre, Mfl3_to_ft3, Mfl_to_inch, Sfr_conv,
      &    Acre_inches_to_mfl3, Inch_to_mfl_t, Mfl3t_to_cfs,
-     &    Mfvol2inch_conv, Gvr2cell_conv, Mfq2inch_conv
+     &    Mfvol2inch_conv, Gvr2cell_conv, Mfq2inch_conv,
+     &    Acre_inches_to_mfl3_sngl
       IMPLICIT NONE
       EXTERNAL :: error_stop
 ! Local Variables
@@ -1838,6 +1843,7 @@ C
       Mfl3t_to_cfs = Mfl3_to_ft3/Mft_to_sec
 ! inch over basin (acres) conversion to modflow length cubed
       Acre_inches_to_mfl3 = FT2_PER_ACRE/(Mfl3_to_ft3*12.0D0)
+      Acre_inches_to_mfl3_sngl = SNGL( Acre_inches_to_mfl3 )
 
       IF ( GSFLOW_flag==OFF ) RETURN
 

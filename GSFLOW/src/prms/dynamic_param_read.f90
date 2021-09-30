@@ -456,8 +456,8 @@
      &    Cov_type, Basin_area_inv, Covden_win, Covden_sum, Ag_area, Ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Transp_on, Epan_coef
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Soil_moist, Soil_rechr, Imperv_stor, Sat_threshold, &
-     &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor !, &
-!     &    Basin_ag_soil_moist, Ag_soil_moist, Ag_soil_rechr
+     &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor, &
+     &    Basin_ag_soil_moist, Ag_soil_moist, Ag_soil_rechr
       USE PRMS_POTET_JH, ONLY: Jh_coef, Jh_coef_hru
       USE PRMS_POTET_PM, ONLY: Pm_n_coef, Pm_d_coef
       USE PRMS_POTET_PT, ONLY: Pt_alpha
@@ -547,7 +547,7 @@
      &       Check_ag_frac==ACTIVE ) THEN
           Basin_soil_moist = 0.0D0
           Basin_soil_rechr = 0.0D0
-!          IF ( Check_ag_frac==ACTIVE ) Basin_ag_soil_moist = 0.0D0
+          IF ( Check_ag_frac==ACTIVE ) Basin_ag_soil_moist = 0.0D0
           DO i = 1, Nhru
             IF ( Hru_type(i)==LAKE .OR. Hru_type(i)==INACTIVE ) CYCLE ! skip lake and inactive HRUs
             harea = Hru_area(i)
@@ -579,25 +579,25 @@
             IF ( Check_ag_frac==ACTIVE ) THEN
               ! Temp4 has new values with negative values set to the old value, Ag_frac has old values
               frac_ag = Temp4(i)
-!              IF ( Ag_soil_moist(i)>0.0 ) THEN
-!                IF ( frac_ag>0.0 ) THEN
-!                  Ag_soil_moist(i) = Ag_soil_moist(i)*Ag_frac(i)/frac_ag
-!                ELSE
-!                  frac = Hru_frac_perv(i)
-!                  IF ( frac>0.0 ) THEN
-!                    tmp = Ag_soil_moist(i)*Ag_frac(i)/frac ! not sure this is correct???
-!                    PRINT *, 'WARNING, dynamic agriculture storage changed to 0 when storage > 0'
-!                    PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
-!                    PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
-!                  ENDIF
-!                  soil_adj = soil_adj + tmp
-!                  Ag_soil_moist(i) = 0.0
-!                  Ag_soil_rechr(i) = 0.0
-!                ENDIF
-!              ENDIF
+              IF ( Ag_soil_moist(i)>0.0 ) THEN
+                IF ( frac_ag>0.0 ) THEN
+                  Ag_soil_moist(i) = Ag_soil_moist(i)*Ag_frac(i)/frac_ag
+                ELSE
+                  frac = Hru_frac_perv(i)
+                  IF ( frac>0.0 ) THEN
+                    tmp = Ag_soil_moist(i)*Ag_frac(i)/frac ! not sure this is correct???
+                    PRINT *, 'WARNING, dynamic agriculture storage changed to 0 when storage > 0'
+                    PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
+                    PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
+                  ENDIF
+                  soil_adj = soil_adj + tmp
+                  Ag_soil_moist(i) = 0.0
+                  Ag_soil_rechr(i) = 0.0
+                ENDIF
+              ENDIF
               Ag_frac(i) = frac_ag
               Ag_area(i) = Ag_frac(i) * Hru_area(i)
-!              Basin_ag_soil_moist = Basin_ag_soil_moist + Ag_soil_moist(i)*Ag_area(i)
+              Basin_ag_soil_moist = Basin_ag_soil_moist + Ag_soil_moist(i)*Ag_area(i)
             ENDIF
 
             IF ( Check_dprst_frac==ACTIVE .OR. check_dprst_depth_flag==ACTIVE ) THEN
@@ -657,7 +657,7 @@
               ENDIF
             ENDIF
 
-            ! check sum of imperv ag, and dprst if either are updated!!!!!!
+            ! check sum of imperv, ag, and dprst if either are updated!!!!!!
             hruperv = harea - Hru_imperv(i)
             IF ( AG_flag==ACTIVE ) hruperv = hruperv - Ag_area(i)
             IF ( hruperv<0.0 ) THEN
@@ -699,7 +699,7 @@
           ENDDO
           Basin_soil_moist = Basin_soil_moist*Basin_area_inv
           Basin_soil_rechr = Basin_soil_rechr*Basin_area_inv
-!          IF ( Check_ag_frac==ACTIVE ) Basin_ag_soil_moist = Basin_ag_soil_moist*Basin_area_inv
+          IF ( Check_ag_frac==ACTIVE ) Basin_ag_soil_moist = Basin_ag_soil_moist*Basin_area_inv
         ENDIF
       ENDIF
 

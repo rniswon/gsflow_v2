@@ -6,7 +6,7 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-09-08'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-09-28'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -395,10 +395,10 @@
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE
       USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Dprst_flag, Ag_package
       USE GSFPRMS2MF
-      USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3, Gwc_row, Gwc_col, Mft_to_days
+      USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3_sngl, Gwc_row, Gwc_col, Mft_to_days
       USE GLOBAL, ONLY: IBOUND
       USE GWFAGMODULE, ONLY: NUMIRRPOND
-      USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, IGSFLOW, FINF, IUZFOPT
+      USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, FINF, IUZFOPT !, IGSFLOW
       USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK !, NLAKES
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_hru_id !, Lake_area
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
@@ -439,14 +439,14 @@
           IF ( Hru_type(j)==2 ) THEN
             ilake = Lake_hru_id(j)
             RNF(ilake) = RNF(ilake) + SNGL( (Lakein_sz(j)+Hortonian_lakes(j)) &
-     &                   *DBLE(Hru_area(j))*Acre_inches_to_mfl3*Mft_to_days )   !RGN 7/15/2015 added *Mft_to_days
-            PRCPLK(ilake) = PRCPLK(ilake) + Hru_ppt(j)*Acre_inches_to_mfl3*Mft_to_days*Hru_area(j) !VOLUMES OF PRECIP
-            EVAPLK(ilake) = EVAPLK(ilake) + Hru_actet(j)*Acre_inches_to_mfl3*Mft_to_days*Hru_area(j) !VOLUMES OF EVAP
+     &                   *Hru_area(j)*Acre_inches_to_mfl3_sngl*Mft_to_days )   !RGN 7/15/2015 added *Mft_to_days
+            PRCPLK(ilake) = PRCPLK(ilake) + Hru_ppt(j)*Acre_inches_to_mfl3_sngl*Mft_to_days*Hru_area(j) !VOLUMES OF PRECIP
+            EVAPLK(ilake) = EVAPLK(ilake) + Hru_actet(j)*Acre_inches_to_mfl3_sngl*Mft_to_days*Hru_area(j) !VOLUMES OF EVAP
           ENDIF
         ENDDO
         !DO ilake = 1, NLAKES
-        !  PRCPLK(ilake) = PRCPLK(ilake)   !RGN 6/3/2021 send as volumes to lake
-        !  EVAPLK(ilake) = EVAPLK(ilake)
+        !  PRCPLK(ilake) = PRCPLK(ilake)/Lake_area(ilake)
+        !  EVAPLK(ilake) = EVAPLK(ilake)/Lake_area(ilake)
         !ENDDO
       ENDIF
 
@@ -508,7 +508,7 @@
 ! Bin precolation in cell_drain_rate
 !-----------------------------------------------------------------------
 ! Set flag for UZF when PRMS sets FINF
-      IGSFLOW = 1
+!      IGSFLOW = 1 this needs to be done in init
       Net_sz2gw = 0.0D0
       Excess = 0.0
       FINF = 0.0

@@ -65,7 +65,6 @@ C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL, ONLY: NCOL,NROW,NLAY,DELR,DELC,
      1                  NPER,NSTP,PERLEN,TSMULT,ISSFLG,IOUT,ITRSS
-!      USE GSFMODFLOW, ONLY : Modflow_skip_time_step
       USE OBSBASMODULE
 C
       CHARACTER*200 LINE
