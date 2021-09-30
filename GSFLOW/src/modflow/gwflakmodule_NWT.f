@@ -55,7 +55,7 @@ crgn        REAL,   SAVE, DIMENSION(:),  POINTER ::EVAP,PRECIP,SEEP,SEEP3
         REAL,   SAVE, DIMENSION(:,:),POINTER ::CAUG,CPPT,CLAKINIT
         REAL,   SAVE, DIMENSION(:,:,:),POINTER ::BDLKN1
 Cdep  Added arrays for tracking lake budgets for dry lakes
-        REAL,   SAVE, DIMENSION(:),  POINTER ::EVAPO,FLWIN
+        REAL,   SAVE, DIMENSION(:),  POINTER ::FLWIN
         REAL,   SAVE, DIMENSION(:),  POINTER ::GWRATELIM
 Cdep    Allocate arrays to add runoff from UZF Package
         REAL,   SAVE, DIMENSION(:),  POINTER ::OVRLNDRNF,CUMLNDRNF
@@ -129,7 +129,7 @@ Crgn        REAL,         DIMENSION(:),  POINTER ::EVAP,PRECIP,SEEP,SEEP3
         REAL,         DIMENSION(:,:),POINTER ::CAUG,CPPT,CLAKINIT
         REAL,         DIMENSION(:,:,:),POINTER ::BDLKN1
 Cdep  Added arrays for tracking lake budgets for dry lakes
-        REAL,         DIMENSION(:),  POINTER ::EVAPO,FLWIN
+        REAL,         DIMENSION(:),  POINTER ::FLWIN
         REAL,         DIMENSION(:),  POINTER ::GWRATELIM
 Cdep    Allocate arrays to add runoff from UZF Package
         REAL,         DIMENSION(:),  POINTER ::OVRLNDRNF,CUMLNDRNF

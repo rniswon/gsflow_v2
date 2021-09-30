@@ -307,9 +307,8 @@ Cdep     1'CONVERGENCE CRITERION = ',1PE9.2)
         ALLOCATE (SUMCNN(NLAKES), SUMCHN(NLAKES))
         ALLOCATE (NCNCVR(NLAKES), LIMERR(NLAKES), DSRFOT(NLAKES))
 Cdep  Allocate arrays that track lake budgets for dry lakes
-        ALLOCATE (EVAPO(NLAKES),WITHDRW(NLAKES),FLWIN(NLAKES))
+        ALLOCATE (WITHDRW(NLAKES),FLWIN(NLAKES))
         ALLOCATE (GWRATELIM(NLAKES))
-        EVAPO = 0.0
         WITHDRW = 0.0D0
         FLWIN = 0.0
         FLWITER = 0.0D0
@@ -1395,7 +1394,6 @@ C4C-----INITIALIZE VARIABLES.
           SEEP3(LL)=0.0D0
           SEEPUZ(LL)=0.0D0
           SURFA(LL)=0.0
-          EVAPO(LL) = EVAPLK(LL)
           WITHDRW(LL) = WTHDRW(LL)
           FLWITER(LL) = FLWIN(LL) 
           FLWITER3(LL) = FLWIN(LL)
@@ -1687,7 +1685,7 @@ C16E----LINEAR CASE. SIMPLY CALCULATE STAGE BASED ON VOLUME.
                   DSTG = ABS(STGNEW(LAKE) - STGITER(LAKE))
                   NCNCVR(LAKE) = 1
                 END IF
- !     IF (lake==1)then
+ !     IF (lake==1 .and. kkper==1)then
  !     write(521,222)PRECIP(LAKE),EVAP(LAKE),RUNF(LAKE),RUNOFF(LAKE),
  !    1                WITHDRW(LAKE),SURFIN(LAKE),SURFOT(LAKE),
  !    2                SEEP(LAKE),VOLNEW1,VOLOLDD(LAKE),STGITER(LAKE),
@@ -4197,6 +4195,7 @@ C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
       INTEGER LAKE
+!gsf      DOUBLE PRECISION :: dmy(1)
 C     -------------------------------------------------------------------
 C
 C0----FILL A NEW VARIABLE CALLED MXLKVOLF CONTAINING THE MODSIM MAX LAKE STORAGE
@@ -4206,7 +4205,8 @@ C0----FILL A NEW VARIABLE CALLED MXLKVOLF CONTAINING THE MODSIM MAX LAKE STORAGE
 C
 C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
 C
-!gsf      CALL LAK2MODSIM(DELTAVOL,LAKEVOL, 0, -1) !,KITER,KSTP,KPER)
+!gsf      dmy(1) = 0.0D0
+!gsf      CALL LAK2MODSIM(DELTAVOL,LAKEVOL, dmy(1), -1) ! rsr, the 0 needs to be an array, values
 C
 C2------STUFF DELTAVOL WITH DEADPOOL INFORMATION CALCULATED BY MODFLOW
       DO LAKE=1, NLAKES
@@ -4309,7 +4309,6 @@ Cdep  deallocate SURFDEPTH 3/3/2009
       DEALLOCATE (GWFLAKDAT(IGRID)%CLAKINIT)
       DEALLOCATE (GWFLAKDAT(IGRID)%BDLKN1)
 Cdep  Added arrays that track lake budgets for dry lakes
-      DEALLOCATE (GWFLAKDAT(Igrid)%EVAPO)
       DEALLOCATE (GWFLAKDAT(Igrid)%WITHDRW)
       DEALLOCATE (GWFLAKDAT(Igrid)%FLWIN)
       DEALLOCATE (GWFLAKDAT(Igrid)%FLWITER)
@@ -4451,7 +4450,6 @@ Cdep  added SURFDEPTH 3/3/2009
       CLAKINIT=>GWFLAKDAT(IGRID)%CLAKINIT
       BDLKN1=>GWFLAKDAT(IGRID)%BDLKN1
 Cdep  Added arrays that track lake budgets for dry lakes
-      EVAPO=>GWFLAKDAT(Igrid)%EVAPO
       WITHDRW=>GWFLAKDAT(Igrid)%WITHDRW
       FLWIN=>GWFLAKDAT(Igrid)%FLWIN
       FLWITER=>GWFLAKDAT(Igrid)%FLWITER
@@ -4599,7 +4597,6 @@ Cdep  Added SURFDEPTH 3/3/2009
       GWFLAKDAT(IGRID)%CLAKINIT=>CLAKINIT
       GWFLAKDAT(IGRID)%BDLKN1=>BDLKN1
 Cdep  Added arrays that track lake budgets for dry lakes
-      GWFLAKDAT(Igrid)%EVAPO=>EVAPO
       GWFLAKDAT(Igrid)%WITHDRW=>WITHDRW
       GWFLAKDAT(Igrid)%FLWIN=>FLWIN
       GWFLAKDAT(Igrid)%FLWITER=>FLWITER

@@ -1510,7 +1510,7 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SGOTFLW, SEG
+      USE GWFSFRMODULE, ONLY: SEG !, SGOTFLW
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GLOBAL, ONLY: IUNIT
       USE GWFBASMODULE, ONLY: TOTIM
@@ -3166,7 +3166,7 @@
      +                    aetold, supold, sup
       integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
-      double precision :: set_factor, etdif
+      double precision :: set_factor !, etdif
       INTRINSIC :: ABS
 ! --------------------------------------------------
 !
@@ -3262,7 +3262,7 @@
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet
       double precision :: pettotal,aettotal, prms_inch2mf_q,
-     +                    aetold, supold, sup, etdif
+     +                    aetold, supold, sup !, etdif
       real :: demand_inch_acres
       integer :: k, ipond, hru_id, i
       external :: set_factor
@@ -3447,7 +3447,7 @@
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: HRU_PERV !(delete this)
       !USE PRMS_BASIN, ONLY: Ag_area !(uncomment this)
-      !USE PRMS_SOILZONE, ONLY: ag_actet !(uncomment this)
+      !USE PRMS_SOILZONE_AG, ONLY: ag_actet !(uncomment this)
       USE PRMS_SOILZONE, ONLY: PERV_ACTET !(delete this)
       USE PRMS_CLIMATEVARS, ONLY: POTET
       USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id
@@ -3750,7 +3750,7 @@
                 Q = PONDSEGFLOW(I)
                 QQ = PONDFLOW(I)
                 QQQ = 0.0
-!                if ( Agriculture_dprst_flag == 1 )   !uncommment this and next 2 lines
+!                if ( Agriculture_dprst_flag == 1 )   !uncommment this and next line
 !     +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
                 CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
      +                          Q, QQ, QQQ)
