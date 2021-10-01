@@ -426,7 +426,6 @@ C7------SIMULATE EACH STRESS PERIOD.
       Iterations = 0
       Mfiter_cnt = 0
       Iter_cnt = 0
-      CALL SETMFTIME()
       IF ( GSFLOW_flag==ACTIVE ) THEN
         IF(IUNIT(55).GT.0) IGSFLOW = 1
         CALL set_cell_values()
@@ -453,6 +452,8 @@ C
       KSTP = 0
       KPER = 1
       KPERSTART = 1
+      CALL GWF2BAS7ST(KKPER,IGRID)
+      CALL SETMFTIME()
       ! run SS if needed, read to current stress period, read restart if needed
       CALL SET_STRESS_DATES()
       Delt_save = DELT
@@ -1362,7 +1363,6 @@ C7------SIMULATE EACH STRESS PERIOD.
         IF ( KSTP == 0 ) KKSTP = 1
         KKPER = KPER
         IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(1,IGRID)
-        CALL GWF2BAS7ST(KKPER,IGRID)
         IF(IUNIT(19).GT.0) CALL GWF2IBS7ST(KKPER,IGRID)
         IF(IUNIT(54).GT.0) CALL GWF2SUB7ST(KKPER,IGRID)
         IF(IUNIT(57).GT.0) CALL GWF2SWT7ST(KKPER,IGRID)
@@ -1478,7 +1478,7 @@ C
       USE OBSBASMODULE, ONLY: OBSTART,ITS
       IMPLICIT NONE
       ! Functions
-      EXTERNAL :: READ_STRESS, RESTART1READ, error_stop
+      EXTERNAL :: READ_STRESS, RESTART1READ, error_stop, GWF2BAS7OC
       INTEGER, EXTERNAL :: gsfrun, compute_julday
       INTRINSIC :: INT, DBLE
 ! Local Variables
