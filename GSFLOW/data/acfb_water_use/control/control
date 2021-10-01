@@ -1,4 +1,4 @@
-GSFLOW version 2.2.0
+PRMS_IV
 ####
 print_debug
 1
@@ -88,12 +88,12 @@ climate_hru
 executable_desc
 1
 4
-GSFLOW 2.2.0
+PRMS 5.1.0
 ####
 executable_model
 1
 4
-../../bin/gsflow
+../../bin/prms
 ####
 initial_deltat
 1
@@ -192,6 +192,11 @@ statsON_OFF
 1
 1
 1
+####
+stats_output_file
+1
+4
+./output/stats.out
 ####
 strmflow_module
 1
@@ -296,7 +301,7 @@ external_transferON_OFF
 external_transfer_file
 1
 4
-./input/sw_returns.wu
+./Input/sw_returns.wu
 ####
 segment_transferON_OFF
 1
@@ -306,4 +311,4 @@ segment_transferON_OFF
 segment_transfer_file
 1
 4
-./input/sw_withdrawals.wu
+./Input/sw_withdrawals.wu

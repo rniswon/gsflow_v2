@@ -1,37 +1,37 @@
 # MF2K NAME file
 #
-# modflow NWT
+# MODFLOW NWT
 #
 #	Main Output File
-LIST               702  ..\output\modflow\tahoe_6.lst
+LIST               702  ..\output\MODFLOW\tahoe_6.lst
 # Global Input Files
-DIS                719  ..\input\modflow\tahoe.dis
+DIS                719  ..\input\MODFLOW\tahoe.dis
 #
 # Input Files
-BAS6               703  ..\input\modflow\tahoe.ba6
-UPW                704  ..\input\modflow\tahoe.upw
-OC                 715  ..\input\modflow\tahoe.oc
-SFR                724  ..\input\modflow\tahoe.sfr2
-LAK                722  ..\input\modflow\tahoe.lak
-GAGE               723  ..\input\modflow\tahoe.gag
-NWT                714  ..\input\modflow\tahoe.nwt 
-UZF                 27  ..\input\modflow\tahoe.uzf
+BAS6               703  ..\input\MODFLOW\tahoe.ba6
+UPW                704  ..\input\MODFLOW\tahoe.upw
+OC                 715  ..\input\MODFLOW\tahoe.oc
+SFR                724  ..\input\MODFLOW\tahoe.sfr2
+LAK                722  ..\input\MODFLOW\tahoe.lak
+GAGE               723  ..\input\MODFLOW\tahoe.gag
+NWT                714  ..\input\MODFLOW\tahoe.nwt 
+UZF                 27  ..\input\MODFLOW\tahoe.uzf
 # Restart Files
-IWRT  91  ..\output\modflow\restartdata6.out
-IRED  92  ..\output\modflow\restartdata5.out
+IWRT  91  ..\output\MODFLOW\restartdata6.out
+IRED  92  ..\output\MODFLOW\restartdata5.out
 # Lake bathymetry Files
-DATA               20   ..\input\modflow\Tahoe_bath.txt
-DATA               21   ..\input\modflow\Marlette_bath.txt
-DATA               22   ..\input\modflow\FallenLeaf_bath.txt
-DATA               23   ..\input\modflow\Gilmore_bath.txt
-DATA               24   ..\input\modflow\Cascade_bath.txt
-DATA               25   ..\input\modflow\Echo_bath.txt
-DATA               26   ..\input\modflow\Spooner_bath.txt   
-DATA               28   ..\input\modflow\Tahoe_outflow.txt
-DATA(BINARY)       94   ..\input\modflow\tahoe_ss.hed
+DATA               20   ..\input\MODFLOW\Tahoe_bath.txt
+DATA               21   ..\input\MODFLOW\Marlette_bath.txt
+DATA               22   ..\input\MODFLOW\FallenLeaf_bath.txt
+DATA               23   ..\input\MODFLOW\Gilmore_bath.txt
+DATA               24   ..\input\MODFLOW\Cascade_bath.txt
+DATA               25   ..\input\MODFLOW\Echo_bath.txt
+DATA               26   ..\input\MODFLOW\Spooner_bath.txt   
+DATA               28   ..\input\MODFLOW\Tahoe_outflow.txt
+DATA(BINARY)       94   ..\input\MODFLOW\tahoe_ss.hed
 # Output Files
-DATA               730  ..\output\modflow\tahoe.hed
-DATA(BINARY)       740  ..\output\modflow\tahoe.ccf
-DATA               125  ..\output\modflow\UZF_tot.out
-DATA            801  ..\output\modflow\gages\tahoe_lake_1.gag
-DATA            901  ..\output\modflow\gages\tahoe_stream_1.gag
+DATA               730  ..\output\MODFLOW\tahoe.hed
+DATA(BINARY)       740  ..\output\MODFLOW\tahoe.ccf
+DATA               125  ..\output\MODFLOW\UZF_tot.out
+DATA            801  ..\output\MODFLOW\gages\tahoe_lake_1.gag
+DATA            901  ..\output\MODFLOW\gages\tahoe_stream_1.gag
