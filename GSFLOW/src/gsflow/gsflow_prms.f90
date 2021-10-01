@@ -722,7 +722,7 @@
         ELSE
           Process_flag = RUN
           DO WHILE ( Kper_mfo<=Nper )
-            IF ( mf_nowtime>endday ) EXIT
+!            IF ( mf_nowtime>endday ) EXIT
             test = gsflow_modflow()
             IF ( test/=0 ) CALL module_error('gsflow_modflow', 'run', test)
             IF ( mf_timestep==NSTP(Kper_mfo) ) THEN
