@@ -4,11 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "gsflow_develop", "gsflow_develop.vfproj", "{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}"
-	ProjectSection(ProjectDependencies) = postProject
-		{9E8144B7-970A-436B-8BEC-AD857C3D7D89} = {9E8144B7-970A-436B-8BEC-AD857C3D7D89}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mmf", "..\mmf\mmf.vcxproj", "{9E8144B7-970A-436B-8BEC-AD857C3D7D89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,14 +21,6 @@ Global
 		{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}.Release|Win32.Build.0 = Release|Win32
 		{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}.Release|x64.ActiveCfg = Release|x64
 		{9F382363-E0E2-4A78-B83A-4DF10DCCC9CA}.Release|x64.Build.0 = Release|x64
-		{9E8144B7-970A-436B-8BEC-AD857C3D7D89}.Debug|Win32.ActiveCfg = Debug|Win32
-		{9E8144B7-970A-436B-8BEC-AD857C3D7D89}.Debug|Win32.Build.0 = Debug|Win32
-		{9E8144B7-970A-436B-8BEC-AD857C3D7D89}.Debug|x64.ActiveCfg = Debug|x64
-		{9E8144B7-970A-436B-8BEC-AD857C3D7D89}.Debug|x64.Build.0 = Debug|x64
-		{9E8144B7-970A-436B-8BEC-AD857C3D7D89}.Release|Win32.ActiveCfg = Release|Win32
-		{9E8144B7-970A-436B-8BEC-AD857C3D7D89}.Release|Win32.Build.0 = Release|Win32
-		{9E8144B7-970A-436B-8BEC-AD857C3D7D89}.Release|x64.ActiveCfg = Release|x64
-		{9E8144B7-970A-436B-8BEC-AD857C3D7D89}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
