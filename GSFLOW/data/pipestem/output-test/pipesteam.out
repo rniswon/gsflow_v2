@@ -1,6 +1,24 @@
+====================================================================
+Using PRMS Parameter File: .\input\pipestem.params
+Description: written by gov.usgs.mows.paramDb.NhmPrmsParamFileWriter
+====================================================================
+Comment lines:
+1.7
+====================================================================
+Using dimensions    number
+nsegment               7
+nobs                   1
+ndeplval             154
+ndepl                 14
+one                    1
+nssr                  14
+nmonths               12
+nhru                  14
+ngw                   14
+====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.0 01/20/2021
+                       Version 5.3.0 09/30/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -20,14 +38,14 @@ Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Interception: intcp
 Snow & Glacr Dynam: snowcomp, glacr_melt
     Surface Runoff: srunoff_smidx, srunoff_carea
-         Soil Zone: soilzone
+         Soil Zone: soilzone, soilzone_ag
        Groundwater: gwflow
 Streamflow Routing: strmflow, strmflow_in_out, muskingum,
                     muskingum_lake, muskingum_mann
 Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
-                    basin_summary, nsegment_summary
+                    basin_summary, nsegment_summary, statvar_out
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
@@ -36,25 +54,49 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-01-20
-Basin Definition                basin               2020-12-02
-Common States and Fluxes        climateflow         2021-01-11
-Potential Solar Radiation       soltab              2020-12-02
-Timestep Control                prms_time           2020-12-02
-Time Series Data                obs                 2020-12-02
-Temperature Distribution        climate_hru         2020-12-02
-Precipitation Distribution      climate_hru         2020-12-02
-Solar Radiation Distribution    ddsolrad            2020-12-02
-Transpiration Distribution      transp_tindex       2020-12-02
-Potential Evapotranspiration    potet_jh            2020-08-03
-Canopy Interception             intcp               2021-02-18
-Snow Dynamics                   snowcomp            2021-01-11
-Surface Runoff                  srunoff_smidx       2021-01-11
-Soilzone Computations           soilzone            2021-02-18
-Groundwater                     gwflow              2020-12-02
+PRMS Computation Order          gsflow_prms         2021-09-30
+Read Control File               read_control_file   2021-09-07
+Read Parameter File             read_parameter_file 2021-09-07
+
+
+====================================================================
+Using PRMS Data File: .\input\NWIS.data
+Title: Written by class gov.usgs.trinli.ft.point.writer.PrmsWriter
+====================================================================
+Comment lines:
+////////////////////////////////////////////////////////////
+// Station metadata (listed in the same order as the data):
+// ID    Type Latitude Longitude Elevation
+// 06469400   runoff 47.1675  -98.969  1500.63
+////////////////////////////////////////////////////////////
+// Unit: runoff = ft3 per sec, elevation = feet
+////////////////////////////////////////////////////////////
+====================================================================
+measured variables
+runoff 1
+====================================================================
+ Data File time period: 1980/01/01 00:00:00 to 2015/09/30 00:00:00
+Simulation time period: 1980/10/01 00:00:00 to 2014/09/30 00:00:00
+====================================================================
+Basin Definition                basin               2021-09-30
+Common States and Fluxes        climateflow         2021-09-15
+Potential Solar Radiation       soltab              2021-09-07
+Time Series Data                obs                 2021-09-07
+Timestep Control                prms_time           2021-09-07
+Temperature Distribution        climate_hru         2021-09-09
+Precipitation Distribution      climate_hru         2021-09-09
+Solar Radiation Distribution    ddsolrad            2021-09-07
+Transpiration Distribution      transp_tindex       2021-09-07
+Potential Evapotranspiration    potet_jh            2021-09-07
+Canopy Interception             intcp               2021-10-01
+Snow Dynamics                   snowcomp            2021-09-15
+Surface Runoff                  srunoff_smidx       2021-09-30
+Soilzone Computations           soilzone            2021-09-30
+Groundwater                     gwflow              2021-09-07
 Streamflow Routing              strmflow            2020-08-03
-Output Summary                  basin_sum           2020-12-02
-Output Summary                  prms_summary        2020-12-02
+Output Summary                  basin_sum           2021-09-07
+Statistics Variables Output     statvar_out         2021-09-08
+Output Summary                  prms_summary        2021-09-14
 ==============================================================
 
 Using Control File: .\pipestem.control
@@ -114,5 +156,5 @@ DPRST area:               14741.23    Fraction DPRST:          0.0352
  *************************************************************
  Total for run     708.810  664.661    2.628   46.117 1488.712
  *************************************************************
-Execution elapsed time    0 minutes  0.97 seconds
+Execution elapsed time    0 minutes  2.47 seconds
 
