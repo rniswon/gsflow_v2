@@ -8,7 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-09-30'
+      character(len=*), parameter :: Version_intcp = '2021-10-01'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -66,7 +66,7 @@
 !***********************************************************************
       INTEGER FUNCTION intdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION
-      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, PRMS_land_iteration_flag, Ag_package
+      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, PRMS_land_iteration_flag, AG_flag
       USE PRMS_INTCP
       IMPLICIT NONE
 ! Functions
@@ -85,8 +85,8 @@
 ! NEW VARIABLES and PARAMETERS for APPLICATION RATES
       ALLOCATE ( Net_apply(Nhru) )
       Use_transfer_intcp = OFF
-      IF ( Water_use_flag==ACTIVE .OR. Ag_package==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-        Use_transfer_intcp = ACTIVE
+      IF ( Water_use_flag==ACTIVE .OR. AG_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( Water_use_flag==ACTIVE ) Use_transfer_intcp = ACTIVE
         ALLOCATE ( Gain_inches(Nhru) )
         CALL declvar_real(MODNAME, 'gain_inches', 'nhru', Nhru, &
      &       'Canopy_gain in canopy as depth over the HRU', &
