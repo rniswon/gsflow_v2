@@ -227,7 +227,7 @@ basin_actet
 basinOutBaseFileName
 1
 4
-../output/basin_
+../output/prms/basin_
 ####
 nsegmentOutON_OFF
 1
@@ -253,7 +253,7 @@ strm_seg_in
 nsegmentOutBaseFileName
 1
 4
-../output/nsegment_out_
+../output/prms/nsegment_out_
 ####
 nhruOutON_OFF
 1
@@ -282,4 +282,4 @@ hru_actet
 nhruOutBaseFileName
 1
 4
-../output/nhru_out_
+../output/prms/nhru_out_

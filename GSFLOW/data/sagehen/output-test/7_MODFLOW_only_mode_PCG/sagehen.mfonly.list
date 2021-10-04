@@ -16655,7 +16655,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
 
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP 1 IN STRESS PERIOD    1
+              HEAD IN LAYER 1 AT END OF TIME STEP 1 IN STRESS PERIOD 1
   ---------------------------------------------------------------------------
 
            1       2       3       4       5       6       7       8       9      10      11      12      13      14      15
@@ -17104,7 +17104,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
       2254.81 -999.00 -999.00 -999.00 -999.00 -999.00 -999.00 -999.00 -999.00 -999.00 -999.00 -999.00 -999.00 -999.00 -999.00
       -999.00 -999.00 -999.00 -999.00 -999.00 -999.00
 1
-              HEAD IN LAYER   2 AT END OF TIME STEP 1 IN STRESS PERIOD    1
+              HEAD IN LAYER 2 AT END OF TIME STEP 1 IN STRESS PERIOD 1
   ---------------------------------------------------------------------------
 
            1       2       3       4       5       6       7       8       9      10      11      12      13      14      15
@@ -17952,6 +17952,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/07/23  9:51:07
- Elapsed run time: 1.726 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/10/01 16:35:53
+ Elapsed run time: 1.764 Seconds
 
