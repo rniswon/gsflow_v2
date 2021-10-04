@@ -1,5 +1,5 @@
 @ECHO OFF
-..\..\bin\gsflow -C.\control\skunk.control
+..\..\bin\gsflow control\skunk.control
 ECHO.
 ECHO Run complete. Please press enter to continue.
 PAUSE>NUL
