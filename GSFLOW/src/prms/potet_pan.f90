@@ -4,27 +4,24 @@
 !   Declared Parameters: hru_pansta, epan_coef
 !***********************************************************************
       MODULE PRMS_POTET_PAN
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, MONTHS_PER_YEAR, DEBUG_less, ERROR_dim, &
-       &    READ_INIT, SAVE_INIT     
-        USE PRMS_MODULE, ONLY: Process_flag, Nevap, Print_debug, Save_vars_to_file, Init_vars_from_file
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=9), parameter :: MODNAME = 'potet_pan'
-        character(len=*), parameter :: Version_potet = '2020-12-02'
+        character(len=*), parameter :: Version_potet = '2021-09-07'
         REAL, SAVE, ALLOCATABLE :: Last_pan_evap(:)
       END MODULE PRMS_POTET_PAN
 
       INTEGER FUNCTION potet_pan()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, MONTHS_PER_YEAR, DEBUG_less, ERROR_dim, READ_INIT, SAVE_INIT
+      USE PRMS_MODULE, ONLY: Process_flag, Nevap, Print_debug, Save_vars_to_file, Init_vars_from_file, Nowmonth
       USE PRMS_POTET_PAN
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Hru_pansta, Epan_coef
-      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_OBS, ONLY: Pan_evap
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: declparam, getparam
       EXTERNAL :: read_error, print_module, potet_pan_restart, print_date, error_stop
 ! Local Variables
       INTEGER :: i, j, k

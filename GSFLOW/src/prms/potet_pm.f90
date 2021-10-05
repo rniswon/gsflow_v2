@@ -7,21 +7,20 @@
 !   central Nebraska-USA: Journal of Hydrology, V. 420-421, p. 228-244
 !***********************************************************************
       MODULE PRMS_POTET_PM
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR, OFF, INCH2MM
-        USE PRMS_MODULE, ONLY: Process_flag, Nhru, Humidity_cbh_flag
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_pm'
-        character(len=*), parameter :: Version_potet = '2020-08-03'
+        character(len=*), parameter :: Version_potet = '2021-09-07'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Pm_n_coef(:, :), Pm_d_coef(:, :), Crop_coef(:, :)
       END MODULE PRMS_POTET_PM
 
 !***********************************************************************
       INTEGER FUNCTION potet_pm()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR, OFF, INCH2MM
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Humidity_cbh_flag, Nowmonth
       USE PRMS_POTET_PM
-      USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Swrad, Tminc, Tmaxc, &
      &    Tempc_dewpt, Vp_actual, Lwrad_net, Vp_slope, Vp_sat, Basin_humidity, Humidity_percent
@@ -31,7 +30,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, LOG, SNGL
-      INTEGER, EXTERNAL :: declparam, getparam
+      INTEGER, EXTERNAL :: declparam, getparam_real
       REAL, EXTERNAL :: sat_vapor_press
       EXTERNAL :: read_error, print_module
 ! Local Variables
@@ -172,9 +171,9 @@
 !******Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
         Vp_sat = 0.0
-        IF ( getparam(MODNAME, 'pm_n_coef', Nhru*MONTHS_PER_YEAR, 'real', Pm_n_coef)/=0 ) CALL read_error(2, 'pm_n_coef')
-        IF ( getparam(MODNAME, 'pm_d_coef', Nhru*MONTHS_PER_YEAR, 'real', Pm_d_coef)/=0 ) CALL read_error(2, 'pm_d_coef')
-        IF ( getparam(MODNAME, 'crop_coef', Nhru*MONTHS_PER_YEAR, 'real', Crop_coef)/=0 ) CALL read_error(2, 'crop_coef')
+        IF ( getparam_real(MODNAME, 'pm_n_coef', Nhru*MONTHS_PER_YEAR, Pm_n_coef)/=0 ) CALL read_error(2, 'pm_n_coef')
+        IF ( getparam_real(MODNAME, 'pm_d_coef', Nhru*MONTHS_PER_YEAR, Pm_d_coef)/=0 ) CALL read_error(2, 'pm_d_coef')
+        IF ( getparam_real(MODNAME, 'crop_coef', Nhru*MONTHS_PER_YEAR, Crop_coef)/=0 ) CALL read_error(2, 'crop_coef')
 
       ENDIF
 

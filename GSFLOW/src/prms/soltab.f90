@@ -11,13 +11,12 @@
 !   50 pp.
 !***********************************************************************
       MODULE PRMS_SOLTAB
-      USE PRMS_CONSTANTS, ONLY: DAYS_IN_YEAR, MAX_DAYS_PER_YEAR, DEBUG_SOLTAB, OFF
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag
+      USE PRMS_CONSTANTS, ONLY: DAYS_IN_YEAR, MAX_DAYS_PER_YEAR
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Potential Solar Radiation'
       character(len=*), parameter :: MODNAME = 'soltab'
-      character(len=*), parameter :: Version_soltab = '2021-05-06'
+      character(len=*), parameter :: Version_soltab = '2021-09-07'
       DOUBLE PRECISION, PARAMETER :: PI=3.1415926535898D0
       DOUBLE PRECISION, PARAMETER :: RADIANS=PI/180.0D0, TWOPI=2.0D0*PI
       DOUBLE PRECISION, PARAMETER :: PI_12=12.0D0/PI
@@ -65,6 +64,8 @@
 !     hru_aspect, hru_lat, hru_slope
 !***********************************************************************
       INTEGER FUNCTION sthdecl()
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR
+      USE PRMS_MODULE, ONLY: Nhru
       USE PRMS_SOLTAB
       IMPLICIT NONE
 ! Functions
@@ -110,13 +111,15 @@
 !               for each HRU for each day of the year.
 !***********************************************************************
       INTEGER FUNCTION sthinit()
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, DEBUG_SOLTAB, OFF
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag
       USE PRMS_SOLTAB
       USE PRMS_BASIN, ONLY: Hru_type, Active_hrus, Hru_route_order, Basin_lat, Hru_lat
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SIN, COS, DBLE
 !     INTRINSIC :: ASIN
-      INTEGER, EXTERNAL :: getparam
+      INTEGER, EXTERNAL :: getparam_real
       EXTERNAL :: compute_soltab, read_error, PRMS_open_module_file
 ! Local Variables
       CHARACTER(LEN=12) :: output_path
@@ -128,8 +131,8 @@
 !***********************************************************************
       sthinit = 0
 
-      IF ( getparam(MODNAME, 'hru_slope', Nhru, 'real', Hru_slope)/=0 ) CALL read_error(2, 'hru_slope')
-      IF ( getparam(MODNAME, 'hru_aspect', Nhru, 'real', Hru_aspect)/=0 ) CALL read_error(2, 'hru_aspect')
+      IF ( getparam_real(MODNAME, 'hru_slope', Nhru, Hru_slope)/=0 ) CALL read_error(2, 'hru_slope')
+      IF ( getparam_real(MODNAME, 'hru_aspect', Nhru, Hru_aspect)/=0 ) CALL read_error(2, 'hru_aspect')
 
       DO jd = 1, MAX_DAYS_PER_YEAR
         jddbl = DBLE(jd)

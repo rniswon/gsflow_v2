@@ -23,6 +23,8 @@ $(TARGET): $(PRMSLIB)
 
 LIBOBJS = \
         prms_constants.o \
+        mmf_utils.o \
+        soilzone_module.o \
         basin.o \
         climateflow.o \
         cascade.o \
@@ -34,7 +36,6 @@ LIBOBJS = \
         read_data_file.o \
         read_parameter_file.o \
         climate_hru.o \
-        mmf_utils.o \
         potet_jh.o \
         potet_pt.o \
         potet_hs.o \
@@ -149,6 +150,12 @@ basin_summary.o: basin_summary.f90 prms_module.mod prms_basin.mod prms_set_time.
 soltab.o: soltab.f90 prms_module.mod prms_basin.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) soltab.f90
 
+mmf_utils.o: mmf_utils.f90 prms_constants.mod
+	$(FC) -c $(FFLAGS) mmf_utils.f90
+
+soilzone_module.o: soilzone_module.f90
+	$(FC) -c $(FFLAGS) soilzone_module.f90
+
 frost_date.o: frost_date.f90 prms_module.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) frost_date.f90
 
@@ -227,13 +234,16 @@ srunoff.o: srunoff.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_cli
 climateflow.o: climateflow.f90 prms_module.mod prms_basin.mod prms_set_time.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) climateflow.f90
 
-soilzone.o: soilzone.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod
+soilzone.o: soilzone.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod prms_soilzone.mod
 	$(FC) -c $(FFLAGS) soilzone.f90
+
+soilzone_ag.o: soilzone_ag.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod
+	$(FC) -c $(FFLAGS) soilzone_ag.f90
 
 routing.o: routing.f90 prms_module.mod prms_basin.mod prms_gwflow.mod prms_flowvars.mod prms_set_time.mod prms_srunoff.mod prms_climatevars.mod prms_water_use.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) routing.f90
 
-prms_time.o: prms_time.f90 prms_basin.mod prms_constants.mod
+prms_time.o: prms_time.f90 prms_module.mod prms_basin.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) prms_time.f90
 
 water_balance.o: water_balance.f90 prms_module.mod prms_basin.mod prms_srunoff.mod prms_flowvars.mod prms_gwflow.mod prms_climatevars.mod prms_set_time.mod prms_cascade.mod prms_intcp.mod prms_snow.mod prms_soilzone.mod prms_constants.mod
@@ -260,7 +270,7 @@ convert_params.o: convert_params.f90 prms_module.mod
 glacr_melt.o: glacr_melt.f90 prms_snow.mod prms_intcp.mod prms_soltab.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) glacr_melt.f90
 
-read_control_file.o: read_control_file.f90 prms_module.mod prms_constants.mod prms_climate_hru.mod map_results.o statvar_out.o nhru_summary.o nsub_summary.o basin_summary.o nsegment_summary.o water_use_read.o dynamic_param_read.o glacr_melt.o precip_map.o temp_map.o gsfmodflow.mod
+read_control_file.o: read_control_file.f90 prms_module.mod gsfmodflow.mod prms_constants.mod prms_climate_hru.mod map_results.o statvar_out.o nhru_summary.o nsub_summary.o basin_summary.o nsegment_summary.o water_use_read.o dynamic_param_read.o glacr_melt.o precip_map.o temp_map.o gsfmodflow.mod
 	$(FC) -c $(FFLAGS) read_control_file.f90
 
 read_data_file.o: read_data_file.f90 prms_module.mod prms_constants.mod mmf_utils.o prms_set_time.mod obs.o climateflow.o
@@ -268,9 +278,6 @@ read_data_file.o: read_data_file.f90 prms_module.mod prms_constants.mod mmf_util
 
 read_parameter_file.o: read_parameter_file.f90 prms_module.mod prms_constants.mod mmf_utils.o
 	$(FC) -c $(FFLAGS) read_parameter_file.f90
-
-mmf_utils.o: mmf_utils.f90 prms_module.mod prms_constants.mod
-	$(FC) -c $(FFLAGS) mmf_utils.f90
 
 statvar_out.o: statvar_out.f90 prms_module.mod prms_constants.mod prms_set_time.mod
 	$(FC) -c $(FFLAGS) statvar_out.f90
@@ -281,9 +288,6 @@ prms_gwflow.mod: gwflow.o
 prms_module.mod:
 	$(CD) ../gsflow;make prms_module.mod
 	$(CP) ../gsflow/prms_module.mod .
-gsfmodflow.mod:
-	$(CD) ../gsflow;make prms_module.mod
-	$(CP) ../gsflow/gsfmodflow.mod .
 prms_obs.mod: obs.o
 prms_basin.mod: basin.o
 prms_soltab.mod: soltab.o
@@ -304,4 +308,10 @@ prms_potet_pm.mod: potet_pm.o
 prms_potet_pt.mod: potet_pt.o
 prms_potet_hs.mod: potet_hs.o
 prms_potet_hamon.mod: potet_hamon.o
-
+gsfmodflow.mod: $(GSFLOWDIR)/gsfmodflow.mod
+	$(RM) gsfmodflow.mod
+	$(LN) $(GSFLOWDIR)/gsfmodflow.mod gsfmodflow.mod
+gwfagmodule.mod: $(MODFLOWDIR)/gwfagmodule.mod
+	$(RM) gwfagmodule.mod
+	$(LN) $(MODFLOWDIR)/gwfagmodule.mod gwfagmodule.mod
+	

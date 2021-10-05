@@ -29,7 +29,7 @@
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Parameter Setup'
       character(len=*), parameter :: MODNAME = 'setup_param'
-      character(len=*), parameter :: Version_setup = '2021-05-10'
+      character(len=*), parameter :: Version_setup = '2021-09-07'
 ! Functions
       INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module

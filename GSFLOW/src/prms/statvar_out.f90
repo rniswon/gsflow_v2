@@ -3,12 +3,11 @@
 !***********************************************************************
       MODULE PRMS_STATVAR_OUT
         USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH
-        USE PRMS_MODULE, ONLY: StatsON_OFF, Stat_var_file
         IMPLICIT NONE
 ! Module Variables
         character(len=*), parameter :: MODDESC = 'Statistics Variables Output'
         character(len=*), parameter :: MODNAME = 'statvar_out'
-        character(len=*), parameter :: Version_statvar_out = '2021-07-19'
+        character(len=*), parameter :: Version_statvar_out = '2021-09-08'
         character(len=*), parameter :: stamp = '(7(I0,1X),'
         character(len=24) :: Output_fmt
         integer, save :: Statvar_unit
@@ -84,7 +83,7 @@
       ELSEIF ( statvarOut_format==5 ) THEN
         WRITE ( Output_fmt, 9005 ) stamp, nstatVars
       ENDIF
-      print *, output_fmt
+      !print *, output_fmt
  9001 FORMAT (A,I0,'(1X,ES10.3))')
  9002 FORMAT (A,I0,'(1X,F0.2))')
  9003 FORMAT (A,I0,'(1X,F0.3))')
@@ -98,6 +97,7 @@
 !***********************************************************************
       SUBROUTINE statvar_outinit()
       USE PRMS_CONSTANTS, ONLY: ERROR_control, ERROR_open_out
+      USE PRMS_MODULE, ONLY: Stat_var_file
       USE PRMS_STATVAR_OUT
       IMPLICIT NONE
 ! Functions

@@ -3,25 +3,25 @@
 ! on time between the last spring and the first fall killing frost.
 !***********************************************************************
       MODULE PRMS_TRANSP_FROST
-        USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, ACTIVE, OFF
-        USE PRMS_MODULE, ONLY: Process_flag, Nhru
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Transpiration Distribution'
         character(len=*), parameter :: MODNAME = 'transp_frost'
-        character(len=*), parameter :: Version_transp = '2020-12-02'
+        character(len=*), parameter :: Version_transp = '2021-09-07'
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Fall_frost(:), Spring_frost(:)
       END MODULE PRMS_TRANSP_FROST
 
       INTEGER FUNCTION transp_frost()
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru
       USE PRMS_TRANSP_FROST
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Transp_on, Basin_transp_on
       USE PRMS_SET_TIME, ONLY: Jsol
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, getparam
+      INTEGER, EXTERNAL :: declparam, getparam_int
       EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
@@ -62,8 +62,8 @@
      &       'Solar date')/=0 ) CALL read_error(1, 'fall_frost')
 
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam(MODNAME, 'spring_frost', Nhru, 'integer', Spring_frost)/=0 ) CALL read_error(2, 'spring_frost')
-        IF ( getparam(MODNAME, 'fall_frost', Nhru, 'integer', Fall_frost)/=0 ) CALL read_error(2, 'fall_frost')
+        IF ( getparam_int(MODNAME, 'spring_frost', Nhru, Spring_frost)/=0 ) CALL read_error(2, 'spring_frost')
+        IF ( getparam_int(MODNAME, 'fall_frost', Nhru, Fall_frost)/=0 ) CALL read_error(2, 'fall_frost')
 
         DO j = 1, Active_hrus
           i = Hru_route_order(j)

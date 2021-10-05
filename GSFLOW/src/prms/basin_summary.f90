@@ -2,15 +2,12 @@
 !     Output a set of declared basin variables as CSV file
 !***********************************************************************
       MODULE PRMS_BASIN_SUMMARY
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ACTIVE, OFF, &
-     &    DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, DAILY, YEARLY, MONTHLY, &
-     &    DOCUMENTATION, DBLE_TYPE, ERROR_control, ERROR_open_out
-      USE PRMS_MODULE, ONLY: Model, Inputerror_flag, Start_year, Prms_warmup, BasinOutON_OFF, Nhru
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       IMPLICIT NONE
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'basin_summary'
-      character(len=*), parameter :: Version_basin_summary = '2021-05-10'
+      character(len=*), parameter :: Version_basin_summary = '2021-09-07'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear, Dailyunit, Monthlyunit, Yearlyunit, Basin_var_type
       INTEGER, SAVE, ALLOCATABLE :: Nc_vars(:)
       CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2, Output_fmt3
@@ -54,6 +51,8 @@
 !     declare parameters and variables
 !***********************************************************************
       SUBROUTINE basin_summarydecl()
+      USE PRMS_CONSTANTS, ONLY: DAILY, YEARLY, DOCUMENTATION, ERROR_control
+      USE PRMS_MODULE, ONLY: Model, BasinOutON_OFF, Nhru
       USE PRMS_BASIN_SUMMARY
       IMPLICIT NONE
 ! Functions
@@ -95,9 +94,12 @@
 !     Initialize module values
 !***********************************************************************
       SUBROUTINE basin_summaryinit()
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ACTIVE, OFF, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, DAILY, MONTHLY, &
+     &    DBLE_TYPE, ERROR_control, ERROR_open_out
+      USE PRMS_MODULE, ONLY: Start_year, Prms_warmup, BasinOutON_OFF, Nhru
       USE PRMS_BASIN_SUMMARY
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam
+      INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam_int
       EXTERNAL :: PRMS_open_output_file, error_stop, read_error
 ! Local Variables
       INTEGER :: ios, ierr, size, jj
@@ -151,7 +153,7 @@
       WRITE ( Output_fmt2, 9002 ) BasinOutVars
 
       IF ( BasinOutON_OFF==2 ) THEN
-        IF ( getparam(MODNAME, 'nhm_id', Nhru, 'integer', Nhm_id)/=0 ) CALL read_error(2, 'nhm_id')
+        IF ( getparam_int(MODNAME, 'nhm_id', Nhru, Nhm_id)/=0 ) CALL read_error(2, 'nhm_id')
       ENDIF
 
       IF ( Daily_flag==ACTIVE ) THEN
@@ -195,8 +197,9 @@
 !     Output set of declared variables in CSV format
 !***********************************************************************
       SUBROUTINE basin_summaryrun()
-      USE PRMS_BASIN_SUMMARY
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MEAN_MONTHLY, YEARLY
       USE PRMS_MODULE, ONLY: Start_month, Start_day, End_year, End_month, End_day, Nowyear, Nowmonth, Nowday
+      USE PRMS_BASIN_SUMMARY
       USE PRMS_SET_TIME, ONLY: Modays
       IMPLICIT NONE
 ! Functions
