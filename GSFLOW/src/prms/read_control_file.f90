@@ -980,21 +980,21 @@
 ! Get Control File from command line or user interaction.
 !***********************************************************************
       SUBROUTINE get_control_filename()
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control
+      USE PRMS_CONSTANTS, ONLY: MAXCMDLINE_LENGTH, ERROR_control
       USE PRMS_MODULE, ONLY: Print_debug, EQULS, Model_control_file
       IMPLICIT NONE
       ! Functions
       INTRINSIC :: GET_COMMAND_ARGUMENT, COMMAND_ARGUMENT_COUNT, GET_COMMAND, TRIM
       EXTERNAL :: error_stop
       ! Local Variables
-      CHARACTER(LEN=MAXFILE_LENGTH) command_line_arg, command_line
+      CHARACTER(LEN=MAXCMDLINE_LENGTH) command_line_arg, command_line
       LOGICAL :: exists
       INTEGER :: status, nchars, numargs
 !***********************************************************************
 ! Subroutine GET_COMMAND_ARGUMENT may not be available with all compilers-it is a Fortran 2003 routine
 ! This routine expects the Control File name to be the first argument, if present
       CALL GET_COMMAND(command_line)
-!      print *, 'Command line: ', TRIM(command_line)
+      print *, 'Command line: ', TRIM(command_line)
       numargs = COMMAND_ARGUMENT_COUNT()
       IF ( Print_debug>-1 ) PRINT '(/,A)', EQULS
       CALL GET_COMMAND_ARGUMENT(1, command_line_arg, nchars, status)

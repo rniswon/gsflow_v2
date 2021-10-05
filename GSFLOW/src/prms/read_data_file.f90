@@ -10,9 +10,9 @@
       END MODULE PRMS_DATA_FILE
 
       SUBROUTINE read_prms_data_file
-      USE PRMS_CONSTANTS, ONLY: ERROR_time, ERROR_read, ERROR_open_in
+      USE PRMS_CONSTANTS, ONLY: ERROR_time, ERROR_read, ERROR_open_in, MAXDATALINE_LENGTH, MAXFILE_LENGTH
       USE PRMS_DATA_FILE
-      USE PRMS_MODULE, ONLY: PRMS_output_unit, MAXFILE_LENGTH, EQULS, Print_debug, Starttime, Endtime
+      USE PRMS_MODULE, ONLY: PRMS_output_unit, Print_debug, Starttime, Endtime, EQULS
       IMPLICIT NONE
       ! Functions
       INTRINSIC LEN_TRIM, TRIM
@@ -21,7 +21,8 @@
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Read Data File'
       character(len=*), parameter :: MODNAME = 'read_data_file'
-      CHARACTER(LEN=MAXFILE_LENGTH) :: data_filename, data_line, dmy
+      CHARACTER(LEN=MAXFILE_LENGTH) :: data_filename
+      CHARACTER(LEN=MAXDATALINE_LENGTH) :: data_line, dmy
       CHARACTER(LEN=80) :: line
       INTEGER n, ierr, ios, numchrs, length
       INTEGER startyr, startmo, startdy, starthr, startmn, startsec
