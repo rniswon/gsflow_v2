@@ -1003,8 +1003,9 @@
         READ ( *, '(A)' ) Model_control_file
         IF ( Model_control_file(:4)=='quit' .OR. Model_control_file(:4)=='QUIT' ) ERROR STOP ERROR_control
       ELSE
-        IF ( TRIM(command_line_arg)=='-C' ) THEN
-          CALL GET_COMMAND_ARGUMENT(2, Model_control_file, nchars, status)
+        IF ( TRIM(command_line_arg(:2))=='-C' ) THEN
+          Model_control_file = TRIM(command_line_arg(3:))
+!          CALL GET_COMMAND_ARGUMENT(2, Model_control_file, nchars, status)
           IF ( status/=0 ) CALL error_stop('bad argment value after -C argument', ERROR_control)
         ELSE
           Model_control_file = TRIM(command_line_arg)
@@ -1033,7 +1034,7 @@
       EXTERNAL :: error_stop
       ! Local Variables
       CHARACTER(LEN=MAXFILE_LENGTH) command_line_arg, command_line
-      INTEGER :: status, i, j, nchars, numargs, index, param_type, num_param_values
+      INTEGER :: status, i, j, ii, nchars, numargs, index, param_type, num_param_values
 !***********************************************************************
 ! Subroutine GET_COMMAND_ARGUMENT may not be available with all compilers-it is a Fortran 2003 routine
 ! This routine expects the Control File name to be the first argument, if present
@@ -1045,7 +1046,7 @@
         i = i + 1
         CALL GET_COMMAND_ARGUMENT(i, command_line_arg, nchars, status)
         IF ( status/=0 ) CALL error_stop('setting control parameters from command line', ERROR_control)
-        IF ( TRIM(command_line_arg)=='-C' ) THEN
+        IF ( TRIM(command_line_arg(:2))=='-C' ) THEN ! rsr, this doesn't work if no space
           i = i + 2
           CYCLE
         ELSE
@@ -1075,6 +1076,13 @@
               IF ( status/=0 ) CALL error_stop('bad value after -set argument', ERROR_control)
               IF ( Print_debug>-1 ) PRINT *, 'PRMS command line argument,', i, ': ', TRIM(command_line_arg)
               IF ( param_type==1 ) THEN
+                IF ( Control_parameter_data(index)%name(:10)=='start_time' .OR. &
+     &               Control_parameter_data(index)%name(:8)=='end_time' ) THEN
+                  READ ( command_line_arg, *, IOSTAT=status ) &
+     &                   (Control_parameter_data(index)%values_int(ii),ii=1,num_param_values)
+!                  print *, 'values ', Control_parameter_data(index)%values_int
+                  EXIT
+                ENDIF
                 READ ( command_line_arg, *, IOSTAT=status ) Control_parameter_data(index)%values_int(j)
                 IF ( status/=0 ) CALL error_stop('reading integer command line argument', ERROR_control)
               ELSEIF ( param_type==4 ) THEN

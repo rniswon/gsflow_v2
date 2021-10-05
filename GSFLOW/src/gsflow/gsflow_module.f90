@@ -23,8 +23,8 @@
       character(len=*), parameter :: GSFLOW_versn = '2.4.0 09/30/2021'
       character(len=*), parameter :: PRMS_versn = '2021-09-30'
       character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 09/30/2021'
-      character(len=*), parameter :: Version_read_control_file = '2021-09-07'
-      character(len=*), parameter :: Version_read_parameter_file = '2021-09-07'
+      character(len=*), parameter :: Version_read_control_file = '2021-10-05'
+      character(len=*), parameter :: Version_read_parameter_file = '2021-10-05'
       character(len=*), parameter :: Version_read_data_file = '2021-09-07'
       CHARACTER(len=8), SAVE :: Process
 ! Dimensions
