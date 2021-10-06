@@ -45,15 +45,12 @@
 !***********************************************************************
 
       MODULE PRMS_GLACR
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, MONTHS_PER_YEAR, GLACIER, LAND, &
-     &    FEET2METERS, METERS2FEET, DNEARZERO, NEARZERO, FEET, METERS, MAX_DAYS_PER_YEAR
-      USE PRMS_MODULE, ONLY: Nhru, Model, Init_vars_from_file
       IMPLICIT NONE
       !****************************************************************
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2021-05-06'
+      character(len=*), parameter :: Version_glacr = '2021-08-13'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -146,6 +143,8 @@
 !     glacrdecl - declare parameters and variables for glacier runoff
 !***********************************************************************
       INTEGER FUNCTION glacrdecl()
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file
       USE PRMS_GLACR
       IMPLICIT NONE
 ! Functions
@@ -438,13 +437,15 @@
 !     glacrinit - Initialize glacr module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION glacrinit()
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, GLACIER, LAND
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file
       USE PRMS_GLACR
       USE PRMS_BASIN, ONLY: Hru_area, Hru_elev_ts, Active_hrus, Hru_route_order, &
      &    Hru_type, Basin_area_inv, Hru_elev_meters
       USE PRMS_FLOWVARS, ONLY: Glacier_frac, Alt_above_ela, Glrette_frac
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getparam, get_ftnunit, compute_ela_aar
+      INTEGER, EXTERNAL :: getparam_real, getparam_int, get_ftnunit, compute_ela_aar
       INTRINSIC :: ABS, SQRT, SNGL, REAL
       EXTERNAL :: read_error, tag_count, sort5, glacr_restart
 ! Local Variables
@@ -463,17 +464,17 @@
 
       IF ( Init_vars_from_file>0 ) CALL glacr_restart(1)
 
-      IF ( getparam(MODNAME, 'max_gldepth', 1, 'real', Max_gldepth)/=0 ) CALL read_error(2, 'max_gldepth')
-      IF ( getparam(MODNAME, 'glacrva_coef', Nhru, 'real', Glacrva_coef)/=0 ) CALL read_error(2, 'glacrva_coef')
-      IF ( getparam(MODNAME, 'glacrva_exp', Nhru, 'real', Glacrva_exp)/=0 ) CALL read_error(2, 'glacrva_exp')
-      IF ( getparam(MODNAME, 'stor_ice', Nhru*MONTHS_PER_YEAR, 'real', Stor_ice)/=0 ) CALL read_error(2, 'stor_ice')
-      IF ( getparam(MODNAME, 'stor_snow', Nhru*MONTHS_PER_YEAR, 'real', Stor_snow)/=0 ) CALL read_error(2, 'stor_snow')
-      IF ( getparam(MODNAME, 'stor_firn', Nhru*MONTHS_PER_YEAR, 'real', Stor_firn)/=0 ) CALL read_error(2, 'stor_firn')
-      IF ( getparam(MODNAME, 'hru_length', Nhru, 'real', Hru_length)/=0 ) CALL read_error(2, 'hru_length')
-      IF ( getparam(MODNAME, 'hru_width', Nhru, 'real', Hru_width)/=0 ) CALL read_error(2, 'hru_width')
-      IF ( getparam(MODNAME, 'abl_elev_range', Nhru, 'real', Abl_elev_range)/=0 ) CALL read_error(2, 'abl_elev_range')
-      IF ( getparam(MODNAME, 'tohru', Nhru, 'integer', Tohru)/=0 ) CALL read_error(2, 'tohru')
-      IF ( getparam(MODNAME, 'hru_slope', Nhru, 'real', Hru_slope)/=0 ) CALL read_error(2, 'hru_slope')
+      IF ( getparam_real(MODNAME, 'max_gldepth', 1, Max_gldepth)/=0 ) CALL read_error(2, 'max_gldepth')
+      IF ( getparam_real(MODNAME, 'glacrva_coef', Nhru, Glacrva_coef)/=0 ) CALL read_error(2, 'glacrva_coef')
+      IF ( getparam_real(MODNAME, 'glacrva_exp', Nhru, Glacrva_exp)/=0 ) CALL read_error(2, 'glacrva_exp')
+      IF ( getparam_real(MODNAME, 'stor_ice', Nhru*MONTHS_PER_YEAR, Stor_ice)/=0 ) CALL read_error(2, 'stor_ice')
+      IF ( getparam_real(MODNAME, 'stor_snow', Nhru*MONTHS_PER_YEAR, Stor_snow)/=0 ) CALL read_error(2, 'stor_snow')
+      IF ( getparam_real(MODNAME, 'stor_firn', Nhru*MONTHS_PER_YEAR, Stor_firn)/=0 ) CALL read_error(2, 'stor_firn')
+      IF ( getparam_real(MODNAME, 'hru_length', Nhru, Hru_length)/=0 ) CALL read_error(2, 'hru_length')
+      IF ( getparam_real(MODNAME, 'hru_width', Nhru, Hru_width)/=0 ) CALL read_error(2, 'hru_width')
+      IF ( getparam_real(MODNAME, 'abl_elev_range', Nhru, Abl_elev_range)/=0 ) CALL read_error(2, 'abl_elev_range')
+      IF ( getparam_int(MODNAME, 'tohru', Nhru, Tohru)/=0 ) CALL read_error(2, 'tohru')
+      IF ( getparam_real(MODNAME, 'hru_slope', Nhru, Hru_slope)/=0 ) CALL read_error(2, 'hru_slope')
       IF ( Init_vars_from_file==0 ) THEN
         Alt_above_ela = 0.0
         Prev_out = 0.0
@@ -793,9 +794,10 @@
 !                  computations
 !***********************************************************************
       INTEGER FUNCTION glacrrun()
+      USE PRMS_CONSTANTS, ONLY: GLACIER, LAND, FEET2METERS, METERS2FEET, NEARZERO, FEET
       USE PRMS_GLACR
       USE PRMS_BASIN, ONLY: Hru_elev_ts, Active_hrus, Hru_route_order, Hru_type, &
-     &                      Elev_units, Hru_elev_feet, Hru_elev_meters
+     &    Elev_units, Hru_elev_feet, Hru_elev_meters
       USE PRMS_FLOWVARS, ONLY: Alt_above_ela, Glrette_frac
       IMPLICIT NONE
 ! Functions
@@ -870,8 +872,9 @@
 !                   computations
 !***********************************************************************
       INTEGER FUNCTION comp_glsurf(glacr_exist, glrette_exist)
-      USE PRMS_GLACR
+      USE PRMS_CONSTANTS, ONLY: GLACIER, LAND, FEET2METERS, METERS2FEET, DNEARZERO, NEARZERO, FEET, METERS
       USE PRMS_MODULE, ONLY: Nhru, Start_year, Nowyear, Nowmonth
+      USE PRMS_GLACR
       USE PRMS_BASIN, ONLY: Hru_type, Hru_elev_ts, Basin_area_inv, Active_hrus, &
      &    Hru_route_order, Elev_units, Hru_elev
       USE PRMS_SET_TIME, ONLY: Julwater
@@ -1617,8 +1620,9 @@
 !                              last years MB, won't work first year
 !***********************************************************************
       INTEGER FUNCTION compute_ela_mb()
-      USE PRMS_GLACR, ONLY: Ntp, Ngl, Glacr_tag, Term, Top, Top_tag, Hru_mb_yrend, &
-     &    Ela, Nhru, GLACIER
+      USE PRMS_CONSTANTS, ONLY: GLACIER
+      USE PRMS_MODULE, ONLY: Nhru
+      USE PRMS_GLACR, ONLY: Ntp, Ngl, Glacr_tag, Term, Top, Top_tag, Hru_mb_yrend, Ela
       USE PRMS_BASIN, ONLY: Hru_type, Active_hrus, Hru_route_order
       IMPLICIT NONE
 ! Functions
@@ -1676,7 +1680,9 @@
 !                               from theoretical steady state AAR
 !***********************************************************************
       INTEGER FUNCTION compute_ela_aar()
-      USE PRMS_GLACR, ONLY: Ntp, Ngl, Glacr_tag, Term, Top, Top_tag, Prev_area, Ela, Nhru, GLACIER
+      USE PRMS_CONSTANTS, ONLY: GLACIER
+      USE PRMS_MODULE, ONLY: Nhru
+      USE PRMS_GLACR, ONLY: Ntp, Ngl, Glacr_tag, Term, Top, Top_tag, Prev_area, Ela
       USE PRMS_BASIN, ONLY: Hru_type, Active_hrus, Hru_route_order
       IMPLICIT NONE
 ! Functions
@@ -1745,10 +1751,10 @@
 ! of changing slope
 !***********************************************************************
       INTEGER FUNCTION recompute_soltab()
-      USE PRMS_GLACR, ONLY: Hru_slope_ts, MAX_DAYS_PER_YEAR, GLACIER
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, GLACIER
+      USE PRMS_GLACR, ONLY: Hru_slope_ts
       USE PRMS_SOLTAB, ONLY: Hru_aspect, Hru_cossl, PI, RADIANS, &
-     &    Soltab_potsw, Soltab_sunhrs, Solar_declination, &
-     &    ECCENTRICY, DEGDAY, DEGDAYRAD
+     &    Soltab_potsw, Soltab_sunhrs, Solar_declination, ECCENTRICY, DEGDAY, DEGDAYRAD
       USE PRMS_BASIN, ONLY: Hru_type, Active_hrus, Hru_route_order, Hru_lat
       IMPLICIT NONE
 ! Functions
@@ -1794,7 +1800,9 @@
 ! disapears.
 !***********************************************************************
       SUBROUTINE tag_count(do_init, hru_flowline, toflowline, glacier_frac_use)
-      USE PRMS_GLACR, ONLY: Ntp, Ngl, Glacr_tag, Term, Top, Top_tag, Tohru, Nhru, GLACIER
+      USE PRMS_CONSTANTS, ONLY: GLACIER
+      USE PRMS_MODULE, ONLY: Nhru
+      USE PRMS_GLACR, ONLY: Ntp, Ngl, Glacr_tag, Term, Top, Top_tag, Tohru
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type
       IMPLICIT NONE
 ! Arguments
@@ -2453,9 +2461,10 @@
 ! Don't have basal slope calculated there so would need to use something else.
 !***********************************************************************
       SUBROUTINE yearly_ca_coef(Frawt, Ela_elevt)
+      USE PRMS_CONSTANTS, ONLY: GLACIER
+      USE PRMS_MODULE, ONLY: Nhru
       USE PRMS_GLACR, ONLY: Ntp, Nhrugl, Ngl, Order_flowline, Keep_gl, Ikeep_gl, &
-     &    Hru_length, Av_basal_slope, Av_fgrad, Glacr_tag, Term, Glacr_slope_init, &
-     &    Hru_length, Nhru, GLACIER
+     &    Hru_length, Av_basal_slope, Av_fgrad, Glacr_tag, Term, Glacr_slope_init
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type
       USE PRMS_FLOWVARS, ONLY: Glacier_frac
       IMPLICIT NONE

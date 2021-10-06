@@ -2,15 +2,11 @@
 ! stream temperature module
 !***********************************************************************
       MODULE PRMS_STRMTEMP
-      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, MONTHS_PER_YEAR, DOCUMENTATION, ACTIVE, OFF, &
-     &    NEARZERO, ERROR_param, CFS2CMS_CONV, DAYS_YR, DAYS_PER_YEAR, DAYS_YR
-      USE PRMS_MODULE, ONLY: Process_flag, Nsegment, Model, Init_vars_from_file, &
-     &    Print_debug, Strmtemp_humidity_flag, Model, Inputerror_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2021-05-06'
+      character(len=*), parameter :: Version_stream_temp = '2021-09-07'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -94,6 +90,8 @@
 !   Declared Parameters
 !***********************************************************************
       INTEGER FUNCTION stream_temp_decl()
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DOCUMENTATION, ACTIVE, OFF, DAYS_PER_YEAR
+      USE PRMS_MODULE, ONLY: Nsegment, Model, Init_vars_from_file, Strmtemp_humidity_flag, Model
       USE PRMS_STRMTEMP
       IMPLICIT NONE
 ! Functions
@@ -412,6 +410,8 @@
 !    stream_temp_init - Initialize module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION stream_temp_init()
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, MONTHS_PER_YEAR, OFF, NEARZERO, ERROR_param, DAYS_YR
+      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag, Inputerror_flag
       USE PRMS_STRMTEMP
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_OBS, ONLY: Nhumid
@@ -419,7 +419,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: COS, SIN, ABS, SIGN, ASIN, maxval
-      INTEGER, EXTERNAL :: getparam
+      INTEGER, EXTERNAL :: getparam_real, getparam_int
       REAL, EXTERNAL :: solalt
       EXTERNAL :: read_error, checkdim_param_limits, error_stop
 ! Local Variables
@@ -428,54 +428,54 @@
 !***********************************************************************
       stream_temp_init = 0
 
-      IF ( getparam( MODNAME, 'albedo', 1, 'real', Albedo)/=0 ) CALL read_error(2, 'albedo')
-      IF ( getparam( MODNAME, 'lat_temp_adj', Nsegment*MONTHS_PER_YEAR, 'real', lat_temp_adj)/=0 ) &
+      IF ( getparam_real( MODNAME, 'albedo', 1, Albedo)/=0 ) CALL read_error(2, 'albedo')
+      IF ( getparam_real( MODNAME, 'lat_temp_adj', Nsegment*MONTHS_PER_YEAR, lat_temp_adj)/=0 ) &
      &     CALL read_error(2, 'lat_temp_adj')
-      IF ( getparam( MODNAME, 'seg_length', Nsegment, 'real', Seg_length)/=0 ) CALL read_error(2, 'seg_length')
+      IF ( getparam_real( MODNAME, 'seg_length', Nsegment, Seg_length)/=0 ) CALL read_error(2, 'seg_length')
 
-      IF (getparam(MODNAME, 'seg_lat', Nsegment, 'real', Seg_lat)/=0 ) CALL read_error(2, 'seg_lat')
+      IF (getparam_real(MODNAME, 'seg_lat', Nsegment, Seg_lat)/=0 ) CALL read_error(2, 'seg_lat')
 !     Convert latitude from degrees to radians
       seg_lat = seg_lat * DEG_TO_RAD
 
-      IF (getparam(MODNAME, 'seg_elev', Nsegment, 'real', Seg_elev)/=0 ) CALL read_error(2, 'seg_elev')
+      IF (getparam_real(MODNAME, 'seg_elev', Nsegment, Seg_elev)/=0 ) CALL read_error(2, 'seg_elev')
 
 ! convert stream length in meters to km
       Seg_length = Seg_length / 1000.0
 
-      IF ( getparam( MODNAME, 'seg_slope', Nsegment, 'real', Seg_slope)/=0 ) CALL read_error(2, 'seg_slope')
-      IF ( getparam( MODNAME, 'width_alpha', Nsegment, 'real', width_alpha)/=0 ) CALL read_error(2, 'width_alpha')
-      IF ( getparam( MODNAME, 'width_m', Nsegment, 'real', width_m)/=0 ) CALL read_error(2, 'width_m')
+      IF ( getparam_real( MODNAME, 'seg_slope', Nsegment, Seg_slope)/=0 ) CALL read_error(2, 'seg_slope')
+      IF ( getparam_real( MODNAME, 'width_alpha', Nsegment, width_alpha)/=0 ) CALL read_error(2, 'width_alpha')
+      IF ( getparam_real( MODNAME, 'width_m', Nsegment, width_m)/=0 ) CALL read_error(2, 'width_m')
 
       IF ( Stream_temp_shade_flag==OFF ) THEN
-         IF ( getparam( MODNAME, 'azrh', Nsegment, 'real', Azrh)/=0 ) CALL read_error(2, 'azrh')
-         IF ( getparam( MODNAME, 'alte', Nsegment, 'real', Alte)/=0 ) CALL read_error(2, 'alte')
-         IF ( getparam( MODNAME, 'altw', Nsegment, 'real', Altw)/=0 ) CALL read_error(2, 'altw')
-         IF ( getparam( MODNAME, 'vce', Nsegment, 'real', Vce)/=0 ) CALL read_error(2, 'vce')
-         IF ( getparam( MODNAME, 'vdemx', Nsegment, 'real', Vdemx)/=0 ) CALL read_error(2, 'vdemx')
-         IF ( getparam( MODNAME, 'vdemn', Nsegment, 'real', Vdemn)/=0 ) CALL read_error(2, 'vdemn')
-         IF ( getparam( MODNAME, 'vhe', Nsegment, 'real', Vhe)/=0 ) CALL read_error(2, 'vhe')
-         IF ( getparam( MODNAME, 'voe', Nsegment, 'real', Voe)/=0 ) CALL read_error(2, 'voe')
-         IF ( getparam( MODNAME, 'vcw', Nsegment, 'real', Vcw)/=0 ) CALL read_error(2, 'vcw')
-         IF ( getparam( MODNAME, 'vdwmx', Nsegment, 'real', Vdwmx)/=0 ) CALL read_error(2, 'vdwmx')
-         IF ( getparam( MODNAME, 'vdwmn', Nsegment, 'real', Vdwmn)/=0 ) CALL read_error(2, 'vdwmn')
-         IF ( getparam( MODNAME, 'vhw', Nsegment, 'real', Vhw)/=0 ) CALL read_error(2, 'vhw')
-         IF ( getparam( MODNAME, 'vow', Nsegment, 'real', Vow)/=0 ) CALL read_error(2, 'vow')
+         IF ( getparam_real( MODNAME, 'azrh', Nsegment, Azrh)/=0 ) CALL read_error(2, 'azrh')
+         IF ( getparam_real( MODNAME, 'alte', Nsegment, Alte)/=0 ) CALL read_error(2, 'alte')
+         IF ( getparam_real( MODNAME, 'altw', Nsegment, Altw)/=0 ) CALL read_error(2, 'altw')
+         IF ( getparam_real( MODNAME, 'vce', Nsegment, Vce)/=0 ) CALL read_error(2, 'vce')
+         IF ( getparam_real( MODNAME, 'vdemx', Nsegment, Vdemx)/=0 ) CALL read_error(2, 'vdemx')
+         IF ( getparam_real( MODNAME, 'vdemn', Nsegment, Vdemn)/=0 ) CALL read_error(2, 'vdemn')
+         IF ( getparam_real( MODNAME, 'vhe', Nsegment, Vhe)/=0 ) CALL read_error(2, 'vhe')
+         IF ( getparam_real( MODNAME, 'voe', Nsegment, Voe)/=0 ) CALL read_error(2, 'voe')
+         IF ( getparam_real( MODNAME, 'vcw', Nsegment, Vcw)/=0 ) CALL read_error(2, 'vcw')
+         IF ( getparam_real( MODNAME, 'vdwmx', Nsegment, Vdwmx)/=0 ) CALL read_error(2, 'vdwmx')
+         IF ( getparam_real( MODNAME, 'vdwmn', Nsegment, Vdwmn)/=0 ) CALL read_error(2, 'vdwmn')
+         IF ( getparam_real( MODNAME, 'vhw', Nsegment, Vhw)/=0 ) CALL read_error(2, 'vhw')
+         IF ( getparam_real( MODNAME, 'vow', Nsegment, Vow)/=0 ) CALL read_error(2, 'vow')
       ELSE
-         IF ( getparam( MODNAME, 'segshade_sum', Nsegment, 'real', Segshade_sum)/=0 ) CALL read_error(2, 'segshade_sum')
-         IF ( getparam( MODNAME, 'segshade_win', Nsegment, 'real', Segshade_win)/=0 ) CALL read_error(2, 'segshade_win')
+         IF ( getparam_real( MODNAME, 'segshade_sum', Nsegment, Segshade_sum)/=0 ) CALL read_error(2, 'segshade_sum')
+         IF ( getparam_real( MODNAME, 'segshade_win', Nsegment, Segshade_win)/=0 ) CALL read_error(2, 'segshade_win')
       ENDIF
 
-      IF ( getparam( MODNAME, 'ss_tau', Nsegment, 'integer', Ss_tau)/=0 ) CALL read_error(2, 'ss_tau')
-      IF ( getparam( MODNAME, 'gw_tau', Nsegment, 'integer', Gw_tau)/=0 ) CALL read_error(2, 'Gw_tau')
-      IF ( getparam( MODNAME, 'melt_temp', 1, 'real', Melt_temp)/=0 ) CALL read_error(2, 'melt_temp')
-      IF ( getparam( MODNAME, 'maxiter_sntemp', 1, 'real', Maxiter_sntemp)/=0 ) CALL read_error(2, 'maxiter_sntemp')
+      IF ( getparam_int( MODNAME, 'ss_tau', Nsegment, Ss_tau)/=0 ) CALL read_error(2, 'ss_tau')
+      IF ( getparam_int( MODNAME, 'gw_tau', Nsegment, Gw_tau)/=0 ) CALL read_error(2, 'Gw_tau')
+      IF ( getparam_real( MODNAME, 'melt_temp', 1, Melt_temp)/=0 ) CALL read_error(2, 'melt_temp')
+      IF ( getparam_real( MODNAME, 'maxiter_sntemp', 1, Maxiter_sntemp)/=0 ) CALL read_error(2, 'maxiter_sntemp')
 
       ierr = 0
       IF ( Strmtemp_humidity_flag==1 ) THEN
-         IF ( getparam( MODNAME, 'seg_humidity', Nsegment*MONTHS_PER_YEAR, 'real', Seg_humidity)/=0 ) &
+         IF ( getparam_real( MODNAME, 'seg_humidity', Nsegment*MONTHS_PER_YEAR, Seg_humidity)/=0 ) &
      &      CALL read_error(2, 'seg_humidity')
       ELSEIF ( Strmtemp_humidity_flag==2 ) THEN ! use station data
-         IF ( getparam(MODNAME, 'seg_humidity_sta', Nsegment, 'integer', Seg_humidity_sta)/=0 ) &
+         IF ( getparam_int(MODNAME, 'seg_humidity_sta', Nsegment, Seg_humidity_sta)/=0 ) &
      &      CALL read_error(2, 'seg_humidity_sta')
          DO i = 1, Nsegment
             CALL checkdim_param_limits(i, 'seg_humidity_sta', 'nhumid', Seg_humidity_sta(i), 1, Nhumid, ierr)
@@ -494,7 +494,7 @@
       seg_tave_sroff = 0.0
 
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==8 ) THEN
-        IF ( getparam(MODNAME, 'stream_tave_init', Nsegment, 'real', Stream_tave_init)/=0 ) CALL read_error(2, 'stream_tave_init')
+        IF ( getparam_real(MODNAME, 'stream_tave_init', Nsegment, Stream_tave_init)/=0 ) CALL read_error(2, 'stream_tave_init')
         Seg_tave_water = Stream_tave_init
       ENDIF
       IF ( Init_vars_from_file == 0 ) THEN
@@ -717,17 +717,17 @@
 !     stream_temp_run - Computes stream temperatures
 !***********************************************************************
       INTEGER FUNCTION stream_temp_run()
-      USE PRMS_MODULE, ONLY: Nowmonth !, Nowyear, Nowday
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, CFS2CMS_CONV
+      USE PRMS_MODULE, ONLY: Nsegment, Strmtemp_humidity_flag, Nowmonth !, Nowyear, Nowday
       USE PRMS_STRMTEMP
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area
-      USE PRMS_SET_TIME, ONLY: Summer_flag
+      USE PRMS_SET_TIME, ONLY: Summer_flag, Jday
       USE PRMS_CLIMATEVARS, ONLY: Tavgc, Potet, Hru_rain, Swrad
       USE PRMS_CLIMATE_HRU, ONLY: Humidity_hru
       USE PRMS_FLOWVARS, ONLY: Seg_outflow
       USE PRMS_SNOW, ONLY: Snowmelt
       USE PRMS_ROUTING, ONLY: Hru_segment, Segment_order, Seginc_swrad
       USE PRMS_OBS, ONLY: Humidity
-      USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_SOLTAB, ONLY: Soltab_potsw, Hru_cossl
 
       IMPLICIT NONE
@@ -871,6 +871,7 @@
  
       ENDDO
 
+
 ! Compute the running averages for groundwater and subsurface temperatures.
       if (gw_index >= gw_tau(i)) then
          gw_index = 1
@@ -1012,7 +1013,7 @@
              ! If there is no flow, set the temperature to -98.9
              ! -99.9 means that the segment never has any flow (determined up in init).
              ! -98.9 means that this a segment that could have flow, but doesn't
-            Seg_tave_water(i) = -98.9
+            Seg_tave_water(i) = NOFLOW_TEMP
             t_o = Seg_tave_water(i)
 
          elseif (fs .le. NEARZERO) then
@@ -1077,7 +1078,7 @@
 ! Compute the flow-weighted average temperature and a total sum of lateral inflows
 !*********************************************************************************
       SUBROUTINE lat_inflow(Qlat, Tl_avg, id, tave_gw, tave_air, tave_ss, melt, rain)
-      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV, NEARZERO
+      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
       USE PRMS_STRMTEMP, ONLY: Melt_temp
       USE PRMS_FLOWVARS, ONLY: Seg_lateral_inflow
       USE PRMS_ROUTING, ONLY: Seginc_sroff, Seginc_ssflow, Seginc_gwflow

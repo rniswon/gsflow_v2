@@ -16,7 +16,7 @@ MMFLIB      = $(LIBDIR)/libmmf.a
 ARC		= LINUX
 #ARC		= WINDOWS
 
-OPTLEVEL	= -g3 -fvar-tracking -gas-loc-support
+OPTLEVEL	= -g
 #OPTLEVEL	= -O -Bstatic
 #for gfortran
 LDFLAGS	=$(OPTLEVEL)

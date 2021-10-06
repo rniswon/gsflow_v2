@@ -5,20 +5,12 @@
 ! period. Associated states with each parameter are adjusted.
 !***********************************************************************
       MODULE PRMS_DYNAMIC_PARAM_READ
-        USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, MAXFILE_LENGTH, ACTIVE, OFF, &
-     &      ERROR_dynamic, DEBUG_minimum, DEBUG_less, INACTIVE, LAKE, NEARZERO, &
-     &      potet_jh_module, potet_pan_module, potet_hamon_module, potet_hs_module, &
-     &      potet_pt_module, potet_pm_module, climate_hru_module
-        USE PRMS_MODULE, ONLY: Model, Nhru, Print_debug, Start_year, Start_month, Start_day, &
-     &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_ag_soil_flag, &
-     &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
-     &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
-     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag, Dyn_ag_frac_flag, dynamic_param_log_file
+        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2021-05-10'
+        character(len=*), parameter :: Version_dynamic_param_read = '2021-09-14'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -53,7 +45,7 @@
         CHARACTER(LEN=MAXFILE_LENGTH) :: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic
-        CHARACTER(LEN=MAXFILE_LENGTH) :: soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic
+        CHARACTER(LEN=MAXFILE_LENGTH) :: soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, dynamic_param_log_file
         CHARACTER(LEN=MAXFILE_LENGTH) :: ag_soilmoist_dynamic, ag_soilrechr_dynamic, ag_frac_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, snareathresh_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn
@@ -87,6 +79,12 @@
 !     dynparaminit - open files, read to start time, initialize flags and arrays
 !***********************************************************************
       INTEGER FUNCTION dynparaminit()
+        USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, OFF, ERROR_dynamic, DEBUG_minimum
+        USE PRMS_MODULE, ONLY: Nhru, Print_debug, Start_year, Start_month, Start_day, &
+     &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_ag_soil_flag, &
+     &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
+     &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
+     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, PRMS4_flag, Dyn_ag_frac_flag
       USE PRMS_DYNAMIC_PARAM_READ
       IMPLICIT NONE
 ! Functions
@@ -444,8 +442,14 @@
 !     dynparamrun - Read and set dynamic parameters
 !***********************************************************************
       INTEGER FUNCTION dynparamrun()
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dynamic, INACTIVE, LAKE, &
+     &    potet_jh_module, potet_pan_module, potet_hamon_module, potet_hs_module, &
+     &    potet_pt_module, potet_pm_module, climate_hru_module
+      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, AG_flag, &
+     &    Dyn_imperv_flag, Dyn_covtype_flag, Dyn_potet_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
+     &    Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dprst_flag, &
+     &    Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag, Dyn_ag_frac_flag
       USE PRMS_DYNAMIC_PARAM_READ
-      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday, Ag_frac_flag
       USE PRMS_BASIN, ONLY: Hru_type, Hru_area, Dprst_clos_flag, &
      &    Hru_percent_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Dprst_frac, Dprst_open_flag, &
      &    Dprst_area_max, Dprst_area_open_max, Dprst_area_clos_max, Dprst_frac_open, &
@@ -484,7 +488,8 @@
       check_srechr_max_flag = OFF
       check_sm_max_flag = OFF
 
-      IF ( Imperv_frac_flag==ACTIVE .OR. Dprst_frac_flag==ACTIVE .OR. Dprst_depth_flag==ACTIVE .OR. Ag_frac_flag==ACTIVE ) THEN
+      IF ( Imperv_frac_flag==ACTIVE .OR. Dprst_frac_flag==ACTIVE .OR. Dprst_depth_flag==ACTIVE &
+     &     .OR. Dyn_ag_frac_flag==ACTIVE ) THEN
         Check_imperv = OFF
         Check_dprst_frac = OFF
         check_dprst_depth_flag = OFF
@@ -527,7 +532,7 @@
           ENDIF
         ENDIF
 
-        IF ( Ag_frac_flag==ACTIVE ) THEN
+        IF ( Dyn_ag_frac_flag==ACTIVE ) THEN
           IF ( Ag_frac_next_mo/=0 ) THEN
             IF ( Ag_frac_next_yr==Nowyear .AND. Ag_frac_next_mo==Nowmonth .AND. Ag_frac_next_day==Nowday ) THEN
               READ ( Ag_frac_unit, * ) Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day, Temp4
@@ -603,7 +608,7 @@
                 dprstfrac = Temp3(i)
                 IF ( dprstfrac==0.0 .AND. tmp>0.0 ) THEN
                   frac = Hru_frac_perv(i)
-!                  IF ( Ag_frac_flag==ACTIVE ) frac = frac + Ag_frac(i)
+                  IF ( AG_flag==ACTIVE ) frac = frac + Ag_frac(i)
                   IF ( frac>0.0 ) THEN
                     tmp = tmp/(Dprst_frac(i)*harea)/frac ! not sure this is correct???
                     PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0'
@@ -652,9 +657,9 @@
               ENDIF
             ENDIF
 
-            ! check sum of imperv ag, and dprst if either are updated!!!!!!
+            ! check sum of imperv, ag, and dprst if either are updated!!!!!!
             hruperv = harea - Hru_imperv(i)
-            IF ( Ag_frac_flag==ACTIVE ) hruperv = hruperv - Ag_area(i)
+            IF ( AG_flag==ACTIVE ) hruperv = hruperv - Ag_area(i)
             IF ( hruperv<0.0 ) THEN
               print *, 'hruperv problem, < 0, set to 0 ', hruperv
               hruperv = 0.0
@@ -1083,9 +1088,8 @@
 !     Values are read in, Parm are are updated or old
 !***********************************************************************
 !      SUBROUTINE write_dynparam_dble(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
-!      USE PRMS_MODULE, ONLY: Print_debug, Nhru
+!      USE PRMS_MODULE, ONLY: Print_debug, Nhru, Nowyear, Nowmonth, Nowday
 !      USE PRMS_BASIN, ONLY: Hru_type
-!      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
 !      IMPLICIT NONE
 ! Arguments
 !      INTEGER, INTENT(IN) :: Output_unit, Dim

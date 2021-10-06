@@ -3,15 +3,11 @@
 ! and flows for all HRUs
 !***********************************************************************
       MODULE PRMS_BASINSUM
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, &
-     &    strmflow_muskingum_module, strmflow_muskingum_lake_module, strmflow_muskingum_mann_module
-      USE PRMS_MODULE, ONLY: Nhru, Nobs, Model, Init_vars_from_file, &
-     &    Print_debug, End_year, Strmflow_flag, Glacier_flag
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=9), parameter :: MODNAME = 'basin_sum'
-      character(len=*), parameter :: Version_basin_sum = '2021-05-06'
+      character(len=*), parameter :: Version_basin_sum = '2021-09-07'
 
       INTEGER, SAVE :: BALUNT, Totdays
       INTEGER, SAVE :: Header_prt, Endjday
@@ -93,6 +89,8 @@
 !     print_type, print_freq, outlet_sta
 !***********************************************************************
       INTEGER FUNCTION sumbdecl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION
+      USE PRMS_MODULE, ONLY: Nhru, Nobs, Model
       USE PRMS_BASINSUM
       IMPLICIT NONE
 ! Functions
@@ -313,6 +311,8 @@
 !     sumbinit - Initialize basinsum module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION sumbinit()
+      USE PRMS_CONSTANTS, ONLY: OFF
+      USE PRMS_MODULE, ONLY: Nobs, Init_vars_from_file, Print_debug
       USE PRMS_BASINSUM
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_lake_stor
       USE PRMS_INTCP, ONLY: Basin_intcp_stor
@@ -322,7 +322,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MAX, MOD
-      INTEGER, EXTERNAL :: getparam, julian_day
+      INTEGER, EXTERNAL :: getparam_int, julian_day
       EXTERNAL :: header_print, read_error, write_outfile, PRMS_open_module_file
 ! Local Variables
       INTEGER :: pftemp
@@ -330,15 +330,15 @@
       sumbinit = 0
 
       IF ( Nobs>0 ) THEN
-        IF ( getparam(MODNAME, 'outlet_sta', 1, 'integer', Outlet_sta) &
+        IF ( getparam_int(MODNAME, 'outlet_sta', 1, Outlet_sta) &
      &       /=0 ) CALL read_error(2, 'outlet_sta')
         IF ( Outlet_sta==0 ) Outlet_sta = 1
       ENDIF
 
-      IF ( getparam(MODNAME, 'print_type', 1, 'integer', Print_type) &
+      IF ( getparam_int(MODNAME, 'print_type', 1, Print_type) &
      &     /=0 ) CALL read_error(2, 'print_type')
 
-      IF ( getparam(MODNAME, 'print_freq', 1, 'integer', Print_freq) &
+      IF ( getparam_int(MODNAME, 'print_freq', 1, Print_freq) &
      &     /=0 ) CALL read_error(2, 'print_freq')
 
       IF ( Init_vars_from_file==OFF ) THEN
@@ -475,7 +475,8 @@
 !     sumbrun - Computes summary values
 !***********************************************************************
       INTEGER FUNCTION sumbrun()
-      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, strmflow_muskingum_module, strmflow_muskingum_lake_module, strmflow_muskingum_mann_module
+      USE PRMS_MODULE, ONLY: Nobs, Print_debug, End_year, Strmflow_flag, Glacier_flag, Nowyear, Nowmonth, Nowday
       USE PRMS_BASINSUM
       USE PRMS_BASIN, ONLY: Active_area, Active_hrus, Hru_route_order
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, &

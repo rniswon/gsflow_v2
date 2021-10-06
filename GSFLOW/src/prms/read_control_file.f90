@@ -2,27 +2,20 @@
 ! Read Control File
 !***********************************************************************
       MODULE PRMS_CONTROL_FILE
-        USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH, MAXFILE_LENGTH, INT_TYPE, REAL_TYPE, CHAR_TYPE, &
-     &      ERROR_control, OFF, ACTIVE, DEBUG_normal
+        USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH, MAXFILE_LENGTH, INT_TYPE, REAL_TYPE, CHAR_TYPE, ERROR_control
         USE PRMS_MODULE, ONLY: Print_debug, EQULS, statsON_OFF, &
      &      Init_vars_from_file, Save_vars_to_file, Parameter_check_flag, Param_file, Model_output_file, &
      &      Precip_module, Temp_module, Et_module, Srunoff_module, Solrad_module, Gwr_swale_flag, &
      &      Strmflow_module, Transp_module, Soilzone_module, Print_debug, Dprst_flag, Subbasin_flag, Frozen_flag, &
      &      CsvON_OFF, MapOutON_OFF, Model_mode, Orad_flag, Endtime, Starttime, Snow_cbh_flag, Stream_temp_flag, &
-     &      Cascade_flag, Cascadegw_flag, Prms_warmup, Humidity_cbh_flag, Windspeed_cbh_flag, Strmtemp_humidity_flag, &
+     &      Cascadegw_flag, Prms_warmup, Humidity_cbh_flag, Windspeed_cbh_flag, Strmtemp_humidity_flag, &
      &      Gwflow_cbh_flag, NhruOutON_OFF, NsubOutON_OFF, BasinOutON_OFF, Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, &
      &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, NsegmentOutON_OFF, &
      &      Dyn_springfrost_flag, Dyn_snareathresh_flag, Dyn_covden_flag, Segment_transferON_OFF, Gwr_transferON_OFF, &
      &      Lake_transferON_OFF, External_transferON_OFF, Dprst_transferON_OFF, BasinOutON_OFF, &
-     &      Snarea_curve_flag, Gsflow_output_file, Dynamic_param_log_file, PRMS_land_iteration_flag, &
-     &      Csv_output_file, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, &
-     &      mappingFileName, xyFileName, Irrigation_area_module, AET_module, PET_ag_module, soilzone_aet_flag, Stat_var_file, &
-     &      Albedo_cbh_flag, Cloud_cover_cbh_flag, Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
-     &      Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use
+     &      Snarea_curve_flag, Gsflow_output_file, Stat_var_file
         USE GSFMODFLOW, ONLY: Modflow_name, Modflow_time_zero
-        USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, &
-     &      Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, AET_cbh_file, PET_cbh_file
         USE PRMS_MAP_RESULTS, ONLY: NmapOutVars, MapOutVar_names
         USE PRMS_STATVAR_OUT, ONLY: statvarOut_format, nstatVars, statVar_element, statVar_names
         USE PRMS_NHRU_SUMMARY, ONLY: NhruOutVars, NhruOut_freq, NhruOutBaseFileName, NhruOutVar_names, NhruOut_format, &
@@ -31,15 +24,7 @@
         USE PRMS_BASIN_SUMMARY, ONLY: BasinOutVars, BasinOut_freq, BasinOutBaseFileName, BasinOutVar_names
         USE PRMS_NSEGMENT_SUMMARY, ONLY: NsegmentOutVars, NsegmentOut_freq, NsegmentOutBaseFileName, &
      &      NsegmentOutVar_names, NsegmentOut_format
-        USE PRMS_WATER_USE, ONLY: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file, &
-     &      External_transfer_file, Lake_transfer_file
-        USE PRMS_DYNAMIC_PARAM_READ, ONLY: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
-     &      wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
-     &      potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, &
-     &      soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, &
-     &      fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, snareathresh_dynamic, &
-     &      covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn, &
-     &      ag_soilmoist_dynamic, ag_soilrechr_dynamic
+        USE PRMS_WATER_USE, ONLY: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file, External_transfer_file, Lake_transfer_file
         USE PRMS_GLACR, ONLY: Mbinit_flag
         USE PRMS_PRECIP_MAP, ONLY: Precip_map_file
         USE PRMS_TEMP_MAP, ONLY: Tmax_map_file, Tmin_map_file
@@ -69,6 +54,7 @@
       END MODULE PRMS_CONTROL_FILE
 
       SUBROUTINE read_control_file()
+      USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH, MAXFILE_LENGTH
       USE PRMS_CONTROL_FILE
       USE PRMS_MODULE, ONLY: Print_debug, Model_output_file, Model_control_file
       IMPLICIT NONE
@@ -134,7 +120,21 @@
 ! setup_cont - Set control parameter value defaults
 !***********************************************************************
       SUBROUTINE setup_cont()
-      USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag
+      USE PRMS_CONSTANTS, ONLY: DEBUG_normal, ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Soilzone_aet_flag, PRMS_land_iteration_flag, &
+     &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, Irrigation_area_module, AET_module, PET_ag_module, &
+     &    selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, &
+     &    Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
+     &    Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use
+      USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, &
+     &    Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, AET_cbh_file, PET_cbh_file
+      USE PRMS_DYNAMIC_PARAM_READ, ONLY: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
+     &    wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
+     &    potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, Dynamic_param_log_file, &
+     &    soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, &
+     &    fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, &
+     &    covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn, &
+     &    ag_soilmoist_dynamic, ag_soilrechr_dynamic !, snareathresh_dynamic
       USE PRMS_CONTROL_FILE
       IMPLICIT NONE
       ! Local Variables
@@ -219,6 +219,9 @@
       i = i + 1
       Control_parameter_data(i)%name = 'snarea_curve_flag'
       Snarea_curve_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'snow_cloudcover_flag'
+      snow_cloudcover_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'orad_flag'
       Orad_flag = OFF
@@ -355,7 +358,7 @@
       PRMS_land_iteration_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'soilzone_aet_flag'
-      soilzone_aet_flag = OFF
+      Soilzone_aet_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'albedo_cbh_flag'
       Albedo_cbh_flag = OFF
@@ -573,6 +576,11 @@
       Control_parameter_data(i)%name = 'transp_module'
       Transp_module = 'transp_tindex'
       Control_parameter_data(i)%values_character(1) = Transp_module
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'soilzone_module'
+      Soilzone_module = 'soilzone'
+      Control_parameter_data(i)%values_character(1) = Soilzone_module
       Control_parameter_data(i)%data_type = CHAR_TYPE
       i = i + 1
       Control_parameter_data(i)%name = 'data_file'
@@ -972,21 +980,21 @@
 ! Get Control File from command line or user interaction.
 !***********************************************************************
       SUBROUTINE get_control_filename()
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control
+      USE PRMS_CONSTANTS, ONLY: MAXCMDLINE_LENGTH, ERROR_control
       USE PRMS_MODULE, ONLY: Print_debug, EQULS, Model_control_file
       IMPLICIT NONE
       ! Functions
-      !INTRINSIC :: GET_COMMAND_ARGUMENT, COMMAND_ARGUMENT_COUNT, GET_COMMAND, TRIM
+      INTRINSIC :: GET_COMMAND_ARGUMENT, COMMAND_ARGUMENT_COUNT, GET_COMMAND, TRIM
       EXTERNAL :: error_stop
       ! Local Variables
-      CHARACTER(LEN=MAXFILE_LENGTH) command_line_arg, command_line
+      CHARACTER(LEN=MAXCMDLINE_LENGTH) command_line_arg, command_line
       LOGICAL :: exists
       INTEGER :: status, nchars, numargs
 !***********************************************************************
 ! Subroutine GET_COMMAND_ARGUMENT may not be available with all compilers-it is a Fortran 2003 routine
 ! This routine expects the Control File name to be the first argument, if present
       CALL GET_COMMAND(command_line)
-!      print *, 'Command line: ', TRIM(command_line)
+      print *, 'Command line: ', TRIM(command_line)
       numargs = COMMAND_ARGUMENT_COUNT()
       IF ( Print_debug>-1 ) PRINT '(/,A)', EQULS
       CALL GET_COMMAND_ARGUMENT(1, command_line_arg, nchars, status)
@@ -995,8 +1003,9 @@
         READ ( *, '(A)' ) Model_control_file
         IF ( Model_control_file(:4)=='quit' .OR. Model_control_file(:4)=='QUIT' ) ERROR STOP ERROR_control
       ELSE
-        IF ( TRIM(command_line_arg)=='-C' ) THEN
-          CALL GET_COMMAND_ARGUMENT(2, Model_control_file, nchars, status)
+        IF ( TRIM(command_line_arg(:2))=='-C' ) THEN
+          Model_control_file = TRIM(command_line_arg(3:))
+!          CALL GET_COMMAND_ARGUMENT(2, Model_control_file, nchars, status)
           IF ( status/=0 ) CALL error_stop('bad argment value after -C argument', ERROR_control)
         ELSE
           Model_control_file = TRIM(command_line_arg)
@@ -1025,7 +1034,7 @@
       EXTERNAL :: error_stop
       ! Local Variables
       CHARACTER(LEN=MAXFILE_LENGTH) command_line_arg, command_line
-      INTEGER :: status, i, j, nchars, numargs, index, param_type, num_param_values
+      INTEGER :: status, i, j, ii, nchars, numargs, index, param_type, num_param_values
 !***********************************************************************
 ! Subroutine GET_COMMAND_ARGUMENT may not be available with all compilers-it is a Fortran 2003 routine
 ! This routine expects the Control File name to be the first argument, if present
@@ -1037,7 +1046,7 @@
         i = i + 1
         CALL GET_COMMAND_ARGUMENT(i, command_line_arg, nchars, status)
         IF ( status/=0 ) CALL error_stop('setting control parameters from command line', ERROR_control)
-        IF ( TRIM(command_line_arg)=='-C' ) THEN
+        IF ( TRIM(command_line_arg(:2))=='-C' ) THEN ! rsr, this doesn't work if no space
           i = i + 2
           CYCLE
         ELSE
@@ -1067,6 +1076,13 @@
               IF ( status/=0 ) CALL error_stop('bad value after -set argument', ERROR_control)
               IF ( Print_debug>-1 ) PRINT *, 'PRMS command line argument,', i, ': ', TRIM(command_line_arg)
               IF ( param_type==1 ) THEN
+                IF ( Control_parameter_data(index)%name(:10)=='start_time' .OR. &
+     &               Control_parameter_data(index)%name(:8)=='end_time' ) THEN
+                  READ ( command_line_arg, *, IOSTAT=status ) &
+     &                   (Control_parameter_data(index)%values_int(ii),ii=1,num_param_values)
+!                  print *, 'values ', Control_parameter_data(index)%values_int
+                  EXIT
+                ENDIF
                 READ ( command_line_arg, *, IOSTAT=status ) Control_parameter_data(index)%values_int(j)
                 IF ( status/=0 ) CALL error_stop('reading integer command line argument', ERROR_control)
               ELSEIF ( param_type==4 ) THEN
