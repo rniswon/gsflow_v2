@@ -4,13 +4,13 @@
 !***********************************************************************
 
       MODULE GSFSUM
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, DEBUG_WB, DEBUG_less, ERROR_open_out, CFS2CMS_CONV, ACTIVE, READ_INIT, OFF
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       USE PRMS_MODULE, ONLY: Print_debug
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output CSV Summary'
       character(len=10), parameter :: MODNAME = 'gsflow_sum'
-      character(len=*), parameter :: Version_gsflow_sum = '2021-06-08'
+      character(len=*), parameter :: Version_gsflow_sum = '2021-09-28'
       INTEGER, SAVE :: BALUNT
       DOUBLE PRECISION, PARAMETER :: ERRCHK = 0.0001D0
       INTEGER, SAVE :: Balance_unt, Vbnm_index(14), Gsf_unt, Rpt_count
@@ -102,6 +102,7 @@
 !     rpt_days, csv_output_file, gsflow_output_file, model_output_file
 !***********************************************************************
       INTEGER FUNCTION gsfsumdecl()
+      USE PRMS_CONSTANTS, ONLY: DEBUG_WB
       USE GSFSUM
       IMPLICIT NONE
       INTEGER, EXTERNAL :: declparam
@@ -310,6 +311,7 @@
      &     'Volumetric flow rate of flow from gravity reservoirs to capillary reservoirs', &
      &     'L3/T', Basingvr2sm)
 
+!     includes precipitation, snowmelt, and cascading Hortonian and Dunnian runoff and interflow
       CALL declvar_dble(MODNAME, 'Infil2CapTotal_Q', 'one', 1, &
      &     'Volumetric flow rate of soil infiltration into capillary reservoirs including precipitation, snowmelt, and'// &
      &     ' cascading Hortonian and Dunnian runoff and interflow minus infiltration to preferential-flow reservoirs', &
@@ -401,22 +403,23 @@
 !                set to zero
 !***********************************************************************
       INTEGER FUNCTION gsfsuminit()
+      USE PRMS_CONSTANTS, ONLY: READ_INIT, OFF
+      USE PRMS_MODULE, ONLY: Init_vars_from_file
       USE GSFSUM
       USE GSFMODFLOW, ONLY: Acre_inches_to_mfl3, Mft_to_days
       USE GWFLAKMODULE, ONLY: TOTSTOR_LAK
       USE GWFSFRMODULE, ONLY: IRTFLG
       USE GLOBAL, ONLY: IUNIT
-      USE PRMS_MODULE, ONLY: Init_vars_from_file
       USE PRMS_BASIN, ONLY: Active_area
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor
       USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop, Basin_dprst_volcl
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getparam
+      INTEGER, EXTERNAL :: getparam_int
       EXTERNAL GSF_PRINT, gsflow_sum_restart, MODFLOW_SFR_GET_STORAGE
 !***********************************************************************
       gsfsuminit = 0
 
-      IF ( getparam(MODNAME, 'id_obsrunoff', 1, 'integer', Id_obsrunoff)/=0 ) CALL read_error(3, 'id_obsrunoff')
+      IF ( getparam_int(MODNAME, 'id_obsrunoff', 1, Id_obsrunoff)/=0 ) CALL read_error(3, 'id_obsrunoff')
       IF ( Id_obsrunoff==0 ) Id_obsrunoff = 1
 
       Basin_convert = Acre_inches_to_mfl3*Active_area*Mft_to_days       !RGN 7/15/2015 added *Mft_to_days
@@ -549,6 +552,8 @@
 !     gsfsumrun - Computes summary values
 !***********************************************************************
       INTEGER FUNCTION gsfsumrun()
+      USE PRMS_CONSTANTS, ONLY: DEBUG_WB, CFS2CMS_CONV, ACTIVE
+      USE PRMS_MODULE, ONLY: KKITER, Nobs, Timestep, Dprst_flag, Have_lakes, Nowyear, Nowmonth, Nowday, Gsf_rpt, Rpt_days
       USE GSFSUM
       USE GSFMODFLOW, ONLY: Mfl3t_to_cfs, KKSTP, KKPER, Maxgziter
       USE GSFBUDGET, ONLY: NetBoundaryFlow2Sat_Q, Gw_bnd_in, Gw_bnd_out, Well_in, Basin_szreject, &
@@ -558,9 +563,8 @@
       USE GWFSFRMODULE, ONLY: SFRUZBD, STRMDELSTOR_RATE, SFRRATIN, SFRRATOUT, IRTFLG, TOTSPFLOW
       USE GWFLAKMODULE, ONLY: TOTGWIN_LAK, TOTGWOT_LAK, TOTDELSTOR_LAK, &
      &    TOTSTOR_LAK, TOTWTHDRW_LAK, TOTRUNF_LAK, TOTSURFIN_LAK, &
-     &    TOTSURFOT_LAK, TOTEVAP_LAK, TOTPPT_LAK
+     &    TOTSURFOT_LAK, TOTEVAP_LAK, TOTPPT_LAK, NLAKES, EVAPLK
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_MODULE, ONLY: KKITER, Nobs, Timestep, Dprst_flag, Have_lakes, Nowyear, Nowmonth, Nowday, Gsf_rpt, Rpt_days
       USE PRMS_OBS, ONLY: Runoff, Runoff_units
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       USE PRMS_FLOWVARS, ONLY: Basin_perv_et, Basin_swale_et, &
@@ -581,6 +585,7 @@
       DOUBLE PRECISION :: obsq_cfs !, obsq_cms
 !     REAL :: gw_out, basinreachlatflowm3
       DOUBLE PRECISION :: sz_bal, et, rnf, gvf, szin, szout, szdstor, hru_bal
+      INTEGER :: ILAKE
 !***********************************************************************
       gsfsumrun = 0
 
@@ -603,7 +608,10 @@
       ImpervEvap_Q = Basin_imperv_evap*Basin_convert
       CanopyEvap_Q = Basin_intcp_evap*Basin_convert
       SnowEvap_Q = Basin_snowevap*Basin_convert
-      LakeEvap_Q = Basin_lakeevap*Basin_convert
+      LakeEvap_Q = 0.0    !this should just be lake package ET
+      DO ilake = 1, NLAKES
+          LakeEvap_Q = LakeEvap_Q + EVAPLK(ilake)
+      END DO
       DprstEvap_Q = Basin_dprst_evap*Basin_convert
 !      IF ( Have_lakes==ACTIVE ) LakeEvap_Q = TOTEVAP_LAK
       ! sanity check
@@ -988,8 +996,9 @@
 !     PRINTS VOLUMETRIC BUDGET FOR ENTIRE GSFLOW MODEL
 !***********************************************************************
       USE GSFSUM
-      USE GWFSFRMODULE, ONLY: STRMDELSTOR_RATE, STRMDELSTOR_CUM, IRTFLG
+      USE PRMS_CONSTANTS, ONLY: ACTIVE
       USE PRMS_MODULE, ONLY: KKITER, Have_lakes, Nowyear, Nowmonth, Nowday
+      USE GWFSFRMODULE, ONLY: STRMDELSTOR_RATE, STRMDELSTOR_CUM, IRTFLG
       IMPLICIT NONE
       INTRINSIC ABS
       EXTERNAL GSFFMTNUM

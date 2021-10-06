@@ -2,11 +2,10 @@
 !     Perform the MODFLOW budget procedure for PRMS soil zone
 !***********************************************************************
       MODULE GSFBUDGET
-      USE PRMS_CONSTANTS, ONLY: ERROR_dim, NEARZERO, CLOSEZERO, ACTIVE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2021-05-07'
+      character(len=*), parameter :: Version_gsflow_budget = '2021-09-29'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -193,7 +192,7 @@
 !     gsfbudinit - Initialize GSFBUDGET module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION gsfbudinit()
-      USE PRMS_CONSTANTS, ONLY: OFF
+      USE PRMS_CONSTANTS, ONLY: ERROR_dim, OFF
       USE GSFBUDGET
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru
       USE GWFSFRMODULE, ONLY: NSTRM
@@ -252,6 +251,7 @@
 ! adjust gravity flow storage with last gw2sm and gw_rejected
 !***********************************************************************
       INTEGER FUNCTION gsfbudrun()
+      USE PRMS_CONSTANTS, ONLY: DNEARZERO, CLOSEZERO, ACTIVE
       USE GSFBUDGET
       USE GSFMODFLOW, ONLY: Mfq2inch_conv, Mfl2_to_acre, & !, Cellarea, &
      &    Mfvol2inch_conv, Mfl3t_to_cfs, Mfl_to_inch, Gwc_col, Gwc_row
@@ -358,8 +358,8 @@
           IF ( Hru_type(i)==2 ) THEN
             lake = Lake_hru_id(i)
             !EVAP in mfl3/dt   SURFA in MFL2/dt
-            IF ( SURFA(lake)>NEARZERO ) THEN
-              inches_on_lake = SNGL(EVAP(lake))*DELT/SNGL(SURFA(lake)*Mfl_to_inch)                         !RGN 5/23/15 added *DELT for time units other than days.         
+            IF ( SURFA(lake)>DNEARZERO ) THEN
+              inches_on_lake = SNGL(EVAP(lake))*DELT/SNGL(SURFA(lake))*Mfl_to_inch                         !RGN 5/23/15 added *DELT for time units other than days.         
               Hru_actet(i) = inches_on_lake*SNGL(SURFA(lake)*Mfl2_to_acre/Lake_area(lake))
             ELSE
               Hru_actet(i) = 0.0
@@ -732,9 +732,9 @@
         END IF
         IF ( IOTSG(i)==0 .and. itemp == 0 ) Basin_cfs = Basin_cfs + SGOTFLW(i)
         Streamflow_sfr(i) = SGOTFLW(i)*Mfl3t_to_cfs_sngl
-        nrch = ISTRM(5, i)
+        nrch = ISTRM(5, first_reach)
         DO j = first_reach, nrch + first_reach - 1
-          Seepage_reach_sfr(i) = Seepage_reach_sfr(i) + STRM(11,j)*SNGL( Mfl3t_to_cfs )
+          Seepage_reach_sfr(i) = Seepage_reach_sfr(i) + STRM(11,j)*Mfl3t_to_cfs_sngl
         ENDDO
         Seepage_segment_sfr(i) = Seepage_reach_sfr(i)/FLOAT(nrch)
         first_reach = first_reach + nrch
