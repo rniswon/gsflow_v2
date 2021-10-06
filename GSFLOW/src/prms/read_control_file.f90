@@ -124,7 +124,7 @@
       USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Soilzone_aet_flag, PRMS_land_iteration_flag, &
      &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, Irrigation_area_module, AET_module, PET_ag_module, &
      &    selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, &
-     &    Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
+     &    Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, mappingFileName, xyFileName, &
      &    Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use
       USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, &
      &    Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, AET_cbh_file, PET_cbh_file

@@ -21,28 +21,24 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2021-09-30'
+      character(len=*), parameter :: Version_soilzone_ag = '2021-10-06'
       INTEGER, SAVE :: Soil_iter, Iter_aet_PRMS_flag, HRU_id
-!   Declared Variables
-      INTEGER, SAVE, ALLOCATABLE :: Ag_soil_saturated(:)
-!   GSFLOW Declared Variables
-      REAL, SAVE, ALLOCATABLE :: Ag_replenish_frac(:)
-!   Declared Parameters
-      INTEGER, SAVE :: max_soilzone_ag_iter
-      REAL, SAVE :: soilzone_aet_converge
-      ! AG variables and parameters
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
-      DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr, Basin_agwaterin
+      DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr
       !DOUBLE PRECISION, SAVE :: Basin_ag_ssstor, Basin_ag_recharge, Basin_ag_ssflow
-      REAL, SAVE, ALLOCATABLE :: Ag_soil_to_gw(:), Ag_soil_to_ssr(:), Ag_hortonian(:), Unused_ag_et(:), Ag_soil2gvr(:)
-      REAL, SAVE, ALLOCATABLE :: Ag_actet(:), Ag_dunnian(:), Ag_irrigation_add(:), Ag_gvr2sm(:), Ag_irrigation_add_vol(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Ag_upslope_dunnian(:)
-      REAL, SAVE, ALLOCATABLE :: Ag_soil_lower(:), Ag_soil_lower_stor_max(:), Ag_potet_rechr(:), Ag_potet_lower(:)
-      REAL, SAVE, ALLOCATABLE :: It0_ag_soil_rechr(:), It0_ag_soil_moist(:), Ag_soilwater_deficit(:)
-      !REAL, SAVE, ALLOCATABLE :: Ag_slow_flow(:), Ag_ssres_in(:) !, Ag_water_maxin(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_soil_to_gw(:), Ag_soil_to_ssr(:), Ag_dunnian(:), Ag_replenish_frac(:)
+      REAL, SAVE, ALLOCATABLE :: It0_ag_soil_rechr(:), It0_ag_soil_moist(:)
+      !REAL, SAVE, ALLOCATABLE :: Ag_slow_flow(:), Ag_ssres_in(:), Ag_water_maxin(:)
       !REAL, SAVE, ALLOCATABLE :: Ag_ssr_to_gw(:), Ag_slow_stor(:), Ag_recharge(:)
       !REAL, SAVE, ALLOCATABLE :: Ag_ssres_stor(:), Ag_ssres_flow(:)
-      integer, save :: total_iters, iter_nonconverge
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Ag_upslope_dunnian(:)
+!   Agriculture Declared Variables
+      INTEGER, SAVE, ALLOCATABLE :: Ag_soil_saturated(:)
+      DOUBLE PRECISION, SAVE :: Basin_agwaterin
+      REAL, SAVE, ALLOCATABLE :: Ag_hortonian(:), Unused_ag_et(:), Ag_soil2gvr(:), Ag_soilwater_deficit(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_actet(:), Ag_irrigation_add(:), Ag_gvr2sm(:), Ag_irrigation_add_vol(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_soil_lower(:), Ag_soil_lower_stor_max(:), Ag_potet_rechr(:), Ag_potet_lower(:)
+      INTEGER, SAVE :: total_iters, iter_nonconverge
       real, save :: unsatisfied_big
       ! parameters
 ! have covden a monthly, later
@@ -50,15 +46,20 @@
 !      REAL, SAVE, ALLOCATABLE :: Ag_sat_threshold(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_rechr_max_frac(:) ! Ag_crop_coef later, will specify PET
       !REAL, SAVE, ALLOCATABLE :: Ag_snowinfil_max(:), Ag_ssstor_init_frac(:)
+      INTEGER, SAVE :: max_soilzone_ag_iter
+      REAL, SAVE :: soilzone_aet_converge
 
       END MODULE PRMS_SOILZONE_AG
 
 !***********************************************************************
 !     Main soilzone_ag routine
 !***********************************************************************
-      INTEGER FUNCTION soilzone_ag()
+      INTEGER FUNCTION soilzone_ag(AFR)
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
+      IMPLICIT NONE
+      ! Arguments
+      LOGICAL, INTENT(IN) :: AFR
 ! Functions
       INTEGER, EXTERNAL :: szdecl, szinit, szrun_ag, szdecl_ag, szinit_ag
       EXTERNAL :: soilzone_restart_ag
@@ -66,7 +67,7 @@
       soilzone_ag = 0
 
       IF ( Process_flag==RUN ) THEN
-        soilzone_ag = szrun_ag()
+        soilzone_ag = szrun_ag(AFR)
       ELSEIF ( Process_flag==DECL ) THEN
         soilzone_ag = szdecl()
         soilzone_ag = szdecl_ag()
@@ -103,6 +104,8 @@
 
       total_iters = 0
 
+      CALL print_module(MODDESC_AG, MODNAME_AG, Version_soilzone_ag)
+
 ! Agriculture variables and parameters
       ALLOCATE ( Ag_soil_to_gw(Nhru), Ag_soil_to_ssr(Nhru) )
       ALLOCATE ( Ag_dunnian(Nhru) )
@@ -137,10 +140,12 @@
       CALL declvar_real(MODNAME, 'ag_irrigation_add', 'nhru', Nhru, &
      &     'Irrigation water added to agriculture fraction when ag_actet < PET_external for each HRU', &
      &     'inches', Ag_irrigation_add)
+
       ALLOCATE ( Ag_soilwater_deficit(Nhru) )
       CALL declvar_real(MODNAME, 'ag_soilwater_deficit', 'nhru', Nhru, &
      &     'Soil-water deficit of agriculture fraction for each HRU', &
      &     'inches', Ag_soilwater_deficit)
+
       ALLOCATE ( Ag_irrigation_add_vol(Nhru) )
       CALL declvar_real(MODNAME, 'ag_irrigation_add_vol', 'nhru', Nhru, &
      &     'Irrigation water added to agriculture fraction when ag_actet < PET_external for each HRU', &
@@ -330,7 +335,7 @@
 !                interflow, excess routed to stream,
 !                and groundwater reservoirs
 !***********************************************************************
-      INTEGER FUNCTION szrun_ag()
+      INTEGER FUNCTION szrun_ag(AFR)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
@@ -360,10 +365,12 @@
       USE PRMS_SNOW, ONLY: Snowcov_area, Snow_evap
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen, Infil_ag
       IMPLICIT NONE
+! Arguments
+      LOGICAL, INTENT(IN) :: AFR
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow
-      EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars, print_date
+      EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars, print_date, check_gvr_sm
 ! Local Variables
       INTEGER :: i, k, update_potet, compute_lateral, perv_on_flag
       REAL :: dunnianflw, interflow, perv_area, harea
@@ -395,7 +402,7 @@
           IF ( GSFLOW_flag==ACTIVE ) Gravity_stor_res = It0_gravity_stor_res
           IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
           IF ( Nlake>0 ) Potet = It0_potet
-        ELSE
+        ELSE IF (AFR) THEN
           It0_ssres_stor = Ssres_stor
           It0_slow_stor = Slow_stor
           IF ( GSFLOW_flag==ACTIVE ) THEN
@@ -414,7 +421,7 @@
           ! computed in srunoff
           Sroff = It0_sroff
           IF ( Call_cascade==ACTIVE ) Strm_seg_in = It0_strm_seg_in
-        ELSE
+        ELSE  IF (AFR) THEN
           It0_soil_rechr = Soil_rechr
           It0_soil_moist = Soil_moist
           It0_sroff = Sroff
@@ -425,7 +432,7 @@
       IF ( Kkiter>1 ) THEN
         Basin_soil_moist = It0_basin_soil_moist
         Basin_ssstor = It0_basin_ssstor
-      ELSE
+      ELSE  IF (AFR) THEN
         It0_basin_soil_moist = Basin_soil_moist
         It0_basin_ssstor = Basin_ssstor
       ENDIF
@@ -507,8 +514,6 @@
         IF ( Hru_type(i)==LAND .OR. Hru_type(i)==GLACIER ) compute_lateral = ACTIVE
         perv_area = Hru_perv(i)
         perv_frac = Hru_frac_perv(i)
-        ! infil for pervious portion of HRU
-        ! infil_ag for pervious and agriculture portion of HRU
         perv_on_flag = OFF
         IF ( perv_area>0.0 ) perv_on_flag = ACTIVE
         ag_water_maxin = 0.0
@@ -546,6 +551,7 @@
 !******if cascading flow available from upslope cascades
 !****** add soil excess (Dunnian flow) to infiltration
         ! infil for pervious portion of HRU
+        ! infil_ag for pervious and agriculture portion of HRU
         capwater_maxin = Infil(i)
 
         ag_water_maxin = 0.0
@@ -702,7 +708,7 @@
      &                          ag_capacity, ag_on_flag)
           ! adjust soil moisture with replenish amount
           IF ( Gvr2sm(i)>0.0 ) THEN
-            IF ( perv_frac>0.0 ) THEN
+            IF ( perv_on_flag==ACTIVE ) THEN
               Soil_moist(i) = Soil_moist(i) + Gvr2sm(i)/perv_frac ! ??? could this be bigger than soil_moist_max ??? (add to Dunnian)
 !              IF ( Soil_moist(i)>Soil_moist_max(i) ) PRINT *, 'CAP sm>max', Soil_moist(i), Soil_moist_max(i), i
               IF ( Soilzone_aet_flag==ACTIVE ) THEN
@@ -873,7 +879,7 @@
 !     &           Nowmonth, Nowday, Hru_actet(i), Potet(i), avail_potet
 !          ENDIF
 !          Hru_actet(i) = Potet(i)
-!          IF ( perv_frac>0.0 ) THEN
+!          IF ( perv_on_flag==ACTIVE ) THEN
 !            tmp = avail_potet/perv_frac
 !            pervactet = pervactet + tmp
 !            Soil_moist(i) = Soil_moist(i) - tmp
