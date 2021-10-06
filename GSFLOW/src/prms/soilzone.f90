@@ -125,7 +125,7 @@
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ERROR_dim, ACTIVE, OFF, DEBUG_WB, &
      &    CASCADE_OFF, MONTHS_PER_YEAR
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Nhrucell, Print_debug, &
-     &    Cascade_flag, GSFLOW_flag, Call_cascade
+     &    Cascade_flag, GSFLOW_flag, Call_cascade, PRMS_land_iteration_flag, AG_flag
       USE PRMS_SOILZONE
       IMPLICIT NONE
 ! Functions
@@ -499,12 +499,14 @@
         ENDIF
       ENDIF
 
-      IF ( GSFLOW_flag==ACTIVE ) THEN
+      Iter_aet = OFF
+      IF ( AG_flag==ACTIVE ) Iter_aet = ACTIVE
+      IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE .OR. Iter_aet==ACTIVE ) THEN
         ALLOCATE ( It0_ssres_stor(Nhru), It0_slow_stor(Nhru) )
         IF ( GSFLOW_flag==ACTIVE ) ALLOCATE ( It0_gravity_stor_res(Nhrucell) )
         IF ( Nlake>0 ) ALLOCATE ( It0_potet(Nhru) )
       ENDIF
-      IF ( GSFLOW_flag==ACTIVE ) THEN
+      IF ( (GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet==ACTIVE ) THEN
         ALLOCATE ( It0_soil_rechr(Nhru), It0_soil_moist(Nhru), It0_sroff(Nhru) )
         IF ( Call_cascade==ACTIVE ) ALLOCATE ( It0_strm_seg_in(Nsegment) )
       ENDIF
@@ -609,7 +611,8 @@
       INTEGER FUNCTION szinit()
       USE PRMS_CONSTANTS, ONLY: ERROR_dim, ACTIVE, OFF, LAKE, SWALE, INACTIVE, GLACIER, CASCADE_OFF, MONTHS_PER_YEAR
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nlake, Nhrucell, Dprst_flag, &
-     &    Init_vars_from_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag
+     &    Init_vars_from_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag, &
+     &    PRMS_land_iteration_flag
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Active_hrus, Hru_route_order, Hru_storage, &
      &    Basin_area_inv, Hru_area, Hru_frac_perv, Numlake_hrus
@@ -724,22 +727,24 @@
         perv_area = Hru_perv(i)
         Soil_zone_max(i) = Sat_threshold(i) + Soil_moist_max(i)*Hru_frac_perv(i)
         Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*Hru_frac_perv(i)
-!        Soil_moist_frac(i) = Soil_moist_tot(i)/Soil_zone_max(i)
-!        Cpr_stor_frac(i) = Soil_moist(i)/Soil_moist_max(i)
-!        Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Cpr_stor_frac(i)*perv_area )
-        Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Soil_moist(i)/Soil_moist_max(i)*perv_area )
-        Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)
-        Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
-        IF ( Soil_lower_stor_max(i)>0.0 ) Soil_lower_ratio(i) = Soil_lower(i)/Soil_lower_stor_max(i)
-!        Soil_rechr_ratio(i) = Soil_rechr(i)/Soil_rechr_max(i)
-!        Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_frac(i)*hruarea )
-        Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_tot(i)/Soil_zone_max(i)*hruarea )
-        Basin_soil_lower_stor_frac = Basin_soil_lower_stor_frac + DBLE( Soil_lower_ratio(i)*perv_area )
-!        Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + DBLE( Soil_rechr_ratio(i)*perv_area )
-        Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + DBLE( Soil_rechr(i)/Soil_rechr_max(i)*perv_area )
-        Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*perv_area )
-        Basin_soil_moist_tot = Basin_soil_moist_tot + DBLE( Soil_moist_tot(i)*hruarea )
-        Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(i)*perv_area )
+        IF ( perv_area>0.0 ) THEN
+!          Soil_moist_frac(i) = Soil_moist_tot(i)/Soil_zone_max(i)
+!          Cpr_stor_frac(i) = Soil_moist(i)/Soil_moist_max(i)
+!          Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Cpr_stor_frac(i)*perv_area )
+          Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Soil_moist(i)/Soil_moist_max(i)*perv_area )
+          Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)
+          Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
+          IF ( Soil_lower_stor_max(i)>0.0 ) Soil_lower_ratio(i) = Soil_lower(i)/Soil_lower_stor_max(i)
+!          Soil_rechr_ratio(i) = Soil_rechr(i)/Soil_rechr_max(i)
+!          Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_frac(i)*hruarea )
+          Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_tot(i)/Soil_zone_max(i)*hruarea )
+          Basin_soil_lower_stor_frac = Basin_soil_lower_stor_frac + DBLE( Soil_lower_ratio(i)*perv_area )
+!          Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + DBLE( Soil_rechr_ratio(i)*perv_area )
+          Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + DBLE( Soil_rechr(i)/Soil_rechr_max(i)*perv_area )
+          Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*perv_area )
+          Basin_soil_moist_tot = Basin_soil_moist_tot + DBLE( Soil_moist_tot(i)*hruarea )
+          Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(i)*perv_area )
+        ENDIF
         ! rsr, 6/12/2014 potential problem for GSFLOW if sum of slow_stor /= gravity_stor_res
         Basin_slstor = Basin_slstor + DBLE( Slow_stor(i)*hruarea )
         Basin_ssstor = Basin_ssstor + DBLE( Ssres_stor(i)*hruarea )
@@ -797,7 +802,7 @@
       Unused_potet = 0.0 ! dimension nhru
       Soil_saturated = OFF
       IF ( Pref_flag==ACTIVE ) THEN
-        IF ( GSFLOW_flag==ACTIVE ) ALLOCATE ( It0_pref_flow_stor(Nhru) )
+        IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_pref_flow_stor(Nhru) )
       ENDIF
 !      Interflow_max = 0.0
 !      Snowevap_aet_frac = 0.0
@@ -864,7 +869,8 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
-     &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, Nowmonth !, Nowyear, Nowday
+     &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, PRMS_land_iteration_flag, &
+     &    Soilzone_aet_flag, Nowmonth !, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -906,7 +912,7 @@
       szrun = 0
 
 ! It0 variables used with MODFLOW integration to save iteration states.
-      IF ( GSFLOW_flag==ACTIVE ) THEN
+      IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE ) THEN
         IF ( Kkiter>1 ) THEN
           Ssres_stor = It0_ssres_stor
           Slow_stor = It0_slow_stor
@@ -922,7 +928,7 @@
           Gw2sm_grav = 0.0
         ENDIF
       ENDIF
-      IF ( GSFLOW_flag==ACTIVE ) THEN
+      IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
         IF ( Kkiter>1 ) THEN
           Soil_rechr = It0_soil_rechr
           Soil_moist = It0_soil_moist
@@ -1137,7 +1143,17 @@
           IF ( Gvr2sm(i)>0.0 ) THEN
             Soil_moist(i) = Soil_moist(i) + Gvr2sm(i)/perv_frac ! ??? could this be bigger than soil_moist_max ??? (add to Dunnian)
 !            IF ( Soil_moist(i)>Soil_moist_max(i) ) PRINT *, 'CAP sm>max', Soil_moist(i), Soil_moist_max(i), i
-            Soil_rechr(i) = MIN( Soil_rechr_max(i), Soil_rechr(i) + Gvr2sm(i)/perv_frac*Replenish_frac(i) )
+            IF ( Soilzone_aet_flag==ACTIVE ) THEN
+              Soil_lower(i) = MIN( Soil_lower_stor_max(i), Soil_moist(i) - Soil_rechr(i) + Gvr2sm(i)/perv_frac )
+              Soil_rechr(i) = Soil_moist(i) - Soil_lower(i)
+!              excess = MAX( 0.0, Soil_lower(i) - Soil_lower_stor_max(i) )
+!              if ( abs(soil_lower(i) + soil_rechr(i) - soil_moist(i))>NEARZERO ) THEN
+!                print *, 'excess', excess, Soil_lower_stor_max(i), soil_lower(i) + soil_rechr(i)-soil_moist(i)
+!                print *, soil_lower(i), soil_rechr(i), soil_moist(i)
+!              endif
+            ELSE
+              Soil_rechr(i) = MIN( Soil_rechr_max(i), Soil_rechr(i) + Gvr2sm(i)/perv_frac*Replenish_frac(i) )
+            ENDIF
             Basin_gvr2sm = Basin_gvr2sm + DBLE( Gvr2sm(i)*harea )
 !          ELSEIF ( Gvr2sm(i)<-NEARZERO ) THEN
 !            PRINT *, 'negative gvr2sm, HRU:', i, Gvr2sm(i)
