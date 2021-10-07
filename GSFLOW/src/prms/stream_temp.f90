@@ -205,7 +205,7 @@
 
       ALLOCATE ( Seg_length(Nsegment) )
       IF ( declparam( MODNAME, 'seg_length', 'nsegment', 'real', &
-     &     '1000.0', '1.0', '100000.0', &
+     &     '1000.0', '0.001', '200000.0', &
      &     'Length of each segment', &
      &     'Length of each segment', &
      &     'meters')/=0 ) CALL read_error(1, 'seg_length')
@@ -990,6 +990,8 @@
          CALL lat_inflow(qlat, seg_tave_lat(i), i, seg_tave_gw(i), Seg_tave_air(i), seg_tave_ss(i), &
      &                   Seg_melt(i), Seg_rain(i))
 
+! addition of lat_temp_adj moved up here before the ).0 degree cutoff.
+         seg_tave_lat(i) = seg_tave_lat(i) + lat_temp_adj(i,Nowmonth)
 
          ! This code does not handle thermodynamics of ice, so temperatures below 0 are not allowed.
          ! The question is when to set temperatures below 0 to 0. If, after computing the running averages
@@ -1018,7 +1020,8 @@
 
          elseif (fs .le. NEARZERO) then
              ! if this is true, then there is no flow from upstream, but there is lateral inflow
-            t_o = seg_tave_lat(i) + lat_temp_adj(i,Nowmonth)
+!            t_o = seg_tave_lat(i) + lat_temp_adj(i,Nowmonth)
+            t_o = seg_tave_lat(i)
 
          elseif (qlat .le. NEARZERO) then
              ! if this is true, then there is no lateral flow, but there is flow from upstream
@@ -1027,8 +1030,11 @@
          else
              ! if this is true, then there is both lateral flow and flow from upstream
              !  qlat is in CMS so fs needs to be converted
+!            t_o = sngl((seg_tave_upstream(i) * fs * CFS2CMS_CONV) + &
+!     &                   (sngl(qlat) * (seg_tave_lat(i) + lat_temp_adj(i,Nowmonth)))) / &
+!     &                   sngl((fs * CFS2CMS_CONV) + sngl(qlat))
             t_o = sngl((seg_tave_upstream(i) * fs * CFS2CMS_CONV) + &
-     &                   (sngl(qlat) * (seg_tave_lat(i) + lat_temp_adj(i,Nowmonth)))) / &
+     &                   (sngl(qlat) * seg_tave_lat(i))) / &
      &                   sngl((fs * CFS2CMS_CONV) + sngl(qlat))
          endif
 
