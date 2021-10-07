@@ -457,6 +457,7 @@
         year = Start_year
         month = Start_month
         day = Start_day
+        ierr = 0
 
         CALL PRMS_open_module_file(Outunit, 'water_use.out')
         WRITE ( Outunit, 10 ) 'Simulation Start Date:', year, month, day, '   End Date:', &
