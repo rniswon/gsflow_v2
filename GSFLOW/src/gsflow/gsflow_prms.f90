@@ -1108,11 +1108,8 @@
 
       IF ( call_modules('setdims')/=0 ) Inputerror_flag = 1
 
-      IF ( Inputerror_flag==1 ) THEN
-        PRINT '(//,A,/,A)', '**FIX input errors in your Control File to continue**', &
-     &        'NOTE: some errors may be due to use of defalut values'
-        STOP
-      ENDIF
+      IF ( Inputerror_flag==1 ) PRINT '(//,A,/,A,/ )', '**FIX input errors in your Control File to continue**', &
+     &     'NOTE: some errors may be due to use of defalut values'
 
       setdims = Inputerror_flag
       END FUNCTION setdims
@@ -1441,7 +1438,8 @@
       CALL water_balance()
       test = subbasin()
 
-      PRINT 9001
+      IF ( Process_flag==DECL ) PRINT 9001
+
  9001 FORMAT (//, ' All available modules have been called.', /, &
      &        ' All parameters have been declared.', /, &
      &        ' Note, no simulation was computed.', /)

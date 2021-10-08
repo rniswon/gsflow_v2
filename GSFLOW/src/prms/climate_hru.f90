@@ -318,13 +318,13 @@
         IF ( Humidity_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Humidity_hru(Nhru) )
           IF ( declvar(MODNAME, 'humidity_hru', 'nhru', Nhru, 'real', &
-     &         'Relative humidity of each HRU', &
+     &         'Relative humidity of each HRU read from CBH File', &
      &         'percentage', Humidity_hru)/=0 ) CALL read_error(3, 'humidity_hru')
         ENDIF
         IF ( Albedo_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Albedo_hru(Nhru) )
           IF ( declvar(MODNAME, 'albedo_hru', 'nhru', Nhru, 'real', &
-     &         'Snowpack albedo of each HRU', &
+     &         'Snowpack albedo of each HRU read from CBH File', &
      &         'decimal fraction', Albedo_hru)/=0 ) CALL read_error(3, 'albedo_hru')
         ENDIF
         IF ( Cloud_cover_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
@@ -339,7 +339,7 @@
      &         'meters/second', Basin_windspeed)/=0 ) CALL read_error(3, 'basin_windspeed')
           ALLOCATE ( Windspeed_hru(Nhru) )
           IF ( declvar(MODNAME, 'windspeed_hru', 'nhru', Nhru, 'real', &
-     &         'Wind speed for each HRU', &
+     &         'Wind speed for each HRU read from CBH File', &
      &         'meters/second', Windspeed_hru)/=0 ) CALL read_error(3, 'windspeed_hru')
         ENDIF
 

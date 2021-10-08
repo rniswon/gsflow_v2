@@ -89,7 +89,7 @@
         Use_transfer_intcp = ACTIVE
         ALLOCATE ( Gain_inches(Nhru) )
         IF ( declvar(MODNAME, 'gain_inches', 'nhru', Nhru, 'real', &
-     &       'Canopy_gain in canopy as depth over the HRU', &
+     &       'Canopy_gain in as depth in canopy', &
      &       'inches', Gain_inches)/=0 ) CALL read_error(3, 'gain_inches')
         ALLOCATE ( Gain_inches_hru(Nhru) )
         IF ( declvar(MODNAME, 'gain_inches_hru', 'nhru', Nhru, 'real', &

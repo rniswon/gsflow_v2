@@ -424,7 +424,7 @@
      &       'cfs', Soilzone_gain_tot)/=0 ) CALL read_error(1, 'soilzone_gain_tot')
         ALLOCATE ( Soilzone_gain_hru(Nhru) )
         IF ( declvar(MODNAME, 'soilzone_gain_hru', 'nhru', Nhru, 'real', &
-     &       'Irrigation added to soilzone from water-use module for each HRU', &
+     &       'Irrigation added to soilzone as depth over each HRU', &
      &       'inches', Soilzone_gain_hru)/=0 ) CALL read_error(3, 'soilzone_gain_hru')
         IF ( declvar(MODNAME, 'total_soilzone_gain', 'one', 1, 'double', &
      &       'Transfer gains to all capillary reservoirs for each time step', &
