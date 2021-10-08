@@ -322,7 +322,6 @@
       ENDIF
 
       IF ( Model==CLIMATE ) THEN
-        IF ( ierr/=0 ) CALL module_error('CLIMATE', Arg, ierr)
         IF ( Process_flag==RUN ) THEN
           CALL summary_output()
           RETURN
@@ -389,7 +388,6 @@
       ENDIF
 
       IF ( Model==POTET ) THEN
-        IF ( ierr/=0 ) CALL module_error('POTET', Arg, ierr)
         IF ( Process_flag==RUN ) THEN
           CALL summary_output()
           RETURN
