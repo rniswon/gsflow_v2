@@ -1352,6 +1352,8 @@
 !     Module documentation
 !**********************************************************************
       SUBROUTINE module_doc()
+      USE PRMS_CONSTANTS, ONLY: DECL
+      USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: basin, climateflow, prms_time
@@ -1430,7 +1432,8 @@
       CALL water_balance()
       test = subbasin()
 
-      PRINT 9001
+      IF ( Process_flag==DECL ) PRINT 9001
+
  9001 FORMAT (//, ' All available modules have been called.', /, &
      &        ' All parameters have been declared.', /, &
      &        ' Note, no simulation was computed.', /)
