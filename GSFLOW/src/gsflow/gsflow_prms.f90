@@ -1448,6 +1448,8 @@
 !     Module documentation
 !**********************************************************************
       SUBROUTINE module_doc(AFR)
+      USE PRMS_CONSTANTS, ONLY: DECL
+      USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Arguments
       LOGICAL, INTENT(IN) :: AFR
