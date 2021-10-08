@@ -8,7 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-10-01'
+      character(len=*), parameter :: Version_intcp = '2021-10-08'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -89,14 +89,14 @@
         IF ( Water_use_flag==ACTIVE ) Use_transfer_intcp = ACTIVE
         ALLOCATE ( Gain_inches(Nhru) )
         CALL declvar_real(MODNAME, 'gain_inches', 'nhru', Nhru, &
-     &       'Canopy_gain in canopy as depth over the HRU', &
+     &       'Canopy_gain in as depth in canopy', &
      &       'inches', Gain_inches)
         ALLOCATE ( Gain_inches_hru(Nhru) )
         CALL declvar_real(MODNAME, 'gain_inches_hru', 'nhru', Nhru, &
      &       'Canopy_gain in canopy as depth over the HRU', &
      &       'inches', Gain_inches_hru)
         CALL declvar_dble(MODNAME, 'basin_net_apply', 'one', 1, &
-     &       'Basin area-weighted average net_apply', &
+     &       'Basin area-weighted average net application', &
      &       'inches', Basin_net_apply)
         CALL declvar_dble(MODNAME, 'basin_hru_apply', 'one', 1, &
      &       'Basin area-weighted average canopy_gain', &

@@ -425,7 +425,7 @@
      &       'cfs', Soilzone_gain_tot)
         ALLOCATE ( Soilzone_gain_hru(Nhru) )
         CALL declvar_real(MODNAME, 'soilzone_gain_hru', 'nhru', Nhru, &
-     &       'Irrigation added to soilzone from water-use module for each HRU', &
+     &       'Irrigation added to soilzone as depth over each HRU', &
      &       'inches', Soilzone_gain_hru)
         CALL declvar_dble(MODNAME, 'total_soilzone_gain', 'one', 1, &
      &       'Transfer gains to all capillary reservoirs for each time step', &
