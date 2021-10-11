@@ -12,7 +12,7 @@
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
-      INTEGER, SAVE :: Use_transfer_intcp
+      INTEGER, SAVE :: Use_transfer_intcp, Canopy_irrigation_flag
       INTEGER, PARAMETER :: RAIN = 0, SNOW = 1
 !   Declared Variables
       INTEGER, SAVE, ALLOCATABLE :: Intcp_on(:), Intcp_form(:)
@@ -227,7 +227,7 @@
 !***********************************************************************
       INTEGER FUNCTION intinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB
-      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug, Agriculture_soilzone_flag, Ag_package
       USE PRMS_INTCP
       USE PRMS_CLIMATEVARS, ONLY: Transp_on
       IMPLICIT NONE
@@ -271,6 +271,8 @@
       Basin_net_apply = 0.0D0
       Basin_hru_apply = 0.0D0
       IF ( Print_debug==DEBUG_WB ) ALLOCATE ( Intcp_stor_ante(Nhru) )
+      Canopy_irrigation_flag = OFF
+      IF ( Ag_package==ACTIVE .AND. Agriculture_soilzone_flag==OFF ) Canopy_irrigation_flag = ACTIVE
 
       END FUNCTION intinit
 
@@ -481,7 +483,7 @@
           ENDIF
           IF ( Hru_type(i)==LAKE ) CALL error_stop('irrigation specified and hru_type is lake', ERROR_param)
           ag_water_maxin = 0.0  ! inches
-          IF ( Ag_package==ACTIVE ) ag_water_maxin = Hru_ag_irr(i) / Ag_area(i) ! Hru_ag_irr must be in inches
+          IF ( Canopy_irrigation_flag==ACTIVE ) ag_water_maxin = Hru_ag_irr(i) / Ag_area(i) ! Hru_ag_irr must be in inches, should this be divided by ag_frac ??
           IF ( Use_transfer_intcp==ACTIVE ) ag_water_maxin = ag_water_maxin + Canopy_gain(i)/SNGL(Cfs_conv)/harea ! Canopy_gain in CFS, convert to inches
 
           IF ( ag_water_maxin>0.0 ) THEN
@@ -501,7 +503,7 @@
             ELSEIF ( irrigation_type==2 ) THEN
               IF ( Use_transfer_intcp==ACTIVE ) PRINT *, 'WARNING, irrigation water > 0, but irr_type = 2 (ignore), HRU:', &
      &                                                   i, ', application water:', Canopy_gain(i)
-              IF ( Ag_package==ACTIVE ) CALL error_stop('irrigation specified and irr_type = 2 (ignore)', ERROR_param)
+              IF ( Canopy_irrigation_flag==ACTIVE ) CALL error_stop('irrigation specified and irr_type = 2 (ignore)', ERROR_param)
               Canopy_gain(i) = 0.0 ! remove ignored canopy gain from water budget
             ELSEIF ( irrigation_type==1 .OR. .NOT.(cov>0.0) ) THEN ! irr_type = 1 or (0 or 3 and cov=0) bare ground
               Net_apply(i) = ag_water_maxin
