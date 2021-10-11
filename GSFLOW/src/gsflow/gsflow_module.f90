@@ -20,7 +20,7 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 09/30/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 10/11/2021'
       character(len=*), parameter :: PRMS_versn = '2021-09-30'
       character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 09/30/2021'
       character(len=*), parameter :: Version_read_control_file = '2021-10-05'
@@ -72,7 +72,8 @@
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
-      INTEGER, SAVE :: Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, Dyn_ag_frac_flag, Dyn_ag_soil_flag
+      INTEGER, SAVE :: Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, Agriculture_soilzone_flag
+      INTEGER, SAVE :: Dyn_ag_frac_flag, Dyn_ag_soil_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF, outputSelectDatesON_OFF, snow_cloudcover_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName
@@ -122,7 +123,7 @@
       INTEGER, SAVE, ALLOCATABLE :: Stress_dates(:)
       INTEGER, SAVE :: Modflow_skip_stress, Kkper_new
       INTEGER, SAVE :: Modflow_skip_time_step
-      DOUBLE PRECISION, SAVE :: Modflow_time_in_stress,Modflow_skip_time
+      DOUBLE PRECISION, SAVE :: Modflow_time_in_stress, Modflow_skip_time
       DOUBLE PRECISION, SAVE :: Mft_to_sec, Totalarea_mf
       DOUBLE PRECISION, SAVE :: Mfl2_to_acre, Mfl3_to_ft3, Sfr_conv
       DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs

@@ -8,7 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-10-08'
+      character(len=*), parameter :: Version_intcp = '2021-10-11'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -285,7 +285,7 @@
      &    Ag_package, Hru_ag_irr
       USE PRMS_INTCP
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_type, Covden_win, Covden_sum, &
-     &    Hru_route_order, Hru_area, Cov_type, Ag_frac !, Ag_cov_type
+     &    Hru_route_order, Hru_area, Cov_type, Ag_frac, Ag_area !, Ag_cov_type
       USE PRMS_WATER_USE, ONLY: Canopy_gain ! need to add ag apply ???
 ! Newsnow and Pptmix can be modfied, WARNING!!!
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, &
@@ -481,7 +481,7 @@
           ENDIF
           IF ( Hru_type(i)==LAKE ) CALL error_stop('irrigation specified and hru_type is lake', ERROR_param)
           ag_water_maxin = 0.0  ! inches
-          IF ( Ag_package==ACTIVE ) ag_water_maxin = Hru_ag_irr(i) ! Hru_ag_irr must be in inches
+          IF ( Ag_package==ACTIVE ) ag_water_maxin = Hru_ag_irr(i) / Ag_area(i) ! Hru_ag_irr must be in inches
           IF ( Use_transfer_intcp==ACTIVE ) ag_water_maxin = ag_water_maxin + Canopy_gain(i)/SNGL(Cfs_conv)/harea ! Canopy_gain in CFS, convert to inches
 
           IF ( ag_water_maxin>0.0 ) THEN
