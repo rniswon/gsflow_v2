@@ -6,7 +6,7 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-09-28'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-10-11'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -568,7 +568,7 @@
       USE PRMS_CONSTANTS, ONLY: DNEARZERO
       USE GWFAGMODULE, ONLY: NUMIRRPOND, IRRPONDVAR, PONDFLOW
       USE PRMS_MODULE, ONLY: Dprst_ag_transfer
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
+!      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
       USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
       IMPLICIT NONE
       INTRINSIC :: SNGL
@@ -586,11 +586,12 @@
           !IF ( demand_inch_acres > SNGL(Dprst_vol_open(hru_id))) demand_inch_acres = SNGL(Dprst_vol_open(hru_id))
           !PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
           Dprst_ag_transfer(hru_id) = Dprst_ag_transfer(hru_id) + demand_inch_acres
-          Dprst_vol_open(hru_id) = Dprst_vol_open(hru_id) - demand_inch_acres
-          if (Dprst_vol_open(hru_id)<0.0) THEN
-            if (Dprst_vol_open(hru_id)<1.0D-09) print *, 'dprst empty', Dprst_vol_open(hru_id)
-            Dprst_vol_open(hru_id) = 0.0D0
-          end if
+          ! rsr, moving to srunoff
+!          Dprst_vol_open(hru_id) = Dprst_vol_open(hru_id) - demand_inch_acres
+!          if (Dprst_vol_open(hru_id)<0.0) THEN
+!            if (Dprst_vol_open(hru_id)<1.0D-09) print *, 'dprst empty', Dprst_vol_open(hru_id)
+!            Dprst_vol_open(hru_id) = 0.0D0
+!          end if
         END IF
       end do
 

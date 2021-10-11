@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2021-09-30'
+      character(len=*), parameter :: Version_srunoff = '2021-10-11'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -1447,7 +1447,7 @@
      &           Avail_et, Net_rain, Dprst_in)
       USE PRMS_CONSTANTS, ONLY: ERROR_water_use, NEARZERO, DNEARZERO, OFF, ACTIVE ! , DEBUG_less
       USE PRMS_MODULE, ONLY: Cascade_flag, Dprst_add_water_use, Dprst_transfer_water_use, &
-     &    Nowyear, Nowmonth, Nowday !, Print_debug
+     &    Nowyear, Nowmonth, Nowday, Dprst_ag_gain, Dprst_ag_transfer, Ag_package !, Print_debug
       USE PRMS_SRUNOFF, ONLY: Srp, Sri, Ihru, Perv_frac, Imperv_frac, Hruarea, Dprst_et_coef, &
      &    Dprst_seep_rate_open, Dprst_seep_rate_clos, Va_clos_exp, Va_open_exp, Dprst_flow_coef, &
      &    Dprst_vol_thres_open, Dprst_vol_clos_max, Dprst_insroff_hru, Upslope_hortonian, &
@@ -1508,6 +1508,9 @@
 
       IF ( Dprst_add_water_use==ACTIVE ) THEN
         IF ( Dprst_gain(Ihru)>0.0 ) inflow = inflow + Dprst_gain(Ihru) / SNGL( Cfs_conv )
+      ENDIF
+      IF ( Ag_package==ACTIVE ) THEN
+        inflow = inflow + Dprst_ag_gain(Ihru) - Dprst_ag_transfer(Ihru) ! in inch-acres
       ENDIF
 
       Dprst_in = 0.0D0
