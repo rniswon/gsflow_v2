@@ -151,7 +151,7 @@
      &         'Current iteration in GSFLOW simulation', 'none', KKITER)
           ALLOCATE ( Hru_ag_irr(Nhru) )
           CALL declvar_real(MODNAME, 'hru_ag_irr', 'nhru', Nhru, &
-     &         'Irrigation added to soilzone from MODFLOW wells', 'inches', Hru_ag_irr)
+     &         'Irrigation added to soilzone from MODFLOW wells', 'inch-acres', Hru_ag_irr)
           Hru_ag_irr = 0.0
           ALLOCATE ( Dprst_ag_gain(Nhru) )
           CALL declvar_real(MODNAME, 'dprst_ag_gain', 'nhru', Nhru, &
@@ -531,9 +531,9 @@
           ENDIF
 
           IF ( AG_flag==ACTIVE ) THEN
-            ierr = soilzone_ag()
+            ierr = soilzone_ag(AFR)
           ELSE
-            ierr = soilzone()
+            ierr = soilzone(AFR)
           ENDIF
           IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
@@ -1064,6 +1064,7 @@
       IF ( control_integer(Agriculture_soil_flag, 'agriculture_soil_flag')/=0 ) Agriculture_soil_flag = OFF
       IF ( control_integer(Agriculture_canopy_flag, 'agriculture_canopy_flag')/=0 ) Agriculture_canopy_flag = OFF
       IF ( control_integer(Agriculture_dprst_flag, 'agriculture_dprst_flag')/=0 ) Agriculture_dprst_flag = OFF
+      IF ( control_integer(Agriculture_soilzone_flag, 'agriculture_soilzone_flag')/=0 ) Agriculture_soilzone_flag = OFF
       IF ( Dprst_flag==OFF .AND. Agriculture_dprst_flag==ACTIVE ) &
      &     CALL error_stop('agriculture_dprst_flag = 1, but dprst_flag = 0', ERROR_control)
       Agriculture_flag = Agriculture_soil_flag + Agriculture_canopy_flag + Agriculture_dprst_flag

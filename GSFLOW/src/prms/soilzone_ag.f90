@@ -21,8 +21,8 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2021-10-06'
-      INTEGER, SAVE :: Soil_iter, Iter_aet_PRMS_flag, HRU_id
+      character(len=*), parameter :: Version_soilzone_ag = '2021-10-11'
+      INTEGER, SAVE :: Soil_iter, Iter_aet_PRMS_flag, HRU_id, Soilzone_irr_flag
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr
       !DOUBLE PRECISION, SAVE :: Basin_ag_ssstor, Basin_ag_recharge, Basin_ag_ssflow
@@ -244,8 +244,8 @@
 !                 set initial values and check parameter values
 !***********************************************************************
       INTEGER FUNCTION szinit_ag()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, LAKE, GLACIER, INACTIVE
-      USE PRMS_MODULE, ONLY: Ag_package, Init_vars_from_file, Nhru
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, LAKE, GLACIER, INACTIVE, OFF
+      USE PRMS_MODULE, ONLY: Ag_package, Init_vars_from_file, Nhru, Agriculture_soilzone_flag, AG_flag
       USE PRMS_SOILZONE, ONLY: MODNAME, Iter_aet, Soil2gw_max
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_type, Basin_area_inv, Ag_area, Covden_win, Covden_sum
@@ -325,6 +325,8 @@
       Soil_iter = 1
       iter_nonconverge = 0
       unsatisfied_big = 0.0
+      Soilzone_irr_flag = OFF
+      IF ( Ag_package==ACTIVE .AND. Agriculture_soilzone_flag==ACTIVE .AND. AG_flag==ACTIVE ) Soilzone_irr_flag = ACTIVE
 
       END FUNCTION szinit_ag
 
@@ -555,7 +557,7 @@
         capwater_maxin = Infil(i)
 
         ag_water_maxin = 0.0
-        IF ( Ag_package==ACTIVE ) THEN
+        IF ( Soilzone_irr_flag==ACTIVE ) THEN
           IF ( Hru_ag_irr(i)>0.0 ) THEN ! Hru_ag_irr is in inches-acres over ag area
             IF ( ag_on_flag==OFF ) THEN
               PRINT *, 'ag_frac=0.0 for HRU:', i
