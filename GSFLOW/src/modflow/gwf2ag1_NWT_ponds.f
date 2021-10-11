@@ -2373,12 +2373,12 @@
         ELSE
           IF ( POND(3,L) > 0 ) THEN
             PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))
-      write(888,121)POND(3,L),kkper,kkstp,kkiter,POND(4,L),
-     +            SGOTFLW(int(POND(3,L))),seg(2,POND(3,L))
+!      write(888,121)POND(3,L),kkper,kkstp,kkiter,POND(4,L),
+!     +            PONDSEGFLOW(L),seg(2,POND(3,L))
           END IF
         END IF
       END DO
-121   format(e20.10,3i6,3e20.10)
+!121   format(e20.10,3i6,3e20.10)
       !
       !2 - -----IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF (ETDEMANDFLAG > 0) THEN
@@ -2802,6 +2802,13 @@
          ! - -------COPY FLOW TO WELL LIST.
          WELL(NWELVL, L) = SNGL( QQ )
          END IF
+      END DO
+      DO L = 1, NUMIRRPOND
+        IF ( FLOWTHROUGH_POND(L) == 0 ) THEN
+          IF ( POND(3,L) > 0 ) THEN
+            PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))
+          END IF
+        END IF
       END DO
       !
       ! - -------WRITE REQUESTED TIME SERIES OUTPUT.
@@ -3339,13 +3346,13 @@
      +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
         PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
-  !      if(i==1)then
-  !    etdif = pettotal - aettotal
-  !        write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
-  !   +                 PONDFLOWOLD(I),pettotal,aettotal,etdif,
-  !   +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
-  !      endif
-  !33  format(4i5,7e20.10)
+        !if(i==1)then
+      !etdif = pettotal - aettotal
+          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
+     +                 PONDSEGFLOW(I),pettotal,aettotal,
+     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
+        !endif
+  33  format(4i5,6e20.10)
 300   continue
       return
       end subroutine demandpond_prms
@@ -3807,8 +3814,10 @@
            Q = Q + PONDSEGFLOW(I)
            QQ = QQ + PONDFLOW(I)
            hru_id = IRRPONDVAR(I)
+           sub = DZERO
            if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
-             sub = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+             if ( ISSFLG(kkper) == 0 ) sub = 
+     +            Dprst_vol_open(hru_id)/MFQ_to_inch_acres
              if ( sub < DZERO ) sub = DZERO
              QQQ = QQQ + sub
            end if
