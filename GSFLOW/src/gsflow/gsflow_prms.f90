@@ -1360,6 +1360,8 @@
 !     Module documentation
 !**********************************************************************
       SUBROUTINE module_doc()
+      USE PRMS_CONSTANTS, ONLY: DECL
+      USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: basin, climateflow, prms_time
