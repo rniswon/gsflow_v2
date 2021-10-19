@@ -849,7 +849,7 @@
                 PRINT *, ag_AETtarget-Ag_actet(i), Ag_soil_moist(i), Ag_soil_rechr(i)
               endif
             endif
-            ag_hruactet = ag_hruactet + Ag_actet(i)*agfrac
+            ag_hruactet = Ag_actet(i)*agfrac
           ENDIF
         ENDIF
 !        Perv_avail_et(i) = avail_potet
