@@ -321,7 +321,6 @@
           It0_intcp_transp_on = Intcp_transp_on
         ENDIF
       ENDIF
-
       IF ( Print_debug==DEBUG_WB ) THEN
         Intcp_stor_ante = Hru_intcpstor
         Last_intcp_stor = Basin_intcp_stor
@@ -483,7 +482,9 @@
           ENDIF
           IF ( Hru_type(i)==LAKE ) CALL error_stop('irrigation specified and hru_type is lake', ERROR_param)
           ag_water_maxin = 0.0  ! inches
-          IF ( Canopy_irrigation_flag==ACTIVE ) ag_water_maxin = Hru_ag_irr(i) / Ag_area(i) ! Hru_ag_irr must be in inches, should this be divided by ag_frac ??
+          IF ( Canopy_irrigation_flag==ACTIVE ) THEN
+              IF ( Ag_area(i) > 0.0 ) ag_water_maxin = Hru_ag_irr(i) / Ag_area(i) ! Hru_ag_irr must be in inches, should this be divided by ag_frac ??
+          END IF
           IF ( Use_transfer_intcp==ACTIVE ) ag_water_maxin = ag_water_maxin + Canopy_gain(i)/SNGL(Cfs_conv)/harea ! Canopy_gain in CFS, convert to inches
 
           IF ( ag_water_maxin>0.0 ) THEN
