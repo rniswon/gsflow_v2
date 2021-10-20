@@ -20,9 +20,9 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 10/11/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-09-30'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 09/30/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 10/20/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-10-20'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 10/20/2021'
       character(len=*), parameter :: Version_read_control_file = '2021-10-05'
       character(len=*), parameter :: Version_read_parameter_file = '2021-10-05'
       character(len=*), parameter :: Version_read_data_file = '2021-09-07'
@@ -109,7 +109,7 @@
       character(len=*), parameter :: Version_uzf = '2021-03-02'
       character(len=*), parameter :: Version_sfr = '2020-09-30'
       character(len=*), parameter :: Version_lak = '2021-09-28'
-      character(len=*), parameter :: Version_ag =  '2021-06-21'
+      character(len=*), parameter :: Version_ag =  '2021-10-19'
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
       INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS, KPERSTART
