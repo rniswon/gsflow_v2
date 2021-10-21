@@ -302,7 +302,7 @@
 ! Local Variables
       INTEGER :: i, j, irrigation_type
       REAL :: last, evrn, evsn, cov, intcpstor, diff, changeover, intcpevap, z, d, harea
-      REAL :: netrain, netsnow, extra_water, stor_max_rain, ag_water_maxin, stor_max
+      REAL :: netrain, netsnow, extra_water, stor_max_rain, ag_water_maxin !, stor_max
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       intrun = 0
@@ -348,11 +348,6 @@
         netrain = Hru_rain(i)
         netsnow = Hru_snow(i)
 
-        intcpstor = Intcp_stor(i)
-        intcpevap = 0.0
-        changeover = 0.0
-        extra_water = 0.0
-
 !******Adjust interception amounts for changes in summer/winter cover density
 
         IF ( Transp_on(i)==ACTIVE ) THEN
@@ -362,6 +357,11 @@
         ENDIF
         cov = Canopy_covden(i)
 
+        intcpstor = Intcp_stor(i)
+        intcpevap = 0.0
+        changeover = 0.0
+        extra_water = 0.0
+
         IF ( Transp_on(i)==ACTIVE ) THEN
           stor_max_rain = Srain_intcp(i)
         ELSE
@@ -369,23 +369,23 @@
         ENDIF
         IF ( Hru_snow(i)>0.0 ) THEN
           Intcp_form(i) = SNOW
-          stor_max = Snow_intcp(i)
+!          stor_max = Snow_intcp(i)
         ELSE
           Intcp_form(i) = RAIN
-          stor_max = stor_max_rain
+!          stor_max = stor_max_rain
         ENDIF
 
-        IF ( intcpstor>stor_max ) THEN
-          extra_water = intcpstor - stor_max
-          intcpstor = stor_max
-          write (888,*) i, extra_water, stor_max
-        ENDIF
+!        IF ( intcpstor>stor_max ) THEN
+!          extra_water = intcpstor - stor_max
+!          intcpstor = stor_max
+!        ENDIF
 
         ! Lake or bare ground HRUs
         IF ( Hru_type(i)==LAKE .OR. Cov_type(i)==BARESOIL ) THEN ! cov_type = 0
           IF ( Cov_type(i)==BARESOIL .AND. intcpstor>0.0 ) THEN
             ! could happen if cov_type changed from > 0 to 0 with storage using dynamic parameters
-            extra_water = extra_water + intcpstor
+            extra_water = Hru_intcpstor(i)
+!            extra_water = extra_water + Hru_intcpstor(i)
             IF ( Print_debug>DEBUG_less ) THEN
               PRINT *, 'WARNING, cov_type changed to 0 with canopy storage of:', Hru_intcpstor(i)
               PRINT *, '         this storage added to intcp_changeover'
@@ -510,9 +510,6 @@
 
             IF ( (irrigation_type==0 .OR. irrigation_type==3) .AND. cov>0.0 ) THEN
               CALL intercept(ag_water_maxin, stor_max_rain, cov, intcpstor, Net_apply(i))
-!                            if (i==3056)then
-!                  print *, i, ag_water_maxin, Ag_area(i), Hru_ag_irr(i), stor_max_rain, cov, intcpstor, Net_apply(i)
-!                  endif
             ELSEIF ( irrigation_type==4 ) THEN
               CALL intercept(Gain_inches(i), stor_max_rain, 1.0, intcpstor, Net_apply(i))
             ELSEIF ( irrigation_type==2 ) THEN
