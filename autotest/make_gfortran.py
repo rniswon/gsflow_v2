@@ -37,9 +37,9 @@ def cleanup(srcdir, tempdir):
     try:
         if platform.system().lower() == "windows":
             os.remove(os.path.join('stemp', 'prms', 'utils_prms_linux.f90'))
-            os.remove(os.path.join('stemp', 'prms', 'utils_prms.f90'))
+ #           os.remove(os.path.join('stemp', 'prms', 'utils_prms.f90'))
         else:
-            os.remove(os.path.join('stemp', 'prms', 'utils_prms.f90'))
+ #           os.remove(os.path.join('stemp', 'prms', 'utils_prms.f90'))
             os.remove(os.path.join('stemp', 'prms', 'utils_prms_windows.f90'))
     except:
         pass
