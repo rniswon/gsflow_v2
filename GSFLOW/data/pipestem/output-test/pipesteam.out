@@ -18,7 +18,7 @@ ngw                   14
 ====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 09/30/2021
+                       Version 5.3.0 10/20/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -54,9 +54,9 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-09-30
-Read Control File               read_control_file   2021-09-07
-Read Parameter File             read_parameter_file 2021-09-07
+PRMS Computation Order          gsflow_prms         2021-10-20
+Read Control File               read_control_file   2021-10-05
+Read Parameter File             read_parameter_file 2021-10-05
 
 
 ====================================================================
@@ -78,20 +78,20 @@ runoff 1
  Data File time period: 1980/01/01 00:00:00 to 2015/09/30 00:00:00
 Simulation time period: 1980/10/01 00:00:00 to 2014/09/30 00:00:00
 ====================================================================
-Basin Definition                basin               2021-09-30
-Common States and Fluxes        climateflow         2021-09-15
+Basin Definition                basin               2021-10-21
+Common States and Fluxes        climateflow         2021-10-21
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2021-09-07
 Timestep Control                prms_time           2021-09-07
-Temperature Distribution        climate_hru         2021-09-09
-Precipitation Distribution      climate_hru         2021-09-09
+Temperature Distribution        climate_hru         2021-10-21
+Precipitation Distribution      climate_hru         2021-10-21
 Solar Radiation Distribution    ddsolrad            2021-09-07
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-09-07
-Canopy Interception             intcp               2021-10-01
+Canopy Interception             intcp               2021-10-20
 Snow Dynamics                   snowcomp            2021-09-15
-Surface Runoff                  srunoff_smidx       2021-09-30
-Soilzone Computations           soilzone            2021-09-30
+Surface Runoff                  srunoff_smidx       2021-10-11
+Soilzone Computations           soilzone            2021-10-21
 Groundwater                     gwflow              2021-09-07
 Streamflow Routing              strmflow            2020-08-03
 Output Summary                  basin_sum           2021-09-07
@@ -156,5 +156,5 @@ DPRST area:               14741.23    Fraction DPRST:          0.0352
  *************************************************************
  Total for run     708.810  664.661    2.628   46.117 1488.712
  *************************************************************
-Execution elapsed time    0 minutes  2.47 seconds
+Execution elapsed time    0 minutes  2.92 seconds
 
