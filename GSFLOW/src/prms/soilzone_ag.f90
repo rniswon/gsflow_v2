@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2021-10-20'
+      character(len=*), parameter :: Version_soilzone_ag = '2021-10-21'
       INTEGER, SAVE :: Soil_iter, Iter_aet_PRMS_flag, HRU_id, Soilzone_irr_flag
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr
@@ -827,6 +827,19 @@
 !            PRINT *, 'perv_et problem', pervactet, Avail_potet
 !          ENDIF
         ENDIF
+        ! sanity check
+!        IF ( Soil_moist(i)<0.0 ) THEN
+!          IF ( Print_debug>-1 ) PRINT *, i, Soil_moist(i), ' negative'
+!          IF ( pervactet>=ABS(Soil_moist(i)) ) THEN
+!            pervactet = pervactet + Soil_moist(i)
+!            Soil_moist(i) = 0.0
+!          ENDIF
+!          IF ( Soil_moist(i)<-NEARZERO ) THEN
+!            IF ( Print_debug>-1 ) PRINT *, 'HRU:', i, ' soil_moist<0.0', Soil_moist(i)
+!          ENDIF
+!          Soil_moist(i) = 0.0
+!        ENDIF
+        hruactet = hruactet + pervactet*perv_frac
         ag_hruactet = 0.0
         IF ( ag_on_flag==ACTIVE ) THEN
           IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN
@@ -851,7 +864,7 @@
             ENDIF
             ag_hruactet = Ag_actet(i)*agfrac
                     
-!        avail_potet = ag_AETtarget - (hruactet + pervactet*perv_frac + ag_hruactet)
+!        avail_potet = ag_AETtarget - (hruactet + ag_hruactet)
 !                      if (i == 3056 .and. Net_apply(i)>0.0 ) then
 !            write(877,*) i, kkiter, avail_potet, ag_hruactet, Ag_actet(i), ag_AETtarget, Ag_soilwater_deficit(i), Ag_soil_saturated(i), Infil_ag(i), sroff(i), 'aet'
 !            write(877,*) hruactet, Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), Dprst_evap_hru(i), pervactet
@@ -860,20 +873,7 @@
         ENDIF
 !        Perv_avail_et(i) = avail_potet
 
-        ! sanity check
-!        IF ( Soil_moist(i)<0.0 ) THEN
-!          IF ( Print_debug>-1 ) PRINT *, i, Soil_moist(i), ' negative'
-!          IF ( pervactet>=ABS(Soil_moist(i)) ) THEN
-!            pervactet = pervactet + Soil_moist(i)
-!            Soil_moist(i) = 0.0
-!          ENDIF
-!          IF ( Soil_moist(i)<-NEARZERO ) THEN
-!            IF ( Print_debug>-1 ) PRINT *, 'HRU:', i, ' soil_moist<0.0', Soil_moist(i)
-!          ENDIF
-!          Soil_moist(i) = 0.0
-!        ENDIF
-
-        Hru_actet(i) = hruactet + pervactet*perv_frac + ag_hruactet
+        Hru_actet(i) = hruactet + ag_hruactet
         avail_potet = Potet(i) - Hru_actet(i)
         ! sanity check
         IF ( avail_potet<0.0 ) THEN
