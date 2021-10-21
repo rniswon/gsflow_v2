@@ -299,7 +299,7 @@
 ! Local Variables
       INTEGER :: i, j, irrigation_type
       REAL :: last, evrn, evsn, cov, intcpstor, diff, changeover, intcpevap, z, d, harea
-      REAL :: netrain, netsnow, extra_water, stor_max_rain, ag_water_maxin
+      REAL :: netrain, netsnow, extra_water, stor_max_rain, ag_water_maxin !, stor_max
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       intrun = 0
@@ -353,18 +353,36 @@
           Canopy_covden(i) = Covden_win(i)
         ENDIF
         cov = Canopy_covden(i)
-        Intcp_form(i) = RAIN
-        IF ( Hru_snow(i)>0.0 ) Intcp_form(i) = SNOW
 
         intcpstor = Intcp_stor(i)
         intcpevap = 0.0
         changeover = 0.0
         extra_water = 0.0
+
+        IF ( Transp_on(i)==ACTIVE ) THEN
+          stor_max_rain = Srain_intcp(i)
+        ELSE
+          stor_max_rain = Wrain_intcp(i)
+        ENDIF
+        IF ( Hru_snow(i)>0.0 ) THEN
+          Intcp_form(i) = SNOW
+!          stor_max = Snow_intcp(i)
+        ELSE
+          Intcp_form(i) = RAIN
+!          stor_max = stor_max_rain
+        ENDIF
+
+!        IF ( intcpstor>stor_max ) THEN
+!          extra_water = intcpstor - stor_max
+!          intcpstor = stor_max
+!        ENDIF
+
         ! Lake or bare ground HRUs
         IF ( Hru_type(i)==LAKE .OR. Cov_type(i)==BARESOIL ) THEN ! cov_type = 0
           IF ( Cov_type(i)==BARESOIL .AND. intcpstor>0.0 ) THEN
             ! could happen if cov_type changed from > 0 to 0 with storage using dynamic parameters
             extra_water = Hru_intcpstor(i)
+!            extra_water = extra_water + Hru_intcpstor(i)
             IF ( Print_debug>DEBUG_less ) THEN
               PRINT *, 'WARNING, cov_type changed to 0 with canopy storage of:', Hru_intcpstor(i)
               PRINT *, '         this storage added to intcp_changeover'
@@ -416,12 +434,6 @@
               intcpstor = 0.0
             ENDIF
           ENDIF
-        ENDIF
-
-        IF ( Transp_on(i)==ACTIVE ) THEN
-          stor_max_rain = Srain_intcp(i)
-        ELSE
-          stor_max_rain = Wrain_intcp(i)
         ENDIF
 
 !*****Determine the amount of interception from rain
@@ -569,8 +581,8 @@
         Basin_net_rain = Basin_net_rain + DBLE( Net_rain(i)*harea )
         Basin_intcp_stor = Basin_intcp_stor + DBLE( intcpstor*cov*harea )
         Basin_intcp_evap = Basin_intcp_evap + DBLE( intcpevap*cov*harea )
-        IF ( Intcp_changeover(i)>0.0 ) THEN
-          IF ( Print_debug>DEBUG_less ) PRINT '(A,F0.5,A,4(1X,I0))', 'Change over storage:', Intcp_changeover(i), '; HRU:', i, &
+        IF ( changeover>0.0 ) THEN
+          IF ( Print_debug>DEBUG_less ) PRINT '(A,F0.5,A,4(1X,I0))', 'Change over storage:', changeover, '; HRU:', i, &
      &                                                               Nowyear, Nowmonth, Nowday
           Basin_changeover = Basin_changeover + DBLE( Intcp_changeover(i)*harea )
         ENDIF

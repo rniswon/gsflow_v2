@@ -548,7 +548,7 @@
      &       'decimal fraction', Glacier_frac)/=0 ) CALL read_error(3, 'glacier_frac')
 
         ALLOCATE ( Glrette_frac(Nhru) )
-          IF ( declvar(MODNAME, 'glrette_frac', 'nhru', Nhru, 'real', &
+        IF ( declvar(MODNAME, 'glrette_frac', 'nhru', Nhru, 'real', &
      &       'Fraction of snow field (too small for glacier dynamics)', &
      &       'decimal fraction', Glrette_frac)/=0 ) CALL read_error(3, 'glrette_frac')
 
