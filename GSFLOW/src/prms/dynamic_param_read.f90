@@ -10,7 +10,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2021-09-14'
+        character(len=*), parameter :: Version_dynamic_param_read = '2021-10-21'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -457,7 +457,8 @@
       USE PRMS_CLIMATEVARS, ONLY: Transp_on, Epan_coef
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Soil_moist, Soil_rechr, Imperv_stor, Sat_threshold, &
      &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor, &
-     &    Basin_ag_soil_moist, Ag_soil_moist, Ag_soil_rechr
+     &    Basin_ag_soil_moist, Basin_ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, &
+     &    Ag_soil_rechr_max, Ag_soil_rechr_max_frac
       USE PRMS_POTET_JH, ONLY: Jh_coef, Jh_coef_hru
       USE PRMS_POTET_PM, ONLY: Pm_n_coef, Pm_d_coef
       USE PRMS_POTET_PT, ONLY: Pt_alpha
@@ -473,6 +474,7 @@
      &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, Hru_impervstor
       USE PRMS_SOILZONE, ONLY: Basin_soil_rechr, Soil_zone_max, Soil_moist_tot, &
      &    Soil_lower_stor_max, Replenish_frac
+      USE PRMS_SOILZONE_AG, ONLY: Ag_soil_lower_stor_max, Ag_replenish_frac
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL, DBLE
@@ -480,6 +482,7 @@
       EXTERNAL :: write_dynparam_potet
 ! Local Variables
       INTEGER :: i, istop, check_dprst_depth_flag, check_sm_max_flag, check_srechr_max_flag
+      INTEGER :: check_ag_sm_max_flag, check_ag_srechr_max_flag
       REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj, frac, frac_ag
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
@@ -908,12 +911,56 @@
           Soil_zone_max(i) = Sat_threshold(i) + Soil_moist_max(i)*Hru_frac_perv(i)
           Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*Hru_frac_perv(i)
           Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
-          IF ( GSFLOW_flag==ACTIVE ) Replenish_frac(i) = Soil_rechr_max(i)/Soil_moist_max(i)
+          IF ( GSFLOW_flag==ACTIVE .AND. Soil_moist_max(i)>0.0 ) Replenish_frac(i) = Soil_rechr_max(i)/Soil_moist_max(i)
           Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*Hru_perv(i) )
           Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(i)*Hru_perv(i) )
         ENDDO
         Basin_soil_moist = Basin_soil_moist*Basin_area_inv
         Basin_soil_rechr = Basin_soil_rechr*Basin_area_inv
+      ENDIF
+
+! Ag soil parameters
+      IF ( Ag_soilrechr_flag==ACTIVE ) THEN
+        IF ( Ag_soil_rechr_next_mo/=0 ) THEN
+          IF ( Ag_soil_rechr_next_yr==Nowyear .AND. Ag_soil_rechr_next_mo==Nowmonth .AND. Ag_soil_rechr_next_day==Nowday ) THEN
+            READ ( Ag_soil_rechr_unit, * ) Ag_soil_rechr_next_yr, Ag_soil_rechr_next_mo, Ag_soil_rechr_next_day, Temp
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Ag_soil_rechr_max_frac, 'ag_soil_rechr_max_frac')
+            CALL is_eof(Ag_soil_rechr_unit, Ag_soil_rechr_next_yr, Ag_soil_rechr_next_mo, Ag_soil_rechr_next_day)
+            check_ag_srechr_max_flag = ACTIVE
+          ENDIF
+        ENDIF
+      ENDIF
+
+! leave current soil_moist storage amount alone as it will be taking care of later in current timestep
+      IF ( Ag_soilmoist_flag==ACTIVE ) THEN
+        IF ( Ag_soil_moist_next_mo/=0 ) THEN
+          IF ( Ag_soil_moist_next_yr==Nowyear .AND. Ag_soil_moist_next_mo==Nowmonth .AND. Ag_soil_moist_next_day==Nowday ) THEN
+            READ ( Ag_soil_moist_unit, * ) Ag_soil_moist_next_yr, Ag_soil_moist_next_mo, Ag_soil_moist_next_day, Temp
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Ag_soil_moist_max, 'ag_soil_moist_max')
+            CALL is_eof(Ag_soil_moist_unit, Ag_soil_moist_next_yr, Ag_soil_moist_next_mo, Ag_soil_moist_next_day)
+            check_ag_sm_max_flag = ACTIVE
+          ENDIF
+        ENDIF
+      ENDIF
+
+      IF ( check_ag_sm_max_flag==ACTIVE .OR. check_ag_srechr_max_flag==ACTIVE ) THEN
+        Basin_ag_soil_moist = 0.0D0
+        Basin_ag_soil_rechr = 0.0D0
+        DO i = 1, Nhru
+          IF ( Hru_type(i)==LAKE .OR. Hru_type(i)==INACTIVE ) CYCLE ! skip lake and inactive HRUs
+
+          IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
+            istop = 1
+            PRINT 9003, Ag_soil_rechr_max(i), Ag_soil_moist_max(i), i
+            CYCLE
+          ENDIF
+          Ag_soil_lower_stor_max(i) = Ag_soil_moist_max(i) - Ag_soil_rechr_max(i)
+          IF ( GSFLOW_flag==ACTIVE .AND. Ag_soil_moist_max(i)>0.0 ) Ag_replenish_frac(i) = ag_soil_rechr_max(i)/Ag_soil_moist_max(i)
+          Basin_ag_soil_moist = Basin_ag_soil_moist + DBLE( Ag_soil_moist(i)*Ag_area(i) )
+          Basin_ag_soil_rechr = Basin_ag_soil_rechr + DBLE( Ag_soil_rechr(i)*Ag_area(i) )
+        ENDDO
+        Basin_ag_soil_moist = Basin_ag_soil_moist*Basin_area_inv
+        Basin_ag_soil_rechr = Basin_ag_soil_rechr*Basin_area_inv
       ENDIF
 
       IF ( Dyn_radtrncf_flag==ACTIVE ) THEN
@@ -970,6 +1017,7 @@
 
  9001 FORMAT (/, 'WARNING, dynamic parameter', A, ' <', F0.7, ' for HRU: ', I0, /, 9X, 'value: ', F0.7, ' set to ', F0.7)
  9002 FORMAT (/, 'ERROR, dynamic parameter causes soil_rechr_max: ', F0.7, ' > soil_moist_max: ', F0.7, ' for HRU: ', I0)
+ 9003 FORMAT (/, 'ERROR, dynamic parameter causes ag_soil_rechr_max: ', F0.7, ' > ag_soil_moist_max: ', F0.7, ' for HRU: ', I0)
 
       END FUNCTION dynparamrun
 

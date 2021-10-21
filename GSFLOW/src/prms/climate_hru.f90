@@ -10,13 +10,13 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2021-09-09'
+        character(len=*), parameter :: Version_climate_hru = '2021-10-21'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit, AET_unit, PET_unit, Irrigated_area_unit
         INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit
         ! Control Parameters
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Tmin_day, Tmax_day, Precip_day, Potet_day, Swrad_day, Transp_day
-        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Humidity_day, Windspeed_day, AET_cbh_file, PET_cbh_file
+        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Humidity_day, Windspeed_day, AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Albedo_day, Cloud_cover_day
         INTEGER, SAVE :: Cbh_check_flag, Cbh_binary_flag
         ! Declared Variables
@@ -34,7 +34,7 @@
       USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Climate_transp_flag, Orad_flag, &
      &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
      &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
-     &    Climate_irrigated_area_flag, AET_cbh_flag, PET_cbh_flag, Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth
+     &    irrigated_area_flag, AET_cbh_flag, PET_cbh_flag, Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth
       USE PRMS_CLIMATE_HRU
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
@@ -150,7 +150,7 @@
           Basin_pet_external = 0.0D0
         ENDIF
 
-        IF ( Climate_irrigated_area_flag==ACTIVE ) THEN
+        IF ( irrigated_area_flag==ACTIVE ) THEN
           IF ( Cbh_binary_flag==OFF ) THEN
             READ ( Irrigated_area_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Irrigated_area(i), i=1,Nhru)
           ELSE
@@ -260,7 +260,7 @@
           IF ( Windspeed_cbh_flag==ACTIVE ) CALL check_cbh_value('windspeed_hru', Windspeed_hru, 0.0, 400.0, missing)
           IF ( AET_cbh_flag==ACTIVE ) CALL check_cbh_value('AET_external', AET_external, 0.0, 50.0, missing)
           IF ( PET_cbh_flag==ACTIVE ) CALL check_cbh_value('PET_external', PET_external, 0.0, 50.0, missing)
-          IF ( Climate_irrigated_area_flag==ACTIVE ) CALL check_cbh_value('irrigated_area', Irrigated_area, 0.0, 9999.0, missing)
+          IF ( irrigated_area_flag==ACTIVE ) CALL check_cbh_value('irrigated_area', Irrigated_area, 0.0, 9999.0, missing)
 
           IF ( missing==1 ) THEN
             CALL print_date(0)
@@ -316,7 +316,7 @@
           IF ( Windspeed_cbh_flag==ACTIVE ) Basin_windspeed = Basin_windspeed + DBLE( Windspeed_hru(i)*harea )
           IF ( AET_cbh_flag==ACTIVE ) Basin_aet_external = Basin_aet_external + DBLE( AET_external(i)*harea )
           IF ( PET_cbh_flag==ACTIVE ) Basin_pet_external = Basin_pet_external + DBLE( PET_external(i)*harea )
-          IF ( Climate_irrigated_area_flag==ACTIVE ) Basin_irrigated_area = Basin_irrigated_area + DBLE( Irrigated_area(i)*harea )
+          IF ( irrigated_area_flag==ACTIVE ) Basin_irrigated_area = Basin_irrigated_area + DBLE( Irrigated_area(i)*harea )
         ENDDO
 
         IF ( ierr==1 ) THEN
@@ -349,7 +349,7 @@
         IF ( Windspeed_cbh_flag==ACTIVE ) Basin_windspeed = Basin_windspeed*Basin_area_inv
         IF ( AET_cbh_flag==ACTIVE ) Basin_aet_external = Basin_aet_external*Basin_area_inv
         IF ( PET_cbh_flag==ACTIVE ) Basin_pet_external = Basin_pet_external*Basin_area_inv
-        IF ( Climate_irrigated_area_flag==ACTIVE ) Basin_irrigated_area = Basin_irrigated_area*Basin_area_inv
+        IF ( irrigated_area_flag==ACTIVE ) Basin_irrigated_area = Basin_irrigated_area*Basin_area_inv
 
       ELSEIF ( Process_flag==DECL ) THEN
 
@@ -415,7 +415,7 @@
      &         'inches', PET_external)
         ENDIF
 
-        IF ( Climate_irrigated_area_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( irrigated_area_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           CALL declvar_dble(MODNAME, 'basin_irrigated_area', 'one', 1, &
      &         'Basin area-weighted average irrigation area read from CBH File', &
      &         'acres', Basin_irrigated_area)
@@ -567,6 +567,20 @@
             CALL find_current_time(PET_unit, Start_year, Start_month, Start_day, ierr, Cbh_binary_flag)
             IF ( ierr==-1 ) THEN
               PRINT *, 'for first time step, CBH File: ', PET_cbh_file
+              istop = 1
+            ENDIF
+          ENDIF
+        ENDIF
+
+        IF ( irrigated_area_flag==ACTIVE ) THEN
+          IF ( control_string(irrigated_area_cbh_file, 'irrigated_cbh_file')/=0 ) CALL read_error(5, 'irrigated_area_cbh_file')
+          CALL find_header_end(irrigated_area_unit, irrigated_area_cbh_file, 'irrigated_area_cbh_file', ierr, 1, Cbh_binary_flag)
+          IF ( ierr==1 ) THEN
+            istop = 1
+          ELSE
+            CALL find_current_time(irrigated_area_unit, Start_year, Start_month, Start_day, ierr, Cbh_binary_flag)
+            IF ( ierr==-1 ) THEN
+              PRINT *, 'for first time step, CBH File: ', irrigated_area_cbh_file
               istop = 1
             ENDIF
           ENDIF
