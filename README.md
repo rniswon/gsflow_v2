@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/rniswon/gsflow_v2.svg?token=JQ4RYmycyrTBEPDUKxGA&branch=master)](https://travis-ci.com/rniswon/gsflow_v2)
+[![GSFLOW CI](https://github.com/rniswon/gsflow_v2/actions/workflows/ci.yml/badge.svg)](https://github.com/rniswon/gsflow_v2/actions/workflows/ci.yml)
 
 # GSFLOW: Coupled Groundwater and Surface-Water Flow Model
 
