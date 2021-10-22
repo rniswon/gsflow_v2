@@ -870,11 +870,10 @@
       IF ( control_string(Soilzone_module, 'soilzone_module')/=0 ) CALL read_error(5, 'soilzone_module')
       Strmflow_module = 'strmflow'
       IF ( control_string(Strmflow_module, 'strmflow_module')/=0 ) CALL read_error(5, 'strmflow_module')
-      Irrigation_area_module = ' '
-      IF ( control_string(irrigation_area_module, 'irrigation_area_module')/=0 ) CALL read_error(5, 'irrigation_area_module')
+      IF ( control_string(irrigated_area_module, 'irrigated_area_module')/=0 ) CALL read_error(5, 'irrigated_area_module')
       IF ( control_string(AET_module, 'AET_module')/=0 ) CALL read_error(5, 'AET_module')
       IF ( control_string(PET_ag_module, 'PET_ag_module')/=0 ) CALL read_error(5, 'PET_ag_module')
-      IF ( Irrigation_area_module(:11)=='climate_hru' ) Climate_irrigated_area_flag = ACTIVE
+      IF ( irrigated_area_module(:11)=='climate_hru' ) irrigated_area_flag = ACTIVE
       IF ( AET_module(:11)=='climate_hru' ) AET_cbh_flag = ACTIVE
       IF ( PET_ag_module(:11)=='climate_hru' ) PET_cbh_flag = ACTIVE
 
@@ -885,7 +884,6 @@
       Climate_transp_flag = OFF
       Climate_potet_flag = OFF
       Climate_swrad_flag = OFF
-      Climate_irrigated_area_flag = OFF
 
       IF ( Precip_module(:11)=='precip_1sta' .OR. Precip_module(:11)=='precip_prms') THEN
         Precip_flag = precip_1sta_module
@@ -1015,7 +1013,7 @@
       IF ( Climate_temp_flag==ACTIVE .OR. Climate_precip_flag==ACTIVE .OR. Climate_potet_flag==ACTIVE .OR. &
      &     Climate_swrad_flag==ACTIVE .OR. Climate_transp_flag==ACTIVE .OR. &
      &     Humidity_cbh_flag==ACTIVE .OR. Windspeed_cbh_flag==ACTIVE .OR. &
-     &     Climate_irrigated_area_flag==ACTIVE .OR. AET_cbh_flag==ACTIVE .OR. PET_cbh_flag==ACTIVE .OR. &
+     &     irrigated_area_flag==ACTIVE .OR. AET_cbh_flag==ACTIVE .OR. PET_cbh_flag==ACTIVE .OR. &
      &     Albedo_cbh_flag==ACTIVE .OR. Cloud_cover_cbh_flag==ACTIVE .OR. &
      &     Gwflow_cbh_flag==ACTIVE .OR. Snow_cbh_flag==ACTIVE ) Climate_hru_flag = ACTIVE
 

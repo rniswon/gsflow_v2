@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2021-09-15'
+      character(len=*), parameter :: Version_climateflow = '2021-10-21'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -66,12 +66,12 @@
       DOUBLE PRECISION, SAVE :: Basin_ssflow, Basin_soil_to_gw
       DOUBLE PRECISION, SAVE :: Basin_actet, Basin_lakeevap
       DOUBLE PRECISION, SAVE :: Basin_swale_et, Basin_perv_et, Basin_sroff
-      DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor, Basin_ag_soil_moist
+      DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor, Basin_ag_soil_moist, Basin_ag_soil_rechr
       REAL, SAVE, ALLOCATABLE :: Hru_actet(:), Soil_moist(:), Ag_soil_moist(:), Ag_soil_rechr(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_ssr(:), Ssres_in(:)
       REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:)
-      REAL, SAVE, ALLOCATABLE :: Ssres_stor(:), Ssres_flow(:), Soil_rechr(:)
+      REAL, SAVE, ALLOCATABLE :: Ssres_stor(:), Ssres_flow(:), Soil_rechr(:), Ag_soil_rechr_max(:)
       ! srunoff
       REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:)
       ! Surface-Depression Storage
@@ -91,7 +91,7 @@
 !   Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Soil_moist_max(:), Soil_rechr_max(:), Sat_threshold(:)
       REAL, SAVE, ALLOCATABLE :: Snowinfil_max(:), Imperv_stor_max(:)
-      REAL, SAVE, ALLOCATABLE :: Ag_soil_moist_max(:), Ag_soil_rechr_max(:), Ag_soil_rechr_max_frac(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_soil_moist_max(:), Ag_soil_rechr_max_frac(:)
       END MODULE PRMS_FLOWVARS
 
 !***********************************************************************
@@ -440,7 +440,7 @@
 
       ALLOCATE ( Infil(Nhru) )
       CALL declvar_real(Srunoff_module, 'infil', 'nhru', Nhru, &
-     &     'Infiltration to the capillary, preferential-flow, and agriculture reservoirs for each HRU', &
+     &     'Infiltration to the capillary and preferential-flow reservoirs for each HRU', &
      &     'inches', Infil)
 
       ALLOCATE ( Sroff(Nhru) )
@@ -848,6 +848,9 @@
         CALL declvar_dble(Soilzone_module, 'basin_ag_soil_moist', 'one', 1, &
      &       'Basin area-weighted average soil agriculture reservoir storage', &
      &       'inches', Basin_ag_soil_moist)
+        CALL declvar_dble(Soilzone_module, 'basin_ag_soil_rechr', 'one', 1, &
+     &       'Basin area-weighted average soil agriculture reservoir storage', &
+     &       'inches', Basin_ag_soil_rechr)
         ALLOCATE ( Ag_soil_moist(Nhru) )
         CALL declvar_real(Soilzone_module, 'ag_soil_moist', 'nhru', Nhru, &
      &       'Storage of soil agriculture reservoir for each HRU', &

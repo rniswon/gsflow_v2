@@ -8,7 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-10-11'
+      character(len=*), parameter :: Version_intcp = '2021-10-20'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -287,7 +287,7 @@
      &    Ag_package, Hru_ag_irr
       USE PRMS_INTCP
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_type, Covden_win, Covden_sum, &
-     &    Hru_route_order, Hru_area, Cov_type, Ag_frac, Ag_area !, Ag_cov_type
+     &    Hru_route_order, Hru_area, Cov_type, Ag_frac !, Ag_area, Ag_cov_type
       USE PRMS_WATER_USE, ONLY: Canopy_gain ! need to add ag apply ???
 ! Newsnow and Pptmix can be modfied, WARNING!!!
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, &
@@ -302,7 +302,7 @@
 ! Local Variables
       INTEGER :: i, j, irrigation_type
       REAL :: last, evrn, evsn, cov, intcpstor, diff, changeover, intcpevap, z, d, harea
-      REAL :: netrain, netsnow, extra_water, stor_max_rain, ag_water_maxin
+      REAL :: netrain, netsnow, extra_water, stor_max_rain, ag_water_maxin !, stor_max
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       intrun = 0
@@ -356,18 +356,36 @@
           Canopy_covden(i) = Covden_win(i)
         ENDIF
         cov = Canopy_covden(i)
-        Intcp_form(i) = RAIN
-        IF ( Hru_snow(i)>0.0 ) Intcp_form(i) = SNOW
 
         intcpstor = Intcp_stor(i)
         intcpevap = 0.0
         changeover = 0.0
         extra_water = 0.0
+
+        IF ( Transp_on(i)==ACTIVE ) THEN
+          stor_max_rain = Srain_intcp(i)
+        ELSE
+          stor_max_rain = Wrain_intcp(i)
+        ENDIF
+        IF ( Hru_snow(i)>0.0 ) THEN
+          Intcp_form(i) = SNOW
+!          stor_max = Snow_intcp(i)
+        ELSE
+          Intcp_form(i) = RAIN
+!          stor_max = stor_max_rain
+        ENDIF
+
+!        IF ( intcpstor>stor_max ) THEN
+!          extra_water = intcpstor - stor_max
+!          intcpstor = stor_max
+!        ENDIF
+
         ! Lake or bare ground HRUs
         IF ( Hru_type(i)==LAKE .OR. Cov_type(i)==BARESOIL ) THEN ! cov_type = 0
           IF ( Cov_type(i)==BARESOIL .AND. intcpstor>0.0 ) THEN
             ! could happen if cov_type changed from > 0 to 0 with storage using dynamic parameters
             extra_water = Hru_intcpstor(i)
+!            extra_water = extra_water + Hru_intcpstor(i)
             IF ( Print_debug>DEBUG_less ) THEN
               PRINT *, 'WARNING, cov_type changed to 0 with canopy storage of:', Hru_intcpstor(i)
               PRINT *, '         this storage added to intcp_changeover'
@@ -419,12 +437,6 @@
               intcpstor = 0.0
             ENDIF
           ENDIF
-        ENDIF
-
-        IF ( Transp_on(i)==ACTIVE ) THEN
-          stor_max_rain = Srain_intcp(i)
-        ELSE
-          stor_max_rain = Wrain_intcp(i)
         ENDIF
 
 !*****Determine the amount of interception from rain
@@ -483,7 +495,7 @@
           ENDIF
           IF ( Hru_type(i)==LAKE ) CALL error_stop('irrigation specified and hru_type is lake', ERROR_param)
           ag_water_maxin = 0.0  ! inches
-          IF ( Canopy_irrigation_flag==ACTIVE ) ag_water_maxin = Hru_ag_irr(i) / Ag_area(i) ! Hru_ag_irr must be in inches, should this be divided by ag_frac ??
+          IF ( Canopy_irrigation_flag==ACTIVE ) ag_water_maxin = Hru_ag_irr(i) / harea ! Hru_ag_irr is in inch-acres
           IF ( Use_transfer_intcp==ACTIVE ) ag_water_maxin = ag_water_maxin + Canopy_gain(i)/SNGL(Cfs_conv)/harea ! Canopy_gain in CFS, convert to inches
 
           IF ( ag_water_maxin>0.0 ) THEN
@@ -582,8 +594,8 @@
         Basin_net_rain = Basin_net_rain + DBLE( Net_rain(i)*harea )
         Basin_intcp_stor = Basin_intcp_stor + DBLE( intcpstor*cov*harea )
         Basin_intcp_evap = Basin_intcp_evap + DBLE( intcpevap*cov*harea )
-        IF ( Intcp_changeover(i)>0.0 ) THEN
-          IF ( Print_debug>DEBUG_less ) PRINT '(A,F0.5,A,4(1X,I0))', 'Change over storage:', Intcp_changeover(i), '; HRU:', i, &
+        IF ( changeover>0.0 ) THEN
+          IF ( Print_debug>DEBUG_less ) PRINT '(A,F0.5,A,4(1X,I0))', 'Change over storage:', changeover, '; HRU:', i, &
      &                                                               Nowyear, Nowmonth, Nowday
           Basin_changeover = Basin_changeover + DBLE( Intcp_changeover(i)*harea )
         ENDIF

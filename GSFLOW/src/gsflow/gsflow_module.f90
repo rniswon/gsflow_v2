@@ -21,9 +21,9 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 10/11/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-09-30'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 09/30/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 10/20/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-10-20'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 10/20/2021'
       character(len=*), parameter :: Version_read_control_file = '2021-10-05'
       character(len=*), parameter :: Version_read_parameter_file = '2021-10-05'
       character(len=*), parameter :: Version_read_data_file = '2021-09-07'
@@ -46,7 +46,7 @@
       INTEGER, SAVE :: PRMS_flag, GSFLOW_flag, PRMS4_flag, MODSIM_flag
       INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Grid_flag, Ag_package
       INTEGER, SAVE :: Agriculture_flag, Canopy_iter, Keep_iterating_PRMS
-      INTEGER, SAVE :: Climate_irrigated_area_flag, AET_cbh_flag, PET_cbh_flag
+      INTEGER, SAVE :: irrigated_area_flag, AET_cbh_flag, PET_cbh_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Soilzone_add_water_use
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
@@ -85,7 +85,7 @@
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Temp_module, Srunoff_module, Et_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Strmflow_module, Transp_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Model_mode, Precip_module, Solrad_module
-      CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: irrigation_area_module, AET_module, PET_ag_module
+      CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: irrigated_area_module, AET_module, PET_ag_module
       CHARACTER(LEN=8), SAVE :: Soilzone_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
       INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF
@@ -112,7 +112,7 @@
       character(len=*), parameter :: Version_uzf = '2021-03-02'
       character(len=*), parameter :: Version_sfr = '2020-09-30'
       character(len=*), parameter :: Version_lak = '2021-09-28'
-      character(len=*), parameter :: Version_ag =  '2021-06-21'
+      character(len=*), parameter :: Version_ag =  '2021-10-19'
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells, Gsflag
       INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS, KPERSTART
