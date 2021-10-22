@@ -1,0 +1,88 @@
+name: gsflow continuous integration
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master, develop]
+    
+jobs:
+  pygsflowCI:
+      name: autotests
+      runs-on: ${{ matrix.os }}
+      strategy:
+        fail-fast: false
+        matrix:
+          os: [ubuntu-latest]
+          python-version: [3.9, 3.8, 3.7]
+          run-type: [std]
+          test-pth: ["./autotest"]
+      defaults:
+        run:
+          shell: bash
+
+    steps:
+    - name: Checkout pygsflow repo
+      uses: actions/checkout@v2.3.4
+
+    - name: Get branch name
+      uses: nelonoel/branch-name@v1.0.1
+
+    - name: Cache Miniconda
+      uses: actions/cache@v2.1.0
+      env:
+        # Increase this value to reset cache if environment.yml has changed
+        CACHE_NUMBER: 0
+      with:
+        path: ~/conda_pkgs_dir
+        key: ${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.run-type }}-${{ env.CACHE_NUMBER }}-${{ hashFiles('etc/environment.yml') }}
+
+    - name: Setup Miniconda
+      uses: conda-incubator/setup-miniconda@v2.0.0
+      with:
+        python-version: ${{ matrix.python-version }}
+        mamba-version: "*"
+        channels: conda-forge
+        auto-update-conda: true
+        activate-environment: pygsflow
+        use-only-tar-bz2: true
+
+    - name: Add packages to pygsflow environment using mamba or conda
+      shell: bash -l {0}
+      run: |
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          conda env update --name pygsflow --file etc/environment.yml
+        else
+          mamba env update --name pygsflow --file etc/environment.yml
+        fi
+
+    - name: Install flopy and pygsflow
+      shell: bash -l {0}
+      run: |
+        pip install https://github.com/modflowpy/flopy/zipball/develop
+        pip install https://github.com/pygsflow/pygsflow/zipball/develop
+
+    - name: Setup symbolic link to gfortran on Linux
+      if: runner.os == 'Linux'
+      run: |
+        sudo ln -fs /usr/bin/gfortran-10 /usr/bin/gfortran
+        sudo ln -fs /usr/bin/gcc-10 /usr/bin/gcc
+        sudo ln -fs /usr/bin/g++-10 /usr/bin/g++
+
+    - name: Print GNU compiler versions
+      run: |
+        gfortran --version
+        gcc --version
+        g++ --version
+      
+    - name: Run nosetest CI testing suite for GSFLOW
+      shell: bash -l {0}
+      run: |
+        cd autotest
+        chmod u+x make_linux_gfortran.sh
+        sed -i -e 's/\r$//' make_linux_gfortran.sh
+        chmod a+x gsflow
+        pip install https://github.com/modflowpy/flopy/zipball/develop
+        pip install https://github.com/pygsflow/pygsflow/zipball/develop
+        nosetests -v
+

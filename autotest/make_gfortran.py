@@ -1,4 +1,6 @@
 #! /usr/bin/env python
+import platform
+print(platform.python_version())
 try:
     import pymake
 except:
@@ -9,7 +11,6 @@ except:
     raise Exception()
 import os
 import shutil
-import platform
 
 
 def copytree(src, dst, symlinks=False, ignore=None):

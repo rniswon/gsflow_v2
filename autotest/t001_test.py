@@ -152,7 +152,7 @@ def do_model(model):
     gsf = gsflow.GsflowModel.load_from_file(model, gsflow_exe=gsflow_exe,
                                             forgive=False)
     external_fnames = gsf.mf.external_fnames
-    gsf.mf.external_fnames = [os.path.split(p)[-1] for p in external_fnames]
+    gsf.mf.external_fnames = [os.path.join(out_dir, os.path.split(p)[-1]) for p in external_fnames]
     gsf.write_input(workspace=out_dir)
 
     # remove the temporary name file
