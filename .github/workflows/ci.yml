@@ -8,19 +8,18 @@ on:
     
 jobs:
   pygsflowCI:
-      name: autotests
-      runs-on: ${{ matrix.os }}
-      strategy:
-        fail-fast: false
-        matrix:
-          os: [ubuntu-latest]
-          python-version: [3.9, 3.8, 3.7]
-          run-type: [std]
-          test-pth: ["./autotest"]
-      defaults:
-        run:
-          shell: bash
-
+    name: autotests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.9, 3.8, 3.7]
+        run-type: [std]
+        test-pth: ["./autotest"]
+    defaults:
+      run:
+        shell: bash
     steps:
     - name: Checkout pygsflow repo
       uses: actions/checkout@v2.3.4
