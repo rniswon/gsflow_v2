@@ -55,9 +55,10 @@ jobs:
           mamba env update --name pygsflow --file etc/environment.yml
         fi
 
-    - name: Install flopy and pygsflow
+    - name: Install pymake, flopy, and pygsflow
       shell: bash -l {0}
       run: |
+        pip install https://github.com/modflowpy/pymake/zipball/master
         pip install https://github.com/modflowpy/flopy/zipball/develop
         pip install https://github.com/pygsflow/pygsflow/zipball/develop
 
@@ -80,8 +81,7 @@ jobs:
         cd autotest
         chmod u+x make_linux_gfortran.sh
         sed -i -e 's/\r$//' make_linux_gfortran.sh
+        ./make_linux_gfortran.sh
         chmod a+x gsflow
-        pip install https://github.com/modflowpy/flopy/zipball/develop
-        pip install https://github.com/pygsflow/pygsflow/zipball/develop
         nosetests -v
 
