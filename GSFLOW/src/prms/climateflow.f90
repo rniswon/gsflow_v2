@@ -973,7 +973,7 @@
         ENDDO
       ELSE
         IF ( getparam_real(Precip_module, 'tmax_allrain_offset', Nhru*MONTHS_PER_YEAR, Tmax_allrain_offset)/=0 ) &
-     &                CALL read_error(2, 'tmax_allrain_offset')
+     &       CALL read_error(2, 'tmax_allrain_offset')
       ENDIF
 
       ! Set tmax_allrain in units of the input values
@@ -1230,7 +1230,7 @@
         Vp_slope = 0.0
         IF ( Et_flag==potet_pm_module .OR. Et_flag==potet_pm_sta_module ) Vp_sat = 0.0
         IF ( Humidity_cbh_flag==OFF ) THEN
-          IF ( getparam_real(Et_module, 'humidity_percent', Nhru*12, Humidity_percent)/=0 ) &
+          IF ( getparam_real(Et_module, 'humidity_percent', Nhru*MONTHS_PER_YEAR, Humidity_percent)/=0 ) &
      &         CALL read_error(2, 'humidity_percent')
         ELSE
           Humidity_percent = 1.0

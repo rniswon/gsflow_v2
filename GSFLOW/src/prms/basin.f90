@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2021-10-21'
+      character(len=*), parameter :: Version_basin = '2021-10-22'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -29,7 +29,7 @@
       INTEGER, SAVE, ALLOCATABLE :: Hru_type(:), Cov_type(:), Ag_cov_type(:)
       INTEGER, SAVE, ALLOCATABLE :: Lake_hru_id(:), Lake_type(:) !not needed if no lakes
       REAL, SAVE, ALLOCATABLE :: Hru_area(:), Hru_percent_imperv(:), Hru_elev(:), Hru_lat(:)
-      REAL, SAVE, ALLOCATABLE :: Covden_sum(:), Covden_win(:)
+      REAL, SAVE, ALLOCATABLE :: Covden_sum(:,:), Covden_win(:,:)
       REAL, SAVE, ALLOCATABLE :: Dprst_frac_open(:), Dprst_area(:), Dprst_frac(:)
       REAL, SAVE, ALLOCATABLE :: Ag_frac(:)
       END MODULE PRMS_BASIN
@@ -62,7 +62,7 @@
 !     lake_hru_id, ag_frac, ag_cov_type
 !***********************************************************************
       INTEGER FUNCTION basdecl()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CASCADEGW_OFF, DOCUMENTATION, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CASCADEGW_OFF, DOCUMENTATION, MONTHS_PER_YEAR, &
      &    ide_dist_module, potet_pt_module, potet_pm_module, potet_pm_sta_module
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Model, Dprst_flag, Lake_route_flag, Et_flag, Precip_flag, Cascadegw_flag, &
      &    Stream_temp_flag, PRMS4_flag, GSFLOW_flag, Glacier_flag, AG_flag
@@ -243,15 +243,15 @@
      &     ' 1=grasses; 2=shrubs; 3=trees; 4=coniferous)', &
      &     'none')/=0 ) CALL read_error(1, 'cov_type')
 
-      ALLOCATE ( Covden_sum(Nhru) )
-      IF ( declparam(MODNAME, 'covden_sum', 'nhru', 'real', &
+      ALLOCATE ( Covden_sum(Nhru,MONTHS_PER_YEAR) )
+      IF ( declparam(MODNAME, 'covden_sum', 'nhru,nmonths', 'real', &
      &     '0.5', '0.0', '1.0', &
      &     'Summer vegetation cover density for major vegetation type', &
      &     'Summer vegetation cover density for the major vegetation type in each HRU', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'covden_sum')
 
-      ALLOCATE ( Covden_win(Nhru) )
-      IF ( declparam(MODNAME, 'covden_win', 'nhru', 'real', &
+      ALLOCATE ( Covden_win(Nhru,MONTHS_PER_YEAR) )
+      IF ( declparam(MODNAME, 'covden_win', 'nhru,nmonths', 'real', &
      &     '0.5', '0.0', '1.0', &
      &     'Winter vegetation cover density for major vegetation type', &
      &     'Winter vegetation cover density for the major vegetation type in each HRU', &
@@ -290,7 +290,7 @@
       INTEGER FUNCTION basinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CASCADEGW_OFF, &
      &    INACTIVE, LAKE, SWALE, FEET, ERROR_basin, DEBUG_minimum, ERROR_param, &
-     &    NORTHERN, SOUTHERN, FEET2METERS, METERS2FEET, DNEARZERO, &
+     &    NORTHERN, SOUTHERN, FEET2METERS, METERS2FEET, DNEARZERO, MONTHS_PER_YEAR, &
      &    ide_dist_module, potet_pt_module, potet_pm_module, potet_pm_sta_module
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, &
      &    Dprst_flag, Lake_route_flag, Et_flag, Precip_flag, Cascadegw_flag, &
@@ -316,8 +316,8 @@
       IF ( getparam_real(MODNAME, 'hru_lat', Nhru, Hru_lat)/=0 ) CALL read_error(2, 'hru_lat')
       IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
       IF ( getparam_int(MODNAME, 'cov_type', Nhru, Cov_type)/=0 ) CALL read_error(2, 'cov_type')
-      IF ( getparam_real(MODNAME, 'covden_sum', Nhru, Covden_sum)/=0 ) CALL read_error(2, 'covden_sum')
-      IF ( getparam_real(MODNAME, 'covden_win', Nhru, Covden_win)/=0 ) CALL read_error(2, 'covden_win')
+      IF ( getparam_real(MODNAME, 'covden_sum', Nhru*MONTHS_PER_YEAR, Covden_sum)/=0 ) CALL read_error(2, 'covden_sum')
+      IF ( getparam_real(MODNAME, 'covden_win', Nhru*MONTHS_PER_YEAR, Covden_win)/=0 ) CALL read_error(2, 'covden_win')
       IF ( getparam_int(MODNAME, 'elev_units', 1, Elev_units)/=0 ) CALL read_error(2, 'elev_units')
       IF ( getparam_real(MODNAME, 'hru_percent_imperv', Nhru, Hru_percent_imperv)/=0 ) CALL read_error(2, 'hru_percent_imperv')
       IF ( AG_flag==ACTIVE ) THEN
