@@ -42,7 +42,8 @@
       real, save :: unsatisfied_big
       ! parameters
 ! have covden a monthly, later
-      INTEGER, SAVE, ALLOCATABLE :: Ag_soil_type(:), Ag_soilwater_deficit_min(:), Ag_covden_sum(:), Ag_covden_win(:) !, Ag_crop_type(:)
+      INTEGER, SAVE, ALLOCATABLE :: Ag_soil_type(:) !, Ag_crop_type(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_soilwater_deficit_min(:), Ag_covden_sum(:,:), Ag_covden_win(:,:)
 !      REAL, SAVE, ALLOCATABLE :: Ag_sat_threshold(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_rechr_max_frac(:) ! Ag_crop_coef later, will specify PET
       !REAL, SAVE, ALLOCATABLE :: Ag_snowinfil_max(:), Ag_ssstor_init_frac(:)
@@ -91,7 +92,7 @@
 !     hru_area, slowcoef_sq, gvr_hru_id
 !***********************************************************************
       INTEGER FUNCTION szdecl_ag()
-      USE PRMS_CONSTANTS, ONLY: OFF, ACTIVE, DOCUMENTATION, PRMS_AG
+      USE PRMS_CONSTANTS, ONLY: OFF, ACTIVE, DOCUMENTATION, PRMS_AG, MONTHS_PER_YEAR
       USE PRMS_MODULE, ONLY: Nhru, Cascade_flag, GSFLOW_flag, Model
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
@@ -223,15 +224,15 @@
 !     &     'none')/=0 ) CALL read_error(1, 'ag_crop_type')
 
         ! use existing covden_sum, covden_win
-      ALLOCATE ( Ag_covden_sum(Nhru) )
-      IF ( declparam(MODNAME, 'ag_covden_sum', 'nhru', 'real', &
+      ALLOCATE ( Ag_covden_sum(Nhru,MONTHS_PER_YEAR) )
+      IF ( declparam(MODNAME, 'ag_covden_sum', 'nhru,nmonths', 'real', &
      &     '-1.0', '-1.0', '1.0', &
      &     'Summer vegetation cover density for agriculture crop type', &
      &     'Summer vegetation cover density for the agriculture crop type in each HRU', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'ag_covden_sum')
 
-      ALLOCATE ( Ag_covden_win(Nhru) )
-      IF ( declparam(MODNAME, 'ag_covden_win', 'nhru', 'real', &
+      ALLOCATE ( Ag_covden_win(Nhru,MONTHS_PER_YEAR) )
+      IF ( declparam(MODNAME, 'ag_covden_win', 'nhru,nmonths', 'real', &
      &     '-1.0', '-1.0', '1.0', &
      &     'Winter vegetation cover density for crop type', &
      &     'Winter vegetation cover density for the crop type in each HRU', &
@@ -244,7 +245,7 @@
 !                 set initial values and check parameter values
 !***********************************************************************
       INTEGER FUNCTION szinit_ag()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, LAKE, GLACIER, INACTIVE, OFF
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, LAKE, GLACIER, INACTIVE, OFF, MONTHS_PER_YEAR
       USE PRMS_MODULE, ONLY: Ag_package, Init_vars_from_file, Nhru, Agriculture_soilzone_flag, AG_flag
       USE PRMS_SOILZONE, ONLY: MODNAME, Iter_aet, Soil2gw_max
       USE PRMS_SOILZONE_AG
@@ -269,10 +270,10 @@
       IF ( getparam_real(MODNAME, 'ag_soilwater_deficit_min', Nhru, Ag_soilwater_deficit_min)/=0 ) &
      &     CALL read_error(2, 'ag_soilwater_deficit_min')
 !      IF ( getparam_int(MODNAME, 'ag_crop_type', Nhru, Ag_crop_type)/=0 ) CALL read_error(2, 'ag_crop_type')
-      IF ( getparam_real(MODNAME, 'ag_covden_sum', Nhru, Ag_covden_sum)/=0 ) CALL read_error(2, 'ag_covden_sum')
-      IF ( Ag_covden_sum(1)<0.0 ) Ag_covden_sum = Covden_sum
-      IF ( getparam_real(MODNAME, 'ag_covden_win', Nhru, Ag_covden_win)/=0 ) CALL read_error(2, 'ag_covden_win')
-      IF ( Ag_covden_win(1)<0.0 ) Ag_covden_win = Covden_win
+      IF ( getparam_real(MODNAME, 'ag_covden_sum', Nhru*MONTHS_PER_YEAR, Ag_covden_sum)/=0 ) CALL read_error(2, 'ag_covden_sum')
+      IF ( Ag_covden_sum(1,1)<0.0 ) Ag_covden_sum = Covden_sum
+      IF ( getparam_real(MODNAME, 'ag_covden_win', Nhru*MONTHS_PER_YEAR, Ag_covden_win)/=0 ) CALL read_error(2, 'ag_covden_win')
+      IF ( Ag_covden_win(1,1)<0.0 ) Ag_covden_win = Covden_win
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) Ag_soil_lower = 0.0
       Basin_agwaterin = 0.0D0
       Basin_ag_soil_to_gw = 0.0D0
