@@ -125,7 +125,7 @@
      &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, irrigated_area_module, AET_module, PET_ag_module, &
      &    selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, Agriculture_soilzone_flag, &
      &    Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
-     &    Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use ! , mappingFileName, xyFileName
+     &    Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use, mappingFileName, xyFileName
       USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, Albedo_day, Cloud_cover_day, &
      &    Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
       USE PRMS_DYNAMIC_PARAM_READ, ONLY: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
@@ -603,16 +603,16 @@
       Control_parameter_data(i)%values_character(1) = Model_output_file
       Control_parameter_data(i)%data_type = CHAR_TYPE
       i = i + 1
-      !Control_parameter_data(i)%name = 'mappingFileName'
-      !mappingFileName = 'MODSIM.map'
-      !Control_parameter_data(i)%values_character(1) = mappingFileName
-      !Control_parameter_data(i)%data_type = CHAR_TYPE
-      !i = i + 1
-      !Control_parameter_data(i)%name = 'xyFileName'
-      !xyFileName = 'MODSIM.xy'
-      !Control_parameter_data(i)%values_character(1) = xyFileName
-      !Control_parameter_data(i)%data_type = CHAR_TYPE
-      !i = i + 1
+      Control_parameter_data(i)%name = 'mappingFileName'
+      mappingFileName = 'MODSIM.map'
+      Control_parameter_data(i)%values_character(1) = mappingFileName
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'xyFileName'
+      xyFileName = 'MODSIM.xy'
+      Control_parameter_data(i)%values_character(1) = xyFileName
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
       Control_parameter_data(i)%name = 'csv_output_file'
       Csv_output_file = 'prms_summary.csv'
       Control_parameter_data(i)%values_character(1) = Csv_output_file
