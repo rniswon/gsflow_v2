@@ -581,7 +581,7 @@
 !***********************************************************************
 !     declare the dimensions
 !***********************************************************************
-      INTEGER FUNCTION setdims()
+      SUBROUTINE setdims()
       USE PRMS_CONSTANTS, ONLY: ERROR_control
       USE PRMS_MODULE
       USE GLOBAL, ONLY: NSTP, NPER, ISSFLG
@@ -596,8 +596,6 @@
 ! Local Variables
       INTEGER :: idim, iret, j, test
 !***********************************************************************
-      setdims = 1
-
       Inputerror_flag = 0
 
       CALL read_control_file()
@@ -1100,8 +1098,7 @@
         STOP
       ENDIF
 
-      setdims = Inputerror_flag
-      END FUNCTION setdims
+      END SUBROUTINE setdims
 
 !***********************************************************************
 !     Get and check consistency of dimensions with flags
