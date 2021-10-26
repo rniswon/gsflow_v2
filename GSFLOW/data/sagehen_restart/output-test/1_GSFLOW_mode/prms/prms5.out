@@ -94,18 +94,18 @@ runoff 1
  Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
 Simulation time period: 1983/09/23 00:00:00 to 1983/09/29 00:00:00
 ====================================================================
-Basin Definition                basin               2021-10-21
+Basin Definition                basin               2021-10-22
 Cascading Flow                  cascade             2021-09-14
 Common States and Fluxes        climateflow         2021-10-21
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2021-09-07
 Timestep Control                prms_time           2021-09-07
-Temperature Distribution        climate_hru         2021-10-21
-Precipitation Distribution      climate_hru         2021-10-21
+Temperature Distribution        climate_hru         2021-10-22
+Precipitation Distribution      climate_hru         2021-10-22
 Solar Radiation Distribution    ddsolrad            2021-09-07
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-09-07
-Canopy Interception             intcp               2021-10-20
+Canopy Interception             intcp               2021-10-22
 Snow Dynamics                   snowcomp            2021-09-15
 Surface Runoff                  srunoff_smidx       2021-10-11
 Soilzone Computations           soilzone            2021-10-21
@@ -132,5 +132,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    0 minutes  2.04 seconds
+Execution elapsed time    0 minutes  2.11 seconds
 

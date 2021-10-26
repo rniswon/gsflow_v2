@@ -95,7 +95,7 @@ runoff 1
  Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
 Simulation time period: 1990/10/01 00:00:00 to 2000/10/31 00:00:00
 ====================================================================
-Basin Definition                basin               2021-10-21
+Basin Definition                basin               2021-10-22
 Cascading Flow                  cascade             2021-09-14
 Common States and Fluxes        climateflow         2021-10-21
 Potential Solar Radiation       soltab              2021-09-07
@@ -106,7 +106,7 @@ Precipitation Distribution      precip_1sta         2021-09-07
 Solar Radiation Distribution    ddsolrad            2021-09-07
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-09-07
-Canopy Interception             intcp               2021-10-20
+Canopy Interception             intcp               2021-10-22
 Snow Dynamics                   snowcomp            2021-09-15
 Surface Runoff                  srunoff_smidx       2021-10-11
 Soilzone Computations           soilzone            2021-10-21
@@ -138,5 +138,5 @@ Fraction impervious:        0.0000    Fraction pervious:       0.9899
 Agriculture area:            67.91    Fraction AG:             0.0101
 
 
-Execution elapsed time    6 minutes 41.88 seconds
+Execution elapsed time    7 minutes  7.88 seconds
 

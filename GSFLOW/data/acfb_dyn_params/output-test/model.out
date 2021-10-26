@@ -85,18 +85,18 @@ runoff 6
  Data File time period: 1950/01/01 00:00:00 to 1999/12/31 00:00:00
 Simulation time period: 1980/01/01 00:00:00 to 1999/12/31 00:00:00
 ====================================================================
-Basin Definition                basin               2021-10-21
+Basin Definition                basin               2021-10-22
 Common States and Fluxes        climateflow         2021-10-21
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2021-09-07
 Timestep Control                prms_time           2021-09-07
-Time Series Data                dynamic_param_read  2021-10-21
-Temperature Distribution        climate_hru         2021-10-21
-Precipitation Distribution      climate_hru         2021-10-21
-Solar Radiation Distribution    climate_hru         2021-10-21
-Potential Evapotranspiration    climate_hru         2021-10-21
+Time Series Data                dynamic_param_read  2021-10-22
+Temperature Distribution        climate_hru         2021-10-22
+Precipitation Distribution      climate_hru         2021-10-22
+Solar Radiation Distribution    climate_hru         2021-10-22
+Potential Evapotranspiration    climate_hru         2021-10-22
 Transpiration Distribution      transp_tindex       2021-09-07
-Canopy Interception             intcp               2021-10-20
+Canopy Interception             intcp               2021-10-22
 Snow Dynamics                   snowcomp            2021-09-15
 Surface Runoff                  srunoff_smidx       2021-10-11
 Soilzone Computations           soilzone            2021-10-21
@@ -152,5 +152,5 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
  *************************************************************
  Total for run    1110.775  440.221    8.439  693.939   13.445
  *************************************************************
-Execution elapsed time    0 minutes  1.08 seconds
+Execution elapsed time    0 minutes  1.14 seconds
 
