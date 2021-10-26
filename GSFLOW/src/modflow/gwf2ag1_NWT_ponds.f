@@ -2226,8 +2226,8 @@
         write (iout, 7) NUMGW + NUMGWALL
         write (iout, 8) NUMSWET
         write (iout, 9) NUMGWET + NUMGWETALL        
-!        write (iout, 10) NUMPONDET + NUMPONDETALL
-!        write (iout, 11) NUMPOND + NUMPONDALL
+!dev        write (iout, 10) NUMPONDET + NUMPONDETALL
+!dev        write (iout, 11) NUMPOND + NUMPONDALL
       ELSE
         BACKSPACE(IN)
       END IF
@@ -2406,9 +2406,9 @@
       !
       !3 - -----SET MAX PUMPING RATE OR IRR DEMAND FOR GW.
       DO L = 1, NWELLS
-         IR = WELL(2, L)
-         IC = WELL(3, L)
-         IL = WELL(1, L)
+         IR = INT( WELL(2, L) )
+         IC = INT( WELL(3, L) )
+         IL = INT( WELL(1, L) )
          Q = WELL(4, L)
          IF (NUMIRRDIVERSIONSP + NUMIRRWELSP == 0) Q = 0.0
          QQ=Q
@@ -2553,7 +2553,7 @@
         DO IPC = 1, K
           dvt = IRRFIELDFACTPOND(IPC, L)*SUBVOL
           dvt = IRRFACTPOND(IPC, L)*dvt
-          PONDIRRPRMS(IPC, L) = dvt
+          PONDIRRPRMS(IPC, L) = SNGL( dvt )
         END DO
       !
       ! Set diversions rates to zero before summing up demands from
@@ -3133,9 +3133,9 @@
         !1 - -----limit diversion to water right and flow in river
         !
       if(iseg==9.and.kper==8.and.kstp==1)then
-!      etdif = pettotal - aettotal
-!          write(999,33)kper,kstp,kiter,SEG(2, iseg),
-!     +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
+!dev      etdif = pettotal - aettotal
+!dev          write(999,33)kper,kstp,kiter,SEG(2, iseg),
+!dev     +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
         endif
   33  format(3i5,6e20.10)
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
@@ -3267,10 +3267,10 @@
       DOUBLE PRECISION :: factor, area, aet, pet
       double precision :: pettotal,aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup !, etdif
-      real :: demand_inch_acres
+      real :: demand_inch_acres, Q, saveflow
       integer :: k, ipond, hru_id, i
       external :: set_factor
-      double precision :: set_factor, Q, saveflow
+      double precision :: set_factor
 ! --------------------------------------------------
 !     check if there are active irrigation ponds for this stress period.
 !
@@ -3337,13 +3337,13 @@
      +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
         PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
-!        if(i==2)then
-!      !etdif = pettotal - aettotal
-!          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
-!     +                 PONDSEGFLOW(I),pettotal,aettotal,
-!     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
-!        endif
-!  33  format(4i5,6e20.10)
+!dev        if(i==2)then
+!dev      !etdif = pettotal - aettotal
+!dev          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
+!dev     +                 PONDSEGFLOW(I),pettotal,aettotal,
+!dev     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
+!dev        endif
+!dev  33  format(4i5,6e20.10)
 300   continue
       return
       end subroutine demandpond_prms
@@ -3746,8 +3746,8 @@
                 Q = PONDSEGFLOW(I)
                 QQ = PONDFLOW(I)
                 QQQ = 0.0
-!                if ( Agriculture_dprst_flag == 1 )   !uncommment this and next line
-!     +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+!dev                if ( Agriculture_dprst_flag == 1 )   !uncommment this and next line
+!dev     +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
                 CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
      +                          Q, QQ, QQQ)
               END IF
