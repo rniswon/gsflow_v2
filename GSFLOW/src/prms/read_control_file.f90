@@ -136,7 +136,7 @@
      &    soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, &
      &    fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, &
      &    covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn, &
-     &    ag_soilmoist_dynamic, ag_soilrechr_dynamic !, snareathresh_dynamic
+     &    ag_soilmoist_dynamic, ag_soilrechr_dynamic, ag_frac_dynamic !, snareathresh_dynamic
       USE PRMS_CONTROL_FILE
       IMPLICIT NONE
       ! Local Variables
@@ -789,6 +789,11 @@
       Control_parameter_data(i)%name = 'gsflow_output_file'
       Gsflow_output_file = 'gsflow.out'
       Control_parameter_data(i)%values_character(1) = Gsflow_output_file
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'ag_frac_dynamic'
+      Dprst_depth_dynamic = 'dynag_frac'
+      Control_parameter_data(i)%values_character(1) = ag_frac_dynamic
       Control_parameter_data(i)%data_type = CHAR_TYPE
       i = i + 1
       Control_parameter_data(i)%name = 'dprst_depth_dynamic'
