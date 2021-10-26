@@ -584,7 +584,8 @@
             Ag_hortonian(i) = excess
             Sroff(i) = Sroff(i) + excess
             ag_water_maxin = ag_water_maxin - excess
-            if(ag_soil_moist(i)>ag_soil_moist_max(i)) WRITE(531,333) Nowyear, Nowmonth, Nowday, i, excess, Ag_soil_moist(i), Ag_soil_moist_max(i), Ag_irrigation_add(i)
+            if(ag_soil_moist(i)>ag_soil_moist_max(i)) WRITE(531,333) Nowyear, Nowmonth, Nowday, i, excess, &
+     &                                                               Ag_soil_moist(i), Ag_soil_moist_max(i), Ag_irrigation_add(i)
  333 format (I4, 2(', ',i3), ', ', I0, 4(', ',F0.5))
           ENDIF
         ENDIF
@@ -883,7 +884,8 @@
               PRINT *, 'hru_actet>potet', i, hruactet, &
      &                 Nowmonth, Nowday, Hru_actet(i), Potet(i), avail_potet, ag_hruactet, &
      &                 pervactet*perv_frac, perv_frac, agfrac
-              PRINT *, 'hruactet', hruactet, Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i)
+              PRINT *, 'hruactet', hruactet, Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i), &
+     &                 Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i)
             ENDIF
           ENDIF
 !          Hru_actet(i) = Potet(i)

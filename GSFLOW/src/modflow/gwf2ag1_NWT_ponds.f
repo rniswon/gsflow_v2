@@ -2406,9 +2406,9 @@
       !
       !3 - -----SET MAX PUMPING RATE OR IRR DEMAND FOR GW.
       DO L = 1, NWELLS
-         IR = WELL(2, L)
-         IC = WELL(3, L)
-         IL = WELL(1, L)
+         IR = INT( WELL(2, L) )
+         IC = INT( WELL(3, L) )
+         IL = INT( WELL(1, L ) )
          Q = WELL(4, L)
          IF (NUMIRRDIVERSIONSP + NUMIRRWELSP == 0) Q = 0.0
          QQ=Q
@@ -2553,7 +2553,7 @@
         DO IPC = 1, K
           dvt = IRRFIELDFACTPOND(IPC, L)*SUBVOL
           dvt = IRRFACTPOND(IPC, L)*dvt
-          PONDIRRPRMS(IPC, L) = dvt
+          PONDIRRPRMS(IPC, L) = SNGL( dvt )
         END DO
       !
       ! Set diversions rates to zero before summing up demands from
@@ -3267,10 +3267,10 @@
       DOUBLE PRECISION :: factor, area, aet, pet
       double precision :: pettotal,aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup !, etdif
-      real :: demand_inch_acres
+      real :: demand_inch_acres, Q, saveflow
       integer :: k, ipond, hru_id, i
       external :: set_factor
-      double precision :: set_factor, Q, saveflow
+      double precision :: set_factor
 ! --------------------------------------------------
 !     check if there are active irrigation ponds for this stress period.
 !

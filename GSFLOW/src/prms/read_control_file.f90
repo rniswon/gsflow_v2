@@ -24,7 +24,8 @@
         USE PRMS_BASIN_SUMMARY, ONLY: BasinOutVars, BasinOut_freq, BasinOutBaseFileName, BasinOutVar_names
         USE PRMS_NSEGMENT_SUMMARY, ONLY: NsegmentOutVars, NsegmentOut_freq, NsegmentOutBaseFileName, &
      &      NsegmentOutVar_names, NsegmentOut_format
-        USE PRMS_WATER_USE, ONLY: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file, External_transfer_file, Lake_transfer_file
+        USE PRMS_WATER_USE, ONLY: Segment_transfer_file, Gwr_transfer_file, Dprst_transfer_file, &
+     &      External_transfer_file, Lake_transfer_file
         USE PRMS_GLACR, ONLY: Mbinit_flag
         USE PRMS_PRECIP_MAP, ONLY: Precip_map_file
         USE PRMS_TEMP_MAP, ONLY: Tmax_map_file, Tmin_map_file
@@ -125,7 +126,8 @@
      &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, irrigated_area_module, AET_module, PET_ag_module, &
      &    selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, Agriculture_soilzone_flag, &
      &    Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
-     &    Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use, mappingFileName, xyFileName
+     &    Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use, &
+     &    mappingFileName, xyFileName
       USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, Albedo_day, Cloud_cover_day, &
      &    Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
       USE PRMS_DYNAMIC_PARAM_READ, ONLY: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &

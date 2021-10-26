@@ -29,7 +29,7 @@
 !   GSFLOW variables
       INTEGER, SAVE, ALLOCATABLE :: Hru_gvr_count(:), Hru_gvr_index(:, :), Hrucheck(:)
       REAL, SAVE, ALLOCATABLE :: Replenish_frac(:)
-      REAL, SAVE :: It0_basin_soil_moist, It0_basin_ssstor
+      DOUBLE PRECISION, SAVE :: It0_basin_soil_moist, It0_basin_ssstor
       REAL, SAVE, ALLOCATABLE :: It0_soil_rechr(:), It0_soil_moist(:)
       REAL, SAVE, ALLOCATABLE :: It0_pref_flow_stor(:), It0_ssres_stor(:)
       REAL, SAVE, ALLOCATABLE :: It0_gravity_stor_res(:), It0_sroff(:)
