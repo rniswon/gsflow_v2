@@ -128,6 +128,7 @@
       REAL :: temp
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: dimen1, dimen2
 !***********************************************************************
+      declparam = 0
       !!!!!!!!!!!! check to see if already in data structure
       ! doesn't check to see if declared the same, uses first values
       CALL check_parameters_declared(Paramname, Modname, declared)
@@ -656,7 +657,8 @@
           ENDIF
           IF ( TRIM(Parameter_data(i)%data_type)/='real' ) THEN
             ierr = 1
-            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' data type does in getparam_real not match declared data type'
+            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
+     &               ' data type does in getparam_real not match declared data type'
           ENDIF
           param_id = i
           EXIT
@@ -675,11 +677,13 @@
         DO i = 1, Numvalues
           IF ( Parameter_data(param_id)%values(i) > Parameter_data(param_id)%maximum ) THEN
             PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
-            PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; maximum value: ', Parameter_data(param_id)%maximum
+            PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; maximum value: ', &
+     &                               Parameter_data(param_id)%maximum
           ENDIF
           IF ( Parameter_data(param_id)%values(i) < Parameter_data(param_id)%minimum ) THEN
             PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
-            PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; minimum value: ', Parameter_data(param_id)%minimum
+            PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; minimum value: ', &
+     &                               Parameter_data(param_id)%minimum
           ENDIF
         ENDDO
       ENDIF
@@ -718,7 +722,8 @@
           ENDIF
           IF ( TRIM(Parameter_data(i)%data_type)/='integer' ) THEN
             ierr = 1
-            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' data type does in getparam_int not match declared data type'
+            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
+     &               ' data type does in getparam_int not match declared data type'
           ENDIF
           param_id = i
           EXIT
@@ -735,11 +740,13 @@
         DO i = 1, Numvalues
           IF ( Parameter_data(param_id)%int_values(i) > Parameter_data(param_id)%maximum_int ) THEN
             PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
-            PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%int_values(i), '; maximum value: ', Parameter_data(param_id)%maximum_int
+            PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%int_values(i), '; maximum value: ', &
+     &                             Parameter_data(param_id)%maximum_int
           ENDIF
           IF ( Parameter_data(param_id)%int_values(i) < Parameter_data(param_id)%minimum_int ) THEN
             PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
-            PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%int_values(i), '; minimum value: ', Parameter_data(param_id)%minimum_int
+            PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%int_values(i), '; minimum value: ', &
+     &                             Parameter_data(param_id)%minimum_int
           ENDIF
         ENDDO
       ENDIF
