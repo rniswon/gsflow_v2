@@ -127,7 +127,7 @@
      &    selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, Agriculture_soilzone_flag, &
      &    Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
      &    Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use, &
-     &    mappingFileName, xyFileName
+     &    mappingFileName, xyFileName, Iter_aet_flag
       USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, Albedo_day, Cloud_cover_day, &
      &    Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
       USE PRMS_DYNAMIC_PARAM_READ, ONLY: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
@@ -361,6 +361,9 @@
       i = i + 1
       Control_parameter_data(i)%name = 'soilzone_aet_flag'
       Soilzone_aet_flag = OFF
+      i = i + 1
+      Control_parameter_data(i)%name = 'iter_aet_flag'
+      Iter_aet_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'albedo_cbh_flag'
       Albedo_cbh_flag = OFF

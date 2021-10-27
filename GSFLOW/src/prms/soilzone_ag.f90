@@ -22,7 +22,7 @@
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
       character(len=*), parameter :: Version_soilzone_ag = '2021-10-21'
-      INTEGER, SAVE :: Soil_iter, Iter_aet_PRMS_flag, HRU_id, Soilzone_irr_flag
+      INTEGER, SAVE :: Soil_iter, HRU_id, Soilzone_irr_flag
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr
       !DOUBLE PRECISION, SAVE :: Basin_ag_ssstor, Basin_ag_recharge, Basin_ag_ssflow
@@ -340,7 +340,7 @@
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Nowmonth, Nowyear, Nowday
+     &    Soilzone_aet_flag, Nowmonth, Nowyear, Nowday, Iter_aet_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Hru_frac_perv, Hru_storage, &
@@ -579,14 +579,14 @@
         IF ( ag_on_flag==ACTIVE ) THEN
           Ag_soilwater_deficit(i) = ag_soil_moist_max(i) - ag_soil_moist(i)
           excess = ag_water_maxin + ag_soil_moist(i) - ag_soil_moist_max(i)
-          IF ( excess>0.0 ) THEN
+          IF ( excess>0.0 .OR. Ag_irrigation_add(i)>0.0 ) THEN
+            if(ag_soil_moist(i)>ag_soil_moist_max(i)) WRITE(531,333) Nowyear, Nowmonth, Nowday, i, excess, ag_water_maxin, &
+     &                                                               Ag_soil_moist(i), Ag_soil_moist_max(i), Ag_irrigation_add(i)
             ag_soil_moist(i) = ag_soil_moist(i) - excess
             Ag_hortonian(i) = excess
             Sroff(i) = Sroff(i) + excess
             ag_water_maxin = ag_water_maxin - excess
-            if(ag_soil_moist(i)>ag_soil_moist_max(i)) WRITE(531,333) Nowyear, Nowmonth, Nowday, i, excess, &
-     &                                                               Ag_soil_moist(i), Ag_soil_moist_max(i), Ag_irrigation_add(i)
- 333 format (I4, 2(', ',i3), ', ', I0, 4(', ',F0.5))
+ 333 format (I4, 2(', ',i3), ', ', I0, 5(', ',F0.5))
           ENDIF
         ENDIF
         capwater_maxin = capwater_maxin + cap_ag_water_maxin
@@ -677,6 +677,7 @@
             ENDIF
           ENDIF
           IF ( ag_on_flag==ACTIVE ) THEN
+ write(531,*)              ag_water_maxin,Ag_soil_moist(i)
             IF ( ag_water_maxin+Ag_soil_moist(i)>0.0 ) THEN
               ag_soil2gw = 0.0
               CALL compute_soilmoist(ag_water_maxin, Ag_soil_moist_max(i), &
@@ -844,12 +845,13 @@
         hruactet = hruactet + pervactet*perv_frac
         ag_hruactet = 0.0
         IF ( ag_on_flag==ACTIVE ) THEN
-          IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN
+          IF ( Iter_aet_flag==ACTIVE ) THEN
               !soilwater_deficit = MAX( sz_deficit_param, ag_soil_moist(i)/ag_soil_moist_max(i) ) irrigation happens at a deficit threshold
             ag_AETtarget = AET_external(i) ! ??? rsr, should this be PET target
           ELSE
             ag_AETtarget = Potet(i)
           ENDIF
+
           ag_avail_targetAET = ag_AETtarget - hruactet
           IF ( Ag_soil_moist(i)>0.0 .AND. cfgi_frozen_hru==OFF ) THEN
 !            print *, Ag_soil_moist(i), Ag_soil_rechr(i)
@@ -857,8 +859,9 @@
      &                           Ag_soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_actet(i), ag_avail_targetAET, & !?? instead of ag_avail_potet use AET_external
      &                           Snow_free(i), Ag_potet_rechr(i), Ag_potet_lower(i), &
      &                           ag_AETtarget, agfrac, Ag_soil_saturated(i))
+                      write(531,*) ag_AETtarget, hruactet, AET_external(i), Ag_actet(i), ag_avail_targetAET
             ! sanity checks
-            IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN
+            IF ( Iter_aet_flag==ACTIVE ) THEN
               IF ( Ag_actet(i)-ag_AETtarget>NEARZERO ) THEN
                 PRINT *, 'ag_actet problem', Ag_actet(i), ag_avail_potet, agfrac, AET_external(i), ag_potet, i, hruactet
                 PRINT *, ag_AETtarget-Ag_actet(i), Ag_soil_moist(i), Ag_soil_rechr(i)
@@ -1011,8 +1014,8 @@
         Grav_dunnian_flow(i) = dunnianflw_gvr
         Unused_potet(i) = Potet(i) - Hru_actet(i)
         IF ( ag_on_flag==ACTIVE ) THEN
-          !IF ( Iter_aet_PRMS_flag==ACTIVE .AND.Transp_on(i)==ACTIVE ) THEN
-          IF ( Iter_aet_PRMS_flag==ACTIVE ) THEN
+          !IF ( Iter_aet_flag==ACTIVE .AND.Transp_on(i)==ACTIVE ) THEN
+          IF ( Iter_aet_flag==ACTIVE ) THEN
             !agriculture_external(i)
             !IF ( Unused_potet(i)>0.0 ) THEN
             unsatisfied_et = ag_AETtarget - Ag_actet(i)

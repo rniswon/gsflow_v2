@@ -548,3 +548,8 @@ ag_frac_dynamic
 1
 4
 ./input/dyn_ag_frac.param
+####
+iter_aet_flag
+1
+1
+1
