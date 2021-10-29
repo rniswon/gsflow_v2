@@ -1,7 +1,7 @@
 !***********************************************************************
 !     Modules PRMS_MODULE and GSFMODFLOW
 !***********************************************************************
-      MODULE PRMS_MODULE
+  MODULE PRMS_MODULE
     USE ISO_FORTRAN_ENV
     USE PRMS_CONSTANTS, ONLY: MODFLOW, MAX_DAYS_PER_YEAR, DEBUG_minimum, DEBUG_less, DEBUG_WB, &
    &    RUN, DECL, INIT, SETDIMENS, CLEAN, ACTIVE, OFF, ERROR_dim, ERROR_open_out, ERROR_param, ERROR_restart, &
@@ -20,10 +20,10 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 10/20/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-10-20'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 10/20/2021'
-      character(len=*), parameter :: Version_read_control_file = '2021-10-05'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 10/28/2021'
+      character(len=*), parameter :: PRMS_versn = '2021-10-28'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 10/28/2021'
+      character(len=*), parameter :: Version_read_control_file = '2021-10-28'
       character(len=*), parameter :: Version_read_parameter_file = '2021-10-05'
       character(len=*), parameter :: Version_read_data_file = '2021-09-07'
       CHARACTER(len=8), SAVE :: Process
@@ -44,7 +44,7 @@
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag, Albedo_cbh_flag, Cloud_cover_cbh_flag
       INTEGER, SAVE :: PRMS_flag, GSFLOW_flag, PRMS4_flag
       INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Grid_flag, Ag_package
-      INTEGER, SAVE :: Agriculture_flag, Canopy_iter, Keep_iterating_PRMS
+      INTEGER, SAVE :: Agriculture_flag, Canopy_iter
       INTEGER, SAVE :: irrigated_area_flag, AET_cbh_flag, PET_cbh_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Soilzone_add_water_use
@@ -72,7 +72,7 @@
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, Iter_aet_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
-      INTEGER, SAVE :: Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, Agriculture_soilzone_flag
+      INTEGER, SAVE :: Agriculture_dprst_flag, Agriculture_soilzone_flag, Agriculture_canopy_flag 
       INTEGER, SAVE :: Dyn_ag_frac_flag, Dyn_ag_soil_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF, outputSelectDatesON_OFF, snow_cloudcover_flag
@@ -90,9 +90,9 @@
       INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag, Gsf_rpt, Rpt_days
       INTEGER, SAVE :: Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, Dyn_springfrost_flag
       INTEGER, SAVE :: Gwr_transferON_OFF, External_transferON_OFF, Segment_transferON_OFF, Lake_transferON_OFF
-      END MODULE PRMS_MODULE
+    END MODULE PRMS_MODULE
 
-      MODULE GSFMODFLOW
+    MODULE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       IMPLICIT NONE
 !   Local Variables
@@ -145,4 +145,4 @@
 !   Control Parameters
       INTEGER, SAVE :: Modflow_time_zero(6)
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Modflow_name
-      END MODULE GSFMODFLOW
+    END MODULE GSFMODFLOW
