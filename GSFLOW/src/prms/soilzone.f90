@@ -120,7 +120,7 @@
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ERROR_dim, ACTIVE, OFF, DEBUG_WB, &
      &    CASCADE_OFF, MONTHS_PER_YEAR
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Nhrucell, Print_debug, &
-     &    Cascade_flag, GSFLOW_flag, Call_cascade, PRMS_land_iteration_flag, AG_flag
+     &    Cascade_flag, GSFLOW_flag, Call_cascade, PRMS_land_iteration_flag, AG_flag, iter_aet_flag
       USE PRMS_SOILZONE
       IMPLICIT NONE
 ! Functions
@@ -495,7 +495,7 @@
       ENDIF
 
       Iter_aet = OFF
-      IF ( AG_flag==ACTIVE ) Iter_aet = ACTIVE
+      IF ( AG_flag==ACTIVE .OR. iter_aet_flag==ACTIVE ) Iter_aet = ACTIVE
       IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE .OR. Iter_aet==ACTIVE ) THEN
         ALLOCATE ( It0_ssres_stor(Nhru), It0_slow_stor(Nhru) )
         IF ( GSFLOW_flag==ACTIVE ) ALLOCATE ( It0_gravity_stor_res(Nhrucell) )

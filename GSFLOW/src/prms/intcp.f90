@@ -227,7 +227,7 @@
 !***********************************************************************
       INTEGER FUNCTION intinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, MONTHS_PER_YEAR
-      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug, Agriculture_soilzone_flag, Ag_package
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug
       USE PRMS_INTCP
       USE PRMS_CLIMATEVARS, ONLY: Transp_on
       IMPLICIT NONE
@@ -271,8 +271,6 @@
       Basin_net_apply = 0.0D0
       Basin_hru_apply = 0.0D0
       IF ( Print_debug==DEBUG_WB ) ALLOCATE ( Intcp_stor_ante(Nhru) )
-      Canopy_irrigation_flag = OFF
-      IF ( Ag_package==ACTIVE .AND. Agriculture_soilzone_flag==OFF ) Canopy_irrigation_flag = ACTIVE
 
       END FUNCTION intinit
 
