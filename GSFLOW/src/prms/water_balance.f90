@@ -6,7 +6,7 @@
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Water Balance Computations'
         character(len=*), parameter :: MODNAME_WB = 'water_balance'
-        character(len=*), parameter :: Version_water_balance = '2021-08-13'
+        character(len=*), parameter :: Version_water_balance = '2021-09-09'
         INTEGER, SAVE :: BALUNT, SZUNIT, GWUNIT, INTCPUNT, SROUNIT, SNOWUNIT
         REAL, PARAMETER :: TOOSMALL = 3.1E-05, SMALL = 1.0E-04, BAD = 1.0E-03
         DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 1.0D-05
@@ -53,35 +53,34 @@
       USE PRMS_SRUNOFF, ONLY: MODNAME
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declvar
-      EXTERNAL :: read_error, print_module, PRMS_open_module_file
+      EXTERNAL :: read_error, print_module, PRMS_open_module_file, declvar_dble
 !***********************************************************************
       CALL print_module(MODDESC, MODNAME_WB, Version_water_balance)
 
 ! Declare Variables
-      IF ( declvar(MODNAME_WB, 'basin_capillary_wb', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME_WB, 'basin_capillary_wb', 'one', 1, &
      &     'Basin area-weighted average capillary reservoir storage', &
-     &     'inches', Basin_capillary_wb)/=0 ) CALL read_error(3, 'basin_capillary_wb')
+     &     'inches', Basin_capillary_wb)
 
-      IF ( declvar(MODNAME_WB, 'basin_gravity_wb', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME_WB, 'basin_gravity_wb', 'one', 1, &
      &     'Basin area-weighted average gravity reservoir storage', &
-     &     'inches', Basin_gravity_wb)/=0 ) CALL read_error(3, 'basin_gravity_wb')
+     &     'inches', Basin_gravity_wb)
 
-      IF ( declvar(MODNAME_WB, 'basin_soilzone_wb', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME_WB, 'basin_soilzone_wb', 'one', 1, &
      &     'Basin area-weighted average storage in soilzone reservoirs', &
-     &     'inches', Basin_soilzone_wb)/=0 ) CALL read_error(3, 'basin_soilzone_wb')
+     &     'inches', Basin_soilzone_wb)
 
 !      ALLOCATE ( Hru_runoff(Nhru) )
-!      IF ( declvar(MODNAME, 'hru_runoff', 'nhru', Nhru, 'double', &
+!      CALL declvar_dble(MODNAME, 'hru_runoff', 'nhru', Nhru, &
 !     &     'Total lateral flow leaving each HRU (includes cascading flow)', &
-!     &     'inches', Hru_runoff)/=0 ) CALL read_error(3, 'hru_runoff')
+!     &     'inches', Hru_runoff)
 
       ALLOCATE ( Hru_storage_ante(Nhru) )
 
       IF ( Dprst_flag==ACTIVE ) THEN
-        IF ( declvar(MODNAME_WB, 'basin_dprst_wb', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME_WB, 'basin_dprst_wb', 'one', 1, &
      &       'Basin area-weighted average surface-depression storage water balance', &
-     &       'inches', Basin_dprst_wb)/=0 ) CALL read_error(3, 'basin_dprst_wb')
+     &       'inches', Basin_dprst_wb)
       ENDIF
 
       ALLOCATE ( Gwstor_ante(Nhru) )
@@ -228,8 +227,8 @@
           ENDIF
           WRITE ( BALUNT,'(I7,6I5,15F10.5,I5)' ) i, Nowtime, hrubal, &
      &            Net_rain(i), Net_snow(i), Hru_rain(i), Hru_snow(i), &
-     &            Intcp_stor(i), Intcp_stor_ante(i), Intcp_evap(i), Srain_intcp(i), &
-     &            Wrain_intcp(i), Snow_intcp(i), Canopy_covden(i), delstor, &
+     &            Intcp_stor(i), Intcp_stor_ante(i), Intcp_evap(i), Srain_intcp(i,Nowmonth), &
+     &            Wrain_intcp(i,Nowmonth), Snow_intcp(i,Nowmonth), Canopy_covden(i), delstor, &
      &            Hru_intcpstor(i), Intcp_changeover(i), Cov_type(i)
           IF ( Use_transfer_intcp==1 ) WRITE ( BALUNT, * ) Gain_inches(i), Net_apply(i)
         ENDIF

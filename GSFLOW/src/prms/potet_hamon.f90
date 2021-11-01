@@ -24,7 +24,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam, getparam
+      INTEGER, EXTERNAL :: declparam, getparam_real
       EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
@@ -63,7 +63,7 @@
 
 !******Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam(MODNAME, 'hamon_coef', Nhru*MONTHS_PER_YEAR, 'real', Hamon_coef)/=0 ) CALL read_error(2, 'hamon_coef')
+        IF ( getparam_real(MODNAME, 'hamon_coef', Nhru*MONTHS_PER_YEAR, Hamon_coef)/=0 ) CALL read_error(2, 'hamon_coef')
       ENDIF
 
       END FUNCTION potet_hamon

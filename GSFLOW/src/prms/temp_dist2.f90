@@ -76,8 +76,8 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: INDEX
-      INTEGER, EXTERNAL :: declparam, declvar
-      EXTERNAL :: read_error, print_module, error_stop
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL :: read_error, print_module, error_stop, declvar_real
 !***********************************************************************
       t2dist2decl = 0
 
@@ -89,13 +89,13 @@
 ! added by Mastin 5/8/98
       ALLOCATE ( Elfac(Nhru,Ntemp), Delv(Ntemp,Ntemp), Dist(Nhru,Ntemp), N_tsta(Nhru) )
 
-      IF ( declvar(MODNAME, 'basin_lapse_max', 'one', 1, 'real', &
+      CALL declvar_real(MODNAME, 'basin_lapse_max', 'one', 1, &
      &     'Basin area-weighted average maximum air temperature lapse rate per 1000 feet', &
-     &     'degrees', Basin_lapse_max)/=0 ) CALL read_error(3, 'basin_lapse_max')
+     &     'degrees', Basin_lapse_max)
 
-      IF ( declvar(MODNAME, 'basin_lapse_min', 'one', 1, 'real', &
+      CALL declvar_real(MODNAME, 'basin_lapse_min', 'one', 1, &
      &     'Basin area-weighted average minimum air temperature lapse rate per 1000 feet', &
-     &     'degrees', Basin_lapse_min)/=0 ) CALL read_error(3, 'basin_lapse_min')
+     &     'degrees', Basin_lapse_min)
 
       IF ( declparam(MODNAME, 'dist_max', 'one', 'real', &
      &     '1.0E9', '0.0', '1.0E9', &
@@ -208,7 +208,7 @@
       USE PRMS_CLIMATEVARS, ONLY: Tsta_elev
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getparam
+      INTEGER, EXTERNAL :: getparam_real, getparam_int
       EXTERNAL :: read_error
       INTRINSIC :: DSQRT, ABS, DABS, DBLE
 ! Local Variables
@@ -218,37 +218,37 @@
 !***********************************************************************
       t2dist2init = 0
 
-      IF ( getparam(MODNAME, 'dist_max', 1, 'real', Dist_max)/=0 ) CALL read_error(2, 'dist_max')
+      IF ( getparam_real(MODNAME, 'dist_max', 1, Dist_max)/=0 ) CALL read_error(2, 'dist_max')
 
-      IF ( getparam(MODNAME, 'max_tsta', 1, 'integer', Max_tsta)/=0 ) CALL read_error(2, 'max_tsta')
+      IF ( getparam_int(MODNAME, 'max_tsta', 1, Max_tsta)/=0 ) CALL read_error(2, 'max_tsta')
       IF ( Max_tsta==0 ) Max_tsta = Ntemp
 
-      IF ( getparam(MODNAME, 'monmin', MONTHS_PER_YEAR, 'real', Monmin)/=0 ) CALL read_error(2, 'monmin')
+      IF ( getparam_real(MODNAME, 'monmin', MONTHS_PER_YEAR, Monmin)/=0 ) CALL read_error(2, 'monmin')
 
-      IF ( getparam(MODNAME, 'monmax', MONTHS_PER_YEAR, 'real', Monmax)/=0 ) CALL read_error(2, 'monmax')
+      IF ( getparam_real(MODNAME, 'monmax', MONTHS_PER_YEAR, Monmax)/=0 ) CALL read_error(2, 'monmax')
 
-      IF ( getparam(MODNAME, 'lapsemin_min', MONTHS_PER_YEAR, 'real', Lapsemin_min) &
+      IF ( getparam_real(MODNAME, 'lapsemin_min', MONTHS_PER_YEAR, Lapsemin_min) &
      &     /=0 ) CALL read_error(2, 'lapsemin_min')
 
-      IF ( getparam(MODNAME, 'lapsemin_max', MONTHS_PER_YEAR, 'real', Lapsemin_max) &
+      IF ( getparam_real(MODNAME, 'lapsemin_max', MONTHS_PER_YEAR, Lapsemin_max) &
      &     /=0 ) CALL read_error(2, 'lapsemin_max')
 
-      IF ( getparam(MODNAME, 'lapsemax_min', MONTHS_PER_YEAR, 'real', Lapsemax_min) &
+      IF ( getparam_real(MODNAME, 'lapsemax_min', MONTHS_PER_YEAR, Lapsemax_min) &
      &     /=0 ) CALL read_error(2, 'lapsemax_min')
 
-      IF ( getparam(MODNAME, 'lapsemax_max', MONTHS_PER_YEAR, 'real', Lapsemax_max) &
+      IF ( getparam_real(MODNAME, 'lapsemax_max', MONTHS_PER_YEAR, Lapsemax_max) &
      &     /=0 ) CALL read_error(2, 'lapsemax_max')
 
-      IF ( getparam(MODNAME, 'tsta_xlong', Ntemp, 'real', Tsta_xlong) &
+      IF ( getparam_real(MODNAME, 'tsta_xlong', Ntemp, Tsta_xlong) &
      &     /=0 ) CALL read_error(2, 'tsta_xlong')
 
-      IF ( getparam(MODNAME, 'tsta_ylat', Ntemp, 'real', Tsta_ylat) &
+      IF ( getparam_real(MODNAME, 'tsta_ylat', Ntemp, Tsta_ylat) &
      &     /=0 ) CALL read_error(2, 'tsta_ylat')
 
-      IF ( getparam(MODNAME, 'hru_xlong', Nhru, 'real', Hru_xlong) &
+      IF ( getparam_real(MODNAME, 'hru_xlong', Nhru, Hru_xlong) &
      &     /=0 ) CALL read_error(2, 'hru_xlong')
 
-      IF ( getparam(MODNAME, 'hru_ylat', Nhru, 'real', Hru_ylat) &
+      IF ( getparam_real(MODNAME, 'hru_ylat', Nhru, Hru_ylat) &
      &     /=0 ) CALL read_error(2, 'hru_ylat')
 
       Basin_lapse_max = 0.0

@@ -8,7 +8,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_jh'
-        character(len=*), parameter :: Version_potet = '2021-08-13'
+        character(len=*), parameter :: Version_potet = '2021-09-07'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Jh_coef(:, :), Jh_coef_hru(:)
       END MODULE PRMS_POTET_JH
@@ -22,7 +22,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: declparam, getparam
+      INTEGER, EXTERNAL :: declparam, getparam_real
       EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
@@ -66,8 +66,8 @@
 
 !******Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam(MODNAME, 'jh_coef', Nhru*MONTHS_PER_YEAR, 'real', Jh_coef)/=0 ) CALL read_error(2, 'jh_coef')
-        IF ( getparam(MODNAME, 'jh_coef_hru', Nhru, 'real', Jh_coef_hru)/=0 ) CALL read_error(2, 'jh_coef_hru')
+        IF ( getparam_real(MODNAME, 'jh_coef', Nhru*MONTHS_PER_YEAR, Jh_coef)/=0 ) CALL read_error(2, 'jh_coef')
+        IF ( getparam_real(MODNAME, 'jh_coef_hru', Nhru, Jh_coef_hru)/=0 ) CALL read_error(2, 'jh_coef_hru')
 
       ENDIF
 

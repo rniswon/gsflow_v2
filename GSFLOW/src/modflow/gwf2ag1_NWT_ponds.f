@@ -2226,8 +2226,8 @@
         write (iout, 7) NUMGW + NUMGWALL
         write (iout, 8) NUMSWET
         write (iout, 9) NUMGWET + NUMGWETALL        
-!dev        write (iout, 10) NUMPONDET + NUMPONDETALL
-!dev        write (iout, 11) NUMPOND + NUMPONDALL
+        write (iout, 10) NUMPONDET + NUMPONDETALL
+        write (iout, 11) NUMPOND + NUMPONDALL
       ELSE
         BACKSPACE(IN)
       END IF
@@ -3133,9 +3133,9 @@
         !1 - -----limit diversion to water right and flow in river
         !
       if(iseg==9.and.kper==8.and.kstp==1)then
-!dev      etdif = pettotal - aettotal
-!dev          write(999,33)kper,kstp,kiter,SEG(2, iseg),
-!dev     +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
+      etdif = pettotal - aettotal
+          write(999,33)kper,kstp,kiter,SEG(2, iseg),
+     +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
         endif
   33  format(3i5,6e20.10)
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
@@ -3337,13 +3337,13 @@
      +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
         PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
-!dev        if(i==2)then
-!dev      !etdif = pettotal - aettotal
-!dev          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
-!dev     +                 PONDSEGFLOW(I),pettotal,aettotal,
-!dev     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
-!dev        endif
-!dev  33  format(4i5,6e20.10)
+        if(i==2)then
+      !etdif = pettotal - aettotal
+          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
+     +                 PONDSEGFLOW(I),pettotal,aettotal,
+     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
+        endif
+  33  format(4i5,6e20.10)
 300   continue
       return
       end subroutine demandpond_prms
@@ -3688,13 +3688,13 @@
       USE GWFAGMODULE
       USE GLOBAL, ONLY: DELR, DELC, ISSFLG
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id !,
-!dev     +    Agriculture_dprst_flag
+      USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id,
+     +    Agriculture_dprst_flag
       USE PRMS_BASIN, ONLY: Hru_area
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Hru_actet !, Dprst_vol_open
-      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row !,
-!dev     +                      Mfq_to_inch_acres
+      USE PRMS_FLOWVARS, ONLY: Hru_actet, Dprst_vol_open
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row,
+     +                      Mfq_to_inch_acres
       IMPLICIT NONE
 ! --------------------------------------
       !arguments
@@ -3746,8 +3746,8 @@
                 Q = PONDSEGFLOW(I)
                 QQ = PONDFLOW(I)
                 QQQ = 0.0
-!dev                if ( Agriculture_dprst_flag == 1 )   !uncommment this and next line
-!dev     +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+                if ( Agriculture_dprst_flag == 1 )   !uncommment this and next line
+     +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
                 CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
      +                          Q, QQ, QQQ)
               END IF
@@ -3790,13 +3790,13 @@
            Q = Q + PONDSEGFLOW(I)
            QQ = QQ + PONDFLOW(I)
            hru_id = IRRPONDVAR(I)
-!dev           sub = DZERO
-!dev           if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
-!dev             if ( ISSFLG(kkper) == 0 ) sub = 
-!dev     +            Dprst_vol_open(hru_id)/MFQ_to_inch_acres
-!dev             if ( sub < DZERO ) sub = DZERO
-!dev             QQQ = QQQ + sub
-!dev           end if
+           sub = DZERO
+           if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
+             if ( ISSFLG(kkper) == 0 ) sub = 
+     +            Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+             if ( sub < DZERO ) sub = DZERO
+             QQQ = QQQ + sub
+           end if
          END DO
          hru_id = 0
          CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,

@@ -13,7 +13,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Solar Radiation Distribution'
         character(len=*), parameter :: MODNAME = 'ccsolrad'
-        character(len=*), parameter :: Version_ccsolrad = '2021-08-13'
+        character(len=*), parameter :: Version_ccsolrad = '2021-09-07'
         INTEGER, SAVE :: Observed_flag
         ! Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_radadj, Basin_cloud_cover
@@ -38,8 +38,8 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam, getparam, declvar
-      EXTERNAL :: read_error, print_module, print_date
+      INTEGER, EXTERNAL :: declparam, getparam_real
+      EXTERNAL :: read_error, print_module, print_date, declvar_real, declvar_dble
 ! Local Variables
       INTEGER :: j, jj, k
       REAL :: pptadj, radadj, ccov
@@ -121,22 +121,22 @@
         CALL print_module(MODDESC, MODNAME, Version_ccsolrad)
 
         ALLOCATE ( Cloud_radadj(Nhru) )
-        IF ( declvar(MODNAME, 'cloud_radadj', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'cloud_radadj', 'nhru', Nhru, &
      &       'Radiation adjustment for cloud cover of each HRU', &
-     &       'decimal fraction', Cloud_radadj)/=0 ) CALL read_error(3, 'cloud_radadj')
+     &       'decimal fraction', Cloud_radadj)
 
-        IF ( declvar(MODNAME, 'basin_radadj', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_radadj', 'one', 1, &
      &       'Basin area-weighted average radiation adjustment for cloud cover', &
-     &       'decimal fraction', Basin_radadj)/=0 ) CALL read_error(3, 'basin_radadj')
+     &       'decimal fraction', Basin_radadj)
 
         ALLOCATE ( Cloud_cover_hru(Nhru) )
-        IF ( declvar(MODNAME, 'cloud_cover_hru', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'cloud_cover_hru', 'nhru', Nhru, &
      &       'Cloud cover proportion of each HRU', &
-     &       'decimal fraction', Cloud_cover_hru)/=0 ) CALL read_error(3, 'cloud_cover_hru')
+     &       'decimal fraction', Cloud_cover_hru)
 
-        IF ( declvar(MODNAME, 'basin_cloud_cover', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_cloud_cover', 'one', 1, &
      &       'Basin area-weighted average cloud cover proportion', &
-     &       'decimal fraction', Basin_cloud_cover)/=0 ) CALL read_error(3, 'basin_cloud_cover')
+     &       'decimal fraction', Basin_cloud_cover)
 
         ! Declare Parameters
         ALLOCATE ( Crad_coef(Nhru,MONTHS_PER_YEAR) )
@@ -169,10 +169,10 @@
 
       ELSEIF ( Process_flag==INIT ) THEN
 ! Get parameters
-        IF ( getparam(MODNAME, 'crad_coef', Nhru*MONTHS_PER_YEAR, 'real', Crad_coef)/=0 ) CALL read_error(2, 'crad_coef')
-        IF ( getparam(MODNAME, 'crad_exp', Nhru*MONTHS_PER_YEAR, 'real', Crad_exp)/=0 ) CALL read_error(2, 'crad_exp')
-        IF ( getparam(MODNAME, 'ccov_slope', Nhru*MONTHS_PER_YEAR, 'real', Ccov_slope)/=0 ) CALL read_error(2, 'ccov_slope')
-        IF ( getparam(MODNAME, 'ccov_intcp', Nhru*MONTHS_PER_YEAR, 'real', Ccov_intcp)/=0 ) CALL read_error(2, 'ccov_intcp')
+        IF ( getparam_real(MODNAME, 'crad_coef', Nhru*MONTHS_PER_YEAR, Crad_coef)/=0 ) CALL read_error(2, 'crad_coef')
+        IF ( getparam_real(MODNAME, 'crad_exp', Nhru*MONTHS_PER_YEAR, Crad_exp)/=0 ) CALL read_error(2, 'crad_exp')
+        IF ( getparam_real(MODNAME, 'ccov_slope', Nhru*MONTHS_PER_YEAR, Ccov_slope)/=0 ) CALL read_error(2, 'ccov_slope')
+        IF ( getparam_real(MODNAME, 'ccov_intcp', Nhru*MONTHS_PER_YEAR, Ccov_intcp)/=0 ) CALL read_error(2, 'ccov_intcp')
 
         Cloud_radadj = 0.0
         Basin_radadj = 0.0D0

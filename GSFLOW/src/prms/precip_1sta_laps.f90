@@ -45,7 +45,7 @@
       USE PRMS_OBS, ONLY: Precip
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, getparam
+      INTEGER, EXTERNAL :: declparam, getparam_int, getparam_real
       EXTERNAL :: read_error, precip_form, print_module, compute_precip_laps
       EXTERNAL :: print_date, checkdim_param_limits
 ! Local Variables
@@ -175,16 +175,16 @@
 
 ! Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam(MODNAME, 'hru_psta', Nhru, 'integer', Hru_psta)/=0 ) CALL read_error(2, 'hru_psta')
+        IF ( getparam_int(MODNAME, 'hru_psta', Nhru, Hru_psta)/=0 ) CALL read_error(2, 'hru_psta')
 
         IF ( Precip_flag==precip_1sta_module ) THEN
-          IF ( getparam(MODNAME, 'rain_adj', Nhru*MONTHS_PER_YEAR, 'real', Rain_adj_lapse)/=0 ) CALL read_error(2, 'rain_adj')
-          IF ( getparam(MODNAME, 'snow_adj', Nhru*MONTHS_PER_YEAR, 'real', Snow_adj_lapse)/=0 ) CALL read_error(2, 'snow_adj')
+          IF ( getparam_real(MODNAME, 'rain_adj', Nhru*MONTHS_PER_YEAR, Rain_adj_lapse)/=0 ) CALL read_error(2, 'rain_adj')
+          IF ( getparam_real(MODNAME, 'snow_adj', Nhru*MONTHS_PER_YEAR, Snow_adj_lapse)/=0 ) CALL read_error(2, 'snow_adj')
         ELSE
-          IF ( getparam(MODNAME, 'padj_rn', Nrain*MONTHS_PER_YEAR, 'real', Padj_rn)/=0 ) CALL read_error(2, 'padj_rn')
-          IF ( getparam(MODNAME, 'padj_sn', Nrain*MONTHS_PER_YEAR, 'real', Padj_sn)/=0 ) CALL read_error(2, 'padj_sn')
-          IF ( getparam(MODNAME, 'hru_plaps', Nhru, 'integer', Hru_plaps)/=0 ) CALL read_error(2, 'hru_plaps')
-          IF ( getparam(MODNAME, 'pmn_mo', Nrain*MONTHS_PER_YEAR, 'real', Pmn_mo)/=0 ) CALL read_error(2, 'pmn_mo')
+          IF ( getparam_real(MODNAME, 'padj_rn', Nrain*MONTHS_PER_YEAR, Padj_rn)/=0 ) CALL read_error(2, 'padj_rn')
+          IF ( getparam_real(MODNAME, 'padj_sn', Nrain*MONTHS_PER_YEAR, Padj_sn)/=0 ) CALL read_error(2, 'padj_sn')
+          IF ( getparam_int(MODNAME, 'hru_plaps', Nhru, Hru_plaps)/=0 ) CALL read_error(2, 'hru_plaps')
+          IF ( getparam_real(MODNAME, 'pmn_mo', Nrain*MONTHS_PER_YEAR, Pmn_mo)/=0 ) CALL read_error(2, 'pmn_mo')
         ENDIF
 
         Psta_nuse = 0

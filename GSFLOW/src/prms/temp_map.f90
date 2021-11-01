@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Temperature Distribution'
         character(len=*), parameter :: MODNAME = 'temp_map'
-        character(len=*), parameter :: Version_temp_map = '2021-08-13'
+        character(len=*), parameter :: Version_temp_map = '2021-09-07'
         INTEGER, SAVE :: Tmax_unit, Tmin_unit
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
@@ -32,7 +32,7 @@
      &    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, Tavgc
 ! Functions
       INTRINSIC :: SNGL
-      INTEGER, EXTERNAL :: declparam, getparam, getdim, decldim, control_string
+      INTEGER, EXTERNAL :: declparam, getparam_real, getparam_int, getdim, decldim, control_string
       EXTERNAL :: read_error, precip_form, temp_set, find_header_end, find_current_time
       EXTERNAL :: read_cbh_date, print_module, print_date
 ! Local Variables
@@ -114,15 +114,15 @@
 
 ! Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam(MODNAME, 'map2hru_id', Nmap2hru, 'integer', Map2hru_id)/=0 ) CALL read_error(2, 'map2hru_id')
-        IF ( getparam(MODNAME, 'hru2map_id', Nmap2hru, 'integer', Hru2map_id)/=0 ) CALL read_error(2, 'hru2map_id')
-        IF ( getparam(MODNAME, 'hru2map_pct', Nmap2hru, 'real', Hru2map_pct)/=0 ) CALL read_error(2, 'hru2map_pct')
+        IF ( getparam_int(MODNAME, 'map2hru_id', Nmap2hru, Map2hru_id)/=0 ) CALL read_error(2, 'map2hru_id')
+        IF ( getparam_int(MODNAME, 'hru2map_id', Nmap2hru, Hru2map_id)/=0 ) CALL read_error(2, 'hru2map_id')
+        IF ( getparam_real(MODNAME, 'hru2map_pct', Nmap2hru, Hru2map_pct)/=0 ) CALL read_error(2, 'hru2map_pct')
 
         istop = 0
         ierr = 0
-        IF ( getparam(MODNAME, 'tmax_map_adj', Nmap*MONTHS_PER_YEAR, 'real', Tmax_map_adj)/=0 ) &
+        IF ( getparam_real(MODNAME, 'tmax_map_adj', Nmap*MONTHS_PER_YEAR, Tmax_map_adj)/=0 ) &
      &       CALL read_error(2, 'tmax_map_adj')
-        IF ( getparam(MODNAME, 'tmin_map_adj', Nmap*MONTHS_PER_YEAR, 'real', Tmin_map_adj)/=0 ) &
+        IF ( getparam_real(MODNAME, 'tmin_map_adj', Nmap*MONTHS_PER_YEAR, Tmin_map_adj)/=0 ) &
      &       CALL read_error(2, 'tmin_map_adj')
         IF ( control_string(Tmax_map_file, 'tmax_map_file')/=0 ) CALL read_error(5, 'tmax_map_file')
         IF ( control_string(Tmin_map_file, 'tmin_map_file')/=0 ) CALL read_error(5, 'tmin_map_file')

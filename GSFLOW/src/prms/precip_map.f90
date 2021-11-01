@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=*), parameter :: MODNAME = 'precip_map'
-        character(len=*), parameter :: Version_precip_map = '2021-08-13'
+        character(len=*), parameter :: Version_precip_map = '2021-09-07'
         INTEGER, SAVE :: Precip_unit
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
@@ -33,7 +33,7 @@
      &    Basin_ppt, Basin_snow, Basin_rain, Basin_obs_ppt, Tmax_allsnow_f
 ! Functions
       INTRINSIC :: SNGL
-      INTEGER, EXTERNAL :: declparam, getparam, control_string
+      INTEGER, EXTERNAL :: declparam, getparam_int, getparam_real, control_string
       EXTERNAL :: read_error, precip_form, find_header_end, find_current_time
       EXTERNAL :: read_cbh_date, print_module, print_date
 ! Local Variables
@@ -119,13 +119,13 @@
 
 ! Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam(MODNAME, 'map2hru_id', Nmap2hru, 'integer', Map2hru_id)/=0 ) CALL read_error(2, 'map2hru_id')
-        IF ( getparam(MODNAME, 'hru2map_id', Nmap2hru, 'integer', Hru2map_id)/=0 ) CALL read_error(2, 'hru2map_id')
-        IF ( getparam(MODNAME, 'hru2map_pct', Nmap2hru, 'real', Hru2map_pct)/=0 ) CALL read_error(2, 'hru2map_pct')
+        IF ( getparam_int(MODNAME, 'map2hru_id', Nmap2hru, Map2hru_id)/=0 ) CALL read_error(2, 'map2hru_id')
+        IF ( getparam_int(MODNAME, 'hru2map_id', Nmap2hru, Hru2map_id)/=0 ) CALL read_error(2, 'hru2map_id')
+        IF ( getparam_real(MODNAME, 'hru2map_pct', Nmap2hru, Hru2map_pct)/=0 ) CALL read_error(2, 'hru2map_pct')
 
         istop = 0
         ierr = 0
-        IF ( getparam(MODNAME, 'precip_map_adj', Nmap*MONTHS_PER_YEAR, 'real', Precip_map_adj)/=0 ) &
+        IF ( getparam_real(MODNAME, 'precip_map_adj', Nmap*MONTHS_PER_YEAR, Precip_map_adj)/=0 ) &
      &       CALL read_error(2, 'precip_map_adj')
         IF ( control_string(Precip_map_file, 'precip_map_file')/=0 ) CALL read_error(5, 'precip_map_file')
         CALL find_header_end(Precip_unit, Precip_map_file, 'precip_map_file', ierr, 1, 0)

@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2021-08-18'
+      character(len=*), parameter :: Version_basin = '2021-10-22'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -17,20 +17,21 @@
       INTEGER, SAVE :: Weir_gate_flag, Puls_lin_flag
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_area_dble(:), Lake_area(:)
 !   Declared Variables
-      REAL, SAVE, ALLOCATABLE :: Hru_frac_perv(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_frac_perv(:), Ag_area(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_area_max(:)
       REAL, SAVE, ALLOCATABLE :: Hru_perv(:), Hru_imperv(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_area_open_max(:), Dprst_area_clos_max(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_storage(:)
       REAL, SAVE, ALLOCATABLE :: Hru_elev_ts(:)
-      DOUBLE PRECISION, SAVE :: Basin_gl_cfs, Basin_gl_ice_cfs
+      DOUBLE PRECISION, SAVE :: Basin_gl_cfs, Basin_gl_ice_cfs, Basin_ag
 !   Declared Parameters
       INTEGER, SAVE :: Elev_units
-      INTEGER, SAVE, ALLOCATABLE :: Hru_type(:), Cov_type(:)
+      INTEGER, SAVE, ALLOCATABLE :: Hru_type(:), Cov_type(:), Ag_cov_type(:)
       INTEGER, SAVE, ALLOCATABLE :: Lake_hru_id(:), Lake_type(:) !not needed if no lakes
       REAL, SAVE, ALLOCATABLE :: Hru_area(:), Hru_percent_imperv(:), Hru_elev(:), Hru_lat(:)
-      REAL, SAVE, ALLOCATABLE :: Covden_sum(:), Covden_win(:)
+      REAL, SAVE, ALLOCATABLE :: Covden_sum(:,:), Covden_win(:,:)
       REAL, SAVE, ALLOCATABLE :: Dprst_frac_open(:), Dprst_area(:), Dprst_frac(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_frac(:)
       END MODULE PRMS_BASIN
 
 !***********************************************************************
@@ -58,18 +59,18 @@
 !   Declared Parameters
 !     print_debug, hru_area, hru_percent_imperv, hru_type, hru_elev,
 !     cov_type, hru_lat, dprst_frac_open, dprst_frac, basin_area
-!     lake_hru_id
+!     lake_hru_id, ag_frac, ag_cov_type
 !***********************************************************************
       INTEGER FUNCTION basdecl()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CASCADEGW_OFF, DOCUMENTATION, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CASCADEGW_OFF, DOCUMENTATION, MONTHS_PER_YEAR, &
      &    ide_dist_module, potet_pt_module, potet_pm_module, potet_pm_sta_module
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Model, Dprst_flag, Lake_route_flag, Et_flag, Precip_flag, Cascadegw_flag, &
-     &    Stream_temp_flag, PRMS4_flag, GSFLOW_flag, Glacier_flag
+     &    Stream_temp_flag, PRMS4_flag, GSFLOW_flag, Glacier_flag, AG_flag
       USE PRMS_BASIN
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar
-      EXTERNAL :: read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL :: read_error, print_module, declvar_real, declvar_dble
 !***********************************************************************
       basdecl = 0
 
@@ -78,54 +79,54 @@
 ! Declared Variables
       ALLOCATE ( Hru_elev_ts(Nhru) )
       IF ( Glacier_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-        IF ( declvar(MODNAME, 'hru_elev_ts', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'hru_elev_ts', 'nhru', Nhru, &
      &       'HRU elevation for timestep, which can change for glaciers', &
-     &       'elev_units', Hru_elev_ts)/=0 ) CALL read_error(3, 'hru_elev_ts')
+     &       'elev_units', Hru_elev_ts)
 
-        IF ( declvar(MODNAME, 'basin_gl_ice_cfs', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_gl_ice_cfs', 'one', 1, &
      &       'Basin glacier ice (firn) melt leaving the basin through the stream network', &
-     &       'cfs', Basin_gl_ice_cfs)/=0 ) CALL read_error(3, 'basin_gl_ice_cfs')
+     &       'cfs', Basin_gl_ice_cfs)
 
-        IF ( declvar(MODNAME, 'basin_gl_cfs', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_gl_cfs', 'one', 1, &
      &       'Basin glacier surface melt (rain, snow, ice) leaving the basin through the stream network', &
-     &       'cfs', Basin_gl_cfs)/=0 ) CALL read_error(3, 'basin_gl_cfs')
+     &       'cfs', Basin_gl_cfs)
       ENDIF
 
       ALLOCATE ( Hru_imperv(Nhru) )
-      IF ( declvar(MODNAME, 'hru_imperv', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_imperv', 'nhru', Nhru, &
      &     'Area of HRU that is impervious', &
-     &     'acres', Hru_imperv)/=0 ) CALL read_error(3, 'hru_imperv')
+     &     'acres', Hru_imperv)
 
       ALLOCATE ( Hru_perv(Nhru) )
-      IF ( declvar(MODNAME, 'hru_perv', 'nhru', Nhru, 'real', &
+      CALL declvar_real(MODNAME, 'hru_perv', 'nhru', Nhru, &
      &     'Area of HRU that is pervious', &
-     &     'acres', Hru_perv)/=0 ) CALL read_error(3, 'hru_perv')
+     &     'acres', Hru_perv)
 
       ALLOCATE ( Hru_frac_perv(Nhru) )
-     ! IF ( declvar(MODNAME, 'hru_frac_perv', 'nhru', Nhru, 'real', &
-     !&     'Fraction of HRU that is pervious', &
-     !&     'decimal fraction', Hru_frac_perv)/=0 ) CALL read_error(3, 'hru_frac_perv')
+      CALL declvar_real(MODNAME, 'hru_frac_perv', 'nhru', Nhru, &
+     &     'Fraction of HRU that is pervious', &
+     &     'decimal fraction', Hru_frac_perv)
 
       ALLOCATE ( Hru_storage(Nhru) )
-      IF ( declvar(MODNAME, 'hru_storage', 'nhru', Nhru, 'double', &
+      CALL declvar_dble(MODNAME, 'hru_storage', 'nhru', Nhru, &
      &     'Storage for each HRU', &
-     &     'inches', Hru_storage)/=0 ) CALL read_error(3, 'hru_storage')
+     &     'inches', Hru_storage)
 
       IF ( Dprst_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Dprst_area_max(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_area_max', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_max', 'nhru', Nhru, &
      &       'Aggregate sum of surface-depression storage areas of each HRU', &
-     &       'acres', Dprst_area_max)/=0 ) CALL read_error(1, 'dprst_area_max')
+     &       'acres', Dprst_area_max)
 
         ALLOCATE ( Dprst_area_open_max(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_area_open_max', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_open_max', 'nhru', Nhru, &
      &       'Aggregate sum of open surface-depression storage areas of each HRU', &
-     &       'acres', Dprst_area_open_max)/=0 ) CALL read_error(1, 'dprst_area_open_max')
+     &       'acres', Dprst_area_open_max)
 
         ALLOCATE ( Dprst_area_clos_max(Nhru) )
-        IF ( declvar(MODNAME, 'dprst_area_clos_max', 'nhru', Nhru, 'real', &
+        CALL declvar_real(MODNAME, 'dprst_area_clos_max', 'nhru', Nhru, &
      &       'Aggregate sum of closed surface-depression storage areas of each HRU', &
-     &       'acres', Dprst_area_clos_max)/=0 ) CALL read_error(1, 'dprst_area_clos_max')
+     &       'acres', Dprst_area_clos_max)
 
         ALLOCATE ( Dprst_frac(Nhru) )
         IF ( PRMS4_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
@@ -203,6 +204,31 @@
      &     'HRU percent impervious', 'Fraction of each HRU area that is impervious', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'hru_percent_imperv')
 
+      ALLOCATE ( Ag_area(Nhru) )
+      IF ( AG_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        CALL declvar_dble(MODNAME, 'basin_ag', 'one', 1, &
+     &       'Basin area-weighted agricultural area', &
+     &       'cfs', Basin_ag)
+
+        CALL declvar_real(MODNAME, 'ag_area', 'nhru', Nhru, &
+     &       'Area of HRU that is used for agriculture', &
+     &       'acres', Ag_area)
+
+        ALLOCATE ( Ag_frac(Nhru) )
+        IF ( declparam(MODNAME, 'ag_frac', 'nhru', 'real', &
+     &       '0.0', '0.0', '1.0', &
+     &       'Fraction of each HRU area that has agriculture', &
+     &       'Fraction of each HRU area that has agriculture', &
+     &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_frac')
+
+        ALLOCATE ( Ag_cov_type(Nhru) )
+        IF ( declparam(MODNAME, 'ag_cov_type', 'nhru', 'integer', &
+     &       '1', '0', '4', &
+     &       'Cover type designation for agriculture area of each HRU', &
+     &       'Vegetation cover type for agriculture area of each HRU (0=bare soil; 1=grasses; 2=shrubs; 3=trees; 4=coniferous)', &
+     &       'none')/=0 ) CALL read_error(1, 'ag_cov_type')
+      ENDIF
+
       ALLOCATE ( Hru_type(Nhru) )
       IF ( declparam(MODNAME, 'hru_type', 'nhru', 'integer', &
      &     '1', '0', '4', &
@@ -217,15 +243,15 @@
      &     ' 1=grasses; 2=shrubs; 3=trees; 4=coniferous)', &
      &     'none')/=0 ) CALL read_error(1, 'cov_type')
 
-      ALLOCATE ( Covden_sum(Nhru) )
-      IF ( declparam(MODNAME, 'covden_sum', 'nhru', 'real', &
+      ALLOCATE ( Covden_sum(Nhru,MONTHS_PER_YEAR) )
+      IF ( declparam(MODNAME, 'covden_sum', 'nhru,nmonths', 'real', &
      &     '0.5', '0.0', '1.0', &
      &     'Summer vegetation cover density for major vegetation type', &
      &     'Summer vegetation cover density for the major vegetation type in each HRU', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'covden_sum')
 
-      ALLOCATE ( Covden_win(Nhru) )
-      IF ( declparam(MODNAME, 'covden_win', 'nhru', 'real', &
+      ALLOCATE ( Covden_win(Nhru,MONTHS_PER_YEAR) )
+      IF ( declparam(MODNAME, 'covden_win', 'nhru,nmonths', 'real', &
      &     '0.5', '0.0', '1.0', &
      &     'Winter vegetation cover density for major vegetation type', &
      &     'Winter vegetation cover density for the major vegetation type in each HRU', &
@@ -263,17 +289,17 @@
 !**********************************************************************
       INTEGER FUNCTION basinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CASCADEGW_OFF, &
-     &    INACTIVE, LAKE, SWALE, FEET, ERROR_basin, DEBUG_minimum, &
-     &    NORTHERN, SOUTHERN, FEET2METERS, METERS2FEET, DNEARZERO, &
+     &    INACTIVE, LAKE, SWALE, FEET, ERROR_basin, DEBUG_minimum, ERROR_param, &
+     &    NORTHERN, SOUTHERN, FEET2METERS, METERS2FEET, DNEARZERO, MONTHS_PER_YEAR, &
      &    ide_dist_module, potet_pt_module, potet_pm_module, potet_pm_sta_module
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, &
      &    Dprst_flag, Lake_route_flag, Et_flag, Precip_flag, Cascadegw_flag, &
      &    Stream_temp_flag, PRMS4_flag, GSFLOW_flag, Glacier_flag, Frozen_flag, PRMS_VERSION, &
-     &    Starttime, Endtime, Parameter_check_flag
+     &    Starttime, Endtime, Parameter_check_flag, AG_flag
       USE PRMS_BASIN
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getparam
+      INTEGER, EXTERNAL :: getparam_real, getparam_int
       EXTERNAL :: write_outfile, checkdim_bounded_limits
       INTRINSIC :: DBLE
 ! Local Variables
@@ -284,30 +310,34 @@
 !**********************************************************************
       basinit = 0
 
-      IF ( getparam(MODNAME, 'hru_area', Nhru, 'real', Hru_area)/=0 ) CALL read_error(2, 'hru_area')
-      IF ( getparam(MODNAME, 'hru_elev', Nhru, 'real', Hru_elev)/=0 ) CALL read_error(2, 'hru_elev')
+      IF ( getparam_real(MODNAME, 'hru_area', Nhru, Hru_area)/=0 ) CALL read_error(2, 'hru_area')
+      IF ( getparam_real(MODNAME, 'hru_elev', Nhru, Hru_elev)/=0 ) CALL read_error(2, 'hru_elev')
       Hru_elev_ts = Hru_elev
-      IF ( getparam(MODNAME, 'hru_lat', Nhru, 'real', Hru_lat)/=0 ) CALL read_error(2, 'hru_lat')
-      IF ( getparam(MODNAME, 'hru_type', Nhru, 'integer', Hru_type)/=0 ) CALL read_error(2, 'hru_type')
-      IF ( getparam(MODNAME, 'cov_type', Nhru, 'integer', Cov_type)/=0 ) CALL read_error(2, 'cov_type')
-      IF ( getparam(MODNAME, 'covden_sum', Nhru, 'real', Covden_sum)/=0 ) CALL read_error(2, 'covden_sum')
-      IF ( getparam(MODNAME, 'covden_win', Nhru, 'real', Covden_win)/=0 ) CALL read_error(2, 'covden_win')
-      IF ( getparam(MODNAME, 'elev_units', 1, 'integer', Elev_units)/=0 ) CALL read_error(2, 'elev_units')
-      IF ( getparam(MODNAME, 'hru_percent_imperv', Nhru, 'real', Hru_percent_imperv)/=0 ) CALL read_error(2, 'hru_percent_imperv')
+      IF ( getparam_real(MODNAME, 'hru_lat', Nhru, Hru_lat)/=0 ) CALL read_error(2, 'hru_lat')
+      IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
+      IF ( getparam_int(MODNAME, 'cov_type', Nhru, Cov_type)/=0 ) CALL read_error(2, 'cov_type')
+      IF ( getparam_real(MODNAME, 'covden_sum', Nhru*MONTHS_PER_YEAR, Covden_sum)/=0 ) CALL read_error(2, 'covden_sum')
+      IF ( getparam_real(MODNAME, 'covden_win', Nhru*MONTHS_PER_YEAR, Covden_win)/=0 ) CALL read_error(2, 'covden_win')
+      IF ( getparam_int(MODNAME, 'elev_units', 1, Elev_units)/=0 ) CALL read_error(2, 'elev_units')
+      IF ( getparam_real(MODNAME, 'hru_percent_imperv', Nhru, Hru_percent_imperv)/=0 ) CALL read_error(2, 'hru_percent_imperv')
+      IF ( AG_flag==ACTIVE ) THEN
+        IF ( getparam_real(MODNAME, 'ag_frac', Nhru, Ag_frac)/=0 ) CALL read_error(2, 'ag_frac')
+        IF ( getparam_int(MODNAME, 'ag_cov_type', Nhru, Ag_cov_type)/=0 ) CALL read_error(2, 'ag_cov_type')
+      ENDIF
 
       dprst_frac_flag = 0
       IF ( Dprst_flag==ACTIVE ) THEN
-        IF ( getparam(MODNAME, 'dprst_frac_open', Nhru, 'real', Dprst_frac_open)/=0 ) CALL read_error(2, 'dprst_frac_open')
+        IF ( getparam_real(MODNAME, 'dprst_frac_open', Nhru, Dprst_frac_open)/=0 ) CALL read_error(2, 'dprst_frac_open')
         IF ( PRMS4_flag==ACTIVE ) THEN
-          IF ( getparam(MODNAME, 'dprst_frac_hru', Nhru, 'real', Dprst_frac)/=0 ) CALL read_error(2, 'dprst_frac_hru')
+          IF ( getparam_real(MODNAME, 'dprst_frac_hru', Nhru, Dprst_frac)/=0 ) CALL read_error(2, 'dprst_frac_hru')
           IF ( Dprst_frac(1)>-1.0 ) THEN
             IF ( Print_debug>DEBUG_less ) PRINT *, 'Using dprst_frac_hru instead of dprst_area'
             dprst_frac_flag = 1
           ELSE
-            IF ( getparam(MODNAME, 'dprst_area', Nhru, 'real', Dprst_area)/=0 ) CALL read_error(2, 'dprst_area')
+            IF ( getparam_real(MODNAME, 'dprst_area', Nhru, Dprst_area)/=0 ) CALL read_error(2, 'dprst_area')
           ENDIF
         ELSE
-          IF ( getparam(MODNAME, 'dprst_frac', Nhru, 'real', Dprst_frac)/=0 ) CALL read_error(2, 'Dprst_frac')
+          IF ( getparam_real(MODNAME, 'dprst_frac', Nhru, Dprst_frac)/=0 ) CALL read_error(2, 'Dprst_frac')
         ENDIF
       ENDIF
 
@@ -318,10 +348,10 @@
       Numlakes_check = 0
       Numlake_hrus = 0
       IF ( Nlake>0 ) THEN
-        IF ( getparam(MODNAME, 'lake_hru_id', Nhru, 'integer', Lake_hru_id)/=0 ) CALL read_error(1, 'lake_hru_id')
+        IF ( getparam_int(MODNAME, 'lake_hru_id', Nhru, Lake_hru_id)/=0 ) CALL read_error(1, 'lake_hru_id')
         IF ( Parameter_check_flag>0 ) CALL checkdim_bounded_limits('lake_hru_id', 'nlake', Lake_hru_id, Nhru, 0, Nlake, basinit)
         IF ( Lake_route_flag==ACTIVE ) THEN ! Lake_route_flag set to 0 for GSFLOW mode and if muskingum_lake and nlake = 1
-          IF ( getparam(MODNAME, 'lake_type', Nlake, 'integer', Lake_type)/=0 ) CALL read_error(2, 'lake_type')
+          IF ( getparam_int(MODNAME, 'lake_type', Nlake, Lake_type)/=0 ) CALL read_error(2, 'lake_type')
           DO i = 1, Nlake
             IF ( Lake_type(i)==4 .OR. Lake_type(i)==5 ) THEN
               Weir_gate_flag = ACTIVE
@@ -342,6 +372,8 @@
         Dprst_area_clos_max = 0.0
         Dprst_area_max = 0.0
       ENDIF
+      Basin_ag = 0.0D0
+      Ag_area = 0.0
       Dprst_clos_flag = OFF
       Dprst_open_flag = OFF
       basin_perv = 0.0D0
@@ -443,15 +475,24 @@
           ENDIF
         ENDIF
 
+        IF ( AG_flag==ACTIVE ) THEN
+          IF ( Ag_frac(i)>0.0 ) THEN
+            Ag_area(i) = Ag_frac(i) * harea
+            Basin_ag = Basin_ag + DBLE( Ag_area(i) )
+            perv_area = perv_area - Ag_area(i)
+          ENDIF
+        ENDIF
+        IF ( .NOT.(perv_area>0.0) .AND. .NOT.(Ag_area(i)>0.0) ) CALL error_stop('no pervious or agriculture area', ERROR_param)
+
         Hru_perv(i) = perv_area
         Hru_frac_perv(i) = perv_area/harea
-        IF ( Hru_frac_perv(i)<0.001 ) THEN
-          PRINT *, 'ERROR, pervious fraction must be >= 0.001 for HRU:', i
-          PRINT *, '       pervious portion is HRU fraction - impervious fraction - depression fraction'
-          PRINT *, '       pervious fraction:', Hru_frac_perv(i)
-          PRINT *, '       impervious fraction:', Hru_percent_imperv(i)
-          IF ( Dprst_flag==ACTIVE ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
-          basinit = 1
+        IF ( Hru_frac_perv(i)<0.001 .AND. Print_debug>DEBUG_less ) THEN
+          PRINT *, 'WARNING, pervious fraction recommended to be >= 0.001 for HRU:', i
+          PRINT *, '         pervious portion is HRU fraction - impervious fraction - depression fraction'
+          PRINT *, '         pervious fraction:', Hru_frac_perv(i)
+          PRINT *, '         impervious fraction:', Hru_percent_imperv(i)
+          IF ( Dprst_flag==ACTIVE ) PRINT *, '         depression storage fraction:', Dprst_frac(i)
+          IF ( AG_flag==ACTIVE ) PRINT *, '         agriculture fraction:', Ag_frac(i)
         ENDIF
         basin_perv = basin_perv + DBLE( Hru_perv(i) )
       ENDDO
@@ -500,6 +541,7 @@
 
       basin_perv = basin_perv*Basin_area_inv
       basin_imperv = basin_imperv*Basin_area_inv
+      Basin_ag = Basin_ag*Basin_area_inv
 
       IF ( Print_debug==2 ) THEN
         PRINT *, ' HRU     Area'
@@ -511,6 +553,7 @@
         PRINT *,                           'Fraction pervious           = ', basin_perv
         IF ( Water_area>0.0D0 ) PRINT *,   'Fraction lakes              = ', Water_area*Basin_area_inv
         IF ( Dprst_flag==ACTIVE ) PRINT *, 'Fraction storage area       = ', basin_dprst*Basin_area_inv
+        IF ( AG_flag==ACTIVE ) PRINT *,    'Fraction area               = ', Basin_ag
         PRINT *, ' '
       ENDIF
 
@@ -533,6 +576,10 @@
         ENDIF
         IF ( Dprst_flag==ACTIVE ) THEN
           WRITE (buffer, 9005) 'DPRST area:          ', basin_dprst, '    Fraction DPRST:   ', basin_dprst*Basin_area_inv
+          CALL write_outfile(buffer)
+        ENDIF
+        IF ( AG_flag==ACTIVE ) THEN
+          WRITE (buffer, 9005) 'Agriculture area:    ', Basin_ag*Active_area, '    Fraction AG:      ', Basin_ag
           CALL write_outfile(buffer)
         ENDIF
         CALL write_outfile(' ')

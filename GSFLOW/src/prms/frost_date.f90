@@ -13,10 +13,10 @@
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Preprocessing'
       character(len=*), parameter :: MODNAME = 'frost_date'
-      character(len=*), parameter :: Version_frost_date = '2020-12-02'
+      character(len=*), parameter :: Version_frost_date = '2021-09-07'
 ! Functions
       INTRINSIC :: NINT, DBLE
-      INTEGER, EXTERNAL :: declparam, getparam, get_season
+      INTEGER, EXTERNAL :: declparam, getparam_real, get_season
       EXTERNAL :: read_error, write_integer_param, PRMS_open_module_file, print_module
 ! Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Frost_temp(:)
@@ -113,7 +113,7 @@
         ALLOCATE ( currentFallFrost(Nhru), currentSpringFrost(Nhru) )
 
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam(MODNAME, 'frost_temp', Nhru, 'real', Frost_temp)/=0 ) CALL read_error(2, 'frost_temp')
+        IF ( getparam_real(MODNAME, 'frost_temp', Nhru, Frost_temp)/=0 ) CALL read_error(2, 'frost_temp')
         fall_frost = 0
         spring_frost = 0
         currentFallFrost = 0

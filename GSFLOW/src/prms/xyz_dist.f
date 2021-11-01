@@ -24,7 +24,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'xyz_dist'
-      character(len=*), parameter :: Version_xyz_dist = '2021-08-13'
+      character(len=*), parameter :: Version_xyz_dist = '2021-09-07'
       INTEGER, SAVE :: Nlapse, Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Basin_centroid_x, Basin_centroid_y
@@ -133,31 +133,28 @@
       USE PRMS_XYZ_DIST
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar
-      EXTERNAL :: read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL :: read_error, print_module, declvar_int, declvar_real
 !***********************************************************************
       xyzdecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_xyz_dist)
 
-      IF ( declvar(MODNAME, 'is_rain_day', 'one', 1, 'integer',
+      CALL declvar_int(MODNAME, 'is_rain_day', 'one', 1,
      +     'Flag to indicate if it is raining anywhere in the basin',
-     +     'none',
-     +     Is_rain_day)/=0 ) CALL read_error(3, 'is_rain_day')
+     +     'none', Is_rain_day)
 
       ALLOCATE ( Tmax_rain_sta(Nrain) )
-      IF ( declvar(MODNAME, 'tmax_rain_sta', 'nrain', Nrain, 'real',
+      CALL declvar_real(MODNAME, 'tmax_rain_sta', 'nrain', Nrain,
      +     'Maximum temperature distributed to the precipitation'//
      +     ' measurement stations',
-     +     'degrees Fahrenheit',
-     +     Tmax_rain_sta)/=0 ) CALL read_error(3, 'tmax_rain_sta')
+     +     'degrees Fahrenheit', Tmax_rain_sta)
 
       ALLOCATE ( Tmin_rain_sta(Nrain) )
-      IF ( declvar(MODNAME, 'tmin_rain_sta', 'nrain', Nrain, 'real',
+      CALL declvar_real(MODNAME, 'tmin_rain_sta', 'nrain', Nrain,
      +     'Minimum temperature distributed to the precipitation'//
      +     ' measurement stations',
-     +     'degrees Fahrenheit',
-     +     Tmin_rain_sta)/=0 ) CALL read_error(3, 'tmin_rain_sta')
+     +     'degrees Fahrenheit', Tmin_rain_sta)
 
 ! declare parameters
       ALLOCATE ( Adjust_snow(Nrain,MONTHS_PER_YEAR) )
@@ -469,7 +466,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getparam
+      INTEGER, EXTERNAL :: getparam_real, getparam_int
       EXTERNAL :: mean_by_month, read_error
 ! Local Variables
       INTEGER :: i, m, ii, ierr
@@ -481,108 +478,108 @@
       Tmax_rain_sta = 0.0
       Tmin_rain_sta = 0.0
 
-      IF ( getparam(MODNAME, 'adjust_rain',Nrain*MONTHS_PER_YEAR,'real',
+      IF ( getparam_real(MODNAME, 'adjust_rain',Nrain*MONTHS_PER_YEAR,
      +     Adjust_rain)/=0 ) CALL read_error(2, 'adjust_rain')
 
-      IF ( getparam(MODNAME, 'adjust_snow',Nrain*MONTHS_PER_YEAR,'real',
+      IF ( getparam_real(MODNAME, 'adjust_snow',Nrain*MONTHS_PER_YEAR,
      +     Adjust_snow)/=0 ) CALL read_error(2, 'adjust_snow')
 
-      IF ( getparam (MODNAME, 'solrad_elev', 1, 'real', Solrad_elev)
+      IF ( getparam_real (MODNAME, 'solrad_elev', 1, Solrad_elev)
      +     /=0 ) CALL read_error(2, 'solrad_elev')
 
-      IF ( getparam(MODNAME, 'hru_x', Nhru, 'real', MRUx)
+      IF ( getparam_real(MODNAME, 'hru_x', Nhru, MRUx)
      +     /=0 ) CALL read_error(2, 'hru_x')
 
-      IF ( getparam(MODNAME, 'hru_y', Nhru, 'real', MRUy)
+      IF ( getparam_real(MODNAME, 'hru_y', Nhru, MRUy)
      +     /=0 ) CALL read_error(2, 'hru_y')
 
-      IF ( getparam(MODNAME,'max_lapse',MAXLAPSE*MONTHS_PER_YEAR,'real',
+      IF ( getparam_real(MODNAME,'max_lapse',MAXLAPSE*MONTHS_PER_YEAR,
      +     Max_lapse)/=0 ) CALL read_error(2, 'max_lapse')
 
-      IF ( getparam(MODNAME,'min_lapse',MAXLAPSE*MONTHS_PER_YEAR,'real',
+      IF ( getparam_real(MODNAME,'min_lapse',MAXLAPSE*MONTHS_PER_YEAR,
      +     Min_lapse)/=0 ) CALL read_error(2, 'min_lapse')
 
-      IF ( getparam(MODNAME,'ppt_lapse',MAXLAPSE*MONTHS_PER_YEAR,'real',
+      IF ( getparam_real(MODNAME,'ppt_lapse',MAXLAPSE*MONTHS_PER_YEAR,
      +     Ppt_lapse)/=0 ) CALL read_error(2, 'ppt_lapse')
 
-      IF ( getparam(MODNAME, 'tsta_x', Ntemp, 'real', Temp_STAx)
+      IF ( getparam_real(MODNAME, 'tsta_x', Ntemp, Temp_STAx)
      +     /=0 ) CALL read_error(2, 'tsta_x')
 
-      IF ( getparam(MODNAME, 'tsta_y', Ntemp, 'real', Temp_STAy)
+      IF ( getparam_real(MODNAME, 'tsta_y', Ntemp, Temp_STAy)
      +     /=0 ) CALL read_error(2, 'tsta_y')
 
-      IF ( getparam(MODNAME, 'psta_x', Nrain, 'real', Rain_STAx)
+      IF ( getparam_real(MODNAME, 'psta_x', Nrain, Rain_STAx)
      +     /=0 ) CALL read_error(2, 'psta_x')
 
-      IF ( getparam(MODNAME, 'psta_y', Nrain, 'real', Rain_STAy)
+      IF ( getparam_real(MODNAME, 'psta_y', Nrain, Rain_STAy)
      +     /=0 ) CALL read_error(2, 'psta_y')
 
-      IF ( getparam(MODNAME, 'tsta_nuse', Ntemp, 'integer',
+      IF ( getparam_int(MODNAME, 'tsta_nuse', Ntemp,
      +     Tsta_nuse)/=0 ) CALL read_error(2, 'tsta_nuse')
 
-      IF ( getparam(MODNAME, 'psta_nuse', Nrain, 'integer',
+      IF ( getparam_int(MODNAME, 'psta_nuse', Nrain,
      +     Psta_nuse)/=0 ) CALL read_error(2, 'psta_nuse')
 
-      IF ( getparam(MODNAME, 'psta_freq_nuse', Nrain, 'integer',
+      IF ( getparam_int(MODNAME, 'psta_freq_nuse', Nrain,
      +     Psta_freq_nuse)/=0 ) CALL read_error(2, 'psta_freq_nuse')
 
-      IF ( getparam(MODNAME, 'tsta_month_min', Ntemp*MONTHS_PER_YEAR,
-     +     'real', TminMTH)/=0 ) CALL read_error(2, 'tsta_month_min')
+      IF ( getparam_real(MODNAME,'tsta_month_min',Ntemp*MONTHS_PER_YEAR,
+     +     TminMTH)/=0 ) CALL read_error(2, 'tsta_month_min')
 
-      IF ( getparam(MODNAME, 'tsta_month_max', Ntemp*MONTHS_PER_YEAR,
-     +     'real', TmaxMTH)/=0 ) CALL read_error(2, 'tsta_month_max')
+      IF ( getparam_real(MODNAME,'tsta_month_max',Ntemp*MONTHS_PER_YEAR,
+     +     TmaxMTH)/=0 ) CALL read_error(2, 'tsta_month_max')
 
-      IF ( getparam(MODNAME, 'psta_month_ppt', Nrain*MONTHS_PER_YEAR,
-     +     'real', PptMTH)/=0 ) CALL read_error(2, 'psta_month_ppt')
+      IF ( getparam_real(MODNAME,'psta_month_ppt',Nrain*MONTHS_PER_YEAR,
+     +     PptMTH)/=0 ) CALL read_error(2, 'psta_month_ppt')
 
-      IF ( getparam(MODNAME, 'z_add', 1, 'real', Z_add)
+      IF ( getparam_real(MODNAME, 'z_add', 1, Z_add)
      +     /=0 ) CALL read_error(2, 'z_add')
 
-      IF ( getparam(MODNAME, 'z_div', 1, 'real', Z_div)
+      IF ( getparam_real(MODNAME, 'z_div', 1, Z_div)
      +     /=0 ) CALL read_error(2, 'z_div')
 
-      IF ( getparam(MODNAME, 'x_add', 1, 'real', X_add)
+      IF ( getparam_real(MODNAME, 'x_add', 1, X_add)
      +     /=0 ) CALL read_error(2, 'x_add')
 
-      IF ( getparam(MODNAME, 'x_div', 1, 'real', X_div)
+      IF ( getparam_real(MODNAME, 'x_div', 1, X_div)
      +     /=0 ) CALL read_error(2, 'x_div')
 
-      IF ( getparam(MODNAME, 'y_add', 1, 'real', Y_add)
+      IF ( getparam_real(MODNAME, 'y_add', 1, Y_add)
      +     /=0 ) CALL read_error(2, 'y_add')
 
-      IF ( getparam(MODNAME, 'y_div', 1, 'real', Y_div)
+      IF ( getparam_real(MODNAME, 'y_div', 1, Y_div)
      +     /=0 ) CALL read_error(2, 'y_div')
 
-      IF ( getparam(MODNAME, 'tmax_add', 1, 'real', Tmax_add)
+      IF ( getparam_real(MODNAME, 'tmax_add', 1, Tmax_add)
      +     /=0 ) CALL read_error(2, 'tmax_add')
 
-      IF ( getparam(MODNAME, 'tmax_div', 1, 'real', Tmax_div)
+      IF ( getparam_real(MODNAME, 'tmax_div', 1, Tmax_div)
      +     /=0 ) CALL read_error(2, 'tmax_div')
 
-      IF ( getparam(MODNAME, 'tmin_add', 1, 'real', Tmin_add)
+      IF ( getparam_real(MODNAME, 'tmin_add', 1, Tmin_add)
      +     /=0 ) CALL read_error(2, 'tmin_add')
 
-      IF ( getparam(MODNAME, 'tmin_div', 1, 'real', Tmin_div)
+      IF ( getparam_real(MODNAME, 'tmin_div', 1, Tmin_div)
      +     /=0 ) CALL read_error(2, 'tmin_div')
 
-      IF ( getparam(MODNAME, 'ppt_add', 1, 'real', Ppt_add)
+      IF ( getparam_real(MODNAME, 'ppt_add', 1, Ppt_add)
      +     /=0 ) CALL read_error(2, 'ppt_add')
 
-      IF ( getparam(MODNAME, 'ppt_div', 1, 'real', Ppt_div)
+      IF ( getparam_real(MODNAME, 'ppt_div', 1, Ppt_div)
      +     /=0 ) CALL read_error(2, 'ppt_div')
 
-      IF ( getparam(MODNAME, 'conv_flag', 1, 'integer', Conv_flag)
+      IF ( getparam_int(MODNAME, 'conv_flag', 1, Conv_flag)
      +     /=0 ) CALL read_error(2, 'conv_flag')
 
-      ! IF ( getparam(MODNAME, 'tmax_allrain_sta', Nrain*MONTHS_PER_YEAR, 'real',
+      ! IF ( getparam_real(MODNAME, 'tmax_allrain_sta', Nrain*MONTHS_PER_YEAR,
       !+     Tmax_allrain_sta)/=0 ) CALL read_error(2, 'tmax_allrain_sta')
-      ! IF ( getparam(MODNAME, 'tmax_allsnow_sta', Nrain*MONTHS_PER_YEAR, 'real',
+      ! IF ( getparam_real(MODNAME, 'tmax_allsnow_sta', Nrain*MONTHS_PER_YEAR,
       !+     Tmax_allsnow_sta)/=0 ) CALL read_error(2, 'tmax_allsnow_sta')
 
-      IF ( getparam(MODNAME, 'tmax_allrain_dist',MONTHS_PER_YEAR,'real',
+      IF ( getparam_real(MODNAME, 'tmax_allrain_dist',MONTHS_PER_YEAR,
      +   Tmax_allrain_dist)/=0 ) CALL read_error(2, 'tmax_allrain_dist')
 
-      IF ( getparam(MODNAME, 'tmax_allsnow_dist', 1, 'real',
+      IF ( getparam_real(MODNAME, 'tmax_allsnow_dist', 1,
      +   Tmax_allsnow_dist)/=0 ) CALL read_error(2, 'tmax_allsnow_dist')
 !
 ! Compute basin centroid

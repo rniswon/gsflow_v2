@@ -6,7 +6,7 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-09-28'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-10-11'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -61,47 +61,47 @@
       USE GSFPRMS2MF
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Nsegment, Model
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: declparam, declvar
-      EXTERNAL read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL read_error, print_module, declvar_dble, declvar_real !, declvar_int
 !***********************************************************************
       prms2mfdecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_gsflow_prms2mf)
 
 ! Declared Variables
-      IF ( declvar(MODNAME, 'net_sz2gw', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'net_sz2gw', 'one', 1, &
      &     'Net volumetric flow rate of gravity drainage from the soil zone to the unsaturated and saturated zones', &
-     &     'L3/T', Net_sz2gw)/=0 ) CALL read_error(3, 'net_sz2gw')
+     &     'L3/T', Net_sz2gw)
 
-!     ALLOCATE (Reach_latflow(Nreach))
-!     IF ( decl var(MODNAME, 'reach_latflow', 'nreach', Nreach, 'double', &
-!    &     'Lateral flow (surface runoff and interflow) into each stream reach', &
-!    &     'cfs', Reach_latflow)/=0 ) CALL read_error(3, 'reach_latflow')
+!      ALLOCATE (Reach_latflow(Nreach))
+!      CALL declvar_dble(MODNAME, 'reach_latflow', 'nreach', Nreach, &
+!     &     'Lateral flow (surface runoff and interflow) into each stream reach', &
+!     &     'cfs', Reach_latflow)
 
-!     ALLOCATE (Reach_id(Nreach, Nsegment))
-!     IF ( declvar(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, 'integer', &
-!    &     'Mapping of reach id by segment id', &
-!    &     'none', Reach_id)/=0 ) CALL read_error(3, 'reach_id')
+!      ALLOCATE (Reach_id(Nreach, Nsegment))
+!      CALL declvar_int(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, &
+!     &     'Mapping of reach id by segment id', &
+!     &     'none', Reach_id)
 
       ALLOCATE (Cell_drain_rate(Ngwcell))
-      IF ( declvar(MODNAME, 'cell_drain_rate', 'ngwcell', Ngwcell, 'real', &
+      CALL declvar_real(MODNAME, 'cell_drain_rate', 'ngwcell', Ngwcell, &
      &     'Recharge rate for each cell', &
-     &     'L/T', Cell_drain_rate)/=0 ) CALL read_error(3, 'cell_drain_rate')
+     &     'L/T', Cell_drain_rate)
 
-      IF ( declvar(MODNAME, 'basin_reach_latflow', 'one', 1, 'double', &
+      CALL declvar_dble(MODNAME, 'basin_reach_latflow', 'one', 1, &
      &     'Lateral flow into all reaches in basin', &
-     &     'cfs', Basin_reach_latflow)/=0 ) CALL read_error(3, 'basin_reach_latflow')
+     &     'cfs', Basin_reach_latflow)
 
       ALLOCATE (Gw_rejected_grav(Nhrucell))
-      IF ( declvar(MODNAME, 'gw_rejected_grav', 'nhrucell', Nhrucell, 'real', &
+      CALL declvar_real(MODNAME, 'gw_rejected_grav', 'nhrucell', Nhrucell, &
      &   'Recharge rejected by UZF for each gravity-flow reservoir', &
-     &   'inches', Gw_rejected_grav)/=0 ) CALL read_error(3, 'gw_rejected_grav')
+     &   'inches', Gw_rejected_grav)
 
       !rsr, all reaches receive same precentage of flow to each segment
       ALLOCATE (Segment_pct_area(Nsegment))
-!      IF ( declvar(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, 'double', &
+!      CALL declvar_dble(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, &
 !     &     'Proportion of each segment that contributes flow to a stream reach', &
-!     &     'decimal fraction', Segment_pct_area)/=0 ) CALL read_error(3, 'segment_pct_area')
+!     &     'decimal fraction', Segment_pct_area)
 
       ! Allocate local arrays
       ALLOCATE ( Excess(Ngwcell) )
@@ -159,7 +159,7 @@
       USE PRMS_SOILZONE, ONLY: Gvr_hru_id, Gvr_hru_pct_adjusted
       USE GLOBAL, ONLY: NLAY, NROW, NCOL
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getparam
+      INTEGER, EXTERNAL :: getparam_real
       EXTERNAL read_error
       INTRINSIC ABS, DBLE
 ! Local Variables
@@ -197,7 +197,7 @@
       ENDIF
 
       IF ( Nhru/=Nhrucell ) THEN
-        IF ( getparam('prms2mf', 'gvr_hru_pct', Nhrucell, 'real', Gvr_hru_pct)/=0 ) CALL read_error(2, 'gvr_hru_pct')
+        IF ( getparam_real('prms2mf', 'gvr_hru_pct', Nhrucell, Gvr_hru_pct)/=0 ) CALL read_error(2, 'gvr_hru_pct')
       ENDIF
 
       ALLOCATE ( Numreach_segment(Nsegment) )
@@ -393,10 +393,11 @@
 !***********************************************************************
       INTEGER FUNCTION prms2mfrun()
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Dprst_flag, Ag_package
       USE GSFPRMS2MF
-      USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3_sngl, Gwc_row, Gwc_col, Mft_to_days !, Inch_to_mfl_t
+      USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3_sngl, Gwc_row, Gwc_col, Mft_to_days
       USE GLOBAL, ONLY: IBOUND
+      USE GWFAGMODULE, ONLY: NUMIRRPOND
       USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, FINF, IUZFOPT !, IGSFLOW
       USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK !, NLAKES
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_hru_id !, Lake_area
@@ -407,7 +408,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: toStream
-      EXTERNAL Bin_percolation
+      EXTERNAL Bin_percolation, toIrr
 ! Local Variables
       INTEGER :: irow, icol, ik, jk, ii, ilake
       INTEGER :: j, icell, ihru, is_draining
@@ -418,6 +419,12 @@
 ! Add runoff to stream reaches
 !-----------------------------------------------------------------------
       IF ( toStream()/=0 ) RETURN
+!-----------------------------------------------------------------------
+! Remove open dprst storage for irrigation
+!-----------------------------------------------------------------------
+       IF ( Ag_package==ACTIVE .AND. Dprst_flag==ACTIVE ) THEN
+         IF ( NUMIRRPOND>0 ) CALL toIrr()
+       ENDIF
 
 !-----------------------------------------------------------------------
 ! Add runoff and precip to lakes
@@ -435,8 +442,6 @@
      &                   *Hru_area(j)*Acre_inches_to_mfl3_sngl*Mft_to_days )   !RGN 7/15/2015 added *Mft_to_days
             PRCPLK(ilake) = PRCPLK(ilake) + Hru_ppt(j)*Acre_inches_to_mfl3_sngl*Mft_to_days*Hru_area(j) !VOLUMES OF PRECIP
             EVAPLK(ilake) = EVAPLK(ilake) + Hru_actet(j)*Acre_inches_to_mfl3_sngl*Mft_to_days*Hru_area(j) !VOLUMES OF EVAP
-!            PRCPLK(ilake) = PRCPLK(ilake) + Hru_ppt(j)*Inch_to_mfl_t*Hru_area(j)
-!            EVAPLK(ilake) = EVAPLK(ilake) + Hru_actet(j)*Inch_to_mfl_t*Hru_area(j)
           ENDIF
         ENDDO
         !DO ilake = 1, NLAKES
@@ -556,6 +561,41 @@
       toStream = 0
 
       END FUNCTION toStream
+
+!***********************************************************************
+!***********************************************************************
+      SUBROUTINE toIrr()
+      USE PRMS_CONSTANTS, ONLY: DNEARZERO
+      USE GWFAGMODULE, ONLY: NUMIRRPOND, IRRPONDVAR, PONDFLOW
+      USE PRMS_MODULE, ONLY: Dprst_ag_transfer
+!      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
+      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
+      IMPLICIT NONE
+      INTRINSIC :: SNGL
+! Local Variables
+      INTEGER :: i, hru_id
+      REAL :: demand_inch_acres
+!***********************************************************************
+! Calculate conversion for MF units to inch_acres
+      Dprst_ag_transfer = 0.0
+      do i = 1, NUMIRRPOND
+        hru_id = IRRPONDVAR(i)
+        IF ( hru_id > 0 ) THEN
+          demand_inch_acres = PONDFLOW(i)*MFQ_to_inch_acres
+! next 2 lines moved to ag package
+          !IF ( demand_inch_acres > SNGL(Dprst_vol_open(hru_id))) demand_inch_acres = SNGL(Dprst_vol_open(hru_id))
+          !PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
+          Dprst_ag_transfer(hru_id) = Dprst_ag_transfer(hru_id) + demand_inch_acres
+          ! rsr, moving to srunoff
+!          Dprst_vol_open(hru_id) = Dprst_vol_open(hru_id) - demand_inch_acres
+!          if (Dprst_vol_open(hru_id)<0.0) THEN
+!            if (Dprst_vol_open(hru_id)<1.0D-09) print *, 'dprst empty', Dprst_vol_open(hru_id)
+!            Dprst_vol_open(hru_id) = 0.0D0
+!          end if
+        END IF
+      end do
+
+      END SUBROUTINE toIrr
 
 !***********************************************************************
 ! Bin percolation to reduce waves

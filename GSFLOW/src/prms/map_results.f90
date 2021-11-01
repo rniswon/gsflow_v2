@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'map_results'
-      character(len=*), parameter :: Version_map_results = '2021-08-13'
+      character(len=*), parameter :: Version_map_results = '2021-09-07'
       INTEGER, SAVE :: Mapflg, Numvalues, Lastyear, Totdays
       INTEGER, SAVE :: Yrdays, Yrresults, Totresults, Monresults, Mondays
       INTEGER, SAVE :: Begin_results, Begyr, Dailyresults
@@ -169,10 +169,10 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getparam, getvartype, numchars, getvarsize
+      INTEGER, EXTERNAL :: getparam_int, getparam_real, getvartype, numchars, getvarsize
       EXTERNAL :: read_error, PRMS_open_output_file, checkdim_bounded_limits
 ! Local Variables
-      INTEGER :: i, jj, is, ios, ierr, size, dim
+      INTEGER :: i, jj, is, ios, ierr, size
       REAL, ALLOCATABLE, DIMENSION(:) :: map_frac
 !***********************************************************************
       map_resultsinit = 0
@@ -182,15 +182,15 @@
       Begyr = Start_year + Prms_warmup
       Lastyear = Begyr
 
-      IF ( getparam(MODNAME, 'mapvars_freq', 1, 'integer', Mapvars_freq)/=0 ) CALL read_error(1, 'mapvars_freq')
+      IF ( getparam_int(MODNAME, 'mapvars_freq', 1, Mapvars_freq)/=0 ) CALL read_error(1, 'mapvars_freq')
       IF ( Mapvars_freq==0 ) THEN
         PRINT *, 'WARNING, map_results requested with mapvars_freq equal 0'
         PRINT *, 'no map_resultsults output is produced'
         MapOutON_OFF = OFF
         RETURN
       ENDIF
-      IF ( getparam(MODNAME, 'ncol', 1, 'integer', Ncol)/=0 ) CALL read_error(2, 'ncol')
-      IF ( getparam(MODNAME, 'mapvars_units', 1, 'integer', Mapvars_units)/=0 ) CALL read_error(2, 'Mapvars_units')
+      IF ( getparam_int(MODNAME, 'ncol', 1, Ncol)/=0 ) CALL read_error(2, 'ncol')
+      IF ( getparam_int(MODNAME, 'mapvars_units', 1, Mapvars_units)/=0 ) CALL read_error(2, 'Mapvars_units')
 
       WRITE ( Mapfmt, 9001 ) Ncol
 
@@ -215,13 +215,13 @@
       ierr = 0
       DO jj = 1, NmapOutVars
         Nc_vars(jj) = numchars(MapOutVar_names(jj))
-        Map_var_type(jj) = getvartype(MapOutVar_names(jj)(:Nc_vars(jj)), Map_var_type(jj) )
+        Map_var_type(jj) = getvartype(MapOutVar_names(jj)(:Nc_vars(jj)) )
         IF ( Map_var_type(jj)/=REAL_TYPE .AND. Map_var_type(jj)/=DBLE_TYPE ) THEN
           PRINT *, 'ERROR, invalid map_results variable:', MapOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only real or double variables allowed'
           ierr = 1
         ENDIF
-        size = getvarsize(MapOutVar_names(jj)(:Nc_vars(jj)), dim )
+        size = getvarsize(MapOutVar_names(jj)(:Nc_vars(jj)))
         IF ( size/=Nhru ) THEN
           PRINT *, 'ERROR, invalid map_results variable:', MapOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only variables with the number of values equal to nhru allowed'
@@ -300,9 +300,9 @@
       IF ( ierr==1 ) Inputerror_flag = 1
 
       IF ( Mapflg==OFF ) THEN
-        IF ( getparam(MODNAME, 'gvr_cell_id', Nhrucell, 'integer', Gvr_map_id)/=0 ) CALL read_error(2, 'gvr_cell_id')
+        IF ( getparam_int(MODNAME, 'gvr_cell_id', Nhrucell, Gvr_map_id)/=0 ) CALL read_error(2, 'gvr_cell_id')
         IF ( Nhru/=Nhrucell ) THEN
-          IF ( getparam(MODNAME, 'gvr_hru_id', Nhrucell, 'integer', Gvr_hru_id)/=0 ) CALL read_error(2, 'gvr_hru_id')
+          IF ( getparam_int(MODNAME, 'gvr_hru_id', Nhrucell, Gvr_hru_id)/=0 ) CALL read_error(2, 'gvr_hru_id')
           IF ( Parameter_check_flag>0 ) &
      &         CALL checkdim_bounded_limits('gvr_hru_id', 'nhru', Gvr_hru_id, Nhrucell, 1, Nhru, Inputerror_flag)
         ELSE
@@ -311,7 +311,7 @@
           ENDDO
         ENDIF
         IF ( Nhrucell/=Ngwcell ) THEN
-          IF ( getparam(MODNAME, 'gvr_cell_pct', Nhrucell, 'real', Gvr_map_frac)/=0 ) CALL read_error(2, 'gvr_cell_pct')
+          IF ( getparam_real(MODNAME, 'gvr_cell_pct', Nhrucell, Gvr_map_frac)/=0 ) CALL read_error(2, 'gvr_cell_pct')
         ELSE
           Gvr_map_frac = 1.0
         ENDIF
@@ -374,8 +374,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getvar
-      EXTERNAL :: read_error, write_results
+      EXTERNAL :: write_results, getvar_real, getvar_dble
 ! Local Variables
       INTEGER :: j, i, k, jj, last_day
       DOUBLE PRECISION :: factor, map_var_double
@@ -448,13 +447,9 @@
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NmapOutVars
         IF ( Map_var_type(jj)==REAL_TYPE ) THEN
-          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), &
-     &         Nhru, 'real', Map_var(1, jj))/=0 ) &
-     &         CALL read_error(4, MapOutVar_names(jj)(:Nc_vars(jj)))
+          CALL getvar_real(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var(1, jj))
         ELSEIF ( Map_var_type(jj)==DBLE_TYPE ) THEN
-          IF ( getvar(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), &
-     &         Nhru, 'double', Map_var_dble(1, jj))/=0 ) &
-     &         CALL read_error(4, MapOutVar_names(jj)(:Nc_vars(jj)))
+          CALL getvar_dble(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var_dble(1, jj))
         ENDIF
       ENDDO
 

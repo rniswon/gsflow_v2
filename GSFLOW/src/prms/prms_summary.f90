@@ -6,7 +6,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Output Summary'
         character(len=*), parameter :: MODNAME = 'prms_summary'
-        character(len=*), parameter :: Version_prms_summary = '2021-08-13'
+        character(len=*), parameter :: Version_prms_summary = '2021-09-14'
         INTEGER, PARAMETER :: NVARS = 51
         INTEGER, SAVE :: Iunit
         INTEGER, SAVE, ALLOCATABLE :: Gageid_len(:)
@@ -18,9 +18,9 @@
         ! Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_total_storage, Basin_surface_storage
         ! Declared Parameters
-        INTEGER, SAVE, ALLOCATABLE :: Poi_gage_segment(:)
+        INTEGER, SAVE, ALLOCATABLE :: Poi_gage_segment(:), Poi_gage_id(:)
 !        INTEGER, SAVE, ALLOCATABLE :: Parent_poigages(:)
-        CHARACTER(LEN=16), SAVE, ALLOCATABLE :: Poi_gage_id(:)
+!        CHARACTER(LEN=16), SAVE, ALLOCATABLE :: Poi_gage_id(:)
       END MODULE PRMS_PRMS_SUMMARY
 
       SUBROUTINE prms_summary()
@@ -44,12 +44,12 @@
      &    Basin_gwstor_minarea_wb, Basin_dnflow
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: CHAR, INDEX, MAX
-      INTEGER, EXTERNAL :: declparam, declvar, getparam !, control_integer
-      EXTERNAL :: read_error, PRMS_open_output_file, print_module, statvar_to_csv, checkdim_bounded_limits
+      INTRINSIC :: MAX !, CHAR, INDEX
+      INTEGER, EXTERNAL :: declparam, getparam_int !, control_integer
+      EXTERNAL :: read_error, PRMS_open_output_file, print_module, statvar_to_csv, checkdim_bounded_limits, declvar_dble
       INTEGER, EXTERNAL :: getparamstring, control_string
 ! Local Variables
-      INTEGER :: i, ios, foo, idim !, statsON_OFF
+      INTEGER :: i, ios, idim !, foo, statsON_OFF
       DOUBLE PRECISION :: gageflow
       CHARACTER(LEN=10) :: chardate
 !***********************************************************************
@@ -99,12 +99,12 @@
           IF ( ios/=0 ) ERROR STOP ERROR_open_out
         ENDIF
 
-        IF ( declvar(MODNAME, 'basin_total_storage', 'one', 1, 'double', &
+        CALL declvar_dble(MODNAME, 'basin_total_storage', 'one', 1, &
      &       'Basin area-weighted average storage in all water storage reservoirs', &
-     &       'inches', Basin_total_storage)/=0 ) CALL read_error(3, 'basin_total_storage')
-        IF ( declvar(MODNAME, 'basin_surface_storage', 'one', 1, 'double', &
+     &       'inches', Basin_total_storage)
+        CALL declvar_dble(MODNAME, 'basin_surface_storage', 'one', 1, &
      &       'Basin area-weighted average storage in all surface water storage reservoirs', &
-     &       'inches', Basin_surface_storage)/=0 ) CALL read_error(3, 'basin_surface_storage')
+     &       'inches', Basin_surface_storage)
 
         IF ( Npoigages>0 .OR. Model==DOCUMENTATION ) THEN
 !          ALLOCATE ( Parent_poigages(Npoigages) )
@@ -119,10 +119,14 @@
      &         'Segment index for each POI gage', &
      &         'none')/=0 ) CALL read_error(1, 'poi_gage_segment')
           ALLOCATE ( Poi_gage_id(Npoigages) )
-          IF ( declparam(MODNAME, 'poi_gage_id', 'npoigages', 'string', &
+          IF ( declparam(MODNAME, 'poi_gage_id', 'npoigages', 'integer', &
      &         '0', '0', '9999999', &
      &         'POI Gage ID', 'USGS stream gage for each POI gage', &
      &         'none')/=0 ) CALL read_error(1, 'poi_gage_id')
+!          IF ( declparam(MODNAME, 'poi_gage_id', 'npoigages', 'string', &
+!     &         '0', '0', '9999999', &
+!     &         'POI Gage ID', 'USGS stream gage for each POI gage', &
+!     &         'none')/=0 ) CALL read_error(1, 'poi_gage_id')
         ENDIF
 
 ! Initialize Procedure
@@ -142,35 +146,51 @@
         Basin_surface_storage = 0.0D0
 
         IF ( Npoigages>0 ) THEN
-!          IF ( getparam(MODNAME, 'parent_poigages', Npoigages, 'integer', Parent_poigages)/=0 ) &
+!          IF ( getparam_int(MODNAME, 'parent_poigages', Npoigages, Parent_poigages)/=0 ) &
 !     &         CALL read_error(2, 'parent_poigages')
-          IF ( getparam(MODNAME, 'poi_gage_segment', Npoigages, 'integer', Poi_gage_segment)/=0 ) &
+          IF ( getparam_int(MODNAME, 'poi_gage_segment', Npoigages, Poi_gage_segment)/=0 ) &
      &         CALL read_error(2, 'poi_gage_segment')
           IF ( Parameter_check_flag>0 ) &
      &      CALL checkdim_bounded_limits('poi_gage_segment', 'nsegment', Poi_gage_segment, Npoigages, 1, Nsegment, Inputerror_flag)
-          DO i = 1, Npoigages
-            Poi_gage_id(i) = '                '
-          ENDDO
+          IF ( getparam_int(MODNAME, 'poi_gage_id', Npoigages, Poi_gage_id)/=0 ) &
+     &         CALL read_error(2, 'poi_gage_id')
+!          DO i = 1, Npoigages
+!            Poi_gage_id(i) = '                '
+!          ENDDO
 
-          DO i = 1, Npoigages
-            foo = getparamstring(MODNAME, 'poi_gage_id', Npoigages, 'string', &
-     &            i-1, Poi_gage_id(i))
-          ENDDO
+!          DO i = 1, Npoigages
+!            foo = getparamstring(MODNAME, 'poi_gage_id', Npoigages, 'string', &
+!     &            i-1, Poi_gage_id(i))
+!          ENDDO
 
           DO i = 1, Npoigages
             IF ( Poi_gage_segment(i)<1 .OR. Poi_gage_segment(i)>Nsegment ) CYCLE
-            Gageid_len(i) = INDEX( Poi_gage_id(i), ' ' ) - 1
-            IF ( Gageid_len(i)<0 ) Gageid_len(i) = INDEX( Poi_gage_id(i), CHAR(0) ) - 1
+            Gageid_len(i) = 1
+            IF ( Poi_gage_id(i)>0 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>9 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>99 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>999 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>9999 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>99999 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>999999 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>9999999 ) Gageid_len(i) = Gageid_len(i) + 1
+            IF ( Poi_gage_id(i)>99999999 ) Gageid_len(i) = Gageid_len(i) + 1
+!            Gageid_len(i) = INDEX( Poi_gage_id(i), ' ' ) - 1
+!            IF ( Gageid_len(i)<0 ) Gageid_len(i) = INDEX( Poi_gage_id(i), CHAR(0) ) - 1
 !            PRINT *, 'gageid_len ', Gageid_len(i), ' :', Poi_gage_id(i), ':'
-            IF ( Gageid_len(i)<1 ) Gageid_len(i) = 0
+!            IF ( Gageid_len(i)<1 ) Gageid_len(i) = 0
             IF ( Gageid_len(i)>0 ) THEN
-              IF ( Gageid_len(i)>15 ) Gageid_len(i) = 15
+!              IF ( Gageid_len(i)>15 ) Gageid_len(i) = 15
               IF ( CsvON_OFF==ACTIVE ) THEN
-                WRITE (Streamflow_pairs(i), '(A,I0,2A)' ) ',seg_outflow_', Poi_gage_segment(i), '_gage_', &
-     &                                                    Poi_gage_id(i)(:Gageid_len(i))
+!                WRITE (Streamflow_pairs(i), '(A,I0,2A)' ) ',seg_outflow_', Poi_gage_segment(i), '_gage_', &
+!     &                                                    Poi_gage_id(i)(:Gageid_len(i))
+                WRITE (Streamflow_pairs(i), '(A,I0,A,I0)' ) ',seg_outflow_', Poi_gage_segment(i), '_gage_', &
+     &                                                      Poi_gage_id(i)
               ELSE
-                WRITE (Streamflow_pairs(i), '(A,I0,2A)' ) ' seg_outflow_', Poi_gage_segment(i), '_gage_', &
-     &                                                    Poi_gage_id(i)(:Gageid_len(i))
+!                WRITE (Streamflow_pairs(i), '(A,I0,2A)' ) ' seg_outflow_', Poi_gage_segment(i), '_gage_', &
+!     &                                                    Poi_gage_id(i)(:Gageid_len(i))
+                WRITE (Streamflow_pairs(i), '(A,I0,A,I0)' ) ' seg_outflow_', Poi_gage_segment(i), '_gage_', &
+     &                                                      Poi_gage_id(i)
               ENDIF
               IF ( Poi_gage_segment(i)>9 ) Gageid_len(i) = Gageid_len(i) + 1
               IF ( Poi_gage_segment(i)>99 ) Gageid_len(i) = Gageid_len(i) + 1

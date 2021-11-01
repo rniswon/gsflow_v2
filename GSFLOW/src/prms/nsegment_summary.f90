@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsegment_summary'
-      character(len=*), parameter :: Version_nsegment_summary = '2021-08-13'
+      character(len=*), parameter :: Version_nsegment_summary = '2021-09-07'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsegment_var_type(:)
       REAL, SAVE, ALLOCATABLE :: Nsegment_var_daily(:, :)
@@ -116,7 +116,7 @@
       USE PRMS_NSEGMENT_SUMMARY
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam
+      INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam_int
       EXTERNAL :: read_error, PRMS_open_output_file, error_stop
 ! Local Variables
       INTEGER :: ios, ierr, size, jj, j
@@ -200,7 +200,7 @@
       ENDIF
 
       IF ( NsegmentOutON_OFF==2 ) THEN
-        IF ( getparam(MODNAME, 'nhm_seg', Nsegment, 'integer', Nhm_seg)/=0 ) CALL read_error(2, 'nhm_seg')
+        IF ( getparam_int(MODNAME, 'nhm_seg', Nsegment, Nhm_seg)/=0 ) CALL read_error(2, 'nhm_seg')
       ENDIF
       WRITE ( Output_fmt2, 9002 ) Nsegment
       ALLOCATE ( Nsegment_var_daily(Nsegment, NsegmentOutVars) )
@@ -280,8 +280,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC SNGL, DBLE
-      INTEGER, EXTERNAL :: getvar
-      EXTERNAL :: read_error
+      EXTERNAL read_error, getvar_real, getvar_dble
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day
 !***********************************************************************
@@ -297,11 +296,9 @@
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NsegmentOutVars
         IF ( Nsegment_var_type(jj)==REAL_TYPE ) THEN
-          IF ( getvar(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, 'real', Nsegment_var_daily(1, jj))/=0 ) &
-     &         CALL read_error(4, NsegmentOutVar_names(jj)(:Nc_vars(jj)))
+          CALL getvar_real(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, Nsegment_var_daily(1, jj))
         ELSEIF ( Nsegment_var_type(jj)==DBLE_TYPE ) THEN
-          IF ( getvar(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, 'double', Nsegment_var_dble(1, jj))/=0 ) &
-     &         CALL read_error(4, NsegmentOutVar_names(jj)(:Nc_vars(jj)))
+          CALL getvar_dble(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, Nsegment_var_dble(1, jj))
           DO i = 1, Nsegment
             Nsegment_var_daily(i, jj) = SNGL( Nsegment_var_dble(i, jj) )
           ENDDO

@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_pt'
-        character(len=*), parameter :: Version_potet = '2021-08-13'
+        character(len=*), parameter :: Version_potet = '2021-09-07'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Pt_alpha(:, :)
       END MODULE PRMS_POTET_PT
@@ -30,7 +30,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, LOG, SNGL
-      INTEGER, EXTERNAL :: declparam, getparam
+      INTEGER, EXTERNAL :: declparam, getparam_real
       REAL, EXTERNAL :: sat_vapor_press
       EXTERNAL :: read_error, print_module
 ! Local Variables
@@ -164,7 +164,7 @@
 
 !******Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam(MODNAME, 'pt_alpha', Nhru*MONTHS_PER_YEAR, 'real', Pt_alpha)/=0 ) CALL read_error(2, 'pt_alpha')
+        IF ( getparam_real(MODNAME, 'pt_alpha', Nhru*MONTHS_PER_YEAR, Pt_alpha)/=0 ) CALL read_error(2, 'pt_alpha')
 
       ENDIF
 

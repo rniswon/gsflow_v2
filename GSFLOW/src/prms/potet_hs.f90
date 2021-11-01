@@ -23,7 +23,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SQRT, DBLE, ABS
-      INTEGER, EXTERNAL :: declparam, getparam
+      INTEGER, EXTERNAL :: declparam, getparam_real
       EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
@@ -65,7 +65,7 @@
 
 !******Get parameters
       ELSEIF ( Process_FLAG==INIT ) THEN
-        IF ( getparam(MODNAME, 'hs_krs', Nhru*MONTHS_PER_YEAR, 'real', Hs_krs)/=0 ) CALL read_error(2, 'hs_krs')
+        IF ( getparam_real(MODNAME, 'hs_krs', Nhru*MONTHS_PER_YEAR, Hs_krs)/=0 ) CALL read_error(2, 'hs_krs')
       ENDIF
 
       END FUNCTION potet_hs

@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsub_summary'
-      character(len=*), parameter :: Version_nsub_summary = '2021-08-13'
+      character(len=*), parameter :: Version_nsub_summary = '2021-09-07'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsub_var_type(:), Nsub_var_size(:)
       REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
@@ -120,10 +120,10 @@
       USE PRMS_NSUB_SUMMARY
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam
+      INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam_int
       EXTERNAL :: read_error, PRMS_open_output_file, error_stop
 ! Local Variables
-      INTEGER :: ios, ierr, dum, jj, j, i, k
+      INTEGER :: ios, ierr, jj, j, i, k
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
 !***********************************************************************
       Begin_results = ACTIVE
@@ -150,13 +150,13 @@
       ierr = 0
       DO jj = 1, NsubOutVars
         Nc_vars(jj) = numchars(NsubOutVar_names(jj))
-        Nsub_var_type(jj) = getvartype(NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub_var_type(jj) )
+        Nsub_var_type(jj) = getvartype(NsubOutVar_names(jj)(:Nc_vars(jj)) )
         IF ( Nsub_var_type(jj)/=REAL_TYPE .AND. Nsub_var_type(jj)/=DBLE_TYPE ) THEN
           PRINT *, 'ERROR, invalid nsub_summary variable:', NsubOutVar_names(jj)(:Nc_vars(jj))
           PRINT *, '       only real or double variables allowed'
           ierr = 1
         ENDIF
-        Nsub_var_size(jj) = getvarsize(NsubOutVar_names(jj)(:Nc_vars(jj)), dum )
+        Nsub_var_size(jj) = getvarsize(NsubOutVar_names(jj)(:Nc_vars(jj)))
         IF ( Nsub_var_size(jj)==Nhru ) THEN
           Nhru_vars = ACTIVE
           IF ( Nsub_var_type(jj)==DBLE_TYPE ) Nhru_double_vars = ACTIVE
@@ -256,7 +256,7 @@
         ENDIF
       ENDDO
 
-      IF ( getparam(MODNAME, 'hru_subbasin', Nhru, 'integer', Hru_subbasin)/=0 ) CALL read_error(2, 'hru_subbasin')
+      IF ( getparam_int(MODNAME, 'hru_subbasin', Nhru, Hru_subbasin)/=0 ) CALL read_error(2, 'hru_subbasin')
       Sub_area = 0.0D0
       DO i = 1, Active_hrus
         j = Hru_route_order(i)
@@ -296,8 +296,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: SNGL, DBLE
-      INTEGER, EXTERNAL :: getvar
-      EXTERNAL :: read_error
+      EXTERNAL :: read_error, getvar_real, getvar_dble
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day, k
 !***********************************************************************
@@ -314,19 +313,15 @@
       DO jj = 1, NsubOutVars
         IF ( Nsub_var_type(jj)==REAL_TYPE ) THEN
           IF ( Nsub_var_size(jj)==Nhru ) THEN
-            IF ( getvar(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'real', Nhru_var_daily(1, jj))/=0 ) &
-     &           CALL read_error(4, NsubOutVar_names(jj)(:Nc_vars(jj)))
+            CALL getvar_real(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_daily(1, jj))
           ELSE
-            IF ( getvar(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub, 'real', Nsub_var_single(1, jj))/=0 ) &
-     &           CALL read_error(4, NsubOutVar_names(jj)(:Nc_vars(jj)))
+            CALL getvar_real(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub, Nsub_var_single(1, jj))
           ENDIF
         ELSEIF ( Nsub_var_type(jj)==DBLE_TYPE ) THEN
           IF ( Nsub_var_size(jj)==Nhru ) THEN
-            IF ( getvar(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nhru, 'double', Nhru_var_dble(1, jj))/=0 ) &
-     &           CALL read_error(4, NsubOutVar_names(jj)(:Nc_vars(jj)))
+            CALL getvar_dble(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_dble(1, jj))
           ELSE
-            IF ( getvar(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub, 'double', Nsub_var_dble(1, jj))/=0 ) &
-     &           CALL read_error(4, NsubOutVar_names(jj)(:Nc_vars(jj)))
+            CALL getvar_dble(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub, Nsub_var_dble(1, jj))
           ENDIF
         ENDIF
       ENDDO

@@ -16,7 +16,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Potential Solar Radiation'
       character(len=*), parameter :: MODNAME = 'soltab'
-      character(len=*), parameter :: Version_soltab = '2021-08-13'
+      character(len=*), parameter :: Version_soltab = '2021-09-07'
       DOUBLE PRECISION, PARAMETER :: PI=3.1415926535898D0
       DOUBLE PRECISION, PARAMETER :: RADIANS=PI/180.0D0, TWOPI=2.0D0*PI
       DOUBLE PRECISION, PARAMETER :: PI_12=12.0D0/PI
@@ -69,22 +69,22 @@
       USE PRMS_SOLTAB
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam !, declvar
-      EXTERNAL :: read_error, print_module
+      INTEGER, EXTERNAL :: declparam
+      EXTERNAL :: read_error, print_module !, declvar_dble
 !***********************************************************************
       sthdecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_soltab)
 
       ALLOCATE ( Soltab_potsw(MAX_DAYS_PER_YEAR, Nhru) )
-!      IF ( declvar(MODNAME, 'soltab_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, 'double', &
+!      CALL declvar_dble(MODNAME, 'soltab_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
 !     &     'Potential solar radiation for each Julian Day, for each HRU', &
-!     &     'Langleys', Soltab_potsw)/=0 ) CALL read_error(3, 'soltab_potsw')
+!     &     'Langleys', Soltab_potsw)
 
       ALLOCATE ( Soltab_horad_potsw(MAX_DAYS_PER_YEAR, Nhru) )
-!      IF ( declvar(MODNAME, 'soltab_horad_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, 'double', &
+!      CALL declvar_dble(MODNAME, 'soltab_horad_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
 !     &     'Potential solar radiation on a horizontal plane for each Julian Day, for each HRU', &
-!     &     'Langleys', Soltab_horad_potsw)/=0 ) CALL read_error(3, 'soltab_horad_potsw')
+!     &     'Langleys', Soltab_horad_potsw)
 
       ALLOCATE ( Hru_cossl(Nhru), Soltab_sunhrs(MAX_DAYS_PER_YEAR, Nhru) )
 
@@ -119,7 +119,7 @@
 ! Functions
       INTRINSIC :: SIN, COS, DBLE
 !     INTRINSIC :: ASIN
-      INTEGER, EXTERNAL :: getparam
+      INTEGER, EXTERNAL :: getparam_real
       EXTERNAL :: compute_soltab, read_error, PRMS_open_module_file
 ! Local Variables
       CHARACTER(LEN=12) :: output_path
@@ -131,8 +131,8 @@
 !***********************************************************************
       sthinit = 0
 
-      IF ( getparam(MODNAME, 'hru_slope', Nhru, 'real', Hru_slope)/=0 ) CALL read_error(2, 'hru_slope')
-      IF ( getparam(MODNAME, 'hru_aspect', Nhru, 'real', Hru_aspect)/=0 ) CALL read_error(2, 'hru_aspect')
+      IF ( getparam_real(MODNAME, 'hru_slope', Nhru, Hru_slope)/=0 ) CALL read_error(2, 'hru_slope')
+      IF ( getparam_real(MODNAME, 'hru_aspect', Nhru, Hru_aspect)/=0 ) CALL read_error(2, 'hru_aspect')
 
       DO jd = 1, MAX_DAYS_PER_YEAR
         jddbl = DBLE(jd)

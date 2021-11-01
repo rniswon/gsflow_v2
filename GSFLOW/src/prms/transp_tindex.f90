@@ -23,7 +23,7 @@
       USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Temp_units, Transp_on, Basin_transp_on 
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, getparam
+      INTEGER, EXTERNAL :: declparam, getparam_int, getparam_real
       REAL, EXTERNAL :: c_to_f
       EXTERNAL :: read_error, print_module, transp_tindex_restart
 ! Local Variables
@@ -102,9 +102,9 @@
 
       ELSEIF ( Process_flag==INIT ) THEN
 
-        IF ( getparam(MODNAME, 'transp_beg', Nhru, 'integer', Transp_beg)/=0 ) CALL read_error(2, 'transp_beg')
-        IF ( getparam(MODNAME, 'transp_end', Nhru, 'integer', Transp_end)/=0 ) CALL read_error(2, 'transp_end')
-        IF ( getparam(MODNAME, 'transp_tmax', Nhru, 'real', Transp_tmax)/=0 ) CALL read_error(2, 'transp_tmax')
+        IF ( getparam_int(MODNAME, 'transp_beg', Nhru, Transp_beg)/=0 ) CALL read_error(2, 'transp_beg')
+        IF ( getparam_int(MODNAME, 'transp_end', Nhru, Transp_end)/=0 ) CALL read_error(2, 'transp_end')
+        IF ( getparam_real(MODNAME, 'transp_tmax', Nhru, Transp_tmax)/=0 ) CALL read_error(2, 'transp_tmax')
 
         IF ( Init_vars_from_file>OFF ) CALL transp_tindex_restart(READ_INIT)
         IF ( Temp_units==FAHRENHEIT ) THEN
