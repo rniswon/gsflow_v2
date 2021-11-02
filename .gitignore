@@ -3,5 +3,8 @@ GSFLOW/bin/gsflow.exe
 *.o
 *.a
 *.bak
+*.obj
+*.chk
+*.pyc
 create_Ag_input/create_Ag_input.sln
 create_Ag_input/create_Ag_input/create_Ag_input.u2d
