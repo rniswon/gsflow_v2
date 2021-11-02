@@ -5,5 +5,6 @@ GSFLOW/bin/gsflow.exe
 *.bak
 *.obj
 *.chk
+*.pyc
 create_Ag_input/create_Ag_input.sln
 create_Ag_input/create_Ag_input/create_Ag_input.u2d
