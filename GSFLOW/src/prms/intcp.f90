@@ -282,7 +282,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, NEARZERO, DNEARZERO, &
      &    DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
       USE PRMS_MODULE, ONLY: Print_debug, PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Nowday, &
-     &    Ag_package, Hru_ag_irr
+     &    Ag_package, Hru_ag_irr, AG_flag
       USE PRMS_INTCP
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_type, Covden_win, Covden_sum, &
      &    Hru_route_order, Hru_area, Cov_type, Ag_frac !, Ag_area, Ag_cov_type
@@ -486,9 +486,11 @@
 
         IF ( Use_transfer_intcp==ACTIVE .OR. Ag_package==ACTIVE ) THEN ! Ag_package active for GSFLOW_AG or PRMS_AG
           IF ( Ag_package==ACTIVE ) THEN
-            IF ( Hru_ag_irr(i)>0.0 .AND. .NOT.(Ag_frac(i)>0.0) ) THEN
-              PRINT *, 'ag_frac=0.0 for HRU:', i
-              CALL error_stop('AG Package irrigation specified and ag_frac=0', ERROR_param)
+            IF ( Hru_ag_irr(i)>0.0 .AND. AG_flag==ACTIVE ) THEN
+              IF ( .NOT.(Ag_frac(i)>0.0) ) THEN
+                PRINT *, 'ag_frac=0.0 for HRU:', i
+                CALL error_stop('AG Package irrigation specified and ag_frac=0', ERROR_param)
+              ENDIF
             ENDIF
           ENDIF
           IF ( Hru_type(i)==LAKE ) CALL error_stop('irrigation specified and hru_type is lake', ERROR_param)
