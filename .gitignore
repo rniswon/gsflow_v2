@@ -8,3 +8,10 @@ GSFLOW/bin/gsflow.exe
 *.pyc
 create_Ag_input/create_Ag_input.sln
 create_Ag_input/create_Ag_input/create_Ag_input.u2d
+gsflow_develop/Debug/*.*
+gsflow_develop/x64/Release/*.*
+gsflow_develop/x64/Debug/*.*
+gsflow_develop/gsflow_develop.vfproj.rniswon.user
+gsflow_develop/.vs/gsflow_develop/v16/*.*
+
+
