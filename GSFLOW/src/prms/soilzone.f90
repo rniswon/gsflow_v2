@@ -895,14 +895,16 @@
       INTEGER :: i, k, update_potet, compute_lateral
       REAL :: dunnianflw, interflow, perv_area, harea
       REAL :: dnslowflow, dnpreflow, dndunn, availh2o, avail_potet, hruactet
-      REAL :: gvr_maxin, topfr !, tmp
+      REAL :: gvr_maxin, topfr, ag_capacity !, tmp
       REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin
       REAL :: perv_frac, capacity, capwater_maxin, ssresin
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
       DOUBLE PRECISION :: gwin
-      INTEGER :: cfgi_frozen_hru
+      INTEGER :: cfgi_frozen_hru, ag_on_flag
 !***********************************************************************
       szrun = 0
+      ag_on_flag = 0
+      ag_capacity = 0.0
 
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==ACTIVE ) THEN
@@ -1132,7 +1134,8 @@
      &                          Slowcoef_sq(i), Ssr2gw_rate(i), Ssr2gw_exp(i), &
      &                          gvr_maxin, Pref_flow_thrsh(i), topfr, &
      &                          Ssr_to_gw(i), Slow_flow(i), Slow_stor(i), &
-     &                          Gvr2sm(i), Soil_to_gw(i), gwin, compute_lateral)
+     &                          Gvr2sm(i), Soil_to_gw(i), gwin, compute_lateral, &
+     &                          ag_capacity, ag_on_flag)
           ! adjust soil moisture with replenish amount
           IF ( Gvr2sm(i)>0.0 ) THEN
             Soil_moist(i) = Soil_moist(i) + Gvr2sm(i)/perv_frac ! ??? could this be bigger than soil_moist_max ??? (add to Dunnian)
@@ -1717,21 +1720,23 @@
       SUBROUTINE compute_gravflow(Ihru, Capacity, Slowcoef_lin, &
      &           Slowcoef_sq, Ssr2gw_rate, Ssr2gw_exp, Gvr_maxin, &
      &           Pref_flow_thrsh, Gvr2pfr, Ssr_to_gw, &
-     &           Slow_flow, Slow_stor, Gvr2sm, Soil_to_gw, Gwin, Compute_lateral)
+     &           Slow_flow, Slow_stor, Gvr2sm, Soil_to_gw, Gwin, Compute_lateral, &
+     &           Ag_capacity, Ag_on_flag)
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE
-      USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug
+      USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug, Dprst_flag, Print_debug
       USE PRMS_SOILZONE, ONLY: Gravity_stor_res, Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, &
      &    Gw2sm_grav, Gvr_hru_pct_adjusted
+      USE PRMS_SOILZONE_AG, ONLY: Ag_gvr2sm
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MAX, DBLE, SNGL
       EXTERNAL :: check_gvr_sm, compute_interflow
 ! Arguments
-      INTEGER, INTENT(IN) :: Ihru, Compute_lateral
+      INTEGER, INTENT(IN) :: Ihru, Compute_lateral, Ag_on_flag
       REAL, INTENT(IN) :: Slowcoef_lin, Slowcoef_sq, Ssr2gw_rate, Ssr2gw_exp
       REAL, INTENT(IN) :: Pref_flow_thrsh, Soil_to_gw, Gvr_maxin
-      REAL, INTENT(INOUT) :: Capacity
+      REAL, INTENT(INOUT) :: Capacity, Ag_capacity
       REAL, INTENT(OUT) :: Ssr_to_gw, Slow_stor, Slow_flow, Gvr2pfr, Gvr2sm
       DOUBLE PRECISION, INTENT(OUT) :: Gwin
 ! Local Variables
@@ -1759,7 +1764,10 @@
         Gwin = Gwin + DBLE( Gw2sm_grav(igvr) )*frac
         input = Gvr_maxin + Gw2sm_grav(igvr)
         depth = Gravity_stor_res(igvr) + input
-        IF ( depth>0.0 .AND. Capacity>0.0 ) CALL check_gvr_sm(Capacity, depth, frac, Gvr2sm, input)
+        IF ( depth>0.0 ) THEN
+          IF ( Capacity>0.0 ) CALL check_gvr_sm(Capacity, depth, frac, Gvr2sm, input)
+          IF ( Ag_on_flag==ACTIVE .AND. Ag_capacity>0.0 ) CALL check_gvr_sm(Ag_capacity, depth, frac, Ag_gvr2sm(igvr), input)
+        ENDIF
 
         IF ( Compute_lateral==ACTIVE ) THEN
           extra_water = MAX( 0.0, depth-Pref_flow_thrsh )
