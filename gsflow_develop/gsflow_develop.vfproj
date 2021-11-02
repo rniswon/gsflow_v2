@@ -62,8 +62,10 @@
 		<File RelativePath="..\GSFLOW\src\prms\frost_date.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\glacr_melt.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_budget.f90"/>
+		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_fortran.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_mf2prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_modflow.f"/>
+		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_module.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms2mf.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_sum.f90"/>
@@ -112,6 +114,7 @@
 		<File RelativePath="..\GSFLOW\src\modflow\mach_mod.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\map_results.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\mhc7.f"/>
+		<File RelativePath="..\GSFLOW\src\prms\mmf_utils.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\modules.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\muskingum.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\muskingum_lake.f90"/>
@@ -146,13 +149,18 @@
 		<File RelativePath="..\GSFLOW\src\prms\prms_constants.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_summary.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_time.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\read_control_file.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\read_data_file.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\read_parameter_file.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\routing.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\setup_param.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\sip7_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\snowcomp.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\soilzone.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\soilzone_ag.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\soltab.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\srunoff.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\statvar_out.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\stream_temp.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\strmflow.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\strmflow_in_out.f90"/>
