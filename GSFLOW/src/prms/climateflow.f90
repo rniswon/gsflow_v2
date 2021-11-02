@@ -669,9 +669,10 @@
      &     'Flag to indicate the units of measured air-temperature values (0=Fahrenheit; 1=Celsius)', &
      &     'none')/=0 ) CALL read_error(1, 'temp_units')
 
-      IF ( Temp_flag<ide_dist_module .OR. Model==DOCUMENTATION ) THEN
+      IF ( Temp_flag==temp_1sta_module .OR. Temp_flag==temp_sta_module .OR. Temp_flag==temp_laps_module &
+     &     .OR. Temp_flag==temp_dist2_module .OR. Model==DOCUMENTATION ) THEN
         IF ( declparam(Temp_module, 'basin_tsta', 'one', 'integer', &
-     &       '0', 'bounded', 'ntemp', &
+     &       '1', 'bounded', 'ntemp', &
      &       'Index of main temperature station', &
      &       'Index of temperature station used to compute basin temperature values', &
      &       'none')/=0 ) CALL read_error(1, 'basin_tsta')
@@ -942,7 +943,8 @@
 
       IF ( getparam_int(Temp_module, 'temp_units', 1, Temp_units)/=0 ) CALL read_error(2, 'temp_units')
 
-      IF ( Temp_flag<ide_dist_module ) THEN
+      IF ( Temp_flag==temp_1sta_module .OR. Temp_flag==temp_sta_module .OR. Temp_flag==temp_laps_module .OR. &
+     &     Temp_flag==temp_dist2_module ) THEN
         IF ( getparam_int(Temp_module, 'basin_tsta', 1, Basin_tsta)/=0 ) CALL read_error(2, 'basin_tsta')
         CALL checkdim_param_limits(1, 'basin_tsta', 'ntemp', Basin_tsta, 1, Ntemp, Inputerror_flag)
       ELSE
