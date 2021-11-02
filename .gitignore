@@ -3,5 +3,6 @@ GSFLOW/bin/gsflow.exe
 *.o
 *.a
 *.bak
+*.obj
 create_Ag_input/create_Ag_input.sln
 create_Ag_input/create_Ag_input/create_Ag_input.u2d
