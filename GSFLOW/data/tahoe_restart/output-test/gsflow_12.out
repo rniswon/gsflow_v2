@@ -17,25 +17,25 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        5082965.38     EVAPOTRANSPIRATION =         581131.01
+   EVAPOTRANSPIRATION =        5082933.99     EVAPOTRANSPIRATION =         581217.00
            STREAMFLOW =        2.1368D+07             STREAMFLOW =        3181969.25
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
    INFLOWS - OUTFLOWS =        1.7385D+08     INFLOWS - OUTFLOWS =        5.7621D+07
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        1.7356D+08         STORAGE CHANGE =        5.7580D+07
+ TOTAL STORAGE CHANGE =        1.7368D+08         STORAGE CHANGE =        5.7586D+07
        --------------                             --------------
          LAND SURFACE =        1.3829D+08           LAND SURFACE =        4.4149D+07
-            SOIL ZONE =        3947948.04              SOIL ZONE =         604872.05
-     UNSATURATED ZONE =         844846.26       UNSATURATED ZONE =         130119.54
-       SATURATED ZONE =       -1640322.35         SATURATED ZONE =        -102651.74
-                LAKES =        3.2119D+07                  LAKES =        1.2798D+07
+            SOIL ZONE =        3948879.44              SOIL ZONE =         604938.81
+     UNSATURATED ZONE =         835459.04       UNSATURATED ZONE =         131705.03
+       SATURATED ZONE =       -1617847.70         SATURATED ZONE =        -111462.88
+                LAKES =        3.2219D+07                  LAKES =        1.2811D+07
 
- OVERALL BUDGET ERROR =         290501.96           BUDGET ERROR =          40963.61
+ OVERALL BUDGET ERROR =         176676.07           BUDGET ERROR =          34913.55
 
 
-  PERCENT DISCREPANCY =              0.15    PERCENT DISCREPANCY =              0.07
+  PERCENT DISCREPANCY =              0.09    PERCENT DISCREPANCY =              0.06
 
 
 
