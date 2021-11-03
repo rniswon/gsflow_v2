@@ -125,9 +125,9 @@
       USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Soilzone_aet_flag, PRMS_land_iteration_flag, &
      &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, irrigated_area_module, AET_module, PET_ag_module, &
      &    selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, Agriculture_soilzone_flag, &
-     &    Agriculture_soil_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
+     &    Agriculture_canopy_flag, Agriculture_dprst_flag, &
      &    Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use, &
-     &    mappingFileName, xyFileName
+     &    mappingFileName, xyFileName, Iter_aet_flag
       USE PRMS_CLIMATE_HRU, ONLY: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, Albedo_day, Cloud_cover_day, &
      &    Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
       USE PRMS_DYNAMIC_PARAM_READ, ONLY: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
@@ -136,7 +136,7 @@
      &    soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, &
      &    fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, &
      &    covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn, &
-     &    ag_soilmoist_dynamic, ag_soilrechr_dynamic !, snareathresh_dynamic
+     &    ag_soilmoist_dynamic, ag_soilrechr_dynamic, ag_frac_dynamic !, snareathresh_dynamic
       USE PRMS_CONTROL_FILE
       IMPLICIT NONE
       ! Local Variables
@@ -362,23 +362,23 @@
       Control_parameter_data(i)%name = 'soilzone_aet_flag'
       Soilzone_aet_flag = OFF
       i = i + 1
+      Control_parameter_data(i)%name = 'iter_aet_flag'
+      Iter_aet_flag = OFF
+      i = i + 1
       Control_parameter_data(i)%name = 'albedo_cbh_flag'
       Albedo_cbh_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'cloud_cover_cbh_flag'
       Cloud_cover_cbh_flag = OFF
       i = i + 1
-      Control_parameter_data(i)%name = 'agriculture_soil_flag'
-      Agriculture_soil_flag = OFF
+      Control_parameter_data(i)%name = 'agriculture_soilzone_flag'
+      Agriculture_soilzone_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'agriculture_canopy_flag'
       Agriculture_canopy_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'agriculture_dprst_flag'
       Agriculture_dprst_flag = OFF
-      i = i + 1
-      Control_parameter_data(i)%name = 'agriculture_soilzone_flag'
-      Agriculture_soilzone_flag = OFF
       i = i + 1
       Control_parameter_data(i)%name = 'dyn_ag_frac_flag'
       Dyn_ag_frac_flag = OFF
@@ -789,6 +789,11 @@
       Control_parameter_data(i)%name = 'gsflow_output_file'
       Gsflow_output_file = 'gsflow.out'
       Control_parameter_data(i)%values_character(1) = Gsflow_output_file
+      Control_parameter_data(i)%data_type = CHAR_TYPE
+      i = i + 1
+      Control_parameter_data(i)%name = 'ag_frac_dynamic'
+      Dprst_depth_dynamic = 'dynag_frac'
+      Control_parameter_data(i)%values_character(1) = ag_frac_dynamic
       Control_parameter_data(i)%data_type = CHAR_TYPE
       i = i + 1
       Control_parameter_data(i)%name = 'dprst_depth_dynamic'

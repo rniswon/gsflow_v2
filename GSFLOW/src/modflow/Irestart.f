@@ -399,7 +399,8 @@ C
 C1------SET LOCAT TO NEGATIVE UNIT NUMBER FOR UNFORMATTED FILE
        LOCAT = -IN
 C2------SET FMTIN to read binary
-       FMTIN = 'BINARY'
+!       FMTIN = FORM
+       FMTIN = 'UNFORMATTED'
        CNSTNT = 1.0
 C
 C4------TEST LOCAT TO SEE HOW TO DEFINE ARRAY VALUES.
@@ -431,11 +432,11 @@ C4B-----LOCAT>0; READ FORMATTED RECORDS USING FORMAT FMTIN.
      1      1X,'READING ON UNIT ',I4,' WITH FORMAT: ',A)
         END IF
         DO 100 I=1,II
-        IF(FMTIN.EQ.'(FREE)') THEN
-           READ(LOCAT,*) (A(J,I),J=1,JJ)
-        ELSE
+!        IF(FMTIN.EQ.'(FREE)') THEN
+!           READ(LOCAT,*) (A(J,I),J=1,JJ)
+!        ELSE
            READ(LOCAT,FMTIN) (A(J,I),J=1,JJ)
-        END IF
+!        END IF
   100   CONTINUE
       ELSE
 C
@@ -478,7 +479,7 @@ C     ------------------------------------------------------------------
       USE GSFMODFLOW, ONLY: KKPER, KKSTP
 C
       INTEGER, INTENT(IN) :: IHEDFM
-      INTEGER K, IFIRST, KK, IHEDUN
+      INTEGER K, I, J, IFIRST, KK, IHEDUN !, KL
       CHARACTER*16 TEXT
       DATA TEXT /'            HEAD'/
 C     ------------------------------------------------------------------
@@ -493,12 +494,13 @@ C2------IS HEAD NEEDED FOR THIS LAYER?
 !      IF(IOFLG(KL,1).EQ.0 .AND. IOFLG(KL,3).EQ.0) GO TO 59  !RGN
 C
 C3------MOVE HNEW TO BUFF FOR THE LAYER.
-!      DO 58 I=1,NROW
-!      DO 58 J=1,NCOL
-!      BUFF(J,I,K)=SNGL( HNEW(J,I,K) )
-!   58 CONTINUE
-!   59 CONTINUE
-       BUFF = SNGL( HNEW )
+       DO 59 K=1,NLAY
+       DO 58 I=1,NROW
+       DO 58 J=1,NCOL
+      BUFF(J,I,K)=SNGL( HNEW(J,I,K) )
+   58 CONTINUE
+   59 CONTINUE
+!       BUFF = SNGL( HNEW )
 C
 C4------FOR EACH LAYER: DETERMINE IF HEAD SHOULD BE PRINTED.
 C4------IF SO THEN CALL ULAPRS OR ULAPRW TO PRINT HEAD.

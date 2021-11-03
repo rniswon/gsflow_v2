@@ -920,6 +920,8 @@
       ENDIF
 
 ! Ag soil parameters
+      check_ag_sm_max_flag = OFF
+      check_ag_srechr_max_flag = OFF
       IF ( Ag_soilrechr_flag==ACTIVE ) THEN
         IF ( Ag_soil_rechr_next_mo/=0 ) THEN
           IF ( Ag_soil_rechr_next_yr==Nowyear .AND. Ag_soil_rechr_next_mo==Nowmonth .AND. Ag_soil_rechr_next_day==Nowday ) THEN

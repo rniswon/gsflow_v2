@@ -115,7 +115,7 @@
       IF ( Cbh_binary_flag==0 ) THEN
         OPEN ( Iunit, FILE=trim(Fname), STATUS='OLD', IOSTAT=ios )
       ELSE
-        OPEN ( Iunit, FILE=trim(Fname), STATUS='OLD', FORM='UNFORMATTED', IOSTAT=ios )
+        OPEN ( Iunit, FILE=trim(Fname), STATUS='OLD', FORM='UNFORMATTED', IOSTAT=ios, ACCESS='STREAM' )
       ENDIF
       IF ( ios/=0 ) THEN
         IF ( Iret==2 ) THEN ! this signals climate_hru to ignore the Humidity CBH file, could add other files
@@ -760,9 +760,7 @@
       IF ( Ftype==0 ) THEN
         OPEN ( Iunit, FILE=Fname(:nchars), STATUS='OLD', IOSTAT=ios )
       ELSE
-        !USE UNFORMATTED for UNIX
-        !OPEN ( Iunit, FILE=Fname(:nchars), STATUS='OLD', FORM='UNFORMATTED', IOSTAT=ios ) ! for linux
-        OPEN ( Iunit, FILE=Fname(:nchars), STATUS='OLD', FORM='BINARY', IOSTAT=ios ) ! for windows
+        OPEN ( Iunit, FILE=Fname(:nchars), STATUS='OLD', FORM='UNFORMATTED', IOSTAT=ios, ACCESS='STREAM' )
       ENDIF
       IF ( ios/=0 ) THEN
         WRITE ( *, '(/,2A,/,A,/,2A,/)' ) 'ERROR opening input file: ', Fname(:nchars), &
@@ -793,9 +791,7 @@
       IF ( Ftype==0 ) THEN
         OPEN ( Iunit, FILE=Fname(:nchars), STATUS='REPLACE', IOSTAT=ios )
       ELSE
-        !USE UNFORMATTED for UNIX
-        !OPEN ( Iunit, FILE=Fname(:nchars), STATUS='REPLACE', IOSTAT=ios, FORM='UNFORMATTED' ) ! for linux
-        OPEN ( Iunit, FILE=Fname(:nchars), STATUS='REPLACE', IOSTAT=ios, FORM='BINARY' ) ! for windows
+        OPEN ( Iunit, FILE=Fname(:nchars), STATUS='REPLACE', IOSTAT=ios, FORM='UNFORMATTED', ACCESS='STREAM' )
       ENDIF
 
       IF ( ios/=0 ) THEN

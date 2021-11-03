@@ -227,6 +227,10 @@
             STOP ERROR_modflow
           ENDIF
         ENDIF
+        Agriculture_flag = Agriculture_soilzone_flag + Agriculture_canopy_flag + Agriculture_dprst_flag
+        IF ( Agriculture_flag>OFF .AND. Ag_package==OFF ) CALL error_stop( &
+     &       'agriculture_soilzone_flag, agriculture_canopy_flag, and/or agriculture_dprst_flag = 1 without AG Package active', &
+     &       ERROR_control)
 
         nc = numchars(Model_control_file)
         IF ( Print_debug>DEBUG_less ) PRINT 9004, 'Using Control File: ', Model_control_file(:nc)
@@ -972,6 +976,7 @@
 
       IF ( control_integer(Snarea_curve_flag, 'snarea_curve_flag')/=0 ) Snarea_curve_flag = OFF
       IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
+      IF ( control_integer(Iter_aet_flag, 'iter_aet_flag')/=0 ) Iter_aet_flag = OFF
       IF ( control_integer(snow_cloudcover_flag, 'snow_cloudcover_flag')/=0 ) snow_cloudcover_flag = OFF
 
       IF ( control_integer(Humidity_cbh_flag, 'humidity_cbh_flag')/=0 ) Humidity_cbh_flag = OFF
@@ -1055,17 +1060,18 @@
       IF ( control_integer(Dprst_transfer_water_use, 'dprst_transfer_water_use')/=0 ) Dprst_transfer_water_use = OFF
       IF ( control_integer(Dprst_add_water_use, 'dprst_add_water_use')/=0 ) Dprst_add_water_use = OFF
       IF ( control_integer(PRMS_land_iteration_flag, 'PRMS_land_iteration_flag')/=0 ) PRMS_land_iteration_flag = OFF
-      IF ( PRMS_only==ACTIVE ) PRMS_land_iteration_flag = OFF ! srunoff in iteration loop, 2 = land modules in iteration loop
+      IF ( PRMS_only==ACTIVE ) PRMS_land_iteration_flag = OFF ! 1 = srunoff in iteration loop, 2 = land modules in iteration loop
 
       ! 0 = off, 1 = apply irrigation in soilzone, 2 = apply irrigation to canopy
       ! these are for GSFLOW5 with AG package ACTIVE
-      IF ( control_integer(Agriculture_soil_flag, 'agriculture_soil_flag')/=0 ) Agriculture_soil_flag = OFF
+      IF ( control_integer(Agriculture_soilzone_flag, 'agriculture_soilzone_flag')/=0 ) Agriculture_Soilzone_flag = OFF
       IF ( control_integer(Agriculture_canopy_flag, 'agriculture_canopy_flag')/=0 ) Agriculture_canopy_flag = OFF
+      IF ( Agriculture_soilzone_flag==ACTIVE .AND. Agriculture_canopy_flag==ACTIVE ) &
+     &     CALL error_stop('agriculture_soilzone_flag and agriculture_canopy_flag = 1, only one can be active', ERROR_control)
+
       IF ( control_integer(Agriculture_dprst_flag, 'agriculture_dprst_flag')/=0 ) Agriculture_dprst_flag = OFF
-      IF ( control_integer(Agriculture_soilzone_flag, 'agriculture_soilzone_flag')/=0 ) Agriculture_soilzone_flag = OFF
       IF ( Dprst_flag==OFF .AND. Agriculture_dprst_flag==ACTIVE ) &
      &     CALL error_stop('agriculture_dprst_flag = 1, but dprst_flag = 0', ERROR_control)
-      Agriculture_flag = Agriculture_soil_flag + Agriculture_canopy_flag + Agriculture_dprst_flag
 
       ! 0 = off, 1 = on, 2 = lauren version
       IF ( control_integer(CsvON_OFF, 'csvON_OFF')/=0 ) CsvON_OFF = OFF

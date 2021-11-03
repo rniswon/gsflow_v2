@@ -2408,7 +2408,7 @@
       DO L = 1, NWELLS
          IR = INT( WELL(2, L) )
          IC = INT( WELL(3, L) )
-         IL = INT( WELL(1, L ) )
+         IL = INT( WELL(1, L) )
          Q = WELL(4, L)
          IF (NUMIRRDIVERSIONSP + NUMIRRWELSP == 0) Q = 0.0
          QQ=Q
