@@ -19,21 +19,21 @@
                                     OUT                                        OUT
                                     ---                                        ---
    EVAPOTRANSPIRATION =         277260.53     EVAPOTRANSPIRATION =          36854.99
-           STREAMFLOW =          35003.61             STREAMFLOW =           4789.00
+           STREAMFLOW =          35003.62             STREAMFLOW =           4789.00
      GW BOUNDARY FLOW =           5022.11       GW BOUNDARY FLOW =            717.51
                 WELLS =           6190.10                  WELLS =            877.03
 
    INFLOWS - OUTFLOWS =         -35224.28     INFLOWS - OUTFLOWS =         -43215.69
              --------                                   --------
 
- TOTAL STORAGE CHANGE =         -35205.83         STORAGE CHANGE =         -43213.23
+ TOTAL STORAGE CHANGE =         -35205.82         STORAGE CHANGE =         -43213.23
        --------------                             --------------
          LAND SURFACE =         -46670.17           LAND SURFACE =          -2455.80
-            SOIL ZONE =         115362.38              SOIL ZONE =         -25898.33
-     UNSATURATED ZONE =         -39292.91       UNSATURATED ZONE =          -5387.71
-       SATURATED ZONE =         -64605.12         SATURATED ZONE =          -9471.39
+            SOIL ZONE =         115362.38              SOIL ZONE =         -25898.32
+     UNSATURATED ZONE =         -39292.93       UNSATURATED ZONE =          -5387.71
+       SATURATED ZONE =         -64605.11         SATURATED ZONE =          -9471.39
 
- OVERALL BUDGET ERROR =            -18.45           BUDGET ERROR =             -2.46
+ OVERALL BUDGET ERROR =            -18.46           BUDGET ERROR =             -2.46
 
 
   PERCENT DISCREPANCY =             -0.01    PERCENT DISCREPANCY =             -0.01

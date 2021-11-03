@@ -23,17 +23,17 @@
      GW BOUNDARY FLOW =           5065.29       GW BOUNDARY FLOW =            723.51
                 WELLS =           4392.13                  WELLS =            933.66
 
-   INFLOWS - OUTFLOWS =        4947034.62     INFLOWS - OUTFLOWS =        1522535.01
+   INFLOWS - OUTFLOWS =        4947034.62     INFLOWS - OUTFLOWS =        1522535.02
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        4947048.66         STORAGE CHANGE =        1522536.80
+ TOTAL STORAGE CHANGE =        4947048.63         STORAGE CHANGE =        1522536.80
        --------------                             --------------
-         LAND SURFACE =        4987854.28           LAND SURFACE =        1524162.66
-            SOIL ZONE =         -32519.21              SOIL ZONE =           -434.32
+         LAND SURFACE =        4987854.26           LAND SURFACE =        1524162.66
+            SOIL ZONE =         -32519.22              SOIL ZONE =           -434.32
      UNSATURATED ZONE =          46432.05       UNSATURATED ZONE =           6862.98
        SATURATED ZONE =         -54718.46         SATURATED ZONE =          -8054.52
 
- OVERALL BUDGET ERROR =            -14.04           BUDGET ERROR =             -1.79
+ OVERALL BUDGET ERROR =            -14.01           BUDGET ERROR =             -1.78
 
 
   PERCENT DISCREPANCY =             -0.00    PERCENT DISCREPANCY =             -0.00
