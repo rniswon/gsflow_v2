@@ -29,7 +29,7 @@
 !   GSFLOW variables
       INTEGER, SAVE, ALLOCATABLE :: Hru_gvr_count(:), Hru_gvr_index(:, :), Hrucheck(:)
       REAL, SAVE, ALLOCATABLE :: Replenish_frac(:)
-      REAL, SAVE :: It0_basin_soil_moist, It0_basin_ssstor
+      DOUBLE PRECISION, SAVE :: It0_basin_soil_moist, It0_basin_ssstor
       REAL, SAVE, ALLOCATABLE :: It0_soil_rechr(:), It0_soil_moist(:)
       REAL, SAVE, ALLOCATABLE :: It0_pref_flow_stor(:), It0_ssres_stor(:)
       REAL, SAVE, ALLOCATABLE :: It0_gravity_stor_res(:), It0_sroff(:)
@@ -74,7 +74,7 @@
       REAL, SAVE, ALLOCATABLE :: Gravity_stor_res(:), Gvr2sm(:), Grav_gwin(:)
 !   Declared Parameters
       INTEGER, SAVE, ALLOCATABLE :: Soil_type(:), Gvr_hru_id(:)
-      REAL, SAVE, ALLOCATABLE :: Pref_flow_den(:)
+      REAL, SAVE, ALLOCATABLE :: Pref_flow_den(:), Pref_flow_infil_frac(:)
       REAL, SAVE, ALLOCATABLE :: Fastcoef_lin(:), Fastcoef_sq(:)
       REAL, SAVE, ALLOCATABLE :: Slowcoef_lin(:), Slowcoef_sq(:)
       REAL, SAVE, ALLOCATABLE :: Ssr2gw_rate(:), Ssr2gw_exp(:)
@@ -124,7 +124,7 @@
       USE PRMS_SOILZONE
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, declvar, getdim, control_integer
+      INTEGER, EXTERNAL :: declparam, declvar, getdim
       EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop
 !***********************************************************************
       szdecl = 0
@@ -543,6 +543,13 @@
      &     'Fraction of the gravity reservoir in which preferential flow occurs for each HRU', &
      &     'decimal fraction')/=0 ) CALL read_error(1,'pref_flow_den')
 
+      ALLOCATE ( Pref_flow_infil_frac(Nhru) )
+      IF ( declparam(MODNAME, 'pref_flow_infil_frac', 'nhru', 'real', &
+     &     '-1.0', '-1.0', '1.0', &
+     &     'Fraction of the soilwater infiltration to the preferential flow occurs for each HRU', &
+     &     'Fraction of the soilwater infiltration to the preferential flow occurs for each HRU', &
+     &     'decimal fraction')/=0 ) CALL read_error(1,'pref_flow_infil_frac')
+
       ALLOCATE ( Soil2gw_max(Nhru) )
       IF ( declparam(MODNAME, 'soil2gw_max', 'nhru', 'real', &
      &     '0.0', '0.0', '5.0', &
@@ -622,6 +629,9 @@
       IF ( getparam(MODNAME, 'slowcoef_lin', Nhru, 'real', Slowcoef_lin)/=0 ) CALL read_error(2, 'slowcoef_lin')
       IF ( getparam(MODNAME, 'slowcoef_sq', Nhru, 'real', Slowcoef_sq)/=0 ) CALL read_error(2, 'slowcoef_sq')
       IF ( getparam(MODNAME, 'pref_flow_den', Nhru, 'real', Pref_flow_den)/=0 ) CALL read_error(2, 'pref_flow_den')
+      IF ( getparam(MODNAME, 'pref_flow_infil_frac', 'real', Nhru, Pref_flow_infil_frac)/=0 ) &
+     &     CALL read_error(2, 'pref_flow_infil_frac')
+      IF ( Pref_flow_infil_frac(1)<0.0 ) Pref_flow_infil_frac = Pref_flow_den ! should pref_flow_infil_frac be set to 0 if pref_flow_den = 0 ???
       IF ( getparam(MODNAME, 'fastcoef_lin', Nhru, 'real', Fastcoef_lin)/=0 ) CALL read_error(2, 'fastcoef_lin')
       IF ( getparam(MODNAME, 'fastcoef_sq', Nhru, 'real', Fastcoef_sq)/=0 ) CALL read_error(2, 'fastcoef_sq')
       IF ( getparam(MODNAME, 'ssr2gw_rate', Nssr, 'real', Ssr2gw_rate)/=0 ) CALL read_error(2, 'ssr2gw_rate')
@@ -670,8 +680,11 @@
 
       DO i = 1, Nhru
 
-! WARNING changing parameter value as invalid for these HRU types, need to be 0 for computations below
-        IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE .OR. Hru_type(i)==SWALE) Pref_flow_den(i) = 0.0
+! WARNING changing parameter values as invalid for these HRU types, need to be 0 for computations below
+        IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE .OR. Hru_type(i)==SWALE) THEN
+          Pref_flow_den(i) = 0.0
+          Pref_flow_infil_frac(i) = 0.0
+        ENDIF
 
         IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE ) THEN
           Sat_threshold(i) = 0.0 ! allow modification of parameter value for lake and inactive HRUs
@@ -1052,12 +1065,12 @@
 ! ??? should cascading flow go to preferential flow fraction ???
         prefflow = 0.0
         dunnianflw_pfr = 0.0
-        IF ( Pref_flow_den(i)>0.0 ) THEN
+        IF ( Pref_flow_infil_frac(i)>0.0 ) THEN
           pref_flow_maxin = 0.0
           Pref_flow_infil(i) = 0.0
           IF ( capwater_maxin>0.0 ) THEN
             ! pref_flow for whole HRU
-            pref_flow_maxin = capwater_maxin*Pref_flow_den(i)
+            pref_flow_maxin = capwater_maxin*Pref_flow_infil_frac(i)
             capwater_maxin = capwater_maxin - pref_flow_maxin
             pref_flow_maxin = pref_flow_maxin*perv_frac
             IF ( cfgi_frozen_hru==ACTIVE ) THEN
