@@ -152,7 +152,7 @@ Temp & Precip Distribution      xyz_dist            2021-09-07
 Solar Radiation Distribution    ccsolrad            2021-09-07
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-09-07
-Canopy Interception             intcp               2021-10-22
+Canopy Interception             intcp               2021-11-03
 Snow Dynamics                   snowcomp            2021-09-15
 Glacier Dynamics                glacr_melt          2021-08-13
 Surface Runoff                  srunoff_smidx       2021-10-11
@@ -252,5 +252,5 @@ Fraction impervious:        0.0473    Fraction pervious:       0.9527
  *************************************************************
  Total for run     727.176  237.804-1152.344 1628.805 -316.118
  *************************************************************
-Execution elapsed time    0 minutes  6.67 seconds
+Execution elapsed time    0 minutes  5.87 seconds
 

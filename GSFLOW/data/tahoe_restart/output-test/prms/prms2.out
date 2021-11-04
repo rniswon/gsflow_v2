@@ -188,7 +188,7 @@ Precipitation Distribution      precip_1sta         2021-09-07
 Solar Radiation Distribution    ddsolrad            2021-09-07
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-09-07
-Canopy Interception             intcp               2021-10-22
+Canopy Interception             intcp               2021-11-03
 Snow Dynamics                   snowcomp            2021-09-15
 Surface Runoff                  srunoff_smidx       2021-10-11
 Soilzone Computations           soilzone            2021-10-21
@@ -217,5 +217,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time    0 minutes  8.36 seconds
+Execution elapsed time    0 minutes  9.00 seconds
 

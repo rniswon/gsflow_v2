@@ -105,7 +105,7 @@ Precipitation Distribution      precip_1sta         2021-09-07
 Solar Radiation Distribution    ddsolrad            2021-09-07
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-09-07
-Canopy Interception             intcp               2021-10-22
+Canopy Interception             intcp               2021-11-03
 Snow Dynamics                   snowcomp            2021-09-15
 Surface Runoff                  srunoff_smidx       2021-10-11
 Soilzone Computations           soilzone            2021-10-21
@@ -156,5 +156,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  *************************************************************
  Total for run     668.938  378.199    9.262  284.576  260.348
  *************************************************************
-Execution elapsed time    0 minutes  1.08 seconds
+Execution elapsed time    0 minutes  1.11 seconds
 

@@ -78,7 +78,7 @@ Precipitation Distribution      climate_hru         2021-10-22
 Solar Radiation Distribution    climate_hru         2021-10-22
 Potential Evapotranspiration    climate_hru         2021-10-22
 Transpiration Distribution      transp_tindex       2021-09-07
-Canopy Interception             intcp               2021-10-22
+Canopy Interception             intcp               2021-11-03
 Snow Dynamics                   snowcomp            2021-09-15
 Surface Runoff                  srunoff_smidx       2021-10-11
 Soilzone Computations           soilzone            2021-10-21
@@ -105,5 +105,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time   16 minutes 10.14 seconds
+Execution elapsed time   15 minutes 42.11 seconds
 
