@@ -66,7 +66,7 @@
 !***********************************************************************
       INTEGER FUNCTION intdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, MONTHS_PER_YEAR
-      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, PRMS_land_iteration_flag, AG_flag
+      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, PRMS_land_iteration_flag, AG_flag, GSFLOW_flag
       USE PRMS_INTCP
       IMPLICIT NONE
 ! Functions
@@ -85,7 +85,9 @@
 ! NEW VARIABLES and PARAMETERS for APPLICATION RATES
       ALLOCATE ( Net_apply(Nhru) )
       Use_transfer_intcp = OFF
-      IF ( Water_use_flag==ACTIVE .OR. AG_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+      IF ( Water_use_flag==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        ! always declare for GSFLOW as may be needed if the AG Package is active
+        ! don't know if AG Package is active during declare, set during init
         IF ( Water_use_flag==ACTIVE ) Use_transfer_intcp = ACTIVE
         ALLOCATE ( Gain_inches(Nhru) )
         CALL declvar_real(MODNAME, 'gain_inches', 'nhru', Nhru, &
@@ -227,7 +229,8 @@
 !***********************************************************************
       INTEGER FUNCTION intinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, MONTHS_PER_YEAR
-      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug, Agriculture_soilzone_flag, Ag_package
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug, Agriculture_soilzone_flag, &
+     &    Ag_package, AG_flag, GSFLOW_flag
       USE PRMS_INTCP
       USE PRMS_CLIMATEVARS, ONLY: Transp_on
       IMPLICIT NONE
@@ -241,10 +244,12 @@
       IF ( getparam_real(MODNAME, 'wrain_intcp', Nhru*MONTHS_PER_YEAR, Wrain_intcp)/=0 ) CALL read_error(2, 'wrain_intcp')
       IF ( getparam_real(MODNAME, 'srain_intcp', Nhru*MONTHS_PER_YEAR, Srain_intcp)/=0 ) CALL read_error(2, 'srain_intcp')
 
-      IF ( Use_transfer_intcp==ACTIVE ) THEN
+      IF ( Use_transfer_intcp==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE ) THEN
         IF ( getparam_int(MODNAME, 'irr_type', Nhru, Irr_type)/=0 ) CALL read_error(1, 'irr_type')
         Gain_inches = 0.0
         Gain_inches_hru = 0.0
+      ELSE
+        Irr_type = 0
       ENDIF
       Net_apply = 0.0
 
@@ -486,7 +491,7 @@
 ! irr_type = 0 or 3 are the same in terms of application rate
 ! gain_inches_hru is water applied to whole HRU, gain_inches is water added to canopy
 
-        IF ( Use_transfer_intcp==ACTIVE .OR. Ag_package==ACTIVE ) THEN ! Ag_package active for GSFLOW_AG or PRMS_AG
+        IF ( Use_transfer_intcp==ACTIVE .OR. Canopy_irrigation_flag==ACTIVE ) THEN ! Ag_package active for GSFLOW_AG or PRMS_AG
           IF ( Ag_package==ACTIVE ) THEN
             IF ( Hru_ag_irr(i)>0.0 .AND. AG_flag==ACTIVE ) THEN
               IF ( .NOT.(Ag_frac(i)>0.0) ) THEN

@@ -635,7 +635,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ACTIVE ) THEN
-              IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+              IF ( PRMS_land_iteration_flag==1 ) THEN
                 retval = intcp()
                 IF ( retval/=0 ) THEN
                   PRINT 9001, 'intcp', retval
@@ -653,6 +653,8 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                     RETURN
                   ENDIF
                 ENDIF
+              ENDIF
+              IF ( PRMS_land_iteration_flag>0 ) THEN
                 retval = srunoff()
                 IF ( retval/=0 ) THEN
                   PRINT 9001, 'srunoff', retval
