@@ -5,6 +5,11 @@ gwr_swale_flag
 1
 1
 ####
+cascadegw_flag
+1
+1
+2
+####
 model_mode
 1
 4
@@ -127,7 +132,7 @@ srunoff_smidx
 strmflow_module
 1
 4
-muskingum_lake
+strmflow
 ####
 init_vars_from_file
 1
@@ -253,7 +258,7 @@ basinOutBaseFileName
 nsegmentOutON_OFF
 1
 1
-1
+0
 ####
 nsegmentOutVars
 1
