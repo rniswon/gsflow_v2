@@ -229,7 +229,8 @@
 !***********************************************************************
       INTEGER FUNCTION intinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, MONTHS_PER_YEAR
-      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug, Agriculture_soilzone_flag, Ag_package
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug, Agriculture_soilzone_flag, &
+     &    Ag_package, AG_flag, GSFLOW_flag
       USE PRMS_INTCP
       USE PRMS_CLIMATEVARS, ONLY: Transp_on
       IMPLICIT NONE
@@ -243,10 +244,12 @@
       IF ( getparam_real(MODNAME, 'wrain_intcp', Nhru*MONTHS_PER_YEAR, Wrain_intcp)/=0 ) CALL read_error(2, 'wrain_intcp')
       IF ( getparam_real(MODNAME, 'srain_intcp', Nhru*MONTHS_PER_YEAR, Srain_intcp)/=0 ) CALL read_error(2, 'srain_intcp')
 
-      IF ( Use_transfer_intcp==ACTIVE ) THEN
+      IF ( Use_transfer_intcp==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE ) THEN
         IF ( getparam_int(MODNAME, 'irr_type', Nhru, Irr_type)/=0 ) CALL read_error(1, 'irr_type')
         Gain_inches = 0.0
         Gain_inches_hru = 0.0
+      ELSE
+        Irr_type = 0
       ENDIF
       Net_apply = 0.0
 

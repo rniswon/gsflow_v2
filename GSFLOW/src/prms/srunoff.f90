@@ -657,7 +657,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL, DBLE
-      EXTERNAL :: imperv_et, compute_infil, run_cascade_sroff, dprst_comp, perv_comp, ag_comp
+      EXTERNAL :: imperv_et, compute_infil, run_cascade_sroff, dprst_comp
 ! Local Variables
       INTEGER :: i, k, dprst_chk, frzen, active_glacier, perv_on, ag_on
       REAL :: srunoff, avail_et, perv_area, availh2o
@@ -1141,7 +1141,11 @@
       IF ( Sroff_flag==smidx_module ) THEN
         ! antecedent soil_moist
         smidx = Soil_moist(Ihru) + (0.5*Ptc)
-        ca_fraction = Smidx_coef(Ihru)*10.0**(Smidx_exp(Ihru)*smidx)
+        IF ( smidx>25.0) THEN
+          ca_fraction = Carea_max(Ihru)
+        ELSE
+          ca_fraction = Smidx_coef(Ihru)*10.0**(Smidx_exp(Ihru)*smidx)
+        ENDIF
       ELSE
         ! antecedent soil_rechr
         ca_fraction = Carea_min(Ihru) + Carea_dif(Ihru)*(Soil_rechr(Ihru)/Soil_rechr_max(Ihru))
@@ -1176,7 +1180,11 @@
       IF ( Sroff_flag==smidx_module ) THEN
         ! antecedent soil_moist
         smidx = Ag_soil_moist(Ihru) + (0.5*Ptc)
-        ca_fraction = Smidx_coef(Ihru)*10.0**(Smidx_exp(Ihru)*smidx)
+        IF ( smidx>25.0) THEN
+          ca_fraction = Carea_max(Ihru)
+        ELSE
+          ca_fraction = Smidx_coef(Ihru)*10.0**(Smidx_exp(Ihru)*smidx)
+        ENDIF
       ELSE
         ! antecedent soil_rechr
         ca_fraction = Carea_min(Ihru) + Carea_dif(Ihru)*(Ag_soil_rechr(Ihru)/Ag_soil_rechr_max(Ihru))
