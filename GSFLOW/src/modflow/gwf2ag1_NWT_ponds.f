@@ -3337,13 +3337,13 @@
      +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
         PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
-        if(i==2)then
+!        if(i==2)then
       !etdif = pettotal - aettotal
-          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
-     +                 PONDSEGFLOW(I),pettotal,aettotal,
-     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
-        endif
-  33  format(4i5,6e20.10)
+!          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
+!     +                 PONDSEGFLOW(I),pettotal,aettotal,
+!     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
+!        endif
+!  33  format(4i5,6e20.10)
 300   continue
       return
       end subroutine demandpond_prms

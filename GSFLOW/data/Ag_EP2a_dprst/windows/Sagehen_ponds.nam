@@ -6,7 +6,7 @@ upw            12    ..\input\modflow\sagehen.UPW
 uzf            14    ..\input\modflow\sagehen.uzf
 sfr            15    ..\input\modflow\sagehen.sfr
 nwt            17    ..\input\modflow\sagehen.nwt
-AG            20    ..\input\modflow\sagehen.ag
+#AG            20    ..\input\modflow\sagehen.ag
 GAGE            21    ..\input\modflow\sagehen.gag
 #
 # TabFiles
