@@ -10846,15 +10846,15 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
  
                                                    Max.-Head-Change                         Max.-Flux-Residual
   Residual-Control   Outer-Iter.   Inner-Iter.     Column Row Layer    Maximum-Head-Change  Column Row Layer    Maximum-Flux-Residual          L2-NORM 
-          0                 1           2            69   42     1      -0.1378219753E+00      69   42    1        -0.1549311656E+03      0.3108111271E+03
-          0                 2           2            75   45     1       0.3598977927E-01      69   42    1         0.1810610222E+02      0.4668429698E+02
-          0                 3           2            15   38     1      -0.7149662040E-02      26   48    1         0.1515891241E+01      0.7693846258E+01
-          0                 4           2            15   38     1       0.6401801093E-02      15   38    1         0.8073769827E+01      0.8348003382E+01
-          0                 5           1            26   48     1       0.3210330890E-03      26   48    1         0.2178582115E+00      0.6720908144E+00
-          0                 6           1            26   48     1       0.1217710319E-03      26   48    1         0.8262587762E-01      0.2175370262E+00
-          0                 7           1            26   48     1       0.4619397802E-04      26   48    1         0.3134171200E-01      0.7370158688E-01
-          0                 8           1            26   48     1       0.1752504420E-04      26   48    1         0.1188972849E-01      0.2570142524E-01
-          0                 9           1            26   48     1       0.6649001998E-05      26   48    1         0.4510767509E-02      0.9202004282E-02
+          0                 1           2            69   42     1      -0.1378219752E+00      69   42    1        -0.1549311656E+03      0.3108110587E+03
+          0                 2           2            75   45     1       0.3598977929E-01      69   42    1         0.1810610222E+02      0.4668425215E+02
+          0                 3           2            15   38     1      -0.7149724569E-02      26   48    1         0.1515891285E+01      0.7693796810E+01
+          0                 4           2            15   38     1       0.6401863286E-02      15   38    1         0.8073848243E+01      0.8348076111E+01
+          0                 5           1            26   48     1       0.3210331010E-03      26   48    1         0.2178582189E+00      0.6720872291E+00
+          0                 6           1            26   48     1       0.1217710354E-03      26   48    1         0.8262588039E-01      0.2175357835E+00
+          0                 7           1            26   48     1       0.4619397902E-04      26   48    1         0.3134171336E-01      0.7370114722E-01
+          0                 8           1            26   48     1       0.1752504570E-04      26   48    1         0.1188972951E-01      0.2570128109E-01
+          0                 9           1            26   48     1       0.6649002498E-05      26   48    1         0.4510767965E-02      0.9201947357E-02
 
     ------------------------------------------------
        NWT REQUIRED            9 OUTER ITERATIONS 
@@ -11120,13 +11120,13 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP  1108 STRESS PERIOD   
           OUT:                                     OUT:
           ----                                     ----
               UZF ET =       0.0000E+00                UZF ET =       0.0000E+00
-        UZF RECHARGE =        6158.9812          UZF RECHARGE =        6158.9812
+        UZF RECHARGE =        6158.9989          UZF RECHARGE =        6158.9989
 
-            IN - OUT =       -5814.3345              IN - OUT =       -5814.3345
+            IN - OUT =       -5814.3522              IN - OUT =       -5814.3522
 
           STORAGE:                                 STORAGE:
           --------                                 --------
-      STORAGE CHANGE =       -5810.8648        STORAGE CHANGE =       -5810.8648
+      STORAGE CHANGE =       -5810.8825        STORAGE CHANGE =       -5810.8825
 
  PERCENT DISCREPANCY IS DIFFERENCE BETWEEN IN-OUT MINUS CHANGE IN STORAGE
  DIVIDED BY THE AVERAGE OF IN AND OUT TIMES 100
@@ -11139,28 +11139,28 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP  1108 STRESS PERIOD   
 
 
  
-  MNW2 WELL: WELL-A               Qnet =   9.842061597653551E-008  < Qdes
+  MNW2 WELL: WELL-A               Qnet =   9.841511254549129E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-B               Qnet =   7.660138570675379E-008  < Qdes
+  MNW2 WELL: WELL-B               Qnet =   7.660312034696304E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-C               Qnet =  -4.932784024441750E-006  < Qdes
+  MNW2 WELL: WELL-C               Qnet =  -4.932775047969407E-006  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-D               Qnet =   1.909242864500671E-008  < Qdes
+  MNW2 WELL: WELL-D               Qnet =   1.910272189736828E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-E               Qnet =   -383.414851951042       < Qdes
+  MNW2 WELL: WELL-E               Qnet =   -383.414852404424       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-F               Qnet =   -391.747323262075       < Qdes
+  MNW2 WELL: WELL-F               Qnet =   -391.747323350202       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-G               Qnet =   -496.283442573543       < Qdes
+  MNW2 WELL: WELL-G               Qnet =   -496.283443251800       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-H               Qnet =  -1.311644801660350E-007  < Qdes
+  MNW2 WELL: WELL-H               Qnet =  -1.310533832565852E-007  < Qdes
    Q  updated because of Hlim constraint
 1
   VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP 1108, STRESS PERIOD   2
@@ -11171,10 +11171,10 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP  1108 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE     =       10698.2998               STORAGE     =       10698.2998
+             STORAGE     =       10698.2812               STORAGE     =       10698.2812
        CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
       STREAM LEAKAGE     =        7081.9302        STREAM LEAKAGE     =        7081.9302
-        UZF RECHARGE     =        6158.9771          UZF RECHARGE     =        6158.9771
+        UZF RECHARGE     =        6158.9966          UZF RECHARGE     =        6158.9966
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
                 MNW2     =          21.3555                  MNW2     =          21.3555
@@ -11183,17 +11183,17 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP  1108 STRESS PERIOD   
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE     =         938.6682               STORAGE     =         938.6682
-       CONSTANT HEAD     =         717.3491         CONSTANT HEAD     =         717.3491
+             STORAGE     =         938.6676               STORAGE     =         938.6676
+       CONSTANT HEAD     =         717.3490         CONSTANT HEAD     =         717.3490
       STREAM LEAKAGE     =       10518.5527        STREAM LEAKAGE     =       10518.5527
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =       10493.1895       SURFACE LEAKAGE     =       10493.1895
                 MNW2     =        1292.8011                  MNW2     =        1292.8011
 
-               TOTAL OUT =       23960.5605                 TOTAL OUT =       23960.5605
+               TOTAL OUT =       23960.5586                 TOTAL OUT =       23960.5586
 
-                IN - OUT =       1.9531E-03                  IN - OUT =       1.9531E-03
+                IN - OUT =       3.9062E-03                  IN - OUT =       3.9062E-03
 
      PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
@@ -11233,15 +11233,15 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
  
                                                    Max.-Head-Change                         Max.-Flux-Residual
   Residual-Control   Outer-Iter.   Inner-Iter.     Column Row Layer    Maximum-Head-Change  Column Row Layer    Maximum-Flux-Residual          L2-NORM 
-          0                 1           2            69   42     1      -0.1333164900E+00      69   42    1        -0.1498441956E+03      0.3057896820E+03
-          0                 2           2            69   42     2       0.3009050862E-01      69   42    1         0.1747893309E+02      0.4308879305E+02
-          0                 3           2            26   48     1       0.2149358405E-02      26   48    1         0.1451228787E+01      0.7754081462E+01
-          0                 4           2            26   48     1       0.8159513204E-03      26   48    1         0.5510422584E+00      0.2180347841E+01
-          0                 5           1            26   48     1       0.3096898319E-03      26   48    1         0.2091779307E+00      0.6882438949E+00
-          0                 6           1            26   48     1       0.1175184444E-03      26   48    1         0.7938883066E-01      0.2272471381E+00
-          0                 7           1            26   48     1       0.4458725518E-04      26   48    1         0.3012453907E-01      0.7761911975E-01
-          0                 8           1            26   48     1       0.1691410946E-04      26   48    1         0.1142902735E-01      0.2726275981E-01
-          0                 9           1            26   48     1       0.6415468315E-05      26   48    1         0.4335442683E-02      0.9817952789E-02
+          0                 1           2            69   42     1      -0.1333164899E+00      69   42    1        -0.1498441955E+03      0.3057896989E+03
+          0                 2           2            69   42     2       0.3009050860E-01      69   42    1         0.1747893308E+02      0.4308880442E+02
+          0                 3           2            26   48     1       0.2149358433E-02      26   48    1         0.1451228806E+01      0.7754090514E+01
+          0                 4           2            26   48     1       0.8159513304E-03      26   48    1         0.5510422657E+00      0.2180349563E+01
+          0                 5           1            26   48     1       0.3096898359E-03      26   48    1         0.2091779335E+00      0.6882443918E+00
+          0                 6           1            26   48     1       0.1175184459E-03      26   48    1         0.7938883158E-01      0.2272459621E+00
+          0                 7           1            26   48     1       0.4458725568E-04      26   48    1         0.3012453935E-01      0.7761910543E-01
+          0                 8           1            26   48     1       0.1691410996E-04      26   48    1         0.1142902740E-01      0.2726283339E-01
+          0                 9           1            26   48     1       0.6415467814E-05      26   48    1         0.4335442540E-02      0.9817778950E-02
 
     ------------------------------------------------
        NWT REQUIRED            9 OUTER ITERATIONS 
@@ -11250,28 +11250,28 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
 
  NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP 1109
  
-  MNW2 WELL: WELL-A               Qnet =   1.250828830651196E-007  < Qdes
+  MNW2 WELL: WELL-A               Qnet =   1.250847826567147E-007  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-B               Qnet =   8.968389572650004E-008  < Qdes
+  MNW2 WELL: WELL-B               Qnet =   8.968502968054182E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-C               Qnet =  -4.816805285030867E-006  < Qdes
+  MNW2 WELL: WELL-C               Qnet =  -4.816802877880000E-006  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-D               Qnet =   1.920209293654329E-008  < Qdes
+  MNW2 WELL: WELL-D               Qnet =   1.919555513152371E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-E               Qnet =   -382.470563446351       < Qdes
+  MNW2 WELL: WELL-E               Qnet =   -382.470563901948       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-F               Qnet =   -389.276021649791       < Qdes
+  MNW2 WELL: WELL-F               Qnet =   -389.276021737757       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-G               Qnet =   -494.947495877111       < Qdes
+  MNW2 WELL: WELL-G               Qnet =   -494.947496557242       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-H               Qnet =   1.089248183205882E-006  < Qdes
+  MNW2 WELL: WELL-H               Qnet =   1.090432814265796E-006  < Qdes
    Q  updated because of Hlim constraint
  
 MNW2 Well Conductance and Screen (Open Interval) Data
@@ -11297,15 +11297,15 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
  
                                                    Max.-Head-Change                         Max.-Flux-Residual
   Residual-Control   Outer-Iter.   Inner-Iter.     Column Row Layer    Maximum-Head-Change  Column Row Layer    Maximum-Flux-Residual          L2-NORM 
-          0                 1           2            69   42     1      -0.1290023112E+00      69   42    1        -0.1449744566E+03      0.3012587423E+03
-          0                 2           2            69   42     2       0.2917446868E-01      69   42    1         0.1698739061E+02      0.4233531655E+02
-          0                 3           2            69   42     2      -0.2020069280E-02      26   48    1         0.1356240090E+01      0.7791952894E+01
-          0                 4           2            26   48     1       0.7607985839E-03      26   48    1         0.5121822108E+00      0.2208189545E+01
-          0                 5           1            26   48     1       0.2871919249E-03      26   48    1         0.1933706405E+00      0.7001483103E+00
-          0                 6           1            26   48     1       0.1083913487E-03      26   48    1         0.7299209831E-01      0.2322092526E+00
-          0                 7           1            26   48     1       0.4090201702E-04      26   48    1         0.2754738198E-01      0.7954559091E-01
-          0                 8           1            26   48     1       0.1543229207E-04      26   48    1         0.1039477028E-01      0.2797851197E-01
-          0                 9           1            26   48     1       0.5821820249E-05      26   48    1         0.3921811008E-02      0.1006656682E-01
+          0                 1           2            69   42     1      -0.1290023112E+00      69   42    1        -0.1449744566E+03      0.3012587643E+03
+          0                 2           2            69   42     2       0.2917446846E-01      69   42    1         0.1698739060E+02      0.4233533091E+02
+          0                 3           2            69   42     2      -0.2020069266E-02      26   48    1         0.1356240100E+01      0.7791959420E+01
+          0                 4           2            26   48     1       0.7607985849E-03      26   48    1         0.5121822127E+00      0.2208191462E+01
+          0                 5           1            26   48     1       0.2871919249E-03      26   48    1         0.1933706407E+00      0.7001489047E+00
+          0                 6           1            26   48     1       0.1083913487E-03      26   48    1         0.7299209802E-01      0.2322094223E+00
+          0                 7           1            26   48     1       0.4090201602E-04      26   48    1         0.2754738152E-01      0.7954563908E-01
+          0                 8           1            26   48     1       0.1543229207E-04      26   48    1         0.1039477032E-01      0.2797852516E-01
+          0                 9           1            26   48     1       0.5821820249E-05      26   48    1         0.3921811036E-02      0.1006657031E-01
 
     ------------------------------------------------
        NWT REQUIRED            9 OUTER ITERATIONS 
@@ -11314,28 +11314,28 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
 
  NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP 1110
  
-  MNW2 WELL: WELL-A               Qnet =   1.033928912347326E-007  < Qdes
+  MNW2 WELL: WELL-A               Qnet =   1.033901061986420E-007  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-B               Qnet =  -1.313604386377065E-008  < Qdes
+  MNW2 WELL: WELL-B               Qnet =  -1.314038955424479E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-C               Qnet =  -4.050929276265547E-006  < Qdes
+  MNW2 WELL: WELL-C               Qnet =  -4.050930110251205E-006  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-D               Qnet =   2.693873427800364E-008  < Qdes
+  MNW2 WELL: WELL-D               Qnet =   2.692996483449894E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-E               Qnet =   -381.556614163617       < Qdes
+  MNW2 WELL: WELL-E               Qnet =   -381.556614622763       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-F               Qnet =   -386.912933397675       < Qdes
+  MNW2 WELL: WELL-F               Qnet =   -386.912933486795       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-G               Qnet =   -493.662797404379       < Qdes
+  MNW2 WELL: WELL-G               Qnet =   -493.662798088004       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-H               Qnet =   1.038401823194590E-006  < Qdes
+  MNW2 WELL: WELL-H               Qnet =   1.038694964705655E-006  < Qdes
    Q  updated because of Hlim constraint
  
 MNW2 Well Conductance and Screen (Open Interval) Data
@@ -11361,15 +11361,15 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
  
                                                    Max.-Head-Change                         Max.-Flux-Residual
   Residual-Control   Outer-Iter.   Inner-Iter.     Column Row Layer    Maximum-Head-Change  Column Row Layer    Maximum-Flux-Residual          L2-NORM 
-          0                 1           2            69   42     1      -0.1245498568E+00      69   42    1        -0.1402420998E+03      0.2969983702E+03
-          0                 2           2            69   42     2       0.2821352769E-01      69   42    1         0.1630010348E+02      0.4184757700E+02
-          0                 3           2            69   42     2      -0.1952902207E-02      69   42    1        -0.1269070756E+01      0.7705262724E+01
-          0                 4           2            26   48     1       0.7058454865E-03      26   48    1         0.4750682483E+00      0.2169569581E+01
-          0                 5           1            26   48     1       0.2648561548E-03      26   48    1         0.1782831612E+00      0.6807888358E+00
-          0                 6           1            26   48     1       0.9936629626E-04      26   48    1         0.6689520619E-01      0.2231197812E+00
-          0                 7           1            26   48     1       0.3727384119E-04      26   48    1         0.2509619966E-01      0.7545087186E-01
-          0                 8           1            64   33     2       0.1736862550E-04      26   48    1         0.9413674209E-02      0.2623084050E-01
-          0                 9           1            26   48     1       0.5242863206E-05      26   48    1         0.3530647840E-02      0.9289264519E-02
+          0                 1           2            69   42     1      -0.1245498568E+00      69   42    1        -0.1402420997E+03      0.2969983875E+03
+          0                 2           2            69   42     2       0.2821352767E-01      69   42    1         0.1630010348E+02      0.4184758825E+02
+          0                 3           2            69   42     2      -0.1952902207E-02      69   42    1        -0.1269070756E+01      0.7705262912E+01
+          0                 4           2            26   48     1       0.7058454840E-03      26   48    1         0.4750682479E+00      0.2169570607E+01
+          0                 5           1            26   48     1       0.2648561533E-03      26   48    1         0.1782831608E+00      0.6807892078E+00
+          0                 6           1            26   48     1       0.9936629676E-04      26   48    1         0.6689520612E-01      0.2231198960E+00
+          0                 7           1            26   48     1       0.3727384069E-04      26   48    1         0.2509619924E-01      0.7545088021E-01
+          0                 8           1            64   33     2       0.1736862626E-04      26   48    1         0.9413673917E-02      0.2623085186E-01
+          0                 9           1            26   48     1       0.5242863206E-05      26   48    1         0.3530647904E-02      0.9289267056E-02
 
     ------------------------------------------------
        NWT REQUIRED            9 OUTER ITERATIONS 
@@ -11378,28 +11378,28 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
 
  NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP 1111
  
-  MNW2 WELL: WELL-A               Qnet =   9.966690210638784E-008  < Qdes
+  MNW2 WELL: WELL-A               Qnet =   9.967430372737063E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-B               Qnet =  -6.411373515424756E-009  < Qdes
+  MNW2 WELL: WELL-B               Qnet =  -6.412293751534293E-009  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-C               Qnet =  -8.332882182993107E-006  < Qdes
+  MNW2 WELL: WELL-C               Qnet =  -8.332883798881086E-006  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-D               Qnet =   1.970838992004786E-008  < Qdes
+  MNW2 WELL: WELL-D               Qnet =   1.970396278777597E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-E               Qnet =   -380.671904451015       < Qdes
+  MNW2 WELL: WELL-E               Qnet =   -380.671904912959       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-F               Qnet =   -384.655421049581       < Qdes
+  MNW2 WELL: WELL-F               Qnet =   -384.655421139258       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-G               Qnet =   -492.427184435131       < Qdes
+  MNW2 WELL: WELL-G               Qnet =   -492.427185121728       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-H               Qnet =   6.828112120160768E-008  < Qdes
+  MNW2 WELL: WELL-H               Qnet =   6.869965218925245E-008  < Qdes
    Q  updated because of Hlim constraint
  
 MNW2 Well Conductance and Screen (Open Interval) Data
@@ -11425,15 +11425,15 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
  
                                                    Max.-Head-Change                         Max.-Flux-Residual
   Residual-Control   Outer-Iter.   Inner-Iter.     Column Row Layer    Maximum-Head-Change  Column Row Layer    Maximum-Flux-Residual          L2-NORM 
-          0                 1           2            69   42     1      -0.1203488483E+00      69   42    1        -0.1354942621E+03      0.2933065430E+03
-          0                 2           2            69   42     2       0.2731261781E-01      69   42    1         0.1572139979E+02      0.4163409184E+02
-          0                 3           2            69   42     2      -0.1890084215E-02      69   42    1        -0.1222549062E+01      0.7716517575E+01
-          0                 4           2            26   48     1       0.6562469210E-03      26   48    1         0.4418303397E+00      0.2164784386E+01
-          0                 5           1            26   48     1       0.2443269073E-03      26   48    1         0.1645139007E+00      0.6739217260E+00
-          0                 6           1            26   48     1       0.9095282888E-04      26   48    1         0.6124827190E-01      0.2185633780E+00
-          0                 7           1            26   48     1       0.3385388281E-04      26   48    1         0.2279946769E-01      0.7305597749E-01
-          0                 8           1            26   48     1       0.1259953889E-04      26   48    1         0.8486042866E-02      0.2497993528E-01
-          0                 9           1            26   48     1       0.4688788210E-05      26   48    1         0.3158209332E-02      0.8716595379E-02
+          0                 1           2            69   42     1      -0.1203488483E+00      69   42    1        -0.1354942621E+03      0.2933065578E+03
+          0                 2           2            69   42     2       0.2731261775E-01      69   42    1         0.1572139978E+02      0.4163409252E+02
+          0                 3           2            69   42     2      -0.1890084212E-02      69   42    1        -0.1222549061E+01      0.7716512016E+01
+          0                 4           2            26   48     1       0.6562469430E-03      26   48    1         0.4418303522E+00      0.2164784951E+01
+          0                 5           1            26   48     1       0.2443269158E-03      26   48    1         0.1645139059E+00      0.6739219648E+00
+          0                 6           1            26   48     1       0.9095283238E-04      26   48    1         0.6124827414E-01      0.2185634429E+00
+          0                 7           1            26   48     1       0.3385388382E-04      26   48    1         0.2279946860E-01      0.7305599143E-01
+          0                 8           1            26   48     1       0.1259953939E-04      26   48    1         0.8486043444E-02      0.2497993849E-01
+          0                 9           1            26   48     1       0.4688787710E-05      26   48    1         0.3158209725E-02      0.8716598419E-02
 
     ------------------------------------------------
        NWT REQUIRED            9 OUTER ITERATIONS 
@@ -11442,28 +11442,28 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
 
  NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP 1112
  
-  MNW2 WELL: WELL-A               Qnet =   9.882982304754151E-008  < Qdes
+  MNW2 WELL: WELL-A               Qnet =   9.882767598723419E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-B               Qnet =  -1.484467052059735E-008  < Qdes
+  MNW2 WELL: WELL-B               Qnet =  -1.485425776825977E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-C               Qnet =  -4.824498284768108E-006  < Qdes
+  MNW2 WELL: WELL-C               Qnet =  -4.824492826897842E-006  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-D               Qnet =   1.912327768360811E-008  < Qdes
+  MNW2 WELL: WELL-D               Qnet =   1.913646786866341E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-E               Qnet =   -379.815173057669       < Qdes
+  MNW2 WELL: WELL-E               Qnet =   -379.815173522253       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-F               Qnet =   -382.497581830160       < Qdes
+  MNW2 WELL: WELL-F               Qnet =   -382.497581920580       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-G               Qnet =   -491.238230926292       < Qdes
+  MNW2 WELL: WELL-G               Qnet =   -491.238231615700       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-H               Qnet =   5.587876685808624E-007  < Qdes
+  MNW2 WELL: WELL-H               Qnet =   5.593279226445702E-007  < Qdes
    Q  updated because of Hlim constraint
  
 MNW2 Well Conductance and Screen (Open Interval) Data
@@ -11489,15 +11489,15 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
  
                                                    Max.-Head-Change                         Max.-Flux-Residual
   Residual-Control   Outer-Iter.   Inner-Iter.     Column Row Layer    Maximum-Head-Change  Column Row Layer    Maximum-Flux-Residual          L2-NORM 
-          0                 1           2            69   42     1      -0.1163257241E+00      69   42    1        -0.1309478320E+03      0.2896888224E+03
-          0                 2           2            69   42     2       0.2645392566E-01      69   42    1         0.1516878093E+02      0.4118523058E+02
-          0                 3           2            69   42     2      -0.1830128069E-02      69   42    1        -0.1178209974E+01      0.7662672434E+01
-          0                 4           2            26   48     1       0.6133771238E-03      26   48    1         0.4130428361E+00      0.2135021286E+01
-          0                 5           1            26   48     1       0.2283080378E-03      26   48    1         0.1537591833E+00      0.6585662339E+00
-          0                 6           1            26   48     1       0.8496563371E-04      26   48    1         0.5722936893E-01      0.2114934258E+00
-          0                 7           1            26   48     1       0.3161551753E-04      26   48    1         0.2129725183E-01      0.6992202161E-01
-          0                 8           1            26   48     1       0.1176248326E-04      26   48    1         0.7924380965E-02      0.2365975474E-01
-          0                 9           1            26   48     1       0.4375682198E-05      26   48    1         0.2948154752E-02      0.8166741977E-02
+          0                 1           2            69   42     1      -0.1163257240E+00      69   42    1        -0.1309478319E+03      0.2896888353E+03
+          0                 2           2            69   42     2       0.2645392503E-01      69   42    1         0.1516878092E+02      0.4118523938E+02
+          0                 3           2            69   42     2      -0.1830127878E-02      69   42    1        -0.1178209974E+01      0.7662664866E+01
+          0                 4           2            26   48     1       0.6133771253E-03      26   48    1         0.4130428387E+00      0.2135021988E+01
+          0                 5           1            26   48     1       0.2283080373E-03      26   48    1         0.1537591842E+00      0.6585665848E+00
+          0                 6           1            26   48     1       0.8496563421E-04      26   48    1         0.5722936976E-01      0.2114935283E+00
+          0                 7           1            26   48     1       0.3161551753E-04      26   48    1         0.2129725211E-01      0.6992206317E-01
+          0                 8           1            26   48     1       0.1176248326E-04      26   48    1         0.7924381214E-02      0.2365976806E-01
+          0                 9           1            26   48     1       0.4375682699E-05      26   48    1         0.2948154975E-02      0.8166720664E-02
 
     ------------------------------------------------
        NWT REQUIRED            9 OUTER ITERATIONS 
@@ -11506,28 +11506,28 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
 
  NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP 1113
  
-  MNW2 WELL: WELL-A               Qnet =   1.183857963882318E-007  < Qdes
+  MNW2 WELL: WELL-A               Qnet =   1.183791041164950E-007  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-B               Qnet =  -9.284210789051173E-009  < Qdes
+  MNW2 WELL: WELL-B               Qnet =  -9.283356111611241E-009  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-C               Qnet =  -3.104163344445909E-006  < Qdes
+  MNW2 WELL: WELL-C               Qnet =  -3.104157020185350E-006  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-D               Qnet =   1.781910571874157E-008  < Qdes
+  MNW2 WELL: WELL-D               Qnet =   1.781787791615974E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-E               Qnet =   -378.985382718105       < Qdes
+  MNW2 WELL: WELL-E               Qnet =   -378.985383185293       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-F               Qnet =   -380.433829112301       < Qdes
+  MNW2 WELL: WELL-F               Qnet =   -380.433829206506       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-G               Qnet =   -490.093969742437       < Qdes
+  MNW2 WELL: WELL-G               Qnet =   -490.093970434408       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-H               Qnet =   1.415396585713324E-006  < Qdes
+  MNW2 WELL: WELL-H               Qnet =   1.415046611441539E-006  < Qdes
    Q  updated because of Hlim constraint
  
 MNW2 Well Conductance and Screen (Open Interval) Data
@@ -11553,16 +11553,16 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
  
                                                    Max.-Head-Change                         Max.-Flux-Residual
   Residual-Control   Outer-Iter.   Inner-Iter.     Column Row Layer    Maximum-Head-Change  Column Row Layer    Maximum-Flux-Residual          L2-NORM 
-          0                 1           2            69   42     1      -0.1124726723E+00      69   42    1        -0.1265919070E+03      0.2864361480E+03
-          0                 2           2            69   42     2       0.2563526044E-01      69   42    1         0.1464077479E+02      0.4084063848E+02
-          0                 3           2            67   41     2       0.2351135338E+02      67   41    2         0.3781803599E+03      0.3782590463E+03
-          0                 4           2            67   41     2       0.3673325490E+01      67   41    2         0.5885841666E+02      0.7152110499E+02
-          0                 5           2            67   41     2       0.2524816889E+00      67   41    1         0.8919761554E+01      0.9969275082E+01
-          0                 6           2            67   41     2       0.1844880237E-01      68   41    1         0.3493017743E+00      0.5631244549E+00
-          0                 7           1            67   41     2       0.1294081283E-02      68   41    1         0.6735016427E-01      0.1109906774E+00
-          0                 8           1            67   39     2       0.1233969466E-03      68   41    1         0.1252573170E-01      0.2674886416E-01
-          0                 9           1            67   39     2       0.3671399002E-04      26   48    1         0.2613286768E-02      0.8309880171E-02
-          0                10           1            67   39     2      -0.2523563533E-05      26   48    1         0.9644663378E-03      0.2774680262E-02
+          0                 1           2            69   42     1      -0.1124726723E+00      69   42    1        -0.1265919069E+03      0.2864361595E+03
+          0                 2           2            69   42     2       0.2563526075E-01      69   42    1         0.1464077478E+02      0.4084064597E+02
+          0                 3           2            67   41     2       0.2351135333E+02      67   41    2         0.3781803599E+03      0.3782590460E+03
+          0                 4           2            67   41     2       0.3673325483E+01      67   41    2         0.5885841666E+02      0.7152110510E+02
+          0                 5           2            67   41     2       0.2524816884E+00      67   41    1         0.8919761556E+01      0.9969275097E+01
+          0                 6           2            67   41     2       0.1844880217E-01      68   41    1         0.3493017789E+00      0.5631243050E+00
+          0                 7           1            67   41     2       0.1294081451E-02      68   41    1         0.6735015880E-01      0.1109907271E+00
+          0                 8           1            67   39     2       0.1233969384E-03      68   41    1         0.1252573791E-01      0.2674888571E-01
+          0                 9           1            67   39     2       0.3671398977E-04      26   48    1         0.2613286961E-02      0.8309867115E-02
+          0                10           1            67   39     2      -0.2523562822E-05      26   48    1         0.9644667080E-03      0.2774679863E-02
 
     ------------------------------------------------
        NWT REQUIRED           10 OUTER ITERATIONS 
@@ -11571,28 +11571,28 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
 
  NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP 1114
  
-  MNW2 WELL: WELL-A               Qnet =   2.301237070345685E-008  < Qdes
+  MNW2 WELL: WELL-A               Qnet =   2.301608513499698E-008  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-B               Qnet =   1.452073322694147E-009  < Qdes
+  MNW2 WELL: WELL-B               Qnet =   1.446937125670900E-009  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-C               Qnet =  -7.267851726625030E-007  < Qdes
+  MNW2 WELL: WELL-C               Qnet =  -7.267773002236910E-007  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-D               Qnet =   1.719846084990984E-009  < Qdes
+  MNW2 WELL: WELL-D               Qnet =   1.702089622024339E-009  < Qdes
    Q  updated because of Hlim constraint
  
-  MNW2 WELL: WELL-E               Qnet =  -1.832468475626570E-006  < Qdes
+  MNW2 WELL: WELL-E               Qnet =  -1.831435650245794E-006  < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-F               Qnet =   -379.398020978710       < Qdes
+  MNW2 WELL: WELL-F               Qnet =   -379.398021033131       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-G               Qnet =   -490.812558978865       < Qdes
+  MNW2 WELL: WELL-G               Qnet =   -490.812559668383       < Qdes
    Q  updated because of Hlim constraint and/or Seepage Face calculation
  
-  MNW2 WELL: WELL-H               Qnet =   1.680074837295820E-005  < Qdes
+  MNW2 WELL: WELL-H               Qnet =   1.680138791471109E-005  < Qdes
    Q  updated because of Hlim constraint
 
  WRITING FILE ON UNIT   91:
@@ -11605,6 +11605,6 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
   WRITING DATA FOR RESTART MNW2
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/11/04 11:47:45
- Elapsed run time: 1.722 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/11/05 15:11:55
+ Elapsed run time: 1.745 Seconds
 
