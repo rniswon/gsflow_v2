@@ -3132,12 +3132,12 @@
         !
         !1 - -----limit diversion to water right and flow in river
         !
-      if(iseg==9.and.kper==8.and.kstp==1)then
-      etdif = pettotal - aettotal
-          write(999,33)kper,kstp,kiter,SEG(2, iseg),
-     +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
-        endif
-  33  format(3i5,6e20.10)
+  !    if(iseg==9.and.kper==8.and.kstp==1)then
+  !    etdif = pettotal - aettotal
+  !        write(999,33)kper,kstp,kiter,SEG(2, iseg),
+  !   +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
+  !      endif
+  !33  format(3i5,6e20.10)
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
 300   CONTINUE
       RETURN
