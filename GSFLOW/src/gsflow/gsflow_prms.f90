@@ -5,6 +5,8 @@
       SUBROUTINE gsflow_prms(Arg)
       USE PRMS_CONSTANTS, ONLY: ERROR_control
       USE PRMS_MODULE
+      USE PRMS_MMFAPI, ONLY: Num_variables, Variable_data, MAXVARIABLES
+      USE PRMS_MMFSUBS, ONLY: declvar_int_0d, declvar_real
       IMPLICIT NONE
 ! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: Arg
@@ -28,9 +30,8 @@
       EXTERNAL :: gsflow_prms_restart, water_balance, summary_output
       EXTERNAL :: prms_summary, module_doc, convert_params, read_error, error_stop
       INTEGER, EXTERNAL :: gsflow_modflow, gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
-      INTEGER, EXTERNAL :: declparam, getparam_real, getparam_int
-      EXTERNAL :: setdims, declvar_int, declvar_real, check_parameters
-      EXTERNAL :: read_control_file, read_parameter_file_dimens, read_prms_data_file
+      INTEGER, EXTERNAL :: declparam, getparam_real, getparam_int, getparam_int_0d
+      EXTERNAL :: setdims, check_parameters, read_control_file, read_parameter_file_dimens, read_prms_data_file
 ! Local Variables
       INTEGER :: i, iret, nc, ierr
 !***********************************************************************
@@ -99,13 +100,17 @@
           WRITE ( PRMS_output_unit, 16 ) EQULS(:62)
         ENDIF
         CALL print_module(MODDESC, MODNAME, PRMS_versn)
+
         CALL print_module('Read Control File', 'read_control_file', Version_read_control_file)
         CALL print_module('Read Parameter File', 'read_parameter_file', Version_read_parameter_file)
-
+        CALL print_module('Read Data File', 'read_data_file', Version_read_data_file)
         CALL read_prms_data_file()
 
+        Num_variables = 0
+        ALLOCATE ( Variable_data(MAXVARIABLES) ) ! don't know how many, need to read var_name file
+
         IF ( GSFLOW_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-          CALL declvar_int(MODNAME, 'KKITER', 'one', 1, &
+          CALL declvar_int_0d(MODNAME, 'KKITER', 'one', 1, &
      &         'Current iteration in GSFLOW simulation', 'none', KKITER)
           ALLOCATE ( Hru_ag_irr(Nhru) )
           CALL declvar_real(MODNAME, 'hru_ag_irr', 'nhru', Nhru, &
@@ -156,7 +161,7 @@
           ELSE
             IF ( getparam_real(MODNAME, 'gvr_cell_pct', Nhrucell, Gvr_cell_pct)/=0 ) CALL read_error(2, 'gvr_cell_pct')
           ENDIF
-          IF ( getparam_int(MODNAME, 'mxsziter', 1, Mxsziter)/=0 ) CALL read_error(2, 'mxsziter')
+          IF ( getparam_int_0d(MODNAME, 'mxsziter', 1, Mxsziter)/=0 ) CALL read_error(2, 'mxsziter')
           IF ( getparam_int(MODNAME, 'gvr_cell_id', Nhrucell, Gvr_cell_id)/=0 ) CALL read_error(2, 'gvr_cell_id')
           IF ( Gvr_cell_id(1)==-1 ) THEN
             IF ( Nhru==Nhrucell ) THEN

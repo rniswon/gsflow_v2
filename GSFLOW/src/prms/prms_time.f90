@@ -116,3 +116,37 @@
       ENDIF
 
       END FUNCTION prms_time
+
+!***********************************************************************
+! dattim - get start, end, or current date and time
+!***********************************************************************
+      SUBROUTINE dattim(String, Datetime)
+      USE PRMS_CONSTANTS, ONLY: ERROR_time
+      USE PRMS_MODULE, ONLY: Endtime, Starttime, Nowyear, Nowmonth, Nowday
+      USE PRMS_SET_TIME, ONLY: Julian_day_absolute
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: String
+      INTEGER, INTENT(OUT) :: Datetime(6)
+      EXTERNAL :: compute_gregorian, error_stop
+      ! Local variable
+      INTEGER :: string_length
+!***********************************************************************
+      Datetime = 0
+      string_length = LEN(String)
+      IF ( String(:3)=='end' ) THEN
+        Datetime = Endtime
+      ELSEIF ( String(:3)=='now' ) THEN
+        CALL compute_gregorian(Julian_day_absolute, Nowyear, Nowmonth, Nowday)
+        Datetime(1) = Nowyear
+        Datetime(2) = Nowmonth
+        Datetime(3) = Nowday
+        ! Datetime = LIS function
+      ELSEIF ( string_length>4 ) THEN
+        IF ( String(:5)=='start' ) THEN
+          Datetime = Starttime
+        ELSE
+          CALL error_stop('invalid call to dattim', ERROR_time)
+        ENDIF
+      ENDIF
+      END SUBROUTINE dattim

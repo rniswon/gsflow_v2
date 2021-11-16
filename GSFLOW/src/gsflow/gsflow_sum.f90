@@ -104,9 +104,10 @@
       INTEGER FUNCTION gsfsumdecl()
       USE PRMS_CONSTANTS, ONLY: DEBUG_WB
       USE GSFSUM
+      USE PRMS_MMFSUBS, ONLY: declvar_dble
       IMPLICIT NONE
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: print_module, PRMS_open_module_file, declvar_dble
+      EXTERNAL :: print_module, PRMS_open_module_file
 !***********************************************************************
       gsfsumdecl = 0
 
@@ -414,12 +415,12 @@
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor
       USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop, Basin_dprst_volcl
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getparam_int
+      INTEGER, EXTERNAL :: getparam_int_0d
       EXTERNAL GSF_PRINT, gsflow_sum_restart, MODFLOW_SFR_GET_STORAGE
 !***********************************************************************
       gsfsuminit = 0
 
-      IF ( getparam_int(MODNAME, 'id_obsrunoff', 1, Id_obsrunoff)/=0 ) CALL read_error(3, 'id_obsrunoff')
+      IF ( getparam_int_0d(MODNAME, 'id_obsrunoff', 1, Id_obsrunoff)/=0 ) CALL read_error(3, 'id_obsrunoff')
       IF ( Id_obsrunoff==0 ) Id_obsrunoff = 1
 
       Basin_convert = Acre_inches_to_mfl3*Active_area*Mft_to_days       !RGN 7/15/2015 added *Mft_to_days

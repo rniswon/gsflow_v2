@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2021-10-28'
+      character(len=*), parameter :: Version_soilzone_ag = '2021-11-11'
       INTEGER, SAVE :: Soil_iter, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr
@@ -93,10 +93,11 @@
       USE PRMS_MODULE, ONLY: Nhru, Cascade_flag, GSFLOW_flag, Model
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
+      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_real, declvar_int
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam, getdim
-      EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop, declvar_dble, declvar_real, declvar_int
+      EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop
 !***********************************************************************
       szdecl_ag = 0
 
@@ -251,7 +252,7 @@
       IMPLICIT NONE
 ! Functions
       EXTERNAL :: init_basin_vars, checkdim_bounded_limits, error_stop
-      INTEGER, EXTERNAL :: getparam_int, getparam_real
+      INTEGER, EXTERNAL :: getparam_int, getparam_real, getparam_real_2d, getparam_int_0d, getparam_real_0d
       INTRINSIC :: MIN, DBLE
 ! Local Variables
       INTEGER :: ihru
@@ -259,17 +260,17 @@
       szinit_ag = 0
 
 !??? figure out what to save in restart file ???
-      IF ( getparam_int(MODNAME, 'max_soilzone_ag_iter', 1, max_soilzone_ag_iter)/=0 ) &
+      IF ( getparam_int_0d(MODNAME, 'max_soilzone_ag_iter', 1, max_soilzone_ag_iter)/=0 ) &
      &     CALL read_error(2, 'max_soilzone_ag_iter')
-      IF ( getparam_real(MODNAME, 'soilzone_aet_converge', 1, soilzone_aet_converge)/=0 ) &
+      IF ( getparam_real_0d(MODNAME, 'soilzone_aet_converge', 1, soilzone_aet_converge)/=0 ) &
      &     CALL read_error(2, 'soilzone_aet_converge')
       IF ( getparam_int(MODNAME, 'ag_soil_type', Nhru, Ag_soil_type)/=0 ) CALL read_error(2, 'ag_soil_type')
       IF ( getparam_real(MODNAME, 'ag_soilwater_deficit_min', Nhru, Ag_soilwater_deficit_min)/=0 ) &
      &     CALL read_error(2, 'ag_soilwater_deficit_min')
 !      IF ( getparam_int(MODNAME, 'ag_crop_type', Nhru, Ag_crop_type)/=0 ) CALL read_error(2, 'ag_crop_type')
-      IF ( getparam_real(MODNAME, 'ag_covden_sum', Nhru*MONTHS_PER_YEAR, Ag_covden_sum)/=0 ) CALL read_error(2, 'ag_covden_sum')
+      IF ( getparam_real_2d(MODNAME, 'ag_covden_sum', Nhru, MONTHS_PER_YEAR, Ag_covden_sum)/=0 ) CALL read_error(2, 'ag_covden_sum')
       IF ( Ag_covden_sum(1,1)<0.0 ) Ag_covden_sum = Covden_sum
-      IF ( getparam_real(MODNAME, 'ag_covden_win', Nhru*MONTHS_PER_YEAR, Ag_covden_win)/=0 ) CALL read_error(2, 'ag_covden_win')
+      IF ( getparam_real_2d(MODNAME, 'ag_covden_win', Nhru, MONTHS_PER_YEAR, Ag_covden_win)/=0 ) CALL read_error(2, 'ag_covden_win')
       IF ( Ag_covden_win(1,1)<0.0 ) Ag_covden_win = Covden_win
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) Ag_soil_lower = 0.0
       Basin_agwaterin = 0.0D0
@@ -600,7 +601,7 @@ endif
             Ag_hortonian(i) = excess
             Sroff(i) = Sroff(i) + excess
             ag_water_maxin = ag_water_maxin - excess
- 333 format (I4, 2(', ',i3), ', ', I0, 5(', ',F0.5))
+! 333 format (I4, 2(', ',i3), ', ', I0, 5(', ',F0.5))
           ENDIF
         ENDIF
         capwater_maxin = capwater_maxin + cap_ag_water_maxin

@@ -23,6 +23,7 @@ $(TARGET): $(PRMSLIB)
 
 LIBOBJS = \
         prms_constants.o \
+        mmf_module.o \
         mmf_utils.o \
         basin.o \
         climateflow.o \
@@ -81,7 +82,7 @@ LIBOBJS = \
         write_climate_hru.o \
         prms_summary.o \
         basin_sum.o \
-        utils_prms_linux.o
+        utils_prms.o
 
 install: lib
 
@@ -102,6 +103,9 @@ clean:
 prms_constants.o: prms_constants.f90
 	$(FC) -c $(FFLAGS) prms_constants.f90
 
+mmf_module.o: mmf_module.f90
+	$(FC) -c $(FFLAGS) mmf_module.f90
+
 basin_sum.o: basin_sum.f90 prms_module.mod prms_flowvars.mod prms_intcp.mod prms_snow.mod prms_srunoff.mod prms_gwflow.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod prms_obs.mod prms_muskingum.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) basin_sum.f90
 
@@ -120,8 +124,8 @@ snowcomp.o: snowcomp.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_c
 gwflow.o: gwflow.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_intcp.mod prms_srunoff.mod prms_soilzone.mod prms_cascade.mod prms_set_time.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) gwflow.f90
 
-utils_prms_linux.o: utils_prms_linux.f90 prms_module.mod prms_basin.mod prms_set_time.mod prms_constants.mod
-	$(FC) -c $(FFLAGS) utils_prms_linux.f90
+utils_prms.o: utils_prms.f90 prms_module.mod prms_basin.mod prms_set_time.mod prms_constants.mod
+	$(FC) -c $(FFLAGS) utils_prms.f90
 
 prms_summary.o: prms_summary.f90 prms_module.mod prms_climatevars.mod prms_flowvars.mod prms_set_time.mod prms_obs.mod prms_intcp.mod prms_snow.mod prms_srunoff.mod prms_soilzone.mod prms_gwflow.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) prms_summary.f90
@@ -307,6 +311,7 @@ prms_potet_pm.mod: potet_pm.o
 prms_potet_pt.mod: potet_pt.o
 prms_potet_hs.mod: potet_hs.o
 prms_potet_hamon.mod: potet_hamon.o
+mmf_module.mod: mmf_module.o
 gsfmodflow.mod: $(GSFLOWDIR)/gsfmodflow.mod
 	$(RM) gsfmodflow.mod
 	$(LN) $(GSFLOWDIR)/gsfmodflow.mod gsfmodflow.mod

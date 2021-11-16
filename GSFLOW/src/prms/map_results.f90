@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'map_results'
-      character(len=*), parameter :: Version_map_results = '2021-09-07'
+      character(len=*), parameter :: Version_map_results = '2021-11-11'
       INTEGER, SAVE :: Mapflg, Numvalues, Lastyear, Totdays
       INTEGER, SAVE :: Yrdays, Yrresults, Totresults, Monresults, Mondays
       INTEGER, SAVE :: Begin_results, Begyr, Dailyresults
@@ -169,7 +169,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getparam_int, getparam_real, getvartype, numchars, getvarsize
+      INTEGER, EXTERNAL :: getparam_int, getparam_real, getvartype, numchars, getvarsize, getparam_int_0d
       EXTERNAL :: read_error, PRMS_open_output_file, checkdim_bounded_limits
 ! Local Variables
       INTEGER :: i, jj, is, ios, ierr, size
@@ -182,15 +182,15 @@
       Begyr = Start_year + Prms_warmup
       Lastyear = Begyr
 
-      IF ( getparam_int(MODNAME, 'mapvars_freq', 1, Mapvars_freq)/=0 ) CALL read_error(1, 'mapvars_freq')
+      IF ( getparam_int_0d(MODNAME, 'mapvars_freq', 1, Mapvars_freq)/=0 ) CALL read_error(1, 'mapvars_freq')
       IF ( Mapvars_freq==0 ) THEN
         PRINT *, 'WARNING, map_results requested with mapvars_freq equal 0'
         PRINT *, 'no map_resultsults output is produced'
         MapOutON_OFF = OFF
         RETURN
       ENDIF
-      IF ( getparam_int(MODNAME, 'ncol', 1, Ncol)/=0 ) CALL read_error(2, 'ncol')
-      IF ( getparam_int(MODNAME, 'mapvars_units', 1, Mapvars_units)/=0 ) CALL read_error(2, 'Mapvars_units')
+      IF ( getparam_int_0d(MODNAME, 'ncol', 1, Ncol)/=0 ) CALL read_error(2, 'ncol')
+      IF ( getparam_int_0d(MODNAME, 'mapvars_units', 1, Mapvars_units)/=0 ) CALL read_error(2, 'Mapvars_units')
 
       WRITE ( Mapfmt, 9001 ) Ncol
 

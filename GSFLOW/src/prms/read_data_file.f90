@@ -184,7 +184,7 @@
         nvals = getvarnvals(Data_varname(jj))
         var_id = getvar_id(Data_varname(jj))
         column_end = column_end + nvals
-        Variable_data(var_id)%values_real = TRANSFER(Data_line_values(column:column_end), Variable_data(var_id)%values_real)
+        Variable_data(var_id)%values_real_1d = TRANSFER(Data_line_values(column:column_end), Variable_data(var_id)%values_real_1d)
         CALL check_data_variables(Data_varname(jj),nvals,Data_line_values(column:column_end),1,ios)
         IF ( ios/=0 ) THEN
           PRINT *, 'ERROR, Data File corrupted. Reading variable: ', Data_varname(jj)
@@ -324,7 +324,7 @@
             ndim = 1
           ENDIF
         ELSE
-          Rain_day = Values(1)
+          Rain_day = Values(1) ! WARNING: Rain_day is an integer, but Values(1) is real
         ENDIF
       ELSEIF ( Varname(:8)=='humidity' ) THEN
         IF ( Iflag==0 ) THEN

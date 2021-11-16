@@ -14,7 +14,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Solar Radiation Distribution'
         character(len=*), parameter :: MODNAME = 'ddsolrad'
-        character(len=*), parameter :: Version_ddsolrad = '2021-09-07'
+        character(len=*), parameter :: Version_ddsolrad = '2021-11-11'
         INTEGER, SAVE :: Observed_flag
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Radadj_slope(:, :), Radadj_intcp(:, :)
@@ -36,7 +36,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: INT, FLOAT, DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam, getparam_real
+      INTEGER, EXTERNAL :: declparam, getparam_real_2d
       EXTERNAL :: read_error, print_module, print_date
 ! Local Variables
       INTEGER :: j, jj, k, kp, kp1
@@ -163,11 +163,11 @@
 
       ELSEIF ( Process_flag==INIT ) THEN
 ! Get parameters
-        IF ( getparam_real(MODNAME, 'dday_slope', Nhru*MONTHS_PER_YEAR, Dday_slope)/=0 ) CALL read_error(2, 'dday_slope')
-        IF ( getparam_real(MODNAME, 'dday_intcp', Nhru*MONTHS_PER_YEAR, Dday_intcp)/=0 ) CALL read_error(2, 'dday_intcp')
-        IF ( getparam_real(MODNAME, 'radadj_slope', Nhru*MONTHS_PER_YEAR, Radadj_slope)/=0 ) CALL read_error(2, 'radadj_slope')
-        IF ( getparam_real(MODNAME, 'radadj_intcp', Nhru*MONTHS_PER_YEAR, Radadj_intcp)/=0 ) CALL read_error(2, 'radadj_intcp')
-        IF ( getparam_real(MODNAME, 'tmax_index', Nhru*MONTHS_PER_YEAR, Tmax_index)/=0 ) CALL read_error(2, 'tmax_index')
+        IF ( getparam_real_2d(MODNAME, 'dday_slope', Nhru, MONTHS_PER_YEAR, Dday_slope)/=0 ) CALL read_error(2, 'dday_slope')
+        IF ( getparam_real_2d(MODNAME, 'dday_intcp', Nhru, MONTHS_PER_YEAR, Dday_intcp)/=0 ) CALL read_error(2, 'dday_intcp')
+        IF ( getparam_real_2d(MODNAME, 'radadj_slope', Nhru, MONTHS_PER_YEAR, Radadj_slope)/=0 ) CALL read_error(2, 'radadj_slope')
+        IF ( getparam_real_2d(MODNAME, 'radadj_intcp', Nhru, MONTHS_PER_YEAR, Radadj_intcp)/=0 ) CALL read_error(2, 'radadj_intcp')
+        IF ( getparam_real_2d(MODNAME, 'tmax_index', Nhru, MONTHS_PER_YEAR, Tmax_index)/=0 ) CALL read_error(2, 'tmax_index')
         Observed_flag = OFF
         IF ( Nsol>0 .AND. Basin_solsta>0 ) Observed_flag = ACTIVE
 

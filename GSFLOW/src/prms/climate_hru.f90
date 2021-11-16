@@ -10,7 +10,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2021-10-22'
+        character(len=*), parameter :: Version_climate_hru = '2021-11-15'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit, AET_unit, PET_unit, Irrigated_area_unit
         INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit
@@ -46,12 +46,13 @@
      &    Transp_on, Basin_transp_on, Tmax_allsnow_f, Basin_humidity, Ppt_zero_thresh
       USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_SOLTAB, ONLY: Soltab_basinpotsw, Hru_cossl, Soltab_potsw
+      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_real
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam, control_integer, getparam_real, control_string
+      INTEGER, EXTERNAL :: declparam, control_integer, getparam_real_2d, control_string
       EXTERNAL :: read_error, precip_form, temp_set, find_header_end, find_current_time
-      EXTERNAL :: read_cbh_date, check_cbh_value, check_cbh_intvalue, print_module, declvar_dble, declvar_real
+      EXTERNAL :: read_cbh_date, check_cbh_value, check_cbh_intvalue, print_module
 ! Local Variables
       INTEGER :: yr, mo, dy, i, hr, mn, sec, jj, ierr, istop, missing, ios
       DOUBLE PRECISION :: sum_obs
@@ -484,8 +485,10 @@
         ierr = 0
 
         IF ( Climate_precip_flag==ACTIVE ) THEN
-          IF ( getparam_real(MODNAME, 'rain_cbh_adj', Nhru*MONTHS_PER_YEAR, Rain_cbh_adj)/=0 ) CALL read_error(2, 'rain_cbh_adj')
-          IF ( getparam_real(MODNAME, 'snow_cbh_adj', Nhru*MONTHS_PER_YEAR, Snow_cbh_adj)/=0 ) CALL read_error(2, 'snow_cbh_adj')
+          IF ( getparam_real_2d(MODNAME, 'rain_cbh_adj', Nhru, MONTHS_PER_YEAR, Rain_cbh_adj)/=0 ) &
+     &         CALL read_error(2, 'rain_cbh_adj')
+          IF ( getparam_real_2d(MODNAME, 'snow_cbh_adj', Nhru, MONTHS_PER_YEAR, Snow_cbh_adj)/=0 ) &
+     &         CALL read_error(2, 'snow_cbh_adj')
 
           IF ( control_string(Precip_day, 'precip_day')/=0 ) CALL read_error(5, 'precip_day')
           CALL find_header_end(Precip_unit, Precip_day, 'precip_day', ierr, 1, Cbh_binary_flag)
@@ -501,8 +504,10 @@
         ENDIF
 
         IF ( Climate_temp_flag==ACTIVE ) THEN
-          IF ( getparam_real(MODNAME, 'tmax_cbh_adj', Nhru*MONTHS_PER_YEAR, Tmax_cbh_adj)/=0 ) CALL read_error(2, 'tmax_cbh_adj')
-          IF ( getparam_real(MODNAME, 'tmin_cbh_adj', Nhru*MONTHS_PER_YEAR, Tmin_cbh_adj)/=0 ) CALL read_error(2, 'tmin_cbh_adj')
+          IF ( getparam_real_2d(MODNAME, 'tmax_cbh_adj', Nhru, MONTHS_PER_YEAR, Tmax_cbh_adj)/=0 ) &
+     &         CALL read_error(2, 'tmax_cbh_adj')
+          IF ( getparam_real_2d(MODNAME, 'tmin_cbh_adj', Nhru, MONTHS_PER_YEAR, Tmin_cbh_adj)/=0 ) &
+     &         CALL read_error(2, 'tmin_cbh_adj')
 
           IF ( control_string(Tmax_day, 'tmax_day')/=0 ) CALL read_error(5, 'tmax_day')
           IF ( control_string(Tmin_day, 'tmin_day')/=0 ) CALL read_error(5, 'tmin_day')
@@ -529,7 +534,7 @@
         ENDIF
 
         IF ( Climate_potet_flag==ACTIVE ) THEN
-          IF ( getparam_real(MODNAME, 'potet_cbh_adj', Nhru*MONTHS_PER_YEAR, Potet_cbh_adj)/=0 ) &
+          IF ( getparam_real_2d(MODNAME, 'potet_cbh_adj', Nhru, MONTHS_PER_YEAR, Potet_cbh_adj)/=0 ) &
      &         CALL read_error(2, 'potet_cbh_adj')
           IF ( control_string(Potet_day, 'potet_day')/=0 ) CALL read_error(5, 'potet_day')
           CALL find_header_end(Et_unit, Potet_day, 'potet_day', ierr, 1, Cbh_binary_flag)

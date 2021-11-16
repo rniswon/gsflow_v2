@@ -1,49 +1,4 @@
 !***********************************************************************
-! DONE:
-!  getdim, declfix, declmodule, decldim, declparam, getparam
-!  control_string, control_integer, control_string_array, getvartype
-!***********************************************************************
-      MODULE PRMS_MMFAPI
-        USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH, MAXFILE_LENGTH, MAXLINE_LENGTH, ERROR_var
-        IMPLICIT NONE
-        ! DANGER, DANGER, hard coded maximum number of paraemters and dimensions, DANGER, DANGER
-        INTEGER, PARAMETER :: MAXDIMENSIONS = 50, MAXPARAMETERS = 240, MAXVARIABLES = 500
-        INTEGER, SAVE :: Num_parameters, Num_dimensions, Num_variables  !, Total_parameters
- 
-        TYPE PRMS_parameter
-             CHARACTER(LEN=MAXCONTROL_LENGTH) :: param_name
-             CHARACTER(LEN=512) :: short_description, long_description
-             INTEGER :: numvals, data_flag, decl_flag, read_flag, nchars, id_num
-             INTEGER :: default_int, maximum_int, minimum_int, num_dimens
-             CHARACTER(LEN=MAXCONTROL_LENGTH) :: max_value, min_value, def_value, data_type
-             CHARACTER(LEN=MAXCONTROL_LENGTH) :: dimen_names, module_name, units
-             REAL, POINTER :: values(:)
-             INTEGER, POINTER :: int_values(:)
-             REAL :: maximum, minimum, default_real
-        END TYPE PRMS_parameter
-        TYPE ( PRMS_parameter ), SAVE, ALLOCATABLE :: Parameter_data(:)
-
-        TYPE PRMS_dimension
-             CHARACTER(LEN=16) :: name
-             INTEGER :: value, default, maximum, length
-             CHARACTER(LEN=MAXFILE_LENGTH) :: description
-        END TYPE PRMS_dimension
-        TYPE ( PRMS_dimension ), SAVE, ALLOCATABLE :: Dimension_data(:)
-
-        TYPE PRMS_variable
-             CHARACTER(LEN=MAXCONTROL_LENGTH) :: variable_name
-             CHARACTER(LEN=MAXLINE_LENGTH) :: description
-             INTEGER :: numvals, data_flag, decl_flag, get_flag, var_name_nchars, id_num
-             CHARACTER(LEN=MAXCONTROL_LENGTH) :: data_type, dimen_names, module_name, units
-             INTEGER, POINTER :: values_int(:)
-             REAL, POINTER :: values_real(:)
-             DOUBLE PRECISION, POINTER :: values_dble(:)
-        END TYPE PRMS_variable
-        TYPE ( PRMS_variable ), SAVE, ALLOCATABLE :: Variable_data(:)
-
-      END MODULE PRMS_MMFAPI
-
-!***********************************************************************
 ! Allocate and initialize parameter data base
 ! DANGER, DANGER, hard coded maximum number of paraemters, DANGER, DANGER
 !***********************************************************************
@@ -79,6 +34,9 @@
         Parameter_data(i)%minimum_int = 0
         Parameter_data(i)%default_int = 0
         Parameter_data(i)%num_dimens = 0
+        Parameter_data(i)%num_dim1 = 0
+        Parameter_data(i)%num_dim2 = 0
+        Parameter_data(i)%scalar_flag = 0
       ENDDO
       Num_parameters = 0
 
@@ -124,9 +82,9 @@
       INTEGER, EXTERNAL :: numchars, isdeclared, getdim
       EXTERNAL :: check_parameters_declared, read_error, error_stop
       ! Local Variables
-      INTEGER :: comma, ndimen, nval, nvals, nvals2, declared, numvalues, type_flag, iset, i, itemp
+      INTEGER :: comma, ndimen, nval, nvals, nvals2, declared, numvalues, type_flag, iset, i, itemp, j
       REAL :: temp
-      CHARACTER(LEN=MAXCONTROL_LENGTH) :: dimen1, dimen2
+      CHARACTER(LEN=16) :: dimen1, dimen2
 !***********************************************************************
       declparam = 0
       !!!!!!!!!!!! check to see if already in data structure
@@ -148,7 +106,9 @@
       Parameter_data(Num_parameters)%short_description = Descshort
       Parameter_data(Num_parameters)%long_description = Desclong
       Parameter_data(Num_parameters)%units = Units
-
+      Parameter_data(Num_parameters)%num_dim1 = 0
+      Parameter_data(Num_parameters)%num_dim2 = 0
+      Parameter_data(Num_parameters)%scalar_flag = 0
       Parameter_data(Num_parameters)%decl_flag = 1
       Parameter_data(Num_parameters)%nchars = numchars(Paramname)
       Parameter_data(Num_parameters)%id_num = Num_dimensions
@@ -169,11 +129,14 @@
         dimen2 = Dimenname((comma+1):ndimen)
         Parameter_data(Num_parameters)%num_dimens = 2
       ENDIF
+      IF ( dimen1(:3) == 'one' ) Parameter_data(Num_parameters)%scalar_flag = 1
       numvalues = getdim(TRIM(dimen1))
+      Parameter_data(Num_parameters)%num_dim1 = numvalues
       IF ( numvalues==-1 ) CALL read_error(11, TRIM(dimen1))
       IF ( comma>0 ) THEN
         nvals2 = getdim(TRIM(dimen2))
         IF ( nvals2==-1 ) CALL read_error(11, TRIM(dimen2))
+        Parameter_data(Num_parameters)%num_dim2 = nvals2
         numvalues = numvalues * nvals2
       ENDIF
       Parameter_data(Num_parameters)%numvals = numvalues
@@ -182,24 +145,44 @@
       IF ( type_flag==1 ) THEN
         READ ( defvalue, * ) itemp
         Parameter_data(Num_parameters)%default_int = itemp
-        ALLOCATE ( Parameter_data(Num_parameters)%int_values(numvalues) )
-        IF ( numvalues>50000 ) THEN
-          DO i = 1, numvalues
-            Parameter_data(Num_parameters)%int_values(i) = itemp
-          ENDDO
+        IF ( Parameter_data(Num_parameters)%num_dimens == 1 ) THEN
+          IF ( Parameter_data(Num_parameters)%scalar_flag == 1 ) THEN
+            ALLOCATE ( Parameter_data(Num_parameters)%values_int_0d )
+            Parameter_data(Num_parameters)%values_int_0d = itemp
+          ELSE
+            ALLOCATE ( Parameter_data(Num_parameters)%values_int_1d(numvalues) )
+            DO i = 1, numvalues
+              Parameter_data(Num_parameters)%values_int_1d(i) = itemp
+            ENDDO
+          ENDIF
         ELSE
-          Parameter_data(Num_parameters)%int_values = itemp
+          ALLOCATE ( Parameter_data(Num_parameters)%values_int_2d(Parameter_data(Num_parameters)%num_dim1,nvals2) )
+          DO i = 1, Parameter_data(Num_parameters)%num_dim1
+            DO j = 1, nvals2
+              Parameter_data(Num_parameters)%values_int_2d(i,j) = itemp
+            ENDDO
+          ENDDO
         ENDIF
       ELSEIF ( type_flag==2 ) THEN
         READ ( defvalue, * ) temp
         Parameter_data(Num_parameters)%default_real = temp
-        ALLOCATE ( Parameter_data(Num_parameters)%values(numvalues) )
-        IF ( numvalues>50000 ) THEN
-          DO i = 1, numvalues
-            Parameter_data(Num_parameters)%values(i) = temp
-          ENDDO
+        IF ( Parameter_data(Num_parameters)%num_dimens==1 ) THEN
+          IF ( Parameter_data(Num_parameters)%scalar_flag == 1 ) THEN
+            ALLOCATE ( Parameter_data(Num_parameters)%values_real_0d )
+            Parameter_data(Num_parameters)%values_real_0d = temp
+          ELSE
+            ALLOCATE ( Parameter_data(Num_parameters)%values_real_1d(numvalues) )
+            DO i = 1, numvalues
+              Parameter_data(Num_parameters)%values_real_1d(i) = temp
+            ENDDO
+          ENDIF
         ELSE
-          Parameter_data(Num_parameters)%values = temp
+          ALLOCATE ( Parameter_data(Num_parameters)%values_real_2d(Parameter_data(Num_parameters)%num_dim1,nvals2) )
+          DO i = 1, Parameter_data(Num_parameters)%num_dim1
+            DO j = 1, nvals2
+              Parameter_data(Num_parameters)%values_real_2d(i,j) = temp
+            ENDDO
+          ENDDO
         ENDIF
       ENDIF
 
@@ -211,12 +194,12 @@
 
       IF ( iset==1 ) THEN
         IF ( type_flag==1 ) THEN  ! bounded parameters should all be integer
-        nvals = getdim(TRIM(Maxvalue))
-        IF ( nvals==-1 ) CALL read_error(11, Maxvalue)
+          nvals = getdim(TRIM(Maxvalue))
+          IF ( nvals==-1 ) CALL read_error(11, Maxvalue)
           Parameter_data(Num_parameters)%maximum_int = nvals
           Parameter_data(Num_parameters)%minimum_int = Parameter_data(Num_parameters)%default_int
         ELSE
-          CALL error_stop('bounded parameter not real type', ERROR_param)
+          CALL error_stop('bounded parameter cannot be real type', ERROR_param)
         ENDIF
       ELSE
         IF ( type_flag==1 ) THEN
@@ -312,14 +295,7 @@
       EXTERNAL :: set_data_type, error_stop
       ! Local Variables
       INTEGER :: type_flag
-      INTEGER, SAVE :: init
-      DATA init/0/ ! does this work?
 !***********************************************************************
-      IF ( init==0 ) THEN
-        init = 1
-        Num_variables = 0
-        ALLOCATE ( Variable_data(MAXVARIABLES) ) ! don't know how many, need to read var_name file
-      ENDIF
       ! need to declare parameters first, but don't know how many, know how many in Parameter File
       Num_variables = Num_variables + 1
       IF ( Num_variables>MAXVARIABLES ) THEN
@@ -337,6 +313,7 @@
       Variable_data(Num_variables)%numvals = Numvalues
       Variable_data(Num_variables)%data_type = Data_type
       Variable_data(Num_variables)%id_num = Num_variables
+      Variable_data(Num_variables)%dim_flag = 1
       CALL set_data_type(Data_type, type_flag)
       IF ( type_flag<1 .OR. type_flag>3 ) THEN
         PRINT *, 'ERROR, data type not implemented: ', Data_type, ' Variable: ', &
@@ -348,9 +325,9 @@
       END SUBROUTINE declvar
 
 !***********************************************************************
-! declvar_dble - set up memory for double precision variables
+! declvar_dble_1d - set up memory for double precision variables
 !***********************************************************************
-      SUBROUTINE declvar_dble(Modname, Varname, Dimenname, Numvalues, Desc, Units, Values)
+      SUBROUTINE declvar_dble_1d(Modname, Varname, Dimenname, Numvalues, Desc, Units, Values)
       USE PRMS_MMFAPI, ONLY: Num_variables, Variable_data
       IMPLICIT NONE
       ! Arguments
@@ -361,9 +338,54 @@
       EXTERNAL :: declvar
 !***********************************************************************
       CALL declvar( Modname, Varname, Dimenname, Numvalues, 'double', Desc, Units )
-      ALLOCATE ( Variable_data(Num_variables)%values_dble(Numvalues) )
-      Variable_data(Num_variables)%values_dble => Values(:Numvalues)
+      ALLOCATE ( Variable_data(Num_variables)%values_dble_1d(Numvalues) )
+      Variable_data(Num_variables)%values_dble_1d => Values(:Numvalues)
+      END SUBROUTINE declvar_dble_1d
+
+!***********************************************************************
+! declvar_dble - set up memory for scalar double precision variables
+!***********************************************************************
+      SUBROUTINE declvar_dble(Modname, Varname, Dimenname, Numvalues, Desc, Units, Value)
+      USE PRMS_MMFAPI, ONLY: Num_variables, Variable_data
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Dimenname, Desc, Units
+      INTEGER, INTENT(IN) :: Numvalues
+      DOUBLE PRECISION, TARGET :: Value
+      ! Functions
+      EXTERNAL :: declvar
+!***********************************************************************
+      CALL declvar( Modname, Varname, Dimenname, Numvalues, 'double', Desc, Units )
+      ALLOCATE ( Variable_data(Num_variables)%values_dble_0d )
+      Variable_data(Num_variables)%values_dble_0d => Value
+      Variable_data(Num_variables)%dim_flag = 0
       END SUBROUTINE declvar_dble
+
+!***********************************************************************
+! declvar_dble_2d - set up memory for 2 dimensional double precision variables
+!***********************************************************************
+      SUBROUTINE declvar_dble_2d(Modname, Varname, Dimenname, Dim1, Dim2, Desc, Units, Values)
+      USE PRMS_MMFAPI, ONLY: Num_variables, Variable_data
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Dimenname, Desc, Units
+      INTEGER, INTENT(IN) :: Dim1, Dim2
+      DOUBLE PRECISION, TARGET :: Values(Dim1, Dim2)
+      ! Functions
+      EXTERNAL :: declvar
+      ! Local variables
+      INTEGER :: numvalues, i, j
+!***********************************************************************
+      numvalues = Dim1 * Dim2
+      CALL declvar( Modname, Varname, Dimenname, numvalues, 'double', Desc, Units )
+      ALLOCATE ( Variable_data(Num_variables)%values_dble_2d(Dim1,Dim2) )
+      DO i = 1, Dim1
+        DO j = 1, Dim2
+          Variable_data(Num_variables)%values_dble_2d => Values
+        ENDDO
+      ENDDO
+      Variable_data(Num_variables)%dim_flag = 2
+      END SUBROUTINE declvar_dble_2d
 
 !***********************************************************************
 ! declvar_real - set up memory for real variables
@@ -379,9 +401,50 @@
       EXTERNAL :: declvar
 !***********************************************************************
       CALL declvar( Modname, Varname, Dimenname, Numvalues, 'real', Desc, Units )
-      ALLOCATE ( Variable_data(Num_variables)%values_real(Numvalues) )
-      Variable_data(Num_variables)%values_real => Values(:Numvalues)
+      ALLOCATE ( Variable_data(Num_variables)%values_real_1d(Numvalues) )
+      Variable_data(Num_variables)%values_real_1d => Values(:Numvalues)
       END SUBROUTINE declvar_real
+
+!***********************************************************************
+! declvar_real - set up memory for scalar real variables
+!***********************************************************************
+      SUBROUTINE declvar_real_0d(Modname, Varname, Dimenname, Numvalues, Desc, Units, Value)
+      USE PRMS_MMFAPI, ONLY: Num_variables, Variable_data
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Dimenname, Desc, Units
+      INTEGER, INTENT(IN) :: Numvalues
+      REAL, TARGET :: Value
+      ! Functions
+      EXTERNAL :: declvar
+!***********************************************************************
+      CALL declvar( Modname, Varname, Dimenname, Numvalues, 'real', Desc, Units )
+      ALLOCATE (Variable_data(Num_variables)%values_real_0d)
+      Variable_data(Num_variables)%values_real_0d => Value
+      Variable_data(Num_variables)%dim_flag = 0
+      END SUBROUTINE declvar_real_0d
+
+!***********************************************************************
+! declvar_real - set up memory for 2 dimensional real variables
+!***********************************************************************
+      SUBROUTINE declvar_real_2d(Modname, Varname, Dimenname, Dim1, Dim2, Desc, Units, Values)
+      USE PRMS_MMFAPI, ONLY: Num_variables, Variable_data
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Dimenname, Desc, Units
+      INTEGER, INTENT(IN) :: Dim1, Dim2
+      REAL, TARGET :: Values(Dim1, Dim2)
+      ! Functions
+      EXTERNAL :: declvar
+      ! Local variables
+      INTEGER :: numvalues
+!***********************************************************************
+      numvalues = Dim1 * Dim2
+      CALL declvar( Modname, Varname, Dimenname, numvalues, 'real', Desc, Units )
+      ALLOCATE ( Variable_data(Num_variables)%values_real_2d(Dim1,Dim2) )
+      Variable_data(Num_variables)%values_real_2d => Values
+      Variable_data(Num_variables)%dim_flag = 2
+      END SUBROUTINE declvar_real_2d
 
 !***********************************************************************
 ! declvar_int - set up memory for integer variables
@@ -397,9 +460,49 @@
       EXTERNAL :: declvar
 !***********************************************************************
       CALL declvar( Modname, Varname, Dimenname, Numvalues, 'integer', Desc, Units )
-      ALLOCATE ( Variable_data(Num_variables)%values_int(Numvalues) )
-      Variable_data(Num_variables)%values_int => Values(:Numvalues)
+      ALLOCATE ( Variable_data(Num_variables)%values_int_1d(Numvalues) )
+      Variable_data(Num_variables)%values_int_1d => Values(:Numvalues)
       END SUBROUTINE declvar_int
+
+!***********************************************************************
+! declvar_int - set up memory for scalar integer variables
+!***********************************************************************
+      SUBROUTINE declvar_int_0d(Modname, Varname, Dimenname, Numvalues, Desc, Units, Value)
+      USE PRMS_MMFAPI, ONLY: Num_variables, Variable_data
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Dimenname, Desc, Units
+      INTEGER, INTENT(IN) :: Numvalues
+      INTEGER, TARGET :: Value
+      ! Functions
+      EXTERNAL :: declvar
+!***********************************************************************
+      CALL declvar( Modname, Varname, Dimenname, Numvalues, 'integer', Desc, Units )
+      ALLOCATE (Variable_data(Num_variables)%values_int_0d)
+      Variable_data(Num_variables)%values_int_0d => Value
+      Variable_data(Num_variables)%dim_flag = 0
+      END SUBROUTINE declvar_int_0d
+
+!***********************************************************************
+! declvar_int_2d - set up memory for two-dimensional integer variables
+!***********************************************************************
+      SUBROUTINE declvar_int_2d(Modname, Varname, Dimenname, Dim1, Dim2, Desc, Units, Values)
+      USE PRMS_MMFAPI, ONLY: Num_variables, Variable_data
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Dimenname, Desc, Units
+      INTEGER, INTENT(IN) :: Dim1, Dim2
+      INTEGER, TARGET :: Values(Dim1, Dim2)
+      ! Functions
+      EXTERNAL :: declvar
+      INTEGER :: numvalues
+!***********************************************************************
+      numvalues = Dim1 * Dim2
+      CALL declvar( Modname, Varname, Dimenname, numvalues, 'integer', Desc, Units )
+      ALLOCATE ( Variable_data(Num_variables)%values_int_2d(Dim1, Dim2) )
+      Variable_data(Num_variables)%values_int_2d => Values
+      Variable_data(Num_variables)%dim_flag = 2
+      END SUBROUTINE declvar_int_2d
 
 !***********************************************************************
 ! getvar_dble - get double precision variable values
@@ -414,14 +517,56 @@
       ! Functions
       INTEGER, EXTERNAL :: find_variable
       ! Local Variables
-      INTEGER :: var_id
+      INTEGER :: var_id, i
 !***********************************************************************
       var_id = find_variable(Modname, Varname, Numvalues, 'double')
-      Values = Variable_data(var_id)%values_dble
+      DO i = 1, Numvalues
+        Values(i) = Variable_data(var_id)%values_dble_1d(i)
+      ENDDO
       END SUBROUTINE getvar_dble
 
 !***********************************************************************
-! getvar_dble - get single precision variable values
+! getvar_dble_2d - get double precision variable values
+!***********************************************************************
+!      SUBROUTINE getvar_dble_2d(Modname, Varname, Numvalues, Values)
+!      USE PRMS_MMFAPI
+!      IMPLICIT NONE
+!      ! Arguments
+!      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname
+!      INTEGER, INTENT(IN) :: Numvalues
+!      DOUBLE PRECISION, INTENT(OUT) :: Values(Numvalues)
+!      ! Functions
+!      INTEGER, EXTERNAL :: find_variable
+!      ! Local Variables
+!      INTEGER :: var_id, i
+!***********************************************************************
+!      var_id = find_variable(Modname, Varname, Numvalues, 'double')
+!      DO i = 1, Numvalues
+!        Values(i) = Variable_data(var_id)%values_dble_2d(i) ! need to make 2d
+!      ENDDO
+!      END SUBROUTINE getvar_dble_2d
+
+!***********************************************************************
+! getvar_dble_0d - get double precision scalar variable values
+!***********************************************************************
+      SUBROUTINE getvar_dble_0d(Modname, Varname, Numvalues, Value)
+      USE PRMS_MMFAPI
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname
+      INTEGER, INTENT(IN) :: Numvalues
+      DOUBLE PRECISION, INTENT(OUT) :: Value
+      ! Functions
+      INTEGER, EXTERNAL :: find_variable
+      ! Local Variables
+      INTEGER :: var_id
+!***********************************************************************
+      var_id = find_variable(Modname, Varname, Numvalues, 'double')
+      Value = Variable_data(var_id)%values_dble_0d
+      END SUBROUTINE getvar_dble_0d
+
+!***********************************************************************
+! getvar_real - get single precision variable values
 !***********************************************************************
       SUBROUTINE getvar_real(Modname, Varname, Numvalues, Values)
       USE PRMS_MMFAPI
@@ -433,14 +578,35 @@
       ! Functions
       INTEGER, EXTERNAL :: find_variable
       ! Local Variables
-      INTEGER :: var_id
+      INTEGER :: var_id, i
 !***********************************************************************
       var_id = find_variable(Modname, Varname, Numvalues, 'real')
-      Values = Variable_data(var_id)%values_real
+      DO i = 1, Numvalues
+        Values(i) = Variable_data(var_id)%values_real_1d(i)
+      ENDDO
       END SUBROUTINE getvar_real
 
 !***********************************************************************
-! getvar_dble - get integer variable values
+! getvar_real_0d - get scalar single precision variable values
+!***********************************************************************
+      SUBROUTINE getvar_real_0d(Modname, Varname, Numvalues, Value)
+      USE PRMS_MMFAPI
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname
+      INTEGER, INTENT(IN) :: Numvalues
+      REAL, INTENT(OUT) :: Value
+      ! Functions
+      INTEGER, EXTERNAL :: find_variable
+      ! Local Variables
+      INTEGER :: var_id
+!***********************************************************************
+      var_id = find_variable(Modname, Varname, Numvalues, 'real')
+      Value = Variable_data(var_id)%values_real_0d
+      END SUBROUTINE getvar_real_0d
+
+!***********************************************************************
+! getvar_int - get integer variable values
 !***********************************************************************
       SUBROUTINE getvar_int(Modname, Varname, Numvalues, Values)
       USE PRMS_MMFAPI
@@ -452,64 +618,84 @@
       ! Functions
       INTEGER, EXTERNAL :: find_variable
       ! Local Variables
+      INTEGER :: var_id, i
+!***********************************************************************
+      var_id = find_variable(Modname, Varname, Numvalues, 'integer')
+      DO i = 1, Numvalues
+        Values(i) = Variable_data(var_id)%values_int_1d(i)
+      ENDDO
+      END SUBROUTINE getvar_int
+
+!***********************************************************************
+! getvar_int_0d - get scalar integer variable values
+!***********************************************************************
+      SUBROUTINE getvar_int_0d(Modname, Varname, Numvalues, Value)
+      USE PRMS_MMFAPI
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname
+      INTEGER, INTENT(IN) :: Numvalues
+      INTEGER, INTENT(OUT) :: Value
+      ! Functions
+      INTEGER, EXTERNAL :: find_variable
+      ! Local Variables
       INTEGER :: var_id
 !***********************************************************************
       var_id = find_variable(Modname, Varname, Numvalues, 'integer')
-      Values = Variable_data(var_id)%values_int
-      END SUBROUTINE getvar_int
+      Value = Variable_data(var_id)%values_int_0d
+      END SUBROUTINE getvar_int_0d
 
 !***********************************************************************
 ! getvar - get variable values
 !***********************************************************************
-      INTEGER FUNCTION getvar(Modname, Varname, Numvalues, Data_type, Values)
-      USE PRMS_MMFAPI
-      IMPLICIT NONE
-      ! Arguments
-      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Data_type
-      INTEGER, INTENT(IN) :: Numvalues
-      ! values could be any data type
-      REAL, INTENT(OUT) :: Values(Numvalues)
-      ! Functions
-      !INTRINSIC :: TRANSFER
-      INTEGER, EXTERNAL :: find_variable
-      ! Local Variables
-      INTEGER :: var_id, var_type
-      INTEGER, ALLOCATABLE :: itemp(:)
-      REAL, ALLOCATABLE :: temp(:)
-      DOUBLE PRECISION, ALLOCATABLE :: dtemp(:)
-!***********************************************************************
-      var_id = find_variable(Modname, Varname, Numvalues, Data_type)
-      var_type = Variable_data(var_id)%data_flag
-
-      IF ( var_type==1 ) THEN
-        ALLOCATE ( itemp(Numvalues) )
-        itemp = Variable_data(var_id)%values_int
-        Values = transfer(itemp, Values)
-        DEALLOCATE ( itemp )
-      ELSEIF ( var_type==2 ) THEN
-        ALLOCATE ( temp(Numvalues) )
-        temp = Variable_data(var_id)%values_real
-        Values = transfer(temp, Values)
-        DEALLOCATE ( temp )
-      ELSEIF ( var_type==3 ) THEN
-        ALLOCATE ( dtemp(Numvalues) )
-        dtemp = Variable_data(var_id)%values_dble
-        Values = transfer(dtemp, Values)
-        DEALLOCATE ( dtemp )
-      ENDIF
-      
-
-      !Values = TRANSFER(Variable_data(var_id)%values_dble,Values)
-      !do i = 1, Numvalues
-      !    !Values(i) = SNGL(Variable_data(var_id)%values_dble(i))
-      !    Values(i) = temp(i)
-      !    IF ( values(i)<0.0 ) values(i) = 0.0
-      !    !print *, Variable_data(var_id)%values_dble(i)
-      !ENDDO
-      !values = temp
-
-      getvar = 0
-      END FUNCTION getvar
+!      INTEGER FUNCTION getvar(Modname, Varname, Numvalues, Data_type, Values)
+!      USE PRMS_MMFAPI
+!      IMPLICIT NONE
+!      ! Arguments
+!      CHARACTER(LEN=*), INTENT(IN) :: Modname, Varname, Data_type
+!      INTEGER, INTENT(IN) :: Numvalues
+!      ! values could be any data type
+!      REAL, INTENT(OUT) :: Values(Numvalues)
+!      ! Functions
+!      !INTRINSIC :: TRANSFER
+!      INTEGER, EXTERNAL :: find_variable
+!      ! Local Variables
+!      INTEGER :: var_id, var_type
+!      INTEGER, ALLOCATABLE :: itemp(:)
+!      REAL, ALLOCATABLE :: temp(:)
+!      DOUBLE PRECISION, ALLOCATABLE :: dtemp(:)
+!!***********************************************************************
+!      var_id = find_variable(Modname, Varname, Numvalues, Data_type)
+!      var_type = Variable_data(var_id)%data_flag
+!
+!      IF ( var_type==1 ) THEN
+!        ALLOCATE ( itemp(Numvalues) )
+!        itemp = Variable_data(var_id)%values_int_1d
+!        Values = transfer(itemp, Values)
+!        DEALLOCATE ( itemp )
+!      ELSEIF ( var_type==2 ) THEN
+!        ALLOCATE ( temp(Numvalues) )
+!        temp = Variable_data(var_id)%values_real_1d
+!        Values = transfer(temp, Values)
+!        DEALLOCATE ( temp )
+!      ELSEIF ( var_type==3 ) THEN
+!        ALLOCATE ( dtemp(Numvalues) )
+!        dtemp = Variable_data(var_id)%values_dble_1d
+!        Values = transfer(dtemp, Values)
+!        DEALLOCATE ( dtemp )
+!      ENDIF
+!
+!      !Values = TRANSFER(Variable_data(var_id)%values_dble,Values)
+!      !do i = 1, Numvalues
+!      !    !Values(i) = SNGL(Variable_data(var_id)%values_dble(i))
+!      !    Values(i) = temp(i)
+!      !    IF ( values(i)<0.0 ) values(i) = 0.0
+!      !    !print *, Variable_data(var_id)%values_dble(i)
+!      !ENDDO
+!      !values = temp
+!
+!      getvar = 0
+!      END FUNCTION getvar
 
 !***********************************************************************
 ! find_variable - find variable in data structure
@@ -632,6 +818,7 @@
       INTEGER FUNCTION getparam_real(Modname, Paramname, Numvalues, Values)
       USE PRMS_MMFAPI
       USE PRMS_MODULE, ONLY: Parameter_check_flag
+      USE PRMS_BASIN, ONLY: Hru_type
       IMPLICIT NONE
       ! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: Modname, Paramname
@@ -666,31 +853,161 @@
       ENDDO
 
       IF ( found==0 ) THEN
-        print *, Modname
         PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' not declared'
         ierr = 1
       ENDIF
       IF ( ierr==1 ) ERROR STOP ERROR_var
 
-
       IF ( Parameter_check_flag==1 ) THEN
         DO i = 1, Numvalues
-          IF ( Parameter_data(param_id)%values(i) > Parameter_data(param_id)%maximum ) THEN
-            PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
-            PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; maximum value: ', &
+          IF ( Hru_type(i)==0 .OR. Hru_type(i)==2 ) CYCLE
+          IF ( Parameter_data(param_id)%values_real_1d(i) > Parameter_data(param_id)%maximum ) THEN
+            PRINT '(/,3A,I0,A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id, '; HRU: ', i
+            PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values_real_1d(i), '; maximum value: ', &
      &                               Parameter_data(param_id)%maximum
           ENDIF
-          IF ( Parameter_data(param_id)%values(i) < Parameter_data(param_id)%minimum ) THEN
-            PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
-            PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values(i), '; minimum value: ', &
+          IF ( Parameter_data(param_id)%values_real_1d(i) < Parameter_data(param_id)%minimum ) THEN
+            PRINT '(/,3A,I0,A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id, '; HRU: ', i
+            PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values_real_1d(i), '; minimum value: ', &
      &                               Parameter_data(param_id)%minimum
           ENDIF
         ENDDO
       ENDIF
-      Values = Parameter_data(param_id)%values
+      Values = Parameter_data(param_id)%values_real_1d
 
       getparam_real = 0
       END FUNCTION getparam_real
+
+!***********************************************************************
+! getparam_real_2d - get real parameter values
+!***********************************************************************
+      INTEGER FUNCTION getparam_real_2d(Modname, Paramname, Dim1, Dim2, Values)
+      USE PRMS_MMFAPI
+      USE PRMS_MODULE, ONLY: Parameter_check_flag
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Paramname
+      INTEGER, INTENT(IN) :: Dim1, Dim2
+      ! values could be any data type
+      REAL, INTENT(OUT) :: Values(Dim1,Dim2)
+      ! Functions
+      INTRINSIC :: TRIM
+      EXTERNAL :: error_stop
+      ! Local Variables
+      INTEGER :: found, param_id, i, ierr, j, numvalues
+!***********************************************************************
+      numvalues = Dim1 * Dim2
+      Values = 0.0
+      ierr = 0
+      found = 0
+      DO i = 1, Num_parameters
+        IF ( Paramname==TRIM(Parameter_data(i)%param_name) ) THEN
+          found = 1
+          IF ( Parameter_data(i)%numvals/=numvalues ) THEN
+            ierr = 1
+            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
+     &               ' number of values in getparam_real_2d does not match declared number of values'
+          ENDIF
+          IF ( TRIM(Parameter_data(i)%data_type)/='real' ) THEN
+            ierr = 1
+            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
+     &               ' data type does in getparam_real_2d not match declared data type'
+          ENDIF
+          param_id = i
+          EXIT
+        ENDIF
+      ENDDO
+
+      IF ( found==0 ) THEN
+        PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' not declared'
+        ierr = 1
+      ENDIF
+      IF ( ierr==1 ) ERROR STOP ERROR_var
+
+      IF ( Parameter_check_flag==1 ) THEN
+        DO i = 1, Dim1
+          DO j = 1, Dim2
+            IF ( Parameter_data(param_id)%values_real_2d(i,j) > Parameter_data(param_id)%maximum ) THEN
+              PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
+              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values_real_2d(i,j), '; maximum value: ', &
+     &                                 Parameter_data(param_id)%maximum
+            ENDIF
+            IF ( Parameter_data(param_id)%values_real_2d(i,j) < Parameter_data(param_id)%minimum ) THEN
+              PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
+              PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values_real_2d(i,j), '; minimum value: ', &
+     &                                 Parameter_data(param_id)%minimum
+            ENDIF
+          ENDDO
+        ENDDO
+      ENDIF
+      Values = Parameter_data(param_id)%values_real_2d
+
+      getparam_real_2d = 0
+      END FUNCTION getparam_real_2d
+
+!***********************************************************************
+! getparam_real_0d - get real parameter values
+!***********************************************************************
+      INTEGER FUNCTION getparam_real_0d(Modname, Paramname, Numvalues, Value)
+      USE PRMS_MMFAPI
+      USE PRMS_MODULE, ONLY: Parameter_check_flag
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Paramname
+      INTEGER, INTENT(IN) :: Numvalues
+      ! values could be any data type
+      REAL, INTENT(OUT) :: Value
+      ! Functions
+      INTRINSIC :: TRIM
+      EXTERNAL :: error_stop
+      ! Local Variables
+      INTEGER :: found, param_id, i, ierr
+!***********************************************************************
+      Value = 0.0
+      ierr = 0
+      found = 0
+      DO i = 1, Num_parameters
+        IF ( Paramname==TRIM(Parameter_data(i)%param_name) ) THEN
+          found = 1
+          IF ( Parameter_data(i)%numvals/=Numvalues ) THEN
+            ierr = 1
+            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
+     &               ' number of values in getparam_real_0d does not match declared number of values'
+          ENDIF
+          IF ( TRIM(Parameter_data(i)%data_type)/='real' ) THEN
+            ierr = 1
+            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
+     &               ' data type does in getparam_real_0d not match declared data type'
+          ENDIF
+          param_id = i
+          EXIT
+        ENDIF
+      ENDDO
+
+      IF ( found==0 ) THEN
+        PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' not declared'
+        ierr = 1
+      ENDIF
+      IF ( ierr==1 ) ERROR STOP ERROR_var
+
+      IF ( Parameter_check_flag==1 ) THEN
+        DO i = 1, Numvalues
+          IF ( Parameter_data(param_id)%values_real_0d > Parameter_data(param_id)%maximum ) THEN
+            PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
+            PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values_real_0d, '; maximum value: ', &
+     &                               Parameter_data(param_id)%maximum
+          ENDIF
+          IF ( Parameter_data(param_id)%values_real_0d < Parameter_data(param_id)%minimum ) THEN
+            PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
+            PRINT '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values_real_0d, '; minimum value: ', &
+     &                               Parameter_data(param_id)%minimum
+          ENDIF
+        ENDDO
+      ENDIF
+      Value = Parameter_data(param_id)%values_real_0d
+
+      getparam_real_0d = 0
+      END FUNCTION getparam_real_0d
 
 !***********************************************************************
 ! getparam_int - integer get parameter values
@@ -738,77 +1055,152 @@
 
       IF ( Parameter_check_flag==1 ) THEN
         DO i = 1, Numvalues
-          IF ( Parameter_data(param_id)%int_values(i) > Parameter_data(param_id)%maximum_int ) THEN
+          IF ( Parameter_data(param_id)%values_int_1d(i) > Parameter_data(param_id)%maximum_int ) THEN
             PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
-            PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%int_values(i), '; maximum value: ', &
+            PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%values_int_1d(i), '; maximum value: ', &
      &                             Parameter_data(param_id)%maximum_int
           ENDIF
-          IF ( Parameter_data(param_id)%int_values(i) < Parameter_data(param_id)%minimum_int ) THEN
+          IF ( Parameter_data(param_id)%values_int_1d(i) < Parameter_data(param_id)%minimum_int ) THEN
             PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
-            PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%int_values(i), '; minimum value: ', &
+            PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%values_int_1d(i), '; minimum value: ', &
      &                             Parameter_data(param_id)%minimum_int
           ENDIF
         ENDDO
       ENDIF
 
-
-
-      CALL getvalues_int(param_id, Numvalues, Values)
+      Values = Parameter_data(param_id)%values_int_1d
 
       getparam_int = 0
       END FUNCTION getparam_int
 
 !***********************************************************************
-! getvar_values_int - get values from variable data structure
+! getparam_int_2d - integer get parameter values
 !***********************************************************************
-!      SUBROUTINE getvar_values_int(param_id, Numvalues, Values)
-!      USE PRMS_MMFAPI
-!      IMPLICIT NONE
-!      ! Arguments
-!      INTEGER, INTENT(IN) :: param_id, Numvalues
-!      INTEGER, INTENT(OUT) :: Values(Numvalues)
-!!***********************************************************************
-!      values = Variable_data(param_id)%values_int
-!      END SUBROUTINE getvar_values_int
-
-!***********************************************************************
-! getvar_values_real - get values from variable data structure
-!***********************************************************************
-!      SUBROUTINE getvar_values_real(param_id, Numvalues, Values)
-!      USE PRMS_MMFAPI
-!      IMPLICIT NONE
-!      ! Arguments
-!      INTEGER, INTENT(IN) :: param_id, Numvalues
-!      REAL, INTENT(OUT) :: Values(Numvalues)
-!!***********************************************************************
-!      values = Variable_data(param_id)%values_real
-!      END SUBROUTINE getvar_values_real
-
-!***********************************************************************
-! getvalues_int - get values from parameter data structure
-!***********************************************************************
-      SUBROUTINE getvalues_int(param_id, Numvalues, Values)
-      USE PRMS_MMFAPI, ONLY: Parameter_data
+      INTEGER FUNCTION getparam_int_2d(Modname, Paramname, Dim1, Dim2, Values)
+      USE PRMS_MMFAPI
+      USE PRMS_MODULE, ONLY: Parameter_check_flag
       IMPLICIT NONE
       ! Arguments
-      INTEGER, INTENT(IN) :: param_id, Numvalues
-      INTEGER, INTENT(OUT) :: Values(Numvalues)
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Paramname
+      INTEGER, INTENT(IN) :: Dim1, Dim2
+      INTEGER, INTENT(OUT) :: Values(Dim1, Dim2)
+      ! Functions
+      INTRINSIC :: TRIM
+      EXTERNAL :: error_stop
+      ! Local Variables
+      INTEGER :: found, param_id, i, j, ierr, numvalues
 !***********************************************************************
-      Values = Parameter_data(param_id)%int_values
-      END SUBROUTINE getvalues_int
+      numvalues = Dim1 * Dim2
+      Values = 0
+      ierr = 0
+      found = 0
+      DO i = 1, Num_parameters
+        IF ( Paramname==TRIM(Parameter_data(i)%param_name) ) THEN
+          found = 1
+          IF ( Parameter_data(i)%numvals/=numvalues ) THEN
+            ierr = 1
+            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
+     &               ' number of values in getparam_int_2d does not match declared number of values'
+          ENDIF
+          IF ( TRIM(Parameter_data(i)%data_type)/='integer' ) THEN
+            ierr = 1
+            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
+     &               ' data type does in getparam_int_2d not match declared data type'
+          ENDIF
+          param_id = i
+          EXIT
+        ENDIF
+      ENDDO
+
+      IF ( found==0 ) THEN
+        PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' not declared'
+        ierr = 1
+      ENDIF
+      IF ( ierr==1 ) ERROR STOP ERROR_var
+
+      IF ( Parameter_check_flag==1 ) THEN
+        DO i = 1, Dim1
+          DO j = 1, Dim2
+            IF ( Parameter_data(param_id)%values_int_2d(i,j) > Parameter_data(param_id)%maximum_int ) THEN
+              PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
+              PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%values_int_2d(i,j), '; maximum value: ', &
+     &                               Parameter_data(param_id)%maximum_int
+            ENDIF
+            IF ( Parameter_data(param_id)%values_int_2d(i,j) < Parameter_data(param_id)%minimum_int ) THEN
+              PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
+              PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%values_int_2d(i,j), '; minimum value: ', &
+     &                               Parameter_data(param_id)%minimum_int
+            ENDIF
+          ENDDO
+        ENDDO
+      ENDIF
+
+      Values = Parameter_data(param_id)%values_int_2d
+
+      getparam_int_2d = 0
+      END FUNCTION getparam_int_2d
 
 !***********************************************************************
-! getvalues_dbl - get values from parameter data structure
+! getparam_int_0d - scalar integer get parameter values
 !***********************************************************************
-      SUBROUTINE getvalues_dbl(param_id, Numvalues, Values)
-      USE PRMS_MMFAPI, ONLY: Parameter_data
+      INTEGER FUNCTION getparam_int_0d(Modname, Paramname, Numvalues, Value)
+      USE PRMS_MMFAPI
+      USE PRMS_MODULE, ONLY: Parameter_check_flag
       IMPLICIT NONE
       ! Arguments
-      INTEGER, INTENT(IN) :: param_id, Numvalues
-      DOUBLE PRECISION, INTENT(OUT) :: Values(Numvalues)
+      CHARACTER(LEN=*), INTENT(IN) :: Modname, Paramname
+      INTEGER, INTENT(IN) :: Numvalues
+      INTEGER, INTENT(OUT) :: Value
+      ! Functions
+      INTRINSIC :: TRIM
+      EXTERNAL :: error_stop
+      ! Local Variables
+      INTEGER :: found, param_id, i, ierr
 !***********************************************************************
-      values = Parameter_data(param_id)%values
-      END SUBROUTINE getvalues_dbl
+      Value = 0
+      ierr = 0
+      found = 0
+      DO i = 1, Num_parameters
+        IF ( Paramname==TRIM(Parameter_data(i)%param_name) ) THEN
+          found = 1
+          IF ( Parameter_data(i)%numvals/=Numvalues ) THEN
+            ierr = 1
+            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
+     &               ' number of values in getparam_int_0d does not match declared number of alues'
+          ENDIF
+          IF ( TRIM(Parameter_data(i)%data_type)/='integer' ) THEN
+            ierr = 1
+            PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
+     &               ' data type does in getparam_int_0d not match declared data type'
+          ENDIF
+          param_id = i
+          EXIT
+        ENDIF
+      ENDDO
+
+      IF ( found==0 ) THEN
+        PRINT *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' not declared'
+        ierr = 1
+      ENDIF
+      IF ( ierr==1 ) ERROR STOP ERROR_var
+
+      IF ( Parameter_check_flag==1 ) THEN
+        IF ( Parameter_data(param_id)%values_int_0d > Parameter_data(param_id)%maximum_int ) THEN
+          PRINT '(/,3A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id
+          PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%values_int_0d, '; maximum value: ', &
+     &                             Parameter_data(param_id)%maximum_int
+        ENDIF
+        IF ( Parameter_data(param_id)%values_int_0d < Parameter_data(param_id)%minimum_int ) THEN
+          PRINT '(/,3A,I0)', 'WARNING, value < minimum value for parameter: ', Paramname, '; index: ', param_id
+          PRINT '(A,F0.5,A,I0)', '         value: ', Parameter_data(param_id)%values_int_0d, '; minimum value: ', &
+     &                           Parameter_data(param_id)%minimum_int
+        ENDIF
+      ENDIF
+
+      Value = Parameter_data(param_id)%values_int_0d
+
+      getparam_int_0d = 0
+      END FUNCTION getparam_int_0d
 
 !***********************************************************************
 ! timestep_hours - time step increment in hours
@@ -819,40 +1211,6 @@
       !deltim = lisfunction() ! need to make routine to get time step increment
       deltim = 24.0D0
       END FUNCTION deltim
-
-!***********************************************************************
-! dattim - get start, end, or current date and time
-!***********************************************************************
-      SUBROUTINE dattim(String, Datetime)
-      USE PRMS_CONSTANTS, ONLY: ERROR_time
-      USE PRMS_MODULE, ONLY: Endtime, Starttime, Nowyear, Nowmonth, Nowday
-      USE PRMS_SET_TIME, ONLY: Julian_day_absolute
-      IMPLICIT NONE
-      ! Arguments
-      CHARACTER(LEN=*), INTENT(IN) :: String
-      INTEGER, INTENT(OUT) :: Datetime(6)
-      EXTERNAL :: compute_gregorian, error_stop
-      ! Local variable
-      INTEGER :: string_length
-!***********************************************************************
-      Datetime = 0
-      string_length = LEN(String)
-      IF ( String(:3)=='end' ) THEN
-        Datetime = Endtime
-      ELSEIF ( String(:3)=='now' ) THEN
-        CALL compute_gregorian(Julian_day_absolute, Nowyear, Nowmonth, Nowday)
-        Datetime(1) = Nowyear
-        Datetime(2) = Nowmonth
-        Datetime(3) = Nowday
-        ! Datetime = LIS function
-      ELSEIF ( string_length>4 ) THEN
-        IF ( String(:5)=='start' ) THEN
-          Datetime = Starttime
-        ELSE
-          CALL error_stop('invalid call to dattim', ERROR_time)
-        ENDIF
-      ENDIF
-      END SUBROUTINE dattim
 
 !***********************************************************************
 ! decldim
@@ -961,7 +1319,7 @@
 !***********************************************************************
       INTEGER FUNCTION control_integer(Parmval, Paramname)
       USE PRMS_CONSTANTS, ONLY: ERROR_control
-      USE PRMS_CONTROL_FILE, ONLY: Num_control_parameters, Control_parameter_data, Max_num_control_parameters
+      USE PRMS_MMFAPI, ONLY: Control_parameter_data, Max_num_control_parameters, Num_control_parameters
       IMPLICIT NONE
       ! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: Paramname
@@ -1002,7 +1360,7 @@
 !***********************************************************************
       INTEGER FUNCTION control_integer_array(Parmval, Array_index, Paramname)
       USE PRMS_CONSTANTS, ONLY: ERROR_control
-      USE PRMS_CONTROL_FILE, ONLY: Control_parameter_data, Num_control_parameters
+      USE PRMS_MMFAPI, ONLY: Control_parameter_data, Num_control_parameters
       IMPLICIT NONE
       ! Arguments
       ! Array_index and Parmval not used, only used with MMF
@@ -1036,7 +1394,7 @@
 ! function checks to be sure a required parameter has a value (read or default)
 !***********************************************************************
       INTEGER FUNCTION control_string(Parmval, Paramname)
-      USE PRMS_CONTROL_FILE, ONLY: Num_control_parameters, Control_parameter_data, Max_num_control_parameters
+      USE PRMS_MMFAPI, ONLY: Num_control_parameters, Control_parameter_data
       IMPLICIT NONE
       ! Functions
       INTRINSIC :: TRIM
@@ -1074,7 +1432,7 @@
 !***********************************************************************
       INTEGER FUNCTION control_string_array(Parmval, Paramname, Array_index)
       USE PRMS_CONSTANTS, ONLY: ERROR_control
-      USE PRMS_CONTROL_FILE, ONLY: Control_parameter_data, Num_control_parameters
+      USE PRMS_MMFAPI, ONLY: Control_parameter_data, Num_control_parameters
       IMPLICIT NONE
       ! Arguments
       ! Array_index and Parmval not used, only used with MMF
@@ -1165,7 +1523,7 @@
       ! Functions
       INTRINSIC :: TRIM, INDEX
       ! Local Variables
-      INTEGER :: found, i, ii, j, k, ierr, iflg, comma, nvals
+      INTEGER :: found, i, ii, j, jj, k, ierr, iflg, comma, nvals
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: dimen1
 !***********************************************************************
       ierr = 0
@@ -1179,24 +1537,64 @@
           ENDIF
           IF ( Parameter_data(i)%numvals==Numvalues ) THEN
             IF ( Data_type==2 ) THEN
-              DO j = 1, Numvalues
-                Parameter_data(found)%values(j) = Values(j)
-              ENDDO
+              IF ( Parameter_data(found)%scalar_flag == 1 ) THEN
+                Parameter_data(found)%values_real_0d = Values(1)
+              ELSEIF ( Parameter_data(found)%num_dimens==1 ) THEN
+                DO j = 1, Numvalues
+                  Parameter_data(found)%values_real_1d(j) = Values(j)
+                ENDDO
+              ELSE ! 2d
+                k = 0
+                DO j = 1, Parameter_data(found)%num_dim2
+                  DO jj = 1, Parameter_data(found)%num_dim1
+                    k = k + 1
+                    Parameter_data(found)%values_real_2d(jj,j) = Values(k)
+                  ENDDO
+                ENDDO
+              ENDIF
             ELSE
-              DO j = 1, Numvalues
-                Parameter_data(found)%int_values(j) = Ivalues(j)
-              ENDDO
+              IF ( Parameter_data(found)%scalar_flag == 1 ) THEN
+                Parameter_data(found)%values_int_0d = Ivalues(1)
+              ELSEIF ( Parameter_data(found)%num_dimens==1 ) THEN
+                DO j = 1, Numvalues
+                  Parameter_data(found)%values_int_1d(j) = Ivalues(j)
+                ENDDO
+              ELSE ! 2d
+                k = 0
+                DO j = 1, Parameter_data(found)%num_dim1
+                  DO jj = 1, Parameter_data(found)%num_dim2
+                    k = k + 1
+                    Parameter_data(found)%values_int_2d(jj,j) = Ivalues(k)
+                  ENDDO
+                ENDDO
+              ENDIF
             ENDIF
           ELSE ! check for flexible dimension
             IF ( Numvalues==1 ) THEN ! set all values to single value
               IF ( Data_type==2 ) THEN
-                DO j = 1, Parameter_data(found)%numvals
-                  Parameter_data(found)%values(j) = Values(1)
-                ENDDO
-              ELSE
-                DO j = 1, Parameter_data(found)%numvals
-                  Parameter_data(found)%int_values(j) = Ivalues(1)
-                ENDDO
+                IF ( Parameter_data(found)%num_dimens==1 ) THEN
+                  DO j = 1, Parameter_data(found)%num_dim1
+                    Parameter_data(found)%values_real_1d(j) = Values(1)
+                  ENDDO
+                ELSE ! 2d
+                  DO j = 1, Parameter_data(found)%num_dim2
+                    DO jj = 1, Parameter_data(found)%num_dim1
+                      Parameter_data(found)%values_real_2d(jj,j) = Values(1)
+                    ENDDO
+                  ENDDO
+                ENDIF
+              ELSE ! data_type 1
+                IF ( Parameter_data(found)%num_dimens==1 ) THEN
+                  DO j = 1, Parameter_data(found)%num_dim1
+                    Parameter_data(found)%values_int_1d(j) = Ivalues(1)
+                  ENDDO
+                ELSE ! 2d
+                  DO j = 1, Parameter_data(found)%num_dim1
+                    DO jj = 1, Parameter_data(found)%num_dim2
+                      Parameter_data(found)%values_int_2d(jj,j) = Ivalues(1)
+                    ENDDO
+                  ENDDO
+                ENDIF
               ENDIF
             ELSE
               nvals = Parameter_data(found)%numvals / 12
@@ -1229,11 +1627,10 @@
               IF ( iflg==3 ) THEN ! 12 sets of nhru values
                 DO j = 1, 12
                   DO ii = 1, nvals
-                    k = k + 1
                     IF ( Data_type==2 ) THEN
-                      Parameter_data(found)%values(k) = Values(ii)
+                      Parameter_data(found)%values_real_2d(ii,j) = Values(ii)
                     ELSE
-                      Parameter_data(found)%int_values(k) = Ivalues(ii)
+                      Parameter_data(found)%values_int_2d(ii,j) = Ivalues(ii)
                     ENDIF
                   ENDDO
                 ENDDO
@@ -1242,9 +1639,9 @@
                   DO ii = 1, nvals
                     k = k + 1
                     IF ( Data_type==2 ) THEN
-                      Parameter_data(found)%values(k) = Values(j)
+                      Parameter_data(found)%values_real_2d(ii,j) = Values(j)
                     ELSE
-                      Parameter_data(found)%int_values(k) = Ivalues(j)
+                      Parameter_data(found)%values_int_2d(ii,j) = Ivalues(j)
                     ENDIF
                   ENDDO
                 ENDDO
@@ -1254,9 +1651,9 @@
 !                  DO j = 1, 12
 !                    k = k + 1
 !                    IF ( Data_type==2 ) THEN
-!                      Parameter_data(found)%values(k) = Values(ii)
+!                      Parameter_data(found)%values_real_1d(k) = Values(ii)
 !                    ELSE
-!                      Parameter_data(found)%int_values(k) = Ivalues(ii)
+!                      Parameter_data(found)%values_int_1d(k) = Ivalues(ii)
 !                    ENDIF
 !                  ENDDO
 !                ENDDO

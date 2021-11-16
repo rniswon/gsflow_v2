@@ -53,9 +53,10 @@
       INTEGER FUNCTION gsfbuddecl()
       USE GSFBUDGET
       USE PRMS_MODULE, ONLY: Nhru, Nsegment
+      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_real
       IMPLICIT NONE
       INTEGER, EXTERNAL :: getdim
-      EXTERNAL :: print_module, read_error, declvar_dble, declvar_real
+      EXTERNAL :: print_module, read_error
 !***********************************************************************
       gsfbuddecl = 0
 

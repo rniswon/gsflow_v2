@@ -7,7 +7,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Cascading Flow'
       character(len=*), parameter :: MODNAME = 'cascade'
-      character(len=*), parameter :: Version_cascade = '2021-09-14'
+      character(len=*), parameter :: Version_cascade = '2021-11-11'
       INTEGER, SAVE :: MSGUNT
       INTEGER, SAVE :: Iorder, Igworder, Ndown
 !   Computed Variables
@@ -200,7 +200,7 @@
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Gwr_route_order, Active_gwrs, Gwr_type, Hru_type
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getparam_real, getparam_int
+      INTEGER, EXTERNAL :: getparam_real_0d, getparam_int_0d
       EXTERNAL :: read_error, init_cascade, initgw_cascade
 ! Local Variables
       INTEGER :: i, j, k, ii, iret, itest
@@ -212,9 +212,9 @@
         Cascade_flg = 1
         Circle_switch = 0
       ELSE
-        IF ( getparam_real(MODNAME, 'cascade_tol', 1, Cascade_tol)/=0 ) CALL read_error(2, 'cascade_tol')
-        IF ( getparam_int(MODNAME, 'cascade_flg', 1, Cascade_flg)/=0 ) CALL read_error(2, 'cascade_flg')
-        IF ( getparam_int(MODNAME, 'circle_switch', 1, Circle_switch)/=0 ) CALL read_error(2, 'circle_switch')
+        IF ( getparam_real_0d(MODNAME, 'cascade_tol', 1, Cascade_tol)/=0 ) CALL read_error(2, 'cascade_tol')
+        IF ( getparam_int_0d(MODNAME, 'cascade_flg', 1, Cascade_flg)/=0 ) CALL read_error(2, 'cascade_flg')
+        IF ( getparam_int_0d(MODNAME, 'circle_switch', 1, Circle_switch)/=0 ) CALL read_error(2, 'circle_switch')
       ENDIF
 
       IF ( Cascade_flag>CASCADE_OFF ) CALL init_cascade(itest)

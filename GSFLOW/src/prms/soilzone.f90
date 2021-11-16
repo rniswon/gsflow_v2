@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-10-21'
+      character(len=*), parameter :: Version_soilzone = '2021-11-11'
       INTEGER, SAVE :: DBGUNT, Iter_aet
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -122,10 +122,11 @@
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Nhrucell, Print_debug, &
      &    Cascade_flag, GSFLOW_flag, Call_cascade, PRMS_land_iteration_flag, AG_flag, iter_aet_flag
       USE PRMS_SOILZONE
+      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_real, declvar_int, declvar_dble_1d
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam, getdim
-      EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop, declvar_dble, declvar_real, declvar_int
+      EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop
 !***********************************************************************
       szdecl = 0
 
@@ -301,13 +302,13 @@
      &       'inches', Basin_dncascadeflow)
 
         ALLOCATE ( Upslope_interflow(Nhru) )
-        CALL declvar_dble(MODNAME, 'upslope_interflow', 'nhru', Nhru, &
+        CALL declvar_dble_1d(MODNAME, 'upslope_interflow', 'nhru', Nhru, &
      &       'Cascading interflow runoff that flows to'// &
      &       ' the capillary reservoir of each downslope HRU for each upslope HRU', &
      &       'inches', Upslope_interflow)
 
         ALLOCATE ( Upslope_dunnianflow(Nhru) )
-        CALL declvar_dble(MODNAME, 'upslope_dunnianflow', 'nhru', Nhru, &
+        CALL declvar_dble_1d(MODNAME, 'upslope_dunnianflow', 'nhru', Nhru, &
      &       'Cascading Dunnian surface runoff that'// &
      &       ' flows to the capillary reservoir of each downslope HRU for each upslope HRU', &
      &       'inches', Upslope_dunnianflow)
@@ -335,7 +336,7 @@
 
         IF ( Nlake>0 ) THEN
           ALLOCATE ( Lakein_sz(Nhru) )
-          CALL declvar_dble(MODNAME, 'lakein_sz', 'nhru', Nhru, &
+          CALL declvar_dble_1d(MODNAME, 'lakein_sz', 'nhru', Nhru, &
      &         'Cascading interflow and Dunnian surface runoff to lake HRUs from each upslope HRU', &
      &         'inches', Lakein_sz)
 
@@ -445,7 +446,7 @@
      &     'none', Soil_saturated)
 
 !      ALLOCATE ( Snowevap_aet_frac(Nhru) )
-!      CALL declvar_dble(MODNAME, 'snowevap_aet_frac', 'nhru', Nhru, &
+!      CALL declvar_dble_1d(MODNAME, 'snowevap_aet_frac', 'nhru', Nhru, &
 !     &     'Fraction of sublimation of AET for each HRU', &
 !     &     'decimal fraction', Snowevap_aet_frac)
 
@@ -568,7 +569,7 @@
 
       ALLOCATE ( Fastcoef_lin(Nhru) )
       IF ( declparam(MODNAME, 'fastcoef_lin', 'nhru', 'real', &
-     &     '0.1', '0.0', '1.0', &
+     &     '0.1', '0.0', '1.5', &
      &     'Linear preferential-flow routing coefficient', &
      &     'Linear coefficient in equation to route preferential-flow storage downslope for each HRU', &
      &     'fraction/day')/=0 ) CALL read_error(1, 'fastcoef_lin')
@@ -620,7 +621,7 @@
       IMPLICIT NONE
 ! Functions
       EXTERNAL :: init_basin_vars, checkdim_bounded_limits, error_stop
-      INTEGER, EXTERNAL :: getparam_real, getparam_int
+      INTEGER, EXTERNAL :: getparam_real, getparam_int, getparam_real_2d
       INTRINSIC :: MIN, DBLE
 ! Local Variables
       INTEGER :: i, ii, ihru, icnt, j
@@ -641,7 +642,7 @@
       IF ( getparam_int(MODNAME, 'soil_type', Nhru, Soil_type)/=0 ) CALL read_error(2, 'soil_type')
       IF ( getparam_real(MODNAME, 'soil2gw_max', Nhru, Soil2gw_max)/=0 ) CALL read_error(2, 'soil2gw_max')
       IF ( Nlake>0 ) THEN
-        IF ( getparam_real(MODNAME, 'lake_evap_adj', MONTHS_PER_YEAR*Nlake, Lake_evap_adj)/=0 ) &
+        IF ( getparam_real_2d(MODNAME, 'lake_evap_adj', MONTHS_PER_YEAR, Nlake, Lake_evap_adj)/=0 ) &
      &       CALL read_error(2, 'lake_evap_adj')
       ENDIF
 
@@ -726,7 +727,7 @@
 !          Soil_moist_frac(i) = Soil_moist_tot(i)/Soil_zone_max(i)
 !          Cpr_stor_frac(i) = Soil_moist(i)/Soil_moist_max(i)
 !          Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Cpr_stor_frac(i)*perv_area )
-          Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Soil_moist(i)/Soil_moist_max(i)*perv_area )
+          IF ( Soil_moist_max(i)>0.0 ) Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Soil_moist(i)/Soil_moist_max(i)*perv_area )
           Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)
           Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
           IF ( Soil_lower_stor_max(i)>0.0 ) Soil_lower_ratio(i) = Soil_lower(i)/Soil_lower_stor_max(i)
@@ -747,7 +748,7 @@
           Basin_pref_stor = Basin_pref_stor + DBLE( Pref_flow_stor(i)*hruarea )
 !          Pfr_stor_frac(i) = Pref_flow_stor(i)/Pref_flow_max(i)
 !          Basin_pfr_stor_frac = Basin_pfr_stor_frac + DBLE( Pfr_stor_frac(i)*hruarea )
-          Basin_pfr_stor_frac = Basin_pfr_stor_frac + DBLE( Pref_flow_stor(i)/Pref_flow_max(i)*hruarea )
+          IF ( Pref_flow_max(i)>0.0 ) Basin_pfr_stor_frac = Basin_pfr_stor_frac + DBLE( Pref_flow_stor(i)/Pref_flow_max(i)*hruarea )
           IF ( Pref_flow_thrsh(i)>0.0 ) THEN
 !            Gvr_stor_frac(i) = Slow_stor(i)/Pref_flow_thrsh(i)
             Basin_gvr_stor_frac = Basin_gvr_stor_frac + DBLE( (Slow_stor(i)/Pref_flow_thrsh(i))*hruarea )
@@ -1195,7 +1196,7 @@
           Basin_pref_stor = Basin_pref_stor + DBLE( Pref_flow_stor(i)*harea )
 !          Pfr_stor_frac(i) = Pref_flow_stor(i)/Pref_flow_max(i)
 !          Basin_pfr_stor_frac = Basin_pfr_stor_frac + DBLE( Pfr_stor_frac(i)*harea )
-          Basin_pfr_stor_frac = Basin_pfr_stor_frac + DBLE( Pref_flow_stor(i)/Pref_flow_max(i)*harea )
+          IF ( Pref_flow_max(i)>0.0 ) Basin_pfr_stor_frac = Basin_pfr_stor_frac + DBLE( Pref_flow_stor(i)/Pref_flow_max(i)*harea )
         ELSEIF ( compute_lateral==ACTIVE ) THEN
           dunnianflw_gvr = topfr  !?? is this right
         ENDIF
