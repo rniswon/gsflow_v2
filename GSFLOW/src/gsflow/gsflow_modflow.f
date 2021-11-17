@@ -189,7 +189,7 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
         ierr = 1
       ENDIF
       IF ( IUNIT(66)==0 .AND. AG_flag == ACTIVE ) THEN
-        PRINT *, 'AG requires the AG Package'
+        PRINT *, 'GSFLOW_AG requires the AG Package'
         ierr = 1
       ENDIF
 
