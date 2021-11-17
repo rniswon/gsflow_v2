@@ -47,8 +47,9 @@
       USE GSFPRMS2MODSIM
       USE PRMS_MODULE, ONLY: Nsegment, Nlake
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Lake_hru_id
+	  USE PRMS_MODULE, ONLY: declvar_dble_1d
       IMPLICIT NONE
-      EXTERNAL read_error, declvar_dble
+      EXTERNAL read_error
       INTRINSIC ABS, DBLE
 ! Local Variables
       INTEGER :: i, ii, ierr
@@ -70,19 +71,19 @@
 !      ENDIF
 
       ALLOCATE ( Segment_latflow(Nsegment) )
-      CALL declvar_dble(MODNAME, 'Segment_latflow', 'nsegment', Nsegment, &
+      CALL declvar_dble_1d(MODNAME, 'Segment_latflow', 'nsegment', Nsegment, &
      &     'Lateral flow to each segment', &
      &     'acre-inches', Segment_latflow)
       ALLOCATE ( Lake_latflow(Nlake) )
-      CALL declvar_dble(MODNAME, 'Lake_latflow', 'nlake', Nlake, &
+      CALL declvar_dble_1d(MODNAME, 'Lake_latflow', 'nlake', Nlake, &
      &     'Total lateral flow into each lake', &
      &     'acre-inches', Lake_latflow)
       ALLOCATE ( Lake_precip(Nlake) )
-      CALL declvar_dble(MODNAME, 'Lake_precip', 'nlake', Nlake, &
+      CALL declvar_dble_1d(MODNAME, 'Lake_precip', 'nlake', Nlake, &
      &     'Precipitation into each lake', &
      &     'acre-inches', Lake_precip)
       ALLOCATE ( Lake_et(Nlake) )
-      CALL declvar_dble(MODNAME, 'Lake_et', 'nlake', Nlake, &
+      CALL declvar_dble_1d(MODNAME, 'Lake_et', 'nlake', Nlake, &
      &     'Evaporation from each lake', &
      &     'acre-inches', Lake_et)
       ALLOCATE ( Lake_In_flow(Nlake) )
