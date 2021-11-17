@@ -5,11 +5,13 @@
      &                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP) BIND(C,NAME="gsflow_prms")
       
       !DEC$ ATTRIBUTES DLLEXPORT :: gsflow_prms
+      USE PRMS_CONSTANTS, ONLY: ERROR_control
       USE PRMS_MODULE
+      USE PRMS_MMFAPI, ONLY: Num_variables, Variable_data, MAXVARIABLES
+      USE PRMS_MMFSUBS, ONLY: declvar_int_0d, declvar_real
       USE MF_DLL, ONLY: gsfdecl, MFNWT_RUN, MFNWT_CLEAN, MFNWT_OCBUDGET, MFNWT_INIT
       USE GWFSFRMODULE, ONLY: NSS
       USE GWFLAKMODULE, ONLY: NLAKES
-      USE PRMS_MMFSUBS, ONLY: declparam, getparam_real, getparam_int, getparam_int_0d, declvar_int_0d, declvar_real
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Process_mode, Idivert(Nsegshold)
@@ -40,9 +42,11 @@
       EXTERNAL :: gsflow_prms_restart, water_balance, summary_output
       EXTERNAL :: prms_summary, module_doc, convert_params, read_error, error_stop
       INTEGER, EXTERNAL :: gsflow_prms2modsim, gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
+      INTEGER, EXTERNAL :: declparam, getparam_real, getparam_int, getparam_int_0d
       EXTERNAL :: setdims, check_parameters, read_control_file, read_parameter_file_dimens, read_prms_data_file
 ! Local Variables
       INTEGER :: i, iret, nc, ierr
+      CHARACTER(len=8) :: Arg
 !***********************************************************************
       ierr = 0
 
