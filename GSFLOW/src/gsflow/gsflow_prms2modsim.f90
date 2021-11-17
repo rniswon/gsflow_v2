@@ -47,7 +47,7 @@
       USE GSFPRMS2MODSIM
       USE PRMS_MODULE, ONLY: Nsegment, Nlake
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Lake_hru_id
-	  USE PRMS_MODULE, ONLY: declvar_dble_1d
+      USE PRMS_MMFSUBS, ONLY: declvar_dble_1d
       IMPLICIT NONE
       EXTERNAL read_error
       INTRINSIC ABS, DBLE
