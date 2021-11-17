@@ -67,22 +67,23 @@
       USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR
       USE PRMS_MODULE, ONLY: Nhru
       USE PRMS_SOLTAB
+      !USE PRMS_MMFSUBS, ONLY: declvar_dble_2d
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module !, declvar_dble
+      EXTERNAL :: read_error, print_module 
 !***********************************************************************
       sthdecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_soltab)
 
       ALLOCATE ( Soltab_potsw(MAX_DAYS_PER_YEAR, Nhru) )
-!      CALL declvar_dble(MODNAME, 'soltab_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
+!      CALL declvar_dble_2d(MODNAME, 'soltab_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR, Nhru, &
 !     &     'Potential solar radiation for each Julian Day, for each HRU', &
 !     &     'Langleys', Soltab_potsw)
 
       ALLOCATE ( Soltab_horad_potsw(MAX_DAYS_PER_YEAR, Nhru) )
-!      CALL declvar_dble(MODNAME, 'soltab_horad_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
+!      CALL declvar_dble_2d(MODNAME, 'soltab_horad_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR, Nhru, &
 !     &     'Potential solar radiation on a horizontal plane for each Julian Day, for each HRU', &
 !     &     'Langleys', Soltab_horad_potsw)
 

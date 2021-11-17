@@ -7,7 +7,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=9), parameter :: MODNAME = 'basin_sum'
-      character(len=*), parameter :: Version_basin_sum = '2021-09-07'
+      character(len=*), parameter :: Version_basin_sum = '2021-11-11'
 
       INTEGER, SAVE :: BALUNT, Totdays
       INTEGER, SAVE :: Header_prt, Endjday
@@ -92,10 +92,11 @@
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION
       USE PRMS_MODULE, ONLY: Nhru, Nobs, Model
       USE PRMS_BASINSUM
+      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_dble_1d
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_dble
+      EXTERNAL :: read_error, print_module
 !***********************************************************************
       sumbdecl = 0
 
@@ -293,7 +294,7 @@
      &     'inches', Obsq_inches_mo)
 
       ALLOCATE ( Hru_et_yr(Nhru) )
-      CALL declvar_dble(MODNAME, 'hru_et_yr', 'nhru', Nhru, &
+      CALL declvar_dble_1d(MODNAME, 'hru_et_yr', 'nhru', Nhru, &
      &     'Yearly area-weighted average actual ET for each HRU', &
      &     'inches', Hru_et_yr)
 
@@ -322,7 +323,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MAX, MOD
-      INTEGER, EXTERNAL :: getparam_int, julian_day
+      INTEGER, EXTERNAL :: getparam_int_0d, julian_day
       EXTERNAL :: header_print, read_error, write_outfile, PRMS_open_module_file
 ! Local Variables
       INTEGER :: pftemp
@@ -330,15 +331,15 @@
       sumbinit = 0
 
       IF ( Nobs>0 ) THEN
-        IF ( getparam_int(MODNAME, 'outlet_sta', 1, Outlet_sta) &
+        IF ( getparam_int_0d(MODNAME, 'outlet_sta', 1, Outlet_sta) &
      &       /=0 ) CALL read_error(2, 'outlet_sta')
         IF ( Outlet_sta==0 ) Outlet_sta = 1
       ENDIF
 
-      IF ( getparam_int(MODNAME, 'print_type', 1, Print_type) &
+      IF ( getparam_int_0d(MODNAME, 'print_type', 1, Print_type) &
      &     /=0 ) CALL read_error(2, 'print_type')
 
-      IF ( getparam_int(MODNAME, 'print_freq', 1, Print_freq) &
+      IF ( getparam_int_0d(MODNAME, 'print_freq', 1, Print_freq) &
      &     /=0 ) CALL read_error(2, 'print_freq')
 
       IF ( Init_vars_from_file==OFF ) THEN

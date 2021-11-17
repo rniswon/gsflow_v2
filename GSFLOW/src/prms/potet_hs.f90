@@ -9,7 +9,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_hs'
-        character(len=*), parameter :: Version_potet = '2021-09-07'
+        character(len=*), parameter :: Version_potet = '2021-11-11'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Hs_krs(:, :)
       END MODULE PRMS_POTET_HS
@@ -23,7 +23,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SQRT, DBLE, ABS
-      INTEGER, EXTERNAL :: declparam, getparam_real
+      INTEGER, EXTERNAL :: declparam, getparam_real_2d
       EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
@@ -65,7 +65,7 @@
 
 !******Get parameters
       ELSEIF ( Process_FLAG==INIT ) THEN
-        IF ( getparam_real(MODNAME, 'hs_krs', Nhru*MONTHS_PER_YEAR, Hs_krs)/=0 ) CALL read_error(2, 'hs_krs')
+        IF ( getparam_real_2d(MODNAME, 'hs_krs', Nhru, MONTHS_PER_YEAR, Hs_krs)/=0 ) CALL read_error(2, 'hs_krs')
       ENDIF
 
       END FUNCTION potet_hs

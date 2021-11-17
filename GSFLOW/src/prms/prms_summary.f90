@@ -42,11 +42,12 @@
      &    Basin_pref_stor, Basin_slstor, Basin_soil_rechr, Basin_sz2gw, Basin_dunnian
       USE PRMS_GWFLOW, ONLY: Basin_gwstor, Basin_gwin, Basin_gwsink, Basin_gwflow, &
      &    Basin_gwstor_minarea_wb, Basin_dnflow
+      USE PRMS_MMFSUBS, ONLY: declvar_dble
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MAX !, CHAR, INDEX
       INTEGER, EXTERNAL :: declparam, getparam_int !, control_integer
-      EXTERNAL :: read_error, PRMS_open_output_file, print_module, statvar_to_csv, checkdim_bounded_limits, declvar_dble
+      EXTERNAL :: read_error, PRMS_open_output_file, print_module, statvar_to_csv, checkdim_bounded_limits
       INTEGER, EXTERNAL :: getparamstring, control_string
 ! Local Variables
       INTEGER :: i, ios, idim !, foo, statsON_OFF

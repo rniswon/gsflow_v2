@@ -2,7 +2,7 @@
 
 rm ../output/*.csv
 rm ../output/*.out
-rm ../output/prms/*
+
 
 ..\..\..\bin\gsflow .\gsflow.control -set init_vars_from_file 0 -set save_vars_to_file 0
 

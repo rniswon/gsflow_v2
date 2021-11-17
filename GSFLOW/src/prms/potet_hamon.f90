@@ -7,7 +7,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_hamon'
-        character(len=*), parameter :: Version_potet = '2021-08-13'
+        character(len=*), parameter :: Version_potet = '2021-11-11'
         DOUBLE PRECISION, PARAMETER :: ONE_12TH = 1.0D0/12.0D0
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Hamon_coef(:, :)
@@ -24,7 +24,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam, getparam_real
+      INTEGER, EXTERNAL :: declparam, getparam_real_2d
       EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
@@ -63,7 +63,7 @@
 
 !******Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam_real(MODNAME, 'hamon_coef', Nhru*MONTHS_PER_YEAR, Hamon_coef)/=0 ) CALL read_error(2, 'hamon_coef')
+        IF ( getparam_real_2d(MODNAME, 'hamon_coef', Nhru, MONTHS_PER_YEAR, Hamon_coef)/=0 ) CALL read_error(2, 'hamon_coef')
       ENDIF
 
       END FUNCTION potet_hamon

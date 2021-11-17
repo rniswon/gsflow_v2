@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2021-10-22'
+      character(len=*), parameter :: Version_basin = '2021-11-11'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -67,10 +67,11 @@
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Model, Dprst_flag, Lake_route_flag, Et_flag, Precip_flag, Cascadegw_flag, &
      &    Stream_temp_flag, PRMS4_flag, GSFLOW_flag, Glacier_flag, AG_flag
       USE PRMS_BASIN
+      USE PRMS_MMFSUBS, ONLY: declvar_real, declvar_dble, declvar_dble_1d
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_real, declvar_dble
+      EXTERNAL :: read_error, print_module
 !***********************************************************************
       basdecl = 0
 
@@ -108,7 +109,7 @@
      &     'decimal fraction', Hru_frac_perv)
 
       ALLOCATE ( Hru_storage(Nhru) )
-      CALL declvar_dble(MODNAME, 'hru_storage', 'nhru', Nhru, &
+      CALL declvar_dble_1d(MODNAME, 'hru_storage', 'nhru', Nhru, &
      &     'Storage for each HRU', &
      &     'inches', Hru_storage)
 
@@ -230,6 +231,7 @@
       ENDIF
 
       ALLOCATE ( Hru_type(Nhru) )
+      Hru_type = 0
       IF ( declparam(MODNAME, 'hru_type', 'nhru', 'integer', &
      &     '1', '0', '4', &
      &     'HRU type', 'Type of each HRU (0=inactive; 1=land; 2=lake; 3=swale; 4=glacier)', &
@@ -299,7 +301,7 @@
       USE PRMS_BASIN
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getparam_real, getparam_int
+      INTEGER, EXTERNAL :: getparam_real, getparam_int, getparam_int_0d, getparam_real_2d
       EXTERNAL :: write_outfile, checkdim_bounded_limits
       INTRINSIC :: DBLE
 ! Local Variables
@@ -310,15 +312,15 @@
 !**********************************************************************
       basinit = 0
 
+      IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
       IF ( getparam_real(MODNAME, 'hru_area', Nhru, Hru_area)/=0 ) CALL read_error(2, 'hru_area')
       IF ( getparam_real(MODNAME, 'hru_elev', Nhru, Hru_elev)/=0 ) CALL read_error(2, 'hru_elev')
       Hru_elev_ts = Hru_elev
       IF ( getparam_real(MODNAME, 'hru_lat', Nhru, Hru_lat)/=0 ) CALL read_error(2, 'hru_lat')
-      IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
       IF ( getparam_int(MODNAME, 'cov_type', Nhru, Cov_type)/=0 ) CALL read_error(2, 'cov_type')
-      IF ( getparam_real(MODNAME, 'covden_sum', Nhru*MONTHS_PER_YEAR, Covden_sum)/=0 ) CALL read_error(2, 'covden_sum')
-      IF ( getparam_real(MODNAME, 'covden_win', Nhru*MONTHS_PER_YEAR, Covden_win)/=0 ) CALL read_error(2, 'covden_win')
-      IF ( getparam_int(MODNAME, 'elev_units', 1, Elev_units)/=0 ) CALL read_error(2, 'elev_units')
+      IF ( getparam_real_2d(MODNAME, 'covden_sum', Nhru, MONTHS_PER_YEAR, Covden_sum)/=0 ) CALL read_error(2, 'covden_sum')
+      IF ( getparam_real_2d(MODNAME, 'covden_win', Nhru, MONTHS_PER_YEAR, Covden_win)/=0 ) CALL read_error(2, 'covden_win')
+      IF ( getparam_int_0d(MODNAME, 'elev_units', 1, Elev_units)/=0 ) CALL read_error(2, 'elev_units')
       IF ( getparam_real(MODNAME, 'hru_percent_imperv', Nhru, Hru_percent_imperv)/=0 ) CALL read_error(2, 'hru_percent_imperv')
       IF ( AG_flag==ACTIVE ) THEN
         IF ( getparam_real(MODNAME, 'ag_frac', Nhru, Ag_frac)/=0 ) CALL read_error(2, 'ag_frac')

@@ -91,8 +91,8 @@
       SUBROUTINE read_parameter_file_params
       USE PRMS_CONSTANTS, ONLY: MAXCONTROL_LENGTH
       USE PRMS_READ_PARAM_FILE
-      USE PRMS_CONTROL_FILE, ONLY: Control_parameter_data, Param_file_control_parameter_id
-      USE PRMS_MMFAPI, ONLY: Num_parameters, Parameter_data
+      USE PRMS_CONTROL_FILE, ONLY: Param_file_control_parameter_id
+      USE PRMS_MMFAPI, ONLY: Control_parameter_data, Num_parameters, Parameter_data
       IMPLICIT NONE
       ! Functions
       EXTERNAL read_error, PRMS_open_input_file, setparam

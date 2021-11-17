@@ -8,7 +8,7 @@
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'water_use_read'
-      character(len=*), parameter :: Version_water_use_read = '2021-09-07'
+      character(len=*), parameter :: Version_water_use_read = '2021-11-11'
 
       ! transfer type
       integer, parameter :: STREAM = 1
@@ -59,11 +59,11 @@
      &    End_year, End_month, End_day, Dprst_transfer_water_use, Dprst_add_water_use, &
      &    Gwr_transfer_water_use, Gwr_add_water_use, Lake_transfer_water_use, Lake_add_water_use
       USE PRMS_WATER_USE
+      USE PRMS_MMFSUBS, ONLY: declvar_real, declvar_dble
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL, DBLE
       INTEGER, EXTERNAL :: control_string, decldim, getdim
-      EXTERNAL :: declvar_real, declvar_dble
       EXTERNAL :: read_error, find_header_end, find_current_file_time, read_event, print_module, PRMS_open_module_file, error_stop
 ! Local Variables
       INTEGER, SAVE :: external_unit, external_next_year, external_next_month, external_next_day
@@ -445,10 +445,10 @@
 
         ALLOCATE ( Transfer_rate(Nwateruse), Source_id(Nwateruse), Source_type(Nwateruse) )
         ALLOCATE ( Destination_id(Nwateruse), Destination_type(Nwateruse) )
-        CALL declvar_real(MODNAME, 'total_transfers', 'one', 1, &
+        CALL declvar_dble(MODNAME, 'total_transfers', 'one', 1, &
      &           'Transfer of all water-use transfers for each time step', &
      &           'cfs', Total_transfers)
-        CALL declvar_dble(MODNAME, 'transfer_rate', 'nwateruse', nwateruse, &
+        CALL declvar_real(MODNAME, 'transfer_rate', 'nwateruse', nwateruse, &
      &           'Transfer of each water-use transfer for each time step', &
      &           'cfs', Transfer_rate)
 

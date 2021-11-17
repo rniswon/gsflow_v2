@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2021-09-07'
+      character(len=*), parameter :: Version_routing = '2021-11-09'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades
@@ -64,10 +64,11 @@
      &    strmflow_muskingum_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
       USE PRMS_MODULE, ONLY: Nhru, Nsegment, Model, Init_vars_from_file, Strmflow_flag, Cascade_flag
       USE PRMS_ROUTING
+      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_dble_1d
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_dble
+      EXTERNAL :: read_error, print_module
 !***********************************************************************
       routingdecl = 0
 
@@ -75,7 +76,7 @@
 
 ! Declared Variables
       ALLOCATE ( Hru_outflow(Nhru) )
-      CALL declvar_dble(MODNAME, 'hru_outflow', 'nhru', Nhru, &
+      CALL declvar_dble_1d(MODNAME, 'hru_outflow', 'nhru', Nhru, &
      &     'Total flow leaving each HRU', &
      &     'cfs', Hru_outflow)
 
@@ -245,50 +246,50 @@
      &       'Basin area-weighted average storage in the stream network', &
      &       'inches', Basin_segment_storage)
         ALLOCATE ( Segment_delta_flow(Nsegment) )
-        CALL declvar_dble(MODNAME, 'segment_delta_flow', 'nsegment', Nsegment, &
+        CALL declvar_dble_1d(MODNAME, 'segment_delta_flow', 'nsegment', Nsegment, &
      &       'Cumulative flow in minus flow out for each stream segment', &
      &       'cfs', Segment_delta_flow)
       ENDIF
 
       IF ( Hru_seg_cascades==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Seginc_potet(Nsegment) )
-        CALL declvar_dble(MODNAME, 'seginc_potet', 'nsegment', Nsegment, &
+        CALL declvar_dble_1d(MODNAME, 'seginc_potet', 'nsegment', Nsegment, &
      &       'Area-weighted average potential ET for each segment from HRUs contributing flow to the segment', &
      &       'inches', Seginc_potet)
 
         ALLOCATE ( Seginc_swrad(Nsegment) )
-        CALL declvar_dble(MODNAME, 'seginc_swrad', 'nsegment', Nsegment, &
+        CALL declvar_dble_1d(MODNAME, 'seginc_swrad', 'nsegment', Nsegment, &
      &       'Area-weighted average solar radiation for each segment from HRUs contributing flow to the segment', &
      &       'Langleys', Seginc_swrad)
 
         ALLOCATE ( Seginc_ssflow(Nsegment) )
-        CALL declvar_dble(MODNAME, 'seginc_ssflow', 'nsegment', Nsegment, &
+        CALL declvar_dble_1d(MODNAME, 'seginc_ssflow', 'nsegment', Nsegment, &
      &       'Area-weighted average interflow for each segment from HRUs contributing flow to the segment', &
      &       'cfs', Seginc_ssflow)
 
         ALLOCATE ( Seginc_gwflow(Nsegment) )
-        CALL declvar_dble(MODNAME, 'seginc_gwflow', 'nsegment', Nsegment, &
+        CALL declvar_dble_1d(MODNAME, 'seginc_gwflow', 'nsegment', Nsegment, &
      &       'Area-weighted average groundwater discharge for each segment from HRUs contributing flow to the segment', &
      &       'cfs', Seginc_gwflow)
 
         ALLOCATE ( Seginc_sroff(Nsegment) )
-        CALL declvar_dble(MODNAME, 'seginc_sroff', 'nsegment', Nsegment, &
+        CALL declvar_dble_1d(MODNAME, 'seginc_sroff', 'nsegment', Nsegment, &
      &       'Area-weighted average surface runoff for each segment from HRUs contributing flow to the segment', &
      &       'cfs', Seginc_sroff)
 
         ALLOCATE ( Seg_ssflow(Nsegment) )
-        CALL declvar_dble(MODNAME, 'seg_ssflow', 'nsegment', Nsegment, &
+        CALL declvar_dble_1d(MODNAME, 'seg_ssflow', 'nsegment', Nsegment, &
      &       'Area-weighted average interflow for each segment from HRUs contributing flow to the segment and upstream HRUs', &
      &       'inches', Seg_ssflow)
 
         ALLOCATE ( Seg_gwflow(Nsegment) )
-        CALL declvar_dble(MODNAME, 'seg_gwflow', 'nsegment', Nsegment, &
+        CALL declvar_dble_1d(MODNAME, 'seg_gwflow', 'nsegment', Nsegment, &
      &       'Area-weighted average groundwater discharge for each segment from'// &
      &       ' HRUs contributing flow to the segment and upstream HRUs', &
      &       'inches', Seg_gwflow)
 
         ALLOCATE ( Seg_sroff(Nsegment) )
-        CALL declvar_dble(MODNAME, 'seg_sroff', 'nsegment', Nsegment, &
+        CALL declvar_dble_1d(MODNAME, 'seg_sroff', 'nsegment', Nsegment, &
      &       'Area-weighted average surface runoff for each segment from'// &
      &       ' HRUs contributing flow to the segment and upstream HRUs', &
      &       'inches', Seg_sroff)
