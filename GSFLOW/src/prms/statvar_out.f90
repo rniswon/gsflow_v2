@@ -154,12 +154,14 @@
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC SNGL, FLOAT
       INTEGER, EXTERNAL :: getvarnvals
-      EXTERNAL read_error, getvar_real, getvar_dble, getvar_int
+      EXTERNAL read_error, getvar_real, getvar_dble, getvar_int, getvar_dble_0d, getvar_int_0d, getvar_real_0d
 ! Local Variables
-      INTEGER :: jj, nvals, nc, nvalues
+      INTEGER :: jj, nvals, nc, nvalues, value_int
       INTEGER, ALLOCATABLE, TARGET :: values_int(:)
       REAL, ALLOCATABLE, TARGET :: values_real(:)
+      REAL :: value_real
       DOUBLE PRECISION, ALLOCATABLE, TARGET :: values_dble(:)
+      DOUBLE PRECISION :: value_dble
 !***********************************************************************
       DO jj = 1, nstatVars
         nc = Nc_vars(jj)
@@ -171,19 +173,34 @@
         ENDIF
         IF ( Stat_var_type(jj)==3 ) THEN
           ALLOCATE ( values_dble(nvals) )
-          CALL getvar_dble(MODNAME, statVar_names(jj)(:nc), nvals, values_dble)
+          IF ( nvals==1 ) THEN
+            CALL getvar_dble_0d(MODNAME, statVar_names(jj)(:nc), nvals, value_dble)
+            values_dble(1) = value_dble
+          ELSE
+            CALL getvar_dble(MODNAME, statVar_names(jj)(:nc), nvals, values_dble)
+          ENDIF
           Stat_var_values(jj) = SNGL(values_dble(Statvar_id(jj)))
           !print *, statVar_names(jj)(:nc), nvals, Stat_var_values(jj), 'double'
           DEALLOCATE ( values_dble )
         ELSEIF ( Stat_var_type(jj)==2 ) THEN
           ALLOCATE ( values_real(nvals) )
-          CALL getvar_real(MODNAME, statVar_names(jj)(:nc), nvals, values_real)
+          IF ( nvals==1 ) THEN
+            CALL getvar_real_0d(MODNAME, statVar_names(jj)(:nc), nvals, value_real)
+            values_real(1) = value_real
+          ELSE
+            CALL getvar_real(MODNAME, statVar_names(jj)(:nc), nvals, values_real)
+          ENDIF
           Stat_var_values(jj) = values_real(Statvar_id(jj))
           !print *, statVar_names(jj)(:nc), nvals,Stat_var_values(jj), 'real'
           DEALLOCATE ( values_real )
         ELSEIF ( Stat_var_type(jj)==1 ) THEN
           ALLOCATE ( values_int(nvals) )
-          CALL getvar_int(MODNAME, statVar_names(jj)(:nc), nvals, values_int)
+          IF ( nvals==1 ) THEN
+            CALL getvar_int_0d(MODNAME, statVar_names(jj)(:nc), nvals, value_int)
+            values_int(1) = value_int
+          ELSE
+            CALL getvar_int(MODNAME, statVar_names(jj)(:nc), nvals, values_int)
+          ENDIF
           Stat_var_values(jj) = FLOAT(values_int(Statvar_id(jj)))
           !print *, statVar_names(jj)(:nc), nvals,Stat_var_values(jj), 'integer'
           DEALLOCATE ( values_int )

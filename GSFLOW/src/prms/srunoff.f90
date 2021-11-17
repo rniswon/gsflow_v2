@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2021-10-11'
+      character(len=*), parameter :: Version_srunoff = '2021-11-11'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -111,10 +111,11 @@
      &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, PRMS4_flag, &
      &    Frozen_flag, AG_flag, PRMS_land_iteration_flag, Ag_package
       USE PRMS_SRUNOFF
+      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_real, declvar_int, declvar_dble_1d
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_dble, declvar_real, declvar_int
+      EXTERNAL :: read_error, print_module
 !***********************************************************************
       srunoffdecl = 0
 
@@ -206,7 +207,7 @@
      &       'inches', Basin_dprst_volcl)
 
         ALLOCATE ( Dprst_sroff_hru(Nhru) )
-        CALL declvar_dble(MODNAME, 'dprst_sroff_hru', 'nhru', Nhru, &
+        CALL declvar_dble_1d(MODNAME, 'dprst_sroff_hru', 'nhru', Nhru, &
      &       'Surface runoff from open surface-depression storage for each HRU', &
      &       'inches', Dprst_sroff_hru)
 
@@ -226,17 +227,17 @@
      &       'acres', Dprst_area_clos)
 
 !        ALLOCATE ( Upslope_dprst_hortonian(Nhru) )
-!        CALL declvar_dble(MODNAME, 'upslope_dprst_hortonian', 'nhru', Nhru, &
+!        CALL declvar_dble_1d(MODNAME, 'upslope_dprst_hortonian', 'nhru', Nhru, &
 !     &       'Upslope surface-depression spillage and interflow for each HRU',   &
 !     &       'inches', Upslope_dprst_hortonian)
 
         ALLOCATE ( Dprst_stor_hru(Nhru) )
-        CALL declvar_dble(MODNAME, 'dprst_stor_hru', 'nhru', Nhru, &
+        CALL declvar_dble_1d(MODNAME, 'dprst_stor_hru', 'nhru', Nhru, &
      &       'Surface-depression storage for each HRU', &
      &       'inches', Dprst_stor_hru)
 
         ALLOCATE ( Dprst_seep_hru(Nhru) )
-        CALL declvar_dble(MODNAME, 'dprst_seep_hru', 'nhru', Nhru, &
+        CALL declvar_dble_1d(MODNAME, 'dprst_seep_hru', 'nhru', Nhru, &
      &       'Seepage from surface-depression storage to associated GWR for each HRU', &
      &       'inches', Dprst_seep_hru)
 
@@ -276,7 +277,7 @@
 ! cascading variables and parameters
       IF ( Cascade_flag>CASCADE_OFF .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Upslope_hortonian(Nhru) )
-        CALL declvar_dble(MODNAME, 'upslope_hortonian', 'nhru', Nhru, &
+        CALL declvar_dble_1d(MODNAME, 'upslope_hortonian', 'nhru', Nhru, &
      &       'Hortonian surface runoff received from upslope HRUs', &
      &       'inches', Upslope_hortonian)
 
@@ -289,7 +290,7 @@
      &       'inches', Basin_sroff_upslope)
 
         ALLOCATE ( Hru_hortn_cascflow(Nhru) )
-        CALL declvar_dble(MODNAME, 'hru_hortn_cascflow', 'nhru', Nhru, &
+        CALL declvar_dble_1d(MODNAME, 'hru_hortn_cascflow', 'nhru', Nhru, &
      &       'Cascading Hortonian surface runoff leaving each HRU', &
      &       'inches', Hru_hortn_cascflow)
 
@@ -299,7 +300,7 @@
      &         'inches', Basin_hortonian_lakes)
 
           ALLOCATE ( Hortonian_lakes(Nhru) )
-          CALL declvar_dble(MODNAME, 'hortonian_lakes', 'nhru', Nhru, &
+          CALL declvar_dble_1d(MODNAME, 'hortonian_lakes', 'nhru', Nhru, &
      &         'Surface runoff to lakes for each HRU', &
      &         'inches', Hortonian_lakes)
         ENDIF
@@ -307,7 +308,7 @@
 
       IF ( Call_cascade==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Strm_seg_in(Nsegment) )
-        CALL declvar_dble(MODNAME, 'strm_seg_in', 'nsegment', Nsegment, &
+        CALL declvar_dble_1d(MODNAME, 'strm_seg_in', 'nsegment', Nsegment, &
      &       'Flow in stream segments as a result of cascading flow in each stream segment', &
      &       'cfs', Strm_seg_in)
       ENDIF
@@ -520,7 +521,7 @@
       USE PRMS_FLOWVARS, ONLY: Basin_sroff
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getparam_real
+      INTEGER, EXTERNAL :: getparam_real, getparam_real_0d
       EXTERNAL :: read_error
 ! Local Variables
       INTEGER :: i, j !, k, num_hrus
@@ -625,8 +626,8 @@
 
 ! Frozen soil parameters
       IF ( Frozen_flag==ACTIVE ) THEN
-        IF ( getparam_real(MODNAME, 'cfgi_thrshld', 1, Cfgi_thrshld)/=0 ) CALL read_error(2, 'cfgi_thrshld')
-        IF ( getparam_real(MODNAME, 'cfgi_decay', 1, Cfgi_decay)/=0 ) CALL read_error(2, 'cfgi_decay')
+        IF ( getparam_real_0d(MODNAME, 'cfgi_thrshld', 1, Cfgi_thrshld)/=0 ) CALL read_error(2, 'cfgi_thrshld')
+        IF ( getparam_real_0d(MODNAME, 'cfgi_decay', 1, Cfgi_decay)/=0 ) CALL read_error(2, 'cfgi_decay')
       ENDIF
 
 ! Agriculture variables

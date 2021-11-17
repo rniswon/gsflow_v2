@@ -13,7 +13,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Solar Radiation Distribution'
         character(len=*), parameter :: MODNAME = 'ccsolrad'
-        character(len=*), parameter :: Version_ccsolrad = '2021-09-07'
+        character(len=*), parameter :: Version_ccsolrad = '2021-11-11'
         INTEGER, SAVE :: Observed_flag
         ! Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_radadj, Basin_cloud_cover
@@ -35,11 +35,12 @@
       USE PRMS_SOLTAB, ONLY: Soltab_potsw, Soltab_basinpotsw, Hru_cossl, Soltab_horad_potsw
       USE PRMS_SET_TIME, ONLY: Jday, Summer_flag
       USE PRMS_OBS, ONLY: Solrad
+      USE PRMS_MMFSUBS, ONLY: declvar_real, declvar_dble
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
-      INTEGER, EXTERNAL :: declparam, getparam_real
-      EXTERNAL :: read_error, print_module, print_date, declvar_real, declvar_dble
+      INTEGER, EXTERNAL :: declparam, getparam_real_2d
+      EXTERNAL :: read_error, print_module, print_date
 ! Local Variables
       INTEGER :: j, jj, k
       REAL :: pptadj, radadj, ccov
@@ -169,10 +170,10 @@
 
       ELSEIF ( Process_flag==INIT ) THEN
 ! Get parameters
-        IF ( getparam_real(MODNAME, 'crad_coef', Nhru*MONTHS_PER_YEAR, Crad_coef)/=0 ) CALL read_error(2, 'crad_coef')
-        IF ( getparam_real(MODNAME, 'crad_exp', Nhru*MONTHS_PER_YEAR, Crad_exp)/=0 ) CALL read_error(2, 'crad_exp')
-        IF ( getparam_real(MODNAME, 'ccov_slope', Nhru*MONTHS_PER_YEAR, Ccov_slope)/=0 ) CALL read_error(2, 'ccov_slope')
-        IF ( getparam_real(MODNAME, 'ccov_intcp', Nhru*MONTHS_PER_YEAR, Ccov_intcp)/=0 ) CALL read_error(2, 'ccov_intcp')
+        IF ( getparam_real_2d(MODNAME, 'crad_coef', Nhru, MONTHS_PER_YEAR, Crad_coef)/=0 ) CALL read_error(2, 'crad_coef')
+        IF ( getparam_real_2d(MODNAME, 'crad_exp', Nhru, MONTHS_PER_YEAR, Crad_exp)/=0 ) CALL read_error(2, 'crad_exp')
+        IF ( getparam_real_2d(MODNAME, 'ccov_slope', Nhru, MONTHS_PER_YEAR, Ccov_slope)/=0 ) CALL read_error(2, 'ccov_slope')
+        IF ( getparam_real_2d(MODNAME, 'ccov_intcp', Nhru, MONTHS_PER_YEAR, Ccov_intcp)/=0 ) CALL read_error(2, 'ccov_intcp')
 
         Cloud_radadj = 0.0
         Basin_radadj = 0.0D0

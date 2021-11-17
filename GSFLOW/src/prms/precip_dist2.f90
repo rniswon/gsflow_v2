@@ -17,7 +17,7 @@
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=*), parameter :: MODNAME = 'precip_dist2'
-        character(len=*), parameter :: Version_precip = '2021-09-07'
+        character(len=*), parameter :: Version_precip = '2021-11-11'
         INTEGER, SAVE, ALLOCATABLE :: N_psta(:), Nuse_psta(:, :)
         DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dist2(:, :)
 !   Declared Parameters
@@ -173,7 +173,7 @@
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getparam_int, getparam_real
+      INTEGER, EXTERNAL :: getparam_int_0d, getparam_real, getparam_real_0d, getparam_real_2d
       EXTERNAL :: read_error
       INTRINSIC :: DSQRT, DABS, DBLE
 ! Local Variables
@@ -184,26 +184,26 @@
       pptdist2init = 0
 
 ! NEW PARAMETERS
-      IF ( getparam_real(MODNAME, 'maxday_prec', 1, Maxday_prec) &
+      IF ( getparam_real_0d(MODNAME, 'maxday_prec', 1, Maxday_prec) &
      &     /=0 ) CALL read_error(2, 'maxday_prec')
 
-      IF ( getparam_real(MODNAME, 'dist_max', 1, Dist_max) &
+      IF ( getparam_real_0d(MODNAME, 'dist_max', 1, Dist_max) &
      &     /=0 ) CALL read_error(2, 'dist_max')
 
-      IF ( getparam_int(MODNAME, 'max_psta', 1, Max_psta) &
+      IF ( getparam_int_0d(MODNAME, 'max_psta', 1, Max_psta) &
      &     /=0 ) CALL read_error(2, 'max_psta')
       IF ( Max_psta==0 ) Max_psta = Nrain
 
 !      IF ( getparam_real(MODNAME, 'maxmon_prec', MONTHS_PER_YEAR, Maxmon_prec) &
 !           /=0 ) CALL read_error(2, 'maxmon_prec')
 
-      IF ( getparam_real(MODNAME, 'rain_mon', Nhru*MONTHS_PER_YEAR, Rain_mon) &
+      IF ( getparam_real_2d(MODNAME, 'rain_mon', Nhru, MONTHS_PER_YEAR, Rain_mon) &
      &     /=0 ) CALL read_error(2, 'rain_mon')
 
-      IF ( getparam_real(MODNAME, 'snow_mon', Nhru*MONTHS_PER_YEAR, Snow_mon) &
+      IF ( getparam_real_2d(MODNAME, 'snow_mon', Nhru, MONTHS_PER_YEAR, Snow_mon) &
      &     /=0 ) CALL read_error(2, 'snow_mon')
 
-      IF ( getparam_real(MODNAME, 'psta_mon', Nrain*MONTHS_PER_YEAR, Psta_mon) &
+      IF ( getparam_real_2d(MODNAME, 'psta_mon', Nrain, MONTHS_PER_YEAR, Psta_mon) &
      &     /=0 ) CALL read_error(2, 'psta_mon')
 
       IF ( getparam_real(MODNAME, 'psta_xlong', Nrain, Psta_xlong) &

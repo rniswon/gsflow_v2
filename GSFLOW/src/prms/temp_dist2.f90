@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Temperature Distribution'
       character(len=10), parameter :: MODNAME = 'temp_dist2'
-      character(len=*), parameter :: Version_temp = '2021-09-07'
+      character(len=*), parameter :: Version_temp = '2021-11-11'
       INTEGER, SAVE, ALLOCATABLE :: N_tsta(:), Nuse_tsta(:, :)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dist(:, :)
       REAL, SAVE, ALLOCATABLE :: Delv(:, :), Elfac(:, :)
@@ -73,11 +73,12 @@
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ERROR_dim
       USE PRMS_MODULE, ONLY: Model, Nhru, Ntemp
       USE PRMS_TEMP_DIST2
+      USE PRMS_MMFSUBS, ONLY: declvar_real_0d
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: INDEX
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, error_stop, declvar_real
+      EXTERNAL :: read_error, print_module, error_stop
 !***********************************************************************
       t2dist2decl = 0
 
@@ -89,11 +90,11 @@
 ! added by Mastin 5/8/98
       ALLOCATE ( Elfac(Nhru,Ntemp), Delv(Ntemp,Ntemp), Dist(Nhru,Ntemp), N_tsta(Nhru) )
 
-      CALL declvar_real(MODNAME, 'basin_lapse_max', 'one', 1, &
+      CALL declvar_real_0d(MODNAME, 'basin_lapse_max', 'one', 1, &
      &     'Basin area-weighted average maximum air temperature lapse rate per 1000 feet', &
      &     'degrees', Basin_lapse_max)
 
-      CALL declvar_real(MODNAME, 'basin_lapse_min', 'one', 1, &
+      CALL declvar_real_0d(MODNAME, 'basin_lapse_min', 'one', 1, &
      &     'Basin area-weighted average minimum air temperature lapse rate per 1000 feet', &
      &     'degrees', Basin_lapse_min)
 
@@ -208,7 +209,7 @@
       USE PRMS_CLIMATEVARS, ONLY: Tsta_elev
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getparam_real, getparam_int
+      INTEGER, EXTERNAL :: getparam_real, getparam_int, getparam_real_0d, getparam_int_0d
       EXTERNAL :: read_error
       INTRINSIC :: DSQRT, ABS, DABS, DBLE
 ! Local Variables
@@ -218,9 +219,9 @@
 !***********************************************************************
       t2dist2init = 0
 
-      IF ( getparam_real(MODNAME, 'dist_max', 1, Dist_max)/=0 ) CALL read_error(2, 'dist_max')
+      IF ( getparam_real_0d(MODNAME, 'dist_max', 1, Dist_max)/=0 ) CALL read_error(2, 'dist_max')
 
-      IF ( getparam_int(MODNAME, 'max_tsta', 1, Max_tsta)/=0 ) CALL read_error(2, 'max_tsta')
+      IF ( getparam_int_0d(MODNAME, 'max_tsta', 1, Max_tsta)/=0 ) CALL read_error(2, 'max_tsta')
       IF ( Max_tsta==0 ) Max_tsta = Ntemp
 
       IF ( getparam_real(MODNAME, 'monmin', MONTHS_PER_YEAR, Monmin)/=0 ) CALL read_error(2, 'monmin')

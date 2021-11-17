@@ -15,7 +15,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'ide_dist'
-      character(len=*), parameter :: Version_ide_dist = '2021-09-07'
+      character(len=*), parameter :: Version_ide_dist = '2021-11-11'
       INTEGER, SAVE :: Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Dalr
@@ -69,10 +69,11 @@
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DOCUMENTATION
       USE PRMS_MODULE, ONLY: Model, Nhru, Ntemp, Nrain
       USE PRMS_IDE
+      USE PRMS_MMFSUBS, ONLY: declvar_real
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_real
+      EXTERNAL :: read_error, print_module
 !***********************************************************************
       idedecl = 0
 
@@ -260,7 +261,8 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getparam_real, getparam_int
+      INTEGER, EXTERNAL :: getparam_real, getparam_int, getparam_int_0d
+      INTEGER, EXTERNAL :: getparam_real_0d, getparam_real_2d
       EXTERNAL :: read_error
 ! Local Variables
       INTEGER i, ii, ierr
@@ -271,13 +273,13 @@
       Tmax_rain_sta = 0.0
       Tmin_rain_sta = 0.0
 
-      IF ( getparam_real(MODNAME, 'adjust_rain',Nrain*MONTHS_PER_YEAR,
+      IF ( getparam_real_2d(MODNAME,'adjust_rain',Nrain,MONTHS_PER_YEAR,
      +     Adjust_rain)/=0 ) CALL read_error(2, 'adjust_rain')
 
-      IF ( getparam_real(MODNAME, 'adjust_snow',Nrain*MONTHS_PER_YEAR,
+      IF ( getparam_real_2d(MODNAME,'adjust_snow',Nrain,MONTHS_PER_YEAR,
      +     Adjust_snow)/=0 ) CALL read_error(2, 'adjust_snow')
 
-      IF ( getparam_real(MODNAME, 'solrad_elev', 1, Solrad_elev)
+      IF ( getparam_real_0d(MODNAME, 'solrad_elev', 1, Solrad_elev)
      +     /=0 ) CALL read_error(2, 'solrad_elev')
 
       IF ( getparam_real(MODNAME, 'hru_x', Nhru, Hru_x)
@@ -310,29 +312,29 @@
       IF ( getparam_real(MODNAME, 'prcp_wght_dist', MONTHS_PER_YEAR,
      +     Prcp_wght_dist)/=0 ) CALL read_error(2, 'prcp_wght_dist')
 
-      IF ( getparam_real(MODNAME, 'dist_exp', 1, Dist_exp)
+      IF ( getparam_real_0d(MODNAME, 'dist_exp', 1, Dist_exp)
      +     /=0 ) CALL read_error(2, 'dist_exp')
 
-      IF ( getparam_int(MODNAME, 'ndist_psta', 1,
+      IF ( getparam_int_0d(MODNAME, 'ndist_psta', 1,
      +     Ndist_psta)/=0 ) CALL read_error(2, 'ndist_psta')
       IF ( Ndist_psta==0 ) THEN
         PRINT *, 'ERROR, need to specify ndist_psta > 0'
         ierr = 1
       ENDIF
 
-      IF ( getparam_int(MODNAME, 'ndist_tsta', 1,
+      IF ( getparam_int_0d(MODNAME, 'ndist_tsta', 1,
      +     Ndist_tsta)/=0 ) CALL read_error(2, 'ndist_tsta')
       IF ( Ndist_tsta==0 ) THEN
         PRINT *, 'ERROR, need to specify ndist_tsta > 0'
         ierr = 1
       ENDIF
 
-      IF ( getparam_real(MODNAME, 'tmax_allrain_sta',
-     +     Nrain*MONTHS_PER_YEAR,
+      IF ( getparam_real_2d(MODNAME, 'tmax_allrain_sta',
+     +     Nrain, MONTHS_PER_YEAR,
      +     Tmax_allrain_sta)/=0 ) CALL read_error(2, 'tmax_allrain_sta')
 
-      IF ( getparam_real(MODNAME, 'tmax_allsnow_sta',
-     +     Nrain*MONTHS_PER_YEAR,
+      IF ( getparam_real_2d(MODNAME, 'tmax_allsnow_sta',
+     +     Nrain, MONTHS_PER_YEAR,
      +     Tmax_allsnow_sta)/=0 ) CALL read_error(2, 'tmax_allsnow_sta')
 
 ! dry adiabatic lapse rate (DALR) when extrapolating

@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2021-10-28'
+      character(len=*), parameter :: Version_soilzone_ag = '2021-11-11'
       INTEGER, SAVE :: Soil_iter, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr
@@ -96,10 +96,11 @@
       USE PRMS_MODULE, ONLY: Nhru, Cascade_flag, GSFLOW_flag, Model
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
+      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_real, declvar_int
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: declparam, getdim
-      EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop, declvar_dble, declvar_real, declvar_int
+      EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop
 !***********************************************************************
       szdecl_ag = 0
 
@@ -254,7 +255,7 @@
       IMPLICIT NONE
 ! Functions
       EXTERNAL :: init_basin_vars, checkdim_bounded_limits, error_stop
-      INTEGER, EXTERNAL :: getparam_int, getparam_real
+      INTEGER, EXTERNAL :: getparam_int, getparam_real, getparam_real_2d, getparam_int_0d, getparam_real_0d
       INTRINSIC :: MIN, DBLE
 ! Local Variables
       INTEGER :: ihru
@@ -262,17 +263,17 @@
       szinit_ag = 0
 
 !??? figure out what to save in restart file ???
-      IF ( getparam_int(MODNAME, 'max_soilzone_ag_iter', 1, max_soilzone_ag_iter)/=0 ) &
+      IF ( getparam_int_0d(MODNAME, 'max_soilzone_ag_iter', 1, max_soilzone_ag_iter)/=0 ) &
      &     CALL read_error(2, 'max_soilzone_ag_iter')
-      IF ( getparam_real(MODNAME, 'soilzone_aet_converge', 1, soilzone_aet_converge)/=0 ) &
+      IF ( getparam_real_0d(MODNAME, 'soilzone_aet_converge', 1, soilzone_aet_converge)/=0 ) &
      &     CALL read_error(2, 'soilzone_aet_converge')
       IF ( getparam_int(MODNAME, 'ag_soil_type', Nhru, Ag_soil_type)/=0 ) CALL read_error(2, 'ag_soil_type')
       IF ( getparam_real(MODNAME, 'ag_soilwater_deficit_min', Nhru, Ag_soilwater_deficit_min)/=0 ) &
      &     CALL read_error(2, 'ag_soilwater_deficit_min')
 !      IF ( getparam_int(MODNAME, 'ag_crop_type', Nhru, Ag_crop_type)/=0 ) CALL read_error(2, 'ag_crop_type')
-      IF ( getparam_real(MODNAME, 'ag_covden_sum', Nhru*MONTHS_PER_YEAR, Ag_covden_sum)/=0 ) CALL read_error(2, 'ag_covden_sum')
+      IF ( getparam_real_2d(MODNAME, 'ag_covden_sum', Nhru, MONTHS_PER_YEAR, Ag_covden_sum)/=0 ) CALL read_error(2, 'ag_covden_sum')
       IF ( Ag_covden_sum(1,1)<0.0 ) Ag_covden_sum = Covden_sum
-      IF ( getparam_real(MODNAME, 'ag_covden_win', Nhru*MONTHS_PER_YEAR, Ag_covden_win)/=0 ) CALL read_error(2, 'ag_covden_win')
+      IF ( getparam_real_2d(MODNAME, 'ag_covden_win', Nhru, MONTHS_PER_YEAR, Ag_covden_win)/=0 ) CALL read_error(2, 'ag_covden_win')
       IF ( Ag_covden_win(1,1)<0.0 ) Ag_covden_win = Covden_win
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) Ag_soil_lower = 0.0
       Basin_agwaterin = 0.0D0
@@ -495,6 +496,7 @@
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
         HRU_id = i
+!        if (i==36) write(531,*) 'a', Ag_soil_moist(i), It0_ag_soil_moist(i), ag_soil_rechr(i), iter_aet, Soil_iter, Infil_ag(i)
 
         hruactet = Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i)
         IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
@@ -604,7 +606,7 @@ endif
             Ag_hortonian(i) = excess
             Sroff(i) = Sroff(i) + excess
             ag_water_maxin = ag_water_maxin - excess
- 333 format (I4, 2(', ',i3), ', ', I0, 5(', ',F0.5))
+! 333 format (I4, 2(', ',i3), ', ', I0, 5(', ',F0.5))
           ENDIF
         ENDIF
         capwater_maxin = capwater_maxin + cap_ag_water_maxin
@@ -695,11 +697,13 @@ endif
             ENDIF
           ENDIF
           IF ( ag_on_flag==ACTIVE ) THEN
+ !if(i==36) write(531,*)              'c',ag_water_maxin,Ag_soil_moist(i)
             IF ( ag_water_maxin+Ag_soil_moist(i)>0.0 ) THEN
               ag_soil2gw = 0.0
               CALL compute_soilmoist(ag_water_maxin, Ag_soil_moist_max(i), &
      &             Ag_soil_rechr_max(i), Soil2gw_max(i), Ag_soil2gvr(i), &
      &             Ag_soil_moist(i), Ag_soil_rechr(i), ag_soil2gw, agfrac)
+! if(i==36) write(531,*)              'd',ag_water_maxin,Ag_soil_moist(i), Ag_soil2gvr(i), ag_soil2gw
               ag_water_maxin = ag_water_maxin*agfrac
 !              Ag_water_maxin(i) = ag_water_maxin
               Basin_agwaterin = Basin_agwaterin + DBLE( ag_water_maxin*harea )
@@ -750,6 +754,7 @@ endif
           IF ( ag_on_flag==ACTIVE ) THEN
             IF ( Ag_gvr2sm(i)>0.0 ) THEN
               Ag_soil_moist(i) = Ag_soil_moist(i) + Ag_gvr2sm(i)/agfrac
+!if(i==36) write(531,*) 'ag_gvr2sm 1', ag_gvr2sm(i), agfrac, Ag_soil_moist(i)
 !              IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) &
 !     &             PRINT *, 'AG sm>max', Ag_soil_moist(i), Ag_soil_moist_max(i), i
               Ag_soil_rechr(i) = MIN( Ag_soil_rechr_max(i), Ag_soil_rechr(i) + (Ag_gvr2sm(i)/agfrac)*Ag_replenish_frac(i))
@@ -784,6 +789,7 @@ endif
             CALL check_gvr_sm(ag_capacity, Slow_stor(i), frac, Ag_gvr2sm(i), depth)
             IF ( Ag_gvr2sm(i)>0.0 ) THEN
               Ag_soil_moist(i) = Ag_soil_moist(i) + Ag_gvr2sm(i)/agfrac
+!if(i==36) write(531,*) 'ag_gvr2sm 2', ag_gvr2sm(i), agfrac, Ag_soil_moist(i)
 !              IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) &
 !     &             PRINT *, 'AG sm>max', Ag_soil_moist(i), Ag_soil_moist_max(i), i
               Ag_soil_rechr(i) = MIN( Ag_soil_rechr_max(i), Ag_soil_rechr(i) + (Ag_gvr2sm(i)/agfrac)*Ag_replenish_frac(i))
@@ -872,12 +878,18 @@ endif
           ag_avail_targetAET = ag_AETtarget - hruactet
           IF ( Ag_soil_moist(i)>0.0 .AND. cfgi_frozen_hru==OFF ) THEN
 !            print *, Ag_soil_moist(i), Ag_soil_rechr(i)
+!if (i==36)  write(531,*) 'ee',ag_AETtarget, hruactet, AET_external(i), Ag_actet(i), ag_avail_targetAET, Ag_soil_moist(i)
             CALL compute_szactet(Ag_soil_moist_max(i), Ag_soil_rechr_max(i), Transp_on(i), Ag_cov_type(i), &
      &                           Ag_soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_actet(i), ag_avail_targetAET, & !?? instead of ag_avail_potet use AET_external
      &                           Snow_free(i), Ag_potet_rechr(i), Ag_potet_lower(i), &
      &                           ag_AETtarget, agfrac, Ag_soil_saturated(i))
+!if (i==36)  write(531,*) 'e',ag_AETtarget, hruactet, AET_external(i), Ag_actet(i), ag_avail_targetAET, Ag_soil_moist(i)
+!if (i==36) write(531,*) 'f',Ag_soil_moist_max(i), Ag_soil_rechr_max(i), Transp_on(i), Ag_cov_type(i), &
+!     &                           Ag_soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_actet(i), ag_avail_targetAET, & !?? instead of ag_avail_potet use AET_external
+!     &                           Snow_free(i), Ag_potet_rechr(i), Ag_potet_lower(i), &
+!     &                           ag_AETtarget, agfrac, Ag_soil_saturated(i)
             ! sanity checks
-            IF ( Iter_aet_flag==ACTIVE .AND. Transp_on(i)==ACTIVE ) THEN
+            IF ( Iter_aet_flag==ACTIVE  .AND. Transp_on(i)==ACTIVE ) THEN
               IF ( Ag_actet(i)-ag_AETtarget>NEARZERO ) THEN
                 PRINT *, 'ag_actet problem', Ag_actet(i), ag_avail_potet, agfrac, AET_external(i), ag_potet, i, hruactet
                 PRINT *, ag_AETtarget-Ag_actet(i), Ag_soil_moist(i), Ag_soil_rechr(i)

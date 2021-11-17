@@ -60,9 +60,10 @@
       INTEGER FUNCTION prms2mfdecl()
       USE GSFPRMS2MF
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Nsegment, Model
+      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_real !, declvar_int_2d, declvar_dble_1d
       IMPLICIT NONE
       INTEGER, EXTERNAL :: declparam
-      EXTERNAL read_error, print_module, declvar_dble, declvar_real !, declvar_int
+      EXTERNAL read_error, print_module
 !***********************************************************************
       prms2mfdecl = 0
 
@@ -74,12 +75,12 @@
      &     'L3/T', Net_sz2gw)
 
 !      ALLOCATE (Reach_latflow(Nreach))
-!      CALL declvar_dble(MODNAME, 'reach_latflow', 'nreach', Nreach, &
+!      CALL declvar_dble_1d(MODNAME, 'reach_latflow', 'nreach', Nreach, &
 !     &     'Lateral flow (surface runoff and interflow) into each stream reach', &
 !     &     'cfs', Reach_latflow)
 
 !      ALLOCATE (Reach_id(Nreach, Nsegment))
-!      CALL declvar_int(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, &
+!      CALL declvar_int_2d(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment, Nreach, &
 !     &     'Mapping of reach id by segment id', &
 !     &     'none', Reach_id)
 
@@ -99,7 +100,7 @@
 
       !rsr, all reaches receive same precentage of flow to each segment
       ALLOCATE (Segment_pct_area(Nsegment))
-!      CALL declvar_dble(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, &
+!      CALL declvar_dble_1d(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, &
 !     &     'Proportion of each segment that contributes flow to a stream reach', &
 !     &     'decimal fraction', Segment_pct_area)
 

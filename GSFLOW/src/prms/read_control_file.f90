@@ -29,13 +29,13 @@
         USE PRMS_GLACR, ONLY: Mbinit_flag
         USE PRMS_PRECIP_MAP, ONLY: Precip_map_file
         USE PRMS_TEMP_MAP, ONLY: Tmax_map_file, Tmin_map_file
+        USE PRMS_MMFAPI, ONLY: Num_control_parameters
         character(len=*), parameter :: MODDESC = 'Read Control File'
         character(len=*), parameter :: MODNAME = 'read_control_file'
-        INTEGER, PARAMETER :: Max_num_control_parameters = 250 ! WARNING, hard coded, DANGER, DANGER
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Data_file, Var_init_file, Ani_out_file
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Executable_desc, Executable_model, Var_save_file
         CHARACTER(LEN=MAXFILE_LENGTH) :: Control_file, Ani_output_file, Control_description
-        INTEGER, SAVE :: PlotsON_OFF, Num_control_parameters, Glacier_flag, Stream_temp_shade_flag
+        INTEGER, SAVE :: PlotsON_OFF, Glacier_flag, Stream_temp_shade_flag
         INTEGER, SAVE :: AniOutON_OFF, NaniOutVars, NdispGraphs, DispGraphsBuffSize, Param_file_control_parameter_id
         INTEGER, SAVE :: NumdispVar_names, NumdispVar_elements
         INTEGER, SAVE :: Canopy_transferON_OFF, Soilzone_transferON_OFF, Consumed_transferON_OFF
@@ -43,15 +43,6 @@
         REAL, SAVE :: Initial_deltat
         CHARACTER(LEN=MAXCONTROL_LENGTH), ALLOCATABLE, SAVE :: param_file_names(:)
         CHARACTER(LEN=MAXCONTROL_LENGTH), ALLOCATABLE, SAVE :: dispVar_element(:), dispVar_names(:)
-        ! read_flag: 0 = not set, 1 = set from control file, 2 = set to default
-        TYPE PRMS_control_parameter
-             CHARACTER(LEN=MAXCONTROL_LENGTH) :: name
-             INTEGER :: numvals, read_flag, data_type, index, allocate_flag
-             INTEGER, ALLOCATABLE :: values_int(:)
-             REAL, ALLOCATABLE :: values_real(:)
-             CHARACTER(LEN=MAXFILE_LENGTH), ALLOCATABLE :: values_character(:)
-        END TYPE PRMS_control_parameter
-        TYPE ( PRMS_control_parameter ), SAVE, ALLOCATABLE :: Control_parameter_data(:)
       END MODULE PRMS_CONTROL_FILE
 
       SUBROUTINE read_control_file()
@@ -138,6 +129,7 @@
      &    covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn, &
      &    ag_soilmoist_dynamic, ag_soilrechr_dynamic, ag_frac_dynamic !, snareathresh_dynamic
       USE PRMS_CONTROL_FILE
+      USE PRMS_MMFAPI, ONLY: Control_parameter_data, Max_num_control_parameters
       IMPLICIT NONE
       ! Local Variables
       INTEGER i, numvalues
@@ -1051,8 +1043,9 @@
 !***********************************************************************
       SUBROUTINE get_control_arguments()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MAXFILE_LENGTH, ERROR_control
-      USE PRMS_CONTROL_FILE, ONLY: PlotsON_OFF, Num_control_parameters, Control_parameter_data
+      USE PRMS_CONTROL_FILE, ONLY: PlotsON_OFF
       USE PRMS_MODULE, ONLY: Print_debug, EQULS
+      USE PRMS_MMFAPI, ONLY: Num_control_parameters, Control_parameter_data
       IMPLICIT NONE
       ! Functions
       INTRINSIC :: GET_COMMAND_ARGUMENT, COMMAND_ARGUMENT_COUNT, GET_COMMAND, TRIM
@@ -1133,6 +1126,7 @@
       SUBROUTINE set_control_parameter(Paramname, Numvalues, Paramval_int, Paramval_real, Paramval_char) ! allow arrays
       USE PRMS_CONSTANTS, ONLY: ERROR_control
       USE PRMS_CONTROL_FILE
+      USE PRMS_MMFAPI, ONLY: Control_parameter_data
       IMPLICIT NONE
       ! Arguments
       CHARACTER(LEN=MAXCONTROL_LENGTH), INTENT(IN) :: Paramname

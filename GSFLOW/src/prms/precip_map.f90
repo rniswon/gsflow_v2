@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=*), parameter :: MODNAME = 'precip_map'
-        character(len=*), parameter :: Version_precip_map = '2021-09-07'
+        character(len=*), parameter :: Version_precip_map = '2021-11-11'
         INTEGER, SAVE :: Precip_unit
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
@@ -33,7 +33,7 @@
      &    Basin_ppt, Basin_snow, Basin_rain, Basin_obs_ppt, Tmax_allsnow_f
 ! Functions
       INTRINSIC :: SNGL
-      INTEGER, EXTERNAL :: declparam, getparam_int, getparam_real, control_string
+      INTEGER, EXTERNAL :: declparam, getparam_int, getparam_real, getparam_real_2d, control_string
       EXTERNAL :: read_error, precip_form, find_header_end, find_current_time
       EXTERNAL :: read_cbh_date, print_module, print_date
 ! Local Variables
@@ -125,7 +125,7 @@
 
         istop = 0
         ierr = 0
-        IF ( getparam_real(MODNAME, 'precip_map_adj', Nmap*MONTHS_PER_YEAR, Precip_map_adj)/=0 ) &
+        IF ( getparam_real_2d(MODNAME, 'precip_map_adj', Nmap, MONTHS_PER_YEAR, Precip_map_adj)/=0 ) &
      &       CALL read_error(2, 'precip_map_adj')
         IF ( control_string(Precip_map_file, 'precip_map_file')/=0 ) CALL read_error(5, 'precip_map_file')
         CALL find_header_end(Precip_unit, Precip_map_file, 'precip_map_file', ierr, 1, 0)

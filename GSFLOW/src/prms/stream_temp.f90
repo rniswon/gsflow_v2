@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2021-09-07'
+      character(len=*), parameter :: Version_stream_temp = '2021-11-11'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -93,11 +93,12 @@
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DOCUMENTATION, ACTIVE, OFF, DAYS_PER_YEAR
       USE PRMS_MODULE, ONLY: Nsegment, Model, Init_vars_from_file, Strmtemp_humidity_flag, Model
       USE PRMS_STRMTEMP
+      USE PRMS_MMFSUBS, ONLY: declvar_real, declvar_dble_1d
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: INDEX
       INTEGER, EXTERNAL :: declparam, getdim, control_integer
-      EXTERNAL :: read_error, print_module, declvar_real, declvar_dble
+      EXTERNAL :: read_error, print_module
 !***********************************************************************
       stream_temp_decl = 0
 
@@ -143,7 +144,7 @@
      &     'degrees Celsius', Seg_tave_air )
 
       ALLOCATE ( Seg_potet(Nsegment) )
-      CALL declvar_dble( MODNAME, 'seg_potet', 'nsegment', Nsegment, &
+      CALL declvar_dble_1d( MODNAME, 'seg_potet', 'nsegment', Nsegment, &
      &     'HRU area-weighted average potential ET for each segment', &
      &     'inches', Seg_potet )
 
@@ -419,7 +420,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: COS, SIN, ABS, SIGN, ASIN, maxval
-      INTEGER, EXTERNAL :: getparam_real, getparam_int
+      INTEGER, EXTERNAL :: getparam_real, getparam_int, getparam_real_0d, getparam_real_2d, getparam_int_0d
       REAL, EXTERNAL :: solalt
       EXTERNAL :: read_error, checkdim_param_limits, error_stop
 ! Local Variables
@@ -428,8 +429,8 @@
 !***********************************************************************
       stream_temp_init = 0
 
-      IF ( getparam_real( MODNAME, 'albedo', 1, Albedo)/=0 ) CALL read_error(2, 'albedo')
-      IF ( getparam_real( MODNAME, 'lat_temp_adj', Nsegment*MONTHS_PER_YEAR, lat_temp_adj)/=0 ) &
+      IF ( getparam_real_0d( MODNAME, 'albedo', 1, Albedo)/=0 ) CALL read_error(2, 'albedo')
+      IF ( getparam_real_2d( MODNAME, 'lat_temp_adj', Nsegment, MONTHS_PER_YEAR, lat_temp_adj)/=0 ) &
      &     CALL read_error(2, 'lat_temp_adj')
       IF ( getparam_real( MODNAME, 'seg_length', Nsegment, Seg_length)/=0 ) CALL read_error(2, 'seg_length')
 
@@ -467,12 +468,12 @@
 
       IF ( getparam_int( MODNAME, 'ss_tau', Nsegment, Ss_tau)/=0 ) CALL read_error(2, 'ss_tau')
       IF ( getparam_int( MODNAME, 'gw_tau', Nsegment, Gw_tau)/=0 ) CALL read_error(2, 'Gw_tau')
-      IF ( getparam_real( MODNAME, 'melt_temp', 1, Melt_temp)/=0 ) CALL read_error(2, 'melt_temp')
-      IF ( getparam_real( MODNAME, 'maxiter_sntemp', 1, Maxiter_sntemp)/=0 ) CALL read_error(2, 'maxiter_sntemp')
+      IF ( getparam_real_0d( MODNAME, 'melt_temp', 1, Melt_temp)/=0 ) CALL read_error(2, 'melt_temp')
+      IF ( getparam_int_0d( MODNAME, 'maxiter_sntemp', 1, Maxiter_sntemp)/=0 ) CALL read_error(2, 'maxiter_sntemp')
 
       ierr = 0
       IF ( Strmtemp_humidity_flag==1 ) THEN
-         IF ( getparam_real( MODNAME, 'seg_humidity', Nsegment*MONTHS_PER_YEAR, Seg_humidity)/=0 ) &
+         IF ( getparam_real_2d( MODNAME, 'seg_humidity', Nsegment, MONTHS_PER_YEAR, Seg_humidity)/=0 ) &
      &      CALL read_error(2, 'seg_humidity')
       ELSEIF ( Strmtemp_humidity_flag==2 ) THEN ! use station data
          IF ( getparam_int(MODNAME, 'seg_humidity_sta', Nsegment, Seg_humidity_sta)/=0 ) &
