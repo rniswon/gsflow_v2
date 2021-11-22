@@ -4,19 +4,19 @@
       MODULE PRMS_BASIN_SUMMARY
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       IMPLICIT NONE
-! Module Variables
+      ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'basin_summary'
-      character(len=*), parameter :: Version_basin_summary = '2021-11-11'
+      character(len=*), parameter :: Version_basin_summary = '2021-11-19'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear, Dailyunit, Monthlyunit, Yearlyunit, Basin_var_type
       INTEGER, SAVE, ALLOCATABLE :: Nc_vars(:)
       CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2, Output_fmt3
       INTEGER, SAVE :: Daily_flag, Yeardays, Monthly_flag
       DOUBLE PRECISION, SAVE :: Monthdays
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Basin_var_daily(:), Basin_var_monthly(:), Basin_var_yearly(:)
-! Paramters
+      ! Parameters
       INTEGER, SAVE, ALLOCATABLE :: Nhm_id(:)
-! Control Parameters
+      ! Control Parameters
       INTEGER, SAVE :: BasinOutVars, BasinOut_freq
       CHARACTER(LEN=36), SAVE, ALLOCATABLE :: BasinOutVar_names(:)
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: BasinOutBaseFileName
@@ -52,12 +52,12 @@
 !***********************************************************************
       SUBROUTINE basin_summarydecl()
       USE PRMS_CONSTANTS, ONLY: DAILY, YEARLY, DOCUMENTATION, ERROR_control
+      use PRMS_READ_PARAM_FILE, only: declparam
+      use PRMS_CONTROL_FILE, only: control_string_array, control_integer, control_string
       USE PRMS_MODULE, ONLY: Model, BasinOutON_OFF, Nhru
       USE PRMS_BASIN_SUMMARY
+      use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string, declparam
-      EXTERNAL read_error, print_module, error_stop
 ! Local Variables
       INTEGER :: i
 !***********************************************************************
@@ -96,11 +96,12 @@
       SUBROUTINE basin_summaryinit()
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ACTIVE, OFF, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, DAILY, MONTHLY, &
      &    DBLE_TYPE, ERROR_control, ERROR_open_out
+      use PRMS_MMFAPI, only: getvarsize, getvartype
+      use PRMS_READ_PARAM_FILE, only: getparam_int
       USE PRMS_MODULE, ONLY: Start_year, Prms_warmup, BasinOutON_OFF, Nhru
       USE PRMS_BASIN_SUMMARY
+      use prms_utils, only: error_stop, numchars, PRMS_open_output_file, read_error
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam_int
-      EXTERNAL :: PRMS_open_output_file, error_stop, read_error
 ! Local Variables
       INTEGER :: ios, ierr, size, jj
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
@@ -198,12 +199,11 @@
 !***********************************************************************
       SUBROUTINE basin_summaryrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MEAN_MONTHLY, YEARLY
+      use PRMS_MMFAPI, only: getvar_dble
       USE PRMS_MODULE, ONLY: Start_month, Start_day, End_year, End_month, End_day, Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN_SUMMARY
       USE PRMS_SET_TIME, ONLY: Modays
       IMPLICIT NONE
-! Functions
-      EXTERNAL :: getvar_dble_0d
 ! Local Variables
       INTEGER :: jj, write_month, last_day
 !***********************************************************************
@@ -218,7 +218,7 @@
 !-----------------------------------------------------------------------
 ! need getvars for each variable (only can have short string)
       DO jj = 1, BasinOutVars
-        CALL getvar_dble_0d( MODNAME, BasinOutVar_names(jj)(:Nc_vars(jj)), 1, Basin_var_daily(jj) )
+        CALL getvar_dble( MODNAME, BasinOutVar_names(jj)(:Nc_vars(jj)), 1, Basin_var_daily(jj) )
       ENDDO
 
       write_month = OFF

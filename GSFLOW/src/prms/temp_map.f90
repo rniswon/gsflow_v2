@@ -2,7 +2,7 @@
 ! Maximum, minimum, average temperatures, and precipitation are distributed to each HRU
 ! using temperature and/or precipitation data input as a time series of gridded
 ! or other spatial units using an area-weighted method and correction factors to
-! account for differences in altitude, spatial variation, topography, and 
+! account for differences in altitude, spatial variation, topography, and
 ! measurement gage efficiency
 !***********************************************************************
       MODULE PRMS_TEMP_MAP
@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Temperature Distribution'
         character(len=*), parameter :: MODNAME = 'temp_map'
-        character(len=*), parameter :: Version_temp_map = '2021-11-11'
+        character(len=*), parameter :: Version_temp_map = '2021-11-19'
         INTEGER, SAVE :: Tmax_unit, Tmin_unit
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
@@ -25,16 +25,17 @@
 
       SUBROUTINE temp_map()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MAXFILE_LENGTH, MONTHS_PER_YEAR, temp_map_module
+      use PRMS_CONTROL_FILE, only: control_string
+      use PRMS_READ_PARAM_FILE, only: decldim, declparam, getdim, getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Process_flag, Start_year, Start_month, Start_day, Nmap2hru, Nmap, Nowmonth
       USE PRMS_TEMP_MAP
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
      &    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, Tavgc
+      use prms_utils, only: find_current_time, find_header_end, print_date, print_module, read_error
 ! Functions
       INTRINSIC :: SNGL
-      INTEGER, EXTERNAL :: declparam, getparam_real, getparam_int, getdim, decldim, control_string, getparam_real_2d
-      EXTERNAL :: read_error, precip_form, temp_set, find_header_end, find_current_time
-      EXTERNAL :: read_cbh_date, print_module, print_date
+      EXTERNAL :: precip_form, temp_set, read_cbh_date
 ! Local Variables
       INTEGER :: yr, mo, dy, i, hr, mn, sec, ierr, ios, j, kg, kh, istop
       REAL :: tmax_hru, tmin_hru, harea
@@ -120,9 +121,9 @@
 
         istop = 0
         ierr = 0
-        IF ( getparam_real_2d(MODNAME, 'tmax_map_adj', Nmap, MONTHS_PER_YEAR, Tmax_map_adj)/=0 ) &
+        IF ( getparam_real(MODNAME, 'tmax_map_adj', Nmap*MONTHS_PER_YEAR, Tmax_map_adj)/=0 ) &
      &       CALL read_error(2, 'tmax_map_adj')
-        IF ( getparam_real_2d(MODNAME, 'tmin_map_adj', Nmap, MONTHS_PER_YEAR, Tmin_map_adj)/=0 ) &
+        IF ( getparam_real(MODNAME, 'tmin_map_adj', Nmap*MONTHS_PER_YEAR, Tmin_map_adj)/=0 ) &
      &       CALL read_error(2, 'tmin_map_adj')
         IF ( control_string(Tmax_map_file, 'tmax_map_file')/=0 ) CALL read_error(5, 'tmax_map_file')
         IF ( control_string(Tmin_map_file, 'tmin_map_file')/=0 ) CALL read_error(5, 'tmin_map_file')

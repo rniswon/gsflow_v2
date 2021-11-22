@@ -26,12 +26,12 @@
 !     parent_gw, parent_ssr, parent_segment, parent_hru, hru_lon
 !***********************************************************************
       INTEGER FUNCTION setupdecl()
+      use PRMS_READ_PARAM_FILE, only: declparam
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Parameter Setup'
       character(len=*), parameter :: MODNAME = 'setup_param'
-      character(len=*), parameter :: Version_setup = '2021-09-07'
+      character(len=*), parameter :: Version_setup = '2021-11-19'
 ! Functions
-      INTEGER, EXTERNAL :: declparam
       EXTERNAL :: read_error, print_module
 !***********************************************************************
       setupdecl = 0
@@ -64,7 +64,7 @@
      &     'Segment index for each POI gage', &
      &     'none')/=0 ) CALL read_error(1, 'poi_gage_segment')
 
-      ! Type code for each point-of-interest (POI) gage (1=USGS streamgage; 2=NWS River Forecast Center Node 
+      ! Type code for each point-of-interest (POI) gage (1=USGS streamgage; 2=NWS River Forecast Center Node
       ! (http://water.weather.gov/ahps/download.php); 3=USGS SPARROW node (https://water.usgs.gov/nawqa/sparrow/);
       ! 4=outlet from or inlet to NHD-defined waterbody; 5=confluence of NHDPlus flowlines exceeding a Strahler stream order (Strahler, 1952, 1957) of four;
       ! 6=connectivity segment not in NHDPlus; 7=split segment from NHDPlus flowline because of travel time > 24 hours;

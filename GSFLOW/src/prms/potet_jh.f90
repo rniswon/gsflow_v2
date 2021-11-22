@@ -8,22 +8,22 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_jh'
-        character(len=*), parameter :: Version_potet = '2021-11-11'
+        character(len=*), parameter :: Version_potet = '2021-11-19'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Jh_coef(:, :), Jh_coef_hru(:)
       END MODULE PRMS_POTET_JH
 
       INTEGER FUNCTION potet_jh()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR, INCH2CM
+      use PRMS_READ_PARAM_FILE, only: declparam, getparam_real
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nowmonth
       USE PRMS_POTET_JH
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Tavgf, Swrad
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: declparam, getparam_real, getparam_real_2d
-      EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
       REAL :: elh
@@ -32,7 +32,7 @@
 
       IF ( Process_flag==RUN ) THEN
 !***********************************************************************
-! 597.3 cal/gm at 0 C is the energy required to change the state of 
+! 597.3 cal/gm at 0 C is the energy required to change the state of
 ! water to vapor
 ! elh is the latent heat of vaporization (not including the *2.54)
         Basin_potet = 0.0D0
@@ -66,7 +66,7 @@
 
 !******Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam_real_2d(MODNAME, 'jh_coef', Nhru, MONTHS_PER_YEAR, Jh_coef)/=0 ) CALL read_error(2, 'jh_coef')
+        IF ( getparam_real(MODNAME, 'jh_coef', Nhru*MONTHS_PER_YEAR, Jh_coef)/=0 ) CALL read_error(2, 'jh_coef')
         IF ( getparam_real(MODNAME, 'jh_coef_hru', Nhru, Jh_coef_hru)/=0 ) CALL read_error(2, 'jh_coef_hru')
 
       ENDIF
