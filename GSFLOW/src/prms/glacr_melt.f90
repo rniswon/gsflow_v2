@@ -50,7 +50,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2021-11-11'
+      character(len=*), parameter :: Version_glacr = '2021-11-19'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -121,10 +121,10 @@
 !***********************************************************************
       INTEGER FUNCTION glacrsetdims()
       USE PRMS_GLACR, ONLY: Nglres, Seven, Four, MbInit_flag
+      use PRMS_READ_PARAM_FILE, only: declfix
+      use PRMS_CONTROL_FILE, only: control_integer
+      use prms_utils, only: read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declfix, control_integer
-      EXTERNAL :: read_error
 !***********************************************************************
       glacrsetdims = 0
 
@@ -144,20 +144,18 @@
 !***********************************************************************
       INTEGER FUNCTION glacrdecl()
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
+      use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file
+      use prms_utils, only: print_module, read_error
       USE PRMS_GLACR
-      USE PRMS_MMFSUBS, ONLY: declvar_real, declvar_dble, declvar_int, declvar_int_0d, &
-     &    declvar_int_2d, declvar_dble_1d, declvar_real_2d
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module
 !***********************************************************************
       glacrdecl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_glacr)
 
-      CALL declvar_int_0d(MODNAME, 'nhrugl', 'one', 1, &
+      CALL declvar_int(MODNAME, 'nhrugl', 'one', 1, &
            'Number of at least partially glacierized HRUs at initiation', &
            'none', Nhrugl)
 
@@ -180,12 +178,12 @@
      &     'inches', Basin_gl_ice_melt)
 
       ALLOCATE ( Gl_mb_yrcumul(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'gl_mb_yrcumul', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'gl_mb_yrcumul', 'nhru', Nhru, &
      &     'Yearly mass balance for each glacier, indexed by Glacr_tag', &
      &     'inches', Gl_mb_yrcumul)
 
       ALLOCATE ( Gl_mb_cumul(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'gl_mb_cumul', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'gl_mb_cumul', 'nhru', Nhru, &
      &     'Cumulative mass balance for each glacier since start day, indexed by Glacr_tag', &
      &     'inches', Gl_mb_cumul)
 
@@ -194,12 +192,12 @@
      &     'decimal fraction', Basin_gl_area)
 
       ALLOCATE ( Gl_area(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'gl_area', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'gl_area', 'nhru', Nhru, &
      &     'Area of each glacier, indexed by Glacr_tag', &
      &     'acres', Gl_area)
 
       ALLOCATE ( Glnet_ar_delta(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'glnet_ar_delta', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'glnet_ar_delta', 'nhru', Nhru, &
      &     'Sum of area change of each glacier since start year, indexed by Glacr_tag', &
      &     'acres', Glnet_ar_delta)
 
@@ -209,12 +207,12 @@
      &     'inches cubed', Glacr_flow)
 
       ALLOCATE ( Delta_volyr(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'delta_volyr', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'delta_volyr', 'nhru', Nhru, &
      &     'Year total volume change for each glacier, indexed by Glacr_tag', &
      &     'inches cubed', Delta_volyr)
 
       ALLOCATE ( Hru_mb_yrcumul(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'hru_mb_yrcumul', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'hru_mb_yrcumul', 'nhru', Nhru, &
      &     'Mass balance for a glacier HRU, cumulative for year', &
      &     'inches', Hru_mb_yrcumul)
 
@@ -229,22 +227,22 @@
      &     'none', Glacr_tag)
 
       ALLOCATE ( Prev_area(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'prev_area', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'prev_area', 'nhru', Nhru, &
      &     'Previous year glacier-covered area above each HRU where all branches of the glacier are included', &
      &     'inches squared', Prev_area)
 
       ALLOCATE ( Prev_vol(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'prev_vol', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'prev_vol', 'nhru', Nhru, &
      &     'Previous volume of each glacier, indexed by Glacr_tag', &
      &     'inches cubed', Prev_vol)
 
       ALLOCATE ( Prev_out(Nhru,Nglres) )
-      CALL declvar_real_2d(MODNAME, 'prev_out', 'nhru,nglres', Nhru, Nglres, &
+      CALL declvar_real(MODNAME, 'prev_out', 'nhru,nglres', Nhru*Nglres, &
      &     'Antecedent outflow of the 3 reservoirs in each glacier, indexed by Glacr_tag',&
      &     'inches cubed', Prev_out)
 
       ALLOCATE ( Prev_outi(Nhru,Nglres) )
-      CALL declvar_real_2d(MODNAME, 'prev_outi', 'nhru,nglres', Nhru, Nglres, &
+      CALL declvar_real(MODNAME, 'prev_outi', 'nhru,nglres', Nhru*Nglres, &
      &     'Antecedent outflow of the 3 reservoirs in each glacier for only ice (firn) melt, indexed by Glacr_tag',&
      &     'inches cubed', Prev_outi)
 
@@ -309,12 +307,12 @@
      &     'elev_units', Basal_elev)
 
       ALLOCATE ( Keep_gl(Nhru,Seven) )
-      CALL declvar_real_2d(MODNAME, 'keep_gl', 'nhru,seven', Nhru, Seven, &
+      CALL declvar_real(MODNAME, 'keep_gl', 'nhru,seven', Nhru*Seven, &
      &     'Glacier real variables keeping from first year', &
      &     'none', Keep_gl)
 
       ALLOCATE ( Ikeep_gl(Nhru,Four) )
-      CALL declvar_int_2d(MODNAME, 'ikeep_gl', 'nhru,four', Nhru, Four, &
+      CALL declvar_int(MODNAME, 'ikeep_gl', 'nhru,four', Nhru*Four, &
      &     'Glacier integer variables keeping from first year', &
      &     'none', Ikeep_gl)
 
@@ -440,16 +438,18 @@
 !***********************************************************************
       INTEGER FUNCTION glacrinit()
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, GLACIER, LAND
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file
       USE PRMS_GLACR
       USE PRMS_BASIN, ONLY: Hru_area, Hru_elev_ts, Active_hrus, Hru_route_order, &
      &    Hru_type, Basin_area_inv, Hru_elev_meters
       USE PRMS_FLOWVARS, ONLY: Glacier_frac, Alt_above_ela, Glrette_frac
+      use prms_utils, only: get_ftnunit, read_error
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getparam_real, getparam_int, getparam_real_0d, getparam_real_2d, get_ftnunit, compute_ela_aar
+      INTEGER, EXTERNAL :: compute_ela_aar
       INTRINSIC :: ABS, SQRT, SNGL, REAL
-      EXTERNAL :: read_error, tag_count, sort5, glacr_restart
+      EXTERNAL :: tag_count, sort5, glacr_restart
 ! Local Variables
       INTEGER :: i, j, ii, jj, o, p, hru_flowline(Nhru), toflowline(Nhru), doela, termh, len_str
       INTEGER :: iwksp(Nhru), is(Nhru), ie(Nhru), n_inline(Nhru), cell_id(Nhru), str_id(Nhru), prev
@@ -466,12 +466,12 @@
 
       IF ( Init_vars_from_file>0 ) CALL glacr_restart(1)
 
-      IF ( getparam_real_0d(MODNAME, 'max_gldepth', 1, Max_gldepth)/=0 ) CALL read_error(2, 'max_gldepth')
+      IF ( getparam_real(MODNAME, 'max_gldepth', 1, Max_gldepth)/=0 ) CALL read_error(2, 'max_gldepth')
       IF ( getparam_real(MODNAME, 'glacrva_coef', Nhru, Glacrva_coef)/=0 ) CALL read_error(2, 'glacrva_coef')
       IF ( getparam_real(MODNAME, 'glacrva_exp', Nhru, Glacrva_exp)/=0 ) CALL read_error(2, 'glacrva_exp')
-      IF ( getparam_real_2d(MODNAME, 'stor_ice', Nhru, MONTHS_PER_YEAR, Stor_ice)/=0 ) CALL read_error(2, 'stor_ice')
-      IF ( getparam_real_2d(MODNAME, 'stor_snow', Nhru, MONTHS_PER_YEAR, Stor_snow)/=0 ) CALL read_error(2, 'stor_snow')
-      IF ( getparam_real_2d(MODNAME, 'stor_firn', Nhru, MONTHS_PER_YEAR, Stor_firn)/=0 ) CALL read_error(2, 'stor_firn')
+      IF ( getparam_real(MODNAME, 'stor_ice', Nhru*MONTHS_PER_YEAR, Stor_ice)/=0 ) CALL read_error(2, 'stor_ice')
+      IF ( getparam_real(MODNAME, 'stor_snow', Nhru*MONTHS_PER_YEAR, Stor_snow)/=0 ) CALL read_error(2, 'stor_snow')
+      IF ( getparam_real(MODNAME, 'stor_firn', Nhru*MONTHS_PER_YEAR, Stor_firn)/=0 ) CALL read_error(2, 'stor_firn')
       IF ( getparam_real(MODNAME, 'hru_length', Nhru, Hru_length)/=0 ) CALL read_error(2, 'hru_length')
       IF ( getparam_real(MODNAME, 'hru_width', Nhru, Hru_width)/=0 ) CALL read_error(2, 'hru_width')
       IF ( getparam_real(MODNAME, 'abl_elev_range', Nhru, Abl_elev_range)/=0 ) CALL read_error(2, 'abl_elev_range')
@@ -884,9 +884,10 @@
       USE PRMS_SNOW, ONLY: Snowcov_area, Snowmelt, Glacrmelt, Glacr_air_deltemp, Glacr_delsnow, &
      &    Glrette_frac_init, Snowcov_area, Basin_snowicecov, Snow_evap, Glacr_evap, Basin_glacrb_melt
       USE PRMS_FLOWVARS, ONLY: Glacier_frac, Alt_above_ela, Glrette_frac
+      use prms_utils, only: get_ftnunit
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: get_ftnunit, compute_ela_mb, compute_ela_aar, recompute_soltab
+      INTEGER, EXTERNAL :: compute_ela_mb, compute_ela_aar, recompute_soltab
       INTRINSIC :: ABS, EXP, SUM, SQRT, ISNAN, SNGL, DBLE
       EXTERNAL :: tag_count, bottom
 ! Local Variables
@@ -3032,10 +3033,10 @@
       SUBROUTINE glacr_restart(In_out)
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_GLACR
+      use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      EXTERNAL :: check_restart
       ! Local Variable
       CHARACTER(LEN=10) :: module_name
 !***********************************************************************

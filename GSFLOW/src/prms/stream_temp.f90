@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2021-11-11'
+      character(len=*), parameter :: Version_stream_temp = '2021-11-19'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -91,14 +91,15 @@
 !***********************************************************************
       INTEGER FUNCTION stream_temp_decl()
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DOCUMENTATION, ACTIVE, OFF, DAYS_PER_YEAR
+      use PRMS_CONTROL_FILE, only: control_integer
+      use PRMS_MMFAPI, only: declvar_dble, declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam, getdim
       USE PRMS_MODULE, ONLY: Nsegment, Model, Init_vars_from_file, Strmtemp_humidity_flag, Model
       USE PRMS_STRMTEMP
-      USE PRMS_MMFSUBS, ONLY: declvar_real, declvar_dble_1d
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: INDEX
-      INTEGER, EXTERNAL :: declparam, getdim, control_integer
-      EXTERNAL :: read_error, print_module
 !***********************************************************************
       stream_temp_decl = 0
 
@@ -144,7 +145,7 @@
      &     'degrees Celsius', Seg_tave_air )
 
       ALLOCATE ( Seg_potet(Nsegment) )
-      CALL declvar_dble_1d( MODNAME, 'seg_potet', 'nsegment', Nsegment, &
+      CALL declvar_dble( MODNAME, 'seg_potet', 'nsegment', Nsegment, &
      &     'HRU area-weighted average potential ET for each segment', &
      &     'inches', Seg_potet )
 
@@ -412,25 +413,25 @@
 !***********************************************************************
       INTEGER FUNCTION stream_temp_init()
       USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, MONTHS_PER_YEAR, OFF, NEARZERO, ERROR_param, DAYS_YR
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag, Inputerror_flag
       USE PRMS_STRMTEMP
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_OBS, ONLY: Nhumid
       USE PRMS_ROUTING, ONLY: Hru_segment, Tosegment, Segment_order, Segment_up
+      use prms_utils, only: checkdim_param_limits, error_stop, read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: COS, SIN, ABS, SIGN, ASIN, maxval
-      INTEGER, EXTERNAL :: getparam_real, getparam_int, getparam_real_0d, getparam_real_2d, getparam_int_0d
       REAL, EXTERNAL :: solalt
-      EXTERNAL :: read_error, checkdim_param_limits, error_stop
 ! Local Variables
       INTEGER :: i, j, k, iseg, ierr, ii, this_seg
       REAL :: tan_d, tano, sinhro, temp, decl, cos_d, tanod, alrs
 !***********************************************************************
       stream_temp_init = 0
 
-      IF ( getparam_real_0d( MODNAME, 'albedo', 1, Albedo)/=0 ) CALL read_error(2, 'albedo')
-      IF ( getparam_real_2d( MODNAME, 'lat_temp_adj', Nsegment, MONTHS_PER_YEAR, lat_temp_adj)/=0 ) &
+      IF ( getparam_real( MODNAME, 'albedo', 1, Albedo)/=0 ) CALL read_error(2, 'albedo')
+      IF ( getparam_real( MODNAME, 'lat_temp_adj', Nsegment*MONTHS_PER_YEAR, lat_temp_adj)/=0 ) &
      &     CALL read_error(2, 'lat_temp_adj')
       IF ( getparam_real( MODNAME, 'seg_length', Nsegment, Seg_length)/=0 ) CALL read_error(2, 'seg_length')
 
@@ -468,12 +469,12 @@
 
       IF ( getparam_int( MODNAME, 'ss_tau', Nsegment, Ss_tau)/=0 ) CALL read_error(2, 'ss_tau')
       IF ( getparam_int( MODNAME, 'gw_tau', Nsegment, Gw_tau)/=0 ) CALL read_error(2, 'Gw_tau')
-      IF ( getparam_real_0d( MODNAME, 'melt_temp', 1, Melt_temp)/=0 ) CALL read_error(2, 'melt_temp')
-      IF ( getparam_int_0d( MODNAME, 'maxiter_sntemp', 1, Maxiter_sntemp)/=0 ) CALL read_error(2, 'maxiter_sntemp')
+      IF ( getparam_real( MODNAME, 'melt_temp', 1, Melt_temp)/=0 ) CALL read_error(2, 'melt_temp')
+      IF ( getparam_int( MODNAME, 'maxiter_sntemp', 1, Maxiter_sntemp)/=0 ) CALL read_error(2, 'maxiter_sntemp')
 
       ierr = 0
       IF ( Strmtemp_humidity_flag==1 ) THEN
-         IF ( getparam_real_2d( MODNAME, 'seg_humidity', Nsegment, MONTHS_PER_YEAR, Seg_humidity)/=0 ) &
+         IF ( getparam_real( MODNAME, 'seg_humidity', Nsegment*MONTHS_PER_YEAR, Seg_humidity)/=0 ) &
      &      CALL read_error(2, 'seg_humidity')
       ELSEIF ( Strmtemp_humidity_flag==2 ) THEN ! use station data
          IF ( getparam_int(MODNAME, 'seg_humidity_sta', Nsegment, Seg_humidity_sta)/=0 ) &
@@ -773,7 +774,7 @@
          j = Hru_route_order(k)
 
 ! DANGER HACK
-! On restart, sometimes soltab_potsw comes in as zero. It should never be zero as 
+! On restart, sometimes soltab_potsw comes in as zero. It should never be zero as
 ! this results in divide by 0.0
          if (Soltab_potsw(jday, j) <= 10.0) then
             ccov = 1.0 - (Swrad(j) / sngl(10.0) * sngl(Hru_cossl(j)))
@@ -861,15 +862,15 @@
 !         if (Seg_melt(i) .ne. Seg_melt(i)) then
 !            write(*,*) "Seg_melt is nan", i
 !         endif
-!             
+!
 !         if (Seg_rain(i) .ne. Seg_rain(i)) then
 !            write(*,*) "Seg_rain is nan", i
 !         endif
-!             
+!
 !         if (Seg_humid(i) .ne. Seg_humid(i)) then
 !            write(*,*) "Seg_humid is nan", i
 !         endif
- 
+
       ENDDO
 
 
@@ -1235,11 +1236,11 @@
      &    Seg_ccov, Seg_potet, Albedo, seg_tave_gw, Seg_slope
       USE PRMS_FLOWVARS, ONLY: Seg_inflow
       USE PRMS_ROUTING, ONLY: Seginc_swrad
+      use prms_utils, only: sat_vapor_press_poly
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, SQRT, ABS, SNGL, DBLE
       EXTERNAL :: teak1
-      REAL, EXTERNAL :: sat_vapor_press_poly
 ! Arguments:
       REAL, INTENT(OUT) :: Ted
       REAL, INTENT(OUT) :: Ak1d, Ak2d
@@ -1912,11 +1913,11 @@
       SUBROUTINE stream_temp_restart(In_out)
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_STRMTEMP
+      use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
       ! Functions
-      EXTERNAL :: check_restart
       ! Local Variable
       CHARACTER(LEN=11) :: module_name
 !***********************************************************************

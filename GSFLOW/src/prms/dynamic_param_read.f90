@@ -58,10 +58,10 @@
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT
       USE PRMS_MODULE, ONLY: Process_flag
       USE PRMS_DYNAMIC_PARAM_READ, ONLY: MODDESC, MODNAME, Version_dynamic_param_read
+      use prms_utils, only: print_module
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: dynparamrun, dynparaminit
-      EXTERNAL :: print_module
 !***********************************************************************
       dynamic_param_read = 0
 
@@ -79,17 +79,16 @@
 !     dynparaminit - open files, read to start time, initialize flags and arrays
 !***********************************************************************
       INTEGER FUNCTION dynparaminit()
-        USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, OFF, ERROR_dynamic, DEBUG_minimum
-        USE PRMS_MODULE, ONLY: Nhru, Print_debug, Start_year, Start_month, Start_day, &
-     &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_ag_soil_flag, &
-     &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
-     &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
-     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, PRMS4_flag, Dyn_ag_frac_flag
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, OFF, ERROR_dynamic, DEBUG_minimum
+        use PRMS_CONTROL_FILE, only: control_string
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Start_year, Start_month, Start_day, &
+     &    Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_ag_soil_flag, &
+     &    Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
+     &    Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
+     &    Dyn_springfrost_flag, Dyn_snareathresh_flag, PRMS4_flag, Dyn_ag_frac_flag
       USE PRMS_DYNAMIC_PARAM_READ
+      use prms_utils, only: error_stop, find_current_file_time, find_header_end, PRMS_open_output_file, read_error, numchars
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: control_string, numchars
-      EXTERNAL :: read_error, find_header_end, find_current_file_time, PRMS_open_output_file, error_stop
 ! Local Variables
       INTEGER :: year, month, day, istop, ierr
 !***********************************************************************
@@ -371,7 +370,7 @@
           istop = 1
         ENDIF
       ENDIF
-      
+
       IF ( Dyn_radtrncf_flag==ACTIVE ) THEN
         IF ( control_string(radtrncf_dynamic, 'radtrncf_dynamic')/=0 ) CALL read_error(5, 'radtrncf_dynamic')
         CALL find_header_end(Rad_trncf_unit, radtrncf_dynamic, 'radtrncf_dynamic', ierr, 0, 0)
@@ -475,10 +474,11 @@
       USE PRMS_SOILZONE, ONLY: Basin_soil_rechr, Soil_zone_max, Soil_moist_tot, &
      &    Soil_lower_stor_max, Replenish_frac
       USE PRMS_SOILZONE_AG, ONLY: Ag_soil_lower_stor_max, Ag_replenish_frac
+      use prms_utils, only: is_eof
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL, DBLE
-      EXTERNAL :: write_dynoutput, is_eof, write_dynparam, write_dynparam_int
+      EXTERNAL :: write_dynoutput, write_dynparam, write_dynparam_int
       EXTERNAL :: write_dynparam_potet
 ! Local Variables
       INTEGER :: i, istop, check_dprst_depth_flag, check_sm_max_flag, check_srechr_max_flag

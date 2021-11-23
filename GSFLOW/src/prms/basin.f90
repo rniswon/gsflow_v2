@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2021-11-11'
+      character(len=*), parameter :: Version_basin = '2021-11-19'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -64,14 +64,13 @@
       INTEGER FUNCTION basdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CASCADEGW_OFF, DOCUMENTATION, MONTHS_PER_YEAR, &
      &    ide_dist_module, potet_pt_module, potet_pm_module, potet_pm_sta_module
+      use PRMS_MMFAPI, only: declvar_real, declvar_dble
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Model, Dprst_flag, Lake_route_flag, Et_flag, Precip_flag, Cascadegw_flag, &
      &    Stream_temp_flag, PRMS4_flag, GSFLOW_flag, Glacier_flag, AG_flag
       USE PRMS_BASIN
-      USE PRMS_MMFSUBS, ONLY: declvar_real, declvar_dble, declvar_dble_1d
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module
 !***********************************************************************
       basdecl = 0
 
@@ -109,7 +108,7 @@
      &     'decimal fraction', Hru_frac_perv)
 
       ALLOCATE ( Hru_storage(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'hru_storage', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'hru_storage', 'nhru', Nhru, &
      &     'Storage for each HRU', &
      &     'inches', Hru_storage)
 
@@ -294,15 +293,14 @@
      &    INACTIVE, LAKE, SWALE, FEET, ERROR_basin, DEBUG_minimum, ERROR_param, &
      &    NORTHERN, SOUTHERN, FEET2METERS, METERS2FEET, DNEARZERO, MONTHS_PER_YEAR, &
      &    ide_dist_module, potet_pt_module, potet_pm_module, potet_pm_sta_module
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, &
      &    Dprst_flag, Lake_route_flag, Et_flag, Precip_flag, Cascadegw_flag, &
      &    Stream_temp_flag, PRMS4_flag, GSFLOW_flag, Glacier_flag, Frozen_flag, PRMS_VERSION, &
      &    Starttime, Endtime, Parameter_check_flag, AG_flag
       USE PRMS_BASIN
+      use prms_utils, only: checkdim_bounded_limits, error_stop, read_error, write_outfile
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: getparam_real, getparam_int, getparam_int_0d, getparam_real_2d
-      EXTERNAL :: write_outfile, checkdim_bounded_limits
       INTRINSIC :: DBLE
 ! Local Variables
       CHARACTER(LEN=69) :: buffer
@@ -318,9 +316,9 @@
       Hru_elev_ts = Hru_elev
       IF ( getparam_real(MODNAME, 'hru_lat', Nhru, Hru_lat)/=0 ) CALL read_error(2, 'hru_lat')
       IF ( getparam_int(MODNAME, 'cov_type', Nhru, Cov_type)/=0 ) CALL read_error(2, 'cov_type')
-      IF ( getparam_real_2d(MODNAME, 'covden_sum', Nhru, MONTHS_PER_YEAR, Covden_sum)/=0 ) CALL read_error(2, 'covden_sum')
-      IF ( getparam_real_2d(MODNAME, 'covden_win', Nhru, MONTHS_PER_YEAR, Covden_win)/=0 ) CALL read_error(2, 'covden_win')
-      IF ( getparam_int_0d(MODNAME, 'elev_units', 1, Elev_units)/=0 ) CALL read_error(2, 'elev_units')
+      IF ( getparam_real(MODNAME, 'covden_sum', Nhru*MONTHS_PER_YEAR, Covden_sum)/=0 ) CALL read_error(2, 'covden_sum')
+      IF ( getparam_real(MODNAME, 'covden_win', Nhru*MONTHS_PER_YEAR, Covden_win)/=0 ) CALL read_error(2, 'covden_win')
+      IF ( getparam_int(MODNAME, 'elev_units', 1, Elev_units)/=0 ) CALL read_error(2, 'elev_units')
       IF ( getparam_real(MODNAME, 'hru_percent_imperv', Nhru, Hru_percent_imperv)/=0 ) CALL read_error(2, 'hru_percent_imperv')
       IF ( AG_flag==ACTIVE ) THEN
         IF ( getparam_real(MODNAME, 'ag_frac', Nhru, Ag_frac)/=0 ) CALL read_error(2, 'ag_frac')

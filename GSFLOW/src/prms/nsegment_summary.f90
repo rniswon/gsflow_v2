@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsegment_summary'
-      character(len=*), parameter :: Version_nsegment_summary = '2021-09-07'
+      character(len=*), parameter :: Version_nsegment_summary = '2021-11-19'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsegment_var_type(:)
       REAL, SAVE, ALLOCATABLE :: Nsegment_var_daily(:, :)
@@ -65,12 +65,12 @@
 !***********************************************************************
       SUBROUTINE nsegment_summarydecl()
       USE PRMS_CONSTANTS, ONLY: ERROR_control, DAILY, YEARLY, DOCUMENTATION
+      use PRMS_CONTROL_FILE, only: control_integer, control_string, control_string_array
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Model, Nsegment, NsegmentOutON_OFF
       USE PRMS_NSEGMENT_SUMMARY
+      use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string, declparam
-      EXTERNAL :: read_error, print_module, error_stop
 ! Local Variables
       INTEGER :: i
 !***********************************************************************
@@ -112,12 +112,12 @@
       SUBROUTINE nsegment_summaryinit()
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, &
      &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, REAL_TYPE, DBLE_TYPE
+      use PRMS_MMFAPI, only: getvartype, getvarsize
+      use PRMS_READ_PARAM_FILE, only: getparam_int
       USE PRMS_MODULE, ONLY: Nsegment, NsegmentOutON_OFF, Start_year, Prms_warmup
       USE PRMS_NSEGMENT_SUMMARY
+      use prms_utils, only: error_stop, numchars, PRMS_open_output_file, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam_int
-      EXTERNAL :: read_error, PRMS_open_output_file, error_stop
 ! Local Variables
       INTEGER :: ios, ierr, size, jj, j
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
@@ -274,13 +274,14 @@
 !***********************************************************************
       SUBROUTINE nsegment_summaryrun()
       USE PRMS_CONSTANTS, ONLY: MEAN_MONTHLY, MEAN_YEARLY, ACTIVE, OFF, REAL_TYPE, DBLE_TYPE
+      use PRMS_MMFAPI, only: getvar_dble, getvar_real
       USE PRMS_MODULE, ONLY: Nsegment, Start_month, Start_day, End_year, End_month, End_day, Nowyear, Nowmonth, Nowday
       USE PRMS_NSEGMENT_SUMMARY
       USE PRMS_SET_TIME, ONLY: Modays
+      use prms_utils, only: read_error
       IMPLICIT NONE
-! FUNCTIONS AND SUBROUTINES
-      INTRINSIC SNGL, DBLE
-      EXTERNAL read_error, getvar_real, getvar_dble
+! FUNCTIONS
+      INTRINSIC :: SNGL, DBLE
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day
 !***********************************************************************

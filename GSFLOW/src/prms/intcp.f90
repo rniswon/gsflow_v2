@@ -8,7 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-11-11'
+      character(len=*), parameter :: Version_intcp = '2021-11-19'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -66,13 +66,12 @@
 !***********************************************************************
       INTEGER FUNCTION intdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, MONTHS_PER_YEAR
-      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, PRMS_land_iteration_flag, AG_flag, GSFLOW_flag
+      use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam
+      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, PRMS_land_iteration_flag, AG_flag
+      use prms_utils, only: print_module, read_error
       USE PRMS_INTCP
-      USE PRMS_MMFSUBS, ONLY: declvar_real, declvar_dble, declvar_int
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module
 !***********************************************************************
       intdecl = 0
 
@@ -230,20 +229,18 @@
 !***********************************************************************
       INTEGER FUNCTION intinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, MONTHS_PER_YEAR
-      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug, Agriculture_soilzone_flag, &
-     &    Ag_package, AG_flag, GSFLOW_flag
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug
       USE PRMS_INTCP
       USE PRMS_CLIMATEVARS, ONLY: Transp_on
+      use prms_utils, only: read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: getparam_real_2d, getparam_int
-      EXTERNAL :: read_error
 !***********************************************************************
       intinit = 0
 
-      IF ( getparam_real_2d(MODNAME, 'snow_intcp', Nhru, MONTHS_PER_YEAR, Snow_intcp)/=0 ) CALL read_error(2, 'snow_intcp')
-      IF ( getparam_real_2d(MODNAME, 'wrain_intcp', Nhru, MONTHS_PER_YEAR, Wrain_intcp)/=0 ) CALL read_error(2, 'wrain_intcp')
-      IF ( getparam_real_2d(MODNAME, 'srain_intcp', Nhru, MONTHS_PER_YEAR, Srain_intcp)/=0 ) CALL read_error(2, 'srain_intcp')
+      IF ( getparam_real(MODNAME, 'snow_intcp', Nhru*MONTHS_PER_YEAR, Snow_intcp)/=0 ) CALL read_error(2, 'snow_intcp')
+      IF ( getparam_real(MODNAME, 'wrain_intcp', Nhru*MONTHS_PER_YEAR, Wrain_intcp)/=0 ) CALL read_error(2, 'wrain_intcp')
+      IF ( getparam_real(MODNAME, 'srain_intcp', Nhru*MONTHS_PER_YEAR, Srain_intcp)/=0 ) CALL read_error(2, 'srain_intcp')
 
       IF ( Use_transfer_intcp==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE ) THEN
         IF ( getparam_int(MODNAME, 'irr_type', Nhru, Irr_type)/=0 ) CALL read_error(1, 'irr_type')
@@ -301,9 +298,10 @@
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_OBS, ONLY: Pan_evap
+      use prms_utils, only: error_stop
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: intercept, error_stop
+      EXTERNAL :: intercept
       INTRINSIC :: DBLE, SNGL
 ! Local Variables
       INTEGER :: i, j, irrigation_type
@@ -651,11 +649,10 @@
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_INTCP
+      use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      ! Function
-      EXTERNAL :: check_restart
       ! Local Variable
       CHARACTER(LEN=5) :: module_name
 !***********************************************************************

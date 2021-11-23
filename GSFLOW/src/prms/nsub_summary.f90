@@ -70,12 +70,12 @@
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, DNEARZERO, &
      &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, &
      &    REAL_TYPE, DBLE_TYPE, RUN, DECL, INIT, CLEAN, DOCUMENTATION
+      use PRMS_CONTROL_FILE, only: control_integer, control_string, control_string_array
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Nsub, Model
       USE PRMS_NSUB_SUMMARY
+      use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: control_string_array, control_integer, control_string, declparam
-      EXTERNAL :: read_error, print_module, error_stop
 ! Local Variables
       INTEGER :: i
 !***********************************************************************
@@ -116,12 +116,13 @@
       SUBROUTINE nsub_summaryinit()
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, DNEARZERO, &
      &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, REAL_TYPE, DBLE_TYPE
+      use PRMS_MMFAPI, only: getvartype, getvarsize
+      use PRMS_READ_PARAM_FILE, only: getparam_int
       USE PRMS_MODULE, ONLY: Nhru, Nsub, Inputerror_flag, Start_year, Prms_warmup
       USE PRMS_NSUB_SUMMARY
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order
+      use prms_utils, only: error_stop, numchars, PRMS_open_output_file, read_error
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getvartype, numchars, getvarsize, getparam_int
-      EXTERNAL :: read_error, PRMS_open_output_file, error_stop
 ! Local Variables
       INTEGER :: ios, ierr, jj, j, i, k
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
@@ -289,14 +290,15 @@
 !***********************************************************************
       SUBROUTINE nsub_summaryrun()
       USE PRMS_CONSTANTS, ONLY: MEAN_MONTHLY, MEAN_YEARLY, ACTIVE, OFF, REAL_TYPE, DBLE_TYPE
+      use PRMS_MMFAPI, only: getvar_dble, getvar_real
       USE PRMS_MODULE, ONLY: Nhru, Nsub, Start_month, Start_day, End_year, End_month, End_day, Nowyear, Nowmonth, Nowday
       USE PRMS_NSUB_SUMMARY
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area_dble
       USE PRMS_SET_TIME, ONLY: Modays
+      use prms_utils, only: read_error
       IMPLICIT NONE
-! FUNCTIONS AND SUBROUTINES
+! FUNCTIONS
       INTRINSIC :: SNGL, DBLE
-      EXTERNAL :: read_error, getvar_real, getvar_dble
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day, k
 !***********************************************************************
