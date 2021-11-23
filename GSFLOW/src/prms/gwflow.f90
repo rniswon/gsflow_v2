@@ -74,6 +74,8 @@
 !***********************************************************************
       INTEGER FUNCTION gwflowdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, DOCUMENTATION, CASCADEGW_OFF
+      use PRMS_MMFAPI, only: declvar_real, declvar_dble
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Model, Nhru, Ngw, Nlake, Init_vars_from_file, Dprst_flag, Cascadegw_flag, Lake_route_flag
       USE PRMS_GWFLOW
       use prms_utils, only: print_module, read_error

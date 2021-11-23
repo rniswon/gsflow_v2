@@ -68,7 +68,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, MONTHS_PER_YEAR
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, PRMS_land_iteration_flag, AG_flag
+      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, PRMS_land_iteration_flag, AG_flag, GSFLOW_flag
       use prms_utils, only: print_module, read_error
       USE PRMS_INTCP
       IMPLICIT NONE
@@ -230,7 +230,8 @@
       INTEGER FUNCTION intinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, MONTHS_PER_YEAR
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug, &
+     &     GSFLOW_flag, AG_flag, Ag_package, Agriculture_soilzone_flag
       USE PRMS_INTCP
       USE PRMS_CLIMATEVARS, ONLY: Transp_on
       use prms_utils, only: read_error

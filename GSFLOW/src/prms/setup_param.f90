@@ -27,12 +27,11 @@
 !***********************************************************************
       INTEGER FUNCTION setupdecl()
       use PRMS_READ_PARAM_FILE, only: declparam
+      use prms_utils, only: read_error, print_module
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Parameter Setup'
       character(len=*), parameter :: MODNAME = 'setup_param'
       character(len=*), parameter :: Version_setup = '2021-11-19'
-! Functions
-      EXTERNAL :: read_error, print_module
 !***********************************************************************
       setupdecl = 0
 
