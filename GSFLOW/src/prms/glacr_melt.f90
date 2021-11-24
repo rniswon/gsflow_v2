@@ -57,7 +57,7 @@
 !#of cells=Nhrugl,#of streams=Ntp,#of cells/stream<=Ntp, #of glaciers<=Nhru
       INTEGER, SAVE :: Nglres, Ngl, Ntp, Nhrugl, MbInit_flag, Output_unit, Fraw_unit, All_unit
       INTEGER, SAVE :: Seven, Four, Glac_HRUnum_down
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_area_inch2(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_area_inch2(:), Gl_mbc_yrend(:)
       REAL, PARAMETER :: Gravity = 9.8 ! m/s2
       REAL, PARAMETER :: Aflow = 1.e-25 ! Pa^-3/s, Farinotti 2009 could be 2.4e-24, could be 1e-26 see Patterson 2010
       REAL, PARAMETER :: Density = 917.0 ! kg/m3
@@ -77,7 +77,7 @@
       DOUBLE PRECISION, SAVE :: Basin_gl_storstart
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_mb_yrcumul(:), Delta_volyr(:), Prev_vol(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Prev_area(:), Gl_mb_yrcumul(:), Gl_area(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gl_mb_cumul(:), Glnet_ar_delta(:), Gl_mbc_yrend(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gl_mb_cumul(:), Glnet_ar_delta(:)
 
       !****************************************************************
       !   Declared Parameters
@@ -2675,10 +2675,10 @@
 !***********************************************************************
       Flag = 0
       Rtnewt = 0.5*(X1+X2) !Initial guess.
-!      Rtnewt = 1.0 !???
       DO j = 1, JMAX
         CALL funcd(Rtnewt, Di, Upfunciph, Afunciph, Bfunciph, f, df, K, Nn)
-        dx = f/df
+        df = 1.0
+        IF ( df>0.0 ) dx = f/df
         Rtnewt = Rtnewt - dx
 !            PRINT*, 'Rtnewt jumped out of brackets, Rtnewt =', Rtnewt
         IF ( Rtnewt<X1 ) Rtnewt = X1

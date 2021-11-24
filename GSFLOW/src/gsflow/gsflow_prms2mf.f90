@@ -498,7 +498,7 @@
           IF ( Unused_potet(ihru)<0.0 ) Unused_potet(ihru) = 0.0
         ENDIF
       ENDDO
- 
+
 !-----------------------------------------------------------------------
 ! Bin precolation in cell_drain_rate
 !-----------------------------------------------------------------------
@@ -546,7 +546,7 @@
 !-----------------------------------------------------------------------
 ! latflow is in cfs
 ! convert the gain to the SFR reach to correct units
-!-----------------------------------------------------------------------          
+!-----------------------------------------------------------------------
           STRM(12, k) = SNGL( latflow*Sfr_conv )
 !         Basin_reach_latflow = Basin_reach_latflow + Reach_latflow(k)
           Basin_reach_latflow = Basin_reach_latflow + latflow

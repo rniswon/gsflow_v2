@@ -133,7 +133,7 @@ C     ------------------------------------------------------------------
      &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
      &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package, Model,
-     &    GSFLOW_flag, Print_debug, AG_flag
+     &    GSFLOW_flag, Print_debug
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -165,7 +165,7 @@ C
      &           'HYD ', 'SFR ', '    ', 'GAGE', 'LVDA', '    ', 'LMT6',  ! 49
      &           'MNW2', 'MNWI', 'MNW1', 'KDEP', 'SUB ', 'UZF ', 'gwm ',  ! 56
      &           'SWT ', 'cfp ', 'pcgn', '    ', 'fmp ', 'UPW ', 'NWT ',  ! 63
-     &           'SWR ', 'SWI2', 'AG  ', '    ', 'IWRT', 'IRED', '    ',  ! 70     - SWR - JDH 
+     &           'SWR ', 'SWI2', 'AG  ', '    ', 'IWRT', 'IRED', '    ',  ! 70     - SWR - JDH
      &           30*'    '/                                               ! 71-100 - SWR - JDH
 C     ------------------------------------------------------------------
       gsfinit = 0
@@ -239,14 +239,11 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
         PRINT *, 'FMP Package not supported'
         ierr = 1
       ENDIF
-      IF ( IUNIT(55)==0 .AND. Model>GSFLOW ) THEN
+      IF ( IUNIT(55)==0 .AND. Model==GSFLOW ) THEN
         PRINT *, 'GSFLOW requires UZF Package'
         ierr = 1
       ENDIF
-      IF ( IUNIT(66)==0 .AND. AG_flag == ACTIVE ) THEN
-        PRINT *, 'AG requires the AG Package'
-        ierr = 1
-      ENDIF
+
 ! Packages available in NWT but not in GSFLOW
       IF ( GSFLOW_flag==ACTIVE ) THEN
         IF ( IUNIT(3)>0 ) THEN
@@ -332,7 +329,7 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
       IF(IUNIT(37).GT.0) CALL GWF2HUF7AR(IUNIT(37),IUNIT(47),
      1                                     IUNIT(53),IGRID)
 ! Allocate arrays for Newton Solver
-      IF(IUNIT(63).GT.0) CALL GWF2NWT1AR(IUNIT(63),MXITER, 
+      IF(IUNIT(63).GT.0) CALL GWF2NWT1AR(IUNIT(63),MXITER,
      1                                   IUNIT(22),IGRID)
       IF(IUNIT(62).GT.0) CALL GWF2UPW1AR(IUNIT(62), Igrid)
       IF(IUNIT(2).GT.0) CALL GWF2WEL7AR(IUNIT(2),IUNIT(63),IGRID)
@@ -567,7 +564,7 @@ C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
           IF(IUNIT(16).GT.0) CALL GWF2FHB7AD(IGRID)
           IF(IUNIT(22).GT.0) CALL GWF2LAK7AD(KKPER,KKSTP,IUNIT(15),
      1                                           IGRID)
-          IF(IUNIT(55).GT.0) CALL GWF2UZF1AD(IUNIT(55), KKPER, KKSTP, 
+          IF(IUNIT(55).GT.0) CALL GWF2UZF1AD(IUNIT(55), KKPER, KKSTP,
      1                                       Igrid)
           IF(IUNIT(65).GT.0) CALL GWF2SWI2AD(KKSTP,KKPER,IGRID)  !SWI2
           IF( IUNIT(44).GT.0 ) CALL GWF2SFR7AD(IUNIT(44),IUNIT(22),
@@ -598,7 +595,7 @@ C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
 !             IF(IRTFL.EQ.3.OR.ICUFL.EQ.3.OR.IPFL.EQ.3
 !     1                           .OR.IEBFL.EQ.1.OR.IEBFL.EQ.3)
 !     2       CALL FMP2AD(ISTARTFL,KKPER,IGRID)
-!          ENDIF     
+!          ENDIF
           IF(IUNIT(64).GT.0) CALL GWF2SWR7AD(KKPER,KKSTP,
      2                                       IGRID,IUNIT(54))  !SWR - JDH
           IF(IUNIT(66).GT.0) CALL GWF2AG7AD(IUNIT(66),KKPER)
@@ -637,7 +634,7 @@ C7C2----ITERATIVELY FORMULATE AND SOLVE THE FLOW EQUATIONS.
                 ITREAL = KITER
             END IF
             IF(IUNIT(62).GT.0) CALL GWF2UPWUPDATE(2,Igrid)
-      
+
 C
 C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             CALL GWF2BAS7FM(IGRID)
@@ -679,7 +676,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ACTIVE ) THEN
-              IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+              IF ( PRMS_land_iteration_flag==1 ) THEN
                 retval = intcp()
                 IF ( retval/=0 ) THEN
                   PRINT 9001, 'intcp', retval
@@ -719,7 +716,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             ELSEIF ( iss==0 ) THEN
               IF ( KKITER==Mxsziter+1 ) Stopcount = Stopcount + 1
             ENDIF
-            IF(IUNIT(66).GT.0 ) 
+            IF(IUNIT(66).GT.0 )
      1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
             IF(IUNIT(22).GT.0) CALL GWF2LAK7FM(KKITER,KKPER,KKSTP,
      1                                     IUNIT(44),IUNIT(55),IGRID)  !RGN 9/21/2021 to keep seepage from lake in UZF
@@ -727,7 +724,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
      1                           IUNIT(44),IUNIT(22),IUNIT(63),
      2                           IUNIT(64),IGRID)  !SWR - JDH ADDED IUNIT(64)
             IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,
-     1                              IUNIT(22),IUNIT(63),IUNIT(8), 
+     1                              IUNIT(22),IUNIT(63),IUNIT(8),
      2                              IUNIT(55),IGRID)   !cjm (added IUNIT(8))
             IF(IUNIT(50).GT.0) THEN
               IF (IUNIT(1).GT.0) THEN
@@ -912,7 +909,7 @@ C7C4----CALCULATE BUDGET TERMS. SAVE CELL-BY-CELL FLOW TERMS.
           IF(IUNIT(8).GT.0) THEN
              IF(IUNIT(22).GT.0.AND.NRCHOP.EQ.3) CALL GWF2LAK7ST(
      1                                                     0,IGRID)
-             CALL GWF2RCH7BD(KKSTP,KKPER,IGRID) 
+             CALL GWF2RCH7BD(KKSTP,KKPER,IGRID)
              IF(IUNIT(22).GT.0.AND.NRCHOP.EQ.3) CALL GWF2LAK7ST(
      1                                                     1,IGRID)
           END IF
@@ -921,7 +918,7 @@ C7C4----CALCULATE BUDGET TERMS. SAVE CELL-BY-CELL FLOW TERMS.
           IF(IUNIT(18).GT.0) CALL GWF2STR7BD(KKSTP,KKPER,IGRID)
           IF(IUNIT(19).GT.0) CALL GWF2IBS7BD(KKSTP,KKPER,IGRID)
           IF(IUNIT(39).GT.0) CALL GWF2ETS7BD(KKSTP,KKPER,IGRID)
-          IF(IUNIT(40).GT.0) CALL GWF2DRT7BD(KKSTP,KKPER,IGRID)  
+          IF(IUNIT(40).GT.0) CALL GWF2DRT7BD(KKSTP,KKPER,IGRID)
 ! (CJM) Added RCH unit number for RCH->SFR.
           IF(IUNIT(44).GT.0) CALL GWF2SFR7BD(KKSTP,KKPER,IUNIT(15),
      1                        IUNIT(22),IUNIT(46),IUNIT(55),NSOL,
@@ -936,9 +933,9 @@ C7C4----CALCULATE BUDGET TERMS. SAVE CELL-BY-CELL FLOW TERMS.
           IF(IUNIT(52).GT.0) CALL GWF2MNW17BD(NSTP(KPER),KKSTP,KKPER,
      1                      IGRID)
           IF(IUNIT(54).GT.0) CALL GWF2SUB7BD(KKSTP,KKPER,IGRID)
-          IF(IUNIT(57).GT.0) CALL GWF2SWT7BD(KKSTP,KKPER,IGRID)     
+          IF(IUNIT(57).GT.0) CALL GWF2SWT7BD(KKSTP,KKPER,IGRID)
           IF(IUNIT(64).GT.0) CALL GWF2SWR7BD(KKSTP,KKPER,IGRID)  !SWR - JDH
-!         IF(IUNIT(67).GT.0) CALL GWF2GFB7BD(KKSTP,KKPER,IGRID) 
+!         IF(IUNIT(67).GT.0) CALL GWF2GFB7BD(KKSTP,KKPER,IGRID)
           IF(IUNIT(65).GT.0) CALL GWF2SWI2BD(KKSTP,KKPER,IGRID)  !SWI2 - JDH
           IF(IUNIT(66).GT.0) CALL GWF2AG7BD(KKSTP,KKPER,IUNIT(63))
 CLMT
@@ -946,7 +943,7 @@ CLMT----CALL LINK-MT3DMS SUBROUTINES TO SAVE FLOW-TRANSPORT LINK FILE
 CLMT----FOR USE BY MT3DMS FOR TRANSPORT SIMULATION
 CLMT
           IF(IUNIT(49).GT.0) CALL LMT8BD(KKSTP,KKPER,IGRID)
-CLMT                              
+CLMT
 C
 C
 !  Set NWT heads to Hdry when head is below bottom.
@@ -1418,7 +1415,7 @@ C----------READ USING PACKAGE READ AND PREPARE MODULES.
      1                            IUNIT(23),IUNIT(37),IUNIT(62),KKPER,
      2                            IGRID)
 !        IF(IUNIT(61).GT.0) CALL FMP2RP(IUNIT(61),ISTARTFL,KKPER,        !FMP2AR CALL ADDED BY SCHMID
-!     1                          IUNIT(44),IUNIT(52),IGRID)     
+!     1                          IUNIT(44),IUNIT(52),IGRID)
         IF(IUNIT(64).GT.0) CALL GWF2SWR7RP(IUNIT(64),KKPER,IGRID)  !SWR - JDH
         IF ( IUNIT(66).GT.0 ) CALL GWF2AG7RP(IUNIT(66),IUNIT(44),KKPER)
 C
@@ -1631,7 +1628,7 @@ C
       INTEGER, INTENT(IN) :: Iunitlak, Iunitsfr
       INTRINSIC :: ABS, SNGL
 ! Local Variables
-      INTEGER :: i, j 
+      INTEGER :: i, j
       REAL :: TESTSFR, TESTLAK
 !***********************************************************************
 ! Zero SFR flows (RUNOFF, ETSW, and PPTSW)
@@ -1651,7 +1648,7 @@ C
 ! Zero LAK flows (PPT, EVAP, RUNOFF, SP.WITHDRAWL).
       IF ( Iunitlak>0 ) THEN
         DO i = 1, NLAKES
-          TESTLAK = TESTLAK + SNGL(ABS(PRCPLK(i)) + ABS(EVAPLK(i))) + 
+          TESTLAK = TESTLAK + SNGL(ABS(PRCPLK(i)) + ABS(EVAPLK(i))) +
      +              ABS(RNF(i)) + ABS(WTHDRW(i))
           IF ( TESTLAK>1.0 ) EXIT
         END DO
@@ -1668,7 +1665,7 @@ C
      +       'Non-zero values were specified for precipitation,',/,
      +       'streamflow, and ET for streams in MODFLOW input files.',/,
      +       'These values are set to zero for GSFLOW ',
-     +       'simulations', /)    
+     +       'simulations', /)
    11 FORMAT(/, '***WARNING***', /,
      +       'Non-zero values were specified for precipitation,',/,
      +       'streamflow, ET, and Sp.Flow for lakes in MODFLOW',/,
@@ -1800,7 +1797,7 @@ C
       USE GSFMODFLOW, ONLY: Mft_to_sec, Mft_to_days, Modflow_time_zero
       USE GLOBAL, ONLY: ITMUNI
       IMPLICIT NONE
-      INTRINSIC SNGL
+      INTRINSIC :: SNGL
       INTEGER, EXTERNAL :: control_integer_array
       EXTERNAL :: error_stop
 ! Local Variables

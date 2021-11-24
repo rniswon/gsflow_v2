@@ -53,7 +53,7 @@
             SGNM = IRRSEG(J)
             NMCL = 0
             IF ( SGNM>0 ) NMCL = DVRCH(SGNM)
-            DO K=1,NMCL        
+            DO K=1,NMCL
               ihru = IRRROW_SW(K,SGNM)
               Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + DIVERSIONIRRPRMS(k,SGNM)*MFQ_to_inch_acres
             END DO

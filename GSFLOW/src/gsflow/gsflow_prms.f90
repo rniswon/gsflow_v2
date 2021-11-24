@@ -167,7 +167,7 @@
 
         IF ( GSFLOW_flag==ACTIVE ) THEN
           ierr = gsflow_modflow()
-          IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
+          IF ( ierr/=0 ) CALL module_error('gsflow_modflow', Arg, ierr)
         ENDIF
 
         IF ( Print_debug>DEBUG_minimum ) THEN
@@ -241,7 +241,7 @@
           ENDIF
 
           ierr = gsflow_modflow()
-          IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
+          IF ( ierr/=0 ) CALL module_error('gsflow_modflow', Arg, ierr)
           IF ( Have_lakes==ACTIVE .AND. Nlake/=NLAKES_MF ) THEN
             PRINT *, 'ERROR, NLAKES not equal to Nlake'
             PRINT *, '       NLAKES=', NLAKES_MF, '; Nlake=', Nlake
@@ -301,7 +301,7 @@
           ENDIF
           IF ( GSFLOW_flag==ACTIVE ) THEN
             ierr = gsflow_modflow()
-            IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
+            IF ( ierr/=0 ) CALL module_error('gsflow_modflow', Arg, ierr)
           ENDIF
         ENDIF
       ENDIF
@@ -383,7 +383,6 @@
       ENDIF
 
       IF ( Model==CLIMATE ) THEN
-        IF ( ierr/=0 ) CALL module_error('CLIMATE', Arg, ierr)
         IF ( Process_flag==RUN ) THEN
           CALL summary_output()
           RETURN
@@ -394,7 +393,6 @@
       IF ( Model==FROST ) THEN
         ierr = frost_date()
         IF ( ierr/=0 ) CALL module_error('frost_date', Arg, ierr)
-        call_modules = ierr
         IF ( Process_flag==RUN ) THEN
           CALL summary_output()
           RETURN
@@ -419,7 +417,6 @@
       IF ( ierr/=0 ) CALL module_error(Transp_module, Arg, ierr)
 
       IF ( Model==TRANSPIRE ) THEN
-        call_modules = ierr
         IF ( Process_flag==RUN ) THEN
           CALL summary_output()
           RETURN
@@ -448,12 +445,10 @@
       IF ( Model==WRITE_CLIMATE ) THEN
         ierr = write_climate_hru()
         IF ( ierr/=0 ) CALL module_error('write_climate_hru', Arg, ierr)
-        call_modules = ierr
         IF ( Process_flag==RUN ) RETURN
       ENDIF
 
       IF ( Model==POTET ) THEN
-        IF ( ierr/=0 ) CALL module_error('POTET', Arg, ierr)
         IF ( Process_flag==RUN ) THEN
           CALL summary_output()
           RETURN
@@ -575,7 +570,7 @@
 
       IF ( CsvON_OFF>OFF .AND. PRMS_only==ACTIVE ) CALL prms_summary()
 
-      call_modules = ierr ! set in case of the following RETURNs
+      IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
       IF ( Process_flag==RUN ) THEN
         RETURN
       ELSEIF ( Process_flag==CLEAN ) THEN
@@ -764,7 +759,7 @@
           DO WHILE ( Kper_mfo<=Nper )
 !            IF ( mf_nowtime>endday ) EXIT
             test = gsflow_modflow()
-            IF ( test/=0 ) CALL module_error(MODNAME, 'run', test)
+            IF ( test/=0 ) CALL module_error('gsflow_modflow', 'run', test)
             IF ( mf_timestep==NSTP(Kper_mfo) ) THEN
               Kper_mfo = Kper_mfo + 1
               mf_timestep = 0
@@ -800,18 +795,19 @@
         IF ( control_string(Var_save_file, 'var_save_file')/=0 ) CALL read_error(5, 'var_save_file')
       ENDIF
 
-      Temp_module = ' '
+      Temp_module = 'temp_1sta'
       IF ( control_string(Temp_module, 'temp_module')/=0 ) CALL read_error(5, 'temp_module')
-      Precip_module = ' '
+      Precip_module = 'precip_1sta'
       IF ( control_string(Precip_module, 'precip_module')/=0 ) CALL read_error(5, 'precip_module')
-      Transp_module = ' '
+      Transp_module = 'transp_index'
       IF ( control_string(Transp_module, 'transp_module')/=0 ) CALL read_error(5, 'transp_module')
-      Et_module = ' '
+      Et_module = 'potet_jh'
       IF ( control_string(Et_module, 'et_module')/=0 ) CALL read_error(5, 'et_module')
-      Srunoff_module = ' '
+      Srunoff_module = 'srunoff_smidx'
       IF ( control_string(Srunoff_module, 'srunoff_module')/=0 ) CALL read_error(5, 'srunoff_module')
-      Solrad_module = ' '
+      Solrad_module = 'ddsolrad'
       IF ( control_string(Solrad_module, 'solrad_module')/=0 ) CALL read_error(5, 'solrad_module')
+      Soilzone_module = 'soilzone'
       Strmflow_module = 'strmflow'
       IF ( control_string(Strmflow_module, 'strmflow_module')/=0 ) CALL read_error(5, 'strmflow_module')
 
@@ -928,8 +924,6 @@
         PRINT '(/,2A)', 'ERROR, invalid srunoff_module value: ', Srunoff_module
         Inputerror_flag = 1
       ENDIF
-
-      Soilzone_module = 'soilzone'
 
       IF ( control_integer(Orad_flag, 'orad_flag')/=0 ) Orad_flag = OFF
       IF ( Solrad_module(:8)=='ddsolrad' ) THEN

@@ -311,11 +311,10 @@
      &     'Volumetric flow rate of flow from gravity reservoirs to capillary reservoirs', &
      &     'L3/T', Basingvr2sm)/=0 ) CALL read_error(3, 'basingvr2sm')
 
+!     includes precipitation, snowmelt, and cascading Hortonian and Dunnian runoff and interflow
       IF ( declvar(MODNAME, 'Infil2CapTotal_Q', 'one', 1, 'double', &
-     &     'Volumetric flow rate of soil infiltration into capillary'// &
-     &     ' reservoirs including precipitation, snowmelt, and'// &
-     &     ' cascading Hortonian and Dunnian runoff and interflow'// &
-     &     ' minus infiltration to preferential-flow reservoirs', &
+     &     'Volumetric flow rate of soil infiltration into capillary reservoirs including precipitation, snowmelt, and'// &
+     &     ' cascading Hortonian and Dunnian runoff and interflow minus infiltration to preferential-flow reservoirs', &
      &     'L3/T', Infil2CapTotal_Q)/=0 ) CALL read_error(3, 'Infil2CapTotal_Q')
 
       IF ( declvar(MODNAME, 'Infil2Pref_Q', 'one', 1, 'double', &
@@ -715,7 +714,7 @@
 
       IF ( Have_lakes==ACTIVE ) THEN
         Lake_S = TOTSTOR_LAK
-        SatDisch2Lake_Q = TOTGWIN_LAK 
+        SatDisch2Lake_Q = TOTGWIN_LAK
         Lake2Sat_Q = TOTGWOT_LAK
         Lake_dS = TOTDELSTOR_LAK
         LakeExchng2Sat_Q = -Lake2Sat_Q - SatDisch2Lake_Q
@@ -921,7 +920,7 @@
         CALL PRMS_open_output_file(Balance_unt, Csv_output_file, 'csv_output_file', 0, ios)
         IF ( ios/=0 ) ERROR STOP ERROR_open_out
       ENDIF
- 
+
 ! Open the GSF volumetric balance report file
 
       IF ( Print_debug>DEBUG_less ) PRINT '(/,A,I4)', 'Water Budget print frequency is:', Rpt_days
@@ -1177,7 +1176,7 @@
      &        'RATES FOR THIS TIME STEP', 11X, 'L**3/T', /, 3X, 18('-'), &
      &        22X, 24('-'), //, 37X, 'IN', 41X, 'IN', /, 37X, '--', 41X, '--')
  9003 FORMAT (3X, A18, ' =', A18, 5X, A18, ' =', A18)
- 9004 FORMAT (//, 36X, 'OUT', 40X, 'OUT', /, 36X, '---', 40X, '---') 
+ 9004 FORMAT (//, 36X, 'OUT', 40X, 'OUT', /, 36X, '---', 40X, '---')
  9005 FORMAT (/, 3X, 'INFLOWS - OUTFLOWS =', A18, 5X, &
      &        'INFLOWS - OUTFLOWS =', A18, /, 13X, 8('-'), 35X, 8('-'))
  9006 FORMAT (/, ' TOTAL STORAGE CHANGE =', A18, 9X, 'STORAGE CHANGE =', &

@@ -690,7 +690,7 @@
 !***********************************************************************
       INTEGER FUNCTION snoinit()
       USE PRMS_CONSTANTS, ONLY: LAND, GLACIER, FEET, FEET2METERS, DNEARZERO, ACTIVE, OFF, MONTHS_PER_YEAR, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Print_debug, Init_vars_from_file, Glacier_flag, Snarea_curve_flag
+      USE PRMS_MODULE, ONLY: Nhru, Ndeplval, Print_debug, Init_vars_from_file, Glacier_flag, Snarea_curve_flag
       USE PRMS_SNOW
       USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_route_order, Active_hrus, Hru_area_dble, Elev_units, Hru_type
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
@@ -725,7 +725,7 @@
       IF ( getparam(MODNAME, 'rad_trncf', Nhru, 'real', Rad_trncf)/=0 ) CALL read_error(2, 'rad_trncf')
       IF ( Snarea_curve_flag==OFF ) THEN
         IF ( getparam(MODNAME, 'hru_deplcrv', Nhru, 'integer', Hru_deplcrv)/=0 ) CALL read_error(2, 'hru_deplcrv')
-        IF ( getparam(MODNAME, 'snarea_curve', Ndepl*11, 'real', Snarea_curve)/=0 ) CALL read_error(2, 'snarea_curve')
+        IF ( getparam(MODNAME, 'snarea_curve', Ndeplval, 'real', Snarea_curve)/=0 ) CALL read_error(2, 'snarea_curve')
       ELSE
         IF ( getparam(MODNAME, 'snarea_a', Nhru, 'real', Snarea_a)/=0 ) CALL read_error(2, 'snarea_a')
         IF ( getparam(MODNAME, 'snarea_b', Nhru, 'real', Snarea_b)/=0 ) CALL read_error(2, 'snarea_b')
@@ -1092,14 +1092,18 @@
               ELSE
                 Glacr_albedo(i) = Albedo_ice(i) +(Albedo_coef(i)/PI)*ATAN( (Alt_above_ela(i)+300.0)/200.0 )
               ENDIF
-            ELSE !IF ( Active_glacier==2 ) 
+            ELSE !IF ( Active_glacier==2 )
               Glacr_albedo(i) = Albedo_ice(i) !glacr_albedo doesn't change if glacierette but could get zeroed out
             ENDIF
           ENDIF
           IF ( isglacier==ACTIVE ) THEN
             IF (Nowyear >= Start_year+10 .AND. MOD(Nowyear-Start_year,5)==0 ) THEN
               Glacr_air_deltemp(i) = Glacr_air_5avtemp1(i) - Glacr_air_5avtemp(i) !need 5 years of data
-              Glacr_delsnow(i) = 10.0*(Glacr_5avsnow1(i) - Glacr_5avsnow(i))/Glacr_5avsnow1(i) !number of 10 percent (*100.0/10.0) changes
+              IF ( Glacr_5avsnow1(i)>0.0 ) THEN
+                Glacr_delsnow(i) = 10.0*(Glacr_5avsnow1(i) - Glacr_5avsnow(i))/Glacr_5avsnow1(i) !number of 10 percent (*100.0/10.0) changes
+              ELSE
+                Glacr_delsnow(i) = 0.0
+              ENDIF
             ENDIF
             !keep before restart
             IF ( MOD(Nowyear-Start_year,5)==0 ) THEN
