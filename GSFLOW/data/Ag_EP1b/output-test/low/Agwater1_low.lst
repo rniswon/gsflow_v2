@@ -3,7 +3,7 @@
                             VERSION 1.2.0 03/01/2020
                     BASED ON MODFLOW-2005 VERSION 1.12.00 02/03/2017
 
- LIST FILE: ./output/Agwater1_low.lst
+ LIST FILE: ./output/low/Agwater1_low.lst
                          UNIT    9
 
  OPENING ./input/Agwater1.ba6
@@ -54,83 +54,83 @@
  FILE TYPE:AG   UNIT   57   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/EP1b_Agwater1_low.hed
+ OPENING ./output/low/EP1b_Agwater1_low.hed
  FILE TYPE:DATA   UNIT   62   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1GW_low.ts5
+ OPENING ./output/low/Agwater1GW_low.ts5
  FILE TYPE:DATA   UNIT  105   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1GW_ET_low.ts5
+ OPENING ./output/low/Agwater1GW_ET_low.ts5
  FILE TYPE:DATA   UNIT  106   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1GW_ET_low.all
+ OPENING ./output/low/Agwater1GW_ET_low.all
  FILE TYPE:DATA   UNIT  107   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1GW_low.all
+ OPENING ./output/low/Agwater1GW_low.all
  FILE TYPE:DATA   UNIT  108   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_low.uzfot
+ OPENING ./output/low/Agwater1_low.uzfot
  FILE TYPE:DATA(BINARY)   UNIT   61   STATUS:UNKNOWN
  FORMAT:UNFORMATTED            ACCESS:STREAM              
 
- OPENING ./output/Agwater1cbc_low.unf
+ OPENING ./output/low/Agwater1cbc_low.unf
  FILE TYPE:DATA(BINARY)   UNIT  102   STATUS:UNKNOWN
  FORMAT:UNFORMATTED            ACCESS:STREAM              
 
- OPENING ./output/Agwater1_low.uzf1
+ OPENING ./output/low/Agwater1_low.uzf1
  FILE TYPE:DATA   UNIT   65   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_low.uzf2
+ OPENING ./output/low/Agwater1_low.uzf2
  FILE TYPE:DATA   UNIT   66   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_low.uzf3
+ OPENING ./output/low/Agwater1_low.uzf3
  FILE TYPE:DATA   UNIT   67   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_low.uzf4
+ OPENING ./output/low/Agwater1_low.uzf4
  FILE TYPE:DATA   UNIT   68   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_low.flw
+ OPENING ./output/low/Agwater1_low.flw
  FILE TYPE:DATA   UNIT   81   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_low.sg1
+ OPENING ./output/low/Agwater1_low.sg1
  FILE TYPE:DATA   UNIT   83   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_low.sg2
+ OPENING ./output/low/Agwater1_low.sg2
  FILE TYPE:DATA   UNIT   84   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_low.sg3
+ OPENING ./output/low/Agwater1_low.sg3
  FILE TYPE:DATA   UNIT   85   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_low.sg4
+ OPENING ./output/low/Agwater1_low.sg4
  FILE TYPE:DATA   UNIT   86   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_low.sg5
+ OPENING ./output/low/Agwater1_low.sg5
  FILE TYPE:DATA   UNIT   87   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_low.sg6
+ OPENING ./output/low/Agwater1_low.sg6
  FILE TYPE:DATA   UNIT   88   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_low.sg7
+ OPENING ./output/low/Agwater1_low.sg7
  FILE TYPE:DATA   UNIT   89   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_low.sg8
+ OPENING ./output/low/Agwater1_low.sg8
  FILE TYPE:DATA   UNIT   90   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
@@ -37788,6 +37788,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/11/16  8:25:44
- Elapsed run time: 3.843 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/11/23 20:40:46
+ Elapsed run time: 3.789 Seconds
 

@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsegment_summary'
-      character(len=*), parameter :: Version_nsegment_summary = '2021-11-19'
+      character(len=*), parameter :: Version_nsegment_summary = '2021-11-23'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsegment_var_type(:)
       REAL, SAVE, ALLOCATABLE :: Nsegment_var_daily(:, :)
@@ -297,9 +297,9 @@
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NsegmentOutVars
         IF ( Nsegment_var_type(jj)==REAL_TYPE ) THEN
-          CALL getvar_real(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, Nsegment_var_daily(1, jj))
+          CALL getvar_real(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, Nsegment_var_daily(:, jj))
         ELSEIF ( Nsegment_var_type(jj)==DBLE_TYPE ) THEN
-          CALL getvar_dble(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, Nsegment_var_dble(1, jj))
+          CALL getvar_dble(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, Nsegment_var_dble(:, jj))
           DO i = 1, Nsegment
             Nsegment_var_daily(i, jj) = SNGL( Nsegment_var_dble(i, jj) )
           ENDDO

@@ -33,7 +33,7 @@ contains
 
   module subroutine read_control_file()
     use PRMS_CONSTANTS, only: MAXCONTROL_LENGTH, MAXFILE_LENGTH
-    use PRMS_MODULE, only: Print_debug, Model_output_file, Model_control_file
+    use PRMS_MODULE, only:  Model_control_file
     use prms_utils, only: numchars, PRMS_open_input_file, PRMS_open_output_file, read_error, write_outfile
     implicit none
     ! Functions

@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nhru_summary'
-      character(len=*), parameter :: Version_nhru_summary = '2021-11-19'
+      character(len=*), parameter :: Version_nhru_summary = '2021-11-23'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nhru_var_type(:), Nhru_var_int(:, :)
       REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
@@ -187,6 +187,7 @@
           ierr = 1
         ENDIF
       ENDDO
+
       IF ( ierr==1 ) ERROR STOP ERROR_control
       IF ( Double_vars==ACTIVE ) THEN
         ALLOCATE ( Nhru_var_dble(Nhru, NhruOutVars) )
@@ -335,15 +336,15 @@
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NhruOutVars
         IF ( Nhru_var_type(jj)==REAL_TYPE ) THEN
-          CALL getvar_real(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_daily(1, jj))
+          CALL getvar_real(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_daily(:, jj))
         ELSEIF ( Nhru_var_type(jj)==DBLE_TYPE ) THEN
-          CALL getvar_dble(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_dble(1, jj))
+          CALL getvar_dble(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_dble(:, jj))
           DO j = 1, Active_hrus
             i = Hru_route_order(j)
             Nhru_var_daily(i, jj) = SNGL( Nhru_var_dble(i, jj) )
           ENDDO
         ELSEIF ( Nhru_var_type(jj)==INT_TYPE ) THEN
-          CALL getvar_int(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_int(1, jj))
+          CALL getvar_int(MODNAME, NhruOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_int(:, jj))
           IF ( NhruOut_freq>DAILY ) THEN
             DO j = 1, Active_hrus
               i = Hru_route_order(j)

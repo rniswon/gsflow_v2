@@ -197,30 +197,30 @@ module PRMS_MMFAPI
   end interface
 
   interface getvalues_dbl
-    module subroutine getvalues_dbl_0d(param_id, Numvalues, Values)
-      integer, intent(IN) :: param_id, Numvalues
+    module subroutine getvalues_dbl_0d(param_id, Values)
+      integer, intent(IN) :: param_id
       double precision, intent(OUT) :: Values
     end subroutine
 
-    module subroutine getvalues_dbl_1d(param_id, Numvalues, Values)
-      integer, intent(IN) :: param_id, Numvalues
+    module subroutine getvalues_dbl_1d(param_id, Values)
+      integer, intent(IN) :: param_id
       double precision, intent(OUT) :: Values(:)
     end subroutine
   end interface
 
   interface getvalues_int
-    module subroutine getvalues_int_0d(param_id, Numvalues, Values)
-      integer, intent(IN) :: param_id, Numvalues
+    module subroutine getvalues_int_0d(param_id, Values)
+      integer, intent(IN) :: param_id
       integer, intent(OUT) :: Values
     end subroutine
 
-    module subroutine getvalues_int_1d(param_id, Numvalues, Values)
-      integer, intent(IN) :: param_id, Numvalues
+    module subroutine getvalues_int_1d(param_id, Values)
+      integer, intent(IN) :: param_id
       integer, intent(OUT) :: Values(:)
     end subroutine
 
-    module subroutine getvalues_int_2d(param_id, Numvalues, Values)
-      integer, intent(IN) :: param_id, Numvalues
+    module subroutine getvalues_int_2d(param_id, Values)
+      integer, intent(IN) :: param_id
       integer, intent(OUT) :: Values(:, :)
     end subroutine
   end interface

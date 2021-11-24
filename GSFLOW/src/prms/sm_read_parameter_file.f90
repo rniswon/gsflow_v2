@@ -233,7 +233,7 @@ contains
     ! allocate and store parameter data
     allocate (Parameter_data(MAXPARAMETERS)) ! allow for extra parameters being expected
     do i = 1, MAXPARAMETERS
-        Parameter_data(i)%param_name = ' '
+      Parameter_data(i)%param_name = ' '
       Parameter_data(i)%short_description = ' '
       Parameter_data(i)%long_description = ' '
       Parameter_data(i)%numvals = 0
@@ -292,6 +292,7 @@ contains
   integer module function declparam(Modname, Paramname, Dimenname, Datatype, &
                                     Defvalue, Minvalue, Maxvalue, Descshort, Desclong, Units)
     use PRMS_CONSTANTS, only: ERROR_param
+    use PRMS_MODULE, only: Ndepl
     use PRMS_MMFAPI, only: set_data_type
     use prms_utils, only: error_stop, numchars, read_error
     implicit none
@@ -309,7 +310,7 @@ contains
     character(LEN=16) :: dimen1, dimen2
     !***********************************************************************
     declparam = 0
-      !!!!!!!!!!!! check to see if already in data structure
+    !!!!!!!!!!!! check to see if already in data structure
     ! doesn't check to see if declared the same, uses first values
     call check_parameters_declared(Paramname, Modname, declared)
     if (declared == 1) return
@@ -398,10 +399,10 @@ contains
         else
           if (trim(dimen1) == 'ndeplval') then
             ! Special case to handle snarea_curve
-            allocate (Parameter_data(Num_parameters)%values_real_2d(11, numvalues / 11))
-            do i = 1, 11
-              do j = 1, numvalues / 11
-                Parameter_data(Num_parameters)%values_real_2d(i, j) = temp
+            allocate (Parameter_data(Num_parameters)%values_real_2d(11, Ndepl))
+            do i = 1, Ndepl
+              do j = 1, 11
+                Parameter_data(Num_parameters)%values_real_2d(j, i) = temp
               end do
             end do
           else
@@ -989,7 +990,7 @@ contains
     ! Functions
     intrinsic :: INDEX
     ! Local Variables
-    integer nchars, nchars_param, type_flag, num_values, i, j
+    integer nchars, nchars_param, type_flag, num_values
     character(LEN=16) :: dimenname
     !***********************************************************************
     String = ' '
@@ -1055,7 +1056,14 @@ contains
               Parameter_data(found)%values_real_0d = Values(1)
             elseif (Parameter_data(found)%num_dimens == 1) then
               if (trim(Parameter_data(found)%param_name) == 'snarea_curve') then
-                Parameter_data(found)%values_real_2d = reshape(Values, (/11, Ndepl/))
+                k = 0
+                do ii = 1, Ndepl
+                  do j = 1, 11
+                    k = k + 1
+                    Parameter_data(found)%values_real_2d(j,ii) = Values(k)
+                  enddo
+                enddo
+!                Parameter_data(found)%values_real_2d = reshape(Values, (/11, Ndepl/))
               else
                 do j = 1, Numvalues
                   Parameter_data(found)%values_real_1d(j) = Values(j)
@@ -1079,10 +1087,10 @@ contains
               end do
             else ! 2d
               k = 0
-              do j = 1, Parameter_data(found)%num_dim1
-                do jj = 1, Parameter_data(found)%num_dim2
+              do jj = 1, Parameter_data(found)%num_dim2
+                do j = 1, Parameter_data(found)%num_dim1
                   k = k + 1
-                  Parameter_data(found)%values_int_2d(jj, j) = Ivalues(k)
+                  Parameter_data(found)%values_int_2d(j, jj) = Ivalues(k)
                 end do
               end do
             end if

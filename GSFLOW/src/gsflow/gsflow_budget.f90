@@ -52,11 +52,11 @@
 !***********************************************************************
       INTEGER FUNCTION gsfbuddecl()
       USE GSFBUDGET
+      use PRMS_MMFAPI, only: declvar_dble, declvar_real
+      use PRMS_READ_PARAM_FILE, only: getdim
       USE PRMS_MODULE, ONLY: Nhru, Nsegment
-      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_real
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getdim
-      EXTERNAL :: print_module, read_error
 !***********************************************************************
       gsfbuddecl = 0
 
@@ -360,7 +360,7 @@
             lake = Lake_hru_id(i)
             !EVAP in mfl3/dt   SURFA in MFL2/dt
             IF ( SURFA(lake)>DNEARZERO ) THEN
-              inches_on_lake = SNGL(EVAP(lake))*DELT/SNGL(SURFA(lake))*Mfl_to_inch                         !RGN 5/23/15 added *DELT for time units other than days.         
+              inches_on_lake = SNGL(EVAP(lake))*DELT/SNGL(SURFA(lake))*Mfl_to_inch                         !RGN 5/23/15 added *DELT for time units other than days.
               Hru_actet(i) = inches_on_lake*SNGL(SURFA(lake)*Mfl2_to_acre/Lake_area(lake))
             ELSE
               Hru_actet(i) = 0.0
@@ -739,11 +739,11 @@
         ENDDO
         Seepage_segment_sfr(i) = Seepage_reach_sfr(i)/FLOAT(nrch)
         first_reach = first_reach + nrch
-      ENDDO 
+      ENDDO
       IF ( TOTSPFLOW<0.0 ) THEN
         Basin_cfs = Basin_cfs + TOTSPFLOW
       ELSE
-! RGN added specified inflows and outflows from SFR. 
+! RGN added specified inflows and outflows from SFR.
         Stream_inflow = Stream_inflow + TOTSPFLOW
       END IF
 ! RGN added next line.
@@ -794,10 +794,10 @@
       SUBROUTINE gsflow_budget_restart(In_out)
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      use prms_utils, only: check_restart
       USE GSFBUDGET
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      EXTERNAL check_restart
       ! Local Variable
       CHARACTER(LEN=13) :: module_name
 !***********************************************************************

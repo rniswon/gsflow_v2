@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 11/11/2021
+                       Version 5.3.0 11/23/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,9 +36,10 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-11-11
-Read Control File               read_control_file   2021-11-11
-Read Parameter File             read_parameter_file 2021-11-11
+PRMS Computation Order          gsflow_prms         2021-11-23
+Read Control File               read_control_file   2021-11-22
+Read Parameter File             read_parameter_file 2021-11-22
+Read Data File                  read_data_file      2021-11-22
 
 
 ====================================================================
@@ -67,26 +68,26 @@ runoff 1
  Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
 Simulation time period: 1980/10/01 00:00:00 to 1996/09/30 00:00:00
 ====================================================================
-Basin Definition                basin               2021-11-11
-Cascading Flow                  cascade             2021-11-11
-Common States and Fluxes        climateflow         2021-11-11
+Basin Definition                basin               2021-11-19
+Cascading Flow                  cascade             2021-11-19
+Common States and Fluxes        climateflow         2021-11-19
 Potential Solar Radiation       soltab              2021-09-07
-Time Series Data                obs                 2021-11-11
-Timestep Control                prms_time           2021-09-07
-Temperature Distribution        climate_hru         2021-11-15
-Precipitation Distribution      climate_hru         2021-11-15
-Solar Radiation Distribution    climate_hru         2021-11-15
-Potential Evapotranspiration    climate_hru         2021-11-15
+Time Series Data                obs                 2021-11-19
+Timestep Control                prms_time           2021-11-19
+Temperature Distribution        climate_hru         2021-11-19
+Precipitation Distribution      climate_hru         2021-11-19
+Solar Radiation Distribution    climate_hru         2021-11-19
+Potential Evapotranspiration    climate_hru         2021-11-19
 Transpiration Distribution      transp_tindex       2021-09-07
-Canopy Interception             intcp               2021-11-11
-Snow Dynamics                   snowcomp            2021-11-11
-Surface Runoff                  srunoff_smidx       2021-11-11
-Soilzone Computations           soilzone            2021-11-11
+Canopy Interception             intcp               2021-11-19
+Snow Dynamics                   snowcomp            2021-11-23
+Surface Runoff                  srunoff_smidx       2021-11-19
+Soilzone Computations           soilzone            2021-11-19
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-10-11
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-06-10
 GSFLOW Output Budget Summary    gsflow_budget       2021-09-29
 GSFLOW Output CSV Summary       gsflow_sum          2021-09-28
-Output Summary                  subbasin            2021-11-09
+Output Summary                  subbasin            2021-11-19
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2021-09-29
 UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
@@ -105,5 +106,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time   15 minutes 32.70 seconds
+Execution elapsed time   17 minutes 14.55 seconds
 

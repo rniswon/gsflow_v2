@@ -368,7 +368,7 @@ contains
 !***********************************************************************
   module subroutine read_data_file_line(Iret)
       USE PRMS_CONSTANTS, ONLY: ERROR_read
-      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day, Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       use prms_utils, only: compute_julday, read_error
       IMPLICIT NONE
       ! Arguments
@@ -379,32 +379,23 @@ contains
       DATA init/1/
 !***********************************************************************
       Iret = 0
-      IF ( init==1 ) THEN ! RSR ???, is this allowed to change a DATA declared variable
-        Nowyear = Start_year
-        Nowmonth = Start_month
-        Nowday = Start_day
-      ELSE
-        last_julday = compute_julday(Nowyear, Nowmonth, Nowday)
-      ENDIF
+      last_julday = compute_julday(Nowyear, Nowmonth, Nowday)
       READ ( Datafile_unit, *, IOSTAT=Iret ) Nowyear, Nowmonth, Nowday, hr, mn, sec, (Data_line_values(i),i=1,Num_datafile_columns)
-      IF ( Iret==0 ) THEN
-        IF ( init==0 ) THEN
-          now_julday = compute_julday(Nowyear, Nowmonth, Nowday)
-          IF ( now_julday-last_julday/=1 ) THEN
-            PRINT *, 'ERROR, Data File timestep not equal to 1 day on:', Nowyear, Nowmonth, Nowday
-            PRINT *, '       timestep =', now_julday - last_julday
-            STOP ERROR_read
-          ENDIF
-        ELSE
-          init = 0
+      IF ( Iret/=0 ) CALL read_error(13, 'measured variables')
+      IF ( init==0 ) THEN
+        now_julday = compute_julday(Nowyear, Nowmonth, Nowday)
+        IF ( now_julday-last_julday/=1 ) THEN
+          PRINT *, 'ERROR, Data File timestep not equal to 1 day on:', Nowyear, Nowmonth, Nowday
+          PRINT *, '       timestep =', now_julday - last_julday
+          STOP ERROR_read
         ENDIF
-        start = 1
-        DO i = 1, Num_datafile_types
-          CALL check_data_variables(Data_varname(i), Data_varnum(i), Data_line_values(start), 1, Iret)
-          start = start + Data_varnum(i)
-        ENDDO
       ELSE
-        CALL read_error(13, 'measured variables')
+        init = 0
       ENDIF
+      start = 1
+      DO i = 1, Num_datafile_types
+        CALL check_data_variables(Data_varname(i), Data_varnum(i), Data_line_values(start), 1, Iret)
+        start = start + Data_varnum(i)
+      ENDDO
       END SUBROUTINE read_data_file_line
 end submodule

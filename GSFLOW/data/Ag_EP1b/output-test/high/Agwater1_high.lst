@@ -3,7 +3,7 @@
                             VERSION 1.2.0 03/01/2020
                     BASED ON MODFLOW-2005 VERSION 1.12.00 02/03/2017
 
- LIST FILE: ./output/Agwater1_high.lst
+ LIST FILE: ./output/high/Agwater1_high.lst
                          UNIT    9
 
  OPENING ./input/Agwater1.ba6
@@ -54,83 +54,83 @@
  FILE TYPE:AG   UNIT   57   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/EP1b_Agwater1_high.hed
+ OPENING ./output/high/EP1b_Agwater1_high.hed
  FILE TYPE:DATA   UNIT   62   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1GW_high.ts5
+ OPENING ./output/high/Agwater1GW_high.ts5
  FILE TYPE:DATA   UNIT  105   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1GW_high_ET.ts5
+ OPENING ./output/high/Agwater1GW_high_ET.ts5
  FILE TYPE:DATA   UNIT  106   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1GW_high_ET.all
+ OPENING ./output/high/Agwater1GW_high_ET.all
  FILE TYPE:DATA   UNIT  107   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1GW_high.all
+ OPENING ./output/high/Agwater1GW_high.all
  FILE TYPE:DATA   UNIT  108   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_high.uzfot
+ OPENING ./output/high/Agwater1_high.uzfot
  FILE TYPE:DATA(BINARY)   UNIT   61   STATUS:UNKNOWN
  FORMAT:UNFORMATTED            ACCESS:STREAM              
 
- OPENING ./output/Agwater1cbc_high.unf
+ OPENING ./output/high/Agwater1cbc_high.unf
  FILE TYPE:DATA(BINARY)   UNIT  102   STATUS:UNKNOWN
  FORMAT:UNFORMATTED            ACCESS:STREAM              
 
- OPENING ./output/Agwater1_high.uzf1
+ OPENING ./output/high/Agwater1_high.uzf1
  FILE TYPE:DATA   UNIT   65   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_high.uzf2
+ OPENING ./output/high/Agwater1_high.uzf2
  FILE TYPE:DATA   UNIT   66   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_high.uzf3
+ OPENING ./output/high/Agwater1_high.uzf3
  FILE TYPE:DATA   UNIT   67   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_high.uzf4
+ OPENING ./output/high/Agwater1_high.uzf4
  FILE TYPE:DATA   UNIT   68   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_high.flw
+ OPENING ./output/high/Agwater1_high.flw
  FILE TYPE:DATA   UNIT   81   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_high.sg1
+ OPENING ./output/high/Agwater1_high.sg1
  FILE TYPE:DATA   UNIT   83   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_high.sg2
+ OPENING ./output/high/Agwater1_high.sg2
  FILE TYPE:DATA   UNIT   84   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_high.sg3
+ OPENING ./output/high/Agwater1_high.sg3
  FILE TYPE:DATA   UNIT   85   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_high.sg4
+ OPENING ./output/high/Agwater1_high.sg4
  FILE TYPE:DATA   UNIT   86   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_high.sg5
+ OPENING ./output/high/Agwater1_high.sg5
  FILE TYPE:DATA   UNIT   87   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_high.sg6
+ OPENING ./output/high/Agwater1_high.sg6
  FILE TYPE:DATA   UNIT   88   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_high.sg7
+ OPENING ./output/high/Agwater1_high.sg7
  FILE TYPE:DATA   UNIT   89   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/Agwater1_high.sg8
+ OPENING ./output/high/Agwater1_high.sg8
  FILE TYPE:DATA   UNIT   90   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
@@ -38127,6 +38127,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/11/16  8:25:40
- Elapsed run time: 3.638 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/11/23 20:40:42
+ Elapsed run time: 3.691 Seconds
 

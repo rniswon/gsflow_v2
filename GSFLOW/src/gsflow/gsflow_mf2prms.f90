@@ -9,6 +9,7 @@
       INTEGER FUNCTION gsflow_mf2prms()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, RUN, DECL
       USE PRMS_MODULE, ONLY: Process_flag, Nhrucell, Gvr_cell_id, Ag_package, Dprst_flag, Dprst_ag_gain, Hru_ag_irr
+      use prms_utils, only: print_module
       USE GSFMODFLOW, ONLY: Mfq2inch_conv, Gwc_col, Gwc_row, MFQ_to_inch_acres
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Gw2sm_grav
       USE GWFUZFMODULE, ONLY: SEEPOUT
@@ -19,7 +20,6 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL
-      EXTERNAL :: print_module
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW to PRMS'
       character(len=*), parameter :: MODNAME = 'gsflow_mf2prms'
@@ -56,7 +56,7 @@
             SGNM = IRRSEG(J)
             NMCL = 0
             IF ( SGNM>0 ) NMCL = DVRCH(SGNM)
-            DO K=1,NMCL        
+            DO K=1,NMCL
               ihru = IRRROW_SW(K,SGNM)
               Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + DIVERSIONIRRPRMS(k,SGNM)*MFQ_to_inch_acres
             END DO

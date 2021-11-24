@@ -373,7 +373,6 @@
       USE PRMS_MAP_RESULTS
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, Basin_area_inv
       USE PRMS_SET_TIME, ONLY: Modays
-      USE PRMS_MMFAPI, ONLY: getvar_dble, getvar_real
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: DBLE
@@ -450,9 +449,9 @@
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NmapOutVars
         IF ( Map_var_type(jj)==REAL_TYPE ) THEN
-          CALL getvar_real(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var(1, jj))
+          CALL getvar_real(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var(:, jj))
         ELSEIF ( Map_var_type(jj)==DBLE_TYPE ) THEN
-          CALL getvar_dble(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var_dble(1, jj))
+          CALL getvar_dble(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var_dble(:, jj))
         ENDIF
       ENDDO
 

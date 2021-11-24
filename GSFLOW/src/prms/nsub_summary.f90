@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsub_summary'
-      character(len=*), parameter :: Version_nsub_summary = '2021-09-07'
+      character(len=*), parameter :: Version_nsub_summary = '2021-11-23'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsub_var_type(:), Nsub_var_size(:)
       REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
@@ -315,15 +315,15 @@
       DO jj = 1, NsubOutVars
         IF ( Nsub_var_type(jj)==REAL_TYPE ) THEN
           IF ( Nsub_var_size(jj)==Nhru ) THEN
-            CALL getvar_real(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_daily(1, jj))
+            CALL getvar_real(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_daily(:, jj))
           ELSE
-            CALL getvar_real(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub, Nsub_var_single(1, jj))
+            CALL getvar_real(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub, Nsub_var_single(:, jj))
           ENDIF
         ELSEIF ( Nsub_var_type(jj)==DBLE_TYPE ) THEN
           IF ( Nsub_var_size(jj)==Nhru ) THEN
-            CALL getvar_dble(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_dble(1, jj))
+            CALL getvar_dble(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_dble(:, jj))
           ELSE
-            CALL getvar_dble(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub, Nsub_var_dble(1, jj))
+            CALL getvar_dble(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub, Nsub_var_dble(:, jj))
           ENDIF
         ENDIF
       ENDDO

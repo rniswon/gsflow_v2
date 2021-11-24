@@ -50,7 +50,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2021-11-19'
+      character(len=*), parameter :: Version_glacr = '2021-11-23'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -2678,10 +2678,10 @@
 !***********************************************************************
       Flag = 0
       Rtnewt = 0.5*(X1+X2) !Initial guess.
-!      Rtnewt = 1.0 !???
       DO j = 1, JMAX
         CALL funcd(Rtnewt, Di, Upfunciph, Afunciph, Bfunciph, f, df, K, Nn)
-        dx = f/df
+        df = 1.0
+        IF ( df>0.0 ) dx = f/df
         Rtnewt = Rtnewt - dx
 !            PRINT*, 'Rtnewt jumped out of brackets, Rtnewt =', Rtnewt
         IF ( Rtnewt<X1 ) Rtnewt = X1

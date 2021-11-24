@@ -269,7 +269,9 @@ contains
     ! Local Variables
     integer :: var_id
     !***********************************************************************
+    print *, modname, varname, numvalues
       var_id = find_variable(Modname, Varname, Numvalues, 'real')
+      if (var_id==49)     print *, Variable_data(49)%get_flag
       Values = Variable_data(var_id)%values_real_0d
   end subroutine getvar_real_0d
 
@@ -533,28 +535,28 @@ contains
 !***********************************************************************
 ! getvalues_int - get values from parameter data structure
 !***********************************************************************
-  module subroutine getvalues_int_0d(param_id, Numvalues, Values)
+  module subroutine getvalues_int_0d(param_id, Values)
     implicit none
     ! Arguments
-    integer, intent(IN) :: param_id, Numvalues
+    integer, intent(IN) :: param_id
     integer, intent(OUT) :: Values
     !***********************************************************************
     Values = Variable_data(param_id)%values_int_0d
   end subroutine
 
-  module subroutine getvalues_int_1d(param_id, Numvalues, Values)
+  module subroutine getvalues_int_1d(param_id, Values)
     implicit none
     ! Arguments
-    integer, intent(IN) :: param_id, Numvalues
+    integer, intent(IN) :: param_id
     integer, intent(OUT) :: Values(:)
     !***********************************************************************
     Values = Variable_data(param_id)%values_int_1d
   end subroutine
 
-  module subroutine getvalues_int_2d(param_id, Numvalues, Values)
+  module subroutine getvalues_int_2d(param_id, Values)
     implicit none
     ! Arguments
-    integer, intent(IN) :: param_id, Numvalues
+    integer, intent(IN) :: param_id
     integer, intent(OUT) :: Values(:, :)
     !***********************************************************************
     Values = Variable_data(param_id)%values_int_2d
@@ -563,19 +565,19 @@ contains
 !***********************************************************************
 ! getvalues_dbl - get values from parameter data structure
 !***********************************************************************
-  module subroutine getvalues_dbl_0d(param_id, Numvalues, Values)
+  module subroutine getvalues_dbl_0d(param_id, Values)
     implicit none
     ! Arguments
-    integer, intent(IN) :: param_id, Numvalues
+    integer, intent(IN) :: param_id
     double precision, intent(OUT) :: Values
     !***********************************************************************
     values = Variable_data(param_id)%values_dble_0d
   end subroutine
 
-  module subroutine getvalues_dbl_1d(param_id, Numvalues, Values)
+  module subroutine getvalues_dbl_1d(param_id, Values)
     implicit none
     ! Arguments
-    integer, intent(IN) :: param_id, Numvalues
+    integer, intent(IN) :: param_id
     double precision, intent(OUT) :: Values(:)
     !***********************************************************************
     values = Variable_data(param_id)%values_dble_1d
