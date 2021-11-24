@@ -64,7 +64,7 @@
 
  OPENING .\output\SFR_LAK_floodplain.uzfot
  FILE TYPE:DATA(BINARY)   UNIT   61   STATUS:UNKNOWN
- FORMAT:BINARY                 ACCESS:SEQUENTIAL          
+ FORMAT:UNFORMATTED            ACCESS:STREAM              
 
  OPENING .\output\SFR_LAK_floodplain.uzf1
  FILE TYPE:DATA   UNIT   65   STATUS:UNKNOWN
@@ -13867,6 +13867,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP   120 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/09/29  9:09:19
- Elapsed run time: 1.123 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/11/24 13:25:13
+ Elapsed run time: 1.059 Seconds
 

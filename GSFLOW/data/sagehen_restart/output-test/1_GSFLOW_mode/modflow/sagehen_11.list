@@ -44,11 +44,11 @@
 
  OPENING ..\input\modflow\restartdata10.out
  FILE TYPE:IRED   UNIT   90   STATUS:UNKNOWN
- FORMAT:BINARY                 ACCESS:SEQUENTIAL          
+ FORMAT:UNFORMATTED            ACCESS:STREAM              
 
  OPENING ..\input\modflow\restartdata11.out
  FILE TYPE:IWRT   UNIT   91   STATUS:UNKNOWN
- FORMAT:BINARY                 ACCESS:SEQUENTIAL          
+ FORMAT:UNFORMATTED            ACCESS:STREAM              
 
  OPENING ..\output\modflow\head_sagehen_11.out
  FILE TYPE:DATA   UNIT   58   STATUS:UNKNOWN
@@ -11603,6 +11603,6 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
   WRITING DATA FOR RESTART MNW2
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/10/25 19:55:48
- Elapsed run time: 1.852 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/11/24 13:53:21
+ Elapsed run time: 2.307 Seconds
 

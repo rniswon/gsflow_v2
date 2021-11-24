@@ -1,0 +1,82 @@
+
+               Precipitation-Runoff Modeling System (PRMS)
+                       Version 5.2.1 09/28/2021
+
+        Process            Available Modules
+--------------------------------------------------------------------
+  Basin Definition: basin
+    Cascading Flow: cascade
+  Time Series Data: obs, water_use_read, dynamic_param_read
+   Potet Solar Rad: soltab
+  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,
+                    temp_map
+       Precip Dist: precip_1sta, precip_laps, precip_dist2,
+                    climate_hru, precip_map
+Temp & Precip Dist: xyz_dist, ide_dist
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
+Transpiration Dist: transp_tindex, climate_hru, transp_frost
+      Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
+                    potet_hs, potet_pt, potet_pm, potet_pm_sta
+      Interception: intcp
+Snow & Glacr Dynam: snowcomp, glacr_melt
+    Surface Runoff: srunoff_smidx, srunoff_carea
+         Soil Zone: soilzone
+       Groundwater: gwflow
+Streamflow Routing: strmflow, strmflow_in_out, muskingum,
+                    muskingum_lake, muskingum_mann
+Stream Temperature: stream_temp
+    Output Summary: basin_sum, subbasin, map_results, prms_summary,
+                    nhru_summary, nsub_summary, water_balance
+                    basin_summary, nsegment_summary
+     Preprocessing: write_climate_hru, frost_date
+--------------------------------------------------------------------
+
+
+    Active modules listed in the order in which they are called
+
+        Process                    Module         Version Date
+==============================================================
+PRMS Computation Order          gsflow_prms         2021-09-28
+Basin Definition                basin               2021-08-18
+Common States and Fluxes        climateflow         2021-08-13
+Potential Solar Radiation       soltab              2021-08-13
+Timestep Control                prms_time           2021-08-13
+Time Series Data                obs                 2021-08-13
+Temp & Precip Distribution      ide_dist            2021-09-07
+Solar Radiation Distribution    ddsolrad            2021-08-13
+Transpiration Distribution      transp_tindex       2021-09-07
+Potential Evapotranspiration    potet_jh            2021-08-13
+Canopy Interception             intcp               2021-09-07
+Snow Dynamics                   snowcomp            2021-09-15
+Surface Runoff                  srunoff_smidx       2021-08-18
+Soilzone Computations           soilzone            2021-09-08
+Groundwater                     gwflow              2021-08-13
+Streamflow Routing              strmflow            2020-08-03
+Output Summary                  basin_sum           2021-08-13
+Output Summary                  prms_summary        2021-08-13
+==============================================================
+
+Using Control File: .\control\mercdIDE.control
+
+Using Parameter File: ./input/mercdIDE.param
+
+
+Start time: 1993/10/01 00:00:00
+End time:   1995/09/30 00:00:00
+
+
+Model domain area:       206059.42    Active basin area:    206059.42
+Fraction impervious:        0.0001    Fraction pervious:       0.9999
+
+
+
+
+   Year Month Day   Precip     ET    Storage S-Runoff M-Runoff
+                  (inches) (inches) (inches) (inches) (inches)
+ -------------------------------------------------------------
+ initial                               7.288
+ *************************************************************
+ Total for run     100.986   43.325    7.864   57.085   67.341
+ *************************************************************
+Execution elapsed time    0 minutes  0.21 seconds
+

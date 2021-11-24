@@ -42,11 +42,11 @@
  FILE TYPE:GAGE   UNIT   32   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./input/seg1.tab
+ OPENING ./input/UZF_cap_ET_seg1.tab
  FILE TYPE:DATA   UNIT   55   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./input/seg9.tab
+ OPENING ./input/UZF_cap_ET_seg9.tab
  FILE TYPE:DATA   UNIT   56   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
@@ -56,11 +56,11 @@
 
  OPENING ./output/UZF_cap_ET.uzfot
  FILE TYPE:DATA(BINARY)   UNIT   61   STATUS:UNKNOWN
- FORMAT:BINARY                 ACCESS:SEQUENTIAL          
+ FORMAT:UNFORMATTED            ACCESS:STREAM              
 
  OPENING ./output/UZF_cap_ET.unf
  FILE TYPE:DATA(BINARY)   UNIT  102   STATUS:UNKNOWN
- FORMAT:BINARY                 ACCESS:SEQUENTIAL          
+ FORMAT:UNFORMATTED            ACCESS:STREAM              
 
  OPENING ./output/UZF_cap_ET.uzf1
  FILE TYPE:DATA   UNIT   65   STATUS:UNKNOWN
@@ -34216,6 +34216,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/09/23 15:40:48
- Elapsed run time: 2.715 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/11/24 13:32:44
+ Elapsed run time: 2.734 Seconds
 
