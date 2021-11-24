@@ -117,17 +117,17 @@
      &         'Current iteration in GSFLOW simulation', 'none', KKITER)
           ALLOCATE ( Hru_ag_irr(Nhru) )
           CALL declvar_real(MODNAME, 'hru_ag_irr', 'nhru', Nhru, &
-     &         'Irrigation added to soilzone from MODFLOW wells', 'inch-acres', Hru_ag_irr)
+     &         'Irrigation added to soilzone from MODFLOW wells', 'acre-inches', Hru_ag_irr)
           Hru_ag_irr = 0.0
           ALLOCATE ( Dprst_ag_gain(Nhru) )
           CALL declvar_real(MODNAME, 'dprst_ag_gain', 'nhru', Nhru, &
      &         'Irrigation added to surface depression storage from MODFLOW ponds', &
-     &         'inch-acres', Dprst_ag_gain)
+     &         'acre-inches', Dprst_ag_gain)
           Dprst_ag_gain = 0.0
           ALLOCATE ( Dprst_ag_transfer(Nhru) )
           CALL declvar_real(MODNAME, 'dprst_ag_transfer', 'nhru', Nhru, &
      &         'Surface depression storage transfer to MODFLOW cells', &
-     &         'inch-acres', Dprst_ag_transfer)
+     &         'acre-inches', Dprst_ag_transfer)
           Dprst_ag_transfer = 0.0
           IF ( declparam(MODNAME, 'mxsziter', 'one', 'integer', &
      &         '0', '0', '5000', &
