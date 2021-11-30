@@ -15,7 +15,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'ide_dist'
-      character(len=*), parameter :: Version_ide_dist = '2021-11-11'
+      character(len=*), parameter :: Version_ide_dist = '2021-11-19'
       INTEGER, SAVE :: Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Dalr
@@ -67,13 +67,12 @@
 !***********************************************************************
       INTEGER FUNCTION idedecl()
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DOCUMENTATION
+      use PRMS_MMFAPI, only: declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Model, Nhru, Ntemp, Nrain
       USE PRMS_IDE
-      USE PRMS_MMFSUBS, ONLY: declvar_real
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module
 !***********************************************************************
       idedecl = 0
 
@@ -254,16 +253,15 @@
 !***********************************************************************
       INTEGER FUNCTION ideinit()
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE
+      use PRMS_READ_PARAM_FILE, only: getparam_real, getparam_int
       USE PRMS_MODULE, ONLY: Nhru, Ntemp, Nrain, Inputerror_flag
       USE PRMS_IDE
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv,
      +    Active_hrus, Hru_route_order
+      use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getparam_real, getparam_int, getparam_int_0d
-      INTEGER, EXTERNAL :: getparam_real_0d, getparam_real_2d
-      EXTERNAL :: read_error
 ! Local Variables
       INTEGER i, ii, ierr
 !***********************************************************************
@@ -273,13 +271,13 @@
       Tmax_rain_sta = 0.0
       Tmin_rain_sta = 0.0
 
-      IF ( getparam_real_2d(MODNAME,'adjust_rain',Nrain,MONTHS_PER_YEAR,
+      IF ( getparam_real(MODNAME, 'adjust_rain',Nrain*MONTHS_PER_YEAR,
      +     Adjust_rain)/=0 ) CALL read_error(2, 'adjust_rain')
 
-      IF ( getparam_real_2d(MODNAME,'adjust_snow',Nrain,MONTHS_PER_YEAR,
+      IF ( getparam_real(MODNAME, 'adjust_snow',Nrain*MONTHS_PER_YEAR,
      +     Adjust_snow)/=0 ) CALL read_error(2, 'adjust_snow')
 
-      IF ( getparam_real_0d(MODNAME, 'solrad_elev', 1, Solrad_elev)
+      IF ( getparam_real(MODNAME, 'solrad_elev', 1, Solrad_elev)
      +     /=0 ) CALL read_error(2, 'solrad_elev')
 
       IF ( getparam_real(MODNAME, 'hru_x', Nhru, Hru_x)
@@ -312,29 +310,29 @@
       IF ( getparam_real(MODNAME, 'prcp_wght_dist', MONTHS_PER_YEAR,
      +     Prcp_wght_dist)/=0 ) CALL read_error(2, 'prcp_wght_dist')
 
-      IF ( getparam_real_0d(MODNAME, 'dist_exp', 1, Dist_exp)
+      IF ( getparam_real(MODNAME, 'dist_exp', 1, Dist_exp)
      +     /=0 ) CALL read_error(2, 'dist_exp')
 
-      IF ( getparam_int_0d(MODNAME, 'ndist_psta', 1,
+      IF ( getparam_int(MODNAME, 'ndist_psta', 1,
      +     Ndist_psta)/=0 ) CALL read_error(2, 'ndist_psta')
       IF ( Ndist_psta==0 ) THEN
         PRINT *, 'ERROR, need to specify ndist_psta > 0'
         ierr = 1
       ENDIF
 
-      IF ( getparam_int_0d(MODNAME, 'ndist_tsta', 1,
+      IF ( getparam_int(MODNAME, 'ndist_tsta', 1,
      +     Ndist_tsta)/=0 ) CALL read_error(2, 'ndist_tsta')
       IF ( Ndist_tsta==0 ) THEN
         PRINT *, 'ERROR, need to specify ndist_tsta > 0'
         ierr = 1
       ENDIF
 
-      IF ( getparam_real_2d(MODNAME, 'tmax_allrain_sta',
-     +     Nrain, MONTHS_PER_YEAR,
+      IF ( getparam_real(MODNAME, 'tmax_allrain_sta',
+     +     Nrain*MONTHS_PER_YEAR,
      +     Tmax_allrain_sta)/=0 ) CALL read_error(2, 'tmax_allrain_sta')
 
-      IF ( getparam_real_2d(MODNAME, 'tmax_allsnow_sta',
-     +     Nrain, MONTHS_PER_YEAR,
+      IF ( getparam_real(MODNAME, 'tmax_allsnow_sta',
+     +     Nrain*MONTHS_PER_YEAR,
      +     Tmax_allsnow_sta)/=0 ) CALL read_error(2, 'tmax_allsnow_sta')
 
 ! dry adiabatic lapse rate (DALR) when extrapolating
@@ -442,11 +440,11 @@
      +    Tavgc, Tmin_aspect_adjust, Tmax_aspect_adjust,
      +    Tsta_elev_meters, Temp_units, Psta_elev_meters
       USE PRMS_OBS, ONLY: Tmax, Tmin
+      use prms_utils, only: c_to_f
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL
       EXTERNAL :: temp_set, compute_inv, compute_elv
-      REAL, EXTERNAL :: c_to_f
 ! Arguments
       REAL, INTENT(IN) :: Temp_wght_dist, Temp_wght_elev
 ! Local Variables
@@ -620,10 +618,10 @@
      +    Basin_ppt, Prmx, Basin_snow, Psta_elev_meters, Basin_obs_ppt,
      +    Precip_units, Tmax_allsnow_f, Tmax_allrain_f, Adjmix_rain
       USE PRMS_OBS, ONLY: Precip
+      use prms_utils, only: error_stop, print_date
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: precip_form, compute_inv, compute_elv, print_date
-      EXTERNAL :: error_stop
+      EXTERNAL :: precip_form, compute_inv, compute_elv
 ! Arguments
       REAL, INTENT(IN) :: Prcp_wght_dist, Prcp_wght_elev
 ! Local variables
@@ -741,10 +739,11 @@
       SUBROUTINE compute_inv(Imax, Nsta, Nuse, Sta_x, X, Sta_y, Y, Dat,
      +                       Dat_dist, Ndist, Dist_exp)
       USE PRMS_CONSTANTS, ONLY: ERROR_data
+      use prms_utils, only: error_stop, print_date
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SQRT, DBLE, SNGL
-      EXTERNAL :: SORT2I, print_date, error_stop
+      EXTERNAL :: SORT2I
 ! Arguments
       INTEGER, INTENT(IN) :: Imax, Ndist, Nsta
       INTEGER, DIMENSION(Imax), INTENT(IN) :: Nuse

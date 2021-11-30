@@ -84,7 +84,7 @@
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Streamflow Routing'
       character(len=14), parameter :: MODNAME = 'muskingum_mann'
-      character(len=*), parameter :: Version_muskingum = '2021-08-13'
+      character(len=*), parameter :: Version_muskingum = '2021-11-19'
 !   Local Variables
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
@@ -126,9 +126,8 @@
       USE PRMS_CONSTANTS, ONLY: strmflow_muskingum_module
       USE PRMS_MODULE, ONLY: Nsegment, Strmflow_flag
       USE PRMS_MUSKINGUM
+      use prms_utils, only: print_module
       IMPLICIT NONE
-! Functions
-      EXTERNAL :: print_module
 !***********************************************************************
       muskingum_decl = 0
 
@@ -190,10 +189,10 @@
      &    Flow_to_lakes, Flow_replacement, Flow_in_region, Flow_in_nation, Flow_headwater, Flow_in_great_lakes
       USE PRMS_GLACR, ONLY: Basin_gl_top_melt, Basin_gl_ice_melt
       USE PRMS_GWFLOW, ONLY: Basin_gwflow
+      use prms_utils, only: error_stop
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MOD
-      EXTERNAL :: error_stop
 ! Local Variables
       INTEGER :: i, j, iorder, toseg, imod, tspd, segtype
       DOUBLE PRECISION :: area_fac, segout, currin
@@ -376,11 +375,10 @@
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_MUSKINGUM
+      use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      ! Function
-      EXTERNAL :: check_restart
       ! Local Variable
       CHARACTER(LEN=14) :: module_name
 !***********************************************************************

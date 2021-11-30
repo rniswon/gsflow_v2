@@ -1,34 +1,20 @@
-!***********************************************************************
-! Sets PRMS time variables
-!***********************************************************************
-      MODULE PRMS_SET_TIME
-        USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
-        IMPLICIT NONE
-!   Local Variables
-        character(len=*), parameter :: MODDESC = 'Timestep Control'
-        character(len=*), parameter :: MODNAME = 'prms_time'
-        character(len=*), parameter :: Version_prms_time = '2021-09-07'
-        INTEGER, SAVE :: Modays(MONTHS_PER_YEAR), Yrdays, Summer_flag, Jday, Jsol, Julwater
-        INTEGER, SAVE :: Nowtime(6), Nowhour, Nowminute, Julian_day_absolute
-        REAL, SAVE :: Timestep_hours, Timestep_days, Timestep_minutes
-        DOUBLE PRECISION, SAVE :: Cfs2inches, Cfs_conv, Timestep_seconds
-      END MODULE PRMS_SET_TIME
+submodule(PRMS_SET_TIME) sm_prms_time
 
+contains
 !***********************************************************************
 !***********************************************************************
-      INTEGER FUNCTION prms_time()
+  integer module function prms_time()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, YEAR, MONTH, DAY, HOUR, MINUTE, MAX_DAYS_PER_YEAR, DAYS_PER_YEAR, &
      &    ACTIVE, OFF, NORTHERN, FT2_PER_ACRE, SECS_PER_HOUR, INCHES_PER_FOOT, SECS_PER_DAY, ERROR_time
+      use PRMS_MMFAPI, only: dattim, deltim
       USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime, Nowyear, Nowmonth, Nowday
-      USE PRMS_SET_TIME
       USE PRMS_BASIN, ONLY: Hemisphere, Basin_area_inv
+      use PRMS_DATA_FILE, only: read_data_line
+      use prms_utils, only: leap_day, julian_day, compute_julday, print_module
       IMPLICIT NONE
-! Functions
+      ! Functions
       INTRINSIC :: SNGL
-      INTEGER, EXTERNAL :: leap_day, julian_day, compute_julday
-      DOUBLE PRECISION, EXTERNAL :: deltim
-      EXTERNAL :: dattim, print_module, read_data_line
-! Local Variables
+      ! Local Variables
       INTEGER :: startday
       DOUBLE PRECISION :: dt
 !***********************************************************************
@@ -116,37 +102,4 @@
       ENDIF
 
       END FUNCTION prms_time
-
-!***********************************************************************
-! dattim - get start, end, or current date and time
-!***********************************************************************
-      SUBROUTINE dattim(String, Datetime)
-      USE PRMS_CONSTANTS, ONLY: ERROR_time
-      USE PRMS_MODULE, ONLY: Endtime, Starttime, Nowyear, Nowmonth, Nowday
-      USE PRMS_SET_TIME, ONLY: Julian_day_absolute
-      IMPLICIT NONE
-      ! Arguments
-      CHARACTER(LEN=*), INTENT(IN) :: String
-      INTEGER, INTENT(OUT) :: Datetime(6)
-      EXTERNAL :: compute_gregorian, error_stop
-      ! Local variable
-      INTEGER :: string_length
-!***********************************************************************
-      Datetime = 0
-      string_length = LEN(String)
-      IF ( String(:3)=='end' ) THEN
-        Datetime = Endtime
-      ELSEIF ( String(:3)=='now' ) THEN
-        CALL compute_gregorian(Julian_day_absolute, Nowyear, Nowmonth, Nowday)
-        Datetime(1) = Nowyear
-        Datetime(2) = Nowmonth
-        Datetime(3) = Nowday
-        ! Datetime = LIS function
-      ELSEIF ( string_length>4 ) THEN
-        IF ( String(:5)=='start' ) THEN
-          Datetime = Starttime
-        ELSE
-          CALL error_stop('invalid call to dattim', ERROR_time)
-        ENDIF
-      ENDIF
-      END SUBROUTINE dattim
+end submodule

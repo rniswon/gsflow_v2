@@ -21,7 +21,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2021-11-11'
+      character(len=*), parameter :: Version_snowcomp = '2021-11-23'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -113,14 +113,13 @@
 !***********************************************************************
       INTEGER FUNCTION snodecl()
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, MONTHS_PER_YEAR
+      use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Model, Nhru, Ndepl, &
      &    Init_vars_from_file, Glacier_flag, Snarea_curve_flag, PRMS_land_iteration_flag
       USE PRMS_SNOW
-      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_real, declvar_int, declvar_dble_1d, declvar_int_0d
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module
 !***********************************************************************
       snodecl = 0
 
@@ -136,12 +135,12 @@
       ENDIF
 ! declare variables
       ALLOCATE ( Scrv(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'scrv', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'scrv', 'nhru', Nhru, &
      &     'Snowpack water equivalent plus a portion of new snow on each HRU', &
      &     'inches', Scrv)
 
       ALLOCATE ( Pksv(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'pksv', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'pksv', 'nhru', Nhru, &
      &     'Snowpack water equivalent when there is new snow and in melt phase;'// &
      &     ' used to interpolate between depletion curve and 100 percent on each HRU', &
      &     'inches', Pksv)
@@ -169,7 +168,7 @@
 
 ! Glacier declares
       IF ( Glacier_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-        CALL declvar_int_0d(MODNAME, 'yrdays5', 'one', 1, &
+        CALL declvar_int(MODNAME, 'yrdays5', 'one', 1, &
      &     'Number of days since last 5-year mark', &
      &     'none', Yrdays5)
 
@@ -251,12 +250,12 @@
      &       'inches', Glacrmelt)
 
         ALLOCATE ( Glacr_pkwater_equiv(Nhru) )
-        CALL declvar_dble_1d(MODNAME, 'glacr_pkwater_equiv', 'nhru', Nhru, &
+        CALL declvar_dble(MODNAME, 'glacr_pkwater_equiv', 'nhru', Nhru, &
      &       'Icepack water equivalent on each glacier or glacierette HRU', &
      &       'inches', Glacr_pkwater_equiv)
 
         ALLOCATE ( Glacr_pkwater_ante(Nhru) )
-        CALL declvar_dble_1d(MODNAME, 'glacr_pkwater_ante', 'nhru', Nhru, &
+        CALL declvar_dble(MODNAME, 'glacr_pkwater_ante', 'nhru', Nhru, &
      &       'Antecedent icepack water equivalent on each glacier or glacierette HRU', &
      &       'inches', Glacr_pkwater_ante)
 
@@ -276,17 +275,17 @@
      &       'inches', Glacr_freeh2o)
 
         ALLOCATE ( Glacr_pk_depth(Nhru) )
-        CALL declvar_dble_1d(MODNAME, 'glacr_pk_depth', 'nhru', Nhru, &
+        CALL declvar_dble(MODNAME, 'glacr_pk_depth', 'nhru', Nhru, &
      &       'Depth of icepack on each glacier or glacierette HRU, make essentially infinite', &
      &       'inches', Glacr_pk_depth)
 
         ALLOCATE ( Glacr_pss(Nhru) )
-        CALL declvar_dble_1d(MODNAME, 'glacr_pss', 'nhru', Nhru, &
+        CALL declvar_dble(MODNAME, 'glacr_pss', 'nhru', Nhru, &
      &       'Previous glacier or glacierette pack water equivalent plus new ice', &
      &       'inches', Glacr_pss)
 
         ALLOCATE ( Glacr_pst(Nhru) )
-        CALL declvar_dble_1d(MODNAME, 'glacr_pst', 'nhru', Nhru, &
+        CALL declvar_dble(MODNAME, 'glacr_pst', 'nhru', Nhru, &
      &       'While an icepack exists, glacr_pst tracks the maximum ice water equivalent of that icepack', &
      &       'inches', Glacr_pst)
 
@@ -359,7 +358,7 @@
      &     'inches', Basin_pweqv)
 
       ALLOCATE ( Pkwater_ante(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'pkwater_ante', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'pkwater_ante', 'nhru', Nhru, &
      &     'Antecedent snowpack water equivalent on each HRU', &
      &     'inches', Pkwater_ante)
 
@@ -435,19 +434,19 @@
 
       !rpayn commented
       ALLOCATE ( Pk_depth(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'pk_depth', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'pk_depth', 'nhru', Nhru, &
      &     'Depth of snowpack on each HRU', &
      &     'inches', Pk_depth)
 
       !rpayn commented
       ALLOCATE ( Pss(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'pss', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'pss', 'nhru', Nhru, &
      &     'Previous snowpack water equivalent plus new snow', &
      &     'inches', Pss)
 
       !rpayn commented
       ALLOCATE ( Pst(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'pst', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'pst', 'nhru', Nhru, &
      &     'While a snowpack exists, pst tracks the maximum snow water equivalent of that snowpack', &
      &     'inches', Pst)
 
@@ -459,7 +458,7 @@
      &     'inches', Snsv)
 
       ALLOCATE ( Ai(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'ai', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'ai', 'nhru', Nhru, &
      &     'Maximum snowpack for each HRU', &
      &     'inches', Ai)
 
@@ -691,15 +690,17 @@
 !***********************************************************************
       INTEGER FUNCTION snoinit()
       USE PRMS_CONSTANTS, ONLY: LAND, GLACIER, FEET, FEET2METERS, DNEARZERO, ACTIVE, OFF, MONTHS_PER_YEAR, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Ndeplval, Print_debug, Init_vars_from_file, Glacier_flag, Snarea_curve_flag
+      USE PRMS_MODULE, ONLY: Ndeplval
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Init_vars_from_file, Glacier_flag, Snarea_curve_flag
       USE PRMS_SNOW
       USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_route_order, Active_hrus, Hru_area_dble, Elev_units, Hru_type
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
+      use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, ATAN, SNGL, MIN
-      INTEGER, EXTERNAL :: getparam_real, getparam_int, getparam_real_2d, getparam_real_0d,getparam_int_2d
-      EXTERNAL :: read_error, sca_deplcrv, glacr_states_to_zero
+      EXTERNAL :: sca_deplcrv, glacr_states_to_zero
 ! Local Variables
       INTEGER :: i, j
       REAL :: x
@@ -748,14 +749,14 @@
         ENDDO
       ENDIF
       IF ( getparam_real(MODNAME, 'snarea_thresh', Nhru, Snarea_thresh)/=0 ) CALL read_error(2, 'snarea_thresh')
-      IF ( getparam_real_0d(MODNAME, 'albset_rnm', 1, Albset_rnm)/=0 ) CALL read_error(2, 'albset_rnm')
-      IF ( getparam_real_0d(MODNAME, 'albset_rna', 1, Albset_rna)/=0 ) CALL read_error(2, 'albset_rna')
-      IF ( getparam_real_0d(MODNAME, 'albset_sna', 1, Albset_sna)/=0 ) CALL read_error(2, 'albset_sna')
-      IF ( getparam_real_0d(MODNAME, 'albset_snm', 1, Albset_snm)/=0 ) CALL read_error(2, 'albset_snm')
+      IF ( getparam_real(MODNAME, 'albset_rnm', 1, Albset_rnm)/=0 ) CALL read_error(2, 'albset_rnm')
+      IF ( getparam_real(MODNAME, 'albset_rna', 1, Albset_rna)/=0 ) CALL read_error(2, 'albset_rna')
+      IF ( getparam_real(MODNAME, 'albset_sna', 1, Albset_sna)/=0 ) CALL read_error(2, 'albset_sna')
+      IF ( getparam_real(MODNAME, 'albset_snm', 1, Albset_snm)/=0 ) CALL read_error(2, 'albset_snm')
       IF ( getparam_real(MODNAME, 'emis_noppt', Nhru, Emis_noppt)/=0 ) CALL read_error(2, 'emis_noppt')
-      IF ( getparam_real_2d(MODNAME, 'cecn_coef', Nhru, MONTHS_PER_YEAR, Cecn_coef)/=0 ) CALL read_error(2, 'cecn_coef')
+      IF ( getparam_real(MODNAME, 'cecn_coef', Nhru*MONTHS_PER_YEAR, Cecn_coef)/=0 ) CALL read_error(2, 'cecn_coef')
       IF ( getparam_real(MODNAME, 'freeh2o_cap', Nhru, Freeh2o_cap)/=0 ) CALL read_error(2, 'freeh2o_cap')
-      IF ( getparam_int_2d(MODNAME, 'tstorm_mo', Nhru, MONTHS_PER_YEAR, Tstorm_mo)/=0 ) CALL read_error(2, 'tstorm_mo')
+      IF ( getparam_int(MODNAME, 'tstorm_mo', Nhru*MONTHS_PER_YEAR, Tstorm_mo)/=0 ) CALL read_error(2, 'tstorm_mo')
 
       Pk_precip = 0.0
       Snowmelt = 0.0
@@ -1093,14 +1094,18 @@
               ELSE
                 Glacr_albedo(i) = Albedo_ice(i) +(Albedo_coef(i)/PI)*ATAN( (Alt_above_ela(i)+300.0)/200.0 )
               ENDIF
-            ELSE !IF ( Active_glacier==2 ) 
+            ELSE !IF ( Active_glacier==2 )
               Glacr_albedo(i) = Albedo_ice(i) !glacr_albedo doesn't change if glacierette but could get zeroed out
             ENDIF
           ENDIF
           IF ( isglacier==ACTIVE ) THEN
             IF (Nowyear >= Start_year+10 .AND. MOD(Nowyear-Start_year,5)==0 ) THEN
               Glacr_air_deltemp(i) = Glacr_air_5avtemp1(i) - Glacr_air_5avtemp(i) !need 5 years of data
-              Glacr_delsnow(i) = 10.0*(Glacr_5avsnow1(i) - Glacr_5avsnow(i))/Glacr_5avsnow1(i) !number of 10 percent (*100.0/10.0) changes
+              IF ( Glacr_5avsnow1(i)>0.0 ) THEN
+                Glacr_delsnow(i) = 10.0*(Glacr_5avsnow1(i) - Glacr_5avsnow(i))/Glacr_5avsnow1(i) !number of 10 percent (*100.0/10.0) changes
+              ELSE
+                Glacr_delsnow(i) = 0.0
+              ENDIF
             ENDIF
             !keep before restart
             IF ( MOD(Nowyear-Start_year,5)==0 ) THEN
@@ -1585,9 +1590,9 @@
      &           Net_snow, Pk_den, Pptmix_nopack, Pk_precip, Tmax_allsnow_c, &
      &           Freeh2o_cap, Den_max, Ihru_gl)
       USE PRMS_CONSTANTS, ONLY: CLOSEZERO, INCH2CM, ACTIVE !, DNEARZERO
+      use prms_utils, only: f_to_c
       IMPLICIT NONE
 ! Functions
-      REAL, EXTERNAL :: f_to_c
       EXTERNAL :: calin
       INTRINSIC :: ABS, DBLE, SNGL
 ! Arguments
@@ -1919,6 +1924,7 @@
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, OFF
       USE PRMS_MODULE, ONLY: Print_debug
       USE PRMS_SNOW, ONLY: Active_glacier
+      use prms_utils, only: print_date
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(INOUT) :: Iasw
@@ -1930,7 +1936,7 @@
       DOUBLE PRECISION, INTENT(INOUT) :: Pss, Pst, Pk_depth
 ! Functions
       INTRINSIC :: SNGL, DBLE
-      EXTERNAL :: print_date, glacr_states_to_zero
+      EXTERNAL :: glacr_states_to_zero
 ! Local Variables
       REAL :: dif, pmlt, apmlt, apk_ice, pwcap
       DOUBLE PRECISION :: dif_dble
@@ -2990,11 +2996,10 @@
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Glacier_flag
       USE PRMS_SNOW
+      use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      ! Functions
-      EXTERNAL :: check_restart
       ! Local Variable
       CHARACTER(LEN=8) :: module_name
 !***********************************************************************

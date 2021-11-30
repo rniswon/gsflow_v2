@@ -7,7 +7,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'obs'
-      character(len=*), parameter :: Version_obs = '2021-11-11'
+      character(len=*), parameter :: Version_obs = '2021-11-19'
       INTEGER, SAVE :: Nlakeelev, Nwind, Nhumid, Rain_flag
 !   Declared Variables
       INTEGER, SAVE :: Rain_day
@@ -49,10 +49,9 @@
 !***********************************************************************
       INTEGER FUNCTION obssetdims()
       USE PRMS_CONSTANTS, ONLY: MAXDIM
+      use PRMS_READ_PARAM_FILE, only: decldim
+      use prms_utils, only: read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: decldim
-      EXTERNAL read_error
 !***********************************************************************
       obssetdims = 0
 
@@ -70,13 +69,12 @@
 !***********************************************************************
       INTEGER FUNCTION obsdecl()
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, xyz_dist_module
+      use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam, getdim
       USE PRMS_MODULE, ONLY: Model, Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Precip_flag
       USE PRMS_OBS
-      USE PRMS_MMFSUBS, ONLY: declvar_real, declvar_dble_1d, declvar_int_0d
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: getdim, declparam
-      EXTERNAL :: read_error, print_module
 !***********************************************************************
       obsdecl = 0
 
@@ -89,11 +87,11 @@
      &       'Streamflow at each measurement station', &
      &       'runoff_units', Runoff)
         ALLOCATE ( Streamflow_cfs(Nobs) )
-        CALL declvar_dble_1d(MODNAME, 'streamflow_cfs', 'nobs', Nobs, &
+        CALL declvar_dble(MODNAME, 'streamflow_cfs', 'nobs', Nobs, &
      &       'Streamflow at each measurement station', &
      &       'cfs', Streamflow_cfs)
         ALLOCATE ( Streamflow_cms(Nobs) )
-        CALL declvar_dble_1d(MODNAME, 'streamflow_cms', 'nobs', Nobs, &
+        CALL declvar_dble(MODNAME, 'streamflow_cms', 'nobs', Nobs, &
      &       'Streamflow at each measurement station', &
      &       'cms', Streamflow_cms)
         IF ( declparam(MODNAME, 'runoff_units', 'one', 'integer', &
@@ -175,7 +173,7 @@
       Rain_flag = OFF
       IF ( Precip_flag==xyz_dist_module ) Rain_flag = ACTIVE
       IF ( Rain_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-        CALL declvar_int_0d(MODNAME, 'rain_day', 'one', 1, &
+        CALL declvar_int(MODNAME, 'rain_day', 'one', 1, &
      &       'Flag to set the form of any precipitation to rain (0=determine form; 1=rain)', &
      &       'none', Rain_day)
         IF ( declparam(MODNAME, 'rain_code', 'nmonths', 'integer', &
@@ -214,18 +212,17 @@
 !***********************************************************************
       INTEGER FUNCTION obsinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR, CFS
+      use PRMS_READ_PARAM_FILE, only: getparam_int
       USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow
       USE PRMS_OBS
+      use prms_utils, only: read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: getparam_int, getparam_int_0d
-      EXTERNAL :: read_error
 !***********************************************************************
       obsinit = 0
 
       Runoff_units = CFS
       IF ( Nobs>0 ) THEN
-        IF ( getparam_int_0d(MODNAME, 'runoff_units', 1, Runoff_units)/=0 ) CALL read_error(2, 'runoff_units')
+        IF ( getparam_int(MODNAME, 'runoff_units', 1, Runoff_units)/=0 ) CALL read_error(2, 'runoff_units')
       ENDIF
 
       IF ( Rain_flag==ACTIVE ) THEN

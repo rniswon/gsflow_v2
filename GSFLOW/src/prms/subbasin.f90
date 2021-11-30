@@ -15,7 +15,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'subbasin'
-      character(len=*), parameter :: Version_subbasin = '2021-11-09'
+      character(len=*), parameter :: Version_subbasin = '2021-11-19'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Qsub(:), Sub_area(:), Laststor(:)
       INTEGER, SAVE, ALLOCATABLE :: Tree(:, :)
 !   Declared Variables
@@ -63,13 +63,12 @@
 !***********************************************************************
       INTEGER FUNCTION subdecl()
       USE PRMS_CONSTANTS, ONLY: OFF, DOCUMENTATION, ERROR_dim
+      use PRMS_MMFAPI, only: declvar_dble
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Model, Nsub, Nhru, GSFLOW_flag
       USE PRMS_SUBBASIN
-      USE PRMS_MMFSUBS, ONLY: declvar_dble_1d
+      use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, error_stop
 !***********************************************************************
       subdecl = 0
 
@@ -82,138 +81,138 @@
 
 ! Declared Variables
       ALLOCATE ( Sub_interflow(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'sub_interflow', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'sub_interflow', 'nsub', Nsub, &
      &     'Area-weighted average interflow to each subbasin from associated HRUs and from upstream subbasins', &
      &     'cfs', Sub_interflow)
 
       IF ( GSFLOW_flag==OFF .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Sub_gwflow(Nsub) )
-        CALL declvar_dble_1d(MODNAME, 'sub_gwflow', 'nsub', Nsub, &
+        CALL declvar_dble(MODNAME, 'sub_gwflow', 'nsub', Nsub, &
      &       'Area-weighted average groundwater discharge from associated GWRs to each subbasin and from upstream subbasins', &
      &       'cfs', Sub_gwflow)
         ALLOCATE ( Subinc_gwflow(Nsub) )
-        CALL declvar_dble_1d(MODNAME, 'subinc_gwflow', 'nsub', Nsub, &
+        CALL declvar_dble(MODNAME, 'subinc_gwflow', 'nsub', Nsub, &
      &       'Area-weighted average groundwater discharge from associated GWRs to each subbasin', &
      &       'cfs', Subinc_gwflow)
       ENDIF
 
       ALLOCATE ( Sub_sroff(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'sub_sroff', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'sub_sroff', 'nsub', Nsub, &
      &     'Area-weighted average surface runoff from associated HRUs to each subbasin and from upstream subbasins', &
      &     'cfs', Sub_sroff)
 
       ALLOCATE ( Subinc_snowcov(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_snowcov', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_snowcov', 'nsub', Nsub, &
      &     'Area-weighted average snow-covered area for associated HRUs for each subbasin', &
      &     'decimal fraction', Subinc_snowcov)
 
       ALLOCATE ( Subinc_interflow(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_interflow', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_interflow', 'nsub', Nsub, &
      &     'Area-weighted average interflow from associated HRUs to each subbasin', &
      &     'cfs', Subinc_interflow)
 
       ALLOCATE ( Subinc_sroff(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_sroff', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_sroff', 'nsub', Nsub, &
      &    'Area-weighted average surface runoff from associated HRUs to each subbasin', &
      &    'cfs', Subinc_sroff)
 
       ALLOCATE ( Subinc_precip(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_precip', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_precip', 'nsub', Nsub, &
      &     'Area-weighted average precipitation from associated HRUs to each subbasin', &
      &     'inches', Subinc_precip)
 
       ALLOCATE ( Subinc_rain(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_rain', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_rain', 'nsub', Nsub, &
      &     'Area-weighted average rain on associated HRUs to each subbasin', &
      &     'inches', Subinc_rain)
 
       ALLOCATE ( Subinc_snow(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_snow', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_snow', 'nsub', Nsub, &
      &     'Area-weighted average snow on associated HRUs to each subbasin', &
      &     'inches', Subinc_snow)
 
       ALLOCATE ( Subinc_actet(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_actet', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_actet', 'nsub', Nsub, &
      &     'Area-weighted average actual ET from associated HRUs to each subbasin', &
      &     'inches', Subinc_actet)
 
       ALLOCATE ( Subinc_potet(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_potet', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_potet', 'nsub', Nsub, &
      &     'Area-weighted average potential ET from associated HRUs to each subbasin', &
      &     'inches', Subinc_potet)
 
       ALLOCATE ( Subinc_swrad(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_swrad', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_swrad', 'nsub', Nsub, &
      &     'Area-weighted average shortwave radiation distributed to associated HRUs of each subbasin', &
      &     'Langleys', Subinc_swrad)
 
       ALLOCATE ( Subinc_tminc(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_tminc', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_tminc', 'nsub', Nsub, &
      &     'Area-weighted average minimum air temperature for associated HRUs to each subbasin', &
      &     'degrees Celsius', Subinc_tminc)
 
       ALLOCATE ( Subinc_tmaxc(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_tmaxc', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_tmaxc', 'nsub', Nsub, &
      &     'Area-weighted average maximum air temperature for associated HRUs to each subbasin', &
      &     'degrees Celsius', Subinc_tmaxc)
 
       ALLOCATE ( Subinc_tavgc(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_tavgc', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_tavgc', 'nsub', Nsub, &
      &     'Area-weighted average air temperature for associated HRUs to each subbasin', &
      &     'degrees Celsius', Subinc_tavgc)
 
       ALLOCATE ( Subinc_wb(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_wb', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_wb', 'nsub', Nsub, &
      &     'Water balance for each subbasin', &
      &     'inches', Subinc_wb)
 
       ALLOCATE ( Subinc_deltastor(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_deltastor', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_deltastor', 'nsub', Nsub, &
      &     'Change in storage for each subbasin', &
      &     'inches', Subinc_deltastor)
 
       ALLOCATE ( Subinc_snowmelt(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_snowmelt', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_snowmelt', 'nsub', Nsub, &
      &     'Area-weighted average snowmelt from associated HRUs of each subbasin', &
      &     'inches', Subinc_snowmelt)
 
       ALLOCATE ( Subinc_pkweqv(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_pkweqv', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_pkweqv', 'nsub', Nsub, &
      &     'Area-weighted average snowpack water equivalent from associated HRUs of each subbasin', &
      &     'inches', Subinc_pkweqv)
 
       ALLOCATE ( Subinc_recharge(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_recharge', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_recharge', 'nsub', Nsub, &
      &     'Area-weighted average recharge from associated HRUs of each subbasin', &
      &     'inches', Subinc_recharge)
 
       ALLOCATE ( Subinc_szstor_frac(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_szstor_frac', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_szstor_frac', 'nsub', Nsub, &
      &     'Area-weighted average fraction of soil-zone water content storage for associated HRUs of each subbasin', &
      &     'decimal fraction', Subinc_szstor_frac)
 
       ALLOCATE ( Subinc_capstor_frac(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_capstor_frac', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_capstor_frac', 'nsub', Nsub, &
      &     'Area-weighted average fraction of capillary reservoir water content storage for associated HRUs of each subbasin', &
      &     'decimal fraction', Subinc_capstor_frac)
 
       ALLOCATE ( Subinc_stor(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'subinc_stor', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'subinc_stor', 'nsub', Nsub, &
      &     'Area-weighted average total water content in storage reservoirs for associated HRUs of each subbasin', &
      &     'inches', subinc_stor)
 
       ALLOCATE ( Qsub(Nsub), Tree(Nsub, Nsub), Sub_inq(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'sub_inq', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'sub_inq', 'nsub', Nsub, &
      &     'Sum of streamflow from upstream subbasins to each subbasin', &
      &     'cfs', Sub_inq)
 
       ALLOCATE ( Sub_cfs(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'sub_cfs', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'sub_cfs', 'nsub', Nsub, &
      &     'Total streamflow leaving each subbasin', &
      &     'cfs', Sub_cfs)
 
       ALLOCATE ( Sub_cms(Nsub) )
-      CALL declvar_dble_1d(MODNAME, 'sub_cms', 'nsub', Nsub, &
+      CALL declvar_dble(MODNAME, 'sub_cms', 'nsub', Nsub, &
      &     'Total streamflow leaving each subbasin', &
      &     'cms', Sub_cms)
 
@@ -242,6 +241,7 @@
 !***********************************************************************
       INTEGER FUNCTION subinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, DNEARZERO
+      use PRMS_READ_PARAM_FILE, only: getparam_int
       USE PRMS_MODULE, ONLY: Nsub, Nhru, Print_debug, GSFLOW_flag, &
      &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag
       USE PRMS_SUBBASIN
@@ -254,11 +254,10 @@
       USE PRMS_SOILZONE, ONLY: Lakein_sz
       USE PRMS_GWFLOW, ONLY: Gwres_flow
       USE PRMS_MUSKINGUM_LAKE, ONLY: Lake_outcfs
+      use prms_utils, only: PRMS_open_module_file, read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getparam_int
-      EXTERNAL :: read_error, PRMS_open_module_file
 ! Local Variables
       INTEGER :: i, j, k, kk, TREEUNIT
       DOUBLE PRECISION :: harea, gwstor, soilstor, snowstor, landstor, srq, ssq, gwq

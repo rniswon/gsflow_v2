@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-11-11'
+      character(len=*), parameter :: Version_soilzone = '2021-11-19'
       INTEGER, SAVE :: DBGUNT, Iter_aet
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -122,14 +122,13 @@
       INTEGER FUNCTION szdecl()
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ERROR_dim, ACTIVE, OFF, DEBUG_WB, &
      &    CASCADE_OFF, MONTHS_PER_YEAR
+      use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam, getdim
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Nhrucell, Print_debug, &
      &    Cascade_flag, GSFLOW_flag, Call_cascade, PRMS_land_iteration_flag, AG_flag, iter_aet_flag
       USE PRMS_SOILZONE
-      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_real, declvar_int, declvar_dble_1d
+      use prms_utils, only: error_stop, print_module, PRMS_open_module_file, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam, getdim
-      EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop
 !***********************************************************************
       szdecl = 0
 
@@ -305,13 +304,13 @@
      &       'inches', Basin_dncascadeflow)
 
         ALLOCATE ( Upslope_interflow(Nhru) )
-        CALL declvar_dble_1d(MODNAME, 'upslope_interflow', 'nhru', Nhru, &
+        CALL declvar_dble(MODNAME, 'upslope_interflow', 'nhru', Nhru, &
      &       'Cascading interflow runoff that flows to'// &
      &       ' the capillary reservoir of each downslope HRU for each upslope HRU', &
      &       'inches', Upslope_interflow)
 
         ALLOCATE ( Upslope_dunnianflow(Nhru) )
-        CALL declvar_dble_1d(MODNAME, 'upslope_dunnianflow', 'nhru', Nhru, &
+        CALL declvar_dble(MODNAME, 'upslope_dunnianflow', 'nhru', Nhru, &
      &       'Cascading Dunnian surface runoff that'// &
      &       ' flows to the capillary reservoir of each downslope HRU for each upslope HRU', &
      &       'inches', Upslope_dunnianflow)
@@ -339,7 +338,7 @@
 
         IF ( Nlake>0 ) THEN
           ALLOCATE ( Lakein_sz(Nhru) )
-          CALL declvar_dble_1d(MODNAME, 'lakein_sz', 'nhru', Nhru, &
+          CALL declvar_dble(MODNAME, 'lakein_sz', 'nhru', Nhru, &
      &         'Cascading interflow and Dunnian surface runoff to lake HRUs from each upslope HRU', &
      &         'inches', Lakein_sz)
 
@@ -449,7 +448,7 @@
      &     'none', Soil_saturated)
 
 !      ALLOCATE ( Snowevap_aet_frac(Nhru) )
-!      CALL declvar_dble_1d(MODNAME, 'snowevap_aet_frac', 'nhru', Nhru, &
+!      CALL declvar_dble(MODNAME, 'snowevap_aet_frac', 'nhru', Nhru, &
 !     &     'Fraction of sublimation of AET for each HRU', &
 !     &     'decimal fraction', Snowevap_aet_frac)
 
@@ -609,6 +608,7 @@
 !***********************************************************************
       INTEGER FUNCTION szinit()
       USE PRMS_CONSTANTS, ONLY: ERROR_dim, ACTIVE, OFF, LAKE, SWALE, INACTIVE, GLACIER, CASCADE_OFF, MONTHS_PER_YEAR
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nlake, Nhrucell, Dprst_flag, &
      &    Init_vars_from_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag, &
      &    PRMS_land_iteration_flag
@@ -621,10 +621,10 @@
       USE PRMS_SNOW, ONLY: Snowcov_area
       USE PRMS_INTCP, ONLY: Hru_intcpstor
       USE PRMS_SRUNOFF, ONLY: Hru_impervstor, Dprst_stor_hru
+      use prms_utils, only: checkdim_bounded_limits, error_stop, read_error
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: init_basin_vars, checkdim_bounded_limits, error_stop
-      INTEGER, EXTERNAL :: getparam_real, getparam_int, getparam_real_2d
+      EXTERNAL :: init_basin_vars
       INTRINSIC :: MIN, DBLE
 ! Local Variables
       INTEGER :: i, ii, ihru, icnt, j
@@ -645,7 +645,7 @@
       IF ( getparam_int(MODNAME, 'soil_type', Nhru, Soil_type)/=0 ) CALL read_error(2, 'soil_type')
       IF ( getparam_real(MODNAME, 'soil2gw_max', Nhru, Soil2gw_max)/=0 ) CALL read_error(2, 'soil2gw_max')
       IF ( Nlake>0 ) THEN
-        IF ( getparam_real_2d(MODNAME, 'lake_evap_adj', MONTHS_PER_YEAR, Nlake, Lake_evap_adj)/=0 ) &
+        IF ( getparam_real(MODNAME, 'lake_evap_adj', MONTHS_PER_YEAR*Nlake, Lake_evap_adj)/=0 ) &
      &       CALL read_error(2, 'lake_evap_adj')
       ENDIF
 
@@ -890,13 +890,14 @@
       USE PRMS_INTCP, ONLY: Hru_intcpevap
       USE PRMS_SNOW, ONLY: Snowcov_area, Snow_evap
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen
+      use prms_utils, only: print_date
       IMPLICIT NONE
 ! Arguments
       LOGICAL, INTENT(IN) :: AFR
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow
-      EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars, print_date
+      EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars
 ! Local Variables
       INTEGER :: i, k, update_potet, compute_lateral
       REAL :: dunnianflw, interflow, perv_area, harea
@@ -1622,10 +1623,10 @@
 !***********************************************************************
       SUBROUTINE compute_interflow(Coef_lin, Coef_sq, Ssres_in, Storage, Inter_flow)
       USE PRMS_CONSTANTS, ONLY: ERROR_soilzone !, NEARZERO, CLOSEZERO
+      use prms_utils, only: error_stop
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, SQRT
-      EXTERNAL :: error_stop
 ! Arguments
       REAL, INTENT(IN) :: Coef_lin, Coef_sq, Ssres_in
       REAL, INTENT(INOUT) :: Storage, Inter_flow
@@ -1822,11 +1823,10 @@
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, GSFLOW_flag
       USE PRMS_SOILZONE
+      use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      ! Function
-      EXTERNAL :: check_restart
       ! Local Variable
       CHARACTER(LEN=8) :: module_name
 !***********************************************************************

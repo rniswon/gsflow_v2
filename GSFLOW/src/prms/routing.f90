@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2021-11-09'
+      character(len=*), parameter :: Version_routing = '2021-11-19'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades
@@ -62,13 +62,12 @@
       INTEGER FUNCTION routingdecl()
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
      &    strmflow_muskingum_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
+      use PRMS_MMFAPI, only: declvar_dble
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Nsegment, Model, Init_vars_from_file, Strmflow_flag, Cascade_flag
       USE PRMS_ROUTING
-      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_dble_1d
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module
 !***********************************************************************
       routingdecl = 0
 
@@ -76,7 +75,7 @@
 
 ! Declared Variables
       ALLOCATE ( Hru_outflow(Nhru) )
-      CALL declvar_dble_1d(MODNAME, 'hru_outflow', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'hru_outflow', 'nhru', Nhru, &
      &     'Total flow leaving each HRU', &
      &     'cfs', Hru_outflow)
 
@@ -246,50 +245,50 @@
      &       'Basin area-weighted average storage in the stream network', &
      &       'inches', Basin_segment_storage)
         ALLOCATE ( Segment_delta_flow(Nsegment) )
-        CALL declvar_dble_1d(MODNAME, 'segment_delta_flow', 'nsegment', Nsegment, &
+        CALL declvar_dble(MODNAME, 'segment_delta_flow', 'nsegment', Nsegment, &
      &       'Cumulative flow in minus flow out for each stream segment', &
      &       'cfs', Segment_delta_flow)
       ENDIF
 
       IF ( Hru_seg_cascades==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Seginc_potet(Nsegment) )
-        CALL declvar_dble_1d(MODNAME, 'seginc_potet', 'nsegment', Nsegment, &
+        CALL declvar_dble(MODNAME, 'seginc_potet', 'nsegment', Nsegment, &
      &       'Area-weighted average potential ET for each segment from HRUs contributing flow to the segment', &
      &       'inches', Seginc_potet)
 
         ALLOCATE ( Seginc_swrad(Nsegment) )
-        CALL declvar_dble_1d(MODNAME, 'seginc_swrad', 'nsegment', Nsegment, &
+        CALL declvar_dble(MODNAME, 'seginc_swrad', 'nsegment', Nsegment, &
      &       'Area-weighted average solar radiation for each segment from HRUs contributing flow to the segment', &
      &       'Langleys', Seginc_swrad)
 
         ALLOCATE ( Seginc_ssflow(Nsegment) )
-        CALL declvar_dble_1d(MODNAME, 'seginc_ssflow', 'nsegment', Nsegment, &
+        CALL declvar_dble(MODNAME, 'seginc_ssflow', 'nsegment', Nsegment, &
      &       'Area-weighted average interflow for each segment from HRUs contributing flow to the segment', &
      &       'cfs', Seginc_ssflow)
 
         ALLOCATE ( Seginc_gwflow(Nsegment) )
-        CALL declvar_dble_1d(MODNAME, 'seginc_gwflow', 'nsegment', Nsegment, &
+        CALL declvar_dble(MODNAME, 'seginc_gwflow', 'nsegment', Nsegment, &
      &       'Area-weighted average groundwater discharge for each segment from HRUs contributing flow to the segment', &
      &       'cfs', Seginc_gwflow)
 
         ALLOCATE ( Seginc_sroff(Nsegment) )
-        CALL declvar_dble_1d(MODNAME, 'seginc_sroff', 'nsegment', Nsegment, &
+        CALL declvar_dble(MODNAME, 'seginc_sroff', 'nsegment', Nsegment, &
      &       'Area-weighted average surface runoff for each segment from HRUs contributing flow to the segment', &
      &       'cfs', Seginc_sroff)
 
         ALLOCATE ( Seg_ssflow(Nsegment) )
-        CALL declvar_dble_1d(MODNAME, 'seg_ssflow', 'nsegment', Nsegment, &
+        CALL declvar_dble(MODNAME, 'seg_ssflow', 'nsegment', Nsegment, &
      &       'Area-weighted average interflow for each segment from HRUs contributing flow to the segment and upstream HRUs', &
      &       'inches', Seg_ssflow)
 
         ALLOCATE ( Seg_gwflow(Nsegment) )
-        CALL declvar_dble_1d(MODNAME, 'seg_gwflow', 'nsegment', Nsegment, &
+        CALL declvar_dble(MODNAME, 'seg_gwflow', 'nsegment', Nsegment, &
      &       'Area-weighted average groundwater discharge for each segment from'// &
      &       ' HRUs contributing flow to the segment and upstream HRUs', &
      &       'inches', Seg_gwflow)
 
         ALLOCATE ( Seg_sroff(Nsegment) )
-        CALL declvar_dble_1d(MODNAME, 'seg_sroff', 'nsegment', Nsegment, &
+        CALL declvar_dble(MODNAME, 'seg_sroff', 'nsegment', Nsegment, &
      &       'Area-weighted average surface runoff for each segment from'// &
      &       ' HRUs contributing flow to the segment and upstream HRUs', &
      &       'inches', Seg_sroff)
@@ -307,17 +306,17 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, FT2_PER_ACRE, NEARZERO, DNEARZERO, OUTFLOW_SEGMENT, ERROR_param, &
      &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
      &    strmflow_muskingum_module, strmflow_in_out_module
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nsegment, Init_vars_from_file, &
      &    Strmflow_flag, Water_use_flag, Segment_transferON_OFF, Inputerror_flag, Parameter_check_flag
       USE PRMS_ROUTING
       USE PRMS_SET_TIME, ONLY: Timestep_seconds
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area_dble !, Active_area
       USE PRMS_FLOWVARS, ONLY: Seg_outflow, Seg_inflow
+      use prms_utils, only: read_error, write_outfile
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MOD
-      INTEGER, EXTERNAL :: getparam_real, getparam_int
-      EXTERNAL :: read_error
 ! Local Variables
       INTEGER :: i, j, test, lval, toseg, iseg, isegerr, ierr, eseg
       REAL :: k, x, d, x_max, velocity
@@ -811,11 +810,10 @@
      &    strmflow_muskingum_module, strmflow_muskingum_mann_module
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Strmflow_flag
       USE PRMS_ROUTING
+      use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      ! Functions
-      EXTERNAL :: check_restart
       ! Local Variables
       CHARACTER(LEN=7) :: module_name
 !***********************************************************************

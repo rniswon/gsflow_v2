@@ -6,7 +6,7 @@
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Water Balance Computations'
         character(len=*), parameter :: MODNAME_WB = 'water_balance'
-        character(len=*), parameter :: Version_water_balance = '2021-11-09'
+        character(len=*), parameter :: Version_water_balance = '2021-11-19'
         INTEGER, SAVE :: BALUNT, SZUNIT, GWUNIT, INTCPUNT, SROUNIT, SNOWUNIT
         REAL, PARAMETER :: TOOSMALL = 3.1E-05, SMALL = 1.0E-04, BAD = 1.0E-03
         DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 1.0D-05
@@ -48,13 +48,12 @@
 !***********************************************************************
       SUBROUTINE water_balance_decl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, DOCUMENTATION, CASCADE_OFF
+      use PRMS_MMFAPI, only: declvar_dble
       USE PRMS_MODULE, ONLY: Model, Nhru, Cascade_flag, Dprst_flag
       USE PRMS_WATER_BALANCE
       USE PRMS_SRUNOFF, ONLY: MODNAME
-      USE PRMS_MMFSUBS, ONLY: declvar_dble !, declvar_dble_1d
+      use prms_utils, only: print_module, PRMS_open_module_file, read_error
       IMPLICIT NONE
-! Functions
-      EXTERNAL :: read_error, print_module, PRMS_open_module_file
 !***********************************************************************
       CALL print_module(MODDESC, MODNAME_WB, Version_water_balance)
 
@@ -72,7 +71,7 @@
      &     'inches', Basin_soilzone_wb)
 
 !      ALLOCATE ( Hru_runoff(Nhru) )
-!      CALL declvar_dble_1d(MODNAME, 'hru_runoff', 'nhru', Nhru, &
+!      CALL declvar_dble(MODNAME, 'hru_runoff', 'nhru', Nhru, &
 !     &     'Total lateral flow leaving each HRU (includes cascading flow)', &
 !     &     'inches', Hru_runoff)
 
@@ -187,10 +186,10 @@
       USE PRMS_GWFLOW, ONLY: Basin_dnflow, Basin_gwsink, Basin_gwstor_minarea_wb, Gwres_flow, &
      &    Basin_gwstor, Basin_gwflow, Basin_gw_upslope, Basin_gwin, Gwres_sink, Hru_gw_cascadeflow, Gw_upslope, &
      &    Gwminarea_flag, Gwstor_minarea_wb, Gwin_dprst, Gwres_in
+      use prms_utils, only: print_date
       IMPLICIT NONE
 ! Functions
       INTRINSIC ABS, DBLE, SNGL, DABS
-      EXTERNAL print_date
 ! Local Variables
       INTEGER :: i, k
       REAL :: last_sm, last_ss, soilbal, perv_frac, gvrbal, test, waterin, waterout, hrubal
