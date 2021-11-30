@@ -2130,7 +2130,7 @@ C     -----------------------------------------------------------------
       INTEGER i, ibflg, ic, icalc, idivseg, iflg, iic, iic2, iic3, iic4,
      +        il, ilay, iprior, iprndpth, iprvsg, ir, istsg, itot,itrib,
      +        itstr, iwidthcheck, kerp, kss, l, lk, ll, nstrpts, nreach,
-     +        maxwav, icalccheck, iskip, iss, lsub, numdelt, irt,
+     +        maxwav, icalccheck, iskip, iss, lsub, numdelt, irt, ifm,
      +        lfold, illake, lakid
 !      INTEGER irr, icc, icount  !cjm
       DOUBLE PRECISION FIVE_THIRDS
@@ -2177,6 +2177,9 @@ C2b-----START INTERNAL TIME LOOP FOR STREAMFLOW ROUTING.
         numdelt = 1
       END IF
       DO irt = 1, numdelt
+C
+C2c-----FORCE THE SFR7FM LOOP TO COMPLETE TWICE
+        DO ifm = 1, 2
 C
 C3------DETERMINE LAYER, ROW, COLUMN OF EACH REACH.
         DO l = 1, NSTRM
@@ -3574,8 +3577,10 @@ C         STREAMBED BOTTOM ELEVATION.
             END IF
 !      write(iout,*)'in fm',l,fin,fout
         END DO !rsr, end l = 1, NSTRM loop
-C        
-C81-----END INTERNAL TIME LOOP FOR ROUTING STREAMFLOWS.
+C
+C81A----END THE LOOP THAT FORCES THE FM ROUTINES TO SOLVE TWICE
+        END DO
+C81b----END INTERNAL TIME LOOP FOR ROUTING STREAMFLOWS.
       END DO !rsr, end irt loop
 C
 C82-----RETURN.
