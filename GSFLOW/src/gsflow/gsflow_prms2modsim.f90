@@ -6,7 +6,7 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODSIM'
       character(len=14), SAVE :: MODNAME = 'gsflow_prms2modsim'
-      character(len=*), parameter :: Version_gsflow_prms2modsim = '2021-06-11'
+      character(len=*), parameter :: Version_gsflow_prms2modsim = '2021-11-30'
       DOUBLE PRECISION, SAVE :: Acre_inches_to_MSl3
 !   Declared Variables
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Segment_latflow(:), Lake_In_flow(:)
@@ -20,12 +20,12 @@
 	  USE PRMS_CONSTANTS, ONLY: ACTIVE, SAVE_INIT, RUN, DECL, INIT
       USE PRMS_MODULE, ONLY: Process_flag, Nlake, Nsegment
       USE GSFPRMS2MODSIM
+	  use prms_utils, only: print_module
       IMPLICIT NONE
 ! Arguments
       DOUBLE PRECISION, INTENT(OUT) :: EXCHANGE(Nsegment), DELTAVOL(Nlake), LAKEVAP(Nlake)
 ! Functions
       INTEGER, EXTERNAL :: prms2modsiminit, prms2modsimrun
-      EXTERNAL :: print_module
 !***********************************************************************
       gsflow_prms2modsim = 0
 
@@ -47,11 +47,12 @@
       USE GSFPRMS2MODSIM
       USE PRMS_MODULE, ONLY: Nsegment, Nlake
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Lake_hru_id
-      USE PRMS_MMFSUBS, ONLY: declvar_dble_1d
+      use PRMS_MMFAPI, only: declvar_dble
+	  use prms_utils, only: read_error
       IMPLICIT NONE
-      EXTERNAL read_error
-      INTRINSIC ABS, DBLE
-! Local Variables
+	  ! Functions
+      INTRINSIC :: ABS, DBLE
+      ! Local Variables
       INTEGER :: i, ii, ierr
       DOUBLE PRECISION :: MSl3_to_ft3
 !      DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: seg_area
@@ -71,19 +72,19 @@
 !      ENDIF
 
       ALLOCATE ( Segment_latflow(Nsegment) )
-      CALL declvar_dble_1d(MODNAME, 'Segment_latflow', 'nsegment', Nsegment, &
+      CALL declvar_dble(MODNAME, 'Segment_latflow', 'nsegment', Nsegment, &
      &     'Lateral flow to each segment', &
      &     'acre-inches', Segment_latflow)
       ALLOCATE ( Lake_latflow(Nlake) )
-      CALL declvar_dble_1d(MODNAME, 'Lake_latflow', 'nlake', Nlake, &
+      CALL declvar_dble(MODNAME, 'Lake_latflow', 'nlake', Nlake, &
      &     'Total lateral flow into each lake', &
      &     'acre-inches', Lake_latflow)
       ALLOCATE ( Lake_precip(Nlake) )
-      CALL declvar_dble_1d(MODNAME, 'Lake_precip', 'nlake', Nlake, &
+      CALL declvar_dble(MODNAME, 'Lake_precip', 'nlake', Nlake, &
      &     'Precipitation into each lake', &
      &     'acre-inches', Lake_precip)
       ALLOCATE ( Lake_et(Nlake) )
-      CALL declvar_dble_1d(MODNAME, 'Lake_et', 'nlake', Nlake, &
+      CALL declvar_dble(MODNAME, 'Lake_et', 'nlake', Nlake, &
      &     'Evaporation from each lake', &
      &     'acre-inches', Lake_et)
       ALLOCATE ( Lake_In_flow(Nlake) )
@@ -131,7 +132,6 @@
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Timestep_seconds
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes, Strm_seg_in
       USE PRMS_SOILZONE, ONLY: Lakein_sz
-!      USE PRMS_GWFLOW, ONLY: 
       IMPLICIT NONE
 ! Arguments
       DOUBLE PRECISION, INTENT(OUT) :: EXCHANGE(Nsegment), DELTAVOL(Nlake), LAKEVAP(Nlake)
