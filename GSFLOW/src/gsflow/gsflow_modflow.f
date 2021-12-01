@@ -691,14 +691,14 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             ENDIF
             IF(IUNIT(66).GT.0 )
      1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
-            IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,   ! EDM 11/23/2021 Moved before LAK for SRFIN convrg on lakes (MODSIM-GSF)
-     1                              IUNIT(22),IUNIT(63),IUNIT(8),
-     2                              IUNIT(55),IGRID)   !cjm (added IUNIT(8))
             IF(IUNIT(22).GT.0) CALL GWF2LAK7FM(KKITER,KKPER,KKSTP,
      1                                     IUNIT(44),IUNIT(55),IGRID)  !RGN 9/21/2021 to keep seepage from lake in UZF
             IF(IUNIT(55).GT.0) CALL GWF2UZF1FM(KKPER,KKSTP,KKITER,
      1                           IUNIT(44),IUNIT(22),IUNIT(63),
      2                           IUNIT(64),IGRID)  !SWR - JDH ADDED IUNIT(64)
+            IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,
+     1                              IUNIT(22),IUNIT(63),IUNIT(8),
+     2                              IUNIT(55),IGRID)   !cjm (added IUNIT(8))
             IF(IUNIT(50).GT.0) THEN
               IF (IUNIT(1).GT.0) THEN
                 CALL GWF2MNW27BCF(KPER,IGRID)

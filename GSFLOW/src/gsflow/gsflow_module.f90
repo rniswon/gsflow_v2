@@ -110,8 +110,8 @@
       character(len=*), parameter :: MODNAME_LAK = 'gwf2lak7_NWT'
       character(len=*), parameter :: MODNAME_AG =  'gwf2ag1_NWT_ponds'
       character(len=*), parameter :: Version_uzf = '2021-03-02'
-      character(len=*), parameter :: Version_sfr = '2020-09-30'
-      character(len=*), parameter :: Version_lak = '2021-09-28'
+      character(len=*), parameter :: Version_sfr = '2021-12-01'
+      character(len=*), parameter :: Version_lak = '2021-11-28'
       character(len=*), parameter :: Version_ag =  '2021-10-19'
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells, Gsflag

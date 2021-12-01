@@ -2083,6 +2083,8 @@ C     *****************************************************************
 !!      USE GWFNWTMODULE, ONLY: Heps, A, IA, Icell
       USE GWFLAKMODULE, ONLY: THETA, STGOLD, STGNEW, LKARR1
 !!      USE GWFLAKMODULE, ONLY: THETA, STGOLD, STGNEW, VOL, LKARR1
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: MODSIM_flag
       IMPLICIT NONE
       INTRINSIC IABS, ABS, DABS, MIN, DSQRT, FLOAT, SQRT, SNGL
 C     -----------------------------------------------------------------
@@ -2131,7 +2133,7 @@ C     -----------------------------------------------------------------
      +        il, ilay, iprior, iprndpth, iprvsg, ir, istsg, itot,itrib,
      +        itstr, iwidthcheck, kerp, kss, l, lk, ll, nstrpts, nreach,
      +        maxwav, icalccheck, iskip, iss, lsub, numdelt, irt, ifm,
-     +        lfold, illake, lakid
+     +        lfold, illake, lakid, isfr_loop
 !      INTEGER irr, icc, icount  !cjm
       DOUBLE PRECISION FIVE_THIRDS
       PARAMETER (FIVE_THIRDS=5.0D0/3.0D0)
@@ -2178,8 +2180,10 @@ C2b-----START INTERNAL TIME LOOP FOR STREAMFLOW ROUTING.
       END IF
       DO irt = 1, numdelt
 C
+        isfr_loop = 1
+        IF ( MODSIM_flag==ACTIVE ) isfr_loop = 2
 C2c-----FORCE THE SFR7FM LOOP TO COMPLETE TWICE
-        DO ifm = 1, 2
+        DO ifm = 1, isfr_loop
 C
 C3------DETERMINE LAYER, ROW, COLUMN OF EACH REACH.
         DO l = 1, NSTRM
@@ -3514,7 +3518,7 @@ C75-----STORE FLOWS NEEDED FOR SENSITIVITIES. - ERB
           END IF
 C
 C76-----ADD TERMS TO RHS AND HCOF IF FLOBOT IS NOT ZERO.
-          IF ( irt.EQ.numdelt .and. ifm.EQ.2 ) THEN
+          IF ( irt.EQ.numdelt .AND. (MODSIM_flag==OFF.OR.ifm==2) ) THEN
             hstrave = 0.0D0
             DO i = 1, numdelt
               hstrave = hstrave + HSTRM(l,i)
