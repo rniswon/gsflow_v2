@@ -14,13 +14,12 @@
      &    Flow_to_lakes, Flow_to_ocean, Flow_to_great_lakes, Flow_out_region, Flow_replacement, &
      &    Flow_out_NHM, Flow_terminus, Flow_in_region, Flow_in_nation, Flow_headwater, Flow_in_great_lakes
       USE PRMS_OBS, ONLY: Streamflow_cfs
+      use prms_utils, only: print_module
       IMPLICIT NONE
-! Functions
-      EXTERNAL :: print_module
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing'
       character(len=*), parameter :: MODNAME = 'strmflow_in_out'
-      character(len=*), parameter :: Version_strmflow = '2020-08-03'
+      character(len=*), parameter :: Version_strmflow = '2020-11-19'
       INTEGER :: i, iorder, toseg, segtype
       DOUBLE PRECISION :: area_fac, segout
 !***********************************************************************

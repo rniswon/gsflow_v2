@@ -6,18 +6,19 @@
 !***********************************************************************
       INTEGER FUNCTION frost_date()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, DAYS_PER_YEAR, NORTHERN
+      use PRMS_READ_PARAM_FILE, only: declparam, getparam_real
       USE PRMS_MODULE, ONLY: Process_flag, Nhru
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Hemisphere
       USE PRMS_CLIMATEVARS, ONLY: Tmin_hru
       USE PRMS_SET_TIME, ONLY: Jsol
+      use prms_utils, only: PRMS_open_module_file, print_module, read_error, write_integer_param
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Preprocessing'
       character(len=*), parameter :: MODNAME = 'frost_date'
-      character(len=*), parameter :: Version_frost_date = '2021-09-07'
+      character(len=*), parameter :: Version_frost_date = '2021-11-22'
 ! Functions
       INTRINSIC :: NINT, DBLE
-      INTEGER, EXTERNAL :: declparam, getparam_real, get_season
-      EXTERNAL :: read_error, write_integer_param, PRMS_open_module_file, print_module
+      INTEGER, EXTERNAL :: get_season
 ! Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Frost_temp(:)
 ! Local Variables

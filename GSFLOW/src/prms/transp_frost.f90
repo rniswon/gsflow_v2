@@ -7,22 +7,21 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Transpiration Distribution'
         character(len=*), parameter :: MODNAME = 'transp_frost'
-        character(len=*), parameter :: Version_transp = '2021-09-07'
+        character(len=*), parameter :: Version_transp = '2021-11-19'
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Fall_frost(:), Spring_frost(:)
       END MODULE PRMS_TRANSP_FROST
 
       INTEGER FUNCTION transp_frost()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, ACTIVE, OFF
+      use PRMS_READ_PARAM_FILE, only: declparam, getparam_int
       USE PRMS_MODULE, ONLY: Process_flag, Nhru
       USE PRMS_TRANSP_FROST
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Transp_on, Basin_transp_on
       USE PRMS_SET_TIME, ONLY: Jsol
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam, getparam_int
-      EXTERNAL :: read_error, print_module
 ! Local Variables
       INTEGER :: i, j
 !***********************************************************************
@@ -75,4 +74,3 @@
       ENDIF
 
       END FUNCTION transp_frost
- 

@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2021-11-11'
+      character(len=*), parameter :: Version_soilzone_ag = '2021-11-19'
       INTEGER, SAVE :: Soil_iter, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr
@@ -90,14 +90,13 @@
 !***********************************************************************
       INTEGER FUNCTION szdecl_ag()
       USE PRMS_CONSTANTS, ONLY: OFF, ACTIVE, DOCUMENTATION, PRMS_AG, MONTHS_PER_YEAR
+      use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam, getdim
       USE PRMS_MODULE, ONLY: Nhru, Cascade_flag, GSFLOW_flag, Model
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
-      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_real, declvar_int
+      use prms_utils, only: error_stop, print_module, PRMS_open_module_file, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam, getdim
-      EXTERNAL :: read_error, print_module, PRMS_open_module_file, error_stop
 !***********************************************************************
       szdecl_ag = 0
 
@@ -244,15 +243,16 @@
 !***********************************************************************
       INTEGER FUNCTION szinit_ag()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, LAKE, GLACIER, INACTIVE, OFF, MONTHS_PER_YEAR
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Ag_package, Init_vars_from_file, Nhru, Agriculture_soilzone_flag
       USE PRMS_SOILZONE, ONLY: MODNAME, Iter_aet, Soil2gw_max
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_type, Basin_area_inv, Ag_area, Covden_win, Covden_sum
       USE PRMS_FLOWVARS, ONLY: Basin_ag_soil_moist, Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, Ag_soil_rechr_max
+      use prms_utils, only: checkdim_bounded_limits, error_stop, read_error
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: init_basin_vars, checkdim_bounded_limits, error_stop
-      INTEGER, EXTERNAL :: getparam_int, getparam_real, getparam_real_2d, getparam_int_0d, getparam_real_0d
+      EXTERNAL :: init_basin_vars
       INTRINSIC :: MIN, DBLE
 ! Local Variables
       INTEGER :: ihru
@@ -260,17 +260,17 @@
       szinit_ag = 0
 
 !??? figure out what to save in restart file ???
-      IF ( getparam_int_0d(MODNAME, 'max_soilzone_ag_iter', 1, max_soilzone_ag_iter)/=0 ) &
+      IF ( getparam_int(MODNAME, 'max_soilzone_ag_iter', 1, max_soilzone_ag_iter)/=0 ) &
      &     CALL read_error(2, 'max_soilzone_ag_iter')
-      IF ( getparam_real_0d(MODNAME, 'soilzone_aet_converge', 1, soilzone_aet_converge)/=0 ) &
+      IF ( getparam_real(MODNAME, 'soilzone_aet_converge', 1, soilzone_aet_converge)/=0 ) &
      &     CALL read_error(2, 'soilzone_aet_converge')
       IF ( getparam_int(MODNAME, 'ag_soil_type', Nhru, Ag_soil_type)/=0 ) CALL read_error(2, 'ag_soil_type')
       IF ( getparam_real(MODNAME, 'ag_soilwater_deficit_min', Nhru, Ag_soilwater_deficit_min)/=0 ) &
      &     CALL read_error(2, 'ag_soilwater_deficit_min')
 !      IF ( getparam_int(MODNAME, 'ag_crop_type', Nhru, Ag_crop_type)/=0 ) CALL read_error(2, 'ag_crop_type')
-      IF ( getparam_real_2d(MODNAME, 'ag_covden_sum', Nhru, MONTHS_PER_YEAR, Ag_covden_sum)/=0 ) CALL read_error(2, 'ag_covden_sum')
+      IF ( getparam_real(MODNAME, 'ag_covden_sum', Nhru*MONTHS_PER_YEAR, Ag_covden_sum)/=0 ) CALL read_error(2, 'ag_covden_sum')
       IF ( Ag_covden_sum(1,1)<0.0 ) Ag_covden_sum = Covden_sum
-      IF ( getparam_real_2d(MODNAME, 'ag_covden_win', Nhru, MONTHS_PER_YEAR, Ag_covden_win)/=0 ) CALL read_error(2, 'ag_covden_win')
+      IF ( getparam_real(MODNAME, 'ag_covden_win', Nhru*MONTHS_PER_YEAR, Ag_covden_win)/=0 ) CALL read_error(2, 'ag_covden_win')
       IF ( Ag_covden_win(1,1)<0.0 ) Ag_covden_win = Covden_win
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) Ag_soil_lower = 0.0
       Basin_agwaterin = 0.0D0
@@ -363,11 +363,12 @@
       USE PRMS_INTCP, ONLY: Hru_intcpevap
       USE PRMS_SNOW, ONLY: Snowcov_area, Snow_evap
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen, Infil_ag
+      use prms_utils, only: error_stop, print_date
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow
-      EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars, print_date, check_gvr_sm
+      EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars, check_gvr_sm
 ! Local Variables
       INTEGER :: i, k, update_potet, compute_lateral, perv_on_flag
       REAL :: dunnianflw, interflow, perv_area, harea
@@ -891,7 +892,7 @@ endif
               ENDIF
             ENDIF
             ag_hruactet = Ag_actet(i)*agfrac
-                    
+
 !        avail_potet = ag_AETtarget - (hruactet + ag_hruactet)
 !                      if (i == 3056 .and. Net_apply(i)>0.0 ) then
 !            write(877,*) i, kkiter, avail_potet, ag_hruactet, Ag_actet(i), ag_AETtarget, Ag_soilwater_deficit(i), Ag_soil_saturated(i), Infil_ag(i), sroff(i), 'aet'
@@ -1060,7 +1061,7 @@ endif
               ENDIF
             ENDIF
           ELSE
-!print *, i, AET_external(i), Ag_actet(i), unsatisfied_et, Ag_irrigation_add(i) 
+!print *, i, AET_external(i), Ag_actet(i), unsatisfied_et, Ag_irrigation_add(i)
           ENDIF
           Unused_ag_et(i) = ag_AETtarget - Ag_actet(i)
           Unused_potet(i) = Unused_potet(i) - Unused_ag_et(i)
@@ -1268,11 +1269,10 @@ endif
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, GSFLOW_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
+      use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      ! Function
-      EXTERNAL :: check_restart
       ! Local Variable
       CHARACTER(LEN=8) :: module_name
 !***********************************************************************

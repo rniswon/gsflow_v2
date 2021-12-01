@@ -59,11 +59,11 @@
 !***********************************************************************
       INTEGER FUNCTION prms2mfdecl()
       USE GSFPRMS2MF
+      use PRMS_MMFAPI, only: declvar_dble, declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Nsegment, Model
-      USE PRMS_MMFSUBS, ONLY: declvar_dble, declvar_real !, declvar_int
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL read_error, print_module
 !***********************************************************************
       prms2mfdecl = 0
 
@@ -75,12 +75,12 @@
      &     'L3/T', Net_sz2gw)
 
 !      ALLOCATE (Reach_latflow(Nreach))
-!      CALL declvar_dble_1d(MODNAME, 'reach_latflow', 'nreach', Nreach, &
+!      CALL declvar_dble(MODNAME, 'reach_latflow', 'nreach', Nreach, &
 !     &     'Lateral flow (surface runoff and interflow) into each stream reach', &
 !     &     'cfs', Reach_latflow)
 
 !      ALLOCATE (Reach_id(Nreach, Nsegment))
-!      CALL declvar_int_2d(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment, Nreach, &
+!      CALL declvar_int(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, &
 !     &     'Mapping of reach id by segment id', &
 !     &     'none', Reach_id)
 
@@ -100,7 +100,7 @@
 
       !rsr, all reaches receive same precentage of flow to each segment
       ALLOCATE (Segment_pct_area(Nsegment))
-!      CALL declvar_dble_1d(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, &
+!      CALL declvar_dble(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, &
 !     &     'Proportion of each segment that contributes flow to a stream reach', &
 !     &     'decimal fraction', Segment_pct_area)
 
@@ -148,6 +148,7 @@
 !***********************************************************************
       INTEGER FUNCTION prms2mfinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_param, ACTIVE, OFF
+      use PRMS_READ_PARAM_FILE, only: getparam_real
       USE GSFPRMS2MF
       USE GWFUZFMODULE, ONLY: NTRAIL, NWAV, IUZFBND
       USE GWFSFRMODULE, ONLY: ISEG, NSS
@@ -158,10 +159,9 @@
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, &
      &    Basin_area_inv, Hru_area
       USE PRMS_SOILZONE, ONLY: Gvr_hru_id, Gvr_hru_pct_adjusted
+      use prms_utils, only: read_error
       USE GLOBAL, ONLY: NLAY, NROW, NCOL
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getparam_real
-      EXTERNAL read_error
       INTRINSIC ABS, DBLE
 ! Local Variables
       INTEGER :: is, i, ii, ierr, ihru, icell, irow, icol
@@ -504,7 +504,7 @@
           IF ( Unused_potet(ihru)<0.0 ) Unused_potet(ihru) = 0.0
         ENDIF
       ENDDO
- 
+
 !-----------------------------------------------------------------------
 ! Bin precolation in cell_drain_rate
 !-----------------------------------------------------------------------
@@ -552,7 +552,7 @@
 !-----------------------------------------------------------------------
 ! latflow is in cfs
 ! convert the gain to the SFR reach to correct units
-!-----------------------------------------------------------------------          
+!-----------------------------------------------------------------------
           STRM(12, k) = SNGL( latflow*Sfr_conv )
 !         Basin_reach_latflow = Basin_reach_latflow + Reach_latflow(k)
           Basin_reach_latflow = Basin_reach_latflow + latflow

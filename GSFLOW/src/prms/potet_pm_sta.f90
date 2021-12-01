@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_pm_sta'
-        character(len=*), parameter :: Version_potet = '2021-11-11'
+        character(len=*), parameter :: Version_potet = '2021-11-19'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Pm_n_coef(:, :), Pm_d_coef(:, :), Crop_coef(:, :)
         INTEGER, SAVE, ALLOCATABLE :: Hru_windspeed_sta(:), Hru_humidity_sta(:)
@@ -20,6 +20,7 @@
 !***********************************************************************
       INTEGER FUNCTION potet_pm_sta()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR, INCH2MM
+      use PRMS_READ_PARAM_FILE, only: declparam, getparam_real, getparam_int
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Parameter_check_flag, Inputerror_flag, Nowmonth
       USE PRMS_POTET_PM_STA
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order, Hru_elev_meters
@@ -28,15 +29,13 @@
       USE PRMS_OBS, ONLY: Humidity, Wind_speed, Nwind, Nhumid
       USE PRMS_SOLTAB, ONLY: Soltab_potsw
       USE PRMS_SET_TIME, ONLY: Jday
+      use prms_utils, only: checkdim_param_limits, print_module, read_error, sat_vapor_press
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, LOG, SNGL
-      INTEGER, EXTERNAL :: declparam, getparam_real_2d, getparam_int
-      REAL, EXTERNAL :: sat_vapor_press
-      EXTERNAL :: read_error, print_module, checkdim_param_limits
 ! Local Variables
       INTEGER :: i, j
-      REAL :: elh, prsr, psycnst, heat_flux, net_rad, vp_deficit, a, b, c 
+      REAL :: elh, prsr, psycnst, heat_flux, net_rad, vp_deficit, a, b, c
       REAL :: A1, B1, t1, num, den, stab, sw
 !***********************************************************************
       potet_pm_sta = 0
@@ -54,7 +53,7 @@
 !...LATENT HEAT OF VAPORIZATION AT AVG TEMPERATURE, CAL/GRAM:
           ! elh = 597.3 - 0.5653*Tavgc(i) ! same as potet_jh
 !...LATENT HEAT OF VAPORIZATION AT AVG TEMPERATURE, JOULES/GRAM:
-          elh = (597.3 - 0.5653*Tavgc(i)) * 4.184 
+          elh = (597.3 - 0.5653*Tavgc(i)) * 4.184
           ! elh = 2501.0 - 2.361*Tavgc(i)
           ! elh = 2500.8 - 2.36*Tavgc(i) + 0.0016*Tavgc(i)**2 - 0.00006*Tavgc(i)**3
 
@@ -185,9 +184,9 @@
 !******Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
         Vp_sat = 0.0
-        IF ( getparam_real_2d(MODNAME, 'pm_n_coef', Nhru, MONTHS_PER_YEAR, Pm_n_coef)/=0 ) CALL read_error(2, 'pm_n_coef')
-        IF ( getparam_real_2d(MODNAME, 'pm_d_coef', Nhru, MONTHS_PER_YEAR, Pm_d_coef)/=0 ) CALL read_error(2, 'pm_d_coef')
-        IF ( getparam_real_2d(MODNAME, 'crop_coef', Nhru, MONTHS_PER_YEAR, Crop_coef)/=0 ) CALL read_error(2, 'crop_coef')
+        IF ( getparam_real(MODNAME, 'pm_n_coef', Nhru*MONTHS_PER_YEAR, Pm_n_coef)/=0 ) CALL read_error(2, 'pm_n_coef')
+        IF ( getparam_real(MODNAME, 'pm_d_coef', Nhru*MONTHS_PER_YEAR, Pm_d_coef)/=0 ) CALL read_error(2, 'pm_d_coef')
+        IF ( getparam_real(MODNAME, 'crop_coef', Nhru*MONTHS_PER_YEAR, Crop_coef)/=0 ) CALL read_error(2, 'crop_coef')
         IF ( getparam_int(MODNAME, 'hru_windspeed_sta', Nhru, Hru_windspeed_sta)/=0 ) CALL read_error(2,'hru_windspeed_sta')
         IF ( getparam_int(MODNAME, 'hru_humidity_sta', Nhru, Hru_humidity_sta)/=0 ) CALL read_error(2, 'hru_humidity_sta')
         IF ( Parameter_check_flag>0 ) THEN

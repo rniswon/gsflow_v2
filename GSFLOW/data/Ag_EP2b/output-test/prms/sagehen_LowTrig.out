@@ -28,7 +28,7 @@ ncol                   1
 ====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 10/28/2021
+                       Version 5.3.0 11/23/2021
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -64,9 +64,10 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-10-28
-Read Control File               read_control_file   2021-10-28
-Read Parameter File             read_parameter_file 2021-10-05
+PRMS Computation Order          gsflow_prms         2021-11-23
+Read Control File               read_control_file   2021-11-22
+Read Parameter File             read_parameter_file 2021-11-22
+Read Data File                  read_data_file      2021-11-22
 
 
 ====================================================================
@@ -95,28 +96,28 @@ runoff 1
  Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
 Simulation time period: 1990/10/01 00:00:00 to 2000/10/31 00:00:00
 ====================================================================
-Basin Definition                basin               2021-10-22
-Cascading Flow                  cascade             2021-09-14
-Common States and Fluxes        climateflow         2021-10-21
+Basin Definition                basin               2021-11-19
+Cascading Flow                  cascade             2021-11-19
+Common States and Fluxes        climateflow         2021-11-19
 Potential Solar Radiation       soltab              2021-09-07
-Time Series Data                obs                 2021-09-07
-Timestep Control                prms_time           2021-09-07
-Temperature Distribution        temp_1sta           2021-09-07
-Precipitation Distribution      precip_1sta         2021-09-07
-Solar Radiation Distribution    ddsolrad            2021-09-07
+Time Series Data                obs                 2021-11-19
+Timestep Control                prms_time           2021-11-19
+Temperature Distribution        temp_1sta           2021-11-19
+Precipitation Distribution      precip_1sta         2021-11-19
+Solar Radiation Distribution    ddsolrad            2021-11-19
 Transpiration Distribution      transp_tindex       2021-09-07
-Potential Evapotranspiration    potet_jh            2021-09-07
-Canopy Interception             intcp               2021-11-03
-Snow Dynamics                   snowcomp            2021-09-15
-Surface Runoff                  srunoff_smidx       2021-10-11
-Soilzone Computations           soilzone            2021-10-21
+Potential Evapotranspiration    potet_jh            2021-11-19
+Canopy Interception             intcp               2021-11-19
+Snow Dynamics                   snowcomp            2021-11-23
+Surface Runoff                  srunoff_smidx       2021-11-19
+Soilzone Computations           soilzone            2021-11-19
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-10-11
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-06-10
 GSFLOW Output Budget Summary    gsflow_budget       2021-09-29
 GSFLOW Output CSV Summary       gsflow_sum          2021-09-28
-Output Summary                  nhru_summary        2021-09-07
-Output Summary                  basin_summary       2021-09-07
-Output Summary                  nsegment_summary    2021-09-07
+Output Summary                  nhru_summary        2021-11-23
+Output Summary                  basin_summary       2021-11-19
+Output Summary                  nsegment_summary    2021-11-23
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2021-09-29
 UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
@@ -136,5 +137,5 @@ Model domain area:        11226.32    Active basin area:      6740.99
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    4 minutes 43.03 seconds
+Execution elapsed time    4 minutes 52.15 seconds
 
