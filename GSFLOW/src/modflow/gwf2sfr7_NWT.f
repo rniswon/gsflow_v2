@@ -3501,20 +3501,20 @@ C74-----SUM SEEPAGE TO WATER TABLE.
           END IF
 C
 C75-----STORE FLOWS NEEDED FOR SENSITIVITIES. - ERB
-            IF ( IRTFLG.EQ.0 ) THEN
-              SFRQ(1, l) = flwmpt
-              SFRQ(2, l) = flowc
-              SFRQ(3, l) = flobot
-              SFRQ(5, l) = flowin
-            ELSE
-              SFRQ(1, l) = (qc + qd)/2.0
-              SFRQ(2, l) = (qc + qd)/2.0
-              SFRQ(3, l) = flobot
-              SFRQ(5, l) = qc
-            END IF
+          IF ( IRTFLG.EQ.0 ) THEN
+            SFRQ(1, l) = flwmpt
+            SFRQ(2, l) = flowc
+            SFRQ(3, l) = flobot
+            SFRQ(5, l) = flowin
+          ELSE
+            SFRQ(1, l) = (qc + qd)/2.0
+            SFRQ(2, l) = (qc + qd)/2.0
+            SFRQ(3, l) = flobot
+            SFRQ(5, l) = qc
+          END IF
 C
 C76-----ADD TERMS TO RHS AND HCOF IF FLOBOT IS NOT ZERO.
-          IF ( irt.EQ.numdelt ) THEN
+          IF ( irt.EQ.numdelt .and. ifm.EQ.2 ) THEN
             hstrave = 0.0D0
             DO i = 1, numdelt
               hstrave = hstrave + HSTRM(l,i)
@@ -3574,7 +3574,7 @@ C         STREAMBED BOTTOM ELEVATION.
               RHS(ic, ir, il) = RHS(ic, ir, il) - SUMRCH(l)
  !      fin=fin+sumrch(l)
             END IF
-            END IF
+          END IF
 !      write(iout,*)'in fm',l,fin,fout
         END DO !rsr, end l = 1, NSTRM loop
 C
