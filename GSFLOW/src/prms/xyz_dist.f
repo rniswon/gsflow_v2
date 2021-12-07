@@ -715,14 +715,14 @@
       SUBROUTINE xyz_temp_run(Max_lapse, Min_lapse, Meantmax, Meantmin,
      +                        Temp_meanx, Temp_meany, Temp_meanz)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, DNEARZERO, ACTIVE, GLACIER
-      USE PRMS_MODULE, ONLY: Glacier_flag, Nrain
+      USE PRMS_MODULE, ONLY: Glacier_flag, Nrain, Hru_type
       USE PRMS_XYZ_DIST, ONLY: MRUx, MRUy, Tmax_rain_sta, Solradelev,
      +    Tmin_rain_sta, Temp_nuse, Tmin_add, Tmin_div, Tmax_add,
      +    Tmax_div, Temp_nsta, X_div, Y_div, Z_div, X_add, Y_add, Z_add,
      +    Temp_STAx, Temp_STAy, Basin_centroid_y, Basin_centroid_x,
      +    MAXLAPSE, Pstaelev, Pstax, Pstay, MRUelev, Temp_STAelev
       USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_area, Active_hrus,
-     +    Hru_route_order, Hru_type, Hru_elev_meters
+     +    Hru_route_order, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp,
      +    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf,
      +    Tavgc, Tmin_aspect_adjust, Tmax_aspect_adjust

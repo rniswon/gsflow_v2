@@ -243,10 +243,9 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, DNEARZERO
       use PRMS_READ_PARAM_FILE, only: getparam_int
       USE PRMS_MODULE, ONLY: Nsub, Nhru, Print_debug, GSFLOW_flag, &
-     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag
+     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag, Hru_type
       USE PRMS_SUBBASIN
-      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
-     &    Hru_type, Hru_frac_perv, Lake_hru_id
+      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, Hru_frac_perv, Lake_hru_id
       USE PRMS_FLOWVARS, ONLY: Ssres_stor, Soil_moist, Pkwater_equiv, Gwres_stor, Sroff, Ssres_flow, Lake_vol
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Cfs2inches
       USE PRMS_INTCP, ONLY: Hru_intcpstor
@@ -439,10 +438,9 @@
 !***********************************************************************
       INTEGER FUNCTION subrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, CASCADE_OFF
-      USE PRMS_MODULE, ONLY: Nsub, GSFLOW_flag, Dprst_flag, Lake_route_flag, Cascade_flag
+      USE PRMS_MODULE, ONLY: Nsub, GSFLOW_flag, Dprst_flag, Lake_route_flag, Cascade_flag, Hru_type
       USE PRMS_SUBBASIN
-      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
-     &    Hru_type, Hru_frac_perv, Lake_hru_id
+      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, Hru_frac_perv, Lake_hru_id
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Cfs2inches
       USE PRMS_SNOW, ONLY: Snowcov_area, Snowmelt
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Swrad, Potet, Tminc, Tmaxc, Tavgc, Hru_rain, Hru_snow

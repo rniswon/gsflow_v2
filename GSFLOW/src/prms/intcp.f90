@@ -288,9 +288,9 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, NEARZERO, DNEARZERO, &
      &    DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
       USE PRMS_MODULE, ONLY: Print_debug, PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Nowday, &
-     &    Ag_package, Hru_ag_irr, AG_flag
+     &    Ag_package, Hru_ag_irr, AG_flag, Hru_type
       USE PRMS_INTCP
-      USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_type, Covden_win, Covden_sum, &
+      USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Covden_win, Covden_sum, &
      &    Hru_route_order, Hru_area, Cov_type, Ag_frac !, Ag_area, Ag_cov_type
       USE PRMS_WATER_USE, ONLY: Canopy_gain ! need to add ag apply ???
 ! Newsnow and Pptmix can be modfied, WARNING!!!

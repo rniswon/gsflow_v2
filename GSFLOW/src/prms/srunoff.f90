@@ -640,11 +640,11 @@
       INTEGER FUNCTION srunoffrun()
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF, DEBUG_WB, LAND, LAKE, GLACIER, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Call_cascade, &
-     &    Frozen_flag, Glacier_flag, PRMS_land_iteration_flag, Kkiter, AG_flag
+     &    Frozen_flag, Glacier_flag, PRMS_land_iteration_flag, Kkiter, AG_flag, Hru_type
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, &
      &    Hru_perv, Hru_imperv, Hru_percent_imperv, Hru_frac_perv, &
-     &    Dprst_area_max, Hru_area, Hru_type, Basin_area_inv, &
+     &    Dprst_area_max, Hru_area, Basin_area_inv, &
      &    Dprst_area_clos_max, Dprst_area_open_max, Hru_area_dble, Ag_area
       USE PRMS_CLIMATEVARS, ONLY: Potet, Tavgc
       USE PRMS_FLOWVARS, ONLY: Sroff, Infil, Imperv_stor, Pkwater_equiv, Dprst_vol_open, Dprst_vol_clos, &

@@ -555,9 +555,8 @@ contains
 !***********************************************************************
   module function getparam_real_1d(Modname, Paramname, Numvalues, Values) result(res)
     use prms_constants, only: ERROR_param
-    use PRMS_MODULE, only: Parameter_check_flag
+    use PRMS_MODULE, only: Parameter_check_flag, Hru_type
     use prms_utils, only: error_stop
-    use PRMS_BASIN, only: Hru_type
     implicit none
       ! Arguments
       integer :: res  ! Function result

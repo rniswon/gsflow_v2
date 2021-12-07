@@ -26,7 +26,7 @@
       DOUBLE PRECISION, SAVE :: Basin_gl_cfs, Basin_gl_ice_cfs, Basin_ag
 !   Declared Parameters
       INTEGER, SAVE :: Elev_units
-      INTEGER, SAVE, ALLOCATABLE :: Hru_type(:), Cov_type(:), Ag_cov_type(:)
+      INTEGER, SAVE, ALLOCATABLE :: Cov_type(:), Ag_cov_type(:)
       INTEGER, SAVE, ALLOCATABLE :: Lake_hru_id(:), Lake_type(:) !not needed if no lakes
       REAL, SAVE, ALLOCATABLE :: Hru_area(:), Hru_percent_imperv(:), Hru_elev(:), Hru_lat(:)
       REAL, SAVE, ALLOCATABLE :: Covden_sum(:,:), Covden_win(:,:)
@@ -57,7 +57,7 @@
 !***********************************************************************
 !     basdecl - set up parameters
 !   Declared Parameters
-!     print_debug, hru_area, hru_percent_imperv, hru_type, hru_elev,
+!     print_debug, hru_area, hru_percent_imperv, hru_elev,
 !     cov_type, hru_lat, dprst_frac_open, dprst_frac, basin_area
 !     lake_hru_id, ag_frac, ag_cov_type
 !***********************************************************************
@@ -229,13 +229,6 @@
      &       'none')/=0 ) CALL read_error(1, 'ag_cov_type')
       ENDIF
 
-      ALLOCATE ( Hru_type(Nhru) )
-      Hru_type = 0
-      IF ( declparam(MODNAME, 'hru_type', 'nhru', 'integer', &
-     &     '1', '0', '4', &
-     &     'HRU type', 'Type of each HRU (0=inactive; 1=land; 2=lake; 3=swale; 4=glacier)', &
-     &     'none')/=0 ) CALL read_error(1, 'hru_type')
-
       ALLOCATE ( Cov_type(Nhru) )
       IF ( declparam(MODNAME, 'cov_type', 'nhru', 'integer', &
      &     '3', '0', '4', &
@@ -294,7 +287,7 @@
      &    NORTHERN, SOUTHERN, FEET2METERS, METERS2FEET, DNEARZERO, MONTHS_PER_YEAR, &
      &    ide_dist_module, potet_pt_module, potet_pm_module, potet_pm_sta_module
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, &
+      USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, &
      &    Dprst_flag, Lake_route_flag, Et_flag, Precip_flag, Cascadegw_flag, &
      &    Stream_temp_flag, PRMS4_flag, GSFLOW_flag, Glacier_flag, Frozen_flag, PRMS_VERSION, &
      &    Starttime, Endtime, Parameter_check_flag, AG_flag
@@ -310,7 +303,6 @@
 !**********************************************************************
       basinit = 0
 
-      IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
       IF ( getparam_real(MODNAME, 'hru_area', Nhru, Hru_area)/=0 ) CALL read_error(2, 'hru_area')
       IF ( getparam_real(MODNAME, 'hru_elev', Nhru, Hru_elev)/=0 ) CALL read_error(2, 'hru_elev')
       Hru_elev_ts = Hru_elev

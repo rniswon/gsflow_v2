@@ -904,13 +904,13 @@
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nevap, Nlake, Ntemp, Nrain, Nsol, &
      &    Print_debug, Init_vars_from_file, Temp_flag, Precip_flag, &
-     &    Temp_module, Stream_order_flag, GSFLOW_flag, &
+     &    Temp_module, Stream_order_flag, GSFLOW_flag, Hru_type, &
      &    Precip_module, Solrad_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Et_flag, Dprst_flag, Solrad_flag, &
      &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, AG_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
-      USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_type, Hru_perv
+      USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv
       use prms_utils, only: c_to_f, checkdim_bounded_limits, checkdim_param_limits, f_to_c, read_error
       IMPLICIT NONE
 ! Local variables

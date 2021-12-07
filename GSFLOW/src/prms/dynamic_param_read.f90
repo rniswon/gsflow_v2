@@ -444,12 +444,12 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dynamic, INACTIVE, LAKE, &
      &    potet_jh_module, potet_pan_module, potet_hamon_module, potet_hs_module, &
      &    potet_pt_module, potet_pm_module, climate_hru_module
-      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, AG_flag, &
+      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, AG_flag, Hru_type, &
      &    Dyn_imperv_flag, Dyn_covtype_flag, Dyn_potet_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &    Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dprst_flag, &
      &    Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag, Dyn_ag_frac_flag
       USE PRMS_DYNAMIC_PARAM_READ
-      USE PRMS_BASIN, ONLY: Hru_type, Hru_area, Dprst_clos_flag, &
+      USE PRMS_BASIN, ONLY: Hru_area, Dprst_clos_flag, &
      &    Hru_percent_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Dprst_frac, Dprst_open_flag, &
      &    Dprst_area_max, Dprst_area_open_max, Dprst_area_clos_max, Dprst_frac_open, &
      &    Cov_type, Basin_area_inv, Covden_win, Covden_sum, Ag_area, Ag_frac
@@ -1028,8 +1028,7 @@
 !***********************************************************************
       SUBROUTINE write_dynoutput(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
-      USE PRMS_BASIN, ONLY: Hru_type
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday, Hru_type
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -1065,8 +1064,7 @@
 !***********************************************************************
       SUBROUTINE write_dynparam_int(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
-      USE PRMS_BASIN, ONLY: Hru_type
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday, Hru_type
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -1102,8 +1100,7 @@
 !***********************************************************************
       SUBROUTINE write_dynparam(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
-      USE PRMS_BASIN, ONLY: Hru_type
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday, Hru_type
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -1138,8 +1135,7 @@
 !     Values are read in, Parm are are updated or old
 !***********************************************************************
 !      SUBROUTINE write_dynparam_dble(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
-!      USE PRMS_MODULE, ONLY: Print_debug, Nhru, Nowyear, Nowmonth, Nowday
-!      USE PRMS_BASIN, ONLY: Hru_type
+!      USE PRMS_MODULE, ONLY: Print_debug, Nhru, Nowyear, Nowmonth, Nowday, Hru_type
 !      IMPLICIT NONE
 ! Arguments
 !      INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -1177,8 +1173,7 @@
 !***********************************************************************
       SUBROUTINE write_dynparam_potet(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
-      USE PRMS_BASIN, ONLY: Hru_type
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday, Hru_type
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim

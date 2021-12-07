@@ -606,11 +606,11 @@
       INTEGER FUNCTION szinit()
       USE PRMS_CONSTANTS, ONLY: ERROR_dim, ACTIVE, OFF, LAKE, SWALE, INACTIVE, GLACIER, CASCADE_OFF, MONTHS_PER_YEAR
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Nssr, Nlake, Nhrucell, Dprst_flag, &
+      USE PRMS_MODULE, ONLY: Nhru, Nssr, Nlake, Nhrucell, Dprst_flag, Hru_type, &
      &    Init_vars_from_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag, &
      &    PRMS_land_iteration_flag
       USE PRMS_SOILZONE
-      USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Active_hrus, Hru_route_order, Hru_storage, &
+      USE PRMS_BASIN, ONLY: Hru_perv, Active_hrus, Hru_route_order, Hru_storage, &
      &    Basin_area_inv, Hru_area, Hru_frac_perv, Numlake_hrus
       USE PRMS_FLOWVARS, ONLY: Soil_moist_max, Soil_rechr_max, &
      &    Ssres_stor, Basin_ssstor, Basin_soil_moist, Slow_stor, &
@@ -866,9 +866,9 @@
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Nowmonth !, Nowyear, Nowday
+     &    Soilzone_aet_flag, Hru_type, Nowmonth !, Nowyear, Nowday
       USE PRMS_SOILZONE
-      USE PRMS_BASIN, ONLY: Hru_type, Hru_perv, Hru_frac_perv, Hru_storage, &
+      USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
      &    Lake_hru_id, Cov_type, Numlake_hrus, Hru_area_dble
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Transp_on, Potet, Basin_potet
@@ -1212,7 +1212,7 @@
         Potet_rechr(i) = 0.0
         Potet_lower(i) = 0.0
         pervactet = 0.0
-        IF ( Soil_moist(i)>0.0 .AND. cfgi_frozen_hru==OFF ) THEN
+        IF ( Soil_moist(i)>0.0 .AND. cfgi_frozen_hru==OFF .AND. avail_potet>0.0 ) THEN
           CALL compute_szactet(Soil_moist_max(i), Soil_rechr_max(i), Transp_on(i), Cov_type(i), &
      &                         Soil_type(i), Soil_moist(i), Soil_rechr(i), pervactet, avail_potet, &
      &                         Snow_free(i), Potet_rechr(i), Potet_lower(i), &

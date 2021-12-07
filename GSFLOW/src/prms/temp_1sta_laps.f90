@@ -36,9 +36,9 @@
      &    MINTEMP, MAXTEMP, NEARZERO, temp_1sta_module, temp_laps_module, READ_INIT, SAVE_INIT
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Ntemp, Model, Print_debug, Init_vars_from_file, Save_vars_to_file, &
-     &    Temp_flag, Inputerror_flag, Start_month, Glacier_flag, Nowmonth, Nowday
+     &    Temp_flag, Inputerror_flag, Start_month, Glacier_flag, Nowmonth, Nowday, Hru_type
       USE PRMS_TEMP_1STA_LAPS
-      USE PRMS_BASIN, ONLY: Hru_elev_ts, Hru_area, Active_hrus, Hru_route_order, Basin_area_inv, Hru_type
+      USE PRMS_BASIN, ONLY: Hru_elev_ts, Hru_area, Active_hrus, Hru_route_order, Basin_area_inv
       USE PRMS_CLIMATEVARS, ONLY: Tmax_aspect_adjust, Tmin_aspect_adjust, Tsta_elev, &
      &    Hru_tsta, Solrad_tmax, Solrad_tmin, Basin_temp, Basin_tmax, &
      &    Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, Tavgc, Basin_tsta, Tmax_allrain
