@@ -112,6 +112,13 @@
         Num_variables = 0
         ALLOCATE ( Variable_data(MAXVARIABLES) ) ! don't know how many, need to read var_name file
 
+        ALLOCATE ( Hru_type(Nhru) )
+        Hru_type = 0
+        IF ( declparam(MODNAME, 'hru_type', 'nhru', 'integer', &
+     &       '1', '0', '4', &
+     &       'HRU type', 'Type of each HRU (0=inactive; 1=land; 2=lake; 3=swale; 4=glacier)', &
+     &       'none')/=0 ) CALL read_error(1, 'hru_type')
+
         IF ( GSFLOW_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           CALL declvar_int(MODNAME, 'KKITER', 'one', 1, &
      &         'Current iteration in GSFLOW simulation', 'none', KKITER)
@@ -155,6 +162,8 @@
 
       ELSEIF ( Process(:4)=='init' ) THEN
         Process_flag = INIT
+
+        IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
 
         Grid_flag = OFF
         IF ( Nhru==Nhrucell ) Grid_flag = ACTIVE
