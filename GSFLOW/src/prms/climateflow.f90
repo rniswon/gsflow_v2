@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2021-11-19'
+      character(len=*), parameter :: Version_climateflow = '2021-12-07'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -59,6 +59,8 @@
 !***********************************************************************
       MODULE PRMS_FLOWVARS
       IMPLICIT NONE
+      REAL, SAVE, ALLOCATABLE :: Soil_moist_ante(:), Soil_rechr_ante(:)
+      REAL, SAVE, ALLOCATABLE :: Slow_stor_ante(:), Pref_flow_stor_ante(:), Ssres_stor_ante(:)
 !   Declared Variables
       ! snow
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pkwater_equiv(:)
@@ -336,6 +338,9 @@
       ENDIF
 
 ! Soilzone variables
+      ALLOCATE ( Soil_moist_ante(Nhru), Soil_rechr_ante(Nhru) )
+      ALLOCATE ( Slow_stor_ante(Nhru), Pref_flow_stor_ante(Nhru), Ssres_stor_ante(Nhru) )
+
       ALLOCATE ( Soil_rechr(Nhru) )
       CALL declvar_real(Soilzone_module, 'soil_rechr', 'nhru', Nhru, &
      &     'Storage for recharge zone (upper portion) of the'// &
