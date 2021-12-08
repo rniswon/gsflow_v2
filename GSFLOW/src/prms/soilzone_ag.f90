@@ -392,19 +392,19 @@
         Soil_rechr_ante = Soil_rechr
         Ssres_stor_ante = Ssres_stor
         Slow_stor_ante = Slow_stor
+        IF ( GSFLOW_flag==ACTIVE ) THEN
+          IF ( Nlake>0 ) It0_potet = Potet
+          It0_gravity_stor_res = Gravity_stor_res
+          Gw2sm_grav = 0.0
+        ENDIF
         IF ( Pref_flag==ACTIVE ) Pref_flow_stor_ante = Pref_flow_stor
+        Last_soil_moist = Basin_soil_moist
+        Last_ssstor = Basin_ssstor
         IF ( (GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet==ACTIVE ) THEN
           ! computed in srunoff
           It0_sroff = Sroff
           IF ( Call_cascade==ACTIVE ) It0_strm_seg_in = Strm_seg_in
         ENDIF
-        IF ( GSFLOW_flag==ACTIVE ) THEN
-          Gravity_stor_res = It0_gravity_stor_res
-          IF ( Nlake>0 ) It0_potet = Potet
-          Gw2sm_grav = 0.0
-        ENDIF
-        Last_soil_moist = Basin_soil_moist
-        Last_ssstor = Basin_ssstor
       ENDIF
 
       IF ( Iter_aet==ACTIVE ) THEN
@@ -426,12 +426,10 @@
         Soil_rechr = Soil_rechr_ante
         Ssres_stor = Ssres_stor_ante
         Slow_stor = Slow_stor_ante
+        Gravity_stor_res = It0_gravity_stor_res
         IF ( Pref_flag==ACTIVE ) Pref_flow_stor = Pref_flow_stor_ante
         IF ( Nlake>0 ) Potet = It0_potet
-        IF ( GSFLOW_flag==ACTIVE ) THEN
-          Gravity_stor_res = It0_gravity_stor_res
-          Gw2sm_grav = 0.0
-        ENDIF
+        IF ( GSFLOW_flag==ACTIVE ) Gravity_stor_res = It0_gravity_stor_res
         IF ( Kkiter>1 ) THEN
           IF ( (GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet==ACTIVE ) THEN
             ! states saved in srunoff when PRMS_land_iteration_flag = ACTIVE
