@@ -362,8 +362,8 @@
       Basin_lake_seep = 0.0D0
 ! do only once, so restart uses saved values
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
-        Gw_upslope = 0.0D0
-        Hru_gw_cascadeflow = 0.0
+!        Gw_upslope = 0.0D0
+!        Hru_gw_cascadeflow = 0.0
         IF ( Nlake>0 ) Lakein_gwflow = 0.0D0
       ENDIF
       Gwres_flow = 0.0
@@ -406,6 +406,7 @@
 
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         Gw_upslope = 0.0D0
+        Hru_gw_cascadeflow = 0.0
         Basin_dnflow = 0.0D0
         Basin_gw_upslope = 0.0D0
         IF ( Nlake>0 ) Lakein_gwflow = 0.0D0

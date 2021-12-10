@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-12-07'
+      character(len=*), parameter :: Version_soilzone = '2021-12-09'
       INTEGER, SAVE :: DBGUNT, Iter_aet
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -117,7 +117,7 @@
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getdim
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Nhrucell, Print_debug, &
-     &    Cascade_flag, GSFLOW_flag, Call_cascade, PRMS_land_iteration_flag, AG_flag, iter_aet_flag
+     &    Cascade_flag, GSFLOW_flag, Call_cascade, PRMS_land_iteration_flag, AG_flag, Iter_aet_flag
       USE PRMS_SOILZONE
       use prms_utils, only: error_stop, print_module, PRMS_open_module_file, read_error
       IMPLICIT NONE
@@ -783,11 +783,11 @@
       Perv_actet = 0.0
 !      Perv_avail_et = 0.0
       Recharge = 0.0
-      Cap_waterin = 0.0
+      !Cap_waterin = 0.0
       Potet_lower = 0.0
       Potet_rechr = 0.0
       Unused_potet = 0.0 ! dimension nhru
-      Soil_saturated = OFF
+      !Soil_saturated = OFF
 !      Interflow_max = 0.0
 !      Snowevap_aet_frac = 0.0
 

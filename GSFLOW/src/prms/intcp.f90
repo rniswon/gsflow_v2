@@ -8,7 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-11-19'
+      character(len=*), parameter :: Version_intcp = '2021-12-09'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -267,11 +267,11 @@
         Hru_intcpstor = 0.0
         Basin_intcp_stor = 0.0D0
       ENDIF
-      Basin_changeover = 0.0D0
-      Basin_net_ppt = 0.0D0
-      Basin_net_snow = 0.0D0
-      Basin_net_rain = 0.0D0
-      Basin_intcp_evap = 0.0D0
+      !Basin_changeover = 0.0D0
+      !Basin_net_ppt = 0.0D0
+      !Basin_net_snow = 0.0D0
+      !Basin_net_rain = 0.0D0
+      !Basin_intcp_evap = 0.0D0
       Basin_net_apply = 0.0D0
       Basin_hru_apply = 0.0D0
       IF ( Print_debug==DEBUG_WB ) ALLOCATE ( Intcp_stor_ante(Nhru) )
@@ -491,7 +491,7 @@
 ! irr_type = 0 or 3 are the same in terms of application rate
 ! gain_inches_hru is water applied to whole HRU, gain_inches is water added to canopy
 
-        IF ( Use_transfer_intcp==ACTIVE .OR. Canopy_irrigation_flag==ACTIVE ) THEN ! Ag_package active for GSFLOW_AG or PRMS_AG
+        IF ( Use_transfer_intcp==ACTIVE .OR. Canopy_irrigation_flag==ACTIVE ) THEN
           IF ( Ag_package==ACTIVE ) THEN
             IF ( Hru_ag_irr(i)>0.0 .AND. AG_flag==ACTIVE ) THEN
               IF ( .NOT.(Ag_frac(i)>0.0) ) THEN

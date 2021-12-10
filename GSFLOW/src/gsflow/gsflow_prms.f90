@@ -642,24 +642,14 @@
       IF ( control_string(Model_mode, 'model_mode')/=0 ) CALL read_error(5, 'model_mode')
       IF ( Model_mode(:4)=='    ' ) Model_mode = 'GSFLOW5'
       PRMS4_flag = ACTIVE
-      IF ( Model_mode(:5)=='PRMS5' .OR. Model_mode(:7)=='PRMS_AG' .OR. &
-     &     Model_mode(:7)=='GSFLOW5' .OR. Model_mode(:9)=='GSFLOW_AG' ) PRMS4_flag = OFF
+      IF ( Model_mode(:5)=='PRMS5' .OR. Model_mode(:7)=='GSFLOW5' ) PRMS4_flag = OFF
       PRMS_flag = ACTIVE
       GSFLOW_flag = OFF
       PRMS_only = OFF
-      AG_flag = OFF
-      IF ( Model_mode(:9)=='GSFLOW_AG' .OR. Model_mode(:9)=='gsflow_ag' .OR. Model_mode(:7)=='PRMS_AG' &
-     &     .OR. Model_mode(:7)=='prms_ag' ) AG_flag = ACTIVE
-      ! Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 3=GSFLOW_AG; 4=PRMS_AG)
-      IF ( Model_mode(:7)=='PRMS_AG' .OR. Model_mode(:7)=='prms_ag' ) THEN
-        Model = PRMS_AG
-        PRMS_only = ACTIVE
-      ELSEIF ( Model_mode(:4)=='PRMS' .OR. Model_mode(:4)=='prms' .OR. Model_mode(:5)=='DAILY' ) THEN
+      ! Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
+      IF ( Model_mode(:4)=='PRMS' .OR. Model_mode(:4)=='prms' .OR. Model_mode(:5)=='DAILY' ) THEN
         Model = PRMS
         PRMS_only = ACTIVE
-      ELSEIF ( Model_mode(:9)=='GSFLOW_AG' .OR. Model_mode(:9)=='gsflow_ag' ) THEN
-        Model = GSFLOW_AG
-        GSFLOW_flag = ACTIVE
       ELSEIF ( Model_mode(:6)=='GSFLOW' .OR. Model_mode(:4)=='gsflow' ) THEN
         Model = GSFLOW
         GSFLOW_flag = ACTIVE
@@ -797,6 +787,8 @@
       IF ( control_string(Solrad_module, 'solrad_module')/=0 ) CALL read_error(5, 'solrad_module')
       Soilzone_module = 'soilzone'
       IF ( control_string(Soilzone_module, 'soilzone_module')/=0 ) CALL read_error(5, 'soilzone_module')
+      AG_flag = OFF
+      IF ( Soilzone_module=='soilzone_ag' ) AG_flag = ACTIVE
       Strmflow_module = 'strmflow'
       IF ( control_string(Strmflow_module, 'strmflow_module')/=0 ) CALL read_error(5, 'strmflow_module')
       IF ( control_string(irrigated_area_module, 'irrigated_area_module')/=0 ) CALL read_error(5, 'irrigated_area_module')
