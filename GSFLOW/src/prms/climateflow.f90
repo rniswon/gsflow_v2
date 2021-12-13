@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2021-12-09'
+      character(len=*), parameter :: Version_climateflow = '2021-12-10'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -1192,6 +1192,45 @@
             Ssres_stor(i) = Sat_threshold(i)
           ENDIF
         ENDIF
+
+        IF ( AG_flag==ACTIVE ) THEN
+        IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
+          IF ( Parameter_check_flag>0 ) THEN
+            PRINT 9022, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
+            ierr = 1
+          ELSE
+            IF ( Print_debug>DEBUG_less ) PRINT 9032, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
+            Ag_soil_rechr_max(i) = Ag_soil_moist_max(i)
+          ENDIF
+        ENDIF
+        IF ( Ag_soil_rechr(i)>Ag_soil_rechr_max(i) ) THEN
+          IF ( Parameter_check_flag>0 ) THEN
+            PRINT 9023, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
+            ierr = 1
+          ELSE
+            IF ( Print_debug>DEBUG_less ) PRINT 9033, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
+            Ag_soil_rechr(i) = Ag_soil_rechr_max(i)
+          ENDIF
+        ENDIF
+        IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) THEN
+          IF ( Parameter_check_flag>0 ) THEN
+            PRINT 9024, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
+            ierr = 1
+          ELSE
+            IF ( Print_debug>DEBUG_less ) PRINT 9034, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
+            Ag_soil_moist(i) = Ag_soil_moist_max(i)
+          ENDIF
+        ENDIF
+        IF ( Ag_soil_rechr(i)>Ag_soil_moist(i) ) THEN
+          IF ( Parameter_check_flag>0 ) THEN
+            PRINT 9025, i, Ag_soil_rechr(i), Ag_soil_moist(i)
+            ierr = 1
+          ELSE
+            IF ( Print_debug>DEBUG_less ) PRINT 9035, i, Ag_soil_rechr(i), Ag_soil_moist(i)
+            Ag_soil_rechr(i) = Ag_soil_moist(i)
+          ENDIF
+        ENDIF
+        ENDIF
       ENDDO
 
       IF ( ierr>0 ) STOP ERROR_PARAM
@@ -1307,7 +1346,11 @@
  9002 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max > soil_moist_max', 2F10.5)
  9003 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_init > soil_rechr_max', 2F10.5)
  9004 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_init > soil_moist_max', 2F10.5)
- 9005 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr > soil_moist based on init and max values', 2F10.5)
+ 9005  FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr > soil_moist based on init and max values', 2F10.5)
+ 9022 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_max > ag_soil_moist_max', 2F10.5)
+ 9023 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max', 2F10.5)
+ 9024 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max', 2F10.5)
+ 9025 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr > ag_soil_moist based on init and max values', 2F10.5)
 ! 9006 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_max < 0.00001', F10.5)
 ! 9007 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max < 0.00001', F10.5)
 ! 9008 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_moist_max < 0.00001, set to 0.00001')
@@ -1320,7 +1363,14 @@
      &        'soil_moist set to soil_moist_max')
  9015 FORMAT ('WARNING, HRU: ', I0, ' soil_rechr_init > soil_moist_init,', 2F10.5, /, 9X, &
      &        'soil_rechr set to soil_moist based on init and max values')
-
+ 9032 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_max > ag_soil_moist_max,', 2F10.5, /, 9X, &
+     &        'ag_soil_rechr_max set to ag_soil_moist_max')
+ 9033 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max,', 2F10.5, /, 9X, &
+     &        'ag_soil_rechr set to ag_soil_rechr_max')
+ 9034 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max,', 2F10.5, /, 9X, &
+     &        'ag_soil_moist set to ag_soil_moist_max')
+ 9035 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_moist_init,', 2F10.5, /, 9X, &
+     &        'ag_soil_rechr set to ag_soil_moist based on init and max values')
       END FUNCTION climateflow_init
 
 !***********************************************************************

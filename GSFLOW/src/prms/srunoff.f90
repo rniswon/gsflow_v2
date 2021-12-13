@@ -518,7 +518,6 @@
      &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, Frozen_flag !, Parameter_check_flag
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
-      USE PRMS_FLOWVARS, ONLY: Basin_sroff
       use prms_utils, only: read_error
       IMPLICIT NONE
 ! Local Variables
