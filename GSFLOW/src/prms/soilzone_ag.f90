@@ -476,13 +476,14 @@
       Cap_waterin = 0.0
       Soil_saturated = OFF
       update_potet = OFF
+      unsatisfied_big = 0.0
       IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
-      add_estimated_irrigation = ACTIVE
+      add_estimated_irrigation = OFF
       num_hrus_ag_iter = 0
       IF ( Ag_package==ACTIVE ) Ag_soil_saturated = OFF
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
-!        if ( ag_irrigation_add(i)>0.0) print *, 'ag add', i, ag_irrigation_add(i), Ag_soil_moist(i)
+!        if ( ag_irrigation_add(i)>0.0) print *, 'ag add', i, ag_irrigation_add(i), Ag_soil_moist(i), soil_iter
         HRU_id = i
 !        if (i==5) write(531,*) 'a', Ag_soil_moist(i), It0_ag_soil_moist(i), ag_soil_rechr(i), iter_aet, Soil_iter, Infil_ag(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i)
 
@@ -1083,16 +1084,12 @@
             !agriculture_external(i)
             !IF ( Unused_potet(i)>0.0 ) THEN
             IF ( unsatisfied_et>soilzone_aet_converge ) THEN
-!              IF ( Transp_on(i)==ACTIVE ) THEN
-                IF ( Ag_soilwater_deficit(i)>Ag_soilwater_deficit_min(i) ) Ag_irrigation_add(i) = Ag_irrigation_add(i) + unsatisfied_et
-                keep_iterating = ACTIVE
-                add_estimated_irrigation = ACTIVE
-                num_hrus_ag_iter = num_hrus_ag_iter + 1
-                IF ( unsatisfied_et>unsatisfied_big ) unsatisfied_big = unsatisfied_et
-!              ENDIF
+              IF ( Ag_soilwater_deficit(i)>Ag_soilwater_deficit_min(i) ) Ag_irrigation_add(i) = Ag_irrigation_add(i) + unsatisfied_et
+              keep_iterating = ACTIVE
+              add_estimated_irrigation = ACTIVE
+              num_hrus_ag_iter = num_hrus_ag_iter + 1
+              IF ( unsatisfied_et>unsatisfied_big ) unsatisfied_big = unsatisfied_et
             ENDIF
-          ELSE
-!print *, i, AET_external(i), Ag_actet(i), unsatisfied_et, Ag_irrigation_add(i)
           ENDIF
         ENDIF
         Basin_actet = Basin_actet + DBLE( Hru_actet(i)*harea )
@@ -1105,13 +1102,16 @@
 
       Soil_iter = Soil_iter + 1
       IF ( Iter_aet_flag==OFF .OR. Basin_transp_on==OFF ) keep_iterating = OFF
-      IF ( Soil_iter>max_soilzone_ag_iter .OR. .NOT.(Basin_agwaterin>0.0) ) keep_iterating = OFF
+      IF ( Soil_iter>max_soilzone_ag_iter .OR. add_estimated_irrigation==OFF ) then
+!                  print *, Soil_iter,max_soilzone_ag_iter,Basin_agwaterin,unsatisfied_big
+        keep_iterating = OFF
+      endif
 !      if (ag_actet(i)>potet(i)) print *, 'ag_actet>potet', ag_actet(i), potet(i)
 !      if (unused_potet(i)<0.00) print *, 'unused', unused_potet(i), potet(i)
 !      if ( hru_actet(i)>potet(i)) print *, 'hru_actet', hru_actet(i), potet(i)
       ENDDO ! end iteration while loop
 !      print *, Ag_irrigation_add(51), soil_iter, nowyear, nowmonth, nowday, ag_soil_moist(i), ag_soil_rechr(i), transp_on(i), ag_actet(i), add_estimated_irrigation, Basin_agwaterin, basin_transp_on
-!      write (531,*) Ag_irrigation_add(51), soil_iter, ag_soil_moist(51)
+!      write (531,*) Ag_irrigation_add(51), soil_iter, ag_soil_moist(51),Ag_irrigation_add(5), ag_soil_moist(5),Basin_agwaterin
       Soil_iter = Soil_iter - 1
       IF ( Iter_aet_flag==ACTIVE ) THEN
         Ag_irrigation_add_vol = Ag_irrigation_add*Ag_area
