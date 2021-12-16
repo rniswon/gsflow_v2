@@ -5,7 +5,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2021-12-09'
+      character(len=*), parameter :: Version_gsflow_budget = '2021-12-15'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -226,7 +226,6 @@
         Total_pump = 0.0D0
         Total_pump_cfs = 0.0D0
       ENDIF
-
       Actet_tot_gwsz = 0.0 ! dimension nhru
 
 !  Set the volume budget indicies to -1 anytime "init" is called.
@@ -280,10 +279,10 @@
       area_fac = Cfs_conv*Active_area
       Basin_ssflow_cfs = Basin_ssflow*area_fac
       Basin_sroff_cfs = Basin_sroff*area_fac
-	  Gw2sm = 0.0 ! dimension nhru
-	  Actet_gw = 0.0 ! dimension nhru
+      Gw2sm = 0.0 ! dimension nhru
+      Actet_gw = 0.0 ! dimension nhru
       Gw_rejected = 0.0 ! dimension nhru
-	  Slow_stor = 0.0
+      Slow_stor = 0.0
       Fluxchange = 0.0
 !      Uzf_infil_map = 0.0 ! dimension nhru
 !      Sat_recharge = 0.0 ! dimension nhru
