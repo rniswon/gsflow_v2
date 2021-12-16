@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2021-12-14'
+      character(len=*), parameter :: Version_soilzone_ag = '2021-12-16'
       INTEGER, SAVE :: Soil_iter !, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr
@@ -244,7 +244,7 @@
       INTEGER FUNCTION szinit_ag()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, LAKE, GLACIER, INACTIVE, OFF, MONTHS_PER_YEAR
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Ag_package, Init_vars_from_file, Nhru, Agriculture_soilzone_flag, Hru_type, Iter_aet_flag
+      USE PRMS_MODULE, ONLY: Ag_package, Init_vars_from_file, Nhru, Agriculture_soilzone_flag, Hru_type
       USE PRMS_SOILZONE, ONLY: MODNAME, Soil2gw_max
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Basin_area_inv, Ag_area, Covden_win, Covden_sum
@@ -283,10 +283,6 @@
       Ag_dunnian = 0.0
       Ag_hortonian = 0.0
       Ag_soil2gvr = 0.0
-      IF ( Iter_aet_flag==ACTIVE ) THEN
-        Unused_ag_et = 0.0
-        Ag_soilwater_deficit = 0.0
-      ENDIF
       Ag_soil_lower_stor_max = 0.0
       Ag_potet_lower = 0.0
       Ag_potet_rechr = 0.0
@@ -372,7 +368,7 @@
       INTEGER :: i, k, update_potet, compute_lateral, perv_on_flag
       REAL :: dunnianflw, interflow, perv_area, harea
       REAL :: dnslowflow, dnpreflow, dndunn, availh2o, avail_potet, hruactet, ag_hruactet
-      REAL :: gvr_maxin, topfr !, depth !, tmp
+      REAL :: gvr_maxin, topfr !, depth, tmp
       REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin
       REAL :: perv_frac, capacity, capwater_maxin, ssresin
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
@@ -393,7 +389,8 @@
         IF ( GSFLOW_flag==ACTIVE ) THEN
           IF ( Nlake>0 ) It0_potet = Potet
           It0_gravity_stor_res = Gravity_stor_res
-          Gw2sm_grav = 0.0
+          Gw2sm_grav = 0.0 ! dimension nhrucell
+          Grav_gwin = 0.0 ! dimension nhru
         ENDIF
         IF ( Pref_flag==ACTIVE ) Pref_flow_stor_ante = Pref_flow_stor
         Last_soil_moist = Basin_soil_moist
@@ -407,7 +404,6 @@
 
       IF ( Iter_aet_flag==ACTIVE ) THEN
         Ag_irrigation_add = 0.0
-        Ag_irrigation_add_vol = 0.0
         It0_ag_soil_moist = Ag_soil_moist
         It0_ag_soil_rechr = Ag_soil_rechr
         Ag_gvr2sm = 0.0
@@ -730,8 +726,9 @@
           IF ( ag_on_flag==ACTIVE ) THEN
             IF ( Ag_gvr2sm(i)>0.0 ) THEN
               Ag_soil_moist(i) = Ag_soil_moist(i) + Ag_gvr2sm(i)/agfrac
-              IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) &
-     &             PRINT *, 'AG sm>max', Ag_soil_moist(i), Ag_soil_moist_max(i), i
+!              IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) then
+!                  PRINT *, 'AG sm>max', Ag_soil_moist(i), Ag_soil_moist_max(i), i, Ag_gvr2sm(i)/agfrac, Ag_gvr2sm(i),agfrac
+!     endif
               IF ( Soilzone_aet_flag==ACTIVE ) THEN
                 Ag_soil_lower(i) = MIN( Ag_soil_lower_stor_max(i), Ag_soil_moist(i) - Ag_soil_rechr(i) + Ag_gvr2sm(i)/agfrac )
                 Ag_soil_rechr(i) = Ag_soil_moist(i) - Ag_soil_lower(i)
@@ -1135,8 +1132,14 @@
         ENDDO
         Basin_potet = Basin_potet*Basin_area_inv
       ENDIF
+      !write(555,*) ag_irrigation_add(4), ag_irrigation_add(5), ag_irrigation_add(7), ag_irrigation_add(32), '  ag_irrigation_add'
+      !write(555,*) ag_actet(4), ag_actet(5), ag_actet(7), ag_actet(32), '  ag_actet'
+      !write(555,*) AET_external(4), AET_external(5), AET_external(7), AET_external(32), '  AET_external'
+      !write(555,*) hru_actet(4), hru_actet(5), hru_actet(7), hru_actet(32), '  hru_actet'
+      !write(555,*) nowyear, nowmonth, nowday, soil_iter
 
       END FUNCTION szrun_ag
+
 !***********************************************************************
 !     compute interflow and flow to groundwater reservoir
 !***********************************************************************
