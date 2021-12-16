@@ -289,7 +289,6 @@
       Basin_ag_soil_moist = 0.0D0
       Basin_ag_soil_rechr = 0.0D0
       Ag_replenish_frac = 0.0
-      Ag_gvr2sm = 0.0
       DO ihru = 1, Nhru
         ! make sure LAKE, INACTIVE, GLACIER have agriculture values of 0
         IF ( Hru_type(ihru)==LAKE .OR. Hru_type(ihru)==INACTIVE .OR. Hru_type(ihru)==GLACIER ) Ag_area(ihru) = 0.0
@@ -313,7 +312,6 @@
       Last_ag_soil_moist = Basin_ag_soil_moist
 
       IF ( Ag_package==ACTIVE .OR. Agriculture_soilzone_flag==ACTIVE ) ALLOCATE ( It0_ag_soil_rechr(Nhru), It0_ag_soil_moist(Nhru) )
-      Ag_actet = 0.0
 
       Soil_iter = 1
       iter_nonconverge = 0
@@ -444,15 +442,12 @@
         ENDIF
       ENDIF
 
-      IF ( Iter_aet_flag==ACTIVE ) THEN
-        Unused_ag_et = 0.0
-        Ag_soilwater_deficit = 0.0
-        Ag_actet = 0.0
-        IF ( Soil_iter>1 ) THEN
-          Ag_soil_moist = It0_ag_soil_moist
-          Ag_soil_rechr = It0_ag_soil_rechr
-          Ag_gvr2sm = 0.0
-        ENDIF
+      Ag_actet = 0.0
+      Unused_ag_et = 0.0
+      Ag_soilwater_deficit = 0.0
+      IF ( Soil_iter>1 ) THEN
+        Ag_soil_moist = It0_ag_soil_moist
+        Ag_soil_rechr = It0_ag_soil_rechr
       ENDIF
       Basin_ag_soil_moist = 0.0D0
       !Basin_ag_soil_to_gw = 0.0D0
@@ -710,7 +705,6 @@
           IF ( Gvr2sm(i)>0.0 ) THEN
             IF ( perv_on_flag==ACTIVE ) THEN
               Soil_moist(i) = Soil_moist(i) + Gvr2sm(i)/perv_frac ! ??? could this be bigger than soil_moist_max ??? (add to Dunnian)
-!              IF ( Soil_moist(i)>Soil_moist_max(i) ) PRINT *, 'CAP sm>max', Soil_moist(i), Soil_moist_max(i), i
               IF ( Soilzone_aet_flag==ACTIVE ) THEN
                 Soil_lower(i) = MIN( Soil_lower_stor_max(i), Soil_moist(i) - Soil_rechr(i) + Gvr2sm(i)/perv_frac )
                 Soil_rechr(i) = Soil_moist(i) - Soil_lower(i)
@@ -726,9 +720,9 @@
           IF ( ag_on_flag==ACTIVE ) THEN
             IF ( Ag_gvr2sm(i)>0.0 ) THEN
               Ag_soil_moist(i) = Ag_soil_moist(i) + Ag_gvr2sm(i)/agfrac
-!              IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) then
-!                  PRINT *, 'AG sm>max', Ag_soil_moist(i), Ag_soil_moist_max(i), i, Ag_gvr2sm(i)/agfrac, Ag_gvr2sm(i),agfrac
-!     endif
+              IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) then
+                  PRINT *, 'AG sm>max', Ag_soil_moist(i), Ag_soil_moist_max(i), i, Ag_gvr2sm(i)/agfrac, Ag_gvr2sm(i),agfrac,ag_capacity
+     endif
               IF ( Soilzone_aet_flag==ACTIVE ) THEN
                 Ag_soil_lower(i) = MIN( Ag_soil_lower_stor_max(i), Ag_soil_moist(i) - Ag_soil_rechr(i) + Ag_gvr2sm(i)/agfrac )
                 Ag_soil_rechr(i) = Ag_soil_moist(i) - Ag_soil_lower(i)
