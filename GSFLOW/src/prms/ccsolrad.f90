@@ -176,8 +176,6 @@
         IF ( getparam_real(MODNAME, 'ccov_intcp', Nhru*MONTHS_PER_YEAR, Ccov_intcp)/=0) CALL read_error(2, 'ccov_intcp')
 
         Cloud_radadj = 0.0
-        !Basin_radadj = 0.0D0
-        !Basin_cloud_cover = 0.0D0
         Cloud_cover_hru = 0.0
 
         Observed_flag = OFF

@@ -1256,16 +1256,10 @@
       Hru_snow = 0.0
       Swrad = 0.0
       Potet = 0.0
-!      Slow_flow = 0.0
-!      Soil_to_gw = 0.0 ! rsr 12/9/21 don't need to initialize some variables as they are always initialized in run
-!      Soil_to_ssr = 0.0
       Hru_actet = 0.0
-!      Infil = 0.0
       Sroff = 0.0
 ! initialize arrays (dimensioned Nssr)
-!      Ssr_to_gw = 0.0
       Ssres_in = 0.0
-!      Ssres_flow = 0.0
       IF ( Solrad_flag==ddsolrad_module .OR. Solrad_flag==ccsolrad_module ) Orad_hru = 0.0
       IF ( Et_flag==potet_pt_module .OR. Et_flag==potet_pm_module .OR. Et_flag==potet_pm_sta_module ) THEN
         Tempc_dewpt = 0.0

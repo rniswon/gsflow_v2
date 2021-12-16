@@ -470,7 +470,7 @@
      &       'Groundwater discharge to gravity-flow reservoirs', &
      &       'inches', Gw2sm_grav)
 
-        ALLOCATE ( Grav_gwin(Nhru) ) ! ???
+        ALLOCATE ( Grav_gwin(Nhru) )
         CALL declvar_real(MODNAME, 'grav_gwin', 'nhru', Nhru, &
      &       'Groundwater discharge to gravity-flow reservoirs for each HRU', &
      &       'inches', Grav_gwin)
@@ -648,8 +648,6 @@
             Gvr_hru_id(i) = i
           ENDDO
         ENDIF
-        Grav_gwin = 0.0 ! dimension nhru
-        Gw2sm_grav = 0.0
       ENDIF
 
       Swale_limit = 0.0
@@ -783,11 +781,9 @@
       Perv_actet = 0.0
 !      Perv_avail_et = 0.0
       Recharge = 0.0
-      !Cap_waterin = 0.0
       Potet_lower = 0.0
       Potet_rechr = 0.0
       Unused_potet = 0.0 ! dimension nhru
-      !Soil_saturated = OFF
 !      Interflow_max = 0.0
 !      Snowevap_aet_frac = 0.0
 
@@ -914,7 +910,8 @@
         IF ( GSFLOW_flag==ACTIVE ) THEN
           IF ( Nlake>0 ) It0_potet = Potet
           It0_gravity_stor_res = Gravity_stor_res
-          Gw2sm_grav = 0.0
+          Gw2sm_grav = 0.0 ! dimension nhrucell
+          Grav_gwin = 0.0 ! dimension nhru
         ENDIF
         IF ( Pref_flag==ACTIVE ) Pref_flow_stor_ante = Pref_flow_stor
         Last_soil_moist = Basin_soil_moist
@@ -1697,7 +1694,6 @@
       Dunnian = Dunnian - Dndunnflow
 
       END SUBROUTINE compute_cascades
-
 
 !***********************************************************************
 !     adjust soil moist based on being below field capacity (capacity)

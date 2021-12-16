@@ -17,7 +17,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Groundwater'
       character(len=6), parameter :: MODNAME = 'gwflow'
-      character(len=*), parameter :: Version_gwflow = '2021-11-19'
+      character(len=*), parameter :: Version_gwflow = '2021-12-16'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea(:), Gwin_dprst(:)
       DOUBLE PRECISION, SAVE :: Basin_gw_upslope
       INTEGER, SAVE :: Gwminarea_flag
@@ -267,7 +267,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, LAKE, SWALE, DEBUG_less, CASCADEGW_OFF
       use PRMS_READ_PARAM_FILE, only: getparam_real
       USE PRMS_MODULE, ONLY: Ngw, Nlake, Print_debug, Init_vars_from_file, &
-     &    Dprst_flag, Cascadegw_flag, Inputerror_flag, Gwr_swale_flag
+     &    Dprst_flag, Inputerror_flag, Gwr_swale_flag
       USE PRMS_GWFLOW
       USE PRMS_BASIN, ONLY: Gwr_type, Hru_area, Basin_area_inv, Active_gwrs, Gwr_route_order, &
      &                      Lake_hru_id, Weir_gate_flag, Hru_storage
@@ -360,12 +360,6 @@
       Basin_gw_upslope = 0.0D0
       Basin_dnflow = 0.0D0
       Basin_lake_seep = 0.0D0
-! do only once, so restart uses saved values
-      IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
-!        Gw_upslope = 0.0D0
-!        Hru_gw_cascadeflow = 0.0
-        IF ( Nlake>0 ) Lakein_gwflow = 0.0D0
-      ENDIF
       Gwres_flow = 0.0
       Gwres_in = 0.0
       Gwres_sink = 0.0
