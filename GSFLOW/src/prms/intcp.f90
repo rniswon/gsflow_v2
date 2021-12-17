@@ -500,7 +500,7 @@
               ENDIF
             ENDIF
           ENDIF
-          IF ( Hru_type(i)==LAKE ) CALL error_stop('irrigation specified and hru_type is lake', ERROR_param)
+          IF ( Hru_type(i)==LAKE .and. Hru_ag_irr(i)>0.0 ) CALL error_stop('irrigation specified and hru_type is lake', ERROR_param)
           ag_water_maxin = 0.0  ! inches
           IF ( Canopy_irrigation_flag==ACTIVE ) ag_water_maxin = Hru_ag_irr(i) / harea ! Hru_ag_irr is in inch-acres
           IF ( Use_transfer_intcp==ACTIVE ) ag_water_maxin = ag_water_maxin + Canopy_gain(i)/SNGL(Cfs_conv)/harea ! Canopy_gain in CFS, convert to inches
