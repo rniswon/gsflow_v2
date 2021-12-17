@@ -3519,9 +3519,9 @@ C75-----STORE FLOWS NEEDED FOR SENSITIVITIES. - ERB
 C
 C76-----ADD TERMS TO RHS AND HCOF IF FLOBOT IS NOT ZERO.
           mskip = 1
-          IF ( MODSIM_flag==ACTIVE .AND. ifm==2 ) mskip = 0
-          IF ( (irt.EQ.numdelt .AND. MODSIM_flag==OFF ) .OR.
-     1         (irt.EQ.numdelt.AND.mskip==0) ) THEN
+          IF ( irt.EQ.numdelt .AND. MODSIM_flag==ACTIVE .AND. ifm==2 )
+     1         mskip = 0
+          IF ( irt.EQ.numdelt .OR. mskip==0 ) THEN
             hstrave = 0.0D0
             DO i = 1, numdelt
               hstrave = hstrave + HSTRM(l,i)
