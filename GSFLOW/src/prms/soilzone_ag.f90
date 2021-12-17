@@ -671,11 +671,13 @@
           IF ( ag_on_flag==ACTIVE ) THEN
             IF ( ag_water_maxin+Ag_soil_moist(i)>0.0 ) THEN
               ag_soil2gw = 0.0
-        if ( Ag_soil_moist(i)< Ag_soil_rechr(i)) print *, 'AG1 soilrechr, before', i, Ag_soil_moist(i)-Ag_soil_rechr(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_soil_moist_max(i), Ag_soil_rechr_max(i)
+        if ( Ag_soil_moist(i)< Ag_soil_rechr(i)) print *, 'AG1 soilrechr, before', i, &
+     &       Ag_soil_moist(i)-Ag_soil_rechr(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_soil_moist_max(i), Ag_soil_rechr_max(i)
               CALL compute_soilmoist(ag_water_maxin, Ag_soil_moist_max(i), &
      &                               Ag_soil_rechr_max(i), Soil2gw_max(i), Ag_soil2gvr(i), &
      &                               Ag_soil_moist(i), Ag_soil_rechr(i), ag_soil2gw, agfrac)
-        if ( Ag_soil_moist(i)< Ag_soil_rechr(i)) print *, 'AG1 soilrechr, after', i, Ag_soil_moist(i)-Ag_soil_rechr(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_soil_moist_max(i), Ag_soil_rechr_max(i)
+        if ( Ag_soil_moist(i)< Ag_soil_rechr(i)) print *, 'AG1 soilrechr, after', i, &
+            Ag_soil_moist(i)-Ag_soil_rechr(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_soil_moist_max(i), Ag_soil_rechr_max(i)
               ag_water_maxin = ag_water_maxin*agfrac
 !              Ag_water_maxin(i) = ag_water_maxin
               Basin_agwaterin = Basin_agwaterin + DBLE( ag_water_maxin*harea )
@@ -721,7 +723,8 @@
             IF ( Ag_gvr2sm(i)>0.0 ) THEN
               Ag_soil_moist(i) = Ag_soil_moist(i) + Ag_gvr2sm(i)/agfrac
               IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) then
-                  PRINT *, 'AG sm>max', Ag_soil_moist(i), Ag_soil_moist_max(i), i, Ag_gvr2sm(i)/agfrac, Ag_gvr2sm(i),agfrac,ag_capacity
+                  PRINT *, 'AG sm>max', Ag_soil_moist(i), Ag_soil_moist_max(i), i, Ag_gvr2sm(i)/agfrac, &
+                      Ag_gvr2sm(i),agfrac,ag_capacity
      endif
               IF ( Soilzone_aet_flag==ACTIVE ) THEN
                 Ag_soil_lower(i) = MIN( Ag_soil_lower_stor_max(i), Ag_soil_moist(i) - Ag_soil_rechr(i) + Ag_gvr2sm(i)/agfrac )
@@ -847,12 +850,14 @@
           IF ( ag_avail_targetAET>0.0 ) THEN
 !if (i==5)  write(531,*) 'ee',ag_AETtarget, hruactet, AET_external(i), Ag_actet(i), ag_avail_targetAET, Ag_soil_moist(i)
 !                print *, 'before computeAET', ag_water_maxin, Ag_soil_moist(i), Ag_irrigation_add(i)
-        if ( Ag_soil_moist(i)< Ag_soil_rechr(i)) print *, 'AG1 szactet, before', i, Ag_soil_moist(i)-Ag_soil_rechr(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_soil_moist_max(i), Ag_soil_rechr_max(i)
+        if ( Ag_soil_moist(i)< Ag_soil_rechr(i)) print *, 'AG1 szactet, before', i, Ag_soil_moist(i)-Ag_soil_rechr(i), &
+            Ag_soil_moist(i), Ag_soil_rechr(i), Ag_soil_moist_max(i), Ag_soil_rechr_max(i)
               CALL compute_szactet(Ag_soil_moist_max(i), Ag_soil_rechr_max(i), Transp_on(i), Ag_cov_type(i), &
      &                           Ag_soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_actet(i), ag_avail_targetAET, & !?? instead of ag_avail_potet use AET_external
      &                           Snow_free(i), Ag_potet_rechr(i), Ag_potet_lower(i), &
      &                           ag_AETtarget, agfrac, Ag_soil_saturated(i))
-        if ( Ag_soil_moist(i)< Ag_soil_rechr(i)) print *, 'AG1 szactet, after', i, Ag_soil_moist(i)-Ag_soil_rechr(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_soil_moist_max(i), Ag_soil_rechr_max(i)
+        if ( Ag_soil_moist(i)< Ag_soil_rechr(i)) print *, 'AG1 szactet, after', i, Ag_soil_moist(i)-Ag_soil_rechr(i), &
+            Ag_soil_moist(i), Ag_soil_rechr(i), Ag_soil_moist_max(i), Ag_soil_rechr_max(i)
 !if (i==5) write(531,*) 'f',Ag_soil_moist_max(i), Ag_soil_rechr_max(i), Transp_on(i), Ag_cov_type(i), &
 !     &                           Ag_soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_actet(i), ag_avail_targetAET, & !?? instead of ag_avail_potet use AET_external
 !     &                           Snow_free(i), Ag_potet_rechr(i), Ag_potet_lower(i), &
@@ -1027,7 +1032,8 @@
             !agriculture_external(i)
             !IF ( Unused_potet(i)>0.0 ) THEN
             IF ( unsatisfied_et>soilzone_aet_converge ) THEN
-              IF ( Ag_soilwater_deficit(i)>Ag_soilwater_deficit_min(i) ) Ag_irrigation_add(i) = Ag_irrigation_add(i) + unsatisfied_et
+              IF ( Ag_soilwater_deficit(i)>Ag_soilwater_deficit_min(i) ) &
+                  Ag_irrigation_add(i) = Ag_irrigation_add(i) + unsatisfied_et
               keep_iterating = ACTIVE
               add_estimated_irrigation = ACTIVE
               num_hrus_ag_iter = num_hrus_ag_iter + 1

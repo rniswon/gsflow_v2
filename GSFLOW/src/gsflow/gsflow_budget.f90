@@ -287,8 +287,8 @@
 !      Uzf_infil_map = 0.0 ! dimension nhru
 !      Sat_recharge = 0.0 ! dimension nhru
 !      Mfoutflow_to_gvr = 0.0 ! dimension nhru
-	  Streamflow_sfr = 0.0 ! dimension nsegment
-	  Seepage_reach_sfr = 0.0 ! dimension nreach
+      Streamflow_sfr = 0.0 ! dimension nsegment
+      Seepage_reach_sfr = 0.0 ! dimension nreach
       Seepage_segment_sfr = 0.0 ! dimension nsegment
 
       DO i = 1, Nhrucell
