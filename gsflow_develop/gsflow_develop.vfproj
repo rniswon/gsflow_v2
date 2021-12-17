@@ -34,7 +34,7 @@
 				<Tool Name="VFPreBuildEventTool"/>
 				<Tool Name="VFPostBuildEventTool"/>
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
-		<Configuration Name="Release|x64" UseCompiler="ifxCompiler">
+		<Configuration Name="Release|x64">
 				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" EnableRecursion="true" FloatingPointExceptionHandling="fpe0" FloatingPointModel="source" FloatingPointExceptionsModel="enable" ExternalNameInterpretation="extNameLowerCase" ExternalNameUnderscore="true" GlobalOptimizations="true" ImproveFloatingPointConsistency="true"/>
 				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole"/>
 				<Tool Name="VFResourceCompilerTool"/>
@@ -51,6 +51,12 @@
 		<File RelativePath="..\GSFLOW\src\prms\basin.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\basin_sum.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\basin_summary.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\c_mmf_utils.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\c_prms_time.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\c_read_control_file.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\c_read_data_file.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\c_read_parameter_file.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\c_utils_prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\cascade.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\ccsolrad.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\climate_hru.f90"/>
@@ -114,8 +120,6 @@
 		<File RelativePath="..\GSFLOW\src\modflow\mach_mod.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\map_results.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\mhc7.f"/>
-		<File RelativePath="..\GSFLOW\src\prms\mmf_module.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\mmf_utils.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\modules.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\muskingum.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\muskingum_lake.f90"/>
@@ -149,13 +153,15 @@
 		<File RelativePath="..\GSFLOW\src\prms\precip_map.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_constants.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_summary.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\prms_time.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\read_control_file.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\read_data_file.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\read_parameter_file.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\routing.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\setup_param.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\sip7_NWT.f"/>
+		<File RelativePath="..\GSFLOW\src\prms\sm_mmf_utils.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\sm_prms_time.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\sm_read_control_file.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\sm_read_data_file.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\sm_read_parameter_file.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\sm_utils_prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\snowcomp.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\soilzone.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\soilzone_ag.f90"/>
@@ -171,7 +177,6 @@
 		<File RelativePath="..\GSFLOW\src\prms\temp_map.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\transp_frost.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\transp_tindex.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\utils_prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\utl7.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\water_balance.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\water_use_read.f90"/>
