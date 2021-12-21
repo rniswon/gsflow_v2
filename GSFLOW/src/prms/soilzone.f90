@@ -923,6 +923,7 @@
           IF ( Pref_flag==ACTIVE ) It0_pref_flow_stor = Pref_flow_stor
           IF ( Nlake>0 ) It0_potet = Potet
           Gw2sm_grav = 0.0
+          Hru_ag_irr = 0.0
         ENDIF
       ENDIF
       IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
