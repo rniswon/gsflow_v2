@@ -4156,11 +4156,11 @@ C
             !INODE = IDIV(LAKE,IDV)
 C           THE FOLLOWING CONDITION WILL BE TRIGGERED WHEN NEAR DEADPOOL STORAGE
 C           CHECKS WHAT'S AVAILABLE AGAINST WHAT MODSIM IS ASKING FOR ("Diversions")
-            ELSEIF((start_vol + inflow - outflow + gwsw).LT.
+            ELSEIF((start_vol + inflow - outflow + gwsw + 1.0).LT.
      &              DEADPOOLVOL(LAK_ID)) THEN
              Diversions(M)=MAX((RELEASABLE_STOR(LAK_ID)/DELT),FXLKOT(M))
-            ELSEIF((RELEASABLE_STOR(LAK_ID)/DELT).LT.Diversions(M)) THEN
-              Diversions(M)=RELEASABLE_STOR(LAK_ID) / DELT
+            !ELSEIF((RELEASABLE_STOR(LAK_ID)/DELT).LT.Diversions(M)) THEN
+              !Diversions(M)=RELEASABLE_STOR(LAK_ID) / DELT
              !Diversions(M)=MAX((RELEASABLE_STOR(LAK_ID)/DELT),FXLKOT(M))
       ! NEED TODO: Look into "/ DELT", could be an issue in Deschutes where seconds are used.
       ! Need to check this calculation by hand to make sure units are as expected for MODSIM
@@ -4202,7 +4202,7 @@ C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
       INTEGER LAKE
-!gsf      DOUBLE PRECISION :: dmy(1)
+      DOUBLE PRECISION :: dmy(1)
 C     -------------------------------------------------------------------
 C
 C0----FILL A NEW VARIABLE CALLED MXLKVOLF CONTAINING THE MODSIM MAX LAKE STORAGE
@@ -4212,8 +4212,8 @@ C0----FILL A NEW VARIABLE CALLED MXLKVOLF CONTAINING THE MODSIM MAX LAKE STORAGE
 C
 C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
 C
-!gsf      dmy(1) = 0.0D0
-!gsf      CALL LAK2MODSIM(DELTAVOL,LAKEVOL, dmy(1), -1) ! rsr, the 0 needs to be an array, values
+      dmy(1) = 0.0D0
+      CALL LAK2MODSIM(DELTAVOL,LAKEVOL, dmy(1), -1) ! rsr, the 0 needs to be an array, values
 C
 C2------STUFF DELTAVOL WITH DEADPOOL INFORMATION CALCULATED BY MODFLOW
       DO LAKE=1, NLAKES

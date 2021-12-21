@@ -330,7 +330,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
-     &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, PRMS_land_iteration_flag, &
+     &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Call_cascade, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Nowmonth, Nowyear, Nowday, Iter_aet_flag, Agriculture_soilzone_flag, Hru_type
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
@@ -404,7 +404,6 @@
         Ag_irrigation_add = 0.0
         It0_ag_soil_moist = Ag_soil_moist
         It0_ag_soil_rechr = Ag_soil_rechr
-        Ag_gvr2sm = 0.0
       ENDIF
 
       keep_iterating = ACTIVE
@@ -472,7 +471,8 @@
       IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
       add_estimated_irrigation = OFF
       num_hrus_ag_iter = 0
-      IF ( Ag_package==ACTIVE ) Ag_soil_saturated = OFF
+      Ag_soil_saturated = OFF
+      Ag_gvr2sm = 0.0
 
 ! ***************************************
       DO k = 1, Active_hrus

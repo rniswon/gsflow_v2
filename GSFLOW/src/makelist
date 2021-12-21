@@ -16,8 +16,8 @@ MMFLIB      = $(LIBDIR)/libmmf.a
 ARC		= LINUX
 #ARC		= WINDOWS
 
-OPTLEVEL	= -g
-#OPTLEVEL	= -O -Bstatic
+#OPTLEVEL	= -g
+OPTLEVEL	= -O2 -Bstatic
 #for gfortran
 LDFLAGS	=$(OPTLEVEL)
 #for ifort
@@ -27,8 +27,8 @@ LDFLAGS	=$(OPTLEVEL)
 # Define the Fortran compile flags
 ##########################################################
 #for gfortran
-FFLAGS= $(OPTLEVEL) -fbounds-check -fno-second-underscore -Wall
-#FFLAGS= $(OPTLEVEL) -fno-second-underscore
+#FFLAGS= $(OPTLEVEL) -fbounds-check -fno-second-underscore -Wall
+FFLAGS= $(OPTLEVEL) -fno-second-underscore
 #for ifort
 #FFLAGS= $(OPTLEVEL) -warn all -fltconsistency
 #FFLAGS= $(OPTLEVEL) -fp-model source
