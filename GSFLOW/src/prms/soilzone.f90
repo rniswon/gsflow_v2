@@ -850,7 +850,7 @@
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Hru_type, Nowmonth !, Nowyear, Nowday
+     &    Soilzone_aet_flag, Hru_type, Ag_flag, Nowmonth !, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -912,6 +912,7 @@
           It0_gravity_stor_res = Gravity_stor_res
           Gw2sm_grav = 0.0 ! dimension nhrucell
           Grav_gwin = 0.0 ! dimension nhru
+          IF ( Ag_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
         ENDIF
         IF ( Pref_flag==ACTIVE ) Pref_flow_stor_ante = Pref_flow_stor
         Last_soil_moist = Basin_soil_moist
@@ -1338,7 +1339,8 @@
 !        IF ( Hru_actet(i)>0.0 ) Snowevap_aet_frac(i) = Snow_evap(i)/Hru_actet(i)
         Hru_storage(i) = DBLE( Soil_moist_tot(i) + Hru_intcpstor(i) + Hru_impervstor(i) ) + Pkwater_equiv(i)
         IF ( Dprst_flag==ACTIVE ) Hru_storage(i) = Hru_storage(i) + Dprst_stor_hru(i)
-
+if(i==2659) &
+        write(987, *) potet(i), hru_actet(i), pervactet,hru_ag_irr(i), soil_to_gw(i), ssr_to_gw(i)
       ENDDO ! end HRU loop
       Basin_actet = Basin_actet*Basin_area_inv
       Basin_perv_et = Basin_perv_et*Basin_area_inv

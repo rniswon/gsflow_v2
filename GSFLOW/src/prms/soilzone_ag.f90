@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2021-12-16'
+      character(len=*), parameter :: Version_soilzone_ag = '2021-12-21'
       INTEGER, SAVE :: Soil_iter !, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr
@@ -331,7 +331,7 @@
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Call_cascade, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Nowmonth, Nowyear, Nowday, Iter_aet_flag, Agriculture_soilzone_flag, Hru_type
+     &    Soilzone_aet_flag, Ag_flag, Nowmonth, Nowyear, Nowday, Iter_aet_flag, Agriculture_soilzone_flag, Hru_type
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
@@ -389,6 +389,7 @@
           It0_gravity_stor_res = Gravity_stor_res
           Gw2sm_grav = 0.0 ! dimension nhrucell
           Grav_gwin = 0.0 ! dimension nhru
+          IF ( Ag_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
         ENDIF
         IF ( Pref_flag==ACTIVE ) Pref_flow_stor_ante = Pref_flow_stor
         Last_soil_moist = Basin_soil_moist
