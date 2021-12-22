@@ -70,7 +70,7 @@ Simulation time period: 1990/10/01 00:00:00 to 1995/10/31 00:00:00
 ====================================================================
 Basin Definition                basin               2021-11-19
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2021-11-19
+Common States and Fluxes        climateflow         2021-12-10
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2021-11-19
 Timestep Control                prms_time           2021-11-19
@@ -79,14 +79,13 @@ Precipitation Distribution      precip_1sta         2021-11-19
 Solar Radiation Distribution    ddsolrad            2021-11-19
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2021-11-19
-Snow Dynamics                   snowcomp            2021-11-23
-Surface Runoff                  srunoff_smidx       2021-11-19
-Soilzone Computations           soilzone            2021-11-19
-Soilzone Computations           soilzone_ag         2021-11-19
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-10-11
+Canopy Interception             intcp               2021-12-16
+Snow Dynamics                   snowcomp            2021-12-09
+Surface Runoff                  srunoff_smidx       2021-12-16
+Soilzone Computations           soilzone            2021-12-09
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-12-09
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-06-10
-GSFLOW Output Budget Summary    gsflow_budget       2021-09-29
+GSFLOW Output Budget Summary    gsflow_budget       2021-12-15
 GSFLOW Output CSV Summary       gsflow_sum          2021-09-28
 Output Summary                  nhru_summary        2021-11-23
 Output Summary                  basin_summary       2021-11-19
@@ -107,10 +106,9 @@ End time:   1995/10/31 00:00:00
 
 
 Model domain area:        11226.32    Active basin area:      6740.99
-Fraction impervious:        0.0000    Fraction pervious:       0.9866
-DPRST area:                  22.42    Fraction DPRST:          0.0033
-Agriculture area:            67.91    Fraction AG:             0.0101
+Fraction impervious:        0.0000    Fraction pervious:       1.0000
+DPRST area:                   0.00    Fraction DPRST:          0.0000
 
 
-Execution elapsed time    2 minutes 22.09 seconds
+Execution elapsed time    2 minutes  4.82 seconds
 

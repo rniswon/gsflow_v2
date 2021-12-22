@@ -158,20 +158,20 @@ tmin 16
 Simulation time period: 1971/10/01 00:00:00 to 2015/09/30 00:00:00
 ====================================================================
 Basin Definition                basin               2021-11-19
-Common States and Fluxes        climateflow         2021-11-19
+Common States and Fluxes        climateflow         2021-12-10
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2021-11-19
 Timestep Control                prms_time           2021-11-19
 Temp & Precip Distribution      xyz_dist            2021-11-19
-Solar Radiation Distribution    ccsolrad            2021-11-19
+Solar Radiation Distribution    ccsolrad            2021-12-09
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2021-11-19
-Snow Dynamics                   snowcomp            2021-11-23
+Canopy Interception             intcp               2021-12-16
+Snow Dynamics                   snowcomp            2021-12-09
 Glacier Dynamics                glacr_melt          2021-11-23
-Surface Runoff                  srunoff_smidx       2021-11-19
-Soilzone Computations           soilzone            2021-11-19
-Groundwater                     gwflow              2021-11-19
+Surface Runoff                  srunoff_smidx       2021-12-16
+Soilzone Computations           soilzone            2021-12-09
+Groundwater                     gwflow              2021-12-16
 Streamflow Routing Init         routing             2021-11-19
 Streamflow Routing              muskingum           2021-11-19
 Output Summary                  basin_sum           2021-11-19
@@ -245,5 +245,5 @@ Fraction impervious:        0.0687    Fraction pervious:       0.9313
  *************************************************************
  Total for run      97.155   71.614    0.207   31.589 -286.767
  *************************************************************
-Execution elapsed time    0 minutes  3.18 seconds
+Execution elapsed time    0 minutes  3.30 seconds
 
