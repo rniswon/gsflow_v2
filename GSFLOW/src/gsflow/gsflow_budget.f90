@@ -225,24 +225,12 @@
         Total_pump = 0.0D0
         Total_pump_cfs = 0.0D0
       ENDIF
-!      Uzf_infil_map = 0.0 ! dimension nhru
-!      Sat_recharge = 0.0 ! dimension nhru
-!      Mfoutflow_to_gvr = 0.0 ! dimension nhru
-      Gw2sm = 0.0 ! dimension nhru
-      Actet_gw = 0.0 ! dimension nhru
       Actet_tot_gwsz = 0.0 ! dimension nhru
-      Streamflow_sfr = 0.0 ! dimension nsegment
-      Seepage_reach_sfr = 0.0 ! dimension nreach
-      Seepage_segment_sfr = 0.0 ! dimension nsegment
 
 !  Set the volume budget indicies to -1 anytime "init" is called.
 !  This will make "run" figure out the vbnm order.
       Vbnm_index = -1
       ALLOCATE ( Fluxchange(Nhru) )
-      Fluxchange = 0.0
-      Basin_fluxchange = 0.0D0
-      Basin_szreject = 0.0D0
-      Gw_rejected = 0.0
 
       END FUNCTION gsfbudinit
 
@@ -290,20 +278,17 @@
       area_fac = Cfs_conv*Active_area
       Basin_ssflow_cfs = Basin_ssflow*area_fac
       Basin_sroff_cfs = Basin_sroff*area_fac
-      DO ii = 1, Active_hrus
-        i = Hru_route_order(ii)
-        Gw2sm(i) = 0.0
-        Gw_rejected(i) = 0.0
-        Actet_gw(i) = 0.0
-        Slow_stor(i) = 0.0 !shouldn't be reset if any cells of HRU inactive and HRU active
-!        Uzf_infil_map(i) = 0.0
-!        Sat_recharge(i) = 0.0
-!        Mfoutflow_to_gvr(i) = 0.0
-        Fluxchange(i) = 0.0
-      ENDDO
-      Streamflow_sfr = 0.0
-      Seepage_reach_sfr = 0.0
-      Seepage_segment_sfr = 0.0
+      Gw2sm = 0.0 ! dimension nhru
+      Actet_gw = 0.0 ! dimension nhru
+      Gw_rejected = 0.0 ! dimension nhru
+      Slow_stor = 0.0
+      Fluxchange = 0.0
+!      Uzf_infil_map = 0.0 ! dimension nhru
+!      Sat_recharge = 0.0 ! dimension nhru
+!      Mfoutflow_to_gvr = 0.0 ! dimension nhru
+      Streamflow_sfr = 0.0 ! dimension nsegment
+      Seepage_reach_sfr = 0.0 ! dimension nreach
+      Seepage_segment_sfr = 0.0 ! dimension nsegment
 
       DO i = 1, Nhrucell
         ihru = Gvr_hru_id(i)

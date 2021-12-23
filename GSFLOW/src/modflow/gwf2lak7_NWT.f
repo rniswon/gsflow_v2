@@ -4091,7 +4091,7 @@ C     *******************************************************************
       USE GWFLAKMODULE, ONLY: NLAKES, SURFIN, SURFOT, VOLOLDD, VOL,
      +                        DEADPOOLVOL, RELEASABLE_STOR, IDIV, 
      +                        MXLKVOLF
-      USE GWFSFRMODULE, ONLY: IDIVAR
+      USE GWFSFRMODULE, ONLY: IDIVAR, FXLKOT
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 C     -------------------------------------------------------------------
@@ -4109,7 +4109,7 @@ C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
       INTEGER LAKE, M, LAK_ID, INODE
-      DOUBLE PRECISION DELTAQ
+      DOUBLE PRECISION DELTAQ, start_vol, inflow, outflow, gwsw
 C     -------------------------------------------------------------------
 C
 C
@@ -4140,15 +4140,27 @@ C-----LOOP OVER REACHES AND OVERRIDE LAKE RELEASES IF WATER LIMITED
         DO M = 1, Nsegshold
           IF (IDIVAR(1,M).LT.0) THEN
             LAK_ID = ABS(IDIVAR(1,M))
+            ! Set some variables for readability of ELSEIF statement
+            start_vol = VOLOLDD(LAK_ID)
+            inflow = SURFIN(LAK_ID)
+            outflow = SURFOT(LAK_ID)
+            gwsw = DELTAVOL(LAK_ID)
+C            
             ! The following bit of code added to handle stress period 54
-            IF (VOL(LAK_ID).GT.MXLKVOLF(LAK_ID).AND.
+            IF (VOL(LAK_ID).GT.(MXLKVOLF(LAK_ID)+1.0).AND.
      &          .NOT.MXLKVOLF(LAK_ID).LT.0.0) THEN
-              Diversions(M) = (VOL(LAK_ID) - MXLKVOLF(LAK_ID)) / DELT
+              !Diversions(M) = (VOL(LAK_ID) - MXLKVOLF(LAK_ID)) / DELT
+            ELSEIF((start_vol + inflow + gwsw).LT.
+     &             DEADPOOLVOL(LAK_ID)) THEN
+              Diversions(M) = 0.0001
             !INODE = IDIV(LAKE,IDV)
 C           THE FOLLOWING CONDITION WILL BE TRIGGERED WHEN NEAR DEADPOOL STORAGE
 C           CHECKS WHAT'S AVAILABLE AGAINST WHAT MODSIM IS ASKING FOR ("Diversions")
-            ELSEIF((RELEASABLE_STOR(LAK_ID)/DELT).LT.Diversions(M)) THEN
-              Diversions(M)=RELEASABLE_STOR(LAK_ID) / DELT
+            ELSEIF((start_vol + inflow - outflow + gwsw + 1.0).LT.
+     &              DEADPOOLVOL(LAK_ID)) THEN
+             Diversions(M)=MAX((RELEASABLE_STOR(LAK_ID)/DELT),FXLKOT(M))
+            !ELSEIF((RELEASABLE_STOR(LAK_ID)/DELT).LT.Diversions(M)) THEN
+              !Diversions(M)=RELEASABLE_STOR(LAK_ID) / DELT
              !Diversions(M)=MAX((RELEASABLE_STOR(LAK_ID)/DELT),FXLKOT(M))
       ! NEED TODO: Look into "/ DELT", could be an issue in Deschutes where seconds are used.
       ! Need to check this calculation by hand to make sure units are as expected for MODSIM
@@ -4190,7 +4202,7 @@ C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
       INTEGER LAKE
-!gsf      DOUBLE PRECISION :: dmy(1)
+      DOUBLE PRECISION :: dmy(1)
 C     -------------------------------------------------------------------
 C
 C0----FILL A NEW VARIABLE CALLED MXLKVOLF CONTAINING THE MODSIM MAX LAKE STORAGE
@@ -4200,8 +4212,8 @@ C0----FILL A NEW VARIABLE CALLED MXLKVOLF CONTAINING THE MODSIM MAX LAKE STORAGE
 C
 C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
 C
-!gsf      dmy(1) = 0.0D0
-!gsf      CALL LAK2MODSIM(DELTAVOL,LAKEVOL, dmy(1), -1) ! rsr, the 0 needs to be an array, values
+      dmy(1) = 0.0D0
+      CALL LAK2MODSIM(DELTAVOL,LAKEVOL, dmy(1), -1) ! rsr, the 0 needs to be an array, values
 C
 C2------STUFF DELTAVOL WITH DEADPOOL INFORMATION CALCULATED BY MODFLOW
       DO LAKE=1, NLAKES

@@ -154,8 +154,7 @@
       USE GSFMODFLOW, ONLY: Gwc_row, Gwc_col
       USE PRMS_MODULE, ONLY: Nhru, Nsegment, Nlake, Print_debug, &
      &    Nhrucell, Ngwcell, Gvr_cell_id, Have_lakes
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, &
-     &    Basin_area_inv, Hru_area
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Basin_area_inv, Hru_area
       USE PRMS_SOILZONE, ONLY: Gvr_hru_id, Gvr_hru_pct_adjusted
       USE GLOBAL, ONLY: NLAY, NROW, NCOL
       IMPLICIT NONE
@@ -371,10 +370,6 @@
       IF ( Nhru/=Nhrucell ) DEALLOCATE ( hru_pct, newpct, temp_pct )
       !DEALLOCATE ( nseg_rch, seg_area )
 
-      Basin_reach_latflow = 0.0D0
-      Net_sz2gw = 0.0D0
-      Excess = 0.0 ! dimension ngwcell
-      Gw_rejected_grav = 0.0 ! dimension nhrucell
       NTRAIL_CHK = NWAV - 3*NTRAIL + 1
 
       IF ( Nhru/=Nhrucell ) DEALLOCATE ( Gvr_hru_pct )
@@ -505,7 +500,7 @@
 ! Set flag for UZF when PRMS sets FINF
 !      IGSFLOW = 1 this needs to be done in init
       Net_sz2gw = 0.0D0
-      Excess = 0.0
+      Excess = 0.0 ! dimension ngwcell
       FINF = 0.0
       IF ( is_draining==1 ) CALL Bin_percolation()
 

@@ -694,6 +694,8 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                     RETURN
                   ENDIF
                 ENDIF
+              ENDIF
+              IF ( PRMS_land_iteration_flag>0 ) THEN
                 retval = srunoff()
                 IF ( retval/=0 ) THEN
                   PRINT 9001, 'srunoff', retval

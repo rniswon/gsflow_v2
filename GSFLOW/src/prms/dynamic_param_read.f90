@@ -74,12 +74,12 @@
 !     dynparaminit - open files, read to start time, initialize flags and arrays
 !***********************************************************************
       INTEGER FUNCTION dynparaminit()
-        USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, OFF, ERROR_dynamic, DEBUG_minimum
-        USE PRMS_MODULE, ONLY: Nhru, Print_debug, Start_year, Start_month, Start_day, &
-     &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, &
-     &      Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
-     &      Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
-     &      Dyn_springfrost_flag, Dyn_snareathresh_flag, PRMS4_flag
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, OFF, ERROR_dynamic, DEBUG_minimum
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Start_year, Start_month, Start_day, &
+     &    Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, Dyn_covden_flag, &
+     &    Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
+     &    Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dprst_flag, Dyn_fallfrost_flag, &
+     &    Dyn_springfrost_flag, Dyn_snareathresh_flag, PRMS4_flag
       USE PRMS_DYNAMIC_PARAM_READ
       IMPLICIT NONE
 ! Functions
@@ -436,7 +436,7 @@
       EXTERNAL :: write_dynparam_potet
 ! Local Variables
       INTEGER :: i, istop, check_dprst_depth_flag, check_sm_max_flag, check_srechr_max_flag
-      REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj
+      REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj, frac
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       dynparamrun = 0
@@ -501,10 +501,13 @@
                 IF ( frac_imperv>0.0 ) THEN
                   Imperv_stor(i) = Imperv_stor(i)*Hru_percent_imperv(i)/frac_imperv
                 ELSE
-                  tmp = Imperv_stor(i)*Hru_percent_imperv(i)/Hru_frac_perv(i) ! not sure this is correct???
-                  PRINT *, 'WARNING, dynamic impervious changed to 0 when impervious storage > 0'
-                  PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
-                  PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
+                  frac = Hru_frac_perv(i)
+                  IF ( frac>0.0 ) THEN
+                    tmp = Imperv_stor(i)*Hru_percent_imperv(i)/frac ! not sure this is correct???
+                    PRINT *, 'WARNING, dynamic impervious changed to 0 when impervious storage > 0'
+                    PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
+                    PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
+                  ENDIF
                   soil_adj = tmp
                   Imperv_stor(i) = 0.0
                 ENDIF
@@ -521,11 +524,14 @@
                 ! Temp3 has new values with negative values set to the old value, Dprst_frac has old values
                 dprstfrac = Temp3(i)
                 IF ( dprstfrac==0.0 .AND. tmp>0.0 ) THEN
-                  tmp = tmp/(Dprst_frac(i)*harea)/Hru_frac_perv(i) ! not sure this is correct???
-                  PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0'
-                  PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
-                  PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
-                  soil_adj = soil_adj + tmp
+                  frac = Hru_frac_perv(i)
+                  IF ( frac>0.0 ) THEN
+                    tmp = tmp/(Dprst_frac(i)*harea)/frac ! not sure this is correct???
+                    PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0'
+                    PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
+                    PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
+                    soil_adj = soil_adj + tmp
+                  ENDIF
                   Dprst_vol_open(i) = 0.0D0
                   Dprst_vol_clos(i) = 0.0D0
                   tmp = 0.0

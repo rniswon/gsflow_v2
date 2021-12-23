@@ -275,35 +275,6 @@
         IF ( kk/=0 ) Tree(kk, j) = 1
       ENDDO
 
-      Sub_cfs = 0.0D0
-      Sub_cms = 0.0D0
-      Sub_inq = 0.0D0
-      Subinc_interflow = 0.0D0
-      IF ( GSFLOW_flag==OFF ) THEN
-        Subinc_gwflow = 0.0D0
-        Sub_gwflow = 0.0D0
-      ENDIF
-      Subinc_sroff = 0.0D0
-      Subinc_precip = 0.0D0
-      Subinc_rain = 0.0D0
-      Subinc_snow = 0.0D0
-      Subinc_snowmelt = 0.0D0
-      Subinc_pkweqv = 0.0D0
-      Subinc_actet = 0.0D0
-      Subinc_snowcov = 0.0D0
-      Subinc_swrad = 0.0D0
-      Subinc_tminc = 0.0D0
-      Subinc_tmaxc = 0.0D0
-      Subinc_tavgc = 0.0D0
-      Subinc_potet = 0.0D0
-      Subinc_wb = 0.0D0
-      Subinc_deltastor = 0.0D0
-      Subinc_recharge = 0.0D0
-      Subinc_szstor_frac = 0.0D0
-      Subinc_capstor_frac = 0.0D0
-      Sub_interflow = 0.0D0
-      Sub_sroff = 0.0D0
-
       IF ( Print_debug==14 ) THEN
         CALL PRMS_open_module_file(TREEUNIT, 'tree_structure')
         WRITE ( TREEUNIT, 9001 ) (j, j=1, Nsub)
@@ -345,6 +316,10 @@
       ENDIF
 
 ! added some code to allow for restart, but not climate states and fluxes and subinc_deltastor
+
+      Subinc_interflow = 0.0D0
+      IF ( GSFLOW_flag==OFF ) Subinc_gwflow = 0.0D0
+      Subinc_sroff = 0.0D0
       Subinc_stor = 0.0D0
       Sub_area = 0.0D0
       gwstor = 0.0D0

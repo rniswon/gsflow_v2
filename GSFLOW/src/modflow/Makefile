@@ -64,8 +64,6 @@ LIBOBJS = \
         Irestart.o
 
 all: lib
-#	$(RM) openspec.inc
-#	$(CP) openspec_linux.inc openspec.inc
 	echo made $(MFNWTLIB)
 
 install: lib
@@ -79,11 +77,6 @@ $(MFNWTLIB): $(LIBOBJS)
 
 clean:
 	$(RM) *.o *.mod *~ $(MFNWTLIB)
-
-# on Windows machines comment out next 3 lines
-#openspec.inc:
-#	$(RM) openspec.inc
-#	$(CP) openspec_linux.inc openspec.inc
 
 modules.o: modules.f90 mach_mod.o
 	$(FC) $(FFLAGS) -c modules.f90
@@ -175,7 +168,11 @@ Irestart.o: Irestart.f gwfuzfmodule_NWT.o gwfsfrmodule_NWT.o gsfmodflow.mod
 prms_module.mod:
 	$(CD) ../gsflow;make prms_module.mod
 	$(CP) ../gsflow/prms_module.mod .
-	
+
+prms_constants.mod:
+	$(CD) ../gsflow;make prms_constants.mod
+	$(CP) ../gsflow/prms_constants.mod .
+
 gsfmodflow.mod:
 	$(CD) ../gsflow;make gsfmodflow.mod
 	$(CP) ../gsflow/gsfmodflow.mod .
@@ -217,7 +214,7 @@ gwf2lak7_NWT.o: gwf2lak7_NWT.f gwflakmodule_NWT.o gwf2bas7_NWT.o gwfsfrmodule_NW
 obs2ghb7.o: obs2ghb7.f gwf2bas7_NWT.o gwf2ghb7_NWT.o
 	$(FC) $(FFLAGS) -c obs2ghb7.f
 
-gwfsfrmodule_NWT.o: gwfsfrmodule_NWT.f
+gwfsfrmodule_NWT.o: gwfsfrmodule_NWT.f  prms_constants.mod  prms_module.mod
 	$(FC) $(FFLAGS) -c gwfsfrmodule_NWT.f
 
 gwfuzfmodule_NWT.o: gwfuzfmodule_NWT.f

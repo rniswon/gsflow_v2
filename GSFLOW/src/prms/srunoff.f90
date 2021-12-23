@@ -517,26 +517,16 @@
       Hru_impervevap = 0.0
       IF ( Call_cascade==ACTIVE ) Strm_seg_in = 0.0D0
       IF ( Cascade_flag>CASCADE_OFF ) THEN
-        Upslope_hortonian = 0.0D0
         Hru_hortn_cascflow = 0.0D0
         IF ( Nlake>0 ) Hortonian_lakes = 0.0D0
       ENDIF
 
-      Basin_sroffi = 0.0D0
-      Basin_sroffp = 0.0D0
-      Basin_infil = 0.0D0
-      Basin_sroff = 0.0D0
-      Basin_imperv_evap = 0.0D0
-      Basin_hortonian = 0.0D0
       Basin_dprst_sroff = 0.0D0
       Basin_dprst_evap = 0.0D0
       Basin_dprst_seep = 0.0D0
       Basin_sroff_upslope = 0.0D0
       Basin_sroff_down = 0.0D0
       Basin_hortonian_lakes = 0.0D0
-      Basin_contrib_fraction = 0.0D0
-      Srp = 0.0
-      Sri = 0.0
 
       IF ( Init_vars_from_file==OFF ) THEN
         Basin_imperv_stor = 0.0D0
@@ -779,28 +769,16 @@
 
 !******Compute runoff for pervious, impervious, and depression storage area, only if not frozen ground
         IF ( frzen==OFF ) THEN
-! DO IRRIGATION APPLICATION, ONLY DONE HERE, ASSUMES NO SNOW and
-! only for pervious areas (just like infiltration)
-          IF ( Use_transfer_intcp==ACTIVE ) THEN
-            IF ( Net_apply(i)>0.0 ) THEN
-              sra = 0.0
-              Infil(i) = Infil(i) + Net_apply(i)
-              CALL perv_comp(Net_apply(i), Net_apply(i), Infil(i), sra)
-! ** ADD in water from irrigation application and water-use transfer for pervious portion - sra (if any)
-              apply_sroff = DBLE( sra*perv_area )
-              Basin_apply_sroff = Basin_apply_sroff + apply_sroff
-              runoff = runoff + apply_sroff
-            ENDIF
-          ENDIF
-
           IF ( Isglacier==OFF ) THEN
             CALL compute_infil(Net_rain(i), Net_ppt(i), Imperv_stor(i), Imperv_stor_max(i), Snowmelt(i), &
-     &                         Snowinfil_max(i), Net_snow(i), Pkwater_equiv(i), Infil(i), Hru_type(i), Intcp_changeover(i))
+     &                         Snowinfil_max(i), Net_snow(i), Pkwater_equiv(i), Infil(i), Hru_type(i), Intcp_changeover(i), &
+     &                         Net_apply(i), perv_area)
           ELSE ! glacier
             temp = Snowmelt(i) + glcrmltb !Snowmelt or 0.0
             temp2 = availh2o*(1.0-Glacier_frac(i))
             CALL compute_infil(temp2, Net_ppt(i), Imperv_stor(i), Imperv_stor_max(i), temp, &
-     &                         Snowinfil_max(i), Net_snow(i), Pkwater_equiv(i), Infil(i), Hru_type(i), Intcp_changeover(i))
+     &                         Snowinfil_max(i), Net_snow(i), Pkwater_equiv(i), Infil(i), Hru_type(i), Intcp_changeover(i), &
+     &                         Net_apply(i), perv_area)
           ENDIF
         ENDIF
 
@@ -895,6 +873,7 @@
       Basin_sroffi = Basin_sroffi*Basin_area_inv
       Basin_hortonian = Basin_hortonian*Basin_area_inv
       Basin_contrib_fraction = Basin_contrib_fraction*Basin_area_inv
+      Basin_apply_sroff = Basin_apply_sroff*Basin_area_inv
       IF ( Cascade_flag>CASCADE_OFF ) THEN
         Basin_hortonian_lakes = Basin_hortonian_lakes*Basin_area_inv
         Basin_sroff_down = Basin_sroff_down*Basin_area_inv
@@ -943,15 +922,15 @@
 !     Compute infiltration
 !***********************************************************************
       SUBROUTINE compute_infil(Net_rain, Net_ppt, Imperv_stor, Imperv_stor_max, Snowmelt, &
-     &                         Snowinfil_max, Net_snow, Pkwater_equiv, Infil, Hru_type, Intcp_changeover)
+     &                         Snowinfil_max, Net_snow, Pkwater_equiv, Infil, Hru_type, Intcp_changeover, Net_apply, Perv_area)
       USE PRMS_CONSTANTS, ONLY: NEARZERO, DNEARZERO, LAND, ACTIVE, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Cascade_flag
-      USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp, Isglacier
+      USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp, Isglacier, Basin_apply_sroff
       USE PRMS_SNOW, ONLY: Pptmix_nopack
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Hru_type
-      REAL, INTENT(IN) :: Net_rain, Net_ppt, Imperv_stor_max
+      REAL, INTENT(IN) :: Net_rain, Net_ppt, Imperv_stor_max, Net_apply, Perv_area
       REAL, INTENT(IN) :: Snowmelt, Snowinfil_max, Net_snow, Intcp_changeover
       DOUBLE PRECISION, INTENT(IN) :: Pkwater_equiv
       REAL, INTENT(INOUT) :: Imperv_stor, Infil
@@ -959,20 +938,31 @@
       INTRINSIC :: SNGL
       EXTERNAL :: perv_comp, check_capacity
 ! Local Variables
-      REAL :: avail_water
+      REAL :: avail_water, upslope
       INTEGER :: hru_flag
 !***********************************************************************
       hru_flag = 0
       IF ( Hru_type==LAND .OR. Isglacier==ACTIVE ) hru_flag = 1 ! land or glacier
+      avail_water = 0.0
+
+! DO IRRIGATION APPLICATION, ONLY DONE HERE, ASSUMES NO SNOW
+      IF ( Net_apply>0.0 ) THEN
+        avail_water = Net_apply
+        Infil = Net_apply
+        IF ( hru_flag==1 ) THEN
+          CALL perv_comp(Net_apply, Net_apply, Infil, Srp)
+          Basin_apply_sroff = Basin_apply_sroff + Srp*Perv_area
+        ENDIF
+      ENDIF
+
 ! compute runoff from cascading Hortonian flow
       IF ( Cascade_flag>CASCADE_OFF ) THEN
-        avail_water = SNGL( Upslope_hortonian(Ihru) )
-        IF ( avail_water>0.0 ) THEN
-          Infil = Infil + avail_water
-          IF ( hru_flag==1 ) CALL perv_comp(avail_water, avail_water, Infil, Srp)
+        upslope = SNGL( Upslope_hortonian(Ihru) )
+        IF ( upslope>0.0 ) THEN
+          avail_water = avail_water + upslope
+          Infil = Infil + upslope
+          IF ( hru_flag==1 ) CALL perv_comp(upslope, upslope, Infil, Srp)
         ENDIF
-      ELSE
-        avail_water = 0.0
       ENDIF
 
 ! compute runoff from canopy changeover water
@@ -1065,7 +1055,11 @@
       IF ( Sroff_flag==smidx_module ) THEN
         ! antecedent soil_moist
         smidx = Soil_moist(Ihru) + (0.5*Ptc)
-        ca_fraction = Smidx_coef(Ihru)*10.0**(Smidx_exp(Ihru)*smidx)
+        IF ( smidx>25.0) THEN
+          ca_fraction = Carea_max(Ihru)
+        ELSE
+          ca_fraction = Smidx_coef(Ihru)*10.0**(Smidx_exp(Ihru)*smidx)
+        ENDIF
       ELSE
         ! antecedent soil_rechr
         ca_fraction = Carea_min(Ihru) + Carea_dif(Ihru)*(Soil_rechr(Ihru)/Soil_rechr_max(Ihru))
@@ -1437,7 +1431,7 @@
               PRINT *, '       storage: ', Dprst_vol_open, '; transfer: ', Dprst_transfer(Ihru)/Cfs_conv
               ERROR STOP ERROR_water_use
             ENDIF
-            Dprst_vol_open = Dprst_vol_open - DBLE( Dprst_transfer(Ihru)*Dprst_area_open_max ) / Cfs_conv 
+            Dprst_vol_open = Dprst_vol_open - DBLE( Dprst_transfer(Ihru)*Dprst_area_open_max ) / Cfs_conv
           ENDIF
         ENDIF
         IF ( Dprst_area_clos_max>0.0 ) THEN

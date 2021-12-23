@@ -3132,12 +3132,12 @@
         !
         !1 - -----limit diversion to water right and flow in river
         !
-      if(iseg==9.and.kper==8.and.kstp==1)then
-!dev      etdif = pettotal - aettotal
-!dev          write(999,33)kper,kstp,kiter,SEG(2, iseg),
-!dev     +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
-        endif
-  33  format(3i5,6e20.10)
+  !    if(iseg==9.and.kper==8.and.kstp==1)then
+  !    etdif = pettotal - aettotal
+  !        write(999,33)kper,kstp,kiter,SEG(2, iseg),
+  !   +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
+  !      endif
+  !33  format(3i5,6e20.10)
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
 300   CONTINUE
       RETURN
@@ -3337,13 +3337,13 @@
      +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
         PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
-!dev        if(i==2)then
-!dev      !etdif = pettotal - aettotal
-!dev          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
-!dev     +                 PONDSEGFLOW(I),pettotal,aettotal,
-!dev     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
-!dev        endif
-!dev  33  format(4i5,6e20.10)
+!        if(i==2)then
+      !etdif = pettotal - aettotal
+!          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
+!     +                 PONDSEGFLOW(I),pettotal,aettotal,
+!     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
+!        endif
+!  33  format(4i5,6e20.10)
 300   continue
       return
       end subroutine demandpond_prms
