@@ -48,7 +48,7 @@
       DOUBLE PRECISION, SAVE :: Basin_soil_moist_tot
       DOUBLE PRECISION, SAVE :: Basin_soil_lower_stor_frac, Basin_soil_rechr_stor_frac, Basin_sz_stor_frac
       DOUBLE PRECISION, SAVE :: Basin_cpr_stor_frac, Basin_gvr_stor_frac, Basin_pfr_stor_frac
-      REAL, SAVE, ALLOCATABLE :: Perv_actet(:), Pref_flow_thrsh(:)
+      REAL, SAVE, ALLOCATABLE :: Perv_actet(:), Pref_flow_thrsh(:), hru_perv_actet(:)
       REAL, SAVE, ALLOCATABLE :: Soil_moist_tot(:), Recharge(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Upslope_interflow(:), Upslope_dunnianflow(:), Lakein_sz(:)
       REAL, SAVE, ALLOCATABLE :: Dunnian_flow(:), Cap_infil_tot(:)
@@ -266,6 +266,10 @@
       CALL declvar_real(MODNAME, 'perv_actet', 'nhru', Nhru, &
      &     'Actual ET from the capillary reservoir of each HRU', &
      &     'inches', Perv_actet)
+      ALLOCATE ( hru_perv_actet(Nhru) )
+      CALL declvar_real(MODNAME, 'hru_perv_actet', 'nhru', Nhru, &
+     &     'Actual ET from the capillary reservoir as HRU value', &
+     &     'inches', hru_perv_actet)
 
 !      ALLOCATE ( Perv_avail_et(Nhru) )
 !      CALL declvar_real(MODNAME, 'perv_avail_et', 'nhru', Nhru, &
@@ -779,6 +783,7 @@
       Gvr2pfr = 0.0
       Swale_actet = 0.0
       Perv_actet = 0.0
+      hru_perv_actet = 0.0
 !      Perv_avail_et = 0.0
       Recharge = 0.0
       Potet_lower = 0.0
@@ -1239,6 +1244,7 @@
 !          IF ( Soil_moist(i)<0.0 ) Soil_moist(i) = 0.0
 !        ENDIF
         Perv_actet(i) = pervactet
+        hru_perv_actet(i) = pervactet * perv_frac
 
 ! soil_moist & soil_rechr multiplied by perv_area instead of harea
         Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)
