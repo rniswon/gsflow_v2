@@ -9,12 +9,12 @@ submodule(PRMS_CONTROL_FILE) sm_read_control_file
                          Strmflow_module, Transp_module, Soilzone_module, Print_debug, Dprst_flag, Subbasin_flag, Frozen_flag, &
                          CsvON_OFF, MapOutON_OFF, Model_mode, Orad_flag, Endtime, Starttime, Snow_cbh_flag, Stream_temp_flag, &
                          Cascadegw_flag, Prms_warmup, Humidity_cbh_flag, Windspeed_cbh_flag, Strmtemp_humidity_flag, &
-                         Gwflow_cbh_flag, NhruOutON_OFF, NsubOutON_OFF, BasinOutON_OFF, Dyn_imperv_flag, Dyn_dprst_flag, Dyn_intcp_flag, &
-                         Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
-                         Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, NsegmentOutON_OFF, &
-                         Dyn_springfrost_flag, Dyn_snareathresh_flag, Dyn_covden_flag, Segment_transferON_OFF, Gwr_transferON_OFF, &
-                         Lake_transferON_OFF, External_transferON_OFF, Dprst_transferON_OFF, BasinOutON_OFF, &
-                         Snarea_curve_flag, Gsflow_output_file, Stat_var_file
+                         Gwflow_cbh_flag, NhruOutON_OFF, NsubOutON_OFF, BasinOutON_OFF, Dyn_imperv_flag, Dyn_dprst_flag, &
+                         Dyn_intcp_flag, Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, &
+                         Dyn_transp_on_flag, Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, &
+                         NsegmentOutON_OFF, Dyn_springfrost_flag, Dyn_snareathresh_flag, Dyn_covden_flag, &
+                         Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, External_transferON_OFF, &
+                         Dprst_transferON_OFF, BasinOutON_OFF, Snarea_curve_flag, Gsflow_output_file, Stat_var_file
   use GSFMODFLOW, only: Modflow_name, Modflow_time_zero
   use PRMS_MAP_RESULTS, only: NmapOutVars, MapOutVar_names
   use PRMS_STATVAR_OUT, only: statvarOut_format, nstatVars, statVar_element, statVar_names
@@ -70,7 +70,7 @@ contains
       if (ios /= 0) call read_error(5, 'invalid number of values: '//trim(paramname))
       read (control_unit, *, IOSTAT=ios) param_type
       if (ios /= 0) call read_error(5, 'invalid parameter type: '//trim(paramstring))
-      if (param_type < 1 .or. param_type > 4 .or. param_type == 3) call read_error(5, 'invalid parameter type: '//trim(paramstring))
+      if (param_type<1 .or. param_type>4 .or. param_type==3) call read_error(5, 'invalid parameter type: '//trim(paramstring))
       allocate (int_parameter_values(numvalues), real_parameter_values(numvalues), parameter_values(numvalues))
       if (param_type == INT_TYPE) then
         read (Control_unit, *, IOSTAT=ios) (int_parameter_values(j), j=1, numvalues)
@@ -98,13 +98,14 @@ contains
   module subroutine setup_cont()
     use PRMS_CONSTANTS, only: DEBUG_normal, ACTIVE, OFF
     use PRMS_MODULE, only: Print_debug, Dprst_flag, Cascade_flag, Soilzone_aet_flag, PRMS_land_iteration_flag, &
-                           Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, irrigated_area_module, AET_module, PET_ag_module, &
-                           selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, Agriculture_soilzone_flag, &
-                           Agriculture_canopy_flag, Agriculture_dprst_flag, &
-                           Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, Dprst_transfer_water_use, &
-                           mappingFileName, xyFileName, Iter_aet_flag
+                           Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, irrigated_area_module, AET_module, &
+                           PET_ag_module, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, &
+                           Agriculture_soilzone_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
+                           Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, &
+                           Dprst_transfer_water_use, mappingFileName, xyFileName, Iter_aet_flag
     use PRMS_CLIMATE_HRU, only: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, Albedo_day, Cloud_cover_day, &
-                                Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
+                                Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, &
+                                AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
     use PRMS_DYNAMIC_PARAM_READ, only: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
                                        wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
                                        potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, Dynamic_param_log_file, &

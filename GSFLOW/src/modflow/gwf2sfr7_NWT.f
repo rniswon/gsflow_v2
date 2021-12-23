@@ -2133,7 +2133,7 @@ C     -----------------------------------------------------------------
      +        il, ilay, iprior, iprndpth, iprvsg, ir, istsg, itot,itrib,
      +        itstr, iwidthcheck, kerp, kss, l, lk, ll, nstrpts, nreach,
      +        maxwav, icalccheck, iskip, iss, lsub, numdelt, irt, ifm,
-     +        lfold, illake, lakid, isfr_loop
+     +        lfold, illake, lakid, isfr_loop, mskip
 !      INTEGER irr, icc, icount  !cjm
       DOUBLE PRECISION FIVE_THIRDS
       PARAMETER (FIVE_THIRDS=5.0D0/3.0D0)
@@ -3505,20 +3505,23 @@ C74-----SUM SEEPAGE TO WATER TABLE.
           END IF
 C
 C75-----STORE FLOWS NEEDED FOR SENSITIVITIES. - ERB
-          IF ( IRTFLG.EQ.0 ) THEN
-            SFRQ(1, l) = flwmpt
-            SFRQ(2, l) = flowc
-            SFRQ(3, l) = flobot
-            SFRQ(5, l) = flowin
-          ELSE
-            SFRQ(1, l) = (qc + qd)/2.0
-            SFRQ(2, l) = (qc + qd)/2.0
-            SFRQ(3, l) = flobot
-            SFRQ(5, l) = qc
-          END IF
+            IF ( IRTFLG.EQ.0 ) THEN
+              SFRQ(1, l) = flwmpt
+              SFRQ(2, l) = flowc
+              SFRQ(3, l) = flobot
+              SFRQ(5, l) = flowin
+            ELSE
+              SFRQ(1, l) = (qc + qd)/2.0
+              SFRQ(2, l) = (qc + qd)/2.0
+              SFRQ(3, l) = flobot
+              SFRQ(5, l) = qc
+            END IF
 C
 C76-----ADD TERMS TO RHS AND HCOF IF FLOBOT IS NOT ZERO.
-          IF ( irt.EQ.numdelt .AND. (MODSIM_flag==OFF.OR.ifm==2) ) THEN
+          mskip = 1
+          IF ( irt.EQ.numdelt .AND. MODSIM_flag==ACTIVE .AND. ifm==2 )
+     1         mskip = 0
+          IF ( irt.EQ.numdelt .OR. mskip==0 ) THEN
             hstrave = 0.0D0
             DO i = 1, numdelt
               hstrave = hstrave + HSTRM(l,i)

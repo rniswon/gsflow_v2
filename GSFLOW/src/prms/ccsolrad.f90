@@ -13,7 +13,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Solar Radiation Distribution'
         character(len=*), parameter :: MODNAME = 'ccsolrad'
-        character(len=*), parameter :: Version_ccsolrad = '2021-11-19'
+        character(len=*), parameter :: Version_ccsolrad = '2021-12-09'
         INTEGER, SAVE :: Observed_flag
         ! Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_radadj, Basin_cloud_cover
@@ -176,8 +176,6 @@
         IF ( getparam_real(MODNAME, 'ccov_intcp', Nhru*MONTHS_PER_YEAR, Ccov_intcp)/=0) CALL read_error(2, 'ccov_intcp')
 
         Cloud_radadj = 0.0
-        Basin_radadj = 0.0D0
-        Basin_cloud_cover = 0.0D0
         Cloud_cover_hru = 0.0
 
         Observed_flag = OFF
