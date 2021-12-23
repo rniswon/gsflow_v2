@@ -2083,6 +2083,8 @@ C     *****************************************************************
 !!      USE GWFNWTMODULE, ONLY: Heps, A, IA, Icell
       USE GWFLAKMODULE, ONLY: THETA, STGOLD, STGNEW, LKARR1
 !!      USE GWFLAKMODULE, ONLY: THETA, STGOLD, STGNEW, VOL, LKARR1
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: MODSIM_flag
       IMPLICIT NONE
       INTRINSIC IABS, ABS, DABS, MIN, DSQRT, FLOAT, SQRT, SNGL
 C     -----------------------------------------------------------------
@@ -2130,8 +2132,8 @@ C     -----------------------------------------------------------------
       INTEGER i, ibflg, ic, icalc, idivseg, iflg, iic, iic2, iic3, iic4,
      +        il, ilay, iprior, iprndpth, iprvsg, ir, istsg, itot,itrib,
      +        itstr, iwidthcheck, kerp, kss, l, lk, ll, nstrpts, nreach,
-     +        maxwav, icalccheck, iskip, iss, lsub, numdelt, irt,
-     +        lfold, illake, lakid
+     +        maxwav, icalccheck, iskip, iss, lsub, numdelt, irt, ifm,
+     +        lfold, illake, lakid, isfr_loop, mskip
 !      INTEGER irr, icc, icount  !cjm
       DOUBLE PRECISION FIVE_THIRDS
       PARAMETER (FIVE_THIRDS=5.0D0/3.0D0)
@@ -2177,6 +2179,11 @@ C2b-----START INTERNAL TIME LOOP FOR STREAMFLOW ROUTING.
         numdelt = 1
       END IF
       DO irt = 1, numdelt
+C
+        isfr_loop = 1
+        IF ( MODSIM_flag==ACTIVE ) isfr_loop = 2
+C2c-----FORCE THE SFR7FM LOOP TO COMPLETE TWICE
+        DO ifm = 1, isfr_loop
 C
 C3------DETERMINE LAYER, ROW, COLUMN OF EACH REACH.
         DO l = 1, NSTRM
@@ -3511,7 +3518,10 @@ C75-----STORE FLOWS NEEDED FOR SENSITIVITIES. - ERB
             END IF
 C
 C76-----ADD TERMS TO RHS AND HCOF IF FLOBOT IS NOT ZERO.
-          IF ( irt.EQ.numdelt ) THEN
+          mskip = 1
+          IF ( irt.EQ.numdelt .AND. MODSIM_flag==ACTIVE .AND. ifm==2 )
+     1         mskip = 0
+          IF ( irt.EQ.numdelt .OR. mskip==0 ) THEN
             hstrave = 0.0D0
             DO i = 1, numdelt
               hstrave = hstrave + HSTRM(l,i)
@@ -3571,11 +3581,13 @@ C         STREAMBED BOTTOM ELEVATION.
               RHS(ic, ir, il) = RHS(ic, ir, il) - SUMRCH(l)
  !      fin=fin+sumrch(l)
             END IF
-            END IF
+          END IF
 !      write(iout,*)'in fm',l,fin,fout
         END DO !rsr, end l = 1, NSTRM loop
-C        
-C81-----END INTERNAL TIME LOOP FOR ROUTING STREAMFLOWS.
+C
+C81A----END THE LOOP THAT FORCES THE FM ROUTINES TO SOLVE TWICE
+        END DO
+C81b----END INTERNAL TIME LOOP FOR ROUTING STREAMFLOWS.
       END DO !rsr, end irt loop
 C
 C82-----RETURN.

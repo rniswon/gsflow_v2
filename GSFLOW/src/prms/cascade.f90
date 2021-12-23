@@ -196,9 +196,9 @@
       INTEGER FUNCTION cascinit()
       USE PRMS_CONSTANTS, ONLY: OFF, ERROR_cascades, CASCADE_OFF, CASCADE_HRU_SEGMENT, CASCADE_NORMAL, CASCADEGW_OFF
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Ngw, Print_debug, Cascade_flag, Cascadegw_flag, Gwr_swale_flag
+      USE PRMS_MODULE, ONLY: Ngw, Print_debug, Cascade_flag, Cascadegw_flag, Gwr_swale_flag, Hru_type
       USE PRMS_CASCADE
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Gwr_route_order, Active_gwrs, Gwr_type, Hru_type
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Gwr_route_order, Active_gwrs, Gwr_type
       use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions
@@ -310,9 +310,9 @@
       SUBROUTINE init_cascade(Iret)
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, INACTIVE, LAKE, SWALE, CASCADE_HRU_SEGMENT, CASCADE_NORMAL
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Ncascade, Ncascdgw, Print_debug, Cascade_flag, Cascadegw_flag
+      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Ncascade, Ncascdgw, Print_debug, Cascade_flag, Cascadegw_flag, Hru_type
       USE PRMS_CASCADE
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area
       use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions
@@ -549,8 +549,8 @@
       SUBROUTINE order_hrus(Iret)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, INACTIVE, LAND, LAKE, SWALE, GLACIER
       USE PRMS_CASCADE, ONLY: Hru_down, Iorder, MSGUNT, Circle_switch, Ncascade_hru
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Hru_type
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       use prms_utils, only: PRMS_open_module_file
       IMPLICIT NONE
 ! Functions

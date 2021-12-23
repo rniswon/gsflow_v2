@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2021-11-19'
+      character(len=*), parameter :: Version_srunoff = '2021-12-16'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -518,7 +518,6 @@
      &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, Frozen_flag !, Parameter_check_flag
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
-      USE PRMS_FLOWVARS, ONLY: Basin_sroff
       use prms_utils, only: read_error
       IMPLICIT NONE
 ! Local Variables
@@ -535,27 +534,16 @@
       Hru_impervevap = 0.0
       IF ( Call_cascade==ACTIVE ) Strm_seg_in = 0.0D0
       IF ( Cascade_flag>CASCADE_OFF ) THEN
-        Upslope_hortonian = 0.0D0
         Hru_hortn_cascflow = 0.0D0
         IF ( Nlake>0 ) Hortonian_lakes = 0.0D0
       ENDIF
 
-      Basin_sroffi = 0.0D0
-      Basin_sroffp = 0.0D0
-      Basin_infil = 0.0D0
-      Basin_sroff = 0.0D0
-      Basin_imperv_evap = 0.0D0
-      Basin_hortonian = 0.0D0
       Basin_dprst_sroff = 0.0D0
       Basin_dprst_evap = 0.0D0
       Basin_dprst_seep = 0.0D0
       Basin_sroff_upslope = 0.0D0
       Basin_sroff_down = 0.0D0
       Basin_hortonian_lakes = 0.0D0
-      Basin_contrib_fraction = 0.0D0
-      Srp = 0.0
-      Sri = 0.0
-      Sroff_ag = 0.0
 
       IF ( Init_vars_from_file==OFF ) THEN
         Basin_imperv_stor = 0.0D0
@@ -640,11 +628,11 @@
       INTEGER FUNCTION srunoffrun()
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF, DEBUG_WB, LAND, LAKE, GLACIER, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Call_cascade, &
-     &    Frozen_flag, Glacier_flag, PRMS_land_iteration_flag, Kkiter, AG_flag
+     &    Frozen_flag, Glacier_flag, PRMS_land_iteration_flag, Kkiter, AG_flag, Hru_type
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, &
      &    Hru_perv, Hru_imperv, Hru_percent_imperv, Hru_frac_perv, &
-     &    Dprst_area_max, Hru_area, Hru_type, Basin_area_inv, &
+     &    Dprst_area_max, Hru_area, Basin_area_inv, &
      &    Dprst_area_clos_max, Dprst_area_open_max, Hru_area_dble, Ag_area
       USE PRMS_CLIMATEVARS, ONLY: Potet, Tavgc
       USE PRMS_FLOWVARS, ONLY: Sroff, Infil, Imperv_stor, Pkwater_equiv, Dprst_vol_open, Dprst_vol_clos, &

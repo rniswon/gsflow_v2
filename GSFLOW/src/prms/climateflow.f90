@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2021-11-19'
+      character(len=*), parameter :: Version_climateflow = '2021-12-10'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -59,6 +59,8 @@
 !***********************************************************************
       MODULE PRMS_FLOWVARS
       IMPLICIT NONE
+      REAL, SAVE, ALLOCATABLE :: Soil_moist_ante(:), Soil_rechr_ante(:)
+      REAL, SAVE, ALLOCATABLE :: Slow_stor_ante(:), Pref_flow_stor_ante(:), Ssres_stor_ante(:)
 !   Declared Variables
       ! snow
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pkwater_equiv(:)
@@ -336,6 +338,9 @@
       ENDIF
 
 ! Soilzone variables
+      ALLOCATE ( Soil_moist_ante(Nhru), Soil_rechr_ante(Nhru) )
+      ALLOCATE ( Slow_stor_ante(Nhru), Pref_flow_stor_ante(Nhru), Ssres_stor_ante(Nhru) )
+
       ALLOCATE ( Soil_rechr(Nhru) )
       CALL declvar_real(Soilzone_module, 'soil_rechr', 'nhru', Nhru, &
      &     'Storage for recharge zone (upper portion) of the'// &
@@ -904,13 +909,13 @@
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nevap, Nlake, Ntemp, Nrain, Nsol, &
      &    Print_debug, Init_vars_from_file, Temp_flag, Precip_flag, &
-     &    Temp_module, Stream_order_flag, GSFLOW_flag, &
+     &    Temp_module, Stream_order_flag, GSFLOW_flag, Hru_type, &
      &    Precip_module, Solrad_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Et_flag, Dprst_flag, Solrad_flag, &
      &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, AG_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
-      USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_type, Hru_perv
+      USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv
       use prms_utils, only: c_to_f, checkdim_bounded_limits, checkdim_param_limits, f_to_c, read_error
       IMPLICIT NONE
 ! Local variables
@@ -1187,6 +1192,45 @@
             Ssres_stor(i) = Sat_threshold(i)
           ENDIF
         ENDIF
+
+        IF ( AG_flag==ACTIVE ) THEN
+        IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
+          IF ( Parameter_check_flag>0 ) THEN
+            PRINT 9022, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
+            ierr = 1
+          ELSE
+            IF ( Print_debug>DEBUG_less ) PRINT 9032, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
+            Ag_soil_rechr_max(i) = Ag_soil_moist_max(i)
+          ENDIF
+        ENDIF
+        IF ( Ag_soil_rechr(i)>Ag_soil_rechr_max(i) ) THEN
+          IF ( Parameter_check_flag>0 ) THEN
+            PRINT 9023, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
+            ierr = 1
+          ELSE
+            IF ( Print_debug>DEBUG_less ) PRINT 9033, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
+            Ag_soil_rechr(i) = Ag_soil_rechr_max(i)
+          ENDIF
+        ENDIF
+        IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) THEN
+          IF ( Parameter_check_flag>0 ) THEN
+            PRINT 9024, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
+            ierr = 1
+          ELSE
+            IF ( Print_debug>DEBUG_less ) PRINT 9034, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
+            Ag_soil_moist(i) = Ag_soil_moist_max(i)
+          ENDIF
+        ENDIF
+        IF ( Ag_soil_rechr(i)>Ag_soil_moist(i) ) THEN
+          IF ( Parameter_check_flag>0 ) THEN
+            PRINT 9025, i, Ag_soil_rechr(i), Ag_soil_moist(i)
+            ierr = 1
+          ELSE
+            IF ( Print_debug>DEBUG_less ) PRINT 9035, i, Ag_soil_rechr(i), Ag_soil_moist(i)
+            Ag_soil_rechr(i) = Ag_soil_moist(i)
+          ENDIF
+        ENDIF
+        ENDIF
       ENDDO
 
       IF ( ierr>0 ) STOP ERROR_PARAM
@@ -1212,16 +1256,10 @@
       Hru_snow = 0.0
       Swrad = 0.0
       Potet = 0.0
-      Slow_flow = 0.0
-      Soil_to_gw = 0.0
-      Soil_to_ssr = 0.0
       Hru_actet = 0.0
-      Infil = 0.0
       Sroff = 0.0
 ! initialize arrays (dimensioned Nssr)
-      Ssr_to_gw = 0.0
       Ssres_in = 0.0
-      Ssres_flow = 0.0
       IF ( Solrad_flag==ddsolrad_module .OR. Solrad_flag==ccsolrad_module ) Orad_hru = 0.0
       IF ( Et_flag==potet_pt_module .OR. Et_flag==potet_pm_module .OR. Et_flag==potet_pm_sta_module ) THEN
         Tempc_dewpt = 0.0
@@ -1302,7 +1340,11 @@
  9002 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max > soil_moist_max', 2F10.5)
  9003 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_init > soil_rechr_max', 2F10.5)
  9004 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_init > soil_moist_max', 2F10.5)
- 9005 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr > soil_moist based on init and max values', 2F10.5)
+ 9005  FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr > soil_moist based on init and max values', 2F10.5)
+ 9022 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_max > ag_soil_moist_max', 2F10.5)
+ 9023 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max', 2F10.5)
+ 9024 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max', 2F10.5)
+ 9025 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr > ag_soil_moist based on init and max values', 2F10.5)
 ! 9006 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_max < 0.00001', F10.5)
 ! 9007 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max < 0.00001', F10.5)
 ! 9008 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_moist_max < 0.00001, set to 0.00001')
@@ -1315,7 +1357,14 @@
      &        'soil_moist set to soil_moist_max')
  9015 FORMAT ('WARNING, HRU: ', I0, ' soil_rechr_init > soil_moist_init,', 2F10.5, /, 9X, &
      &        'soil_rechr set to soil_moist based on init and max values')
-
+ 9032 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_max > ag_soil_moist_max,', 2F10.5, /, 9X, &
+     &        'ag_soil_rechr_max set to ag_soil_moist_max')
+ 9033 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max,', 2F10.5, /, 9X, &
+     &        'ag_soil_rechr set to ag_soil_rechr_max')
+ 9034 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max,', 2F10.5, /, 9X, &
+     &        'ag_soil_moist set to ag_soil_moist_max')
+ 9035 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_moist_init,', 2F10.5, /, 9X, &
+     &        'ag_soil_rechr set to ag_soil_moist based on init and max values')
       END FUNCTION climateflow_init
 
 !***********************************************************************

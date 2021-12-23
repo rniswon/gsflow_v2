@@ -427,14 +427,13 @@
 !***********************************************************************
       INTEGER FUNCTION ide_temp_run(Temp_wght_dist, Temp_wght_elev)
       USE PRMS_CONSTANTS, ONLY: FEET2METERS, GLACIER, FEET, CELSIUS
-      USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nowmonth
+      USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nowmonth, Hru_type
       USE PRMS_IDE, ONLY: Hru_x, Hru_y, Tmax_rain_sta, Solrad_elev,
      +    Tmin_rain_sta, Temp_nuse, Temp_nsta, Tsta_x, Tsta_y, Dist_exp,
      +    Psta_x, Psta_y, Basin_centroid_x, Basin_centroid_y,
      +    Ndist_tsta
       USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_area, Active_hrus,
-     +    Hru_route_order, Hru_elev_meters, Hru_elev_ts, Hru_type,
-     +    Elev_units
+     +    Hru_route_order, Hru_elev_meters, Hru_elev_ts, Elev_units
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp,
      +    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf,
      +    Tavgc, Tmin_aspect_adjust, Tmax_aspect_adjust,
@@ -605,14 +604,13 @@
       INTEGER FUNCTION ide_rain_run(Prcp_wght_dist, Prcp_wght_elev)
       USE PRMS_CONSTANTS, ONLY: FEET2METERS, MM2INCH, GLACIER, FEET,
      +    CELSIUS, ERROR_data
-      USE PRMS_MODULE, ONLY: Nrain, Nowmonth
+      USE PRMS_MODULE, ONLY: Nrain, Nowmonth, Hru_type
       USE PRMS_IDE, ONLY: Hru_x, Hru_y, Psta_x, Psta_y,
      +    Rain_nuse, Rain_nsta, Tmax_rain_sta, Tmin_rain_sta,
      +    Ndist_psta, Dist_exp, Precip_ide, Adjust_snow, Adjust_rain,
      +    Tmax_allsnow_sta, Tmax_allrain_sta
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus,
-     +    Hru_route_order, Hru_elev_meters, Hru_elev_ts, Hru_type,
-     +    Elev_units
+     +    Hru_route_order, Hru_elev_meters, Hru_elev_ts, Elev_units
       USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Tminf, Newsnow, Pptmix,
      +    Hru_ppt, Hru_rain, Hru_snow, Basin_rain,
      +    Basin_ppt, Prmx, Basin_snow, Psta_elev_meters, Basin_obs_ppt,

@@ -112,9 +112,9 @@
       INTEGER FUNCTION sthinit()
       USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, DEBUG_SOLTAB, OFF
       use PRMS_READ_PARAM_FILE, only: getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag, Hru_type
       USE PRMS_SOLTAB
-      USE PRMS_BASIN, ONLY: Hru_type, Active_hrus, Hru_route_order, Basin_lat, Hru_lat
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Basin_lat, Hru_lat
       use prms_utils, only: PRMS_open_module_file, read_error
       IMPLICIT NONE
 ! Functions

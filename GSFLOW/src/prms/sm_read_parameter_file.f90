@@ -555,9 +555,8 @@ contains
 !***********************************************************************
   module function getparam_real_1d(Modname, Paramname, Numvalues, Values) result(res)
     use prms_constants, only: ERROR_param
-    use PRMS_MODULE, only: Parameter_check_flag
+    use PRMS_MODULE, only: Parameter_check_flag, Hru_type
     use prms_utils, only: error_stop
-    use PRMS_BASIN, only: Hru_type
     implicit none
       ! Arguments
       integer :: res  ! Function result
@@ -599,7 +598,7 @@ contains
 
     if (Parameter_check_flag == 1) then
       do i = 1, Numvalues
-!        if ( Hru_type(i)==0 .OR. Hru_type(i)==2 ) CYCLE
+        !if ( Hru_type(i)==0 .OR. Hru_type(i)==2 ) CYCLE
         if ( Parameter_data(param_id)%values_real_1d(i) > Parameter_data(param_id)%maximum ) then
           print '(/,3A,I0,A,I0)', 'WARNING, value > maximum value for parameter: ', Paramname, '; index: ', param_id, '; HRU: ', i
           print '(A,F0.5,A,F0.5)', '         value: ', Parameter_data(param_id)%values_real_1d(i), '; maximum value: ', &

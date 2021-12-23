@@ -112,6 +112,13 @@
         Num_variables = 0
         ALLOCATE ( Variable_data(MAXVARIABLES) ) ! don't know how many, need to read var_name file
 
+        ALLOCATE ( Hru_type(Nhru) )
+        Hru_type = 0
+        IF ( declparam(MODNAME, 'hru_type', 'nhru', 'integer', &
+     &       '1', '0', '4', &
+     &       'HRU type', 'Type of each HRU (0=inactive; 1=land; 2=lake; 3=swale; 4=glacier)', &
+     &       'none')/=0 ) CALL read_error(1, 'hru_type')
+
         IF ( GSFLOW_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           CALL declvar_int(MODNAME, 'KKITER', 'one', 1, &
      &         'Current iteration in GSFLOW simulation', 'none', KKITER)
@@ -155,6 +162,8 @@
 
       ELSEIF ( Process(:4)=='init' ) THEN
         Process_flag = INIT
+
+        IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
 
         Grid_flag = OFF
         IF ( Nhru==Nhrucell ) Grid_flag = ACTIVE
@@ -633,24 +642,15 @@
       IF ( control_string(Model_mode, 'model_mode')/=0 ) CALL read_error(5, 'model_mode')
       IF ( Model_mode(:4)=='    ' ) Model_mode = 'GSFLOW5'
       PRMS4_flag = ACTIVE
-      IF ( Model_mode(:5)=='PRMS5' .OR. Model_mode(:7)=='PRMS_AG' .OR. &
-     &     Model_mode(:7)=='GSFLOW5' .OR. Model_mode(:9)=='GSFLOW_AG' ) PRMS4_flag = OFF
+      IF ( Model_mode(:5)=='PRMS5' .OR. Model_mode(:7)=='GSFLOW5' .OR. Model_mode(:7)=='gsflow5' ) PRMS4_flag = OFF
       PRMS_flag = ACTIVE
       GSFLOW_flag = OFF
       PRMS_only = OFF
-      AG_flag = OFF
-      IF ( Model_mode(:9)=='GSFLOW_AG' .OR. Model_mode(:9)=='gsflow_ag' .OR. Model_mode(:7)=='PRMS_AG' &
-     &     .OR. Model_mode(:7)=='prms_ag' ) AG_flag = ACTIVE
-      ! Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 3=GSFLOW_AG; 4=PRMS_AG)
-      IF ( Model_mode(:7)=='PRMS_AG' .OR. Model_mode(:7)=='prms_ag' ) THEN
-        Model = PRMS_AG
-        PRMS_only = ACTIVE
-      ELSEIF ( Model_mode(:4)=='PRMS' .OR. Model_mode(:4)=='prms' .OR. Model_mode(:5)=='DAILY' ) THEN
+      MODSIM_flag = OFF
+      ! Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
+      IF ( Model_mode(:4)=='PRMS' .OR. Model_mode(:4)=='prms' .OR. Model_mode(:5)=='DAILY' ) THEN
         Model = PRMS
         PRMS_only = ACTIVE
-      ELSEIF ( Model_mode(:9)=='GSFLOW_AG' .OR. Model_mode(:9)=='gsflow_ag' ) THEN
-        Model = GSFLOW_AG
-        GSFLOW_flag = ACTIVE
       ELSEIF ( Model_mode(:6)=='GSFLOW' .OR. Model_mode(:4)=='gsflow' ) THEN
         Model = GSFLOW
         GSFLOW_flag = ACTIVE
@@ -788,6 +788,8 @@
       IF ( control_string(Solrad_module, 'solrad_module')/=0 ) CALL read_error(5, 'solrad_module')
       Soilzone_module = 'soilzone'
       IF ( control_string(Soilzone_module, 'soilzone_module')/=0 ) CALL read_error(5, 'soilzone_module')
+      AG_flag = OFF
+      IF ( Soilzone_module=='soilzone_ag' ) AG_flag = ACTIVE
       Strmflow_module = 'strmflow'
       IF ( control_string(Strmflow_module, 'strmflow_module')/=0 ) CALL read_error(5, 'strmflow_module')
       IF ( control_string(irrigated_area_module, 'irrigated_area_module')/=0 ) CALL read_error(5, 'irrigated_area_module')

@@ -877,10 +877,10 @@
       INTEGER FUNCTION muskingum_lake_run()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, CFS2CMS_CONV, OUTFLOW_SEGMENT, LAKE, ERROR_water_use, ERROR_streamflow, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Nsegment, Nlake, Cascade_flag, Glacier_flag, Lake_transfer_water_use, Lake_add_water_use, &
-     &    Nowyear, Nowmonth, Nowday
+     &    Nowyear, Nowmonth, Nowday, Hru_type
       USE PRMS_MUSKINGUM_LAKE
       USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_route_order, Active_hrus, &
-     &    Lake_area, Lake_type, Hru_area_dble, Lake_hru_id, Hru_type, Weir_gate_flag, &
+     &    Lake_area, Lake_type, Hru_area_dble, Lake_hru_id, Weir_gate_flag, &
      &    Basin_gl_cfs, Basin_gl_ice_cfs
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_cms, Basin_gwflow_cfs, Basin_ssflow_cfs, &

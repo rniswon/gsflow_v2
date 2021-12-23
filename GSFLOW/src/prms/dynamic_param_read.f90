@@ -10,7 +10,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2021-10-22'
+        character(len=*), parameter :: Version_dynamic_param_read = '2021-12-14'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -444,12 +444,12 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dynamic, INACTIVE, LAKE, &
      &    potet_jh_module, potet_pan_module, potet_hamon_module, potet_hs_module, &
      &    potet_pt_module, potet_pm_module, climate_hru_module
-      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, AG_flag, &
+      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, AG_flag, Hru_type, &
      &    Dyn_imperv_flag, Dyn_covtype_flag, Dyn_potet_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &    Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dprst_flag, &
      &    Dyn_snareathresh_flag, Et_flag, PRMS4_flag, GSFLOW_flag, Dyn_ag_frac_flag
       USE PRMS_DYNAMIC_PARAM_READ
-      USE PRMS_BASIN, ONLY: Hru_type, Hru_area, Dprst_clos_flag, &
+      USE PRMS_BASIN, ONLY: Hru_area, Dprst_clos_flag, &
      &    Hru_percent_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Dprst_frac, Dprst_open_flag, &
      &    Dprst_area_max, Dprst_area_open_max, Dprst_area_clos_max, Dprst_frac_open, &
      &    Cov_type, Basin_area_inv, Covden_win, Covden_sum, Ag_area, Ag_frac
@@ -550,7 +550,10 @@
      &       Check_ag_frac==ACTIVE ) THEN
           Basin_soil_moist = 0.0D0
           Basin_soil_rechr = 0.0D0
-          IF ( Check_ag_frac==ACTIVE ) Basin_ag_soil_moist = 0.0D0
+          IF ( Check_ag_frac==ACTIVE ) THEN
+            Basin_ag_soil_moist = 0.0D0
+            Basin_ag_soil_rechr = 0.0D0
+          ENDIF
           DO i = 1, Nhru
             IF ( Hru_type(i)==LAKE .OR. Hru_type(i)==INACTIVE ) CYCLE ! skip lake and inactive HRUs
             harea = Hru_area(i)
@@ -585,6 +588,7 @@
               IF ( Ag_soil_moist(i)>0.0 ) THEN
                 IF ( frac_ag>0.0 ) THEN
                   Ag_soil_moist(i) = Ag_soil_moist(i)*Ag_frac(i)/frac_ag
+                  Ag_soil_rechr(i) = Ag_soil_rechr(i)*Ag_frac(i)/frac_ag
                 ELSE
                   frac = Hru_frac_perv(i)
                   IF ( frac>0.0 ) THEN
@@ -601,6 +605,7 @@
               Ag_frac(i) = frac_ag
               Ag_area(i) = Ag_frac(i) * Hru_area(i)
               Basin_ag_soil_moist = Basin_ag_soil_moist + Ag_soil_moist(i)*Ag_area(i)
+              Basin_ag_soil_rechr = Basin_ag_soil_rechr + Ag_soil_rechr(i)*Ag_area(i)
             ENDIF
 
             IF ( Check_dprst_frac==ACTIVE .OR. check_dprst_depth_flag==ACTIVE ) THEN
@@ -1028,8 +1033,7 @@
 !***********************************************************************
       SUBROUTINE write_dynoutput(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
-      USE PRMS_BASIN, ONLY: Hru_type
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday, Hru_type
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -1065,8 +1069,7 @@
 !***********************************************************************
       SUBROUTINE write_dynparam_int(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
-      USE PRMS_BASIN, ONLY: Hru_type
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday, Hru_type
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -1102,8 +1105,7 @@
 !***********************************************************************
       SUBROUTINE write_dynparam(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
-      USE PRMS_BASIN, ONLY: Hru_type
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday, Hru_type
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -1138,8 +1140,7 @@
 !     Values are read in, Parm are are updated or old
 !***********************************************************************
 !      SUBROUTINE write_dynparam_dble(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
-!      USE PRMS_MODULE, ONLY: Print_debug, Nhru, Nowyear, Nowmonth, Nowday
-!      USE PRMS_BASIN, ONLY: Hru_type
+!      USE PRMS_MODULE, ONLY: Print_debug, Nhru, Nowyear, Nowmonth, Nowday, Hru_type
 !      IMPLICIT NONE
 ! Arguments
 !      INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -1177,8 +1178,7 @@
 !***********************************************************************
       SUBROUTINE write_dynparam_potet(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: INACTIVE, DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
-      USE PRMS_BASIN, ONLY: Hru_type
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday, Hru_type
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
