@@ -96,7 +96,7 @@ UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
 SFR-NWT Package                 gwf2sfr7_NWT        2020-09-30
 AG-NWT Package                  gwf2ag1_NWT_ponds   2021-10-19
 
-Using Control File: .\Sagehen_ponds.control
+Using Control File: Sagehen_ponds.control
 
 Using Parameter File: ..\input\prms\sagehen_grid_v5_highKc.params
 
@@ -106,9 +106,9 @@ End time:   1995/10/31 00:00:00
 
 
 Model domain area:        11226.32    Active basin area:      6740.99
-Fraction impervious:        0.0000    Fraction pervious:       1.0000
-DPRST area:                   0.00    Fraction DPRST:          0.0000
+Fraction impervious:        0.0000    Fraction pervious:       0.9967
+DPRST area:                  22.42    Fraction DPRST:          0.0033
 
 
-Execution elapsed time    2 minutes  4.82 seconds
+Execution elapsed time    1 minutes 49.81 seconds
 
