@@ -34,7 +34,7 @@ PRMS_land_iteration_flag
 model_mode
 1
 4
-GSFLOW_AG
+GSFLOW5
 ####
 start_time
 6
@@ -358,10 +358,10 @@ agriculture_soil_flag
 1
 1
 ####
-soilzone_aet_flag
+soilzone_module
 1
-1
-0
+4
+soilzone
 ####
 executable_desc
 1
