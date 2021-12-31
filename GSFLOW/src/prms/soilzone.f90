@@ -950,21 +950,22 @@
 
       CALL init_basin_vars()
       gwin = 0.0D0
-      ! Soil_to_gw and Soil_to_ssr for whole HRU
-      Soil_to_gw = 0.0
-      Soil_to_ssr = 0.0
-!      Snowevap_aet_frac = 0.0
-      ! gravity reservoir variables for whole HRU
-      Ssr_to_gw = 0.0
-      Slow_flow = 0.0
-      Ssres_flow = 0.0
-      Cap_waterin = 0.0
-      Soil_saturated = OFF
       update_potet = OFF
       IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
 
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
+
+        ! Soil_to_gw and Soil_to_ssr for whole HRU
+        Soil_to_gw(i) = 0.0
+        Soil_to_ssr(i) = 0.0
+!        Snowevap_aet_frac(i) = 0.0
+        ! gravity reservoir variables for whole HRU
+        Ssr_to_gw(i) = 0.0
+        Slow_flow(i) = 0.0
+        Ssres_flow(i) = 0.0
+        Cap_waterin(i) = 0.0
+        Soil_saturated(i) = OFF
 
         hruactet = Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i)
         IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)

@@ -26,8 +26,8 @@
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr
       !DOUBLE PRECISION, SAVE :: Basin_ag_ssstor, Basin_ag_recharge, Basin_ag_ssflow
-      REAL, SAVE, ALLOCATABLE :: Ag_soil_to_gw(:), Ag_soil_to_ssr(:), Ag_dunnian(:), Ag_replenish_frac(:)
-      REAL, SAVE, ALLOCATABLE :: It0_ag_soil_rechr(:), It0_ag_soil_moist(:)
+!      REAL, SAVE, ALLOCATABLE :: Ag_soil_to_gw(:), Ag_soil_to_ssr(:)
+      REAL, SAVE, ALLOCATABLE :: It0_ag_soil_rechr(:), It0_ag_soil_moist(:), Ag_replenish_frac(:)
       !REAL, SAVE, ALLOCATABLE :: Ag_slow_flow(:), Ag_ssres_in(:), Ag_water_maxin(:)
       !REAL, SAVE, ALLOCATABLE :: Ag_ssr_to_gw(:), Ag_slow_stor(:), Ag_recharge(:)
       !REAL, SAVE, ALLOCATABLE :: Ag_ssres_stor(:), Ag_ssres_flow(:)
@@ -105,8 +105,7 @@
       CALL print_module(MODDESC_AG, MODNAME_AG, Version_soilzone_ag)
 
 ! Agriculture variables and parameters
-      ALLOCATE ( Ag_soil_to_gw(Nhru), Ag_soil_to_ssr(Nhru) )
-      ALLOCATE ( Ag_dunnian(Nhru) )
+!      ALLOCATE ( Ag_soil_to_gw(Nhru), Ag_soil_to_ssr(Nhru) )
       IF ( Cascade_flag>OFF ) ALLOCATE ( Ag_upslope_dunnian(Nhru) )
 
       ALLOCATE ( Ag_actet(Nhru) )
@@ -282,10 +281,8 @@
       Basin_ag_actet = 0.0D0
       Basin_ag_gvr2sm = 0.0D0
       ! dimensioned nhru
-      Ag_soil_to_gw = 0.0
-      Ag_soil_to_ssr = 0.0
-      Ag_dunnian = 0.0
-      Ag_hortonian = 0.0
+      !Ag_soil_to_gw = 0.0
+      !Ag_soil_to_ssr = 0.0
       Ag_soil2gvr = 0.0
       Ag_soil_lower_stor_max = 0.0
       Ag_potet_lower = 0.0
@@ -450,8 +447,6 @@
         ENDIF
       ENDIF
 
-      Unused_ag_et = 0.0
-      Ag_soilwater_deficit = 0.0
       IF ( Soil_iter>1 ) THEN
         Ag_soil_moist = It0_ag_soil_moist
         Ag_soil_rechr = It0_ag_soil_rechr
@@ -464,29 +459,31 @@
       Basin_agwaterin = 0.0D0
       CALL init_basin_vars()
       gwin = 0.0D0
-      ! Soil_to_gw and Soil_to_ssr for whole HRU
-      Soil_to_gw = 0.0
-      Soil_to_ssr = 0.0
-!      Snowevap_aet_frac = 0.0
-      ! gravity reservoir variables for whole HRU
-      Ssr_to_gw = 0.0
-      Slow_flow = 0.0
-      Ssres_flow = 0.0
-      Cap_waterin = 0.0
-      Soil_saturated = OFF
       update_potet = OFF
       unsatisfied_big = 0.0
       IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
       add_estimated_irrigation = OFF
       num_hrus_ag_iter = 0
-      Ag_soil_saturated = OFF
-      Ag_gvr2sm = 0.0
 
 ! ***************************************
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 ! ***************************************
-
+        ! Soil_to_gw and Soil_to_ssr for whole HRU
+        Soil_to_gw(i) = 0.0
+        Soil_to_ssr(i) = 0.0
+!        Snowevap_aet_frac(i) = 0.0
+        ! gravity reservoir variables for whole HRU
+        Ssr_to_gw(i) = 0.0
+        Slow_flow(i) = 0.0
+        Ssres_flow(i) = 0.0
+        Cap_waterin(i) = 0.0
+        Soil_saturated(i) = OFF
+        Ag_soil_saturated(i) = OFF
+        Ag_gvr2sm(i) = 0.0
+        Ag_hortonian(i) = 0.0
+        Unused_ag_et(i) = 0.0
+        Ag_soilwater_deficit(i) = 0.0
         !HRU_id = i
         hruactet = Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i)
         IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
