@@ -6,7 +6,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Output Summary'
         character(len=*), parameter :: MODNAME = 'prms_summary'
-        character(len=*), parameter :: Version_prms_summary = '2021-09-14'
+        character(len=*), parameter :: Version_prms_summary = '2021-11-19'
         INTEGER, PARAMETER :: NVARS = 51
         INTEGER, SAVE :: Iunit
         INTEGER, SAVE, ALLOCATABLE :: Gageid_len(:)
@@ -25,6 +25,9 @@
 
       SUBROUTINE prms_summary()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, ERROR_open_out, DOCUMENTATION, MAXDIM
+      use PRMS_CONTROL_FILE, only: control_string
+      use PRMS_MMFAPI, only: declvar_dble
+      use PRMS_READ_PARAM_FILE, only: declparam, getparamstring, getparam_int
       USE PRMS_MODULE, ONLY: Model, Process_flag, Nobs, Nsegment, Npoigages, &
      &    Csv_output_file, Inputerror_flag, Parameter_check_flag, CsvON_OFF, Nowyear, Nowmonth, Nowday
       USE PRMS_PRMS_SUMMARY
@@ -42,12 +45,11 @@
      &    Basin_pref_stor, Basin_slstor, Basin_soil_rechr, Basin_sz2gw, Basin_dunnian
       USE PRMS_GWFLOW, ONLY: Basin_gwstor, Basin_gwin, Basin_gwsink, Basin_gwflow, &
      &    Basin_gwstor_minarea_wb, Basin_dnflow
+      use prms_utils, only: checkdim_bounded_limits, print_module, PRMS_open_output_file, read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MAX !, CHAR, INDEX
-      INTEGER, EXTERNAL :: declparam, getparam_int !, control_integer
-      EXTERNAL :: read_error, PRMS_open_output_file, print_module, statvar_to_csv, checkdim_bounded_limits, declvar_dble
-      INTEGER, EXTERNAL :: getparamstring, control_string
+      EXTERNAL :: statvar_to_csv
 ! Local Variables
       INTEGER :: i, ios, idim !, foo, statsON_OFF
       DOUBLE PRECISION :: gageflow
@@ -264,11 +266,10 @@
 !***********************************************************************
       SUBROUTINE statvar_to_csv()
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_open_in, ERROR_open_out, ERROR_read
+      use PRMS_CONTROL_FILE, only: control_string
       USE PRMS_PRMS_SUMMARY
+      use prms_utils, only: error_stop, numchars, PRMS_open_input_file, PRMS_open_output_file, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: control_string, numchars
-      EXTERNAL PRMS_open_input_file, PRMS_open_output_file, error_stop
       ! Local Variable
       INTEGER :: inunit, numvariables, ios, i, outunit, ts, yr, mo, day, hr, mn, sec, num
       INTEGER, ALLOCATABLE :: varindex(:), nc(:)

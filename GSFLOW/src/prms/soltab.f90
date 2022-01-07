@@ -65,12 +65,11 @@
 !***********************************************************************
       INTEGER FUNCTION sthdecl()
       USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru
       USE PRMS_SOLTAB
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module !, declvar_dble
 !***********************************************************************
       sthdecl = 0
 
@@ -112,15 +111,16 @@
 !***********************************************************************
       INTEGER FUNCTION sthinit()
       USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, DEBUG_SOLTAB, OFF
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag
+      use PRMS_READ_PARAM_FILE, only: getparam_real
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag, Hru_type
       USE PRMS_SOLTAB
-      USE PRMS_BASIN, ONLY: Hru_type, Active_hrus, Hru_route_order, Basin_lat, Hru_lat
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Basin_lat, Hru_lat
+      use prms_utils, only: PRMS_open_module_file, read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SIN, COS, DBLE
 !     INTRINSIC :: ASIN
-      INTEGER, EXTERNAL :: getparam_real
-      EXTERNAL :: compute_soltab, read_error, PRMS_open_module_file
+      EXTERNAL :: compute_soltab
 ! Local Variables
       CHARACTER(LEN=12) :: output_path
       INTEGER :: jd, j, n, file_unit, nn

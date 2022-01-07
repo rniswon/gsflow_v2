@@ -3,14 +3,13 @@
 !***********************************************************************
       SUBROUTINE convert_params()
       USE PRMS_CONSTANTS, ONLY: DECL, INIT, MONTHS_PER_YEAR, ACTIVE
+      use PRMS_READ_PARAM_FILE, only: declparam, getparam_real
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Dprst_flag, Model_mode
+      use prms_utils, only: print_module, PRMS_open_module_file, read_error
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Convert PRMS parameters'
       character(len=*), parameter :: MODNAME = 'convert_params'
-      character(len=*), parameter :: Version_convert_params = '2021-09-07'
-! Functions
-      EXTERNAL :: print_module, PRMS_open_module_file, read_error
-      INTEGER, EXTERNAL :: declparam, getparam_real
+      character(len=*), parameter :: Version_convert_params = '2021-11-19'
       INTRINSIC :: MIN
 ! Parameters
       REAL, SAVE, ALLOCATABLE :: Soil_rechr_init(:), Soil_moist_init(:), Soil_rechr_max(:)

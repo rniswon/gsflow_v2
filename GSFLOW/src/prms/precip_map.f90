@@ -2,7 +2,7 @@
 ! Maximum, minimum, average temperatures, and precipitation are distributed to each HRU
 ! using temperature and/or precipitation data input as a time series of gridded
 ! or other spatial units using an area-weighted method and correction factors to
-! account for differences in altitude, spatial variation, topography, and 
+! account for differences in altitude, spatial variation, topography, and
 ! measurement gage efficiency
 !***********************************************************************
       MODULE PRMS_PRECIP_MAP
@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=*), parameter :: MODNAME = 'precip_map'
-        character(len=*), parameter :: Version_precip_map = '2021-09-07'
+        character(len=*), parameter :: Version_precip_map = '2021-11-19'
         INTEGER, SAVE :: Precip_unit
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
@@ -25,17 +25,18 @@
 
       SUBROUTINE precip_map()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, OFF, MM, MM2INCH, MONTHS_PER_YEAR, precip_map_module
+      use PRMS_CONTROL_FILE, only: control_string
+      use PRMS_READ_PARAM_FILE, only: declparam, getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Process_flag, Start_year, Start_month, Start_day, Nmap2hru, Nmap, Nowmonth
       USE PRMS_PRECIP_MAP
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Hru_rain, Hru_snow, Prmx, Pptmix, Newsnow, &
      &    Precip_units, Tmax_allrain_f, Adjmix_rain, Tmaxf, Tminf, &
      &    Basin_ppt, Basin_snow, Basin_rain, Basin_obs_ppt, Tmax_allsnow_f
+      use prms_utils, only: find_current_time, find_header_end, print_date, print_module, read_error
 ! Functions
       INTRINSIC :: SNGL
-      INTEGER, EXTERNAL :: declparam, getparam_int, getparam_real, control_string
-      EXTERNAL :: read_error, precip_form, find_header_end, find_current_time
-      EXTERNAL :: read_cbh_date, print_module, print_date
+      EXTERNAL :: precip_form, read_cbh_date
 ! Local Variables
       INTEGER :: yr, mo, dy, i, hr, mn, sec, ierr, ios, j, kg, kh, istop
       REAL :: ppt, harea

@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Temperature Distribution'
       character(len=10), parameter :: MODNAME = 'temp_dist2'
-      character(len=*), parameter :: Version_temp = '2021-09-07'
+      character(len=*), parameter :: Version_temp = '2021-11-19'
       INTEGER, SAVE, ALLOCATABLE :: N_tsta(:), Nuse_tsta(:, :)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dist(:, :)
       REAL, SAVE, ALLOCATABLE :: Delv(:, :), Elfac(:, :)
@@ -71,13 +71,14 @@
 !***********************************************************************
       INTEGER FUNCTION t2dist2decl()
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ERROR_dim
+      use PRMS_MMFAPI, only: declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Model, Nhru, Ntemp
       USE PRMS_TEMP_DIST2
+      use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: INDEX
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, error_stop, declvar_real
 !***********************************************************************
       t2dist2decl = 0
 
@@ -202,14 +203,14 @@
 !***********************************************************************
       INTEGER FUNCTION t2dist2init()
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DNEARZERO, NEARZERO
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY:  Nhru, Ntemp, Init_vars_from_file
       USE PRMS_TEMP_DIST2
       USE PRMS_BASIN, ONLY: Hru_elev
       USE PRMS_CLIMATEVARS, ONLY: Tsta_elev
+      use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: getparam_real, getparam_int
-      EXTERNAL :: read_error
       INTRINSIC :: DSQRT, ABS, DABS, DBLE
 ! Local Variables
       INTEGER :: i, j, k, n, kk, kkbig
@@ -320,16 +321,16 @@
 !***********************************************************************
       INTEGER FUNCTION t2dist2run()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, DNEARZERO, MAXTEMP, MINTEMP, ERROR_data, GLACIER
-      USE PRMS_MODULE, ONLY: Ntemp, Glacier_flag, Nowmonth
+      USE PRMS_MODULE, ONLY: Ntemp, Glacier_flag, Nowmonth, Hru_type
       USE PRMS_TEMP_DIST2
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, &
-     &    Hru_elev_ts, Hru_type
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Hru_elev_ts
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, Tmax_aspect_adjust, Tmin_aspect_adjust, &
      &    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, Tavgc, Basin_tsta, Tsta_elev
       USE PRMS_OBS, ONLY: Tmax, Tmin
+      use prms_utils, only: error_stop, print_date
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: temp_set, print_date, error_stop
+      EXTERNAL :: temp_set
       INTRINSIC :: FLOAT, DBLE, SNGL
 ! Local Variables
       INTEGER :: j, k, ntotx, ntotn, jj, kk, allmissing
@@ -483,11 +484,10 @@
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_TEMP_DIST2
+      use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      ! Function
-      EXTERNAL :: check_restart
       ! Local Variable
       CHARACTER(LEN=10) :: module_name
 !***********************************************************************

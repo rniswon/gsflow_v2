@@ -103,10 +103,11 @@
 !***********************************************************************
       INTEGER FUNCTION gsfsumdecl()
       USE PRMS_CONSTANTS, ONLY: DEBUG_WB
+      use PRMS_MMFAPI, only: declvar_dble
+      use PRMS_READ_PARAM_FILE, only: declparam
+      use prms_utils, only: print_module, PRMS_open_module_file, read_error
       USE GSFSUM
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: print_module, PRMS_open_module_file, declvar_dble
 !***********************************************************************
       gsfsumdecl = 0
 
@@ -404,6 +405,7 @@
 !***********************************************************************
       INTEGER FUNCTION gsfsuminit()
       USE PRMS_CONSTANTS, ONLY: READ_INIT, OFF
+      use PRMS_READ_PARAM_FILE, only: getparam_int
       USE PRMS_MODULE, ONLY: Init_vars_from_file
       USE GSFSUM
       USE GSFMODFLOW, ONLY: Acre_inches_to_mfl3, Mft_to_days
@@ -413,8 +415,8 @@
       USE PRMS_BASIN, ONLY: Active_area
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor
       USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop, Basin_dprst_volcl
+      use prms_utils, only: read_error
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getparam_int
       EXTERNAL GSF_PRINT, gsflow_sum_restart, MODFLOW_SFR_GET_STORAGE
 !***********************************************************************
       gsfsuminit = 0
@@ -714,7 +716,7 @@
 
       IF ( Have_lakes==ACTIVE ) THEN
         Lake_S = TOTSTOR_LAK
-        SatDisch2Lake_Q = TOTGWIN_LAK 
+        SatDisch2Lake_Q = TOTGWIN_LAK
         Lake2Sat_Q = TOTGWOT_LAK
         Lake_dS = TOTDELSTOR_LAK
         LakeExchng2Sat_Q = -Lake2Sat_Q - SatDisch2Lake_Q
@@ -903,11 +905,12 @@
 !***********************************************************************
       SUBROUTINE GSF_PRINT()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_open_out
+      use PRMS_CONTROL_FILE, only: control_string
       USE PRMS_MODULE, ONLY: Print_debug, Gsf_rpt, Rpt_days
+      use prms_utils, only: numchars, PRMS_open_output_file, read_error
       USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Csv_output_file, Gsflow_output_file
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: control_string, numchars
-      EXTERNAL GSF_HEADERS, read_error, PRMS_open_output_file
+      EXTERNAL :: GSF_HEADERS
 ! Local Variables
       INTEGER :: nc, ios
 !***********************************************************************
@@ -920,7 +923,7 @@
         CALL PRMS_open_output_file(Balance_unt, Csv_output_file, 'csv_output_file', 0, ios)
         IF ( ios/=0 ) ERROR STOP ERROR_open_out
       ENDIF
- 
+
 ! Open the GSF volumetric balance report file
 
       IF ( Print_debug>DEBUG_less ) PRINT '(/,A,I4)', 'Water Budget print frequency is:', Rpt_days
@@ -1176,7 +1179,7 @@
      &        'RATES FOR THIS TIME STEP', 11X, 'L**3/T', /, 3X, 18('-'), &
      &        22X, 24('-'), //, 37X, 'IN', 41X, 'IN', /, 37X, '--', 41X, '--')
  9003 FORMAT (3X, A18, ' =', A18, 5X, A18, ' =', A18)
- 9004 FORMAT (//, 36X, 'OUT', 40X, 'OUT', /, 36X, '---', 40X, '---') 
+ 9004 FORMAT (//, 36X, 'OUT', 40X, 'OUT', /, 36X, '---', 40X, '---')
  9005 FORMAT (/, 3X, 'INFLOWS - OUTFLOWS =', A18, 5X, &
      &        'INFLOWS - OUTFLOWS =', A18, /, 13X, 8('-'), 35X, 8('-'))
  9006 FORMAT (/, ' TOTAL STORAGE CHANGE =', A18, 9X, 'STORAGE CHANGE =', &
@@ -1240,10 +1243,10 @@
 !***********************************************************************
       SUBROUTINE gsflow_sum_restart(In_out)
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      use prms_utils, only: check_restart
       USE GSFSUM
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      EXTERNAL check_restart
       ! Local Variable
       CHARACTER(LEN=10) :: module_name
 !***********************************************************************

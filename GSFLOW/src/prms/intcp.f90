@@ -8,11 +8,11 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-10-22'
+      character(len=*), parameter :: Version_intcp = '2021-12-16'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
-      INTEGER, SAVE :: Use_transfer_intcp, Canopy_irrigation_flag
+      INTEGER, SAVE :: Use_transfer_intcp
       INTEGER, PARAMETER :: RAIN = 0, SNOW = 1
 !   Declared Variables
       INTEGER, SAVE, ALLOCATABLE :: Intcp_on(:), Intcp_form(:)
@@ -66,12 +66,12 @@
 !***********************************************************************
       INTEGER FUNCTION intdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, MONTHS_PER_YEAR
-      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, PRMS_land_iteration_flag, AG_flag
+      use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam
+      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, PRMS_land_iteration_flag, AG_flag, GSFLOW_flag
+      use prms_utils, only: print_module, read_error
       USE PRMS_INTCP
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_real, declvar_dble, declvar_int
 !***********************************************************************
       intdecl = 0
 
@@ -85,7 +85,9 @@
 ! NEW VARIABLES and PARAMETERS for APPLICATION RATES
       ALLOCATE ( Net_apply(Nhru) )
       Use_transfer_intcp = OFF
-      IF ( Water_use_flag==ACTIVE .OR. AG_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+      IF ( Water_use_flag==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        ! always declare for GSFLOW as may be needed if the AG Package is active
+        ! don't know if AG Package is active during declare, set during init
         IF ( Water_use_flag==ACTIVE ) Use_transfer_intcp = ACTIVE
         ALLOCATE ( Gain_inches(Nhru) )
         CALL declvar_real(MODNAME, 'gain_inches', 'nhru', Nhru, &
@@ -191,7 +193,7 @@
      &     'Water released from a change over of canopy cover type for each HRU', &
      &     'inches', Intcp_changeover)
 
-      CALL declvar_dble(MODNAME, 'basin_changeover', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'basin_changeover', 'one', 1, &
      &     'Basin area-weighted average water released from a change over of canopy cover type', &
      &     'inches', Basin_changeover)
 
@@ -226,14 +228,14 @@
 !               set initial values.
 !***********************************************************************
       INTEGER FUNCTION intinit()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, MONTHS_PER_YEAR
-      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, MONTHS_PER_YEAR, ERROR_control
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug, &
+     &     GSFLOW_flag, AG_flag, Ag_package, Agriculture_canopy_flag
       USE PRMS_INTCP
       USE PRMS_CLIMATEVARS, ONLY: Transp_on
+      use prms_utils, only: read_error, error_stop
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: getparam_real, getparam_int
-      EXTERNAL :: read_error
 !***********************************************************************
       intinit = 0
 
@@ -241,10 +243,12 @@
       IF ( getparam_real(MODNAME, 'wrain_intcp', Nhru*MONTHS_PER_YEAR, Wrain_intcp)/=0 ) CALL read_error(2, 'wrain_intcp')
       IF ( getparam_real(MODNAME, 'srain_intcp', Nhru*MONTHS_PER_YEAR, Srain_intcp)/=0 ) CALL read_error(2, 'srain_intcp')
 
-      IF ( Use_transfer_intcp==ACTIVE ) THEN
+      IF ( Use_transfer_intcp==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE ) THEN
         IF ( getparam_int(MODNAME, 'irr_type', Nhru, Irr_type)/=0 ) CALL read_error(1, 'irr_type')
         Gain_inches = 0.0
         Gain_inches_hru = 0.0
+      ELSE
+        Irr_type = 0
       ENDIF
       Net_apply = 0.0
 
@@ -263,14 +267,11 @@
         Hru_intcpstor = 0.0
         Basin_intcp_stor = 0.0D0
       ENDIF
-      Basin_changeover = 0.0D0
-      Basin_net_ppt = 0.0D0
-      Basin_net_snow = 0.0D0
-      Basin_net_rain = 0.0D0
-      Basin_intcp_evap = 0.0D0
       Basin_net_apply = 0.0D0
       Basin_hru_apply = 0.0D0
       IF ( Print_debug==DEBUG_WB ) ALLOCATE ( Intcp_stor_ante(Nhru) )
+      IF ( Ag_package==OFF .AND. Agriculture_canopy_flag==ACTIVE ) &
+     &     CALL error_stop('AG Package not active and agriculture_canopy_flag specified = 0', ERROR_control)
 
       END FUNCTION intinit
 
@@ -282,9 +283,9 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, NEARZERO, DNEARZERO, &
      &    DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
       USE PRMS_MODULE, ONLY: Print_debug, PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Nowday, &
-     &    Ag_package, Hru_ag_irr
+     &    Ag_package, Hru_ag_irr, Agriculture_canopy_flag, Hru_type
       USE PRMS_INTCP
-      USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_type, Covden_win, Covden_sum, &
+      USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Covden_win, Covden_sum, &
      &    Hru_route_order, Hru_area, Cov_type, Ag_frac !, Ag_area, Ag_cov_type
       USE PRMS_WATER_USE, ONLY: Canopy_gain ! need to add ag apply ???
 ! Newsnow and Pptmix can be modfied, WARNING!!!
@@ -293,9 +294,10 @@
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_OBS, ONLY: Pan_evap
+      use prms_utils, only: error_stop
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: intercept, error_stop
+      EXTERNAL :: intercept
       INTRINSIC :: DBLE, SNGL
 ! Local Variables
       INTEGER :: i, j, irrigation_type
@@ -484,19 +486,20 @@
 ! irr_type = 0 or 3 are the same in terms of application rate
 ! gain_inches_hru is water applied to whole HRU, gain_inches is water added to canopy
 
-        IF ( Use_transfer_intcp==ACTIVE .OR. Ag_package==ACTIVE ) THEN ! Ag_package active for GSFLOW_AG or PRMS_AG
-          IF ( Ag_package==ACTIVE ) THEN
-            IF ( Hru_ag_irr(i)>0.0 .AND. .NOT.(Ag_frac(i)>0.0) ) THEN
-              PRINT *, 'ag_frac=0.0 for HRU:', i
-              CALL error_stop('AG Package irrigation specified and ag_frac=0', ERROR_param)
+        IF ( Use_transfer_intcp==ACTIVE .OR. Agriculture_canopy_flag==ACTIVE ) THEN
+          ag_water_maxin = 0.0  ! inches
+          IF ( Agriculture_canopy_flag==ACTIVE ) THEN
+            IF ( Hru_ag_irr(i)>0.0 ) THEN
+              IF ( .NOT.(Ag_frac(i)>0.0) ) THEN
+                PRINT *, 'ag_frac=0.0 for HRU:', i
+                CALL error_stop('AG Package irrigation specified and ag_frac=0', ERROR_param)
+              ENDIF
+              ag_water_maxin = Hru_ag_irr(i) / harea ! Hru_ag_irr is in inch-acres
             ENDIF
           ENDIF
-          IF ( Hru_type(i)==LAKE ) CALL error_stop('irrigation specified and hru_type is lake', ERROR_param)
-          ag_water_maxin = 0.0  ! inches
-          IF ( Canopy_irrigation_flag==ACTIVE ) ag_water_maxin = Hru_ag_irr(i) / harea ! Hru_ag_irr is in inch-acres
           IF ( Use_transfer_intcp==ACTIVE ) ag_water_maxin = ag_water_maxin + Canopy_gain(i)/SNGL(Cfs_conv)/harea ! Canopy_gain in CFS, convert to inches
-
           IF ( ag_water_maxin>0.0 ) THEN
+            IF ( Hru_type(i)==LAKE ) CALL error_stop('irrigation specified and hru_type is lake', ERROR_param)
             Gain_inches_hru(i) = ag_water_maxin
             Gain_inches(i) = ag_water_maxin
             IF ( cov>0.0 ) Gain_inches(i) = ag_water_maxin/cov
@@ -513,7 +516,8 @@
             ELSEIF ( irrigation_type==2 ) THEN
               IF ( Use_transfer_intcp==ACTIVE ) PRINT *, 'WARNING, irrigation water > 0, but irr_type = 2 (ignore), HRU:', &
      &                                                   i, ', application water:', Canopy_gain(i)
-              IF ( Canopy_irrigation_flag==ACTIVE ) CALL error_stop('irrigation specified and irr_type = 2 (ignore)', ERROR_param)
+              IF ( Agriculture_canopy_flag==ACTIVE ) &
+     &             CALL error_stop('irrigation specified for HRU and irr_type = 2 (ignore)', ERROR_param)
               Canopy_gain(i) = 0.0 ! remove ignored canopy gain from water budget
             ELSEIF ( irrigation_type==1 .OR. .NOT.(cov>0.0) ) THEN ! irr_type = 1 or (0 or 3 and cov=0) bare ground
               Net_apply(i) = ag_water_maxin
@@ -641,11 +645,10 @@
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_INTCP
+      use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      ! Function
-      EXTERNAL :: check_restart
       ! Local Variable
       CHARACTER(LEN=5) :: module_name
 !***********************************************************************

@@ -47,11 +47,10 @@
 !***********************************************************************
       SUBROUTINE statvar_outdecl()
       USE PRMS_CONSTANTS, ONLY: ERROR_control
+      use PRMS_CONTROL_FILE, only: control_integer, control_string_array
       USE PRMS_STATVAR_OUT
+      use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: control_integer, control_string_array
-      EXTERNAL :: print_module, error_stop
 ! Local Variables
       INTEGER :: i
 !***********************************************************************
@@ -89,7 +88,7 @@
  9003 FORMAT (A,I0,'(1X,F0.3))')
  9004 FORMAT (A,I0,'(1X,F0.4))')
  9005 FORMAT (A,I0,'(1X,F0.5))')
-      
+
     END SUBROUTINE statvar_outdecl
 
 !***********************************************************************
@@ -97,12 +96,11 @@
 !***********************************************************************
       SUBROUTINE statvar_outinit()
       USE PRMS_CONSTANTS, ONLY: ERROR_control, ERROR_open_out
+      use PRMS_MMFAPI, only: getvartype, getvarnvals
       USE PRMS_MODULE, ONLY: Stat_var_file
       USE PRMS_STATVAR_OUT
+      use prms_utils, only: error_stop, numchars, PRMS_open_output_file
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: numchars, getvartype, getvarnvals
-      EXTERNAL PRMS_open_output_file, error_stop
 ! Local Variables
       INTEGER :: jj, ios, ierr, itype
 !***********************************************************************
@@ -121,7 +119,7 @@
 
       CALL PRMS_open_output_file(Statvar_unit, Stat_var_file, 'statvar.out', 0, ios)
       IF ( ios/=0 ) CALL error_stop('opening statvar file', ERROR_open_out)
-      WRITE ( Statvar_unit, '(I0)' ) nstatVars 
+      WRITE ( Statvar_unit, '(I0)' ) nstatVars
 
       DO jj = 1, nstatVars
         Nc_vars(jj) = numchars(statVar_names(jj))
@@ -147,14 +145,14 @@
 !***********************************************************************
       SUBROUTINE statvar_outrun()
       USE PRMS_CONSTANTS, ONLY: ERROR_write
+      use PRMS_MMFAPI, only: getvarnvals, getvar_dble, getvar_int, getvar_real, var_is_scalar
       USE PRMS_STATVAR_OUT
       USE PRMS_MODULE, ONLY: Timestep
       USE PRMS_SET_TIME, ONLY: Nowtime
+      use prms_utils, only: error_stop, read_error
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
-      INTRINSIC SNGL, FLOAT
-      INTEGER, EXTERNAL :: getvarnvals
-      EXTERNAL read_error, getvar_real, getvar_dble, getvar_int
+      INTRINSIC SNGL, FLOAT, TRIM
 ! Local Variables
       INTEGER :: jj, nvals, nc, nvalues
       INTEGER, ALLOCATABLE, TARGET :: values_int(:)
@@ -169,21 +167,37 @@
           PRINT *, 'ERROR, element id number exceeds dimension for variable: ', statVar_names(jj)(:nc)
           STOP
         ENDIF
+
         IF ( Stat_var_type(jj)==3 ) THEN
           ALLOCATE ( values_dble(nvals) )
-          CALL getvar_dble(MODNAME, statVar_names(jj)(:nc), nvals, values_dble)
+          IF ( var_is_scalar(TRIM(statVar_names(jj))) ) THEN
+            CALL getvar_dble(MODNAME, statVar_names(jj)(:nc), nvals, values_dble(1))
+          ELSE
+            CALL getvar_dble(MODNAME, statVar_names(jj)(:nc), nvals, values_dble)
+          ENDIF
+
           Stat_var_values(jj) = SNGL(values_dble(Statvar_id(jj)))
           !print *, statVar_names(jj)(:nc), nvals, Stat_var_values(jj), 'double'
           DEALLOCATE ( values_dble )
         ELSEIF ( Stat_var_type(jj)==2 ) THEN
           ALLOCATE ( values_real(nvals) )
-          CALL getvar_real(MODNAME, statVar_names(jj)(:nc), nvals, values_real)
+          IF ( var_is_scalar(TRIM(statVar_names(jj))) ) THEN
+            CALL getvar_real(MODNAME, statVar_names(jj)(:nc), nvals, values_real(1))
+          ELSE
+            CALL getvar_real(MODNAME, statVar_names(jj)(:nc), nvals, values_real)
+          ENDIF
+
           Stat_var_values(jj) = values_real(Statvar_id(jj))
           !print *, statVar_names(jj)(:nc), nvals,Stat_var_values(jj), 'real'
           DEALLOCATE ( values_real )
         ELSEIF ( Stat_var_type(jj)==1 ) THEN
           ALLOCATE ( values_int(nvals) )
-          CALL getvar_int(MODNAME, statVar_names(jj)(:nc), nvals, values_int)
+          IF ( var_is_scalar(TRIM(statVar_names(jj))) ) THEN
+            CALL getvar_int(MODNAME, statVar_names(jj)(:nc), nvals, values_int(1))
+          ELSE
+            CALL getvar_int(MODNAME, statVar_names(jj)(:nc), nvals, values_int)
+          ENDIF
+
           Stat_var_values(jj) = FLOAT(values_int(Statvar_id(jj)))
           !print *, statVar_names(jj)(:nc), nvals,Stat_var_values(jj), 'integer'
           DEALLOCATE ( values_int )
@@ -193,5 +207,5 @@
       ENDDO
 
       WRITE ( Statvar_unit, Output_fmt ) Timestep, Nowtime, (Stat_var_values(jj), jj=1, nstatVars)
- 
+
       END SUBROUTINE statvar_outrun

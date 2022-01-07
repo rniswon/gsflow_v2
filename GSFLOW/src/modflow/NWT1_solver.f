@@ -657,7 +657,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 ! Order system for MODFLOW storage scheme by relating Row, Col, and Lay to
 ! Jacobian order
       USE GLOBAL, ONLY:Ncol, Nrow, Nlay, Ibound, Iout, HNEW
-      USE GWFBASMODULE, ONLY: HDRY
+      USE GWFBASMODULE, ONLY: HNOFLO
       USE GWFNWTMODULE
       IMPLICIT NONE
 !     ------------------------------------------------------------------
@@ -709,7 +709,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
             WRITE(IOUT,*)'ROW=',ir,'COL=',ic,'LAY=',il
             WRITE(IOUT,*)
             Ibound(ic, ir, il) = 0
-            HNEW(ic,ir,il) = HDRY
+            HNEW(ic,ir,il) = HNOFLO
           END IF
         ENDIF
         ic = ic + 1

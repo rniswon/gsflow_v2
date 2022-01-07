@@ -7,7 +7,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=9), parameter :: MODNAME = 'basin_sum'
-      character(len=*), parameter :: Version_basin_sum = '2021-09-07'
+      character(len=*), parameter :: Version_basin_sum = '2021-11-19'
 
       INTEGER, SAVE :: BALUNT, Totdays
       INTEGER, SAVE :: Header_prt, Endjday
@@ -90,12 +90,12 @@
 !***********************************************************************
       INTEGER FUNCTION sumbdecl()
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION
+      use PRMS_MMFAPI, only: declvar_dble
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Nobs, Model
       USE PRMS_BASINSUM
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_dble
 !***********************************************************************
       sumbdecl = 0
 
@@ -312,6 +312,7 @@
 !***********************************************************************
       INTEGER FUNCTION sumbinit()
       USE PRMS_CONSTANTS, ONLY: OFF
+      use PRMS_READ_PARAM_FILE, only: getparam_int
       USE PRMS_MODULE, ONLY: Nobs, Init_vars_from_file, Print_debug
       USE PRMS_BASINSUM
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_lake_stor
@@ -319,11 +320,11 @@
       USE PRMS_SNOW, ONLY: Basin_pweqv
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_dprst_volcl, Basin_dprst_volop
       USE PRMS_GWFLOW, ONLY: Basin_gwstor
+      use prms_utils, only: julian_day, PRMS_open_module_file, read_error, write_outfile
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MAX, MOD
-      INTEGER, EXTERNAL :: getparam_int, julian_day
-      EXTERNAL :: header_print, read_error, write_outfile, PRMS_open_module_file
+      EXTERNAL :: header_print
 ! Local Variables
       INTEGER :: pftemp
 !***********************************************************************
@@ -492,10 +493,11 @@
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_imperv_evap, &
      &    Basin_dprst_evap, Basin_dprst_volcl, Basin_dprst_volop
       USE PRMS_ROUTING, ONLY: Basin_segment_storage
+      use prms_utils, only: write_outfile
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL, ABS, ALOG, DBLE
-      EXTERNAL :: header_print, write_outfile
+      EXTERNAL :: header_print
 ! Local variables
       INTEGER :: i, j, wyday, endrun, monthdays
       DOUBLE PRECISION :: wat_bal, obsrunoff
@@ -823,8 +825,8 @@
 !***********************************************************************
       SUBROUTINE header_print(Print_type)
       USE PRMS_BASINSUM, ONLY: DASHS, Buffer80, Print_freq, Header_prt
+      use prms_utils, only: write_outfile
       IMPLICIT NONE
-      EXTERNAL :: write_outfile
 ! Arguments
       INTEGER, INTENT(IN) :: Print_type
 !***********************************************************************
@@ -874,11 +876,10 @@
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_BASINSUM
+      use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      ! Functions
-      EXTERNAL :: check_restart
       ! Local Variable
       CHARACTER(LEN=9) :: module_name
 !***********************************************************************

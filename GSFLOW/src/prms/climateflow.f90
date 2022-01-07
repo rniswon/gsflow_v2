@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2021-10-21'
+      character(len=*), parameter :: Version_climateflow = '2021-12-10'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -59,6 +59,8 @@
 !***********************************************************************
       MODULE PRMS_FLOWVARS
       IMPLICIT NONE
+      REAL, SAVE, ALLOCATABLE :: Soil_moist_ante(:), Soil_rechr_ante(:)
+      REAL, SAVE, ALLOCATABLE :: Slow_stor_ante(:), Pref_flow_stor_ante(:), Ssres_stor_ante(:)
 !   Declared Variables
       ! snow
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pkwater_equiv(:)
@@ -127,6 +129,8 @@
      &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
      &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
      &    ddsolrad_module, ccsolrad_module
+      use PRMS_MMFAPI, only: declvar_int, declvar_dble, declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, &
      &    Model, Init_vars_from_file, Temp_flag, Precip_flag, Glacier_flag, &
      &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, &
@@ -134,10 +138,8 @@
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, AG_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_real, declvar_dble, declvar_int
 !***********************************************************************
       climateflow_decl = 0
 
@@ -336,6 +338,9 @@
       ENDIF
 
 ! Soilzone variables
+      ALLOCATE ( Soil_moist_ante(Nhru), Soil_rechr_ante(Nhru) )
+      ALLOCATE ( Slow_stor_ante(Nhru), Pref_flow_stor_ante(Nhru), Ssres_stor_ante(Nhru) )
+
       ALLOCATE ( Soil_rechr(Nhru) )
       CALL declvar_real(Soilzone_module, 'soil_rechr', 'nhru', Nhru, &
      &     'Storage for recharge zone (upper portion) of the'// &
@@ -669,9 +674,10 @@
      &     'Flag to indicate the units of measured air-temperature values (0=Fahrenheit; 1=Celsius)', &
      &     'none')/=0 ) CALL read_error(1, 'temp_units')
 
-      IF ( Temp_flag<ide_dist_module .OR. Model==DOCUMENTATION ) THEN
+      IF ( Temp_flag==temp_1sta_module .OR. Temp_flag==temp_sta_module .OR. Temp_flag==temp_laps_module &
+     &     .OR. Temp_flag==temp_dist2_module .OR. Model==DOCUMENTATION ) THEN
         IF ( declparam(Temp_module, 'basin_tsta', 'one', 'integer', &
-     &       '0', 'bounded', 'ntemp', &
+     &       '1', 'bounded', 'ntemp', &
      &       'Index of main temperature station', &
      &       'Index of temperature station used to compute basin temperature values', &
      &       'none')/=0 ) CALL read_error(1, 'basin_tsta')
@@ -763,7 +769,7 @@
 
       ALLOCATE ( Soil_moist_max(Nhru) )
       IF ( declparam(Soilzone_module, 'soil_moist_max', 'nhru', 'real', &
-     &     '2.0', '0.0', '20.0', &
+     &     '2.0', '0.0', '30.0', &
      &     'Maximum value of water for soil zone', &
      &     'Maximum available water holding capacity of capillary'// &
      &     ' reservoir from land surface to rooting depth of the major vegetation type of each HRU', &
@@ -772,7 +778,7 @@
       ALLOCATE ( Soil_rechr_max(Nhru) )
       IF ( PRMS4_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         IF ( declparam(Soilzone_module, 'soil_rechr_max', 'nhru', 'real', &
-     &       '1.5', '0.0', '20.0', &
+     &       '1.5', '0.0', '30.0', &
      &       'Maximum storage for soil recharge zone', &
      &       'Maximum storage for soil recharge zone (upper portion of'// &
      &       ' capillary reservoir where losses occur as both'// &
@@ -900,20 +906,18 @@
      &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
      &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
      &    FEET, FEET2METERS, METERS2FEET, FAHRENHEIT, INACTIVE, LAKE, ERROR_PARAM, ddsolrad_module, ccsolrad_module
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nevap, Nlake, Ntemp, Nrain, Nsol, &
      &    Print_debug, Init_vars_from_file, Temp_flag, Precip_flag, &
-     &    Temp_module, Stream_order_flag, GSFLOW_flag, &
+     &    Temp_module, Stream_order_flag, GSFLOW_flag, Hru_type, &
      &    Precip_module, Solrad_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Et_flag, Dprst_flag, Solrad_flag, &
      &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, AG_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
-      USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_type, Hru_perv
+      USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv
+      use prms_utils, only: c_to_f, checkdim_bounded_limits, checkdim_param_limits, f_to_c, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: getparam_int, getparam_real
-      EXTERNAL :: checkdim_param_limits, checkdim_bounded_limits
-      REAL, EXTERNAL :: c_to_f, f_to_c
 ! Local variables
       INTEGER :: i, j, ierr
 !***********************************************************************
@@ -942,7 +946,8 @@
 
       IF ( getparam_int(Temp_module, 'temp_units', 1, Temp_units)/=0 ) CALL read_error(2, 'temp_units')
 
-      IF ( Temp_flag<ide_dist_module ) THEN
+      IF ( Temp_flag==temp_1sta_module .OR. Temp_flag==temp_sta_module .OR. Temp_flag==temp_laps_module .OR. &
+     &     Temp_flag==temp_dist2_module ) THEN
         IF ( getparam_int(Temp_module, 'basin_tsta', 1, Basin_tsta)/=0 ) CALL read_error(2, 'basin_tsta')
         CALL checkdim_param_limits(1, 'basin_tsta', 'ntemp', Basin_tsta, 1, Ntemp, Inputerror_flag)
       ELSE
@@ -1187,6 +1192,45 @@
             Ssres_stor(i) = Sat_threshold(i)
           ENDIF
         ENDIF
+
+        IF ( AG_flag==ACTIVE ) THEN
+        IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
+          IF ( Parameter_check_flag>0 ) THEN
+            PRINT 9022, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
+            ierr = 1
+          ELSE
+            IF ( Print_debug>DEBUG_less ) PRINT 9032, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
+            Ag_soil_rechr_max(i) = Ag_soil_moist_max(i)
+          ENDIF
+        ENDIF
+        IF ( Ag_soil_rechr(i)>Ag_soil_rechr_max(i) ) THEN
+          IF ( Parameter_check_flag>0 ) THEN
+            PRINT 9023, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
+            ierr = 1
+          ELSE
+            IF ( Print_debug>DEBUG_less ) PRINT 9033, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
+            Ag_soil_rechr(i) = Ag_soil_rechr_max(i)
+          ENDIF
+        ENDIF
+        IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) THEN
+          IF ( Parameter_check_flag>0 ) THEN
+            PRINT 9024, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
+            ierr = 1
+          ELSE
+            IF ( Print_debug>DEBUG_less ) PRINT 9034, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
+            Ag_soil_moist(i) = Ag_soil_moist_max(i)
+          ENDIF
+        ENDIF
+        IF ( Ag_soil_rechr(i)>Ag_soil_moist(i) ) THEN
+          IF ( Parameter_check_flag>0 ) THEN
+            PRINT 9025, i, Ag_soil_rechr(i), Ag_soil_moist(i)
+            ierr = 1
+          ELSE
+            IF ( Print_debug>DEBUG_less ) PRINT 9035, i, Ag_soil_rechr(i), Ag_soil_moist(i)
+            Ag_soil_rechr(i) = Ag_soil_moist(i)
+          ENDIF
+        ENDIF
+        ENDIF
       ENDDO
 
       IF ( ierr>0 ) STOP ERROR_PARAM
@@ -1212,16 +1256,10 @@
       Hru_snow = 0.0
       Swrad = 0.0
       Potet = 0.0
-      Slow_flow = 0.0
-      Soil_to_gw = 0.0
-      Soil_to_ssr = 0.0
       Hru_actet = 0.0
-      Infil = 0.0
       Sroff = 0.0
 ! initialize arrays (dimensioned Nssr)
-      Ssr_to_gw = 0.0
       Ssres_in = 0.0
-      Ssres_flow = 0.0
       IF ( Solrad_flag==ddsolrad_module .OR. Solrad_flag==ccsolrad_module ) Orad_hru = 0.0
       IF ( Et_flag==potet_pt_module .OR. Et_flag==potet_pm_module .OR. Et_flag==potet_pm_sta_module ) THEN
         Tempc_dewpt = 0.0
@@ -1302,11 +1340,15 @@
  9002 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max > soil_moist_max', 2F10.5)
  9003 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_init > soil_rechr_max', 2F10.5)
  9004 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_init > soil_moist_max', 2F10.5)
- 9005 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr > soil_moist based on init and max values', 2F10.5)
- 9006 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_max < 0.00001', F10.5)
- 9007 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max < 0.00001', F10.5)
- 9008 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_moist_max < 0.00001, set to 0.00001')
- 9009 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr_max < 0.00001, set to 0.00001')
+ 9005  FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr > soil_moist based on init and max values', 2F10.5)
+ 9022 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_max > ag_soil_moist_max', 2F10.5)
+ 9023 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max', 2F10.5)
+ 9024 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max', 2F10.5)
+ 9025 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr > ag_soil_moist based on init and max values', 2F10.5)
+! 9006 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_max < 0.00001', F10.5)
+! 9007 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max < 0.00001', F10.5)
+! 9008 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_moist_max < 0.00001, set to 0.00001')
+! 9009 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr_max < 0.00001, set to 0.00001')
  9012 FORMAT ('WARNING, HRU: ', I0, ' soil_rechr_max > soil_moist_max,', 2F10.5, /, 9X, &
      &        'soil_rechr_max set to soil_moist_max')
  9013 FORMAT ('WARNING, HRU: ', I0, ' soil_rechr_init > soil_rechr_max,', 2F10.5, /, 9X, &
@@ -1315,7 +1357,14 @@
      &        'soil_moist set to soil_moist_max')
  9015 FORMAT ('WARNING, HRU: ', I0, ' soil_rechr_init > soil_moist_init,', 2F10.5, /, 9X, &
      &        'soil_rechr set to soil_moist based on init and max values')
-
+ 9032 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_max > ag_soil_moist_max,', 2F10.5, /, 9X, &
+     &        'ag_soil_rechr_max set to ag_soil_moist_max')
+ 9033 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max,', 2F10.5, /, 9X, &
+     &        'ag_soil_rechr set to ag_soil_rechr_max')
+ 9034 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max,', 2F10.5, /, 9X, &
+     &        'ag_soil_moist set to ag_soil_moist_max')
+ 9035 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_moist_init,', 2F10.5, /, 9X, &
+     &        'ag_soil_rechr set to ag_soil_moist based on init and max values')
       END FUNCTION climateflow_init
 
 !***********************************************************************
@@ -1324,6 +1373,7 @@
       SUBROUTINE temp_set(Ihru, Tmax, Tmin, Tmaxf, Tminf, Tavgf, Tmaxc, Tminc, Tavgc, Hru_area)
       USE PRMS_CLIMATEVARS, ONLY: Basin_temp, Basin_tmax, Basin_tmin, Temp_units, Tmax_hru, Tmin_hru
       USE PRMS_CONSTANTS, ONLY: MINTEMP, MAXTEMP, ERROR_temp
+      use prms_utils, only: c_to_f, f_to_c, print_date
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Ihru
@@ -1331,8 +1381,6 @@
       REAL, INTENT(OUT) :: Tmaxf, Tminf, Tavgf, Tmaxc, Tminc, Tavgc
 ! Functions
       INTRINSIC :: DBLE
-      REAL, EXTERNAL :: c_to_f, f_to_c
-      EXTERNAL :: print_date
 !***********************************************************************
       IF ( Temp_units==0 ) THEN
 !       degrees Fahrenheit
@@ -1375,10 +1423,10 @@
      &           Snow_adj, Adjmix_rain, Hru_area, Sum_obs, Tmax_allsnow_f)
       USE PRMS_CONSTANTS, ONLY: NEARZERO
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
+      use prms_utils, only: print_date
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, DBLE
-      EXTERNAL :: print_date
 ! Arguments
       REAL, INTENT(IN) :: Tmax_allrain_f, Tmax_allsnow_f, Rain_adj, Snow_adj
       REAL, INTENT(IN) :: Adjmix_rain, Tmaxf, Tminf, Hru_area
@@ -1447,11 +1495,10 @@
      &    Dprst_flag, Stream_order_flag, Nlake, AG_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
+      use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      ! Functions
-      EXTERNAL :: check_restart
       ! Local Variable
       CHARACTER(LEN=11) :: module_name
 !***********************************************************************

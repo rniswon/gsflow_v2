@@ -21,7 +21,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=11) :: MODNAME
-        character(len=*), parameter :: Version_precip = '2021-09-07'
+        character(len=*), parameter :: Version_precip = '2021-11-19'
         INTEGER, SAVE, ALLOCATABLE :: Psta_nuse(:)
         REAL, SAVE, ALLOCATABLE :: Rain_adj_lapse(:, :), Snow_adj_lapse(:, :), Precip_local(:)
         ! Declared Parameters
@@ -34,20 +34,20 @@
       INTEGER FUNCTION precip_1sta_laps()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, ACTIVE, OFF, GLACIER, &
      &    DEBUG_less, MM, MM2INCH, MONTHS_PER_YEAR, DOCUMENTATION, precip_1sta_module, precip_laps_module
+      use PRMS_READ_PARAM_FILE, only: declparam, getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nrain, Model, Process_flag, Inputerror_flag, Precip_flag, &
-     &    Print_debug, Glacier_flag, Nowmonth
+     &    Print_debug, Glacier_flag, Nowmonth, Hru_type
       USE PRMS_PRECIP_1STA_LAPS
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_area, Hru_route_order, Basin_area_inv, Hru_elev_ts, Hru_type
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_area, Hru_route_order, Basin_area_inv, Hru_elev_ts
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Prmx, Basin_ppt, &
      &    Basin_rain, Basin_snow, Hru_ppt, Hru_rain, Hru_snow, &
      &    Basin_obs_ppt, Tmaxf, Tminf, Tmax_allrain_f, Tmax_allsnow_f, &
      &    Adjmix_rain, Precip_units
       USE PRMS_OBS, ONLY: Precip
+      use prms_utils, only: checkdim_param_limits, print_date, print_module, read_error
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: declparam, getparam_int, getparam_real
-      EXTERNAL :: read_error, precip_form, print_module, compute_precip_laps
-      EXTERNAL :: print_date, checkdim_param_limits
+      EXTERNAL :: precip_form, compute_precip_laps
 ! Local Variables
       INTEGER :: i, ii, ierr
       REAL :: ppt
@@ -123,14 +123,14 @@
         ALLOCATE ( Rain_adj_lapse(Nhru, MONTHS_PER_YEAR), Snow_adj_lapse(Nhru, MONTHS_PER_YEAR) )
         IF ( Precip_flag==precip_1sta_module .OR. Model==DOCUMENTATION ) THEN
           IF ( declparam(MODNAME, 'rain_adj', 'nhru,nmonths', 'real', &
-     &         '1.0', '0.5', '10.0', &
+     &         '1.0', '0.2', '5.0', &
      &         'Monthly rain adjustment factor for each HRU', &
      &         'Monthly (January to December) factor to adjust measured rain on each HRU'// &
      &         ' to account for differences in elevation, and so forth', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'rain_adj')
 
           IF ( declparam(MODNAME, 'snow_adj', 'nhru,nmonths', 'real', &
-     &         '1.0', '0.5', '2.5', &
+     &         '1.0', '0.2', '5.0', &
      &         'Monthly snow adjustment factor for each HRU', &
      &         'Monthly (January to December) factor to adjust measured snow on each HRU'// &
      &         ' to account for differences in elevation, and so forth', &

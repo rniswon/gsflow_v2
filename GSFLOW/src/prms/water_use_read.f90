@@ -8,7 +8,7 @@
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'water_use_read'
-      character(len=*), parameter :: Version_water_use_read = '2021-09-07'
+      character(len=*), parameter :: Version_water_use_read = '2021-11-19'
 
       ! transfer type
       integer, parameter :: STREAM = 1
@@ -52,6 +52,9 @@
       INTEGER FUNCTION water_use_read()
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, &
      &    RUN, DECL, INIT, CLEAN, ERROR_water_use, strmflow_noroute_module, strmflow_muskingum_lake_module
+     use PRMS_CONTROL_FILE, only: control_string
+     use PRMS_MMFAPI, only: declvar_dble, declvar_real
+     use PRMS_READ_PARAM_FILE, only: decldim, getdim
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nsegment, Nwateruse, Nexternal, Nconsumed, &
      &    Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
      &    External_transferON_OFF, Dprst_transferON_OFF, Dprst_flag, Strmflow_flag, &
@@ -59,12 +62,11 @@
      &    End_year, End_month, End_day, Dprst_transfer_water_use, Dprst_add_water_use, &
      &    Gwr_transfer_water_use, Gwr_add_water_use, Lake_transfer_water_use, Lake_add_water_use
       USE PRMS_WATER_USE
+      use prms_utils, only: error_stop, find_current_file_time, find_header_end, print_module, PRMS_open_module_file, read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL, DBLE
-      INTEGER, EXTERNAL :: control_string, decldim, getdim
-      EXTERNAL :: declvar_real, declvar_dble
-      EXTERNAL :: read_error, find_header_end, find_current_file_time, read_event, print_module, PRMS_open_module_file, error_stop
+      EXTERNAL :: read_event
 ! Local Variables
       INTEGER, SAVE :: external_unit, external_next_year, external_next_month, external_next_day
       INTEGER, SAVE :: segment_unit, dprst_unit, gwr_unit, lake_unit
@@ -78,7 +80,7 @@
       ! Types
       ! (1) stream segments; (2) groundwater reservoirs; (3) surface-depression storage;
       ! (4) external locations; (5) lakes; (6) capillary reservoir of the soil zone;
-      ! (7) internal consumptive-use locations; and (8) plant canopy. 
+      ! (7) internal consumptive-use locations; and (8) plant canopy.
 !***********************************************************************
       water_use_read = 0
 
@@ -122,7 +124,7 @@
           Total_segment_gain = 0.0D0
           Segment_gain = 0.0
         ENDIF
-          
+
         IF ( Lake_transferON_OFF==ACTIVE ) THEN
           CALL read_event(lake_unit, LAKE, lake_next_year, lake_next_month, lake_next_day)
           Total_lake_transfer = 0.0D0
@@ -445,10 +447,10 @@
 
         ALLOCATE ( Transfer_rate(Nwateruse), Source_id(Nwateruse), Source_type(Nwateruse) )
         ALLOCATE ( Destination_id(Nwateruse), Destination_type(Nwateruse) )
-        CALL declvar_real(MODNAME, 'total_transfers', 'one', 1, &
+        CALL declvar_dble(MODNAME, 'total_transfers', 'one', 1, &
      &           'Transfer of all water-use transfers for each time step', &
      &           'cfs', Total_transfers)
-        CALL declvar_dble(MODNAME, 'transfer_rate', 'nwateruse', nwateruse, &
+        CALL declvar_real(MODNAME, 'transfer_rate', 'nwateruse', nwateruse, &
      &           'Transfer of each water-use transfer for each time step', &
      &           'cfs', Transfer_rate)
 
@@ -462,7 +464,7 @@
         CALL PRMS_open_module_file(Outunit, 'water_use.out')
         WRITE ( Outunit, 10 ) 'Simulation Start Date:', year, month, day, '   End Date:', &
      &                         End_year, End_month, End_day
-10      FORMAT ( 'Water Use Summary File', /, 2(A, I5, 2('/',I2.2)), / ) 
+10      FORMAT ( 'Water Use Summary File', /, 2(A, I5, 2('/',I2.2)), / )
 
         istop = 0
         IF ( Segment_transferON_OFF==ACTIVE ) THEN ! type STREAM
@@ -594,12 +596,13 @@
       USE PRMS_CONSTANTS, ONLY: ERROR_water_use, ACTIVE, OFF
       USE PRMS_WATER_USE, ONLY: CANOPY
       USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
+      use prms_utils, only: is_eof
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Iunit, Src_type
       INTEGER, INTENT (INOUT) :: Next_yr, Next_mo, Next_day
 ! Funcions
-      EXTERNAL :: check_event, set_transfers, is_eof
+      EXTERNAL :: check_event, set_transfers
 ! Local Variables
       INTEGER src_id, dest_type, dest_id, keep_reading, ignore
       REAL transfer
@@ -634,9 +637,8 @@
      &    STREAM, GROUNDWATER, DPRST, EXTRNAL, LAKE, CAPILLARY, CONSUMPTIVE, CANOPY
       USE PRMS_MODULE, ONLY: Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
      &    Dprst_transferON_OFF, External_transferON_OFF, Strmflow_flag, Nexternal, Dprst_flag, Nowyear, Nowmonth, Nowday
+      use prms_utils, only: error_stop
       IMPLICIT NONE
-! Functions
-      EXTERNAL :: error_stop
 ! Arguments
       INTEGER, INTENT(IN) :: Src_type, Dest_type, Src_id, Dest_id
       INTEGER, INTENT(OUT) :: Ignore

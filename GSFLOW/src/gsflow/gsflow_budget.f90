@@ -5,7 +5,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2021-09-29'
+      character(len=*), parameter :: Version_gsflow_budget = '2021-12-15'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -52,10 +52,11 @@
 !***********************************************************************
       INTEGER FUNCTION gsfbuddecl()
       USE GSFBUDGET
+      use PRMS_MMFAPI, only: declvar_dble, declvar_real
+      use PRMS_READ_PARAM_FILE, only: getdim
       USE PRMS_MODULE, ONLY: Nhru, Nsegment
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-      INTEGER, EXTERNAL :: getdim
-      EXTERNAL :: print_module, read_error, declvar_dble, declvar_real
 !***********************************************************************
       gsfbuddecl = 0
 
@@ -229,19 +230,12 @@
 !      Sat_recharge = 0.0 ! dimension nhru
 !      Mfoutflow_to_gvr = 0.0 ! dimension nhru
       Gw2sm = 0.0 ! dimension nhru
-      Actet_gw = 0.0 ! dimension nhru
       Actet_tot_gwsz = 0.0 ! dimension nhru
-      Streamflow_sfr = 0.0 ! dimension nsegment
-      Seepage_reach_sfr = 0.0 ! dimension nreach
-      Seepage_segment_sfr = 0.0 ! dimension nsegment
 
 !  Set the volume budget indicies to -1 anytime "init" is called.
 !  This will make "run" figure out the vbnm order.
       Vbnm_index = -1
       ALLOCATE ( Fluxchange(Nhru) )
-      Fluxchange = 0.0
-      Basin_fluxchange = 0.0D0
-      Basin_szreject = 0.0D0
       Gw_rejected = 0.0
 
       END FUNCTION gsfbudinit
@@ -258,13 +252,13 @@
 !      USE GLOBAL, ONLY: IUNIT
 !Warning, modifies Gw_rejected_grav
       USE GSFPRMS2MF, ONLY: Excess, Gw_rejected_grav
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes !, Gvr_cell_pct, Print_debug
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Hru_type !, Gvr_cell_pct, Print_debug
       USE GWFBASMODULE, ONLY: VBVL, DELT
       USE GWFUZFMODULE, ONLY: SEEPOUT, UZFETOUT, UZTSRAT, REJ_INF, GWET !, UZOLSFLX, UZFLWT
       USE GWFLAKMODULE, ONLY: EVAP, SURFA
 !Warning, modifies Basin_gwflow_cfs, Basin_cfs, Basin_cms, Basin_stflow,
 !                  Basin_ssflow_cfs, Basin_sroff_cfs
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Active_area, &
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Active_area, &
      &    Basin_area_inv, Hru_area, Lake_hru_id, Lake_area
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Hru_actet, Basin_sroff, &
      &    Basin_actet, Basin_ssstor, Ssres_stor, Slow_stor, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_gwflow_cfs
@@ -296,14 +290,15 @@
         Gw_rejected(i) = 0.0
         Actet_gw(i) = 0.0
         Slow_stor(i) = 0.0 !shouldn't be reset if any cells of HRU inactive and HRU active
+        Slow_stor(i) = 0.0 !shouldn't be reset if any cells of HRU inactive and HRU active
 !        Uzf_infil_map(i) = 0.0
 !        Sat_recharge(i) = 0.0
 !        Mfoutflow_to_gvr(i) = 0.0
         Fluxchange(i) = 0.0
       ENDDO
-      Streamflow_sfr = 0.0
-      Seepage_reach_sfr = 0.0
-      Seepage_segment_sfr = 0.0
+      Streamflow_sfr = 0.0 ! dimension nsegment
+      Seepage_reach_sfr = 0.0 ! dimension nreach
+      Seepage_segment_sfr = 0.0 ! dimension nsegment
 
       DO i = 1, Nhrucell
         ihru = Gvr_hru_id(i)
@@ -359,7 +354,7 @@
             lake = Lake_hru_id(i)
             !EVAP in mfl3/dt   SURFA in MFL2/dt
             IF ( SURFA(lake)>DNEARZERO ) THEN
-              inches_on_lake = SNGL(EVAP(lake))*DELT/SNGL(SURFA(lake))*Mfl_to_inch                         !RGN 5/23/15 added *DELT for time units other than days.         
+              inches_on_lake = SNGL(EVAP(lake))*DELT/SNGL(SURFA(lake))*Mfl_to_inch                         !RGN 5/23/15 added *DELT for time units other than days.
               Hru_actet(i) = inches_on_lake*SNGL(SURFA(lake)*Mfl2_to_acre/Lake_area(lake))
             ELSE
               Hru_actet(i) = 0.0
@@ -738,11 +733,11 @@
         ENDDO
         Seepage_segment_sfr(i) = Seepage_reach_sfr(i)/FLOAT(nrch)
         first_reach = first_reach + nrch
-      ENDDO 
+      ENDDO
       IF ( TOTSPFLOW<0.0 ) THEN
         Basin_cfs = Basin_cfs + TOTSPFLOW
       ELSE
-! RGN added specified inflows and outflows from SFR. 
+! RGN added specified inflows and outflows from SFR.
         Stream_inflow = Stream_inflow + TOTSPFLOW
       END IF
 ! RGN added next line.
@@ -793,10 +788,10 @@
       SUBROUTINE gsflow_budget_restart(In_out)
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      use prms_utils, only: check_restart
       USE GSFBUDGET
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      EXTERNAL check_restart
       ! Local Variable
       CHARACTER(LEN=13) :: module_name
 !***********************************************************************

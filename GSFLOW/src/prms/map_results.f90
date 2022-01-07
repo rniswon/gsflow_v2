@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'map_results'
-      character(len=*), parameter :: Version_map_results = '2021-09-07'
+      character(len=*), parameter :: Version_map_results = '2021-11-19'
       INTEGER, SAVE :: Mapflg, Numvalues, Lastyear, Totdays
       INTEGER, SAVE :: Yrdays, Yrresults, Totresults, Monresults, Mondays
       INTEGER, SAVE :: Begin_results, Begyr, Dailyresults
@@ -63,12 +63,12 @@
 !***********************************************************************
       INTEGER FUNCTION map_resultsdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, ERROR_dim
+      use PRMS_READ_PARAM_FILE, only: declparam
+      use PRMS_CONTROL_FILE, only: control_integer, control_string_array
       USE PRMS_MODULE, ONLY: Model, Nhru, Nhrucell, Ngwcell, MapOutON_OFF
       USE PRMS_MAP_RESULTS
+      use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam, control_string_array, control_integer
-      EXTERNAL :: read_error, print_module, error_stop
 ! Local Variables
       INTEGER :: i
 !***********************************************************************
@@ -163,14 +163,15 @@
 !***********************************************************************
       INTEGER FUNCTION map_resultsinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, REAL_TYPE, DBLE_TYPE, DEBUG_less
+      use PRMS_MMFAPI, only: getvarsize, getvartype
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Ngwcell, MapOutON_OFF, &
      &    Print_debug, Inputerror_flag, Start_year, Start_month, Start_day, Parameter_check_flag, Prms_warmup
       USE PRMS_MAP_RESULTS
+      use prms_utils, only: checkdim_bounded_limits, numchars, PRMS_open_output_file, read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getparam_int, getparam_real, getvartype, numchars, getvarsize
-      EXTERNAL :: read_error, PRMS_open_output_file, checkdim_bounded_limits
 ! Local Variables
       INTEGER :: i, jj, is, ios, ierr, size
       REAL, ALLOCATABLE, DIMENSION(:) :: map_frac
@@ -366,6 +367,7 @@
 !***********************************************************************
       INTEGER FUNCTION map_resultsrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, REAL_TYPE, DBLE_TYPE
+      use PRMS_MMFAPI, only: getvar_dble, getvar_real
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Start_month, Start_day, &
      &    End_year, End_month, End_day, Nowyear, Nowmonth, Nowday
       USE PRMS_MAP_RESULTS
@@ -374,7 +376,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: DBLE
-      EXTERNAL :: write_results, getvar_real, getvar_dble
+      EXTERNAL :: write_results
 ! Local Variables
       INTEGER :: j, i, k, jj, last_day
       DOUBLE PRECISION :: factor, map_var_double
@@ -447,9 +449,9 @@
 ! need getvars for each variable (only can have short string)
       DO jj = 1, NmapOutVars
         IF ( Map_var_type(jj)==REAL_TYPE ) THEN
-          CALL getvar_real(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var(1, jj))
+          CALL getvar_real(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var(:, jj))
         ELSEIF ( Map_var_type(jj)==DBLE_TYPE ) THEN
-          CALL getvar_dble(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var_dble(1, jj))
+          CALL getvar_dble(MODNAME, MapOutVar_names(jj)(:Nc_vars(jj)), Nhru, Map_var_dble(:, jj))
         ENDIF
       ENDDO
 

@@ -24,7 +24,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'xyz_dist'
-      character(len=*), parameter :: Version_xyz_dist = '2021-09-07'
+      character(len=*), parameter :: Version_xyz_dist = '2021-11-19'
       INTEGER, SAVE :: Nlapse, Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Basin_centroid_x, Basin_centroid_y
@@ -100,10 +100,9 @@
 !***********************************************************************
       INTEGER FUNCTION xyzsetdims()
       USE PRMS_XYZ_DIST, ONLY: Nlapse
+      use PRMS_READ_PARAM_FILE, only: declfix
+      use prms_utils, only: read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declfix
-      EXTERNAL read_error
 !***********************************************************************
       xyzsetdims = 0
 
@@ -129,12 +128,12 @@
 !***********************************************************************
       INTEGER FUNCTION xyzdecl()
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
+      use PRMS_MMFAPI, only: declvar_int, declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Nrain, Ntemp
       USE PRMS_XYZ_DIST
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_int, declvar_real
 !***********************************************************************
       xyzdecl = 0
 
@@ -458,16 +457,17 @@
 !***********************************************************************
       INTEGER FUNCTION xyzinit()
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, FEET2METERS
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nrain, Ntemp, Inputerror_flag
       USE PRMS_XYZ_DIST
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv,
      +    Hru_elev_ts, Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Psta_elev, Tsta_elev
+      use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getparam_real, getparam_int
-      EXTERNAL :: mean_by_month, read_error
+      EXTERNAL :: mean_by_month
 ! Local Variables
       INTEGER :: i, m, ii, ierr
 !***********************************************************************
@@ -715,24 +715,24 @@
       SUBROUTINE xyz_temp_run(Max_lapse, Min_lapse, Meantmax, Meantmin,
      +                        Temp_meanx, Temp_meany, Temp_meanz)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, DNEARZERO, ACTIVE, GLACIER
-      USE PRMS_MODULE, ONLY: Glacier_flag, Nrain
+      USE PRMS_MODULE, ONLY: Glacier_flag, Nrain, Hru_type
       USE PRMS_XYZ_DIST, ONLY: MRUx, MRUy, Tmax_rain_sta, Solradelev,
      +    Tmin_rain_sta, Temp_nuse, Tmin_add, Tmin_div, Tmax_add,
      +    Tmax_div, Temp_nsta, X_div, Y_div, Z_div, X_add, Y_add, Z_add,
      +    Temp_STAx, Temp_STAy, Basin_centroid_y, Basin_centroid_x,
      +    MAXLAPSE, Pstaelev, Pstax, Pstay, MRUelev, Temp_STAelev
       USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_area, Active_hrus,
-     +    Hru_route_order, Hru_type, Hru_elev_meters
+     +    Hru_route_order, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp,
      +    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf,
      +    Tavgc, Tmin_aspect_adjust, Tmax_aspect_adjust
       USE PRMS_OBS, ONLY: Tmax, Tmin
       USE PRMS_MODULE, ONLY: Nowmonth
+      use prms_utils, only: c_to_f
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, SNGL, DBLE
       EXTERNAL :: temp_set
-      REAL, EXTERNAL :: c_to_f
 ! Arguments
 !   Declared Parameters
       REAL, INTENT(IN) :: Max_lapse(MAXLAPSE), Min_lapse(MAXLAPSE)

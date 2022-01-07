@@ -4,13 +4,20 @@
 !***********************************************************************
       SUBROUTINE gsflow_prms(Arg)
       USE PRMS_CONSTANTS, ONLY: ERROR_control
+      use PRMS_CONTROL_FILE, only: read_control_file
+      use PRMS_DATA_FILE, only: read_prms_data_file
+      use PRMS_MMFAPI, only: Num_variables, Variable_data, MAXVARIABLES, declvar_int, declvar_real
       USE PRMS_MODULE
+      use PRMS_READ_PARAM_FILE, only: declparam, check_parameters, getparam_int, getparam_real, &
+                                      read_parameter_file_dimens, read_parameter_file_params, setup_params
+      use PRMS_SET_TIME, only: prms_time
+      use prms_utils, only: error_stop, module_error, numchars, print_module, PRMS_open_output_file, read_error
       IMPLICIT NONE
 ! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: Arg
 ! Functions
       INTRINSIC :: DATE_AND_TIME, INT
-      INTEGER, EXTERNAL :: check_dims, basin, climateflow, prms_time !, setup
+      INTEGER, EXTERNAL :: check_dims, basin, climateflow !, setup
       INTEGER, EXTERNAL :: cascade, obs, soltab, transp_tindex
       INTEGER, EXTERNAL :: transp_frost, frost_date, routing
       INTEGER, EXTERNAL :: temp_1sta_laps, temp_dist2
@@ -21,16 +28,13 @@
       INTEGER, EXTERNAL :: intcp, snowcomp, gwflow
       INTEGER, EXTERNAL :: srunoff, soilzone, soilzone_ag
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, write_climate_hru
-      INTEGER, EXTERNAL :: strmflow_in_out, muskingum, muskingum_lake, numchars
+      INTEGER, EXTERNAL :: strmflow_in_out, muskingum, muskingum_lake
       INTEGER, EXTERNAL :: water_use_read, dynamic_param_read, potet_pm_sta
       INTEGER, EXTERNAL :: stream_temp, glacr
-      EXTERNAL :: module_error, print_module, PRMS_open_output_file, precip_map, temp_map
+      EXTERNAL :: precip_map, temp_map
       EXTERNAL :: gsflow_prms_restart, water_balance, summary_output
-      EXTERNAL :: prms_summary, module_doc, convert_params, read_error, error_stop
+      EXTERNAL :: prms_summary, module_doc, convert_params
       INTEGER, EXTERNAL :: gsflow_modflow, gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
-      INTEGER, EXTERNAL :: declparam, getparam_real, getparam_int
-      EXTERNAL :: setdims, declvar_int, declvar_real, check_parameters
-      EXTERNAL :: read_control_file, read_parameter_file_dimens, read_prms_data_file
 ! Local Variables
       INTEGER :: i, iret, nc, ierr
 !***********************************************************************
@@ -99,27 +103,38 @@
           WRITE ( PRMS_output_unit, 16 ) EQULS(:62)
         ENDIF
         CALL print_module(MODDESC, MODNAME, PRMS_versn)
+
         CALL print_module('Read Control File', 'read_control_file', Version_read_control_file)
         CALL print_module('Read Parameter File', 'read_parameter_file', Version_read_parameter_file)
-
+        CALL print_module('Read Data File', 'read_data_file', Version_read_data_file)
         CALL read_prms_data_file()
+
+        Num_variables = 0
+        ALLOCATE ( Variable_data(MAXVARIABLES) ) ! don't know how many, need to read var_name file
+
+        ALLOCATE ( Hru_type(Nhru) )
+        Hru_type = 0
+        IF ( declparam(MODNAME, 'hru_type', 'nhru', 'integer', &
+     &       '1', '0', '4', &
+     &       'HRU type', 'Type of each HRU (0=inactive; 1=land; 2=lake; 3=swale; 4=glacier)', &
+     &       'none')/=0 ) CALL read_error(1, 'hru_type')
 
         IF ( GSFLOW_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           CALL declvar_int(MODNAME, 'KKITER', 'one', 1, &
      &         'Current iteration in GSFLOW simulation', 'none', KKITER)
           ALLOCATE ( Hru_ag_irr(Nhru) )
           CALL declvar_real(MODNAME, 'hru_ag_irr', 'nhru', Nhru, &
-     &         'Irrigation added to soilzone from MODFLOW wells', 'inch-acres', Hru_ag_irr)
+     &         'Irrigation added to soilzone from MODFLOW wells', 'acre-inches', Hru_ag_irr)
           Hru_ag_irr = 0.0
           ALLOCATE ( Dprst_ag_gain(Nhru) )
           CALL declvar_real(MODNAME, 'dprst_ag_gain', 'nhru', Nhru, &
      &         'Irrigation added to surface depression storage from MODFLOW ponds', &
-     &         'inch-acres', Dprst_ag_gain)
+     &         'acre-inches', Dprst_ag_gain)
           Dprst_ag_gain = 0.0
           ALLOCATE ( Dprst_ag_transfer(Nhru) )
           CALL declvar_real(MODNAME, 'dprst_ag_transfer', 'nhru', Nhru, &
      &         'Surface depression storage transfer to MODFLOW cells', &
-     &         'inch-acres', Dprst_ag_transfer)
+     &         'acre-inches', Dprst_ag_transfer)
           Dprst_ag_transfer = 0.0
           IF ( declparam(MODNAME, 'mxsziter', 'one', 'integer', &
      &         '0', '0', '5000', &
@@ -147,6 +162,8 @@
 
       ELSEIF ( Process(:4)=='init' ) THEN
         Process_flag = INIT
+
+        IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
 
         Grid_flag = OFF
         IF ( Nhru==Nhrucell ) Grid_flag = ACTIVE
@@ -588,14 +605,15 @@
 !***********************************************************************
       SUBROUTINE setdims()
       USE PRMS_CONSTANTS, ONLY: ERROR_control
+      use PRMS_CONTROL_FILE, only: get_control_arguments, read_control_file, control_integer, control_integer_array, control_string !, control_file_name
       USE PRMS_MODULE
+      use PRMS_READ_PARAM_FILE, only: decldim, declfix, read_parameter_file_dimens, setup_dimens
+      use prms_utils, only: compute_julday, error_stop, module_error, PRMS_open_input_file, PRMS_open_output_file, read_error
       USE GLOBAL, ONLY: NSTP, NPER, ISSFLG
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: decldim, declfix, control_integer_array !, control_file_name
-      INTEGER, EXTERNAL :: control_string, control_integer, gsflow_modflow, compute_julday
-      EXTERNAL :: read_error, PRMS_open_output_file, PRMS_open_input_file, check_module_names, module_error
-      EXTERNAL :: read_control_file, setup_dimens, read_parameter_file_dimens, get_control_arguments
+      INTEGER, EXTERNAL :: gsflow_modflow
+      EXTERNAL :: check_module_names
 ! Local Variables
       ! Maximum values are no longer limits
 ! Local Variables
@@ -624,24 +642,15 @@
       IF ( control_string(Model_mode, 'model_mode')/=0 ) CALL read_error(5, 'model_mode')
       IF ( Model_mode(:4)=='    ' ) Model_mode = 'GSFLOW5'
       PRMS4_flag = ACTIVE
-      IF ( Model_mode(:5)=='PRMS5' .OR. Model_mode(:7)=='PRMS_AG' .OR. &
-     &     Model_mode(:7)=='GSFLOW5' .OR. Model_mode(:9)=='GSFLOW_AG' ) PRMS4_flag = OFF
+      IF ( Model_mode(:5)=='PRMS5' .OR. Model_mode(:7)=='GSFLOW5' .OR. Model_mode(:7)=='gsflow5' ) PRMS4_flag = OFF
       PRMS_flag = ACTIVE
       GSFLOW_flag = OFF
       PRMS_only = OFF
-      AG_flag = OFF
-      IF ( Model_mode(:9)=='GSFLOW_AG' .OR. Model_mode(:9)=='gsflow_ag' .OR. Model_mode(:7)=='PRMS_AG' &
-     &     .OR. Model_mode(:7)=='prms_ag' ) AG_flag = ACTIVE
-      ! Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 3=GSFLOW_AG; 4=PRMS_AG)
-      IF ( Model_mode(:7)=='PRMS_AG' .OR. Model_mode(:7)=='prms_ag' ) THEN
-        Model = PRMS_AG
-        PRMS_only = ACTIVE
-      ELSEIF ( Model_mode(:4)=='PRMS' .OR. Model_mode(:4)=='prms' .OR. Model_mode(:5)=='DAILY' ) THEN
+      MODSIM_flag = OFF
+      ! Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
+      IF ( Model_mode(:4)=='PRMS' .OR. Model_mode(:4)=='prms' .OR. Model_mode(:5)=='DAILY' ) THEN
         Model = PRMS
         PRMS_only = ACTIVE
-      ELSEIF ( Model_mode(:9)=='GSFLOW_AG' .OR. Model_mode(:9)=='gsflow_ag' ) THEN
-        Model = GSFLOW_AG
-        GSFLOW_flag = ACTIVE
       ELSEIF ( Model_mode(:6)=='GSFLOW' .OR. Model_mode(:4)=='gsflow' ) THEN
         Model = GSFLOW
         GSFLOW_flag = ACTIVE
@@ -779,6 +788,8 @@
       IF ( control_string(Solrad_module, 'solrad_module')/=0 ) CALL read_error(5, 'solrad_module')
       Soilzone_module = 'soilzone'
       IF ( control_string(Soilzone_module, 'soilzone_module')/=0 ) CALL read_error(5, 'soilzone_module')
+      AG_flag = OFF
+      IF ( Soilzone_module=='soilzone_ag' ) AG_flag = ACTIVE
       Strmflow_module = 'strmflow'
       IF ( control_string(Strmflow_module, 'strmflow_module')/=0 ) CALL read_error(5, 'strmflow_module')
       IF ( control_string(irrigated_area_module, 'irrigated_area_module')/=0 ) CALL read_error(5, 'irrigated_area_module')
@@ -975,7 +986,7 @@
       IF ( control_integer(Agriculture_canopy_flag, 'agriculture_canopy_flag')/=0 ) Agriculture_canopy_flag = OFF
       IF ( Agriculture_soilzone_flag==ACTIVE .AND. Agriculture_canopy_flag==ACTIVE ) &
      &     CALL error_stop('agriculture_soilzone_flag and agriculture_canopy_flag = 1, only one can be active', ERROR_control)
-      
+
       IF ( control_integer(Agriculture_dprst_flag, 'agriculture_dprst_flag')/=0 ) Agriculture_dprst_flag = OFF
       IF ( Dprst_flag==OFF .AND. Agriculture_dprst_flag==ACTIVE ) &
      &     CALL error_stop('agriculture_dprst_flag = 1, but dprst_flag = 0', ERROR_control)
@@ -1111,10 +1122,10 @@
 !     Get and check consistency of dimensions with flags
 !***********************************************************************
       INTEGER FUNCTION check_dims()
+      use PRMS_READ_PARAM_FILE, only: getdim
       USE PRMS_MODULE
+      use prms_utils, only: read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: getdim
       EXTERNAL :: check_dimens
 !***********************************************************************
 
@@ -1357,9 +1368,10 @@
       SUBROUTINE module_doc()
       USE PRMS_CONSTANTS, ONLY: DECL
       USE PRMS_MODULE, ONLY: Process_flag
+      use PRMS_SET_TIME, only: prms_time
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: basin, climateflow, prms_time
+      INTEGER, EXTERNAL :: basin, climateflow
       INTEGER, EXTERNAL :: cascade, obs, soltab, transp_tindex
       INTEGER, EXTERNAL :: transp_frost, frost_date, routing
       INTEGER, EXTERNAL :: temp_1sta_laps, temp_dist2
@@ -1558,12 +1570,12 @@
 !***********************************************************************
       SUBROUTINE gsflow_prms_restart(In_out)
       USE PRMS_MODULE
+      use prms_utils, only: check_restart, check_restart_dimen
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      EXTERNAL check_restart, check_restart_dimen
       ! Functions
-      INTRINSIC TRIM
+      INTRINSIC :: TRIM
       ! Local Variables
       INTEGER :: nhru_test, dprst_test, nsegment_test, temp_test, et_test, ierr, time_step
       INTEGER :: cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, start_time(6), end_time(6)

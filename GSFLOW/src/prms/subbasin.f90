@@ -15,7 +15,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'subbasin'
-      character(len=*), parameter :: Version_subbasin = '2021-09-07'
+      character(len=*), parameter :: Version_subbasin = '2021-12-09'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Qsub(:), Sub_area(:), Laststor(:)
       INTEGER, SAVE, ALLOCATABLE :: Tree(:, :)
 !   Declared Variables
@@ -63,12 +63,12 @@
 !***********************************************************************
       INTEGER FUNCTION subdecl()
       USE PRMS_CONSTANTS, ONLY: OFF, DOCUMENTATION, ERROR_dim
+      use PRMS_MMFAPI, only: declvar_dble
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Model, Nsub, Nhru, GSFLOW_flag
       USE PRMS_SUBBASIN
+      use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, error_stop, declvar_dble
 !***********************************************************************
       subdecl = 0
 
@@ -241,11 +241,11 @@
 !***********************************************************************
       INTEGER FUNCTION subinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, DNEARZERO
+      use PRMS_READ_PARAM_FILE, only: getparam_int
       USE PRMS_MODULE, ONLY: Nsub, Nhru, Print_debug, GSFLOW_flag, &
-     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag
+     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag, Hru_type
       USE PRMS_SUBBASIN
-      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
-     &    Hru_type, Hru_frac_perv, Lake_hru_id
+      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, Hru_frac_perv, Lake_hru_id
       USE PRMS_FLOWVARS, ONLY: Ssres_stor, Soil_moist, Pkwater_equiv, Gwres_stor, Sroff, Ssres_flow, Lake_vol
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Cfs2inches
       USE PRMS_INTCP, ONLY: Hru_intcpstor
@@ -253,11 +253,10 @@
       USE PRMS_SOILZONE, ONLY: Lakein_sz
       USE PRMS_GWFLOW, ONLY: Gwres_flow
       USE PRMS_MUSKINGUM_LAKE, ONLY: Lake_outcfs
+      use prms_utils, only: PRMS_open_module_file, read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getparam_int
-      EXTERNAL :: read_error, PRMS_open_module_file
 ! Local Variables
       INTEGER :: i, j, k, kk, TREEUNIT
       DOUBLE PRECISION :: harea, gwstor, soilstor, snowstor, landstor, srq, ssq, gwq
@@ -274,35 +273,6 @@
         kk = Subbasin_down(j)
         IF ( kk/=0 ) Tree(kk, j) = 1
       ENDDO
-
-      Sub_cfs = 0.0D0
-      Sub_cms = 0.0D0
-      Sub_inq = 0.0D0
-      Subinc_interflow = 0.0D0
-      IF ( GSFLOW_flag==OFF ) THEN
-        Subinc_gwflow = 0.0D0
-        Sub_gwflow = 0.0D0
-      ENDIF
-      Subinc_sroff = 0.0D0
-      Subinc_precip = 0.0D0
-      Subinc_rain = 0.0D0
-      Subinc_snow = 0.0D0
-      Subinc_snowmelt = 0.0D0
-      Subinc_pkweqv = 0.0D0
-      Subinc_actet = 0.0D0
-      Subinc_snowcov = 0.0D0
-      Subinc_swrad = 0.0D0
-      Subinc_tminc = 0.0D0
-      Subinc_tmaxc = 0.0D0
-      Subinc_tavgc = 0.0D0
-      Subinc_potet = 0.0D0
-      Subinc_wb = 0.0D0
-      Subinc_deltastor = 0.0D0
-      Subinc_recharge = 0.0D0
-      Subinc_szstor_frac = 0.0D0
-      Subinc_capstor_frac = 0.0D0
-      Sub_interflow = 0.0D0
-      Sub_sroff = 0.0D0
 
       IF ( Print_debug==14 ) THEN
         CALL PRMS_open_module_file(TREEUNIT, 'tree_structure')
@@ -345,6 +315,10 @@
       ENDIF
 
 ! added some code to allow for restart, but not climate states and fluxes and subinc_deltastor
+
+      Subinc_interflow = 0.0D0
+      IF ( GSFLOW_flag==OFF ) Subinc_gwflow = 0.0D0
+      Subinc_sroff = 0.0D0
       Subinc_stor = 0.0D0
       Sub_area = 0.0D0
       gwstor = 0.0D0
@@ -439,10 +413,9 @@
 !***********************************************************************
       INTEGER FUNCTION subrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, CASCADE_OFF
-      USE PRMS_MODULE, ONLY: Nsub, GSFLOW_flag, Dprst_flag, Lake_route_flag, Cascade_flag
+      USE PRMS_MODULE, ONLY: Nsub, GSFLOW_flag, Dprst_flag, Lake_route_flag, Cascade_flag, Hru_type
       USE PRMS_SUBBASIN
-      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
-     &    Hru_type, Hru_frac_perv, Lake_hru_id
+      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, Hru_frac_perv, Lake_hru_id
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Cfs2inches
       USE PRMS_SNOW, ONLY: Snowcov_area, Snowmelt
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Swrad, Potet, Tminc, Tmaxc, Tavgc, Hru_rain, Hru_snow
@@ -537,8 +510,8 @@
           Subinc_tmaxc(k) = Subinc_tmaxc(k) + DBLE(Tmaxc(j))*harea
           Subinc_tavgc(k) = Subinc_tavgc(k) + DBLE(Tavgc(j))*harea
           Subinc_recharge(k) = Subinc_recharge(k) + Recharge(j)*harea
-          Subinc_szstor_frac(k) = Subinc_szstor_frac(k) + Soil_moist_tot(j)/Soil_zone_max(j)*harea
-          Subinc_capstor_frac(k) = Subinc_capstor_frac(k) + Soil_moist(j)/Soil_moist_max(j)*harea
+          IF ( Soil_zone_max(j)>0.0 ) Subinc_szstor_frac(k) = Subinc_szstor_frac(k) + Soil_moist_tot(j)/Soil_zone_max(j)*harea
+          IF ( Soil_moist_max(j)>0.0 ) Subinc_capstor_frac(k) = Subinc_capstor_frac(k) + Soil_moist(j)/Soil_moist_max(j)*harea
           Subinc_stor(k) = Subinc_stor(k) + soilstor + snowstor + landstor
           IF ( GSFLOW_flag==OFF ) THEN
             gwq = DBLE(Gwres_flow(j))*harea

@@ -17,7 +17,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Groundwater'
       character(len=6), parameter :: MODNAME = 'gwflow'
-      character(len=*), parameter :: Version_gwflow = '2021-09-07'
+      character(len=*), parameter :: Version_gwflow = '2021-12-16'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea(:), Gwin_dprst(:)
       DOUBLE PRECISION, SAVE :: Basin_gw_upslope
       INTEGER, SAVE :: Gwminarea_flag
@@ -74,12 +74,12 @@
 !***********************************************************************
       INTEGER FUNCTION gwflowdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, DOCUMENTATION, CASCADEGW_OFF
+      use PRMS_MMFAPI, only: declvar_real, declvar_dble
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Model, Nhru, Ngw, Nlake, Init_vars_from_file, Dprst_flag, Cascadegw_flag, Lake_route_flag
       USE PRMS_GWFLOW
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_real, declvar_dble
 !***********************************************************************
       gwflowdecl = 0
 
@@ -265,16 +265,15 @@
 !***********************************************************************
       INTEGER FUNCTION gwflowinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, LAKE, SWALE, DEBUG_less, CASCADEGW_OFF
+      use PRMS_READ_PARAM_FILE, only: getparam_real
       USE PRMS_MODULE, ONLY: Ngw, Nlake, Print_debug, Init_vars_from_file, &
-     &    Dprst_flag, Cascadegw_flag, Inputerror_flag, Gwr_swale_flag
+     &    Dprst_flag, Inputerror_flag, Gwr_swale_flag
       USE PRMS_GWFLOW
       USE PRMS_BASIN, ONLY: Gwr_type, Hru_area, Basin_area_inv, Active_gwrs, Gwr_route_order, &
      &                      Lake_hru_id, Weir_gate_flag, Hru_storage
       USE PRMS_FLOWVARS, ONLY: Gwres_stor
+      use prms_utils, only: read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: getparam_real
-      EXTERNAL :: read_error
       INTRINSIC :: DBLE
 ! Local Variables
       INTEGER :: i, j, jjj
@@ -361,12 +360,6 @@
       Basin_gw_upslope = 0.0D0
       Basin_dnflow = 0.0D0
       Basin_lake_seep = 0.0D0
-! do only once, so restart uses saved values
-      IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
-        Gw_upslope = 0.0D0
-        Hru_gw_cascadeflow = 0.0
-        IF ( Nlake>0 ) Lakein_gwflow = 0.0D0
-      ENDIF
       Gwres_flow = 0.0
       Gwres_in = 0.0
       Gwres_sink = 0.0
@@ -393,9 +386,10 @@
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
       USE PRMS_WATER_USE, ONLY: Gwr_transfer, Gwr_gain
+      use prms_utils, only: print_date
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: rungw_cascade, print_date
+      EXTERNAL :: rungw_cascade
       INTRINSIC :: DBLE, DABS, SNGL, MIN
 ! Local Variables
       INTEGER :: i, j, jj, jjj
@@ -406,6 +400,7 @@
 
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         Gw_upslope = 0.0D0
+        Hru_gw_cascadeflow = 0.0
         Basin_dnflow = 0.0D0
         Basin_gw_upslope = 0.0D0
         IF ( Nlake>0 ) Lakein_gwflow = 0.0D0
@@ -520,10 +515,10 @@
               PRINT *, '       storage: ', gwstor, '; transfer: ', Gwr_transfer(i)/Cfs_conv
               ERROR STOP ERROR_water_use
             ENDIF
-            gwstor = gwstor - DBLE( Gwr_transfer(i) ) / Cfs_conv 
+            gwstor = gwstor - DBLE( Gwr_transfer(i) ) / Cfs_conv
           ENDIF
         ENDIF
- 
+
         gwsink = 0.0D0
         IF ( gwstor<0.0D0 ) THEN ! could happen with water use
           IF ( Print_debug>DEBUG_less ) PRINT *, 'Warning, groundwater reservoir for HRU:', i, ' is < 0.0', gwstor
@@ -633,10 +628,9 @@
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
       USE PRMS_BASIN, ONLY: Weir_gate_flag
       USE PRMS_GWFLOW
+      use prms_utils, only: check_restart
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      ! Functions
-      EXTERNAL :: check_restart
       ! Local Variable
       CHARACTER(LEN=6) :: module_name
 !***********************************************************************

@@ -1,32 +1,28 @@
 !***********************************************************************
 ! Read PRMS Data File
 !***********************************************************************
-      MODULE PRMS_DATA_FILE
-        INTEGER, SAVE :: Num_datafile_types, Num_datafile_columns, Datafile_unit
-        CHARACTER(LEN=16), ALLOCATABLE, SAVE :: Data_varname(:)
-        INTEGER, ALLOCATABLE, SAVE :: Data_varnum(:)
-        REAL, ALLOCATABLE, SAVE :: Data_line_values(:)
-        CHARACTER(LEN=1), ALLOCATABLE :: data_transfer(:)
-      END MODULE PRMS_DATA_FILE
+submodule(PRMS_DATA_FILE) sm_read_data_file
 
-      SUBROUTINE read_prms_data_file
+contains
+
+  module subroutine read_prms_data_file()
       USE PRMS_CONSTANTS, ONLY: ERROR_time, ERROR_read, ERROR_open_in, MAXDATALINE_LENGTH, MAXFILE_LENGTH
-      USE PRMS_DATA_FILE
+      use PRMS_CONTROL_FILE, only: control_string
       USE PRMS_MODULE, ONLY: PRMS_output_unit, Print_debug, Starttime, Endtime, EQULS
+      use prms_utils, only: error_stop, find_current_time, numchars, PRMS_open_input_file, read_error, write_outfile
       IMPLICIT NONE
       ! Functions
-      INTRINSIC LEN_TRIM, TRIM
-      EXTERNAL read_error, write_outfile, PRMS_open_input_file, find_current_time, error_stop
-      INTEGER, EXTERNAL :: control_string, numchars, check_data_values
+      INTRINSIC :: LEN_TRIM, TRIM
+      INTEGER, EXTERNAL :: check_data_values
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Read Data File'
       character(len=*), parameter :: MODNAME = 'read_data_file'
       CHARACTER(LEN=MAXFILE_LENGTH) :: data_filename
       CHARACTER(LEN=MAXDATALINE_LENGTH) :: data_line, dmy
       CHARACTER(LEN=80) :: line
-      INTEGER n, ierr, ios, numchrs, length
-      INTEGER startyr, startmo, startdy, starthr, startmn, startsec
-      INTEGER endyr, endmo, enddy, endhr, endmn, endsec, num_vars
+      INTEGER :: n, ierr, ios, numchrs, length
+      INTEGER :: startyr, startmo, startdy, starthr, startmn, startsec
+      INTEGER :: endyr, endmo, enddy, endhr, endmn, endsec, num_vars
       REAL, ALLOCATABLE :: var(:)
 !***********************************************************************
       IF ( control_string(data_filename, 'data_file')/=0 ) CALL read_error(5, 'data_file')
@@ -153,16 +149,14 @@
 !***********************************************************************
 ! Read PRMS Data File line
 !***********************************************************************
-      SUBROUTINE read_data_line()
+  module subroutine read_data_line()
       USE PRMS_CONSTANTS, ONLY: ERROR_read
-      USE PRMS_DATA_FILE
-      USE PRMS_MMFAPI
+      use PRMS_MMFAPI   ! , only: getvarnvals, getvar_id
       USE PRMS_SET_TIME, ONLY: Nowtime
+      use prms_utils, only: read_error
       IMPLICIT NONE
       ! Functions
       INTRINSIC TRANSFER
-      EXTERNAL read_error, check_data_variables
-      INTEGER, EXTERNAL :: getvarnvals, getvar_id
       ! Local Variables
       INTEGER datatime(6), jj, ios, column_end, column, nvals, var_id
 !***********************************************************************
@@ -184,7 +178,7 @@
         nvals = getvarnvals(Data_varname(jj))
         var_id = getvar_id(Data_varname(jj))
         column_end = column_end + nvals
-        Variable_data(var_id)%values_real = TRANSFER(Data_line_values(column:column_end), Variable_data(var_id)%values_real)
+        Variable_data(var_id)%values_real_1d = TRANSFER(Data_line_values(column:column_end), Variable_data(var_id)%values_real_1d)
         CALL check_data_variables(Data_varname(jj),nvals,Data_line_values(column:column_end),1,ios)
         IF ( ios/=0 ) THEN
           PRINT *, 'ERROR, Data File corrupted. Reading variable: ', Data_varname(jj)
@@ -198,7 +192,7 @@
 !***********************************************************************
 ! check_data_variables - Check data variables and dimensions
 !***********************************************************************
-      SUBROUTINE check_data_variables(Varname, Numvalues, Values, Iflag, Iret)
+  module subroutine check_data_variables(Varname, Numvalues, Values, Iflag, Iret)
       USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
       USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow
       USE PRMS_OBS, ONLY: Nlakeelev, Nwind, Nhumid, &
@@ -324,7 +318,7 @@
             ndim = 1
           ENDIF
         ELSE
-          Rain_day = Values(1)
+          Rain_day = Values(1) ! WARNING: Rain_day is an integer, but Values(1) is real
         ENDIF
       ELSEIF ( Varname(:8)=='humidity' ) THEN
         IF ( Iflag==0 ) THEN
@@ -372,14 +366,11 @@
 !***********************************************************************
 ! read_data_file_line - Read next data line, check increment
 !***********************************************************************
-      SUBROUTINE read_data_file_line(Iret)
+  module subroutine read_data_file_line(Iret)
       USE PRMS_CONSTANTS, ONLY: ERROR_read
-      USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day, Nowyear, Nowmonth, Nowday
-      USE PRMS_DATA_FILE
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
+      use prms_utils, only: compute_julday, read_error
       IMPLICIT NONE
-      ! Functions
-      INTEGER, EXTERNAL :: compute_julday
-      EXTERNAL check_data_variables, read_error
       ! Arguments
       INTEGER, INTENT(OUT) :: Iret
       ! Local Variables
@@ -388,31 +379,23 @@
       DATA init/1/
 !***********************************************************************
       Iret = 0
-      IF ( init==1 ) THEN
-        Nowyear = Start_year
-        Nowmonth = Start_month
-        Nowday = Start_day
-      ELSE
-        last_julday = compute_julday(Nowyear, Nowmonth, Nowday)
-      ENDIF
+      last_julday = compute_julday(Nowyear, Nowmonth, Nowday)
       READ ( Datafile_unit, *, IOSTAT=Iret ) Nowyear, Nowmonth, Nowday, hr, mn, sec, (Data_line_values(i),i=1,Num_datafile_columns)
-      IF ( Iret==0 ) THEN
-        IF ( init==0 ) THEN
-          now_julday = compute_julday(Nowyear, Nowmonth, Nowday)
-          IF ( now_julday-last_julday/=1 ) THEN
-            PRINT *, 'ERROR, Data File timestep not equal to 1 day on:', Nowyear, Nowmonth, Nowday
-            PRINT *, '       timestep =', now_julday - last_julday
-            STOP ERROR_read
-          ENDIF
-        ELSE
-          init = 0
+      IF ( Iret/=0 ) CALL read_error(13, 'measured variables')
+      IF ( init==0 ) THEN
+        now_julday = compute_julday(Nowyear, Nowmonth, Nowday)
+        IF ( now_julday-last_julday/=1 ) THEN
+          PRINT *, 'ERROR, Data File timestep not equal to 1 day on:', Nowyear, Nowmonth, Nowday
+          PRINT *, '       timestep =', now_julday - last_julday
+          STOP ERROR_read
         ENDIF
-        start = 1
-        DO i = 1, Num_datafile_types
-          CALL check_data_variables(Data_varname(i), Data_varnum(i), Data_line_values(start), 1, Iret)
-          start = start + Data_varnum(i)
-        ENDDO
       ELSE
-        CALL read_error(13, 'measured variables')
+        init = 0
       ENDIF
+      start = 1
+      DO i = 1, Num_datafile_types
+        CALL check_data_variables(Data_varname(i), Data_varnum(i), Data_line_values(start), 1, Iret)
+        start = start + Data_varnum(i)
+      ENDDO
       END SUBROUTINE read_data_file_line
+end submodule

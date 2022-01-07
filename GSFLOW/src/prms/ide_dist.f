@@ -15,7 +15,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'ide_dist'
-      character(len=*), parameter :: Version_ide_dist = '2021-09-07'
+      character(len=*), parameter :: Version_ide_dist = '2021-11-19'
       INTEGER, SAVE :: Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Dalr
@@ -67,12 +67,12 @@
 !***********************************************************************
       INTEGER FUNCTION idedecl()
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DOCUMENTATION
+      use PRMS_MMFAPI, only: declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Model, Nhru, Ntemp, Nrain
       USE PRMS_IDE
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_real
 !***********************************************************************
       idedecl = 0
 
@@ -253,15 +253,15 @@
 !***********************************************************************
       INTEGER FUNCTION ideinit()
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE
+      use PRMS_READ_PARAM_FILE, only: getparam_real, getparam_int
       USE PRMS_MODULE, ONLY: Nhru, Ntemp, Nrain, Inputerror_flag
       USE PRMS_IDE
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv,
      +    Active_hrus, Hru_route_order
+      use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE
-      INTEGER, EXTERNAL :: getparam_real, getparam_int
-      EXTERNAL :: read_error
 ! Local Variables
       INTEGER i, ii, ierr
 !***********************************************************************
@@ -427,24 +427,23 @@
 !***********************************************************************
       INTEGER FUNCTION ide_temp_run(Temp_wght_dist, Temp_wght_elev)
       USE PRMS_CONSTANTS, ONLY: FEET2METERS, GLACIER, FEET, CELSIUS
-      USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nowmonth
+      USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nowmonth, Hru_type
       USE PRMS_IDE, ONLY: Hru_x, Hru_y, Tmax_rain_sta, Solrad_elev,
      +    Tmin_rain_sta, Temp_nuse, Temp_nsta, Tsta_x, Tsta_y, Dist_exp,
      +    Psta_x, Psta_y, Basin_centroid_x, Basin_centroid_y,
      +    Ndist_tsta
       USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_area, Active_hrus,
-     +    Hru_route_order, Hru_elev_meters, Hru_elev_ts, Hru_type,
-     +    Elev_units
+     +    Hru_route_order, Hru_elev_meters, Hru_elev_ts, Elev_units
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp,
      +    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf,
      +    Tavgc, Tmin_aspect_adjust, Tmax_aspect_adjust,
      +    Tsta_elev_meters, Temp_units, Psta_elev_meters
       USE PRMS_OBS, ONLY: Tmax, Tmin
+      use prms_utils, only: c_to_f
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL
       EXTERNAL :: temp_set, compute_inv, compute_elv
-      REAL, EXTERNAL :: c_to_f
 ! Arguments
       REAL, INTENT(IN) :: Temp_wght_dist, Temp_wght_elev
 ! Local Variables
@@ -605,23 +604,22 @@
       INTEGER FUNCTION ide_rain_run(Prcp_wght_dist, Prcp_wght_elev)
       USE PRMS_CONSTANTS, ONLY: FEET2METERS, MM2INCH, GLACIER, FEET,
      +    CELSIUS, ERROR_data
-      USE PRMS_MODULE, ONLY: Nrain, Nowmonth
+      USE PRMS_MODULE, ONLY: Nrain, Nowmonth, Hru_type
       USE PRMS_IDE, ONLY: Hru_x, Hru_y, Psta_x, Psta_y,
      +    Rain_nuse, Rain_nsta, Tmax_rain_sta, Tmin_rain_sta,
      +    Ndist_psta, Dist_exp, Precip_ide, Adjust_snow, Adjust_rain,
      +    Tmax_allsnow_sta, Tmax_allrain_sta
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus,
-     +    Hru_route_order, Hru_elev_meters, Hru_elev_ts, Hru_type,
-     +    Elev_units
+     +    Hru_route_order, Hru_elev_meters, Hru_elev_ts, Elev_units
       USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Tminf, Newsnow, Pptmix,
      +    Hru_ppt, Hru_rain, Hru_snow, Basin_rain,
      +    Basin_ppt, Prmx, Basin_snow, Psta_elev_meters, Basin_obs_ppt,
      +    Precip_units, Tmax_allsnow_f, Tmax_allrain_f, Adjmix_rain
       USE PRMS_OBS, ONLY: Precip
+      use prms_utils, only: error_stop, print_date
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: precip_form, compute_inv, compute_elv, print_date
-      EXTERNAL :: error_stop
+      EXTERNAL :: precip_form, compute_inv, compute_elv
 ! Arguments
       REAL, INTENT(IN) :: Prcp_wght_dist, Prcp_wght_elev
 ! Local variables
@@ -739,10 +737,11 @@
       SUBROUTINE compute_inv(Imax, Nsta, Nuse, Sta_x, X, Sta_y, Y, Dat,
      +                       Dat_dist, Ndist, Dist_exp)
       USE PRMS_CONSTANTS, ONLY: ERROR_data
+      use prms_utils, only: error_stop, print_date
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SQRT, DBLE, SNGL
-      EXTERNAL :: SORT2I, print_date, error_stop
+      EXTERNAL :: SORT2I
 ! Arguments
       INTEGER, INTENT(IN) :: Imax, Ndist, Nsta
       INTEGER, DIMENSION(Imax), INTENT(IN) :: Nuse

@@ -348,7 +348,7 @@ c     brute force factor
 c
 c     local variables
 c
-      integer :: i, itemp, ii, first, iold, iend, num, next,
+      integer :: itemp, ii, first, iold, iend, num, next,
      [        maxint, iblck, id, kk, idk, idkk
       double precision temp, epsmin
 
@@ -674,7 +674,7 @@ c
 c
 c     locall variables
 c
-      integer :: ibf, nred, ii, idf, i, iHalf, iBlack,iRed, ierror, k
+      integer :: ibf, nred, ii, i, iHalf, iBlack,iRed, ierror, k
       integer, allocatable, dimension(:) :: ilist
       allocate( ilist(neq) , stat = ierror )
       if (ierror /= 0) stop "== not enough memory (xmdRedBlack) =="
@@ -1950,7 +1950,7 @@ c
 c
 c     local variables
 c
-      integer :: ierror, i, nred
+      integer :: ierror, nred
 
       double precision, dimension(:), allocatable :: soln
 

@@ -21,7 +21,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2021-09-15'
+      character(len=*), parameter :: Version_snowcomp = '2021-12-09'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -113,13 +113,13 @@
 !***********************************************************************
       INTEGER FUNCTION snodecl()
       USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, MONTHS_PER_YEAR
+      use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Model, Nhru, Ndepl, &
      &    Init_vars_from_file, Glacier_flag, Snarea_curve_flag, PRMS_land_iteration_flag
       USE PRMS_SNOW
+      use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-! Functions
-      INTEGER, EXTERNAL :: declparam
-      EXTERNAL :: read_error, print_module, declvar_dble, declvar_real, declvar_int
 !***********************************************************************
       snodecl = 0
 
@@ -690,15 +690,17 @@
 !***********************************************************************
       INTEGER FUNCTION snoinit()
       USE PRMS_CONSTANTS, ONLY: LAND, GLACIER, FEET, FEET2METERS, DNEARZERO, ACTIVE, OFF, MONTHS_PER_YEAR, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Print_debug, Init_vars_from_file, Glacier_flag, Snarea_curve_flag
+      USE PRMS_MODULE, ONLY: Ndeplval
+      use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Init_vars_from_file, Glacier_flag, Snarea_curve_flag, Hru_type
       USE PRMS_SNOW
-      USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_route_order, Active_hrus, Hru_area_dble, Elev_units, Hru_type
+      USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_route_order, Active_hrus, Hru_area_dble, Elev_units
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
+      use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, ATAN, SNGL, MIN
-      INTEGER, EXTERNAL :: getparam_real, getparam_int
-      EXTERNAL :: read_error, sca_deplcrv, glacr_states_to_zero
+      EXTERNAL :: sca_deplcrv, glacr_states_to_zero
 ! Local Variables
       INTEGER :: i, j
       REAL :: x
@@ -725,7 +727,7 @@
       IF ( getparam_real(MODNAME, 'rad_trncf', Nhru, Rad_trncf)/=0 ) CALL read_error(2, 'rad_trncf')
       IF ( Snarea_curve_flag==OFF ) THEN
         IF ( getparam_int(MODNAME, 'hru_deplcrv', Nhru, Hru_deplcrv)/=0 ) CALL read_error(2, 'hru_deplcrv')
-        IF ( getparam_real(MODNAME, 'snarea_curve', Ndepl*11, Snarea_curve)/=0 ) CALL read_error(2, 'snarea_curve')
+        IF ( getparam_real(MODNAME, 'snarea_curve', Ndeplval, Snarea_curve)/=0 ) CALL read_error(2, 'snarea_curve')
       ELSE
         IF ( getparam_real(MODNAME, 'snarea_a', Nhru, Snarea_a)/=0 ) CALL read_error(2, 'snarea_a')
         IF ( getparam_real(MODNAME, 'snarea_b', Nhru, Snarea_b)/=0 ) CALL read_error(2, 'snarea_b')
@@ -764,10 +766,7 @@
       Frac_swe = 0.0
       Acum = acum_init
       Amlt = amlt_init
-      Basin_tcal = 0.0D0
-      Basin_snowmelt = 0.0D0
-      Basin_snowevap = 0.0D0
-      Basin_pk_precip = 0.0D0
+      Pkwater_ante = 0.0D0
       Basin_glacrb_melt = 0.0D0
       Basin_glacrevap = 0.0D0
       IF ( Glacier_flag==ACTIVE ) THEN
@@ -903,13 +902,12 @@
       INTEGER FUNCTION snorun()
       USE PRMS_CONSTANTS, ONLY: LAKE, LAND, GLACIER, SHRUBS, FEET, &
      &    INCH2M, FEET2METERS, DNEARZERO, ACTIVE, OFF, DEBUG_less, DAYS_YR
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag, Start_year, &
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag, Start_year, Hru_type, &
      &    PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Albedo_cbh_flag, snow_cloudcover_flag
       USE PRMS_SNOW
       USE PRMS_SOLTAB, ONLY: Soltab_horad_potsw, Soltab_potsw, Hru_cossl
       USE PRMS_CLIMATE_HRU, ONLY: Albedo_hru
-      USE PRMS_BASIN, ONLY: Hru_area, Active_hrus, Hru_type, &
-     &    Basin_area_inv, Hru_route_order, Cov_type, Elev_units
+      USE PRMS_BASIN, ONLY: Hru_area, Active_hrus, Basin_area_inv, Hru_route_order, Cov_type, Elev_units
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Orad, Basin_horad, Potet_sublim, &
      &    Hru_ppt, Prmx, Tmaxc, Tminc, Tavgc, Swrad, Potet, Transp_on, Tmax_allsnow_c
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
@@ -1002,14 +1000,8 @@
       Frac_swe = 0.0
       ! By default, the precipitation added to snowpack, snowmelt,
       ! and snow evaporation are 0
-      Pk_precip = 0.0 ! [inches]
-      Snowmelt = 0.0 ! [inches]
-      Snow_evap = 0.0 ! [inches]
-      Tcal = 0.0
-      Ai = 0.0D0
       ! Keep track of the pack water equivalent before it is changed
       ! by precipitation during this time step
-      Pkwater_ante = Pkwater_equiv
 
       ! Loop through all the active HRUs, in routing order
       DO j = 1, Active_hrus
@@ -1018,6 +1010,12 @@
         ! Skip the HRU if it is a lake
         IF ( Hru_type(i)==LAKE ) CYCLE
 
+        Pk_precip(i) = 0.0 ! [inches]
+        Snowmelt(i) = 0.0 ! [inches]
+        Snow_evap(i) = 0.0 ! [inches]
+        Tcal(i) = 0.0
+        Ai(i) = 0.0D0
+        Pkwater_ante(i) = Pkwater_equiv(i)
         Active_glacier = OFF
         isglacier = OFF
         IF ( Glacier_flag==ACTIVE ) THEN
@@ -1092,14 +1090,18 @@
               ELSE
                 Glacr_albedo(i) = Albedo_ice(i) +(Albedo_coef(i)/PI)*ATAN( (Alt_above_ela(i)+300.0)/200.0 )
               ENDIF
-            ELSE !IF ( Active_glacier==2 ) 
+            ELSE !IF ( Active_glacier==2 )
               Glacr_albedo(i) = Albedo_ice(i) !glacr_albedo doesn't change if glacierette but could get zeroed out
             ENDIF
           ENDIF
           IF ( isglacier==ACTIVE ) THEN
             IF (Nowyear >= Start_year+10 .AND. MOD(Nowyear-Start_year,5)==0 ) THEN
               Glacr_air_deltemp(i) = Glacr_air_5avtemp1(i) - Glacr_air_5avtemp(i) !need 5 years of data
-              Glacr_delsnow(i) = 10.0*(Glacr_5avsnow1(i) - Glacr_5avsnow(i))/Glacr_5avsnow1(i) !number of 10 percent (*100.0/10.0) changes
+              IF ( Glacr_5avsnow1(i)>0.0 ) THEN
+                Glacr_delsnow(i) = 10.0*(Glacr_5avsnow1(i) - Glacr_5avsnow(i))/Glacr_5avsnow1(i) !number of 10 percent (*100.0/10.0) changes
+              ELSE
+                Glacr_delsnow(i) = 0.0
+              ENDIF
             ENDIF
             !keep before restart
             IF ( MOD(Nowyear-Start_year,5)==0 ) THEN
@@ -1584,9 +1586,9 @@
      &           Net_snow, Pk_den, Pptmix_nopack, Pk_precip, Tmax_allsnow_c, &
      &           Freeh2o_cap, Den_max, Ihru_gl)
       USE PRMS_CONSTANTS, ONLY: CLOSEZERO, INCH2CM, ACTIVE !, DNEARZERO
+      use prms_utils, only: f_to_c
       IMPLICIT NONE
 ! Functions
-      REAL, EXTERNAL :: f_to_c
       EXTERNAL :: calin
       INTRINSIC :: ABS, DBLE, SNGL
 ! Arguments
@@ -1918,6 +1920,7 @@
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, OFF
       USE PRMS_MODULE, ONLY: Print_debug
       USE PRMS_SNOW, ONLY: Active_glacier
+      use prms_utils, only: print_date
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(INOUT) :: Iasw
@@ -1929,7 +1932,7 @@
       DOUBLE PRECISION, INTENT(INOUT) :: Pss, Pst, Pk_depth
 ! Functions
       INTRINSIC :: SNGL, DBLE
-      EXTERNAL :: print_date, glacr_states_to_zero
+      EXTERNAL :: glacr_states_to_zero
 ! Local Variables
       REAL :: dif, pmlt, apmlt, apk_ice, pwcap
       DOUBLE PRECISION :: dif_dble
@@ -2989,11 +2992,10 @@
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Glacier_flag
       USE PRMS_SNOW
+      use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
       INTEGER, INTENT(IN) :: In_out
-      ! Functions
-      EXTERNAL :: check_restart
       ! Local Variable
       CHARACTER(LEN=8) :: module_name
 !***********************************************************************

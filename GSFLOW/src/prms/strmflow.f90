@@ -10,13 +10,12 @@
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_cfs, Basin_cms, Basin_stflow_in, &
      &    Basin_sroff_cfs, Basin_ssflow_cfs, Basin_gwflow_cfs, Basin_stflow_out, Basin_sroff
       USE PRMS_SET_TIME, ONLY: Cfs_conv
+      use prms_utils, only: print_module
       IMPLICIT NONE
-! Functions
-      EXTERNAL :: print_module
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing'
       character(len=*), parameter :: MODNAME = 'strmflow'
-      character(len=*), parameter :: Version_strmflow = '2020-08-03'
+      character(len=*), parameter :: Version_strmflow = '2021-11-19'
       double precision :: area_fac
 !***********************************************************************
       strmflow = 0

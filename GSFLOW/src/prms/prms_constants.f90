@@ -13,9 +13,10 @@ MODULE PRMS_CONSTANTS
 
     integer, parameter :: MAXFILE_LENGTH = 256
     integer, parameter :: MAXLINE_LENGTH = 256
-    integer, parameter :: MAXCMDLINE_LENGTH = 512
     integer, parameter :: MAXDATALINE_LENGTH = 12000
     integer, parameter :: MAXCONTROL_LENGTH = 32
+    integer, parameter :: MAXDESCRIPTION_LENGTH = 512
+    integer, parameter :: MAXCMDLINE_LENGTH = 512
     integer, parameter :: MAXDIM = 500
     integer, parameter :: MONTHS_PER_YEAR = 12
     integer, parameter :: MAX_DAYS_PER_YEAR = 366
@@ -136,8 +137,6 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: GSFLOW = 0
     integer, parameter :: PRMS = 1
     integer, parameter :: MODFLOW = 2
-    integer, parameter :: GSFLOW_AG = 3
-    integer, parameter :: PRMS_AG = 4
     integer, parameter :: MODSIM_GSFLOW = 10
     integer, parameter :: MODSIM_PRMS = 11
     integer, parameter :: MODSIM_MODFLOW = 12
