@@ -21,7 +21,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2021-12-09'
+      character(len=*), parameter :: Version_snowcomp = '2022-01-12'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -33,22 +33,16 @@
       !   Declared Variables
 
       INTEGER :: Yrdays5
-      INTEGER, SAVE, ALLOCATABLE :: Pptmix_nopack(:), Lst(:)
-      INTEGER, SAVE, ALLOCATABLE :: Iasw(:), Iso(:), Mso(:), Lso(:)
-      DOUBLE PRECISION, SAVE :: Basin_snowmelt, Basin_pweqv, Basin_tcal
-      DOUBLE PRECISION, SAVE :: Basin_snowcov, Basin_snowevap
-      DOUBLE PRECISION, SAVE :: Basin_snowdepth, Basin_pk_precip
-      REAL, SAVE, ALLOCATABLE :: Snowmelt(:), Snow_evap(:)
+      INTEGER, SAVE, ALLOCATABLE :: Lst(:), Iasw(:), Iso(:), Mso(:), Lso(:)
+      DOUBLE PRECISION, SAVE :: Basin_tcal, Basin_snowdepth
       REAL, SAVE, ALLOCATABLE :: Albedo(:), Pk_temp(:), Pk_den(:)
       REAL, SAVE, ALLOCATABLE :: Pk_def(:), Pk_ice(:), Freeh2o(:)
-      REAL, SAVE, ALLOCATABLE :: Snowcov_area(:), Tcal(:)
-      REAL, SAVE, ALLOCATABLE :: Snsv(:), Pk_precip(:)
-      REAL, SAVE, ALLOCATABLE :: Frac_swe(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pk_depth(:), Pkwater_ante(:), Ai(:)
+      REAL, SAVE, ALLOCATABLE :: Tcal(:), Snsv(:), Pk_precip(:), Frac_swe(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Ai(:)
       DOUBLE PRECISION, SAVE :: Basin_glacrevap, Basin_snowicecov, Basin_glacrb_melt
       REAL, SAVE, ALLOCATABLE :: Glacrmelt(:), Glacr_evap(:), Glacr_albedo(:), Glacr_pk_den(:)
       REAL, SAVE, ALLOCATABLE :: Glacr_pk_ice(:), Glacr_freeh2o(:), Glacrcov_area(:)
-      REAL, SAVE, ALLOCATABLE :: Glacrb_melt(:), Glacr_pk_def(:), Glacr_pk_temp(:), Ann_tempc(:)
+      REAL, SAVE, ALLOCATABLE :: Glacr_pk_def(:), Glacr_pk_temp(:), Ann_tempc(:)
       REAL, SAVE, ALLOCATABLE :: Glacr_air_5avtemp1(:), Glacr_air_deltemp(:), Glacr_air_5avtemp(:)
       REAL, SAVE, ALLOCATABLE :: Glacr_5avsnow1(:), Glacr_5avsnow(:), Glacr_delsnow(:), Glacr_freeh2o_capm(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Glacr_pkwater_ante(:), Glacr_pkwater_equiv(:)
@@ -176,11 +170,6 @@
         CALL declvar_real(MODNAME, 'glacr_freeh2o_capm', 'nhru', Nhru, &
      &       'Free-water holding capacity of glacier or glacierette ice, changes to 0 if active layer melts', &
      &       'decimal fraction', Glacr_freeh2o_capm)
-
-        ALLOCATE ( Glacrb_melt(Nhru) )
-        CALL declvar_real(MODNAME, 'glacrb_melt', 'nhru', Nhru, &
-             'Glacier or glacierette basal melt, goes to soil', &
-             'inches/day', Glacrb_melt)
 
         ALLOCATE ( Ann_tempc(Nhru) )
         CALL declvar_real(MODNAME, 'ann_tempc', 'nhru', Nhru, &
@@ -311,10 +300,6 @@
      &     'Precipitation added to snowpack for each HRU', &
      &     'inches', Pk_precip)
 
-      CALL declvar_dble(MODNAME, 'basin_pk_precip', 'one', 1, &
-     &     'Basin area-weighted average precipitation added to snowpack', &
-     &     'inches', Basin_pk_precip)
-
       ALLOCATE ( Albedo(Nhru) )
       CALL declvar_real(MODNAME, 'albedo', 'nhru', Nhru, &
      &     'Snow surface albedo or the fraction of radiation reflected from the snowpack surface for each HRU', &
@@ -338,49 +323,6 @@
       CALL declvar_real(MODNAME, 'tcal', 'nhru', Nhru, &
      &     'Net snowpack energy balance on each HRU', &
      &     'Langleys', Tcal)
-
-      ALLOCATE ( Snow_evap(Nhru) )
-      CALL declvar_real(MODNAME, 'snow_evap', 'nhru', Nhru, &
-     &     'Evaporation and sublimation from snowpack on each HRU', &
-     &     'inches', Snow_evap)
-
-      ALLOCATE ( Snowmelt(Nhru) )
-      CALL declvar_real(MODNAME, 'snowmelt', 'nhru', Nhru, &
-     &     'Snowmelt from snowpack on each HRU (not including snow on glacier)', &
-     &     'inches', Snowmelt)
-
-      CALL declvar_dble(MODNAME, 'basin_snowmelt', 'one', 1, &
-     &     'Basin area-weighted average snowmelt (not on including snow on glacier)', &
-     &     'inches', Basin_snowmelt)
-
-      CALL declvar_dble(MODNAME, 'basin_pweqv', 'one', 1, &
-     &     'Basin area-weighted average snowpack water equivalent (not including glacier)', &
-     &     'inches', Basin_pweqv)
-
-      ALLOCATE ( Pkwater_ante(Nhru) )
-      CALL declvar_dble(MODNAME, 'pkwater_ante', 'nhru', Nhru, &
-     &     'Antecedent snowpack water equivalent on each HRU', &
-     &     'inches', Pkwater_ante)
-
-      ALLOCATE ( Snowcov_area(Nhru) )
-      CALL declvar_real(MODNAME, 'snowcov_area', 'nhru', Nhru, &
-     &     'Snow-covered area on each HRU prior to melt and sublimation unless snowpack depleted', &
-     &     'decimal fraction', Snowcov_area)
-
-      CALL declvar_dble(MODNAME, 'basin_snowevap', 'one', 1, &
-     &     'Basin area-weighted average evaporation and sublimation from snowpack (not including glacier)', &
-     &     'inches', Basin_snowevap)
-
-      CALL declvar_dble(MODNAME, 'basin_snowcov', 'one', 1, &
-     &     'Basin area-weighted average snow-covered area', &
-     &     'decimal fraction', Basin_snowcov)
-
-      !rpayn commented
-      ALLOCATE ( Pptmix_nopack(Nhru) )
-      CALL declvar_int(MODNAME, 'pptmix_nopack', 'nhru', Nhru, &
-     &     'Flag indicating that a mixed precipitation event has'// &
-     &     ' occurred with no snowpack present on an HRU (1), otherwise (0)', &
-     &     'none', Pptmix_nopack)
 
       !rpayn commented
       ALLOCATE ( Iasw(Nhru) )
@@ -431,12 +373,6 @@
       CALL declvar_real(MODNAME, 'freeh2o', 'nhru', Nhru, &
      &     'Storage of free liquid water in the snowpack on each HRU', &
      &     'inches', Freeh2o)
-
-      !rpayn commented
-      ALLOCATE ( Pk_depth(Nhru) )
-      CALL declvar_dble(MODNAME, 'pk_depth', 'nhru', Nhru, &
-     &     'Depth of snowpack on each HRU', &
-     &     'inches', Pk_depth)
 
       !rpayn commented
       ALLOCATE ( Pss(Nhru) )
@@ -695,7 +631,8 @@
       USE PRMS_MODULE, ONLY: Nhru, Print_debug, Init_vars_from_file, Glacier_flag, Snarea_curve_flag, Hru_type
       USE PRMS_SNOW
       USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_route_order, Active_hrus, Hru_area_dble, Elev_units
-      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
+      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela, &
+     &    Snowcov_area, Pk_depth, Basin_pweqv, Basin_snowcov
       use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions
@@ -759,18 +696,13 @@
       IF ( getparam_int(MODNAME, 'tstorm_mo', Nhru*MONTHS_PER_YEAR, Tstorm_mo)/=0 ) CALL read_error(2, 'tstorm_mo')
 
       Pk_precip = 0.0
-      Snowmelt = 0.0
-      Snow_evap = 0.0
-      Pptmix_nopack = OFF
       Tcal = 0.0
       Frac_swe = 0.0
       Acum = acum_init
       Amlt = amlt_init
-      Pkwater_ante = 0.0D0
       Basin_glacrb_melt = 0.0D0
       Basin_glacrevap = 0.0D0
       IF ( Glacier_flag==ACTIVE ) THEN
-        Glacrb_melt = 0.0
         Glacrmelt = 0.0
         Glacr_evap = 0.0
       ENDIF
@@ -778,7 +710,6 @@
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==3 ) THEN
         IF ( getparam_real(MODNAME, 'snowpack_init', Nhru, Snowpack_init)/=0 ) CALL read_error(2, 'snowpack_init')
         Pkwater_equiv = 0.0D0
-        Pk_depth = 0.0D0
         Pk_den = 0.0
         Pk_ice = 0.0
         Freeh2o = 0.0
@@ -910,7 +841,9 @@
       USE PRMS_BASIN, ONLY: Hru_area, Active_hrus, Basin_area_inv, Hru_route_order, Cov_type, Elev_units
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Orad, Basin_horad, Potet_sublim, &
      &    Hru_ppt, Prmx, Tmaxc, Tminc, Tavgc, Swrad, Potet, Transp_on, Tmax_allsnow_c
-      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
+      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela, &
+     &    Snow_evap, Snowmelt, Snowcov_area, Pptmix_nopack, Pk_depth, Glacrb_melt, Basin_snowmelt, &
+     &    Basin_snowevap, Basin_pweqv, Basin_snowcov, Basin_pk_precip, Pkwater_ante
       USE PRMS_SET_TIME, ONLY: Jday, Julwater
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Canopy_covden, Hru_intcpevap
       IMPLICIT NONE
@@ -2992,6 +2925,7 @@
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Glacier_flag
       USE PRMS_SNOW
+      USE PRMS_FLOWVARS, ONLY: Snowcov_area, Pk_depth, Basin_pweqv, Basin_snowcov
       use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument

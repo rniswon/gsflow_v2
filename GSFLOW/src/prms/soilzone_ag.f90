@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2022-01-06'
+      character(len=*), parameter :: Version_soilzone_ag = '2022-01-12'
       INTEGER, SAVE :: Soil_iter !, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr, Last_ag_soil_rechr
@@ -290,10 +290,6 @@
         ! make sure LAKE, INACTIVE, GLACIER have agriculture values of 0
         IF ( Hru_type(ihru)==LAKE .OR. Hru_type(ihru)==INACTIVE .OR. Hru_type(ihru)==GLACIER ) Ag_area(ihru) = 0.0
         IF ( Ag_area(ihru)>0.0 ) THEN
-          IF ( Soil2gw_max(ihru)>0.0 ) THEN
-            print *, 'soil2gw_max>0 for ag_frac, HRU:', ihru, Soil2gw_max(ihru)
-            !Soil2gw_max(ihru) = 0.0
-          ENDIF
           Basin_ag_soil_moist = Basin_ag_soil_moist + DBLE( Ag_soil_moist(ihru)*Ag_area(ihru) )
           Basin_ag_soil_rechr = Basin_ag_soil_rechr + DBLE( Ag_soil_rechr(ihru)*Ag_area(ihru) )
         ELSE
@@ -336,9 +332,9 @@
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Transp_on, Potet, Basin_potet, Basin_transp_on
 ! WARNING!!! Sroff, Basin_sroff, and Strm_seg_in can be updated
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_actet, Hru_actet, &
-     &    Ssres_flow, Soil_to_gw, Basin_soil_to_gw, Ssr_to_gw, &
+     &    Ssres_flow, Soil_to_gw, Basin_soil_to_gw, Ssr_to_gw, Snowcov_area, &
      &    Soil_to_ssr, Basin_lakeevap, Basin_perv_et, Basin_swale_et, &
-     &    Sroff, Soil_moist_max, Infil, Soil_rechr_max, Ssres_in, &
+     &    Sroff, Soil_moist_max, Infil, Soil_rechr_max, Ssres_in, Snowcov_area, Snow_evap, &
      &    Basin_soil_moist, Basin_ssstor, Slow_stor, Slow_flow, Pkwater_equiv, &
      &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_sroff, Basin_lake_stor, &
      &    Ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr_max, Ag_soil_moist_max, Basin_ag_soil_moist, &
@@ -350,7 +346,6 @@
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_INTCP, ONLY: Hru_intcpevap
-      USE PRMS_SNOW, ONLY: Snowcov_area, Snow_evap
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen, Infil_ag
       use prms_utils, only: error_stop, print_date
       IMPLICIT NONE
@@ -475,6 +470,7 @@
         Ssres_flow(i) = 0.0
         Cap_waterin(i) = 0.0
         Soil_saturated(i) = OFF
+! initialize all HRU values in case dynamic ag frac
         Ag_soil_saturated(i) = OFF
         Ag_gvr_to_sm(i) = 0.0
         Ag_soil_to_gvr(i) = 0.0
@@ -486,6 +482,7 @@
         hruactet = Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i)
         IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
         harea = Hru_area(i)
+        agfrac = Ag_frac(i)
 
         IF ( Hru_type(i)==LAKE ) THEN ! lake or reservoir
           !WARNING, RSR, if hru_actet>water in lake, then budget error
@@ -521,7 +518,6 @@
         ag_on_flag = OFF
         IF ( Ag_area(i)>0.0 ) THEN
           ag_on_flag = ACTIVE
-          agfrac = Ag_frac(i)
           ag_water_maxin = Infil_ag(i)
         ENDIF
 
@@ -672,7 +668,7 @@
           ENDIF
           IF ( ag_on_flag==ACTIVE ) THEN
             IF ( ag_water_maxin+Ag_soil_moist(i)>0.0 ) THEN
-              if ( Ag_soil_moist(i)< Ag_soil_rechr(i)) print *, 'AG1 soilrechr, before', i, &
+              if ( Ag_soil_moist(i)<Ag_soil_rechr(i) ) print *, 'AG1 soilrechr, before', i, &
      &             Ag_soil_moist(i)-Ag_soil_rechr(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_soil_moist_max(i), Ag_soil_rechr_max(i)
               CALL compute_soilmoist(ag_water_maxin, Ag_soil_moist_max(i), &
      &                               Ag_soil_rechr_max(i), Soil2gw_max(i), Ag_soil_to_gvr(i), &

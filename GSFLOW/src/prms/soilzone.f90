@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2022-01-06'
+      character(len=*), parameter :: Version_soilzone = '2022-01-12'
       INTEGER, SAVE :: DBGUNT, Iter_aet
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -610,8 +610,7 @@
      &    Basin_area_inv, Hru_area, Hru_frac_perv, Numlake_hrus
       USE PRMS_FLOWVARS, ONLY: Soil_moist_max, Soil_rechr_max, &
      &    Ssres_stor, Basin_ssstor, Basin_soil_moist, Slow_stor, &
-     &    Soil_moist, Sat_threshold, Soil_rechr, Pkwater_equiv, Pref_flow_stor_ante
-      USE PRMS_SNOW, ONLY: Snowcov_area
+     &    Soil_moist, Sat_threshold, Soil_rechr, Pkwater_equiv, Pref_flow_stor_ante, Snowcov_area
       USE PRMS_INTCP, ONLY: Hru_intcpstor
       USE PRMS_SRUNOFF, ONLY: Hru_impervstor, Dprst_stor_hru
       use prms_utils, only: checkdim_bounded_limits, error_stop, read_error
@@ -863,7 +862,7 @@
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Transp_on, Potet, Basin_potet
 ! WARNING!!! Sroff, Basin_sroff, and Strm_seg_in can be updated
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_actet, Hru_actet, &
-     &    Ssres_flow, Soil_to_gw, Basin_soil_to_gw, Ssr_to_gw, &
+     &    Ssres_flow, Soil_to_gw, Basin_soil_to_gw, Ssr_to_gw, Snowcov_area, Snow_evap, &
      &    Soil_to_ssr, Basin_lakeevap, Basin_perv_et, Basin_swale_et, &
      &    Sroff, Soil_moist_max, Infil, Soil_rechr_max, Ssres_in, &
      &    Basin_soil_moist, Basin_ssstor, Slow_stor, Slow_flow, Pkwater_equiv, &
@@ -875,7 +874,6 @@
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_INTCP, ONLY: Hru_intcpevap
-      USE PRMS_SNOW, ONLY: Snowcov_area, Snow_evap
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen
       use prms_utils, only: print_date
       IMPLICIT NONE
@@ -1414,9 +1412,10 @@
       SUBROUTINE compute_soilmoist(Infil, Soil_moist_max, &
      &           Soil_rechr_max, Soil2gw_max, Soil_to_ssr, Soil_moist, &
      &           Soil_rechr, Soil_to_gw, Perv_frac)
+      USE PRMS_CONSTANTS, ONLY: CLOSEZERO
       IMPLICIT NONE
 ! Function
-      INTRINSIC :: MIN
+      INTRINSIC :: MIN, ABS
 ! Arguments
       REAL, INTENT(IN) :: Perv_frac, Soil_moist_max, Soil_rechr_max, Soil2gw_max
       REAL, INTENT(INOUT) :: Infil, Soil_moist, Soil_rechr, Soil_to_gw, Soil_to_ssr
@@ -1429,6 +1428,10 @@
       excs = Soil_moist + Infil
       Soil_moist = MIN( excs, Soil_moist_max )
       excs = (excs - Soil_moist_max)*Perv_frac
+      IF ( ABS(excs)<CLOSEZERO ) THEN
+        Soil_moist = Soil_moist_max
+        excs = 0.0
+      ENDIF
       IF ( excs>0.0 ) THEN
         IF ( Soil2gw_max>0.0 ) THEN
           Soil_to_gw = MIN( Soil2gw_max, excs )

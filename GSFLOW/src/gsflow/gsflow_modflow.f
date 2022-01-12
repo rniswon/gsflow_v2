@@ -431,7 +431,7 @@ C
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
      &    ERROR_time, ERROR_modflow
-      USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
+      USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, no_snow_flag,
      &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
      &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday,
      &    Model, GSFLOW_flag, Print_debug, Soilzone_module
@@ -633,16 +633,18 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                   PRINT 9001, 'intcp', retval
                   RETURN
                 ENDIF
-                retval = snowcomp()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'snowcomp', retval
-                  RETURN
-                ENDIF
-                IF ( Glacier_flag==ACTIVE ) THEN
-                  retval = glacr()
+                IF ( no_snow_flag==OFF ) THEN
+                  retval = snowcomp()
                   IF ( retval/=0 ) THEN
-                    PRINT 9001, 'glacr_melt', retval
+                    PRINT 9001, 'snowcomp', retval
                     RETURN
+                  ENDIF
+                  IF ( Glacier_flag==ACTIVE ) THEN
+                    retval = glacr()
+                    IF ( retval/=0 ) THEN
+                      PRINT 9001, 'glacr_melt', retval
+                      RETURN
+                    ENDIF
                   ENDIF
                 ENDIF
               ENDIF
