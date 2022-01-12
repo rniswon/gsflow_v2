@@ -3,18 +3,7 @@
 !***********************************************************************
 submodule(PRMS_CONTROL_FILE) sm_read_control_file
   use PRMS_CONSTANTS, only: MAXCONTROL_LENGTH, MAXFILE_LENGTH, INT_TYPE, REAL_TYPE, CHAR_TYPE, ERROR_control
-  use PRMS_MODULE, only: Print_debug, EQULS, statsON_OFF, &
-                         Init_vars_from_file, Save_vars_to_file, Parameter_check_flag, Param_file, Model_output_file, &
-                         Precip_module, Temp_module, Et_module, Srunoff_module, Solrad_module, Gwr_swale_flag, &
-                         Strmflow_module, Transp_module, Soilzone_module, Print_debug, Dprst_flag, Subbasin_flag, Frozen_flag, &
-                         CsvON_OFF, MapOutON_OFF, Model_mode, Orad_flag, Endtime, Starttime, Snow_cbh_flag, Stream_temp_flag, &
-                         Cascadegw_flag, Prms_warmup, Humidity_cbh_flag, Windspeed_cbh_flag, Strmtemp_humidity_flag, &
-                         Gwflow_cbh_flag, NhruOutON_OFF, NsubOutON_OFF, BasinOutON_OFF, Dyn_imperv_flag, Dyn_dprst_flag, &
-                         Dyn_intcp_flag, Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_soil_flag, Dyn_radtrncf_flag, &
-                         Dyn_transp_on_flag, Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, &
-                         NsegmentOutON_OFF, Dyn_springfrost_flag, Dyn_snareathresh_flag, Dyn_covden_flag, &
-                         Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, External_transferON_OFF, &
-                         Dprst_transferON_OFF, BasinOutON_OFF, Snarea_curve_flag, Gsflow_output_file, Stat_var_file
+  use PRMS_MODULE
   use GSFMODFLOW, only: Modflow_name, Modflow_time_zero
   use PRMS_MAP_RESULTS, only: NmapOutVars, MapOutVar_names
   use PRMS_STATVAR_OUT, only: statvarOut_format, nstatVars, statVar_element, statVar_names
@@ -185,6 +174,9 @@ contains
     Control_parameter_data(i) % name = 'glacier_flag'
     Glacier_flag = OFF
     i = i + 1
+    Control_parameter_data(i) % name = 'no_snow_flag'
+    no_snow_flag = ACTIVE
+    i = i + 1
     Control_parameter_data(i) % name = 'stream_temp_flag'
     Stream_temp_flag = OFF
     i = i + 1
@@ -279,9 +271,9 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'csvON_OFF'
     CsvON_OFF = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'aniOutON_OFF'
-    AniOutON_OFF = OFF
+!    i = i + 1
+!    Control_parameter_data(i) % name = 'aniOutON_OFF'
+!    AniOutON_OFF = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'mapOutON_OFF'
     MapOutON_OFF = OFF
@@ -291,12 +283,12 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'nmapOutVars'
     NmapOutVars = 0
-    i = i + 1
-    Control_parameter_data(i) % name = 'naniOutVars'
-    NaniOutVars = 0
-    i = i + 1
-    Control_parameter_data(i) % name = 'ndispGraphs'
-    NdispGraphs = 0
+!    i = i + 1
+!    Control_parameter_data(i) % name = 'naniOutVars'
+!    NaniOutVars = 0
+!    i = i + 1
+!    Control_parameter_data(i) % name = 'ndispGraphs'
+!    NdispGraphs = 0
     i = i + 1
     Control_parameter_data(i) % name = 'nsubOut_freq'
     NsubOut_freq = 1
@@ -366,10 +358,10 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'PET_cbh_flag'
     PET_cbh_flag = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'dispGraphsBuffSize'
-    DispGraphsBuffSize = 50
-    Control_parameter_data(i) % values_int(1) = DispGraphsBuffSize
+!    i = i + 1
+!    Control_parameter_data(i) % name = 'dispGraphsBuffSize'
+!    DispGraphsBuffSize = 50
+!    Control_parameter_data(i) % values_int(1) = DispGraphsBuffSize
     i = i + 1
     Control_parameter_data(i) % name = 'dyn_transp_flag'
     Dyn_transp_flag = OFF
@@ -403,12 +395,12 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'dyn_snareathresh_flag'
     Dyn_snareathresh_flag = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'dyn_sro_to_dprst_flag'
-    Dyn_sro_to_dprst_flag = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'dyn_sro_to_imperv_flag'
-    Dyn_sro_to_imperv_flag = OFF
+!    i = i + 1
+!    Control_parameter_data(i) % name = 'dyn_sro_to_dprst_flag'
+!    Dyn_sro_to_dprst_flag = OFF
+!    i = i + 1
+!    Control_parameter_data(i) % name = 'dyn_sro_to_imperv_flag'
+!    Dyn_sro_to_imperv_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'dyn_dprst_flag'
     Dyn_dprst_flag = OFF
@@ -421,21 +413,21 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'external_transferON_OFF'
     External_transferON_OFF = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'consumed_transferON_OFF'
-    Consumed_transferON_OFF = OFF
+!    i = i + 1
+!    Control_parameter_data(i) % name = 'consumed_transferON_OFF'
+!    Consumed_transferON_OFF = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'lake_transferON_OFF'
     Lake_transferON_OFF = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'dprst_transferON_OFF'
     Dprst_transferON_OFF = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'soilzone_transferON_OFF'
-    Soilzone_transferON_OFF = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'canopy_transferON_OFF'
-    Canopy_transferON_OFF = OFF
+!    i = i + 1
+!    Control_parameter_data(i) % name = 'soilzone_transferON_OFF'
+!    Soilzone_transferON_OFF = OFF
+!    i = i + 1
+!    Control_parameter_data(i) % name = 'canopy_transferON_OFF'
+!    Canopy_transferON_OFF = OFF
     i = i + 1
 
     ! parameters that get allocated if in Control File
@@ -610,33 +602,28 @@ contains
     Control_parameter_data(i) % values_character(1) = Stat_var_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
-    Control_parameter_data(i) % name = 'ani_output_file'
-    Ani_output_file = 'animation.out'
-    Control_parameter_data(i) % values_character(1) = Ani_output_file
-    Control_parameter_data(i) % data_type = CHAR_TYPE
-    i = i + 1
     Control_parameter_data(i) % name = 'segment_transfer_file'
-    Ani_output_file = 'segment_transfer.in'
+    Segment_transfer_file = 'segment_transfer.in'
     Control_parameter_data(i) % values_character(1) = Segment_transfer_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'gwr_transfer_file'
-    Ani_output_file = 'gwr_transfer.in'
+    Gwr_transfer_file = 'gwr_transfer.in'
     Control_parameter_data(i) % values_character(1) = Gwr_transfer_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'dprst_transfer_file'
-    Ani_output_file = 'dprst_transfer.in'
+    Dprst_transfer_file = 'dprst_transfer.in'
     Control_parameter_data(i) % values_character(1) = Dprst_transfer_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'external_transfer_file'
-    Ani_output_file = 'external_transfer.in'
+    External_transfer_file = 'external_transfer.in'
     Control_parameter_data(i) % values_character(1) = External_transfer_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'lake_transfer_file'
-    Ani_output_file = 'lake_transfer.in'
+    Lake_transfer_file = 'lake_transfer.in'
     Control_parameter_data(i) % values_character(1) = Lake_transfer_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1

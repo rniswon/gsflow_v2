@@ -420,13 +420,15 @@
         ierr = intcp()
         IF ( ierr/=0 ) CALL module_error('intcp', Arg, ierr)
 
-        ! rsr, need to do something if snow_cbh_flag=1
-        ierr = snowcomp()
-        IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
+        IF ( no_snow_flag==OFF ) THEN
+          ! rsr, need to do something if snow_cbh_flag=1
+          ierr = snowcomp()
+          IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
 
-        IF ( Glacier_flag==ACTIVE ) THEN
-          ierr = glacr()
-          IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
+          IF ( Glacier_flag==ACTIVE ) THEN
+            ierr = glacr()
+            IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
+          ENDIF
         ENDIF
 
         ierr = srunoff()
@@ -491,15 +493,16 @@
             ierr = intcp()
             IF ( ierr/=0 ) CALL module_error('intcp', Arg, ierr)
 
-            ! rsr, need to do something if snow_cbh_flag=1
-            ierr = snowcomp()
-            IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
+            IF ( no_snow_flag==OFF ) THEN
+              ! rsr, need to do something if snow_cbh_flag=1
+              ierr = snowcomp()
+              IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
 
-            IF ( Glacier_flag==ACTIVE ) THEN
-              ierr = glacr()
-              IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
+              IF ( Glacier_flag==ACTIVE ) THEN
+                ierr = glacr()
+                IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
+              ENDIF
             ENDIF
-
             ierr = srunoff()
             IF ( ierr/=0 ) CALL module_error(Srunoff_module, Arg, ierr)
           ENDIF
@@ -629,6 +632,7 @@
       ! 0=none; 1=water balances; 2=basin;
       ! 4=basin_sum; 5=soltab; 7=soil zone;
       ! 9=snowcomp; 13=cascade; 14=subbasin tree
+      IF ( control_string(Data_file, 'data_file')/=0 ) CALL read_error(5, 'data_file')
       IF ( control_integer(Print_debug, 'print_debug')/=0 ) Print_debug = 0
       IF ( Print_debug>DEBUG_less ) PRINT 3, GSFLOW_versn
     3 FORMAT (//, 26X, 'U.S. Geological Survey', /, 8X, &
@@ -1010,6 +1014,7 @@
      &     CALL read_error(7, 'nmap2hru')
       IF ( decldim('nmap', 0, MAXDIM, 'Number of mapped values')/=0 ) CALL read_error(7, 'nmap')
       IF ( control_integer(Glacier_flag, 'glacier_flag')/=0 ) Glacier_flag = OFF
+      IF ( control_integer(no_snow_flag, 'no_snow_flag')/=0 ) no_snow_flag = OFF
       IF ( control_integer(Frozen_flag, 'frozen_flag')/=0 ) Frozen_flag = OFF
       IF ( control_integer(Dyn_imperv_flag, 'dyn_imperv_flag')/=0 ) Dyn_imperv_flag = OFF
       IF ( control_integer(Dyn_intcp_flag, 'dyn_intcp_flag')/=0 ) Dyn_intcp_flag = OFF

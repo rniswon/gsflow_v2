@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2021-12-10'
+      character(len=*), parameter :: Version_climateflow = '2022-01-12'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -63,10 +63,12 @@
       REAL, SAVE, ALLOCATABLE :: Slow_stor_ante(:), Pref_flow_stor_ante(:), Ssres_stor_ante(:)
 !   Declared Variables
       ! snow
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pkwater_equiv(:)
+      DOUBLE PRECISION, SAVE :: Basin_pweqv, Basin_snowmelt, Basin_snowevap, Basin_snowcov, Basin_pk_precip
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pkwater_equiv(:), Pk_depth(:), Pkwater_ante(:)
+      REAL, SAVE, ALLOCATABLE :: Snowmelt(:), Snow_evap(:), Snowcov_area(:)
+      INTEGER, SAVE, ALLOCATABLE :: Pptmix_nopack(:)
       ! soilzone
-      DOUBLE PRECISION, SAVE :: Basin_ssflow, Basin_soil_to_gw
-      DOUBLE PRECISION, SAVE :: Basin_actet, Basin_lakeevap
+      DOUBLE PRECISION, SAVE :: Basin_ssflow, Basin_soil_to_gw, Basin_actet, Basin_lakeevap
       DOUBLE PRECISION, SAVE :: Basin_swale_et, Basin_perv_et, Basin_sroff
       DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor, Basin_ag_soil_moist, Basin_ag_soil_rechr
       REAL, SAVE, ALLOCATABLE :: Hru_actet(:), Soil_moist(:), Ag_soil_moist(:), Ag_soil_rechr(:)
@@ -89,7 +91,7 @@
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Seg_upstream_inflow(:), Seg_lateral_inflow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Seg_outflow(:), Seg_inflow(:)
       ! glacr
-      REAL, SAVE, ALLOCATABLE :: Glacier_frac(:), Alt_above_ela(:), Glrette_frac(:)
+      REAL, SAVE, ALLOCATABLE :: Glacier_frac(:), Alt_above_ela(:), Glrette_frac(:), Glacrb_melt(:)
 !   Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Soil_moist_max(:), Soil_rechr_max(:), Sat_threshold(:)
       REAL, SAVE, ALLOCATABLE :: Snowinfil_max(:), Imperv_stor_max(:)
@@ -133,7 +135,7 @@
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, &
      &    Model, Init_vars_from_file, Temp_flag, Precip_flag, Glacier_flag, &
-     &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, &
+     &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, no_snow_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, AG_flag
       USE PRMS_CLIMATEVARS
@@ -542,26 +544,71 @@
       ENDIF
 
       ALLOCATE ( Pkwater_equiv(Nhru) )
-      CALL declvar_dble('snowcomp', 'pkwater_equiv', 'nhru', Nhru, &
-     &     'Snowpack water equivalent on each HRU', &
-     &     'inches', Pkwater_equiv)
-
+      ALLOCATE ( Pk_depth(Nhru) )
+      ALLOCATE ( Snowcov_area(Nhru) )
+      ALLOCATE ( Snow_evap(Nhru) )
+      ALLOCATE ( Snowmelt(Nhru) )
+      ALLOCATE ( Pptmix_nopack(Nhru) )
+      ALLOCATE ( Pkwater_ante(Nhru) )
+      IF ( no_snow_flag==OFF ) THEN
+        CALL declvar_dble('snowcomp', 'basin_pweqv', 'one', 1, &
+     &       'Basin area-weighted average snowpack water equivalent (not including glacier)', &
+     &       'inches', Basin_pweqv)
+        CALL declvar_dble('snowcomp', 'basin_snowmelt', 'one', 1, &
+     &       'Basin area-weighted average snowmelt (not on including snow on glacier)', &
+     &       'inches', Basin_snowmelt)
+        CALL declvar_dble('snowcomp', 'basin_snowevap', 'one', 1, &
+     &       'Basin area-weighted average evaporation and sublimation from snowpack (not including glacier)', &
+     &       'inches', Basin_snowevap)
+        CALL declvar_dble('snowcomp', 'basin_snowcov', 'one', 1, &
+     &       'Basin area-weighted average snow-covered area', &
+     &       'decimal fraction', Basin_snowcov)
+        CALL declvar_dble('snowcomp', 'basin_pk_precip', 'one', 1, &
+     &       'Basin area-weighted average precipitation added to snowpack', &
+     &       'inches', Basin_pk_precip)
+        CALL declvar_dble('snowcomp', 'pkwater_equiv', 'nhru', Nhru, &
+     &       'Snowpack water equivalent on each HRU', &
+     &       'inches', Pkwater_equiv)
+        CALL declvar_dble('snowcomp', 'pkwater_ante', 'nhru', Nhru, &
+     &       'Antecedent snowpack water equivalent on each HRU', &
+     &       'inches', Pkwater_ante)
+        CALL declvar_dble('snowcomp', 'pk_depth', 'nhru', Nhru, &
+     &       'Depth of snowpack on each HRU', &
+     &       'inches', Pk_depth)
+        CALL declvar_real('snowcomp', 'snowcov_area', 'nhru', Nhru, &
+     &       'Snow-covered area on each HRU prior to melt and sublimation unless snowpack depleted', &
+     &       'decimal fraction', Snowcov_area)
+        CALL declvar_real('snowcomp', 'snow_evap', 'nhru', Nhru, &
+     &       'Evaporation and sublimation from snowpack on each HRU', &
+     &       'inches', Snow_evap)
+        CALL declvar_real('snowcomp', 'snowmelt', 'nhru', Nhru, &
+     &       'Snowmelt from snowpack on each HRU (not including snow on glacier)', &
+     &       'inches', Snowmelt)
+        CALL declvar_int('snowcomp', 'pptmix_nopack', 'nhru', Nhru, &
+     &       'Flag indicating that a mixed precipitation event has'// &
+     &       ' occurred with no snowpack present on an HRU (1), otherwise (0)', &
+     &       'none', Pptmix_nopack)
+      ENDIF
 ! glacier variables
       IF ( Glacier_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Glacier_frac(Nhru) )
-        CALL declvar_real(MODNAME, 'glacier_frac', 'nhru', Nhru, &
+        ALLOCATE ( Glrette_frac(Nhru) )
+        ALLOCATE ( Alt_above_ela(Nhru) )
+        ALLOCATE ( Glacrb_melt(Nhru) )
+        IF ( no_snow_flag==OFF .OR. Model==DOCUMENTATION ) THEN
+          CALL declvar_real('glacr_melt', 'glacier_frac', 'nhru', Nhru, &
      &       'Fraction of glaciation (0=none; 1=100%)', &
      &       'decimal fraction', Glacier_frac)
-
-        ALLOCATE ( Glrette_frac(Nhru) )
-        CALL declvar_real(MODNAME, 'glrette_frac', 'nhru', Nhru, &
-     &       'Fraction of snow field (too small for glacier dynamics)', &
-     &       'decimal fraction', Glrette_frac)
-
-        ALLOCATE ( Alt_above_ela(Nhru) )
-        CALL declvar_real(MODNAME, 'alt_above_ela', 'nhru', Nhru, &
-     &       'Altitude above equilibrium line altitude (ELA)', &
-     &       'elev_units', Alt_above_ela)
+          CALL declvar_real('glacr_melt', 'glrette_frac', 'nhru', Nhru, &
+     &         'Fraction of snow field (too small for glacier dynamics)', &
+     &         'decimal fraction', Glrette_frac)
+          CALL declvar_real('glacr_melt', 'alt_above_ela', 'nhru', Nhru, &
+     &         'Altitude above equilibrium line altitude (ELA)', &
+     &         'elev_units', Alt_above_ela)
+          CALL declvar_real('glacr_melt', 'glacrb_melt', 'nhru', Nhru, &
+               'Glacier or glacierette basal melt, goes to soil', &
+               'inches/day', Glacrb_melt)
+        ENDIF
       ENDIF
 
       ! Allocate local variables
@@ -910,9 +957,9 @@
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nevap, Nlake, Ntemp, Nrain, Nsol, &
      &    Print_debug, Init_vars_from_file, Temp_flag, Precip_flag, &
      &    Temp_module, Stream_order_flag, GSFLOW_flag, Hru_type, &
-     &    Precip_module, Solrad_module, Et_module, PRMS4_flag, &
+     &    Precip_module, Solrad_module, Et_module, PRMS4_flag, no_snow_flag, &
      &    Soilzone_module, Srunoff_module, Et_flag, Dprst_flag, Solrad_flag, &
-     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, AG_flag
+     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, AG_flag, Glacier_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv
@@ -960,25 +1007,30 @@
      &       CALL checkdim_bounded_limits('hru_tsta', 'ntemp', Hru_tsta, Nhru, 0, Ntemp, Inputerror_flag)
       ENDIF
 
-      IF ( getparam_real(Precip_module, 'tmax_allsnow', Nhru*MONTHS_PER_YEAR, Tmax_allsnow)/=0 ) &
-     &    CALL read_error(2, 'tmax_allsnow')
+      IF ( no_snow_flag==OFF ) THEN
+        IF ( getparam_real(Precip_module, 'tmax_allsnow', Nhru*MONTHS_PER_YEAR, Tmax_allsnow)/=0 ) &
+     &      CALL read_error(2, 'tmax_allsnow')
 
-      IF ( PRMS4_flag==ACTIVE ) THEN
-        IF ( getparam_real(Precip_module, 'tmax_allrain', Nhru*MONTHS_PER_YEAR, Tmax_allrain)/=0 ) &
-     &       CALL read_error(2, 'tmax_allrain')
-        DO j = 1, MONTHS_PER_YEAR
-          DO i = 1, Nhru
-            Tmax_allrain_offset(i, j) = Tmax_allrain(i, j) - Tmax_allsnow(i, j)
-            IF ( Tmax_allrain_offset(i, j)<0.0 ) THEN
-              IF ( Print_debug>DEBUG_less ) PRINT *, 'WARNING, tmax_allsnow > tmax_allrain for HRU:', i, '; month:', j, &
-     &                                               ' tmax_allrain set to tmax_allsnow'
-              Tmax_allrain_offset(i, j) = 0.0
-            ENDIF
+        IF ( PRMS4_flag==ACTIVE ) THEN
+          IF ( getparam_real(Precip_module, 'tmax_allrain', Nhru*MONTHS_PER_YEAR, Tmax_allrain)/=0 ) &
+     &         CALL read_error(2, 'tmax_allrain')
+          DO j = 1, MONTHS_PER_YEAR
+            DO i = 1, Nhru
+              Tmax_allrain_offset(i, j) = Tmax_allrain(i, j) - Tmax_allsnow(i, j)
+              IF ( Tmax_allrain_offset(i, j)<0.0 ) THEN
+                IF ( Print_debug>DEBUG_less ) PRINT *, 'WARNING, tmax_allsnow > tmax_allrain for HRU:', i, '; month:', j, &
+     &                                                 ' tmax_allrain set to tmax_allsnow'
+                Tmax_allrain_offset(i, j) = 0.0
+              ENDIF
+            ENDDO
           ENDDO
-        ENDDO
+        ELSE
+          IF ( getparam_real(Precip_module, 'tmax_allrain_offset', Nhru*MONTHS_PER_YEAR, Tmax_allrain_offset)/=0 ) &
+     &         CALL read_error(2, 'tmax_allrain_offset')
+        ENDIF
       ELSE
-        IF ( getparam_real(Precip_module, 'tmax_allrain_offset', Nhru*MONTHS_PER_YEAR, Tmax_allrain_offset)/=0 ) &
-     &       CALL read_error(2, 'tmax_allrain_offset')
+        Tmax_allrain_offset = 0.0
+        Tmax_allsnow = -99.0
       ENDIF
 
       ! Set tmax_allrain in units of the input values
@@ -1327,8 +1379,25 @@
       Transp_on = OFF
 ! initialize storage variables
       Imperv_stor = 0.0
+      Basin_pweqv = 0.0D0
+      Basin_snowmelt = 0.0D0
+      Basin_snowevap = 0.0D0
+      Basin_snowcov = 0.0D0
       Pkwater_equiv = 0.0D0
+      Pkwater_ante = 0.0D0
+      Basin_pk_precip = 0.0D0
+      Pk_depth = 0.0D0
+      Snowcov_area = 0.0
+      Snow_evap = 0.0
+      Snowmelt = 0.0
+      IF ( Glacier_flag==ACTIVE ) THEN
+        Glacrb_melt = 0.0
+        Glacier_frac = 0.0
+        Alt_above_ela = 0.0
+        Glrette_frac = 0.0
+      ENDIF
       Slow_stor = 0.0
+      Pptmix_nopack = OFF
       IF ( GSFLOW_flag==OFF ) Gwres_stor = 0.0D0 ! not needed for GSFLOW
       IF ( Dprst_flag==ACTIVE ) THEN
         Dprst_vol_open = 0.0D0

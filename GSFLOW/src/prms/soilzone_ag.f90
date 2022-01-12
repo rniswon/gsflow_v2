@@ -21,12 +21,13 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2022-01-06'
+      character(len=*), parameter :: Version_soilzone_ag = '2022-01-12'
       INTEGER, SAVE :: Soil_iter !, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
-      DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr, Last_ag_soil_rechr
-      !DOUBLE PRECISION, SAVE :: Basin_ag_ssstor, Basin_ag_recharge, Basin_ag_ssflow
+      DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr, Last_ag_soil_rechr, Last_ag_gvr_stor
+      DOUBLE PRECISION, SAVE :: Basin_ag_gvr_stor, Basin_ag_recharge, Basin_ag_interflow
       REAL, SAVE, ALLOCATABLE :: It0_ag_soil_rechr(:), It0_ag_soil_moist(:), Ag_replenish_frac(:), Gvr_non_ag_frac(:)
+      REAL, SAVE, ALLOCATABLE :: It0_ag_gvr_stor(:)
       !REAL, SAVE, ALLOCATABLE :: Ag_slow_flow(:), Ag_ssres_in(:), Ag_water_maxin(:)
 !   Agriculture Declared Variables
       INTEGER, SAVE, ALLOCATABLE :: Ag_soil_saturated(:)
@@ -334,8 +335,14 @@
       IF ( getparam_real(MODNAME, 'ag_gvr2gw_exp', Nhru, Ag_gvr2gw_exp)/=0 ) CALL read_error(2, 'ag_gvr2gw_exp')
       IF ( Ag_gvr2gw_rate(1)<0.0 ) Ag_gvr2gw_exp = Ssr2gw_exp
       IF ( getparam_real(MODNAME, 'ag_soil2gw_max', Nhru, Ag_soil2gw_max)/=0 ) CALL read_error(2, 'ag_soil2gw_max')
+      Ag_soil2gw_max = 0.0
       IF ( Ag_soil2gw_max(1)<0.0 ) Ag_soil2gw_max = Ssr2gw_exp
-      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) Ag_soil_lower = 0.0
+      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
+        IF ( getparam_real(MODNAME, 'ag_gvr_stor_init_frac', Nhru, Ag_gvr_stor)/=0 ) &
+     &       CALL read_error(2, 'ag_gvr_stor_init_frac')
+        Ag_gvr_stor = Ag_gvr_stor*Sat_threshold
+        Ag_soil_lower = 0.0
+      ENDIF
       ! dimensioned nhru
       Ag_soil_to_gw = 0.0
       Ag_soil_to_gvr = 0.0
@@ -351,36 +358,32 @@
       IF ( GSFLOW_flag==ACTIVE ) Ag_gvr_to_sm = 0.0
       Basin_ag_soil_moist = 0.0D0
       Basin_ag_soil_rechr = 0.0D0
+      Basin_ag_gvr_stor = 0.0D0
       Ag_replenish_frac = 0.0
       Ag_soil_saturated = OFF
       DO ihru = 1, Nhru
         ! make sure LAKE, INACTIVE, GLACIER have agriculture values of 0
         IF ( Hru_type(ihru)==LAKE .OR. Hru_type(ihru)==INACTIVE .OR. Hru_type(ihru)==GLACIER ) Ag_area(ihru) = 0.0
-        IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
-          IF ( getparam_real(MODNAME, 'ag_gvr_stor_init_frac', Nhru, Ag_gvr_stor)/=0 ) &
-     &         CALL read_error(2, 'ag_gvr_stor_init_frac')
-          Ag_gvr_stor = Ag_gvr_stor*Sat_threshold
-        ENDIF
         IF ( Ag_area(ihru)>0.0 ) THEN
-          IF ( Soil2gw_max(ihru)>0.0 ) THEN
-            print *, 'soil2gw_max>0 for ag_frac, HRU:', ihru, Soil2gw_max(ihru)
-            !Soil2gw_max(ihru) = 0.0
-          ENDIF
           Basin_ag_soil_moist = Basin_ag_soil_moist + DBLE( Ag_soil_moist(ihru)*Ag_area(ihru) )
           Basin_ag_soil_rechr = Basin_ag_soil_rechr + DBLE( Ag_soil_rechr(ihru)*Ag_area(ihru) )
+          Basin_ag_gvr_stor = Basin_ag_gvr_stor + DBLE ( Ag_gvr_stor(ihru)*Ag_area(ihru) )
         ELSE
           Ag_soil_moist_max(ihru) = 0.0
           Ag_soil_rechr_max(ihru) = 0.0
           Ag_soil_moist(ihru) = 0.0
           Ag_soil_rechr(ihru) = 0.0
+          Ag_gvr_stor(ihru) = 0.0
         ENDIF
         IF ( Ag_soil_moist_max(ihru)>0.0 ) Ag_replenish_frac(ihru) = Ag_soil_rechr_max(ihru)/Ag_soil_moist_max(ihru)
         Gvr_non_ag_frac(ihru) = 1.0 - Ag_frac(ihru)
       ENDDO
       Basin_ag_soil_moist = Basin_ag_soil_moist*Basin_area_inv
       Basin_ag_soil_rechr = Basin_ag_soil_rechr*Basin_area_inv
+      Basin_ag_gvr_stor = Basin_ag_gvr_stor*Basin_area_inv
 
-      IF ( Ag_package==ACTIVE .OR. Agriculture_soilzone_flag==ACTIVE ) ALLOCATE ( It0_ag_soil_rechr(Nhru), It0_ag_soil_moist(Nhru) )
+      IF ( Ag_package==ACTIVE .OR. Agriculture_soilzone_flag==ACTIVE ) &
+     &     ALLOCATE ( It0_ag_soil_rechr(Nhru), It0_ag_soil_moist(Nhru), It0_ag_gvr_stor(Nhru) )
 
       Soil_iter = 1
       iter_nonconverge = 0
@@ -409,9 +412,9 @@
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Transp_on, Potet, Basin_potet, Basin_transp_on
 ! WARNING!!! Sroff, Basin_sroff, and Strm_seg_in can be updated
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_actet, Hru_actet, &
-     &    Ssres_flow, Soil_to_gw, Basin_soil_to_gw, Ssr_to_gw, &
+     &    Ssres_flow, Soil_to_gw, Basin_soil_to_gw, Ssr_to_gw, Snowcov_area, &
      &    Soil_to_ssr, Basin_lakeevap, Basin_perv_et, Basin_swale_et, &
-     &    Sroff, Soil_moist_max, Infil, Soil_rechr_max, Ssres_in, &
+     &    Sroff, Soil_moist_max, Infil, Soil_rechr_max, Ssres_in, Snowcov_area, Snow_evap, &
      &    Basin_soil_moist, Basin_ssstor, Slow_stor, Slow_flow, Pkwater_equiv, &
      &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_sroff, Basin_lake_stor, &
      &    Ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr_max, Ag_soil_moist_max, Basin_ag_soil_moist, &
@@ -423,7 +426,6 @@
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_INTCP, ONLY: Hru_intcpevap
-      USE PRMS_SNOW, ONLY: Snowcov_area, Snow_evap
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen, Infil_ag
       use prms_utils, only: error_stop, print_date
       IMPLICIT NONE
@@ -474,9 +476,11 @@
         Ag_irrigation_add = 0.0
         It0_ag_soil_moist = Ag_soil_moist
         It0_ag_soil_rechr = Ag_soil_rechr
+        It0_ag_gvr_stor = Ag_gvr_stor
       ENDIF
       Last_ag_soil_moist = Basin_ag_soil_moist
       Last_ag_soil_rechr = Basin_ag_soil_rechr
+      Last_ag_gvr_stor = Basin_ag_gvr_stor
 
       keep_iterating = ACTIVE
       Soil_iter = 1
@@ -519,6 +523,7 @@
       IF ( Soil_iter>1 ) THEN
         Ag_soil_moist = It0_ag_soil_moist
         Ag_soil_rechr = It0_ag_soil_rechr
+        Ag_gvr_stor = It0_ag_gvr_stor
       ENDIF
       Basin_ag_soil_moist = 0.0D0
       Basin_ag_soil_rechr = 0.0D0
@@ -527,6 +532,9 @@
       Basin_ag_actet = 0.0D0
       Basin_ag_gvr2sm = 0.0D0
       Basin_ag_waterin = 0.0D0
+      Basin_ag_gvr_stor = 0.0D0
+      Basin_ag_recharge = 0.0D0
+      Basin_ag_interflow = 0.0D0
       CALL init_basin_vars()
       gwin = 0.0D0
       update_potet = OFF
@@ -746,7 +754,7 @@
           ENDIF
           IF ( ag_on_flag==ACTIVE ) THEN
             IF ( ag_water_maxin+Ag_soil_moist(i)>0.0 ) THEN
-              if ( Ag_soil_moist(i)< Ag_soil_rechr(i)) print *, 'AG1 soilrechr, before', i, &
+              if ( Ag_soil_moist(i)<Ag_soil_rechr(i) ) print *, 'AG1 soilrechr, before', i, &
      &             Ag_soil_moist(i)-Ag_soil_rechr(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_soil_moist_max(i), Ag_soil_rechr_max(i)
               CALL compute_soilmoist(ag_water_maxin, Ag_soil_moist_max(i), &
      &                               Ag_soil_rechr_max(i), Soil2gw_max(i), Ag_soil_to_gvr(i), &
@@ -780,7 +788,7 @@
      &                             Gvr2sm(i), Soil_to_gw(i), gwin, compute_lateral, &
      &                             ag_capacity, Ag_soil_to_gw(i), Ag_gvr2gw_rate(i), &
      &                             Ag_gvr2gw_exp(i), Ag_soil_to_gvr(i), Ag_interflow(i), &
-     &                             Gvr_non_ag_frac(i), Ag_gvr_to_sm(i), agfrac)
+     &                             Gvr_non_ag_frac(i), Ag_gvr_to_sm(i), Ag_gvr_stor(i), agfrac)
           ! adjust soil moisture with replenish amount
           IF ( Gvr2sm(i)>0.0 ) THEN
             IF ( perv_on_flag==ACTIVE ) THEN
@@ -1243,7 +1251,7 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
      &           Pref_flow_thrsh, Gvr2pfr, Ssr_to_gw, &
      &           Slow_flow, Slow_stor, Gvr2sm, Soil_to_gw, Gwin, Compute_lateral, &
      &           Ag_capacity, Ag_soil_to_gw, Ag_gvr2gw_rate, Ag_gvr2gw_exp, Ag_gvr_maxin, &
-     &           Ag_interflow, Gvr_non_ag_frac, Ag_gvr_to_sm, Agfrac)
+     &           Ag_interflow, Gvr_non_ag_frac, Ag_gvr_to_sm, Ag_gvr_stor, Agfrac)
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE
       USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug, Dprst_flag, Print_debug
       USE PRMS_SOILZONE, ONLY: Gravity_stor_res, Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, &
@@ -1260,7 +1268,7 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
       REAL, INTENT(IN) :: Pref_flow_thrsh, Soil_to_gw, Gvr_maxin, Ag_gvr_maxin, Gvr_non_ag_frac, Agfrac
       REAL, INTENT(INOUT) :: Capacity, Ag_capacity
       REAL, INTENT(INOUT) :: Ssr_to_gw, Slow_stor, Slow_flow, Gvr2pfr, Gvr2sm
-      REAL, INTENT(INOUT) :: Ag_soil_to_gw, Ag_gvr_to_sm, Ag_interflow
+      REAL, INTENT(INOUT) :: Ag_soil_to_gw, Ag_gvr_to_sm, Ag_interflow, Ag_gvr_stor
       DOUBLE PRECISION, INTENT(OUT) :: Gwin
 ! Local Variables
       INTEGER :: j, igvr

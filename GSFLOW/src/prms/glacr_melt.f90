@@ -50,7 +50,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2021-11-23'
+      character(len=*), parameter :: Version_glacr = '2022-01-12'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -478,7 +478,6 @@
       IF ( getparam_int(MODNAME, 'tohru', Nhru, Tohru)/=0 ) CALL read_error(2, 'tohru')
       IF ( getparam_real(MODNAME, 'hru_slope', Nhru, Hru_slope)/=0 ) CALL read_error(2, 'hru_slope')
       IF ( Init_vars_from_file==0 ) THEN
-        Alt_above_ela = 0.0
         Prev_out = 0.0
         Prev_outi = 0.0
         Prev_area = 0.0D0
@@ -881,9 +880,9 @@
       USE PRMS_BASIN, ONLY: Hru_elev_ts, Basin_area_inv, Active_hrus, Hru_route_order, Elev_units, Hru_elev
       USE PRMS_SET_TIME, ONLY: Julwater
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow
-      USE PRMS_SNOW, ONLY: Snowcov_area, Snowmelt, Glacrmelt, Glacr_air_deltemp, Glacr_delsnow, &
-     &    Glrette_frac_init, Snowcov_area, Basin_snowicecov, Snow_evap, Glacr_evap, Basin_glacrb_melt
-      USE PRMS_FLOWVARS, ONLY: Glacier_frac, Alt_above_ela, Glrette_frac
+      USE PRMS_SNOW, ONLY: Glacrmelt, Glacr_air_deltemp, Glacr_delsnow, &
+     &    Glrette_frac_init, Basin_snowicecov, Glacr_evap, Basin_glacrb_melt
+      USE PRMS_FLOWVARS, ONLY: Glacier_frac, Alt_above_ela, Glrette_frac, Snowcov_area, Snowmelt, Snow_evap
       use prms_utils, only: get_ftnunit
       IMPLICIT NONE
 ! Functions

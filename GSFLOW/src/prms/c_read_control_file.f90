@@ -7,14 +7,11 @@ module PRMS_CONTROL_FILE
   character(len=*), parameter :: MODDESC = 'Read Control File'
   character(len=*), parameter :: MODNAME = 'read_control_file'
   integer, parameter :: Max_num_control_parameters = 256 ! WARNING, hard coded, DANGER, DANGER
-  character(LEN=MAXFILE_LENGTH), save :: Data_file, Var_init_file, Ani_out_file
-  character(LEN=MAXFILE_LENGTH), save :: Executable_desc, Executable_model, Var_save_file
-  character(LEN=MAXFILE_LENGTH) :: Control_file, Ani_output_file, Control_description
-  integer, save :: PlotsON_OFF, Num_control_parameters, Glacier_flag, Stream_temp_shade_flag
-  integer, save :: AniOutON_OFF, NaniOutVars, NdispGraphs, DispGraphsBuffSize, Param_file_control_parameter_id
-  integer, save :: NumdispVar_names, NumdispVar_elements
-  integer, save :: Canopy_transferON_OFF, Soilzone_transferON_OFF, Consumed_transferON_OFF
-  integer, save :: Dyn_sro_to_dprst_flag, Dyn_sro_to_imperv_flag
+  character(LEN=MAXFILE_LENGTH), save :: Executable_desc, Executable_model
+  character(LEN=MAXFILE_LENGTH) :: Control_description
+  integer, save :: Num_control_parameters, Param_file_control_parameter_id, PlotsON_OFF
+!  integer, save :: AniOutON_OFF, NaniOutVars, NdispGraphs, DispGraphsBuffSize
+!  integer, save :: NumdispVar_names, NumdispVar_elements
   real, save :: Initial_deltat
   character(LEN=MAXCONTROL_LENGTH), allocatable, save :: param_file_names(:)
   character(LEN=MAXCONTROL_LENGTH), allocatable, save :: dispVar_element(:), dispVar_names(:)
