@@ -616,14 +616,14 @@ max_soilzone_ag_iter
 one
 1
 1
-75
+50
 ####
 soilzone_aet_converge
 1
 one
 1
 2
-0.001
+0.0005
 ####
 ag_cov_type
 1
@@ -651,7 +651,7 @@ transp_end
 one
 1
 1
-11
+10
 ####
 ag_soilwater_deficit_min
 1
