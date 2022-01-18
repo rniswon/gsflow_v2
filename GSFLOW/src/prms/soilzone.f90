@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2021-12-09'
+      character(len=*), parameter :: Version_soilzone = '2022-01-12'
       INTEGER, SAVE :: DBGUNT, Iter_aet
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -48,7 +48,7 @@
       DOUBLE PRECISION, SAVE :: Basin_soil_moist_tot
       DOUBLE PRECISION, SAVE :: Basin_soil_lower_stor_frac, Basin_soil_rechr_stor_frac, Basin_sz_stor_frac
       DOUBLE PRECISION, SAVE :: Basin_cpr_stor_frac, Basin_gvr_stor_frac, Basin_pfr_stor_frac
-      REAL, SAVE, ALLOCATABLE :: Perv_actet(:), Pref_flow_thrsh(:)
+      REAL, SAVE, ALLOCATABLE :: Perv_actet(:), Pref_flow_thrsh(:), hru_perv_actet(:)
       REAL, SAVE, ALLOCATABLE :: Soil_moist_tot(:), Recharge(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Upslope_interflow(:), Upslope_dunnianflow(:), Lakein_sz(:)
       REAL, SAVE, ALLOCATABLE :: Dunnian_flow(:), Cap_infil_tot(:)
@@ -269,6 +269,10 @@
       CALL declvar_real(MODNAME, 'perv_actet', 'nhru', Nhru, &
      &     'Actual ET from the capillary reservoir of each HRU', &
      &     'inches', Perv_actet)
+      ALLOCATE ( hru_perv_actet(Nhru) )
+      CALL declvar_real(MODNAME, 'hru_perv_actet', 'nhru', Nhru, &
+     &     'Actual ET from the capillary reservoir as HRU value', &
+     &     'inches', hru_perv_actet)
 
 !      ALLOCATE ( Perv_avail_et(Nhru) )
 !      CALL declvar_real(MODNAME, 'perv_avail_et', 'nhru', Nhru, &
@@ -609,8 +613,7 @@
      &    Basin_area_inv, Hru_area, Hru_frac_perv, Numlake_hrus
       USE PRMS_FLOWVARS, ONLY: Soil_moist_max, Soil_rechr_max, &
      &    Ssres_stor, Basin_ssstor, Basin_soil_moist, Slow_stor, &
-     &    Soil_moist, Sat_threshold, Soil_rechr, Pkwater_equiv, Pref_flow_stor_ante
-      USE PRMS_SNOW, ONLY: Snowcov_area
+     &    Soil_moist, Sat_threshold, Soil_rechr, Pkwater_equiv, Pref_flow_stor_ante, Snowcov_area
       USE PRMS_INTCP, ONLY: Hru_intcpstor
       USE PRMS_SRUNOFF, ONLY: Hru_impervstor, Dprst_stor_hru
       use prms_utils, only: checkdim_bounded_limits, error_stop, read_error
@@ -651,8 +654,6 @@
             Gvr_hru_id(i) = i
           ENDDO
         ENDIF
-        Grav_gwin = 0.0 ! dimension nhru
-        Gw2sm_grav = 0.0
       ENDIF
 
       Swale_limit = 0.0
@@ -784,6 +785,7 @@
       Gvr2pfr = 0.0
       Swale_actet = 0.0
       Perv_actet = 0.0
+      hru_perv_actet = 0.0
 !      Perv_avail_et = 0.0
       Recharge = 0.0
       Potet_lower = 0.0
@@ -863,7 +865,7 @@
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Transp_on, Potet, Basin_potet
 ! WARNING!!! Sroff, Basin_sroff, and Strm_seg_in can be updated
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_actet, Hru_actet, &
-     &    Ssres_flow, Soil_to_gw, Basin_soil_to_gw, Ssr_to_gw, &
+     &    Ssres_flow, Soil_to_gw, Basin_soil_to_gw, Ssr_to_gw, Snowcov_area, Snow_evap, &
      &    Soil_to_ssr, Basin_lakeevap, Basin_perv_et, Basin_swale_et, &
      &    Sroff, Soil_moist_max, Infil, Soil_rechr_max, Ssres_in, &
      &    Basin_soil_moist, Basin_ssstor, Slow_stor, Slow_flow, Pkwater_equiv, &
@@ -875,7 +877,6 @@
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_INTCP, ONLY: Hru_intcpevap
-      USE PRMS_SNOW, ONLY: Snowcov_area, Snow_evap
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen
       use prms_utils, only: print_date
       IMPLICIT NONE
@@ -889,16 +890,14 @@
       INTEGER :: i, k, update_potet, compute_lateral
       REAL :: dunnianflw, interflow, perv_area, harea
       REAL :: dnslowflow, dnpreflow, dndunn, availh2o, avail_potet, hruactet
-      REAL :: gvr_maxin, topfr, ag_capacity !, tmp
+      REAL :: gvr_maxin, topfr !, tmp
       REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin
       REAL :: perv_frac, capacity, capwater_maxin, ssresin
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
       DOUBLE PRECISION :: gwin
-      INTEGER :: cfgi_frozen_hru, ag_on_flag
+      INTEGER :: cfgi_frozen_hru
 !***********************************************************************
       szrun = 0
-      ag_on_flag = 0
-      ag_capacity = 0.0
 
 ! It0 and _ante variables used with MODFLOW integration to save iteration states.
       IF ( Kkiter>1 ) THEN ! Kkiter>1 means GSFLOW is active
@@ -952,21 +951,22 @@
 
       CALL init_basin_vars()
       gwin = 0.0D0
-      ! Soil_to_gw and Soil_to_ssr for whole HRU
-      Soil_to_gw = 0.0
-      Soil_to_ssr = 0.0
-!      Snowevap_aet_frac = 0.0
-      ! gravity reservoir variables for whole HRU
-      Ssr_to_gw = 0.0
-      Slow_flow = 0.0
-      Ssres_flow = 0.0
-      Cap_waterin = 0.0
-      Soil_saturated = OFF
       update_potet = OFF
       IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
 
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
+
+        ! Soil_to_gw and Soil_to_ssr for whole HRU
+        Soil_to_gw(i) = 0.0
+        Soil_to_ssr(i) = 0.0
+!        Snowevap_aet_frac(i) = 0.0
+        ! gravity reservoir variables for whole HRU
+        Ssr_to_gw(i) = 0.0
+        Slow_flow(i) = 0.0
+        Ssres_flow(i) = 0.0
+        Cap_waterin(i) = 0.0
+        Soil_saturated(i) = OFF
 
         hruactet = Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i)
         IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
@@ -1126,8 +1126,7 @@
      &                          Slowcoef_sq(i), Ssr2gw_rate(i), Ssr2gw_exp(i), &
      &                          gvr_maxin, Pref_flow_thrsh(i), topfr, &
      &                          Ssr_to_gw(i), Slow_flow(i), Slow_stor(i), &
-     &                          Gvr2sm(i), Soil_to_gw(i), gwin, compute_lateral, &
-     &                          ag_capacity, ag_on_flag)
+     &                          Gvr2sm(i), Soil_to_gw(i), gwin, compute_lateral)
           ! adjust soil moisture with replenish amount
           IF ( Gvr2sm(i)>0.0 ) THEN
             Soil_moist(i) = Soil_moist(i) + Gvr2sm(i)/perv_frac ! ??? could this be bigger than soil_moist_max ??? (add to Dunnian)
@@ -1246,6 +1245,7 @@
 !          IF ( Soil_moist(i)<0.0 ) Soil_moist(i) = 0.0
 !        ENDIF
         Perv_actet(i) = pervactet
+        hru_perv_actet(i) = pervactet * perv_frac
 
 ! soil_moist & soil_rechr multiplied by perv_area instead of harea
         Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)
@@ -1416,9 +1416,10 @@
       SUBROUTINE compute_soilmoist(Infil, Soil_moist_max, &
      &           Soil_rechr_max, Soil2gw_max, Soil_to_ssr, Soil_moist, &
      &           Soil_rechr, Soil_to_gw, Perv_frac)
+      USE PRMS_CONSTANTS, ONLY: CLOSEZERO
       IMPLICIT NONE
 ! Function
-      INTRINSIC :: MIN
+      INTRINSIC :: MIN, ABS
 ! Arguments
       REAL, INTENT(IN) :: Perv_frac, Soil_moist_max, Soil_rechr_max, Soil2gw_max
       REAL, INTENT(INOUT) :: Infil, Soil_moist, Soil_rechr, Soil_to_gw, Soil_to_ssr
@@ -1431,6 +1432,10 @@
       excs = Soil_moist + Infil
       Soil_moist = MIN( excs, Soil_moist_max )
       excs = (excs - Soil_moist_max)*Perv_frac
+      IF ( ABS(excs)<CLOSEZERO ) THEN
+        Soil_moist = Soil_moist_max
+        excs = 0.0
+      ENDIF
       IF ( excs>0.0 ) THEN
         IF ( Soil2gw_max>0.0 ) THEN
           Soil_to_gw = MIN( Soil2gw_max, excs )
@@ -1706,6 +1711,111 @@
       Dunnian = Dunnian - Dndunnflow
 
       END SUBROUTINE compute_cascades
+
+!***********************************************************************
+!     compute interflow and flow to groundwater reservoir
+!***********************************************************************
+      SUBROUTINE compute_gravflow(Ihru, Capacity, Slowcoef_lin, &
+     &           Slowcoef_sq, Ssr2gw_rate, Ssr2gw_exp, Gvr_maxin, &
+     &           Pref_flow_thrsh, Gvr2pfr, Ssr_to_gw, &
+     &           Slow_flow, Slow_stor, Gvr2sm, Soil_to_gw, Gwin, Compute_lateral)
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE
+      USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug
+      USE PRMS_SOILZONE, ONLY: Gravity_stor_res, Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, &
+     &    Gw2sm_grav, Gvr_hru_pct_adjusted
+      USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
+      IMPLICIT NONE
+! Functions
+      INTRINSIC :: MAX, DBLE, SNGL
+      EXTERNAL :: check_gvr_sm, compute_interflow
+! Arguments
+      INTEGER, INTENT(IN) :: Ihru, Compute_lateral
+      REAL, INTENT(IN) :: Slowcoef_lin, Slowcoef_sq, Ssr2gw_rate, Ssr2gw_exp
+      REAL, INTENT(IN) :: Pref_flow_thrsh, Soil_to_gw, Gvr_maxin
+      REAL, INTENT(INOUT) :: Capacity
+      REAL, INTENT(OUT) :: Ssr_to_gw, Slow_stor, Slow_flow, Gvr2pfr, Gvr2sm
+      DOUBLE PRECISION, INTENT(OUT) :: Gwin
+! Local Variables
+      INTEGER :: j, igvr
+      REAL :: perc, slowflow, extra_water, gvrin_actual, depth, input
+      DOUBLE PRECISION :: topfr, slflow, togw, slowstor, frac
+!***********************************************************************
+      !Capacity is for whole HRU
+      !Soil_to_gw is for whole HRU
+      !TO DO
+! use VKS as a function of slope (vector analysis) instead of coef_lin
+! coef_lin for pref_flow needs to be VKS lateral times a factor
+! change slow to interflow
+! in init, set an array dimensioned by nhrucell to vks*mfl_to_inch
+
+      Gwin = 0.0D0
+      Gvr2sm = 0.0
+      topfr = 0.0D0
+      slflow = 0.0D0
+      togw = 0.0D0
+      slowstor = 0.0D0
+      DO j = 1, Hru_gvr_count(Ihru)
+        igvr = Hru_gvr_index(j, Ihru)
+        frac = Gvr_hru_pct_adjusted(igvr)
+        Gwin = Gwin + DBLE( Gw2sm_grav(igvr) )*frac
+        input = Gvr_maxin + Gw2sm_grav(igvr)
+        depth = Gravity_stor_res(igvr) + input
+        IF ( depth>0.0 .AND. Capacity>0.0 ) CALL check_gvr_sm(Capacity, depth, frac, Gvr2sm, input)
+
+        IF ( Compute_lateral==ACTIVE ) THEN
+          extra_water = MAX( 0.0, depth-Pref_flow_thrsh )
+          IF ( extra_water>0.0 ) THEN
+            !compute contribution to preferential-flow reservoir storage
+            topfr = topfr + DBLE( extra_water )*frac
+            depth = Pref_flow_thrsh
+          ENDIF
+          gvrin_actual = MAX(0.0, input-extra_water)
+
+! compute contribution to slow interflow, if any
+          IF ( depth>0.0 ) THEN
+            CALL compute_interflow(Slowcoef_lin, Slowcoef_sq, gvrin_actual, depth, slowflow)
+            slflow = slflow + DBLE( slowflow )*frac
+          ENDIF
+        ENDIF
+
+! compute flow to groundwater, if any
+        IF ( depth>0.0 ) THEN
+          IF ( Ssr2gw_rate>0.0 ) THEN
+! use VKS instead of rate  ???????????????
+            perc = Ssr2gw_rate*(depth**Ssr2gw_exp)
+            IF ( perc<0.0 ) THEN
+              perc = 0.0
+            ELSEIF ( perc>depth ) THEN
+              perc = depth
+            ENDIF
+            depth = depth - perc
+            Sm2gw_grav(igvr) = perc
+            togw = togw + DBLE( perc )*frac
+          ENDIF
+!        ELSE ! GVRs can go negative if flux change in MODFLOW final iteration decreases, so don't set to 0
+!          if(depth<0.0) print *, 'depth<0', depth, ihru
+!          depth = 0.0
+        ENDIF
+
+        Gravity_stor_res(igvr) = depth
+        slowstor = slowstor + DBLE(depth)*frac
+
+! add any direct recharge from soil infiltration
+        Sm2gw_grav(igvr) = Sm2gw_grav(igvr) + Soil_to_gw
+        IF ( Dprst_flag==1 ) Sm2gw_grav(igvr) = Sm2gw_grav(igvr) + SNGL( Dprst_seep_hru(Ihru) )
+
+      ENDDO ! end loop of GVRs in the HRU
+
+      Gvr2pfr = SNGL( topfr )
+      Slow_flow = SNGL( slflow )
+      Ssr_to_gw = SNGL( togw )
+      Slow_stor = SNGL( slowstor )
+      IF ( Slow_stor>Pref_flow_thrsh ) THEN
+        IF ( Print_debug>DEBUG_less .AND. Compute_lateral==ACTIVE ) &
+     &       PRINT *, 'slow_stor > thrsh', Slow_stor, Pref_flow_thrsh, ' HRU:', Ihru
+      ENDIF
+
+      END SUBROUTINE compute_gravflow
 
 !***********************************************************************
 !     adjust soil moist based on being below field capacity (capacity)

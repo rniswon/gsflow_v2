@@ -21,12 +21,12 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 11/23/2021'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 01/12/2022'
       character(len=*), parameter :: PRMS_versn = '2021-11-23'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 11/23/2021'
-      character(len=*), parameter :: Version_read_control_file = '2021-11-22'
-      character(len=*), parameter :: Version_read_parameter_file = '2021-11-22'
-      character(len=*), parameter :: Version_read_data_file = '2021-11-22'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 01/12/2022'
+      character(len=*), parameter :: Version_read_control_file = '2022-01-12'
+      character(len=*), parameter :: Version_read_parameter_file = '2022-01-12'
+      character(len=*), parameter :: Version_read_data_file = '2022-01-12'
       CHARACTER(len=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -73,13 +73,13 @@
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, Iter_aet_flag
-      INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
+      INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag, no_snow_flag
       INTEGER, SAVE :: Agriculture_dprst_flag, Agriculture_soilzone_flag, Agriculture_canopy_flag 
       INTEGER, SAVE :: Dyn_ag_frac_flag, Dyn_ag_soil_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF, outputSelectDatesON_OFF, snow_cloudcover_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName
-      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file
+      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file, Data_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Csv_output_file, Model_control_file, Param_file, Stat_var_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: mappingFileName, xyFileName
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Temp_module, Srunoff_module, Et_module
@@ -100,7 +100,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2021-09-29'
+      character(len=*), parameter :: Version_gsflow_modflow='2022-01-12'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'

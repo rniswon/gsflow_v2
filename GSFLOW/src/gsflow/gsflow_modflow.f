@@ -429,7 +429,7 @@ C
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
      &    ERROR_time, ERROR_modflow
-      USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
+      USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, no_snow_flag,
      &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
      &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday,
      &    Model, GSFLOW_flag, Print_debug, Soilzone_module
@@ -514,21 +514,21 @@ C
 C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
           IF (AFR) THEN
             IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(1,Igrid)
-            CALL GWF2BAS7AD(KKPER,KKSTP,IGRID)
-            IF(IUNIT(62).GT.0) CALL GWF2UPW1AD(IGRID)
-            IF(IUNIT(20).GT.0) CALL GWF2CHD7AD(KKPER,IGRID)
-            IF(IUNIT(1).GT.0) CALL GWF2BCF7AD(KKPER,IGRID)
-            IF(IUNIT(17).GT.0) CALL GWF2RES7AD(KKSTP,KKPER,IGRID)
-            IF(IUNIT(23).GT.0) CALL GWF2LPF7AD(KKPER,IGRID)
-            IF(IUNIT(37).GT.0) CALL GWF2HUF7AD(KKPER,IGRID)
-            IF(IUNIT(16).GT.0) CALL GWF2FHB7AD(IGRID)
-            IF(IUNIT(22).GT.0) CALL GWF2LAK7AD(KKPER,KKSTP,IUNIT(15),
-     1                                             IGRID)
-            IF(IUNIT(55).GT.0) CALL GWF2UZF1AD(IUNIT(55), KKPER, KKSTP,
-     1                                         Igrid)
-            IF(IUNIT(65).GT.0) CALL GWF2SWI2AD(KKSTP,KKPER,IGRID)  !SWI2
-            IF( IUNIT(44).GT.0 ) CALL GWF2SFR7AD(IUNIT(44),IUNIT(22),
-     1                                           KKSTP,KKPER,IGRID)
+          CALL GWF2BAS7AD(KKPER,KKSTP,IGRID)
+          IF(IUNIT(62).GT.0) CALL GWF2UPW1AD(IGRID)
+          IF(IUNIT(20).GT.0) CALL GWF2CHD7AD(KKPER,IGRID)
+          IF(IUNIT(1).GT.0) CALL GWF2BCF7AD(KKPER,IGRID)
+          IF(IUNIT(17).GT.0) CALL GWF2RES7AD(KKSTP,KKPER,IGRID)
+          IF(IUNIT(23).GT.0) CALL GWF2LPF7AD(KKPER,IGRID)
+          IF(IUNIT(37).GT.0) CALL GWF2HUF7AD(KKPER,IGRID)
+          IF(IUNIT(16).GT.0) CALL GWF2FHB7AD(IGRID)
+          IF(IUNIT(22).GT.0) CALL GWF2LAK7AD(KKPER,KKSTP,IUNIT(15),
+     1                                           IGRID)
+          IF(IUNIT(55).GT.0) CALL GWF2UZF1AD(IUNIT(55), KKPER, KKSTP,
+     1                                       Igrid)
+          IF(IUNIT(65).GT.0) CALL GWF2SWI2AD(KKSTP,KKPER,IGRID)  !SWI2
+          IF( IUNIT(44).GT.0 ) CALL GWF2SFR7AD(IUNIT(44),IUNIT(22),
+     1                                         KKSTP,KKPER,IGRID)
           END IF
           IF(IUNIT(50).GT.0) THEN
             IF (IUNIT(1).GT.0) THEN
@@ -649,16 +649,18 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                   PRINT 9001, 'intcp', retval
                   RETURN
                 ENDIF
-                retval = snowcomp()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'snowcomp', retval
-                  RETURN
-                ENDIF
-                IF ( Glacier_flag==ACTIVE ) THEN
-                  retval = glacr()
+                IF ( no_snow_flag==OFF ) THEN
+                  retval = snowcomp()
                   IF ( retval/=0 ) THEN
-                    PRINT 9001, 'glacr_melt', retval
+                    PRINT 9001, 'snowcomp', retval
                     RETURN
+                  ENDIF
+                  IF ( Glacier_flag==ACTIVE ) THEN
+                    retval = glacr()
+                    IF ( retval/=0 ) THEN
+                      PRINT 9001, 'glacr_melt', retval
+                      RETURN
+                    ENDIF
                   ENDIF
                 ENDIF
               ENDIF

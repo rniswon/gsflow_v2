@@ -208,6 +208,8 @@
 
       ELSEIF ( Process_flag==INIT ) THEN
 
+        IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
+
         Grid_flag = OFF
         IF ( Nhru==Nhrucell ) Grid_flag = ACTIVE
         IF ( GSFLOW_flag==ACTIVE ) THEN
@@ -460,13 +462,15 @@
         ierr = intcp()
         IF ( ierr/=0 ) CALL module_error('intcp', Arg, ierr)
 
-        ! rsr, need to do something if snow_cbh_flag=1
-        ierr = snowcomp()
-        IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
+        IF ( no_snow_flag==OFF ) THEN
+          ! rsr, need to do something if snow_cbh_flag=1
+          ierr = snowcomp()
+          IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
 
-        IF ( Glacier_flag==ACTIVE ) THEN
-          ierr = glacr()
-          IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
+          IF ( Glacier_flag==ACTIVE ) THEN
+            ierr = glacr()
+            IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
+          ENDIF
         ENDIF
 
         ierr = srunoff()
@@ -487,30 +491,30 @@
         IF ( ierr/=0 ) CALL module_error('gwflow', Arg, ierr)
 
         IF ( Model==PRMS ) THEN
-          IF ( Stream_order_flag==ACTIVE ) THEN
-            ierr = routing()
-            IF ( ierr/=0 ) CALL module_error('routing', Arg, ierr)
-          ENDIF
+        IF ( Stream_order_flag==ACTIVE ) THEN
+          ierr = routing()
+          IF ( ierr/=0 ) CALL module_error('routing', Arg, ierr)
+        ENDIF
 
-          IF ( Strmflow_flag==strmflow_noroute_module ) THEN
-            ierr = strmflow()
-          ELSEIF ( Muskingum_flag==ACTIVE ) THEN ! muskingum = 4; muskingum_mann = 7
-            ierr = muskingum()
-          ELSEIF ( Strmflow_flag==strmflow_in_out_module ) THEN
-            ierr = strmflow_in_out()
-          ELSEIF ( Strmflow_flag==strmflow_muskingum_lake_module ) THEN
-            ierr = muskingum_lake()
-          ENDIF
-          IF ( ierr/=0 ) CALL module_error(Strmflow_module, Arg, ierr)
+        IF ( Strmflow_flag==strmflow_noroute_module ) THEN
+          ierr = strmflow()
+        ELSEIF ( Muskingum_flag==ACTIVE ) THEN ! muskingum = 4; muskingum_mann = 7
+          ierr = muskingum()
+        ELSEIF ( Strmflow_flag==strmflow_in_out_module ) THEN
+          ierr = strmflow_in_out()
+        ELSEIF ( Strmflow_flag==strmflow_muskingum_lake_module ) THEN
+          ierr = muskingum_lake()
+        ENDIF
+        IF ( ierr/=0 ) CALL module_error(Strmflow_module, Arg, ierr)
 
-          IF ( Stream_temp_flag==ACTIVE ) ierr = stream_temp()
+        IF ( Stream_temp_flag==ACTIVE ) ierr = stream_temp()
 
-          IF ( Print_debug>DEBUG_minimum ) THEN
-            ierr = basin_sum()
-            IF ( ierr/=0 ) CALL module_error('basin_sum', Arg, ierr)
-          ENDIF
+        IF ( Print_debug>DEBUG_minimum ) THEN
+          ierr = basin_sum()
+          IF ( ierr/=0 ) CALL module_error('basin_sum', Arg, ierr)
+        ENDIF
 
-          IF ( Print_debug==DEBUG_WB ) CALL water_balance()
+        IF ( Print_debug==DEBUG_WB ) CALL water_balance()
 
         ENDIF
       ENDIF
@@ -538,15 +542,16 @@
             ierr = intcp()
             IF ( ierr/=0 ) CALL module_error('intcp', Arg, ierr)
 
-            ! rsr, need to do something if snow_cbh_flag=1
-            ierr = snowcomp()
-            IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
+            IF ( no_snow_flag==OFF ) THEN
+              ! rsr, need to do something if snow_cbh_flag=1
+              ierr = snowcomp()
+              IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
 
-            IF ( Glacier_flag==ACTIVE ) THEN
-              ierr = glacr()
-              IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
+              IF ( Glacier_flag==ACTIVE ) THEN
+                ierr = glacr()
+                IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
+              ENDIF
             ENDIF
-
             ierr = srunoff()
             IF ( ierr/=0 ) CALL module_error(Srunoff_module, Arg, ierr)
           ENDIF
@@ -569,12 +574,12 @@
 
           IF ( Process_flag==RUN ) CALL MFNWT_OCBUDGET()
 
-          ierr = gsflow_budget()
-          IF ( ierr/=0 ) CALL module_error('gsflow_budget', Arg, ierr)
+        ierr = gsflow_budget()
+        IF ( ierr/=0 ) CALL module_error('gsflow_budget', Arg, ierr)
 
-          ierr = gsflow_sum()
-          IF ( ierr/=0 ) CALL module_error('gsflow_sum', Arg, ierr)
-        ENDIF
+        ierr = gsflow_sum()
+        IF ( ierr/=0 ) CALL module_error('gsflow_sum', Arg, ierr)
+      ENDIF
       ENDIF
 
 ! for MODSIM-PRMS simulations
@@ -708,6 +713,7 @@
       ! 0=none; 1=water balances; 2=basin;
       ! 4=basin_sum; 5=soltab; 7=soil zone;
       ! 9=snowcomp; 13=cascade; 14=subbasin tree
+      IF ( control_string(Data_file, 'data_file')/=0 ) CALL read_error(5, 'data_file')
       IF ( control_integer(Print_debug, 'print_debug')/=0 ) Print_debug = 0
       IF ( Print_debug>DEBUG_less ) PRINT 3, GSFLOW_versn
     3 FORMAT (//, 26X, 'U.S. Geological Survey', /, 8X, &
@@ -1104,6 +1110,7 @@
      &     CALL read_error(7, 'nmap2hru')
       IF ( decldim('nmap', 0, MAXDIM, 'Number of mapped values')/=0 ) CALL read_error(7, 'nmap')
       IF ( control_integer(Glacier_flag, 'glacier_flag')/=0 ) Glacier_flag = OFF
+      IF ( control_integer(no_snow_flag, 'no_snow_flag')/=0 ) no_snow_flag = OFF
       IF ( control_integer(Frozen_flag, 'frozen_flag')/=0 ) Frozen_flag = OFF
       IF ( control_integer(Dyn_imperv_flag, 'dyn_imperv_flag')/=0 ) Dyn_imperv_flag = OFF
       IF ( control_integer(Dyn_intcp_flag, 'dyn_intcp_flag')/=0 ) Dyn_intcp_flag = OFF

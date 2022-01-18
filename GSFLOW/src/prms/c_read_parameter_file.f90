@@ -60,8 +60,8 @@ module PRMS_READ_PARAM_FILE
       character(LEN=*), intent(IN) :: Dimname
     end function
 
-    integer module function getparamstring(Module_name, Paramname, Numvalues, Data_type, Array_index, String)
-      character(LEN=*), intent(IN) :: Module_name, Paramname, Data_type
+    integer module function getparamstring(Paramname, Numvalues, Data_type, Array_index, String)
+      character(LEN=*), intent(IN) :: Paramname, Data_type
       integer, intent(IN) :: Numvalues, Array_index
       character(LEN=*), intent(OUT) :: String
     end function

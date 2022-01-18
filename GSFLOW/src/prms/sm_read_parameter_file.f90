@@ -555,7 +555,7 @@ contains
 !***********************************************************************
   module function getparam_real_1d(Modname, Paramname, Numvalues, Values) result(res)
     use prms_constants, only: ERROR_param
-    use PRMS_MODULE, only: Parameter_check_flag, Hru_type
+    use PRMS_MODULE, only: Parameter_check_flag !, Hru_type
     use prms_utils, only: error_stop
     implicit none
       ! Arguments
@@ -978,12 +978,12 @@ contains
 ! control parameters are read and verified this
 ! function checks to be sure a required parameter has a value (read or default)
 !***********************************************************************
-  integer module function getparamstring(Module_name, Paramname, Numvalues, Data_type, Array_index, String)
+  integer module function getparamstring(Paramname, Numvalues, Data_type, Array_index, String)
     use PRMS_CONSTANTS, only: ERROR_var
     use PRMS_MMFAPI, only: set_data_type
     implicit none
     ! Arguments
-    character(LEN=*), intent(IN) :: Module_name, Paramname, Data_type
+    character(LEN=*), intent(IN) :: Paramname, Data_type
     integer, intent(IN) :: Numvalues, Array_index
     character(LEN=*), intent(OUT) :: String
     ! Functions
