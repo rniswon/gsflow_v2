@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2022-01-18'
+      character(len=*), parameter :: Version_soilzone_ag = '2022-01-12'
       INTEGER, SAVE :: Soil_iter !, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr, Last_ag_soil_rechr
@@ -485,8 +485,10 @@
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 ! ***************************************
+        ! Soil_to_gw and Soil_to_ssr for whole HRU
         Soil_to_gw(i) = 0.0
         Soil_to_ssr(i) = 0.0
+        ! gravity reservoir variables for whole HRU
         Ssr_to_gw(i) = 0.0
         Slow_flow(i) = 0.0
         Ssres_flow(i) = 0.0
@@ -495,6 +497,7 @@
 ! initialize all HRU values in case dynamic ag frac
         Ag_soil_saturated(i) = OFF
         Ag_gvr_to_sm(i) = 0.0
+        Ag_soil_to_gvr(i) = 0.0
         Ag_soil_to_gw(i) = 0.0
         Ag_hortonian(i) = 0.0
         Unused_ag_et(i) = 0.0
