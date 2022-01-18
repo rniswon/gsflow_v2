@@ -1256,7 +1256,6 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
       USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug, Dprst_flag, Print_debug
       USE PRMS_SOILZONE, ONLY: Gravity_stor_res, Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, &
      &    Gw2sm_grav, Gvr_hru_pct_adjusted
-      USE PRMS_SOILZONE_AG, ONLY: 
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
       IMPLICIT NONE
 ! Functions
