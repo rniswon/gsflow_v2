@@ -89,7 +89,7 @@ C1------USE package modules.
       INTEGER :: I
       INCLUDE 'openspec.inc'
 ! Functions
-      INTRINSIC DBLE
+      INTRINSIC :: DBLE
       INTEGER, EXTERNAL :: GET_KPER
       EXTERNAL :: SET_STRESS_DATES, SETMFTIME
       EXTERNAL :: SETCONVFACTORS, check_gvr_cell_pct
