@@ -45,8 +45,8 @@
       INTEGER FUNCTION prms2modsiminit()
       USE PRMS_CONSTANTS, ONLY: FT2_PER_ACRE
       USE GSFPRMS2MODSIM
-      USE PRMS_MODULE, ONLY: Nsegment, Nlake
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Lake_hru_id
+      USE PRMS_MODULE, ONLY: Nsegment, Nlake, Hru_type
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Lake_hru_id
       use PRMS_MMFAPI, only: declvar_dble
 	  use prms_utils, only: read_error
       IMPLICIT NONE
@@ -125,8 +125,8 @@
       INTEGER FUNCTION prms2modsimrun(EXCHANGE, DELTAVOL, LAKEVAP)
       USE PRMS_CONSTANTS, ONLY: FT2_PER_ACRE
       USE GSFPRMS2MODSIM
-      USE PRMS_MODULE, ONLY: Nsegment, Nlake
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_type, Hru_area, Lake_hru_id, Lake_area
+      USE PRMS_MODULE, ONLY: Nsegment, Nlake, Hru_type
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Lake_hru_id, Lake_area
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Hru_actet
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Timestep_seconds
