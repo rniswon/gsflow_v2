@@ -4306,6 +4306,50 @@
      +     , 9X, 'PERCENT DISCREPANCY =', F15.2, ///)
 !
       END
+
+C
+C-------SUBROUTINE SFR2MODSIM
+C
+      SUBROUTINE AG2MODSIM(Diversions)
+C     *******************************************************************
+C     Pass Irrigation demand to MODSIM 
+C     
+!--------January 17, 2022
+C     *******************************************************************
+      USE GWFSFRMODULE, ONLY: SEG, IDIVAR, NSS
+      USE GWFAGMODULE
+      USE GWFBASMODULE, ONLY: DELT
+      IMPLICIT NONE
+C     -------------------------------------------------------------------
+C     SPECIFICATIONS:
+C     -------------------------------------------------------------------
+C     ARGUMENTS
+      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(NSS)
+C     -------------------------------------------------------------------
+!      INTEGER 
+!      DOUBLE PRECISION 
+C     -------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     -------------------------------------------------------------------
+      INTEGER :: ISEG, i
+!      double precision :: total !delete this
+C     -------------------------------------------------------------------
+C
+C1------LOOP OVER SEGMETS
+C
+C
+C2------Set diversion demand from that calculated from AG.
+C 
+        do i = 1, NUMIRRDIVERSIONSP
+          iseg = IRRSEG(i)        
+          !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
+            Diversions(ISEG) = SEG(2,iseg)*DELT
+          !END IF
+        END DO
+C
+C8------RETURN.
+      RETURN
+      END SUBROUTINE AG2MODSIM
       !
       SUBROUTINE GWF2AG7DA()
       ! Deallocate AG MEMORY
