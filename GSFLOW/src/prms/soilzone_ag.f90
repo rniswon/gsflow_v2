@@ -700,7 +700,7 @@
             ENDIF
           ENDIF
           Basin_soil_to_gw = Basin_soil_to_gw + DBLE( Soil_to_gw(i)*harea )
-          Soil_to_ssr(i) = Soil_to_ssr(i) * Gvr_non_ag_frac(i) + Ag_soil_to_gvr(i) * agfrac
+          Soil_to_ssr(i) = Soil_to_ssr(i) + Ag_soil_to_gvr(i)
           Basin_sm2gvr_max = Basin_sm2gvr_max + DBLE( Soil_to_ssr(i)*harea )
         ENDIF
 
