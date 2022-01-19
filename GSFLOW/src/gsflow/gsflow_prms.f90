@@ -491,30 +491,30 @@
         IF ( ierr/=0 ) CALL module_error('gwflow', Arg, ierr)
 
         IF ( Model==PRMS ) THEN
-        IF ( Stream_order_flag==ACTIVE ) THEN
-          ierr = routing()
-          IF ( ierr/=0 ) CALL module_error('routing', Arg, ierr)
-        ENDIF
+          IF ( Stream_order_flag==ACTIVE ) THEN
+            ierr = routing()
+            IF ( ierr/=0 ) CALL module_error('routing', Arg, ierr)
+          ENDIF
 
-        IF ( Strmflow_flag==strmflow_noroute_module ) THEN
-          ierr = strmflow()
-        ELSEIF ( Muskingum_flag==ACTIVE ) THEN ! muskingum = 4; muskingum_mann = 7
-          ierr = muskingum()
-        ELSEIF ( Strmflow_flag==strmflow_in_out_module ) THEN
-          ierr = strmflow_in_out()
-        ELSEIF ( Strmflow_flag==strmflow_muskingum_lake_module ) THEN
-          ierr = muskingum_lake()
-        ENDIF
-        IF ( ierr/=0 ) CALL module_error(Strmflow_module, Arg, ierr)
+          IF ( Strmflow_flag==strmflow_noroute_module ) THEN
+            ierr = strmflow()
+          ELSEIF ( Muskingum_flag==ACTIVE ) THEN ! muskingum = 4; muskingum_mann = 7
+            ierr = muskingum()
+          ELSEIF ( Strmflow_flag==strmflow_in_out_module ) THEN
+            ierr = strmflow_in_out()
+          ELSEIF ( Strmflow_flag==strmflow_muskingum_lake_module ) THEN
+            ierr = muskingum_lake()
+          ENDIF
+          IF ( ierr/=0 ) CALL module_error(Strmflow_module, Arg, ierr)
 
-        IF ( Stream_temp_flag==ACTIVE ) ierr = stream_temp()
+          IF ( Stream_temp_flag==ACTIVE ) ierr = stream_temp()
 
-        IF ( Print_debug>DEBUG_minimum ) THEN
-          ierr = basin_sum()
-          IF ( ierr/=0 ) CALL module_error('basin_sum', Arg, ierr)
-        ENDIF
+          IF ( Print_debug>DEBUG_minimum ) THEN
+            ierr = basin_sum()
+            IF ( ierr/=0 ) CALL module_error('basin_sum', Arg, ierr)
+          ENDIF
 
-        IF ( Print_debug==DEBUG_WB ) CALL water_balance()
+          IF ( Print_debug==DEBUG_WB ) CALL water_balance()
 
         ENDIF
       ENDIF
@@ -574,12 +574,12 @@
 
           IF ( Process_flag==RUN ) CALL MFNWT_OCBUDGET()
 
-        ierr = gsflow_budget()
-        IF ( ierr/=0 ) CALL module_error('gsflow_budget', Arg, ierr)
+          ierr = gsflow_budget()
+          IF ( ierr/=0 ) CALL module_error('gsflow_budget', Arg, ierr)
 
-        ierr = gsflow_sum()
-        IF ( ierr/=0 ) CALL module_error('gsflow_sum', Arg, ierr)
-      ENDIF
+          ierr = gsflow_sum()
+          IF ( ierr/=0 ) CALL module_error('gsflow_sum', Arg, ierr)
+        ENDIF
       ENDIF
 
 ! for MODSIM-PRMS simulations

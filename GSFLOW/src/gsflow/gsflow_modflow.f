@@ -514,21 +514,21 @@ C
 C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
           IF (AFR) THEN
             IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(1,Igrid)
-          CALL GWF2BAS7AD(KKPER,KKSTP,IGRID)
-          IF(IUNIT(62).GT.0) CALL GWF2UPW1AD(IGRID)
-          IF(IUNIT(20).GT.0) CALL GWF2CHD7AD(KKPER,IGRID)
-          IF(IUNIT(1).GT.0) CALL GWF2BCF7AD(KKPER,IGRID)
-          IF(IUNIT(17).GT.0) CALL GWF2RES7AD(KKSTP,KKPER,IGRID)
-          IF(IUNIT(23).GT.0) CALL GWF2LPF7AD(KKPER,IGRID)
-          IF(IUNIT(37).GT.0) CALL GWF2HUF7AD(KKPER,IGRID)
-          IF(IUNIT(16).GT.0) CALL GWF2FHB7AD(IGRID)
-          IF(IUNIT(22).GT.0) CALL GWF2LAK7AD(KKPER,KKSTP,IUNIT(15),
-     1                                           IGRID)
-          IF(IUNIT(55).GT.0) CALL GWF2UZF1AD(IUNIT(55), KKPER, KKSTP,
-     1                                       Igrid)
-          IF(IUNIT(65).GT.0) CALL GWF2SWI2AD(KKSTP,KKPER,IGRID)  !SWI2
-          IF( IUNIT(44).GT.0 ) CALL GWF2SFR7AD(IUNIT(44),IUNIT(22),
-     1                                         KKSTP,KKPER,IGRID)
+            CALL GWF2BAS7AD(KKPER,KKSTP,IGRID)
+            IF(IUNIT(62).GT.0) CALL GWF2UPW1AD(IGRID)
+            IF(IUNIT(20).GT.0) CALL GWF2CHD7AD(KKPER,IGRID)
+            IF(IUNIT(1).GT.0) CALL GWF2BCF7AD(KKPER,IGRID)
+            IF(IUNIT(17).GT.0) CALL GWF2RES7AD(KKSTP,KKPER,IGRID)
+            IF(IUNIT(23).GT.0) CALL GWF2LPF7AD(KKPER,IGRID)
+            IF(IUNIT(37).GT.0) CALL GWF2HUF7AD(KKPER,IGRID)
+            IF(IUNIT(16).GT.0) CALL GWF2FHB7AD(IGRID)
+            IF(IUNIT(22).GT.0) CALL GWF2LAK7AD(KKPER,KKSTP,IUNIT(15),
+     1                                             IGRID)
+            IF(IUNIT(55).GT.0) CALL GWF2UZF1AD(IUNIT(55), KKPER, KKSTP,
+     1                                         Igrid)
+            IF(IUNIT(65).GT.0) CALL GWF2SWI2AD(KKSTP,KKPER,IGRID)  !SWI2
+            IF( IUNIT(44).GT.0 ) CALL GWF2SFR7AD(IUNIT(44),IUNIT(22),
+     1                                           KKSTP,KKPER,IGRID)
           END IF
           IF(IUNIT(50).GT.0) THEN
             IF (IUNIT(1).GT.0) THEN
@@ -642,7 +642,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 !     1                              IUNIT(44),IUNIT(52),IUNIT(55),IGRID)
 
 !  Call the PRMS modules that need to be inside the iteration loop
-            IF ( Szcheck==ACTIVE ) THEN
+            IF ( Szcheck==ACTIVE .and. kkiter == 1 ) THEN
               IF ( PRMS_land_iteration_flag==1 ) THEN
                 retval = intcp()
                 IF ( retval/=0 ) THEN
@@ -701,7 +701,48 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
      2                              IUNIT(55),IGRID)   !cjm (added IUNIT(8))
             IF(IUNIT(66).GT.0 )
      1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
-            
+            IF ( Szcheck==ACTIVE .and. kkiter == 1 ) THEN
+              IF ( PRMS_land_iteration_flag==1 ) THEN
+                retval = intcp()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'intcp', retval
+                  RETURN
+                ENDIF
+                retval = snowcomp()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'snowcomp', retval
+                  RETURN
+                ENDIF
+                IF ( Glacier_flag==ACTIVE ) THEN
+                  retval = glacr()
+                  IF ( retval/=0 ) THEN
+                    PRINT 9001, 'glacr_melt', retval
+                    RETURN
+                  ENDIF
+                ENDIF
+              ENDIF
+              IF ( PRMS_land_iteration_flag>0 ) THEN
+                retval = srunoff()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'srunoff', retval
+                  RETURN
+                ENDIF
+              ENDIF
+              IF ( AG_flag==ACTIVE ) THEN
+                retval = soilzone_ag(AFR)
+              ELSE
+                retval = soilzone(AFR)
+              ENDIF
+              IF ( retval/=0 ) THEN
+                PRINT 9001, Soilzone_module, retval
+                RETURN
+              ENDIF
+              retval = gsflow_prms2mf()
+              IF ( retval.NE.0 ) THEN
+                PRINT 9001, 'gsflow_prms2mf', retval
+                RETURN
+              ENDIF
+            END IF
             IF(IUNIT(50).GT.0) THEN
               IF (IUNIT(1).GT.0) THEN
                 CALL GWF2MNW27BCF(KPER,IGRID)
@@ -818,6 +859,9 @@ C
         IF(IUNIT(44).GT.0) CALL LAK2MODSIM(DELTAVOL, LAKEVOL, 
      1                              Diversions, Nsegshold)
       ENDIF
+      IF (Model>=10 .AND. iss==0) THEN
+        IF( IUNIT(66).GT.0 ) CALL AG2MODSIM(Diversions)
+      END IF
       END SUBROUTINE MFNWT_RUN
 C
 C     ************************************************************************
