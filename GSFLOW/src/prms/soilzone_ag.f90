@@ -381,7 +381,7 @@
       INTEGER :: i, k, update_potet, compute_lateral, perv_on_flag
       REAL :: dunnianflw, interflow, perv_area, harea
       REAL :: dnslowflow, dnpreflow, dndunn, availh2o, avail_potet, hruactet, ag_hruactet
-      REAL :: gvr_maxin, topfr !, depth, tmp
+      REAL :: topfr !, depth, tmp
       REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin
       REAL :: perv_frac, capacity, capwater_maxin, ssresin
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
@@ -676,7 +676,6 @@
         ENDIF
 
 !******Add infiltration to soil and compute excess
-        gvr_maxin = 0.0
         Cap_waterin(i) = capwater_maxin
 
         IF ( cfgi_frozen_hru==OFF ) THEN
@@ -684,7 +683,7 @@
             ! call even if capwater_maxin = 0, just in case soil_moist now > Soil_moist_max
             IF ( capwater_maxin+Soil_moist(i)>0.0 ) THEN
               CALL compute_soilmoist(Cap_waterin(i), Soil_moist_max(i), &
-     &                               Soil_rechr_max(i), Soil2gw_max(i), gvr_maxin, &
+     &                               Soil_rechr_max(i), Soil2gw_max(i), Soil_to_ssr(i), &
      &                               Soil_moist(i), Soil_rechr(i), Soil_to_gw(i), perv_frac)
               Cap_waterin(i) = Cap_waterin(i)*perv_frac
               Basin_capwaterin = Basin_capwaterin + DBLE( Cap_waterin(i)*harea )
@@ -703,12 +702,11 @@
 !              Ag_water_maxin(i) = ag_water_maxin
               Basin_ag_waterin = Basin_ag_waterin + DBLE( ag_water_maxin*harea )
               Soil_to_gw(i) = Soil_to_gw(i) + Ag_soil_to_gw(i)
-              gvr_maxin = gvr_maxin + Ag_soil_to_gvr(i)
             ENDIF
           ENDIF
           Basin_soil_to_gw = Basin_soil_to_gw + DBLE( Soil_to_gw(i)*harea )
-          Basin_sm2gvr_max = Basin_sm2gvr_max + DBLE( gvr_maxin*harea )
-          Soil_to_ssr(i) = gvr_maxin
+          Soil_to_ssr(i) = Soil_to_ssr(i) * Gvr_non_ag_frac(i) + Ag_soil_to_gvr(i) * agfrac
+          Basin_sm2gvr_max = Basin_sm2gvr_max + DBLE( Soil_to_ssr(i)*harea )
         ENDIF
 
 ! compute slow interflow and ssr_to_gw
@@ -794,7 +792,7 @@
             topfr = topfr - dunnianflw_gvr
             IF ( topfr<0.0 ) THEN
 !              IF ( topfr<-NEARZERO .AND. Print_debug>DEBUG_less ) PRINT *, 'gvr2pfr<0', topfr, dunnianflw_gvr, &
-!     &             Pref_flow_max(i), Pref_flow_stor(i), gvr_maxin
+!     &             Pref_flow_max(i), Pref_flow_stor(i), Soil_to_ssr(i)
               topfr = 0.0
             ENDIF
           ENDIF
