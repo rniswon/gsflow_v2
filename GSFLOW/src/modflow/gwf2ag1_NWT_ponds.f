@@ -1529,7 +1529,7 @@
       ! - -----------------------------------------------------------------
       !
       !1 - ------RESET DEMAND IF IT CHANGES
-      DEMAND = szero
+      !DEMAND = szero   !RGN this needs to store the demand because seg(2,:) can be set to zero
       TOTAL = dzero
       TIME = TOTIM
       PONDSEGFLOW = szero
