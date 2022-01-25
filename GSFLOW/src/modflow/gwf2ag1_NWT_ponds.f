@@ -1298,6 +1298,9 @@
                write (iout, '(/1x,a)') 'FINISHED READING '//
      +          trim(adjustl(char))
                exit
+            case ('STRESS PERIOD')
+              backspace(in)
+              exit
             case default
                WRITE (IOUT, *) 'Invalid AG Input: '//LINE(ISTART:ISTOP)
      +           //' Should be: '//trim(adjustl(CHAR))
