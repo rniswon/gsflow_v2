@@ -251,7 +251,9 @@ contains
         ELSE
           DO i = 1, Numvalues
             Precip(i) = Values(i)
-            IF ( Precip(i)<Ppt_zero_thresh ) Precip(i) = 0.0
+            IF ( Ppt_zero_thresh>0.0 ) THEN
+              IF ( Precip(i)<Ppt_zero_thresh ) Precip(i) = 0.0
+            ENDIF
           ENDDO
         ENDIF
       ELSEIF ( Varname(:6)=='runoff' ) THEN

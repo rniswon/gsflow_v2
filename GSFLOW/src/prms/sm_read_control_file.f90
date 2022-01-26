@@ -885,7 +885,7 @@ contains
     Tmin_map_file = 'tmin.map'
     Control_parameter_data(i) % values_character(1) = Tmin_map_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
-    i = i + 1
+    !      i = i + 1
     !      Control_parameter_data(i)%name = 'pkwater_equiv_day'
     !      Pkwater_equiv_day = 'pkwater_equiv.day'
     !      Control_parameter_data(i)%values_character(1) = Pkwater_equiv_day
@@ -915,9 +915,9 @@ contains
     !      Gwres_flow_day = 'gwres_flow.day'
     !      Control_parameter_data(i)%values_character(1) = Gwres_flow_day
     !      Control_parameter_data(i)%data_type = CHAR_TYPE
-    !      i = i + 1
 
     ! time arrays
+    i = i + 1
     Control_parameter_data(i) % name = 'start_time'
     deallocate (Control_parameter_data(i) % values_int)
     allocate (Control_parameter_data(i) % values_int(6))
@@ -941,8 +941,8 @@ contains
     Endtime(6) = 0
     Control_parameter_data(i) % values_int = Endtime
     Control_parameter_data(i) % numvals = 6
-    i = i + 1
 
+    i = i + 1
     ! GSFLOW parameters
     Control_parameter_data(i) % name = 'modflow_time_zero'
     deallocate (Control_parameter_data(i) % values_int)
