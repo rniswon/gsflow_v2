@@ -128,7 +128,6 @@
 !     hru_elev, hru_area
 !***********************************************************************
       INTEGER FUNCTION xyzdecl()
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
       USE PRMS_MODULE, ONLY: Nhru, Nrain, Ntemp
       USE PRMS_XYZ_DIST
       IMPLICIT NONE
@@ -460,11 +459,11 @@
 !     xyzinit - Initialize xyz_dist module - get parameter values,
 !***********************************************************************
       INTEGER FUNCTION xyzinit()
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, FEET2METERS
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, FEET2METERS
       USE PRMS_MODULE, ONLY: Nhru, Nrain, Ntemp, Inputerror_flag
       USE PRMS_XYZ_DIST
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv,
-     +    Hru_elev_ts, Active_hrus, Hru_route_order
+     +    Hru_elev, Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Psta_elev, Tsta_elev
       IMPLICIT NONE
 ! Functions
@@ -601,7 +600,7 @@
 !
       IF ( Conv_flag==ACTIVE ) THEN
         DO i = 1, Nhru
-          MRUelev(i) = Hru_elev_ts(i)*FEET2METERS
+          MRUelev(i) = Hru_elev(i)*FEET2METERS
         ENDDO
         DO i = 1, Ntemp
           Temp_STAelev(i) = Tsta_elev(i)*FEET2METERS
@@ -611,7 +610,7 @@
         ENDDO
         Solradelev = Solrad_elev*FEET2METERS
       ELSE
-        MRUelev = Hru_elev_ts
+        MRUelev = Hru_elev
         Temp_STAelev = Tsta_elev
         Pstaelev = Psta_elev
         Solradelev = Solrad_elev
@@ -735,7 +734,6 @@
 ! Functions
       INTRINSIC :: ABS, SNGL, DBLE
       EXTERNAL :: temp_set
-      REAL, EXTERNAL :: c_to_f
 ! Arguments
 !   Declared Parameters
       REAL, INTENT(IN) :: Max_lapse(MAXLAPSE), Min_lapse(MAXLAPSE)
@@ -958,14 +956,13 @@
       SUBROUTINE xyz_rain_run(Ppt_lapse, Rain_meanx, Rain_meany,
      +                        Rain_meanz, Meanppt, Rain_code)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, DNEARZERO,
-     +    MM2INCH, CELSIUS
+     +    MM2INCH, MM
       USE PRMS_MODULE, ONLY: Nowmonth, Nrain
       USE PRMS_XYZ_DIST, ONLY: MRUx, MRUy, Rain_STAx, Rain_STAy,
      +    Rain_nuse, Ppt_add, Ppt_div, Rain_nsta, Tmax_rain_sta,
      +    Tmin_rain_sta, Is_rain_day, Psta_freq_nuse, X_div, Y_div,
      +    Z_div, X_add, Y_add, Z_add, Precip_xyz, MAXLAPSE, MRUelev,
-     +    Tmax_allsnow_dist, Tmax_allrain_dist, Adjust_snow,
-     +    Adjust_rain
+     +    Tmax_allsnow_dist, Tmax_allrain_dist, Adjust_snow, Adjust_rain
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus,
      +    Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Tminf, Newsnow, Pptmix,
@@ -1155,7 +1152,7 @@
 
 !******Ignore small amounts of precipitation on HRU
           IF ( ppt>NEARZERO ) THEN
-            IF ( Precip_units==CELSIUS ) ppt = ppt*MM2INCH
+            IF ( Precip_units==MM ) ppt = ppt*MM2INCH
             CALL precip_form(ppt, Hru_ppt(i), Hru_rain(i),
      +           Hru_snow(i), Tmaxf(i), Tminf(i), Pptmix(i),
      +           Newsnow(i), Prmx(i), Tmax_allrain_f(i,Nowmonth), 1.0,

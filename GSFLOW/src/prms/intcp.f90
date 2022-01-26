@@ -191,7 +191,7 @@
      &     'Water released from a change over of canopy cover type for each HRU', &
      &     'inches', Intcp_changeover)/=0 ) CALL read_error(3, 'intcp_changeover')
 
-      IF ( declvar(MODNAME, 'basin_changeover', 'nhru', Nhru, 'double', &
+      IF ( declvar(MODNAME, 'basin_changeover', 'one', 1, 'double', &
      &     'Basin area-weighted average water released from a change over of canopy cover type', &
      &     'inches', Basin_changeover)/=0 ) CALL read_error(3, 'basin_changeover')
 

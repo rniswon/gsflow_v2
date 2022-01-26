@@ -66,7 +66,7 @@
 !     idedecl - set up parameters for temperature computations
 !***********************************************************************
       INTEGER FUNCTION idedecl()
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DOCUMENTATION
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION
       USE PRMS_MODULE, ONLY: Model, Nhru, Ntemp, Nrain
       USE PRMS_IDE
       IMPLICIT NONE
@@ -254,7 +254,7 @@
 !     ideinit - Initialize ide_dist module - get parameter values,
 !***********************************************************************
       INTEGER FUNCTION ideinit()
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: ACTIVE
       USE PRMS_MODULE, ONLY: Nhru, Ntemp, Nrain, Inputerror_flag
       USE PRMS_IDE
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv,
@@ -428,15 +428,13 @@
 !               Outputs a daily max and min Temperature by HRU elevation
 !***********************************************************************
       INTEGER FUNCTION ide_temp_run(Temp_wght_dist, Temp_wght_elev)
-      USE PRMS_CONSTANTS, ONLY: FEET2METERS, GLACIER, FEET, CELSIUS
+      USE PRMS_CONSTANTS, ONLY: CELSIUS
       USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nowmonth
       USE PRMS_IDE, ONLY: Hru_x, Hru_y, Tmax_rain_sta, Solrad_elev,
      +    Tmin_rain_sta, Temp_nuse, Temp_nsta, Tsta_x, Tsta_y, Dist_exp,
-     +    Psta_x, Psta_y, Basin_centroid_x, Basin_centroid_y,
-     +    Ndist_tsta
+     +    Psta_x, Psta_y, Basin_centroid_x, Basin_centroid_y, Ndist_tsta
       USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_area, Active_hrus,
-     +    Hru_route_order, Hru_elev_meters, Hru_elev_ts, Hru_type,
-     +    Elev_units
+     +    Hru_route_order, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp,
      +    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf,
      +    Tavgc, Tmin_aspect_adjust, Tmax_aspect_adjust,
@@ -476,13 +474,7 @@
         dat_dist = 0.0
         x = Hru_x(n)
         y = Hru_y(n)
-        IF ( Hru_type(n)/=GLACIER ) THEN
-          z = Hru_elev_meters(n)
-        ELSEIF ( Elev_units==FEET ) THEN
-          z = Hru_elev_ts(n)*FEET2METERS
-        ELSE
-          z = Hru_elev_ts(n)
-        ENDIF
+        z = Hru_elev_meters(n)
         IF ( Temp_wght_dist.GT.0.0 )
      +       CALL compute_inv(Ntemp, Temp_nsta, Temp_nuse, Tsta_x, x,
      +       Tsta_y, y, Tmax, dat_dist, Ndist_tsta, Dist_exp)
@@ -605,16 +597,14 @@
 !***********************************************************************
 !***********************************************************************
       INTEGER FUNCTION ide_rain_run(Prcp_wght_dist, Prcp_wght_elev)
-      USE PRMS_CONSTANTS, ONLY: FEET2METERS, MM2INCH, GLACIER, FEET,
-     +    CELSIUS, ERROR_data
+      USE PRMS_CONSTANTS, ONLY: MM2INCH, MM, ERROR_data
       USE PRMS_MODULE, ONLY: Nrain, Nowmonth
       USE PRMS_IDE, ONLY: Hru_x, Hru_y, Psta_x, Psta_y,
      +    Rain_nuse, Rain_nsta, Tmax_rain_sta, Tmin_rain_sta,
      +    Ndist_psta, Dist_exp, Precip_ide, Adjust_snow, Adjust_rain,
      +    Tmax_allsnow_sta, Tmax_allrain_sta
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus,
-     +    Hru_route_order, Hru_elev_meters, Hru_elev_ts, Hru_type,
-     +    Elev_units
+     +    Hru_route_order, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Tminf, Newsnow, Pptmix,
      +    Hru_ppt, Hru_rain, Hru_snow, Basin_rain,
      +    Basin_ppt, Prmx, Basin_snow, Psta_elev_meters, Basin_obs_ppt,
@@ -695,13 +685,7 @@
         dat_dist = 0.0
         x = Hru_x(n)
         y = Hru_y(n)
-        IF ( Hru_type(n)/=GLACIER ) THEN
-          z = Hru_elev_meters(n)
-        ELSEIF ( Elev_units==FEET ) THEN
-          z = Hru_elev_ts(n)*FEET2METERS
-        ELSE
-          z = Hru_elev_ts(n)
-        ENDIF
+        z = Hru_elev_meters(n)
         IF ( Prcp_wght_dist>0.0 )
      +       CALL compute_inv(Nrain, Rain_nsta, Rain_nuse, Psta_x, x,
      +            Psta_y, y, Precip_ide, dat_dist, Ndist_psta, Dist_exp)
@@ -715,7 +699,7 @@
         ppt = (Prcp_wght_dist*dat_dist) + (Prcp_wght_elev*dat_elev)
 
         IF ( ppt>0.0 ) THEN
-          IF ( Precip_units==CELSIUS ) ppt = ppt*MM2INCH
+          IF ( Precip_units==MM ) ppt = ppt*MM2INCH
           CALL precip_form(ppt, Hru_ppt(n), Hru_rain(n), Hru_snow(n),
      +         Tmaxf(n), Tminf(n), Pptmix(n), Newsnow(n), Prmx(n),
      +         Tmax_allrain_f(n,Nowmonth), 1.0, 1.0,

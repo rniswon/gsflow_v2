@@ -266,7 +266,7 @@
       INTEGER FUNCTION gwflowinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, LAKE, SWALE, DEBUG_less, CASCADEGW_OFF
       USE PRMS_MODULE, ONLY: Ngw, Nlake, Print_debug, Init_vars_from_file, &
-     &    Dprst_flag, Cascadegw_flag, Inputerror_flag, Gwr_swale_flag
+     &    Dprst_flag, Inputerror_flag, Gwr_swale_flag
       USE PRMS_GWFLOW
       USE PRMS_BASIN, ONLY: Gwr_type, Hru_area, Basin_area_inv, Active_gwrs, Gwr_route_order, &
      &                      Lake_hru_id, Weir_gate_flag, Hru_storage
@@ -361,12 +361,6 @@
       Basin_gw_upslope = 0.0D0
       Basin_dnflow = 0.0D0
       Basin_lake_seep = 0.0D0
-! do only once, so restart uses saved values
-      IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
-        Gw_upslope = 0.0D0
-        Hru_gw_cascadeflow = 0.0
-        IF ( Nlake>0 ) Lakein_gwflow = 0.0D0
-      ENDIF
       Gwres_flow = 0.0
       Gwres_in = 0.0
       Gwres_sink = 0.0
@@ -406,6 +400,7 @@
 
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         Gw_upslope = 0.0D0
+        Hru_gw_cascadeflow = 0.0
         Basin_dnflow = 0.0D0
         Basin_gw_upslope = 0.0D0
         IF ( Nlake>0 ) Lakein_gwflow = 0.0D0
@@ -520,10 +515,10 @@
               PRINT *, '       storage: ', gwstor, '; transfer: ', Gwr_transfer(i)/Cfs_conv
               ERROR STOP ERROR_water_use
             ENDIF
-            gwstor = gwstor - DBLE( Gwr_transfer(i) ) / Cfs_conv 
+            gwstor = gwstor - DBLE( Gwr_transfer(i) ) / Cfs_conv
           ENDIF
         ENDIF
- 
+
         gwsink = 0.0D0
         IF ( gwstor<0.0D0 ) THEN ! could happen with water use
           IF ( Print_debug>DEBUG_less ) PRINT *, 'Warning, groundwater reservoir for HRU:', i, ' is < 0.0', gwstor

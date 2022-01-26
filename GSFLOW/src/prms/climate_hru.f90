@@ -521,6 +521,34 @@
           ENDIF
         ENDIF
 
+        IF ( Albedo_cbh_flag==ACTIVE ) THEN
+          IF ( control_string(Albedo_day, 'albedo_day')/=0 ) CALL read_error(5, 'albedo_day')
+          CALL find_header_end(Albedo_unit, Albedo_day, 'albedo_day', ierr, 1, Cbh_binary_flag)
+          IF ( ierr==1 ) THEN
+            istop = 1
+          ELSE
+            CALL find_current_time(Albedo_unit, Start_year, Start_month, Start_day, ierr, Cbh_binary_flag)
+            IF ( ierr==-1 ) THEN
+              PRINT *, 'for first time step, CBH File: ', Albedo_day
+              istop = 1
+            ENDIF
+          ENDIF
+        ENDIF
+
+        IF ( Cloud_cover_cbh_flag==ACTIVE ) THEN
+          IF ( control_string(Cloud_cover_day, 'cloud_cover_day')/=0 ) CALL read_error(5, 'cloud_cover_day')
+          CALL find_header_end(Cloud_cover_unit, Cloud_cover_day, 'cloud_cover_day', ierr, 1, Cbh_binary_flag)
+          IF ( ierr==1 ) THEN
+            istop = 1
+          ELSE
+            CALL find_current_time(Cloud_cover_unit, Start_year, Start_month, Start_day, ierr, Cbh_binary_flag)
+            IF ( ierr==-1 ) THEN
+              PRINT *, 'for first time step, CBH File: ', Cloud_cover_day
+              istop = 1
+            ENDIF
+          ENDIF
+        ENDIF
+
         IF ( istop==ACTIVE ) THEN
           PRINT *, 'ERROR in climate_hru'
           ERROR STOP ERROR_cbh
