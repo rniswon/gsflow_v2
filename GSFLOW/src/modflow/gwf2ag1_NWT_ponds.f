@@ -1022,7 +1022,7 @@
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: IOUT, NCOL, NROW, NLAY, IFREFM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS
+      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS, SEG, NUMTAB_SFR
       USE PRMS_MODULE, ONLY: Nhru
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
@@ -1490,6 +1490,16 @@
             ISTARTSAVE = ISTART
          end if
       end do
+!
+! Set demand to specified diversion flows in SFR.
+!
+      DO i = 1, NUMIRRDIVERSIONSP
+         iseg = IRRSEG(i)
+         if (iseg > 0 .and. IUNITSFR > 0) then
+               DEMAND(ISEG) = SEG(2, ISEG)
+         END IF
+      END DO
+!
 6     FORMAT(1X, /
      +       1X, 'NO IRRDIVERSION DATA OR REUSING IRRDIVERSION DATA ',
      +       'FROM LAST STRESS PERIOD ')
@@ -1513,7 +1523,7 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SEG !, SGOTFLW
+      USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR !, SGOTFLW
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GLOBAL, ONLY: IUNIT
       USE GWFBASMODULE, ONLY: TOTIM
@@ -1528,26 +1538,18 @@
       REAL :: RATETERPQ, TIME
       ! - -----------------------------------------------------------------
       !
-      !1 - ------RESET DEMAND IF IT CHANGES
-      !DEMAND = szero   !RGN this needs to store the demand because seg(2,:) can be set to zero
-      TOTAL = dzero
-      TIME = TOTIM
-      PONDSEGFLOW = szero
+            !1 - ------RESET DEMAND IF IT CHANGES
+      if ( NUMTAB_SFR > 0 ) DEMAND = 0.0
       DO i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
-         if (iseg > 0) then
-            if (IUNIT(44) > 0) then
+         if (iseg > 0 .and. IUNIT(44) > 0) then
                ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
                ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
                ! contains the TABFILE values at this point.
-               DEMAND(ISEG) = SEG(2, ISEG)
-               IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = szero
-               TOTAL = TOTAL + DBLE( DEMAND(ISEG) )
-            elseif (GSFLOW_flag == 1) then
-            end if
-            SUPACT(ISEG) = szero
-            ACTUAL(ISEG) = szero
-         END IF
+           IF ( NUMTAB_SFR > 0 )  DEMAND(ISEG) = SEG(2, ISEG)
+           SUPACT(ISEG) = 0.0
+           ACTUAL(ISEG) = 0.0
+         end if
       END DO
       !2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
       IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
