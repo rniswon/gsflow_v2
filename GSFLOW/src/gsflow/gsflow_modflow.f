@@ -133,7 +133,7 @@ C     ------------------------------------------------------------------
      &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
      &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package, Model,
-     &    GSFLOW_flag, Print_debug, AG_flag
+     &    GSFLOW_flag, Print_debug !, AG_flag
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -243,10 +243,10 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
         PRINT *, 'GSFLOW requires UZF Package'
         ierr = 1
       ENDIF
-      IF ( IUNIT(66)==0 .AND. AG_flag == ACTIVE ) THEN
-        PRINT *, 'AG requires the AG Package'
-        ierr = 1
-      ENDIF
+!      IF ( IUNIT(66)==0 .AND. AG_flag == ACTIVE ) THEN
+!        PRINT *, 'AG requires the AG Package'
+!        ierr = 1
+!      ENDIF
 ! Packages available in NWT but not in GSFLOW
       IF ( GSFLOW_flag==ACTIVE ) THEN
         IF ( IUNIT(3)>0 ) THEN
