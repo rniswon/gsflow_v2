@@ -15,7 +15,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'subbasin'
-      character(len=*), parameter :: Version_subbasin = '2022-01-12'
+      character(len=*), parameter :: Version_subbasin = '2022-01-25'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Qsub(:), Sub_area(:), Laststor(:)
       INTEGER, SAVE, ALLOCATABLE :: Tree(:, :)
 !   Declared Variables
@@ -431,7 +431,7 @@
 ! Local Variables
       INTEGER :: j, jj, k
       DOUBLE PRECISION :: harea, srq, ssq, gwq, dmy, dmy1, subarea
-      DOUBLE PRECISION :: soilstor, snowstor, landstor, dmy2 !, conv
+      DOUBLE PRECISION :: soilstor, snowstor, landstor, dmy2
 !***********************************************************************
       subrun = 0
 

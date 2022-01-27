@@ -428,7 +428,7 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
-     &    ERROR_time, ERROR_modflow
+     &    ERROR_time, ERROR_modflow, MODSIM_GSFLOW
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, no_snow_flag,
      &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
      &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday,
@@ -589,7 +589,7 @@ C7C2----ITERATIVELY FORMULATE AND SOLVE THE FLOW EQUATIONS.
            ITREAL = 0
 C
 C0----Plug in MODSIM values before PRMS-MODFLOW iterations
-           IF ( Model>=10 ) THEN
+           IF ( Model>=MODSIM_GSFLOW ) THEN
              IF(IUNIT(44).GT.0.AND.iss==0) CALL MODSIM2SFR(Diversions)
            ENDIF
 C

@@ -478,6 +478,7 @@
       IF ( getparam_int(MODNAME, 'tohru', Nhru, Tohru)/=0 ) CALL read_error(2, 'tohru')
       IF ( getparam_real(MODNAME, 'hru_slope', Nhru, Hru_slope)/=0 ) CALL read_error(2, 'hru_slope')
       IF ( Init_vars_from_file==0 ) THEN
+        Alt_above_ela = 0.0
         Prev_out = 0.0
         Prev_outi = 0.0
         Prev_area = 0.0D0
@@ -795,11 +796,11 @@
 !                  computations
 !***********************************************************************
       INTEGER FUNCTION glacrrun()
-      USE PRMS_CONSTANTS, ONLY: GLACIER, LAND, FEET2METERS, METERS2FEET, NEARZERO, FEET
+      USE PRMS_CONSTANTS, ONLY: GLACIER, LAND, FEET2METERS, NEARZERO, FEET !, METERS2FEET
       USE PRMS_MODULE, ONLY: Hru_type
       USE PRMS_GLACR
       USE PRMS_BASIN, ONLY: Hru_elev_ts, Active_hrus, Hru_route_order, &
-     &    Elev_units, Hru_elev_feet, Hru_elev_meters
+     &    Elev_units, Hru_elev_meters !, Hru_elev_feet
       USE PRMS_FLOWVARS, ONLY: Alt_above_ela, Glrette_frac
       IMPLICIT NONE
 ! Functions
@@ -858,11 +859,11 @@
         IF ( Hru_type(i)==GLACIER ) THEN
           IF ( Ngl==0 ) Hru_elev_ts(i) = Basal_elev(i)
           IF ( Elev_units==FEET ) THEN
-            Hru_elev_feet(i) = Hru_elev_ts(i)
+            !Hru_elev_feet(i) = Hru_elev_ts(i)
             Hru_elev_meters(i) = Hru_elev_ts(i)*FEET2METERS
           ELSE
             Hru_elev_meters(i) = Hru_elev_ts(i)
-            Hru_elev_feet(i) = Hru_elev_ts(i)*METERS2FEET
+            !Hru_elev_feet(i) = Hru_elev_ts(i)*METERS2FEET
           ENDIF
         ENDIF
       ENDDO
@@ -2671,6 +2672,7 @@
       REAL, INTENT(IN) :: Di, Upfunciph, Afunciph, K, Nn, Bfunciph, X1, X2, Xacc
       REAL, INTENT(OUT) :: Rtnewt
 ! Functions
+      INTRINSIC :: ABS
       EXTERNAL :: funcd
 ! Local Variables
       INTEGER j
@@ -2678,10 +2680,11 @@
 !***********************************************************************
       Flag = 0
       Rtnewt = 0.5*(X1+X2) !Initial guess.
+!      Rtnewt = 1.0 !???
       DO j = 1, JMAX
         CALL funcd(Rtnewt, Di, Upfunciph, Afunciph, Bfunciph, f, df, K, Nn)
-        df = 1.0
-        IF ( df>0.0 ) dx = f/df
+        dx = 0.0
+        IF ( ABS(df)>0.0 ) dx = f/df
         Rtnewt = Rtnewt - dx
 !            PRINT*, 'Rtnewt jumped out of brackets, Rtnewt =', Rtnewt
         IF ( Rtnewt<X1 ) Rtnewt = X1

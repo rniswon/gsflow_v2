@@ -269,9 +269,8 @@ contains
     ! Local Variables
     integer :: var_id
     !***********************************************************************
-    print *, modname, varname, numvalues
+    !print *, modname, varname, numvalues
       var_id = find_variable(Modname, Varname, Numvalues, 'real')
-      if (var_id==49)     print *, Variable_data(49)%get_flag
       Values = Variable_data(var_id)%values_real_0d
   end subroutine getvar_real_0d
 
