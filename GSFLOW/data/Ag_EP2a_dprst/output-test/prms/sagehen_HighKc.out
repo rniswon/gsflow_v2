@@ -96,9 +96,9 @@ runoff 1
  Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
 Simulation time period: 1990/10/01 00:00:00 to 1995/10/31 00:00:00
 ====================================================================
-Basin Definition                basin               2022-01-26
+Basin Definition                basin               2022-01-27
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-01-12
+Common States and Fluxes        climateflow         2022-01-20
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2021-11-19
@@ -138,5 +138,5 @@ Fraction impervious:        0.0000    Fraction pervious:       0.9967
 DPRST area:                  22.42    Fraction DPRST:          0.0033
 
 
-Execution elapsed time    2 minutes 34.42 seconds
+Execution elapsed time    2 minutes 22.38 seconds
 

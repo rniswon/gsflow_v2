@@ -379,8 +379,8 @@ runoff 58
  Data File time period: 1988/10/01 00:00:00 to 1990/09/30 00:00:00
 Simulation time period: 1988/10/01 00:00:00 to 1990/09/30 00:00:00
 ====================================================================
-Basin Definition                basin               2022-01-26
-Common States and Fluxes        climateflow         2022-01-12
+Basin Definition                basin               2022-01-27
+Common States and Fluxes        climateflow         2022-01-20
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2021-11-19
@@ -1233,5 +1233,5 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
  ***************************************
  Total for run        159.12    22642.64
  ***************************************
-Execution elapsed time    0 minutes  0.66 seconds
+Execution elapsed time    0 minutes  0.62 seconds
 

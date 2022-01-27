@@ -95,9 +95,9 @@ runoff 1
  Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
 Simulation time period: 1980/10/01 00:00:00 to 1984/01/30 00:00:00
 ====================================================================
-Basin Definition                basin               2022-01-26
+Basin Definition                basin               2022-01-27
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-01-12
+Common States and Fluxes        climateflow         2022-01-20
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2021-11-19
@@ -113,7 +113,7 @@ Soilzone Computations           soilzone            2022-01-21
 Groundwater                     gwflow              2021-12-16
 Streamflow Routing              strmflow            2021-11-19
 Output Summary                  basin_sum           2022-01-12
-Output Summary                  subbasin            2022-01-12
+Output Summary                  subbasin            2022-01-25
 Output Summary                  basin_summary       2021-11-19
 ==============================================================
 
@@ -1353,5 +1353,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
    1984    1   28    0.000    0.066   39.756    0.018    0.035    0.000    0.000
    1984    1   29    0.000    0.064   39.674    0.018    0.035   -0.000    0.000
    1984    1   30    0.000    0.073   39.583    0.018    0.035   -0.000    0.000
-Execution elapsed time    0 minutes  0.29 seconds
+Execution elapsed time    0 minutes  0.31 seconds
 

@@ -144,8 +144,8 @@ tmin 11
  Data File time period: 1948/10/01 00:00:00 to 2015/09/30 00:00:00
 Simulation time period: 1950/10/01 00:00:00 to 2015/09/30 00:00:00
 ====================================================================
-Basin Definition                basin               2022-01-26
-Common States and Fluxes        climateflow         2022-01-12
+Basin Definition                basin               2022-01-27
+Common States and Fluxes        climateflow         2022-01-20
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2021-11-19
@@ -253,5 +253,5 @@ Fraction impervious:        0.0473    Fraction pervious:       0.9527
  *************************************************************
  Total for run    1036.624  384.717-1147.029 1789.414 -316.118
  *************************************************************
-Execution elapsed time    0 minutes  6.69 seconds
+Execution elapsed time    0 minutes  6.56 seconds
 
