@@ -72,11 +72,11 @@
 
  OPENING ./output/Agwater1_high.uzfot
  FILE TYPE:DATA(BINARY)   UNIT   61   STATUS:UNKNOWN
- FORMAT:BINARY                 ACCESS:SEQUENTIAL          
+ FORMAT:UNFORMATTED            ACCESS:STREAM              
 
  OPENING ./output/Agwater1cbc_high.unf
  FILE TYPE:DATA(BINARY)   UNIT  102   STATUS:UNKNOWN
- FORMAT:BINARY                 ACCESS:SEQUENTIAL          
+ FORMAT:UNFORMATTED            ACCESS:STREAM              
 
  OPENING ./output/Agwater1_high.uzf1
  FILE TYPE:DATA   UNIT   65   STATUS:UNKNOWN
@@ -728,6 +728,8 @@ SELECTED MODEL CELLS ARE:
  A total number of          1 AG output time series files were activated for GROUNDWATER 
  A total number of          1 AG output time series files were activated for SURFACE WATER ET
  A total number of          0 AG output time series files were activated for GROUNDWATER ET
+ A total number of          0 AG output time series files were activated for POND ET
+ A total number of          0 AG output time series files were activated for POND IRRIGATION
 1
                             STRESS PERIOD NO.    1, LENGTH =   86400.00    
                             -----------------------------------------------
@@ -40555,6 +40557,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/10/25 19:17:08
- Elapsed run time: 4.274 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/01/26 14:52:13
+ Elapsed run time: 4.464 Seconds
 

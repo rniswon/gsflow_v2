@@ -52,7 +52,7 @@
 
  OPENING .\output\UZFtest2.uzfot
  FILE TYPE:DATA(BINARY)   UNIT   61   STATUS:UNKNOWN
- FORMAT:BINARY                 ACCESS:SEQUENTIAL          
+ FORMAT:UNFORMATTED            ACCESS:STREAM              
 
  OPENING .\output\UZFtest2.uzf1
  FILE TYPE:DATA   UNIT   65   STATUS:UNKNOWN
@@ -10896,6 +10896,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/09/24  9:52:23
- Elapsed run time: 2.323 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/01/26 14:59:56
+ Elapsed run time: 2.416 Seconds
 

@@ -28,7 +28,7 @@
 
  OPENING .\output\Pr1aMFNWT.BUD
  FILE TYPE:DATA(BINARY)   UNIT   50   STATUS:UNKNOWN
- FORMAT:BINARY                 ACCESS:SEQUENTIAL          
+ FORMAT:UNFORMATTED            ACCESS:STREAM              
 
  OPENING .\output\Pr1aMFNWT.out
  FILE TYPE:DATA   UNIT   51   STATUS:UNKNOWN
@@ -279,6 +279,6 @@
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/09/23 14:12:57
- Elapsed run time: 0.035 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/01/26 14:55:53
+ Elapsed run time: 0.033 Seconds
 

@@ -24,7 +24,7 @@
 
  OPENING .\output\Pr2MFNWT.BUD
  FILE TYPE:DATA(BINARY)   UNIT   32   STATUS:UNKNOWN
- FORMAT:BINARY                 ACCESS:SEQUENTIAL          
+ FORMAT:UNFORMATTED            ACCESS:STREAM              
 
  OPENING .\input\Pr2.NWT
  FILE TYPE:NWT   UNIT   34   STATUS:OLD    
@@ -15629,6 +15629,6 @@
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2021/09/23 14:23:13
- Elapsed run time: 6.289 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/01/26 14:57:41
+ Elapsed run time: 8.447 Seconds
 
