@@ -1022,7 +1022,7 @@
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: IOUT, NCOL, NROW, NLAY, IFREFM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS
+      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS, SEG, NUMTAB_SFR
       USE PRMS_MODULE, ONLY: Nhru
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
@@ -1298,6 +1298,9 @@
                write (iout, '(/1x,a)') 'FINISHED READING '//
      +          trim(adjustl(char))
                exit
+            case ('STRESS PERIOD')
+              backspace(in)
+              exit
             case default
                WRITE (IOUT, *) 'Invalid AG Input: '//LINE(ISTART:ISTOP)
      +           //' Should be: '//trim(adjustl(CHAR))
@@ -1487,6 +1490,16 @@
             ISTARTSAVE = ISTART
          end if
       end do
+!
+! Set demand to specified diversion flows in SFR.
+!
+      DO i = 1, NUMIRRDIVERSIONSP
+         iseg = IRRSEG(i)
+         if (iseg > 0 .and. IUNITSFR > 0) then
+               DEMAND(ISEG) = SEG(2, ISEG)
+         END IF
+      END DO
+!
 6     FORMAT(1X, /
      +       1X, 'NO IRRDIVERSION DATA OR REUSING IRRDIVERSION DATA ',
      +       'FROM LAST STRESS PERIOD ')
@@ -1510,7 +1523,7 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SEG !, SGOTFLW
+      USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR !, SGOTFLW
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GLOBAL, ONLY: IUNIT
       USE GWFBASMODULE, ONLY: TOTIM
@@ -1525,26 +1538,18 @@
       REAL :: RATETERPQ, TIME
       ! - -----------------------------------------------------------------
       !
-      !1 - ------RESET DEMAND IF IT CHANGES
-      DEMAND = szero
-      TOTAL = dzero
-      TIME = TOTIM
-      PONDSEGFLOW = szero
+            !1 - ------RESET DEMAND IF IT CHANGES
+      if ( NUMTAB_SFR > 0 ) DEMAND = 0.0
       DO i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
-         if (iseg > 0) then
-            if (IUNIT(44) > 0) then
+         if (iseg > 0 .and. IUNIT(44) > 0) then
                ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
                ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
                ! contains the TABFILE values at this point.
-               DEMAND(ISEG) = SEG(2, ISEG)
-               IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = szero
-               TOTAL = TOTAL + DBLE( DEMAND(ISEG) )
-            elseif (GSFLOW_flag == 1) then
-            end if
-            SUPACT(ISEG) = szero
-            ACTUAL(ISEG) = szero
-         END IF
+           IF ( NUMTAB_SFR > 0 )  DEMAND(ISEG) = SEG(2, ISEG)
+           SUPACT(ISEG) = 0.0
+           ACTUAL(ISEG) = 0.0
+         end if
       END DO
       !2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
       IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
@@ -2226,8 +2231,8 @@
         write (iout, 7) NUMGW + NUMGWALL
         write (iout, 8) NUMSWET
         write (iout, 9) NUMGWET + NUMGWETALL        
-!dev        write (iout, 10) NUMPONDET + NUMPONDETALL
-!dev        write (iout, 11) NUMPOND + NUMPONDALL
+        write (iout, 10) NUMPONDET + NUMPONDETALL
+        write (iout, 11) NUMPOND + NUMPONDALL
       ELSE
         BACKSPACE(IN)
       END IF
@@ -3132,12 +3137,12 @@
         !
         !1 - -----limit diversion to water right and flow in river
         !
-      if(iseg==9.and.kper==8.and.kstp==1)then
-!dev      etdif = pettotal - aettotal
-!dev          write(999,33)kper,kstp,kiter,SEG(2, iseg),
-!dev     +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
-        endif
-  33  format(3i5,6e20.10)
+  !    if(iseg==9.and.kper==8.and.kstp==1)then
+  !    etdif = pettotal - aettotal
+  !        write(999,33)kper,kstp,kiter,SEG(2, iseg),
+  !   +                 SUPACT(iseg),pettotal,aettotal,demand(ISEG),etdif
+  !      endif
+  !33  format(3i5,6e20.10)
         IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
 300   CONTINUE
       RETURN
@@ -3337,13 +3342,13 @@
      +       demand_inch_acres = SNGL(Dprst_vol_open(ipond))
         PONDFLOW(i) = demand_inch_acres/MFQ_to_inch_acres
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
-!dev        if(i==2)then
-!dev      !etdif = pettotal - aettotal
-!dev          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
-!dev     +                 PONDSEGFLOW(I),pettotal,aettotal,
-!dev     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
-!dev        endif
-!dev  33  format(4i5,6e20.10)
+!        if(i==2)then
+      !etdif = pettotal - aettotal
+!          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
+!     +                 PONDSEGFLOW(I),pettotal,aettotal,
+!     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
+!        endif
+!  33  format(4i5,6e20.10)
 300   continue
       return
       end subroutine demandpond_prms
@@ -3426,11 +3431,11 @@
          SEG(2, iseg) = 0.0
          if (TIMEINPERIODSEG(ISEG) > IRRPERIODSEG(ISEG)) then
             if (factor <= TRIGGERPERIODSEG(ISEG)) then
-               SEG(2, iseg) = DEMAND(iseg)
-               TIMEINPERIODSEG(ISEG) = 0.0
+                SEG(2, iseg) = DEMAND(iseg)
+                TIMEINPERIODSEG(ISEG) = done
             end if
          end if
-         if (TIMEINPERIODSEG(ISEG) < IRRPERIODSEG(ISEG))
+         if (TIMEINPERIODSEG(ISEG) - DELT < IRRPERIODSEG(ISEG))
      +                              SEG(2, iseg) = DEMAND(iseg)
 300    continue
        deallocate (petseg, aetseg)
@@ -3689,12 +3694,12 @@
       USE GLOBAL, ONLY: DELR, DELC, ISSFLG
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id !,
-!dev     +    Agriculture_dprst_flag
+!     +    Agriculture_dprst_flag
       USE PRMS_BASIN, ONLY: Hru_area
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Hru_actet !, Dprst_vol_open
-      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row !,
-!dev     +                      Mfq_to_inch_acres
+      USE PRMS_FLOWVARS, ONLY: Hru_actet, Dprst_vol_open
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row,
+     +                      Mfq_to_inch_acres
       IMPLICIT NONE
 ! --------------------------------------
       !arguments
@@ -3746,8 +3751,8 @@
                 Q = PONDSEGFLOW(I)
                 QQ = PONDFLOW(I)
                 QQQ = 0.0
-!dev                if ( Agriculture_dprst_flag == 1 )   !uncommment this and next line
-!dev     +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+!                if ( Agriculture_dprst_flag == 1 )   !uncommment this and next line
+!     +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
                 CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
      +                          Q, QQ, QQQ)
               END IF
@@ -3790,13 +3795,13 @@
            Q = Q + PONDSEGFLOW(I)
            QQ = QQ + PONDFLOW(I)
            hru_id = IRRPONDVAR(I)
-!dev           sub = DZERO
-!dev           if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
-!dev             if ( ISSFLG(kkper) == 0 ) sub = 
-!dev     +            Dprst_vol_open(hru_id)/MFQ_to_inch_acres
-!dev             if ( sub < DZERO ) sub = DZERO
-!dev             QQQ = QQQ + sub
-!dev           end if
+           sub = DZERO
+!           if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
+!             if ( ISSFLG(kkper) == 0 ) sub = 
+!     +            Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+!             if ( sub < DZERO ) sub = DZERO
+!             QQQ = QQQ + sub
+!           end if
          END DO
          hru_id = 0
          CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
@@ -4306,6 +4311,50 @@
      +     , 9X, 'PERCENT DISCREPANCY =', F15.2, ///)
 !
       END
+
+C
+C-------SUBROUTINE SFR2MODSIM
+C
+      SUBROUTINE AG2MODSIM(Diversions)
+C     *******************************************************************
+C     Pass Irrigation demand to MODSIM 
+C     
+!--------January 17, 2022
+C     *******************************************************************
+      USE GWFSFRMODULE, ONLY: SEG, IDIVAR, NSS
+      USE GWFAGMODULE
+      USE GWFBASMODULE, ONLY: DELT
+      IMPLICIT NONE
+C     -------------------------------------------------------------------
+C     SPECIFICATIONS:
+C     -------------------------------------------------------------------
+C     ARGUMENTS
+      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(NSS)
+C     -------------------------------------------------------------------
+!      INTEGER 
+!      DOUBLE PRECISION 
+C     -------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     -------------------------------------------------------------------
+      INTEGER :: ISEG, i
+!      double precision :: total !delete this
+C     -------------------------------------------------------------------
+C
+C1------LOOP OVER SEGMETS
+C
+C
+C2------Set diversion demand from that calculated from AG.
+C 
+        do i = 1, NUMIRRDIVERSIONSP
+          iseg = IRRSEG(i)        
+          !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
+            Diversions(ISEG) = SEG(2,iseg)*DELT
+          !END IF
+        END DO
+C
+C8------RETURN.
+      RETURN
+      END SUBROUTINE AG2MODSIM
       !
       SUBROUTINE GWF2AG7DA()
       ! Deallocate AG MEMORY

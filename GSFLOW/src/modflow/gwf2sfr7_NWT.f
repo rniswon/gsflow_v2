@@ -109,7 +109,7 @@ C     ------------------------------------------------------------------
       ALLOCATE (SFRRATIN, SFRRATOUT)
       ALLOCATE (STRMDELSTOR_CUM, STRMDELSTOR_RATE)
       ALLOCATE (SFRUZINFIL, SFRUZDELSTOR, SFRUZRECH)
-      ALLOCATE (ITRFLG,NUMTAB,MAXVAL)
+      ALLOCATE (ITRFLG,NUMTAB_SFR,MAXVAL)
       ALLOCATE (STRHC1KHFLAG,STRHC1KVFLAG,FACTORKH,FACTORKV)
       ALLOCATE (FLOWTYPE(5)) ! POSITION 1: VOLUME; 2: REACH LENGTH; 3: PRECIP; 4: EVAP; 5: RUNOFF
       ALLOCATE (NFLOWTYPE)
@@ -136,7 +136,7 @@ C         DLEAK, ISTCB1, ISTCB2.
       SFRRATIN = 0.0
       SFRRATOUT = 0.0
       TOTSPFLOW = 0.0D0
-      NUMTAB = 0
+      NUMTAB_SFR = 0
       MAXVAL = 1
       IRFG = 0
       MXVL = 0
@@ -295,13 +295,13 @@ Cdep  changed DSTROT to FXLKOT
 Cdep  allocate space for stream outflow derivatives for lake package
       ALLOCATE (DLKOTFLW(200,nssar), SLKOTFLW(200,nssar))
       ALLOCATE (DLKSTAGE(200,nssar))
-      IF ( NUMTAB.GT.0 ) THEN
-        ALLOCATE (TABFLOW(MAXVAL,nssar+NUMTAB+1), 
-     +            TABTIME(MAXVAL,nssar+NUMTAB+1))
+      IF ( NUMTAB_SFR.GT.0 ) THEN
+        ALLOCATE (TABFLOW(MAXVAL,nssar+NUMTAB_SFR+1), 
+     +            TABTIME(MAXVAL,nssar+NUMTAB_SFR+1))
       ELSE
         ALLOCATE (TABFLOW(1,1), TABTIME(1,1))
       END IF 
-      ALLOCATE (ISFRLIST(3,nssar+NUMTAB))
+      ALLOCATE (ISFRLIST(3,nssar+NUMTAB_SFR))
       TABFLOW = 0.0
       TABTIME = 0.0
       ISFRLIST = 0
@@ -1028,11 +1028,11 @@ C
               WRITE(IOUT,'(A)')' TRANSIENT ROUTING IN STREAMS IS ACTIVE'
               WRITE(iout,*)
             case('TABFILES')
-              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB,R,IOUT,IN)
-              IF(NUMTAB.LT.0) NUMTAB=0
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB_SFR,R,IOUT,IN)
+              IF(NUMTAB_SFR.LT.0) NUMTAB_SFR=0
               CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
               IF(MAXVAL.LT.0) MAXVAL=0
-              WRITE(IOUT,31) NUMTAB,MAXVAL
+              WRITE(IOUT,31) NUMTAB_SFR,MAXVAL
             case('LOSSFACTOR')
               WRITE(IOUT,*)
               CALL URWORD(line, lloc, istart, istop, 3, i, FACTOR,
@@ -1083,11 +1083,11 @@ C
               WRITE(iout,*)
               found = .true.
             case('TABFILES')
-              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB,R,IOUT,IN)
-              IF(NUMTAB.LT.0) NUMTAB=0
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB_SFR,R,IOUT,IN)
+              IF(NUMTAB_SFR.LT.0) NUMTAB_SFR=0
               CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
               IF(MAXVAL.LT.0) MAXVAL=0
-              WRITE(IOUT,31) NUMTAB,MAXVAL
+              WRITE(IOUT,31) NUMTAB_SFR,MAXVAL
               found = .true.
             case('STRHC1KH')
               STRHC1KHFLAG = 1
@@ -2026,8 +2026,8 @@ C        LAKES ARE COMPUTED IN THE LAKE PACKAGE.
       END IF
 CC45-----READ TABLES FOR SPECIFIED INFLOWS
       IF ( Kkper.EQ.1 ) THEN
-        IF ( NUMTAB.GT.0 ) THEN
-          DO i=1,NUMTAB
+        IF ( NUMTAB_SFR.GT.0 ) THEN
+          DO i=1,NUMTAB_SFR
 ! segment number, number of rows, unit number
             READ(In,*)ISFRLIST(1,i),ISFRLIST(2,i),ISFRLIST(3,i)
             WRITE(iout,9033)ISFRLIST(1,i),ISFRLIST(3,i)
@@ -2083,6 +2083,8 @@ C     *****************************************************************
 !!      USE GWFNWTMODULE, ONLY: Heps, A, IA, Icell
       USE GWFLAKMODULE, ONLY: THETA, STGOLD, STGNEW, LKARR1
 !!      USE GWFLAKMODULE, ONLY: THETA, STGOLD, STGNEW, VOL, LKARR1
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
+!      USE PRMS_MODULE, ONLY: MODSIM_flag
       IMPLICIT NONE
       INTRINSIC IABS, ABS, DABS, MIN, DSQRT, FLOAT, SQRT, SNGL
 C     -----------------------------------------------------------------
@@ -2130,8 +2132,8 @@ C     -----------------------------------------------------------------
       INTEGER i, ibflg, ic, icalc, idivseg, iflg, iic, iic2, iic3, iic4,
      +        il, ilay, iprior, iprndpth, iprvsg, ir, istsg, itot,itrib,
      +        itstr, iwidthcheck, kerp, kss, l, lk, ll, nstrpts, nreach,
-     +        maxwav, icalccheck, iskip, iss, lsub, numdelt, irt,
-     +        lfold, illake, lakid
+     +        maxwav, icalccheck, iskip, iss, lsub, numdelt, irt, ifm,
+     +        lfold, illake, lakid, isfr_loop, mskip
 !      INTEGER irr, icc, icount  !cjm
       DOUBLE PRECISION FIVE_THIRDS
       PARAMETER (FIVE_THIRDS=5.0D0/3.0D0)
@@ -2177,6 +2179,11 @@ C2b-----START INTERNAL TIME LOOP FOR STREAMFLOW ROUTING.
         numdelt = 1
       END IF
       DO irt = 1, numdelt
+C
+        isfr_loop = 1
+!        IF ( MODSIM_flag==ACTIVE ) isfr_loop = 2
+C2c-----FORCE THE SFR7FM LOOP TO COMPLETE TWICE
+        DO ifm = 1, isfr_loop
 C
 C3------DETERMINE LAYER, ROW, COLUMN OF EACH REACH.
         DO l = 1, NSTRM
@@ -3511,7 +3518,10 @@ C75-----STORE FLOWS NEEDED FOR SENSITIVITIES. - ERB
             END IF
 C
 C76-----ADD TERMS TO RHS AND HCOF IF FLOBOT IS NOT ZERO.
-          IF ( irt.EQ.numdelt ) THEN
+          mskip = 1
+!          IF ( irt.EQ.numdelt .AND. MODSIM_flag==ACTIVE .AND. ifm==2 )
+!     1         mskip = 0
+          IF ( irt.EQ.numdelt .OR. mskip==0 ) THEN
             hstrave = 0.0D0
             DO i = 1, numdelt
               hstrave = hstrave + HSTRM(l,i)
@@ -3571,11 +3581,13 @@ C         STREAMBED BOTTOM ELEVATION.
               RHS(ic, ir, il) = RHS(ic, ir, il) - SUMRCH(l)
  !      fin=fin+sumrch(l)
             END IF
-            END IF
+          END IF
 !      write(iout,*)'in fm',l,fin,fout
         END DO !rsr, end l = 1, NSTRM loop
-C        
-C81-----END INTERNAL TIME LOOP FOR ROUTING STREAMFLOWS.
+C
+C81A----END THE LOOP THAT FORCES THE FM ROUTINES TO SOLVE TWICE
+        END DO
+C81b----END INTERNAL TIME LOOP FOR ROUTING STREAMFLOWS.
       END DO !rsr, end irt loop
 C
 C82-----RETURN.
@@ -8278,9 +8290,9 @@ C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFBASMODULE, ONLY: TOTIM
-      USE GWFSFRMODULE, ONLY: NSS, NUMTAB, ISFRLIST,
+      USE GWFSFRMODULE, ONLY: NSS, NUMTAB_SFR, ISFRLIST,
      +                        SEG, FXLKOT, IDIVAR, CLOSEZERO
-!!      USE GWFSFRMODULE, ONLY: NSS, TABFLOW, TABTIME, NUMTAB, ISFRLIST,
+!!      USE GWFSFRMODULE, ONLY: NSS, TABFLOW, TABTIME, NUMTAB_SFR, ISFRLIST,
 !!     +                        SEG, FXLKOT, IDIVAR, CLOSEZERO
       USE GLOBAL, ONLY: IOUT
       IMPLICIT NONE
@@ -8299,8 +8311,8 @@ C-------SET POINTERS FOR CURRENT GRID.
       CALL SGWF2SFR7PNT(Igrid)
 C
 C1------CALL LINEAR INTERPOLATION ROUTINE
-      IF ( NUMTAB.GT.0 ) THEN
-        DO i = 1, NUMTAB
+      IF ( NUMTAB_SFR.GT.0 ) THEN
+        DO i = 1, NUMTAB_SFR
           iseg = ISFRLIST(1,i)
           SEG(2,iseg) = FLOWTERP(TOTIM,i)  
         END DO
@@ -8337,7 +8349,7 @@ C     FUNCTION LINEARLY INTERPOLATES BETWEEN TWO VALUES
 C     OF TIME TO CACULATE SPECIFIED INFLOW TO SEGMENTS.
       USE GWFSFRMODULE, ONLY: TABFLOW, TABTIME, ISFRLIST,
      +                        CLOSEZERO
-!!      USE GWFSFRMODULE, ONLY: TABFLOW, TABTIME, NUMTAB, ISFRLIST,
+!!      USE GWFSFRMODULE, ONLY: TABFLOW, TABTIME, NUMTAB_SFR, ISFRLIST,
 !!     +                        CLOSEZERO
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
@@ -8654,7 +8666,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%STRHC1KHFLAG)
       DEALLOCATE (GWFSFRDAT(IGRID)%STRHC1KVFLAG)
       DEALLOCATE (GWFSFRDAT(IGRID)%Nfoldflbt)
-      DEALLOCATE (GWFSFRDAT(IGRID)%NUMTAB)
+      DEALLOCATE (GWFSFRDAT(IGRID)%NUMTAB_SFR)
       DEALLOCATE (GWFSFRDAT(IGRID)%MAXVAL)
 C
       END SUBROUTINE GWF2SFR7DA
@@ -8769,7 +8781,7 @@ C     ------------------------------------------------------------------
       STRHC1KHFLAG=>GWFSFRDAT(IGRID)%STRHC1KHFLAG
       STRHC1KVFLAG=>GWFSFRDAT(IGRID)%STRHC1KVFLAG
       Nfoldflbt=>GWFSFRDAT(IGRID)%Nfoldflbt
-      NUMTAB=>GWFSFRDAT(IGRID)%NUMTAB
+      NUMTAB_SFR=>GWFSFRDAT(IGRID)%NUMTAB_SFR
       MAXVAL=>GWFSFRDAT(IGRID)%MAXVAL
       END SUBROUTINE SGWF2SFR7PNT
 C
@@ -8883,7 +8895,7 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%STRHC1KHFLAG=>STRHC1KHFLAG
       GWFSFRDAT(IGRID)%STRHC1KVFLAG=>STRHC1KVFLAG
       GWFSFRDAT(IGRID)%Nfoldflbt=>Nfoldflbt
-      GWFSFRDAT(IGRID)%NUMTAB=>NUMTAB
+      GWFSFRDAT(IGRID)%NUMTAB_SFR=>NUMTAB_SFR
       GWFSFRDAT(IGRID)%MAXVAL=>MAXVAL
 C
       END SUBROUTINE SGWF2SFR7PSV
