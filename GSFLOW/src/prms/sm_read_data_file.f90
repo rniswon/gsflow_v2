@@ -7,7 +7,6 @@ contains
 
   module subroutine read_prms_data_file()
       USE PRMS_CONSTANTS, ONLY: ERROR_time, ERROR_read, ERROR_open_in, MAXDATALINE_LENGTH, MAXFILE_LENGTH
-      use PRMS_CONTROL_FILE, only: control_string
       USE PRMS_MODULE, ONLY: PRMS_output_unit, Print_debug, Starttime, Endtime, EQULS, Data_file
       use prms_utils, only: error_stop, find_current_time, numchars, PRMS_open_input_file, read_error, write_outfile
       IMPLICIT NONE
