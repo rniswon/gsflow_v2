@@ -323,7 +323,7 @@
       Basin_ag_soil_rechr = Basin_ag_soil_rechr*Basin_area_inv
 
       IF ( Iter_aet_flag==ACTIVE .OR. Ag_package==ACTIVE .OR. Agriculture_soilzone_flag==ACTIVE ) &
-     &     ALLOCATE ( It0_ag_soil_rechr(Nhru), It0_ag_soil_moist(Nhru), It0_ag_gvr_stor(Nhru) )
+     &     ALLOCATE ( It0_ag_soil_rechr(Nhru), It0_ag_soil_moist(Nhru) )
 
       Soil_iter = 1
       iter_nonconverge = 0
