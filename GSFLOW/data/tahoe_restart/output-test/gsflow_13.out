@@ -17,25 +17,25 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        2168606.78     EVAPOTRANSPIRATION =         484308.74
+   EVAPOTRANSPIRATION =        2168631.94     EVAPOTRANSPIRATION =         484289.25
            STREAMFLOW =        2.9240D+07             STREAMFLOW =        4453044.50
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
    INFLOWS - OUTFLOWS =        1.3013D+08     INFLOWS - OUTFLOWS =        4.0293D+07
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        1.2992D+08         STORAGE CHANGE =        4.0247D+07
+ TOTAL STORAGE CHANGE =        1.2987D+08         STORAGE CHANGE =        4.0248D+07
        --------------                             --------------
          LAND SURFACE =        1.1908D+08           LAND SURFACE =        3.3650D+07
-            SOIL ZONE =        -669957.30              SOIL ZONE =         -62994.31
-     UNSATURATED ZONE =         581292.58       UNSATURATED ZONE =          59809.66
-       SATURATED ZONE =       -1332747.48         SATURATED ZONE =        -178798.94
-                LAKES =        1.2260D+07                  LAKES =        6778812.50
+            SOIL ZONE =        -667205.27              SOIL ZONE =         -63384.29
+     UNSATURATED ZONE =         589719.30       UNSATURATED ZONE =          60250.96
+       SATURATED ZONE =       -1345197.45         SATURATED ZONE =        -177785.75
+                LAKES =        1.2208D+07                  LAKES =        6778928.50
 
- OVERALL BUDGET ERROR =         207198.41           BUDGET ERROR =          45846.58
+ OVERALL BUDGET ERROR =         260531.21           BUDGET ERROR =          44685.55
 
 
-  PERCENT DISCREPANCY =              0.13    PERCENT DISCREPANCY =              0.10
+  PERCENT DISCREPANCY =              0.16    PERCENT DISCREPANCY =              0.10
 
 
 
