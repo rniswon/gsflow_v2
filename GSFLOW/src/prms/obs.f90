@@ -59,7 +59,8 @@
      &     'Maximum number of lake elevations for any rating table data set')/=0 ) CALL read_error(7, 'nlakeelev')
       IF ( decldim('nwind', 0, MAXDIM, 'Number of wind-speed measurement stations')/=0 ) CALL read_error(7, 'nwind')
       IF ( decldim('nhumid', 0, MAXDIM, 'Number of relative humidity measurement stations')/=0 ) CALL read_error(7, 'nhumid')
-      IF ( decldim('nstream_temp', 0, MAXDIM, 'Number of stream temperature replacement segments')/=0 ) CALL read_error(7, 'nstream_temp')
+      IF ( decldim('nstream_temp', 0, MAXDIM, 'Number of stream temperature replacement segments')/=0 ) &
+     &     CALL read_error(7, 'nstream_temp')
 
       END FUNCTION obssetdims
 

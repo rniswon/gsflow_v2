@@ -656,13 +656,16 @@
         Soil_zone_max(i) = Sat_threshold(i) + Soil_moist_max(i)*Hru_frac_perv(i)
         Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*Hru_frac_perv(i)
         IF ( perv_area>0.0 ) THEN
-          IF ( Soil_moist_max(i)>0.0 ) Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Soil_moist(i)/Soil_moist_max(i)*perv_area )
+          IF ( Soil_moist_max(i)>0.0 ) Basin_cpr_stor_frac = Basin_cpr_stor_frac + &
+     &         DBLE( Soil_moist(i)/Soil_moist_max(i)*perv_area )
           Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)
           Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
           IF ( Soil_lower_stor_max(i)>0.0 ) Soil_lower_ratio(i) = Soil_lower(i)/Soil_lower_stor_max(i)
-          IF ( Soil_zone_max(i) > 0.0 ) Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_tot(i)/Soil_zone_max(i)*hruarea )   !RGN added to avoid divide by zero 1/20/2022
+          IF ( Soil_zone_max(i) > 0.0 ) Basin_sz_stor_frac = Basin_sz_stor_frac + &
+     &         DBLE( Soil_moist_tot(i)/Soil_zone_max(i)*hruarea )   !RGN added to avoid divide by zero 1/20/2022
           Basin_soil_lower_stor_frac = Basin_soil_lower_stor_frac + DBLE( Soil_lower_ratio(i)*perv_area )
-          IF ( Soil_rechr_max(i)>0.0 ) Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + DBLE( Soil_rechr(i)/Soil_rechr_max(i)*perv_area )
+          IF ( Soil_rechr_max(i)>0.0 ) Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + &
+     &         DBLE( Soil_rechr(i)/Soil_rechr_max(i)*perv_area )
           Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*perv_area )
           Basin_soil_moist_tot = Basin_soil_moist_tot + DBLE( Soil_moist_tot(i)*hruarea )
           Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(i)*perv_area )
@@ -1211,7 +1214,8 @@
         IF ( Soil_zone_max(i) > 0.0 ) Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_tot(i)/Soil_zone_max(i)*harea ) !RGN added to avoid divide by zero. 1/20/2022
         Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_tot(i)/Soil_zone_max(i)*harea )
         Basin_soil_lower_stor_frac = Basin_soil_lower_stor_frac + DBLE( Soil_lower_ratio(i)*perv_area )
-        IF ( Soil_rechr_max(i)>0.0 ) Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + DBLE( Soil_rechr(i)/Soil_rechr_max(i)*perv_area )
+        IF ( Soil_rechr_max(i)>0.0 ) Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + &
+     &       DBLE( Soil_rechr(i)/Soil_rechr_max(i)*perv_area )
         Recharge(i) = Soil_to_gw(i) + Ssr_to_gw(i)
         IF ( Dprst_flag==1 ) Recharge(i) = Recharge(i) + SNGL( Dprst_seep_hru(i) )
         Basin_recharge = Basin_recharge + DBLE( Recharge(i)*harea )
