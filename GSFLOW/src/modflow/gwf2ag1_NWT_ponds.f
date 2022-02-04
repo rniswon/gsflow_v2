@@ -1070,6 +1070,15 @@
             CHAR = CHAR2
             write (iout, '(/1x,a)') 'PROCESSING '//
      +             trim(adjustl(CHAR2))//''
+            IF ( IUNITSFR == 0 ) THEN
+               WRITE (IOUT, *)
+                    WRITE (IOUT, *) 'SFR PACKAGE IS NOT ACTIVE',
+     +                               ' AND MUST BE ACTIVE FOR ',
+     +                               ' SEGMENT LIST. MODEL STOPPING'
+                    WRITE (IOUT, *)
+                    CALL USTOP('ERROR IN AG:SFR PACKAGE MUST BE ACTIVE',
+     +                         'MODEL STOPPING')  
+            END IF
             nseg = 0
             do
                nseg = nseg + 1
@@ -1102,6 +1111,14 @@
                      WRITE (IOUT, *)
                      CALL USTOP('ERROR: INVALID SEGMENT VALUE
      +                     CHECK AG SEGMENT LIST INPUT.MODEL STOPPING')
+                  else if (iseg > NSS) then
+                     WRITE (IOUT, *)
+                     WRITE (IOUT, *) 'ERROR: INVALID SEGMENT VALUE',
+     +                               ' CHECK AG SEGMENT LIST INPUT.',
+     +                               ' MODEL STOPPING'
+                     WRITE (IOUT, *)
+                     CALL USTOP('ERROR: INVALID SEGMENT VALUE
+     +                     CHECK AG SEGMENT LIST INPUT.MODEL STOPPING')
                   else
                      is = is + 1
                      seglist(is) = iseg
@@ -1127,6 +1144,14 @@
                   exit
                 case default
                   IF (NUMTABPOND .EQ. 0) THEN
+                    IF (L > Numirrpond) THEN
+                      WRITE (IOUT, *)
+                      WRITE (IOUT, *) 'ERROR: Number of ponds in POND '
+     +                        ,'LIST is greater than Numirrpond',
+     +                        ' MODEL STOPPING.'
+                      WRITE (IOUT, *)
+                      CALL USTOP('ERROR: Too many ponds in list')
+                    END IF
                     LLOC = 1 
                     CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IPOND, R,
      +                           IOUT, IN)
@@ -1212,15 +1237,15 @@
                      END DO
                    END IF
                  DO I = 1, NSEGDIMTEMP
-     !!!              IF ( PONDSEGFRAC(I) > DONEP ) THEN
-     !!!                IF ( .NOT. ierror)
-     !!!+                       WRITE (IOUT, *) 'ERROR: SEGMENT INFLOW ',
-     !!!+                          ' FRACTION FOR ALL IRR PONDS SUMS TO',
-     !!!+                          ' GREATER THAN ONE. MODEL STOPPING'
-     !!!                      WRITE (IOUT, *)'SEGMENT= ',I,'SUM= ',
-     !!!+                                     PONDSEGFRAC(I)
-     !!!               ierror = .true.
-     !!!              END IF
+                   IF ( PONDSEGFRAC(I) > DONEP ) THEN
+                     IF ( .NOT. ierror)
+     +                       WRITE (IOUT, *) 'ERROR: SEGMENT INFLOW ',
+     +                          ' FRACTION FOR ALL IRR PONDS SUMS TO',
+     +                          ' GREATER THAN ONE. MODEL STOPPING'
+                           WRITE (IOUT, *)'SEGMENT= ',I,'SUM= ',
+     +                                     PONDSEGFRAC(I)
+                    ierror = .true.
+                   END IF
                  END DO
                  IF ( ierror )  CALL USTOP('ERROR: SEGMENT INFLOW'//
      +              ' FRACTION TO PONDS IS GREATER THAN ONE.'//
@@ -1888,8 +1913,7 @@
          IF (NMCL > MAXCELLSPOND) THEN
             WRITE (IOUT, *)
             WRITE (IOUT, 105) MAXCELLSPOND, NMCL
-            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
-     +                 'PONDS')
+            STOP
          END IF
          TEST = .TRUE.
          DO 200 IP = 1, NUMIRRPOND
@@ -1912,7 +1936,8 @@
      +                 'PONDS')  
          END IF
          IF (TEST) THEN
-           WRITE(IOUT,107)IRWL 
+           WRITE(IOUT,*)IRWL
+           WRITE(IOUT,107)
            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
      +                 'PONDS')
          END IF
@@ -1924,6 +1949,7 @@
            IF (IRRHRU_POND(K, IPOND) <= 0 .OR. 
      +         IRRHRU_POND(K, IPOND) > NHRU) THEN
              WRITE (IOUT, 106)
+             WRITE (IOUT, *)
              CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
      +                 'PONDS')
            END IF
@@ -2388,7 +2414,7 @@
         IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
           PONDSEGFLOW(L) = szero
         ELSE
-          IF ( POND(3,L) > 0 ) THEN
+          IF ( POND(3,L) > 0 .and. NUMCELLSPOND(L) > 0 ) THEN
             PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))
 !      write(888,121)POND(3,L),kkper,kkstp,kkiter,POND(4,L),
 !     +            PONDSEGFLOW(L),seg(2,POND(3,L))
