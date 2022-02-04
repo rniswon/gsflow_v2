@@ -84,6 +84,7 @@
 
 ! NEW VARIABLES and PARAMETERS for APPLICATION RATES
       ALLOCATE ( Net_apply(Nhru) )
+      ALLOCATE ( Irr_type(Nhru) )
       Use_transfer_intcp = OFF
       IF ( Water_use_flag==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ! always declare for GSFLOW as may be needed if the AG Package is active
@@ -106,7 +107,6 @@
         CALL declvar_real(MODNAME, 'net_apply', 'nhru', Nhru, &
      &       'canopy_gain minus interception', &
      &       'inches', Net_apply)
-        ALLOCATE ( Irr_type(Nhru) )
         IF ( declparam(MODNAME, 'irr_type', 'nhru', 'integer', &
      &       '0', '0', '2', &
      &       'Application method of irrigation water', &

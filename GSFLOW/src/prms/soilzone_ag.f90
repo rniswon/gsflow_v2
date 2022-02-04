@@ -262,8 +262,7 @@
       INTEGER FUNCTION szinit_ag()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, LAKE, GLACIER, INACTIVE, OFF, MONTHS_PER_YEAR
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru, Hru_type, Iter_aet_flag, GSFLOW_flag, &
-     &    Ag_package, Agriculture_soilzone_flag 
+      USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru, Hru_type, Iter_aet_flag, GSFLOW_flag, Ag_package, Agriculture_soilzone_flag
       USE PRMS_SOILZONE, ONLY: MODNAME, Soil2gw_max
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Basin_area_inv, Ag_area, Covden_win, Covden_sum
@@ -326,7 +325,7 @@
       Basin_ag_soil_moist = Basin_ag_soil_moist*Basin_area_inv
       Basin_ag_soil_rechr = Basin_ag_soil_rechr*Basin_area_inv
 
-      IF ( Ag_package==ACTIVE .OR. Agriculture_soilzone_flag==ACTIVE .OR. Iter_aet_flag==ACTIVE ) &
+      IF ( Iter_aet_flag==ACTIVE .OR. Ag_package==ACTIVE .OR. Agriculture_soilzone_flag==ACTIVE ) &
      &     ALLOCATE ( It0_ag_soil_rechr(Nhru), It0_ag_soil_moist(Nhru) )
 
       Soil_iter = 1
