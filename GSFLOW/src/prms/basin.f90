@@ -256,7 +256,7 @@
      &       'Identification number of the lake associated with an HRU;'// &
      &       ' more than one HRU can be associated with each lake', &
      &       'none')/=0 ) CALL read_error(1, 'lake_hru_id')
-        IF ( (Lake_route_flag==ACTIVE .AND. GSFLOW_flag==OFF ) .OR. Model==DOCUMENTATION ) THEN
+        IF ( Lake_route_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Lake_type(Nlake) )
           IF ( declparam(MODNAME, 'lake_type', 'nlake', 'integer', &
      &         '1', '1', '6', &

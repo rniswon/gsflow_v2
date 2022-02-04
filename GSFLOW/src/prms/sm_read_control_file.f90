@@ -474,8 +474,8 @@ contains
     Control_parameter_data(i) % name = 'nhruOutVar_names'
     Control_parameter_data(i) % data_type = CHAR_TYPE
     Control_parameter_data(i) % allocate_flag = 1 ! need to allocate
-    i = i + 1
 
+    i = i + 1
     Control_parameter_data(i) % name = 'gsf_rpt'
     Gsf_rpt = 1
     Control_parameter_data(i) % values_int(1) = Gsf_rpt
@@ -483,8 +483,8 @@ contains
     Control_parameter_data(i) % name = 'rpt_days'
     Rpt_days = 7
     Control_parameter_data(i) % values_int(1) = Rpt_days
-    i = i + 1
 
+    i = i + 1
     ! floating point parameters
  !   Control_parameter_data(i) % name = 'initial_deltat'
  !   Initial_deltat = 24.0

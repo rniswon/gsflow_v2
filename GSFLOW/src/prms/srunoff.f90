@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2022-01-21'
+      character(len=*), parameter :: Version_srunoff = '2022-02-04'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -1486,16 +1486,17 @@
       IF ( Dprst_add_water_use==ACTIVE ) THEN
         IF ( Dprst_gain(Ihru)>0.0 ) inflow = inflow + Dprst_gain(Ihru) / SNGL( Cfs_conv )
       ENDIF
-      IF ( Ag_package==ACTIVE ) inflow = inflow + Dprst_ag_gain(Ihru) - Dprst_ag_transfer(Ihru) ! in inch-acres
+      IF ( Ag_package==ACTIVE ) &
+     &     inflow = inflow + (Dprst_ag_gain(Ihru) - Dprst_ag_transfer(Ihru)) / Hruarea ! again and transfer in acre-inches
 
       Dprst_in = 0.0D0
       IF ( Dprst_area_open_max>0.0 ) THEN
-        Dprst_in = DBLE( inflow*Dprst_area_open_max ) ! inch-acres
+        Dprst_in = DBLE( inflow*Dprst_area_open_max ) ! acre-inches
         Dprst_vol_open = Dprst_vol_open + Dprst_in
       ENDIF
 
       IF ( Dprst_area_clos_max>0.0 ) THEN
-        tmp1 = DBLE( inflow*Dprst_area_clos_max ) ! inch-acres
+        tmp1 = DBLE( inflow*Dprst_area_clos_max ) ! acre-inches
         Dprst_vol_clos = Dprst_vol_clos + tmp1
         Dprst_in = Dprst_in + tmp1
       ENDIF
