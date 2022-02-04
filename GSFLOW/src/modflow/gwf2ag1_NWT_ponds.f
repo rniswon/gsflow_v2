@@ -2416,12 +2416,9 @@
         ELSE
           IF ( POND(3,L) > 0 .and. NUMCELLSPOND(L) > 0 ) THEN
             PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))
-!      write(888,121)POND(3,L),kkper,kkstp,kkiter,POND(4,L),
-!     +            PONDSEGFLOW(L),seg(2,POND(3,L))
           END IF
         END IF
       END DO
-!121   format(e20.10,3i6,3e20.10)
       !
       !2 - -----IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF (ETDEMANDFLAG > 0) THEN
@@ -2848,7 +2845,7 @@
       END DO
       DO L = 1, NUMIRRPOND
         IF ( FLOWTHROUGH_POND(L) == 0 ) THEN
-          IF ( POND(3,L) > 0 ) THEN
+          IF ( POND(3,L) > 0 .and. NUMCELLSPOND(L) > 0 ) THEN
             PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))
           END IF
         END IF
@@ -3365,7 +3362,7 @@
      +                (sone - REAL(AGCONVERGE))*SNGL(factor)
         !
         !set pond inflow using demand.
-        IF ( FLOWTHROUGH_POND(i) == 1 ) THEN
+        IF ( FLOWTHROUGH_POND(i) == 1 .and. NUMCELLSPOND(i) > 0 ) THEN
           PONDSEGFLOW(i) = PONDSEGFLOW(i) + PONDFLOW(i)  !need to constrain to available flow in segment
         END IF
         !
