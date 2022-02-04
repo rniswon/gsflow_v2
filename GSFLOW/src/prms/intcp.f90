@@ -8,7 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-12-16'
+      character(len=*), parameter :: Version_intcp = '2022-02-03'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -84,6 +84,7 @@
 
 ! NEW VARIABLES and PARAMETERS for APPLICATION RATES
       ALLOCATE ( Net_apply(Nhru) )
+      ALLOCATE ( Irr_type(Nhru) )
       Use_transfer_intcp = OFF
       IF ( Water_use_flag==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ! always declare for GSFLOW as may be needed if the AG Package is active
@@ -106,7 +107,6 @@
         CALL declvar_real(MODNAME, 'net_apply', 'nhru', Nhru, &
      &       'canopy_gain minus interception', &
      &       'inches', Net_apply)
-        ALLOCATE ( Irr_type(Nhru) )
         IF ( declparam(MODNAME, 'irr_type', 'nhru', 'integer', &
      &       '0', '0', '2', &
      &       'Application method of irrigation water', &
@@ -494,7 +494,7 @@
                 PRINT *, 'ag_frac=0.0 for HRU:', i
                 CALL error_stop('AG Package irrigation specified and ag_frac=0', ERROR_param)
               ENDIF
-              ag_water_maxin = Hru_ag_irr(i) / harea ! Hru_ag_irr is in inch-acres
+              ag_water_maxin = Hru_ag_irr(i) / harea ! Hru_ag_irr is in acre-inches
             ENDIF
           ENDIF
           IF ( Use_transfer_intcp==ACTIVE ) ag_water_maxin = ag_water_maxin + Canopy_gain(i)/SNGL(Cfs_conv)/harea ! Canopy_gain in CFS, convert to inches
