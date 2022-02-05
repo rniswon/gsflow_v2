@@ -701,7 +701,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
      2                              IUNIT(55),IGRID)   !cjm (added IUNIT(8))
             IF(IUNIT(66).GT.0 )
      1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
-            IF ( Szcheck==ACTIVE .and. kkiter == 1 ) THEN
+            IF ( Szcheck==ACTIVE ) THEN
               IF ( PRMS_land_iteration_flag==1 ) THEN
                 retval = intcp()
                 IF ( retval/=0 ) THEN
