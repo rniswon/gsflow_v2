@@ -305,9 +305,9 @@
       INTEGER FUNCTION routinginit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, FT2_PER_ACRE, NEARZERO, DNEARZERO, OUTFLOW_SEGMENT, ERROR_param, &
      &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
-     &    strmflow_muskingum_module, strmflow_in_out_module
+     &    strmflow_muskingum_module, strmflow_in_out_module, DEBUG_LESS
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Init_vars_from_file, &
+      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Init_vars_from_file, Print_debug, &
      &    Strmflow_flag, Water_use_flag, Segment_transferON_OFF, Inputerror_flag, Parameter_check_flag
       USE PRMS_ROUTING
       USE PRMS_SET_TIME, ONLY: Timestep_seconds
