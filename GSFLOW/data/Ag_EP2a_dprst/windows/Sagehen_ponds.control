@@ -169,7 +169,7 @@ srunoff_smidx
 soilzone_module
 1
 4
-soilzone
+soilzone_ag
 ####
 strmflow_module
 1

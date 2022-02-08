@@ -361,7 +361,7 @@ agriculture_soil_flag
 soilzone_module
 1
 4
-soilzone
+soilzone_ag
 ####
 executable_desc
 1
@@ -371,7 +371,7 @@ GSFLOW develop
 executable_model
 1
 4
-../../bin/gsflow_2.2.0.exe
+../../bin/gsflow.exe
 ####
 initial_deltat
 1

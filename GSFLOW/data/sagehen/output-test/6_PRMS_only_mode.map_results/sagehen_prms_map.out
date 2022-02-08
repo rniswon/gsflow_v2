@@ -106,10 +106,10 @@ Precipitation Distribution      precip_1sta         2021-11-19
 Solar Radiation Distribution    ddsolrad            2021-11-19
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2021-12-16
-Snow Dynamics                   snowcomp            2022-01-12
-Surface Runoff                  srunoff_smidx       2022-01-21
-Soilzone Computations           soilzone            2022-01-21
+Canopy Interception             intcp               2022-02-03
+Snow Dynamics                   snowcomp            2022-02-04
+Surface Runoff                  srunoff_smidx       2022-02-04
+Soilzone Computations           soilzone            2022-02-04
 Groundwater                     gwflow              2021-12-16
 Streamflow Routing              strmflow            2021-11-19
 Output Summary                  basin_sum           2022-01-12
@@ -157,5 +157,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  *************************************************************
  Total for run     668.938  378.199    9.262  284.576  260.348
  *************************************************************
-Execution elapsed time    0 minutes  1.19 seconds
+Execution elapsed time    0 minutes  1.67 seconds
 
