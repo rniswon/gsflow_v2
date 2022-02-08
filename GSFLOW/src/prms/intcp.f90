@@ -8,7 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2021-12-16'
+      character(len=*), parameter :: Version_intcp = '2022-02-03'
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
       DOUBLE PRECISION, SAVE :: Last_intcp_stor
@@ -494,7 +494,7 @@
                 PRINT *, 'ag_frac=0.0 for HRU:', i
                 CALL error_stop('AG Package irrigation specified and ag_frac=0', ERROR_param)
               ENDIF
-              ag_water_maxin = Hru_ag_irr(i) / harea ! Hru_ag_irr is in inch-acres
+              ag_water_maxin = Hru_ag_irr(i) / harea ! Hru_ag_irr is in acre-inches
             ENDIF
           ENDIF
           IF ( Use_transfer_intcp==ACTIVE ) ag_water_maxin = ag_water_maxin + Canopy_gain(i)/SNGL(Cfs_conv)/harea ! Canopy_gain in CFS, convert to inches
