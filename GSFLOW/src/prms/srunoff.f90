@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2021-12-16'
+      character(len=*), parameter :: Version_srunoff = '2022-02-04'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -637,10 +637,9 @@
       USE PRMS_CLIMATEVARS, ONLY: Potet, Tavgc
       USE PRMS_FLOWVARS, ONLY: Sroff, Infil, Imperv_stor, Pkwater_equiv, Dprst_vol_open, Dprst_vol_clos, &
      &    Imperv_stor_max, Snowinfil_max, Basin_sroff, Glacier_frac, Soil_moist, Soil_rechr, &
-     &    Ag_soil_moist, Ag_soil_rechr
+     &    Ag_soil_moist, Ag_soil_rechr, Pk_depth, Snowcov_area, Snow_evap, Snowmelt, Glacrb_melt
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Hru_intcpevap, Net_apply, Intcp_changeover, Use_transfer_intcp
-      USE PRMS_SNOW, ONLY: Snow_evap, Snowcov_area, Snowmelt, Pk_depth, Glacrb_melt
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL, DBLE
@@ -966,7 +965,7 @@
       USE PRMS_CONSTANTS, ONLY: NEARZERO, DNEARZERO, LAND, ACTIVE, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Cascade_flag
       USE PRMS_SRUNOFF, ONLY: Sri, Hruarea_imperv, Upslope_hortonian, Ihru, Srp, Isglacier, Sroff_ag, Basin_apply_sroff
-      USE PRMS_SNOW, ONLY: Pptmix_nopack
+      USE PRMS_FLOWVARS, ONLY: Pptmix_nopack
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Hru_type, Perv_on, Ag_on
@@ -1194,8 +1193,6 @@
 !     Compute cascading runoff (runoff in inche*acre/dt)
 !***********************************************************************
       SUBROUTINE run_cascade_sroff(Ncascade_hru, Runoff, Hru_sroff_down)
-!      USE PRMS_BASIN, ONLY: NEARZERO
-!      USE PRMS_MODULE, ONLY: Print_debug
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_SRUNOFF, ONLY: Ihru, Upslope_hortonian, Strm_seg_in
       USE PRMS_CASCADE, ONLY: Hru_down, Hru_down_frac, Hru_down_fracwt, Cascade_area
@@ -1225,23 +1222,6 @@
 
 ! reset Sroff as it accumulates flow to streams
       Runoff = Runoff - SNGL( Hru_sroff_down )
-!      IF ( Runoff<0.0 ) THEN
-!        IF ( Runoff<-NEARZERO ) THEN
-!          IF ( Print_debug>-1 ) PRINT *, 'runoff < NEARZERO', Runoff
-!          IF ( Hru_sroff_down>ABS(Runoff) ) THEN
-!            Hru_sroff_down = Hru_sroff_down - Runoff
-!          ELSE
-!            DO k = 1, Ncascade_hru
-!              j = Hru_down(k, Ihru)
-!              IF ( Strm_seg_in(j)>ABS(Runoff) ) THEN
-!                Strm_seg_in(j) = Strm_seg_in(j) - Runoff
-!                EXIT
-!              ENDIF
-!            ENDDO
-!          ENDIF
-!        ENDIF
-!        Runoff = 0.0
-!      ENDIF
 
       END SUBROUTINE run_cascade_sroff
 
@@ -1424,7 +1404,9 @@
           Dprst_stor_hru(i) = (Dprst_vol_open(i)+Dprst_vol_clos(i))/Hru_area_dble(i)
           IF ( Dprst_vol_open_max(i)>0.0 ) Dprst_vol_open_frac(i) = SNGL( Dprst_vol_open(i)/Dprst_vol_open_max(i) )
           IF ( Dprst_vol_clos_max(i)>0.0 ) Dprst_vol_clos_frac(i) = SNGL( Dprst_vol_clos(i)/Dprst_vol_clos_max(i) )
-          Dprst_vol_frac(i) = SNGL( (Dprst_vol_open(i)+Dprst_vol_clos(i))/(Dprst_vol_open_max(i)+Dprst_vol_clos_max(i)) )
+          if (Dprst_vol_open_max(i)+Dprst_vol_clos_max(i) > 0.0 ) then  !RGN added to avoid divide by zero 1/20/2022
+            Dprst_vol_frac(i) = SNGL( (Dprst_vol_open(i)+Dprst_vol_clos(i))/(Dprst_vol_open_max(i)+Dprst_vol_clos_max(i)) )
+          end if
         ENDIF
       ENDDO
       Basin_dprst_volop = Basin_dprst_volop*Basin_area_inv
@@ -1441,7 +1423,7 @@
      &           Dprst_vol_open_max, Dprst_vol_open, Dprst_area_open_max, Dprst_area_open, &
      &           Dprst_sroff_hru, Dprst_seep_hru, Sro_to_dprst_perv, Sro_to_dprst_imperv, Dprst_evap_hru, &
      &           Avail_et, Net_rain, Dprst_in)
-      USE PRMS_CONSTANTS, ONLY: ERROR_water_use, NEARZERO, DNEARZERO, OFF, ACTIVE ! , DEBUG_less
+      USE PRMS_CONSTANTS, ONLY: ERROR_water_use, NEARZERO, DNEARZERO, OFF, ACTIVE !, DEBUG_less
       USE PRMS_MODULE, ONLY: Cascade_flag, Dprst_add_water_use, Dprst_transfer_water_use, &
      &    Nowyear, Nowmonth, Nowday, Dprst_ag_gain, Dprst_ag_transfer, Ag_package !, Print_debug
       USE PRMS_SRUNOFF, ONLY: Srp, Sri, Ihru, Perv_frac, Imperv_frac, Hruarea, Dprst_et_coef, &
@@ -1454,8 +1436,7 @@
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_INTCP, ONLY: Net_snow
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv
-      USE PRMS_SNOW, ONLY: Snowmelt, Pptmix_nopack, Snowcov_area
+      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Snowcov_area, Snowmelt, Pptmix_nopack
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, LOG, MAX, DBLE, SNGL
@@ -1505,18 +1486,17 @@
       IF ( Dprst_add_water_use==ACTIVE ) THEN
         IF ( Dprst_gain(Ihru)>0.0 ) inflow = inflow + Dprst_gain(Ihru) / SNGL( Cfs_conv )
       ENDIF
-      IF ( Ag_package==ACTIVE ) THEN
-        inflow = inflow + Dprst_ag_gain(Ihru) - Dprst_ag_transfer(Ihru) ! in inch-acres
-      ENDIF
+      IF ( Ag_package==ACTIVE ) &
+     &     inflow = inflow + (Dprst_ag_gain(Ihru) - Dprst_ag_transfer(Ihru)) / Hruarea ! again and transfer in acre-inches
 
       Dprst_in = 0.0D0
       IF ( Dprst_area_open_max>0.0 ) THEN
-        Dprst_in = DBLE( inflow*Dprst_area_open_max ) ! inch-acres
+        Dprst_in = DBLE( inflow*Dprst_area_open_max ) ! acre-inches
         Dprst_vol_open = Dprst_vol_open + Dprst_in
       ENDIF
 
       IF ( Dprst_area_clos_max>0.0 ) THEN
-        tmp1 = DBLE( inflow*Dprst_area_clos_max ) ! inch-acres
+        tmp1 = DBLE( inflow*Dprst_area_clos_max ) ! acre-inches
         Dprst_vol_clos = Dprst_vol_clos + tmp1
         Dprst_in = Dprst_in + tmp1
       ENDIF
@@ -1538,11 +1518,11 @@
           Dprst_vol_clos = Dprst_vol_clos + DBLE( dprst_srp_clos )
         ENDIF
         Srp = Srp - dprst_srp/Perv_frac
-!        IF ( Srp<0.0 ) THEN
-!          IF ( Srp<-NEARZERO ) PRINT *, 'dprst srp<0.0', Srp, dprst_srp
+        IF ( Srp<0.0 ) THEN
+          IF ( Srp<-NEARZERO ) PRINT *, 'dprst srp<0.0', Srp, dprst_srp
           ! may need to adjust dprst_srp and volumes
-!          Srp = 0.0
-!        ENDIF
+          Srp = 0.0
+        ENDIF
       ENDIF
 
       IF ( Sri>0.0 ) THEN
@@ -1558,11 +1538,11 @@
           Dprst_vol_clos = Dprst_vol_clos + DBLE( dprst_sri_clos )
         ENDIF
         Sri = Sri - dprst_sri/Imperv_frac
-!        IF ( Sri<0.0 ) THEN
-!          IF ( Sri<-NEARZERO ) PRINT *, 'dprst sri<0.0', Sri, dprst_sri
+        IF ( Sri<0.0 ) THEN
+          IF ( Sri<-NEARZERO ) PRINT *, 'dprst sri<0.0', Sri, dprst_sri
           ! may need to adjust dprst_sri and volumes
-!          Sri = 0.0
-!        ENDIF
+          Sri = 0.0
+        ENDIF
       ENDIF
       Dprst_insroff_hru(Ihru) = dprst_srp + dprst_sri
 
@@ -1671,11 +1651,11 @@
       IF ( Dprst_vol_open>0.0D0 ) THEN
         seep_open = Dprst_vol_open*DBLE( Dprst_seep_rate_open(Ihru) )
         Dprst_vol_open = Dprst_vol_open - seep_open
-!        IF ( Dprst_vol_open<0.0D0 ) THEN
+        IF ( Dprst_vol_open<0.0D0 ) THEN
 !          IF ( Dprst_vol_open<-DNEARZERO ) PRINT *, 'negative dprst_vol_open:', Dprst_vol_open, ' HRU:', Ihru
-!          seep_open = seep_open + Dprst_vol_open
-!          Dprst_vol_open = 0.0D0
-!        ENDIF
+          seep_open = seep_open + Dprst_vol_open
+          Dprst_vol_open = 0.0D0
+        ENDIF
         Dprst_seep_hru = seep_open/Hruarea_dble
       ENDIF
 
@@ -1688,21 +1668,21 @@
         Dprst_vol_open = Dprst_vol_open - Dprst_sroff_hru
         Dprst_sroff_hru = Dprst_sroff_hru/Hruarea_dble
         ! sanity checks
-!        IF ( Dprst_vol_open<0.0D0 ) THEN
+        IF ( Dprst_vol_open<0.0D0 ) THEN
 !          IF ( Dprst_vol_open<-DNEARZERO ) PRINT *, 'issue, dprst_vol_open<0.0', Dprst_vol_open
-!          Dprst_vol_open = 0.0D0
-!        ENDIF
+          Dprst_vol_open = 0.0D0
+        ENDIF
       ENDIF
 
       IF ( Dprst_area_clos_max>0.0 ) THEN
         IF ( Dprst_area_clos>NEARZERO ) THEN
           seep_clos = Dprst_vol_clos*DBLE( Dprst_seep_rate_clos(Ihru) )
           Dprst_vol_clos = Dprst_vol_clos - seep_clos
-!          IF ( Dprst_vol_clos<0.0D0 ) THEN
+          IF ( Dprst_vol_clos<0.0D0 ) THEN
 !            IF ( Dprst_vol_clos<-DNEARZERO ) PRINT *, 'issue, dprst_vol_clos<0.0', Dprst_vol_clos
-!            seep_clos = seep_clos + Dprst_vol_clos
-!            Dprst_vol_clos = 0.0D0
-!          ENDIF
+            seep_clos = seep_clos + Dprst_vol_clos
+            Dprst_vol_clos = 0.0D0
+          ENDIF
           Dprst_seep_hru = Dprst_seep_hru + seep_clos/Hruarea_dble
         ENDIF
       ENDIF
@@ -1715,7 +1695,9 @@
       Avail_et = Avail_et - Dprst_evap_hru
       IF ( Dprst_vol_open_max>0.0 ) Dprst_vol_open_frac(Ihru) = SNGL( Dprst_vol_open/Dprst_vol_open_max )
       IF ( Dprst_vol_clos_max(Ihru)>0.0 ) Dprst_vol_clos_frac(Ihru) = SNGL( Dprst_vol_clos/Dprst_vol_clos_max(Ihru) )
-      Dprst_vol_frac(Ihru) = SNGL( (Dprst_vol_open+Dprst_vol_clos)/(Dprst_vol_open_max+Dprst_vol_clos_max(Ihru)) )
+      if (Dprst_vol_open_max+Dprst_vol_clos_max(Ihru) > 0.0 ) then  !RGN added to avoid divide by zero 1/20/2022
+        Dprst_vol_frac(Ihru) = SNGL( (Dprst_vol_open+Dprst_vol_clos)/(Dprst_vol_open_max+Dprst_vol_clos_max(Ihru)) )
+      end if
       Dprst_stor_hru(Ihru) = (Dprst_vol_open+Dprst_vol_clos)/Hruarea_dble
 
       END SUBROUTINE dprst_comp
