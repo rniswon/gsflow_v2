@@ -546,6 +546,10 @@
             PRINT *, 'ERROR, seg_length too small for segment:', i, ', value:', Seg_length(i)
             ierr = 1
          ENDIF
+         IF ( Seg_slope(i)<0.0000001 ) THEN
+            IF ( Print_debug>DEBUG_LESS ) PRINT *, 'WARNING, seg_slope < 0.0000001, set to 0.0001', i, Seg_slope(i)
+            Seg_slope(i) = 0.0001
+         ENDIF
       ENDDO
 
 ! exit if there are any segments that are too short
