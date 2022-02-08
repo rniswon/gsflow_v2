@@ -561,7 +561,7 @@
         ENDIF
         Basin_gwflow = Basin_gwflow + DBLE(Gwres_flow(i))*gwarea
 
-        ! leave gwin in inch-acres
+        ! leave gwin in acre-inches
         Gwres_in(i) = gwin
         Gwres_stor(i) = gwstor/gwarea
         Hru_lateral_flow(i) = DBLE( Gwres_flow(i) + Sroff(i) + Ssres_flow(i) )
