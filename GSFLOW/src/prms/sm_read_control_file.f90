@@ -504,7 +504,7 @@ contains
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'executable_desc'
-    Executable_desc = 'GSFLOW with MODSIM, MFNWT, and PRMS-5'
+    Executable_desc = 'GSFLOW Fortran-only'
     Control_parameter_data(i) % values_character(1) = Executable_desc
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1

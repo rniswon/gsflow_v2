@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2021-11-19'
+      character(len=*), parameter :: Version_stream_temp = '2022-02-03'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -38,7 +38,7 @@
       INTEGER, SAVE:: Width_dim, Maxiter_sntemp
       REAL, SAVE, ALLOCATABLE :: Seg_humidity(:, :)
       REAL, SAVE, ALLOCATABLE :: lat_temp_adj(:, :)
-      INTEGER, SAVE, ALLOCATABLE :: Seg_humidity_sta(:)
+      INTEGER, SAVE, ALLOCATABLE :: Seg_humidity_sta(:), tempIN_segment(:)
 !   Shade Parameters needed if stream_temp_shade_flag = 0
       REAL, SAVE, ALLOCATABLE :: Azrh(:), Alte(:), Altw(:), Vce(:)
       REAL, SAVE, ALLOCATABLE :: Vdemx(:), Vhe(:), Voe(:), Vcw(:), Vdwmx(:), Vhw(:), Vow(:)
@@ -368,6 +368,13 @@
      &     'Maximum number of Newton-Raphson iterations to compute stream temperature', &
      &     'none')/=0 ) CALL read_error(1, 'maxiter_sntemp')
 
+      ALLOCATE ( tempIN_segment(Nsegment) )
+      IF ( declparam(MODNAME, 'tempIN_segment', 'nsegment', 'integer', &
+     &     '0', 'bounded', 'nstreamtemp', &
+     &     'Index of streamflow temperature in Data File that replaces temperature in a segment', &
+     &     'Index of streamflow temperature in Data File that replaces temperature in a segment', &
+     &     'none')/=0 ) CALL read_error(1, 'tempIN_segment')
+
       IF ( Strmtemp_humidity_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN  ! specified constant
          ALLOCATE ( Seg_humidity(Nsegment, MONTHS_PER_YEAR) )
          IF ( declparam( MODNAME, 'seg_humidity', 'nsegment,nmonths', 'real', &
@@ -471,6 +478,7 @@
       IF ( getparam_int( MODNAME, 'gw_tau', Nsegment, Gw_tau)/=0 ) CALL read_error(2, 'Gw_tau')
       IF ( getparam_real( MODNAME, 'melt_temp', 1, Melt_temp)/=0 ) CALL read_error(2, 'melt_temp')
       IF ( getparam_int( MODNAME, 'maxiter_sntemp', 1, Maxiter_sntemp)/=0 ) CALL read_error(2, 'maxiter_sntemp')
+      IF ( getparam_int( MODNAME, 'tempIN_segment', Nsegment, tempIN_segment)/=0 ) CALL read_error(2, 'tempIN_segment')
 
       ierr = 0
       IF ( Strmtemp_humidity_flag==1 ) THEN
@@ -537,6 +545,10 @@
          IF ( Seg_length(i)<NEARZERO ) THEN
             PRINT *, 'ERROR, seg_length too small for segment:', i, ', value:', Seg_length(i)
             ierr = 1
+         ENDIF
+         IF ( Seg_slope(i)<0.0000001 ) THEN
+            IF ( Print_debug>DEBUG_LESS ) PRINT *, 'WARNING, seg_slope < 0.0000001, set to 0.0001', i, Seg_slope(i)
+            Seg_slope(i) = 0.0001
          ENDIF
       ENDDO
 
@@ -726,10 +738,9 @@
       USE PRMS_SET_TIME, ONLY: Summer_flag, Jday
       USE PRMS_CLIMATEVARS, ONLY: Tavgc, Potet, Hru_rain, Swrad
       USE PRMS_CLIMATE_HRU, ONLY: Humidity_hru
-      USE PRMS_FLOWVARS, ONLY: Seg_outflow
-      USE PRMS_SNOW, ONLY: Snowmelt
+      USE PRMS_FLOWVARS, ONLY: Seg_outflow, Snowmelt
       USE PRMS_ROUTING, ONLY: Hru_segment, Segment_order, Seginc_swrad
-      USE PRMS_OBS, ONLY: Humidity
+      USE PRMS_OBS, ONLY: Humidity, Stream_temp
       USE PRMS_SOLTAB, ONLY: Soltab_potsw, Hru_cossl
 
       IMPLICIT NONE
@@ -777,7 +788,7 @@
 ! On restart, sometimes soltab_potsw comes in as zero. It should never be zero as
 ! this results in divide by 0.0
          if (Soltab_potsw(jday, j) <= 10.0) then
-            ccov = 1.0 - (Swrad(j) / sngl(10.0) * sngl(Hru_cossl(j)))
+            ccov = 1.0 - (Swrad(j) / 10.0 * sngl(Hru_cossl(j)))
          else
             ccov = 1.0 - (Swrad(j) / sngl(Soltab_potsw(jday, j)) * sngl(Hru_cossl(j)))
          endif
@@ -1074,6 +1085,7 @@
               ! bad t_o value
               Seg_tave_water(i) = NOFLOW_TEMP
           endif
+          if ( tempIN_segment(i)>0 ) Seg_tave_water(i) = Stream_temp(tempIN_segment(i))
 
 !          if (Seg_tave_water(i) .ne. Seg_tave_water(i)) then
 !             write(*,*) "seg_tave_water is NaN", i, qlat, seg_tave_lat(i), te, ak1, ak2,seg_shade(i), svi, i, t_o

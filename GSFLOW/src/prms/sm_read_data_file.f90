@@ -7,8 +7,7 @@ contains
 
   module subroutine read_prms_data_file()
       USE PRMS_CONSTANTS, ONLY: ERROR_time, ERROR_read, ERROR_open_in, MAXDATALINE_LENGTH, MAXFILE_LENGTH
-      use PRMS_CONTROL_FILE, only: control_string
-      USE PRMS_MODULE, ONLY: PRMS_output_unit, Print_debug, Starttime, Endtime, EQULS
+      USE PRMS_MODULE, ONLY: PRMS_output_unit, Print_debug, Starttime, Endtime, EQULS, Data_file
       use prms_utils, only: error_stop, find_current_time, numchars, PRMS_open_input_file, read_error, write_outfile
       IMPLICIT NONE
       ! Functions
@@ -17,7 +16,6 @@ contains
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Read Data File'
       character(len=*), parameter :: MODNAME = 'read_data_file'
-      CHARACTER(LEN=MAXFILE_LENGTH) :: data_filename
       CHARACTER(LEN=MAXDATALINE_LENGTH) :: data_line, dmy
       CHARACTER(LEN=80) :: line
       INTEGER :: n, ierr, ios, numchrs, length
@@ -25,12 +23,11 @@ contains
       INTEGER :: endyr, endmo, enddy, endhr, endmn, endsec, num_vars
       REAL, ALLOCATABLE :: var(:)
 !***********************************************************************
-      IF ( control_string(data_filename, 'data_file')/=0 ) CALL read_error(5, 'data_file')
-      CALL PRMS_open_input_file(Datafile_unit, data_filename, 'data_file', 0, ios)
+      CALL PRMS_open_input_file(Datafile_unit, Data_file, 'data_file', 0, ios)
       IF ( ios/=0 ) ERROR STOP ERROR_open_in
       CALL write_outfile(' ')
       CALL write_outfile(EQULS)
-      CALL write_outfile('Using PRMS Data File: '//data_filename)
+      CALL write_outfile('Using PRMS Data File: '//Data_file)
 ! Echo Data File Header and comment lines
       READ ( Datafile_unit, FMT='(A)', IOSTAT=ios ) line
       IF ( ios/=0 ) CALL read_error(13, 'title')
@@ -140,7 +137,7 @@ contains
       CALL find_current_time(Datafile_unit, Starttime(1), Starttime(2), Starttime(3), ios, 0)
       IF ( ios/=0 ) THEN
         PRINT *, 'End of file or error reading Data File to find the first simulation time step'
-        PRINT *, 'Data File: ', data_filename
+        PRINT *, 'Data File: ', Data_file
         ERROR STOP ERROR_read
       ENDIF
 
@@ -195,9 +192,9 @@ contains
   module subroutine check_data_variables(Varname, Numvalues, Values, Iflag, Iret)
       USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
       USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow
-      USE PRMS_OBS, ONLY: Nlakeelev, Nwind, Nhumid, &
+      USE PRMS_OBS, ONLY: Nlakeelev, Nwind, Nhumid, Nstream_temp, &
      &    Tmin, Tmax, Precip, Snowdepth, Runoff, Pan_evap, Wind_speed, Humidity, Solrad, &
-     &    Gate_ht, Lake_elev, Rain_day, Runoff_units, Streamflow_cfs, Streamflow_cms
+     &    Gate_ht, Lake_elev, Rain_day, Runoff_units, Streamflow_cfs, Streamflow_cms, Stream_temp
       USE PRMS_CLIMATEVARS, ONLY: Ppt_zero_thresh
       IMPLICIT NONE
       ! Arguments
@@ -253,7 +250,9 @@ contains
         ELSE
           DO i = 1, Numvalues
             Precip(i) = Values(i)
-            IF ( Precip(i)<Ppt_zero_thresh ) Precip(i) = 0.0
+            IF ( Ppt_zero_thresh>0.0 ) THEN
+              IF ( Precip(i)<Ppt_zero_thresh ) Precip(i) = 0.0
+            ENDIF
           ENDDO
         ENDIF
       ELSEIF ( Varname(:6)=='runoff' ) THEN
@@ -351,6 +350,17 @@ contains
         ELSE
           DO i = 1, Numvalues
             Wind_speed(i) = Values(i)
+          ENDDO
+        ENDIF
+      ELSEIF ( Varname(:11)=='stream_temp' ) THEN
+        IF ( Iflag==0 ) THEN
+          IF ( Numvalues/=Nstream_temp ) THEN
+            Iret = -1
+            ndim = Nstream_temp
+          ENDIF
+        ELSE
+          DO i = 1, Numvalues
+            Stream_temp(i) = Values(i)
           ENDDO
         ENDIF
       ELSE

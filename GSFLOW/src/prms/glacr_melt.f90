@@ -50,7 +50,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2021-11-23'
+      character(len=*), parameter :: Version_glacr = '2022-01-12'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -796,11 +796,11 @@
 !                  computations
 !***********************************************************************
       INTEGER FUNCTION glacrrun()
-      USE PRMS_CONSTANTS, ONLY: GLACIER, LAND, FEET2METERS, METERS2FEET, NEARZERO, FEET
+      USE PRMS_CONSTANTS, ONLY: GLACIER, LAND, FEET2METERS, NEARZERO, FEET !, METERS2FEET
       USE PRMS_MODULE, ONLY: Hru_type
       USE PRMS_GLACR
       USE PRMS_BASIN, ONLY: Hru_elev_ts, Active_hrus, Hru_route_order, &
-     &    Elev_units, Hru_elev_feet, Hru_elev_meters
+     &    Elev_units, Hru_elev_meters !, Hru_elev_feet
       USE PRMS_FLOWVARS, ONLY: Alt_above_ela, Glrette_frac
       IMPLICIT NONE
 ! Functions
@@ -859,11 +859,11 @@
         IF ( Hru_type(i)==GLACIER ) THEN
           IF ( Ngl==0 ) Hru_elev_ts(i) = Basal_elev(i)
           IF ( Elev_units==FEET ) THEN
-            Hru_elev_feet(i) = Hru_elev_ts(i)
+            !Hru_elev_feet(i) = Hru_elev_ts(i)
             Hru_elev_meters(i) = Hru_elev_ts(i)*FEET2METERS
           ELSE
             Hru_elev_meters(i) = Hru_elev_ts(i)
-            Hru_elev_feet(i) = Hru_elev_ts(i)*METERS2FEET
+            !Hru_elev_feet(i) = Hru_elev_ts(i)*METERS2FEET
           ENDIF
         ENDIF
       ENDDO
@@ -881,9 +881,9 @@
       USE PRMS_BASIN, ONLY: Hru_elev_ts, Basin_area_inv, Active_hrus, Hru_route_order, Elev_units, Hru_elev
       USE PRMS_SET_TIME, ONLY: Julwater
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow
-      USE PRMS_SNOW, ONLY: Snowcov_area, Snowmelt, Glacrmelt, Glacr_air_deltemp, Glacr_delsnow, &
-     &    Glrette_frac_init, Snowcov_area, Basin_snowicecov, Snow_evap, Glacr_evap, Basin_glacrb_melt
-      USE PRMS_FLOWVARS, ONLY: Glacier_frac, Alt_above_ela, Glrette_frac
+      USE PRMS_SNOW, ONLY: Glacrmelt, Glacr_air_deltemp, Glacr_delsnow, &
+     &    Glrette_frac_init, Basin_snowicecov, Glacr_evap, Basin_glacrb_melt
+      USE PRMS_FLOWVARS, ONLY: Glacier_frac, Alt_above_ela, Glrette_frac, Snowcov_area, Snowmelt, Snow_evap
       use prms_utils, only: get_ftnunit
       IMPLICIT NONE
 ! Functions
@@ -2672,6 +2672,7 @@
       REAL, INTENT(IN) :: Di, Upfunciph, Afunciph, K, Nn, Bfunciph, X1, X2, Xacc
       REAL, INTENT(OUT) :: Rtnewt
 ! Functions
+      INTRINSIC :: ABS
       EXTERNAL :: funcd
 ! Local Variables
       INTEGER j
@@ -2679,10 +2680,11 @@
 !***********************************************************************
       Flag = 0
       Rtnewt = 0.5*(X1+X2) !Initial guess.
+!      Rtnewt = 1.0 !???
       DO j = 1, JMAX
         CALL funcd(Rtnewt, Di, Upfunciph, Afunciph, Bfunciph, f, df, K, Nn)
-        df = 1.0
-        IF ( df>0.0 ) dx = f/df
+        dx = 0.0
+        IF ( ABS(df)>0.0 ) dx = f/df
         Rtnewt = Rtnewt - dx
 !            PRINT*, 'Rtnewt jumped out of brackets, Rtnewt =', Rtnewt
         IF ( Rtnewt<X1 ) Rtnewt = X1
