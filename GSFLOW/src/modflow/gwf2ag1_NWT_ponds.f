@@ -1011,7 +1011,7 @@
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: IOUT, NCOL, NROW, NLAY, IFREFM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS, SEG, NUMTAB_SFR
+      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS, SEG
       USE PRMS_MODULE, ONLY: Nhru
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
@@ -1076,8 +1076,8 @@
      +                               ' AND MUST BE ACTIVE FOR ',
      +                               ' SEGMENT LIST. MODEL STOPPING'
                     WRITE (IOUT, *)
-                    CALL USTOP('ERROR IN AG:SFR PACKAGE MUST BE ACTIVE',
-     +                         'MODEL STOPPING')  
+                    CALL USTOP('ERROR IN AG:SFR PACKAGE MUST BE '//
+     +                         'ACTIVE MODEL STOPPING')  
             END IF
             nseg = 0
             do
@@ -1561,7 +1561,6 @@
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR !, SGOTFLW
-      USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GLOBAL, ONLY: IUNIT
       USE GWFBASMODULE, ONLY: TOTIM
       IMPLICIT NONE
@@ -4356,7 +4355,7 @@ C     Pass Irrigation demand to MODSIM
 C     
 !--------January 17, 2022
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: SEG, IDIVAR, NSS
+      USE GWFSFRMODULE, ONLY: SEG, NSS
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
