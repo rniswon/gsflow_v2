@@ -21,7 +21,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2022-02-04'
+      character(len=*), parameter :: Version_snowcomp = '2022-02-03'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -1832,11 +1832,11 @@
       IF ( Pkwater_equiv>0.0D0 ) THEN
         Pk_temp = -Pk_def/SNGL(Pkwater_equiv*1.27D0)  ! [degrees C]
       ELSE
-        IF ( Pkwater_equiv<0.0D0 ) THEN
+!        IF ( Pkwater_equiv<0.0D0 ) THEN
 !          IF ( Pkwater_equiv<-DNEARZERO ) &
 !     &         PRINT *, 'snowpack issue 4, negative pkwater_equiv', Pkwater_equiv
-          Pkwater_equiv = 0.0D0
-        ENDIF
+!          Pkwater_equiv = 0.0D0
+!        ENDIF
         ! If on melting glacier ice/firn, Ihru_gl >0, so melted active layer (won't melt infinite ice layer)
         If (Ihru_gl>0) CALL glacr_states_to_zero(Ihru_gl,0)
       ENDIF
