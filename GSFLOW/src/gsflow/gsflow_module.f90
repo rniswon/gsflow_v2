@@ -21,8 +21,8 @@
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
       character(len=*), parameter :: GSFLOW_versn = '2.4.0 11/23/2021'
-      character(len=*), parameter :: PRMS_versn = '2021-11-23'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 11/23/2021'
+      character(len=*), parameter :: PRMS_versn = '2022-02-08'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 02/08/2022'
       character(len=*), parameter :: Version_read_control_file = '2021-11-22'
       character(len=*), parameter :: Version_read_parameter_file = '2021-11-22'
       character(len=*), parameter :: Version_read_data_file = '2021-11-22'
@@ -42,10 +42,9 @@
       INTEGER, SAVE :: Precip_combined_flag, Temp_combined_flag, Muskingum_flag
       INTEGER, SAVE :: Inputerror_flag, Timestep
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag, Albedo_cbh_flag, Cloud_cover_cbh_flag
-      INTEGER, SAVE :: PRMS_flag, GSFLOW_flag, PRMS4_flag, MODSIM_flag
-      INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Grid_flag, Ag_package
-      INTEGER, SAVE :: Agriculture_flag, Canopy_iter
-      INTEGER, SAVE :: irrigated_area_flag, AET_cbh_flag, PET_cbh_flag
+      INTEGER, SAVE :: PRMS4_flag, Canopy_iter, irrigated_area_flag, AET_cbh_flag, PET_cbh_flag
+      INTEGER, SAVE :: PRMS_flag, GSFLOW_flag, MODSIM_flag
+      INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Grid_flag, Ag_package, Agriculture_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Soilzone_add_water_use
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
@@ -53,7 +52,7 @@
       INTEGER, SAVE :: Gwr_transfer_water_use, Gwr_add_water_use
       INTEGER, SAVE :: Lake_transfer_water_use, Lake_add_water_use
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
-      INTEGER, SAVE :: mf_timestep, startday, endday, mf_nowtime, Number_timesteps
+      INTEGER, SAVE :: startday, endday, Number_timesteps, mf_timestep, mf_nowtime
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
 !   Declared Variables for DPRST agriculture computations
@@ -71,13 +70,13 @@
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, Iter_aet_flag
-      INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
+      INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag, no_snow_flag
       INTEGER, SAVE :: Agriculture_dprst_flag, Agriculture_soilzone_flag, Agriculture_canopy_flag 
       INTEGER, SAVE :: Dyn_ag_frac_flag, Dyn_ag_soil_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF, outputSelectDatesON_OFF, snow_cloudcover_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName
-      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file
+      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file, Data_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Csv_output_file, Model_control_file, Param_file, Stat_var_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: mappingFileName, xyFileName
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Temp_module, Srunoff_module, Et_module

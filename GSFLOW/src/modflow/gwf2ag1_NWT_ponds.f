@@ -1022,7 +1022,7 @@
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: IOUT, NCOL, NROW, NLAY, IFREFM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS
+      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS, SEG, NUMTAB_SFR
       USE PRMS_MODULE, ONLY: Nhru
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
@@ -1298,6 +1298,9 @@
                write (iout, '(/1x,a)') 'FINISHED READING '//
      +          trim(adjustl(char))
                exit
+            case ('STRESS PERIOD')
+              backspace(in)
+              exit
             case default
                WRITE (IOUT, *) 'Invalid AG Input: '//LINE(ISTART:ISTOP)
      +           //' Should be: '//trim(adjustl(CHAR))
@@ -1487,6 +1490,16 @@
             ISTARTSAVE = ISTART
          end if
       end do
+!
+! Set demand to specified diversion flows in SFR.
+!
+      DO i = 1, NUMIRRDIVERSIONSP
+         iseg = IRRSEG(i)
+         if (iseg > 0 .and. IUNITSFR > 0) then
+               DEMAND(ISEG) = SEG(2, ISEG)
+         END IF
+      END DO
+!
 6     FORMAT(1X, /
      +       1X, 'NO IRRDIVERSION DATA OR REUSING IRRDIVERSION DATA ',
      +       'FROM LAST STRESS PERIOD ')
@@ -1510,7 +1523,7 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SEG !, SGOTFLW
+      USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR !, SGOTFLW
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GLOBAL, ONLY: IUNIT
       USE GWFBASMODULE, ONLY: TOTIM
@@ -1525,26 +1538,18 @@
       REAL :: RATETERPQ, TIME
       ! - -----------------------------------------------------------------
       !
-      !1 - ------RESET DEMAND IF IT CHANGES
-      DEMAND = szero
-      TOTAL = dzero
-      TIME = TOTIM
-      PONDSEGFLOW = szero
+            !1 - ------RESET DEMAND IF IT CHANGES
+      if ( NUMTAB_SFR > 0 ) DEMAND = 0.0
       DO i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
-         if (iseg > 0) then
-            if (IUNIT(44) > 0) then
+         if (iseg > 0 .and. IUNIT(44) > 0) then
                ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
                ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
                ! contains the TABFILE values at this point.
-               DEMAND(ISEG) = SEG(2, ISEG)
-               IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = szero
-               TOTAL = TOTAL + DBLE( DEMAND(ISEG) )
-            elseif (GSFLOW_flag == 1) then
-            end if
-            SUPACT(ISEG) = szero
-            ACTUAL(ISEG) = szero
-         END IF
+           IF ( NUMTAB_SFR > 0 )  DEMAND(ISEG) = SEG(2, ISEG)
+           SUPACT(ISEG) = 0.0
+           ACTUAL(ISEG) = 0.0
+         end if
       END DO
       !2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
       IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
@@ -3426,11 +3431,11 @@
          SEG(2, iseg) = 0.0
          if (TIMEINPERIODSEG(ISEG) > IRRPERIODSEG(ISEG)) then
             if (factor <= TRIGGERPERIODSEG(ISEG)) then
-               SEG(2, iseg) = DEMAND(iseg)
-               TIMEINPERIODSEG(ISEG) = 0.0
+                SEG(2, iseg) = DEMAND(iseg)
+                TIMEINPERIODSEG(ISEG) = done
             end if
          end if
-         if (TIMEINPERIODSEG(ISEG) < IRRPERIODSEG(ISEG))
+         if (TIMEINPERIODSEG(ISEG) - DELT < IRRPERIODSEG(ISEG))
      +                              SEG(2, iseg) = DEMAND(iseg)
 300    continue
        deallocate (petseg, aetseg)
@@ -4306,6 +4311,50 @@
      +     , 9X, 'PERCENT DISCREPANCY =', F15.2, ///)
 !
       END
+
+C
+C-------SUBROUTINE SFR2MODSIM
+C
+      SUBROUTINE AG2MODSIM(Diversions)
+C     *******************************************************************
+C     Pass Irrigation demand to MODSIM 
+C     
+!--------January 17, 2022
+C     *******************************************************************
+      USE GWFSFRMODULE, ONLY: SEG, IDIVAR, NSS
+      USE GWFAGMODULE
+      USE GWFBASMODULE, ONLY: DELT
+      IMPLICIT NONE
+C     -------------------------------------------------------------------
+C     SPECIFICATIONS:
+C     -------------------------------------------------------------------
+C     ARGUMENTS
+      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(NSS)
+C     -------------------------------------------------------------------
+!      INTEGER 
+!      DOUBLE PRECISION 
+C     -------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     -------------------------------------------------------------------
+      INTEGER :: ISEG, i
+!      double precision :: total !delete this
+C     -------------------------------------------------------------------
+C
+C1------LOOP OVER SEGMETS
+C
+C
+C2------Set diversion demand from that calculated from AG.
+C 
+        do i = 1, NUMIRRDIVERSIONSP
+          iseg = IRRSEG(i)        
+          !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
+            Diversions(ISEG) = SEG(2,iseg)*DELT
+          !END IF
+        END DO
+C
+C8------RETURN.
+      RETURN
+      END SUBROUTINE AG2MODSIM
       !
       SUBROUTINE GWF2AG7DA()
       ! Deallocate AG MEMORY

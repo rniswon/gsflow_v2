@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output CSV Summary'
       character(len=10), parameter :: MODNAME = 'gsflow_sum'
-      character(len=*), parameter :: Version_gsflow_sum = '2021-09-28'
+      character(len=*), parameter :: Version_gsflow_sum = '2022-02-10'
       INTEGER, SAVE :: BALUNT
       DOUBLE PRECISION, PARAMETER :: ERRCHK = 0.0001D0
       INTEGER, SAVE :: Balance_unt, Vbnm_index(14), Gsf_unt, Rpt_count
@@ -571,11 +571,11 @@
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       USE PRMS_FLOWVARS, ONLY: Basin_perv_et, Basin_swale_et, &
      &    Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_actet, &
-     &    Basin_sroff, Basin_soil_moist, Basin_ssstor, Basin_cfs
+     &    Basin_sroff, Basin_soil_moist, Basin_ssstor, Basin_cfs, Basin_snowevap, Basin_snowmelt
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_evap, &
      &    Basin_hortonian, Basin_hortonian_lakes, &
      &    Basin_infil, Basin_dprst_evap, Basin_dprst_volop, Basin_dprst_volcl
-      USE PRMS_SNOW, ONLY: Basin_snowevap, Basin_snowmelt
+      USE PRMS_SNOW, ONLY: 
       USE PRMS_INTCP, ONLY: Basin_intcp_evap
       USE PRMS_SOILZONE, ONLY: Basin_lakeprecip, Basin_dunnian, &
      &    Basin_slowflow, Basin_prefflow, Basin_lakeinsz, &
@@ -966,10 +966,9 @@
 !***********************************************************************
       SUBROUTINE BASIN_GET_STORAGE()
       USE GSFSUM
-      USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor
+      USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_pweqv
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor
       USE PRMS_INTCP, ONLY: Basin_intcp_stor
-      USE PRMS_SNOW, ONLY: Basin_pweqv
       USE PRMS_SOILZONE, ONLY: Basin_pref_stor
       USE GSFBUDGET, ONLY: Sat_S, Unsat_S
       IMPLICIT NONE
