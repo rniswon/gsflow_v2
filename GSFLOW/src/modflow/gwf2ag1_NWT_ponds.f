@@ -2032,7 +2032,7 @@
             CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
      +                 'DIVERSION')
          END IF
-         IF (SGNM > 0) THEN
+         IF (SGNM > 0) THEN    !need to make sure SGNM is in the segment list
             IRRSEG(J) = SGNM
             DVRCH(SGNM) = NMCL
             IRRPERIODSEG(SGNM) = IRRPER
