@@ -166,13 +166,13 @@ Temp & Precip Distribution      xyz_dist            2022-01-25
 Solar Radiation Distribution    ccsolrad            2021-12-09
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2021-12-16
-Snow Dynamics                   snowcomp            2022-01-12
+Canopy Interception             intcp               2022-02-03
+Snow Dynamics                   snowcomp            2022-02-04
 Glacier Dynamics                glacr_melt          2022-01-12
-Surface Runoff                  srunoff_smidx       2022-01-21
-Soilzone Computations           soilzone            2022-01-21
+Surface Runoff                  srunoff_smidx       2022-02-04
+Soilzone Computations           soilzone            2022-02-04
 Groundwater                     gwflow              2021-12-16
-Streamflow Routing Init         routing             2021-11-19
+Streamflow Routing Init         routing             2022-02-04
 Streamflow Routing              muskingum           2021-11-19
 Output Summary                  basin_sum           2022-01-12
 Statistics Variables Output     statvar_out         2021-09-08
@@ -245,5 +245,5 @@ Fraction impervious:        0.0687    Fraction pervious:       0.9313
  *************************************************************
  Total for run     418.200  279.047    1.062  152.101 -286.767
  *************************************************************
-Execution elapsed time    0 minutes  3.15 seconds
+Execution elapsed time    0 minutes  3.76 seconds
 

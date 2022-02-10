@@ -965,7 +965,7 @@
      +    Hru_ppt, Hru_rain, Hru_snow, Basin_rain,
      +    Basin_ppt, Prmx, Basin_snow, Psta_elev, Basin_obs_ppt,
      +    Precip_units, Tmax_allsnow_f, Adjmix_rain, Tmax_allrain_f
-      USE PRMS_OBS, ONLY: Precip, Rain_day
+      USE PRMS_OBS, ONLY: Precip
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, SNGL, DBLE
@@ -1006,9 +1006,6 @@
 
       ELSEIF ( Rain_code==3 ) THEN
         Is_rain_day = ACTIVE
-
-      ELSEIF ( Rain_code==4 ) THEN
-        IF ( Rain_day==1 ) Is_rain_day = ACTIVE
 
       ELSEIF ( Rain_code==5 ) THEN
         DO i = 1, Nrain

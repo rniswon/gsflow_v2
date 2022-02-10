@@ -217,10 +217,10 @@ Precipitation Distribution      precip_1sta         2021-11-19
 Solar Radiation Distribution    ddsolrad            2021-11-19
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2021-12-16
-Snow Dynamics                   snowcomp            2022-01-12
-Surface Runoff                  srunoff_smidx       2022-01-21
-Soilzone Computations           soilzone            2022-01-21
+Canopy Interception             intcp               2022-02-03
+Snow Dynamics                   snowcomp            2022-02-04
+Surface Runoff                  srunoff_smidx       2022-02-04
+Soilzone Computations           soilzone            2022-02-04
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-12-09
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-06-10
 GSFLOW Output Budget Summary    gsflow_budget       2021-12-15
@@ -246,5 +246,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time    0 minutes  5.54 seconds
+Execution elapsed time    0 minutes  6.75 seconds
 
