@@ -715,6 +715,7 @@
 
       startday = compute_julday(Start_year, Start_month, Start_day)
       endday = compute_julday(End_year, End_month, End_day)
+      IF ( endday<startday ) CALL error_stop('end_time is specified < start_time', ERROR_control)
       Number_timesteps = endday - startday + 1
 
       IF ( control_integer(Init_vars_from_file, 'init_vars_from_file')/=0 ) Init_vars_from_file = 0
