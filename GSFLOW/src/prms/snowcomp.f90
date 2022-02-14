@@ -1931,7 +1931,7 @@
         IF ( Active_glacier>OFF ) THEN
           IF ( pmlt>apk_ice ) THEN
             !fractionate density with snow/active layer melting vs extra ice underneath melting
-            Pk_den = Pk_den*SNGL(apk_ice/pmlt) + 0.917*((pmlt-apk_ice)/pmlt)
+            Pk_den = Pk_den*(apk_ice/pmlt) + 0.917*((pmlt-apk_ice)/pmlt)
             apk_ice = pmlt
             Pk_ice =  apmlt
             Pkwater_equiv = apmlt
