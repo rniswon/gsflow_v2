@@ -273,7 +273,7 @@
      &     'inches')/=0 ) CALL read_error(1, 'ag_soil2gw_max')
 
       IF ( (Ag_gravity_flag==ACTIVE .AND. (Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. &
-     &     Init_vars_from_file==5) .OR. Model==DOCUMENTATION) THEN
+     &     Init_vars_from_file==5)) .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Ag_gvr_stor_init_frac(Nhru) )
         IF ( declparam(MODNAME, 'ag_gvr_stor_init_frac', 'nhru', 'real', &
      &       '0.0', '0.0', '1.0', &
