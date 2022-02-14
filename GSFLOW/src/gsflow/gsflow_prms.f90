@@ -723,6 +723,7 @@
      &        '    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)', /)
 
       IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = 1
+      Ag_gravity_flag = OFF
 
       IF ( control_string(Model_mode, 'model_mode')/=0 ) CALL read_error(5, 'model_mode')
       IF ( Model_mode(:4)=='    ' ) Model_mode = 'GSFLOW5'
@@ -813,6 +814,7 @@
 
       startday = compute_julday(Start_year, Start_month, Start_day)
       endday = compute_julday(End_year, End_month, End_day)
+      IF ( endday<startday ) CALL error_stop('end_time is specified < start_time', ERROR_control)
       Number_timesteps = endday - startday + 1
 
       IF ( control_integer(Init_vars_from_file, 'init_vars_from_file')/=0 ) Init_vars_from_file = 0

@@ -177,6 +177,9 @@ contains
     Control_parameter_data(i) % name = 'no_snow_flag'
     no_snow_flag = ACTIVE
     i = i + 1
+    Control_parameter_data(i) % name = 'ag_gravity_flag'
+    Ag_gravity_flag = OFF
+    i = i + 1
     Control_parameter_data(i) % name = 'stream_temp_flag'
     Stream_temp_flag = OFF
     i = i + 1
@@ -505,7 +508,7 @@ contains
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'executable_desc'
-    Executable_desc = 'GSFLOW with MODSIM, MFNWT, and PRMS-5'
+    Executable_desc = 'GSFLOW Fortran-only'
     Control_parameter_data(i) % values_character(1) = Executable_desc
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1

@@ -431,7 +431,7 @@ C
      &    ERROR_time, ERROR_modflow, MODSIM_GSFLOW
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, no_snow_flag,
      &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
-     &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday,
+     &    PRMS_land_iteration_flag,
      &    Model, GSFLOW_flag, Print_debug, Soilzone_module
       use prms_utils, only: error_stop
 C1------USE package modules.
@@ -1240,7 +1240,7 @@ c      IF(IUNIT(14).GT.0) CALL LMG7DA(IGRID)
 !      IF(IUNIT(61).GT.0) CALL FMP2DA(IGRID)
       CALL GWF2BAS7DA(IGRID)
 C
-      IF ( GSFLOW_flag==ACTIVE ) THEN
+      IF ( GSFLOW_flag==ACTIVE .and. Timestep > 0 ) THEN
         PRINT 9001, Timestep, Convfail_cnt, Iterations, Sziters,
      &            FLOAT(Iterations)/FLOAT(Timestep),
      &            FLOAT(Sziters)/FLOAT(Timestep), Max_iters, Max_sziters
