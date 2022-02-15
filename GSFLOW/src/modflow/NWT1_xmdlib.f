@@ -1950,7 +1950,7 @@ c
 c
 c     local variables
 c
-      integer :: ierror, nred
+      integer :: ierror, nred, i
 
       double precision, dimension(:), allocatable :: soln
 
@@ -2001,10 +2001,10 @@ c
 c
 c     scatter solution
 c
-c      do i = 1, nblack
-c        x( RBorder(i) ) = soln(i)
-c      enddo
-       x( RBorder(1:nblack) ) = soln(1:nblack)
+      do i = 1, nblack
+        x( RBorder(i) ) = soln(i)
+      enddo
+!       x( RBorder(1:nblack) ) = soln(1:nblack)  RGN 2/15/2022
 
 c     recover red nodes
 
