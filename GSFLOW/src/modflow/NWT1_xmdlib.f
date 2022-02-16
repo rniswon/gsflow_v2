@@ -348,7 +348,7 @@ c     brute force factor
 c
 c     local variables
 c
-      integer :: itemp, ii, first, iold, iend, num, next,
+      integer :: i, itemp, ii, first, iold, iend, num, next,
      [        maxint, iblck, id, kk, idk, idkk
       double precision temp, epsmin
 
@@ -674,7 +674,7 @@ c
 c
 c     locall variables
 c
-      integer :: ibf, nred, ii, i, iHalf, iBlack,iRed, ierror, k
+      integer :: ibf, nred, ii, idf, i, iHalf, iBlack,iRed, ierror, k
       integer, allocatable, dimension(:) :: ilist
       allocate( ilist(neq) , stat = ierror )
       if (ierror /= 0) stop "== not enough memory (xmdRedBlack) =="
@@ -1950,7 +1950,7 @@ c
 c
 c     local variables
 c
-      integer :: ierror, nred, i
+      integer :: ierror, i, nred
 
       double precision, dimension(:), allocatable :: soln
 
@@ -2001,17 +2001,17 @@ c
 c
 c     scatter solution
 c
-      do i = 1, nblack
-        x( RBorder(i) ) = soln(i)
-      enddo
-!       x( RBorder(1:nblack) ) = soln(1:nblack)  RGN 2/15/2022
+c      do i = 1, nblack               !rgn
+c        x( RBorder(i) ) = soln(i)    !rgn
+c      enddo                          !rgn
+       do i = 1, nblack               !rgn
+         x( RBorder(i) ) = soln(i)    !rgn
+       end do                         !rgn
 
 c     recover red nodes
-
       if (nred > 0) then
         call xmdgtred(a, x, b, ia, ja, RBorder(nblack+1), nja, n, nred)
       endif
-
 c     deallocate ( soln )
       end subroutine xmdsolv
 
