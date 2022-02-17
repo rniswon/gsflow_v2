@@ -28,7 +28,7 @@ one                    1
 ====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 01/12/2022
+                       Version 5.3.0 02/08/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -64,7 +64,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-11-23
+PRMS Computation Order          gsflow_prms         2022-02-08
 Read Control File               read_control_file   2022-01-12
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-01-12
@@ -206,7 +206,7 @@ rain_day 0
  Data File time period: 1980/10/01 00:00:00 to 2011/09/30 00:00:00
 Simulation time period: 1980/10/01 00:00:00 to 1984/01/30 00:00:00
 ====================================================================
-Basin Definition                basin               2022-01-27
+Basin Definition                basin               2022-02-10
 Cascading Flow                  cascade             2021-11-19
 Common States and Fluxes        climateflow         2022-01-20
 Potential Solar Radiation       soltab              2021-09-07
@@ -218,13 +218,13 @@ Solar Radiation Distribution    ddsolrad            2021-11-19
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-02-03
-Snow Dynamics                   snowcomp            2022-02-04
-Surface Runoff                  srunoff_smidx       2022-02-04
+Snow Dynamics                   snowcomp            2022-02-10
+Surface Runoff                  srunoff_smidx       2022-02-10
 Soilzone Computations           soilzone            2022-02-04
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-12-09
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-06-10
 GSFLOW Output Budget Summary    gsflow_budget       2021-12-15
-GSFLOW Output CSV Summary       gsflow_sum          2022-01-12
+GSFLOW Output CSV Summary       gsflow_sum          2022-02-10
 Output Summary                  subbasin            2022-01-25
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2022-01-12
@@ -246,5 +246,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time   20 minutes 22.95 seconds
+Execution elapsed time   18 minutes 26.73 seconds
 

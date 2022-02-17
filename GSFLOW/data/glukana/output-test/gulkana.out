@@ -23,7 +23,7 @@ nlapse                 3
 ====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 01/12/2022
+                       Version 5.3.0 02/08/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -59,7 +59,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-11-23
+PRMS Computation Order          gsflow_prms         2022-02-08
 Read Control File               read_control_file   2022-01-12
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-01-12
@@ -157,7 +157,7 @@ tmin 16
  Data File time period: 1948/10/01 00:00:00 to 2015/09/30 00:00:00
 Simulation time period: 1971/10/01 00:00:00 to 2015/09/30 00:00:00
 ====================================================================
-Basin Definition                basin               2022-01-27
+Basin Definition                basin               2022-02-10
 Common States and Fluxes        climateflow         2022-01-20
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
@@ -167,9 +167,9 @@ Solar Radiation Distribution    ccsolrad            2021-12-09
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-02-03
-Snow Dynamics                   snowcomp            2022-02-04
+Snow Dynamics                   snowcomp            2022-02-10
 Glacier Dynamics                glacr_melt          2022-01-12
-Surface Runoff                  srunoff_smidx       2022-02-04
+Surface Runoff                  srunoff_smidx       2022-02-10
 Soilzone Computations           soilzone            2022-02-04
 Groundwater                     gwflow              2021-12-16
 Streamflow Routing Init         routing             2022-02-04
@@ -245,5 +245,5 @@ Fraction impervious:        0.0687    Fraction pervious:       0.9313
  *************************************************************
  Total for run     418.200  279.047    1.062  152.101 -286.767
  *************************************************************
-Execution elapsed time    0 minutes  3.76 seconds
+Execution elapsed time    0 minutes  3.39 seconds
 
