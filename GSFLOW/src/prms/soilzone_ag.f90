@@ -21,23 +21,23 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2022-02-15'
+      character(len=*), parameter :: Version_soilzone_ag = '2022-02-16'
       INTEGER, SAVE :: Soil_iter
-      DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_ag_gvr2sm
+      DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr, Last_ag_soil_rechr
-      REAL, SAVE, ALLOCATABLE :: It0_ag_soil_rechr(:), It0_ag_soil_moist(:), Ag_replenish_frac(:)
-      DOUBLE PRECISION, SAVE :: Basin_ag_gvr_stor, Basin_ag_recharge, Basin_ag_interflow, Last_ag_gvr_stor
-      REAL, SAVE, ALLOCATABLE :: It0_ag_gvr_stor(:), Gvr_non_ag_frac(:)
+      REAL, SAVE, ALLOCATABLE :: It0_ag_soil_rechr(:), It0_ag_soil_moist(:)
+      DOUBLE PRECISION, SAVE :: Basin_ag_gvr_stor, Basin_ag_recharge, Basin_ag_interflow, Last_ag_gvr_stor, Basin_ag_gvr2sm
+      REAL, SAVE, ALLOCATABLE :: It0_ag_gvr_stor(:), Gvr_non_ag_frac(:), Ag_replenish_frac(:)
       !REAL, SAVE, ALLOCATABLE :: Ag_slow_flow(:), Ag_ssres_in(:), Ag_water_maxin(:)
 !   Agriculture Declared Variables
       INTEGER, SAVE, ALLOCATABLE :: Ag_soil_saturated(:)
       DOUBLE PRECISION, SAVE :: Basin_ag_waterin
       REAL, SAVE, ALLOCATABLE :: Ag_hortonian(:), Unused_ag_et(:), Ag_soil_to_gvr(:), Ag_soilwater_deficit(:)
-      REAL, SAVE, ALLOCATABLE :: Ag_actet(:), Ag_irrigation_add(:), Ag_gvr_to_sm(:), Ag_irrigation_add_vol(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_actet(:), Ag_irrigation_add(:), Ag_irrigation_add_vol(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_to_gw(:), hru_ag_actet(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_lower(:), Ag_soil_lower_stor_max(:), Ag_potet_rechr(:), Ag_potet_lower(:)
 !      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Ag_upslope_dunnian(:)
-      REAL, SAVE, ALLOCATABLE :: Ag_gvr_to_gw(:), Ag_gvr_stor(:), Ag_recharge(:), Ag_interflow(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_gvr_to_gw(:), Ag_gvr_stor(:), Ag_recharge(:), Ag_interflow(:), Ag_gvr_to_sm(:)
       INTEGER, SAVE :: total_iters, iter_nonconverge
       real, save :: unsatisfied_big
       ! parameters
@@ -46,7 +46,7 @@
       REAL, SAVE, ALLOCATABLE :: Ag_soilwater_deficit_min(:), Ag_covden_sum(:,:), Ag_covden_win(:,:)
 !      REAL, SAVE, ALLOCATABLE :: Ag_sat_threshold(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_rechr_max_frac(:), Ag_soil2gw_max(:) ! Ag_crop_coef later, will specify PET
-      REAL, SAVE, ALLOCATABLE :: Ag_gvr_stor_init_frac(:), Ag_gvr2gw_rate(:), Ag_gvr2gw_exp(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_gvr_stor_init_frac(:), Ag_gvr2gw_rate(:), Ag_gvr2gw_exp(:), Ag_slowcoef_lin(:), Ag_slowcoef_sq(:)
       INTEGER, SAVE :: max_soilzone_ag_iter
       REAL, SAVE :: soilzone_aet_converge
 
@@ -191,12 +191,11 @@
         CALL declvar_real(MODNAME, 'ag_gvr_stor', 'nhru', Nhru, &
      &       'Storage in the agriculture gravity reservoir of the agriculture fraction of each HRU', &
      &       'inches', Ag_gvr_stor)
-
         ALLOCATE ( Ag_gvr_to_gw(Nhru) )
         CALL declvar_real(MODNAME, 'ag_gvr_to_gw', 'nhru', Nhru, &
      &       'Gravity drainage from the agriculture reservoir for each HRU', &
      &       'inches', Ag_gvr_to_gw)
-
+        ALLOCATE ( Ag_interflow(Nhru) )
         CALL declvar_real(MODNAME, 'ag_interflow', 'nhru', Nhru, &
      &       'Interflow from the agriculture reservoir for each HRU', &
      &       'inches', Ag_interflow)
@@ -263,26 +262,17 @@
      &     'Winter vegetation cover density for the crop type in each HRU', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'ag_covden_win')
 
-      ALLOCATE ( Ag_soil2gw_max(Nhru) )
-      IF ( declparam(MODNAME, 'ag_soil2gw_max', 'nhru', 'real', &
-     &     '-1.0', '0.0', '5.0', &
-     &     'Maximum value for agriculture capillary reservoir excess to groundwater storage', &
-     &     'Maximum amount of the agriculture capillary reservoir excess that'// &
-     &     ' is routed directly to the groundwater storage for each HRU', &
-     &     'inches')/=0 ) CALL read_error(1, 'ag_soil2gw_max')
+      IF ( Ag_gravity_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 .OR. Model==DOCUMENTATION ) THEN
+          ALLOCATE ( Ag_gvr_stor_init_frac(Nhru) )
+          IF ( declparam(MODNAME, 'ag_gvr_stor_init_frac', 'nhru', 'real', &
+     &         '0.0', '0.0', '1.0', &
+     &         'Initial fraction of available water in the agriculture gravity reservoir', &
+     &         'Initial fraction of available water in the agriculture gravity reservoir'// &
+     &         ' (fraction of sat_threshold) for each HRU', &
+     &         'decimal fraction')/=0 ) CALL read_error(1, 'ag_gvr_stor_init_frac')
+        ENDIF
 
-      IF ( (Ag_gravity_flag==ACTIVE .AND. (Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. &
-     &     Init_vars_from_file==5)) .OR. Model==DOCUMENTATION ) THEN
-        ALLOCATE ( Ag_gvr_stor_init_frac(Nhru) )
-        IF ( declparam(MODNAME, 'ag_gvr_stor_init_frac', 'nhru', 'real', &
-     &       '0.0', '0.0', '1.0', &
-     &       'Initial fraction of available water in the agriculture gravity reservoir', &
-     &       'Initial fraction of available water in the agriculture gravity reservoir'// &
-     &       ' (fraction of sat_threshold) for each HRU', &
-     &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_gvr_stor_init_frac')
-      ENDIF
-
-      IF ( Ag_gravity_flag==ACTIVE ) THEN
         ALLOCATE ( Ag_gvr2gw_rate(Nhru) )
         IF ( declparam(MODNAME, 'ag_gvr2gw_rate', 'nhru', 'real', &
      &       '-1.0', '0.0001', '999.0', &
@@ -297,7 +287,28 @@
      &       'Non-linear coefficient in equation used to route water'// &
      &       ' from the agriculture gravity reservoir to groundwater storage for each HRU', &
      &       'none')/=0 ) CALL read_error(1, 'ag_gvr2gw_exp')
+        ALLOCATE ( Ag_slowcoef_lin(Nhru) )
+        IF ( declparam(MODNAME, 'ag_slowcoef_lin', 'nhru', 'real', &
+     &       '-1.0', '0.0', '1.0', &
+     &       'Linear agriculture gravity-flow reservoir routing coefficient', &
+     &       'Linear coefficient in equation to route agriculture gravity-reservoir storage downslope for each HRU', &
+     &       'fraction/day')/=0 ) CALL read_error(1, 'ag_slowcoef_lin')
+        ALLOCATE ( Ag_slowcoef_sq(Nhru) )
+        IF ( declparam(MODNAME, 'ag_slowcoef_sq', 'nhru', 'real', &
+     &       '-1.0', '0.0', '1.0', &
+     &       'Non-linear agriculture gravity-flow reservoir routing coefficient', &
+     &       'Non-linear coefficient in equation to route agriculture'// &
+     &       ' gravity-reservoir storage downslope for each HRU', &
+     &       'none')/=0 ) CALL read_error(1, 'ag_slowcoef_sq')
       ENDIF
+
+      ALLOCATE ( Ag_soil2gw_max(Nhru) )
+      IF ( declparam(MODNAME, 'ag_soil2gw_max', 'nhru', 'real', &
+     &     '-1.0', '0.0', '5.0', &
+     &     'Maximum value for agriculture capillary reservoir excess to groundwater storage', &
+     &     'Maximum amount of the agriculture capillary reservoir excess that'// &
+     &     ' is routed directly to the groundwater storage for each HRU', &
+     &     'inches')/=0 ) CALL read_error(1, 'ag_soil2gw_max')
 
       END FUNCTION szdecl_ag
 
@@ -308,9 +319,9 @@
       INTEGER FUNCTION szinit_ag()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, LAKE, GLACIER, INACTIVE, OFF, MONTHS_PER_YEAR
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru, Hru_type, Iter_aet_flag, GSFLOW_flag, &
-     &    Ag_package, Agriculture_soilzone_flag, Ag_gravity_flag
-      USE PRMS_SOILZONE, ONLY: MODNAME, Soil2gw_max, Ssr2gw_rate, Ssr2gw_exp
+      USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru, Hru_type, Iter_aet_flag, &
+     &    GSFLOW_flag, Ag_package, Agriculture_soilzone_flag, Ag_gravity_flag
+      USE PRMS_SOILZONE, ONLY: MODNAME, Soil2gw_max, Ssr2gw_rate, Ssr2gw_exp, Slowcoef_lin, Slowcoef_sq
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Basin_area_inv, Ag_area, Covden_win, Covden_sum, Ag_frac
       USE PRMS_FLOWVARS, ONLY: Basin_ag_soil_moist, Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max,&
@@ -340,9 +351,13 @@
       IF ( Ag_covden_win(1,1)<0.0 ) Ag_covden_win = Covden_win
       IF ( Ag_gravity_flag==ACTIVE ) THEN
         IF ( getparam_real(MODNAME, 'ag_gvr2gw_rate', Nhru, Ag_gvr2gw_rate)/=0 ) CALL read_error(2, 'ag_gvr2gw_rate')
-        IF ( ag_gvr2gw_rate(1)<0.0 ) Ag_gvr2gw_rate = Ssr2gw_rate
+        IF ( Ag_gvr2gw_rate(1)<0.0 ) Ag_gvr2gw_rate = Ssr2gw_rate
         IF ( getparam_real(MODNAME, 'ag_gvr2gw_exp', Nhru, Ag_gvr2gw_exp)/=0 ) CALL read_error(2, 'ag_gvr2gw_exp')
         IF ( Ag_gvr2gw_rate(1)<0.0 ) Ag_gvr2gw_exp = Ssr2gw_exp
+        IF ( getparam_real(MODNAME, 'ag_slowcoef_lin', Nhru, Ag_slowcoef_lin)/=0 ) CALL read_error(2, 'ag_slowcoef_lin')
+        IF ( Ag_slowcoef_lin(1)<0.0 ) ag_slowcoef_lin = Slowcoef_lin
+        IF ( getparam_real(MODNAME, 'ag_slowcoef_sq', Nhru, Ag_slowcoef_sq)/=0 ) CALL read_error(2, 'ag_slowcoef_sq')
+        IF ( Ag_gvr2gw_rate(1)<0.0 ) Ag_slowcoef_sq = Slowcoef_sq
         IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
           IF ( getparam_real(MODNAME, 'ag_gvr_stor_init_frac', Nhru, Ag_gvr_stor)/=0 ) &
      &         CALL read_error(2, 'ag_gvr_stor_init_frac')
@@ -382,6 +397,7 @@
           Ag_soil_rechr_max(ihru) = 0.0
           Ag_soil_moist(ihru) = 0.0
           Ag_soil_rechr(ihru) = 0.0
+          IF ( Ag_gravity_flag==ACTIVE ) Ag_gvr_stor(ihru) = 0.0
         ENDIF
         IF ( Ag_soil_moist_max(ihru)>0.0 ) Ag_replenish_frac(ihru) = Ag_soil_rechr_max(ihru)/Ag_soil_moist_max(ihru)
         Gvr_non_ag_frac(ihru) = 1.0 - Ag_frac(ihru)
@@ -411,9 +427,11 @@
       INTEGER FUNCTION szrun_ag()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF
-      USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
-     &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Call_cascade, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Ag_flag, Nowmonth, Nowyear, Nowday, Iter_aet_flag, Agriculture_soilzone_flag, Hru_type
+      USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, &
+     &    Frozen_flag, Soilzone_add_water_use, Call_cascade, &
+     &    Nowmonth, Nowyear, Nowday, Iter_aet_flag, Hru_type, &
+     &    GSFLOW_flag, Ag_gravity_flag, Kkiter, Hru_ag_irr, PRMS_land_iteration_flag, &
+     &    Soilzone_aet_flag, Ag_flag, Agriculture_soilzone_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
@@ -441,18 +459,21 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
-      EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow_ag
-      EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars, check_gvr_sm
+      EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades
+      EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars
+      EXTERNAL :: compute_gravflow_ag
+      !EXTERNAL :: check_gvr_sm
 ! Local Variables
       INTEGER :: i, k, update_potet, compute_lateral, perv_on_flag
       REAL :: dunnianflw, interflow, perv_area, harea
       REAL :: dnslowflow, dnpreflow, dndunn, availh2o, avail_potet, hruactet, ag_hruactet
-      REAL :: topfr, topfr_sm, topfr_ag, availh2o_sm, availh2o_ag !, depth, tmp
+      REAL :: topfr !, depth, tmp
       REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin
-      REAL :: perv_frac, capacity, capwater_maxin, ssresin, gvrin_ag
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
       REAL :: ag_upflow_max, ag_capacity, excess, agfrac, ag_avail_potet, ag_potet
       REAL :: ag_AETtarget, ag_avail_targetAET, cap_ag_water_maxin, agactet
+      REAL :: perv_frac, capwater_maxin, ssresin
+      REAL :: topfr_sm, topfr_ag, availh2o_sm, availh2o_ag, capacity, gvrin_ag
       DOUBLE PRECISION :: gwin !, frac
       INTEGER :: cfgi_frozen_hru
       INTEGER :: num_hrus_ag_iter, ag_on_flag, keep_iterating, add_estimated_irrigation
@@ -568,7 +589,7 @@
         Soil_saturated(i) = OFF
 ! initialize all HRU values in case dynamic ag frac
         Ag_soil_saturated(i) = OFF
-        Ag_gvr_to_sm(i) = 0.0
+        IF ( GSFLOW_flag==ACTIVE ) Ag_gvr_to_sm(i) = 0.0
         Ag_soil_to_gvr(i) = 0.0
         Ag_soil_to_gw(i) = 0.0
         Ag_hortonian(i) = 0.0
@@ -792,7 +813,7 @@
      &                             Soil_to_ssr(i), Pref_flow_thrsh(i), topfr, &
      &                             Ssr_to_gw(i), Slow_flow(i), Slow_stor(i), &
      &                             Gvr2sm(i), Soil_to_gw(i), gwin, compute_lateral, &
-     &                             ag_capacity, Ag_soil_to_gw(i), agfrac, , Gvr_non_ag_frac(i))
+     &                             ag_capacity, Ag_soil_to_gvr(i), Ag_gvr_to_sm(i), agfrac, Gvr_non_ag_frac(i))
           ! adjust soil moisture with replenish amount
           IF ( Gvr2sm(i)>0.0 ) THEN
             IF ( perv_on_flag==ACTIVE ) THEN
@@ -826,28 +847,39 @@
           Grav_gwin(i) = SNGL( gwin )
           Basin_sz_gwin = Basin_sz_gwin + gwin*Hru_area_dble(i)
         ELSE
-          availh2o_sm = Slow_stor(i) + Soil_to_ssr(i)
-          IF ( Ag_gravity_flag==ACTIVE ) availh2o_ag = Ag_gvr_stor(i) + Ag_soil_to_gvr(i)
-          IF ( compute_lateral==ACTIVE ) THEN
-            topfr_sm = MAX( 0.0, availh2o_sm-Pref_flow_thrsh(i) ) * Gvr_non_ag_frac(i)
-            Slow_stor(i) = availh2o_sm - topfr_sm
-            ! compute slow contribution to interflow, if any
-            IF ( Slow_stor(i)>0.0 ) THEN
+          IF ( Ag_gravity_flag==OFF ) THEN
+            availh2o = Slow_stor(i) + Soil_to_ssr(i) + Ag_soil_to_gvr(i)
+            IF ( compute_lateral==ACTIVE ) THEN
+              topfr = MAX( 0.0, availh2o-Pref_flow_thrsh(i) )
+              ssresin = Soil_to_ssr(i) - topfr
+              Slow_stor(i) = availh2o - topfr
+              ! compute slow contribution to interflow, if any
+              IF ( Slow_stor(i)>0.0 ) &
+     &             CALL compute_interflow(Slowcoef_lin(i), Slowcoef_sq(i), ssresin, Slow_stor(i), Slow_flow(i))
+            ELSEIF ( Hru_type(i)==SWALE ) THEN
+              Slow_stor(i) = availh2o
+            ENDIF
+          ELSE
+            availh2o_sm = Slow_stor(i) + Soil_to_ssr(i)
+            availh2o_ag = Ag_gvr_stor(i) + Ag_soil_to_gvr(i)
+            IF ( compute_lateral==ACTIVE ) THEN
+              topfr_sm = MAX( 0.0, availh2o_sm-Pref_flow_thrsh(i) )
               ssresin = Soil_to_ssr(i) - topfr_sm
-              CALL compute_interflow(Slowcoef_lin(i), Slowcoef_sq(i), ssresin, Slow_stor(i), Slow_flow(i))
-            ENDIF
-            IF ( Ag_gravity_flag==ACTIVE ) THEN
-              topfr_ag = MAX( 0.0, availh2o_ag-Pref_flow_thrsh(i) ) * agfrac
+              Slow_stor(i) = availh2o_sm - topfr_sm
+              ! compute slow contribution to interflow, if any
+              IF ( Slow_stor(i)>0.0 ) &
+     &             CALL compute_interflow(Slowcoef_lin(i), Slowcoef_sq(i), ssresin, Slow_stor(i), Slow_flow(i))
+              topfr_ag = MAX( 0.0, availh2o_ag-Pref_flow_thrsh(i) )
+              gvrin_ag = Ag_soil_to_gvr(i) - topfr_ag
               Ag_gvr_stor(i) = availh2o_ag - topfr_ag
-              IF ( Ag_gvr_stor(i)>0.0 ) THEN
-                gvrin_ag = Ag_soil_to_gvr(i) - topfr_ag
-                CALL compute_interflow(Slowcoef_lin(i), Slowcoef_sq(i), gvrin_ag, Ag_gvr_stor(i), Ag_interflow(i))
-print *, Ag_gvr_stor(i), Ag_interflow(i)
-              ENDIF
+              ! compute slow contribution from AG GVR to interflow, if any
+              IF ( Ag_gvr_stor(i)>0.0 ) &
+     &             CALL compute_interflow(Slowcoef_lin(i), Slowcoef_sq(i), gvrin_ag, Ag_gvr_stor(i), Ag_interflow(i))
+            ELSEIF ( Hru_type(i)==SWALE ) THEN
+              Slow_stor(i) = availh2o_sm
+              Ag_gvr_stor(i) = availh2o_ag
             ENDIF
-          ELSEIF ( Hru_type(i)==SWALE ) THEN
-            Slow_stor(i) = availh2o_sm
-            IF ( Ag_gravity_flag==ACTIVE ) Ag_gvr_stor(i) = availh2o_ag
+print *, Ag_gvr_stor(i), Ag_interflow(i)
           ENDIF
 !          IF ( ag_on_flag==ACTIVE ) THEN
 !            IF ( Slow_stor(i)>0.0 .AND. ag_capacity>0.0 ) THEN
@@ -1005,8 +1037,11 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
 ! if HRU cascades,
 ! compute interflow and excess flow to each HRU or stream
         IF ( compute_lateral==ACTIVE ) THEN
-          interflow = Slow_flow(i) * Gvr_non_ag_frac(i) + prefflow
-          IF ( Ag_gravity_flag==ACTIVE ) interflow = interflow + Ag_interflow(i) * agfrac
+          IF ( Ag_gravity_flag==OFF ) THEN
+            interflow = Slow_flow(i) + prefflow
+          ELSE
+            interflow = Slow_flow(i) * Gvr_non_ag_frac(i) + prefflow + Ag_interflow(i) * agfrac
+          ENDIF
           Basin_interflow_max = Basin_interflow_max + interflow*harea
           dunnianflw = dunnianflw_gvr + dunnianflw_pfr
           Dunnian_flow(i) = dunnianflw
@@ -1204,12 +1239,13 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
      &           Slowcoef_sq, Ssr2gw_rate, Ssr2gw_exp, Gvr_maxin, &
      &           Pref_flow_thrsh, Gvr2pfr, Ssr_to_gw, &
      &           Slow_flow, Slow_stor, Gvr2sm, Soil_to_gw, Gwin, Compute_lateral, &
-     &           Ag_capacity, Ag_gvr_to_sm, Gvr_non_ag_frac)
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE
+     &           Ag_capacity, Ag_gvr_maxin, Ag_gvr_to_sm, Agfrac, Gvr_non_ag_frac)
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug, Dprst_flag, Print_debug, Ag_gravity_flag
       USE PRMS_SOILZONE, ONLY: Gravity_stor_res, Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, &
-     &    Gw2sm_grav, Gvr_hru_pct_adjusted
-      USE PRMS_SOILZONE_AG, ONLY: Ag_soil_to_gw, Ag_interflow, Ag_gvr_stor, Ag_gvr2gw_rate, Ag_gvr2gw_exp
+     &                         Gw2sm_grav, Gvr_hru_pct_adjusted
+      USE PRMS_SOILZONE_AG, ONLY: Ag_gvr_stor, Ag_gvr2gw_rate, Ag_gvr2gw_exp, &
+     &                            Ag_slowcoef_lin, Ag_Slowcoef_sq, Ag_interflow
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
       IMPLICIT NONE
 ! Functions
@@ -1218,14 +1254,15 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
 ! Arguments
       INTEGER, INTENT(IN) :: Ihru, Compute_lateral
       REAL, INTENT(IN) :: Slowcoef_lin, Slowcoef_sq, Ssr2gw_rate, Ssr2gw_exp
-      REAL, INTENT(IN) :: Pref_flow_thrsh, Soil_to_gw, Gvr_maxin, Gvr_non_ag_frac
+      REAL, INTENT(IN) :: Pref_flow_thrsh, Soil_to_gw, Gvr_maxin
+      REAL, INTENT(IN) :: Ag_gvr_maxin, Gvr_non_ag_frac, Agfrac
       REAL, INTENT(INOUT) :: Capacity, Ag_capacity
       REAL, INTENT(OUT) :: Ssr_to_gw, Slow_stor, Slow_flow, Gvr2pfr, Gvr2sm, Ag_gvr_to_sm
       DOUBLE PRECISION, INTENT(OUT) :: Gwin
 ! Local Variables
       INTEGER :: j, igvr
-      REAL :: perc, slowflow, extra_water, gvrin_actual, depth, input, input_sm, input_ag
-      DOUBLE PRECISION :: topfr, slflow, togw, slowstor, frac
+      REAL :: perc, slowflow, extra_water, gvrin_actual, depth, input, input_sm, input_ag, depth_ag, perc_ag
+      DOUBLE PRECISION :: topfr, slflow, togw, slowstor, frac, aginterflow, ag_gvrstor
 !***********************************************************************
       !Capacity is for whole HRU
       !Soil_to_gw is for whole HRU
@@ -1242,21 +1279,26 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
       slflow = 0.0D0
       togw = 0.0D0
       slowstor = 0.0D0
+      aginterflow = 0.0D0
+      ag_gvrstor = 0.0D0
       DO j = 1, Hru_gvr_count(Ihru)
         igvr = Hru_gvr_index(j, Ihru)
         frac = Gvr_hru_pct_adjusted(igvr)
         Gwin = Gwin + DBLE( Gw2sm_grav(igvr) )*frac
-        input = Gvr_maxin + Gw2sm_grav(igvr)
-        IF ( Ag_gravity_flag== ACTIVE ) THEN
-          input_sm = input * Gvr_non_ag_frac
-          input_ag = input * Agfrac
-          depth = Gravity_stor_res(igvr) + input_sm + input_ag
-        ELSE
+        IF ( Ag_gravity_flag==OFF ) THEN
+          input = Gvr_maxin + Gw2sm_grav(igvr)
           depth = Gravity_stor_res(igvr) + input
-        ENDIF
-        IF ( depth>0.0 ) THEN
-          IF ( Capacity>0.0 ) CALL check_gvr_sm(Capacity, depth, frac, Gvr2sm, input)
-          IF ( Ag_capacity>0.0 ) CALL check_gvr_sm(Ag_capacity, depth, frac, Ag_gvr_to_sm, input)
+          IF ( depth>0.0 ) THEN
+            IF ( Capacity>0.0 ) CALL check_gvr_sm(Capacity, depth, frac, Gvr2sm, input)
+            IF ( Ag_capacity>0.0 ) CALL check_gvr_sm(Ag_capacity, depth, frac, Ag_gvr_to_sm, input)
+          ENDIF
+        ELSE
+          input_sm = Gvr_maxin + Gw2sm_grav(igvr)
+          input_ag = Ag_gvr_maxin + Gw2sm_grav(igvr)
+          depth = Gravity_stor_res(igvr) + input_sm
+          IF ( depth>0.0 .AND. Capacity>0.0 ) CALL check_gvr_sm(Capacity, depth, frac, Gvr2sm, input_sm)
+          depth_ag = Ag_gvr_stor(Ihru) + input_ag
+          IF ( depth_ag>0.0 .AND. Ag_capacity>0.0 ) CALL check_gvr_sm(Ag_capacity, depth_ag, frac, Ag_gvr_to_sm, input_ag)
         ENDIF
 
         IF ( Compute_lateral==ACTIVE ) THEN
@@ -1265,37 +1307,70 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
             !compute contribution to preferential-flow reservoir storage
             topfr = topfr + DBLE( extra_water )*frac
             depth = Pref_flow_thrsh
+            gvrin_actual = MAX( 0.0, input - extra_water )
+            ! compute contribution to slow interflow, if any
+            IF ( depth>0.0 ) THEN
+              CALL compute_interflow(Slowcoef_lin, Slowcoef_sq, gvrin_actual, depth, slowflow)
+              IF ( Ag_gravity_flag==ACTIVE ) slowflow = slowflow * Gvr_non_ag_frac
+              slflow = slflow + DBLE( slowflow )*frac
+            ENDIF
           ENDIF
-          gvrin_actual = MAX(0.0, input-extra_water)
-
-! compute contribution to slow interflow, if any
-          IF ( depth>0.0 ) THEN
-            CALL compute_interflow(Slowcoef_lin, Slowcoef_sq, gvrin_actual, depth, slowflow)
-            slflow = slflow + DBLE( slowflow )*frac
+          IF ( Ag_gravity_flag==ACTIVE ) THEN
+            extra_water = MAX( 0.0, depth_ag - Pref_flow_thrsh )
+            IF ( extra_water>0.0 ) THEN
+              !compute contribution to preferential-flow reservoir storage
+              topfr = topfr + DBLE( extra_water )*frac
+              depth_ag = Pref_flow_thrsh
+              gvrin_actual = MAX( 0.0, input_ag - extra_water )
+            ENDIF
+            ! compute contribution to slow interflow from AG GVR, if any
+            IF ( depth_ag>0.0 ) THEN
+              CALL compute_interflow(Ag_slowcoef_lin(Ihru), Ag_slowcoef_sq(Ihru), gvrin_actual, depth_ag, Ag_interflow(Ihru))
+              slowflow = Ag_interflow(Ihru) * Agfrac
+              slflow = slflow + DBLE( slowflow )*frac
+            ENDIF
           ENDIF
         ENDIF
 
 ! compute flow to groundwater, if any
+        perc = 0.0
+        perc_ag = 0.0
         IF ( depth>0.0 ) THEN
           IF ( Ssr2gw_rate>0.0 ) THEN
 ! use VKS instead of rate  ???????????????
-            perc = Ssr2gw_rate*(depth**Ssr2gw_exp)
+            perc = Ssr2gw_rate * (depth**Ssr2gw_exp)
             IF ( perc<0.0 ) THEN
               perc = 0.0
             ELSEIF ( perc>depth ) THEN
               perc = depth
             ENDIF
             depth = depth - perc
-            Sm2gw_grav(igvr) = perc
-            togw = togw + DBLE( perc )*frac
           ENDIF
 !        ELSE ! GVRs can go negative if flux change in MODFLOW final iteration decreases, so don't set to 0
 !          if(depth<0.0) print *, 'depth<0', depth, ihru
 !          depth = 0.0
         ENDIF
 
+! compute flow to groundwater from AG GVR, if any
+        IF ( depth_ag>0.0 ) THEN
+          IF ( Ag_gvr2gw_rate(Ihru)>0.0 ) THEN
+            perc_ag = Ag_gvr2gw_rate(Ihru) * (depth_ag**Ag_gvr2gw_exp(Ihru))
+            IF ( perc_ag<0.0 ) THEN
+              perc_ag = 0.0
+            ELSEIF ( perc_ag>depth_ag ) THEN
+              perc_ag = depth_ag
+            ENDIF
+            depth_ag = depth_ag - perc_ag
+            perc_ag = perc_ag * Agfrac
+            perc = perc * Gvr_non_ag_frac
+            togw = togw + DBLE( perc )*frac
+          ENDIF
+        ENDIF
+        togw = togw + DBLE( perc + perc_ag )*frac
+        Sm2gw_grav(igvr) = perc + perc_ag
         Gravity_stor_res(igvr) = depth
         slowstor = slowstor + DBLE(depth)*frac
+        ag_gvrstor = ag_gvrstor + DBLE(depth_ag)*frac
 
 ! add any direct recharge from soil infiltration
         Sm2gw_grav(igvr) = Sm2gw_grav(igvr) + Soil_to_gw
@@ -1311,6 +1386,7 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
         IF ( Print_debug>DEBUG_less .AND. Compute_lateral==ACTIVE ) &
      &       PRINT *, 'slow_stor > thrsh', Slow_stor, Pref_flow_thrsh, ' HRU:', Ihru
       ENDIF
+      IF ( Ag_gravity_flag==ACTIVE ) Ag_gvr_stor(Ihru) = SNGL( ag_gvrstor )
 
       END SUBROUTINE compute_gravflow_ag
 
@@ -1335,7 +1411,7 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
         WRITE ( Restart_outunit ) Pref_flow_stor
         IF ( GSFLOW_flag==ACTIVE ) WRITE ( Restart_outunit ) Gravity_stor_res
         WRITE ( Restart_outunit ) Ag_soil_lower
-        IF ( Ag_gravity_flag== ACTIVE ) WRITE ( Restart_outunit ) Ag_gvr_stor
+        IF ( Ag_gravity_flag==ACTIVE ) WRITE ( Restart_outunit ) Ag_gvr_stor
       ELSE
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
@@ -1343,6 +1419,6 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
         READ ( Restart_inunit ) Pref_flow_stor
         IF ( GSFLOW_flag==ACTIVE ) READ ( Restart_inunit ) Gravity_stor_res
         READ ( Restart_inunit ) Ag_soil_lower
-        IF ( Ag_gravity_flag== ACTIVE ) READ ( Restart_inunit ) Ag_gvr_stor
+        IF ( Ag_gravity_flag==ACTIVE ) READ ( Restart_inunit ) Ag_gvr_stor
       ENDIF
       END SUBROUTINE soilzone_restart_ag
