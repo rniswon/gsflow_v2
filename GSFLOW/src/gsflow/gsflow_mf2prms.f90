@@ -18,8 +18,6 @@
      &                       NUMCELLSPOND, IRRHRU_POND, PONDIRRPRMS, PONDSEGFLOW, &
      &                       IRRPONDVAR, NUMIRRPOND
       IMPLICIT NONE
-! Functions
-      EXTERNAL :: print_module
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW to PRMS'
       character(len=*), parameter :: MODNAME = 'gsflow_mf2prms'
