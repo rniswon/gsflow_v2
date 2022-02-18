@@ -20,9 +20,9 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 02/11/2022'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 02/18/2022'
       character(len=*), parameter :: PRMS_versn = '2022-02-08'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 02/08/2022'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 03/01/2022'
       character(len=*), parameter :: Version_read_control_file = '2022-01-12'
       character(len=*), parameter :: Version_read_parameter_file = '2022-01-12'
       character(len=*), parameter :: Version_read_data_file = '2022-01-12'
@@ -90,7 +90,7 @@
       INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag, Gsf_rpt, Rpt_days
       INTEGER, SAVE :: Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, Dyn_springfrost_flag
       INTEGER, SAVE :: Gwr_transferON_OFF, External_transferON_OFF, Segment_transferON_OFF, Lake_transferON_OFF
-    END MODULE PRMS_MODULE
+  END MODULE PRMS_MODULE
 
     MODULE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
@@ -108,9 +108,9 @@
       character(len=*), parameter :: MODNAME_LAK = 'gwf2lak7_NWT'
       character(len=*), parameter :: MODNAME_AG =  'gwf2ag1_NWT_ponds'
       character(len=*), parameter :: Version_uzf = '2021-03-02'
-      character(len=*), parameter :: Version_sfr = '2020-09-30'
+      character(len=*), parameter :: Version_sfr = '2022-02-01'
       character(len=*), parameter :: Version_lak = '2021-09-28'
-      character(len=*), parameter :: Version_ag =  '2021-10-19'
+      character(len=*), parameter :: Version_ag =  '2022-02-01'
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
       INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS, KPERSTART

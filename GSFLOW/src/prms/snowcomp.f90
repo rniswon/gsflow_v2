@@ -21,7 +21,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2022-02-10'
+      character(len=*), parameter :: Version_snowcomp = '2022-02-18'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -707,13 +707,14 @@
         Glacr_evap = 0.0
       ENDIF
 
+      Ai = 0.0D0
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==3 ) THEN
         IF ( getparam_real(MODNAME, 'snowpack_init', Nhru, Snowpack_init)/=0 ) CALL read_error(2, 'snowpack_init')
         Pkwater_equiv = 0.0D0
+        Pk_depth = 0.0D0
         Pk_den = 0.0
         Pk_ice = 0.0
         Freeh2o = 0.0
-        Ai = 0.0D0
         Snowcov_area = 0.0
         Basin_pweqv = 0.0D0
         Basin_snowdepth = 0.0D0
@@ -935,6 +936,7 @@
       ! and snow evaporation are 0
       ! Keep track of the pack water equivalent before it is changed
       ! by precipitation during this time step
+      Pkwater_ante = Pkwater_equiv
 
       ! Loop through all the active HRUs, in routing order
       DO j = 1, Active_hrus
@@ -948,7 +950,6 @@
         Snow_evap(i) = 0.0 ! [inches]
         Tcal(i) = 0.0
         Ai(i) = 0.0D0
-        Pkwater_ante(i) = Pkwater_equiv(i)
         Active_glacier = OFF
         isglacier = OFF
         IF ( Glacier_flag==ACTIVE ) THEN

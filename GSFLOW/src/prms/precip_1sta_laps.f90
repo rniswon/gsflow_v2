@@ -21,7 +21,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=11) :: MODNAME
-        character(len=*), parameter :: Version_precip = '2021-11-19'
+        character(len=*), parameter :: Version_precip = '2022-02-18'
         INTEGER, SAVE, ALLOCATABLE :: Psta_nuse(:)
         REAL, SAVE, ALLOCATABLE :: Rain_adj_lapse(:, :), Snow_adj_lapse(:, :), Precip_local(:)
         ! Declared Parameters
@@ -123,7 +123,7 @@
         ALLOCATE ( Rain_adj_lapse(Nhru, MONTHS_PER_YEAR), Snow_adj_lapse(Nhru, MONTHS_PER_YEAR) )
         IF ( Precip_flag==precip_1sta_module .OR. Model==DOCUMENTATION ) THEN
           IF ( declparam(MODNAME, 'rain_adj', 'nhru,nmonths', 'real', &
-     &         '1.0', '0.2', '5.0', &
+     &         '1.0', '0.2', '10.0', &
      &         'Monthly rain adjustment factor for each HRU', &
      &         'Monthly (January to December) factor to adjust measured rain on each HRU'// &
      &         ' to account for differences in elevation, and so forth', &

@@ -5,7 +5,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2021-12-15'
+      character(len=*), parameter :: Version_gsflow_budget = '2022-02-18'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -289,7 +289,6 @@
         Gw2sm(i) = 0.0
         Gw_rejected(i) = 0.0
         Actet_gw(i) = 0.0
-        Slow_stor(i) = 0.0 !shouldn't be reset if any cells of HRU inactive and HRU active
         Slow_stor(i) = 0.0 !shouldn't be reset if any cells of HRU inactive and HRU active
 !        Uzf_infil_map(i) = 0.0
 !        Sat_recharge(i) = 0.0
