@@ -133,7 +133,7 @@ C     ------------------------------------------------------------------
      &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
      &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package, Model,
-     &    GSFLOW_flag, Print_debug !, AG_flag
+     &    GSFLOW_flag, Print_debug
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -143,7 +143,7 @@ C1------USE package modules.
       INTEGER :: I
       INCLUDE 'openspec.inc'
 ! Functions
-      INTRINSIC DBLE
+      INTRINSIC :: DBLE
       INTEGER, EXTERNAL :: numchars, GET_KPER
       EXTERNAL :: SET_STRESS_DATES, print_module, SETMFTIME
       EXTERNAL :: SETCONVFACTORS, check_gvr_cell_pct
@@ -243,10 +243,7 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
         PRINT *, 'GSFLOW requires UZF Package'
         ierr = 1
       ENDIF
-!      IF ( IUNIT(66)==0 .AND. AG_flag == ACTIVE ) THEN
-!        PRINT *, 'AG requires the AG Package'
-!        ierr = 1
-!      ENDIF
+
 ! Packages available in NWT but not in GSFLOW
       IF ( GSFLOW_flag==ACTIVE ) THEN
         IF ( IUNIT(3)>0 ) THEN
@@ -487,7 +484,7 @@ C
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep,
      &    Init_vars_from_file, Mxsziter, Glacier_flag,
      &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday,
-     &    Model, GSFLOW_flag, Print_debug
+     &    Model, GSFLOW_flag, Print_debug, Soilzone_module
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
@@ -707,7 +704,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
               ENDIF
               retval = soilzone()
               IF ( retval/=0 ) THEN
-                PRINT 9001, 'soilzone', retval
+                PRINT 9001, Soilzone_module, retval
                 RETURN
               ENDIF
               retval = gsflow_prms2mf()
@@ -1147,7 +1144,7 @@ c      IF(IUNIT(14).GT.0) CALL LMG7DA(IGRID)
 !      IF(IUNIT(61).GT.0) CALL FMP2DA(IGRID)
       CALL GWF2BAS7DA(IGRID)
 C
-      IF ( GSFLOW_flag==ACTIVE ) THEN
+      IF ( GSFLOW_flag==ACTIVE .and. Timestep > 0 ) THEN
         PRINT 9001, Timestep, Convfail_cnt, Iterations, Sziters,
      &            FLOAT(Iterations)/FLOAT(Timestep),
      &            FLOAT(Sziters)/FLOAT(Timestep), Max_iters, Max_sziters
@@ -1583,7 +1580,7 @@ C
           IF ( ISSFLG(1)==0 ) CALL READ_STRESS()
         ELSE
           nstress = INT( Modflow_skip_stress ) - ISSFLG(1)
-          DO i = 1, nstress
+          DO i = 1, nstress   !RGN because SP1 already read if SS during first period.
             KPER = KPER + 1 ! set to next stress period
             IF ( ISSFLG(KPER) == 0 ) CALL READ_STRESS()
             n = NSTP(KPER)

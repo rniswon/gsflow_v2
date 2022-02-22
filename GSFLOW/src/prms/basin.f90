@@ -61,8 +61,8 @@
 !     lake_hru_id
 !***********************************************************************
       INTEGER FUNCTION basdecl()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CASCADEGW_OFF, DOCUMENTATION
-      USE PRMS_MODULE, ONLY: Nhru, Nlake, Model, Dprst_flag, Lake_route_flag, Cascadegw_flag, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION
+      USE PRMS_MODULE, ONLY: Nhru, Nlake, Model, Dprst_flag, Lake_route_flag, &
      &    PRMS4_flag, GSFLOW_flag, Glacier_flag
       USE PRMS_BASIN
       IMPLICIT NONE
@@ -162,7 +162,7 @@
       ALLOCATE ( Hru_route_order(Nhru) )
 ! gwflow inactive for GSFLOW mode so arrays not allocated
 ! when GSFLOW can run in multi-mode will need these arrays
-      IF ( GSFLOW_flag==OFF .OR. Cascadegw_flag>CASCADEGW_OFF ) ALLOCATE ( Gwr_route_order(Nhru), Gwr_type(Nhru) )
+      IF ( GSFLOW_flag==OFF ) ALLOCATE ( Gwr_route_order(Nhru), Gwr_type(Nhru) )
 !      ALLOCATE ( Hru_elev_feet(Nhru) )
       ALLOCATE ( Hru_elev_meters(Nhru) )
 
@@ -236,7 +236,7 @@
      &       'Identification number of the lake associated with an HRU;'// &
      &       ' more than one HRU can be associated with each lake', &
      &       'none')/=0 ) CALL read_error(1, 'lake_hru_id')
-        IF ( (Lake_route_flag==ACTIVE .AND. GSFLOW_flag==0 ) .OR. Model==DOCUMENTATION ) THEN
+        IF ( (Lake_route_flag==ACTIVE .AND. GSFLOW_flag==OFF ) .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Lake_type(Nlake) )
           IF ( declparam(MODNAME, 'lake_type', 'nlake', 'integer', &
      &         '1', '1', '6', &
@@ -256,12 +256,11 @@
 !               and compute reservoir areas
 !**********************************************************************
       INTEGER FUNCTION basinit()
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CASCADEGW_OFF, &
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, &
      &    INACTIVE, LAKE, SWALE, FEET, ERROR_basin, DEBUG_minimum, &
-     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO
+     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO !, METERS2FEET
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, &
-     &    Dprst_flag, Lake_route_flag, Cascadegw_flag, &
-     &    PRMS4_flag, GSFLOW_flag, Frozen_flag, PRMS_VERSION, &
+     &    Dprst_flag, Lake_route_flag, PRMS4_flag, GSFLOW_flag, Frozen_flag, PRMS_VERSION, &
      &    Starttime, Endtime, Parameter_check_flag
       USE PRMS_BASIN
       IMPLICIT NONE
@@ -432,7 +431,7 @@
 
         Hru_perv(i) = perv_area
         Hru_frac_perv(i) = perv_area/harea
-        IF ( Hru_frac_perv(i)<0.001 ) THEN
+        IF ( Hru_frac_perv(i)<0.00099 ) THEN
           PRINT *, 'ERROR, pervious fraction must be >= 0.001 for HRU:', i
           PRINT *, '       pervious portion is HRU fraction - impervious fraction - depression fraction'
           PRINT *, '       pervious fraction:', Hru_frac_perv(i)
@@ -470,8 +469,8 @@
       Active_hrus = j
       Active_area = Land_area + Water_area
 
-      IF ( GSFLOW_flag==OFF .OR. Cascadegw_flag>CASCADEGW_OFF ) THEN
-        Active_gwrs = Active_hrus
+      Active_gwrs = Active_hrus
+      IF ( GSFLOW_flag==OFF ) THEN
         Gwr_type = Hru_type
         Gwr_route_order = Hru_route_order
       ENDIF

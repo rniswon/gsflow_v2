@@ -264,7 +264,7 @@
           ENDDO
         ENDIF
         IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
-          WRITE ( MSGUNT, 9002 ) 
+          WRITE ( MSGUNT, 9002 )
           k = 0
           DO ii = 1, Active_gwrs
             i = Gwr_route_order(ii)
@@ -947,7 +947,7 @@
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, Gwr_type
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: up_tree
+      EXTERNAL :: up_tree, PRMS_open_module_file
 !     Arguments
       INTEGER, INTENT(OUT) :: Iret
 !     Local Variables

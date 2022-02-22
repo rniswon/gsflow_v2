@@ -772,10 +772,10 @@
          j = Hru_route_order(k)
 
 ! DANGER HACK
-! On restart, sometimes soltab_potsw comes in as zero. It should never be zero as 
+! On restart, sometimes soltab_potsw comes in as zero. It should never be zero as
 ! this results in divide by 0.0
          if (Soltab_potsw(jday, j) <= 10.0) then
-            ccov = 1.0 - (Swrad(j) / sngl(10.0) * sngl(Hru_cossl(j)))
+            ccov = 1.0 - (Swrad(j) / 10.0 * sngl(Hru_cossl(j)))
          else
             ccov = 1.0 - (Swrad(j) / sngl(Soltab_potsw(jday, j)) * sngl(Hru_cossl(j)))
          endif
@@ -860,15 +860,15 @@
 !         if (Seg_melt(i) .ne. Seg_melt(i)) then
 !            write(*,*) "Seg_melt is nan", i
 !         endif
-!             
+!
 !         if (Seg_rain(i) .ne. Seg_rain(i)) then
 !            write(*,*) "Seg_rain is nan", i
 !         endif
-!             
+!
 !         if (Seg_humid(i) .ne. Seg_humid(i)) then
 !            write(*,*) "Seg_humid is nan", i
 !         endif
- 
+
       ENDDO
 
 

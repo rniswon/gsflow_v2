@@ -2084,7 +2084,7 @@ C     *****************************************************************
       USE GWFLAKMODULE, ONLY: THETA, STGOLD, STGNEW, LKARR1
 !!      USE GWFLAKMODULE, ONLY: THETA, STGOLD, STGNEW, VOL, LKARR1
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
-!      USE PRMS_MODULE, ONLY: MODSIM_flag
+      USE PRMS_MODULE, ONLY: MODSIM_flag
       IMPLICIT NONE
       INTRINSIC IABS, ABS, DABS, MIN, DSQRT, FLOAT, SQRT, SNGL
 C     -----------------------------------------------------------------
@@ -2181,7 +2181,7 @@ C2b-----START INTERNAL TIME LOOP FOR STREAMFLOW ROUTING.
       DO irt = 1, numdelt
 C
         isfr_loop = 1
-!        IF ( MODSIM_flag==ACTIVE ) isfr_loop = 2
+        IF ( MODSIM_flag==ACTIVE ) isfr_loop = 2
 C2c-----FORCE THE SFR7FM LOOP TO COMPLETE TWICE
         DO ifm = 1, isfr_loop
 C
@@ -3518,10 +3518,10 @@ C75-----STORE FLOWS NEEDED FOR SENSITIVITIES. - ERB
             END IF
 C
 C76-----ADD TERMS TO RHS AND HCOF IF FLOBOT IS NOT ZERO.
-          mskip = 1
-!          IF ( irt.EQ.numdelt .AND. MODSIM_flag==ACTIVE .AND. ifm==2 )
-!     1         mskip = 0
-          IF ( irt.EQ.numdelt .OR. mskip==0 ) THEN
+          mskip = 0
+          IF ( irt.EQ.numdelt .AND. MODSIM_flag==ACTIVE .AND. ifm==1 )
+     1         mskip = 1
+          IF ( irt.EQ.numdelt .AND. mskip==0 ) THEN
             hstrave = 0.0D0
             DO i = 1, numdelt
               hstrave = hstrave + HSTRM(l,i)

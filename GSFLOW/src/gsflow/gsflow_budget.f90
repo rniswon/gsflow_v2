@@ -229,19 +229,12 @@
 !      Sat_recharge = 0.0 ! dimension nhru
 !      Mfoutflow_to_gvr = 0.0 ! dimension nhru
       Gw2sm = 0.0 ! dimension nhru
-      Actet_gw = 0.0 ! dimension nhru
       Actet_tot_gwsz = 0.0 ! dimension nhru
-      Streamflow_sfr = 0.0 ! dimension nsegment
-      Seepage_reach_sfr = 0.0 ! dimension nreach
-      Seepage_segment_sfr = 0.0 ! dimension nsegment
 
 !  Set the volume budget indicies to -1 anytime "init" is called.
 !  This will make "run" figure out the vbnm order.
       Vbnm_index = -1
       ALLOCATE ( Fluxchange(Nhru) )
-      Fluxchange = 0.0
-      Basin_fluxchange = 0.0D0
-      Basin_szreject = 0.0D0
       Gw_rejected = 0.0
 
       END FUNCTION gsfbudinit
@@ -301,9 +294,9 @@
 !        Mfoutflow_to_gvr(i) = 0.0
         Fluxchange(i) = 0.0
       ENDDO
-      Streamflow_sfr = 0.0
-      Seepage_reach_sfr = 0.0
-      Seepage_segment_sfr = 0.0
+      Streamflow_sfr = 0.0 ! dimension nsegment
+      Seepage_reach_sfr = 0.0 ! dimension nreach
+      Seepage_segment_sfr = 0.0 ! dimension nsegment
 
       DO i = 1, Nhrucell
         ihru = Gvr_hru_id(i)
@@ -359,7 +352,7 @@
             lake = Lake_hru_id(i)
             !EVAP in mfl3/dt   SURFA in MFL2/dt
             IF ( SURFA(lake)>DNEARZERO ) THEN
-              inches_on_lake = SNGL(EVAP(lake))*DELT/SNGL(SURFA(lake))*Mfl_to_inch                         !RGN 5/23/15 added *DELT for time units other than days.         
+              inches_on_lake = SNGL(EVAP(lake))*DELT/SNGL(SURFA(lake))*Mfl_to_inch                         !RGN 5/23/15 added *DELT for time units other than days.
               Hru_actet(i) = inches_on_lake*SNGL(SURFA(lake)*Mfl2_to_acre/Lake_area(lake))
             ELSE
               Hru_actet(i) = 0.0
@@ -738,11 +731,11 @@
         ENDDO
         Seepage_segment_sfr(i) = Seepage_reach_sfr(i)/FLOAT(nrch)
         first_reach = first_reach + nrch
-      ENDDO 
+      ENDDO
       IF ( TOTSPFLOW<0.0 ) THEN
         Basin_cfs = Basin_cfs + TOTSPFLOW
       ELSE
-! RGN added specified inflows and outflows from SFR. 
+! RGN added specified inflows and outflows from SFR.
         Stream_inflow = Stream_inflow + TOTSPFLOW
       END IF
 ! RGN added next line.

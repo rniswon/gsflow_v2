@@ -1,4 +1,4 @@
-﻿!***********************************************************************
+!***********************************************************************
 ! Initiates development of a snowpack and simulates snow accumulation
 ! and depletion processes using an energy-budget approach
 !
@@ -690,7 +690,7 @@
 !***********************************************************************
       INTEGER FUNCTION snoinit()
       USE PRMS_CONSTANTS, ONLY: LAND, GLACIER, FEET, FEET2METERS, DNEARZERO, ACTIVE, OFF, MONTHS_PER_YEAR, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Print_debug, Init_vars_from_file, Glacier_flag, Snarea_curve_flag
+      USE PRMS_MODULE, ONLY: Nhru, Ndeplval, Print_debug, Init_vars_from_file, Glacier_flag, Snarea_curve_flag
       USE PRMS_SNOW
       USE PRMS_BASIN, ONLY: Basin_area_inv, Hru_route_order, Active_hrus, Hru_area_dble, Elev_units, Hru_type
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela
@@ -725,7 +725,7 @@
       IF ( getparam(MODNAME, 'rad_trncf', Nhru, 'real', Rad_trncf)/=0 ) CALL read_error(2, 'rad_trncf')
       IF ( Snarea_curve_flag==OFF ) THEN
         IF ( getparam(MODNAME, 'hru_deplcrv', Nhru, 'integer', Hru_deplcrv)/=0 ) CALL read_error(2, 'hru_deplcrv')
-        IF ( getparam(MODNAME, 'snarea_curve', Ndepl*11, 'real', Snarea_curve)/=0 ) CALL read_error(2, 'snarea_curve')
+        IF ( getparam(MODNAME, 'snarea_curve', Ndeplval, 'real', Snarea_curve)/=0 ) CALL read_error(2, 'snarea_curve')
       ELSE
         IF ( getparam(MODNAME, 'snarea_a', Nhru, 'real', Snarea_a)/=0 ) CALL read_error(2, 'snarea_a')
         IF ( getparam(MODNAME, 'snarea_b', Nhru, 'real', Snarea_b)/=0 ) CALL read_error(2, 'snarea_b')
@@ -764,10 +764,6 @@
       Frac_swe = 0.0
       Acum = acum_init
       Amlt = amlt_init
-      Basin_tcal = 0.0D0
-      Basin_snowmelt = 0.0D0
-      Basin_snowevap = 0.0D0
-      Basin_pk_precip = 0.0D0
       Basin_glacrb_melt = 0.0D0
       Basin_glacrevap = 0.0D0
       IF ( Glacier_flag==ACTIVE ) THEN
@@ -776,6 +772,7 @@
         Glacr_evap = 0.0
       ENDIF
 
+      Ai = 0.0D0
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==3 ) THEN
         IF ( getparam(MODNAME, 'snowpack_init', Nhru, 'real', Snowpack_init)/=0 ) CALL read_error(2, 'snowpack_init')
         Pkwater_equiv = 0.0D0
@@ -783,7 +780,6 @@
         Pk_den = 0.0
         Pk_ice = 0.0
         Freeh2o = 0.0
-        Ai = 0.0D0
         Snowcov_area = 0.0
         Basin_pweqv = 0.0D0
         Basin_snowdepth = 0.0D0
@@ -1002,11 +998,6 @@
       Frac_swe = 0.0
       ! By default, the precipitation added to snowpack, snowmelt,
       ! and snow evaporation are 0
-      Pk_precip = 0.0 ! [inches]
-      Snowmelt = 0.0 ! [inches]
-      Snow_evap = 0.0 ! [inches]
-      Tcal = 0.0
-      Ai = 0.0D0
       ! Keep track of the pack water equivalent before it is changed
       ! by precipitation during this time step
       Pkwater_ante = Pkwater_equiv
@@ -1018,6 +1009,11 @@
         ! Skip the HRU if it is a lake
         IF ( Hru_type(i)==LAKE ) CYCLE
 
+        Pk_precip(i) = 0.0 ! [inches]
+        Snowmelt(i) = 0.0 ! [inches]
+        Snow_evap(i) = 0.0 ! [inches]
+        Tcal(i) = 0.0
+        Ai(i) = 0.0D0
         Active_glacier = OFF
         isglacier = OFF
         IF ( Glacier_flag==ACTIVE ) THEN
@@ -1092,14 +1088,18 @@
               ELSE
                 Glacr_albedo(i) = Albedo_ice(i) +(Albedo_coef(i)/PI)*ATAN( (Alt_above_ela(i)+300.0)/200.0 )
               ENDIF
-            ELSE !IF ( Active_glacier==2 ) 
+            ELSE !IF ( Active_glacier==2 )
               Glacr_albedo(i) = Albedo_ice(i) !glacr_albedo doesn't change if glacierette but could get zeroed out
             ENDIF
           ENDIF
           IF ( isglacier==ACTIVE ) THEN
             IF (Nowyear >= Start_year+10 .AND. MOD(Nowyear-Start_year,5)==0 ) THEN
               Glacr_air_deltemp(i) = Glacr_air_5avtemp1(i) - Glacr_air_5avtemp(i) !need 5 years of data
-              Glacr_delsnow(i) = 10.0*(Glacr_5avsnow1(i) - Glacr_5avsnow(i))/Glacr_5avsnow1(i) !number of 10 percent (*100.0/10.0) changes
+              IF ( Glacr_5avsnow1(i)>0.0 ) THEN
+                Glacr_delsnow(i) = 10.0*(Glacr_5avsnow1(i) - Glacr_5avsnow(i))/Glacr_5avsnow1(i) !number of 10 percent (*100.0/10.0) changes
+              ELSE
+                Glacr_delsnow(i) = 0.0
+              ENDIF
             ENDIF
             !keep before restart
             IF ( MOD(Nowyear-Start_year,5)==0 ) THEN
@@ -1897,11 +1897,11 @@
       IF ( Pkwater_equiv>0.0D0 ) THEN
         Pk_temp = -Pk_def/SNGL(Pkwater_equiv*1.27D0)  ! [degrees C]
       ELSE
-!        IF ( Pkwater_equiv<0.0D0 ) THEN
+        IF ( Pkwater_equiv<0.0D0 ) THEN
 !          IF ( Pkwater_equiv<-DNEARZERO ) &
 !     &         PRINT *, 'snowpack issue 4, negative pkwater_equiv', Pkwater_equiv
-!          Pkwater_equiv = 0.0D0
-!        ENDIF
+          Pkwater_equiv = 0.0D0
+        ENDIF
         ! If on melting glacier ice/firn, Ihru_gl >0, so melted active layer (won't melt infinite ice layer)
         If (Ihru_gl>0) CALL glacr_states_to_zero(Ihru_gl,0)
       ENDIF
@@ -1995,7 +1995,7 @@
         IF ( Active_glacier>OFF ) THEN
           IF ( pmlt>apk_ice ) THEN
             !fractionate density with snow/active layer melting vs extra ice underneath melting
-            Pk_den = Pk_den*SNGL(apk_ice/pmlt) + 0.917*SNGL((pmlt-apk_ice)/pmlt)
+            Pk_den = Pk_den*(apk_ice/pmlt) + 0.917*((pmlt-apk_ice)/pmlt)
             apk_ice = pmlt
             Pk_ice =  apmlt
             Pkwater_equiv = apmlt

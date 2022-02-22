@@ -1,4 +1,4 @@
-﻿!***********************************************************************
+!***********************************************************************
 ! Compute potential solar radiation and sunlight hours for each HRU for
 ! each day of year; modification of soltab_prms
 !

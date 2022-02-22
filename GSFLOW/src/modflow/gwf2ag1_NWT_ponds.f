@@ -3753,8 +3753,8 @@
       USE GWFAGMODULE
       USE GLOBAL, ONLY: DELR, DELC, ISSFLG
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id  !,  uncomment for master
-!     +    Agriculture_dprst_flag  !uncomment for master
+      USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id,
+     +    Agriculture_dprst_flag
       USE PRMS_BASIN, ONLY: Hru_area
       USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_FLOWVARS, ONLY: Hru_actet, Dprst_vol_open
@@ -3811,10 +3811,10 @@
                 Q = PONDSEGFLOW(I)
                 QQ = PONDFLOW(I)
                 QQQ = 0.0
-     !!           if ( Agriculture_dprst_flag == 1 )   !uncommment this and next line
-     !!+               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
-     !!           CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
-     !!+                          Q, QQ, QQQ)
+                if ( Agriculture_dprst_flag == 1 )   !uncommment this and next line
+     +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+                CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
+     +                          Q, QQ, QQQ)
               END IF
            END DO
          END DO
@@ -3856,12 +3856,12 @@
            QQ = QQ + PONDFLOW(I)
            hru_id = IRRPONDVAR(I)
            sub = DZERO
-     !!      if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
-     !!        if ( ISSFLG(kkper) == 0 ) sub = 
-     !!+            Dprst_vol_open(hru_id)/MFQ_to_inch_acres
-     !!        if ( sub < DZERO ) sub = DZERO
-     !!        QQQ = QQQ + sub
-     !!      end if
+           if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
+             if ( ISSFLG(kkper) == 0 ) sub = 
+     +            Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+             if ( sub < DZERO ) sub = DZERO
+             QQQ = QQQ + sub
+           end if
          END DO
          hru_id = 0
          CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
