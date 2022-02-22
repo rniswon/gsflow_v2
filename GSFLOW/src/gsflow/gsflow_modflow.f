@@ -1583,9 +1583,9 @@ C
           IF ( ISSFLG(1)==0 ) CALL READ_STRESS()
         ELSE
           nstress = INT( Modflow_skip_stress ) - ISSFLG(1)
-          DO i = 1, nstress   !RGN because SP1 already read if SS during first period.
+          DO i = 1, nstress
             KPER = KPER + 1 ! set to next stress period
-            IF ( ISSFLG(i) == 0 ) CALL READ_STRESS()
+            IF ( ISSFLG(KPER) == 0 ) CALL READ_STRESS()
             n = NSTP(KPER)
             IF ( i==nstress ) n = INT( Modflow_time_in_stress )
             DO KSTP = 1, n

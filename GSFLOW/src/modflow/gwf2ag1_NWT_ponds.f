@@ -12,7 +12,6 @@
         DOUBLE PRECISION, PARAMETER :: zerod3 = 1.0d-3
         DOUBLE PRECISION, PARAMETER :: dzero = 0.0d0
         INTEGER, SAVE, POINTER :: NWELLS, MXWELL, NWELVL, NPWEL, IPRWEL
-        INTEGER, SAVE, POINTER :: MXPOND
         INTEGER, SAVE, POINTER :: IWELLCB, IRDPSI, NNPWEL, NAUXWELL
         INTEGER, SAVE, POINTER :: IWELLCBU, ISFRCB
         INTEGER, SAVE, POINTER :: IPONDCB, IPONDCBU  !DS
@@ -144,6 +143,7 @@
         REAL, SAVE, DIMENSION(:), POINTER :: DEMAND, SUPACT, SUPACTOLD
         REAL, SAVE, DIMENSION(:), POINTER :: ACTUAL
         REAL, SAVE, DIMENSION(:), POINTER :: ACTUALOLD
+        INTEGER, SAVE, POINTER :: KPEROLD
       END MODULE GWFAGMODULE
 
       SUBROUTINE GWF2AG7AR(IN, IUNITSFR, IUNITNWT)
@@ -183,8 +183,8 @@
       ALLOCATE (TSACTIVEALLPOND, TSACTIVEALLPONDET)
       ALLOCATE (TSGWALLUNIT, TSGWETALLUNIT, NSEGDIMTEMP)
       ALLOCATE (TSPONDALLUNIT, TSPONDETALLUNIT)
-      ALLOCATE (MXPOND, NUMPOND, NUMPONDET, NUMTABPOND, MAXVALPOND)
-      MXPOND = 1
+      ALLOCATE (NUMPOND, NUMPONDET, NUMTABPOND, MAXVALPOND)
+      ALLOCATE (KPEROLD)
       VBVLAG = szero
       MSUMAG = 0
       PSIRAMP = 0.10
@@ -215,6 +215,7 @@
       TSPONDALLUNIT = 0
       TSPONDETALLUNIT = 0
       WELAUX = ' '
+      KPEROLD = 0
       ALLOCATE (NUMSUP, NUMIRRWEL, UNITSUP, MAXCELLSWEL)
       ALLOCATE (NUMSUPSP, MAXSEGS, NUMIRRWELSP)
       ALLOCATE (ETDEMANDFLAG, NUMIRRDIVERSION, NUMIRRDIVERSIONSP)
@@ -271,22 +272,22 @@
       ALLOCATE (TRIGGERPERIODSEG(NSEGDIMTEMP))
       ALLOCATE (TIMEINPERIODWELL(MXWELL), TIMEINPERIODSEG(NSEGDIMTEMP))
       ALLOCATE (SEGLIST(NSEGDIMTEMP), NUMSEGLIST)
-      ALLOCATE (TIMEINPERIODPOND(MXPOND))
-      ALLOCATE (AETITERPOND(MXPOND),PETPOND(MXPOND))
-      ALLOCATE (PONDFLOW(MXPOND),PONDFLOWOLD(MXPOND))
-      ALLOCATE (PONDFLOWMAX(MXPOND), PONDSEGFLOW(MXPOND))
-      ALLOCATE (PONDIRRPRMS(MAXCELLSPOND,MXPOND))
-      ALLOCATE (TSPONDUNIT(MXPOND),TSPONDNUM(MXPOND))
-      ALLOCATE (TSPONDETUNIT(MXPOND),TSPONDETNUM(MXPOND))
-      ALLOCATE (IRRPONDVAR(MXPOND),TABPONDSEG(MXPOND))
-      ALLOCATE (TABPONDFRAC(MXPOND))
-      ALLOCATE (NUMCELLSPOND(MXPOND),IRRPERIODPOND(MXPOND))
-      ALLOCATE (TRIGGERPERIODPOND(MXPOND))
-      ALLOCATE (FLOWTHROUGH_POND(MXPOND))
-      ALLOCATE (NUMIRRPONDSP,IRRFIELDFACTPOND(MAXCELLSPOND,MXPOND)) 
-      ALLOCATE (IRRFACTPOND(MAXCELLSPOND,MXPOND))
-      ALLOCATE (IRRHRU_POND(MAXCELLSPOND,MXPOND))
-      ALLOCATE (RMSEPOND(MXPOND))
+      ALLOCATE (TIMEINPERIODPOND(NUMIRRPOND))
+      ALLOCATE (AETITERPOND(NUMIRRPOND),PETPOND(NUMIRRPOND))
+      ALLOCATE (PONDFLOW(NUMIRRPOND),PONDFLOWOLD(NUMIRRPOND))
+      ALLOCATE (PONDFLOWMAX(NUMIRRPOND), PONDSEGFLOW(NUMIRRPOND))
+      ALLOCATE (PONDIRRPRMS(MAXCELLSPOND,NUMIRRPOND))
+      ALLOCATE (TSPONDUNIT(NUMIRRPOND),TSPONDNUM(NUMIRRPOND))
+      ALLOCATE (TSPONDETUNIT(NUMIRRPOND),TSPONDETNUM(NUMIRRPOND))
+      ALLOCATE (IRRPONDVAR(NUMIRRPOND),TABPONDSEG(NUMIRRPOND))
+      ALLOCATE (TABPONDFRAC(NUMIRRPOND))
+      ALLOCATE (NUMCELLSPOND(NUMIRRPOND),IRRPERIODPOND(NUMIRRPOND))
+      ALLOCATE (TRIGGERPERIODPOND(NUMIRRPOND))
+      ALLOCATE (FLOWTHROUGH_POND(NUMIRRPOND))
+      ALLOCATE (NUMIRRPONDSP,IRRFIELDFACTPOND(MAXCELLSPOND,NUMIRRPOND)) 
+      ALLOCATE (IRRFACTPOND(MAXCELLSPOND,NUMIRRPOND))
+      ALLOCATE (IRRHRU_POND(MAXCELLSPOND,NUMIRRPOND))
+      ALLOCATE (RMSEPOND(NUMIRRPOND))
       IF ( NUMIRRPOND > 0 ) THEN
         ALLOCATE(PONDSEGFRAC(NSEGDIMTEMP))
       ELSE
@@ -370,7 +371,7 @@
       IF ( max<1 ) max = 1
       ALLOCATE (TABTIMEPOND(max, NUMTABHOLD))
       ALLOCATE (TABRATEPOND(max, NUMTABHOLD))
-      max = MXPOND
+      max = NUMIRRPOND
       IF ( max<1 ) max = 1
       ALLOCATE (TABVALPOND(max),TABIDPOND(max))
       ALLOCATE (TABPONDHRU(max),TABUNITPOND(max))
@@ -394,13 +395,13 @@
       END IF
       ALLOCATE (WELL(NWELVL, MXWELL))
       WELL = 0.0
-      IF (MXPOND .LT. 1) THEN
+      IF (NUMIRRPOND .LT. 1) THEN
          WRITE (IOUT, 18)
 18       FORMAT(1X,
      +        'No ponds active in the AG Package')
-         MXPOND = 1
+         NUMIRRPOND = 1
       END IF
-      ALLOCATE (POND(4, MXPOND))
+      ALLOCATE (POND(4, NUMIRRPOND))
       !
       !9 - --- ALLOCATE SUPPLEMENTAL AND IRRIGATION WELL ARRAYS
       NUMSUPHOLD = NUMSUP
@@ -601,15 +602,6 @@
             IF (MXWELL .LT. 0) MXWELL = 0
             WRITE (IOUT, *)
             WRITE (IOUT, 36) MXWELL
-            WRITE (IOUT, *)
-            !
-            !3 - --- MAX NUMBER OF STORAGE PONDS
-         case ('MAXPONDS')
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, MXPOND, 
-     +                  R, IOUT, IN)
-            IF (MXPOND .LT. 0) MXPOND = 0
-            WRITE (IOUT, *)
-            WRITE (IOUT, 41) MXPOND
             WRITE (IOUT, *)
             !
             !4 - --- Option to output list for wells
@@ -1022,7 +1014,7 @@
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: IOUT, NCOL, NROW, NLAY, IFREFM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS, SEG, NUMTAB_SFR
+      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS
       USE PRMS_MODULE, ONLY: Nhru
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
@@ -1081,6 +1073,15 @@
             CHAR = CHAR2
             write (iout, '(/1x,a)') 'PROCESSING '//
      +             trim(adjustl(CHAR2))//''
+            IF ( IUNITSFR == 0 ) THEN
+               WRITE (IOUT, *)
+                    WRITE (IOUT, *) 'SFR PACKAGE IS NOT ACTIVE',
+     +                               ' AND MUST BE ACTIVE FOR ',
+     +                               ' SEGMENT LIST. MODEL STOPPING'
+                    WRITE (IOUT, *)
+                    CALL USTOP('ERROR IN AG:SFR PACKAGE MUST BE '//
+     +                         'ACTIVE MODEL STOPPING')  
+            END IF
             nseg = 0
             do
                nseg = nseg + 1
@@ -1113,6 +1114,14 @@
                      WRITE (IOUT, *)
                      CALL USTOP('ERROR: INVALID SEGMENT VALUE
      +                     CHECK AG SEGMENT LIST INPUT.MODEL STOPPING')
+                  else if (iseg > NSS) then
+                     WRITE (IOUT, *)
+                     WRITE (IOUT, *) 'ERROR: INVALID SEGMENT VALUE',
+     +                               ' CHECK AG SEGMENT LIST INPUT.',
+     +                               ' MODEL STOPPING'
+                     WRITE (IOUT, *)
+                     CALL USTOP('ERROR: INVALID SEGMENT VALUE
+     +                     CHECK AG SEGMENT LIST INPUT.MODEL STOPPING')
                   else
                      is = is + 1
                      seglist(is) = iseg
@@ -1122,89 +1131,106 @@
             end do
          !2 - ---READ POND LIST
           case ('POND LIST')
-               CHAR = CHAR3
-               write (iout, '(/1x,a)') 'PROCESSING '//
+            CHAR = CHAR3
+            write (iout, '(/1x,a)') 'PROCESSING '//
      +                         trim(adjustl(CHAR3))//''
-               IF (NUMTABPOND .EQ. 0) THEN
-                  DO L = 1, MXPOND
-                     CALL URDCOM(In, IOUT, line)
-                     LLOC = 1 
-                     CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IPOND, R,
+              L = 0
+              DO
+                L = L + 1
+                CALL URDCOM(In, IOUT, line)
+                LLOC = 1
+              CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
+                select case (LINE(ISTART:ISTOP))
+                case ('END')
+                  write (iout, '(/1x,a)') 'FINISHED READING '//
+     +                                     trim(adjustl(char3))
+                  exit
+                case default
+                  IF (NUMTABPOND .EQ. 0) THEN
+                    IF (L > Numirrpond) THEN
+                      WRITE (IOUT, *)
+                      WRITE (IOUT, *) 'ERROR: Number of ponds in POND '
+     +                        ,'LIST is greater than Numirrpond',
+     +                        ' MODEL STOPPING.'
+                      WRITE (IOUT, *)
+                      CALL USTOP('ERROR: Too many ponds in list')
+                    END IF
+                    LLOC = 1 
+                    CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IPOND, R,
      +                           IOUT, IN)
-                     CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
+                    CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
      +                           QPOND, IOUT,IN)
-                     CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ISEG, R,
+                    CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ISEG, R,
      +                           IOUT, IN)
-                     CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
+                    CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
      +                           QFRAC, IOUT,IN)
-                     POND(1,L) = IPOND   !check that this is less than NRHU
-                     IRRPONDVAR(L) = IPOND
-                     POND(2,L) = QPOND   
-                     POND(3,L) = ISEG    !check that this is less than NSEG
-                     PONDSEGFRAC(ISEG) = PONDSEGFRAC(ISEG) + QFRAC
-                     POND(4,L) = QFRAC   !check that sum of QFRAC for a SEG sums to 1.
-                     IF (POND(2, L) < 0.0) THEN
-                        WRITE (IOUT, *)
-                        WRITE (IOUT, *) 'ERROR: MAX AG POND IRRIGATION '
+                    POND(1,L) = IPOND   !check that this is less than NRHU
+                    IRRPONDVAR(L) = IPOND
+                    POND(2,L) = QPOND   
+                    POND(3,L) = ISEG    !check that this is less than NSEG
+                    PONDSEGFRAC(ISEG) = PONDSEGFRAC(ISEG) + QFRAC
+                    POND(4,L) = QFRAC   !check that sum of QFRAC for a SEG sums to 1.
+                    IF (POND(2, L) < 0.0) THEN
+                      WRITE (IOUT, *)
+                      WRITE (IOUT, *) 'ERROR: MAX AG POND IRRIGATION '
      +                        ,'IN LIST',
      +                        ' IS NEGATIVE AND SHOULD BE POSITIVE.',
      +                        ' MODEL STOPPING.'
-                        WRITE (IOUT, *)
+                      WRITE (IOUT, *)
                 CALL USTOP('ERROR: MAX AG IRRIGATION RATE IS NEGATIVE')
-                     END IF
-                     IF (INT(POND(1,L)) > Nhru) THEN
-                        WRITE (IOUT, *)
-                        WRITE (IOUT, *) 'ERROR: HRUID for Pond > NHRU ',
+                    END IF
+                    IF (INT(POND(1,L)) > Nhru) THEN
+                      WRITE (IOUT, *)
+                      WRITE (IOUT, *) 'ERROR: HRUID for Pond > NHRU ',
      +                        ' Check HRU ID set for Pond.',
      +                        ' MODEL STOPPING.'
-                        WRITE (IOUT, *)
-                        CALL USTOP('ERROR: HRUID for Pond > NHRU')
-                     END IF
-                     IF (INT(POND(3,L)) > NSS) THEN
-                        WRITE (IOUT, *)
-                        WRITE (IOUT, *) 'ERROR: SEGID for Pond > NSEG.',
+                      WRITE (IOUT, *)
+                          CALL USTOP('ERROR: HRUID for Pond > NHRU')
+                    END IF
+                    IF (INT(POND(3,L)) > NSS) THEN
+                     WRITE (IOUT, *)
+                     WRITE (IOUT, *) 'ERROR: SEGID for Pond > NSEG.',
      +                        ' Check SEGID set for Pond.',
      +                        ' MODEL STOPPING.'
+                     WRITE (IOUT, *)
+                     CALL USTOP('ERROR: SEGID for Pond > NSEG')
+                    END IF               
+                  ELSE
+                    NUMTABPOND = 0
+                    MATCH = 0  
+                    J = L
+                    READ (IN, *) TABUNITPOND(J), TABVALPOND(J), 
+     +                           TABPONDHRU(J), TABPONDSEG(J),
+     +                           TABPONDFRAC(J)
+                    IRRPONDVAR(J) = TABPONDHRU(J)
+                    DO I = 1, J - 1
+                      IF (TABUNITPOND(I) == TABUNITPOND(J)) THEN
+                        MATCH = 1
+                        TABIDPOND(J) = TABIDPOND(I)
+                      END IF
+                    END DO
+                    IF (MATCH == 0) THEN
+                      NUMTABPOND = NUMTABPOND + 1
+                      TABIDPOND(J) = NUMTABPOND
+                    END IF
+                    IF (TABUNITPOND(J) .LE. 0) THEN
+                      WRITE (IOUT, 100)
+                      CALL USTOP('')
+                    END IF
+                    REWIND (TABUNITPOND(J))   
+                    DO II = 1, TABVALPOND(J)
+                      LLOC = 1
+                      CALL URDCOM(TABUNITPOND(J), IOUT, LINE)
+                      CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
+     +                          TTIME, IOUT,TABUNITPOND(J))
+                      CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
+     +                            TRATE, IOUT,TABUNITPOND(J))
+                      IF (TRATE < 0.0) THEN
                         WRITE (IOUT, *)
-                        CALL USTOP('ERROR: SEGID for Pond > NSEG')
-                     END IF
-                  END DO
-               ELSE
-                  NUMTABPOND = 0
-                  MATCH = 0
-                  DO J = 1, MXPOND    
-                     READ (IN, *) TABUNITPOND(J), TABVALPOND(J), 
-     +                            TABPONDHRU(J), TABPONDSEG(J),
-     +                            TABPONDFRAC(J)
-                     IRRPONDVAR(J) = TABPONDHRU(J)
-                     DO I = 1, J - 1
-                        IF (TABUNITPOND(I) == TABUNITPOND(J)) THEN
-                           MATCH = 1
-                           TABIDPOND(J) = TABIDPOND(I)
-                        END IF
-                     END DO
-                     IF (MATCH == 0) THEN
-                        NUMTABPOND = NUMTABPOND + 1
-                        TABIDPOND(J) = NUMTABPOND
-                     END IF
-                     IF (TABUNITPOND(J) .LE. 0) THEN
-                        WRITE (IOUT, 100)
-                        CALL USTOP('')
-                     END IF
-                     REWIND (TABUNITPOND(J))   
-                     DO II = 1, TABVALPOND(J)
-                        LLOC = 1
-                        CALL URDCOM(TABUNITPOND(J), IOUT, LINE)
-                        CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
-     +                              TTIME, IOUT,TABUNITPOND(J))
-                        CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
-     +                              TRATE, IOUT,TABUNITPOND(J))
-                        IF (TRATE < 0.0) THEN
-                           WRITE (IOUT, *)
-                           WRITE (IOUT, *) 'ERROR: MAX AG POND',
+                        WRITE (IOUT, *) 'ERROR: MAX AG POND',
      +                          ' DIVERSION IN LIST IS NEGATIVE AND ',
      +                          ' SHOULD BE POSITIVE. MODEL STOPPING'
-                           WRITE (IOUT, *)
+                        WRITE (IOUT, *)
                            CALL USTOP('ERROR: MAX POND DIVERSION RATE IN
      +                     LIST IS NEGATIVE AND SHOULD BE POSITIVE.
      +                     MODEL STOPPING')
@@ -1212,33 +1238,45 @@
                         TABTIMEPOND(II, TABIDPOND(J)) = TTIME
                         TABRATEPOND(II, TABIDPOND(J)) = TRATE
                      END DO
-                  END DO
-               END IF
-               DO I = 1, NSEGDIMTEMP
-                 IF ( PONDSEGFRAC(I) > DONEP ) THEN
+                   END IF
+                 DO I = 1, NSEGDIMTEMP
+                   IF ( PONDSEGFRAC(I) > DONEP ) THEN
                      IF ( .NOT. ierror)
      +                       WRITE (IOUT, *) 'ERROR: SEGMENT INFLOW ',
      +                          ' FRACTION FOR ALL IRR PONDS SUMS TO',
      +                          ' GREATER THAN ONE. MODEL STOPPING'
                            WRITE (IOUT, *)'SEGMENT= ',I,'SUM= ',
      +                                     PONDSEGFRAC(I)
-                   ierror = .true.
-                 END IF
-               END DO
-               IF ( ierror )  CALL USTOP('ERROR: SEGMENT INFLOW'//
+                    ierror = .true.
+                   END IF
+                 END DO
+                 IF ( ierror )  CALL USTOP('ERROR: SEGMENT INFLOW'//
      +              ' FRACTION TO PONDS IS GREATER THAN ONE.'//
      +              ' MODEL STOPPING')
+              end select
+            end do
           case ('WELL LIST')
-               found4 = .true.
-               CHAR = CHAR1
-               write (iout, '(/1x,a)') 'PROCESSING '//
-     +                         trim(adjustl(CHAR1))//''
-               IF (NUMTABWELL .EQ. 0) THEN
-                  CALL ULSTRD(NNPWEL, WELL, 1, NWELVL, MXWELL, 1, IN, 
+            found4 = .true.
+            CHAR = CHAR1
+            write (iout, '(/1x,a)') 'PROCESSING '//
+     +                trim(adjustl(CHAR1))//''
+            DO
+              CALL URDCOM(In, IOUT, line)
+              LLOC = 1
+              CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
+              select case (LINE(ISTART:ISTOP))
+                case ('END')
+                  write (iout, '(/1x,a)') 'FINISHED READING '//
+     +                                     trim(adjustl(char1))
+                  exit
+                case default
+                 backspace(in)
+                 IF (NUMTABWELL .EQ. 0) THEN
+                   CALL ULSTRD(NNPWEL, WELL, 1, NWELVL, MXWELL, 1, IN, 
      +                 IOUT,'LAYER   ROW   COL   MAX STRESS RATE',
      +                 WELAUX, 20, NAUXWELL, IFREFM, NCOL, NROW, NLAY, 
      +                 4, 4, IPRWEL)
-                  DO L = 1, NNPWEL
+                   DO L = 1, NNPWEL
                      IF (WELL(4, L) > 0.0) THEN
                         WRITE (IOUT, *)
                         WRITE (IOUT, *) 'ERROR: MAX AG PUMPING RATE IN '
@@ -1249,10 +1287,10 @@
                   CALL USTOP('ERROR: MAX AG PUMPING RATE IS POSITIVE')
                      END IF
                   END DO
-               ELSE
-                  NUMTABS = 0
-                  MATCH = 0
-                  DO J = 1, MXWELL    
+                 ELSE
+                   NUMTABS = 0
+                   MATCH = 0
+                   DO J = 1, MXWELL    
                      READ (IN, *) TABUNITWELL(J), TABVALWELL(J), 
      +                    TABLAYWELL(J),TABROWWELL(J), TABCOLWELL(J)
                      DO I = 1, J - 1
@@ -1291,8 +1329,10 @@
                         TABTIMEWELL(II, TABIDWELL(J)) = TTIME
                         TABRATEWELL(II, TABIDWELL(J)) = TRATE
                      END DO
-                  END DO
-               END IF
+                   END DO
+                 END IF
+                end select
+              END DO
             case ('END')
                !found4 = .false.
                write (iout, '(/1x,a)') 'FINISHED READING '//
@@ -1491,15 +1531,6 @@
          end if
       end do
 !
-! Set demand to specified diversion flows in SFR.
-!
-      DO i = 1, NUMIRRDIVERSIONSP
-         iseg = IRRSEG(i)
-         if (iseg > 0 .and. IUNITSFR > 0) then
-               DEMAND(ISEG) = SEG(2, ISEG)
-         END IF
-      END DO
-!
 6     FORMAT(1X, /
      +       1X, 'NO IRRDIVERSION DATA OR REUSING IRRDIVERSION DATA ',
      +       'FROM LAST STRESS PERIOD ')
@@ -1523,8 +1554,7 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR !, SGOTFLW
-      USE PRMS_MODULE, ONLY: GSFLOW_flag
+      USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR, ISFRLIST
       USE GLOBAL, ONLY: IUNIT
       USE GWFBASMODULE, ONLY: TOTIM
       IMPLICIT NONE
@@ -1532,34 +1562,25 @@
       ! ARGUMENTS:
       INTEGER, INTENT(IN)::IN, KPER
       !
-      INTEGER ISEG, i, L, ID
-      DOUBLE PRECISION :: TOTAL !, Qpond
+      INTEGER ISEG, i, ii, tabseg, istab, L, ID
       EXTERNAL :: RATETERPQ
       REAL :: RATETERPQ, TIME
       ! - -----------------------------------------------------------------
       !
-            !1 - ------RESET DEMAND IF IT CHANGES
-      if ( NUMTAB_SFR > 0 ) DEMAND = 0.0
-      DO i = 1, NUMIRRDIVERSIONSP
-         iseg = IRRSEG(i)
-         if (iseg > 0 .and. IUNIT(44) > 0) then
-               ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
-               ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
-               ! contains the TABFILE values at this point.
-           IF ( NUMTAB_SFR > 0 )  DEMAND(ISEG) = SEG(2, ISEG)
-           SUPACT(ISEG) = 0.0
-           ACTUAL(ISEG) = 0.0
-         end if
-      END DO
-      !2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
-      IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
-         DO i = 1, NUMSEGLIST
-            SEG(2, SEGLIST(i)) = szero
-         END DO
-      END IF
+      !1 - ------RESET DEMAND IF IT CHANGES
+      if (NUMTAB_SFR.ne.0) then
+          DO ii = 1, NUMTAB_SFR
+             tabseg = ISFRLIST(1, ii)
+             DEMAND(tabseg) = 0.0
+          END DO
+      endif
+      ! RESET ALL DEMAND if new stress period 
+      if (KPEROLD.ne.KPER) then
+	   DEMAND = 0.0
+      endif	  
       !
       !3 - -----SET MAXIMUM POND OUTFLOW DIVERSION RATES WHEN TABFILES ARE USED
-      IF ( MXPOND > 0 ) THEN
+      IF ( NUMIRRPOND > 0 ) THEN
           IF (NUMTABPOND > 0) THEN
             DO L = 1, NUMIRRPOND
               ID = TABIDPOND(L)
@@ -1584,6 +1605,47 @@
      +                    TABRATEWELL(:,ID), TABVALWELL(L))
          END IF
       END DO
+      DO i = 1, NUMIRRDIVERSIONSP
+         iseg = IRRSEG(i)
+         if (iseg > 0) then
+            if (IUNIT(44) > 0) then
+               ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
+               ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
+               ! contains the TABFILE values at this point.
+               if (NUMTAB_SFR.ne.0) then
+			    ! check if this segment has a tabfile associated with it
+                  istab = 0
+                  DO ii = 1, NUMTAB_SFR
+                     tabseg = ISFRLIST(1, ii)
+                     if (iseg.eq.tabseg) then
+                         istab = 1
+                     endif
+                  END DO
+                  ! update demand if there is a tabfile or if it is a new
+                  ! stress period
+                  if ((istab.eq.1) .OR. (KPEROLD.ne.KPER)) then
+			       DEMAND(ISEG) = SEG(2, ISEG)
+                  endif
+                 ! update demand if this is a new stress period
+               elseif (KPEROLD.ne.KPER) then
+			    DEMAND(ISEG) = SEG(2, ISEG)
+			 endif
+               IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
+            end if
+            SUPACT(ISEG) = 0.0
+            ACTUAL(ISEG) = 0.0
+         END IF
+      END DO
+      ! update kperold to track new stress periods and set data accordingly
+      if (KPEROLD.ne.KPER) then
+          KPEROLD = KPEROLD + 1
+      endif
+      !2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
+      IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
+         DO i = 1, NUMSEGLIST
+            SEG(2, SEGLIST(i)) = 0.0
+         END DO
+      END IF
 !
 !6 - -----RESET SAVED IRR AND AET FROM LAST TIME STEP
       DIVERSIONIRRUZF = szero
@@ -1876,8 +1938,7 @@
          IF (NMCL > MAXCELLSPOND) THEN
             WRITE (IOUT, *)
             WRITE (IOUT, 105) MAXCELLSPOND, NMCL
-            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
-     +                 'PONDS')
+            STOP
          END IF
          TEST = .TRUE.
          DO 200 IP = 1, NUMIRRPOND
@@ -1900,7 +1961,8 @@
      +                 'PONDS')  
          END IF
          IF (TEST) THEN
-           WRITE(IOUT,107)IRWL 
+           WRITE(IOUT,*)IRWL
+           WRITE(IOUT,107)
            CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
      +                 'PONDS')
          END IF
@@ -1912,6 +1974,7 @@
            IF (IRRHRU_POND(K, IPOND) <= 0 .OR. 
      +         IRRHRU_POND(K, IPOND) > NHRU) THEN
              WRITE (IOUT, 106)
+             WRITE (IOUT, *)
              CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
      +                 'PONDS')
            END IF
@@ -1995,7 +2058,7 @@
             CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR IRR '//
      +                 'DIVERSION')
          END IF
-         IF (SGNM > 0) THEN
+         IF (SGNM > 0) THEN    !need to make sure SGNM is in the segment list
             IRRSEG(J) = SGNM
             DVRCH(SGNM) = NMCL
             IRRPERIODSEG(SGNM) = IRRPER
@@ -2376,14 +2439,11 @@
         IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
           PONDSEGFLOW(L) = szero
         ELSE
-          IF ( POND(3,L) > 0 ) THEN
+          IF ( POND(3,L) > 0 .and. NUMCELLSPOND(L) > 0 ) THEN
             PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))
-!      write(888,121)POND(3,L),kkper,kkstp,kkiter,POND(4,L),
-!     +            PONDSEGFLOW(L),seg(2,POND(3,L))
           END IF
         END IF
       END DO
-!121   format(e20.10,3i6,3e20.10)
       !
       !2 - -----IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF (ETDEMANDFLAG > 0) THEN
@@ -2810,7 +2870,7 @@
       END DO
       DO L = 1, NUMIRRPOND
         IF ( FLOWTHROUGH_POND(L) == 0 ) THEN
-          IF ( POND(3,L) > 0 ) THEN
+          IF ( POND(3,L) > 0 .and. NUMCELLSPOND(L) > 0 ) THEN
             PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))
           END IF
         END IF
@@ -3327,7 +3387,7 @@
      +                (sone - REAL(AGCONVERGE))*SNGL(factor)
         !
         !set pond inflow using demand.
-        IF ( FLOWTHROUGH_POND(i) == 1 ) THEN
+        IF ( FLOWTHROUGH_POND(i) == 1 .and. NUMCELLSPOND(i) > 0 ) THEN
           PONDSEGFLOW(i) = PONDSEGFLOW(i) + PONDFLOW(i)  !need to constrain to available flow in segment
         END IF
         !
@@ -3432,7 +3492,7 @@
          if (TIMEINPERIODSEG(ISEG) > IRRPERIODSEG(ISEG)) then
             if (factor <= TRIGGERPERIODSEG(ISEG)) then
                 SEG(2, iseg) = DEMAND(iseg)
-                TIMEINPERIODSEG(ISEG) = done
+                TIMEINPERIODSEG(ISEG) = 0.0
             end if
          end if
          if (TIMEINPERIODSEG(ISEG) - DELT < IRRPERIODSEG(ISEG))
@@ -3693,8 +3753,8 @@
       USE GWFAGMODULE
       USE GLOBAL, ONLY: DELR, DELC, ISSFLG
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id !,
-!     +    Agriculture_dprst_flag
+      USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id  !,  uncomment for master
+!     +    Agriculture_dprst_flag  !uncomment for master
       USE PRMS_BASIN, ONLY: Hru_area
       USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_FLOWVARS, ONLY: Hru_actet, Dprst_vol_open
@@ -3751,10 +3811,10 @@
                 Q = PONDSEGFLOW(I)
                 QQ = PONDFLOW(I)
                 QQQ = 0.0
-!                if ( Agriculture_dprst_flag == 1 )   !uncommment this and next line
-!     +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
-                CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
-     +                          Q, QQ, QQQ)
+     !!           if ( Agriculture_dprst_flag == 1 )   !uncommment this and next line
+     !!+               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+     !!           CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
+     !!+                          Q, QQ, QQQ)
               END IF
            END DO
          END DO
@@ -3796,12 +3856,12 @@
            QQ = QQ + PONDFLOW(I)
            hru_id = IRRPONDVAR(I)
            sub = DZERO
-!           if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
-!             if ( ISSFLG(kkper) == 0 ) sub = 
-!     +            Dprst_vol_open(hru_id)/MFQ_to_inch_acres
-!             if ( sub < DZERO ) sub = DZERO
-!             QQQ = QQQ + sub
-!           end if
+     !!      if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
+     !!        if ( ISSFLG(kkper) == 0 ) sub = 
+     !!+            Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+     !!        if ( sub < DZERO ) sub = DZERO
+     !!        QQQ = QQQ + sub
+     !!      end if
          END DO
          hru_id = 0
          CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
@@ -4321,7 +4381,7 @@ C     Pass Irrigation demand to MODSIM
 C     
 !--------January 17, 2022
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: SEG, IDIVAR, NSS
+      USE GWFSFRMODULE, ONLY: SEG, NSS
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
@@ -4445,7 +4505,6 @@ C8------RETURN.
       DEALLOCATE(SEGLIST)
       DEALLOCATE(NUMSEGLIST)
       DEALLOCATE(ACCEL)
-      DEALLOCATE(MXPOND)
       DEALLOCATE(MAXCELLSPOND)
       DEALLOCATE(IPONDCB)
       DEALLOCATE(IPONDCBU)
