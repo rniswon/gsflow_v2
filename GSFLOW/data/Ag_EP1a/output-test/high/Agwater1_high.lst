@@ -730,6 +730,7 @@ SELECTED MODEL CELLS ARE:
  A total number of          0 AG output time series files were activated for GROUNDWATER ET
  A total number of          0 AG output time series files were activated for POND ET
  A total number of          0 AG output time series files were activated for POND IRRIGATION
+ No ponds active in the AG Package
 1
                             STRESS PERIOD NO.    1, LENGTH =   86400.00    
                             -----------------------------------------------
@@ -2618,11 +2619,11 @@ EXTINCTION WATER CONTENT FOR CELL AT ROW    15, COLUMN     6 IS LESS THAN RESIDU
       6      1      8      5      -100.0    
 
  FINISHED READING WELL LIST
+ # AG stress period
 
       6 WELLS
 
  PROCESSING AG STRESS PERIOD DATA
- # AG stress period
 
  READING AG STRESS PERIOD DATA
 
@@ -40557,6 +40558,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/01/26 14:52:13
- Elapsed run time: 4.464 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/02/22 13:05:05
+ Elapsed run time: 4.366 Seconds
 

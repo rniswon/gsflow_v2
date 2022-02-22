@@ -17,25 +17,25 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        1.3513D+07     EVAPOTRANSPIRATION =         646026.70
+   EVAPOTRANSPIRATION =        1.3513D+07     EVAPOTRANSPIRATION =         645940.72
            STREAMFLOW =        1.7081D+07             STREAMFLOW =        2997192.50
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
    INFLOWS - OUTFLOWS =        7.2790D+07     INFLOWS - OUTFLOWS =        8.3587D+07
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        7.2738D+07         STORAGE CHANGE =        8.3545D+07
+ TOTAL STORAGE CHANGE =        7.2738D+07         STORAGE CHANGE =        8.3551D+07
        --------------                             --------------
          LAND SURFACE =        4.8915D+07           LAND SURFACE =        4.6421D+07
-            SOIL ZONE =        5630469.57              SOIL ZONE =        7532748.04
-     UNSATURATED ZONE =         388042.19       UNSATURATED ZONE =         182701.16
-       SATURATED ZONE =        -475799.09         SATURATED ZONE =         773849.00
-                LAKES =        1.8281D+07                  LAKES =        2.8635D+07
+            SOIL ZONE =        5630633.54              SOIL ZONE =        7532744.03
+     UNSATURATED ZONE =         378484.24       UNSATURATED ZONE =         174293.48
+       SATURATED ZONE =        -474165.30         SATURATED ZONE =         787122.50
+                LAKES =        1.8288D+07                  LAKES =        2.8636D+07
 
- OVERALL BUDGET ERROR =          51796.65           BUDGET ERROR =          41415.26
+ OVERALL BUDGET ERROR =          52029.34           BUDGET ERROR =          35377.43
 
 
-  PERCENT DISCREPANCY =              0.05    PERCENT DISCREPANCY =              0.05
+  PERCENT DISCREPANCY =              0.05    PERCENT DISCREPANCY =              0.04
 
 
 

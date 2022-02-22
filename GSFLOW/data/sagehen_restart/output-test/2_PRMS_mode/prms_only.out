@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.1 09/28/2021
+                       Version 5.2.1 02/08/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,7 +36,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-09-28
+PRMS Computation Order          gsflow_prms         2022-02-08
 Basin Definition                basin               2021-08-18
 Cascading Flow                  cascade             2021-08-13
 Common States and Fluxes        climateflow         2021-08-13
@@ -1295,5 +1295,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
    1984    1   28    0.000    0.066   39.756    0.018    0.035    0.000    0.000
    1984    1   29    0.000    0.064   39.674    0.018    0.035   -0.000    0.000
    1984    1   30    0.000    0.073   39.583    0.018    0.035   -0.000    0.000
-Execution elapsed time    0 minutes  0.29 seconds
+Execution elapsed time    0 minutes  0.35 seconds
 
