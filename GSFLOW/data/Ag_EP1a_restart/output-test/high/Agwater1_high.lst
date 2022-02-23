@@ -77,6 +77,11 @@
  OPENING ./output/high/Agwater1cbc_high.unf
  FILE TYPE:DATA(BINARY)   UNIT  102   STATUS:UNKNOWN
  FORMAT:UNFORMATTED            ACCESS:STREAM              
+#IWRT                 103 ./output/high/restart.out                                                                                                                                                                                                                                                         
+
+ OPENING ./output/high/restart.out
+ FILE TYPE:IRED   UNIT  104   STATUS:UNKNOWN
+ FORMAT:UNFORMATTED            ACCESS:STREAM              
 
  OPENING ./output/high/Agwater1_high.uzf1
  FILE TYPE:DATA   UNIT   65   STATUS:UNKNOWN
@@ -40558,6 +40563,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/02/04 20:43:04
- Elapsed run time: 4.534 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/02/23 10:11:36
+ Elapsed run time: 4.271 Seconds
 

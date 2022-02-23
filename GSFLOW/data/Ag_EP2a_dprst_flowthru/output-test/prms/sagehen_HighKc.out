@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 02/08/2022
+                       Version 5.3.0 03/01/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -70,23 +70,23 @@ Simulation time period: 1990/10/01 00:00:00 to 1995/10/31 00:00:00
 ====================================================================
 Basin Definition                basin               2022-02-10
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-01-20
+Common States and Fluxes        climateflow         2022-02-18
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2021-11-19
 Temperature Distribution        temp_1sta           2021-11-19
-Precipitation Distribution      precip_1sta         2021-11-19
+Precipitation Distribution      precip_1sta         2022-02-18
 Solar Radiation Distribution    ddsolrad            2021-11-19
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-02-03
-Snow Dynamics                   snowcomp            2022-02-10
+Snow Dynamics                   snowcomp            2022-02-18
 Surface Runoff                  srunoff_smidx       2022-02-10
 Soilzone Computations           soilzone            2022-02-04
 Soilzone Computations           soilzone_ag         2022-02-16
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-12-09
-GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-06-10
-GSFLOW Output Budget Summary    gsflow_budget       2021-12-15
+GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
+GSFLOW Output Budget Summary    gsflow_budget       2022-02-18
 GSFLOW Output CSV Summary       gsflow_sum          2022-02-10
 Output Summary                  nhru_summary        2021-11-23
 Output Summary                  basin_summary       2021-11-19
@@ -94,8 +94,8 @@ Output Summary                  nsegment_summary    2021-11-23
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2022-01-12
 UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
-SFR-NWT Package                 gwf2sfr7_NWT        2020-09-30
-AG-NWT Package                  gwf2ag1_NWT_ponds   2021-10-19
+SFR-NWT Package                 gwf2sfr7_NWT        2022-02-01
+AG-NWT Package                  gwf2ag1_NWT_ponds   2022-02-01
 
 Using Control File: .\Sagehen_ponds.control
 
@@ -112,5 +112,5 @@ DPRST area:                  22.42    Fraction DPRST:          0.0033
 Agriculture area:            67.91    Fraction AG:             0.0101
 
 
-Execution elapsed time    2 minutes 43.81 seconds
+Execution elapsed time    3 minutes 22.73 seconds
 
