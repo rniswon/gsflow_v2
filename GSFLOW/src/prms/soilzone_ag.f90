@@ -1395,8 +1395,8 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
 !     soilzone_restart_ag - write or read soilzone_ag restart file
 !***********************************************************************
       SUBROUTINE soilzone_restart_ag(In_out)
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, GSFLOW_flag, Ag_gravity_flag
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, GSFLOW_flag, Ag_gravity_flag, text_restart_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       use prms_utils, only: check_restart
@@ -1406,7 +1406,8 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
       ! Local Variable
       CHARACTER(LEN=8) :: module_name
 !***********************************************************************
-      IF ( In_out==SAVE_INIT ) THEN
+    IF ( In_out==SAVE_INIT ) THEN
+      IF ( text_restart_flag==OFF ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_soil_rechr, Basin_slstor, Basin_soil_moist_tot, Basin_pref_stor
         WRITE ( Restart_outunit ) Pref_flow_stor
@@ -1414,6 +1415,15 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
         WRITE ( Restart_outunit ) Ag_soil_lower
         IF ( Ag_gravity_flag==ACTIVE ) WRITE ( Restart_outunit ) Ag_gvr_stor
       ELSE
+        WRITE ( Restart_outunit, * ) MODNAME
+        WRITE ( Restart_outunit, * ) Basin_soil_rechr, Basin_slstor, Basin_soil_moist_tot, Basin_pref_stor
+        WRITE ( Restart_outunit, * ) Pref_flow_stor
+        IF ( GSFLOW_flag==ACTIVE ) WRITE ( Restart_outunit, * ) Gravity_stor_res
+        WRITE ( Restart_outunit, * ) Ag_soil_lower
+        IF ( Ag_gravity_flag==ACTIVE ) WRITE ( Restart_outunit, * ) Ag_gvr_stor
+      ENDIF
+    ELSE
+      IF ( text_restart_flag==OFF ) THEN
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Basin_soil_rechr, Basin_slstor, Basin_soil_moist_tot, Basin_pref_stor
@@ -1421,5 +1431,14 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
         IF ( GSFLOW_flag==ACTIVE ) READ ( Restart_inunit ) Gravity_stor_res
         READ ( Restart_inunit ) Ag_soil_lower
         IF ( Ag_gravity_flag==ACTIVE ) READ ( Restart_inunit ) Ag_gvr_stor
+      ELSE
+        READ ( Restart_inunit, * ) module_name
+        CALL check_restart(MODNAME, module_name)
+        READ ( Restart_inunit, * ) Basin_soil_rechr, Basin_slstor, Basin_soil_moist_tot, Basin_pref_stor
+        READ ( Restart_inunit, * ) Pref_flow_stor
+        IF ( GSFLOW_flag==ACTIVE ) READ ( Restart_inunit, * ) Gravity_stor_res
+        READ ( Restart_inunit, * ) Ag_soil_lower
+        IF ( Ag_gravity_flag==ACTIVE ) READ ( Restart_inunit, * ) Ag_gvr_stor
       ENDIF
-      END SUBROUTINE soilzone_restart_ag
+    ENDIF
+    END SUBROUTINE soilzone_restart_ag

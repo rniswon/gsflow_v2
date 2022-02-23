@@ -1450,8 +1450,8 @@
 !     muskingum_lake_restart - write or read restart file
 !***********************************************************************
       SUBROUTINE muskingum_lake_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, SAVE_INIT
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, SAVE_INIT, OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, text_restart_flag
       USE PRMS_BASIN, ONLY: Puls_lin_flag
       USE PRMS_MUSKINGUM_LAKE
       use prms_utils, only: check_restart
@@ -1462,19 +1462,38 @@
       CHARACTER(LEN=14) :: module_name
 !***********************************************************************
       IF ( In_out==SAVE_INIT ) THEN
-        WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Outflow_ts
-        IF ( Puls_lin_flag==ACTIVE ) THEN
-          WRITE ( Restart_outunit ) Din1
-          WRITE ( Restart_outunit ) Lake_sto
+        IF ( text_restart_flag==OFF ) THEN
+          WRITE ( Restart_outunit ) MODNAME
+          WRITE ( Restart_outunit ) Outflow_ts
+          IF ( Puls_lin_flag==ACTIVE ) THEN
+            WRITE ( Restart_outunit ) Din1
+            WRITE ( Restart_outunit ) Lake_sto
+          ENDIF
+        ELSE
+          WRITE ( Restart_outunit, * ) MODNAME
+          WRITE ( Restart_outunit, * ) Outflow_ts
+          IF ( Puls_lin_flag==ACTIVE ) THEN
+            WRITE ( Restart_outunit, * ) Din1
+            WRITE ( Restart_outunit, * ) Lake_sto
+          ENDIF
         ENDIF
       ELSE
-        READ ( Restart_inunit ) module_name
-        CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Outflow_ts
-        IF ( Puls_lin_flag==ACTIVE ) THEN
-          READ ( Restart_inunit ) Din1
-          READ ( Restart_inunit ) Lake_sto
+        IF ( text_restart_flag==OFF ) THEN
+          READ ( Restart_inunit ) module_name
+          CALL check_restart(MODNAME, module_name)
+          READ ( Restart_inunit ) Outflow_ts
+          IF ( Puls_lin_flag==ACTIVE ) THEN
+            READ ( Restart_inunit ) Din1
+            READ ( Restart_inunit ) Lake_sto
+          ENDIF
+        ELSE
+          READ ( Restart_inunit, * ) module_name
+          CALL check_restart(MODNAME, module_name)
+          READ ( Restart_inunit, * ) Outflow_ts
+          IF ( Puls_lin_flag==ACTIVE ) THEN
+            READ ( Restart_inunit, * ) Din1
+            READ ( Restart_inunit, * ) Lake_sto
+          ENDIF
         ENDIF
       ENDIF
       END SUBROUTINE muskingum_lake_restart

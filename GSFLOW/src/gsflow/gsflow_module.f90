@@ -20,10 +20,10 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 02/18/2022'
-      character(len=*), parameter :: PRMS_versn = '2022-02-08'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 03/01/2022'
+      character(len=*), parameter :: PRMS_versn = '2022-03-01'
       character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 03/01/2022'
-      character(len=*), parameter :: Version_read_control_file = '2022-01-12'
+      character(len=*), parameter :: Version_read_control_file = '2022-02-23'
       character(len=*), parameter :: Version_read_parameter_file = '2022-01-12'
       character(len=*), parameter :: Version_read_data_file = '2022-01-12'
       CHARACTER(len=8), SAVE :: Process
@@ -70,7 +70,7 @@
       INTEGER, SAVE :: Init_vars_from_file, Save_vars_to_file, Orad_flag, Cascade_flag, Cascadegw_flag
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
-      INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, Iter_aet_flag
+      INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, Iter_aet_flag, text_restart_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag, no_snow_flag
       INTEGER, SAVE :: Agriculture_dprst_flag, Agriculture_soilzone_flag, Agriculture_canopy_flag 
       INTEGER, SAVE :: Dyn_ag_frac_flag, Dyn_ag_soil_flag, Ag_gravity_flag

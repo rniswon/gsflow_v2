@@ -1881,8 +1881,9 @@ C
 !     gsflow_modflow_restart - write or read restart file
 !***********************************************************************
       SUBROUTINE gsflow_modflow_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, SAVE_INIT
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit,Print_debug
+      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, SAVE_INIT, OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit,
+     &                       Print_debug, text_restart_flag
       use prms_utils, only: check_restart
       USE GSFMODFLOW, ONLY: MODNAME, Modflow_time_zero
       USE GWFBASMODULE, ONLY: DELT
@@ -1894,12 +1895,23 @@ C
       INTEGER :: MF_time_zero(6)
 !***********************************************************************
       IF ( In_out==SAVE_INIT ) THEN
-        WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) DELT, Modflow_time_zero
+        IF ( text_restart_flag==OFF ) THEN
+          WRITE ( Restart_outunit ) MODNAME
+          WRITE ( Restart_outunit ) DELT, Modflow_time_zero
+        ELSE
+          WRITE ( Restart_outunit, * ) MODNAME
+          WRITE ( Restart_outunit, * ) DELT, Modflow_time_zero
+        ENDIF
       ELSE
-        READ ( Restart_inunit ) module_name
-        CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) DELT, MF_time_zero
+        IF ( text_restart_flag==OFF ) THEN
+          READ ( Restart_inunit ) module_name
+          CALL check_restart(MODNAME, module_name)
+          READ ( Restart_inunit ) DELT, MF_time_zero
+        ELSE
+          READ ( Restart_inunit, * ) module_name
+          CALL check_restart(MODNAME, module_name)
+          READ ( Restart_inunit, * ) DELT, MF_time_zero
+        ENDIF
         IF ( Print_debug>DEBUG_minimum ) PRINT 4,
      &       'modflow_time_zero of Restart File:', MF_time_zero(1),
      &       MF_time_zero(2), MF_time_zero(3), MF_time_zero(4),

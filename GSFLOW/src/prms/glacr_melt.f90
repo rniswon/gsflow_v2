@@ -3034,7 +3034,8 @@
 !     glacr_restart- write or read glacrrestart file
 !***********************************************************************
       SUBROUTINE glacr_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, text_restart_flag
       USE PRMS_GLACR
       use prms_utils, only: check_restart
       IMPLICIT NONE
@@ -3043,7 +3044,8 @@
       ! Local Variable
       CHARACTER(LEN=10) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+    IF ( In_out==SAVE_INIT ) THEN
+      IF ( text_restart_flag==OFF ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Nhrugl, Basin_gl_top_melt, Gl_mb_yrcumul
         WRITE ( Restart_outunit ) Gl_mb_cumul, Glnet_ar_delta, Gl_mbc_yrend
@@ -3072,6 +3074,36 @@
         WRITE ( Restart_outunit ) Hru_mb_yrcumul
         WRITE ( Restart_outunit ) Hru_slope_ts
       ELSE
+        WRITE ( Restart_outunit, * ) MODNAME
+        WRITE ( Restart_outunit, * ) Nhrugl, Basin_gl_top_melt, Gl_mb_yrcumul
+        WRITE ( Restart_outunit, * ) Gl_mb_cumul, Glnet_ar_delta, Gl_mbc_yrend
+        WRITE ( Restart_outunit, * ) Basin_gl_top_gain
+        WRITE ( Restart_outunit, * ) Basin_gl_area, Gl_area, Basin_gl_ice_melt
+        WRITE ( Restart_outunit, * ) Hru_glres_melt, Basin_gl_storstart
+        WRITE ( Restart_outunit, * ) Gl_top_melt, Basin_gl_storage, Basin_gl_storvol
+        WRITE ( Restart_outunit, * ) Basal_elev
+        WRITE ( Restart_outunit, * ) Keep_gl
+        WRITE ( Restart_outunit, * ) Ikeep_gl
+        WRITE ( Restart_outunit, * ) Basal_slope
+        WRITE ( Restart_outunit, * ) Av_basal_slope
+        WRITE ( Restart_outunit, * ) Av_fgrad
+        WRITE ( Restart_outunit, * ) Prev_out, Prev_outi
+        WRITE ( Restart_outunit, * ) Hru_mb_yrend
+        WRITE ( Restart_outunit, * ) Glacr_flow
+        WRITE ( Restart_outunit, * ) Gl_ice_melt
+        WRITE ( Restart_outunit, * ) Top
+        WRITE ( Restart_outunit, * ) Term
+        WRITE ( Restart_outunit, * ) Ela
+        WRITE ( Restart_outunit, * ) Order_flowline
+        WRITE ( Restart_outunit, * ) Ode_glacrva_coef
+        WRITE ( Restart_outunit, * ) Top_tag
+        WRITE ( Restart_outunit, * ) Glacr_tag
+        WRITE ( Restart_outunit, * ) Delta_volyr
+        WRITE ( Restart_outunit, * ) Hru_mb_yrcumul
+        WRITE ( Restart_outunit, * ) Hru_slope_ts
+      ENDIF
+    ELSE
+      IF ( text_restart_flag==OFF ) THEN
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Nhrugl, Basin_gl_top_melt, Gl_mb_yrcumul
@@ -3100,5 +3132,35 @@
         READ ( Restart_inunit ) Delta_volyr
         READ ( Restart_inunit ) Hru_mb_yrcumul
         READ ( Restart_inunit ) Hru_slope_ts
+      ELSE
+        READ ( Restart_inunit, * ) module_name
+        CALL check_restart(MODNAME, module_name)
+        READ ( Restart_inunit, * ) Nhrugl, Basin_gl_top_melt, Gl_mb_yrcumul
+        READ ( Restart_inunit, * ) Gl_mb_cumul, Glnet_ar_delta, Gl_mbc_yrend
+        READ ( Restart_inunit, * ) Basin_gl_top_gain
+        READ ( Restart_inunit, * ) Basin_gl_area, Gl_area, Basin_gl_ice_melt
+        READ ( Restart_inunit, * ) Hru_glres_melt, Basin_gl_storstart
+        READ ( Restart_inunit, * ) Gl_top_melt, Basin_gl_storage, Basin_gl_storvol
+        READ ( Restart_inunit, * ) Basal_elev
+        READ ( Restart_inunit, * ) Keep_gl
+        READ ( Restart_inunit, * ) Ikeep_gl
+        READ ( Restart_inunit, * ) Basal_slope
+        READ ( Restart_inunit, * ) Av_basal_slope
+        READ ( Restart_inunit, * ) Av_fgrad
+        READ ( Restart_inunit, * ) Prev_out, Prev_outi
+        READ ( Restart_inunit, * ) Hru_mb_yrend
+        READ ( Restart_inunit, * ) Glacr_flow
+        READ ( Restart_inunit, * ) Gl_ice_melt
+        READ ( Restart_inunit, * ) Top
+        READ ( Restart_inunit, * ) Term
+        READ ( Restart_inunit, * ) Ela
+        READ ( Restart_inunit, * ) Order_flowline
+        READ ( Restart_inunit, * ) Ode_glacrva_coef
+        READ ( Restart_inunit, * ) Top_tag
+        READ ( Restart_inunit, * ) Glacr_tag
+        READ ( Restart_inunit, * ) Delta_volyr
+        READ ( Restart_inunit, * ) Hru_mb_yrcumul
+        READ ( Restart_inunit, * ) Hru_slope_ts
       ENDIF
-      END SUBROUTINE glacr_restart
+    ENDIF
+    END SUBROUTINE glacr_restart

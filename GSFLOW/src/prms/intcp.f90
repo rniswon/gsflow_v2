@@ -630,8 +630,8 @@
 !     intcp_restart - write or read intcp restart file
 !***********************************************************************
       SUBROUTINE intcp_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, text_restart_flag
       USE PRMS_INTCP
       use prms_utils, only: check_restart
       IMPLICIT NONE
@@ -640,7 +640,8 @@
       ! Local Variable
       CHARACTER(LEN=5) :: module_name
 !***********************************************************************
-      IF ( In_out==SAVE_INIT ) THEN
+    IF ( In_out==SAVE_INIT ) THEN
+      IF ( text_restart_flag==OFF ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_intcp_stor
         WRITE ( Restart_outunit ) Intcp_transp_on
@@ -648,6 +649,15 @@
         WRITE ( Restart_outunit ) Intcp_stor
         WRITE ( Restart_outunit ) Hru_intcpstor
       ELSE
+        WRITE ( Restart_outunit, * ) MODNAME
+        WRITE ( Restart_outunit, * ) Basin_intcp_stor
+        WRITE ( Restart_outunit, * ) Intcp_transp_on
+        WRITE ( Restart_outunit, * ) Intcp_on
+        WRITE ( Restart_outunit, * ) Intcp_stor
+        WRITE ( Restart_outunit, * ) Hru_intcpstor
+      ENDIF
+    ELSE
+      IF ( text_restart_flag==OFF ) THEN
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Basin_intcp_stor
@@ -655,5 +665,14 @@
         READ ( Restart_inunit ) Intcp_on
         READ ( Restart_inunit ) Intcp_stor
         READ ( Restart_inunit ) Hru_intcpstor
+      ELSE
+        READ ( Restart_inunit, * ) module_name
+        CALL check_restart(MODNAME, module_name)
+        READ ( Restart_inunit, * ) Basin_intcp_stor
+        READ ( Restart_inunit, * ) Intcp_transp_on
+        READ ( Restart_inunit, * ) Intcp_on
+        READ ( Restart_inunit, * ) Intcp_stor
+        READ ( Restart_inunit, * ) Hru_intcpstor
       ENDIF
-      END SUBROUTINE intcp_restart
+    ENDIF
+    END SUBROUTINE intcp_restart

@@ -1567,7 +1567,7 @@
       SUBROUTINE climateflow_restart(In_out)
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Glacier_flag, GSFLOW_flag, &
-     &    Dprst_flag, Stream_order_flag, Nlake, AG_flag
+     &    Dprst_flag, Stream_order_flag, Nlake, AG_flag, text_restart_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       use prms_utils, only: check_restart
@@ -1577,7 +1577,8 @@
       ! Local Variable
       CHARACTER(LEN=11) :: module_name
 !***********************************************************************
-      IF ( In_out==SAVE_INIT ) THEN
+    IF ( In_out==SAVE_INIT ) THEN
+      IF ( text_restart_flag==OFF ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
         WRITE ( Restart_outunit ) Transp_on
@@ -1607,6 +1608,37 @@
           WRITE ( Restart_outunit ) Ag_soil_rechr
         ENDIF
       ELSE
+        WRITE ( Restart_outunit, * ) MODNAME
+        WRITE ( Restart_outunit, * ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
+        WRITE ( Restart_outunit, * ) Transp_on
+        WRITE ( Restart_outunit, * ) Pkwater_equiv
+        IF ( Glacier_flag==ACTIVE ) THEN
+          WRITE ( Restart_outunit, * ) Glacier_frac
+          WRITE ( Restart_outunit, * ) Glrette_frac
+          WRITE ( Restart_outunit, * ) Alt_above_ela
+        ENDIF
+        WRITE ( Restart_outunit, * ) Soil_moist
+        WRITE ( Restart_outunit, * ) Slow_stor
+        WRITE ( Restart_outunit, * ) Ssres_stor
+        WRITE ( Restart_outunit, * ) Soil_rechr
+        WRITE ( Restart_outunit, * ) Imperv_stor
+        IF ( GSFLOW_flag==OFF ) WRITE ( Restart_outunit, * ) Gwres_stor
+        IF ( Dprst_flag==ACTIVE ) THEN
+          WRITE ( Restart_outunit, * ) Dprst_vol_open
+          WRITE ( Restart_outunit, * ) Dprst_vol_clos
+        ENDIF
+        IF ( Stream_order_flag==ACTIVE ) THEN
+          WRITE ( Restart_outunit, * ) Seg_inflow
+          WRITE ( Restart_outunit, * ) Seg_outflow
+        ENDIF
+        IF ( Nlake>0 ) WRITE ( Restart_outunit, * ) Lake_vol
+        IF ( AG_flag==ACTIVE ) THEN
+          WRITE ( Restart_outunit, * ) Ag_soil_moist
+          WRITE ( Restart_outunit, * ) Ag_soil_rechr
+        ENDIF
+      ENDIF
+    ELSE
+      IF ( text_restart_flag==OFF ) THEN
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
@@ -1636,5 +1668,36 @@
           READ ( Restart_inunit ) Ag_soil_moist
           READ ( Restart_inunit ) Ag_soil_rechr
         ENDIF
+      ELSE
+        READ ( Restart_inunit, * ) module_name
+        CALL check_restart(MODNAME, module_name)
+        READ ( Restart_inunit, * ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
+        READ ( Restart_inunit, * ) Transp_on
+        READ ( Restart_inunit, * ) Pkwater_equiv
+        IF ( Glacier_flag==ACTIVE ) THEN
+          READ ( Restart_inunit, * ) Glacier_frac
+          READ ( Restart_inunit, * ) Glrette_frac
+          READ ( Restart_inunit, * ) Alt_above_ela
+        ENDIF
+        READ ( Restart_inunit, * ) Soil_moist
+        READ ( Restart_inunit, * ) Slow_stor
+        READ ( Restart_inunit, * ) Ssres_stor
+        READ ( Restart_inunit, * ) Soil_rechr
+        READ ( Restart_inunit, * ) Imperv_stor
+        IF ( GSFLOW_flag==OFF ) READ ( Restart_inunit, * ) Gwres_stor
+        IF ( Dprst_flag==ACTIVE ) THEN
+          READ ( Restart_inunit, * ) Dprst_vol_open
+          READ ( Restart_inunit, * ) Dprst_vol_clos
+        ENDIF
+        IF ( Stream_order_flag==ACTIVE ) THEN
+          READ ( Restart_inunit, * ) Seg_inflow
+          READ ( Restart_inunit, * ) Seg_outflow
+        ENDIF
+        IF ( Nlake>0 ) READ ( Restart_inunit, * ) Lake_vol
+        IF ( AG_flag==ACTIVE ) THEN
+          READ ( Restart_inunit, * ) Ag_soil_moist
+          READ ( Restart_inunit, * ) Ag_soil_rechr
+        ENDIF
       ENDIF
-      END SUBROUTINE climateflow_restart
+    ENDIF
+    END SUBROUTINE climateflow_restart
