@@ -28,7 +28,7 @@ one                    1
 ====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 02/08/2022
+                       Version 5.3.0 03/01/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -64,8 +64,8 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-02-08
-Read Control File               read_control_file   2022-01-12
+PRMS Computation Order          gsflow_prms         2022-03-01
+Read Control File               read_control_file   2022-02-23
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-01-12
 
@@ -208,28 +208,28 @@ Simulation time period: 1983/10/28 00:00:00 to 1983/11/03 00:00:00
 ====================================================================
 Basin Definition                basin               2022-02-10
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-01-20
+Common States and Fluxes        climateflow         2022-02-18
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2021-11-19
 Temperature Distribution        temp_laps           2021-11-19
-Precipitation Distribution      precip_1sta         2021-11-19
+Precipitation Distribution      precip_1sta         2022-02-18
 Solar Radiation Distribution    ddsolrad            2021-11-19
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-02-03
-Snow Dynamics                   snowcomp            2022-02-10
+Snow Dynamics                   snowcomp            2022-02-18
 Surface Runoff                  srunoff_smidx       2022-02-10
 Soilzone Computations           soilzone            2022-02-04
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-12-09
-GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2021-06-10
-GSFLOW Output Budget Summary    gsflow_budget       2021-12-15
+GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
+GSFLOW Output Budget Summary    gsflow_budget       2022-02-18
 GSFLOW Output CSV Summary       gsflow_sum          2022-02-10
 Output Summary                  subbasin            2022-01-25
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2022-01-12
 UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
-SFR-NWT Package                 gwf2sfr7_NWT        2020-09-30
+SFR-NWT Package                 gwf2sfr7_NWT        2022-02-01
 LAK-NWT Package                 gwf2lak7_NWT        2021-09-28
 
 Using Control File: .\Tahoe.control
@@ -246,5 +246,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time    0 minutes  6.00 seconds
+Execution elapsed time    0 minutes  5.55 seconds
 

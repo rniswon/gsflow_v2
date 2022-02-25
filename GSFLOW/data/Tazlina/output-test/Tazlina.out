@@ -23,7 +23,7 @@ nlapse                 3
 ====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 02/08/2022
+                       Version 5.3.0 03/01/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -59,8 +59,8 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-02-08
-Read Control File               read_control_file   2022-01-12
+PRMS Computation Order          gsflow_prms         2022-03-01
+Read Control File               read_control_file   2022-02-23
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-01-12
 
@@ -145,7 +145,7 @@ tmin 11
 Simulation time period: 1950/10/01 00:00:00 to 2015/09/30 00:00:00
 ====================================================================
 Basin Definition                basin               2022-02-10
-Common States and Fluxes        climateflow         2022-01-20
+Common States and Fluxes        climateflow         2022-02-18
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2021-11-19
@@ -154,7 +154,7 @@ Solar Radiation Distribution    ccsolrad            2021-12-09
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-02-03
-Snow Dynamics                   snowcomp            2022-02-10
+Snow Dynamics                   snowcomp            2022-02-18
 Glacier Dynamics                glacr_melt          2022-01-12
 Surface Runoff                  srunoff_smidx       2022-02-10
 Soilzone Computations           soilzone            2022-02-04
@@ -253,5 +253,5 @@ Fraction impervious:        0.0473    Fraction pervious:       0.9527
  *************************************************************
  Total for run    1036.624  384.717-1147.029 1789.414 -316.118
  *************************************************************
-Execution elapsed time    0 minutes  7.07 seconds
+Execution elapsed time    0 minutes  7.73 seconds
 

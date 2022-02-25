@@ -36,8 +36,8 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-02-08
-Read Control File               read_control_file   2022-01-12
+PRMS Computation Order          gsflow_prms         2022-03-01
+Read Control File               read_control_file   2022-02-23
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-01-12
 
@@ -184,5 +184,5 @@ Fraction impervious:        0.0001    Fraction pervious:       0.9999
  *************************************************************
  Total for run     119.830   53.742    6.791   63.263   67.341
  *************************************************************
-Execution elapsed time    0 minutes  0.22 seconds
+Execution elapsed time    0 minutes  0.23 seconds
 

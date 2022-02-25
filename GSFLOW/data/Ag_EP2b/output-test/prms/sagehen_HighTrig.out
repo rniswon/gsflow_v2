@@ -64,8 +64,8 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-02-08
-Read Control File               read_control_file   2022-01-12
+PRMS Computation Order          gsflow_prms         2022-03-01
+Read Control File               read_control_file   2022-02-23
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-01-12
 
@@ -137,5 +137,5 @@ Model domain area:        11226.32    Active basin area:      6740.99
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    5 minutes  7.65 seconds
+Execution elapsed time    4 minutes 36.88 seconds
 

@@ -36,8 +36,8 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-02-08
-Read Control File               read_control_file   2022-01-12
+PRMS Computation Order          gsflow_prms         2022-03-01
+Read Control File               read_control_file   2022-02-23
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-01-12
 
@@ -112,5 +112,5 @@ DPRST area:                  22.42    Fraction DPRST:          0.0033
 Agriculture area:            67.91    Fraction AG:             0.0101
 
 
-Execution elapsed time    3 minutes 22.73 seconds
+Execution elapsed time    2 minutes 45.19 seconds
 
