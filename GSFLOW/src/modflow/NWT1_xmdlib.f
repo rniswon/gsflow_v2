@@ -949,11 +949,11 @@ c     get [a]{x} -- note: use t as tmp
 
 c     save x into soln and use x as temporary(n) array
 
-c      do i = 1, nblack
-c        soln(i) = x( RBorder(i) )
-c      enddo
+      do i = 1, nblack
+        soln(i) = x( RBorder(i) )
+      enddo
 
-      soln(1:nblack) = x( RBorder(1:nblack) )
+c      soln(1:nblack) = x( RBorder(1:nblack) )  !rgn
 
 c
 c     iteration loop
