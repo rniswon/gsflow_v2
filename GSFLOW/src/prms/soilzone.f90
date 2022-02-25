@@ -778,7 +778,7 @@
 !***********************************************************************
       INTEGER FUNCTION szrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
-     &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF
+     &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, Ag_flag, Nowmonth !, Nowyear, Nowday
@@ -924,7 +924,7 @@
         perv_frac = Hru_frac_perv(i)
 
         avail_potet = Potet(i) - hruactet
-        IF ( avail_potet<0.0 ) THEN
+        IF ( avail_potet<-CLOSEZERO ) THEN
           print *, 'avail_potet<0', avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
           avail_potet = 0.0
           hruactet = Potet(i)
