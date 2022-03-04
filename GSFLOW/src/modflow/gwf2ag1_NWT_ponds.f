@@ -143,6 +143,7 @@
         REAL, SAVE, DIMENSION(:), POINTER :: DEMAND, SUPACT, SUPACTOLD
         REAL, SAVE, DIMENSION(:), POINTER :: ACTUAL
         REAL, SAVE, DIMENSION(:), POINTER :: ACTUALOLD
+        INTEGER, SAVE, POINTER :: KPEROLD
       END MODULE GWFAGMODULE
 
       SUBROUTINE GWF2AG7AR(IN, IUNITSFR, IUNITNWT)
@@ -165,7 +166,7 @@
       INTEGER :: MXACTWSUP, MXACTWIRR, NUMSUPHOLD, NUMIRRHOLD
       INTEGER :: MAXSEGSHOLD, NUMCOLS, NUMROWS, MAXCELLSHOLD
       INTEGER :: NUMCELLSHOLD
-      INTEGER :: NUMTABHOLD, max
+      INTEGER :: NUMTABHOLD, max, maxirr, maxcellpond
       ! - -----------------------------------------------------------------
       !
       !1 - --- ALLOCATE ALLOCATE CONSTANTS AND FLAGS
@@ -183,6 +184,7 @@
       ALLOCATE (TSGWALLUNIT, TSGWETALLUNIT, NSEGDIMTEMP)
       ALLOCATE (TSPONDALLUNIT, TSPONDETALLUNIT)
       ALLOCATE (NUMPOND, NUMPONDET, NUMTABPOND, MAXVALPOND)
+      ALLOCATE (KPEROLD)
       VBVLAG = szero
       MSUMAG = 0
       PSIRAMP = 0.10
@@ -213,6 +215,7 @@
       TSPONDALLUNIT = 0
       TSPONDETALLUNIT = 0
       WELAUX = ' '
+      KPEROLD = 0
       ALLOCATE (NUMSUP, NUMIRRWEL, UNITSUP, MAXCELLSWEL)
       ALLOCATE (NUMSUPSP, MAXSEGS, NUMIRRWELSP)
       ALLOCATE (ETDEMANDFLAG, NUMIRRDIVERSION, NUMIRRDIVERSIONSP)
@@ -269,22 +272,26 @@
       ALLOCATE (TRIGGERPERIODSEG(NSEGDIMTEMP))
       ALLOCATE (TIMEINPERIODWELL(MXWELL), TIMEINPERIODSEG(NSEGDIMTEMP))
       ALLOCATE (SEGLIST(NSEGDIMTEMP), NUMSEGLIST)
-      ALLOCATE (TIMEINPERIODPOND(NUMIRRPOND))
-      ALLOCATE (AETITERPOND(NUMIRRPOND),PETPOND(NUMIRRPOND))
-      ALLOCATE (PONDFLOW(NUMIRRPOND),PONDFLOWOLD(NUMIRRPOND))
-      ALLOCATE (PONDFLOWMAX(NUMIRRPOND), PONDSEGFLOW(NUMIRRPOND))
-      ALLOCATE (PONDIRRPRMS(MAXCELLSPOND,NUMIRRPOND))
-      ALLOCATE (TSPONDUNIT(NUMIRRPOND),TSPONDNUM(NUMIRRPOND))
-      ALLOCATE (TSPONDETUNIT(NUMIRRPOND),TSPONDETNUM(NUMIRRPOND))
-      ALLOCATE (IRRPONDVAR(NUMIRRPOND),TABPONDSEG(NUMIRRPOND))
-      ALLOCATE (TABPONDFRAC(NUMIRRPOND))
-      ALLOCATE (NUMCELLSPOND(NUMIRRPOND),IRRPERIODPOND(NUMIRRPOND))
-      ALLOCATE (TRIGGERPERIODPOND(NUMIRRPOND))
-      ALLOCATE (FLOWTHROUGH_POND(NUMIRRPOND))
-      ALLOCATE (NUMIRRPONDSP,IRRFIELDFACTPOND(MAXCELLSPOND,NUMIRRPOND)) 
-      ALLOCATE (IRRFACTPOND(MAXCELLSPOND,NUMIRRPOND))
-      ALLOCATE (IRRHRU_POND(MAXCELLSPOND,NUMIRRPOND))
-      ALLOCATE (RMSEPOND(NUMIRRPOND))
+      maxirr = NUMIRRPOND
+      IF ( maxirr<1 ) maxirr = 1
+      maxcellpond = MAXCELLSPOND
+      IF ( maxcellpond<1 ) maxcellpond = 1
+      ALLOCATE (TIMEINPERIODPOND(maxirr))
+      ALLOCATE (AETITERPOND(maxirr),PETPOND(maxirr))
+      ALLOCATE (PONDFLOW(maxirr),PONDFLOWOLD(maxirr))
+      ALLOCATE (PONDFLOWMAX(maxirr), PONDSEGFLOW(maxirr))
+      ALLOCATE (PONDIRRPRMS(maxcellpond,maxirr))
+      ALLOCATE (TSPONDUNIT(maxirr),TSPONDNUM(maxirr))
+      ALLOCATE (TSPONDETUNIT(maxirr),TSPONDETNUM(maxirr))
+      ALLOCATE (IRRPONDVAR(maxirr),TABPONDSEG(maxirr))
+      ALLOCATE (TABPONDFRAC(maxirr))
+      ALLOCATE (NUMCELLSPOND(maxirr),IRRPERIODPOND(maxirr))
+      ALLOCATE (TRIGGERPERIODPOND(maxirr))
+      ALLOCATE (FLOWTHROUGH_POND(maxirr))
+      ALLOCATE (NUMIRRPONDSP,IRRFIELDFACTPOND(maxcellpond,maxirr)) 
+      ALLOCATE (IRRFACTPOND(maxcellpond,maxirr))
+      ALLOCATE (IRRHRU_POND(maxcellpond,maxirr))
+      ALLOCATE (RMSEPOND(maxirr))
       IF ( NUMIRRPOND > 0 ) THEN
         ALLOCATE(PONDSEGFRAC(NSEGDIMTEMP))
       ELSE
@@ -368,10 +375,8 @@
       IF ( max<1 ) max = 1
       ALLOCATE (TABTIMEPOND(max, NUMTABHOLD))
       ALLOCATE (TABRATEPOND(max, NUMTABHOLD))
-      max = NUMIRRPOND
-      IF ( max<1 ) max = 1
-      ALLOCATE (TABVALPOND(max),TABIDPOND(max))
-      ALLOCATE (TABPONDHRU(max),TABUNITPOND(max))
+      ALLOCATE (TABVALPOND(maxirr),TABIDPOND(maxirr))
+      ALLOCATE (TABPONDHRU(maxirr),TABUNITPOND(maxirr))
       TABTIMEPOND = szero
       TABRATEPOND = szero
       TABPONDHRU = 0
@@ -396,9 +401,9 @@
          WRITE (IOUT, 18)
 18       FORMAT(1X,
      +        'No ponds active in the AG Package')
-         NUMIRRPOND = 1
+        ! NUMIRRPOND = 1
       END IF
-      ALLOCATE (POND(4, NUMIRRPOND))
+      ALLOCATE (POND(4, maxirr))
       !
       !9 - --- ALLOCATE SUPPLEMENTAL AND IRRIGATION WELL ARRAYS
       NUMSUPHOLD = NUMSUP
@@ -1011,7 +1016,7 @@
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: IOUT, NCOL, NROW, NLAY, IFREFM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS, SEG
+      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS
       USE PRMS_MODULE, ONLY: Nhru
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
@@ -1528,15 +1533,6 @@
          end if
       end do
 !
-! Set demand to specified diversion flows in SFR.
-!
-      DO i = 1, NUMIRRDIVERSIONSP
-         iseg = IRRSEG(i)
-         if (iseg > 0 .and. IUNITSFR > 0) then
-               DEMAND(ISEG) = SEG(2, ISEG)
-         END IF
-      END DO
-!
 6     FORMAT(1X, /
      +       1X, 'NO IRRDIVERSION DATA OR REUSING IRRDIVERSION DATA ',
      +       'FROM LAST STRESS PERIOD ')
@@ -1560,39 +1556,30 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR !, SGOTFLW
+      USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR, ISFRLIST
       USE GLOBAL, ONLY: IUNIT
-      USE GWFBASMODULE, ONLY: TOTIM
+!      USE GWFBASMODULE, ONLY: TOTIM
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS:
       INTEGER, INTENT(IN)::IN, KPER
       !
-      INTEGER ISEG, i, L, ID
-      DOUBLE PRECISION :: TOTAL !, Qpond
+      INTEGER ISEG, i, ii, tabseg, istab, L, ID
       EXTERNAL :: RATETERPQ
       REAL :: RATETERPQ, TIME
       ! - -----------------------------------------------------------------
       !
-            !1 - ------RESET DEMAND IF IT CHANGES
-      if ( NUMTAB_SFR > 0 ) DEMAND = 0.0
-      DO i = 1, NUMIRRDIVERSIONSP
-         iseg = IRRSEG(i)
-         if (iseg > 0 .and. IUNIT(44) > 0) then
-               ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
-               ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
-               ! contains the TABFILE values at this point.
-           IF ( NUMTAB_SFR > 0 )  DEMAND(ISEG) = SEG(2, ISEG)
-           SUPACT(ISEG) = 0.0
-           ACTUAL(ISEG) = 0.0
-         end if
-      END DO
-      !2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
-      IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
-         DO i = 1, NUMSEGLIST
-            SEG(2, SEGLIST(i)) = szero
-         END DO
-      END IF
+      !1 - ------RESET DEMAND IF IT CHANGES
+      if (NUMTAB_SFR.ne.0) then
+          DO ii = 1, NUMTAB_SFR
+             tabseg = ISFRLIST(1, ii)
+             DEMAND(tabseg) = 0.0
+          END DO
+      endif
+      ! RESET ALL DEMAND if new stress period 
+      if (KPEROLD.ne.KPER) then
+	   DEMAND = 0.0
+      endif	  
       !
       !3 - -----SET MAXIMUM POND OUTFLOW DIVERSION RATES WHEN TABFILES ARE USED
       IF ( NUMIRRPOND > 0 ) THEN
@@ -1620,6 +1607,47 @@
      +                    TABRATEWELL(:,ID), TABVALWELL(L))
          END IF
       END DO
+      DO i = 1, NUMIRRDIVERSIONSP
+         iseg = IRRSEG(i)
+         if (iseg > 0) then
+            if (IUNIT(44) > 0) then
+               ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
+               ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
+               ! contains the TABFILE values at this point.
+               if (NUMTAB_SFR.ne.0) then
+			    ! check if this segment has a tabfile associated with it
+                  istab = 0
+                  DO ii = 1, NUMTAB_SFR
+                     tabseg = ISFRLIST(1, ii)
+                     if (iseg.eq.tabseg) then
+                         istab = 1
+                     endif
+                  END DO
+                  ! update demand if there is a tabfile or if it is a new
+                  ! stress period
+                  if ((istab.eq.1) .OR. (KPEROLD.ne.KPER)) then
+			       DEMAND(ISEG) = SEG(2, ISEG)
+                  endif
+                 ! update demand if this is a new stress period
+               elseif (KPEROLD.ne.KPER) then
+			    DEMAND(ISEG) = SEG(2, ISEG)
+			 endif
+               IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
+            end if
+            SUPACT(ISEG) = 0.0
+            ACTUAL(ISEG) = 0.0
+         END IF
+      END DO
+      ! update kperold to track new stress periods and set data accordingly
+      if (KPEROLD.ne.KPER) then
+          KPEROLD = KPEROLD + 1
+      endif
+      !2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
+      IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
+         DO i = 1, NUMSEGLIST
+            SEG(2, SEGLIST(i)) = 0.0
+         END DO
+      END IF
 !
 !6 - -----RESET SAVED IRR AND AET FROM LAST TIME STEP
       DIVERSIONIRRUZF = szero
@@ -2360,10 +2388,10 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: DELR, DELC, IBOUND, HNEW, LBOTM, BOTM,
-     +                  RHS, IUNIT
+     +                  RHS
       USE GWFBASMODULE, ONLY: TOTIM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, SGOTFLW, NUMTAB_SFR
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, SGOTFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -2384,7 +2412,7 @@
       DOUBLE PRECISION :: Qp, Hh, Ttop, Bbot, dQp, SMOOTHQ
       DOUBLE PRECISION :: QSW, QQ, demandtrigger_gw
       DOUBLE PRECISION :: demandgw_uzf, demandgw_prms
-      INTEGER :: k, ipc, iseg !, PONDID
+      INTEGER :: k, ipc !, PONDID
       !
       ! - -----------------------------------------------------------------
       !
@@ -3487,7 +3515,7 @@
          if (TIMEINPERIODSEG(ISEG) > IRRPERIODSEG(ISEG)) then
             if (factor <= TRIGGERPERIODSEG(ISEG)) then
                 SEG(2, iseg) = DEMAND(iseg)
-                TIMEINPERIODSEG(ISEG) = done
+                TIMEINPERIODSEG(ISEG) = 0.0
             end if
          end if
          if (TIMEINPERIODSEG(ISEG) - DELT < IRRPERIODSEG(ISEG))
