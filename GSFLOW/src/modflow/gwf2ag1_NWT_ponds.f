@@ -2360,10 +2360,10 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: DELR, DELC, IBOUND, HNEW, LBOTM, BOTM,
-     +                  RHS
+     +                  RHS, IUNIT
       USE GWFBASMODULE, ONLY: TOTIM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, SGOTFLW
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, SGOTFLW, NUMTAB_SFR
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -2384,7 +2384,7 @@
       DOUBLE PRECISION :: Qp, Hh, Ttop, Bbot, dQp, SMOOTHQ
       DOUBLE PRECISION :: QSW, QQ, demandtrigger_gw
       DOUBLE PRECISION :: demandgw_uzf, demandgw_prms
-      INTEGER :: k, ipc !, PONDID
+      INTEGER :: k, ipc, iseg !, PONDID
       !
       ! - -----------------------------------------------------------------
       !
@@ -2407,6 +2407,27 @@
       RMSESW = szero
       RMSEGW = szero
       RMSEPOND = szero
+!1 - ------RESET DEMAND IF IT CHANGES for MODSIM simulations
+      IF ( kkiter == 1) Then
+        if ( NUMTAB_SFR > 0 ) DEMAND = 0.0
+        DO i = 1, NUMIRRDIVERSIONSP
+          iseg = IRRSEG(i)
+          if (iseg > 0 .and. IUNIT(44) > 0) then
+               ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
+               ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
+               ! contains the TABFILE values at this point.
+            IF ( NUMTAB_SFR > 0 )  DEMAND(ISEG) = SEG(2, ISEG)
+            SUPACT(ISEG) = 0.0
+            ACTUAL(ISEG) = 0.0
+          end if
+        END DO
+      !2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
+        IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
+           DO i = 1, NUMSEGLIST
+              SEG(2, SEGLIST(i)) = szero
+           END DO
+        END IF
+      END IF
       agconverge = 0
       IF ( kkiter > 2 ) agconverge = 1    
       DO L = 1, NUMIRRPOND
