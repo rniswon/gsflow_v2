@@ -2319,7 +2319,7 @@
       END
       !
       ! - ------SUBROUTINE WRITE_HEADER_AG
-      SUBROUTINE WRITE_HEADER_AG(TSTYPE, NUM)
+        SUBROUTINE WRITE_HEADER_AG(TSTYPE, NUM)
         ! READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
         USE GWFAGMODULE
         IMPLICIT NONE
@@ -2388,10 +2388,10 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: DELR, DELC, IBOUND, HNEW, LBOTM, BOTM,
-     +                  RHS
+     +                  RHS, IUNIT
       USE GWFBASMODULE, ONLY: TOTIM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, SGOTFLW
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, SGOTFLW, NUMTAB_SFR
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -2412,7 +2412,7 @@
       DOUBLE PRECISION :: Qp, Hh, Ttop, Bbot, dQp, SMOOTHQ
       DOUBLE PRECISION :: QSW, QQ, demandtrigger_gw
       DOUBLE PRECISION :: demandgw_uzf, demandgw_prms
-      INTEGER :: k, ipc !, PONDID
+      INTEGER :: k, ipc, iseg !, PONDID
       !
       ! - -----------------------------------------------------------------
       !
