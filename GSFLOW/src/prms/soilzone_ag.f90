@@ -418,7 +418,8 @@
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Call_cascade, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Ag_flag, Nowmonth, Nowyear, Nowday, Iter_aet_flag, Agriculture_soilzone_flag, Hru_type
+     &    Soilzone_aet_flag, Ag_flag, Nowmonth, Nowyear, Nowday, Iter_aet_flag, Agriculture_soilzone_flag, Hru_type, &
+     &    MODSIM_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
@@ -467,7 +468,8 @@
       szrun_ag = 0
 
 ! It0 and _ante variables used with MODFLOW integration to save iteration states.
-      IF ( AFR .OR. Kkiter==1 ) THEN
+      IF ( Kkiter==1 ) THEN
+        IF ( (MODSIM_flag==ACTIVE .AND. AFR) .OR. MODSIM_flag==OFF ) THEN
         Soil_moist_ante = Soil_moist
         Soil_rechr_ante = Soil_rechr
         Ssres_stor_ante = Ssres_stor
@@ -488,6 +490,7 @@
           ! computed in srunoff
           It0_sroff = Sroff
           IF ( Call_cascade==ACTIVE ) It0_strm_seg_in = Strm_seg_in
+        ENDIF
         ENDIF
       ENDIF
 
