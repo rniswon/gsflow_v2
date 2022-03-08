@@ -5,7 +5,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2021-12-15'
+      character(len=*), parameter :: Version_gsflow_budget = '2022-02-18'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -289,7 +289,6 @@
         Gw2sm(i) = 0.0
         Gw_rejected(i) = 0.0
         Actet_gw(i) = 0.0
-        Slow_stor(i) = 0.0 !shouldn't be reset if any cells of HRU inactive and HRU active
         Slow_stor(i) = 0.0 !shouldn't be reset if any cells of HRU inactive and HRU active
 !        Uzf_infil_map(i) = 0.0
 !        Sat_recharge(i) = 0.0
@@ -786,8 +785,8 @@
 !     gsflow_budget_restart - write to or read from restart file
 !***********************************************************************
       SUBROUTINE gsflow_budget_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, text_restart_flag
       use prms_utils, only: check_restart
       USE GSFBUDGET
       ! Argument
@@ -795,16 +794,31 @@
       ! Local Variable
       CHARACTER(LEN=13) :: module_name
 !***********************************************************************
-      IF ( In_out==SAVE_INIT ) THEN
+    IF ( In_out==SAVE_INIT ) THEN
+      IF ( text_restart_flag==OFF ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Total_pump, Total_pump_cfs, Unsat_S, Sat_S, &
-     &          Sat_dS, StreamExchng2Sat_Q, Stream2Unsat_Q, Stream_inflow, &
-     &          Basin_gw2sm, LakeExchng2Sat_Q, Lake2Unsat_Q
+                Sat_dS, StreamExchng2Sat_Q, Stream2Unsat_Q, Stream_inflow, &
+                Basin_gw2sm, LakeExchng2Sat_Q, Lake2Unsat_Q
       ELSE
+        WRITE ( Restart_outunit, * ) MODNAME
+        WRITE ( Restart_outunit, * ) Total_pump, Total_pump_cfs, Unsat_S, Sat_S, &
+                Sat_dS, StreamExchng2Sat_Q, Stream2Unsat_Q, Stream_inflow, &
+                Basin_gw2sm, LakeExchng2Sat_Q, Lake2Unsat_Q
+      ENDIF
+    ELSE
+      IF ( text_restart_flag==OFF ) THEN
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Total_pump, Total_pump_cfs, Unsat_S, Sat_S, &
-     &         Sat_dS, StreamExchng2Sat_Q, Stream2Unsat_Q, Stream_inflow, &
-     &         Basin_gw2sm, LakeExchng2Sat_Q, Lake2Unsat_Q
+               Sat_dS, StreamExchng2Sat_Q, Stream2Unsat_Q, Stream_inflow, &
+               Basin_gw2sm, LakeExchng2Sat_Q, Lake2Unsat_Q
+      ELSE
+        READ ( Restart_inunit, * ) module_name
+        CALL check_restart(MODNAME, module_name)
+        READ ( Restart_inunit, * ) Total_pump, Total_pump_cfs, Unsat_S, Sat_S, &
+               Sat_dS, StreamExchng2Sat_Q, Stream2Unsat_Q, Stream_inflow, &
+               Basin_gw2sm, LakeExchng2Sat_Q, Lake2Unsat_Q
       ENDIF
+    ENDIF
       END SUBROUTINE gsflow_budget_restart

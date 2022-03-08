@@ -1240,7 +1240,8 @@
 !     gsflow_sum_restart - write to or read from restart file
 !***********************************************************************
       SUBROUTINE gsflow_sum_restart(In_out)
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, text_restart_flag
       use prms_utils, only: check_restart
       USE GSFSUM
       ! Argument
@@ -1248,7 +1249,8 @@
       ! Local Variable
       CHARACTER(LEN=10) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+    IF ( In_out==0 ) THEN
+      IF ( text_restart_flag==OFF ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Rate_soilstor, Rate_uzstor, Basingwstor, &
      &          Rate_satstor, Basingvr2sm, Rate_pweqv, Lake_dS, Rate_lakin, Rate_lakot, Rate_lakestor, &
@@ -1266,6 +1268,25 @@
      &          Dprst_S, DprstEvap_Q, Lake2Unsat_Q, LakeExchng2Sat_Q, Lake_S, Stream_S, &
      &          BoundaryStreamFlow_Q, SwaleEvap_Q
       ELSE
+        WRITE ( Restart_outunit, * ) MODNAME
+        WRITE ( Restart_outunit, * ) Rate_soilstor, Rate_uzstor, Basingwstor, &
+     &          Rate_satstor, Basingvr2sm, Rate_pweqv, Lake_dS, Rate_lakin, Rate_lakot, Rate_lakestor, &
+     &          SnowPweqv_S, Ave_SoilDrainage2Unsat_Q, Infil2Soil_Q, Basinsoilstor, Cap_S, &
+     &          CapDrainage2Sat_Q, StreamOut_Q, SatDisch2Stream_Q, Rate_Dprst_S
+        WRITE ( Restart_outunit, * ) Precip_Q, CapET_Q, ImpervEvap_Q, PotGravDrn2Unsat_Q, Sat2Grav_Q, Lake2Sat_Q, &
+     &          Canopy_S, Imperv_S, Interflow2Stream_Q, Sroff2Stream_Q, Obs_strmflow, UnsatDrainageExcess_Q, UnsatET_Q, &
+     &          SatET_Q, Uzf_et, RechargeUnsat2Sat_Q, Basinseepout, SoilDrainage2Unsat_Q, Unsat_dS, Basinrain, &
+     &          Basinsnow, Basinslowflow
+        WRITE ( Restart_outunit, * ) Basingvr2pfr, SnowEvap_Q, HortSroff2Stream_Q, HortSroff2Lake_Q, &
+     &          DunnInterflow2Lake_Q, LakeEvap_Q, LakePrecip_Q, Grav_S, Basinprefflow, Pref_S, &
+     &          Stream2Sat_Q, Basinsm2gvr, UnsatStream_dS, UnsatStream_S, SatDisch2Lake_Q, DunnSroff2Stream_Q
+        WRITE ( Restart_outunit, * ) Infil2CapTotal_Q, Infil2Pref_Q, ActualET_Q, SnowMelt_Q, &
+     &          CanopyEvap_Q, DunnInterflow2Cap_Q, NetWellFlow_Q, Stream2Unsat_Q, &
+     &          Dprst_S, DprstEvap_Q, Lake2Unsat_Q, LakeExchng2Sat_Q, Lake_S, Stream_S, &
+     &          BoundaryStreamFlow_Q, SwaleEvap_Q
+      ENDIF
+    ELSE
+      IF ( text_restart_flag==OFF ) THEN
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Rate_soilstor, Rate_uzstor, Basingwstor, &
@@ -1283,5 +1304,24 @@
      &         CanopyEvap_Q, DunnInterflow2Cap_Q, NetWellFlow_Q, Stream2Unsat_Q, &
      &         Dprst_S, DprstEvap_Q, Lake2Unsat_Q, LakeExchng2Sat_Q, Lake_S, Stream_S, &
      &         BoundaryStreamFlow_Q, SwaleEvap_Q
+      ELSE
+        READ ( Restart_inunit, * ) module_name
+        CALL check_restart(MODNAME, module_name)
+        READ ( Restart_inunit, * ) Rate_soilstor, Rate_uzstor, Basingwstor, &
+     &         Rate_satstor, Basingvr2sm, Rate_pweqv, Lake_dS, Rate_lakin, Rate_lakot, Rate_lakestor, &
+     &         SnowPweqv_S, Ave_SoilDrainage2Unsat_Q, Infil2Soil_Q, Basinsoilstor, Cap_S, &
+     &         CapDrainage2Sat_Q, StreamOut_Q, SatDisch2Stream_Q, Rate_Dprst_S
+        READ ( Restart_inunit, * ) Precip_Q, CapET_Q, ImpervEvap_Q, PotGravDrn2Unsat_Q, Sat2Grav_Q, Lake2Sat_Q, &
+     &         Canopy_S, Imperv_S, Interflow2Stream_Q, Sroff2Stream_Q, Obs_strmflow, UnsatDrainageExcess_Q, UnsatET_Q, &
+     &         SatET_Q, Uzf_et, RechargeUnsat2Sat_Q, Basinseepout, SoilDrainage2Unsat_Q, Unsat_dS, Basinrain, &
+     &         Basinsnow, Basinslowflow
+        READ ( Restart_inunit, * ) Basingvr2pfr, SnowEvap_Q, HortSroff2Stream_Q, HortSroff2Lake_Q, &
+     &         DunnInterflow2Lake_Q, LakeEvap_Q, LakePrecip_Q, Grav_S, Basinprefflow, Pref_S, &
+     &         Stream2Sat_Q, Basinsm2gvr, UnsatStream_dS, UnsatStream_S, SatDisch2Lake_Q, DunnSroff2Stream_Q
+        READ ( Restart_inunit, * ) Infil2CapTotal_Q, Infil2Pref_Q, ActualET_Q, SnowMelt_Q, &
+     &         CanopyEvap_Q, DunnInterflow2Cap_Q, NetWellFlow_Q, Stream2Unsat_Q, &
+     &         Dprst_S, DprstEvap_Q, Lake2Unsat_Q, LakeExchng2Sat_Q, Lake_S, Stream_S, &
+     &         BoundaryStreamFlow_Q, SwaleEvap_Q
       ENDIF
-      END SUBROUTINE gsflow_sum_restart
+    ENDIF
+    END SUBROUTINE gsflow_sum_restart

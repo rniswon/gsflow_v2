@@ -624,8 +624,8 @@
 !     gwflow_restart - write or read gwflow restart file
 !***********************************************************************
       SUBROUTINE gwflow_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, text_restart_flag
       USE PRMS_BASIN, ONLY: Weir_gate_flag
       USE PRMS_GWFLOW
       use prms_utils, only: check_restart
@@ -635,11 +635,22 @@
       CHARACTER(LEN=6) :: module_name
 !***********************************************************************
       IF ( In_out==SAVE_INIT ) THEN
-        WRITE ( Restart_outunit ) MODNAME
-        IF ( Weir_gate_flag==ACTIVE ) WRITE ( Restart_outunit ) Elevlake
+        IF ( text_restart_flag==OFF ) THEN
+          WRITE ( Restart_outunit ) MODNAME
+          IF ( Weir_gate_flag==ACTIVE ) WRITE ( Restart_outunit ) Elevlake
+        ELSE
+          WRITE ( Restart_outunit, * ) MODNAME
+          IF ( Weir_gate_flag==ACTIVE ) WRITE ( Restart_outunit, * ) Elevlake
+        ENDIF
       ELSE
-        READ ( Restart_inunit ) module_name
-        CALL check_restart(MODNAME, module_name)
-        IF ( Weir_gate_flag==ACTIVE ) READ ( Restart_inunit ) Elevlake ! could be error if someone turns off weirs for restart
+        IF ( text_restart_flag==OFF ) THEN
+          READ ( Restart_inunit ) module_name
+          CALL check_restart(MODNAME, module_name)
+          IF ( Weir_gate_flag==ACTIVE ) READ ( Restart_inunit ) Elevlake ! could be error if someone turns off weirs for restart
+        ELSE
+          READ ( Restart_inunit, * ) module_name
+          CALL check_restart(MODNAME, module_name)
+          IF ( Weir_gate_flag==ACTIVE ) READ ( Restart_inunit, * ) Elevlake ! could be error if someone turns off weirs for restart
+        ENDIF
       ENDIF
       END SUBROUTINE gwflow_restart

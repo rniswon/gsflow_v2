@@ -91,7 +91,7 @@ contains
                            PET_ag_module, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, &
                            Agriculture_soilzone_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
                            Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, &
-                           Dprst_transfer_water_use, mappingFileName, xyFileName, Iter_aet_flag
+                           Dprst_transfer_water_use, mappingFileName, xyFileName, Iter_aet_flag, text_restart_flag
     use PRMS_CLIMATE_HRU, only: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, Albedo_day, Cloud_cover_day, &
                                 Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, &
                                 AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
@@ -334,6 +334,9 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'iter_aet_flag'
     Iter_aet_flag = OFF
+    i = i + 1
+    Control_parameter_data(i) % name = 'text_restart_flag'
+    text_restart_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'albedo_cbh_flag'
     Albedo_cbh_flag = OFF

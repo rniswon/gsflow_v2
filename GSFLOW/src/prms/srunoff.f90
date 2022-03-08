@@ -1706,8 +1706,8 @@
 !     srunoff_restart - write or read srunoff restart file
 !***********************************************************************
       SUBROUTINE srunoff_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Dprst_flag, Frozen_flag
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Dprst_flag, Frozen_flag, text_restart_flag
       USE PRMS_SRUNOFF
       use prms_utils, only: check_restart
       IMPLICIT NONE
@@ -1716,7 +1716,8 @@
       ! Local Variable
       CHARACTER(LEN=13) :: module_name
 !***********************************************************************
-      IF ( In_out==SAVE_INIT ) THEN
+    IF ( In_out==SAVE_INIT ) THEN
+      IF ( text_restart_flag==OFF ) THEN
         WRITE ( Restart_outunit ) MODNAME
         WRITE ( Restart_outunit ) Basin_imperv_stor, Basin_dprst_volop, Basin_dprst_volcl
         WRITE ( Restart_outunit ) Hru_impervstor
@@ -1732,6 +1733,23 @@
           WRITE ( Restart_outunit ) Cfgi_prev
         ENDIF
       ELSE
+        WRITE ( Restart_outunit, * ) MODNAME
+        WRITE ( Restart_outunit, * ) Basin_imperv_stor, Basin_dprst_volop, Basin_dprst_volcl
+        WRITE ( Restart_outunit, * ) Hru_impervstor
+        IF ( Dprst_flag==ACTIVE ) THEN
+          WRITE ( Restart_outunit, * ) Dprst_area_open
+          WRITE ( Restart_outunit, * ) Dprst_area_clos
+          WRITE ( Restart_outunit, * ) Dprst_stor_hru
+          WRITE ( Restart_outunit, * ) Dprst_vol_thres_open
+        ENDIF
+        IF ( Frozen_flag==ACTIVE ) THEN
+          WRITE ( Restart_outunit, * ) Frozen
+          WRITE ( Restart_outunit, * ) Cfgi
+          WRITE ( Restart_outunit, * ) Cfgi_prev
+        ENDIF
+      ENDIF
+    ELSE
+      IF ( text_restart_flag==OFF ) THEN
         READ ( Restart_inunit ) module_name
         CALL check_restart(MODNAME, module_name)
         READ ( Restart_inunit ) Basin_imperv_stor, Basin_dprst_volop, Basin_dprst_volcl
@@ -1747,5 +1765,22 @@
           READ ( Restart_inunit ) Cfgi
           READ ( Restart_inunit ) Cfgi_prev
         ENDIF
+      ELSE
+        READ ( Restart_inunit, * ) module_name
+        CALL check_restart(MODNAME, module_name)
+        READ ( Restart_inunit, * ) Basin_imperv_stor, Basin_dprst_volop, Basin_dprst_volcl
+        READ ( Restart_inunit, * ) Hru_impervstor
+        IF ( Dprst_flag==ACTIVE ) THEN
+          READ ( Restart_inunit, * ) Dprst_area_open
+          READ ( Restart_inunit, * ) Dprst_area_clos
+          READ ( Restart_inunit, * ) Dprst_stor_hru
+          READ ( Restart_inunit, * ) Dprst_vol_thres_open
+        ENDIF
+        IF ( Frozen_flag==ACTIVE ) THEN ! could be problem for restart
+          READ ( Restart_inunit, * ) Frozen
+          READ ( Restart_inunit, * ) Cfgi
+          READ ( Restart_inunit, * ) Cfgi_prev
+        ENDIF
       ENDIF
-      END SUBROUTINE srunoff_restart
+    ENDIF
+    END SUBROUTINE srunoff_restart
