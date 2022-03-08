@@ -2,7 +2,7 @@
 ! Defines the computational sequence, valid modules, and dimensions
 !***********************************************************************
       SUBROUTINE gsflow_prms(Process_mode, AFR, MS_GSF_converge, Nsegshold, Nlakeshold, &
-     &                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP) BIND(C,NAME="gsflow_prms")
+     &                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand) BIND(C,NAME="gsflow_prms")
       
       !DEC$ ATTRIBUTES DLLEXPORT :: gsflow_prms
       USE PRMS_CONSTANTS, ONLY: ERROR_control
@@ -23,6 +23,7 @@
       INTEGER, INTENT(INOUT) :: Nsegshold, Nlakeshold
       LOGICAL, INTENT(INOUT) :: AFR, MS_GSF_converge
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
+      DOUBLE PRECISION, INTENT(INOUT) :: agDemand(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(Nlakeshold), &
      &                                   EXCHANGE(Nsegshold),  &
      &                                   LAKEVOL(Nlakeshold), &
