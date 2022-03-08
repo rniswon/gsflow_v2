@@ -302,7 +302,11 @@
         IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active
           IF ( Init_vars_from_file>0 ) CLOSE ( Restart_inunit )
           IF ( Save_vars_to_file==ACTIVE ) THEN
-            CALL PRMS_open_output_file(Restart_outunit, Var_save_file, 'var_save_file', 1, iret)
+            IF ( text_restart_flag==OFF ) THEN
+              CALL PRMS_open_output_file(Restart_outunit, Var_save_file, 'var_save_file', 1, iret)
+            ELSE
+              CALL PRMS_open_output_file(Restart_outunit, Var_save_file, 'var_save_file', 0, iret)
+            ENDIF
             IF ( iret/=0 ) ERROR STOP ERROR_open_out
             CALL gsflow_prms_restart(SAVE_INIT)
           ENDIF
@@ -724,7 +728,6 @@
      &        '    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)', /)
 
       IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = 1
-      Ag_gravity_flag = OFF
 
       IF ( control_string(Model_mode, 'model_mode')/=0 ) CALL read_error(5, 'model_mode')
       IF ( Model_mode(:4)=='    ' ) Model_mode = 'GSFLOW5'
@@ -820,6 +823,7 @@
 
       IF ( control_integer(Init_vars_from_file, 'init_vars_from_file')/=0 ) Init_vars_from_file = 0
       IF ( control_integer(Save_vars_to_file, 'save_vars_to_file')/=0 ) Save_vars_to_file = 0
+      IF ( control_integer(text_restart_flag, 'text_restart_flag')/=0 ) text_restart_flag = OFF
       IF ( control_string(mappingFileName, 'mappingFileName')/=0 ) CALL read_error(5, 'mappingFileName')
       IF ( control_string(xyFileName, 'xyFileName')/=0 ) CALL read_error(5, 'xyFileName')
 
@@ -870,7 +874,11 @@
       ! Check for restart files
       IF ( Init_vars_from_file>0 ) THEN
         IF ( control_string(Var_init_file, 'var_init_file')/=0 ) CALL read_error(5, 'var_init_file')
-        CALL PRMS_open_input_file(Restart_inunit, Var_init_file, 'var_init_file', 1, iret)
+        IF ( text_restart_flag==OFF ) THEN
+          CALL PRMS_open_input_file(Restart_inunit, Var_init_file, 'var_init_file', 1, iret)
+        ELSE
+          CALL PRMS_open_input_file(Restart_inunit, Var_init_file, 'var_init_file', 0, iret)
+        ENDIF
         IF ( iret/=0 ) Inputerror_flag = 1
       ENDIF
       IF ( Save_vars_to_file==ACTIVE ) THEN
@@ -1114,6 +1122,7 @@
       IF ( decldim('nmap', 0, MAXDIM, 'Number of mapped values')/=0 ) CALL read_error(7, 'nmap')
       IF ( control_integer(Glacier_flag, 'glacier_flag')/=0 ) Glacier_flag = OFF
       IF ( control_integer(no_snow_flag, 'no_snow_flag')/=0 ) no_snow_flag = OFF
+      IF ( control_integer(ag_gravity_flag, 'ag_gravity_flag')/=0 ) Ag_gravity_flag = OFF
       IF ( control_integer(Frozen_flag, 'frozen_flag')/=0 ) Frozen_flag = OFF
       IF ( control_integer(Dyn_imperv_flag, 'dyn_imperv_flag')/=0 ) Dyn_imperv_flag = OFF
       IF ( control_integer(Dyn_intcp_flag, 'dyn_intcp_flag')/=0 ) Dyn_intcp_flag = OFF
@@ -1132,7 +1141,7 @@
       IF ( control_integer(Dyn_transp_on_flag, 'dyn_transp_on_flag')/=0 ) Dyn_transp_on_flag = OFF
       IF ( control_integer(Dyn_ag_frac_flag, 'dyn_ag_frac_flag')/=0 ) Dyn_ag_frac_flag = OFF
       IF ( control_integer(Dyn_ag_soil_flag, 'dyn_ag_soil_flag')/=0 ) Dyn_ag_soil_flag = OFF
-      Dynamic_flag = 0
+      Dynamic_flag = OFF
       IF ( Dyn_imperv_flag/=OFF .OR. Dyn_intcp_flag/=0 .OR. Dyn_covden_flag/=0 .OR. Dyn_dprst_flag/=OFF .OR. &
      &     Dyn_potet_flag/=OFF .OR. Dyn_covtype_flag/=0 .OR. Dyn_transp_flag/=0 .OR. Dyn_soil_flag /=OFF .OR. &
      &     Dyn_radtrncf_flag/=OFF .OR. Dyn_sro2dprst_perv_flag/=0 .OR. Dyn_sro2dprst_imperv_flag/=OFF .OR. &
@@ -1718,6 +1727,7 @@
 !     gsflow_prms_restart - write or read restart file
 !***********************************************************************
       SUBROUTINE gsflow_prms_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: OFF
       USE PRMS_MODULE
       use prms_utils, only: check_restart, check_restart_dimen
       IMPLICIT NONE
@@ -1732,17 +1742,32 @@
       CHARACTER(LEN=11) :: module_name
 !***********************************************************************
       IF ( In_out==0 ) THEN
-        WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
-     &          Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
-        WRITE ( Restart_outunit ) Starttime, Endtime
+        IF ( text_restart_flag==OFF ) THEN
+          WRITE ( Restart_outunit ) MODNAME
+          WRITE ( Restart_outunit ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
+                  Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
+          WRITE ( Restart_outunit ) Starttime, Endtime
+        ELSE
+          WRITE ( Restart_outunit, * ) MODNAME
+          WRITE ( Restart_outunit, * ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
+                  Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
+          WRITE ( Restart_outunit, * ) Starttime, Endtime
+        ENDIF
       ELSE
         ierr = 0
-        READ ( Restart_inunit ) module_name
-        CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
-     &         cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
-        READ ( Restart_inunit ) start_time, end_time
+        IF ( text_restart_flag==OFF ) THEN
+          READ ( Restart_inunit ) module_name
+          CALL check_restart(MODNAME, module_name)
+          READ ( Restart_inunit ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
+                 cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
+          READ ( Restart_inunit ) start_time, end_time
+        ELSE
+          READ ( Restart_inunit, * ) module_name
+          CALL check_restart(MODNAME, module_name)
+          READ ( Restart_inunit, * ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
+                 cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
+          READ ( Restart_inunit, * ) start_time, end_time
+        ENDIF
         IF ( Print_debug>DEBUG_minimum ) PRINT 4, EQULS, 'Simulation time period of Restart File:', &
      &       start_time(1), start_time(2), start_time(3), ' -', end_time(1), end_time(2), end_time(3), &
      &       'Last time step of simulation: ', time_step, EQULS

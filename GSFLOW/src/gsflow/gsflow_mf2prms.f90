@@ -18,12 +18,10 @@
      &                       NUMCELLSPOND, IRRHRU_POND, PONDIRRPRMS, PONDSEGFLOW, &
      &                       IRRPONDVAR, NUMIRRPOND
       IMPLICIT NONE
-! Functions
-      INTRINSIC :: SNGL
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW to PRMS'
       character(len=*), parameter :: MODNAME = 'gsflow_mf2prms'
-      character(len=*), parameter :: Version_gsflow_mf2prms = '2021-06-10'
+      character(len=*), parameter :: Version_gsflow_mf2prms = '2022-02-18'
       integer :: i, j, k, ihru, IRWL, NMCL, SGNM
 !***********************************************************************
       gsflow_mf2prms = 0

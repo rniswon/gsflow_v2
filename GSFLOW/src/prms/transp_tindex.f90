@@ -150,8 +150,8 @@
 !     Write to or read from restart file
 !***********************************************************************
       SUBROUTINE transp_tindex_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, text_restart_flag
       USE PRMS_TRANSP_TINDEX
       use prms_utils, only: check_restart
       IMPLICIT NONE
@@ -161,11 +161,22 @@
       CHARACTER(LEN=13) :: module_name
 !***********************************************************************
       IF ( In_out==SAVE_INIT ) THEN
-        WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Tmax_sum
+        IF ( text_restart_flag==OFF ) THEN
+          WRITE ( Restart_outunit ) MODNAME
+          WRITE ( Restart_outunit ) Tmax_sum
+        ELSE
+          WRITE ( Restart_outunit, * ) MODNAME
+          WRITE ( Restart_outunit, * ) Tmax_sum
+        ENDIF
       ELSE
-        READ ( Restart_inunit ) module_name
-        CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Tmax_sum
+        IF ( text_restart_flag==OFF ) THEN
+          READ ( Restart_inunit ) module_name
+          CALL check_restart(MODNAME, module_name)
+          READ ( Restart_inunit ) Tmax_sum
+        ELSE
+          READ ( Restart_inunit, * ) module_name
+          CALL check_restart(MODNAME, module_name)
+          READ ( Restart_inunit, * ) Tmax_sum
+        ENDIF
       ENDIF
       END SUBROUTINE transp_tindex_restart

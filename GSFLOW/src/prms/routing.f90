@@ -811,8 +811,8 @@
 !***********************************************************************
       SUBROUTINE routing_restart(In_out)
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT, strmflow_muskingum_lake_module, &
-     &    strmflow_muskingum_module, strmflow_muskingum_mann_module
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Strmflow_flag
+     &    strmflow_muskingum_module, strmflow_muskingum_mann_module, OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Strmflow_flag, text_restart_flag
       USE PRMS_ROUTING
       use prms_utils, only: check_restart
       IMPLICIT NONE
@@ -822,15 +822,30 @@
       CHARACTER(LEN=7) :: module_name
 !***********************************************************************
       IF ( In_out==SAVE_INIT ) THEN
-        WRITE ( Restart_outunit ) MODNAME
-        WRITE ( Restart_outunit ) Basin_segment_storage
-        IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
-     &       Strmflow_flag==strmflow_muskingum_mann_module ) WRITE ( Restart_outunit ) Segment_delta_flow
+        IF ( text_restart_flag==OFF ) THEN
+          WRITE ( Restart_outunit ) MODNAME
+          WRITE ( Restart_outunit ) Basin_segment_storage
+          IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
+     &         Strmflow_flag==strmflow_muskingum_mann_module ) WRITE ( Restart_outunit ) Segment_delta_flow
+        ELSE
+          WRITE ( Restart_outunit, * ) MODNAME
+          WRITE ( Restart_outunit, * ) Basin_segment_storage
+          IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
+     &         Strmflow_flag==strmflow_muskingum_mann_module ) WRITE ( Restart_outunit, * ) Segment_delta_flow
+        ENDIF
       ELSE
-        READ ( Restart_inunit ) module_name
-        CALL check_restart(MODNAME, module_name)
-        READ ( Restart_inunit ) Basin_segment_storage
-        IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
-     &     Strmflow_flag==strmflow_muskingum_mann_module ) READ ( Restart_inunit ) Segment_delta_flow
+        IF ( text_restart_flag==OFF ) THEN
+          READ ( Restart_inunit ) module_name
+          CALL check_restart(MODNAME, module_name)
+          READ ( Restart_inunit ) Basin_segment_storage
+          IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
+     &         Strmflow_flag==strmflow_muskingum_mann_module ) READ ( Restart_inunit ) Segment_delta_flow
+        ELSE
+          READ ( Restart_inunit, * ) module_name
+          CALL check_restart(MODNAME, module_name)
+          READ ( Restart_inunit, * ) Basin_segment_storage
+          IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
+     &         Strmflow_flag==strmflow_muskingum_mann_module ) READ ( Restart_inunit, * ) Segment_delta_flow
+        ENDIF
       ENDIF
       END SUBROUTINE routing_restart
