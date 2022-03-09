@@ -1457,6 +1457,14 @@
 ! Functions
       INTRINSIC :: DBLE
 !***********************************************************************
+      IF ( Tmax<Tmin ) THEN
+        PRINT '(A,I0)', 'Warning, adjusted tmax value < adjusted tmin value for HRU: ', Ihru
+        PRINT '(A,F0.4,A,F0.4,/)', '         tmax: ', Tmax, ' tmin: ', Tmin
+        !PRINT *, '         tmax set to tmin'
+        CALL print_date(1)
+        ! Tmax = Tmin or Tmin = Tmax
+        ! ERROR STOP ERROR_temp (if we want this to be an error)
+      ENDIF
       IF ( Temp_units==0 ) THEN
 !       degrees Fahrenheit
         Tmaxf = Tmax

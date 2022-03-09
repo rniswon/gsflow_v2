@@ -14,13 +14,14 @@
    &    strmflow_noroute_module, strmflow_muskingum_mann_module, &
    &    strmflow_muskingum_module, precip_1sta_module, precip_laps_module, &
    &    climate_hru_module, precip_map_module, temp_1sta_module, temp_laps_module, temp_sta_module, &
-   &    smidx_module, carea_module, ddsolrad_module, ccsolrad_module, SAVE_INIT, READ_INIT
+   &    smidx_module, carea_module, ddsolrad_module, ccsolrad_module, SAVE_INIT, READ_INIT, &
+   &    MODSIM_MODFLOW, MODSIM_PRMS, MODSIM, MODSIM_GSFLOW
       IMPLICIT NONE
       character(LEN=*), parameter :: &
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 03/01/2022'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 02/11/2022'
       character(len=*), parameter :: PRMS_versn = '2022-03-01'
       character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 03/01/2022'
       character(len=*), parameter :: Version_read_control_file = '2022-02-23'
@@ -32,7 +33,7 @@
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus, NLAKES_MF, Nreach
       INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval, Nmap2hru, Nmap, Nsnow
 ! Global
-      !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
+      !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 10=MODSIM-GSFLOW; 11=MODSIM-PRMS; 12=MODSIM-MODFLOW; 13=MODSIM)
       INTEGER, SAVE :: Model, Process_flag, Call_cascade, PRMS_only
       INTEGER, SAVE :: Start_year, Start_month, Start_day, End_year, End_month, End_day
       INTEGER, SAVE :: Transp_flag, Sroff_flag, Solrad_flag, Et_flag, AG_flag
@@ -54,6 +55,7 @@
       INTEGER, SAVE :: Lake_transfer_water_use, Lake_add_water_use
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
       INTEGER, SAVE :: mf_timestep, startday, endday, mf_nowtime, Number_timesteps
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Lake_In_Out_vol(:)
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
 !   Declared Variables for DPRST agriculture computations
@@ -112,7 +114,7 @@
       character(len=*), parameter :: Version_lak = '2021-09-28'
       character(len=*), parameter :: Version_ag =  '2022-02-01'
       INTEGER, PARAMETER :: ITDIM = 80
-      INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells
+      INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells, Gsflag
       INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS, KPERSTART
       INTEGER, SAVE :: AGCONVERGE
       INTEGER, SAVE :: KSTP, KKSTP, IERR, Max_iters, Itreal
@@ -134,6 +136,7 @@
       REAL, SAVE, ALLOCATABLE :: Mfq2inch_conv(:), Cellarea(:)
       REAL, SAVE, ALLOCATABLE :: Gvr2cell_conv(:), Mfvol2inch_conv(:)
       INTEGER, SAVE :: Stopcount
+      REAL(8), DIMENSION(5) :: DIVS
 !-------ASSIGN VERSION NUMBER AND DATE
       CHARACTER*40 VERSION,VERSION2,VERSION3
       CHARACTER*10 MFVNAM

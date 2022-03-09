@@ -1557,10 +1557,10 @@ C          ADD PRECIPITATION TO FLWITER AND FLWITER3.
           SURFA(LAKE)=FINTERP(STGNEW(LAKE),LAKE)
 ! The following lines were added to make sure the volume of precip
 ! is a constant from PRMS
-          SRFPT=FINTERP(STGNEW(LAKE)+DLSTG,LAKE)
           IF ( IGSFLOWLAK == 0 ) THEN
              EVAP(LAKE)=EVAPLK(LAKE)*SURFA(LAKE)
              PRECIP(LAKE)=PRCPLK(LAKE)*SURFA(LAKE)
+             SRFPT=FINTERP(STGNEW(LAKE)+DLSTG,LAKE)
              EVAP3(LAKE)=EVAPLK(LAKE)*SRFPT
              PRECIP3(LAKE)=PRCPLK(LAKE)*SRFPT
           ELSE
@@ -1695,7 +1695,7 @@ C16E----LINEAR CASE. SIMPLY CALCULATE STAGE BASED ON VOLUME.
                   DSTG = ABS(STGNEW(LAKE) - STGITER(LAKE))
                   NCNCVR(LAKE) = 1
                 END IF
- !     IF (lake==9)then
+ !     IF (lake==1 .and. kkper==1)then
  !     write(521,222)PRECIP(LAKE),EVAP(LAKE),RUNF(LAKE),RUNOFF(LAKE),
  !    1                WITHDRW(LAKE),SURFIN(LAKE),SURFOT(LAKE),
  !    2                SEEP(LAKE),VOLNEW1,VOLOLDD(LAKE),STGITER(LAKE),
@@ -4189,7 +4189,7 @@ C-------SUBROUTINE LAK2MODSIM, But directly callable by MODSIM
       SUBROUTINE LAK2MODSIM_InitLakes(DELTAVOL,LAKEVOL, MXLKVOL) 
      &                           BIND(C,NAME="LAK2MODSIM_InitLakes")
       
-C      !DEC$ ATTRIBUTES DLLEXPORT :: LAK2MODSIM_InitLakes
+      !DEC$ ATTRIBUTES DLLEXPORT :: LAK2MODSIM_InitLakes
       
 C     *******************************************************************
 C     SET VOLUMES, SFR INFLOWS, AND SFR OUTFLOWS FOR MODSIM

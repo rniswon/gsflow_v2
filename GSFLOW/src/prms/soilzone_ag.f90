@@ -56,9 +56,12 @@
 !***********************************************************************
 !     Main soilzone_ag routine
 !***********************************************************************
-      INTEGER FUNCTION soilzone_ag()
+      INTEGER FUNCTION soilzone_ag(AFR)
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
+      IMPLICIT NONE
+      ! Arguments
+      LOGICAL, INTENT(IN) :: AFR
 ! Functions
       INTEGER, EXTERNAL :: szdecl, szinit, szrun_ag, szdecl_ag, szinit_ag
       EXTERNAL :: soilzone_restart_ag
@@ -66,7 +69,7 @@
       soilzone_ag = 0
 
       IF ( Process_flag==RUN ) THEN
-        soilzone_ag = szrun_ag()
+        soilzone_ag = szrun_ag(AFR)
       ELSEIF ( Process_flag==DECL ) THEN
         soilzone_ag = szdecl()
         soilzone_ag = szdecl_ag()
@@ -425,14 +428,14 @@
 !                interflow, excess routed to stream,
 !                and groundwater reservoirs
 !***********************************************************************
-      INTEGER FUNCTION szrun_ag()
+      INTEGER FUNCTION szrun_ag(AFR)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, &
      &    Frozen_flag, Soilzone_add_water_use, Call_cascade, &
      &    Nowmonth, Nowyear, Nowday, Iter_aet_flag, Hru_type, &
      &    GSFLOW_flag, Ag_gravity_flag, Kkiter, Hru_ag_irr, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Ag_flag, Agriculture_soilzone_flag
+     &    Soilzone_aet_flag, Ag_flag, Agriculture_soilzone_flag, MODSIM_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
@@ -458,6 +461,8 @@
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen, Infil_ag
       use prms_utils, only: error_stop, print_date
       IMPLICIT NONE
+! Arguments
+      LOGICAL, INTENT(IN) :: AFR
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades
@@ -483,6 +488,7 @@
 
 ! It0 and _ante variables used with MODFLOW integration to save iteration states.
       IF ( Kkiter==1 ) THEN
+        IF ( (MODSIM_flag==ACTIVE .AND. AFR) .OR. MODSIM_flag==OFF ) THEN
         Soil_moist_ante = Soil_moist
         Soil_rechr_ante = Soil_rechr
         Ssres_stor_ante = Ssres_stor
@@ -504,9 +510,10 @@
           It0_sroff = Sroff
           IF ( Call_cascade==ACTIVE ) It0_strm_seg_in = Strm_seg_in
         ENDIF
+        ENDIF
       ENDIF
 
-      IF ( Iter_aet_flag==ACTIVE ) THEN
+      IF ( Iter_aet_flag==ACTIVE .AND. AFR ) THEN
         Ag_irrigation_add = 0.0
         It0_ag_soil_moist = Ag_soil_moist
         It0_ag_soil_rechr = Ag_soil_rechr

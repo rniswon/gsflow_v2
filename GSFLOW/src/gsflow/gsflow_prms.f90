@@ -1,9 +1,10 @@
 !***********************************************************************
 ! Defines the computational sequence, valid modules, and dimensions
 !***********************************************************************
-!***********************************************************************
-      SUBROUTINE gsflow_prms(Arg)
-      USE PRMS_CONSTANTS, ONLY: ERROR_control
+      SUBROUTINE gsflow_prms(Process_mode, AFR, MS_GSF_converge, Nsegshold, Nlakeshold, &
+     &                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand)
+      
+      USE PRMS_CONSTANTS, ONLY: ERROR_control, RUN, DECL, INIT, CLEAN, SETDIMENS, MODSIM_MODFLOW
       use PRMS_CONTROL_FILE, only: read_control_file
       use PRMS_DATA_FILE, only: read_prms_data_file
       use PRMS_MMFAPI, only: Num_variables, Variable_data, MAXVARIABLES, declvar_int, declvar_real
@@ -12,9 +13,19 @@
                                       read_parameter_file_dimens, read_parameter_file_params, setup_params
       use PRMS_SET_TIME, only: prms_time
       use prms_utils, only: error_stop, module_error, numchars, print_module, PRMS_open_output_file, read_error
+      USE GWFSFRMODULE, ONLY: NSS
+      USE GWFLAKMODULE, ONLY: NLAKES
       IMPLICIT NONE
 ! Arguments
-      CHARACTER(LEN=*), INTENT(IN) :: Arg
+      INTEGER, INTENT(IN) :: Process_mode, Idivert(Nsegshold)
+      INTEGER, INTENT(INOUT) :: Nsegshold, Nlakeshold
+      LOGICAL, INTENT(INOUT) :: AFR, MS_GSF_converge
+      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
+      DOUBLE PRECISION, INTENT(INOUT) :: agDemand(Nsegshold)
+      DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(Nlakeshold), &
+     &                                   EXCHANGE(Nsegshold),  &
+     &                                   LAKEVOL(Nlakeshold), &
+     &                                   LAKEVAP(Nlakeshold)
 ! Functions
       INTRINSIC :: DATE_AND_TIME, INT
       INTEGER, EXTERNAL :: check_dims, basin, climateflow !, setup
@@ -34,23 +45,47 @@
       EXTERNAL :: precip_map, temp_map
       EXTERNAL :: gsflow_prms_restart, water_balance, summary_output
       EXTERNAL :: prms_summary, module_doc, convert_params
-      INTEGER, EXTERNAL :: gsflow_modflow, gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
+      EXTERNAL :: MFNWT_RUN, MFNWT_CLEAN, MFNWT_OCBUDGET, MFNWT_INIT
+      INTEGER, EXTERNAL :: gsflow_prms2modsim, gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum, gsfdecl
 ! Local Variables
       INTEGER :: i, iret, nc, ierr
+      CHARACTER(len=8) :: Arg
 !***********************************************************************
       ierr = 0
 
+      ! Process_mode set in MODSIM interface (0=run, 1=declare, 2=init, 3=clean, 4=setdims)
+      Process_flag = Process_mode
+      IF ( Process_flag==RUN ) THEN
+        Arg = 'run'
+      ELSEIF ( Process_flag==DECL ) THEN
+        Arg = 'decl'
+      ELSEIF ( Process_flag==INIT ) THEN
+        Arg = 'init'
+      ELSEIF ( Process_flag==CLEAN ) THEN
+        Arg = 'clean'
+      ELSEIF ( Process_flag==SETDIMENS ) THEN
+        Arg = 'setdims'
+      ENDIF
       Process = Arg
+!     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 10=MODSIM-GSFLOW; 11=MODSIM-PRMS; 12=MODSIM-MODFLOW; 13=MODSIM)
 
-      IF ( Process(:3)=='run' ) THEN
-        Process_flag = RUN !(0=run, 1=declare, 2=init, 3=clean, 4=setdims)
+      IF ( Process_flag==RUN ) THEN
+        IF ( Model==MODSIM_MODFLOW ) THEN
+          IF ( .NOT. MS_GSF_converge ) THEN
+            CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold)  !SOLVE GW SW EQUATIONS FOR MODSIM-MODFLOW ITERATION
+          ELSE !IF( MS_GSF_converge ) THEN
+            CALL MFNWT_OCBUDGET()
+          ENDIF
+          RETURN
+        ENDIF
+        IF ( Model==MODSIM_PRMS ) THEN
+          IF ( .NOT.AFR .AND. Ag_package==OFF ) RETURN !do not return if diversion applied to soils
+        ENDIF
 
-      ELSEIF ( Process(:4)=='decl' ) THEN
+      ELSEIF ( Process_flag==DECL ) THEN
         CALL DATE_AND_TIME(VALUES=Elapsed_time_start)
         Execution_time_start = Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
      &                         Elapsed_time_start(7) + Elapsed_time_start(8)*0.001
-
-        Process_flag = DECL
 
         IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active (GSFLOW or PRMS)
           IF ( check_dims()/=0 ) ERROR STOP ERROR_dim
@@ -90,9 +125,18 @@
   16  FORMAT (//, 4X, 'Active modules listed in the order in which they are called', //, 8X, 'Process', 20X, &
      &        'Module', 9X, 'Version Date', /, A)
 
-        IF ( GSFLOW_flag==ACTIVE ) THEN
-          ierr = gsflow_modflow()
-          IF ( ierr/=0 ) CALL module_error('gsflow_modflow', Arg, ierr)
+        !IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active, GSFLOW, PRMS, MODSIM-PRMS
+        !  Nsegshold = Nsegment ! would have to deallocate and allocate if changed, leave at 1
+        !  Nlakeshold = Nlake
+        !ENDIF
+        IF ( GSFLOW_flag==ACTIVE .OR. Model==MODSIM_MODFLOW ) THEN ! GSFLOW, MODSIM-GSFLOW
+          IF ( Model==MODSIM_MODFLOW ) THEN
+            Nsegshold = NSS
+            Nlakeshold = NLAKES
+            RETURN
+          END IF
+          ierr = gsfdecl()
+          IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
         ENDIF
 
         IF ( Print_debug>DEBUG_minimum ) THEN
@@ -157,11 +201,12 @@
      &         'none')/=0 ) CALL read_error(1, 'gvr_cell_id')
         ENDIF
 
+        IF ( MODSIM_flag==ACTIVE ) ALLOCATE ( Lake_In_Out_vol(Nlake) )
+
         Timestep = 0
         IF ( Init_vars_from_file>OFF ) CALL gsflow_prms_restart(READ_INIT)
 
-      ELSEIF ( Process(:4)=='init' ) THEN
-        Process_flag = INIT
+      ELSEIF ( Process_flag==INIT ) THEN
 
         IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
 
@@ -189,18 +234,17 @@
             ENDIF
           ENDIF
 
-          ierr = gsflow_modflow()
-          IF ( ierr/=0 ) CALL module_error('gsflow_modflow', Arg, ierr)
+          CALL MFNWT_INIT(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, NSegshold, Nlakeshold)
           IF ( Have_lakes==ACTIVE .AND. Nlake/=NLAKES_MF ) THEN
             PRINT *, 'ERROR, NLAKES not equal to Nlake'
             PRINT *, '       NLAKES=', NLAKES_MF, '; Nlake=', Nlake
             ERROR STOP ERROR_modflow
           ENDIF
-!          IF ( Nsegment/=NSS ) THEN
-!            PRINT *, 'ERROR, NSS not equal to nsegment'
-!            PRINT *, '       NSS=', NSS, '; nsegment=', Nsegment
-!            STOP
-!          ENDIF
+          IF ( Nsegment/=NSS ) THEN
+            PRINT *, 'ERROR, NSS not equal to nsegment'
+            PRINT *, '       NSS=', NSS, '; nsegment=', Nsegment
+            STOP ERROR_modflow
+          ENDIF
         ENDIF
         Agriculture_flag = Agriculture_soilzone_flag + Agriculture_canopy_flag + Agriculture_dprst_flag
         IF ( Agriculture_flag>OFF .AND. Ag_package==OFF ) CALL error_stop( &
@@ -229,10 +273,10 @@
           PRINT 9004, 'Writing PRMS Water Budget File: ', Model_output_file(:nc)
         ENDIF
 
-      ELSEIF ( Process(:7)=='setdims' ) THEN
-        Process_flag = SETDIMENS
+      ELSEIF ( Process_flag==SETDIMENS ) THEN
         Have_lakes = OFF ! set for modes when MODFLOW is not active
         Kkiter = 1 ! set for PRMS-only mode
+        AFR = .TRUE.
         Ag_package = OFF
         Canopy_iter = 1
         Soilzone_add_water_use = OFF
@@ -243,15 +287,16 @@
         Lake_add_water_use = OFF
         Lake_transfer_water_use = OFF
         ! Note, MODFLOW-only doesn't leave setdims
-        CALL setdims() ! if MODFLOW only the execution stops in setdims
-        IF ( ierr/=0 ) CALL module_error('setdims', Arg, ierr)
+        CALL setdims(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold) ! if MODFLOW only the execution stops in setdims
+
+        IF ( Model==MODSIM_MODFLOW .OR. Model==MODSIM ) RETURN
+
         IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active
           CALL setup_params()
           CALL read_parameter_file_dimens()
         ENDIF
 
-      ELSE  !IF ( Process(:5)=='clean' ) THEN
-        Process_flag = CLEAN
+      ELSE  !IF ( Process_flag==CLEAN ) THEN
 
         IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active
           IF ( Init_vars_from_file>0 ) CLOSE ( Restart_inunit )
@@ -264,18 +309,14 @@
             IF ( iret/=0 ) ERROR STOP ERROR_open_out
             CALL gsflow_prms_restart(SAVE_INIT)
           ENDIF
-          IF ( GSFLOW_flag==ACTIVE ) THEN
-            ierr = gsflow_modflow()
-            IF ( ierr/=0 ) CALL module_error('gsflow_modflow', Arg, ierr)
-          ENDIF
         ENDIF
+        IF ( GSFLOW_flag==ACTIVE ) CALL MFNWT_CLEAN()
       ENDIF
 
       IF ( Model==DOCUMENTATION ) THEN
         IF ( Process_flag==SETDIMENS .OR. Process_flag==DECL ) THEN
           Init_vars_from_file = 0 ! make sure this is set so all variables and parameters are declared
-          CALL module_doc()
-          IF ( ierr/=0 ) CALL module_error('DOCUMENTATION', Arg, ierr)
+          CALL module_doc(AFR)
           RETURN
         ELSE
           STOP
@@ -305,6 +346,7 @@
 !        IF ( ierr/=0 ) CALL module_error('setup', Arg, ierr)
       ENDIF
 
+    IF ( AFR ) THEN
       ierr = prms_time()
       IF ( ierr/=0 ) CALL module_error('prms_time', Arg, ierr)
 
@@ -439,12 +481,12 @@
         IF ( ierr/=0 ) CALL module_error(Srunoff_module, Arg, ierr)
       ENDIF
 
-! for PRMS-only simulations
-      IF ( PRMS_only==ACTIVE ) THEN
+! for PRMS-only and MODSIM-PRMS simulations
+      IF ( Model==PRMS .OR. Model==MODSIM_PRMS ) THEN
         IF ( AG_flag==ACTIVE ) THEN
-          ierr = soilzone_ag()
+          ierr = soilzone_ag(AFR)
         ELSE
-          ierr = soilzone()
+          ierr = soilzone(AFR)
         ENDIF
         IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
@@ -452,37 +494,44 @@
         ierr = gwflow()
         IF ( ierr/=0 ) CALL module_error('gwflow', Arg, ierr)
 
-        IF ( Stream_order_flag==ACTIVE ) THEN
-          ierr = routing()
-          IF ( ierr/=0 ) CALL module_error('routing', Arg, ierr)
+        IF ( Model==PRMS ) THEN
+          IF ( Stream_order_flag==ACTIVE ) THEN
+            ierr = routing()
+            IF ( ierr/=0 ) CALL module_error('routing', Arg, ierr)
+          ENDIF
+
+          IF ( Strmflow_flag==strmflow_noroute_module ) THEN
+            ierr = strmflow()
+          ELSEIF ( Muskingum_flag==ACTIVE ) THEN ! muskingum = 4; muskingum_mann = 7
+            ierr = muskingum()
+          ELSEIF ( Strmflow_flag==strmflow_in_out_module ) THEN
+            ierr = strmflow_in_out()
+          ELSEIF ( Strmflow_flag==strmflow_muskingum_lake_module ) THEN
+            ierr = muskingum_lake()
+          ENDIF
+          IF ( ierr/=0 ) CALL module_error(Strmflow_module, Arg, ierr)
+
+          IF ( Stream_temp_flag==ACTIVE ) ierr = stream_temp()
+
+          IF ( Print_debug>DEBUG_minimum ) THEN
+            ierr = basin_sum()
+            IF ( ierr/=0 ) CALL module_error('basin_sum', Arg, ierr)
+          ENDIF
+
+          IF ( Print_debug==DEBUG_WB ) CALL water_balance()
+
         ENDIF
-
-        IF ( Strmflow_flag==strmflow_noroute_module ) THEN
-          ierr = strmflow()
-        ELSEIF ( Muskingum_flag==ACTIVE ) THEN ! muskingum = 4; muskingum_mann = 7
-          ierr = muskingum()
-        ELSEIF ( Strmflow_flag==strmflow_in_out_module ) THEN
-          ierr = strmflow_in_out()
-        ELSEIF ( Strmflow_flag==strmflow_muskingum_lake_module ) THEN
-          ierr = muskingum_lake()
-        ENDIF
-        IF ( ierr/=0 ) CALL module_error(Strmflow_module, Arg, ierr)
-
-        IF ( Stream_temp_flag==ACTIVE ) ierr = stream_temp()
-
-        IF ( Print_debug>DEBUG_minimum ) THEN
-          ierr = basin_sum()
-          IF ( ierr/=0 ) CALL module_error('basin_sum', Arg, ierr)
-        ENDIF
-
-        IF ( Print_debug==DEBUG_WB ) CALL water_balance()
+      ENDIF
+    ENDIF ! AFR = TRUE
 
 ! for GSFLOW simulations
-      ELSEIF ( GSFLOW_flag==ACTIVE ) THEN
+! TODO below need this for MODSIM-GSFLOW and GSFLOW
+      IF ( GSFLOW_flag==ACTIVE ) THEN
 
         IF ( Process_flag==RUN ) THEN
-          ierr = gsflow_modflow()
-          IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
+          IF ( .NOT. MS_GSF_converge ) THEN
+            CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold)  !SOLVE GW SW EQUATIONS FOR MODSIM-GSFLOW ITERATION
+          ENDIF
 
 ! The following modules are in the MODFLOW iteration loop
 ! (contained in gsflow_modflow.f).
@@ -512,9 +561,9 @@
           ENDIF
 
           IF ( AG_flag==ACTIVE ) THEN
-            ierr = soilzone_ag()
+            ierr = soilzone_ag(AFR)
           ELSE
-            ierr = soilzone()
+            ierr = soilzone(AFR)
           ENDIF
           IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
@@ -525,11 +574,34 @@
           IF ( ierr/=0 ) CALL module_error('gsflow_mf2prms', Arg, ierr)
         ENDIF
 
-        ierr = gsflow_budget()
-        IF ( ierr/=0 ) CALL module_error('gsflow_budget', Arg, ierr)
+        IF ( MS_GSF_converge .OR. Process_flag/=RUN .OR. Model==GSFLOW ) THEN
 
-        ierr = gsflow_sum()
-        IF ( ierr/=0 ) CALL module_error('gsflow_sum', Arg, ierr)
+          IF ( Process_flag==RUN ) CALL MFNWT_OCBUDGET()
+
+          ierr = gsflow_budget()
+          IF ( ierr/=0 ) CALL module_error('gsflow_budget', Arg, ierr)
+
+          ierr = gsflow_sum()
+          IF ( ierr/=0 ) CALL module_error('gsflow_sum', Arg, ierr)
+        ENDIF
+      ENDIF
+
+! for MODSIM-PRMS simulations
+      IF ( Model==MODSIM_PRMS .AND. .NOT.AFR ) THEN
+        IF ( AG_flag==ACTIVE ) THEN
+          ierr = soilzone_ag(AFR)
+        ELSE
+          ierr = soilzone(AFR)
+        ENDIF
+        IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
+
+        ! rsr, need to do something if gwflow_cbh_flag=1
+        ierr = gwflow()
+        IF ( ierr/=0 ) CALL module_error('gwflow', Arg, ierr)
+      ENDIF
+
+      IF ( Model==MODSIM_GSFLOW ) THEN
+        IF ( Process_flag==0 .AND. .NOT.MS_GSF_converge ) RETURN
       ENDIF
 
       IF ( MapOutON_OFF>OFF ) THEN
@@ -546,6 +618,7 @@
 
       IF ( CsvON_OFF>OFF .AND. PRMS_only==ACTIVE ) CALL prms_summary()
 
+      IF ( Model==MODSIM_PRMS ) ierr = gsflow_prms2modsim(EXCHANGE, DELTAVOL, LAKEVAP)
       IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
       IF ( Process_flag==RUN ) THEN
         RETURN
@@ -610,7 +683,7 @@
 !***********************************************************************
 !     declare the dimensions
 !***********************************************************************
-      SUBROUTINE setdims()
+      SUBROUTINE setdims(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold)
       USE PRMS_CONSTANTS, ONLY: ERROR_control
       use PRMS_CONTROL_FILE, only: get_control_arguments, read_control_file, control_integer, control_integer_array, control_string !, control_file_name
       USE PRMS_MODULE
@@ -618,9 +691,18 @@
       use prms_utils, only: compute_julday, error_stop, module_error, PRMS_open_input_file, PRMS_open_output_file, read_error
       USE GLOBAL, ONLY: NSTP, NPER, ISSFLG
       IMPLICIT NONE
+! Arguments
+      LOGICAL, INTENT(IN) :: AFR
+      INTEGER, INTENT(INOUT) :: Nsegshold, Nlakeshold
+      INTEGER, INTENT(IN) :: Idivert(Nsegshold)
+      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
+      DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(Nsegshold),   &
+     &                                   DELTAVOL(Nlakeshold),  &
+     &                                   LAKEVOL(Nlakeshold)
 ! Functions
-      INTEGER, EXTERNAL :: gsflow_modflow
       EXTERNAL :: check_module_names
+      INTEGER, EXTERNAL :: gsfdecl
+      EXTERNAL :: MFNWT_RUN, MFNWT_INIT, MFNWT_CLEAN, MFNWT_OCBUDGET
 ! Local Variables
       ! Maximum values are no longer limits
 ! Local Variables
@@ -665,6 +747,23 @@
       ELSEIF ( Model_mode(:7)=='MODFLOW' .OR. Model_mode(:7)=='modflow' ) THEN
         Model = MODFLOW
         PRMS_flag = OFF
+      ELSEIF ( Model_mode(:13)=='MODSIM-GSFLOW' ) THEN
+        Model = MODSIM_GSFLOW
+        GSFLOW_flag = ACTIVE
+        MODSIM_flag = ACTIVE
+        PRMS4_flag = OFF
+      ELSEIF ( Model_mode(:14)=='MODSIM-MODFLOW' ) THEN
+        Model = MODSIM_MODFLOW
+        PRMS_flag = OFF
+        MODSIM_flag = ACTIVE
+      ELSEIF ( Model_mode(:11)=='MODSIM-PRMS' ) THEN
+        Model = MODSIM_PRMS
+        MODSIM_flag = ACTIVE
+        PRMS4_flag = OFF
+      ELSEIF ( Model_mode(:6)=='MODSIM' ) THEN
+        Model = MODSIM
+        PRMS_flag = OFF
+        MODSIM_flag = ACTIVE
       ELSEIF ( Model_mode(:5)=='FROST' ) THEN
         Model = FROST
       ELSEIF ( Model_mode(:13)=='WRITE_CLIMATE' ) THEN
@@ -728,25 +827,22 @@
       IF ( control_string(mappingFileName, 'mappingFileName')/=0 ) CALL read_error(5, 'mappingFileName')
       IF ( control_string(xyFileName, 'xyFileName')/=0 ) CALL read_error(5, 'xyFileName')
 
-      IF ( Model==MODFLOW ) THEN
+      IF ( Model==MODFLOW .OR. Model==MODSIM-MODFLOW ) THEN
 ! for MODFLOW-only simulations
         Kper_mfo = 1
         mf_timestep = 1
         mf_nowtime = startday
-        Process_flag = DECL
-        test = gsflow_modflow()
+        test = gsfdecl()
         IF ( test/=0 ) CALL module_error(MODNAME, 'declare', test)
-        Process_flag = INIT
-        test = gsflow_modflow()
-        IF ( test/=0 ) CALL module_error(MODNAME, 'initialize', test)
+        CALL MFNWT_INIT(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold)
         PRINT *, ' '
+        IF ( Model==MODSIM_MODFLOW ) RETURN
         If ( ISSFLG(Kper_mfo) == 1 .and. nper == 1) THEN
         ELSE
-          Process_flag = RUN
           DO WHILE ( Kper_mfo<=Nper )
 !            IF ( mf_nowtime>endday ) EXIT
-            test = gsflow_modflow()
-            IF ( test/=0 ) CALL module_error('gsflow_modflow', 'run', test)
+            CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold)            ! ITERATE TO SOLVE GW-SW SOLUTION FOR SS
+            CALL MFNWT_OCBUDGET()          ! CALCULATE BUDGET
             IF ( mf_timestep==NSTP(Kper_mfo) ) THEN
               Kper_mfo = Kper_mfo + 1
               mf_timestep = 0
@@ -757,10 +853,11 @@
 !rsr            kstp = mf_timestep
           ENDDO
         ENDIF
-        Process_flag = CLEAN
-        test = gsflow_modflow()
-        IF ( test/=0 ) CALL module_error(MODNAME, 'clean', test)
+
+        CALL MFNWT_CLEAN()
         STOP
+      ELSEIF ( Model==MODSIM ) THEN
+        RETURN
       ENDIF
 
       CALL setup_dimens()
@@ -1274,6 +1371,11 @@
       Lake_route_flag = OFF
       IF ( Nlake>0 .AND. Strmflow_flag==3 .AND. PRMS_only==ACTIVE ) Lake_route_flag = ACTIVE ! muskingum_lake
 
+      IF ( MODSIM_flag==ACTIVE ) THEN
+        Lake_route_flag = OFF
+        Stream_order_flag = OFF
+      ENDIF
+
       IF ( Stream_temp_flag>0 .AND. Stream_order_flag==0 ) THEN
         PRINT *, 'ERROR, stream temperature computation requires streamflow routing, thus strmflow_module'
         PRINT *, '       must be set to strmflow_in_out, muskingum, muskingum_mann, or muskingum_lake'
@@ -1381,11 +1483,13 @@
 !**********************************************************************
 !     Module documentation
 !**********************************************************************
-      SUBROUTINE module_doc()
+      SUBROUTINE module_doc(AFR)
       USE PRMS_CONSTANTS, ONLY: DECL
       USE PRMS_MODULE, ONLY: Process_flag
       use PRMS_SET_TIME, only: prms_time
       IMPLICIT NONE
+! Arguments
+      LOGICAL, INTENT(IN) :: AFR
 ! Functions
       INTEGER, EXTERNAL :: basin, climateflow
       INTEGER, EXTERNAL :: cascade, obs, soltab, transp_tindex
@@ -1441,7 +1545,7 @@
       test = snowcomp()
       test = srunoff()
       test = glacr()
-      test = soilzone_ag()
+      test = soilzone_ag(AFR)
       test = gsflow_prms2mf()
       test = gsflow_mf2prms()
       test = gsflow_budget()
@@ -1580,6 +1684,43 @@
       IF ( ierr==1 ) ERROR STOP ERROR_control
 
       END SUBROUTINE check_module_names
+
+!***********************************************************************
+!     gsflow_prmsSettings - set MODSIM variables set in PRMS
+!***********************************************************************
+      SUBROUTINE gsflow_prmsSettings(Numts, Model_mode, Start_time, xy_len, xy_FileName, map_len, map_FileName) BIND(C,NAME="gsflow_prmsSettings")
+      USE PRMS_MODULE, ONLY: Model, Number_timesteps, Starttime, mappingFileName, xyFileName
+      use prms_utils, only: numchars
+      IMPLICIT NONE
+      ! Arguments
+      INTEGER, INTENT(IN) :: xy_len, map_len
+      INTEGER, INTENT(OUT) :: Numts, Start_time(6), Model_mode
+      CHARACTER(LEN=1), INTENT(INOUT) :: xy_FileName(xy_len), map_FileName(map_len)
+      ! Local Variabales
+      INTEGER :: i, nc
+!***********************************************************************
+      Model_mode = Model
+      Numts = Number_timesteps
+      Start_time = Starttime
+      nc = numchars(xyFileName)
+      DO i = 1, xy_len
+        IF ( i<=nc ) THEN
+          xy_FileName(i) = xyFileName(i:i)
+        ELSE
+          xy_FileName(i) = ' '
+        ENDIF
+      ENDDO
+
+      nc = numchars(mappingFileName)
+      DO i = 1, map_len
+        IF ( i<=nc ) THEN
+          map_FileName(i) = mappingFileName(i:i)
+        ELSE
+          map_FileName(i) = ' '
+        ENDIF
+      ENDDO
+
+      END SUBROUTINE gsflow_prmsSettings
 
 !***********************************************************************
 !     gsflow_prms_restart - write or read restart file
