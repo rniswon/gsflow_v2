@@ -141,6 +141,7 @@
         REAL, SAVE, DIMENSION(:, :), POINTER :: KCROPDIVERSION
         REAL, SAVE, DIMENSION(:, :), POINTER :: KCROPWELL
         REAL, SAVE, DIMENSION(:), POINTER :: DEMAND, SUPACT, SUPACTOLD
+        REAL, SAVE, DIMENSION(:), POINTER :: DEMANDPOT
         REAL, SAVE, DIMENSION(:), POINTER :: ACTUAL
         REAL, SAVE, DIMENSION(:), POINTER :: ACTUALOLD
         INTEGER, SAVE, POINTER :: KPEROLD
@@ -421,7 +422,7 @@
          MAXSEGSHOLD = 1
       END IF
       ALLOCATE (DEMAND(NSEGDIMTEMP), ACTUAL(NSEGDIMTEMP))
-      ALLOCATE (ACTUALOLD(NSEGDIMTEMP))
+      ALLOCATE (ACTUALOLD(NSEGDIMTEMP),DEMANDPOT(NSEGDIMTEMP))
       ALLOCATE (SUPACT(NSEGDIMTEMP), SUPACTOLD(NSEGDIMTEMP))
       IF (NUMIRRHOLD .EQ. 0) THEN
          MAXCELLSHOLD = 1
@@ -498,6 +499,7 @@
       ALLOCATE (IDVFLG)
       IDVFLG = 0
       DEMAND = szero
+      DEMANDPOT = szero
       SUPACT = szero
       SUPACTOLD = szero
       ACTUAL = szero
@@ -3316,7 +3318,8 @@
         !1 - -----limit diversion to water right
         !
         
-        IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)  !need to check this, unintensional comment?
+        IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
+        DEMANDPOT(ISEG) = SEG(2, iseg)
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
   
@@ -3520,6 +3523,7 @@
          end if
          if (TIMEINPERIODSEG(ISEG) - DELT < IRRPERIODSEG(ISEG))
      +                              SEG(2, iseg) = DEMAND(iseg)
+         DEMANDPOT(ISEG) = SEG(2, iseg)
 300    continue
        deallocate (petseg, aetseg)
        return
@@ -4495,6 +4499,7 @@ C8------RETURN.
       DEALLOCATE(NUMIRRDIVERSIONSP)
       DEALLOCATE(MAXCELLSDIVERSION)
       DEALLOCATE(DEMAND)
+      DEALLOCATE(DEMANDPOT)
       DEALLOCATE(ACTUAL)
       DEALLOCATE(ACTUALOLD)
       DEALLOCATE(SUPACT)
