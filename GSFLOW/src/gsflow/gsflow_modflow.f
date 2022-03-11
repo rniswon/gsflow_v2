@@ -56,7 +56,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 !     MFNWT_INIT - Initialize MODFLOW module - get parameter values
 !***********************************************************************
       SUBROUTINE MFNWT_INIT(AFR, Diversions, Idivert,EXCHANGE,DELTAVOL,
-     &                      LAKEVOL, Nsegshold, Nlakeshold) 
+     &                      LAKEVOL, Nsegshold, Nlakeshold, agDemand) 
 !     ------------------------------------------------------------------
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
@@ -83,7 +83,8 @@ C1------USE package modules.
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(Nsegshold), 
      &                                   DELTAVOL(Nlakeshold),
-     &                                   LAKEVOL(Nlakeshold)
+     &                                   LAKEVOL(Nlakeshold),
+     &                                   agDemand(Nsegshold)
 ! Functions
       INTRINSIC :: DBLE
 ! Local Variables
@@ -401,7 +402,7 @@ C
       KPERSTART = 1
       ! run SS if needed, read to current stress period, read restart if needed
       CALL SET_STRESS_DATES(AFR, Diversions, Idivert, EXCHANGE,DELTAVOL,
-     +                      LAKEVOL,Nsegshold, Nlakeshold)
+     +                      LAKEVOL,Nsegshold, Nlakeshold, agDemand)
       Delt_save = DELT
       IF ( ISSFLG(1).EQ.0 ) Delt_save = 1.0/Mft_to_days
       CALL SETCONVFACTORS()
@@ -419,7 +420,8 @@ C
 !                 THE LATEST VALUES OF ISEG UPDATED BY MODSIM.
 !***********************************************************************
       SUBROUTINE MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, 
-     &                     DELTAVOL,LAKEVOL,Nsegshold, Nlakeshold)
+     &                     DELTAVOL,LAKEVOL,Nsegshold, Nlakeshold, 
+     &                     agDemand)
 C
       !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_RUN
 C
@@ -454,7 +456,8 @@ c     USE LMGMODULE
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold), 
      &                                   EXCHANGE(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(Nlakeshold), 
-     &                                   LAKEVOL(Nlakeshold)
+     &                                   LAKEVOL(Nlakeshold),
+     &                                   agDemand(Nsegshold)
       INTEGER, INTENT(IN) :: Idivert(Nsegshold)
       INTEGER I
       INCLUDE 'openspec.inc'
@@ -860,7 +863,7 @@ C
      1                              Diversions, Nsegshold)
       ENDIF
       IF (Model>=10 .AND. iss==0) THEN
-        IF( IUNIT(66).GT.0 ) CALL AG2MODSIM(Diversions)
+        IF( IUNIT(66).GT.0 ) CALL AG2MODSIM(agDemand)
       END IF
       END SUBROUTINE MFNWT_RUN
 C
@@ -1646,7 +1649,7 @@ C
 !     READ AND PREPARE INFORMATION FOR STRESS PERIOD.
 !***********************************************************************
       SUBROUTINE SET_STRESS_DATES(AFR, Diversions, Idivert, 
-     &    EXCHANGE, DELTAVOL, LAKEVOL,Nsegshold, Nlakeshold)
+     &    EXCHANGE, DELTAVOL, LAKEVOL,Nsegshold, Nlakeshold, agDemand)
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, GSFLOW,
      &    ERROR_restart, ERROR_time, ERROR_modflow, MODSIM_MODFLOW
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Kkiter, Model,
@@ -1667,7 +1670,8 @@ C
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(Nsegshold), 
      &                                   DELTAVOL(Nlakeshold),
-     &                                   LAKEVOL(Nlakeshold)
+     &                                   LAKEVOL(Nlakeshold),
+     &                                   agDemand(Nsegshold)
       ! Functions
       EXTERNAL :: RESTART1READ, GWF2BAS7OC
       INTRINSIC :: INT, DBLE
@@ -1718,7 +1722,7 @@ C
           IF ( Init_vars_from_file==0 ) THEN
             Steady_state = 1
             CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL,
-     +                     LAKEVOL,Nsegshold, Nlakeshold)            ! ITERATE TO SOLVE GW-SW SOLUTION FOR SS
+     +                     LAKEVOL,Nsegshold,Nlakeshold,agDemand)    ! ITERATE TO SOLVE GW-SW SOLUTION FOR SS
             CALL MFNWT_OCBUDGET()          ! CALCULATE BUDGET
             Steady_state = 0
  !           TOTIM = plen !RGN 9/4/2018 TOTIM needs to stay in MF time units

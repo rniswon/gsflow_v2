@@ -2517,13 +2517,13 @@
                      FMIN = SUPACT(J)
                   ELSE IF (TRIGGERFLAG > 0) then
                      IF (TIMEINPERIODSEG(J) < IRRPERIODSEG(J)) THEN  
-                        FMIN = SEG(2, J)
+                        FMIN = DEMANDPOT(J)   !RGN 3/11/2022
                      ELSE
                        QSW = DZERO
                        FMIN = DZERO
                      END IF
                   ELSE
-                     FMIN = DEMAND(J)
+                     FMIN = DEMANDPOT(J)
                   END IF
                   FMIN = FRACSUP(I, L)*(FRACSUPMAX(I, L)*FMIN - QSW)
                   IF (FMIN < DZERO) FMIN = DZERO
@@ -3815,7 +3815,7 @@
          DO I = 1, NUMSW
             UNIT = TSSWUNIT(I)
             L = TSSWNUM(I)
-            Q = demand(L)
+            Q = demandpot(L)
             QQ = DVRSFLW(L)   !consider making this SGOTFLOW
             QQQ = SUPSEG(L)
             CALL timeseries(unit, Kkper, Kkstp, TOTIM, L,
@@ -4402,7 +4402,7 @@
 C
 C-------SUBROUTINE SFR2MODSIM
 C
-      SUBROUTINE AG2MODSIM(Diversions)
+      SUBROUTINE AG2MODSIM(agDemand)
 C     *******************************************************************
 C     Pass Irrigation demand to MODSIM 
 C     
@@ -4416,7 +4416,7 @@ C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     -------------------------------------------------------------------
 C     ARGUMENTS
-      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(NSS)
+      DOUBLE PRECISION, INTENT(INOUT) :: agDemand(NSS)
 C     -------------------------------------------------------------------
 !      INTEGER 
 !      DOUBLE PRECISION 
@@ -4435,7 +4435,7 @@ C
         do i = 1, NUMIRRDIVERSIONSP
           iseg = IRRSEG(i)        
           !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
-            Diversions(ISEG) = SEG(2,iseg)*DELT
+            agDemand(ISEG) = SEG(2,iseg)*DELT
           !END IF
         END DO
 C
