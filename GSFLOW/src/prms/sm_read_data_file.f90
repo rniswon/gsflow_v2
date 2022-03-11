@@ -368,9 +368,10 @@ contains
 ! read_data_file_line - Read next data line, check increment
 !***********************************************************************
   module subroutine read_data_file_line(Iret)
-      USE PRMS_CONSTANTS, ONLY: ERROR_read
-      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
-      use prms_utils, only: compute_julday, read_error
+      USE PRMS_CONSTANTS, ONLY: ERROR_read, ACTIVE
+      USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday, Ntemp, forcing_check_flag
+      use prms_obs, only: Tmax, Tmin
+      use prms_utils, only: compute_julday, read_error, print_date
       IMPLICIT NONE
       ! Arguments
       INTEGER, INTENT(OUT) :: Iret
@@ -398,5 +399,16 @@ contains
         CALL check_data_variables(Data_varname(i), Data_varnum(i), Data_line_values(start), 1, Iret)
         start = start + Data_varnum(i)
       ENDDO
+
+      IF ( forcing_check_flag == ACTIVE ) THEN
+        DO i = 1, Ntemp
+          IF ( Tmax(i) < Tmin(i) ) THEN
+            PRINT '(A,I0)', 'Warning, observed tmax value < observed tmin value for station: ', i
+            PRINT '(2(A,F0.4))', '         tmax: ', Tmax(i), ' tmin: ', Tmin(i)
+            CALL print_date(1)
+          ENDIF
+        ENDDO
+      ENDIF
+
       END SUBROUTINE read_data_file_line
 end submodule

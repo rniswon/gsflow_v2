@@ -16,6 +16,7 @@ MODOBJS =	\
 		gsflow_modflow.o \
 		gsflow_prms2mf.o \
 		gsflow_mf2prms.o \
+		gsflow_prms2modsim.o \
 		gsflow_budget.o \
 		gsflow_sum.o
 
@@ -201,4 +202,6 @@ gsflow_budget.o: gsflow_budget.f90 prms_module.mod prms_read_param_file.mod gwfs
 
 gsflow_mf2prms.o: gsflow_mf2prms.f90 global.mod gwfuzfmodule.mod gwflakmodule.mod gwfsfrmodule.mod prms_soilzone.mod prms_module.mod gwfbasmodule.mod gwfagmodule.mod gsflow_module.o
 	$(FC) -c $(FFLAGS) gsflow_mf2prms.f90
-
+	
+gsflow_prms2modsim.o: gsflow_prms2modsim.f90 prms_constants.mod prms_module.mod prms_utils.mod prms_basin.mod prms_module.mod prms_mmfapi.mod prms_climatevars.mod prms_flowvars.mod prms_set_time.mod prms_srunoff.mod prms_soilzone.mod
+	$(FC) -c $(FFLAGS) gsflow_prms2modsim.f90

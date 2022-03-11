@@ -145,6 +145,10 @@ contains
     Parameter_check_flag = ACTIVE
     Control_parameter_data(i) % values_int(1) = Parameter_check_flag
     i = i + 1
+    Control_parameter_data(i) % name = 'forcing_check_flag'
+    forcing_check_flag = OFF
+    Control_parameter_data(i) % values_int(1) = forcing_check_flag
+    i = i + 1
     Control_parameter_data(i) % name = 'dprst_flag'
     Dprst_flag = OFF
     i = i + 1

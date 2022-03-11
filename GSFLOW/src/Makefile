@@ -25,8 +25,8 @@ standard:
 	cd $(GSFLOW); $(MAKE)
 
 clean:
-	cd $(MODFLOW); $(RM) *.o *.mod *~;
-	cd $(PRMS); $(RM) *.o *.mod *~;
-	cd $(GSFLOW); $(RM) *.o *.mod *~;
+	cd $(MODFLOW); $(MAKE) clean;
+	cd $(PRMS); $(MAKE) clean;
+	cd $(GSFLOW); $(MAKE) clean;
 	cd $(LIB); rm -f *.a;
 

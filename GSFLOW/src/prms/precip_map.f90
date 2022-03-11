@@ -70,7 +70,7 @@
             CALL precip_form(ppt, Hru_ppt(i), Hru_rain(i), Hru_snow(i), &
      &                       Tmaxf(i), Tminf(i), Pptmix(i), Newsnow(i), &
      &                       Prmx(i), Tmax_allrain_f(i,Nowmonth), 1.0, 1.0, &
-     &                       Adjmix_rain(i,Nowmonth), harea, Basin_obs_ppt, Tmax_allsnow_f(i,Nowmonth))
+     &                       Adjmix_rain(i,Nowmonth), harea, Basin_obs_ppt, Tmax_allsnow_f(i,Nowmonth), i)
           ELSEIF ( Hru_ppt(i)<0.0 ) THEN
             PRINT *, 'WARNING, negative precipitation value entered in precipitation map file and set to 0.0, HRU:', i
             CALL print_date(0)

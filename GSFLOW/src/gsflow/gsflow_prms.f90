@@ -2,9 +2,10 @@
 ! Defines the computational sequence, valid modules, and dimensions
 !***********************************************************************
       SUBROUTINE gsflow_prms(Process_mode, AFR, MS_GSF_converge, Nsegshold, Nlakeshold, &
-     &                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand)
+     &                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand) !BIND(C,NAME="gsflow_prms")
       
-      USE PRMS_CONSTANTS, ONLY: ERROR_control, RUN, DECL, INIT, CLEAN, SETDIMENS, MODSIM_MODFLOW
+!!!      !DEC$ ATTRIBUTES DLLEXPORT :: gsflow_prms
+      USE PRMS_CONSTANTS, ONLY: ERROR_control
       use PRMS_CONTROL_FILE, only: read_control_file
       use PRMS_DATA_FILE, only: read_prms_data_file
       use PRMS_MMFAPI, only: Num_variables, Variable_data, MAXVARIABLES, declvar_int, declvar_real
@@ -13,6 +14,7 @@
                                       read_parameter_file_dimens, read_parameter_file_params, setup_params
       use PRMS_SET_TIME, only: prms_time
       use prms_utils, only: error_stop, module_error, numchars, print_module, PRMS_open_output_file, read_error
+      USE MF_DLL, ONLY: gsfdecl, MFNWT_RUN, MFNWT_CLEAN, MFNWT_OCBUDGET, MFNWT_INIT
       USE GWFSFRMODULE, ONLY: NSS
       USE GWFLAKMODULE, ONLY: NLAKES
       IMPLICIT NONE
@@ -45,8 +47,7 @@
       EXTERNAL :: precip_map, temp_map
       EXTERNAL :: gsflow_prms_restart, water_balance, summary_output
       EXTERNAL :: prms_summary, module_doc, convert_params
-      EXTERNAL :: MFNWT_RUN, MFNWT_CLEAN, MFNWT_OCBUDGET, MFNWT_INIT
-      INTEGER, EXTERNAL :: gsflow_prms2modsim, gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum, gsfdecl
+      INTEGER, EXTERNAL :: gsflow_prms2modsim, gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
 ! Local Variables
       INTEGER :: i, iret, nc, ierr
       CHARACTER(len=8) :: Arg
@@ -482,7 +483,7 @@
       ENDIF
 
 ! for PRMS-only and MODSIM-PRMS simulations
-      IF ( Model==PRMS .OR. Model==MODSIM_PRMS ) THEN
+      IF ( Model==PRMS .OR. Model==MODSIM_PRMS .OR. Model>=WRITE_CLIMATE ) THEN
         IF ( AG_flag==ACTIVE ) THEN
           ierr = soilzone_ag(AFR)
         ELSE
@@ -690,6 +691,7 @@
       use PRMS_READ_PARAM_FILE, only: decldim, declfix, read_parameter_file_dimens, setup_dimens
       use prms_utils, only: compute_julday, error_stop, module_error, PRMS_open_input_file, PRMS_open_output_file, read_error
       USE GLOBAL, ONLY: NSTP, NPER, ISSFLG
+      USE MF_DLL, ONLY: gsfdecl, MFNWT_RUN, MFNWT_INIT, MFNWT_CLEAN, MFNWT_OCBUDGET
       IMPLICIT NONE
 ! Arguments
       LOGICAL, INTENT(IN) :: AFR
@@ -701,8 +703,6 @@
      &                                   LAKEVOL(Nlakeshold)
 ! Functions
       EXTERNAL :: check_module_names
-      INTEGER, EXTERNAL :: gsfdecl
-      EXTERNAL :: MFNWT_RUN, MFNWT_INIT, MFNWT_CLEAN, MFNWT_OCBUDGET
 ! Local Variables
       ! Maximum values are no longer limits
 ! Local Variables
@@ -727,7 +727,8 @@
      &        '    An integration of the Precipitation-Runoff Modeling System (PRMS)', /, &
      &        '    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)', /)
 
-      IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = 1
+      IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = 0
+      IF ( control_integer(forcing_check_flag, 'forcing_check_flag')/=0 ) forcing_check_flag = OFF
 
       IF ( control_string(Model_mode, 'model_mode')/=0 ) CALL read_error(5, 'model_mode')
       IF ( Model_mode(:4)=='    ' ) Model_mode = 'GSFLOW5'
@@ -755,6 +756,7 @@
       ELSEIF ( Model_mode(:14)=='MODSIM-MODFLOW' ) THEN
         Model = MODSIM_MODFLOW
         PRMS_flag = OFF
+        PRMS4_flag = OFF
         MODSIM_flag = ACTIVE
       ELSEIF ( Model_mode(:11)=='MODSIM-PRMS' ) THEN
         Model = MODSIM_PRMS
@@ -764,23 +766,29 @@
         Model = MODSIM
         PRMS_flag = OFF
         MODSIM_flag = ACTIVE
-      ELSEIF ( Model_mode(:5)=='FROST' ) THEN
-        Model = FROST
-      ELSEIF ( Model_mode(:13)=='WRITE_CLIMATE' ) THEN
-        Model = WRITE_CLIMATE
-      ELSEIF ( Model_mode(:7)=='CLIMATE' ) THEN
-        Model = CLIMATE
-      ELSEIF ( Model_mode(:5)=='POTET' ) THEN
-        Model = POTET
-      ELSEIF ( Model_mode(:9)=='TRANSPIRE' ) THEN
-        Model = TRANSPIRE
-      ELSEIF ( Model_mode(:7)=='CONVERT' ) THEN ! can be CONVERT4 or CONVERT5 or CONVERT (=CONVERT5)
-        Model = CONVERT
-      ELSEIF ( Model_mode(:13)=='DOCUMENTATION' ) THEN
-        Model = DOCUMENTATION
+        PRMS4_flag = OFF
       ELSE
-        PRINT '(/,2A)', 'ERROR, invalid model_mode value: ', Model_mode
-        Inputerror_flag = 1
+        PRMS_flag = ACTIVE
+        PRMS_only = ACTIVE
+        PRMS4_flag = OFF
+        IF ( Model_mode(:5)=='FROST' ) THEN
+          Model = FROST
+        ELSEIF ( Model_mode(:13)=='WRITE_CLIMATE' ) THEN
+          Model = WRITE_CLIMATE
+        ELSEIF ( Model_mode(:7)=='CLIMATE' ) THEN
+          Model = CLIMATE
+        ELSEIF ( Model_mode(:5)=='POTET' ) THEN
+          Model = POTET
+        ELSEIF ( Model_mode(:9)=='TRANSPIRE' ) THEN
+          Model = TRANSPIRE
+        ELSEIF ( Model_mode(:7)=='CONVERT' ) THEN ! can be CONVERT4 or CONVERT5 or CONVERT (=CONVERT5)
+          Model = CONVERT
+        ELSEIF ( Model_mode(:13)=='DOCUMENTATION' ) THEN
+          Model = DOCUMENTATION
+        ELSE
+          PRINT '(/,2A)', 'ERROR, invalid model_mode value: ', Model_mode
+          Inputerror_flag = 1
+        ENDIF
       ENDIF
 
       ! get simulation start_time and end_time
@@ -1688,7 +1696,9 @@
 !***********************************************************************
 !     gsflow_prmsSettings - set MODSIM variables set in PRMS
 !***********************************************************************
-      SUBROUTINE gsflow_prmsSettings(Numts, Model_mode, Start_time, xy_len, xy_FileName, map_len, map_FileName) BIND(C,NAME="gsflow_prmsSettings")
+      SUBROUTINE gsflow_prmsSettings(Numts, Model_mode, Start_time, xy_len, xy_FileName, map_len, map_FileName) &
+                                     BIND(C,NAME="gsflow_prmsSettings")
+!!!      !DEC$ ATTRIBUTES DLLEXPORT :: gsflow_prmsSettings
       USE PRMS_MODULE, ONLY: Model, Number_timesteps, Starttime, mappingFileName, xyFileName
       use prms_utils, only: numchars
       IMPLICIT NONE

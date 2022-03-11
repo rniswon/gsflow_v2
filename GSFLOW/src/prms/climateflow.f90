@@ -1447,24 +1447,29 @@
 !***********************************************************************
       SUBROUTINE temp_set(Ihru, Tmax, Tmin, Tmaxf, Tminf, Tavgf, Tmaxc, Tminc, Tavgc, Hru_area)
       USE PRMS_CLIMATEVARS, ONLY: Basin_temp, Basin_tmax, Basin_tmin, Temp_units, Tmax_hru, Tmin_hru
-      USE PRMS_CONSTANTS, ONLY: MINTEMP, MAXTEMP, ERROR_temp
+      USE PRMS_CONSTANTS, ONLY: MINTEMP, MAXTEMP, ERROR_temp, DEBUG_less, ACTIVE
+      USE PRMS_MODULE, ONLY: Print_debug, forcing_check_flag, Nowyear, Nowmonth, Nowday
       use prms_utils, only: c_to_f, f_to_c, print_date
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Ihru
-      REAL, INTENT(IN) :: Tmax, Tmin, Hru_area
+      REAL, INTENT(IN) :: Hru_area
+      REAL, INTENT(INOUT) :: Tmin, Tmax
       REAL, INTENT(OUT) :: Tmaxf, Tminf, Tavgf, Tmaxc, Tminc, Tavgc
 ! Functions
       INTRINSIC :: DBLE
 !***********************************************************************
-      IF ( Tmax<Tmin ) THEN
-        PRINT '(A,I0)', 'Warning, adjusted tmax value < adjusted tmin value for HRU: ', Ihru
-        PRINT '(A,F0.4,A,F0.4,/)', '         tmax: ', Tmax, ' tmin: ', Tmin
-        !PRINT *, '         tmax set to tmin'
-        CALL print_date(1)
-        ! Tmax = Tmin or Tmin = Tmax
-        ! ERROR STOP ERROR_temp (if we want this to be an error)
+      IF ( forcing_check_flag == ACTIVE ) THEN
+        IF ( Tmax < Tmin ) THEN
+          IF ( Print_debug > -1 ) THEN
+            PRINT '(A,I0)', 'Warning, adjusted tmax value < adjusted tmin value for HRU: ', Ihru
+            PRINT '(3(A,F0.4))', '         tmax: ', Tmax, ' tmin: ', Tmin, ', ', Tmin-Tmax
+            CALL print_date(0)
+            write (861,'(i4,2i3,i5,3(A,F0.4))') Nowyear, Nowmonth, Nowday, Ihru, ',', Tmax, ',', Tmin, ',', Tmin-Tmax
+          ENDIF
+        ENDIF
       ENDIF
+
       IF ( Temp_units==0 ) THEN
 !       degrees Fahrenheit
         Tmaxf = Tmax
@@ -1485,10 +1490,12 @@
         Basin_temp = Basin_temp + DBLE( Tavgc*Hru_area )
       ENDIF
 
-      IF ( Tminf<MINTEMP .OR. Tmaxf>MAXTEMP ) THEN
-        PRINT '(A,I0,1X,F0.4,1X,F0.4,/)', ' ERROR, invalid temperature value for HRU: ', Ihru, Tminf, Tmaxf
-        CALL print_date(1)
-        ERROR STOP ERROR_temp
+      IF ( forcing_check_flag == ACTIVE ) THEN
+        IF ( Tminf<MINTEMP .OR. Tmaxf>MAXTEMP ) THEN
+          PRINT '(A,I0,1X,F0.4,1X,F0.4,/)', ' ERROR, invalid temperature value for HRU: ', Ihru, Tminf, Tmaxf
+          CALL print_date(1)
+          ERROR STOP ERROR_temp
+        ENDIF
       ENDIF
       Tmax_hru(Ihru) = Tmax ! in units temp_units
       Tmin_hru(Ihru) = Tmin ! in units temp_units
@@ -1503,14 +1510,16 @@
 !***********************************************************************
       SUBROUTINE precip_form(Precip, Hru_ppt, Hru_rain, Hru_snow, Tmaxf, &
      &           Tminf, Pptmix, Newsnow, Prmx, Tmax_allrain_f, Rain_adj, &
-     &           Snow_adj, Adjmix_rain, Hru_area, Sum_obs, Tmax_allsnow_f)
-      USE PRMS_CONSTANTS, ONLY: NEARZERO
+     &           Snow_adj, Adjmix_rain, Hru_area, Sum_obs, Tmax_allsnow_f, Ihru)
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, DEBUG_less
+      USE PRMS_MODULE, ONLY: forcing_check_flag, Print_debug
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       use prms_utils, only: print_date
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, DBLE
 ! Arguments
+      INTEGER, INTENT(IN) :: Ihru
       REAL, INTENT(IN) :: Tmax_allrain_f, Tmax_allsnow_f, Rain_adj, Snow_adj
       REAL, INTENT(IN) :: Adjmix_rain, Tmaxf, Tminf, Hru_area
       DOUBLE PRECISION, INTENT(INOUT) :: Sum_obs
@@ -1566,6 +1575,16 @@
       Basin_ppt = Basin_ppt + DBLE( Hru_ppt*Hru_area )
       Basin_rain = Basin_rain + DBLE( Hru_rain*Hru_area )
       Basin_snow = Basin_snow + DBLE( Hru_snow*Hru_area )
+
+      IF ( forcing_check_flag == ACTIVE ) THEN
+        IF ( Hru_ppt < 0.0 .OR. Hru_rain < 0.0 .OR. Hru_ppt < 0.0 ) THEN
+          IF ( Print_debug > DEBUG_less ) THEN
+            PRINT '(A,I0)', 'Warning, adjusted precipitation value(s) < 0.0 for HRU: ', Ihru
+            PRINT '(A,F0.4,A,F0.4,A)', '         hru_ppt: ', Hru_ppt, ' hru_rain: ', Hru_rain, ' hru_snow: ', Hru_snow
+            CALL print_date(0)
+          ENDIF
+        ENDIF
+      ENDIF
 
       END SUBROUTINE precip_form
 

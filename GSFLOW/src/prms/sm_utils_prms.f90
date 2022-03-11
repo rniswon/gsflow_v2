@@ -850,8 +850,8 @@ contains
 ! print module version information to user's screen
 !***********************************************************************
   module subroutine print_module(Description, Modname, Versn)
-    use PRMS_CONSTANTS, only: DEBUG_minimum
-    use PRMS_MODULE, only: Print_debug, PRMS_output_unit
+    use PRMS_CONSTANTS, only: DEBUG_minimum, MODFLOW
+    use PRMS_MODULE, only: Print_debug, PRMS_output_unit, Model
     implicit none
     ! Arguments
     character(LEN=*), intent(IN) :: Description, Modname, Versn
@@ -870,7 +870,7 @@ contains
     blanks = ' '
     string = Description//blanks(:nblanks)//Modname//blanks(:nblanks2)//Versn
     print '(A)', trim(string)
-    write (PRMS_output_unit, '(A)') trim(string)
+    IF ( Model/=MODFLOW ) write (PRMS_output_unit, '(A)') trim(string)
   end subroutine print_module
 
 !***********************************************************************

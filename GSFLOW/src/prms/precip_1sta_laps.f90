@@ -95,7 +95,7 @@
      &         CALL precip_form(ppt, Hru_ppt(i), Hru_rain(i), Hru_snow(i), Tmaxf(i), &
      &                          Tminf(i), Pptmix(i), Newsnow(i), Prmx(i), &
      &                          Tmax_allrain_f(i,Nowmonth), Rain_adj_lapse(i,Nowmonth), Snow_adj_lapse(i,Nowmonth), &
-     &                          Adjmix_rain(i,Nowmonth), Hru_area(i), sum_obs, Tmax_allsnow_f(i,Nowmonth))
+     &                          Adjmix_rain(i,Nowmonth), Hru_area(i), sum_obs, Tmax_allsnow_f(i,Nowmonth), i)
         ENDDO
         Basin_ppt = Basin_ppt*Basin_area_inv
         Basin_obs_ppt = sum_obs*Basin_area_inv

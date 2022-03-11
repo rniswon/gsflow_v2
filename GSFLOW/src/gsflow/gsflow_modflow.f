@@ -431,13 +431,13 @@ C
      &    ERROR_time, ERROR_modflow, MODSIM_GSFLOW
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, no_snow_flag,
      &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
-     &    PRMS_land_iteration_flag, Nowyear, Nowmonth, Nowday,
+     &    PRMS_land_iteration_flag,
      &    Model, GSFLOW_flag, Print_debug, Soilzone_module
       use prms_utils, only: error_stop
 C1------USE package modules.
       USE GLOBAL
       USE GWFBASMODULE
-      USE GWFHUFMODULE, ONLY:IOHUFHDS,IOHUFFLWS
+!      USE GWFHUFMODULE, ONLY:IOHUFHDS,IOHUFFLWS
       USE GWFEVTMODULE, ONLY:NEVTOP
       USE GWFRCHMODULE, ONLY:NRCHOP
       USE PCGMODULE
@@ -446,7 +446,7 @@ c     USE LMGMODULE
       USE DE4MODULE
 !gsf  USE GMGMODULE
 !      USE GWFNWTMODULE, ONLY:ITREAL, ICNVGFLG  !ITREAL removed from NWT module and added to PRMS_MODULE
-      USE GWFNWTMODULE, ONLY:ICNVGFLG
+!      USE GWFNWTMODULE, ONLY:ICNVGFLG
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Nsegshold, Nlakeshold
@@ -459,16 +459,15 @@ c     USE LMGMODULE
       INTEGER I
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
-      INTEGER, EXTERNAL :: soilzone, soilzone_ag, GET_KPER
-      INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
-      INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsfclean
+      INTEGER, EXTERNAL :: soilzone, soilzone_ag
+      INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms
+      INTEGER, EXTERNAL :: intcp, snowcomp, glacr, srunoff
       EXTERNAL :: MODSIM2SFR, SFR2MODSIM, LAK2MODSIM
-      EXTERNAL :: MFNWT_CLEAN, MFNWT_RDSTRESS
       INTRINSIC MIN
 ! Local Variables
-      INTEGER :: retval, II, KITER, IBDRET, iss
-      INTEGER :: IC1, IC2, IR1, IR2, IL1, IL2, IDIR, iprt
-      REAL :: BUDPERC
+      INTEGER :: retval, KITER, iss, iprt !, II, IBDRET
+!      INTEGER :: IC1, IC2, IR1, IR2, IL1, IL2, IDIR
+!      REAL :: BUDPERC
 !***********************************************************************
 !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 10=MODSIM-GSFLOW; 11=MODSIM-PRMS; 12=MODSIM-MODFLOW; 13=MODSIM)
 C
@@ -644,6 +643,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 
 !  Call the PRMS modules that need to be inside the iteration loop
             IF ( Szcheck==ACTIVE ) THEN
+        !    IF ( Szcheck==ACTIVE .AND. Model>=MODSIM_GSFLOW ) THEN
               IF ( PRMS_land_iteration_flag==1 ) THEN
                 retval = intcp()
                 IF ( retval/=0 ) THEN

@@ -19,8 +19,15 @@
       MS_GSF_converge = .FALSE.
       Nsegshold = 1
       Nlakeshold = 1
+      ALLOCATE ( Idivert(Nsegshold) )
       ALLOCATE ( Diversions(Nsegshold), agDemand(Nsegshold), EXCHANGE(Nsegshold) )
       ALLOCATE ( DELTAVOL(Nlakeshold), LAKEVOL(Nlakeshold), LAKEVAP(Nlakeshold) )
+      Diversions = 0.0D0
+      agDemand = 0.0D0
+      EXCHANGE = 0.0D0
+      LAKEVOL = 0.0D0
+      LAKEVAP = 0.0D0
+      DELTAVOL = 0.0D0
 
       CALL gsflow_prms(SETDIMENS, AFR, MS_GSF_converge, Nsegshold, Nlakeshold, &
                        Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand)
