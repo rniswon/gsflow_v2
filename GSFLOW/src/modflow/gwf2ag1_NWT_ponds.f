@@ -1572,6 +1572,8 @@
       ! - -----------------------------------------------------------------
       !
       !1 - ------RESET DEMAND IF IT CHANGES
+      DEMANDPOT(ISEG) = 0.0
+      !
       if (NUMTAB_SFR.ne.0) then
           DO ii = 1, NUMTAB_SFR
              tabseg = ISFRLIST(1, ii)
