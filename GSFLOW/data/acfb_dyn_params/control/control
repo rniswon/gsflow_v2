@@ -1,4 +1,4 @@
-GSFLOW version 2.2.0
+Apalachicola-Chattahoochee-Flint (ACF) River Basin PRMS example model
 ####
 print_debug
 1
@@ -88,7 +88,7 @@ climate_hru
 executable_desc
 1
 4
-GSFLOW 2.2.0
+GSFLOW 2.2.1
 ####
 executable_model
 1
