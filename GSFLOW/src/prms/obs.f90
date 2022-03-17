@@ -302,7 +302,7 @@
         IF ( readvar(MODNAME, 'tmin')/=0 ) CALL read_error(9, 'tmin')
         IF ( forcing_check_flag == ACTIVE ) THEN
           DO i = 1, Ntemp
-            IF ( Tmin(i) < -100 .OR. Tmin(i) < -100 ) CYCLE
+            IF ( Tmin(i) < -98 .OR. Tmax(i) < -98 ) CYCLE
             IF ( Tmin(i) > Tmax(i) ) THEN
               PRINT *, 'WARNING, observed tmin > tmax: HRU, date, tmin, tmax:', &
                        i, Nowyear, Nowmonth, Nowday, Tmin(i), Tmax(i)

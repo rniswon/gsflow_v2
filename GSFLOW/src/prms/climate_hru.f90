@@ -53,7 +53,7 @@
       EXTERNAL :: read_error, precip_form, temp_set, find_header_end, find_current_time
       EXTERNAL :: read_cbh_date, check_cbh_value, check_cbh_intvalue, print_module
 ! Local Variables
-      INTEGER :: yr, mo, dy, i, hr, mn, sec, jj, ierr, istop, missing, ios, write_tmin_tmax
+      INTEGER :: yr, mo, dy, i, hr, mn, sec, jj, ierr, istop, missing, ios !, write_tmin_tmax
       DOUBLE PRECISION :: sum_obs
       REAL :: tmax_hru, tmin_hru, ppt, harea !, foo
 !***********************************************************************
