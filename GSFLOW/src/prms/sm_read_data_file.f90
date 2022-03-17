@@ -147,7 +147,9 @@ contains
 ! Read PRMS Data File line
 !***********************************************************************
   module subroutine read_data_line()
-      USE PRMS_CONSTANTS, ONLY: ERROR_read
+      USE PRMS_CONSTANTS, ONLY: ERROR_read, ACTIVE
+      USE PRMS_MODULE, ONLY: forcing_check_flag, Ntemp, Nowyear, Nowmonth, Nowday
+      USE PRMS_OBS, ONLY: Tmax, Tmin
       use PRMS_MMFAPI   ! , only: getvarnvals, getvar_id
       USE PRMS_SET_TIME, ONLY: Nowtime
       use prms_utils, only: read_error
@@ -155,7 +157,8 @@ contains
       ! Functions
       INTRINSIC TRANSFER
       ! Local Variables
-      INTEGER datatime(6), jj, ios, column_end, column, nvals, var_id
+      INTEGER datatime(6), jj, ios, column_end, column, nvals, var_id, i
+      !real :: foo
 !***********************************************************************
       READ ( Datafile_unit, *, IOSTAT=ios ) datatime, (Data_line_values(jj),jj=1, Num_datafile_columns)
       IF ( ios/=0 ) THEN
@@ -184,6 +187,24 @@ contains
         ENDIF
         column = column + nvals
       ENDDO
+
+      IF ( Ntemp>0 .AND. forcing_check_flag == ACTIVE ) THEN
+        DO i = 1, Ntemp
+          IF ( Tmin(i) < -98 .OR. Tmax(i) < -98 ) CYCLE
+          IF ( Tmin(i) > Tmax(i) ) THEN
+            PRINT *, 'WARNING, observed tmin > tmax: HRU, date, tmin, tmax:', &
+                     i, Nowyear, Nowmonth, Nowday, Tmin(i), Tmax(i)
+!            WRITE ( 862, * ) 'WARNING, observed tmin > tmax, swapped fort_866 and fort_867: HRU, date, tmin, tmax:', &
+!                             i, Nowyear, Nowmonth, Nowday, Tmin(i), Tmax(i)
+!            foo = Tmax(i)
+!            Tmax(i) = Tmin(i)
+!            Tmin(i) = foo
+          ENDIF
+        ENDDO
+!        WRITE ( 866,  '(I4,2I3,3I2,22F8.2)' ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tmax(i), i=1,Ntemp)
+!        WRITE ( 867, '(I4,2I3,3I2,22F8.2)' ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tmin(i), i=1,Ntemp)
+      ENDIF
+
       END SUBROUTINE read_data_line
 
 !***********************************************************************

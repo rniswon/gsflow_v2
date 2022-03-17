@@ -1447,7 +1447,8 @@
 !***********************************************************************
       SUBROUTINE temp_set(Ihru, Tmax, Tmin, Tmaxf, Tminf, Tavgf, Tmaxc, Tminc, Tavgc, Hru_area)
       USE PRMS_CLIMATEVARS, ONLY: Basin_temp, Basin_tmax, Basin_tmin, Temp_units, Tmax_hru, Tmin_hru
-      USE PRMS_CONSTANTS, ONLY: MINTEMP, MAXTEMP, ERROR_temp
+      USE PRMS_CONSTANTS, ONLY: MINTEMP, MAXTEMP, ERROR_temp, DEBUG_less, ACTIVE
+      USE PRMS_MODULE, ONLY: Print_debug, forcing_check_flag !, Nowyear, Nowmonth, Nowday
       use prms_utils, only: c_to_f, f_to_c, print_date
       IMPLICIT NONE
 ! Arguments
@@ -1457,6 +1458,19 @@
 ! Functions
       INTRINSIC :: DBLE
 !***********************************************************************
+      IF ( forcing_check_flag == ACTIVE ) THEN
+        IF ( Tmax < Tmin ) THEN
+          IF ( Print_debug > -1 ) THEN
+            PRINT '(A,I0)', 'Warning, adjusted tmax value < adjusted tmin value for HRU: ', Ihru
+            PRINT '(3(A,F0.4))', '         tmax: ', Tmax, ' tmin: ', Tmin, ', ', Tmin-Tmax
+            CALL print_date(0)
+            !WRITE (861,'(3I4)') Nowyear, nowmonth, nowday
+            !WRITE (861, '(A,I0)') 'Warning, adjusted tmax value < adjusted tmin value for HRU: ', Ihru
+            !WRITE (861, '(3(A,F0.4))') '         tmax: ', Tmax, ' tmin: ', Tmin, ', ', Tmin-Tmax
+          ENDIF
+        ENDIF
+      ENDIF
+
       IF ( Temp_units==0 ) THEN
 !       degrees Fahrenheit
         Tmaxf = Tmax
@@ -1477,10 +1491,12 @@
         Basin_temp = Basin_temp + DBLE( Tavgc*Hru_area )
       ENDIF
 
-      IF ( Tminf<MINTEMP .OR. Tmaxf>MAXTEMP ) THEN
-        PRINT '(A,I0,1X,F0.4,1X,F0.4,/)', ' ERROR, invalid temperature value for HRU: ', Ihru, Tminf, Tmaxf
-        CALL print_date(1)
-        ERROR STOP ERROR_temp
+      IF ( forcing_check_flag == ACTIVE ) THEN
+        IF ( Tminf<MINTEMP .OR. Tmaxf>MAXTEMP ) THEN
+          PRINT '(A,I0,1X,F0.4,1X,F0.4,/)', ' ERROR, invalid temperature value for HRU: ', Ihru, Tminf, Tmaxf
+          CALL print_date(1)
+          ERROR STOP ERROR_temp
+        ENDIF
       ENDIF
       Tmax_hru(Ihru) = Tmax ! in units temp_units
       Tmin_hru(Ihru) = Tmin ! in units temp_units

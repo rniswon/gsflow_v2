@@ -102,10 +102,8 @@ C6------Convert word to a number if requested.
          L=30-ISTOP+ISTART
          IF(L.LT.1) GO TO 200
          RW(L:30)=LINE(ISTART:ISTOP)
-         IF ( RW(L:30)/="") THEN
-           IF(NCODE.EQ.2) READ(RW,*,ERR=200) N
-           IF(NCODE.EQ.3) READ(RW,*,ERR=200) R
-         END IF
+         IF(NCODE.EQ.2) READ(RW,'(I30)',ERR=200) N
+         IF(NCODE.EQ.3) READ(RW,'(F30.0)',ERR=200) R
       END IF
       RETURN
 C
@@ -224,6 +222,7 @@ C2------Check for and decode EXTERNAL and OPEN/CLOSE records.
       IN=INPACK
       ICLOSE=0
       IBINARY=0
+      JAUX=0
       READ(IN,'(A)') LINE
       SFAC=1.
       LLOC=1

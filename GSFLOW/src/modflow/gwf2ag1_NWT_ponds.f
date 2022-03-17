@@ -1570,11 +1570,13 @@
       ! - -----------------------------------------------------------------
       !
       !1 - ------RESET DEMAND IF IT CHANGES
-      if (NUMTAB_SFR.ne.0) then
-          DO ii = 1, NUMTAB_SFR
-             tabseg = ISFRLIST(1, ii)
-             DEMAND(tabseg) = 0.0
-          END DO
+      if(IUNIT(44).GT.0) then
+        if (NUMTAB_SFR.ne.0) then
+            DO ii = 1, NUMTAB_SFR
+               tabseg = ISFRLIST(1, ii)
+               DEMAND(tabseg) = 0.0
+            END DO
+        endif
       endif
       ! RESET ALL DEMAND if new stress period 
       if (KPEROLD.ne.KPER) then
@@ -2436,11 +2438,11 @@
       RMSEGW = szero
       RMSEPOND = szero
 !1 - ------RESET DEMAND IF IT CHANGES for MODSIM simulations
-      IF ( kkiter == 1) Then
+      IF ( kkiter == 1 .and. IUNIT(44) > 0 ) Then
         if ( NUMTAB_SFR > 0 ) DEMAND = 0.0
         DO i = 1, NUMIRRDIVERSIONSP
           iseg = IRRSEG(i)
-          if (iseg > 0 .and. IUNIT(44) > 0) then
+          if (iseg > 0 ) then
                ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
                ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
                ! contains the TABFILE values at this point.

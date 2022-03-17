@@ -727,7 +727,8 @@
      &        '    An integration of the Precipitation-Runoff Modeling System (PRMS)', /, &
      &        '    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)', /)
 
-      IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = 1
+      IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = 0
+      IF ( control_integer(forcing_check_flag, 'forcing_check_flag')/=0 ) forcing_check_flag = OFF
 
       IF ( control_string(Model_mode, 'model_mode')/=0 ) CALL read_error(5, 'model_mode')
       IF ( Model_mode(:4)=='    ' ) Model_mode = 'GSFLOW5'
@@ -764,23 +765,28 @@
         Model = MODSIM
         PRMS_flag = OFF
         MODSIM_flag = ACTIVE
-      ELSEIF ( Model_mode(:5)=='FROST' ) THEN
-        Model = FROST
-      ELSEIF ( Model_mode(:13)=='WRITE_CLIMATE' ) THEN
-        Model = WRITE_CLIMATE
-      ELSEIF ( Model_mode(:7)=='CLIMATE' ) THEN
-        Model = CLIMATE
-      ELSEIF ( Model_mode(:5)=='POTET' ) THEN
-        Model = POTET
-      ELSEIF ( Model_mode(:9)=='TRANSPIRE' ) THEN
-        Model = TRANSPIRE
-      ELSEIF ( Model_mode(:7)=='CONVERT' ) THEN ! can be CONVERT4 or CONVERT5 or CONVERT (=CONVERT5)
-        Model = CONVERT
-      ELSEIF ( Model_mode(:13)=='DOCUMENTATION' ) THEN
-        Model = DOCUMENTATION
       ELSE
-        PRINT '(/,2A)', 'ERROR, invalid model_mode value: ', Model_mode
-        Inputerror_flag = 1
+        PRMS_flag = ACTIVE
+        PRMS_only = ACTIVE
+        PRMS4_flag = OFF
+        IF ( Model_mode(:5)=='FROST' ) THEN
+          Model = FROST
+        ELSEIF ( Model_mode(:13)=='WRITE_CLIMATE' ) THEN
+          Model = WRITE_CLIMATE
+        ELSEIF ( Model_mode(:7)=='CLIMATE' ) THEN
+          Model = CLIMATE
+        ELSEIF ( Model_mode(:5)=='POTET' ) THEN
+          Model = POTET
+        ELSEIF ( Model_mode(:9)=='TRANSPIRE' ) THEN
+          Model = TRANSPIRE
+        ELSEIF ( Model_mode(:7)=='CONVERT' ) THEN ! can be CONVERT4 or CONVERT5 or CONVERT (=CONVERT5)
+          Model = CONVERT
+        ELSEIF ( Model_mode(:13)=='DOCUMENTATION' ) THEN
+          Model = DOCUMENTATION
+        ELSE
+          PRINT '(/,2A)', 'ERROR, invalid model_mode value: ', Model_mode
+          Inputerror_flag = 1
+        ENDIF
       ENDIF
 
       ! get simulation start_time and end_time
