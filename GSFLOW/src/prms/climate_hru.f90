@@ -34,7 +34,7 @@
       USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Climate_transp_flag, Orad_flag, &
      &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
      &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
-     &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth
+     &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, Nowyear, Nowday, forcing_check_flag
       USE PRMS_CLIMATE_HRU
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
@@ -53,9 +53,9 @@
       EXTERNAL :: read_error, precip_form, temp_set, find_header_end, find_current_time
       EXTERNAL :: read_cbh_date, check_cbh_value, check_cbh_intvalue, print_module
 ! Local Variables
-      INTEGER :: yr, mo, dy, i, hr, mn, sec, jj, ierr, istop, missing, ios
+      INTEGER :: yr, mo, dy, i, hr, mn, sec, jj, ierr, istop, missing, ios, write_tmin_tmax
       DOUBLE PRECISION :: sum_obs
-      REAL :: tmax_hru, tmin_hru, ppt, harea
+      REAL :: tmax_hru, tmin_hru, ppt, harea !, foo
 !***********************************************************************
       climate_hru = 0
       ierr = 0
@@ -200,7 +200,10 @@
           Basin_windspeed = 0.0D0
         ENDIF
 
-        IF ( ierr/=0 ) ERROR STOP ERROR_cbh
+        IF ( ierr/=0 ) THEN
+          PRINT *, 'ERROR in climate_hru', ierr
+          ERROR STOP ERROR_cbh
+        ENDIF
 
         IF ( Cbh_check_flag==ACTIVE ) THEN
           missing = 0
@@ -231,11 +234,24 @@
           Hru_snow = 0.0
         ENDIF
 
+!        write_tmin_tmax = 0
         DO jj = 1, Active_hrus
           i = Hru_route_order(jj)
           harea = Hru_area(i)
 
           IF ( Climate_temp_flag==ACTIVE ) THEN
+            IF ( forcing_check_flag==ACTIVE ) THEN
+              IF ( Tminf(i) > Tmaxf(i))  THEN
+!                write_tmin_tmax = 1
+                PRINT *, 'WARNING, CBH tmin > tmax, swapped and written to files fort_863 and fort_864: HRU, date, tmin, tmax:', &
+                         i, Nowyear, Nowmonth, Nowday, Tminf(i), Tmaxf(i)
+!                WRITE ( 862, * ) 'WARNING, CBH tmin > tmax, swapped and written to files  fort_863 and fort_864:', &
+!                                 ' HRU, date, tmin, tmax:', i, Nowyear, Nowmonth, Nowday, Tminf(i), Tmaxf(i)
+!                foo = Tmaxf(i)
+!                Tmaxf(i) = Tminf(i)
+!                Tminf(i) = foo
+              ENDIF
+            ENDIF
             tmax_hru = Tmaxf(i) + Tmax_cbh_adj(i, Nowmonth)
             tmin_hru = Tminf(i) + Tmin_cbh_adj(i, Nowmonth)
             CALL temp_set(i, tmax_hru, tmin_hru, Tmaxf(i), Tminf(i), &
@@ -269,6 +285,10 @@
           IF ( Humidity_cbh_flag==ACTIVE ) Basin_humidity = Basin_humidity + DBLE( Humidity_hru(i)*harea )
           IF ( Windspeed_cbh_flag==ACTIVE ) Basin_windspeed = Basin_windspeed + DBLE( Windspeed_hru(i)*harea )
         ENDDO
+!        IF ( write_tmin_tmax == 1 ) THEN
+!          WRITE ( 863,  '(I4,2I3,3I2,128F7.2)' ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tmaxf(i), i=1,Nhru)
+!          WRITE ( 864, '(I4,2I3,3I2,128F7.2)' ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tminf(i), i=1,Nhru)
+!        ENDIF
 
         IF ( ierr==1 ) THEN
           CALL print_date(0)

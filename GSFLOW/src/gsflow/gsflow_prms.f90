@@ -63,7 +63,7 @@
       INTEGER, SAVE :: Print_debug, MapOutON_OFF, CsvON_OFF, Dprst_flag, Subbasin_flag, Parameter_check_flag
       INTEGER, SAVE :: Init_vars_from_file, Save_vars_to_file, Orad_flag, Cascade_flag, Cascadegw_flag
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
-      INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
+      INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag, forcing_check_flag
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
@@ -311,6 +311,7 @@
           Init_vars_from_file = 0 ! make sure this is set so all variables and parameters are declared
           CALL module_doc()
           IF ( ierr/=0 ) CALL module_error('DOCUMENTATION', Arg, ierr)
+          call_modules = ierr
           RETURN
         ELSE
           STOP
@@ -385,6 +386,7 @@
       IF ( Model==CLIMATE ) THEN
         IF ( Process_flag==RUN ) THEN
           CALL summary_output()
+          call_modules = ierr
           RETURN
         ENDIF
       ENDIF
@@ -395,6 +397,7 @@
         IF ( ierr/=0 ) CALL module_error('frost_date', Arg, ierr)
         IF ( Process_flag==RUN ) THEN
           CALL summary_output()
+          call_modules = ierr
           RETURN
         ENDIF
         IF ( Process_flag==CLEAN ) STOP
@@ -418,6 +421,7 @@
 
       IF ( Model==TRANSPIRE ) THEN
         IF ( Process_flag==RUN ) THEN
+          call_modules = ierr
           CALL summary_output()
           RETURN
         ENDIF
@@ -445,12 +449,14 @@
       IF ( Model==WRITE_CLIMATE ) THEN
         ierr = write_climate_hru()
         IF ( ierr/=0 ) CALL module_error('write_climate_hru', Arg, ierr)
+        call_modules = ierr
         IF ( Process_flag==RUN ) RETURN
       ENDIF
 
       IF ( Model==POTET ) THEN
         IF ( Process_flag==RUN ) THEN
           CALL summary_output()
+          call_modules = ierr
           RETURN
         ENDIF
       ENDIF
@@ -665,7 +671,8 @@
      &        '    An integration of the Precipitation-Runoff Modeling System (PRMS)', /, &
      &        '    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)', /)
 
-      IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = 1
+      IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = 0
+      IF ( control_integer(forcing_check_flag, 'forcing_check_flag')/=0 ) forcing_check_flag = OFF
 
       IF ( control_string(Model_mode, 'model_mode')/=0 ) CALL read_error(5, 'model_mode')
       IF ( Model_mode(:4)=='    ' ) Model_mode = 'GSFLOW5'
@@ -685,23 +692,28 @@
       ELSEIF ( Model_mode(:7)=='MODFLOW' .OR. Model_mode(:7)=='modflow' ) THEN
         Model = MODFLOW
         PRMS_flag = OFF
-      ELSEIF ( Model_mode(:5)=='FROST' ) THEN
-        Model = FROST
-      ELSEIF ( Model_mode(:13)=='WRITE_CLIMATE' ) THEN
-        Model = WRITE_CLIMATE
-      ELSEIF ( Model_mode(:7)=='CLIMATE' ) THEN
-        Model = CLIMATE
-      ELSEIF ( Model_mode(:5)=='POTET' ) THEN
-        Model = POTET
-      ELSEIF ( Model_mode(:9)=='TRANSPIRE' ) THEN
-        Model = TRANSPIRE
-      ELSEIF ( Model_mode(:7)=='CONVERT' ) THEN ! can be CONVERT4 or CONVERT5 or CONVERT (=CONVERT5)
-        Model = CONVERT
-      ELSEIF ( Model_mode(:13)=='DOCUMENTATION' ) THEN
-        Model = DOCUMENTATION
       ELSE
-        PRINT '(/,2A)', 'ERROR, invalid model_mode value: ', Model_mode
-        Inputerror_flag = 1
+        PRMS_flag = ACTIVE
+        PRMS_only = ACTIVE
+        PRMS4_flag = OFF
+        IF ( Model_mode(:5)=='FROST' ) THEN
+          Model = FROST
+        ELSEIF ( Model_mode(:13)=='WRITE_CLIMATE' ) THEN
+          Model = WRITE_CLIMATE
+        ELSEIF ( Model_mode(:7)=='CLIMATE' ) THEN
+          Model = CLIMATE
+        ELSEIF ( Model_mode(:5)=='POTET' ) THEN
+          Model = POTET
+        ELSEIF ( Model_mode(:9)=='TRANSPIRE' ) THEN
+          Model = TRANSPIRE
+        ELSEIF ( Model_mode(:7)=='CONVERT' ) THEN ! can be CONVERT4 or CONVERT5 or CONVERT (=CONVERT5)
+          Model = CONVERT
+        ELSEIF ( Model_mode(:13)=='DOCUMENTATION' ) THEN
+          Model = DOCUMENTATION
+        ELSE
+          PRINT '(/,2A)', 'ERROR, invalid model_mode value: ', Model_mode
+          Inputerror_flag = 1
+        ENDIF
       ENDIF
 
       ! get simulation start_time and end_time

@@ -33,9 +33,9 @@
       DOUBLE PRECISION, ALLOCATABLE :: Seg_potet(:)
 !   Segment Parameters
       REAL, SAVE, ALLOCATABLE :: Seg_length(:) !, Mann_n(:)
-      REAL, SAVE, ALLOCATABLE :: Seg_slope(:), Width_values(:, :)
+      REAL, SAVE, ALLOCATABLE :: Seg_slope(:)
       REAL, SAVE, ALLOCATABLE :: width_alpha(:), width_m(:), Stream_tave_init(:)
-      INTEGER, SAVE:: Width_dim, Maxiter_sntemp
+      INTEGER, SAVE:: Maxiter_sntemp
       REAL, SAVE, ALLOCATABLE :: Seg_humidity(:, :)
       REAL, SAVE, ALLOCATABLE :: lat_temp_adj(:, :)
       INTEGER, SAVE, ALLOCATABLE :: Seg_humidity_sta(:)

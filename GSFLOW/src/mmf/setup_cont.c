@@ -121,6 +121,10 @@ void setup_cont (void) {
 		decl_control_int_array ("parameter_check_flag", 1, lval);
 
         lval = (long *)umalloc (sizeof (long));
+		lval[0] = 0;
+		decl_control_int_array ("forcing_check_flag", 1, lval);
+
+        lval = (long *)umalloc (sizeof (long));
 		lval[0] = 1;
 		decl_control_int_array ("cbh_check_flag", 1, lval);
 

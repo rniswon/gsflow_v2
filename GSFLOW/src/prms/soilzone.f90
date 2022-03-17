@@ -1096,7 +1096,7 @@
             Slow_stor(i) = availh2o
           ENDIF
           IF ( Slow_stor(i)>0.0 .AND. Ssr2gw_rate(i)>0.0 ) &
-       &       CALL compute_gwflow(Ssr2gw_rate(i), Ssr2gw_exp(i), Ssr_to_gw(i), Slow_stor(i))
+     &         CALL compute_gwflow(Ssr2gw_rate(i), Ssr2gw_exp(i), Ssr_to_gw(i), Slow_stor(i))
         ENDIF
 
         ! compute contribution to Dunnian flow from PFR, if any
@@ -1132,48 +1132,17 @@
         Potet_rechr(i) = 0.0
         Potet_lower(i) = 0.0
         pervactet = 0.0
-        IF ( Soil_moist(i)>0.0 .AND. cfgi_frozen_hru==OFF .AND. avail_potet>0.0 ) THEN
-          CALL compute_szactet(Soil_moist_max(i), Soil_rechr_max(i), Transp_on(i), Cov_type(i), &
-     &                         Soil_type(i), Soil_moist(i), Soil_rechr(i), pervactet, avail_potet, &
-     &                         Snow_free(i), Potet_rechr(i), Potet_lower(i), &
-     &                         Potet(i), perv_frac, Soil_saturated(i))
-          ! sanity check
-!          IF ( pervactet>avail_potet ) THEN
-!            Soil_moist(i) = Soil_moist(i) + pervactet - avail_potet
-!            pervactet = avail_potet
-!            PRINT *, 'perv_et problem', pervactet, Avail_potet
-!          ENDIF
+        IF ( cfgi_frozen_hru==OFF ) THEN
+          IF ( Soil_moist(i)>0.0 .AND. avail_potet>0.0 ) THEN
+            CALL compute_szactet(Soil_moist_max(i), Soil_rechr_max(i), Transp_on(i), Cov_type(i), &
+     &                           Soil_type(i), Soil_moist(i), Soil_rechr(i), pervactet, avail_potet, &
+     &                           Snow_free(i), Potet_rechr(i), Potet_lower(i), &
+     &                           Potet(i), perv_frac, Soil_saturated(i))
+          ENDIF
         ENDIF
-
-        ! sanity check
-!        IF ( Soil_moist(i)<0.0 ) THEN
-!          IF ( Print_debug>-1 ) PRINT *, i, Soil_moist(i), ' negative'
-!          IF ( pervactet>=ABS(Soil_moist(i)) ) THEN
-!            pervactet = pervactet + Soil_moist(i)
-!            Soil_moist(i) = 0.0
-!          ENDIF
-!          IF ( Soil_moist(i)<-NEARZERO ) THEN
-!            IF ( Print_debug>-1 ) PRINT *, 'HRU:', i, ' soil_moist<0.0', Soil_moist(i)
-!          ENDIF
-!          Soil_moist(i) = 0.0
-!        ENDIF
 
         Hru_actet(i) = hruactet + pervactet*perv_frac
         avail_potet = Potet(i) - Hru_actet(i)
-        ! sanity check
-!        IF ( avail_potet<0.0 ) THEN
-!          IF ( Print_debug>-1 ) THEN
-!            IF ( avail_potet<-NEARZERO ) PRINT *, 'hru_actet>potet', i, &
-!     &           Nowmonth, Nowday, Hru_actet(i), Potet(i), avail_potet
-!          ENDIF
-!          Hru_actet(i) = Potet(i)
-!          tmp = avail_potet/perv_frac
-!          pervactet = pervactet + tmp
-!          Soil_moist(i) = Soil_moist(i) - tmp
-!          Soil_rechr(i) = Soil_rechr(i) - tmp
-!          IF ( Soil_rechr(i)<0.0 ) Soil_rechr(i) = 0.0
-!          IF ( Soil_moist(i)<0.0 ) Soil_moist(i) = 0.0
-!        ENDIF
         Perv_actet(i) = pervactet
 !        hru_perv_actet(i) = pervactet * perv_frac
 
@@ -1577,15 +1546,6 @@
         Inter_flow = Storage
       ENDIF
       Storage = Storage - Inter_flow
-!      IF ( Storage<0.0 ) THEN
-!        IF ( Storage<-CLOSEZERO ) PRINT *, 'Sanity check, ssres_stor<0.0', Storage
-!        Storage = 0.0
-! rsr, if very small storage, add it to interflow
-!      ELSEIF ( Storage>0.0 .AND. Storage<NEARZERO ) THEN
-!        print *, 'small storage', storage, inter_flow
-!        Inter_flow = Inter_flow + Storage
-!        Storage = 0.0
-!      ENDIF
 
       END SUBROUTINE compute_interflow
 

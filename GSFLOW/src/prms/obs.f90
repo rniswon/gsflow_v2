@@ -257,8 +257,9 @@
 !     obsrun - runs obs module
 ! **********************************************************************
       INTEGER FUNCTION obsrun()
-      USE PRMS_CONSTANTS, ONLY: CMS, CFS2CMS_CONV
-      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Nowmonth
+      USE PRMS_CONSTANTS, ONLY: CMS, CFS2CMS_CONV, ACTIVE
+      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, &
+                             Nowyear, Nowmonth, Nowday, forcing_check_flag
       USE PRMS_OBS
       USE PRMS_CLIMATEVARS, ONLY: Ppt_zero_thresh
       IMPLICIT NONE
@@ -268,6 +269,7 @@
       EXTERNAL :: read_error
 ! Local Variables
       INTEGER :: i
+      !REAL :: foo
 ! **********************************************************************
       obsrun = 0
 
@@ -298,6 +300,22 @@
       IF ( Ntemp>0 ) THEN
         IF ( readvar(MODNAME, 'tmax')/=0 ) CALL read_error(9, 'tmax')
         IF ( readvar(MODNAME, 'tmin')/=0 ) CALL read_error(9, 'tmin')
+        IF ( forcing_check_flag == ACTIVE ) THEN
+          DO i = 1, Ntemp
+            IF ( Tmin(i) < -100 .OR. Tmin(i) < -100 ) CYCLE
+            IF ( Tmin(i) > Tmax(i) ) THEN
+              PRINT *, 'WARNING, observed tmin > tmax: HRU, date, tmin, tmax:', &
+                       i, Nowyear, Nowmonth, Nowday, Tmin(i), Tmax(i)
+!              WRITE ( 862, * ) 'WARNING, observed tmin > tmax, swapped fort_866 and fort_867: HRU, date, tmin, tmax:', &
+!                               i, Nowyear, Nowmonth, Nowday, Tmin(i), Tmax(i)
+!              foo = Tmax(i)
+!              Tmax(i) = Tmin(i)
+!              Tmin(i) = foo
+            ENDIF
+          ENDDO
+!          WRITE ( 866,  '(I4,2I3,3I2,22F8.2)' ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tmax(i), i=1,Ntemp)
+!          WRITE ( 867, '(I4,2I3,3I2,22F8.2)' ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tmin(i), i=1,Ntemp)
+        ENDIF
       ENDIF
 
       IF ( Nsol>0 ) THEN
