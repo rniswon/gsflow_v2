@@ -9,7 +9,6 @@ include ./makedefaults
 SOURCEDIR1=./stemp
 SOURCEDIR2=./stemp/gsflow
 SOURCEDIR3=./stemp/merge
-SOURCEDIR4=./stemp/mmf
 SOURCEDIR5=./stemp/modflow
 SOURCEDIR6=./stemp/prms
 
@@ -17,13 +16,15 @@ VPATH = \
 ${SOURCEDIR1} \
 ${SOURCEDIR2} \
 ${SOURCEDIR3} \
-${SOURCEDIR4} \
 ${SOURCEDIR5} \
 ${SOURCEDIR6} 
 
 .SUFFIXES: .f .f90 .c .o
 
 OBJECTS = \
+$(OBJDIR)/prms_constants.o \
+$(OBJDIR)/gsflow_module.o \
+$(OBJDIR)/gsflow_fortran.o \
 $(OBJDIR)/gwf2swr7util.o \
 $(OBJDIR)/gwflakmodule_NWT.o \
 $(OBJDIR)/mach_mod.o \
@@ -31,7 +32,6 @@ $(OBJDIR)/utl7.o \
 $(OBJDIR)/gwfuzfmodule_NWT.o \
 $(OBJDIR)/modules.o \
 $(OBJDIR)/mhc7.o \
-$(OBJDIR)/prms_constants.o \
 $(OBJDIR)/gwfsfrmodule_NWT.o \
 $(OBJDIR)/NWT1_xmdlib.o \
 $(OBJDIR)/gwf2bas7_NWT.o \
@@ -73,11 +73,17 @@ $(OBJDIR)/obs2ghb7.o \
 $(OBJDIR)/obs2chd7.o \
 $(OBJDIR)/gwf2wel7_NWT.o \
 $(OBJDIR)/gwf2swi27.o \
+$(OBJDIR)/c_prms_time.o \
+$(OBJDIR)/c_utils_prms.o \
+$(OBJDIR)/c_read_control_file.o \
+$(OBJDIR)/c_read_data_file.o \
+$(OBJDIR)/c_read_parameter_file.o \
+$(OBJDIR)/c_mmf_utils.o \
 $(OBJDIR)/basin.o \
+$(OBJDIR)/climateflow.o \
 $(OBJDIR)/convert_params.o \
 $(OBJDIR)/NWT1_gmres.o \
 $(OBJDIR)/gwf2lak7_NWT.o \
-$(OBJDIR)/climateflow.o \
 $(OBJDIR)/gwf2sub7_NWT.o \
 $(OBJDIR)/gwf2mnw27_NWT.o \
 $(OBJDIR)/gwf2sfr7_NWT.o \
@@ -86,114 +92,70 @@ $(OBJDIR)/NWT1_solver.o \
 $(OBJDIR)/gwf2mnw17_NWT.o \
 $(OBJDIR)/gwf2hydmod7.o \
 $(OBJDIR)/cascade.o \
+$(OBJDIR)/obs.o \
+$(OBJDIR)/climate_hru.o \
 $(OBJDIR)/lmt8_NWT.o \
-$(OBJDIR)/prms_time.o \
 $(OBJDIR)/potet_hamon.o \
 $(OBJDIR)/potet_hs.o \
-$(OBJDIR)/transp_tindex.o \
-$(OBJDIR)/gsflow_modflow.o \
-$(OBJDIR)/gwf2mnw2i7.o \
-$(OBJDIR)/potet_jh.o \
-$(OBJDIR)/precip_temp_map.o \
-$(OBJDIR)/nsegment_summary.o \
-$(OBJDIR)/basin_summary.o \
-$(OBJDIR)/climate_hru.o \
-$(OBJDIR)/nhru_summary.o \
-$(OBJDIR)/frost_date.o \
-$(OBJDIR)/water_use_read.o \
-$(OBJDIR)/transp_frost.o \
-$(OBJDIR)/map_results.o \
 $(OBJDIR)/potet_pt.o \
-$(OBJDIR)/obs.o \
-$(OBJDIR)/utils_prms_linux.o \
-$(OBJDIR)/write_climate_hru.o \
-$(OBJDIR)/nsub_summary.o \
-$(OBJDIR)/ide_dist.o \
-$(OBJDIR)/Irestart.o \
+$(OBJDIR)/potet_jh.o \
 $(OBJDIR)/potet_pm.o \
 $(OBJDIR)/potet_pm_sta.o \
-$(OBJDIR)/ddsolrad.o \
 $(OBJDIR)/potet_pan.o \
+$(OBJDIR)/ddsolrad.o \
+$(OBJDIR)/ccsolrad.o \
+$(OBJDIR)/ide_dist.o \
+$(OBJDIR)/xyz_dist.o \
+$(OBJDIR)/precip_temp.o \
+$(OBJDIR)/precip_map.o \
 $(OBJDIR)/temp_1sta_laps.o \
+$(OBJDIR)/precip_1sta_laps.o \
 $(OBJDIR)/precip_dist2.o \
 $(OBJDIR)/temp_dist2.o \
+$(OBJDIR)/transp_tindex.o \
+$(OBJDIR)/transp_frost.o \
+$(OBJDIR)/gsflow_modflow.o \
+$(OBJDIR)/gwf2mnw2i7.o \
+$(OBJDIR)/water_use_read.o \
+$(OBJDIR)/dynamic_param_read.o \
+$(OBJDIR)/utils_prms.o \
+$(OBJDIR)/Irestart.o \
 $(OBJDIR)/intcp.o \
-$(OBJDIR)/precip_1sta_laps.o \
-$(OBJDIR)/ccsolrad.o \
-$(OBJDIR)/xyz_dist.o \
 $(OBJDIR)/snowcomp.o \
 $(OBJDIR)/srunoff.o \
 $(OBJDIR)/glacr_melt.o \
 $(OBJDIR)/soilzone.o \
+$(OBJDIR)/routing.o \
+$(OBJDIR)/strmflow.o \
+$(OBJDIR)/strmflow_in_out.o \
+$(OBJDIR)/muskingum.o \
+$(OBJDIR)/muskingum_lake.o \
+$(OBJDIR)/stream_temp.o \
 $(OBJDIR)/gwf2ag1_NWT.o \
-$(OBJDIR)/dynamic_param_read.o \
 $(OBJDIR)/gwf2uzf1_NWT.o \
 $(OBJDIR)/gwflow.o \
 $(OBJDIR)/gsflow_prms2mf.o \
+$(OBJDIR)/gsflow_prms2modsim.o \
+$(OBJDIR)/nsegment_summary.o \
+$(OBJDIR)/basin_summary.o \
+$(OBJDIR)/nhru_summary.o \
+$(OBJDIR)/map_results.o \
+$(OBJDIR)/frost_date.o \
 $(OBJDIR)/prms_summary.o \
+$(OBJDIR)/write_climate_hru.o \
+$(OBJDIR)/nsub_summary.o \
 $(OBJDIR)/water_balance.o \
-$(OBJDIR)/strmflow.o \
 $(OBJDIR)/gsflow_budget.o \
-$(OBJDIR)/routing.o \
 $(OBJDIR)/gsflow_mf2prms.o \
-$(OBJDIR)/strmflow_in_out.o \
 $(OBJDIR)/gsflow_sum.o \
-$(OBJDIR)/stream_temp.o \
-$(OBJDIR)/muskingum.o \
 $(OBJDIR)/basin_sum.o \
-$(OBJDIR)/muskingum_lake.o \
 $(OBJDIR)/subbasin.o \
-$(OBJDIR)/print_vars.o \
-$(OBJDIR)/write_vstats.o \
-$(OBJDIR)/batch_run.o \
-$(OBJDIR)/param_addr.o \
-$(OBJDIR)/sort_vars.o \
-$(OBJDIR)/umalloc_etc.o \
-$(OBJDIR)/julconvert.o \
-$(OBJDIR)/readvar.o \
-$(OBJDIR)/control_addr.o \
-$(OBJDIR)/alloc_space.o \
-$(OBJDIR)/julday.o \
-$(OBJDIR)/getdimname.o \
-$(OBJDIR)/save_params.o \
-$(OBJDIR)/mmf.o \
-$(OBJDIR)/reset_dim.o \
-$(OBJDIR)/dim_addr.o \
-$(OBJDIR)/check_vars.o \
-$(OBJDIR)/control_var.o \
-$(OBJDIR)/sort_dims.o \
-$(OBJDIR)/decl_control.o \
-$(OBJDIR)/control_array.o \
-$(OBJDIR)/sort_params.o \
-$(OBJDIR)/print_params.o \
-$(OBJDIR)/load_param.o \
-$(OBJDIR)/putvar.o \
-$(OBJDIR)/create_vstats.o \
-$(OBJDIR)/declparam.o \
-$(OBJDIR)/get_times.o \
-$(OBJDIR)/read_line.o \
-$(OBJDIR)/batch_run_functions.o \
-$(OBJDIR)/declvar.o \
-$(OBJDIR)/read_control.o \
-$(OBJDIR)/graph_single_run.o \
-$(OBJDIR)/timing.o \
-$(OBJDIR)/var_addr.o \
-$(OBJDIR)/getparam.o \
-$(OBJDIR)/str_to_vals.o \
-$(OBJDIR)/call_modules.o \
-$(OBJDIR)/parse_args.o \
-$(OBJDIR)/read_params.o \
-$(OBJDIR)/getvar.o \
-$(OBJDIR)/read_datainfo.o \
-$(OBJDIR)/read_vars.o \
-$(OBJDIR)/getdim.o \
-$(OBJDIR)/decldim.o \
-$(OBJDIR)/call_setdims.o \
-$(OBJDIR)/setup_cont.o \
-$(OBJDIR)/get_elem_add.o \
-$(OBJDIR)/build_lists.o \
-$(OBJDIR)/free_vstats.o \
-$(OBJDIR)/print_model_info.o
+$(OBJDIR)/sm_prms_time.o \
+$(OBJDIR)/sm_utils_prms.o \
+$(OBJDIR)/sm_read_control_file.o \
+$(OBJDIR)/sm_read_data_file.o \
+$(OBJDIR)/sm_read_parameter_file.o \
+$(OBJDIR)/sm_mmf_utils.o
 
 # Define the objects that make up the program
 $(PROGRAM) : $(OBJECTS)
