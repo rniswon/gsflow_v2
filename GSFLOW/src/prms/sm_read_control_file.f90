@@ -142,7 +142,7 @@ contains
     Print_debug = DEBUG_normal
     i = i + 1
     Control_parameter_data(i) % name = 'parameter_check_flag'
-    Parameter_check_flag = ACTIVE
+    Parameter_check_flag = OFF
     Control_parameter_data(i) % values_int(1) = Parameter_check_flag
     i = i + 1
     Control_parameter_data(i) % name = 'forcing_check_flag'

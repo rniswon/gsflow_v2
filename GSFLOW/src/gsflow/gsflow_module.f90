@@ -92,7 +92,7 @@
       INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag, Gsf_rpt, Rpt_days
       INTEGER, SAVE :: Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, Dyn_springfrost_flag
       INTEGER, SAVE :: Gwr_transferON_OFF, External_transferON_OFF, Segment_transferON_OFF, Lake_transferON_OFF
-  END MODULE PRMS_MODULE
+    END MODULE PRMS_MODULE
 
     MODULE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH

@@ -870,7 +870,7 @@ contains
     blanks = ' '
     string = Description//blanks(:nblanks)//Modname//blanks(:nblanks2)//Versn
     print '(A)', trim(string)
-    IF ( Model/=MODFLOW ) write (PRMS_output_unit, '(A)') trim(string)
+    IF ( Model /= MODFLOW ) write (PRMS_output_unit, '(A)') trim(string)
   end subroutine print_module
 
 !***********************************************************************

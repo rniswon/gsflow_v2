@@ -179,7 +179,7 @@ gsfmf2prms.mod: gsflow_mf2prms.o
 gsfmodflow.mod: gsflow_modflow.o
 prms_module.mod: gsflow_module.o
 
-gsflow_fortran.o: gsflow_fortran.f90
+gsflow_fortran.o: gsflow_fortran.f90 prms_constants.mod
 	$(FC) -c $(FFLAGS) gsflow_fortran.f90
 
 gsflow_module.o: gsflow_module.f90 prms_constants.mod

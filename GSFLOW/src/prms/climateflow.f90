@@ -1448,13 +1448,12 @@
       SUBROUTINE temp_set(Ihru, Tmax, Tmin, Tmaxf, Tminf, Tavgf, Tmaxc, Tminc, Tavgc, Hru_area)
       USE PRMS_CLIMATEVARS, ONLY: Basin_temp, Basin_tmax, Basin_tmin, Temp_units, Tmax_hru, Tmin_hru
       USE PRMS_CONSTANTS, ONLY: MINTEMP, MAXTEMP, ERROR_temp, DEBUG_less, ACTIVE
-      USE PRMS_MODULE, ONLY: Print_debug, forcing_check_flag, Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Print_debug, forcing_check_flag !, Nowyear, Nowmonth, Nowday
       use prms_utils, only: c_to_f, f_to_c, print_date
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Ihru
-      REAL, INTENT(IN) :: Hru_area
-      REAL, INTENT(INOUT) :: Tmin, Tmax
+      REAL, INTENT(IN) :: Tmax, Tmin, Hru_area
       REAL, INTENT(OUT) :: Tmaxf, Tminf, Tavgf, Tmaxc, Tminc, Tavgc
 ! Functions
       INTRINSIC :: DBLE
@@ -1465,7 +1464,9 @@
             PRINT '(A,I0)', 'Warning, adjusted tmax value < adjusted tmin value for HRU: ', Ihru
             PRINT '(3(A,F0.4))', '         tmax: ', Tmax, ' tmin: ', Tmin, ', ', Tmin-Tmax
             CALL print_date(0)
-            write (861,'(i4,2i3,i5,3(A,F0.4))') Nowyear, Nowmonth, Nowday, Ihru, ',', Tmax, ',', Tmin, ',', Tmin-Tmax
+            !WRITE (861,'(3I4)') Nowyear, nowmonth, nowday
+            !WRITE (861, '(A,I0)') 'Warning, adjusted tmax value < adjusted tmin value for HRU: ', Ihru
+            !WRITE (861, '(3(A,F0.4))') '         tmax: ', Tmax, ' tmin: ', Tmin, ', ', Tmin-Tmax
           ENDIF
         ENDIF
       ENDIF
