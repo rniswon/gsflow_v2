@@ -34,7 +34,7 @@ LIBOBJS = \
         gwflakmodule_NWT.o \
         gwf2lak7_NWT.o \
         gwf2sfr7_NWT.o \
-        gwf2ag1_NWT_ponds.o \
+        gwf2ag1_NWT.o \
         gwf2wel7_NWT.o \
         gwf2uzf1_NWT.o \
         gwf2ghb7_NWT.o \
