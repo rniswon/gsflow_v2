@@ -488,7 +488,7 @@
 
 ! It0 and _ante variables used with MODFLOW integration to save iteration states.
       IF ( Kkiter==1 ) THEN
-        IF ( (MODSIM_flag==ACTIVE .AND. AFR) .OR. MODSIM_flag==OFF ) THEN
+        !IF ( (MODSIM_flag==ACTIVE .AND. AFR) .OR. MODSIM_flag==OFF ) THEN
         Soil_moist_ante = Soil_moist
         Soil_rechr_ante = Soil_rechr
         Ssres_stor_ante = Ssres_stor
@@ -510,10 +510,11 @@
           It0_sroff = Sroff
           IF ( Call_cascade==ACTIVE ) It0_strm_seg_in = Strm_seg_in
         ENDIF
-        ENDIF
+        !ENDIF
       ENDIF
 
-      IF ( Iter_aet_flag==ACTIVE .AND. AFR ) THEN
+!      IF ( Iter_aet_flag==ACTIVE .AND. AFR ) THEN
+      IF ( Iter_aet_flag==ACTIVE ) THEN
         Ag_irrigation_add = 0.0
         It0_ag_soil_moist = Ag_soil_moist
         It0_ag_soil_rechr = Ag_soil_rechr
