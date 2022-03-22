@@ -74,10 +74,10 @@ Common States and Fluxes        climateflow         2022-02-18
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2021-11-19
-Temperature Distribution        climate_hru         2021-11-19
-Precipitation Distribution      climate_hru         2021-11-19
-Solar Radiation Distribution    climate_hru         2021-11-19
-Potential Evapotranspiration    climate_hru         2021-11-19
+Temperature Distribution        climate_hru         2022-03-17
+Precipitation Distribution      climate_hru         2022-03-17
+Solar Radiation Distribution    climate_hru         2022-03-17
+Potential Evapotranspiration    climate_hru         2022-03-17
 Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-02-03
 Snow Dynamics                   snowcomp            2022-02-18
@@ -106,5 +106,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time   16 minutes 11.23 seconds
+Execution elapsed time   16 minutes 55.95 seconds
 

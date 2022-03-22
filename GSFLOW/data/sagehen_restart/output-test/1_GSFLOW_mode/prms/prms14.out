@@ -101,8 +101,8 @@ Common States and Fluxes        climateflow         2022-02-18
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2021-11-19
-Temperature Distribution        climate_hru         2021-11-19
-Precipitation Distribution      climate_hru         2021-11-19
+Temperature Distribution        climate_hru         2022-03-17
+Precipitation Distribution      climate_hru         2022-03-17
 Solar Radiation Distribution    ddsolrad            2021-11-19
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
@@ -133,5 +133,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    0 minutes  2.73 seconds
+Execution elapsed time    0 minutes  1.75 seconds
 
