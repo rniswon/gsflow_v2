@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2022-02-16'
+      character(len=*), parameter :: Version_soilzone_ag = '2022-03-25'
       INTEGER, SAVE :: Soil_iter
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Last_ag_soil_moist, Basin_ag_soil_rechr, Last_ag_soil_rechr
@@ -430,7 +430,7 @@
 !***********************************************************************
       INTEGER FUNCTION szrun_ag(AFR)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
-     &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF
+     &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, &
      &    Frozen_flag, Soilzone_add_water_use, Call_cascade, &
      &    Nowmonth, Nowyear, Nowday, Iter_aet_flag, Hru_type, &
@@ -470,7 +470,7 @@
       EXTERNAL :: compute_gravflow_ag
       !EXTERNAL :: check_gvr_sm
 ! Local Variables
-      INTEGER :: i, k, update_potet, compute_lateral, perv_on_flag
+      INTEGER :: i, k, update_potet, compute_lateral, j, igvr, perv_on_flag
       REAL :: dunnianflw, interflow, perv_area, harea
       REAL :: dnslowflow, dnpreflow, dndunn, availh2o, avail_potet, hruactet, ag_hruactet
       REAL :: topfr !, depth, tmp
@@ -651,7 +651,7 @@
         ENDIF
 
         avail_potet = Potet(i) - hruactet
-        IF ( avail_potet<0.0 ) THEN
+        IF ( avail_potet<-CLOSEZERO ) THEN
           print *, 'avail_potet<0', avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
           avail_potet = 0.0
           hruactet = Potet(i)
@@ -1098,6 +1098,12 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
               Swale_actet(i) = availh2o
               Hru_actet(i) = Hru_actet(i) + Swale_actet(i)
               Slow_stor(i) = Slow_stor(i) - Swale_actet(i)
+              IF ( GSFLOW_flag==ACTIVE ) THEN
+                 DO j = 1, Hru_gvr_count(i)
+                    igvr = Hru_gvr_index(j, i)
+                    Gravity_stor_res(igvr) = Gravity_stor_res(igvr) - Swale_actet(i)
+                 ENDDO
+              ENDIF
               Basin_swale_et = Basin_swale_et + DBLE( Swale_actet(i)*harea )
             ENDIF
             IF ( Print_debug==7 ) THEN

@@ -19,7 +19,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Temperature Distribution'
         character(len=9), SAVE :: MODNAME
-        character(len=*), parameter :: Version_temp = '2021-11-19'
+        character(len=*), parameter :: Version_temp = '2022-03-25'
         INTEGER, SAVE, ALLOCATABLE :: Tmax_cnt(:), Tmin_cnt(:), Nuse_tsta(:)
         REAL, SAVE, ALLOCATABLE :: Elfac(:), Tmax_prev(:), Tmin_prev(:)
         REAL, SAVE, ALLOCATABLE :: Tcrn(:), Tcrx(:) ! temp_1sta
@@ -50,7 +50,7 @@
       EXTERNAL :: temp_set, temp_1sta_laps_restart
       EXTERNAL :: compute_temp_laps
 ! Local Variables
-      INTEGER :: j, k, jj, i, kk, kkk, l, ierr
+      INTEGER :: j, k, jj, i, kk, kkk, l, ierr, nchar
       REAL :: tmx, tmn
 !***********************************************************************
       temp_1sta_laps = 0
@@ -171,14 +171,16 @@
         ENDIF
 
       ELSEIF ( Process_flag==DECL ) THEN
+        nchar = 9
         IF ( Temp_flag==temp_1sta_module ) THEN
           MODNAME = 'temp_1sta'
         ELSEIF ( Temp_flag==temp_laps_module ) THEN
           MODNAME = 'temp_laps'
         ELSE ! Temp_flag = temp_sta_module
           MODNAME = 'temp_sta '
+          nchar = 8
         ENDIF
-        CALL print_module(MODDESC, MODNAME, Version_temp)
+        CALL print_module(MODDESC, MODNAME(:nchar), Version_temp)
 
         ALLOCATE ( Elfac(Nhru), Nuse_tsta(Ntemp) )
         ALLOCATE ( Tmin_cnt(Ntemp), Tmax_cnt(Ntemp), Tmax_prev(Ntemp), Tmin_prev(Ntemp) )

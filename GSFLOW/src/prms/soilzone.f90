@@ -20,7 +20,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2022-02-04'
+      character(len=*), parameter :: Version_soilzone = '2022-03-25'
       INTEGER, SAVE :: DBGUNT, Iter_aet
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -652,6 +652,7 @@
           ELSE
             Pref_flow_stor(i) = 0.0
           ENDIF
+          Ssres_stor(i) = Slow_stor(i) + Pref_flow_stor(i)
         ENDIF
 
         hruarea = Hru_area(i)
@@ -814,7 +815,7 @@
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow
       EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars
 ! Local Variables
-      INTEGER :: i, k, update_potet, compute_lateral
+      INTEGER :: i, k, update_potet, compute_lateral, j, igvr
       REAL :: dunnianflw, interflow, perv_area, harea
       REAL :: dnslowflow, dnpreflow, dndunn, availh2o, avail_potet, hruactet
       REAL :: gvr_maxin, topfr !, tmp
@@ -1194,6 +1195,12 @@
               Swale_actet(i) = availh2o
               Hru_actet(i) = Hru_actet(i) + Swale_actet(i)
               Slow_stor(i) = Slow_stor(i) - Swale_actet(i)
+              IF ( GSFLOW_flag==ACTIVE ) THEN
+                 DO j = 1, Hru_gvr_count(i)
+                    igvr = Hru_gvr_index(j, i)
+                    Gravity_stor_res(igvr) = Gravity_stor_res(igvr) - Swale_actet(i)
+                 ENDDO
+              ENDIF
               Basin_swale_et = Basin_swale_et + DBLE( Swale_actet(i)*harea )
             ENDIF
             IF ( Print_debug==7 ) THEN
