@@ -141,6 +141,7 @@
         REAL, SAVE, DIMENSION(:, :), POINTER :: KCROPDIVERSION
         REAL, SAVE, DIMENSION(:, :), POINTER :: KCROPWELL
         REAL, SAVE, DIMENSION(:), POINTER :: DEMAND, SUPACT, SUPACTOLD
+        REAL, SAVE, DIMENSION(:), POINTER :: DEMANDPOT
         REAL, SAVE, DIMENSION(:), POINTER :: ACTUAL
         REAL, SAVE, DIMENSION(:), POINTER :: ACTUALOLD
         INTEGER, SAVE, POINTER :: KPEROLD
@@ -421,7 +422,7 @@
          MAXSEGSHOLD = 1
       END IF
       ALLOCATE (DEMAND(NSEGDIMTEMP), ACTUAL(NSEGDIMTEMP))
-      ALLOCATE (ACTUALOLD(NSEGDIMTEMP))
+      ALLOCATE (ACTUALOLD(NSEGDIMTEMP),DEMANDPOT(NSEGDIMTEMP))
       ALLOCATE (SUPACT(NSEGDIMTEMP), SUPACTOLD(NSEGDIMTEMP))
       IF (NUMIRRHOLD .EQ. 0) THEN
          MAXCELLSHOLD = 1
@@ -498,6 +499,7 @@
       ALLOCATE (IDVFLG)
       IDVFLG = 0
       DEMAND = szero
+      DEMANDPOT = szero
       SUPACT = szero
       SUPACTOLD = szero
       ACTUAL = szero
@@ -2517,13 +2519,13 @@
                      FMIN = SUPACT(J)
                   ELSE IF (TRIGGERFLAG > 0) then
                      IF (TIMEINPERIODSEG(J) < IRRPERIODSEG(J)) THEN  
-                        FMIN = SEG(2, J)
+                        FMIN = DEMANDPOT(J)   !RGN 3/11/2022
                      ELSE
                        QSW = DZERO
                        FMIN = DZERO
                      END IF
                   ELSE
-                     FMIN = DEMAND(J)
+                     FMIN = DEMANDPOT(J)
                   END IF
                   FMIN = FRACSUP(I, L)*(FRACSUPMAX(I, L)*FMIN - QSW)
                   IF (FMIN < DZERO) FMIN = DZERO
@@ -3318,7 +3320,8 @@
         !1 - -----limit diversion to water right
         !
         
-        IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)  !need to check this, unintensional comment?
+        IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
+        DEMANDPOT(ISEG) = SEG(2, iseg)
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
   
@@ -3522,6 +3525,7 @@
          end if
          if (TIMEINPERIODSEG(ISEG) - DELT < IRRPERIODSEG(ISEG))
      +                              SEG(2, iseg) = DEMAND(iseg)
+         DEMANDPOT(ISEG) = SEG(2, iseg)
 300    continue
        deallocate (petseg, aetseg)
        return
@@ -3813,7 +3817,7 @@
          DO I = 1, NUMSW
             UNIT = TSSWUNIT(I)
             L = TSSWNUM(I)
-            Q = demand(L)
+            Q = demandpot(L)
             QQ = DVRSFLW(L)   !consider making this SGOTFLOW
             QQQ = SUPSEG(L)
             CALL timeseries(unit, Kkper, Kkstp, TOTIM, L,
@@ -4400,7 +4404,7 @@
 C
 C-------SUBROUTINE SFR2MODSIM
 C
-      SUBROUTINE AG2MODSIM(Diversions)
+      SUBROUTINE AG2MODSIM(agDemand)
 C     *******************************************************************
 C     Pass Irrigation demand to MODSIM 
 C     
@@ -4414,7 +4418,7 @@ C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     -------------------------------------------------------------------
 C     ARGUMENTS
-      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(NSS)
+      DOUBLE PRECISION, INTENT(INOUT) :: agDemand(NSS)
 C     -------------------------------------------------------------------
 !      INTEGER 
 !      DOUBLE PRECISION 
@@ -4433,7 +4437,7 @@ C
         do i = 1, NUMIRRDIVERSIONSP
           iseg = IRRSEG(i)        
           !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
-            Diversions(ISEG) = SEG(2,iseg)*DELT
+            agDemand(ISEG) = SEG(2,iseg)*DELT
           !END IF
         END DO
 C
@@ -4497,6 +4501,7 @@ C8------RETURN.
       DEALLOCATE(NUMIRRDIVERSIONSP)
       DEALLOCATE(MAXCELLSDIVERSION)
       DEALLOCATE(DEMAND)
+      DEALLOCATE(DEMANDPOT)
       DEALLOCATE(ACTUAL)
       DEALLOCATE(ACTUALOLD)
       DEALLOCATE(SUPACT)

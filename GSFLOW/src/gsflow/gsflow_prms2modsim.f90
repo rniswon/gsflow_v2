@@ -5,7 +5,7 @@
       IMPLICIT NONE
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODSIM'
-      character(len=14), SAVE :: MODNAME = 'gsflow_prms2modsim'
+      character(len=*), parameter :: MODNAME = 'gsflow_prms2modsim'
       character(len=*), parameter :: Version_gsflow_prms2modsim = '2021-11-30'
       DOUBLE PRECISION, SAVE :: Acre_inches_to_MSl3
 !   Declared Variables
@@ -17,10 +17,10 @@
 !     Mapping module to convert PRMS states for use by MODSIM
 !     ******************************************************************
       INTEGER FUNCTION gsflow_prms2modsim(EXCHANGE,DELTAVOL,LAKEVAP)
-	  USE PRMS_CONSTANTS, ONLY: ACTIVE, SAVE_INIT, RUN, DECL, INIT
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, SAVE_INIT, RUN, DECL, INIT
       USE PRMS_MODULE, ONLY: Process_flag, Nlake, Nsegment
       USE GSFPRMS2MODSIM
-	  use prms_utils, only: print_module
+      use prms_utils, only: print_module
       IMPLICIT NONE
 ! Arguments
       DOUBLE PRECISION, INTENT(OUT) :: EXCHANGE(Nsegment), DELTAVOL(Nlake), LAKEVAP(Nlake)
@@ -48,9 +48,9 @@
       USE PRMS_MODULE, ONLY: Nsegment, Nlake, Hru_type
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Lake_hru_id
       use PRMS_MMFAPI, only: declvar_dble
-	  use prms_utils, only: read_error
+      use prms_utils, only: read_error
       IMPLICIT NONE
-	  ! Functions
+      ! Functions
       INTRINSIC :: ABS, DBLE
       ! Local Variables
       INTEGER :: i, ii, ierr
@@ -172,5 +172,5 @@
         DELTAVOL(i) = Lake_In_flow(i) * Acre_inches_to_MSl3 ! m3 / day
         LAKEVAP(i) = Lake_et(i) / Lake_area(i) ! inches / day
       ENDDO
- 
+
       END FUNCTION prms2modsimrun

@@ -320,7 +320,7 @@
      &                         Tmaxf(i), Tminf(i), Pptmix(i), Newsnow(i), &
      &                         Prmx(i), Tmax_allrain_f(i,Nowmonth), &
      &                         Rain_cbh_adj(i,Nowmonth), Snow_cbh_adj(i,Nowmonth), &
-     &                         Adjmix_rain(i,Nowmonth), harea, sum_obs, Tmax_allsnow_f(i,Nowmonth))
+     &                         Adjmix_rain(i,Nowmonth), harea, sum_obs, Tmax_allsnow_f(i,Nowmonth), i)
             ELSEIF ( Hru_ppt(i)<0.0 ) THEN
               PRINT *, 'ERROR, negative precipitation value entered in CBH File, HRU:', i
               ierr = 1

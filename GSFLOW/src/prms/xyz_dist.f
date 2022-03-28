@@ -1150,7 +1150,7 @@
      +           Hru_snow(i), Tmaxf(i), Tminf(i), Pptmix(i),
      +           Newsnow(i), Prmx(i), Tmax_allrain_f(i,Nowmonth), 1.0,
      +           1.0, Adjmix_rain(i,Nowmonth), Hru_area(i), sum_obs,
-     +           Tmax_allsnow_f(i,Nowmonth))
+     +           Tmax_allsnow_f(i,Nowmonth), i)
 
           ENDIF
         ENDIF

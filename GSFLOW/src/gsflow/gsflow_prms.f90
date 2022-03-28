@@ -73,7 +73,7 @@
       IF ( Process_flag==RUN ) THEN
         IF ( Model==MODSIM_MODFLOW ) THEN
           IF ( .NOT. MS_GSF_converge ) THEN
-            CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold)  !SOLVE GW SW EQUATIONS FOR MODSIM-MODFLOW ITERATION
+            CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold, agDemand)  !SOLVE GW SW EQUATIONS FOR MODSIM-MODFLOW ITERATION
           ELSE !IF( MS_GSF_converge ) THEN
             CALL MFNWT_OCBUDGET()
           ENDIF
@@ -235,7 +235,7 @@
             ENDIF
           ENDIF
 
-          CALL MFNWT_INIT(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, NSegshold, Nlakeshold)
+          CALL MFNWT_INIT(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, NSegshold, Nlakeshold, agDemand)
           IF ( Have_lakes==ACTIVE .AND. Nlake/=NLAKES_MF ) THEN
             PRINT *, 'ERROR, NLAKES not equal to Nlake'
             PRINT *, '       NLAKES=', NLAKES_MF, '; Nlake=', Nlake
@@ -288,7 +288,7 @@
         Lake_add_water_use = OFF
         Lake_transfer_water_use = OFF
         ! Note, MODFLOW-only doesn't leave setdims
-        CALL setdims(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold) ! if MODFLOW only the execution stops in setdims
+        CALL setdims(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold, agDemand) ! if MODFLOW only the execution stops in setdims
 
         IF ( Model==MODSIM_MODFLOW .OR. Model==MODSIM ) RETURN
 
@@ -483,7 +483,7 @@
       ENDIF
 
 ! for PRMS-only and MODSIM-PRMS simulations
-      IF ( Model==PRMS .OR. Model==MODSIM_PRMS ) THEN
+      IF ( Model==PRMS .OR. Model==MODSIM_PRMS .OR. Model>=WRITE_CLIMATE ) THEN
         IF ( AG_flag==ACTIVE ) THEN
           ierr = soilzone_ag(AFR)
         ELSE
@@ -531,7 +531,7 @@
 
         IF ( Process_flag==RUN ) THEN
           IF ( .NOT. MS_GSF_converge ) THEN
-            CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold)  !SOLVE GW SW EQUATIONS FOR MODSIM-GSFLOW ITERATION
+            CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold, agDemand)  !SOLVE GW SW EQUATIONS FOR MODSIM-GSFLOW ITERATION
           ENDIF
 
 ! The following modules are in the MODFLOW iteration loop
@@ -684,7 +684,7 @@
 !***********************************************************************
 !     declare the dimensions
 !***********************************************************************
-      SUBROUTINE setdims(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold)
+      SUBROUTINE setdims(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold, agDemand)
       USE PRMS_CONSTANTS, ONLY: ERROR_control
       use PRMS_CONTROL_FILE, only: get_control_arguments, read_control_file, control_integer, control_integer_array, control_string !, control_file_name
       USE PRMS_MODULE
@@ -700,7 +700,8 @@
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(Nsegshold),   &
      &                                   DELTAVOL(Nlakeshold),  &
-     &                                   LAKEVOL(Nlakeshold)
+     &                                   LAKEVOL(Nlakeshold),   &
+     &                                   agDemand(Nsegshold)
 ! Functions
       EXTERNAL :: check_module_names
 ! Local Variables
@@ -756,6 +757,7 @@
       ELSEIF ( Model_mode(:14)=='MODSIM-MODFLOW' ) THEN
         Model = MODSIM_MODFLOW
         PRMS_flag = OFF
+        PRMS4_flag = OFF
         MODSIM_flag = ACTIVE
       ELSEIF ( Model_mode(:11)=='MODSIM-PRMS' ) THEN
         Model = MODSIM_PRMS
@@ -765,6 +767,7 @@
         Model = MODSIM
         PRMS_flag = OFF
         MODSIM_flag = ACTIVE
+        PRMS4_flag = OFF
       ELSE
         PRMS_flag = ACTIVE
         PRMS_only = ACTIVE
@@ -840,14 +843,14 @@
         mf_nowtime = startday
         test = gsfdecl()
         IF ( test/=0 ) CALL module_error(MODNAME, 'declare', test)
-        CALL MFNWT_INIT(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold)
+        CALL MFNWT_INIT(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold, agDemand)
         PRINT *, ' '
         IF ( Model==MODSIM_MODFLOW ) RETURN
         If ( ISSFLG(Kper_mfo) == 1 .and. nper == 1) THEN
         ELSE
           DO WHILE ( Kper_mfo<=Nper )
 !            IF ( mf_nowtime>endday ) EXIT
-            CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold)            ! ITERATE TO SOLVE GW-SW SOLUTION FOR SS
+            CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold, agDemand)            ! ITERATE TO SOLVE GW-SW SOLUTION FOR SS
             CALL MFNWT_OCBUDGET()          ! CALCULATE BUDGET
             IF ( mf_timestep==NSTP(Kper_mfo) ) THEN
               Kper_mfo = Kper_mfo + 1

@@ -1511,14 +1511,16 @@
 !***********************************************************************
       SUBROUTINE precip_form(Precip, Hru_ppt, Hru_rain, Hru_snow, Tmaxf, &
      &           Tminf, Pptmix, Newsnow, Prmx, Tmax_allrain_f, Rain_adj, &
-     &           Snow_adj, Adjmix_rain, Hru_area, Sum_obs, Tmax_allsnow_f)
-      USE PRMS_CONSTANTS, ONLY: NEARZERO
+     &           Snow_adj, Adjmix_rain, Hru_area, Sum_obs, Tmax_allsnow_f, Ihru)
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, DEBUG_less
+      USE PRMS_MODULE, ONLY: forcing_check_flag, Print_debug
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       use prms_utils, only: print_date
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, DBLE
 ! Arguments
+      INTEGER, INTENT(IN) :: Ihru
       REAL, INTENT(IN) :: Tmax_allrain_f, Tmax_allsnow_f, Rain_adj, Snow_adj
       REAL, INTENT(IN) :: Adjmix_rain, Tmaxf, Tminf, Hru_area
       DOUBLE PRECISION, INTENT(INOUT) :: Sum_obs
@@ -1574,6 +1576,16 @@
       Basin_ppt = Basin_ppt + DBLE( Hru_ppt*Hru_area )
       Basin_rain = Basin_rain + DBLE( Hru_rain*Hru_area )
       Basin_snow = Basin_snow + DBLE( Hru_snow*Hru_area )
+
+      IF ( forcing_check_flag == ACTIVE ) THEN
+        IF ( Hru_ppt < 0.0 .OR. Hru_rain < 0.0 .OR. Hru_ppt < 0.0 ) THEN
+          IF ( Print_debug > DEBUG_less ) THEN
+            PRINT '(A,I0)', 'Warning, adjusted precipitation value(s) < 0.0 for HRU: ', Ihru
+            PRINT '(A,F0.4,A,F0.4,A)', '         hru_ppt: ', Hru_ppt, ' hru_rain: ', Hru_rain, ' hru_snow: ', Hru_snow
+            CALL print_date(0)
+          ENDIF
+        ENDIF
+      ENDIF
 
       END SUBROUTINE precip_form
 

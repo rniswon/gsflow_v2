@@ -32,10 +32,10 @@
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
      &    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, Tavgc
-      use prms_utils, only: find_current_time, find_header_end, print_date, print_module, read_error
+      use prms_utils, only: find_current_time, find_header_end, print_module, read_error
 ! Functions
       INTRINSIC :: SNGL
-      EXTERNAL :: precip_form, temp_set, read_cbh_date
+      EXTERNAL :: temp_set, read_cbh_date
 ! Local Variables
       INTEGER :: yr, mo, dy, i, hr, mn, sec, ierr, ios, j, kg, kh, istop
       REAL :: tmax_hru, tmin_hru, harea
