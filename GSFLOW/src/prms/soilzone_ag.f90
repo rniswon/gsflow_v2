@@ -1296,6 +1296,7 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
       slowstor = 0.0D0
       aginterflow = 0.0D0
       ag_gvrstor = 0.0D0
+      depth_ag = 0.0
       DO j = 1, Hru_gvr_count(Ihru)
         igvr = Hru_gvr_index(j, Ihru)
         frac = Gvr_hru_pct_adjusted(igvr)
