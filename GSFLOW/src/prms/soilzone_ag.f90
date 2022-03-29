@@ -308,7 +308,7 @@
 
       ALLOCATE ( Ag_soil2gw_max(Nhru) )
       IF ( declparam(MODNAME, 'ag_soil2gw_max', 'nhru', 'real', &
-     &     '-1.0', '0.0', '5.0', &
+     &     '-1.0', '-1.0', '5.0', &
      &     'Maximum value for agriculture capillary reservoir excess to groundwater storage', &
      &     'Maximum amount of the agriculture capillary reservoir excess that'// &
      &     ' is routed directly to the groundwater storage for each HRU', &
