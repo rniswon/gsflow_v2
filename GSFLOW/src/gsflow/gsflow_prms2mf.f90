@@ -6,7 +6,7 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2021-12-09'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2022-04-07'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -19,7 +19,7 @@
 !     INTEGER, SAVE, ALLOCATABLE :: Reach_id(:,:)
       REAL, SAVE, ALLOCATABLE :: Gw_rejected_grav(:)
 !     DOUBLE PRECISION, SAVE, ALLOCATABLE :: Reach_latflow(:)
-      REAL, SAVE, ALLOCATABLE :: Cell_drain_rate(:)
+      REAL, SAVE, ALLOCATABLE :: Cell_drain_rate(:), finf_cell(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Segment_pct_area(:)
 !   Declared Parameters
 !     INTEGER, SAVE, ALLOCATABLE :: Local_reachid(:)
@@ -88,6 +88,11 @@
       CALL declvar_real(MODNAME, 'cell_drain_rate', 'ngwcell', Ngwcell, &
      &     'Recharge rate for each cell', &
      &     'L/T', Cell_drain_rate)
+
+      ALLOCATE ( finf_cell(Ngwcell) )
+      CALL declvar_real(MODNAME, 'finf_cell', 'ngwcell', Ngwcell, &
+     &     'Drainage from soilzone to each MODFLOW cell', &
+     &     'L3/T', finf_cell)
 
       CALL declvar_dble(MODNAME, 'basin_reach_latflow', 'one', 1, &
      &     'Lateral flow into all reaches in basin', &
@@ -284,6 +289,7 @@
 !      STOP
 
       Cell_drain_rate = 0.0 ! dimension ngwcell
+      finf_cell = 0.0 ! dimension ngwcell
 
       ierr = 0
       IF ( Nhru/=Nhrucell ) THEN
@@ -450,6 +456,7 @@
 !-----------------------------------------------------------------------
       PETRATE = 0.0 ! should just be active cells
       Cell_drain_rate = 0.0 ! should just be active cells
+      finf_cell = 0.0
       Gw_rejected_grav = Sm2gw_grav ! assume all is rejected to start with
       is_draining = 0
 
@@ -598,7 +605,7 @@
 ! Bin percolation to reduce waves
 !***********************************************************************
       SUBROUTINE Bin_percolation()
-      USE GSFPRMS2MF, ONLY: Excess, Cell_drain_rate, Net_sz2gw
+      USE GSFPRMS2MF, ONLY: Excess, Cell_drain_rate, Net_sz2gw, finf_cell
       USE GSFMODFLOW, ONLY: Cellarea, Gwc_row, Gwc_col !, Mft_to_days
       USE GWFUZFMODULE, ONLY: FINF, VKS, FBINS, IUZFBND, NUZTOP, SURFDEP
       USE GLOBAL, ONLY: HNEW, BOTM
@@ -663,6 +670,7 @@
 !-----------------------------------------------------------------------
           Excess(icell) = (finfprms - finf_temp)
           FINF(icol, irow) = finf_temp
+          finf_cell(icell) = finf_temp*Cellarea(icell)
           Net_sz2gw = Net_sz2gw + finf_temp*Cellarea(icell)
         ENDIF
       ENDDO
