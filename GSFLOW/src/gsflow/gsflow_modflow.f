@@ -430,7 +430,7 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
-     &    ERROR_time, ERROR_modflow, MODSIM_GSFLOW
+     &    ERROR_time, ERROR_modflow, MODSIM_GSFLOW, GSFLOW
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, no_snow_flag,
      &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
      &    PRMS_land_iteration_flag,
@@ -645,7 +645,10 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
 !     1                              IUNIT(44),IUNIT(52),IUNIT(55),IGRID)
 
 !  Call the PRMS modules that need to be inside the iteration loop
-            IF ( Szcheck==ACTIVE .and. kkiter == 1 ) THEN
+!            IF ( Szcheck==ACTIVE ) THEN
+            IF ( (Szcheck==ACTIVE .AND. Model==GSFLOW) .OR.
+     1           (Szcheck==ACTIVE .AND. kkiter==1 .AND.
+     2            Model==MODSIM_GSFLOW) ) THEN
               IF ( PRMS_land_iteration_flag==1 ) THEN
                 retval = intcp()
                 IF ( retval/=0 ) THEN
@@ -704,7 +707,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
      2                              IUNIT(55),IGRID)   !cjm (added IUNIT(8))
             IF(IUNIT(66).GT.0 )
      1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
-            IF ( Szcheck==ACTIVE .AND. Model>=MODSIM_GSFLOW ) THEN
+            IF ( Szcheck==ACTIVE .AND. Model==MODSIM_GSFLOW ) THEN
               IF ( PRMS_land_iteration_flag==1 ) THEN
                 retval = intcp()
                 IF ( retval/=0 ) THEN
