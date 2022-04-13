@@ -3264,7 +3264,7 @@
      +                    aetold, supold, sup
       integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
-      double precision :: set_factor !, etdif
+      double precision :: set_factor, etdif
       INTRINSIC :: ABS
 ! --------------------------------------------------
 !
@@ -3325,13 +3325,13 @@
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
   
-  !      if(iseg==19)then
-  !      etdif = pettotal - aettotal
-  !        write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),
-  !   +                 SUPACT(iseg),etdif,RMSESW(ISEG),zerod2*pettotal,
-  !   +                 AGCONVERGE
-  !      endif
-  !33  format(4i5,5e20.10,i5)
+        if(iseg==19)then
+        etdif = pettotal - aettotal
+          write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),
+     +                 SUPACT(iseg),etdif,RMSESW(ISEG),zerod2*pettotal,
+     +                 AGCONVERGE
+        endif
+  33  format(4i5,5e20.10,i5)
 300   continue
       return
       end subroutine demandconjunctive_prms
