@@ -1,4 +1,4 @@
-PRMS_IV
+Apalachicola-Chattahoochee-Flint (ACF) River Basin PRMS example model
 ####
 print_debug
 1
@@ -88,12 +88,12 @@ climate_hru
 executable_desc
 1
 4
-PRMS 5.1.0
+GSFLOW 2.2.1
 ####
 executable_model
 1
 4
-../../bin/prms
+../../bin/gsflow
 ####
 initial_deltat
 1
@@ -192,11 +192,6 @@ statsON_OFF
 1
 1
 1
-####
-stats_output_file
-1
-4
-./output/stats.out
 ####
 strmflow_module
 1
@@ -301,7 +296,7 @@ external_transferON_OFF
 external_transfer_file
 1
 4
-./Input/sw_returns.wu
+./input/sw_returns.wu
 ####
 segment_transferON_OFF
 1
@@ -311,4 +306,4 @@ segment_transferON_OFF
 segment_transfer_file
 1
 4
-./Input/sw_withdrawals.wu
+./input/sw_withdrawals.wu

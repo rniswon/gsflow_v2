@@ -285,7 +285,7 @@ hru_actet
 print_debug
 1
 1
--1
+0
 ####
 initial_deltat
 1
@@ -416,6 +416,11 @@ prms_warmup
 0
 ####
 soilzone_aet_flag
+1
+1
+1
+####
+forcing_check_flag
 1
 1
 1

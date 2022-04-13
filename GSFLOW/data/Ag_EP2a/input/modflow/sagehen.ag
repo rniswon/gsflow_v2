@@ -4,7 +4,7 @@ etdemand 10.0
 irrigation_diversion 2 20
 supplemental_well 34 1 
 irrigation_well 34 1 
-tabfileswell 1 10075
+tabfiles 1 10075
 maxwells 34  
 diversionlist -2 
 welllist -2

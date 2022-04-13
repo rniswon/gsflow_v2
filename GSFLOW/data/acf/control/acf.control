@@ -3,12 +3,12 @@ Apalachicola-Chattahoochee-Flint (ACF) River Basin PRMS example model
 executable_desc
 1
 4
-PRMS 5.1.0 Release
+GSFLOW 2.2.1 Release
 ####
 executable_model
 1
 4
-..\..\bin\prms
+..\..\bin\gsflow
 ####
 model_mode
 1

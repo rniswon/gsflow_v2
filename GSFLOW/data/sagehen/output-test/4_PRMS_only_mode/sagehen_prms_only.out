@@ -1,6 +1,33 @@
+====================================================================
+Using PRMS Parameter File: ..\input\prms\prms.params
+Description: Sagehen Parameter File with 128 HRUs, 201 reaches, segments, cascading flow
+====================================================================
+Comment lines:
+Version: 1.7
+====================================================================
+Using dimensions    number
+nrain                  2
+ncascade             317
+nsegment              15
+ntemp                  2
+ngw                  128
+ncascdgw             317
+nreach               201
+nobs                   1
+nhru                 128
+nssr                 128
+ngwcell             5913
+nhrucell            4691
+ndepl                  2
+ndeplval              22
+nsub                   2
+one                    1
+nmonths               12
+ndays                366
+====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 06/22/2021
+                       Version 5.3.0 03/01/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -20,14 +47,14 @@ Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Interception: intcp
 Snow & Glacr Dynam: snowcomp, glacr_melt
     Surface Runoff: srunoff_smidx, srunoff_carea
-         Soil Zone: soilzone
+         Soil Zone: soilzone, soilzone_ag
        Groundwater: gwflow
 Streamflow Routing: strmflow, strmflow_in_out, muskingum,
                     muskingum_lake, muskingum_mann
 Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
-                    basin_summary, nsegment_summary
+                    basin_summary, nsegment_summary, statvar_out
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
@@ -36,29 +63,60 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-06-22
-Basin Definition                basin               2021-06-21
-Cascading Flow                  cascade             2021-05-06
-Common States and Fluxes        climateflow         2021-05-24
-Potential Solar Radiation       soltab              2020-12-02
-Timestep Control                prms_time           2021-05-25
-Time Series Data                obs                 2020-12-02
-Temperature Distribution        temp_1sta           2020-12-02
-Precipitation Distribution      precip_1sta         2020-12-02
-Solar Radiation Distribution    ddsolrad            2020-12-02
-Transpiration Distribution      transp_tindex       2020-12-02
-Potential Evapotranspiration    potet_jh            2020-08-03
-Canopy Interception             intcp               2021-05-06
-Snow Dynamics                   snowcomp            2021-01-11
-Surface Runoff                  srunoff_smidx       2021-05-27
-Soilzone Computations           soilzone            2021-06-07
-Groundwater                     gwflow              2021-05-06
-Streamflow Routing Init         routing             2021-05-06
-Streamflow Routing              strmflow_in_out     2020-08-03
-Output Summary                  basin_sum           2021-05-06
-Output Summary                  subbasin            2021-05-06
-Output Summary                  nhru_summary        2021-05-06
-Output Summary                  basin_summary       2021-05-10
+PRMS Computation Order          gsflow_prms         2022-03-01
+Read Control File               read_control_file   2022-02-23
+Read Parameter File             read_parameter_file 2022-01-12
+Read Data File                  read_data_file      2022-01-12
+
+
+====================================================================
+Using PRMS Data File: ..\input\prms\sagehen.data
+Title: Sagehen Data File: Independence Lake and Sagehen Creek data staions
+====================================================================
+Comment lines:
+// tmax stations are:
+//   INDEPENDENCE LAKE
+//   SAGEHEN CREEK
+// tmin stations are:
+//   INDEPENDENCE LAKE
+//   SAGEHEN CREEK
+// precip stations are:
+//   INDEPENDENCE LAKE
+//   SAGEHEN CREEK
+// runoff value is:
+//   10343500 	SAGEHEN C NR TRUCKEE C
+====================================================================
+measured variables
+tmax 2
+tmin 2
+precip 2
+runoff 1
+====================================================================
+ Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
+Simulation time period: 1980/10/01 00:00:00 to 1996/09/30 00:00:00
+====================================================================
+Basin Definition                basin               2022-02-10
+Cascading Flow                  cascade             2021-11-19
+Common States and Fluxes        climateflow         2022-02-18
+Potential Solar Radiation       soltab              2021-09-07
+Time Series Data                obs                 2022-01-12
+Timestep Control                prms_time           2021-11-19
+Temperature Distribution        temp_1sta           2021-11-19
+Precipitation Distribution      precip_1sta         2022-02-18
+Solar Radiation Distribution    ddsolrad            2021-11-19
+Transpiration Distribution      transp_tindex       2021-09-07
+Potential Evapotranspiration    potet_jh            2021-11-19
+Canopy Interception             intcp               2022-02-03
+Snow Dynamics                   snowcomp            2022-02-18
+Surface Runoff                  srunoff_smidx       2022-02-10
+Soilzone Computations           soilzone            2022-02-04
+Groundwater                     gwflow              2021-12-16
+Streamflow Routing Init         routing             2022-02-04
+Streamflow Routing              strmflow_in_out     2020-11-19
+Output Summary                  basin_sum           2022-01-12
+Output Summary                  subbasin            2022-01-25
+Output Summary                  nhru_summary        2021-11-23
+Output Summary                  basin_summary       2021-11-19
 ==============================================================
 
 Using Control File: .\prms.control
@@ -80,24 +138,24 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
                   (inches) (inches) (inches) (inches) (inches)
  -------------------------------------------------------------
  initial                               3.100
-   1981             27.189   19.021    4.320    6.948    6.181
-   1982             76.778   29.335   12.413   39.350   36.819
-   1983             64.524   30.750   12.133   34.054   38.374
-   1984             52.146   30.059   10.297   23.922   26.168
-   1985             29.538   21.718    7.301   10.815   11.260
-   1986             60.447   29.521   10.892   27.334   27.044
-   1987             17.887   16.248    5.119    7.412    6.438
-   1988             21.214   17.024    3.578    5.731    4.140
-   1989             43.851   25.427    6.628   15.374   12.683
-   1990             29.970   22.996    6.279    7.323    6.491
-   1991             25.841   21.938    4.160    6.023    5.574
-   1992             21.591   15.636    3.722    6.392    3.847
-   1993             55.061   27.287    7.489   24.007   18.886
-   1994             20.340   16.073    5.379    6.377    4.182
-   1995             69.736   29.709    8.423   36.984   29.493
-   1996             52.824   25.455    9.262   26.529   22.769
+   1981             27.189   19.068    4.270    6.951    6.181
+   1982             76.778   29.393   12.425   39.230   36.819
+   1983             64.524   31.232   12.109   33.608   38.374
+   1984             52.146   30.129   10.188   23.938   26.168
+   1985             29.538   21.654    7.271   10.801   11.260
+   1986             60.447   28.780   10.553   28.384   27.044
+   1987             17.887   15.674    5.118    7.648    6.438
+   1988             21.214   17.018    3.583    5.731    4.140
+   1989             43.851   25.299    6.349   15.786   12.683
+   1990             29.970   23.055    6.013    7.251    6.491
+   1991             25.841   21.757    4.058    6.039    5.574
+   1992             21.591   15.507    3.677    6.465    3.847
+   1993             55.061   27.463    6.868   24.407   18.886
+   1994             20.340   15.535    5.026    6.648    4.182
+   1995             69.736   29.135    8.176   37.451   29.493
+   1996             52.824   24.873    9.202   26.925   22.769
  *************************************************************
- Total for run     668.938  378.199    9.262  284.576  260.348
+ Total for run     668.938  375.572    9.202  287.264  260.348
  *************************************************************
-Execution elapsed time    0 minutes  1.85 seconds
+Execution elapsed time    0 minutes  1.31 seconds
 

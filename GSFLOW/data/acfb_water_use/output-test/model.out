@@ -1,6 +1,28 @@
+====================================================================
+Using PRMS Parameter File: ./input/params
+Description: ACF coarse-resolution model 2/2/2011
+====================================================================
+Comment lines:
+Flow substitution applied
+====================================================================
+Using dimensions    number
+nmonths               12
+nssr                  27
+ndays                366
+nsegment              12
+one                    1
+ndepl                  2
+nobs                   6
+ndeplval              22
+nhru                  27
+ngw                   27
+nwateruse            100
+nexternal             10
+npoigages              6
+====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 06/22/2021
+                       Version 5.3.0 03/01/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -20,14 +42,14 @@ Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Interception: intcp
 Snow & Glacr Dynam: snowcomp, glacr_melt
     Surface Runoff: srunoff_smidx, srunoff_carea
-         Soil Zone: soilzone
+         Soil Zone: soilzone, soilzone_ag
        Groundwater: gwflow
 Streamflow Routing: strmflow, strmflow_in_out, muskingum,
                     muskingum_lake, muskingum_mann
 Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
-                    basin_summary, nsegment_summary
+                    basin_summary, nsegment_summary, statvar_out
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
@@ -36,31 +58,61 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2021-06-22
-Basin Definition                basin               2021-06-21
-Common States and Fluxes        climateflow         2021-05-24
-Potential Solar Radiation       soltab              2020-12-02
-Timestep Control                prms_time           2021-05-25
-Time Series Data                obs                 2020-12-02
-Time Series Data                water_use_read      2021-05-10
-Temperature Distribution        climate_hru         2021-05-27
-Precipitation Distribution      climate_hru         2021-05-27
-Solar Radiation Distribution    climate_hru         2021-05-27
-Potential Evapotranspiration    climate_hru         2021-05-27
-Transpiration Distribution      transp_tindex       2020-12-02
-Canopy Interception             intcp               2021-05-06
-Snow Dynamics                   snowcomp            2021-01-11
-Surface Runoff                  srunoff_smidx       2021-05-27
-Soilzone Computations           soilzone            2021-06-07
-Groundwater                     gwflow              2021-05-06
-Streamflow Routing Init         routing             2021-05-06
-Streamflow Routing              muskingum           2020-12-02
-Output Summary                  basin_sum           2021-05-06
-Output Summary                  nhru_summary        2021-05-06
-Output Summary                  prms_summary        2021-05-06
+PRMS Computation Order          gsflow_prms         2022-03-01
+Read Control File               read_control_file   2022-02-23
+Read Parameter File             read_parameter_file 2022-01-12
+Read Data File                  read_data_file      2022-01-12
+
+
+====================================================================
+Using PRMS Data File: ./input/data
+Title: Written by class gov.usgs.trinli.ft.point.writer.PrmsWriter
+====================================================================
+Comment lines:
+////////////////////////////////////////////////////////////
+// Station metadata (listed in the same order as the data):
+// ID				Type	Latitude	Longitude	Elevation
+// 02330450			runoff	34.7008		-83.7289		427.9514
+// 02331600			runoff	34.5407		-83.6228		343.976
+// 02333500			runoff	34.5281		-83.9397		343.9973
+// 02334430			runoff	34.1569		-84.0789		278.0081
+// 02334885			runoff	34.0323		-84.0894		277.3375
+// 02335000			runoff	33.9972		-84.2019		267.6754
+////////////////////////////////////////////////////////////
+// Unit: runoff = ft3 per sec, elevation = meters
+////////////////////////////////////////////////////////////
+====================================================================
+measured variables
+runoff 6
+====================================================================
+ Data File time period: 1950/01/01 00:00:00 to 1999/12/31 00:00:00
+Simulation time period: 1980/01/01 00:00:00 to 1999/12/31 00:00:00
+====================================================================
+Basin Definition                basin               2022-02-10
+Common States and Fluxes        climateflow         2022-02-18
+Potential Solar Radiation       soltab              2021-09-07
+Time Series Data                obs                 2022-01-12
+Timestep Control                prms_time           2021-11-19
+Time Series Data                water_use_read      2021-11-19
+Temperature Distribution        climate_hru         2021-11-19
+Precipitation Distribution      climate_hru         2021-11-19
+Solar Radiation Distribution    climate_hru         2021-11-19
+Potential Evapotranspiration    climate_hru         2021-11-19
+Transpiration Distribution      transp_tindex       2021-09-07
+Canopy Interception             intcp               2022-02-03
+Snow Dynamics                   snowcomp            2022-02-18
+Surface Runoff                  srunoff_smidx       2022-02-10
+Soilzone Computations           soilzone            2022-02-04
+Groundwater                     gwflow              2021-12-16
+Streamflow Routing Init         routing             2022-02-04
+Streamflow Routing              muskingum           2021-11-19
+Output Summary                  basin_sum           2022-01-12
+Output Summary                  nhru_summary        2021-11-23
+Statistics Variables Output     statvar_out         2021-09-08
+Output Summary                  prms_summary        2022-01-12
 ==============================================================
 
-Using Control File: .\Control\control
+Using Control File: .\control\control
 
 Using Parameter File: ./input/params
 
@@ -71,7 +123,7 @@ End time:   1999/12/31 00:00:00
 
 Model domain area:       749508.57    Active basin area:    749508.57
 Fraction impervious:        0.0310    Fraction pervious:       0.8664
-DPRST area:                   0.10    Fraction DPRST:          0.0000
+DPRST area:               76833.59    Fraction DPRST:          0.1025
 
 
 
@@ -103,5 +155,5 @@ DPRST area:                   0.10    Fraction DPRST:          0.0000
  *************************************************************
  Total for run    1110.775  507.968   10.154  622.340   13.445
  *************************************************************
-Execution elapsed time    0 minutes  1.61 seconds
+Execution elapsed time    0 minutes  1.08 seconds
 

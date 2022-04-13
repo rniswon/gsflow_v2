@@ -1,6 +1,6 @@
 # AG options
 options
-etdemand
+etdemand 10.0
 irrigation_well 6 1 
 maxwells 6  
 welllist -2
