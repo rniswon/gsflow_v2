@@ -2440,26 +2440,26 @@
       RMSEGW = szero
       RMSEPOND = szero
 !1 - ------RESET DEMAND IF IT CHANGES for MODSIM simulations
-      IF ( kkiter == 1 .and. IUNIT(44) > 0 ) Then
-        if ( NUMTAB_SFR > 0 ) DEMAND = 0.0
-        DO i = 1, NUMIRRDIVERSIONSP
-          iseg = IRRSEG(i)
-          if (iseg > 0 ) then
-               ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
-               ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
-               ! contains the TABFILE values at this point.
-            IF ( NUMTAB_SFR > 0 )  DEMAND(ISEG) = SEG(2, ISEG)
-            SUPACT(ISEG) = 0.0
-            ACTUAL(ISEG) = 0.0
-          end if
-        END DO
-      !2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
-        IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
-           DO i = 1, NUMSEGLIST
-              SEG(2, SEGLIST(i)) = szero
-           END DO
-        END IF
-      END IF
+      !IF ( kkiter == 1 .and. IUNIT(44) > 0 ) Then
+      !  if ( NUMTAB_SFR > 0 ) DEMAND = 0.0
+      !  DO i = 1, NUMIRRDIVERSIONSP
+      !    iseg = IRRSEG(i)
+      !    if (iseg > 0 ) then
+      !         ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
+      !         ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
+      !         ! contains the TABFILE values at this point.
+      !      IF ( NUMTAB_SFR > 0 )  DEMAND(ISEG) = SEG(2, ISEG)
+      !      SUPACT(ISEG) = 0.0
+      !      ACTUAL(ISEG) = 0.0
+      !    end if
+      !  END DO
+      !!2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
+      !  IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
+      !     DO i = 1, NUMSEGLIST
+      !        SEG(2, SEGLIST(i)) = szero
+      !     END DO
+      !  END IF
+      !END IF
       agconverge = 0
       IF ( kkiter > 2 ) agconverge = 1    
       DO L = 1, NUMIRRPOND
