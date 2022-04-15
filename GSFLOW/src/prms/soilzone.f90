@@ -79,12 +79,13 @@
 !***********************************************************************
 !     Main soilzone routine
 !***********************************************************************
-      INTEGER FUNCTION soilzone(AFR)
+      INTEGER FUNCTION soilzone(AFR,iter_flag)
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Arguments
       LOGICAL, INTENT(IN) :: AFR
+      INTEGER, INTENT(IN) :: iter_flag
 ! Functions
       INTEGER, EXTERNAL :: szdecl, szinit, szrun
       EXTERNAL :: soilzone_restart
@@ -92,7 +93,7 @@
       soilzone = 0
 
       IF ( Process_flag==RUN ) THEN
-        soilzone = szrun(AFR)
+        soilzone = szrun(AFR, iter_flag)
       ELSEIF ( Process_flag==DECL ) THEN
         soilzone = szdecl()
       ELSEIF ( Process_flag==INIT ) THEN
@@ -780,7 +781,7 @@
 !             interflow, excess routed to stream,
 !             and groundwater reservoirs
 !***********************************************************************
-      INTEGER FUNCTION szrun(AFR)
+      INTEGER FUNCTION szrun(AFR, iter_flag)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
@@ -810,6 +811,7 @@
       IMPLICIT NONE
 ! Arguments
       LOGICAL, INTENT(IN) :: AFR
+      INTEGER, INTENT(IN) :: iter_flag
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow
@@ -1378,7 +1380,7 @@
       ELSE
         pet = Avail_potet
       ENDIF
-      IF ( Avail_potet<NEARZERO ) THEN
+      IF ( Avail_potet<0.0 ) THEN
         Et_type = 1
         pet = 0.0
       ELSEIF ( Transp_on==OFF ) THEN
@@ -1397,7 +1399,7 @@
 
       IF ( Et_type>1 ) THEN
         pcts = Soil_moist/Soil_moist_max
-        IF ( pcts>0.9999 ) Soil_saturated = 1
+        IF ( pcts>0.9999999 ) Soil_saturated = 1
         pctr = 0.0
         IF ( Soil_rechr_max>0.0 ) pctr = Soil_rechr/Soil_rechr_max
         Potet_lower = pet

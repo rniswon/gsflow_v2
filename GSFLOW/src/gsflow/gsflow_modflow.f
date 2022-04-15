@@ -678,9 +678,9 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                 ENDIF
               ENDIF
               IF ( AG_flag==ACTIVE ) THEN
-                retval = soilzone_ag(AFR)
+                retval = soilzone_ag(AFR,1)
               ELSE
-                retval = soilzone(AFR)
+                retval = soilzone(AFR,1)
               ENDIF
               IF ( retval/=0 ) THEN
                 PRINT 9001, Soilzone_module, retval
@@ -735,9 +735,9 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                 ENDIF
               ENDIF
               IF ( AG_flag==ACTIVE ) THEN
-                retval = soilzone_ag(AFR)
+                retval = soilzone_ag(AFR,2)
               ELSE
-                retval = soilzone(AFR)
+                retval = soilzone(AFR,2)
               ENDIF
               IF ( retval/=0 ) THEN
                 PRINT 9001, Soilzone_module, retval

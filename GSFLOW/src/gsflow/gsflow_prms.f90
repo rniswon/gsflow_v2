@@ -485,9 +485,9 @@
 ! for PRMS-only and MODSIM-PRMS simulations
       IF ( Model==PRMS .OR. Model==MODSIM_PRMS .OR. Model>=WRITE_CLIMATE ) THEN
         IF ( AG_flag==ACTIVE ) THEN
-          ierr = soilzone_ag(AFR)
+          ierr = soilzone_ag(AFR,1)
         ELSE
-          ierr = soilzone(AFR)
+          ierr = soilzone(AFR,1)
         ENDIF
         IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
@@ -562,9 +562,9 @@
           ENDIF
 
           IF ( AG_flag==ACTIVE ) THEN
-            ierr = soilzone_ag(AFR)
+            ierr = soilzone_ag(AFR,1)
           ELSE
-            ierr = soilzone(AFR)
+            ierr = soilzone(AFR,1)
           ENDIF
           IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
@@ -590,9 +590,9 @@
 ! for MODSIM-PRMS simulations
       IF ( Model==MODSIM_PRMS .AND. .NOT.AFR ) THEN
         IF ( AG_flag==ACTIVE ) THEN
-          ierr = soilzone_ag(AFR)
+          ierr = soilzone_ag(AFR,1)
         ELSE
-          ierr = soilzone(AFR)
+          ierr = soilzone(AFR,1)
         ENDIF
         IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
@@ -1554,7 +1554,7 @@
       test = snowcomp()
       test = srunoff()
       test = glacr()
-      test = soilzone_ag(AFR)
+      test = soilzone_ag(AFR,1)
       test = gsflow_prms2mf()
       test = gsflow_mf2prms()
       test = gsflow_budget()

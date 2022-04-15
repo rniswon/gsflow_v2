@@ -10,6 +10,7 @@
         DOUBLE PRECISION, PARAMETER :: doneneg = -1.0d0
         DOUBLE PRECISION, PARAMETER :: zerod2 = 1.0d-2
         DOUBLE PRECISION, PARAMETER :: zerod3 = 1.0d-3
+        DOUBLE PRECISION, PARAMETER :: zerod4 = 1.0d-4
         DOUBLE PRECISION, PARAMETER :: dzero = 0.0d0
         INTEGER, SAVE, POINTER :: NWELLS, MXWELL, NWELVL, NPWEL, IPRWEL
         INTEGER, SAVE, POINTER :: IWELLCB, IRDPSI, NNPWEL, NAUXWELL
@@ -1637,9 +1638,12 @@
 			    DEMAND(ISEG) = SEG(2, ISEG)
 			 endif
                IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
-            end if
+               end if
             SUPACT(ISEG) = 0.0
             ACTUAL(ISEG) = 0.0
+            ACTUALOLD(ISEG) = 0.0
+            SUPACTOLD(ISEG) = 0.0
+            AETITERSW(ISEG) = 0.0
          END IF
       END DO
       ! update kperold to track new stress periods and set data accordingly
@@ -2439,6 +2443,11 @@
       RMSESW = szero
       RMSEGW = szero
       RMSEPOND = szero
+      IF ( kkiter == 1) THEN
+        ACTUALOLD(ISEG) = 0.0
+        SUPACTOLD(ISEG) = 0.0
+        AETITERSW(ISEG) = 0.0
+      END IF
 !1 - ------RESET DEMAND IF IT CHANGES for MODSIM simulations
       !IF ( kkiter == 1 .and. IUNIT(44) > 0 ) Then
       !  if ( NUMTAB_SFR > 0 ) DEMAND = 0.0
@@ -3294,6 +3303,11 @@
              icell = Gvr_cell_id(hru_id)
              irow = Gwc_row(icell)
              icol = Gwc_col(icell)
+!       if(kstp==15)then
+!          write(888,22)kiter,hru_id,aet,UZFETOUT(icol, irow)/DELT,
+!     +                GWET(icol, irow),pet-aet
+!       end if
+!22    format(2i5,4e20.10)
              uzet = UZFETOUT(icol, irow)/DELT
              aet = uzet + GWET(icol, irow) 
              aettotal = aettotal + aet
@@ -3306,7 +3320,7 @@
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
      +           supold, kper, kstp, kiter)
         RMSESW(ISEG) = SQRT((aetold - aettotal)**dtwo)
-        IF ( RMSESW(ISEG) > zerod3*pettotal ) AGCONVERGE = 0
+        IF ( RMSESW(ISEG) > zerod2*pettotal ) AGCONVERGE = 0
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + 
@@ -3315,23 +3329,22 @@
         !
         !1 - -----set diversion to demand
         !
-        SEG(2, iseg) = SUPACT(iseg)
+        DEMANDPOT(ISEG) = SUPACT(iseg)
         !
         !1 - -----limit diversion to water right
         !
         
-        IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)
-        DEMANDPOT(ISEG) = SEG(2, iseg)
+        IF (DEMANDPOT(ISEG) > demand(ISEG)) 
+     +      DEMANDPOT(ISEG) = demand(ISEG)
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
   
-        if(iseg==19)then
-        etdif = pettotal - aettotal
-          write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),
-     +                 SUPACT(iseg),etdif,RMSESW(ISEG),zerod2*pettotal,
-     +                 AGCONVERGE
-        endif
-  33  format(4i5,5e20.10,i5)
+  !      if(iseg==24.and.kstp==15)then
+  !      etdif = pettotal - aettotal
+  !        write(999,33)kper,kstp,kiter,iseg,sup,
+  !   +                 supold,aettotal,aetold
+  !      endif
+  !33  format(4i5,4e20.10)
 300   continue
       return
       end subroutine demandconjunctive_prms
@@ -4434,6 +4447,7 @@ C
 C
 C2------Set diversion demand from that calculated from AG.
 C 
+        agDemand = 0.0
         do i = 1, NUMIRRDIVERSIONSP
           iseg = IRRSEG(i)        
           !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
