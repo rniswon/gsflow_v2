@@ -50,7 +50,7 @@
      &    Transp_on, Basin_transp_on, Tmax_allsnow_f, Basin_humidity, Ppt_zero_thresh
       USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_SOLTAB, ONLY: Soltab_basinpotsw, Hru_cossl, Soltab_potsw
-      use prms_utils, only: find_current_time, find_header_end, print_date, print_module, read_error
+      use prms_utils, only: find_current_time, find_cbh_header_end, print_date, print_module, read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
@@ -511,7 +511,7 @@
           IF ( getparam_real(MODNAME, 'snow_cbh_adj', Nhru*MONTHS_PER_YEAR, Snow_cbh_adj)/=0 ) CALL read_error(2, 'snow_cbh_adj')
 
           IF ( control_string(Precip_day, 'precip_day')/=0 ) CALL read_error(5, 'precip_day')
-          CALL find_header_end(Precip_unit, Precip_day, 'precip_day', ierr, 1, Cbh_binary_flag)
+          CALL find_cbh_header_end(Precip_unit, Precip_day, 'precip_day', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
@@ -529,7 +529,7 @@
 
           IF ( control_string(Tmax_day, 'tmax_day')/=0 ) CALL read_error(5, 'tmax_day')
           IF ( control_string(Tmin_day, 'tmin_day')/=0 ) CALL read_error(5, 'tmin_day')
-          CALL find_header_end(Tmax_unit, Tmax_day, 'tmax_day', ierr, 1, Cbh_binary_flag)
+          CALL find_cbh_header_end(Tmax_unit, Tmax_day, 'tmax_day', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
@@ -539,7 +539,7 @@
               istop = 1
             ENDIF
           ENDIF
-          CALL find_header_end(Tmin_unit, Tmin_day, 'tmin_day', ierr, 1, Cbh_binary_flag)
+          CALL find_cbh_header_end(Tmin_unit, Tmin_day, 'tmin_day', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
@@ -555,7 +555,7 @@
           IF ( getparam_real(MODNAME, 'potet_cbh_adj', Nhru*MONTHS_PER_YEAR, Potet_cbh_adj)/=0 ) &
      &         CALL read_error(2, 'potet_cbh_adj')
           IF ( control_string(Potet_day, 'potet_day')/=0 ) CALL read_error(5, 'potet_day')
-          CALL find_header_end(Et_unit, Potet_day, 'potet_day', ierr, 1, Cbh_binary_flag)
+          CALL find_cbh_header_end(Et_unit, Potet_day, 'potet_day', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
@@ -569,7 +569,7 @@
 
         IF ( AET_cbh_flag==ACTIVE ) THEN
           IF ( control_string(AET_cbh_file, 'AET_cbh_file')/=0 ) CALL read_error(5, 'AET_cbh_file')
-          CALL find_header_end(AET_unit, AET_cbh_file, 'AET_cbh_file', ierr, 1, Cbh_binary_flag)
+          CALL find_cbh_header_end(AET_unit, AET_cbh_file, 'AET_cbh_file', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
@@ -583,7 +583,7 @@
 
         IF ( PET_cbh_flag==ACTIVE ) THEN
           IF ( control_string(PET_cbh_file, 'PET_cbh_file')/=0 ) CALL read_error(5, 'PET_cbh_file')
-          CALL find_header_end(PET_unit, PET_cbh_file, 'PET_cbh_file', ierr, 1, Cbh_binary_flag)
+          CALL find_cbh_header_end(PET_unit, PET_cbh_file, 'PET_cbh_file', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
@@ -597,7 +597,8 @@
 
         IF ( irrigated_area_flag==ACTIVE ) THEN
           IF ( control_string(irrigated_area_cbh_file, 'irrigated_cbh_file')/=0 ) CALL read_error(5, 'irrigated_area_cbh_file')
-          CALL find_header_end(irrigated_area_unit, irrigated_area_cbh_file, 'irrigated_area_cbh_file', ierr, 1, Cbh_binary_flag)
+          CALL find_cbh_header_end(irrigated_area_unit, irrigated_area_cbh_file, 'irrigated_area_cbh_file', ierr, 1, &
+                                   Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
@@ -611,7 +612,7 @@
 
         IF ( Climate_transp_flag==ACTIVE ) THEN
           IF ( control_string(Transp_day, 'transp_day')/=0 ) CALL read_error(5, 'transp_day')
-          CALL find_header_end(Transp_unit, Transp_day, 'transp_day', ierr, 1, Cbh_binary_flag)
+          CALL find_cbh_header_end(Transp_unit, Transp_day, 'transp_day', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
@@ -625,7 +626,7 @@
 
         IF ( Climate_swrad_flag==ACTIVE ) THEN
           IF ( control_string(Swrad_day, 'swrad_day')/=0 ) CALL read_error(5, 'swrad_day')
-          CALL find_header_end(Swrad_unit, Swrad_day, 'swrad_day', ierr, 1, Cbh_binary_flag)
+          CALL find_cbh_header_end(Swrad_unit, Swrad_day, 'swrad_day', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
@@ -640,7 +641,7 @@
         IF ( Humidity_cbh_flag==ACTIVE ) THEN
           IF ( control_string(Humidity_day, 'humidity_day')/=0 ) CALL read_error(5, 'humidity_day')
           ierr = 2 ! signals routine to ignore CBH file requirement and use a parameter
-          CALL find_header_end(Humidity_unit, Humidity_day, 'humidity_day', ierr, 1, Cbh_binary_flag)
+          CALL find_cbh_header_end(Humidity_unit, Humidity_day, 'humidity_day', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSEIF ( ierr==2 ) THEN
@@ -656,7 +657,7 @@
 
         IF ( Windspeed_cbh_flag==ACTIVE ) THEN
           IF ( control_string(Windspeed_day, 'windspeed_day')/=0 ) CALL read_error(5, 'windspeed_day')
-          CALL find_header_end(Windspeed_unit, Windspeed_day, 'windspeed_day', ierr, 1, Cbh_binary_flag)
+          CALL find_cbh_header_end(Windspeed_unit, Windspeed_day, 'windspeed_day', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
@@ -670,7 +671,7 @@
 
         IF ( Albedo_cbh_flag==ACTIVE ) THEN
           IF ( control_string(Albedo_day, 'albedo_day')/=0 ) CALL read_error(5, 'albedo_day')
-          CALL find_header_end(Albedo_unit, Albedo_day, 'albedo_day', ierr, 1, Cbh_binary_flag)
+          CALL find_cbh_header_end(Albedo_unit, Albedo_day, 'albedo_day', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE
@@ -684,7 +685,7 @@
 
         IF ( Cloud_cover_cbh_flag==ACTIVE ) THEN
           IF ( control_string(Cloud_cover_day, 'cloud_cover_day')/=0 ) CALL read_error(5, 'cloud_cover_day')
-          CALL find_header_end(Cloud_cover_unit, Cloud_cover_day, 'cloud_cover_day', ierr, 1, Cbh_binary_flag)
+          CALL find_cbh_header_end(Cloud_cover_unit, Cloud_cover_day, 'cloud_cover_day', ierr, 1, Cbh_binary_flag)
           IF ( ierr==1 ) THEN
             istop = 1
           ELSE

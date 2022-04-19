@@ -470,7 +470,7 @@
         IF ( Segment_transferON_OFF==ACTIVE ) THEN ! type STREAM
           IF ( control_string(Segment_transfer_file, 'segment_transfer_file')/=0 ) &
      &         CALL read_error(5, 'segment_transfer_file')
-          CALL find_header_end(segment_unit, Segment_transfer_file, 'segment_transfer_file', ierr, 0, 0)
+          CALL find_header_end(segment_unit, Segment_transfer_file, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(segment_unit, year, month, day, segment_next_year, segment_next_month, segment_next_day)
             Total_segment_transfer = 0.0D0
@@ -489,7 +489,7 @@
         IF ( Gwr_transferON_OFF==ACTIVE ) THEN ! type GROUNDWATER
           IF ( control_string(Gwr_transfer_file, 'gwr_transfer_file')/=0 ) &
      &         CALL read_error(5, 'gwr_transfer_file')
-          CALL find_header_end(gwr_unit, Gwr_transfer_file, 'gwr_transfer_file', ierr, 0, 0)
+          CALL find_header_end(gwr_unit, Gwr_transfer_file, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(gwr_unit, year, month, day, &
      &                                  gwr_next_year, gwr_next_month, gwr_next_day)
@@ -506,7 +506,7 @@
 
         IF ( Dprst_transferON_OFF==ACTIVE ) THEN ! type DPRST
           IF ( control_string(Dprst_transfer_file, 'dprst_transfer_file')/=0 ) CALL read_error(5, 'dprst_transfer_file')
-          CALL find_header_end(dprst_unit, Dprst_transfer_file, 'dprst_transfer_file', ierr, 0, 0)
+          CALL find_header_end(dprst_unit, Dprst_transfer_file, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(dprst_unit, year, month, day, dprst_next_year, dprst_next_month, dprst_next_day)
             Total_dprst_transfer = 0.0D0
@@ -525,7 +525,7 @@
         IF ( External_transferON_OFF==ACTIVE ) THEN ! type EXTRNAL
           IF ( control_string(External_transfer_file, 'external_transfer_file')/=0 ) &
      &         CALL read_error(5, 'external_transfer_file')
-          CALL find_header_end(external_unit, External_transfer_file, 'external_transfer_file', ierr, 0, 0)
+          CALL find_header_end(external_unit, External_transfer_file, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(external_unit, year, month, day, &
      &                                  external_next_year, external_next_month, external_next_day)
@@ -544,7 +544,7 @@
 
         IF ( Lake_transferON_OFF==ACTIVE ) THEN ! Type LAKE
           IF ( control_string(Lake_transfer_file, 'lake_transfer_file')/=0 ) CALL read_error(5, 'lake_transfer_file')
-          CALL find_header_end(lake_unit, Lake_transfer_file, 'lake_transfer_file', ierr, 0, 0)
+          CALL find_header_end(lake_unit, Lake_transfer_file, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(lake_unit, year, month, day, lake_next_year, lake_next_month, lake_next_day)
             Total_lake_transfer = 0.0D0

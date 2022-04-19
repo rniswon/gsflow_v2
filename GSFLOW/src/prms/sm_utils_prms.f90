@@ -96,9 +96,9 @@ contains
   end subroutine find_current_file_time
 
 !***********************************************************************
-!     Read File to line before data starts in file
+!   Read CBH File to line before data starts
 !***********************************************************************
-  module subroutine find_header_end(Iunit, Fname, Paramname, Iret, Cbh_flag, Cbh_binary_flag)
+  module subroutine find_cbh_header_end(Iunit, Fname, Paramname, Iret, Cbh_flag, Cbh_binary_flag)
     use PRMS_CONSTANTS, only: DEBUG_less
     use PRMS_MODULE, only: Nhru, Orad_flag, Print_debug
     implicit none
@@ -109,7 +109,6 @@ contains
     character(LEN=*), intent(IN) :: Fname, Paramname
     ! Functions
     intrinsic :: trim
-
     ! Local Variables
     integer :: i, ios, dim
     character(LEN=4) :: dum
@@ -179,6 +178,45 @@ contains
           end if
           if (Orad_flag == 1 .and. Paramname(:5) == 'swrad') read (Iunit, FMT='(A4)') dum ! read again as swrad CBH file contains orad as last column
           i = 1
+        end if
+      end do
+    end if
+
+    end subroutine find_cbh_header_end
+    
+!***********************************************************************
+! Read file to line before data starts
+!***********************************************************************
+  module subroutine find_header_end( Iunit, Fname, Iret )
+    use PRMS_CONSTANTS, only: DEBUG_less
+    implicit none
+    ! Argument
+    integer, intent(OUT) :: Iunit
+    integer, intent(INOUT) :: Iret
+    character(LEN=*), intent(IN) :: Fname
+    ! Functions
+    intrinsic :: trim
+    ! Local Variables
+    integer :: i, ios
+    character(LEN=4) :: dum
+    !***********************************************************************
+    Iret = 0
+    Iunit = get_ftnunit(6777)
+    open (Iunit, FILE=trim(Fname), STATUS='OLD', IOSTAT=ios)
+    if (ios /= 0) then
+      PRINT '(/,A,/,A,/,A)', 'ERROR reading file:', Fname, 'check to be sure the input file exists'
+      Iret = 1
+    else
+      ! read to line before data starts in each file
+      i = 0
+      do while (i == 0)
+        read (Iunit, FMT='(A4)', IOSTAT=ios) dum
+        if (ios /= 0) then
+          write (*, '(/,A,/,A,/,A)') 'ERROR reading file:', Fname, 'check to be sure the input file is in correct format'
+          Iret = 1
+          exit
+        elseif (dum == '####') then
+          exit
         end if
       end do
     end if

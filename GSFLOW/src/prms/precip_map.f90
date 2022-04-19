@@ -33,7 +33,7 @@
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Hru_rain, Hru_snow, Prmx, Pptmix, Newsnow, &
      &    Precip_units, Tmax_allrain_f, Adjmix_rain, Tmaxf, Tminf, &
      &    Basin_ppt, Basin_snow, Basin_rain, Basin_obs_ppt, Tmax_allsnow_f
-      use prms_utils, only: find_current_time, find_header_end, print_date, print_module, read_error
+      use prms_utils, only: find_current_time, find_cbh_header_end, print_date, print_module, read_error
 ! Functions
       INTRINSIC :: SNGL
       EXTERNAL :: precip_form, read_cbh_date
@@ -129,7 +129,7 @@
         IF ( getparam_real(MODNAME, 'precip_map_adj', Nmap*MONTHS_PER_YEAR, Precip_map_adj)/=0 ) &
      &       CALL read_error(2, 'precip_map_adj')
         IF ( control_string(Precip_map_file, 'precip_map_file')/=0 ) CALL read_error(5, 'precip_map_file')
-        CALL find_header_end(Precip_unit, Precip_map_file, 'precip_map_file', ierr, 1, 0)
+        CALL find_cbh_header_end(Precip_unit, Precip_map_file, 'precip_map_file', ierr, 1, 0)
         IF ( ierr==1 ) THEN
           istop = 1
         ELSE
