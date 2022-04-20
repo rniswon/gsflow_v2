@@ -261,7 +261,7 @@
      &      'decimal fraction', Dprst_vol_frac)
 
         ALLOCATE ( Dprst_vol_open_max(Nhru), Dprst_vol_clos_max(Nhru), Dprst_vol_thres_open(Nhru), Dprst_in(Nhru) )
-        IF ( PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_dprst_vol_open(Nhru), It0_dprst_vol_clos(Nhru) )
+        IF ( PRMS_land_iteration_flag==ACTIVE .OR. Ag_Package==ACTIVE ) ALLOCATE ( It0_dprst_vol_open(Nhru), It0_dprst_vol_clos(Nhru) )
       ENDIF
       IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
         ALLOCATE ( It0_imperv_stor(Nhru), It0_soil_moist(Nhru), It0_soil_rechr(Nhru) )
@@ -628,7 +628,7 @@
       INTEGER FUNCTION srunoffrun()
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF, DEBUG_WB, LAND, LAKE, GLACIER, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Call_cascade, &
-     &    Frozen_flag, Glacier_flag, PRMS_land_iteration_flag, Kkiter, AG_flag, Hru_type
+     &    Frozen_flag, Glacier_flag, PRMS_land_iteration_flag, Kkiter, AG_flag, Hru_type, Ag_Package
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, &
      &    Hru_perv, Hru_imperv, Hru_percent_imperv, Hru_frac_perv, &
@@ -654,11 +654,13 @@
       srunoffrun = 0
 
 ! It0 variables used with MODFLOW integration and PRMS iteration to save states.
-      IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+      IF ( PRMS_land_iteration_flag==ACTIVE .OR. Ag_Package==ACTIVE ) THEN
         IF ( Kkiter>1 ) THEN
-          Imperv_stor = It0_imperv_stor
-          Soil_moist = It0_soil_moist
-          Soil_rechr = It0_soil_rechr
+          IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+            Imperv_stor = It0_imperv_stor
+            Soil_moist = It0_soil_moist
+            Soil_rechr = It0_soil_rechr
+          ENDIF
           IF ( Dprst_flag==ACTIVE ) THEN
             Dprst_vol_open = It0_dprst_vol_open
             Dprst_vol_clos = It0_dprst_vol_clos
@@ -668,9 +670,11 @@
             Ag_soil_rechr = It0_ag_soil_rechr
           ENDIF
         ELSE
-          It0_imperv_stor = Imperv_stor
-          It0_soil_moist = Soil_moist
-          It0_soil_rechr = Soil_rechr
+          IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+            It0_imperv_stor = Imperv_stor
+            It0_soil_moist = Soil_moist
+            It0_soil_rechr = Soil_rechr
+          ENDIF
           IF ( Dprst_flag==ACTIVE ) THEN
             It0_dprst_vol_open = Dprst_vol_open
             It0_dprst_vol_clos = Dprst_vol_clos
