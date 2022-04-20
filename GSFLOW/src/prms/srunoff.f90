@@ -29,6 +29,7 @@
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_open_in(:), Dprst_total_open_out(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_clos_in(:), Dprst_total_clos_out(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
       REAL, SAVE, ALLOCATABLE :: Carea_dif(:), Imperv_stor_ante(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_stor_ante(:)
@@ -263,6 +264,7 @@
 
         ALLOCATE ( Dprst_vol_open_max(Nhru), Dprst_vol_clos_max(Nhru), Dprst_vol_thres_open(Nhru), Dprst_in(Nhru) )
         ALLOCATE ( Dprst_total_open_in(Nhru), Dprst_total_open_out(Nhru) )
+        ALLOCATE ( Dprst_total_clos_in(Nhru), Dprst_total_clos_out(Nhru) )
         IF ( PRMS_land_iteration_flag==ACTIVE .OR. Ag_Package==ACTIVE ) ALLOCATE ( It0_dprst_vol_open(Nhru), It0_dprst_vol_clos(Nhru) )
       ENDIF
       IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
@@ -828,6 +830,8 @@
           Dprst_in(i) = 0.0D0
           Dprst_total_open_in(i) = 0.0D0
           Dprst_total_open_out(i) = 0.0D0
+          Dprst_total_clos_in(i) = 0.0D0
+          Dprst_total_clos_out(i) = 0.0D0
           dprst_chk = OFF
           IF ( Dprst_area_max(i)>0.0 ) THEN
             dprst_chk = ACTIVE
@@ -1341,6 +1345,8 @@
       Dprst_in = 0.0D0
       Dprst_total_open_in = 0.0D0
       Dprst_total_open_out = 0.0D0
+      Dprst_total_clos_in = 0.0D0
+      Dprst_total_clos_out = 0.0D0
       Dprst_area_open = 0.0
       Dprst_area_clos = 0.0
       Dprst_stor_hru = 0.0D0
@@ -1441,7 +1447,7 @@
      &    Dprst_vol_thres_open, Dprst_vol_clos_max, Dprst_insroff_hru, Upslope_hortonian, &
      &    Basin_dprst_volop, Basin_dprst_volcl, Basin_dprst_evap, Basin_dprst_seep, Basin_dprst_sroff, &
      &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, Dprst_stor_hru, Hruarea_dble, &
-     &    Dprst_total_open_in, Dprst_total_open_out
+     &    Dprst_total_open_in, Dprst_total_open_out, Dprst_total_clos_in, Dprst_total_clos_out
       USE PRMS_BASIN, ONLY: Dprst_frac_open, Dprst_frac_clos
       USE PRMS_WATER_USE, ONLY: Dprst_transfer, Dprst_gain
       USE PRMS_SET_TIME, ONLY: Cfs_conv
@@ -1465,7 +1471,7 @@
       REAL :: dprst_srp_open, dprst_srp_clos, dprst_sri_open, dprst_sri_clos
       REAL :: frac_op_ar, frac_cl_ar, open_vol_r, clos_vol_r, unsatisfied_et
       REAL :: tmp, dprst_evap_open, dprst_evap_clos
-      DOUBLE PRECISION :: seep_open, seep_clos, tmp1, open_in, open_out
+      DOUBLE PRECISION :: seep_open, seep_clos, tmp1, open_in, open_out, clos_in, clos_out
 !***********************************************************************
 !     add the hortonian flow to the depression storage volumes:
       IF ( Cascade_flag>OFF ) THEN
@@ -1506,8 +1512,10 @@
       ENDIF
       open_in = Dprst_in
 
+      clos_in = 0.0D0
       IF ( Dprst_area_clos_max>0.0 ) THEN
         tmp1 = DBLE( inflow*Dprst_area_clos_max ) ! acre-inches
+        clos_in = tmp1
         Dprst_vol_clos = Dprst_vol_clos + tmp1
         Dprst_in = Dprst_in + tmp1
       ENDIF
@@ -1526,6 +1534,7 @@
         ENDIF
         IF ( Dprst_area_clos_max>0.0 ) THEN
           dprst_srp_clos = tmp*Dprst_frac_clos(Ihru)
+          clos_in = clos_in + DBLE( dprst_srp_clos )
           dprst_srp = dprst_srp + dprst_srp_clos/Hruarea
           Dprst_vol_clos = Dprst_vol_clos + DBLE( dprst_srp_clos )
         ENDIF
@@ -1547,6 +1556,7 @@
         ENDIF
         IF ( Dprst_area_clos_max>0.0 ) THEN
           dprst_sri_clos = tmp*Dprst_frac_clos(Ihru)
+          clos_in = clos_in + DBLE( dprst_sri_clos )
           dprst_sri = dprst_sri + dprst_sri_clos/Hruarea
           Dprst_vol_clos = Dprst_vol_clos + DBLE( dprst_sri_clos )
         ENDIF
@@ -1560,6 +1570,7 @@
       Dprst_insroff_hru(Ihru) = dprst_srp + dprst_sri
 
       open_out = 0.0D0
+      clos_out = 0.0D0
       IF ( Dprst_transfer_water_use==ACTIVE ) THEN
         IF ( Dprst_area_open_max>0.0 ) THEN
           IF ( Dprst_transfer(Ihru)>0.0 ) THEN
@@ -1581,11 +1592,12 @@
               PRINT *, '       storage: ', Dprst_vol_clos, '; transfer: ', Dprst_transfer(Ihru)/Cfs_conv
               ERROR STOP ERROR_water_use
             ENDIF
+            clos_out = clos_out + DBLE( Dprst_transfer(Ihru)*Dprst_area_clos_max ) / Cfs_conv
             Dprst_vol_clos = Dprst_vol_clos - DBLE( Dprst_transfer(Ihru)*Dprst_area_clos_max ) / Cfs_conv
           ENDIF
         ENDIF
       ENDIF
-      
+
       IF ( Ag_package==ACTIVE ) THEN
          open_out = open_out + DBLE( Dprst_ag_transfer(Ihru) )
          Dprst_vol_open = Dprst_vol_open - DBLE( Dprst_ag_transfer(Ihru) ) ! ag transfer in acre-inches
@@ -1662,6 +1674,7 @@
             dprst_evap_clos = unsatisfied_et*Hruarea
           ENDIF
           IF ( dprst_evap_clos>SNGL(Dprst_vol_clos) ) dprst_evap_clos = SNGL( Dprst_vol_clos )
+          clos_out = clos_out + DBLE( dprst_evap_clos )
           Dprst_vol_clos = Dprst_vol_clos - DBLE( dprst_evap_clos )
         ENDIF
         Dprst_evap_hru = (dprst_evap_open + dprst_evap_clos)/Hruarea
@@ -1700,6 +1713,7 @@
       IF ( Dprst_area_clos_max>0.0 ) THEN
         IF ( Dprst_area_clos>NEARZERO ) THEN
           seep_clos = Dprst_vol_clos*DBLE( Dprst_seep_rate_clos(Ihru) )
+          open_out = open_out + seep_clos
           Dprst_vol_clos = Dprst_vol_clos - seep_clos
           IF ( Dprst_vol_clos<0.0D0 ) THEN
 !            IF ( Dprst_vol_clos<-DNEARZERO ) PRINT *, 'issue, dprst_vol_clos<0.0', Dprst_vol_clos
@@ -1724,6 +1738,8 @@
       Dprst_stor_hru(Ihru) = (Dprst_vol_open+Dprst_vol_clos)/Hruarea_dble
       Dprst_total_open_in(Ihru) = open_in
       Dprst_total_open_out(Ihru) = open_out
+      Dprst_total_clos_in(Ihru) = clos_in
+      Dprst_total_clos_out(Ihru) = clos_out
 
       END SUBROUTINE dprst_comp
 
