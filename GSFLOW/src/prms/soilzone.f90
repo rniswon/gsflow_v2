@@ -800,7 +800,7 @@
      &    Basin_soil_moist, Basin_ssstor, Slow_stor, Slow_flow, Pkwater_equiv, &
      &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_sroff, Basin_lake_stor, &
      &    Soil_moist_ante, Soil_rechr_ante, Ssres_stor_ante, Slow_stor_ante, Pref_flow_stor_ante
-      USE GSFMODSIM2PRMS, ONLY: HRU_diversion
+!      USE GSFMODSIM2PRMS, ONLY: HRU_diversion
       USE PRMS_INTCP, ONLY: Hru_intcpstor
       USE PRMS_SRUNOFF, ONLY: Hru_impervstor, Dprst_stor_hru
       USE PRMS_WATER_USE, ONLY: Soilzone_gain, Soilzone_gain_hru
@@ -964,9 +964,9 @@
         IF ( Ag_package==ACTIVE ) THEN
           IF ( Hru_ag_irr(i)>0.0 ) ag_water_maxin = Hru_ag_irr(i)/perv_area ! Hru_ag_irr is in acre-inches
         ENDIF
-        IF ( Model == MODSIM_PRMS ) THEN
-          IF ( Hru_diversion(i)>0.0 ) ag_water_maxin = ag_water_maxin + Hru_diversion(i) / perv_area
-        ENDIF
+!        IF ( Model == MODSIM_PRMS ) THEN
+!          IF ( Hru_diversion(i)>0.0 ) ag_water_maxin = ag_water_maxin + Hru_diversion(i) / perv_area
+!        ENDIF
         IF ( Soilzone_add_water_use==ACTIVE ) THEN
           IF ( Soilzone_gain(i)>0.0 ) THEN
             Soilzone_gain_hru(i) = Soilzone_gain(i)/perv_area/SNGL(Cfs_conv) ! ??? is this harea

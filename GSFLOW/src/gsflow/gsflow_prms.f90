@@ -46,8 +46,8 @@
       INTEGER, EXTERNAL :: stream_temp, glacr
       EXTERNAL :: precip_map, temp_map
       EXTERNAL :: gsflow_prms_restart, water_balance, summary_output
-      EXTERNAL :: prms_summary, module_doc, convert_params
-      INTEGER, EXTERNAL :: gsflow_prms2modsim, gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
+      EXTERNAL :: prms_summary, module_doc, convert_params, gsflow_prms2modsim !, gsflow_modsim2prms
+      INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
 ! Local Variables
       INTEGER :: i, iret, nc, ierr
       CHARACTER(len=8) :: Arg
@@ -484,10 +484,11 @@
 
 ! for PRMS-only and MODSIM-PRMS simulations
       IF ( Model==PRMS .OR. Model==MODSIM_PRMS .OR. Model>=WRITE_CLIMATE ) THEN
+!        IF ( Model==MODSIM_PRMS ) CALL gsflow_modsim2prms(DIVERSIONS)
         IF ( AG_flag==ACTIVE ) THEN
-          ierr = soilzone_ag(AFR)
+          ierr = soilzone_ag(AFR,1)
         ELSE
-          ierr = soilzone(AFR)
+          ierr = soilzone(AFR,1)
         ENDIF
         IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
@@ -562,9 +563,9 @@
           ENDIF
 
           IF ( AG_flag==ACTIVE ) THEN
-            ierr = soilzone_ag(AFR)
+            ierr = soilzone_ag(AFR,1)
           ELSE
-            ierr = soilzone(AFR)
+            ierr = soilzone(AFR,1)
           ENDIF
           IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
@@ -590,9 +591,9 @@
 ! for MODSIM-PRMS simulations
       IF ( Model==MODSIM_PRMS .AND. .NOT.AFR ) THEN
         IF ( AG_flag==ACTIVE ) THEN
-          ierr = soilzone_ag(AFR)
+          ierr = soilzone_ag(AFR,1)
         ELSE
-          ierr = soilzone(AFR)
+          ierr = soilzone(AFR,1)
         ENDIF
         IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
@@ -619,7 +620,7 @@
 
       IF ( CsvON_OFF>OFF .AND. PRMS_only==ACTIVE ) CALL prms_summary()
 
-      IF ( Model==MODSIM_PRMS ) ierr = gsflow_prms2modsim(EXCHANGE, DELTAVOL, LAKEVAP)
+      IF ( Model==MODSIM_PRMS ) CALL gsflow_prms2modsim(EXCHANGE, DELTAVOL, LAKEVAP, agDemand)
       IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
       IF ( Process_flag==RUN ) THEN
         RETURN
@@ -1554,7 +1555,7 @@
       test = snowcomp()
       test = srunoff()
       test = glacr()
-      test = soilzone_ag(AFR)
+      test = soilzone_ag(AFR,1)
       test = gsflow_prms2mf()
       test = gsflow_mf2prms()
       test = gsflow_budget()

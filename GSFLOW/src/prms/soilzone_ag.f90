@@ -452,7 +452,7 @@
      &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_sroff, Basin_lake_stor, &
      &    Ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr_max, Ag_soil_moist_max, Basin_ag_soil_moist, &
      &    Soil_moist_ante, Soil_rechr_ante, Ssres_stor_ante, Slow_stor_ante, Pref_flow_stor_ante
-      USE GSFMODSIM2PRMS, ONLY: Hru_diversion
+!      USE GSFMODSIM2PRMS, ONLY: Hru_diversion
       USE PRMS_INTCP, ONLY: Hru_intcpstor
       USE PRMS_SRUNOFF, ONLY: Hru_impervstor, Dprst_stor_hru
       USE PRMS_WATER_USE, ONLY: Soilzone_gain, Soilzone_gain_hru
@@ -707,13 +707,13 @@
           ENDIF
         ENDIF
         IF ( Model == MODSIM_PRMS ) THEN
-          IF ( Hru_diversion(i)>0.0 ) THEN
-            IF ( ag_on_flag==OFF ) THEN
-              PRINT *, 'ag_frac=0.0 for HRU:', i
-              CALL error_stop('MODSIM diversion specified and ag_frac=0.0', ERROR_param)
-            ENDIF
-            ag_water_maxin = ag_water_maxin + Hru_diversion(i) / Ag_area(i)
-          ENDIF
+!          IF ( Hru_diversion(i)>0.0 ) THEN
+!            IF ( ag_on_flag==OFF ) THEN
+!              PRINT *, 'ag_frac=0.0 for HRU:', i
+!              CALL error_stop('MODSIM diversion specified and ag_frac=0.0', ERROR_param)
+!            ENDIF
+!            ag_water_maxin = ag_water_maxin + Hru_diversion(i) / Ag_area(i)
+!          ENDIF
         ENDIF
         IF ( Iter_aet_flag==ACTIVE ) ag_water_maxin = ag_water_maxin + Ag_irrigation_add(i) ! units of inches over Ag_area
         IF ( Soilzone_add_water_use==ACTIVE ) THEN
