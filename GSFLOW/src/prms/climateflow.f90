@@ -80,6 +80,7 @@
       REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:)
       ! Surface-Depression Storage
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open(:), Dprst_vol_clos(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_dprst_vol_open(:), It0_dprst_vol_clos(:)
       ! gwflow
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwres_stor(:)
       ! lakes
@@ -137,7 +138,8 @@
      &    Model, Init_vars_from_file, Temp_flag, Precip_flag, Glacier_flag, &
      &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, no_snow_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
-     &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, AG_flag
+     &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, &
+     &    AG_flag, PRMS_land_iteration_flag, Ag_Package
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       use prms_utils, only: print_module, read_error
@@ -541,6 +543,8 @@
         CALL declvar_dble(Srunoff_module, 'dprst_vol_clos', 'nhru', Nhru, &
      &       'Storage volume in closed surface depressions for each HRU', &
      &       'acre-inches', Dprst_vol_clos)
+        IF ( PRMS_land_iteration_flag==ACTIVE .OR. Ag_Package==ACTIVE ) &
+             ALLOCATE ( It0_dprst_vol_open(Nhru), It0_dprst_vol_clos(Nhru) )
       ENDIF
 
       ALLOCATE ( Pkwater_equiv(Nhru) )

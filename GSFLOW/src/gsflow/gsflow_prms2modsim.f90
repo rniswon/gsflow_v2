@@ -161,7 +161,7 @@
 ! Functions
       INTRINSIC :: DBLE
 ! Local Variables
-      INTEGER :: ii, ilake, j, i, ihru, iseg
+      INTEGER :: ii, ilake, j, i !, ihru, iseg
 !***********************************************************************
 
 !-----------------------------------------------------------------------

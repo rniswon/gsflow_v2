@@ -1023,8 +1023,8 @@
       USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS
       USE PRMS_MODULE, ONLY: Nhru
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
-      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
+      !USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
+      !USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS:
@@ -1565,8 +1565,7 @@
       USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR, ISFRLIST
       USE GLOBAL, ONLY: IUNIT
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
-      USE PRMS_SRUNOFF, ONLY: It0_dprst_vol_open
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, It0_dprst_vol_open
       USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
 !      USE GWFBASMODULE, ONLY: TOTIM
       IMPLICIT NONE
@@ -2412,7 +2411,7 @@
      +                  RHS, IUNIT
       USE GWFBASMODULE, ONLY: TOTIM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, SGOTFLW, NUMTAB_SFR
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, SGOTFLW !, NUMTAB_SFR
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -2433,7 +2432,7 @@
       DOUBLE PRECISION :: Qp, Hh, Ttop, Bbot, dQp, SMOOTHQ
       DOUBLE PRECISION :: QSW, QQ, demandtrigger_gw
       DOUBLE PRECISION :: demandgw_uzf, demandgw_prms
-      INTEGER :: k, ipc, iseg !, PONDID
+      INTEGER :: k, ipc !, iseg, PONDID
       !
       ! - -----------------------------------------------------------------
       !
