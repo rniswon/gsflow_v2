@@ -2700,8 +2700,9 @@
       USE GWFSFRMODULE, ONLY: SGOTFLW, DVRSFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE PRMS_MODULE, ONLY: GSFLOW_flag
-      USE PRMS_SRUNOFF, ONLY: Dprst_total_open_in, Dprst_total_open_out
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
+      USE PRMS_SRUNOFF, ONLY: 
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_total_open_in,
+     +    Dprst_total_open_out
       USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
       IMPLICIT NONE
       ! ARGUMENTS:
@@ -3385,10 +3386,10 @@
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: Hru_area
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Hru_actet
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Hru_actet !,
+!     +    Dprst_total_open_in, Dprst_total_open_out
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
      +                      MFQ_to_inch_acres
-      USE PRMS_SRUNOFF, ONLY: Dprst_total_open_in, Dprst_total_open_out
       USE GLOBAL, ONLY: ISSFLG
       IMPLICIT NONE
 ! --------------------------------------------------

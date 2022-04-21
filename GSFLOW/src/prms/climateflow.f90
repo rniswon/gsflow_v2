@@ -81,6 +81,8 @@
       ! Surface-Depression Storage
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open(:), Dprst_vol_clos(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_dprst_vol_open(:), It0_dprst_vol_clos(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_open_in(:), Dprst_total_open_out(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_clos_in(:), Dprst_total_clos_out(:)
       ! gwflow
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwres_stor(:)
       ! lakes
@@ -545,6 +547,8 @@
      &       'acre-inches', Dprst_vol_clos)
         IF ( PRMS_land_iteration_flag==ACTIVE .OR. Ag_Package==ACTIVE ) &
              ALLOCATE ( It0_dprst_vol_open(Nhru), It0_dprst_vol_clos(Nhru) )
+        ALLOCATE ( Dprst_total_open_in(Nhru), Dprst_total_open_out(Nhru) )
+        ALLOCATE ( Dprst_total_clos_in(Nhru), Dprst_total_clos_out(Nhru) )
       ENDIF
 
       ALLOCATE ( Pkwater_equiv(Nhru) )

@@ -28,8 +28,6 @@
       character(len=*), parameter :: Version_srunoff = '2022-02-10'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_open_in(:), Dprst_total_open_out(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_clos_in(:), Dprst_total_clos_out(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
       REAL, SAVE, ALLOCATABLE :: Carea_dif(:), Imperv_stor_ante(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_stor_ante(:)
@@ -262,8 +260,6 @@
      &      'decimal fraction', Dprst_vol_frac)
 
         ALLOCATE ( Dprst_vol_open_max(Nhru), Dprst_vol_clos_max(Nhru), Dprst_vol_thres_open(Nhru), Dprst_in(Nhru) )
-        ALLOCATE ( Dprst_total_open_in(Nhru), Dprst_total_open_out(Nhru) )
-        ALLOCATE ( Dprst_total_clos_in(Nhru), Dprst_total_clos_out(Nhru) )
       ENDIF
       IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
         ALLOCATE ( It0_imperv_stor(Nhru), It0_soil_moist(Nhru), It0_soil_rechr(Nhru) )
@@ -640,7 +636,8 @@
       USE PRMS_FLOWVARS, ONLY: Sroff, Infil, Imperv_stor, Pkwater_equiv, Dprst_vol_open, Dprst_vol_clos, &
      &    Imperv_stor_max, Snowinfil_max, Basin_sroff, Glacier_frac, Soil_moist, Soil_rechr, &
      &    Ag_soil_moist, Ag_soil_rechr, Pk_depth, Snowcov_area, Snow_evap, Snowmelt, Glacrb_melt, &
-     &    It0_dprst_vol_open, It0_dprst_vol_clos
+     &    It0_dprst_vol_open, It0_dprst_vol_clos, Dprst_total_open_in, Dprst_total_open_out, &
+     &    Dprst_total_clos_in, Dprst_total_clos_out
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Hru_intcpevap, Net_apply, Intcp_changeover, Use_transfer_intcp
       IMPLICIT NONE
@@ -1293,7 +1290,8 @@
       USE PRMS_BASIN, ONLY: Dprst_clos_flag, Dprst_frac, &
      &    Dprst_area_clos_max, Dprst_area_open_max, Basin_area_inv, &
      &    Hru_area_dble, Active_hrus, Hru_route_order, Dprst_open_flag
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_vol_clos
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_vol_clos, Dprst_total_open_in, Dprst_total_open_out, &
+     &    Dprst_total_clos_in, Dprst_total_clos_out
       use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions
@@ -1445,14 +1443,14 @@
      &    Dprst_seep_rate_open, Dprst_seep_rate_clos, Va_clos_exp, Va_open_exp, Dprst_flow_coef, &
      &    Dprst_vol_thres_open, Dprst_vol_clos_max, Dprst_insroff_hru, Upslope_hortonian, &
      &    Basin_dprst_volop, Basin_dprst_volcl, Basin_dprst_evap, Basin_dprst_seep, Basin_dprst_sroff, &
-     &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, Dprst_stor_hru, Hruarea_dble, &
-     &    Dprst_total_open_in, Dprst_total_open_out, Dprst_total_clos_in, Dprst_total_clos_out
+     &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, Dprst_stor_hru, Hruarea_dble
       USE PRMS_BASIN, ONLY: Dprst_frac_open, Dprst_frac_clos
       USE PRMS_WATER_USE, ONLY: Dprst_transfer, Dprst_gain
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_INTCP, ONLY: Net_snow
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Snowcov_area, Snowmelt, Pptmix_nopack
+      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Snowcov_area, Snowmelt, Pptmix_nopack, &
+     &    Dprst_total_open_in, Dprst_total_open_out, Dprst_total_clos_in, Dprst_total_clos_out
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: EXP, LOG, MAX, DBLE, SNGL
