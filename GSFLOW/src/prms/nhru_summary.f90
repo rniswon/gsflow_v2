@@ -136,7 +136,7 @@
       Lastyear = Begyr
 
       IF ( outputSelectDatesON_OFF==ACTIVE ) THEN
-        CALL find_header_end(selectDates_unit, selectDatesFileName, 'selectDatesFileName', ierr, 0, 0)
+        CALL find_header_end(selectDates_unit, selectDatesFileName, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(selectDates_unit, Start_year, Start_month, Start_day, &
      &                                dates_next_year, dates_next_month, dates_next_day)

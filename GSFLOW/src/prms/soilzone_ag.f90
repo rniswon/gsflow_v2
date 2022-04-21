@@ -56,12 +56,13 @@
 !***********************************************************************
 !     Main soilzone_ag routine
 !***********************************************************************
-      INTEGER FUNCTION soilzone_ag(AFR)
+      INTEGER FUNCTION soilzone_ag(AFR, iter_flag)
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
       ! Arguments
       LOGICAL, INTENT(IN) :: AFR
+      INTEGER, INTENT(in) :: iter_flag
 ! Functions
       INTEGER, EXTERNAL :: szdecl, szinit, szrun_ag, szdecl_ag, szinit_ag
       EXTERNAL :: soilzone_restart_ag
@@ -69,7 +70,7 @@
       soilzone_ag = 0
 
       IF ( Process_flag==RUN ) THEN
-        soilzone_ag = szrun_ag(AFR)
+        soilzone_ag = szrun_ag(AFR, iter_flag)
       ELSEIF ( Process_flag==DECL ) THEN
         soilzone_ag = szdecl()
         soilzone_ag = szdecl_ag()
@@ -428,14 +429,14 @@
 !                interflow, excess routed to stream,
 !                and groundwater reservoirs
 !***********************************************************************
-      INTEGER FUNCTION szrun_ag(AFR)
+      INTEGER FUNCTION szrun_ag(AFR, iter_flag)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
-     &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO
+     &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, &
-     &    Frozen_flag, Soilzone_add_water_use, Call_cascade, &
+     &    Frozen_flag, Soilzone_add_water_use, Call_cascade, Model, &
      &    Nowmonth, Nowyear, Nowday, Iter_aet_flag, Hru_type, &
      &    GSFLOW_flag, Ag_gravity_flag, Kkiter, Hru_ag_irr, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Ag_flag, Agriculture_soilzone_flag, MODSIM_flag
+     &    Soilzone_aet_flag, Ag_flag, Agriculture_soilzone_flag, MODSIM_flag, ag_package
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
@@ -451,6 +452,7 @@
      &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_sroff, Basin_lake_stor, &
      &    Ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr_max, Ag_soil_moist_max, Basin_ag_soil_moist, &
      &    Soil_moist_ante, Soil_rechr_ante, Ssres_stor_ante, Slow_stor_ante, Pref_flow_stor_ante
+      USE GSFMODSIM2PRMS, ONLY: Hru_diversion
       USE PRMS_INTCP, ONLY: Hru_intcpstor
       USE PRMS_SRUNOFF, ONLY: Hru_impervstor, Dprst_stor_hru
       USE PRMS_WATER_USE, ONLY: Soilzone_gain, Soilzone_gain_hru
@@ -460,9 +462,11 @@
       USE PRMS_INTCP, ONLY: Hru_intcpevap
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Strm_seg_in, Dprst_evap_hru, Dprst_seep_hru, Frozen, Infil_ag
       use prms_utils, only: error_stop, print_date
+!      use GSFMODFLOW, only: kkstp
       IMPLICIT NONE
 ! Arguments
       LOGICAL, INTENT(IN) :: AFR
+      INTEGER, INTENT(IN) :: iter_flag
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades
@@ -487,8 +491,9 @@
       szrun_ag = 0
 
 ! It0 and _ante variables used with MODFLOW integration to save iteration states.
-      IF ( Kkiter==1 ) THEN
-        !IF ( (MODSIM_flag==ACTIVE .AND. AFR) .OR. MODSIM_flag==OFF ) THEN
+      IF ( Kkiter==1 .and. iter_flag == 1 ) THEN
+        IF ( Ag_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
+        IF ( (MODSIM_flag==ACTIVE .AND. AFR) .OR. MODSIM_flag==OFF ) THEN
         Soil_moist_ante = Soil_moist
         Soil_rechr_ante = Soil_rechr
         Ssres_stor_ante = Ssres_stor
@@ -500,7 +505,6 @@
           It0_gravity_stor_res = Gravity_stor_res
           Gw2sm_grav = 0.0 ! dimension nhrucell
           Grav_gwin = 0.0 ! dimension nhru
-          IF ( Ag_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
         ENDIF
         IF ( Pref_flag==ACTIVE ) Pref_flow_stor_ante = Pref_flow_stor
         Last_soil_moist = Basin_soil_moist
@@ -510,16 +514,30 @@
           It0_sroff = Sroff
           IF ( Call_cascade==ACTIVE ) It0_strm_seg_in = Strm_seg_in
         ENDIF
-        !ENDIF
+        IF ( Iter_aet_flag==ACTIVE .or. ag_package==ACTIVE ) THEN
+           It0_ag_soil_moist = Ag_soil_moist
+           It0_ag_soil_rechr = Ag_soil_rechr
+           IF ( Ag_gravity_flag==ACTIVE ) It0_ag_gvr_stor = Ag_gvr_stor
+         ENDIF
+        ENDIF
       ENDIF
-
-!      IF ( Iter_aet_flag==ACTIVE .AND. AFR ) THEN
-      IF ( Iter_aet_flag==ACTIVE ) THEN
-        Ag_irrigation_add = 0.0
-        It0_ag_soil_moist = Ag_soil_moist
-        It0_ag_soil_rechr = Ag_soil_rechr
-        IF ( Ag_gravity_flag==ACTIVE ) It0_ag_gvr_stor = Ag_gvr_stor
-      ENDIF
+      IF ( kkiter == 1) then
+      DO k = 1, Active_hrus
+           i = Hru_route_order(k)
+           Soil_moist(i) = Soil_moist_ante(i)
+           Soil_rechr(i) = Soil_rechr_ante(i)
+           Ssres_stor(i) = Ssres_stor_ante(i)
+           Slow_stor(i) = Slow_stor_ante(i)
+           IF ( Pref_flag==ACTIVE ) Pref_flow_stor(i) = Pref_flow_stor_ante(i)
+           IF ( Nlake>0 ) Potet(i) = It0_potet(i)
+         ENDDO
+         !IF ( Soil_iter>1 .or. kkiter>1 ) THEN
+           Ag_soil_moist = It0_ag_soil_moist
+           Ag_soil_rechr = It0_ag_soil_rechr
+           IF ( Ag_gravity_flag==ACTIVE ) Ag_gvr_stor = It0_ag_gvr_stor
+         !ENDIF
+      END IF
+      Ag_irrigation_add = 0.0  
       Last_ag_soil_moist = Basin_ag_soil_moist
       Last_ag_soil_rechr = Basin_ag_soil_rechr
       Last_ag_gvr_stor = Basin_ag_gvr_stor
@@ -562,11 +580,11 @@
         ENDIF
       ENDIF
 
-      IF ( Soil_iter>1 ) THEN
-        Ag_soil_moist = It0_ag_soil_moist
-        Ag_soil_rechr = It0_ag_soil_rechr
-        IF ( Ag_gravity_flag==ACTIVE ) Ag_gvr_stor = It0_ag_gvr_stor
-      ENDIF
+      !IF ( Soil_iter>1 .or. kkiter>1 ) THEN
+      !  Ag_soil_moist = It0_ag_soil_moist
+      !  Ag_soil_rechr = It0_ag_soil_rechr
+      !  IF ( Ag_gravity_flag==ACTIVE ) Ag_gvr_stor = It0_ag_gvr_stor
+      !ENDIF
       Basin_ag_soil_moist = 0.0D0
       Basin_ag_soil_rechr = 0.0D0
       Basin_ag_soil_to_gw = 0.0D0
@@ -686,6 +704,15 @@
               CALL error_stop('AG Package irrigation specified and ag_frac=0.0', ERROR_param)
             ENDIF
             ag_water_maxin = ag_water_maxin + Hru_ag_irr(i) / Ag_area(i)
+          ENDIF
+        ENDIF
+        IF ( Model == MODSIM_PRMS ) THEN
+          IF ( Hru_diversion(i)>0.0 ) THEN
+            IF ( ag_on_flag==OFF ) THEN
+              PRINT *, 'ag_frac=0.0 for HRU:', i
+              CALL error_stop('MODSIM diversion specified and ag_frac=0.0', ERROR_param)
+            ENDIF
+            ag_water_maxin = ag_water_maxin + Hru_diversion(i) / Ag_area(i)
           ENDIF
         ENDIF
         IF ( Iter_aet_flag==ACTIVE ) ag_water_maxin = ag_water_maxin + Ag_irrigation_add(i) ! units of inches over Ag_area

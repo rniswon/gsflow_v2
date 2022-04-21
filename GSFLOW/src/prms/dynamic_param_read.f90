@@ -105,7 +105,7 @@
       ierr = 0
       IF ( Dyn_imperv_flag==1 .OR. Dyn_imperv_flag==3 ) THEN
         IF ( control_string(imperv_frac_dynamic, 'imperv_frac_dynamic')/=0 ) CALL read_error(5, 'imperv_frac_dynamic')
-        CALL find_header_end(Imperv_frac_unit, imperv_frac_dynamic, 'imperv_frac_dynamic', ierr, 0, 0)
+        CALL find_header_end(Imperv_frac_unit, imperv_frac_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Imperv_frac_unit, year, month, day, Imperv_next_yr, Imperv_next_mo, Imperv_next_day)
           Imperv_frac_flag = 1
@@ -116,7 +116,7 @@
 
       IF ( Dyn_imperv_flag>1 ) THEN
         IF ( control_string(imperv_stor_dynamic, 'imperv_stor_dynamic')/=0 ) CALL read_error(5, 'imperv_stor_dynamic')
-        CALL find_header_end(Imperv_stor_unit, imperv_stor_dynamic, 'imperv_stor_dynamic', ierr, 0, 0)
+        CALL find_header_end(Imperv_stor_unit, imperv_stor_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Imperv_stor_unit, year, month, day, &
      &                                Imperv_stor_next_yr, Imperv_stor_next_mo, Imperv_stor_next_day)
@@ -130,7 +130,7 @@
       IF ( Dprst_flag==ACTIVE ) THEN
         IF ( Dyn_dprst_flag==1 .OR. Dyn_dprst_flag==3 ) THEN
           IF ( control_string(dprst_frac_dynamic, 'dprst_frac_dynamic')/=0 ) CALL read_error(5, 'dprst_frac_dynamic')
-          CALL find_header_end(Dprst_frac_unit, dprst_frac_dynamic, 'dprst_frac_dynamic', ierr, 0, 0)
+          CALL find_header_end(Dprst_frac_unit, dprst_frac_dynamic, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(Dprst_frac_unit, year, month, day, &
      &                                  Dprst_frac_next_yr, Dprst_frac_next_mo, Dprst_frac_next_day)
@@ -143,7 +143,7 @@
 
         IF ( Dyn_dprst_flag==2 .OR. Dyn_dprst_flag==3 ) THEN
           IF ( control_string(dprst_depth_dynamic, 'dprst_depth_dynamic')/=0 ) CALL read_error(5, 'dprst_depth_dynamic')
-          CALL find_header_end(Dprst_depth_unit, dprst_depth_dynamic, 'dprst_depth_dynamic', ierr, 0, 0)
+          CALL find_header_end(Dprst_depth_unit, dprst_depth_dynamic, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(Dprst_depth_unit, year, month, day, &
      &                                  Dprst_depth_next_yr, Dprst_depth_next_mo, Dprst_depth_next_day)
@@ -156,7 +156,7 @@
 
       IF ( Dyn_ag_frac_flag==ACTIVE ) THEN
         IF ( control_string(ag_frac_dynamic, 'ag_frac_dynamic')/=0 ) CALL read_error(5, 'ag_frac_dynamic')
-        CALL find_header_end(Ag_frac_unit, ag_frac_dynamic, 'ag_frac_dynamic', ierr, 0, 0)
+        CALL find_header_end(Ag_frac_unit, ag_frac_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Ag_frac_unit, year, month, day, &
      &                                Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day)
@@ -173,7 +173,7 @@
         IF ( Dyn_intcp_flag==1 .OR. Dyn_intcp_flag==3 .OR. Dyn_intcp_flag==5 .OR. Dyn_intcp_flag==7 ) THEN
           Wrainintcp_flag = ACTIVE
           IF ( control_string(wrain_intcp_dynamic, 'wrain_intcp_dynamic')/=0 ) CALL read_error(5, 'wrain_intcp_dynamic')
-          CALL find_header_end(Wrain_intcp_unit, wrain_intcp_dynamic, 'wrain_intcp_dynamic', ierr, 0, 0)
+          CALL find_header_end(Wrain_intcp_unit, wrain_intcp_dynamic, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(Wrain_intcp_unit, year, month, day, &
      &                                  Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day)
@@ -184,7 +184,7 @@
         IF ( Dyn_intcp_flag==2 .OR. Dyn_intcp_flag==3 .OR. Dyn_intcp_flag==6 .OR. Dyn_intcp_flag==7 ) THEN
           Srainintcp_flag = ACTIVE
           IF ( control_string(srain_intcp_dynamic, 'srain_intcp_dynamic')/=0 ) CALL read_error(5, 'srain_intcp_dynamic')
-          CALL find_header_end(Srain_intcp_unit, srain_intcp_dynamic, 'srain_intcp_dynamic', ierr, 0, 0)
+          CALL find_header_end(Srain_intcp_unit, srain_intcp_dynamic, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(Srain_intcp_unit, year, month, day, &
      &                                  Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day)
@@ -195,7 +195,7 @@
         IF ( Dyn_intcp_flag>3 ) THEN
           Snowintcp_flag = ACTIVE
           IF ( control_string(snow_intcp_dynamic, 'snow_intcp_dynamic')/=0 ) CALL read_error(5, 'snown_intcp_dynamic')
-          CALL find_header_end(Snow_intcp_unit, snow_intcp_dynamic, 'snow_intcp_dynamic', ierr, 0, 0)
+          CALL find_header_end(Snow_intcp_unit, snow_intcp_dynamic, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(Snow_intcp_unit, year, month, day, &
      &                                  Snow_intcp_next_yr, Snow_intcp_next_mo, Snow_intcp_next_day)
@@ -209,7 +209,7 @@
       Covden_sum_flag = OFF
       IF ( Dyn_covden_flag==1 .OR. Dyn_covden_flag==3 ) THEN
         IF ( control_string(covden_sum_dynamic, 'covden_sum_dynamic')/=0 ) CALL read_error(5, 'covden_sum_dynamic')
-        CALL find_header_end(Covden_sum_unit, covden_sum_dynamic, 'covden_sum_dynamic', ierr, 0, 0)
+        CALL find_header_end(Covden_sum_unit, covden_sum_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Covden_sum_unit, year, month, day, Covden_sum_next_yr, Covden_sum_next_mo,Covden_sum_next_day)
           Covden_sum_flag = ACTIVE
@@ -219,7 +219,7 @@
       ENDIF
       IF ( Dyn_covden_flag==2 .OR. Dyn_covden_flag==3 ) THEN
         IF ( control_string(covden_win_dynamic, 'covden_win_dynamic')/=0 ) CALL read_error(5, 'covden_win_dynamic')
-        CALL find_header_end(Covden_win_unit, covden_win_dynamic, 'covden_win_dynamic', ierr, 0, 0)
+        CALL find_header_end(Covden_win_unit, covden_win_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Covden_win_unit, year, month, day, Covden_win_next_yr, Covden_win_next_mo,Covden_win_next_day)
           Covden_win_flag = ACTIVE
@@ -230,7 +230,7 @@
 
       IF ( Dyn_covtype_flag==ACTIVE ) THEN
         IF ( control_string(covtype_dynamic, 'covtype_dynamic')/=0 ) CALL read_error(5, 'covtype_dynamic')
-        CALL find_header_end(Covtype_unit, covtype_dynamic, 'covtype_dynamic', ierr, 0, 0)
+        CALL find_header_end(Covtype_unit, covtype_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Covtype_unit, year, month, day, Covtype_next_yr, Covtype_next_mo, Covtype_next_day)
         ELSE
@@ -241,7 +241,7 @@
       IF ( Dyn_potet_flag>OFF ) THEN
         ALLOCATE ( Potet_coef(Nhru,MONTHS_PER_YEAR) )
         IF ( control_string(potetcoef_dynamic, 'potetcoef_dynamic')/=0 ) CALL read_error(5, 'potetcoef_dynamic')
-        CALL find_header_end(Potetcoef_unit, potetcoef_dynamic, 'potetcoef_dynamic', ierr, 0, 0)
+        CALL find_header_end(Potetcoef_unit, potetcoef_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Potetcoef_unit, year, month, day, Potetcoef_next_yr, Potetcoef_next_mo, Potetcoef_next_day)
         ELSE
@@ -256,7 +256,7 @@
           istop = 1
         ELSE
           IF ( control_string(transpbeg_dynamic, 'transpbeg_dynamic')/=0 ) CALL read_error(5, 'transpbeg_dynamic')
-          CALL find_header_end(Transpbeg_unit, transpbeg_dynamic, 'transpbeg_dynamic', ierr, 0, 0)
+          CALL find_header_end(Transpbeg_unit, transpbeg_dynamic, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(Transpbeg_unit, year, month, day, Transpbeg_next_yr, Transpbeg_next_mo, Transpbeg_next_day)
             Transpbeg_flag = ACTIVE
@@ -273,7 +273,7 @@
           istop = 1
         ELSE
           IF ( control_string(transpend_dynamic, 'transpend_dynamic')/=0 ) CALL read_error(5, 'transpend_dynamic')
-          CALL find_header_end(Transpend_unit, transpend_dynamic, 'transpend_dynamic', ierr, 0, 0)
+          CALL find_header_end(Transpend_unit, transpend_dynamic, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(Transpend_unit, year, month, day, Transpend_next_yr, Transpend_next_mo, Transpend_next_day)
             Transpend_flag = ACTIVE
@@ -290,7 +290,7 @@
           istop = 1
         ELSE
           IF ( control_string(fallfrost_dynamic, 'fallfrost_dynamic')/=0 ) CALL read_error(5, 'fallfrost_dynamic')
-          CALL find_header_end(Fallfrost_unit, fallfrost_dynamic, 'fallfrost_dynamic', ierr, 0, 0)
+          CALL find_header_end(Fallfrost_unit, fallfrost_dynamic, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(Fallfrost_unit, year, month, day, Fallfrost_next_yr, Fallfrost_next_mo, Fallfrost_next_day)
             Fallfrost_flag = ACTIVE
@@ -307,7 +307,7 @@
           istop = 1
         ELSE
           IF ( control_string(springfrost_dynamic, 'springfrost_dynamic')/=0 ) CALL read_error(5, 'springfrost_dynamic')
-          CALL find_header_end(Springfrost_unit, springfrost_dynamic, 'springfrost_dynamic', ierr, 0, 0)
+          CALL find_header_end(Springfrost_unit, springfrost_dynamic, ierr)
           IF ( ierr==0 ) THEN
             CALL find_current_file_time(Springfrost_unit, year, month, day, Springfrost_next_yr, Springfrost_next_mo, &
      &                                  Springfrost_next_day)
@@ -323,7 +323,7 @@
         Soilrechr_flag = ACTIVE
         IF ( PRMS4_flag==OFF ) ALLOCATE ( Soil_rechr_max_frac(Nhru) )
         IF ( control_string(soilrechr_dynamic, 'soilrechr_dynamic')/=0 ) CALL read_error(5, 'soilrechr_dynamic')
-        CALL find_header_end(Soil_rechr_unit, soilrechr_dynamic, 'soilrechr_dynamic', ierr, 0, 0)
+        CALL find_header_end(Soil_rechr_unit, soilrechr_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Soil_rechr_unit, year, month, day, &
      &                                Soil_rechr_next_yr, Soil_rechr_next_mo, Soil_rechr_next_day)
@@ -336,7 +336,7 @@
       IF ( Dyn_soil_flag==1 .OR. Dyn_soil_flag==3 ) THEN
         Soilmoist_flag = ACTIVE
         IF ( control_string(soilmoist_dynamic, 'soilmoist_dynamic')/=0 ) CALL read_error(5, 'soilmoist_dynamic')
-        CALL find_header_end(Soil_moist_unit, soilmoist_dynamic, 'soilmoist_dynamic', ierr, 0, 0)
+        CALL find_header_end(Soil_moist_unit, soilmoist_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Soil_moist_unit, year, month, day, &
      &                                Soil_moist_next_yr, Soil_moist_next_mo, Soil_moist_next_day)
@@ -349,7 +349,7 @@
       IF ( Dyn_ag_soil_flag>1 ) THEN
         Ag_soilrechr_flag = ACTIVE
         IF ( control_string(ag_soilrechr_dynamic, 'ag_soilrechr_dynamic')/=0 ) CALL read_error(5, 'ag_soilrechr_dynamic')
-        CALL find_header_end(Ag_soil_rechr_unit, ag_soilrechr_dynamic, 'ag_soilrechr_dynamic', ierr, 0, 0)
+        CALL find_header_end(Ag_soil_rechr_unit, ag_soilrechr_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Ag_soil_rechr_unit, year, month, day, &
      &                                Ag_soil_rechr_next_yr, Ag_soil_rechr_next_mo, Ag_soil_rechr_next_day)
@@ -362,7 +362,7 @@
       IF ( Dyn_Ag_soil_flag==1 .OR. Dyn_Ag_soil_flag==3 ) THEN
         Ag_soilmoist_flag = ACTIVE
         IF ( control_string(ag_soilmoist_dynamic, 'ag_soilmoist_dynamic')/=0 ) CALL read_error(5, 'ag_soilmoist_dynamic')
-        CALL find_header_end(Ag_soil_moist_unit, Ag_soilmoist_dynamic, 'Ag_soilmoist_dynamic', ierr, 0, 0)
+        CALL find_header_end(Ag_soil_moist_unit, Ag_soilmoist_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Ag_soil_moist_unit, year, month, day, &
      &                                Ag_soil_moist_next_yr, Ag_soil_moist_next_mo, Ag_soil_moist_next_day)
@@ -373,7 +373,7 @@
 
       IF ( Dyn_radtrncf_flag==ACTIVE ) THEN
         IF ( control_string(radtrncf_dynamic, 'radtrncf_dynamic')/=0 ) CALL read_error(5, 'radtrncf_dynamic')
-        CALL find_header_end(Rad_trncf_unit, radtrncf_dynamic, 'radtrncf_dynamic', ierr, 0, 0)
+        CALL find_header_end(Rad_trncf_unit, radtrncf_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Rad_trncf_unit, year, month, day, &
      &                                Rad_trncf_next_yr, Rad_trncf_next_mo, Rad_trncf_next_day)
@@ -384,7 +384,7 @@
 
       IF ( Dyn_snareathresh_flag==ACTIVE ) THEN
         IF ( control_string(snareathresh_dynamic, 'snareathresh_dynamic')/=0 ) CALL read_error(5, 'snareathresh_dynamic')
-        CALL find_header_end(Snarea_thresh_unit, snareathresh_dynamic, 'snareathresh_dynamic', ierr, 0, 0)
+        CALL find_header_end(Snarea_thresh_unit, snareathresh_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Snarea_thresh_unit, year, month, day, &
      &                                Snarea_thresh_next_yr, Snarea_thresh_next_mo, Snarea_thresh_next_day)
@@ -395,7 +395,7 @@
 
       IF ( Dyn_sro2dprst_perv_flag==ACTIVE ) THEN
         IF ( control_string(sro2dprst_perv_dyn, 'sro2dprst_perv_dynamic')/=0 ) CALL read_error(5, 'sro2dprst_perv_dynamic')
-        CALL find_header_end(Sro_to_dprst_unit, sro2dprst_perv_dyn, 'sro2dprst_perv_dynamic', ierr, 0, 0)
+        CALL find_header_end(Sro_to_dprst_unit, sro2dprst_perv_dyn, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Sro_to_dprst_unit, year, month, day, &
      &                                Sro_to_dprst_next_yr, Sro_to_dprst_next_mo, Sro_to_dprst_next_day)
@@ -406,7 +406,7 @@
 
       IF ( Dyn_sro2dprst_imperv_flag==ACTIVE ) THEN
         IF ( control_string(sro2dprst_imperv_dyn, 'sro2dprst_imperv_dynamic')/=0 ) CALL read_error(5, 'sro2dprst_imperv_dynamic')
-        CALL find_header_end(Sro_to_imperv_unit, sro2dprst_imperv_dyn, 'sro2dprst_imperv_dynamic', ierr, 0, 0)
+        CALL find_header_end(Sro_to_imperv_unit, sro2dprst_imperv_dyn, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Sro_to_imperv_unit, year, month, day, &
      &                                Sro_to_imperv_next_yr, Sro_to_imperv_next_mo, Sro_to_imperv_next_day)
@@ -417,7 +417,7 @@
 
       IF ( Dyn_transp_on_flag==ACTIVE ) THEN
         IF ( control_string(transp_on_dynamic, 'transp_on_dynamic')/=0 ) CALL read_error(5, 'transp_on_dynamic')
-        CALL find_header_end(Transp_event_unit, transp_on_dynamic, 'transp_on_dynamic', ierr, 0, 0)
+        CALL find_header_end(Transp_event_unit, transp_on_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Transp_event_unit, year, month, day, Transp_event_next_yr, Transp_event_next_mo, &
      &                                Transp_event_next_day)

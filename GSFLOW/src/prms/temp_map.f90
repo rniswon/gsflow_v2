@@ -32,7 +32,7 @@
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
      &    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, Tavgc
-      use prms_utils, only: find_current_time, find_header_end, print_module, read_error
+      use prms_utils, only: find_current_time, find_cbh_header_end, print_module, read_error
 ! Functions
       INTRINSIC :: SNGL
       EXTERNAL :: temp_set, read_cbh_date
@@ -127,7 +127,7 @@
      &       CALL read_error(2, 'tmin_map_adj')
         IF ( control_string(Tmax_map_file, 'tmax_map_file')/=0 ) CALL read_error(5, 'tmax_map_file')
         IF ( control_string(Tmin_map_file, 'tmin_map_file')/=0 ) CALL read_error(5, 'tmin_map_file')
-        CALL find_header_end(Tmax_unit, Tmax_map_file, 'tmax_map_file', ierr, 1, 0)
+        CALL find_cbh_header_end(Tmax_unit, Tmax_map_file, 'tmax_map_file', ierr, 1, 0)
         IF ( ierr==1 ) THEN
           istop = 1
         ELSE
@@ -137,7 +137,7 @@
             istop = 1
           ENDIF
         ENDIF
-        CALL find_header_end(Tmin_unit, Tmin_map_file, 'tmin_map_file', ierr, 1, 0)
+        CALL find_cbh_header_end(Tmin_unit, Tmin_map_file, 'tmin_map_file', ierr, 1, 0)
         IF ( ierr==1 ) THEN
           istop = 1
         ELSE
