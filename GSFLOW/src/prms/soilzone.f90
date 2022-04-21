@@ -1382,7 +1382,7 @@
       ELSE
         pet = Avail_potet
       ENDIF
-      IF ( Avail_potet<0.0 ) THEN
+      IF ( Avail_potet<NEARZERO ) THEN
         Et_type = 1
         pet = 0.0
       ELSEIF ( Transp_on==OFF ) THEN
@@ -1401,7 +1401,7 @@
 
       IF ( Et_type>1 ) THEN
         pcts = Soil_moist/Soil_moist_max
-        IF ( pcts>0.9999999 ) Soil_saturated = 1
+        IF ( pcts>0.9999 ) Soil_saturated = 1
         pctr = 0.0
         IF ( Soil_rechr_max>0.0 ) pctr = Soil_rechr/Soil_rechr_max
         Potet_lower = pet

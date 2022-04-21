@@ -559,7 +559,6 @@
           IF ( Pref_flag==ACTIVE ) Pref_flow_stor(i) = Pref_flow_stor_ante(i)
           IF ( Nlake>0 ) Potet(i) = It0_potet(i)
         ENDDO
-        !write(888,*)'set ante',Soil_moist_ante(3056),it0_ag_soil_moist(3056)
         IF ( GSFLOW_flag==ACTIVE ) Gravity_stor_res = It0_gravity_stor_res
         IF ( Kkiter>1 ) THEN
           IF ( (GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet_flag==ACTIVE ) THEN
@@ -1187,10 +1186,7 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
         Basin_actet = Basin_actet + DBLE( Hru_actet(i)*harea )
         Hru_storage(i) = DBLE( Soil_moist_tot(i) + Hru_intcpstor(i) + Hru_impervstor(i) ) + Pkwater_equiv(i)
         IF ( Dprst_flag==ACTIVE ) Hru_storage(i) = Hru_storage(i) + Dprst_stor_hru(i)
-!        if(i==3056.and.kkstp==15)then
-!        write(888,222)nowday,i,kkiter,afr,potet(i),hru_actet(i),ag_soil_moist(i),ag_soil_rechr(i),hru_ag_irr(i),avail_potet,ag_avail_potet
-!        end if
-!222     format(4i5,7e20.10)    
+
 ! ***************************************
       ENDDO ! end HRU loop
 ! ***************************************
