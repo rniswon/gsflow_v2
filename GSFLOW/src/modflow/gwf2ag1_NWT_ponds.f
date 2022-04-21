@@ -2701,6 +2701,9 @@
       USE GWFSFRMODULE, ONLY: SGOTFLW, DVRSFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE PRMS_MODULE, ONLY: GSFLOW_flag
+      USE PRMS_SRUNOFF, ONLY: Dprst_total_open_in, Dprst_total_open_out
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
+      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
       IMPLICIT NONE
       ! ARGUMENTS:
       ! - -----------------------------------------------------------------
@@ -2726,7 +2729,7 @@
       EXTERNAL :: SMOOTHQ
       INTRINSIC :: INT, SNGL
       DOUBLE PRECISION :: SMOOTHQ, bbot, ttop, hh
-      DOUBLE PRECISION :: Qp, QQ, Qsave, dQp
+      DOUBLE PRECISION :: Qp, QQ, Qsave, dQp, DELIN, DELOUT, DELSTOR
       DATA TEXT1/'           AG WELLS'/
       DATA TEXT2/'  DIVERSION SEGMENTS'/
       DATA TEXT13/'   IRRIGATION PONDS'/
@@ -3078,9 +3081,8 @@
       QPOND = DZERO
       !19b ------POND IRRIGATION
       STOR = DZERO
+      DELSTOR = DZERO
       DO L = 1, NUMIRRPOND
-        STOR = STOR + (PONDSTORNEW(L) - PONDSTOROLD(L))/DELT
-      !write(888,*)L,STOR,PONDSTORNEW(L),PONDSTOROLD(L)
         K = NUMCELLSPOND(L)
         SUBVOL = PONDFLOW(L)
         DO IPC = 1, K
@@ -3088,12 +3090,22 @@
         END DO
       END DO
       ROUT = QPOND
+      DO L = 1, NUMIRRPOND
+        ipond = IRRPONDVAR(L)
+        DELIN = DELIN + Dprst_total_open_in(ipond)/MFQ_to_inch_acres
+        DELOUT = DELOUT + Dprst_total_open_out(ipond)/MFQ_to_inch_acres 
+        PONDSTORNEW(L) = Dprst_vol_open(ipond)/MFQ_to_inch_acres
+        DELSTOR = DELSTOR + PONDSTORNEW(L) - PONDSTOROLD(L)
+      END DO  
+      DELIN = DELIN - RIN
+      DELOUT = DELOUT - ROUT
+      DELSTOR = (DELSTOR - DELIN + DELOUT)/DELT
       RIN_SNGL = SNGL(RIN)
       ROUT_SNGL = SNGL(ROUT)
-      IF ( STOR >= DZERO ) THEN
-          ROUT_SNGL = ROUT_SNGL + SNGL(STOR)
+      IF ( DELSTOR >= DZERO ) THEN
+          ROUT_SNGL = ROUT_SNGL + SNGL(DELSTOR)
       ELSE
-          RIN_SNGL = RIN_SNGL + SNGL(STOR)
+          RIN_SNGL = RIN_SNGL + SNGL(DELSTOR)
       END IF
       VBVLAG(3, MSUMAG) = RIN_SNGL
       VBVLAG(4, MSUMAG) = ROUT_SNGL
@@ -3377,6 +3389,7 @@
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Hru_actet
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
      +                      MFQ_to_inch_acres
+      USE PRMS_SRUNOFF, ONLY: Dprst_total_open_in, Dprst_total_open_out
       USE GLOBAL, ONLY: ISSFLG
       IMPLICIT NONE
 ! --------------------------------------------------
@@ -3388,7 +3401,7 @@
       DOUBLE PRECISION :: factor, area, aet, pet
       double precision :: pettotal,aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup !, etdif
-      real :: demand_inch_acres, Q, saveflow
+      real :: demand_inch_acres, Q, saveflow, pondstor
       integer :: k, ipond, hru_id, i
       external :: set_factor
       double precision :: set_factor
@@ -3452,10 +3465,10 @@
         Q = POND(2, i)        
         IF ( PONDFLOW(i) > Q ) PONDFLOW(i) = Q        !
         !1 limit pond outflow to pond storage
-        PONDSTORNEW(i) = SNGL(Dprst_vol_open(ipond))/MFQ_to_inch_acres
+        pondstor = Dprst_vol_open(ipond)/MFQ_to_inch_acres
+                  
         IF ( demand_inch_acres < dzero ) demand_inch_acres = dzero
-        IF ( PONDFLOW(i) > PONDSTORNEW(i)/DELT ) 
-     +       PONDFLOW(i) = PONDSTORNEW(i)/DELT
+        IF ( PONDFLOW(i) > pondstor/DELT ) PONDFLOW(i) = pondstor/DELT
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
 !        if(i==2)then
       !etdif = pettotal - aettotal
