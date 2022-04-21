@@ -1590,7 +1590,7 @@
       ! RESET ALL DEMAND if new stress period 
       if (KPEROLD.ne.KPER) then
 	   DEMAND = 0.0
-      endif	  
+      endif
       !
       !3 - -----SET MAXIMUM POND OUTFLOW DIVERSION RATES WHEN TABFILES ARE USED
       IF ( NUMIRRPOND > 0 ) THEN
@@ -2700,7 +2700,6 @@
       USE GWFSFRMODULE, ONLY: SGOTFLW, DVRSFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE PRMS_MODULE, ONLY: GSFLOW_flag
-      USE PRMS_SRUNOFF, ONLY: 
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_total_open_in,
      +    Dprst_total_open_out
       USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
