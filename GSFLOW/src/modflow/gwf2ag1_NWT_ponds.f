@@ -3303,15 +3303,12 @@
              icell = Gvr_cell_id(hru_id)
              irow = Gwc_row(icell)
              icol = Gwc_col(icell)
-!       if(kstp==15)then
-!          write(888,22)kiter,hru_id,aet,UZFETOUT(icol, irow)/DELT,
-!     +                GWET(icol, irow),pet-aet
-!       end if
-!22    format(2i5,4e20.10)
              uzet = UZFETOUT(icol, irow)/DELT
              aet = uzet + GWET(icol, irow) 
              aettotal = aettotal + aet
            end if
+      write(888,22)kiter,hru_id,aet,pet
+22    format(2i5,2e20.10)
         end do
         ! convert PRMS ET deficit to MODFLOW flow
         aetold = AETITERSW(ISEG)
@@ -3320,7 +3317,7 @@
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
      +           supold, kper, kstp, kiter)
         RMSESW(ISEG) = SQRT((aetold - aettotal)**dtwo)
-        IF ( RMSESW(ISEG) > zerod2*pettotal ) AGCONVERGE = 0
+        IF ( RMSESW(ISEG) > zerod3*pettotal ) AGCONVERGE = 0
         AETITERSW(ISEG) = SNGL(aettotal)
         SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + 
@@ -3339,12 +3336,13 @@
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
   
-  !      if(iseg==24.and.kstp==15)then
-  !      etdif = pettotal - aettotal
-  !        write(999,33)kper,kstp,kiter,iseg,sup,
-  !   +                 supold,aettotal,aetold
-  !      endif
-  !33  format(4i5,4e20.10)
+        if(iseg==24)then
+        etdif = pettotal - aettotal
+          write(999,33)kper,kstp,kiter,iseg,SUPACT(iseg),
+     +                 pettotal,aettotal,factor,RMSESW(ISEG),
+     +                 zerod3*pettotal,AGCONVERGE
+        endif
+  33  format(4i5,6e20.10,i5)
 300   continue
       return
       end subroutine demandconjunctive_prms
