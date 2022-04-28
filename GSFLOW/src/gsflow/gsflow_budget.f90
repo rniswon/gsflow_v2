@@ -5,7 +5,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2022-02-18'
+      character(len=*), parameter :: Version_gsflow_budget = '2022-04-27'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -261,11 +261,11 @@
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Active_area, &
      &    Basin_area_inv, Hru_area, Lake_hru_id, Lake_area
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Hru_actet, Basin_sroff, &
-     &    Basin_actet, Basin_ssstor, Ssres_stor, Slow_stor, Basin_ssflow_cfs, Basin_sroff_cfs, Basin_gwflow_cfs
+     &    Basin_actet, Basin_ssstor, Ssres_stor, Slow_stor, Basin_ssflow_cfs, Basin_sroff_cfs, &
+     &    Basin_gwflow_cfs, Pref_flow_stor, Gravity_stor_res
       USE PRMS_SET_TIME, ONLY: Cfs_conv
 !Warning, modifies Basin_ssstor, and Gw2sm_grav
-      USE PRMS_SOILZONE, ONLY: Pref_flow_stor, Gravity_stor_res, Hrucheck, Gvr_hru_id, &
-     &    Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
+      USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, SNGL

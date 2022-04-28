@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output CSV Summary'
       character(len=10), parameter :: MODNAME = 'gsflow_sum'
-      character(len=*), parameter :: Version_gsflow_sum = '2022-02-10'
+      character(len=*), parameter :: Version_gsflow_sum = '2022-04-22'
       INTEGER, SAVE :: BALUNT
       DOUBLE PRECISION, PARAMETER :: ERRCHK = 0.0001D0
       INTEGER, SAVE :: Balance_unt, Vbnm_index(14), Gsf_unt, Rpt_count
@@ -23,7 +23,6 @@
       DOUBLE PRECISION, SAVE :: Cumvol_gwbndot, Rate_gwbndot
       DOUBLE PRECISION, SAVE :: Cum_surfstor, Basin_convert
       DOUBLE PRECISION, SAVE :: Cum_delstore, Rate_delstore
-      DOUBLE PRECISION, SAVE :: Last_basin_soil_moist, Last_basin_ssstor
       DOUBLE PRECISION, SAVE :: Rate_strmin, Rate_wellin, Rate_wellot
       DOUBLE PRECISION, SAVE :: Rate_surfstor, Last_Grav_S
       DOUBLE PRECISION, SAVE :: Last_Canopy_S, Last_Imperv_S, Last_SnowPweqv_S, Last_Cap_S
@@ -414,6 +413,7 @@
       USE GLOBAL, ONLY: IUNIT
       USE PRMS_BASIN, ONLY: Active_area
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor
+      USE PRMS_IT0_VARS, ONLY: It0_basin_ssstor, It0_basin_soil_moist
       USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop, Basin_dprst_volcl
       use prms_utils, only: read_error
       IMPLICIT NONE
@@ -466,8 +466,8 @@
       Last_Cap_S = Cap_S
       Last_Grav_S = Grav_S
       Last_Pref_S = Pref_S
-      Last_basin_soil_moist = Basin_soil_moist
-      Last_basin_ssstor = Basin_ssstor
+      It0_basin_soil_moist = Basin_soil_moist
+      It0_basin_ssstor = Basin_ssstor
       Last_Canopy_S = Canopy_S
       Last_Imperv_S = Imperv_S
       Last_SnowPweqv_S = SnowPweqv_S
@@ -572,6 +572,7 @@
       USE PRMS_FLOWVARS, ONLY: Basin_perv_et, Basin_swale_et, &
      &    Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_actet, &
      &    Basin_sroff, Basin_soil_moist, Basin_ssstor, Basin_cfs, Basin_snowmelt, Basin_snowevap
+      USE PRMS_IT0_VARS, ONLY: It0_basin_soil_moist, It0_basin_ssstor
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_evap, &
      &    Basin_hortonian, Basin_hortonian_lakes, &
      &    Basin_infil, Basin_dprst_evap, Basin_dprst_volop, Basin_dprst_volcl
@@ -745,33 +746,27 @@
         ENDIF
 
         rnf = Basin_hortonian + Basin_dunnian - Basin_sroff
-        IF ( ABS(rnf)>ERRCHK ) WRITE (BALUNT, *) 'runoff', rnf, &
-     &       Basin_hortonian, Basin_dunnian, Basin_sroff
+        IF ( ABS(rnf)>ERRCHK ) WRITE (BALUNT, *) 'runoff', rnf, Basin_hortonian, Basin_dunnian, Basin_sroff
         gvf = Basin_slowflow + Basin_prefflow - Basin_ssflow
-        IF ( ABS(gvf)>ERRCHK ) WRITE (BALUNT, *) 'gravflow', gvf, &
-     &       Basin_slowflow, Basin_prefflow, Basin_ssflow
+        IF ( ABS(gvf)>ERRCHK ) WRITE (BALUNT, *) 'gravflow', gvf, Basin_slowflow, Basin_prefflow, Basin_ssflow
 
         szin = Basin_infil + Basin_gw2sm + Basin_szreject
-        szdstor = Last_basin_soil_moist + Last_basin_ssstor &
-     &            - Basin_soil_moist - Basin_ssstor
+        szdstor = It0_basin_soil_moist + It0_basin_ssstor - Basin_soil_moist - Basin_ssstor
         szout = Basin_sz2gw + Basin_ssflow + Basin_lakeinsz + &
      &          Basin_dunnian + Basin_perv_et + Basin_soil_to_gw + Basin_swale_et
         IF ( Basin_soil_moist>0.0D0 ) THEN
           IF ( ABS(szin-szout+szdstor)>ERRCHK ) THEN
             WRITE (BALUNT, 9002) Nowyear, Nowmonth, Nowday
-            WRITE (BALUNT, *) 'SZ flow', szin-szout+szdstor, szin, &
-     &                        szout, szdstor
+            WRITE (BALUNT, *) 'SZ flow', szin-szout+szdstor, szin, szout, szdstor
             WRITE (BALUNT, *) 'SZ flow', Basin_infil, Basin_gw2sm, &
-     &                        Basin_szreject, Last_basin_soil_moist, &
-     &                        Last_basin_ssstor, Basin_soil_moist, &
+     &                        Basin_szreject, It0_basin_soil_moist, &
+     &                        It0_basin_ssstor, Basin_soil_moist, &
      &                        Basin_ssstor, Basin_sz2gw, Basin_ssflow, &
      &                        Basin_lakeinsz, Basin_dunnian, &
      &                        Basin_perv_et, Basin_soil_to_gw, Basin_swale_et, Basin_fluxchange
             WRITE (BALUNT, *) KKITER, Maxgziter
           ENDIF
         ENDIF
-        Last_basin_soil_moist = Basin_soil_moist
-        Last_basin_ssstor = Basin_ssstor
 
         sz_bal = Cap_S - Last_Cap_S + Grav_S - Last_Grav_S - Sat2Grav_Q - Infil2Soil_Q &
      &           + Interflow2Stream_Q + DunnSroff2Stream_Q + DunnInterflow2Lake_Q &
@@ -965,9 +960,8 @@
 !***********************************************************************
       SUBROUTINE BASIN_GET_STORAGE()
       USE GSFSUM
-      USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_pweqv
+      USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_pweqv, Basin_intcp_stor
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor
-      USE PRMS_INTCP, ONLY: Basin_intcp_stor
       USE PRMS_SOILZONE, ONLY: Basin_pref_stor
       USE GSFBUDGET, ONLY: Sat_S, Unsat_S
       IMPLICIT NONE

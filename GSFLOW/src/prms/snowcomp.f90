@@ -21,7 +21,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2022-02-18'
+      character(len=*), parameter :: Version_snowcomp = '2022-04-27'
       INTEGER, SAVE :: Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -48,9 +48,9 @@
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Glacr_pkwater_ante(:), Glacr_pkwater_equiv(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Glacr_pk_depth(:), Glacr_pss(:), Glacr_pst(:)
       INTEGER, SAVE, ALLOCATABLE :: It0_iasw(:), It0_iso(:), It0_mso(:), It0_lso(:), It0_int_alb(:), It0_lst(:)
-      REAL, SAVE, ALLOCATABLE :: It0_snowcov_area(:), It0_snowcov_areasv(:), It0_albedo(:)
+      REAL, SAVE, ALLOCATABLE :: It0_snowcov_areasv(:), It0_albedo(:)
       REAL, SAVE, ALLOCATABLE :: It0_pk_temp(:), It0_pk_def(:), It0_pk_ice(:), It0_pk_den(:), It0_freeh2o(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:), It0_scrv(:), It0_pksv(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_scrv(:), It0_pksv(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pst(:), It0_pss(:), It0_pk_depth(:)
       REAL, SAVE, ALLOCATABLE :: It0_snsv(:), It0_salb(:), It0_slst(:)
       !****************************************************************
@@ -120,12 +120,11 @@
       CALL print_module(MODDESC, MODNAME, Version_snowcomp)
 
       IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
-        ALLOCATE ( It0_snowcov_area(Nhru), It0_snowcov_areasv(Nhru), It0_pkwater_equiv(Nhru) )
         ALLOCATE ( It0_albedo(Nhru), It0_pk_depth(Nhru), It0_iasw(Nhru), It0_pst(Nhru) )
         ALLOCATE ( It0_pksv(Nhru), It0_scrv(Nhru), It0_pk_temp(Nhru), It0_pss(Nhru) )
         ALLOCATE ( It0_pk_def(Nhru), It0_pk_ice(Nhru), It0_pk_den(Nhru), It0_freeh2o(Nhru) )
         ALLOCATE ( It0_iso(Nhru),  It0_mso(Nhru), It0_lso(Nhru), It0_int_alb(Nhru), It0_lst(Nhru) )
-        ALLOCATE ( It0_snsv(Nhru), It0_salb(Nhru), It0_slst(Nhru) )
+        ALLOCATE ( It0_snsv(Nhru), It0_salb(Nhru), It0_slst(Nhru), It0_snowcov_areasv(Nhru) )
       ENDIF
 ! declare variables
       ALLOCATE ( Scrv(Nhru) )
@@ -844,7 +843,8 @@
      &    Hru_ppt, Prmx, Tmaxc, Tminc, Tavgc, Swrad, Potet, Transp_on, Tmax_allsnow_c
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela, &
      &    Snow_evap, Snowmelt, Snowcov_area, Pptmix_nopack, Pk_depth, Glacrb_melt, Basin_snowmelt, &
-     &    Basin_snowevap, Basin_pweqv, Basin_snowcov, Basin_pk_precip, Pkwater_ante
+     &    Basin_snowevap, Basin_pweqv, Basin_snowcov, Basin_pk_precip
+      USE PRMS_IT0_VARS, ONLY: It0_pkwater_equiv, It0_snowcov_area
       USE PRMS_SET_TIME, ONLY: Jday, Julwater
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Canopy_covden, Hru_intcpevap
       IMPLICIT NONE
@@ -885,8 +885,6 @@
           Salb = It0_salb
           Slst = It0_slst
         ELSE
-          It0_pkwater_equiv = Pkwater_equiv
-          It0_snowcov_area = Snowcov_area
           It0_snowcov_areasv = Snowcov_areasv
           It0_albedo = It0_albedo
           It0_pk_depth = Pk_depth
@@ -934,9 +932,8 @@
       Frac_swe = 0.0
       ! By default, the precipitation added to snowpack, snowmelt,
       ! and snow evaporation are 0
-      ! Keep track of the pack water equivalent before it is changed
-      ! by precipitation during this time step
-      Pkwater_ante = Pkwater_equiv
+      ! It0_pkwater_equiv used to keep track of the pack water equivalent
+      ! before it is changed by precipitation during this time step
 
       ! Loop through all the active HRUs, in routing order
       DO j = 1, Active_hrus

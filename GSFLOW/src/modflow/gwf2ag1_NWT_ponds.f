@@ -10,7 +10,6 @@
         DOUBLE PRECISION, PARAMETER :: doneneg = -1.0d0
         DOUBLE PRECISION, PARAMETER :: zerod2 = 1.0d-2
         DOUBLE PRECISION, PARAMETER :: zerod3 = 1.0d-3
-        DOUBLE PRECISION, PARAMETER :: zerod4 = 1.0d-4
         DOUBLE PRECISION, PARAMETER :: dzero = 0.0d0
         INTEGER, SAVE, POINTER :: NWELLS, MXWELL, NWELVL, NPWEL, IPRWEL
         INTEGER, SAVE, POINTER :: IWELLCB, IRDPSI, NNPWEL, NAUXWELL
@@ -31,6 +30,8 @@
 !        CHARACTER(LEN=16), SAVE, DIMENSION(:), POINTER :: SFRAUX
         REAL, SAVE, DIMENSION(:, :), POINTER :: WELL
         REAL, SAVE, DIMENSION(:, :), POINTER :: POND
+        REAL, SAVE, DIMENSION(:), POINTER :: PONDSTORNEW
+        REAL, SAVE, DIMENSION(:), POINTER :: PONDSTOROLD
         REAL, SAVE, DIMENSION(:, :), POINTER :: TABTIMEWELL
         REAL, SAVE, DIMENSION(:, :), POINTER :: TABRATEWELL
         REAL, SAVE, DIMENSION(:, :), POINTER :: TABTIMEPOND
@@ -294,6 +295,7 @@
       ALLOCATE (IRRFACTPOND(maxcellpond,maxirr))
       ALLOCATE (IRRHRU_POND(maxcellpond,maxirr))
       ALLOCATE (RMSEPOND(maxirr))
+      ALLOCATE (PONDSTORNEW(maxirr),PONDSTOROLD(maxirr))
       IF ( NUMIRRPOND > 0 ) THEN
         ALLOCATE(PONDSEGFRAC(NSEGDIMTEMP))
       ELSE
@@ -344,6 +346,8 @@
       IRRPERIODPOND = 0
       TRIGGERPERIODPOND = 0
       RMSEPOND = szero
+      PONDSTORNEW = szero
+      PONDSTOROLD = szero
       !
       !5 - --- ALLOCATE TIME SERIES VARIABLES
       IF (TSACTIVEGW .OR. TSACTIVESW .OR. TSACTIVEGWET .OR.
@@ -1561,13 +1565,17 @@
       USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR, ISFRLIST
       USE GLOBAL, ONLY: IUNIT
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
+      USE PRMS_IT0_VARS, ONLY: It0_dprst_vol_open
+      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
 !      USE GWFBASMODULE, ONLY: TOTIM
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS:
       INTEGER, INTENT(IN)::IN, KPER
       !
-      INTEGER ISEG, i, ii, tabseg, istab, L, ID
+      INTRINSIC :: SNGL
+      INTEGER ISEG, i, ii, tabseg, istab, L, ID, ipond
       EXTERNAL :: RATETERPQ
       REAL :: RATETERPQ, TIME
       ! - -----------------------------------------------------------------
@@ -1583,8 +1591,8 @@
       endif
       ! RESET ALL DEMAND if new stress period 
       if (KPEROLD.ne.KPER) then
-	   DEMAND = 0.0
-      endif	  
+        DEMAND = 0.0
+      endif
       !
       !3 - -----SET MAXIMUM POND OUTFLOW DIVERSION RATES WHEN TABFILES ARE USED
       IF ( NUMIRRPOND > 0 ) THEN
@@ -1620,7 +1628,7 @@
                ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
                ! contains the TABFILE values at this point.
                if (NUMTAB_SFR.ne.0) then
-			    ! check if this segment has a tabfile associated with it
+                  ! check if this segment has a tabfile associated with it
                   istab = 0
                   DO ii = 1, NUMTAB_SFR
                      tabseg = ISFRLIST(1, ii)
@@ -1631,14 +1639,14 @@
                   ! update demand if there is a tabfile or if it is a new
                   ! stress period
                   if ((istab.eq.1) .OR. (KPEROLD.ne.KPER)) then
-			       DEMAND(ISEG) = SEG(2, ISEG)
+                    DEMAND(ISEG) = SEG(2, ISEG)
                   endif
                  ! update demand if this is a new stress period
                elseif (KPEROLD.ne.KPER) then
-			    DEMAND(ISEG) = SEG(2, ISEG)
-			 endif
+                 DEMAND(ISEG) = SEG(2, ISEG)
+               endif
                IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
-               end if
+            end if
             SUPACT(ISEG) = 0.0
             ACTUAL(ISEG) = 0.0
             ACTUALOLD(ISEG) = 0.0
@@ -1657,7 +1665,16 @@
          END DO
       END IF
 !
-!6 - -----RESET SAVED IRR AND AET FROM LAST TIME STEP
+!6 --------SET POND STORAGE FOR PREVIOUS AND CURRENT TIME STEPS
+      do i = 1, NUMIRRPOND
+        ipond = IRRPONDVAR(i)  !these are hru ids for ponds
+        PONDSTOROLD(i) = SNGL(It0_dprst_vol_open(ipond))
+     +                       /MFQ_to_inch_acres
+        PONDSTORNEW(i) = SNGL(Dprst_vol_open(ipond))
+     +                       /MFQ_to_inch_acres
+      end do
+!
+!7 - -----RESET SAVED IRR AND AET FROM LAST TIME STEP
       DIVERSIONIRRUZF = szero
       DIVERSIONIRRPRMS = szero
       WELLIRRUZF = szero
@@ -2399,7 +2416,7 @@
      +                  RHS, IUNIT
       USE GWFBASMODULE, ONLY: TOTIM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, SGOTFLW, NUMTAB_SFR
+      USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, SGOTFLW !, NUMTAB_SFR
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -2420,7 +2437,7 @@
       DOUBLE PRECISION :: Qp, Hh, Ttop, Bbot, dQp, SMOOTHQ
       DOUBLE PRECISION :: QSW, QQ, demandtrigger_gw
       DOUBLE PRECISION :: demandgw_uzf, demandgw_prms
-      INTEGER :: k, ipc, iseg !, PONDID
+      INTEGER :: k, ipc !, iseg, PONDID
       !
       ! - -----------------------------------------------------------------
       !
@@ -2444,9 +2461,9 @@
       RMSEGW = szero
       RMSEPOND = szero
       IF ( kkiter == 1) THEN
-        ACTUALOLD(ISEG) = 0.0
-        SUPACTOLD(ISEG) = 0.0
-        AETITERSW(ISEG) = 0.0
+        ACTUALOLD = 0.0
+        SUPACTOLD = 0.0
+        AETITERSW = 0.0
       END IF
 !1 - ------RESET DEMAND IF IT CHANGES for MODSIM simulations
       !IF ( kkiter == 1 .and. IUNIT(44) > 0 ) Then
@@ -2693,6 +2710,9 @@
       USE GWFSFRMODULE, ONLY: SGOTFLW, DVRSFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE PRMS_MODULE, ONLY: GSFLOW_flag
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_total_open_in,
+     +    Dprst_total_open_out
+      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
       IMPLICIT NONE
       ! ARGUMENTS:
       ! - -----------------------------------------------------------------
@@ -2702,25 +2722,27 @@
 !      CHARACTER*22 TEXT2, TEXT6, TEXT7, TEXT8, TEXT1, TEXT3, TEXT4, 
 !     +             TEXT5, TEXT13, TEXT14, TEXT15, TEXT16
       CHARACTER*22 TEXT2, TEXT7, TEXT8, TEXT1, TEXT3, TEXT4, TEXT13
+!      CHARACTER*22 TEXT14
       CHARACTER*16 TEXT9
 !      CHARACTER*21 TEXT10, TEXT11, TEXT12
-      DOUBLE PRECISION :: RATIN, RATOUT, DVT, RIN, ROUT
+      DOUBLE PRECISION :: RATIN, RATOUT, DVT, RIN, ROUT, STOR
       DOUBLE PRECISION :: SUP, SUBVOL, RATINAG, RATOUTAG, AREA
       DOUBLE PRECISION :: QSW, QSWIRR, QWELL, QWELLIRR, QWELLET
       DOUBLE PRECISION :: QSWGL, QPOND, QPONDIRR
       REAL :: Q, TIME, QIRR, BUDPERC, RIN_SNGL, ROUT_SNGL
       INTEGER :: NWELLSTEMP, L, I, J, ISTSG, ICOUNT, IL !, ID
-      INTEGER :: IC, IR, IBDLBL, IW1, IHRU, K, IPC
+      INTEGER :: IC, IR, IBDLBL, IW1, IHRU, K, IPC, ipond
       INTEGER :: IBD1, IBD2, IBD3, IBD4, IBD5, IBD6, IBD7
 !      INTEGER :: TOTWELLCELLS, TOTDIVERSIONCELLS
 !      INTEGER :: TOTPONDCELLS
       EXTERNAL :: SMOOTHQ
       INTRINSIC :: INT, SNGL
       DOUBLE PRECISION :: SMOOTHQ, bbot, ttop, hh
-      DOUBLE PRECISION :: Qp, QQ, Qsave, dQp
+      DOUBLE PRECISION :: Qp, QQ, Qsave, dQp, DELIN, DELOUT, DELSTOR
       DATA TEXT1/'           AG WELLS'/
       DATA TEXT2/'  DIVERSION SEGMENTS'/
       DATA TEXT13/'   IRRIGATION PONDS'/
+!      DATA TEXT14/'       POND STORAGE'/
       DATA TEXT3/'       SW IRRIGATION'/
       DATA TEXT4/'       GW IRRIGATION'/
 !      DATA TEXT14/'    POND IRRIGATION'/
@@ -2739,6 +2761,7 @@
       RATOUT = DZERO
       RATINAG = DZERO
       RATOUTAG = DZERO
+      STOR = DZERO
       QSW = DZERO
       QSWIRR = DZERO
       QSWGL = DZERO
@@ -3065,6 +3088,8 @@
       RIN = QPOND
       QPOND = DZERO
       !19b ------POND IRRIGATION
+      STOR = DZERO
+      DELSTOR = DZERO
       DO L = 1, NUMIRRPOND
         K = NUMCELLSPOND(L)
         SUBVOL = PONDFLOW(L)
@@ -3073,8 +3098,25 @@
         END DO
       END DO
       ROUT = QPOND
+      DELIN = 0.0D0
+      DELOUT = 0.0D0
+      DO L = 1, NUMIRRPOND
+        ipond = IRRPONDVAR(L)
+        DELIN = DELIN + Dprst_total_open_in(ipond)/MFQ_to_inch_acres
+        DELOUT = DELOUT + Dprst_total_open_out(ipond)/MFQ_to_inch_acres 
+        PONDSTORNEW(L) = Dprst_vol_open(ipond)/MFQ_to_inch_acres
+        DELSTOR = DELSTOR + PONDSTORNEW(L) - PONDSTOROLD(L)
+      END DO  
+      DELIN = DELIN - RIN
+      DELOUT = DELOUT - ROUT
+      DELSTOR = (DELSTOR - DELIN + DELOUT)/DELT
       RIN_SNGL = SNGL(RIN)
       ROUT_SNGL = SNGL(ROUT)
+      IF ( DELSTOR >= DZERO ) THEN
+          ROUT_SNGL = ROUT_SNGL + SNGL(DELSTOR)
+      ELSE
+          RIN_SNGL = RIN_SNGL + SNGL(DELSTOR)
+      END IF
       VBVLAG(3, MSUMAG) = RIN_SNGL
       VBVLAG(4, MSUMAG) = ROUT_SNGL
       VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN_SNGL*DELT
@@ -3357,7 +3399,8 @@
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: Hru_area
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Hru_actet
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Hru_actet !,
+!     +    Dprst_total_open_in, Dprst_total_open_out
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
      +                      MFQ_to_inch_acres
       USE GLOBAL, ONLY: ISSFLG
@@ -4577,5 +4620,7 @@ C8------RETURN.
       DEALLOCATE(RMSEPOND)
       DEALLOCATE(PONDSEGFRAC)
       DEALLOCATE(FLOWTHROUGH_POND)
+      DEALLOCATE(PONDSTOROLD)
+      DEALLOCATE(PONDSTORNEW)
       RETURN
       END

@@ -103,7 +103,7 @@ C     ------------------------------------------------------------------
       ALLOCATE (NSFRPAR, ISTCB1, ISTCB2, IUZT, MAXPTS)
       ALLOCATE (ISFROPT, NSTRAIL, ISUZN, NSFRSETS)
       ALLOCATE (NUZST, NSTOTRL, NUMAVE)
-      ALLOCATE (ITMP, IRDFLG, IPTFLG, NP)
+      ALLOCATE (ITMP, IRDFLG, IPTFLG, NP, OUTSEGFLAG, UNITSEGOUT)
       ALLOCATE (CONST, DLEAK, IRTFLG, NUMTIM, WEIGHT, FLWTOL)
       ALLOCATE (NSEGDIM)  
       ALLOCATE (SFRRATIN, SFRRATOUT)
@@ -145,6 +145,8 @@ C         DLEAK, ISTCB1, ISTCB2.
       lloc = 1
       IERR = 0
       IFLG = 0
+      OUTSEGFLAG = 0
+      UNITSEGOUT = 0
       STRHC1KHFLAG = 0
       STRHC1KVFLAG = 0
       FACTORKH=1.0
@@ -179,6 +181,11 @@ C
       CALL URWORD(line, lloc, istart, istop, 3, i, DLEAK, IOUT, In)
       CALL URWORD(line, lloc, istart, istop, 2, ISTCB1, r, IOUT, In)
       CALL URWORD(line, lloc, istart, istop, 2, ISTCB2, r, IOUT, In)
+      IF ( OUTSEGFLAG > 0 ) THEN
+          ALLOCATE(SEGFLOWS(NSS))
+      ELSE
+          ALLOCATE(SEGFLOWS(1))
+      END IF
       IF ( NSTRM.LT.0 ) THEN
 !        WRITE(IOUT, 9036)
 ! 9036   FORMAT (//, 'NSTRM IS NEGATIVE AND THIS METHOD FOR ',
@@ -1033,6 +1040,18 @@ C
               CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
               IF(MAXVAL.LT.0) MAXVAL=0
               WRITE(IOUT,31) NUMTAB_SFR,MAXVAL
+            case('SEGOUTPUT')
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITSEGOUT,R,IOUT,IN)
+              OUTSEGFLAG = 1
+              IF(UNITSEGOUT.LE.0) THEN
+                  OUTSEGFLAG = 0
+                  UNITSEGOUT = 0
+              END IF
+              IF ( OUTSEGFLAG > 0 ) THEN
+                WRITE(IOUT,35) UNITSEGOUT
+              ELSE
+                WRITE(IOUT,36)
+              END IF
             case('LOSSFACTOR')
               WRITE(IOUT,*)
               CALL URWORD(line, lloc, istart, istop, 3, i, FACTOR,
@@ -1136,6 +1155,10 @@ C
      +                'This option replaces NSTRM<0')
    31 FORMAT(1X,I10,' Specified inflow files will be read ',
      +                 'with a maximum of ',I10,' row entries per file')
+   35 FORMAT(1X,I10,' Option to output flows by segments is active. ',
+     +                 'Values will be written to file unit ',I10)
+   36 FORMAT(1X,I10,' Option to output flows by segments is active. ',
+     +            'But an invalid value for UNITSEGOUT was specified.')
   33  FORMAT('Stream loss will be calculated as a factor ',
      +                 'of the streambed hydraulic conductivity. ',
      +                 'Multiplication factor is equal to ',E20.10)
@@ -4369,6 +4392,7 @@ cDEP   need to fix for unsaturated flow
             SFRQ(5, l) = qc
         END IF
       END DO
+      IF ( OUTSEGFLAG > 0 ) CALL OUTSEGFLOWS()
 !        IF ( Irtflg.NE.0 )WRITE(IOUT,*)
 !     +         'TRANSIENT FLOW ERROR = ', Transient_bd
 C
@@ -8556,6 +8580,67 @@ C8------RETURN.
       RETURN
       END SUBROUTINE MODSIM2SFR
 C
+C-------SUBROUTINE MODSIM2SFR
+C
+      SUBROUTINE OUTSEGFLOWS()
+C     *******************************************************************
+C     APPLY DIVERSIONS/LAKE RELEASES CALCULATED BY MODSIM TO DIVERSION 
+C     SEGMENTS.
+!--------MARCH 8, 2017
+C     *******************************************************************
+      USE GWFSFRMODULE
+      USE GWFBASMODULE, ONLY: DELT,TOTIM
+      IMPLICIT NONE
+C     -------------------------------------------------------------------
+C     SPECIFICATIONS:
+C     -------------------------------------------------------------------
+C     ARGUMENTS
+C     -------------------------------------------------------------------
+!      INTEGER 
+!      DOUBLE PRECISION 
+C     -------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     -------------------------------------------------------------------
+      INTEGER :: ISTSG, L, ISTSGOLD, REACHNUMINSEG
+      DOUBLE PRECISION :: FLOWIN, FLOWOUT
+C     -------------------------------------------------------------------
+C
+      ISTSG = 1
+      ISTSGOLD = ISTSG
+      REACHNUMINSEG = 0
+      FLOWIN = 0.0D0
+      FLOWOUT = 0.0D0
+C
+C1------LOOP OVER REACHES TO SET ACCRETIONS/DEPLETIONS
+C
+      DO L = 1, NSTRM
+C
+C2------DETERMINE STREAM SEGMENT NUMBER.
+        REACHNUMINSEG = REACHNUMINSEG + 1
+        ISTSGOLD = ISTSG
+        ISTSG = ISTRM(4, L)
+C
+C3------DIFFERENCE FLOW IN AND FLOW OUT OF SEGEMENT.
+        IF( ISTSG /= ISTSGOLD ) THEN
+          REACHNUMINSEG = 1
+        END IF
+C
+C4------IF FIRST REACH IN SEGMENT THEN SET FLOWIN
+        IF ( REACHNUMINSEG == 1 ) FLOWIN = STRM(10,L)
+C
+C5------IF LAST REACH IN SEGMENT THEN SET FLOWOT
+        IF ( REACHNUMINSEG == ISEG(4,ISTSG) ) THEN
+          FLOWOUT = STRM(9,L)
+          SEGFLOWS(ISTSG) = SEGFLOWS(ISTSG) + (FLOWOUT - FLOWIN)*DELT
+        END IF
+      END DO
+      WRITE(UNITSEGOUT,33)TOTIM,(SEGFLOWS(L),L=1,NSS)
+33    FORMAT(5000E15.5)
+C
+C8------RETURN.
+      RETURN
+      END SUBROUTINE OUTSEGFLOWS
+C
 C-------SUBROUTINE GWF2SFR7DA
       SUBROUTINE GWF2SFR7DA(IGRID)
 C  Save SFR data for a grid.
@@ -8668,6 +8753,8 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%Nfoldflbt)
       DEALLOCATE (GWFSFRDAT(IGRID)%NUMTAB_SFR)
       DEALLOCATE (GWFSFRDAT(IGRID)%MAXVAL)
+      DEALLOCATE (GWFSFRDAT(IGRID)%OUTSEGFLAG)
+      DEALLOCATE (GWFSFRDAT(IGRID)%UNITSEGOUT) 
 C
       END SUBROUTINE GWF2SFR7DA
 C
@@ -8783,6 +8870,8 @@ C     ------------------------------------------------------------------
       Nfoldflbt=>GWFSFRDAT(IGRID)%Nfoldflbt
       NUMTAB_SFR=>GWFSFRDAT(IGRID)%NUMTAB_SFR
       MAXVAL=>GWFSFRDAT(IGRID)%MAXVAL
+      OUTSEGFLAG=>GWFSFRDAT(IGRID)%OUTSEGFLAG  
+      UNITSEGOUT=>GWFSFRDAT(IGRID)%UNITSEGOUT
       END SUBROUTINE SGWF2SFR7PNT
 C
 C-------SUBROUTINE SGWF2SFR7PSV
@@ -8897,5 +8986,7 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%Nfoldflbt=>Nfoldflbt
       GWFSFRDAT(IGRID)%NUMTAB_SFR=>NUMTAB_SFR
       GWFSFRDAT(IGRID)%MAXVAL=>MAXVAL
+      GWFSFRDAT(IGRID)%OUTSEGFLAG=>OUTSEGFLAG
+      GWFSFRDAT(IGRID)%UNITSEGOUT=>UNITSEGOUT 
 C
       END SUBROUTINE SGWF2SFR7PSV
