@@ -6,11 +6,11 @@
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Water Balance Computations'
         character(len=*), parameter :: MODNAME_WB = 'water_balance'
-        character(len=*), parameter :: Version_water_balance = '2022-01-12'
+        character(len=*), parameter :: Version_water_balance = '2022-04-22'
         INTEGER, SAVE :: BALUNT, SZUNIT, GWUNIT, INTCPUNT, SROUNIT, SNOWUNIT
         REAL, PARAMETER :: TOOSMALL = 3.1E-05, SMALL = 1.0E-04, BAD = 1.0E-03
         DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 1.0D-05
-        DOUBLE PRECISION, SAVE :: Last_basin_gwstor, Basin_dprst_wb
+        DOUBLE PRECISION, SAVE :: Basin_dprst_wb
         DOUBLE PRECISION, ALLOCATABLE, SAVE :: Hru_storage_ante(:), Gwstor_ante(:)
 !   Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_capillary_wb, Basin_gravity_wb, Basin_soilzone_wb
@@ -128,8 +128,8 @@
 !***********************************************************************
       SUBROUTINE water_balance_init()
       USE PRMS_WATER_BALANCE
-      USE PRMS_FLOWVARS, ONLY: Gwres_stor
-      USE PRMS_GWFLOW, ONLY: Basin_gwstor
+      USE PRMS_FLOWVARS, ONLY: Gwres_stor, Basin_gwstor
+      USE PRMS_IT0_VARS, ONLY: It0_basin_gwstor
       USE PRMS_BASIN, ONLY: Hru_storage
 !***********************************************************************
       Basin_capillary_wb = 0.0D0
@@ -137,7 +137,7 @@
       Basin_soilzone_wb = 0.0D0
       Basin_dprst_wb = 0.0D0
 !      Hru_runoff = 0.0D0
-      Last_basin_gwstor = Basin_gwstor
+      It0_basin_gwstor = Basin_gwstor
       Gwstor_ante = Gwres_stor
       Hru_storage_ante = Hru_storage
 
@@ -153,37 +153,39 @@
       USE PRMS_BASIN, ONLY: Hru_route_order, Active_hrus, Hru_frac_perv, Hru_area_dble, Hru_perv, &
      &    Basin_area_inv, Dprst_area_max, Hru_percent_imperv, Dprst_frac, Cov_type, Hru_storage
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Basin_ppt, Hru_rain, Hru_snow, Newsnow, Pptmix
-      USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Soil_to_gw, Soil_to_ssr, Soil_moist_ante, &
-     &    Infil, Soil_moist_max, Ssr_to_gw, Ssres_flow, Basin_soil_to_gw, Soil_moist, Ssres_stor, Ssres_stor_ante, &
-     &    Slow_flow, Basin_perv_et, Basin_ssflow, Basin_swale_et, Slow_stor, Ssres_in, Soil_rechr, Pkwater_ante, &
+      USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Soil_to_gw, Soil_to_ssr, &
+     &    Infil, Soil_moist_max, Ssr_to_gw, Ssres_flow, Basin_soil_to_gw, Soil_moist, Ssres_stor, &
+     &    Slow_flow, Basin_perv_et, Basin_ssflow, Basin_swale_et, Slow_stor, Ssres_in, Soil_rechr, &
      &    Basin_lakeevap, Sroff, Hru_actet, Pkwater_equiv, Gwres_stor, Dprst_vol_open, Dprst_vol_clos, Basin_sroff, &
-     &    Snowmelt, Snow_evap, Snowcov_area, Pptmix_nopack, Glacrb_melt, Basin_pweqv, Basin_snowmelt, Basin_snowevap, Basin_snowcov
+     &    Snowmelt, Snow_evap, Snowcov_area, Pptmix_nopack, Glacrb_melt, Basin_pweqv, Basin_snowmelt, Basin_snowevap, Basin_snowcov, &
+     &    Dprst_stor_hru, Hru_impervstor, Hru_intcpstor, Pref_flow_stor, Basin_gwstor, Intcp_stor, Basin_intcp_stor
+      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_pkwater_equiv, It0_ssres_stor, It0_basin_soil_moist, &
+                               It0_basin_ssstor, It0_basin_gwstor, It0_dprst_stor_hru, It0_imperv_stor
       USE PRMS_SET_TIME, ONLY: Nowtime
       USE PRMS_CASCADE, ONLY: Ncascade_hru
-      USE PRMS_INTCP, ONLY: Hru_intcpstor, Basin_net_ppt, Basin_intcp_evap, Basin_changeover, &
-     &    Basin_intcp_stor, Net_rain, Net_snow, Hru_intcpevap, &
-     &    Srain_intcp, Wrain_intcp, Snow_intcp, Intcp_stor, Intcp_evap, &
+      USE PRMS_INTCP, ONLY: Basin_net_ppt, Basin_intcp_evap, Basin_changeover, &
+     &    Net_rain, Net_snow, Hru_intcpevap, Srain_intcp, Wrain_intcp, Snow_intcp, Intcp_evap, &
+     &    Srain_intcp, Wrain_intcp, Snow_intcp, Intcp_evap, &
      &    Canopy_covden, Intcp_changeover, Net_ppt, Intcp_stor_ante, Last_intcp_stor, &
      &    Net_apply, Gain_inches, Use_transfer_intcp, Basin_hru_apply, Basin_net_apply
       USE PRMS_GLACR, ONLY: Glacr_flow
-      USE PRMS_SRUNOFF, ONLY: Basin_infil, Hru_hortn_cascflow, Upslope_hortonian, Hru_impervstor, &
-     &    Dprst_stor_hru, Basin_sroffp, Basin_sroffi, Basin_dprst_sroff, Basin_sroff_down, &
+      USE PRMS_SRUNOFF, ONLY: Basin_infil, Hru_hortn_cascflow, Upslope_hortonian, &
+     &    Basin_sroffp, Basin_sroffi, Basin_dprst_sroff, Basin_sroff_down, &
      &    Basin_hortonian_lakes, Basin_imperv_evap, Basin_imperv_stor, &
      &    Basin_dprst_evap, Basin_dprst_seep, Hru_impervevap, Dprst_seep_hru, &
      &    Dprst_evap_hru, Dprst_sroff_hru, Dprst_insroff_hru, Sro_to_dprst_perv, &
-     &    Dprst_area_clos, Hortonian_flow, Dprst_in, Hru_sroffp, Hru_sroffi, Imperv_stor_ante, &
-     &    Dprst_stor_ante, Basin_cfgi_sroff
+     &    Dprst_area_clos, Hortonian_flow, Dprst_in, Hru_sroffp, Hru_sroffi, Basin_cfgi_sroff
       USE PRMS_SOILZONE, ONLY: Swale_actet, Dunnian_flow, Basin_sz2gw, &
      &    Perv_actet, Cap_infil_tot, Pref_flow_infil, Cap_waterin, Upslope_interflow, &
-     &    Upslope_dunnianflow, Pref_flow, Pref_flow_stor, Soil_lower, Gvr2pfr, Basin_ssin, &
+     &    Upslope_dunnianflow, Pref_flow, Soil_lower, Gvr2pfr, Basin_ssin, &
      &    Basin_lakeinsz, Basin_dunnian, Pref_flow_max, Pref_flow_den, Pref_flow_thrsh, &
      &    Basin_sm2gvr_max, Basin_cap_infil_tot, Basin_slowflow, &
      &    Basin_dunnian_gvr, Basin_pref_flow_infil, Basin_dninterflow, Basin_pref_stor, Basin_dunnian_pfr, &
      &    Basin_dncascadeflow, Basin_capwaterin, Basin_sm2gvr, Basin_prefflow, Basin_slstor, Basin_gvr2pfr, &
      &    Hru_sz_cascadeflow, Pfr_dunnian_flow, Grav_dunnian_flow, Basin_dndunnianflow, &
-     &    Soil_moist_tot, Last_soil_moist, Last_ssstor
+     &    Soil_moist_tot
       USE PRMS_GWFLOW, ONLY: Basin_dnflow, Basin_gwsink, Basin_gwstor_minarea_wb, Gwres_flow, &
-     &    Basin_gwstor, Basin_gwflow, Basin_gw_upslope, Basin_gwin, Gwres_sink, Hru_gw_cascadeflow, Gw_upslope, &
+     &    Basin_gwflow, Basin_gw_upslope, Basin_gwin, Gwres_sink, Hru_gw_cascadeflow, Gw_upslope, &
      &    Gwminarea_flag, Gwstor_minarea_wb, Gwin_dprst, Gwres_in
       !use prms_utils, only: print_date
       IMPLICIT NONE
@@ -233,8 +235,8 @@
         ENDIF
 
         ! Skip the HRU if there is no snowpack and no new snow
-        IF ( Pkwater_ante(i)>DNEARZERO .OR. Newsnow(i)==ACTIVE ) THEN
-          hrubal = SNGL( Pkwater_ante(i) - Pkwater_equiv(i) ) - Snow_evap(i) - Snowmelt(i)
+        IF ( It0_pkwater_equiv(i)>DNEARZERO .OR. Newsnow(i)==ACTIVE ) THEN
+          hrubal = SNGL( It0_pkwater_equiv(i) - Pkwater_equiv(i) ) - Snow_evap(i) - Snowmelt(i)
           IF ( Pptmix_nopack(i)==ACTIVE ) THEN
             hrubal = hrubal + Net_snow(i)
           ELSE
@@ -247,7 +249,7 @@
               WRITE ( BALUNT, * ) 'Possible HRU snow rounding issue'
             ENDIF
             WRITE ( BALUNT,* ) i, hrubal, Nowyear, Nowmonth, Nowday, &
-     &              Pkwater_ante(i), Pkwater_equiv(i), Snow_evap(i), &
+     &              It0_pkwater_equiv(i), Pkwater_equiv(i), Snow_evap(i), &
      &              Snowmelt(i), Net_ppt(i), Net_snow(i), Net_rain(i), &
      &              Newsnow(i), Pptmix(i), Pptmix_nopack(i)
           ENDIF
@@ -255,7 +257,7 @@
         ENDIF
 
         robal = Snowmelt(i) - Hortonian_flow(i) & !includes dprst runoff, if any
-     &          - Infil(i)*perv_frac - Hru_impervevap(i) + Imperv_stor_ante(i) - Hru_impervstor(i) + Intcp_changeover(i)
+     &          - Infil(i)*perv_frac - Hru_impervevap(i) + It0_imperv_stor(i) - Hru_impervstor(i) + Intcp_changeover(i)
         ! need to account for AG in water balance
         IF ( Use_transfer_intcp==ACTIVE ) robal = robal + Net_apply(i)*perv_frac !??? is net_apply for whole HRU (also for ag, impervious, dprst)
         IF ( Net_ppt(i)>0.0 ) THEN
@@ -273,12 +275,12 @@
         ENDIF
         IF ( Cascade_flag>CASCADE_OFF ) robal = robal + SNGL( Upslope_hortonian(i) - Hru_hortn_cascflow(i) )
         IF ( Dprst_flag==ACTIVE ) robal = robal - Dprst_evap_hru(i) + &
-     &                               SNGL( Dprst_stor_ante(i) - Dprst_stor_hru(i) - Dprst_seep_hru(i) ) !- Dprst_in(i) - Dprst_insroff_hru(i)
+     &                               SNGL( It0_dprst_stor_hru(i) - Dprst_stor_hru(i) - Dprst_seep_hru(i) ) !- Dprst_in(i) - Dprst_insroff_hru(i)
         gmelt = 0.0
         basin_robal = basin_robal + DBLE( robal )
         IF ( ABS(robal)>TOOSMALL ) THEN
           IF ( Dprst_flag==ACTIVE ) THEN
-            dprst_hru_wb = Dprst_stor_ante(i) - Dprst_stor_hru(i) - Dprst_seep_hru(i) - Dprst_sroff_hru(i) + Dprst_in(i) &
+            dprst_hru_wb = It0_dprst_stor_hru(i) - Dprst_stor_hru(i) - Dprst_seep_hru(i) - Dprst_sroff_hru(i) + Dprst_in(i) &
      &                     - DBLE( Dprst_evap_hru(i) ) + DBLE( Dprst_insroff_hru(i) )
             Basin_dprst_wb = Basin_dprst_wb + dprst_hru_wb*harea
             WRITE ( BALUNT, * ) 'dprst', dprst_hru_wb, Dprst_stor_hru(i), Dprst_stor_hru(i), &
@@ -289,7 +291,7 @@
      &              Dprst_area_clos(i), Snowcov_area(i), Dprst_in(i), Sro_to_dprst_perv(i), Hru_sroffp(i), Hru_sroffi(i)
             WRITE ( BALUNT, * ) robal, Net_rain(i), Net_ppt(i), Net_rain(i)*Dprst_frac(i), &
      &              Dprst_frac(i), Pptmix_nopack(i)
-            WRITE ( BALUNT, * ) Infil(i), perv_frac, Hru_impervevap(i), Imperv_stor_ante(i), Hru_impervstor(i), &
+            WRITE ( BALUNT, * ) Infil(i), perv_frac, Hru_impervevap(i), It0_imperv_stor(i), Hru_impervstor(i), &
      &                          Hru_percent_imperv(i), Dprst_sroff_hru(i)
           ENDIF
           IF ( ABS(robal)>SMALL ) THEN
@@ -301,19 +303,19 @@
           IF ( Glacier_flag==ACTIVE ) gmelt = Glacrb_melt(i) + Glacr_flow(i)
           IF ( Cascade_flag>CASCADE_OFF ) THEN
             WRITE ( BALUNT, '(4I4,1X,F0.6,18(1X,F0.6))' ) Nowyear, Nowmonth, Nowday, Pptmix_nopack(i), robal, Snowmelt(i), &
-     &              Upslope_hortonian(i), Imperv_stor_ante(i), Hru_hortn_cascflow(i), Infil(i), Hortonian_flow(i), &
+     &              Upslope_hortonian(i), It0_imperv_stor(i), Hru_hortn_cascflow(i), Infil(i), Hortonian_flow(i), &
      &              Hru_impervstor(i), Hru_impervevap(i), Net_ppt(i), &
      &              Pkwater_equiv(i), Snow_evap(i), Net_snow(i), Net_rain(i), Hru_sroffp(i), Hru_sroffi(i), gmelt, harea
           ELSE
             WRITE ( BALUNT,'(4I4,1X,F0.6,18(1X,F0.6))' ) Nowyear, Nowmonth, Nowday, Pptmix_nopack(i), &
-     &              robal, Snowmelt(i), Imperv_stor_ante(i), Infil(i), Hortonian_flow(i), Hru_impervstor(i), &
+     &              robal, Snowmelt(i), It0_imperv_stor(i), Infil(i), Hortonian_flow(i), Hru_impervstor(i), &
      &              Hru_impervevap(i), Hru_percent_imperv(i), Net_ppt(i), Pkwater_equiv(i), Snow_evap(i), &
      &              Net_snow(i), Net_rain(i), Hru_sroffp(i), Hru_sroffi(i), Intcp_changeover(i), gmelt, harea
           ENDIF
         ENDIF
 
-        last_sm = Soil_moist_ante(i)
-        last_ss = Ssres_stor_ante(i)
+        last_sm = It0_soil_moist(i)
+        last_ss = It0_ssres_stor(i)
 
         soilbal = (last_sm - Soil_moist(i) - Perv_actet(i))*perv_frac &
      &            - Soil_to_ssr(i) - Soil_to_gw(i) + Cap_infil_tot(i)
@@ -465,38 +467,38 @@
       ENDIF
 
 ! soilzone
-      Basin_capillary_wb = Last_soil_moist - Basin_soil_moist - &
+      Basin_capillary_wb = It0_basin_soil_moist - Basin_soil_moist - &
      &                     Basin_perv_et - Basin_sm2gvr_max + Basin_cap_infil_tot - Basin_soil_to_gw
-      Basin_gravity_wb = Last_ssstor - Basin_ssstor + Basin_sm2gvr - Basin_dncascadeflow - &
+      Basin_gravity_wb = It0_basin_ssstor - Basin_ssstor + Basin_sm2gvr - Basin_dncascadeflow - &
      &                   Basin_ssflow - Basin_sz2gw - Basin_dunnian + Basin_dunnian_pfr - &
      &                   Basin_swale_et + Basin_pref_flow_infil
-      Basin_soilzone_wb = Basin_infil + Last_ssstor - &
-     &                    Basin_ssstor + Last_soil_moist - Basin_soil_moist - &
+      Basin_soilzone_wb = Basin_infil + It0_basin_ssstor - &
+     &                    Basin_ssstor + It0_basin_soil_moist - Basin_soil_moist - &
      &                    Basin_perv_et - Basin_swale_et - Basin_sz2gw - &
      &                    Basin_soil_to_gw - Basin_ssflow - Basin_dunnian - &
      &                    Basin_lakeinsz
 
       IF ( DABS(Basin_gravity_wb)>DTOOSMALL ) WRITE ( BALUNT, * ) 'basin gvrbal issue', Basin_gravity_wb, &
-     &     Last_ssstor, Basin_ssstor, Basin_sm2gvr, Basin_ssflow, Basin_sz2gw, Basin_dunnian, &
+     &     It0_basin_ssstor, Basin_ssstor, Basin_sm2gvr, Basin_ssflow, Basin_sz2gw, Basin_dunnian, &
      &     Basin_swale_et, Basin_pref_flow_infil, Basin_dninterflow, Basin_pref_stor, &
      &     Basin_dunnian_pfr, Basin_lakeinsz, Basin_dncascadeflow, &
      &     Basin_dunnian_gvr, Basin_slowflow, Basin_prefflow, Basin_gvr2pfr, Nowtime
       IF ( DABS(Basin_capillary_wb)>DTOOSMALL ) WRITE( BALUNT, * ) 'possible basin capillary balance issue', &
-     &     Basin_capillary_wb, Last_soil_moist, Basin_soil_moist, Basin_perv_et, &
+     &     Basin_capillary_wb, It0_basin_soil_moist, Basin_soil_moist, Basin_perv_et, &
      &     Basin_sm2gvr, Basin_cap_infil_tot, Basin_soil_to_gw, Basin_sm2gvr_max, Basin_capwaterin, Nowtime
       IF ( DABS(Basin_soilzone_wb)>DTOOSMALL ) WRITE ( BALUNT, * ) 'possible basin soil zone rounding issue', &
      &     Basin_soilzone_wb, Basin_capwaterin, Basin_pref_flow_infil, Basin_infil, &
-     &     Last_ssstor, Basin_ssstor, Last_soil_moist, Basin_soil_moist, Basin_perv_et, Basin_swale_et, &
+     &     It0_basin_ssstor, Basin_ssstor, It0_basin_soil_moist, Basin_soil_moist, Basin_perv_et, Basin_swale_et, &
      &     Basin_sz2gw, Basin_soil_to_gw, Basin_ssflow, Basin_dunnian, Basin_dncascadeflow, &
      &     Basin_sm2gvr, Basin_lakeinsz, Basin_dunnian_pfr, Nowtime
 
       soil_in = soil_in*Basin_area_inv
       basin_bal = basin_bal*Basin_area_inv
-      bsmbal = Last_soil_moist - Basin_soil_moist + Last_ssstor - Basin_ssstor - Basin_perv_et - Basin_sz2gw + soil_in - &
+      bsmbal = It0_basin_soil_moist - Basin_soil_moist + It0_basin_ssstor - Basin_ssstor - Basin_perv_et - Basin_sz2gw + soil_in - &
      &         Basin_ssflow - Basin_soil_to_gw - Basin_dunnian - Basin_swale_et - Basin_lakeinsz
 
       WRITE ( SZUNIT, 9002 ) Nowyear, Nowmonth, Nowday, basin_bal, &
-     &        bsmbal, Last_soil_moist, Basin_soil_moist, Last_ssstor, &
+     &        bsmbal, It0_basin_soil_moist, Basin_soil_moist, It0_basin_ssstor, &
      &        Basin_ssstor, Basin_perv_et, Basin_sz2gw, Basin_ssflow, &
      &        Basin_soil_to_gw, Basin_dunnian, soil_in, Basin_lakeinsz, &
      &        Basin_dncascadeflow, Basin_swale_et, Basin_prefflow, Basin_dunnian_pfr, &
@@ -504,15 +506,15 @@
 
       IF ( DABS(bsmbal)>0.05D0 .OR. DABS(basin_bal)>0.001D0 ) THEN
         WRITE ( BALUNT, * ) '*ERROR, soilzone basin water balance', bsmbal, &
-     &          basin_bal, Last_soil_moist, Basin_soil_moist, &
-     &          Last_ssstor, Basin_ssstor, Basin_perv_et, Basin_sz2gw, &
+     &          basin_bal, It0_basin_soil_moist, Basin_soil_moist, &
+     &          It0_basin_ssstor, Basin_ssstor, Basin_perv_et, Basin_sz2gw, &
      &          soil_in, Basin_ssflow, Basin_soil_to_gw, Basin_dunnian, &
      &          Basin_swale_et, Basin_lakeinsz
         WRITE ( BALUNT, * ) Basin_pref_stor, Basin_slstor
       ELSEIF ( DABS(bsmbal)>0.005D0 .OR. DABS(basin_bal)>DTOOSMALL ) THEN
         WRITE ( BALUNT, * ) 'Possible soilzone basin water balance ERROR', &
-     &          bsmbal, basin_bal, Last_soil_moist, Basin_soil_moist, &
-     &          Last_ssstor, Basin_ssstor, Basin_perv_et, Basin_sz2gw, &
+     &          bsmbal, basin_bal, It0_basin_soil_moist, Basin_soil_moist, &
+     &          It0_basin_ssstor, Basin_ssstor, Basin_perv_et, Basin_sz2gw, &
      &          soil_in, Basin_ssflow, Basin_soil_to_gw, Basin_dunnian, &
      &          Basin_swale_et, Basin_lakeinsz
         WRITE ( BALUNT, * ) Basin_pref_stor, Basin_slstor
@@ -527,15 +529,15 @@
 
       ! not going to balance because gwstor under lakes is computed each time step fix for lakes
       ! basin_gwin includes upslope flow, gwin_dprst, soil_to_gw, ssr_to_gw
-      gwbal = Basin_gwin + Last_basin_gwstor - Basin_gwstor - Basin_gwsink &
+      gwbal = Basin_gwin + It0_basin_gwstor - Basin_gwstor - Basin_gwsink &
      &        - Basin_gwflow - Basin_dnflow + Basin_gwstor_minarea_wb
       IF ( DABS(gwbal)>DSMALL ) WRITE ( BALUNT, 9003 ) 'Possible GWR basin water balance issue', &
      &                                                 Nowyear, Nowmonth, Nowday, gwbal
       WRITE ( GWUNIT, 9002 ) Nowyear, Nowmonth, Nowday, &
-     &        gwbal, Last_basin_gwstor, Basin_gwstor, Basin_gwin, &
+     &        gwbal, It0_basin_gwstor, Basin_gwstor, Basin_gwin, &
      &        Basin_gwflow, Basin_gwsink, &
      &        Basin_gw_upslope, Basin_gwstor_minarea_wb, Basin_dnflow
-      Last_basin_gwstor = Basin_gwstor
+      It0_basin_gwstor = Basin_gwstor
 
  9001 FORMAT (I5, 2('/', I2.2), I7, 26F11.5)
  9002 FORMAT (I5, 2('/', I2.2), 23F11.5)

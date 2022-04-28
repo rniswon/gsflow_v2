@@ -148,10 +148,10 @@
       USE PRMS_MODULE, ONLY: Nsegment, Nlake, Hru_type, Iter_aet_flag
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Lake_hru_id, Lake_area
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
-      USE PRMS_FLOWVARS, ONLY: Hru_actet
+      USE PRMS_FLOWVARS, ONLY: Hru_actet, Strm_seg_in
       USE PRMS_SET_TIME, ONLY: Cfs_conv
 !      USE PRMS_MODSIM_DIVERSION_READ, ONLY: Nag_diversions, Hru_destination_id, Seg_source_id
-      USE PRMS_SRUNOFF, ONLY: Hortonian_lakes, Strm_seg_in
+      USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
       USE PRMS_SOILZONE, ONLY: Lakein_sz
 !      USE PRMS_SOILZONE_AG, ONLY: Ag_irrigation_add_vol ! acre-inches
       IMPLICIT NONE

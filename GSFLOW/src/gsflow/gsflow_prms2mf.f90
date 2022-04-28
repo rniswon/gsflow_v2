@@ -528,7 +528,7 @@
       USE GSFMODFLOW, ONLY: Sfr_conv
       USE GWFSFRMODULE, ONLY: STRM
       USE PRMS_MODULE, ONLY: Nsegment
-      USE PRMS_SRUNOFF, ONLY: Strm_seg_in
+      USE PRMS_FLOWVARS, ONLY: Strm_seg_in
       IMPLICIT NONE
       INTRINSIC SNGL
 ! Local Variables

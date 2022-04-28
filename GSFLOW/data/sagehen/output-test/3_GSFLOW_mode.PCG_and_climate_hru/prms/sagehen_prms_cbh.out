@@ -70,24 +70,24 @@ Simulation time period: 1980/10/01 00:00:00 to 1996/09/30 00:00:00
 ====================================================================
 Basin Definition                basin               2022-02-10
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-02-18
+Common States and Fluxes        climateflow         2022-04-27
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
-Timestep Control                prms_time           2021-11-19
+Timestep Control                prms_time           2022-04-21
 Temperature Distribution        climate_hru         2022-03-17
 Precipitation Distribution      climate_hru         2022-03-17
 Solar Radiation Distribution    climate_hru         2022-03-17
 Potential Evapotranspiration    climate_hru         2022-03-17
 Transpiration Distribution      transp_tindex       2021-09-07
-Canopy Interception             intcp               2022-02-03
-Snow Dynamics                   snowcomp            2022-02-18
-Surface Runoff                  srunoff_smidx       2022-02-10
-Soilzone Computations           soilzone            2022-02-04
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-12-09
+Canopy Interception             intcp               2022-04-21
+Snow Dynamics                   snowcomp            2022-04-27
+Surface Runoff                  srunoff_smidx       2022-04-22
+Soilzone Computations           soilzone            2022-04-27
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-04-07
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
-GSFLOW Output Budget Summary    gsflow_budget       2022-02-18
-GSFLOW Output CSV Summary       gsflow_sum          2022-02-10
-Output Summary                  subbasin            2022-01-25
+GSFLOW Output Budget Summary    gsflow_budget       2022-04-27
+GSFLOW Output CSV Summary       gsflow_sum          2022-04-22
+Output Summary                  subbasin            2022-04-21
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2022-01-12
 UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
@@ -106,5 +106,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time   16 minutes 55.95 seconds
+Execution elapsed time   16 minutes 42.67 seconds
 

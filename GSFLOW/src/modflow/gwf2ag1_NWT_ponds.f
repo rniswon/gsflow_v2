@@ -1565,7 +1565,8 @@
       USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR, ISFRLIST
       USE GLOBAL, ONLY: IUNIT
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, It0_dprst_vol_open
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
+      USE PRMS_IT0_VARS, ONLY: It0_dprst_vol_open
       USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
 !      USE GWFBASMODULE, ONLY: TOTIM
       IMPLICIT NONE
@@ -1573,6 +1574,7 @@
       ! ARGUMENTS:
       INTEGER, INTENT(IN)::IN, KPER
       !
+      INTRINSIC :: SNGL
       INTEGER ISEG, i, ii, tabseg, istab, L, ID, ipond
       EXTERNAL :: RATETERPQ
       REAL :: RATETERPQ, TIME
@@ -3089,6 +3091,8 @@
         END DO
       END DO
       ROUT = QPOND
+      DELIN = 0.0D0
+      DELOUT = 0.0D0
       DO L = 1, NUMIRRPOND
         ipond = IRRPONDVAR(L)
         DELIN = DELIN + Dprst_total_open_in(ipond)/MFQ_to_inch_acres

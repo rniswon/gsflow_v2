@@ -143,23 +143,23 @@ runoff 1
 Simulation time period: 1993/10/01 00:00:00 to 1995/09/30 00:00:00
 ====================================================================
 Basin Definition                basin               2022-02-10
-Common States and Fluxes        climateflow         2022-02-18
+Common States and Fluxes        climateflow         2022-04-27
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
-Timestep Control                prms_time           2021-11-19
+Timestep Control                prms_time           2022-04-21
 Temp & Precip Distribution      ide_dist            2022-01-25
 Solar Radiation Distribution    ddsolrad            2021-11-19
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2022-02-03
-Snow Dynamics                   snowcomp            2022-02-18
-Surface Runoff                  srunoff_smidx       2022-02-10
-Soilzone Computations           soilzone            2022-02-04
-Groundwater                     gwflow              2021-12-16
+Canopy Interception             intcp               2022-04-21
+Snow Dynamics                   snowcomp            2022-04-27
+Surface Runoff                  srunoff_smidx       2022-04-22
+Soilzone Computations           soilzone            2022-04-27
+Groundwater                     gwflow              2022-04-21
 Streamflow Routing              strmflow            2021-11-19
-Output Summary                  basin_sum           2022-01-12
+Output Summary                  basin_sum           2022-04-22
 Statistics Variables Output     statvar_out         2021-09-08
-Output Summary                  prms_summary        2022-01-12
+Output Summary                  prms_summary        2022-04-21
 ==============================================================
 
 Using Control File: .\control\mercdIDE.control
@@ -184,5 +184,5 @@ Fraction impervious:        0.0001    Fraction pervious:       0.9999
  *************************************************************
  Total for run     100.986   43.325    7.864   57.085   67.341
  *************************************************************
-Execution elapsed time    0 minutes  0.32 seconds
+Execution elapsed time    0 minutes  0.30 seconds
 

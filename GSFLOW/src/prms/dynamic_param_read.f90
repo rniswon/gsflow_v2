@@ -10,7 +10,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2021-12-14'
+        character(len=*), parameter :: Version_dynamic_param_read = '2022-04-21'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -457,7 +457,7 @@
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Soil_moist, Soil_rechr, Imperv_stor, Sat_threshold, &
      &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor, &
      &    Basin_ag_soil_moist, Basin_ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, &
-     &    Ag_soil_rechr_max, Ag_soil_rechr_max_frac
+     &    Ag_soil_rechr_max, Ag_soil_rechr_max_frac, Hru_impervstor
       USE PRMS_POTET_JH, ONLY: Jh_coef, Jh_coef_hru
       USE PRMS_POTET_PM, ONLY: Pm_n_coef, Pm_d_coef
       USE PRMS_POTET_PT, ONLY: Pt_alpha
@@ -470,7 +470,7 @@
       USE PRMS_SNOW, ONLY: Rad_trncf, Snarea_thresh
       USE PRMS_SRUNOFF, ONLY: Sro_to_dprst_perv, Sro_to_dprst_imperv, Dprst_depth_avg, &
      &    Op_flow_thres, Dprst_vol_open_max, Dprst_vol_clos_max, Dprst_vol_thres_open, &
-     &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac, Hru_impervstor
+     &    Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac
       USE PRMS_SOILZONE, ONLY: Basin_soil_rechr, Soil_zone_max, Soil_moist_tot, &
      &    Soil_lower_stor_max, Replenish_frac
       USE PRMS_SOILZONE_AG, ONLY: Ag_soil_lower_stor_max, Ag_replenish_frac

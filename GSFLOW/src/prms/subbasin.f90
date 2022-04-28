@@ -15,7 +15,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'subbasin'
-      character(len=*), parameter :: Version_subbasin = '2022-01-25'
+      character(len=*), parameter :: Version_subbasin = '2022-04-21'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Qsub(:), Sub_area(:), Laststor(:)
       INTEGER, SAVE, ALLOCATABLE :: Tree(:, :)
 !   Declared Variables
@@ -246,10 +246,10 @@
      &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag, Hru_type
       USE PRMS_SUBBASIN
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, Hru_frac_perv, Lake_hru_id
-      USE PRMS_FLOWVARS, ONLY: Ssres_stor, Soil_moist, Pkwater_equiv, Gwres_stor, Sroff, Ssres_flow, Lake_vol
+      USE PRMS_FLOWVARS, ONLY: Ssres_stor, Soil_moist, Pkwater_equiv, Gwres_stor, Sroff, Ssres_flow, &
+                               Lake_vol, Dprst_stor_hru, Hru_impervstor, Hru_intcpstor
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Cfs2inches
-      USE PRMS_INTCP, ONLY: Hru_intcpstor
-      USE PRMS_SRUNOFF, ONLY: Hru_impervstor, Hortonian_lakes, Dprst_stor_hru
+      USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
       USE PRMS_SOILZONE, ONLY: Lakein_sz
       USE PRMS_GWFLOW, ONLY: Gwres_flow
       USE PRMS_MUSKINGUM_LAKE, ONLY: Lake_outcfs
@@ -418,10 +418,9 @@
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, Hru_frac_perv, Lake_hru_id
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Cfs2inches
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Swrad, Potet, Tminc, Tmaxc, Tavgc, Hru_rain, Hru_snow
-      USE PRMS_FLOWVARS, ONLY: Hru_actet, Ssres_flow, Sroff, Snowcov_area, Snowmelt, &
-     &    Ssres_stor, Soil_moist, Pkwater_equiv, Gwres_stor, Lake_vol, Soil_moist, Soil_moist_max
-      USE PRMS_INTCP, ONLY: Hru_intcpstor
-      USE PRMS_SRUNOFF, ONLY: Hru_impervstor, Hortonian_lakes, Dprst_stor_hru
+      USE PRMS_FLOWVARS, ONLY: Hru_actet, Ssres_flow, Sroff, Snowcov_area, Snowmelt, Dprst_stor_hru, Hru_intcpstor, &
+     &    Ssres_stor, Soil_moist, Pkwater_equiv, Gwres_stor, Lake_vol, Soil_moist, Soil_moist_max, Hru_impervstor
+      USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
       USE PRMS_SOILZONE, ONLY: Lakein_sz, Recharge, Soil_moist_tot, Soil_zone_max
       USE PRMS_GWFLOW, ONLY: Gwres_flow
       USE PRMS_MUSKINGUM_LAKE, ONLY: Lake_outcfs

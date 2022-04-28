@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'map_results'
-      character(len=*), parameter :: Version_map_results = '2021-11-19'
+      character(len=*), parameter :: Version_map_results = '2022-04-22'
       INTEGER, SAVE :: Mapflg, Numvalues, Lastyear, Totdays
       INTEGER, SAVE :: Yrdays, Yrresults, Totresults, Monresults, Mondays
       INTEGER, SAVE :: Begin_results, Begyr, Dailyresults
@@ -392,11 +392,11 @@
       ENDIF
 
 ! check for last day of simulation
-      last_day = 0
+      last_day = OFF
       IF ( Nowyear==End_year ) THEN
         IF ( Nowmonth==End_month ) THEN
           IF ( Nowday==End_day ) THEN
-            last_day = 1
+            last_day = ACTIVE
             Prevyr = Nowyear
             Prevmo = Nowmonth
             Prevday = Nowday
@@ -406,8 +406,8 @@
 
       IF ( Yrresults==ACTIVE ) THEN
 ! check for first time step of the next year
-        IF ( Lastyear/=Nowyear .OR. last_day==1 ) THEN
-          IF ( (Nowmonth==Start_month .AND. Nowday==Start_day) .OR. last_day==1 ) THEN
+        IF ( Lastyear/=Nowyear .OR. last_day==ACTIVE ) THEN
+          IF ( (Nowmonth==Start_month .AND. Nowday==Start_day) .OR. last_day==ACTIVE ) THEN
             Lastyear = Nowyear
             factor = Conv_fac/DBLE(Yrdays)
             Basin_var_yr = 0.0D0
@@ -546,7 +546,7 @@
       IF ( Monresults==ACTIVE ) THEN
         Mondays = Mondays + 1
 ! check for last day of current month
-        IF ( Nowday==Modays(Nowmonth) .OR. last_day==1 ) THEN
+        IF ( Nowday==Modays(Nowmonth) .OR. last_day==ACTIVE ) THEN
           factor = Conv_fac/DBLE(Mondays)
           Basin_var_mon = 0.0D0
           DO jj = 1, NmapOutVars
@@ -581,7 +581,7 @@
       IF ( Totresults==ACTIVE ) THEN
         Totdays = Totdays + 1
 ! check for last day of simulation
-        IF ( last_day==1 ) THEN
+        IF ( last_day==ACTIVE ) THEN
           factor = Conv_fac/DBLE(Totdays)
           Basin_var_tot = 0.0D0
           DO jj = 1, NmapOutVars

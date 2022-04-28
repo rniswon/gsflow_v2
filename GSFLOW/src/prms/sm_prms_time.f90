@@ -7,8 +7,18 @@ contains
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, YEAR, MONTH, DAY, HOUR, MINUTE, MAX_DAYS_PER_YEAR, DAYS_PER_YEAR, &
      &    ACTIVE, OFF, NORTHERN, FT2_PER_ACRE, SECS_PER_HOUR, INCHES_PER_FOOT, SECS_PER_DAY, ERROR_time
       use PRMS_MMFAPI, only: dattim, deltim
-      USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime, Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime, Nowyear, Nowmonth, Nowday, Dprst_flag, &
+          GSFLOW_flag, PRMS_land_iteration_flag, Ag_flag, Ag_gravity_flag
       USE PRMS_BASIN, ONLY: Hemisphere, Basin_area_inv
+      USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Pkwater_equiv, Snowcov_area, Hru_intcpstor, &
+                               Ssres_stor, Slow_stor, Pref_flow_stor, Basin_intcp_stor, Basin_ssstor, &
+                               Basin_soil_moist, Basin_gwstor, Intcp_transp_on, Dprst_stor_hru, Intcp_stor, &
+                               Gravity_stor_res, Ag_soil_moist, Ag_soil_rechr, Ag_gvr_stor, Imperv_stor
+      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_pkwater_equiv, It0_snowcov_area, &
+                               It0_hru_intcpstor, It0_ssres_stor, It0_slow_stor, It0_pref_flow_stor, &
+                               It0_basin_intcp_stor, It0_basin_ssstor, It0_basin_soil_moist, It0_basin_gwstor, &
+                               It0_intcp_transp_on, It0_dprst_stor_hru, It0_intcp_stor, &
+                               It0_gravity_stor_res, It0_ag_soil_moist, It0_ag_soil_rechr, It0_imperv_stor, It0_ag_gvr_stor
       use PRMS_DATA_FILE, only: read_data_line
       use prms_utils, only: leap_day, julian_day, compute_julday, print_module
       IMPLICIT NONE
@@ -31,6 +41,30 @@ contains
           Julwater = julian_day('now', 'water')
           Julian_day_absolute = Julian_day_absolute + 1
           CALL read_data_line()
+          It0_basin_soil_moist = Basin_soil_moist
+          It0_basin_ssstor = Basin_ssstor
+          It0_basin_gwstor = Basin_gwstor
+          It0_basin_intcp_stor = Basin_intcp_stor
+          It0_soil_moist = Soil_moist
+          It0_soil_rechr = Soil_rechr
+          It0_ssres_stor = Ssres_stor
+          It0_slow_stor = Slow_stor
+          It0_pref_flow_stor = Pref_flow_stor
+          It0_pkwater_equiv = Pkwater_equiv
+          It0_imperv_stor = Imperv_stor
+          IF ( Dprst_flag==ACTIVE ) It0_dprst_stor_hru = Dprst_stor_hru
+          IF ( GSFLOW_flag==ACTIVE ) It0_gravity_stor_res = Gravity_stor_res
+          IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+            It0_hru_intcpstor = Hru_intcpstor
+            It0_intcp_transp_on = Intcp_transp_on
+            It0_intcp_stor = Intcp_stor
+            It0_snowcov_area = Snowcov_area
+            IF ( Ag_flag==ACTIVE ) THEN
+              It0_ag_soil_moist = Ag_soil_moist
+              It0_ag_soil_rechr = Ag_soil_rechr
+            ENDIF
+          ENDIF
+          IF ( Ag_gravity_flag==ACTIVE ) It0_ag_gvr_stor = Ag_gvr_stor
 
         ELSE ! initialize
           Modays(1) = 31

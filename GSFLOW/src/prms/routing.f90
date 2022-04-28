@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2022-02-04'
+      character(len=*), parameter :: Version_routing = '2022-04-21'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades
@@ -661,10 +661,9 @@
       USE PRMS_BASIN, ONLY: Hru_area, Hru_route_order, Active_hrus
       USE PRMS_CLIMATEVARS, ONLY: Swrad, Potet
       USE PRMS_SET_TIME, ONLY: Timestep_seconds, Cfs_conv
-      USE PRMS_FLOWVARS, ONLY: Ssres_flow, Sroff, Seg_lateral_inflow !, Seg_outflow
+      USE PRMS_FLOWVARS, ONLY: Ssres_flow, Sroff, Seg_lateral_inflow, Strm_seg_in !, Seg_outflow
       USE PRMS_WATER_USE, ONLY: Segment_transfer, Segment_gain
       USE PRMS_GWFLOW, ONLY: Gwres_flow
-      USE PRMS_SRUNOFF, ONLY: Strm_seg_in
       USE PRMS_GLACR, ONLY: Glacr_flow
       IMPLICIT NONE
 ! Functions
