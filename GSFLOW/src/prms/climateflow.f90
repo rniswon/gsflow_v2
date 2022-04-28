@@ -1461,6 +1461,11 @@ end module PRMS_IT0_VARS
       Flow_out = 0.0D0
       Orad = 0.0
 
+      Basin_snowmelt = 0.0D0
+      Basin_snowevap = 0.0D0
+      Snow_evap = 0.0
+      Snowmelt = 0.0
+
       IF ( Init_vars_from_file>0 .OR. ierr>0 ) RETURN
 
       Basin_soil_moist = 0.0D0
@@ -1476,16 +1481,12 @@ end module PRMS_IT0_VARS
 ! initialize storage variables
       Imperv_stor = 0.0
       Basin_pweqv = 0.0D0
-      Basin_snowmelt = 0.0D0
-      Basin_snowevap = 0.0D0
       Basin_snowcov = 0.0D0
       Pkwater_equiv = 0.0D0
       It0_pkwater_equiv = 0.0D0
       Basin_pk_precip = 0.0D0
       Pk_depth = 0.0D0
       Snowcov_area = 0.0
-      Snow_evap = 0.0
-      Snowmelt = 0.0
       IF ( Glacier_flag==ACTIVE ) THEN
         Glacrb_melt = 0.0
         Glacier_frac = 0.0
