@@ -89,20 +89,20 @@ runoff 6
 Simulation time period: 1980/01/01 00:00:00 to 1999/12/31 00:00:00
 ====================================================================
 Basin Definition                basin               2022-02-10
-Common States and Fluxes        climateflow         2022-04-27
+Common States and Fluxes        climateflow         2022-05-10
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2022-04-21
 Time Series Data                water_use_read      2021-11-19
-Temperature Distribution        climate_hru         2022-03-17
-Precipitation Distribution      climate_hru         2022-03-17
-Solar Radiation Distribution    climate_hru         2022-03-17
-Potential Evapotranspiration    climate_hru         2022-03-17
+Temperature Distribution        climate_hru         2022-05-09
+Precipitation Distribution      climate_hru         2022-05-09
+Solar Radiation Distribution    climate_hru         2022-05-09
+Potential Evapotranspiration    climate_hru         2022-05-09
 Transpiration Distribution      transp_tindex       2021-09-07
-Canopy Interception             intcp               2022-04-21
+Canopy Interception             intcp               2022-05-09
 Snow Dynamics                   snowcomp            2022-04-27
-Surface Runoff                  srunoff_smidx       2022-04-22
-Soilzone Computations           soilzone            2022-04-27
+Surface Runoff                  srunoff_smidx       2022-05-09
+Soilzone Computations           soilzone            2022-05-10
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing Init         routing             2022-04-21
 Streamflow Routing              muskingum           2021-11-19
@@ -155,5 +155,5 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
  *************************************************************
  Total for run    1110.775  507.968   10.154  622.340   13.445
  *************************************************************
-Execution elapsed time    0 minutes  1.05 seconds
+Execution elapsed time    0 minutes  1.27 seconds
 

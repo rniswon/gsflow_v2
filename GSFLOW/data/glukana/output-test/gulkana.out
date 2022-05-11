@@ -158,19 +158,19 @@ tmin 16
 Simulation time period: 1971/10/01 00:00:00 to 2015/09/30 00:00:00
 ====================================================================
 Basin Definition                basin               2022-02-10
-Common States and Fluxes        climateflow         2022-04-27
+Common States and Fluxes        climateflow         2022-05-10
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2022-04-21
-Temp & Precip Distribution      xyz_dist            2022-01-25
+Temp & Precip Distribution      xyz_dist            2022-05-09
 Solar Radiation Distribution    ccsolrad            2021-12-09
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2022-04-21
+Canopy Interception             intcp               2022-05-09
 Snow Dynamics                   snowcomp            2022-04-27
 Glacier Dynamics                glacr_melt          2022-01-12
-Surface Runoff                  srunoff_smidx       2022-04-22
-Soilzone Computations           soilzone            2022-04-27
+Surface Runoff                  srunoff_smidx       2022-05-09
+Soilzone Computations           soilzone            2022-05-10
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing Init         routing             2022-04-21
 Streamflow Routing              muskingum           2021-11-19
@@ -245,5 +245,5 @@ Fraction impervious:        0.0687    Fraction pervious:       0.9313
  *************************************************************
  Total for run     418.200  279.047    1.062  152.101 -286.767
  *************************************************************
-Execution elapsed time    0 minutes  3.52 seconds
+Execution elapsed time    0 minutes  4.85 seconds
 

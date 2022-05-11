@@ -97,19 +97,19 @@ Simulation time period: 1980/10/01 00:00:00 to 1984/01/30 00:00:00
 ====================================================================
 Basin Definition                basin               2022-02-10
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-04-27
+Common States and Fluxes        climateflow         2022-05-10
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2022-04-21
-Temperature Distribution        climate_hru         2022-03-17
-Precipitation Distribution      climate_hru         2022-03-17
+Temperature Distribution        climate_hru         2022-05-09
+Precipitation Distribution      climate_hru         2022-05-09
 Solar Radiation Distribution    ddsolrad            2021-11-19
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2022-04-21
+Canopy Interception             intcp               2022-05-09
 Snow Dynamics                   snowcomp            2022-04-27
-Surface Runoff                  srunoff_smidx       2022-04-22
-Soilzone Computations           soilzone            2022-04-27
+Surface Runoff                  srunoff_smidx       2022-05-09
+Soilzone Computations           soilzone            2022-05-10
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing              strmflow            2021-11-19
 Output Summary                  basin_sum           2022-04-22
@@ -1353,5 +1353,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
    1984    1   28    0.000    0.066   39.756    0.018    0.035    0.000    0.000
    1984    1   29    0.000    0.064   39.674    0.018    0.035   -0.000    0.000
    1984    1   30    0.000    0.073   39.583    0.018    0.035   -0.000    0.000
-Execution elapsed time    0 minutes  0.32 seconds
+Execution elapsed time    0 minutes  0.46 seconds
 
