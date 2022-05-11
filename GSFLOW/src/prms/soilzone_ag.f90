@@ -458,6 +458,7 @@
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades
+      EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars
       EXTERNAL :: compute_gravflow_ag !, check_gvr_sm
 ! Local Variables
       INTEGER :: i, k, update_potet, compute_lateral, j, igvr, perv_on_flag
@@ -1302,12 +1303,12 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
             topfr = topfr + DBLE( extra_water )*frac
             depth = Pref_flow_thrsh
             gvrin_actual = MAX( 0.0, input - extra_water )
-          ENDIF
-          ! compute contribution to slow interflow, if any
-          IF ( depth>0.0 ) THEN
-            CALL compute_interflow(Slowcoef_lin, Slowcoef_sq, gvrin_actual, depth, slowflow)
-            IF ( Ag_gravity_flag==ACTIVE ) slowflow = slowflow * Gvr_non_ag_frac
-            slflow = slflow + DBLE( slowflow )*frac
+            ! compute contribution to slow interflow, if any
+            IF ( depth>0.0 ) THEN
+              CALL compute_interflow(Slowcoef_lin, Slowcoef_sq, gvrin_actual, depth, slowflow)
+              IF ( Ag_gravity_flag==ACTIVE ) slowflow = slowflow * Gvr_non_ag_frac
+              slflow = slflow + DBLE( slowflow )*frac
+            ENDIF
           ENDIF
           IF ( Ag_gravity_flag==ACTIVE ) THEN
             extra_water = MAX( 0.0, depth_ag - Pref_flow_thrsh )
