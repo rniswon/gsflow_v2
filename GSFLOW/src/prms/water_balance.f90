@@ -6,7 +6,7 @@
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Water Balance Computations'
         character(len=*), parameter :: MODNAME_WB = 'water_balance'
-        character(len=*), parameter :: Version_water_balance = '2022-04-22'
+        character(len=*), parameter :: Version_water_balance = '2022-05-09'
         INTEGER, SAVE :: BALUNT, SZUNIT, GWUNIT, INTCPUNT, SROUNIT, SNOWUNIT
         REAL, PARAMETER :: TOOSMALL = 3.1E-05, SMALL = 1.0E-04, BAD = 1.0E-03
         DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 1.0D-05
@@ -128,8 +128,7 @@
 !***********************************************************************
       SUBROUTINE water_balance_init()
       USE PRMS_WATER_BALANCE
-      USE PRMS_FLOWVARS, ONLY: Gwres_stor, Basin_gwstor
-      USE PRMS_IT0_VARS, ONLY: It0_basin_gwstor
+      USE PRMS_FLOWVARS, ONLY: Gwres_stor
       USE PRMS_BASIN, ONLY: Hru_storage
 !***********************************************************************
       Basin_capillary_wb = 0.0D0
@@ -137,7 +136,6 @@
       Basin_soilzone_wb = 0.0D0
       Basin_dprst_wb = 0.0D0
 !      Hru_runoff = 0.0D0
-      It0_basin_gwstor = Basin_gwstor
       Gwstor_ante = Gwres_stor
       Hru_storage_ante = Hru_storage
 
@@ -160,13 +158,13 @@
      &    Snowmelt, Snow_evap, Snowcov_area, Pptmix_nopack, Glacrb_melt, Basin_pweqv, Basin_snowmelt, Basin_snowevap, Basin_snowcov, &
      &    Dprst_stor_hru, Hru_impervstor, Hru_intcpstor, Pref_flow_stor, Basin_gwstor, Intcp_stor, Basin_intcp_stor
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_pkwater_equiv, It0_ssres_stor, It0_basin_soil_moist, &
-                               It0_basin_ssstor, It0_basin_gwstor, It0_dprst_stor_hru, It0_imperv_stor
+                               It0_basin_ssstor, It0_basin_gwstor, It0_dprst_stor_hru, It0_hru_impervstor, &
+                               It0_basin_intcp_stor, It0_hru_intcpstor
       USE PRMS_SET_TIME, ONLY: Nowtime
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_INTCP, ONLY: Basin_net_ppt, Basin_intcp_evap, Basin_changeover, &
      &    Net_rain, Net_snow, Hru_intcpevap, Srain_intcp, Wrain_intcp, Snow_intcp, Intcp_evap, &
-     &    Srain_intcp, Wrain_intcp, Snow_intcp, Intcp_evap, &
-     &    Canopy_covden, Intcp_changeover, Net_ppt, Intcp_stor_ante, Last_intcp_stor, &
+     &    Canopy_covden, Intcp_changeover, Net_ppt, &
      &    Net_apply, Gain_inches, Use_transfer_intcp, Basin_hru_apply, Basin_net_apply
       USE PRMS_GLACR, ONLY: Glacr_flow
       USE PRMS_SRUNOFF, ONLY: Basin_infil, Hru_hortn_cascflow, Upslope_hortonian, &
@@ -216,7 +214,7 @@
         perv_frac = Hru_frac_perv(i)
 
         ! intcp
-        delstor = Hru_intcpstor(i) - Intcp_stor_ante(i)
+        delstor = Hru_intcpstor(i) - It0_hru_intcpstor(i)
         hrubal = Hru_rain(i) + Hru_snow(i) - Net_rain(i) - Net_snow(i) &
      &           - delstor - Hru_intcpevap(i) - Intcp_changeover(i)
         IF ( Use_transfer_intcp==ACTIVE ) hrubal = hrubal + Gain_inches(i) - Net_apply(i)
@@ -228,7 +226,7 @@
           ENDIF
           WRITE ( BALUNT,'(I7,6I5,15F10.5,I5)' ) i, Nowtime, hrubal, &
      &            Net_rain(i), Net_snow(i), Hru_rain(i), Hru_snow(i), &
-     &            Intcp_stor(i), Intcp_stor_ante(i), Intcp_evap(i), Srain_intcp(i,Nowmonth), &
+     &            Intcp_stor(i), It0_hru_intcpstor(i), Intcp_evap(i), Srain_intcp(i,Nowmonth), &
      &            Wrain_intcp(i,Nowmonth), Snow_intcp(i,Nowmonth), Canopy_covden(i), delstor, &
      &            Hru_intcpstor(i), Intcp_changeover(i), Cov_type(i)
           IF ( Use_transfer_intcp==1 ) WRITE ( BALUNT, * ) Gain_inches(i), Net_apply(i)
@@ -257,7 +255,7 @@
         ENDIF
 
         robal = Snowmelt(i) - Hortonian_flow(i) & !includes dprst runoff, if any
-     &          - Infil(i)*perv_frac - Hru_impervevap(i) + It0_imperv_stor(i) - Hru_impervstor(i) + Intcp_changeover(i)
+     &          - Infil(i)*perv_frac - Hru_impervevap(i) + It0_hru_impervstor(i) - Hru_impervstor(i) + Intcp_changeover(i)
         ! need to account for AG in water balance
         IF ( Use_transfer_intcp==ACTIVE ) robal = robal + Net_apply(i)*perv_frac !??? is net_apply for whole HRU (also for ag, impervious, dprst)
         IF ( Net_ppt(i)>0.0 ) THEN
@@ -291,7 +289,7 @@
      &              Dprst_area_clos(i), Snowcov_area(i), Dprst_in(i), Sro_to_dprst_perv(i), Hru_sroffp(i), Hru_sroffi(i)
             WRITE ( BALUNT, * ) robal, Net_rain(i), Net_ppt(i), Net_rain(i)*Dprst_frac(i), &
      &              Dprst_frac(i), Pptmix_nopack(i)
-            WRITE ( BALUNT, * ) Infil(i), perv_frac, Hru_impervevap(i), It0_imperv_stor(i), Hru_impervstor(i), &
+            WRITE ( BALUNT, * ) Infil(i), perv_frac, Hru_impervevap(i), It0_hru_impervstor(i), Hru_impervstor(i), &
      &                          Hru_percent_imperv(i), Dprst_sroff_hru(i)
           ENDIF
           IF ( ABS(robal)>SMALL ) THEN
@@ -303,12 +301,12 @@
           IF ( Glacier_flag==ACTIVE ) gmelt = Glacrb_melt(i) + Glacr_flow(i)
           IF ( Cascade_flag>CASCADE_OFF ) THEN
             WRITE ( BALUNT, '(4I4,1X,F0.6,18(1X,F0.6))' ) Nowyear, Nowmonth, Nowday, Pptmix_nopack(i), robal, Snowmelt(i), &
-     &              Upslope_hortonian(i), It0_imperv_stor(i), Hru_hortn_cascflow(i), Infil(i), Hortonian_flow(i), &
+     &              Upslope_hortonian(i), It0_hru_impervstor(i), Hru_hortn_cascflow(i), Infil(i), Hortonian_flow(i), &
      &              Hru_impervstor(i), Hru_impervevap(i), Net_ppt(i), &
      &              Pkwater_equiv(i), Snow_evap(i), Net_snow(i), Net_rain(i), Hru_sroffp(i), Hru_sroffi(i), gmelt, harea
           ELSE
             WRITE ( BALUNT,'(4I4,1X,F0.6,18(1X,F0.6))' ) Nowyear, Nowmonth, Nowday, Pptmix_nopack(i), &
-     &              robal, Snowmelt(i), It0_imperv_stor(i), Infil(i), Hortonian_flow(i), Hru_impervstor(i), &
+     &              robal, Snowmelt(i), It0_hru_impervstor(i), Infil(i), Hortonian_flow(i), Hru_impervstor(i), &
      &              Hru_impervevap(i), Hru_percent_imperv(i), Net_ppt(i), Pkwater_equiv(i), Snow_evap(i), &
      &              Net_snow(i), Net_rain(i), Hru_sroffp(i), Hru_sroffi(i), Intcp_changeover(i), gmelt, harea
           ENDIF
@@ -417,7 +415,7 @@
       Basin_dprst_wb = Basin_dprst_wb*Basin_area_inv
 
 ! intcp
-      delta_stor = Basin_intcp_stor - Last_intcp_stor
+      delta_stor = Basin_intcp_stor - It0_basin_intcp_stor
       pptbal = Basin_ppt - Basin_net_ppt - delta_stor - Basin_intcp_evap - Basin_changeover
       IF ( Use_transfer_intcp==ACTIVE ) pptbal = pptbal + Basin_net_apply
       IF ( DABS(pptbal)>DSMALL ) THEN
@@ -429,7 +427,7 @@
       ENDIF
       WRITE ( INTCPUNT, 9002 ) Nowyear, Nowmonth, Nowday, pptbal, &
      &        Basin_ppt, Basin_net_ppt, Basin_intcp_evap, &
-     &        Basin_intcp_stor, Last_intcp_stor, Basin_changeover, Basin_net_apply, Basin_hru_apply
+     &        Basin_intcp_stor, It0_basin_intcp_stor, Basin_changeover, Basin_net_apply, Basin_hru_apply
 
 ! snowcomp
       bsnobal = bsnobal*Basin_area_inv

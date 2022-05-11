@@ -10,7 +10,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2022-04-21'
+        character(len=*), parameter :: Version_dynamic_param_read = '2022-05-09'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -458,6 +458,8 @@
      &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor, &
      &    Basin_ag_soil_moist, Basin_ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, &
      &    Ag_soil_rechr_max, Ag_soil_rechr_max_frac, Hru_impervstor
+      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_imperv_stor, It0_hru_impervstor, &
+                               It0_ag_soil_moist, It0_ag_soil_rechr
       USE PRMS_POTET_JH, ONLY: Jh_coef, Jh_coef_hru
       USE PRMS_POTET_PM, ONLY: Pm_n_coef, Pm_d_coef
       USE PRMS_POTET_PT, ONLY: Pt_alpha
@@ -710,7 +712,15 @@
           ENDDO
           Basin_soil_moist = Basin_soil_moist*Basin_area_inv
           Basin_soil_rechr = Basin_soil_rechr*Basin_area_inv
-          IF ( Check_ag_frac==ACTIVE ) Basin_ag_soil_moist = Basin_ag_soil_moist*Basin_area_inv
+          It0_soil_moist = Soil_moist
+          It0_soil_rechr = Soil_rechr
+          It0_imperv_stor = Imperv_stor
+          It0_hru_impervstor = Hru_impervstor
+          IF ( AG_flag==ACTIVE ) THEN
+            Basin_ag_soil_moist = Basin_ag_soil_moist*Basin_area_inv
+            It0_ag_soil_moist = Ag_soil_moist
+            It0_ag_soil_rechr = Ag_soil_rechr
+          ENDIF
         ENDIF
       ENDIF
 

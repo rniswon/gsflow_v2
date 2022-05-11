@@ -1,8 +1,3 @@
-C
-      MODULE MF_DLL
-C
-      CONTAINS
-C
 !***********************************************************************
 !     GSFLOW module that replaces MF_NWT.f
 !***********************************************************************
@@ -87,6 +82,10 @@ C1------USE package modules.
      &                                   agDemand(Nsegshold)
 ! Functions
       INTRINSIC :: DBLE
+      INTEGER, EXTERNAL :: GET_KPER
+      EXTERNAL :: SET_STRESS_DATES, SETMFTIME, SETCONVFACTORS
+      EXTERNAL :: gsflow_modflow_restart, set_cell_values
+      EXTERNAL :: check_gvr_cell_pct
 ! Local Variables
       INTEGER :: MAXUNIT, NC
 C
@@ -423,8 +422,6 @@ C
      &                     DELTAVOL,LAKEVOL,Nsegshold, Nlakeshold, 
      &                     agDemand)
 C
-C      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_RUN
-C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
@@ -462,10 +459,10 @@ c     USE LMGMODULE
       INTEGER I
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
-      INTEGER, EXTERNAL :: soilzone, soilzone_ag
+      INTEGER, EXTERNAL :: soilzone, soilzone_ag, GET_KPER
+      INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms
-      INTEGER, EXTERNAL :: intcp, snowcomp, glacr, srunoff
-      EXTERNAL :: MODSIM2SFR, SFR2MODSIM, LAK2MODSIM
+      EXTERNAL :: MFNWT_RDSTRESS, MODSIM2SFR, MFNWT_CLEAN
       INTRINSIC MIN
 ! Local Variables
       INTEGER :: retval, KITER, iss, iprt !, II, IBDRET
@@ -497,7 +494,7 @@ C7------SIMULATE EACH STRESS PERIOD.
           IF ( ISSFLG(KKPER).EQ.1 ) CALL error_stop
      &         ('cannot run steady state after first stress period.',
      &          ERROR_modflow)
-!          IF ( ISSFLG(1).EQ.0 ) Delt_save = DELT ! rsr, delt_save set in gsfinit
+!          IF ( ISSFLG(1).EQ.0 ) Delt_save = DELT ! rsr, delt_save set in MFNWT_INIT
           IF ( DELT.NE.Delt_save )
      &         CALL error_stop('cannot change DELT', ERROR_time)
         END IF
@@ -678,9 +675,9 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                 ENDIF
               ENDIF
               IF ( AG_flag==ACTIVE ) THEN
-                retval = soilzone_ag(AFR,1)
+                retval = soilzone_ag(AFR, 1)
               ELSE
-                retval = soilzone(AFR,1)
+                retval = soilzone(AFR, 1)
               ENDIF
               IF ( retval/=0 ) THEN
                 PRINT 9001, Soilzone_module, retval
@@ -735,9 +732,9 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                 ENDIF
               ENDIF
               IF ( AG_flag==ACTIVE ) THEN
-                retval = soilzone_ag(AFR,2)
+                retval = soilzone_ag(AFR, 2)
               ELSE
-                retval = soilzone(AFR,2)
+                retval = soilzone(AFR, 2)
               ENDIF
               IF ( retval/=0 ) THEN
                 PRINT 9001, Soilzone_module, retval
@@ -874,10 +871,7 @@ C     ************************************************************************
 C     ACCUMULATE ACCRETION/DEPLETIONS FOR ALL STREAM SEGMENETS AND LAKES THAT
 C     ARE MAPPED TO MODSIM NODES (OR LINKS)
 C     ************************************************************************
-      SUBROUTINE COMPUTE_EXCHG(EXCHG, ELAKVol, KPER) 
-     &                  BIND(C,NAME="COMPUTE_EXCHG")
-C      
-C        !DEC$ ATTRIBUTES DLLEXPORT :: COMPUTE_EXCHG
+      SUBROUTINE COMPUTE_EXCHG(EXCHG, ELAKVol, KPER)
 C
         USE GWFLAKMODULE, ONLY: NLAKES, VOL 
         IMPLICIT NONE
@@ -904,9 +898,6 @@ C     Upon MODSIM-MODFLOW conversion,
 C     write the budget terms
 C     ************************************************************************
       SUBROUTINE MFNWT_OCBUDGET()
-     &                  BIND(C,NAME="MFNWT_OCBUDGET")
-C      
-C      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_OCBUDGET
 C
       USE PRMS_CONSTANTS, ONLY: ACTIVE, DEBUG_LESS, MODFLOW, OFF
       USE GLOBAL
@@ -1128,7 +1119,7 @@ C
       ENDIF
 
  9001 FORMAT ('ERROR in ', A, ' module, arg = run.',
-     &        ' Called from gsfrun.', /, 'Return val = ', I0)
+     &        ' Called from MFNWT_RUN.', /, 'Return val = ', I0)
  9002 FORMAT('Date: ', I0, 2('/',I2.2), '; Stress: ', I0, '; Step: ',I0,
      &       '; Simulation step: ', I0, /, 18X, 'MF iterations: ', I0,
      &       '; SZ iterations: ', I0, /)
@@ -1144,10 +1135,7 @@ C
 C     ************************************************************************
 C     Close out MODFLOW
 C     ************************************************************************
-      SUBROUTINE MFNWT_CLEAN() BIND(C,NAME="MFNWT_CLEAN")
-C
-C      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_CLEAN
-C
+      SUBROUTINE MFNWT_CLEAN()
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
@@ -1158,7 +1146,7 @@ C
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
       USE GWFNWTMODULE, ONLY:LINMETH
       IMPLICIT NONE
-      EXTERNAL :: RESTART1WRITE
+      EXTERNAL :: RESTART1WRITE, gsflow_modflow_restart
 !***********************************************************************
 C
 C8------END OF SIMULATION
@@ -1458,10 +1446,7 @@ C     REQUIRE THAT A MODSIM TIME STEP EQUAL A MODFLOW TIME STEP
 C     AND THAT MODFLOW WILL NEED TO BE RESTRICTED TO ONE TIME STEP
 C     PER MODFLOW STRESS PERIOD.
 !***********************************************************************
-      SUBROUTINE MFNWT_RDSTRESS() BIND(C,NAME="MFNWT_RDSTRESS")
-C
-C      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_RDSTRESS
-C
+      SUBROUTINE MFNWT_RDSTRESS()
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, ERROR_time
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GSFMODFLOW, ONLY: IGRID, KKPER, KPER, NSOL, IOUTS, KKSTP,
@@ -1539,9 +1524,7 @@ C     ************************************************************************
 C     WRITE RASTERS OF GROUNDWATER/SURFACE-WATER INTERACTION
 C     
 C     ************************************************************************
-      SUBROUTINE MFNWT_WRITERAS(KPER) BIND(C,NAME="MFNWT_WRITERAS")
-C
-C      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_WRITERAS
+      SUBROUTINE MFNWT_WRITERAS(KPER)
 C
       USE GLOBAL,       ONLY: NROW,NCOL
       USE GWFSFRMODULE, ONLY: NSTRM,ISTRM,STRM
@@ -1674,7 +1657,7 @@ C
      &                                   LAKEVOL(Nlakeshold),
      &                                   agDemand(Nsegshold)
       ! Functions
-      EXTERNAL :: RESTART1READ, GWF2BAS7OC
+      EXTERNAL :: MFNWT_RDSTRESS, RESTART1READ, GWF2BAS7OC, MFNWT_RUN
       INTRINSIC :: INT, DBLE
 ! Local Variables
       INTEGER :: i, n, nstress, start_jul, mfstrt_jul
@@ -2098,7 +2081,7 @@ C
         ! MF volume to PRMS inches
         Mfvol2inch_conv(i) = Mfl_to_inch/Cellarea(Gvr_cell_id(i))
         ! MF discharge to PRMS inches
-        ! note DELT may change during simulation at some point, so this will need to go in read_stress
+        ! note DELT may change during simulation at some point, so this will need to go in MFNWT_RDSTRESS
         Mfq2inch_conv(i) = Mfvol2inch_conv(i)*DELT
         ! PRMS inches in a gravity-flow reservoir to MF rate
         Gvr2cell_conv(i) = Gvr_cell_pct(i)*Inch_to_mfl_t
@@ -2151,5 +2134,3 @@ C
     4   FORMAT (/, A, I5, 2('/',I2.2), I3.2, 2(':', I2.2) )
       ENDIF
       END SUBROUTINE gsflow_modflow_restart
-
-      END MODULE MF_DLL

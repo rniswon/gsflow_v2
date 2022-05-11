@@ -10,6 +10,7 @@
       character(len=*), parameter :: Version_obs = '2022-01-12'
       INTEGER, SAVE :: Nlakeelev, Nwind, Nhumid, Rain_flag, nstream_temp
 !   Declared Variables
+      INTEGER, SAVE :: Rain_day
       REAL, SAVE, ALLOCATABLE :: Pan_evap(:), Runoff(:), Precip(:)
       REAL, SAVE, ALLOCATABLE :: Humidity(:), Wind_speed(:), Stream_temp(:)
       REAL, SAVE, ALLOCATABLE :: Tmax(:), Tmin(:), Solrad(:), Snowdepth(:)
@@ -181,6 +182,9 @@
       Rain_flag = OFF
       IF ( Precip_flag==xyz_dist_module ) Rain_flag = ACTIVE
       IF ( Rain_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        CALL declvar_int(MODNAME, 'rain_day', 'one', 1, &
+     &       'Flag to set the form of any precipitation to rain (0=determine form; 1=rain)', &
+     &       'none', Rain_day)
         IF ( declparam(MODNAME, 'rain_code', 'nmonths', 'integer', &
      &       '2', '1', '5', &
      &       'Flag indicating rule for precipitation station use', &
@@ -189,7 +193,8 @@
      &       ' precipitation if the regression stations have'// &
      &       ' precipitation; 2=only precipitation'// &
      &       ' if any station in the basin has precipitation;'// &
-     &       ' 3=precipitation if xyz says so; 5=only'// &
+     &       ' 3=precipitation if xyz says so; 4=only'// &
+     &       ' precipitation if rain_day variable is set to 1; 5=only'// &
      &       ' precipitation if psta_freq_nuse stations have precipitation)', &
      &       'none')/=0 ) CALL read_error(1, 'rain_code')
       ENDIF
@@ -239,6 +244,7 @@
         Streamflow_cms = 0.0D0
       ENDIF
       IF ( Nrain>0 ) Precip = 0.0
+      Rain_day = OFF
       IF ( Ntemp>0 ) THEN
         Tmax = 0.0
         Tmin = 0.0
