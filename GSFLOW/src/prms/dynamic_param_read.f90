@@ -10,7 +10,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2022-04-21'
+        character(len=*), parameter :: Version_dynamic_param_read = '2022-05-09'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
@@ -443,7 +443,7 @@
       INTEGER FUNCTION dynparamrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dynamic, INACTIVE, LAKE, &
      &    potet_jh_module, potet_pan_module, potet_hamon_module, potet_hs_module, &
-     &    potet_pt_module, potet_pm_module, climate_hru_module
+     &    potet_pt_module, potet_pm_module, climate_hru_module, ERROR_dynamic
       USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, AG_flag, Hru_type, &
      &    Dyn_imperv_flag, Dyn_covtype_flag, Dyn_potet_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &    Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dprst_flag, &
@@ -458,6 +458,8 @@
      &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor, &
      &    Basin_ag_soil_moist, Basin_ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, &
      &    Ag_soil_rechr_max, Ag_soil_rechr_max_frac, Hru_impervstor
+      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_imperv_stor, It0_hru_impervstor, &
+                               It0_ag_soil_moist, It0_ag_soil_rechr
       USE PRMS_POTET_JH, ONLY: Jh_coef, Jh_coef_hru
       USE PRMS_POTET_PM, ONLY: Pm_n_coef, Pm_d_coef
       USE PRMS_POTET_PT, ONLY: Pt_alpha
@@ -474,7 +476,7 @@
       USE PRMS_SOILZONE, ONLY: Basin_soil_rechr, Soil_zone_max, Soil_moist_tot, &
      &    Soil_lower_stor_max, Replenish_frac
       USE PRMS_SOILZONE_AG, ONLY: Ag_soil_lower_stor_max, Ag_replenish_frac
-      use prms_utils, only: is_eof
+      use prms_utils, only: is_eof, error_stop
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL, DBLE
@@ -482,7 +484,7 @@
       EXTERNAL :: write_dynparam_potet
 ! Local Variables
       INTEGER :: i, istop, check_dprst_depth_flag, check_sm_max_flag, check_srechr_max_flag
-      INTEGER :: check_ag_sm_max_flag, check_ag_srechr_max_flag
+      INTEGER :: check_ag_sm_max_flag, check_ag_srechr_max_flag, ios
       REAL :: harea, frac_imperv, tmp, hruperv, dprstfrac, soil_adj, frac, frac_ag
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
@@ -501,7 +503,8 @@
         IF ( Dprst_depth_flag==ACTIVE ) THEN
           IF ( Dprst_depth_next_mo/=0 ) THEN
             IF ( Dprst_depth_next_yr==Nowyear .AND. Dprst_depth_next_mo==Nowmonth .AND. Dprst_depth_next_day==Nowday ) THEN
-              READ ( Dprst_depth_unit, * ) Dprst_depth_next_yr, Dprst_depth_next_mo, Dprst_depth_next_day, Temp
+              READ ( Dprst_depth_unit, *, IOSTAT=ios ) Dprst_depth_next_yr, Dprst_depth_next_mo, Dprst_depth_next_day, Temp
+              if (ios /= 0) call error_stop('reading depression storage dynamic parameter file', ERROR_dynamic)
               CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Dprst_depth_avg, 'dprst_depth_avg')
               CALL is_eof(Dprst_depth_unit, Dprst_depth_next_yr, Dprst_depth_next_mo, Dprst_depth_next_day)
               check_dprst_depth_flag = ACTIVE
@@ -512,7 +515,8 @@
         IF ( Imperv_frac_flag==ACTIVE ) THEN
           IF ( Imperv_next_mo/=0 ) THEN
             IF ( Imperv_next_yr==Nowyear .AND. Imperv_next_mo==Nowmonth .AND. Imperv_next_day==Nowday ) THEN
-              READ ( Imperv_frac_unit, * ) Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Temp
+              READ ( Imperv_frac_unit, *, iostat=ios ) Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Temp
+              if (ios /= 0) call error_stop('reading impervious dynamic parameter file', ERROR_dynamic)
               ! Temp has new values, Hru_percent_imperv has old values
               CALL write_dynoutput(Output_unit, Nhru, Updated_hrus, Temp, Hru_percent_imperv, 'hru_percent_imperv')
               ! Temp has new values with negative values set to the old value
@@ -538,7 +542,8 @@
         IF ( Dyn_ag_frac_flag==ACTIVE ) THEN
           IF ( Ag_frac_next_mo/=0 ) THEN
             IF ( Ag_frac_next_yr==Nowyear .AND. Ag_frac_next_mo==Nowmonth .AND. Ag_frac_next_day==Nowday ) THEN
-              READ ( Ag_frac_unit, * ) Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day, Temp4
+              READ ( Ag_frac_unit, *, IOSTAT=ios ) Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day, Temp4
+              if (ios /= 0) call error_stop('reading agricultural fraction dynamic parameter file', ERROR_dynamic)
               CALL write_dynoutput(Output_unit, Nhru, Updated_hrus, Temp4, Ag_frac, 'ag_frac')
               CALL is_eof(Ag_frac_unit, Ag_frac_next_yr, Ag_frac_next_mo, Ag_frac_next_day)
               Check_ag_frac = ACTIVE
@@ -707,7 +712,15 @@
           ENDDO
           Basin_soil_moist = Basin_soil_moist*Basin_area_inv
           Basin_soil_rechr = Basin_soil_rechr*Basin_area_inv
-          IF ( Check_ag_frac==ACTIVE ) Basin_ag_soil_moist = Basin_ag_soil_moist*Basin_area_inv
+          It0_soil_moist = Soil_moist
+          It0_soil_rechr = Soil_rechr
+          It0_imperv_stor = Imperv_stor
+          It0_hru_impervstor = Hru_impervstor
+          IF ( AG_flag==ACTIVE ) THEN
+            Basin_ag_soil_moist = Basin_ag_soil_moist*Basin_area_inv
+            It0_ag_soil_moist = Ag_soil_moist
+            It0_ag_soil_rechr = Ag_soil_rechr
+          ENDIF
         ENDIF
       ENDIF
 
@@ -715,7 +728,8 @@
       IF ( Dyn_imperv_flag>1 ) THEN
         IF ( Imperv_stor_next_mo/=0 ) THEN
           IF ( Imperv_stor_next_yr==Nowyear .AND. Imperv_stor_next_mo==Nowmonth .AND. Imperv_stor_next_day==Nowday ) THEN
-            READ ( Imperv_stor_unit, * ) Imperv_stor_next_yr, Imperv_stor_next_mo, Imperv_stor_next_day, Temp
+            READ ( Imperv_stor_unit, *, IOSTAT=ios ) Imperv_stor_next_yr, Imperv_stor_next_mo, Imperv_stor_next_day, Temp
+            if (ios /= 0) call error_stop('reading impervious storage dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Imperv_stor_max, 'imperv_stor_max')
             CALL is_eof(Imperv_stor_unit, Imperv_stor_next_yr, Imperv_stor_next_mo, Imperv_stor_next_day)
           ENDIF
@@ -726,7 +740,8 @@
       IF ( Wrainintcp_flag==ACTIVE ) THEN
         IF ( Wrain_intcp_next_mo/=0 ) THEN
           IF ( Wrain_intcp_next_yr==Nowyear .AND. Wrain_intcp_next_mo==Nowmonth .AND. Wrain_intcp_next_day==Nowday ) THEN
-            READ ( Wrain_intcp_unit, * ) Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day, Temp
+            READ ( Wrain_intcp_unit, *, IOSTAT=ios ) Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day, Temp
+            if (ios /= 0) call error_stop('reading wrain_intcp dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Wrain_intcp(1,Nowmonth), 'wrain_intcp')
             CALL is_eof(Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day)
           ENDIF
@@ -735,7 +750,8 @@
       IF ( Srainintcp_flag==ACTIVE ) THEN
         IF ( Srain_intcp_next_mo/=0 ) THEN
           IF ( Srain_intcp_next_yr==Nowyear .AND. Srain_intcp_next_mo==Nowmonth .AND. Srain_intcp_next_day==Nowday ) THEN
-            READ ( Srain_intcp_unit, * ) Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day, Temp
+            READ ( Srain_intcp_unit, *, IOSTAT=ios ) Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day, Temp
+            if (ios /= 0) call error_stop('reading srain_intcp dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Srain_intcp(1,Nowmonth), 'srain_intcp')
             CALL is_eof(Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day)
           ENDIF
@@ -744,7 +760,8 @@
       IF ( Snowintcp_flag==ACTIVE ) THEN
         IF ( Snow_intcp_next_mo/=0 ) THEN
           IF ( Snow_intcp_next_yr==Nowyear .AND. Snow_intcp_next_mo==Nowmonth .AND. Snow_intcp_next_day==Nowday ) THEN
-            READ ( Snow_intcp_unit, * ) Snow_intcp_next_yr, Snow_intcp_next_mo, Snow_intcp_next_day, Temp
+            READ ( Snow_intcp_unit, *, IOSTAT=ios ) Snow_intcp_next_yr, Snow_intcp_next_mo, Snow_intcp_next_day, Temp
+            if (ios /= 0) call error_stop('reading snow_intcp dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Snow_intcp(1,Nowmonth), 'snow_intcp')
             CALL is_eof(Snow_intcp_unit, Snow_intcp_next_yr, Snow_intcp_next_mo, Snow_intcp_next_day)
           ENDIF
@@ -754,7 +771,8 @@
       IF ( Covden_sum_flag==ACTIVE ) THEN
         IF ( Covden_sum_next_mo/=0 ) THEN
           IF ( Covden_sum_next_yr==Nowyear .AND. Covden_sum_next_mo==Nowmonth .AND. Covden_sum_next_day==Nowday ) THEN
-            READ ( Covden_sum_unit, * ) Covden_sum_next_yr, Covden_sum_next_mo, Covden_sum_next_day, Temp
+            READ ( Covden_sum_unit, *, IOSTAT=ios ) Covden_sum_next_yr, Covden_sum_next_mo, Covden_sum_next_day, Temp
+            if (ios /= 0) call error_stop('reading covden_sum dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_sum(1,Nowmonth), 'covden_sum')
             CALL is_eof(Covden_sum_unit, Covden_sum_next_yr, Covden_sum_next_mo, Covden_sum_next_day)
           ENDIF
@@ -763,7 +781,8 @@
       IF ( Covden_win_flag==ACTIVE ) THEN
         IF ( Covden_win_next_mo/=0 ) THEN
           IF ( Covden_win_next_yr==Nowyear .AND. Covden_win_next_mo==Nowmonth .AND. Covden_win_next_day==Nowday ) THEN
-            READ ( Covden_win_unit, * ) Covden_win_next_yr, Covden_win_next_mo, Covden_win_next_day, Temp
+            READ ( Covden_win_unit, *, IOSTAT=ios ) Covden_win_next_yr, Covden_win_next_mo, Covden_win_next_day, Temp
+            if (ios /= 0) call error_stop('reading covden_win dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_win(1,Nowmonth), 'covden_win')
             CALL is_eof(Covden_win_unit, Covden_win_next_yr, Covden_win_next_mo, Covden_win_next_day)
           ENDIF
@@ -773,7 +792,8 @@
       IF ( Dyn_covtype_flag==ACTIVE ) THEN
         IF ( Covtype_next_mo/=0 ) THEN
           IF ( Covtype_next_yr==Nowyear .AND. Covtype_next_mo==Nowmonth .AND. Covtype_next_day==Nowday ) THEN
-            READ ( Covtype_unit, * ) Covtype_next_yr, Covtype_next_mo, Covtype_next_day, Itemp
+            READ ( Covtype_unit, *, IOSTAT=ios ) Covtype_next_yr, Covtype_next_mo, Covtype_next_day, Itemp
+            if (ios /= 0) call error_stop('reading cov_type dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam_int(Output_unit, Nhru, Updated_hrus, Itemp, Cov_type, 'cov_type')
             Cov_type = Itemp
             CALL is_eof(Covtype_unit, Covtype_next_yr, Covtype_next_mo, Covtype_next_day)
@@ -784,7 +804,8 @@
       IF ( Dyn_potet_flag>0 ) THEN  ! fix so only current month is updated
         IF ( Potetcoef_next_mo/=0 ) THEN
           IF ( Potetcoef_next_yr==Nowyear .AND. Potetcoef_next_mo==Nowmonth .AND. Potetcoef_next_day==Nowday ) THEN
-            READ ( Potetcoef_unit, * ) Potetcoef_next_yr, Potetcoef_next_mo, Potetcoef_next_day, Temp
+            READ ( Potetcoef_unit, *, IOSTAT=ios ) Potetcoef_next_yr, Potetcoef_next_mo, Potetcoef_next_day, Temp
+            if (ios /= 0) call error_stop('reading potet coefficient dynamic parameter file', ERROR_dynamic)
             IF ( Et_flag==potet_jh_module .AND. Dyn_potet_flag/=1 ) THEN ! allow values to be < 0.0 for potet_jh_hru parameter
               CALL write_dynparam_potet(Output_unit, Nhru, Updated_hrus, Temp, Potet_coef(1,Nowmonth), 'potet_coef')
             ELSE
@@ -824,7 +845,8 @@
       IF ( Transpbeg_flag==ACTIVE ) THEN
         IF ( Transpbeg_next_mo/=0 ) THEN
           IF ( Transpbeg_next_yr==Nowyear .AND. Transpbeg_next_mo==Nowmonth .AND. Transpbeg_next_day==Nowday ) THEN
-            READ ( Transpbeg_unit, * ) Transpbeg_next_yr, Transpbeg_next_mo, Transpbeg_next_day, Itemp
+            READ ( Transpbeg_unit, *, IOSTAT=ios ) Transpbeg_next_yr, Transpbeg_next_mo, Transpbeg_next_day, Itemp
+            if (ios /= 0) call error_stop('reading transp_beg dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam_int(Output_unit, Nhru, Updated_hrus, Itemp, Transp_beg, 'transp_beg')
             CALL is_eof(Transpbeg_unit, Transpbeg_next_yr, Transpbeg_next_mo, Transpbeg_next_day)
           ENDIF
@@ -834,7 +856,8 @@
       IF ( Transpend_flag==ACTIVE ) THEN
         IF ( Transpend_next_mo/=0 ) THEN
           IF ( Transpend_next_yr==Nowyear .AND. Transpend_next_mo==Nowmonth .AND. Transpend_next_day==Nowday ) THEN
-            READ ( Transpend_unit, * ) Transpend_next_yr, Transpend_next_mo, Transpend_next_day, Itemp
+            READ ( Transpend_unit, *, IOSTAT=ios ) Transpend_next_yr, Transpend_next_mo, Transpend_next_day, Itemp
+            if (ios /= 0) call error_stop('reading transp_end dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam_int(Output_unit, Nhru, Updated_hrus, Itemp, Transp_end, 'transp_end')
             CALL is_eof(Transpend_unit, Transpend_next_yr, Transpend_next_mo, Transpend_next_day)
           ENDIF
@@ -844,7 +867,8 @@
       IF ( Fallfrost_flag==ACTIVE ) THEN
         IF ( Fallfrost_next_mo/=0 ) THEN
           IF ( Fallfrost_next_yr==Nowyear .AND. Fallfrost_next_mo==Nowmonth .AND. Fallfrost_next_day==Nowday ) THEN
-            READ ( Fallfrost_unit, * ) Fallfrost_next_yr, Fallfrost_next_mo, Fallfrost_next_day, Itemp
+            READ ( Fallfrost_unit, *, IOSTAT=ios ) Fallfrost_next_yr, Fallfrost_next_mo, Fallfrost_next_day, Itemp
+            if (ios /= 0) call error_stop('reading fall_frost dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam_int(Output_unit, Nhru, Updated_hrus, Itemp, Fall_frost, 'fall_frost')
             CALL is_eof(Fallfrost_unit, Fallfrost_next_yr, Fallfrost_next_mo, Fallfrost_next_day)
           ENDIF
@@ -854,7 +878,8 @@
       IF ( Springfrost_flag==ACTIVE ) THEN
         IF ( Springfrost_next_mo/=0 ) THEN
           IF ( Springfrost_next_yr==Nowyear .AND. Springfrost_next_mo==Nowmonth .AND. Springfrost_next_day==Nowday ) THEN
-            READ ( Springfrost_unit, * ) Springfrost_next_yr, Springfrost_next_mo, Springfrost_next_day, Itemp
+            READ ( Springfrost_unit, *, IOSTAT=ios ) Springfrost_next_yr, Springfrost_next_mo, Springfrost_next_day, Itemp
+            if (ios /= 0) call error_stop('reading spring_frost dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam_int(Output_unit, Nhru, Updated_hrus, Itemp, Spring_frost, 'spring_frost')
             CALL is_eof(Springfrost_unit, Springfrost_next_yr, Springfrost_next_mo, Springfrost_next_day)
           ENDIF
@@ -865,7 +890,8 @@
       IF ( Soilrechr_flag==ACTIVE ) THEN
         IF ( Soil_rechr_next_mo/=0 ) THEN
           IF ( Soil_rechr_next_yr==Nowyear .AND. Soil_rechr_next_mo==Nowmonth .AND. Soil_rechr_next_day==Nowday ) THEN
-            READ ( Soil_rechr_unit, * ) Soil_rechr_next_yr, Soil_rechr_next_mo, Soil_rechr_next_day, Temp
+            READ ( Soil_rechr_unit, *, IOSTAT=ios ) Soil_rechr_next_yr, Soil_rechr_next_mo, Soil_rechr_next_day, Temp
+            if (ios /= 0) call error_stop('reading soil_rechr_max dynamic parameter file', ERROR_dynamic)
             IF ( PRMS4_flag==ACTIVE ) THEN
               CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Soil_rechr_max, 'soil_rechr_max')
             ELSE
@@ -881,7 +907,8 @@
       IF ( Soilmoist_flag==ACTIVE ) THEN
         IF ( Soil_moist_next_mo/=0 ) THEN
           IF ( Soil_moist_next_yr==Nowyear .AND. Soil_moist_next_mo==Nowmonth .AND. Soil_moist_next_day==Nowday ) THEN
-            READ ( Soil_moist_unit, * ) Soil_moist_next_yr, Soil_moist_next_mo, Soil_moist_next_day, Temp
+            READ ( Soil_moist_unit, *, IOSTAT=ios ) Soil_moist_next_yr, Soil_moist_next_mo, Soil_moist_next_day, Temp
+            if (ios /= 0) call error_stop('reading soil_moist_max dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Soil_moist_max, 'soil_moist_max')
             CALL is_eof(Soil_moist_unit, Soil_moist_next_yr, Soil_moist_next_mo, Soil_moist_next_day)
             check_sm_max_flag = ACTIVE
@@ -930,7 +957,8 @@
       IF ( Ag_soilrechr_flag==ACTIVE ) THEN
         IF ( Ag_soil_rechr_next_mo/=0 ) THEN
           IF ( Ag_soil_rechr_next_yr==Nowyear .AND. Ag_soil_rechr_next_mo==Nowmonth .AND. Ag_soil_rechr_next_day==Nowday ) THEN
-            READ ( Ag_soil_rechr_unit, * ) Ag_soil_rechr_next_yr, Ag_soil_rechr_next_mo, Ag_soil_rechr_next_day, Temp
+            READ ( Ag_soil_rechr_unit, *, IOSTAT=ios ) Ag_soil_rechr_next_yr, Ag_soil_rechr_next_mo, Ag_soil_rechr_next_day, Temp
+            if (ios /= 0) call error_stop('reading ag_soil_rechr_frac dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Ag_soil_rechr_max_frac, 'ag_soil_rechr_max_frac')
             CALL is_eof(Ag_soil_rechr_unit, Ag_soil_rechr_next_yr, Ag_soil_rechr_next_mo, Ag_soil_rechr_next_day)
             check_ag_srechr_max_flag = ACTIVE
@@ -942,7 +970,8 @@
       IF ( Ag_soilmoist_flag==ACTIVE ) THEN
         IF ( Ag_soil_moist_next_mo/=0 ) THEN
           IF ( Ag_soil_moist_next_yr==Nowyear .AND. Ag_soil_moist_next_mo==Nowmonth .AND. Ag_soil_moist_next_day==Nowday ) THEN
-            READ ( Ag_soil_moist_unit, * ) Ag_soil_moist_next_yr, Ag_soil_moist_next_mo, Ag_soil_moist_next_day, Temp
+            READ ( Ag_soil_moist_unit, *, IOSTAT=ios ) Ag_soil_moist_next_yr, Ag_soil_moist_next_mo, Ag_soil_moist_next_day, Temp
+            if (ios /= 0) call error_stop('reading ag_soil_moist_max dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Ag_soil_moist_max, 'ag_soil_moist_max')
             CALL is_eof(Ag_soil_moist_unit, Ag_soil_moist_next_yr, Ag_soil_moist_next_mo, Ag_soil_moist_next_day)
             check_ag_sm_max_flag = ACTIVE
@@ -973,7 +1002,8 @@
       IF ( Dyn_radtrncf_flag==ACTIVE ) THEN
         IF ( Rad_trncf_next_mo/=0 ) THEN
           IF ( Rad_trncf_next_yr==Nowyear .AND. Rad_trncf_next_mo==Nowmonth .AND. Rad_trncf_next_day==Nowday ) THEN
-            READ ( Rad_trncf_unit, * ) Rad_trncf_next_yr, Rad_trncf_next_mo, Rad_trncf_next_day, Temp
+            READ ( Rad_trncf_unit, *, IOSTAT=ios ) Rad_trncf_next_yr, Rad_trncf_next_mo, Rad_trncf_next_day, Temp
+            if (ios /= 0) call error_stop('reading rad_trnch dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Rad_trncf, 'rad_trncf')
             CALL is_eof(Rad_trncf_unit, Rad_trncf_next_yr, Rad_trncf_next_mo, Rad_trncf_next_day)
           ENDIF
@@ -983,7 +1013,8 @@
       IF ( Dyn_snareathresh_flag==ACTIVE ) THEN
         IF ( Snarea_thresh_next_mo/=0 ) THEN
           IF ( Snarea_thresh_next_yr==Nowyear .AND. Snarea_thresh_next_mo==Nowmonth .AND. Snarea_thresh_next_day==Nowday ) THEN
-            READ ( Snarea_thresh_unit, * ) Snarea_thresh_next_yr, Snarea_thresh_next_mo, Snarea_thresh_next_day, Temp
+            READ ( Snarea_thresh_unit, *, IOSTAT=ios ) Snarea_thresh_next_yr, Snarea_thresh_next_mo, Snarea_thresh_next_day, Temp
+            if (ios /= 0) call error_stop('reading snarea_thresh dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Snarea_thresh, 'snarea_thresh')
             CALL is_eof(Snarea_thresh_unit, Snarea_thresh_next_yr, Snarea_thresh_next_mo, Snarea_thresh_next_day)
           ENDIF
@@ -993,7 +1024,8 @@
       IF ( Dyn_sro2dprst_perv_flag==ACTIVE ) THEN
         IF ( Sro_to_dprst_next_mo/=0 ) THEN
           IF ( Sro_to_dprst_next_yr==Nowyear .AND. Sro_to_dprst_next_mo==Nowmonth .AND. Sro_to_dprst_next_day==Nowday ) THEN
-            READ ( Sro_to_dprst_unit, * ) Sro_to_dprst_next_yr, Sro_to_dprst_next_mo, Sro_to_dprst_next_day, Temp
+            READ ( Sro_to_dprst_unit, *, IOSTAT=ios ) Sro_to_dprst_next_yr, Sro_to_dprst_next_mo, Sro_to_dprst_next_day, Temp
+            if (ios /= 0) call error_stop('reading sro_to_dprst dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Sro_to_dprst_perv, 'sro_to_dprst_perv')
             CALL is_eof(Sro_to_dprst_unit, Sro_to_dprst_next_yr, Sro_to_dprst_next_mo, Sro_to_dprst_next_day)
           ENDIF
@@ -1003,7 +1035,8 @@
       IF ( Dyn_sro2dprst_imperv_flag==ACTIVE ) THEN
         IF ( Sro_to_imperv_next_mo/=0 ) THEN
           IF ( Sro_to_imperv_next_yr==Nowyear .AND. Sro_to_imperv_next_mo==Nowmonth .AND. Sro_to_imperv_next_day==Nowday ) THEN
-            READ ( Sro_to_imperv_unit, * ) Sro_to_imperv_next_yr, Sro_to_imperv_next_mo, Sro_to_imperv_next_day, Temp
+            READ ( Sro_to_imperv_unit, *, IOSTAT=ios ) Sro_to_imperv_next_yr, Sro_to_imperv_next_mo, Sro_to_imperv_next_day, Temp
+            if (ios /= 0) call error_stop('reading sro_to_imperv dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Sro_to_dprst_imperv, 'sro_to_dprst_imperv')
             CALL is_eof(Sro_to_imperv_unit, Sro_to_imperv_next_yr, Sro_to_imperv_next_mo, Sro_to_imperv_next_day)
           ENDIF
@@ -1013,7 +1046,8 @@
       IF ( Dyn_transp_on_flag==ACTIVE ) THEN
         IF ( Transp_event_next_mo/=0 ) THEN
           IF ( Transp_event_next_yr==Nowyear .AND. Transp_event_next_mo==Nowmonth .AND. Transp_event_next_day==Nowday ) THEN
-            READ ( Transp_event_unit, * ) Transp_event_next_yr, Transp_event_next_mo, Transp_event_next_day, Itemp
+            READ ( Transp_event_unit, *, IOSTAT=ios ) Transp_event_next_yr, Transp_event_next_mo, Transp_event_next_day, Itemp
+            if (ios /= 0) call error_stop('reading transp_on dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam_int(Output_unit, Nhru, Updated_hrus, Itemp, Transp_on, 'transp_on_event')
             CALL is_eof(Transp_event_unit, Transp_event_next_yr, Transp_event_next_mo, Transp_event_next_day)
           ENDIF

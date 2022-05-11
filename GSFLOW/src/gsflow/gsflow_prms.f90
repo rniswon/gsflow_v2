@@ -137,7 +137,7 @@
             RETURN
           END IF
           ierr = gsfdecl()
-          IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
+          IF ( ierr/=0 ) CALL module_error('gsfdecl', Arg, ierr)
         ENDIF
 
         IF ( Print_debug>DEBUG_minimum ) THEN
@@ -486,9 +486,9 @@
       IF ( Model==PRMS .OR. Model==MODSIM_PRMS .OR. Model>=WRITE_CLIMATE ) THEN
         IF ( Model==MODSIM_PRMS ) CALL gsflow_modsim2prms(DIVERSIONS)
         IF ( AG_flag==ACTIVE ) THEN
-          ierr = soilzone_ag(AFR,1)
+          ierr = soilzone_ag(AFR, 1)
         ELSE
-          ierr = soilzone(AFR,1)
+          ierr = soilzone(AFR, 1)
         ENDIF
         IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
@@ -563,9 +563,9 @@
           ENDIF
 
           IF ( AG_flag==ACTIVE ) THEN
-            ierr = soilzone_ag(AFR,1)
+            ierr = soilzone_ag(AFR, 1)
           ELSE
-            ierr = soilzone(AFR,1)
+            ierr = soilzone(AFR, 1)
           ENDIF
           IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
@@ -1555,7 +1555,7 @@
       test = snowcomp()
       test = srunoff()
       test = glacr()
-      test = soilzone_ag(AFR,1)
+      test = soilzone_ag(AFR, 1)
       test = gsflow_prms2mf()
       test = gsflow_mf2prms()
       test = gsflow_budget()

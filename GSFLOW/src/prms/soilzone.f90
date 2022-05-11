@@ -20,7 +20,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2022-04-27'
+      character(len=*), parameter :: Version_soilzone = '2022-05-10'
       INTEGER, SAVE :: DBGUNT, Iter_aet
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -77,7 +77,7 @@
 !***********************************************************************
 !     Main soilzone routine
 !***********************************************************************
-      INTEGER FUNCTION soilzone(AFR,iter_flag)
+      INTEGER FUNCTION soilzone(AFR, iter_flag)
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
@@ -546,8 +546,6 @@
       USE PRMS_FLOWVARS, ONLY: Soil_moist_max, Soil_rechr_max, Hru_impervstor, Dprst_stor_hru, &
      &    Ssres_stor, Basin_ssstor, Basin_soil_moist, Slow_stor, Hru_intcpstor, Pref_flow_stor, &
      &    Soil_moist, Sat_threshold, Soil_rechr, Pkwater_equiv, Snowcov_area, Gravity_stor_res
-      USE PRMS_IT0_VARS, ONLY: It0_pref_flow_stor, It0_gravity_stor_res, It0_soil_moist, It0_soil_rechr, &
-                               It0_ssres_stor, It0_slow_stor, It0_basin_soil_moist, It0_basin_ssstor
       use prms_utils, only: checkdim_bounded_limits, error_stop, read_error
       IMPLICIT NONE
 ! Functions
@@ -586,7 +584,6 @@
             Gvr_hru_id(i) = i
           ENDDO
         ENDIF
-        Gw2sm_grav = 0.0
       ENDIF
 
       Swale_limit = 0.0
@@ -688,13 +685,6 @@
       Basin_sz_stor_frac = Basin_sz_stor_frac*Basin_area_inv
       Basin_soil_lower_stor_frac = Basin_soil_lower_stor_frac*Basin_area_inv
       Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac*Basin_area_inv
-      It0_basin_soil_moist = Basin_soil_moist_tot
-      It0_basin_ssstor = Basin_ssstor
-      It0_pref_flow_stor = Pref_flow_stor
-      It0_soil_moist = Soil_moist
-      It0_soil_rechr = Soil_rechr
-      It0_ssres_stor = Ssres_stor
-      It0_slow_stor = Slow_stor
 
 ! initialize arrays (dimensioned Nhru)
       Dunnian_flow = 0.0
@@ -719,6 +709,9 @@
 
 ! initialize GSFLOW arrays
       IF ( GSFLOW_flag==ACTIVE ) THEN
+        Gvr2sm = 0.0 ! dimension nhru
+        Sm2gw_grav = 0.0 ! dimension nhrucell
+
         Max_gvrs = 1
         Hrucheck = 1
         Hru_gvr_count = 0
@@ -737,7 +730,6 @@
             IF ( Soil_moist_max(ihru)>0.0 ) Replenish_frac(ihru) = Soil_rechr_max(ihru)/Soil_moist_max(ihru)
           ENDIF
         ENDDO
-        It0_gravity_stor_res = Gravity_stor_res
         ALLOCATE ( Hru_gvr_index(Max_gvrs, Nhru) )
         Hru_gvr_index = 0
         IF ( Nhru==Nhrucell ) THEN
@@ -778,7 +770,7 @@
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Hru_type, Model, Nowmonth !, Nowyear, Nowday
+     &    Soilzone_aet_flag, Hru_type, AG_flag, Model, Nowmonth !, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -823,6 +815,19 @@
       szrun = 0
 
 ! It0 variables used with MODFLOW integration to save iteration states.
+      IF ( Kkiter==1 .and. iter_flag == 1 ) THEN
+        IF ( GSFLOW_flag==ACTIVE ) THEN
+          IF ( Nlake>0 ) It0_potet = Potet
+          It0_strm_seg_in = Strm_seg_in
+          Gw2sm_grav = 0.0 ! dimension nhrucell
+          IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
+        ENDIF
+        IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF .AND. AFR) THEN
+          ! computed in srunoff
+          It0_sroff = Sroff
+        ENDIF
+      ENDIF
+
       IF ( Kkiter>1 .OR. .NOT.(AFR) ) THEN ! Kkiter>1 means GSFLOW is active, AFR = FALSE means within MODSIM iteration
         Soil_moist = It0_soil_moist
         Soil_rechr = It0_soil_rechr
@@ -837,20 +842,12 @@
           ! computed in srunoff
           Sroff = It0_sroff
           IF ( Call_cascade==ACTIVE ) Strm_seg_in = It0_strm_seg_in
-        ELSE IF (AFR) THEN
-          ! computed in srunoff
-          It0_sroff = Sroff
-          IF ( Call_cascade==ACTIVE ) It0_strm_seg_in = Strm_seg_in
         ENDIF
       ENDIF
       IF ( GSFLOW_flag==ACTIVE ) THEN
-        IF ( Kkiter == 1 ) THEN
-          Gw2sm_grav = 0.0 ! dimension nhrucell
-          IF ( Nlake>0 ) It0_potet = Potet
-        ENDIF
-        Gvr2sm = 0.0 ! dimension nhru
         Sm2gw_grav = 0.0 ! dimension nhrucell
         Grav_gwin = 0.0 ! dimension nhru
+        Gvr2sm = 0.0 ! dimension nhru
       ENDIF
 
       IF ( Cascade_flag>CASCADE_OFF ) THEN
@@ -1616,6 +1613,7 @@
 ! in init, set an array dimensioned by nhrucell to vks*mfl_to_inch
 
       Gwin = 0.0D0
+      Gvr2sm = 0.0
       topfr = 0.0D0
       slflow = 0.0D0
       togw = 0.0D0

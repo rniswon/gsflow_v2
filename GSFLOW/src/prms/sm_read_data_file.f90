@@ -215,7 +215,7 @@ contains
       USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow
       USE PRMS_OBS, ONLY: Nlakeelev, Nwind, Nhumid, Nstream_temp, &
      &    Tmin, Tmax, Precip, Snowdepth, Runoff, Pan_evap, Wind_speed, Humidity, Solrad, &
-     &    Gate_ht, Lake_elev, Runoff_units, Streamflow_cfs, Streamflow_cms, Stream_temp
+     &    Gate_ht, Lake_elev, Rain_day, Runoff_units, Streamflow_cfs, Streamflow_cms, Stream_temp
       USE PRMS_CLIMATEVARS, ONLY: Ppt_zero_thresh
       IMPLICIT NONE
       ! Arguments
@@ -330,6 +330,15 @@ contains
           DO i = 1, Numvalues
             Pan_evap(i) = Values(i)
           ENDDO
+        ENDIF
+      ELSEIF ( Varname(:8)=='rain_day' ) THEN
+        IF ( Iflag==0 ) THEN
+          IF ( Numvalues/=1 ) THEN
+            Iret = -1
+            ndim = 1
+          ENDIF
+        ELSE
+          Rain_day = Values(1) ! WARNING: Rain_day is an integer, but Values(1) is real
         ENDIF
       ELSEIF ( Varname(:8)=='humidity' ) THEN
         IF ( Iflag==0 ) THEN

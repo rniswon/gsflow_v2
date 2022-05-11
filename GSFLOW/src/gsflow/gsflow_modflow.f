@@ -463,8 +463,8 @@ c     USE LMGMODULE
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: soilzone, soilzone_ag
+      INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms
-      INTEGER, EXTERNAL :: intcp, snowcomp, glacr, srunoff
       EXTERNAL :: MODSIM2SFR, SFR2MODSIM, LAK2MODSIM
       INTRINSIC MIN
 ! Local Variables
@@ -497,7 +497,7 @@ C7------SIMULATE EACH STRESS PERIOD.
           IF ( ISSFLG(KKPER).EQ.1 ) CALL error_stop
      &         ('cannot run steady state after first stress period.',
      &          ERROR_modflow)
-!          IF ( ISSFLG(1).EQ.0 ) Delt_save = DELT ! rsr, delt_save set in gsfinit
+!          IF ( ISSFLG(1).EQ.0 ) Delt_save = DELT ! rsr, delt_save set in MFNWT_INIT
           IF ( DELT.NE.Delt_save )
      &         CALL error_stop('cannot change DELT', ERROR_time)
         END IF
@@ -678,9 +678,9 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                 ENDIF
               ENDIF
               IF ( AG_flag==ACTIVE ) THEN
-                retval = soilzone_ag(AFR,1)
+                retval = soilzone_ag(AFR, 1)
               ELSE
-                retval = soilzone(AFR,1)
+                retval = soilzone(AFR, 1)
               ENDIF
               IF ( retval/=0 ) THEN
                 PRINT 9001, Soilzone_module, retval
@@ -735,9 +735,9 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                 ENDIF
               ENDIF
               IF ( AG_flag==ACTIVE ) THEN
-                retval = soilzone_ag(AFR,2)
+                retval = soilzone_ag(AFR, 2)
               ELSE
-                retval = soilzone(AFR,2)
+                retval = soilzone(AFR, 2)
               ENDIF
               IF ( retval/=0 ) THEN
                 PRINT 9001, Soilzone_module, retval
@@ -1128,7 +1128,7 @@ C
       ENDIF
 
  9001 FORMAT ('ERROR in ', A, ' module, arg = run.',
-     &        ' Called from gsfrun.', /, 'Return val = ', I0)
+     &        ' Called from MFNWT_RUN.', /, 'Return val = ', I0)
  9002 FORMAT('Date: ', I0, 2('/',I2.2), '; Stress: ', I0, '; Step: ',I0,
      &       '; Simulation step: ', I0, /, 18X, 'MF iterations: ', I0,
      &       '; SZ iterations: ', I0, /)
@@ -2098,7 +2098,7 @@ C
         ! MF volume to PRMS inches
         Mfvol2inch_conv(i) = Mfl_to_inch/Cellarea(Gvr_cell_id(i))
         ! MF discharge to PRMS inches
-        ! note DELT may change during simulation at some point, so this will need to go in read_stress
+        ! note DELT may change during simulation at some point, so this will need to go in MFNWT_RDSTRESS
         Mfq2inch_conv(i) = Mfvol2inch_conv(i)*DELT
         ! PRMS inches in a gravity-flow reservoir to MF rate
         Gvr2cell_conv(i) = Gvr_cell_pct(i)*Inch_to_mfl_t
