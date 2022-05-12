@@ -7092,14 +7092,6 @@ C         STREAM.
           IF ( zoldist.LT.0.0 ) zoldist = 0.0D0
           surflux = Uzseep(i)
           oldsflx = Uzolsflx(i)
- !     if(l==1157)then
- !     !write(99,*)kkper,kkstp,kkiter
- !         do iwav = iset, iset + numwaves - 1
- !         write(99,323)iwav,Uzdpst(iwav),Uzspst(iwav),Uzthst(iwav),
- !    +               Uzflst(iwav),Itrlst(iwav),Ltrlst(iwav)
- !         end do
- !     end if
- !323  format(i5,4e20.10,2i5)
           CALL UZFLOW(L, surflux, dlength, zoldist, Uzdpit, Uzthit, 
      +                Uzflit, Uzspit, Itrlit, Ltrlit, totflux, 
      +                numwaves, Thr, Thetas, Fks, Epsilon, oldsflx, 
@@ -7386,7 +7378,7 @@ C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
       DOUBLE PRECISION ffcheck, bottomtime, shortest, fcheck, fhold
       DOUBLE PRECISION eps_m1, checktime(NSTOTRL), timenew, feps3
-      DOUBLE PRECISION big, comp1, comp2, diff, f7, f8, ftheta1, ftheta2
+      REAL big, comp1, comp2, diff, f7, f8, ftheta1, ftheta2 
       INTEGER idif, iflag, iflag2, iflx, iremove, itrwaveb, j, jj, k, 
      +        kk, l, jpnwavesm1, jpntpkm1, jpntpkm2, more(NSTOTRL)
 C     ------------------------------------------------------------------
@@ -7636,16 +7628,16 @@ C         COMBINED WAVE.
                 IF ( j.EQ.3 ) THEN
                   comp1 = ABS(Theta(Jpnt+j-1)-THETAB)
                   comp2 = ABS(Flux(Jpnt+j-1)-FLUXB)
-                  IF ( comp1.LE.1.D-9 ) Theta(Jpnt+j-1) = THETAB - 1.D-9
-                  IF ( comp2.LE.1.D-15 ) Flux(Jpnt+j-1) = FLUXB - 1.D-15
+                  IF ( comp1.LE.1.E-9 ) Theta(Jpnt+j-1) = THETAB - 1.D-9
+                  IF ( comp2.LE.1.E-15 ) Flux(Jpnt+j-1) = FLUXB - 1.D-15
                   Speed(Jpnt+j-1) = (Flux(Jpnt+j-1)-FLUXB)
      +                              /(Theta(Jpnt+j-1)-THETAB)
                 ELSE
                   comp1 = ABS(Theta(Jpnt+j-1)-Theta(Jpnt+j-3))
                   comp2 = ABS(Flux(Jpnt+j-1)-Flux(Jpnt+j-3))
-                  IF ( comp1.LT.1.0d-9 ) Theta(Jpnt+j-1)
+                  IF ( comp1.LT.1.0E-9 ) Theta(Jpnt+j-1)
      +                 = Theta(Jpnt+j-3) - 1.0D-9
-                  IF ( comp2.LT.1.0D-15 ) Flux(Jpnt+j-1)
+                  IF ( comp2.LT.1.0E-15 ) Flux(Jpnt+j-1)
      +                 = Flux(Jpnt+j-3) - 1.0D-15
                   Speed(Jpnt+j-1) = (Flux(Jpnt+j-1)-Flux(Jpnt+j-3))/
      +                              (Theta(Jpnt+j-1)-Theta(Jpnt+j-3))
@@ -7679,8 +7671,8 @@ C
 C14-----RECALCULATE FLUX.
                     comp1 = ABS(Theta(Jpnt+j-1)-THETAB)
                     comp2 = ABS(Flux(Jpnt+j-1)-FLUXB)
-                    IF (comp1.LE.1.D-9) Theta(Jpnt+j-1) = THETAB - 1.D-9
-                    IF (comp2.LE.1.D-15) Flux(Jpnt+j-1) = FLUXB - 1.D-15
+                    IF (comp1.LE.1.E-9) Theta(Jpnt+j-1) = THETAB - 1.D-9
+                    IF (comp2.LE.1.E-15) Flux(Jpnt+j-1) = FLUXB - 1.D-15
                     Speed(Jpnt+j-1) = (Flux(Jpnt+j-1)-FLUXB)
      +                                /(Theta(Jpnt+j-1)-THETAB)
                     IF ( Flux(Jpnt+j-1)-FLUXB.LT.0.0D0 ) THEN
@@ -7697,9 +7689,9 @@ C14-----RECALCULATE FLUX.
                   ELSE
                     comp1 = ABS(Theta(Jpnt+j-1)-Theta(Jpnt+j-3))
                     comp2 = ABS(Flux(Jpnt+j-1)-Flux(Jpnt+j-3))
-                    IF ( comp1.LT.1.0d-9 ) Theta(Jpnt+j-1)
+                    IF ( comp1.LT.1.0E-9 ) Theta(Jpnt+j-1)
      +                   = Theta(Jpnt+j-3) - 1.0D-9
-                    IF ( comp2.LT.1.0D-15 ) Flux(Jpnt+j-1)
+                    IF ( comp2.LT.1.0E-15 ) Flux(Jpnt+j-1)
      +                   = Flux(Jpnt+j-3) - 1.0D-15
                     IF ( Flux(Jpnt+j-1)-Flux(Jpnt+j-3).LT.0.0D0 ) THEN
                       fhold = (Theta(Jpnt+j-1)-Thetar)/(Thetas-Thetar)
@@ -7735,16 +7727,16 @@ C14-----RECALCULATE FLUX.
                 IF ( j.EQ.3 ) THEN
                   comp1 = ABS(Theta(Jpnt+j-1)-THETAB)
                   comp2 = ABS(Flux(Jpnt+j-1)-FLUXB)
-                  IF ( comp1.LE.1.D-9 ) Theta(Jpnt+j-1) = THETAB - 1.D-9
-                  IF ( comp2.LE.1.D-15 ) Flux(Jpnt+j-1) = FLUXB - 1.D-15
+                  IF ( comp1.LE.1.E-9 ) Theta(Jpnt+j-1) = THETAB - 1.D-9
+                  IF ( comp2.LE.1.E-15 ) Flux(Jpnt+j-1) = FLUXB - 1.D-15
                   Speed(Jpnt+j-1) = (Flux(Jpnt+j-1)-FLUXB)
      +                              /(Theta(Jpnt+j-1)-THETAB)
                 ELSE
                   comp1 = ABS(Theta(Jpnt+j-1)-Theta(Jpnt+j-3))
                   comp2 = ABS(Flux(Jpnt+j-1)-Flux(Jpnt+j-3))
-                  IF ( comp1.LT.1.0d-9 ) Theta(Jpnt+j-1)
+                  IF ( comp1.LT.1.0E-9 ) Theta(Jpnt+j-1)
      +                 = Theta(Jpnt+j-3) - 1.0D-9
-                  IF ( comp2.LT.1.0D-15 ) Flux(Jpnt+j-1)
+                  IF ( comp2.LT.1.0E-15 ) Flux(Jpnt+j-1)
      +                 = Flux(Jpnt+j-3) - 1.0D-15
                   Speed(Jpnt+j-1) = (Flux(Jpnt+j-1)-Flux(Jpnt+j-3))/
      +                              (Theta(Jpnt+j-1)-Theta(Jpnt+j-3))

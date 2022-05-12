@@ -412,8 +412,6 @@
       USE GWFSFRMODULE, ONLY: IRTFLG
       USE GLOBAL, ONLY: IUNIT
       USE PRMS_BASIN, ONLY: Active_area
-      USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor
-      USE PRMS_IT0_VARS, ONLY: It0_basin_ssstor, It0_basin_soil_moist
       USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop, Basin_dprst_volcl
       use prms_utils, only: read_error
       IMPLICIT NONE
@@ -466,8 +464,6 @@
       Last_Cap_S = Cap_S
       Last_Grav_S = Grav_S
       Last_Pref_S = Pref_S
-      It0_basin_soil_moist = Basin_soil_moist
-      It0_basin_ssstor = Basin_ssstor
       Last_Canopy_S = Canopy_S
       Last_Imperv_S = Imperv_S
       Last_SnowPweqv_S = SnowPweqv_S

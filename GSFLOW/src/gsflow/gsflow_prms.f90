@@ -2,9 +2,7 @@
 ! Defines the computational sequence, valid modules, and dimensions
 !***********************************************************************
       SUBROUTINE gsflow_prms(Process_mode, AFR, MS_GSF_converge, Nsegshold, Nlakeshold, &
-     &                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand) !BIND(C,NAME="gsflow_prms")
-      
-!!!      !DEC$ ATTRIBUTES DLLEXPORT :: gsflow_prms
+     &                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand)
       USE PRMS_CONSTANTS, ONLY: ERROR_control
       use PRMS_CONTROL_FILE, only: read_control_file
       use PRMS_DATA_FILE, only: read_prms_data_file
@@ -14,7 +12,6 @@
                                       read_parameter_file_dimens, read_parameter_file_params, setup_params
       use PRMS_SET_TIME, only: prms_time
       use prms_utils, only: error_stop, module_error, numchars, print_module, PRMS_open_output_file, read_error
-      USE MF_DLL, ONLY: gsfdecl, MFNWT_RUN, MFNWT_CLEAN, MFNWT_OCBUDGET, MFNWT_INIT
       USE GWFSFRMODULE, ONLY: NSS
       USE GWFLAKMODULE, ONLY: NLAKES
       IMPLICIT NONE
@@ -48,6 +45,8 @@
       EXTERNAL :: gsflow_prms_restart, water_balance, summary_output
       EXTERNAL :: prms_summary, module_doc, convert_params, gsflow_prms2modsim !, gsflow_modsim2prms
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
+      INTEGER, EXTERNAL :: gsfdecl
+      EXTERNAL :: MFNWT_RUN, MFNWT_OCBUDGET, MFNWT_INIT, MFNWT_CLEAN
 ! Local Variables
       INTEGER :: i, iret, nc, ierr
       CHARACTER(len=8) :: Arg
@@ -137,7 +136,7 @@
             RETURN
           END IF
           ierr = gsfdecl()
-          IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
+          IF ( ierr/=0 ) CALL module_error('gsfdecl', Arg, ierr)
         ENDIF
 
         IF ( Print_debug>DEBUG_minimum ) THEN
@@ -486,9 +485,9 @@
       IF ( Model==PRMS .OR. Model==MODSIM_PRMS .OR. Model>=WRITE_CLIMATE ) THEN
 !        IF ( Model==MODSIM_PRMS ) CALL gsflow_modsim2prms(DIVERSIONS)
         IF ( AG_flag==ACTIVE ) THEN
-          ierr = soilzone_ag(AFR,1)
+          ierr = soilzone_ag(AFR, 1)
         ELSE
-          ierr = soilzone(AFR,1)
+          ierr = soilzone(AFR, 1)
         ENDIF
         IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
@@ -563,9 +562,9 @@
           ENDIF
 
           IF ( AG_flag==ACTIVE ) THEN
-            ierr = soilzone_ag(AFR,1)
+            ierr = soilzone_ag(AFR, 1)
           ELSE
-            ierr = soilzone(AFR,1)
+            ierr = soilzone(AFR, 1)
           ENDIF
           IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
@@ -692,7 +691,6 @@
       use PRMS_READ_PARAM_FILE, only: decldim, declfix, read_parameter_file_dimens, setup_dimens
       use prms_utils, only: compute_julday, error_stop, module_error, PRMS_open_input_file, PRMS_open_output_file, read_error
       USE GLOBAL, ONLY: NSTP, NPER, ISSFLG
-      USE MF_DLL, ONLY: gsfdecl, MFNWT_RUN, MFNWT_INIT, MFNWT_CLEAN, MFNWT_OCBUDGET
       IMPLICIT NONE
 ! Arguments
       LOGICAL, INTENT(IN) :: AFR
@@ -704,7 +702,8 @@
      &                                   LAKEVOL(Nlakeshold),   &
      &                                   agDemand(Nsegshold)
 ! Functions
-      EXTERNAL :: check_module_names
+      INTEGER, EXTERNAL :: gsfdecl
+      EXTERNAL :: check_module_names, MFNWT_RUN, MFNWT_CLEAN, MFNWT_INIT, MFNWT_OCBUDGET
 ! Local Variables
       ! Maximum values are no longer limits
 ! Local Variables
@@ -1555,7 +1554,7 @@
       test = snowcomp()
       test = srunoff()
       test = glacr()
-      test = soilzone_ag(AFR,1)
+      test = soilzone_ag(AFR, 1)
       test = gsflow_prms2mf()
       test = gsflow_mf2prms()
       test = gsflow_budget()
@@ -1698,9 +1697,7 @@
 !***********************************************************************
 !     gsflow_prmsSettings - set MODSIM variables set in PRMS
 !***********************************************************************
-      SUBROUTINE gsflow_prmsSettings(Numts, Model_mode, Start_time, xy_len, xy_FileName, map_len, map_FileName) &
-                                     BIND(C,NAME="gsflow_prmsSettings")
-!!!      !DEC$ ATTRIBUTES DLLEXPORT :: gsflow_prmsSettings
+      SUBROUTINE gsflow_prmsSettings(Numts, Model_mode, Start_time, xy_len, xy_FileName, map_len, map_FileName)
       USE PRMS_MODULE, ONLY: Model, Number_timesteps, Starttime, mappingFileName, xyFileName
       use prms_utils, only: numchars
       IMPLICIT NONE

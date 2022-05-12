@@ -10,7 +10,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2022-03-17'
+        character(len=*), parameter :: Version_climate_hru = '2022-05-09'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit, AET_unit, PET_unit, Irrigated_area_unit
         INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit
@@ -40,7 +40,7 @@
      &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, Nowyear, Nowday, forcing_check_flag, &
      &    irrigated_area_flag, AET_cbh_flag, PET_cbh_flag
       USE PRMS_CLIMATE_HRU
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Ag_Frac
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
      &    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, &
      &    Tavgc, Hru_ppt, Hru_rain, Hru_snow, Prmx, Pptmix, Newsnow, &
@@ -57,6 +57,7 @@
       EXTERNAL :: precip_form, read_cbh_date, check_cbh_value, check_cbh_intvalue
 ! Local Variables
       INTEGER :: yr, mo, dy, i, hr, mn, sec, jj, ierr, istop, missing, ios !, write_tmin_tmax
+      INTEGER :: ii, num_ag, num_pet
       DOUBLE PRECISION :: sum_obs
       REAL :: tmax_hru, tmin_hru, ppt, harea !, foo
 !***********************************************************************
@@ -151,6 +152,22 @@
             CALL read_cbh_date(yr, mo, dy, 'PET_external', ios, ierr)
           ENDIF
           Basin_pet_external = 0.0D0
+
+          num_ag = 0
+          num_pet = 0
+          DO ii = 1, Nhru
+            IF ( PET_external(ii)<AET_external(ii) ) then
+!              PRINT *, yr, mo, dy, ii, PET_external(ii), AET_external(ii), Ag_frac(ii)
+              num_pet = num_pet + 1
+              PET_external(ii) = AET_external(ii)
+            ENDIF
+            IF ( Ag_frac(ii)>0.0 ) num_ag = num_ag + 1
+          END DO
+          IF ( num_pet>0 ) then
+            PRINT '(2(A,I0))', 'number of AG HRUs ', num_ag, ', number of OpenET PET < AET ', num_pet
+            PRINT *, 'Date:', yr, mo, dy
+          ENDIF
+
         ENDIF
 
         IF ( irrigated_area_flag==ACTIVE ) THEN

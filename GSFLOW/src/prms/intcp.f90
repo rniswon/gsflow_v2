@@ -8,9 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2022-04-21'
-      REAL, SAVE, ALLOCATABLE :: Intcp_stor_ante(:)
-      DOUBLE PRECISION, SAVE :: Last_intcp_stor
+      character(len=*), parameter :: Version_intcp = '2022-05-09'
       INTEGER, SAVE :: Use_transfer_intcp
       INTEGER, PARAMETER :: RAIN = 0, SNOW = 1
 !   Declared Variables
@@ -205,12 +203,11 @@
       INTEGER FUNCTION intinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, MONTHS_PER_YEAR, ERROR_control
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Print_debug, &
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, &
      &    GSFLOW_flag, AG_flag, Ag_package, Agriculture_canopy_flag
       USE PRMS_INTCP
       USE PRMS_CLIMATEVARS, ONLY: Transp_on
       USE PRMS_FLOWVARS, ONLY: Intcp_transp_on, Intcp_stor, Hru_intcpstor, Basin_intcp_stor
-      USE PRMS_IT0_VARS, ONLY: It0_intcp_transp_on
       use prms_utils, only: read_error, error_stop
       IMPLICIT NONE
 !***********************************************************************
@@ -244,10 +241,8 @@
         Hru_intcpstor = 0.0
         Basin_intcp_stor = 0.0D0
       ENDIF
-      It0_intcp_transp_on = Intcp_transp_on
       Basin_net_apply = 0.0D0
       Basin_hru_apply = 0.0D0
-      IF ( Print_debug==DEBUG_WB ) ALLOCATE ( Intcp_stor_ante(Nhru) )
       IF ( Ag_package==OFF .AND. Agriculture_canopy_flag==ACTIVE ) &
      &     CALL error_stop('AG Package not active and agriculture_canopy_flag specified = 0', ERROR_control)
 
@@ -296,10 +291,6 @@
         ENDIF
       ENDIF
 
-      IF ( Print_debug==DEBUG_WB ) THEN
-        Intcp_stor_ante = Hru_intcpstor
-        Last_intcp_stor = Basin_intcp_stor
-      ENDIF
       Basin_changeover = 0.0D0
       Basin_net_ppt = 0.0D0
       Basin_net_snow = 0.0D0

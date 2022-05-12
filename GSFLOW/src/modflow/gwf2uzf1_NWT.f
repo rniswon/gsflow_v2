@@ -2195,7 +2195,7 @@ C4------RESET ALL UNSATRATED ZONE CELLS TO PREVIOUS CONDITIONS.
                   LTRLIT(iwav) = LTRLST(iwav, l)
                 END DO
 C
-C5------TO ROUTE WAVES FOR LATEST ITERATION.
+C5------CALL UZFLOW TO ROUTE WAVES FOR LATEST ITERATION.
                 IF ( htest1 .LT. 0.0D0 ) THEN
                   dlength = celtop - h
                   IF ( dlength.LT.0.0D0 ) dlength = 0.0D0
@@ -2941,7 +2941,7 @@ C
 C13-----UPDATE UNSATURATED ZONE WAVES WHEN THE WATER TABLE REMAINS
 C         BELOW LAND SURFACE AND CALCULATE CHANGE IN STORAGE.         
           ELSE IF ( hdif.LT.1.0E-5 .AND. nwaves.EQ.1 .AND. 
-     +              fluxdif.LT.1.0d-9 .AND. htest1.LT.2.0E-5 .AND. 
+     +              fluxdif.LT.1.0E-9 .AND. htest1.LT.2.0E-5 .AND. 
      +              IETFLG.EQ.0 ) THEN
             IF ( IUZFOPT.GT.0 ) THEN
               IF ( ibnd.GT.0 ) THEN
@@ -3447,7 +3447,7 @@ C28-----COMPUTE UNSATURATED ERROR FOR EACH CELL.
      +                              + DELSTOR(ic, ir)
               fminn = MAX(ABS(UZTOTBAL(ic,ir,1)), ABS(UZTOTBAL(ic,ir,2))
      +                , ABS(UZTOTBAL(ic,ir,3)))
-              IF ( fminn.LE.1.0d-9 ) THEN
+              IF ( fminn.LE.1.0E-9 ) THEN
                 prcntdif = 0.0D0
               ELSE IF ( ABS(UZTOTBAL(ic,ir,1)-UZTOTBAL(ic,ir,3))
      +                  .LT.CLOSEZERO .AND. ABS(UZTOTBAL(ic,ir,1))
