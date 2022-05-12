@@ -606,7 +606,7 @@
      &    Imperv_stor_max, Snowinfil_max, Basin_sroff, Glacier_frac, Soil_moist, Soil_rechr, Dprst_stor_hru, &
      &    Ag_soil_moist, Ag_soil_rechr, Pk_depth, Snowcov_area, Snow_evap, Snowmelt, Glacrb_melt, &
      &    Dprst_total_open_in, Dprst_total_open_out, Dprst_total_clos_in, Dprst_total_clos_out, &
-     &    Strm_seg_in, Hru_impervstor
+     &    Strm_seg_in, Hru_impervstor, strm_seg_interflow_in, strm_seg_sroff_in, strm_seg_gwflow_in
       USE PRMS_IT0_VARS, ONLY: It0_dprst_vol_open, It0_dprst_vol_clos, It0_imperv_stor, It0_soil_moist, &
                                It0_soil_rechr, It0_ag_soil_moist, It0_ag_soil_rechr, It0_hru_impervstor
       USE PRMS_CASCADE, ONLY: Ncascade_hru
@@ -655,7 +655,12 @@
       Basin_cfgi_sroff = 0.0D0
       Basin_apply_sroff = 0.0D0
 
-      IF ( Call_cascade==ACTIVE ) Strm_seg_in = 0.0D0
+      IF ( Call_cascade==ACTIVE ) THEN
+        Strm_seg_in = 0.0D0
+        strm_seg_interflow_in = 0.0D0
+        strm_seg_sroff_in = 0.0D0
+        strm_seg_gwflow_in = 0.0D0
+      ENDIF
       IF ( Cascade_flag>CASCADE_OFF ) THEN
         Basin_sroff_down = 0.0D0
         Basin_sroff_upslope = 0.0D0
@@ -1155,7 +1160,7 @@
       SUBROUTINE run_cascade_sroff(Ncascade_hru, Runoff, Hru_sroff_down)
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_SRUNOFF, ONLY: Ihru, Upslope_hortonian
-      USE PRMS_FLOWVARS, ONLY: Strm_seg_in
+      USE PRMS_FLOWVARS, ONLY: Strm_seg_in, strm_seg_sroff_in
       USE PRMS_CASCADE, ONLY: Hru_down, Hru_down_frac, Hru_down_fracwt, Cascade_area
       IMPLICIT NONE
 ! Functions
@@ -1166,6 +1171,7 @@
       DOUBLE PRECISION, INTENT(INOUT) :: Hru_sroff_down
 ! Local Variables
       INTEGER :: j, k
+      DOUBLE PRECISION :: sroff_in
 !***********************************************************************
       DO k = 1, Ncascade_hru
         j = Hru_down(k, Ihru)
@@ -1177,7 +1183,9 @@
 ! if hru_down(k, Ihru) < 0, cascade contributes to a stream
         ELSEIF ( j<0 ) THEN
           j = IABS( j )
-          Strm_seg_in(j) = Strm_seg_in(j) + DBLE( Runoff*Cascade_area(k, Ihru) )*Cfs_conv
+          sroff_in = DBLE( Runoff*Cascade_area(k, Ihru) )*Cfs_conv
+          strm_seg_sroff_in(j) = strm_seg_sroff_in(j) + sroff_in
+          Strm_seg_in(j) = Strm_seg_in(j) + sroff_in
         ENDIF
       ENDDO
 

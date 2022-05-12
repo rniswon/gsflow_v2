@@ -1538,7 +1538,7 @@
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_SOILZONE, ONLY: Upslope_dunnianflow, Upslope_interflow
       USE PRMS_CASCADE, ONLY: Hru_down, Hru_down_frac, Hru_down_fracwt, Cascade_area
-      USE PRMS_FLOWVARS, ONLY: Strm_seg_in
+      USE PRMS_FLOWVARS, ONLY: Strm_seg_in, strm_seg_interflow_in
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: IABS, DBLE
@@ -1549,6 +1549,7 @@
 ! Local Variables
       INTEGER :: j, k
       REAL :: frac, fracwt
+      DOUBLE PRECISION :: interflow_in
 !***********************************************************************
       DO k = 1, Ncascade_hru
         j = Hru_down(k, Ihru)
@@ -1564,7 +1565,9 @@
 ! if hru_down(k, Ihru) < 0, cascade contributes to a stream
         ELSEIF ( j<0 ) THEN
           j = IABS(j)
-          Strm_seg_in(j) = Strm_seg_in(j) + DBLE( (Slowflow+Preflow+Dunnian)*Cascade_area(k, Ihru) )*Cfs_conv
+          interflow_in = DBLE( (Slowflow+Preflow+Dunnian)*Cascade_area(k, Ihru) )*Cfs_conv
+          strm_seg_interflow_in(j) = strm_seg_interflow_in(j) + interflow_in
+          Strm_seg_in(j) = Strm_seg_in(j) + interflow_in
         ENDIF
       ENDDO
 

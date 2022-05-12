@@ -83,6 +83,7 @@
       REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:)
       REAL, SAVE, ALLOCATABLE :: Pref_flow_stor(:), Hru_impervstor(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Strm_seg_in(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: strm_seg_interflow_in(:), strm_seg_sroff_in(:), strm_seg_gwflow_in(:)
       ! Surface-Depression Storage
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open(:), Dprst_vol_clos(:), Dprst_stor_hru(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_open_in(:), Dprst_total_open_out(:)
@@ -512,6 +513,18 @@ end module PRMS_IT0_VARS
         CALL declvar_dble(Srunoff_module, 'strm_seg_in', 'nsegment', Nsegment, &
      &       'Flow in stream segments as a result of cascading flow in each stream segment', &
      &       'cfs', Strm_seg_in)
+        ALLOCATE ( strm_seg_gwflow_in(Nsegment) )
+        CALL declvar_dble(Srunoff_module, 'strm_seg_gwflow_in', 'nsegment', Nsegment, &
+     &       'Groundwater flow to each stream segment as a result of cascading flow in each stream segment', &
+     &       'cfs', strm_seg_gwflow_in)
+        ALLOCATE ( strm_seg_sroff_in(Nsegment) )
+        CALL declvar_dble(Srunoff_module, 'strm_seg_sroff_in', 'nsegment', Nsegment, &
+     &       'Surface-runoff flow to each stream segment as a result of cascading flow in each stream segment', &
+     &       'cfs', strm_seg_sroff_in)
+        ALLOCATE ( strm_seg_interflow_in(Nsegment) )
+        CALL declvar_dble(Srunoff_module, 'strm_seg_interflow_in', 'nsegment', Nsegment, &
+     &       'Interflow to each stream segment as a result of cascading flow in each stream segment', &
+     &       'cfs', strm_seg_interflow_in)
       ENDIF
 
       CALL declvar_dble(Srunoff_module, 'basin_sroff', 'one', 1, &
