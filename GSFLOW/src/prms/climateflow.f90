@@ -605,7 +605,7 @@ end module PRMS_IT0_VARS
       ENDIF
 
       IF ( Dprst_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-        IF ( PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_dprst_vol_open(Nhru), It0_dprst_vol_clos(Nhru) )
+        ALLOCATE ( It0_dprst_vol_open(Nhru), It0_dprst_vol_clos(Nhru) )
         ALLOCATE ( Dprst_vol_open(Nhru) )
         CALL declvar_dble(Srunoff_module, 'dprst_vol_open', 'nhru', Nhru, &
      &       'Storage volume in open surface depressions for each HRU', &

@@ -63,10 +63,10 @@ contains
           IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
             It0_intcp_transp_on = Intcp_transp_on
             It0_intcp_stor = Intcp_stor
-            IF ( Dprst_flag==ACTIVE ) THEN
+          ENDIF
+          IF ( Dprst_flag==ACTIVE ) THEN
               It0_dprst_vol_open = Dprst_vol_open
               It0_dprst_vol_clos = Dprst_vol_clos
-            ENDIF
           ENDIF
           IF ( AG_flag==ACTIVE ) THEN
             It0_basin_ag_gvr_stor = Basin_ag_gvr_stor
