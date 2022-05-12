@@ -7478,7 +7478,11 @@ C
 C5------CALCULATE HOW LONG IT WILL TAKE BEFORE DEEPEST WAVE REACHES
 C         WATER TABLE.
         IF ( Numwaves.GT.1 ) THEN
-          bottomtime = (Depth(Jpnt)-Depth(Jpnt+1))/Speed(Jpnt+1)
+          IF ( Speed(Jpnt+1).GT.NEARZERO ) THEN
+            bottomtime = (Depth(Jpnt)-Depth(Jpnt+1))/Speed(Jpnt+1)
+          ELSE
+            bottomtime = big
+          END IF
           IF ( bottomtime.LE.0.0 ) bottomtime = 1.0D-12
         ELSE
           bottomtime = big
