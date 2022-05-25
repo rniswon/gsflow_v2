@@ -1563,7 +1563,7 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR, ISFRLIST
+      USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR, ISFRLIST, SEGINFLOWSAVE
       USE GLOBAL, ONLY: IUNIT
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
       USE PRMS_IT0_VARS, ONLY: It0_dprst_vol_open
@@ -1640,10 +1640,12 @@
                   ! stress period
                   if ((istab.eq.1) .OR. (KPEROLD.ne.KPER)) then
                     DEMAND(ISEG) = SEG(2, ISEG)
+                  else
+                     DEMAND(ISEG) = SEGINFLOWSAVE(ISEG) 
                   endif
                  ! update demand if this is a new stress period
-               elseif (KPEROLD.ne.KPER) then
-                 DEMAND(ISEG) = SEG(2, ISEG)
+               else
+                  DEMAND(ISEG) = SEGINFLOWSAVE(ISEG)
                endif
                IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
             end if
@@ -3297,9 +3299,9 @@
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
-      USE PRMS_BASIN, ONLY: Hru_area
+      USE PRMS_BASIN, ONLY: gsflow_ag_area, gsflow_ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Hru_actet
+      USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
       USE GWFUZFMODULE, ONLY: UZFETOUT, GWET
       USE GLOBAL, ONLY: ISSFLG
@@ -3336,17 +3338,17 @@
         !
         do k = 1, DVRCH(iseg)
            hru_id = IRRROW_SW(k, iseg)
-           area = Hru_area(hru_id)
+           area = gsflow_ag_area(hru_id)
            pet = Potet(hru_id)*area*prms_inch2mf_q
-           aet = Hru_actet(hru_id)*area*prms_inch2mf_q
+           aet = gsflow_ag_actet(hru_id)*area*prms_inch2mf_q
            pettotal = pettotal + pet
            aettotal = aettotal + aet
            if ( Nhru==Nhrucell ) then
              icell = Gvr_cell_id(hru_id)
              irow = Gwc_row(icell)
              icol = Gwc_col(icell)
-             uzet = UZFETOUT(icol, irow)/DELT
-             aet = uzet + GWET(icol, irow) 
+             uzet = gsflow_ag_frac(hru_id)*UZFETOUT(icol, irow)/DELT  !multiply by ag_frac
+             aet = uzet + gsflow_ag_frac(hru_id)*GWET(icol, irow)   !multiply by ag_frac
              aettotal = aettotal + aet
            end if
       write(888,22)kiter,hru_id,aet,pet
@@ -3373,11 +3375,10 @@
         !1 - -----limit diversion to water right
         !
         
-        IF (DEMANDPOT(ISEG) > demand(ISEG)) 
-     +      DEMANDPOT(ISEG) = demand(ISEG)
+        IF (SEG(2, iseg) > demand(ISEG)) SEG(2, iseg) = demand(ISEG)  !need to check this, unintensional comment?
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
-  
+
         if(iseg==24)then
         etdif = pettotal - aettotal
           write(999,33)kper,kstp,kiter,iseg,SUPACT(iseg),
@@ -3397,10 +3398,10 @@
 !     SPECIFICATIONS:
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_BASIN, ONLY: Hru_area
+      USE PRMS_BASIN, ONLY: gsflow_ag_area
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Hru_actet !,
-!     +    Dprst_total_open_in, Dprst_total_open_out
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, gsflow_ag_actet
+!     +    , Dprst_total_open_in, Dprst_total_open_out
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
      +                      MFQ_to_inch_acres
       USE GLOBAL, ONLY: ISSFLG
@@ -3445,9 +3446,9 @@
         !
         do k = 1, NUMCELLSPOND(i)
            hru_id = IRRHRU_POND(K, i)    !these are HRUs irrigated by ponds
-           area = Hru_area(hru_id)
+           area = gsflow_ag_area(hru_id)
            pet = Potet(hru_id)*area*prms_inch2mf_q
-           aet = Hru_actet(hru_id)*area*prms_inch2mf_q
+           aet = gsflow_ag_actet(hru_id)*area*prms_inch2mf_q
            pettotal = pettotal + pet
            aettotal = aettotal + aet
         end do
@@ -3506,9 +3507,9 @@
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id, GSFLOW_flag
-      USE PRMS_BASIN, ONLY: Hru_area
+      USE PRMS_BASIN, ONLY: gsflow_ag_area, gsflow_ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Hru_actet
+      USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
       IMPLICIT NONE
 ! --------------------------------------------
@@ -3551,15 +3552,16 @@
                aet = aet + gwet(ic, ir) + uzet
             else
                hru_id = IRRROW_SW(k, iseg)
-               area = Hru_area(hru_id)
+               area = gsflow_ag_area(hru_id)
                pet = Potet(hru_id)*area*prms_inch2mf_q
-               aet = Hru_actet(hru_id)*area*prms_inch2mf_q
+               aet = gsflow_ag_actet(hru_id)*area*prms_inch2mf_q
                if ( Nhru==Nhrucell ) then
                  icell = Gvr_cell_id(hru_id)
                  irow = Gwc_row(icell)
                  icol = Gwc_col(icell)
-                 uzet = UZFETOUT(icol, irow)/DELT
-                 aet = aet + uzet + gwet(icol, irow)
+                 uzet = gsflow_ag_frac(hru_id)*UZFETOUT(icol, irow)/DELT
+                 aet = aet + uzet + gsflow_ag_frac(hru_id)
+     +                              *gwet(icol, irow)
                end if
             end if
          end do
@@ -3596,9 +3598,9 @@
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT, PETRATE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id
-      USE PRMS_BASIN, ONLY: Hru_area
+      USE PRMS_BASIN, ONLY: gsflow_ag_area, gsflow_ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Hru_actet
+      USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
       IMPLICIT NONE
 ! --------------------------------------------
@@ -3630,15 +3632,15 @@
             aettotal = aettotal + (gwet(ic, ir) + uzet)
           else
             hru_id = IRRROW_GW(i, l)
-            area = Hru_area(hru_id)
+            area = gsflow_ag_area(hru_id)
             pet = Potet(hru_id)*area*prms_inch2mf_q
-            aet = Hru_actet(hru_id)*area*prms_inch2mf_q
+            aet = gsflow_ag_actet(hru_id)*area*prms_inch2mf_q
             if ( Nhru==Nhrucell ) then
               icell = Gvr_cell_id(hru_id)
               irow = Gwc_row(icell)
               icol = Gwc_col(icell)
-              uzet = UZFETOUT(icol, irow)/DELT
-              aet = aet + uzet + gwet(icol, irow)
+              uzet = gsflow_ag_frac(hru_id)*UZFETOUT(icol, irow)/DELT
+              aet = aet + uzet + gsflow_ag_frac(hru_id)*gwet(icol, irow)
             end if
             pettotal = pettotal + pet
             aettotal = aettotal + aet
@@ -3729,9 +3731,9 @@
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
-      USE PRMS_BASIN, ONLY: Hru_area
+      USE PRMS_BASIN, ONLY: gsflow_ag_area, gsflow_ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Hru_actet
+      USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet
       USE GWFUZFMODULE, ONLY: GWET, UZFETOUT
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
       USE GLOBAL, ONLY: ISSFLG
@@ -3757,17 +3759,17 @@
      +     prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       DO I = 1, NUMCELLS(L)
          hru_id = IRRROW_GW(I, L)
-         area = Hru_area(hru_id)
+         area = gsflow_ag_area(hru_id)
          pet = Potet(hru_id)*area*prms_inch2mf_q
-         aet = Hru_actet(hru_id)*area*prms_inch2mf_q
+         aet = gsflow_ag_actet(hru_id)*area*prms_inch2mf_q
          pettotal = pettotal + pet
          aettotal = aettotal + aet
          if ( Nhru==Nhrucell ) then
            icell = Gvr_cell_id(hru_id)
            irow = Gwc_row(icell)
            icol = Gwc_col(icell)
-           uzet = UZFETOUT(icol, irow)/DELT
-           aet = uzet + gwet(icol, irow)
+           uzet = gsflow_ag_frac(hru_id)*UZFETOUT(icol, irow)/DELT
+           aet = uzet + gsflow_ag_frac(hru_id)*gwet(icol, irow)
            aettotal = aettotal + aet
          end if
       end do
@@ -3838,9 +3840,9 @@
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id,
      +    Agriculture_dprst_flag
-      USE PRMS_BASIN, ONLY: Hru_area
+      USE PRMS_BASIN, ONLY: gsflow_ag_area, gsflow_ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Hru_actet, Dprst_vol_open
+      USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet, Dprst_vol_open
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row,
      +                      Mfq_to_inch_acres
       IMPLICIT NONE
@@ -3995,15 +3997,17 @@
                      aet = gwet(ic, ir) + uzet  !vol rate
                   ELSE
                      hru_id = IRRROW_SW(k, iseg)
-                     area = Hru_area(hru_id)
+                     area = gsflow_ag_area(hru_id)
                      pet = Potet(hru_id)*area*prms_inch2mf_q
-                     aet = Hru_actet(hru_id)*area*prms_inch2mf_q
+                     aet = gsflow_ag_actet(hru_id)*area*prms_inch2mf_q
                      if ( Nhru==Nhrucell ) then
                        icell = Gvr_cell_id(hru_id)
                        irow = Gwc_row(icell)
                        icol = Gwc_col(icell)
-                       uzet = UZFETOUT(icol, irow)/DELT
-                       aet = aet + uzet + gwet(icol, irow)
+                       uzet = gsflow_ag_frac(hru_id)*
+     +                        UZFETOUT(icol, irow)/DELT
+                       aet = aet + uzet + gsflow_ag_frac(hru_id)*
+     +                                    gwet(icol, irow)
                      end if
                   end if
                   aettot = aettot + aet
@@ -4067,15 +4071,18 @@
                            aet = gwet(ic, ir) + uzet
                         ELSE
                            hru_id = IRRROW_GW(J, L)
-                           area = Hru_area(hru_id)
+                           area = gsflow_ag_area(hru_id)
                            pet = Potet(hru_id)*area*prms_inch2mf_q
-                           aet = Hru_actet(hru_id)*area*prms_inch2mf_q
+                           aet = gsflow_ag_actet(hru_id)*area*
+     +                           prms_inch2mf_q
                            if ( Nhru==Nhrucell ) then
                              icell = Gvr_cell_id(hru_id)
                              irow = Gwc_row(icell)
                              icol = Gwc_col(icell)
-                             uzet = UZFETOUT(icol, irow)/DELT
-                             aet = aet + uzet + gwet(icol, irow)
+                             uzet = gsflow_ag_frac(hru_id)*
+     +                              UZFETOUT(icol, irow)/DELT
+                             aet = aet + uzet + gsflow_ag_frac(hru_id)*
+     +                                          gwet(icol, irow)
                           end if
                         END IF
                         pettot = pettot + pet
@@ -4121,15 +4128,17 @@
                      aet = gwet(ic, ir) + uzet
                   ELSE
                      hru_id = IRRROW_GW(J, L)
-                     area = Hru_area(hru_id)
+                     area = gsflow_ag_area(hru_id)
                      pet = Potet(hru_id)*area*prms_inch2mf_q
-                     aet = Hru_actet(hru_id)*area*prms_inch2mf_q
+                     aet = gsflow_ag_actet(hru_id)*area*prms_inch2mf_q
                      if ( Nhru==Nhrucell ) then
                        icell = Gvr_cell_id(hru_id)
                        irow = Gwc_row(icell)
                        icol = Gwc_col(icell)
-                       uzet = UZFETOUT(icol, irow)/DELT
-                       aet = aet + uzet + gwet(icol, irow)
+                       uzet = gsflow_ag_frac(hru_id)*
+     +                        UZFETOUT(icol, irow)/DELT
+                       aet = aet + uzet + gsflow_ag_frac(hru_id)*
+     +                                    gwet(icol, irow)
                      end if
                   END IF
                   pettot = pettot + pet

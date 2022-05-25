@@ -20,7 +20,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2022-05-10'
+      character(len=*), parameter :: Version_soilzone = '2022-05-25'
       INTEGER, SAVE :: DBGUNT, Iter_aet
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -770,7 +770,7 @@
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Hru_type, AG_flag, Model, Nowmonth !, Nowyear, Nowday
+     &    Soilzone_aet_flag, Hru_type, AG_flag, Ag_package, Model, Nowmonth !, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -778,7 +778,7 @@
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Transp_on, Potet, Basin_potet
 ! WARNING!!! Sroff, Basin_sroff, and Strm_seg_in can be updated
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_actet, Hru_actet, Hru_intcpstor, &
-     &    Hru_impervstor, Dprst_stor_hru, Pref_flow_stor, &
+     &    Hru_impervstor, Dprst_stor_hru, Pref_flow_stor, gsflow_ag_actet, &
      &    Ssres_flow, Soil_to_gw, Basin_soil_to_gw, Ssr_to_gw, Strm_seg_in, &
      &    Soil_to_ssr, Basin_lakeevap, Basin_perv_et, Basin_swale_et, &
      &    Sroff, Soil_moist_max, Infil, Soil_rechr_max, Ssres_in, Snowcov_area, Snow_evap, &
@@ -1118,6 +1118,7 @@
 
         Hru_actet(i) = hruactet + pervactet*perv_frac
         avail_potet = Potet(i) - Hru_actet(i)
+        IF ( Ag_package==ACTIVE ) gsflow_ag_actet = Hru_actet
         Perv_actet(i) = pervactet
         hru_perv_actet(i) = pervactet * perv_frac
 
@@ -1538,7 +1539,7 @@
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_SOILZONE, ONLY: Upslope_dunnianflow, Upslope_interflow
       USE PRMS_CASCADE, ONLY: Hru_down, Hru_down_frac, Hru_down_fracwt, Cascade_area
-      USE PRMS_FLOWVARS, ONLY: Strm_seg_in
+      USE PRMS_FLOWVARS, ONLY: Strm_seg_in, strm_seg_interflow_in
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: IABS, DBLE
@@ -1549,6 +1550,7 @@
 ! Local Variables
       INTEGER :: j, k
       REAL :: frac, fracwt
+      DOUBLE PRECISION :: interflow_in
 !***********************************************************************
       DO k = 1, Ncascade_hru
         j = Hru_down(k, Ihru)
@@ -1564,7 +1566,9 @@
 ! if hru_down(k, Ihru) < 0, cascade contributes to a stream
         ELSEIF ( j<0 ) THEN
           j = IABS(j)
-          Strm_seg_in(j) = Strm_seg_in(j) + DBLE( (Slowflow+Preflow+Dunnian)*Cascade_area(k, Ihru) )*Cfs_conv
+          interflow_in = DBLE( (Slowflow+Preflow+Dunnian)*Cascade_area(k, Ihru) )*Cfs_conv
+          strm_seg_interflow_in(j) = strm_seg_interflow_in(j) + interflow_in
+          Strm_seg_in(j) = Strm_seg_in(j) + interflow_in
         ENDIF
       ENDDO
 

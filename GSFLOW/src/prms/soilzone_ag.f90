@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2022-05-10'
+      character(len=*), parameter :: Version_soilzone_ag = '2022-05-25'
       INTEGER, SAVE :: Soil_iter !, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Basin_ag_soil_rechr
@@ -424,7 +424,7 @@
      &    Frozen_flag, Soilzone_add_water_use, Call_cascade, Model, &
      &    Nowmonth, Nowyear, Nowday, Iter_aet_flag, Hru_type, &
      &    GSFLOW_flag, Ag_gravity_flag, Kkiter, Hru_ag_irr, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, AG_flag, Agriculture_soilzone_flag, MODSIM_flag
+     &    Soilzone_aet_flag, AG_flag, Agriculture_soilzone_flag, MODSIM_flag, Ag_package
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
@@ -439,7 +439,7 @@
      &    Basin_soil_moist, Basin_ssstor, Slow_stor, Slow_flow, Pkwater_equiv, Pref_flow_stor, &
      &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_sroff, Basin_lake_stor, &
      &    Ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr_max, Ag_soil_moist_max, &
-     &    Basin_ag_soil_moist, Hru_intcpstor, Basin_ag_gvr_stor, Ag_gvr_stor
+     &    Basin_ag_soil_moist, Hru_intcpstor, Basin_ag_gvr_stor, Ag_gvr_stor, gsflow_ag_actet
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_ssres_stor, It0_slow_stor, &
                                It0_pref_flow_stor, It0_gravity_stor_res, &
                                It0_ag_soil_rechr, It0_ag_soil_moist, It0_ag_gvr_stor
@@ -486,7 +486,7 @@
           IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
           IF ( Ag_gravity_flag==ACTIVE ) Ag_gvr_stor = It0_ag_gvr_stor
         ENDIF
-        IF ( (GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet==ACTIVE ) THEN
+        IF ( ((GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet==ACTIVE) .AND.AFR ) THEN
           ! computed in srunoff
           It0_sroff = Sroff
         ENDIF
@@ -501,7 +501,7 @@
       DO WHILE ( keep_iterating==ACTIVE )
 ! ***************************************
 
-      IF ( Soil_iter>1 .OR. Kkiter>1 ) THEN ! Kkiter>1 means GSFLOW is active
+      IF ( Soil_iter>1 .OR. Kkiter>1 .OR. .NOT.(AFR) ) THEN ! Kkiter>1 means GSFLOW is active
         Soil_moist = It0_soil_moist
         Soil_rechr = It0_soil_rechr
         Ssres_stor = It0_ssres_stor
@@ -509,6 +509,8 @@
         IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
         IF ( Nlake>0 ) Potet = It0_potet
         IF ( GSFLOW_flag==ACTIVE ) Gravity_stor_res = It0_gravity_stor_res
+      ENDIF
+      IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
         IF ( Kkiter>1 ) THEN
           IF ( (GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet_flag==ACTIVE ) THEN
             ! states saved in srunoff when PRMS_land_iteration_flag = ACTIVE
@@ -937,7 +939,7 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
      &                           Potet(i), perv_frac, Soil_saturated(i))
           ENDIF
 
-          IF ( ag_on_flag==ACTIVE .AND. Iter_aet==ACTIVE ) THEN
+          IF ( ag_on_flag==ACTIVE .OR. Iter_aet==ACTIVE ) THEN
             IF ( Iter_aet_flag==ACTIVE ) THEN
               !soilwater_deficit = MAX( sz_deficit_param, ag_soil_moist(i)/ag_soil_moist_max(i) ) irrigation happens at a deficit threshold
               ag_AETtarget = AET_external(i) ! ??? rsr, should this be PET target
@@ -982,11 +984,12 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
               Unused_ag_et(i) = ag_AETtarget - agactet
             ENDIF
             unsatisfied_et = ag_AETtarget - agactet
-            if ( unsatisfied_et<0.0 ) print *, unsatisfied_et, i, 'unsat', soilzone_aet_converge, ag_AETtarget, Ag_actet(i)
+            if ( unsatisfied_et<0.0 ) print *, unsatisfied_et, i, 'unsat', soilzone_aet_converge, ag_AETtarget, agactet
           ENDIF
           Unused_potet(i) = Unused_potet(i) - Unused_ag_et(i)
         ENDIF
-        Ag_actet(i) = agactet
+        Ag_actet(i) = agactet + hruactet * agfrac
+        IF ( Ag_package==ACTIVE ) gsflow_ag_actet = Ag_actet
         hru_ag_actet(i) = ag_hruactet
         hruactet = hruactet + pervactet*perv_frac
         Hru_actet(i) = hruactet + ag_hruactet

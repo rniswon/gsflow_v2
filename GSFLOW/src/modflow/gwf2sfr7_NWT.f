@@ -290,6 +290,7 @@ Cdep  changed DSTROT to FXLKOT
       ALLOCATE (QSTRM(nstrmar,NUMTIM))
       ALLOCATE (HWTPRM(nstrmar,NUMTIM))
       ALLOCATE (FNETSEEP(NCOL,NROW)) !rgn printing net recharge in UZF
+      ALLOCATE (SEGINFLOWSAVE(NSS))
       STRM = 0.0  
       HSTRM = 0.0
       QSTRM = 0.0
@@ -297,6 +298,7 @@ Cdep  changed DSTROT to FXLKOT
       HWTPRM = 0.0
       ISTRM = 0
       FNETSEEP = 0.0
+      SEGINFLOWSAVE = 0.0
 !changed to seg(27,nsegdim) to store GW flow to streams by segment.
       ALLOCATE (SEG(27,nsegdim), ISEG(4,nsegdim), IDIVAR(2,nsegdim))  
 Cdep  allocate space for stream outflow derivatives for lake package
@@ -1308,6 +1310,13 @@ C2------CHECK FOR TOO MANY SEGMENTS.
         CALL USTOP(' ')
       END IF
 C
+C5b-----RESET SPECIFIED INFLOWS IN CASE AG PACKAGE NEEDS THEM.
+      IF ( KKPER > 1 ) THEN
+        DO kss = 1, NSS
+          SEG(2, kss) = SEGINFLOWSAVE(kss)
+        END DO
+      END IF
+C
 C3------REUSE NON-PARAMETER DATA FROM LAST STRESS PERIOD IF ITMP<0.
       IF ( ITMP.GE.0 ) THEN
 C
@@ -1437,6 +1446,11 @@ C         7 ASSIGNED TO SEGMENTS RECEIVING TRIBUTARY FLOW.
         k6 = 0
         k7 = 0
         DO nseg = 1, NSS
+          IF ( KKPER == 1) THEN
+              SEGINFLOWSAVE(nseg) = SEG(2,nseg)
+          ELSEIF ( ITMP > 0 ) THEN
+              SEGINFLOWSAVE(nseg) = SEG(2,nseg)
+          END IF
 C
 C11-----IDENTIFY SEGMENTS THAT DIVERT FLOW.
           IF ( IDIVAR(1, nseg).NE.0 ) THEN
@@ -7478,7 +7492,11 @@ C
 C5------CALCULATE HOW LONG IT WILL TAKE BEFORE DEEPEST WAVE REACHES
 C         WATER TABLE.
         IF ( Numwaves.GT.1 ) THEN
-          bottomtime = (Depth(Jpnt)-Depth(Jpnt+1))/Speed(Jpnt+1)
+          IF ( Speed(Jpnt+1).GT.NEARZERO ) THEN
+            bottomtime = (Depth(Jpnt)-Depth(Jpnt+1))/Speed(Jpnt+1)
+          ELSE
+            bottomtime = big
+          END IF
           IF ( bottomtime.LE.0.0 ) bottomtime = 1.0D-12
         ELSE
           bottomtime = big
@@ -8755,6 +8773,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%MAXVAL)
       DEALLOCATE (GWFSFRDAT(IGRID)%OUTSEGFLAG)
       DEALLOCATE (GWFSFRDAT(IGRID)%UNITSEGOUT) 
+      DEALLOCATE (GWFSFRDAT(IGRID)%SEGINFLOWSAVE)
 C
       END SUBROUTINE GWF2SFR7DA
 C
@@ -8872,6 +8891,7 @@ C     ------------------------------------------------------------------
       MAXVAL=>GWFSFRDAT(IGRID)%MAXVAL
       OUTSEGFLAG=>GWFSFRDAT(IGRID)%OUTSEGFLAG  
       UNITSEGOUT=>GWFSFRDAT(IGRID)%UNITSEGOUT
+      SEGINFLOWSAVE=>GWFSFRDAT(IGRID)%SEGINFLOWSAVE
       END SUBROUTINE SGWF2SFR7PNT
 C
 C-------SUBROUTINE SGWF2SFR7PSV
@@ -8988,5 +9008,6 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%MAXVAL=>MAXVAL
       GWFSFRDAT(IGRID)%OUTSEGFLAG=>OUTSEGFLAG
       GWFSFRDAT(IGRID)%UNITSEGOUT=>UNITSEGOUT 
+      GWFSFRDAT(IGRID)%SEGINFLOWSAVE=>SEGINFLOWSAVE
 C
       END SUBROUTINE SGWF2SFR7PSV
