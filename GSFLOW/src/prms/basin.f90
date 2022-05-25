@@ -6,13 +6,13 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2022-02-10'
+      character(len=*), parameter :: Version_basin = '2022-05-25'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
       DOUBLE PRECISION, SAVE :: Basin_area_inv, Basin_lat, Totarea, Active_area
       REAL, SAVE, ALLOCATABLE :: Hru_elev_meters(:) !, Hru_elev_feet(:)
-      REAL, SAVE, ALLOCATABLE :: Dprst_frac_clos(:)
+      REAL, SAVE, ALLOCATABLE :: Dprst_frac_clos(:), gsflow_ag_area(:), gsflow_ag_frac(:)
       INTEGER, SAVE, ALLOCATABLE :: Gwr_type(:), Hru_route_order(:), Gwr_route_order(:)
       INTEGER, SAVE :: Weir_gate_flag, Puls_lin_flag
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_area_dble(:), Lake_area(:)
@@ -282,7 +282,7 @@
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, &
      &    Dprst_flag, Lake_route_flag, PRMS4_flag, GSFLOW_flag, Frozen_flag, PRMS_VERSION, &
-     &    Starttime, Endtime, Parameter_check_flag, AG_flag
+     &    Starttime, Endtime, Parameter_check_flag, AG_flag, Ag_package
       USE PRMS_BASIN
       use prms_utils, only: checkdim_bounded_limits, error_stop, read_error, write_outfile
       IMPLICIT NONE
@@ -515,6 +515,18 @@
         Hemisphere = NORTHERN
       ELSE
         Hemisphere = SOUTHERN
+      ENDIF
+
+      IF ( Ag_package==ACTIVE ) THEN
+        ALLOCATE ( gsflow_ag_area(Nhru) )
+        ALLOCATE ( gsflow_ag_frac(Nhru) )
+        IF ( AG_flag==ACTIVE ) THEN
+            gsflow_ag_area = Ag_area
+            gsflow_ag_frac = Ag_frac
+        ELSE
+            gsflow_ag_area = Hru_area
+            gsflow_ag_frac = 1.0
+        ENDIF
       ENDIF
 
       basin_perv = basin_perv*Basin_area_inv

@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2022-05-10'
+      character(len=*), parameter :: Version_climateflow = '2022-05-25'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -73,7 +73,7 @@
       DOUBLE PRECISION, SAVE :: Basin_ssflow, Basin_soil_to_gw, Basin_actet, Basin_lakeevap
       DOUBLE PRECISION, SAVE :: Basin_swale_et, Basin_perv_et, Basin_sroff, Basin_ag_gvr_stor
       DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor, Basin_ag_soil_moist, Basin_ag_soil_rechr
-      REAL, SAVE, ALLOCATABLE :: Hru_actet(:), Soil_moist(:), Ag_soil_moist(:), Ag_soil_rechr(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_actet(:), gsflow_ag_actet(:), Soil_moist(:), Ag_soil_moist(:), Ag_soil_rechr(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_ssr(:), Ssres_in(:)
       REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:)
@@ -163,7 +163,7 @@ end module PRMS_IT0_VARS
      &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, no_snow_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, &
-     &    AG_flag, PRMS_land_iteration_flag, Ag_gravity_flag
+     &    AG_flag, PRMS_land_iteration_flag, Ag_gravity_flag, Ag_package
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       USE PRMS_IT0_VARS
@@ -439,6 +439,13 @@ end module PRMS_IT0_VARS
       CALL declvar_real(Soilzone_module, 'hru_actet', 'nhru', Nhru, &
      &     'Actual ET for each HRU', &
      &     'inches', Hru_actet)
+
+      IF ( Ag_package==ACTIVE ) THEN
+        ALLOCATE ( gsflow_ag_actet(Nhru) )
+        CALL declvar_real(Soilzone_module, 'gsflow_ag_actet', 'nhru', Nhru, &
+     &       'Agriculture actual ET for GSFLOW simulations for each HRU', &
+     &       'inches', gsflow_ag_actet)
+      ENDIF
 
       CALL declvar_dble(Soilzone_module, 'basin_actet', 'one', 1, &
      &     'Basin area-weighted average actual ET', &
@@ -1052,7 +1059,8 @@ end module PRMS_IT0_VARS
      &    Temp_module, Stream_order_flag, GSFLOW_flag, Hru_type, &
      &    Precip_module, Solrad_module, Et_module, PRMS4_flag, no_snow_flag, &
      &    Soilzone_module, Srunoff_module, Et_flag, Dprst_flag, Solrad_flag, &
-     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, AG_flag, Glacier_flag
+     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, AG_flag, &
+     &    Glacier_flag, Ag_package
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv
@@ -1248,7 +1256,7 @@ end module PRMS_IT0_VARS
 
       IF ( AG_flag==ACTIVE ) THEN
         IF ( getparam_real(Soilzone_module, 'ag_soil_moist_max', Nhru, Ag_soil_moist_max)/=0 ) &
-     &       CALL read_error(2, 'soil_moist_max')
+     &       CALL read_error(2, 'ag_soil_moist_max')
         IF ( getparam_real(Soilzone_module, 'ag_soil_rechr_max_frac', Nhru, Ag_soil_rechr_max_frac)/=0 ) &
      &       CALL read_error(2, 'ag_soil_rechr_max_frac')
         Ag_soil_rechr_max = Ag_soil_rechr_max_frac*Ag_soil_moist_max
@@ -1405,6 +1413,7 @@ end module PRMS_IT0_VARS
       Soil_to_gw = 0.0
       Soil_to_ssr = 0.0
       Hru_actet = 0.0
+      IF ( Ag_package==ACTIVE ) gsflow_ag_actet = 0.0
       Infil = 0.0
       Sroff = 0.0
 ! initialize arrays (dimensioned Nssr)
