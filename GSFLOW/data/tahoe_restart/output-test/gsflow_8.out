@@ -17,25 +17,25 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        8987258.70     EVAPOTRANSPIRATION =        1579528.91
+   EVAPOTRANSPIRATION =        8988342.63     EVAPOTRANSPIRATION =        1578563.94
            STREAMFLOW =        2848361.88             STREAMFLOW =         445328.69
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
-   INFLOWS - OUTFLOWS =       -8475068.32     INFLOWS - OUTFLOWS =       -2024857.60
+   INFLOWS - OUTFLOWS =       -8476152.26     INFLOWS - OUTFLOWS =       -2023892.63
              --------                                   --------
 
- TOTAL STORAGE CHANGE =       -8511063.90         STORAGE CHANGE =       -2020175.76
+ TOTAL STORAGE CHANGE =       -8509428.61         STORAGE CHANGE =       -2022743.64
        --------------                             --------------
          LAND SURFACE =         -49152.38           LAND SURFACE =         -15503.93
-            SOIL ZONE =       -1256849.07              SOIL ZONE =        -602034.91
-     UNSATURATED ZONE =        -334696.51       UNSATURATED ZONE =         -47284.64
-       SATURATED ZONE =       -1277328.04         SATURATED ZONE =        -199808.16
-                LAKES =       -5593037.91                  LAKES =       -1155544.12
+            SOIL ZONE =       -1257763.24              SOIL ZONE =        -602182.56
+     UNSATURATED ZONE =        -329952.51       UNSATURATED ZONE =         -47727.25
+       SATURATED ZONE =       -1284300.61         SATURATED ZONE =        -199250.53
+                LAKES =       -5588259.88                  LAKES =       -1158079.38
 
- OVERALL BUDGET ERROR =          35995.58           BUDGET ERROR =          -4681.84
+ OVERALL BUDGET ERROR =          33276.36           BUDGET ERROR =          -1148.99
 
 
-  PERCENT DISCREPANCY =              0.30    PERCENT DISCREPANCY =             -0.23
+  PERCENT DISCREPANCY =              0.28    PERCENT DISCREPANCY =             -0.06
 
 
 

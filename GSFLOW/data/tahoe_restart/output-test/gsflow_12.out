@@ -17,25 +17,25 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        5140125.39     EVAPOTRANSPIRATION =         584829.49
+   EVAPOTRANSPIRATION =        5139343.79     EVAPOTRANSPIRATION =         584881.28
            STREAMFLOW =        2.1368D+07             STREAMFLOW =        3181969.25
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
    INFLOWS - OUTFLOWS =        1.7380D+08     INFLOWS - OUTFLOWS =        5.7617D+07
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        1.7359D+08         STORAGE CHANGE =        5.7580D+07
+ TOTAL STORAGE CHANGE =        1.7343D+08         STORAGE CHANGE =        5.7575D+07
        --------------                             --------------
          LAND SURFACE =        1.3796D+08           LAND SURFACE =        4.4110D+07
-            SOIL ZONE =        4074904.51              SOIL ZONE =         609256.15
-     UNSATURATED ZONE =         786545.60       UNSATURATED ZONE =         127298.15
-       SATURATED ZONE =       -1450503.07         SATURATED ZONE =         -90351.75
-                LAKES =        3.2221D+07                  LAKES =        1.2824D+07
+            SOIL ZONE =        4074529.32              SOIL ZONE =         609286.65
+     UNSATURATED ZONE =         778242.56       UNSATURATED ZONE =         118144.67
+       SATURATED ZONE =       -1455656.31         SATURATED ZONE =         -78442.34
+                LAKES =        3.2076D+07                  LAKES =        1.2817D+07
 
- OVERALL BUDGET ERROR =         210310.28           BUDGET ERROR =          37041.55
+ OVERALL BUDGET ERROR =         369779.50           BUDGET ERROR =          41690.34
 
 
-  PERCENT DISCREPANCY =              0.11    PERCENT DISCREPANCY =              0.06
+  PERCENT DISCREPANCY =              0.18    PERCENT DISCREPANCY =              0.07
 
 
 

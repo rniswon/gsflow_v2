@@ -206,9 +206,9 @@ rain_day 0
  Data File time period: 1980/10/01 00:00:00 to 2011/09/30 00:00:00
 Simulation time period: 1983/11/25 00:00:00 to 1983/12/01 00:00:00
 ====================================================================
-Basin Definition                basin               2022-02-10
+Basin Definition                basin               2022-05-25
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-05-10
+Common States and Fluxes        climateflow         2022-05-25
 Potential Solar Radiation       soltab              2021-09-07
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2022-04-21
@@ -219,8 +219,8 @@ Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-05-09
 Snow Dynamics                   snowcomp            2022-04-27
-Surface Runoff                  srunoff_smidx       2022-05-09
-Soilzone Computations           soilzone            2022-05-10
+Surface Runoff                  srunoff_smidx       2022-05-26
+Soilzone Computations           soilzone            2022-05-26
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-04-07
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2022-04-27
@@ -246,5 +246,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time    0 minutes  5.77 seconds
+Execution elapsed time    0 minutes  5.87 seconds
 
