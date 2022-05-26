@@ -224,9 +224,9 @@ contains
       INTEGER, INTENT(OUT) :: Iret
       REAL, INTENT(IN) :: Values(Numvalues)
       ! Functions
-      INTRINSIC DBLE
+      INTRINSIC :: DBLE, INT
       ! Local Variables
-      INTEGER ndim, i
+      INTEGER :: ndim, i
 !***********************************************************************
       Iret = 0
       IF ( Varname(:4)=='tmax' ) THEN
@@ -338,7 +338,7 @@ contains
             ndim = 1
           ENDIF
         ELSE
-          Rain_day = Values(1) ! WARNING: Rain_day is an integer, but Values(1) is real
+          Rain_day = INT( Values(1) ) ! WARNING: Rain_day is an integer, but Values(1) is real
         ENDIF
       ELSEIF ( Varname(:8)=='humidity' ) THEN
         IF ( Iflag==0 ) THEN

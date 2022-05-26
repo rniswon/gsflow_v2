@@ -165,6 +165,10 @@ prms_data_file.mod:
 prms_read_param_file.mod:
 	$(RM) prms_read_param_file.mod
 	$(LN) $(PRMSDIR)/prms_read_param_file.mod .
+	
+prms_it0_vars.mod:
+	$(RM) prms_it0_vars.mod
+	$(LN) $(PRMSDIR)/prms_it0_vars.mod .
 
 prms_mmfapi.mod:
 	$(RM) prms_mmfapi.mod
@@ -194,7 +198,7 @@ gsflow_modflow.o: gsflow_modflow.f openspec.inc prms_constants.mod prms_module.m
 gsflow_prms.o: gsflow_prms.f90 global.mod prms_constants.mod prms_control_file.mod prms_read_param_file.mod prms_data_file.mod prms_read_param_file.mod prms_mmfapi.mod prms_utils.mod gsflow_module.o prms_set_time.mod
 	$(FC) -c $(FFLAGS) gsflow_prms.f90
 
-gsflow_sum.o: gsflow_sum.f90 prms_constants.mod prms_module.mod prms_control_file.mod prms_read_param_file.mod gsfmodflow.mod gwflakmodule.mod gwfsfrmodule.mod global.mod prms_basin.mod prms_flowvars.mod prms_srunoff.mod gsfbudget.mod gwfuzfmodule.mod gwfbasmodule.mod prms_obs.mod prms_set_time.mod prms_climatevars.mod prms_snow.mod prms_intcp.mod prms_soilzone.mod gwfbcfmodule.mod gwflpfmodule.mod gwfupwmodule.mod gwfnwtmodule.mod gwfagmodule.mod gsflow_module.o
+gsflow_sum.o: gsflow_sum.f90 prms_constants.mod prms_module.mod prms_control_file.mod prms_read_param_file.mod gsfmodflow.mod gwflakmodule.mod gwfsfrmodule.mod global.mod prms_basin.mod prms_flowvars.mod prms_it0_vars.mod prms_srunoff.mod gsfbudget.mod gwfuzfmodule.mod gwfbasmodule.mod prms_obs.mod prms_set_time.mod prms_climatevars.mod prms_snow.mod prms_intcp.mod prms_soilzone.mod gwfbcfmodule.mod gwflpfmodule.mod gwfupwmodule.mod gwfnwtmodule.mod gwfagmodule.mod gsflow_module.o
 	$(FC) -c $(FFLAGS) gsflow_sum.f90
 
 gsflow_budget.o: gsflow_budget.f90 prms_module.mod prms_read_param_file.mod gwfsfrmodule.mod global.mod gwfuzfmodule.mod gsfmodflow.mod gsfprms2mf.mod gwfbasmodule.mod gwflakmodule.mod prms_constants.mod prms_basin.mod prms_flowvars.mod prms_set_time.mod prms_soilzone.mod gsflow_module.o

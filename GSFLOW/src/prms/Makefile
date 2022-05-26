@@ -341,6 +341,7 @@ prms_soltab.mod: soltab.o
 prms_srunoff.mod: srunoff.o
 prms_utils.mod: c_utils_prms.o
 prms_water_use.mod: water_use_read.o
+prms_it0_vars.mod: climateflow.o
 
 gsfmodflow.mod: $(GSFLOWDIR)/gsfmodflow.mod
 	$(RM) gsfmodflow.mod

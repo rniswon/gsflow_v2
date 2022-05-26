@@ -155,8 +155,9 @@
      &    Infil, Soil_moist_max, Ssr_to_gw, Ssres_flow, Basin_soil_to_gw, Soil_moist, Ssres_stor, &
      &    Slow_flow, Basin_perv_et, Basin_ssflow, Basin_swale_et, Slow_stor, Ssres_in, Soil_rechr, &
      &    Basin_lakeevap, Sroff, Hru_actet, Pkwater_equiv, Gwres_stor, Dprst_vol_open, Dprst_vol_clos, Basin_sroff, &
-     &    Snowmelt, Snow_evap, Snowcov_area, Pptmix_nopack, Glacrb_melt, Basin_pweqv, Basin_snowmelt, Basin_snowevap, Basin_snowcov, &
-     &    Dprst_stor_hru, Hru_impervstor, Hru_intcpstor, Pref_flow_stor, Basin_gwstor, Intcp_stor, Basin_intcp_stor
+     &    Snowmelt, Snow_evap, Snowcov_area, Pptmix_nopack, Glacrb_melt, Basin_pweqv, Basin_snowmelt, Basin_snowevap, &
+     &    Dprst_stor_hru, Hru_impervstor, Hru_intcpstor, Pref_flow_stor, Basin_gwstor, Intcp_stor, Basin_intcp_stor, &
+     &    Basin_snowcov
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_pkwater_equiv, It0_ssres_stor, It0_basin_soil_moist, &
                                It0_basin_ssstor, It0_basin_gwstor, It0_dprst_stor_hru, It0_hru_impervstor, &
                                It0_basin_intcp_stor, It0_hru_intcpstor
