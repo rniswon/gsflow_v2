@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2022-05-25'
+      character(len=*), parameter :: Version_soilzone_ag = '2022-05-26'
       INTEGER, SAVE :: Soil_iter !, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Basin_ag_soil_rechr
@@ -523,6 +523,7 @@
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Sm2gw_grav = 0.0 ! dimension nhrucell
         Grav_gwin = 0.0 ! dimension nhru
+        Gvr2sm = 0.0 ! dimension nhru
       ENDIF
 
       IF ( Cascade_flag>CASCADE_OFF ) THEN
@@ -909,7 +910,7 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
           ENDIF
           Pref_flow_in(i) = Pref_flow_infil(i) + topfr
           Pref_flow_stor(i) = Pref_flow_stor(i) + topfr
-          IF ( Pref_flow_stor(i)>0.0 ) &
+          IF ( Pref_flow_stor(i)>CLOSEZERO ) &
      &         CALL compute_interflow(Fastcoef_lin(i), Fastcoef_sq(i), &
      &                                Pref_flow_in(i), Pref_flow_stor(i), prefflow)
           Basin_pref_stor = Basin_pref_stor + DBLE( Pref_flow_stor(i)*harea )
@@ -1019,6 +1020,7 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
         ENDIF
         Perv_actet(i) = pervactet
         hru_perv_actet(i) = pervactet * perv_frac
+        unsatisfied_et = 0.0
 
 ! soil_moist & soil_rechr multiplied by perv_area instead of harea
         Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)

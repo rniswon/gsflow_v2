@@ -20,7 +20,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2022-05-25'
+      character(len=*), parameter :: Version_soilzone = '2022-05-26'
       INTEGER, SAVE :: DBGUNT, Iter_aet
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -1088,7 +1088,7 @@
           ENDIF
           Pref_flow_in(i) = Pref_flow_infil(i) + topfr
           Pref_flow_stor(i) = Pref_flow_stor(i) + topfr
-          IF ( Pref_flow_stor(i)>0.0 ) &
+          IF ( Pref_flow_stor(i)>CLOSEZERO ) &
      &         CALL compute_interflow(Fastcoef_lin(i), Fastcoef_sq(i), &
      &                                Pref_flow_in(i), Pref_flow_stor(i), prefflow)
           Basin_pref_stor = Basin_pref_stor + DBLE( Pref_flow_stor(i)*harea )
@@ -1121,6 +1121,7 @@
         IF ( Ag_package==ACTIVE ) gsflow_ag_actet = Hru_actet
         Perv_actet(i) = pervactet
         hru_perv_actet(i) = pervactet * perv_frac
+        unsatisfied_et = 0.0
 
 ! soil_moist & soil_rechr multiplied by perv_area instead of harea
         Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)

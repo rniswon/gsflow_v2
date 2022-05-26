@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2022-05-09'
+      character(len=*), parameter :: Version_srunoff = '2022-05-26'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -1076,7 +1076,7 @@
 
 !***********************************************************************
       SUBROUTINE perv_comp(Pptp, Ptc, Infil, Srp)
-      USE PRMS_CONSTANTS, ONLY: smidx_module !, CLOSEZERO
+      USE PRMS_CONSTANTS, ONLY: smidx_module, CLOSEZERO
       USE PRMS_MODULE, ONLY: Sroff_flag
       USE PRMS_SRUNOFF, ONLY: Ihru, Smidx_coef, Smidx_exp, &
      &    Carea_max, Carea_min, Carea_dif, Contrib_fraction
@@ -1103,6 +1103,7 @@
       ENDIF
       IF ( ca_fraction>Carea_max(Ihru) ) ca_fraction = Carea_max(Ihru)
       srpp = ca_fraction*Pptp
+      IF ( srpp<CLOSEZERO ) srpp = 0.0
       Contrib_fraction(Ihru) = ca_fraction
 !      IF ( srpp<0.0 ) THEN
 !        PRINT *, 'negative srp', srpp
