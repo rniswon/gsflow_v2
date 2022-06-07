@@ -3406,7 +3406,8 @@
       DOUBLE PRECISION :: factor, area, aet, pet
       double precision :: pettotal,aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup !, etdif
-      real :: demand_inch_acres, Q, saveflow, pondstor
+      !real :: demand_inch_acres, Q, saveflow, pondstor
+      real :: Q, saveflow, pondstor
       integer :: k, ipond, hru_id, i
       external :: set_factor
       double precision :: set_factor
@@ -3472,7 +3473,7 @@
         !1 limit pond outflow to pond storage
         pondstor = Dprst_vol_open(ipond)/MFQ_to_inch_acres
                   
-        IF ( demand_inch_acres < dzero ) demand_inch_acres = dzero
+        !IF ( demand_inch_acres < dzero ) demand_inch_acres = dzero
         IF ( PONDFLOW(i) > pondstor/DELT ) PONDFLOW(i) = pondstor/DELT
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
 !        if(i==2)then
