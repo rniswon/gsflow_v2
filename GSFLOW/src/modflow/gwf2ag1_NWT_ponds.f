@@ -1052,10 +1052,11 @@
       character(len=16)  :: char = 'SOURCE LIST'
       INTEGER LLOC, ISTART, ISTOP, ISTARTSAVE
       INTEGER J, II, KPER2, L, MATCH, NUMTABS, is, ip, nseg
-      INTEGER istsg, istsgold, ISEG, IPOND
+      INTEGER istsg, istsgold, ISEG, IPOND, NUMTABPOND2
       logical :: FOUND, ierror
       logical :: found1, found2, found3, found4, found7
-      REAL :: R, TTIME, TRATE, QPOND, QFRAC
+      REAL :: R, TTIME, TRATE, QPOND, QFRAC, TABVAL, TABFRAC
+      INTEGER :: TABUNIT, TABHRU, TABSEG
       CHARACTER*6 CWELL
       ! - -----------------------------------------------------------------
       found4 = .false.
@@ -1205,12 +1206,25 @@
                      CALL USTOP('ERROR: SEGID for Pond > NSEG')
                     END IF               
                   ELSE
-                    NUMTABPOND = 0
+                    NUMTABPOND2 = 0
                     MATCH = 0  
                     J = L
-                    READ (IN, *) TABUNITPOND(J), TABVALPOND(J), 
-     +                           TABPONDHRU(J), TABPONDSEG(J),
-     +                           TABPONDFRAC(J)
+                    LLOC = 1
+                    CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, TABUNIT, 
+     +                           R, IOUT, IN)
+                    CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
+     +                           TABVAL, IOUT, IN)
+                    CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, TABHRU, R,
+     +                           IOUT, IN)
+                    CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, TABSEG, R,
+     +                           IOUT, IN)
+                    CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, 
+     +                           TABFRAC, IOUT,IN)
+                    TABUNITPOND(J) = TABUNIT
+                    TABVALPOND(J) = TABVAL
+                    TABPONDHRU(J) = TABHRU
+                    TABPONDSEG(J) = TABSEG
+                    TABPONDFRAC(J) = TABFRAC
                     IRRPONDVAR(J) = TABPONDHRU(J)
                     DO I = 1, J - 1
                       IF (TABUNITPOND(I) == TABUNITPOND(J)) THEN
@@ -1219,8 +1233,8 @@
                       END IF
                     END DO
                     IF (MATCH == 0) THEN
-                      NUMTABPOND = NUMTABPOND + 1
-                      TABIDPOND(J) = NUMTABPOND
+                      NUMTABPOND2 = NUMTABPOND2 + 1
+                      TABIDPOND(J) = NUMTABPOND2
                     END IF
                     IF (TABUNITPOND(J) .LE. 0) THEN
                       WRITE (IOUT, 100)
@@ -1564,7 +1578,7 @@
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR, ISFRLIST, SEGINFLOWSAVE
-      USE GLOBAL, ONLY: IUNIT
+      USE GLOBAL, ONLY: IUNIT, ISSFLG 
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
       USE PRMS_IT0_VARS, ONLY: It0_dprst_vol_open
       USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
@@ -1665,13 +1679,15 @@
       END IF
 !
 !6 --------SET POND STORAGE FOR PREVIOUS AND CURRENT TIME STEPS
-      do i = 1, NUMIRRPOND
-        ipond = IRRPONDVAR(i)  !these are hru ids for ponds
-        PONDSTOROLD(i) = SNGL(It0_dprst_vol_open(ipond))
+      IF ( ISSFLG(kper) == 0 ) THEN
+        do i = 1, NUMIRRPOND
+          ipond = IRRPONDVAR(i)  !these are hru ids for ponds
+          PONDSTOROLD(i) = SNGL(It0_dprst_vol_open(ipond))
      +                       /MFQ_to_inch_acres
-        PONDSTORNEW(i) = SNGL(Dprst_vol_open(ipond))
+          PONDSTORNEW(i) = SNGL(Dprst_vol_open(ipond))
      +                       /MFQ_to_inch_acres
-      end do
+        end do
+      END IF
 !
 !7 - -----RESET SAVED IRR AND AET FROM LAST TIME STEP
       DIVERSIONIRRUZF = szero
@@ -2697,7 +2713,7 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: IOUT, DELR, DELC, NCOL, NROW, NLAY,
-     +     IBOUND, HNEW, BUFF, BOTM, LBOTM
+     +     IBOUND, HNEW, BUFF, BOTM, LBOTM, ISSFLG
       USE GWFBASMODULE, ONLY: ICBCFL, IAUXSV, DELT, PERTIM, TOTIM,
      +     VBNM, VBVL, MSUM, IBUDFL
       USE GWFAGMODULE
@@ -3095,13 +3111,16 @@
       ROUT = QPOND
       DELIN = 0.0D0
       DELOUT = 0.0D0
-      DO L = 1, NUMIRRPOND
-        ipond = IRRPONDVAR(L)
-        DELIN = DELIN + Dprst_total_open_in(ipond)/MFQ_to_inch_acres
-        DELOUT = DELOUT + Dprst_total_open_out(ipond)/MFQ_to_inch_acres 
-        PONDSTORNEW(L) = Dprst_vol_open(ipond)/MFQ_to_inch_acres
-        DELSTOR = DELSTOR + PONDSTORNEW(L) - PONDSTOROLD(L)
-      END DO  
+      IF ( ISSFLG(kkper) == 0 ) THEN
+        DO L = 1, NUMIRRPOND
+          ipond = IRRPONDVAR(L)
+          DELIN = DELIN + Dprst_total_open_in(ipond)/MFQ_to_inch_acres
+          DELOUT = DELOUT + Dprst_total_open_out(ipond)/
+     +                      MFQ_to_inch_acres 
+          PONDSTORNEW(L) = Dprst_vol_open(ipond)/MFQ_to_inch_acres
+          DELSTOR = DELSTOR + PONDSTORNEW(L) - PONDSTOROLD(L)
+        END DO  
+      END IF
       DELIN = DELIN - RIN
       DELOUT = DELOUT - ROUT
       DELSTOR = (DELSTOR - DELIN + DELOUT)/DELT
