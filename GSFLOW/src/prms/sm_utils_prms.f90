@@ -1,4 +1,4 @@
-! utils_prms.f90 2020-07-30
+! utils_prms.f90 2022-06-02
 
 submodule(prms_utils) sm_utils_prms
 
@@ -7,10 +7,10 @@ contains
 !***********************************************************************
 !     Read CBH File to current time
 !***********************************************************************
-  module subroutine find_current_time(Iunit, Year, Month, Day, Iret, Cbh_binary_flag)
+  module subroutine find_current_time(Iunit, Year, Month, Day, Iret)
     implicit none
     ! Argument
-    integer, intent(IN) :: Iunit, Year, Month, Day, Cbh_binary_flag
+    integer, intent(IN) :: Iunit, Year, Month, Day
     integer, intent(OUT) :: Iret
     ! Local Variables
     integer :: yr, mo, dy
@@ -18,11 +18,7 @@ contains
     !***********************************************************************
     Iret = 0
     do
-      if (Cbh_binary_flag == 0) then
-        read (Iunit, *, IOSTAT=Iret) yr, mo, dy
-      else
-        read (Iunit, IOSTAT=Iret) yr, mo, dy
-      end if
+      read (Iunit, *, IOSTAT=Iret) yr, mo, dy
       if (Iret == -1) print fmt1, 'ERROR, end-of-file found reading input file for date:', Year, Month, Day
       if (Iret /= 0) return
       if (yr == Year .and. mo == Month .and. dy == Day) exit
@@ -98,12 +94,12 @@ contains
 !***********************************************************************
 !   Read CBH File to line before data starts
 !***********************************************************************
-  module subroutine find_cbh_header_end(Iunit, Fname, Paramname, Iret, Cbh_flag, Cbh_binary_flag)
+  module subroutine find_cbh_header_end(Iunit, Fname, Paramname, Iret, Cbh_flag)
     use PRMS_CONSTANTS, only: DEBUG_less
     use PRMS_MODULE, only: Nhru, Orad_flag, Print_debug
     implicit none
     ! Argument
-    integer, intent(IN) :: Cbh_flag, Cbh_binary_flag
+    integer, intent(IN) :: Cbh_flag
     integer, intent(OUT) :: Iunit
     integer, intent(INOUT) :: Iret
     character(LEN=*), intent(IN) :: Fname, Paramname
@@ -112,15 +108,10 @@ contains
     ! Local Variables
     integer :: i, ios, dim
     character(LEN=4) :: dum
-    character(LEN=80) :: dum2
     !***********************************************************************
     if (Iret /= 2) Iret = 0
     Iunit = get_ftnunit(7777)
-    if (Cbh_binary_flag == 0) then
-      open (Iunit, FILE=trim(Fname), STATUS='OLD', IOSTAT=ios)
-    else
-      open (Iunit, FILE=trim(Fname), STATUS='OLD', FORM='UNFORMATTED', IOSTAT=ios)
-    end if
+    open (Iunit, FILE=trim(Fname), STATUS='OLD', IOSTAT=ios)
     if (ios /= 0) then
       if (Iret == 2) then ! this signals climate_hru to ignore the Humidity CBH file, could add other files
         Iret = 0
@@ -134,12 +125,7 @@ contains
       ! read to line before data starts in each file
       i = 0
       do while (i == 0)
-        if (Cbh_binary_flag == 0) then
-          read (Iunit, FMT='(A4)', IOSTAT=ios) dum
-        else
-          read (Iunit, IOSTAT=ios) dum2
-          read (dum2, '(A4)') dum
-        end if
+        read (Iunit, FMT='(A4)', IOSTAT=ios) dum
         if (ios /= 0) then
           write (*, '(/,A,/,A,/,A)') 'ERROR reading file:', Fname, 'check to be sure the input file is in correct format'
           Iret = 1
@@ -149,12 +135,7 @@ contains
           backspace Iunit
           backspace Iunit
           if (Orad_flag == 1 .and. Paramname(:5) == 'swrad') backspace Iunit ! backspace again as swrad CBH file contains orad as last column
-          if (Cbh_binary_flag == 0) then
-            read (Iunit, *, IOSTAT=ios) dum, dim
-          else
-            read (Iunit, IOSTAT=ios) dum2
-            read (dum2, *) dum, dim
-          end if
+          read (Iunit, *, IOSTAT=ios) dum, dim
           if (ios /= 0) then
             write (*, '(/,A,/,A,/,A)') 'ERROR reading file:', Fname, 'check to be sure dimension line is in correct format'
             Iret = 1
@@ -166,11 +147,7 @@ contains
             Iret = 1
             exit
           end if
-          if (Cbh_binary_flag == 0) then
-            read (Iunit, FMT='(A4)', IOSTAT=ios) dum
-          else
-            read (Iunit, IOSTAT=ios) dum
-          end if
+          read (Iunit, FMT='(A4)', IOSTAT=ios) dum
           if (ios /= 0) then
             write (*, '(/,A,/,A,/)') 'ERROR reading file:', Fname
             Iret = 1

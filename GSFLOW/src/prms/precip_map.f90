@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=*), parameter :: MODNAME = 'precip_map'
-        character(len=*), parameter :: Version_precip_map = '2021-11-19'
+        character(len=*), parameter :: Version_precip_map = '2022-06-02'
         INTEGER, SAVE :: Precip_unit
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
@@ -129,11 +129,11 @@
         IF ( getparam_real(MODNAME, 'precip_map_adj', Nmap*MONTHS_PER_YEAR, Precip_map_adj)/=0 ) &
      &       CALL read_error(2, 'precip_map_adj')
         IF ( control_string(Precip_map_file, 'precip_map_file')/=0 ) CALL read_error(5, 'precip_map_file')
-        CALL find_cbh_header_end(Precip_unit, Precip_map_file, 'precip_map_file', ierr, 1, 0)
+        CALL find_cbh_header_end(Precip_unit, Precip_map_file, 'precip_map_file', ierr, 1)
         IF ( ierr==1 ) THEN
           istop = 1
         ELSE
-          CALL find_current_time(Precip_unit, Start_year, Start_month, Start_day, ierr, 0)
+          CALL find_current_time(Precip_unit, Start_year, Start_month, Start_day, ierr)
           IF ( ierr==-1 ) THEN
             PRINT *, 'for first time step, Precip Map File: ', Precip_map_file
             istop = 1

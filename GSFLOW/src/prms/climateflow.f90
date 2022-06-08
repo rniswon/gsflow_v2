@@ -156,7 +156,6 @@ end module PRMS_IT0_VARS
      &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
      &    ddsolrad_module, ccsolrad_module
       use PRMS_MMFAPI, only: declvar_int, declvar_dble, declvar_real
-      use prms_utils, only: error_stop
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, Nhrucell, &
      &    Model, Init_vars_from_file, Temp_flag, Precip_flag, Glacier_flag, &
@@ -167,7 +166,7 @@ end module PRMS_IT0_VARS
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       USE PRMS_IT0_VARS
-      use prms_utils, only: print_module, read_error
+      use prms_utils, only: print_module, read_error, error_stop
       IMPLICIT NONE
 !***********************************************************************
       climateflow_decl = 0
@@ -682,7 +681,7 @@ end module PRMS_IT0_VARS
      &       'none', Pptmix_nopack)
       ENDIF
 ! glacier variables
-      IF ( Glacier_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+      IF ( Glacier_flag==1 .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Glacier_frac(Nhru) )
         ALLOCATE ( Glrette_frac(Nhru) )
         ALLOCATE ( Alt_above_ela(Nhru) )
@@ -1496,7 +1495,7 @@ end module PRMS_IT0_VARS
       Basin_pk_precip = 0.0D0
       Pk_depth = 0.0D0
       Snowcov_area = 0.0
-      IF ( Glacier_flag==ACTIVE ) THEN
+      IF ( Glacier_flag==1 ) THEN
         Glacrb_melt = 0.0
         Glacier_frac = 0.0
         Alt_above_ela = 0.0
@@ -1711,7 +1710,7 @@ end module PRMS_IT0_VARS
         WRITE ( Restart_outunit ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
         WRITE ( Restart_outunit ) Transp_on
         WRITE ( Restart_outunit ) Pkwater_equiv
-        IF ( Glacier_flag==ACTIVE ) THEN
+        IF ( Glacier_flag==1 ) THEN
           WRITE ( Restart_outunit) Glacier_frac
           WRITE ( Restart_outunit) Glrette_frac
           WRITE ( Restart_outunit) Alt_above_ela
@@ -1740,7 +1739,7 @@ end module PRMS_IT0_VARS
         WRITE ( Restart_outunit, * ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
         WRITE ( Restart_outunit, * ) Transp_on
         WRITE ( Restart_outunit, * ) Pkwater_equiv
-        IF ( Glacier_flag==ACTIVE ) THEN
+        IF ( Glacier_flag==1 ) THEN
           WRITE ( Restart_outunit, * ) Glacier_frac
           WRITE ( Restart_outunit, * ) Glrette_frac
           WRITE ( Restart_outunit, * ) Alt_above_ela
@@ -1772,7 +1771,7 @@ end module PRMS_IT0_VARS
         READ ( Restart_inunit ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
         READ ( Restart_inunit ) Transp_on
         READ ( Restart_inunit ) Pkwater_equiv
-        IF ( Glacier_flag==ACTIVE ) THEN
+        IF ( Glacier_flag==1 ) THEN
           READ ( Restart_inunit) Glacier_frac
           READ ( Restart_inunit) Glrette_frac
           READ ( Restart_inunit) Alt_above_ela
@@ -1802,7 +1801,7 @@ end module PRMS_IT0_VARS
         READ ( Restart_inunit, * ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
         READ ( Restart_inunit, * ) Transp_on
         READ ( Restart_inunit, * ) Pkwater_equiv
-        IF ( Glacier_flag==ACTIVE ) THEN
+        IF ( Glacier_flag==1 ) THEN
           READ ( Restart_inunit, * ) Glacier_frac
           READ ( Restart_inunit, * ) Glrette_frac
           READ ( Restart_inunit, * ) Alt_above_ela
