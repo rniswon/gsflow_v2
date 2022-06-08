@@ -975,35 +975,39 @@ contains
   !***********************************************************************
   module subroutine get_control_filename()
     use PRMS_CONSTANTS, only: MAXCMDLINE_LENGTH, ERROR_control
-    use PRMS_MODULE, only: Print_debug, EQULS, Model_control_file
+    use PRMS_MODULE, only: Print_debug, EQULS, Model_control_file, command_line, Model_mode
     use prms_utils, only: error_stop
     implicit none
     ! Functions
     intrinsic :: GET_COMMAND_ARGUMENT, COMMAND_ARGUMENT_COUNT, GET_COMMAND, TRIM
     ! Local Variables
-    character(LEN=MAXCMDLINE_LENGTH) command_line_arg, command_line
+    character(LEN=MAXCMDLINE_LENGTH) command_line_arg
     logical :: exists
     integer :: status, nchars, numargs
     !***********************************************************************
     ! Subroutine GET_COMMAND_ARGUMENT may not be available with all compilers-it is a Fortran 2003 routine
     ! This routine expects the Control File name to be the first argument, if present
-    call GET_COMMAND(command_line)
-    print *, 'Command line: ', trim(command_line)
-    numargs = COMMAND_ARGUMENT_COUNT()
-    if (Print_debug > -1) print '(/,A)', EQULS
-    call GET_COMMAND_ARGUMENT(1, command_line_arg, nchars, status)
-    if (status /= 0) then
-      write (*, '(/,A)') 'Enter the name of the PRMS Control File or quit:'
-      read (*, '(A)') Model_control_file
-      if (Model_control_file(:4) == 'quit' .or. Model_control_file(:4) == 'QUIT') ERROR stop ERROR_control
+    if ( Model_mode(:7) /= 'MODSIM' ) then
+      call GET_COMMAND(command_line)
+      numargs = COMMAND_ARGUMENT_COUNT()
+      call GET_COMMAND_ARGUMENT(1, command_line_arg, nchars, status)
+      if (status /= 0) then
+        write (*, '(/,A)') 'Enter the name of the PRMS Control File or quit:'
+        read (*, '(A)') Model_control_file
+        if (Model_control_file(:4) == 'quit' .or. Model_control_file(:4) == 'QUIT') ERROR stop ERROR_control
+      endif
     else
-      if (trim(command_line_arg(:2)) == '-C') then
-        Model_control_file = trim(command_line_arg(3:))
-        !          CALL GET_COMMAND_ARGUMENT(2, Model_control_file, nchars, status)
-        if (status /= 0) call error_stop('bad argment value after -C argument', ERROR_control)
-      else
-        Model_control_file = trim(command_line_arg)
-      end if
+      numargs = count_words_text(command_line)
+      read (*, '(A)') command_line_arg
+    endif
+    print *, 'Command line: ', trim(command_line)
+    if (Print_debug > -1) print '(/,A)', EQULS
+    if (trim(command_line_arg(:2)) == '-C') then
+      Model_control_file = trim(command_line_arg(3:))
+      !          CALL GET_COMMAND_ARGUMENT(2, Model_control_file, nchars, status)
+      if (status /= 0) call error_stop('bad argment value after -C argument', ERROR_control)
+    else
+      Model_control_file = trim(command_line_arg)
     end if
 
     inquire (FILE=trim(Model_control_file), EXIST=exists)
@@ -1300,4 +1304,27 @@ contains
 
     control_string_array = 0
   end function control_string_array
+
+  integer module function count_words_text(text)
+    implicit none
+    ! Argument
+    character(LEN=*), intent(IN) :: text
+    ! Functions
+    intrinsic :: scan, verify
+    ! Local Variables
+    integer :: nwords, pos, i
+    !***********************************************************************
+    pos = 1
+    nwords = 0
+    loop: do
+      i = verify(text(pos:), ' ')  !-- Find next non-blank.
+      if (i == 0) exit loop        !-- No word found.
+      nwords = nwords + 1          !-- Found something.
+      pos = pos + i - 1            !-- Move to start of the word.
+      i = scan(text(pos:), ' ')    !-- Find next blank.
+      if (i == 0) exit loop        !-- No blank found.
+      pos = pos + i - 1            !-- Move to the blank.
+    end do loop
+    count_words_text = nwords
+  end function count_words_text
 end submodule

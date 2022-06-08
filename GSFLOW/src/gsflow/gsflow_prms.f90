@@ -1706,6 +1706,23 @@
       END SUBROUTINE gsflow_prmsSettings
 
 !***********************************************************************
+!     put_prms_control_file - MODSIM sends PRMS Control File name
+!***********************************************************************
+      SUBROUTINE put_prms_control_file(command_line_args)
+      USE PRMS_MODULE, ONLY: command_line
+      use prms_utils, only: numchars
+      IMPLICIT NONE
+      ! Arguments
+      CHARACTER(LEN=*), INTENT(IN) :: command_line_args
+      ! Local Variabales
+      INTEGER :: i, nc
+!***********************************************************************
+      nc = numchars(command_line_args)
+      command_line = ' '
+      command_line(:nc) = command_line_args(:nc)
+      END SUBROUTINE put_prms_control_file
+
+!***********************************************************************
 !     gsflow_prms_restart - write or read restart file
 !***********************************************************************
       SUBROUTINE gsflow_prms_restart(In_out)

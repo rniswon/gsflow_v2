@@ -69,5 +69,10 @@ module PRMS_CONTROL_FILE
       character(LEN=*), intent(OUT) :: Parmval
       integer, intent(IN) :: Array_index
     end function
+
+    integer module function count_words_text(text)
+      character(LEN=*), intent(IN) :: text
+    end function
+
   end interface
 end module PRMS_CONTROL_FILE
