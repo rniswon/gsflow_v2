@@ -1564,7 +1564,7 @@
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: SEG, NUMTAB_SFR, ISFRLIST, SEGINFLOWSAVE
-      USE GLOBAL, ONLY: IUNIT, ISSFLG 
+      USE GLOBAL, ONLY: IUNIT
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
       USE PRMS_IT0_VARS, ONLY: It0_dprst_vol_open
       USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
@@ -1665,15 +1665,13 @@
       END IF
 !
 !6 --------SET POND STORAGE FOR PREVIOUS AND CURRENT TIME STEPS
-      IF ( ISSFLG(kper) == 0 ) THEN
-        do i = 1, NUMIRRPOND
-          ipond = IRRPONDVAR(i)  !these are hru ids for ponds
-          PONDSTOROLD(i) = SNGL(It0_dprst_vol_open(ipond))
+      do i = 1, NUMIRRPOND
+        ipond = IRRPONDVAR(i)  !these are hru ids for ponds
+        PONDSTOROLD(i) = SNGL(It0_dprst_vol_open(ipond))
      +                       /MFQ_to_inch_acres
-          PONDSTORNEW(i) = SNGL(Dprst_vol_open(ipond))
+        PONDSTORNEW(i) = SNGL(Dprst_vol_open(ipond))
      +                       /MFQ_to_inch_acres
-        end do
-      END IF
+      end do
 !
 !7 - -----RESET SAVED IRR AND AET FROM LAST TIME STEP
       DIVERSIONIRRUZF = szero
@@ -2699,7 +2697,7 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: IOUT, DELR, DELC, NCOL, NROW, NLAY,
-     +     IBOUND, HNEW, BUFF, BOTM, LBOTM, ISSFLG
+     +     IBOUND, HNEW, BUFF, BOTM, LBOTM
       USE GWFBASMODULE, ONLY: ICBCFL, IAUXSV, DELT, PERTIM, TOTIM,
      +     VBNM, VBVL, MSUM, IBUDFL
       USE GWFAGMODULE
@@ -3097,16 +3095,13 @@
       ROUT = QPOND
       DELIN = 0.0D0
       DELOUT = 0.0D0
-      IF ( ISSFLG(kkper) == 0 ) THEN
-        DO L = 1, NUMIRRPOND
-          ipond = IRRPONDVAR(L)
-          DELIN = DELIN + Dprst_total_open_in(ipond)/MFQ_to_inch_acres
-          DELOUT = DELOUT + Dprst_total_open_out(ipond)/
-     +                      MFQ_to_inch_acres 
-          PONDSTORNEW(L) = Dprst_vol_open(ipond)/MFQ_to_inch_acres
-          DELSTOR = DELSTOR + PONDSTORNEW(L) - PONDSTOROLD(L)
-        END DO  
-      END IF
+      DO L = 1, NUMIRRPOND
+        ipond = IRRPONDVAR(L)
+        DELIN = DELIN + Dprst_total_open_in(ipond)/MFQ_to_inch_acres
+        DELOUT = DELOUT + Dprst_total_open_out(ipond)/MFQ_to_inch_acres 
+        PONDSTORNEW(L) = Dprst_vol_open(ipond)/MFQ_to_inch_acres
+        DELSTOR = DELSTOR + PONDSTORNEW(L) - PONDSTOROLD(L)
+      END DO  
       DELIN = DELIN - RIN
       DELOUT = DELOUT - ROUT
       DELSTOR = (DELSTOR - DELIN + DELOUT)/DELT
