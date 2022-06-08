@@ -134,7 +134,7 @@ contains
         READ ( Datafile_unit, FMT='(A)' ) data_line
         IF ( data_line(:4)=='####' ) EXIT
       ENDDO
-      CALL find_current_time(Datafile_unit, Starttime(1), Starttime(2), Starttime(3), ios, 0)
+      CALL find_current_time(Datafile_unit, Starttime(1), Starttime(2), Starttime(3), ios)
       IF ( ios/=0 ) THEN
         PRINT *, 'End of file or error reading Data File to find the first simulation time step'
         PRINT *, 'Data File: ', Data_file

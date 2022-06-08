@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Temperature Distribution'
         character(len=*), parameter :: MODNAME = 'temp_map'
-        character(len=*), parameter :: Version_temp_map = '2021-11-19'
+        character(len=*), parameter :: Version_temp_map = '2023-06-02'
         INTEGER, SAVE :: Tmax_unit, Tmin_unit
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
@@ -127,21 +127,21 @@
      &       CALL read_error(2, 'tmin_map_adj')
         IF ( control_string(Tmax_map_file, 'tmax_map_file')/=0 ) CALL read_error(5, 'tmax_map_file')
         IF ( control_string(Tmin_map_file, 'tmin_map_file')/=0 ) CALL read_error(5, 'tmin_map_file')
-        CALL find_cbh_header_end(Tmax_unit, Tmax_map_file, 'tmax_map_file', ierr, 1, 0)
+        CALL find_cbh_header_end(Tmax_unit, Tmax_map_file, 'tmax_map_file', ierr, 1)
         IF ( ierr==1 ) THEN
           istop = 1
         ELSE
-          CALL find_current_time(Tmax_unit, Start_year, Start_month, Start_day, ierr, 0)
+          CALL find_current_time(Tmax_unit, Start_year, Start_month, Start_day, ierr)
           IF ( ierr==-1 ) THEN
             PRINT *, 'for first time step, Tmax Map File: ', Tmax_map_file
             istop = 1
           ENDIF
         ENDIF
-        CALL find_cbh_header_end(Tmin_unit, Tmin_map_file, 'tmin_map_file', ierr, 1, 0)
+        CALL find_cbh_header_end(Tmin_unit, Tmin_map_file, 'tmin_map_file', ierr, 1)
         IF ( ierr==1 ) THEN
           istop = 1
         ELSE
-          CALL find_current_time(Tmin_unit, Start_year, Start_month, Start_day, ierr, 0)
+          CALL find_current_time(Tmin_unit, Start_year, Start_month, Start_day, ierr)
           IF ( ierr==-1 ) THEN
             PRINT *, 'for first time step, Tmin Map File: ', Tmin_map_file
             istop = 1

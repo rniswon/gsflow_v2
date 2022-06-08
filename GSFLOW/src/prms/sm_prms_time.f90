@@ -58,15 +58,15 @@ contains
           It0_imperv_stor = Imperv_stor
           It0_hru_impervstor = Hru_impervstor
           It0_hru_intcpstor = Hru_intcpstor
-          IF ( Dprst_flag==ACTIVE ) It0_dprst_stor_hru = Dprst_stor_hru
           IF ( GSFLOW_flag==ACTIVE ) It0_gravity_stor_res = Gravity_stor_res
           IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
             It0_intcp_transp_on = Intcp_transp_on
             It0_intcp_stor = Intcp_stor
           ENDIF
           IF ( Dprst_flag==ACTIVE ) THEN
-              It0_dprst_vol_open = Dprst_vol_open
-              It0_dprst_vol_clos = Dprst_vol_clos
+            It0_dprst_vol_open = Dprst_vol_open
+            It0_dprst_vol_clos = Dprst_vol_clos
+            It0_dprst_stor_hru = Dprst_stor_hru
           ENDIF
           IF ( AG_flag==ACTIVE ) THEN
             It0_basin_ag_gvr_stor = Basin_ag_gvr_stor
@@ -94,7 +94,7 @@ contains
           Jday = julian_day('start', 'calendar')
           Jsol = julian_day('start', 'solar')
           Julwater = julian_day('start', 'water')
-          startday = compute_julday(Starttime(1), Starttime(2), Starttime(3))
+          startday = compute_julday(Starttime(YEAR), Starttime(MONTH), Starttime(DAY))
           Julian_day_absolute = startday
         ENDIF
 

@@ -90,10 +90,10 @@ contains
                            Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, irrigated_area_module, AET_module, &
                            PET_ag_module, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, &
                            Agriculture_soilzone_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
-                           Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, Dprst_add_water_use, &
-                           Dprst_transfer_water_use, mappingFileName, xyFileName, Iter_aet_flag, text_restart_flag
+                           Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, &
+                           mappingFileName, xyFileName, Iter_aet_flag, text_restart_flag
     use PRMS_CLIMATE_HRU, only: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, Albedo_day, Cloud_cover_day, &
-                                Cbh_check_flag, Cbh_binary_flag, Windspeed_day, Humidity_day, &
+                                Cbh_check_flag, Windspeed_day, Humidity_day, &
                                 AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
     use PRMS_DYNAMIC_PARAM_READ, only: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
                                        wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
@@ -101,7 +101,7 @@ contains
                                        soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, &
                                        fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, &
                                        covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn, &
-                                       ag_soilmoist_dynamic, ag_soilrechr_dynamic, ag_frac_dynamic !, snareathresh_dynamic
+                                       ag_soilmoist_dynamic, ag_soilrechr_dynamic, ag_frac_dynamic, snareathresh_dynamic
     implicit none
     ! Local Variables
     integer i, numvalues
@@ -140,23 +140,16 @@ contains
     i = 1
     Control_parameter_data(i) % name = 'print_debug'
     Print_debug = DEBUG_normal
+    Control_parameter_data(i) % values_int(1) = Print_debug
     i = i + 1
     Control_parameter_data(i) % name = 'parameter_check_flag'
     Parameter_check_flag = OFF
-    Control_parameter_data(i) % values_int(1) = Parameter_check_flag
     i = i + 1
     Control_parameter_data(i) % name = 'forcing_check_flag'
     forcing_check_flag = OFF
-    Control_parameter_data(i) % values_int(1) = forcing_check_flag
     i = i + 1
     Control_parameter_data(i) % name = 'dprst_flag'
     Dprst_flag = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'dprst_add_water_use'
-    Dprst_add_water_use = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'dprst_transfer_water_use'
-    Dprst_transfer_water_use = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'cascade_flag'
     Cascade_flag = ACTIVE
@@ -179,7 +172,7 @@ contains
     Glacier_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'no_snow_flag'
-    no_snow_flag = ACTIVE
+    no_snow_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'ag_gravity_flag'
     Ag_gravity_flag = OFF
@@ -209,9 +202,6 @@ contains
     Control_parameter_data(i) % name = 'cbh_check_flag'
     Cbh_check_flag = ACTIVE
     Control_parameter_data(i) % values_int(1) = Cbh_check_flag
-    i = i + 1
-    Control_parameter_data(i) % name = 'cbh_binary_flag'
-    Cbh_binary_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'gwr_swale_flag'
     Gwr_swale_flag = OFF
@@ -707,22 +697,22 @@ contains
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'irrigated_area_module'
-    irrigated_area_module = 'irrigated_area_module'
+    irrigated_area_module = 'none'
     Control_parameter_data(i) % values_character(1) = irrigated_area_module
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'PET_ag_module'
-    PET_ag_module = 'PET_ag_module'
+    PET_ag_module = 'none'
     Control_parameter_data(i) % values_character(1) = PET_ag_module
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'AET_module'
-    PET_ag_module = 'AET_module'
+    AET_module = 'none'
     Control_parameter_data(i) % values_character(1) = AET_module
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'AET_cbh_file'
-    AET_cbh_file = 'AET_cbh_day'
+    AET_cbh_file = 'AET_cbh.day'
     Control_parameter_data(i) % values_character(1) = AET_cbh_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
@@ -732,17 +722,17 @@ contains
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'irrigated_area_cbh_file'
-    irrigated_area_cbh_file = 'irrigated_area_cbh_day'
+    irrigated_area_cbh_file = 'irrigated_area_cbh.day'
     Control_parameter_data(i) % values_character(1) = irrigated_area_cbh_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'ag_soilmoist_dynamic'
-    ag_soilmoist_dynamic = 'ag_soilmoist.dynamic'
+    ag_soilmoist_dynamic = 'dyn.ag_soilmoist.param'
     Control_parameter_data(i) % values_character(1) = ag_soilmoist_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'ag_soilrechr_dynamic'
-    ag_soilrechr_dynamic = 'ag_soilrechr.dynamic'
+    ag_soilrechr_dynamic = 'dyn.ag_soilrechr.param'
     Control_parameter_data(i) % values_character(1) = ag_soilrechr_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
@@ -763,117 +753,122 @@ contains
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'ag_frac_dynamic'
-    Dprst_depth_dynamic = 'dynag_frac'
+    Dprst_depth_dynamic = 'dyn_ag_frac.param'
     Control_parameter_data(i) % values_character(1) = ag_frac_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'dprst_depth_dynamic'
-    Dprst_depth_dynamic = 'dyndprst_depth'
+    Dprst_depth_dynamic = 'dyn_dprst_depth.param'
     Control_parameter_data(i) % values_character(1) = Dprst_depth_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'dprst_frac_dynamic'
-    Dprst_frac_dynamic = 'dyndprst_frac'
+    Dprst_frac_dynamic = 'dyn_dprst_frac.param'
     Control_parameter_data(i) % values_character(1) = Dprst_frac_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'snow_intcp_dynamic'
-    Snow_intcp_dynamic = 'dynsnowintcp'
+    Snow_intcp_dynamic = 'dyn_snow_intcp.param'
     Control_parameter_data(i) % values_character(1) = Snow_intcp_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
+    Control_parameter_data(i) % name = 'snareathresh_dynamic'
+    Snareathresh_dynamic = 'dyn_snarea_thresh.param'
+    Control_parameter_data(i) % values_character(1) = Snareathresh_dynamic
+    Control_parameter_data(i) % data_type = CHAR_TYPE
+    i = i + 1
     Control_parameter_data(i) % name = 'srain_intcp_dynamic'
-    Srain_intcp_dynamic = 'dynsrainintcp'
+    Srain_intcp_dynamic = 'dyn_srain_intcp.param'
     Control_parameter_data(i) % values_character(1) = Srain_intcp_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'wrain_intcp_dynamic'
-    Wrain_intcp_dynamic = 'dynwrainintcp'
+    Wrain_intcp_dynamic = 'dyn_wrain_intcp.param'
     Control_parameter_data(i) % values_character(1) = Wrain_intcp_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'imperv_frac_dynamic'
-    Imperv_frac_dynamic = 'dynimperv_frac'
+    Imperv_frac_dynamic = 'dyn_hru_percent_imperv.param'
     Control_parameter_data(i) % values_character(1) = Imperv_frac_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'imperv_stor_dynamic'
-    Imperv_stor_dynamic = 'dynimperv_stor'
+    Imperv_stor_dynamic = 'dyn_imperv_stor_max.param'
     Control_parameter_data(i) % values_character(1) = Imperv_stor_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'covtype_dynamic'
-    Covtype_dynamic = 'dyncovtype'
+    Covtype_dynamic = 'dyn_cov_type.param'
     Control_parameter_data(i) % values_character(1) = Covtype_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'covden_sum_dynamic'
-    Covden_sum_dynamic = 'dyncovden_sum'
+    Covden_sum_dynamic = 'dyn_covden_sum.param'
     Control_parameter_data(i) % values_character(1) = Covden_sum_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'covden_win_dynamic'
-    Covden_win_dynamic = 'dyncovden_win'
+    Covden_win_dynamic = 'dyn_covden_win.param'
     Control_parameter_data(i) % values_character(1) = Covden_win_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'potetcoef_dynamic'
-    Potetcoef_dynamic = 'dynpotetcoef'
+    Potetcoef_dynamic = 'dyn_potet_coef.param'
     Control_parameter_data(i) % values_character(1) = Potetcoef_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'transpbeg_dynamic'
-    Transpbeg_dynamic = 'dyntranspbeg'
+    Transpbeg_dynamic = 'dyn_transp_beg.param'
     Control_parameter_data(i) % values_character(1) = Transpbeg_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'transpend_dynamic'
-    Transpend_dynamic = 'dyntranspend'
+    Transpend_dynamic = 'dyn_transp_end.param'
     Control_parameter_data(i) % values_character(1) = Transpend_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'fallfrost_dynamic'
-    Fallfrost_dynamic = 'dynfallfrost'
+    Fallfrost_dynamic = 'dyn_fall_frost.param'
     Control_parameter_data(i) % values_character(1) = Fallfrost_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'springfrost_dynamic'
-    Springfrost_dynamic = 'dynspringfrost'
+    Springfrost_dynamic = 'dyn_spring_frost.param'
     Control_parameter_data(i) % values_character(1) = Springfrost_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'soilrechr_dynamic'
-    Soilrechr_dynamic = 'dynsoilrechr'
+    Soilrechr_dynamic = 'dyn_soil_rechr.param'
     Control_parameter_data(i) % values_character(1) = Soilrechr_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'soilmoist_dynamic'
-    Soilmoist_dynamic = 'dynsoilmoist'
+    Soilmoist_dynamic = 'dyn_soil_moist.param'
     Control_parameter_data(i) % values_character(1) = Soilmoist_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'radtrncf_dynamic'
-    Radtrncf_dynamic = 'dynradtrncf'
+    Radtrncf_dynamic = 'dyn_rad_trncf.param'
     Control_parameter_data(i) % values_character(1) = Radtrncf_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'sro2dprst_perv_dynamic'
-    Sro2dprst_perv_dyn = 'dynsro2dprst_perv'
+    Sro2dprst_perv_dyn = 'dyn_sro_to_dprst_perv.param'
     Control_parameter_data(i) % values_character(1) = Sro2dprst_perv_dyn
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'sro2dprst_imperv_dynamic'
-    Sro2dprst_imperv_dyn = 'dynsro2dprst_imperv'
+    Sro2dprst_imperv_dyn = 'dyn_sro_to_dprst_imperv.param'
     Control_parameter_data(i) % values_character(1) = Sro2dprst_imperv_dyn
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'transp_on_dynamic'
-    Transp_on_dynamic = 'dyntranspon'
+    Transp_on_dynamic = 'dyn_transp_on.param'
     Control_parameter_data(i) % values_character(1) = Transp_on_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'dynamic_param_log_file'
-    Dynamic_param_log_file = 'dynamic_param.log'
+    Dynamic_param_log_file = 'dynamic_parameter.out'
     Control_parameter_data(i) % values_character(1) = Dynamic_param_log_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
@@ -977,35 +972,39 @@ contains
   !***********************************************************************
   module subroutine get_control_filename()
     use PRMS_CONSTANTS, only: MAXCMDLINE_LENGTH, ERROR_control
-    use PRMS_MODULE, only: Print_debug, EQULS, Model_control_file
+    use PRMS_MODULE, only: Print_debug, EQULS, Model_control_file, command_line, Model_mode
     use prms_utils, only: error_stop
     implicit none
     ! Functions
     intrinsic :: GET_COMMAND_ARGUMENT, COMMAND_ARGUMENT_COUNT, GET_COMMAND, TRIM
     ! Local Variables
-    character(LEN=MAXCMDLINE_LENGTH) command_line_arg, command_line
+    character(LEN=MAXCMDLINE_LENGTH) command_line_arg
     logical :: exists
     integer :: status, nchars, numargs
     !***********************************************************************
     ! Subroutine GET_COMMAND_ARGUMENT may not be available with all compilers-it is a Fortran 2003 routine
     ! This routine expects the Control File name to be the first argument, if present
-    call GET_COMMAND(command_line)
-    print *, 'Command line: ', trim(command_line)
-    numargs = COMMAND_ARGUMENT_COUNT()
-    if (Print_debug > -1) print '(/,A)', EQULS
-    call GET_COMMAND_ARGUMENT(1, command_line_arg, nchars, status)
-    if (status /= 0) then
-      write (*, '(/,A)') 'Enter the name of the PRMS Control File or quit:'
-      read (*, '(A)') Model_control_file
-      if (Model_control_file(:4) == 'quit' .or. Model_control_file(:4) == 'QUIT') ERROR stop ERROR_control
+    if ( Model_mode(:7) /= 'MODSIM' ) then
+      call GET_COMMAND(command_line)
+      numargs = COMMAND_ARGUMENT_COUNT()
+      call GET_COMMAND_ARGUMENT(1, command_line_arg, nchars, status)
+      if (status /= 0) then
+        write (*, '(/,A)') 'Enter the name of the PRMS Control File or quit:'
+        read (*, '(A)') Model_control_file
+        if (Model_control_file(:4) == 'quit' .or. Model_control_file(:4) == 'QUIT') ERROR stop ERROR_control
+      endif
     else
-      if (trim(command_line_arg(:2)) == '-C') then
-        Model_control_file = trim(command_line_arg(3:))
-        !          CALL GET_COMMAND_ARGUMENT(2, Model_control_file, nchars, status)
-        if (status /= 0) call error_stop('bad argment value after -C argument', ERROR_control)
-      else
-        Model_control_file = trim(command_line_arg)
-      end if
+      numargs = count_words_text(command_line)
+      read (*, '(A)') command_line_arg
+    endif
+    print *, 'Command line: ', trim(command_line)
+    if (Print_debug > -1) print '(/,A)', EQULS
+    if (trim(command_line_arg(:2)) == '-C') then
+      Model_control_file = trim(command_line_arg(3:))
+      !          CALL GET_COMMAND_ARGUMENT(2, Model_control_file, nchars, status)
+      if (status /= 0) call error_stop('bad argment value after -C argument', ERROR_control)
+    else
+      Model_control_file = trim(command_line_arg)
     end if
 
     inquire (FILE=trim(Model_control_file), EXIST=exists)
@@ -1302,4 +1301,27 @@ contains
 
     control_string_array = 0
   end function control_string_array
+
+  integer module function count_words_text(text)
+    implicit none
+    ! Argument
+    character(LEN=*), intent(IN) :: text
+    ! Functions
+    intrinsic :: scan, verify
+    ! Local Variables
+    integer :: nwords, pos, i
+    !***********************************************************************
+    pos = 1
+    nwords = 0
+    loop: do
+      i = verify(text(pos:), ' ')  !-- Find next non-blank.
+      if (i == 0) exit loop        !-- No word found.
+      nwords = nwords + 1          !-- Found something.
+      pos = pos + i - 1            !-- Move to start of the word.
+      i = scan(text(pos:), ' ')    !-- Find next blank.
+      if (i == 0) exit loop        !-- No blank found.
+      pos = pos + i - 1            !-- Move to the blank.
+    end do loop
+    count_words_text = nwords
+  end function count_words_text
 end submodule

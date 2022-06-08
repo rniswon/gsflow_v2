@@ -654,7 +654,7 @@
         capwater_maxin = Infil(i)
 
         IF ( Agriculture_soilzone_flag==ACTIVE ) THEN
-          IF ( Hru_ag_irr(i)>0.0 ) THEN ! Hru_ag_irr is in inches-acres over ag area
+          IF ( Hru_ag_irr(i)>0.0 ) THEN ! Hru_ag_irr is in acre-inches over ag area
             IF ( ag_on_flag==OFF ) THEN
               PRINT *, 'ag_frac=0.0 for HRU:', i
               CALL error_stop('AG Package irrigation specified and ag_frac=0.0', ERROR_param)
@@ -825,8 +825,10 @@
           IF ( Ag_gvr_to_sm(i)>0.0 ) THEN
             Ag_soil_moist(i) = Ag_soil_moist(i) + Ag_gvr_to_sm(i)/agfrac
             IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) THEN
+              IF ( ABS(Ag_soil_moist(i)-Ag_soil_moist_max(i)) > NEARZERO ) &
                 PRINT *, 'AG sm>max', Ag_soil_moist(i), Ag_soil_moist_max(i), i, Ag_gvr_to_sm(i)/agfrac, &
                          Ag_gvr_to_sm(i),agfrac,ag_capacity
+              Ag_soil_moist(i) = Ag_soil_moist_max(i)
             ENDIF
             IF ( Soilzone_aet_flag==ACTIVE ) THEN
               Ag_soil_lower(i) = MIN( Ag_soil_lower_stor_max(i), Ag_soil_moist(i) - Ag_soil_rechr(i) + Ag_gvr_to_sm(i)/agfrac )
