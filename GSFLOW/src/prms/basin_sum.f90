@@ -474,7 +474,7 @@
 !***********************************************************************
       INTEGER FUNCTION sumbrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, strmflow_muskingum_module, strmflow_muskingum_lake_module, strmflow_muskingum_mann_module
-      USE PRMS_MODULE, ONLY: Nobs, Print_debug, End_year, Strmflow_flag, Glacier_flag, Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Nobs, Print_debug, End_year, Strmflow_flag, Glacier_flag, Nowyear, Nowmonth, Nowday, Nratetbl
       USE PRMS_BASINSUM
       USE PRMS_BASIN, ONLY: Active_area, Active_hrus, Hru_route_order
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Basin_pweqv, Basin_snowmelt, Basin_snowevap, &
@@ -485,14 +485,16 @@
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_GWFLOW, ONLY: Basin_gwflow, Basin_gwsink, Basin_gwstor_minarea_wb
       USE PRMS_INTCP, ONLY: Basin_intcp_evap, Basin_net_ppt
-      USE PRMS_GLACR, ONLY: Basin_gl_storage
+      USE PRMS_SNOW, ONLY: Basin_glacrb_melt, Basin_glacrevap
+      USE PRMS_GLACR, ONLY: Basin_gl_storage, Basin_gl_top_melt
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_imperv_evap, &
      &    Basin_dprst_evap, Basin_dprst_volcl, Basin_dprst_volop
       USE PRMS_ROUTING, ONLY: Basin_segment_storage
+      USE PRMS_MUSKINGUM_LAKE, ONLY: Basin_2ndstflow
       use prms_utils, only: write_outfile
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: SNGL, ABS, ALOG, DBLE
+      INTRINSIC :: SNGL, ABS, DBLE
       EXTERNAL :: header_print
 ! Local variables
       INTEGER :: i, j, wyday, endrun, monthdays
@@ -517,7 +519,7 @@
 ! Basin_storage doesn't include any processes on glacier
 ! In glacier module, Basin_gl_storstart is an estimate for starting glacier volume, but only
 !   includes glaciers that have depth estimates and these are known to be iffy
-      IF ( Glacier_flag==ACTIVE ) Basin_storage = Basin_storage + Basin_gl_storage
+      IF ( Glacier_flag==1 ) Basin_storage = Basin_storage + Basin_gl_storage
       IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module &
      &     .OR. Strmflow_flag==strmflow_muskingum_mann_module) Basin_storage = Basin_storage + Basin_segment_storage
 
@@ -530,6 +532,8 @@
 
       wat_bal = Last_basin_stor - Basin_storage + Basin_ppt + Basin_gwstor_minarea_wb &
      &          - Basin_actet - Basin_stflow_out - Basin_gwsink
+      IF ( Strmflow_flag == strmflow_muskingum_lake_module .AND. Nratetbl > 0 ) wat_bal = wat_bal - Basin_2ndstflow
+      IF ( Glacier_flag==1 ) wat_bal = wat_bal + Basin_glacrb_melt + Basin_gl_top_melt - Basin_glacrevap
 
       IF ( Basin_stflow_out>0.0 ) THEN
         Basin_runoff_ratio = Basin_ppt/Basin_stflow_out

@@ -905,7 +905,7 @@
 ! Arguments
       INTEGER, INTENT(IN) :: glacr_exist, glrette_exist
 !***********************************************************************
-      comp_glsurf = 1
+      comp_glsurf = 0
       dobot = 1 ! 1 calls bottom calcs, 0 doesn't: Set to 0 for calibrating, then run one extra step with it on
       ! Should change so that saves the basal elevations (or reads in as parameter) and then recalibrating does not change
       botwrite = 0 ! 1 writes bottom calcs, 0 doesn't: Set to 0 for calibrating
@@ -1614,8 +1614,6 @@
       Basin_gl_storage = Basin_gl_storage + Basin_gl_top_gain - Basin_glacrb_melt - Basin_gl_top_melt
       Basin_gl_storvol = Basin_gl_storage/Basin_area_inv
 !
-      comp_glsurf = 0
-!
       END FUNCTION comp_glsurf
 
 !***********************************************************************
@@ -1634,7 +1632,7 @@
       INTEGER :: i, j, ii, o, p, ela2(Nhru)
       REAL :: elamin0(Nhru), elamin20(Nhru), elamin(Nhru), elamin2(Nhru)
 !***********************************************************************
-      compute_ela_mb = 1
+      compute_ela_mb = 0
 ! initialize
       ela2 = 0
       elamin0 = 1.0E15
@@ -1674,8 +1672,6 @@
         ENDDO
       ENDDO
 !
-      compute_ela_mb = 0
-!
       END FUNCTION compute_ela_mb
 
 !***********************************************************************
@@ -1696,7 +1692,7 @@
       REAL :: aar, elaarea
       REAL, PARAMETER :: Convert_units = (39.37*1000)**2
 !***********************************************************************
-      compute_ela_aar = 1
+      compute_ela_aar = 0
 ! initialize
       ela2 = 0
       elamin0 = 1.0E15
@@ -1744,8 +1740,6 @@
           ENDDO
         ENDDO
       ENDDO
-!
-      compute_ela_aar = 0
 
       END FUNCTION compute_ela_aar
 
@@ -1757,7 +1751,7 @@
       USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, GLACIER
       USE PRMS_MODULE, ONLY: Hru_type
       USE PRMS_GLACR, ONLY: Hru_slope_ts
-      USE PRMS_SOLTAB, ONLY: Hru_aspect, Hru_cossl, PI, RADIANS, &
+      USE PRMS_SOLTAB, ONLY: Hru_aspect, Hru_cossl, PI, RADIANS, Sunset_angle, &
      &    Soltab_potsw, Soltab_sunhrs, Solar_declination, ECCENTRICY, DEGDAY, DEGDAYRAD
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_lat
       IMPLICIT NONE
@@ -1788,9 +1782,9 @@
           Soltab_sunhrs(1, n) = 0.0
           Soltab_potsw(1, n) = 0.0
           CALL compute_soltab(obliquity, Solar_declination, Hru_slope_ts(n), Hru_aspect(n), &
-     &                      Hru_lat(n), Hru_cossl(n), Soltab_potsw(1, n), &
-     &                      Soltab_sunhrs(1, n), Hru_type(n), n)
-          ENDIF
+     &                      Hru_lat(n), Hru_cossl(n), Soltab_potsw(:, n), &
+     &                      Soltab_sunhrs(:, n), Sunset_angle(:, n), Hru_type(n), n)
+        ENDIF
       ENDDO
 !
       END FUNCTION recompute_soltab

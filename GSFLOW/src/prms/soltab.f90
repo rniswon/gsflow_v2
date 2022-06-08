@@ -16,7 +16,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Potential Solar Radiation'
       character(len=*), parameter :: MODNAME = 'soltab'
-      character(len=*), parameter :: Version_soltab = '2021-09-07'
+      character(len=*), parameter :: Version_soltab = '2022-03-29'
       DOUBLE PRECISION, PARAMETER :: PI=3.1415926535898D0
       DOUBLE PRECISION, PARAMETER :: RADIANS=PI/180.0D0, TWOPI=2.0D0*PI
       DOUBLE PRECISION, PARAMETER :: PI_12=12.0D0/PI
@@ -34,6 +34,7 @@
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_cossl(:), Soltab_sunhrs(:, :)
 !   Declared Variables
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Soltab_potsw(:, :), Soltab_horad_potsw(:, :)
+      REAL, SAVE, ALLOCATABLE :: Sunset_angle(:, :)
 !   Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Hru_aspect(:), Hru_slope(:)
       END MODULE PRMS_SOLTAB
@@ -75,6 +76,7 @@
 
       CALL print_module(MODDESC, MODNAME, Version_soltab)
 
+      ALLOCATE ( Sunset_angle(MAX_DAYS_PER_YEAR, Nhru) )
       ALLOCATE ( Soltab_potsw(MAX_DAYS_PER_YEAR, Nhru) )
 !      CALL declvar_dble(MODNAME, 'soltab_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
 !     &     'Potential solar radiation for each Julian Day, for each HRU', &
@@ -127,6 +129,7 @@
       REAL :: lat
       DOUBLE PRECISION :: basin_cossl
       DOUBLE PRECISION :: basin_sunhrs(MAX_DAYS_PER_YEAR), obliquity(MAX_DAYS_PER_YEAR)
+      REAL :: basin_angle(MAX_DAYS_PER_YEAR) !, dayangle
       DOUBLE PRECISION :: y, y2, y3, jddbl
 !***********************************************************************
       sthinit = 0
@@ -168,20 +171,21 @@
       Soltab_sunhrs = 0.0D0
       Soltab_potsw = 0.0D0
       Soltab_horad_potsw = 0.0D0
+      Sunset_angle = 0.0
       Hru_cossl = 0.0D0
       DO nn = 1, Active_hrus
         n = Hru_route_order(nn)
         CALL compute_soltab(obliquity, Solar_declination, 0.0, 0.0, Hru_lat(n), &
      &                      Hru_cossl(n), Soltab_horad_potsw(1, n), &
-     &                      Soltab_sunhrs(1, n), Hru_type(n), n)
+     &                      Soltab_sunhrs(:, n), Sunset_angle(:, n), Hru_type(n), n)
         CALL compute_soltab(obliquity, Solar_declination, Hru_slope(n), Hru_aspect(n), &
      &                      Hru_lat(n), Hru_cossl(n), Soltab_potsw(1, n), &
-     &                      Soltab_sunhrs(1, n), Hru_type(n), n)
+     &                      Soltab_sunhrs(:, n), Sunset_angle(:, n), Hru_type(n), n)
       ENDDO
 
       lat = SNGL( Basin_lat )
       CALL compute_soltab(obliquity, Solar_declination, 0.0, 0.0, lat, basin_cossl, &
-     &                    Soltab_basinpotsw, basin_sunhrs, 0, 0)
+     &                    Soltab_basinpotsw, basin_sunhrs, basin_angle, 0, 0)
 
       IF ( Print_debug==DEBUG_SOLTAB ) THEN
         output_path = 'soltab_debug'
@@ -208,7 +212,7 @@
      &                         Solar_declination(80), Solar_declination(94), Solar_declination(109), &
      &                         Solar_declination(123), Solar_declination(138), Solar_declination(152), &
      &                         Solar_declination(173)
-        CLOSE ( file_unit)
+        CLOSE ( file_unit )
 ! from original soltab
 !     data obliquity/2.06699,2.06317,2.05582,2.04520,2.03243,2.01706,2.00080,
 !    +1.98553,1.96990,1.95714,1.94689,1.94005,1.93616/
@@ -230,7 +234,7 @@
 !  for each HRU for each day of the year.
 !***********************************************************************
       SUBROUTINE compute_soltab(Obliquity, Solar_declination, Slope, Aspect, &
-     &                          Latitude, Cossl, Soltab, Sunhrs, Hru_type, Id)
+     &                          Latitude, Cossl, Soltab, Sunhrs, Sunset_angle, Hru_type, Id)
       USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, DNEARZERO
       USE PRMS_SOLTAB, ONLY: PI, TWOPI, RADIANS, PI_12
       IMPLICIT NONE
@@ -244,6 +248,7 @@
       REAL, INTENT(IN) :: Slope, Aspect, Latitude
       DOUBLE PRECISION, INTENT(OUT) :: Cossl
       DOUBLE PRECISION, INTENT(OUT), DIMENSION(MAX_DAYS_PER_YEAR) :: Soltab, Sunhrs
+      REAL, INTENT(OUT), DIMENSION(MAX_DAYS_PER_YEAR) :: Sunset_angle
 !     Local Variables
       INTEGER :: jd
       DOUBLE PRECISION :: a, x0, x1, x2, r0, r1, d1, t, sunh, solt
@@ -365,6 +370,7 @@
         IF ( sunh<DNEARZERO ) sunh = 0.0D0
         Sunhrs(jd) = sunh
         Soltab(jd) = solt
+        Sunset_angle(jd) = t3*PI_12
 
       ENDDO
 

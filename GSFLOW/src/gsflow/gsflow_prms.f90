@@ -41,7 +41,7 @@
       INTEGER, EXTERNAL :: strmflow_in_out, muskingum, muskingum_lake
       INTEGER, EXTERNAL :: water_use_read, dynamic_param_read, potet_pm_sta
       INTEGER, EXTERNAL :: stream_temp, glacr
-      EXTERNAL :: precip_map, temp_map
+      EXTERNAL :: precip_map, temp_map, segment_to_hru
       EXTERNAL :: gsflow_prms_restart, water_balance, summary_output
       EXTERNAL :: prms_summary, module_doc, convert_params, gsflow_prms2modsim !, gsflow_modsim2prms
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
@@ -106,7 +106,7 @@
      &        '       Precip Dist: precip_1sta, precip_laps, precip_dist2,', /, &
      &        '                    climate_hru, precip_map', /, &
      &        'Temp & Precip Dist: xyz_dist, ide_dist', /, &
-     &        '    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru', /, &
+     &        '    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover', /, &
      &        'Transpiration Dist: transp_tindex, climate_hru, transp_frost', /, &
      &        '      Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,', /, &
      &        '                    potet_hs, potet_pt, potet_pm, potet_pm_sta', /, &
@@ -116,7 +116,7 @@
      &        '         Soil Zone: soilzone, soilzone_ag', /, &
      &        '       Groundwater: gwflow', /, &
      &        'Streamflow Routing: strmflow, strmflow_in_out, muskingum,', /, &
-     &        '                    muskingum_lake, muskingum_mann', /, &
+     &        '                    muskingum_lake, muskingum_mann, segment_to_hru', /, &
      &        'Stream Temperature: stream_temp', /, &
      &        '    Output Summary: basin_sum, subbasin, map_results, prms_summary,', /, &
      &        '                    nhru_summary, nsub_summary, water_balance', /, &
@@ -411,6 +411,7 @@
         IF ( Solrad_flag==ddsolrad_module ) THEN
           ierr = ddsolrad()
         ELSE !IF ( Solrad_flag==ccsolrad_module ) THEN
+          CALL cloud_cover()
           ierr = ccsolrad()
         ENDIF
         IF ( ierr/=0 ) CALL module_error(Solrad_module, Arg, ierr)
@@ -499,6 +500,7 @@
           IF ( Stream_order_flag==ACTIVE ) THEN
             ierr = routing()
             IF ( ierr/=0 ) CALL module_error('routing', Arg, ierr)
+            IF ( seg2hru_flag==ACTIVE ) CALL segment_to_hru()
           ENDIF
 
           IF ( Strmflow_flag==strmflow_noroute_module ) THEN
@@ -730,6 +732,7 @@
 
       IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = 0
       IF ( control_integer(forcing_check_flag, 'forcing_check_flag')/=0 ) forcing_check_flag = OFF
+      IF ( control_integer(seg2hru_flag, 'seg2hru_flag')/=0 ) seg2hru_flag = OFF
 
       IF ( control_string(Model_mode, 'model_mode')/=0 ) CALL read_error(5, 'model_mode')
       IF ( Model_mode(:4)=='    ' ) Model_mode = 'GSFLOW5'
@@ -1095,8 +1098,6 @@
       IF ( decldim('nsub', 0, MAXDIM, 'Number of internal subbasins')/=0 ) CALL read_error(7, 'nsub')
 
       IF ( control_integer(Dprst_flag, 'dprst_flag')/=0 ) Dprst_flag = OFF
-      IF ( control_integer(Dprst_transfer_water_use, 'dprst_transfer_water_use')/=0 ) Dprst_transfer_water_use = OFF
-      IF ( control_integer(Dprst_add_water_use, 'dprst_add_water_use')/=0 ) Dprst_add_water_use = OFF
       IF ( control_integer(PRMS_land_iteration_flag, 'PRMS_land_iteration_flag')/=0 ) PRMS_land_iteration_flag = OFF
       IF ( PRMS_only==ACTIVE ) PRMS_land_iteration_flag = OFF ! 1 = srunoff in iteration loop, 2 = land modules in iteration loop
 
@@ -1106,6 +1107,7 @@
       IF ( control_integer(Agriculture_canopy_flag, 'agriculture_canopy_flag')/=0 ) Agriculture_canopy_flag = OFF
       IF ( Agriculture_soilzone_flag==ACTIVE .AND. Agriculture_canopy_flag==ACTIVE ) &
      &     CALL error_stop('agriculture_soilzone_flag and agriculture_canopy_flag = 1, only one can be active', ERROR_control)
+      IF ( Agriculture_canopy_flag ) PRMS_land_iteration_flag  = 1
 
       IF ( control_integer(Agriculture_dprst_flag, 'agriculture_dprst_flag')/=0 ) Agriculture_dprst_flag = OFF
       IF ( Dprst_flag==OFF .AND. Agriculture_dprst_flag==ACTIVE ) &
@@ -1315,11 +1317,15 @@
       IF ( Nlake_hrus==-1 ) CALL read_error(7, 'nlake_hrus')
       IF ( Nlake>0 .AND. Nlake_hrus==0 ) Nlake_hrus = Nlake
 
-      Ndepl = getdim('ndepl')
-      IF ( Ndepl==-1 ) CALL read_error(7, 'ndepl')
-
-      Ndeplval = getdim('ndeplval')
-      IF ( Ndeplval==-1 ) CALL read_error(7, 'ndeplval')
+      IF ( Snarea_curve_flag==ACTIVE ) THEN
+        Ndepl = Nhru
+        Ndeplval = Ndepl * 11
+      ELSE
+        Ndepl = getdim('ndepl')
+        IF ( Ndepl==-1 ) CALL read_error(7, 'ndepl')
+        Ndeplval = getdim('ndeplval')
+        IF ( Ndeplval==-1 ) CALL read_error(7, 'ndeplval')
+      ENDIF
 
       Nsub = getdim('nsub')
       IF ( Nsub==-1 ) CALL read_error(7, 'nsub')
@@ -1515,7 +1521,7 @@
       EXTERNAL :: nhru_summary, prms_summary, water_balance, nsub_summary, basin_summary, nsegment_summary
       INTEGER, EXTERNAL :: dynamic_param_read, water_use_read, potet_pm_sta, glacr !, setup
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
-      EXTERNAL :: precip_map, temp_map
+      EXTERNAL :: precip_map, temp_map, segment_to_hru, cloud_cover
 ! Local variable
       INTEGER :: test
 !**********************************************************************
@@ -1538,6 +1544,7 @@
       test = precip_1sta_laps()
       test = precip_dist2()
       test = ddsolrad()
+      CALL cloud_cover()
       test = ccsolrad()
       test = transp_tindex()
       test = frost_date()
@@ -1561,6 +1568,7 @@
       test = gsflow_sum()
       test = gwflow()
       test = routing()
+      CALL segment_to_hru()
       test = strmflow()
       test = strmflow_in_out()
       test = muskingum()

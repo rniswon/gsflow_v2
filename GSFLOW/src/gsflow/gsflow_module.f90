@@ -21,12 +21,12 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 02/11/2022'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 06/02/2022'
       character(len=*), parameter :: PRMS_versn = '2022-03-01'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 03/01/2022'
-      character(len=*), parameter :: Version_read_control_file = '2022-02-23'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 06/02/2022'
+      character(len=*), parameter :: Version_read_control_file = '2022-06-02'
       character(len=*), parameter :: Version_read_parameter_file = '2022-01-12'
-      character(len=*), parameter :: Version_read_data_file = '2022-01-12'
+      character(len=*), parameter :: Version_read_data_file = '2022-06-02'
       CHARACTER(len=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
@@ -75,7 +75,7 @@
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, Iter_aet_flag, text_restart_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag, no_snow_flag
       INTEGER, SAVE :: Agriculture_dprst_flag, Agriculture_soilzone_flag, Agriculture_canopy_flag 
-      INTEGER, SAVE :: Dyn_ag_frac_flag, Dyn_ag_soil_flag, Ag_gravity_flag
+      INTEGER, SAVE :: Dyn_ag_frac_flag, Dyn_ag_soil_flag, Ag_gravity_flag, seg2hru_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF, outputSelectDatesON_OFF, snow_cloudcover_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName

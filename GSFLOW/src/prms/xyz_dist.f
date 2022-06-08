@@ -710,7 +710,7 @@
 !***********************************************************************
       SUBROUTINE xyz_temp_run(Max_lapse, Min_lapse, Meantmax, Meantmin,
      +                        Temp_meanx, Temp_meany, Temp_meanz)
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, DNEARZERO, ACTIVE, GLACIER
+      USE PRMS_CONSTANTS, ONLY: DNEARZERO, GLACIER
       USE PRMS_MODULE, ONLY: Glacier_flag, Nrain, Hru_type, Nowmonth
       USE PRMS_XYZ_DIST, ONLY: MRUx, MRUy, Tmax_rain_sta, Solradelev,
      +    Tmin_rain_sta, Temp_nuse, Tmin_add, Tmin_div, Tmax_add,
@@ -897,7 +897,7 @@
 
       DO ii = 1, Active_hrus
         i = Hru_route_order(ii)
-        IF ( Glacier_flag==ACTIVE ) THEN
+        IF ( Glacier_flag==1 ) THEN
           ! glacier module may have changed Hru_elev_meters
           IF ( Hru_type(i)==GLACIER )
      +         MRUelev(i) = (Hru_elev_meters(i)+Z_add)/Z_div

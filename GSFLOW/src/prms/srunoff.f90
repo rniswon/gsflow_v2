@@ -695,9 +695,9 @@
         glcrmltb = 0.0 ! glacier
         Isglacier = 0
         active_glacier = -1 ! not an glacier
-        IF ( Glacier_flag==ACTIVE ) THEN
+        IF ( Glacier_flag==1 ) THEN
           IF ( Hru_type(i)==GLACIER ) THEN
-            IF ( Glacier_flag==ACTIVE ) THEN ! glacier
+            IF ( Glacier_flag==1 ) THEN ! glacier
               Isglacier = 1
               glcrmltb = Glacrb_melt(i)
               IF ( Glacier_frac(i)>0.0 ) THEN
@@ -1597,7 +1597,7 @@
       ENDIF
 
       ! evaporate water from depressions based on snowcov_area
-      ! dprst_evap_open & dprst_evap_clos = inches-acres on the HRU
+      ! dprst_evap_open & dprst_evap_clos = acre-inches on the HRU
       unsatisfied_et = Avail_et
       dprst_avail_et = (Potet(Ihru)*(1.0-Snowcov_area(Ihru)))*Dprst_et_coef(Ihru)
       Dprst_evap_hru = 0.0

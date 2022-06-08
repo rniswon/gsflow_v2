@@ -1152,7 +1152,7 @@
       USE PRMS_CONSTANTS, ONLY: NEARZERO, CFS2CMS_CONV
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: ABS, EXP, ALOG, SNGL, SIGN
+      INTRINSIC :: ABS, EXP, SNGL, SIGN
 ! Arguments
       REAL, INTENT(IN) :: T0, Tl_avg, Te, Ak1, Ak2, width, length, qup
       DOUBLE PRECISION, INTENT(IN) :: Qlat

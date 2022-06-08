@@ -2,8 +2,8 @@
 
 module prms_utils
   interface
-    module subroutine find_current_time(Iunit, Year, Month, Day, Iret, Cbh_binary_flag)
-      integer, intent(IN) :: Iunit, Year, Month, Day, Cbh_binary_flag
+    module subroutine find_current_time(Iunit, Year, Month, Day, Iret)
+      integer, intent(IN) :: Iunit, Year, Month, Day
       integer, intent(OUT) :: Iret
     end subroutine
   end interface
@@ -16,8 +16,8 @@ module prms_utils
   end interface
 
   interface
-    module subroutine find_cbh_header_end(Iunit, Fname, Paramname, Iret, Cbh_flag, Cbh_binary_flag)
-      integer, intent(IN) :: Cbh_flag, Cbh_binary_flag
+    module subroutine find_cbh_header_end(Iunit, Fname, Paramname, Iret, Cbh_flag)
+      integer, intent(IN) :: Cbh_flag
       integer, intent(OUT) :: Iunit
       integer, intent(INOUT) :: Iret
       character(LEN=*), intent(IN) :: Fname, Paramname
