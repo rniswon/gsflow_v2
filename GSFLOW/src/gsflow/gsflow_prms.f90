@@ -1107,6 +1107,7 @@
       IF ( control_integer(Agriculture_canopy_flag, 'agriculture_canopy_flag')/=0 ) Agriculture_canopy_flag = OFF
       IF ( Agriculture_soilzone_flag==ACTIVE .AND. Agriculture_canopy_flag==ACTIVE ) &
      &     CALL error_stop('agriculture_soilzone_flag and agriculture_canopy_flag = 1, only one can be active', ERROR_control)
+      IF ( Agriculture_canopy_flag ) PRMS_land_iteration_flag  = 1
 
       IF ( control_integer(Agriculture_dprst_flag, 'agriculture_dprst_flag')/=0 ) Agriculture_dprst_flag = OFF
       IF ( Dprst_flag==OFF .AND. Agriculture_dprst_flag==ACTIVE ) &
