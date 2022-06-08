@@ -328,42 +328,25 @@
         ierr = basin()
         IF ( ierr/=0 ) CALL module_error('basin', Arg, ierr)
 
-        IF ( Call_cascade==ACTIVE ) THEN
-          ierr = cascade()
-          IF ( ierr/=0 ) CALL module_error('cascade', Arg, ierr)
-        ENDIF
+        IF ( Call_cascade==ACTIVE ) ierr = cascade()
 
         ierr = climateflow()
-        IF ( ierr/=0 ) CALL module_error('climateflow', Arg, ierr)
 
         ierr = soltab()
-        IF ( ierr/=0 ) CALL module_error('soltab', Arg, ierr)
 
         ierr = obs()
-        IF ( ierr/=0 ) CALL module_error('obs', Arg, ierr)
 
 !        ierr = setup()
-!        IF ( ierr/=0 ) CALL module_error('setup', Arg, ierr)
       ENDIF
 
     IF ( AFR ) THEN
       ierr = prms_time()
-      IF ( ierr/=0 ) CALL module_error('prms_time', Arg, ierr)
 
-      IF ( Water_use_flag==ACTIVE ) THEN
-        ierr = water_use_read()
-        IF ( ierr/=0 ) CALL module_error('water_use_read', Arg, ierr)
-      ENDIF
+      IF ( Water_use_flag==ACTIVE ) ierr = water_use_read()
 
-      IF ( Dynamic_flag==ACTIVE ) THEN
-        ierr = dynamic_param_read()
-        IF ( ierr/=0 ) CALL module_error('dynamic_param_read', Arg, ierr)
-      ENDIF
+      IF ( Dynamic_flag==ACTIVE ) ierr = dynamic_param_read()
 
-      IF ( Climate_hru_flag==ACTIVE ) THEN
-        ierr = climate_hru()
-        IF ( ierr/=0 ) CALL module_error('climate_hru', Arg, ierr)
-      ENDIF
+      IF ( Climate_hru_flag==ACTIVE ) ierr = climate_hru()
 
       IF ( Climate_temp_flag==OFF ) THEN
         IF ( Temp_combined_flag==ACTIVE ) THEN
@@ -377,7 +360,6 @@
         ELSE !IF ( Temp_flag==temp_map_module )
           CALL temp_map()
         ENDIF
-        IF ( ierr/=0 ) CALL module_error(Temp_module, Arg, ierr)
       ENDIF
 
       IF ( Climate_precip_flag==OFF ) THEN
@@ -386,7 +368,6 @@
         ELSEIF ( Precip_flag==precip_dist2_module ) THEN
           ierr = precip_dist2()
         ENDIF
-        IF ( ierr/=0 ) CALL module_error(Precip_module, Arg, ierr)
       ENDIF
 
       IF ( Model==CLIMATE ) THEN
@@ -399,7 +380,6 @@
 ! frost_date is a pre-process module
       IF ( Model==FROST ) THEN
         ierr = frost_date()
-        IF ( ierr/=0 ) CALL module_error('frost_date', Arg, ierr)
         IF ( Process_flag==RUN ) THEN
           CALL summary_output()
           RETURN
@@ -407,14 +387,14 @@
         IF ( Process_flag==CLEAN ) STOP
       ENDIF
 
+      IF ( Cloud_flag==ACTIVE ) CALL cloud_cover()
+
       IF ( Climate_swrad_flag==0 ) THEN
         IF ( Solrad_flag==ddsolrad_module ) THEN
           ierr = ddsolrad()
         ELSE !IF ( Solrad_flag==ccsolrad_module ) THEN
-          CALL cloud_cover()
           ierr = ccsolrad()
         ENDIF
-        IF ( ierr/=0 ) CALL module_error(Solrad_module, Arg, ierr)
       ENDIF
 
       IF ( Transp_flag==1 ) THEN
@@ -422,7 +402,6 @@
       ELSEIF ( Transp_flag==2 ) THEN
         ierr = transp_frost()
       ENDIF
-      IF ( ierr/=0 ) CALL module_error(Transp_module, Arg, ierr)
 
       IF ( Model==TRANSPIRE ) THEN
         IF ( Process_flag==RUN ) THEN
@@ -447,12 +426,10 @@
         ELSE !IF ( Et_flag==potet_hs_module ) THEN
           ierr = potet_hs()
         ENDIF
-        IF ( ierr/=0 ) CALL module_error(Et_module, Arg, ierr)
       ENDIF
 
       IF ( Model==WRITE_CLIMATE ) THEN
         ierr = write_climate_hru()
-        IF ( ierr/=0 ) CALL module_error('write_climate_hru', Arg, ierr)
         IF ( Process_flag==RUN ) RETURN
       ENDIF
 
@@ -465,17 +442,12 @@
 
       IF ( PRMS_land_iteration_flag==OFF .OR. PRMS_only==ACTIVE) THEN
         ierr = intcp()
-        IF ( ierr/=0 ) CALL module_error('intcp', Arg, ierr)
 
         IF ( no_snow_flag==OFF ) THEN
           ! rsr, need to do something if snow_cbh_flag=1
           ierr = snowcomp()
-          IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
 
-          IF ( Glacier_flag==ACTIVE ) THEN
-            ierr = glacr()
-            IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
-          ENDIF
+          IF ( Glacier_flag==ACTIVE ) ierr = glacr()
         ENDIF
 
         ierr = srunoff()
@@ -485,12 +457,11 @@
 ! for PRMS-only and MODSIM-PRMS simulations
       IF ( Model==PRMS .OR. Model==MODSIM_PRMS .OR. Model>=WRITE_CLIMATE ) THEN
 !        IF ( Model==MODSIM_PRMS ) CALL gsflow_modsim2prms(DIVERSIONS)
-        IF ( AG_flag==ACTIVE ) THEN
-          ierr = soilzone_ag(AFR, 1)
-        ELSE
+        IF ( AG_flag==OFF ) THEN
           ierr = soilzone(AFR, 1)
+        ELSE
+          ierr = soilzone_ag(AFR, 1)
         ENDIF
-        IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
         ! rsr, need to do something if gwflow_cbh_flag=1
         ierr = gwflow()
@@ -607,22 +578,15 @@
         IF ( Process_flag==0 .AND. .NOT.MS_GSF_converge ) RETURN
       ENDIF
 
-      IF ( MapOutON_OFF>OFF ) THEN
-        ierr = map_results()
-        IF ( ierr/=0 ) CALL module_error('map_results', Arg, ierr)
-      ENDIF
+      IF ( MapOutON_OFF>OFF ) ierr = map_results()
 
-      IF ( Subbasin_flag==ACTIVE ) THEN
-        ierr = subbasin()
-        IF ( ierr/=0 ) CALL module_error('subbasin', Arg, ierr)
-      ENDIF
+      IF ( Subbasin_flag==ACTIVE ) ierr = subbasin()
 
       CALL summary_output()
 
       IF ( CsvON_OFF>OFF .AND. PRMS_only==ACTIVE ) CALL prms_summary()
 
       IF ( Model==MODSIM_PRMS ) CALL gsflow_prms2modsim(EXCHANGE, DELTAVOL, LAKEVAP, agDemand)
-      IF ( ierr/=0 ) CALL module_error(MODNAME, Arg, ierr)
       IF ( Process_flag==RUN ) THEN
         RETURN
       ELSEIF ( Process_flag==CLEAN ) THEN
@@ -1038,12 +1002,14 @@
       ENDIF
 
       IF ( control_integer(Orad_flag, 'orad_flag')/=0 ) Orad_flag = OFF
+      Cloud_flag = OFF
       IF ( Solrad_module(:8)=='ddsolrad' ) THEN
         Solrad_flag = ddsolrad_module
       ELSEIF ( Solrad_module(:11)=='climate_hru' ) THEN
         Solrad_flag = climate_hru_module
         Climate_swrad_flag = ACTIVE
       ELSEIF ( Solrad_module(:8)=='ccsolrad' ) THEN
+        Cloud_flag = ACTIVE
         Solrad_flag = ccsolrad_module
       ELSE
         PRINT '(/,2A)', 'ERROR, invalid solrad_module value: ', Solrad_module
@@ -1107,7 +1073,7 @@
       IF ( control_integer(Agriculture_canopy_flag, 'agriculture_canopy_flag')/=0 ) Agriculture_canopy_flag = OFF
       IF ( Agriculture_soilzone_flag==ACTIVE .AND. Agriculture_canopy_flag==ACTIVE ) &
      &     CALL error_stop('agriculture_soilzone_flag and agriculture_canopy_flag = 1, only one can be active', ERROR_control)
-      IF ( Agriculture_canopy_flag ) PRMS_land_iteration_flag  = 1
+      IF ( Agriculture_canopy_flag==ACTIVE ) PRMS_land_iteration_flag  = 1
 
       IF ( control_integer(Agriculture_dprst_flag, 'agriculture_dprst_flag')/=0 ) Agriculture_dprst_flag = OFF
       IF ( Dprst_flag==OFF .AND. Agriculture_dprst_flag==ACTIVE ) &

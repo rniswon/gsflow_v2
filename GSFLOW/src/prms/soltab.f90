@@ -241,7 +241,7 @@
       EXTERNAL compute_t
 !     Functions
       DOUBLE PRECISION, EXTERNAL :: func3
-      INTRINSIC ASIN, SIN, COS, ATAN, ABS
+      INTRINSIC ASIN, SIN, COS, ATAN, ABS, SNGL
 !     Arguments
       INTEGER, INTENT(IN) :: Hru_type, Id
       DOUBLE PRECISION, INTENT(IN), DIMENSION(MAX_DAYS_PER_YEAR) :: Obliquity, Solar_declination
@@ -370,7 +370,7 @@
         IF ( sunh<DNEARZERO ) sunh = 0.0D0
         Sunhrs(jd) = sunh
         Soltab(jd) = solt
-        Sunset_angle(jd) = t3*PI_12
+        Sunset_angle(jd) = SNGL( t3*PI_12 )
 
       ENDDO
 
