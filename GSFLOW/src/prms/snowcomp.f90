@@ -680,7 +680,7 @@
 
       IF ( Glacier_flag==2 ) THEN
         IF ( Print_debug>DEBUG_minimum ) THEN
-          WRITE ( Buffer,'(2A)' ) 'Total volume of basin-wide snow-water equivalent, in 100 acre-feet for the first day of the month'
+          WRITE(Buffer,'(2A)')'Total volume of basin-wide snow-water equivalent, in 100 acre-feet for the first day of the month'
           CALL write_outfile(Buffer)
           WRITE ( Buffer, '(2A)' ) 'YEAR    OCT     NOV     DEC     JAN     FEB     MAR', &
                                    '     APR     MAY     JUN     JUL     AUG     SEP'
@@ -1175,8 +1175,8 @@
 ! the parameter groundmelt(nhru). Groundmelt is kept as a separate item
 ! from snowmelt and is saved and passed to soilzone
           Gmelt_to_soil(i) = 0.0
-          IF ( Groundmelt(i)>0.0 .AND. Pkwater_equiv(i)>0.0 ) THEN
-            diff = Pkwater_equiv(i) - Groundmelt(i)
+          IF ( Groundmelt(i)>0.0 .AND. Pkwater_equiv(i)>0.0D0 ) THEN
+            diff = SNGL( Pkwater_equiv(i) ) - Groundmelt(i)
             IF ( diff>0.0 ) THEN
               Pkwater_equiv(i) = diff
               diff = Pk_ice(i) - Groundmelt(i)
@@ -1188,7 +1188,7 @@
               ENDIF
               Gmelt_to_soil(i) = Groundmelt(i)
             ELSE
-              Gmelt_to_soil(i) = Pkwater_equiv(i)
+              Gmelt_to_soil(i) = SNGL( Pkwater_equiv(i) )
               Pkwater_equiv(i) = 0.0
             ENDIF
           ENDIF

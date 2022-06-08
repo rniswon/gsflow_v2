@@ -45,6 +45,9 @@
             DO K = 1, NMCL
               ihru = IRRROW_GW(K,IRWL)
               Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + WELLIRRPRMS(k,IRWL)*MFQ_to_inch_acres
+              if(Hru_ag_irr(ihru)>0.0)then
+                  print *, ihru, Hru_ag_irr(ihru)
+                  endif
             END DO
           END DO
 !
@@ -57,6 +60,9 @@
             DO K=1,NMCL
               ihru = IRRROW_SW(K,SGNM)
               Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + DIVERSIONIRRPRMS(k,SGNM)*MFQ_to_inch_acres
+                            if(Hru_ag_irr(ihru)>0.0)then
+                  print *, ihru, Hru_ag_irr(ihru)
+                  endif
             END DO
           END DO
 !
@@ -75,6 +81,9 @@
               DO k = 1, NUMCELLSPOND(i)
                 ihru = IRRHRU_POND(k, i)
                 Hru_ag_irr(ihru) = Hru_ag_irr(ihru) + PONDIRRPRMS(k, i)*MFQ_to_inch_acres
+                              if(Hru_ag_irr(ihru)>0.0)then
+                  print *, ihru, Hru_ag_irr(ihru)
+                  endif
               END DO
             END DO
           END IF

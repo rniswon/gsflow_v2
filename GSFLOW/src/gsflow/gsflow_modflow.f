@@ -648,22 +648,10 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
      2            Model==MODSIM_GSFLOW) ) THEN
               IF ( PRMS_land_iteration_flag==1 ) THEN
                 retval = intcp()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'intcp', retval
-                  RETURN
-                ENDIF
                 IF ( no_snow_flag==OFF ) THEN
                   retval = snowcomp()
-                  IF ( retval/=0 ) THEN
-                    PRINT 9001, 'snowcomp', retval
-                    RETURN
-                  ENDIF
                   IF ( Glacier_flag==ACTIVE ) THEN
                     retval = glacr()
-                    IF ( retval/=0 ) THEN
-                      PRINT 9001, 'glacr_melt', retval
-                      RETURN
-                    ENDIF
                   ENDIF
                 ENDIF
               ENDIF
@@ -684,10 +672,6 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                 RETURN
               ENDIF
               retval = gsflow_prms2mf()
-              IF ( retval.NE.0 ) THEN
-                PRINT 9001, 'gsflow_prms2mf', retval
-                RETURN
-              ENDIF
               Sziters = Sziters + 1
               Maxgziter = KKITER
               IF ( KKITER==Mxsziter ) Szcheck = OFF ! stop calling PRMS in iteration loop
@@ -707,21 +691,9 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF ( Szcheck==ACTIVE .AND. Model==MODSIM_GSFLOW ) THEN
               IF ( PRMS_land_iteration_flag==1 ) THEN
                 retval = intcp()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'intcp', retval
-                  RETURN
-                ENDIF
                 retval = snowcomp()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'snowcomp', retval
-                  RETURN
-                ENDIF
                 IF ( Glacier_flag==ACTIVE ) THEN
                   retval = glacr()
-                  IF ( retval/=0 ) THEN
-                    PRINT 9001, 'glacr_melt', retval
-                    RETURN
-                  ENDIF
                 ENDIF
               ENDIF
               IF ( PRMS_land_iteration_flag>0 ) THEN
@@ -741,10 +713,6 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                 RETURN
               ENDIF
               retval = gsflow_prms2mf()
-              IF ( retval.NE.0 ) THEN
-                PRINT 9001, 'gsflow_prms2mf', retval
-                RETURN
-              ENDIF
             END IF
             IF(IUNIT(50).GT.0) THEN
               IF (IUNIT(1).GT.0) THEN
@@ -834,13 +802,7 @@ C
 C7C2C---IF CONVERGENCE CRITERION HAS BEEN MET STOP ITERATING.
 C
             IF (ICNVG.EQ.1) GOTO 33
-            IF ( Szcheck==ACTIVE ) THEN
-              retval = gsflow_mf2prms()
-              IF ( retval.NE.0 ) THEN
-                PRINT 9001, 'gsflow_mf2prms', retval
-                RETURN
-              ENDIF
-            ENDIF
+            IF ( Szcheck==ACTIVE ) retval = gsflow_mf2prms()
 !  30      CONTINUE
           END DO
           KITER = MXITER
