@@ -1710,7 +1710,7 @@
       ! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: command_line_args
       ! Local Variabales
-      INTEGER :: i, nc
+      INTEGER :: nc
 !***********************************************************************
       nc = numchars(command_line_args)
       command_line = ' '
