@@ -322,6 +322,11 @@ agriculture_canopy_flag
 1
 1
 ####
+PRMS_land_iteration_flag
+1
+1
+1
+####
 executable_desc
 1
 4
@@ -331,3 +336,4 @@ executable_model
 1
 4
 ../../bin/gsflow_2.2.0.exe
+
