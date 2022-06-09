@@ -28,7 +28,7 @@ one                    1
 ====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 03/01/2022
+                       Version 5.3.0 06/02/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -41,7 +41,7 @@ one                    1
        Precip Dist: precip_1sta, precip_laps, precip_dist2,
                     climate_hru, precip_map
 Temp & Precip Dist: xyz_dist, ide_dist
-    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
 Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
                     potet_hs, potet_pt, potet_pm, potet_pm_sta
@@ -51,7 +51,7 @@ Snow & Glacr Dynam: snowcomp, glacr_melt
          Soil Zone: soilzone, soilzone_ag
        Groundwater: gwflow
 Streamflow Routing: strmflow, strmflow_in_out, muskingum,
-                    muskingum_lake, muskingum_mann
+                    muskingum_lake, muskingum_mann, segment_to_hru
 Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
@@ -65,9 +65,9 @@ Stream Temperature: stream_temp
         Process                    Module         Version Date
 ==============================================================
 PRMS Computation Order          gsflow_prms         2022-03-01
-Read Control File               read_control_file   2022-02-23
+Read Control File               read_control_file   2022-06-02
 Read Parameter File             read_parameter_file 2022-01-12
-Read Data File                  read_data_file      2022-01-12
+Read Data File                  read_data_file      2022-06-02
 
 
 ====================================================================
@@ -209,7 +209,7 @@ Simulation time period: 1983/09/09 00:00:00 to 1983/09/15 00:00:00
 Basin Definition                basin               2022-05-25
 Cascading Flow                  cascade             2021-11-19
 Common States and Fluxes        climateflow         2022-05-25
-Potential Solar Radiation       soltab              2021-09-07
+Potential Solar Radiation       soltab              2022-03-29
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2022-04-21
 Temperature Distribution        temp_laps           2022-03-25
@@ -246,5 +246,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time    0 minutes 10.92 seconds
+Execution elapsed time    0 minutes 11.62 seconds
 

@@ -17,7 +17,6 @@
      &                       NUMIRRDIVERSIONSP, IRRSEG, DVRCH, DIVERSIONIRRPRMS, IRRROW_GW, &
      &                       NUMCELLSPOND, IRRHRU_POND, PONDIRRPRMS, PONDSEGFLOW, &
      &                       IRRPONDVAR, NUMIRRPOND
-      USE GSFMODFLOW, ONLY: KPER
       IMPLICIT NONE
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW to PRMS'
