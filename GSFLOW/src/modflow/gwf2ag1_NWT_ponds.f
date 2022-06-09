@@ -1984,7 +1984,7 @@
          END IF
          TEST = .TRUE.
          DO 200 IP = 1, NUMIRRPOND
-           IF ( POND(1,IP) == IRWL ) THEN
+           IF ( IRRPONDVAR(IP) == IRWL ) THEN
               TEST = .FALSE.
               IPOND = IP
               EXIT
