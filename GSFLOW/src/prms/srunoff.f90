@@ -1426,7 +1426,7 @@
       DOUBLE PRECISION, INTENT(OUT) :: Dprst_sroff_hru, Dprst_seep_hru
 ! Local Variables
       REAL :: inflow, dprst_avail_et
-      REAL :: dprst_srp, dprst_sri
+      REAL :: dprst_srp, dprst_sri, inflow_ag
       REAL :: dprst_srp_open, dprst_srp_clos, dprst_sri_open, dprst_sri_clos
       REAL :: frac_op_ar, frac_cl_ar, open_vol_r, clos_vol_r, unsatisfied_et
       REAL :: tmp, dprst_evap_open, dprst_evap_clos
@@ -1462,11 +1462,12 @@
       IF ( Dprst_add_water_use==ACTIVE ) THEN
         IF ( Dprst_gain(Ihru)>0.0 ) inflow = inflow + Dprst_gain(Ihru) / SNGL( Cfs_conv )
       ENDIF
-      IF ( Ag_package==ACTIVE ) inflow = inflow + Dprst_ag_gain(Ihru) / Hruarea ! again and transfer in acre-inches
+      inflow_ag = 0.0
+      IF ( Ag_package==ACTIVE ) inflow_ag = Dprst_ag_gain(Ihru) ! again and transfer in acre-inches
 
       Dprst_in = 0.0D0
       IF ( Dprst_area_open_max>0.0 ) THEN
-        Dprst_in = DBLE( inflow*Dprst_area_open_max ) ! acre-inches
+        Dprst_in = DBLE( inflow*Dprst_area_open_max + inflow_ag) ! acre-inches
         Dprst_vol_open = Dprst_vol_open + Dprst_in
       ENDIF
       open_in = Dprst_in
