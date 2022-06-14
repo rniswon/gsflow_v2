@@ -11,7 +11,7 @@
       use PRMS_READ_PARAM_FILE, only: declparam, check_parameters, getparam_int, getparam_real, &
                                       read_parameter_file_dimens, read_parameter_file_params, setup_params
       use PRMS_SET_TIME, only: prms_time
-      use prms_utils, only: error_stop, module_error, numchars, print_module, PRMS_open_output_file, read_error
+      use prms_utils, only: error_stop, numchars, print_module, PRMS_open_output_file, read_error
       USE GWFSFRMODULE, ONLY: NSS
       USE GWFLAKMODULE, ONLY: NLAKES
       IMPLICIT NONE
@@ -136,7 +136,6 @@
             RETURN
           END IF
           ierr = gsfdecl()
-          IF ( ierr/=0 ) CALL module_error('gsfdecl', Arg, ierr)
         ENDIF
 
         IF ( Print_debug>DEBUG_minimum ) THEN
@@ -326,7 +325,6 @@
 ! All modules must be called for setdims, declare, initialize, and cleanup
       IF ( Process_flag/=RUN .AND. PRMS_flag==ACTIVE ) THEN
         ierr = basin()
-        IF ( ierr/=0 ) CALL module_error('basin', Arg, ierr)
 
         IF ( Call_cascade==ACTIVE ) ierr = cascade()
 
@@ -451,7 +449,6 @@
         ENDIF
 
         ierr = srunoff()
-        IF ( ierr/=0 ) CALL module_error(Srunoff_module, Arg, ierr)
       ENDIF
 
 ! for PRMS-only and MODSIM-PRMS simulations
@@ -465,14 +462,9 @@
 
         ! rsr, need to do something if gwflow_cbh_flag=1
         ierr = gwflow()
-        IF ( ierr/=0 ) CALL module_error('gwflow', Arg, ierr)
 
         IF ( Model==PRMS ) THEN
-          IF ( Stream_order_flag==ACTIVE ) THEN
-            ierr = routing()
-            IF ( ierr/=0 ) CALL module_error('routing', Arg, ierr)
-            IF ( seg2hru_flag==ACTIVE ) CALL segment_to_hru()
-          ENDIF
+          IF ( Stream_order_flag==ACTIVE ) ierr = routing()
 
           IF ( Strmflow_flag==strmflow_noroute_module ) THEN
             ierr = strmflow()
@@ -483,14 +475,12 @@
           ELSEIF ( Strmflow_flag==strmflow_muskingum_lake_module ) THEN
             ierr = muskingum_lake()
           ENDIF
-          IF ( ierr/=0 ) CALL module_error(Strmflow_module, Arg, ierr)
+
+          IF ( seg2hru_flag==ACTIVE ) CALL segment_to_hru()
 
           IF ( Stream_temp_flag==ACTIVE ) ierr = stream_temp()
 
-          IF ( Print_debug>DEBUG_minimum ) THEN
-            ierr = basin_sum()
-            IF ( ierr/=0 ) CALL module_error('basin_sum', Arg, ierr)
-          ENDIF
+          IF ( Print_debug>DEBUG_minimum ) ierr = basin_sum()
 
           IF ( Print_debug==DEBUG_WB ) CALL water_balance()
 
@@ -518,20 +508,16 @@
 ! only call for declare, initialize, and cleanup.
           IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
             ierr = intcp()
-            IF ( ierr/=0 ) CALL module_error('intcp', Arg, ierr)
 
             IF ( no_snow_flag==OFF ) THEN
               ! rsr, need to do something if snow_cbh_flag=1
               ierr = snowcomp()
-              IF ( ierr/=0 ) CALL module_error('snowcomp', Arg, ierr)
 
               IF ( Glacier_flag==ACTIVE ) THEN
                 ierr = glacr()
-                IF ( ierr/=0 ) CALL module_error('glacr', Arg, ierr)
               ENDIF
             ENDIF
             ierr = srunoff()
-            IF ( ierr/=0 ) CALL module_error(Srunoff_module, Arg, ierr)
           ENDIF
 
           IF ( AG_flag==ACTIVE ) THEN
@@ -539,13 +525,10 @@
           ELSE
             ierr = soilzone(AFR, 1)
           ENDIF
-          IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
           ierr = gsflow_prms2mf()
-          IF ( ierr/=0 ) CALL module_error('gsflow_prms2mf', Arg, ierr)
 
           ierr = gsflow_mf2prms()
-          IF ( ierr/=0 ) CALL module_error('gsflow_mf2prms', Arg, ierr)
         ENDIF
 
         IF ( MS_GSF_converge .OR. Process_flag/=RUN .OR. Model==GSFLOW ) THEN
@@ -553,10 +536,8 @@
           IF ( Process_flag==RUN ) CALL MFNWT_OCBUDGET()
 
           ierr = gsflow_budget()
-          IF ( ierr/=0 ) CALL module_error('gsflow_budget', Arg, ierr)
 
           ierr = gsflow_sum()
-          IF ( ierr/=0 ) CALL module_error('gsflow_sum', Arg, ierr)
         ENDIF
       ENDIF
 
@@ -567,11 +548,9 @@
         ELSE
           ierr = soilzone(AFR,1)
         ENDIF
-        IF ( ierr/=0 ) CALL module_error(Soilzone_module, Arg, ierr)
 
         ! rsr, need to do something if gwflow_cbh_flag=1
         ierr = gwflow()
-        IF ( ierr/=0 ) CALL module_error('gwflow', Arg, ierr)
       ENDIF
 
       IF ( Model==MODSIM_GSFLOW ) THEN
@@ -655,7 +634,7 @@
       use PRMS_CONTROL_FILE, only: get_control_arguments, read_control_file, control_integer, control_integer_array, control_string !, control_file_name
       USE PRMS_MODULE
       use PRMS_READ_PARAM_FILE, only: decldim, declfix, read_parameter_file_dimens, setup_dimens
-      use prms_utils, only: compute_julday, error_stop, module_error, PRMS_open_input_file, PRMS_open_output_file, read_error
+      use prms_utils, only: compute_julday, error_stop, PRMS_open_input_file, PRMS_open_output_file, read_error
       USE GLOBAL, ONLY: NSTP, NPER, ISSFLG
       IMPLICIT NONE
 ! Arguments
@@ -809,7 +788,6 @@
         mf_timestep = 1
         mf_nowtime = startday
         test = gsfdecl()
-        IF ( test/=0 ) CALL module_error(MODNAME, 'declare', test)
         CALL MFNWT_INIT(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold, agDemand)
         PRINT *, ' '
         IF ( Model==MODSIM_MODFLOW ) RETURN
