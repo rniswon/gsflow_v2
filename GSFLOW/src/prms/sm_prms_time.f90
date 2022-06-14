@@ -5,10 +5,10 @@ contains
 !***********************************************************************
   integer module function prms_time()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, YEAR, MONTH, DAY, HOUR, MINUTE, MAX_DAYS_PER_YEAR, DAYS_PER_YEAR, &
-     &    ACTIVE, OFF, NORTHERN, FT2_PER_ACRE, SECS_PER_HOUR, INCHES_PER_FOOT, SECS_PER_DAY, ERROR_time
+     &    ACTIVE, OFF, NORTHERN, FT2_PER_ACRE, SECS_PER_HOUR, INCHES_PER_FOOT, SECS_PER_DAY, ERROR_time, DEBUG_WB
       use PRMS_MMFAPI, only: dattim, deltim
       USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime, Nowyear, Nowmonth, Nowday, Dprst_flag, &
-                             GSFLOW_flag, PRMS_land_iteration_flag, AG_flag, Ag_gravity_flag
+                             GSFLOW_flag, PRMS_land_iteration_flag, AG_flag, Ag_gravity_flag, Print_debug
       USE PRMS_BASIN, ONLY: Hemisphere, Basin_area_inv
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Pkwater_equiv, Hru_intcpstor, &
                                Ssres_stor, Slow_stor, Pref_flow_stor, Basin_intcp_stor, Basin_ssstor, &
@@ -55,13 +55,13 @@ contains
           It0_slow_stor = Slow_stor
           It0_pref_flow_stor = Pref_flow_stor
           It0_pkwater_equiv = Pkwater_equiv
-          It0_imperv_stor = Imperv_stor
-          It0_hru_impervstor = Hru_impervstor
-          It0_hru_intcpstor = Hru_intcpstor
           IF ( GSFLOW_flag==ACTIVE ) It0_gravity_stor_res = Gravity_stor_res
+          IF ( GSFLOW_flag==ACTIVE .OR. Print_debug==DEBUG_WB ) It0_hru_impervstor = Hru_impervstor
+          IF ( PRMS_land_iteration_flag==ACTIVE .OR. Print_debug==DEBUG_WB ) It0_hru_intcpstor = Hru_intcpstor
           IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
             It0_intcp_transp_on = Intcp_transp_on
             It0_intcp_stor = Intcp_stor
+            It0_imperv_stor = Imperv_stor
           ENDIF
           IF ( Dprst_flag==ACTIVE ) THEN
             It0_dprst_vol_open = Dprst_vol_open

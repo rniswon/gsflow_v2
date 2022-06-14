@@ -650,7 +650,7 @@
 !******if cascading flow available from upslope cascades
 !****** add soil excess (Dunnian flow) to infiltration
         ! infil for pervious portion of HRU
-        ! infil_ag for pervious and agriculture portion of HRU
+        ! infil_ag for agriculture portion of HRU
         capwater_maxin = Infil(i)
 
         IF ( Agriculture_soilzone_flag==ACTIVE ) THEN
@@ -787,6 +787,7 @@
 !              Ag_water_maxin(i) = ag_water_maxin
               Basin_ag_waterin = Basin_ag_waterin + DBLE( ag_water_maxin*harea )
               Soil_to_gw(i) = Soil_to_gw(i) + Ag_soil_to_gw(i)
+              Soil_to_ssr(i) = Soil_to_ssr(i) + Ag_soil_to_gvr(i)
             ENDIF
           ENDIF
           Basin_soil_to_gw = Basin_soil_to_gw + DBLE( Soil_to_gw(i)*harea )
@@ -1246,7 +1247,7 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
       USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug, Dprst_flag, Print_debug, Ag_gravity_flag
       USE PRMS_FLOWVARS, ONLY: Gravity_stor_res, Ag_gvr_stor
       USE PRMS_SOILZONE, ONLY: Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, Gw2sm_grav, Gvr_hru_pct_adjusted
-      USE PRMS_SOILZONE_AG, ONLY: Ag_gvr2gw_rate, Ag_gvr2gw_exp, Ag_slowcoef_lin, Ag_Slowcoef_sq, Ag_interflow
+!      USE PRMS_SOILZONE_AG, ONLY: Ag_gvr2gw_rate, Ag_gvr2gw_exp, Ag_slowcoef_lin, Ag_Slowcoef_sq, Ag_interflow
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
       IMPLICIT NONE
 ! Functions
@@ -1262,8 +1263,8 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
       DOUBLE PRECISION, INTENT(OUT) :: Gwin
 ! Local Variables
       INTEGER :: j, igvr
-      REAL :: perc, slowflow, extra_water, gvrin_actual, depth, input, input_sm, input_ag, depth_ag, perc_ag
-      DOUBLE PRECISION :: topfr, slflow, togw, slowstor, frac, aginterflow, ag_gvrstor
+      REAL :: perc, slowflow, extra_water, gvrin_actual, depth, input !, input_sm, input_ag, depth_ag, perc_ag
+      DOUBLE PRECISION :: topfr, slflow, togw, slowstor, frac !, aginterflow, ag_gvrstor
 !***********************************************************************
       !Capacity is for whole HRU
       !Soil_to_gw is for whole HRU
@@ -1280,28 +1281,28 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
       slflow = 0.0D0
       togw = 0.0D0
       slowstor = 0.0D0
-      aginterflow = 0.0D0
-      ag_gvrstor = 0.0D0
-      depth_ag = 0.0
+      !aginterflow = 0.0D0
+      !ag_gvrstor = 0.0D0
+      !depth_ag = 0.0
       DO j = 1, Hru_gvr_count(Ihru)
         igvr = Hru_gvr_index(j, Ihru)
         frac = Gvr_hru_pct_adjusted(igvr)
         Gwin = Gwin + DBLE( Gw2sm_grav(igvr) )*frac
-        IF ( Ag_gravity_flag==OFF ) THEN
+        !IF ( Ag_gravity_flag==OFF ) THEN
           input = Gvr_maxin + Gw2sm_grav(igvr)
           depth = Gravity_stor_res(igvr) + input
           IF ( depth>0.0 ) THEN
             IF ( Capacity>0.0 ) CALL check_gvr_sm(Capacity, depth, frac, Gvr2sm, input)
             IF ( Ag_capacity>0.0 ) CALL check_gvr_sm(Ag_capacity, depth, frac, Ag_gvr_to_sm, input)
           ENDIF
-        ELSE
-          input_sm = Gvr_maxin + Gw2sm_grav(igvr)
-          input_ag = Ag_gvr_maxin + Gw2sm_grav(igvr)
-          depth = Gravity_stor_res(igvr) + input_sm
-          IF ( depth>0.0 .AND. Capacity>0.0 ) CALL check_gvr_sm(Capacity, depth, frac, Gvr2sm, input_sm)
-          depth_ag = Ag_gvr_stor(Ihru) + input_ag
-          IF ( depth_ag>0.0 .AND. Ag_capacity>0.0 ) CALL check_gvr_sm(Ag_capacity, depth_ag, frac, Ag_gvr_to_sm, input_ag)
-        ENDIF
+        !ELSE
+        !  input_sm = Gvr_maxin + Gw2sm_grav(igvr)
+        !  input_ag = Ag_gvr_maxin + Gw2sm_grav(igvr)
+        !  depth = Gravity_stor_res(igvr) + input_sm
+        !  IF ( depth>0.0 .AND. Capacity>0.0 ) CALL check_gvr_sm(Capacity, depth, frac, Gvr2sm, input_sm)
+        !  depth_ag = Ag_gvr_stor(Ihru) + input_ag
+        !  IF ( depth_ag>0.0 .AND. Ag_capacity>0.0 ) CALL check_gvr_sm(Ag_capacity, depth_ag, frac, Ag_gvr_to_sm, input_ag)
+        !ENDIF
 
         IF ( Compute_lateral==ACTIVE ) THEN
           extra_water = MAX( 0.0, depth-Pref_flow_thrsh )
@@ -1313,30 +1314,31 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
             ! compute contribution to slow interflow, if any
             IF ( depth>0.0 ) THEN
               CALL compute_interflow(Slowcoef_lin, Slowcoef_sq, gvrin_actual, depth, slowflow)
-              IF ( Ag_gravity_flag==ACTIVE ) slowflow = slowflow * Gvr_non_ag_frac
+              !IF ( Ag_gravity_flag==ACTIVE ) slowflow = slowflow * Gvr_non_ag_frac
               slflow = slflow + DBLE( slowflow )*frac
             ENDIF
           ENDIF
-          IF ( Ag_gravity_flag==ACTIVE ) THEN
-            extra_water = MAX( 0.0, depth_ag - Pref_flow_thrsh )
-            IF ( extra_water>0.0 ) THEN
-              !compute contribution to preferential-flow reservoir storage
-              topfr = topfr + DBLE( extra_water )*frac
-              depth_ag = Pref_flow_thrsh
-              gvrin_actual = MAX( 0.0, input_ag - extra_water )
-            ENDIF
-            ! compute contribution to slow interflow from AG GVR, if any
-            IF ( depth_ag>0.0 ) THEN
-              CALL compute_interflow(Ag_slowcoef_lin(Ihru), Ag_slowcoef_sq(Ihru), gvrin_actual, depth_ag, Ag_interflow(Ihru))
-              slowflow = Ag_interflow(Ihru) * Agfrac
-              slflow = slflow + DBLE( slowflow )*frac
-            ENDIF
-          ENDIF
+          !IF ( Ag_gravity_flag==ACTIVE ) THEN
+          !  extra_water = MAX( 0.0, depth_ag - Pref_flow_thrsh )
+          !  IF ( extra_water>0.0 ) THEN
+          !    !compute contribution to preferential-flow reservoir storage
+          !    topfr = topfr + DBLE( extra_water )*frac
+          !    depth_ag = Pref_flow_thrsh
+          !    gvrin_actual = MAX( 0.0, input_ag - extra_water )
+          !  ENDIF
+          !  ! compute contribution to slow interflow from AG GVR, if any
+          !  IF ( depth_ag>0.0 ) THEN
+          !      print *, Ag_gravity_flag, depth_ag
+          !    CALL compute_interflow(Ag_slowcoef_lin(Ihru), Ag_slowcoef_sq(Ihru), gvrin_actual, depth_ag, Ag_interflow(Ihru))
+          !    slowflow = Ag_interflow(Ihru) * Agfrac
+          !    slflow = slflow + DBLE( slowflow )*frac
+          !  ENDIF
+          !ENDIF
         ENDIF
 
 ! compute flow to groundwater, if any
         perc = 0.0
-        perc_ag = 0.0
+!        perc_ag = 0.0
         IF ( depth>0.0 ) THEN
           IF ( Ssr2gw_rate>0.0 ) THEN
 ! use VKS instead of rate  ???????????????
@@ -1348,31 +1350,33 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
             ENDIF
             depth = depth - perc
           ENDIF
+          Sm2gw_grav(igvr) = perc
+          togw = togw + DBLE( perc )*frac
 !        ELSE ! GVRs can go negative if flux change in MODFLOW final iteration decreases, so don't set to 0
 !          if(depth<0.0) print *, 'depth<0', depth, ihru
 !          depth = 0.0
         ENDIF
 
 ! compute flow to groundwater from AG GVR, if any
-        IF ( depth_ag>0.0 ) THEN
-          IF ( Ag_gvr2gw_rate(Ihru)>0.0 ) THEN
-            perc_ag = Ag_gvr2gw_rate(Ihru) * (depth_ag**Ag_gvr2gw_exp(Ihru))
-            IF ( perc_ag<0.0 ) THEN
-              perc_ag = 0.0
-            ELSEIF ( perc_ag>depth_ag ) THEN
-              perc_ag = depth_ag
-            ENDIF
-            depth_ag = depth_ag - perc_ag
-            perc_ag = perc_ag * Agfrac
-            perc = perc * Gvr_non_ag_frac
-            togw = togw + DBLE( perc )*frac
-          ENDIF
-        ENDIF
-        togw = togw + DBLE( perc + perc_ag )*frac
-        Sm2gw_grav(igvr) = perc + perc_ag
+        !IF ( depth_ag>0.0 ) THEN
+        !  IF ( Ag_gvr2gw_rate(Ihru)>0.0 ) THEN
+        !    perc_ag = Ag_gvr2gw_rate(Ihru) * (depth_ag**Ag_gvr2gw_exp(Ihru))
+        !    IF ( perc_ag<0.0 ) THEN
+        !      perc_ag = 0.0
+        !    ELSEIF ( perc_ag>depth_ag ) THEN
+        !      perc_ag = depth_ag
+        !    ENDIF
+        !    depth_ag = depth_ag - perc_ag
+        !    perc_ag = perc_ag * Agfrac
+        !    perc = perc * Gvr_non_ag_frac
+        !    togw = togw + DBLE( perc )*frac
+        !  ENDIF
+        !ENDIF
+        !togw = togw + DBLE( perc + perc_ag )*frac
+        !Sm2gw_grav(igvr) = perc + perc_ag
         Gravity_stor_res(igvr) = depth
         slowstor = slowstor + DBLE(depth)*frac
-        ag_gvrstor = ag_gvrstor + DBLE(depth_ag)*frac
+        !ag_gvrstor = ag_gvrstor + DBLE(depth_ag)*frac
 
 ! add any direct recharge from soil infiltration
         Sm2gw_grav(igvr) = Sm2gw_grav(igvr) + Soil_to_gw
@@ -1388,7 +1392,7 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
         IF ( Print_debug>DEBUG_less .AND. Compute_lateral==ACTIVE ) &
      &       PRINT *, 'slow_stor > thrsh', Slow_stor, Pref_flow_thrsh, ' HRU:', Ihru
       ENDIF
-      IF ( Ag_gravity_flag==ACTIVE ) Ag_gvr_stor(Ihru) = SNGL( ag_gvrstor )
+!      IF ( Ag_gravity_flag==ACTIVE ) Ag_gvr_stor(Ihru) = SNGL( ag_gvrstor )
 
       END SUBROUTINE compute_gravflow_ag
 
