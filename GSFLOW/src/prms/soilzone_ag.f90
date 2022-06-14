@@ -464,12 +464,12 @@
       INTEGER :: i, k, update_potet, compute_lateral, j, igvr, perv_on_flag
       REAL :: dunnianflw, interflow, perv_area, harea
       REAL :: dnslowflow, dnpreflow, dndunn, availh2o, avail_potet, hruactet, ag_hruactet
-      REAL :: topfr !, depth, tmp
+      REAL :: gvr_maxin, topfr !, depth, tmp
       REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
       REAL :: ag_upflow_max, ag_capacity, excess, agfrac, ag_avail_potet, ag_potet
       REAL :: ag_AETtarget, ag_avail_targetAET, cap_ag_water_maxin, agactet
-      REAL :: perv_frac, capwater_maxin, ssresin
+      REAL :: perv_frac, capwater_maxin, ssresin, upflow_max
       REAL :: topfr_sm, topfr_ag, availh2o_sm, availh2o_ag, capacity, gvrin_ag
       DOUBLE PRECISION :: gwin !, frac
       INTEGER :: cfgi_frozen_hru
@@ -502,12 +502,15 @@
 ! ***************************************
 
       IF ( Soil_iter>1 .OR. Kkiter>1 .OR. .NOT.(AFR) ) THEN ! Kkiter>1 means GSFLOW is active
-        Soil_moist = It0_soil_moist
-        Soil_rechr = It0_soil_rechr
-        Ssres_stor = It0_ssres_stor
-        Slow_stor = It0_slow_stor
-        IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
-        IF ( Nlake>0 ) Potet = It0_potet
+        DO k = 1, Active_hrus
+          i = Hru_route_order(k)
+          Soil_moist(i) = It0_soil_moist(i)
+          Soil_rechr(i) = It0_soil_rechr(i)
+          Ssres_stor(i) = It0_ssres_stor(i)
+          Slow_stor(i) = It0_slow_stor(i)
+          IF ( Pref_flag==ACTIVE ) Pref_flow_stor(i) = It0_pref_flow_stor(i)
+          IF ( Nlake>0 ) Potet(i) = It0_potet(i)
+        ENDDO
         IF ( GSFLOW_flag==ACTIVE ) Gravity_stor_res = It0_gravity_stor_res
       ENDIF
       IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
@@ -617,12 +620,6 @@
         perv_frac = Hru_frac_perv(i)
         perv_on_flag = OFF
         IF ( perv_area>0.0 ) perv_on_flag = ACTIVE
-        ag_water_maxin = 0.0
-        ag_on_flag = OFF
-        IF ( Ag_area(i)>0.0 ) THEN
-          ag_on_flag = ACTIVE
-          ag_water_maxin = Infil_ag(i)
-        ENDIF
 
         avail_potet = Potet(i) - hruactet
         IF ( avail_potet<-CLOSEZERO ) THEN
@@ -653,6 +650,12 @@
         ! infil_ag for agriculture portion of HRU
         capwater_maxin = Infil(i)
 
+        ag_water_maxin = 0.0
+        ag_on_flag = OFF
+        IF ( Ag_area(i)>0.0 ) THEN
+          ag_on_flag = ACTIVE
+          ag_water_maxin = Infil_ag(i)
+        ENDIF
         IF ( Agriculture_soilzone_flag==ACTIVE ) THEN
           IF ( Hru_ag_irr(i)>0.0 ) THEN ! Hru_ag_irr is in acre-inches over ag area
             IF ( ag_on_flag==OFF ) THEN
@@ -671,7 +674,6 @@
 !            ag_water_maxin = ag_water_maxin + HRU_diversion(i) / Ag_area(i)
 !          ENDIF
         ENDIF
-        IF ( Iter_aet_flag==ACTIVE ) ag_water_maxin = ag_water_maxin + Ag_irrigation_add(i) ! units of inches over Ag_area
         IF ( Soilzone_add_water_use==ACTIVE ) THEN
           IF ( Soilzone_gain(i)>0.0 ) THEN
             IF ( perv_on_flag==OFF ) THEN
@@ -685,6 +687,7 @@
         ENDIF
         IF ( ag_on_flag==ACTIVE ) THEN
           Ag_soilwater_deficit(i) = Ag_soil_moist_max(i) - Ag_soil_moist(i)
+          IF ( Iter_aet_flag==ACTIVE ) ag_water_maxin = ag_water_maxin + Ag_irrigation_add(i) ! units of inches over Ag_area
           excess = MAX( 0.0, ag_water_maxin + Ag_soil_moist(i) - Ag_soil_moist_max(i) )
           IF ( excess>0.0 ) THEN
             Ag_hortonian(i) = excess
@@ -720,7 +723,7 @@
             capwater_maxin = capwater_maxin - pref_flow_maxin
             pref_flow_maxin = pref_flow_maxin*perv_frac
           ENDIF
-          IF ( ag_water_maxin>0.0 .AND. ag_on_flag==ACTIVE ) THEN
+          IF ( ag_water_maxin>0.0 ) THEN
             pref_flow_maxin = ag_water_maxin*Pref_flow_infil_frac(i)
             ag_water_maxin = ag_water_maxin - pref_flow_maxin
             pref_flow_maxin = pref_flow_maxin*agfrac
@@ -744,15 +747,16 @@
         ENDIF
 
         IF ( Cascade_flag>CASCADE_OFF ) THEN
+          upflow_max = SNGL( Upslope_dunnianflow(i)+Upslope_interflow(i) )
           IF ( perv_on_flag==ACTIVE ) THEN
-            cap_upflow_max = SNGL(Upslope_dunnianflow(i)+Upslope_interflow(i))/perv_frac
+            cap_upflow_max = upflow_max * perv_frac / (perv_frac + agfrac)
             capwater_maxin = capwater_maxin + cap_upflow_max
             Basin_cap_up_max = Basin_cap_up_max + DBLE( cap_upflow_max*perv_area )
           ENDIF
           IF ( ag_on_flag==ACTIVE ) THEN
-            ag_upflow_max = SNGL(Upslope_dunnianflow(i)+Upslope_interflow(i))/agfrac
-            Basin_ag_up_max = Basin_ag_up_max + ag_upflow_max*Ag_area(i)
+            ag_upflow_max = upflow_max * agfrac / (perv_frac + agfrac)
             ag_water_maxin = ag_water_maxin + ag_upflow_max
+            Basin_ag_up_max = Basin_ag_up_max + DBLE( ag_upflow_max*Ag_area(i) )
           ENDIF
         ENDIF
         IF ( perv_on_flag==ACTIVE ) THEN
@@ -761,6 +765,7 @@
         ENDIF
 
 !******Add infiltration to soil and compute excess
+        gvr_maxin = 0.0
         Cap_waterin(i) = capwater_maxin
 
         IF ( cfgi_frozen_hru==OFF ) THEN
@@ -768,7 +773,7 @@
             ! call even if capwater_maxin = 0, just in case soil_moist now > Soil_moist_max
             IF ( capwater_maxin+Soil_moist(i)>0.0 ) THEN
               CALL compute_soilmoist(Cap_waterin(i), Soil_moist_max(i), &
-     &                               Soil_rechr_max(i), Soil2gw_max(i), Soil_to_ssr(i), &
+     &                               Soil_rechr_max(i), Soil2gw_max(i), gvr_maxin, &
      &                               Soil_moist(i), Soil_rechr(i), Soil_to_gw(i), perv_frac)
               Cap_waterin(i) = Cap_waterin(i)*perv_frac
               Basin_capwaterin = Basin_capwaterin + DBLE( Cap_waterin(i)*harea )
@@ -787,11 +792,12 @@
 !              Ag_water_maxin(i) = ag_water_maxin
               Basin_ag_waterin = Basin_ag_waterin + DBLE( ag_water_maxin*harea )
               Soil_to_gw(i) = Soil_to_gw(i) + Ag_soil_to_gw(i)
-              Soil_to_ssr(i) = Soil_to_ssr(i) + Ag_soil_to_gvr(i)
+              gvr_maxin = gvr_maxin + Ag_soil_to_gvr(i)
             ENDIF
           ENDIF
           Basin_soil_to_gw = Basin_soil_to_gw + DBLE( Soil_to_gw(i)*harea )
-          Basin_sm2gvr_max = Basin_sm2gvr_max + DBLE( (Soil_to_ssr(i) + Ag_soil_to_gvr(i)) * harea )
+          Basin_sm2gvr_max = Basin_sm2gvr_max + DBLE( gvr_maxin*harea )
+          Soil_to_ssr(i) = gvr_maxin
         ENDIF
 
 ! compute slow interflow and ssr_to_gw
@@ -803,7 +809,7 @@
           capacity = (Soil_moist_max(i) - Soil_moist(i))*perv_frac
           CALL compute_gravflow_ag(i, capacity, Slowcoef_lin(i), &
      &                             Slowcoef_sq(i), Ssr2gw_rate(i), Ssr2gw_exp(i), &
-     &                             Soil_to_ssr(i), Pref_flow_thrsh(i), topfr, &
+     &                             gvr_maxin, Pref_flow_thrsh(i), topfr, &
      &                             Ssr_to_gw(i), Slow_flow(i), Slow_stor(i), &
      &                             Gvr2sm(i), Soil_to_gw(i), gwin, compute_lateral, &
      &                             ag_capacity, Ag_soil_to_gvr(i), Ag_gvr_to_sm(i), agfrac, Gvr_non_ag_frac(i))
@@ -843,19 +849,20 @@
           Basin_sz_gwin = Basin_sz_gwin + gwin*Hru_area_dble(i)
         ELSE
           IF ( Ag_gravity_flag==OFF ) THEN
-            availh2o = Slow_stor(i) + Soil_to_ssr(i) + Ag_soil_to_gvr(i)
+            availh2o = Slow_stor(i) + gvr_maxin
             IF ( compute_lateral==ACTIVE ) THEN
               topfr = MAX( 0.0, availh2o-Pref_flow_thrsh(i) )
-              ssresin = Soil_to_ssr(i) - topfr
+              ssresin = gvr_maxin - topfr
               Slow_stor(i) = availh2o - topfr
               ! compute slow contribution to interflow, if any
               IF ( Slow_stor(i)>0.0 ) &
-     &             CALL compute_interflow(Slowcoef_lin(i), Slowcoef_sq(i), ssresin, Slow_stor(i), Slow_flow(i))
+     &             CALL compute_interflow(Slowcoef_lin(i), Slowcoef_sq(i), &
+     &                                    ssresin, Slow_stor(i), Slow_flow(i))
             ELSEIF ( Hru_type(i)==SWALE ) THEN
               Slow_stor(i) = availh2o
             ENDIF
           ELSE
-            availh2o_sm = Slow_stor(i) + Soil_to_ssr(i)
+            availh2o_sm = Slow_stor(i) + Soil_to_ssr(i)   ! need to fix to fraction
             availh2o_ag = Ag_gvr_stor(i) + Ag_soil_to_gvr(i)
             IF ( compute_lateral==ACTIVE ) THEN
               topfr_sm = MAX( 0.0, availh2o_sm-Pref_flow_thrsh(i) )
@@ -874,8 +881,7 @@
               Slow_stor(i) = availh2o_sm
               Ag_gvr_stor(i) = availh2o_ag
             ENDIF
-print *, Ag_gvr_stor(i), Ag_interflow(i)
-          ENDIF
+            print *, Ag_gvr_stor(i), Ag_interflow(i)
 !          IF ( ag_on_flag==ACTIVE ) THEN
 !            IF ( Slow_stor(i)>0.0 .AND. ag_capacity>0.0 ) THEN
 !              frac = 1.0D0
@@ -889,14 +895,14 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
 !                Basin_ag_gvr2sm = Basin_ag_gvr2sm + DBLE( Ag_gvr_to_sm(i)*harea )
 !              ENDIF
 !            ENDIF
-!          ENDIF
+          ENDIF
           IF ( Slow_stor(i)>0.0 .AND. Ssr2gw_rate(i)>0.0 ) &
      &         CALL compute_gwflow(Ssr2gw_rate(i), Ssr2gw_exp(i), Ssr_to_gw(i), Slow_stor(i))
-          IF ( Ag_gravity_flag==ACTIVE ) THEN
-            IF ( Ag_gvr_stor(i)>0.0 .AND. Ag_gvr2gw_rate(i)>0.0 ) &
-     &           CALL compute_gwflow(Ssr2gw_rate(i), Ssr2gw_exp(i), Ag_gvr_to_gw(i), Ag_gvr_stor(i))
-            Ssr_to_gw(i) = Ssr_to_gw(i)*Gvr_non_ag_frac(i) + Ag_gvr_to_gw(i)*agfrac
-          ENDIF
+!          IF ( Ag_gravity_flag==ACTIVE ) THEN
+!            IF ( Ag_gvr_stor(i)>0.0 .AND. Ag_gvr2gw_rate(i)>0.0 ) &
+!     &           CALL compute_gwflow(Ssr2gw_rate(i), Ssr2gw_exp(i), Ag_gvr_to_gw(i), Ag_gvr_stor(i))
+!            Ssr_to_gw(i) = Ssr_to_gw(i)*Gvr_non_ag_frac(i) + Ag_gvr_to_gw(i)*agfrac
+!          ENDIF
         ENDIF
 
         ! compute contribution to Dunnian flow from PFR, if any
@@ -1034,11 +1040,11 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
 ! if HRU cascades,
 ! compute interflow and excess flow to each HRU or stream
         IF ( compute_lateral==ACTIVE ) THEN
-          IF ( Ag_gravity_flag==OFF ) THEN
+!          IF ( Ag_gravity_flag==OFF ) THEN
             interflow = Slow_flow(i) + prefflow
-          ELSE
-            interflow = Slow_flow(i) * Gvr_non_ag_frac(i) + prefflow + Ag_interflow(i) * agfrac
-          ENDIF
+!          ELSE
+!            interflow = Slow_flow(i) * Gvr_non_ag_frac(i) + prefflow + Ag_interflow(i) * agfrac
+!          ENDIF
           Basin_interflow_max = Basin_interflow_max + interflow*harea
           dunnianflw = dunnianflw_gvr + dunnianflw_pfr
           Dunnian_flow(i) = dunnianflw
@@ -1349,9 +1355,9 @@ print *, Ag_gvr_stor(i), Ag_interflow(i)
               perc = depth
             ENDIF
             depth = depth - perc
+            Sm2gw_grav(igvr) = perc
+            togw = togw + DBLE( perc )*frac
           ENDIF
-          Sm2gw_grav(igvr) = perc
-          togw = togw + DBLE( perc )*frac
 !        ELSE ! GVRs can go negative if flux change in MODFLOW final iteration decreases, so don't set to 0
 !          if(depth<0.0) print *, 'depth<0', depth, ihru
 !          depth = 0.0
