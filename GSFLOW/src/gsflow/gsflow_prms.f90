@@ -1049,6 +1049,11 @@
       ! these are for GSFLOW5 with AG package ACTIVE
       IF ( control_integer(Agriculture_soilzone_flag, 'agriculture_soilzone_flag')/=0 ) Agriculture_Soilzone_flag = OFF
       IF ( control_integer(Agriculture_canopy_flag, 'agriculture_canopy_flag')/=0 ) Agriculture_canopy_flag = OFF
+      IF ( PRMS_only==ACTIVE ) THEN
+        Agriculture_soilzone_flag = OFF
+        Agriculture_canopy_flag = OFF
+        Agriculture_dprst_flag = OFF
+      ENDIF
       IF ( Agriculture_soilzone_flag==ACTIVE .AND. Agriculture_canopy_flag==ACTIVE ) &
      &     CALL error_stop('agriculture_soilzone_flag and agriculture_canopy_flag = 1, only one can be active', ERROR_control)
       IF ( Agriculture_canopy_flag==ACTIVE ) PRMS_land_iteration_flag  = 1
