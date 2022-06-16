@@ -64,7 +64,7 @@
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, Iter_aet_flag, text_restart_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag, no_snow_flag
       INTEGER, SAVE :: Agriculture_dprst_flag, Agriculture_soilzone_flag, Agriculture_canopy_flag 
-      INTEGER, SAVE :: Dyn_ag_frac_flag, Dyn_ag_soil_flag, Ag_gravity_flag, seg2hru_flag
+      INTEGER, SAVE :: Dyn_ag_frac_flag, Dyn_ag_soil_flag, seg2hru_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF, outputSelectDatesON_OFF, snow_cloudcover_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName

@@ -71,13 +71,13 @@
       INTEGER, SAVE, ALLOCATABLE :: Pptmix_nopack(:)
       ! soilzone
       DOUBLE PRECISION, SAVE :: Basin_ssflow, Basin_soil_to_gw, Basin_actet, Basin_lakeevap
-      DOUBLE PRECISION, SAVE :: Basin_swale_et, Basin_perv_et, Basin_sroff, Basin_ag_gvr_stor
+      DOUBLE PRECISION, SAVE :: Basin_swale_et, Basin_perv_et, Basin_sroff
       DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor, Basin_ag_soil_moist, Basin_ag_soil_rechr
       REAL, SAVE, ALLOCATABLE :: Hru_actet(:), gsflow_ag_actet(:), Soil_moist(:), Ag_soil_moist(:), Ag_soil_rechr(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_ssr(:), Ssres_in(:)
       REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:)
-      REAL, SAVE, ALLOCATABLE :: Ag_gvr_stor(:), Gravity_stor_res(:)
+      REAL, SAVE, ALLOCATABLE :: Gravity_stor_res(:)
       REAL, SAVE, ALLOCATABLE :: Ssres_stor(:), Ssres_flow(:), Soil_rechr(:), Ag_soil_rechr_max(:)
       ! srunoff
       REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:)
@@ -111,15 +111,14 @@ module PRMS_IT0_VARS
        IMPLICIT NONE
 !   Global Variables
        DOUBLE PRECISION, SAVE :: It0_basin_intcp_stor, It0_basin_gwstor, It0_basin_ssstor, It0_basin_soil_moist
-       DOUBLE PRECISION, SAVE :: It0_basin_ag_gvr_stor, It0_basin_ag_soil_moist, It0_basin_ag_soil_rechr
+       DOUBLE PRECISION, SAVE :: It0_basin_ag_soil_moist, It0_basin_ag_soil_rechr
        INTEGER, SAVE, ALLOCATABLE :: It0_intcp_transp_on(:)
        DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_dprst_vol_open(:), It0_dprst_vol_clos(:), It0_dprst_stor_hru(:)
        REAL, SAVE, ALLOCATABLE :: It0_soil_moist(:), It0_soil_rechr(:), It0_imperv_stor(:), It0_hru_impervstor(:)
        REAL, SAVE, ALLOCATABLE :: It0_slow_stor(:), It0_pref_flow_stor(:), It0_ssres_stor(:)
        REAL, SAVE, ALLOCATABLE :: It0_intcp_stor(:), It0_gravity_stor_res(:)
        DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:)
-       REAL, SAVE, ALLOCATABLE :: It0_ag_soil_moist(:), It0_ag_soil_rechr(:), It0_ag_gvr_stor(:)
-       REAL, SAVE, ALLOCATABLE :: It0_hru_intcpstor(:)
+       REAL, SAVE, ALLOCATABLE :: It0_ag_soil_moist(:), It0_ag_soil_rechr(:), It0_hru_intcpstor(:)
 end module PRMS_IT0_VARS
 
 !***********************************************************************
@@ -162,7 +161,7 @@ end module PRMS_IT0_VARS
      &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, no_snow_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, &
-     &    AG_flag, PRMS_land_iteration_flag, Ag_gravity_flag
+     &    AG_flag, PRMS_land_iteration_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       USE PRMS_IT0_VARS
@@ -1030,12 +1029,6 @@ end module PRMS_IT0_VARS
      &       'Initial fraction of available water in the soil agriculture reservoir'// &
      &       ' (fraction of ag_soil_moist_max for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_soil_moist_init_frac')
-      ENDIF
-      IF ( Ag_gravity_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-        ALLOCATE ( Ag_gvr_stor(Nhru), It0_ag_gvr_stor(Nhru) )
-        CALL declvar_real(Soilzone_module, 'ag_gvr_stor', 'nhru', Nhru, &
-     &       'Storage in the agriculture gravity reservoir of the agriculture fraction of each HRU', &
-     &       'inches', Ag_gvr_stor)
       ENDIF
 
       END FUNCTION climateflow_decl

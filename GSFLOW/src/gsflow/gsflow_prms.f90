@@ -1082,7 +1082,6 @@
       IF ( decldim('nmap', 0, MAXDIM, 'Number of mapped values')/=0 ) CALL read_error(7, 'nmap')
       IF ( control_integer(Glacier_flag, 'glacier_flag')/=0 ) Glacier_flag = OFF
       IF ( control_integer(no_snow_flag, 'no_snow_flag')/=0 ) no_snow_flag = OFF
-      IF ( control_integer(ag_gravity_flag, 'ag_gravity_flag')/=0 ) Ag_gravity_flag = OFF
       IF ( control_integer(Frozen_flag, 'frozen_flag')/=0 ) Frozen_flag = OFF
       IF ( control_integer(Dyn_imperv_flag, 'dyn_imperv_flag')/=0 ) Dyn_imperv_flag = OFF
       IF ( control_integer(Dyn_intcp_flag, 'dyn_intcp_flag')/=0 ) Dyn_intcp_flag = OFF

@@ -159,10 +159,10 @@
      &    Basin_lakeevap, Sroff, Hru_actet, Pkwater_equiv, Gwres_stor, Dprst_vol_open, Dprst_vol_clos, Basin_sroff, &
      &    Snowmelt, Snow_evap, Snowcov_area, Pptmix_nopack, Glacrb_melt, Basin_pweqv, Basin_snowmelt, Basin_snowevap, &
      &    Dprst_stor_hru, Hru_impervstor, Hru_intcpstor, Pref_flow_stor, Basin_gwstor, Intcp_stor, Basin_intcp_stor, &
-     &    Basin_snowcov, Ag_soil_moist
+     &    Basin_snowcov, Ag_soil_moist, Basin_ag_soil_moist
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_pkwater_equiv, It0_ssres_stor, It0_basin_soil_moist, &
                                It0_basin_ssstor, It0_basin_gwstor, It0_dprst_stor_hru, It0_hru_impervstor, &
-                               It0_basin_intcp_stor, It0_hru_intcpstor, It0_ag_soil_moist
+                               It0_basin_intcp_stor, It0_hru_intcpstor, It0_ag_soil_moist, It0_basin_ag_soil_moist
       USE PRMS_SET_TIME, ONLY: Nowtime
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_INTCP, ONLY: Basin_net_ppt, Basin_intcp_evap, Basin_changeover, &
@@ -185,7 +185,8 @@
      &    Basin_dncascadeflow, Basin_capwaterin, Basin_sm2gvr, Basin_prefflow, Basin_slstor, Basin_gvr2pfr, &
      &    Hru_sz_cascadeflow, Pfr_dunnian_flow, Grav_dunnian_flow, Basin_dndunnianflow, &
      &    Soil_moist_tot
-      USE PRMS_SOILZONE_AG, ONLY: Ag_cap_infil_tot, hru_ag_actet
+      USE PRMS_SOILZONE_AG, ONLY: Ag_cap_infil_tot, hru_ag_actet, perv_soil_to_gvr, perv_soil_to_gw, &
+     &    Basin_perv_to_gw, Basin_ag_actet
       USE PRMS_GWFLOW, ONLY: Basin_dnflow, Basin_gwsink, Basin_gwstor_minarea_wb, Gwres_flow, &
      &    Basin_gwflow, Basin_gw_upslope, Basin_gwin, Gwres_sink, Hru_gw_cascadeflow, Gw_upslope, &
      &    Gwminarea_flag, Gwstor_minarea_wb, Gwin_dprst, Gwres_in
@@ -322,13 +323,18 @@
         last_sm = It0_soil_moist(i)
         last_ss = It0_ssres_stor(i)
 
-        soilbal = (last_sm - Soil_moist(i) - Perv_actet(i))*perv_frac &
-     &            - Soil_to_ssr(i) - Soil_to_gw(i) + Cap_infil_tot(i)
+        soilbal = (last_sm - Soil_moist(i) - Perv_actet(i))*perv_frac + Cap_infil_tot(i)
+        IF ( Ag_flag == ACTIVE ) THEN
+          soilbal = soilbal - perv_soil_to_gvr(i) - perv_soil_to_gw(i)
+        ELSE 
+          soilbal = soilbal - Soil_to_ssr(i) - Soil_to_gw(i)
+        ENDIF
         IF ( ABS(soilbal)>TOOSMALL ) THEN
           WRITE ( BALUNT, * ) 'HRU capillary problem'
           WRITE ( BALUNT, * ) soilbal, Cap_infil_tot(i), last_sm, Soil_moist(i), Perv_actet(i), Soil_to_ssr(i), &
      &                        Soil_to_gw(i), i, Infil(i), Pref_flow_infil(i), perv_frac, &
      &                        Soil_moist_max(i), Cap_waterin(i), gmelt
+          IF ( Ag_flag == ACTIVE ) WRITE ( BALUNT, * ) 'pervious for ag', perv_soil_to_gvr(i), perv_soil_to_gw(i)
           IF ( Cascade_flag>CASCADE_OFF ) WRITE ( BALUNT, * ) 'UP cascade', Upslope_interflow(i), Upslope_dunnianflow(i)
         ENDIF
         gvrbal = last_ss - Ssres_stor(i) + Soil_to_ssr(i) - Ssr_to_gw(i) - Swale_actet(i) - Dunnian_flow(i) &
@@ -405,7 +411,7 @@
           WRITE ( BALUNT, * ) 'storage', Soil_moist_tot(i), Hru_intcpstor(i), Gwres_stor(i), &
                               Pkwater_equiv(i), Hru_impervstor(i), Hru_storage_ante(i), Hru_storage(i)
           WRITE ( BALUNT, * ) 'fractions', perv_frac, Dprst_frac(i), Hru_percent_imperv(i)
-          IF ( Ag_flag==ACTIVE ) WRITE ( BALUNT, * ) 'ag', Ag_soil_moist(i), Ag_frac(i)
+          IF ( Ag_flag==ACTIVE ) WRITE ( BALUNT, * ) 'ag', Ag_soil_moist(i), Ag_frac(i), perv_frac+ Dprst_frac(i)+ Hru_percent_imperv(i)+ Ag_frac(i)
           IF ( Cascade_flag>CASCADE_OFF ) WRITE ( BALUNT, * ) 'cascade', &
                Hru_sz_cascadeflow(i), Upslope_dunnianflow(i), Upslope_interflow(i), &
                Upslope_hortonian(i), Hru_hortn_cascflow(i)
@@ -483,7 +489,7 @@
 
 ! soilzone
       Basin_capillary_wb = It0_basin_soil_moist - Basin_soil_moist - &
-     &                     Basin_perv_et - Basin_sm2gvr_max + Basin_cap_infil_tot - Basin_soil_to_gw
+     &                     Basin_perv_et - Basin_sm2gvr_max + Basin_cap_infil_tot
       Basin_gravity_wb = It0_basin_ssstor - Basin_ssstor + Basin_sm2gvr - Basin_dncascadeflow - &
      &                   Basin_ssflow - Basin_sz2gw - Basin_dunnian + Basin_dunnian_pfr - &
      &                   Basin_swale_et + Basin_pref_flow_infil
@@ -493,6 +499,13 @@
      &                    Basin_soil_to_gw - Basin_ssflow - Basin_dunnian - &
      &                    Basin_lakeinsz
 
+      IF ( Ag_flag == ACTIVE ) THEN
+        Basin_capillary_wb = Basin_capillary_wb - Basin_perv_to_gw
+        Basin_soilzone_wb = Basin_soilzone_wb + It0_basin_ag_soil_moist - Basin_ag_soil_moist - Basin_ag_actet
+      ELSE
+        Basin_capillary_wb = Basin_capillary_wb - Basin_soil_to_gw
+      ENDIF
+
       IF ( DABS(Basin_gravity_wb)>DTOOSMALL ) WRITE ( BALUNT, * ) 'basin gvrbal issue', Basin_gravity_wb, &
      &     It0_basin_ssstor, Basin_ssstor, Basin_sm2gvr, Basin_ssflow, Basin_sz2gw, Basin_dunnian, &
      &     Basin_swale_et, Basin_pref_flow_infil, Basin_dninterflow, Basin_pref_stor, &
@@ -501,16 +514,21 @@
       IF ( DABS(Basin_capillary_wb)>DTOOSMALL ) WRITE( BALUNT, * ) 'possible basin capillary balance issue', &
      &     Basin_capillary_wb, It0_basin_soil_moist, Basin_soil_moist, Basin_perv_et, &
      &     Basin_sm2gvr, Basin_cap_infil_tot, Basin_soil_to_gw, Basin_sm2gvr_max, Basin_capwaterin, Nowtime
-      IF ( DABS(Basin_soilzone_wb)>DTOOSMALL ) WRITE ( BALUNT, * ) 'possible basin soil zone rounding issue', &
+      IF ( DABS(Basin_soilzone_wb)>DTOOSMALL ) THEN
+        WRITE ( BALUNT, * ) 'possible basin soil zone rounding issue', &
      &     Basin_soilzone_wb, Basin_capwaterin, Basin_pref_flow_infil, Basin_infil, &
      &     It0_basin_ssstor, Basin_ssstor, It0_basin_soil_moist, Basin_soil_moist, Basin_perv_et, Basin_swale_et, &
      &     Basin_sz2gw, Basin_soil_to_gw, Basin_ssflow, Basin_dunnian, Basin_dncascadeflow, &
-     &     Basin_sm2gvr, Basin_lakeinsz, Basin_dunnian_pfr, Nowtime
+     &     Basin_sm2gvr, Basin_lakeinsz, Basin_dunnian_pfr
+           IF ( Ag_flag == ACTIVE ) WRITE ( BALUNT, * ) 'ag', It0_basin_ag_soil_moist, Basin_ag_soil_moist, Basin_ag_actet
+           WRITE ( BALUNT, * ) Nowtime
+      ENDIF
 
       soil_in = soil_in*Basin_area_inv
       basin_bal = basin_bal*Basin_area_inv
       bsmbal = It0_basin_soil_moist - Basin_soil_moist + It0_basin_ssstor - Basin_ssstor - Basin_perv_et - Basin_sz2gw + soil_in - &
      &         Basin_ssflow - Basin_soil_to_gw - Basin_dunnian - Basin_swale_et - Basin_lakeinsz
+      IF ( Ag_flag == ACTIVE ) bsmbal = bsmbal + It0_basin_ag_soil_moist - Basin_ag_soil_moist - Basin_ag_actet
 
       WRITE ( SZUNIT, 9002 ) Nowyear, Nowmonth, Nowday, basin_bal, &
      &        bsmbal, It0_basin_soil_moist, Basin_soil_moist, It0_basin_ssstor, &
