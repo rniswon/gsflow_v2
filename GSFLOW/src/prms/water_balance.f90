@@ -411,7 +411,8 @@
           WRITE ( BALUNT, * ) 'storage', Soil_moist_tot(i), Hru_intcpstor(i), Gwres_stor(i), &
                               Pkwater_equiv(i), Hru_impervstor(i), Hru_storage_ante(i), Hru_storage(i)
           WRITE ( BALUNT, * ) 'fractions', perv_frac, Dprst_frac(i), Hru_percent_imperv(i)
-          IF ( Ag_flag==ACTIVE ) WRITE ( BALUNT, * ) 'ag', Ag_soil_moist(i), Ag_frac(i), perv_frac+ Dprst_frac(i)+ Hru_percent_imperv(i)+ Ag_frac(i)
+          IF ( Ag_flag==ACTIVE ) WRITE ( BALUNT, * ) 'ag', Ag_soil_moist(i), Ag_frac(i), &
+      &        perv_frac + Dprst_frac(i) + Hru_percent_imperv(i) + Ag_frac(i)
           IF ( Cascade_flag>CASCADE_OFF ) WRITE ( BALUNT, * ) 'cascade', &
                Hru_sz_cascadeflow(i), Upslope_dunnianflow(i), Upslope_interflow(i), &
                Upslope_hortonian(i), Hru_hortn_cascflow(i)
