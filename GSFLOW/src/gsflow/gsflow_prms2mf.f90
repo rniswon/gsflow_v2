@@ -314,7 +314,7 @@
      &           PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
           ENDIF
           IF ( IUZFBND(icol, irow)==0 ) THEN
-            IF ( Hru_type(ihru)/=0 ) &
+            IF ( Hru_type(ihru)/=0 .AND. Hru_type(ihru)/=2 ) &
      &           PRINT *, 'WARNING, UZF cell inactive, irow:', irow, ' icell:', icell, ' HRU is active:', ihru
           ENDIF
         ENDIF

@@ -774,7 +774,7 @@
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
-     &    Lake_hru_id, Cov_type, Numlake_hrus, Hru_area_dble
+     &    Lake_hru_id, Cov_type, Numlake_hrus, Hru_area_dble, gsflow_ag_area
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Transp_on, Potet, Basin_potet
 ! WARNING!!! Sroff, Basin_sroff, and Strm_seg_in can be updated
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_actet, Hru_actet, Hru_intcpstor, &
@@ -942,7 +942,7 @@
 
         ag_water_maxin = 0.0
         IF ( Ag_package==ACTIVE ) THEN
-          IF ( Hru_ag_irr(i)>0.0 ) ag_water_maxin = Hru_ag_irr(i)/perv_area ! Hru_ag_irr is in acre-inches
+          IF ( Hru_ag_irr(i)>0.0 ) ag_water_maxin = Hru_ag_irr(i)/gsflow_ag_area(i) ! Hru_ag_irr is in acre-inches
         ENDIF
         IF ( Model == MODSIM_PRMS ) THEN
 !          IF ( Hru_diversion(i)>0.0 ) ag_water_maxin = ag_water_maxin + Hru_diversion(i) / perv_area

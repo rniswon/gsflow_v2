@@ -369,19 +369,14 @@
       ENDIF
 
       IF ( Model==CLIMATE ) THEN
-        IF ( Process_flag==RUN ) THEN
-          CALL summary_output()
-          RETURN
-        ENDIF
+        IF ( Process_flag==RUN ) RETURN
+        IF ( Process_flag==CLEAN ) STOP
       ENDIF
 
 ! frost_date is a pre-process module
       IF ( Model==FROST ) THEN
         ierr = frost_date()
-        IF ( Process_flag==RUN ) THEN
-          CALL summary_output()
-          RETURN
-        ENDIF
+        IF ( Process_flag==RUN ) RETURN
         IF ( Process_flag==CLEAN ) STOP
       ENDIF
 
@@ -406,6 +401,7 @@
           CALL summary_output()
           RETURN
         ENDIF
+        IF ( Process_flag==CLEAN ) STOP
       ENDIF
 
       IF ( Climate_potet_flag==OFF ) THEN
@@ -436,6 +432,7 @@
           CALL summary_output()
           RETURN
         ENDIF
+        IF ( Process_flag==CLEAN ) STOP
       ENDIF
 
       IF ( PRMS_land_iteration_flag==OFF .OR. PRMS_only==ACTIVE) THEN
