@@ -1021,13 +1021,13 @@ contains
   !***********************************************************************
   module subroutine get_control_arguments()
     use PRMS_CONSTANTS, only: DEBUG_less, MAXCMDLINE_LENGTH, ERROR_control
-    use PRMS_MODULE, only: Print_debug, EQULS, Starttime, Endtime
+    use PRMS_MODULE, only: Print_debug, EQULS, command_line
     use prms_utils, only: error_stop
     implicit none
     ! Functions
     intrinsic :: GET_COMMAND_ARGUMENT, COMMAND_ARGUMENT_COUNT, GET_COMMAND, trim
     ! Local Variables
-    character(LEN=MAXCMDLINE_LENGTH) command_line_arg, command_line
+    character(LEN=MAXCMDLINE_LENGTH) command_line_arg
     integer :: status, i, j, ii, nchars, numargs, index, param_type, num_param_values
     !***********************************************************************
     ! Subroutine GET_COMMAND_ARGUMENT may not be available with all compilers-it is a Fortran 2003 routine
@@ -1065,26 +1065,18 @@ contains
           end do
           if (index == 0) call error_stop('control parameter argument not found', ERROR_control)
           do j = 1, num_param_values
-
-            if (Control_parameter_data(index) % name(:10) == 'start_time' .or. &
-                Control_parameter_data(index) % name(:8) == 'end_time') then
-              do ii = 1, num_param_values
-                i = i + 1
-                call GET_COMMAND_ARGUMENT(i, command_line_arg, nchars, status)
-                read (command_line_arg, *, IOSTAT=status) Control_parameter_data(index) % values_int(ii)
-              enddo
-              if (Control_parameter_data(index) % name(:10) == 'start_time') &
-                  Starttime = Control_parameter_data(index) % values_int
-              if (Control_parameter_data(index) % name(:8) == 'end_time') &
-                  Endtime = Control_parameter_data(index) % values_int
-              exit
-            end if
-
             i = i + 1
             call GET_COMMAND_ARGUMENT(i, command_line_arg, nchars, status)
             if (status /= 0) call error_stop('bad value after -set argument', ERROR_control)
             if (Print_debug > -1) print *, 'PRMS command line argument,', i, ': ', trim(command_line_arg)
             if (param_type == 1) then
+              if (Control_parameter_data(index) % name(:10) == 'start_time' .or. &
+                  Control_parameter_data(index) % name(:8) == 'end_time') then
+                read (command_line_arg, *, IOSTAT=status) &
+                  (Control_parameter_data(index) % values_int(ii), ii=1, num_param_values)
+                !                  print *, 'values ', Control_parameter_data(index)%values_int
+                exit
+              end if
               read (command_line_arg, *, IOSTAT=status) Control_parameter_data(index) % values_int(j)
               if (status /= 0) call error_stop('reading integer command line argument', ERROR_control)
             elseif (param_type == 4) then
