@@ -280,7 +280,7 @@
      &    INACTIVE, LAKE, SWALE, FEET, ERROR_basin, DEBUG_minimum, ERROR_param, &
      &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, MONTHS_PER_YEAR !, METERS2FEET
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, &
+      USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, Agriculture_canopy_flag, Soilzone_module, &
      &    Dprst_flag, Lake_route_flag, PRMS4_flag, GSFLOW_flag, Frozen_flag, PRMS_VERSION, &
      &    Starttime, Endtime, Parameter_check_flag, AG_flag, Ag_package
       USE PRMS_BASIN
@@ -529,12 +529,15 @@
       IF ( Ag_package==ACTIVE ) THEN
         ALLOCATE ( gsflow_ag_area(Nhru) )
         ALLOCATE ( gsflow_ag_frac(Nhru) )
-        IF ( AG_flag==ACTIVE ) THEN
-            gsflow_ag_area = Hru_perv
-            gsflow_ag_frac = Hru_frac_perv
-        ELSE
-            gsflow_ag_area = Hru_area
+        IF ( Agriculture_canopy_flag==ACTIVE ) THEN
+            gsflow_ag_area = Hru_area ! apply irrigation to canopy, which adjusts for covden
             gsflow_ag_frac = 1.0
+        ELSEIF ( Soilzone_module(:11) == 'soilzone_ag' ) THEN
+            gsflow_ag_area = Ag_area ! apply irrigation to ag area in soilzone_ag module
+            gsflow_ag_frac = Ag_frac
+        ELSE
+            gsflow_ag_area = Hru_perv ! apply irrigation to pervious area in soilzone module
+            gsflow_ag_frac = Hru_frac_perv
         ENDIF
       ENDIF
 

@@ -572,8 +572,11 @@
               PRINT *, 'ag_frac=0.0 for HRU:', i, nowyear, nowmonth, nowday
               CALL error_stop('AG Package irrigation specified and ag_frac=0.0', ERROR_param)
             ENDIF
-            !if ( Hru_ag_irr(i) / gsflow_ag_area(i) > 2.0 ) print *, 'hru_ag_irr/agarea > 2.0, hru:', i, Hru_ag_irr(i) / gsflow_ag_area(i)
-            ag_water_maxin = ag_water_maxin + Hru_ag_irr(i) / gsflow_ag_area(i)
+            if ( gsflow_ag_area(i)>0.0 ) then
+              if ( Hru_ag_irr(i) / gsflow_ag_area(i) > 2.0 ) &
+                   print *, 'hru_ag_irr/agarea > 2.0, hru:', i, Hru_ag_irr(i) / gsflow_ag_area(i)
+              ag_water_maxin = ag_water_maxin + Hru_ag_irr(i) / gsflow_ag_area(i)
+            endif
           ENDIF
         ENDIF
 
