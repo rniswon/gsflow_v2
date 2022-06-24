@@ -3624,13 +3624,15 @@ C
        END IF
 C 
 C32-----SAVE ET RATES TO UNFORMATTED FILE FOR UZF OR MODFLOW BUDGET ITEMS.
-      IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
-          IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, txthold, IUZFCB1, 
-     +                                BUFF, NCOL, NROW, NLAY, IOUT)
-          IF ( ibduzf.GT.0 ) CALL UBDSV3(Kkstp, Kkper, txthold,  
-     +                               IUZFCB2, BUFF, LAYNUM, NUZTOP,
-     +                               NCOL, NROW, NLAY, IOUT, DELT,  
-     +                               PERTIM, TOTIM, IBOUND)
+      IF(IETFLG.NE.0) THEN
+        IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
+            IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, txthold, IUZFCB1, 
+     +                                  BUFF, NCOL, NROW, NLAY, IOUT)
+            IF ( ibduzf.GT.0 ) CALL UBDSV3(Kkstp, Kkper, txthold,  
+     +                                 IUZFCB2, BUFF, LAYNUM, NUZTOP,
+     +                                 NCOL, NROW, NLAY, IOUT, DELT,  
+     +                                 PERTIM, TOTIM, IBOUND)
+        END IF
       END IF
 C
 C33-----UPDATE RATES AND BUFFERS WITH GW ET FOR MODFLOW BUDGET ITEMS.
