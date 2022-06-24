@@ -354,7 +354,7 @@
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
-     &    Lake_hru_id, Cov_type, Numlake_hrus, Hru_area_dble, Ag_frac, Ag_area, Ag_cov_type
+     &    Lake_hru_id, Cov_type, Numlake_hrus, Hru_area_dble, Ag_frac, Ag_area, Ag_cov_type, gsflow_ag_area
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Transp_on, Potet, Basin_potet, Basin_transp_on
 ! WARNING!!! Sroff, Basin_sroff, and Strm_seg_in can be updated
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_actet, Hru_actet, Hru_intcpstor, &
@@ -568,11 +568,15 @@
 
         IF ( Agriculture_soilzone_flag==ACTIVE ) THEN
           IF ( Hru_ag_irr(i)>0.0 ) THEN ! Hru_ag_irr is in acre-inches over ag area
-            IF ( ag_on_flag==OFF ) THEN
-              PRINT *, 'ag_frac=0.0 for HRU:', i
+            IF ( .not.(gsflow_ag_area(i))>0.0 ) THEN
+              PRINT *, 'ag_frac=0.0 for HRU:', i, nowyear, nowmonth, nowday
               CALL error_stop('AG Package irrigation specified and ag_frac=0.0', ERROR_param)
             ENDIF
-            ag_water_maxin = ag_water_maxin + Hru_ag_irr(i) / agarea
+            if ( gsflow_ag_area(i)>0.0 ) then
+              if ( Hru_ag_irr(i) / gsflow_ag_area(i) > 2.0 ) &
+                   print *, 'hru_ag_irr/agarea > 2.0, hru:', i, Hru_ag_irr(i) / gsflow_ag_area(i)
+              ag_water_maxin = ag_water_maxin + Hru_ag_irr(i) / gsflow_ag_area(i)
+            endif
           ENDIF
         ENDIF
 
