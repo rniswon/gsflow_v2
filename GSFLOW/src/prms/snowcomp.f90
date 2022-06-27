@@ -113,7 +113,7 @@
 !     glacr_freeh2o_cap, glacier_frac_init, groundmelt. glacr_layer
 !***********************************************************************
       INTEGER FUNCTION snodecl()
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, MONTHS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, MONTHS_PER_YEAR, CANOPY
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Model, Nhru, Ndepl, &
@@ -126,7 +126,7 @@
 
       CALL print_module(MODDESC, MODNAME, Version_snowcomp)
 
-      IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+      IF ( PRMS_land_iteration_flag==CANOPY ) THEN
         ALLOCATE ( It0_snowcov_area(Nhru), It0_snowcov_areasv(Nhru) )
         ALLOCATE ( It0_albedo(Nhru), It0_pk_depth(Nhru), It0_iasw(Nhru), It0_pst(Nhru) )
         ALLOCATE ( It0_pksv(Nhru), It0_scrv(Nhru), It0_pk_temp(Nhru), It0_pss(Nhru) )
@@ -868,7 +868,7 @@
 !***********************************************************************
       INTEGER FUNCTION snorun()
       USE PRMS_CONSTANTS, ONLY: LAKE, LAND, GLACIER, SHRUBS, FEET, &
-     &    INCH2M, FEET2METERS, DNEARZERO, ACTIVE, OFF, DEBUG_less, DAYS_YR, DEBUG_minimum
+     &    INCH2M, FEET2METERS, DNEARZERO, ACTIVE, OFF, DEBUG_less, DAYS_YR, DEBUG_minimum, CANOPY
       USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag, Start_year, Hru_type, &
      &    PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Nowday, Albedo_cbh_flag, snow_cloudcover_flag
       USE PRMS_SNOW
@@ -896,7 +896,7 @@
 !***********************************************************************
       snorun = 0
 
-      IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+      IF ( PRMS_land_iteration_flag==CANOPY ) THEN
         IF ( Kkiter>1 ) THEN
           Pkwater_equiv = It0_pkwater_equiv
           Snowcov_area = It0_snowcov_area

@@ -634,9 +634,9 @@
       srunoffrun = 0
 
 ! It0 variables used with MODFLOW integration and PRMS iteration to save states.
-      IF ( PRMS_land_iteration_flag==ACTIVE .OR. Ag_Package==ACTIVE ) THEN
+      IF ( PRMS_land_iteration_flag>0 .OR. Ag_Package==ACTIVE ) THEN
         IF ( Kkiter>1 ) THEN
-          IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+          IF ( PRMS_land_iteration_flag>0 ) THEN
             Imperv_stor = It0_imperv_stor
             Soil_moist = It0_soil_moist
             Soil_rechr = It0_soil_rechr

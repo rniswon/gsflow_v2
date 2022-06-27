@@ -153,7 +153,7 @@ end module PRMS_IT0_VARS
      &    potet_pt_module, potet_pm_module, potet_pm_sta_module, climate_hru_module, &
      &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
      &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
-     &    ddsolrad_module, ccsolrad_module
+     &    ddsolrad_module, ccsolrad_module, CANOPY
       use PRMS_MMFAPI, only: declvar_int, declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, Nhrucell, &
@@ -365,7 +365,7 @@ end module PRMS_IT0_VARS
       ENDIF
 
       ALLOCATE ( Intcp_transp_on(Nhru) )
-      IF ( PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_intcp_transp_on(Nhru), It0_intcp_stor(Nhru) )
+      IF ( PRMS_land_iteration_flag==CANOPY ) ALLOCATE ( It0_intcp_transp_on(Nhru), It0_intcp_stor(Nhru) )
       ALLOCATE ( Intcp_stor(Nhru) )
       CALL declvar_real(MODNAME, 'intcp_stor', 'nhru', Nhru, &
      &     'Interception storage in canopy for cover density for each HRU', &
