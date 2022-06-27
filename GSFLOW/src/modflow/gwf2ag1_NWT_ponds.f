@@ -1156,15 +1156,15 @@
      +                                     trim(adjustl(char3))
                   exit
                 case default
+                  IF (L > Numirrpond) THEN
+                    WRITE (IOUT, *)
+                    WRITE (IOUT, *) 'ERROR: Number of ponds in POND '
+     +                    ,'LIST is greater than Numirrpond',
+     +                      ' MODEL STOPPING.'
+                    WRITE (IOUT, *)
+                    CALL USTOP('ERROR: Too many ponds in list')
+                  END IF
                   IF (NUMTABPOND .EQ. 0) THEN
-                    IF (L > Numirrpond) THEN
-                      WRITE (IOUT, *)
-                      WRITE (IOUT, *) 'ERROR: Number of ponds in POND '
-     +                        ,'LIST is greater than Numirrpond',
-     +                        ' MODEL STOPPING.'
-                      WRITE (IOUT, *)
-                      CALL USTOP('ERROR: Too many ponds in list')
-                    END IF
                     LLOC = 1 
                     CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IPOND, R,
      +                           IOUT, IN)
@@ -3389,13 +3389,13 @@
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
 
-        if(iseg==516)then
-        etdif = pettotal - aettotal
-          write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
-     +                 SUPACT(iseg),etdif,RMSESW(ISEG),zerod2*pettotal,
-     +                 AGCONVERGE
-        endif
-  33  format(4i5,6e20.10,i5)
+  !      if(iseg==516)then
+  !      etdif = pettotal - aettotal
+  !        write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
+  !   +                 SUPACT(iseg),etdif,RMSESW(ISEG),zerod2*pettotal,
+  !   +                 AGCONVERGE
+  !      endif
+  !33  format(4i5,6e20.10,i5)
 300   continue
       return
       end subroutine demandconjunctive_prms
@@ -3845,7 +3845,7 @@
       USE GLOBAL, ONLY: DELR, DELC, ISSFLG
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id,
-     +    Agriculture_dprst_flag
+     +    dprst_flag
       USE PRMS_BASIN, ONLY: gsflow_ag_area, gsflow_ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet, Dprst_vol_open
@@ -3902,7 +3902,7 @@
                 Q = PONDSEGFLOW(I)
                 QQ = PONDFLOW(I)
                 QQQ = 0.0
-                if ( Agriculture_dprst_flag == 1 )   !uncommment this and next line
+                if ( dprst_flag == 1 )   !uncommment this and next line
      +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
                 CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
      +                          Q, QQ, QQQ)
@@ -3947,7 +3947,7 @@
            QQ = QQ + PONDFLOW(I)
            hru_id = IRRPONDVAR(I)
            sub = DZERO
-           if ( Agriculture_dprst_flag == 1 ) then    !uncomment this and next 4 lines
+           if ( dprst_flag == 1 ) then    !uncomment this and next 4 lines
              if ( ISSFLG(kkper) == 0 ) sub = 
      +            Dprst_vol_open(hru_id)/MFQ_to_inch_acres
              if ( sub < DZERO ) sub = DZERO

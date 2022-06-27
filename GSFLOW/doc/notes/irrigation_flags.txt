@@ -1,0 +1,27 @@
+
+PRMS_land_iteration_flag (can be used with and without AG Package)
+         0 only soilzone in iteration loop
+		 1 intcp, snowcomp, srunoff, soilzone in iteration loop
+		 2 srunoff and soilzone in iteration loop
+		 3 srunoff and soilzone with dprst in iteration loop
+		 
+agriculture_canopy_flag
+		1 apply AG Package irrigation to canopy, set PRMS_land_iteration_flag = 1
+		  gsflow_ag_area = hru_area
+		
+agriculture_dprst_flag
+		1 AG Package irrigation includes DPRST dynamics, set PRMS_land_iteration_flag = 3
+		
+agriculture_soilzone_flag
+		1 AG Package irrigation to capillary reservoir
+			set PRMS_land_iteration_flag = 3 if agriculture_dprst_flag = 1
+			set PRMS_land_iteration_flag = 0 if agriculture_dprst_flag = 0
+			if soilzone_module = soilzone_ag  gsflow_ag_area = ag_area
+			if soilzone_module = soilzone  gsflow_ag_area = perv_area
+			
+what is gsflow_ag_area when agriculture_canopy_flag and agriculture_dprst_flag are 1?
+
+
+set IRR_type to 0--sprinkler; 4--apply water to canopy; 
+
+set cuvdenwin, covdensum = ag_frac
