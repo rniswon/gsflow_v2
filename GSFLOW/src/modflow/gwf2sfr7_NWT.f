@@ -8598,7 +8598,7 @@ C8------RETURN.
       RETURN
       END SUBROUTINE MODSIM2SFR
 C
-C-------SUBROUTINE MODSIM2SFR
+C-------SUBROUTINE OUTSEGFLOWS
 C
       SUBROUTINE OUTSEGFLOWS()
 C     *******************************************************************
