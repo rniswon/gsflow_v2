@@ -253,7 +253,7 @@
       !
       !2 - --- IDENTIFY PACKAGE AND INITIALIZE AG OPTIONS.
       WRITE (IOUT, 1) IN
-1     FORMAT(1X, /1X, 'AG -- AG PACKAGE FOR NWT VERSION 1.2.0, ',
+1     FORMAT(1X, /1X, 'AG -- AG PACKAGE FOR NWT VERSION 1.3.0, ',
      +     ' 3/03/2020 INPUT READ FROM UNIT ', I4)
       !
       !3 - --- CHECK FOR KEYWORDS.
@@ -3280,8 +3280,13 @@
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
      +           supold, kper, kstp, kiter)
         AETITERSW(ISEG) = SNGL(aettotal)
-        SUPACTOLD(ISEG) = DVRSFLW(iseg)
-        SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
+        if ( kiter == 2 ) then
+          SUPACT(iseg) = SNGL(factor)
+          SUPACTOLD(ISEG) = dzero
+        else
+          SUPACTOLD(ISEG) = DVRSFLW(iseg)
+          SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
+        end if
         !
         !1 - -----set diversion to demand
         !
@@ -3373,9 +3378,14 @@
         RMSESW(ISEG) = SQRT((aetold - aettotal)**dtwo)
         IF ( RMSESW(ISEG) > zerod3*pettotal ) AGCONVERGE = 0
         AETITERSW(ISEG) = SNGL(aettotal)
-        SUPACTOLD(ISEG) = DVRSFLW(iseg)
-        SUPACT(iseg) = SUPACT(iseg) + 
+        if ( kiter == 2 ) then
+          SUPACT(iseg) = SNGL(factor)
+          SUPACTOLD(ISEG) = dzero
+        else
+          SUPACTOLD(ISEG) = DVRSFLW(iseg)
+          SUPACT(iseg) = SUPACT(iseg) + 
      +                 (sone - REAL(AGCONVERGE))*SNGL(factor)
+        end if
 !        if (SUPACT(iseg) < 0.0) SUPACT(iseg) = 0.0
         !
         !1 - -----set diversion to demand
@@ -3415,6 +3425,7 @@
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
      +                      MFQ_to_inch_acres
       USE GLOBAL, ONLY: ISSFLG
+      USE GWFSFRMODULE, ONLY: DVRSFLW
       IMPLICIT NONE
 ! --------------------------------------------------
       !modules
@@ -3476,13 +3487,14 @@
      +                     AGCONVERGE = 0
         AETITERPOND(i) = SNGL(aettotal)
         saveflow = PONDFLOW(i)
-        PONDFLOW(i) = PONDFLOW(i) + 
+        if ( kiter == 2 ) then
+          PONDFLOW(i) = SNGL(factor)
+          PONDFLOWOLD(i) = dzero
+        else
+          PONDFLOWOLD(i) = PONDFLOW(i)
+          PONDFLOW(i) = PONDFLOW(i) + 
      +                (sone - REAL(AGCONVERGE))*SNGL(factor)
-        !
-        !set pond inflow using demand.
-        IF ( FLOWTHROUGH_POND(i) == 1 .and. NUMCELLSPOND(i) > 0 ) THEN
-          PONDSEGFLOW(i) = PONDSEGFLOW(i) + PONDFLOW(i)  !need to constrain to available flow in segment
-        END IF
+        end if
         !
         !set max pond irrigation rate
         !
@@ -3492,6 +3504,11 @@
         pondstor = Dprst_vol_open(ipond)/MFQ_to_inch_acres
         IF ( PONDFLOW(i) > pondstor/DELT ) PONDFLOW(i) = pondstor/DELT
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
+        !
+        !set pond inflow using demand.
+        IF ( FLOWTHROUGH_POND(i) == 1 .and. NUMCELLSPOND(i) > 0 ) THEN
+          PONDSEGFLOW(i) = PONDSEGFLOW(i) + PONDFLOW(i)  !need to constrain to available flow in segment
+        END IF
 !        if(i==2)then
       !etdif = pettotal - aettotal
 !          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
