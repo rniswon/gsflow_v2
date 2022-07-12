@@ -1014,6 +1014,8 @@
 ! nsegment dimension
       IF ( decldim('nsegment', 0, MAXDIM, 'Number of stream-channel segments')/=0 ) CALL read_error(7, 'nsegment')
 
+      IF ( decldim('nstreamtemp', 0, MAXDIM, 'Number of stream temperature replacement setments')/=0 ) CALL read_error(7, 'nstreamtemp')
+
 ! subbasin dimensions
       IF ( control_integer(Subbasin_flag, 'subbasin_flag')/=0 ) Subbasin_flag = ACTIVE
       IF ( decldim('nsub', 0, MAXDIM, 'Number of internal subbasins')/=0 ) CALL read_error(7, 'nsub')
