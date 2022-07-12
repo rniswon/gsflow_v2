@@ -527,11 +527,11 @@
       ierr = 0
       DO i = 1, Nsegment
         IF ( Strmflow_flag==strmflow_muskingum_mann_module ) THEN
-          velocity = (1./Mann_n(i))*SQRT(Seg_slope(i))*Seg_depth(i)**(2./3.) ! simplify if say width>>depth
-          IF ( Seg_slope(i)<0.0000001 ) THEN
-            IF ( Print_debug>DEBUG_LESS ) PRINT *, 'WARNING, seg_slope < 0.0000001, set to 0.0001', i, Seg_slope(i)
-            Seg_slope(i) = 0.0001
+          IF ( Seg_slope(i)<0.00001 ) THEN
+            IF ( Print_debug>DEBUG_LESS ) PRINT *, 'WARNING, seg_slope < 0.00001, set to 0.00001', i, Seg_slope(i)
+            Seg_slope(i) = 0.00001
           ENDIF
+          velocity = (1./Mann_n(i))*SQRT(Seg_slope(i))*Seg_depth(i)**(2./3.) ! simplify if say width>>depth
           K_coef(i) = Seg_length(i)/(velocity*60.*60.) !want in hours, length should include sloped length
           !K_coef(i) = Seg_length(i)*sqrt(1+ Seg_slope(i)**2)/(velocity*60.*60.) !want in hours
         ENDIF
