@@ -13,7 +13,7 @@ MODULE PRMS_CONSTANTS
 
     integer, parameter :: MAXFILE_LENGTH = 256
     integer, parameter :: MAXLINE_LENGTH = 256
-    integer, parameter :: MAXDATALINE_LENGTH = 12000
+    integer, parameter :: MAXDATALINE_LENGTH = 60000
     integer, parameter :: MAXCONTROL_LENGTH = 32
     integer, parameter :: MAXDESCRIPTION_LENGTH = 512
     integer, parameter :: MAXCMDLINE_LENGTH = 512

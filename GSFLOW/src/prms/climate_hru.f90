@@ -33,7 +33,7 @@
 
       INTEGER FUNCTION climate_hru()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, RUN, DECL, INIT, DOCUMENTATION, &
-     &    MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, CELSIUS, MONTHS_PER_YEAR
+     &    MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, CELSIUS, MONTHS_PER_YEAR, DEBUG_less
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real
       use PRMS_CONTROL_FILE, only: control_integer, control_string
@@ -41,7 +41,7 @@
      &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
      &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
      &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, Nowyear, Nowday, forcing_check_flag, Snow_cbh_flag, &
-     &    irrigated_area_flag, AET_cbh_flag, PET_cbh_flag
+     &    irrigated_area_flag, AET_cbh_flag, PET_cbh_flag, Print_debug
       USE PRMS_CLIMATE_HRU
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Hru_area_dble, Ag_Frac
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
@@ -302,11 +302,9 @@
           IF ( Climate_temp_flag==ACTIVE ) THEN
             IF ( forcing_check_flag==ACTIVE ) THEN
               IF ( Tminf(i) > Tmaxf(i))  THEN
+                IF ( Print_debug > DEBUG_less ) PRINT *, 'WARNING, CBH tmin > tmax, HRU, date, tmin, tmax, diff:', &
+                                                         i, Nowyear, Nowmonth, Nowday, Tminf(i), Tmaxf(i), Tmaxf(i) - Tminf(i)
 !                write_tmin_tmax = 1
-                PRINT *, 'WARNING, CBH tmin > tmax, swapped and written to files fort_863 and fort_864: HRU, date, tmin, tmax:', &
-                         i, Nowyear, Nowmonth, Nowday, Tminf(i), Tmaxf(i)
-!                WRITE ( 862, * ) 'WARNING, CBH tmin > tmax, swapped and written to files  fort_863 and fort_864:', &
-!                                 ' HRU, date, tmin, tmax:', i, Nowyear, Nowmonth, Nowday, Tminf(i), Tmaxf(i)
 !                foo = Tmaxf(i)
 !                Tmaxf(i) = Tminf(i)
 !                Tminf(i) = foo
