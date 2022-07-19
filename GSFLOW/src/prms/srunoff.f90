@@ -37,8 +37,8 @@
       DOUBLE PRECISION, SAVE :: Basin_sroff_down, Basin_sroff_upslope
       DOUBLE PRECISION, SAVE :: Basin_sroffi, Basin_sroffp
       DOUBLE PRECISION, SAVE :: Basin_imperv_stor, Basin_imperv_evap, Basin_infil
-      DOUBLE PRECISION, SAVE :: Basin_hortonian, Basin_hortonian_lakes, Basin_contrib_fraction
-      REAL, SAVE, ALLOCATABLE :: Contrib_fraction(:), Imperv_evap(:)
+      DOUBLE PRECISION, SAVE :: Basin_hortonian, Basin_hortonian_lakes, Basin_contrib_fraction, basin_ag_contrib_fraction
+      REAL, SAVE, ALLOCATABLE :: Contrib_fraction(:), ag_contrib_fraction(:), Imperv_evap(:)
       REAL, SAVE, ALLOCATABLE :: Hru_sroffp(:), Hru_sroffi(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Upslope_hortonian(:)
       REAL, SAVE, ALLOCATABLE :: Hortonian_flow(:), Hru_impervevap(:)
@@ -424,6 +424,13 @@
      &         'Fraction of agricultural surface runoff that flows into'// &
      &         ' surface-depression storage; the remainder flows to a stream network for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'sro_to_dprst_ag')
+        CALL declvar_dble(MODNAME, 'basin_ag_contrib_fraction', 'one', 1, &
+     &       'Basin area-weighted average contributing area of the agriculture area of each HRU', &
+     &       'decimal fraction', basin_ag_contrib_fraction)
+        ALLOCATE ( ag_contrib_fraction(Nhru) )
+        CALL declvar_real(MODNAME, 'ag_contrib_fraction', 'nhru', Nhru, &
+     &       'Contributing area of each HRU agriculture area', &
+     &       'decimal fraction', ag_contrib_fraction)
         ENDIF
 
         ALLOCATE ( Dprst_et_coef(Nhru) )
@@ -482,7 +489,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, smidx_module, carea_module, CASCADE_OFF
       use PRMS_READ_PARAM_FILE, only: getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Init_vars_from_file, &
-     &    Dprst_flag, Cascade_flag, Sroff_flag, Frozen_flag !, Parameter_check_flag
+     &    Dprst_flag, Cascade_flag, Sroff_flag, Frozen_flag, Ag_flag !, Parameter_check_flag
       USE PRMS_SRUNOFF
       USE PRMS_FLOWVARS, ONLY: Hru_impervstor
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
@@ -584,6 +591,8 @@
       ENDIF
 
 ! Agriculture variables
+      IF ( Ag_flag==ACTIVE ) ag_contrib_fraction = 0.0
+      basin_ag_contrib_fraction = 0.0D0
       Infil_ag = 0.0 ! always allocated as passed to subroutine
 
       END FUNCTION srunoffinit
@@ -625,9 +634,9 @@
       srunoffrun = 0
 
 ! It0 variables used with MODFLOW integration and PRMS iteration to save states.
-      IF ( PRMS_land_iteration_flag==ACTIVE .OR. Ag_Package==ACTIVE ) THEN
+      IF ( PRMS_land_iteration_flag>0 .OR. Ag_Package==ACTIVE ) THEN
         IF ( Kkiter>1 ) THEN
-          IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+          IF ( PRMS_land_iteration_flag>0 ) THEN
             Imperv_stor = It0_imperv_stor
             Soil_moist = It0_soil_moist
             Soil_rechr = It0_soil_rechr
@@ -678,7 +687,11 @@
 
       dprst_chk = 0
       Infil = 0.0
-      IF ( AG_flag==ACTIVE ) Infil_ag = 0.0
+      IF ( AG_flag==ACTIVE ) THEN
+        Infil_ag = 0.0
+        basin_ag_contrib_fraction = 0.0D0
+        ag_contrib_fraction = 0.0
+      ENDIF
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 
@@ -828,7 +841,10 @@
         ENDIF
 
         Basin_infil = Basin_infil + DBLE( Infil(i)*perv_area )
-        IF ( AG_flag==ACTIVE ) Basin_infil = Basin_infil + DBLE( Infil_ag(i)*Ag_area(i) )
+        IF ( AG_flag==ACTIVE ) THEN
+          Basin_infil = Basin_infil + DBLE( Infil_ag(i)*Ag_area(i) )
+          basin_ag_contrib_fraction = basin_ag_contrib_fraction + DBLE( ag_contrib_fraction(i)*Ag_area(i) )
+        ENDIF
         Basin_contrib_fraction = Basin_contrib_fraction + DBLE( Contrib_fraction(i)*perv_area )
 
 !******Compute evaporation from impervious area
@@ -876,6 +892,7 @@
       Basin_sroffi = Basin_sroffi*Basin_area_inv
       Basin_hortonian = Basin_hortonian*Basin_area_inv
       Basin_contrib_fraction = Basin_contrib_fraction*Basin_area_inv
+      basin_ag_contrib_fraction = basin_ag_contrib_fraction*Basin_area_inv
       Basin_apply_sroff = Basin_apply_sroff*Basin_area_inv
       IF ( Cascade_flag>CASCADE_OFF ) THEN
         Basin_hortonian_lakes = Basin_hortonian_lakes*Basin_area_inv
@@ -1118,7 +1135,7 @@
 !***********************************************************************
       SUBROUTINE ag_comp(Pptp, Ptc, Infil_ag, Sroff_ag)
       USE PRMS_CONSTANTS, ONLY: smidx_module !, CLOSEZERO
-      USE PRMS_SRUNOFF, ONLY: Ihru, Smidx_coef, Smidx_exp, Carea_max, Carea_min, Carea_dif, Contrib_fraction
+      USE PRMS_SRUNOFF, ONLY: Ihru, Smidx_coef, Smidx_exp, Carea_max, Carea_min, Carea_dif, ag_contrib_fraction
       USE PRMS_MODULE, ONLY: Sroff_flag
       USE PRMS_FLOWVARS, ONLY: Ag_soil_moist, Ag_soil_rechr, Ag_soil_rechr_max
       IMPLICIT NONE
@@ -1143,12 +1160,11 @@
       ENDIF
       IF ( ca_fraction>Carea_max(Ihru) ) ca_fraction = Carea_max(Ihru)
       srpp = ca_fraction*Pptp
-!      Contrib_fraction(Ihru) = ca_fraction
+      ag_contrib_fraction(Ihru) = ca_fraction
 !      IF ( srpp<0.0 ) THEN
 !        PRINT *, 'negative srp', srpp
 !        srpp = 0.0
 !      ENDIF
-      Contrib_fraction(Ihru) = Contrib_fraction(Ihru) + ca_fraction
       Infil_ag = Infil_ag - srpp
       Sroff_ag = Sroff_ag + srpp
       !IF ( Srp<CLOSEZERO ) Srp = 0.0
