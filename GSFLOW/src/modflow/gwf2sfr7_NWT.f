@@ -699,7 +699,7 @@ C       Number of reaches in segment added to ISEG
           uzfar_check%irchnum = ii
           uzfar_check%iflag = IFLG
           uzfar_check%iunit = IOUT
-          IERR = ICHKSTRBOT(uzfar_check)
+          if(ibound(jrch,irch,krch)>0) IERR = ICHKSTRBOT(uzfar_check)
           IF ( IERR.GT.0 ) IFLG = IERR
         END IF
       END DO
@@ -1572,7 +1572,7 @@ C19-----COMPUTE VARIABLES NEEDED FOR STREAM LEAKAGE.
               uzfrp_check%irchnum = IRCH
               uzfrp_check%iflag = IFLG
               uzfrp_check%iunit = IOUT
-              IERR = ICHKSTRBOT(uzfrp_check)
+              if(ibound(jrck,irck,krck)>0)IERR = ICHKSTRBOT(uzfrp_check)
               IF ( IERR.GT.0 )IFLG = IERR
 !
               STRM(6, irch) = avhc
@@ -8598,7 +8598,7 @@ C8------RETURN.
       RETURN
       END SUBROUTINE MODSIM2SFR
 C
-C-------SUBROUTINE MODSIM2SFR
+C-------SUBROUTINE OUTSEGFLOWS
 C
       SUBROUTINE OUTSEGFLOWS()
 C     *******************************************************************
