@@ -13,7 +13,7 @@ MODULE PRMS_CONSTANTS
 
     integer, parameter :: MAXFILE_LENGTH = 256
     integer, parameter :: MAXLINE_LENGTH = 256
-    integer, parameter :: MAXDATALINE_LENGTH = 12000
+    integer, parameter :: MAXDATALINE_LENGTH = 60000
     integer, parameter :: MAXCONTROL_LENGTH = 32
     integer, parameter :: MAXDESCRIPTION_LENGTH = 512
     integer, parameter :: MAXCMDLINE_LENGTH = 512
@@ -149,6 +149,9 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: CLEAN = 3
     integer, parameter :: SETDIMENS = 4
     integer, parameter :: WRITE_CLIMATE=24, CONVERT=25, CLIMATE=26, POTET=27, TRANSPIRE=28, FROST=29
+
+    ! AG irrigation flags
+    integer, parameter :: CANOPY = 1, CAPILLARY = 2, CAPILLARY_DPRST = 3
 
     ! Error Codes
     integer, parameter :: ERROR_modflow = -5

@@ -118,8 +118,8 @@ module PRMS_IT0_VARS
        REAL, SAVE, ALLOCATABLE :: It0_slow_stor(:), It0_pref_flow_stor(:), It0_ssres_stor(:)
        REAL, SAVE, ALLOCATABLE :: It0_intcp_stor(:), It0_gravity_stor_res(:)
        DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:)
-       REAL, SAVE, ALLOCATABLE :: It0_ag_soil_moist(:), It0_ag_soil_rechr(:), It0_ag_gvr_stor(:)
-       REAL, SAVE, ALLOCATABLE :: It0_hru_intcpstor(:)
+       REAL, SAVE, ALLOCATABLE :: It0_ag_soil_moist(:), It0_ag_soil_rechr(:), It0_hru_intcpstor(:)
+       REAL, SAVE, ALLOCATABLE :: It0_ag_gvr_stor(:)
 end module PRMS_IT0_VARS
 
 !***********************************************************************
@@ -154,7 +154,7 @@ end module PRMS_IT0_VARS
      &    potet_pt_module, potet_pm_module, potet_pm_sta_module, climate_hru_module, &
      &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
      &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
-     &    ddsolrad_module, ccsolrad_module
+     &    ddsolrad_module, ccsolrad_module, CANOPY
       use PRMS_MMFAPI, only: declvar_int, declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, Nhrucell, &
@@ -366,7 +366,7 @@ end module PRMS_IT0_VARS
       ENDIF
 
       ALLOCATE ( Intcp_transp_on(Nhru) )
-      IF ( PRMS_land_iteration_flag==ACTIVE ) ALLOCATE ( It0_intcp_transp_on(Nhru), It0_intcp_stor(Nhru) )
+      IF ( PRMS_land_iteration_flag==CANOPY ) ALLOCATE ( It0_intcp_transp_on(Nhru), It0_intcp_stor(Nhru) )
       ALLOCATE ( Intcp_stor(Nhru) )
       CALL declvar_real(MODNAME, 'intcp_stor', 'nhru', Nhru, &
      &     'Interception storage in canopy for cover density for each HRU', &
@@ -1553,19 +1553,24 @@ end module PRMS_IT0_VARS
 ! Arguments
       INTEGER, INTENT(IN) :: Ihru
       REAL, INTENT(IN) :: Tmax, Tmin, Hru_area
+!      REAL, INTENT(INOUT) :: Tmax, Tmin
+!      REAL, INTENT(IN) :: Hru_area
       REAL, INTENT(OUT) :: Tmaxf, Tminf, Tavgf, Tmaxc, Tminc, Tavgc
 ! Functions
       INTRINSIC :: DBLE
+! Local Variable
+!      INTEGER :: foo
 !***********************************************************************
       IF ( forcing_check_flag == ACTIVE ) THEN
         IF ( Tmax < Tmin ) THEN
-          IF ( Print_debug > -1 ) THEN
+          IF ( Print_debug > DEBUG_less ) THEN
             PRINT '(A,I0)', 'Warning, adjusted tmax value < adjusted tmin value for HRU: ', Ihru
-            PRINT '(3(A,F0.4))', '         tmax: ', Tmax, ' tmin: ', Tmin, ', ', Tmin-Tmax
+            PRINT '(4(A,F0.4))', '         tmax: ', Tmax, ' tmin: ', Tmin, ', Difference: ', Tmin-Tmax
+!           PRINT '(A)',         '         values swapped'
             CALL print_date(0)
-            !WRITE (861,'(3I4)') Nowyear, nowmonth, nowday
-            !WRITE (861, '(A,I0)') 'Warning, adjusted tmax value < adjusted tmin value for HRU: ', Ihru
-            !WRITE (861, '(3(A,F0.4))') '         tmax: ', Tmax, ' tmin: ', Tmin, ', ', Tmin-Tmax
+!            foo = Tmax
+!            Tmax = Tmin
+!            Tmin = foo
           ENDIF
         ENDIF
       ENDIF

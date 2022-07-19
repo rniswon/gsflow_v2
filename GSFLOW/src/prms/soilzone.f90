@@ -770,11 +770,11 @@
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Hru_type, AG_flag, Ag_package, Model, Nowmonth !, Nowyear, Nowday
+     &    Soilzone_aet_flag, Hru_type, AG_flag, Model, Nowmonth !, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
-     &    Lake_hru_id, Cov_type, Numlake_hrus, Hru_area_dble
+     &    Lake_hru_id, Cov_type, Numlake_hrus, Hru_area_dble, gsflow_ag_area
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Transp_on, Potet, Basin_potet
 ! WARNING!!! Sroff, Basin_sroff, and Strm_seg_in can be updated
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_actet, Hru_actet, Hru_intcpstor, &
@@ -829,12 +829,15 @@
       ENDIF
 
       IF ( Kkiter>1 .OR. .NOT.(AFR) ) THEN ! Kkiter>1 means GSFLOW is active, AFR = FALSE means within MODSIM iteration
-        Soil_moist = It0_soil_moist
-        Soil_rechr = It0_soil_rechr
-        Ssres_stor = It0_ssres_stor
-        Slow_stor = It0_slow_stor
-        IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
-        IF ( Nlake>0 ) Potet = It0_potet
+        DO k = 1, Active_hrus
+          i = Hru_route_order(k)
+          Soil_moist(i) = It0_soil_moist(i)
+          Soil_rechr(i) = It0_soil_rechr(i)
+          Ssres_stor(i) = It0_ssres_stor(i)
+          Slow_stor(i) = It0_slow_stor(i)
+          IF ( Pref_flag==ACTIVE ) Pref_flow_stor(i) = It0_pref_flow_stor(i)
+          IF ( Nlake>0 ) Potet(i) = It0_potet(i)
+        ENDDO
         IF ( GSFLOW_flag==ACTIVE ) Gravity_stor_res = It0_gravity_stor_res
       ENDIF
       IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
@@ -918,8 +921,6 @@
           hruactet = Potet(i)
         ENDIF
 
-        !Hru_type can be 1 (land) or 3 (swale) or 4 (glacier)
-
 !******Add infiltration to soil and compute excess
         dunnianflw = 0.0
         dunnianflw_pfr = 0.0
@@ -941,7 +942,7 @@
 
         ag_water_maxin = 0.0
         IF ( Ag_package==ACTIVE ) THEN
-          IF ( Hru_ag_irr(i)>0.0 ) ag_water_maxin = Hru_ag_irr(i)/perv_area ! Hru_ag_irr is in acre-inches
+          IF ( Hru_ag_irr(i)>0.0 ) ag_water_maxin = Hru_ag_irr(i)/gsflow_ag_area(i) ! Hru_ag_irr is in acre-inches
         ENDIF
         IF ( Model == MODSIM_PRMS ) THEN
           IF ( Hru_diversion(i)>0.0 ) ag_water_maxin = ag_water_maxin + Hru_diversion(i) / perv_area

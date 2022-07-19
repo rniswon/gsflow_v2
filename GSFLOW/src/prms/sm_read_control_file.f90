@@ -148,6 +148,9 @@ contains
     Control_parameter_data(i) % name = 'forcing_check_flag'
     forcing_check_flag = OFF
     i = i + 1
+    Control_parameter_data(i) % name = 'seg2hru_flag'
+    seg2hru_flag = OFF
+    i = i + 1
     Control_parameter_data(i) % name = 'dprst_flag'
     Dprst_flag = OFF
     i = i + 1
@@ -1020,14 +1023,14 @@ contains
   ! Get Control File set arguments from command line.
   !***********************************************************************
   module subroutine get_control_arguments()
-    use PRMS_CONSTANTS, only: DEBUG_less, MAXFILE_LENGTH, ERROR_control
-    use PRMS_MODULE, only: Print_debug, EQULS
+    use PRMS_CONSTANTS, only: DEBUG_less, MAXCMDLINE_LENGTH, ERROR_control
+    use PRMS_MODULE, only: Print_debug, EQULS, command_line
     use prms_utils, only: error_stop
     implicit none
     ! Functions
     intrinsic :: GET_COMMAND_ARGUMENT, COMMAND_ARGUMENT_COUNT, GET_COMMAND, trim
     ! Local Variables
-    character(LEN=MAXFILE_LENGTH) command_line_arg, command_line
+    character(LEN=MAXCMDLINE_LENGTH) command_line_arg
     integer :: status, i, j, ii, nchars, numargs, index, param_type, num_param_values
     !***********************************************************************
     ! Subroutine GET_COMMAND_ARGUMENT may not be available with all compilers-it is a Fortran 2003 routine

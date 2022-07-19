@@ -254,12 +254,12 @@
 !***********************************************************************
       INTEGER FUNCTION intrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, NEARZERO, DNEARZERO, &
-     &    DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param
+     &    DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param, CANOPY
       USE PRMS_MODULE, ONLY: Print_debug, PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Nowday, &
      &    Ag_package, Hru_ag_irr, Agriculture_canopy_flag, Hru_type
       USE PRMS_INTCP
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Covden_win, Covden_sum, &
-     &    Hru_route_order, Hru_area, Cov_type, Ag_frac !, Ag_area, Ag_cov_type
+     &    Hru_route_order, Hru_area, Cov_type, Ag_frac, gsflow_ag_area !, Ag_cov_type
       USE PRMS_WATER_USE, ONLY: Canopy_gain ! need to add ag apply ???
 ! Newsnow and Pptmix can be modfied, WARNING!!!
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, &
@@ -282,7 +282,7 @@
       intrun = 0
 
       ! pkwater_equiv is from last time step
-      IF ( PRMS_land_iteration_flag==ACTIVE ) THEN
+      IF ( PRMS_land_iteration_flag==CANOPY ) THEN
         IF ( Kkiter>1 ) THEN
           Intcp_stor = It0_intcp_stor
           Hru_intcpstor = It0_hru_intcpstor
@@ -447,7 +447,7 @@
                 PRINT *, 'ag_frac=0.0 for HRU:', i
                 CALL error_stop('AG Package irrigation specified and ag_frac=0', ERROR_param)
               ENDIF
-              ag_water_maxin = Hru_ag_irr(i) / harea ! Hru_ag_irr is in acre-inches
+              ag_water_maxin = Hru_ag_irr(i) / gsflow_ag_area(i) ! Hru_ag_irr is in acre-inches
             ENDIF
           ENDIF
           IF ( Use_transfer_intcp==ACTIVE ) ag_water_maxin = ag_water_maxin + Canopy_gain(i)/SNGL(Cfs_conv)/harea ! Canopy_gain in CFS, convert to inches

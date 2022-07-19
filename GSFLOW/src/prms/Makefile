@@ -44,6 +44,7 @@ LIBOBJS = \
         potet_pan.o \
         potet_hamon.o \
         ddsolrad.o \
+		cloud_cover.o \
         ccsolrad.o \
         ide_dist.o \
         xyz_dist.o \
@@ -71,6 +72,7 @@ LIBOBJS = \
         strmflow_in_out.o \
         muskingum.o \
         muskingum_lake.o \
+		segment_to_hru.o \
         subbasin.o \
         stream_temp.o \
         statvar_out.o \
@@ -119,6 +121,9 @@ cascade.o: cascade.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod p
 
 ccsolrad.o: ccsolrad.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod prms_climatevars.mod prms_soltab.mod prms_set_time.mod prms_obs.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) ccsolrad.f90
+
+cloud_cover.o: cloud_cover.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod prms_climatevars.mod prms_soltab.mod prms_set_time.mod prms_obs.mod prms_constants.mod
+	$(FC) -c $(FFLAGS) cloud_cover.f90
 
 climateflow.o: climateflow.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod prms_set_time.mod prms_constants.mod prms_utils.mod
 	$(FC) -c $(FFLAGS) climateflow.f90
@@ -236,6 +241,9 @@ strmflow.o: strmflow.f90 prms_module.mod prms_basin.mod prms_obs.mod prms_flowva
 
 strmflow_in_out.o: strmflow_in_out.f90 prms_module.mod prms_basin.mod prms_obs.mod prms_flowvars.mod prms_gwflow.mod prms_srunoff.mod prms_set_time.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) strmflow_in_out.f90
+
+segment_to_hru.o: segment_to_hru.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_set_time.mod prms_constants.mod prms_soilzone.mod
+	$(FC) -c $(FFLAGS) segment_to_hru.f90
 
 subbasin.o: subbasin.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod prms_flowvars.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_soilzone.mod prms_gwflow.mod prms_snow.mod prms_climatevars.mod prms_muskingum_lake.mod prms_constants.mod prms_climate_hru.mod
 	$(FC) -c $(FFLAGS) subbasin.f90
