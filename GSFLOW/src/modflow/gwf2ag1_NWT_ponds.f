@@ -3483,8 +3483,10 @@
      +                      supold, kper, kstp, kiter)
         if ( factor < dzero ) factor = dzero
         RMSEPOND(I) = SQRT((aetold - aettotal)**dtwo)
-        IF ( RMSEPOND(I) > zerod2*pettotal .and. kiter > 2 ) 
+        IF ( NUMCELLSPOND(i) > 0 ) THEN
+          IF ( RMSEPOND(I) > zerod2*pettotal .and. kiter > 2 ) 
      +                     AGCONVERGE = 0
+        END IF
         AETITERPOND(i) = SNGL(aettotal)
         saveflow = PONDFLOW(i)
         if ( kiter == 2 ) then
@@ -3499,7 +3501,6 @@
         !set max pond irrigation rate
         !
         Q = POND(2, i)        
-        IF ( PONDFLOW(i) > Q ) PONDFLOW(i) = Q        !
         !1 limit pond outflow to pond storage
         pondstor = Dprst_vol_open(ipond)/MFQ_to_inch_acres
         IF ( PONDFLOW(i) > pondstor/DELT ) PONDFLOW(i) = pondstor/DELT
@@ -3508,6 +3509,7 @@
         !set pond inflow using demand.
         IF ( FLOWTHROUGH_POND(i) == 1 .and. NUMCELLSPOND(i) > 0 ) THEN
           PONDSEGFLOW(i) = PONDSEGFLOW(i) + PONDFLOW(i)  !need to constrain to available flow in segment
+          IF ( PONDSEGFLOW(i) > Q ) PONDSEGFLOW(i) = Q
         END IF
 !        if(i==2)then
       !etdif = pettotal - aettotal
@@ -3735,7 +3737,9 @@
      +                    kper, kstp, kiter)
       QONLYOLD(l) = QONLY(l)
       RMSEGW(L) = SQRT((aetold - aettotal)**dtwo)
-      IF ( RMSEGW(L) > zerod2*pettotal ) AGCONVERGE = 0
+      IF ( NUMCELLS(L) > 0 ) THEN
+        IF ( RMSEGW(L) > zerod2*pettotal ) AGCONVERGE = 0
+      END IF
       AETITERGW(l) = sngl(aettotal)
       QONLY(L) = QONLY(L) + (sone - REAL(AGCONVERGE))*SNGL(factor)
       if (QONLY(L) > sumvks) then
@@ -3804,7 +3808,9 @@
      +                    kper, kstp, kiter)
       QONLYOLD(l) = QONLY(L)
       RMSEGW(L) = SQRT((aetold - aettotal)**dtwo)
-      IF ( RMSEGW(L) > zerod2*pettotal ) AGCONVERGE = 0
+      IF ( NUMCELLS(L) > 0 ) THEN
+        IF ( RMSEGW(L) > zerod2*pettotal ) AGCONVERGE = 0
+      END IF
       AETITERGW(l) = sngl(aettotal)
       QONLY(L) = QONLY(L) + (sone - REAL(AGCONVERGE))*SNGL(factor)
       if (QONLY(L) < 0.0) QONLY(L) = 0.0
@@ -3958,7 +3964,7 @@
       QQQ = DZERO
       IF (TSACTIVEALLPOND) THEN
          UNIT = TSPONDALLUNIT
-         DO i = 1, NUMIRRPOND
+         DO i = 1, NUMIRRPONDSP
            k = TSPONDNUM(I)
            Q = Q + PONDSEGFLOW(I)
            QQ = QQ + PONDFLOW(I)
@@ -3985,7 +3991,7 @@
       if (TSACTIVEALLPONDET) then
         unit = TSPONDETALLUNIT
         hru_id = 0  !dummy value for all ponds
-        do i = 1, NUMIRRPOND
+        do i = 1, NUMIRRPONDSP
           Q = Q + PETPOND(i)
           QQ = QQ + AETITERPOND(i)
           QQQ = DZERO
