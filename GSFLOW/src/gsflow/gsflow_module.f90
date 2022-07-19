@@ -17,7 +17,7 @@
       character(len=*), parameter :: Version_read_data_file = '2022-06-02'
       CHARACTER(len=8), SAVE :: Process
 ! Dimensions
-      INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
+      INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw, Nstreamtemp
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus, NLAKES_MF, Nreach
       INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval, Nmap2hru, Nmap, Nsnow
 ! Global
@@ -27,7 +27,7 @@
       INTEGER, SAVE :: Transp_flag, Sroff_flag, Solrad_flag, Et_flag, AG_flag
       INTEGER, SAVE :: Climate_temp_flag, Climate_precip_flag, Climate_potet_flag, Climate_transp_flag
       INTEGER, SAVE :: Lake_route_flag, Strmflow_flag, Stream_order_flag
-      INTEGER, SAVE :: Temp_flag, Precip_flag, Climate_hru_flag, Climate_swrad_flag
+      INTEGER, SAVE :: Temp_flag, Precip_flag, Climate_hru_flag, Climate_swrad_flag, Cloud_flag
       INTEGER, SAVE :: Precip_combined_flag, Temp_combined_flag, Muskingum_flag
       INTEGER, SAVE :: Inputerror_flag, Timestep
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag, Albedo_cbh_flag, Cloud_cover_cbh_flag
@@ -64,7 +64,7 @@
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, Iter_aet_flag, text_restart_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag, no_snow_flag
       INTEGER, SAVE :: Agriculture_dprst_flag, Agriculture_soilzone_flag, Agriculture_canopy_flag 
-      INTEGER, SAVE :: Dyn_ag_frac_flag, Dyn_ag_soil_flag, Ag_gravity_flag
+      INTEGER, SAVE :: Dyn_ag_frac_flag, Dyn_ag_soil_flag, seg2hru_flag, Ag_gravity_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF, outputSelectDatesON_OFF, snow_cloudcover_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName

@@ -430,7 +430,7 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
-     &    ERROR_time, ERROR_modflow, MODSIM_GSFLOW, GSFLOW
+     &    ERROR_time, ERROR_modflow, MODSIM_GSFLOW, GSFLOW, CANOPY
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, no_snow_flag,
      &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
      &    PRMS_land_iteration_flag,
@@ -649,7 +649,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF ( (Szcheck==ACTIVE .AND. Model==GSFLOW) .OR.
      1           (Szcheck==ACTIVE .AND. kkiter==1 .AND.
      2            Model==MODSIM_GSFLOW) ) THEN
-              IF ( PRMS_land_iteration_flag==1 ) THEN
+              IF ( PRMS_land_iteration_flag==CANOPY ) THEN
                 retval = intcp()
                 IF ( no_snow_flag==OFF ) THEN
                   retval = snowcomp()
@@ -692,7 +692,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF(IUNIT(66).GT.0 )
      1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
             IF ( Szcheck==ACTIVE .AND. Model==MODSIM_GSFLOW ) THEN
-              IF ( PRMS_land_iteration_flag==1 ) THEN
+              IF ( PRMS_land_iteration_flag==CANOPY ) THEN
                 retval = intcp()
                 retval = snowcomp()
                 IF ( Glacier_flag==ACTIVE ) THEN
