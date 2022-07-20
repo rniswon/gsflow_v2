@@ -57,7 +57,7 @@ C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: MODFLOW, GSFLOW, ACTIVE, OFF,
-     &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT, CANOPY
+     &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
      &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package, Model,
      &    GSFLOW_flag, Print_debug, AG_flag

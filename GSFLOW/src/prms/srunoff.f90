@@ -1160,12 +1160,11 @@
       ENDIF
       IF ( ca_fraction>Carea_max(Ihru) ) ca_fraction = Carea_max(Ihru)
       srpp = ca_fraction*Pptp
-!      ag_contrib_fraction(Ihru) = ca_fraction
+      ag_contrib_fraction(Ihru) = ca_fraction
 !      IF ( srpp<0.0 ) THEN
 !        PRINT *, 'negative srp', srpp
 !        srpp = 0.0
 !      ENDIF
-      ag_contrib_fraction(Ihru) = ag_contrib_fraction(Ihru) + ca_fraction
       Infil_ag = Infil_ag - srpp
       Sroff_ag = Sroff_ag + srpp
       !IF ( Srp<CLOSEZERO ) Srp = 0.0

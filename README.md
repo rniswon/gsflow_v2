@@ -28,6 +28,4 @@ square kilometers, and for time periods that range from months to several
 decades.
 
 
-<p align="center">
-  <img src="https://prd-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/s3fs-public/styles/full_width/public/thumbnails/image/gsflow.jpg" alt="Sagehen_GSFLOW"/>
-</p>
+![image](https://user-images.githubusercontent.com/3373895/179845243-1e4c7f58-ef30-4081-aeb7-f332120d5f50.png)

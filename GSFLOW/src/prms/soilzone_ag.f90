@@ -33,7 +33,7 @@
       DOUBLE PRECISION, SAVE :: Basin_ag_waterin
       REAL, SAVE, ALLOCATABLE :: Unused_ag_et(:), ag_soil_to_gvr(:), Ag_soilwater_deficit(:)
       REAL, SAVE, ALLOCATABLE :: Ag_actet(:), Ag_irrigation_add(:), Ag_irrigation_add_vol(:)
-      REAL, SAVE, ALLOCATABLE :: ag_soil_to_gw(:), hru_ag_actet(:)
+      REAL, SAVE, ALLOCATABLE :: ag_soil_to_gw(:), hru_ag_actet(:), Ag_hortonian(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_lower(:), Ag_soil_lower_stor_max(:), Ag_potet_rechr(:), Ag_potet_lower(:)
 !      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Ag_upslope_dunnian(:)
       REAL, SAVE, ALLOCATABLE :: Ag_gvr_to_sm(:)
@@ -143,6 +143,11 @@
      &     'Actual ET for agriculture capillary reservoir for each HRU', &
      &     'inches', Unused_ag_et)
 
+      ALLOCATE ( Ag_hortonian(Nhru) )
+      CALL declvar_real(MODNAME, 'ag_hortonian', 'nhru', Nhru, &
+     &     'Hortonian surface runoff that flows to the stream network from the agriculture fraction of each HRU', &
+     &     'inches', Ag_hortonian)
+
       ALLOCATE ( ag_soil_to_gvr(Nhru) )
       CALL declvar_real(MODNAME, 'ag_soil_to_gvr', 'nhru', Nhru, &
      &     'Excess capillary water that flows to the agriculture gravity reservoir from the agriculture fraction of each HRU', &
@@ -181,7 +186,7 @@
      &       'inches', Ag_gvr_to_sm)
       ENDIF
 
-      ALLOCATE ( Ag_potet_lower(Nhru) )
+      ALLOCATE ( Ag_potet_lower(Nhru) ) !, Ag_water_maxin(Nhru) )
       CALL declvar_real(MODNAME, 'ag_potet_lower', 'nhru', Nhru, &
      &     'Potential ET in the lower zone of the agriculture reservoir for each HRU', &
      &     'inches', Ag_potet_lower)
@@ -297,6 +302,7 @@
       ! dimensioned nhru
       Ag_irrigation_add = 0.0
       ag_soil_to_gw = 0.0
+      Ag_hortonian = 0.0
       ag_soil_to_gvr = 0.0
       Ag_soil_lower_stor_max = 0.0
       Ag_potet_lower = 0.0
@@ -348,8 +354,8 @@
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, &
-     &    Soilzone_aet_flag, Hru_type, Model, Nowmonth, Nowyear, Nowday, &
-     &    Iter_aet_flag, Agriculture_soilzone_flag, MODSIM_flag, PRMS_land_iteration_flag
+     &    Soilzone_aet_flag, Hru_type, Nowmonth, Nowyear, Nowday, &
+     &    Iter_aet_flag, Agriculture_soilzone_flag, PRMS_land_iteration_flag !, MODSIM_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
@@ -364,7 +370,8 @@
      &    Sroff, Soil_moist_max, Infil, Soil_rechr_max, Ssres_in, Snowcov_area, Snow_evap, &
      &    Basin_soil_moist, Basin_ssstor, Slow_stor, Slow_flow, Pkwater_equiv, &
      &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_sroff, Basin_lake_stor, Gravity_stor_res, &
-     &    Ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr_max, Ag_soil_moist_max, Basin_ag_soil_moist
+     &    Ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr_max, Ag_soil_moist_max, Basin_ag_soil_moist, &
+     &    Hru_intcpstor, gsflow_ag_actet
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_ssres_stor, It0_slow_stor, &
                                It0_pref_flow_stor, It0_gravity_stor_res, &
                                It0_ag_soil_rechr, It0_ag_soil_moist
@@ -394,6 +401,7 @@
       REAL :: ag_upflow_max, ag_capacity, agfrac, ag_avail_potet, ag_potet
       REAL :: ag_AETtarget, ag_avail_targetAET, agactet
       REAL :: perv_frac, capwater_maxin, ssresin, upflow_max, ag_portion, perv_portion, agarea
+      REAL :: excess
       DOUBLE PRECISION :: gwin
       INTEGER :: cfgi_frozen_hru
       INTEGER :: num_hrus_ag_iter, ag_on_flag, keep_iterating, add_estimated_irrigation
@@ -406,7 +414,7 @@
           IF ( Nlake>0 ) It0_potet = Potet
           It0_strm_seg_in = Strm_seg_in
           Gw2sm_grav = 0.0 ! dimension nhrucell
-          Hru_ag_irr = 0.0 ! dimension nhru
+          IF ( Ag_package==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
         ENDIF
         IF ( ((GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet==ACTIVE) .AND.AFR ) THEN
           ! computed in srunoff
@@ -496,6 +504,7 @@
         IF ( GSFLOW_flag==ACTIVE ) Ag_gvr_to_sm(i) = 0.0
         ag_soil_to_gvr(i) = 0.0
         ag_soil_to_gw(i) = 0.0
+        Ag_hortonian(i) = 0.0
         Unused_ag_et(i) = 0.0
         Ag_soilwater_deficit(i) = 0.0
         !HRU_id = i
@@ -573,8 +582,8 @@
               CALL error_stop('AG Package irrigation specified and ag_frac=0.0', ERROR_param)
             ENDIF
             if ( gsflow_ag_area(i)>0.0 ) then
-              if ( Hru_ag_irr(i) / gsflow_ag_area(i) > 2.0 ) &
-                   print *, 'hru_ag_irr/agarea > 2.0, hru:', i, Hru_ag_irr(i) / gsflow_ag_area(i)
+!              if ( Hru_ag_irr(i) / gsflow_ag_area(i) > 2.0 ) &
+!                   print *, 'hru_ag_irr/agarea > 2.0, hru:', i, Hru_ag_irr(i) / gsflow_ag_area(i)
               ag_water_maxin = ag_water_maxin + Hru_ag_irr(i) / gsflow_ag_area(i)
             endif
           ENDIF
@@ -590,6 +599,7 @@
 !          ENDIF
 !        ENDIF
 
+        IF ( Iter_aet_flag==ACTIVE ) ag_water_maxin = ag_water_maxin + Ag_irrigation_add(i) ! units of inches over Ag_area
         IF ( Soilzone_add_water_use==ACTIVE ) THEN
           IF ( Soilzone_gain(i)>0.0 ) THEN
             Soilzone_gain_hru(i) = Soilzone_gain(i)/perv_area/SNGL(Cfs_conv) ! ??? is this harea
@@ -618,6 +628,16 @@
               ag_water_maxin = ag_water_maxin + ag_upflow_max
               Basin_ag_up_max = Basin_ag_up_max + DBLE( ag_upflow_max*agarea )
             ENDIF
+          ENDIF
+        ENDIF
+
+        IF ( ag_on_flag==ACTIVE ) THEN
+          Ag_soilwater_deficit(i) = Ag_soil_moist_max(i) - Ag_soil_moist(i)
+          excess = MAX( 0.0, ag_water_maxin + Ag_soil_moist(i) - Ag_soil_moist_max(i) )
+          IF ( excess>0.0 ) THEN
+            Ag_hortonian(i) = excess * agfrac
+            Sroff(i) = Sroff(i) + excess * agfrac
+            ag_water_maxin = ag_water_maxin - excess
           ENDIF
         ENDIF
 
@@ -782,8 +802,8 @@
           ELSEIF ( Hru_type(i)==SWALE ) THEN
             Slow_stor(i) = availh2o
           ENDIF
-        IF ( Slow_stor(i)>0.0 .AND. Ssr2gw_rate(i)>0.0 ) &
-     &       CALL compute_gwflow(Ssr2gw_rate(i), Ssr2gw_exp(i), Ssr_to_gw(i), Slow_stor(i))
+          IF ( Slow_stor(i)>0.0 .AND. Ssr2gw_rate(i)>0.0 ) &
+     &         CALL compute_gwflow(Ssr2gw_rate(i), Ssr2gw_exp(i), Ssr_to_gw(i), Slow_stor(i))
         ENDIF
 
         ! compute contribution to Dunnian flow from PFR, if any
