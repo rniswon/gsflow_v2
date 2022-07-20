@@ -1506,6 +1506,7 @@
 
 ! LAST check to clear out all arrays if packwater is gone
         IF ( Pkwater_equiv(i)<=0.0D0 ) THEN
+        !IF ( Pkwater_equiv(i)<1.0D-12 ) THEN
           IF ( Print_debug>DEBUG_less ) THEN
             IF ( Pkwater_equiv(i)<-DNEARZERO ) &
      &           PRINT *, 'Snowpack problem, pkwater_equiv negative, HRU:', i, ' value:', Pkwater_equiv(i)

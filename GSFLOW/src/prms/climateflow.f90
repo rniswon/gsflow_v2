@@ -1540,7 +1540,7 @@ end module PRMS_IT0_VARS
       SUBROUTINE temp_set(Ihru, Tmax, Tmin, Tmaxf, Tminf, Tavgf, Tmaxc, Tminc, Tavgc, Hru_area)
       USE PRMS_CLIMATEVARS, ONLY: Basin_temp, Basin_tmax, Basin_tmin, Temp_units, Tmax_hru, Tmin_hru
       USE PRMS_CONSTANTS, ONLY: MINTEMP, MAXTEMP, ERROR_temp, DEBUG_less, ACTIVE
-      USE PRMS_MODULE, ONLY: Print_debug, forcing_check_flag !, Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: forcing_check_flag !, Print_debug
       use prms_utils, only: c_to_f, f_to_c, print_date
       IMPLICIT NONE
 ! Arguments
@@ -1559,12 +1559,12 @@ end module PRMS_IT0_VARS
           IF ( Print_debug > DEBUG_less ) THEN
             PRINT '(A,I0)', 'Warning, adjusted tmax value < adjusted tmin value for HRU: ', Ihru
             PRINT '(4(A,F0.4))', '         tmax: ', Tmax, ' tmin: ', Tmin, ', Difference: ', Tmin-Tmax
-!           PRINT '(A)',         '         values swapped'
+!            PRINT '(A)',         '         values swapped'
             CALL print_date(0)
-!            foo = Tmax
-!            Tmax = Tmin
-!            Tmin = foo
           ENDIF
+!          foo = Tmax
+!          Tmax = Tmin
+!          Tmin = foo
         ENDIF
       ENDIF
 
