@@ -2502,7 +2502,8 @@
         IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
           PONDSEGFLOW(L) = szero
         ELSE
-          IF ( POND(3,L) > 0 .and. NUMCELLSPOND(L) > 0 ) THEN
+!          IF ( POND(3,L) > 0 .and. NUMCELLSPOND(L) > 0 ) THEN
+           IF ( POND(3,L) > 0 ) THEN
             PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))
           END IF
         END IF
@@ -2939,7 +2940,8 @@
       END DO
       DO L = 1, NUMIRRPOND
         IF ( FLOWTHROUGH_POND(L) == 0 ) THEN
-          IF ( POND(3,L) > 0 .and. NUMCELLSPOND(L) > 0 ) THEN
+!          IF ( POND(3,L) > 0 .and. NUMCELLSPOND(L) > 0 ) THEN
+           IF ( POND(3,L) > 0 ) THEN
             PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))
           END IF
         END IF
