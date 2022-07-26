@@ -20,7 +20,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2022-05-26'
+      character(len=*), parameter :: Version_soilzone = '2022-07-25'
       INTEGER, SAVE :: DBGUNT, Iter_aet
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -1113,7 +1113,7 @@
             CALL compute_szactet(Soil_moist_max(i), Soil_rechr_max(i), Transp_on(i), Cov_type(i), &
      &                           Soil_type(i), Soil_moist(i), Soil_rechr(i), pervactet, avail_potet, &
      &                           Snow_free(i), Potet_rechr(i), Potet_lower(i), &
-     &                           Potet(i), perv_frac, Soil_saturated(i))
+     &                           Potet(i), perv_frac, Soil_saturated(i), i, 0)
           ENDIF
         ENDIF
 
@@ -1341,13 +1341,14 @@
       SUBROUTINE compute_szactet(Soil_moist_max, Soil_rechr_max, &
      &           Transp_on, Cov_type, Soil_type, &
      &           Soil_moist, Soil_rechr, Perv_actet, Avail_potet, &
-     &           Snow_free, Potet_rechr, Potet_lower, Potet, Perv_frac, Soil_saturated)
+     &           Snow_free, Potet_rechr, Potet_lower, Potet, Perv_frac, Soil_saturated, hru_id, ag_perv_flag)
       USE PRMS_CONSTANTS, ONLY: NEARZERO, BARESOIL, SAND, LOAM, CLAY, ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Soilzone_aet_flag
       USE PRMS_SOILZONE, ONLY: Et_type
+      use prms_utils, only: print_date
       IMPLICIT NONE
 ! Arguments
-      INTEGER, INTENT(IN) :: Transp_on, Cov_type, Soil_type
+      INTEGER, INTENT(IN) :: Transp_on, Cov_type, Soil_type, ag_perv_flag, hru_id
       INTEGER, INTENT(INOUT) :: Soil_saturated
       REAL, INTENT(IN) :: Soil_moist_max, Soil_rechr_max, Snow_free, Potet, Perv_frac
       REAL, INTENT(INOUT) :: Soil_moist, Soil_rechr, Avail_potet, Potet_rechr, Potet_lower
@@ -1454,12 +1455,22 @@
       Perv_actet = et
       ! sanity check
       IF ( Perv_actet*Perv_frac-Avail_potet > NEARZERO ) THEN
-        PRINT *, 'perv_et problem', Perv_actet*Perv_frac, Avail_potet, Perv_frac, Perv_actet
+        IF ( ag_perv_flag == 0 ) THEN
+          PRINT '(a,i0,4F0.6)', 'perv_actet problem', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Perv_actet
+        ELSE
+          PRINT '(a,i0,4F0.6)', 'ag_actet problem', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Perv_actet
+        ENDIF
+        CALL print_date(0)
 !        Soil_moist = Soil_moist + Perv_actet - Avail_potet
 !        Perv_actet = Avail_potet
       ENDIF
       IF ( Perv_actet*Perv_frac>Potet ) THEN
-        PRINT *, 'perv_et PET problem', Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
+        IF ( ag_perv_flag == 0 ) THEN
+          PRINT '(a,i0,4(1x,F0.6))', 'perv_actet PET problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
+        ELSE
+          PRINT '(a,i0,4(1x,F0.6))', 'ag_actet PET problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
+        ENDIF
+        CALL print_date(0)
       ENDIF
 
       END SUBROUTINE compute_szactet

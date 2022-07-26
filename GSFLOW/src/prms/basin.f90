@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2022-05-25'
+      character(len=*), parameter :: Version_basin = '2022-07-25'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -276,7 +276,7 @@
 !               and compute reservoir areas
 !**********************************************************************
       INTEGER FUNCTION basinit()
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, &
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CLOSEZERO, &
      &    INACTIVE, LAKE, SWALE, FEET, ERROR_basin, DEBUG_minimum, ERROR_param, &
      &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, MONTHS_PER_YEAR !, METERS2FEET
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
@@ -286,11 +286,13 @@
       USE PRMS_BASIN
       use prms_utils, only: checkdim_bounded_limits, error_stop, read_error, write_outfile
       IMPLICIT NONE
+! Functions
+      EXTERNAL :: adjust_fractions
       INTRINSIC :: DBLE
 ! Local Variables
       CHARACTER(LEN=69) :: buffer
       INTEGER :: i, j, dprst_frac_flag, lakeid
-      REAL :: harea, perv_area
+      REAL :: harea, perv_area, non_perv
       DOUBLE PRECISION :: basin_imperv, basin_perv, basin_dprst, harea_dble
 !**********************************************************************
       basinit = 0
@@ -310,6 +312,7 @@
       ENDIF
 
       dprst_frac_flag = 0
+      Dprst_frac = 0.0
       IF ( Dprst_flag==ACTIVE ) THEN
         IF ( getparam_real(MODNAME, 'dprst_frac_open', Nhru, Dprst_frac_open)/=0 ) CALL read_error(2, 'dprst_frac_open')
         IF ( PRMS4_flag==ACTIVE ) THEN
@@ -321,7 +324,7 @@
             IF ( getparam_real(MODNAME, 'dprst_area', Nhru, Dprst_area)/=0 ) CALL read_error(2, 'dprst_area')
           ENDIF
         ELSE
-          IF ( getparam_real(MODNAME, 'dprst_frac', Nhru, Dprst_frac)/=0 ) CALL read_error(2, 'Dprst_frac')
+          IF ( getparam_real(MODNAME, 'dprst_frac', Nhru, Dprst_frac)/=0 ) CALL read_error(2, 'dprst_frac')
         ENDIF
       ENDIF
 
@@ -429,6 +432,20 @@
 
         IF ( Hru_type(i)==LAKE ) CYCLE
 
+        IF ( AG_flag==ACTIVE ) THEN
+          IF ( Ag_frac(i)>0.0 ) THEN
+            IF ( Ag_frac(i)>1.0 ) THEN
+              PRINT '(A,I0,A,F0.6)', 'WARNING, ag_frac > 1.0, set to 1.0 for HRU: ', i, ', ag_frac: ', ag_frac(i)
+              Ag_frac(i) = 1.0
+            ENDIF
+            Ag_area(i) = Ag_frac(i) * harea
+            Basin_ag = Basin_ag + DBLE( Ag_area(i) )
+            non_perv = Ag_frac(i) + Hru_percent_imperv(i) + Dprst_frac(i)
+            IF ( non_perv > 1.0 ) CALL adjust_fractions( i, non_perv, Dprst_frac(i), Hru_percent_imperv(i) )
+            perv_area = perv_area - Ag_area(i)
+          ENDIF
+        ENDIF
+
         IF ( Hru_percent_imperv(i)>0.0 ) THEN
           Hru_imperv(i) = Hru_percent_imperv(i)*harea
           basin_imperv = basin_imperv + DBLE( Hru_imperv(i) )
@@ -453,33 +470,39 @@
           ENDIF
         ENDIF
 
-        IF ( AG_flag==ACTIVE ) THEN
-          IF ( Ag_frac(i)>0.0 ) THEN
-            Ag_area(i) = Ag_frac(i) * harea
-            Basin_ag = Basin_ag + DBLE( Ag_area(i) )
-            perv_area = perv_area - Ag_area(i)
-          ENDIF
-        ENDIF
         IF ( .NOT.(perv_area>0.0) .AND. .NOT.(Ag_area(i)>0.0) ) CALL error_stop('no pervious or agriculture area', ERROR_param)
 
         Hru_perv(i) = perv_area
         Hru_frac_perv(i) = perv_area/harea
-        IF ( Hru_frac_perv(i)<0.00099 .AND. Print_debug>DEBUG_less ) THEN
+        IF ( Hru_frac_perv(i)<0.0 ) THEN
+          IF ( Hru_frac_perv(i)<-CLOSEZERO ) THEN
+            PRINT *, 'ERROR, pervious < 0 for HRU:', i
+            PRINT *, '       pervious fraction equals 1.0 - hru_percent_imperv - dprst_frac - ag_frac'
+            PRINT *, '       pervious fraction:', Hru_frac_perv(i)
+            PRINT *, '       impervious fraction:', Hru_percent_imperv(i)
+            IF ( Dprst_flag==ACTIVE ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
+            IF ( AG_flag==ACTIVE ) PRINT *, '       agriculture fraction:', Ag_frac(i)
+            basinit = 1
+          ELSE
+            Hru_perv(i) = 0.0
+            Hru_frac_perv(i) = 0.0
+          ENDIF
+        ELSEIF ( Hru_frac_perv(i)<0.00099 .AND. Print_debug>DEBUG_less ) THEN
           PRINT *, 'WARNING, pervious fraction recommended to be >= 0.001 for HRU:', i
-          PRINT *, '         pervious portion is HRU fraction - impervious fraction - depression fraction'
+          PRINT *, '         hru_frac_perv = 1.0 - hru_percent_imperv - dprst_frac - ag_frac'
+          IF ( Hru_frac_perv(i) < CLOSEZERO ) THEN
+            IF ( Dprst_frac(i) > 0.0 ) THEN
+              Dprst_frac(i) = Dprst_frac(i) + Hru_frac_perv(i)
+            ELSE
+              IF ( Hru_percent_imperv(i) > 0.0 ) Hru_percent_imperv(i) = Hru_percent_imperv(i) + Hru_frac_perv(i)
+            ENDIF
+            Hru_frac_perv(i) = 0.0
+          ENDIF
           PRINT *, '         pervious fraction:', Hru_frac_perv(i)
           PRINT *, '         impervious fraction:', Hru_percent_imperv(i)
           IF ( Dprst_flag==ACTIVE ) PRINT *, '         depression storage fraction:', Dprst_frac(i)
           IF ( AG_flag==ACTIVE ) PRINT *, '         agriculture fraction:', Ag_frac(i)
-        ENDIF
-        IF ( Hru_frac_perv(i)<0.0 ) THEN
-          PRINT *, 'ERROR, pervious < 0 for HRU:', i
-          PRINT *, '       pervious portion is HRU fraction - impervious fraction - depression fraction'
-          PRINT *, '       pervious fraction:', Hru_frac_perv(i)
-          PRINT *, '       impervious fraction:', Hru_percent_imperv(i)
-          IF ( Dprst_flag==ACTIVE ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
-          IF ( AG_flag==ACTIVE ) PRINT *, '       agriculture fraction:', Ag_frac(i)
-          basinit = 1
+          PRINT *, ' '
         ENDIF
         basin_perv = basin_perv + DBLE( Hru_perv(i) )
       ENDDO
@@ -593,3 +616,37 @@
  9005 FORMAT (A, F13.2, A, F13.4)
 
       END FUNCTION basinit
+
+!***********************************************************************
+! Adjust DPRST and impervious fractions when adding ag_frac > 1.0
+!***********************************************************************
+    SUBROUTINE adjust_fractions(Hru_id, Non_perv, Dprst_frac, Imperv_frac)
+      use prms_constants, only: CLOSEZERO
+      IMPLICIT NONE
+      INTRINSIC :: ABS
+! Arguments
+      INTEGER, INTENT(IN) :: Hru_id
+      REAL, INTENT(IN) :: Non_perv
+      REAL, INTENT(INOUT) :: Dprst_frac, Imperv_frac
+! Local Variables
+      REAL :: excess, dprst_adj
+!-----------------------------------------------------------------------
+      excess = Non_perv - 1.0
+      PRINT '(A,I0,A,F0.5)', 'WARNING, ag_frac + hru_percent_imperv + dprst_frac > 1.0; HRU: ', Hru_id, '; excess: ', excess
+      PRINT *, '        dprst_frac and/or hru_percent_imperv adjusted'
+      IF ( Dprst_frac > 0.0 ) THEN
+        dprst_adj = Dprst_frac - excess
+        IF ( dprst_adj > 0.0 ) THEN
+          Dprst_frac = Dprst_frac - excess
+          excess = 0.0
+        ELSE
+          excess = excess - Dprst_frac
+          Dprst_frac = 0.0
+        ENDIF
+      ENDIF
+      Imperv_frac = Imperv_frac - excess
+      IF ( Imperv_frac < CLOSEZERO .AND. ABS(Imperv_frac) > 0.0 ) THEN
+        IF ( Imperv_frac < 0.0 ) PRINT *, 'WARNING, hru_percent_imperv < 0 after adjustment, set to 0, imperv_frac:', Imperv_frac
+        Imperv_frac = 0.0
+       ENDIF
+    END SUBROUTINE adjust_fractions

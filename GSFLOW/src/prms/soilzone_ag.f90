@@ -21,11 +21,11 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2022-06-16'
+      character(len=*), parameter :: Version_soilzone_ag = '2022-07-25'
       INTEGER, SAVE :: Soil_iter !, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_perv_to_gw
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Basin_ag_soil_rechr, Basin_ag_gvr2sm
-      REAL, SAVE, ALLOCATABLE :: Ag_replenish_frac(:), Ag_cap_infil_tot(:), Ag_water_in(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_replenish_frac(:), Ag_cap_infil_tot(:), Ag_water_in(:), non_ag_frac(:)
 !   Pervious Declared Variables
       REAL, SAVE, ALLOCATABLE :: perv_soil_to_gw(:), perv_soil_to_gvr(:)
 !   Agriculture Declared Variables
@@ -201,7 +201,7 @@
      &     'Flag set if infiltration saturates capillary reservoir (0=no, 1=yes)', &
      &     'none', Ag_soil_saturated)
 
-      ALLOCATE ( Ag_cap_infil_tot(Nhru), Ag_water_in(Nhru) )
+      ALLOCATE ( Ag_cap_infil_tot(Nhru), Ag_water_in(Nhru), non_ag_frac(Nhru) )
 
       IF ( declparam(MODNAME, 'max_soilzone_ag_iter', 'one', 'integer', &
      &     '10', '1', '9999', &
@@ -270,7 +270,7 @@
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru, Hru_type, GSFLOW_flag
       USE PRMS_SOILZONE, ONLY: MODNAME, Soil2gw_max
       USE PRMS_SOILZONE_AG
-      USE PRMS_BASIN, ONLY: Basin_area_inv, Ag_area, Covden_win, Covden_sum
+      USE PRMS_BASIN, ONLY: Basin_area_inv, Ag_area, Covden_win, Covden_sum, Ag_frac
       USE PRMS_FLOWVARS, ONLY: Basin_ag_soil_moist, Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, &
                                Ag_soil_rechr_max
       use prms_utils, only: checkdim_bounded_limits, error_stop, read_error
@@ -319,12 +319,14 @@
       Ag_soil_saturated = OFF
       Ag_cap_infil_tot = 0.0
       Ag_water_in = 0.0
+      non_ag_frac = 1.0
       DO ihru = 1, Nhru
         ! make sure LAKE, INACTIVE, GLACIER have agriculture values of 0
         IF ( Hru_type(ihru)==LAKE .OR. Hru_type(ihru)==INACTIVE .OR. Hru_type(ihru)==GLACIER ) Ag_area(ihru) = 0.0
         IF ( Ag_area(ihru)>0.0 ) THEN
           Basin_ag_soil_moist = Basin_ag_soil_moist + DBLE( Ag_soil_moist(ihru)*Ag_area(ihru) )
           Basin_ag_soil_rechr = Basin_ag_soil_rechr + DBLE( Ag_soil_rechr(ihru)*Ag_area(ihru) )
+          non_ag_frac(ihru) = 1.0 - Ag_frac(ihru)
         ELSE
           Ag_soil_moist(ihru) = 0.0
           Ag_soil_rechr(ihru) = 0.0
@@ -866,7 +868,7 @@
               CALL compute_szactet(Ag_soil_moist_max(i), Ag_soil_rechr_max(i), Transp_on(i), Ag_cov_type(i), &
      &                             Ag_soil_type(i), Ag_soil_moist(i), Ag_soil_rechr(i), agactet, ag_avail_targetAET, & !?? instead of ag_avail_potet use AET_external
      &                             Snow_free(i), Ag_potet_rechr(i), Ag_potet_lower(i), &
-     &                             ag_AETtarget, agfrac, Ag_soil_saturated(i))
+     &                             ag_AETtarget, agfrac, Ag_soil_saturated(i), i, 1)
               !if ( Ag_soil_moist(i)< Ag_soil_rechr(i)) print *, 'AG1 szactet, after', i, Ag_soil_moist(i)-Ag_soil_rechr(i), &
                     !Ag_soil_moist(i), Ag_soil_rechr(i), Ag_soil_moist_max(i), Ag_soil_rechr_max(i)
               ! sanity check
@@ -891,22 +893,22 @@
             !if ( unsatisfied_et<0.0 ) print *, unsatisfied_et, i, 'unsat', soilzone_aet_converge, ag_AETtarget, agactet
           ENDIF
 
-          avail_potet = ag_AETtarget - hruactet - ag_hruactet
+          avail_potet = Potet(i) - hruactet - ag_hruactet
           IF ( Soil_moist(i)>0.0 .AND. avail_potet>0.0 ) THEN
             CALL compute_szactet(Soil_moist_max(i), Soil_rechr_max(i), Transp_on(i), Cov_type(i), &
      &                           Soil_type(i), Soil_moist(i), Soil_rechr(i), pervactet, avail_potet, &
      &                           Snow_free(i), Potet_rechr(i), Potet_lower(i), &
-     &                           Potet(i), perv_frac, Soil_saturated(i))
+     &                           Potet(i), perv_frac, Soil_saturated(i), i, 0)
           ENDIF
 
         ENDIF
         Ag_actet(i) = agactet + hruactet * agfrac
-        IF ( Ag_package==ACTIVE ) gsflow_ag_actet = Ag_actet
+        IF ( Ag_package==ACTIVE ) gsflow_ag_actet(i) = agactet
         hru_ag_actet(i) = ag_hruactet
         Hru_actet(i) = hruactet + pervactet*perv_frac + ag_hruactet
-        Unused_potet(i) = Potet(i) - Hru_actet(i)
+        Unused_potet(i) = ( Potet(i)*non_ag_frac(i) ) + ( ag_AETtarget*Ag_frac(i) ) - Hru_actet(i)
         ! sanity check
-        IF ( Unused_potet(i)<0.0 ) THEN
+        IF ( Unused_potet(i)<-CLOSEZERO ) THEN
           IF ( Print_debug>-1 ) THEN
             IF ( avail_potet<-NEARZERO ) THEN
               PRINT *, 'hru_actet>potet', i, Nowmonth, Nowday, Unused_potet(i)
