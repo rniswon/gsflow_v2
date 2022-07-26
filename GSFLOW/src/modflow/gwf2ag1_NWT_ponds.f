@@ -2681,7 +2681,7 @@
         SUBVOL = PONDFLOW(L)
         DO IPC = 1, K
           dvt = IRRFIELDFACTPOND(IPC, L)*SUBVOL
-          dvt = IRRFACTPOND(IPC, L)*dvt
+          dvt = (done-IRRFACTPOND(IPC, L))*dvt
           PONDIRRPRMS(IPC, L) = SNGL( dvt )
         END DO
       !
