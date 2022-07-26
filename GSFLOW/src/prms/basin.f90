@@ -111,6 +111,7 @@
      &     'Storage for each HRU', &
      &     'inches', Hru_storage)
 
+      ALLOCATE ( Dprst_frac(Nhru) )
       IF ( Dprst_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Dprst_area_max(Nhru) )
         CALL declvar_real(MODNAME, 'dprst_area_max', 'nhru', Nhru, &
@@ -127,7 +128,6 @@
      &       'Aggregate sum of closed surface-depression storage areas of each HRU', &
      &       'acres', Dprst_area_clos_max)
 
-        ALLOCATE ( Dprst_frac(Nhru) )
         IF ( PRMS4_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
           ALLOCATE ( Dprst_area(Nhru) )
           IF ( declparam(MODNAME, 'dprst_area', 'nhru', 'real', &
