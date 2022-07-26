@@ -1018,7 +1018,7 @@ end module PRMS_IT0_VARS
      &       ' evaporation and transpiration (upper zone of agriculture reservoir) for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_soil_rechr_max_frac')
         IF ( declparam(Soilzone_module, 'ag_soil_rechr_init_frac', 'nhru', 'real', &
-     &       '1.0', '0.0', '1.0', &
+     &       '-1.0', '0.0', '1.0', &
      &       'Initial fraction of available water in the soil recharge zone within the agriculture reservoir', &
      &       'Initial fraction of available water in the agriculture reservoir where losses occur'// &
      &       ' as both evaporation and transpiration (upper zone of agriculture reservoir) for each HRU', &
@@ -1248,14 +1248,14 @@ end module PRMS_IT0_VARS
         IF ( getparam_real(Soilzone_module, 'ag_soil_moist_max', Nhru, Ag_soil_moist_max)/=0 ) &
      &       CALL read_error(2, 'ag_soil_moist_max')
         if ( Ag_soil_moist_max(1) < 0.0 ) then
-          print *, 'WARNING, ag_soil_moist_max not specified substituing soil_moist_max'
+          print *, 'WARNING, ag_soil_moist_max not specified substituting soil_moist_max'
           Ag_soil_moist_max = Soil_moist_max
         endif
         IF ( getparam_real(Soilzone_module, 'ag_soil_rechr_max_frac', Nhru, Ag_soil_rechr_max_frac)/=0 ) &
      &       CALL read_error(2, 'ag_soil_rechr_max_frac')
         IF ( Ag_soil_rechr_max_frac(1) < 0.0 ) THEN
-          print *, 'WARNING, ag_soil_rechr_max_frac not specified substituing soil_rechr_max_frac'
-          Ag_soil_rechr_max_frac = Soil_rechr_max
+          print *, 'WARNING, ag_soil_rechr_max_frac not specified substituting soil_rechr_max_frac'
+          Ag_soil_rechr_max = Soil_rechr_max
         ELSE
           Ag_soil_rechr_max = Ag_soil_rechr_max_frac*Ag_soil_moist_max
         ENDIF
@@ -1264,7 +1264,7 @@ end module PRMS_IT0_VARS
           IF ( getparam_real(Soilzone_module, 'ag_soil_moist_init_frac', Nhru, Ag_soil_moist)/=0 ) &
      &         CALL read_error(2, 'ag_soil_moist_init_frac')
           if ( Ag_soil_moist(1) < 0.0 ) then
-            print *, 'WARNING, ag_soil_moist_init_frac not specified substituing soil_moist_init_frac'
+            print *, 'WARNING, ag_soil_moist_init_frac not specified substituting soil_moist_init_frac'
             Ag_soil_moist = Soil_moist ! possible problem
           else
             Ag_soil_moist = Ag_soil_moist*Ag_soil_moist_max
@@ -1272,8 +1272,8 @@ end module PRMS_IT0_VARS
           IF ( getparam_real(Soilzone_module, 'ag_soil_rechr_init_frac', Nhru, Ag_soil_rechr)/=0 ) &
      &         CALL read_error(2, 'ag_soil_rechr_init_frac')
           if ( Ag_soil_rechr(1) < 0.0 ) then
-            print *, 'WARNING, ag_soil_rechr_init_frac not specified substituing soil_rechr_init_frac'
-            Ag_soil_moist = Soil_rechr
+            print *, 'WARNING, ag_soil_rechr_init_frac not specified substituting soil_rechr_init_frac'
+            Ag_soil_rechr = Soil_rechr
           else
             Ag_soil_rechr = Ag_soil_rechr*Ag_soil_rechr_max ! possible problem if
           endif
