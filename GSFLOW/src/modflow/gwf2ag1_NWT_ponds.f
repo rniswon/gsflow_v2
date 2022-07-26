@@ -3422,7 +3422,8 @@
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: gsflow_ag_area
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, gsflow_ag_actet
+      USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet,hru_actet
+      USE PRMS_IT0_VARS, ONLY: It0_dprst_vol_open
 !     +    , Dprst_total_open_in, Dprst_total_open_out
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
      +                      MFQ_to_inch_acres
@@ -3437,8 +3438,8 @@
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet
       double precision :: pettotal,aettotal, prms_inch2mf_q,
-     +                    aetold, supold, sup !, etdif
-      real :: Q, saveflow, pondstor
+     +                    aetold, supold, sup, etdif
+      real :: Q, saveflow, pondstor, totstor
       integer :: k, ipond, hru_id, i
       external :: set_factor
       double precision :: set_factor
@@ -3491,9 +3492,9 @@
         END IF
         AETITERPOND(i) = SNGL(aettotal)
         saveflow = PONDFLOW(i)
-        if ( kiter == 2 ) then
-          PONDFLOW(i) = SNGL(factor)
+        if ( kiter == 1 ) then
           PONDFLOWOLD(i) = dzero
+          PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
         else
           PONDFLOWOLD(i) = PONDFLOW(i)
           PONDFLOW(i) = PONDFLOW(i) + 
@@ -3502,24 +3503,30 @@
         !
         !set max pond irrigation rate
         !
-        Q = POND(2, i)        
         !1 limit pond outflow to pond storage
-        pondstor = Dprst_vol_open(ipond)/MFQ_to_inch_acres
-        IF ( PONDFLOW(i) > pondstor/DELT ) PONDFLOW(i) = pondstor/DELT
-        IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
+        pondstor = It0_dprst_vol_open(ipond)/MFQ_to_inch_acres
+        if ( pondstor < dzero ) pondstor = dzero
+        totstor = pondstor/DELT + PONDSEGFLOW(i)
         !
         !set pond inflow using demand.
         IF ( FLOWTHROUGH_POND(i) == 1 .and. NUMCELLSPOND(i) > 0 ) THEN
-          PONDSEGFLOW(i) = PONDSEGFLOW(i) + PONDFLOW(i)  !need to constrain to available flow in segment
-          IF ( PONDSEGFLOW(i) > Q ) PONDSEGFLOW(i) = Q
-        END IF
-!        if(i==2)then
-      !etdif = pettotal - aettotal
-!          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
-!     +                 PONDSEGFLOW(I),pettotal,aettotal,
-!     +    Dprst_vol_open(ipond)/MFQ_to_inch_acres,factor
-!        endif
-!  33  format(4i5,6e20.10)
+          PONDSEGFLOW(i) = PONDFLOW(i)
+        END IF  
+        IF ( PONDFLOW(i) > totstor ) PONDFLOW(i) = totstor
+        Q = POND(2, i)
+        IF ( PONDSEGFLOW(i) > Q ) PONDSEGFLOW(i) = Q
+     !!   IF ( kiter > 1) THEN
+     !!       IF ( PONDFLOW(i) < saveflow ) 
+     !!+       PONDFLOW(i) = saveflow
+     !!   END IF
+        if(ipond==4884)then
+      etdif = pettotal - aettotal
+          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
+     +                 PONDSEGFLOW(I),pettotal,aettotal,
+     +    It0_dprst_vol_open(ipond)/MFQ_to_inch_acres,factor,
+     +    hru_actet(5389),potet(5389)
+        endif
+  33  format(4i5,8e20.10)
 300   continue
       return
       end subroutine demandpond_prms
