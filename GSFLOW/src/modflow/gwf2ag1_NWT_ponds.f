@@ -1955,8 +1955,9 @@
       !
       !3 - --INACTIVATE ALL IRRIGATION DEPRESSION STORAGE RESERRVOIRS.
       IF (ITMP == 0) THEN
-         NUMIRRPONDSP = 0
          RETURN
+      ELSEIF (ITMP > 0) THEN
+         FLOWTHROUGH_POND = 0
       END IF
       !
       !4 - --READ NEW IRRIGATION DEPRESSION STORAGE DATA
@@ -3378,7 +3379,7 @@
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
      +           supold, kper, kstp, kiter)
         RMSESW(ISEG) = SQRT((aetold - aettotal)**dtwo)
-        IF ( RMSESW(ISEG) > zerod3*pettotal ) AGCONVERGE = 0
+        IF ( RMSESW(ISEG) > zerod2*pettotal ) AGCONVERGE = 0
         AETITERSW(ISEG) = SNGL(aettotal)
         if ( kiter == 2 ) then
           SUPACT(iseg) = SNGL(factor)
