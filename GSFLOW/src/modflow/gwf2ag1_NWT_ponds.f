@@ -8,6 +8,7 @@
         REAL, PARAMETER :: szero = 0.0e0
         DOUBLE PRECISION, PARAMETER :: dtwo = 2.0d0
         DOUBLE PRECISION, PARAMETER :: doneneg = -1.0d0
+        DOUBLE PRECISION, PARAMETER :: zerod1 = 1.0d-1
         DOUBLE PRECISION, PARAMETER :: zerod2 = 1.0d-2
         DOUBLE PRECISION, PARAMETER :: zerod3 = 1.0d-3
         DOUBLE PRECISION, PARAMETER :: dzero = 0.0d0
@@ -70,6 +71,8 @@
         INTEGER, SAVE, POINTER :: NUMSEGLIST
         REAL, SAVE, POINTER :: PSIRAMP
         REAL, SAVE, POINTER :: ACCEL
+        REAL, SAVE, POINTER :: AGTOL
+        INTEGER, SAVE, POINTER :: MAXAGITER
         INTEGER, SAVE, POINTER :: IUNITRAMP
         INTEGER, SAVE, POINTER :: NUMTABWELL
         INTEGER, SAVE, POINTER :: NUMTABPOND
@@ -177,7 +180,7 @@
       ALLOCATE (WELAUX(20))
       ALLOCATE (IRRWELLCB, IRRSFRCB, IWELLCBU)
       ALLOCATE (IPONDCB, IPONDCBU, IRRPONDCB)
-      ALLOCATE (PSIRAMP, IUNITRAMP, ACCEL)
+      ALLOCATE (PSIRAMP, IUNITRAMP, ACCEL, AGTOL, MAXAGITER)
       ALLOCATE (NUMTABWELL, MAXVALWELL, NPWEL, NNPWEL, IPRWEL)
       ALLOCATE (TSACTIVEGW, TSACTIVESW, NUMSW, NUMGW)
       ALLOCATE (TSACTIVEGWET, TSACTIVESWET, NUMSWET, NUMGWET)
@@ -191,6 +194,8 @@
       MSUMAG = 0
       PSIRAMP = 0.10
       ACCEL = sone
+      AGTOL = sone
+      MAXAGITER = 20
       NUMTABWELL = 0
       NUMTABPOND = 0
       MAXVALWELL = 1
@@ -610,6 +615,16 @@
             WRITE (IOUT, *)
             WRITE (IOUT, 36) MXWELL
             WRITE (IOUT, *)
+         case ('CHECKCONVERGE')
+            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, AGTOL, 
+     +                     IOUT, IN)
+            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, MAXAGITER, 
+     +                  R, IOUT, IN)
+            IF (AGTOL .LT. zerod3) AGTOL = zerod3
+            IF (MAXAGITER .LT. 1) MAXAGITER = 1
+            WRITE (IOUT, *)
+            WRITE (IOUT, 48) AGTOL, MAXAGITER
+            WRITE (IOUT, *)
             !
             !4 - --- Option to output list for wells
          case ('WELLLIST')
@@ -1010,6 +1025,10 @@
 47    FORMAT(1X, ' POND DIVERSION RATES WILL BE READ FROM TIME ',
      + 'SERIES INPUT FILE. A MAXIMUM OF ', I10,
      + ' ROW ENTRIES WILL BE READ FROM EACH FILE')
+48    FORMAT(1X, ' Convergence on AET will be checked ',
+     + 'For convergence. A fraction of PET equal to ', e10.5,
+     + ' will be used to determine convergence, and a',
+     + ' maximum of ',i6,'iterations')
       END SUBROUTINE
       !
       SUBROUTINE GWF2AG7RP(IN, IUNITSFR, KPER)
@@ -3379,9 +3398,11 @@
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
      +           supold, kper, kstp, kiter)
         RMSESW(ISEG) = SQRT((aetold - aettotal)**dtwo)
-        IF ( RMSESW(ISEG) > zerod2*pettotal ) AGCONVERGE = 0
+        IF ( RMSESW(ISEG) > AGTOL*pettotal .AND. KITER > 2 ) then
+            IF ( KITER < MAXAGITER ) AGCONVERGE = 0
+        END IF
         AETITERSW(ISEG) = SNGL(aettotal)
-        if ( kiter == 2 ) then
+        if ( kiter <= 2 ) then
           SUPACT(iseg) = SNGL(factor)
           SUPACTOLD(ISEG) = dzero
         else
@@ -3488,8 +3509,9 @@
         if ( factor < dzero ) factor = dzero
         RMSEPOND(I) = SQRT((aetold - aettotal)**dtwo)
         IF ( NUMCELLSPOND(i) > 0 ) THEN
-          IF ( RMSEPOND(I) > zerod2*pettotal .and. kiter > 2 ) 
-     +                     AGCONVERGE = 0
+          IF ( RMSEPOND(I) > AGTOL*pettotal .and. kiter > 2 ) then
+            IF ( KITER < MAXAGITER ) AGCONVERGE = 0
+          END IF
         END IF
         AETITERPOND(i) = SNGL(aettotal)
         saveflow = PONDFLOW(i)
@@ -3520,14 +3542,14 @@
      !!       IF ( PONDFLOW(i) < saveflow ) 
      !!+       PONDFLOW(i) = saveflow
      !!   END IF
-        if(ipond==4884)then
-      etdif = pettotal - aettotal
-          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
-     +                 PONDSEGFLOW(I),pettotal,aettotal,
-     +    It0_dprst_vol_open(ipond)/MFQ_to_inch_acres,factor,
-     +    hru_actet(5389),potet(5389)
-        endif
-  33  format(4i5,8e20.10)
+  !      if(ipond==4884)then
+  !    etdif = pettotal - aettotal
+  !        write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
+  !   +                 PONDSEGFLOW(I),pettotal,aettotal,
+  !   +    It0_dprst_vol_open(ipond)/MFQ_to_inch_acres,factor,
+  !   +    hru_actet(5389),potet(5389)
+  !      endif
+  !33  format(4i5,8e20.10)
 300   continue
       return
       end subroutine demandpond_prms
@@ -3748,7 +3770,7 @@
       QONLYOLD(l) = QONLY(l)
       RMSEGW(L) = SQRT((aetold - aettotal)**dtwo)
       IF ( NUMCELLS(L) > 0 ) THEN
-        IF ( RMSEGW(L) > zerod2*pettotal ) AGCONVERGE = 0
+        IF ( RMSEGW(L) > zerod1*pettotal ) AGCONVERGE = 0
       END IF
       AETITERGW(l) = sngl(aettotal)
       QONLY(L) = QONLY(L) + (sone - REAL(AGCONVERGE))*SNGL(factor)
@@ -4636,6 +4658,8 @@ C8------RETURN.
       DEALLOCATE(SEGLIST)
       DEALLOCATE(NUMSEGLIST)
       DEALLOCATE(ACCEL)
+      DEALLOCATE(AGTOL)
+      DEALLOCATE(MAXAGITER)
       DEALLOCATE(MAXCELLSPOND)
       DEALLOCATE(IPONDCB)
       DEALLOCATE(IPONDCBU)
