@@ -208,7 +208,9 @@
 
       ELSEIF ( Process_flag==INIT ) THEN
 
-        IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
+        IF ( PRMS_flag==ACTIVE ) THEN
+          IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
+        ENDIF
 
         Grid_flag = OFF
         IF ( Nhru==Nhrucell ) Grid_flag = ACTIVE
