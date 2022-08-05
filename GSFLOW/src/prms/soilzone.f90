@@ -1122,7 +1122,6 @@
         IF ( Ag_package==ACTIVE ) gsflow_ag_actet = Hru_actet
         Perv_actet(i) = pervactet
         hru_perv_actet(i) = pervactet * perv_frac
-        unsatisfied_et = 0.0
 
 ! soil_moist & soil_rechr multiplied by perv_area instead of harea
         Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)

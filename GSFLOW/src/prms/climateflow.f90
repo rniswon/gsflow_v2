@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2022-07-25'
+      character(len=*), parameter :: Version_climateflow = '2022-08-05'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -1053,7 +1053,7 @@ end module PRMS_IT0_VARS
      &    Glacier_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
-      USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv
+      USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv, Ag_area
       use prms_utils, only: c_to_f, checkdim_bounded_limits, checkdim_param_limits, f_to_c, read_error
       IMPLICIT NONE
 ! Local variables
@@ -1355,43 +1355,47 @@ end module PRMS_IT0_VARS
           ENDIF
         ENDIF
 
-        IF ( AG_flag==ACTIVE ) THEN
-        IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
-          IF ( Parameter_check_flag>0 ) THEN
-            PRINT 9022, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
-            ierr = 1
-          ELSE
-            IF ( Print_debug>DEBUG_less ) PRINT 9032, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
-            Ag_soil_rechr_max(i) = Ag_soil_moist_max(i)
+        IF ( AG_flag==ACTIVE .AND. Ag_area(i)>0.0 ) THEN
+          IF ( Ag_soil_moist_max(i) < 2.0 ) THEN
+            PRINT *, 'ag_soil_moist_max < 2.0, set to 2.0, HRU:', i, Ag_soil_moist_max(i)
+            Ag_soil_moist_max(i) = 2.0
           ENDIF
-        ENDIF
-        IF ( Ag_soil_rechr(i)>Ag_soil_rechr_max(i) ) THEN
-          IF ( Parameter_check_flag>0 ) THEN
-            PRINT 9023, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
-            ierr = 1
-          ELSE
-            IF ( Print_debug>DEBUG_less ) PRINT 9033, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
-            Ag_soil_rechr(i) = Ag_soil_rechr_max(i)
+          IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
+            IF ( Parameter_check_flag>0 ) THEN
+              PRINT 9022, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
+              ierr = 1
+            ELSE
+              IF ( Print_debug>DEBUG_less ) PRINT 9032, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
+              Ag_soil_rechr_max(i) = Ag_soil_moist_max(i)
+            ENDIF
           ENDIF
-        ENDIF
-        IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) THEN
-          IF ( Parameter_check_flag>0 ) THEN
-            PRINT 9024, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
-            ierr = 1
-          ELSE
-            IF ( Print_debug>DEBUG_less ) PRINT 9034, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
-            Ag_soil_moist(i) = Ag_soil_moist_max(i)
+          IF ( Ag_soil_rechr(i)>Ag_soil_rechr_max(i) ) THEN
+            IF ( Parameter_check_flag>0 ) THEN
+              PRINT 9023, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
+              ierr = 1
+            ELSE
+              IF ( Print_debug>DEBUG_less ) PRINT 9033, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
+              Ag_soil_rechr(i) = Ag_soil_rechr_max(i)
+            ENDIF
           ENDIF
-        ENDIF
-        IF ( Ag_soil_rechr(i)>Ag_soil_moist(i) ) THEN
-          IF ( Parameter_check_flag>0 ) THEN
-            PRINT 9025, i, Ag_soil_rechr(i), Ag_soil_moist(i)
-            ierr = 1
-          ELSE
-            IF ( Print_debug>DEBUG_less ) PRINT 9035, i, Ag_soil_rechr(i), Ag_soil_moist(i)
-            Ag_soil_rechr(i) = Ag_soil_moist(i)
+          IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) THEN
+            IF ( Parameter_check_flag>0 ) THEN
+              PRINT 9024, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
+              ierr = 1
+            ELSE
+              IF ( Print_debug>DEBUG_less ) PRINT 9034, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
+              Ag_soil_moist(i) = Ag_soil_moist_max(i)
+            ENDIF
           ENDIF
-        ENDIF
+          IF ( Ag_soil_rechr(i)>Ag_soil_moist(i) ) THEN
+            IF ( Parameter_check_flag>0 ) THEN
+              PRINT 9025, i, Ag_soil_rechr(i), Ag_soil_moist(i)
+              ierr = 1
+            ELSE
+              IF ( Print_debug>DEBUG_less ) PRINT 9035, i, Ag_soil_rechr(i), Ag_soil_moist(i)
+              Ag_soil_rechr(i) = Ag_soil_moist(i)
+            ENDIF
+          ENDIF
         ENDIF
       ENDDO
 
