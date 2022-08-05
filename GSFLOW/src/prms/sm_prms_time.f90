@@ -6,7 +6,7 @@ contains
   integer module function prms_time()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, YEAR, MONTH, DAY, HOUR, MINUTE, MAX_DAYS_PER_YEAR, DAYS_PER_YEAR, &
                                 ACTIVE, OFF, NORTHERN, FT2_PER_ACRE, SECS_PER_HOUR, INCHES_PER_FOOT, SECS_PER_DAY, &
-                                ERROR_time, DEBUG_WB, CANOPY, CAPILLARY_DPRST
+                                ERROR_time, DEBUG_WB, CANOPY
       use PRMS_MMFAPI, only: dattim, deltim
       USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime, Nowyear, Nowmonth, Nowday, Dprst_flag, &
                              GSFLOW_flag, PRMS_land_iteration_flag, AG_flag, Print_debug
@@ -63,7 +63,7 @@ contains
             It0_intcp_transp_on = Intcp_transp_on
             It0_intcp_stor = Intcp_stor
           ENDIF
-          IF ( PRMS_land_iteration_flag==CANOPY .OR. PRMS_land_iteration_flag==CAPILLARY_DPRST ) It0_imperv_stor = Imperv_stor
+          IF ( PRMS_land_iteration_flag>0 ) It0_imperv_stor = Imperv_stor
           IF ( Dprst_flag==ACTIVE ) THEN
             It0_dprst_vol_open = Dprst_vol_open
             It0_dprst_vol_clos = Dprst_vol_clos

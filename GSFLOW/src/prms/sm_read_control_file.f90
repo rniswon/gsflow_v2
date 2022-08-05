@@ -89,9 +89,8 @@ contains
     use PRMS_MODULE, only: Print_debug, Dprst_flag, Cascade_flag, Soilzone_aet_flag, PRMS_land_iteration_flag, &
                            Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, irrigated_area_module, AET_module, &
                            PET_ag_module, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, &
-                           Agriculture_soilzone_flag, Agriculture_canopy_flag, Agriculture_dprst_flag, &
                            Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, &
-                           mappingFileName, xyFileName, Iter_aet_flag, text_restart_flag
+                           mappingFileName, xyFileName, Iter_aet_flag, text_restart_flag, irrigation_apply_flag
     use PRMS_CLIMATE_HRU, only: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, Albedo_day, Cloud_cover_day, &
                                 Cbh_check_flag, Windspeed_day, Humidity_day, &
                                 AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
@@ -338,14 +337,8 @@ contains
     Control_parameter_data(i) % name = 'cloud_cover_cbh_flag'
     Cloud_cover_cbh_flag = OFF
     i = i + 1
-    Control_parameter_data(i) % name = 'agriculture_soilzone_flag'
-    Agriculture_soilzone_flag = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'agriculture_canopy_flag'
-    Agriculture_canopy_flag = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'agriculture_dprst_flag'
-    Agriculture_dprst_flag = OFF
+    Control_parameter_data(i) % name = 'irrigation_apply_flag'
+    irrigation_apply_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'dyn_ag_frac_flag'
     Dyn_ag_frac_flag = OFF
