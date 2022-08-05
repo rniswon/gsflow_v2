@@ -2713,11 +2713,23 @@
         END IF
       END DO
       !
+      ! Set diversion for filling pond
       DO L = 1, NUMIRRPOND
         IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
           IF ( POND(3,L) > 0 ) THEN
             SEG(2,int(POND(3,L))) = SEG(2,int(POND(3,L))) + 
      +                              PONDSEGFLOW(L)
+          END IF
+        END IF
+      END DO
+      !
+      ! Check that diversion does not exceed max constraint
+      DO L = 1, NUMIRRPOND
+        IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
+          IF ( POND(3,L) > 0 ) THEN
+             Q = POND(2, L)
+             IF ( SEG(2,int(POND(3,L))) > Q ) SEG(2,int(POND(3,L))) = Q
+             PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))        
           END IF
         END IF
       END DO
@@ -3536,8 +3548,6 @@
           PONDSEGFLOW(i) = PONDFLOW(i)
         END IF  
         IF ( PONDFLOW(i) > totstor ) PONDFLOW(i) = totstor
-        Q = POND(2, i)
-        IF ( PONDSEGFLOW(i) > Q ) PONDSEGFLOW(i) = Q
      !!   IF ( kiter > 1) THEN
      !!       IF ( PONDFLOW(i) < saveflow ) 
      !!+       PONDFLOW(i) = saveflow
