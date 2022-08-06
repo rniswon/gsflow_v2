@@ -440,7 +440,7 @@
 ! runoff and soilzone for GSFLOW are in the MODFLOW iteration loop when PRMS_land_iteration_flag = 1
 !
 ! call for declare, initialize, cleanup and PRMS-only.
-      IF ( PRMS_land_iteration_flag==2 .OR. MODEL==PRMS .OR. Process_flag/=RUN ) THEN
+      IF ( PRMS_land_iteration_flag < 2 .OR. PRMS_only==ACTIVE .OR. Process_flag/=RUN ) THEN
         ierr = intcp()
 
         IF ( no_snow_flag==OFF ) THEN
@@ -449,7 +449,8 @@
 
           IF ( Glacier_flag==ACTIVE ) ierr = glacr()
         ENDIF
-
+      ENDIF
+      IF ( PRMS_land_iteration_flag == OFF .OR. PRMS_only==ACTIVE .OR. Process_flag/=RUN ) THEN
         ierr = srunoff()
       ENDIF
 
