@@ -8620,7 +8620,7 @@ C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
       INTEGER :: ISTSG, L, ISTSGOLD, REACHNUMINSEG
-      DOUBLE PRECISION :: FLOWIN, FLOWOUT
+      DOUBLE PRECISION :: FLOWIN, FLOWOUT, TTIM
 C     -------------------------------------------------------------------
 C
       ISTSG = 1
@@ -8629,6 +8629,7 @@ C
       FLOWIN = 0.0D0
       FLOWOUT = 0.0D0
       SEGFLOWS = 0.0D0
+      TTIM = TOTIM - 1.0D0
 C
 C1------LOOP OVER REACHES TO SET ACCRETIONS/DEPLETIONS
 C
@@ -8653,7 +8654,7 @@ C5------IF LAST REACH IN SEGMENT THEN SET FLOWOT
           SEGFLOWS(ISTSG) = SEGFLOWS(ISTSG) + (FLOWOUT - FLOWIN)*DELT
         END IF
       END DO
-      WRITE(UNITSEGOUT,33)TOTIM,(SEGFLOWS(L),L=1,NSS)
+      WRITE(UNITSEGOUT,33)TTIM,(SEGFLOWS(L),L=1,NSS)
 33    FORMAT(5000E15.5)
 C
 C8------RETURN.
