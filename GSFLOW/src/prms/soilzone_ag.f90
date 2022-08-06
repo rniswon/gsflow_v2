@@ -1074,13 +1074,15 @@
       ENDDO ! end iteration while loop
 ! ***************************************
 
-      do i = 1, nhru ! temporary to put mask in nhru_summary file
-        if (ag_frac(i)>0.0 ) then
-              if (transp_on(i)==OFF) AET_external(i) = -1.0
-        else
-              AET_external(i) = -1.0
-        endif
-      enddo
+      IF ( Iter_aet_flag == ACTIVE ) THEN
+        do i = 1, nhru ! temporary to put mask in nhru_summary file
+          if (ag_frac(i)>0.0 ) then
+                if (transp_on(i)==OFF) AET_external(i) = -1.0
+          else
+                AET_external(i) = -1.0
+          endif
+        enddo
+      ENDIF
       Soil_iter = Soil_iter - 1
       IF ( Iter_aet_flag==ACTIVE ) THEN
         Ag_irrigation_add_vol = Ag_irrigation_add*Ag_area
