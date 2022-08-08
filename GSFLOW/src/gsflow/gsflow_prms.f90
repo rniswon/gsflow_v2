@@ -5,7 +5,7 @@
      &                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand) BIND(C,NAME="gsflow_prms")
       
       !DEC$ ATTRIBUTES DLLEXPORT :: gsflow_prms
-      USE PRMS_CONSTANTS, ONLY: ERROR_control
+      USE PRMS_CONSTANTS, ONLY: ERROR_control, CANOPY
       use PRMS_CONTROL_FILE, only: read_control_file
       use PRMS_DATA_FILE, only: read_prms_data_file
       use PRMS_MMFAPI, only: Num_variables, Variable_data, MAXVARIABLES, declvar_int, declvar_real
@@ -13,7 +13,7 @@
       use PRMS_READ_PARAM_FILE, only: declparam, check_parameters, getparam_int, getparam_real, &
                                       read_parameter_file_dimens, read_parameter_file_params, setup_params
       use PRMS_SET_TIME, only: prms_time
-      use prms_utils, only: error_stop, module_error, numchars, print_module, PRMS_open_output_file, read_error
+      use prms_utils, only: error_stop, numchars, print_module, PRMS_open_output_file, read_error
       USE MF_DLL, ONLY: gsfdecl, MFNWT_RUN, MFNWT_CLEAN, MFNWT_OCBUDGET, MFNWT_INIT
       USE GWFSFRMODULE, ONLY: NSS
       USE GWFLAKMODULE, ONLY: NLAKES
@@ -208,7 +208,9 @@
 
       ELSEIF ( Process_flag==INIT ) THEN
 
-        IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
+        IF ( PRMS_flag==ACTIVE ) THEN
+            IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
+        ENDIF
 
         Grid_flag = OFF
         IF ( Nhru==Nhrucell ) Grid_flag = ACTIVE
@@ -246,12 +248,8 @@
             STOP ERROR_modflow
           ENDIF
         ENDIF
-        Agriculture_flag = Agriculture_soilzone_flag + Agriculture_canopy_flag + Agriculture_dprst_flag
-        IF ( Agriculture_flag>OFF .AND. Ag_package==OFF ) CALL error_stop( &
-     &       'agriculture_soilzone_flag, agriculture_canopy_flag, and/or agriculture_dprst_flag = 1 without AG Package active', &
-     &       ERROR_control)
-        IF ( Agriculture_canopy_flag>ACTIVE .AND. Ag_package==ACTIVE ) CALL error_stop( &
-     &       'agriculture_canopy_flag with AG Package active', ERROR_control)
+        IF ( irrigation_apply_flag>0 .AND. Ag_package==OFF ) CALL error_stop( &
+     &       'irrigation_apply_flag > 0 without AG Package active', ERROR_control)
 
         nc = numchars(Model_control_file)
         IF ( Print_debug>DEBUG_less ) PRINT 9004, 'Using Control File: ', Model_control_file(:nc)
@@ -439,12 +437,11 @@
       ENDIF
 
 ! intcp, snowcomp, glacr, srunoff, soilzone_ag, and soilzone for GSFLOW are in the MODFLOW iteration loop
-! when PRMS_land_iteration_flag = 1
-! runoff and soilzone for GSFLOW are in the MODFLOW iteration loop
-! when PRMS_land_iteration_flag = 2 or 3 (with dprst)
+! when PRMS_land_iteration_flag = 2
+! runoff and soilzone for GSFLOW are in the MODFLOW iteration loop when PRMS_land_iteration_flag = 1
 !
 ! call for declare, initialize, cleanup and PRMS-only.
-      IF ( PRMS_land_iteration_flag==OFF .OR. MODEL==PRMS .OR. Process_flag/=RUN ) THEN
+      IF ( PRMS_land_iteration_flag < 2 .OR. PRMS_only==ACTIVE .OR. Process_flag/=RUN ) THEN
         ierr = intcp()
 
         IF ( no_snow_flag==OFF ) THEN
@@ -453,7 +450,8 @@
 
           IF ( Glacier_flag==ACTIVE ) ierr = glacr()
         ENDIF
-
+      ENDIF
+      IF ( PRMS_land_iteration_flag == OFF .OR. PRMS_only==ACTIVE .OR. Process_flag/=RUN ) THEN
         ierr = srunoff()
       ENDIF
 
@@ -608,7 +606,7 @@
 !     declare the dimensions
 !***********************************************************************
       SUBROUTINE setdims(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold, agDemand)
-      USE PRMS_CONSTANTS, ONLY: ERROR_control, CAPILLARY, CANOPY
+      USE PRMS_CONSTANTS, ONLY: ERROR_control, CANOPY
       use PRMS_CONTROL_FILE, only: get_control_arguments, read_control_file, control_integer, control_integer_array, control_string !, control_file_name
       USE PRMS_MODULE
       use PRMS_READ_PARAM_FILE, only: decldim, declfix, read_parameter_file_dimens, setup_dimens
@@ -1025,30 +1023,14 @@
       IF ( control_integer(Dprst_flag, 'dprst_flag')/=0 ) Dprst_flag = OFF
 
       IF ( PRMS_only==ACTIVE ) THEN
-        PRMS_land_iteration_flag = OFF
-        Agriculture_soilzone_flag = OFF
-        Agriculture_canopy_flag = OFF
-        Agriculture_dprst_flag = OFF
+        PRMS_land_iteration_flag = 0
+        irrigation_apply_flag = 0
       ELSE
-        ! 0 = off, 1 apply irrigation to canopy, 2 or 3 apply irrigation in soilzone
+        ! irrigation_apply_flag 0 = off; 1 = pervious, 2 apply to canopy; 3 apply irrigation in ag fraction
         ! these are for GSFLOW5 with AG package ACTIVE
-        IF ( control_integer(Agriculture_soilzone_flag, 'agriculture_soilzone_flag')/=0 ) Agriculture_Soilzone_flag = OFF
-        IF ( control_integer(Agriculture_canopy_flag, 'agriculture_canopy_flag')/=0 ) Agriculture_canopy_flag = OFF
-        IF ( Agriculture_soilzone_flag==ACTIVE .AND. Agriculture_canopy_flag==ACTIVE ) &
-     &       CALL error_stop('agriculture_soilzone_flag and agriculture_canopy_flag = 1, only one can be active', ERROR_control)
-        IF ( control_integer(Agriculture_dprst_flag, 'agriculture_dprst_flag')/=0 ) Agriculture_dprst_flag = OFF
-        IF ( Dprst_flag==OFF .AND. Agriculture_dprst_flag==ACTIVE ) &
-     &       CALL error_stop('agriculture_dprst_flag = 1, but dprst_flag = 0', ERROR_control)
+        IF ( control_integer(irrigation_apply_flag, 'irrigation_apply_flag')/=0 ) irrigation_apply_flag = OFF
+        ! PRMS_land_iteration_flag: 0 = soilzone only; 1 = srunoff and soilzone; 2 = intcp, snowcomp, srunoff, and soilzone in iteration loop
         IF ( control_integer(PRMS_land_iteration_flag, 'PRMS_land_iteration_flag')/=0 ) PRMS_land_iteration_flag = OFF
-      ENDIF
-
-      ! PRMS_land_iteration_flag: 1 = land modules in iteration loop; 2 or 3 = srunoff in iteration loop
-      IF ( Agriculture_canopy_flag==ACTIVE ) THEN
-          PRMS_land_iteration_flag = CANOPY
-      ELSEIF ( Agriculture_dprst_flag==ACTIVE ) THEN
-          PRMS_land_iteration_flag = CAPILLARY_DPRST
-      ELSEIF ( Agriculture_soilzone_flag==ACTIVE ) THEN
-          PRMS_land_iteration_flag = CAPILLARY
       ENDIF
 
       ! 0 = off, 1 = on, 2 = lauren version

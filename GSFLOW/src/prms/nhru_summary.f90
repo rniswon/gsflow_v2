@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nhru_summary'
-      character(len=*), parameter :: Version_nhru_summary = '2021-11-23'
+      character(len=*), parameter :: Version_nhru_summary = '2022-08-04'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nhru_var_type(:), Nhru_var_int(:, :)
       REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
@@ -383,6 +383,15 @@
         ENDIF
       ENDIF
 
+      IF ( NhruOut_freq>MEAN_MONTHLY ) THEN
+        DO jj = 1, NhruOutVars
+          DO j = 1, Active_hrus
+            i = Hru_route_order(j)
+            Nhru_var_yearly(i, jj) = Nhru_var_yearly(i, jj) + DBLE( Nhru_var_daily(i, jj) )
+          ENDDO
+        ENDDO
+      ENDIF
+
       write_month = OFF
       IF ( NhruOut_freq>MEAN_MONTHLY ) THEN
         last_day = OFF
@@ -433,15 +442,7 @@
         Monthdays = Monthdays + 1.0D0
       ENDIF
 
-      IF ( NhruOut_freq>MEAN_MONTHLY ) THEN
-        DO jj = 1, NhruOutVars
-          DO j = 1, Active_hrus
-            i = Hru_route_order(j)
-            Nhru_var_yearly(i, jj) = Nhru_var_yearly(i, jj) + DBLE( Nhru_var_daily(i, jj) )
-          ENDDO
-        ENDDO
-        RETURN
-      ENDIF
+      IF ( NhruOut_freq>MEAN_MONTHLY ) RETURN
 
       IF ( Monthly_flag==ACTIVE ) THEN
         DO jj = 1, NhruOutVars
