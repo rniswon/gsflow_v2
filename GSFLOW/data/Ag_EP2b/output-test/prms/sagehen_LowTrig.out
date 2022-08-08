@@ -28,7 +28,7 @@ ncol                   1
 ====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 06/02/2022
+                       Version 5.3.0 07/29/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -64,8 +64,8 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-03-01
-Read Control File               read_control_file   2022-06-02
+PRMS Computation Order          gsflow_prms         2022-07-29
+Read Control File               read_control_file   2022-07-29
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 
@@ -96,9 +96,9 @@ runoff 1
  Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
 Simulation time period: 1990/10/01 00:00:00 to 2000/10/31 00:00:00
 ====================================================================
-Basin Definition                basin               2022-05-25
+Basin Definition                basin               2022-07-25
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-05-25
+Common States and Fluxes        climateflow         2022-08-05
 Potential Solar Radiation       soltab              2022-03-29
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2022-04-21
@@ -107,15 +107,15 @@ Precipitation Distribution      precip_1sta         2022-02-18
 Solar Radiation Distribution    ddsolrad            2021-11-19
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2022-05-09
+Canopy Interception             intcp               2022-07-29
 Snow Dynamics                   snowcomp            2022-04-27
 Surface Runoff                  srunoff_smidx       2022-05-26
-Soilzone Computations           soilzone            2022-05-26
+Soilzone Computations           soilzone            2022-07-25
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-04-07
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2022-04-27
 GSFLOW Output CSV Summary       gsflow_sum          2022-04-22
-Output Summary                  nhru_summary        2021-11-23
+Output Summary                  nhru_summary        2022-08-04
 Output Summary                  basin_summary       2021-11-19
 Output Summary                  nsegment_summary    2021-11-23
 ==============================================================
@@ -137,5 +137,5 @@ Model domain area:        11226.32    Active basin area:      6740.99
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    5 minutes 56.88 seconds
+Execution elapsed time    6 minutes  3.95 seconds
 
