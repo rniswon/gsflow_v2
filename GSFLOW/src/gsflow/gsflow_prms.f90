@@ -61,6 +61,10 @@
       ELSEIF ( Process_flag==DECL ) THEN
         Arg = 'decl'
       ELSEIF ( Process_flag==INIT ) THEN
+        IF ( Model==MODSIM_MODFLOW ) THEN ! this mode onlh needs to initialize MODFLOW
+          CALL MFNWT_INIT(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, NSegshold, Nlakeshold, agDemand)
+          RETURN
+        ENDIF
         Arg = 'init'
       ELSEIF ( Process_flag==CLEAN ) THEN
         Arg = 'clean'
@@ -88,14 +92,13 @@
         Execution_time_start = Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
      &                         Elapsed_time_start(7) + Elapsed_time_start(8)*0.001
 
-        IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active (GSFLOW or PRMS)
+        IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active, GSFLOW, PRMS, MODSIM-PRMS, MODSIM-PRMS_AG
           IF ( check_dims()/=0 ) ERROR STOP ERROR_dim
-        ENDIF
 
-        IF ( Print_debug>DEBUG_minimum ) THEN
-          PRINT 10, PRMS_VERSION
-          WRITE ( PRMS_output_unit, 10 ) PRMS_VERSION
-        ENDIF
+          IF ( Print_debug>DEBUG_minimum ) THEN
+            PRINT 10, PRMS_VERSION
+            WRITE ( PRMS_output_unit, 10 ) PRMS_VERSION
+          ENDIF
   10  FORMAT (/, 15X, 'Precipitation-Runoff Modeling System (PRMS)', /, 23X, A)
   15  FORMAT (/, 8X, 'Process',  12X, 'Available Modules', /, 68('-'), /, &
      &        '  Basin Definition: basin', /, &
@@ -126,17 +129,15 @@
   16  FORMAT (//, 4X, 'Active modules listed in the order in which they are called', //, 8X, 'Process', 20X, &
      &        'Module', 9X, 'Version Date', /, A)
 
-        IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active, GSFLOW, PRMS, MODSIM-PRMS, MODSIM-PRMS_AG
           Nsegshold = Nsegment
           Nlakeshold = Nlake
         ENDIF
-        IF ( GSFLOW_flag==ACTIVE .OR. Model==MODSIM_MODFLOW ) THEN ! GSFLOW, MODSIM-GSFLOW
-          IF ( Model==MODSIM_MODFLOW ) THEN
-            Nsegshold = NSS
-            Nlakeshold = NLAKES
-            RETURN
-          END IF
-          ierr = gsfdecl()
+
+        IF ( GSFLOW_flag==ACTIVE ) ierr = gsfdecl()
+        IF ( Model==MODSIM_MODFLOW ) THEN
+          Nsegshold = NSS
+          Nlakeshold = NLAKES
+          RETURN
         ENDIF
 
         IF ( Print_debug>DEBUG_minimum ) THEN
@@ -201,16 +202,14 @@
      &         'none')/=0 ) CALL read_error(1, 'gvr_cell_id')
         ENDIF
 
-        IF ( MODSIM_flag==ACTIVE ) ALLOCATE ( Lake_In_Out_vol(Nlake) )
+        !IF ( MODSIM_flag==ACTIVE ) ALLOCATE ( Lake_In_Out_vol(Nlake) )
 
         Timestep = 0
         IF ( Init_vars_from_file>OFF ) CALL gsflow_prms_restart(READ_INIT)
 
-      ELSEIF ( Process_flag==INIT ) THEN
+      ELSEIF ( Process_flag==INIT ) THEN ! PRMS is active, GSFLOW and/or MODSIM could be active
 
-        IF ( PRMS_flag==ACTIVE ) THEN
-            IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
-        ENDIF
+        IF ( getparam_int(MODNAME, 'hru_type', Nhru, Hru_type)/=0 ) CALL read_error(2, 'hru_type')
 
         Grid_flag = OFF
         IF ( Nhru==Nhrucell ) Grid_flag = ACTIVE
@@ -247,9 +246,9 @@
             PRINT *, '       NSS=', NSS, '; nsegment=', Nsegment
             STOP ERROR_modflow
           ENDIF
+          IF ( irrigation_apply_flag>0 .AND. Ag_package==OFF ) CALL error_stop( &
+     &         'irrigation_apply_flag > 0 without AG Package active', ERROR_control)
         ENDIF
-        IF ( irrigation_apply_flag>0 .AND. Ag_package==OFF ) CALL error_stop( &
-     &       'irrigation_apply_flag > 0 without AG Package active', ERROR_control)
 
         nc = numchars(Model_control_file)
         IF ( Print_debug>DEBUG_less ) PRINT 9004, 'Using Control File: ', Model_control_file(:nc)

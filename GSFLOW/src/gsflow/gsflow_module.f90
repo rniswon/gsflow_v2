@@ -42,7 +42,7 @@
       INTEGER, SAVE :: Lake_transfer_water_use, Lake_add_water_use
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
       INTEGER, SAVE :: mf_timestep, startday, endday, mf_nowtime, Number_timesteps
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Lake_In_Out_vol(:)
+      !DOUBLE PRECISION, SAVE, ALLOCATABLE :: Lake_In_Out_vol(:)
       character(LEN=MAXCMDLINE_LENGTH) command_line
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
