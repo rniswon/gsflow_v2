@@ -357,7 +357,7 @@
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, Nowmonth, Nowyear, Nowday, &
-     &    Iter_aet_flag, irrigation_apply_flag !, MODSIM_flag
+     &    Iter_aet_flag, irrigation_apply_flag, Model !, MODSIM_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
