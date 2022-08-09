@@ -62,7 +62,8 @@ C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: MODFLOW, GSFLOW, ACTIVE, OFF,
-     &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT
+     &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT,
+     &    MODSIM_MODFLOW
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
      &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package, Model,
      &    GSFLOW_flag, Print_debug, AG_flag
@@ -408,7 +409,7 @@ C
       CALL SETCONVFACTORS()
 C
       KKPER = KPER
-      IF ( Model==MODFLOW ) THEN ! ??? what about MODSIM-MODFLOW ???
+      IF ( Model==MODFLOW .OR. Model==MODSIM_MODFLOW ) THEN ! ??? what about MODSIM-MODFLOW ???
         Kkper_new = GET_KPER()
         Kper_mfo = Kkper_new
       ENDIF
