@@ -61,10 +61,7 @@
       ELSEIF ( Process_flag==DECL ) THEN
         Arg = 'decl'
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( Model==MODSIM_MODFLOW ) THEN ! this mode onlh needs to initialize MODFLOW
-          CALL MFNWT_INIT(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, NSegshold, Nlakeshold, agDemand)
-          RETURN
-        ENDIF
+        IF ( Model==MODSIM_MODFLOW ) RETURN
         Arg = 'init'
       ELSEIF ( Process_flag==CLEAN ) THEN
         Arg = 'clean'
