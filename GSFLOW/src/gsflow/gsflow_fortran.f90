@@ -8,40 +8,16 @@
 ! Functions
       EXTERNAL :: gsflow_prms
 ! Local Variables
-      INTEGER :: i, Nsegshold, Nlakeshold
-      LOGICAL :: AFR, MS_GSF_converge
-      INTEGER, SAVE, ALLOCATABLE :: Idivert(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Diversions(:), agDemand(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: DELTAVOL(:), EXCHANGE(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: LAKEVOL(:), LAKEVAP(:)
+      INTEGER :: i
 !***********************************************************************
-      AFR = .TRUE.
-      MS_GSF_converge = .FALSE.
-      Nsegshold = 1
-      Nlakeshold = 1
-      ALLOCATE ( Idivert(Nsegshold) )
-      ALLOCATE ( Diversions(Nsegshold), agDemand(Nsegshold), EXCHANGE(Nsegshold) )
-      ALLOCATE ( DELTAVOL(Nlakeshold), LAKEVOL(Nlakeshold), LAKEVAP(Nlakeshold) )
-      Diversions = 0.0D0
-      agDemand = 0.0D0
-      EXCHANGE = 0.0D0
-      LAKEVOL = 0.0D0
-      LAKEVAP = 0.0D0
-      DELTAVOL = 0.0D0
+      CALL gsflow_prms(SETDIMENS)
 
-      CALL gsflow_prms(SETDIMENS, AFR, MS_GSF_converge, Nsegshold, Nlakeshold, &
-                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand)
+      CALL gsflow_prms(DECL)
 
-      CALL gsflow_prms(DECL, AFR, MS_GSF_converge, Nsegshold, Nlakeshold, &
-                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand)
-
-      CALL gsflow_prms(INIT, AFR, MS_GSF_converge, Nsegshold, Nlakeshold, &
-                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand)
+      CALL gsflow_prms(INIT)
       DO i = 1, Number_timesteps
-        CALL gsflow_prms(RUN, AFR, MS_GSF_converge, Nsegshold, Nlakeshold, &
-                         Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand)
+        CALL gsflow_prms(RUN)
       ENDDO
-      CALL gsflow_prms(CLEAN, AFR, MS_GSF_converge, Nsegshold, Nlakeshold, &
-                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand)
+      CALL gsflow_prms(CLEAN)
 
       END PROGRAM GSFLOW_FORTRAN

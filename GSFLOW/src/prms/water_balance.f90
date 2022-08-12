@@ -147,7 +147,7 @@
       SUBROUTINE water_balance_run()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, NEARZERO, DNEARZERO, LAKE, CASCADE_OFF, CASCADEGW_OFF
       USE PRMS_MODULE, ONLY: Cascade_flag, Cascadegw_flag, Dprst_flag, Glacier_flag, Nowyear, Nowmonth, Nowday, &
-                             Hru_type, Ag_flag
+                             Hru_type, AG_flag
       USE PRMS_WATER_BALANCE
       USE PRMS_BASIN, ONLY: Hru_route_order, Active_hrus, Hru_frac_perv, Hru_area, Hru_area_dble, Hru_perv, &
      &    Basin_area_inv, Dprst_area_max, Hru_percent_imperv, Dprst_frac, Cov_type, Hru_storage, &
@@ -262,7 +262,7 @@
 
         robal = Snowmelt(i) - Hortonian_flow(i) & !includes dprst runoff, if any
      &          - Infil(i)*perv_frac - Hru_impervevap(i) + It0_hru_impervstor(i) - Hru_impervstor(i) + Intcp_changeover(i)
-        if ( Ag_flag==ACTIVE ) robal = robal - Infil_ag(i)*ag_frac(i)
+        if ( AG_flag==ACTIVE ) robal = robal - Infil_ag(i)*ag_frac(i)
         ! need to account for AG in water balance
         IF ( Use_transfer_intcp==ACTIVE ) robal = robal + Net_apply(i)*perv_frac !??? is net_apply for whole HRU (also for ag, impervious, dprst)
         IF ( Net_ppt(i)>0.0 ) THEN
@@ -317,14 +317,14 @@
      &              Hru_impervevap(i), Hru_percent_imperv(i), Net_ppt(i), Pkwater_equiv(i), Snow_evap(i), &
      &              Net_snow(i), Net_rain(i), Hru_sroffp(i), Hru_sroffi(i), Intcp_changeover(i), gmelt, harea
           ENDIF
-          if ( Ag_flag==ACTIVE ) WRITE ( BALUNT, * ) 'ag', perv_frac, ag_frac(i), infil_ag(i)
+          if ( AG_flag==ACTIVE ) WRITE ( BALUNT, * ) 'ag', perv_frac, ag_frac(i), infil_ag(i)
         ENDIF
 
         last_sm = It0_soil_moist(i)
         last_ss = It0_ssres_stor(i)
 
         soilbal = (last_sm - Soil_moist(i) - Perv_actet(i))*perv_frac + Cap_infil_tot(i)
-        IF ( Ag_flag == ACTIVE ) THEN
+        IF ( AG_flag == ACTIVE ) THEN
           soilbal = soilbal - perv_soil_to_gvr(i) - perv_soil_to_gw(i)
         ELSE 
           soilbal = soilbal - Soil_to_ssr(i) - Soil_to_gw(i)
@@ -334,7 +334,7 @@
           WRITE ( BALUNT, * ) soilbal, Cap_infil_tot(i), last_sm, Soil_moist(i), Perv_actet(i), Soil_to_ssr(i), &
      &                        Soil_to_gw(i), i, Infil(i), Pref_flow_infil(i), perv_frac, &
      &                        Soil_moist_max(i), Cap_waterin(i), gmelt
-          IF ( Ag_flag == ACTIVE ) WRITE ( BALUNT, * ) 'pervious for ag', perv_soil_to_gvr(i), perv_soil_to_gw(i)
+          IF ( AG_flag == ACTIVE ) WRITE ( BALUNT, * ) 'pervious for ag', perv_soil_to_gvr(i), perv_soil_to_gw(i)
           IF ( Cascade_flag>CASCADE_OFF ) WRITE ( BALUNT, * ) 'UP cascade', Upslope_interflow(i), Upslope_dunnianflow(i)
         ENDIF
         gvrbal = last_ss - Ssres_stor(i) + Soil_to_ssr(i) - Ssr_to_gw(i) - Swale_actet(i) - Dunnian_flow(i) &
@@ -353,14 +353,14 @@
         waterin = Cap_infil_tot(i) + Pref_flow_infil(i) + Pfr_dunnian_flow(i)
         waterout = Ssr_to_gw(i) + Ssres_flow(i) + Soil_to_gw(i) + Swale_actet(i) + Perv_actet(i)*perv_frac &
      &             + Dunnian_flow(i)
-        IF ( Ag_flag==ACTIVE ) THEN
+        IF ( AG_flag==ACTIVE ) THEN
           waterin = waterin + Ag_cap_infil_tot(i)
           waterout = waterout + hru_ag_actet(i)
         ENDIF
         IF ( Cascade_flag>CASCADE_OFF ) waterout = waterout + Hru_sz_cascadeflow(i)
         soil_in = soil_in + DBLE(Infil(i)*perv_frac)*harea_dble
         soilbal = waterin - waterout + last_ss - Ssres_stor(i) + (last_sm-Soil_moist(i))*perv_frac
-        IF ( Ag_flag==ACTIVE ) THEN
+        IF ( AG_flag==ACTIVE ) THEN
           soil_in = soil_in + DBLE(Infil_ag(i)*ag_frac(i))*harea_dble
           soilbal = soilbal + (It0_ag_soil_moist(i) - Ag_soil_moist(i))*Ag_frac(i)
         ENDIF
@@ -384,7 +384,7 @@
      &                                                        Hru_sz_cascadeflow(i), Ncascade_hru(i)
           WRITE ( BALUNT, * ) Hru_perv(i), perv_frac, Pref_flow_den(i), (Infil(i)*perv_frac), Cap_infil_tot(i)
           WRITE ( BALUNT, * ) Dunnian_flow(i), Pfr_dunnian_flow(i)
-          IF ( Ag_flag==ACTIVE ) WRITE ( BALUNT, * ) &
+          IF ( AG_flag==ACTIVE ) WRITE ( BALUNT, * ) &
               'ag', It0_ag_soil_moist(i), Ag_soil_moist(i), Ag_frac(i), Ag_cap_infil_tot(i), hru_ag_actet(i)
 !          ENDIF
         ENDIF
@@ -399,7 +399,7 @@
           hru_out = hru_out + Hru_gw_cascadeflow(i)
           hru_in = hru_in + Gw_upslope(i)/harea_dble
         ENDIF
-!        Hru_runoff(i) = hru_out - DBLE( Hru_ actet(i) )
+!        Hru_runoff(i) = hru_out - DBLE( Hru_actet(i) )
         wbal = hru_in - hru_out + Hru_storage_ante(i) - Hru_storage(i) !- Intcp_changeover(i)
         IF ( Gwminarea_flag==ACTIVE ) wbal = wbal + Gwstor_minarea_wb(i)
         IF ( DABS(wbal)>DTOOSMALL ) THEN
@@ -411,7 +411,7 @@
           WRITE ( BALUNT, * ) 'storage', Soil_moist_tot(i), Hru_intcpstor(i), Gwres_stor(i), &
                               Pkwater_equiv(i), Hru_impervstor(i), Hru_storage_ante(i), Hru_storage(i)
           WRITE ( BALUNT, * ) 'fractions', perv_frac, Dprst_frac(i), Hru_percent_imperv(i)
-          IF ( Ag_flag==ACTIVE ) WRITE ( BALUNT, * ) 'ag', Ag_soil_moist(i), Ag_frac(i), &
+          IF ( AG_flag==ACTIVE ) WRITE ( BALUNT, * ) 'ag', Ag_soil_moist(i), Ag_frac(i), &
       &        perv_frac + Dprst_frac(i) + Hru_percent_imperv(i) + Ag_frac(i)
           IF ( Cascade_flag>CASCADE_OFF ) WRITE ( BALUNT, * ) 'cascade', &
                Hru_sz_cascadeflow(i), Upslope_dunnianflow(i), Upslope_interflow(i), &
@@ -500,7 +500,7 @@
      &                    Basin_soil_to_gw - Basin_ssflow - Basin_dunnian - &
      &                    Basin_lakeinsz
 
-      IF ( Ag_flag == ACTIVE ) THEN
+      IF ( AG_flag == ACTIVE ) THEN
         Basin_capillary_wb = Basin_capillary_wb - Basin_perv_to_gw
         Basin_soilzone_wb = Basin_soilzone_wb + It0_basin_ag_soil_moist - Basin_ag_soil_moist - Basin_ag_actet
       ELSE
@@ -521,7 +521,7 @@
      &     It0_basin_ssstor, Basin_ssstor, It0_basin_soil_moist, Basin_soil_moist, Basin_perv_et, Basin_swale_et, &
      &     Basin_sz2gw, Basin_soil_to_gw, Basin_ssflow, Basin_dunnian, Basin_dncascadeflow, &
      &     Basin_sm2gvr, Basin_lakeinsz, Basin_dunnian_pfr
-           IF ( Ag_flag == ACTIVE ) WRITE ( BALUNT, * ) 'ag', It0_basin_ag_soil_moist, Basin_ag_soil_moist, Basin_ag_actet
+           IF ( AG_flag == ACTIVE ) WRITE ( BALUNT, * ) 'ag', It0_basin_ag_soil_moist, Basin_ag_soil_moist, Basin_ag_actet
            WRITE ( BALUNT, * ) Nowtime
       ENDIF
 
@@ -529,7 +529,7 @@
       basin_bal = basin_bal*Basin_area_inv
       bsmbal = It0_basin_soil_moist - Basin_soil_moist + It0_basin_ssstor - Basin_ssstor - Basin_perv_et - Basin_sz2gw + soil_in - &
      &         Basin_ssflow - Basin_soil_to_gw - Basin_dunnian - Basin_swale_et - Basin_lakeinsz
-      IF ( Ag_flag == ACTIVE ) bsmbal = bsmbal + It0_basin_ag_soil_moist - Basin_ag_soil_moist - Basin_ag_actet
+      IF ( AG_flag == ACTIVE ) bsmbal = bsmbal + It0_basin_ag_soil_moist - Basin_ag_soil_moist - Basin_ag_actet
 
       WRITE ( SZUNIT, 9002 ) Nowyear, Nowmonth, Nowday, basin_bal, &
      &        bsmbal, It0_basin_soil_moist, Basin_soil_moist, It0_basin_ssstor, &
