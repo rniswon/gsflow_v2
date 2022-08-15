@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2022-02-03'
+      character(len=*), parameter :: Version_stream_temp = '2022-08-11'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -1020,9 +1020,11 @@
 !            No flow in this segment and there never will be becuase there are no upstream HRUs.
             t_o = Seg_tave_water(i)
 
-         elseif (Seg_tave_water(i) < -98.0) then
+! markstro bug fix comment this check out because all cases are
+! correctly caught below.
+!         elseif (Seg_tave_water(i) < -98.0) then
 !            No flow in this segment on this time step, but could be on future time step
-            t_o = Seg_tave_water(i)
+!            t_o = Seg_tave_water(i)
 
          elseif ((fs .le. NEARZERO) .and. (qlat .le. NEARZERO)) then
              ! If there is no flow, set the temperature to -98.9
@@ -1461,6 +1463,7 @@
 !      Voe    = OFFSET, EAST SIDE VEGETATION
 !      Vow    = OFFSET, WEST SIDE VEGETATION
 !
+      USE PRMS_CONSTANTS, ONLY: NEARZERO
       USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_STRMTEMP, ONLY: Azrh, Alte, Altw, Seg_daylight, Seg_width, &
      &    PI, HALF_PI, Cos_seg_lat, Sin_seg_lat, Cos_lat_decl, Horizontal_hour_angle, &
@@ -1482,6 +1485,14 @@
 ! PARAMETER
       REAL, PARAMETER :: RADTOHOUR = 24.0/(2.0 * PI)
 !*********************************************************************************
+
+! if the segment has no width (no flow) set the return values to 0.0
+! and return to avoid dividing by 0.0
+      if (seg_width(seg_id) <= NEARZERO) then
+         shade = 0.0
+         svi = 0.0
+         return
+      endif
 
 !  LATITUDE TRIGONOMETRIC PARAMETERS
       coso = Cos_seg_lat(Seg_id)

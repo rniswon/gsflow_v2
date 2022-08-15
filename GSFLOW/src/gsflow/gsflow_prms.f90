@@ -1017,6 +1017,8 @@
       IF ( decldim('nsub', 0, MAXDIM, 'Number of internal subbasins')/=0 ) CALL read_error(7, 'nsub')
 
       IF ( control_integer(Dprst_flag, 'dprst_flag')/=0 ) Dprst_flag = OFF
+      IF ( control_integer(Dprst_transfer_water_use, 'dprst_transfer_water_use')/=0 ) Dprst_transfer_water_use = OFF
+      IF ( control_integer(Dprst_add_water_use, 'dprst_add_water_use')/=0 ) Dprst_add_water_use = OFF
 
       IF ( PRMS_only==ACTIVE ) THEN
         PRMS_land_iteration_flag = 0

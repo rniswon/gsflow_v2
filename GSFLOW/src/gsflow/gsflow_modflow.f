@@ -409,7 +409,8 @@ C
       CALL SETCONVFACTORS()
 C
       KKPER = KPER
-      IF ( Model==MODFLOW .OR. Model==MODSIM_MODFLOW ) THEN ! ??? what about MODSIM-MODFLOW ???
+!      IF ( Model==MODFLOW .OR. Model==MODSIM_MODFLOW ) THEN ! ??? what about MODSIM-MODFLOW ???
+       IF ( Model==MODFLOW ) THEN
         Kkper_new = GET_KPER()
         Kper_mfo = Kkper_new
       ENDIF

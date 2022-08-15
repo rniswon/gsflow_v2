@@ -899,7 +899,6 @@
      &                           Snow_free(i), Potet_rechr(i), Potet_lower(i), &
      &                           Potet(i), perv_frac, Soil_saturated(i), i, 0)
           ENDIF
-
         ENDIF
         Ag_actet(i) = agactet + hruactet * agfrac
         IF ( Ag_package==ACTIVE ) gsflow_ag_actet(i) = agactet
@@ -1226,7 +1225,6 @@
         ENDIF
 
 ! compute flow to groundwater, if any
-        perc = 0.0
         IF ( depth>0.0 ) THEN
           IF ( Ssr2gw_rate>0.0 ) THEN
 ! use VKS instead of rate  ???????????????

@@ -703,9 +703,11 @@
       Perv_actet = 0.0
       hru_perv_actet = 0.0
       Recharge = 0.0
+      Cap_waterin = 0.0
       Potet_lower = 0.0
       Potet_rechr = 0.0
       Unused_potet = 0.0 ! dimension nhru
+      Soil_saturated = 0.0
 
 ! initialize GSFLOW arrays
       IF ( GSFLOW_flag==ACTIVE ) THEN
@@ -838,7 +840,7 @@
           IF ( Pref_flag==ACTIVE ) Pref_flow_stor(i) = It0_pref_flow_stor(i)
           IF ( Nlake>0 ) Potet(i) = It0_potet(i)
         ENDDO
-        IF ( GSFLOW_flag==ACTIVE ) Gravity_stor_res = It0_gravity_stor_res
+        Gravity_stor_res = It0_gravity_stor_res
       ENDIF
       IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
         IF ( Kkiter>1 ) THEN
