@@ -58,6 +58,7 @@
 !     hru_area, mxsziter
 !***********************************************************************
       INTEGER FUNCTION prms2mfdecl()
+      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION
       USE GSFPRMS2MF
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
@@ -137,7 +138,7 @@
 !    &     'Index of stream segment associate with each stream reach', &
 !    &     'none')/=0 ) CALL read_error(1, 'reach_segment')
 
-      IF ( Nhru/=Nhrucell .OR. Model==99 ) THEN
+      IF ( Nhru/=Nhrucell .OR. Model==DOCUMENTATION ) THEN
         ALLOCATE ( Gvr_hru_pct(Nhrucell) )
         IF ( declparam('prms2mf', 'gvr_hru_pct', 'nhrucell', 'real', &
      &       '0.0', '0.0', '1.0', &

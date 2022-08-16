@@ -1088,6 +1088,7 @@
       TTIME = szero
       TRATE = szero
       QFRAC = szero
+      NUMTABPOND2 = 0
       !
       !1 - ---READ SEGMENT, POND, AND WELL LIST DATA
       IF (KPER .EQ. 1) THEN
@@ -1225,7 +1226,6 @@
                      CALL USTOP('ERROR: SEGID for Pond > NSEG')
                     END IF               
                   ELSE
-                    NUMTABPOND2 = 0
                     MATCH = 0  
                     J = L
                     LLOC = 1
@@ -1601,7 +1601,7 @@
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
       USE PRMS_IT0_VARS, ONLY: It0_dprst_vol_open
       USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
-!      USE GWFBASMODULE, ONLY: TOTIM
+      USE GWFBASMODULE, ONLY: TOTIM
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS:
@@ -1614,6 +1614,7 @@
       ! - -----------------------------------------------------------------
       !
       !1 - ------RESET DEMAND IF IT CHANGES
+      TIME = TOTIM
       if(IUNIT(44).GT.0) then
         if (NUMTAB_SFR.ne.0) then
             DO ii = 1, NUMTAB_SFR
@@ -1637,6 +1638,10 @@
               POND(4,L) = TABPONDFRAC(L)
               POND(2,L) = RATETERPQ(TIME, TABTIMEPOND(:,ID), 
      +                              TABRATEPOND(:,ID), TABVALPOND(L))
+              IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
+                iseg = int(POND(3,L))
+                SEG(2,iseg) = 0.0
+              END IF                
             END DO
           END IF
       END IF
@@ -2472,7 +2477,7 @@
       DOUBLE PRECISION :: Qp, Hh, Ttop, Bbot, dQp, SMOOTHQ
       DOUBLE PRECISION :: QSW, QQ, demandtrigger_gw
       DOUBLE PRECISION :: demandgw_uzf, demandgw_prms
-      INTEGER :: k, ipc !, iseg, PONDID
+      INTEGER :: k, ipc, iseg !, PONDID
       !
       ! - -----------------------------------------------------------------
       !
@@ -2519,14 +2524,15 @@
       agconverge = 0
       IF ( kkiter > 2 ) agconverge = 1    
       DO L = 1, NUMIRRPOND
-        IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
-          PONDSEGFLOW(L) = szero
-        ELSE
+        !IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
+        !  PONDSEGFLOW(L) = szero
+        !ELSE
 !          IF ( POND(3,L) > 0 .and. NUMCELLSPOND(L) > 0 ) THEN
-           IF ( POND(3,L) > 0 ) THEN
-            PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))
+           iseg = int(POND(3,L))
+           IF ( iseg > 0 ) THEN
+            PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(iseg)
           END IF
-        END IF
+        !END IF
       END DO
       !
       !2 - -----IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
@@ -2708,28 +2714,18 @@
       ! Set diversions rates to zero before summing up demands from
       ! flow through ponds.
       !
-        IF ( POND(3,L) > 0 .AND. FLOWTHROUGH_POND(L) == 1 ) THEN
-          SEG(2,int(POND(3,L))) = dzero
+        iseg = int(POND(3,L))
+        IF ( iseg > 0 .AND. FLOWTHROUGH_POND(L) == 1 ) THEN
+          SEG(2,iseg) = dzero
         END IF
       END DO
       !
       ! Set diversion for filling pond
       DO L = 1, NUMIRRPOND
         IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
-          IF ( POND(3,L) > 0 ) THEN
-            SEG(2,int(POND(3,L))) = SEG(2,int(POND(3,L))) + 
-     +                              PONDSEGFLOW(L)
-          END IF
-        END IF
-      END DO
-      !
-      ! Check that diversion does not exceed max constraint
-      DO L = 1, NUMIRRPOND
-        IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
-          IF ( POND(3,L) > 0 ) THEN
-             Q = POND(2, L)
-             IF ( SEG(2,int(POND(3,L))) > Q ) SEG(2,int(POND(3,L))) = Q
-             PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))        
+          iseg = int(POND(3,L))
+          IF ( iseg > 0 ) THEN
+            SEG(2,iseg) = SEG(2,iseg) + PONDSEGFLOW(L)
           END IF
         END IF
       END DO
@@ -3530,6 +3526,7 @@
         if ( kiter == 1 ) then
           PONDFLOWOLD(i) = dzero
           PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
+          PONDSEGFLOW(i) = PONDFLOW(i)
         else
           PONDFLOWOLD(i) = PONDFLOW(i)
           PONDFLOW(i) = PONDFLOW(i) + 
@@ -3546,13 +3543,13 @@
         !set pond inflow using demand.
         IF ( FLOWTHROUGH_POND(i) == 1 .and. NUMCELLSPOND(i) > 0 ) THEN
           PONDSEGFLOW(i) = PONDFLOW(i)
-        END IF  
+        END IF 
         IF ( PONDFLOW(i) > totstor ) PONDFLOW(i) = totstor
      !!   IF ( kiter > 1) THEN
      !!       IF ( PONDFLOW(i) < saveflow ) 
      !!+       PONDFLOW(i) = saveflow
      !!   END IF
-  !      if(ipond==4884)then
+  !      if(ipond==27131)then
   !    etdif = pettotal - aettotal
   !        write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
   !   +                 PONDSEGFLOW(I),pettotal,aettotal,

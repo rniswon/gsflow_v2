@@ -244,7 +244,7 @@
       Basin_net_apply = 0.0D0
       Basin_hru_apply = 0.0D0
       IF ( Ag_package==OFF .AND. irrigation_apply_flag==CANOPY ) &
-     &     CALL error_stop('AG Package not active and agriculture_canopy_flag specified = 0', ERROR_control)
+     &     CALL error_stop('AG Package not active and irrigation_apply_flag specified = 0', ERROR_control)
 
       END FUNCTION intinit
 
