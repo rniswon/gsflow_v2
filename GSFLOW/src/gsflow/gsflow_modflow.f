@@ -431,7 +431,8 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
-     &    ERROR_time, ERROR_modflow, MODSIM_GSFLOW, GSFLOW, CANOPY
+     &    ERROR_time, ERROR_modflow, MODSIM_GSFLOW, GSFLOW, CANOPY,
+     &    MODSIM_MODFLOW
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, no_snow_flag,
      &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
      &    PRMS_land_iteration_flag,
@@ -494,7 +495,7 @@ C7------SIMULATE EACH STRESS PERIOD.
           KSTP = 0
         END IF
         CALL MFNWT_RDSTRESS() ! second time in run, read restart
-        IF ( Model/=MODFLOW ) THEN    !RGN added check for MF only mode 2/21/19
+        IF ( Model==GSFLOW .or. Model==MODSIM_GSFLOW ) THEN    !RGN added check for MF only mode 2/21/19
           IF ( ISSFLG(KKPER).EQ.1 ) CALL error_stop
      &         ('cannot run steady state after first stress period.',
      &          ERROR_modflow)
@@ -565,7 +566,7 @@ C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
      2                                       IGRID,IUNIT(54))  !SWR - JDH
           IF(IUNIT(66).GT.0) CALL GWF2AG7AD(IUNIT(66),KKPER)
 
-          IF ( Model==MODFLOW ) THEN ! ??? what about MODSIM-MODFLOW ???
+          IF ( Model==MODFLOW .or. Model==MODSIM_MODFLOW ) THEN ! ??? what about MODSIM-MODFLOW ???
 C
 C---------INDICATE IN PRINTOUT THAT SOLUTION IS FOR HEADS
             iprt = 0
@@ -1573,7 +1574,7 @@ C
 !     DETERMINE THE STRESS PERIOD FOR THE CURRENT TIMESTEP
 !     ******************************************************************
       INTEGER FUNCTION GET_KPER()
-      USE PRMS_CONSTANTS, ONLY: MODFLOW
+      USE PRMS_CONSTANTS, ONLY: MODFLOW, MODSIM_MODFLOW
       USE GLOBAL, ONLY: NPER
       USE GSFMODFLOW, ONLY: Stress_dates, KPER
       USE PRMS_MODULE, ONLY: Start_year, Start_month, Start_day,
@@ -1585,7 +1586,7 @@ C
       INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
       GET_KPER = -1
-      IF ( Model==MODFLOW ) THEN
+      IF ( Model==MODFLOW .or. Model==MODSIM_MODFLOW ) THEN
         now = mf_nowtime
       ELSE
         now = compute_julday(Nowyear, Nowmonth, Nowday)
@@ -2001,7 +2002,8 @@ C
 ! Set conversion factors to go to and from PRMS and MF units
 !***********************************************************************
       SUBROUTINE SETCONVFACTORS()
-      USE PRMS_CONSTANTS, ONLY: FT2_PER_ACRE, MODFLOW, ERROR_modflow,OFF
+      USE PRMS_CONSTANTS, ONLY: FT2_PER_ACRE, MODFLOW, ERROR_modflow,
+     &                          OFF,MODSIM_MODFLOW
       USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Model, Gvr_cell_pct,
      &    GSFLOW_flag
       use prms_utils, only: error_stop
@@ -2018,7 +2020,8 @@ C
       INTEGER :: i
 !***********************************************************************
       IF ( LENUNI<1 .OR. ITMUNI<1 .OR. LENUNI>3 .OR. ITMUNI>6 ) THEN
-        IF ( Model==MODFLOW .AND. (LENUNI==0.OR.ITMUNI==0) ) RETURN
+        IF ( (Model==MODFLOW .or. Model==MODSIM_MODFLOW) .AND. 
+     &       (LENUNI==0.OR.ITMUNI==0) ) RETURN
         WRITE ( IOUT, 9001 ) LENUNI, ITMUNI
         PRINT 9001, LENUNI, ITMUNI
         ERROR STOP ERROR_modflow
