@@ -793,7 +793,8 @@
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_INTCP, ONLY: Hru_intcpevap
-      USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Dprst_evap_hru, Dprst_seep_hru, Frozen
+      USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Dprst_evap_hru, Dprst_seep_hru, Frozen, &
+          Hru_sroffp, Hortonian_flow, Basin_sroffp, Basin_hortonian
       use prms_utils, only: print_date
       IMPLICIT NONE
 ! Arguments
@@ -812,7 +813,7 @@
       REAL :: perv_frac, capacity, capwater_maxin, ssresin
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
       DOUBLE PRECISION :: gwin
-      INTEGER :: cfgi_frozen_hru
+      INTEGER :: cfgi_frozen_hru, adjust_hortonian
 !***********************************************************************
       szrun = 0
 
@@ -868,6 +869,7 @@
       gwin = 0.0D0
       update_potet = OFF
       IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
+      adjust_hortonian = OFF
 
 ! ***************************************
       DO k = 1, Active_hrus
@@ -925,8 +927,6 @@
 
 !******Add infiltration to soil and compute excess
         dunnianflw = 0.0
-        dunnianflw_pfr = 0.0
-        dunnianflw_gvr = 0.0
         interflow = 0.0
 
 !******Add infiltration to soil and compute excess
@@ -999,8 +999,8 @@
             Pref_flow_infil(i) = pref_flow_maxin - dunnianflw_pfr
             Basin_pref_flow_infil = Basin_pref_flow_infil + DBLE( Pref_flow_infil(i)*harea )
           ENDIF
-          Pfr_dunnian_flow(i) = dunnianflw_pfr
         ENDIF
+        Pfr_dunnian_flow(i) = dunnianflw_pfr
 
         IF ( Cascade_flag>CASCADE_OFF ) THEN
           cap_upflow_max = SNGL(Upslope_dunnianflow(i)+Upslope_interflow(i))/perv_frac
@@ -1012,21 +1012,25 @@
 
 !******Add infiltration to soil and compute excess
         gvr_maxin = 0.0
-        Cap_waterin(i) = capwater_maxin
-
         IF ( cfgi_frozen_hru==OFF ) THEN
           ! call even if capwater_maxin = 0, just in case soil_moist now > Soil_moist_max
           IF ( capwater_maxin+Soil_moist(i)>0.0 ) THEN
-            CALL compute_soilmoist(Cap_waterin(i), Soil_moist_max(i), &
+            CALL compute_soilmoist(capwater_maxin, Soil_moist_max(i), &
      &           Soil_rechr_max(i), Soil2gw_max(i), gvr_maxin, &
      &           Soil_moist(i), Soil_rechr(i), Soil_to_gw(i), perv_frac)
-            Cap_waterin(i) = Cap_waterin(i)*perv_frac
-            Basin_capwaterin = Basin_capwaterin + DBLE( Cap_waterin(i)*harea )
+            Cap_waterin(i) = capwater_maxin * perv_frac
             Basin_soil_to_gw = Basin_soil_to_gw + DBLE( Soil_to_gw(i)*harea )
             Basin_sm2gvr_max = Basin_sm2gvr_max + DBLE( gvr_maxin*harea )
             Soil_to_ssr(i) = gvr_maxin
           ENDIF
+        ELSE
+          adjust_hortonian = ACTIVE
+          Cap_waterin(i) = 0.0
+          Sroff(i) = Sroff(i) + capwater_maxin
+          Hru_sroffp(i) = Hru_sroffp(i) + capwater_maxin * perv_frac
+          Hortonian_flow(i) = Hortonian_flow(i) + capwater_maxin * perv_frac
         ENDIF
+        Basin_capwaterin = Basin_capwaterin + DBLE( Cap_waterin(i)*harea )
 
 ! compute slow interflow and ssr_to_gw
         topfr = 0.0
@@ -1078,6 +1082,7 @@
         ENDIF
 
         ! compute contribution to Dunnian flow from PFR, if any
+        dunnianflw_gvr = 0.0
         IF ( Pref_flow_den(i)>0.0 ) THEN
           availh2o = Pref_flow_stor(i) + topfr
           dunnianflw_gvr = MAX( 0.0, availh2o-Pref_flow_max(i) )
@@ -1137,7 +1142,6 @@
           interflow = Slow_flow(i) + prefflow
           Basin_interflow_max = Basin_interflow_max + interflow*harea
           dunnianflw = dunnianflw_gvr + dunnianflw_pfr
-          Dunnian_flow(i) = dunnianflw
           IF ( Cascade_flag>CASCADE_OFF ) THEN
             IF ( Ncascade_hru(i)>0 ) THEN
               dnslowflow = 0.0
@@ -1145,7 +1149,7 @@
               dndunn = 0.0
               IF ( interflow+dunnianflw>0.0 ) THEN
                 CALL compute_cascades(i, Ncascade_hru(i), Slow_flow(i), &
-     &                                prefflow, Dunnian_flow(i), dnslowflow, &
+     &                                prefflow, dunnianflw, dnslowflow, &
      &                                dnpreflow, dndunn)
                 Basin_dninterflow = Basin_dninterflow + DBLE( (dnslowflow+dnpreflow)*harea )
                 Basin_dndunnianflow = Basin_dndunnianflow + DBLE( dndunn*harea )
@@ -1167,9 +1171,11 @@
           Basin_slowflow = Basin_slowflow + DBLE( Slow_flow(i)*harea )
 
 ! treat dunnianflw as surface runoff to streams
-          Sroff(i) = Sroff(i) + Dunnian_flow(i)
-          Basin_sroff = Basin_sroff + DBLE( Sroff(i)*harea )
-          Basin_dunnian = Basin_dunnian + DBLE( Dunnian_flow(i)*harea )
+          IF ( dunnianflw > 0.0 ) THEN
+            adjust_hortonian = ACTIVE
+            Sroff(i) = Sroff(i) + dunnianflw
+            Basin_dunnian = Basin_dunnian + DBLE( dunnianflw*harea )
+          ENDIF
           Ssres_stor(i) = Slow_stor(i) + Pref_flow_stor(i)
 
         ELSE ! for swales
@@ -1200,6 +1206,7 @@
           ENDIF
           Ssres_stor(i) = Slow_stor(i)
         ENDIF
+        Dunnian_flow(i) = dunnianflw
 
         IF ( Soil_lower_stor_max(i)>0.0 ) Soil_lower_ratio(i) = Soil_lower(i)/Soil_lower_stor_max(i)
         Ssres_in(i) = Soil_to_ssr(i) + Pref_flow_infil(i) + SNGL( gwin )
@@ -1281,6 +1288,20 @@
           Basin_potet = Basin_potet + DBLE( Potet(i)*Hru_area(i) )
         ENDDO
         Basin_potet = Basin_potet*Basin_area_inv
+      ENDIF
+      IF ( adjust_hortonian == ACTIVE ) THEN
+        Basin_hortonian = 0.0D0
+        Basin_sroff = 0.0D0
+        Basin_sroffp = 0.0D0
+        DO k = 1, Active_hrus
+          i = Hru_route_order(k)
+          Basin_hortonian = Basin_hortonian + DBLE( Hortonian_flow(i)*Hru_area(i) )
+          Basin_sroff = Basin_sroff + DBLE( Sroff(i)*Hru_area(i) )
+          Basin_sroffp = Basin_sroffp + DBLE( Hru_sroffp(i)*Hru_perv(i) )
+        ENDDO
+        Basin_hortonian = Basin_hortonian*Basin_area_inv
+        Basin_sroff = Basin_sroff*Basin_area_inv
+        Basin_sroffp = Basin_sroffp*Basin_area_inv
       ENDIF
 
       END FUNCTION szrun
