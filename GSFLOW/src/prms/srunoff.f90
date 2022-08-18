@@ -738,11 +738,6 @@
         Sroff_ag = 0.0
         Hru_sroffp(i) = 0.0
         Contrib_fraction(i) = 0.0
-!******Impervious area computations, need to zero fluxes in case of dynamic
-        Hruarea_imperv = Hru_imperv(i)
-        Hru_sroffi(i) = 0.0
-        Imperv_evap(i) = 0.0
-        Hru_impervevap(i) = 0.0
 
         avail_et = Potet(i) - Snow_evap(i) - Hru_intcpevap(i)
         availh2o = Intcp_changeover(i) + Net_rain(i) + SNGL(upslope) + Net_apply(i)
@@ -788,6 +783,11 @@
           Frozen(i) = frzen
         ENDIF
 
+!******Impervious area computations, need to zero fluxes in case of dynamic
+        Hru_sroffi(i) = 0.0
+        Imperv_evap(i) = 0.0
+        Hru_impervevap(i) = 0.0
+        Hruarea_imperv = Hru_imperv(i)
         IF ( Hruarea_imperv > 0.0 ) THEN
           Imperv_frac = Hru_percent_imperv(i)
           Imperv_stor(i) = Imperv_stor(i) + availh2o_total
