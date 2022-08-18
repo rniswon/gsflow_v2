@@ -487,7 +487,7 @@
           ENDIF
         ENDIF
       ENDIF
-    ELSE ! AFR = FALSE, thus MODSIM-PRMS simulations
+    ELSEIF ( Model == MODSIM_PRMS ) THEN
       IF ( AG_flag==ACTIVE ) THEN
         ierr = soilzone_ag(AFR,1)
       ELSE
@@ -495,7 +495,7 @@
       ENDIF
       ! rsr, need to do something if gwflow_cbh_flag=1
       ierr = gwflow()
-    ENDIF ! end of AFR = TRUE blose
+    ENDIF ! end of AFR = TRUE block
 
 ! for GSFLOW simulations
 ! TODO below need this for MODSIM-GSFLOW and GSFLOW
