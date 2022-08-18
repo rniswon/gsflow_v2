@@ -712,7 +712,7 @@
           IF ( Hru_type(i)==GLACIER ) THEN
             Isglacier = 1
             glcrmltb = Glacrb_melt(i)
-            IF ( Glacier_frac(i)>0.0 ) THEN
+            IF ( Glacier_frac(i)>0.0 ) THEN ! should frozen ground be triggered if glacier_frac > 0.75 (maybe a parameter)?
               active_glacier = ACTIVE
             ELSE
               active_glacier = OFF  ! glacier capable HRU, but not glaciated
@@ -725,7 +725,7 @@
 !     eventually add code for lake area less than hru_area
 !     that includes soil_moist for fraction of hru_area that is dry bank
           Hortonian_lakes(i) = upslope
-          Basin_hortonian_lakes = Basin_hortonian_lakes + Hortonian_lakes(i)*Hruarea_dble
+          Basin_hortonian_lakes = Basin_hortonian_lakes + upslope*Hruarea_dble
           CYCLE
         ENDIF
 
@@ -740,8 +740,8 @@
         Contrib_fraction(i) = 0.0
 
         avail_et = Potet(i) - Snow_evap(i) - Hru_intcpevap(i)
-        availh2o = Intcp_changeover(i) + Net_rain(i) + upslope + Net_apply(i)
-        availh2o_total = Intcp_changeover(i) + upslope + Net_apply(i) + glcrmltb
+        availh2o = Intcp_changeover(i) + Net_rain(i) + SNGL(upslope) + Net_apply(i)
+        availh2o_total = Intcp_changeover(i) + SNGL(upslope) + Net_apply(i) + glcrmltb
         IF ( Pptmix_nopack(i)==ACTIVE ) availh2o_total = availh2o_total + Net_rain(i)
         !******If precipitation on snowpack all water available to the surface is considered to be snowmelt
         !******If there is no snowpack and no precip,then check for melt from last of snowpack.
@@ -788,8 +788,8 @@
         Imperv_evap(i) = 0.0
         Hru_impervevap(i) = 0.0
         Hruarea_imperv = Hru_imperv(i)
-        Imperv_frac = Hru_percent_imperv(i)
-        IF ( Imperv_frac > 0.0 ) THEN
+        IF ( Hruarea_imperv > 0.0 ) THEN
+          Imperv_frac = Hru_percent_imperv(i)
           Imperv_stor(i) = Imperv_stor(i) + availh2o_total
           IF ( frzen == OFF ) THEN
             IF ( Hru_type(i) /= SWALE ) THEN
