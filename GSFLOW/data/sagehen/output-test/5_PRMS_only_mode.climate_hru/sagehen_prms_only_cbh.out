@@ -81,7 +81,7 @@ Potential Evapotranspiration    climate_hru         2022-06-02
 Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-07-29
 Snow Dynamics                   snowcomp            2022-04-27
-Surface Runoff                  srunoff_smidx       2022-05-26
+Surface Runoff                  srunoff_smidx       2022-08-10
 Soilzone Computations           soilzone            2022-07-25
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing              strmflow            2021-11-19
@@ -128,5 +128,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  *************************************************************
  Total for run     668.938  375.566    9.201  287.270  260.348
  *************************************************************
-Execution elapsed time    0 minutes  1.63 seconds
+Execution elapsed time    0 minutes  1.66 seconds
 

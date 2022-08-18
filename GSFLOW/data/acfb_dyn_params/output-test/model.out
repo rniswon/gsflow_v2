@@ -99,12 +99,13 @@ Potential Evapotranspiration    climate_hru         2022-06-02
 Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-07-29
 Snow Dynamics                   snowcomp            2022-04-27
-Surface Runoff                  srunoff_smidx       2022-05-26
+Surface Runoff                  srunoff_smidx       2022-08-10
 Soilzone Computations           soilzone            2022-07-25
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing Init         routing             2022-04-21
 Streamflow Routing              muskingum           2021-11-19
 Output Summary                  basin_sum           2022-04-22
+Water Balance Computations      water_balance       2022-05-09
 Output Summary                  nhru_summary        2022-08-04
 Statistics Variables Output     statvar_out         2021-09-08
 Output Summary                  prms_summary        2022-04-21
@@ -153,5 +154,5 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
  *************************************************************
  Total for run    1110.775  440.221    8.439  693.939   13.445
  *************************************************************
-Execution elapsed time    0 minutes  1.14 seconds
+Execution elapsed time    0 minutes  1.42 seconds
 

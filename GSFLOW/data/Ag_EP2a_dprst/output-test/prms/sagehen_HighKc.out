@@ -109,7 +109,7 @@ Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-07-29
 Snow Dynamics                   snowcomp            2022-04-27
-Surface Runoff                  srunoff_smidx       2022-05-26
+Surface Runoff                  srunoff_smidx       2022-08-10
 Soilzone Computations           soilzone            2022-07-25
 Soilzone Computations           soilzone_ag         2022-08-05
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-04-07
@@ -140,5 +140,5 @@ DPRST area:                  22.42    Fraction DPRST:          0.0033
 Agriculture area:            67.91    Fraction AG:             0.0101
 
 
-Execution elapsed time    2 minutes 33.53 seconds
+Execution elapsed time    2 minutes 31.50 seconds
 
