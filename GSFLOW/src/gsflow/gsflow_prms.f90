@@ -460,7 +460,7 @@
           ierr = soilzone_ag(AFR, 1)
         ENDIF
 
-        IF ( MODEL/=GSFLOW ) THEN
+        IF ( GSFLOW_flag == OFF ) THEN
           ! rsr, need to do something if gwflow_cbh_flag=1
           ierr = gwflow()
 
