@@ -424,13 +424,6 @@
      &         'Fraction of agricultural surface runoff that flows into'// &
      &         ' surface-depression storage; the remainder flows to a stream network for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'sro_to_dprst_ag')
-        CALL declvar_dble(MODNAME, 'basin_ag_contrib_fraction', 'one', 1, &
-     &       'Basin area-weighted average contributing area of the agriculture area of each HRU', &
-     &       'decimal fraction', basin_ag_contrib_fraction)
-        ALLOCATE ( ag_contrib_fraction(Nhru) )
-        CALL declvar_real(MODNAME, 'ag_contrib_fraction', 'nhru', Nhru, &
-     &       'Contributing area of each HRU agriculture area', &
-     &       'decimal fraction', ag_contrib_fraction)
         ENDIF
 
         ALLOCATE ( Dprst_et_coef(Nhru) )
@@ -478,6 +471,13 @@
         CALL declvar_real(MODNAME, 'infil_ag', 'nhru', Nhru, &
      &       'Infiltration to the agriculture reservoirs for each HRU', &
      &       'inches', Infil_ag)
+        CALL declvar_dble(MODNAME, 'basin_ag_contrib_fraction', 'one', 1, &
+     &       'Basin area-weighted average contributing area of the agriculture area of each HRU', &
+     &       'decimal fraction', basin_ag_contrib_fraction)
+        ALLOCATE ( ag_contrib_fraction(Nhru) )
+        CALL declvar_real(MODNAME, 'ag_contrib_fraction', 'nhru', Nhru, &
+     &       'Contributing area of each HRU agriculture area', &
+     &       'decimal fraction', ag_contrib_fraction)
       ENDIF
 
       END FUNCTION srunoffdecl
