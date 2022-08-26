@@ -23,7 +23,7 @@ nlapse                 3
 ====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 03/01/2022
+                       Version 5.3.0 07/29/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,7 +36,7 @@ nlapse                 3
        Precip Dist: precip_1sta, precip_laps, precip_dist2,
                     climate_hru, precip_map
 Temp & Precip Dist: xyz_dist, ide_dist
-    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
 Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
                     potet_hs, potet_pt, potet_pm, potet_pm_sta
@@ -46,7 +46,7 @@ Snow & Glacr Dynam: snowcomp, glacr_melt
          Soil Zone: soilzone, soilzone_ag
        Groundwater: gwflow
 Streamflow Routing: strmflow, strmflow_in_out, muskingum,
-                    muskingum_lake, muskingum_mann
+                    muskingum_lake, muskingum_mann, segment_to_hru
 Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
@@ -59,10 +59,10 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-03-01
-Read Control File               read_control_file   2022-02-23
+PRMS Computation Order          gsflow_prms         2022-07-29
+Read Control File               read_control_file   2022-07-29
 Read Parameter File             read_parameter_file 2022-01-12
-Read Data File                  read_data_file      2022-01-12
+Read Data File                  read_data_file      2022-06-02
 
 
 ====================================================================
@@ -157,20 +157,21 @@ tmin 16
  Data File time period: 1948/10/01 00:00:00 to 2015/09/30 00:00:00
 Simulation time period: 1971/10/01 00:00:00 to 2015/09/30 00:00:00
 ====================================================================
-Basin Definition                basin               2022-05-25
-Common States and Fluxes        climateflow         2022-05-25
-Potential Solar Radiation       soltab              2021-09-07
+Basin Definition                basin               2022-07-25
+Common States and Fluxes        climateflow         2022-08-05
+Potential Solar Radiation       soltab              2022-03-29
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2022-04-21
 Temp & Precip Distribution      xyz_dist            2022-05-09
-Solar Radiation Distribution    ccsolrad            2021-12-09
+Cloud cover                     cloud_cover         2022-06-07
+Solar Radiation Distribution    ccsolrad            2022-06-07
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2022-05-09
+Canopy Interception             intcp               2022-07-29
 Snow Dynamics                   snowcomp            2022-04-27
 Glacier Dynamics                glacr_melt          2022-01-12
-Surface Runoff                  srunoff_smidx       2022-05-26
-Soilzone Computations           soilzone            2022-05-26
+Surface Runoff                  srunoff_smidx       2022-08-10
+Soilzone Computations           soilzone            2022-07-25
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing Init         routing             2022-04-21
 Streamflow Routing              muskingum           2021-11-19
@@ -198,52 +199,52 @@ Fraction impervious:        0.0687    Fraction pervious:       0.9313
                   (inches) (inches) (inches) (inches) (inches)
  -------------------------------------------------------------
  initial                               4.912
-   1972             11.095    6.252    2.849    6.915   -7.040
-   1973              9.229    7.288    2.567    2.272   -7.021
-   1974              8.515    6.107    1.961    3.023   -7.021
-   1975             11.982    7.976    2.726    3.381   -7.021
-   1976              7.685    6.182    1.813    2.452   -7.040
-   1977             12.102    5.936    2.100    7.026   -7.021
-   1978              8.871    6.317    1.457    3.263   -7.021
-   1979             11.400    6.821    1.277    5.108   -7.021
-   1980             11.233    6.756    2.801    2.978   -7.040
-   1981             12.862    9.622    2.635    3.529   -7.021
-   1982              6.102    4.559    1.798    2.482   -7.021
-   1983             12.117    6.700    3.460    4.042   -7.021
-   1984              9.436    8.390    1.817    2.813   -7.040
-   1985             13.146    7.616    2.945    4.602   -7.021
-   1986              7.630    4.929    1.231    4.691   -7.021
-   1987              9.401    6.239    1.916    2.660   -7.021
-   1988             12.897    9.195    1.876    4.021   -7.040
-   1989             13.281    6.590    2.264    6.454   -7.021
-   1990             12.651    5.734    2.846    6.372   -7.021
-   1991              9.734    6.526    1.665    4.691   -7.021
-   1992             13.249    6.183    2.981    5.882   -7.040
-   1993             10.296    6.852    2.813    3.752   -7.021
-   1994              8.073    5.746    1.660    3.531   -7.021
-   1995             12.085    7.926    1.717    4.193   -7.021
-   1996              7.038    4.443    1.387    2.944   -7.040
-   1997              6.778    4.991    1.042    2.294   -7.021
-   1998              6.647    4.008    1.467    2.348   -7.021
-   1999              7.868    6.053    1.644    1.730   -7.021
-   2000              9.908    5.926    2.792    3.634   -7.040
-   2001              7.618    6.912    1.580    2.106   -7.021
-   2002              9.953    6.045    3.447    2.085   -6.361
-   2003              8.866    7.485    2.419    2.491    0.210
-   2004              6.666    5.300    2.538    1.418    0.132
-   2005             11.914    8.719    2.657    3.558    0.275
-   2006              7.410    5.821    2.472    2.077   -7.021
-   2007              5.456    3.508    1.835    2.632   -7.021
-   2008              7.207    5.745    2.205    1.114   -7.040
-   2009              6.532    5.665    1.543    1.867   -7.021
-   2010              8.305    6.780    1.504    1.575   -7.021
-   2011              7.586    5.694    1.327    2.116   -7.021
-   2012              9.316    6.237    1.542    3.128   -7.040
-   2013             10.819    5.587    2.224    5.198   -7.021
-   2014             11.512    7.579    1.423    5.357   -7.021
-   2015              5.728    4.108    1.062    2.296   -7.021
+   1972             11.095    6.338    2.849    7.111   -7.040
+   1973              9.229    7.367    2.567    2.233   -7.021
+   1974              8.515    6.237    1.961    3.042   -7.021
+   1975             11.982    8.090    2.726    3.287   -7.021
+   1976              7.685    6.285    1.813    2.427   -7.040
+   1977             12.102    6.000    2.100    6.168   -7.021
+   1978              8.871    6.403    1.457    3.290   -7.021
+   1979             11.400    6.894    1.277    4.966   -7.021
+   1980             11.233    6.862    2.801    3.002   -7.040
+   1981             12.862    9.713    2.635    3.474   -7.021
+   1982              6.102    4.689    1.798    2.383   -7.021
+   1983             12.117    6.798    3.460    3.859   -7.021
+   1984              9.436    8.514    1.817    2.702   -7.040
+   1985             13.146    7.702    2.945    4.559   -7.021
+   1986              7.630    5.006    1.231    4.613   -7.021
+   1987              9.401    6.359    1.916    2.485   -7.021
+   1988             12.897    9.283    1.876    3.851   -7.040
+   1989             13.281    6.633    2.264    6.643   -7.021
+   1990             12.651    5.784    2.846    6.683   -7.021
+   1991              9.734    6.592    1.665    4.581   -7.021
+   1992             13.249    6.256    2.981    6.014   -7.040
+   1993             10.296    6.947    2.813    3.714   -7.021
+   1994              8.073    5.849    1.660    3.579   -7.021
+   1995             12.085    8.024    1.717    4.231   -7.021
+   1996              7.038    4.551    1.387    2.988   -7.040
+   1997              6.778    5.081    1.042    2.149   -7.021
+   1998              6.647    4.110    1.467    2.230   -7.021
+   1999              7.868    6.115    1.644    1.641   -7.021
+   2000              9.908    6.029    2.792    2.867   -7.040
+   2001              7.618    6.972    1.580    1.925   -7.021
+   2002              9.953    6.116    3.447    2.050   -6.361
+   2003              8.866    7.543    2.419    2.413    0.210
+   2004              6.666    5.346    2.538    1.248    0.132
+   2005             11.914    8.805    2.657    3.141    0.275
+   2006              7.410    5.899    2.472    1.777   -7.021
+   2007              5.456    3.625    1.835    2.605   -7.021
+   2008              7.207    5.778    2.205    1.093   -7.040
+   2009              6.532    5.728    1.543    1.532   -7.021
+   2010              8.305    6.838    1.504    1.569   -7.021
+   2011              7.586    5.779    1.327    2.084   -7.021
+   2012              9.316    6.334    1.542    2.912   -7.040
+   2013             10.819    5.677    2.224    4.721   -7.021
+   2014             11.512    7.639    1.423    4.940   -7.021
+   2015              5.728    4.211    1.062    1.985   -7.021
  *************************************************************
- Total for run     418.200  279.047    1.062  152.101 -286.767
+ Total for run     418.200  282.803    1.062  146.769 -286.767
  *************************************************************
-Execution elapsed time    0 minutes  3.61 seconds
+Execution elapsed time    0 minutes  3.53 seconds
 

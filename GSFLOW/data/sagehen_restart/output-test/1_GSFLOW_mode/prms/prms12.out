@@ -27,7 +27,7 @@ ndays                366
 ====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 03/01/2022
+                       Version 5.3.0 07/29/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -40,7 +40,7 @@ ndays                366
        Precip Dist: precip_1sta, precip_laps, precip_dist2,
                     climate_hru, precip_map
 Temp & Precip Dist: xyz_dist, ide_dist
-    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
 Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
                     potet_hs, potet_pt, potet_pm, potet_pm_sta
@@ -50,7 +50,7 @@ Snow & Glacr Dynam: snowcomp, glacr_melt
          Soil Zone: soilzone, soilzone_ag
        Groundwater: gwflow
 Streamflow Routing: strmflow, strmflow_in_out, muskingum,
-                    muskingum_lake, muskingum_mann
+                    muskingum_lake, muskingum_mann, segment_to_hru
 Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
@@ -63,10 +63,10 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-03-01
-Read Control File               read_control_file   2022-02-23
+PRMS Computation Order          gsflow_prms         2022-07-29
+Read Control File               read_control_file   2022-07-29
 Read Parameter File             read_parameter_file 2022-01-12
-Read Data File                  read_data_file      2022-01-12
+Read Data File                  read_data_file      2022-06-02
 
 
 ====================================================================
@@ -95,21 +95,21 @@ runoff 1
  Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
 Simulation time period: 1983/11/11 00:00:00 to 1983/11/17 00:00:00
 ====================================================================
-Basin Definition                basin               2022-05-25
+Basin Definition                basin               2022-07-25
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-05-25
-Potential Solar Radiation       soltab              2021-09-07
+Common States and Fluxes        climateflow         2022-08-05
+Potential Solar Radiation       soltab              2022-03-29
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2022-04-21
-Temperature Distribution        climate_hru         2022-05-09
-Precipitation Distribution      climate_hru         2022-05-09
+Temperature Distribution        climate_hru         2022-06-02
+Precipitation Distribution      climate_hru         2022-06-02
 Solar Radiation Distribution    ddsolrad            2021-11-19
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2022-05-09
+Canopy Interception             intcp               2022-07-29
 Snow Dynamics                   snowcomp            2022-04-27
-Surface Runoff                  srunoff_smidx       2022-05-26
-Soilzone Computations           soilzone            2022-05-26
+Surface Runoff                  srunoff_smidx       2022-08-10
+Soilzone Computations           soilzone            2022-07-25
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-04-07
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2022-04-27
@@ -133,5 +133,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    0 minutes  2.20 seconds
+Execution elapsed time    0 minutes  1.88 seconds
 

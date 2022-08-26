@@ -10,7 +10,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output CSV Summary'
       character(len=10), parameter :: MODNAME = 'gsflow_sum'
-      character(len=*), parameter :: Version_gsflow_sum = '2022-04-22'
+      character(len=*), parameter :: Version_gsflow_sum = '2022-08-26'
       INTEGER, SAVE :: BALUNT
       DOUBLE PRECISION, PARAMETER :: ERRCHK = 0.0001D0
       INTEGER, SAVE :: Balance_unt, Vbnm_index(14), Gsf_unt, Rpt_count
@@ -558,7 +558,7 @@
      &    Well_out, Stream_inflow, Basin_gw2sm, Sat_dS, StreamExchng2Sat_Q, Unsat_S, Sat_S, Basin_actetgw, Basin_fluxchange
 !      USE GSFPRMS2MF, ONLY: Basin_reach_latflow
       USE GWFUZFMODULE, ONLY: UZTSRAT
-      USE GWFSFRMODULE, ONLY: SFRUZBD, STRMDELSTOR_RATE, SFRRATIN, SFRRATOUT, IRTFLG, TOTSPFLOW
+      USE GWFSFRMODULE, ONLY: SFRUZBD, STRMDELSTOR_RATE, SFRRATIN, SFRRATOUT, IRTFLG, TOTSPFLOW, SFRUZINFIL
       USE GWFLAKMODULE, ONLY: TOTGWIN_LAK, TOTGWOT_LAK, TOTDELSTOR_LAK, &
      &    TOTSTOR_LAK, TOTWTHDRW_LAK, TOTRUNF_LAK, TOTSURFIN_LAK, &
      &    TOTSURFOT_LAK, TOTEVAP_LAK, TOTPPT_LAK, NLAKES, EVAPLK
@@ -701,6 +701,7 @@
       SatDisch2Stream_Q = SFRRATOUT
       UnsatStream_S = SFRUZBD(10)
       BoundaryStreamFlow_Q = TOTSPFLOW
+      Stream2Unsat_Q = SFRUZINFIL
 
       IF ( Timestep>1 ) THEN ! rsr, this could be incorrect for restart
         Ave_SoilDrainage2Unsat_Q = (Ave_SoilDrainage2Unsat_Q*(Timestep-1)) + PotGravDrn2Unsat_Q - &

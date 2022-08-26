@@ -90,7 +90,7 @@ contains
                            Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, irrigated_area_module, AET_module, &
                            PET_ag_module, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, &
                            Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, &
-                           mappingFileName, xyFileName, Iter_aet_flag, text_restart_flag, irrigation_apply_flag
+                           Iter_aet_flag, text_restart_flag, irrigation_apply_flag
     use PRMS_CLIMATE_HRU, only: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, Albedo_day, Cloud_cover_day, &
                                 Cbh_check_flag, Windspeed_day, Humidity_day, &
                                 AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
@@ -564,16 +564,6 @@ contains
     Control_parameter_data(i) % values_character(1) = Model_output_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
-    Control_parameter_data(i) % name = 'mappingFileName'
-    mappingFileName = 'MODSIM.map'
-    Control_parameter_data(i) % values_character(1) = mappingFileName
-    Control_parameter_data(i) % data_type = CHAR_TYPE
-    i = i + 1
-    Control_parameter_data(i) % name = 'xyFileName'
-    xyFileName = 'MODSIM.xy'
-    Control_parameter_data(i) % values_character(1) = xyFileName
-    Control_parameter_data(i) % data_type = CHAR_TYPE
-    i = i + 1
     Control_parameter_data(i) % name = 'csv_output_file'
     Csv_output_file = 'prms_summary.csv'
     Control_parameter_data(i) % values_character(1) = Csv_output_file
@@ -965,7 +955,7 @@ contains
   !***********************************************************************
   module subroutine get_control_filename()
     use PRMS_CONSTANTS, only: MAXCMDLINE_LENGTH, ERROR_control
-    use PRMS_MODULE, only: Print_debug, EQULS, Model_control_file, command_line, Model_mode
+    use PRMS_MODULE, only: Print_debug, EQULS, Model_control_file, command_line
     use prms_utils, only: error_stop
     implicit none
     ! Functions
@@ -977,18 +967,13 @@ contains
     !***********************************************************************
     ! Subroutine GET_COMMAND_ARGUMENT may not be available with all compilers-it is a Fortran 2003 routine
     ! This routine expects the Control File name to be the first argument, if present
-    if ( Model_mode(:7) /= 'MODSIM' ) then
-      call GET_COMMAND(command_line)
-      numargs = COMMAND_ARGUMENT_COUNT()
-      call GET_COMMAND_ARGUMENT(1, command_line_arg, nchars, status)
-      if (status /= 0) then
-        write (*, '(/,A)') 'Enter the name of the PRMS Control File or quit:'
-        read (*, '(A)') Model_control_file
-        if (Model_control_file(:4) == 'quit' .or. Model_control_file(:4) == 'QUIT') ERROR stop ERROR_control
-      endif
-    else
-      numargs = count_words_text(command_line)
-      read (*, '(A)') command_line_arg
+    call GET_COMMAND(command_line)
+    numargs = COMMAND_ARGUMENT_COUNT()
+    call GET_COMMAND_ARGUMENT(1, command_line_arg, nchars, status)
+    if (status /= 0) then
+      write (*, '(/,A)') 'Enter the name of the PRMS Control File or quit:'
+      read (*, '(A)') Model_control_file
+      if (Model_control_file(:4) == 'quit' .or. Model_control_file(:4) == 'QUIT') ERROR stop ERROR_control
     endif
     print *, 'Command line: ', trim(command_line)
     if (Print_debug > -1) print '(/,A)', EQULS

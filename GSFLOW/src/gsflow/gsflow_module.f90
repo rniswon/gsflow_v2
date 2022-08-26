@@ -21,7 +21,7 @@
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus, NLAKES_MF, Nreach
       INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval, Nmap2hru, Nmap, Nsnow
 ! Global
-      !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 10=MODSIM-GSFLOW; 11=MODSIM-PRMS; 12=MODSIM-MODFLOW; 13=MODSIM)
+      !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW)
       INTEGER, SAVE :: Model, Process_flag, Call_cascade, PRMS_only
       INTEGER, SAVE :: Start_year, Start_month, Start_day, End_year, End_month, End_day
       INTEGER, SAVE :: Transp_flag, Sroff_flag, Solrad_flag, Et_flag, AG_flag
@@ -42,7 +42,6 @@
       INTEGER, SAVE :: Lake_transfer_water_use, Lake_add_water_use
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
       INTEGER, SAVE :: mf_timestep, startday, endday, mf_nowtime, Number_timesteps
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Lake_In_Out_vol(:)
       character(LEN=MAXCMDLINE_LENGTH) command_line
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
@@ -68,7 +67,6 @@
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file, Data_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Csv_output_file, Model_control_file, Param_file, Stat_var_file
-      CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: mappingFileName, xyFileName
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Temp_module, Srunoff_module, Et_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Strmflow_module, Transp_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Model_mode, Precip_module, Solrad_module

@@ -674,7 +674,7 @@ SELECTED MODEL CELLS ARE:
 
 
 
- AG -- AG PACKAGE FOR NWT VERSION 1.2.0,  3/03/2020 INPUT READ FROM UNIT   57
+ AG -- AG PACKAGE FOR NWT VERSION 1.3.0,  3/03/2020 INPUT READ FROM UNIT   57
  # AG options
 
  PROCESSING AG OPTIONS
@@ -37124,6 +37124,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/06/07 19:00:55
- Elapsed run time: 3.059 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/08/05 20:52:04
+ Elapsed run time: 3.654 Seconds
 
