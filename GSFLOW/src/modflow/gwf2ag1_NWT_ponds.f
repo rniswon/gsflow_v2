@@ -3531,7 +3531,7 @@
           PONDFLOWOLD(i) = PONDFLOW(i)
           PONDFLOW(i) = PONDFLOW(i) + 
      +                (sone - REAL(AGCONVERGE))*SNGL(factor)
-        end if
+        end if             
         !
         !set max pond irrigation rate
         !
@@ -3542,6 +3542,8 @@
         !
         !set pond inflow using demand.
         IF ( FLOWTHROUGH_POND(i) == 1 .and. NUMCELLSPOND(i) > 0 ) THEN
+          if ( PONDFLOW(i) > POND(4,i)*POND(2,i) ) 
+     +         PONDFLOW(i) = POND(4,i)*POND(2,i)
           PONDSEGFLOW(i) = PONDFLOW(i)
         END IF 
         IF ( PONDFLOW(i) > totstor ) PONDFLOW(i) = totstor
