@@ -425,7 +425,7 @@
             Hru_ag_irr = 0.0 ! dimension nhru
           ENDIF
         ENDIF
-      ELSEIF ( Iter_aet==ACTIVE ) THEN
+      ELSEIF ( Iter_aet_flag==ACTIVE ) THEN
         ! computed in srunoff
         It0_sroff = Sroff
         It0_strm_seg_in = Strm_seg_in
@@ -457,7 +457,7 @@
             Strm_seg_in = It0_strm_seg_in
           ENDIF
         ENDIF
-      ELSEIF ( Iter_aet==ACTIVE ) THEN
+      ELSEIF ( Iter_aet_flag==ACTIVE ) THEN
         Sroff = It0_sroff
         Strm_seg_in = It0_strm_seg_in
       ENDIF

@@ -16,16 +16,17 @@
 !     ******************************************************************
 !     Mapping module to convert MODSIM diversions for use by PRMS
 !     ******************************************************************
-      SUBROUTINE gsflow_modsim2prms(DIVERSIONS)
+      SUBROUTINE gsflow_modsim2prms(DIVERSIONS, Nsegshold)
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, FT2_PER_ACRE
-      USE PRMS_MODULE, ONLY: Process_flag, Nsegment, Nhru
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru
       USE GSFMODSIM2PRMS
       USE PRMS_MODSIM_DIVERSION_READ, ONLY: Nag_diversions, seg_source_id, hru_destination_id, destination_frac
       use prms_utils, only: print_module
       USE PRMS_MMFAPI, only: declvar_dble, declvar_real
       IMPLICIT NONE
 ! Arguments
-      DOUBLE PRECISION, INTENT(IN) :: DIVERSIONS(Nsegment)
+      INTEGER, INTENT(IN) :: Nsegshold
+      DOUBLE PRECISION, INTENT(INOUT) :: DIVERSIONS(Nsegshold)
 ! Local Variables
       INTEGER :: i
       DOUBLE PRECISION :: MSl3_to_ft3
@@ -41,8 +42,8 @@
          ENDDO
          Segment_diversions = DIVERSIONS * MSl3_to_acre_inches
       ELSEIF ( Process_flag==DECL ) THEN
-         ALLOCATE ( Segment_diversions(Nsegment) )
-         CALL declvar_dble(MODNAME, 'Segment_diversions', 'nsegment', Nsegment, &
+         ALLOCATE ( Segment_diversions(Nsegshold) )
+         CALL declvar_dble(MODNAME, 'Segment_diversions', 'nsegment', Nsegshold, &
      &        'Diversion fow from each segment as computed by MODSIM', &
      &        'acre-inches', Segment_diversions)
          ALLOCATE ( HRU_diversion(Nhru) )

@@ -16,11 +16,11 @@
       use prms_utils, only: error_stop, numchars, print_module, PRMS_open_output_file, read_error
       USE MF_DLL, ONLY: gsfdecl, MFNWT_RUN, MFNWT_CLEAN, MFNWT_OCBUDGET, MFNWT_INIT
       USE GWFSFRMODULE, ONLY: NSS
-      USE GWFLAKMODULE, ONLY: NLAKES
       IMPLICIT NONE
 ! Arguments
-      INTEGER, INTENT(IN) :: Process_mode, Idivert(Nsegshold)
+      INTEGER, INTENT(IN) :: Process_mode
       INTEGER, INTENT(INOUT) :: Nsegshold, Nlakeshold
+      INTEGER, INTENT(INOUT) :: Idivert(Nsegshold)
       LOGICAL, INTENT(INOUT) :: AFR, MS_GSF_converge
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: agDemand(Nsegshold)
@@ -90,7 +90,7 @@
      &                         Elapsed_time_start(7) + Elapsed_time_start(8)*0.001
 
         IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active, GSFLOW, PRMS, MODSIM-PRMS, MODSIM-PRMS_AG
-          IF ( check_dims()/=0 ) ERROR STOP ERROR_dim
+          IF ( check_dims(Nsegshold, Nlakeshold)/=0 ) ERROR STOP ERROR_dim
 
           IF ( Print_debug>DEBUG_minimum ) THEN
             PRINT 10, PRMS_VERSION
@@ -126,14 +126,11 @@
   16  FORMAT (//, 4X, 'Active modules listed in the order in which they are called', //, 8X, 'Process', 20X, &
      &        'Module', 9X, 'Version Date', /, A)
 
-          Nsegshold = Nsegment
-          Nlakeshold = Nlake
         ENDIF
 
         IF ( GSFLOW_flag==ACTIVE ) ierr = gsfdecl()
         IF ( Model==MODSIM_MODFLOW ) THEN
           Nsegshold = NSS
-          Nlakeshold = NLAKES
           RETURN
         ENDIF
 
@@ -453,7 +450,7 @@
 
 ! for PRMS-only and MODSIM-PRMS simulations
       IF ( Model==PRMS .OR. Model==MODSIM_PRMS .OR. Process_flag/=RUN ) THEN
-        IF ( Model==MODSIM_PRMS ) CALL gsflow_modsim2prms(DIVERSIONS)
+        IF ( Model==MODSIM_PRMS ) CALL gsflow_modsim2prms(DIVERSIONS, Nsegshold)
         IF ( AG_flag==OFF ) THEN
           ierr = soilzone(AFR, 1)
         ELSE
@@ -537,7 +534,7 @@
 
       IF ( CsvON_OFF>OFF .AND. PRMS_only==ACTIVE ) CALL prms_summary()
 
-      IF ( Model==MODSIM_PRMS ) CALL gsflow_prms2modsim(EXCHANGE, DELTAVOL, LAKEVAP, agDemand)
+      IF ( Model==MODSIM_PRMS ) CALL gsflow_prms2modsim(EXCHANGE, DELTAVOL, LAKEVAP, agDemand, Nsegshold, Nlakeshold)
       IF ( Process_flag==RUN ) THEN
         RETURN
       ELSEIF ( Process_flag==CLEAN ) THEN
@@ -613,7 +610,7 @@
 ! Arguments
       LOGICAL, INTENT(IN) :: AFR
       INTEGER, INTENT(INOUT) :: Nsegshold, Nlakeshold
-      INTEGER, INTENT(IN) :: Idivert(Nsegshold)
+      INTEGER, INTENT(INOUT) :: Idivert(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(Nsegshold),   &
      &                                   DELTAVOL(Nlakeshold),  &
@@ -999,7 +996,11 @@
         PRINT '(/,2A)', 'ERROR, invalid strmflow_module value: ', Strmflow_module
         Inputerror_flag = 1
       ENDIF
-
+      Stream_order_flag = 0
+      IF ( Strmflow_flag>1 .AND. PRMS_flag==ACTIVE ) THEN
+          print *, nsegment, strmflow_flag, strmflow_module
+        Stream_order_flag = 1 ! strmflow_in_out, muskingum, muskingum_lake, muskingum_mann
+      ENDIF
 ! cascade dimensions
       IF ( decldim('ncascade', 0, MAXDIM, &
      &     'Number of HRU links for cascading flow')/=0 ) CALL read_error(7, 'ncascade')
@@ -1163,11 +1164,13 @@
 !***********************************************************************
 !     Get and check consistency of dimensions with flags
 !***********************************************************************
-      INTEGER FUNCTION check_dims()
+      INTEGER FUNCTION check_dims(Nsegshold, Nlakeshold)
       use PRMS_READ_PARAM_FILE, only: getdim
       USE PRMS_MODULE
       use prms_utils, only: read_error
       IMPLICIT NONE
+      ! Arguments
+      INTEGER, INTENT(INOUT) :: Nsegshold, Nlakeshold
       EXTERNAL :: check_dimens
 !***********************************************************************
 
@@ -1252,6 +1255,8 @@
 
       Nsegment = getdim('nsegment')
       IF ( Nsegment==-1 ) CALL read_error(7, 'nsegment')
+      Nsegshold = Nsegment
+      Nlakeshold = Nlake
 
       Nhrucell = getdim('nhrucell')
       IF ( Nhrucell==-1 ) CALL read_error(6, 'nhrucell')
@@ -1287,11 +1292,6 @@
           PRINT *, 'ERROR, specified water-use event based lake input and have lake simulation inactive'
           Inputerror_flag = 1
         ENDIF
-      ENDIF
-
-      Stream_order_flag = 0
-      IF ( Nsegment>0 .AND. Strmflow_flag>1 .AND. Model/=0 ) THEN
-        Stream_order_flag = 1 ! strmflow_in_out, muskingum, muskingum_lake, muskingum_mann
       ENDIF
 
       IF ( Nsegment<1 .AND. Model/=DOCUMENTATION ) THEN
