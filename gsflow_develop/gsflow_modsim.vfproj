@@ -61,6 +61,7 @@
 		<File RelativePath="..\GSFLOW\src\prms\ccsolrad.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\climate_hru.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\climateflow.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\cloud_cover.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\convert_params.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\ddsolrad.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\de47_NWT.f"/>
@@ -70,6 +71,7 @@
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_budget.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_mf2prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_modflow.f"/>
+		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_modsim2prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_module.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms2mf.f90"/>
@@ -120,6 +122,7 @@
 		<File RelativePath="..\GSFLOW\src\modflow\mach_mod.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\map_results.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\mhc7.f"/>
+		<File RelativePath="..\GSFLOW\src\prms\modsim_diversion_read.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\modules.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\muskingum.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\muskingum_lake.f90"/>
@@ -154,6 +157,7 @@
 		<File RelativePath="..\GSFLOW\src\prms\prms_constants.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\prms_summary.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\routing.f90"/>
+		<File RelativePath="..\GSFLOW\src\prms\segment_to_hru.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\setup_param.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\sip7_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\sm_mmf_utils.f90"/>

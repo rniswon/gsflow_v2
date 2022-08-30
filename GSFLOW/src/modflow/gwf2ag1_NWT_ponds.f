@@ -194,7 +194,7 @@
       MSUMAG = 0
       PSIRAMP = 0.10
       ACCEL = sone
-      AGTOL = sone
+      AGTOL = 0.10
       MAXAGITER = 20
       NUMTABWELL = 0
       NUMTABPOND = 0
@@ -3431,13 +3431,13 @@
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
 
-  !      if(iseg==516)then
-  !      etdif = pettotal - aettotal
-  !        write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
-  !   +                 SUPACT(iseg),etdif,RMSESW(ISEG),zerod2*pettotal,
-  !   +                 AGCONVERGE
-  !      endif
-  !33  format(4i5,6e20.10,i5)
+        if(iseg==25)then
+        etdif = pettotal - aettotal
+          write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
+     +                 SUPACT(iseg),etdif,RMSESW(ISEG),AGTOL*pettotal,
+     +                 AGCONVERGE
+        endif
+  33  format(4i5,6e20.10,i5)
 300   continue
       return
       end subroutine demandconjunctive_prms
@@ -4569,8 +4569,10 @@ C
           iseg = IRRSEG(i)        
           !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
             Diversions(ISEG) = SEG(2,iseg)*DELT
+      write(888,*)iseg,Diversions(ISEG)
           !END IF
         END DO
+      write(888,*)'end loop'
 C
 C8------RETURN.
       RETURN

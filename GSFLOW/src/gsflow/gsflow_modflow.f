@@ -534,7 +534,7 @@ C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
             IF(IUNIT(65).GT.0) CALL GWF2SWI2AD(KKSTP,KKPER,IGRID)  !SWI2
             IF( IUNIT(44).GT.0 ) CALL GWF2SFR7AD(IUNIT(44),IUNIT(22),
      1                                           KKSTP,KKPER,IGRID)
-          END IF
+          !END IF  !moving this down below all AD routines
           IF(IUNIT(50).GT.0) THEN
             IF (IUNIT(1).GT.0) THEN
               CALL GWF2MNW27BCF(KPER,IGRID)
@@ -583,6 +583,7 @@ C---------INDICATE IN PRINTOUT THAT SOLUTION IS FOR HEADS
    26     FORMAT('Skipping:  Stress period: ',i5,4x,
      &       'Time step:',I6)
           ENDIF
+        END IF   ! moved this AFR check down here 8/30/2022
 C
 C7C2----ITERATIVELY FORMULATE AND SOLVE THE FLOW EQUATIONS.
           Szcheck = OFF

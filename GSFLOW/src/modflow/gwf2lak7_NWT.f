@@ -1695,16 +1695,16 @@ C16E----LINEAR CASE. SIMPLY CALCULATE STAGE BASED ON VOLUME.
                   DSTG = ABS(STGNEW(LAKE) - STGITER(LAKE))
                   NCNCVR(LAKE) = 1
                 END IF
- !     IF (lake==1 .and. kkper==1)then
- !     write(521,222)PRECIP(LAKE),EVAP(LAKE),RUNF(LAKE),RUNOFF(LAKE),
- !    1                WITHDRW(LAKE),SURFIN(LAKE),SURFOT(LAKE),
- !    2                SEEP(LAKE),VOLNEW1,VOLOLDD(LAKE),STGITER(LAKE),
- !    3                resid1,SURFA(LAKE),deriv,dstg,l1,kkiter,kkstp
- !     write(521,222)PRECIP3(LAKE),EVAP3(LAKE),RUNF(LAKE),RUNOFF(LAKE),
- !    1                WITHDRW3,SURFIN(LAKE),OUTFLOW,
- !    2                SEEP3(LAKE),VOLNEW2,VOLOLDD(LAKE),STGNEW(LAKE),
- !    3                resid2,SRFPT,deriv,dstg,l1,kkiter,kkstp
- !     END IF
+     !! IF (lake==1 )then
+     !! write(521,222)PRECIP(LAKE),EVAP(LAKE),RUNF(LAKE),RUNOFF(LAKE),
+     !!1                WITHDRW(LAKE),SURFIN(LAKE),SURFOT(LAKE),
+     !!2                SEEP(LAKE),VOLNEW1,VOLOLDD(LAKE),STGITER(LAKE),
+     !!3                resid1,SURFA(LAKE),deriv,dstg,l1,kkiter,kkstp
+     !! write(521,222)PRECIP3(LAKE),EVAP3(LAKE),RUNF(LAKE),RUNOFF(LAKE),
+     !!1                WITHDRW3,SURFIN(LAKE),OUTFLOW,
+     !!2                SEEP3(LAKE),VOLNEW2,VOLOLDD(LAKE),STGNEW(LAKE),
+     !!3                resid2,SRFPT,deriv,dstg,l1,kkiter,kkstp
+      !END IF
  !222  format(15e20.10,3i5)
                 IF(STGNEW(LAKE).LT.BOTTMS(LAKE)) 
      +             STGNEW(LAKE)=BOTTMS(LAKE)
