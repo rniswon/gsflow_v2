@@ -79,7 +79,7 @@ C1------USE package modules.
 ! Arguments
       LOGICAL, INTENT(IN) :: AFR
       INTEGER, INTENT(IN) :: Nsegshold
-      INTEGER, INTENT(IN) :: Idivert(Nsegshold)
+      INTEGER, INTENT(INOUT) :: Idivert(Nsegshold)
       INTEGER, INTENT(INOUT) :: Nlakeshold
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(Nsegshold), 
@@ -460,7 +460,7 @@ c     USE LMGMODULE
       DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(Nlakeshold), 
      &                                   LAKEVOL(Nlakeshold),
      &                                   agDemand(Nsegshold)
-      INTEGER, INTENT(IN) :: Idivert(Nsegshold)
+      INTEGER, INTENT(INOUT) :: Idivert(Nsegshold)
       INTEGER I
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
@@ -1631,7 +1631,7 @@ C
       ! Arguments
       LOGICAL, INTENT(IN) :: AFR
       INTEGER, INTENT(IN) :: Nsegshold, Nlakeshold
-      INTEGER, INTENT(IN) :: Idivert(Nsegshold)
+      INTEGER, INTENT(INOUT) :: Idivert(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(Nsegshold), 
      &                                   DELTAVOL(Nlakeshold),
