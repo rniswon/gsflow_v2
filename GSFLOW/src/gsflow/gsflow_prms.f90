@@ -16,7 +16,6 @@
       use prms_utils, only: error_stop, numchars, print_module, PRMS_open_output_file, read_error
       USE MF_DLL, ONLY: gsfdecl, MFNWT_RUN, MFNWT_CLEAN, MFNWT_OCBUDGET, MFNWT_INIT
       USE GWFSFRMODULE, ONLY: NSS
-      USE GWFLAKMODULE, ONLY: NLAKES
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Process_mode

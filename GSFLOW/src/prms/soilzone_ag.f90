@@ -355,7 +355,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
-     &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, PRMS_land_iteration_flag, &
+     &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, Nowmonth, Nowyear, Nowday, &
      &    Iter_aet_flag, irrigation_apply_flag, Model !, MODSIM_flag
       USE PRMS_SOILZONE
@@ -412,17 +412,23 @@
       szrun_ag = 0
 
 ! It0 variables used with MODFLOW integration to save iteration states.
-      IF ( Kkiter==1 .and. iter_flag == 1 ) THEN
-        IF ( GSFLOW_flag==ACTIVE ) THEN
-          IF ( Nlake>0 ) It0_potet = Potet
-          It0_strm_seg_in = Strm_seg_in
+      IF ( GSFLOW_flag==ACTIVE ) THEN
+        IF ( Kkiter==1 ) THEN
           Gw2sm_grav = 0.0 ! dimension nhrucell
-          IF ( Ag_package==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
+          IF ( AFR .AND. iter_flag == 1 ) THEN
+            IF ( PRMS_land_iteration_flag==OFF ) THEN
+              ! computed in srunoff
+              It0_sroff = Sroff
+              It0_strm_seg_in = Strm_seg_in
+            ENDIF
+            IF ( Nlake>0 ) It0_potet = Potet
+            Hru_ag_irr = 0.0 ! dimension nhru
+          ENDIF
         ENDIF
-        IF ( ((GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet==ACTIVE) .AND.AFR ) THEN
-          ! computed in srunoff
-          It0_sroff = Sroff
-        ENDIF
+      ELSEIF ( Iter_aet_flag==ACTIVE ) THEN
+        ! computed in srunoff
+        It0_sroff = Sroff
+        It0_strm_seg_in = Strm_seg_in
       ENDIF
 
       IF ( Iter_aet_flag==ACTIVE ) Ag_irrigation_add = 0.0
@@ -434,30 +440,26 @@
       DO WHILE ( keep_iterating==ACTIVE )
 ! ***************************************
 
-      IF ( Soil_iter>1 .OR. Kkiter>1 .OR. .NOT.(AFR) ) THEN ! Kkiter>1 means GSFLOW is active, AFR = FALSE means within MODSIM iteration
-        DO k = 1, Active_hrus
-          i = Hru_route_order(k)
-          Soil_moist(i) = It0_soil_moist(i)
-          Soil_rechr(i) = It0_soil_rechr(i)
-          Ssres_stor(i) = It0_ssres_stor(i)
-          Slow_stor(i) = It0_slow_stor(i)
-          IF ( Pref_flag==ACTIVE ) Pref_flow_stor(i) = It0_pref_flow_stor(i)
-          IF ( Nlake>0 ) Potet(i) = It0_potet(i)
-        ENDDO
-        IF ( GSFLOW_flag==ACTIVE ) Gravity_stor_res = It0_gravity_stor_res
-      ENDIF
-      IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF .OR. Iter_aet_flag==ACTIVE ) THEN
-        IF ( Kkiter>1 .OR. Iter_aet_flag==ACTIVE ) THEN
-          ! states saved in srunoff when PRMS_land_iteration_flag > 0
-          ! computed in srunoff
-          Sroff = It0_sroff
-          IF ( Call_cascade==ACTIVE ) Strm_seg_in = It0_strm_seg_in
-        ENDIF
-      ENDIF
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Sm2gw_grav = 0.0 ! dimension nhrucell
         Grav_gwin = 0.0 ! dimension nhru
-        Gvr2sm = 0.0 ! dimension nhru
+        IF ( Kkiter>1 ) THEN ! Kkiter>1 means GSFLOW is active
+          Soil_moist = It0_soil_moist
+          Soil_rechr = It0_soil_rechr
+          Ssres_stor = It0_ssres_stor
+          Slow_stor = It0_slow_stor
+          IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
+          IF ( Nlake>0 ) Potet = It0_potet
+          Gravity_stor_res = It0_gravity_stor_res
+          IF ( PRMS_land_iteration_flag==OFF ) THEN
+            ! computed in srunoff
+            Sroff = It0_sroff
+            Strm_seg_in = It0_strm_seg_in
+          ENDIF
+        ENDIF
+      ELSEIF ( Iter_aet_flag==ACTIVE ) THEN
+        Sroff = It0_sroff
+        Strm_seg_in = It0_strm_seg_in
       ENDIF
 
       IF ( Cascade_flag>CASCADE_OFF ) THEN

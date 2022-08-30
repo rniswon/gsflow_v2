@@ -708,6 +708,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                   RETURN
                 ENDIF
               ENDIF
+              IF ( Szcheck==ACTIVE ) retval = gsflow_mf2prms()
               IF ( AG_flag==ACTIVE ) THEN
                 retval = soilzone_ag(AFR, 2)
               ELSE
@@ -807,7 +808,8 @@ C
 C7C2C---IF CONVERGENCE CRITERION HAS BEEN MET STOP ITERATING.
 C
             IF (ICNVG.EQ.1) GOTO 33
-            IF ( Szcheck==ACTIVE ) retval = gsflow_mf2prms()
+            IF ( Szcheck==ACTIVE .AND. .NOT.(Model==MODSIM_GSFLOW) )
+     1       retval = gsflow_mf2prms()
 !  30      CONTINUE
           END DO
           KITER = MXITER
