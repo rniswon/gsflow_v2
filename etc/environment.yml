@@ -20,4 +20,4 @@ dependencies:
   - pyproj
   - shapely>=1.8
   - pycrs
-  - geos=3.8.1
+  - geos>=3.9.1
