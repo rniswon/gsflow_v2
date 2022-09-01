@@ -115,7 +115,7 @@
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getdim
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Nhrucell, Print_debug, &
-     &    Cascade_flag, GSFLOW_flag, Call_cascade, PRMS_land_iteration_flag, Iter_aet_flag
+     &    Cascade_flag, GSFLOW_flag, Iter_aet_flag
       USE PRMS_SOILZONE
       use prms_utils, only: error_stop, print_module, PRMS_open_module_file, read_error
       IMPLICIT NONE
@@ -428,10 +428,8 @@
 
       IF ( GSFLOW_flag==ACTIVE .OR. Iter_aet_flag==ACTIVE ) THEN
         IF ( Nlake>0 ) ALLOCATE ( It0_potet(Nhru) )
-      ENDIF
-      IF ( (GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet_flag==ACTIVE ) THEN
         ALLOCATE ( It0_sroff(Nhru) )
-        IF ( Call_cascade==ACTIVE ) ALLOCATE ( It0_strm_seg_in(Nsegment) )
+        ALLOCATE ( It0_strm_seg_in(Nsegment) )
       ENDIF
 
 ! Allocate arrays for local and variables from other modules
@@ -828,11 +826,11 @@
         ELSE ! Kkiter == 1
           Gw2sm_grav = 0.0 ! dimension nhrucell
           IF ( Nlake>0 ) It0_potet = Potet
-          It0_strm_seg_in = Strm_seg_in
           IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
-          IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==OFF ) THEN
+          IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             It0_sroff = Sroff
+            It0_strm_seg_in = Strm_seg_in
           ENDIF
         ENDIF
       ENDIF

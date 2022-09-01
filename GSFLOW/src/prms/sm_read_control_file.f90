@@ -176,6 +176,9 @@ contains
     Control_parameter_data(i) % name = 'no_snow_flag'
     no_snow_flag = OFF
     i = i + 1
+    Control_parameter_data(i) % name = 'ag_gravity_flag'
+    Ag_gravity_flag = OFF
+    i = i + 1
     Control_parameter_data(i) % name = 'stream_temp_flag'
     Stream_temp_flag = OFF
     i = i + 1
@@ -415,6 +418,12 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'dprst_transferON_OFF'
     Dprst_transferON_OFF = OFF
+    i = i + 1
+    Control_parameter_data(i) % name = 'dprst_transfer_water_use'
+    Dprst_transfer_water_use = OFF
+    i = i + 1
+    Control_parameter_data(i) % name = 'dprst_add_water_use'
+    Dprst_add_water_use = OFF
 !    i = i + 1
 !    Control_parameter_data(i) % name = 'soilzone_transferON_OFF'
 !    Soilzone_transferON_OFF = OFF

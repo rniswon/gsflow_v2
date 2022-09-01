@@ -119,8 +119,7 @@ module PRMS_IT0_VARS
        REAL, SAVE, ALLOCATABLE :: It0_intcp_stor(:), It0_gravity_stor_res(:)
        DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:)
        REAL, SAVE, ALLOCATABLE :: It0_ag_soil_moist(:), It0_ag_soil_rechr(:), It0_hru_intcpstor(:)
-       REAL, SAVE, ALLOCATABLE :: It0_sroff(:), It0_ag_gvr_stor(:)
-       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_strm_seg_in(:)
+       REAL, SAVE, ALLOCATABLE :: It0_ag_gvr_stor(:)
 end module PRMS_IT0_VARS
 
 !***********************************************************************
@@ -163,7 +162,7 @@ end module PRMS_IT0_VARS
      &    Strmflow_module, Temp_module, Stream_order_flag, GSFLOW_flag, no_snow_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, &
-     &    AG_flag, PRMS_land_iteration_flag, Ag_gravity_flag, Iter_aet_flag
+     &    AG_flag, PRMS_land_iteration_flag, Ag_gravity_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       USE PRMS_IT0_VARS
@@ -1037,10 +1036,6 @@ end module PRMS_IT0_VARS
         CALL declvar_real(Soilzone_module, 'ag_gvr_stor', 'nhru', Nhru, &
      &       'Storage in the agriculture gravity reservoir of the agriculture fraction of each HRU', &
      &       'inches', Ag_gvr_stor)
-      ENDIF
-      IF ( GSFLOW_flag==ACTIVE .OR. Iter_aet_flag==ACTIVE ) THEN
-        ALLOCATE ( It0_sroff(Nhru) )
-        ALLOCATE ( It0_strm_seg_in(Nsegment) )
       ENDIF
 
       END FUNCTION climateflow_decl
