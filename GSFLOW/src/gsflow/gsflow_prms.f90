@@ -998,7 +998,7 @@
       ENDIF
       Stream_order_flag = 0
       IF ( Strmflow_flag>1 .AND. PRMS_flag==ACTIVE ) THEN
-          print *, nsegment, strmflow_flag, strmflow_module
+          !print *, nsegment, strmflow_flag, strmflow_module
         Stream_order_flag = 1 ! strmflow_in_out, muskingum, muskingum_lake, muskingum_mann
       ENDIF
 ! cascade dimensions
