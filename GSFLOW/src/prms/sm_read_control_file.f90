@@ -418,6 +418,12 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'dprst_transferON_OFF'
     Dprst_transferON_OFF = OFF
+    i = i + 1
+    Control_parameter_data(i) % name = 'dprst_transfer_water_use'
+    Dprst_transfer_water_use = OFF
+    i = i + 1
+    Control_parameter_data(i) % name = 'dprst_add_water_use'
+    Dprst_add_water_use = OFF
 !    i = i + 1
 !    Control_parameter_data(i) % name = 'soilzone_transferON_OFF'
 !    Soilzone_transferON_OFF = OFF
