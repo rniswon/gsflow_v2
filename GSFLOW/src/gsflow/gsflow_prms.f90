@@ -420,7 +420,7 @@
           ierr = soilzone_ag()
         ENDIF
 
-        IF ( MODEL/=GSFLOW ) THEN
+        IF ( GSFLOW_flag == OFF ) THEN
           ! rsr, need to do something if gwflow_cbh_flag=1
           ierr = gwflow()
 
@@ -909,7 +909,11 @@
         PRINT '(/,2A)', 'ERROR, invalid strmflow_module value: ', Strmflow_module
         Inputerror_flag = 1
       ENDIF
-
+      Stream_order_flag = 0
+      IF ( Strmflow_flag>1 .AND. PRMS_flag==ACTIVE ) THEN
+          !print *, nsegment, strmflow_flag, strmflow_module
+        Stream_order_flag = 1 ! strmflow_in_out, muskingum, muskingum_lake, muskingum_mann
+      ENDIF
 ! cascade dimensions
       IF ( decldim('ncascade', 0, MAXDIM, &
      &     'Number of HRU links for cascading flow')/=0 ) CALL read_error(7, 'ncascade')
@@ -961,6 +965,7 @@
       IF ( decldim('nmap', 0, MAXDIM, 'Number of mapped values')/=0 ) CALL read_error(7, 'nmap')
       IF ( control_integer(Glacier_flag, 'glacier_flag')/=0 ) Glacier_flag = OFF
       IF ( control_integer(no_snow_flag, 'no_snow_flag')/=0 ) no_snow_flag = OFF
+      IF ( control_integer(ag_gravity_flag, 'ag_gravity_flag')/=0 ) Ag_gravity_flag = OFF
       IF ( control_integer(Frozen_flag, 'frozen_flag')/=0 ) Frozen_flag = OFF
       IF ( control_integer(Dyn_imperv_flag, 'dyn_imperv_flag')/=0 ) Dyn_imperv_flag = OFF
       IF ( control_integer(Dyn_intcp_flag, 'dyn_intcp_flag')/=0 ) Dyn_intcp_flag = OFF
@@ -1196,11 +1201,6 @@
           PRINT *, 'ERROR, specified water-use event based lake input and have lake simulation inactive'
           Inputerror_flag = 1
         ENDIF
-      ENDIF
-
-      Stream_order_flag = 0
-      IF ( Nsegment>0 .AND. Strmflow_flag>1 .AND. Model/=0 ) THEN
-        Stream_order_flag = 1 ! strmflow_in_out, muskingum, muskingum_lake, muskingum_mann
       ENDIF
 
       IF ( Nsegment<1 .AND. Model/=DOCUMENTATION ) THEN

@@ -16,22 +16,23 @@
 !     ******************************************************************
 !     Mapping module to convert PRMS states for use by MODSIM
 !     ******************************************************************
-      SUBROUTINE gsflow_prms2modsim(EXCHANGE, DELTAVOL, LAKEVAP, agDemand)
+      SUBROUTINE gsflow_prms2modsim(EXCHANGE, DELTAVOL, LAKEVAP, agDemand, Nsegshold, Nlakeshold)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, RUN, DECL, INIT
-      USE PRMS_MODULE, ONLY: Process_flag, Nlake, Nsegment
+      USE PRMS_MODULE, ONLY: Process_flag
       USE GSFPRMS2MODSIM
       IMPLICIT NONE
 ! Arguments
-      DOUBLE PRECISION, INTENT(OUT) :: EXCHANGE(Nsegment), DELTAVOL(Nlake), LAKEVAP(Nlake), agDemand(Nsegment)
+      INTEGER, INTENT(IN) :: Nsegshold, Nlakeshold
+      DOUBLE PRECISION, INTENT(OUT) :: EXCHANGE(Nsegshold), DELTAVOL(Nlakeshold), LAKEVAP(Nlakeshold), agDemand(Nsegshold)
 ! Functions
       EXTERNAL :: prms2modsiminit, prms2modsimrun, prms2modsimdecl
 !***********************************************************************
       IF ( Process_flag==RUN ) THEN
-        CALL prms2modsimrun(EXCHANGE, DELTAVOL, LAKEVAP, AgDemand)
+        CALL prms2modsimrun(EXCHANGE, DELTAVOL, LAKEVAP, AgDemand, Nsegshold, Nlakeshold)
       ELSEIF ( Process_flag==DECL ) THEN
-        CALL prms2modsimdecl()
+        CALL prms2modsimdecl(Nsegshold, Nlakeshold)
       ELSEIF ( Process_flag==INIT ) THEN
-        CALL prms2modsiminit(EXCHANGE, agDemand)
+        CALL prms2modsiminit(EXCHANGE, agDemand, Nsegshold)
       ENDIF
 
       END SUBROUTINE gsflow_prms2modsim
@@ -40,52 +41,54 @@
 !***********************************************************************
 !     prms2modsimdecl - Declare variables
 !***********************************************************************
-      SUBROUTINE prms2modsimdecl()
+      SUBROUTINE prms2modsimdecl(Nsegshold, Nlakeshold)
       USE GSFPRMS2MODSIM
-      USE PRMS_MODULE, ONLY: Nsegment, Nlake
       use PRMS_MMFAPI, only: declvar_dble
       use prms_utils, only: read_error, print_module
       IMPLICIT NONE
+      ! Arguments
+      INTEGER, INTENT(IN) :: Nsegshold, Nlakeshold
 !***********************************************************************
       CALL print_module(MODDESC, MODNAME, Version_gsflow_prms2modsim)
 
-      ALLOCATE ( Segment_latflow(Nsegment) )
-      CALL declvar_dble(MODNAME, 'Segment_latflow', 'nsegment', Nsegment, &
+      ALLOCATE ( Segment_latflow(Nsegshold) )
+      CALL declvar_dble(MODNAME, 'Segment_latflow', 'nsegment', Nsegshold, &
      &     'Lateral flow to each segment', &
      &     'acre-inches', Segment_latflow)
-      ALLOCATE ( Lake_latflow(Nlake) )
-      CALL declvar_dble(MODNAME, 'Lake_latflow', 'nlake', Nlake, &
+      ALLOCATE ( Lake_latflow(Nlakeshold) )
+      CALL declvar_dble(MODNAME, 'Lake_latflow', 'nlake', Nlakeshold, &
      &     'Total lateral flow into each lake', &
      &     'acre-inches', Lake_latflow)
-      ALLOCATE ( Lake_precip(Nlake) )
-      CALL declvar_dble(MODNAME, 'Lake_precip', 'nlake', Nlake, &
+      ALLOCATE ( Lake_precip(Nlakeshold) )
+      CALL declvar_dble(MODNAME, 'Lake_precip', 'nlake', Nlakeshold, &
      &     'Precipitation into each lake', &
      &     'acre-inches', Lake_precip)
-      ALLOCATE ( Lake_et(Nlake) )
-      CALL declvar_dble(MODNAME, 'Lake_et', 'nlake', Nlake, &
+      ALLOCATE ( Lake_et(Nlakeshold) )
+      CALL declvar_dble(MODNAME, 'Lake_et', 'nlake', Nlakeshold, &
      &     'Evaporation from each lake', &
      &     'acre-inches', Lake_et)
-      ALLOCATE ( add_irrigation_seg(Nsegment) )
-      CALL declvar_dble(MODNAME, 'add_irrigation_seg', 'nsegment', Nsegment, &
+      ALLOCATE ( add_irrigation_seg(Nsegshold) )
+      CALL declvar_dble(MODNAME, 'add_irrigation_seg', 'nsegment', Nsegshold, &
      &     'Estimated irrigation demand needed for diversion from each segment', &
      &     'acre-inches', add_irrigation_seg)
-      ALLOCATE ( Lake_In_flow(Nlake) )
+      ALLOCATE ( Lake_In_flow(Nlakeshold) )
 
       END SUBROUTINE prms2modsimdecl
 
 !***********************************************************************
 !     prms2mfinit - Initialize PRMS2MODSIM module - get parameter values
 !***********************************************************************
-      SUBROUTINE prms2modsiminit(EXCHANGE, agDemand)
+      SUBROUTINE prms2modsiminit(EXCHANGE, agDemand, Nsegshold)
       USE PRMS_CONSTANTS, ONLY: FT2_PER_ACRE
       USE GSFPRMS2MODSIM
-      USE PRMS_MODULE, ONLY: Nsegment, Hru_type
+      USE PRMS_MODULE, ONLY: Hru_type
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Lake_hru_id
       use PRMS_MMFAPI, only: declvar_dble
       use prms_utils, only: read_error
       IMPLICIT NONE
 ! Arguments
-      DOUBLE PRECISION, INTENT(OUT) :: EXCHANGE(Nsegment), agDemand(Nsegment)
+      INTEGER, INTENT(IN) :: Nsegshold
+      DOUBLE PRECISION, INTENT(OUT) :: EXCHANGE(Nsegshold), agDemand(Nsegshold)
       ! Functions
       INTRINSIC :: ABS, DBLE
       ! Local Variables
@@ -95,14 +98,14 @@
 !***********************************************************************
       ierr = 0
 
-!      IF ( Nlake/=NLAKES ) THEN ! use MODSIM dimensions
+!      IF ( Nlakeshold/=NLAKES ) THEN ! use MODSIM dimensions
 !        PRINT *, 'ERROR, PRMS dimension nlake must equal Lake Package NLAKES'
-!        PRINT *, '       nlake=', Nlake, ' NLAKES=', NLAKES
+!        PRINT *, '       nlake=', Nlakeshold, ' NLAKES=', NLAKES
 !        ierr = 1
 !      ENDIF
 
-!      IF ( Nsegment/=NSS ) THEN
-!        PRINT *, 'ERROR, nsegment must equal NSS', Nsegment, NSS
+!      IF ( Nsegshold/=NSS ) THEN
+!        PRINT *, 'ERROR, nsegment must equal NSS', Nsegshold, NSS
 !        ierr = 1
 !      ENDIF
 
@@ -142,32 +145,33 @@
 !***********************************************************************
 !     prms2modsimrun - Maps the PRMS results to MODSIM lakes and segments
 !***********************************************************************
-      SUBROUTINE prms2modsimrun(EXCHANGE, DELTAVOL, LAKEVAP, agDemand)
+      SUBROUTINE prms2modsimrun(EXCHANGE, DELTAVOL, LAKEVAP, agDemand, Nsegshold, Nlakeshold)
       USE PRMS_CONSTANTS, ONLY: ACTIVE
       USE GSFPRMS2MODSIM
-      USE PRMS_MODULE, ONLY: Nsegment, Nlake, Hru_type, Iter_aet_flag
+      USE PRMS_MODULE, ONLY: Hru_type, Iter_aet_flag
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Lake_hru_id, Lake_area
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Hru_actet, Strm_seg_in
       USE PRMS_SET_TIME, ONLY: Cfs_conv
-!      USE PRMS_MODSIM_DIVERSION_READ, ONLY: Nag_diversions, Hru_destination_id, Seg_source_id
+      USE PRMS_MODSIM_DIVERSION_READ, ONLY: Nag_diversions, Hru_destination_id, Seg_source_id
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
       USE PRMS_SOILZONE, ONLY: Lakein_sz
-!      USE PRMS_SOILZONE_AG, ONLY: Ag_irrigation_add_vol ! acre-inches
+      USE PRMS_SOILZONE_AG, ONLY: Ag_irrigation_add_vol ! acre-inches
       IMPLICIT NONE
 ! Arguments
-      DOUBLE PRECISION, INTENT(OUT) :: EXCHANGE(Nsegment), DELTAVOL(Nlake), LAKEVAP(Nlake)
-      DOUBLE PRECISION, INTENT(OUT) :: agDemand(Nsegment)
+      INTEGER, INTENT(IN) :: Nsegshold, Nlakeshold
+      DOUBLE PRECISION, INTENT(OUT) :: EXCHANGE(Nsegshold), DELTAVOL(Nlakeshold), LAKEVAP(Nlakeshold)
+      DOUBLE PRECISION, INTENT(OUT) :: agDemand(Nsegshold)
 ! Functions
       INTRINSIC :: DBLE
 ! Local Variables
-      INTEGER :: ii, ilake, j, i !, ihru, iseg
+      INTEGER :: ii, ilake, j, i, ihru, iseg
 !***********************************************************************
 
 !-----------------------------------------------------------------------
 ! Flow to stream segments in Strm_seg_in, units cfs
 !-----------------------------------------------------------------------
-      DO i = 1, Nsegment
+      DO i = 1, Nsegshold
         Segment_latflow(i) = Strm_seg_in(i) / Cfs_conv
         EXCHANGE(i) = Segment_latflow(i) * Acre_inches_to_MSl3
       ENDDO
@@ -179,12 +183,12 @@
 !----------
       IF ( Iter_aet_flag==ACTIVE ) THEN
         agDemand = 0.0D0
-!        DO j = 1, Nag_diversions
-!          ihru = hru_destination_id(j)
-!          iseg = seg_source_id(j)
-!          IF ( iseg > 0 ) &
-!               agDemand(iseg) = agDemand(iseg) + DBLE( Ag_irrigation_add_vol(ihru) ) * Acre_inches_to_MSl3 ! m3 / day
-!        ENDDO
+        DO j = 1, Nag_diversions
+          ihru = hru_destination_id(j)
+          iseg = seg_source_id(j)
+          IF ( iseg > 0 ) &
+               agDemand(iseg) = agDemand(iseg) + DBLE( Ag_irrigation_add_vol(ihru) ) * Acre_inches_to_MSl3 ! m3 / day
+        ENDDO
         add_irrigation_seg = agDemand
       ENDIF
         
@@ -206,7 +210,7 @@
         ENDIF
       ENDDO
 ! need different array to pass back to MODSIM to avoid circular dependences.
-      DO i = 1, Nlake
+      DO i = 1, Nlakeshold
         Lake_In_flow(i) = Lake_latflow(i) + Lake_precip(i)
         DELTAVOL(i) = Lake_In_flow(i) * Acre_inches_to_MSl3 ! m3 / day
         LAKEVAP(i) = Lake_et(i) / Lake_area(i) ! inches / day

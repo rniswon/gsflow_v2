@@ -9,21 +9,21 @@ contains
                                 ERROR_time, DEBUG_WB, CANOPY
       use PRMS_MMFAPI, only: dattim, deltim
       USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime, Nowyear, Nowmonth, Nowday, Dprst_flag, &
-                             GSFLOW_flag, PRMS_land_iteration_flag, AG_flag, Print_debug
+                             GSFLOW_flag, PRMS_land_iteration_flag, AG_flag, Print_debug, Ag_gravity_flag, Iter_aet_flag
       USE PRMS_BASIN, ONLY: Hemisphere, Basin_area_inv
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Pkwater_equiv, Hru_intcpstor, &
                                Ssres_stor, Slow_stor, Pref_flow_stor, Basin_intcp_stor, Basin_ssstor, &
                                Basin_soil_moist, Basin_gwstor, Intcp_transp_on, Dprst_stor_hru, Intcp_stor, &
                                Gravity_stor_res, Ag_soil_moist, Ag_soil_rechr, Imperv_stor, &
-                               Dprst_vol_open, Dprst_vol_clos, Hru_impervstor, &
-                               Basin_ag_soil_moist, Basin_ag_soil_rechr
+                               Dprst_vol_open, Dprst_vol_clos, Hru_impervstor, Ag_gvr_stor, &
+                               Basin_ag_soil_moist, Basin_ag_soil_rechr, Basin_ag_gvr_stor, Sroff, Strm_seg_in
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_pkwater_equiv, &
                                It0_hru_intcpstor, It0_ssres_stor, It0_slow_stor, It0_pref_flow_stor, &
                                It0_basin_intcp_stor, It0_basin_ssstor, It0_basin_soil_moist, It0_basin_gwstor, &
                                It0_intcp_transp_on, It0_dprst_stor_hru, It0_intcp_stor, &
-                               It0_gravity_stor_res, It0_ag_soil_moist, It0_ag_soil_rechr, It0_imperv_stor, &
-                               It0_hru_impervstor, It0_dprst_vol_open, It0_dprst_vol_clos, &
-                               It0_basin_ag_soil_moist, It0_basin_ag_soil_rechr
+                               It0_gravity_stor_res, It0_ag_soil_moist, It0_ag_soil_rechr, It0_imperv_stor, It0_ag_gvr_stor, &
+                               It0_hru_impervstor, It0_dprst_vol_open, It0_dprst_vol_clos, It0_basin_ag_gvr_stor, &
+                               It0_basin_ag_soil_moist, It0_basin_ag_soil_rechr, It0_sroff, It0_strm_seg_in
       use PRMS_DATA_FILE, only: read_data_line
       use prms_utils, only: leap_day, julian_day, compute_julday, print_module
       IMPLICIT NONE
@@ -74,6 +74,14 @@ contains
             It0_basin_ag_soil_rechr = Basin_ag_soil_rechr
             It0_ag_soil_moist = Ag_soil_moist
             It0_ag_soil_rechr = Ag_soil_rechr
+            IF ( Ag_gravity_flag==ACTIVE ) THEN
+              It0_ag_gvr_stor = Ag_gvr_stor
+              It0_basin_ag_gvr_stor = Basin_ag_gvr_stor
+            ENDIF
+          ENDIF
+          IF ( GSFLOW_flag==ACTIVE .OR. Iter_aet_flag==ACTIVE ) THEN
+            It0_sroff = Sroff
+            It0_strm_seg_in = Strm_seg_in
           ENDIF
 
         ELSE ! initialize

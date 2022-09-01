@@ -87,7 +87,7 @@ Soilzone Computations           soilzone_ag         2022-08-17
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-04-07
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2022-04-27
-GSFLOW Output CSV Summary       gsflow_sum          2022-04-22
+GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
 Output Summary                  nhru_summary        2022-08-04
 Output Summary                  basin_summary       2021-11-19
 Output Summary                  nsegment_summary    2021-11-23
@@ -112,5 +112,5 @@ DPRST area:                  22.42    Fraction DPRST:          0.0033
 Agriculture area:            67.91    Fraction AG:             0.0101
 
 
-Execution elapsed time    2 minutes 40.88 seconds
+Execution elapsed time    2 minutes 44.02 seconds
 

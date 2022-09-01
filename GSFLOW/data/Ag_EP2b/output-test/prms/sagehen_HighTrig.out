@@ -114,7 +114,7 @@ Soilzone Computations           soilzone            2022-07-25
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-04-07
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2022-04-27
-GSFLOW Output CSV Summary       gsflow_sum          2022-04-22
+GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
 Output Summary                  nhru_summary        2022-08-04
 Output Summary                  basin_summary       2021-11-19
 Output Summary                  nsegment_summary    2021-11-23
@@ -137,5 +137,5 @@ Model domain area:        11226.32    Active basin area:      6740.99
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    5 minutes 49.03 seconds
+Execution elapsed time    5 minutes 17.97 seconds
 

@@ -21,7 +21,7 @@
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
       character(len=*), parameter :: Version_soilzone = '2022-07-25'
-      INTEGER, SAVE :: DBGUNT, Iter_aet
+      INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
       REAL, SAVE, ALLOCATABLE :: Soil_lower_stor_max(:)
@@ -115,7 +115,7 @@
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getdim
       USE PRMS_MODULE, ONLY: Model, Nhru, Nsegment, Nlake, Nhrucell, Print_debug, &
-     &    Cascade_flag, GSFLOW_flag, Call_cascade, PRMS_land_iteration_flag, AG_flag, Iter_aet_flag
+     &    Cascade_flag, GSFLOW_flag, Call_cascade, PRMS_land_iteration_flag, Iter_aet_flag
       USE PRMS_SOILZONE
       use prms_utils, only: error_stop, print_module, PRMS_open_module_file, read_error
       IMPLICIT NONE
@@ -426,12 +426,10 @@
         ENDIF
       ENDIF
 
-      Iter_aet = OFF
-      IF ( AG_flag==ACTIVE .OR. iter_aet_flag==ACTIVE ) Iter_aet = ACTIVE
-      IF ( GSFLOW_flag==ACTIVE .OR. Iter_aet==ACTIVE ) THEN
+      IF ( GSFLOW_flag==ACTIVE .OR. Iter_aet_flag==ACTIVE ) THEN
         IF ( Nlake>0 ) ALLOCATE ( It0_potet(Nhru) )
       ENDIF
-      IF ( (GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet==ACTIVE ) THEN
+      IF ( (GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF) .OR. Iter_aet_flag==ACTIVE ) THEN
         ALLOCATE ( It0_sroff(Nhru) )
         IF ( Call_cascade==ACTIVE ) ALLOCATE ( It0_strm_seg_in(Nsegment) )
       ENDIF
@@ -709,7 +707,7 @@
 ! initialize GSFLOW arrays
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Gvr2sm = 0.0 ! dimension nhru
-        Sm2gw_grav = 0.0 ! dimension nhrucell
+        Gw2sm_grav = 0.0 ! dimension nhrucell
 
         Max_gvrs = 1
         Hrucheck = 1
@@ -768,7 +766,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
-     &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, Call_cascade, PRMS_land_iteration_flag, &
+     &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, AG_flag, Nowmonth !, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
@@ -811,42 +809,32 @@
       szrun = 0
 
 ! It0 variables used with MODFLOW integration to save iteration states.
-      IF ( Kkiter==1 ) THEN
-        IF ( GSFLOW_flag==ACTIVE ) THEN
-          IF ( Nlake>0 ) It0_potet = Potet
-          It0_strm_seg_in = Strm_seg_in
-          Gw2sm_grav = 0.0 ! dimension nhrucell
-          IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
-        ENDIF
-        IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
-          ! computed in srunoff
-          It0_sroff = Sroff
-        ENDIF
-      ENDIF
-
-      IF ( Kkiter>1 ) THEN ! Kkiter>1 means GSFLOW is active
-        DO k = 1, Active_hrus
-          i = Hru_route_order(k)
-          Soil_moist(i) = It0_soil_moist(i)
-          Soil_rechr(i) = It0_soil_rechr(i)
-          Ssres_stor(i) = It0_ssres_stor(i)
-          Slow_stor(i) = It0_slow_stor(i)
-          IF ( Pref_flag==ACTIVE ) Pref_flow_stor(i) = It0_pref_flow_stor(i)
-          IF ( Nlake>0 ) Potet(i) = It0_potet(i)
-        ENDDO
-        Gravity_stor_res = It0_gravity_stor_res
-      ENDIF
-      IF ( GSFLOW_flag==ACTIVE .AND. PRMS_land_iteration_flag==OFF ) THEN
-        IF ( Kkiter>1 ) THEN
-          ! computed in srunoff
-          Sroff = It0_sroff
-          IF ( Call_cascade==ACTIVE ) Strm_seg_in = It0_strm_seg_in
-        ENDIF
-      ENDIF
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Sm2gw_grav = 0.0 ! dimension nhrucell
         Grav_gwin = 0.0 ! dimension nhru
-        Gvr2sm = 0.0 ! dimension nhru
+        IF ( Kkiter>1 ) THEN ! Kkiter>1 means GSFLOW is active
+          Soil_moist = It0_soil_moist
+          Soil_rechr = It0_soil_rechr
+          Ssres_stor = It0_ssres_stor
+          Slow_stor = It0_slow_stor
+          IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
+          IF ( Nlake>0 ) Potet = It0_potet
+          Gravity_stor_res = It0_gravity_stor_res
+          IF ( PRMS_land_iteration_flag==OFF ) THEN
+            ! computed in srunoff
+            Sroff = It0_sroff
+            Strm_seg_in = It0_strm_seg_in
+          ENDIF
+        ELSE ! Kkiter == 1
+          Gw2sm_grav = 0.0 ! dimension nhrucell
+          IF ( Nlake>0 ) It0_potet = Potet
+          It0_strm_seg_in = Strm_seg_in
+          IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
+          IF ( GSFLOW_flag==ACTIVE .OR. PRMS_land_iteration_flag==OFF ) THEN
+            ! computed in srunoff
+            It0_sroff = Sroff
+          ENDIF
+        ENDIF
       ENDIF
 
       IF ( Cascade_flag>CASCADE_OFF ) THEN
@@ -913,7 +901,7 @@
 
         avail_potet = Potet(i) - hruactet
         IF ( avail_potet<-CLOSEZERO ) THEN
-          print *, 'avail_potet<0', avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
+          print *, 'avail_potet<0', i, avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
           avail_potet = 0.0
           hruactet = Potet(i)
         ENDIF

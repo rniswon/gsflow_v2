@@ -112,7 +112,11 @@
               ENDIF
             ENDIF
           ENDIF
-          Swrad(j) = SNGL( Soltab_potsw(Jday, j)/Soltab_horad_potsw(Jday, j)*DBLE(Orad_hru(j))/Hru_cossl(j) )
+          if ( .NOT.(soltab_horad_potsw(jday, j)>0.0) .or. .NOT.(Hru_cossl(j)>0.0) ) then
+            Swrad(j) = 0.0
+          else
+            Swrad(j) = SNGL( Soltab_potsw(Jday, j)/Soltab_horad_potsw(Jday, j)*DBLE(Orad_hru(j))/Hru_cossl(j) )
+          endif
           Basin_swrad = Basin_swrad + DBLE( Swrad(j)*Hru_area(j) )
         ENDDO
         Basin_orad = Basin_orad*Basin_area_inv
