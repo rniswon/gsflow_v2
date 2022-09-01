@@ -4569,7 +4569,6 @@ C
           iseg = IRRSEG(i)        
           !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
             Diversions(ISEG) = SEG(2,iseg)*DELT
-      write(888,*)iseg,Diversions(ISEG)
           !END IF
         END DO
       write(888,*)'end loop'
