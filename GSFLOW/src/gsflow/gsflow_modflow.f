@@ -409,7 +409,7 @@ C
       CALL SETCONVFACTORS()
 C
       KKPER = KPER
-      IF ( Model==MODFLOW .OR. Model==MODSIM_MODFLOW ) THEN 
+      IF ( Model==MODFLOW .OR. Model==MODSIM_MODFLOW ) THEN
         Kkper_new = GET_KPER()
         Kper_mfo = Kkper_new
       ENDIF
@@ -455,13 +455,12 @@ c     USE LMGMODULE
 ! Arguments
       INTEGER, INTENT(IN) :: Nsegshold, Nlakeshold
       LOGICAL, INTENT(IN) :: AFR
-      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold), 
+      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold),
      &                                   EXCHANGE(Nsegshold)
-      DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(Nlakeshold), 
+      DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(Nlakeshold),
      &                                   LAKEVOL(Nlakeshold),
      &                                   agDemand(Nsegshold)
       INTEGER, INTENT(INOUT) :: Idivert(Nsegshold)
-      INTEGER I
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: soilzone, soilzone_ag
@@ -470,7 +469,7 @@ c     USE LMGMODULE
       EXTERNAL :: MODSIM2SFR, SFR2MODSIM, LAK2MODSIM
       INTRINSIC MIN
 ! Local Variables
-      INTEGER :: retval, KITER, iss, iprt !, II, IBDRET
+      INTEGER :: retval, KITER, iss, iprt, I !, II, IBDRET
 !      INTEGER :: IC1, IC2, IR1, IR2, IL1, IL2, IDIR
 !      REAL :: BUDPERC
 !***********************************************************************

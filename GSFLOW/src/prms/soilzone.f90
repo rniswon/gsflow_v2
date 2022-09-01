@@ -833,13 +833,13 @@
         ELSE ! Kkiter == 1
           Gw2sm_grav = 0.0 ! dimension nhrucell
           IF ( AFR .AND. iter_flag == 1 ) THEN
+            IF ( Nlake>0 ) It0_potet = Potet
+            IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
             IF ( PRMS_land_iteration_flag==OFF ) THEN
               ! computed in srunoff
               It0_sroff = Sroff
               It0_strm_seg_in = Strm_seg_in
             ENDIF
-            IF ( Nlake>0 ) It0_potet = Potet
-            IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
           ENDIF
         ENDIF
       ENDIF
@@ -908,7 +908,7 @@
 
         avail_potet = Potet(i) - hruactet
         IF ( avail_potet<-CLOSEZERO ) THEN
-          print *, 'avail_potet<0', avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
+          print *, 'avail_potet<0', i, avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
           avail_potet = 0.0
           hruactet = Potet(i)
         ENDIF
