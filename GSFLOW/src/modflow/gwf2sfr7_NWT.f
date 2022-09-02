@@ -8486,8 +8486,9 @@ C     CAUTION: DOES NOT WORK WITH TRANSIENT ROUTING.
 C-------- May 28, 2017
 C     ADDING CODE TO RETURN WATER-LIMITED RELEASES FROM RESERVOIRS
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM, ISEG
-      USE GWFBASMODULE, ONLY: DELT
+      USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM, ISEG, ISTCB1
+      USE GWFBASMODULE, ONLY: DELT, PERTIM, TOTIM
+      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, IBOUND
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -8545,6 +8546,12 @@ C6----GENERATE SOME DEBUG 'WATCHER' FILES
   !    OPEN(224, FILE='SFR_DEBUG_ins.TXT')
   !    WRITE(224,335) Timestep, KITER, (STRM(10,II), II=1, NSTRM)
   !335 FORMAT(I5,1X,I5,1X,4909E17.10)
+  !   For convenience of debugging the Mark West Creek model,
+  !   attempting to use the call below for writing the SFR binary 
+  !   file for interpretation with FloPy
+      call UBDSV4(KITER,KITER,'  STREAM LEAKAGE', 0, 'IFACE           ',
+     +            ISTCB1, NCOL, NROW, NLAY, NSTRM, IOUT, 
+     +            DELT, PERTIM, TOTIM, IBOUND)
 
 C
 C8----RETURN.
