@@ -8488,7 +8488,8 @@ C     ADDING CODE TO RETURN WATER-LIMITED RELEASES FROM RESERVOIRS
 C     *******************************************************************
       USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM, ISEG, ISTCB1
       USE GWFBASMODULE, ONLY: DELT, PERTIM, TOTIM
-      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, IBOUND
+      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, IBOUND, BUFF !buff added for debug
+      USE GSFMODFLOW, ONLY: KPER, KSTP  !added for debug
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -8506,6 +8507,10 @@ C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
       INTEGER :: ISTSG, L, ISTSGOLD, REACHNUMINSEG
       DOUBLE PRECISION :: FLOWIN, FLOWOUT
+      !debug code
+      CHARACTER*16 text
+      DATA text/'  STREAM LEAKAGE'/
+      integer il, ir, ic, iout1
 C     -------------------------------------------------------------------
 C
       ISTSG = 1
@@ -8514,6 +8519,7 @@ C
       EXCHANGE = 0.0D0
       FLOWIN = 0.0D0
       FLOWOUT = 0.0D0
+      BUFF = 0.0  ! debug
 C
 C1------LOOP OVER REACHES TO SET ACCRETIONS/DEPLETIONS
 C
@@ -8523,6 +8529,13 @@ C2------DETERMINE STREAM SEGMENT NUMBER.
         REACHNUMINSEG = REACHNUMINSEG + 1
         ISTSGOLD = ISTSG
         ISTSG = ISTRM(4, L)
+        
+        !debug code
+        il = ISTRM(1, l)
+        ir = ISTRM(2, l)
+        ic = ISTRM(3, l)
+        BUFF(ic,ir,il) = STRM(11, l) !set to flobot
+        ! end debug code
 C
 C3------DIFFERENCE FLOW IN AND FLOW OUT OF SEGEMENT.
         IF( ISTSG /= ISTSGOLD ) THEN
@@ -8549,10 +8562,8 @@ C6----GENERATE SOME DEBUG 'WATCHER' FILES
   !   For convenience of debugging the Mark West Creek model,
   !   attempting to use the call below for writing the SFR binary 
   !   file for interpretation with FloPy
-      call UBDSV4(KITER,KITER,'  STREAM LEAKAGE', 0, 'IFACE           ',
-     +            ISTCB1, NCOL, NROW, NLAY, NSTRM, IOUT, 
-     +            DELT, PERTIM, TOTIM, IBOUND)
-
+      CALL UBUDSV(Kstp, kper, text, iout1, BUFF, NCOL,
+     +                            NROW, NLAY, IOUT)
 C
 C8----RETURN.
       RETURN
