@@ -4565,13 +4565,13 @@ C
 C
 C2------Set diversion demand from that calculated from AG.
 C 
+        Diversions = 0.0
         do i = 1, NUMIRRDIVERSIONSP
           iseg = IRRSEG(i)        
           !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
             Diversions(ISEG) = SEG(2,iseg)*DELT
           !END IF
         END DO
-      write(888,*)'end loop'
 C
 C8------RETURN.
       RETURN
