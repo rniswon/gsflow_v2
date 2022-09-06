@@ -1887,14 +1887,14 @@ C11-----CHECK FOR MAJOR OPTIONS.
       ELSE
         DO 20 I=1,NIUNIT
            IF(LINE(ITYP1:ITYP2).EQ.CUNIT(I)) THEN
-              IF ( LINE(ITYP1:ITYP1+3).EQ."IWRT" ) THEN  !next section modified for restart option !gsf
+              IF ( LINE(ITYP1:ITYP1+3).EQ.'IWRT' ) THEN  !next section modified for restart option !gsf
                   IUNIT(I)=IU
                   FILSTAT='UNKNOWN'
                   FILACT=ACTION(2)
                   FMTARG=FORM
                   ACCARG=ACCESS
                   GO TO 30
-              ELSEIF ( LINE(ITYP1:ITYP1+3).EQ."IRED" ) THEN
+              ELSEIF ( LINE(ITYP1:ITYP1+3).EQ.'IRED' ) THEN
                   IUNIT(I)=IU
                   FILSTAT='UNKNOWN'
                   FILACT=ACTION(2)

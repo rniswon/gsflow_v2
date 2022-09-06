@@ -301,9 +301,22 @@
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) Ag_soil_lower = 0.0
       ! dimensioned nhru
       Ag_irrigation_add = 0.0
+      ag_soil_to_gw = 0.0
+      Ag_hortonian = 0.0
+      ag_soil_to_gvr = 0.0
+      Ag_potet_lower = 0.0
+      Ag_potet_rechr = 0.0
+      Ag_actet = 0.0
+      Unused_ag_et = 0.0
+      perv_soil_to_gw = 0.0
+      perv_soil_to_gvr = 0.0
+      Ag_soilwater_deficit = 0.0
       Basin_ag_soil_moist = 0.0D0
       Basin_ag_soil_rechr = 0.0D0
       Ag_replenish_frac = 0.0
+      Ag_soil_saturated = OFF
+      Ag_cap_infil_tot = 0.0
+      Ag_water_in = 0.0
       DO ihru = 1, Nhru
         ! make sure LAKE, INACTIVE, GLACIER have agriculture values of 0
         IF ( Hru_type(ihru)==LAKE .OR. Hru_type(ihru)==INACTIVE .OR. Hru_type(ihru)==GLACIER ) Ag_area(ihru) = 0.0

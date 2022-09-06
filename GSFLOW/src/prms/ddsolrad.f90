@@ -14,7 +14,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Solar Radiation Distribution'
         character(len=*), parameter :: MODNAME = 'ddsolrad'
-        character(len=*), parameter :: Version_ddsolrad = '2021-11-19'
+        character(len=*), parameter :: Version_ddsolrad = '2022-09-01'
         INTEGER, SAVE :: Observed_flag
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Radadj_slope(:, :), Radadj_intcp(:, :)
