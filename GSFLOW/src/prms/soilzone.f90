@@ -1474,11 +1474,11 @@
 !        Soil_moist = Soil_moist + Perv_actet - Avail_potet
 !        Perv_actet = Avail_potet
       ENDIF
-      IF ( ABS(Perv_actet*Perv_frac-Potet)>NEARZERO ) THEN
+      IF ( Perv_actet > Potet ) THEN
         IF ( ag_perv_flag == 0 ) THEN
-          PRINT '(a,i0,4(1x,F0.6))', 'perv_actet PET problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
+          PRINT '(a,i0,4(1x,F0.8))', 'perv_actet PET problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet, Perv_actet
         ELSE
-          PRINT '(a,i0,4(1x,F0.6))', 'ag_actet PET problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
+          PRINT '(a,i0,4(1x,F0.8))', 'ag_actet PET problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
         ENDIF
         CALL print_date(0)
       ENDIF
