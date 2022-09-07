@@ -20,7 +20,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2022-07-25'
+      character(len=*), parameter :: Version_soilzone = '2022-09-01'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -29,7 +29,7 @@
 !   GSFLOW variables
       INTEGER, SAVE, ALLOCATABLE :: Hru_gvr_count(:), Hru_gvr_index(:, :), Hrucheck(:)
       REAL, SAVE, ALLOCATABLE :: Replenish_frac(:)
-      REAL, SAVE, ALLOCATABLE :: It0_sroff(:), It0_potet(:)
+      REAL, SAVE, ALLOCATABLE :: It0_sroff(:), It0_potet(:), It0_hru_sroffp(:), It0_hortonian_flow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_strm_seg_in(:)
       DOUBLE PRECISION, SAVE :: Basin_sz_gwin
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gvr_hru_pct_adjusted(:)
@@ -428,7 +428,7 @@
 
       IF ( GSFLOW_flag==ACTIVE .OR. Iter_aet_flag==ACTIVE ) THEN
         IF ( Nlake>0 ) ALLOCATE ( It0_potet(Nhru) )
-        ALLOCATE ( It0_sroff(Nhru) )
+        ALLOCATE ( It0_sroff(Nhru), It0_hru_sroffp(Nhru), It0_hortonian_flow(Nhru) )
         ALLOCATE ( It0_strm_seg_in(Nsegment) )
       ENDIF
 
@@ -821,6 +821,8 @@
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             Sroff = It0_sroff
+            Hru_sroffp = It0_hru_sroffp
+            Hortonian_flow = It0_hortonian_flow
             Strm_seg_in = It0_strm_seg_in
           ENDIF
         ELSE ! Kkiter == 1
@@ -830,9 +832,16 @@
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             It0_sroff = Sroff
+            It0_hru_sroffp = hru_sroffp
+            It0_hortonian_flow = Hortonian_flow
             It0_strm_seg_in = Strm_seg_in
           ENDIF
         ENDIF
+      ENDIF
+
+      IF ( Pref_flag==ACTIVE ) THEN
+        Pref_flow = 0.0
+        Pref_flow_infil = 0.0
       ENDIF
 
       IF ( Cascade_flag>CASCADE_OFF ) THEN
@@ -861,8 +870,13 @@
         Ssr_to_gw(i) = 0.0
         Slow_flow(i) = 0.0
         Ssres_flow(i) = 0.0
+        Dunnian_flow(i) = 0.0
         Cap_waterin(i) = 0.0
         Soil_saturated(i) = OFF
+        Pfr_dunnian_flow(i) = 0.0
+        Potet_rechr(i) = 0.0
+        Potet_lower(i) = 0.0
+        Cap_infil_tot(i) = 0.0
         hruactet = Hru_impervevap(i) + Hru_intcpevap(i) + Snow_evap(i)
         IF ( Dprst_flag==ACTIVE ) hruactet = hruactet + Dprst_evap_hru(i)
         harea = Hru_area(i)
@@ -952,7 +966,6 @@
         dunnianflw_pfr = 0.0
         IF ( Pref_flow_infil_frac(i)>0.0 ) THEN
           pref_flow_maxin = 0.0
-          Pref_flow_infil(i) = 0.0
           IF ( capwater_maxin>0.0 ) THEN
             ! pref_flow for whole HRU
             pref_flow_maxin = capwater_maxin*Pref_flow_infil_frac(i)
@@ -1080,8 +1093,6 @@
 
 !******Compute actual evapotranspiration
         Snow_free(i) = 1.0 - Snowcov_area(i)
-        Potet_rechr(i) = 0.0
-        Potet_lower(i) = 0.0
         pervactet = 0.0
         IF ( cfgi_frozen_hru==OFF ) THEN
           IF ( Soil_moist(i)>0.0 .AND. avail_potet>0.0 ) THEN
@@ -1114,15 +1125,11 @@
             dunnianflw = dunnianflw_gvr + dunnianflw_pfr
             Dunnian_flow(i) = dunnianflw
             Basin_dunnian_gvr = Basin_dunnian_gvr + DBLE( dunnianflw_gvr*harea )
-            Grav_dunnian_flow(i) = dunnianflw_gvr
             Pfr_dunnian_flow(i) = dunnianflw_pfr
             Basin_dunnian_pfr = Basin_dunnian_pfr + DBLE( dunnianflw_pfr*harea )
           ELSE ! when frozen need to leave water in soil, may exceed maximum storage in PFR
             Pref_flow_stor(i) = Pref_flow_stor(i) + dunnianflw_pfr
             Slow_stor(i) = Slow_stor(i) + dunnianflw_gvr
-            Pfr_dunnian_flow(i) = 0.0
-            Dunnian_flow(i) = 0.0
-            Grav_dunnian_flow(i) = 0.0
           ENDIF
           Basin_pref_stor = Basin_pref_stor + DBLE( Pref_flow_stor(i)*harea )
           IF ( Pref_flow_max(i)>0.0 ) Basin_pfr_stor_frac = Basin_pfr_stor_frac + DBLE( Pref_flow_stor(i)/Pref_flow_max(i)*harea )
@@ -1205,6 +1212,7 @@
         Recharge(i) = Soil_to_gw(i) + Ssr_to_gw(i)
         IF ( Dprst_flag==1 ) Recharge(i) = Recharge(i) + SNGL( Dprst_seep_hru(i) )
         Basin_recharge = Basin_recharge + DBLE( Recharge(i)*harea )
+        Grav_dunnian_flow(i) = dunnianflw_gvr
         Unused_potet(i) = Potet(i) - Hru_actet(i)
         Basin_actet = Basin_actet + DBLE( Hru_actet(i)*harea )
         Hru_storage(i) = DBLE( Soil_moist_tot(i) + Hru_intcpstor(i) + Hru_impervstor(i) ) + Pkwater_equiv(i)
@@ -1466,11 +1474,11 @@
 !        Soil_moist = Soil_moist + Perv_actet - Avail_potet
 !        Perv_actet = Avail_potet
       ENDIF
-      IF ( Perv_actet*Perv_frac>Potet ) THEN
+      IF ( Perv_actet > Potet ) THEN
         IF ( ag_perv_flag == 0 ) THEN
-          PRINT '(a,i0,4(1x,F0.6))', 'perv_actet PET problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
+          PRINT '(a,i0,4(1x,F0.8))', 'perv_actet PET problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet, Perv_actet
         ELSE
-          PRINT '(a,i0,4(1x,F0.6))', 'ag_actet PET problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
+          PRINT '(a,i0,4(1x,F0.8))', 'ag_actet PET problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
         ENDIF
         CALL print_date(0)
       ENDIF

@@ -9,10 +9,10 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 07/29/2022'
-      character(len=*), parameter :: PRMS_versn = '2022-07-29'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 07/29/2022'
-      character(len=*), parameter :: Version_read_control_file = '2022-07-29'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 09/01/2022'
+      character(len=*), parameter :: PRMS_versn = '2022-09-01'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 09/01/2022'
+      character(len=*), parameter :: Version_read_control_file = '2022-09-01'
       character(len=*), parameter :: Version_read_parameter_file = '2022-01-12'
       character(len=*), parameter :: Version_read_data_file = '2022-06-02'
       CHARACTER(len=8), SAVE :: Process
@@ -85,7 +85,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2022-05-10'
+      character(len=*), parameter :: Version_gsflow_modflow='2022-09-01'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
