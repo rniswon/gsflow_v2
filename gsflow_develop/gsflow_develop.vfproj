@@ -75,7 +75,6 @@
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_module.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms2mf.f90"/>
-		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms2modsim.f90"/>
 		<File RelativePath="..\GSFLOW\src\gsflow\gsflow_sum.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwf2ag1_NWT_ponds.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwf2bas7_NWT.f"/>

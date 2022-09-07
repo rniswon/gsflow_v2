@@ -503,7 +503,7 @@ C8b-----Set flag for determining if FINF will be provided by PRMS.
 C       A value of zero means that FINF will not be set by PRMS.
       IGSFLOW = 0
       
-      IF ( NUZTOP.GE.1 .AND. NUZTOP.LE.4 ) THEN
+      IF ( NUZTOP.GE.1 .AND. NUZTOP.LE.5 ) THEN
         IF ( NUZTOP.EQ.1 ) WRITE (IOUT, 9009)
  9009   FORMAT (' OPTION 1 -- RECHARGE IN UZF TO TOP LAYER ONLY ')
         IF ( NUZTOP.EQ.2 ) WRITE (IOUT, 9010)
@@ -513,8 +513,11 @@ C       A value of zero means that FINF will not be set by PRMS.
  9011   FORMAT (' OPTION 3 -- RECHARGE IN UZF TO HIGHEST ACTIVE ', 
      +          'NODE IN EACH VERTICAL COLUMN')
        IF ( NUZTOP.EQ.4 ) WRITE (IOUT, 9008)
- 9008   FORMAT (' OPTION 4 -- RECHARGE IN UZF TO HIGHEST CELL ', 
+ 9008  FORMAT (' OPTION 4 -- RECHARGE IN UZF TO HIGHEST CELL ', 
      +          'WITH WATER TABLE')
+       IF ( NUZTOP.EQ.5 ) WRITE (IOUT, 9099)
+ 9099   FORMAT (' OPTION 5 -- RECHARGE IN UZF TO SPECIFIED CELL ', 
+     +          'AND MODEL TOP IS HIGHEST ACTIVE CELL')
 C
 C9------STOP SIMULATION IF NUZTOP IS NOT WITHIN SPECIFIED RANGE.
       ELSE
@@ -1197,7 +1200,7 @@ C       SET VKS EQUAL TO VKALPF FOR CORRESPONDING MODEL CELL.
 !   RGN 6/22/09. Add coded to find upper-most active layer
           il = 0
           IF ( NUZTOP.EQ.1 .OR. NUZTOP.EQ.2 ) THEN
-            il = IUZFBND(ncck, nrck)
+            il = ABS(IUZFBND(ncck, nrck))
             IF ( il.GT.0 ) THEN
               IF ( IBOUND(ncck, nrck, il).LT.1 ) il = 0
             END IF
@@ -1216,6 +1219,11 @@ CRGN made il = 0 when all layers for column are inactive 2/21/08
             END DO
           ELSE IF ( NUZTOP.EQ.4 ) THEN
             il = LAYNUM(ncck, nrck)
+          ELSE IF ( NUZTOP.EQ.5 ) THEN
+            il = ABS(IUZFBND(ncck, nrck))
+            IF ( il.GT.0 ) THEN
+              IF ( IBOUND(ncck, nrck, il).LT.1 ) il = 0
+            END IF 
           END IF
           krck = il
           IF ( krck.NE.0 ) THEN
@@ -1425,7 +1433,7 @@ C10-----CHECK FOR NEGATIVE ET EXTINCTION DEPTH.
                 IF ( il.GT.0 ) THEN
                   IF ( IBOUND(ncck, nrck, il).LT.1 ) il = 0
                 END IF
-              ELSE IF ( NUZTOP.EQ.3 ) THEN
+              ELSE IF ( NUZTOP.EQ.3 .OR. NUZTOP.EQ.5 ) THEN
                 ill = 1
                 il = 0
                 DO WHILE ( ill.LT.nlayp1 )
@@ -1442,6 +1450,7 @@ CRGN made il = 0 when all layers for column are inactive 2/21/08
                 il = LAYNUM(ncck, nrck)
               END IF
               land = ABS(IUZFBND(ncck, nrck))
+              IF ( NUZTOP .EQ. 5 ) land = il
 !
               IF ( il.GT.0 .AND. land.GT.0 ) THEN
                 thick = BOTM(ncck, nrck,LBOTM(land)-1)-
@@ -1529,36 +1538,36 @@ C12-----READ IN ARRAY FOR ROOT PRESSURE HEAD.
         END IF
       END IF
 C13B-----SEARCH FOR UPPERMOST ACTIVE CELL.
-      IF ( NUZTOP.NE.4 ) THEN ! rsr, 5/30/2018 don't need to do for NUZTOP = 4
-        DO ir = 1, NROW
-          DO ic = 1, NCOL
-            IF ( IUZFBND(ic, ir).NE.0 ) THEN
-              il = 0
-              IF ( NUZTOP.EQ.1 .OR. NUZTOP.EQ.2 ) THEN
-                il = ABS(IUZFBND(ic, ir))
-                IF ( il.GT.0 ) THEN
-                  IF ( IBOUND(ic, ir, il).LT.1 ) il = 0
-                ELSE
-                  il = 0
-                END IF
-                IF ( IL.EQ.0 ) IUZFBND(ic, ir) = 0
-              ELSE IF ( NUZTOP.EQ.3 ) THEN
-                ill = 1
-                il = 0
-                DO WHILE ( ill.LT.nlayp1 )
-                  IF ( IBOUND(ic, ir, ill).GT.0 ) THEN
-                    il = ill
-                    EXIT
-                  ELSE IF ( IBOUND(ic, ir, ill).LT.0 ) THEN
-                    EXIT
-                  END IF
-                  ill = ill + 1
-                END DO
-              END IF
-            END IF
-          END DO
-        END DO
-      END IF
+      !IF ( NUZTOP.NE.4 ) THEN ! rsr, 5/30/2018 don't need to do for NUZTOP = 4
+      !  DO ir = 1, NROW
+      !    DO ic = 1, NCOL
+      !      IF ( IUZFBND(ic, ir).NE.0 ) THEN
+      !        il = 0
+      !        IF ( NUZTOP.EQ.1 .OR. NUZTOP.EQ.2 ) THEN
+      !          il = ABS(IUZFBND(ic, ir))
+      !          IF ( il.GT.0 ) THEN
+      !            IF ( IBOUND(ic, ir, il).LT.1 ) il = 0
+      !          ELSE
+      !            il = 0
+      !          END IF
+      !          IF ( IL.EQ.0 ) IUZFBND(ic, ir) = 0
+      !        ELSE IF ( NUZTOP.EQ.3 .OR. NUZTOP.EQ.5) THEN
+      !          ill = 1
+      !          il = 0
+      !          DO WHILE ( ill.LT.nlayp1 )
+      !            IF ( IBOUND(ic, ir, ill).GT.0 ) THEN
+      !              il = ill
+      !              EXIT
+      !            ELSE IF ( IBOUND(ic, ir, ill).LT.0 ) THEN
+      !              EXIT
+      !            END IF
+      !            ill = ill + 1
+      !          END DO
+      !        END IF
+      !      END IF
+      !    END DO
+      !  END DO
+      !END IF
 C
 C14------INITIALIZE UNSATURATED ZONE IF ACTIVE.
 C
@@ -1596,7 +1605,7 @@ C16-----SEARCH FOR UPPERMOST ACTIVE CELL.
                 ELSE
                   il = 0
                 END IF
-              ELSE IF ( NUZTOP.EQ.3 ) THEN
+              ELSE IF ( NUZTOP.EQ.3 .OR. NUZTOP.EQ.5) THEN
                 ill = 1
                 il = 0
                 DO WHILE ( ill.LT.nlayp1 )
@@ -1632,6 +1641,10 @@ C16B-----SEARCH FOR UPPER MOST ACTIVE CELL WITH A WATER LEVEL.
                 !END IF
                 h = HNEW(ic, ir, il)
                 land = ABS(IUZFBND(ic, ir))
+                if ( NUZTOP == 5 ) then
+                    land = il
+                    il = ABS(IUZFBND(ic, ir))
+                end if
 crgn changed HNEW(ic, ir, il) to h in next line.
                 HLDUZF(ic, ir) = h
                 IF ( IBOUND(ic, ir, il).LT.0 ) IUZFBND(ic, ir) = 0
@@ -2087,7 +2100,7 @@ C3------SEARCH FOR UPPERMOST ACTIVE CELL.
           ELSE
             il = 0
           END IF
-        ELSE IF ( NUZTOP.EQ.3 ) THEN
+        ELSE IF ( NUZTOP.EQ.3 .OR. NUZTOP == 5) THEN
           ill = 1
           il = 0
           DO WHILE ( ill.LT.nlayp1 )
@@ -2105,6 +2118,10 @@ C3------SEARCH FOR UPPERMOST ACTIVE CELL.
         IF ( land.LT.0 ) land = ABS(land)
         IF ( land.EQ.0 ) land = 1
         IF ( ibnd.EQ.0 ) il = 0
+        IF ( NUZTOP .EQ. 5 ) THEN
+          land = il
+          il = abs(IUZFBND(ic, ir))
+        END IF
 
 ! Suppress seepout and ET beneath a lake
         lakflg = 0
@@ -2688,7 +2705,7 @@ C6------PRINT WARNING WHEN NUZTOP IS 1 OR 2 AND ALL LAYERS ARE INACTIVE.
             END IF
           END IF
         END IF
-        IF ( NUZTOP.EQ.3 ) THEN
+        IF ( NUZTOP.EQ.3 .OR. NUZTOP.EQ.5 ) THEN
           ill = 1
           il = 0
           DO WHILE ( ill.LT.nlayp1 )
@@ -2703,6 +2720,10 @@ C6------PRINT WARNING WHEN NUZTOP IS 1 OR 2 AND ALL LAYERS ARE INACTIVE.
           IF ( land.LT.0 ) land = ABS(land)
           IF ( land.EQ.0 ) land = 1
           IF ( ibnd.EQ.0 ) il = 0
+          IF ( NUZTOP.EQ.5 ) THEN
+            land = il
+            il = abs(IUZFBND(ic, ir))
+          END IF
 C
 C7------PRINT WARNING WHEN NUZTOP IS 3 AND ALL LAYERS ARE INACTIVE.
           IF ( ibnd.NE.0 .AND. il.EQ.0 ) THEN
