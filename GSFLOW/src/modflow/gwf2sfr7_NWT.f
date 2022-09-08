@@ -3476,6 +3476,7 @@ C          CONDUCTANCE FOR EACH REACH.
             STRM(11, l) = flobot
             STRM(15, l) = hstr
             STRM(16, l) = cstr
+            STRM(19, l) = h
             IF ( icalc.GE.1 ) STRM(7, l) = depth
             IF ( icalc.GE.2 ) STRM(5, l) = width
             IF ( icalc.GE.2 ) STRM(20, l) = wetperm
