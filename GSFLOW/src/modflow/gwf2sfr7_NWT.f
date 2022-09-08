@@ -8535,6 +8535,12 @@ C2------DETERMINE STREAM SEGMENT NUMBER.
         ir = ISTRM(2, l)
         ic = ISTRM(3, l)
         BUFF(ic,ir,il) = STRM(11, l) !set to flobot
+                                     ! STRM(9, l): FLOWOT
+                                     ! STRM(10, l): FLOWIN
+                                     ! STRM(11, l): FLOBOT
+                                     ! STRM(12, l): RUNOF (is this where PRMS runoff amounts get added?)
+                                     ! STRM(7, l): DEPTH
+                                     ! hnew(il, ir, ic) would be head in the cell
         ! end debug code
 C
 C3------DIFFERENCE FLOW IN AND FLOW OUT OF SEGEMENT.
@@ -8562,7 +8568,7 @@ C6----GENERATE SOME DEBUG 'WATCHER' FILES
   !   For convenience of debugging the Mark West Creek model,
   !   attempting to use the call below for writing the SFR binary 
   !   file for interpretation with FloPy
-      CALL UBUDSV(Kstp, kper, text, iout1, BUFF, NCOL,
+      CALL UBUDSV(Kstp, kper, text, istcb1, BUFF, NCOL,
      +                            NROW, NLAY, IOUT)
 C
 C8----RETURN.
