@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Temperature Distribution'
         character(len=*), parameter :: MODNAME = 'temp_map'
-        character(len=*), parameter :: Version_temp_map = '2023-06-02'
+        character(len=*), parameter :: Version_temp_map = '2022-09-07'
         INTEGER, SAVE :: Tmax_unit, Tmin_unit
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
@@ -35,7 +35,7 @@
       use prms_utils, only: find_current_time, find_cbh_header_end, print_module, read_error
 ! Functions
       INTRINSIC :: SNGL
-      EXTERNAL :: temp_set, read_cbh_date
+      EXTERNAL :: temp_set
 ! Local Variables
       INTEGER :: yr, mo, dy, i, hr, mn, sec, ierr, ios, j, kg, kh, istop
       REAL :: tmax_hru, tmin_hru, harea
@@ -127,7 +127,7 @@
      &       CALL read_error(2, 'tmin_map_adj')
         IF ( control_string(Tmax_map_file, 'tmax_map_file')/=0 ) CALL read_error(5, 'tmax_map_file')
         IF ( control_string(Tmin_map_file, 'tmin_map_file')/=0 ) CALL read_error(5, 'tmin_map_file')
-        CALL find_cbh_header_end(Tmax_unit, Tmax_map_file, 'tmax_map_file', ierr, 1)
+        CALL find_cbh_header_end(Tmax_unit, Tmax_map_file, 'tmax_map_file', ierr, 0)
         IF ( ierr==1 ) THEN
           istop = 1
         ELSE
@@ -137,7 +137,7 @@
             istop = 1
           ENDIF
         ENDIF
-        CALL find_cbh_header_end(Tmin_unit, Tmin_map_file, 'tmin_map_file', ierr, 1)
+        CALL find_cbh_header_end(Tmin_unit, Tmin_map_file, 'tmin_map_file', ierr, 0)
         IF ( ierr==1 ) THEN
           istop = 1
         ELSE

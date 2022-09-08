@@ -700,7 +700,7 @@
       Potet_lower = 0.0
       Potet_rechr = 0.0
       Unused_potet = 0.0 ! dimension nhru
-      Soil_saturated = 0.0
+      Soil_saturated = OFF
 
 ! initialize GSFLOW arrays
       IF ( GSFLOW_flag==ACTIVE ) THEN

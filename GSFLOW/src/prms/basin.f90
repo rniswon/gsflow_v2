@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2022-07-25'
+      character(len=*), parameter :: Version_basin = '2022-09-07'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area
@@ -312,7 +312,6 @@
       ENDIF
 
       dprst_frac_flag = 0
-      Dprst_frac = 0.0
       IF ( Dprst_flag==ACTIVE ) THEN
         IF ( getparam_real(MODNAME, 'dprst_frac_open', Nhru, Dprst_frac_open)/=0 ) CALL read_error(2, 'dprst_frac_open')
         IF ( PRMS4_flag==ACTIVE ) THEN
@@ -326,6 +325,8 @@
         ELSE
           IF ( getparam_real(MODNAME, 'dprst_frac', Nhru, Dprst_frac)/=0 ) CALL read_error(2, 'dprst_frac')
         ENDIF
+      ELSE
+        Dprst_frac = 0.0
       ENDIF
 
       Weir_gate_flag = OFF
