@@ -443,7 +443,7 @@
       INTEGER FUNCTION dynparamrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dynamic, INACTIVE, LAKE, &
      &    potet_jh_module, potet_pan_module, potet_hamon_module, potet_hs_module, &
-     &    potet_pt_module, potet_pm_module, climate_hru_module, ERROR_dynamic
+     &    potet_pt_module, potet_pm_module, climate_hru_module
       USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, AG_flag, Hru_type, &
      &    Dyn_imperv_flag, Dyn_covtype_flag, Dyn_potet_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &    Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dprst_flag, &
@@ -742,7 +742,7 @@
           IF ( Wrain_intcp_next_yr==Nowyear .AND. Wrain_intcp_next_mo==Nowmonth .AND. Wrain_intcp_next_day==Nowday ) THEN
             READ ( Wrain_intcp_unit, *, IOSTAT=ios ) Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day, Temp
             if (ios /= 0) call error_stop('reading wrain_intcp dynamic parameter file', ERROR_dynamic)
-            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Wrain_intcp(1,Nowmonth), 'wrain_intcp')
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Wrain_intcp(:,Nowmonth), 'wrain_intcp')
             CALL is_eof(Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day)
           ENDIF
         ENDIF
@@ -752,7 +752,7 @@
           IF ( Srain_intcp_next_yr==Nowyear .AND. Srain_intcp_next_mo==Nowmonth .AND. Srain_intcp_next_day==Nowday ) THEN
             READ ( Srain_intcp_unit, *, IOSTAT=ios ) Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day, Temp
             if (ios /= 0) call error_stop('reading srain_intcp dynamic parameter file', ERROR_dynamic)
-            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Srain_intcp(1,Nowmonth), 'srain_intcp')
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Srain_intcp(:,Nowmonth), 'srain_intcp')
             CALL is_eof(Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day)
           ENDIF
         ENDIF
@@ -762,7 +762,7 @@
           IF ( Snow_intcp_next_yr==Nowyear .AND. Snow_intcp_next_mo==Nowmonth .AND. Snow_intcp_next_day==Nowday ) THEN
             READ ( Snow_intcp_unit, *, IOSTAT=ios ) Snow_intcp_next_yr, Snow_intcp_next_mo, Snow_intcp_next_day, Temp
             if (ios /= 0) call error_stop('reading snow_intcp dynamic parameter file', ERROR_dynamic)
-            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Snow_intcp(1,Nowmonth), 'snow_intcp')
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Snow_intcp(:,Nowmonth), 'snow_intcp')
             CALL is_eof(Snow_intcp_unit, Snow_intcp_next_yr, Snow_intcp_next_mo, Snow_intcp_next_day)
           ENDIF
         ENDIF
@@ -773,7 +773,7 @@
           IF ( Covden_sum_next_yr==Nowyear .AND. Covden_sum_next_mo==Nowmonth .AND. Covden_sum_next_day==Nowday ) THEN
             READ ( Covden_sum_unit, *, IOSTAT=ios ) Covden_sum_next_yr, Covden_sum_next_mo, Covden_sum_next_day, Temp
             if (ios /= 0) call error_stop('reading covden_sum dynamic parameter file', ERROR_dynamic)
-            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_sum(1,Nowmonth), 'covden_sum')
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_sum(:,Nowmonth), 'covden_sum')
             CALL is_eof(Covden_sum_unit, Covden_sum_next_yr, Covden_sum_next_mo, Covden_sum_next_day)
           ENDIF
         ENDIF
@@ -783,7 +783,7 @@
           IF ( Covden_win_next_yr==Nowyear .AND. Covden_win_next_mo==Nowmonth .AND. Covden_win_next_day==Nowday ) THEN
             READ ( Covden_win_unit, *, IOSTAT=ios ) Covden_win_next_yr, Covden_win_next_mo, Covden_win_next_day, Temp
             if (ios /= 0) call error_stop('reading covden_win dynamic parameter file', ERROR_dynamic)
-            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_win(1,Nowmonth), 'covden_win')
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_win(:,Nowmonth), 'covden_win')
             CALL is_eof(Covden_win_unit, Covden_win_next_yr, Covden_win_next_mo, Covden_win_next_day)
           ENDIF
         ENDIF
@@ -807,9 +807,9 @@
             READ ( Potetcoef_unit, *, IOSTAT=ios ) Potetcoef_next_yr, Potetcoef_next_mo, Potetcoef_next_day, Temp
             if (ios /= 0) call error_stop('reading potet coefficient dynamic parameter file', ERROR_dynamic)
             IF ( Et_flag==potet_jh_module .AND. Dyn_potet_flag/=1 ) THEN ! allow values to be < 0.0 for potet_jh_hru parameter
-              CALL write_dynparam_potet(Output_unit, Nhru, Updated_hrus, Temp, Potet_coef(1,Nowmonth), 'potet_coef')
+              CALL write_dynparam_potet(Output_unit, Nhru, Updated_hrus, Temp, Potet_coef(:,Nowmonth), 'potet_coef')
             ELSE
-              CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Potet_coef(1,Nowmonth), 'potet_coef')
+              CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Potet_coef(:,Nowmonth), 'potet_coef')
             ENDIF
             CALL is_eof(Potetcoef_unit, Potetcoef_next_yr, Potetcoef_next_mo, Potetcoef_next_day)
 
