@@ -8479,7 +8479,7 @@ C
 C-------SUBROUTINE SFR2MODSIM
 C
       SUBROUTINE SFR2MODSIM(EXCHANGE, Diversions, IDIVERT, Nsegshold, 
-     +                      Timestep, KITER)
+     +                      Timestep, KITER, KKITER)
 C     *******************************************************************
 C-------- MARCH 8, 2017
 C     COMPUTE NET ACCRETION/DEPLETION OVER A SEGMENT FOR MODSIM.
@@ -8496,7 +8496,8 @@ C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     -------------------------------------------------------------------
 C     ARGUMENTS
-      INTEGER,          INTENT(IN)    :: Nsegshold, Timestep, KITER
+      INTEGER,          INTENT(IN)    :: Nsegshold, Timestep, KITER,
+     +                                   KKITER
       DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(NSS)
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold) 
       INTEGER,          INTENT(IN)    :: IDIVERT(Nsegshold)
@@ -8506,7 +8507,7 @@ C     -------------------------------------------------------------------
 C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
-      INTEGER :: ISTSG, L, ISTSGOLD, REACHNUMINSEG
+      INTEGER :: ISTSG, L, ISTSGOLD, REACHNUMINSEG, M, ISTRCH
       DOUBLE PRECISION :: FLOWIN, FLOWOUT
       !debug code
       CHARACTER*16 text
@@ -8535,7 +8536,7 @@ C2------DETERMINE STREAM SEGMENT NUMBER.
         il = ISTRM(1, l)
         ir = ISTRM(2, l)
         ic = ISTRM(3, l)
-        BUFF(ic,ir,il) = STRM(11, l) !set to flobot
+        BUFF(ic,ir,il) = STRM(19, l) !set to flobot
                                      ! STRM(9, l): FLOWOT
                                      ! STRM(10, l): FLOWIN
                                      ! STRM(11, l): FLOBOT
@@ -8560,17 +8561,23 @@ C5------IF LAST REACH IN SEGMENT THEN SET FLOWOT
       END DO
 C
 C6----GENERATE SOME DEBUG 'WATCHER' FILES
-  !    OPEN(223, FILE='SFR_DEBUG_outs.TXT')
-  !    WRITE(223,334) Timestep, KITER, (STRM(9,II), II=1, NSTRM)
-  !334 FORMAT(I5,1X,I5,1X,4909E17.10)
+      OPEN(223, FILE='SFR_DEBUG_strmDat.TXT')
+      do L = 1489, 1523  ! Stream segs 175, 176, & 177
+        do M = 1, 30
+          ISTSG = ISTRM(4, L)
+          ISTRCH = ISTRM(5, L)
+          WRITE(223,334) KKITER, L, ISTSG, ISTRCH, M, STRM(M,L)
+        end do
+      end do
+  334 FORMAT(I5,1X,I5,1X,I5,1X,I5,1X,I5,1X,F12.5)
   !    OPEN(224, FILE='SFR_DEBUG_ins.TXT')
   !    WRITE(224,335) Timestep, KITER, (STRM(10,II), II=1, NSTRM)
   !335 FORMAT(I5,1X,I5,1X,4909E17.10)
   !   For convenience of debugging the Mark West Creek model,
   !   attempting to use the call below for writing the SFR binary 
   !   file for interpretation with FloPy
-      CALL UBUDSV(Kstp, kper, text, istcb1, BUFF, NCOL,
-     +                            NROW, NLAY, IOUT)
+  !   CALL UBUDSV(Kstp, kper, text, istcb1, BUFF, NCOL,
+  !  +                            NROW, NLAY, IOUT)
 C
 C8----RETURN.
       RETURN
