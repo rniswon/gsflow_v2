@@ -15,7 +15,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'ide_dist'
-      character(len=*), parameter :: Version_ide_dist = '2022-01-25'
+      character(len=*), parameter :: Version_ide_dist = '2022-09-07'
       INTEGER, SAVE :: Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Dalr
@@ -702,7 +702,7 @@
      +         Tmaxf(n), Tminf(n), Pptmix(n), Newsnow(n), Prmx(n),
      +         Tmax_allrain_f(n,Nowmonth), 1.0, 1.0,
      +         Adjmix_rain(n,Nowmonth), Hru_area(n), sum_obs,
-     +         Tmax_allsnow_f(n,Nowmonth), i)
+     +         Tmax_allsnow_f(n,Nowmonth), n)
         ENDIF
 !----------------
 !----------------
