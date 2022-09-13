@@ -628,7 +628,8 @@
           land = ABS(IUZFBND(icol, irow))
           IF ( NUZTOP==1 ) THEN
             celtop = BOTM(icol, irow, 0) - 0.5 * SURFDEP
-          ELSEIF ( NUZTOP == 3 .OR. NUZTOP == 5 ) THEN
+!          ELSEIF ( NUZTOP == 3 .OR. NUZTOP == 5 ) THEN
+          ELSEIF ( NUZTOP == 5 ) THEN
             ill = 1
             land = 1
             DO WHILE ( ill.LE.NLAY )
