@@ -1626,12 +1626,12 @@
       SUBROUTINE gsflow_prmsSettings(Numts, Model_mode, Start_time, xy_len, xy_FileName, map_len, map_FileName) &
      &     BIND(C,NAME="gsflow_prmsSettings")
       !DEC$ ATTRIBUTES DLLEXPORT :: gsflow_prmsSettings
-      USE PRMS_MODULE, ONLY: Model, Number_timesteps, Starttime, mappingFileName, xyFileName
+      USE PRMS_MODULE, ONLY: Model, Number_timesteps, Starttime, Endtime, mappingFileName, xyFileName
       use prms_utils, only: numchars
       IMPLICIT NONE
       ! Arguments
       INTEGER, INTENT(IN) :: xy_len, map_len
-      INTEGER, INTENT(OUT) :: Numts, Start_time(6), Model_mode
+      INTEGER, INTENT(OUT) :: Numts, Start_time(6), Model_mode, End_time(6)
       CHARACTER(LEN=1), INTENT(INOUT) :: xy_FileName(xy_len), map_FileName(map_len)
       ! Local Variabales
       INTEGER :: i, nc
@@ -1639,6 +1639,7 @@
       Model_mode = Model
       Numts = Number_timesteps
       Start_time = Starttime
+      End_time = Endtime
       nc = numchars(xyFileName)
       DO i = 1, xy_len
         IF ( i<=nc ) THEN
