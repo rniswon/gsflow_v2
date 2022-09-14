@@ -1623,7 +1623,7 @@
 !***********************************************************************
 !     gsflow_prmsSettings - set MODSIM variables set in PRMS
 !***********************************************************************
-      SUBROUTINE gsflow_prmsSettings(Numts, Model_mode, Start_time, xy_len, xy_FileName, map_len, map_FileName) &
+      SUBROUTINE gsflow_prmsSettings(Numts, Model_mode, Start_time, End_time, xy_len, xy_FileName, map_len, map_FileName) &
      &     BIND(C,NAME="gsflow_prmsSettings")
       !DEC$ ATTRIBUTES DLLEXPORT :: gsflow_prmsSettings
       USE PRMS_MODULE, ONLY: Model, Number_timesteps, Starttime, Endtime, mappingFileName, xyFileName
