@@ -1631,7 +1631,7 @@
       IMPLICIT NONE
       ! Arguments
       INTEGER, INTENT(IN) :: xy_len, map_len
-      INTEGER, INTENT(OUT) :: Numts, Start_time(6), Model_mode, End_time(6)
+      INTEGER, INTENT(INOUT) :: Numts, Start_time(6), Model_mode, End_time(6)
       CHARACTER(LEN=1), INTENT(INOUT) :: xy_FileName(xy_len), map_FileName(map_len)
       ! Local Variabales
       INTEGER :: i, nc
