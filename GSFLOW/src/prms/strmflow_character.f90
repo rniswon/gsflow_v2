@@ -5,7 +5,7 @@
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Characteristics'
-      character(len=11), parameter :: MODNAME = 'strmflow_character'
+      character(len=18), parameter :: MODNAME = 'strmflow_character'
       character(len=*), parameter :: Version_strmflow_character = '2022-09-28'
 
 !   Declared Variables

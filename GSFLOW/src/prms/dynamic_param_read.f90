@@ -551,8 +551,6 @@
 
       IF ( istop==1 ) ERROR STOP ERROR_dynamic
 
- 9001 FORMAT (/, 'WARNING, dynamic parameter', A, ' <', F0.7, ' for HRU: ', I0, /, 9X, 'value: ', F0.7, ' set to ', F0.7)
-
       END FUNCTION dynparamrun
 
 !***********************************************************************
