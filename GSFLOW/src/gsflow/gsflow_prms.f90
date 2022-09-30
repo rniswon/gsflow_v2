@@ -27,10 +27,11 @@
       INTEGER, EXTERNAL :: potet_pan, potet_jh, potet_hamon, potet_hs, potet_pt, potet_pm
       INTEGER, EXTERNAL :: intcp, snowcomp, gwflow
       INTEGER, EXTERNAL :: srunoff, soilzone, soilzone_ag
+      INTEGER, EXTERNAL :: strmflow_character
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, write_climate_hru
       INTEGER, EXTERNAL :: strmflow_in_out, muskingum, muskingum_lake
       INTEGER, EXTERNAL :: water_use_read, dynamic_param_read, potet_pm_sta
-      INTEGER, EXTERNAL :: stream_temp, glacr
+      INTEGER, EXTERNAL :: stream_temp, glacr, dynamic_soil_param_read
       EXTERNAL :: precip_map, temp_map, segment_to_hru
       EXTERNAL :: gsflow_prms_restart, water_balance, summary_output
       EXTERNAL :: prms_summary, module_doc, convert_params
@@ -77,6 +78,7 @@
      &        '  Basin Definition: basin', /, &
      &        '    Cascading Flow: cascade', /, &
      &        '  Time Series Data: obs, water_use_read, dynamic_param_read', /, &
+     &        '                    dynamic_soil_param_read', /, &
      &        '   Potet Solar Rad: soltab', /, &
      &        '  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,', /, &
      &        '                    temp_map', /, &
@@ -94,6 +96,7 @@
      &        '       Groundwater: gwflow', /, &
      &        'Streamflow Routing: strmflow, strmflow_in_out, muskingum,', /, &
      &        '                    muskingum_lake, muskingum_mann, segment_to_hru', /, &
+     &        'Streamflow Charact: strmflow_character', /, &
      &        'Stream Temperature: stream_temp', /, &
      &        '    Output Summary: basin_sum, subbasin, map_results, prms_summary,', /, &
      &        '                    nhru_summary, nsub_summary, water_balance', /, &
@@ -302,6 +305,8 @@
 
       IF ( Dynamic_flag==ACTIVE ) ierr = dynamic_param_read()
 
+      IF ( Dynamic_soil_flag==ACTIVE ) ierr = dynamic_soil_param_read()
+
       IF ( Climate_hru_flag==ACTIVE ) ierr = climate_hru()
 
       IF ( Climate_temp_flag==OFF ) THEN
@@ -438,6 +443,8 @@
             ENDIF
 
             IF ( seg2hru_flag==ACTIVE ) CALL segment_to_hru()
+
+            IF ( Stream_order_flag==ACTIVE ) ierr = strmflow_character()
 
             IF ( Stream_temp_flag==ACTIVE ) ierr = stream_temp()
 
@@ -909,10 +916,10 @@
         PRINT '(/,2A)', 'ERROR, invalid strmflow_module value: ', Strmflow_module
         Inputerror_flag = 1
       ENDIF
-      Stream_order_flag = 0
+      Stream_order_flag = OFF
       IF ( Strmflow_flag>1 .AND. PRMS_flag==ACTIVE ) THEN
           !print *, nsegment, strmflow_flag, strmflow_module
-        Stream_order_flag = 1 ! strmflow_in_out, muskingum, muskingum_lake, muskingum_mann
+        Stream_order_flag = ACTIVE ! strmflow_in_out, muskingum, muskingum_lake, muskingum_mann
       ENDIF
 ! cascade dimensions
       IF ( decldim('ncascade', 0, MAXDIM, &
@@ -985,11 +992,14 @@
       IF ( control_integer(Dyn_ag_frac_flag, 'dyn_ag_frac_flag')/=0 ) Dyn_ag_frac_flag = OFF
       IF ( control_integer(Dyn_ag_soil_flag, 'dyn_ag_soil_flag')/=0 ) Dyn_ag_soil_flag = OFF
       Dynamic_flag = OFF
-      IF ( Dyn_imperv_flag/=OFF .OR. Dyn_intcp_flag/=0 .OR. Dyn_covden_flag/=0 .OR. Dyn_dprst_flag/=OFF .OR. &
-     &     Dyn_potet_flag/=OFF .OR. Dyn_covtype_flag/=0 .OR. Dyn_transp_flag/=0 .OR. Dyn_soil_flag /=OFF .OR. &
+      Dynamic_soil_flag = OFF
+      IF ( Dyn_intcp_flag/=0 .OR. Dyn_covden_flag/=0 .OR. &
+     &     Dyn_potet_flag/=OFF .OR. Dyn_covtype_flag/=0 .OR. Dyn_transp_flag/=0 .OR. &
      &     Dyn_radtrncf_flag/=OFF .OR. Dyn_sro2dprst_perv_flag/=0 .OR. Dyn_sro2dprst_imperv_flag/=OFF .OR. &
      &     Dyn_fallfrost_flag/=OFF .OR. Dyn_springfrost_flag/=0 .OR. Dyn_snareathresh_flag/=0 .OR. &
-     &     Dyn_transp_on_flag/=OFF .OR. Dyn_ag_frac_flag==ACTIVE .OR. Dyn_ag_soil_flag==ACTIVE ) Dynamic_flag = ACTIVE
+     &     Dyn_transp_on_flag/=OFF ) Dynamic_flag = ACTIVE
+      IF ( Dyn_imperv_flag/=OFF .OR. Dyn_dprst_flag/=OFF .OR. Dyn_soil_flag/=OFF .OR. &
+     &     Dyn_ag_frac_flag==ACTIVE .OR. Dyn_ag_soil_flag==ACTIVE ) Dynamic_soil_flag = ACTIVE
       IF ( control_integer(Gwr_transferON_OFF, 'gwr_transferON_OFF')/=0) Gwr_transferON_OFF = OFF
       IF ( control_integer(External_transferON_OFF, 'external_transferON_OFF')/=0 ) External_transferON_OFF = OFF
       IF ( control_integer(Dprst_transferON_OFF, 'dprst_transferON_OFF')/=0 ) Dprst_transferON_OFF = OFF
@@ -1204,7 +1214,7 @@
       ENDIF
 
       IF ( Nsegment<1 .AND. Model/=DOCUMENTATION ) THEN
-        IF ( Stream_order_flag==1 .OR. Call_cascade==1 ) THEN
+        IF ( Stream_order_flag==ACTIVE .OR. Call_cascade==1 ) THEN
           PRINT *, 'ERROR, streamflow and cascade routing require nsegment > 0, specified as:', Nsegment
           Inputerror_flag = 1
         ENDIF
@@ -1213,7 +1223,7 @@
       Lake_route_flag = OFF
       IF ( Nlake>0 .AND. Strmflow_flag==3 .AND. PRMS_only==ACTIVE ) Lake_route_flag = ACTIVE ! muskingum_lake
 
-      IF ( Stream_temp_flag>0 .AND. Stream_order_flag==0 ) THEN
+      IF ( Stream_temp_flag>0 .AND. Stream_order_flag==OFF ) THEN
         PRINT *, 'ERROR, stream temperature computation requires streamflow routing, thus strmflow_module'
         PRINT *, '       must be set to strmflow_in_out, muskingum, muskingum_mann, or muskingum_lake'
         Inputerror_flag = 1
@@ -1337,7 +1347,8 @@
       INTEGER, EXTERNAL :: intcp, snowcomp, gwflow, srunoff, soilzone_ag
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, strmflow_in_out
       INTEGER, EXTERNAL :: write_climate_hru, muskingum, muskingum_lake
-      INTEGER, EXTERNAL :: stream_temp
+      INTEGER, EXTERNAL :: stream_temp, dynamic_soil_param_read
+      INTEGER, EXTERNAL :: strmflow_character
       EXTERNAL :: nhru_summary, prms_summary, water_balance, nsub_summary, basin_summary, nsegment_summary
       INTEGER, EXTERNAL :: dynamic_param_read, water_use_read, potet_pm_sta, glacr !, setup
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
@@ -1354,6 +1365,7 @@
       test = obs()
       test = water_use_read()
       test = dynamic_param_read()
+      test = dynamic_soil_param_read()
       test = temp_1sta_laps()
       test = temp_dist2()
       test = xyz_dist()
@@ -1393,6 +1405,7 @@
       test = strmflow_in_out()
       test = muskingum()
       test = muskingum_lake()
+      test = strmflow_character()
       test = stream_temp()
       test = basin_sum()
       test = map_results()
