@@ -429,7 +429,7 @@
       IF ( GSFLOW_flag==ACTIVE .OR. Iter_aet_flag==ACTIVE ) THEN
         IF ( Nlake>0 ) ALLOCATE ( It0_potet(Nhru) )
         ALLOCATE ( It0_sroff(Nhru), It0_hru_sroffp(Nhru), It0_hortonian_flow(Nhru) )
-        ALLOCATE ( It0_strm_seg_in(Nsegment) )
+        IF ( Cascade_flag>CASCADE_OFF ) ALLOCATE ( It0_strm_seg_in(Nsegment) )
       ENDIF
 
 ! Allocate arrays for local and variables from other modules

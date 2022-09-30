@@ -176,10 +176,10 @@
       DO nn = 1, Active_hrus
         n = Hru_route_order(nn)
         CALL compute_soltab(obliquity, Solar_declination, 0.0, 0.0, Hru_lat(n), &
-     &                      Hru_cossl(n), Soltab_horad_potsw(1, n), &
+     &                      Hru_cossl(n), Soltab_horad_potsw(:, n), &
      &                      Soltab_sunhrs(:, n), Sunset_angle(:, n), Hru_type(n), n)
         CALL compute_soltab(obliquity, Solar_declination, Hru_slope(n), Hru_aspect(n), &
-     &                      Hru_lat(n), Hru_cossl(n), Soltab_potsw(1, n), &
+     &                      Hru_lat(n), Hru_cossl(n), Soltab_potsw(:, n), &
      &                      Soltab_sunhrs(:, n), Sunset_angle(:, n), Hru_type(n), n)
       ENDDO
 

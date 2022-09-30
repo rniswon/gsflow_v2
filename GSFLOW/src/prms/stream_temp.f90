@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2022-08-11'
+      character(len=*), parameter :: Version_stream_temp = '2022-09-28'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -28,13 +28,13 @@
 
 !   Declared Variables
       REAL, SAVE, ALLOCATABLE :: Seg_tave_water(:), seg_tave_upstream(:), Seg_daylight(:)
-      REAL, SAVE, ALLOCATABLE :: Seg_humid(:), Seg_width(:), Seg_ccov(:), seg_shade(:)
+      REAL, SAVE, ALLOCATABLE :: Seg_humid(:), Seg_ccov(:), seg_shade(:)
       REAL, SAVE, ALLOCATABLE :: Seg_tave_air(:), Seg_melt(:), Seg_rain(:)
       DOUBLE PRECISION, ALLOCATABLE :: Seg_potet(:)
 !   Segment Parameters
       REAL, SAVE, ALLOCATABLE :: Seg_length(:) !, Mann_n(:)
       REAL, SAVE, ALLOCATABLE :: Seg_slope(:)
-      REAL, SAVE, ALLOCATABLE :: width_alpha(:), width_m(:), Stream_tave_init(:)
+      REAL, SAVE, ALLOCATABLE :: Stream_tave_init(:)
       INTEGER, SAVE:: Maxiter_sntemp
       REAL, SAVE, ALLOCATABLE :: Seg_humidity(:, :)
       REAL, SAVE, ALLOCATABLE :: lat_temp_adj(:, :)
@@ -109,11 +109,6 @@
       IF ( control_integer(Stream_temp_shade_flag, 'stream_temp_shade_flag')/=0 ) Stream_temp_shade_flag = 0
 
 ! Declared Variables
-      ALLOCATE ( Seg_width(Nsegment) )
-      CALL declvar_real( MODNAME, 'seg_width', 'nsegment', Nsegment, &
-     &     'Width of each segment', &
-     &     'meters', Seg_width )
-
       ALLOCATE (Seg_tave_water(Nsegment) ) ! previous ??
       CALL declvar_real( MODNAME, 'seg_tave_water', 'nsegment', Nsegment, &
      &     'Computed daily mean stream temperature for each segment', &
@@ -207,31 +202,17 @@
 
       ALLOCATE ( Seg_length(Nsegment) )
       IF ( declparam( MODNAME, 'seg_length', 'nsegment', 'real', &
-     &     '1000.0', '0.001', '200000.0', &
+     &     '1000.0', '1.0', '100000.0', &
      &     'Length of each segment', &
      &     'Length of each segment', &
      &     'meters')/=0 ) CALL read_error(1, 'seg_length')
 
       ALLOCATE ( Seg_slope(Nsegment) )
       IF ( declparam( MODNAME, 'seg_slope', 'nsegment', 'real', &
-     &     '0.015', '0.0001', '2.0', &
-     &     'Bed slope of each segment', &
-     &     'Bed slope of each segment', &
+     &     '0.0001', '0.0000001', '2.0', &
+     &     'Surface slope of each segment', &
+     &     'Surface slope of each segment as approximation for bed slope of stream', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'seg_slope')
-
-      ALLOCATE ( width_alpha(Nsegment) )
-      IF ( declparam( MODNAME, 'width_alpha', 'nsegment', 'real', &
-     &     '0.015', '0.0001', '2.0', &
-     &     'Alpha coefficient in power function for width calculation', &
-     &     'Alpha coefficient in power function for width calculation', &
-     &     'unknown')/=0 ) CALL read_error(1, 'width_alpha')
-
-      ALLOCATE ( width_m(Nsegment) )
-      IF ( declparam( MODNAME, 'width_m', 'nsegment', 'real', &
-     &     '0.015', '0.0001', '2.0', &
-     &     'M value in power function for width calculation', &
-     &     'M value in power function for width calculation', &
-     &     'unknown')/=0 ) CALL read_error(1, 'width_m')
 
       IF ( Stream_temp_shade_flag==OFF .OR. Model==DOCUMENTATION ) THEN
          ALLOCATE ( Azrh(Nsegment) )
@@ -452,8 +433,6 @@
       Seg_length = Seg_length / 1000.0
 
       IF ( getparam_real( MODNAME, 'seg_slope', Nsegment, Seg_slope)/=0 ) CALL read_error(2, 'seg_slope')
-      IF ( getparam_real( MODNAME, 'width_alpha', Nsegment, width_alpha)/=0 ) CALL read_error(2, 'width_alpha')
-      IF ( getparam_real( MODNAME, 'width_m', Nsegment, width_m)/=0 ) CALL read_error(2, 'width_m')
 
       IF ( Stream_temp_shade_flag==OFF ) THEN
          IF ( getparam_real( MODNAME, 'azrh', Nsegment, Azrh)/=0 ) CALL read_error(2, 'azrh')
@@ -496,7 +475,6 @@
       seg_tave_upstream = 0.0
       Seg_potet = 0.0D0
       Seg_humid = 0.0
-      Seg_width = 0.0
       Seg_ccov = 0.0
       Seg_tave_air = 0.0
       seg_tave_gw = 0.0
@@ -742,6 +720,7 @@
       USE PRMS_ROUTING, ONLY: Hru_segment, Segment_order, Seginc_swrad
       USE PRMS_OBS, ONLY: Humidity, Stream_temp
       USE PRMS_SOLTAB, ONLY: Soltab_potsw, Hru_cossl
+      USE PRMS_STRMFLOW_CHARACTER, ONLY: Seg_width
 
       IMPLICIT NONE
 ! Functions
@@ -967,11 +946,7 @@
 !      &        fs, " seg_tave_water = ", Seg_tave_water(i), " troff = " , Seg_tave_air(i), " up_temp = ", up_temp
 !         endif
 
-         ! Compute flow-dependent water-in-segment width value
-         if (seg_outflow(i) > NEARZERO) then
-            Seg_width(i) = width_alpha(i) * SNGL(Seg_outflow(i)) ** width_m(i)
-         else
-            Seg_width(i) = 0.0
+         if (seg_outflow(i) <= NEARZERO) then
             if (Seg_tave_water(i) > -99.0) then
                ! This segment has upstream HRUs somewhere, but the current day's flow is zero
                Seg_tave_water(i) = NOFLOW_TEMP
@@ -1246,10 +1221,11 @@
 !        2. DETERMINE THE MAXIMUM DAILY EQUILIBRIUM WATER TEMPERATURE PARAMETERS
 
       USE PRMS_CONSTANTS, ONLY: NEARZERO, CFS2CMS_CONV
-      USE PRMS_STRMTEMP, ONLY: ZERO_C, Seg_width, Seg_humid, Press, MPS_CONVERT, &
+      USE PRMS_STRMTEMP, ONLY: ZERO_C, Seg_humid, Press, MPS_CONVERT, &
      &    Seg_ccov, Seg_potet, Albedo, seg_tave_gw, Seg_slope
       USE PRMS_FLOWVARS, ONLY: Seg_inflow
       USE PRMS_ROUTING, ONLY: Seginc_swrad
+      USE PRMS_STRMFLOW_CHARACTER, ONLY: Seg_width
       use prms_utils, only: sat_vapor_press_poly
       IMPLICIT NONE
 ! Functions
@@ -1465,9 +1441,10 @@
 !
       USE PRMS_CONSTANTS, ONLY: NEARZERO
       USE PRMS_SET_TIME, ONLY: Jday
-      USE PRMS_STRMTEMP, ONLY: Azrh, Alte, Altw, Seg_daylight, Seg_width, &
+      USE PRMS_STRMTEMP, ONLY: Azrh, Alte, Altw, Seg_daylight, &
      &    PI, HALF_PI, Cos_seg_lat, Sin_seg_lat, Cos_lat_decl, Horizontal_hour_angle, &
      &    Level_sunset_azimuth, Max_solar_altitude, Sin_alrs, Sin_declination, Sin_lat_decl, Total_shade
+      USE PRMS_STRMFLOW_CHARACTER, ONLY: Seg_width
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: COS, SIN, TAN, ACOS, ASIN, ATAN, ABS, MAX, SNGL
@@ -1809,8 +1786,9 @@
 !  SEGMENT BETWEEN THE TWO HOUR ANGLES HRSR & HRSS.
 !
       USE PRMS_CONSTANTS, ONLY: NEARZERO
-      USE PRMS_STRMTEMP, ONLY: Azrh, Vce, Vdemx, Vhe, Voe, Vcw, Vdwmx, Vhw, Vow, Seg_width, &
+      USE PRMS_STRMTEMP, ONLY: Azrh, Vce, Vdemx, Vhe, Voe, Vcw, Vdwmx, Vhw, Vow, &
      &    Vdemn, Vdwmn, HALF_PI
+      USE PRMS_STRMFLOW_CHARACTER, ONLY: Seg_width
       USE PRMS_SET_TIME, ONLY: Summer_flag
       IMPLICIT NONE
 ! Functions
