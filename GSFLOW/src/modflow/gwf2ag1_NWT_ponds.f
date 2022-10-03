@@ -3431,13 +3431,13 @@
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
 
-        if(iseg==25)then
-        etdif = pettotal - aettotal
-          write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
-     +                 SUPACT(iseg),etdif,RMSESW(ISEG),AGTOL*pettotal,
-     +                 AGCONVERGE
-        endif
-  33  format(4i5,6e20.10,i5)
+!        if(iseg==25)then
+!        etdif = pettotal - aettotal
+!          write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
+!     +                 SUPACT(iseg),etdif,RMSESW(ISEG),AGTOL*pettotal,
+!     +                 AGCONVERGE
+!        endif
+!  33  format(4i5,6e20.10,i5)
 300   continue
       return
       end subroutine demandconjunctive_prms

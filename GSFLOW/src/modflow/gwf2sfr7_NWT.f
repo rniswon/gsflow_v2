@@ -8479,7 +8479,7 @@ C
 C-------SUBROUTINE SFR2MODSIM
 C
       SUBROUTINE SFR2MODSIM(EXCHANGE, Diversions, IDIVERT, Nsegshold, 
-     +                      Timestep, KITER, KKITER)
+     +                      Timestep, KITER) !, KKITER)
 C     *******************************************************************
 C-------- MARCH 8, 2017
 C     COMPUTE NET ACCRETION/DEPLETION OVER A SEGMENT FOR MODSIM.
@@ -8487,17 +8487,17 @@ C     CAUTION: DOES NOT WORK WITH TRANSIENT ROUTING.
 C-------- May 28, 2017
 C     ADDING CODE TO RETURN WATER-LIMITED RELEASES FROM RESERVOIRS
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM, ISEG, ISTCB1
-      USE GWFBASMODULE, ONLY: DELT, PERTIM, TOTIM
-      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, IBOUND, BUFF !buff added for debug
-      USE GSFMODFLOW, ONLY: KPER, KSTP  !added for debug
+      USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM, ISEG !, ISTCB1
+      USE GWFBASMODULE, ONLY: DELT !, PERTIM, TOTIM
+!      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, IBOUND, BUFF !buff added for debug
+!      USE GSFMODFLOW, ONLY: KPER, KSTP  !added for debug
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     -------------------------------------------------------------------
 C     ARGUMENTS
-      INTEGER,          INTENT(IN)    :: Nsegshold, Timestep, KITER,
-     +                                   KKITER
+      INTEGER,          INTENT(IN)    :: Nsegshold, Timestep, KITER
+!      INTEGER,          INTENT(IN)    :: KKITER
       DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(NSS)
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold) 
       INTEGER,          INTENT(IN)    :: IDIVERT(Nsegshold)
@@ -8507,12 +8507,12 @@ C     -------------------------------------------------------------------
 C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
-      INTEGER :: ISTSG, L, ISTSGOLD, REACHNUMINSEG, M, ISTRCH
+      INTEGER :: ISTSG, L, ISTSGOLD, REACHNUMINSEG !, M, ISTRCH
       DOUBLE PRECISION :: FLOWIN, FLOWOUT
       !debug code
-      CHARACTER*16 text
-      DATA text/'  STREAM LEAKAGE'/
-      integer il, ir, ic, iout1
+!      CHARACTER*16 text
+!      DATA text/'  STREAM LEAKAGE'/
+!      integer il, ir, ic, iout1
 C     -------------------------------------------------------------------
 C
       ISTSG = 1
@@ -8521,7 +8521,7 @@ C
       EXCHANGE = 0.0D0
       FLOWIN = 0.0D0
       FLOWOUT = 0.0D0
-      BUFF = 0.0  ! debug
+!      BUFF = 0.0  ! debug
 C
 C1------LOOP OVER REACHES TO SET ACCRETIONS/DEPLETIONS
 C
@@ -8532,17 +8532,17 @@ C2------DETERMINE STREAM SEGMENT NUMBER.
         ISTSGOLD = ISTSG
         ISTSG = ISTRM(4, L)
         
-        !debug code
-        il = ISTRM(1, l)
-        ir = ISTRM(2, l)
-        ic = ISTRM(3, l)
-        BUFF(ic,ir,il) = STRM(19, l) !set to flobot
-                                     ! STRM(9, l): FLOWOT
-                                     ! STRM(10, l): FLOWIN
-                                     ! STRM(11, l): FLOBOT
-                                     ! STRM(12, l): RUNOF (is this where PRMS runoff amounts get added?)
-                                     ! STRM(7, l): DEPTH
-                                     ! hnew(il, ir, ic) would be head in the cell
+!        !debug code
+!        il = ISTRM(1, l)
+!        ir = ISTRM(2, l)
+!        ic = ISTRM(3, l)
+!        BUFF(ic,ir,il) = STRM(19, l) !set to flobot
+!                                     ! STRM(9, l): FLOWOT
+!                                     ! STRM(10, l): FLOWIN
+!                                     ! STRM(11, l): FLOBOT
+!                                     ! STRM(12, l): RUNOF (is this where PRMS runoff amounts get added?)
+!                                     ! STRM(7, l): DEPTH
+!                                     ! hnew(il, ir, ic) would be head in the cell
         ! end debug code
 C
 C3------DIFFERENCE FLOW IN AND FLOW OUT OF SEGEMENT.
@@ -8561,15 +8561,15 @@ C5------IF LAST REACH IN SEGMENT THEN SET FLOWOT
       END DO
 C
 C6----GENERATE SOME DEBUG 'WATCHER' FILES
-      OPEN(223, FILE='SFR_DEBUG_strmDat.TXT')
-      do L = 1489, 1523  ! Stream segs 175, 176, & 177
-        do M = 1, 30
-          ISTSG = ISTRM(4, L)
-          ISTRCH = ISTRM(5, L)
-          WRITE(223,334) KKITER, L, ISTSG, ISTRCH, M, STRM(M,L)
-        end do
-      end do
-  334 FORMAT(I5,1X,I5,1X,I5,1X,I5,1X,I5,1X,F12.5)
+!      OPEN(223, FILE='SFR_DEBUG_strmDat.TXT')
+!      do L = 1489, 1523  ! Stream segs 175, 176, & 177
+!        do M = 1, 30
+!          ISTSG = ISTRM(4, L)
+!          ISTRCH = ISTRM(5, L)
+!         WRITE(223,334) KKITER, L, ISTSG, ISTRCH, M, STRM(M,L)
+!        end do
+!      end do
+!  334 FORMAT(I5,1X,I5,1X,I5,1X,I5,1X,I5,1X,F12.5)
   !    OPEN(224, FILE='SFR_DEBUG_ins.TXT')
   !    WRITE(224,335) Timestep, KITER, (STRM(10,II), II=1, NSTRM)
   !335 FORMAT(I5,1X,I5,1X,4909E17.10)
