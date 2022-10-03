@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 07/29/2022
+                       Version 5.3.0 09/01/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -36,8 +36,8 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-07-29
-Read Control File               read_control_file   2022-07-29
+PRMS Computation Order          gsflow_prms         2022-09-01
+Read Control File               read_control_file   2022-09-01
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 
@@ -142,19 +142,19 @@ runoff 1
  Data File time period: 1993/10/01 00:00:00 to 1995/09/30 00:00:00
 Simulation time period: 1993/10/01 00:00:00 to 1995/09/30 00:00:00
 ====================================================================
-Basin Definition                basin               2022-07-25
+Basin Definition                basin               2022-09-20
 Common States and Fluxes        climateflow         2022-08-05
 Potential Solar Radiation       soltab              2022-03-29
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2022-04-21
-Temp & Precip Distribution      ide_dist            2022-01-25
-Solar Radiation Distribution    ddsolrad            2021-11-19
+Temp & Precip Distribution      ide_dist            2022-09-07
+Solar Radiation Distribution    ddsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-07-29
 Snow Dynamics                   snowcomp            2022-04-27
 Surface Runoff                  srunoff_smidx       2022-08-10
-Soilzone Computations           soilzone            2022-07-25
+Soilzone Computations           soilzone            2022-09-01
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing              strmflow            2021-11-19
 Output Summary                  basin_sum           2022-04-22
