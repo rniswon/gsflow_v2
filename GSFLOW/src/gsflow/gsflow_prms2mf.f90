@@ -610,12 +610,12 @@
       USE GSFPRMS2MF, ONLY: Excess, Cell_drain_rate, Net_sz2gw, finf_cell
       USE GSFMODFLOW, ONLY: Cellarea, Gwc_row, Gwc_col !, Mft_to_days
       USE GWFUZFMODULE, ONLY: FINF, VKS, FBINS, IUZFBND, NUZTOP, SURFDEP
-      USE GLOBAL, ONLY: HNEW, BOTM
+      USE GLOBAL, ONLY: HNEW, BOTM, IBOUND, NLAY
       USE PRMS_MODULE, ONLY: Ngwcell
       IMPLICIT NONE
       INTRINSIC ABS
 ! Local Variables
-      INTEGER :: icell, irow, icol, ij1, ij2, land, ij2m1
+      INTEGER :: icell, irow, icol, ij1, ij2, land, ij2m1, ill
       REAL :: finfvks, finfprms, finf_temp, celtop
 !***********************************************************************
 !-----------------------------------------------------------------------
@@ -628,6 +628,20 @@
           land = ABS(IUZFBND(icol, irow))
           IF ( NUZTOP==1 ) THEN
             celtop = BOTM(icol, irow, 0) - 0.5 * SURFDEP
+!          ELSEIF ( NUZTOP == 3 .OR. NUZTOP == 5 ) THEN
+          ELSEIF ( NUZTOP == 5 ) THEN
+            ill = 1
+            land = 1
+            DO WHILE ( ill.LE.NLAY )
+              IF ( IBOUND(icol, irow, ill).GT.0 ) THEN
+                land = ill
+                EXIT
+              ELSE IF ( IBOUND(icol, irow, ill).LT.0 ) THEN
+                EXIT
+              END IF
+              ill = ill + 1
+            END DO
+            celtop = BOTM(icol, irow, land-1) - 0.5 * SURFDEP
           ELSE
             celtop = BOTM(icol, irow, land-1) - 0.5 * SURFDEP
           END IF

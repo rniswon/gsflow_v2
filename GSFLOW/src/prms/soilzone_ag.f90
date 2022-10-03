@@ -30,10 +30,10 @@
       REAL, SAVE, ALLOCATABLE :: perv_soil_to_gw(:), perv_soil_to_gvr(:)
 !   Agriculture Declared Variables
       INTEGER, SAVE, ALLOCATABLE :: Ag_soil_saturated(:)
-      DOUBLE PRECISION, SAVE :: Basin_ag_waterin
+      DOUBLE PRECISION, SAVE :: Basin_ag_waterin, Basin_ag_irrigation_add
       REAL, SAVE, ALLOCATABLE :: Unused_ag_et(:), ag_soil_to_gvr(:), Ag_soilwater_deficit(:)
       REAL, SAVE, ALLOCATABLE :: Ag_actet(:), Ag_irrigation_add(:), Ag_irrigation_add_vol(:)
-      REAL, SAVE, ALLOCATABLE :: ag_soil_to_gw(:), hru_ag_actet(:), Ag_hortonian(:)
+      REAL, SAVE, ALLOCATABLE :: ag_soil_to_gw(:), hru_ag_actet(:), Ag_hortonian(:), ag_AET_external_vol(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_lower(:), Ag_soil_lower_stor_max(:), Ag_potet_rechr(:), Ag_potet_lower(:)
 !      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Ag_upslope_dunnian(:)
       REAL, SAVE, ALLOCATABLE :: Ag_gvr_to_sm(:)
@@ -158,6 +158,10 @@
      &     ' cascading interflow and Dunnian flow added to agriculture reservoir storage', &
      &     'inches', Basin_ag_waterin)
 
+      CALL declvar_dble(MODNAME, 'Basin_ag_irrigation_add', 'one', 1, &
+     &     'Basin area-weighted average irrigation estimate', &
+     &     'inches', Basin_ag_irrigation_add)
+
       ALLOCATE ( Ag_irrigation_add(Nhru) )
       CALL declvar_real(MODNAME, 'ag_irrigation_add', 'nhru', Nhru, &
      &     'Irrigation water added to agriculture fraction when ag_actet < PET_external for each HRU', &
@@ -172,6 +176,11 @@
       CALL declvar_real(MODNAME, 'ag_irrigation_add_vol', 'nhru', Nhru, &
      &     'Irrigation water added to agriculture fraction when ag_actet < PET_external for each HRU', &
      &     'acre-inches', Ag_irrigation_add_vol)
+
+      ALLOCATE ( ag_AET_external_vol(Nhru) )
+      CALL declvar_real(MODNAME, 'ag_AET_external_vol', 'nhru', Nhru, &
+     &     'OpenET actual evapotranspiration for transpiration days for each HRU', &
+     &     'acre-inches', ag_AET_external_vol)
 
       ALLOCATE ( Ag_soil_lower(Nhru), Ag_soil_lower_stor_max(Nhru) )
       CALL declvar_real(MODNAME, 'ag_soil_lower', 'nhru', Nhru, &
@@ -303,6 +312,7 @@
       IF ( Ag_soil2gw_max(1)<0.0 ) Ag_soil2gw_max = Soil2gw_max
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) Ag_soil_lower = 0.0
       ! dimensioned nhru
+      Basin_ag_irrigation_add = 0.0D0
       Ag_irrigation_add = 0.0
       ag_soil_to_gw = 0.0
       Ag_hortonian = 0.0
@@ -360,7 +370,7 @@
      &    Iter_aet_flag, irrigation_apply_flag, Model !, MODSIM_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
-      USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
+      USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, Ag_area_total, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
      &    Lake_hru_id, Cov_type, Numlake_hrus, Hru_area_dble, gsflow_ag_area, Ag_frac, Ag_area, Ag_cov_type
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Transp_on, Potet, Basin_potet, Basin_transp_on
@@ -404,7 +414,7 @@
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
       REAL :: ag_upflow_max, ag_capacity, agfrac, ag_avail_potet, ag_potet, unsatisfied_ag_et
       REAL :: ag_AETtarget, ag_avail_targetAET, agactet, excess, ag_pref_flow_maxin, ag_hruactet
-      REAL :: upflow_max, ag_portion, perv_portion, agarea, unsatisfied_max
+      REAL :: upflow_max, ag_portion, perv_portion, agarea, unsatisfied_max !, max_irrigation
       DOUBLE PRECISION :: gwin
       INTEGER :: cfgi_frozen_hru, adjust_hortonian
       INTEGER :: num_hrus_ag_iter, ag_on_flag, keep_iterating, add_estimated_irrigation, perv_on_flag
@@ -432,10 +442,14 @@
         It0_sroff = Sroff
         It0_hru_sroffp = Hru_sroffp
         It0_hortonian_flow = Hortonian_flow
-        It0_strm_seg_in = Strm_seg_in
+        IF ( Cascade_flag>CASCADE_OFF ) It0_strm_seg_in = Strm_seg_in
       ENDIF
 
-      IF ( Iter_aet_flag==ACTIVE ) Ag_irrigation_add = 0.0
+      IF ( Iter_aet_flag==ACTIVE ) THEN
+        Basin_ag_irrigation_add = 0.0D0
+        Ag_irrigation_add = 0.0
+!        max_irrigation = 0.0
+      ENDIF
 
       keep_iterating = ACTIVE
       Soil_iter = 1
@@ -473,7 +487,7 @@
         Sroff = It0_sroff
         Hru_sroffp = It0_hru_sroffp
         Hortonian_flow = It0_hortonian_flow
-        Strm_seg_in = It0_strm_seg_in
+        IF ( Cascade_flag>CASCADE_OFF ) Strm_seg_in = It0_strm_seg_in
       ENDIF
 
       IF ( Cascade_flag>CASCADE_OFF ) THEN
@@ -1082,6 +1096,10 @@
                   num_hrus_ag_iter = num_hrus_ag_iter + 1
                 ENDIF
                 Ag_irrigation_add(i) = Ag_irrigation_add(i) + unsatisfied_max
+                !if ( Ag_irrigation_add(i)>2.5 ) then
+                !    print *, 'large irrigaion', i, Ag_irrigation_add(i), ag_AETtarget, unsatisfied_max
+                !endif
+!                IF ( Ag_irrigation_add(i)>max_irrigation ) max_irrigation = Ag_irrigation_add(i)
               ENDIF
               IF ( unsatisfied_max>unsatisfied_big ) unsatisfied_big = unsatisfied_max
             ENDIF
@@ -1107,18 +1125,20 @@
       ENDDO ! end iteration while loop
 ! ***************************************
 
+      Soil_iter = Soil_iter - 1
       IF ( Iter_aet_flag == ACTIVE ) THEN
+        Ag_irrigation_add_vol = Ag_irrigation_add*Ag_area
+        ag_AET_external_vol = ag_AET_external_vol*Ag_area
+        Basin_ag_irrigation_add = 0.0D0
         do i = 1, nhru ! temporary to put mask in nhru_summary file
           if (ag_frac(i)>0.0 ) then
                 if (transp_on(i)==OFF) AET_external(i) = -1.0
+                Basin_ag_irrigation_add = Basin_ag_irrigation_add + DBLE( Ag_irrigation_add_vol(i) )
           else
                 AET_external(i) = -1.0
           endif
         enddo
-      ENDIF
-      Soil_iter = Soil_iter - 1
-      IF ( Iter_aet_flag==ACTIVE ) THEN
-        Ag_irrigation_add_vol = Ag_irrigation_add*Ag_area
+        Basin_ag_irrigation_add = Basin_ag_irrigation_add / Ag_area_total
      !   IF ( num_hrus_ag_iter>0 ) print '(2(A,I0))', 'number of hrus still iterating on AET: ', &
      !&       num_hrus_ag_iter
      !   if ( soil_iter==max_soilzone_ag_iter ) iter_nonconverge = iter_nonconverge + 1
