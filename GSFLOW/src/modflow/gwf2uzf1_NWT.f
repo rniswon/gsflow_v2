@@ -3668,11 +3668,11 @@ C33-----UPDATE RATES AND BUFFERS WITH GW ET FOR MODFLOW BUDGET ITEMS.
               IF ( IUZFBND(ic,ir).NE.0 ) THEN
                 ill = LAYNUM(ic, ir)
                 IF ( ill.GT.0 ) THEN
-                  IF ( IETFLG.NE.0 ) THEN
-                    BUFF(ic, ir, ill)= -CUMGWET(ic, ir)
-                  ELSE
+                  !IF ( IETFLG.NE.0 ) THEN
+                    !BUFF(ic, ir, ill)= -CUMGWET(ic, ir)
+                  !ELSE
                     BUFF(ic, ir, ill)= -GWET(ic, ir)
-                  END IF
+                  !END IF
                 END IF
               END IF
             END DO
