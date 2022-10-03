@@ -380,7 +380,7 @@ C7------ALLOCATE SPACE FOR ARRAYS AND INITIALIZE.
       END IF
       FINFSAVE = 0.0
       ALLOCATE (GWET(NCOL,NROW))
-      IF ( IETBUD.GT.0 ) THEN
+      IF ( IETFLG.NE.0 ) THEN
         ALLOCATE (CUMGWET(NCOL,NROW))
       ELSE
         ALLOCATE (CUMGWET(1,1))
@@ -3499,7 +3499,7 @@ C29-----ACCUMULATE INFLOW AND OUTFLOW VOLUMES FROM CELLS.
           totbet = totbet + GWET(ic, ir)
           UZTSRAT(7) = UZTSRAT(7) + GWET(ic, ir)
           UZTSRAT(8) = UZTSRAT(8) + cellarea*finfsaveadd
-          IF ( IETBUD.GT.0 )
+          IF ( IETFLG.NE.0 )
      +         CUMGWET(ic,ir) = CUMGWET(ic,ir) + GWET(ic, ir)
           finfsaveadd = 0.0
           IF ( Isavefinf+Igsflow == 2 ) finfsaveadd = finfsave(ic,ir)
@@ -3630,7 +3630,7 @@ C
                  ill = LAYNUM(ic, ir)
                  IF ( ill.GT.0 ) THEN
                    IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
-                     IF ( IETBUD.GT.0 ) THEN
+                     IF ( IETFLG.GT.0 ) THEN
                        BUFF(ic, ir, ill) =-UZTOTBAL(ic, ir, 4)
                      ELSE
                        BUFF(ic, ir, ill) = -UZFETOUT(ic, ir)/DELT
@@ -3668,7 +3668,7 @@ C33-----UPDATE RATES AND BUFFERS WITH GW ET FOR MODFLOW BUDGET ITEMS.
               IF ( IUZFBND(ic,ir).NE.0 ) THEN
                 ill = LAYNUM(ic, ir)
                 IF ( ill.GT.0 ) THEN
-                  IF ( IETBUD.GT.0 ) THEN
+                  IF ( IETFLG.NE.0 ) THEN
                     BUFF(ic, ir, ill)= -CUMGWET(ic, ir)
                   ELSE
                     BUFF(ic, ir, ill)= -GWET(ic, ir)
@@ -3690,7 +3690,7 @@ C34-----SAVE GW ET RATES TO UNFORMATTED FILE FOR UZF OR MODFLOW BUDGET ITEMS.
       END IF
 C
 C35-----UPDATE RATES AND BUFFERS FOR INFILTRATION.
-      IF ( ibd.GT.0 .OR. ibduzf.GT.0 .AND. IETBUD.EQ.0 ) THEN
+      IF ( ibd.GT.0 .OR. ibduzf.GT.0 ) THEN
         IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
           CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))
           DO ir = 1, NROW
@@ -3795,7 +3795,7 @@ C37-----SAVE INFILTRATION RATES TO UNFORMATTED FILE.
 !      END IF
 C--Uncomment to here for MODSIM-MODFLOW
 C38-----UPDATE RATES AND BUFFERS FOR RECHARGE.
-      IF ( ibd.GT.0 .OR. ibduzf.GT.0 .AND. IETBUD.EQ.0 ) THEN
+      IF ( ibd.GT.0 .OR. ibduzf.GT.0 ) THEN
         CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))
         DO ir = 1, NROW
           DO ic = 1, NCOL
@@ -3819,18 +3819,16 @@ C38-----UPDATE RATES AND BUFFERS FOR RECHARGE.
         END DO
       END IF
 C
-C39-----SAVE ACTUAL INFILTRATION RATES TO UNFORMATTED FILE.
-      IF ( IETBUD.EQ.0 ) THEN
+C39-----SAVE RECHARGE RATES TO UNFORMATTED FILE.
         IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, textrch, IUZFCB1, 
      +                            BUFF, NCOL, NROW, NLAY, IOUT)
         IF ( ibduzf.GT.0 ) CALL UBDSV3(Kkstp, Kkper, textrch,  
      +                               IUZFCB2, BUFF, LAYNUM, NUZTOP,
      +                               NCOL, NROW, NLAY, IOUT, DELT,  
      +                               PERTIM, TOTIM, IBOUND)
-      END IF
 C
 C40-----UPDATE RATES AND BUFFERS FOR SURFACE LEAKAGE RATES.
-      IF ( ibd.GT.0 .OR. ibduzf.GT.0 .AND. IETBUD.EQ.0 ) THEN
+      IF ( ibd.GT.0 .OR. ibduzf.GT.0 ) THEN
           CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))
           DO ir = 1, NROW
             DO ic = 1, NCOL
@@ -3847,17 +3845,15 @@ C40-----UPDATE RATES AND BUFFERS FOR SURFACE LEAKAGE RATES.
           END DO
       END IF
 C41-----SAVE SURFACE LEAKAGE TO UNFORMATTED FILE.
-      IF ( IETBUD.EQ.0 ) THEN
         IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, textexfl, IUZFCB1, 
      +                            BUFF, NCOL, NROW, NLAY, IOUT)
         IF ( ibduzf.GT.0 ) CALL UBDSV3(Kkstp, Kkper, textexfl,  
      +                               IUZFCB2, BUFF, LAYNUM, NUZTOP,
      +                               NCOL, NROW, NLAY, IOUT, DELT,  
      +                               PERTIM, TOTIM, IBOUND)
-      END IF
 C
 C40-----UPDATE RATES AND BUFFERS FOR REJECTED INFILTRATON RATES.
-      IF ( ibd.GT.0 .OR. ibduzf.GT.0 .AND. IETBUD.EQ.0 ) THEN
+      IF ( ibd.GT.0 .OR. ibduzf.GT.0 ) THEN
           CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))
           DO ir = 1, NROW
             DO ic = 1, NCOL
@@ -3874,7 +3870,7 @@ C40-----UPDATE RATES AND BUFFERS FOR REJECTED INFILTRATON RATES.
           END DO
       END IF
 C41-----SAVE REJECTED INFILTRATON RATES TO UNFORMATTED FILE.
-      IF ( IETBUD.EQ.0 ) THEN
+      IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
         IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, textrej, IUZFCB1, 
      +                            BUFF, NCOL, NROW, NLAY, IOUT)
         IF ( ibduzf.GT.0 ) CALL UBDSV3(Kkstp, Kkper, textrej,  
@@ -3899,13 +3895,15 @@ C40-----UPDATE RATES AND BUFFERS FOR STORAGE CHANGES.
             END DO
         END IF
       END IF
-C41-----SAVE REJECTED INFILTRATON RATES TO UNFORMATTED FILE.
+C41-----UPDATE RATES AND BUFFERS FOR STORAGE CHANGES.
+      IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
         IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, uzsttext, IUZFCB1, 
      +                            BUFF, NCOL, NROW, NLAY, IOUT)
         IF ( ibduzf.GT.0 ) CALL UBDSV3(Kkstp, Kkper, uzsttext,  
      +                               IUZFCB2, BUFF, LAYNUM, NUZTOP,
      +                               NCOL, NROW, NLAY, IOUT, DELT,  
      +                               PERTIM, TOTIM, IBOUND)
+      END IF
 C
 C42-----PRINT RESULTS.
       bigvl1 = 9.99999E11
