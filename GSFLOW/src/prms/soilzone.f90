@@ -429,7 +429,7 @@
       IF ( GSFLOW_flag==ACTIVE .OR. Iter_aet_flag==ACTIVE ) THEN
         IF ( Nlake>0 ) ALLOCATE ( It0_potet(Nhru) )
         ALLOCATE ( It0_sroff(Nhru), It0_hru_sroffp(Nhru), It0_hortonian_flow(Nhru) )
-        ALLOCATE ( It0_strm_seg_in(Nsegment) )
+        IF ( Cascade_flag>CASCADE_OFF ) ALLOCATE ( It0_strm_seg_in(Nsegment) )
       ENDIF
 
 ! Allocate arrays for local and variables from other modules
@@ -1466,9 +1466,11 @@
       ! sanity check
       IF ( Perv_actet*Perv_frac-Avail_potet > NEARZERO ) THEN
         IF ( ag_perv_flag == 0 ) THEN
-          PRINT '(a,i0,4F0.6)', 'perv_actet problem', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Perv_actet
+          PRINT '(a,i0,4F0.6)', 'perv_actet problem', &
+                hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Perv_actet
         ELSE
-          PRINT '(a,i0,4F0.6)', 'ag_actet problem', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Perv_actet
+          PRINT '(a,i0,4F0.6)', 'ag_actet problem', &
+                hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Perv_actet
         ENDIF
         CALL print_date(0)
 !        Soil_moist = Soil_moist + Perv_actet - Avail_potet
@@ -1476,9 +1478,11 @@
       ENDIF
       IF ( Perv_actet > Potet ) THEN
         IF ( ag_perv_flag == 0 ) THEN
-          PRINT '(a,i0,4(1x,F0.8))', 'perv_actet PET problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet, Perv_actet
+          PRINT '(a,i0,4(1x,F0.8))', 'perv_actet PET problem: ', &
+                hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet, Perv_actet
         ELSE
-          PRINT '(a,i0,4(1x,F0.8))', 'ag_actet PET problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
+          PRINT '(a,i0,4(1x,F0.8))', 'ag_actet PET problem: ', &
+                hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Potet
         ENDIF
         CALL print_date(0)
       ENDIF

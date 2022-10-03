@@ -1363,10 +1363,10 @@ end module PRMS_IT0_VARS
         ENDIF
 
         IF ( AG_flag==ACTIVE .AND. Ag_area(i)>0.0 ) THEN
-          IF ( Ag_soil_moist_max(i) < 2.0 ) THEN
-            PRINT *, 'ag_soil_moist_max < 2.0, set to 2.0, HRU:', i, Ag_soil_moist_max(i)
-            Ag_soil_moist_max(i) = 2.0
-          ENDIF
+          !IF ( Ag_soil_moist_max(i) < 6.0 ) THEN
+          !  PRINT *, 'ag_soil_moist_max < 6.0, set to 6.0, HRU:', i, Ag_soil_moist_max(i)
+          !  Ag_soil_moist_max(i) = 6.0
+          !ENDIF
           IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
             IF ( Parameter_check_flag>0 ) THEN
               PRINT 9022, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)

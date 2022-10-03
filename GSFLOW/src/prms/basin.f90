@@ -6,10 +6,10 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2022-09-07'
+      character(len=*), parameter :: Version_basin = '2022-09-20'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
-      DOUBLE PRECISION, SAVE :: Land_area, Water_area
+      DOUBLE PRECISION, SAVE :: Land_area, Water_area, Ag_area_total
       DOUBLE PRECISION, SAVE :: Basin_area_inv, Basin_lat, Totarea, Active_area
       REAL, SAVE, ALLOCATABLE :: Hru_elev_meters(:) !, Hru_elev_feet(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_frac_clos(:), gsflow_ag_area(:), gsflow_ag_frac(:)
@@ -309,6 +309,7 @@
       IF ( AG_flag==ACTIVE ) THEN
         IF ( getparam_real(MODNAME, 'ag_frac', Nhru, Ag_frac)/=0 ) CALL read_error(2, 'ag_frac')
         IF ( getparam_int(MODNAME, 'ag_cov_type', Nhru, Ag_cov_type)/=0 ) CALL read_error(2, 'ag_cov_type')
+        !ag_cov_type = Cov_type
       ENDIF
 
       dprst_frac_flag = 0
@@ -436,9 +437,13 @@
         IF ( AG_flag==ACTIVE ) THEN
           IF ( Ag_frac(i)>0.0 ) THEN
             IF ( Ag_frac(i)>1.0 ) THEN
-              PRINT '(A,I0,A,F0.6)', 'WARNING, ag_frac > 1.0, set to 1.0 for HRU: ', i, ', ag_frac: ', ag_frac(i)
+              PRINT '(A,I0,A,F0.6)', 'WARNING, ag_frac > 1.0, set to 1.0 for HRU: ', i, ', ag_frac: ', Ag_frac(i)
               Ag_frac(i) = 1.0
             ENDIF
+            !IF ( Ag_frac(i)<0.01 ) THEN
+            !  PRINT '(A,I0,A,F0.6)', 'WARNING, ag_frac < 0.01, set to 0.0 for HRU: ', i, ', ag_frac: ', Ag_frac(i)
+            !  Ag_frac(i) = 0.0
+            !ENDIF
             Ag_area(i) = Ag_frac(i) * harea
             Basin_ag = Basin_ag + DBLE( Ag_area(i) )
             non_perv = Ag_frac(i) + Hru_percent_imperv(i) + Dprst_frac(i)
@@ -567,6 +572,7 @@
 
       basin_perv = basin_perv*Basin_area_inv
       basin_imperv = basin_imperv*Basin_area_inv
+      Ag_area_total = Basin_ag
       Basin_ag = Basin_ag*Basin_area_inv
 
       IF ( Print_debug==2 ) THEN

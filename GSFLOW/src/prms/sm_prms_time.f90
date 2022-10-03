@@ -63,7 +63,7 @@ contains
             It0_intcp_transp_on = Intcp_transp_on
             It0_intcp_stor = Intcp_stor
           ENDIF
-          IF ( PRMS_land_iteration_flag>0 ) It0_imperv_stor = Imperv_stor
+          IF ( PRMS_land_iteration_flag>0 .OR. Print_debug==DEBUG_WB ) It0_imperv_stor = Imperv_stor
           IF ( Dprst_flag==ACTIVE ) THEN
             It0_dprst_vol_open = Dprst_vol_open
             It0_dprst_vol_clos = Dprst_vol_clos

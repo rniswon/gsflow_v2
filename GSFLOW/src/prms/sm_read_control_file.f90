@@ -94,13 +94,14 @@ contains
     use PRMS_CLIMATE_HRU, only: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, Albedo_day, Cloud_cover_day, &
                                 Cbh_check_flag, Windspeed_day, Humidity_day, &
                                 AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
-    use PRMS_DYNAMIC_PARAM_READ, only: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
-                                       wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
-                                       potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, Dynamic_param_log_file, &
-                                       soilmoist_dynamic, soilrechr_dynamic, radtrncf_dynamic, &
-                                       fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, &
+    use PRMS_DYNAMIC_PARAM_READ, only: wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
+                                       potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, dynamic_param_log_file, &
+                                       radtrncf_dynamic, fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, &
                                        covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn, &
-                                       ag_soilmoist_dynamic, ag_soilrechr_dynamic, ag_frac_dynamic, snareathresh_dynamic
+                                       snareathresh_dynamic
+    use PRMS_DYNAMIC_SOIL_PARAM_READ, only: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
+                                            soilmoist_dynamic, soilrechr_dynamic, dynamic_soil_param_log_file, &
+                                            ag_soilmoist_dynamic, ag_soilrechr_dynamic, ag_frac_dynamic
     implicit none
     ! Local Variables
     integer i, numvalues
@@ -729,8 +730,13 @@ contains
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'dynamic_param_log_file'
-    Dynamic_param_log_file = 'dynamic_parameter.out'
-    Control_parameter_data(i) % values_character(1) = Dynamic_param_log_file
+    dynamic_param_log_file = 'dynamic_parameter.out'
+    Control_parameter_data(i) % values_character(1) = dynamic_param_log_file
+    Control_parameter_data(i) % data_type = CHAR_TYPE
+    i = i + 1
+    Control_parameter_data(i) % name = 'dynamic_soil_param_log_file'
+    dynamic_soil_param_log_file = 'dynamic_soil_parameter.out'
+    Control_parameter_data(i) % values_character(1) = dynamic_soil_param_log_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     ! GSFLOW parameters
@@ -857,11 +863,6 @@ contains
     Control_parameter_data(i) % name = 'transp_on_dynamic'
     Transp_on_dynamic = 'dyn_transp_on.param'
     Control_parameter_data(i) % values_character(1) = Transp_on_dynamic
-    Control_parameter_data(i) % data_type = CHAR_TYPE
-    i = i + 1
-    Control_parameter_data(i) % name = 'dynamic_param_log_file'
-    Dynamic_param_log_file = 'dynamic_parameter.out'
-    Control_parameter_data(i) % values_character(1) = Dynamic_param_log_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'selectDatesFileName'

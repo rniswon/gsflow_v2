@@ -66,6 +66,7 @@ LIBOBJS = \
         gwflow.o \
         water_use_read.o \
         dynamic_param_read.o \
+		dynamic_soil_param_read.o \
         water_balance.o \
         routing.o \
         strmflow.o \
@@ -73,6 +74,7 @@ LIBOBJS = \
         muskingum.o \
         muskingum_lake.o \
 		segment_to_hru.o \
+		strmflow_character.o \
         subbasin.o \
         stream_temp.o \
         statvar_out.o \
@@ -139,6 +141,9 @@ ddsolrad.o: ddsolrad.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod
 
 dynamic_param_read.o: dynamic_param_read.f90 prms_module.mod prms_control_file.mod prms_basin.mod prms_set_time.mod prms_climatevars.mod prms_flowvars.mod prms_potet_jh.mod prms_potet_pm.mod prms_potet_hs.mod prms_potet_pt.mod prms_potet_hamon.mod prms_transp_tindex.mod prms_transp_frost.mod prms_intcp.mod prms_snow.mod prms_srunoff.mod prms_soilzone.mod prms_soilzone_ag.mod prms_climate_hru.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) dynamic_param_read.f90
+	
+dynamic_soil_param_read.o: dynamic_soil_param_read.f90 prms_module.mod prms_control_file.mod prms_basin.mod prms_set_time.mod prms_climatevars.mod prms_flowvars.mod prms_potet_jh.mod prms_potet_pm.mod prms_potet_hs.mod prms_potet_pt.mod prms_potet_hamon.mod prms_transp_tindex.mod prms_transp_frost.mod prms_intcp.mod prms_snow.mod prms_srunoff.mod prms_soilzone.mod prms_soilzone_ag.mod prms_climate_hru.mod prms_constants.mod
+	$(FC) -c $(FFLAGS) dynamic_soil_param_read.f90
 
 frost_date.o: frost_date.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod prms_climatevars.mod prms_set_time.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) frost_date.f90
@@ -241,6 +246,9 @@ strmflow.o: strmflow.f90 prms_module.mod prms_basin.mod prms_obs.mod prms_flowva
 
 strmflow_in_out.o: strmflow_in_out.f90 prms_module.mod prms_basin.mod prms_obs.mod prms_flowvars.mod prms_gwflow.mod prms_srunoff.mod prms_set_time.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) strmflow_in_out.f90
+
+strmflow_character.o: strmflow_character.f90 prms_module.mod prms_basin.mod prms_obs.mod prms_flowvars.mod prms_gwflow.mod prms_srunoff.mod prms_set_time.mod prms_constants.mod
+	$(FC) -c $(FFLAGS) strmflow_character.f90
 
 segment_to_hru.o: segment_to_hru.f90 prms_module.mod prms_basin.mod prms_flowvars.mod prms_set_time.mod prms_constants.mod prms_soilzone.mod
 	$(FC) -c $(FFLAGS) segment_to_hru.f90

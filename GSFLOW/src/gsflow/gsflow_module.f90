@@ -35,7 +35,7 @@
       INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Grid_flag, Ag_package
       INTEGER, SAVE :: Canopy_iter,irrigated_area_flag, AET_cbh_flag, PET_cbh_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
-      INTEGER, SAVE :: Dynamic_flag, Water_use_flag, Soilzone_add_water_use
+      INTEGER, SAVE :: Dynamic_flag, Dynamic_soil_flag, Water_use_flag, Soilzone_add_water_use
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
       INTEGER, SAVE :: Nowyear, Nowmonth, Nowday
       INTEGER, SAVE :: Gwr_transfer_water_use, Gwr_add_water_use

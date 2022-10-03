@@ -983,7 +983,7 @@
         ENDIF
         Lake_outflow(lakeid) = Lake_evap(lakeid)
         IF ( Lake_transfer_water_use==ACTIVE ) THEN
-          IF ( Lake_transfer(lakeid)>0.0 ) Lake_outflow(lakeid) = Lake_outflow(lakeid) - Lake_transfer(lakeid)
+          IF ( Lake_transfer(lakeid)>0.0 ) Lake_outflow(lakeid) = Lake_outflow(lakeid) + Lake_transfer(lakeid)
         ENDIF
         IF ( Weir_gate_flag==ACTIVE ) THEN
           tocfs = Lake_area(lakeid)*Cfs_conv
