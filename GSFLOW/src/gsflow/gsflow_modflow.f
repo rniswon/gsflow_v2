@@ -688,6 +688,9 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF(IUNIT(55).GT.0) CALL GWF2UZF1FM(KKPER,KKSTP,KKITER,
      1                           IUNIT(44),IUNIT(22),IUNIT(63),
      2                           IUNIT(64),IGRID)  !SWR - JDH ADDED IUNIT(64)
+            IF (Model>=10 .AND. iss==0) THEN
+              IF( IUNIT(66).GT.0 ) CALL MODSIM2AG(Diversions)
+            END IF
             IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,
      1                              IUNIT(22),IUNIT(63),IUNIT(8),
      2                              IUNIT(55),IGRID)   !cjm (added IUNIT(8))
@@ -821,7 +824,7 @@ C
 C
  9001 FORMAT ('ERROR in ', A, ' module, arg = run.',
      &        ' Called from MFNWT_RUN.', /, 'Return val =', I2)
-
+C
       IF (Model>=10 .AND. iss==0) THEN
         IF(IUNIT(44).GT.0) CALL SFR2MODSIM(EXCHANGE, Diversions, 
      1                             Idivert, Nsegshold, Timestep,KITER,
@@ -870,7 +873,7 @@ C     ************************************************************************
 C     Upon MODSIM-MODFLOW conversion,
 C     write the budget terms
 C     ************************************************************************
-      SUBROUTINE MFNWT_OCBUDGET()
+      SUBROUTINE MFNWT_OCBUDGET(Diversions, Nsegshold)
      &                  BIND(C,NAME="MFNWT_OCBUDGET")
 C      
       !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_OCBUDGET
@@ -884,14 +887,17 @@ C
       USE GWFNWTMODULE, ONLY:ICNVGFLG
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Print_debug, Timestep, Kkiter,
-     +    Nowyear, Nowmonth, Nowday
+     +    Nowyear, Nowmonth, Nowday, Model
       IMPLICIT NONE
       INTRINSIC :: MIN
-      INTEGER :: IBDRET, IC1, IC2, IR1, IR2, IL1, IL2, IDIR, ii
+      INTEGER :: IBDRET, IC1, IC2, IR1, IR2, IL1, IL2, IDIR, ii, 
+     +           Nsegshold, ISS
       REAL :: BUDPERC
+      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
 C     ************************************************************************
       KKSTP = KSTP
       KKPER = KPER
+      ISS  = ISSFLG(KKPER)
 
           CALL GWF2BAS7OC(KKSTP,KKPER,ICNVG,IUNIT(12),IGRID)
 C
@@ -983,6 +989,9 @@ C7C4----CALCULATE BUDGET TERMS. SAVE CELL-BY-CELL FLOW TERMS.
           IF(IUNIT(39).GT.0) CALL GWF2ETS7BD(KKSTP,KKPER,IGRID)
           IF(IUNIT(40).GT.0) CALL GWF2DRT7BD(KKSTP,KKPER,IGRID)
 ! (CJM) Added RCH unit number for RCH->SFR.
+          IF (Model>=10 .AND. iss==0) THEN
+            IF( IUNIT(66).GT.0 ) CALL MODSIM2AG(Diversions)
+          END IF
           IF(IUNIT(44).GT.0) CALL GWF2SFR7BD(KKSTP,KKPER,IUNIT(15),
      1                        IUNIT(22),IUNIT(46),IUNIT(55),NSOL,
      2                        IUNIT(8),IGRID)
@@ -1691,7 +1700,7 @@ C
             Steady_state = 1
             CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL,
      +                     LAKEVOL,Nsegshold,Nlakeshold,agDemand)    ! ITERATE TO SOLVE GW-SW SOLUTION FOR SS
-            CALL MFNWT_OCBUDGET()          ! CALCULATE BUDGET
+            CALL MFNWT_OCBUDGET(Diversions, Nsegshold)          ! CALCULATE BUDGET
             Steady_state = 0
  !           TOTIM = plen !RGN 9/4/2018 TOTIM needs to stay in MF time units
             TOTIM = PERLEN(i)  !RGN 9/4/2018 TOTIM needs to stay in MF time units
