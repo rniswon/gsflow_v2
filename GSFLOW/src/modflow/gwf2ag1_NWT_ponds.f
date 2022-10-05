@@ -4535,11 +4535,55 @@
 C
 C-------SUBROUTINE SFR2MODSIM
 C
-      SUBROUTINE AG2MODSIM(Diversions)
+      SUBROUTINE AG2MODSIM(agDemand)
 C     *******************************************************************
 C     Pass Irrigation demand to MODSIM 
 C     
 !--------January 17, 2022
+C     *******************************************************************
+      USE GWFSFRMODULE, ONLY: SEG, NSS
+      USE GWFAGMODULE
+      USE GWFBASMODULE, ONLY: DELT
+      IMPLICIT NONE
+C     -------------------------------------------------------------------
+C     SPECIFICATIONS:
+C     -------------------------------------------------------------------
+C     ARGUMENTS
+      DOUBLE PRECISION, INTENT(INOUT) :: agDemand(NSS)
+C     -------------------------------------------------------------------
+!      INTEGER 
+!      DOUBLE PRECISION 
+C     -------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     -------------------------------------------------------------------
+      INTEGER :: ISEG, i
+!      double precision :: total !delete this
+C     -------------------------------------------------------------------
+C
+C1------LOOP OVER SEGMETS
+C
+C
+C2------Set diversion demand from that calculated from AG.
+C 
+        agDemand = 0.0
+        do i = 1, NUMIRRDIVERSIONSP
+          iseg = IRRSEG(i)        
+          !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
+            agDemand(ISEG) = SEG(2,iseg)*DELT
+          !END IF
+        END DO
+C
+C8------RETURN.
+      RETURN
+      END SUBROUTINE AG2MODSIM
+C
+C-------SUBROUTINE MODSIM2AG
+C
+      SUBROUTINE MODSIM2AG(Diversions)
+C     *******************************************************************
+C     Update AF diversion to MODSIM diversion
+C     
+!-------October 5, 2022
 C     *******************************************************************
       USE GWFSFRMODULE, ONLY: SEG, NSS
       USE GWFAGMODULE
@@ -4565,17 +4609,16 @@ C
 C
 C2------Set diversion demand from that calculated from AG.
 C 
-        Diversions = 0.0
         do i = 1, NUMIRRDIVERSIONSP
           iseg = IRRSEG(i)        
           !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
-            Diversions(ISEG) = SEG(2,iseg)*DELT
+           SEG(2,iseg) = Diversions(ISEG)/DELT
           !END IF
         END DO
 C
 C8------RETURN.
       RETURN
-      END SUBROUTINE AG2MODSIM
+      END SUBROUTINE MODSIM2AG
       !
       SUBROUTINE GWF2AG7DA()
       ! Deallocate AG MEMORY
