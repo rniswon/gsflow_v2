@@ -28,7 +28,7 @@
       EXTERNAL :: prms2modsiminit, prms2modsimrun, prms2modsimdecl
 !***********************************************************************
       IF ( Process_flag==RUN ) THEN
-        CALL prms2modsimrun(EXCHANGE, DELTAVOL, LAKEVAP, AgDemand, Nsegshold, Nlakeshold)
+        CALL prms2modsimrun(EXCHANGE, DELTAVOL, LAKEVAP, agDemand, Nsegshold, Nlakeshold)
       ELSEIF ( Process_flag==DECL ) THEN
         CALL prms2modsimdecl(Nsegshold, Nlakeshold)
       ELSEIF ( Process_flag==INIT ) THEN
