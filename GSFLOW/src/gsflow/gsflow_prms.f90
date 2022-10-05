@@ -77,7 +77,7 @@
           IF ( .NOT. MS_GSF_converge ) THEN
             CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold, agDemand)  !SOLVE GW SW EQUATIONS FOR MODSIM-MODFLOW ITERATION
           ELSE !IF( MS_GSF_converge ) THEN
-            CALL MFNWT_OCBUDGET(Diversions, Nsegshold)
+            CALL MFNWT_OCBUDGET(agDemand, Diversions, Nsegshold)
           ENDIF
           RETURN
         ENDIF
@@ -521,7 +521,7 @@
 
         IF ( MS_GSF_converge .OR. Process_flag/=RUN .OR. Model==GSFLOW ) THEN
 
-          IF ( Process_flag==RUN ) CALL MFNWT_OCBUDGET(Diversions, Nsegshold)
+          IF ( Process_flag==RUN ) CALL MFNWT_OCBUDGET(agDemand, Diversions, Nsegshold)
 
           ierr = gsflow_budget()
 
@@ -772,7 +772,7 @@
           DO WHILE ( Kper_mfo<=Nper )
 !            IF ( mf_nowtime>endday ) EXIT
             CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold, agDemand)            ! ITERATE TO SOLVE GW-SW SOLUTION FOR SS
-            CALL MFNWT_OCBUDGET(Diversions, Nsegshold)          ! CALCULATE BUDGET
+            CALL MFNWT_OCBUDGET(agDemand, Diversions, Nsegshold)          ! CALCULATE BUDGET
             IF ( mf_timestep==NSTP(Kper_mfo) ) THEN
               Kper_mfo = Kper_mfo + 1
               mf_timestep = 0

@@ -873,7 +873,7 @@ C     ************************************************************************
 C     Upon MODSIM-MODFLOW conversion,
 C     write the budget terms
 C     ************************************************************************
-      SUBROUTINE MFNWT_OCBUDGET(Diversions, Nsegshold)
+      SUBROUTINE MFNWT_OCBUDGET(agDemand, Diversions, Nsegshold)
      &                  BIND(C,NAME="MFNWT_OCBUDGET")
 C      
       !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_OCBUDGET
@@ -893,7 +893,8 @@ C
       INTEGER :: IBDRET, IC1, IC2, IR1, IR2, IL1, IL2, IDIR, ii, 
      +           Nsegshold, ISS
       REAL :: BUDPERC
-      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
+      DOUBLE PRECISION, INTENT(INOUT) :: agDemand(Nsegshold), 
+     +                                   Diversions(Nsegshold)
 C     ************************************************************************
       KKSTP = KSTP
       KKPER = KPER
@@ -1009,7 +1010,8 @@ C7C4----CALCULATE BUDGET TERMS. SAVE CELL-BY-CELL FLOW TERMS.
           IF(IUNIT(64).GT.0) CALL GWF2SWR7BD(KKSTP,KKPER,IGRID)  !SWR - JDH
 !         IF(IUNIT(67).GT.0) CALL GWF2GFB7BD(KKSTP,KKPER,IGRID)
           IF(IUNIT(65).GT.0) CALL GWF2SWI2BD(KKSTP,KKPER,IGRID)  !SWI2 - JDH
-          IF(IUNIT(66).GT.0) CALL GWF2AG7BD(KKSTP,KKPER,IUNIT(63))
+          IF(IUNIT(66).GT.0) CALL GWF2AG7BD(KKSTP,KKPER,IUNIT(63),
+     +                                      agDemand, Nsegshold)
 CLMT
 CLMT----CALL LINK-MT3DMS SUBROUTINES TO SAVE FLOW-TRANSPORT LINK FILE
 CLMT----FOR USE BY MT3DMS FOR TRANSPORT SIMULATION
@@ -1700,7 +1702,7 @@ C
             Steady_state = 1
             CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL,
      +                     LAKEVOL,Nsegshold,Nlakeshold,agDemand)    ! ITERATE TO SOLVE GW-SW SOLUTION FOR SS
-            CALL MFNWT_OCBUDGET(Diversions, Nsegshold)          ! CALCULATE BUDGET
+            CALL MFNWT_OCBUDGET(agDemand, Diversions, Nsegshold)          ! CALCULATE BUDGET
             Steady_state = 0
  !           TOTIM = plen !RGN 9/4/2018 TOTIM needs to stay in MF time units
             TOTIM = PERLEN(i)  !RGN 9/4/2018 TOTIM needs to stay in MF time units

@@ -2734,7 +2734,8 @@
       RETURN
       END
 !
-      SUBROUTINE GWF2AG7BD(kkstp, kkper, Iunitnwt)
+      SUBROUTINE GWF2AG7BD(kkstp, kkper, Iunitnwt, agDemand, 
+     +                     Nsegshold)
       !******************************************************************
       ! CALCULATE FLOWS FOR AG OPTIONS(DIVERSIONS, PONDS, AND PUMPING)
       !******************************************************************
@@ -2755,7 +2756,8 @@
       IMPLICIT NONE
       ! ARGUMENTS:
       ! - -----------------------------------------------------------------
-      INTEGER, INTENT(IN):: KKSTP, KKPER, Iunitnwt
+      INTEGER, INTENT(IN):: KKSTP, KKPER, Iunitnwt, Nsegshold
+      DOUBLE PRECISION, INTENT(INOUT) :: agDemand(Nsegshold)
       ! VARIABLES:
       ! - -----------------------------------------------------------------
 !      CHARACTER*22 TEXT2, TEXT6, TEXT7, TEXT8, TEXT1, TEXT3, TEXT4, 
@@ -2976,7 +2978,7 @@
       END DO
       !
       ! - -------WRITE REQUESTED TIME SERIES OUTPUT.
-      call TIMESERIESOUT(KKPER, KKSTP, TOTIM)
+      call TIMESERIESOUT(KKPER, KKSTP, TOTIM, agDemand, Nsegshold)
       !
       !12 - ------APPLY IRRIGATION FROM DIVERSIONS
       ! IF SAVING CELL - BY - CELL FLOWS IN A LIST(COMPACT BUDGET), WRITE SW IRRIGATION
@@ -3896,7 +3898,8 @@
       set_factor = factor
       end function set_factor
 !
-      subroutine timeseriesout(KKPER, KKSTP, TOTIM)
+      subroutine timeseriesout(KKPER, KKSTP, TOTIM, agDemand, 
+     +                         Nsegshold)
 !     ******************************************************************
 !     timeseriesout---- output to time series file each time step
 !     ******************************************************************
@@ -3916,8 +3919,9 @@
       IMPLICIT NONE
 ! --------------------------------------
       !arguments
-      INTEGER, INTENT(IN) :: KKPER, KKSTP
+      INTEGER, INTENT(IN) :: KKPER, KKSTP, Nsegshold
       REAL, INTENT(IN) :: TOTIM
+      DOUBLE PRECISION, INTENT(INOUT) :: agDemand(Nsegshold)
       !dummy
       DOUBLE PRECISION :: area, uzet, aet, pet, aettot, pettot, sub
       DOUBLE PRECISION :: Q, QQ, QQQ, DVT, prms_inch2mf_q
@@ -3941,7 +3945,8 @@
          DO I = 1, NUMSW
             UNIT = TSSWUNIT(I)
             L = TSSWNUM(I)
-            Q = demand(L)
+            !Q = demand(L)
+            Q = agDemand(L)  !for MODSIM-GSFLOW
             QQ = DVRSFLW(L)   !consider making this SGOTFLOW
             QQQ = SUPSEG(L)
             CALL timeseries(unit, Kkper, Kkstp, TOTIM, L,
