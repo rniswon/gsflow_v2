@@ -2723,9 +2723,20 @@
       ! Set diversion for filling pond
       DO L = 1, NUMIRRPOND
         IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
-          iseg = int(POND(3,L))
-          IF ( iseg > 0 ) THEN
-            SEG(2,iseg) = SEG(2,iseg) + PONDSEGFLOW(L)
+          IF ( POND(3,L) > 0 ) THEN
+            SEG(2,int(POND(3,L))) = SEG(2,int(POND(3,L))) + 
+     +                              PONDSEGFLOW(L)
+          END IF
+        END IF
+      END DO
+      !
+      ! Check that diversion does not exceed max constraint
+      DO L = 1, NUMIRRPOND
+        IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
+          IF ( POND(3,L) > 0 ) THEN
+             Q = POND(2, L)
+             IF ( SEG(2,int(POND(3,L))) > Q ) SEG(2,int(POND(3,L))) = Q
+             PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))        
           END IF
         END IF
       END DO

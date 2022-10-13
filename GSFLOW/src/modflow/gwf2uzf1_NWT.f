@@ -1979,14 +1979,14 @@ C     -----------------------------------------------------------------
       REAL epsilon, fks, rootdp, ths, wiltwc,celthick, finfact, finfhold
       REAL finfsaveadd
       INTEGER ic, il, ill, ir, iset, iss, iwav, l, numwaves,
-     +        land, idelt, ik, ll !, idr, i
+     +        land, idelt, ik, ll, extflg !, idr, i
       INTEGER lakflg, lakid, ibnd, ij, nlayp1, lakflginf
       DOUBLE PRECISION oldsflx, surflux, dlength, h, celtop, deltinc,
      +                 zoldist, totflux, etact, rateud, hld, htest1,
      +                 htest2, flength, width, thr, cellarea, fact,
      +                 totfluxtot, totetact, csep, csepmx,seepoutcheck,
      +                 rhsnew, hcofold, hcofnew, rhsold, fkseep, 
-     +                 fkreject, zero
+     +                 fkreject, zero, extdp
 !!     +                 dcsep
 !!     +                 rhsnew, hcofold, hcofnew, rhsold, bbot, ttop, 
 !!     +                 dcsep
@@ -2003,6 +2003,8 @@ C2------LOOP THROUGH UNSATURATED ZONE FLOW CELLS.
       deltinc = DELT
       idelt = 1
       finfhold = 0.0
+      extdp = 0.0d0
+      extflg = 0
       nlayp1 = NLAY + 1
       IF ( IETFLG.GT.0 ) THEN                      
         IF ( ITMUNI.EQ.1 ) THEN
@@ -2131,6 +2133,7 @@ C3------SEARCH FOR UPPERMOST ACTIVE CELL.
         IF ( Iunitlak.GT.0 ) THEN
           IF ( il.GT.1 ) THEN
             lakid = LKARR1(ic, ir, il-1)
+            extdp = ROOTDPTH(ic, ir)
             IF ( lakid.GT.0 ) THEN
               lakflg = 1
               IF ( STGNEW(lakid).GT.BOTM(ic, ir, il-1) )
@@ -2138,6 +2141,7 @@ C3------SEARCH FOR UPPERMOST ACTIVE CELL.
 ! Define land surface when lakes are present
               IF ( land.LT.il ) land = il   ! moved this into check for lake cell RGN 6/14/17
             END IF
+            IF ( extdp .LT. ZEROD5 ) extflg = 1
           END IF
         END IF   
         IF ( il.GT.0 .AND. VKS(ic, ir).GT.NEARZERO ) THEN
@@ -2232,6 +2236,11 @@ C5------CALL UZFLOW TO ROUTE WAVES FOR LATEST ITERATION.
                   wiltwc = 0.0
                   IF ( IUZFOPT.GT.0 ) wiltwc = WCWILT(ic, ir)
                 ELSE
+                  rateud = 0.0D0
+                  rootdp = 0.0
+                  wiltwc = 0.0
+                END IF
+                IF ( extflg == 1 ) then
                   rateud = 0.0D0
                   rootdp = 0.0
                   wiltwc = 0.0
@@ -2520,7 +2529,7 @@ C     -----------------------------------------------------------------
       DOUBLE PRECISION small, acumdif, aratdif, unsatvol, unsatrat,
      +                 cumdiff, ratedif, fact, totetact, totfluxtot,
      +                 deltinc, fkseep, trhs, thcof, hh, dET, s, x, c, 
-     +                 etgw, fkreject
+     +                 etgw, fkreject, extdp
       REAL avdpt, avwat, bigvl1, bigvl2, depthinc, epsilon, 
      +     eps_m1, ftheta1, ftheta2, finfsaveadd ! , etdp
       REAL fhold, fks, fminn, gcumin, gcumrch, gdelstor, gdlstr, ghdif, 
@@ -2535,7 +2544,7 @@ C     -----------------------------------------------------------------
      +        iog, ir, iset, iss, iuzcol, iuzn, iuzopt, iuzrat, iuzrow, 
      +        j, jj, jk, land, nwavm1, nwaves, idelt, ik, ll, ibnd, iret
       INTEGER k, kknt, l, loop, numwaves, numwavhld, nuzc, nuzr, jm1
-      INTEGER lakflg, lakid, nlayp1, lakflginf
+      INTEGER lakflg, lakid, nlayp1, lakflginf, extflg
       CHARACTER(LEN=16) textrch, textet, textexfl, textinf !, textinf2
       CHARACTER(LEN=16) uzsttext, uzettext, uzinftxt, txthold,textrej
       CHARACTER(LEN=16) netrchtext, netdistext
@@ -2569,6 +2578,8 @@ C       ACCUMULATORS (RATIN AND RATOUT).
       NSETS = 1
       cumapplinf = 0.0
       fact = 1.0D0
+      extdp = 0.0d0
+      extflg = 0
       IF ( IETFLG.GT.0 ) THEN                               
         IF ( ITMUNI.EQ.1 ) THEN
           fact = 86400.0D0          
@@ -2753,6 +2764,8 @@ C7------PRINT WARNING WHEN NUZTOP IS 3 AND ALL LAYERS ARE INACTIVE.
           IF ( land.LT.il ) land = il  ! moved this into check for lake cell RGN 6/14/17
           END IF
         END IF
+        extdp = ROOTDPTH(ic, ir)
+        IF ( extdp .LT. ZEROD5 ) extflg = 1
         LANDLAYER(IC,IR) = LAND
         IF ( il.GT.0 .AND. VKS(ic, ir).GT.NEARZERO ) THEN
           IF ( IBOUND(ic, ir, il).GT.0 ) THEN
@@ -2803,6 +2816,11 @@ C8------SET NWAVES TO 1 WHEN IUZFOPT IS NEGATIVE.
             rateud = 0.0D0
             wiltwc = 0.0
             rootdp = 0.0
+          END IF
+          IF ( extflg == 1 ) then
+            rateud = 0.0D0
+            rootdp = 0.0
+            wiltwc = 0.0
           END IF
           iset = 1
           iuzn = 1
