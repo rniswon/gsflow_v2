@@ -48,7 +48,7 @@
       IF ( Process_flag==RUN ) THEN
         dynamic_soil_param_read = dynsoilparamrun()
       ELSEIF ( Process_flag==DECL ) THEN
-        CALL print_module(MODDESC, MODNAME, Version_dynamic_soil_param_read(:18))
+        CALL print_module(MODDESC, MODNAME, Version_dynamic_soil_param_read)
       ELSEIF ( Process_flag==INIT ) THEN
         dynamic_soil_param_read = dynsoilparaminit()
       ENDIF
