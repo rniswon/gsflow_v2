@@ -987,7 +987,7 @@ contains
     !***********************************************************************
     ! Subroutine GET_COMMAND_ARGUMENT may not be available with all compilers-it is a Fortran 2003 routine
     ! This routine expects the Control File name to be the first argument, if present
-    if ( Model_mode(:7) /= 'MODSIM' ) then
+    if ( Model_mode(:6) /= 'MODSIM' ) then
       call GET_COMMAND(command_line)
       numargs = COMMAND_ARGUMENT_COUNT()
       call GET_COMMAND_ARGUMENT(1, command_line_arg, nchars, status)
