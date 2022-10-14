@@ -827,8 +827,7 @@ C
 C
       IF (Model>=10 .AND. iss==0) THEN
         IF(IUNIT(44).GT.0) CALL SFR2MODSIM(EXCHANGE, Diversions, 
-     1                             Idivert, Nsegshold, Timestep,KITER,
-     2                             KKITER)
+     1                             Idivert, Nsegshold, Timestep, KITER)
       ENDIF
 C
       IF (Model>=10 .AND. iss==0) THEN
