@@ -2723,9 +2723,20 @@
       ! Set diversion for filling pond
       DO L = 1, NUMIRRPOND
         IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
-          iseg = int(POND(3,L))
-          IF ( iseg > 0 ) THEN
-            SEG(2,iseg) = SEG(2,iseg) + PONDSEGFLOW(L)
+          IF ( POND(3,L) > 0 ) THEN
+            SEG(2,int(POND(3,L))) = SEG(2,int(POND(3,L))) + 
+     +                              PONDSEGFLOW(L)
+          END IF
+        END IF
+      END DO
+      !
+      ! Check that diversion does not exceed max constraint
+      DO L = 1, NUMIRRPOND
+        IF ( FLOWTHROUGH_POND(L) == 1 ) THEN
+          IF ( POND(3,L) > 0 ) THEN
+             Q = POND(2, L)
+             IF ( SEG(2,int(POND(3,L))) > Q ) SEG(2,int(POND(3,L))) = Q
+             PONDSEGFLOW(L) = POND(4,L)*SGOTFLW(int(POND(3,L)))        
           END IF
         END IF
       END DO
@@ -3412,7 +3423,7 @@
             IF ( KITER < MAXAGITER ) AGCONVERGE = 0
         END IF
         AETITERSW(ISEG) = SNGL(aettotal)
-        if ( kiter <= 2 ) then
+        if ( kiter == 1 ) then
           SUPACT(iseg) = SNGL(factor)
           SUPACTOLD(ISEG) = dzero
         else
@@ -3433,13 +3444,13 @@
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
 
-!        if(iseg==25)then
-!        etdif = pettotal - aettotal
-!          write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
-!     +                 SUPACT(iseg),etdif,RMSESW(ISEG),AGTOL*pettotal,
-!     +                 AGCONVERGE
-!        endif
-!  33  format(4i5,6e20.10,i5)
+        if(iseg==24.and.kstp==10)then
+        etdif = pettotal - aettotal
+          write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
+     +                 SUPACT(iseg),etdif,RMSESW(ISEG),AGTOL*pettotal,
+     +                 AGCONVERGE
+        endif
+  33  format(4i5,6e20.10,i5)
 300   continue
       return
       end subroutine demandconjunctive_prms
