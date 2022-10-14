@@ -77,10 +77,13 @@
 !***********************************************************************
 !     Main soilzone routine
 !***********************************************************************
-      INTEGER FUNCTION soilzone()
+      INTEGER FUNCTION soilzone(AFR, iter_flag)
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
+! Arguments
+      LOGICAL, INTENT(IN) :: AFR ! true for non-MODSIM modes, true for first iteration of MODSIM modes
+      INTEGER, INTENT(IN) :: iter_flag ! 1 for non-MODSIM modes, 2 for first iteration of MODSIM modes
 ! Functions
       INTEGER, EXTERNAL :: szdecl, szinit, szrun
       EXTERNAL :: soilzone_restart
@@ -88,7 +91,7 @@
       soilzone = 0
 
       IF ( Process_flag==RUN ) THEN
-        soilzone = szrun()
+        soilzone = szrun(AFR, iter_flag)
       ELSEIF ( Process_flag==DECL ) THEN
         soilzone = szdecl()
       ELSEIF ( Process_flag==INIT ) THEN
@@ -760,12 +763,12 @@
 !             interflow, excess routed to stream,
 !             and groundwater reservoirs
 !***********************************************************************
-      INTEGER FUNCTION szrun()
+      INTEGER FUNCTION szrun(AFR, iter_flag)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
-     &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO
+     &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO !, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Hru_type, AG_flag, Nowmonth !, Nowyear, Nowday
+     &    Soilzone_aet_flag, Hru_type, AG_flag, Model, Nowmonth !, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -781,6 +784,7 @@
      &    Ssres_stor, Soil_moist, Sat_threshold, Soil_rechr, Basin_sroff, Basin_lake_stor, Gravity_stor_res
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_ssres_stor, It0_slow_stor, &
                                It0_pref_flow_stor, It0_gravity_stor_res
+!      USE GSFMODSIM2PRMS, ONLY: HRU_diversion
       USE PRMS_WATER_USE, ONLY: Soilzone_gain, Soilzone_gain_hru
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_SET_TIME, ONLY: Cfs_conv
@@ -789,6 +793,9 @@
           Hru_sroffp, Hortonian_flow, Basin_sroffp, Basin_hortonian
       use prms_utils, only: print_date
       IMPLICIT NONE
+! Arguments
+      LOGICAL, INTENT(IN) :: AFR
+      INTEGER, INTENT(IN) :: iter_flag
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow
@@ -827,14 +834,16 @@
           ENDIF
         ELSE ! Kkiter == 1
           Gw2sm_grav = 0.0 ! dimension nhrucell
-          IF ( Nlake>0 ) It0_potet = Potet
-          IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
-          IF ( PRMS_land_iteration_flag==OFF ) THEN
-            ! computed in srunoff
-            It0_sroff = Sroff
-            It0_hru_sroffp = hru_sroffp
-            It0_hortonian_flow = Hortonian_flow
-            It0_strm_seg_in = Strm_seg_in
+          IF ( AFR .AND. iter_flag == 1 ) THEN
+            IF ( Nlake>0 ) It0_potet = Potet
+            IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
+            IF ( PRMS_land_iteration_flag==OFF ) THEN
+              ! computed in srunoff
+              It0_sroff = Sroff
+              It0_hru_sroffp = hru_sroffp
+              It0_hortonian_flow = Hortonian_flow
+              It0_strm_seg_in = Strm_seg_in
+            ENDIF
           ENDIF
         ENDIF
       ENDIF
@@ -938,6 +947,9 @@
         IF ( Ag_package==ACTIVE ) THEN
           IF ( Hru_ag_irr(i)>0.0 ) ag_water_maxin = Hru_ag_irr(i)/gsflow_ag_area(i) ! Hru_ag_irr is in acre-inches
         ENDIF
+!        IF ( Model == MODSIM_PRMS ) THEN
+!          IF ( Hru_diversion(i)>0.0 ) ag_water_maxin = ag_water_maxin + Hru_diversion(i) / perv_area
+!        ENDIF
         IF ( Soilzone_add_water_use==ACTIVE ) THEN
           IF ( Soilzone_gain(i)>0.0 ) THEN
             Soilzone_gain_hru(i) = Soilzone_gain(i)/perv_area/SNGL(Cfs_conv) ! ??? is this harea

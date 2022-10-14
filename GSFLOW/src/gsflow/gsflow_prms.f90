@@ -1,7 +1,7 @@
 !***********************************************************************
 ! Defines the computational sequence, valid modules, and dimensions
 !***********************************************************************
-      SUBROUTINE gsflow_prms(Process_mode)
+      SUBROUTINE gsflow_prms(Process_mode, AFR)
       USE PRMS_CONSTANTS, ONLY: ERROR_control, CANOPY
       use PRMS_CONTROL_FILE, only: read_control_file
       use PRMS_DATA_FILE, only: read_prms_data_file
@@ -15,6 +15,7 @@
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Process_mode
+      LOGICAL, INTENT(INOUT) :: AFR
 ! Functions
       INTRINSIC :: DATE_AND_TIME, INT
       INTEGER, EXTERNAL :: check_dims, basin, climateflow !, setup
@@ -200,7 +201,7 @@
             ENDIF
           ENDIF
 
-          CALL MFNWT_INIT()
+          CALL MFNWT_INIT(AFR)
           IF ( Have_lakes==ACTIVE .AND. Nlake/=NLAKES_MF ) THEN
             PRINT *, 'ERROR, NLAKES not equal to Nlake'
             PRINT *, '       NLAKES=', NLAKES_MF, '; Nlake=', Nlake
@@ -240,6 +241,7 @@
       ELSEIF ( Process_flag==SETDIMENS ) THEN
         Have_lakes = OFF ! set for modes when MODFLOW is not active
         Kkiter = 1 ! set for PRMS-only mode
+        AFR = .TRUE.
         Ag_package = OFF
         Canopy_iter = 1
         Soilzone_add_water_use = OFF
@@ -250,7 +252,7 @@
         Lake_add_water_use = OFF
         Lake_transfer_water_use = OFF
         ! Note, MODFLOW-only doesn't leave setdims
-        CALL setdims() ! if MODFLOW only the execution stops in setdims
+        CALL setdims(AFR) ! if MODFLOW only the execution stops in setdims
 
         IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active
           CALL setup_params()
@@ -277,7 +279,7 @@
       IF ( Model==DOCUMENTATION ) THEN
         IF ( Process_flag==SETDIMENS .OR. Process_flag==DECL ) THEN
           Init_vars_from_file = 0 ! make sure this is set so all variables and parameters are declared
-          CALL module_doc()
+          CALL module_doc(AFR)
           RETURN
         ELSE
           STOP
@@ -420,9 +422,9 @@
 ! for PRMS is active
       IF ( Model==PRMS .OR. Process_flag/=RUN ) THEN
         IF ( AG_flag==OFF ) THEN
-          ierr = soilzone()
+          ierr = soilzone(AFR, 1)
         ELSE
-          ierr = soilzone_ag()
+          ierr = soilzone_ag(AFR, 1)
         ENDIF
 
         IF ( GSFLOW_flag == OFF ) THEN
@@ -459,7 +461,7 @@
       IF ( GSFLOW_flag==ACTIVE ) THEN
 
         IF ( Process_flag==RUN ) THEN
-          CALL MFNWT_RUN()
+          CALL MFNWT_RUN(AFR)
 
 ! The following modules are in the MODFLOW iteration loop
 ! (contained in gsflow_modflow.f).
@@ -551,7 +553,7 @@
 !***********************************************************************
 !     declare the dimensions
 !***********************************************************************
-      SUBROUTINE setdims()
+      SUBROUTINE setdims(AFR)
       USE PRMS_CONSTANTS, ONLY: ERROR_control, CANOPY
       use PRMS_CONTROL_FILE, only: get_control_arguments, read_control_file, control_integer, control_integer_array, control_string !, control_file_name
       USE PRMS_MODULE
@@ -559,6 +561,8 @@
       use prms_utils, only: compute_julday, error_stop, PRMS_open_input_file, PRMS_open_output_file, read_error
       USE GLOBAL, ONLY: NSTP, NPER, ISSFLG
       IMPLICIT NONE
+! Arguments
+      LOGICAL, INTENT(IN) :: AFR
 ! Functions
       INTEGER, EXTERNAL :: gsfdecl
       EXTERNAL :: check_module_names, MFNWT_RUN, MFNWT_CLEAN, MFNWT_INIT, MFNWT_OCBUDGET
@@ -680,13 +684,13 @@
         mf_timestep = 1
         mf_nowtime = startday
         test = gsfdecl()
-        CALL MFNWT_INIT()
+        CALL MFNWT_INIT(AFR)
         PRINT *, ' '
         If ( ISSFLG(Kper_mfo) == 1 .and. nper == 1) THEN
         ELSE
           DO WHILE ( Kper_mfo<=Nper )
 !            IF ( mf_nowtime>endday ) EXIT
-            CALL MFNWT_RUN()            ! ITERATE TO SOLVE GW-SW SOLUTION FOR SS
+            CALL MFNWT_RUN(AFR)            ! ITERATE TO SOLVE GW-SW SOLUTION FOR SS
             CALL MFNWT_OCBUDGET()          ! CALCULATE BUDGET
             IF ( mf_timestep==NSTP(Kper_mfo) ) THEN
               Kper_mfo = Kper_mfo + 1
@@ -1330,11 +1334,13 @@
 !**********************************************************************
 !     Module documentation
 !**********************************************************************
-      SUBROUTINE module_doc()
+      SUBROUTINE module_doc(AFR)
       USE PRMS_CONSTANTS, ONLY: DECL
       USE PRMS_MODULE, ONLY: Process_flag
       use PRMS_SET_TIME, only: prms_time
       IMPLICIT NONE
+! Arguments
+      LOGICAL, INTENT(IN) :: AFR
 ! Functions
       INTEGER, EXTERNAL :: basin, climateflow
       INTEGER, EXTERNAL :: cascade, obs, soltab, transp_tindex
@@ -1393,7 +1399,7 @@
       test = snowcomp()
       test = srunoff()
       test = glacr()
-      test = soilzone_ag()
+      test = soilzone_ag(AFR, 1)
       test = gsflow_prms2mf()
       test = gsflow_mf2prms()
       test = gsflow_budget()

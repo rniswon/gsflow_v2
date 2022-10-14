@@ -9,15 +9,17 @@
       EXTERNAL :: gsflow_prms
 ! Local Variables
       INTEGER :: i
+      LOGICAL :: AFR
 !***********************************************************************
-      CALL gsflow_prms(SETDIMENS)
+      AFR = .TRUE.
+      CALL gsflow_prms(SETDIMENS, AFR)
 
-      CALL gsflow_prms(DECL)
+      CALL gsflow_prms(DECL, AFR)
 
-      CALL gsflow_prms(INIT)
+      CALL gsflow_prms(INIT, AFR)
       DO i = 1, Number_timesteps
-        CALL gsflow_prms(RUN)
+        CALL gsflow_prms(RUN, AFR)
       ENDDO
-      CALL gsflow_prms(CLEAN)
+      CALL gsflow_prms(CLEAN, AFR)
 
       END PROGRAM GSFLOW_FORTRAN
