@@ -82,8 +82,8 @@
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Arguments
-      LOGICAL, INTENT(IN) :: AFR
-      INTEGER, INTENT(IN) :: iter_flag
+      LOGICAL, INTENT(IN) :: AFR ! true for non-MODSIM modes, true for first iteration of MODSIM modes
+      INTEGER, INTENT(IN) :: iter_flag ! 1 for non-MODSIM modes, 2 for first iteration of MODSIM modes
 ! Functions
       INTEGER, EXTERNAL :: szdecl, szinit, szrun
       EXTERNAL :: soilzone_restart

@@ -57,8 +57,8 @@
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Arguments
-      LOGICAL, INTENT(IN) :: AFR
-      INTEGER, INTENT(IN) :: iter_flag
+      LOGICAL, INTENT(IN) :: AFR ! true for non-MODSIM modes, true for first iteration of MODSIM modes
+      INTEGER, INTENT(IN) :: iter_flag ! 1 for non-MODSIM modes, 2 for first iteration of MODSIM modes
 ! Functions
       INTEGER, EXTERNAL :: szdecl, szinit, szrun_ag, szdecl_ag, szinit_ag
       EXTERNAL :: soilzone_restart_ag
@@ -367,7 +367,7 @@
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, Nowmonth, Nowyear, Nowday, &
-     &    Iter_aet_flag, irrigation_apply_flag, Model !, MODSIM_flag
+     &    Iter_aet_flag, irrigation_apply_flag, Model
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, Ag_area_total, &
