@@ -1683,12 +1683,14 @@
       IMPLICIT NONE
       ! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: command_line_args
+      ! Function
+        INTRINSIC :: trim
       ! Local Variabales
 !      INTEGER :: nc
 !***********************************************************************
 !      nc = numchars(command_line_args)
       command_line = ' '
-      command_line = command_line_args(:256)
+      command_line = trim(command_line_args)
       END SUBROUTINE put_prms_control_file
 
 !***********************************************************************
