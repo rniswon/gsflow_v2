@@ -367,7 +367,7 @@
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, Nowmonth, Nowyear, Nowday, &
-     &    Iter_aet_flag, irrigation_apply_flag, Model
+     &    Iter_aet_flag, irrigation_apply_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, Ag_area_total, &
@@ -947,7 +947,7 @@
         IF ( ag_on_flag==ACTIVE ) Unused_potet(i) = Unused_potet(i) + ag_AETtarget*agfrac
         ! sanity check
 !        IF ( Unused_potet(i)<-CLOSEZERO ) THEN
-!          IF ( Print_debug>-1 ) THEN
+!          IF ( Print_debug>DEBUG_less ) THEN
 !            IF ( avail_potet<-NEARZERO ) THEN
 !              PRINT *, 'hru_actet>potet', i, Nowmonth, Nowday, Unused_potet(i)
 !              PRINT *, Hru_actet(i), Potet(i), ag_hruactet, pervactet*perv_frac, perv_frac, agfrac

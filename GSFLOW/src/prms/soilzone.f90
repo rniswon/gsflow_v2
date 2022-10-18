@@ -768,7 +768,7 @@
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO !, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Hru_type, AG_flag, Model, Nowmonth !, Nowyear, Nowday
+     &    Soilzone_aet_flag, Hru_type, AG_flag, Nowmonth !, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
