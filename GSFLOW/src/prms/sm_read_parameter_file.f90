@@ -7,7 +7,7 @@ contains
 ! Read Parameter File Dimensions
 !***********************************************************************
   module subroutine read_parameter_file_dimens()
-    use PRMS_CONSTANTS, only: MAXLINE_LENGTH
+    use PRMS_CONSTANTS, only: MAXLINE_LENGTH, DEBUG_less
     use PRMS_MODULE, only: Print_debug, EQULS, Param_file
     use prms_utils, only: numchars, PRMS_open_input_file, read_error, write_outfile
     implicit none
@@ -21,7 +21,7 @@ contains
     !***********************************************************************
     call PRMS_open_input_file(Param_unit, Param_file, 'param_file', 0, ios)
     if (ios /= 0) stop
-    if (Print_debug > -1) then
+    if (Print_debug > DEBUG_less) then
       call write_outfile(EQULS)
       call write_outfile('Using PRMS Parameter File: '//Param_file)
     end if
@@ -29,7 +29,7 @@ contains
     ! Echo Parmeter File Header and comment lines
     read (Param_unit, FMT='(A)', IOSTAT=ios) line
     if (ios /= 0) call read_error(13, 'description')
-    if (Print_debug > -1) then
+    if (Print_debug > DEBUG_less) then
       call write_outfile('Description: '//trim(line))
       call write_outfile(EQULS)
       call write_outfile('Comment lines:')
@@ -41,10 +41,10 @@ contains
       if (ios == -1) call read_error(13, 'end of file found before dimensions')
       if (ios /= 0) call read_error(13, 'comment')
       if (line(:16) == '** Dimensions **') exit
-      if (Print_debug > -1) call write_outfile(trim(line))
+      if (Print_debug > DEBUG_less) call write_outfile(trim(line))
     end do
     if (line(:16) /= '** Dimensions **') call read_error(11, 'missing dimension section: '//trim(line))
-    if (Print_debug > -1) then
+    if (Print_debug > DEBUG_less) then
       call write_outfile(EQULS)
       call write_outfile('Using dimensions    number')
     end if
@@ -72,21 +72,22 @@ contains
       call setdimension(dimname, dimen_value)
 
       if (dimen_value == 0) then
-        if (Print_debug > -1) print *, 'Warning, dimension: ', dimname(:nchars), ' is not needed as value specified as 0'
+        if (Print_debug > DEBUG_less) print *, 'Warning, dimension: ', dimname(:nchars), ' is not needed as value specified as 0'
       end if
-      if (Print_debug > -1) then
+      if (Print_debug > DEBUG_less) then
         write (dimstring, '(A,I8)') dimname, dimen_value
         call write_outfile(dimstring)
       end if
     end do
-    if (Print_debug > -1) call write_outfile(EQULS)
+    if (Print_debug > DEBUG_less) call write_outfile(EQULS)
   end subroutine read_parameter_file_dimens
 
 !***********************************************************************
 ! Read Parameter File Dimensions
 !***********************************************************************
   module subroutine read_parameter_file_params()
-    use PRMS_CONSTANTS, only: MAXCONTROL_LENGTH
+    use PRMS_CONSTANTS, only: MAXCONTROL_LENGTH, DEBUG_less
+    use PRMS_MODULE, only: Print_debug
     use PRMS_CONTROL_FILE, only: Control_parameter_data, Param_file_control_parameter_id
     use prms_utils, only: numchars, PRMS_open_input_file, read_error
     implicit none
@@ -169,7 +170,7 @@ contains
           end if
         end do
         if (found == 0) then
-          print '(/,3A)', 'Values for parameter: ', trim(paramstring), ' are ignored as the parameter is not used'
+          if (Print_debug > DEBUG_less) print '(3A)', 'Values for parameter: ', trim(paramstring), ' are ignored as the parameter is not used'
           cycle
         end if
 
@@ -454,6 +455,7 @@ contains
 ! check_parameters_declared - check for parameters being declared more than once
 !***********************************************************************
   module subroutine check_parameters_declared(Parmname, Modname, Iret)
+    use PRMS_CONSTANTS, only: DEBUG_less
     use PRMS_MODULE, only: Print_debug
     use prms_utils, only: numchars
     implicit none
@@ -472,7 +474,7 @@ contains
       if (nchars == Parameter_data(i)%nchars) then
         if (Parmname(:nchars) == Parameter_data(i)%param_name(:nchars)) then
           if (Parameter_data(i)%decl_flag == 1) then
-            if (Print_debug > -1) then
+            if (Print_debug > DEBUG_less) then
               print *, 'Parameter: ', trim(Parmname), ' declared more than once'
               print *, 'First declared by module: ', trim(Parameter_data(Num_parameters)%module_name)
               print *, 'Also declared by module: ', trim(Modname)
