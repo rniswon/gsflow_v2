@@ -1034,7 +1034,7 @@ contains
     ! Functions
     intrinsic :: trim, scan
     ! Local Variables
-    character(LEN=48) :: command_line_arg
+    character(LEN=128) :: command_line_arg
     integer :: status, i, j, numargs, index, param_type, num_param_values
     !***********************************************************************
     ! This routine expects the Control File name to be the second word in the command line
@@ -1071,7 +1071,7 @@ contains
 
         do j = 1, num_param_values
           i = i + 1
-          command_line_arg = trim( command_line_args(i)(:48) )
+          command_line_arg = trim( command_line_args(i) )
           print '(A,I0,2A)', 'PRMS command line argument ', i-1, ': ', trim( command_line_arg )
           if (param_type == 1) then
               read (command_line_arg, *, IOSTAT=status) Control_parameter_data(index) % values_int(j)
