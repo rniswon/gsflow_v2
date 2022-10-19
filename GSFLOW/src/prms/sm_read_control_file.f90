@@ -1071,7 +1071,7 @@ contains
 
         do j = 1, num_param_values
           i = i + 1
-          command_line_arg = command_line_args(i)
+          command_line_arg = trim( command_line_args(i)(:48) )
           print '(A,I0,2A)', 'PRMS command line argument ', i-1, ': ', trim( command_line_arg )
           if (param_type == 1) then
               read (command_line_arg, *, IOSTAT=status) Control_parameter_data(index) % values_int(j)
