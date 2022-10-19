@@ -947,7 +947,7 @@
         IF ( ag_on_flag==ACTIVE ) Unused_potet(i) = Unused_potet(i) + ag_AETtarget*agfrac
         ! sanity check
 !        IF ( Unused_potet(i)<-CLOSEZERO ) THEN
-!          IF ( Print_debug>-1 ) THEN
+!          IF ( Print_debug>DEBUG_less ) THEN
 !            IF ( avail_potet<-NEARZERO ) THEN
 !              PRINT *, 'hru_actet>potet', i, Nowmonth, Nowday, Unused_potet(i)
 !              PRINT *, Hru_actet(i), Potet(i), ag_hruactet, pervactet*perv_frac, perv_frac, agfrac

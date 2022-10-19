@@ -114,7 +114,11 @@ contains
           ierr = 1
         ENDIF
       ENDIF
-      IF ( ierr==1 ) CALL error_stop('simulation time begins before Data File', ERROR_time)
+      IF ( ierr==1 ) then
+          print *, starttime
+          print *, endtime
+          CALL error_stop('simulation time begins before Data File', ERROR_time)
+          endif
 
       ierr = 0
       IF ( Endtime(1)>endyr ) THEN

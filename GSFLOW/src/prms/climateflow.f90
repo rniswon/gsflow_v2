@@ -1060,7 +1060,7 @@ end module PRMS_IT0_VARS
      &    Glacier_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
-      USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv, Ag_area
+      USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv
       use prms_utils, only: c_to_f, checkdim_bounded_limits, checkdim_param_limits, f_to_c, read_error
       IMPLICIT NONE
 ! Local variables
@@ -1363,10 +1363,10 @@ end module PRMS_IT0_VARS
         ENDIF
 
         IF ( AG_flag==ACTIVE ) THEN
-          IF ( Ag_soil_moist_max(i) < 6.0 ) THEN
-            PRINT *, 'ag_soil_moist_max < 6.0, set to 6.0, HRU:', i, Ag_soil_moist_max(i)
-            Ag_soil_moist_max(i) = 6.0
-          ENDIF
+          !IF ( Ag_soil_moist_max(i) < 6.0 ) THEN
+          !  PRINT *, 'ag_soil_moist_max < 6.0, set to 6.0, HRU:', i, Ag_soil_moist_max(i)
+          !  Ag_soil_moist_max(i) = 6.0
+          !ENDIF
           IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
             IF ( Parameter_check_flag>0 ) THEN
               PRINT 9022, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)

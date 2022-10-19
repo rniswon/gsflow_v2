@@ -3423,7 +3423,7 @@
             IF ( KITER < MAXAGITER ) AGCONVERGE = 0
         END IF
         AETITERSW(ISEG) = SNGL(aettotal)
-        if ( kiter == 1 ) then
+        if ( kiter <= 2 ) then
           SUPACT(iseg) = SNGL(factor)
           SUPACTOLD(ISEG) = dzero
         else
