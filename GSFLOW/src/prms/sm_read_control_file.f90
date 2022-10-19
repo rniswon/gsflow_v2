@@ -1046,7 +1046,7 @@ contains
     read (command_line, *, IOSTAT=status) (command_line_args(i),i=1,num_words_command_line)
 print *, 'number of command line words: ', num_words_command_line
 print *, command_line_args(1)
-print *,'command_line_args(2)
+print *, command_line_args(2)
     if (status /= 0) call error_stop('reading command line', ERROR_control)
     numargs = num_words_command_line - 2
     i = 2
