@@ -1010,6 +1010,9 @@ contains
       Model_control_file = trim( command_line_args(2) )
       if (trim(Model_control_file(:2)) == '-C') Model_control_file = trim( Model_control_file(3:) )
     ENDIF
+print *, 'number of command line words: ', num_words_command_line
+print *, command_line_args(1)
+print *, command_line_args(2)
 
     inquire (FILE=trim(Model_control_file), EXIST=exists)
     if (.not. exists) then
