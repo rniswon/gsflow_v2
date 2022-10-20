@@ -20,6 +20,7 @@ C     ******************************************************************
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
       USE GSFMODFLOW
       IMPLICIT NONE
+      CHARACTER(len=200) :: LINE
 !***********************************************************************
       gsfdecl = 0
 C
@@ -34,10 +35,15 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 
       IF ( GSFLOW_flag==ACTIVE ) THEN
         IF ( Print_debug>DEBUG_less ) WRITE ( *, 8 )
-    8 FORMAT (14X, 'PROCESSES: GWF and OBS', /, 14X,
+    8   FORMAT (14X, 'PROCESSES: GWF and OBS', /, 14X,
      &        'PACKAGES:  BAS, BCF, CHD, DE4, FHB, GAG, GHB,',
      &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,',
      &        /, 25X, 'AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
+
+      LINE = '                    Github Commit Hash 0a338c0'
+      WRITE(*,*) 
+      WRITE(*,*) Line
+      WRITE(*,*) 
 
         ! Allocate local module variables
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
