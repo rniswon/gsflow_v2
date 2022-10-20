@@ -27,13 +27,14 @@ ndays                366
 ====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 07/29/2022
+                       Version 5.3.0 09/01/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
   Basin Definition: basin
     Cascading Flow: cascade
   Time Series Data: obs, water_use_read, dynamic_param_read
+                    dynamic_soil_param_read
    Potet Solar Rad: soltab
   Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,
                     temp_map
@@ -51,6 +52,7 @@ Snow & Glacr Dynam: snowcomp, glacr_melt
        Groundwater: gwflow
 Streamflow Routing: strmflow, strmflow_in_out, muskingum,
                     muskingum_lake, muskingum_mann, segment_to_hru
+Streamflow Charact: strmflow_character
 Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
@@ -63,8 +65,8 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-07-29
-Read Control File               read_control_file   2022-07-29
+PRMS Computation Order          gsflow_prms         2022-09-01
+Read Control File               read_control_file   2022-09-01
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 
@@ -95,7 +97,7 @@ runoff 1
  Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
 Simulation time period: 1983/12/02 00:00:00 to 1984/01/30 00:00:00
 ====================================================================
-Basin Definition                basin               2022-07-25
+Basin Definition                basin               2022-09-20
 Cascading Flow                  cascade             2021-11-19
 Common States and Fluxes        climateflow         2022-08-05
 Potential Solar Radiation       soltab              2022-03-29
@@ -103,20 +105,20 @@ Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2022-04-21
 Temperature Distribution        climate_hru         2022-06-02
 Precipitation Distribution      climate_hru         2022-06-02
-Solar Radiation Distribution    ddsolrad            2021-11-19
+Solar Radiation Distribution    ddsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-07-29
 Snow Dynamics                   snowcomp            2022-04-27
 Surface Runoff                  srunoff_smidx       2022-08-10
-Soilzone Computations           soilzone            2022-07-25
+Soilzone Computations           soilzone            2022-09-01
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-04-07
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2022-04-27
 GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
 Output Summary                  subbasin            2022-04-21
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2022-05-10
+GSFLOW MODFLOW main             gsflow_modflow      2022-09-01
 UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
 SFR-NWT Package                 gwf2sfr7_NWT        2022-02-01
 
@@ -133,5 +135,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    0 minutes 15.09 seconds
+Execution elapsed time    0 minutes 13.22 seconds
 

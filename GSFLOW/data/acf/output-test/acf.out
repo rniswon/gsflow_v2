@@ -28,6 +28,7 @@ ngw                  258
   Basin Definition: basin
     Cascading Flow: cascade
   Time Series Data: obs, water_use_read, dynamic_param_read
+                    dynamic_soil_param_read
    Potet Solar Rad: soltab
   Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,
                     temp_map
@@ -45,6 +46,7 @@ Snow & Glacr Dynam: snowcomp, glacr_melt
        Groundwater: gwflow
 Streamflow Routing: strmflow, strmflow_in_out, muskingum,
                     muskingum_lake, muskingum_mann, segment_to_hru
+Streamflow Charact: strmflow_character
 Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
@@ -396,6 +398,7 @@ Soilzone Computations           soilzone            2022-09-01
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing Init         routing             2022-04-21
 Streamflow Routing              muskingum           2021-11-19
+Streamflow Characteristics      strmflow_character  2022-09-28
 Output Summary                  basin_sum           2022-04-22
 Water Balance Computations      water_balance       2022-05-09
 Output Summary                  nhru_summary        2022-08-04
@@ -1234,5 +1237,5 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
  ***************************************
  Total for run        159.12    22642.64
  ***************************************
-Execution elapsed time    0 minutes  0.64 seconds
+Execution elapsed time    0 minutes  0.79 seconds
 
