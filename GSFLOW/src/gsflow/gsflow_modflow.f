@@ -25,6 +25,7 @@ C     ******************************************************************
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
       USE GSFMODFLOW
       IMPLICIT NONE
+      CHARACTER(len=200) :: LINE
 !***********************************************************************
       gsfdecl = 0
 C
@@ -43,6 +44,11 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
      &        'PACKAGES:  BAS, BCF, CHD, DE4, FHB, GAG, GHB,',
      &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,',
      &        /, 25X, 'AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
+
+      LINE = '                    Github Commit Hash 0a338c0'
+      WRITE(*,*) 
+      WRITE(*,*) Line
+      WRITE(*,*) 
 
         ! Allocate local module variables
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
@@ -1104,8 +1110,6 @@ C
         ENDIF
       ENDIF
 
- 9001 FORMAT ('ERROR in ', A, ' module, arg = run.',
-     &        ' Called from MFNWT_RUN.', /, 'Return val = ', I0)
  9002 FORMAT('Date: ', I0, 2('/',I2.2), '; Stress: ', I0, '; Step: ',I0,
      &       '; Simulation step: ', I0, /, 18X, 'MF iterations: ', I0,
      &       '; SZ iterations: ', I0, /)
@@ -1140,7 +1144,8 @@ C
 C
 C8------END OF SIMULATION
 C-------SAVE RESTART RECORDS FOR SUB PACKAGE
-  110 IF(IUNIT(54).GT.0) CALL GWF2SUB7SV(IGRID)
+C 110 IF(IUNIT(54).GT.0) CALL GWF2SUB7SV(IGRID)
+      IF(IUNIT(54).GT.0) CALL GWF2SUB7SV(IGRID)
 C-------WRITE RESTART INFORMATION FOR HEADS, SFR, AND UZF
       IF ( Save_vars_to_file==ACTIVE ) THEN
         CALL RESTART1WRITE()

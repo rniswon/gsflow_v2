@@ -9,10 +9,10 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 09/01/2022'
-      character(len=*), parameter :: PRMS_versn = '2022-09-01'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 09/01/2022'
-      character(len=*), parameter :: Version_read_control_file = '2022-09-01'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 11/01/2022'
+      character(len=*), parameter :: PRMS_versn = '2022-11-01'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 11/01/2022'
+      character(len=*), parameter :: Version_read_control_file = '2022-10-20'
       character(len=*), parameter :: Version_read_parameter_file = '2022-01-12'
       character(len=*), parameter :: Version_read_data_file = '2022-06-02'
       CHARACTER(len=8), SAVE :: Process
@@ -43,8 +43,7 @@
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
       INTEGER, SAVE :: mf_timestep, startday, endday, mf_nowtime, Number_timesteps
       INTEGER, SAVE :: num_words_command_line
-      character(LEN=MAXCMDLINE_LENGTH) command_line
-      character(LEN=128), allocatable :: command_line_args(:)
+      character(LEN=MAXCMDLINE_LENGTH) command_line, command_line_modsim
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
 !   Declared Variables for DPRST agriculture computations
@@ -88,7 +87,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2022-09-01'
+      character(len=*), parameter :: Version_gsflow_modflow='2022-10-20'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -97,10 +96,10 @@
       character(len=*), parameter :: MODNAME_SFR = 'gwf2sfr7_NWT'
       character(len=*), parameter :: MODNAME_LAK = 'gwf2lak7_NWT'
       character(len=*), parameter :: MODNAME_AG =  'gwf2ag1_NWT_ponds'
-      character(len=*), parameter :: Version_uzf = '2021-03-02'
-      character(len=*), parameter :: Version_sfr = '2022-02-01'
+      character(len=*), parameter :: Version_uzf = '2022-10-18'
+      character(len=*), parameter :: Version_sfr = '2022-10-18'
       character(len=*), parameter :: Version_lak = '2021-09-28'
-      character(len=*), parameter :: Version_ag =  '2022-02-01'
+      character(len=*), parameter :: Version_ag =  '2022-10-18'
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells, Gsflag
       INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS, KPERSTART
