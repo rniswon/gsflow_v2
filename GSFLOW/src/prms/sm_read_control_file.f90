@@ -985,34 +985,30 @@ contains
     use prms_utils, only: error_stop
     implicit none
     ! Functions
-    intrinsic :: trim, GET_COMMAND, scan
+    intrinsic :: trim, GET_COMMAND, scan, verify
     ! Local Variables
-    character(LEN=128), allocatable :: command_line_args(:)
     logical :: exists
-    integer :: i, status
+    integer :: istart, iend
     !***********************************************************************
     ! This routine expects the Control File name to be the first argument after exe name
     call GET_COMMAND(command_line)
     print '(A)', EQULS
-    print *, 'Command line: ', trim( command_line )
+    print '(A)', 'Command line: ', trim( command_line )
     num_words_command_line = count_words_text(command_line)
-    allocate ( command_line_args(num_words_command_line) )
-    command_line_args = ' '
-    read (command_line, *, IOSTAT=status) (command_line_args(i),i=1,num_words_command_line)
-    if (status /= 0) call error_stop('reading command line', ERROR_control)
-    print '(/,2A)', 'Executable: ', trim( command_line_args(1) )
+    print '(/,A,I0)', 'number of command line words: ', num_words_command_line
+    istart = 1
+    iend = scan(command_line(istart:), ' ,') - 1               !-- Find the first blank.
+    print '(/,2A)', 'Executable: ', command_line(istart:iend)
+    istart = iend + 1
+    istart = verify(command_line(istart:), ' ,') + istart - 1  !-- Find next non-blank; start of control file path
+    iend = scan(command_line(istart:), ' ,') - 2 + istart      !-- Find next blank and set result to end of word
     Model_control_file = ' '
     if ( num_words_command_line == 1 ) then  ! no arguments after executable name
-      write (*, '(/,A)') 'Enter the name of the PRMS Control File or quit:'
-      read (*, '(A)') Model_control_file
-      if (Model_control_file(:4) == 'quit' .or. Model_control_file(:4) == 'QUIT') ERROR stop ERROR_control
+      call error_stop('PRMS Control File must be specified on the command line', ERROR_control)
     ELSE
-      Model_control_file = trim( command_line_args(2) )
+      Model_control_file = trim( command_line(istart:iend) )
       if (trim(Model_control_file(:2)) == '-C') Model_control_file = trim( Model_control_file(3:) )
     ENDIF
-print *, 'number of command line words: ', num_words_command_line
-print *, command_line_args(1)
-print *, command_line_args(2)
 
     inquire (FILE=trim(Model_control_file), EXIST=exists)
     if (.not. exists) then
@@ -1022,7 +1018,6 @@ print *, command_line_args(2)
     end if
     print '(/,2A)', 'Control File: ', trim( Model_control_file )
     print '(A)', EQULS
-    deallocate ( command_line_args )
 
   end subroutine get_control_filename
 
@@ -1031,39 +1026,42 @@ print *, command_line_args(2)
   !***********************************************************************
   module subroutine get_control_arguments()
     use PRMS_CONSTANTS, only: DEBUG_less, ERROR_control
-    use PRMS_MODULE, only: EQULS, command_line, command_line_args, num_words_command_line
+    use PRMS_MODULE, only: EQULS, command_line, num_words_command_line
     use prms_utils, only: error_stop
     implicit none
     ! Functions
-    intrinsic :: trim, scan
+    intrinsic :: trim, scan, verify
     ! Local Variables
     character(LEN=128) :: command_line_arg
-    integer :: status, i, j, numargs, index, param_type, num_param_values
+    integer :: status, i, j, numargs, index, param_type, num_param_values, istart, iend
     !***********************************************************************
     ! This routine expects the Control File name to be the second word in the command line
     if ( num_words_command_line < 3 ) return           ! no arguments after Control File name
     print '(A)', EQULS
-    allocate ( command_line_args(num_words_command_line) )
-    command_line_args = ' '
     command_line_arg = ' '
-    read (command_line, *, IOSTAT=status) (command_line_args(i),i=1,num_words_command_line)
-print *, 'number of command line words: ', num_words_command_line
-print *, command_line_args(1)
-print *, command_line_args(2)
-    if (status /= 0) call error_stop('reading command line', ERROR_control)
+    istart = 1
+    iend = scan(command_line(istart:), ' ,') - 1               !-- Find the first blank; end of exe path
+    istart = iend + 1
+    istart = verify(command_line(istart:), ' ,') + istart - 1  !-- Find next non-blank; start of control file path
+    iend = scan(command_line(istart:), ' ,') - 2 + istart      !-- Find the first blank; end of control file path
+
     numargs = num_words_command_line - 2
     i = 2
     loop: do while (i < numargs)
       i = i + 1
-
-      command_line_arg = trim( command_line_args(i) )
+      istart = iend + 1
+      istart = verify(command_line(istart:), ' ,') + istart - 1      !-- Find next non-blank and set result to end of word
+      iend = scan(command_line(istart:), ' ,') - 2 + istart          !-- Find the first blank; end of control file path
+      command_line_arg = trim( command_line(istart:iend) )
       print '(A,I0,2A)', 'PRMS command line argument ', i-1, ': ', trim( command_line_arg )
 
       if (trim(command_line_arg) == '-set') then
         i = i + 1
-        command_line_arg = trim( command_line_args(i) )
+        istart = iend + 1
+        istart = verify(command_line(istart:), ' ,') + istart - 1       !-- Find next non-blank and set result to end of word
+        iend = scan(command_line(istart:), ' ,') - 2 + istart           !-- Find the first blank; end of control file path
+        command_line_arg = trim( command_line(istart:iend) )
         print '(A,I0,2A)', 'PRMS command line argument ', i-1, ': ', trim( command_line_arg )
-
         index = 0
         do j = 1, Num_control_parameters
           if (trim(command_line_arg) == trim(Control_parameter_data(j) % name)) then
@@ -1077,7 +1075,10 @@ print *, command_line_args(2)
 
         do j = 1, num_param_values
           i = i + 1
-          command_line_arg = trim( command_line_args(i) )
+          istart = iend + 1
+          istart = verify(command_line(istart:), ' ,') + istart - 1  !-- Find next non-blank and set result to end of word
+          iend = scan(command_line(istart:), ' ,') - 2 + istart      !-- Find the first blank; end of control file path
+          command_line_arg = trim( command_line(istart:iend) )
           print '(A,I0,2A)', 'PRMS command line argument ', i-1, ': ', trim( command_line_arg )
           if (param_type == 1) then
               read (command_line_arg, *, IOSTAT=status) Control_parameter_data(index) % values_int(j)
@@ -1328,4 +1329,5 @@ print *, command_line_args(2)
     end do loop
     count_words_text = nwords
   end function count_words_text
+
 end submodule

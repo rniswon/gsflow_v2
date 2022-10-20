@@ -44,7 +44,6 @@
       INTEGER, SAVE :: mf_timestep, startday, endday, mf_nowtime, Number_timesteps
       INTEGER, SAVE :: num_words_command_line
       character(LEN=MAXCMDLINE_LENGTH) command_line
-      character(LEN=128), allocatable :: command_line_args(:)
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
 !   Declared Variables for DPRST agriculture computations

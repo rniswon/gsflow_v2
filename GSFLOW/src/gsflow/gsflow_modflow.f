@@ -980,8 +980,6 @@ C
         ENDIF
       ENDIF
 
- 9001 FORMAT ('ERROR in ', A, ' module, arg = run.',
-     &        ' Called from MFNWT_RUN.', /, 'Return val = ', I0)
  9002 FORMAT('Date: ', I0, 2('/',I2.2), '; Stress: ', I0, '; Step: ',I0,
      &       '; Simulation step: ', I0, /, 18X, 'MF iterations: ', I0,
      &       '; SZ iterations: ', I0, /)
@@ -1013,7 +1011,8 @@ C     ************************************************************************
 C
 C8------END OF SIMULATION
 C-------SAVE RESTART RECORDS FOR SUB PACKAGE
-  110 IF(IUNIT(54).GT.0) CALL GWF2SUB7SV(IGRID)
+C 110 IF(IUNIT(54).GT.0) CALL GWF2SUB7SV(IGRID)
+      IF(IUNIT(54).GT.0) CALL GWF2SUB7SV(IGRID)
 C-------WRITE RESTART INFORMATION FOR HEADS, SFR, AND UZF
       IF ( Save_vars_to_file==ACTIVE ) THEN
         CALL RESTART1WRITE()
