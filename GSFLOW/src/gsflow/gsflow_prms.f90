@@ -1679,18 +1679,12 @@
       SUBROUTINE put_prms_control_file(command_line_args) BIND(C,NAME="put_prms_control_file")
       !DEC$ ATTRIBUTES DLLEXPORT :: put_prms_control_file
       USE PRMS_MODULE, ONLY: command_line_modsim
-!      use prms_utils, only: numchars
       IMPLICIT NONE
       ! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: command_line_args
-      ! Function
-        INTRINSIC :: trim
-      ! Local Variabales
-!      INTEGER :: nc
 !***********************************************************************
-!      nc = numchars(command_line_args)
       command_line_modsim = ' '
-      command_line_modsim = trim(command_line_args)
+      command_line_modsim = command_line_args(:512)
       END SUBROUTINE put_prms_control_file
 
 !***********************************************************************
