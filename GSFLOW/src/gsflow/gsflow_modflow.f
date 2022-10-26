@@ -651,6 +651,9 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF(IUNIT(40).GT.0) CALL GWF2DRT7FM(IGRID)
 !            IF(IUNIT(61).GT.0) CALL FMP2FM(KKITER,KKPER,KKSTP,ISTARTFL, !FMP2FM CALL ADDED BY SCHMID
 !     1                              IUNIT(44),IUNIT(52),IUNIT(55),IGRID)
+            IF (Model>=10 .AND. iss==0) THEN
+              IF( IUNIT(66).GT.0 ) CALL MODSIM2AG(Diversions)
+            END IF
 
 !  Call the PRMS modules that need to be inside the iteration loop
 !            IF ( Szcheck==ACTIVE ) THEN
@@ -697,12 +700,13 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF (Model>=10 .AND. iss==0) THEN
               IF( IUNIT(66).GT.0 ) CALL MODSIM2AG(Diversions)
             END IF
+            IF(IUNIT(66).GT.0 )
+     +         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
             IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,
      1                              IUNIT(22),IUNIT(63),IUNIT(8),
      2                              IUNIT(55),IGRID)   !cjm (added IUNIT(8))
-            IF(IUNIT(66).GT.0 )
-     1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
             IF ( Szcheck==ACTIVE .AND. Model==MODSIM_GSFLOW ) THEN
+              retval = gsflow_mf2prms()
               IF ( PRMS_land_iteration_flag==CANOPY ) THEN
                 retval = intcp()
                 retval = snowcomp()

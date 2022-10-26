@@ -28,8 +28,8 @@
       REAL, SAVE, ALLOCATABLE :: Grav_dunnian_flow(:), Pfr_dunnian_flow(:)
 !   GSFLOW variables
       INTEGER, SAVE, ALLOCATABLE :: Hru_gvr_count(:), Hru_gvr_index(:, :), Hrucheck(:)
-      REAL, SAVE, ALLOCATABLE :: Replenish_frac(:)
-      REAL, SAVE, ALLOCATABLE :: It0_sroff(:), It0_potet(:), It0_hru_sroffp(:), It0_hortonian_flow(:)
+      REAL, SAVE, ALLOCATABLE :: Replenish_frac(:), It0_potet(:)
+      REAL, SAVE, ALLOCATABLE :: It0_sroff(:), It0_hru_sroffp(:), It0_hortonian_flow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_strm_seg_in(:)
       DOUBLE PRECISION, SAVE :: Basin_sz_gwin
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gvr_hru_pct_adjusted(:)
@@ -817,7 +817,12 @@
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Sm2gw_grav = 0.0 ! dimension nhrucell
         Grav_gwin = 0.0 ! dimension nhru
-        IF ( Kkiter>1 ) THEN ! Kkiter>1 means GSFLOW is active
+        IF ( kkiter == 1 ) THEN
+            Gw2sm_grav = 0.0 ! dimension nhrucell
+            IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
+            IF ( Nlake>0 ) It0_potet = Potet
+        END IF
+        !IF ( Kkiter>1 ) THEN ! Kkiter>1 means GSFLOW is active
           Soil_moist = It0_soil_moist
           Soil_rechr = It0_soil_rechr
           Ssres_stor = It0_ssres_stor
@@ -832,20 +837,20 @@
             Hortonian_flow = It0_hortonian_flow
             Strm_seg_in = It0_strm_seg_in
           ENDIF
-        ELSE ! Kkiter == 1
-          Gw2sm_grav = 0.0 ! dimension nhrucell
-          IF ( AFR .AND. iter_flag == 1 ) THEN
-            IF ( Nlake>0 ) It0_potet = Potet
-            IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
-            IF ( PRMS_land_iteration_flag==OFF ) THEN
-              ! computed in srunoff
-              It0_sroff = Sroff
-              It0_hru_sroffp = hru_sroffp
-              It0_hortonian_flow = Hortonian_flow
-              It0_strm_seg_in = Strm_seg_in
-            ENDIF
-          ENDIF
-        ENDIF
+        !ELSE ! Kkiter == 1
+        !  Gw2sm_grav = 0.0 ! dimension nhrucell
+        !  IF ( AFR .AND. iter_flag == 1 ) THEN
+        !    IF ( Nlake>0 ) It0_potet = Potet
+        !    IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
+        !    IF ( PRMS_land_iteration_flag==OFF ) THEN
+        !      ! computed in srunoff
+        !      It0_sroff = Sroff
+        !      It0_hru_sroffp = hru_sroffp
+        !      It0_hortonian_flow = Hortonian_flow
+        !      It0_strm_seg_in = Strm_seg_in
+        !    ENDIF
+        !  ENDIF
+        !ENDIF
       ENDIF
 
       IF ( Pref_flag==ACTIVE ) THEN
