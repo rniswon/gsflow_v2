@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2022-09-01'
+      character(len=*), parameter :: Version_soilzone_ag = '2022-10-25'
       INTEGER, SAVE :: Soil_iter !, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_perv_to_gw
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Basin_ag_soil_rechr, Basin_ag_gvr2sm
@@ -367,7 +367,7 @@
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, Nowmonth, Nowyear, Nowday, &
-     &    Iter_aet_flag, irrigation_apply_flag
+     &    Iter_aet_flag, irrigation_apply_flag !, Model
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, Ag_area_total, &
@@ -385,8 +385,7 @@
      &    Ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr_max, Ag_soil_moist_max, Basin_ag_soil_moist, &
      &    Hru_intcpstor, gsflow_ag_actet
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_ssres_stor, It0_slow_stor, &
-                               It0_pref_flow_stor, It0_gravity_stor_res, &
-                               It0_ag_soil_rechr, It0_ag_soil_moist
+                               It0_pref_flow_stor, It0_gravity_stor_res, It0_ag_soil_rechr, It0_ag_soil_moist
 !      USE GSFMODSIM2PRMS, ONLY: HRU_diversion
       USE PRMS_WATER_USE, ONLY: Soilzone_gain, Soilzone_gain_hru
       USE PRMS_CLIMATE_HRU, ONLY: AET_external, PET_external
@@ -591,14 +590,12 @@
         IF ( agarea>0.0 ) ag_on_flag = ACTIVE
 
         avail_potet = Potet(i) - hruactet
-        IF ( avail_potet<-CLOSEZERO ) THEN
-          print *, 'avail_potet<0', avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
+        IF ( avail_potet<0.0 ) THEN
+          IF ( avail_potet<-CLOSEZERO ) &
+               print *, 'avail_potet<0', i, avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
           avail_potet = 0.0
           hruactet = Potet(i)
         ENDIF
-
-!******Add infiltration to soil and compute excess
-        interflow = 0.0
 
 !******Add infiltration to soil and compute excess
         !infil_tot is the depth in whole HRU

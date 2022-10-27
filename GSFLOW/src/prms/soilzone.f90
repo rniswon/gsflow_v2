@@ -20,7 +20,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2022-09-01'
+      character(len=*), parameter :: Version_soilzone = '2022-10-25'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -768,7 +768,7 @@
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO !, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Hru_type, AG_flag, Nowmonth !, Nowyear, Nowday
+     &    Soilzone_aet_flag, Hru_type, AG_flag, Nowmonth !, Model, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -921,14 +921,12 @@
         perv_frac = Hru_frac_perv(i)
 
         avail_potet = Potet(i) - hruactet
-        IF ( avail_potet<-CLOSEZERO ) THEN
-          print *, 'avail_potet<0', i, avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
+        IF ( avail_potet<0.0 ) THEN
+          IF ( avail_potet<-CLOSEZERO ) &
+               print *, 'avail_potet<0', i, avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
           avail_potet = 0.0
           hruactet = Potet(i)
         ENDIF
-
-!******Add infiltration to soil and compute excess
-        interflow = 0.0
 
 !******Add infiltration to soil and compute excess
         !infil_tot is the depth in whole HRU
@@ -1022,7 +1020,6 @@
           ENDIF
         ELSE
           adjust_hortonian = ACTIVE
-          Cap_waterin(i) = 0.0
           Sroff(i) = Sroff(i) + capwater_maxin
           Hru_sroffp(i) = Hru_sroffp(i) + capwater_maxin * perv_frac
           Hortonian_flow(i) = Hortonian_flow(i) + capwater_maxin * perv_frac
@@ -1129,6 +1126,7 @@
 
 ! if HRU cascades,
 ! compute interflow and excess flow to each HRU or stream
+        interflow = 0.0
         dunnianflw = 0.0
         IF ( compute_lateral==ACTIVE ) THEN
           interflow = Slow_flow(i) + prefflow

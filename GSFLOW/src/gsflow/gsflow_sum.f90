@@ -567,8 +567,9 @@
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       USE PRMS_FLOWVARS, ONLY: Basin_perv_et, Basin_swale_et, &
      &    Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_actet, &
-     &    Basin_sroff, Basin_soil_moist, Basin_ssstor, Basin_cfs, Basin_snowmelt, Basin_snowevap
+     &    Basin_sroff, Basin_soil_moist, Basin_ssstor, Basin_cfs
       USE PRMS_IT0_VARS, ONLY: It0_basin_soil_moist, It0_basin_ssstor
+      USE PRMS_SNOW, ONLY: Basin_snowmelt, Basin_snowevap
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_evap, &
      &    Basin_hortonian, Basin_hortonian_lakes, &
      &    Basin_infil, Basin_dprst_evap, Basin_dprst_volop, Basin_dprst_volcl
@@ -957,7 +958,9 @@
 !***********************************************************************
       SUBROUTINE BASIN_GET_STORAGE()
       USE GSFSUM
-      USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_pweqv, Basin_intcp_stor
+      USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor
+      USE PRMS_SNOW, ONLY: Basin_pweqv
+      USE PRMS_INTCP, ONLY: Basin_intcp_stor
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor
       USE PRMS_SOILZONE, ONLY: Basin_pref_stor
       USE GSFBUDGET, ONLY: Sat_S, Unsat_S
