@@ -43,7 +43,7 @@
      &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, Nowyear, Nowday, forcing_check_flag, Snow_cbh_flag, &
      &    irrigated_area_flag, AET_cbh_flag, PET_cbh_flag, Print_debug
       USE PRMS_CLIMATE_HRU
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Hru_area_dble, Ag_Frac
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Ag_Frac
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
      &    Basin_tmax, Basin_tmin, Tmaxf, Tminf, Tminc, Tmaxc, Tavgf, &
      &    Tavgc, Hru_ppt, Hru_rain, Hru_snow, Prmx, Pptmix, Newsnow, &
@@ -54,9 +54,7 @@
       USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_SOLTAB, ONLY: Soltab_basinpotsw, Hru_cossl, Soltab_potsw
       use prms_utils, only: find_current_time, find_cbh_header_end, print_date, print_module, read_error
-      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Basin_pweqv !, Basin_snowevap, Basin_snowmelt, Basin_snowcov, &
-!     &   Pk_depth, Snow_evap, Snowcov_area, Snowmelt, Gwres_flow, Basin_gwflow
-!      USE PRMS_SNOW, ONLY: Basin_snowdepth
+      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv !, Pk_depth, Snow_evap, Snowcov_area, Snowmelt
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
@@ -243,11 +241,6 @@
           !ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
           !  CALL read_cbh_date(yr, mo, dy, 'snowmelt', ios, ierr)
           !ENDIF
-          Basin_pweqv = 0.0D0
-          !Basin_snowevap = 0.0D0
-          !Basin_snowmelt = 0.0D0
-          !Basin_snowcov = 0.0D0
-          !Basin_snowdepth = 0.0D0
         ENDIF
 
         IF ( ierr/=0 ) THEN
@@ -346,14 +339,6 @@
           IF ( PET_cbh_flag==ACTIVE ) Basin_pet_external = Basin_pet_external + DBLE( PET_external(i)*harea )
           IF ( irrigated_area_flag==ACTIVE ) Basin_irrigated_area = Basin_irrigated_area + DBLE( Irrigated_area(i)*harea )
 
-          IF ( Snow_cbh_flag==ACTIVE ) THEN
-            Basin_pweqv = Basin_pweqv + Pkwater_equiv(i)*Hru_area_dble(i)
-            !Basin_snowdepth = Basin_snowdepth + Pk_depth(i)*Hru_area_dble(i)
-            !Basin_snowevap = Basin_snowevap + DBLE( Snow_evap(i)*harea )
-            !Basin_snowcov = Basin_snowcov + DBLE( Snowcov_area(i)*harea )
-            !Basin_snowmelt = Basin_snowmelt + DBLE( Snowmelt(i)*harea )
-          ENDIF
-
         ENDDO
 !        IF ( write_tmin_tmax == 1 ) THEN
 !          WRITE ( 863,  '(I4,2I3,3I2,128F7.2)' ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tmaxf(i), i=1,Nhru)
@@ -391,13 +376,6 @@
         IF ( AET_cbh_flag==ACTIVE ) Basin_aet_external = Basin_aet_external*Basin_area_inv
         IF ( PET_cbh_flag==ACTIVE ) Basin_pet_external = Basin_pet_external*Basin_area_inv
         IF ( irrigated_area_flag==ACTIVE ) Basin_irrigated_area = Basin_irrigated_area*Basin_area_inv
-        IF ( Snow_cbh_flag==ACTIVE ) THEN
-          Basin_pweqv = Basin_pweqv*Basin_area_inv
-          !Basin_snowevap = Basin_snowevap*Basin_area_inv
-          !Basin_snowmelt = Basin_snowmelt*Basin_area_inv
-          !Basin_snowcov = Basin_snowcov*Basin_area_inv
-          !Basin_snowdepth = Basin_snowdepth*Basin_area_inv
-        ENDIF
 
       ELSEIF ( Process_flag==DECL ) THEN
 

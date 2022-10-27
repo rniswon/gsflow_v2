@@ -8,12 +8,13 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2022-07-29'
+      character(len=*), parameter :: Version_intcp = '2022-10-26'
+      DOUBLE PRECISION, SAVE :: Last_intcp_stor
       INTEGER, SAVE :: Use_transfer_intcp
       INTEGER, PARAMETER :: RAIN = 0, SNOW = 1
 !   Declared Variables
       INTEGER, SAVE, ALLOCATABLE :: Intcp_on(:), Intcp_form(:)
-      DOUBLE PRECISION, SAVE :: Basin_net_ppt, Basin_changeover
+      DOUBLE PRECISION, SAVE :: Basin_net_ppt, Basin_intcp_stor, Basin_changeover
       DOUBLE PRECISION, SAVE :: Basin_intcp_evap, Basin_net_snow, Basin_net_rain
       REAL, SAVE, ALLOCATABLE :: Net_rain(:), Net_snow(:), Net_ppt(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_evap(:)
@@ -139,6 +140,10 @@
      &     'Basin area-weighted average rain net precipitation', &
      &     'inches', Basin_net_rain)
 
+      CALL declvar_dble(MODNAME, 'basin_intcp_stor', 'one', 1, &
+     &     'Basin area-weighted average interception storage', &
+     &     'inches', Basin_intcp_stor)
+
       ALLOCATE ( Intcp_evap(Nhru) )
       CALL declvar_real(MODNAME, 'intcp_evap', 'nhru', Nhru, &
      &     'Evaporation from the canopy for each HRU', &
@@ -207,7 +212,7 @@
      &    GSFLOW_flag, AG_flag, Ag_package, irrigation_apply_flag
       USE PRMS_INTCP
       USE PRMS_CLIMATEVARS, ONLY: Transp_on
-      USE PRMS_FLOWVARS, ONLY: Intcp_transp_on, Intcp_stor, Hru_intcpstor, Basin_intcp_stor
+      USE PRMS_FLOWVARS, ONLY: Intcp_transp_on, Intcp_stor, Hru_intcpstor
       use prms_utils, only: read_error, error_stop
       IMPLICIT NONE
 !***********************************************************************
@@ -264,8 +269,8 @@
 ! Newsnow and Pptmix can be modfied, WARNING!!!
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, &
      &    Hru_snow, Transp_on, Potet, Use_pandata, Hru_pansta, Epan_coef, Potet_sublim
-      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Intcp_transp_on, Intcp_stor, Hru_intcpstor, Basin_intcp_stor
-      USE PRMS_IT0_VARS, ONLY: It0_hru_intcpstor, It0_basin_intcp_stor, It0_intcp_transp_on, It0_intcp_stor
+      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Intcp_transp_on, Intcp_stor, Hru_intcpstor
+      USE PRMS_IT0_VARS, ONLY: It0_hru_intcpstor, It0_intcp_transp_on, It0_intcp_stor
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_OBS, ONLY: Pan_evap
       use prms_utils, only: error_stop
@@ -287,10 +292,10 @@
           Intcp_stor = It0_intcp_stor
           Hru_intcpstor = It0_hru_intcpstor
           Intcp_transp_on = It0_intcp_transp_on
-          Basin_intcp_stor = It0_basin_intcp_stor
         ENDIF
       ENDIF
 
+      IF ( Print_debug==DEBUG_WB ) Last_intcp_stor = Basin_intcp_stor
       Basin_changeover = 0.0D0
       Basin_net_ppt = 0.0D0
       Basin_net_snow = 0.0D0
@@ -597,7 +602,7 @@
       SUBROUTINE intcp_restart(In_out)
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT, OFF
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, text_restart_flag
-      USE PRMS_FLOWVARS, ONLY: Intcp_transp_on, Intcp_stor, Hru_intcpstor, Basin_intcp_stor
+      USE PRMS_FLOWVARS, ONLY: Intcp_transp_on, Intcp_stor, Hru_intcpstor
       USE PRMS_INTCP
       use prms_utils, only: check_restart
       IMPLICIT NONE

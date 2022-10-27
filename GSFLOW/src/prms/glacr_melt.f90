@@ -1751,7 +1751,7 @@
       USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, GLACIER
       USE PRMS_MODULE, ONLY: Hru_type
       USE PRMS_GLACR, ONLY: Hru_slope_ts
-      USE PRMS_SOLTAB, ONLY: Hru_aspect, Hru_cossl, PI, RADIANS, Sunset_angle, &
+      USE PRMS_SOLTAB, ONLY: Hru_aspect, Hru_cossl, PI, RADIANS, &
      &    Soltab_potsw, Soltab_sunhrs, Solar_declination, ECCENTRICY, DEGDAY, DEGDAYRAD
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_lat
       IMPLICIT NONE
@@ -1783,7 +1783,7 @@
           Soltab_potsw(1, n) = 0.0
           CALL compute_soltab(obliquity, Solar_declination, Hru_slope_ts(n), Hru_aspect(n), &
      &                      Hru_lat(n), Hru_cossl(n), Soltab_potsw(:, n), &
-     &                      Soltab_sunhrs(:, n), Sunset_angle(:, n), Hru_type(n), n)
+     &                      Soltab_sunhrs(:, n), Hru_type(n), n)
         ENDIF
       ENDDO
 !

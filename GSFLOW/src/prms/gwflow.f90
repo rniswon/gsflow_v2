@@ -24,7 +24,7 @@
       DOUBLE PRECISION, SAVE :: Basin_dnflow
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Lake_seepage_max(:)
 !   Declared Variables
-      DOUBLE PRECISION, SAVE :: Basin_gwflow, Basin_gwsink
+      DOUBLE PRECISION, SAVE :: Basin_gwstor, Basin_gwflow, Basin_gwsink
       DOUBLE PRECISION, SAVE :: Basin_gwin, Basin_lake_seep
       DOUBLE PRECISION, SAVE :: Basin_gwstor_minarea_wb
       REAL, SAVE, ALLOCATABLE :: Gwres_flow(:), Gwres_sink(:)
@@ -130,6 +130,10 @@
       CALL declvar_dble(MODNAME, 'gw_in_ssr', 'ngw', Ngw, &
      &     'Drainage from gravity reservoir excess water for each GWR', &
      &     'acre-inches', Gw_in_ssr)
+
+      CALL declvar_dble(MODNAME, 'basin_gwstor', 'one', 1, &
+     &     'Basin area-weighted average of storage in GWRs', &
+     &     'inches', Basin_gwstor)
 
       CALL declvar_dble(MODNAME, 'basin_gwin', 'one', 1, &
      &     'Basin area-weighted average of inflow to GWRs', &
@@ -267,7 +271,7 @@
       USE PRMS_GWFLOW
       USE PRMS_BASIN, ONLY: Gwr_type, Hru_area, Basin_area_inv, Active_gwrs, Gwr_route_order, &
      &                      Lake_hru_id, Weir_gate_flag, Hru_storage
-      USE PRMS_FLOWVARS, ONLY: Gwres_stor, Basin_gwstor
+      USE PRMS_FLOWVARS, ONLY: Gwres_stor
       use prms_utils, only: read_error
       IMPLICIT NONE
       INTRINSIC :: DBLE
@@ -377,7 +381,7 @@
       USE PRMS_GWFLOW
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, Lake_type, &
      &    Basin_area_inv, Hru_area, Gwr_type, Lake_hru_id, Weir_gate_flag, Hru_area_dble, Hru_storage
-      USE PRMS_FLOWVARS, ONLY: Soil_to_gw, Ssr_to_gw, Sroff, Ssres_flow, Gwres_stor, Lake_vol, Basin_gwstor
+      USE PRMS_FLOWVARS, ONLY: Soil_to_gw, Ssr_to_gw, Sroff, Ssres_flow, Gwres_stor, Lake_vol
       USE PRMS_CASCADE, ONLY: Ncascade_gwr
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru

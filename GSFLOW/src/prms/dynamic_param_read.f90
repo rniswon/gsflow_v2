@@ -10,7 +10,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2022-09-21'
+        character(len=*), parameter :: Version_dynamic_param_read = '2022-10-24'
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
         INTEGER, SAVE :: Snow_intcp_unit, Snow_intcp_next_yr, Snow_intcp_next_mo, Snow_intcp_next_day
@@ -632,14 +632,14 @@
 !***********************************************************************
       SUBROUTINE write_dynparam(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: Print_debug, Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
       REAL, INTENT(IN) :: Values(Dim)
       REAL, INTENT(INOUT) :: Param(Dim)
-      INTEGER, INTENT(OUT) :: Updated_hrus(Nhru)
+      INTEGER, INTENT(OUT) :: Updated_hrus(Dim)
       CHARACTER(LEN=*), INTENT(IN) :: Param_name
 ! Local Variables
       INTEGER i, j, num

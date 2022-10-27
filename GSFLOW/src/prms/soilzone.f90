@@ -20,7 +20,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2022-09-01'
+      character(len=*), parameter :: Version_soilzone = '2022-10-25'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -28,8 +28,8 @@
       REAL, SAVE, ALLOCATABLE :: Grav_dunnian_flow(:), Pfr_dunnian_flow(:)
 !   GSFLOW variables
       INTEGER, SAVE, ALLOCATABLE :: Hru_gvr_count(:), Hru_gvr_index(:, :), Hrucheck(:)
-      REAL, SAVE, ALLOCATABLE :: Replenish_frac(:), It0_potet(:)
-      REAL, SAVE, ALLOCATABLE :: It0_sroff(:), It0_hru_sroffp(:), It0_hortonian_flow(:)
+      REAL, SAVE, ALLOCATABLE :: Replenish_frac(:)
+      REAL, SAVE, ALLOCATABLE :: It0_sroff(:), It0_potet(:), It0_hru_sroffp(:), It0_hortonian_flow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_strm_seg_in(:)
       DOUBLE PRECISION, SAVE :: Basin_sz_gwin
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gvr_hru_pct_adjusted(:)
@@ -817,7 +817,7 @@
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Sm2gw_grav = 0.0 ! dimension nhrucell
         Grav_gwin = 0.0 ! dimension nhru
-        IF ( kkiter == 1 ) THEN
+        IF ( Kkiter == 1 .AND. AFR .AND. iter_flag == 1 ) THEN
             Gw2sm_grav = 0.0 ! dimension nhrucell
             IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
             IF ( Nlake>0 ) It0_potet = Potet
@@ -926,14 +926,12 @@
         perv_frac = Hru_frac_perv(i)
 
         avail_potet = Potet(i) - hruactet
-        IF ( avail_potet<-CLOSEZERO ) THEN
-          print *, 'avail_potet<0', i, avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
+        IF ( avail_potet<0.0 ) THEN
+          IF ( avail_potet<-CLOSEZERO ) &
+               print *, 'avail_potet<0', i, avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
           avail_potet = 0.0
           hruactet = Potet(i)
         ENDIF
-
-!******Add infiltration to soil and compute excess
-        interflow = 0.0
 
 !******Add infiltration to soil and compute excess
         !infil_tot is the depth in whole HRU
@@ -1027,7 +1025,6 @@
           ENDIF
         ELSE
           adjust_hortonian = ACTIVE
-          Cap_waterin(i) = 0.0
           Sroff(i) = Sroff(i) + capwater_maxin
           Hru_sroffp(i) = Hru_sroffp(i) + capwater_maxin * perv_frac
           Hortonian_flow(i) = Hortonian_flow(i) + capwater_maxin * perv_frac
@@ -1134,6 +1131,7 @@
 
 ! if HRU cascades,
 ! compute interflow and excess flow to each HRU or stream
+        interflow = 0.0
         dunnianflw = 0.0
         IF ( compute_lateral==ACTIVE ) THEN
           interflow = Slow_flow(i) + prefflow
