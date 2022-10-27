@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 09/01/2022
+                       Version 5.3.0 10/26/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -38,8 +38,8 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-09-01
-Read Control File               read_control_file   2022-09-01
+PRMS Computation Order          gsflow_prms         2022-10-26
+Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 
@@ -145,23 +145,23 @@ runoff 1
 Simulation time period: 1993/10/01 00:00:00 to 1995/09/30 00:00:00
 ====================================================================
 Basin Definition                basin               2022-09-20
-Common States and Fluxes        climateflow         2022-08-05
-Potential Solar Radiation       soltab              2022-03-29
+Common States and Fluxes        climateflow         2022-10-24
+Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-01-12
 Timestep Control                prms_time           2022-04-21
 Temp & Precip Distribution      ide_dist            2022-09-07
 Solar Radiation Distribution    ddsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2022-07-29
-Snow Dynamics                   snowcomp            2022-04-27
-Surface Runoff                  srunoff_smidx       2022-08-10
-Soilzone Computations           soilzone            2022-09-01
+Canopy Interception             intcp               2022-10-26
+Snow Dynamics                   snowcomp            2022-09-07
+Surface Runoff                  srunoff_smidx       2022-10-25
+Soilzone Computations           soilzone            2022-10-25
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing              strmflow            2021-11-19
-Output Summary                  basin_sum           2022-04-22
+Output Summary                  basin_sum           2022-09-01
 Statistics Variables Output     statvar_out         2021-09-08
-Output Summary                  prms_summary        2022-04-21
+Output Summary                  prms_summary        2022-10-26
 ==============================================================
 
 Using Control File: .\control\mercdIDE.control
@@ -186,5 +186,5 @@ Fraction impervious:        0.0001    Fraction pervious:       0.9999
  *************************************************************
  Total for run     100.986   43.325    7.864   57.085   67.341
  *************************************************************
-Execution elapsed time    0 minutes  0.27 seconds
+Execution elapsed time    0 minutes  0.33 seconds
 
