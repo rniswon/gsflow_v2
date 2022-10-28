@@ -10,7 +10,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_soil_param_read'
-        character(len=*), parameter :: Version_dynamic_soil_param_read = '2022-09-22'
+        character(len=*), parameter :: Version_dynamic_soil_param_read = '2022-10-24'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Imperv_stor_next_yr, Imperv_stor_next_mo, Imperv_stor_next_day, Imperv_stor_unit
         INTEGER, SAVE :: Soil_rechr_next_yr, Soil_rechr_next_mo, Soil_rechr_next_day, Soil_rechr_unit
@@ -129,7 +129,7 @@
           ENDIF
         ENDIF
 
-        IF ( Dyn_dprst_flag>1 ) THEN
+        IF ( Dyn_dprst_flag==2 .OR. Dyn_dprst_flag==3 ) THEN
           IF ( control_string(dprst_depth_dynamic, 'dprst_depth_dynamic')/=0 ) CALL read_error(5, 'dprst_depth_dynamic')
           CALL find_header_end(Dprst_depth_unit, dprst_depth_dynamic, ierr)
           IF ( ierr==0 ) THEN
@@ -226,20 +226,19 @@
 !     dynsoilparamrun - Read and set dynamic parameters
 !***********************************************************************
       INTEGER FUNCTION dynsoilparamrun()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dynamic, LAKE, CLOSEZERO, &
-     &    potet_jh_module, potet_pan_module, potet_hamon_module, potet_hs_module, &
-     &    potet_pt_module, potet_pm_module, climate_hru_module
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dynamic, LAKE, CLOSEZERO
       USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, AG_flag, Hru_type, &
      &    Dyn_imperv_flag, Dprst_flag, PRMS4_flag, GSFLOW_flag
       USE PRMS_DYNAMIC_SOIL_PARAM_READ
       USE PRMS_BASIN, ONLY: Hru_area, Dprst_clos_flag, Active_hrus, Hru_route_order, &
      &    Hru_percent_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Dprst_frac, Dprst_open_flag, &
      &    Dprst_area_max, Dprst_area_open_max, Dprst_area_clos_max, Dprst_frac_open, &
-     &    Ag_area, Ag_frac, Hru_area_dble, Dprst_area
+     &    Ag_area, Ag_frac, Hru_area_dble, Dprst_area, Basin_area_inv
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Imperv_stor, Sat_threshold, &
      &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor, &
      &    Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, Slow_stor, Pref_flow_stor, &
-     &    Ag_soil_rechr_max, Ag_soil_rechr_max_frac, Hru_impervstor, Dprst_stor_hru
+     &    Ag_soil_rechr_max, Ag_soil_rechr_max_frac, Hru_impervstor, Dprst_stor_hru, &
+     &    Basin_soil_moist, Basin_ssstor, Basin_ag_soil_moist, Basin_ag_soil_rechr
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_imperv_stor, It0_hru_impervstor, &
                                It0_ag_soil_moist, It0_ag_soil_rechr, It0_dprst_vol_open, It0_dprst_vol_clos, &
                                It0_dprst_stor_hru, It0_slow_stor, It0_ssres_stor
@@ -555,7 +554,7 @@
                 it0_imperv_flag = ACTIVE
               ENDIF
             ENDIF
-            !Hru_impervstor(i) = Imperv_stor(i)*frac_imperv
+            Hru_impervstor(i) = Imperv_stor(i)*frac_imperv
             Hru_percent_imperv(i) = frac_imperv
             Hru_imperv(i) = harea*frac_imperv
           ENDIF
@@ -639,20 +638,42 @@
 
         ENDDO
         IF ( it0_sm_flag == ACTIVE ) THEN
-          It0_soil_moist = Soil_moist
-          It0_soil_rechr = Soil_rechr
+          Basin_soil_moist = 0.0D0
+          DO j = 1, Active_hrus
+            i = Hru_route_order(j)
+            It0_soil_moist(i) = Soil_moist(i)
+            It0_soil_rechr(i) = Soil_rechr(i)
+            Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*Hru_perv(i) )
+          ENDDO
+          Basin_soil_moist = Basin_soil_moist * Basin_area_inv
         ENDIF
         IF ( it0_imperv_flag==ACTIVE ) THEN
           It0_imperv_stor = Imperv_stor
           It0_hru_impervstor = Hru_impervstor
         ENDIF
         IF ( it0_grav_flag == ACTIVE ) THEN
-          It0_slow_stor = Slow_stor
-          It0_ssres_stor = Slow_stor + Pref_flow_stor
+          Basin_ssstor = 0.0D0
+          DO j = 1, Active_hrus
+            i = Hru_route_order(j)
+            It0_slow_stor(i) = Slow_stor(i)
+            It0_ssres_stor(i) = Slow_stor(i) + Pref_flow_stor(i)
+            Ssres_stor(i) = Slow_stor(i) + Pref_flow_stor(i)
+            Basin_ssstor = Basin_ssstor + DBLE( Ssres_stor(i)*Hru_area(i) )
+          ENDDO
+          Basin_ssstor = Basin_ssstor * Basin_area_inv
         ENDIF
         IF ( AG_flag==ACTIVE ) THEN
-          It0_ag_soil_moist = Ag_soil_moist
-          It0_ag_soil_rechr = Ag_soil_rechr
+          Basin_ag_soil_moist = 0.0D0
+          Basin_ag_soil_rechr = 0.0D0
+          DO j = 1, Active_hrus
+            i = Hru_route_order(j)
+            It0_ag_soil_moist(i) = Ag_soil_moist(i)
+            It0_ag_soil_rechr(i) = Ag_soil_rechr(i)
+            Basin_ag_soil_moist = Basin_ag_soil_moist + DBLE( Ag_soil_moist(i)*Ag_area(i) )
+            Basin_ag_soil_rechr = Basin_ag_soil_rechr + DBLE( Ag_soil_rechr(i)*Ag_area(i) )
+          ENDDO
+          Basin_ag_soil_moist = Basin_ag_soil_moist * Basin_area_inv
+          Basin_ag_soil_rechr = Basin_ag_soil_rechr * Basin_area_inv
         ENDIF
         IF ( it0_dprst_flag==ACTIVE ) THEN
           It0_dprst_vol_open = Dprst_vol_open

@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2022-08-10'
+      character(len=*), parameter :: Version_srunoff = '2022-10-25'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -754,7 +754,7 @@
           !******   If no snowmelt and no snowpack but there was net snow then
           !******   snowpack was small and was lost to sublimation.
           IF ( .NOT.(Net_snow(i)>0.0) .AND. Net_rain(i)>0.0 ) THEN
-            availh2o_total = availh2o_total + Net_rain(i)
+            IF ( Pptmix_nopack(i)==OFF ) availh2o_total = availh2o_total + Net_rain(i)
           ENDIF
         ENDIF
 
@@ -835,6 +835,11 @@
      &                        Dprst_sroff_hru(i), Dprst_seep_hru(i), Sro_to_dprst_perv(i), Sro_to_dprst_imperv(i), &
      &                        Dprst_evap_hru(i), avail_et, availh2o_total, Dprst_in(i))
               runoff = runoff + Dprst_sroff_hru(i)*Hruarea_dble
+            ELSE
+              Dprst_seep_hru(i) = 0.0D0
+              Dprst_sroff_hru(i) = 0.0D0
+              Dprst_evap_hru(i) = 0.0 ! evap should probably be computed ??
+              runoff = runoff + availh2o_total*Dprst_area_max(i)
             ENDIF
           ENDIF
         ENDIF
@@ -874,6 +879,7 @@
         Basin_contrib_fraction = Basin_contrib_fraction + DBLE( Contrib_fraction(i)*perv_area )
 
 !******Compute evaporation from impervious area
+        IF ( frzen==OFF ) THEN
         IF ( Imperv_stor(i)>0.0 ) THEN
           CALL imperv_et(Imperv_stor(i), Potet(i), Imperv_evap(i), Snowcov_area(i), avail_et)
           Hru_impervevap(i) = Imperv_evap(i)*Imperv_frac
@@ -891,6 +897,7 @@
           Basin_imperv_evap = Basin_imperv_evap + DBLE( Hru_impervevap(i)*Hruarea )
           Hru_impervstor(i) = Imperv_stor(i)*Imperv_frac
           Basin_imperv_stor = Basin_imperv_stor + DBLE(Imperv_stor(i)*Hruarea_imperv )
+        ENDIF
         ENDIF
 
         IF ( dprst_chk==ACTIVE ) Dprst_stor_hru(i) = (Dprst_vol_open(i)+Dprst_vol_clos(i))/Hruarea_dble
@@ -964,7 +971,7 @@
       SUBROUTINE compute_infil(Net_rain, Net_ppt, Snowmelt, Snowinfil_max, Net_snow, &
                                Pkwater_equiv, Infil, Hru_type, Intcp_changeover, &
                                Perv_on, Ag_on, Infil_ag, Net_apply, Perv_area, Ag_area)
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, DNEARZERO, LAND, ACTIVE, CASCADE_OFF
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, DNEARZERO, LAND, ACTIVE, CASCADE_OFF, OFF
       USE PRMS_MODULE, ONLY: Cascade_flag
       USE PRMS_SRUNOFF, ONLY: Upslope_hortonian, Ihru, Srp, Isglacier, Sroff_ag, Basin_apply_sroff
       USE PRMS_FLOWVARS, ONLY: Pptmix_nopack
@@ -1070,7 +1077,7 @@
 !       If no snowmelt and no snowpack but there was net snow then
 !       snowpack was small and was lost to sublimation.
 
-        IF ( Net_snow<NEARZERO .AND. Net_rain>0.0 ) THEN
+        IF ( Net_snow<NEARZERO .AND. Net_rain>0.0 .AND. Pptmix_nopack(Ihru)==OFF ) THEN
 ! no snow, some rain
           Infil = Infil + Net_rain
           IF ( Ag_on==ACTIVE ) Infil_ag = Infil_ag + Net_rain

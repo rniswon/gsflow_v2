@@ -7,7 +7,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=9), parameter :: MODNAME = 'basin_sum'
-      character(len=*), parameter :: Version_basin_sum = '2022-04-22'
+      character(len=*), parameter :: Version_basin_sum = '2022-09-01'
 
       INTEGER, SAVE :: BALUNT, Totdays
       INTEGER, SAVE :: Header_prt, Endjday
@@ -315,8 +315,11 @@
       use PRMS_READ_PARAM_FILE, only: getparam_int
       USE PRMS_MODULE, ONLY: Nobs, Init_vars_from_file, Print_debug
       USE PRMS_BASINSUM
-      USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_lake_stor, Basin_pweqv, Basin_intcp_stor, Basin_gwstor
+      USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_lake_stor
+      USE PRMS_SNOW, ONLY: Basin_pweqv
+      USE PRMS_INTCP, ONLY: Basin_intcp_stor
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_dprst_volcl, Basin_dprst_volop
+      USE PRMS_GWFLOW, ONLY: Basin_gwstor
       use prms_utils, only: julian_day, PRMS_open_module_file, read_error, write_outfile
       IMPLICIT NONE
 ! Functions
@@ -477,15 +480,15 @@
       USE PRMS_MODULE, ONLY: Nobs, Print_debug, End_year, Strmflow_flag, Glacier_flag, Nowyear, Nowmonth, Nowday, Nratetbl
       USE PRMS_BASINSUM
       USE PRMS_BASIN, ONLY: Active_area, Active_hrus, Hru_route_order
-      USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Basin_pweqv, Basin_snowmelt, Basin_snowevap, &
-     &    Basin_actet, Basin_perv_et, Basin_swale_et, Hru_actet, Basin_sroff, Basin_intcp_stor, &
-     &    Basin_ssstor, Basin_soil_moist, Basin_cfs, Basin_stflow_out, Basin_lake_stor, Basin_gwstor
+      USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, &
+     &    Basin_actet, Basin_perv_et, Basin_swale_et, Hru_actet, Basin_sroff, &
+     &    Basin_ssstor, Basin_soil_moist, Basin_cfs, Basin_stflow_out, Basin_lake_stor
       USE PRMS_CLIMATEVARS, ONLY: Basin_swrad, Basin_ppt, Basin_potet, Basin_tmax, Basin_tmin
       USE PRMS_SET_TIME, ONLY: Jday, Modays, Yrdays, Julwater, Cfs2inches
       USE PRMS_OBS, ONLY: Streamflow_cfs
-      USE PRMS_GWFLOW, ONLY: Basin_gwflow, Basin_gwsink, Basin_gwstor_minarea_wb
-      USE PRMS_INTCP, ONLY: Basin_intcp_evap, Basin_net_ppt
-      USE PRMS_SNOW, ONLY: Basin_glacrb_melt, Basin_glacrevap
+      USE PRMS_GWFLOW, ONLY: Basin_gwflow, Basin_gwstor, Basin_gwsink, Basin_gwstor_minarea_wb
+      USE PRMS_INTCP, ONLY: Basin_intcp_evap, Basin_intcp_stor, Basin_net_ppt
+      USE PRMS_SNOW, ONLY: Basin_snowmelt, Basin_snowevap, Basin_pweqv, Basin_glacrb_melt, Basin_glacrevap
       USE PRMS_GLACR, ONLY: Basin_gl_storage, Basin_gl_top_melt
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_imperv_evap, &
      &    Basin_dprst_evap, Basin_dprst_volcl, Basin_dprst_volop

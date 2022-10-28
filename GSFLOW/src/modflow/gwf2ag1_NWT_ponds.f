@@ -456,7 +456,7 @@
       ALLOCATE (IRRFACT(MAXCELLSHOLD, MXACTWIRR))
       ALLOCATE (IRRFIELDFACT(MAXCELLSHOLD, MXACTWIRR))
       ALLOCATE (SUPFLOW(MXACTWSUP))
-      ALLOCATE (NUMSUPWELLSEG(NUMSUPHOLD))
+      ALLOCATE (NUMSUPWELLSEG(MXACTWSUP))
       DIVERSIONSEG = 0
       IRRROW_GW = 0
       IRRCOL_GW = 0
@@ -1815,8 +1815,8 @@
       !
       !4 - ---CALCULATE THE NUMBER OF SUPWELLS ASSOCIATED WITH A DIVERSION SEGEMENT
       NUMSUPWELLSEG = 1
-      DO L = 1, NUMSUPSP
-         DO LL = L + 1, NUMSUPSP
+      DO L = 1, MXWELL
+         DO LL = L + 1, MXWELL
             IF (DIVERSIONSEG(1, LL) == DIVERSIONSEG(1, L))
      +         NUMSUPWELLSEG(L) = NUMSUPWELLSEG(L) + 1
          END DO
@@ -3361,7 +3361,9 @@
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
       USE PRMS_BASIN, ONLY: gsflow_ag_area, gsflow_ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet
+      USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet, soil_moist_max, 
+     +                         soil_moist, soil_to_ssr, soil_to_gw
+      USE PRMS_SOILZONE, ONLY: dunnian_flow, cap_waterin
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
       USE GWFUZFMODULE, ONLY: UZFETOUT, GWET
       USE GLOBAL, ONLY: ISSFLG
@@ -3375,6 +3377,7 @@
       DOUBLE PRECISION :: factor, area, aet, pet, uzet
       double precision :: pettotal,aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup
+      double precision :: tot1,tot2,tot3,tot4,tot5
       integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
       double precision :: set_factor, etdif
@@ -3391,6 +3394,11 @@
         pettotal = DZERO
         aettotal = DZERO
         factor = DZERO
+        tot1= DZERO
+        tot2= DZERO
+        tot3= DZERO
+        tot4= DZERO
+        tot5=DZERO
         iseg = IRRSEG(i)
 !        IF (DEMAND(iseg) < zerod7) goto 300
         !
@@ -3411,6 +3419,16 @@
              aet = uzet + gsflow_ag_frac(hru_id)*GWET(icol, irow)   !multiply by ag_frac
              aettotal = aettotal + aet
            end if
+           tot1 = tot1 + 
+     +area*prms_inch2mf_q*(soil_moist_max(hru_id) - soil_moist(hru_id))
+           tot2 = tot2 + area*prms_inch2mf_q*soil_to_ssr(hru_id)
+           tot3 = tot3 + area*prms_inch2mf_q*cap_waterin(hru_id)
+           tot4 = tot4 + area*prms_inch2mf_q*dunnian_flow(hru_id)   
+           tot5=tot5+soil_to_gw(hru_id)
+!           soil_moist_max(hru_id) - soil_moist(hru_id), 
+!     +                  soil_to_ssr(hru_id), infil(hru_id), 
+!     +                  dunnian_flow(hru_id)
+!222   format(i5,4e20.10)
         end do
         ! convert PRMS ET deficit to MODFLOW flow
         aetold = AETITERSW(ISEG)
@@ -3444,13 +3462,13 @@
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
 
-        if(iseg==24.and.kstp==10)then
+        if(iseg==24.and.kstp==11)then
         etdif = pettotal - aettotal
           write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
      +                 SUPACT(iseg),etdif,RMSESW(ISEG),AGTOL*pettotal,
-     +                 AGCONVERGE
+     +                 AGCONVERGE,tot1,tot2,tot3,tot4,tot5
         endif
-  33  format(4i5,6e20.10,i5)
+  33  format(4i5,6e20.10,i5,5e20.10)
 300   continue
       return
       end subroutine demandconjunctive_prms
@@ -3894,6 +3912,7 @@
       det = (aettotal - aetold)
       factor = etdif
       dq = sup - supold
+      
       if (kiter > 2) then
         if (abs(det) > dzero) then
           factor = dq*etdif/det
@@ -4604,6 +4623,7 @@ C     *******************************************************************
       USE GWFSFRMODULE, ONLY: SEG, NSS
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_MODULE, ONLY: Kkiter
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -4625,6 +4645,7 @@ C
 C
 C2------Set diversion demand from that calculated from AG.
 C 
+        if ( kkiter == 1 ) DIVERSIONIRRPRMS = dzero
         do i = 1, NUMIRRDIVERSIONSP
           iseg = IRRSEG(i)        
           !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN

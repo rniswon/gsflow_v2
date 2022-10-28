@@ -20,9 +20,9 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2022-09-01'
+      character(len=*), parameter :: Version_soilzone = '2022-10-25'
       INTEGER, SAVE :: DBGUNT
-      INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
+      INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag, update_potet
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
       REAL, SAVE, ALLOCATABLE :: Soil_lower_stor_max(:)
       REAL, SAVE, ALLOCATABLE :: Grav_dunnian_flow(:), Pfr_dunnian_flow(:)
@@ -801,7 +801,7 @@
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow
       EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars
 ! Local Variables
-      INTEGER :: i, k, update_potet, compute_lateral, j, igvr
+      INTEGER :: i, k, compute_lateral, j, igvr
       REAL :: dunnianflw, interflow, perv_area, harea
       REAL :: dnslowflow, dnpreflow, dndunn, availh2o, avail_potet, hruactet
       REAL :: gvr_maxin, topfr !, tmp
@@ -823,7 +823,7 @@
           Ssres_stor = It0_ssres_stor
           Slow_stor = It0_slow_stor
           IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
-          IF ( Nlake>0 ) Potet = It0_potet
+          IF ( update_potet == 1 ) Potet = It0_potet
           Gravity_stor_res = It0_gravity_stor_res
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
@@ -832,19 +832,19 @@
             Hortonian_flow = It0_hortonian_flow
             Strm_seg_in = It0_strm_seg_in
           ENDIF
-        ELSE ! Kkiter == 1
+        ELSEIF ( AFR .AND. iter_flag == 1 ) THEN ! Kkiter == 1
+          ! iter_flag = 1 means the call is done before UZF
+          ! iter_flag = 2 means second call within MF iteration loop that is after UZF for a MODSIM-GSFLOW simulation
           Gw2sm_grav = 0.0 ! dimension nhrucell
-          IF ( AFR .AND. iter_flag == 1 ) THEN
-            IF ( Nlake>0 ) It0_potet = Potet
-            IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
-            IF ( PRMS_land_iteration_flag==OFF ) THEN
-              ! computed in srunoff
-              It0_sroff = Sroff
-              It0_hru_sroffp = hru_sroffp
-              It0_hortonian_flow = Hortonian_flow
-              It0_strm_seg_in = Strm_seg_in
-            ENDIF
+          IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
+          IF ( PRMS_land_iteration_flag==OFF  ) THEN
+            ! computed in srunoff
+            It0_sroff = Sroff
+            It0_hru_sroffp = hru_sroffp
+            It0_hortonian_flow = Hortonian_flow
+            It0_strm_seg_in = Strm_seg_in
           ENDIF
+          IF ( Nlake>0 ) It0_potet = Potet
         ENDIF
       ENDIF
 
@@ -921,14 +921,12 @@
         perv_frac = Hru_frac_perv(i)
 
         avail_potet = Potet(i) - hruactet
-        IF ( avail_potet<-CLOSEZERO ) THEN
-          print *, 'avail_potet<0', i, avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
+        IF ( avail_potet<0.0 ) THEN
+          IF ( avail_potet<-CLOSEZERO ) &
+               print *, 'avail_potet<0', i, avail_potet, Potet(i), Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i), hruactet
           avail_potet = 0.0
           hruactet = Potet(i)
         ENDIF
-
-!******Add infiltration to soil and compute excess
-        interflow = 0.0
 
 !******Add infiltration to soil and compute excess
         !infil_tot is the depth in whole HRU
@@ -1022,7 +1020,6 @@
           ENDIF
         ELSE
           adjust_hortonian = ACTIVE
-          Cap_waterin(i) = 0.0
           Sroff(i) = Sroff(i) + capwater_maxin
           Hru_sroffp(i) = Hru_sroffp(i) + capwater_maxin * perv_frac
           Hortonian_flow(i) = Hortonian_flow(i) + capwater_maxin * perv_frac
@@ -1129,6 +1126,7 @@
 
 ! if HRU cascades,
 ! compute interflow and excess flow to each HRU or stream
+        interflow = 0.0
         dunnianflw = 0.0
         IF ( compute_lateral==ACTIVE ) THEN
           interflow = Slow_flow(i) + prefflow
