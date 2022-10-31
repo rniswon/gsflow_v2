@@ -837,7 +837,7 @@
           ! iter_flag = 2 means second call within MF iteration loop that is after UZF for a MODSIM-GSFLOW simulation
           Gw2sm_grav = 0.0 ! dimension nhrucell
           IF ( AG_flag==ACTIVE ) Hru_ag_irr = 0.0 ! dimension nhru
-          IF ( PRMS_land_iteration_flag==OFF  ) THEN
+          IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             It0_sroff = Sroff
             It0_hru_sroffp = hru_sroffp
