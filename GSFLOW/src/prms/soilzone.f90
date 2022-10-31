@@ -768,7 +768,7 @@
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Hru_type, AG_flag, Model, Nowmonth !, Nowyear, Nowday
+     &    Soilzone_aet_flag, Hru_type, Model, Nowmonth !, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -817,20 +817,21 @@
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Sm2gw_grav = 0.0 ! dimension nhrucell
         Grav_gwin = 0.0 ! dimension nhru
-        IF ( AFR .AND. iter_flag == 1 ) THEN ! Kkiter == 1
-          ! iter_flag = 1 means the call is done before UZF
-          ! iter_flag = 2 means second call within MF iteration loop that is after UZF for a MODSIM-GSFLOW simulation
-          Gw2sm_grav = 0.0 ! dimension nhrucell
-          IF ( PRMS_land_iteration_flag==OFF  ) THEN
-            ! computed in srunoff
-            It0_sroff = Sroff
-            It0_hru_sroffp = hru_sroffp
-            It0_hortonian_flow = Hortonian_flow
-            It0_strm_seg_in = Strm_seg_in
-          ENDIF
-          IF ( Nlake>0 ) It0_potet = Potet
+        IF ( Kkiter == 1 ) THEN
+          IF ( AFR .AND. iter_flag == 1 ) THEN ! Kkiter == 1
+            ! iter_flag = 1 means the call is done before UZF
+            ! iter_flag = 2 means second call within MF iteration loop that is after UZF for a MODSIM-GSFLOW simulation
+            Gw2sm_grav = 0.0 ! dimension nhrucell
+            IF ( PRMS_land_iteration_flag==OFF  ) THEN
+              ! computed in srunoff
+              It0_sroff = Sroff
+              It0_hru_sroffp = hru_sroffp
+              It0_hortonian_flow = Hortonian_flow
+              It0_strm_seg_in = Strm_seg_in
+            ENDIF
+            IF ( Nlake>0 ) It0_potet = Potet
+          END IF
         END IF
-        !IF ( Kkiter>1 .or. .not. AFR ) THEN ! Kkiter>1 means GSFLOW is active
         Soil_moist = It0_soil_moist
         Soil_rechr = It0_soil_rechr
         Ssres_stor = It0_ssres_stor

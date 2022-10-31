@@ -433,7 +433,6 @@
               It0_strm_seg_in = Strm_seg_in
             ENDIF
             IF ( Nlake>0 ) It0_potet = Potet
-            Hru_ag_irr = 0.0 ! dimension nhru
           ENDIF
         ENDIF
       ELSEIF ( Iter_aet_flag==ACTIVE ) THEN
@@ -466,21 +465,19 @@
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Sm2gw_grav = 0.0 ! dimension nhrucell
         Grav_gwin = 0.0 ! dimension nhru
-        IF ( Kkiter>1 ) THEN ! Kkiter>1 means GSFLOW is active
-          Soil_moist = It0_soil_moist
-          Soil_rechr = It0_soil_rechr
-          Ssres_stor = It0_ssres_stor
-          Slow_stor = It0_slow_stor
-          IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
-          IF ( Nlake>0 ) Potet = It0_potet
-          Gravity_stor_res = It0_gravity_stor_res
-          IF ( PRMS_land_iteration_flag==OFF ) THEN
-            ! computed in srunoff
-            Sroff = It0_sroff
-            Hru_sroffp = It0_hru_sroffp
-            Hortonian_flow = It0_hortonian_flow
-            Strm_seg_in = It0_strm_seg_in
-          ENDIF
+        Soil_moist = It0_soil_moist
+        Soil_rechr = It0_soil_rechr
+        Ssres_stor = It0_ssres_stor
+        Slow_stor = It0_slow_stor
+        IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
+        IF ( Nlake>0 ) Potet = It0_potet
+        Gravity_stor_res = It0_gravity_stor_res
+        IF ( PRMS_land_iteration_flag==OFF ) THEN
+          ! computed in srunoff
+          Sroff = It0_sroff
+          Hru_sroffp = It0_hru_sroffp
+          Hortonian_flow = It0_hortonian_flow
+          Strm_seg_in = It0_strm_seg_in
         ENDIF
       ELSEIF ( Iter_aet_flag==ACTIVE ) THEN
         Sroff = It0_sroff
