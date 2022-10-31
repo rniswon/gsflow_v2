@@ -22,7 +22,7 @@
       character(len=8), parameter :: MODNAME = 'soilzone'
       character(len=*), parameter :: Version_soilzone = '2022-10-25'
       INTEGER, SAVE :: DBGUNT
-      INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag, update_potet
+      INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
       REAL, SAVE, ALLOCATABLE :: Soil_lower_stor_max(:)
       REAL, SAVE, ALLOCATABLE :: Grav_dunnian_flow(:), Pfr_dunnian_flow(:)
@@ -801,7 +801,7 @@
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow
       EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars
 ! Local Variables
-      INTEGER :: i, k, compute_lateral, j, igvr
+      INTEGER :: i, k, compute_lateral, j, igvr, update_potet
       REAL :: dunnianflw, interflow, perv_area, harea
       REAL :: dnslowflow, dnpreflow, dndunn, availh2o, avail_potet, hruactet
       REAL :: gvr_maxin, topfr !, tmp

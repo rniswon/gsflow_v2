@@ -326,7 +326,7 @@
       Ag_soilwater_deficit = 0.0
       Basin_ag_soil_moist = 0.0D0
       Basin_ag_soil_rechr = 0.0D0
-      Ag_replenish_frac = 0.0
+      !Ag_replenish_frac = 0.0
       Ag_soil_saturated = OFF
       Ag_cap_infil_tot = 0.0
       Ag_water_in = 0.0
