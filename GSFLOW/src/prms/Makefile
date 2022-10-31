@@ -312,6 +312,12 @@ c_read_parameter_file.o: c_read_parameter_file.f90
 sm_read_parameter_file.o: sm_read_parameter_file.f90 prms_read_param_file.mod prms_module.mod prms_constants.mod prms_mmfapi.mod prms_utils.mod prms_control_file.mod
 	$(FC) -c $(FFLAGS) sm_read_parameter_file.f90
 
+c_utils_prms.o: c_utils_prms.f90
+	$(FC) -c $(FFLAGS) c_utils_prms.f90
+
+sm_utils_prms.o: sm_utils_prms.f90 prms_utils.mod prms_module.mod prms_basin.mod prms_set_time.mod prms_constants.mod
+	$(FC) -c $(FFLAGS) sm_utils_prms.f90
+
 prms_climatevars.mod: climateflow.o
 prms_flowvars.mod: climateflow.o
 prms_gwflow.mod: gwflow.o
