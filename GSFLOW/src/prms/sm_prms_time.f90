@@ -10,7 +10,7 @@ contains
       use PRMS_MMFAPI, only: dattim, deltim
       USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime, Nowyear, Nowmonth, Nowday, Dprst_flag, &
                              GSFLOW_flag, PRMS_land_iteration_flag, AG_flag, Print_debug, Ag_gravity_flag, &
-                             AG_package, Hru_ag_irr
+                             Ag_package, Hru_ag_irr, timestep_start_flag
       USE PRMS_BASIN, ONLY: Hemisphere, Basin_area_inv
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Pkwater_equiv, Hru_intcpstor, &
                                Ssres_stor, Slow_stor, Pref_flow_stor, Basin_ssstor, &
@@ -40,6 +40,7 @@ contains
 
         IF ( Process_flag==RUN ) THEN
           Timestep = Timestep + 1
+          timestep_start_flag = ACTIVE
 
           CALL dattim('now', Nowtime)
           Jday = julian_day('now', 'calendar')
@@ -55,7 +56,7 @@ contains
           It0_slow_stor = Slow_stor
           It0_pref_flow_stor = Pref_flow_stor
           It0_pkwater_equiv = Pkwater_equiv
-          IF ( AG_package==ACTIVE ) Hru_ag_irr = 0.0 ! 
+          IF ( Ag_package==ACTIVE ) Hru_ag_irr = 0.0 ! 
           IF ( GSFLOW_flag==ACTIVE ) It0_gravity_stor_res = Gravity_stor_res
           IF ( GSFLOW_flag==ACTIVE .OR. Print_debug==DEBUG_WB ) It0_hru_impervstor = Hru_impervstor
           IF ( PRMS_land_iteration_flag==CANOPY .OR. Print_debug==DEBUG_WB ) It0_hru_intcpstor = Hru_intcpstor

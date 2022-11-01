@@ -52,13 +52,10 @@
 !***********************************************************************
 !     Main soilzone_ag routine
 !***********************************************************************
-      INTEGER FUNCTION soilzone_ag(AFR, iter_flag)
+      INTEGER FUNCTION soilzone_ag()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
-! Arguments
-      LOGICAL, INTENT(IN) :: AFR ! true for non-MODSIM modes, true for first iteration of MODSIM modes
-      INTEGER, INTENT(IN) :: iter_flag ! 1 for non-MODSIM modes, 2 for first iteration of MODSIM modes
 ! Functions
       INTEGER, EXTERNAL :: szdecl, szinit, szrun_ag, szdecl_ag, szinit_ag
       EXTERNAL :: soilzone_restart_ag
@@ -66,7 +63,7 @@
       soilzone_ag = 0
 
       IF ( Process_flag==RUN ) THEN
-        soilzone_ag = szrun_ag(AFR, iter_flag)
+        soilzone_ag = szrun_ag()
       ELSEIF ( Process_flag==DECL ) THEN
         soilzone_ag = szdecl()
         soilzone_ag = szdecl_ag()
@@ -361,13 +358,13 @@
 !                interflow, excess routed to stream,
 !                and groundwater reservoirs
 !***********************************************************************
-      INTEGER FUNCTION szrun_ag(AFR, iter_flag)
+      INTEGER FUNCTION szrun_ag()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
      &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, Nowmonth, Nowyear, Nowday, &
-     &    Iter_aet_flag, irrigation_apply_flag, Model
+     &    Iter_aet_flag, irrigation_apply_flag, timestep_start_flag, Model
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, Ag_area_total, &
@@ -396,9 +393,6 @@
           Hru_sroffp, Hortonian_flow, Basin_sroffp, Basin_hortonian, Infil_ag
       use prms_utils, only: print_date, error_stop
       IMPLICIT NONE
-! Arguments
-      LOGICAL, INTENT(IN) :: AFR
-      INTEGER, INTENT(IN) :: iter_flag
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow_ag
@@ -422,18 +416,17 @@
 
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE ) THEN
-        IF ( Kkiter==1 ) THEN
+        IF ( timestep_start_flag == ACTIVE ) THEN
           Gw2sm_grav = 0.0 ! dimension nhrucell
-          IF ( AFR .AND. iter_flag == 1 ) THEN
-            IF ( PRMS_land_iteration_flag==OFF ) THEN
-              ! computed in srunoff
-              It0_sroff = Sroff
-              It0_hru_sroffp = Hru_sroffp
-              It0_hortonian_flow = Hortonian_flow
-              It0_strm_seg_in = Strm_seg_in
-            ENDIF
-            IF ( Nlake>0 ) It0_potet = Potet
+          IF ( PRMS_land_iteration_flag==OFF ) THEN
+            ! computed in srunoff
+            It0_sroff = Sroff
+            It0_hru_sroffp = Hru_sroffp
+            It0_hortonian_flow = Hortonian_flow
+            It0_strm_seg_in = Strm_seg_in
           ENDIF
+          IF ( Nlake>0 ) It0_potet = Potet
+          timestep_start_flag = OFF
         ENDIF
       ELSEIF ( Iter_aet_flag==ACTIVE ) THEN
         ! computed in srunoff
@@ -464,7 +457,6 @@
 
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Sm2gw_grav = 0.0 ! dimension nhrucell
-        Grav_gwin = 0.0 ! dimension nhru
         Soil_moist = It0_soil_moist
         Soil_rechr = It0_soil_rechr
         Ssres_stor = It0_ssres_stor
