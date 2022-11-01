@@ -56,7 +56,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 !***********************************************************************
 !     MFNWT_INIT - Initialize MODFLOW module - get parameter values
 !***********************************************************************
-      SUBROUTINE MFNWT_INIT(AFR) 
+      SUBROUTINE MFNWT_INIT() 
 !     ------------------------------------------------------------------
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
@@ -75,8 +75,6 @@ C1------USE package modules.
       IMPLICIT NONE
       INTEGER :: I
       INCLUDE 'openspec.inc'
-! Arguments
-      LOGICAL, INTENT(IN) :: AFR
 ! Functions
       INTRINSIC :: DBLE
       INTEGER, EXTERNAL :: GET_KPER
@@ -396,7 +394,7 @@ C
       KPER = 1
       KPERSTART = 1
       ! run SS if needed, read to current stress period, read restart if needed
-      CALL SET_STRESS_DATES(AFR)
+      CALL SET_STRESS_DATES()
       Delt_save = DELT
       IF ( ISSFLG(1).EQ.0 ) Delt_save = 1.0/Mft_to_days
       CALL SETCONVFACTORS()
@@ -412,7 +410,7 @@ C
 !***********************************************************************
 !     MFNWT_RUN = ADVANCE TIME AND RUN THE MODFLOW SOLVER ROUTINE
 !***********************************************************************
-      SUBROUTINE MFNWT_RUN(AFR)
+      SUBROUTINE MFNWT_RUN()
 C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
@@ -439,8 +437,6 @@ c     USE LMGMODULE
 !      USE GWFNWTMODULE, ONLY:ITREAL, ICNVGFLG  !ITREAL removed from NWT module and added to PRMS_MODULE
 !      USE GWFNWTMODULE, ONLY:ICNVGFLG
       IMPLICIT NONE
-! Arguments
-      LOGICAL, INTENT(IN) :: AFR
       INCLUDE 'openspec.inc'
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: soilzone, soilzone_ag, GET_KPER
@@ -635,9 +631,9 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                 ENDIF
               ENDIF
               IF ( AG_flag==ACTIVE ) THEN
-                retval = soilzone_ag(AFR, 1)
+                retval = soilzone_ag()
               ELSE
-                retval = soilzone(AFR, 1)
+                retval = soilzone()
               ENDIF
               IF ( retval/=0 ) THEN
                 PRINT 9001, Soilzone_module, retval
@@ -1426,7 +1422,7 @@ C
 !***********************************************************************
 !     READ AND PREPARE INFORMATION FOR STRESS PERIOD.
 !***********************************************************************
-      SUBROUTINE SET_STRESS_DATES(AFR)
+      SUBROUTINE SET_STRESS_DATES()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, GSFLOW,
      &    ERROR_restart, ERROR_time, ERROR_modflow
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Kkiter, Model,
@@ -1440,8 +1436,6 @@ C
       USE GWFBASMODULE, ONLY: TOTIM
       USE OBSBASMODULE, ONLY: OBSTART,ITS
       IMPLICIT NONE
-      ! Arguments
-      LOGICAL, INTENT(IN) :: AFR
       ! Functions
       EXTERNAL :: MFNWT_RDSTRESS, RESTART1READ, GWF2BAS7OC, MFNWT_RUN
       INTRINSIC :: INT, DBLE
@@ -1491,7 +1485,7 @@ C
           CALL MFNWT_RDSTRESS()
           IF ( Init_vars_from_file==0 ) THEN
             Steady_state = 1
-            CALL MFNWT_RUN(AFR)    ! ITERATE TO SOLVE GW-SW SOLUTION FOR SS
+            CALL MFNWT_RUN()    ! ITERATE TO SOLVE GW-SW SOLUTION FOR SS
             CALL MFNWT_OCBUDGET()          ! CALCULATE BUDGET
             Steady_state = 0
  !           TOTIM = plen !RGN 9/4/2018 TOTIM needs to stay in MF time units
