@@ -381,7 +381,7 @@
           IF ( Covden_sum_next_yr==Nowyear .AND. Covden_sum_next_mo==Nowmonth .AND. Covden_sum_next_day==Nowday ) THEN
             READ ( Covden_sum_unit, *, IOSTAT=ios ) Covden_sum_next_yr, Covden_sum_next_mo, Covden_sum_next_day, Temp
             if (ios /= 0) call error_stop('reading covden_sum dynamic parameter file', ERROR_dynamic)
-            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_sum(:,Nowmonth), 'covden_sum')
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_sum, 'covden_sum')
             CALL is_eof(Covden_sum_unit, Covden_sum_next_yr, Covden_sum_next_mo, Covden_sum_next_day)
           ENDIF
         ENDIF
@@ -391,7 +391,7 @@
           IF ( Covden_win_next_yr==Nowyear .AND. Covden_win_next_mo==Nowmonth .AND. Covden_win_next_day==Nowday ) THEN
             READ ( Covden_win_unit, *, IOSTAT=ios ) Covden_win_next_yr, Covden_win_next_mo, Covden_win_next_day, Temp
             if (ios /= 0) call error_stop('reading covden_win dynamic parameter file', ERROR_dynamic)
-            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_win(:,Nowmonth), 'covden_win')
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_win, 'covden_win')
             CALL is_eof(Covden_win_unit, Covden_win_next_yr, Covden_win_next_mo, Covden_win_next_day)
           ENDIF
         ENDIF

@@ -321,9 +321,9 @@
 !******Adjust interception amounts for changes in summer/winter cover density
 
         IF ( Transp_on(i)==ACTIVE ) THEN
-          Canopy_covden(i) = Covden_sum(i,Nowmonth)
+          Canopy_covden(i) = Covden_sum(i)
         ELSE
-          Canopy_covden(i) = Covden_win(i,Nowmonth)
+          Canopy_covden(i) = Covden_win(i)
         ENDIF
         cov = Canopy_covden(i)
         Intcp_form(i) = RAIN
@@ -352,18 +352,18 @@
           Intcp_transp_on(i) = OFF
           IF ( intcpstor>0.0 ) THEN
             ! assume canopy storage change falls as throughfall
-            diff = Covden_sum(i,Nowmonth) - cov
+            diff = Covden_sum(i) - cov
             changeover = intcpstor*diff
             IF ( cov>0.0 ) THEN
               IF ( changeover<0.0 ) THEN
                 ! covden_win > covden_sum, adjust intcpstor to same volume, and lower depth
-                intcpstor = intcpstor*Covden_sum(i,Nowmonth)/cov
+                intcpstor = intcpstor*Covden_sum(i)/cov
                 changeover = 0.0
               ENDIF
             ELSE
               IF ( Print_debug>DEBUG_less ) THEN
                 PRINT *, 'covden_win=0 at winter change over with canopy storage, HRU:', i, Nowyear, Nowmonth, Nowday
-                PRINT *, 'intcp_stor:', intcpstor, ' covden_sum:', Covden_sum(i,Nowmonth)
+                PRINT *, 'intcp_stor:', intcpstor, ' covden_sum:', Covden_sum(i)
               ENDIF
               intcpstor = 0.0
             ENDIF
@@ -373,18 +373,18 @@
         ELSEIF ( Transp_on(i)==ACTIVE .AND. Intcp_transp_on(i)==OFF ) THEN
           Intcp_transp_on(i) = ACTIVE
           IF ( intcpstor>0.0 ) THEN
-            diff = Covden_win(i,Nowmonth) - cov
+            diff = Covden_win(i) - cov
             changeover = intcpstor*diff
             IF ( cov>0.0 ) THEN
               IF ( changeover<0.0 ) THEN
                 ! covden_sum > covden_win, adjust intcpstor to same volume, and lower depth
-                intcpstor = intcpstor*Covden_win(i,Nowmonth)/cov
+                intcpstor = intcpstor*Covden_win(i)/cov
                 changeover = 0.0
               ENDIF
             ELSE
               IF ( Print_debug>DEBUG_less ) THEN
                 PRINT *, 'covden_sum=0 at summer change over with canopy storage, HRU:', i, Nowyear, Nowmonth, Nowday
-                PRINT *, 'intcp_stor:', intcpstor, ' covden_win:', Covden_win(i,Nowmonth)
+                PRINT *, 'intcp_stor:', intcpstor, ' covden_win:', Covden_win(i)
               ENDIF
               intcpstor = 0.0
             ENDIF
