@@ -134,8 +134,8 @@
 
       ELSEIF ( Process_flag==INIT ) THEN
         ! Get parameters
-        IF ( getparam_real(MODNAME, 'crad_coef', Nhru*MONTHS_PER_YEAR, Crad_coef)/=0) CALL read_error(2, 'crad_coef')
-        IF ( getparam_real(MODNAME, 'crad_exp', Nhru*MONTHS_PER_YEAR, Crad_exp)/=0) CALL read_error(2, 'crad_exp')
+        IF ( getparam_real(MODNAME, 'crad_coef', Nhru*MONTHS_PER_YEAR, Crad_coef)/=0 ) CALL read_error(2, 'crad_coef')
+        IF ( getparam_real(MODNAME, 'crad_exp', Nhru*MONTHS_PER_YEAR, Crad_exp)/=0 ) CALL read_error(2, 'crad_exp')
 
         Cloud_radadj = 0.0
 

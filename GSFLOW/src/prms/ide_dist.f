@@ -66,10 +66,9 @@
 !     idedecl - set up parameters for temperature computations
 !***********************************************************************
       INTEGER FUNCTION idedecl()
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION
       use PRMS_MMFAPI, only: declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Model, Nhru, Ntemp, Nrain
+      USE PRMS_MODULE, ONLY: Nhru, Ntemp, Nrain
       USE PRMS_IDE
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -78,19 +77,17 @@
 
       CALL print_module(MODDESC, MODNAME, Version_ide_dist)
 
-      IF ( Model/=DOCUMENTATION ) THEN
-        ALLOCATE ( Tmax_rain_sta(Nrain) )
-        CALL declvar_real(MODNAME, 'tmax_rain_sta', 'nrain', Nrain,
-     +       'Maximum temperature distributed to the precipitation'//
-     +       ' measurement stations',
-     +       'degrees Fahrenheit', Tmax_rain_sta)
+      ALLOCATE ( Tmax_rain_sta(Nrain) )
+      CALL declvar_real(MODNAME, 'tmax_rain_sta', 'nrain', Nrain,
+     +     'Maximum temperature distributed to the precipitation'//
+     +     ' measurement stations',
+     +     'degrees Fahrenheit', Tmax_rain_sta)
 
-        ALLOCATE ( Tmin_rain_sta(Nrain) )
-        CALL declvar_real(MODNAME, 'tmin_rain_sta', 'nrain', Nrain,
-     +       'Minimum temperature distributed to the precipitation'//
-     +       ' measurement stations',
-     +       'degrees Fahrenheit', Tmin_rain_sta)
-      ENDIF
+      ALLOCATE ( Tmin_rain_sta(Nrain) )
+      CALL declvar_real(MODNAME, 'tmin_rain_sta', 'nrain', Nrain,
+     +     'Minimum temperature distributed to the precipitation'//
+     +     ' measurement stations',
+     +     'degrees Fahrenheit', Tmin_rain_sta)
 
 ! declare parameters
       ALLOCATE ( Adjust_snow(Nrain,MONTHS_PER_YEAR) )

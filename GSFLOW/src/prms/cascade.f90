@@ -73,9 +73,9 @@
 !     hru_area, cascade_tol, cascade_flg, circle_switch
 !***********************************************************************
       INTEGER FUNCTION cascdecl()
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, CASCADE_OFF, CASCADE_HRU_SEGMENT, CASCADE_NORMAL, CASCADEGW_OFF
+      USE PRMS_CONSTANTS, ONLY: CASCADE_OFF, CASCADE_HRU_SEGMENT, CASCADE_NORMAL, CASCADEGW_OFF
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Ngw, Ncascade, Ncascdgw, Model, Print_debug, Cascade_flag, Cascadegw_flag
+      USE PRMS_MODULE, ONLY: Nhru, Ngw, Ncascade, Ncascdgw, Print_debug, Cascade_flag, Cascadegw_flag
       USE PRMS_CASCADE
       use prms_utils, only: print_module, PRMS_open_module_file, read_error
       IMPLICIT NONE
@@ -86,9 +86,9 @@
 
       CALL print_module(MODDESC, MODNAME, Version_cascade)
 
-      IF ( Cascade_flag>CASCADE_OFF .OR. Model==DOCUMENTATION ) ALLOCATE ( Ncascade_hru(Nhru) )
+      IF ( Cascade_flag>CASCADE_OFF ) ALLOCATE ( Ncascade_hru(Nhru) )
 
-      IF ( Cascadegw_flag>CASCADEGW_OFF .OR. Model==DOCUMENTATION ) ALLOCATE ( Ncascade_gwr(Ngw) )
+      IF ( Cascadegw_flag>CASCADEGW_OFF ) ALLOCATE ( Ncascade_gwr(Ngw) )
 
       IF ( Print_debug==13 ) CALL PRMS_open_module_file(MSGUNT, 'cascade.msgs')
 
@@ -99,7 +99,7 @@
         ALLOCATE ( Hru_down_id(Ncascade) )
         ALLOCATE ( Hru_pct_up(Ncascade) )
       ENDIF
-      IF ( Cascade_flag==CASCADE_NORMAL .OR. Model==DOCUMENTATION ) THEN
+      IF ( Cascade_flag==CASCADE_NORMAL ) THEN
         IF ( declparam(MODNAME, 'hru_up_id', 'ncascade', 'integer', &
      &       '0', 'bounded', 'nhru', &
      &       'Index of HRU containing cascade area', &
@@ -125,7 +125,7 @@
      &       ' to a downslope HRU or stream segment for cascade area', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'hru_pct_up')
       ENDIF
-      IF ( Cascade_flag==CASCADE_HRU_SEGMENT .OR. Model==DOCUMENTATION ) THEN ! use hru_segment to define simple cascades
+      IF ( Cascade_flag==CASCADE_HRU_SEGMENT ) THEN ! use hru_segment to define simple cascades
         ALLOCATE ( Hru_segment(Nhru) )
         IF ( declparam(MODNAME, 'hru_segment', 'nhru', 'integer', &
      &       '0', 'bounded', 'nsegment', &
@@ -134,7 +134,7 @@
      &       ' (surface runoff, interflow, and groundwater discharge)', &
      &       'none')/=0 ) CALL read_error(1, 'hru_segment')
       ENDIF
-      IF ( Cascade_flag/=CASCADE_HRU_SEGMENT .OR. Model==DOCUMENTATION ) THEN
+      IF ( Cascade_flag/=CASCADE_HRU_SEGMENT ) THEN
         IF ( declparam(MODNAME, 'cascade_tol', 'one', 'real', &
      &       '5.0', '0.0', '99.0', &
      &       'Cascade area below which a cascade link is ignored', &
@@ -160,7 +160,7 @@
         ALLOCATE ( Gw_down_id(Ncascdgw) )
         ALLOCATE ( Gw_pct_up(Ncascdgw) )
       ENDIF
-      IF ( Cascadegw_flag==CASCADE_NORMAL .OR. Model==DOCUMENTATION ) THEN
+      IF ( Cascadegw_flag==CASCADE_NORMAL ) THEN
 ! declare GWR cascade parameters
         IF ( declparam(MODNAME, 'gw_up_id', 'ncascdgw', 'integer', &
      &       '0', 'bounded', 'ngw', &

@@ -9,9 +9,9 @@
      &          EQULS = '===================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 10/26/2022'
-      character(len=*), parameter :: PRMS_versn = '2022-10-26'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 10/26/2022'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 12/20/2022'
+      character(len=*), parameter :: PRMS_versn = '2022-12-01'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 12/01/2022'
       character(len=*), parameter :: Version_read_control_file = '2022-10-20'
       character(len=*), parameter :: Version_read_parameter_file = '2022-01-12'
       character(len=*), parameter :: Version_read_data_file = '2022-06-02'
@@ -33,7 +33,7 @@
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag, Albedo_cbh_flag, Cloud_cover_cbh_flag
       INTEGER, SAVE :: PRMS_flag, GSFLOW_flag, PRMS4_flag, MODSIM_flag
       INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Grid_flag, Ag_package
-      INTEGER, SAVE :: Canopy_iter,irrigated_area_flag, AET_cbh_flag, PET_cbh_flag
+      INTEGER, SAVE :: Canopy_iter, irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Dynamic_soil_flag, Water_use_flag, Soilzone_add_water_use
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
@@ -62,7 +62,7 @@
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag, forcing_check_flag
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, Iter_aet_flag, text_restart_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag, no_snow_flag
-      INTEGER, SAVE :: irrigation_apply_flag, Dyn_ag_frac_flag, Dyn_ag_soil_flag, seg2hru_flag, Ag_gravity_flag
+      INTEGER, SAVE :: irrigation_apply_flag, Dyn_ag_frac_flag, Dyn_ag_soil_flag, seg2hru_flag !, Ag_gravity_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF, outputSelectDatesON_OFF, snow_cloudcover_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName
@@ -127,7 +127,7 @@
 !-------ASSIGN VERSION NUMBER AND DATE
       CHARACTER*40 VERSION,VERSION2,VERSION3
       CHARACTER*10 MFVNAM
-      PARAMETER (VERSION='1.2.0 03/01/2020')
+      PARAMETER (VERSION='1.3.0 06/01/2022')
       PARAMETER (VERSION2='1.12.0 02/03/2017')
       PARAMETER (VERSION3='1.04.0 09/15/2016')
       PARAMETER (MFVNAM='-NWT-SWR1')

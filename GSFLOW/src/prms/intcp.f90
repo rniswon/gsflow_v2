@@ -60,10 +60,10 @@
 !     covden_win, covden_sum, epan_coef, hru_area, hru_pansta
 !***********************************************************************
       INTEGER FUNCTION intdecl()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, MONTHS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, AG_flag, GSFLOW_flag
+      USE PRMS_MODULE, ONLY: Nhru, Water_use_flag, AG_flag, GSFLOW_flag
       use prms_utils, only: print_module, read_error
       USE PRMS_INTCP
       IMPLICIT NONE
@@ -76,7 +76,7 @@
       ALLOCATE ( Net_apply(Nhru) )
       ALLOCATE ( Irr_type(Nhru) )
       Use_transfer_intcp = OFF
-      IF ( Water_use_flag==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+      IF ( Water_use_flag==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE ) THEN
         ! always declare for GSFLOW as may be needed if the AG Package is active
         ! don't know if AG Package is active during declare, set during init
         IF ( Water_use_flag==ACTIVE ) Use_transfer_intcp = ACTIVE

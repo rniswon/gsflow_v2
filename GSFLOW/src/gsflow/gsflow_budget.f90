@@ -262,10 +262,10 @@
      &    Basin_area_inv, Hru_area, Lake_hru_id, Lake_area
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Hru_actet, Basin_sroff, &
      &    Basin_actet, Basin_ssstor, Ssres_stor, Slow_stor, Basin_ssflow_cfs, Basin_sroff_cfs, &
-     &    Basin_gwflow_cfs, Pref_flow_stor, Gravity_stor_res, Dprst_vol_open, Dprst_vol_clos
+     &    Basin_gwflow_cfs, Pref_flow_stor, Gravity_stor_res, Dprst_vol_open !, Dprst_vol_clos
       USE PRMS_SET_TIME, ONLY: Cfs_conv
 !Warning, modifies Basin_ssstor, and Gw2sm_grav
-      USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop, Basin_dprst_volcl
+      USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop !, Basin_dprst_volcl
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
       IMPLICIT NONE
 ! Functions
@@ -380,7 +380,7 @@
         Basin_fluxchange = Basin_fluxchange + Fluxchange(i)*harea
         IF ( Dprst_flag == ACTIVE .AND. Ag_package == ACTIVE ) THEN
           Basin_dprst_volop = Basin_dprst_volop + Dprst_vol_open(i)
-          Basin_dprst_volcl = Basin_dprst_volcl + Dprst_vol_clos(i)
+!          Basin_dprst_volcl = Basin_dprst_volcl + Dprst_vol_clos(i)
         ENDIF
       ENDDO
 
@@ -394,7 +394,7 @@
       Basin_fluxchange = Basin_fluxchange*Basin_area_inv
       IF ( Dprst_flag == ACTIVE .AND. Ag_package == ACTIVE ) THEN
         Basin_dprst_volop = Basin_dprst_volop*Basin_area_inv
-        Basin_dprst_volcl = Basin_dprst_volcl*Basin_area_inv
+!        Basin_dprst_volcl = Basin_dprst_volcl*Basin_area_inv
       ENDIF
 
       !IF ( IUNIT(1)>0 ) CALL MODFLOW_GET_STORAGE_BCF()

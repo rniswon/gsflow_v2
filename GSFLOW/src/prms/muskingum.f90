@@ -174,7 +174,7 @@
 !     muskingum_run - Compute routing summary values
 !***********************************************************************
       INTEGER FUNCTION muskingum_run()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, CFS2CMS_CONV, OUTFLOW_SEGMENT, ERROR_streamflow
+      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV, OUTFLOW_SEGMENT, ERROR_streamflow
       USE PRMS_MODULE, ONLY: Nsegment, Glacier_flag
       USE PRMS_MUSKINGUM
       USE PRMS_BASIN, ONLY: Basin_area_inv, Basin_gl_cfs, Basin_gl_ice_cfs
@@ -356,7 +356,7 @@
       Basin_cfs = Flow_out
       Basin_stflow_out = Basin_cfs / area_fac
       Basin_cms = Basin_cfs*CFS2CMS_CONV
-      IF ( Glacier_flag==ACTIVE ) THEN
+      IF ( Glacier_flag==1 ) THEN
         Basin_stflow_in = Basin_stflow_in + Basin_gl_top_melt
         Basin_gl_ice_cfs = Basin_gl_ice_melt*area_fac
         Basin_gl_cfs = Basin_gl_top_melt*area_fac

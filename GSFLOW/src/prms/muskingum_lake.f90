@@ -97,7 +97,7 @@
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       character(len=*), parameter :: MODDESC = 'Streamflow & Lake Routing'
       character(len=14), parameter :: MODNAME = 'muskingum_lake'
-      character(len=*), parameter :: Version_muskingum_lake = '2021-11-19'
+      character(len=*), parameter :: Version_muskingum_lake = '2022-10-24'
       INTEGER, SAVE :: Obs_flag, Linear_flag, Weir_flag, Gate_flag, Puls_flag
       INTEGER, SAVE :: Secondoutflow_flag
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
@@ -202,10 +202,10 @@
 !     lake_out2, lake_out2_a, lake_out2_b
 !***********************************************************************
       INTEGER FUNCTION muskingum_lake_decl()
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, CASCADE_OFF, ERROR_dim
+      USE PRMS_CONSTANTS, ONLY: CASCADE_OFF, ERROR_dim
       use PRMS_MMFAPI, only: declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam, getdim
-      USE PRMS_MODULE, ONLY: Model, Nsegment, Nratetbl, Nlake, Init_vars_from_file, Cascade_flag
+      USE PRMS_MODULE, ONLY: Nsegment, Nratetbl, Nlake, Init_vars_from_file, Cascade_flag
       USE PRMS_MUSKINGUM_LAKE
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -217,7 +217,6 @@
       ! Dimension for Puls routing
       Mxnsos = getdim('mxnsos')
       IF ( Mxnsos==-1 ) CALL read_error(1, 'mxnsos')
-      IF ( Model==DOCUMENTATION .AND. Mxnsos<1 ) Mxnsos = 1
 
 ! Nlake_hrus set to nlake in call_modules for 5.0.0, dimension nlake_hrus will be in 5.0.1
 ! 5.0.0 assumes lakes are 1 HRU
@@ -231,7 +230,6 @@
       Nstage3 = 0
       Ngate4 = 0
       Nstage4 = 0
-      IF ( Model==DOCUMENTATION ) Nratetbl = 4
       IF ( Nratetbl>4 ) THEN
         PRINT *, 'dimension nratetbl specified as:', Nratetbl
         CALL error_stop('lake routing allows a maximum of 4 rating tables', ERROR_dim)
@@ -259,18 +257,7 @@
             ENDIF
           ENDIF
         ENDIF
-        IF ( Model==DOCUMENTATION ) THEN
-          IF ( Nstage==0 ) Nstage = 1
-          IF ( Ngate==0 ) Ngate = 1
-          IF ( Nstage2==0 ) Nstage2 = 1
-          IF ( Ngate2==0 ) Ngate2 = 1
-          IF ( Nstage3==0 ) Nstage3 = 1
-          IF ( Ngate3==0 ) Ngate3 = 1
-          IF ( Nstage4==0 ) Nstage4 = 1
-          IF ( Ngate4==0 ) Ngate4 = 1
-        ELSE
-          IF ( Nstage<1 .OR. Ngate<1 ) CALL error_stop('nratetbl>0 and nstage or ngate = 0', ERROR_dim)
-        ENDIF
+        IF ( Nstage<1 .OR. Ngate<1 ) CALL error_stop('nratetbl>0 and nstage or ngate = 0', ERROR_dim)
         IF ( Nratetbl>1 ) THEN
           IF ( Nstage2<1.OR.Ngate2<1 ) CALL error_stop('nratetbl>1 and nstage2 or ngate2 = 0', ERROR_dim)
         ENDIF
@@ -328,7 +315,7 @@
      &     'Total precipitation into each lake', &
      &     'cfs', Lake_precip)
 
-      IF ( Cascade_flag>CASCADE_OFF .OR. Model==DOCUMENTATION ) THEN
+      IF ( Cascade_flag>CASCADE_OFF ) THEN
         ALLOCATE ( Lake_lateral_inflow(Nlake) )
         CALL declvar_dble(MODNAME, 'lake_lateral_inflow', 'nlake', Nlake, &
      &       'Lateral inflow to each lake', &
@@ -380,7 +367,7 @@
      &     'acre-inches', Lake_outvol_ts)
 
 ! Declared Variables for lakes with a second outlet and gate opening routing
-      IF ( Nratetbl>0 .OR. Model==DOCUMENTATION ) THEN
+      IF ( Nratetbl>0 ) THEN
         CALL declvar_dble(MODNAME, 'basin_2ndstflow', 'one', 1, &
      &       'Basin volume-weighted average streamflow from each lake with a second outlet', &
      &       'inches', Basin_2ndstflow)
@@ -725,7 +712,7 @@
         IF ( getparam_real(MODNAME, 'tbl_gate', Ngate, Tbl_gate)/=0 ) CALL read_error(2, 'tbl_gate')
         IF ( getparam_int(MODNAME, 'ratetbl_lake', Nratetbl, Ratetbl_lake)/=0 ) CALL read_error(2, 'ratetbl_lake')
         IF ( Gate_flag==1 ) THEN
-          IF ( getparam_int(MODNAME, 'lake_out2', Nlake, Lake_out2)/=0  ) CALL read_error(2, 'lake_out2')
+          IF ( getparam_int(MODNAME, 'lake_out2', Nlake, Lake_out2)/=0 ) CALL read_error(2, 'lake_out2')
           DO j = 1, Nlake
             IF ( Lake_out2(j)==1 ) Secondoutflow_flag = ACTIVE
           ENDDO
@@ -1152,7 +1139,7 @@
       Basin_cfs = Flow_out
       Basin_stflow_out = Basin_cfs / area_fac
       Basin_cms = Basin_cfs*CFS2CMS_CONV
-      IF ( Glacier_flag==ACTIVE ) THEN
+      IF ( Glacier_flag==1 ) THEN
         Basin_stflow_in = Basin_stflow_in + Basin_gl_top_melt
         Basin_gl_ice_cfs = Basin_gl_ice_melt*area_fac
         Basin_gl_cfs = Basin_gl_top_melt*area_fac

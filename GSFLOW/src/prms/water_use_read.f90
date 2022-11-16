@@ -8,7 +8,7 @@
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'water_use_read'
-      character(len=*), parameter :: Version_water_use_read = '2021-11-19'
+      character(len=*), parameter :: Version_water_use_read = '2022-09-07'
 
       ! transfer type
       integer, parameter :: STREAM = 1
@@ -50,7 +50,7 @@
       END MODULE PRMS_WATER_USE
 
       INTEGER FUNCTION water_use_read()
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, &
      &    RUN, DECL, INIT, CLEAN, ERROR_water_use, strmflow_noroute_module, strmflow_muskingum_lake_module
      use PRMS_CONTROL_FILE, only: control_string
      use PRMS_MMFAPI, only: declvar_dble, declvar_real
@@ -58,7 +58,7 @@
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nsegment, Nwateruse, Nexternal, Nconsumed, &
      &    Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
      &    External_transferON_OFF, Dprst_transferON_OFF, Dprst_flag, Strmflow_flag, &
-     &    Model, Inputerror_flag, Start_year, Start_month, Start_day, Soilzone_add_water_use, &
+     &    Inputerror_flag, Start_year, Start_month, Start_day, Soilzone_add_water_use, &
      &    End_year, End_month, End_day, Dprst_transfer_water_use, Dprst_add_water_use, &
      &    Gwr_transfer_water_use, Gwr_add_water_use, Lake_transfer_water_use, Lake_add_water_use
       USE PRMS_WATER_USE
@@ -250,8 +250,8 @@
         CALL print_module(MODDESC, MODNAME, Version_water_use_read)
 
         Dprst_transfers_on = OFF
-        IF ( Dprst_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
-          IF ( Dprst_transferON_OFF==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( Dprst_flag==ACTIVE ) THEN
+          IF ( Dprst_transferON_OFF==ACTIVE ) THEN
             Dprst_transfers_on = ACTIVE
             ALLOCATE ( Dprst_transfer(Nhru) )
             CALL declvar_real(MODNAME, 'dprst_transfer', 'nhru', Nhru, &
@@ -276,14 +276,14 @@
           CALL declvar_dble(MODNAME, 'total_dprst_gain', 'one', 1, &
      &         'Transfer gains to all surface-depression storage for each time step', &
      &         'cfs', Total_dprst_gain)
-        ELSEIF ( Dprst_transferON_OFF==ACTIVE .AND. Model/=DOCUMENTATION ) THEN
+        ELSEIF ( Dprst_transferON_OFF==ACTIVE ) THEN
           PRINT *, 'ERROR, specified to transfer water from surface-depression storage when dprst_flag = 0'
           Inputerror_flag = 1
         ENDIF
 
         Segment_transfers_on = OFF
-        IF ( Strmflow_flag>strmflow_noroute_module .OR. Model==DOCUMENTATION ) THEN
-          IF ( Segment_transferON_OFF==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( Strmflow_flag>strmflow_noroute_module ) THEN
+          IF ( Segment_transferON_OFF==ACTIVE ) THEN
             Segment_transfers_on = ACTIVE
             ALLOCATE ( Segment_transfer(Nsegment) )
             CALL declvar_real(MODNAME, 'segment_transfer', 'nsegment', Nsegment, &
@@ -308,13 +308,13 @@
           CALL declvar_dble(MODNAME, 'total_segment_gain', 'one', 1, &
      &         'Transfer gains to all stream segments for each time step', &
      &         'cfs', Total_segment_gain)
-        ELSEIF ( Segment_transferON_OFF==ACTIVE .AND. Model/=DOCUMENTATION ) THEN
+        ELSEIF ( Segment_transferON_OFF==ACTIVE ) THEN
           PRINT *, 'ERROR, specified to transfer water from stream segments when they are not present'
           Inputerror_flag = 1
         ENDIF
 
         Gwr_transfers_on = OFF
-        IF ( Gwr_transferON_OFF==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( Gwr_transferON_OFF==ACTIVE ) THEN
           Gwr_transfers_on = ACTIVE
           ALLOCATE ( Gwr_transfer(Nhru) )
           CALL declvar_real(MODNAME, 'gwr_transfer', 'nhru', Nhru, &
@@ -341,8 +341,8 @@
      &       'cfs', Total_gwr_gain)
 
         Lake_transfers_on = OFF
-        IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Model==DOCUMENTATION ) THEN
-          IF ( Lake_transferON_OFF==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( Strmflow_flag==strmflow_muskingum_lake_module ) THEN
+          IF ( Lake_transferON_OFF==ACTIVE ) THEN
             Lake_transfers_on = ACTIVE
             ALLOCATE ( Lake_transfer(Nhru) )
             CALL declvar_real(MODNAME, 'lake_transfer', 'nhru', Nhru, &
@@ -367,13 +367,13 @@
           CALL declvar_dble(MODNAME, 'total_lake_gain', 'one', 1, &
      &         'Transfer gains to all lake HRUs for each time step', &
      &         'cfs', Total_lake_gain)
-        ELSEIF ( Lake_transferON_OFF==ACTIVE .AND. Model/=DOCUMENTATION ) THEN
+        ELSEIF ( Lake_transferON_OFF==ACTIVE ) THEN
           PRINT *, 'ERROR, specified to transfer water from lakes when lake module is not active'
           Inputerror_flag = 1
         ENDIF
 
         External_transfers_on = OFF
-        IF ( (External_transferON_OFF==ACTIVE.AND.Nexternal>0) .OR. Model==DOCUMENTATION ) THEN
+        IF ( (External_transferON_OFF==ACTIVE.AND.Nexternal>0) ) THEN
           External_transfers_on = ACTIVE
           ALLOCATE ( External_transfer(Nexternal) )
           CALL declvar_real(MODNAME, 'external_transfer', 'nexternal', Nexternal, &

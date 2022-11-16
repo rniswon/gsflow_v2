@@ -80,7 +80,6 @@
       INTEGER :: year, month, day, istop, ierr
 !***********************************************************************
       dynparaminit = 0
-      istop = 0
 
       year = Start_year
       month = Start_month
@@ -88,6 +87,7 @@
 
       ALLOCATE ( Temp(Nhru), Itemp(Nhru), Updated_hrus(Nhru) )
 
+      istop = 0
       Wrainintcp_flag = OFF
       Srainintcp_flag = OFF
       Snowintcp_flag = OFF

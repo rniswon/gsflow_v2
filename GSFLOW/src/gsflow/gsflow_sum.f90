@@ -744,9 +744,11 @@
         ENDIF
 
         rnf = Basin_hortonian + Basin_dunnian - Basin_sroff
-        IF ( ABS(rnf)>ERRCHK ) WRITE (BALUNT, *) 'runoff', rnf, Basin_hortonian, Basin_dunnian, Basin_sroff
+        IF ( ABS(rnf)>ERRCHK ) WRITE (BALUNT, *) 'runoff', rnf, &
+     &       Basin_hortonian, Basin_dunnian, Basin_sroff
         gvf = Basin_slowflow + Basin_prefflow - Basin_ssflow
-        IF ( ABS(gvf)>ERRCHK ) WRITE (BALUNT, *) 'gravflow', gvf, Basin_slowflow, Basin_prefflow, Basin_ssflow
+        IF ( ABS(gvf)>ERRCHK ) WRITE (BALUNT, *) 'gravflow', gvf, &
+     &       Basin_slowflow, Basin_prefflow, Basin_ssflow
 
         szin = Basin_infil + Basin_gw2sm + Basin_szreject
         szdstor = It0_basin_soil_moist + It0_basin_ssstor - Basin_soil_moist - Basin_ssstor
@@ -755,7 +757,8 @@
         IF ( Basin_soil_moist>0.0D0 ) THEN
           IF ( ABS(szin-szout+szdstor)>ERRCHK ) THEN
             WRITE (BALUNT, 9002) Nowyear, Nowmonth, Nowday
-            WRITE (BALUNT, *) 'SZ flow', szin-szout+szdstor, szin, szout, szdstor
+            WRITE (BALUNT, *) 'SZ flow', szin-szout+szdstor, szin, &
+     &                        szout, szdstor
             WRITE (BALUNT, *) 'SZ flow', Basin_infil, Basin_gw2sm, &
      &                        Basin_szreject, It0_basin_soil_moist, &
      &                        It0_basin_ssstor, Basin_soil_moist, &
@@ -958,8 +961,7 @@
 !***********************************************************************
       SUBROUTINE BASIN_GET_STORAGE()
       USE GSFSUM
-      USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor
-      USE PRMS_SNOW, ONLY: Basin_pweqv
+      USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_pweqv
       USE PRMS_INTCP, ONLY: Basin_intcp_stor
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor
       USE PRMS_SOILZONE, ONLY: Basin_pref_stor

@@ -618,7 +618,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                 retval = intcp()
                 IF ( no_snow_flag==OFF ) THEN
                   retval = snowcomp()
-                  IF ( Glacier_flag==ACTIVE ) THEN
+                  IF ( Glacier_flag==1 ) THEN
                     retval = glacr()
                   ENDIF
                 ENDIF

@@ -58,11 +58,10 @@
 !     hru_area, mxsziter
 !***********************************************************************
       INTEGER FUNCTION prms2mfdecl()
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION
       USE GSFPRMS2MF
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Nsegment, Model
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Nhru, Nsegment
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
 !***********************************************************************
@@ -138,7 +137,7 @@
 !    &     'Index of stream segment associate with each stream reach', &
 !    &     'none')/=0 ) CALL read_error(1, 'reach_segment')
 
-      IF ( Nhru/=Nhrucell .OR. Model==DOCUMENTATION ) THEN
+      IF ( Nhru/=Nhrucell ) THEN
         ALLOCATE ( Gvr_hru_pct(Nhrucell) )
         IF ( declparam('prms2mf', 'gvr_hru_pct', 'nhrucell', 'real', &
      &       '0.0', '0.0', '1.0', &
@@ -315,7 +314,7 @@
      &           PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
           ENDIF
           IF ( IUZFBND(icol, irow)==0 ) THEN
-            IF ( Hru_type(ihru)==1 .OR. Hru_type(ihru)>3 ) then
+            IF ( Hru_type(ihru)==1 .OR. Hru_type(ihru)>2 ) then
                 PRINT *, 'WARNING, UZF cell inactive, irow:', irow, ' icol:',icol,'icell:',icell, ' HRU is active:', ihru
             end if
           ENDIF

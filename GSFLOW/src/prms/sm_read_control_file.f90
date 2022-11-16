@@ -89,7 +89,7 @@ contains
     use PRMS_MODULE, only: Print_debug, Dprst_flag, Cascade_flag, Soilzone_aet_flag, PRMS_land_iteration_flag, &
                            Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, irrigated_area_module, AET_module, &
                            PET_ag_module, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, &
-                           Dyn_ag_frac_flag, Dyn_ag_soil_flag, AET_cbh_flag, PET_cbh_flag, &
+                           Dyn_ag_frac_flag, Dyn_ag_soil_flag, &
                            mappingFileName, xyFileName, Iter_aet_flag, text_restart_flag, irrigation_apply_flag
     use PRMS_CLIMATE_HRU, only: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, Albedo_day, Cloud_cover_day, &
                                 Cbh_check_flag, Windspeed_day, Humidity_day, &
@@ -401,9 +401,9 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'no_snow_flag'
     no_snow_flag = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'ag_gravity_flag'
-    Ag_gravity_flag = OFF
+!    i = i + 1
+!    Control_parameter_data(i) % name = 'ag_gravity_flag'
+!    Ag_gravity_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'stream_temp_flag'
     Stream_temp_flag = OFF
@@ -536,12 +536,6 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'dyn_ag_soil_flag'
     Dyn_ag_soil_flag = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'AET_cbh_flag'
-    AET_cbh_flag = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'PET_cbh_flag'
-    PET_cbh_flag = OFF
 !    i = i + 1
 !    Control_parameter_data(i) % name = 'dispGraphsBuffSize'
 !    DispGraphsBuffSize = 50

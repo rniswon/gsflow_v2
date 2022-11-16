@@ -23,7 +23,7 @@
         INTEGER, SAVE :: Dprst_frac_next_yr, Dprst_frac_next_mo, Dprst_frac_next_day, Dprst_frac_unit, Dprst_frac_flag
         INTEGER, SAVE :: Soilmoist_flag, Soilrechr_flag, Output_unit
         INTEGER, SAVE, ALLOCATABLE :: Updated_hrus(:)
-        REAL, SAVE, ALLOCATABLE :: Temp(:), temp_imperv_frac(:), temp_ag_frac(:), temp_sm_frac(:), temp_dprst_frac(:)
+        REAL, SAVE, ALLOCATABLE :: Temp(:), temp_imperv_frac(:), temp_sm_frac(:), temp_dprst_frac(:), temp_ag_frac(:)
         REAL, SAVE, ALLOCATABLE :: Soil_rechr_max_frac(:)
 ! Control Parameters
         CHARACTER(LEN=MAXFILE_LENGTH) :: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic
@@ -60,12 +60,11 @@
 !***********************************************************************
       INTEGER FUNCTION dynsoilparaminit()
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, OFF, ERROR_dynamic, DEBUG_minimum
-      use PRMS_CONTROL_FILE, only: control_string
-      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Start_year, Start_month, Start_day, &
-     &    Dyn_imperv_flag, Dyn_dprst_flag, Dyn_ag_soil_flag, AG_flag, &
-     &    Dyn_soil_flag, Dprst_flag, PRMS4_flag, Dyn_ag_frac_flag
-      USE PRMS_DYNAMIC_SOIL_PARAM_READ
-      use prms_utils, only: error_stop, find_current_file_time, find_header_end, PRMS_open_output_file, read_error, numchars
+        use PRMS_CONTROL_FILE, only: control_string
+        USE PRMS_MODULE, ONLY: Nhru, Print_debug, Start_year, Start_month, Start_day, &
+     &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_soil_flag, Dprst_flag, PRMS4_flag, Dyn_ag_soil_flag, AG_flag, Dyn_ag_frac_flag
+        USE PRMS_DYNAMIC_SOIL_PARAM_READ
+        use prms_utils, only: error_stop, find_current_file_time, find_header_end, PRMS_open_output_file, read_error, numchars
       IMPLICIT NONE
 ! Local Variables
       INTEGER :: year, month, day, istop, ierr
@@ -227,18 +226,18 @@
 !***********************************************************************
       INTEGER FUNCTION dynsoilparamrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dynamic, LAKE, CLOSEZERO
-      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, AG_flag, Hru_type, &
-     &    Dyn_imperv_flag, Dprst_flag, PRMS4_flag, GSFLOW_flag
+      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, Dyn_imperv_flag, Dprst_flag, PRMS4_flag, &
+     &    AG_flag, Hru_type, GSFLOW_flag
       USE PRMS_DYNAMIC_SOIL_PARAM_READ
-      USE PRMS_BASIN, ONLY: Hru_area, Dprst_clos_flag, Active_hrus, Hru_route_order, &
+      USE PRMS_BASIN, ONLY: Hru_area, Dprst_clos_flag, &
      &    Hru_percent_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Dprst_frac, Dprst_open_flag, &
      &    Dprst_area_max, Dprst_area_open_max, Dprst_area_clos_max, Dprst_frac_open, &
-     &    Ag_area, Ag_frac, Hru_area_dble, Dprst_area, Basin_area_inv
+     &    Hru_area_dble, Dprst_area, Active_hrus, Hru_route_order, Basin_area_inv, Ag_area, Ag_frac
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Imperv_stor, Sat_threshold, &
      &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor, &
-     &    Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, Slow_stor, Pref_flow_stor, &
-     &    Ag_soil_rechr_max, Ag_soil_rechr_max_frac, Hru_impervstor, Dprst_stor_hru, &
-     &    Basin_soil_moist, Basin_ssstor, Basin_ag_soil_moist, Basin_ag_soil_rechr
+     &    Slow_stor, Pref_flow_stor, Basin_soil_moist, Basin_ssstor, Hru_impervstor, Dprst_stor_hru, &
+     &    Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, Ag_soil_rechr_max, Ag_soil_rechr_max_frac, &
+     &    Basin_ag_soil_moist, Basin_ag_soil_rechr
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_imperv_stor, It0_hru_impervstor, &
                                It0_ag_soil_moist, It0_ag_soil_rechr, It0_dprst_vol_open, It0_dprst_vol_clos, &
                                It0_dprst_stor_hru, It0_slow_stor, It0_ssres_stor
@@ -637,6 +636,7 @@
           endif
 
         ENDDO
+
         IF ( it0_sm_flag == ACTIVE ) THEN
           Basin_soil_moist = 0.0D0
           DO j = 1, Active_hrus

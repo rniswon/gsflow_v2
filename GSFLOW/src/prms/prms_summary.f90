@@ -24,27 +24,27 @@
       END MODULE PRMS_PRMS_SUMMARY
 
       SUBROUTINE prms_summary()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, ERROR_open_out, DOCUMENTATION, MAXDIM
-      use PRMS_CONTROL_FILE, only: control_string
-      use PRMS_MMFAPI, only: declvar_dble
-      use PRMS_READ_PARAM_FILE, only: declparam, getparamstring, getparam_int
-      USE PRMS_MODULE, ONLY: Model, Process_flag, Nobs, Nsegment, Npoigages, &
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, ERROR_open_out, MAXDIM
+      USE PRMS_MODULE, ONLY: Process_flag, Nobs, Nsegment, Npoigages, &
      &    Csv_output_file, Inputerror_flag, Parameter_check_flag, CsvON_OFF, Nowyear, Nowmonth, Nowday
       USE PRMS_PRMS_SUMMARY
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Basin_tmax, Basin_tmin, Basin_swrad, Basin_ppt
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_soil_to_gw, &
      &    Basin_lakeevap, Basin_perv_et, Basin_actet, Basin_lake_stor, &
      &    Basin_gwflow_cfs, Basin_sroff_cfs, Basin_ssflow_cfs, Basin_cfs, Basin_stflow_in, &
-     &    Basin_stflow_out, Seg_outflow
+     &    Basin_stflow_out, Seg_outflow, Basin_pweqv
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_INTCP, ONLY: Basin_intcp_evap, Basin_intcp_stor
-      USE PRMS_SNOW, ONLY: Basin_pweqv, Basin_snowevap, Basin_snowmelt, Basin_snowcov, Basin_pk_precip
+      USE PRMS_SNOW, ONLY: Basin_snowevap, Basin_snowmelt, Basin_snowcov, Basin_pk_precip
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_dprst_evap, Basin_imperv_evap, Basin_dprst_seep, &
      &    Basin_dprst_volop, Basin_dprst_volcl, Basin_hortonian
       USE PRMS_SOILZONE, ONLY: Basin_capwaterin, Basin_pref_flow_infil, Basin_prefflow, Basin_recharge, Basin_slowflow, &
      &    Basin_pref_stor, Basin_slstor, Basin_soil_rechr, Basin_sz2gw, Basin_dunnian
       USE PRMS_GWFLOW, ONLY: Basin_gwstor, Basin_gwin, Basin_gwsink, Basin_gwflow, &
      &    Basin_gwstor_minarea_wb, Basin_dnflow
+      use PRMS_CONTROL_FILE, only: control_string
+      use PRMS_MMFAPI, only: declvar_dble
+      use PRMS_READ_PARAM_FILE, only: declparam, getparamstring, getparam_int
       use prms_utils, only: checkdim_bounded_limits, print_module, PRMS_open_output_file, read_error
       IMPLICIT NONE
 ! Functions
@@ -96,10 +96,8 @@
 
 !       Open summary file
         IF ( control_string(Csv_output_file, 'csv_output_file')/=0 ) CALL read_error(5, 'csv_output_file')
-        IF ( Model/=DOCUMENTATION ) THEN
-          CALL PRMS_open_output_file(Iunit, Csv_output_file, 'csv_output_file', 0, ios)
-          IF ( ios/=0 ) ERROR STOP ERROR_open_out
-        ENDIF
+        CALL PRMS_open_output_file(Iunit, Csv_output_file, 'csv_output_file', 0, ios)
+        IF ( ios/=0 ) ERROR STOP ERROR_open_out
 
         CALL declvar_dble(MODNAME, 'basin_total_storage', 'one', 1, &
      &       'Basin area-weighted average storage in all water storage reservoirs', &
@@ -108,7 +106,7 @@
      &       'Basin area-weighted average storage in all surface water storage reservoirs', &
      &       'inches', Basin_surface_storage)
 
-        IF ( Npoigages>0 .OR. Model==DOCUMENTATION ) THEN
+        IF ( Npoigages>0 ) THEN
 !          ALLOCATE ( Parent_poigages(Npoigages) )
 !          IF ( declparam(MODNAME, 'parent_poigages', 'npoigages', 'integer', &
 !     &         '1', '1', '1000000', &

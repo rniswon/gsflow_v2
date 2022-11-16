@@ -51,10 +51,10 @@
 !     declare parameters and variables
 !***********************************************************************
       SUBROUTINE basin_summarydecl()
-      USE PRMS_CONSTANTS, ONLY: DAILY, YEARLY, DOCUMENTATION, ERROR_control
+      USE PRMS_CONSTANTS, ONLY: DAILY, YEARLY, ERROR_control
       use PRMS_READ_PARAM_FILE, only: declparam
       use PRMS_CONTROL_FILE, only: control_string_array, control_integer, control_string
-      USE PRMS_MODULE, ONLY: Model, BasinOutON_OFF, Nhru
+      USE PRMS_MODULE, ONLY: BasinOutON_OFF, Nhru
       USE PRMS_BASIN_SUMMARY
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -69,7 +69,7 @@
       IF ( BasinOut_freq<DAILY .OR. BasinOut_freq>YEARLY ) CALL error_stop('invalid basinOut_freq value', ERROR_control)
 
       IF ( BasinOutVars==0 ) THEN
-        IF ( Model/=DOCUMENTATION ) CALL error_stop('basin_summary requested with basinOutVars equal 0', ERROR_control)
+        CALL error_stop('basin_summary requested with basinOutVars equal 0', ERROR_control)
       ELSE
         ALLOCATE ( BasinOutVar_names(BasinOutVars), Nc_vars(BasinOutVars) )
         BasinOutVar_names = ' '
@@ -80,7 +80,7 @@
       ENDIF
 
 ! Declared Parameters
-      IF ( BasinOutON_OFF==2 .OR. Model==DOCUMENTATION ) THEN
+      IF ( BasinOutON_OFF==2 ) THEN
         ALLOCATE ( Nhm_id(Nhru) )
         IF ( declparam(MODNAME, 'nhm_id', 'nhru', 'integer', &
      &       '1', '1', '9999999', &

@@ -7,7 +7,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'obs'
-      character(len=*), parameter :: Version_obs = '2022-01-12'
+      character(len=*), parameter :: Version_obs = '2022-09-07'
       INTEGER, SAVE :: Nlakeelev, Nwind, Nhumid, Rain_flag, nstream_temp
 !   Declared Variables
       INTEGER, SAVE :: Rain_day
@@ -70,10 +70,10 @@
 !     rain_code
 !***********************************************************************
       INTEGER FUNCTION obsdecl()
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, xyz_dist_module
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, xyz_dist_module
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getdim
-      USE PRMS_MODULE, ONLY: Model, Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Precip_flag
+      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Precip_flag
       USE PRMS_OBS
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -136,13 +136,6 @@
       Nlakeelev = getdim('nlakeelev')
       IF ( Nlakeelev==-1 ) CALL read_error(6, 'nlakeelev')
 
-      IF ( Model==DOCUMENTATION ) THEN
-        IF ( Nsnow==0 ) Nsnow = 1
-        IF ( Nhumid==0 ) Nhumid = 1
-        IF ( Nwind==0 ) Nwind = 1
-        IF ( Nlakeelev==0 ) Nlakeelev = 1
-      ENDIF
-
       IF ( Nsnow>0 ) THEN
         ALLOCATE ( Snowdepth(Nsnow) )
         CALL declvar_real(MODNAME, 'snowdepth', 'nsnow', Nsnow, &
@@ -174,14 +167,14 @@
       IF ( Nstream_temp>0 ) THEN
         ALLOCATE ( Stream_temp(Nwind) )
         CALL declvar_real(MODNAME, 'stream_temp', 'nstream_temp', nstream_temp, &
-     &       'Stream temperature for segment replacement in stream_temp', &
+     &       'Stream temperature at each measurement station', &
      &       'degrees Celsius', Stream_temp)
       ENDIF
 
 !   Declared Parameters
       Rain_flag = OFF
       IF ( Precip_flag==xyz_dist_module ) Rain_flag = ACTIVE
-      IF ( Rain_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+      IF ( Rain_flag==ACTIVE ) THEN
         CALL declvar_int(MODNAME, 'rain_day', 'one', 1, &
      &       'Flag to set the form of any precipitation to rain (0=determine form; 1=rain)', &
      &       'none', Rain_day)

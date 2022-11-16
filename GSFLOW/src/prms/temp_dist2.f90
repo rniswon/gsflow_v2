@@ -70,10 +70,10 @@
 !     lapsemax_max, tsta_xlong, tsta_ylat, hru_ylat, hru_xlong, dist_max
 !***********************************************************************
       INTEGER FUNCTION t2dist2decl()
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ERROR_dim
+      USE PRMS_CONSTANTS, ONLY: ERROR_dim
       use PRMS_MMFAPI, only: declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Model, Nhru, Ntemp
+      USE PRMS_MODULE, ONLY: Nhru, Ntemp
       USE PRMS_TEMP_DIST2
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -84,7 +84,7 @@
 
       CALL print_module(MODDESC, MODNAME, Version_temp)
 
-      IF ( Ntemp<2 .AND. Model/=DOCUMENTATION ) &
+      IF ( Ntemp<2 ) &
      &     CALL error_stop('temp_dist2 requires at least 2 air-temperature-measurement stations', ERROR_dim)
 
 ! added by Mastin 5/8/98
@@ -320,7 +320,7 @@
 !                  available period of record
 !***********************************************************************
       INTEGER FUNCTION t2dist2run()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, DNEARZERO, MAXTEMP, MINTEMP, ERROR_data, GLACIER
+      USE PRMS_CONSTANTS, ONLY: DNEARZERO, MAXTEMP, MINTEMP, ERROR_data, GLACIER
       USE PRMS_MODULE, ONLY: Ntemp, Glacier_flag, Nowmonth, Hru_type
       USE PRMS_TEMP_DIST2
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Hru_elev_ts
@@ -419,7 +419,7 @@
 
         DO kk = 1, N_tsta(j)
           k = Nuse_tsta(kk, j)
-          IF ( Hru_type(j)==GLACIER .AND. Glacier_flag==ACTIVE ) Elfac(j, k) = (Hru_elev_ts(j)-Tsta_elev(k))/1000.0
+          IF ( Hru_type(j)==GLACIER .AND. Glacier_flag==1 ) Elfac(j, k) = (Hru_elev_ts(j)-Tsta_elev(k))/1000.0
 
 ! check for missing or bad temps
           IF ( Tmax(k)<mn ) CYCLE
