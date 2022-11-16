@@ -463,7 +463,7 @@
         Ssres_stor = It0_ssres_stor
         Slow_stor = It0_slow_stor
         IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
-        IF ( update_potet == 1 ) Potet = It0_potet
+        IF ( Nlake>0 ) Potet = It0_potet
         Gravity_stor_res = It0_gravity_stor_res
         IF ( PRMS_land_iteration_flag==OFF ) THEN
           ! computed in srunoff
