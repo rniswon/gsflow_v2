@@ -24,7 +24,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'xyz_dist'
-      character(len=*), parameter :: Version_xyz_dist = '2022-05-09'
+      character(len=*), parameter :: Version_xyz_dist = '2022-09-07'
       INTEGER, SAVE :: Nlapse, Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Basin_centroid_x, Basin_centroid_y
@@ -460,7 +460,7 @@
       USE PRMS_MODULE, ONLY: Nhru, Nrain, Ntemp, Inputerror_flag
       USE PRMS_XYZ_DIST
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv,
-     +    Hru_elev_meters, Active_hrus, Hru_route_order
+     +    Hru_elev, Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Psta_elev, Tsta_elev
       use prms_utils, only: read_error
       IMPLICIT NONE
@@ -596,6 +596,9 @@
 ! convert elevations from feet to meters
 !
       IF ( Conv_flag==ACTIVE ) THEN
+        DO i = 1, Nhru
+          MRUelev(i) = Hru_elev(i)*FEET2METERS
+        ENDDO
         DO i = 1, Ntemp
           Temp_STAelev(i) = Tsta_elev(i)*FEET2METERS
         ENDDO
@@ -604,11 +607,11 @@
         ENDDO
         Solradelev = Solrad_elev*FEET2METERS
       ELSE
+        MRUelev = Hru_elev
         Temp_STAelev = Tsta_elev
         Pstaelev = Psta_elev
         Solradelev = Solrad_elev
       ENDIF
-      MRUelev = Hru_elev_meters
 !
 ! transform Z, X and Y
 !

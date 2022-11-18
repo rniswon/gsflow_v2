@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsegment_summary'
-      character(len=*), parameter :: Version_nsegment_summary = '2021-11-23'
+      character(len=*), parameter :: Version_nsegment_summary = '2022-09-07'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsegment_var_type(:)
       REAL, SAVE, ALLOCATABLE :: Nsegment_var_daily(:, :)
@@ -64,10 +64,10 @@
 !     declare parameters and variables
 !***********************************************************************
       SUBROUTINE nsegment_summarydecl()
-      USE PRMS_CONSTANTS, ONLY: ERROR_control, DAILY, YEARLY, DOCUMENTATION
+      USE PRMS_CONSTANTS, ONLY: ERROR_control, DAILY, YEARLY
       use PRMS_CONTROL_FILE, only: control_integer, control_string, control_string_array
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Model, Nsegment, NsegmentOutON_OFF
+      USE PRMS_MODULE, ONLY: Nsegment, NsegmentOutON_OFF
       USE PRMS_NSEGMENT_SUMMARY
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -85,7 +85,7 @@
       IF ( NsegmentOut_format<1 .OR. NsegmentOut_format>5 ) CALL error_stop('invalid nsegmentOut_format value', ERROR_control)
 
       IF ( NsegmentOutVars==0 ) THEN
-        IF ( Model/=DOCUMENTATION ) CALL error_stop('nsegment_summary requested with nsegmentOutVars equal 0', ERROR_control)
+        CALL error_stop('nsegment_summary requested with nsegmentOutVars equal 0', ERROR_control)
       ELSE
         ALLOCATE ( NsegmentOutVar_names(NsegmentOutVars), Nsegment_var_type(NsegmentOutVars), Nc_vars(NsegmentOutVars) )
         NsegmentOutVar_names = ' '
@@ -96,7 +96,7 @@
         IF ( control_string(NsegmentOutBaseFileName, 'nsegmentOutBaseFileName')/=0 ) CALL read_error(5, 'nsegmentOutBaseFileName')
       ENDIF
 
-      IF ( NsegmentOutON_OFF==2 .OR. Model==DOCUMENTATION ) THEN
+      IF ( NsegmentOutON_OFF==2 ) THEN
         ALLOCATE ( Nhm_seg(Nsegment) )
         IF ( declparam(MODNAME, 'nhm_seg', 'nsegment', 'integer', &
      &       '0', '0', '9999999', &

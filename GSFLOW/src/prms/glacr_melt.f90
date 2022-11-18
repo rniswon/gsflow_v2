@@ -50,7 +50,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2022-01-12'
+      character(len=*), parameter :: Version_glacr = '2022-09-07'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -878,7 +878,8 @@
       USE PRMS_CONSTANTS, ONLY: GLACIER, LAND, FEET2METERS, METERS2FEET, DNEARZERO, NEARZERO, FEET, METERS
       USE PRMS_MODULE, ONLY: Nhru, Start_year, Nowyear, Nowmonth, Hru_type
       USE PRMS_GLACR
-      USE PRMS_BASIN, ONLY: Hru_elev_ts, Basin_area_inv, Active_hrus, Hru_route_order, Elev_units, Hru_elev
+      USE PRMS_BASIN, ONLY: Hru_elev_ts, Basin_area_inv, Active_hrus, &
+     &    Hru_route_order, Elev_units, Hru_elev
       USE PRMS_SET_TIME, ONLY: Julwater
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow
       USE PRMS_SNOW, ONLY: Glacrmelt, Glacr_air_deltemp, Glacr_delsnow, &

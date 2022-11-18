@@ -61,9 +61,9 @@
 !     hru_ylat, hru_xlong, max_psta, dist_max, maxday_prec
 !***********************************************************************
       INTEGER FUNCTION pptdist2decl()
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, MONTHS_PER_YEAR, ERROR_dim
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ERROR_dim
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Model, Nhru, Nrain
+      USE PRMS_MODULE, ONLY: Nhru, Nrain
       USE PRMS_PRECIP_DIST2
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -72,7 +72,7 @@
 
       CALL print_module(MODDESC, MODNAME, Version_precip)
 
-      IF ( Nrain<2 .AND. Model/=DOCUMENTATION ) &
+      IF ( Nrain<2 ) &
      &     CALL error_stop('precip_dist2 requires at least 2 precipitation measurement stations', ERROR_dim)
 
       ALLOCATE ( N_psta(Nhru), Dist2(Nhru, Nrain) )

@@ -9,7 +9,7 @@
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
       character(len=*), parameter :: Version_intcp = '2022-10-26'
-      DOUBLE PRECISION, SAVE :: Last_intcp_stor
+      DOUBLE PRECISION, SAVE :: Last_basin_intcp_stor
       INTEGER, SAVE :: Use_transfer_intcp
       INTEGER, PARAMETER :: RAIN = 0, SNOW = 1
 !   Declared Variables
@@ -24,7 +24,7 @@
       DOUBLE PRECISION, SAVE :: Basin_net_apply, Basin_hru_apply
 !   Declared Parameters
       INTEGER, SAVE, ALLOCATABLE :: Irr_type(:)
-      REAL, SAVE, ALLOCATABLE :: Snow_intcp(:,:), Srain_intcp(:,:), Wrain_intcp(:,:)
+      REAL, SAVE, ALLOCATABLE :: Snow_intcp(:), Srain_intcp(:), Wrain_intcp(:)
       END MODULE PRMS_INTCP
 
 !***********************************************************************
@@ -60,10 +60,10 @@
 !     covden_win, covden_sum, epan_coef, hru_area, hru_pansta
 !***********************************************************************
       INTEGER FUNCTION intdecl()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, MONTHS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Model, Water_use_flag, AG_flag, GSFLOW_flag
+      USE PRMS_MODULE, ONLY: Nhru, Water_use_flag, AG_flag, GSFLOW_flag
       use prms_utils, only: print_module, read_error
       USE PRMS_INTCP
       IMPLICIT NONE
@@ -76,7 +76,7 @@
       ALLOCATE ( Net_apply(Nhru) )
       ALLOCATE ( Irr_type(Nhru) )
       Use_transfer_intcp = OFF
-      IF ( Water_use_flag==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+      IF ( Water_use_flag==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE ) THEN
         ! always declare for GSFLOW as may be needed if the AG Package is active
         ! don't know if AG Package is active during declare, set during init
         IF ( Water_use_flag==ACTIVE ) Use_transfer_intcp = ACTIVE
@@ -178,22 +178,22 @@
      &     'inches', Basin_changeover)
 
 ! declare parameters
-      ALLOCATE ( Snow_intcp(Nhru,MONTHS_PER_YEAR) )
-      IF ( declparam(MODNAME, 'snow_intcp', 'nhru,nmonths', 'real', &
+      ALLOCATE ( Snow_intcp(Nhru) )
+      IF ( declparam(MODNAME, 'snow_intcp', 'nhru', 'real', &
      &     '0.1', '0.0', '1.0', &
      &     'Snow interception storage capacity', &
      &     'Snow interception storage capacity for the major vegetation type in each HRU', &
      &     'inches')/=0 ) CALL read_error(1, 'snow_intcp')
 
-      ALLOCATE ( Srain_intcp(Nhru,MONTHS_PER_YEAR) )
-      IF ( declparam(MODNAME, 'srain_intcp', 'nhru,nmonths', 'real', &
+      ALLOCATE ( Srain_intcp(Nhru) )
+      IF ( declparam(MODNAME, 'srain_intcp', 'nhru', 'real', &
      &     '0.1', '0.0', '1.0', &
      &     'Summer rain interception storage capacity', &
      &     'Summer rain interception storage capacity for the major vegetation type in each HRU', &
      &     'inches')/=0 ) CALL read_error(1, 'srain_intcp')
 
-      ALLOCATE ( Wrain_intcp(Nhru,MONTHS_PER_YEAR) )
-      IF ( declparam(MODNAME, 'wrain_intcp', 'nhru,nmonths', 'real', &
+      ALLOCATE ( Wrain_intcp(Nhru) )
+      IF ( declparam(MODNAME, 'wrain_intcp', 'nhru', 'real', &
      &     '0.1', '0.0', '1.0', &
      &     'Winter rain interception storage capacity', &
      &     'Winter rain interception storage capacity for the major vegetation type in each HRU', &
@@ -218,9 +218,9 @@
 !***********************************************************************
       intinit = 0
 
-      IF ( getparam_real(MODNAME, 'snow_intcp', Nhru*MONTHS_PER_YEAR, Snow_intcp)/=0 ) CALL read_error(2, 'snow_intcp')
-      IF ( getparam_real(MODNAME, 'wrain_intcp', Nhru*MONTHS_PER_YEAR, Wrain_intcp)/=0 ) CALL read_error(2, 'wrain_intcp')
-      IF ( getparam_real(MODNAME, 'srain_intcp', Nhru*MONTHS_PER_YEAR, Srain_intcp)/=0 ) CALL read_error(2, 'srain_intcp')
+      IF ( getparam_real(MODNAME, 'snow_intcp', Nhru, Snow_intcp)/=0 ) CALL read_error(2, 'snow_intcp')
+      IF ( getparam_real(MODNAME, 'wrain_intcp', Nhru, Wrain_intcp)/=0 ) CALL read_error(2, 'wrain_intcp')
+      IF ( getparam_real(MODNAME, 'srain_intcp', Nhru, Srain_intcp)/=0 ) CALL read_error(2, 'srain_intcp')
 
       IF ( Use_transfer_intcp==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE ) THEN
         IF ( getparam_int(MODNAME, 'irr_type', Nhru, Irr_type)/=0 ) CALL read_error(1, 'irr_type')
@@ -295,7 +295,7 @@
         ENDIF
       ENDIF
 
-      IF ( Print_debug==DEBUG_WB ) Last_intcp_stor = Basin_intcp_stor
+      IF ( Print_debug==DEBUG_WB ) Last_basin_intcp_stor = Basin_intcp_stor
       Basin_changeover = 0.0D0
       Basin_net_ppt = 0.0D0
       Basin_net_snow = 0.0D0
@@ -321,9 +321,9 @@
 !******Adjust interception amounts for changes in summer/winter cover density
 
         IF ( Transp_on(i)==ACTIVE ) THEN
-          Canopy_covden(i) = Covden_sum(i,Nowmonth)
+          Canopy_covden(i) = Covden_sum(i)
         ELSE
-          Canopy_covden(i) = Covden_win(i,Nowmonth)
+          Canopy_covden(i) = Covden_win(i)
         ENDIF
         cov = Canopy_covden(i)
         Intcp_form(i) = RAIN
@@ -352,18 +352,18 @@
           Intcp_transp_on(i) = OFF
           IF ( intcpstor>0.0 ) THEN
             ! assume canopy storage change falls as throughfall
-            diff = Covden_sum(i,Nowmonth) - cov
+            diff = Covden_sum(i) - cov
             changeover = intcpstor*diff
             IF ( cov>0.0 ) THEN
               IF ( changeover<0.0 ) THEN
                 ! covden_win > covden_sum, adjust intcpstor to same volume, and lower depth
-                intcpstor = intcpstor*Covden_sum(i,Nowmonth)/cov
+                intcpstor = intcpstor*Covden_sum(i)/cov
                 changeover = 0.0
               ENDIF
             ELSE
               IF ( Print_debug>DEBUG_less ) THEN
                 PRINT *, 'covden_win=0 at winter change over with canopy storage, HRU:', i, Nowyear, Nowmonth, Nowday
-                PRINT *, 'intcp_stor:', intcpstor, ' covden_sum:', Covden_sum(i,Nowmonth)
+                PRINT *, 'intcp_stor:', intcpstor, ' covden_sum:', Covden_sum(i)
               ENDIF
               intcpstor = 0.0
             ENDIF
@@ -373,18 +373,18 @@
         ELSEIF ( Transp_on(i)==ACTIVE .AND. Intcp_transp_on(i)==OFF ) THEN
           Intcp_transp_on(i) = ACTIVE
           IF ( intcpstor>0.0 ) THEN
-            diff = Covden_win(i,Nowmonth) - cov
+            diff = Covden_win(i) - cov
             changeover = intcpstor*diff
             IF ( cov>0.0 ) THEN
               IF ( changeover<0.0 ) THEN
                 ! covden_sum > covden_win, adjust intcpstor to same volume, and lower depth
-                intcpstor = intcpstor*Covden_win(i,Nowmonth)/cov
+                intcpstor = intcpstor*Covden_win(i)/cov
                 changeover = 0.0
               ENDIF
             ELSE
               IF ( Print_debug>DEBUG_less ) THEN
                 PRINT *, 'covden_sum=0 at summer change over with canopy storage, HRU:', i, Nowyear, Nowmonth, Nowday
-                PRINT *, 'intcp_stor:', intcpstor, ' covden_win:', Covden_win(i,Nowmonth)
+                PRINT *, 'intcp_stor:', intcpstor, ' covden_win:', Covden_win(i)
               ENDIF
               intcpstor = 0.0
             ENDIF
@@ -392,9 +392,9 @@
         ENDIF
 
         IF ( Transp_on(i)==ACTIVE ) THEN
-          stor_max_rain = Srain_intcp(i,Nowmonth)
+          stor_max_rain = Srain_intcp(i)
         ELSE
-          stor_max_rain = Wrain_intcp(i,Nowmonth)
+          stor_max_rain = Wrain_intcp(i)
         ENDIF
 
 !*****Determine the amount of interception from rain
@@ -425,7 +425,7 @@
           IF ( Hru_snow(i)>0.0 ) THEN
             IF ( cov>0.0 ) THEN
               IF ( Cov_type(i)>GRASSES ) THEN ! cov_type > 1
-                CALL intercept(Hru_snow(i), Snow_intcp(i,Nowmonth), cov, intcpstor, netsnow)
+                CALL intercept(Hru_snow(i), Snow_intcp(i), cov, intcpstor, netsnow)
                 IF ( netsnow<NEARZERO ) THEN   !rsr, added 3/9/2006
                   netrain = netrain + netsnow
                   netsnow = 0.0

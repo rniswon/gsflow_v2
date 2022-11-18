@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nhru_summary'
-      character(len=*), parameter :: Version_nhru_summary = '2022-08-04'
+      character(len=*), parameter :: Version_nhru_summary = '2022-09-07'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nhru_var_type(:), Nhru_var_int(:, :)
       REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
@@ -66,10 +66,10 @@
 !     declare parameters and variables
 !***********************************************************************
       SUBROUTINE nhru_summarydecl()
-      USE PRMS_CONSTANTS, ONLY: ERROR_control, DAILY, YEARLY, ACTIVE, OFF, DOCUMENTATION
+      USE PRMS_CONSTANTS, ONLY: ERROR_control, DAILY, YEARLY, ACTIVE, OFF
       use PRMS_CONTROL_FILE, only: control_integer, control_string, control_string_array
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Model, Nhru, NhruOutON_OFF
+      USE PRMS_MODULE, ONLY: Nhru, NhruOutON_OFF
       USE PRMS_NHRU_SUMMARY
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -93,7 +93,7 @@
       ENDIF
 
       IF ( NhruOutVars==0 ) THEN
-        IF ( Model/=DOCUMENTATION ) CALL error_stop('nhru_summary requested with nhruOutVars equal 0', ERROR_control)
+        CALL error_stop('nhru_summary requested with nhruOutVars equal 0', ERROR_control)
       ELSE
         ALLOCATE ( NhruOutVar_names(NhruOutVars), Nhru_var_type(NhruOutVars), Nc_vars(NhruOutVars) )
         NhruOutVar_names = ' '
@@ -104,7 +104,7 @@
       ENDIF
 
 ! Declared Parameters
-      IF ( NhruOutON_OFF==2 .OR. Model==DOCUMENTATION ) THEN
+      IF ( NhruOutON_OFF==2 ) THEN
         ALLOCATE ( Nhm_id(Nhru) )
         IF ( declparam(MODNAME, 'nhm_id', 'nhru', 'integer', &
      &       '1', '1', '9999999', &
@@ -187,7 +187,6 @@
           ierr = 1
         ENDIF
       ENDDO
-
       IF ( ierr==1 ) ERROR STOP ERROR_control
       IF ( Double_vars==ACTIVE ) THEN
         ALLOCATE ( Nhru_var_dble(Nhru, NhruOutVars) )

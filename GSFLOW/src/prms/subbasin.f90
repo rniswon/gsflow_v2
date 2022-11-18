@@ -15,7 +15,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'subbasin'
-      character(len=*), parameter :: Version_subbasin = '2022-04-21'
+      character(len=*), parameter :: Version_subbasin = '2022-09-07'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Qsub(:), Sub_area(:), Laststor(:)
       INTEGER, SAVE, ALLOCATABLE :: Tree(:, :)
 !   Declared Variables
@@ -62,10 +62,10 @@
 !     hru_area, subbasin_down, hru_subbasin
 !***********************************************************************
       INTEGER FUNCTION subdecl()
-      USE PRMS_CONSTANTS, ONLY: OFF, DOCUMENTATION, ERROR_dim
+      USE PRMS_CONSTANTS, ONLY: OFF, ERROR_dim
       use PRMS_MMFAPI, only: declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Model, Nsub, Nhru, GSFLOW_flag
+      USE PRMS_MODULE, ONLY: Nsub, Nhru, GSFLOW_flag
       USE PRMS_SUBBASIN
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -74,10 +74,7 @@
 
       CALL print_module(MODDESC, MODNAME, Version_subbasin)
 
-      IF ( Nsub==0 ) THEN
-        IF ( Model/=DOCUMENTATION ) CALL error_stop('nsub=0 when subbasin module called', ERROR_dim)
-        Nsub = 1
-      ENDIF
+      IF ( Nsub==0 ) CALL error_stop('nsub=0 when subbasin module called', ERROR_dim)
 
 ! Declared Variables
       ALLOCATE ( Sub_interflow(Nsub) )
@@ -85,7 +82,7 @@
      &     'Area-weighted average interflow to each subbasin from associated HRUs and from upstream subbasins', &
      &     'cfs', Sub_interflow)
 
-      IF ( GSFLOW_flag==OFF .OR. Model==DOCUMENTATION ) THEN
+      IF ( GSFLOW_flag==OFF ) THEN
         ALLOCATE ( Sub_gwflow(Nsub) )
         CALL declvar_dble(MODNAME, 'sub_gwflow', 'nsub', Nsub, &
      &       'Area-weighted average groundwater discharge from associated GWRs to each subbasin and from upstream subbasins', &
@@ -241,13 +238,14 @@
 !***********************************************************************
       INTEGER FUNCTION subinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, DNEARZERO
+      USE PRMS_MODULE, ONLY: Nsub, Nhru, Print_debug, &
+     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag, GSFLOW_flag, Hru_type
       use PRMS_READ_PARAM_FILE, only: getparam_int
-      USE PRMS_MODULE, ONLY: Nsub, Nhru, Print_debug, GSFLOW_flag, &
-     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Cascade_flag, Hru_type
       USE PRMS_SUBBASIN
-      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, Hru_frac_perv, Lake_hru_id
-      USE PRMS_FLOWVARS, ONLY: Ssres_stor, Soil_moist, Pkwater_equiv, Gwres_stor, Sroff, Ssres_flow, &
-                               Lake_vol, Dprst_stor_hru, Hru_impervstor, Hru_intcpstor
+      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
+     &    Hru_frac_perv, Lake_hru_id
+      USE PRMS_FLOWVARS, ONLY: Ssres_stor, Soil_moist, Pkwater_equiv, Gwres_stor, Sroff, Ssres_flow, Lake_vol, &
+                               Dprst_stor_hru, Hru_impervstor, Hru_intcpstor
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Cfs2inches
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
       USE PRMS_SOILZONE, ONLY: Lakein_sz
@@ -415,7 +413,8 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, LAKE, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Nsub, GSFLOW_flag, Dprst_flag, Lake_route_flag, Cascade_flag, Hru_type
       USE PRMS_SUBBASIN
-      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, Hru_frac_perv, Lake_hru_id
+      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
+     &    Hru_frac_perv, Lake_hru_id
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Cfs2inches
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Swrad, Potet, Tminc, Tmaxc, Tavgc, Hru_rain, Hru_snow
       USE PRMS_FLOWVARS, ONLY: Hru_actet, Ssres_flow, Sroff, Snowcov_area, Snowmelt, Dprst_stor_hru, Hru_intcpstor, &

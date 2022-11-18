@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2022-04-21'
+      character(len=*), parameter :: Version_routing = '2022-09-07'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades
@@ -60,11 +60,11 @@
 !     routingdecl - set up parameters
 !***********************************************************************
       INTEGER FUNCTION routingdecl()
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
      &    strmflow_muskingum_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
       use PRMS_MMFAPI, only: declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Model, Init_vars_from_file, Strmflow_flag, Cascade_flag
+      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Init_vars_from_file, Strmflow_flag, Cascade_flag
       USE PRMS_ROUTING
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -129,7 +129,7 @@
       ! 11 = outbound to Great Lakes; 12 = ephemeral; + 100 user updated; 1000 user virtual segment
       ! 100 = user normal; 101 - 108 = not used; 109 sink (tosegment used by Lumen)
 
-      IF ( Strmflow_flag==strmflow_muskingum_mann_module .OR. Model==DOCUMENTATION ) THEN
+      IF ( Strmflow_flag==strmflow_muskingum_mann_module ) THEN
         ALLOCATE ( Mann_n(Nsegment) )
         IF ( declparam( MODNAME, 'mann_n', 'nsegment', 'real', &
      &       '0.04', '0.001', '0.15', &
@@ -153,7 +153,7 @@
      &       'meters')/=0 ) CALL read_error(1, 'seg_depth')
       ENDIF
 
-      IF ( Strmflow_flag==strmflow_muskingum_mann_module .OR. Model==DOCUMENTATION ) THEN
+      IF ( Strmflow_flag==strmflow_muskingum_mann_module ) THEN
         ALLOCATE ( Seg_slope(Nsegment) )
         IF ( declparam( MODNAME, 'seg_slope', 'nsegment', 'real', &
      &       '0.0001', '0.0000001', '2.0', &
@@ -182,7 +182,7 @@
      &     ' streamflow flows, for segments that do not flow to another segment enter 0', &
      &     'none')/=0 ) CALL read_error(1, 'tosegment')
 
-      IF ( Cascade_flag==CASCADE_OFF .OR. Cascade_flag==CASCADE_HRU_SEGMENT .OR. Model==DOCUMENTATION ) THEN
+      IF ( Cascade_flag==CASCADE_OFF .OR. Cascade_flag==CASCADE_HRU_SEGMENT ) THEN
         Hru_seg_cascades = ACTIVE
         ALLOCATE ( Hru_segment(Nhru) )
         IF ( declparam(MODNAME, 'hru_segment', 'nhru', 'integer', &
@@ -220,8 +220,7 @@
 
       IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
      &     Strmflow_flag==strmflow_muskingum_mann_module ) ALLOCATE ( K_coef(Nsegment) )
-      IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
-     &     Model==DOCUMENTATION ) THEN
+      IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module ) THEN
         IF ( declparam(MODNAME, 'K_coef', 'nsegment', 'real', &
      &       '1.0', '0.01', '24.0', &
      &       'Muskingum storage coefficient', &
@@ -232,7 +231,7 @@
       ENDIF
 
       IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
-     &     Strmflow_flag==strmflow_muskingum_mann_module .OR. Model==DOCUMENTATION ) THEN
+     &     Strmflow_flag==strmflow_muskingum_mann_module ) THEN
         ALLOCATE ( X_coef(Nsegment) )
         IF ( declparam(MODNAME, 'x_coef', 'nsegment', 'real', &
      &       '0.2', '0.0', '0.5', &
@@ -250,7 +249,7 @@
      &       'cfs', Segment_delta_flow)
       ENDIF
 
-      IF ( Hru_seg_cascades==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+      IF ( Hru_seg_cascades==ACTIVE ) THEN
         ALLOCATE ( Seginc_potet(Nsegment) )
         CALL declvar_dble(MODNAME, 'seginc_potet', 'nsegment', Nsegment, &
      &       'Area-weighted average potential ET for each segment from HRUs contributing flow to the segment', &
@@ -374,6 +373,10 @@
            IF ( Seg_length(i)<NEARZERO ) THEN
               PRINT *, 'ERROR, seg_length too small for segment:', i, ', value:', Seg_length(i)
               ierr = 1
+           ENDIF
+           IF ( Seg_slope(i)<0.0000001 ) THEN
+             IF ( Print_debug>DEBUG_LESS ) PRINT *, 'WARNING, seg_slope < 0.0000001, set to 0.0000001', i, Seg_slope(i)
+             Seg_slope(i) = 0.0000001
            ENDIF
         ENDDO
 ! exit if there are any segments that are too short
@@ -527,10 +530,6 @@
       ierr = 0
       DO i = 1, Nsegment
         IF ( Strmflow_flag==strmflow_muskingum_mann_module ) THEN
-          IF ( Seg_slope(i)<0.0000001 ) THEN
-            IF ( Print_debug>DEBUG_LESS ) PRINT *, 'WARNING, seg_slope < 0.0000001, set to 0.0000001', i, Seg_slope(i)
-            Seg_slope(i) = 0.0000001
-          ENDIF
           velocity = (1./Mann_n(i))*SQRT(Seg_slope(i))*Seg_depth(i)**(2./3.) ! simplify if say width>>depth
           K_coef(i) = Seg_length(i)/(velocity*60.*60.) !want in hours, length should include sloped length
           !K_coef(i) = Seg_length(i)*sqrt(1+ Seg_slope(i)**2)/(velocity*60.*60.) !want in hours
@@ -652,7 +651,7 @@
 !     route_run - Computes segment flow states and fluxes
 !***********************************************************************
       INTEGER FUNCTION route_run()
-      USE PRMS_CONSTANTS, ONLY: DOCUMENTATION, ACTIVE, OFF, FT2_PER_ACRE, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, FT2_PER_ACRE, &
      &    NEARZERO, DNEARZERO, OUTFLOW_SEGMENT, ERROR_param, &
      &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
      &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
@@ -776,13 +775,13 @@
                 if (Segment_hruarea(this_seg) <= NEARZERO) then
 
                    ! Hit the terminal segment without finding any HRUs (i.e. sources of streamflow)
-                   if (tosegment(this_seg) == OUTFLOW_SEGMENT) then
+                   if (Tosegment(this_seg) == OUTFLOW_SEGMENT) then
                      found = .false.
                      exit
                    endif
 
                    ! There is a downstream segment, check that segment for HRUs
-                   this_seg = tosegment(this_seg)
+                   this_seg = Tosegment(this_seg)
                 else
                     ! This segment has HRUs so there will be swrad and potet
                     Seginc_swrad(i) = Seginc_swrad(this_seg)/Segment_hruarea(this_seg)

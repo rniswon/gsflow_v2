@@ -73,10 +73,10 @@
 !     lake_seep_elev, elevlake_init, gw_seep_coef
 !***********************************************************************
       INTEGER FUNCTION gwflowdecl()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, DOCUMENTATION, CASCADEGW_OFF
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, CASCADEGW_OFF
+      USE PRMS_MODULE, ONLY: Nhru, Ngw, Nlake, Init_vars_from_file, Dprst_flag, Cascadegw_flag, Lake_route_flag
       use PRMS_MMFAPI, only: declvar_real, declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Model, Nhru, Ngw, Nlake, Init_vars_from_file, Dprst_flag, Cascadegw_flag, Lake_route_flag
       USE PRMS_GWFLOW
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -86,7 +86,7 @@
       CALL print_module(MODDESC, MODNAME, Version_gwflow)
 
 ! cascading variables and parameters
-      IF ( Cascadegw_flag>CASCADEGW_OFF .OR. Model==DOCUMENTATION ) THEN
+      IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         ALLOCATE ( Gw_upslope(Ngw) )
         CALL declvar_dble(MODNAME, 'gw_upslope', 'ngw', Ngw, &
      &       'Groundwater flow received from upslope GWRs for each GWR', &
@@ -97,7 +97,7 @@
      &       'Cascading groundwater flow from each GWR', &
      &       'inches', Hru_gw_cascadeflow)
 
-        IF ( (Nlake>0.AND.Cascadegw_flag>CASCADEGW_OFF) .OR. Model==DOCUMENTATION ) THEN
+        IF ( (Nlake>0.AND.Cascadegw_flag>CASCADEGW_OFF) ) THEN
           ALLOCATE ( Lakein_gwflow(Nlake) )
           CALL declvar_dble(MODNAME, 'lakein_gwflow', 'nlake', Nlake, &
      &         'Groundwater flow received from upslope GWRs for each Lake GWR', &
@@ -160,7 +160,7 @@
       ALLOCATE ( Gwstor_minarea(Ngw) )
       IF ( Dprst_flag==1 ) ALLOCATE ( Gwin_dprst(Ngw) )
 
-      IF ( Lake_route_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+      IF ( Lake_route_flag==ACTIVE ) THEN
         CALL declvar_dble(MODNAME, 'basin_lake_seep', 'one', 1, &
      &       'Basin area-weighted average of lake-bed seepage to GWRs', &
      &       'acre-feet', Basin_lake_seep)
@@ -210,7 +210,7 @@
      &     ' to the groundwater sink for each GWR', &
      &     'fraction/day')/=0 ) CALL read_error(1, 'gwsink_coef')
 
-      IF ( Lake_route_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+      IF ( Lake_route_flag==ACTIVE ) THEN
         ALLOCATE ( Lake_seep_elev(Nlake) )
         IF ( declparam(MODNAME, 'lake_seep_elev', 'nlake', 'real', &
      &       '1.0', '-300.0', '10000.0', &
