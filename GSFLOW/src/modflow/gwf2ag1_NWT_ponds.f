@@ -3462,10 +3462,10 @@
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
 
-        if(iseg==24.and.kstp==11)then
+        if(iseg==25.and.kstp==11)then
         etdif = pettotal - aettotal
           write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
-     +                 SUPACT(iseg),etdif,RMSESW(ISEG),AGTOL*pettotal,
+     +                 SUPACT(iseg),etdif,RMSESW(ISEG),pettotal,
      +                 AGCONVERGE,tot1,tot2,tot3,tot4,tot5
         endif
   33  format(4i5,6e20.10,i5,5e20.10)
