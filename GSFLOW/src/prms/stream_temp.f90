@@ -43,7 +43,7 @@
       REAL, SAVE, ALLOCATABLE :: Azrh(:), Alte(:), Altw(:), Vce(:)
       REAL, SAVE, ALLOCATABLE :: Vdemx(:), Vhe(:), Voe(:), Vcw(:), Vdwmx(:), Vhw(:), Vow(:)
       REAL, SAVE, ALLOCATABLE :: Vdemn(:), Vdwmn(:)
-      INTEGER, SAVE :: Spring_jday, Summer_jday, Autumn_jday, Winter_jday
+      !INTEGER, SAVE :: Spring_jday, Summer_jday, Autumn_jday, Winter_jday
 !   Shade Parameters needed if stream_temp_shade_flag = 2
       REAL, SAVE, ALLOCATABLE :: Segshade_sum(:), Segshade_win(:)
       REAL, SAVE:: Albedo, Melt_temp
@@ -90,11 +90,11 @@
 !   Declared Parameters
 !***********************************************************************
       INTEGER FUNCTION stream_temp_decl()
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DOCUMENTATION, ACTIVE, OFF, DAYS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, OFF, DAYS_PER_YEAR
       use PRMS_CONTROL_FILE, only: control_integer
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getdim
-      USE PRMS_MODULE, ONLY: Nsegment, Model, Init_vars_from_file, Strmtemp_humidity_flag, Model
+      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag
       USE PRMS_STRMTEMP
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -214,7 +214,7 @@
      &     'Surface slope of each segment as approximation for bed slope of stream', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'seg_slope')
 
-      IF ( Stream_temp_shade_flag==OFF .OR. Model==DOCUMENTATION ) THEN
+      IF ( Stream_temp_shade_flag==OFF ) THEN
          ALLOCATE ( Azrh(Nsegment) )
          IF ( declparam( MODNAME, 'azrh', 'nsegment', 'real', &
      &       '0.0', '-1.5708', '1.5708', &
@@ -307,7 +307,7 @@
      &       'meters')/=0 ) CALL read_error(1, 'vow')
       ENDIF
 
-      IF ( Stream_temp_shade_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+      IF ( Stream_temp_shade_flag==ACTIVE ) THEN
          ALLOCATE ( Segshade_sum(Nsegment) )
          IF ( declparam( MODNAME, 'segshade_sum', 'nsegment', 'real', &
      &       '0.0', '0.0', '1.0.', &
@@ -356,14 +356,14 @@
      &     'Index of streamflow temperature in Data File that replaces temperature in a segment', &
      &     'none')/=0 ) CALL read_error(1, 'tempIN_segment')
 
-      IF ( Strmtemp_humidity_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN  ! specified constant
+      IF ( Strmtemp_humidity_flag==ACTIVE ) THEN  ! specified constant
          ALLOCATE ( Seg_humidity(Nsegment, MONTHS_PER_YEAR) )
          IF ( declparam( MODNAME, 'seg_humidity', 'nsegment,nmonths', 'real', &
      &       '0.7', '0.0', '1.0', &
      &       'Mean monthly humidity for each segment', &
      &       'Mean monthly humidity for each segment, used when values not input in CBH File', &
      &       'decimal fraction')/=0 )  CALL read_error(1, 'seg_humidity')
-      ELSEIF ( Strmtemp_humidity_flag==2 .OR. Model==DOCUMENTATION ) THEN  ! use station data
+      ELSEIF ( Strmtemp_humidity_flag==2 ) THEN  ! use station data
          ALLOCATE ( Seg_humidity_sta(Nsegment) )
          IF ( declparam(MODNAME, 'seg_humidity_sta', 'nsegment', 'integer', &
      &       '0', 'bounded', 'nhumid', &
@@ -653,10 +653,10 @@
 
 !         Check if this segment has any HRUs, keep moving up stream if not.
          do
-            if (seg_hru_count(this_seg) .eq. 0) then
+            if (seg_hru_count(this_seg) == 0) then
                ! Hit the headwater segment without finding any HRUs (i.e. sources of streamflow)
                ! Set the stream temp to -99.9 for this segment because there will never be any flow in this segment
-               if (segment_up(this_seg) .eq. 0) then
+               if (segment_up(this_seg) == 0) then
                   Seg_tave_water(segment_order(j)) = -99.9
                   exit
                endif
@@ -675,7 +675,7 @@
       upstream_count = 0
       do i = 1, nsegment
          do j = 1, nsegment
-            if (tosegment(j) .eq. i) then
+            if (Tosegment(j) == i) then
                upstream_count(i) = upstream_count(i) + 1
             endif
          end do
@@ -687,7 +687,7 @@
       upstream_count = 0
       do i = 1, nsegment
          do j = 1, nsegment
-            if (tosegment(j) .eq. i) then
+            if (Tosegment(j) == i) then
                upstream_count(i) = upstream_count(i) + 1
                upstream_idx(i,upstream_count(i)) = j
             endif

@@ -80,7 +80,6 @@
       INTEGER :: year, month, day, istop, ierr
 !***********************************************************************
       dynparaminit = 0
-      istop = 0
 
       year = Start_year
       month = Start_month
@@ -88,6 +87,7 @@
 
       ALLOCATE ( Temp(Nhru), Itemp(Nhru), Updated_hrus(Nhru) )
 
+      istop = 0
       Wrainintcp_flag = OFF
       Srainintcp_flag = OFF
       Snowintcp_flag = OFF
@@ -350,7 +350,7 @@
           IF ( Wrain_intcp_next_yr==Nowyear .AND. Wrain_intcp_next_mo==Nowmonth .AND. Wrain_intcp_next_day==Nowday ) THEN
             READ ( Wrain_intcp_unit, *, IOSTAT=ios ) Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day, Temp
             if (ios /= 0) call error_stop('reading wrain_intcp dynamic parameter file', ERROR_dynamic)
-            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Wrain_intcp(:,Nowmonth), 'wrain_intcp')
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Wrain_intcp, 'wrain_intcp')
             CALL is_eof(Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day)
           ENDIF
         ENDIF
@@ -360,7 +360,7 @@
           IF ( Srain_intcp_next_yr==Nowyear .AND. Srain_intcp_next_mo==Nowmonth .AND. Srain_intcp_next_day==Nowday ) THEN
             READ ( Srain_intcp_unit, *, IOSTAT=ios ) Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day, Temp
             if (ios /= 0) call error_stop('reading srain_intcp dynamic parameter file', ERROR_dynamic)
-            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Srain_intcp(:,Nowmonth), 'srain_intcp')
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Srain_intcp, 'srain_intcp')
             CALL is_eof(Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day)
           ENDIF
         ENDIF
@@ -370,7 +370,7 @@
           IF ( Snow_intcp_next_yr==Nowyear .AND. Snow_intcp_next_mo==Nowmonth .AND. Snow_intcp_next_day==Nowday ) THEN
             READ ( Snow_intcp_unit, *, IOSTAT=ios ) Snow_intcp_next_yr, Snow_intcp_next_mo, Snow_intcp_next_day, Temp
             if (ios /= 0) call error_stop('reading snow_intcp dynamic parameter file', ERROR_dynamic)
-            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Snow_intcp(:,Nowmonth), 'snow_intcp')
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Snow_intcp, 'snow_intcp')
             CALL is_eof(Snow_intcp_unit, Snow_intcp_next_yr, Snow_intcp_next_mo, Snow_intcp_next_day)
           ENDIF
         ENDIF
@@ -381,7 +381,7 @@
           IF ( Covden_sum_next_yr==Nowyear .AND. Covden_sum_next_mo==Nowmonth .AND. Covden_sum_next_day==Nowday ) THEN
             READ ( Covden_sum_unit, *, IOSTAT=ios ) Covden_sum_next_yr, Covden_sum_next_mo, Covden_sum_next_day, Temp
             if (ios /= 0) call error_stop('reading covden_sum dynamic parameter file', ERROR_dynamic)
-            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_sum(:,Nowmonth), 'covden_sum')
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_sum, 'covden_sum')
             CALL is_eof(Covden_sum_unit, Covden_sum_next_yr, Covden_sum_next_mo, Covden_sum_next_day)
           ENDIF
         ENDIF
@@ -391,7 +391,7 @@
           IF ( Covden_win_next_yr==Nowyear .AND. Covden_win_next_mo==Nowmonth .AND. Covden_win_next_day==Nowday ) THEN
             READ ( Covden_win_unit, *, IOSTAT=ios ) Covden_win_next_yr, Covden_win_next_mo, Covden_win_next_day, Temp
             if (ios /= 0) call error_stop('reading covden_win dynamic parameter file', ERROR_dynamic)
-            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_win(:,Nowmonth), 'covden_win')
+            CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Covden_win, 'covden_win')
             CALL is_eof(Covden_win_unit, Covden_win_next_yr, Covden_win_next_mo, Covden_win_next_day)
           ENDIF
         ENDIF

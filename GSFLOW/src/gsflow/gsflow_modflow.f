@@ -40,7 +40,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 
       IF ( GSFLOW_flag==ACTIVE ) THEN
         IF ( Print_debug>DEBUG_less ) WRITE ( *, 8 )
-    8 FORMAT (14X, 'PROCESSES: GWF and OBS', /, 14X,
+    8   FORMAT (14X, 'PROCESSES: GWF and OBS', /, 14X,
      &        'PACKAGES:  BAS, BCF, CHD, DE4, FHB, GAG, GHB,',
      &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,',
      &        /, 25X, 'AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
@@ -664,7 +664,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                 retval = intcp()
                 IF ( no_snow_flag==OFF ) THEN
                   retval = snowcomp()
-                  IF ( Glacier_flag==ACTIVE ) THEN
+                  IF ( Glacier_flag==1 ) THEN
                     retval = glacr()
                   ENDIF
                 ENDIF
