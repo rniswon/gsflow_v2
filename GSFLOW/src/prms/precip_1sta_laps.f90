@@ -21,7 +21,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=11) :: MODNAME
-        character(len=*), parameter :: Version_precip = '2022-02-18'
+        character(len=*), parameter :: Version_precip = '2022-09-07'
         INTEGER, SAVE, ALLOCATABLE :: Psta_nuse(:)
         REAL, SAVE, ALLOCATABLE :: Rain_adj_lapse(:, :), Snow_adj_lapse(:, :), Precip_local(:)
         ! Declared Parameters
@@ -33,9 +33,8 @@
 
       INTEGER FUNCTION precip_1sta_laps()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, ACTIVE, OFF, GLACIER, &
-     &    DEBUG_less, MM, MM2INCH, MONTHS_PER_YEAR, DOCUMENTATION, precip_1sta_module, precip_laps_module
-      use PRMS_READ_PARAM_FILE, only: declparam, getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Nrain, Model, Process_flag, Inputerror_flag, Precip_flag, &
+     &    DEBUG_less, MM, MM2INCH, MONTHS_PER_YEAR, precip_1sta_module, precip_laps_module
+      USE PRMS_MODULE, ONLY: Nhru, Nrain, Process_flag, Inputerror_flag, Precip_flag, &
      &    Print_debug, Glacier_flag, Nowmonth, Hru_type
       USE PRMS_PRECIP_1STA_LAPS
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_area, Hru_route_order, Basin_area_inv, Hru_elev_ts
@@ -44,6 +43,7 @@
      &    Basin_obs_ppt, Tmaxf, Tminf, Tmax_allrain_f, Tmax_allsnow_f, &
      &    Adjmix_rain, Precip_units
       USE PRMS_OBS, ONLY: Precip
+      use PRMS_READ_PARAM_FILE, only: declparam, getparam_int, getparam_real
       use prms_utils, only: checkdim_param_limits, print_date, print_module, read_error
       IMPLICIT NONE
 ! Functions
@@ -85,7 +85,7 @@
           Newsnow(i) = OFF
           Pptmix(i) = OFF
           ppt = Precip_local(Hru_psta(i))
-          IF ( Glacier_flag==ACTIVE ) THEN
+          IF ( Glacier_flag==1 ) THEN
             IF ( Hru_type(i)==GLACIER ) THEN
               ! Hru_elev_ts is the antecedent glacier elevation
               IF ( Precip_flag==precip_laps_module ) CALL compute_precip_laps(i, Hru_plaps(i), Hru_psta(i), Hru_elev_ts(i))
@@ -121,7 +121,7 @@
      &       'none')/=0 ) CALL read_error(1, 'hru_psta')
 
         ALLOCATE ( Rain_adj_lapse(Nhru, MONTHS_PER_YEAR), Snow_adj_lapse(Nhru, MONTHS_PER_YEAR) )
-        IF ( Precip_flag==precip_1sta_module .OR. Model==DOCUMENTATION ) THEN
+        IF ( Precip_flag==precip_1sta_module ) THEN
           IF ( declparam(MODNAME, 'rain_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.2', '10.0', &
      &         'Monthly rain adjustment factor for each HRU', &
@@ -137,7 +137,7 @@
      &         'decimal fraction')/=0 ) CALL read_error(1, 'snow_adj')
         ENDIF
 
-        IF ( Precip_flag==precip_laps_module .OR. Model==DOCUMENTATION ) THEN
+        IF ( Precip_flag==precip_laps_module ) THEN
           ALLOCATE ( Padj_rn(Nrain, MONTHS_PER_YEAR) )
           IF ( declparam(MODNAME, 'padj_rn', 'nrain,nmonths', 'real', &
      &         '1.0', '-2.0', '10.0', &

@@ -312,7 +312,7 @@
       IF ( Model==DOCUMENTATION ) THEN
         IF ( Process_flag==SETDIMENS .OR. Process_flag==DECL ) THEN
           Init_vars_from_file = 0 ! make sure this is set so all variables and parameters are declared
-          CALL module_doc(AFR)
+          CALL module_doc()
           RETURN
         ELSE
           STOP
@@ -457,9 +457,9 @@
       IF ( Model==PRMS .OR. Model==MODSIM_PRMS .OR. Process_flag/=RUN ) THEN
         IF ( Model==MODSIM_PRMS ) CALL gsflow_modsim2prms(DIVERSIONS, Nsegshold)
         IF ( AG_flag==OFF ) THEN
-          ierr = soilzone(AFR, 1)
+          ierr = soilzone()
         ELSE
-          ierr = soilzone_ag(AFR, 1)
+          ierr = soilzone_ag()
         ENDIF
 
         IF ( GSFLOW_flag == OFF ) THEN
@@ -493,9 +493,9 @@
       ENDIF
     ELSEIF ( Model == MODSIM_PRMS ) THEN
       IF ( AG_flag==ACTIVE ) THEN
-        ierr = soilzone_ag(AFR,1)
+        ierr = soilzone_ag()
       ELSE
-        ierr = soilzone(AFR,1)
+        ierr = soilzone()
       ENDIF
       ! rsr, need to do something if gwflow_cbh_flag=1
       ierr = gwflow()
@@ -1426,13 +1426,11 @@
 !**********************************************************************
 !     Module documentation
 !**********************************************************************
-      SUBROUTINE module_doc(AFR)
+      SUBROUTINE module_doc()
       USE PRMS_CONSTANTS, ONLY: DECL
       USE PRMS_MODULE, ONLY: Process_flag
       use PRMS_SET_TIME, only: prms_time
       IMPLICIT NONE
-! Arguments
-      LOGICAL, INTENT(IN) :: AFR
 ! Functions
       INTEGER, EXTERNAL :: basin, climateflow
       INTEGER, EXTERNAL :: cascade, obs, soltab, transp_tindex
@@ -1491,7 +1489,7 @@
       test = snowcomp()
       test = srunoff()
       test = glacr()
-      test = soilzone_ag(AFR, 1)
+      test = soilzone_ag()
       test = gsflow_prms2mf()
       test = gsflow_mf2prms()
       test = gsflow_budget()

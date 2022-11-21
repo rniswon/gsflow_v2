@@ -62,10 +62,10 @@
 !     map_resultsdecl - declare parameters and variables
 !***********************************************************************
       INTEGER FUNCTION map_resultsdecl()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DOCUMENTATION, ERROR_dim
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dim
       use PRMS_READ_PARAM_FILE, only: declparam
       use PRMS_CONTROL_FILE, only: control_integer, control_string_array
-      USE PRMS_MODULE, ONLY: Model, Nhru, Nhrucell, Ngwcell, MapOutON_OFF
+      USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Ngwcell, MapOutON_OFF
       USE PRMS_MAP_RESULTS
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -78,12 +78,10 @@
 
       IF ( control_integer(NmapOutVars, 'nmapOutVars')/=0 ) NmapOutVars = 0
       IF ( NmapOutVars==0 ) THEN
-        IF ( Model/=DOCUMENTATION ) THEN
-          PRINT *, 'WARNING, map_results requested with nmapOutVars equal 0'
-          PRINT *, 'no map_results output is produced'
-          MapOutON_OFF = OFF
-          RETURN
-        ENDIF
+        PRINT *, 'WARNING, map_results requested with nmapOutVars equal 0'
+        PRINT *, 'no map_results output is produced'
+        MapOutON_OFF = OFF
+        RETURN
       ELSE
         ALLOCATE ( MapOutVar_names(NmapOutVars), Map_var_type(NmapOutVars), Nc_vars(NmapOutVars) )
         ALLOCATE ( Map_var(Nhru, NmapOutVars), Map_var_dble(Nhru, NmapOutVars) )
@@ -101,14 +99,8 @@
         Numvalues = Ngwcell
       ENDIF
 
-      IF ( Mapflg==OFF .OR. Model==DOCUMENTATION ) THEN
-        IF ( Nhrucell<1 ) THEN
-          IF ( Model==DOCUMENTATION ) THEN
-            Nhrucell = 1
-          ELSE
-            CALL error_stop('in map_results, nhrucell = 0 and must be > 0', ERROR_dim)
-          ENDIF
-        ENDIF
+      IF ( Mapflg==OFF ) THEN
+        IF ( Nhrucell<1 ) CALL error_stop('in map_results, nhrucell = 0 and must be > 0', ERROR_dim)
         ALLOCATE ( Gvr_map_id(Nhrucell), Gvr_map_frac(Nhrucell), Gvr_hru_id(Nhrucell), Map_var_id(Ngwcell) )
         ALLOCATE ( Gvr_map_frac_dble(Nhrucell) )
       ENDIF
@@ -134,20 +126,20 @@
      &     'Number of columns for each row of the mapped results', &
      &     'none')/=0 ) CALL read_error(1, 'ncol')
 
-      IF ( Mapflg==OFF .OR. Model==DOCUMENTATION ) THEN
+      IF ( Mapflg==OFF ) THEN
         IF ( declparam(MODNAME, 'gvr_cell_id', 'nhrucell', 'integer', &
      &       '0', 'bounded', 'ngwcell', &
      &       'Corresponding grid cell id associated with each GVR', &
      &       'Index of the grid cell associated with each gravity reservoir', &
      &       'none')/=0 ) CALL read_error(1, 'gvr_cell_id')
-        IF ( Nhrucell/=Ngwcell .OR. Model==DOCUMENTATION ) THEN
+        IF ( Nhrucell/=Ngwcell ) THEN
           IF ( declparam(MODNAME, 'gvr_cell_pct', 'nhrucell', 'real', &
      &         '0.0', '0.0', '1.0', &
      &         'Proportion of the grid cell associated with each GVR', &
      &         'Proportion of the grid cell area associated with each gravity reservoir', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'gvr_cell_pct')
         ENDIF
-        IF ( Nhru/=Nhrucell .OR. Model==DOCUMENTATION ) THEN
+        IF ( Nhru/=Nhrucell ) THEN
           IF ( declparam(MODNAME, 'gvr_hru_id', 'nhrucell', 'integer', &
      &         '0', 'bounded', 'nhru', &
      &         'Corresponding HRU id of each GVR', &
@@ -392,11 +384,11 @@
       ENDIF
 
 ! check for last day of simulation
-      last_day = OFF
+      last_day = 0
       IF ( Nowyear==End_year ) THEN
         IF ( Nowmonth==End_month ) THEN
           IF ( Nowday==End_day ) THEN
-            last_day = ACTIVE
+            last_day = 1
             Prevyr = Nowyear
             Prevmo = Nowmonth
             Prevday = Nowday
@@ -406,8 +398,8 @@
 
       IF ( Yrresults==ACTIVE ) THEN
 ! check for first time step of the next year
-        IF ( Lastyear/=Nowyear .OR. last_day==ACTIVE ) THEN
-          IF ( (Nowmonth==Start_month .AND. Nowday==Start_day) .OR. last_day==ACTIVE ) THEN
+        IF ( Lastyear/=Nowyear .OR. last_day==1 ) THEN
+          IF ( (Nowmonth==Start_month .AND. Nowday==Start_day) .OR. last_day==1 ) THEN
             Lastyear = Nowyear
             factor = Conv_fac/DBLE(Yrdays)
             Basin_var_yr = 0.0D0
@@ -546,7 +538,7 @@
       IF ( Monresults==ACTIVE ) THEN
         Mondays = Mondays + 1
 ! check for last day of current month
-        IF ( Nowday==Modays(Nowmonth) .OR. last_day==ACTIVE ) THEN
+        IF ( Nowday==Modays(Nowmonth) .OR. last_day==1 ) THEN
           factor = Conv_fac/DBLE(Mondays)
           Basin_var_mon = 0.0D0
           DO jj = 1, NmapOutVars
@@ -581,7 +573,7 @@
       IF ( Totresults==ACTIVE ) THEN
         Totdays = Totdays + 1
 ! check for last day of simulation
-        IF ( last_day==ACTIVE ) THEN
+        IF ( last_day==1 ) THEN
           factor = Conv_fac/DBLE(Totdays)
           Basin_var_tot = 0.0D0
           DO jj = 1, NmapOutVars

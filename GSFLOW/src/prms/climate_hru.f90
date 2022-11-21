@@ -10,7 +10,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2022-06-02'
+        character(len=*), parameter :: Version_climate_hru = '2022-09-07'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit, AET_unit, PET_unit, Irrigated_area_unit
         INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit, Pkweqv_unit
@@ -32,16 +32,16 @@
       END MODULE PRMS_CLIMATE_HRU
 
       INTEGER FUNCTION climate_hru()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, RUN, DECL, INIT, DOCUMENTATION, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, RUN, DECL, INIT, &
      &    MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, CELSIUS, MONTHS_PER_YEAR, DEBUG_less
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real
       use PRMS_CONTROL_FILE, only: control_integer, control_string
-      USE PRMS_MODULE, ONLY: Process_flag, Model, Nhru, Climate_transp_flag, Orad_flag, &
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Climate_transp_flag, Orad_flag, &
      &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
      &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
-     &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, Nowyear, Nowday, forcing_check_flag, Snow_cbh_flag, &
-     &    irrigated_area_flag, AET_cbh_flag, PET_cbh_flag, Print_debug
+     &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, Nowyear, Nowday, forcing_check_flag, Print_debug, &
+     &    Snow_cbh_flag, irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag
       USE PRMS_CLIMATE_HRU
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Ag_Frac
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
@@ -54,7 +54,7 @@
       USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_SOLTAB, ONLY: Soltab_basinpotsw, Hru_cossl, Soltab_potsw
       use prms_utils, only: find_current_time, find_cbh_header_end, print_date, print_module, read_error
-      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv !, Pk_depth, Snow_evap, Snowcov_area, Snowmelt
+      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Basin_pweqv !, Pk_depth, Snow_evap, Snowcov_area, Snowmelt
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
@@ -150,7 +150,7 @@
 
         ENDIF
 
-        IF ( irrigated_area_flag==ACTIVE ) THEN
+        IF ( irrigated_area_cbh_flag==ACTIVE ) THEN
           READ ( Irrigated_area_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Irrigated_area(i), i=1,Nhru)
           IF ( ios/=0 ) THEN
             ierr = 1
@@ -217,6 +217,7 @@
           ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
             CALL read_cbh_date(yr, mo, dy, 'pkwater_equiv', ios, ierr)
           ENDIF
+          Basin_pweqv = 0.0D0
           !READ ( Pkdepth_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Pk_depth(i), i=1,Nhru)
           !IF ( ios/=0 ) THEN
           !  ierr = 1
@@ -264,9 +265,9 @@
           IF ( Windspeed_cbh_flag==ACTIVE ) CALL check_cbh_value('windspeed_hru', Windspeed_hru, 0.0, 400.0, missing)
           IF ( AET_cbh_flag==ACTIVE ) CALL check_cbh_value('AET_external', AET_external, 0.0, 50.0, missing)
           IF ( PET_cbh_flag==ACTIVE ) CALL check_cbh_value('PET_external', PET_external, 0.0, 50.0, missing)
-          IF ( irrigated_area_flag==ACTIVE ) CALL check_cbh_value('irrigated_area', Irrigated_area, 0.0, 9999.0, missing)
+          IF ( irrigated_area_cbh_flag==ACTIVE ) CALL check_cbh_value('irrigated_area', Irrigated_area, 0.0, 9999.0, missing)
           !IF ( Snow_cbh_flag==ACTIVE ) THEN
-          !  CALL check_cbh_value('pkwater_equiv', Pkwater_equiv, 0.0, 100.0, missing) ! can't check double now
+            !CALL check_cbh_value('pkwater_equiv', Pkwater_equiv, 0.0, 100.0, missing) ! can't check double now
             !CALL check_cbh_value('pk_depth', Pk_depth, 0.0, 100.0, missing) ! can't check double now
             !CALL check_cbh_value('snow_evap', Snow_evap, 0.0, 100.0, missing)
             !CALL check_cbh_value('snowcov_area', Snowcov_area, 0.0, 100.0, missing)
@@ -337,8 +338,8 @@
           IF ( Windspeed_cbh_flag==ACTIVE ) Basin_windspeed = Basin_windspeed + DBLE( Windspeed_hru(i)*harea )
           IF ( AET_cbh_flag==ACTIVE ) Basin_aet_external = Basin_aet_external + DBLE( AET_external(i)*harea )
           IF ( PET_cbh_flag==ACTIVE ) Basin_pet_external = Basin_pet_external + DBLE( PET_external(i)*harea )
-          IF ( irrigated_area_flag==ACTIVE ) Basin_irrigated_area = Basin_irrigated_area + DBLE( Irrigated_area(i)*harea )
-
+          IF ( irrigated_area_cbh_flag==ACTIVE ) Basin_irrigated_area = Basin_irrigated_area + DBLE( Irrigated_area(i)*harea )
+          IF ( snow_cbh_flag==ACTIVE ) Basin_pweqv = Basin_pweqv + Pkwater_equiv(i) * DBLE( harea )
         ENDDO
 !        IF ( write_tmin_tmax == 1 ) THEN
 !          WRITE ( 863,  '(I4,2I3,3I2,128F7.2)' ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tmaxf(i), i=1,Nhru)
@@ -375,47 +376,48 @@
         IF ( Windspeed_cbh_flag==ACTIVE ) Basin_windspeed = Basin_windspeed*Basin_area_inv
         IF ( AET_cbh_flag==ACTIVE ) Basin_aet_external = Basin_aet_external*Basin_area_inv
         IF ( PET_cbh_flag==ACTIVE ) Basin_pet_external = Basin_pet_external*Basin_area_inv
-        IF ( irrigated_area_flag==ACTIVE ) Basin_irrigated_area = Basin_irrigated_area*Basin_area_inv
+        IF ( irrigated_area_cbh_flag==ACTIVE ) Basin_irrigated_area = Basin_irrigated_area*Basin_area_inv
+        IF ( snow_cbh_flag==ACTIVE ) Basin_pweqv = Basin_pweqv * Basin_area_inv
 
       ELSEIF ( Process_flag==DECL ) THEN
 
         IF ( control_integer(Cbh_check_flag, 'cbh_check_flag')/=0 ) Cbh_check_flag = ACTIVE
 
-        IF ( Climate_temp_flag==ACTIVE .OR. Model==DOCUMENTATION ) &
+        IF ( Climate_temp_flag==ACTIVE ) &
      &       CALL print_module('Temperature Distribution', MODNAME, Version_climate_hru)
-        IF ( Climate_precip_flag==ACTIVE .OR. Model==DOCUMENTATION ) &
+        IF ( Climate_precip_flag==ACTIVE ) &
      &       CALL print_module('Precipitation Distribution', MODNAME, Version_climate_hru)
-        IF ( Climate_swrad_flag==ACTIVE .OR. Model==DOCUMENTATION ) &
+        IF ( Climate_swrad_flag==ACTIVE ) &
      &       CALL print_module('Solar Radiation Distribution', MODNAME, Version_climate_hru)
-        IF ( Climate_potet_flag==ACTIVE .OR. Model==DOCUMENTATION ) &
+        IF ( Climate_potet_flag==ACTIVE ) &
      &       CALL print_module('Potential Evapotranspiration', MODNAME, Version_climate_hru)
-        IF ( Climate_transp_flag==ACTIVE .OR. Model==DOCUMENTATION ) &
+        IF ( Climate_transp_flag==ACTIVE ) &
      &       CALL print_module('Transpiration Distribution', MODNAME, Version_climate_hru)
-        IF ( Snow_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) &
+        IF ( Snow_cbh_flag==ACTIVE ) &
      &       CALL print_module('Snow Computation', MODNAME, Version_climate_hru)
 
-        IF ( Humidity_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( Humidity_cbh_flag==ACTIVE ) THEN
           CALL print_module('Humidity Distribution', MODNAME, Version_climate_hru)
           ALLOCATE ( Humidity_hru(Nhru) )
           CALL declvar_real(MODNAME, 'humidity_hru', 'nhru', Nhru, &
      &         'Relative humidity of each HRU read from CBH File', &
      &         'percentage', Humidity_hru)
         ENDIF
-        IF ( Albedo_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( Albedo_cbh_flag==ACTIVE ) THEN
           CALL print_module('Albedo Distribution', MODNAME, Version_climate_hru)
           ALLOCATE ( Albedo_hru(Nhru) )
           CALL declvar_real(MODNAME, 'albedo_hru', 'nhru', Nhru, &
      &         'Snowpack albedo of each HRU read from CBH File', &
      &         'decimal fraction', Albedo_hru)
         ENDIF
-        IF ( Cloud_cover_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( Cloud_cover_cbh_flag==ACTIVE ) THEN
           CALL print_module('Cloud Cover Distribution', MODNAME, Version_climate_hru)
           ALLOCATE ( Cloud_cover_cbh(Nhru) )
           CALL declvar_real(MODNAME, 'cloud_cover_cbh', 'nhru', Nhru, &
      &         'Cloud_cover of each HRU read from CBH File', &
      &         'decimal fraction', Cloud_cover_cbh)
         ENDIF
-        IF ( Windspeed_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( Windspeed_cbh_flag==ACTIVE ) THEN
           CALL print_module('Wind speed Distribution', MODNAME, Version_climate_hru)
           CALL declvar_dble(MODNAME, 'basin_windspeed', 'one', 1, &
      &         'Basin area-weighted average wind speed', &
@@ -426,7 +428,7 @@
      &         'meters/second', Windspeed_hru)
         ENDIF
 
-        IF ( AET_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( AET_cbh_flag==ACTIVE ) THEN
           CALL declvar_dble(MODNAME, 'basin_aet_external', 'one', 1, &
      &         'Basin area-weighted average PET read from CBH File', &
      &         'inches', Basin_aet_external)
@@ -436,7 +438,7 @@
      &         'inches', AET_external)
         ENDIF
 
-        IF ( PET_cbh_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( PET_cbh_flag==ACTIVE ) THEN
           CALL declvar_dble(MODNAME, 'basin_pet_external', 'one', 1, &
      &         'Basin area-weighted average PET read from CBH File', &
      &         'inches', Basin_pet_external)
@@ -446,7 +448,7 @@
      &         'inches', PET_external)
         ENDIF
 
-        IF ( irrigated_area_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( irrigated_area_cbh_flag==ACTIVE ) THEN
           CALL declvar_dble(MODNAME, 'basin_irrigated_area', 'one', 1, &
      &         'Basin area-weighted average irrigation area read from CBH File', &
      &         'acres', Basin_irrigated_area)
@@ -457,7 +459,7 @@
         ENDIF
 
 !   Declared Parameters
-        IF ( Climate_temp_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( Climate_temp_flag==ACTIVE ) THEN
           ALLOCATE ( Tmax_cbh_adj(Nhru,MONTHS_PER_YEAR) )
           IF ( declparam(MODNAME, 'tmax_cbh_adj', 'nhru,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
@@ -475,7 +477,7 @@
      &         'temp_units')/=0 ) CALL read_error(1, 'tmin_cbh_adj')
         ENDIF
 
-        IF ( Climate_precip_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( Climate_precip_flag==ACTIVE ) THEN
           ALLOCATE ( Rain_cbh_adj(Nhru,MONTHS_PER_YEAR) )
           IF ( declparam(MODNAME, 'rain_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '2.0', &
@@ -495,7 +497,7 @@
      &         'decimal fraction')/=0 ) CALL read_error(1, 'snow_cbh_adj')
         ENDIF
 
-        IF ( Climate_potet_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+        IF ( Climate_potet_flag==ACTIVE ) THEN
           ALLOCATE ( Potet_cbh_adj(Nhru,MONTHS_PER_YEAR) )
           IF ( declparam(MODNAME, 'potet_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '1.5', &
@@ -603,7 +605,7 @@
           ENDIF
         ENDIF
 
-        IF ( irrigated_area_flag==ACTIVE ) THEN
+        IF ( irrigated_area_cbh_flag==ACTIVE ) THEN
           IF ( control_string(irrigated_area_cbh_file, 'irrigated_cbh_file')/=0 ) CALL read_error(5, 'irrigated_area_cbh_file')
           CALL find_cbh_header_end(irrigated_area_unit, irrigated_area_cbh_file, 'irrigated_area_cbh_file', ierr, 1)
           IF ( ierr==1 ) THEN

@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsub_summary'
-      character(len=*), parameter :: Version_nsub_summary = '2021-11-23'
+      character(len=*), parameter :: Version_nsub_summary = '2022-09-07'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsub_var_type(:), Nsub_var_size(:)
       REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
@@ -69,10 +69,10 @@
       SUBROUTINE nsub_summarydecl()
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, DNEARZERO, &
      &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, &
-     &    REAL_TYPE, DBLE_TYPE, RUN, DECL, INIT, CLEAN, DOCUMENTATION
+     &    REAL_TYPE, DBLE_TYPE, RUN, DECL, INIT, CLEAN
       use PRMS_CONTROL_FILE, only: control_integer, control_string, control_string_array
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Nsub, Model
+      USE PRMS_MODULE, ONLY: Nhru, Nsub
       USE PRMS_NSUB_SUMMARY
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -91,7 +91,7 @@
 
       ALLOCATE ( Nsub_var_size(NsubOutVars) )
       IF ( NsubOutVars==0 ) THEN
-        IF ( Model/=DOCUMENTATION ) CALL error_stop('ERROR, nsub_summary requested with nsubOutVars equal 0', ERROR_control)
+        CALL error_stop('ERROR, nsub_summary requested with nsubOutVars equal 0', ERROR_control)
       ELSE
         ALLOCATE ( NsubOutVar_names(NsubOutVars), Nsub_var_type(NsubOutVars), Nc_vars(NsubOutVars) )
         NsubOutVar_names = ' '

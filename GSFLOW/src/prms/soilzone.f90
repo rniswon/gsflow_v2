@@ -77,13 +77,10 @@
 !***********************************************************************
 !     Main soilzone routine
 !***********************************************************************
-      INTEGER FUNCTION soilzone(AFR, iter_flag)
+      INTEGER FUNCTION soilzone()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
-! Arguments
-      LOGICAL, INTENT(IN) :: AFR ! true for non-MODSIM modes, true for first iteration of MODSIM modes
-      INTEGER, INTENT(IN) :: iter_flag ! 1 for non-MODSIM modes, 2 for first iteration of MODSIM modes
 ! Functions
       INTEGER, EXTERNAL :: szdecl, szinit, szrun
       EXTERNAL :: soilzone_restart
@@ -91,7 +88,7 @@
       soilzone = 0
 
       IF ( Process_flag==RUN ) THEN
-        soilzone = szrun(AFR, iter_flag)
+        soilzone = szrun()
       ELSEIF ( Process_flag==DECL ) THEN
         soilzone = szdecl()
       ELSEIF ( Process_flag==INIT ) THEN
@@ -709,6 +706,7 @@
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Gvr2sm = 0.0 ! dimension nhru
         Gw2sm_grav = 0.0 ! dimension nhrucell
+        Grav_gwin = 0.0 ! dimension nhru
 
         Max_gvrs = 1
         Hrucheck = 1
@@ -763,12 +761,12 @@
 !             interflow, excess routed to stream,
 !             and groundwater reservoirs
 !***********************************************************************
-      INTEGER FUNCTION szrun(AFR, iter_flag)
+      INTEGER FUNCTION szrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, GSFLOW_flag, &
-     &    Kkiter, Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Hru_type, AG_flag, Model, Nowmonth !, Nowyear, Nowday
+     &    Frozen_flag, Soilzone_add_water_use, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
+     &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Nowmonth, Model !, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -793,9 +791,6 @@
           Hru_sroffp, Hortonian_flow, Basin_sroffp, Basin_hortonian
       use prms_utils, only: print_date
       IMPLICIT NONE
-! Arguments
-      LOGICAL, INTENT(IN) :: AFR
-      INTEGER, INTENT(IN) :: iter_flag
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow
@@ -816,8 +811,7 @@
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Sm2gw_grav = 0.0 ! dimension nhrucell
-        Grav_gwin = 0.0 ! dimension nhru
-        IF ( AFR .AND. iter_flag == 1 ) THEN ! Kkiter == 1
+        IF ( timestep_start_flag == ACTIVE ) THEN
           ! iter_flag = 1 means the call is done before UZF
           ! iter_flag = 2 means second call within MF iteration loop that is after UZF for a MODSIM-GSFLOW simulation
           Gw2sm_grav = 0.0 ! dimension nhrucell
@@ -829,21 +823,22 @@
             It0_strm_seg_in = Strm_seg_in
           ENDIF
           IF ( Nlake>0 ) It0_potet = Potet
-        END IF
-        !IF ( Kkiter>1 .or. .not. AFR ) THEN ! Kkiter>1 means GSFLOW is active
-        Soil_moist = It0_soil_moist
-        Soil_rechr = It0_soil_rechr
-        Ssres_stor = It0_ssres_stor
-        Slow_stor = It0_slow_stor
-        IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
-        IF ( update_potet == 1 ) Potet = It0_potet
-        Gravity_stor_res = It0_gravity_stor_res
-        IF ( PRMS_land_iteration_flag==OFF ) THEN
-          ! computed in srunoff
-          Sroff = It0_sroff
-          Hru_sroffp = It0_hru_sroffp
-          Hortonian_flow = It0_hortonian_flow
-          Strm_seg_in = It0_strm_seg_in
+          timestep_start_flag = OFF
+        ELSE
+          Soil_moist = It0_soil_moist
+          Soil_rechr = It0_soil_rechr
+          Ssres_stor = It0_ssres_stor
+          Slow_stor = It0_slow_stor
+          IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
+          IF ( update_potet == 1 ) Potet = It0_potet
+          Gravity_stor_res = It0_gravity_stor_res
+          IF ( PRMS_land_iteration_flag==OFF ) THEN
+            ! computed in srunoff
+            Sroff = It0_sroff
+            Hru_sroffp = It0_hru_sroffp
+            Hortonian_flow = It0_hortonian_flow
+            Strm_seg_in = It0_strm_seg_in
+          ENDIF
         ENDIF
       ENDIF
 
