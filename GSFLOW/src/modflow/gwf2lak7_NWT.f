@@ -4187,7 +4187,7 @@ C5------RETURN.
 C
 C-------SUBROUTINE LAK2MODSIM, But directly callable by MODSIM
       SUBROUTINE LAK2MODSIM_InitLakes(DELTAVOL,LAKEVOL, MXLKVOL) 
-     &                           BIND(C,NAME="LAK2MODSIM_InitLakes")
+!     &                           BIND(C,NAME="LAK2MODSIM_InitLakes")
       
       !DEC$ ATTRIBUTES DLLEXPORT :: LAK2MODSIM_InitLakes
       

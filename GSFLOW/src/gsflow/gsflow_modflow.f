@@ -854,7 +854,7 @@ C     ACCUMULATE ACCRETION/DEPLETIONS FOR ALL STREAM SEGMENETS AND LAKES THAT
 C     ARE MAPPED TO MODSIM NODES (OR LINKS)
 C     ************************************************************************
       SUBROUTINE COMPUTE_EXCHG(EXCHG, ELAKVol, KPER) 
-     &                  BIND(C,NAME="COMPUTE_EXCHG")
+!     &                  BIND(C,NAME="COMPUTE_EXCHG")
 C      
         !DEC$ ATTRIBUTES DLLEXPORT :: COMPUTE_EXCHG
 C
@@ -1444,7 +1444,7 @@ C     REQUIRE THAT A MODSIM TIME STEP EQUAL A MODFLOW TIME STEP
 C     AND THAT MODFLOW WILL NEED TO BE RESTRICTED TO ONE TIME STEP
 C     PER MODFLOW STRESS PERIOD.
 !***********************************************************************
-      SUBROUTINE MFNWT_RDSTRESS() BIND(C,NAME="MFNWT_RDSTRESS")
+      SUBROUTINE MFNWT_RDSTRESS() ! BIND(C,NAME="MFNWT_RDSTRESS")
 C
       !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_RDSTRESS
 C
@@ -1525,7 +1525,7 @@ C     ************************************************************************
 C     WRITE RASTERS OF GROUNDWATER/SURFACE-WATER INTERACTION
 C     
 C     ************************************************************************
-      SUBROUTINE MFNWT_WRITERAS(KPER) BIND(C,NAME="MFNWT_WRITERAS")
+      SUBROUTINE MFNWT_WRITERAS(KPER) ! BIND(C,NAME="MFNWT_WRITERAS")
 C
       !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_WRITERAS
 C
