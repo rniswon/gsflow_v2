@@ -118,9 +118,9 @@ GSFLOW Output Budget Summary    gsflow_budget       2022-04-27
 GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
 Output Summary                  subbasin            2022-09-07
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2022-09-01
-UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
-SFR-NWT Package                 gwf2sfr7_NWT        2022-02-01
+GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
+UZF-NWT Package                 gwf2uzf1_NWT        2022-10-18
+SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
 
 Using Control File: .\gsflow.control
 
@@ -135,5 +135,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time   16 minutes  5.45 seconds
+Execution elapsed time   16 minutes 27.11 seconds
 

@@ -229,9 +229,9 @@ GSFLOW Output Budget Summary    gsflow_budget       2022-04-27
 GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
 Output Summary                  subbasin            2022-09-07
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2022-09-01
-UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
-SFR-NWT Package                 gwf2sfr7_NWT        2022-02-01
+GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
+UZF-NWT Package                 gwf2uzf1_NWT        2022-10-18
+SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
 LAK-NWT Package                 gwf2lak7_NWT        2021-09-28
 
 Using Control File: .\Tahoe.control
@@ -248,5 +248,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time   17 minutes 25.58 seconds
+Execution elapsed time   18 minutes 12.85 seconds
 
