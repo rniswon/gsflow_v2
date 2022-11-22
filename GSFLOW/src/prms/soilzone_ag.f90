@@ -40,7 +40,7 @@
       REAL, SAVE, ALLOCATABLE :: Ag_soil_lower(:), Ag_soil_lower_stor_max(:), Ag_potet_rechr(:), Ag_potet_lower(:)
 !      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Ag_upslope_dunnian(:)
       REAL, SAVE, ALLOCATABLE :: Ag_gvr_to_sm(:)
-!      REAL, SAVE, ALLOCATABLE :: Ag_recharge(:), Ag_interflow(:), Ag_gvr_to_sm(:)
+!      REAL, SAVE, ALLOCATABLE :: Ag_recharge(:), Ag_interflow(:)
       INTEGER, SAVE :: total_iters, iter_nonconverge
       real, save :: unsatisfied_big
       ! parameters
@@ -97,7 +97,7 @@
       USE PRMS_CONSTANTS, ONLY: OFF, ACTIVE, MONTHS_PER_YEAR
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getdim
-      USE PRMS_MODULE, ONLY: Nhru, GSFLOW_flag, AG_flag !, Cascade_flag, Ag_gravity_flag
+      USE PRMS_MODULE, ONLY: Nhru, GSFLOW_flag !, Cascade_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       use prms_utils, only: error_stop, print_module, PRMS_open_module_file, read_error
@@ -192,7 +192,7 @@
      &   ' reservoir that is only available for transpiration for each HRU', &
      &   'inches', Ag_soil_lower)
 
-      IF ( GSFLOW_flag==ACTIVE .AND. AG_flag==ACTIVE ) THEN
+      IF ( GSFLOW_flag==ACTIVE ) THEN
         ALLOCATE ( Ag_gvr_to_sm(Nhru), Ag_replenish_frac(Nhru) )
         CALL declvar_real(MODNAME, 'ag_gvr_to_sm', 'nhru', Nhru, &
      &       'Gravity flow to irrigated soil replenishment for each HRU', &
@@ -535,7 +535,7 @@
         Pref_flow = 0.0
         Pref_flow_infil = 0.0
       ENDIF
-!      IF ( GSFLOW_flag==ACTIVE .AND. Ag_gravity_flag==ACTIVE ) Ag_gvr_to_sm = 0.0
+      IF ( GSFLOW_flag==ACTIVE ) Ag_gvr_to_sm = 0.0
 
 ! ***************************************
       DO WHILE ( keep_iterating==ACTIVE )

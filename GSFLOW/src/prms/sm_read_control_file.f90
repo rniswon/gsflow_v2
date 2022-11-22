@@ -974,7 +974,7 @@ contains
   ! Get Control File from command line or user interaction.
   !***********************************************************************
   module subroutine get_control_filename()
-    use PRMS_CONSTANTS, ONLY: ERROR_control, ACTIVE, OFF
+    use PRMS_CONSTANTS, ONLY: ERROR_control, OFF
     use PRMS_MODULE, only: EQULS, Model_control_file, command_line, num_words_command_line, command_line_modsim, MODSIM_flag
     use prms_utils, only: error_stop
     implicit none
@@ -985,10 +985,10 @@ contains
     integer :: istart, iend
     !***********************************************************************
     ! This routine expects the Control File name to be the first argument
-    IF ( MODSIM_flag == ACTIVE ) THEN
-      command_line = command_line_modsim
-    ELSE
+    IF ( MODSIM_flag == OFF ) THEN
       call GET_COMMAND(command_line)
+    ELSE
+      command_line = command_line_modsim
     ENDIF
     print '(A)', EQULS
     print '(A)', 'Command line: ', trim( command_line )
@@ -1001,11 +1001,9 @@ contains
       print '(/,2A)', 'Executable: ', command_line(istart:iend)
       istart = iend + 1
       istart = verify(command_line(istart:), ' ,') + istart - 1  !-- Find next non-blank; start of control file path
-      if ( num_words_command_line == 1 ) then  ! no arguments after Control File name
-        write (*, '(/,A)') 'Enter the name of the PRMS Control File or quit:'
-        read (*, '(A)') Model_control_file
-        if (Model_control_file(:4) == 'quit' .or. Model_control_file(:4) == 'QUIT') ERROR stop ERROR_control
-      endif
+      iend = scan(command_line(istart:), ' ,') - 2 + istart      !-- Find next blank and set result to end of word
+      if ( num_words_command_line == 1 ) &  ! no arguments after executable name
+           call error_stop('PRMS Control File must be specified on the command line', ERROR_control)
     ENDIF
     Model_control_file = trim( command_line(istart:iend) )
     if (trim(Model_control_file(:2)) == '-C') Model_control_file = trim( Model_control_file(3:) )
@@ -1025,7 +1023,7 @@ contains
   ! Get Control File set arguments from command line.
   !***********************************************************************
   module subroutine get_control_arguments()
-    use PRMS_CONSTANTS, only: DEBUG_less, ERROR_control, ACTIVE
+    use PRMS_CONSTANTS, only: DEBUG_less, ERROR_control, OFF
     use PRMS_MODULE, only: EQULS, command_line, num_words_command_line, MODSIM_flag
     use prms_utils, only: error_stop
     implicit none
@@ -1035,25 +1033,24 @@ contains
     character(LEN=128) :: command_line_arg
     integer :: status, i, j, numargs, index, param_type, num_param_values, istart, iend
     !***********************************************************************
+    ! This routine expects the Control File name to be the second word in the command line
+    ! or the Control File name is the first word in the command line passed by MODSIM
     print '(A)', EQULS
     command_line_arg = ' '
     istart = 1
-    ! This routine expects the Control File name to be the second word in the command line
-    ! or the Control File name is the first word in the command line passed by MODSIM
-    IF ( MODSIM_flag == ACTIVE ) THEN
-      if ( num_words_command_line < 2 ) return           ! no arguments after Control File name
-      numargs = num_words_command_line - 1
-      i = 1 ! skip Control File name
-      iend = scan(command_line(istart:), ' ,') - 1               !-- Find the first blank
-    ELSE
+    iend = scan(command_line(istart:), ' ,') - 1               !-- Find the first blank
+    IF ( MODSIM_flag == OFF ) THEN
       if ( num_words_command_line < 3 ) return           ! no arguments after Control File name
-      numargs = num_words_command_line - 2
-      i = 2
       istart = iend + 1
       istart = verify(command_line(istart:), ' ,') + istart - 1  !-- Find next non-blank; start of control file path
       iend = scan(command_line(istart:), ' ,') - 2 + istart      !-- Find the first blank; end of control file path
+      numargs = num_words_command_line - 2
+      i = 2
+    ELSE
+      if ( num_words_command_line < 2 ) return           ! no arguments after Control File name
+      numargs = num_words_command_line - 1
+      i = 1 ! skip Control File name
     ENDIF
-
     loop: do while (i < numargs)
       i = i + 1
       istart = iend + 1

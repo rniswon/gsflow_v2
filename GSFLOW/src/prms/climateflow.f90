@@ -113,7 +113,6 @@ module PRMS_IT0_VARS
 !   Global Variables
        DOUBLE PRECISION, SAVE :: It0_basin_ssstor, It0_basin_soil_moist
        DOUBLE PRECISION, SAVE :: It0_basin_ag_soil_moist, It0_basin_ag_soil_rechr
-!       DOUBLE PRECISION, SAVE :: It0_basin_ag_soil_moist, It0_basin_ag_soil_rechr
        INTEGER, SAVE, ALLOCATABLE :: It0_intcp_transp_on(:)
        DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_dprst_vol_open(:), It0_dprst_vol_clos(:), It0_dprst_stor_hru(:)
        REAL, SAVE, ALLOCATABLE :: It0_soil_moist(:), It0_soil_rechr(:), It0_imperv_stor(:), It0_hru_impervstor(:)
@@ -1028,7 +1027,7 @@ end module PRMS_IT0_VARS
      &       ' (fraction of ag_soil_moist_max for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_soil_moist_init_frac')
       ENDIF
-!      IF ( Ag_gravity_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+!      IF ( Ag_gravity_flag==ACTIVE ) THEN
 !        ALLOCATE ( Ag_gvr_stor(Nhru), It0_ag_gvr_stor(Nhru) )
 !        CALL declvar_real(Soilzone_module, 'ag_gvr_stor', 'nhru', Nhru, &
 !     &       'Storage in the agriculture gravity reservoir of the agriculture fraction of each HRU', &
