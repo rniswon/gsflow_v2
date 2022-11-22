@@ -1274,7 +1274,7 @@
       USE PRMS_SRUNOFF
       USE PRMS_CONSTANTS, ONLY: ACTIVE, NEARZERO
       use PRMS_READ_PARAM_FILE, only: getparam_real
-      USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru, PRMS4_flag, Inputerror_flag
+      USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru, PRMS4_flag, Inputerror_flag !, AG_flag
       USE PRMS_BASIN, ONLY: Dprst_clos_flag, Dprst_frac, &
      &    Dprst_area_clos_max, Dprst_area_open_max, Basin_area_inv, &
      &    Hru_area_dble, Active_hrus, Hru_route_order, Dprst_open_flag

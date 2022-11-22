@@ -401,9 +401,9 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'no_snow_flag'
     no_snow_flag = OFF
-!    i = i + 1
-!    Control_parameter_data(i) % name = 'ag_gravity_flag'
-!    Ag_gravity_flag = OFF
+    i = i + 1
+    Control_parameter_data(i) % name = 'ag_gravity_flag'
+    Ag_gravity_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'stream_temp_flag'
     Stream_temp_flag = OFF
@@ -974,8 +974,8 @@ contains
   ! Get Control File from command line or user interaction.
   !***********************************************************************
   module subroutine get_control_filename()
-    use PRMS_CONSTANTS, ONLY: ERROR_control
-    use PRMS_MODULE, only: EQULS, Model_control_file, command_line, num_words_command_line
+    use PRMS_CONSTANTS, ONLY: ERROR_control, OFF
+    use PRMS_MODULE, only: EQULS, Model_control_file, command_line, num_words_command_line, command_line_modsim, MODSIM_flag
     use prms_utils, only: error_stop
     implicit none
     ! Functions
@@ -984,30 +984,34 @@ contains
     logical :: exists
     integer :: istart, iend
     !***********************************************************************
-    ! This routine expects the Control File name to be the first argument after exe name
-    call GET_COMMAND(command_line)
+    ! This routine expects the Control File name to be the first argument
+    IF ( MODSIM_flag == OFF ) THEN
+      call GET_COMMAND(command_line)
+    ELSE
+      command_line = command_line_modsim
+    ENDIF
     print '(A)', EQULS
     print '(A)', 'Command line: ', trim( command_line )
     num_words_command_line = count_words_text(command_line)
     print '(/,A,I0)', 'number of command line words: ', num_words_command_line
     istart = 1
     iend = scan(command_line(istart:), ' ,') - 1               !-- Find the first blank.
-    print '(/,2A)', 'Executable: ', command_line(istart:iend)
-    istart = iend + 1
-    istart = verify(command_line(istart:), ' ,') + istart - 1  !-- Find next non-blank; start of control file path
-    iend = scan(command_line(istart:), ' ,') - 2 + istart      !-- Find next blank and set result to end of word
     Model_control_file = ' '
-    if ( num_words_command_line == 1 ) then  ! no arguments after executable name
-      call error_stop('PRMS Control File must be specified on the command line', ERROR_control)
-    ELSE
-      Model_control_file = trim( command_line(istart:iend) )
-      if (trim(Model_control_file(:2)) == '-C') Model_control_file = trim( Model_control_file(3:) )
+    IF ( MODSIM_flag == OFF ) THEN
+      print '(/,2A)', 'Executable: ', command_line(istart:iend)
+      istart = iend + 1
+      istart = verify(command_line(istart:), ' ,') + istart - 1  !-- Find next non-blank; start of control file path
+      iend = scan(command_line(istart:), ' ,') - 2 + istart      !-- Find next blank and set result to end of word
+      if ( num_words_command_line == 1 ) &  ! no arguments after executable name
+           call error_stop('PRMS Control File must be specified on the command line', ERROR_control)
     ENDIF
+    Model_control_file = trim( command_line(istart:iend) )
+    if (trim(Model_control_file(:2)) == '-C') Model_control_file = trim( Model_control_file(3:) )
 
     inquire (FILE=trim(Model_control_file), EXIST=exists)
     if (.not. exists) then
       write (*, '(/,A)') 'Control File does not exist, file name: '//trim(Model_control_file)
-      print '(/,2A)', 'Note: Control File names cannot include spaces'
+      print '(/,A)', 'Note: Control File names cannot include spaces'
       ERROR stop - 2
     end if
     print '(/,2A)', 'Control File: ', trim( Model_control_file )
@@ -1019,8 +1023,8 @@ contains
   ! Get Control File set arguments from command line.
   !***********************************************************************
   module subroutine get_control_arguments()
-    use PRMS_CONSTANTS, only: DEBUG_less, ERROR_control
-    use PRMS_MODULE, only: EQULS, command_line, num_words_command_line
+    use PRMS_CONSTANTS, only: DEBUG_less, ERROR_control, OFF
+    use PRMS_MODULE, only: EQULS, command_line, num_words_command_line, MODSIM_flag
     use prms_utils, only: error_stop
     implicit none
     ! Functions
@@ -1030,17 +1034,23 @@ contains
     integer :: status, i, j, numargs, index, param_type, num_param_values, istart, iend
     !***********************************************************************
     ! This routine expects the Control File name to be the second word in the command line
-    if ( num_words_command_line < 3 ) return           ! no arguments after Control File name
+    ! or the Control File name is the first word in the command line passed by MODSIM
     print '(A)', EQULS
     command_line_arg = ' '
     istart = 1
-    iend = scan(command_line(istart:), ' ,') - 1               !-- Find the first blank; end of exe path
-    istart = iend + 1
-    istart = verify(command_line(istart:), ' ,') + istart - 1  !-- Find next non-blank; start of control file path
-    iend = scan(command_line(istart:), ' ,') - 2 + istart      !-- Find the first blank; end of control file path
-
-    numargs = num_words_command_line - 2
-    i = 2
+    iend = scan(command_line(istart:), ' ,') - 1               !-- Find the first blank
+    IF ( MODSIM_flag == OFF ) THEN
+      if ( num_words_command_line < 3 ) return           ! no arguments after Control File name
+      istart = iend + 1
+      istart = verify(command_line(istart:), ' ,') + istart - 1  !-- Find next non-blank; start of control file path
+      iend = scan(command_line(istart:), ' ,') - 2 + istart      !-- Find the first blank; end of control file path
+      numargs = num_words_command_line - 2
+      i = 2
+    ELSE
+      if ( num_words_command_line < 2 ) return           ! no arguments after Control File name
+      numargs = num_words_command_line - 1
+      i = 1 ! skip Control File name
+    ENDIF
     loop: do while (i < numargs)
       i = i + 1
       istart = iend + 1

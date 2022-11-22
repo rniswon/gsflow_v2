@@ -9,7 +9,7 @@
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
       character(len=*), parameter :: Version_intcp = '2022-10-26'
-      DOUBLE PRECISION, SAVE :: Last_intcp_stor
+      DOUBLE PRECISION, SAVE :: Last_basin_intcp_stor
       INTEGER, SAVE :: Use_transfer_intcp
       INTEGER, PARAMETER :: RAIN = 0, SNOW = 1
 !   Declared Variables
@@ -24,7 +24,7 @@
       DOUBLE PRECISION, SAVE :: Basin_net_apply, Basin_hru_apply
 !   Declared Parameters
       INTEGER, SAVE, ALLOCATABLE :: Irr_type(:)
-      REAL, SAVE, ALLOCATABLE :: Snow_intcp(:,:), Srain_intcp(:,:), Wrain_intcp(:,:)
+      REAL, SAVE, ALLOCATABLE :: Snow_intcp(:), Srain_intcp(:), Wrain_intcp(:)
       END MODULE PRMS_INTCP
 
 !***********************************************************************
@@ -178,22 +178,22 @@
      &     'inches', Basin_changeover)
 
 ! declare parameters
-      ALLOCATE ( Snow_intcp(Nhru,MONTHS_PER_YEAR) )
-      IF ( declparam(MODNAME, 'snow_intcp', 'nhru,nmonths', 'real', &
+      ALLOCATE ( Snow_intcp(Nhru) )
+      IF ( declparam(MODNAME, 'snow_intcp', 'nhru', 'real', &
      &     '0.1', '0.0', '1.0', &
      &     'Snow interception storage capacity', &
      &     'Snow interception storage capacity for the major vegetation type in each HRU', &
      &     'inches')/=0 ) CALL read_error(1, 'snow_intcp')
 
-      ALLOCATE ( Srain_intcp(Nhru,MONTHS_PER_YEAR) )
-      IF ( declparam(MODNAME, 'srain_intcp', 'nhru,nmonths', 'real', &
+      ALLOCATE ( Srain_intcp(Nhru) )
+      IF ( declparam(MODNAME, 'srain_intcp', 'nhru', 'real', &
      &     '0.1', '0.0', '1.0', &
      &     'Summer rain interception storage capacity', &
      &     'Summer rain interception storage capacity for the major vegetation type in each HRU', &
      &     'inches')/=0 ) CALL read_error(1, 'srain_intcp')
 
-      ALLOCATE ( Wrain_intcp(Nhru,MONTHS_PER_YEAR) )
-      IF ( declparam(MODNAME, 'wrain_intcp', 'nhru,nmonths', 'real', &
+      ALLOCATE ( Wrain_intcp(Nhru) )
+      IF ( declparam(MODNAME, 'wrain_intcp', 'nhru', 'real', &
      &     '0.1', '0.0', '1.0', &
      &     'Winter rain interception storage capacity', &
      &     'Winter rain interception storage capacity for the major vegetation type in each HRU', &
@@ -218,9 +218,9 @@
 !***********************************************************************
       intinit = 0
 
-      IF ( getparam_real(MODNAME, 'snow_intcp', Nhru*MONTHS_PER_YEAR, Snow_intcp)/=0 ) CALL read_error(2, 'snow_intcp')
-      IF ( getparam_real(MODNAME, 'wrain_intcp', Nhru*MONTHS_PER_YEAR, Wrain_intcp)/=0 ) CALL read_error(2, 'wrain_intcp')
-      IF ( getparam_real(MODNAME, 'srain_intcp', Nhru*MONTHS_PER_YEAR, Srain_intcp)/=0 ) CALL read_error(2, 'srain_intcp')
+      IF ( getparam_real(MODNAME, 'snow_intcp', Nhru, Snow_intcp)/=0 ) CALL read_error(2, 'snow_intcp')
+      IF ( getparam_real(MODNAME, 'wrain_intcp', Nhru, Wrain_intcp)/=0 ) CALL read_error(2, 'wrain_intcp')
+      IF ( getparam_real(MODNAME, 'srain_intcp', Nhru, Srain_intcp)/=0 ) CALL read_error(2, 'srain_intcp')
 
       IF ( Use_transfer_intcp==ACTIVE .OR. AG_flag==ACTIVE .OR. GSFLOW_flag==ACTIVE ) THEN
         IF ( getparam_int(MODNAME, 'irr_type', Nhru, Irr_type)/=0 ) CALL read_error(1, 'irr_type')
@@ -295,7 +295,7 @@
         ENDIF
       ENDIF
 
-      IF ( Print_debug==DEBUG_WB ) Last_intcp_stor = Basin_intcp_stor
+      IF ( Print_debug==DEBUG_WB ) Last_basin_intcp_stor = Basin_intcp_stor
       Basin_changeover = 0.0D0
       Basin_net_ppt = 0.0D0
       Basin_net_snow = 0.0D0
@@ -392,9 +392,9 @@
         ENDIF
 
         IF ( Transp_on(i)==ACTIVE ) THEN
-          stor_max_rain = Srain_intcp(i,Nowmonth)
+          stor_max_rain = Srain_intcp(i)
         ELSE
-          stor_max_rain = Wrain_intcp(i,Nowmonth)
+          stor_max_rain = Wrain_intcp(i)
         ENDIF
 
 !*****Determine the amount of interception from rain
@@ -425,7 +425,7 @@
           IF ( Hru_snow(i)>0.0 ) THEN
             IF ( cov>0.0 ) THEN
               IF ( Cov_type(i)>GRASSES ) THEN ! cov_type > 1
-                CALL intercept(Hru_snow(i), Snow_intcp(i,Nowmonth), cov, intcpstor, netsnow)
+                CALL intercept(Hru_snow(i), Snow_intcp(i), cov, intcpstor, netsnow)
                 IF ( netsnow<NEARZERO ) THEN   !rsr, added 3/9/2006
                   netrain = netrain + netsnow
                   netsnow = 0.0

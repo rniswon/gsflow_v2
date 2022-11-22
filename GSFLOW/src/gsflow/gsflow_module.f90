@@ -43,7 +43,7 @@
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
       INTEGER, SAVE :: mf_timestep, startday, endday, mf_nowtime, Number_timesteps
       INTEGER, SAVE :: num_words_command_line
-      character(LEN=MAXCMDLINE_LENGTH) command_line
+      character(LEN=MAXCMDLINE_LENGTH) command_line, command_line_modsim
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
 !   Declared Variables for DPRST agriculture computations
@@ -62,7 +62,7 @@
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag, forcing_check_flag
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, Iter_aet_flag, text_restart_flag
       INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag, no_snow_flag
-      INTEGER, SAVE :: irrigation_apply_flag, Dyn_ag_frac_flag, Dyn_ag_soil_flag, seg2hru_flag !, Ag_gravity_flag
+      INTEGER, SAVE :: irrigation_apply_flag, Dyn_ag_frac_flag, Dyn_ag_soil_flag, seg2hru_flag, Ag_gravity_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF, outputSelectDatesON_OFF, snow_cloudcover_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName
@@ -87,7 +87,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2022-09-01'
+      character(len=*), parameter :: Version_gsflow_modflow='2022-10-20'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'
@@ -96,10 +96,10 @@
       character(len=*), parameter :: MODNAME_SFR = 'gwf2sfr7_NWT'
       character(len=*), parameter :: MODNAME_LAK = 'gwf2lak7_NWT'
       character(len=*), parameter :: MODNAME_AG =  'gwf2ag1_NWT_ponds'
-      character(len=*), parameter :: Version_uzf = '2021-03-02'
-      character(len=*), parameter :: Version_sfr = '2022-02-01'
+      character(len=*), parameter :: Version_uzf = '2022-10-18'
+      character(len=*), parameter :: Version_sfr = '2022-10-18'
       character(len=*), parameter :: Version_lak = '2021-09-28'
-      character(len=*), parameter :: Version_ag =  '2022-02-01'
+      character(len=*), parameter :: Version_ag =  '2022-10-18'
       INTEGER, PARAMETER :: ITDIM = 80
       INTEGER, SAVE :: Convfail_cnt, Steady_state, Ncells, Gsflag
       INTEGER, SAVE :: IGRID, KKPER, ICNVG, NSOL, IOUTS, KPERSTART

@@ -27,7 +27,7 @@
 !   GSFLOW variables
       INTEGER, SAVE, ALLOCATABLE :: Hru_gvr_count(:), Hru_gvr_index(:, :), Hrucheck(:)
       REAL, SAVE, ALLOCATABLE :: Replenish_frac(:)
-      REAL, SAVE, ALLOCATABLE :: It0_sroff(:), It0_potet(:), It0_hru_sroffp(:), It0_hortonian_flow(:)
+      REAL, SAVE, ALLOCATABLE :: It0_sroff(:), It0_hru_sroffp(:), It0_hortonian_flow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_strm_seg_in(:)
       DOUBLE PRECISION, SAVE :: Basin_sz_gwin
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gvr_hru_pct_adjusted(:)
@@ -425,7 +425,6 @@
       ENDIF
 
       IF ( GSFLOW_flag==ACTIVE .OR. Iter_aet_flag==ACTIVE ) THEN
-        IF ( Nlake>0 ) ALLOCATE ( It0_potet(Nhru) )
         ALLOCATE ( It0_sroff(Nhru), It0_hru_sroffp(Nhru), It0_hortonian_flow(Nhru) )
         IF ( Cascade_flag>CASCADE_OFF ) ALLOCATE ( It0_strm_seg_in(Nsegment) )
       ENDIF
@@ -762,10 +761,10 @@
 !***********************************************************************
       INTEGER FUNCTION szrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
-     &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO !, MODSIM_PRMS
+     &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, &
      &    Frozen_flag, Soilzone_add_water_use, Nowmonth, GSFLOW_flag, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Hru_type, timestep_start_flag !, Model, Nowyear, Nowday
+     &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Model !, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -781,8 +780,8 @@
      &    Gravity_stor_res, Snowcov_area, Snow_evap, Strm_seg_in, Hru_intcpstor, &
      &    Hru_impervstor, Dprst_stor_hru, gsflow_ag_actet
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_ssres_stor, It0_slow_stor, &
-                               It0_pref_flow_stor, It0_gravity_stor_res
-!      USE GSFMODSIM2PRMS, ONLY: HRU_diversion
+                               It0_pref_flow_stor, It0_gravity_stor_res, It0_potet
+      USE GSFMODSIM2PRMS, ONLY: HRU_diversion
       USE PRMS_WATER_USE, ONLY: Soilzone_gain, Soilzone_gain_hru
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_SET_TIME, ONLY: Cfs_conv
@@ -937,9 +936,9 @@
         IF ( Ag_package==ACTIVE ) THEN
           IF ( Hru_ag_irr(i)>0.0 ) ag_water_maxin = Hru_ag_irr(i)/gsflow_ag_area(i) ! Hru_ag_irr is in acre-inches
         ENDIF
-!        IF ( Model == MODSIM_PRMS ) THEN
-!          IF ( Hru_diversion(i)>0.0 ) ag_water_maxin = ag_water_maxin + Hru_diversion(i) / perv_area
-!        ENDIF
+        IF ( Model == MODSIM_PRMS ) THEN
+          IF ( Hru_diversion(i)>0.0 ) ag_water_maxin = ag_water_maxin + Hru_diversion(i) / perv_area
+        ENDIF
         IF ( Soilzone_add_water_use==ACTIVE ) THEN
           IF ( Soilzone_gain(i)>0.0 ) THEN
             Soilzone_gain_hru(i) = Soilzone_gain(i)/perv_area/SNGL(Cfs_conv) ! ??? is this harea

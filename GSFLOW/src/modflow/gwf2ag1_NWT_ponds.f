@@ -2745,7 +2745,8 @@
       RETURN
       END
 !
-      SUBROUTINE GWF2AG7BD(kkstp, kkper, Iunitnwt)
+      SUBROUTINE GWF2AG7BD(kkstp, kkper, Iunitnwt, agDemand, 
+     +                     Nsegshold)
       !******************************************************************
       ! CALCULATE FLOWS FOR AG OPTIONS(DIVERSIONS, PONDS, AND PUMPING)
       !******************************************************************
@@ -2766,7 +2767,8 @@
       IMPLICIT NONE
       ! ARGUMENTS:
       ! - -----------------------------------------------------------------
-      INTEGER, INTENT(IN):: KKSTP, KKPER, Iunitnwt
+      INTEGER, INTENT(IN):: KKSTP, KKPER, Iunitnwt, Nsegshold
+      DOUBLE PRECISION, INTENT(INOUT) :: agDemand(Nsegshold)
       ! VARIABLES:
       ! - -----------------------------------------------------------------
 !      CHARACTER*22 TEXT2, TEXT6, TEXT7, TEXT8, TEXT1, TEXT3, TEXT4, 
@@ -2987,7 +2989,7 @@
       END DO
       !
       ! - -------WRITE REQUESTED TIME SERIES OUTPUT.
-      call TIMESERIESOUT(KKPER, KKSTP, TOTIM)
+      call TIMESERIESOUT(KKPER, KKSTP, TOTIM, agDemand, Nsegshold)
       !
       !12 - ------APPLY IRRIGATION FROM DIVERSIONS
       ! IF SAVING CELL - BY - CELL FLOWS IN A LIST(COMPACT BUDGET), WRITE SW IRRIGATION
@@ -3359,7 +3361,9 @@
       USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Gvr_cell_id
       USE PRMS_BASIN, ONLY: gsflow_ag_area, gsflow_ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet
+      USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet, soil_moist_max, 
+     +                         soil_moist, soil_to_ssr, soil_to_gw
+      USE PRMS_SOILZONE, ONLY: dunnian_flow, cap_waterin
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row
       USE GWFUZFMODULE, ONLY: UZFETOUT, GWET
       USE GLOBAL, ONLY: ISSFLG
@@ -3373,6 +3377,7 @@
       DOUBLE PRECISION :: factor, area, aet, pet, uzet
       double precision :: pettotal,aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup
+      double precision :: tot1,tot2,tot3,tot4,tot5
       integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
       double precision :: set_factor, etdif
@@ -3389,6 +3394,11 @@
         pettotal = DZERO
         aettotal = DZERO
         factor = DZERO
+        tot1= DZERO
+        tot2= DZERO
+        tot3= DZERO
+        tot4= DZERO
+        tot5=DZERO
         iseg = IRRSEG(i)
 !        IF (DEMAND(iseg) < zerod7) goto 300
         !
@@ -3409,6 +3419,16 @@
              aet = uzet + gsflow_ag_frac(hru_id)*GWET(icol, irow)   !multiply by ag_frac
              aettotal = aettotal + aet
            end if
+           tot1 = tot1 + 
+     +area*prms_inch2mf_q*(soil_moist_max(hru_id) - soil_moist(hru_id))
+           tot2 = tot2 + area*prms_inch2mf_q*soil_to_ssr(hru_id)
+           tot3 = tot3 + area*prms_inch2mf_q*cap_waterin(hru_id)
+           tot4 = tot4 + area*prms_inch2mf_q*dunnian_flow(hru_id)   
+           tot5=tot5+soil_to_gw(hru_id)
+!           soil_moist_max(hru_id) - soil_moist(hru_id), 
+!     +                  soil_to_ssr(hru_id), infil(hru_id), 
+!     +                  dunnian_flow(hru_id)
+!222   format(i5,4e20.10)
         end do
         ! convert PRMS ET deficit to MODFLOW flow
         aetold = AETITERSW(ISEG)
@@ -3442,13 +3462,13 @@
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
 
-!        if(iseg==25)then
-!        etdif = pettotal - aettotal
-!          write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
-!     +                 SUPACT(iseg),etdif,RMSESW(ISEG),AGTOL*pettotal,
-!     +                 AGCONVERGE
-!        endif
-!  33  format(4i5,6e20.10,i5)
+        if(iseg==25.and.kstp==11)then
+        etdif = pettotal - aettotal
+          write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
+     +                 SUPACT(iseg),etdif,RMSESW(ISEG),pettotal,
+     +                 AGCONVERGE,tot1,tot2,tot3,tot4,tot5
+        endif
+  33  format(4i5,6e20.10,i5,5e20.10)
 300   continue
       return
       end subroutine demandconjunctive_prms
@@ -3892,6 +3912,7 @@
       det = (aettotal - aetold)
       factor = etdif
       dq = sup - supold
+      
       if (kiter > 2) then
         if (abs(det) > dzero) then
           factor = dq*etdif/det
@@ -3907,7 +3928,8 @@
       set_factor = factor
       end function set_factor
 !
-      subroutine timeseriesout(KKPER, KKSTP, TOTIM)
+      subroutine timeseriesout(KKPER, KKSTP, TOTIM, agDemand, 
+     +                         Nsegshold)
 !     ******************************************************************
 !     timeseriesout---- output to time series file each time step
 !     ******************************************************************
@@ -3927,8 +3949,9 @@
       IMPLICIT NONE
 ! --------------------------------------
       !arguments
-      INTEGER, INTENT(IN) :: KKPER, KKSTP
+      INTEGER, INTENT(IN) :: KKPER, KKSTP, Nsegshold
       REAL, INTENT(IN) :: TOTIM
+      DOUBLE PRECISION, INTENT(INOUT) :: agDemand(Nsegshold)
       !dummy
       DOUBLE PRECISION :: area, uzet, aet, pet, aettot, pettot, sub
       DOUBLE PRECISION :: Q, QQ, QQQ, DVT, prms_inch2mf_q
@@ -3952,7 +3975,8 @@
          DO I = 1, NUMSW
             UNIT = TSSWUNIT(I)
             L = TSSWNUM(I)
-            Q = demand(L)
+            !Q = demand(L)
+            Q = agDemand(L)  !for MODSIM-GSFLOW
             QQ = DVRSFLW(L)   !consider making this SGOTFLOW
             QQQ = SUPSEG(L)
             CALL timeseries(unit, Kkper, Kkstp, TOTIM, L,
@@ -4546,7 +4570,7 @@
 C
 C-------SUBROUTINE SFR2MODSIM
 C
-      SUBROUTINE AG2MODSIM(Diversions)
+      SUBROUTINE AG2MODSIM(agDemand)
 C     *******************************************************************
 C     Pass Irrigation demand to MODSIM 
 C     
@@ -4555,6 +4579,51 @@ C     *******************************************************************
       USE GWFSFRMODULE, ONLY: SEG, NSS
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
+      IMPLICIT NONE
+C     -------------------------------------------------------------------
+C     SPECIFICATIONS:
+C     -------------------------------------------------------------------
+C     ARGUMENTS
+      DOUBLE PRECISION, INTENT(INOUT) :: agDemand(NSS)
+C     -------------------------------------------------------------------
+!      INTEGER 
+!      DOUBLE PRECISION 
+C     -------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     -------------------------------------------------------------------
+      INTEGER :: ISEG, i
+!      double precision :: total !delete this
+C     -------------------------------------------------------------------
+C
+C1------LOOP OVER SEGMETS
+C
+C
+C2------Set diversion demand from that calculated from AG.
+C 
+        agDemand = 0.0
+        do i = 1, NUMIRRDIVERSIONSP
+          iseg = IRRSEG(i)        
+          !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
+            agDemand(ISEG) = SEG(2,iseg)*DELT
+          !END IF
+        END DO
+C
+C8------RETURN.
+      RETURN
+      END SUBROUTINE AG2MODSIM
+C
+C-------SUBROUTINE MODSIM2AG
+C
+      SUBROUTINE MODSIM2AG(Diversions)
+C     *******************************************************************
+C     Update AF diversion to MODSIM diversion
+C     
+!-------October 5, 2022
+C     *******************************************************************
+      USE GWFSFRMODULE, ONLY: SEG, NSS
+      USE GWFAGMODULE
+      USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_MODULE, ONLY: Kkiter
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -4576,17 +4645,17 @@ C
 C
 C2------Set diversion demand from that calculated from AG.
 C 
-        Diversions = 0.0
+        if ( kkiter == 1 ) DIVERSIONIRRPRMS = dzero
         do i = 1, NUMIRRDIVERSIONSP
           iseg = IRRSEG(i)        
           !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
-            Diversions(ISEG) = SEG(2,iseg)*DELT
+           SEG(2,iseg) = Diversions(ISEG)/DELT
           !END IF
         END DO
 C
 C8------RETURN.
       RETURN
-      END SUBROUTINE AG2MODSIM
+      END SUBROUTINE MODSIM2AG
       !
       SUBROUTINE GWF2AG7DA()
       ! Deallocate AG MEMORY

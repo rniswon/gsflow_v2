@@ -165,7 +165,7 @@
       USE PRMS_INTCP, ONLY: Basin_net_ppt, Basin_intcp_evap, Basin_changeover, &
      &    Basin_intcp_stor, Net_rain, Net_snow, Hru_intcpevap, &
      &    Srain_intcp, Wrain_intcp, Snow_intcp, Intcp_evap, &
-     &    Canopy_covden, Intcp_changeover, Net_ppt, Last_intcp_stor, &
+     &    Canopy_covden, Intcp_changeover, Net_ppt, Last_basin_intcp_stor, &
      &    Net_apply, Gain_inches, Use_transfer_intcp, Basin_hru_apply, Basin_net_apply
       USE PRMS_SNOW, ONLY: Basin_snowmelt, Basin_snowevap, Basin_snowcov
       USE PRMS_GLACR, ONLY: Glacr_flow
@@ -228,8 +228,8 @@
           ENDIF
           WRITE ( BALUNT,'(I7,6I5,15F10.5,I5)' ) i, Nowtime, hrubal, &
      &            Net_rain(i), Net_snow(i), Hru_rain(i), Hru_snow(i), &
-     &            Intcp_stor(i), It0_hru_intcpstor(i), Intcp_evap(i), Srain_intcp(i,Nowmonth), &
-     &            Wrain_intcp(i,Nowmonth), Snow_intcp(i,Nowmonth), Canopy_covden(i), delstor, &
+     &            Intcp_stor(i), It0_hru_intcpstor(i), Intcp_evap(i), Srain_intcp(i), &
+     &            Wrain_intcp(i), Snow_intcp(i), Canopy_covden(i), delstor, &
      &            Hru_intcpstor(i), Intcp_changeover(i), Cov_type(i)
           IF ( Use_transfer_intcp==1 ) WRITE ( BALUNT, * ) Gain_inches(i), Net_apply(i)
         ENDIF
@@ -435,7 +435,7 @@
       Basin_dprst_wb = Basin_dprst_wb*Basin_area_inv
 
 ! intcp
-      delta_stor = Basin_intcp_stor - Last_intcp_stor
+      delta_stor = Basin_intcp_stor - Last_basin_intcp_stor
       pptbal = Basin_ppt - Basin_net_ppt - delta_stor - Basin_intcp_evap - Basin_changeover
       IF ( Use_transfer_intcp==ACTIVE ) pptbal = pptbal + Basin_net_apply
       IF ( DABS(pptbal)>DSMALL ) THEN
@@ -447,7 +447,7 @@
       ENDIF
       WRITE ( INTCPUNT, 9002 ) Nowyear, Nowmonth, Nowday, pptbal, &
      &        Basin_ppt, Basin_net_ppt, Basin_intcp_evap, &
-     &        Basin_intcp_stor, Last_intcp_stor, Basin_changeover, Basin_net_apply, Basin_hru_apply
+     &        Basin_intcp_stor, Last_basin_intcp_stor, Basin_changeover, Basin_net_apply, Basin_hru_apply
 
 ! snowcomp
       bsnobal = bsnobal*Basin_area_inv

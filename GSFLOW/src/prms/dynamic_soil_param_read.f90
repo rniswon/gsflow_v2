@@ -1,6 +1,5 @@
 !***********************************************************************
-! Read and makes available dynamic parameters hru_percent_imperv,
-! Wrain_intcp, Srain_intcp, Snow_intcp by HRU from pre-processed files.
+! Read and makes available land surface and soil dynamic parameters
 ! These parameters can be input for any date within the simulation time
 ! period. Associated states with each parameter are adjusted.
 !***********************************************************************

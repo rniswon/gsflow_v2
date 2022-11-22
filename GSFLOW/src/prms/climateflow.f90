@@ -81,6 +81,7 @@
       REAL, SAVE, ALLOCATABLE :: Gravity_stor_res(:)
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_moist, Basin_ag_soil_rechr
       REAL, SAVE, ALLOCATABLE :: gsflow_ag_actet(:), Ag_soil_moist(:), Ag_soil_rechr(:), Ag_soil_rechr_max(:)
+!      REAL, SAVE, ALLOCATABLE :: Ag_gvr_stor(:)
       ! srunoff
       REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:)
       REAL, SAVE, ALLOCATABLE :: Hru_impervstor(:)
@@ -116,9 +117,10 @@ module PRMS_IT0_VARS
        DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_dprst_vol_open(:), It0_dprst_vol_clos(:), It0_dprst_stor_hru(:)
        REAL, SAVE, ALLOCATABLE :: It0_soil_moist(:), It0_soil_rechr(:), It0_imperv_stor(:), It0_hru_impervstor(:)
        REAL, SAVE, ALLOCATABLE :: It0_slow_stor(:), It0_pref_flow_stor(:), It0_ssres_stor(:)
-       REAL, SAVE, ALLOCATABLE :: It0_intcp_stor(:), It0_gravity_stor_res(:)
+       REAL, SAVE, ALLOCATABLE :: It0_intcp_stor(:), It0_gravity_stor_res(:), It0_potet(:)
        DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:)
        REAL, SAVE, ALLOCATABLE :: It0_ag_soil_moist(:), It0_ag_soil_rechr(:), It0_hru_intcpstor(:)
+!       REAL, SAVE, ALLOCATABLE :: It0_ag_gvr_stor(:)
 end module PRMS_IT0_VARS
 
 !***********************************************************************
@@ -159,7 +161,7 @@ end module PRMS_IT0_VARS
      &    Strmflow_module, Temp_module, Stream_order_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, &
-     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, no_snow_flag
+     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, no_snow_flag !, Ag_gravity_flag
       use PRMS_MMFAPI, only: declvar_int, declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_CLIMATEVARS
@@ -321,6 +323,7 @@ end module PRMS_IT0_VARS
 
 ! Potential ET Variables
       ALLOCATE ( Potet(Nhru) )
+      IF ( Nlake > 0 ) ALLOCATE ( It0_potet(Nhru) )
       CALL declvar_real(Et_module, 'potet', 'nhru', Nhru, &
      &     'Potential ET for each HRU', &
      &     'inches', Potet)
@@ -1024,6 +1027,12 @@ end module PRMS_IT0_VARS
      &       ' (fraction of ag_soil_moist_max for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_soil_moist_init_frac')
       ENDIF
+!      IF ( Ag_gravity_flag==ACTIVE ) THEN
+!        ALLOCATE ( Ag_gvr_stor(Nhru), It0_ag_gvr_stor(Nhru) )
+!        CALL declvar_real(Soilzone_module, 'ag_gvr_stor', 'nhru', Nhru, &
+!     &       'Storage in the agriculture gravity reservoir of the agriculture fraction of each HRU', &
+!     &       'inches', Ag_gvr_stor)
+!      ENDIF
 
       END FUNCTION climateflow_decl
 
