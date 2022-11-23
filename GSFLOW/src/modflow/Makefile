@@ -165,6 +165,9 @@ sip7_NWT.o: sip7_NWT.f gwf2bas7_NWT.o
 Irestart.o: Irestart.f gwfuzfmodule_NWT.o gwfsfrmodule_NWT.o gsfmodflow.mod
 	$(FC) $(FFLAGS) -c Irestart.f
 
+gwfagmodule.mod: gwf2ag1_NWT_ponds.o
+	$(FC) $(FFLAGS) -c gwf2ag1_NWT_ponds.o
+
 prms_module.mod:
 	$(CD) ../gsflow;make prms_module.mod
 	$(CP) ../gsflow/prms_module.mod .
