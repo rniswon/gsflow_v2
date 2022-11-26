@@ -63,7 +63,6 @@ LIBOBJS = \
         water_use_read.o \
         dynamic_param_read.o \
         dynamic_soil_param_read.o \
-		modsim_diversion_read.o \
         water_balance.o \
         routing.o \
         strmflow.o \
@@ -238,7 +237,7 @@ srunoff.o: srunoff.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod p
 climateflow.o: climateflow.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod prms_set_time.mod prms_constants.mod prms_utils.mod
 	$(FC) -c $(FFLAGS) climateflow.f90
 
-soilzone.o: soilzone.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod
+soilzone.o: soilzone.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod gsfmodsim2prms.mod
 	$(FC) -c $(FFLAGS) soilzone.f90
 
 routing.o: routing.f90 prms_module.mod prms_basin.mod prms_read_param_file.mod prms_gwflow.mod prms_flowvars.mod prms_set_time.mod prms_srunoff.mod prms_climatevars.mod prms_water_use.mod prms_constants.mod
@@ -280,7 +279,7 @@ glacr_melt.o: glacr_melt.f90 prms_control_file.mod prms_read_param_file.mod prms
 cloud_cover.o: cloud_cover.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod prms_climatevars.mod prms_soltab.mod prms_set_time.mod prms_obs.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) cloud_cover.f90
 
-soilzone_ag.o: soilzone_ag.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod
+soilzone_ag.o: soilzone_ag.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod gsfmodsim2prms.mod
 	$(FC) -c $(FFLAGS) soilzone_ag.f90
 
 statvar_out.o: statvar_out.f90 prms_module.mod prms_control_file.mod prms_constants.mod prms_set_time.mod
@@ -358,3 +357,7 @@ prms_it0_vars.mod: climateflow.o
 gsfmodflow.mod: $(GSFLOWDIR)/gsfmodflow.mod
 	$(RM) gsfmodflow.mod
 	$(LN) $(GSFLOWDIR)/gsfmodflow.mod gsfmodflow.mod
+
+gsfmodsim2prms.mod:
+	$(CD) $(GSFLOWDIR);make gsfmodsim2prms.mod
+	$(CP) $(GSFLOWDIR)/gsfmodsim2prms.mod .

@@ -27,6 +27,8 @@
 ! Arguments
       INTEGER, INTENT(IN) :: Nsegshold
       DOUBLE PRECISION, INTENT(INOUT) :: DIVERSIONS(Nsegshold)
+! Functions
+      INTRINSIC :: SNGL
 ! Local Variables
       INTEGER :: i
       DOUBLE PRECISION :: MSl3_to_ft3
@@ -38,7 +40,7 @@
          HRU_diversion = 0.0
          DO i = 1, Nag_diversions
             HRU_diversion(hru_destination_id(i)) = HRU_diversion(hru_destination_id(i)) + &
-                                                   DIVERSIONS(seg_source_id(i)) * destination_frac(i)
+                                                   SNGL( DIVERSIONS(seg_source_id(i)) * destination_frac(i) )
          ENDDO
          Segment_diversions = DIVERSIONS * MSl3_to_acre_inches
       ELSEIF ( Process_flag==DECL ) THEN

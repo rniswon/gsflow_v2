@@ -4,7 +4,6 @@
       SUBROUTINE gsflow_prms(Process_mode, AFR, MS_GSF_converge, Nsegshold, Nlakeshold, &
      &                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand) !BIND(C,NAME="gsflow_prms")
       
-      !DEC$ ATTRIBUTES DLLEXPORT :: gsflow_prms
       USE PRMS_CONSTANTS, ONLY: ERROR_control, CANOPY
       use PRMS_CONTROL_FILE, only: read_control_file
       use PRMS_DATA_FILE, only: read_prms_data_file
@@ -1049,7 +1048,7 @@
       ! 0 = no glacier simulation; 1 = glacr_melt (Ashley) simulation; 2 = Anderson method
       IF ( control_integer(Glacier_flag, 'glacier_flag')/=0 ) Glacier_flag = OFF
       IF ( control_integer(no_snow_flag, 'no_snow_flag')/=0 ) no_snow_flag = OFF
-      IF ( control_integer(ag_gravity_flag, 'ag_gravity_flag')/=0 ) Ag_gravity_flag = OFF
+      !IF ( control_integer(ag_gravity_flag, 'ag_gravity_flag')/=0 ) Ag_gravity_flag = OFF
       IF ( control_integer(Frozen_flag, 'frozen_flag')/=0 ) Frozen_flag = OFF
       IF ( control_integer(Dyn_imperv_flag, 'dyn_imperv_flag')/=0 ) Dyn_imperv_flag = OFF
       IF ( control_integer(Dyn_intcp_flag, 'dyn_intcp_flag')/=0 ) Dyn_intcp_flag = OFF
@@ -1493,7 +1492,6 @@
 !***********************************************************************
       SUBROUTINE gsflow_prmsSettings(Numts, Model_mode, Start_time, End_time, xy_len, xy_FileName, map_len, map_FileName) !&
 !     &     BIND(C,NAME="gsflow_prmsSettings")
-      !DEC$ ATTRIBUTES DLLEXPORT :: gsflow_prmsSettings
       USE PRMS_MODULE, ONLY: Model, Number_timesteps, Starttime, Endtime, mappingFileName, xyFileName
       use prms_utils, only: numchars
       IMPLICIT NONE
@@ -1532,7 +1530,6 @@
 !     put_prms_control_file - MODSIM sends PRMS Control File name
 !***********************************************************************
       SUBROUTINE put_prms_control_file(command_line_args) ! BIND(C,NAME="put_prms_control_file")
-      !DEC$ ATTRIBUTES DLLEXPORT :: put_prms_control_file
       USE PRMS_MODULE, ONLY: command_line_modsim
       IMPLICIT NONE
       ! Arguments

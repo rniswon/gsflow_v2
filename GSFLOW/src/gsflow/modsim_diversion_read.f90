@@ -12,7 +12,8 @@
       ! Local Variables
       INTEGER, SAVE :: diversion_unit, outunit, Nag_diversions, event_year, event_month, event_day
       INTEGER, SAVE :: diversion_next_year, diversion_next_month, diversion_next_day
-      INTEGER, ALLOCATABLE, SAVE :: seg_source_id(:), hru_destination_id(:), destination_frac(:)
+      INTEGER, ALLOCATABLE, SAVE :: seg_source_id(:), hru_destination_id(:)
+      DOUBLE PRECISION, ALLOCATABLE, SAVE :: destination_frac(:)
       LOGICAL, SAVE :: not_eof
 ! Control Parameters
       CHARACTER(LEN=MAXFILE_LENGTH) :: modsim_diversion_file

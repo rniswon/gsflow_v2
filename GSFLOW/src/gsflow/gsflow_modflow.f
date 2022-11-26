@@ -430,8 +430,6 @@ C
      &                     DELTAVOL,LAKEVOL,Nsegshold, Nlakeshold, 
      &                     agDemand)
 C
-      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_RUN
-C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
@@ -855,8 +853,6 @@ C     ARE MAPPED TO MODSIM NODES (OR LINKS)
 C     ************************************************************************
       SUBROUTINE COMPUTE_EXCHG(EXCHG, ELAKVol, KPER) 
 !     &                  BIND(C,NAME="COMPUTE_EXCHG")
-C      
-        !DEC$ ATTRIBUTES DLLEXPORT :: COMPUTE_EXCHG
 C
         USE GWFLAKMODULE, ONLY: NLAKES, VOL 
         IMPLICIT NONE
@@ -884,8 +880,6 @@ C     write the budget terms
 C     ************************************************************************
       SUBROUTINE MFNWT_OCBUDGET(agDemand, Diversions, Nsegshold)
 !     &                  BIND(C,NAME="MFNWT_OCBUDGET")
-C      
-      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_OCBUDGET
 C
       USE PRMS_CONSTANTS, ONLY: ACTIVE, DEBUG_LESS, MODFLOW, OFF
       USE GLOBAL
@@ -1130,8 +1124,6 @@ C     ************************************************************************
 C     Close out MODFLOW
 C     ************************************************************************
       SUBROUTINE MFNWT_CLEAN() !BIND(C,NAME="MFNWT_CLEAN")
-C
-      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_CLEAN
 C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
@@ -1446,8 +1438,6 @@ C     PER MODFLOW STRESS PERIOD.
 !***********************************************************************
       SUBROUTINE MFNWT_RDSTRESS() ! BIND(C,NAME="MFNWT_RDSTRESS")
 C
-      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_RDSTRESS
-C
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, ERROR_time
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GSFMODFLOW, ONLY: IGRID, KKPER, KPER, NSOL, IOUTS, KKSTP,
@@ -1526,8 +1516,6 @@ C     WRITE RASTERS OF GROUNDWATER/SURFACE-WATER INTERACTION
 C     
 C     ************************************************************************
       SUBROUTINE MFNWT_WRITERAS(KPER) ! BIND(C,NAME="MFNWT_WRITERAS")
-C
-      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_WRITERAS
 C
       USE GLOBAL,       ONLY: NROW,NCOL
       USE GWFSFRMODULE, ONLY: NSTRM,ISTRM,STRM
