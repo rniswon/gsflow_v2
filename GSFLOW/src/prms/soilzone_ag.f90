@@ -445,11 +445,11 @@
 !***********************************************************************
       INTEGER FUNCTION szrun_ag()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
-     &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO !, MODSIM_PRMS
+     &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Dprst_flag, Cascade_flag, &
      &    Frozen_flag, Soilzone_add_water_use, Nowmonth, GSFLOW_flag, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Nowyear, Nowday, &
-     &    Iter_aet_flag, irrigation_apply_flag !, Model, Ag_gravity_flag
+     &    Iter_aet_flag, irrigation_apply_flag, Model !, Ag_gravity_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
@@ -470,7 +470,7 @@
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_ssres_stor, It0_slow_stor, &
                                It0_pref_flow_stor, It0_gravity_stor_res, &
                                It0_ag_soil_rechr, It0_ag_soil_moist, It0_potet !, It0_ag_gvr_stor
-!      USE GSFMODSIM2PRMS, ONLY: HRU_diversion
+      USE GSFMODSIM2PRMS, ONLY: HRU_diversion
       USE PRMS_WATER_USE, ONLY: Soilzone_gain, Soilzone_gain_hru
       USE PRMS_CLIMATE_HRU, ONLY: AET_external, PET_external
       USE PRMS_CASCADE, ONLY: Ncascade_hru
@@ -704,15 +704,15 @@
           ENDIF
         ENDIF
 
-!        IF ( Model == MODSIM_PRMS ) THEN
-!          IF ( Hru_diversion(i)>0.0 ) THEN
-!            IF ( ag_on_flag==OFF ) THEN
-!              PRINT *, 'ag_frac=0.0 for HRU:', i
-!              CALL error_stop('MODSIM diversion specified and ag_frac=0.0', ERROR_param)
-!            ENDIF
-!            ag_water_maxin = ag_water_maxin + HRU_diversion(i) / agarea
-!          ENDIF
-!        ENDIF
+        IF ( Model == MODSIM_PRMS ) THEN
+          IF ( Hru_diversion(i)>0.0 ) THEN
+            IF ( ag_on_flag==OFF ) THEN
+              PRINT *, 'ag_frac=0.0 for HRU:', i
+              CALL error_stop('MODSIM diversion specified and ag_frac=0.0', ERROR_param)
+            ENDIF
+            ag_water_maxin = ag_water_maxin + HRU_diversion(i) / agarea
+          ENDIF
+        ENDIF
         IF ( Iter_aet_flag==ACTIVE ) ag_water_maxin = ag_water_maxin + Ag_irrigation_add(i) ! units of inches over Ag_area
         IF ( Soilzone_add_water_use==ACTIVE ) THEN
           IF ( Soilzone_gain(i)>0.0 ) THEN

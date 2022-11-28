@@ -401,9 +401,9 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'no_snow_flag'
     no_snow_flag = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'ag_gravity_flag'
-    Ag_gravity_flag = OFF
+!    i = i + 1
+!    Control_parameter_data(i) % name = 'ag_gravity_flag'
+!    Ag_gravity_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'stream_temp_flag'
     Stream_temp_flag = OFF
