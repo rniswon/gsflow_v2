@@ -1,3 +1,8 @@
+!
+      MODULE PRMS_DLL
+!
+      CONTAINS
+!
 !***********************************************************************
 ! Defines the computational sequence, valid modules, and dimensions
 !***********************************************************************
@@ -30,7 +35,7 @@
      &                                   LAKEVAP(Nlakeshold)
 ! Functions
       INTRINSIC :: DATE_AND_TIME, INT
-      INTEGER, EXTERNAL :: check_dims, basin, climateflow
+      INTEGER, EXTERNAL :: basin, climateflow
       INTEGER, EXTERNAL :: cascade, obs, soltab, transp_tindex
       INTEGER, EXTERNAL :: transp_frost, frost_date, routing
       INTEGER, EXTERNAL :: temp_1sta_laps, temp_dist2
@@ -46,7 +51,7 @@
       INTEGER, EXTERNAL :: stream_temp, glacr
       INTEGER, EXTERNAL :: dynamic_soil_param_read, strmflow_character
       EXTERNAL :: precip_map, temp_map, segment_to_hru
-      EXTERNAL :: gsflow_prms_restart, water_balance, summary_output
+      EXTERNAL :: water_balance
       EXTERNAL :: prms_summary, convert_params, gsflow_prms2modsim, gsflow_modsim2prms
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
 ! Local Variables
@@ -614,8 +619,6 @@
      &                                   DELTAVOL(Nlakeshold),  &
      &                                   LAKEVOL(Nlakeshold),   &
      &                                   agDemand(Nsegshold)
-! Functions
-      EXTERNAL :: check_module_names
 ! Local Variables
       ! Maximum values are no longer limits
 ! Local Variables
@@ -1171,7 +1174,6 @@
       IMPLICIT NONE
       ! Arguments
       INTEGER, INTENT(INOUT) :: Nsegshold, Nlakeshold
-      EXTERNAL :: check_dimens
 !***********************************************************************
 
       Nhru = getdim('nhru')
@@ -1531,15 +1533,22 @@
 !***********************************************************************
 !     put_prms_control_file - MODSIM sends PRMS Control File name
 !***********************************************************************
-      SUBROUTINE put_prms_control_file(command_line_args) BIND(C,NAME="put_prms_control_file")
+      SUBROUTINE put_prms_control_file(command_line_args, cmd_len) BIND(C,NAME="put_prms_control_file")
       !DEC$ ATTRIBUTES DLLEXPORT :: put_prms_control_file
+      USE PRMS_CONSTANTS, ONLY: MAXCMDLINE_LENGTH
       USE PRMS_MODULE, ONLY: command_line_modsim
       IMPLICIT NONE
       ! Arguments
-      CHARACTER(LEN=*), INTENT(IN) :: command_line_args
+      INTEGER, INTENT(IN) :: cmd_len
+      CHARACTER(LEN=1), INTENT(IN) :: command_line_args(cmd_len)
+      ! Local Variabales
+      INTEGER :: i
 !***********************************************************************
+      IF ( cmd_len > MAXCMDLINE_LENGTH ) STOP 'ERROR, MODSIM command line > MAXCMDLINE_LENGTH'
       command_line_modsim = ' '
-      command_line_modsim = command_line_args(:512)
+      DO i = 1, cmd_len
+        command_line_modsim(i:i) = command_line_args(i)
+      ENDDO
       END SUBROUTINE put_prms_control_file
 
 !***********************************************************************
@@ -1638,3 +1647,5 @@
         IF ( ierr==1 ) ERROR STOP ERROR_restart
       ENDIF
       END SUBROUTINE gsflow_prms_restart
+
+      END MODULE PRMS_DLL

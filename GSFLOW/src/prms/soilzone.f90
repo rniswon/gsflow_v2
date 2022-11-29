@@ -937,7 +937,7 @@
           IF ( Hru_ag_irr(i)>0.0 ) ag_water_maxin = Hru_ag_irr(i)/gsflow_ag_area(i) ! Hru_ag_irr is in acre-inches
         ENDIF
         IF ( Model == MODSIM_PRMS ) THEN
-          IF ( Hru_diversion(i)>0.0 ) ag_water_maxin = ag_water_maxin + Hru_diversion(i) / perv_area
+          IF ( HRU_diversion(i)>0.0 ) ag_water_maxin = ag_water_maxin + HRU_diversion(i) / perv_area
         ENDIF
         IF ( Soilzone_add_water_use==ACTIVE ) THEN
           IF ( Soilzone_gain(i)>0.0 ) THEN

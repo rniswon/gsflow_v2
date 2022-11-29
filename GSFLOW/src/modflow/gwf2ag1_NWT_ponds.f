@@ -2774,7 +2774,7 @@
 !      CHARACTER*22 TEXT2, TEXT6, TEXT7, TEXT8, TEXT1, TEXT3, TEXT4, 
 !     +             TEXT5, TEXT13, TEXT14, TEXT15, TEXT16
       CHARACTER*22 TEXT2, TEXT7, TEXT8, TEXT1, TEXT3, TEXT4, TEXT13
-      CHARACTER*22 TEXT14
+!      CHARACTER*22 TEXT14
       CHARACTER*16 TEXT9
 !      CHARACTER*21 TEXT10, TEXT11, TEXT12
       DOUBLE PRECISION :: RATIN, RATOUT, DVT, RIN, ROUT, STOR
@@ -2794,7 +2794,7 @@
       DATA TEXT1/'           AG WELLS'/
       DATA TEXT2/'  DIVERSION SEGMENTS'/
       DATA TEXT13/'   IRRIGATION PONDS'/
-      DATA TEXT14/'       POND STORAGE'/
+!      DATA TEXT14/'       POND STORAGE'/
       DATA TEXT3/'       SW IRRIGATION'/
       DATA TEXT4/'       GW IRRIGATION'/
 !      DATA TEXT14/'    POND IRRIGATION'/
@@ -3483,13 +3483,13 @@
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: gsflow_ag_area
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet,hru_actet
+      USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet !,hru_actet
       USE PRMS_IT0_VARS, ONLY: It0_dprst_vol_open
 !     +    , Dprst_total_open_in, Dprst_total_open_out
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
      +                      MFQ_to_inch_acres
       USE GLOBAL, ONLY: ISSFLG
-      USE GWFSFRMODULE, ONLY: DVRSFLW
+!      USE GWFSFRMODULE, ONLY: DVRSFLW
       IMPLICIT NONE
 ! --------------------------------------------------
       !modules
@@ -3499,8 +3499,8 @@
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet
       double precision :: pettotal,aettotal, prms_inch2mf_q,
-     +                    aetold, supold, sup, etdif
-      real :: Q, saveflow, pondstor, totstor
+     +                    aetold, supold, sup !, etdif
+      real :: saveflow, pondstor, totstor !, Q
       integer :: k, ipond, hru_id, i
       external :: set_factor
       double precision :: set_factor
@@ -3939,8 +3939,9 @@
       USE GWFAGMODULE
       USE GLOBAL, ONLY: DELR, DELC, ISSFLG
       USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_CONSTANTS, ONLY: MODSIM_GSFLOW
       USE PRMS_MODULE, ONLY: GSFLOW_flag, Nhru, Nhrucell, Gvr_cell_id,
-     +    dprst_flag
+     +    dprst_flag, Model
       USE PRMS_BASIN, ONLY: gsflow_ag_area, gsflow_ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet, Dprst_vol_open
@@ -3975,9 +3976,12 @@
          DO I = 1, NUMSW
             UNIT = TSSWUNIT(I)
             L = TSSWNUM(I)
-            !Q = demand(L)
-            Q = agDemand(L)  !for MODSIM-GSFLOW
-            QQ = DVRSFLW(L)   !consider making this SGOTFLW
+            IF ( Model == MODSIM_GSFLOW ) THEN
+              Q = agDemand(L)  !for MODSIM-GSFLOW
+            ELSE
+              Q = demand(L)
+            ENDIF
+            QQ = DVRSFLW(L)   !consider making this SGOTFLOW
             QQQ = SUPSEG(L)
             CALL timeseries(unit, Kkper, Kkstp, TOTIM, L,
      +                      Q, QQ, QQQ)
