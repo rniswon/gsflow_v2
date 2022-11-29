@@ -430,6 +430,8 @@ C
      &                     DELTAVOL,LAKEVOL,Nsegshold, Nlakeshold, 
      &                     agDemand)
 C
+      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_RUN
+C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
@@ -698,11 +700,13 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF (Model>=10 .AND. iss==0) THEN
               IF( IUNIT(66).GT.0 ) CALL MODSIM2AG(Diversions)
             END IF
-            IF(IUNIT(66).GT.0 )
+            IF(IUNIT(66).GT.0 .AND. Model == MODSIM_GSFLOW )
      +         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
             IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,
      1                              IUNIT(22),IUNIT(63),IUNIT(8),
      2                              IUNIT(55),IGRID)   !cjm (added IUNIT(8))
+            IF(IUNIT(66).GT.0 .AND. Mode l/= MODSIM_GSFLOW )
+     1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
             IF ( Szcheck==ACTIVE .AND. Model==MODSIM_GSFLOW ) THEN
               retval = gsflow_mf2prms()
               IF ( PRMS_land_iteration_flag==CANOPY ) THEN
@@ -852,7 +856,9 @@ C     ACCUMULATE ACCRETION/DEPLETIONS FOR ALL STREAM SEGMENETS AND LAKES THAT
 C     ARE MAPPED TO MODSIM NODES (OR LINKS)
 C     ************************************************************************
       SUBROUTINE COMPUTE_EXCHG(EXCHG, ELAKVol, KPER) 
-!     &                  BIND(C,NAME="COMPUTE_EXCHG")
+     &                  BIND(C,NAME="COMPUTE_EXCHG")
+C      
+        !DEC$ ATTRIBUTES DLLEXPORT :: COMPUTE_EXCHG
 C
         USE GWFLAKMODULE, ONLY: NLAKES, VOL 
         IMPLICIT NONE
@@ -880,6 +886,8 @@ C     write the budget terms
 C     ************************************************************************
       SUBROUTINE MFNWT_OCBUDGET(agDemand, Diversions, Nsegshold)
 !     &                  BIND(C,NAME="MFNWT_OCBUDGET")
+C      
+      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_OCBUDGET
 C
       USE PRMS_CONSTANTS, ONLY: ACTIVE, DEBUG_LESS, MODFLOW, OFF
       USE GLOBAL
@@ -992,7 +1000,6 @@ C7C4----CALCULATE BUDGET TERMS. SAVE CELL-BY-CELL FLOW TERMS.
           IF(IUNIT(19).GT.0) CALL GWF2IBS7BD(KKSTP,KKPER,IGRID)
           IF(IUNIT(39).GT.0) CALL GWF2ETS7BD(KKSTP,KKPER,IGRID)
           IF(IUNIT(40).GT.0) CALL GWF2DRT7BD(KKSTP,KKPER,IGRID)
-! (CJM) Added RCH unit number for RCH->SFR.
           IF (Model>=10 .AND. iss==0) THEN
             IF( IUNIT(66).GT.0 ) CALL MODSIM2AG(Diversions)
           END IF
@@ -1123,7 +1130,9 @@ C
 C     ************************************************************************
 C     Close out MODFLOW
 C     ************************************************************************
-      SUBROUTINE MFNWT_CLEAN() !BIND(C,NAME="MFNWT_CLEAN")
+      SUBROUTINE MFNWT_CLEAN() BIND(C,NAME="MFNWT_CLEAN")
+C
+      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_CLEAN
 C
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
@@ -1436,7 +1445,9 @@ C     REQUIRE THAT A MODSIM TIME STEP EQUAL A MODFLOW TIME STEP
 C     AND THAT MODFLOW WILL NEED TO BE RESTRICTED TO ONE TIME STEP
 C     PER MODFLOW STRESS PERIOD.
 !***********************************************************************
-      SUBROUTINE MFNWT_RDSTRESS() ! BIND(C,NAME="MFNWT_RDSTRESS")
+      SUBROUTINE MFNWT_RDSTRESS() BIND(C,NAME="MFNWT_RDSTRESS")
+C
+      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_RDSTRESS
 C
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, ERROR_time
       USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -1515,7 +1526,9 @@ C     ************************************************************************
 C     WRITE RASTERS OF GROUNDWATER/SURFACE-WATER INTERACTION
 C     
 C     ************************************************************************
-      SUBROUTINE MFNWT_WRITERAS(KPER) ! BIND(C,NAME="MFNWT_WRITERAS")
+      SUBROUTINE MFNWT_WRITERAS(KPER) BIND(C,NAME="MFNWT_WRITERAS")
+C
+      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_WRITERAS
 C
       USE GLOBAL,       ONLY: NROW,NCOL
       USE GWFSFRMODULE, ONLY: NSTRM,ISTRM,STRM

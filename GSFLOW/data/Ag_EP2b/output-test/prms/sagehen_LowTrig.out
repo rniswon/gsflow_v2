@@ -121,10 +121,10 @@ Output Summary                  nhru_summary        2022-09-07
 Output Summary                  basin_summary       2021-11-19
 Output Summary                  nsegment_summary    2022-09-07
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2022-09-01
-UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
-SFR-NWT Package                 gwf2sfr7_NWT        2022-02-01
-AG-NWT Package                  gwf2ag1_NWT_ponds   2022-02-01
+GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
+UZF-NWT Package                 gwf2uzf1_NWT        2022-10-18
+SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
+AG-NWT Package                  gwf2ag1_NWT_ponds   2022-10-18
 
 Using Control File: .\gsflow_gsflow_LowTrig.control
 
@@ -139,5 +139,5 @@ Model domain area:        11226.32    Active basin area:      6740.99
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    5 minutes 23.46 seconds
+Execution elapsed time    5 minutes 10.82 seconds
 

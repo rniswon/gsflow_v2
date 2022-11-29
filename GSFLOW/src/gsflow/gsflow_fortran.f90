@@ -4,16 +4,15 @@
 !***********************************************************************
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, SETDIMENS
       USE PRMS_MODULE, ONLY: Number_timesteps
+      USE PRMS_DLL, ONLY: gsflow_prms
       IMPLICIT NONE
-! Functions
-      EXTERNAL :: gsflow_prms
 ! Local Variables
       INTEGER :: i
       LOGICAL :: AFR, MS_GSF_converge
       INTEGER :: Nsegshold, Nlakeshold
       INTEGER, ALLOCATABLE :: Idivert(:)
       DOUBLE PRECISION, ALLOCATABLE :: Diversions(:), LAKEVOL(:), LAKEVAP(:)
-      DOUBLE PRECISION, ALLOCATABLE :: agDemand(:), DELTAVOL(:), EXCHANGE(:)        
+      DOUBLE PRECISION, ALLOCATABLE :: agDemand(:), DELTAVOL(:), EXCHANGE(:)
 !***********************************************************************
       AFR = .TRUE.
       MS_GSF_converge = .FALSE.
@@ -21,6 +20,12 @@
       Nsegshold = 1
       ALLOCATE ( Idivert(Nlakeshold), DELTAVOL(Nlakeshold),LAKEVOL(Nlakeshold), LAKEVAP(Nlakeshold)  )
       ALLOCATE ( Diversions(Nsegshold), agDemand(Nsegshold), EXCHANGE(Nsegshold) )
+      Diversions = 0.0D0
+      agDemand = 0.0D0
+      EXCHANGE = 0.0D0
+      LAKEVOL = 0.0D0
+      LAKEVAP = 0.0D0
+      DELTAVOL = 0.0D0
       CALL gsflow_prms(SETDIMENS, AFR, MS_GSF_converge, Nsegshold, Nlakeshold, &
      &                 Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand)
 

@@ -93,10 +93,10 @@ Output Summary                  nhru_summary        2022-09-07
 Output Summary                  basin_summary       2021-11-19
 Output Summary                  nsegment_summary    2022-09-07
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2022-09-01
-UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
-SFR-NWT Package                 gwf2sfr7_NWT        2022-02-01
-AG-NWT Package                  gwf2ag1_NWT_ponds   2022-02-01
+GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
+UZF-NWT Package                 gwf2uzf1_NWT        2022-10-18
+SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
+AG-NWT Package                  gwf2ag1_NWT_ponds   2022-10-18
 
 Using Control File: .\Sagehen_ponds.control
 
@@ -112,5 +112,5 @@ Fraction impervious:        0.0000    Fraction pervious:       0.9967
 DPRST area:                  22.42    Fraction DPRST:          0.0033
 
 
-Execution elapsed time    2 minutes 56.05 seconds
+Execution elapsed time    2 minutes 41.08 seconds
 
