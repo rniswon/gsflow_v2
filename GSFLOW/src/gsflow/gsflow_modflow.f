@@ -693,20 +693,23 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
               IF ( KKITER==Mxsziter+1 ) Stopcount = Stopcount + 1
             ENDIF
             IF(IUNIT(22).GT.0) CALL GWF2LAK7FM(KKITER,KKPER,KKSTP,
-     1                                     IUNIT(44),IUNIT(55),IGRID)  !RGN 9/21/2021 to keep seepage from lake in UZF
+     1                                     IUNIT(44),IUNIT(55),IGRID) 
             IF(IUNIT(55).GT.0) CALL GWF2UZF1FM(KKPER,KKSTP,KKITER,
      1                           IUNIT(44),IUNIT(22),IUNIT(63),
-     2                           IUNIT(64),IGRID)  !SWR - JDH ADDED IUNIT(64)
-            IF (Model>=10 .AND. iss==0) THEN
-              IF( IUNIT(66).GT.0 ) CALL MODSIM2AG(Diversions)
-            END IF
+     2                           IUNIT(64),IGRID)  
+            !IF (Model>=10 .AND. iss==0) THEN
+            !  IF( IUNIT(66).GT.0 ) CALL MODSIM2AG(Diversions)
+            !END IF
             IF(IUNIT(66).GT.0 .AND. Model == MODSIM_GSFLOW )
      +         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
             IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,
      1                              IUNIT(22),IUNIT(63),IUNIT(8),
-     2                              IUNIT(55),IGRID)   !cjm (added IUNIT(8))
+     2                              IUNIT(55),IGRID)
             IF(IUNIT(66).GT.0 .AND. Mode l/= MODSIM_GSFLOW )
-     1         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
+     +         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
+     !!       IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,
+     !!1                              IUNIT(22),IUNIT(63),IUNIT(8),
+     !!2                              IUNIT(55),IGRID)
             IF ( Szcheck==ACTIVE .AND. Model==MODSIM_GSFLOW ) THEN
               retval = gsflow_mf2prms()
               IF ( PRMS_land_iteration_flag==CANOPY ) THEN
@@ -885,7 +888,7 @@ C     Upon MODSIM-MODFLOW conversion,
 C     write the budget terms
 C     ************************************************************************
       SUBROUTINE MFNWT_OCBUDGET(agDemand, Diversions, Nsegshold)
-!     &                  BIND(C,NAME="MFNWT_OCBUDGET")
+     &                  BIND(C,NAME="MFNWT_OCBUDGET")
 C      
       !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_OCBUDGET
 C

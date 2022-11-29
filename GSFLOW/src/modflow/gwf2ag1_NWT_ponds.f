@@ -3462,7 +3462,7 @@
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
 
-        if(iseg==25.and.kstp==11)then
+        if(iseg==424)then
         etdif = pettotal - aettotal
           write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
      +                 SUPACT(iseg),etdif,RMSESW(ISEG),pettotal,
@@ -4653,7 +4653,8 @@ C
         do i = 1, NUMIRRDIVERSIONSP
           iseg = IRRSEG(i)        
           !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
-           SEG(2,iseg) = Diversions(ISEG)/DELT
+           if ( SEG(2,iseg) > Diversions(ISEG)/DELT ) 
+     +          SEG(2,iseg) = Diversions(ISEG)/DELT
           !END IF
         END DO
 C
