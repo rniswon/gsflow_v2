@@ -143,11 +143,8 @@
             ENDIF
             IF ( Ag_frac(ii)>0.0 ) num_ag = num_ag + 1
           END DO
-          IF ( num_pet>0 ) then
-            PRINT '(2(A,I0))', 'number of AG HRUs ', num_ag, ', number of OpenET PET < AET ', num_pet
-            PRINT *, 'Date:', yr, mo, dy
-          ENDIF
-
+          IF ( num_pet>0 ) PRINT '(/,2(A,I0),I5,2("/",I0))', &
+               'number of AG HRUs ', num_ag, ', number of OpenET PET < AET ', num_pet, yr, mo, dy
         ENDIF
 
         IF ( irrigated_area_cbh_flag==ACTIVE ) THEN

@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2022-11-02'
+      character(len=*), parameter :: Version_climateflow = '2022-12-06'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -105,7 +105,9 @@
 !   Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Soil_moist_max(:), Soil_rechr_max(:), Sat_threshold(:)
       REAL, SAVE, ALLOCATABLE :: Snowinfil_max(:), Imperv_stor_max(:)
+      REAL, SAVE, ALLOCATABLE :: Soil_moist_init_frac(:), Soil_rechr_init_frac(:), Soil_rechr_max_frac(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_moist_max(:), Ag_soil_rechr_max_frac(:)
+      REAL, SAVE, ALLOCATABLE :: Ag_soil_moist_init_frac(:), Ag_soil_rechr_init_frac(:)
       END MODULE PRMS_FLOWVARS
 
 module PRMS_IT0_VARS
@@ -920,6 +922,7 @@ end module PRMS_IT0_VARS
      &       'inches')/=0 ) CALL read_error(1, 'soil_rechr_max')
       ENDIF
       IF ( PRMS4_flag==OFF ) THEN
+        ALLOCATE ( Soil_rechr_max_frac(Nhru) )
         IF ( declparam(Soilzone_module, 'soil_rechr_max_frac', 'nhru', 'real', &
      &       '1.0', '0.0', '1.0', &
      &       'Fraction of capillary reservoir where losses occur as both evaporation and transpiration (soil recharge zone)', &
@@ -964,12 +967,14 @@ end module PRMS_IT0_VARS
      &         'inches')/=0 ) CALL read_error(1, 'ssstor_init')
         ENDIF
         IF ( PRMS4_flag==OFF ) THEN
+          ALLOCATE ( Soil_rechr_init_frac(Nhru) )
           IF ( declparam(Soilzone_module, 'soil_rechr_init_frac', 'nhru', 'real', &
      &         '0.0', '0.0', '1.0', &
      &         'Initial fraction of available water in the soil recharge zone within the capillary reservoir', &
      &         'Initial fraction of available water in the capillary reservoir where losses occur'// &
      &         ' as both evaporation and transpiration (upper zone of capillary reservoir) for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'soil_rechr_init_frac')
+          ALLOCATE ( Soil_moist_init_frac(Nhru) )
           IF ( declparam(Soilzone_module, 'soil_moist_init_frac', 'nhru', 'real', &
      &         '0.0', '0.0', '1.0', &
      &         'Initial fraction available water in the capillary reservoir', &
@@ -1014,12 +1019,14 @@ end module PRMS_IT0_VARS
      &       'Fraction of the agriculture reservoir water-holding capacity (ag_soil_moist_max) where losses occur as both'// &
      &       ' evaporation and transpiration (upper zone of agriculture reservoir) for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_soil_rechr_max_frac')
+        ALLOCATE ( Ag_soil_rechr_init_frac(Nhru) )
         IF ( declparam(Soilzone_module, 'ag_soil_rechr_init_frac', 'nhru', 'real', &
      &       '-1.0', '0.0', '1.0', &
      &       'Initial fraction of available water in the soil recharge zone within the agriculture reservoir', &
      &       'Initial fraction of available water in the agriculture reservoir where losses occur'// &
      &       ' as both evaporation and transpiration (upper zone of agriculture reservoir) for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_soil_rechr_init_frac')
+        ALLOCATE ( Ag_soil_moist_init_frac(Nhru) )
         IF ( declparam(Soilzone_module, 'ag_soil_moist_init_frac', 'nhru', 'real', &
      &       '-1.0', '0.0', '1.0', &
      &       'Initial fraction available water in the soil agriculture reservoir', &
@@ -1211,9 +1218,9 @@ end module PRMS_IT0_VARS
       IF ( PRMS4_flag==ACTIVE ) THEN
         IF ( getparam_real(Soilzone_module, 'soil_rechr_max', Nhru, Soil_rechr_max)/=0 ) CALL read_error(2, 'soil_rechr_max')
       ELSE
-        IF ( getparam_real(Soilzone_module, 'soil_rechr_max_frac', Nhru, Soil_rechr_max)/=0 ) &
+        IF ( getparam_real(Soilzone_module, 'soil_rechr_max_frac', Nhru, Soil_rechr_max_frac)/=0 ) &
      &       CALL read_error(2, 'soil_rechr_max_frac')
-        Soil_rechr_max = Soil_rechr_max*Soil_moist_max
+        Soil_rechr_max = Soil_rechr_max_frac * Soil_moist_max
       ENDIF
 
       ierr = 0
@@ -1228,14 +1235,14 @@ end module PRMS_IT0_VARS
      &         CALL read_error(2, 'ssstor_init')
 ! PRMS 5 parameters
         ELSE
-          IF ( getparam_real(Soilzone_module, 'soil_moist_init_frac', Nhru, Soil_moist)/=0 ) &
+          IF ( getparam_real(Soilzone_module, 'soil_moist_init_frac', Nhru, Soil_moist_init_frac)/=0 ) &
      &         CALL read_error(2, 'soil_moist_init_frac')
-          IF ( getparam_real(Soilzone_module, 'soil_rechr_init_frac', Nhru, Soil_rechr)/=0 ) &
+          IF ( getparam_real(Soilzone_module, 'soil_rechr_init_frac', Nhru, Soil_rechr_init_frac)/=0 ) &
      &         CALL read_error(2, 'soil_rechr_init_frac')
           IF ( getparam_real(Soilzone_module, 'ssstor_init_frac', Nssr, Ssres_stor)/=0 ) &
      &         CALL read_error(2, 'ssstor_init_frac')
-          Soil_rechr = Soil_rechr*Soil_rechr_max
-          Soil_moist = Soil_moist*Soil_moist_max
+          Soil_rechr = Soil_rechr_init_frac * Soil_rechr_max
+          Soil_moist = Soil_moist_init_frac * Soil_moist_max
           Ssres_stor = Ssres_stor*Sat_threshold
         ENDIF
         Slow_stor = Ssres_stor
@@ -1244,39 +1251,95 @@ end module PRMS_IT0_VARS
       IF ( AG_flag==ACTIVE ) THEN
         IF ( getparam_real(Soilzone_module, 'ag_soil_moist_max', Nhru, Ag_soil_moist_max)/=0 ) &
      &       CALL read_error(2, 'ag_soil_moist_max')
-        if ( Ag_soil_moist_max(1) < 0.0 ) then
+        IF ( Ag_soil_moist_max(1) < 0.0 ) then
           print *, 'WARNING, ag_soil_moist_max not specified substituting soil_moist_max'
           Ag_soil_moist_max = Soil_moist_max
-        endif
+        ENDIF
         IF ( getparam_real(Soilzone_module, 'ag_soil_rechr_max_frac', Nhru, Ag_soil_rechr_max_frac)/=0 ) &
      &       CALL read_error(2, 'ag_soil_rechr_max_frac')
         IF ( Ag_soil_rechr_max_frac(1) < 0.0 ) THEN
           print *, 'WARNING, ag_soil_rechr_max_frac not specified substituting soil_rechr_max_frac'
-          Ag_soil_rechr_max = Soil_rechr_max
-        ELSE
-          Ag_soil_rechr_max = Ag_soil_rechr_max_frac*Ag_soil_moist_max
+          Ag_soil_rechr_max_frac = Soil_rechr_max_frac
         ENDIF
-        ierr = 0
         IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
-          IF ( getparam_real(Soilzone_module, 'ag_soil_moist_init_frac', Nhru, Ag_soil_moist)/=0 ) &
+          IF ( getparam_real(Soilzone_module, 'ag_soil_moist_init_frac', Nhru, Ag_soil_moist_init_frac)/=0 ) &
      &         CALL read_error(2, 'ag_soil_moist_init_frac')
-          if ( Ag_soil_moist(1) < 0.0 ) then
+          IF ( Ag_soil_moist_init_frac(1) < 0.0 ) then
             print *, 'WARNING, ag_soil_moist_init_frac not specified substituting soil_moist_init_frac'
-            Ag_soil_moist = Soil_moist ! possible problem
-          else
-            Ag_soil_moist = Ag_soil_moist*Ag_soil_moist_max
-          endif
-          IF ( getparam_real(Soilzone_module, 'ag_soil_rechr_init_frac', Nhru, Ag_soil_rechr)/=0 ) &
+            Ag_soil_moist_init_frac = Soil_moist_init_frac
+          ENDIF
+          IF ( getparam_real(Soilzone_module, 'ag_soil_rechr_init_frac', Nhru, Ag_soil_rechr_init_frac)/=0 ) &
      &         CALL read_error(2, 'ag_soil_rechr_init_frac')
-          if ( Ag_soil_rechr(1) < 0.0 ) then
+          IF ( Ag_soil_rechr_init_frac(1) < 0.0 ) then
             print *, 'WARNING, ag_soil_rechr_init_frac not specified substituting soil_rechr_init_frac'
-            Ag_soil_rechr = Soil_rechr
-          else
-            Ag_soil_rechr = Ag_soil_rechr*Ag_soil_rechr_max ! possible problem if
-          endif
+            Ag_soil_rechr_init_frac = Soil_rechr_init_frac
+          ENDIF
         ENDIF
+        ! determing ag_soil_rechr_max with minimum 0.75 and have ag_soil_moist_max minimum value
+        Ag_soil_rechr_max = 0.0
+        DO i = 1, Nhru
+          IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE ) CYCLE
+          IF ( Ag_soil_moist_max(i) < 4.0 ) THEN
+            PRINT *, 'ag_soil_moist_max < 4.0, set to 4.0, HRU:', i, Ag_soil_moist_max(i)
+            Ag_soil_moist_max(i) = 4.0
+          ENDIF
+          IF ( Ag_soil_rechr_max_frac(i) < 0.75 ) THEN
+            PRINT *, 'ag_soil_rechr_max_frac < 0.75, set to 0.75, HRU:', i, Ag_soil_rechr_max_frac(i)
+            Ag_soil_rechr_max_frac(i) = 0.75
+          ENDIF
+          Ag_soil_rechr_max(i) = Ag_soil_moist_max(i) * Ag_soil_rechr_max_frac(i)
+          IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
+            IF ( Parameter_check_flag>0 ) THEN
+              PRINT 9022, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
+              ierr = 1
+            ELSE
+              IF ( Print_debug>DEBUG_less ) PRINT 9032, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
+              Ag_soil_rechr_max(i) = Ag_soil_moist_max(i)
+            ENDIF
+          ENDIF
+        ENDDO
+        IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
+          Ag_soil_moist = Ag_soil_moist_init_frac * Ag_soil_moist_max
+          Ag_soil_rechr = Ag_soil_rechr_init_frac * Ag_soil_rechr_max
+        ENDIF
+        ! AG consistency checks
+        DO i = 1, Nhru
+          IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE ) CYCLE
+          IF ( Ag_soil_rechr(i)>Ag_soil_rechr_max(i) ) THEN
+            IF ( Parameter_check_flag>0 ) THEN
+              PRINT 9023, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
+              ierr = 1
+            ELSE
+              IF ( Print_debug>DEBUG_less ) PRINT 9033, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
+              Ag_soil_rechr(i) = Ag_soil_rechr_max(i)
+            ENDIF
+          ENDIF
+          IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) THEN
+            IF ( Parameter_check_flag>0 ) THEN
+              PRINT 9024, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
+              ierr = 1
+            ELSE
+              IF ( Print_debug>DEBUG_less ) PRINT 9034, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
+              Ag_soil_moist(i) = Ag_soil_moist_max(i)
+            ENDIF
+          ENDIF
+          IF ( Ag_soil_rechr(i)>Ag_soil_moist(i) ) THEN
+            IF ( Parameter_check_flag>0 ) THEN
+              PRINT 9025, i, Ag_soil_rechr(i), Ag_soil_moist(i)
+              ierr = 1
+            ELSE
+              IF ( Print_debug>DEBUG_less ) PRINT 9035, i, Ag_soil_rechr(i), Ag_soil_moist(i)
+              Ag_soil_rechr(i) = Ag_soil_moist(i)
+            ENDIF
+          ENDIF
+        ENDDO
+        DEALLOCATE ( Ag_soil_moist_init_frac, Ag_soil_rechr_init_frac, Ag_soil_rechr_max_frac )
       ENDIF
-
+      IF ( PRMS4_flag == OFF ) THEN
+        DEALLOCATE ( Soil_rechr_max_frac )
+        IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) &
+             DEALLOCATE ( Soil_moist_init_frac, Soil_rechr_init_frac )
+      ENDIF
       ! check parameters
       DO i = 1, Nhru
         IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE ) CYCLE
@@ -1349,49 +1412,6 @@ end module PRMS_IT0_VARS
           ELSE
             PRINT *, 'WARNING, HRU:', i, Ssres_stor(i), Sat_threshold(i), ' ssres_stor > sat_threshold, ssres_stor set to max'
             Ssres_stor(i) = Sat_threshold(i)
-          ENDIF
-        ENDIF
-
-        IF ( AG_flag==ACTIVE ) THEN
-          IF ( Ag_soil_moist_max(i) < 6.0 ) THEN
-            PRINT *, 'ag_soil_moist_max < 6.0, set to 6.0, HRU:', i, Ag_soil_moist_max(i)
-            Ag_soil_moist_max(i) = 6.0
-          ENDIF
-          IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
-            IF ( Parameter_check_flag>0 ) THEN
-              PRINT 9022, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
-              ierr = 1
-            ELSE
-              IF ( Print_debug>DEBUG_less ) PRINT 9032, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
-              Ag_soil_rechr_max(i) = Ag_soil_moist_max(i)
-            ENDIF
-          ENDIF
-          IF ( Ag_soil_rechr(i)>Ag_soil_rechr_max(i) ) THEN
-            IF ( Parameter_check_flag>0 ) THEN
-              PRINT 9023, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
-              ierr = 1
-            ELSE
-              IF ( Print_debug>DEBUG_less ) PRINT 9033, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
-              Ag_soil_rechr(i) = Ag_soil_rechr_max(i)
-            ENDIF
-          ENDIF
-          IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) THEN
-            IF ( Parameter_check_flag>0 ) THEN
-              PRINT 9024, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
-              ierr = 1
-            ELSE
-              IF ( Print_debug>DEBUG_less ) PRINT 9034, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
-              Ag_soil_moist(i) = Ag_soil_moist_max(i)
-            ENDIF
-          ENDIF
-          IF ( Ag_soil_rechr(i)>Ag_soil_moist(i) ) THEN
-            IF ( Parameter_check_flag>0 ) THEN
-              PRINT 9025, i, Ag_soil_rechr(i), Ag_soil_moist(i)
-              ierr = 1
-            ELSE
-              IF ( Print_debug>DEBUG_less ) PRINT 9035, i, Ag_soil_rechr(i), Ag_soil_moist(i)
-              Ag_soil_rechr(i) = Ag_soil_moist(i)
-            ENDIF
           ENDIF
         ENDIF
       ENDDO
@@ -1525,8 +1545,8 @@ end module PRMS_IT0_VARS
  9004 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_init > soil_moist_max', 2F10.5)
  9005 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr > soil_moist based on init and max values', 2F10.5)
  9022 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_max > ag_soil_moist_max', 2F10.5)
- 9023 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max', 2F10.5)
- 9024 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max', 2F10.5)
+ 9023 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr > ag_soil_rechr_max', 2F10.5)
+ 9024 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_moist > ag_soil_moist_max', 2F10.5)
  9025 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr > ag_soil_moist based on init and max values', 2F10.5)
 ! 9006 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_max < 0.00001', F10.5)
 ! 9007 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max < 0.00001', F10.5)
