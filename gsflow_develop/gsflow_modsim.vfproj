@@ -123,7 +123,7 @@
 		<File RelativePath="..\GSFLOW\src\modflow\mach_mod.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\map_results.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\mhc7.f"/>
-		<File RelativePath="..\GSFLOW\src\prms\modsim_diversion_read.f90"/>
+		<File RelativePath="..\GSFLOW\src\gsflow\modsim_diversion_read.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\modules.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\muskingum.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\muskingum_lake.f90"/>

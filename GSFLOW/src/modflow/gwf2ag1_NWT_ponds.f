@@ -3462,7 +3462,7 @@
 ! NEED to check IPRIOR value here
 !        k = IDIVAR(1, ISEG)
 
-        if(iseg==424)then
+        if(iseg==24)then
         etdif = pettotal - aettotal
           write(999,33)kper,kstp,kiter,iseg,SEG(2, iseg),demand(iseg),
      +                 SUPACT(iseg),etdif,RMSESW(ISEG),pettotal,
