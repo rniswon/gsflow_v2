@@ -440,10 +440,10 @@
               PRINT '(A,I0,A,F0.6)', 'WARNING, ag_frac > 1.0, set to 1.0 for HRU: ', i, ', ag_frac: ', Ag_frac(i)
               Ag_frac(i) = 1.0
             ENDIF
-            !IF ( Ag_frac(i)<0.01 ) THEN
-            !  PRINT '(A,I0,A,F0.6)', 'WARNING, ag_frac < 0.01, set to 0.0 for HRU: ', i, ', ag_frac: ', Ag_frac(i)
-            !  Ag_frac(i) = 0.0
-            !ENDIF
+            IF ( Ag_frac(i)<0.0001 ) THEN
+              PRINT '(A,I0,A,F0.6)', 'WARNING, ag_frac < 0.0001, set to 0.0 for HRU: ', i, ', ag_frac: ', Ag_frac(i)
+              Ag_frac(i) = 0.0
+            ENDIF
             Ag_area(i) = Ag_frac(i) * harea
             basin_ag_area = basin_ag_area + DBLE( Ag_area(i) )
             non_perv = Ag_frac(i) + Hru_percent_imperv(i) + Dprst_frac(i)

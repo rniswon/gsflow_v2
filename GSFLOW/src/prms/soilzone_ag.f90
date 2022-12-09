@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2022-10-25'
+      character(len=*), parameter :: Version_soilzone_ag = '2022-12-06'
       INTEGER, SAVE :: Soil_iter !, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_perv_to_gw
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Basin_ag_soil_rechr, Basin_ag_gvr2sm
@@ -523,6 +523,8 @@
       IF ( Iter_aet_flag==ACTIVE ) THEN
         Basin_ag_irrigation_add = 0.0D0
         Ag_irrigation_add = 0.0
+        Ag_irrigation_add_vol = 0.0
+        ag_AET_external_vol = 0.0
 !        max_irrigation = 0.0
       ENDIF
 
@@ -761,6 +763,7 @@
               Ag_hortonian(i) = excess * agfrac
               Sroff(i) = Sroff(i) + excess * agfrac
               ag_water_maxin = ag_water_maxin - excess
+              !if(ag_irrigation_add(i)>0.0)print *, 'EXCESS', i, Ag_hortonian(i), excess, agfrac, ag_irrigation_add(i)
             ENDIF
           ENDIF
         ENDIF
@@ -1024,7 +1027,7 @@
               ! sanity check
               IF ( Iter_aet_flag==ACTIVE ) THEN
                 IF ( agactet-ag_AETtarget>NEARZERO ) THEN
-                  PRINT *, 'ag_actet problem', agactet, ag_avail_potet, agfrac, AET_external(i), ag_potet, i, hruactet
+                  PRINT *, 'ag_actet issue', agactet, ag_avail_potet, agfrac, AET_external(i), ag_potet, i, hruactet
                   PRINT *, ag_AETtarget-agactet, Ag_soil_moist(i), Ag_soil_rechr(i)
                 ENDIF
               ENDIF
@@ -1198,25 +1201,24 @@
           !IF ( Iter_aet_flag==ACTIVE ) THEN
             !agriculture_external(i)
             !IF ( Unused_potet(i)>0.0 ) THEN
-            IF ( Soil_iter<max_soilzone_ag_iter ) THEN
             IF ( unsatisfied_ag_et>soilzone_aet_converge ) THEN
               IF ( Ag_soilwater_deficit(i)>Ag_soilwater_deficit_min(i) ) THEN
                 IF ( unsatisfied_ag_et > ag_soil_moist_max(i) ) THEN
                   unsatisfied_max = ag_soil_moist_max(i) ! temporary fix, need better values for ag_soil_moist_max
                 ELSE
                   unsatisfied_max = unsatisfied_ag_et
+                  IF ( Soil_iter > 3 ) unsatisfied_max = unsatisfied_max + unsatisfied_ag_et ! this doubles small values so solution converges faster
                   keep_iterating = ACTIVE
                   add_estimated_irrigation = ACTIVE
                   num_hrus_ag_iter = num_hrus_ag_iter + 1
                 ENDIF
                 Ag_irrigation_add(i) = Ag_irrigation_add(i) + unsatisfied_max
                 !if ( Ag_irrigation_add(i)>2.5 ) then
-                !    print *, 'large irrigaion', i, Ag_irrigation_add(i), ag_AETtarget, unsatisfied_max
+                !    print *, 'large irrigaion', i, Ag_irrigation_add(i), ag_AETtarget, unsatisfied_ag_et, ag_soil_moist(i), ag_soil_rechr(i), soil_iter
                 !endif
 !                IF ( Ag_irrigation_add(i)>max_irrigation ) max_irrigation = Ag_irrigation_add(i)
+                IF ( unsatisfied_max>unsatisfied_big ) unsatisfied_big = unsatisfied_max
               ENDIF
-              IF ( unsatisfied_max>unsatisfied_big ) unsatisfied_big = unsatisfied_max
-            ENDIF
             ENDIF
           ENDIF
         ENDIF
@@ -1241,24 +1243,36 @@
 
       Soil_iter = Soil_iter - 1
       IF ( Iter_aet_flag == ACTIVE ) THEN
-        Ag_irrigation_add_vol = Ag_irrigation_add*Ag_area
-        ag_AET_external_vol = ag_AET_external_vol*Ag_area
+        print '(a,i0)', 'AET iterations: ', soil_iter
         Basin_ag_irrigation_add = 0.0D0
-        do i = 1, nhru ! temporary to put mask in nhru_summary file
-          if (ag_frac(i)>0.0 ) then
+        IF ( Basin_transp_on == ACTIVE ) THEN
+          Ag_irrigation_add_vol = Ag_irrigation_add*Ag_area
+          ag_AET_external_vol = ag_AET_external_vol*Ag_area
+          do i = 1, nhru ! temporary to put mask in nhru_summary file
+            if (ag_frac(i)>0.0 ) then
                 if (transp_on(i)==OFF) AET_external(i) = -1.0
                 Basin_ag_irrigation_add = Basin_ag_irrigation_add + DBLE( Ag_irrigation_add_vol(i) )
-          else
+                if ( ag_irrigation_add(i)>0.0)then
+                    if (ag_soil_moist_max(i)-ag_soil_moist(i) < 0.0001 ) then
+                        print *, 'ag soil full', i, ag_soil_moist_max(i), ag_soil_moist(i), ag_irrigation_add(i), Ag_soilwater_deficit(i)
+                        print *, ag_actet(i), aet_external(i)
+                    endif
+                endif
+            else
                 AET_external(i) = -1.0
-          endif
-        enddo
-        Basin_ag_irrigation_add = Basin_ag_irrigation_add / Ag_area_total
-        IF ( num_hrus_ag_iter>0 ) print '(2(A,I0))', 'number of hrus still iterating on AET: ', num_hrus_ag_iter
-        if ( soil_iter==max_soilzone_ag_iter ) then
+            endif
+          enddo
+          Basin_ag_irrigation_add = Basin_ag_irrigation_add / Ag_area_total
+        ELSE
+          AET_external = -1.0
+        ENDIF
+        IF ( num_hrus_ag_iter > 0 ) print '(2(A,I0))', 'number of hrus still iterating on AET: ', num_hrus_ag_iter
+        if ( Soil_iter == max_soilzone_ag_iter ) then
            iter_nonconverge = iter_nonconverge + 1
-           print *, 'Warning, ag AET did not converge due to max_soilzone_ag_iter:', Nowyear, Nowmonth, Nowday
-           print *, '         largest AET-ag_actet:', unsatisfied_big, '; iterations: ', Soil_iter, '; number of nonconverged:', iter_nonconverge
-           print *, '         convergence criteria:', soilzone_aet_converge, '; maximum iterations:', max_soilzone_ag_iter
+           print '(A,I0,2("/",I0))', 'WARNING, ag AET did not converge due to max_soilzone_ag_iter: ', Nowyear, Nowmonth, Nowday
+           print '(A,F0.4,2(A,I0))', '         largest AET-ag_actet: ', unsatisfied_big, '; iterations: ', Soil_iter, &
+                                    '; number of nonconverged: ', iter_nonconverge
+           print '(A,F0.6,A,I0)', '         convergence criteria: ', soilzone_aet_converge, '; maximum iterations: ', max_soilzone_ag_iter
         ENDIF
       ENDIF
       Basin_ag_waterin = Basin_ag_waterin*Basin_area_inv

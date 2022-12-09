@@ -1469,9 +1469,9 @@
       ! sanity check
       IF ( Perv_actet*Perv_frac-Avail_potet > NEARZERO ) THEN
         IF ( ag_perv_flag == 0 ) THEN
-          PRINT '(a,i0,4(1x,F0.6))', 'perv_actet problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Perv_actet
+          PRINT '(a,i0,4(1x,F0.6))', 'perv_actet issue: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Perv_actet
         ELSE
-          PRINT '(a,i0,4(1x,F0.6))', 'ag_actet problem: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Perv_actet
+          PRINT '(a,i0,4(1x,F0.6))', 'ag_actet issue: ', hru_id, Perv_actet*Perv_frac, Avail_potet, Perv_frac, Perv_actet
         ENDIF
         CALL print_date(0)
 !        Soil_moist = Soil_moist + Perv_actet - Avail_potet
@@ -1479,9 +1479,9 @@
       ENDIF
       IF ( Perv_actet*Perv_frac>Potet ) THEN
         IF ( ag_perv_flag == 0 ) THEN
-          PRINT '(a,i0,4(1x,F0.6))', 'perv_actet PET problem: ', hru_id, Perv_actet, Avail_potet, Potet, Perv_frac
+          PRINT '(a,i0,4(1x,F0.6))', 'perv_actet PET issue: ', hru_id, Perv_actet, Avail_potet, Potet, Perv_frac
         ELSE
-          PRINT '(a,i0,4(1x,F0.6))', 'ag_actet PET problem: ', hru_id, Perv_actet, Avail_potet, Potet, Perv_frac
+          PRINT '(a,i0,4(1x,F0.6))', 'ag_actet PET issue: ', hru_id, Perv_actet, Avail_potet, Potet, Perv_frac
         ENDIF
         CALL print_date(0)
       ENDIF

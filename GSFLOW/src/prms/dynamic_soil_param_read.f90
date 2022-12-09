@@ -254,7 +254,7 @@
       INTEGER :: i, j, istop, check_dprst_depth_flag, check_sm_max_flag, adjust_dprst_fractions, adjust_imperv_fractions
       INTEGER :: check_ag_max_flag, ios, check_fractions, check_imperv, check_ag_frac, check_dprst_frac
       INTEGER :: it0_sm_flag, it0_grav_flag, it0_dprst_flag, it0_imperv_flag
-      REAL :: harea, frac_imperv, tmp, frac_dprst, frac_ag, to_ssr, frac_perv
+      REAL :: harea, frac_imperv, tmp, frac_dprst, frac_ag, to_slow_stor, frac_perv
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       dynsoilparamrun = 0
@@ -444,7 +444,7 @@
           i = Hru_route_order(j)
           IF ( Hru_type(i)==LAKE ) CYCLE ! skip lake HRUs
           harea = Hru_area(i)
-          to_ssr = 0.0
+          to_slow_stor = 0.0
           adjust_dprst_fractions = OFF
           adjust_imperv_fractions = OFF
 
@@ -479,22 +479,25 @@
             frac_ag = temp_ag_frac(i)
             if ( frac_ag>0.0 ) then
               IF ( frac_ag>1.0 ) THEN
-                PRINT '(A,I0,A,F0.6)', 'WARNING, ag_frac > 1.0, set to 1.0 for HRU: ', i, ', frac_ag: ', frac_ag
-                Ag_frac(i) = 1.0
+                PRINT '(A,I0,A,F0.6)', 'WARNING, dynamic ag_frac > 1.0, set to 1.0 for HRU: ', i, ', frac_ag: ', frac_ag
+                frac_ag = 1.0
               ENDIF
-              IF ( frac_ag<0.01 ) THEN
-                PRINT '(A,I0,A,F0.6)', 'WARNING, dynamic ag_frac < 0.01, set to 0.0 for HRU: ', i, ', ag_frac: ', frac_ag
+              IF ( frac_ag<0.0001 ) THEN
+                PRINT '(A,I0,A,F0.6)', 'WARNING, dynamic ag_frac < 0.0001, set to 0.0 for HRU: ', i, ', ag_frac: ', frac_ag
                 frac_ag = 0.0
               ENDIF
             endif
             if ( Ag_frac(i)>0.0 .and. .not.(frac_ag>0.0) ) then
-              print *, 'ag_frac problem', Ag_frac(i), frac_ag, i
+              print *, 'ag_frac issue', Ag_frac(i), frac_ag, i
             endif
             IF ( Ag_soil_moist(i)>0.0 ) THEN
               IF ( frac_ag > 0.0 ) THEN
                 IF ( frac_ag < Ag_frac(i) ) THEN
-                  ! keep same ag depth, send excess to groundwater storage
-                  to_ssr = Ag_soil_moist(i) * (Ag_frac(i) - frac_ag)
+                  ! keep same ag depth, send excess to GVR storage
+                  to_slow_stor = Ag_soil_moist(i) * (Ag_frac(i) - frac_ag)
+                  PRINT *, 'WARNING, dynamic agriculture fraction reduced, ag_soil_moist unchanged,'
+                  PRINT *, '         excess water added to slow storage of GVR:', to_slow_stor
+                  PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
                 ELSEIF ( Ag_frac(i) < frac_ag ) THEN
                   ! adjust ag depth
                   Ag_soil_moist(i) = Ag_soil_moist(i)*Ag_frac(i)/frac_ag
@@ -502,10 +505,10 @@
                 ENDIF
               ELSE
                 tmp = Ag_soil_moist(i)*Ag_frac(i)
-                PRINT *, 'WARNING, dynamic agriculture storage changed to 0 when storage > 0'
-                PRINT *, '         storage added to soil_moist and soil_rechr:', tmp
+                PRINT *, 'WARNING, dynamic agriculture fraction changed to 0 when ag_soil_moist > 0'
+                PRINT *, '         storage added to slow storage of GVR:', tmp
                 PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
-                to_ssr = to_ssr + tmp
+                to_slow_stor = to_slow_stor + tmp
                 Ag_soil_moist(i) = 0.0
                 Ag_soil_rechr(i) = 0.0
               ENDIF
@@ -516,7 +519,7 @@
             ! check sum of imperv, ag, and dprst if either are updated!!!!!!
             frac_perv = frac_imperv + frac_dprst + frac_ag
             IF ( frac_perv>1.0 ) THEN
-              print *, 'Pervious fraction problem, > 1:', frac_perv
+              print *, 'Pervious fraction issue, > 1:', frac_perv, '; HRU:', i
               print *, 'impervious:', frac_imperv, '; dprst:', frac_dprst, '; ag:', frac_ag
               tmp = frac_perv - 1.0
               IF ( frac_dprst>0.0 ) THEN
@@ -545,9 +548,9 @@
               ELSE
                 tmp = Imperv_stor(i)*Hru_percent_imperv(i)
                 PRINT *, 'WARNING, dynamic impervious changed to 0 when impervious storage > 0'
-                PRINT *, '         storage added to gravity reservoir:', tmp
+                PRINT *, '         storage added to slow storage of GVR:', tmp
                 PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
-                to_ssr = to_ssr + tmp  ! later add to runoff
+                to_slow_stor = to_slow_stor + tmp  ! later add to runoff
                 Imperv_stor(i) = 0.0
                 it0_imperv_flag = ACTIVE
               ENDIF
@@ -572,9 +575,9 @@
                 IF ( .NOT.(frac_dprst)>0.0 .AND. tmp>0.0 ) THEN
                   tmp = ( tmp / Dprst_area(i) ) * Dprst_frac(i)
                   PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0'
-                  PRINT *, '         storage added to gravity reservoir:', tmp
+                  PRINT *, '         storage added to slow storage of GVR:', tmp
                   PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
-                  to_ssr = to_ssr + tmp
+                  to_slow_stor = to_slow_stor + tmp
                   Dprst_vol_open(i) = 0.0D0
                   Dprst_vol_clos(i) = 0.0D0
                   it0_dprst_flag = ACTIVE
@@ -619,7 +622,7 @@
             ENDIF
           ELSE
             IF ( Hru_frac_perv(i) > 0.0 ) THEN
-              to_ssr = to_ssr + Soil_moist(i) * Hru_frac_perv(i)
+              to_slow_stor = to_slow_stor + Soil_moist(i) * Hru_frac_perv(i)
               Soil_moist(i) = 0.0
               Soil_rechr(i) = 0.0
               it0_sm_flag = ACTIVE
@@ -628,9 +631,9 @@
           ENDIF
           Hru_frac_perv(i) = frac_perv
           Hru_perv(i) = harea * frac_perv
-          if ( to_ssr>0.0 ) then
-            print *, 'to_ssr', to_ssr
-            Slow_stor(i) = Slow_stor(i) + to_ssr
+          if ( to_slow_stor>0.0 ) then
+!            print *, 'to_slow_stor', to_slow_stor
+            Slow_stor(i) = Slow_stor(i) + to_slow_stor
             it0_grav_flag = ACTIVE
           endif
 
