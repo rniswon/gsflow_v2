@@ -45,7 +45,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
      &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,',
      &        /, 25X, 'AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
 
-      LINE = '                    Github Commit Hash 0a338c0'
+      LINE = '                    Github Commit Hash 36ee101'
       WRITE(*,*) 
       WRITE(*,*) Line
       WRITE(*,*) 
