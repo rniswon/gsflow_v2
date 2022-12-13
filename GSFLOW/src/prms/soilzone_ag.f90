@@ -497,6 +497,7 @@
       INTEGER :: num_hrus_ag_iter, ag_on_flag, keep_iterating, add_estimated_irrigation, perv_on_flag
 !***********************************************************************
       szrun_ag = 0
+      update_potet = OFF
 
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE ) THEN
@@ -510,6 +511,7 @@
             It0_strm_seg_in = Strm_seg_in
 !          IF ( Ag_gravity_flag==ACTIVE ) Ag_gvr_stor = It0_ag_gvr_stor
           ENDIF
+          IF ( Nlake>0 ) It0_potet = Potet
           timestep_start_flag = OFF
         ENDIF
       ELSEIF ( Iter_aet_flag==ACTIVE ) THEN
@@ -548,7 +550,7 @@
         Ssres_stor = It0_ssres_stor
         Slow_stor = It0_slow_stor
         IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
-        IF ( Nlake>0 ) Potet = It0_potet
+        IF ( update_potet == ACTIVE ) Potet = It0_potet
         Gravity_stor_res = It0_gravity_stor_res
         IF ( PRMS_land_iteration_flag==OFF ) THEN
           ! computed in srunoff
@@ -1254,7 +1256,8 @@
                 Basin_ag_irrigation_add = Basin_ag_irrigation_add + DBLE( Ag_irrigation_add_vol(i) )
                 if ( ag_irrigation_add(i)>0.0)then
                     if (ag_soil_moist_max(i)-ag_soil_moist(i) < 0.0001 ) then
-                        print *, 'ag soil full', i, ag_soil_moist_max(i), ag_soil_moist(i), ag_irrigation_add(i), Ag_soilwater_deficit(i)
+                        print *, 'ag soil full', i, ag_soil_moist_max(i), ag_soil_moist(i), ag_irrigation_add(i), &
+                                 Ag_soilwater_deficit(i)
                         print *, ag_actet(i), aet_external(i)
                     endif
                 endif
@@ -1272,7 +1275,8 @@
            print '(A,I0,2("/",I0))', 'WARNING, ag AET did not converge due to max_soilzone_ag_iter: ', Nowyear, Nowmonth, Nowday
            print '(A,F0.4,2(A,I0))', '         largest AET-ag_actet: ', unsatisfied_big, '; iterations: ', Soil_iter, &
                                     '; number of nonconverged: ', iter_nonconverge
-           print '(A,F0.6,A,I0)', '         convergence criteria: ', soilzone_aet_converge, '; maximum iterations: ', max_soilzone_ag_iter
+           print '(A,F0.6,A,I0)', '         convergence criteria: ', soilzone_aet_converge, &
+                                  '; maximum iterations: ', max_soilzone_ag_iter
         ENDIF
       ENDIF
       Basin_ag_waterin = Basin_ag_waterin*Basin_area_inv
