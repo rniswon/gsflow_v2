@@ -20,7 +20,7 @@ npoigages              6
 ====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 12/01/2022
+                       Version 5.3.0 12/20/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -58,7 +58,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-12-01
+PRMS Computation Order          gsflow_prms         2022-12-20
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -89,7 +89,7 @@ runoff 6
 Simulation time period: 1980/01/01 00:00:00 to 1999/12/31 00:00:00
 ====================================================================
 Basin Definition                basin               2022-09-20
-Common States and Fluxes        climateflow         2022-11-02
+Common States and Fluxes        climateflow         2022-12-06
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
@@ -156,5 +156,5 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
  *************************************************************
  Total for run    1110.775  440.221    8.439  693.939   13.445
  *************************************************************
-Execution elapsed time    0 minutes  1.55 seconds
+Execution elapsed time    0 minutes  1.44 seconds
 
