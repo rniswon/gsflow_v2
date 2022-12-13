@@ -162,7 +162,7 @@
      &     'Seepage as computed by SFR for each reach', &
      &     'cfs', Seepage_reach_sfr)
 
-      ALLOCATE (Seepage_segment_sfr(Nreach))
+      ALLOCATE (Seepage_segment_sfr(Nsegment))
       CALL declvar_real(MODNAME, 'seepage_segment_sfr', 'nsegment', Nsegment, &
      &     'Seepage as computed by SFR for each segment', &
      &     'cfs', Seepage_segment_sfr)
