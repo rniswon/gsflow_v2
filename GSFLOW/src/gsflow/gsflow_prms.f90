@@ -1533,7 +1533,7 @@
 !***********************************************************************
 !     put_prms_control_file - MODSIM sends PRMS Control File name
 !***********************************************************************
-      SUBROUTINE put_prms_control_file(command_line_args, cmd_len) BIND(C,NAME="put_prms_control_file")
+      SUBROUTINE put_prms_control_file(cmd_len, command_line_args) BIND(C,NAME="put_prms_control_file")
       !DEC$ ATTRIBUTES DLLEXPORT :: put_prms_control_file
       USE PRMS_CONSTANTS, ONLY: MAXCMDLINE_LENGTH
       USE PRMS_MODULE, ONLY: command_line_modsim
@@ -1544,7 +1544,10 @@
       ! Local Variabales
       INTEGER :: i
 !***********************************************************************
-      IF ( cmd_len > MAXCMDLINE_LENGTH ) STOP 'ERROR, MODSIM command line > MAXCMDLINE_LENGTH'
+      IF ( cmd_len > MAXCMDLINE_LENGTH ) THEN
+          print *, command_line_args, ': ', cmd_len
+          STOP 'ERROR, MODSIM command line > MAXCMDLINE_LENGTH'
+      ENDIF
       command_line_modsim = ' '
       DO i = 1, cmd_len
         command_line_modsim(i:i) = command_line_args(i)
