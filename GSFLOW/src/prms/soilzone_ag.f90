@@ -1060,8 +1060,11 @@
         IF ( Ag_package==ACTIVE ) gsflow_ag_actet(i) = agactet
         hru_ag_actet(i) = ag_hruactet
         Hru_actet(i) = hruactet + pervactet*perv_frac + ag_hruactet
-        Unused_potet(i) = Potet(i) * (1.0-agfrac) - Hru_actet(i)
-        IF ( ag_on_flag==ACTIVE ) Unused_potet(i) = Unused_potet(i) + ag_AETtarget*agfrac
+        IF ( ag_on_flag==ACTIVE ) THEN
+          Unused_potet(i) = Potet(i) - agactet
+        ELSE
+          Unused_potet(i) = Potet(i) - Hru_actet(i)
+        ENDIF
         ! sanity check
 !        IF ( Unused_potet(i)<-CLOSEZERO ) THEN
 !          IF ( Print_debug>DEBUG_less ) THEN
