@@ -500,13 +500,6 @@
 
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE ) THEN
-        Sm2gw_grav = 0.0 ! dimension nhrucell
-        IF ( Kkiter == 1 ) Gw2sm_grav = 0.0 ! dimension nhrucell
-        Ag_gvr_to_sm = 0.0
-        IF ( Ag_package == ACTIVE ) THEN
-          Hru_ag_irr = 0.0
-          IF ( Dprst_flag == ACTIVE ) Dprst_ag_gain = 0.0
-        ENDIF
         IF ( timestep_start_flag == ACTIVE ) THEN
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
@@ -548,8 +541,14 @@
         Soil_rechr = It0_soil_rechr
         Ssres_stor = It0_ssres_stor
         Slow_stor = It0_slow_stor
+        Gw2sm_grav = 0.0
+        IF ( Ag_package == ACTIVE ) THEN
+          Hru_ag_irr = 0.0
+          IF ( Dprst_flag == ACTIVE ) Dprst_ag_gain = 0.0
+        ENDIF
+        Ag_gvr_to_sm = 0.0
         IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
-        IF ( update_potet == ACTIVE ) Potet = It0_potet
+        IF ( Nlake > 0 ) Potet = It0_potet
         Gravity_stor_res = It0_gravity_stor_res
         IF ( PRMS_land_iteration_flag==OFF ) THEN
           ! computed in srunoff
