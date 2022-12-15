@@ -445,7 +445,7 @@
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Dprst_flag, Cascade_flag, &
      &    Frozen_flag, Soilzone_add_water_use, Nowmonth, GSFLOW_flag, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Nowyear, Nowday, &
-     &    Iter_aet_flag, irrigation_apply_flag, Model, Dprst_ag_gain !, Ag_gravity_flag
+     &    Iter_aet_flag, irrigation_apply_flag, Model, Kkiter, Dprst_ag_gain !, Ag_gravity_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
@@ -501,7 +501,7 @@
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Sm2gw_grav = 0.0 ! dimension nhrucell
-        Gw2sm_grav = 0.0 ! dimension nhrucell
+        IF ( Kkiter == 1 ) Gw2sm_grav = 0.0 ! dimension nhrucell
         Ag_gvr_to_sm = 0.0
         IF ( Ag_package == ACTIVE ) THEN
           Hru_ag_irr = 0.0

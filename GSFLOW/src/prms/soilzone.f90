@@ -810,12 +810,12 @@
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Sm2gw_grav = 0.0 ! dimension nhrucell
-        Gw2sm_grav = 0.0 ! dimension nhrucell
         IF ( Ag_package == ACTIVE ) THEN
           Hru_ag_irr = 0.0
           IF ( Dprst_flag == ACTIVE ) Dprst_ag_gain = 0.0
         ENDIF
         IF ( timestep_start_flag == ACTIVE ) THEN
+          Gw2sm_grav = 0.0 ! dimension nhrucell
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             It0_sroff = Sroff
