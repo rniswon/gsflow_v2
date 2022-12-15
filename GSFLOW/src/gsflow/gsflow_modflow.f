@@ -45,7 +45,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
      &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,',
      &        /, 25X, 'AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
 
-      LINE = '                    Github Commit Hash 36ee101'
+      LINE = '                    Github Commit Hash 0a338c0'
       WRITE(*,*) 
       WRITE(*,*) Line
       WRITE(*,*) 
@@ -726,7 +726,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                   RETURN
                 ENDIF
               ENDIF
-              IF ( Szcheck==ACTIVE ) retval = gsflow_mf2prms()
+              !IF ( Szcheck==ACTIVE ) retval = gsflow_mf2prms()  RGN+RSR 12/14/2022
               IF ( AG_flag==ACTIVE ) THEN
                 retval = soilzone_ag()
               ELSE

@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC_AG = 'Soilzone Computations'
       character(len=11), parameter :: MODNAME_AG = 'soilzone_ag'
-      character(len=*), parameter :: Version_soilzone_ag = '2022-12-06'
+      character(len=*), parameter :: Version_soilzone_ag = '2022-12-14'
       INTEGER, SAVE :: Soil_iter !, HRU_id
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_to_gw, Basin_ag_up_max, Basin_perv_to_gw
       DOUBLE PRECISION, SAVE :: Basin_ag_actet, Basin_ag_soil_rechr, Basin_ag_gvr2sm
@@ -445,7 +445,7 @@
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Dprst_flag, Cascade_flag, &
      &    Frozen_flag, Soilzone_add_water_use, Nowmonth, GSFLOW_flag, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Nowyear, Nowday, &
-     &    Iter_aet_flag, irrigation_apply_flag, Model !, Ag_gravity_flag
+     &    Iter_aet_flag, irrigation_apply_flag, Model, Dprst_ag_gain !, Ag_gravity_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
@@ -464,8 +464,8 @@
      &    Hru_impervstor, Dprst_stor_hru, gsflow_ag_actet, &
      &    Ag_soil_rechr, Ag_soil_moist, Ag_soil_rechr_max, Ag_soil_moist_max, Basin_ag_soil_moist !, Basin_ag_gvr_stor, Ag_gvr_stor
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_ssres_stor, It0_slow_stor, &
-                               It0_pref_flow_stor, It0_gravity_stor_res, &
-                               It0_ag_soil_rechr, It0_ag_soil_moist, It0_potet !, It0_ag_gvr_stor
+                               It0_pref_flow_stor, It0_gravity_stor_res, It0_potet, &
+                               It0_ag_soil_rechr, It0_ag_soil_moist !, It0_ag_gvr_stor
       USE GSFMODSIM2PRMS, ONLY: HRU_diversion
       USE PRMS_WATER_USE, ONLY: Soilzone_gain, Soilzone_gain_hru
       USE PRMS_CLIMATE_HRU, ONLY: AET_external, PET_external
@@ -497,12 +497,17 @@
       INTEGER :: num_hrus_ag_iter, ag_on_flag, keep_iterating, add_estimated_irrigation, perv_on_flag
 !***********************************************************************
       szrun_ag = 0
-      update_potet = OFF
 
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE ) THEN
+        Sm2gw_grav = 0.0 ! dimension nhrucell
+        Gw2sm_grav = 0.0 ! dimension nhrucell
+        Ag_gvr_to_sm = 0.0
+        IF ( Ag_package == ACTIVE ) THEN
+          Hru_ag_irr = 0.0
+          IF ( Dprst_flag == ACTIVE ) Dprst_ag_gain = 0.0
+        ENDIF
         IF ( timestep_start_flag == ACTIVE ) THEN
-          Gw2sm_grav = 0.0 ! dimension nhrucell
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             It0_sroff = Sroff
@@ -532,12 +537,6 @@
 
       keep_iterating = ACTIVE
       Soil_iter = 1
-! initialize conditional fluxes outside WHILE loop
-      IF ( Pref_flag==ACTIVE ) THEN
-        Pref_flow = 0.0
-        Pref_flow_infil = 0.0
-      ENDIF
-      IF ( GSFLOW_flag==ACTIVE ) Ag_gvr_to_sm = 0.0
 
 ! ***************************************
       DO WHILE ( keep_iterating==ACTIVE )
@@ -580,11 +579,11 @@
         ENDIF
       ENDIF
 
-      IF ( Soil_iter>1 .or. timestep_start_flag == OFF ) THEN
+      !IF ( Soil_iter>1 .or. timestep_start_flag == OFF ) THEN
         Ag_soil_moist = It0_ag_soil_moist
         Ag_soil_rechr = It0_ag_soil_rechr
 !        IF ( Ag_gravity_flag==ACTIVE ) Ag_gvr_stor = It0_ag_gvr_stor
-      ENDIF
+      !ENDIF
 
       Basin_ag_soil_moist = 0.0D0
       Basin_ag_soil_rechr = 0.0D0
@@ -1060,8 +1059,11 @@
         IF ( Ag_package==ACTIVE ) gsflow_ag_actet(i) = agactet
         hru_ag_actet(i) = ag_hruactet
         Hru_actet(i) = hruactet + pervactet*perv_frac + ag_hruactet
-        Unused_potet(i) = Potet(i) * (1.0-agfrac) - Hru_actet(i)
-        IF ( ag_on_flag==ACTIVE ) Unused_potet(i) = Unused_potet(i) + ag_AETtarget*agfrac
+        IF ( ag_on_flag==ACTIVE ) THEN
+          Unused_potet(i) = Potet(i) - agactet
+        ELSE
+          Unused_potet(i) = Potet(i) - Hru_actet(i)
+        ENDIF
         ! sanity check
 !        IF ( Unused_potet(i)<-CLOSEZERO ) THEN
 !          IF ( Print_debug>DEBUG_less ) THEN

@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2022-11-02'
+      character(len=*), parameter :: Version_soilzone = '2022-12-14'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -764,7 +764,7 @@
      &    DEBUG_less, DEBUG_WB, ERROR_param, CASCADE_OFF, CLOSEZERO, MODSIM_PRMS
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, &
      &    Frozen_flag, Soilzone_add_water_use, Nowmonth, GSFLOW_flag, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Model !, Nowyear, Nowday
+     &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Model, Dprst_ag_gain !, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -810,9 +810,13 @@
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE ) THEN
         Sm2gw_grav = 0.0 ! dimension nhrucell
+        Gw2sm_grav = 0.0 ! dimension nhrucell
+        IF ( Ag_package == ACTIVE ) THEN
+          Hru_ag_irr = 0.0
+          IF ( Dprst_flag == ACTIVE ) Dprst_ag_gain = 0.0
+        ENDIF
         IF ( timestep_start_flag == ACTIVE ) THEN
-          Gw2sm_grav = 0.0 ! dimension nhrucell
-          IF ( PRMS_land_iteration_flag==OFF  ) THEN
+          IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             It0_sroff = Sroff
             It0_hru_sroffp = Hru_sroffp
@@ -827,7 +831,7 @@
           Ssres_stor = It0_ssres_stor
           Slow_stor = It0_slow_stor
           IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
-          IF ( update_potet == 1 ) Potet = It0_potet
+          IF ( Nlake > 0 ) Potet = It0_potet
           Gravity_stor_res = It0_gravity_stor_res
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
