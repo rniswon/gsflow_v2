@@ -501,6 +501,7 @@
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE ) THEN
         IF ( timestep_start_flag == ACTIVE ) THEN
+          Gw2sm_grav = 0.0
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             It0_sroff = Sroff
@@ -541,7 +542,6 @@
         Soil_rechr = It0_soil_rechr
         Ssres_stor = It0_ssres_stor
         Slow_stor = It0_slow_stor
-        Gw2sm_grav = 0.0
         IF ( Ag_package == ACTIVE ) THEN
           Hru_ag_irr = 0.0
           IF ( Dprst_flag == ACTIVE ) Dprst_ag_gain = 0.0
