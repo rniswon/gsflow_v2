@@ -84,7 +84,7 @@ Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-10-26
 Snow Dynamics                   snowcomp            2022-09-07
 Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2022-11-02
+Soilzone Computations           soilzone            2022-12-14
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-04-07
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2022-04-27
@@ -108,5 +108,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time   15 minutes 16.18 seconds
+Execution elapsed time   15 minutes 16.77 seconds
 
