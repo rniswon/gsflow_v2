@@ -10,8 +10,7 @@ contains
       use PRMS_MMFAPI, only: dattim, deltim
       USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime, Nowyear, Nowmonth, Nowday, Dprst_flag, &
                              GSFLOW_flag, PRMS_land_iteration_flag, AG_flag, Print_debug, &
-                             Ag_package, Hru_ag_irr, timestep_start_flag, Nlake, kkiter !, Ag_gravity_flag
-      USE GSFMODFLOW, ONLY: kkstp
+                             Ag_package, Hru_ag_irr, timestep_start_flag, Nlake !, Ag_gravity_flag
       USE PRMS_BASIN, ONLY: Hemisphere, Basin_area_inv
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Pkwater_equiv, Hru_intcpstor, &
                                Ssres_stor, Slow_stor, Pref_flow_stor, Basin_ssstor, &
