@@ -445,7 +445,7 @@
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Dprst_flag, Cascade_flag, &
      &    Frozen_flag, Soilzone_add_water_use, Nowmonth, GSFLOW_flag, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Nowyear, Nowday, &
-     &    Iter_aet_flag, irrigation_apply_flag, Model !, Ag_gravity_flag
+     &    Iter_aet_flag, irrigation_apply_flag, Model, kkiter, dprst_ag_gain !, Ag_gravity_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
@@ -502,7 +502,6 @@
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE ) THEN
         IF ( timestep_start_flag == ACTIVE ) THEN
-          Gw2sm_grav = 0.0 ! dimension nhrucell
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             It0_sroff = Sroff
@@ -549,6 +548,9 @@
         Soil_rechr = It0_soil_rechr
         Ssres_stor = It0_ssres_stor
         Slow_stor = It0_slow_stor
+        hru_ag_irr = 0.0
+        gw2sm_grav = 0.0
+        if ( dprst_flag == ACTIVE ) dprst_ag_gain = 0.0
         IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
         IF ( update_potet == ACTIVE ) Potet = It0_potet
         Gravity_stor_res = It0_gravity_stor_res
@@ -580,11 +582,11 @@
         ENDIF
       ENDIF
 
-      IF ( Soil_iter>1 .or. timestep_start_flag == OFF ) THEN
+      !IF ( Soil_iter>1 .or. timestep_start_flag == OFF ) THEN
         Ag_soil_moist = It0_ag_soil_moist
         Ag_soil_rechr = It0_ag_soil_rechr
 !        IF ( Ag_gravity_flag==ACTIVE ) Ag_gvr_stor = It0_ag_gvr_stor
-      ENDIF
+      !ENDIF
 
       Basin_ag_soil_moist = 0.0D0
       Basin_ag_soil_rechr = 0.0D0
@@ -841,7 +843,7 @@
             ENDIF
           ENDIF
           IF ( ag_on_flag==ACTIVE ) THEN
-            IF ( ag_water_maxin+Ag_soil_moist(i)>0.0 ) THEN
+             IF ( ag_water_maxin+Ag_soil_moist(i)>0.0 ) THEN
               if ( Ag_soil_moist(i)<Ag_soil_rechr(i) ) print *, 'AG1 soilrechr, before', i, &
      &             Ag_soil_moist(i)-Ag_soil_rechr(i), Ag_soil_moist(i), Ag_soil_rechr(i), Ag_soil_moist_max(i), Ag_soil_rechr_max(i)
               CALL compute_soilmoist(ag_water_maxin, Ag_soil_moist_max(i), &

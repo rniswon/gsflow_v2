@@ -726,7 +726,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                   RETURN
                 ENDIF
               ENDIF
-              IF ( Szcheck==ACTIVE ) retval = gsflow_mf2prms()
+              !IF ( Szcheck==ACTIVE ) retval = gsflow_mf2prms()  RGN+RSR 12/14/2022
               IF ( AG_flag==ACTIVE ) THEN
                 retval = soilzone_ag()
               ELSE
