@@ -710,34 +710,6 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
      !!       IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,
      !!1                              IUNIT(22),IUNIT(63),IUNIT(8),
      !!2                              IUNIT(55),IGRID)
-            IF ( Szcheck==ACTIVE .AND. Model==MODSIM_GSFLOW ) THEN
-              retval = gsflow_mf2prms()
-              IF ( PRMS_land_iteration_flag==CANOPY ) THEN
-                retval = intcp()
-                retval = snowcomp()
-                IF ( Glacier_flag==ACTIVE ) THEN
-                  retval = glacr()
-                ENDIF
-              ENDIF
-              IF ( PRMS_land_iteration_flag>0 ) THEN
-                retval = srunoff()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'srunoff', retval
-                  RETURN
-                ENDIF
-              ENDIF
-              !IF ( Szcheck==ACTIVE ) retval = gsflow_mf2prms()  RGN+RSR 12/14/2022
-              IF ( AG_flag==ACTIVE ) THEN
-                retval = soilzone_ag()
-              ELSE
-                retval = soilzone()
-              ENDIF
-              IF ( retval/=0 ) THEN
-                PRINT 9001, Soilzone_module, retval
-                RETURN
-              ENDIF
-              retval = gsflow_prms2mf()
-            END IF
             IF(IUNIT(50).GT.0) THEN
               IF (IUNIT(1).GT.0) THEN
                 CALL GWF2MNW27BCF(KPER,IGRID)
@@ -821,6 +793,35 @@ C
 C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
             IF(IUNIT(64).GT.0) THEN
               CALL GWF2SWR7CV(KKITER,IGRID,ICNVG,MXITER)
+            END IF
+
+            IF ( Szcheck==ACTIVE .AND. Model==MODSIM_GSFLOW ) THEN
+              retval = gsflow_mf2prms()
+              IF ( PRMS_land_iteration_flag==CANOPY ) THEN
+                retval = intcp()
+                retval = snowcomp()
+                IF ( Glacier_flag==ACTIVE ) THEN
+                  retval = glacr()
+                ENDIF
+              ENDIF
+              IF ( PRMS_land_iteration_flag>0 ) THEN
+                retval = srunoff()
+                IF ( retval/=0 ) THEN
+                  PRINT 9001, 'srunoff', retval
+                  RETURN
+                ENDIF
+              ENDIF
+              !IF ( Szcheck==ACTIVE ) retval = gsflow_mf2prms()  RGN+RSR 12/14/2022
+              IF ( AG_flag==ACTIVE ) THEN
+                retval = soilzone_ag()
+              ELSE
+                retval = soilzone()
+              ENDIF
+              IF ( retval/=0 ) THEN
+                PRINT 9001, Soilzone_module, retval
+                RETURN
+              ENDIF
+              retval = gsflow_prms2mf()
             END IF
 C
 C7C2C---IF CONVERGENCE CRITERION HAS BEEN MET STOP ITERATING.
