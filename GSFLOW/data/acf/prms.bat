@@ -1,5 +1,4 @@
 @ECHO OFF
-..\..\bin\gsflow .\control\acf.control
+..\..\bin\gsflow .\control\acf.control > .\output\screen.log
 ECHO.
-ECHO Run complete. Please press enter to continue.
-PAUSE>NUL
+ECHO Run complete.

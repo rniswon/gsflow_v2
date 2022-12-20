@@ -1,6 +1,5 @@
 @ECHO OFF
 
-..\..\bin\gsflow .\control\gulkana.control
+..\..\bin\gsflow .\control\gulkana.control > .\output\screen.log
 ECHO.
-ECHO Run complete. Please press enter to continue.
-PAUSE>NUL
+ECHO Run complete.

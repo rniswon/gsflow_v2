@@ -173,7 +173,7 @@ Canopy Interception             intcp               2022-10-26
 Snow Dynamics                   snowcomp            2022-09-07
 Glacier Dynamics                glacr_melt          2022-09-07
 Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2022-12-14
+Soilzone Computations           soilzone            2022-12-19
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing Init         routing             2022-09-07
 Streamflow Routing              muskingum           2021-11-19
@@ -248,5 +248,5 @@ Fraction impervious:        0.0687    Fraction pervious:       0.9313
  *************************************************************
  Total for run     418.200  279.047    1.062  150.525 -286.767
  *************************************************************
-Execution elapsed time    0 minutes  4.38 seconds
+Execution elapsed time    0 minutes  3.32 seconds
 

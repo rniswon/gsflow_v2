@@ -222,10 +222,10 @@ Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
 Snow Dynamics                   snowcomp            2022-09-07
 Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2022-12-14
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-04-07
+Soilzone Computations           soilzone            2022-12-19
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
-GSFLOW Output Budget Summary    gsflow_budget       2022-04-27
+GSFLOW Output Budget Summary    gsflow_budget       2022-12-19
 GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
 Output Summary                  subbasin            2022-09-07
 ==============================================================
@@ -248,5 +248,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time    0 minutes  4.59 seconds
+Execution elapsed time    0 minutes  4.41 seconds
 

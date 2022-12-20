@@ -1,5 +1,4 @@
 @ECHO OFF
-..\..\bin\gsflow -C.\control\mercdIDE.control
+..\..\bin\gsflow -C.\control\mercdIDE.control > .\output\screenIDE.log
 ECHO.
-ECHO Run complete. Please press enter to continue.
-PAUSE>NUL
+ECHO Run complete.

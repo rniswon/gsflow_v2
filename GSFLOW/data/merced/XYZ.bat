@@ -1,5 +1,4 @@
 @ECHO OFF
-..\..\bin\gsflow -C.\control\mercdXYZ.control
+..\..\bin\gsflow -C.\control\mercdXYZ.control > .\output\screenXYZ.log
 ECHO.
-ECHO Run complete. Please press enter to continue.
-PAUSE>NUL
+ECHO Run complete.
