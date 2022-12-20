@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2022-12-14'
+      character(len=*), parameter :: Version_soilzone = '2022-12-19'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -815,7 +815,7 @@
           IF ( Dprst_flag == ACTIVE ) Dprst_ag_gain = 0.0
         ENDIF
         IF ( timestep_start_flag == ACTIVE ) THEN
-          Gw2sm_grav = 0.0 ! dimension nhrucell
+          !!Gw2sm_grav = 0.0 ! dimension nhrucell rsr 12/19/2022, allow next timestep to begin at previous values of gws2m_grav
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             It0_sroff = Sroff
