@@ -1,6 +1,5 @@
 @ECHO OFF
 
-..\..\..\bin\gsflow .\prms.control
+..\..\..\bin\gsflow .\prms.control > ..\output\prms\screen_prmsonly.log
 ECHO.
-ECHO Run complete. Please press enter when you want to continue.
-PAUSE>NUL
+ECHO Run complete.

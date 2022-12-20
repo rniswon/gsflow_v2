@@ -1,0 +1,482 @@
+====================================================================
+Command line: 
+..\..\bin\gsflow  .\control\Tazlina.control
+
+number of command line words: 2
+
+Executable: ..\..\bin\gsflow
+
+Control File: .\control\Tazlina.control
+====================================================================
+ WARNING, control parameter not used: mbInit_flag, ignored
+====================================================================
+
+
+                          U.S. Geological Survey
+        Coupled Groundwater and Surface-water FLOW model (GSFLOW)
+                         Version: 2.3.0 12/20/2022
+
+    An integration of the Precipitation-Runoff Modeling System (PRMS)
+    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
+
+ WARNING, control parameter not in Control File: mbInit_flag, set to 0
+
+               Precipitation-Runoff Modeling System (PRMS)
+                       Version 5.3.0 12/20/2022
+
+        Process            Available Modules
+--------------------------------------------------------------------
+  Basin Definition: basin
+    Cascading Flow: cascade
+  Time Series Data: obs, water_use_read, dynamic_param_read
+                    dynamic_soil_param_read
+   Potet Solar Rad: soltab
+  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,
+                    temp_map
+       Precip Dist: precip_1sta, precip_laps, precip_dist2,
+                    climate_hru, precip_map
+Temp & Precip Dist: xyz_dist, ide_dist
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
+Transpiration Dist: transp_tindex, climate_hru, transp_frost
+      Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
+                    potet_hs, potet_pt, potet_pm, potet_pm_sta
+      Interception: intcp
+Snow & Glacr Dynam: snowcomp, glacr_melt
+    Surface Runoff: srunoff_smidx, srunoff_carea
+         Soil Zone: soilzone, soilzone_ag
+       Groundwater: gwflow
+Streamflow Routing: strmflow, strmflow_in_out, muskingum,
+                    muskingum_lake, muskingum_mann, segment_to_hru
+Streamflow Charact: strmflow_character
+Stream Temperature: stream_temp
+    Output Summary: basin_sum, subbasin, map_results, prms_summary,
+                    nhru_summary, nsub_summary, water_balance
+                    basin_summary, nsegment_summary, statvar_out
+     Preprocessing: write_climate_hru, frost_date
+--------------------------------------------------------------------
+
+
+==========================================================================
+Please give careful consideration to fixing all ERROR and WARNING messages
+==========================================================================
+
+
+    Active modules listed in the order in which they are called
+
+        Process                    Module         Version Date
+==============================================================
+PRMS Computation Order          gsflow_prms         2022-12-20
+Read Control File               read_control_file   2022-10-20
+Read Parameter File             read_parameter_file 2022-01-12
+Read Data File                  read_data_file      2022-06-02
+Basin Definition                basin               2022-09-20
+Common States and Fluxes        climateflow         2022-12-06
+Potential Solar Radiation       soltab              2022-10-24
+Time Series Data                obs                 2022-09-07
+Timestep Control                prms_time           2022-04-21
+Temp & Precip Distribution      xyz_dist            2022-09-07
+Cloud cover                     cloud_cover         2022-06-07
+Solar Radiation Distribution    ccsolrad            2022-09-01
+Transpiration Distribution      transp_tindex       2021-09-07
+Potential Evapotranspiration    potet_jh            2021-11-19
+Canopy Interception             intcp               2022-10-26
+Snow Dynamics                   snowcomp            2022-09-07
+Glacier Dynamics                glacr_melt          2022-09-07
+ Parameter: hru_slope declared more than once
+ First declared by module: glacr_melt
+ Also declared by module: glacr_melt
+ Model uses values based on first declare
+Surface Runoff                  srunoff_smidx       2022-11-02
+Soilzone Computations           soilzone            2022-12-19
+Groundwater                     gwflow              2022-04-21
+Streamflow Routing Init         routing             2022-09-07
+Streamflow Routing              muskingum           2021-11-19
+Output Summary                  basin_sum           2022-09-01
+Statistics Variables Output     statvar_out         2021-09-08
+Output Summary                  prms_summary        2022-10-26
+Values for parameter: poi_type are ignored as the parameter is not used
+Values for parameter: stage_coef are ignored as the parameter is not used
+Values for parameter: soil_moist_init are ignored as the parameter is not used
+Values for parameter: net_mbc_zero are ignored as the parameter is not used
+Values for parameter: stage_exp are ignored as the parameter is not used
+Values for parameter: net_ard_zero are ignored as the parameter is not used
+Values for parameter: snowfld_frac_init are ignored as the parameter is not used
+==============================================================
+
+Using Control File: .\control\Tazlina.control
+
+Using Parameter File: ./input/Tazlina.par
+
+Writing PRMS Water Budget File: ./output/Tazlina.out
+WARNING, HRU: 1 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 2 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 3 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 4 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 5 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 6 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 7 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 8 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 9 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 10 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 11 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 12 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 13 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 14 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 15 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 16 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 17 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 18 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 19 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 20 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 21 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 22 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 23 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 24 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 25 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 26 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 27 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 28 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 29 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 30 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 31 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 32 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 33 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 34 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 35 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 36 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 37 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 38 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 39 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 40 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 41 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 42 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 43 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 44 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 45 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 46 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 47 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 48 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 49 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 50 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 51 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 52 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 53 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 54 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 55 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 56 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 57 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 58 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 59 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 60 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 61 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 62 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 63 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 64 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 65 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 66 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 67 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 68 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 69 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 70 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 71 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 72 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 73 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 74 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 75 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 76 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 77 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 78 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 79 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 80 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 81 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 82 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 83 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 84 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 85 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 86 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 87 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 88 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 89 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 90 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 91 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 92 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 93 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 94 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 95 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 96 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 97 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 98 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 99 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 100 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 101 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 102 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 103 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 104 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 105 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 106 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 107 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 108 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 109 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 110 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 111 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 112 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 113 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 114 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 115 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 116 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 117 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 118 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 119 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 120 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 121 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 122 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 123 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 124 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 125 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 126 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 127 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 128 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 129 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 130 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 131 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 132 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 133 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 134 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 135 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 136 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 137 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 138 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 139 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 140 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 141 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 142 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 143 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 144 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 145 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 146 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 147 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 148 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 149 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 150 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 151 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 152 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 153 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 154 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 155 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 156 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 157 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 158 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 159 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 160 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 161 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 162 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 163 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 164 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 165 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 166 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 167 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 168 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 169 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 170 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 171 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 172 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 173 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 174 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 175 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 176 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 177 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+WARNING, HRU: 178 soil_rechr_init > soil_moist_init,   1.32662   0.00000
+         soil_rechr set to soil_moist based on init and max values
+
+Simulation time period: 1950/10/01 - 2015/09/30
+
+====================================================================
+
+
+                          ===========================
+                          Normal completion of GSFLOW
+                          ===========================
+
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2022/12/19 20:22:48
+
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2022/12/19 20:22:54
+
+Execution elapsed time    0 minutes  6.42 seconds
+

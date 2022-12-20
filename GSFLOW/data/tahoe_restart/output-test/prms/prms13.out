@@ -28,20 +28,21 @@ one                    1
 ====================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 03/01/2022
+                       Version 5.3.0 12/20/2022
 
         Process            Available Modules
 --------------------------------------------------------------------
   Basin Definition: basin
     Cascading Flow: cascade
   Time Series Data: obs, water_use_read, dynamic_param_read
+                    dynamic_soil_param_read
    Potet Solar Rad: soltab
   Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,
                     temp_map
        Precip Dist: precip_1sta, precip_laps, precip_dist2,
                     climate_hru, precip_map
 Temp & Precip Dist: xyz_dist, ide_dist
-    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
 Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
                     potet_hs, potet_pt, potet_pm, potet_pm_sta
@@ -51,7 +52,8 @@ Snow & Glacr Dynam: snowcomp, glacr_melt
          Soil Zone: soilzone, soilzone_ag
        Groundwater: gwflow
 Streamflow Routing: strmflow, strmflow_in_out, muskingum,
-                    muskingum_lake, muskingum_mann
+                    muskingum_lake, muskingum_mann, segment_to_hru
+Streamflow Charact: strmflow_character
 Stream Temperature: stream_temp
     Output Summary: basin_sum, subbasin, map_results, prms_summary,
                     nhru_summary, nsub_summary, water_balance
@@ -64,10 +66,10 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-03-01
-Read Control File               read_control_file   2022-02-23
+PRMS Computation Order          gsflow_prms         2022-12-20
+Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
-Read Data File                  read_data_file      2022-01-12
+Read Data File                  read_data_file      2022-06-02
 
 
 ====================================================================
@@ -206,30 +208,30 @@ rain_day 0
  Data File time period: 1980/10/01 00:00:00 to 2011/09/30 00:00:00
 Simulation time period: 1983/11/18 00:00:00 to 1983/11/24 00:00:00
 ====================================================================
-Basin Definition                basin               2022-02-10
+Basin Definition                basin               2022-09-20
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-02-18
-Potential Solar Radiation       soltab              2021-09-07
-Time Series Data                obs                 2022-01-12
-Timestep Control                prms_time           2021-11-19
-Temperature Distribution        temp_laps           2021-11-19
-Precipitation Distribution      precip_1sta         2022-02-18
-Solar Radiation Distribution    ddsolrad            2021-11-19
+Common States and Fluxes        climateflow         2022-12-06
+Potential Solar Radiation       soltab              2022-10-24
+Time Series Data                obs                 2022-09-07
+Timestep Control                prms_time           2022-04-21
+Temperature Distribution        temp_laps           2022-09-08
+Precipitation Distribution      precip_1sta         2022-09-07
+Solar Radiation Distribution    ddsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2022-02-03
-Snow Dynamics                   snowcomp            2022-02-18
-Surface Runoff                  srunoff_smidx       2022-02-10
-Soilzone Computations           soilzone            2022-02-04
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2021-12-09
+Canopy Interception             intcp               2022-10-26
+Snow Dynamics                   snowcomp            2022-09-07
+Surface Runoff                  srunoff_smidx       2022-11-02
+Soilzone Computations           soilzone            2022-12-19
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
-GSFLOW Output Budget Summary    gsflow_budget       2022-02-18
-GSFLOW Output CSV Summary       gsflow_sum          2022-02-10
-Output Summary                  subbasin            2022-01-25
+GSFLOW Output Budget Summary    gsflow_budget       2022-12-19
+GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
+Output Summary                  subbasin            2022-09-07
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2022-01-12
-UZF-NWT Package                 gwf2uzf1_NWT        2021-03-02
-SFR-NWT Package                 gwf2sfr7_NWT        2022-02-01
+GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
+UZF-NWT Package                 gwf2uzf1_NWT        2022-10-18
+SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
 LAK-NWT Package                 gwf2lak7_NWT        2021-09-28
 
 Using Control File: .\Tahoe.control
@@ -246,5 +248,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time    0 minutes  7.04 seconds
+Execution elapsed time    0 minutes  4.94 seconds
 

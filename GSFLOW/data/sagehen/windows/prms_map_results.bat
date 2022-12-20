@@ -1,6 +1,5 @@
 @ECHO OFF
 
-..\..\..\bin\gsflow .\prms_map_results.control
+..\..\..\bin\gsflow .\prms_map_results.control > ..\output\prms\screen_prmsonlyMAP.log
 ECHO.
-ECHO Run complete. Please press enter when you want to continue.
-PAUSE>NUL
+ECHO Run complete. 

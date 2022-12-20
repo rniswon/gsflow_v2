@@ -1,0 +1,11 @@
+# header lines 
+# header lines
+OPTIONS   ! character options 
+tabfiles 2 51          ! 2 time series input files max of 51 rows in any tabfile not counting header lines.
+END                    ! end characer options
+         2        -3 0  MXWELL IWELCB         
+         1           ITMP -- Stress Period   1 ITMP can be any positive number if tabiles are used.
+92 51 1 3 50         unit#, numvals, lay, row, col  tabfile 1
+93 51 1 5 55         unit#, numvals, lay, row, col  tabfile 2
+# don't need ITMP for stress period greater than 1 if using tabfiles
+      

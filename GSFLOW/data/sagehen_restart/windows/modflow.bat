@@ -1,7 +1,6 @@
 @ECHO OFF
 
-..\..\..\bin\gsflow .\modflow.control 
+..\..\..\bin\gsflow .\modflow.control > ..\output\modflow\screen_mfonly.log
 
 ECHO.
-ECHO Run complete. Please press enter when you want to continue.
-PAUSE>NUL
+ECHO Run complete.

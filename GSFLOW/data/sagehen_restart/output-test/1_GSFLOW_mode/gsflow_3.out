@@ -110,14 +110,14 @@
    INFLOWS - OUTFLOWS =        -177300.63     INFLOWS - OUTFLOWS =         -63780.00
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        -177295.09         STORAGE CHANGE =         -63778.20
+ TOTAL STORAGE CHANGE =        -177295.08         STORAGE CHANGE =         -63778.19
        --------------                             --------------
          LAND SURFACE =         -54739.79           LAND SURFACE =         -19668.90
             SOIL ZONE =         -81183.50              SOIL ZONE =         -30276.73
      UNSATURATED ZONE =         -16501.40       UNSATURATED ZONE =          -5507.42
        SATURATED ZONE =         -24870.40         SATURATED ZONE =          -8325.14
 
- OVERALL BUDGET ERROR =             -5.54           BUDGET ERROR =             -1.80
+ OVERALL BUDGET ERROR =             -5.54           BUDGET ERROR =             -1.81
 
 
   PERCENT DISCREPANCY =             -0.00    PERCENT DISCREPANCY =             -0.00
@@ -239,7 +239,7 @@
  TOTAL STORAGE CHANGE =        -371407.57         STORAGE CHANGE =         -56773.17
        --------------                             --------------
          LAND SURFACE =        -115682.67           LAND SURFACE =         -17882.22
-            SOIL ZONE =        -171827.07              SOIL ZONE =         -24675.29
+            SOIL ZONE =        -171827.07              SOIL ZONE =         -24675.30
      UNSATURATED ZONE =         -33158.51       UNSATURATED ZONE =          -5679.08
        SATURATED ZONE =         -50739.32         SATURATED ZONE =          -8536.57
 
@@ -275,7 +275,7 @@
      GW BOUNDARY FLOW =           5013.38       GW BOUNDARY FLOW =            715.98
                 WELLS =           3857.79                  WELLS =            449.97
 
-   INFLOWS - OUTFLOWS =        -425486.89     INFLOWS - OUTFLOWS =         -54068.07
+   INFLOWS - OUTFLOWS =        -425486.90     INFLOWS - OUTFLOWS =         -54068.07
              --------                                   --------
 
  TOTAL STORAGE CHANGE =        -425473.59         STORAGE CHANGE =         -54066.02
