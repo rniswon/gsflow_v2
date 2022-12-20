@@ -363,8 +363,8 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/19 20:51:20
- Elapsed run time: 2 Minutes, 14.625 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/20 12:03:06
+ Elapsed run time: 3 Minutes, 21.190 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
  MF iterations:         11651;  SZ iterations:           11605

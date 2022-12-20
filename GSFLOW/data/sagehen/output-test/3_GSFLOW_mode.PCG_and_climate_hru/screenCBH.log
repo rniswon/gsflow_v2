@@ -109,12 +109,12 @@ Simulation time period: 1980/10/01 - 1996/09/30
 ====================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/19 22:05:14
- Elapsed run time: 15 Minutes, 41.123 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/20 12:52:52
+ Elapsed run time: 16 Minutes, 51.557 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
- MF iterations:         62578;  SZ iterations:           62539
- Average MF iterations: 10.71;  Average SZ iterations:   10.70
+ MF iterations:         63708;  SZ iterations:           63671
+ Average MF iterations: 10.90;  Average SZ iterations:   10.90
  Maximum MF iterations:    31;  Maximum SZ iterations:      25
 
 mxsziter reached: 13

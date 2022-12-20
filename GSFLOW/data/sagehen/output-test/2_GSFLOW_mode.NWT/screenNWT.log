@@ -34,12 +34,12 @@ PRMS command line argument 16: ..\output\gsflow_NWT.csv
 
 Steady state simulation successful, used 59 iterations
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/19 21:15:37
- Elapsed run time: 13 Minutes, 23.820 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/20 13:14:02
+ Elapsed run time: 13 Minutes, 10.781 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
- MF iterations:         44506;  SZ iterations:           44506
- Average MF iterations:  7.62;  Average SZ iterations:    7.62
+ MF iterations:         45418;  SZ iterations:           45418
+ Average MF iterations:  7.77;  Average SZ iterations:    7.77
  Maximum MF iterations:    24;  Maximum SZ iterations:      24
 
  Normal termination of simulation

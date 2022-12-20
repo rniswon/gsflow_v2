@@ -17,25 +17,25 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        5085314.23     EVAPOTRANSPIRATION =         576803.67
+   EVAPOTRANSPIRATION =        5084872.43     EVAPOTRANSPIRATION =         576662.48
            STREAMFLOW =        2.1368D+07             STREAMFLOW =        3181969.25
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
    INFLOWS - OUTFLOWS =        1.7385D+08     INFLOWS - OUTFLOWS =        5.7625D+07
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        1.7352D+08         STORAGE CHANGE =        5.7601D+07
+ TOTAL STORAGE CHANGE =        1.7356D+08         STORAGE CHANGE =        5.7593D+07
        --------------                             --------------
          LAND SURFACE =        1.3796D+08           LAND SURFACE =        4.4110D+07
-            SOIL ZONE =        4076157.92              SOIL ZONE =         609921.16
-     UNSATURATED ZONE =         776392.83       UNSATURATED ZONE =          92574.44
-       SATURATED ZONE =       -1521533.85         SATURATED ZONE =         -73819.98
-                LAKES =        3.2238D+07                  LAKES =        1.2863D+07
+            SOIL ZONE =        4076017.88              SOIL ZONE =         610070.75
+     UNSATURATED ZONE =         777324.26       UNSATURATED ZONE =          99324.41
+       SATURATED ZONE =       -1567674.25         SATURATED ZONE =         -81370.27
+                LAKES =        3.2321D+07                  LAKES =        1.2855D+07
 
- OVERALL BUDGET ERROR =         327650.46           BUDGET ERROR =          24012.29
+ OVERALL BUDGET ERROR =         290577.03           BUDGET ERROR =          32047.21
 
 
-  PERCENT DISCREPANCY =              0.16    PERCENT DISCREPANCY =              0.04
+  PERCENT DISCREPANCY =              0.15    PERCENT DISCREPANCY =              0.05
 
 
 

@@ -501,7 +501,7 @@
 ! It0 variables used with MODFLOW integration to save iteration states.
       IF ( GSFLOW_flag==ACTIVE ) THEN
         IF ( timestep_start_flag == ACTIVE ) THEN
-          !!Gw2sm_grav = 0.0 ! rsr 12/19/2022, allow next timestep to begin at previous values of gws2m_grav
+          Gw2sm_grav = 0.0 ! dimension nhrucell
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             It0_sroff = Sroff
