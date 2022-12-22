@@ -1,0 +1,55 @@
+====================================================================
+Command line: 
+..\..\..\bin\gsflow  .\modflow.control
+
+number of command line words: 2
+
+Executable: ..\..\..\bin\gsflow
+
+Control File: .\modflow.control
+====================================================================
+====================================================================
+
+
+                          U.S. Geological Survey
+        Coupled Groundwater and Surface-water FLOW model (GSFLOW)
+                         Version: 2.3.0 12/20/2022
+
+    An integration of the Precipitation-Runoff Modeling System (PRMS)
+    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
+
+
+                            MODFLOW-NWT-SWR1 
+  U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
+                         WITH NEWTON FORMULATION
+                         Version 1.3.0 06/01/202
+              BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
+                      SWR1 Version 1.04.0 09/15/2016
+
+ Run start date and time (yyyy/mm/dd hh:mm:ss): 2022/12/20 16:45:48
+
+GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
+====================================================================
+MODFLOW Packages
+====================================================================
+UZF-NWT Package                 gwf2uzf1_NWT        2022-10-18
+SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
+====================================================================
+
+Using NAME file: ../input/modflow/sagehen.mf.nam
+
+Using Solver Package: PCG 
+
+modflow_time_zero: 1980/10/01
+  
+ Solving:  Stress period:     1    Time step:     1    Groundwater-Flow Eqn.
+
+Steady state simulation successful, used 357 iterations
+  
+ Solving:  Stress period:     2    Time step:     1    Groundwater-Flow Eqn.
+
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/20 16:45:50
+ Elapsed run time: 1.838 Seconds
+
+ Normal termination of simulation
+

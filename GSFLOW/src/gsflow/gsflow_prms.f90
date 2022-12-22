@@ -560,7 +560,7 @@
      &                                                     Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
         IF ( Print_debug>DEBUG_minimum ) CLOSE ( PRMS_output_unit )
         IF ( Save_vars_to_file==ACTIVE ) CLOSE ( Restart_outunit )
-        !STOP
+        IF ( PRMS_only==ACTIVE ) STOP
       ELSEIF ( Process_flag==DECL ) THEN
         CALL read_parameter_file_params()
         IF ( Print_debug>DEBUG_minimum ) THEN

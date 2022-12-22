@@ -469,14 +469,17 @@ Simulation time period: 1950/10/01 - 2015/09/30
 
 ====================================================================
 
+	Closing GSFLOW simulation ...
 
                           ===========================
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2022/12/19 20:22:48
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2022/12/21 19:39:53
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2022/12/19 20:22:54
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2022/12/21 19:40:00
 
-Execution elapsed time    0 minutes  6.42 seconds
+Execution elapsed time    0 minutes  7.17 seconds
 
+Simulation finished.
+ 
