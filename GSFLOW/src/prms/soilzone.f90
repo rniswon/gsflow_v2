@@ -784,7 +784,7 @@
       USE GSFMODSIM2PRMS, ONLY: HRU_diversion
       USE PRMS_WATER_USE, ONLY: Soilzone_gain, Soilzone_gain_hru
       USE PRMS_CASCADE, ONLY: Ncascade_hru
-      USE PRMS_SET_TIME, ONLY: Cfs_conv, nowtime
+      USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_INTCP, ONLY: Hru_intcpevap
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Dprst_evap_hru, Dprst_seep_hru, Frozen, &
           Hru_sroffp, Hortonian_flow, Basin_sroffp, Basin_hortonian
@@ -812,7 +812,6 @@
         Sm2gw_grav = 0.0 ! dimension nhrucell
         IF ( timestep_start_flag == ACTIVE ) THEN
           IF ( Ag_package == ACTIVE ) THEN
-            Hru_ag_irr = 0.0
             IF ( Dprst_flag == ACTIVE ) Dprst_ag_gain = 0.0
           ENDIF
           Gw2sm_grav = 0.0 ! dimension nhrucell
@@ -939,7 +938,6 @@
         ag_water_maxin = 0.0
         IF ( Ag_package==ACTIVE ) THEN
           IF ( Hru_ag_irr(i)>0.0 ) ag_water_maxin = Hru_ag_irr(i)/gsflow_ag_area(i) ! Hru_ag_irr is in acre-inches
-          IF ( Hru_ag_irr(i)>0.0 ) print *, i, hru_ag_irr(i), nowtime
         ENDIF
         IF ( Model == MODSIM_PRMS ) THEN
           IF ( HRU_diversion(i)>0.0 ) ag_water_maxin = ag_water_maxin + HRU_diversion(i) / perv_area
