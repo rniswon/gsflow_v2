@@ -470,7 +470,7 @@
       USE PRMS_WATER_USE, ONLY: Soilzone_gain, Soilzone_gain_hru
       USE PRMS_CLIMATE_HRU, ONLY: AET_external, PET_external
       USE PRMS_CASCADE, ONLY: Ncascade_hru
-      USE PRMS_SET_TIME, ONLY: Cfs_conv
+      USE PRMS_SET_TIME, ONLY: Cfs_conv, nowtime
       USE PRMS_INTCP, ONLY: Hru_intcpevap
       USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Dprst_evap_hru, Dprst_seep_hru, Frozen, &
           Hru_sroffp, Hortonian_flow, Basin_sroffp, Basin_hortonian, Infil_ag
@@ -502,6 +502,10 @@
       IF ( GSFLOW_flag==ACTIVE ) THEN
         IF ( timestep_start_flag == ACTIVE ) THEN
           Gw2sm_grav = 0.0 ! dimension nhrucell
+          IF ( Ag_package == ACTIVE ) THEN
+            Hru_ag_irr = 0.0
+            IF ( Dprst_flag == ACTIVE ) Dprst_ag_gain = 0.0
+          ENDIF
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             It0_sroff = Sroff
@@ -542,10 +546,6 @@
         Soil_rechr = It0_soil_rechr
         Ssres_stor = It0_ssres_stor
         Slow_stor = It0_slow_stor
-        IF ( Ag_package == ACTIVE ) THEN
-          Hru_ag_irr = 0.0
-          IF ( Dprst_flag == ACTIVE ) Dprst_ag_gain = 0.0
-        ENDIF
         Ag_gvr_to_sm = 0.0
         IF ( Pref_flag==ACTIVE ) Pref_flow_stor = It0_pref_flow_stor
         IF ( Nlake > 0 ) Potet = It0_potet
@@ -705,6 +705,7 @@
 
         IF ( irrigation_apply_flag == 3 ) THEN
           IF ( Hru_ag_irr(i)>0.0 ) THEN ! Hru_ag_irr is in acre-inches over ag area
+            print *, i, hru_ag_irr(i), nowtime
             if ( gsflow_ag_area(i)>0.0 ) then
               ag_water_maxin = ag_water_maxin + Hru_ag_irr(i) / gsflow_ag_area(i)
             else ! needed in case dynamic ag_frac causes a problem

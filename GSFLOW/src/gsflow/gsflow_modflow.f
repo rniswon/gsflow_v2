@@ -189,8 +189,9 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
         ierr = 1
       ENDIF
       IF ( IUNIT(66)==0 .AND. AG_flag == ACTIVE ) THEN
-        PRINT *, 'GSFLOW with PRMS agriculture requires the AG Package'
-        ierr = 1
+      !  PRINT *, 'GSFLOW with PRMS agriculture requires the AG Package'
+         PRINT *, 'WARNING, soilzone_ag active and AG Package inactive'
+      !  ierr = 1
       ENDIF
 
 ! Packages available in NWT but not in GSFLOW

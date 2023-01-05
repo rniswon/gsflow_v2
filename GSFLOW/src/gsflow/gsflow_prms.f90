@@ -94,6 +94,8 @@
         CALL DATE_AND_TIME(VALUES=Elapsed_time_start)
         Execution_time_start = Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
      &                         Elapsed_time_start(7) + Elapsed_time_start(8)*0.001
+        PRINT 9003, 'start', (Elapsed_time_start(i),i=1,3), (Elapsed_time_start(i),i=5,7)
+
 
         IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active, GSFLOW, PRMS, MODSIM-PRMS, MODSIM-PRMS_AG
           IF ( check_dims(Nsegshold, Nlakeshold)/=0 ) ERROR STOP ERROR_dim
@@ -250,8 +252,13 @@
             PRINT *, '       NSS=', NSS, '; nsegment=', Nsegment
             STOP ERROR_modflow
           ENDIF
-          IF ( irrigation_apply_flag>0 .AND. Ag_package==OFF ) CALL error_stop( &
-     &         'irrigation_apply_flag > 0 without AG Package active', ERROR_control)
+     !     IF ( irrigation_apply_flag>0 .AND. Ag_package==OFF ) CALL error_stop( &
+     !&         'irrigation_apply_flag > 0 without AG Package active', ERROR_control)
+          IF ( irrigation_apply_flag>0 .AND. Ag_package==OFF ) THEN
+            PRINT *, 'WARNING, irrigation_apply_flag > 0 without AG Package active'
+            PRINT *, '         irrigation_apply_flag set to 0'
+            irrigation_apply_flag = 0
+          ENDIF
         ENDIF
 
         nc = numchars(Model_control_file)
@@ -560,7 +567,7 @@
      &                                                     Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
         IF ( Print_debug>DEBUG_minimum ) CLOSE ( PRMS_output_unit )
         IF ( Save_vars_to_file==ACTIVE ) CLOSE ( Restart_outunit )
-        !STOP
+        IF ( PRMS_only==ACTIVE ) STOP
       ELSEIF ( Process_flag==DECL ) THEN
         CALL read_parameter_file_params()
         IF ( Print_debug>DEBUG_minimum ) THEN
