@@ -470,8 +470,8 @@
       ALLOCATE ( Pref_flow_infil_frac(Nhru) )
       IF ( declparam(MODNAME, 'pref_flow_infil_frac', 'nhru', 'real', &
      &     '-1.0', '-1.0', '1.0', &
-     &     'Fraction of the soilwater infiltration to the preferential flow occurs for each HRU', &
-     &     'Fraction of the soilwater infiltration to the preferential flow occurs for each HRU', &
+     &     'Fraction of the soilwater infiltration partitioned to the preferential for each HRU', &
+     &     'Fraction of the soilwater infiltration partitioned to the preferential for each HRU', &
      &     'decimal fraction')/=0 ) CALL read_error(1,'pref_flow_infil_frac')
 
       ALLOCATE ( Soil2gw_max(Nhru) )

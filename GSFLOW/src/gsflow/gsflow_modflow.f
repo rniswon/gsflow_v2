@@ -1145,7 +1145,7 @@ C
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, DEBUG_less, MODFLOW
       USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file, GSFLOW_flag,
-     &    Print_debug, Model
+     &    Print_debug, Model, Gsf_unt
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
       USE GWFNWTMODULE, ONLY:LINMETH
       IMPLICIT NONE
@@ -1244,6 +1244,14 @@ C
         IF ( Print_debug>DEBUG_less ) THEN
           PRINT 9003, 'MF iteration distribution:', Mfiter_cnt
           PRINT 9007, 'SZ computation distribution:', Iter_cnt
+        ENDIF
+        WRITE(Gsf_unt,9001) Timestep, Convfail_cnt, Iterations, Sziters,
+     &            FLOAT(Iterations)/FLOAT(Timestep),
+     &            FLOAT(Sziters)/FLOAT(Timestep), Max_iters, Max_sziters
+        IF ( Stopcount>0 ) WRITE(Gsf_unt,9005) Stopcount
+        IF ( Print_debug>DEBUG_less ) THEN
+          WRITE(Gsf_unt,9003) 'MF iteration distribution:', Mfiter_cnt
+          WRITE(Gsf_unt,9007) 'SZ computation distribution:', Iter_cnt
         ENDIF
       ENDIF
 

@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2022-09-20'
+      character(len=*), parameter :: Version_basin = '2023-01-11'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area, Ag_area_total
@@ -278,7 +278,7 @@
       INTEGER FUNCTION basinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CLOSEZERO, &
      &    INACTIVE, LAKE, SWALE, FEET, ERROR_basin, DEBUG_minimum, ERROR_param, &
-     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, MONTHS_PER_YEAR !, METERS2FEET
+     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, MONTHS_PER_YEAR, CANOPY !, METERS2FEET
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, irrigation_apply_flag, Soilzone_module, &
      &    Dprst_flag, Lake_route_flag, PRMS4_flag, GSFLOW_flag, Frozen_flag, PRMS_VERSION, &
@@ -558,10 +558,10 @@
       IF ( Ag_package==ACTIVE ) THEN
         ALLOCATE ( gsflow_ag_area(Nhru) )
         ALLOCATE ( gsflow_ag_frac(Nhru) )
-        IF ( irrigation_apply_flag>0 ) THEN
+        IF ( irrigation_apply_flag == CANOPY ) THEN
             gsflow_ag_area = Hru_area ! apply irrigation to canopy, which adjusts for covden
             gsflow_ag_frac = 1.0
-        ELSEIF ( Soilzone_module(:11) == 'soilzone_ag' ) THEN
+        ELSEIF ( Soilzone_module(:11) == 'soilzone_ag' .AND. irrigation_apply_flag == 3 ) THEN
             gsflow_ag_area = Ag_area ! apply irrigation to ag area in soilzone_ag module
             gsflow_ag_frac = Ag_frac
         ELSE
