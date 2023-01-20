@@ -6,7 +6,7 @@
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Water Balance Computations'
         character(len=*), parameter :: MODNAME_WB = 'water_balance'
-        character(len=*), parameter :: Version_water_balance = '2022-10-26'
+        character(len=*), parameter :: Version_water_balance = '2023-01-17'
         INTEGER, SAVE :: BALUNT, SZUNIT, GWUNIT, INTCPUNT, SROUNIT, SNOWUNIT
         REAL, PARAMETER :: TOOSMALL = 3.1E-05, SMALL = 1.0E-04, BAD = 1.0E-03
         DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 1.0D-05
@@ -179,9 +179,9 @@
      &    Perv_actet, Cap_infil_tot, Pref_flow_infil, Cap_waterin, Upslope_interflow, &
      &    Upslope_dunnianflow, Pref_flow, Soil_lower, Gvr2pfr, Basin_ssin, &
      &    Basin_lakeinsz, Basin_dunnian, Pref_flow_max, Pref_flow_den, Pref_flow_thrsh, &
-     &    Basin_sm2gvr_max, Basin_cap_infil_tot, Basin_slowflow, &
+     &    Basin_cap_infil_tot, Basin_slowflow, &
      &    Basin_dunnian_gvr, Basin_pref_flow_infil, Basin_dninterflow, Basin_pref_stor, Basin_dunnian_pfr, &
-     &    Basin_dncascadeflow, Basin_capwaterin, Basin_sm2gvr, Basin_prefflow, Basin_slstor, Basin_gvr2pfr, &
+     &    Basin_dncascadeflow, Basin_sm2gvr, Basin_prefflow, Basin_slstor, Basin_gvr2pfr, &
      &    Hru_sz_cascadeflow, Pfr_dunnian_flow, Grav_dunnian_flow, Basin_dndunnianflow, Soil_moist_tot
       USE PRMS_SOILZONE_AG, ONLY: Ag_cap_infil_tot, hru_ag_actet, perv_soil_to_gvr, perv_soil_to_gw, &
      &    Basin_perv_to_gw, Basin_ag_actet
@@ -400,7 +400,7 @@
         IF ( Gwminarea_flag==ACTIVE ) wbal = wbal + Gwstor_minarea_wb(i)
         IF ( DABS(wbal)>DTOOSMALL ) THEN
           WRITE ( BALUNT, * ) 'Possible HRU water balance issue:', wbal, '; HRU:', i, ' hru_type:', &
-                              Hru_type(i), '; area:', Hru_area(i), '; hru_ppt:' , Hru_ppt(i)
+                              Hru_type(i), '; area:', Hru_area(i), '; hru_ppt:' , Hru_ppt(i), hru_rain(i), hru_snow(i), Net_ppt(i), net_snow(i), net_rain(i)
           WRITE ( BALUNT, * ) 'fluxes', Sroff(i), Gwres_flow(i), Ssres_flow(i), Hru_actet(i), Gwres_sink(i), &
                               Pfr_dunnian_flow(i), Intcp_changeover(i), Snowmelt(i), Dunnian_flow(i)
           !WRITE ( BALUNT, * ) Gwstor_minarea_wb(i)
@@ -486,7 +486,7 @@
 
 ! soilzone
       Basin_capillary_wb = It0_basin_soil_moist - Basin_soil_moist - &
-     &                     Basin_perv_et - Basin_sm2gvr_max + Basin_cap_infil_tot
+     &                     Basin_perv_et - Basin_sm2gvr + Basin_cap_infil_tot
       Basin_gravity_wb = It0_basin_ssstor - Basin_ssstor + Basin_sm2gvr - Basin_dncascadeflow - &
      &                   Basin_ssflow - Basin_sz2gw - Basin_dunnian + Basin_dunnian_pfr - &
      &                   Basin_swale_et + Basin_pref_flow_infil
@@ -510,10 +510,10 @@
      &     Basin_dunnian_gvr, Basin_slowflow, Basin_prefflow, Basin_gvr2pfr, Nowtime
       IF ( DABS(Basin_capillary_wb)>DTOOSMALL ) WRITE( BALUNT, * ) 'possible basin capillary balance issue', &
      &     Basin_capillary_wb, It0_basin_soil_moist, Basin_soil_moist, Basin_perv_et, &
-     &     Basin_sm2gvr, Basin_cap_infil_tot, Basin_soil_to_gw, Basin_sm2gvr_max, Basin_capwaterin, Nowtime
+     &     Basin_sm2gvr, Basin_cap_infil_tot, Basin_soil_to_gw, Nowtime
       IF ( DABS(Basin_soilzone_wb)>DTOOSMALL ) THEN
         WRITE ( BALUNT, * ) 'possible basin soil zone rounding issue', &
-     &     Basin_soilzone_wb, Basin_capwaterin, Basin_pref_flow_infil, Basin_infil, &
+     &     Basin_soilzone_wb, Basin_cap_infil_tot, Basin_pref_flow_infil, Basin_infil, &
      &     It0_basin_ssstor, Basin_ssstor, It0_basin_soil_moist, Basin_soil_moist, Basin_perv_et, Basin_swale_et, &
      &     Basin_sz2gw, Basin_soil_to_gw, Basin_ssflow, Basin_dunnian, Basin_dncascadeflow, &
      &     Basin_sm2gvr, Basin_lakeinsz, Basin_dunnian_pfr
@@ -551,7 +551,7 @@
       ELSEIF ( DABS(bsmbal)>0.0005D0 .OR. DABS(basin_bal)>DTOOSMALL ) THEN
         WRITE ( BALUNT, '(A,2F12.7)' ) 'Basin soilzone rounding issue', bsmbal, basin_bal
         WRITE ( BALUNT, * ) Basin_soilzone_wb, Basin_ssin, &
-     &          Basin_dninterflow, Basin_sm2gvr, Basin_capwaterin, &
+     &          Basin_dninterflow, Basin_sm2gvr, Basin_cap_infil_tot, &
      &          soil_in, Basin_gvr2pfr, Basin_dndunnianflow, (soil_in - Basin_infil)
       ENDIF
 

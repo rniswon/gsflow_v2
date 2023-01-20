@@ -145,8 +145,8 @@
         ENDIF
 
         IF ( Print_debug>DEBUG_minimum ) THEN
-          PRINT 15
-          PRINT 9002
+          IF ( Print_debug>DEBUG_less ) PRINT 15
+          PRINT 9002, EQULS, EQULS
           WRITE ( PRMS_output_unit, 15 )
           PRINT 16, EQULS(:62)
           WRITE ( PRMS_output_unit, 16 ) EQULS(:62)
@@ -576,6 +576,7 @@
         ENDIF
         IF ( Model==CONVERT ) CALL convert_params()
       ELSEIF ( Process_flag==INIT ) THEN
+        CALL check_parameters()
         IF ( Inputerror_flag==1 ) THEN
           PRINT '(//,A,//,A,/,A,/,A)', '**Fix input errors in your Parameter File to continue**', &
      &          '  Set control parameter parameter_check_flag to 0 after', &
@@ -599,9 +600,9 @@
 
     4 FORMAT (/, 2(A, I5, 2('/',I2.2)), //, A, /)
  9001 FORMAT (/, 26X, 27('='), /, 26X, 'Normal completion of GSFLOW', /, 26X, 27('='), /)
- 9002 FORMAT (//, 74('='), /, 'Please give careful consideration to fixing all ERROR and WARNING messages', /, 74('='))
+ 9002 FORMAT (//, A, /, 'Please give careful consideration to fixing all ERROR and WARNING messages', /, A)
  9003 FORMAT ('Execution ', A, ' date and time (yyyy/mm/dd hh:mm:ss)', I5, 2('/',I2.2), I3, 2(':',I2.2), /)
- 9004 FORMAT (/, 2A)
+ 9004 FORMAT (/, 2A, /)
 
       END SUBROUTINE gsflow_prms
 

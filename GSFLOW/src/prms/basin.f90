@@ -217,7 +217,7 @@
 
         ALLOCATE ( Ag_cov_type(Nhru) )
         IF ( declparam(MODNAME, 'ag_cov_type', 'nhru', 'integer', &
-     &       '1', '0', '4', &
+     &       '-1', '0', '4', &
      &       'Cover type designation for agriculture area of each HRU', &
      &       'Vegetation cover type for agriculture area of each HRU (0=bare soil; 1=grasses; 2=shrubs; 3=trees; 4=coniferous)', &
      &       'none')/=0 ) CALL read_error(1, 'ag_cov_type')
@@ -309,7 +309,10 @@
       IF ( AG_flag==ACTIVE ) THEN
         IF ( getparam_real(MODNAME, 'ag_frac', Nhru, Ag_frac)/=0 ) CALL read_error(2, 'ag_frac')
         IF ( getparam_int(MODNAME, 'ag_cov_type', Nhru, Ag_cov_type)/=0 ) CALL read_error(2, 'ag_cov_type')
-        !ag_cov_type = Cov_type
+        IF ( Ag_cov_type(1) == -1 ) THEN
+          print *, 'WARNING, ag_cov_type not specified, substituting cov_type'
+          Ag_cov_type = Cov_type
+        ENDIF
       ENDIF
 
       dprst_frac_flag = 0

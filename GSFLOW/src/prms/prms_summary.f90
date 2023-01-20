@@ -6,7 +6,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Output Summary'
         character(len=*), parameter :: MODNAME = 'prms_summary'
-        character(len=*), parameter :: Version_prms_summary = '2022-10-26'
+        character(len=*), parameter :: Version_prms_summary = '2023-01-17'
         INTEGER, PARAMETER :: NVARS = 51
         INTEGER, SAVE :: Iunit
         INTEGER, SAVE, ALLOCATABLE :: Gageid_len(:)
@@ -38,7 +38,7 @@
       USE PRMS_SNOW, ONLY: Basin_snowevap, Basin_snowmelt, Basin_snowcov, Basin_pk_precip
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_dprst_evap, Basin_imperv_evap, Basin_dprst_seep, &
      &    Basin_dprst_volop, Basin_dprst_volcl, Basin_hortonian
-      USE PRMS_SOILZONE, ONLY: Basin_capwaterin, Basin_pref_flow_infil, Basin_prefflow, Basin_recharge, Basin_slowflow, &
+      USE PRMS_SOILZONE, ONLY: Basin_cap_infil_tot, Basin_pref_flow_infil, Basin_prefflow, Basin_recharge, Basin_slowflow, &
      &    Basin_pref_stor, Basin_slstor, Basin_soil_rechr, Basin_sz2gw, Basin_dunnian
       USE PRMS_GWFLOW, ONLY: Basin_gwstor, Basin_gwin, Basin_gwsink, Basin_gwflow, &
      &    Basin_gwstor_minarea_wb, Basin_dnflow
@@ -77,7 +77,7 @@
      &            Basin_dprst_volcl, Basin_dprst_volop, Basin_gwstor, Basin_imperv_stor, Basin_intcp_stor, Basin_lake_stor, &
      &            Basin_pweqv, Basin_soil_moist, Basin_ssstor, &
      &            Basin_pref_stor, Basin_slstor, Basin_soil_rechr, &
-     &            Basin_capwaterin, Basin_dprst_seep, Basin_gwin, Basin_pref_flow_infil, Basin_recharge, Basin_snowmelt, &
+     &            Basin_cap_infil_tot, Basin_dprst_seep, Basin_gwin, Basin_pref_flow_infil, Basin_recharge, Basin_snowmelt, &
      &            Basin_soil_to_gw, Basin_sz2gw, &
      &            Basin_gwsink, Basin_prefflow, Basin_slowflow, Basin_hortonian, Basin_dunnian, &
      &            Basin_stflow_in, Basin_stflow_out, Basin_gwflow, Basin_dnflow, &
@@ -216,7 +216,7 @@
      &            'basin_dprst_volcl,basin_dprst_volop,basin_gwstor,basin_imperv_stor,basin_intcp_stor,basin_lake_stor,', &
      &            'basin_pweqv,basin_soil_moist,basin_ssstor,', &
      &            'basin_pref_stor,basin_slstor,basin_soil_rechr,', &
-     &            'basin_capwaterin,basin_dprst_seep,basin_gwin,basin_pref_flow_in,basin_recharge,basin_snowmelt,', &
+     &            'basin_cap_infil_tot,basin_dprst_seep,basin_gwin,basin_pref_flow_in,basin_recharge,basin_snowmelt,', &
      &            'basin_soil_to_gw,basin_sz2gw,', &
      &            'basin_gwsink,basin_prefflow,basin_slowflow,basin_hortonian,basin_dunnian,', &
      &            'basin_stflow_in,basin_stflow_out,basin_gwflow,basin_dnflow,', &

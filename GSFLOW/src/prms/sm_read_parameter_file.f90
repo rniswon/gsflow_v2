@@ -89,10 +89,10 @@ contains
     use PRMS_CONSTANTS, only: MAXCONTROL_LENGTH, DEBUG_less
     use PRMS_MODULE, only: Print_debug
     use PRMS_CONTROL_FILE, only: Control_parameter_data, Param_file_control_parameter_id
-    use prms_utils, only: numchars, PRMS_open_input_file, read_error
+    use prms_utils, only: PRMS_open_input_file, read_error
     implicit none
     ! Functions
-    intrinsic :: TRIM
+    intrinsic :: trim, scan
     ! Local Variables
     character(LEN=MAXCONTROL_LENGTH) :: string
     character(LEN=MAXCONTROL_LENGTH) :: paramstring
@@ -132,7 +132,7 @@ contains
         read (Param_unit, '(A)', IOSTAT=ios) paramstring ! parameter name
         if (ios /= 0) call read_error(11, 'missing parameter name')
 
-        nchars = numchars(paramstring)
+        nchars = scan(paramstring, ' ') - 1
         read (Param_unit, *, IOSTAT=ios) num_dims
         if (ios /= 0) call read_error(11, 'invalid number of dimensions: '//paramstring(:nchars))
         if (num_dims > 2) call read_error(11, 'number of dimensions > 3: '//paramstring(:nchars))
@@ -170,8 +170,8 @@ contains
           end if
         end do
         if (found == 0) then
-          if (Print_debug > DEBUG_less) print '(3A)', 'Values for parameter: ', trim(paramstring), &
-		                                      ' are ignored as the parameter is not used'
+          if (Print_debug > DEBUG_less) print '(3A)', 'WARNING, parameter: ', trim(paramstring(:nchars)), &
+                                              ' is ignored as it is not used'
           cycle
         end if
 
@@ -203,20 +203,20 @@ contains
 ! Check for parameters declared but not in Parameter File
 !***********************************************************************
   module subroutine check_parameters()
-    use prms_utils, only: numchars, PRMS_open_input_file, read_error
     implicit none
     ! Functions
-    intrinsic :: TRIM
+    intrinsic :: trim
     ! Local Variables
     integer :: i
     !***********************************************************************
+    print *, ' '
     do i = 1, Num_parameters
       if (Parameter_data(i)%decl_flag == 1 .and. Parameter_data(i)%read_flag == 0) then
-        print *, 'Parameter: ', trim(Parameter_data(i)%param_name), ' is not specified'
+        print *, 'WARNING, parameter: ', trim(Parameter_data(i)%param_name), ' is not specified'
         if (Parameter_data(i)%data_flag == 1) then
-          print *, '           Set to default value:', Parameter_data(i)%default_int
+          print *, '         Set to default value:', Parameter_data(i)%default_int
         elseif (Parameter_data(i)%data_flag == 2) then
-          print *, '           Set to default value:', Parameter_data(i)%default_real
+          print *, '         Set to default value:', Parameter_data(i)%default_real
         end if
       end if
     end do

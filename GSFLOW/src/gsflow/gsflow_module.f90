@@ -5,13 +5,13 @@
     USE ISO_FORTRAN_ENV
     USE PRMS_CONSTANTS
       IMPLICIT NONE
-      character(LEN=*), parameter :: &
-     &          EQULS = '===================================================================='
+      character(LEN=74), parameter :: &
+     &          EQULS = '=========================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/11/2023'
-      character(len=*), parameter :: PRMS_versn = '2023-01-23'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 01/11/2023'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/19/2023'
+      character(len=*), parameter :: PRMS_versn = '2023-01-19'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 01/19/2023'
       character(len=*), parameter :: Version_read_control_file = '2022-10-20'
       character(len=*), parameter :: Version_read_parameter_file = '2022-01-12'
       character(len=*), parameter :: Version_read_data_file = '2022-06-02'

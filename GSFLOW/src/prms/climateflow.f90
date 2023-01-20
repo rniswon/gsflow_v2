@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2022-12-06'
+      character(len=*), parameter :: Version_climateflow = '2023-01-11'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -81,7 +81,6 @@
       REAL, SAVE, ALLOCATABLE :: Gravity_stor_res(:)
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_moist, Basin_ag_soil_rechr
       REAL, SAVE, ALLOCATABLE :: gsflow_ag_actet(:), Ag_soil_moist(:), Ag_soil_rechr(:), Ag_soil_rechr_max(:)
-!      REAL, SAVE, ALLOCATABLE :: Ag_gvr_stor(:)
       ! srunoff
       REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:)
       REAL, SAVE, ALLOCATABLE :: Hru_impervstor(:)
@@ -122,7 +121,6 @@ module PRMS_IT0_VARS
        REAL, SAVE, ALLOCATABLE :: It0_intcp_stor(:), It0_gravity_stor_res(:), It0_potet(:)
        DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:)
        REAL, SAVE, ALLOCATABLE :: It0_ag_soil_moist(:), It0_ag_soil_rechr(:), It0_hru_intcpstor(:)
-!       REAL, SAVE, ALLOCATABLE :: It0_ag_gvr_stor(:)
 end module PRMS_IT0_VARS
 
 !***********************************************************************
@@ -163,7 +161,7 @@ end module PRMS_IT0_VARS
      &    Strmflow_module, Temp_module, Stream_order_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, &
-     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, no_snow_flag !, Ag_gravity_flag
+     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, no_snow_flag
       use PRMS_MMFAPI, only: declvar_int, declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_CLIMATEVARS
@@ -1034,12 +1032,6 @@ end module PRMS_IT0_VARS
      &       ' (fraction of ag_soil_moist_max for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_soil_moist_init_frac')
       ENDIF
-!      IF ( Ag_gravity_flag==ACTIVE ) THEN
-!        ALLOCATE ( Ag_gvr_stor(Nhru), It0_ag_gvr_stor(Nhru) )
-!        CALL declvar_real(Soilzone_module, 'ag_gvr_stor', 'nhru', Nhru, &
-!     &       'Storage in the agriculture gravity reservoir of the agriculture fraction of each HRU', &
-!     &       'inches', Ag_gvr_stor)
-!      ENDIF
 
       END FUNCTION climateflow_decl
 
@@ -1252,26 +1244,26 @@ end module PRMS_IT0_VARS
         IF ( getparam_real(Soilzone_module, 'ag_soil_moist_max', Nhru, Ag_soil_moist_max)/=0 ) &
      &       CALL read_error(2, 'ag_soil_moist_max')
         IF ( Ag_soil_moist_max(1) < 0.0 ) then
-          print *, 'WARNING, ag_soil_moist_max not specified substituting soil_moist_max'
+          print *, 'WARNING, ag_soil_moist_max not specified, substituting soil_moist_max'
           Ag_soil_moist_max = Soil_moist_max
         ENDIF
         IF ( getparam_real(Soilzone_module, 'ag_soil_rechr_max_frac', Nhru, Ag_soil_rechr_max_frac)/=0 ) &
      &       CALL read_error(2, 'ag_soil_rechr_max_frac')
         IF ( Ag_soil_rechr_max_frac(1) < 0.0 ) THEN
-          print *, 'WARNING, ag_soil_rechr_max_frac not specified substituting soil_rechr_max_frac'
+          print *, 'WARNING, ag_soil_rechr_max_frac not specified, substituting soil_rechr_max_frac'
           Ag_soil_rechr_max_frac = Soil_rechr_max_frac
         ENDIF
         IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
           IF ( getparam_real(Soilzone_module, 'ag_soil_moist_init_frac', Nhru, Ag_soil_moist_init_frac)/=0 ) &
      &         CALL read_error(2, 'ag_soil_moist_init_frac')
           IF ( Ag_soil_moist_init_frac(1) < 0.0 ) then
-            print *, 'WARNING, ag_soil_moist_init_frac not specified substituting soil_moist_init_frac'
+            print *, 'WARNING, ag_soil_moist_init_frac not specified, substituting soil_moist_init_frac'
             Ag_soil_moist_init_frac = Soil_moist_init_frac
           ENDIF
           IF ( getparam_real(Soilzone_module, 'ag_soil_rechr_init_frac', Nhru, Ag_soil_rechr_init_frac)/=0 ) &
      &         CALL read_error(2, 'ag_soil_rechr_init_frac')
           IF ( Ag_soil_rechr_init_frac(1) < 0.0 ) then
-            print *, 'WARNING, ag_soil_rechr_init_frac not specified substituting soil_rechr_init_frac'
+            print *, 'WARNING, ag_soil_rechr_init_frac not specified, substituting soil_rechr_init_frac'
             Ag_soil_rechr_init_frac = Soil_rechr_init_frac
           ENDIF
         ENDIF
