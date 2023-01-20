@@ -65,19 +65,19 @@
 
       IF ( Process_flag==RUN ) THEN
         soilzone_ag = szrun_ag()
-        call water_balance_sz()
+        !call water_balance_sz()
       ELSEIF ( Process_flag==DECL ) THEN
         soilzone_ag = szdecl()
         soilzone_ag = szdecl_ag()
-        call water_balance_sz()
+        !call water_balance_sz()
       ELSEIF ( Process_flag==INIT ) THEN
         IF ( Init_vars_from_file>OFF ) CALL soilzone_restart_ag(READ_INIT)
         soilzone_ag = szinit()
         soilzone_ag = szinit_ag()
-        call water_balance_sz()
+        !call water_balance_sz()
       ELSEIF ( Process_flag==CLEAN ) THEN
         IF ( Save_vars_to_file==ACTIVE ) CALL soilzone_restart_ag(SAVE_INIT)
-        call water_balance_sz()
+        !call water_balance_sz()
       ENDIF
 
       END FUNCTION soilzone_ag
