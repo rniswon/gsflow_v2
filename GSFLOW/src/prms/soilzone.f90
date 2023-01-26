@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2023-01-18'
+      character(len=*), parameter :: Version_soilzone = '2023-01-25'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       DOUBLE PRECISION, SAVE :: Basin_pref_flow_max_in
@@ -1493,7 +1493,7 @@
       END SUBROUTINE compute_szactet
 
 !***********************************************************************
-!     compute interflow and flow to groundwater reservoir
+!     compute flow to groundwater reservoir
 !***********************************************************************
       SUBROUTINE compute_gwflow(Ssr2gw_rate, Ssr2gw_exp, Ssr_to_gw, Slow_stor)
       IMPLICIT NONE
@@ -1607,16 +1607,18 @@
       Preflow = Preflow - Dnpreflow
       Dunnian = Dunnian - Dndunnflow
 
-      END SUBROUTINE compute_cascades
+    END SUBROUTINE compute_cascades
 
 !***********************************************************************
-!     compute interflow and flow to groundwater reservoir
+!     compute storage of GVRs, replenishment of capillary reservoir,
+!     excess storage to preferential flow reservoir, interflow and
+!     flow to groundwater reservoir for GSFLOW
 !***********************************************************************
       SUBROUTINE compute_gravflow(Ihru, Capacity, Slowcoef_lin, &
      &           Slowcoef_sq, Ssr2gw_rate, Ssr2gw_exp, Gvr_maxin, &
      &           Pref_flow_thrsh, Gvr2pfr, Ssr_to_gw, &
      &           Slow_flow, Slow_stor, Gvr2sm, Soil_to_gw, Gwin, Compute_lateral)
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, CLOSEZERO
       USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug
       USE PRMS_FLOWVARS, ONLY: Gravity_stor_res
       USE PRMS_SOILZONE, ONLY: Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, &
@@ -1677,7 +1679,7 @@
         ENDIF
 
 ! compute flow to groundwater, if any
-        IF ( depth>0.0 ) THEN
+        IF ( depth>CLOSEZERO ) THEN
           IF ( Ssr2gw_rate>0.0 ) THEN
 ! use VKS instead of rate  ???????????????
             perc = Ssr2gw_rate*(depth**Ssr2gw_exp)

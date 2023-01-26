@@ -1271,14 +1271,14 @@ end module PRMS_IT0_VARS
         Ag_soil_rechr_max = 0.0
         DO i = 1, Nhru
           IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE ) CYCLE
-          IF ( Ag_soil_moist_max(i) < 4.0 ) THEN
-            PRINT *, 'ag_soil_moist_max < 4.0, set to 4.0, HRU:', i, Ag_soil_moist_max(i)
-            Ag_soil_moist_max(i) = 4.0
-          ENDIF
-          IF ( Ag_soil_rechr_max_frac(i) < 0.75 ) THEN
-            PRINT *, 'ag_soil_rechr_max_frac < 0.75, set to 0.75, HRU:', i, Ag_soil_rechr_max_frac(i)
-            Ag_soil_rechr_max_frac(i) = 0.75
-          ENDIF
+          !IF ( Ag_soil_moist_max(i) < 4.0 ) THEN
+          !  PRINT *, 'ag_soil_moist_max < 4.0, set to 4.0, HRU:', i, Ag_soil_moist_max(i)
+          !  Ag_soil_moist_max(i) = 4.0
+          !ENDIF
+          !IF ( Ag_soil_rechr_max_frac(i) < 0.75 ) THEN
+          !  PRINT *, 'ag_soil_rechr_max_frac < 0.75, set to 0.75, HRU:', i, Ag_soil_rechr_max_frac(i)
+          !  Ag_soil_rechr_max_frac(i) = 0.75
+          !ENDIF
           Ag_soil_rechr_max(i) = Ag_soil_moist_max(i) * Ag_soil_rechr_max_frac(i)
           IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
             IF ( Parameter_check_flag>0 ) THEN
