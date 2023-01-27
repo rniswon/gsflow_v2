@@ -62,7 +62,7 @@
 !     lake_hru_id, ag_frac, ag_cov_type
 !***********************************************************************
       INTEGER FUNCTION basdecl()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Dprst_flag, Lake_route_flag, &
      &    PRMS4_flag, GSFLOW_flag, Glacier_flag, AG_flag
       use PRMS_MMFAPI, only: declvar_real, declvar_dble

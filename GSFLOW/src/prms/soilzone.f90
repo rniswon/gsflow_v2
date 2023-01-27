@@ -34,13 +34,13 @@
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gvr_hru_pct_adjusted(:)
 !   Declared Variables
       DOUBLE PRECISION, SAVE :: Basin_sz2gw, Basin_cap_infil_tot
-      DOUBLE PRECISION, SAVE :: Basin_interflow_max
+      DOUBLE PRECISION, SAVE :: Basin_interflow_max, Basin_sm2gvr_max ! this is the same as basin_sm2gvr
       DOUBLE PRECISION, SAVE :: Basin_soil_rechr, Basin_dunnian_gvr
       DOUBLE PRECISION, SAVE :: Basin_recharge, Basin_pref_flow_infil
       DOUBLE PRECISION, SAVE :: Basin_ssin, Basin_dunnian_pfr
       DOUBLE PRECISION, SAVE :: Basin_sm2gvr, Basin_dninterflow
       DOUBLE PRECISION, SAVE :: Basin_dncascadeflow, Basin_dndunnianflow
-      DOUBLE PRECISION, SAVE :: Basin_dunnian
+      DOUBLE PRECISION, SAVE :: Basin_capwaterin, Basin_dunnian
       DOUBLE PRECISION, SAVE :: Basin_gvr2pfr, Basin_slowflow
       DOUBLE PRECISION, SAVE :: Basin_pref_stor, Basin_slstor, Basin_prefflow
       DOUBLE PRECISION, SAVE :: Basin_lakeinsz, Basin_lakeprecip
@@ -124,6 +124,11 @@
       CALL print_module(MODDESC, MODNAME, Version_soilzone)
 
 ! Declare Variables
+      CALL declvar_dble(MODNAME, 'basin_capwaterin', 'one', 1, &
+     &     'Basin area-weighted average infiltration,'// &
+     &     ' cascading interflow and Dunnian flow added to capillary reservoir storage', &
+     &     'inches', Basin_capwaterin)
+
       CALL declvar_dble(MODNAME, 'basin_cap_infil_tot', 'one', 1, &
      &     'Basin area-weighted average infiltration with cascading flow into capillary reservoirs', &
      &     'inches', Basin_cap_infil_tot)
@@ -224,6 +229,11 @@
       CALL declvar_real(MODNAME, 'pref_flow_in', 'nhru', Nhru, &
      &     'Infiltration and flow from gravity reservoir to the preferential-flow reservoir', &
      &     'inches', Pref_flow_in)
+
+      CALL declvar_dble(MODNAME, 'basin_sm2gvr_maxin', 'one', 1, &
+     &     'Basin area-weighted average maximum excess flow from'// &
+     &     ' capillary reservoirs that flows to gravity reservoirs', &
+     &     'inches', Basin_sm2gvr_max)
 
       CALL declvar_dble(MODNAME, 'basin_interflow_max', 'one', 1, &
      &     'Basin area-weighted average maximum interflow that flows from gravity reservoirs', &
@@ -875,6 +885,7 @@
         Ssr_to_gw(i) = 0.0
         Slow_flow(i) = 0.0
         Ssres_flow(i) = 0.0
+        Cap_waterin(i) = 0.0
         Dunnian_flow(i) = 0.0
         Soil_saturated(i) = OFF
         Pfr_dunnian_flow(i) = 0.0
@@ -1005,15 +1016,17 @@
 
 !******Add infiltration to soil and compute excess
         gvr_maxin = 0.0
-        Cap_waterin(i) = capwater_maxin
 
         IF ( cfgi_frozen_hru==OFF ) THEN
           ! call even if capwater_maxin = 0, just in case soil_moist now > Soil_moist_max
           IF ( capwater_maxin+Soil_moist(i)>0.0 ) THEN
-            CALL compute_soilmoist(Cap_waterin(i), Soil_moist_max(i), &
+            CALL compute_soilmoist(capwater_maxin, Soil_moist_max(i), &
      &           Soil_rechr_max(i), Soil2gw_max(i), gvr_maxin, &
      &           Soil_moist(i), Soil_rechr(i), Soil_to_gw(i), perv_frac)
+            Cap_waterin(i) = capwater_maxin*perv_frac
+            Basin_capwaterin = Basin_capwaterin + DBLE( Cap_waterin(i)*harea )
             Basin_soil_to_gw = Basin_soil_to_gw + DBLE( Soil_to_gw(i)*harea )
+            Basin_sm2gvr_max = Basin_sm2gvr_max + DBLE( gvr_maxin*harea )
             Soil_to_ssr(i) = gvr_maxin
           ENDIF
         ELSE
@@ -1086,10 +1099,9 @@
               topfr = 0.0
             ENDIF
           ENDIF
-          Pref_flow_infil(i) = pref_flow_maxin - dunnianflw_pfr
           Pref_flow_in(i) = Pref_flow_infil(i) + topfr
           Pref_flow_stor(i) = Pref_flow_stor(i) + topfr
-          IF ( Pref_flow_stor(i)>CLOSEZERO ) &
+          IF ( Pref_flow_stor(i)>0.0 ) &
      &         CALL compute_interflow(Fastcoef_lin(i), Fastcoef_sq(i), &
      &                                Pref_flow_in(i), Pref_flow_stor(i), prefflow)
         ELSEIF ( compute_lateral==ACTIVE ) THEN
@@ -1261,6 +1273,8 @@
       Basin_sroff = Basin_sroff*Basin_area_inv
       Basin_dunnian = Basin_dunnian*Basin_area_inv
       Basin_sm2gvr = Basin_sm2gvr*Basin_area_inv
+      Basin_sm2gvr_max = Basin_sm2gvr_max*Basin_area_inv
+      Basin_capwaterin = Basin_capwaterin*Basin_area_inv
       Basin_cap_infil_tot = Basin_cap_infil_tot*Basin_area_inv
       Basin_cap_up_max = Basin_cap_up_max*Basin_area_inv
       Basin_dninterflow = Basin_dninterflow*Basin_area_inv
@@ -1308,10 +1322,9 @@
       SUBROUTINE compute_soilmoist(Infil, Soil_moist_max, &
      &           Soil_rechr_max, Soil2gw_max, Soil_to_ssr, Soil_moist, &
      &           Soil_rechr, Soil_to_gw, Perv_frac)
-      USE PRMS_CONSTANTS, ONLY: CLOSEZERO
       IMPLICIT NONE
 ! Function
-      INTRINSIC :: MIN, ABS
+      INTRINSIC :: MIN
 ! Arguments
       REAL, INTENT(IN) :: Perv_frac, Soil_moist_max, Soil_rechr_max, Soil2gw_max
       REAL, INTENT(INOUT) :: Infil, Soil_moist, Soil_rechr, Soil_to_gw, Soil_to_ssr
@@ -1324,10 +1337,6 @@
       excs = Soil_moist + Infil
       Soil_moist = MIN( excs, Soil_moist_max )
       excs = (excs - Soil_moist_max)*Perv_frac
-      IF ( ABS(excs)<CLOSEZERO ) THEN
-        Soil_moist = Soil_moist_max
-        excs = 0.0
-      ENDIF
       IF ( excs>0.0 ) THEN
         IF ( Soil2gw_max>0.0 ) THEN
           Soil_to_gw = MIN( Soil2gw_max, excs )
@@ -1607,7 +1616,7 @@
       Preflow = Preflow - Dnpreflow
       Dunnian = Dunnian - Dndunnflow
 
-    END SUBROUTINE compute_cascades
+      END SUBROUTINE compute_cascades
 
 !***********************************************************************
 !     compute storage of GVRs, replenishment of capillary reservoir,
@@ -1775,8 +1784,10 @@
       Basin_dndunnianflow = 0.0D0
       Basin_dncascadeflow = 0.0D0
       Basin_sz2gw = 0.0D0
+      Basin_sm2gvr_max = 0.0D0
       Basin_interflow_max = 0.0D0
       Basin_dunnian = 0.0D0
+      Basin_capwaterin = 0.0D0
       Basin_cap_infil_tot = 0.0D0
       Basin_cap_up_max = 0.0D0
       Basin_pref_flow_infil = 0.0D0

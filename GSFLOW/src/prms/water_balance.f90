@@ -179,7 +179,7 @@
      &    Perv_actet, Cap_infil_tot, Pref_flow_infil, Cap_waterin, Upslope_interflow, &
      &    Upslope_dunnianflow, Pref_flow, Soil_lower, Gvr2pfr, Basin_ssin, &
      &    Basin_lakeinsz, Basin_dunnian, Pref_flow_max, Pref_flow_den, Pref_flow_thrsh, &
-     &    Basin_cap_infil_tot, Basin_slowflow, &
+     &    Basin_sm2gvr_max, Basin_cap_infil_tot, Basin_slowflow, Basin_capwaterin, &
      &    Basin_dunnian_gvr, Basin_pref_flow_infil, Basin_dninterflow, Basin_pref_stor, Basin_dunnian_pfr, &
      &    Basin_dncascadeflow, Basin_sm2gvr, Basin_prefflow, Basin_slstor, Basin_gvr2pfr, &
      &    Hru_sz_cascadeflow, Pfr_dunnian_flow, Grav_dunnian_flow, Basin_dndunnianflow, Soil_moist_tot
@@ -319,7 +319,7 @@
         last_sm = It0_soil_moist(i)
         last_ss = It0_ssres_stor(i)
 
-        soilbal = (last_sm - Soil_moist(i) - Perv_actet(i))*perv_frac + Cap_infil_tot(i)
+        soilbal = (last_sm - Soil_moist(i) - Perv_actet(i))*perv_frac + Cap_waterin(i)
         IF ( AG_flag == ACTIVE ) THEN
           soilbal = soilbal - perv_soil_to_gvr(i) - perv_soil_to_gw(i)
         ELSE 
@@ -486,7 +486,7 @@
 
 ! soilzone
       Basin_capillary_wb = It0_basin_soil_moist - Basin_soil_moist - &
-     &                     Basin_perv_et - Basin_sm2gvr + Basin_cap_infil_tot
+     &                     Basin_perv_et - Basin_sm2gvr_max + Basin_cap_infil_tot
       Basin_gravity_wb = It0_basin_ssstor - Basin_ssstor + Basin_sm2gvr - Basin_dncascadeflow - &
      &                   Basin_ssflow - Basin_sz2gw - Basin_dunnian + Basin_dunnian_pfr - &
      &                   Basin_swale_et + Basin_pref_flow_infil
@@ -510,10 +510,10 @@
      &     Basin_dunnian_gvr, Basin_slowflow, Basin_prefflow, Basin_gvr2pfr, Nowtime
       IF ( DABS(Basin_capillary_wb)>DTOOSMALL ) WRITE( BALUNT, * ) 'possible basin capillary balance issue', &
      &     Basin_capillary_wb, It0_basin_soil_moist, Basin_soil_moist, Basin_perv_et, &
-     &     Basin_sm2gvr, Basin_cap_infil_tot, Basin_soil_to_gw, Nowtime
+     &     Basin_sm2gvr, Basin_cap_infil_tot, Basin_soil_to_gw, Basin_sm2gvr_max, Basin_capwaterin, Nowtime
       IF ( DABS(Basin_soilzone_wb)>DTOOSMALL ) THEN
         WRITE ( BALUNT, * ) 'possible basin soil zone rounding issue', &
-     &     Basin_soilzone_wb, Basin_cap_infil_tot, Basin_pref_flow_infil, Basin_infil, &
+     &     Basin_soilzone_wb, Basin_capwaterin, Basin_pref_flow_infil, Basin_infil, &
      &     It0_basin_ssstor, Basin_ssstor, It0_basin_soil_moist, Basin_soil_moist, Basin_perv_et, Basin_swale_et, &
      &     Basin_sz2gw, Basin_soil_to_gw, Basin_ssflow, Basin_dunnian, Basin_dncascadeflow, &
      &     Basin_sm2gvr, Basin_lakeinsz, Basin_dunnian_pfr
@@ -551,7 +551,7 @@
       ELSEIF ( DABS(bsmbal)>0.0005D0 .OR. DABS(basin_bal)>DTOOSMALL ) THEN
         WRITE ( BALUNT, '(A,2F12.7)' ) 'Basin soilzone rounding issue', bsmbal, basin_bal
         WRITE ( BALUNT, * ) Basin_soilzone_wb, Basin_ssin, &
-     &          Basin_dninterflow, Basin_sm2gvr, Basin_cap_infil_tot, &
+     &          Basin_dninterflow, Basin_sm2gvr, Basin_capwaterin, &
      &          soil_in, Basin_gvr2pfr, Basin_dndunnianflow, (soil_in - Basin_infil)
       ENDIF
 

@@ -309,7 +309,7 @@ contains
     ! Local Variables
     integer :: comma, j, ndimen, nval, nvals, nvals2, declared, numvalues, type_flag, iset, i, itemp
     real :: temp
-    character(LEN=16) :: dimen1, dimen2
+    character(LEN=16) :: dimen1, dimen2, ctemp
     !***********************************************************************
     declparam = 0
     !!!!!!!!!!!! check to see if already in data structure
@@ -422,6 +422,30 @@ contains
           end do
         end do
       end if
+    elseif (type_flag == 3) then ! only allow for a 1-D array
+      read (defvalue, *) ctemp
+      Parameter_data(Num_parameters)%def_char = ctemp
+      if (Parameter_data(Num_parameters)%num_dimens == 1) then
+        !if (Parameter_data(Num_parameters)%scalar_flag == 1) then
+        !  allocate (Parameter_data(Num_parameters)%values_char_0d)
+        !  Parameter_data(Num_parameters)%values_char_0d = ctemp
+        !else
+          allocate (Parameter_data(Num_parameters)%values_char_1d(numvalues))
+          do i = 1, numvalues
+            Parameter_data(Num_parameters)%values_char_1d(i) = ctemp
+          end do
+        !end if
+      !else
+      !  allocate (Parameter_data(Num_parameters)%values_char_2d(Parameter_data(Num_parameters)%num_dim1, nvals2))
+      !  do i = 1, Parameter_data(Num_parameters)%num_dim1
+      !    do j = 1, nvals2
+      !      Parameter_data(Num_parameters)%values_char_2d(i, j) = ctemp
+      !    end do
+      !  end do
+      else
+          print *, 'ERROR, string parameters must be an 1-D array', Paramname
+          stop
+      end if
     end if
 
     iset = 0
@@ -437,7 +461,7 @@ contains
         Parameter_data(Num_parameters)%maximum_int = nvals
         Parameter_data(Num_parameters)%minimum_int = Parameter_data(Num_parameters)%default_int
       else
-        call error_stop('bounded parameter cannot be real type', ERROR_param)
+        call error_stop('bounded parameter must be integer type', ERROR_param)
       end if
     else
       if (type_flag == 1) then
@@ -494,7 +518,6 @@ contains
 !***********************************************************************
   module function getparam_real_0d(Modname, Paramname, Numvalues, Values) result(res)
     use PRMS_CONSTANTS, only: ERROR_param
-    use prms_utils, only: error_stop
     use PRMS_MODULE, only: Parameter_check_flag
     implicit none
     ! Arguments
@@ -559,10 +582,9 @@ contains
   module function getparam_real_1d(Modname, Paramname, Numvalues, Values) result(res)
     use prms_constants, only: ERROR_param
     use PRMS_MODULE, only: Parameter_check_flag !, Hru_type
-    use prms_utils, only: error_stop
     implicit none
-      ! Arguments
-      integer :: res  ! Function result
+    ! Arguments
+    integer :: res  ! Function result
     character(LEN=*), intent(IN) :: Modname, Paramname
     integer, intent(IN) :: Numvalues
     ! values could be any data type
@@ -581,12 +603,12 @@ contains
         if (Parameter_data(i)%numvals /= Numvalues) then
           ierr = 1
           print *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
-   &               ' number of values in getparam_real does not match declared number of values'
+   &               ' number of values in getparam_real_1d does not match declared number of values'
         end if
         if (trim(Parameter_data(i)%data_type) /= 'real') then
           ierr = 1
           print *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
-   &               ' data type does in getparam_real not match declared data type'
+   &               ' data type does in getparam_real_1d not match declared data type'
         end if
         param_id = i
         exit
@@ -625,7 +647,6 @@ contains
   module function getparam_real_2d(Modname, Paramname, Numvalues, Values) result(res)
     use PRMS_CONSTANTS, only: ERROR_param
     use PRMS_MODULE, only: Parameter_check_flag
-    use prms_utils, only: error_stop
     implicit none
     ! Arguments
     integer :: res  ! Function result
@@ -639,9 +660,9 @@ contains
     ! Local Variables
     integer :: found, param_id, i, ierr, j
     !***********************************************************************
-      Values = 0.0
-      ierr = 0
-      found = 0
+    Values = 0.0
+    ierr = 0
+    found = 0
     do i = 1, Num_parameters
       if (Paramname == trim(Parameter_data(i)%param_name)) then
         found = 1
@@ -688,12 +709,11 @@ contains
   end function getparam_real_2d
 
 !***********************************************************************
-! getparam_int_0d - integer get scalar parameter values
+! getparam_int_0d - get integer scalar parameter values
 !***********************************************************************
   module function getparam_int_0d(Modname, Paramname, Numvalues, Values) result(res)
     USE PRMS_CONSTANTS, ONLY: ERROR_param
     USE PRMS_MODULE, ONLY: Parameter_check_flag
-    use prms_utils, only: error_stop
     implicit none
     ! Arguments
     integer :: res
@@ -752,12 +772,11 @@ contains
   end function getparam_int_0d
 
 !***********************************************************************
-! getparam_int_1d - integer get 1-dimensional parameter values
+! getparam_int_1d - get 1-dimensional integer parameter values
 !***********************************************************************
   module function getparam_int_1d(Modname, Paramname, Numvalues, Values) result(res)
     USE PRMS_CONSTANTS, ONLY: ERROR_param
     USE PRMS_MODULE, ONLY: Parameter_check_flag
-    use prms_utils, only: error_stop
     implicit none
     ! Arguments
     integer :: res
@@ -818,12 +837,11 @@ contains
   end function getparam_int_1d
 
 !***********************************************************************
-! getparam_int_2d - integer get 2-dimensional parameter values
+! getparam_int_2d - get integer 2-dimensional parameter values
 !***********************************************************************
   module function getparam_int_2d(Modname, Paramname, Numvalues, Values) result(res)
     USE PRMS_CONSTANTS, ONLY: ERROR_param
     USE PRMS_MODULE, ONLY: Parameter_check_flag
-    use prms_utils, only: error_stop
     implicit none
     ! Arguments
     integer :: res
@@ -977,53 +995,52 @@ contains
   end function getdim
 
 !***********************************************************************
-! getparamstring
-! control parameters are read and verified this
-! function checks to be sure a required parameter has a value (read or default)
+! getparam_string - get 1-dimensional string parameter values
 !***********************************************************************
-  integer module function getparamstring(Paramname, Numvalues, Data_type, Array_index, String)
-    use PRMS_CONSTANTS, only: ERROR_var
+  integer module function getparam_string(Modname, Paramname, Numvalues, Values)
+    use PRMS_CONSTANTS, only: ERROR_param
     use PRMS_MMFAPI, only: set_data_type
     implicit none
     ! Arguments
-    character(LEN=*), intent(IN) :: Paramname, Data_type
-    integer, intent(IN) :: Numvalues, Array_index
-    character(LEN=*), intent(OUT) :: String
+    character(LEN=*), intent(IN) :: Modname, Paramname
+    integer, intent(IN) :: Numvalues
+    character(LEN=16), intent(OUT) :: Values(:)
     ! Functions
-    intrinsic :: INDEX
+    intrinsic :: TRIM
     ! Local Variables
-    integer nchars, nchars_param, type_flag, num_values
-    character(LEN=16) :: dimenname
+    integer :: found, param_id, i, ierr
     !***********************************************************************
-    String = ' '
-    ! Modname
-    nchars_param = index(Paramname, ' ') - 1
-    ! Paramname(:nchars_param)
-    nchars = index(Dimenname, ' ') - 1
-    num_values = -2
-    if (num_values /= Numvalues) then
-      print *, 'ERROR, number of values does not equal values for the dimension'
-      print *, '       parameter: ', Dimenname(:nchars), ' dimension value:', num_values
-      print *, '       dimension: ', Paramname(:nchars_param), ' number of values:', Numvalues
-      ERROR stop ERROR_var
+    Values = ' '
+    ierr = 0
+    found = 0
+    do i = 1, Num_parameters
+      if (Paramname == trim(Parameter_data(i)%param_name)) then
+        found = 1
+        if (Parameter_data(i)%numvals /= Numvalues) then
+          ierr = 1
+          print *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
+   &               ' number of values in getparam_char_1d does not match declared number of values'
+        end if
+        if (trim(Parameter_data(i)%data_type) /= 'string') then
+          ierr = 1
+          print *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, &
+   &               ' data type does in getparam_char_1d not match declared data type'
+        end if
+        param_id = i
+        exit
+      end if
+    end do
+
+    if (found == 0) then
+      print *, 'ERROR in: ', Modname, ', Parameter: ', Paramname, ' not declared'
+      ierr = 1
     end if
-    nchars = index(Data_type, ' ') - 1
-    ! Data_type(:nchars)
-    call set_data_type(Data_type, type_flag)
+    if (ierr == 1) ERROR stop ERROR_param
 
-!      DO j = 1, Num_parameters      RSR ???
-!          DO i = 1, Numvalues
-!            IF ( type_flag==1 ) THEN
-!            ELSEIF ( type_flag==2 ) THEN
-!            ELSEIF ( type_flag==3 ) THEN
-!            ELSEIF ( type_flag==4 ) THEN
-!            ENDIF
-!          ENDDO
-!        EXIT
-!      ENDDO
+    Values = Parameter_data(param_id)%values_char_1d
+    getparam_string = 0
 
-      getparamstring = 0
-  end function getparamstring
+    end function getparam_string
 
 !***********************************************************************
 ! setparam - set real or integer parameter values read from Parameter File

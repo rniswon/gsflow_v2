@@ -12,6 +12,7 @@ module PRMS_READ_PARAM_FILE
     integer :: default_int, maximum_int, minimum_int, num_dimens, num_dim1, num_dim2
     character(LEN=MAXCONTROL_LENGTH) :: max_value, min_value, def_value, data_type
     character(LEN=MAXCONTROL_LENGTH) :: dimen_names, module_name, units
+    character(LEN=16) :: def_char
     real, pointer :: values_real_0d ! Scalars
     real, pointer :: values_real_1d(:)
     real, pointer :: values_real_2d(:, :)
@@ -19,6 +20,7 @@ module PRMS_READ_PARAM_FILE
     integer, pointer :: values_int_1d(:)
     integer, pointer :: values_int_2d(:, :)
     real :: maximum, minimum, default_real
+    character(LEN=16), pointer :: values_char_1d(:)
   end type PRMS_parameter
 
   type(PRMS_parameter), save, allocatable :: Parameter_data(:)
@@ -60,10 +62,10 @@ module PRMS_READ_PARAM_FILE
       character(LEN=*), intent(IN) :: Dimname
     end function
 
-    integer module function getparamstring(Paramname, Numvalues, Data_type, Array_index, String)
-      character(LEN=*), intent(IN) :: Paramname, Data_type
-      integer, intent(IN) :: Numvalues, Array_index
-      character(LEN=*), intent(OUT) :: String
+    integer module function getparam_string(Modname, Paramname, Numvalues, Values)
+      character(LEN=*), intent(IN) :: Modname, Paramname
+      integer, intent(IN) :: Numvalues
+      character(LEN=16), intent(OUT) :: Values(:)
     end function
 
     module subroutine setdimension(Dimname, Dim)

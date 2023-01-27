@@ -550,8 +550,8 @@
         Ssr_to_gw(i) = 0.0
         Slow_flow(i) = 0.0
         Ssres_flow(i) = 0.0
-        Dunnian_flow(i) = 0.0
         Cap_waterin(i) = 0.0
+        Dunnian_flow(i) = 0.0
         Soil_saturated(i) = OFF
 ! initialize all HRU values in case dynamic ag frac
         Ag_soil_saturated(i) = OFF
@@ -753,7 +753,8 @@
               CALL compute_soilmoist(capwater_maxin, Soil_moist_max(i), &
      &                               Soil_rechr_max(i), Soil2gw_max(i), perv_soil_to_gvr(i), &
      &                               Soil_moist(i), Soil_rechr(i), perv_soil_to_gw(i), perv_frac)
-              Cap_waterin(i) = capwater_maxin
+              Cap_waterin(i) = capwater_maxin*perv_frac
+              Basin_capwaterin = Basin_capwaterin + DBLE( Cap_waterin(i)*harea )
             ENDIF
           ENDIF
           IF ( ag_on_flag==ACTIVE ) THEN
@@ -771,13 +772,13 @@
           Soil_to_gw(i) = perv_soil_to_gw(i) + ag_soil_to_gw(i)
           Soil_to_ssr(i) = perv_soil_to_gvr(i) + ag_soil_to_gvr(i)
           Basin_soil_to_gw = Basin_soil_to_gw + DBLE( Soil_to_gw(i)*harea )
+          Basin_sm2gvr_max = Basin_sm2gvr_max + DBLE( Soil_to_ssr(i)*harea )
           Basin_perv_to_gw = Basin_perv_to_gw + DBLE ( perv_soil_to_gw(i)*harea )
         ELSE
           adjust_hortonian = ACTIVE
           Sroff(i) = Sroff(i) + capwater_maxin
           Hru_sroffp(i) = Hru_sroffp(i) + capwater_maxin * perv_frac
           Hortonian_flow(i) = Hortonian_flow(i) + capwater_maxin * perv_frac
-          Cap_waterin(i) = 0.0
           IF ( ag_on_flag==ACTIVE ) THEN
             Ag_water_in(i) = 0.0
             Sroff(i) = Sroff(i) + ag_water_maxin
@@ -873,7 +874,7 @@
           ENDIF
           Pref_flow_in(i) = Pref_flow_infil(i) + topfr
           Pref_flow_stor(i) = Pref_flow_stor(i) + topfr
-          IF ( Pref_flow_stor(i)>CLOSEZERO ) &
+          IF ( Pref_flow_stor(i)>0.0 ) &
      &         CALL compute_interflow(Fastcoef_lin(i), Fastcoef_sq(i), &
      &                                Pref_flow_in(i), Pref_flow_stor(i), prefflow)
         ELSEIF ( compute_lateral==ACTIVE ) THEN
@@ -1211,6 +1212,8 @@
       Basin_sroff = Basin_sroff*Basin_area_inv
       Basin_dunnian = Basin_dunnian*Basin_area_inv
       Basin_sm2gvr = Basin_sm2gvr*Basin_area_inv
+      Basin_sm2gvr_max = Basin_sm2gvr_max*Basin_area_inv
+      Basin_capwaterin = Basin_capwaterin*Basin_area_inv
       Basin_cap_infil_tot = Basin_cap_infil_tot*Basin_area_inv
       Basin_ag_cap_infil_tot = Basin_ag_cap_infil_tot*Basin_area_inv
       Basin_cap_up_max = Basin_cap_up_max*Basin_area_inv
@@ -1263,7 +1266,7 @@
      &           Slow_flow, Slow_stor, Gvr2sm, Soil_to_gw, Gwin, Compute_lateral, &
      &           Ag_capacity, Gvr2ag)
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, CLOSEZERO
-      USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug, nowyear, nowday, nowmonth
+      USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug
       USE PRMS_FLOWVARS, ONLY: Gravity_stor_res
       USE PRMS_SOILZONE, ONLY: Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, &
      &    Gw2sm_grav, Gvr_hru_pct_adjusted

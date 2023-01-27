@@ -60,7 +60,7 @@
 !     covden_win, covden_sum, epan_coef, hru_area, hru_pansta
 !***********************************************************************
       INTEGER FUNCTION intdecl()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Water_use_flag, AG_flag, GSFLOW_flag
@@ -206,7 +206,7 @@
 !               set initial values.
 !***********************************************************************
       INTEGER FUNCTION intinit()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, MONTHS_PER_YEAR, ERROR_control, CANOPY
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, ERROR_control, CANOPY
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, &
      &    GSFLOW_flag, AG_flag, Ag_package, irrigation_apply_flag
