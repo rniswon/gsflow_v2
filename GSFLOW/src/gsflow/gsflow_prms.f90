@@ -94,6 +94,8 @@
         CALL DATE_AND_TIME(VALUES=Elapsed_time_start)
         Execution_time_start = Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
      &                         Elapsed_time_start(7) + Elapsed_time_start(8)*0.001
+        PRINT 9003, 'start', (Elapsed_time_start(i),i=1,3), (Elapsed_time_start(i),i=5,7)
+
 
         IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active, GSFLOW, PRMS, MODSIM-PRMS, MODSIM-PRMS_AG
           IF ( check_dims(Nsegshold, Nlakeshold)/=0 ) ERROR STOP ERROR_dim
@@ -143,8 +145,8 @@
         ENDIF
 
         IF ( Print_debug>DEBUG_minimum ) THEN
-          PRINT 15
-          PRINT 9002
+          IF ( Print_debug>DEBUG_less ) PRINT 15
+          PRINT 9002, EQULS, EQULS
           WRITE ( PRMS_output_unit, 15 )
           PRINT 16, EQULS(:62)
           WRITE ( PRMS_output_unit, 16 ) EQULS(:62)
@@ -250,8 +252,13 @@
             PRINT *, '       NSS=', NSS, '; nsegment=', Nsegment
             STOP ERROR_modflow
           ENDIF
-          IF ( irrigation_apply_flag>0 .AND. Ag_package==OFF ) CALL error_stop( &
-     &         'irrigation_apply_flag > 0 without AG Package active', ERROR_control)
+     !     IF ( irrigation_apply_flag>0 .AND. Ag_package==OFF ) CALL error_stop( &
+     !&         'irrigation_apply_flag > 0 without AG Package active', ERROR_control)
+          IF ( irrigation_apply_flag>0 .AND. Ag_package==OFF ) THEN
+            PRINT *, 'WARNING, irrigation_apply_flag > 0 without AG Package active'
+            PRINT *, '         irrigation_apply_flag set to 0'
+            irrigation_apply_flag = 0
+          ENDIF
         ENDIF
 
         nc = numchars(Model_control_file)
@@ -569,6 +576,7 @@
         ENDIF
         IF ( Model==CONVERT ) CALL convert_params()
       ELSEIF ( Process_flag==INIT ) THEN
+        CALL check_parameters()
         IF ( Inputerror_flag==1 ) THEN
           PRINT '(//,A,//,A,/,A,/,A)', '**Fix input errors in your Parameter File to continue**', &
      &          '  Set control parameter parameter_check_flag to 0 after', &
@@ -592,9 +600,9 @@
 
     4 FORMAT (/, 2(A, I5, 2('/',I2.2)), //, A, /)
  9001 FORMAT (/, 26X, 27('='), /, 26X, 'Normal completion of GSFLOW', /, 26X, 27('='), /)
- 9002 FORMAT (//, 74('='), /, 'Please give careful consideration to fixing all ERROR and WARNING messages', /, 74('='))
+ 9002 FORMAT (//, A, /, 'Please give careful consideration to fixing all ERROR and WARNING messages', /, A)
  9003 FORMAT ('Execution ', A, ' date and time (yyyy/mm/dd hh:mm:ss)', I5, 2('/',I2.2), I3, 2(':',I2.2), /)
- 9004 FORMAT (/, 2A)
+ 9004 FORMAT (/, 2A, /)
 
       END SUBROUTINE gsflow_prms
 

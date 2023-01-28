@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2022-09-20'
+      character(len=*), parameter :: Version_basin = '2023-01-11'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area, Ag_area_total
@@ -62,7 +62,7 @@
 !     lake_hru_id, ag_frac, ag_cov_type
 !***********************************************************************
       INTEGER FUNCTION basdecl()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Dprst_flag, Lake_route_flag, &
      &    PRMS4_flag, GSFLOW_flag, Glacier_flag, AG_flag
       use PRMS_MMFAPI, only: declvar_real, declvar_dble
@@ -217,7 +217,7 @@
 
         ALLOCATE ( Ag_cov_type(Nhru) )
         IF ( declparam(MODNAME, 'ag_cov_type', 'nhru', 'integer', &
-     &       '1', '0', '4', &
+     &       '-1', '0', '4', &
      &       'Cover type designation for agriculture area of each HRU', &
      &       'Vegetation cover type for agriculture area of each HRU (0=bare soil; 1=grasses; 2=shrubs; 3=trees; 4=coniferous)', &
      &       'none')/=0 ) CALL read_error(1, 'ag_cov_type')
@@ -278,7 +278,7 @@
       INTEGER FUNCTION basinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CLOSEZERO, &
      &    INACTIVE, LAKE, SWALE, FEET, ERROR_basin, DEBUG_minimum, ERROR_param, &
-     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, MONTHS_PER_YEAR !, METERS2FEET
+     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, MONTHS_PER_YEAR, CANOPY !, METERS2FEET
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, irrigation_apply_flag, Soilzone_module, &
      &    Dprst_flag, Lake_route_flag, PRMS4_flag, GSFLOW_flag, Frozen_flag, PRMS_VERSION, &
@@ -309,7 +309,10 @@
       IF ( AG_flag==ACTIVE ) THEN
         IF ( getparam_real(MODNAME, 'ag_frac', Nhru, Ag_frac)/=0 ) CALL read_error(2, 'ag_frac')
         IF ( getparam_int(MODNAME, 'ag_cov_type', Nhru, Ag_cov_type)/=0 ) CALL read_error(2, 'ag_cov_type')
-        !ag_cov_type = Cov_type
+        IF ( Ag_cov_type(1) == -1 ) THEN
+          print *, 'WARNING, ag_cov_type not specified, substituting cov_type'
+          Ag_cov_type = Cov_type
+        ENDIF
       ENDIF
 
       dprst_frac_flag = 0
@@ -558,10 +561,10 @@
       IF ( Ag_package==ACTIVE ) THEN
         ALLOCATE ( gsflow_ag_area(Nhru) )
         ALLOCATE ( gsflow_ag_frac(Nhru) )
-        IF ( irrigation_apply_flag>0 ) THEN
+        IF ( irrigation_apply_flag == CANOPY ) THEN
             gsflow_ag_area = Hru_area ! apply irrigation to canopy, which adjusts for covden
             gsflow_ag_frac = 1.0
-        ELSEIF ( Soilzone_module(:11) == 'soilzone_ag' ) THEN
+        ELSEIF ( Soilzone_module(:11) == 'soilzone_ag' .AND. irrigation_apply_flag == 3 ) THEN
             gsflow_ag_area = Ag_area ! apply irrigation to ag area in soilzone_ag module
             gsflow_ag_frac = Ag_frac
         ELSE

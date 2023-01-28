@@ -9,7 +9,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_soil_param_read'
-        character(len=*), parameter :: Version_dynamic_soil_param_read = '2022-10-24'
+        character(len=*), parameter :: Version_dynamic_soil_param_read = '2023-01-11'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Imperv_stor_next_yr, Imperv_stor_next_mo, Imperv_stor_next_day, Imperv_stor_unit
         INTEGER, SAVE :: Soil_rechr_next_yr, Soil_rechr_next_mo, Soil_rechr_next_day, Soil_rechr_unit
@@ -226,9 +226,9 @@
       INTEGER FUNCTION dynsoilparamrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dynamic, LAKE, CLOSEZERO
       USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, Dyn_imperv_flag, Dprst_flag, PRMS4_flag, &
-     &    AG_flag, Hru_type, GSFLOW_flag
+     &    AG_flag, Hru_type, GSFLOW_flag, Ag_package, Soilzone_module
       USE PRMS_DYNAMIC_SOIL_PARAM_READ
-      USE PRMS_BASIN, ONLY: Hru_area, Dprst_clos_flag, &
+      USE PRMS_BASIN, ONLY: Hru_area, Dprst_clos_flag, gsflow_ag_area, gsflow_ag_frac, &
      &    Hru_percent_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Dprst_frac, Dprst_open_flag, &
      &    Dprst_area_max, Dprst_area_open_max, Dprst_area_clos_max, Dprst_frac_open, &
      &    Hru_area_dble, Dprst_area, Active_hrus, Hru_route_order, Basin_area_inv, Ag_area, Ag_frac
@@ -682,6 +682,15 @@
           It0_dprst_vol_clos = Dprst_vol_clos
           Dprst_stor_hru = (Dprst_vol_open+Dprst_vol_clos) / Hru_area_dble
           It0_dprst_stor_hru = Dprst_stor_hru
+        ENDIF
+        IF ( Ag_package==ACTIVE ) THEN
+          IF ( Soilzone_module(:11) == 'soilzone_ag' ) THEN
+            gsflow_ag_area = Ag_area ! apply irrigation to ag area in soilzone_ag module
+            gsflow_ag_frac = Ag_frac
+          ELSE
+            gsflow_ag_area = Hru_perv ! apply irrigation to pervious area in soilzone module
+            gsflow_ag_frac = Hru_frac_perv
+          ENDIF
         ENDIF
       ENDIF
 

@@ -1,6 +1,6 @@
       MODULE GWFMNW2MODULE
         INTEGER,SAVE,POINTER  ::NMNW2,MNWMAX,NMNWVL,IWL2CB,MNWPRNT
-        INTEGER,SAVE,POINTER  ::NODTOT,INTTOT,NTOTNOD
+        INTEGER,SAVE,POINTER  ::NODTOT,INTTOT,NTOTNOD,ISOLNFLAG
         DOUBLE PRECISION, SAVE,POINTER :: SMALL
         CHARACTER(LEN=20),SAVE, DIMENSION(:),   POINTER     ::WELLID
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::MNWAUX
@@ -11,7 +11,7 @@
         DOUBLE PRECISION, SAVE, DIMENSION(:,:,:), POINTER     ::CapTable
       TYPE GWFMNWTYPE
         INTEGER,POINTER  ::NMNW2,MNWMAX,NMNWVL,IWL2CB,MNWPRNT
-        INTEGER,POINTER  ::NODTOT,INTTOT,NTOTNOD
+        INTEGER,POINTER  ::NODTOT,INTTOT,NTOTNOD,ISOLNFLAG
         DOUBLE PRECISION, POINTER :: SMALL
         CHARACTER(LEN=20), DIMENSION(:),   POINTER     ::WELLID
         CHARACTER(LEN=16), DIMENSION(:),   POINTER     ::MNWAUX
@@ -42,7 +42,7 @@ C     ------------------------------------------------------------------
       USE GWFMNW2MODULE, ONLY:NMNW2,MNWMAX,NMNWVL,IWL2CB,MNWPRNT,
      1                       NODTOT,INTTOT,MNWAUX,MNW2,MNWNOD,MNWINT,
 C-LFK     2                       CapTable,SMALL,NTOTNOD,WELLID
-     2                       CapTable,SMALL,NTOTNOD,WELLID,LIMQ
+     2                    CapTable,SMALL,NTOTNOD,WELLID,LIMQ,ISOLNFLAG
 C
       CHARACTER*200 LINE
 C     ------------------------------------------------------------------
@@ -50,7 +50,7 @@ C
 C1------Allocate scalar variables, which makes it possible for multiple
 C1------grids to be defined.
       ALLOCATE(NMNW2,MNWMAX,NTOTNOD,IWL2CB,MNWPRNT,NODTOT,INTTOT,SMALL,
-     1 NMNWVL)
+     1 NMNWVL,ISOLNFLAG)
 C
 C2------IDENTIFY PACKAGE AND INITIALIZE NMNW2.
       WRITE(IOUT,1)IN
@@ -59,6 +59,7 @@ C---LFK--modify dates & version
      +' 1/5/2017.',/,4X,'INPUT READ FROM UNIT ',i3)
       NMNW2=0
       ntotnod=0
+      ISOLNFLAG=0
 c-lfk-Dec 2012
       nodtot=0
 C
@@ -3362,7 +3363,7 @@ C     ------------------------------------------------------------------
      2                       HNEW,ISSFLG
       USE GWFBASMODULE, ONLY:HDRY
       USE GWFMNW2MODULE, ONLY:NMNW2,MNWMAX,MNWPRNT,MNWINT,INTTOT,
-     1                       NODTOT,MNW2,MNWNOD,SMALL,WELLID
+     1                       NODTOT,MNW2,MNWNOD,SMALL,WELLID,ISOLNFLAG
 
       CHARACTER*10 ctext
 c-lfk      CHARACTER*9 ctext
@@ -3637,6 +3638,7 @@ c           only do partial penetration effect if PP>0 and alpha <1.0
             PPFLAG=INT(MNW2(19,iw))
 c lfk 
 c            IF(PPFLAG.GT.0.and.alpha.lt.1.D0.and.alpha.gt.0.0) then
+            dhp = 0.0
             IF(PPFLAG.GT.0.and.alpha.lt.1.D0) then
 c
 c  use saved partial penetration effect if steady state and past 1st iter
@@ -6319,6 +6321,7 @@ C
         DEALLOCATE(NODTOT)
         DEALLOCATE(INTTOT)
         DEALLOCATE(NTOTNOD)
+        DEALLOCATE(ISOLNFLAG)
         DEALLOCATE(SMALL)
         DEALLOCATE(WELLID)
         DEALLOCATE(MNWAUX)
@@ -6341,6 +6344,7 @@ C
         NODTOT=>GWFMNWDAT(IGRID)%NODTOT
         INTTOT=>GWFMNWDAT(IGRID)%INTTOT
         NTOTNOD=>GWFMNWDAT(IGRID)%NTOTNOD
+        ISOLNFLAG=>GWFMNWDAT(IGRID)%ISOLNFLAG
         SMALL=>GWFMNWDAT(IGRID)%SMALL
         WELLID=>GWFMNWDAT(IGRID)%WELLID
         MNWAUX=>GWFMNWDAT(IGRID)%MNWAUX
@@ -6364,6 +6368,7 @@ C
         GWFMNWDAT(IGRID)%NODTOT=>NODTOT
         GWFMNWDAT(IGRID)%INTTOT=>INTTOT
         GWFMNWDAT(IGRID)%NTOTNOD=>NTOTNOD
+        GWFMNWDAT(IGRID)%ISOLNFLAG=>ISOLNFLAG
         GWFMNWDAT(IGRID)%SMALL=>SMALL
         GWFMNWDAT(IGRID)%WELLID=>WELLID
         GWFMNWDAT(IGRID)%MNWAUX=>MNWAUX

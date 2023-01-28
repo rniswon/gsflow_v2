@@ -5,13 +5,13 @@
     USE ISO_FORTRAN_ENV
     USE PRMS_CONSTANTS
       IMPLICIT NONE
-      character(LEN=*), parameter :: &
-     &          EQULS = '===================================================================='
+      character(LEN=74), parameter :: &
+     &          EQULS = '=========================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 12/20/2022'
-      character(len=*), parameter :: PRMS_versn = '2022-12-20'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 12/20/2022'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/25/2023'
+      character(len=*), parameter :: PRMS_versn = '2023-01-25'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 01/25/2023'
       character(len=*), parameter :: Version_read_control_file = '2022-10-20'
       character(len=*), parameter :: Version_read_parameter_file = '2022-01-12'
       character(len=*), parameter :: Version_read_data_file = '2022-06-02'
@@ -76,7 +76,7 @@
       CHARACTER(LEN=11), SAVE :: Soilzone_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
       INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF
-      INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag, Gsf_rpt, Rpt_days
+      INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag, Gsf_rpt, Rpt_days, Gsf_unt
       INTEGER, SAVE :: Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, Dyn_springfrost_flag
       INTEGER, SAVE :: Gwr_transferON_OFF, External_transferON_OFF, Segment_transferON_OFF, Lake_transferON_OFF
     END MODULE PRMS_MODULE

@@ -1014,8 +1014,8 @@ contains
       print '(/,A)', 'Note: Control File names cannot include spaces'
       ERROR stop - 2
     end if
-    print '(/,2A)', 'Control File: ', trim( Model_control_file )
-    print '(A)', EQULS
+    print '(/,A)', EQULS
+    print '(2A)', 'Control File: ', trim( Model_control_file )
 
   end subroutine get_control_filename
 
@@ -1102,7 +1102,7 @@ contains
 
     end do loop
 
-    print '(A)', EQULS
+    print '(A,/)', EQULS
   end subroutine get_control_arguments
 
   !***********************************************************************

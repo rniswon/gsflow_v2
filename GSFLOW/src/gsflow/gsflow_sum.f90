@@ -13,7 +13,7 @@
       character(len=*), parameter :: Version_gsflow_sum = '2022-08-26'
       INTEGER, SAVE :: BALUNT
       DOUBLE PRECISION, PARAMETER :: ERRCHK = 0.0001D0
-      INTEGER, SAVE :: Balance_unt, Vbnm_index(14), Gsf_unt, Rpt_count
+      INTEGER, SAVE :: Balance_unt, Vbnm_index(14), Rpt_count
       INTEGER, SAVE :: Have_wells
       DOUBLE PRECISION, SAVE :: Cumvol_precip, Cumvol_strmin
       DOUBLE PRECISION, SAVE :: Rate_precip, Cumvol_gwbndin
@@ -885,8 +885,8 @@
 !***********************************************************************
       INTEGER FUNCTION gsfsumclean()
       USE PRMS_CONSTANTS, ONLY: DEBUG_WB
-      USE PRMS_MODULE, ONLY: Print_debug, Gsf_rpt
-      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, BALUNT
+      USE PRMS_MODULE, ONLY: Print_debug, Gsf_rpt, Gsf_unt
+      USE GSFSUM, ONLY: Balance_unt, BALUNT
       IMPLICIT NONE
 !***********************************************************************
       gsfsumclean = 0
@@ -901,9 +901,9 @@
       SUBROUTINE GSF_PRINT()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_open_out
       use PRMS_CONTROL_FILE, only: control_string
-      USE PRMS_MODULE, ONLY: Print_debug, Gsf_rpt, Rpt_days
+      USE PRMS_MODULE, ONLY: Print_debug, Gsf_rpt, Rpt_days, Gsf_unt
       use prms_utils, only: numchars, PRMS_open_output_file, read_error
-      USE GSFSUM, ONLY: Balance_unt, Gsf_unt, Csv_output_file, Gsflow_output_file
+      USE GSFSUM, ONLY: Balance_unt, Csv_output_file, Gsflow_output_file
       IMPLICIT NONE
       EXTERNAL :: GSF_HEADERS
 ! Local Variables
@@ -994,7 +994,7 @@
 !***********************************************************************
       USE GSFSUM
       USE PRMS_CONSTANTS, ONLY: ACTIVE
-      USE PRMS_MODULE, ONLY: KKITER, Have_lakes, Nowyear, Nowmonth, Nowday
+      USE PRMS_MODULE, ONLY: KKITER, Have_lakes, Nowyear, Nowmonth, Nowday, Gsf_unt
       USE GWFSFRMODULE, ONLY: STRMDELSTOR_RATE, STRMDELSTOR_CUM, IRTFLG
       IMPLICIT NONE
       INTRINSIC ABS

@@ -25,13 +25,12 @@ C     ******************************************************************
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
       USE GSFMODFLOW
       IMPLICIT NONE
-      CHARACTER(len=200) :: LINE
 !***********************************************************************
       gsfdecl = 0
 C
 C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
       IF ( Print_debug>DEBUG_minimum )
-     &     WRITE (*,1) MFVNAM,VERSION(:15),VERSION2(:17),VERSION3(:17)
+     &     WRITE (*,1) MFVNAM,VERSION(:16),VERSION2(:17),VERSION3(:17)
     1 FORMAT (/,28X,'MODFLOW',A,/,
      &        '  U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE',
      &        ' GROUNDWATER-FLOW MODEL',/,25X,'WITH NEWTON FORMULATION',
@@ -45,10 +44,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
      &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,',
      &        /, 25X, 'AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
 
-      LINE = '                    Github Commit Hash 0a338c0'
-      WRITE(*,*) 
-      WRITE(*,*) Line
-      WRITE(*,*) 
+        WRITE(*,'(24X,A)') 'Github Commit Hash 0a338c0'
 
         ! Allocate local module variables
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
@@ -189,8 +185,9 @@ C6------ALLOCATE AND READ (AR) PROCEDURE
         ierr = 1
       ENDIF
       IF ( IUNIT(66)==0 .AND. AG_flag == ACTIVE ) THEN
-        PRINT *, 'GSFLOW with PRMS agriculture requires the AG Package'
-        ierr = 1
+      !  PRINT *, 'GSFLOW with PRMS agriculture requires the AG Package'
+         PRINT *, 'WARNING, soilzone_ag active and AG Package inactive'
+      !  ierr = 1
       ENDIF
 
 ! Packages available in NWT but not in GSFLOW
@@ -354,13 +351,14 @@ C
 C7------SIMULATE EACH STRESS PERIOD.
       CALL print_module(MODDESC, MODNAME, Version_gsflow_modflow)
       IF ( Print_debug>DEBUG_minimum )
-     &     PRINT '(A,/A,/A)', EQULS, 'MODFLOW Packages', EQULS
+     &     PRINT '(A,/A,/A)', EQULS(:62), 'MODFLOW Packages', EQULS(:62)
       CALL print_module(MODDESC_UZF, MODNAME_UZF, Version_uzf)
       CALL print_module(MODDESC_SFR, MODNAME_SFR, Version_sfr)
       IF ( Have_lakes==ACTIVE )
      &     CALL print_module(MODDESC_LAK, MODNAME_LAK, Version_lak)
       IF ( Ag_package==ACTIVE )
      &     CALL print_module(MODDESC_AG, MODNAME_AG, Version_ag)
+      IF ( Print_debug>DEBUG_minimum ) PRINT '(A,/)', EQULS(:62)
 
       IF ( IUNIT(63)>0 ) solver = 'NWT'
       IF ( IUNIT(13)>0 ) solver = 'PCG'
@@ -389,7 +387,11 @@ C7------SIMULATE EACH STRESS PERIOD.
         CALL check_gvr_cell_pct()
         ! make the default number of soilzone iterations equal to the
         ! maximum MF iterations, which is a good practice using NWT and cells=nhru
-        IF ( Mxsziter<1 ) Mxsziter = MXITER
+        IF ( Mxsziter<1 ) THEN
+          print '(/,A)',
+     &          'WARNING, mxsziter not specified, substituting MXITER'
+          Mxsziter = MXITER
+        ENDIF
       ENDIF
 C
 C  Observation allocate and read    rgn 5/4/2018 MOVED IN ORDER TO SKIP STEPS FOR OBS PACKAGES
@@ -1144,7 +1146,7 @@ C
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, DEBUG_less, MODFLOW
       USE PRMS_MODULE, ONLY: Timestep, Save_vars_to_file, GSFLOW_flag,
-     &    Print_debug, Model
+     &    Print_debug, Model, Gsf_unt
       USE GLOBAL, ONLY: IOUT, IUNIT, NIUNIT
       USE GWFNWTMODULE, ONLY:LINMETH
       IMPLICIT NONE
@@ -1243,6 +1245,14 @@ C
         IF ( Print_debug>DEBUG_less ) THEN
           PRINT 9003, 'MF iteration distribution:', Mfiter_cnt
           PRINT 9007, 'SZ computation distribution:', Iter_cnt
+        ENDIF
+        WRITE(Gsf_unt,9001) Timestep, Convfail_cnt, Iterations, Sziters,
+     &            FLOAT(Iterations)/FLOAT(Timestep),
+     &            FLOAT(Sziters)/FLOAT(Timestep), Max_iters, Max_sziters
+        IF ( Stopcount>0 ) WRITE(Gsf_unt,9005) Stopcount
+        IF ( Print_debug>DEBUG_less ) THEN
+          WRITE(Gsf_unt,9003) 'MF iteration distribution:', Mfiter_cnt
+          WRITE(Gsf_unt,9007) 'SZ computation distribution:', Iter_cnt
         ENDIF
       ENDIF
 

@@ -14,7 +14,7 @@
         DOUBLE PRECISION, PARAMETER :: dzero = 0.0d0
         INTEGER, SAVE, POINTER :: NWELLS, MXWELL, NWELVL, NPWEL, IPRWEL
         INTEGER, SAVE, POINTER :: IWELLCB, IRDPSI, NNPWEL, NAUXWELL
-        INTEGER, SAVE, POINTER :: IWELLCBU, ISFRCB, ICBSUP
+        INTEGER, SAVE, POINTER :: IWELLCBU, ISFRCB
         INTEGER, SAVE, POINTER :: IPONDCB, IPONDCBU  !DS
         INTEGER, SAVE, POINTER :: IRRWELLCB, IRRSFRCB, IRRPONDCB
         LOGICAL, SAVE, POINTER :: TSACTIVEGW, TSACTIVESW
@@ -178,7 +178,7 @@
       ALLOCATE (VBVLAG(4, 10), VBNMAG(10), MSUMAG)
       ALLOCATE (NWELLS, MXWELL, NWELVL, IWELLCB, ISFRCB, NAUXWELL)
       ALLOCATE (WELAUX(20))
-      ALLOCATE (IRRWELLCB, IRRSFRCB, IWELLCBU, ICBSUP)
+      ALLOCATE (IRRWELLCB, IRRSFRCB, IWELLCBU)
       ALLOCATE (IPONDCB, IPONDCBU, IRRPONDCB)
       ALLOCATE (PSIRAMP, IUNITRAMP, ACCEL, AGTOL, MAXAGITER)
       ALLOCATE (NUMTABWELL, MAXVALWELL, NPWEL, NNPWEL, IPRWEL)
@@ -234,7 +234,6 @@
       NWELVL = 0
       IWELLCB = 0
       IWELLCBU = 0
-      ICBSUP = 0
       IPONDCB = 0
       IPONDCBU = 0
       IRRPONDCB = 0
@@ -639,10 +638,8 @@
          case ('WELLCBC')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IWELLCBU, 
      +                  R, IOUT, IN)
-            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ICBSUP, 
-     +                  R, IOUT, IN)
             WRITE (IOUT, *)
-            WRITE (IOUT, 37) IWELLCBU, ICBSUP
+            WRITE (IOUT, 37) IWELLCBU
             WRITE (IOUT, *)
             !
             !5 - --- Option to output list for ponds
@@ -2807,7 +2804,7 @@
 !      DATA TEXT15/'    POND RETURN FLOW'/
       DATA TEXT7/'    SYSTEM LOSSES SW'/
       DATA TEXT8/'    SYSTEM LOSSES GW'/
-      DATA TEXT9/'           SUP WELLS'/
+      DATA TEXT9/'       AG WELLS'/
 !      DATA TEXT10/'CROP CONSUMPTION SW'/
 !      DATA TEXT11/'CROP CONSUMPTION GW'/
 !      DATA TEXT12/'CROP CONSUMPTION POND'/
@@ -2846,7 +2843,7 @@
       ! Budget output for wells
       IF (IWELLCB .LT. 0 .AND. ICBCFL .NE. 0) IBD1 = IOUT
       IF (IWELLCB .GT. 0 .AND. ICBCFL .NE. 0) IBD1 = IWELLCB
-      ! Unformatted cbc budget output for SUP wells
+      ! Unformatted cbc budget output for wells
       IF (IWELLCBU .GT. 0) IBD5 = ICBCFL
       ! Budeget output for segments
       IF (ISFRCB .LT. 0 .AND. ICBCFL .NE. 0) IBD2 = IOUT
@@ -2892,7 +2889,7 @@
       IF (IAUXSV .EQ. 0) NAUXWELL = 0
       !
       !2 - ----IF CELL - BY - CELL FLOWS WILL BE SAVED AS A LIST, WRITE HEADER.
-      IF (IBD5 .GT. 0) THEN
+      IF (IBD5 .EQ. 2) THEN
          CALL UBDSV4(KKSTP, KKPER, TEXT1, NAUXWELL, WELAUX, IWELLCBU,  
      +    NCOL,NROW, NLAY, NWELLS, IOUT, DELT, PERTIM, TOTIM, IBOUND)
       END IF
@@ -2972,6 +2969,11 @@
          !
          !11D-----FLOW RATE IS ALWAYS NEGATIVE(DISCHARGE) ADD IT TO RATOUT.
          RATOUT = RATOUT - QQ
+         !
+         !11E-----IF SAVING CELL - BY - CELL FLOWS IN A LIST, WRITE FLOW.
+         !
+         IF (IBD5 .EQ. 2) CALL UBDSVB(IWELLCBU, NCOL, NROW, IC, IR, IL, 
+     +                Q, WELL(:, L), NWELVL, NAUXWELL, 5, IBOUND, NLAY)
          !
          ! - -------COPY FLOW TO WELL LIST.
          WELL(NWELVL, L) = SNGL( QQ )
@@ -3088,41 +3090,10 @@
       !
       IF (iw1 .GT. 1) WRITE (IUNITRAMP, *)
       !
-      ! zero buff array
-      DO 60 IL = 1, NLAY
-      DO 60 IR = 1, NROW
-      DO 60 IC = 1, NCOL
-      BUFF(IC, IR, IL) = SZERO
-60    CONTINUE
-      !
-      ! set sup values to buff
-      DO L = 1, NWELLSTEMP
-        IL = INT( WELL(1, L) )
-        IR = INT( WELL(2, L) )
-        IC = INT( WELL(3, L) )
-        IF ( IBOUND(ic,ir,il) > 0 ) THEN
-          IF ( ICBSUP == 0 ) THEN
-            BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + WELL(4, L)
-          ELSE
-            DO I = 1, NUMSEGS(L)
-              J = DIVERSIONSEG(I, L)
-              BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + SUPSEG(J)
-            END DO
-          END IF
-        END IF
-      END DO
-      !
-      !14 - -----IF SUP PUMPING WILL BE SAVED AS A 3 - D ARRAY,
+      !14 - -----IF CELL - BY - CELL FLOWS WILL BE SAVED AS A 3 - D ARRAY,
       ! - ------CALL UBUDSV TO SAVE THEM.
-      IF (IBD5 .GT. 0) THEN
-        IF ( ICBSUP == 0 ) THEN
-          CALL UBUDSV(KKSTP,KKPER,TEXT1,IWELLCBU, 
-     +                             BUFF,NCOL,NROW,NLAY,IOUT)
-        ELSE 
-        CALL UBUDSV(KKSTP,KKPER,TEXT9,IWELLCBU, 
-     +                             BUFF,NCOL,NROW,NLAY,IOUT)
-        END IF       
-      END IF
+      IF (IBD5 .EQ. 1) CALL UBUDSV(KKSTP, KKPER, TEXT1, IWELLCBU, BUFF, 
+     +                             NCOL,NROW, NLAY, IOUT)
       !
       !15 - -----MOVE RATES, VOLUMES&LABELS INTO ARRAYS FOR PRINTING.
       RIN = RATIN
@@ -3133,7 +3104,7 @@
       VBVL(4, MSUM) = ROUT_SNGL
       VBVL(1, MSUM) = VBVL(1, MSUM) + RIN_SNGL*DELT
       VBVL(2, MSUM) = VBVL(2, MSUM) + ROUT_SNGL*DELT
-      VBNM(MSUM) = TEXT1
+      VBNM(MSUM) = TEXT9
       !
       !16 - -----INCREMENT BUDGET TERM COUNTER(MSUM) .
       MSUM = MSUM + 1
