@@ -33,7 +33,7 @@
      UNSATURATED ZONE =          -5388.24       UNSATURATED ZONE =          -5388.24
        SATURATED ZONE =          -9485.43         SATURATED ZONE =          -9485.43
 
- OVERALL BUDGET ERROR =             -2.56           BUDGET ERROR =             -2.56
+ OVERALL BUDGET ERROR =             -2.57           BUDGET ERROR =             -2.57
 
 
   PERCENT DISCREPANCY =             -0.01    PERCENT DISCREPANCY =             -0.01
@@ -291,4 +291,27 @@
   PERCENT DISCREPANCY =             -0.00    PERCENT DISCREPANCY =             -0.00
 
 
+
+ Number of time steps:      7;  Number of non-convergence:   0
+ MF iterations:            63;  SZ iterations:              63
+ Average MF iterations:  9.00;  Average SZ iterations:    9.00
+ Maximum MF iterations:     9;  Maximum SZ iterations:       9
+
+MF iteration distribution:      0    0    0    0    0    0    0    0    7    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+
+SZ computation distribution:    0    0    0    0    0    0    0    0    7    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
 

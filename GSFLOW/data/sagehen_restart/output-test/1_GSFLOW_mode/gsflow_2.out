@@ -117,7 +117,7 @@
      UNSATURATED ZONE =         -14365.28       UNSATURATED ZONE =          -4867.64
        SATURATED ZONE =         -24000.09         SATURATED ZONE =          -8057.93
 
- OVERALL BUDGET ERROR =             -4.21           BUDGET ERROR =             -1.42
+ OVERALL BUDGET ERROR =             -4.22           BUDGET ERROR =             -1.42
 
 
   PERCENT DISCREPANCY =             -0.00    PERCENT DISCREPANCY =             -0.00
@@ -152,7 +152,7 @@
    INFLOWS - OUTFLOWS =        -325174.22     INFLOWS - OUTFLOWS =         -90580.45
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        -325168.47         STORAGE CHANGE =         -90578.91
+ TOTAL STORAGE CHANGE =        -325168.46         STORAGE CHANGE =         -90578.91
        --------------                             --------------
          LAND SURFACE =        -121028.64           LAND SURFACE =         -25869.02
             SOIL ZONE =        -152626.35              SOIL ZONE =         -51561.79
@@ -278,7 +278,7 @@
    INFLOWS - OUTFLOWS =        -570052.17     INFLOWS - OUTFLOWS =         -76167.10
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        -570041.05         STORAGE CHANGE =         -76165.22
+ TOTAL STORAGE CHANGE =        -570041.05         STORAGE CHANGE =         -76165.23
        --------------                             --------------
          LAND SURFACE =        -194606.88           LAND SURFACE =         -24708.45
             SOIL ZONE =        -283670.43              SOIL ZONE =         -37950.40
@@ -291,4 +291,27 @@
   PERCENT DISCREPANCY =             -0.00    PERCENT DISCREPANCY =             -0.00
 
 
+
+ Number of time steps:      7;  Number of non-convergence:   0
+ MF iterations:            70;  SZ iterations:              70
+ Average MF iterations: 10.00;  Average SZ iterations:   10.00
+ Maximum MF iterations:    10;  Maximum SZ iterations:      10
+
+MF iteration distribution:      0    0    0    0    0    0    0    0    0    7
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+
+SZ computation distribution:    0    0    0    0    0    0    0    0    0    7
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
 

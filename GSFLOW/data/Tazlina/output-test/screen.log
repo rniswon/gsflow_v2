@@ -1,4 +1,4 @@
-====================================================================
+==========================================================================
 Command line: 
 ..\..\bin\gsflow  .\control\Tazlina.control
 
@@ -6,23 +6,25 @@ number of command line words: 2
 
 Executable: ..\..\bin\gsflow
 
+==========================================================================
 Control File: .\control\Tazlina.control
-====================================================================
  WARNING, control parameter not used: mbInit_flag, ignored
-====================================================================
+==========================================================================
 
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.0 12/20/2022
+                         Version: 2.3.0 01/25/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  WARNING, control parameter not in Control File: mbInit_flag, set to 0
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:31:16
+
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 12/20/2022
+                       Version 5.3.0 01/25/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -65,12 +67,12 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-12-20
+PRMS Computation Order          gsflow_prms         2023-01-25
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
-Basin Definition                basin               2022-09-20
-Common States and Fluxes        climateflow         2022-12-06
+Basin Definition                basin               2023-01-11
+Common States and Fluxes        climateflow         2023-01-11
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
@@ -87,27 +89,30 @@ Glacier Dynamics                glacr_melt          2022-09-07
  Also declared by module: glacr_melt
  Model uses values based on first declare
 Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2022-12-19
+Soilzone Computations           soilzone            2023-01-25
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing Init         routing             2022-09-07
 Streamflow Routing              muskingum           2021-11-19
 Output Summary                  basin_sum           2022-09-01
 Statistics Variables Output     statvar_out         2021-09-08
-Output Summary                  prms_summary        2022-10-26
-Values for parameter: poi_type are ignored as the parameter is not used
-Values for parameter: stage_coef are ignored as the parameter is not used
-Values for parameter: soil_moist_init are ignored as the parameter is not used
-Values for parameter: net_mbc_zero are ignored as the parameter is not used
-Values for parameter: stage_exp are ignored as the parameter is not used
-Values for parameter: net_ard_zero are ignored as the parameter is not used
-Values for parameter: snowfld_frac_init are ignored as the parameter is not used
+Output Summary                  prms_summary        2023-01-26
+WARNING, parameter: poi_type is ignored as it is not used
+WARNING, parameter: stage_coef is ignored as it is not used
+WARNING, parameter: soil_moist_init is ignored as it is not used
+WARNING, parameter: net_mbc_zero is ignored as it is not used
+WARNING, parameter: stage_exp is ignored as it is not used
+WARNING, parameter: net_ard_zero is ignored as it is not used
+WARNING, parameter: snowfld_frac_init is ignored as it is not used
 ==============================================================
 
 Using Control File: .\control\Tazlina.control
 
+
 Using Parameter File: ./input/Tazlina.par
 
+
 Writing PRMS Water Budget File: ./output/Tazlina.out
+
 WARNING, HRU: 1 soil_rechr_init > soil_moist_init,   1.32662   0.00000
          soil_rechr set to soil_moist based on init and max values
 WARNING, HRU: 2 soil_rechr_init > soil_moist_init,   1.32662   0.00000
@@ -464,19 +469,26 @@ WARNING, HRU: 177 soil_rechr_init > soil_moist_init,   1.32662   0.00000
          soil_rechr set to soil_moist based on init and max values
 WARNING, HRU: 178 soil_rechr_init > soil_moist_init,   1.32662   0.00000
          soil_rechr set to soil_moist based on init and max values
+ WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
+  
+ WARNING, parameter: soil_moist_init_frac is not specified
+          Set to default value:  0.0000000E+00
+ WARNING, parameter: pref_flow_infil_frac is not specified
+          Set to default value:  -1.000000    
+ WARNING, parameter: poi_gage_id is not specified
 
 Simulation time period: 1950/10/01 - 2015/09/30
 
-====================================================================
+==========================================================================
 
 
                           ===========================
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2022/12/19 20:22:48
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:31:16
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2022/12/19 20:22:54
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:31:24
 
-Execution elapsed time    0 minutes  6.42 seconds
+Execution elapsed time    0 minutes  8.07 seconds
 

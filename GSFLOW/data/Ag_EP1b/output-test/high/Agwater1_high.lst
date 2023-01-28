@@ -1314,7 +1314,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.8475
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =      992278.0000                  TOTAL IN =          11.4847
 
@@ -1327,7 +1327,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =      992277.8750                 TOTAL OUT =          11.4847
 
@@ -1962,7 +1962,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =    33653072.0000                  TOTAL IN =          12.3360
 
@@ -1975,7 +1975,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =    33653792.0000                 TOTAL OUT =          12.3362
 
@@ -2610,7 +2610,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =    68182448.0000                  TOTAL IN =          14.1525
 
@@ -2623,7 +2623,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =         620.0454                 GW ET     =       9.2745E-04
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =    68184784.0000                 TOTAL OUT =          14.1539
 
@@ -3258,7 +3258,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   105593832.0000                  TOTAL IN =          14.3228
 
@@ -3271,7 +3271,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =        9869.2041                 GW ET     =       4.4240E-03
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =   105598992.0000                 TOTAL OUT =          14.3232
 
@@ -3534,7 +3534,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   107286264.0000                  TOTAL IN =          19.3053
 
@@ -3547,7 +3547,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =       38340.7969                 GW ET     =           0.3248
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =      326212.1562             AG WELLS      =           3.7211
+               AG WELLS  =      326212.1562                 AG WELLS  =           3.7211
 
                TOTAL OUT =   107291424.0000                 TOTAL OUT =          19.3053
 
@@ -3750,7 +3750,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     2 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   108951616.0000                  TOTAL IN =          18.9964
 
@@ -3763,7 +3763,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     2 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =       63605.7500                 GW ET     =           0.2882
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =      652332.1250             AG WELLS      =           3.7200
+               AG WELLS  =      652332.1250                 AG WELLS  =           3.7200
 
                TOTAL OUT =   108956776.0000                 TOTAL OUT =          18.9964
 
@@ -3965,7 +3965,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     3 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   110593008.0000                  TOTAL IN =          18.7231
 
@@ -3978,7 +3978,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     3 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =       86004.6016                 GW ET     =           0.2555
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =      978452.1250             AG WELLS      =           3.7200
+               AG WELLS  =      978452.1250                 AG WELLS  =           3.7200
 
                TOTAL OUT =   110598040.0000                 TOTAL OUT =          18.7216
 
@@ -4180,7 +4180,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     4 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   112212328.0000                  TOTAL IN =          18.4714
 
@@ -4193,7 +4193,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     4 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =      105841.6641                 GW ET     =           0.2263
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =     1304572.1250             AG WELLS      =           3.7200
+               AG WELLS  =     1304572.1250                 AG WELLS  =           3.7200
 
                TOTAL OUT =   112217216.0000                 TOTAL OUT =          18.4699
 
@@ -4409,7 +4409,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     6 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   115395264.0000                  TOTAL IN =          18.0551
 
@@ -4422,7 +4422,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     6 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =      138885.9219                 GW ET     =           0.1768
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =     1956812.1250             AG WELLS      =           3.7200
+               AG WELLS  =     1956812.1250                 AG WELLS  =           3.7200
 
                TOTAL OUT =   115399904.0000                 TOTAL OUT =          18.0537
 
@@ -4624,7 +4624,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     7 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   116962280.0000                  TOTAL IN =          17.8747
 
@@ -4637,7 +4637,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     7 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =      152550.5312                 GW ET     =           0.1559
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =     2282932.0000             AG WELLS      =           3.7200
+               AG WELLS  =     2282932.0000                 AG WELLS  =           3.7200
 
                TOTAL OUT =   116966800.0000                 TOTAL OUT =          17.8733
 
@@ -4839,7 +4839,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     8 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   118514776.0000                  TOTAL IN =          17.7092
 
@@ -4852,7 +4852,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     8 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =      164574.2812                 GW ET     =           0.1372
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =     2609052.0000             AG WELLS      =           3.7200
+               AG WELLS  =     2609052.0000                 AG WELLS  =           3.7200
 
                TOTAL OUT =   118519184.0000                 TOTAL OUT =          17.7079
 
@@ -5054,7 +5054,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     9 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   120053960.0000                  TOTAL IN =          17.5572
 
@@ -5067,7 +5067,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     9 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =      175128.7500                 GW ET     =           0.1204
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =     2935172.0000             AG WELLS      =           3.7200
+               AG WELLS  =     2935172.0000                 AG WELLS  =           3.7200
 
                TOTAL OUT =   120058256.0000                 TOTAL OUT =          17.5559
 
@@ -5269,7 +5269,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   121581128.0000                  TOTAL IN =          17.4201
 
@@ -5282,7 +5282,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =      184367.0000                 GW ET     =           0.1054
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =     3261292.0000             AG WELLS      =           3.7200
+               AG WELLS  =     3261292.0000                 AG WELLS  =           3.7200
 
                TOTAL OUT =   121585296.0000                 TOTAL OUT =          17.4188
 
@@ -5718,7 +5718,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   150788048.0000                  TOTAL IN =          17.8103
 
@@ -5731,7 +5731,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =      238934.1719                 GW ET     =       5.5732E-02
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =     9783692.0000             AG WELLS      =           3.7200
+               AG WELLS  =     9783692.0000                 AG WELLS  =           3.7200
 
                TOTAL OUT =   150790512.0000                 TOTAL OUT =          17.8102
 
@@ -6396,7 +6396,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   206738912.0000                  TOTAL IN =          21.0902
 
@@ -6409,7 +6409,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =     2045195.1250                 GW ET     =           0.8429
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =    29429858.0000             AG WELLS      =           7.4700
+               AG WELLS  =    29429858.0000                 AG WELLS  =           7.4700
 
                TOTAL OUT =   206741360.0000                 TOTAL OUT =          21.0903
 
@@ -6732,7 +6732,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   222998832.0000                  TOTAL IN =          36.5743
 
@@ -6745,7 +6745,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =     2913454.0000                 GW ET     =           1.7249
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =    39279432.0000             AG WELLS      =          22.4700
+               AG WELLS  =    39279432.0000                 AG WELLS  =          22.4700
 
                TOTAL OUT =   223001344.0000                 TOTAL OUT =          36.5744
 
@@ -7008,7 +7008,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   238847152.0000                  TOTAL IN =          35.9542
 
@@ -7021,7 +7021,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =     3586412.5000                 GW ET     =           1.4476
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =    49128792.0000             AG WELLS      =          22.4700
+               AG WELLS  =    49128792.0000                 AG WELLS  =          22.4700
 
                TOTAL OUT =   238849664.0000                 TOTAL OUT =          35.9543
 
@@ -7284,7 +7284,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   254529824.0000                  TOTAL IN =          35.6855
 
@@ -7297,7 +7297,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =     4192415.0000                 GW ET     =           1.3524
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =    58978152.0000             AG WELLS      =          22.4700
+               AG WELLS  =    58978152.0000                 AG WELLS  =          22.4700
 
                TOTAL OUT =   254532352.0000                 TOTAL OUT =          35.6856
 
@@ -7677,7 +7677,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   301228672.0000                  TOTAL IN =          35.6296
 
@@ -7690,7 +7690,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =     5920915.5000                 GW ET     =           1.2785
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =    88526232.0000             AG WELLS      =          22.4700
+               AG WELLS  =    88526232.0000                 AG WELLS  =          22.4700
 
                TOTAL OUT =   301231392.0000                 TOTAL OUT =          35.6297
 
@@ -7953,7 +7953,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   308192096.0000                  TOTAL IN =          79.4308
 
@@ -7966,7 +7966,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =     6169000.5000                 GW ET     =           2.8299
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =    94206992.0000             AG WELLS      =          64.7995
+               AG WELLS  =    94206992.0000                 AG WELLS  =          64.7995
 
                TOTAL OUT =   308194816.0000                 TOTAL OUT =          79.4308
 
@@ -8214,7 +8214,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   335703328.0000                  TOTAL IN =          78.0906
 
@@ -8227,7 +8227,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =     6904299.5000                 GW ET     =           1.8361
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   116930032.0000             AG WELLS      =          64.7995
+               AG WELLS  =   116930032.0000                 AG WELLS  =          64.7995
 
                TOTAL OUT =   335706048.0000                 TOTAL OUT =          78.0906
 
@@ -8490,7 +8490,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   369801088.0000                  TOTAL IN =          77.6608
 
@@ -8503,7 +8503,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =     7629711.5000                 GW ET     =           1.5908
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   145333824.0000             AG WELLS      =          64.7995
+               AG WELLS  =   145333824.0000                 AG WELLS  =          64.7995
 
                TOTAL OUT =   369803776.0000                 TOTAL OUT =          77.6607
 
@@ -8766,7 +8766,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   403796992.0000                  TOTAL IN =          77.5019
 
@@ -8779,7 +8779,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =     8313711.5000                 GW ET     =           1.5490
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   173737584.0000             AG WELLS      =          64.7995
+               AG WELLS  =   173737584.0000                 AG WELLS  =          64.7995
 
                TOTAL OUT =   403799552.0000                 TOTAL OUT =          77.5018
 
@@ -9159,7 +9159,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   505524864.0000                  TOTAL IN =          77.2658
 
@@ -9172,7 +9172,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    10335196.0000                 GW ET     =           1.5319
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   258948864.0000             AG WELLS      =          64.7995
+               AG WELLS  =   258948864.0000                 AG WELLS  =          64.7995
 
                TOTAL OUT =   505526912.0000                 TOTAL OUT =          77.2654
 
@@ -9837,7 +9837,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =       73223.9531          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   666115584.0000                  TOTAL IN =          60.8206
 
@@ -9850,7 +9850,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    13020404.0000                 GW ET     =           0.9813
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   387082048.0000             AG WELLS      =          48.7200
+               AG WELLS  =   387082048.0000                 AG WELLS  =          48.7200
 
                TOTAL OUT =   666117632.0000                 TOTAL OUT =          60.8207
 
@@ -10518,7 +10518,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =     3967021.7500          UZF RECHARGE     =           6.3718
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   766655040.0000                  TOTAL IN =          37.8527
 
@@ -10531,7 +10531,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    13738450.0000                 GW ET     =           0.2643
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   416590528.0000             AG WELLS      =          11.2200
+               AG WELLS  =   416590528.0000                 AG WELLS  =          11.2200
 
                TOTAL OUT =   766657024.0000                 TOTAL OUT =          37.8528
 
@@ -11211,7 +11211,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    22505086.0000          UZF RECHARGE     =           1.4508
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   856076096.0000                  TOTAL IN =          25.6589
 
@@ -11224,7 +11224,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    13761449.0000                 GW ET     =       3.9797E-03
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   416590528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   416590528.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =   856077824.0000                 TOTAL OUT =          25.6589
 
@@ -11890,7 +11890,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    22887538.0000          UZF RECHARGE     =       3.2393E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   915862400.0000                  TOTAL IN =          21.0427
 
@@ -11903,7 +11903,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    13761509.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   416590528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   416590528.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =   915864192.0000                 TOTAL OUT =          21.0427
 
@@ -12568,7 +12568,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    22888262.0000          UZF RECHARGE     =       2.3521E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =   968167872.0000                  TOTAL IN =          18.8845
 
@@ -12581,7 +12581,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    13761509.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   416590528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   416590528.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =   968169728.0000                 TOTAL OUT =          18.8845
 
@@ -13238,7 +13238,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    22888796.0000          UZF RECHARGE     =       1.7668E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1016001472.0000                  TOTAL IN =          17.4682
 
@@ -13251,7 +13251,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    13761509.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   416590528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   416590528.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  1016003584.0000                 TOTAL OUT =          17.4683
 
@@ -13887,7 +13887,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    22889202.0000          UZF RECHARGE     =       1.3709E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1060543104.0000                  TOTAL IN =          18.3117
 
@@ -13900,7 +13900,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    13761509.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   416590528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   416590528.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  1060545536.0000                 TOTAL OUT =          18.3116
 
@@ -14541,7 +14541,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    22889528.0000          UZF RECHARGE     =       1.1301E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1106516224.0000                  TOTAL IN =          16.9761
 
@@ -14554,7 +14554,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    13771033.0000                 GW ET     =       5.4282E-03
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   416590528.0000             AG WELLS      =           0.0000
+               AG WELLS  =   416590528.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  1106521856.0000                 TOTAL OUT =          16.9771
 
@@ -15189,7 +15189,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    22889528.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1152464768.0000                  TOTAL IN =          16.9154
 
@@ -15202,7 +15202,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    14561342.0000                 GW ET     =           0.2481
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   426373888.0000             AG WELLS      =           3.7200
+               AG WELLS  =   426373888.0000                 AG WELLS  =           3.7200
 
                TOTAL OUT =  1152469504.0000                 TOTAL OUT =          16.9149
 
@@ -15837,7 +15837,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    22889528.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1203808640.0000                  TOTAL IN =          18.8662
 
@@ -15850,7 +15850,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    15414227.0000                 GW ET     =           0.2737
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   446020288.0000             AG WELLS      =           7.4700
+               AG WELLS  =   446020288.0000                 AG WELLS  =           7.4700
 
                TOTAL OUT =  1203809664.0000                 TOTAL OUT =          18.8648
 
@@ -16113,7 +16113,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
         UZF RECHARGE     =    22889528.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1206836992.0000                  TOTAL IN =          34.5431
 
@@ -16126,7 +16126,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    15479250.0000                 GW ET     =           0.7417
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   447990144.0000             AG WELLS      =          22.4700
+               AG WELLS  =   447990144.0000                 AG WELLS  =          22.4700
 
                TOTAL OUT =  1206838016.0000                 TOTAL OUT =          34.5432
 
@@ -16716,7 +16716,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    22889528.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1292865024.0000                  TOTAL IN =          33.8535
 
@@ -16729,7 +16729,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    16571367.0000                 GW ET     =           0.3449
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   505115968.0000             AG WELLS      =          22.4700
+               AG WELLS  =   505115968.0000                 AG WELLS  =          22.4700
 
                TOTAL OUT =  1292865792.0000                 TOTAL OUT =          33.8536
 
@@ -16995,7 +16995,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
         UZF RECHARGE     =    22889528.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1299575296.0000                  TOTAL IN =          76.5435
 
@@ -17008,7 +17008,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    16637137.0000                 GW ET     =           0.7502
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   510796736.0000             AG WELLS      =          64.7995
+               AG WELLS  =   510796736.0000                 AG WELLS  =          64.7995
 
                TOTAL OUT =  1299575936.0000                 TOTAL OUT =          76.5408
 
@@ -17598,7 +17598,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    22889528.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1492872192.0000                  TOTAL IN =          76.4830
 
@@ -17611,7 +17611,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17612102.0000                 GW ET     =           0.2347
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   675539008.0000             AG WELLS      =          64.7995
+               AG WELLS  =   675539008.0000                 AG WELLS  =          64.7995
 
                TOTAL OUT =  1492872320.0000                 TOTAL OUT =          76.4826
 
@@ -18276,7 +18276,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    22889528.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1650909312.0000                  TOTAL IN =          59.8424
 
@@ -18289,7 +18289,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   803672128.0000             AG WELLS      =          48.7200
+               AG WELLS  =   803672128.0000                 AG WELLS  =          48.7200
 
                TOTAL OUT =  1650909440.0000                 TOTAL OUT =          59.8426
 
@@ -18955,7 +18955,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    25301200.0000          UZF RECHARGE     =           4.3512
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1750453632.0000                  TOTAL IN =          36.1624
 
@@ -18968,7 +18968,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   833180608.0000             AG WELLS      =          11.2200
+               AG WELLS  =   833180608.0000                 AG WELLS  =          11.2200
 
                TOTAL OUT =  1750453760.0000                 TOTAL OUT =          36.1624
 
@@ -19650,7 +19650,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    45006384.0000          UZF RECHARGE     =           2.9012
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1842250752.0000                  TOTAL IN =          27.7146
 
@@ -19663,7 +19663,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   833180608.0000             AG WELLS      =           0.0000
+               AG WELLS  =   833180608.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  1842250752.0000                 TOTAL OUT =          27.7146
 
@@ -20330,7 +20330,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    45770348.0000          UZF RECHARGE     =       3.4926E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1903604096.0000                  TOTAL IN =          21.5885
 
@@ -20343,7 +20343,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   833180608.0000             AG WELLS      =           0.0000
+               AG WELLS  =   833180608.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  1903603968.0000                 TOTAL OUT =          21.5885
 
@@ -21008,7 +21008,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    45771136.0000          UZF RECHARGE     =       2.5972E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  1957462656.0000                  TOTAL IN =          19.6138
 
@@ -21021,7 +21021,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   833180608.0000             AG WELLS      =           0.0000
+               AG WELLS  =   833180608.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  1957462528.0000                 TOTAL OUT =          19.6138
 
@@ -21686,7 +21686,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    45771732.0000          UZF RECHARGE     =       1.9945E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  2006881536.0000                  TOTAL IN =          18.1531
 
@@ -21699,7 +21699,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   833180608.0000             AG WELLS      =           0.0000
+               AG WELLS  =   833180608.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  2006881280.0000                 TOTAL OUT =          18.1531
 
@@ -22337,7 +22337,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    45772204.0000          UZF RECHARGE     =       1.5784E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  2053201024.0000                  TOTAL IN =          17.1403
 
@@ -22350,7 +22350,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   833180608.0000             AG WELLS      =           0.0000
+               AG WELLS  =   833180608.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  2053202176.0000                 TOTAL OUT =          17.1407
 
@@ -22985,7 +22985,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    45772564.0000          UZF RECHARGE     =       1.2823E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  2097161216.0000                  TOTAL IN =          16.3527
 
@@ -22998,7 +22998,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   833180608.0000             AG WELLS      =           0.0000
+               AG WELLS  =   833180608.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  2097163008.0000                 TOTAL OUT =          16.3532
 
@@ -23633,7 +23633,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    45772564.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  2140848000.0000                  TOTAL IN =          15.9899
 
@@ -23646,7 +23646,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   842964928.0000             AG WELLS      =           3.7200
+               AG WELLS  =   842964928.0000                 AG WELLS  =           3.7200
 
                TOTAL OUT =  2140849152.0000                 TOTAL OUT =          15.9894
 
@@ -24281,7 +24281,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    45772564.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  2190124032.0000                  TOTAL IN =          18.2185
 
@@ -24294,7 +24294,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   862610368.0000             AG WELLS      =           7.4700
+               AG WELLS  =   862610368.0000                 AG WELLS  =           7.4700
 
                TOTAL OUT =  2190120192.0000                 TOTAL OUT =          18.2169
 
@@ -24959,7 +24959,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    45772564.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  2276717056.0000                  TOTAL IN =          32.8576
 
@@ -24972,7 +24972,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =   921706048.0000             AG WELLS      =          22.4700
+               AG WELLS  =   921706048.0000                 AG WELLS  =          22.4700
 
                TOTAL OUT =  2276713216.0000                 TOTAL OUT =          32.8576
 
@@ -25635,7 +25635,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    45772564.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  2474423296.0000                  TOTAL IN =          75.1604
 
@@ -25648,7 +25648,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1092129024.0000             AG WELLS      =          64.7995
+               AG WELLS  =  1092129024.0000                 AG WELLS  =          64.7995
 
                TOTAL OUT =  2474418688.0000                 TOTAL OUT =          75.1600
 
@@ -26313,7 +26313,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    45772564.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  2629764352.0000                  TOTAL IN =          59.0489
 
@@ -26326,7 +26326,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1220262144.0000             AG WELLS      =          48.7200
+               AG WELLS  =  1220262144.0000                 AG WELLS  =          48.7200
 
                TOTAL OUT =  2629759488.0000                 TOTAL OUT =          59.0491
 
@@ -26993,7 +26993,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    47422856.0000          UZF RECHARGE     =           2.8847
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  2726301440.0000                  TOTAL IN =          34.1588
 
@@ -27006,7 +27006,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1249772544.0000             AG WELLS      =          11.2200
+               AG WELLS  =  1249772544.0000                 AG WELLS  =          11.2200
 
                TOTAL OUT =  2726298624.0000                 TOTAL OUT =          34.1588
 
@@ -27691,7 +27691,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    67381056.0000          UZF RECHARGE     =           4.3515
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  2817466112.0000                  TOTAL IN =          28.9407
 
@@ -27704,7 +27704,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1249772544.0000             AG WELLS      =           0.0000
+               AG WELLS  =  1249772544.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  2817462272.0000                 TOTAL OUT =          28.9407
 
@@ -28371,7 +28371,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    68653616.0000          UZF RECHARGE     =       3.5659E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  2878706688.0000                  TOTAL IN =          21.4074
 
@@ -28384,7 +28384,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1249772544.0000             AG WELLS      =           0.0000
+               AG WELLS  =  1249772544.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  2878703104.0000                 TOTAL OUT =          21.4074
 
@@ -29049,7 +29049,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    68654424.0000          UZF RECHARGE     =       2.6837E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  2932184064.0000                  TOTAL IN =          19.4569
 
@@ -29062,7 +29062,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1249772544.0000             AG WELLS      =           0.0000
+               AG WELLS  =  1249772544.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  2932180992.0000                 TOTAL OUT =          19.4569
 
@@ -29727,7 +29727,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    68655048.0000          UZF RECHARGE     =       2.0846E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  2981577984.0000                  TOTAL IN =          18.2158
 
@@ -29740,7 +29740,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1249772544.0000             AG WELLS      =           0.0000
+               AG WELLS  =  1249772544.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  2981574144.0000                 TOTAL OUT =          18.2158
 
@@ -30383,7 +30383,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    68655528.0000          UZF RECHARGE     =       1.6691E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  3028139008.0000                  TOTAL IN =          17.2625
 
@@ -30396,7 +30396,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1249772544.0000             AG WELLS      =           0.0000
+               AG WELLS  =  1249772544.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  3028136192.0000                 TOTAL OUT =          17.2632
 
@@ -31031,7 +31031,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    68656008.0000          UZF RECHARGE     =       1.3720E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  3072508928.0000                  TOTAL IN =          16.5412
 
@@ -31044,7 +31044,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1249772544.0000             AG WELLS      =           0.0000
+               AG WELLS  =  1249772544.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  3072507648.0000                 TOTAL OUT =          16.5420
 
@@ -31679,7 +31679,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    68656008.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  3116302336.0000                  TOTAL IN =          16.0626
 
@@ -31692,7 +31692,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1259556864.0000             AG WELLS      =           3.7200
+               AG WELLS  =  1259556864.0000                 AG WELLS  =           3.7200
 
                TOTAL OUT =  3116300288.0000                 TOTAL OUT =          16.0623
 
@@ -32327,7 +32327,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    68656008.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  3165459456.0000                  TOTAL IN =          18.0719
 
@@ -32340,7 +32340,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1279202304.0000             AG WELLS      =           7.4700
+               AG WELLS  =  1279202304.0000                 AG WELLS  =           7.4700
 
                TOTAL OUT =  3165453824.0000                 TOTAL OUT =          18.0705
 
@@ -33005,7 +33005,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    68656008.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  3251001856.0000                  TOTAL IN =          32.3120
 
@@ -33018,7 +33018,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1338299904.0000             AG WELLS      =          22.4700
+               AG WELLS  =  1338299904.0000                 AG WELLS  =          22.4700
 
                TOTAL OUT =  3250997248.0000                 TOTAL OUT =          32.3120
 
@@ -33681,7 +33681,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    68656008.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  3447269888.0000                  TOTAL IN =          74.6198
 
@@ -33694,7 +33694,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1508722944.0000             AG WELLS      =          64.7995
+               AG WELLS  =  1508722944.0000                 AG WELLS  =          64.7995
 
                TOTAL OUT =  3447264768.0000                 TOTAL OUT =          74.6194
 
@@ -34359,7 +34359,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    68656008.0000          UZF RECHARGE     =           0.0000
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  3601206272.0000                  TOTAL IN =          58.5212
 
@@ -34372,7 +34372,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1636856064.0000             AG WELLS      =          48.7200
+               AG WELLS  =  1636856064.0000                 AG WELLS  =          48.7200
 
                TOTAL OUT =  3601201152.0000                 TOTAL OUT =          58.5213
 
@@ -35037,7 +35037,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    69926304.0000          UZF RECHARGE     =           1.4504
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  3696434432.0000                  TOTAL IN =          32.4368
 
@@ -35050,7 +35050,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1666366464.0000             AG WELLS      =          11.2200
+               AG WELLS  =  1666366464.0000                 AG WELLS  =          11.2200
 
                TOTAL OUT =  3696430592.0000                 TOTAL OUT =          32.4368
 
@@ -35735,7 +35735,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    89501816.0000          UZF RECHARGE     =           4.3515
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  3786856448.0000                  TOTAL IN =          28.8296
 
@@ -35748,7 +35748,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1666366464.0000             AG WELLS      =           0.0000
+               AG WELLS  =  1666366464.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  3786852864.0000                 TOTAL OUT =          28.8296
 
@@ -36414,7 +36414,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    91537256.0000          UZF RECHARGE     =       3.6161E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  3848553472.0000                  TOTAL IN =          21.3133
 
@@ -36427,7 +36427,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1666366464.0000             AG WELLS      =           0.0000
+               AG WELLS  =  1666366464.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  3848551168.0000                 TOTAL OUT =          21.3133
 
@@ -37092,7 +37092,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =    91538080.0000          UZF RECHARGE     =       2.7433E-04
                GW ET     =           0.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =           0.0000             AG WELLS      =           0.0000
+               AG WELLS  =           0.0000                 AG WELLS  =           0.0000
 
                 TOTAL IN =  3901882112.0000                  TOTAL IN =          19.4529
 
@@ -37105,7 +37105,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
         UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
                GW ET     =    17655448.0000                 GW ET     =           0.0000
      SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
-           AG WELLS      =  1666366464.0000             AG WELLS      =           0.0000
+               AG WELLS  =  1666366464.0000                 AG WELLS  =           0.0000
 
                TOTAL OUT =  3901878528.0000                 TOTAL OUT =          19.4529
 
@@ -37127,6 +37127,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/19 20:13:43
- Elapsed run time: 2.996 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/01/27 19:11:17
+ Elapsed run time: 3.094 Seconds
 

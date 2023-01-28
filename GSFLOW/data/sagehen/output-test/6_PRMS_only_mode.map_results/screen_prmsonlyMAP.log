@@ -1,4 +1,4 @@
-====================================================================
+==========================================================================
 Command line: 
 ..\..\..\bin\gsflow  .\prms_map_results.control
 
@@ -6,21 +6,23 @@ number of command line words: 2
 
 Executable: ..\..\..\bin\gsflow
 
+==========================================================================
 Control File: .\prms_map_results.control
-====================================================================
-====================================================================
+==========================================================================
 
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.0 12/20/2022
+                         Version: 2.3.0 01/25/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:33:42
+
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 12/20/2022
+                       Version 5.3.0 01/25/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -63,13 +65,13 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-12-20
+PRMS Computation Order          gsflow_prms         2023-01-25
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
-Basin Definition                basin               2022-09-20
+Basin Definition                basin               2023-01-11
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-12-06
+Common States and Fluxes        climateflow         2023-01-11
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
@@ -81,7 +83,7 @@ Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
 Snow Dynamics                   snowcomp            2022-09-07
 Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2022-12-19
+Soilzone Computations           soilzone            2023-01-25
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing              strmflow            2021-11-19
 Output Summary                  basin_sum           2022-09-01
@@ -93,27 +95,34 @@ Output Summary                  nsub_summary        2022-09-07
  Also declared by module: nsub_summary
  Model uses values based on first declare
 Statistics Variables Output     statvar_out         2021-09-08
-Values for parameter: gvr_hru_pct are ignored as the parameter is not used
+WARNING, parameter: gvr_hru_pct is ignored as it is not used
 ==============================================================
 
 Using Control File: .\prms_map_results.control
 
+
 Using Parameter File: ..\input\prms\prms.params
+
 
 Writing PRMS Water Budget File: ..\output\prms\sagehen_prms_map.out
 
+ WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
+  
+ WARNING, parameter: pref_flow_infil_frac is not specified
+          Set to default value:  -1.000000    
+
 Simulation time period: 1980/10/01 - 1996/09/30
 
-====================================================================
+==========================================================================
 
 
                           ===========================
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2022/12/19 20:30:48
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:33:42
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2022/12/19 20:30:49
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:33:43
 
-Execution elapsed time    0 minutes  1.18 seconds
+Execution elapsed time    0 minutes  1.44 seconds
 

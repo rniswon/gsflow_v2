@@ -292,3 +292,26 @@
 
 
 
+ Number of time steps:      7;  Number of non-convergence:   0
+ MF iterations:            56;  SZ iterations:              56
+ Average MF iterations:  8.00;  Average SZ iterations:    8.00
+ Maximum MF iterations:     8;  Maximum SZ iterations:       8
+
+MF iteration distribution:      0    0    0    0    0    0    0    7    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+
+SZ computation distribution:    0    0    0    0    0    0    0    7    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+

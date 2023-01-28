@@ -1,4 +1,4 @@
-====================================================================
+==========================================================================
 Command line: 
 ..\..\bin\gsflow.exe  .\gsflow_modflow_1a.control
 
@@ -6,32 +6,34 @@ number of command line words: 2
 
 Executable: ..\..\bin\gsflow.exe
 
+==========================================================================
 Control File: .\gsflow_modflow_1a.control
-====================================================================
-====================================================================
+==========================================================================
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
                          WITH NEWTON FORMULATION
-                         Version 1.3.0 06/01/202
+                         Version 1.3.0 06/01/2022
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
- Run start date and time (yyyy/mm/dd hh:mm:ss): 2022/12/19 20:15:35
+ Run start date and time (yyyy/mm/dd hh:mm:ss): 2023/01/27 19:23:09
 
 GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
-====================================================================
+==============================================================
 MODFLOW Packages
-====================================================================
+==============================================================
 UZF-NWT Package                 gwf2uzf1_NWT        2022-10-18
 SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
+==============================================================
+
   
 
 Steady state simulation successful, used 6 iterations
   
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/19 20:15:35
- Elapsed run time: 0.028 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/01/27 19:23:09
+ Elapsed run time: 0.038 Seconds
 
  Normal termination of simulation
 

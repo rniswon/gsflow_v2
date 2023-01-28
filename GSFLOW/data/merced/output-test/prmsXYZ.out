@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 12/20/2022
+                       Version 5.3.0 01/25/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -38,16 +38,16 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-12-20
+PRMS Computation Order          gsflow_prms         2023-01-25
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 
 
-====================================================================
+==========================================================================
 Using PRMS Data File: ./input/mercd.data
 Title: Created by Downsizer
-====================================================================
+==========================================================================
 Comment lines:
 ////////////////////////////////////////////////////////////
 // Station metadata (listed in the same order as the data):
@@ -134,18 +134,18 @@ Comment lines:
 ////////////////////////////////////////////////////////////
 // Unit: temperature = fahrenheit, precipitation = in per day, runoff = ft3 per
 ////////////////////////////////////////////////////////////
-====================================================================
+==========================================================================
 measured variables
 tmax 26
 tmin 26
 precip 26
 runoff 1
-====================================================================
+==========================================================================
  Data File time period: 1993/10/01 00:00:00 to 1995/09/30 00:00:00
 Simulation time period: 1993/10/01 00:00:00 to 1995/09/30 00:00:00
-====================================================================
-Basin Definition                basin               2022-09-20
-Common States and Fluxes        climateflow         2022-12-06
+==========================================================================
+Basin Definition                basin               2023-01-11
+Common States and Fluxes        climateflow         2023-01-11
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
@@ -156,17 +156,19 @@ Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
 Snow Dynamics                   snowcomp            2022-09-07
 Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2022-12-19
+Soilzone Computations           soilzone            2023-01-25
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing              strmflow            2021-11-19
 Output Summary                  basin_sum           2022-09-01
 Statistics Variables Output     statvar_out         2021-09-08
-Output Summary                  prms_summary        2022-10-26
+Output Summary                  prms_summary        2023-01-26
 ==============================================================
 
 Using Control File: .\control\mercdXYZ.control
 
+
 Using Parameter File: ./input/mercdXYZ.param
+
 
 
 Start time: 1993/10/01 00:00:00
@@ -186,5 +188,5 @@ Fraction impervious:        0.0001    Fraction pervious:       0.9999
  *************************************************************
  Total for run     119.830   53.742    6.791   63.263   67.341
  *************************************************************
-Execution elapsed time    0 minutes  0.18 seconds
+Execution elapsed time    0 minutes  0.24 seconds
 

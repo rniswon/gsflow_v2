@@ -1,4 +1,4 @@
-====================================================================
+==========================================================================
 Command line: 
 ..\..\..\bin\gsflow.exe  .\gsflow_gsflow_LowTrig.control
 
@@ -6,27 +6,29 @@ number of command line words: 2
 
 Executable: ..\..\..\bin\gsflow.exe
 
+==========================================================================
 Control File: .\gsflow_gsflow_LowTrig.control
-====================================================================
-====================================================================
+==========================================================================
 
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.0 12/20/2022
+                         Version: 2.3.0 01/25/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  Warning, dimension: nlake_hrus is not needed as value specified as 0
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:18:21
+
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 12/20/2022
+                       Version 5.3.0 01/25/2023
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
                          WITH NEWTON FORMULATION
-                         Version 1.3.0 06/01/202
+                         Version 1.3.0 06/01/2022
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
@@ -35,11 +37,7 @@ Control File: .\gsflow_gsflow_LowTrig.control
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
- 
-                     Github Commit Hash 0a338c0                                 
-                                                                                
-                                           
- 
+                        Github Commit Hash 0a338c0
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -82,13 +80,13 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-12-20
+PRMS Computation Order          gsflow_prms         2023-01-25
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
-Basin Definition                basin               2022-09-20
+Basin Definition                basin               2023-01-11
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-12-06
+Common States and Fluxes        climateflow         2023-01-11
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
@@ -100,7 +98,7 @@ Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
 Snow Dynamics                   snowcomp            2022-09-07
 Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2022-12-19
+Soilzone Computations           soilzone            2023-01-25
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2022-12-19
@@ -108,24 +106,26 @@ GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
 Output Summary                  nhru_summary        2022-09-07
 Output Summary                  basin_summary       2021-11-19
 Output Summary                  nsegment_summary    2022-09-07
-Values for parameter: mapvars_freq are ignored as the parameter is not used
-Values for parameter: mapvars_units are ignored as the parameter is not used
-Values for parameter: ncol 0 are ignored as the parameter is not used
-Values for parameter: basin_lat are ignored as the parameter is not used
-Values for parameter: basin_area are ignored as the parameter is not used
-Values for parameter: outlet_sta are ignored as the parameter is not used
-Values for parameter: print_type are ignored as the parameter is not used
-Values for parameter: szconverge are ignored as the parameter is not used
-Values for parameter: nrow 0 are ignored as the parameter is not used
+WARNING, parameter: mapvars_freq is ignored as it is not used
+WARNING, parameter: mapvars_units is ignored as it is not used
+WARNING, parameter: ncol is ignored as it is not used
+WARNING, parameter: basin_lat is ignored as it is not used
+WARNING, parameter: basin_area is ignored as it is not used
+WARNING, parameter: outlet_sta is ignored as it is not used
+WARNING, parameter: print_type is ignored as it is not used
+WARNING, parameter: szconverge is ignored as it is not used
+WARNING, parameter: nrow is ignored as it is not used
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
-====================================================================
+==============================================================
 MODFLOW Packages
-====================================================================
+==============================================================
 UZF-NWT Package                 gwf2uzf1_NWT        2022-10-18
 SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
 AG-NWT Package                  gwf2ag1_NWT_ponds   2022-10-18
-====================================================================
+==============================================================
+
+==========================================================================
 
 Using NAME file: sagehen_gsflow_LowTrig.nam
 
@@ -137,9 +137,13 @@ Steady state simulation successful, used 87 iterations
 
 Using Control File: .\gsflow_gsflow_LowTrig.control
 
+
 Using Parameter File: ..\input\prms\sagehen_grid_v5_highKc.params
 
+
 Writing PRMS Water Budget File: ..\output\prms\sagehen_LowTrig.out
+
+ WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
 
 Percent difference between GVR mapping and active model domain:  0.0000000D+00
 
@@ -148,10 +152,17 @@ Water Budget print frequency is:   7
 Writing GSFLOW Water Budget File: ..\output\gsflow_LowTrig.out
 
 Writing GSFLOW CSV File: ..\output\gsflow_LowTrig.csv
+  
+ WARNING, parameter: ppt_zero_thresh is not specified
+          Set to default value:  0.0000000E+00
+ WARNING, parameter: irr_type is not specified
+          Set to default value:           0
+ WARNING, parameter: pref_flow_infil_frac is not specified
+          Set to default value:  -1.000000    
 
 Simulation time period: 1990/10/01 - 2000/10/31
 
-====================================================================
+==========================================================================
 
 Date: 1990/10/01; Stress: 2; Step: 1; Simulation step: 1
                   MF iterations: 9; SZ iterations: 9
@@ -205,7 +216,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1991/07/01; Stress: 11; Step: 1; Simulation step: 274
-                  MF iterations: 9; SZ iterations: 9
+                  MF iterations: 34; SZ iterations: 34
 
 
 ***WARNING***
@@ -217,7 +228,7 @@ Date: 1991/08/01; Stress: 12; Step: 1; Simulation step: 305
                   MF iterations: 9; SZ iterations: 9
 
 Date: 1991/09/01; Stress: 13; Step: 1; Simulation step: 336
-                  MF iterations: 8; SZ iterations: 8
+                  MF iterations: 7; SZ iterations: 7
 
 Date: 1991/10/01; Stress: 14; Step: 1; Simulation step: 366
                   MF iterations: 5; SZ iterations: 5
@@ -304,7 +315,7 @@ Date: 1992/07/01; Stress: 23; Step: 1; Simulation step: 640
                   MF iterations: 6; SZ iterations: 6
 
 Date: 1992/08/01; Stress: 24; Step: 1; Simulation step: 671
-                  MF iterations: 6; SZ iterations: 6
+                  MF iterations: 7; SZ iterations: 7
 
 
 ***WARNING***
@@ -347,6 +358,12 @@ These values are set to zero for GSFLOW simulations
 
 Date: 1993/02/01; Stress: 30; Step: 1; Simulation step: 855
                   MF iterations: 4; SZ iterations: 4
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
 
 Date: 1993/03/01; Stress: 31; Step: 1; Simulation step: 883
                   MF iterations: 4; SZ iterations: 4
@@ -394,7 +411,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1993/08/01; Stress: 36; Step: 1; Simulation step: 1036
-                  MF iterations: 9; SZ iterations: 9
+                  MF iterations: 7; SZ iterations: 7
 
 
 ***WARNING***
@@ -463,7 +480,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1994/05/01; Stress: 45; Step: 1; Simulation step: 1309
-                  MF iterations: 6; SZ iterations: 6
+                  MF iterations: 7; SZ iterations: 7
 
 
 ***WARNING***
@@ -472,7 +489,10 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1994/06/01; Stress: 46; Step: 1; Simulation step: 1340
-                  MF iterations: 8; SZ iterations: 8
+                  MF iterations: 5; SZ iterations: 5
+
+Date: 1994/06/20; Stress: 46; Step: 20; Simulation step: 1359
+                  MF iterations: 78; SZ iterations: 50
 
 
 ***WARNING***
@@ -481,10 +501,10 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1994/07/01; Stress: 47; Step: 1; Simulation step: 1370
-                  MF iterations: 9; SZ iterations: 9
+                  MF iterations: 6; SZ iterations: 6
 
 Date: 1994/08/01; Stress: 48; Step: 1; Simulation step: 1401
-                  MF iterations: 10; SZ iterations: 10
+                  MF iterations: 6; SZ iterations: 6
 
 Date: 1994/09/01; Stress: 49; Step: 1; Simulation step: 1432
                   MF iterations: 7; SZ iterations: 7
@@ -492,563 +512,3 @@ Date: 1994/09/01; Stress: 49; Step: 1; Simulation step: 1432
 Date: 1994/10/01; Stress: 50; Step: 1; Simulation step: 1462
                   MF iterations: 8; SZ iterations: 8
 
-Date: 1994/11/01; Stress: 51; Step: 1; Simulation step: 1493
-                  MF iterations: 7; SZ iterations: 7
-
-Date: 1994/12/01; Stress: 52; Step: 1; Simulation step: 1523
-                  MF iterations: 3; SZ iterations: 3
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1995/01/01; Stress: 53; Step: 1; Simulation step: 1554
-                  MF iterations: 4; SZ iterations: 4
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1995/02/01; Stress: 54; Step: 1; Simulation step: 1585
-                  MF iterations: 5; SZ iterations: 5
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1995/03/01; Stress: 55; Step: 1; Simulation step: 1613
-                  MF iterations: 7; SZ iterations: 7
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1995/04/01; Stress: 56; Step: 1; Simulation step: 1644
-                  MF iterations: 7; SZ iterations: 7
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1995/05/01; Stress: 57; Step: 1; Simulation step: 1674
-                  MF iterations: 7; SZ iterations: 7
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1995/06/01; Stress: 58; Step: 1; Simulation step: 1705
-                  MF iterations: 8; SZ iterations: 8
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1995/07/01; Stress: 59; Step: 1; Simulation step: 1735
-                  MF iterations: 7; SZ iterations: 7
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1995/08/01; Stress: 60; Step: 1; Simulation step: 1766
-                  MF iterations: 8; SZ iterations: 8
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1995/09/01; Stress: 61; Step: 1; Simulation step: 1797
-                  MF iterations: 7; SZ iterations: 7
-
-Date: 1995/10/01; Stress: 62; Step: 1; Simulation step: 1827
-                  MF iterations: 5; SZ iterations: 5
-
-Date: 1995/11/01; Stress: 63; Step: 1; Simulation step: 1858
-                  MF iterations: 6; SZ iterations: 6
-
-Date: 1995/11/28; Stress: 63; Step: 28; Simulation step: 1885
-                  MF iterations: 303; SZ iterations: 50
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1995/12/01; Stress: 64; Step: 1; Simulation step: 1888
-                  MF iterations: 6; SZ iterations: 6
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1996/01/01; Stress: 65; Step: 1; Simulation step: 1919
-                  MF iterations: 4; SZ iterations: 4
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1996/02/01; Stress: 66; Step: 1; Simulation step: 1950
-                  MF iterations: 6; SZ iterations: 6
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1996/03/01; Stress: 67; Step: 1; Simulation step: 1979
-                  MF iterations: 7; SZ iterations: 7
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1996/04/01; Stress: 68; Step: 1; Simulation step: 2010
-                  MF iterations: 6; SZ iterations: 6
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1996/05/01; Stress: 69; Step: 1; Simulation step: 2040
-                  MF iterations: 7; SZ iterations: 7
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1996/06/01; Stress: 70; Step: 1; Simulation step: 2071
-                  MF iterations: 8; SZ iterations: 8
-
-Date: 1996/06/09; Stress: 70; Step: 9; Simulation step: 2079
-                  MF iterations: 88; SZ iterations: 50
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1996/07/01; Stress: 71; Step: 1; Simulation step: 2101
-                  MF iterations: 6; SZ iterations: 6
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1996/08/01; Stress: 72; Step: 1; Simulation step: 2132
-                  MF iterations: 9; SZ iterations: 9
-
-Date: 1996/09/01; Stress: 73; Step: 1; Simulation step: 2163
-                  MF iterations: 7; SZ iterations: 7
-
-Date: 1996/10/01; Stress: 74; Step: 1; Simulation step: 2193
-                  MF iterations: 6; SZ iterations: 6
-
-Date: 1996/11/01; Stress: 75; Step: 1; Simulation step: 2224
-                  MF iterations: 7; SZ iterations: 7
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1996/12/01; Stress: 76; Step: 1; Simulation step: 2254
-                  MF iterations: 5; SZ iterations: 5
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1997/01/01; Stress: 77; Step: 1; Simulation step: 2285
-                  MF iterations: 7; SZ iterations: 7
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1997/02/01; Stress: 78; Step: 1; Simulation step: 2316
-                  MF iterations: 7; SZ iterations: 7
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1997/03/01; Stress: 79; Step: 1; Simulation step: 2344
-                  MF iterations: 6; SZ iterations: 6
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1997/04/01; Stress: 80; Step: 1; Simulation step: 2375
-                  MF iterations: 6; SZ iterations: 6
-
-***TIME STEP FAILED TO CONVERGE - Date: 1997/04/05 number: 1
-
-Date: 1997/04/05; Stress: 80; Step: 5; Simulation step: 2379
-                  MF iterations: 500; SZ iterations: 50
-
-Date: 1997/04/11; Stress: 80; Step: 11; Simulation step: 2385
-                  MF iterations: 193; SZ iterations: 50
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1997/05/01; Stress: 81; Step: 1; Simulation step: 2405
-                  MF iterations: 6; SZ iterations: 6
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1997/06/01; Stress: 82; Step: 1; Simulation step: 2436
-                  MF iterations: 8; SZ iterations: 8
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1997/07/01; Stress: 83; Step: 1; Simulation step: 2466
-                  MF iterations: 6; SZ iterations: 6
-
-Date: 1997/08/01; Stress: 84; Step: 1; Simulation step: 2497
-                  MF iterations: 9; SZ iterations: 9
-
-Date: 1997/09/01; Stress: 85; Step: 1; Simulation step: 2528
-                  MF iterations: 13; SZ iterations: 13
-
-Date: 1997/10/01; Stress: 86; Step: 1; Simulation step: 2558
-                  MF iterations: 4; SZ iterations: 4
-
-Date: 1997/11/01; Stress: 87; Step: 1; Simulation step: 2589
-                  MF iterations: 7; SZ iterations: 7
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1997/12/01; Stress: 88; Step: 1; Simulation step: 2619
-                  MF iterations: 4; SZ iterations: 4
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1998/01/01; Stress: 89; Step: 1; Simulation step: 2650
-                  MF iterations: 4; SZ iterations: 4
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1998/02/01; Stress: 90; Step: 1; Simulation step: 2681
-                  MF iterations: 4; SZ iterations: 4
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1998/03/01; Stress: 91; Step: 1; Simulation step: 2709
-                  MF iterations: 5; SZ iterations: 5
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1998/04/01; Stress: 92; Step: 1; Simulation step: 2740
-                  MF iterations: 7; SZ iterations: 7
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1998/05/01; Stress: 93; Step: 1; Simulation step: 2770
-                  MF iterations: 6; SZ iterations: 6
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1998/06/01; Stress: 94; Step: 1; Simulation step: 2801
-                  MF iterations: 8; SZ iterations: 8
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1998/07/01; Stress: 95; Step: 1; Simulation step: 2831
-                  MF iterations: 6; SZ iterations: 6
-
-Date: 1998/08/01; Stress: 96; Step: 1; Simulation step: 2862
-                  MF iterations: 9; SZ iterations: 9
-
-Date: 1998/09/01; Stress: 97; Step: 1; Simulation step: 2893
-                  MF iterations: 7; SZ iterations: 7
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1998/10/01; Stress: 98; Step: 1; Simulation step: 2923
-                  MF iterations: 5; SZ iterations: 5
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1998/11/01; Stress: 99; Step: 1; Simulation step: 2954
-                  MF iterations: 3; SZ iterations: 3
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1998/12/01; Stress: 100; Step: 1; Simulation step: 2984
-                  MF iterations: 5; SZ iterations: 5
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1999/01/01; Stress: 101; Step: 1; Simulation step: 3015
-                  MF iterations: 5; SZ iterations: 5
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1999/02/01; Stress: 102; Step: 1; Simulation step: 3046
-                  MF iterations: 6; SZ iterations: 6
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1999/03/01; Stress: 103; Step: 1; Simulation step: 3074
-                  MF iterations: 6; SZ iterations: 6
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1999/04/01; Stress: 104; Step: 1; Simulation step: 3105
-                  MF iterations: 8; SZ iterations: 8
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1999/05/01; Stress: 105; Step: 1; Simulation step: 3135
-                  MF iterations: 8; SZ iterations: 8
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1999/06/01; Stress: 106; Step: 1; Simulation step: 3166
-                  MF iterations: 8; SZ iterations: 8
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1999/07/01; Stress: 107; Step: 1; Simulation step: 3196
-                  MF iterations: 8; SZ iterations: 8
-
-Date: 1999/08/01; Stress: 108; Step: 1; Simulation step: 3227
-                  MF iterations: 9; SZ iterations: 9
-
-Date: 1999/09/01; Stress: 109; Step: 1; Simulation step: 3258
-                  MF iterations: 7; SZ iterations: 7
-
-Date: 1999/10/01; Stress: 110; Step: 1; Simulation step: 3288
-                  MF iterations: 6; SZ iterations: 6
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 1999/11/01; Stress: 111; Step: 1; Simulation step: 3319
-                  MF iterations: 6; SZ iterations: 6
-
-Date: 1999/12/01; Stress: 112; Step: 1; Simulation step: 3349
-                  MF iterations: 3; SZ iterations: 3
-
-Date: 2000/01/01; Stress: 113; Step: 1; Simulation step: 3380
-                  MF iterations: 5; SZ iterations: 5
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 2000/02/01; Stress: 114; Step: 1; Simulation step: 3411
-                  MF iterations: 4; SZ iterations: 4
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 2000/03/01; Stress: 115; Step: 1; Simulation step: 3440
-                  MF iterations: 4; SZ iterations: 4
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 2000/04/01; Stress: 116; Step: 1; Simulation step: 3471
-                  MF iterations: 5; SZ iterations: 5
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 2000/05/01; Stress: 117; Step: 1; Simulation step: 3501
-                  MF iterations: 6; SZ iterations: 6
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
-Date: 2000/06/01; Stress: 118; Step: 1; Simulation step: 3532
-                  MF iterations: 6; SZ iterations: 6
-
-Date: 2000/07/01; Stress: 119; Step: 1; Simulation step: 3562
-                  MF iterations: 9; SZ iterations: 9
-
-Date: 2000/08/01; Stress: 120; Step: 1; Simulation step: 3593
-                  MF iterations: 10; SZ iterations: 10
-
-Date: 2000/09/01; Stress: 121; Step: 1; Simulation step: 3624
-                  MF iterations: 8; SZ iterations: 8
-
-Date: 2000/10/01; Stress: 122; Step: 1; Simulation step: 3654
-                  MF iterations: 7; SZ iterations: 7
-
-
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/20 12:12:06
- Elapsed run time: 7 Minutes, 9.964 Seconds
-
- Number of time steps:   3684;  Number of non-convergence:   1
- MF iterations:         25083;  SZ iterations:           24187
- Average MF iterations:  6.81;  Average SZ iterations:    6.57
- Maximum MF iterations:   500;  Maximum SZ iterations:      50
-
-mxsziter reached: 6
-
-MF iteration distribution:      0    0   90  388  608 1045  665  329  354  159
-                                5    4    8    4    3    3    2    1    0    0
-                                0    1    4    1    0    0    0    0    1    0
-                                0    0    0    0    0    1    0    0    1    0
-                                0    1    0    0    0    0    0    0    0    0
-                                0    0    0    0    1    0    1    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    4
-
-SZ computation distribution:    0    0   90  388  608 1045  665  329  354  159
-                                5    4    8    4    3    3    2    1    0    0
-                                0    1    4    1    0    0    0    0    1    0
-                                0    0    0    0    0    1    0    0    1    0
-                                0    1    0    0    0    0    0    0    0    6
-                                0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
-
- FAILED TO MEET SOLVER CONVERGENCE CRITERIA            1  TIME(S)

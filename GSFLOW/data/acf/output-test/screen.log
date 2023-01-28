@@ -1,4 +1,4 @@
-====================================================================
+==========================================================================
 Command line: 
 ..\..\bin\gsflow  .\control\acf.control
 
@@ -6,22 +6,24 @@ number of command line words: 2
 
 Executable: ..\..\bin\gsflow
 
+==========================================================================
 Control File: .\control\acf.control
-====================================================================
  WARNING, control parameter not used: stats_output_file, ignored
-====================================================================
+==========================================================================
 
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.0 12/20/2022
+                         Version: 2.3.0 01/25/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:07:55
+
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 12/20/2022
+                       Version 5.3.0 01/25/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -64,12 +66,12 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-12-20
+PRMS Computation Order          gsflow_prms         2023-01-25
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
-Basin Definition                basin               2022-09-20
-Common States and Fluxes        climateflow         2022-12-06
+Basin Definition                basin               2023-01-11
+Common States and Fluxes        climateflow         2023-01-11
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
@@ -81,7 +83,7 @@ Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-10-26
 Snow Dynamics                   snowcomp            2022-09-07
 Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2022-12-19
+Soilzone Computations           soilzone            2023-01-25
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing Init         routing             2022-09-07
 Streamflow Routing              muskingum           2021-11-19
@@ -89,33 +91,41 @@ Output Summary                  basin_sum           2022-09-01
 Output Summary                  nhru_summary        2022-09-07
 Output Summary                  basin_summary       2021-11-19
 Statistics Variables Output     statvar_out         2021-09-08
-Output Summary                  prms_summary        2022-10-26
+Output Summary                  prms_summary        2023-01-26
 ==============================================================
 
 Using Control File: .\control\acf.control
 
+
 Using Parameter File: .\input\acf.params
+
 
 Writing var_save_file: .\output\save_vars.acf
 
+
 Writing PRMS Water Budget File: .\output\acf.out
+
 WARNING, HRU: 29 soil_rechr_init > soil_moist_init,   1.00000   1.00000
          soil_rechr set to soil_moist based on init and max values
 WARNING, HRU: 34 soil_rechr_init > soil_moist_init,   1.00000   1.00000
          soil_rechr set to soil_moist based on init and max values
+ WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
+  
+ WARNING, parameter: pref_flow_infil_frac is not specified
+          Set to default value:  -1.000000    
 
 Simulation time period: 1988/10/01 - 1990/09/30
 
-====================================================================
+==========================================================================
 
 
                           ===========================
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2022/12/19 20:05:54
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:07:55
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2022/12/19 20:05:55
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:07:55
 
-Execution elapsed time    0 minutes  0.50 seconds
+Execution elapsed time    0 minutes  0.62 seconds
 

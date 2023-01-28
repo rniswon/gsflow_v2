@@ -1,10 +1,10 @@
-====================================================================
+==========================================================================
 Using PRMS Parameter File: ./input/params
 Description: ACF coarse-resolution model 2/2/2011
-====================================================================
+==========================================================================
 Comment lines:
 Flow substitution applied
-====================================================================
+==========================================================================
 Using dimensions    number
 nmonths               12
 nssr                  27
@@ -17,10 +17,10 @@ ndeplval              22
 nhru                  27
 ngw                   27
 npoigages              6
-====================================================================
+==========================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 12/20/2022
+                       Version 5.3.0 01/25/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -58,16 +58,16 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-12-20
+PRMS Computation Order          gsflow_prms         2023-01-25
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 
 
-====================================================================
+==========================================================================
 Using PRMS Data File: ./input/data
 Title: Written by class gov.usgs.trinli.ft.point.writer.PrmsWriter
-====================================================================
+==========================================================================
 Comment lines:
 ////////////////////////////////////////////////////////////
 // Station metadata (listed in the same order as the data):
@@ -81,19 +81,19 @@ Comment lines:
 ////////////////////////////////////////////////////////////
 // Unit: runoff = ft3 per sec, elevation = meters
 ////////////////////////////////////////////////////////////
-====================================================================
+==========================================================================
 measured variables
 runoff 6
-====================================================================
+==========================================================================
  Data File time period: 1950/01/01 00:00:00 to 1999/12/31 00:00:00
 Simulation time period: 1980/01/01 00:00:00 to 1999/12/31 00:00:00
-====================================================================
-Basin Definition                basin               2022-09-20
-Common States and Fluxes        climateflow         2022-12-06
+==========================================================================
+Basin Definition                basin               2023-01-11
+Common States and Fluxes        climateflow         2023-01-11
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
-Time Series Data                dynamic_soil_param  2022-10-24
+Time Series Data                dynamic_soil_param  2023-01-11
 Temperature Distribution        climate_hru         2022-09-07
 Precipitation Distribution      climate_hru         2022-09-07
 Solar Radiation Distribution    climate_hru         2022-09-07
@@ -102,19 +102,21 @@ Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-10-26
 Snow Dynamics                   snowcomp            2022-09-07
 Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2022-12-19
+Soilzone Computations           soilzone            2023-01-25
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing Init         routing             2022-09-07
 Streamflow Routing              muskingum           2021-11-19
 Output Summary                  basin_sum           2022-09-01
 Output Summary                  nhru_summary        2022-09-07
 Statistics Variables Output     statvar_out         2021-09-08
-Output Summary                  prms_summary        2022-10-26
+Output Summary                  prms_summary        2023-01-26
 ==============================================================
 
 Using Control File: .\control\control
 
+
 Using Parameter File: ./input/params
+
 
 
 Start time: 1980/01/01 00:00:00
@@ -155,5 +157,5 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
  *************************************************************
  Total for run    1110.775  440.221    8.439  693.939   13.445
  *************************************************************
-Execution elapsed time    0 minutes  1.02 seconds
+Execution elapsed time    0 minutes  0.95 seconds
 

@@ -1,10 +1,10 @@
-====================================================================
+==========================================================================
 Using PRMS Parameter File: ../input/prms/prms.params
 Description: Sagehen Parameter File with 128 HRUs, 201 reaches, segments, cascading flow
-====================================================================
+==========================================================================
 Comment lines:
 Version: 1.7
-====================================================================
+==========================================================================
 Using dimensions    number
 nrain                  2
 ncascade             317
@@ -24,10 +24,10 @@ nsub                   2
 one                    1
 nmonths               12
 ndays                366
-====================================================================
+==========================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 12/20/2022
+                       Version 5.3.0 01/25/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -65,16 +65,16 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-12-20
+PRMS Computation Order          gsflow_prms         2023-01-25
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 
 
-====================================================================
+==========================================================================
 Using PRMS Data File: ../input/prms/sagehen.data
 Title: Sagehen Data File: Independence Lake and Sagehen Creek data staions
-====================================================================
+==========================================================================
 Comment lines:
 // tmax stations are:
 //   INDEPENDENCE LAKE
@@ -87,19 +87,19 @@ Comment lines:
 //   SAGEHEN CREEK
 // runoff value is:
 //   10343500 	SAGEHEN C NR TRUCKEE C
-====================================================================
+==========================================================================
 measured variables
 tmax 2
 tmin 2
 precip 2
 runoff 1
-====================================================================
+==========================================================================
  Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
 Simulation time period: 1980/10/01 00:00:00 to 1983/09/01 00:00:00
-====================================================================
-Basin Definition                basin               2022-09-20
+==========================================================================
+Basin Definition                basin               2023-01-11
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-12-06
+Common States and Fluxes        climateflow         2023-01-11
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
@@ -111,7 +111,7 @@ Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
 Snow Dynamics                   snowcomp            2022-09-07
 Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2022-12-19
+Soilzone Computations           soilzone            2023-01-25
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2022-12-19
@@ -124,7 +124,9 @@ SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
 
 Using Control File: .\gsflow.control
 
+
 Using Parameter File: ../input/prms/prms.params
+
 
 
 Start time: 1980/10/01 00:00:00
@@ -135,5 +137,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    4 minutes  6.88 seconds
+Execution elapsed time    3 minutes 22.32 seconds
 

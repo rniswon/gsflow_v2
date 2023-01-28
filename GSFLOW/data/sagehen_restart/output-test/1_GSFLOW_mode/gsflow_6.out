@@ -239,7 +239,7 @@
  TOTAL STORAGE CHANGE =        -256382.29         STORAGE CHANGE =        -107931.36
        --------------                             --------------
          LAND SURFACE =         -65448.46           LAND SURFACE =          -6817.27
-            SOIL ZONE =        -110925.35              SOIL ZONE =         -87207.13
+            SOIL ZONE =        -110925.35              SOIL ZONE =         -87207.12
      UNSATURATED ZONE =         -24612.41       UNSATURATED ZONE =          -4375.34
        SATURATED ZONE =         -55396.07         SATURATED ZONE =          -9531.63
 
@@ -291,4 +291,27 @@
   PERCENT DISCREPANCY =             -0.00    PERCENT DISCREPANCY =             -0.00
 
 
+
+ Number of time steps:      7;  Number of non-convergence:   0
+ MF iterations:            68;  SZ iterations:              68
+ Average MF iterations:  9.71;  Average SZ iterations:    9.71
+ Maximum MF iterations:    10;  Maximum SZ iterations:      10
+
+MF iteration distribution:      0    0    0    0    0    0    0    0    2    5
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+
+SZ computation distribution:    0    0    0    0    0    0    0    0    2    5
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
 
