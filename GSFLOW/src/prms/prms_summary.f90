@@ -150,8 +150,8 @@
      &      CALL checkdim_bounded_limits('poi_gage_segment', 'nsegment', Poi_gage_segment, Npoigages, 1, Nsegment, Inputerror_flag)
           Poi_gage_id = '                '
 
-          IF ( getparam_string(MODNAME, 'poi_gage_segment', Npoigages, Poi_gage_id)/=0 ) &
-     &         CALL read_error(2, 'poi_gage_segment')
+          IF ( getparam_string(MODNAME, 'poi_gage_id', Npoigages, Poi_gage_id)/=0 ) &
+     &         CALL read_error(2, 'poi_gage_id')
 
           DO i = 1, Npoigages
             IF ( Poi_gage_segment(i)<1 .OR. Poi_gage_segment(i)>Nsegment ) CYCLE
