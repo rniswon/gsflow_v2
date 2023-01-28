@@ -73,10 +73,11 @@ module PRMS_READ_PARAM_FILE
       character(LEN=*), intent(IN) :: Dimname
     end subroutine
 
-    module subroutine setparam(Paramname, Numvalues, Data_type, Num_dims, Dim_string, Values, Ivalues)
+    module subroutine setparam(Paramname, Numvalues, Data_type, Num_dims, Dim_string, Values, Ivalues, Cvalues)
       integer, intent(IN) :: Numvalues, Data_type, Num_dims, Ivalues(:)
       character(LEN=*), intent(IN) :: Paramname, Dim_string(Num_dims)
       real, intent(IN) :: Values(:)
+      character(LEN=16), intent(IN) :: Cvalues(:)
     end subroutine
 
     module subroutine setup_params()
