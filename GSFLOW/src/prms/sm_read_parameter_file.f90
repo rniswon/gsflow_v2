@@ -100,6 +100,7 @@ contains
     integer nchars, ios, num_dims, num_param_values, i, j, k, param_type, num, inum, numfiles, ii, duplicate, found
     integer, allocatable :: idmy(:)
     real, allocatable :: dmy(:)
+    character(LEN=16), allocatable :: cdmy(:)
     !***********************************************************************
     ! Find parameter section
     rewind (Param_unit)
@@ -152,7 +153,7 @@ contains
 
         read (Param_unit, *, IOSTAT=ios) param_type
         if (ios /= 0) call read_error(11, 'invalid parameter type '//paramstring(:nchars))
-        if (param_type < 1 .or. param_type > 3) call read_error(11, 'invalid parameter type: '//paramstring(:nchars))
+        if (param_type < 1 .or. param_type > 4) call read_error(11, 'invalid parameter type: '//paramstring(:nchars))
 
         ! check to see if parameter already read
         duplicate = 0
@@ -176,23 +177,29 @@ contains
         end if
 
         if (param_type == 1) then
-          allocate (idmy(num_param_values), dmy(1))
+          allocate (idmy(num_param_values), dmy(1), cdmy(1))
           read (Param_unit, *, IOSTAT=ios) (idmy(j), j=1, num_param_values)
           if (ios /= 0) call read_error(11, 'incorrect number of parameter values: '//paramstring(:nchars))
           if (duplicate > 0) &
     &         print '(A,5I8)', '         Using (up to 5 values printed):', (idmy(j), j=1, inum)
-        else
-          allocate (dmy(num_param_values), idmy(1))
+        elseif (param_type == 2) then
+          allocate (dmy(num_param_values), idmy(1), cdmy(1))
           read (Param_unit, *, IOSTAT=ios) (dmy(j), j=1, num_param_values)
           if (ios /= 0) call read_error(11, 'incorrect number of parameter values: '//paramstring(:nchars))
           if (duplicate > 0) &
     &         print '(A,5F8.2)', '         Using (up to 5 values printed): ', (dmy(j), j=1, inum)
+        else  ! param_type = 4
+          allocate (cdmy(num_param_values), idmy(1), dmy(1))
+          read (Param_unit, *, IOSTAT=ios) (cdmy(j), j=1, num_param_values)
+          if (ios /= 0) call read_error(11, 'incorrect number of parameter values: '//paramstring(:nchars))
+          if (duplicate > 0) &
+    &         print '(A,5F8.2)', '         Using (up to 5 values printed): ', (cdmy(j), j=1, inum)
         end if
         if (duplicate > 0) print *, ' '
-        call setparam(paramstring(:nchars), num_param_values, param_type, num_dims, dim_string, dmy, idmy)
+        call setparam(paramstring(:nchars), num_param_values, param_type, num_dims, dim_string, dmy, idmy, cdmy)
         Read_parameters = Read_parameters + 1
         Parameter_data(found)%read_flag = 1
-        deallocate (dmy, idmy)
+        deallocate (dmy, idmy, cdmy)
       end do
     end do
 
@@ -339,7 +346,7 @@ contains
     Parameter_data(Num_parameters)%scalar_flag = 0
 
     call set_data_type(Datatype, type_flag)
-    if (type_flag < 1 .or. type_flag > 2) call read_error(16, Paramname//': data type not implemented: '//Datatype)
+    if (type_flag < 1 .or. type_flag > 4) call read_error(16, Paramname//': data type not implemented: '//Datatype)
     Parameter_data(Num_parameters)%data_flag = type_flag
 
     ! get dimension number of values
@@ -422,7 +429,7 @@ contains
           end do
         end do
       end if
-    elseif (type_flag == 3) then ! only allow for a 1-D array
+    elseif (type_flag == 4) then ! only allow for a 1-D array
       read (defvalue, *) ctemp
       Parameter_data(Num_parameters)%def_char = ctemp
       if (Parameter_data(Num_parameters)%num_dimens == 1) then
@@ -1045,7 +1052,7 @@ contains
 !***********************************************************************
 ! setparam - set real or integer parameter values read from Parameter File
 !***********************************************************************
-  module subroutine setparam(Paramname, Numvalues, Data_type, Num_dims, Dim_string, Values, Ivalues)
+  module subroutine setparam(Paramname, Numvalues, Data_type, Num_dims, Dim_string, Values, Ivalues, Cvalues)
     use PRMS_CONSTANTS, ONLY: ERROR_param
     use PRMS_MODULE, only: Nhru, Ndepl
     implicit none
@@ -1053,6 +1060,7 @@ contains
     integer, intent(IN) :: Numvalues, Data_type, Num_dims, Ivalues(:)
     character(LEN=*), intent(IN) :: Paramname, Dim_string(Num_dims)
     real, intent(IN) :: Values(:)
+    character(LEN=16), intent(IN) :: Cvalues(:)
     ! Functions
     intrinsic :: TRIM, INDEX
     ! Local Variables
@@ -1097,7 +1105,7 @@ contains
                 end do
               end do
             end if
-          else
+          elseif (Data_type == 1) then
             if (Parameter_data(found)%scalar_flag == 1) then
               Parameter_data(found)%values_int_0d = Ivalues(1)
             elseif (Parameter_data(found)%num_dimens == 1) then
@@ -1112,6 +1120,22 @@ contains
                   Parameter_data(found)%values_int_2d(j, jj) = Ivalues(k)
                 end do
               end do
+            end if
+          else  ! Data_type == 4 
+            if (Parameter_data(found)%scalar_flag == 1) then
+!              Parameter_data(found)%values_char_0d = Cvalues(1)
+            elseif (Parameter_data(found)%num_dimens == 1) then
+              do j = 1, Numvalues
+                Parameter_data(found)%values_char_1d(j) = Cvalues(j)
+              end do
+!            else ! 2d
+!              k = 0
+!              do jj = 1, Parameter_data(found)%num_dim2
+!                do j = 1, Parameter_data(found)%num_dim1
+!                  k = k + 1
+!                  Parameter_data(found)%values_char_2d(j, jj) = Cvalues(k)
+!                end do
+!              end do
             end if
           end if
         else ! check for flexible dimension
