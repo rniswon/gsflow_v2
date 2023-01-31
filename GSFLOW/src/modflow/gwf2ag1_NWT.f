@@ -2888,11 +2888,10 @@
       !
       !2 - ----IF CELL - BY - CELL PUMPING WILL BE SAVED AS A LIST(COMPACT BUDGET),
       ! WRITE HEADER.
-      NAUXWELL = NWELVL - 5
       IF (IAUXSV .EQ. 0) NAUXWELL = 0
       !
       !2 - ----IF CELL - BY - CELL FLOWS WILL BE SAVED AS A LIST, WRITE HEADER.
-      IF (IBD5 .GT. 0) THEN
+      IF (IBD5 .EQ. 2) THEN
          CALL UBDSV4(KKSTP, KKPER, TEXT1, NAUXWELL, WELAUX, IWELLCBU,  
      +    NCOL,NROW, NLAY, NWELLS, IOUT, DELT, PERTIM, TOTIM, IBOUND)
       END IF
@@ -3114,14 +3113,33 @@
       !
       !14 - -----IF SUP PUMPING WILL BE SAVED AS A 3 - D ARRAY,
       ! - ------CALL UBUDSV TO SAVE THEM.
-      IF (IBD5 .GT. 0) THEN
+      IF (IBD5 .EQ. 1) THEN
         IF ( ICBSUP == 0 ) THEN
           CALL UBUDSV(KKSTP,KKPER,TEXT1,IWELLCBU, 
      +                             BUFF,NCOL,NROW,NLAY,IOUT)
         ELSE 
         CALL UBUDSV(KKSTP,KKPER,TEXT9,IWELLCBU, 
      +                             BUFF,NCOL,NROW,NLAY,IOUT)
-        END IF       
+        END IF 
+      END IF
+      !
+      !14b - -----IF SUP PUMPING WILL BE SAVED AS A 3 - D ARRAY,
+      ! - ------CALL UBUDSV TO SAVE THEM.
+      
+      IF (IBD5.EQ.2) THEN
+        DO L = 1, NWELLSTEMP
+          IF ( ICBSUP == 0 ) THEN
+            Q = WELL(4, L)
+          ELSE 
+            Q = szero
+            DO I = 1, NUMSEGS(L)
+              J = DIVERSIONSEG(I, L)
+              Q = Q + SUPSEG(J)
+            END DO
+            CALL UBDSVB(IWELLCBU,NCOL,NROW,IC,IR,IL,Q,
+     1                  WELL(NWELVL, L), NWELVL,NAUXWELL,5,IBOUND,NLAY)
+          END IF
+        END DO
       END IF
       !
       !15 - -----MOVE RATES, VOLUMES&LABELS INTO ARRAYS FOR PRINTING.
