@@ -2794,7 +2794,7 @@
       INTRINSIC :: INT, SNGL
       DOUBLE PRECISION :: SMOOTHQ, bbot, ttop, hh
       DOUBLE PRECISION :: Qp, QQ, Qsave, dQp, DELIN, DELOUT, DELSTOR
-      DATA TEXT1/'           AG WELLS'/
+      DATA TEXT1/'        AG WELLS'/
       DATA TEXT2/'  DIVERSION SEGMENTS'/
       DATA TEXT13/'   IRRIGATION PONDS'/
 !      DATA TEXT14/'       POND STORAGE'/
@@ -2807,7 +2807,7 @@
 !      DATA TEXT15/'    POND RETURN FLOW'/
       DATA TEXT7/'    SYSTEM LOSSES SW'/
       DATA TEXT8/'    SYSTEM LOSSES GW'/
-      DATA TEXT9/'           SUP WELLS'/
+      DATA TEXT9/'       SUP WELLS'/
 !      DATA TEXT10/'CROP CONSUMPTION SW'/
 !      DATA TEXT11/'CROP CONSUMPTION GW'/
 !      DATA TEXT12/'CROP CONSUMPTION POND'/
@@ -3136,9 +3136,9 @@
               J = DIVERSIONSEG(I, L)
               Q = Q + SUPSEG(J)
             END DO
-            CALL UBDSVB(IWELLCBU,NCOL,NROW,IC,IR,IL,Q,
-     1                  WELL(NWELVL, L), NWELVL,NAUXWELL,5,IBOUND,NLAY)
           END IF
+          CALL UBDSVB(IWELLCBU,NCOL,NROW,IC,IR,IL,Q,
+     1                  WELL(:,L),NWELVL,NAUXWELL,5,IBOUND,NLAY)
         END DO
       END IF
       !
