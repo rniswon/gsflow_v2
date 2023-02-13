@@ -9,6 +9,7 @@
 #  September 30, 1996
 HEAD SAVE UNIT 58
 HEAD SAVE FORMAT (20F10.3) Label
+COMPACT BUDGET AUX
 Period 	1	Step 	1
 print budget			
 save budget
