@@ -141,7 +141,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: MODSIM_GSFLOW = 10
     integer, parameter :: MODSIM_MODFLOW = 11
     integer, parameter :: MODSIM = 13
-    integer, parameter :: MODSIM_PRMS_LOOSE = 13
+    integer, parameter :: MODSIM_PRMS_LOOSE = 14
     integer, parameter :: RUN = 0
     integer, parameter :: DECL = 1
     integer, parameter :: INIT = 2

@@ -1052,8 +1052,8 @@
 !            IF ( Soil_moist(i)>Soil_moist_max(i) ) PRINT *, 'CAP sm>max', Soil_moist(i), Soil_moist_max(i), i
             IF ( Soilzone_aet_flag==ACTIVE ) THEN
               Soil_lower(i) = MIN( Soil_lower_stor_max(i), Soil_moist(i) - Soil_rechr(i), &
-                                   Soil_moist(i) - Soil_rechr(i) + Gvr2sm(i)/perv_frac )
-              Soil_rechr(i) = Soil_moist(i) - Soil_lower(i)
+                                   Soil_moist(i) - Soil_rechr(i) + Gvr2sm(i)/perv_frac, Soil_moist(i) )
+              Soil_rechr(i) = MIN( Soil_rechr_max(i), Soil_moist(i) - Soil_lower(i) )
 !              excess = MAX( 0.0, Soil_lower(i) - Soil_lower_stor_max(i) )
 !              if ( abs(soil_lower(i) + soil_rechr(i) - soil_moist(i))>NEARZERO ) THEN
 !                print *, 'excess', excess, Soil_lower_stor_max(i), soil_lower(i) + soil_rechr(i)-soil_moist(i)
@@ -1095,7 +1095,7 @@
             topfr = topfr - dunnianflw_gvr
             IF ( topfr<0.0 ) THEN
 !              IF ( topfr<-NEARZERO .AND. Print_debug>DEBUG_less ) PRINT *, 'gvr2pfr<0', topfr, dunnianflw_gvr, &
-!     &             Pref_flow_max(i), Pref_flow_stor(i), gvr_maxin
+!     &             Pref_flow_max(i), Pref_flow_stor(i), Soil_to_ssr(i)
               topfr = 0.0
             ENDIF
           ENDIF
@@ -1151,8 +1151,6 @@
             Pref_flow_stor(i) = Pref_flow_stor(i) + dunnianflw_pfr
             Slow_stor(i) = Slow_stor(i) + dunnianflw_gvr
           ENDIF
-          Basin_pref_stor = Basin_pref_stor + DBLE( Pref_flow_stor(i)*harea )
-          IF ( Pref_flow_max(i)>0.0 ) Basin_pfr_stor_frac = Basin_pfr_stor_frac + DBLE( Pref_flow_stor(i)/Pref_flow_max(i)*harea )
           IF ( Cascade_flag>CASCADE_OFF ) THEN
             IF ( Ncascade_hru(i)>0 ) THEN
               dnslowflow = 0.0
@@ -1237,6 +1235,10 @@
         Basin_actet = Basin_actet + DBLE( Hru_actet(i)*harea )
         Hru_storage(i) = DBLE( Soil_moist_tot(i) + Hru_intcpstor(i) + Hru_impervstor(i) ) + Pkwater_equiv(i)
         IF ( Dprst_flag==ACTIVE ) Hru_storage(i) = Hru_storage(i) + Dprst_stor_hru(i)
+        IF ( Pref_flow_den(i)>0.0 ) THEN
+          Basin_pref_stor = Basin_pref_stor + DBLE( Pref_flow_stor(i)*harea )
+          Basin_pfr_stor_frac = Basin_pfr_stor_frac + DBLE( Pref_flow_stor(i)/Pref_flow_max(i)*harea )
+        ENDIF
 
 ! ***************************************
       ENDDO ! end HRU loop
@@ -1298,7 +1300,7 @@
         ENDDO
         Basin_potet = Basin_potet*Basin_area_inv
       ENDIF
-      IF ( adjust_hortonian==ACTIVE ) THEN ! need for CFGI
+      IF ( adjust_hortonian==ACTIVE ) THEN ! need for CFGI, srunoff water balance will be incorrect, probably need another variable
         Basin_hortonian = 0.0D0
         Basin_sroff = 0.0D0
         Basin_sroffp = 0.0D0

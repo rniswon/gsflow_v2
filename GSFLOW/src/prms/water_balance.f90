@@ -319,7 +319,7 @@
         last_sm = It0_soil_moist(i)
         last_ss = It0_ssres_stor(i)
 
-        soilbal = (last_sm - Soil_moist(i) - Perv_actet(i))*perv_frac + Cap_waterin(i)
+        soilbal = (last_sm - Soil_moist(i) - Perv_actet(i))*perv_frac + Cap_infil_tot(i)
         IF ( AG_flag == ACTIVE ) THEN
           soilbal = soilbal - perv_soil_to_gvr(i) - perv_soil_to_gw(i)
         ELSE 

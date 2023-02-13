@@ -707,7 +707,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,
      1                              IUNIT(22),IUNIT(63),IUNIT(8),
      2                              IUNIT(55),IGRID)
-            IF(IUNIT(66).GT.0 .AND. Mode l/= MODSIM_GSFLOW )
+            IF(IUNIT(66).GT.0 .AND. Model /= MODSIM_GSFLOW )
      +         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
      !!       IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,
      !!1                              IUNIT(22),IUNIT(63),IUNIT(8),

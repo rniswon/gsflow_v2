@@ -416,7 +416,7 @@
      &       ' flows to a stream network for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'sro_to_dprst_imperv')
 
-!        IF ( AG_flag==ACTIVE .OR. Model==DOCUMENTATION ) THEN
+!        IF ( AG_flag==ACTIVE ) THEN
 !          ALLOCATE ( Sro_to_dprst_ag(Nhru) )
 !          IF ( declparam(MODNAME, 'sro_to_dprst_ag', 'nhru', 'real', &
 !     &         '0.2', '0.0', '1.0', &
@@ -972,7 +972,7 @@
       SUBROUTINE compute_infil(Net_rain, Net_ppt, Snowmelt, Snowinfil_max, Net_snow, &
                                Pkwater_equiv, Infil, Hru_type, Intcp_changeover, &
                                Perv_on, Ag_on, Infil_ag, Net_apply, Perv_area, Ag_area)
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, DNEARZERO, LAND, ACTIVE, CASCADE_OFF, OFF
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, LAND, ACTIVE, CASCADE_OFF, OFF
       USE PRMS_MODULE, ONLY: Cascade_flag
       USE PRMS_SRUNOFF, ONLY: Upslope_hortonian, Ihru, Srp, Isglacier, Sroff_ag, Basin_apply_sroff
       USE PRMS_FLOWVARS, ONLY: Pptmix_nopack
@@ -1073,7 +1073,7 @@
 !******There was no snowmelt but a snowpack may exist.  If there is
 !******no snowpack then check for rain on a snowfree HRU.
 
-      ELSEIF ( Pkwater_equiv<DNEARZERO ) THEN
+      ELSEIF ( .not.(Pkwater_equiv>0.0D0) ) THEN
 
 !       If no snowmelt and no snowpack but there was net snow then
 !       snowpack was small and was lost to sublimation.
@@ -1103,7 +1103,7 @@
 
 !***********************************************************************
       SUBROUTINE perv_comp(Pptp, Ptc, Infil, Srp)
-      USE PRMS_CONSTANTS, ONLY: smidx_module, CLOSEZERO
+      USE PRMS_CONSTANTS, ONLY: smidx_module !, CLOSEZERO
       USE PRMS_MODULE, ONLY: Sroff_flag
       USE PRMS_SRUNOFF, ONLY: Ihru, Smidx_coef, Smidx_exp, &
      &    Carea_max, Carea_min, Carea_dif, Contrib_fraction
@@ -1130,7 +1130,7 @@
       ENDIF
       IF ( ca_fraction>Carea_max(Ihru) ) ca_fraction = Carea_max(Ihru)
       srpp = ca_fraction*Pptp
-      IF ( srpp<CLOSEZERO ) srpp = 0.0
+      IF ( srpp<0.0 ) srpp = 0.0
       Contrib_fraction(Ihru) = ca_fraction
 !      IF ( srpp<0.0 ) THEN
 !        PRINT *, 'negative srp', srpp

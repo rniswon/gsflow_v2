@@ -426,12 +426,6 @@ contains
     Control_parameter_data(i) % name = 'gwr_swale_flag'
     Gwr_swale_flag = OFF
     i = i + 1
-    Control_parameter_data(i) % name = 'snow_cbh_flag'
-    Snow_cbh_flag = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'gwflow_cbh_flag'
-    Gwflow_cbh_flag = OFF
-    i = i + 1
     Control_parameter_data(i) % name = 'humidity_cbh_flag'
     Humidity_cbh_flag = OFF
     i = i + 1

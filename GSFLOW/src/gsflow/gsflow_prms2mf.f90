@@ -312,14 +312,13 @@
         icol = Gwc_col(icell)
         IF ( Print_debug>DEBUG_less ) THEN
           IF ( Hru_type(ihru)==0 ) THEN
-            IF ( IUZFBND(icol, irow)/=0 ) THEN
-                 PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
-                 activeHru_inactiveCell(ihru) = 1
-            ENDIF
+            IF ( IUZFBND(icol, irow)/=0 ) &
+     &           PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
           ENDIF
           IF ( IUZFBND(icol, irow)==0 ) THEN
-            IF ( Hru_type(ihru)==1 .OR. Hru_type(ihru)>2 ) then
+            IF ( Hru_type(ihru) > 0 ) then
                 PRINT *, 'WARNING, UZF cell inactive, irow:', irow, ' icol:',icol,'icell:',icell, ' HRU is active:', ihru
+                activeHru_inactiveCell(ihru) = 1
             end if
           ENDIF
         ENDIF
@@ -347,13 +346,7 @@
         IF ( Nhru/=Nhrucell ) THEN
           pct = newpct(i)
           IF ( ABS(pct-1.0D0)>PCT_CHK ) PRINT *, 'Possible issue with GVR to HRU percentage, HRU:', i, pct
-          IF ( pct<0.0D0 ) THEN
-            PRINT *, 'ERROR, HRU to cell mapping is < 0.0', i, pct
-            ierr = 1
-          ELSEIF ( pct<PCT_CHK ) THEN
-            IF ( Print_debug>DEBUG_less ) PRINT *, 'WARNING, active HRU is not mapped to any cell', i, pct
-            activeHru_inactiveCell(ihru) = 1
-          ELSEIF ( pct<0.999D0 ) THEN
+          IF ( pct<0.99D0 ) THEN
             ierr = 1
             PRINT *, 'ERROR, portion of HRU not included in mapping to cells', i, pct
           ELSEIF ( pct>1.00001D0 ) THEN
@@ -361,6 +354,11 @@
               ierr = 1
               PRINT *, 'ERROR, extra portion of HRU included in mapping to cells', i, pct
             ENDIF
+          ELSEIF ( pct<0.0D0 ) THEN
+            PRINT *, 'ERROR, HRU to cell mapping is < 0.0', i, pct
+            ierr = 1
+          ELSEIF ( pct<PCT_CHK ) THEN
+            IF ( Print_debug>DEBUG_less ) PRINT *, 'WARNING, active HRU is not mapped to any cell', i, pct
           ENDIF
           Totalarea = Totalarea + pct*DBLE( Hru_area(i) )
         ELSE
@@ -451,6 +449,8 @@
      &                   *Hru_area(j)*Acre_inches_to_mfl3_sngl*Mft_to_days )   !RGN 7/15/2015 added *Mft_to_days
             PRCPLK(ilake) = PRCPLK(ilake) + Hru_ppt(j)*Acre_inches_to_mfl3_sngl*Mft_to_days*Hru_area(j) !VOLUMES OF PRECIP
             EVAPLK(ilake) = EVAPLK(ilake) + Hru_actet(j)*Acre_inches_to_mfl3_sngl*Mft_to_days*Hru_area(j) !VOLUMES OF EVAP
+!            PRCPLK(ilake) = PRCPLK(ilake) + Hru_ppt(j)*Inch_to_mfl_t*Hru_area(j)
+!            EVAPLK(ilake) = EVAPLK(ilake) + Hru_actet(j)*Inch_to_mfl_t*Hru_area(j)
           ENDIF
         ENDDO
         !DO ilake = 1, NLAKES
