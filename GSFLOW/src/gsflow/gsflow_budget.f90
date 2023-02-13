@@ -267,7 +267,7 @@
 !Warning, modifies Basin_ssstor, and Gw2sm_grav
       USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop !, Basin_dprst_volcl
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
-!      USE GSFPRMS2MF, ONLY: activeHru_inactiveCell
+      USE GSFPRMS2MF, ONLY: activeHru_inactiveCell
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, SNGL
