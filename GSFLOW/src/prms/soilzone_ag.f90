@@ -1170,7 +1170,7 @@
         IF ( num_hrus_ag_iter > 0 ) print '(2(A,I0))', 'number of hrus still iterating on AET: ', num_hrus_ag_iter
         if ( Soil_iter == max_soilzone_ag_iter ) then
            iter_nonconverge = iter_nonconverge + 1
-           print '(A,I0,2("/",I0))', 'WARNING, ag AET did not converge due to max_soilzone_ag_iter: ', Nowyear, Nowmonth, Nowday
+           print '(/,A,I0,2("/",I0))', 'WARNING, ag AET did not converge due to max_soilzone_ag_iter: ', Nowyear, Nowmonth, Nowday
            print '(A,F0.4,2(A,I0))', '         largest AET-ag_actet: ', unsatisfied_big, '; iterations: ', Soil_iter, &
                                     '; number of non-convergence: ', iter_nonconverge
            print '(A,F0.6,A,I0,/)', '         convergence criteria: ', soilzone_aet_converge, &

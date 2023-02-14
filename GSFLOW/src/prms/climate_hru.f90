@@ -138,14 +138,14 @@
               PET_external(ii) = AET_external(ii)
             ENDIF
             IF ( AET_external(ii) < 0.0 .and. AET_external(ii) /= -1.0 ) THEN
-              PRINT '(A,4(I0,1X),A)', 'AET external < 0.0, HRU:', ii, yr, mo, dy, '; set to 0.0'
+              PRINT '(A,4(I0,1X),A)', 'AET external < 0.0, HRU: ', ii, yr, mo, dy, '; set to 0.0'
               PRINT *, 'AET, PET, ag_frac:', AET_external(ii), PET_external(ii), Ag_frac(ii)
               AET_external(ii) = 0.0
             ENDIF
             IF ( Ag_frac(ii)>0.0 ) num_ag = num_ag + 1
           END DO
           IF ( num_pet>0 ) PRINT '(/,I5,2("/",I0), 2(A,I0),/)', yr, mo, dy, &
-               'number of AG HRUs ', num_ag, ', number of OpenET PET < AET ', num_pet
+               ' number of AG HRUs: ', num_ag, ', number of OpenET PET < AET: ', num_pet
         ENDIF
 
         IF ( irrigated_area_cbh_flag==ACTIVE ) THEN

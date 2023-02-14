@@ -642,7 +642,7 @@
       REAL :: excess, dprst_adj
 !-----------------------------------------------------------------------
       excess = Non_perv - 1.0
-      PRINT '(A,I0,A,F0.5)', 'WARNING, ag_frac + hru_percent_imperv + dprst_frac > 1.0; HRU: ', Hru_id, '; excess: ', excess
+      PRINT '(A,I0,A,F0.6)', 'WARNING, ag_frac + hru_percent_imperv + dprst_frac > 1.0; HRU: ', Hru_id, '; excess: ', excess
       PRINT *, '        dprst_frac and/or hru_percent_imperv adjusted'
       IF ( Dprst_frac > 0.0 ) THEN
         dprst_adj = Dprst_frac - excess
@@ -658,5 +658,5 @@
       IF ( Imperv_frac < CLOSEZERO .AND. ABS(Imperv_frac) > 0.0 ) THEN
         IF ( Imperv_frac < 0.0 ) PRINT *, 'WARNING, hru_percent_imperv < 0 after adjustment, set to 0, imperv_frac:', Imperv_frac
         Imperv_frac = 0.0
-       ENDIF
+      ENDIF
     END SUBROUTINE adjust_fractions
