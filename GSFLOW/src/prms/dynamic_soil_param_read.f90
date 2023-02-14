@@ -213,8 +213,8 @@
         IF ( control_string(dynamic_soil_param_log_file, 'dynamic_soil_param_log_file')/=0 ) &
              CALL read_error(5, 'dynamic_soil_param_log_file')
         CALL PRMS_open_output_file(Output_unit, dynamic_soil_param_log_file, 'dynamic_soil_param_log_file', 0, ierr)
-        PRINT '(/,A,/,A)', 'A summary of dynamic parameter events are written to file:', &
-     &                     dynamic_soil_param_log_file(:numchars(dynamic_soil_param_log_file))
+        PRINT '(/,A,/,A,/)', 'A summary of dynamic parameter events are written to file:', &
+     &                       dynamic_soil_param_log_file(:numchars(dynamic_soil_param_log_file))
       ENDIF
 
       IF ( istop==1 .OR. ierr/=0 ) CALL error_stop('in dynamic_soil_param_read initialize procedure', ERROR_dynamic)
@@ -359,6 +359,7 @@
             IF ( Soil_rechr_max(i)>Soil_moist_max(i) ) THEN
               istop = 1
               PRINT 9002, Soil_rechr_max(i), Soil_moist_max(i), i
+              EXIT
             ENDIF
             Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
           ENDIF
@@ -375,6 +376,7 @@
             IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
               istop = 1
               PRINT 9003, Ag_soil_rechr_max(i), Ag_soil_moist_max(i), i
+              EXIT
             ENDIF
             Ag_soil_lower_stor_max(i) = Ag_soil_moist_max(i) - Ag_soil_rechr_max(i)
           ENDIF
@@ -385,6 +387,10 @@
             Dprst_vol_thres_open(i) = Dprst_vol_open_max(i)*DBLE(Op_flow_thres(i))
           ENDIF
         ENDDO
+        if ( istop==1 ) then
+          PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
+          ERROR STOP ERROR_dynamic
+        endif
       ENDIF
 
       !*******************
@@ -468,8 +474,8 @@
             istop = 1
             PRINT *, 'ERROR, fraction impervious + fraction dprst > 0.999 for HRU:', i
             PRINT *, '       fraction impervious + dprst:', frac_imperv + frac_dprst
-            PRINT *, '       hru_percent_imperv:', frac_imperv, '; frac_dprst:', frac_imperv
-            CYCLE
+            PRINT *, '       hru_percent_imperv:', frac_imperv, '; frac_dprst:', frac_dprst
+            EXIT
           ENDIF
 
 ! use ag_frac as input, adjust other fractions if needed
@@ -523,17 +529,19 @@
               istop = 1
               PRINT *, 'ERROR, pervious fraction or agriculture pervious fraction must be >= 0.0001 for HRU:', i
               PRINT *, '       pervious fraction:', tmp, '; agriculture fraction:', frac_ag
-              CYCLE
+              EXIT
             ENDIF
 
             ! check sum of imperv, ag, and dprst if either are updated!!!!!!
             IF ( tmp < 0.0 ) THEN
-              print *, 'Sum of impervious, surface depression storage, and agriculture fractions > 1 for HRU:', i
-              print *, 'impervious:', frac_imperv, '; dprst:', frac_dprst, '; agriculture:', frac_ag
-              print *, 'agriculture fraction will be retained, dprst fraction will be reduced, then if necessary impervious'
+              print *, 'Sum of impervious, surface depression storage, and agriculture fractions > 1'
+              print *, '  for HRU:', i
+              print *, '  impervious:', frac_imperv, '; dprst:', frac_dprst, '; agriculture:', frac_ag
+              print *, '  agriculture fraction is retained, dprst fraction is reduced,'
+              print *, '  if necessary impervious'
               IF ( frac_dprst>0.0 ) THEN
                 adjust_dprst_fractions = ACTIVE
-                frac_dprst = frac_dprst - tmp ! reduce frac_dprst first, then imperv_frac if needed
+                frac_dprst = frac_dprst + tmp ! reduce frac_dprst first, then imperv_frac if needed
               ENDIF
               IF ( frac_dprst<0.0 ) THEN
                 IF ( frac_imperv>0.0 ) frac_imperv = frac_imperv + frac_dprst
@@ -541,7 +549,7 @@
                   IF ( frac_imperv<CLOSEZERO ) THEN
                     PRINT *, 'ERROR adjusting impervious and dprst fractions'
                     istop = 1
-                    CYCLE
+                    EXIT
                   ENDIF
                 ENDIF
                 adjust_imperv_fractions = ACTIVE
@@ -578,7 +586,7 @@
               IF ( .NOT.(Dprst_depth_avg(i)>0.0) .AND. frac_dprst>0.0 ) THEN
                 istop = 1
                 PRINT *, 'ERROR, dprst_frac>0 and dprst_depth_avg==0 for HRU:', i, '; dprst_frac:', frac_dprst
-                CYCLE
+                EXIT
               ENDIF
               ! CAUTION: other DPRST parameters need to have valid values as related to any dynamic parameter updates
               tmp = SNGL( Dprst_vol_open(i) + Dprst_vol_clos(i) )
@@ -649,11 +657,10 @@
           endif
 
         ENDDO
-        IF ( istop==1 ) then
-            PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
-!            print *, 'abc'
-            ERROR STOP ERROR_dynamic
-            endif
+        if ( istop==1 ) then
+          PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
+          ERROR STOP ERROR_dynamic
+        endif
 
         IF ( it0_sm_flag == ACTIVE ) THEN
           Basin_soil_moist = 0.0D0
