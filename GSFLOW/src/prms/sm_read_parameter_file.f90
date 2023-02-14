@@ -153,7 +153,8 @@ contains
 
         read (Param_unit, *, IOSTAT=ios) param_type
         if (ios /= 0) call read_error(11, 'invalid parameter type '//paramstring(:nchars))
-        if (param_type < 1 .or. param_type > 4 .or. param_type == 3) call read_error(11, 'invalid parameter type: '//paramstring(:nchars))
+        if (param_type < 1 .or. param_type > 4 .or. param_type == 3) &
+            call read_error(11, 'invalid parameter type: '//paramstring(:nchars))
 
         ! check to see if parameter already read
         duplicate = 0

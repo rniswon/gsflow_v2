@@ -400,7 +400,8 @@
         IF ( Gwminarea_flag==ACTIVE ) wbal = wbal + Gwstor_minarea_wb(i)
         IF ( DABS(wbal)>DTOOSMALL ) THEN
           WRITE ( BALUNT, * ) 'Possible HRU water balance issue:', wbal, '; HRU:', i, ' hru_type:', &
-                              Hru_type(i), '; area:', Hru_area(i), '; hru_ppt:' , Hru_ppt(i), hru_rain(i), hru_snow(i), Net_ppt(i), net_snow(i), net_rain(i)
+                              Hru_type(i), '; area:', Hru_area(i), '; hru_ppt:' , Hru_ppt(i), hru_rain(i), hru_snow(i), &
+                              Net_ppt(i), net_snow(i), net_rain(i)
           WRITE ( BALUNT, * ) 'fluxes', Sroff(i), Gwres_flow(i), Ssres_flow(i), Hru_actet(i), Gwres_sink(i), &
                               Pfr_dunnian_flow(i), Intcp_changeover(i), Snowmelt(i), Dunnian_flow(i)
           !WRITE ( BALUNT, * ) Gwstor_minarea_wb(i)

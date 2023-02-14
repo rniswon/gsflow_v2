@@ -490,7 +490,8 @@
                 frac_ag = 1.0
               ENDIF
               IF ( frac_ag<0.0001 ) THEN
-                PRINT '(A,I0,A,F0.6)', 'WARNING, dynamic ag_frac > 0.0 and < 0.0001, set to 0.0 for HRU: ', i, ', ag_frac: ', frac_ag
+                PRINT '(A,I0,A,F0.6)', 'WARNING, dynamic ag_frac > 0.0 and < 0.0001, set to 0.0 for HRU: ', i, &
+                    ', ag_frac: ', frac_ag
                 frac_ag = 0.0
               ENDIF
             endif
