@@ -24,12 +24,12 @@ PRMS command line argument 10: ..\output\prms\prms_only.out
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.0 01/25/2023
+                         Version: 2.3.0 02/14/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:25:10
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:54:56
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -127,9 +127,9 @@ Simulation time period: 1980/10/01 - 1984/01/30
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:25:10
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:54:56
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:25:11
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:54:57
 
-Execution elapsed time    0 minutes  0.39 seconds
+Execution elapsed time    0 minutes  0.53 seconds
 

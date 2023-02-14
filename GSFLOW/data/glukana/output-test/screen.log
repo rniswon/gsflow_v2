@@ -16,13 +16,13 @@ Control File: .\control\gulkana.control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.0 01/25/2023
+                         Version: 2.3.0 02/14/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  WARNING, control parameter not in Control File: mbInit_flag, set to 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:24:28
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:33:26
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -129,9 +129,9 @@ Simulation time period: 1971/10/01 - 2015/09/30
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:24:28
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:33:26
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:24:32
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:33:31
 
-Execution elapsed time    0 minutes  3.73 seconds
+Execution elapsed time    0 minutes  4.82 seconds
 

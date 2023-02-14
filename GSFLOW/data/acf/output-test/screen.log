@@ -14,12 +14,12 @@ Control File: .\control\acf.control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.0 01/25/2023
+                         Version: 2.3.0 02/14/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:07:55
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:27:39
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -123,9 +123,9 @@ Simulation time period: 1988/10/01 - 1990/09/30
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:07:55
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:27:39
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:07:55
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:27:40
 
-Execution elapsed time    0 minutes  0.62 seconds
+Execution elapsed time    0 minutes  1.13 seconds
 

@@ -13,13 +13,13 @@ Control File: .\Sagehen_ponds.control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.0 01/25/2023
+                         Version: 2.3.0 02/14/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  Warning, dimension: nlake_hrus is not needed as value specified as 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:12:25
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:53:08
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -460,7 +460,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1993/04/01; Stress: 32; Step: 1; Simulation step: 914
-                  MF iterations: 7; SZ iterations: 7
+                  MF iterations: 6; SZ iterations: 6
 
 
 ***WARNING***
@@ -489,9 +489,6 @@ These values are set to zero for GSFLOW simulations
 Date: 1993/07/01; Stress: 35; Step: 1; Simulation step: 1005
                   MF iterations: 7; SZ iterations: 7
 
-Date: 1993/07/24; Stress: 35; Step: 24; Simulation step: 1028
-                  MF iterations: 79; SZ iterations: 50
-
 
 ***WARNING***
 Non-zero values were specified for precipitation,
@@ -508,7 +505,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1993/09/01; Stress: 37; Step: 1; Simulation step: 1067
-                  MF iterations: 8; SZ iterations: 8
+                  MF iterations: 7; SZ iterations: 7
 
 
 ***WARNING***
@@ -608,12 +605,6 @@ These values are set to zero for GSFLOW simulations
 
 Date: 1994/08/01; Stress: 48; Step: 1; Simulation step: 1401
                   MF iterations: 8; SZ iterations: 8
-
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
 
 Date: 1994/09/01; Stress: 49; Step: 1; Simulation step: 1432
                   MF iterations: 7; SZ iterations: 7
@@ -736,30 +727,30 @@ Date: 1995/10/01; Stress: 62; Step: 1; Simulation step: 1827
                   MF iterations: 6; SZ iterations: 6
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/01/27 19:15:00
- Elapsed run time: 2 Minutes, 34.798 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/06 15:56:00
+ Elapsed run time: 2 Minutes, 51.347 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
- MF iterations:         12012;  SZ iterations:           11946
- Average MF iterations:  6.47;  Average SZ iterations:    6.43
- Maximum MF iterations:    79;  Maximum SZ iterations:      50
+ MF iterations:         11847;  SZ iterations:           11825
+ Average MF iterations:  6.38;  Average SZ iterations:    6.37
+ Maximum MF iterations:    72;  Maximum SZ iterations:      50
 
-mxsziter reached: 4
+mxsziter reached: 1
 
-MF iteration distribution:      0    0   25  198  319  470  478  252   79   18
-                                3    3    3    1    1    1    1    0    0    0
+MF iteration distribution:      0    0   27  197  320  468  483  247   80   18
+                                3    2    3    2    1    2    1    0    0    0
+                                0    0    0    1    0    0    0    0    1    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
-                                1    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    1    0    1    0
                                 0    0    0    0    0    0    0    0    0    0
-                                1    0    0    0    0    0    0    0    1    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    1    0    0    0    0    0    0    0    0
 
-SZ computation distribution:    0    0   25  198  319  470  478  252   79   18
-                                3    3    3    1    1    1    1    0    0    0
+SZ computation distribution:    0    0   27  197  320  468  483  247   80   18
+                                3    2    3    2    1    2    1    0    0    0
+                                0    0    0    1    0    0    0    0    1    0
                                 0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
-                                1    0    0    0    0    0    0    0    0    4
+                                0    0    0    0    0    0    0    0    0    1
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
