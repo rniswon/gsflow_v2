@@ -10,18 +10,15 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2022-09-07'
+        character(len=*), parameter :: Version_climate_hru = '2023-02-08'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit, AET_unit, PET_unit, Irrigated_area_unit
-        INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit, Pkweqv_unit
-!        INTEGER, SAVE :: Pkdepth_unit, Snowevap_unit, Snowarea_unit, Snowmelt_unit, Gwflow_unit
+        INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit
         ! Control Parameters
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Tmin_day, Tmax_day, Precip_day, Potet_day, Swrad_day, Transp_day
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Humidity_day, Windspeed_day, AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
-        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Albedo_day, Cloud_cover_day, Pkwater_equiv_day
+        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Albedo_day, Cloud_cover_day
         INTEGER, SAVE :: Cbh_check_flag
-!        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gwres_flow_day, Snowmelt_day
-!        CHARACTER(LEN=MAXFILE_LENGTH) :: Pk_depth_day, Snow_evap_day, Snowcov_area_day
         ! Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_windspeed, Basin_aet_external, Basin_pet_external, Basin_irrigated_area
         REAL, ALLOCATABLE :: Humidity_hru(:), Windspeed_hru(:), AET_external(:), PET_external(:), Irrigated_area(:)
@@ -41,7 +38,7 @@
      &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
      &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
      &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, Nowyear, Nowday, forcing_check_flag, Print_debug, &
-     &    Snow_cbh_flag, irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag
+     &    irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag
       USE PRMS_CLIMATE_HRU
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Ag_Frac
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
@@ -54,7 +51,6 @@
       USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_SOLTAB, ONLY: Soltab_basinpotsw, Hru_cossl, Soltab_potsw
       use prms_utils, only: find_current_time, find_cbh_header_end, print_date, print_module, read_error
-      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Basin_pweqv !, Pk_depth, Snow_evap, Snowcov_area, Snowmelt
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
@@ -141,10 +137,15 @@
               num_pet = num_pet + 1
               PET_external(ii) = AET_external(ii)
             ENDIF
+            IF ( AET_external(ii) < 0.0 .and. AET_external(ii) /= -1.0 ) THEN
+              PRINT '(A,4(I0,1X),A)', 'AET external < 0.0, HRU: ', ii, yr, mo, dy, '; set to 0.0'
+              PRINT *, 'AET, PET, ag_frac:', AET_external(ii), PET_external(ii), Ag_frac(ii)
+              AET_external(ii) = 0.0
+            ENDIF
             IF ( Ag_frac(ii)>0.0 ) num_ag = num_ag + 1
           END DO
-          IF ( num_pet>0 ) PRINT '(/,2(A,I0),I5,2("/",I0))', &
-               'number of AG HRUs ', num_ag, ', number of OpenET PET < AET ', num_pet, yr, mo, dy
+          IF ( num_pet>0 ) PRINT '(/,I5,2("/",I0), 2(A,I0),/)', yr, mo, dy, &
+               ' number of AG HRUs: ', num_ag, ', number of OpenET PET < AET: ', num_pet
         ENDIF
 
         IF ( irrigated_area_cbh_flag==ACTIVE ) THEN
@@ -207,40 +208,6 @@
           Basin_windspeed = 0.0D0
         ENDIF
 
-        IF ( Snow_cbh_flag==ACTIVE ) THEN
-          READ ( Pkweqv_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Pkwater_equiv(i), i=1,Nhru)
-          IF ( ios/=0 ) THEN
-            ierr = 1
-          ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'pkwater_equiv', ios, ierr)
-          ENDIF
-          Basin_pweqv = 0.0D0
-          !READ ( Pkdepth_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Pk_depth(i), i=1,Nhru)
-          !IF ( ios/=0 ) THEN
-          !  ierr = 1
-          !ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-          !  CALL read_cbh_date(yr, mo, dy, 'pk_depth', ios, ierr)
-          !ENDIF
-          !READ ( Snowevap_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Snow_evap(i), i=1,Nhru)
-          !IF ( ios/=0 ) THEN
-          !  ierr = 1
-          !ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-          !  CALL read_cbh_date(yr, mo, dy, 'snow_evap', ios, ierr)
-          !ENDIF
-          !READ ( Snowarea_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Snowcov_area(i), i=1,Nhru)
-          !IF ( ios/=0 ) THEN
-          !  ierr = 1
-          !ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-          !  CALL read_cbh_date(yr, mo, dy, 'snowcov_area', ios, ierr)
-          !ENDIF
-          !READ ( Snowmelt_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Snowmelt(i), i=1,Nhru)
-          !IF ( ios/=0 ) THEN
-          !  ierr = 1
-          !ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-          !  CALL read_cbh_date(yr, mo, dy, 'snowmelt', ios, ierr)
-          !ENDIF
-        ENDIF
-
         IF ( ierr/=0 ) THEN
           PRINT *, 'ERROR in climate_hru', ierr
           ERROR STOP ERROR_cbh
@@ -263,13 +230,6 @@
           IF ( AET_cbh_flag==ACTIVE ) CALL check_cbh_value('AET_external', AET_external, 0.0, 50.0, missing)
           IF ( PET_cbh_flag==ACTIVE ) CALL check_cbh_value('PET_external', PET_external, 0.0, 50.0, missing)
           IF ( irrigated_area_cbh_flag==ACTIVE ) CALL check_cbh_value('irrigated_area', Irrigated_area, 0.0, 9999.0, missing)
-          !IF ( Snow_cbh_flag==ACTIVE ) THEN
-            !CALL check_cbh_value('pkwater_equiv', Pkwater_equiv, 0.0, 100.0, missing) ! can't check double now
-            !CALL check_cbh_value('pk_depth', Pk_depth, 0.0, 100.0, missing) ! can't check double now
-            !CALL check_cbh_value('snow_evap', Snow_evap, 0.0, 100.0, missing)
-            !CALL check_cbh_value('snowcov_area', Snowcov_area, 0.0, 100.0, missing)
-            !CALL check_cbh_value('snowmelt', Snowmelt, 0.0, 100.0, missing)
-          !ENDIF
           IF ( missing==1 ) THEN
             CALL print_date(0)
             ERROR STOP ERROR_cbh
@@ -336,7 +296,6 @@
           IF ( AET_cbh_flag==ACTIVE ) Basin_aet_external = Basin_aet_external + DBLE( AET_external(i)*harea )
           IF ( PET_cbh_flag==ACTIVE ) Basin_pet_external = Basin_pet_external + DBLE( PET_external(i)*harea )
           IF ( irrigated_area_cbh_flag==ACTIVE ) Basin_irrigated_area = Basin_irrigated_area + DBLE( Irrigated_area(i)*harea )
-          IF ( snow_cbh_flag==ACTIVE ) Basin_pweqv = Basin_pweqv + Pkwater_equiv(i) * DBLE( harea )
         ENDDO
 !        IF ( write_tmin_tmax == 1 ) THEN
 !          WRITE ( 863,  '(I4,2I3,3I2,128F7.2)' ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tmaxf(i), i=1,Nhru)
@@ -374,7 +333,6 @@
         IF ( AET_cbh_flag==ACTIVE ) Basin_aet_external = Basin_aet_external*Basin_area_inv
         IF ( PET_cbh_flag==ACTIVE ) Basin_pet_external = Basin_pet_external*Basin_area_inv
         IF ( irrigated_area_cbh_flag==ACTIVE ) Basin_irrigated_area = Basin_irrigated_area*Basin_area_inv
-        IF ( snow_cbh_flag==ACTIVE ) Basin_pweqv = Basin_pweqv * Basin_area_inv
 
       ELSEIF ( Process_flag==DECL ) THEN
 
@@ -390,8 +348,6 @@
      &       CALL print_module('Potential Evapotranspiration', MODNAME, Version_climate_hru)
         IF ( Climate_transp_flag==ACTIVE ) &
      &       CALL print_module('Transpiration Distribution', MODNAME, Version_climate_hru)
-        IF ( Snow_cbh_flag==ACTIVE ) &
-     &       CALL print_module('Snow Computation', MODNAME, Version_climate_hru)
 
         IF ( Humidity_cbh_flag==ACTIVE ) THEN
           CALL print_module('Humidity Distribution', MODNAME, Version_climate_hru)
@@ -701,64 +657,6 @@
               istop = 1
             ENDIF
           ENDIF
-        ENDIF
-
-        IF ( Snow_cbh_flag==ACTIVE ) THEN
-          IF ( control_string(Pkwater_equiv_day, 'pkwater_equiv_day')/=0 ) CALL read_error(5, 'pkwater_equiv_day')
-          !IF ( control_string(Pk_depth_day, 'pk_depth_day')/=0 ) CALL read_error(5, 'pk_depth_day')
-          !IF ( control_string(Snow_evap_day, 'snow_evap_day')/=0 ) CALL read_error(5, 'snow_evap_day')
-          !IF ( control_string(Snowcov_area_day, 'snowcov_area_day')/=0 ) CALL read_error(5, 'snowcov_area_day')
-          !IF ( control_string(Snowmelt_day, 'snowmelt_day')/=0 ) CALL read_error(5, 'snowmelt_day')
-          CALL find_cbh_header_end(Pkweqv_unit, Pkwater_equiv_day, 'pkwater_equiv_day', ierr, 1)
-          IF ( ierr==1 ) THEN
-            istop = 1
-          ELSE
-            CALL find_current_time(Pkweqv_unit, Start_year, Start_month, Start_day, ierr)
-            IF ( ierr==-1 ) THEN
-              PRINT *, 'for first time step, CBH File: ', Pkwater_equiv_day
-              istop = 1
-            ENDIF
-          ENDIF
-          !CALL find_cbh_header_end(Pkdepth_unit, Pk_depth_day, 'pk_depth_day', ierr, 1)
-          !IF ( ierr==1 ) THEN
-          !  istop = 1
-          !ELSE
-          !  CALL find_current_time(Pkdepth_unit, Start_year, Start_month, Start_day, ierr)
-          !  IF ( ierr==-1 ) THEN
-          !    PRINT *, 'for first time step, CBH File: ', Pk_depth_day
-          !    istop = 1
-          !  ENDIF
-          !ENDIF
-          !CALL find_header_end(Snowevap_unit, Snow_evap_day, 'snow_evap_day', ierr, 1)
-          !IF ( ierr==1 ) THEN
-          !  istop = 1
-          !ELSE
-          !  CALL find_current_time(Snowevap_unit, Start_year, Start_month, Start_day, ierr)
-          !  IF ( ierr==-1 ) THEN
-          !    PRINT *, 'for first time step, CBH File: ', Snow_evap_day
-          !    istop = 1
-          !  ENDIF
-          !ENDIF
-          !CALL find_header_end(Snowarea_unit, Snowcov_area_day, 'snowcov_area_day', ierr, 1)
-          !IF ( ierr==1 ) THEN
-          !  istop = 1
-          !ELSE
-          !  CALL find_current_time(Snowarea_unit, Start_year, Start_month, Start_day, ierr)
-          !  IF ( ierr==-1 ) THEN
-          !    PRINT *, 'for first time step, CBH File: ', Snowcov_area_day
-          !    istop = 1
-          !  ENDIF
-          !ENDIF
-          !CALL find_header_end(Snowmelt_unit, Snowmelt_day, 'snowmelt_day', ierr, 1)
-          !IF ( ierr==1 ) THEN
-          !  istop = 1
-          !ELSE
-          !  CALL find_current_time(Snowmelt_unit, Start_year, Start_month, Start_day, ierr)
-          !  IF ( ierr==-1 ) THEN
-          !    PRINT *, 'for first time step, CBH File: ', Snowmelt_day
-          !    istop = 1
-          !  ENDIF
-          !ENDIF
         ENDIF
 
         IF ( istop==ACTIVE ) THEN

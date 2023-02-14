@@ -1,6 +1,9 @@
 !***********************************************************************
-! Read and makes available dynamic parameters hru_percent_imperv,
-! Wrain_intcp, Srain_intcp, Snow_intcp by HRU from pre-processed files.
+! Read and makes available dynamic parameters cov_type, rad_trncf,
+! transp_beg, transp_end, covden_sum, covden_win, fall_frost, spring_frost
+! sro_to_dprst, sro_to_imperv, snarea_thresh, jh_coef, jh_coef_hru,
+! pm_n_coef, pm_d_coef, pt_alpha, hs_krs, hamon_coef, potet_cbh_adj,
+! wrain_intcp, srain_intcp, snow_intcp by HRU from pre-processed files.
 ! These parameters can be input for any date within the simulation time
 ! period. Associated states with each parameter are adjusted.
 !***********************************************************************
@@ -10,7 +13,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_param_read'
-        character(len=*), parameter :: Version_dynamic_param_read = '2022-10-24'
+        character(len=*), parameter :: Version_dynamic_param_read = '2023-02-07'
         INTEGER, SAVE :: Wrain_intcp_unit, Wrain_intcp_next_yr, Wrain_intcp_next_mo, Wrain_intcp_next_day
         INTEGER, SAVE :: Srain_intcp_unit, Srain_intcp_next_yr, Srain_intcp_next_mo, Srain_intcp_next_day
         INTEGER, SAVE :: Snow_intcp_unit, Snow_intcp_next_yr, Snow_intcp_next_mo, Snow_intcp_next_day
@@ -338,11 +341,10 @@
       EXTERNAL :: write_dynoutput, write_dynparam, write_dynparam_int
       EXTERNAL :: write_dynparam_potet
 ! Local Variables
-      INTEGER :: i, istop, ios
+      INTEGER :: i, ios
       CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       dynparamrun = 0
-      istop = 0
 
       ! leave any interception storage unchanged, it will be evaporated based on new values in intcp module
       IF ( Wrainintcp_flag==ACTIVE ) THEN
@@ -548,8 +550,6 @@
           ENDIF
         ENDIF
       ENDIF
-
-      IF ( istop==1 ) ERROR STOP ERROR_dynamic
 
       END FUNCTION dynparamrun
 

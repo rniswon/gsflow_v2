@@ -292,7 +292,7 @@
         Gw_rejected(i) = 0.0
         Actet_gw(i) = 0.0
         IF ( activeHru_inactiveCell(i) == 0 ) &
-             Slow_stor(i) = 0.0 !shouldn't be reset if any cells of HRU inactive and HRU active
+             Slow_stor(i) = 0.0 !don't reset Slow_stor if inactive cell and HRU active
 !        Uzf_infil_map(i) = 0.0
 !        Sat_recharge(i) = 0.0
 !        Mfoutflow_to_gvr(i) = 0.0

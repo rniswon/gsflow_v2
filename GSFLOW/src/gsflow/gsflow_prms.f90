@@ -51,7 +51,7 @@
       INTEGER, EXTERNAL :: stream_temp, glacr
       INTEGER, EXTERNAL :: dynamic_soil_param_read, strmflow_character
       EXTERNAL :: precip_map, temp_map, segment_to_hru
-      EXTERNAL :: water_balance
+      EXTERNAL :: water_balance, cloud_cover
       EXTERNAL :: prms_summary, convert_params, gsflow_prms2modsim, gsflow_modsim2prms
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
 ! Local Variables
@@ -75,7 +75,7 @@
         Arg = 'setdims'
       ENDIF
       Process = Arg
-!     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 10=MODSIM-GSFLOW; 11=MODSIM-PRMS; 12=MODSIM-MODFLOW; 13=MODSIM)
+!     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 10=MODSIM-GSFLOW; 11=MODSIM-PRMS; 12=MODSIM-MODFLOW; 13=MODSIM; 14=MODSIM-PRMS-LOOSE)
 
       IF ( Process_flag==RUN ) THEN
         IF ( Model==MODSIM_MODFLOW ) THEN
@@ -970,18 +970,12 @@
         Inputerror_flag = 1
       ENDIF
 
-      IF ( control_integer(Snow_cbh_flag, 'snow_cbh_flag')/=0 ) Snow_cbh_flag = OFF
-      IF ( control_integer(Gwflow_cbh_flag, 'gwflow_cbh_flag')/=0 ) Gwflow_cbh_flag = OFF
-      Snow_cbh_flag = OFF ! not implemented yet
-      Gwflow_cbh_flag = OFF ! not implemented yet
-
       Climate_hru_flag = OFF
       IF ( Climate_temp_flag==ACTIVE .OR. Climate_precip_flag==ACTIVE .OR. Climate_potet_flag==ACTIVE .OR. &
      &     Climate_swrad_flag==ACTIVE .OR. Climate_transp_flag==ACTIVE .OR. &
      &     Humidity_cbh_flag==ACTIVE .OR. Windspeed_cbh_flag==ACTIVE .OR. &
      &     irrigated_area_cbh_flag==ACTIVE .OR. AET_cbh_flag==ACTIVE .OR. PET_cbh_flag==ACTIVE .OR. &
-     &     Albedo_cbh_flag==ACTIVE .OR. Cloud_cover_cbh_flag==ACTIVE .OR. &
-     &     Gwflow_cbh_flag==ACTIVE .OR. Snow_cbh_flag==ACTIVE ) Climate_hru_flag = ACTIVE
+     &     Albedo_cbh_flag==ACTIVE .OR. Cloud_cover_cbh_flag==ACTIVE ) Climate_hru_flag = ACTIVE
 
       Muskingum_flag = OFF
       IF ( Strmflow_module(:15)=='strmflow_in_out' ) THEN
@@ -1060,7 +1054,6 @@
       ! 0 = no glacier simulation; 1 = glacr_melt (Ashley) simulation; 2 = Anderson method
       IF ( control_integer(Glacier_flag, 'glacier_flag')/=0 ) Glacier_flag = OFF
       IF ( control_integer(no_snow_flag, 'no_snow_flag')/=0 ) no_snow_flag = OFF
-      !IF ( control_integer(ag_gravity_flag, 'ag_gravity_flag')/=0 ) Ag_gravity_flag = OFF
       IF ( control_integer(Frozen_flag, 'frozen_flag')/=0 ) Frozen_flag = OFF
       IF ( control_integer(Dyn_imperv_flag, 'dyn_imperv_flag')/=0 ) Dyn_imperv_flag = OFF
       IF ( control_integer(Dyn_intcp_flag, 'dyn_intcp_flag')/=0 ) Dyn_intcp_flag = OFF

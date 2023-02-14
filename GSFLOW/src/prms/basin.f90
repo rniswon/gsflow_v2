@@ -278,9 +278,9 @@
       INTEGER FUNCTION basinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CLOSEZERO, &
      &    INACTIVE, LAKE, SWALE, FEET, ERROR_basin, DEBUG_minimum, ERROR_param, &
-     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, MONTHS_PER_YEAR, CANOPY !, METERS2FEET
+     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, CANOPY !, METERS2FEET
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, irrigation_apply_flag, Soilzone_module, &
+      USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, irrigation_apply_flag, &
      &    Dprst_flag, Lake_route_flag, PRMS4_flag, GSFLOW_flag, Frozen_flag, PRMS_VERSION, &
      &    Starttime, Endtime, Parameter_check_flag, AG_flag, Ag_package
       USE PRMS_BASIN
@@ -564,7 +564,7 @@
         IF ( irrigation_apply_flag == CANOPY ) THEN
             gsflow_ag_area = Hru_area ! apply irrigation to canopy, which adjusts for covden
             gsflow_ag_frac = 1.0
-        ELSEIF ( Soilzone_module(:11) == 'soilzone_ag' .AND. irrigation_apply_flag == 3 ) THEN
+        ELSEIF ( AG_flag == ACTIVE .AND. irrigation_apply_flag == 3 ) THEN
             gsflow_ag_area = Ag_area ! apply irrigation to ag area in soilzone_ag module
             gsflow_ag_frac = Ag_frac
         ELSE
@@ -642,7 +642,7 @@
       REAL :: excess, dprst_adj
 !-----------------------------------------------------------------------
       excess = Non_perv - 1.0
-      PRINT '(A,I0,A,F0.5)', 'WARNING, ag_frac + hru_percent_imperv + dprst_frac > 1.0; HRU: ', Hru_id, '; excess: ', excess
+      PRINT '(A,I0,A,F0.6)', 'WARNING, ag_frac + hru_percent_imperv + dprst_frac > 1.0; HRU: ', Hru_id, '; excess: ', excess
       PRINT *, '        dprst_frac and/or hru_percent_imperv adjusted'
       IF ( Dprst_frac > 0.0 ) THEN
         dprst_adj = Dprst_frac - excess
@@ -658,5 +658,5 @@
       IF ( Imperv_frac < CLOSEZERO .AND. ABS(Imperv_frac) > 0.0 ) THEN
         IF ( Imperv_frac < 0.0 ) PRINT *, 'WARNING, hru_percent_imperv < 0 after adjustment, set to 0, imperv_frac:', Imperv_frac
         Imperv_frac = 0.0
-       ENDIF
+      ENDIF
     END SUBROUTINE adjust_fractions

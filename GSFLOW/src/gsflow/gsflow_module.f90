@@ -9,7 +9,7 @@
      &          EQULS = '=========================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 01/25/2023'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 02/14/2023'
       character(len=*), parameter :: PRMS_versn = '2023-01-25'
       character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 01/25/2023'
       character(len=*), parameter :: Version_read_control_file = '2022-10-20'
@@ -21,13 +21,13 @@
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus, NLAKES_MF, Nreach
       INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval, Nmap2hru, Nmap, Nsnow
 ! Global
-      !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 10=MODSIM-GSFLOW; 11=MODSIM-PRMS; 12=MODSIM-MODFLOW; 13=MODSIM)
+      !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 10=MODSIM-GSFLOW; 11=MODSIM-PRMS; 12=MODSIM-MODFLOW; 13=MODSIM; 14=MODSIM-PRMS-LOOSE)
       INTEGER, SAVE :: Model, Process_flag, Call_cascade, PRMS_only, timestep_start_flag
       INTEGER, SAVE :: Start_year, Start_month, Start_day, End_year, End_month, End_day
       INTEGER, SAVE :: Transp_flag, Sroff_flag, Solrad_flag, Et_flag, AG_flag
       INTEGER, SAVE :: Climate_temp_flag, Climate_precip_flag, Climate_potet_flag, Climate_transp_flag
       INTEGER, SAVE :: Lake_route_flag, Strmflow_flag, Stream_order_flag
-      INTEGER, SAVE :: Temp_flag, Precip_flag, Climate_hru_flag, Climate_swrad_flag, Cloud_flag
+      INTEGER, SAVE :: Temp_flag, Precip_flag, Climate_hru_flag, Climate_swrad_flag, Cloud_flag, Gsf_unt
       INTEGER, SAVE :: Precip_combined_flag, Temp_combined_flag, Muskingum_flag
       INTEGER, SAVE :: Inputerror_flag, Timestep
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag, Albedo_cbh_flag, Cloud_cover_cbh_flag
@@ -61,8 +61,8 @@
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag, forcing_check_flag
       INTEGER, SAVE :: Prms_warmup, PRMS_land_iteration_flag, Iter_aet_flag, text_restart_flag
-      INTEGER, SAVE :: Snow_cbh_flag, Gwflow_cbh_flag, Frozen_flag, Glacier_flag, no_snow_flag
-      INTEGER, SAVE :: irrigation_apply_flag, Dyn_ag_frac_flag, Dyn_ag_soil_flag, seg2hru_flag !, Ag_gravity_flag
+      INTEGER, SAVE :: Frozen_flag, Glacier_flag, no_snow_flag
+      INTEGER, SAVE :: irrigation_apply_flag, Dyn_ag_frac_flag, Dyn_ag_soil_flag, seg2hru_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, statsON_OFF, outputSelectDatesON_OFF, snow_cloudcover_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName
@@ -76,7 +76,7 @@
       CHARACTER(LEN=11), SAVE :: Soilzone_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
       INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF
-      INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag, Gsf_rpt, Rpt_days, Gsf_unt
+      INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag, Gsf_rpt, Rpt_days
       INTEGER, SAVE :: Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, Dyn_springfrost_flag
       INTEGER, SAVE :: Gwr_transferON_OFF, External_transferON_OFF, Segment_transferON_OFF, Lake_transferON_OFF
     END MODULE PRMS_MODULE

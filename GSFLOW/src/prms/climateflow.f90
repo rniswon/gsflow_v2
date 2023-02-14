@@ -442,7 +442,7 @@ end module PRMS_IT0_VARS
      &     'Actual ET for each HRU', &
      &     'inches', Hru_actet)
 
-      IF ( GSFLOW_flag==ACTIVE ) THEN
+      IF ( GSFLOW_flag==ACTIVE .AND. AG_flag==ACTIVE ) THEN
         ALLOCATE ( gsflow_ag_actet(Nhru) )
         CALL declvar_real(Soilzone_module, 'gsflow_ag_actet', 'nhru', Nhru, &
      &       'Agriculture actual ET for GSFLOW simulations for each HRU', &
@@ -1267,7 +1267,6 @@ end module PRMS_IT0_VARS
             Ag_soil_rechr_init_frac = Soil_rechr_init_frac
           ENDIF
         ENDIF
-        ! determing ag_soil_rechr_max with minimum 0.75 and have ag_soil_moist_max minimum value
         Ag_soil_rechr_max = 0.0
         DO i = 1, Nhru
           IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE ) CYCLE
@@ -1279,16 +1278,16 @@ end module PRMS_IT0_VARS
           !  PRINT *, 'ag_soil_rechr_max_frac < 0.75, set to 0.75, HRU:', i, Ag_soil_rechr_max_frac(i)
           !  Ag_soil_rechr_max_frac(i) = 0.75
           !ENDIF
-          Ag_soil_rechr_max(i) = Ag_soil_moist_max(i) * Ag_soil_rechr_max_frac(i)
-          IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
+          IF ( Ag_soil_rechr_max_frac(i) > 1.0 ) THEN
             IF ( Parameter_check_flag>0 ) THEN
-              PRINT 9022, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
+              PRINT 9022, i, Ag_soil_rechr_max_frac(i)
               ierr = 1
             ELSE
-              IF ( Print_debug>DEBUG_less ) PRINT 9032, i, Ag_soil_rechr_max(i), Ag_soil_moist_max(i)
-              Ag_soil_rechr_max(i) = Ag_soil_moist_max(i)
+              IF ( Print_debug>DEBUG_less ) PRINT 9032, i, Ag_soil_rechr_max_frac(i)
+              Ag_soil_rechr_max_frac(i) = 1.0
             ENDIF
           ENDIF
+          Ag_soil_rechr_max(i) = Ag_soil_moist_max(i) * Ag_soil_rechr_max_frac(i)
         ENDDO
         IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
           Ag_soil_moist = Ag_soil_moist_init_frac * Ag_soil_moist_max
@@ -1536,7 +1535,7 @@ end module PRMS_IT0_VARS
  9003 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_init > soil_rechr_max', 2F10.5)
  9004 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_init > soil_moist_max', 2F10.5)
  9005 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr > soil_moist based on init and max values', 2F10.5)
- 9022 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_max > ag_soil_moist_max', 2F10.5)
+ 9022 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_max_frac > 1.0', F10.5)
  9023 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max', 2F10.5)
  9024 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max', 2F10.5)
  9025 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr > ag_soil_moist based on init and max values', 2F10.5)
@@ -1552,14 +1551,15 @@ end module PRMS_IT0_VARS
      &        'soil_moist set to soil_moist_max')
  9015 FORMAT ('WARNING, HRU: ', I0, ' soil_rechr_init > soil_moist_init,', 2F10.5, /, 9X, &
      &        'soil_rechr set to soil_moist based on init and max values')
- 9032 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_max > ag_soil_moist_max,', 2F10.5, /, 9X, &
-     &        'ag_soil_rechr_max set to ag_soil_moist_max')
+ 9032 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_max_frac > 1.0,', F10.5, /, 9X, &
+     &        'ag_soil_rechr_max_frac set to 1.0')
  9033 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max,', 2F10.5, /, 9X, &
      &        'ag_soil_rechr set to ag_soil_rechr_max')
  9034 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max,', 2F10.5, /, 9X, &
      &        'ag_soil_moist set to ag_soil_moist_max')
  9035 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_moist_init,', 2F10.5, /, 9X, &
      &        'ag_soil_rechr set to ag_soil_moist based on init and max values')
+
       END FUNCTION climateflow_init
 
 !***********************************************************************
@@ -1568,14 +1568,13 @@ end module PRMS_IT0_VARS
       SUBROUTINE temp_set(Ihru, Tmax, Tmin, Tmaxf, Tminf, Tavgf, Tmaxc, Tminc, Tavgc, Hru_area)
       USE PRMS_CLIMATEVARS, ONLY: Basin_temp, Basin_tmax, Basin_tmin, Temp_units, Tmax_hru, Tmin_hru
       USE PRMS_CONSTANTS, ONLY: MINTEMP, MAXTEMP, ERROR_temp, DEBUG_less, ACTIVE
-      USE PRMS_MODULE, ONLY: forcing_check_flag, Print_debug
+      USE PRMS_MODULE, ONLY: Print_debug, forcing_check_flag
       use prms_utils, only: c_to_f, f_to_c, print_date
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Ihru
       REAL, INTENT(IN) :: Tmax, Tmin, Hru_area
 !      REAL, INTENT(INOUT) :: Tmax, Tmin
-!      REAL, INTENT(IN) :: Hru_area
       REAL, INTENT(OUT) :: Tmaxf, Tminf, Tavgf, Tmaxc, Tminc, Tavgc
 ! Functions
       INTRINSIC :: DBLE
@@ -1638,7 +1637,7 @@ end module PRMS_IT0_VARS
      &           Tminf, Pptmix, Newsnow, Prmx, Tmax_allrain_f, Rain_adj, &
      &           Snow_adj, Adjmix_rain, Hru_area, Sum_obs, Tmax_allsnow_f, Ihru)
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, DEBUG_less
-      USE PRMS_MODULE, ONLY: forcing_check_flag, Print_debug
+      USE PRMS_MODULE, ONLY: Print_debug !, forcing_check_flag
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       use prms_utils, only: print_date
       IMPLICIT NONE
@@ -1702,15 +1701,15 @@ end module PRMS_IT0_VARS
       Basin_rain = Basin_rain + DBLE( Hru_rain*Hru_area )
       Basin_snow = Basin_snow + DBLE( Hru_snow*Hru_area )
 
-      IF ( forcing_check_flag == ACTIVE ) THEN
-        IF ( Hru_ppt < 0.0 .OR. Hru_rain < 0.0 .OR. Hru_ppt < 0.0 ) THEN
+!      IF ( forcing_check_flag == ACTIVE ) THEN
+        IF ( Hru_ppt < 0.0 .OR. Hru_rain < 0.0 .OR. Hru_snow < 0.0 ) THEN
           IF ( Print_debug > DEBUG_less ) THEN
             PRINT '(A,I0)', 'Warning, adjusted precipitation value(s) < 0.0 for HRU: ', Ihru
             PRINT '(A,F0.4,A,F0.4,A)', '         hru_ppt: ', Hru_ppt, ' hru_rain: ', Hru_rain, ' hru_snow: ', Hru_snow
             CALL print_date(0)
           ENDIF
         ENDIF
-      ENDIF
+!      ENDIF
 
       END SUBROUTINE precip_form
 

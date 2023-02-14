@@ -34,7 +34,7 @@ LIBOBJS = \
         gwflakmodule_NWT.o \
         gwf2lak7_NWT.o \
         gwf2sfr7_NWT.o \
-        gwf2ag1_NWT_ponds.o \
+        gwf2ag1_NWT.o \
         gwf2wel7_NWT.o \
         gwf2uzf1_NWT.o \
         gwf2ghb7_NWT.o \
@@ -120,8 +120,8 @@ gwf2upw7.o: gwf2upw1.f gwf2bas7_NWT.o NWT1_module.o
 gwf2wel7.o: gwf2wel7.f gwf2bas7_NWT.o NWT1_module.o gwf2upw1.o
 	$(FC) $(FFLAGS) -c gwf2wel7.f
 	
-gwf2ag1_NWT_ponds.o: gwf2ag1_NWT_ponds.f gwf2bas7_NWT.o NWT1_module.o gwf2upw1.o prms_module.mod prms_it0_vars.mod prms_basin.mod prms_flowvars.mod prms_climatevars.mod gsfmodflow.mod mach_mod.o prms_soilzone.mod
-	$(FC) $(FFLAGS) -c gwf2ag1_NWT_ponds.f
+gwf2ag1_NWT.o: gwf2ag1_NWT.f gwf2bas7_NWT.o NWT1_module.o gwf2upw1.o prms_module.mod prms_it0_vars.mod prms_basin.mod prms_flowvars.mod prms_climatevars.mod gsfmodflow.mod mach_mod.o prms_soilzone.mod
+	$(FC) $(FFLAGS) -c gwf2ag1_NWT.f
 	
 gwf2sfr7_NWT.o: gwf2sfr7_NWT.f gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwf2lpf7.o gwf2bcf7.o gwf2huf7.o gwf2upw1.o gwfuzfmodule_NWT.o NWT1_module.o gwflakmodule_NWT.o prms_constants.mod prms_climatevars.mod prms_module.mod
 	$(FC) $(FFLAGS) -c gwf2sfr7_NWT.f
@@ -165,8 +165,8 @@ sip7_NWT.o: sip7_NWT.f gwf2bas7_NWT.o
 Irestart.o: Irestart.f gwfuzfmodule_NWT.o gwfsfrmodule_NWT.o gsfmodflow.mod
 	$(FC) $(FFLAGS) -c Irestart.f
 
-gwfagmodule.mod: gwf2ag1_NWT_ponds.o
-	$(FC) $(FFLAGS) -c gwf2ag1_NWT_ponds.o
+gwfagmodule.mod: gwf2ag1_NWT.o
+	$(FC) $(FFLAGS) -c gwf2ag1_NWT.o
 
 prms_module.mod:
 	$(CD) ../gsflow;make prms_module.mod
