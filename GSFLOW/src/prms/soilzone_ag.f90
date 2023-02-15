@@ -91,7 +91,7 @@
       USE PRMS_CONSTANTS, ONLY: OFF, ACTIVE, MONTHS_PER_YEAR
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getdim
-      USE PRMS_MODULE, ONLY: Nhru, Nhrucell, GSFLOW_flag !, Cascade_flag
+      USE PRMS_MODULE, ONLY: Nhru, Iter_aet_flag, Nhrucell, GSFLOW_flag !, Cascade_flag
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       use prms_utils, only: error_stop, print_module, PRMS_open_module_file, read_error
@@ -107,7 +107,7 @@
      &     'inches', perv_soil_to_gw)
 
       ALLOCATE ( perv_soil_to_gvr(Nhru) )
-      CALL declvar_real(MODNAME, 'ag_soil_to_gvr', 'nhru', Nhru, &
+      CALL declvar_real(MODNAME, 'perv_soil_to_gvr', 'nhru', Nhru, &
      &     'Excess pervious capillary water that flows to the gravity reservoir of each HRU', &
      &     'inches', perv_soil_to_gvr)
 
@@ -211,30 +211,32 @@
      &     'Total water into the agriculture reservoir for each HRU', &
      &     'inches', Ag_water_in)
 
-      IF ( declparam(MODNAME, 'max_soilzone_ag_iter', 'one', 'integer', &
-     &     '10', '1', '9999', &
-     &     'Maximum number of iterations to optimize computed AET and input AET', &
-     &     'Maximum number of iterations to optimize computed AET and input AET', &
-     &     'none')/=0 ) CALL read_error(1, 'max_soilzone_ag_iter')
+      IF ( Iter_aet_flag==ACTIVE ) THEN
+        IF ( declparam(MODNAME, 'max_soilzone_ag_iter', 'one', 'integer', &
+     &       '10', '1', '9999', &
+     &       'Maximum number of iterations to optimize computed AET and input AET', &
+     &       'Maximum number of iterations to optimize computed AET and input AET', &
+     &       'none')/=0 ) CALL read_error(1, 'max_soilzone_ag_iter')
 
-      IF ( declparam(MODNAME, 'soilzone_aet_converge', 'one', 'real', &
-     &     '0.00001', '0.0', '1.0', &
-     &     'Convergence criteria to iterate computed AET compared to input AET', &
-     &     'Convergence criteria to iterate computed AET compared to input AET', &
-     &     'decimal fraction')/=0 ) CALL read_error(1, 'soilzone_aet_converge')
+        IF ( declparam(MODNAME, 'soilzone_aet_converge', 'one', 'real', &
+     &       '0.00001', '0.0', '1.0', &
+     &       'Convergence criteria to iterate computed AET compared to input AET', &
+     &       'Convergence criteria to iterate computed AET compared to input AET', &
+     &       'decimal fraction')/=0 ) CALL read_error(1, 'soilzone_aet_converge')
+
+        ALLOCATE ( Ag_soilwater_deficit_min(Nhru) )
+        IF ( declparam(MODNAME, 'ag_soilwater_deficit_min', 'nhru', 'real', &
+     &       '0.0', '0.0', '1.0', &
+     &       'Minimum soil-water deficit to begin agriculture irrigaition', &
+     &       'Minimum soil-water deficit fraction to begin agriculture irrigaition', &
+     &       'fraction')/=0 ) CALL read_error(1, 'ag_soilwater_deficit_min')
+      ENDIF
 
       ALLOCATE ( Ag_soil_type(Nhru) )
       IF ( declparam(MODNAME, 'ag_soil_type', 'nhru', 'integer', &
-     &     '-1', '1', '3', &
+     &     '-1', '-1', '3', &
      &     'Agriculture soil type', 'Soil type of agriculture in each HRU (1=sand; 2=loam; 3=clay)', &
      &     'none')/=0 ) CALL read_error(1, 'ag_soil_type')
-
-      ALLOCATE ( Ag_soilwater_deficit_min(Nhru) )
-      IF ( declparam(MODNAME, 'ag_soilwater_deficit_min', 'nhru', 'real', &
-     &     '0.0', '0.0', '1.0', &
-     &     'Minimum soil-water deficit to begin agriculture irrigaition', &
-     &     'Minimum soil-water deficit fraction to begin agriculture irrigaition', &
-     &     'fraction')/=0 ) CALL read_error(1, 'ag_soilwater_deficit_min')
 
 !      ALLOCATE ( Ag_crop_type(Nhru) ) ! find Mastin's code on different crops
 !      IF ( declparam(MODNAME, 'ag_crop_type', 'nhru', 'integer', &
@@ -275,7 +277,7 @@
       INTEGER FUNCTION szinit_ag()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, LAKE, INACTIVE, GLACIER, MONTHS_PER_YEAR
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Hru_type, GSFLOW_flag
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Hru_type, GSFLOW_flag, Iter_aet_flag
       USE PRMS_SOILZONE, ONLY: MODNAME, Soil2gw_max, Soil_type
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Basin_area_inv, Ag_area, Covden_win, Covden_sum
@@ -292,17 +294,21 @@
       szinit_ag = 0
 
 !??? figure out what to save in restart file ???
-      IF ( getparam_int(MODNAME, 'max_soilzone_ag_iter', 1, max_soilzone_ag_iter)/=0 ) &
-     &     CALL read_error(2, 'max_soilzone_ag_iter')
-      IF ( getparam_real(MODNAME, 'soilzone_aet_converge', 1, soilzone_aet_converge)/=0 ) &
-     &     CALL read_error(2, 'soilzone_aet_converge')
+      IF ( Iter_aet_flag==ACTIVE ) THEN
+        IF ( getparam_int(MODNAME, 'max_soilzone_ag_iter', 1, max_soilzone_ag_iter)/=0 ) &
+     &       CALL read_error(2, 'max_soilzone_ag_iter')
+        IF ( getparam_real(MODNAME, 'soilzone_aet_converge', 1, soilzone_aet_converge)/=0 ) &
+     &       CALL read_error(2, 'soilzone_aet_converge')
+        IF ( getparam_real(MODNAME, 'ag_soilwater_deficit_min', Nhru, Ag_soilwater_deficit_min)/=0 ) &
+     &       CALL read_error(2, 'ag_soilwater_deficit_min')
+        Ag_irrigation_add = 0.0
+        Ag_soilwater_deficit = 0.0
+      ENDIF
       IF ( getparam_int(MODNAME, 'ag_soil_type', Nhru, Ag_soil_type)/=0 ) CALL read_error(2, 'ag_soil_type')
       IF ( Ag_soil_type(1) == -1 ) THEN
         print *, 'WARNING, ag_soil_type not specified, substituting soil_type'
         Ag_soil_type = Soil_type
       ENDIF
-      IF ( getparam_real(MODNAME, 'ag_soilwater_deficit_min', Nhru, Ag_soilwater_deficit_min)/=0 ) &
-     &     CALL read_error(2, 'ag_soilwater_deficit_min')
 !      IF ( getparam_int(MODNAME, 'ag_crop_type', Nhru, Ag_crop_type)/=0 ) CALL read_error(2, 'ag_crop_type')
       IF ( getparam_real(MODNAME, 'ag_covden_sum', Nhru, Ag_covden_sum)/=0 ) CALL read_error(2, 'ag_covden_sum')
       IF ( Ag_covden_sum(1)<0.0 ) THEN
@@ -322,7 +328,6 @@
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) Ag_soil_lower = 0.0
       ! dimensioned nhru
       Basin_ag_irrigation_add = 0.0D0
-      Ag_irrigation_add = 0.0
       ag_soil_to_gw = 0.0
       Ag_hortonian = 0.0
       ag_soil_to_gvr = 0.0
@@ -333,7 +338,6 @@
       hru_ag_actet = 0.0
       perv_soil_to_gw = 0.0
       perv_soil_to_gvr = 0.0
-      Ag_soilwater_deficit = 0.0
       Basin_ag_soil_moist = 0.0D0
       Basin_ag_soil_rechr = 0.0D0
       IF ( GSFLOW_flag==ACTIVE ) THEN
@@ -556,7 +560,7 @@
         ag_soil_to_gw(i) = 0.0
         Ag_hortonian(i) = 0.0
         Unused_ag_et(i) = 0.0
-        Ag_soilwater_deficit(i) = 0.0
+        IF ( Iter_aet_flag==ACTIVE ) Ag_soilwater_deficit(i) = 0.0
         Ag_cap_infil_tot(i) = 0.0
         Ag_water_in(i) = 0.0
         Pfr_dunnian_flow(i) = 0.0
@@ -708,8 +712,8 @@
             Pref_flow_infil(i) = pref_flow_maxin - dunnianflw_pfr
             Basin_pref_flow_infil = Basin_pref_flow_infil + DBLE( Pref_flow_infil(i)*harea )
             Pfr_dunnian_flow(i) = dunnianflw_pfr
-          pref_flow_max_in(i) = pref_flow_maxin
-          Basin_pref_flow_max_in = Basin_pref_flow_max_in + DBLE( pref_flow_max_in(i)*harea )
+            pref_flow_max_in(i) = pref_flow_maxin
+            Basin_pref_flow_max_in = Basin_pref_flow_max_in + DBLE( pref_flow_max_in(i)*harea )
           ENDIF
         ENDIF
 
@@ -921,16 +925,16 @@
                   PRINT *, 'ag_actet issue', agactet, ag_avail_potet, agfrac, AET_external(i), ag_potet, i, hruactet
                   PRINT *, ag_AETtarget-agactet, Ag_soil_moist(i), Ag_soil_rechr(i)
                 ENDIF
+                IF ( ag_AETtarget<agactet ) THEN
+                  PRINT *, 'WARNING, external agriculture available target AET from CBH File < computed AET', i, &
+     &                     Nowyear, Nowmonth, Nowday, num_hrus_ag_iter
+                  PRINT '(4(A,F0.6))', '         AET_external: ', ag_AETtarget, '; ag_actet: ', &
+     &                  agactet, ' PET_external: ', PET_external(i), ' AET_external: ', AET_external(i)
+                  print *, Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i)
+                ENDIF
               ENDIF
               ag_hruactet = agactet*agfrac
 
-              IF ( ag_AETtarget<agactet ) THEN
-                PRINT *, 'WARNING, external agriculture available target AET from CBH File < computed AET', i, &
-     &                   Nowyear, Nowmonth, Nowday, num_hrus_ag_iter
-                PRINT '(4(A,F0.6))', '         AET_external: ', ag_AETtarget, '; ag_actet: ', &
-     &                agactet, ' PET_external: ', PET_external(i), ' AET_external: ', AET_external(i)
-                print *, Hru_impervevap(i), Hru_intcpevap(i), Snow_evap(i)
-              ENDIF
               Unused_ag_et(i) = ag_AETtarget - agactet
             ENDIF
             unsatisfied_ag_et = ag_AETtarget - agactet
