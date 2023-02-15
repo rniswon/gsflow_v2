@@ -217,7 +217,7 @@
 
         ALLOCATE ( Ag_cov_type(Nhru) )
         IF ( declparam(MODNAME, 'ag_cov_type', 'nhru', 'integer', &
-     &       '-1', '0', '4', &
+     &       '-1', '-1', '4', &
      &       'Cover type designation for agriculture area of each HRU', &
      &       'Vegetation cover type for agriculture area of each HRU (0=bare soil; 1=grasses; 2=shrubs; 3=trees; 4=coniferous)', &
      &       'none')/=0 ) CALL read_error(1, 'ag_cov_type')

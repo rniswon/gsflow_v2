@@ -1005,28 +1005,28 @@ end module PRMS_IT0_VARS
      &       'inches', Ag_soil_rechr)
         ALLOCATE ( Ag_soil_moist_max(Nhru) )
         IF ( declparam(Soilzone_module, 'ag_soil_moist_max', 'nhru', 'real', &
-     &       '-1.0', '0.0', '20.0', &
+     &       '-1.0', '-1.0', '20.0', &
      &       'Maximum value of water content for agriculture fraction of the soilzone', &
      &       'Maximum available water holding capacity of the agriculture'// &
      &       ' reservoir from land surface to rooting depth of the crop type of each HRU', &
      &       'inches')/=0 ) CALL read_error(1, 'ag_soil_moist_max')
         ALLOCATE ( Ag_soil_rechr_max_frac(Nhru), Ag_soil_rechr_max(Nhru) )
         IF ( declparam(Soilzone_module, 'ag_soil_rechr_max_frac', 'nhru', 'real', &
-     &       '-1.0', '0.0', '1.0', &
+     &       '-1.0', '-1.0', '1.0', &
      &       'Fraction of agriculture reservoir where losses occur as both evaporation and transpiration (soil recharge zone)', &
      &       'Fraction of the agriculture reservoir water-holding capacity (ag_soil_moist_max) where losses occur as both'// &
      &       ' evaporation and transpiration (upper zone of agriculture reservoir) for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_soil_rechr_max_frac')
         ALLOCATE ( Ag_soil_rechr_init_frac(Nhru) )
         IF ( declparam(Soilzone_module, 'ag_soil_rechr_init_frac', 'nhru', 'real', &
-     &       '-1.0', '0.0', '1.0', &
+     &       '-1.0', '-1.0', '1.0', &
      &       'Initial fraction of available water in the soil recharge zone within the agriculture reservoir', &
      &       'Initial fraction of available water in the agriculture reservoir where losses occur'// &
      &       ' as both evaporation and transpiration (upper zone of agriculture reservoir) for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'ag_soil_rechr_init_frac')
         ALLOCATE ( Ag_soil_moist_init_frac(Nhru) )
         IF ( declparam(Soilzone_module, 'ag_soil_moist_init_frac', 'nhru', 'real', &
-     &       '-1.0', '0.0', '1.0', &
+     &       '-1.0', '-1.0', '1.0', &
      &       'Initial fraction available water in the soil agriculture reservoir', &
      &       'Initial fraction of available water in the soil agriculture reservoir'// &
      &       ' (fraction of ag_soil_moist_max for each HRU', &
