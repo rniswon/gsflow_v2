@@ -9,7 +9,7 @@ Executable: ..\..\..\bin\gsflow.exe
 ==========================================================================
 Control File: .\gsflow_gsflowLowKc.control
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:30:43
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:10:31
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -22,7 +22,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:30:43
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
-                        Github Commit Hash 0a338c0
+                        Github Commit Hash b1f5bae
 
 
 ==========================================================================
@@ -50,7 +50,7 @@ Solar Radiation Distribution    ddsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2022-09-07
+Snow Dynamics                   snowcomp            2023-02-08
 Surface Runoff                  srunoff_smidx       2022-11-02
 Soilzone Computations           soilzone            2023-01-25
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
@@ -335,13 +335,19 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/06 15:33:42
- Elapsed run time: 2 Minutes, 58.829 Seconds
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/16 10:12:47
+ Elapsed run time: 2 Minutes, 15.404 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
- MF iterations:         11482;  SZ iterations:           11460
- Average MF iterations:  6.18;  Average SZ iterations:    6.17
- Maximum MF iterations:    72;  Maximum SZ iterations:      50
+ MF iterations:         11511;  SZ iterations:           11500
+ Average MF iterations:  6.20;  Average SZ iterations:    6.19
+ Maximum MF iterations:    61;  Maximum SZ iterations:      50
 
 mxsziter reached: 1
 

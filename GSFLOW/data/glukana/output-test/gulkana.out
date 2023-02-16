@@ -170,7 +170,7 @@ Solar Radiation Distribution    ccsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2022-09-07
+Snow Dynamics                   snowcomp            2023-02-08
 Glacier Dynamics                glacr_melt          2022-09-07
 Surface Runoff                  srunoff_smidx       2022-11-02
 Soilzone Computations           soilzone            2023-01-25
@@ -250,5 +250,5 @@ Fraction impervious:        0.0687    Fraction pervious:       0.9313
  *************************************************************
  Total for run     418.200  279.047    1.062  150.525 -286.767
  *************************************************************
-Execution elapsed time    0 minutes  4.82 seconds
+Execution elapsed time    0 minutes  3.56 seconds
 

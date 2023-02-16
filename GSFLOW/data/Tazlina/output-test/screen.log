@@ -20,7 +20,7 @@ Control File: .\control\Tazlina.control
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  WARNING, control parameter not in Control File: mbInit_flag, set to 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:54:22
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:09:04
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -82,7 +82,7 @@ Solar Radiation Distribution    ccsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2022-09-07
+Snow Dynamics                   snowcomp            2023-02-08
 Glacier Dynamics                glacr_melt          2022-09-07
  Parameter: hru_slope declared more than once
  First declared by module: glacr_melt
@@ -486,9 +486,9 @@ Simulation time period: 1950/10/01 - 2015/09/30
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:54:22
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:09:04
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:54:32
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:09:11
 
-Execution elapsed time    0 minutes  9.47 seconds
+Execution elapsed time    0 minutes  6.51 seconds
 
