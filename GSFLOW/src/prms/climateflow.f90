@@ -442,7 +442,7 @@ end module PRMS_IT0_VARS
      &     'Actual ET for each HRU', &
      &     'inches', Hru_actet)
 
-      IF ( GSFLOW_flag==ACTIVE .AND. AG_flag==ACTIVE ) THEN
+      IF ( GSFLOW_flag==ACTIVE ) THEN
         ALLOCATE ( gsflow_ag_actet(Nhru) )
         CALL declvar_real(Soilzone_module, 'gsflow_ag_actet', 'nhru', Nhru, &
      &       'Agriculture actual ET for GSFLOW simulations for each HRU', &
