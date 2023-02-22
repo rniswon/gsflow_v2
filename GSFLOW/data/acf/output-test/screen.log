@@ -19,7 +19,7 @@ Control File: .\control\acf.control
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:27:39
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:04:19
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -75,13 +75,13 @@ Common States and Fluxes        climateflow         2023-01-11
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
-Temperature Distribution        climate_hru         2022-09-07
-Precipitation Distribution      climate_hru         2022-09-07
-Solar Radiation Distribution    climate_hru         2022-09-07
-Potential Evapotranspiration    climate_hru         2022-09-07
+Temperature Distribution        climate_hru         2023-02-08
+Precipitation Distribution      climate_hru         2023-02-08
+Solar Radiation Distribution    climate_hru         2023-02-08
+Potential Evapotranspiration    climate_hru         2023-02-08
 Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2022-09-07
+Snow Dynamics                   snowcomp            2023-02-08
 Surface Runoff                  srunoff_smidx       2022-11-02
 Soilzone Computations           soilzone            2023-01-25
 Groundwater                     gwflow              2022-04-21
@@ -123,9 +123,9 @@ Simulation time period: 1988/10/01 - 1990/09/30
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:27:39
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:04:19
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:27:40
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:04:20
 
-Execution elapsed time    0 minutes  1.13 seconds
+Execution elapsed time    0 minutes  0.53 seconds
 

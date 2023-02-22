@@ -19,7 +19,7 @@ Control File: .\Sagehen_ponds.control
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  Warning, dimension: nlake_hrus is not needed as value specified as 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:53:08
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:15:27
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -37,7 +37,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:53:08
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash 0a338c0
+                        Github Commit Hash b1f5bae
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -96,10 +96,10 @@ Solar Radiation Distribution    ddsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2022-09-07
+Snow Dynamics                   snowcomp            2023-02-08
 Surface Runoff                  srunoff_smidx       2022-11-02
 Soilzone Computations           soilzone            2023-01-25
-Soilzone Computations           soilzone_ag         2023-01-25
+Soilzone Computations           soilzone_ag         2023-02-08
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2022-12-19
@@ -170,14 +170,8 @@ Writing GSFLOW CSV File: ..\output\gsflowhighKc.csv
           Set to default value:  0.2000000    
  WARNING, parameter: pref_flow_infil_frac is not specified
           Set to default value:  -1.000000    
- WARNING, parameter: max_soilzone_ag_iter is not specified
-          Set to default value:          10
- WARNING, parameter: soilzone_aet_converge is not specified
-          Set to default value:  9.9999997E-06
  WARNING, parameter: ag_soil_type is not specified
           Set to default value:          -1
- WARNING, parameter: ag_soilwater_deficit_min is not specified
-          Set to default value:  0.0000000E+00
  WARNING, parameter: ag_covden_sum is not specified
           Set to default value:  -1.000000    
  WARNING, parameter: ag_covden_win is not specified
@@ -727,17 +721,17 @@ Date: 1995/10/01; Stress: 62; Step: 1; Simulation step: 1827
                   MF iterations: 6; SZ iterations: 6
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/06 15:56:00
- Elapsed run time: 2 Minutes, 51.347 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/16 10:17:45
+ Elapsed run time: 2 Minutes, 18.011 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
- MF iterations:         11847;  SZ iterations:           11825
+ MF iterations:         11846;  SZ iterations:           11824
  Average MF iterations:  6.38;  Average SZ iterations:    6.37
  Maximum MF iterations:    72;  Maximum SZ iterations:      50
 
 mxsziter reached: 1
 
-MF iteration distribution:      0    0   27  197  320  468  483  247   80   18
+MF iteration distribution:      0    0   27  198  319  468  483  247   80   18
                                 3    2    3    2    1    2    1    0    0    0
                                 0    0    0    1    0    0    0    0    1    0
                                 0    0    0    0    0    0    0    0    0    0
@@ -746,7 +740,7 @@ MF iteration distribution:      0    0   27  197  320  468  483  247   80   18
                                 0    0    0    0    0    0    0    0    0    0
                                 0    1    0    0    0    0    0    0    0    0
 
-SZ computation distribution:    0    0   27  197  320  468  483  247   80   18
+SZ computation distribution:    0    0   27  198  319  468  483  247   80   18
                                 3    2    3    2    1    2    1    0    0    0
                                 0    0    0    1    0    0    0    0    1    0
                                 0    0    0    0    0    0    0    0    0    0

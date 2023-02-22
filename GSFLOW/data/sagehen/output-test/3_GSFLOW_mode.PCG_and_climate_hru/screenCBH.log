@@ -10,7 +10,7 @@ Executable: ..\..\..\bin\gsflow
 Control File: .\gsflow_climate_hru.control
  WARNING, control parameter not used: solzone_module, ignored
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:46:55
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:20:54
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -23,7 +23,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/01/27 19:46:55
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
-                        Github Commit Hash 0a338c0
+                        Github Commit Hash b1f5bae
 
 
 ==========================================================================
@@ -45,13 +45,13 @@ Common States and Fluxes        climateflow         2023-01-11
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
-Temperature Distribution        climate_hru         2022-09-07
-Precipitation Distribution      climate_hru         2022-09-07
-Solar Radiation Distribution    climate_hru         2022-09-07
-Potential Evapotranspiration    climate_hru         2022-09-07
+Temperature Distribution        climate_hru         2023-02-08
+Precipitation Distribution      climate_hru         2023-02-08
+Solar Radiation Distribution    climate_hru         2023-02-08
+Potential Evapotranspiration    climate_hru         2023-02-08
 Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2022-09-07
+Snow Dynamics                   snowcomp            2023-02-08
 Surface Runoff                  srunoff_smidx       2022-11-02
 Soilzone Computations           soilzone            2023-01-25
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
@@ -85,12 +85,12 @@ Simulation time period: 1980/10/01 - 1996/09/30
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/01/27 20:02:52
- Elapsed run time: 15 Minutes, 57.302 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/16 10:37:37
+ Elapsed run time: 16 Minutes, 43.243 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
- MF iterations:         63708;  SZ iterations:           63670
- Average MF iterations: 10.90;  Average SZ iterations:   10.89
+ MF iterations:         63715;  SZ iterations:           63677
+ Average MF iterations: 10.90;  Average SZ iterations:   10.90
  Maximum MF iterations:    32;  Maximum SZ iterations:      25
 
 mxsziter reached: 13

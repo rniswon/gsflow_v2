@@ -13,6 +13,7 @@ MODOBJS =	\
 		gsflow_module.o \
 		gsflow_prms.o \
 		gsflow_modflow.o \
+		gsflow_fortran.o \
 		gsflow_prms2mf.o \
 		gsflow_mf2prms.o \
 		gsflow_prms2modsim.o \
@@ -182,6 +183,9 @@ prms_modsim_diversion_read.mod: modsim_diversion_read.o
 
 gsflow_module.o: gsflow_module.f90 prms_constants.mod
 	$(FC) -c $(FFLAGS) gsflow_module.f90
+
+gsflow_fortran.o: gsflow_fortran.f90
+	$(FC) -c $(FFLAGS) gsflow_fortran.f90
 
 gsflow_prms2mf.o: gsflow_prms2mf.f90 prms_module.mod prms_constants.mod prms_read_param_file.mod gwfuzfmodule.mod gwfsfrmodule.mod gwflakmodule.mod gsfmodflow.mod prms_basin.mod prms_soilzone.mod global.mod prms_climatevars.mod prms_flowvars.mod prms_srunoff.mod gwfagmodule.mod gsflow_module.o
 	$(FC) -c $(FFLAGS) gsflow_prms2mf.f90

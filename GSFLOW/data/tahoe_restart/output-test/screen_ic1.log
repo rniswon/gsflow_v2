@@ -44,7 +44,7 @@ PRMS command line argument 24: ..\output\PRMS\prms_ic_1
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 16:58:12
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:30:00
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -62,7 +62,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 16:58:12
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash 0a338c0
+                        Github Commit Hash b1f5bae
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -125,7 +125,7 @@ Solar Radiation Distribution    ddsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2022-09-07
+Snow Dynamics                   snowcomp            2023-02-08
 Surface Runoff                  srunoff_smidx       2022-11-02
 Soilzone Computations           soilzone            2023-01-25
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
@@ -218,7 +218,7 @@ Date: 1981/03/01; Stress: 1; Step: 152; Simulation step: 152
                   MF iterations: 36; SZ iterations: 36
 
 Date: 1981/03/28; Stress: 1; Step: 179; Simulation step: 179
-                  MF iterations: 138; SZ iterations: 138
+                  MF iterations: 137; SZ iterations: 137
 
 Date: 1981/04/01; Stress: 1; Step: 183; Simulation step: 183
                   MF iterations: 36; SZ iterations: 36
@@ -227,19 +227,19 @@ Date: 1981/05/01; Stress: 1; Step: 213; Simulation step: 213
                   MF iterations: 50; SZ iterations: 50
 
 Date: 1981/05/07; Stress: 1; Step: 219; Simulation step: 219
-                  MF iterations: 105; SZ iterations: 105
+                  MF iterations: 108; SZ iterations: 108
 
 Date: 1981/05/31; Stress: 1; Step: 243; Simulation step: 243
-                  MF iterations: 120; SZ iterations: 120
+                  MF iterations: 124; SZ iterations: 124
 
 Date: 1981/06/01; Stress: 1; Step: 244; Simulation step: 244
                   MF iterations: 52; SZ iterations: 52
 
 Date: 1981/06/24; Stress: 1; Step: 267; Simulation step: 267
-                  MF iterations: 97; SZ iterations: 97
+                  MF iterations: 99; SZ iterations: 99
 
 Date: 1981/07/01; Stress: 1; Step: 274; Simulation step: 274
-                  MF iterations: 29; SZ iterations: 29
+                  MF iterations: 31; SZ iterations: 31
 
 Date: 1981/07/05; Stress: 1; Step: 278; Simulation step: 278
                   MF iterations: 87; SZ iterations: 87
@@ -248,19 +248,19 @@ Date: 1981/08/01; Stress: 1; Step: 305; Simulation step: 305
                   MF iterations: 35; SZ iterations: 35
 
 Date: 1981/09/01; Stress: 1; Step: 336; Simulation step: 336
-                  MF iterations: 39; SZ iterations: 39
+                  MF iterations: 31; SZ iterations: 31
 
 Date: 1981/10/01; Stress: 1; Step: 366; Simulation step: 366
-                  MF iterations: 13; SZ iterations: 13
+                  MF iterations: 12; SZ iterations: 12
 
 Date: 1981/11/01; Stress: 1; Step: 397; Simulation step: 397
-                  MF iterations: 9; SZ iterations: 9
+                  MF iterations: 10; SZ iterations: 10
 
 Date: 1981/12/01; Stress: 1; Step: 427; Simulation step: 427
                   MF iterations: 21; SZ iterations: 21
 
 Date: 1982/01/01; Stress: 1; Step: 458; Simulation step: 458
-                  MF iterations: 39; SZ iterations: 39
+                  MF iterations: 37; SZ iterations: 37
 
 Date: 1982/02/01; Stress: 1; Step: 489; Simulation step: 489
                   MF iterations: 35; SZ iterations: 35
@@ -269,25 +269,25 @@ Date: 1982/03/01; Stress: 1; Step: 517; Simulation step: 517
                   MF iterations: 6; SZ iterations: 6
 
 Date: 1982/04/01; Stress: 1; Step: 548; Simulation step: 548
-                  MF iterations: 13; SZ iterations: 13
+                  MF iterations: 17; SZ iterations: 17
 
 Date: 1982/04/19; Stress: 1; Step: 566; Simulation step: 566
                   MF iterations: 77; SZ iterations: 77
 
 Date: 1982/05/01; Stress: 1; Step: 578; Simulation step: 578
-                  MF iterations: 9; SZ iterations: 9
+                  MF iterations: 50; SZ iterations: 50
 
 Date: 1982/06/01; Stress: 1; Step: 609; Simulation step: 609
-                  MF iterations: 34; SZ iterations: 34
+                  MF iterations: 35; SZ iterations: 35
 
 Date: 1982/07/01; Stress: 1; Step: 639; Simulation step: 639
-                  MF iterations: 16; SZ iterations: 16
+                  MF iterations: 17; SZ iterations: 17
 
 Date: 1982/08/01; Stress: 1; Step: 670; Simulation step: 670
-                  MF iterations: 26; SZ iterations: 26
+                  MF iterations: 19; SZ iterations: 19
 
 Date: 1982/09/01; Stress: 1; Step: 701; Simulation step: 701
-                  MF iterations: 23; SZ iterations: 23
+                  MF iterations: 24; SZ iterations: 24
 
 Change over storage:.00016; HRU: 1098 1982 10 1
 Change over storage:.00006; HRU: 1099 1982 10 1
@@ -4043,16 +4043,16 @@ Change over storage:.00091; HRU: 18011 1982 10 1
 Change over storage:.00018; HRU: 18233 1982 10 1
 Change over storage:.00022; HRU: 18121 1982 10 1
 Date: 1982/10/01; Stress: 1; Step: 731; Simulation step: 731
-                  MF iterations: 8; SZ iterations: 8
+                  MF iterations: 3; SZ iterations: 3
 
 Date: 1982/11/01; Stress: 1; Step: 762; Simulation step: 762
                   MF iterations: 10; SZ iterations: 10
 
 Date: 1982/12/01; Stress: 1; Step: 792; Simulation step: 792
-                  MF iterations: 13; SZ iterations: 13
+                  MF iterations: 9; SZ iterations: 9
 
 Date: 1983/01/01; Stress: 1; Step: 823; Simulation step: 823
-                  MF iterations: 7; SZ iterations: 7
+                  MF iterations: 10; SZ iterations: 10
 
 Date: 1983/02/01; Stress: 1; Step: 854; Simulation step: 854
                   MF iterations: 8; SZ iterations: 8
@@ -4066,44 +4066,47 @@ Date: 1983/04/01; Stress: 1; Step: 913; Simulation step: 913
 Date: 1983/05/01; Stress: 1; Step: 943; Simulation step: 943
                   MF iterations: 4; SZ iterations: 4
 
+Date: 1983/05/24; Stress: 1; Step: 966; Simulation step: 966
+                  MF iterations: 85; SZ iterations: 85
+
 Date: 1983/06/01; Stress: 1; Step: 974; Simulation step: 974
-                  MF iterations: 9; SZ iterations: 9
+                  MF iterations: 6; SZ iterations: 6
 
 Date: 1983/07/01; Stress: 1; Step: 1004; Simulation step: 1004
                   MF iterations: 11; SZ iterations: 11
 
 Date: 1983/08/01; Stress: 1; Step: 1035; Simulation step: 1035
-                  MF iterations: 25; SZ iterations: 25
+                  MF iterations: 37; SZ iterations: 37
 
 Date: 1983/09/01; Stress: 1; Step: 1066; Simulation step: 1066
                   MF iterations: 19; SZ iterations: 19
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/06 17:14:44
- Elapsed run time: 16 Minutes, 31.449 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/16 10:46:57
+ Elapsed run time: 16 Minutes, 56.371 Seconds
 
  Number of time steps:   1066;  Number of non-convergence:   0
- MF iterations:         20761;  SZ iterations:           20798
- Average MF iterations: 19.48;  Average SZ iterations:   19.51
- Maximum MF iterations:   138;  Maximum SZ iterations:     138
+ MF iterations:         21007;  SZ iterations:           21044
+ Average MF iterations: 19.71;  Average SZ iterations:   19.74
+ Maximum MF iterations:   137;  Maximum SZ iterations:     137
 
-MF iteration distribution:      0   19   63   73   61   39   22   39   39   30
-                               37   28   39   40   25   27   20   12   30   18
-                               22   19   17   17   15   19   15   20   19   13
-                               17   10   13   12   20   10   17    3   10    7
-                                9    7    9    7    3    8    7    6    4    4
-                                1    9    5    3    2    0    1    0    1    2
-                                2    2    0    1    1    3    0    1    3    1
-                                0    1    0    0    0    0    1    0    0    6
+MF iteration distribution:      0   17   62   76   66   39   22   33   31   36
+                               33   29   33   43   27   31   23   10   30   24
+                               25   19   16   10   14   14    8   18   21   12
+                               21    7   12    5   34    6   24    5    9    7
+                                9   10    8    7    4    7    7    4    5    7
+                                1    9    2    4    3    0    2    0    1    1
+                                2    1    2    3    0    1    2    1    1    1
+                                0    1    0    0    0    0    1    0    0    7
 
-SZ computation distribution:    0   16   66   73   61   37   23   39   39   30
-                               38   25   39   40   26   25   23   12   24   23
-                               24   18   18   17   15   19   15   20   19   13
-                               17   10   13   12   20   10   17    3   10    7
-                                9    7    9    7    3    8    7    6    3    5
-                                1    9    5    3    2    0    1    0    1    2
-                                2    2    0    1    1    3    0    1    3    1
-                                0    1    0    0    0    0    1    0    0    6
+SZ computation distribution:    0   14   65   76   66   38   22   33   31   36
+                               34   25   35   39   31   28   27   11   25   27
+                               27   18   17   10   14   14    8   18   21   12
+                               21    7   12    5   34    6   24    5    9    7
+                                9   10    8    7    4    7    7    4    4    8
+                                1    9    2    4    3    0    2    0    1    1
+                                2    1    2    3    0    1    2    1    1    1
+                                0    1    0    0    0    0    1    0    0    7
 
  Normal termination of simulation
 

@@ -19,7 +19,7 @@ Control File: .\gsflow_gsflow_LowTrig.control
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  Warning, dimension: nlake_hrus is not needed as value specified as 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:34:56
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:26:03
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -37,7 +37,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/06 15:34:56
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash 0a338c0
+                        Github Commit Hash b1f5bae
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -96,7 +96,7 @@ Solar Radiation Distribution    ddsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2022-09-07
+Snow Dynamics                   snowcomp            2023-02-08
 Surface Runoff                  srunoff_smidx       2022-11-02
 Soilzone Computations           soilzone            2023-01-25
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
@@ -216,7 +216,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1991/07/01; Stress: 11; Step: 1; Simulation step: 274
-                  MF iterations: 5; SZ iterations: 5
+                  MF iterations: 34; SZ iterations: 34
 
 
 ***WARNING***
@@ -359,6 +359,12 @@ These values are set to zero for GSFLOW simulations
 Date: 1993/02/01; Stress: 30; Step: 1; Simulation step: 855
                   MF iterations: 4; SZ iterations: 4
 
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
 Date: 1993/03/01; Stress: 31; Step: 1; Simulation step: 883
                   MF iterations: 4; SZ iterations: 4
 
@@ -474,10 +480,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1994/05/01; Stress: 45; Step: 1; Simulation step: 1309
-                  MF iterations: 6; SZ iterations: 6
-
-Date: 1994/05/31; Stress: 45; Step: 31; Simulation step: 1339
-                  MF iterations: 80; SZ iterations: 50
+                  MF iterations: 7; SZ iterations: 7
 
 
 ***WARNING***
@@ -487,6 +490,9 @@ These values are set to zero for GSFLOW simulations
 
 Date: 1994/06/01; Stress: 46; Step: 1; Simulation step: 1340
                   MF iterations: 5; SZ iterations: 5
+
+Date: 1994/06/20; Stress: 46; Step: 20; Simulation step: 1359
+                  MF iterations: 78; SZ iterations: 50
 
 
 ***WARNING***
@@ -501,7 +507,7 @@ Date: 1994/08/01; Stress: 48; Step: 1; Simulation step: 1401
                   MF iterations: 6; SZ iterations: 6
 
 Date: 1994/09/01; Stress: 49; Step: 1; Simulation step: 1432
-                  MF iterations: 8; SZ iterations: 8
+                  MF iterations: 7; SZ iterations: 7
 
 Date: 1994/10/01; Stress: 50; Step: 1; Simulation step: 1462
                   MF iterations: 8; SZ iterations: 8
@@ -603,10 +609,10 @@ Date: 1995/10/01; Stress: 62; Step: 1; Simulation step: 1827
                   MF iterations: 5; SZ iterations: 5
 
 Date: 1995/11/01; Stress: 63; Step: 1; Simulation step: 1858
-                  MF iterations: 5; SZ iterations: 5
+                  MF iterations: 6; SZ iterations: 6
 
-Date: 1995/11/23; Stress: 63; Step: 23; Simulation step: 1880
-                  MF iterations: 288; SZ iterations: 50
+Date: 1995/11/26; Stress: 63; Step: 26; Simulation step: 1883
+                  MF iterations: 174; SZ iterations: 50
 
 
 ***WARNING***
@@ -615,7 +621,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1995/12/01; Stress: 64; Step: 1; Simulation step: 1888
-                  MF iterations: 5; SZ iterations: 5
+                  MF iterations: 6; SZ iterations: 6
 
 
 ***WARNING***
@@ -671,9 +677,6 @@ These values are set to zero for GSFLOW simulations
 Date: 1996/06/01; Stress: 70; Step: 1; Simulation step: 2071
                   MF iterations: 7; SZ iterations: 7
 
-Date: 1996/06/07; Stress: 70; Step: 7; Simulation step: 2077
-                  MF iterations: 292; SZ iterations: 50
-
 
 ***WARNING***
 Non-zero values were specified for precipitation,
@@ -681,7 +684,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1996/07/01; Stress: 71; Step: 1; Simulation step: 2101
-                  MF iterations: 7; SZ iterations: 7
+                  MF iterations: 6; SZ iterations: 6
 
 
 ***WARNING***
@@ -743,18 +746,13 @@ Non-zero values were specified for precipitation,
 streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
-***TIME STEP FAILED TO CONVERGE - Date: 1997/04/01 number: 1
-
 Date: 1997/04/01; Stress: 80; Step: 1; Simulation step: 2375
-                  MF iterations: 500; SZ iterations: 50
+                  MF iterations: 6; SZ iterations: 6
 
-***TIME STEP FAILED TO CONVERGE - Date: 1997/04/03 number: 2
+***TIME STEP FAILED TO CONVERGE - Date: 1997/04/03 number: 1
 
 Date: 1997/04/03; Stress: 80; Step: 3; Simulation step: 2377
                   MF iterations: 500; SZ iterations: 50
-
-Date: 1997/04/04; Stress: 80; Step: 4; Simulation step: 2378
-                  MF iterations: 377; SZ iterations: 50
 
 
 ***WARNING***
@@ -787,13 +785,13 @@ Date: 1997/08/01; Stress: 84; Step: 1; Simulation step: 2497
                   MF iterations: 7; SZ iterations: 7
 
 Date: 1997/09/01; Stress: 85; Step: 1; Simulation step: 2528
-                  MF iterations: 14; SZ iterations: 14
+                  MF iterations: 13; SZ iterations: 13
 
 Date: 1997/10/01; Stress: 86; Step: 1; Simulation step: 2558
                   MF iterations: 4; SZ iterations: 4
 
 Date: 1997/11/01; Stress: 87; Step: 1; Simulation step: 2589
-                  MF iterations: 13; SZ iterations: 13
+                  MF iterations: 7; SZ iterations: 7
 
 
 ***WARNING***
@@ -804,14 +802,19 @@ These values are set to zero for GSFLOW simulations
 Date: 1997/12/01; Stress: 88; Step: 1; Simulation step: 2619
                   MF iterations: 4; SZ iterations: 4
 
-Date: 1997/12/10; Stress: 88; Step: 10; Simulation step: 2628
-                  MF iterations: 174; SZ iterations: 50
+Date: 1997/12/14; Stress: 88; Step: 14; Simulation step: 2632
+                  MF iterations: 213; SZ iterations: 50
 
-Date: 1997/12/11; Stress: 88; Step: 11; Simulation step: 2629
-                  MF iterations: 319; SZ iterations: 50
+Date: 1997/12/15; Stress: 88; Step: 15; Simulation step: 2633
+                  MF iterations: 143; SZ iterations: 50
 
-Date: 1997/12/12; Stress: 88; Step: 12; Simulation step: 2630
-                  MF iterations: 247; SZ iterations: 50
+Date: 1997/12/16; Stress: 88; Step: 16; Simulation step: 2634
+                  MF iterations: 334; SZ iterations: 50
+
+***TIME STEP FAILED TO CONVERGE - Date: 1997/12/17 number: 2
+
+Date: 1997/12/17; Stress: 88; Step: 17; Simulation step: 2635
+                  MF iterations: 500; SZ iterations: 50
 
 
 ***WARNING***
@@ -865,7 +868,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1998/06/01; Stress: 94; Step: 1; Simulation step: 2801
-                  MF iterations: 7; SZ iterations: 7
+                  MF iterations: 8; SZ iterations: 8
 
 
 ***WARNING***
@@ -876,17 +879,11 @@ These values are set to zero for GSFLOW simulations
 Date: 1998/07/01; Stress: 95; Step: 1; Simulation step: 2831
                   MF iterations: 6; SZ iterations: 6
 
-
-***WARNING***
-Non-zero values were specified for precipitation,
-streamflow, and ET for streams in MODFLOW input files.
-These values are set to zero for GSFLOW simulations
-
 Date: 1998/08/01; Stress: 96; Step: 1; Simulation step: 2862
                   MF iterations: 8; SZ iterations: 8
 
 Date: 1998/09/01; Stress: 97; Step: 1; Simulation step: 2893
-                  MF iterations: 13; SZ iterations: 13
+                  MF iterations: 7; SZ iterations: 7
 
 
 ***WARNING***
@@ -895,7 +892,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1998/10/01; Stress: 98; Step: 1; Simulation step: 2923
-                  MF iterations: 4; SZ iterations: 4
+                  MF iterations: 5; SZ iterations: 5
 
 
 ***WARNING***
@@ -914,9 +911,6 @@ These values are set to zero for GSFLOW simulations
 
 Date: 1998/12/01; Stress: 100; Step: 1; Simulation step: 2984
                   MF iterations: 5; SZ iterations: 5
-
-Date: 1998/12/20; Stress: 100; Step: 20; Simulation step: 3003
-                  MF iterations: 128; SZ iterations: 50
 
 
 ***WARNING***
@@ -982,7 +976,7 @@ Date: 1999/07/01; Stress: 107; Step: 1; Simulation step: 3196
                   MF iterations: 8; SZ iterations: 8
 
 Date: 1999/08/01; Stress: 108; Step: 1; Simulation step: 3227
-                  MF iterations: 5; SZ iterations: 5
+                  MF iterations: 6; SZ iterations: 6
 
 Date: 1999/09/01; Stress: 109; Step: 1; Simulation step: 3258
                   MF iterations: 7; SZ iterations: 7
@@ -1063,30 +1057,30 @@ Date: 2000/10/01; Stress: 122; Step: 1; Simulation step: 3654
                   MF iterations: 7; SZ iterations: 7
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/06 15:41:37
- Elapsed run time: 6 Minutes, 41.392 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/16 10:31:21
+ Elapsed run time: 5 Minutes, 17.348 Seconds
 
  Number of time steps:   3684;  Number of non-convergence:   2
- MF iterations:         25560;  SZ iterations:           23155
- Average MF iterations:  6.94;  Average SZ iterations:    6.29
+ MF iterations:         24792;  SZ iterations:           23170
+ Average MF iterations:  6.73;  Average SZ iterations:    6.29
  Maximum MF iterations:   500;  Maximum SZ iterations:      50
 
 mxsziter reached: 10
 
-MF iteration distribution:      0    0   95  395  656 1179  891  280  103   33
-                                6    3    8    5    1    4    5    0    1    0
-                                0    1    3    3    0    0    0    0    0    0
-                                0    0    0    0    1    0    0    0    0    0
-                                0    0    0    0    1    0    0    0    0    0
+MF iteration distribution:      0    0   92  398  639 1201  883  286  107   28
+                                5    1   10    4    3    5    0    1    1    0
+                                0    1    4    1    0    0    0    0    1    0
+                                0    0    0    1    0    1    1    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0   10
+                                0    1    0    0    0    0    0    1    0    0
+                                0    0    0    0    0    0    0    0    0    1
+                                0    0    0    0    0    0    0    1    0    6
 
-SZ computation distribution:    0    0   95  395  656 1179  891  280  103   33
-                                6    3    8    5    1    4    5    0    1    0
-                                0    1    3    3    0    0    0    0    0    0
-                                0    0    0    0    1    0    0    0    0    0
-                                0    0    0    0    1    0    0    0    0   10
+SZ computation distribution:    0    0   92  398  639 1201  883  286  107   28
+                                5    1   10    4    3    5    0    1    1    0
+                                0    1    4    1    0    0    0    0    1    0
+                                0    0    0    1    0    1    1    0    0    0
+                                0    0    0    0    0    0    0    0    0   10
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
