@@ -1144,7 +1144,7 @@
 
         ! Skip the HRU if there is no snowpack and no new snow and not a glacier
         IF ( Active_glacier==OFF ) THEN
-          IF ( .not.(Pkwater_equiv(i)>0.0D0) .AND. Newsnow(i)==0 ) THEN
+          IF ( .not.(Pkwater_equiv(i)>DNEARZERO) .AND. Newsnow(i)==0 ) THEN
             CALL snow_states_to_zero(Lst(i), Iasw(i), Snsv(i), Albedo(i), Pk_den(i), Snowcov_area(i), &
                                      Pk_def(i), Pk_temp(i), Pk_ice(i), Freeh2o(i), Snowcov_areasv(i), &
                                      Frac_swe(i), Pkwater_equiv(i), Pk_depth(i), Pss(i), Pst(i), Ai(i), Scrv(i), Pksv(i))
@@ -1524,7 +1524,7 @@
         ENDIF
 
 ! LAST check to clear out all arrays if packwater is gone
-        IF ( .not.(Pkwater_equiv(i)>0.0D0) ) THEN
+        IF ( .not.(Pkwater_equiv(i)>DNEARZERO) ) THEN
         !IF ( Pkwater_equiv(i)<1.0D-12 ) THEN
           IF ( Print_debug>DEBUG_less ) THEN
             IF ( Pkwater_equiv(i)<-DNEARZERO ) &

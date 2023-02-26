@@ -27,7 +27,7 @@ LDFLAGS	=$(OPTLEVEL)
 # Define the Fortran compile flags
 ##########################################################
 #for gfortran
-FFLAGS= $(OPTLEVEL) -fbounds-check -fno-second-underscore -Wall
+FFLAGS= $(OPTLEVEL) -fbounds-check -Wall
 #FFLAGS= $(OPTLEVEL) -fno-second-underscore
 #for ifort
 #FFLAGS= $(OPTLEVEL) -warn all -fltconsistency
