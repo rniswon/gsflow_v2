@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.8, 3.7]
+        python-version: [3.8, "3.10"]
         run-type: [std]
         test-pth: ["./autotest"]
     defaults:
@@ -83,6 +83,6 @@ jobs:
         sed -i -e 's/\r$//' make_linux_gfortran.sh
         ./make_linux_gfortran.sh
         chmod a+x gsflow
-        pip install nose
-        nosetests -v
+        pip install pytest
+        pytest -v
 

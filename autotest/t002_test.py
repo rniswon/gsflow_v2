@@ -112,7 +112,7 @@ def test_outputs_exist():
                           "UZFtest2hd.out"):
                 pass
             else:
-                yield  do_check_outputs, output
+                do_check_outputs(output)
     return
 
 
@@ -135,7 +135,7 @@ def test_formatted_outputs():
                           "UZFtest2hd.out"):
                 pass
             else:
-                yield do_compare_formatted_head_file, output
+                do_compare_formatted_head_file(output)
     return
 
 
