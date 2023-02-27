@@ -1126,7 +1126,7 @@
         Basin_actet = Basin_actet + DBLE( Hru_actet(i)*harea )
         Hru_storage(i) = DBLE( Soil_moist_tot(i) + Hru_intcpstor(i) + Hru_impervstor(i) ) + Pkwater_equiv(i)
         IF ( Dprst_flag==ACTIVE ) Hru_storage(i) = Hru_storage(i) + Dprst_stor_hru(i)
-        IF ( Pref_flow_den(i)>0.0 ) THEN
+        IF ( Pref_flow_max(i)>0.0 ) THEN
           Basin_pref_stor = Basin_pref_stor + DBLE( Pref_flow_stor(i)*harea )
           Basin_pfr_stor_frac = Basin_pfr_stor_frac + DBLE( Pref_flow_stor(i)/Pref_flow_max(i)*harea )
         ENDIF
