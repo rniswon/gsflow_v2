@@ -10,11 +10,11 @@ Executable: ..\..\bin\gsflow
 Control File: .\control\mercdIDE.control
  WARNING, control parameter not used: aniOutON_OFF, ignored
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:12:11
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/27 18:42:53
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 01/25/2023
+                       Version 5.3.0 02/23/2023
 
 
 ==========================================================================
@@ -26,7 +26,7 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-01-25
+PRMS Computation Order          gsflow_prms         2023-02-23
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -41,8 +41,8 @@ Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
 Snow Dynamics                   snowcomp            2023-02-08
-Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2023-01-25
+Surface Runoff                  srunoff_smidx       2023-02-23
+Soilzone Computations           soilzone            2023-02-23
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing              strmflow            2021-11-19
 Output Summary                  basin_sum           2022-09-01

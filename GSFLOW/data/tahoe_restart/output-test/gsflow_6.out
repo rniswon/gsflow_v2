@@ -17,35 +17,35 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        1.2139D+07     EVAPOTRANSPIRATION =        2738221.88
+   EVAPOTRANSPIRATION =        1.2139D+07     EVAPOTRANSPIRATION =        2737760.81
            STREAMFLOW =        3566884.39             STREAMFLOW =         134710.33
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
-   INFLOWS - OUTFLOWS =       -2782770.00     INFLOWS - OUTFLOWS =       -2872932.21
+   INFLOWS - OUTFLOWS =       -2782793.92     INFLOWS - OUTFLOWS =       -2872471.14
              --------                                   --------
 
- TOTAL STORAGE CHANGE =       -2878732.63         STORAGE CHANGE =       -2874865.32
+ TOTAL STORAGE CHANGE =       -2952484.27         STORAGE CHANGE =       -2869419.91
        --------------                             --------------
          LAND SURFACE =        -506571.71           LAND SURFACE =         -34504.35
-            SOIL ZONE =         703758.05              SOIL ZONE =       -1601204.80
-     UNSATURATED ZONE =        -489496.76       UNSATURATED ZONE =         -71827.17
-       SATURATED ZONE =        -815226.73         SATURATED ZONE =        -181421.31
-                LAKES =       -1771195.48                  LAKES =        -985907.69
+            SOIL ZONE =         709154.99              SOIL ZONE =       -1601671.75
+     UNSATURATED ZONE =        -487130.35       UNSATURATED ZONE =         -74549.62
+       SATURATED ZONE =        -750263.17         SATURATED ZONE =        -178932.62
+                LAKES =       -1917674.03                  LAKES =        -979761.56
 
- OVERALL BUDGET ERROR =          95962.64           BUDGET ERROR =           1933.12
+ OVERALL BUDGET ERROR =         169690.35           BUDGET ERROR =          -3051.23
 
 
-  PERCENT DISCREPANCY =              0.61    PERCENT DISCREPANCY =              0.07
+  PERCENT DISCREPANCY =              1.07    PERCENT DISCREPANCY =             -0.11
 
 
 
  Number of time steps:      7;  Number of non-convergence:   0
- MF iterations:            69;  SZ iterations:              69
- Average MF iterations:  9.86;  Average SZ iterations:    9.86
- Maximum MF iterations:    14;  Maximum SZ iterations:      14
+ MF iterations:            63;  SZ iterations:              64
+ Average MF iterations:  9.00;  Average SZ iterations:    9.14
+ Maximum MF iterations:    15;  Maximum SZ iterations:      15
 
-MF iteration distribution:      0    0    1    0    0    0    0    1    0    1
-                                2    1    0    1    0    0    0    0    0    0
+MF iteration distribution:      0    0    2    0    0    0    1    1    0    0
+                                0    0    1    1    1    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
@@ -53,8 +53,8 @@ MF iteration distribution:      0    0    1    0    0    0    0    1    0    1
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
 
-SZ computation distribution:    0    0    1    0    0    0    0    1    0    1
-                                2    1    0    1    0    0    0    0    0    0
+SZ computation distribution:    0    0    2    0    0    0    1    1    0    0
+                                0    0    0    2    1    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0

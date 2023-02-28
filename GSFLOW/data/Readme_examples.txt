@@ -55,9 +55,6 @@ Sample problems:
    illustrates running PRMS with a time-series of water-use input to the 
    water_use_read module that is described in Regan and LaFontaine (2017).
 
-10. Tazlina: A model of the Tazlina Basin in Alaske is provided for illustrative
-   and educational purposes only. The glacier dynamics simulation method  is
-   described in Van Beusekom and Viger (2015).
 
 References:
 
@@ -94,7 +91,3 @@ Regan, R.S., Niswonger, R.G., Markstrom, S.L., and Barlow, P.M., 2015,
 Documentation of a restart option for the U.S. Geological Survey coupled 
 groundwater and surface-water flow (GSFLOW) model: U.S. Geological Survey 
 Techniques and Methods, book 6, chap. D3, 19 p., http://dx.doi.org/10.3133/tm6D3.
-
-Van Beusekom, A.E., and Viger, R.J., 2015, A glacier runoff extension to the
-Precipitation Runoff Modeling System, Journal of Geophysical Research: Earth 
-Science, 21 p., https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015JF003789. 

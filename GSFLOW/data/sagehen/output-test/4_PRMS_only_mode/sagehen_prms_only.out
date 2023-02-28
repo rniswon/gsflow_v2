@@ -27,7 +27,7 @@ ndays                366
 ==========================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 01/25/2023
+                       Version 5.3.0 02/23/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -65,7 +65,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-01-25
+PRMS Computation Order          gsflow_prms         2023-02-23
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -110,8 +110,8 @@ Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
 Snow Dynamics                   snowcomp            2023-02-08
-Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2023-01-25
+Surface Runoff                  srunoff_smidx       2023-02-23
+Soilzone Computations           soilzone            2023-02-23
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing Init         routing             2022-09-07
 Streamflow Routing              strmflow_in_out     2020-11-19
@@ -161,5 +161,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  *************************************************************
  Total for run     668.938  375.572    9.202  287.264  260.348
  *************************************************************
-Execution elapsed time    0 minutes  1.46 seconds
+Execution elapsed time    0 minutes  1.32 seconds
 

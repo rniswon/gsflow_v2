@@ -10,11 +10,11 @@ Executable: ..\..\..\bin\gsflow
 Control File: .\gsflow_climate_hru.control
  WARNING, control parameter not used: solzone_module, ignored
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:20:54
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/27 19:12:30
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 01/25/2023
+                       Version 5.3.0 02/23/2023
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -23,7 +23,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:20:54
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
-                        Github Commit Hash b1f5bae
+                        Github Commit Hash 18fa0b7
 
 
 ==========================================================================
@@ -35,7 +35,7 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-01-25
+PRMS Computation Order          gsflow_prms         2023-02-23
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -52,8 +52,8 @@ Potential Evapotranspiration    climate_hru         2023-02-08
 Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-10-26
 Snow Dynamics                   snowcomp            2023-02-08
-Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2023-01-25
+Surface Runoff                  srunoff_smidx       2023-02-23
+Soilzone Computations           soilzone            2023-02-23
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2022-12-19
@@ -69,7 +69,7 @@ SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
 ==============================================================
 
 
-Steady state simulation successful, used 351 iterations
+Steady state simulation successful, used 368 iterations
 
 Writing PRMS Water Budget File: ..\output\prms\sagehen_prms_cbh.out
 
@@ -85,12 +85,12 @@ Simulation time period: 1980/10/01 - 1996/09/30
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/16 10:37:37
- Elapsed run time: 16 Minutes, 43.243 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/27 19:27:40
+ Elapsed run time: 15 Minutes, 9.867 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
- MF iterations:         63715;  SZ iterations:           63677
- Average MF iterations: 10.90;  Average SZ iterations:   10.90
+ MF iterations:         63701;  SZ iterations:           63663
+ Average MF iterations: 10.90;  Average SZ iterations:   10.89
  Maximum MF iterations:    32;  Maximum SZ iterations:      25
 
 mxsziter reached: 13

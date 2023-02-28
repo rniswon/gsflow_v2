@@ -13,17 +13,17 @@ Control File: .\Sagehen_ponds.control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.0 02/14/2023
+                         Version: 2.3.0 02/23/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  Warning, dimension: nlake_hrus is not needed as value specified as 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:15:27
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/27 18:40:47
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 01/25/2023
+                       Version 5.3.0 02/23/2023
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -37,7 +37,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/16 10:15:27
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash b1f5bae
+                        Github Commit Hash 18fa0b7
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -80,7 +80,7 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-01-25
+PRMS Computation Order          gsflow_prms         2023-02-23
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -97,9 +97,9 @@ Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
 Snow Dynamics                   snowcomp            2023-02-08
-Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2023-01-25
-Soilzone Computations           soilzone_ag         2023-02-08
+Surface Runoff                  srunoff_smidx       2023-02-23
+Soilzone Computations           soilzone            2023-02-23
+Soilzone Computations           soilzone_ag         2023-02-23
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2022-12-19
@@ -134,7 +134,7 @@ Using Solver Package: NWT
 
 modflow_time_zero: 1990/10/01
 
-Steady state simulation successful, used 89 iterations
+Steady state simulation successful, used 95 iterations
 
 Using Control File: .\Sagehen_ponds.control
 
@@ -248,6 +248,9 @@ These values are set to zero for GSFLOW simulations
 
 Date: 1991/05/01; Stress: 9; Step: 1; Simulation step: 213
                   MF iterations: 6; SZ iterations: 6
+
+Date: 1991/05/05; Stress: 9; Step: 5; Simulation step: 217
+                  MF iterations: 109; SZ iterations: 50
 
 
 ***WARNING***
@@ -673,7 +676,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1995/05/01; Stress: 57; Step: 1; Simulation step: 1674
-                  MF iterations: 7; SZ iterations: 7
+                  MF iterations: 8; SZ iterations: 8
 
 
 ***WARNING***
@@ -721,29 +724,29 @@ Date: 1995/10/01; Stress: 62; Step: 1; Simulation step: 1827
                   MF iterations: 6; SZ iterations: 6
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/16 10:17:45
- Elapsed run time: 2 Minutes, 18.011 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/27 18:43:32
+ Elapsed run time: 2 Minutes, 43.936 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
- MF iterations:         11846;  SZ iterations:           11824
- Average MF iterations:  6.38;  Average SZ iterations:    6.37
- Maximum MF iterations:    72;  Maximum SZ iterations:      50
+ MF iterations:         11913;  SZ iterations:           11854
+ Average MF iterations:  6.42;  Average SZ iterations:    6.38
+ Maximum MF iterations:   109;  Maximum SZ iterations:      50
 
 mxsziter reached: 1
 
-MF iteration distribution:      0    0   27  198  319  468  483  247   80   18
-                                3    2    3    2    1    2    1    0    0    0
+MF iteration distribution:      0    0   27  199  323  459  482  253   78   19
+                                2    2    3    2    1    2    1    0    0    0
                                 0    0    0    1    0    0    0    0    1    0
+                                0    0    0    0    0    0    0    1    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
-                                0    1    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    1
 
-SZ computation distribution:    0    0   27  198  319  468  483  247   80   18
-                                3    2    3    2    1    2    1    0    0    0
+SZ computation distribution:    0    0   27  199  323  459  482  253   78   19
+                                2    2    3    2    1    2    1    0    0    0
                                 0    0    0    1    0    0    0    0    1    0
-                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    1    0    0
                                 0    0    0    0    0    0    0    0    0    1
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
