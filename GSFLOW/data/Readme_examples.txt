@@ -2,7 +2,7 @@
                             GSFLOW Sample Problems
                                  March 2020
  
-Ten sample problems with GSFLOW data sets are provided in this subdirectory
+Nine sample problems with GSFLOW data sets are provided in this subdirectory
 to verify that GSFLOW is correctly installed and running on the user's system.
 The sample problems also may be looked at as examples of how to use various
 simulation, input, and ouput options. The Data and Parameter Files can 
