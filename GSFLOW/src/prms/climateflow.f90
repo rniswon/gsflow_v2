@@ -631,16 +631,16 @@ end module PRMS_IT0_VARS
         ALLOCATE ( Dprst_total_open_in(Nhru), Dprst_total_open_out(Nhru) )
         ALLOCATE ( Dprst_total_clos_in(Nhru), Dprst_total_clos_out(Nhru) )
         CALL declvar_dble(Srunoff_module, 'dprst_total_open_in', 'nhru', Nhru, &
-     &       'Storage volume in closed surface depressions for each HRU', &
+     &       'Total volume flowing in to open surface depressions for each HRU', &
      &       'acre-inches', Dprst_total_open_in)
         CALL declvar_dble(Srunoff_module, 'dprst_total_open_out', 'nhru', Nhru, &
-     &       'Storage volume in closed surface depressions for each HRU', &
+     &       'Total volume flowing out of open surface depressions for each HRU', &
      &       'acre-inches', Dprst_total_open_out)
         CALL declvar_dble(Srunoff_module, 'dprst_total_clos_in', 'nhru', Nhru, &
-     &       'Storage volume in closed surface depressions for each HRU', &
+     &       'Total volume flowing in to closed surface depressions for each HRU', &
      &       'acre-inches', Dprst_total_clos_in)
         CALL declvar_dble(Srunoff_module, 'dprst_total_clos_out', 'nhru', Nhru, &
-     &       'Storage volume in closed surface depressions for each HRU', &
+     &       'Total volume flowing out of closed surface depressions for each HRU', &
      &       'acre-inches', Dprst_total_clos_out)
       ENDIF
 
@@ -989,18 +989,19 @@ end module PRMS_IT0_VARS
 
       IF ( AG_flag==ACTIVE ) THEN
         CALL declvar_dble(Soilzone_module, 'basin_ag_soil_moist', 'one', 1, &
-     &       'Basin area-weighted average soil agriculture reservoir storage', &
+     &       'Basin area-weighted average soil agricultural capillary reservoir storage', &
      &       'inches', Basin_ag_soil_moist)
         CALL declvar_dble(Soilzone_module, 'basin_ag_soil_rechr', 'one', 1, &
-     &       'Basin area-weighted average soil agriculture reservoir storage', &
+     &       'Basin area-weighted average storage for the agricultural recharge zone;'//&
+     &       ' upper portion of agricultura capillary reservoir where both evaporation and transpiration occurs', &
      &       'inches', Basin_ag_soil_rechr)
         ALLOCATE ( Ag_soil_moist(Nhru), It0_ag_soil_moist(Nhru) )
         CALL declvar_real(Soilzone_module, 'ag_soil_moist', 'nhru', Nhru, &
-     &       'Storage of soil agriculture reservoir for each HRU', &
+     &       'Storage of soil agriculture capillary reservoir for each HRU', &
      &       'inches', Ag_soil_moist)
         ALLOCATE ( Ag_soil_rechr(Nhru), It0_ag_soil_rechr(Nhru) )
         CALL declvar_real(Soilzone_module, 'ag_soil_rechr', 'nhru', Nhru, &
-     &       'Storage for upper portion of the soil agriculture reservoir that is available for both'// &
+     &       'Storage for upper portion of the soil agriculture capillary reservoir that is available for both'// &
      &       ' evaporation and transpiration', &
      &       'inches', Ag_soil_rechr)
         ALLOCATE ( Ag_soil_moist_max(Nhru) )
