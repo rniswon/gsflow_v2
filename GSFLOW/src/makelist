@@ -16,8 +16,8 @@ MMFLIB      = $(LIBDIR)/libmmf.a
 ARC		= LINUX
 #ARC		= WINDOWS
 
-OPTLEVEL	= -g
-#OPTLEVEL	= -O -Bstatic
+#OPTLEVEL	= -g
+OPTLEVEL	= -O -Bstatic
 #for gfortran
 LDFLAGS	=$(OPTLEVEL)
 #for ifort
@@ -27,23 +27,13 @@ LDFLAGS	=$(OPTLEVEL)
 # Define the Fortran compile flags
 ##########################################################
 #for gfortran
-FFLAGS= $(OPTLEVEL) -fbounds-check -Wall
-#FFLAGS= $(OPTLEVEL) -fno-second-underscore
+#FFLAGS= $(OPTLEVEL) -fbounds-check -Wall -fno-unsafe-math-optimizations -frounding-math -fsignaling-nans
+FFLAGS= $(OPTLEVEL)
 #for ifort
 #FFLAGS= $(OPTLEVEL) -warn all -fltconsistency
 #FFLAGS= $(OPTLEVEL) -fp-model source
 FC		= gfortran
 #FC		= ifort
-
-##########################################################
-# Define the C compile flags
-# -D_UF defines UNIX naming conventions for mixed language compilation.
-##########################################################
-CFLAGS		= $(OPTLEVEL) -D$(ARC) -D_UF -Wall
-#for gfortran
-CC		= gcc
-#for ifort
-#CC		= icc
 
 ##########################################################
 # Define the libraries
