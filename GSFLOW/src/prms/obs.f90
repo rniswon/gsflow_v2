@@ -8,7 +8,7 @@
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'obs'
       character(len=*), parameter :: Version_obs = '2022-09-07'
-      INTEGER, SAVE :: Nlakeelev, Nwind, Nhumid, Rain_flag, nstream_temp
+      INTEGER, SAVE :: Nlakeelev, Nwind, Nhumid, Rain_flag
 !   Declared Variables
       INTEGER, SAVE :: Rain_day
       REAL, SAVE, ALLOCATABLE :: Pan_evap(:), Runoff(:), Precip(:)
@@ -59,8 +59,6 @@
      &     'Maximum number of lake elevations for any rating table data set')/=0 ) CALL read_error(7, 'nlakeelev')
       IF ( decldim('nwind', 0, MAXDIM, 'Number of wind-speed measurement stations')/=0 ) CALL read_error(7, 'nwind')
       IF ( decldim('nhumid', 0, MAXDIM, 'Number of relative humidity measurement stations')/=0 ) CALL read_error(7, 'nhumid')
-      IF ( decldim('nstream_temp', 0, MAXDIM, 'Number of stream temperature replacement segments')/=0 ) &
-     &     CALL read_error(7, 'nstream_temp')
 
       END FUNCTION obssetdims
 
@@ -73,7 +71,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, xyz_dist_module
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getdim
-      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Precip_flag
+      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Nstreamtemp, Precip_flag
       USE PRMS_OBS
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -164,9 +162,9 @@
      &       'meters per second', Wind_speed)
       ENDIF
 
-      IF ( Nstream_temp>0 ) THEN
+      IF ( Nstreamtemp>0 ) THEN
         ALLOCATE ( Stream_temp(Nwind) )
-        CALL declvar_real(MODNAME, 'stream_temp', 'nstream_temp', nstream_temp, &
+        CALL declvar_real(MODNAME, 'stream_temp', 'nstreamtemp', Nstreamtemp, &
      &       'Stream temperature at each measurement station', &
      &       'degrees Celsius', Stream_temp)
       ENDIF
@@ -215,7 +213,7 @@
       INTEGER FUNCTION obsinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR, CFS
       use PRMS_READ_PARAM_FILE, only: getparam_int
-      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow
+      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Nstreamtemp
       USE PRMS_OBS
       use prms_utils, only: read_error
       IMPLICIT NONE
@@ -249,6 +247,6 @@
       IF ( Nratetbl>0 ) Gate_ht = 0.0
       IF ( Nhumid>0 ) Humidity = 0.0
       IF ( Nwind>0 ) Wind_speed = 0.0
-      IF ( nstream_temp>0 ) Stream_temp = 0.0
+      IF ( Nstreamtemp>0 ) Stream_temp = 0.0
 
       END FUNCTION obsinit
