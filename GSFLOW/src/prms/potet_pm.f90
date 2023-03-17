@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_pm'
-        character(len=*), parameter :: Version_potet = '2021-11-19'
+        character(len=*), parameter :: Version_potet = '2023-03-16'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Pm_n_coef(:, :), Pm_d_coef(:, :), Crop_coef(:, :)
       END MODULE PRMS_POTET_PM
@@ -40,7 +40,6 @@
       potet_pm = 0
 
       IF ( Process_flag==RUN ) THEN
-        IF ( Humidity_cbh_flag==OFF ) Humidity_hru = Humidity_percent(1, Nowmonth)
         Basin_potet = 0.0D0
         Basin_humidity = 0.0D0
         DO j = 1, Active_hrus
@@ -75,6 +74,7 @@
           A1 = 17.625
           B1 = 243.04
           t1 = A1 * Tavgc(i) / (B1 + Tavgc(i))
+          IF ( Humidity_cbh_flag==OFF ) Humidity_hru(i) = Humidity_percent(i, Nowmonth)
           num = B1 * (LOG(Humidity_hru(i)/100.0) + t1)
           den = A1 - LOG(Humidity_hru(i)/100.0) - t1
           Tempc_dewpt(i) = num / den

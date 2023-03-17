@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_pt'
-        character(len=*), parameter :: Version_potet = '2021-11-19'
+        character(len=*), parameter :: Version_potet = '2023-03-16'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Pt_alpha(:, :)
       END MODULE PRMS_POTET_PT
@@ -44,7 +44,6 @@
 !******Compute "EQUIVALENT" EVAPOTRANSPIRATION, EEQ (IN./DAY),
 !...USING PRIESTLY-TAYLOR METHOD. THE VARIBLES ARE CALCULATED
 !...USING FORMULAS GIVEN IN JENSEN, 1990.
-        IF ( Humidity_cbh_flag==OFF ) Humidity_hru = Humidity_percent(1, Nowmonth)
         ! next three lines were in loop, moved out since just setting constants
         A1 = 17.625
         B1 = 243.04
@@ -96,6 +95,7 @@
           !A1 = 17.625 !moved outside loop
           !B1 = 243.04 !moved outside loop
           t1 = A1 * Tavgc(i) / (B1 + Tavgc(i))
+          IF ( Humidity_cbh_flag==OFF ) Humidity_hru(i) = Humidity_percent(i, Nowmonth)
           num = B1 * (LOG(Humidity_hru(i)/100.0) + t1)
           den = A1 - LOG(Humidity_hru(i)/100.0) - t1
           Tempc_dewpt(i) = num / den

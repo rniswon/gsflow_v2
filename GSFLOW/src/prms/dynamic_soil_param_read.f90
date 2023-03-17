@@ -9,7 +9,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_soil_param_read'
-        character(len=*), parameter :: Version_dynamic_soil_param_read = '2023-01-11'
+        character(len=*), parameter :: Version_dynamic_soil_param_read = '2023-03-16'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Imperv_stor_next_yr, Imperv_stor_next_mo, Imperv_stor_next_day, Imperv_stor_unit
         INTEGER, SAVE :: Soil_rechr_next_yr, Soil_rechr_next_mo, Soil_rechr_next_day, Soil_rechr_unit
@@ -256,7 +256,7 @@
       INTEGER :: check_ag_max_flag, ios, check_fractions, check_imperv, check_ag_frac, check_dprst_frac
       INTEGER :: it0_sm_flag, it0_grav_flag, it0_dprst_flag, it0_imperv_flag
       REAL :: harea, frac_imperv, tmp, frac_dprst, frac_ag, to_slow_stor, frac_perv
-      CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
+      CHARACTER(LEN=30), PARAMETER :: FMT1 = '(I5, 2("/",I2.2))'
 !***********************************************************************
       dynsoilparamrun = 0
       istop = 0
@@ -359,7 +359,7 @@
             IF ( Soil_rechr_max(i)>Soil_moist_max(i) ) THEN
               istop = 1
               PRINT 9002, Soil_rechr_max(i), Soil_moist_max(i), i
-              EXIT
+              CYCLE
             ENDIF
             Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
           ENDIF
@@ -376,7 +376,7 @@
             IF ( Ag_soil_rechr_max(i)>Ag_soil_moist_max(i) ) THEN
               istop = 1
               PRINT 9003, Ag_soil_rechr_max(i), Ag_soil_moist_max(i), i
-              EXIT
+              CYCLE
             ENDIF
             Ag_soil_lower_stor_max(i) = Ag_soil_moist_max(i) - Ag_soil_rechr_max(i)
           ENDIF
@@ -387,10 +387,6 @@
             Dprst_vol_thres_open(i) = Dprst_vol_open_max(i)*DBLE(Op_flow_thres(i))
           ENDIF
         ENDDO
-        if ( istop==1 ) then
-          PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
-          ERROR STOP ERROR_dynamic
-        endif
       ENDIF
 
       !*******************
@@ -475,7 +471,7 @@
             PRINT *, 'ERROR, fraction impervious + fraction dprst > 0.999 for HRU:', i
             PRINT *, '       fraction impervious + dprst:', frac_imperv + frac_dprst
             PRINT *, '       hru_percent_imperv:', frac_imperv, '; frac_dprst:', frac_dprst
-            EXIT
+            CYCLE
           ENDIF
 
 ! use ag_frac as input, adjust other fractions if needed
@@ -506,7 +502,7 @@
                   PRINT '(A,F0.4,A,F0.4)', ' WARNING, dynamic agriculture fraction reduced from:', Ag_frac(i), ' to:', frac_ag
                   PRINT *, '         ag_soil_moist unchanged'
                   PRINT *, '         excess water added to slow storage of GVR:', to_slow_stor
-                  PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
+                  PRINT FMT1, Nowyear, Nowmonth, Nowday
                 ELSEIF ( Ag_frac(i) < frac_ag ) THEN
                   ! adjust ag depth
                   Ag_soil_moist(i) = Ag_soil_moist(i)*Ag_frac(i)/frac_ag
@@ -516,7 +512,7 @@
                 tmp = Ag_soil_moist(i)*Ag_frac(i)
                 PRINT *, 'WARNING, dynamic agriculture fraction changed to 0 when ag_soil_moist > 0'
                 PRINT '(A,F0.4,A,F0.4)', '          old value: ', Ag_frac(i), '; storage added to slow storage of GVR: ', tmp
-                PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
+                PRINT FMT1, Nowyear, Nowmonth, Nowday
                 to_slow_stor = to_slow_stor + tmp
                 Ag_soil_moist(i) = 0.0
                 Ag_soil_rechr(i) = 0.0
@@ -530,7 +526,7 @@
               istop = 1
               PRINT *, 'ERROR, pervious fraction or agriculture pervious fraction must be >= 0.0001 for HRU:', i
               PRINT *, '       pervious fraction:', tmp, '; agriculture fraction:', frac_ag
-              EXIT
+              CYCLE
             ENDIF
 
             ! check sum of imperv, ag, and dprst if either are updated!!!!!!
@@ -568,8 +564,8 @@
               ELSE
                 tmp = Imperv_stor(i)*Hru_percent_imperv(i)
                 PRINT *, 'WARNING, impervious changed to 0 in dynamic parameter module with impervious storage > 0'
-                PRINT *, '         this storage is added to slow storage of gravity reservoir:', tmp
-                PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
+                PRINT *, '         this storage is added to slow storage of gravity reservoir:', tmp, '; HRU: ', i
+                PRINT FMT1, Nowyear, Nowmonth, Nowday
                 to_slow_stor = to_slow_stor + tmp
                 Imperv_stor(i) = 0.0
                 it0_imperv_flag = ACTIVE
@@ -587,16 +583,16 @@
               IF ( .NOT.(Dprst_depth_avg(i)>0.0) .AND. frac_dprst>0.0 ) THEN
                 istop = 1
                 PRINT *, 'ERROR, dprst_frac>0 and dprst_depth_avg==0 for HRU:', i, '; dprst_frac:', frac_dprst
-                EXIT
+                CYCLE
               ENDIF
               ! CAUTION: other DPRST parameters need to have valid values as related to any dynamic parameter updates
               tmp = SNGL( Dprst_vol_open(i) + Dprst_vol_clos(i) )
               IF ( tmp > 0.0 ) THEN
                 IF ( .NOT.(frac_dprst)>0.0 .AND. tmp>0.0 ) THEN
                   tmp = ( tmp / Dprst_area(i) ) * Dprst_frac(i)
-                  PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0'
-                  PRINT *, '         storage added to slow storage of the gravity reservoir:', tmp
-                  PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
+                  PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0 in dynamic parameter module'
+                  PRINT *, '         storage added to slow storage of the gravity reservoir:', tmp, '; HRU: ', i
+                  PRINT FMT1, Nowyear, Nowmonth, Nowday
                   to_slow_stor = to_slow_stor + tmp
                   Dprst_vol_open(i) = 0.0D0
                   Dprst_vol_clos(i) = 0.0D0
@@ -659,7 +655,7 @@
 
         ENDDO
         if ( istop==1 ) then
-          PRINT FMT1, '          HRU: ', i, Nowyear, Nowmonth, Nowday
+          PRINT FMT1, Nowyear, Nowmonth, Nowday
           ERROR STOP ERROR_dynamic
         endif
 
@@ -688,7 +684,7 @@
           ENDDO
           Basin_ssstor = Basin_ssstor * Basin_area_inv
         ENDIF
-        IF ( AG_flag==ACTIVE ) THEN
+        IF ( check_ag_frac==ACTIVE ) THEN
           Basin_ag_soil_moist = 0.0D0
           Basin_ag_soil_rechr = 0.0D0
           DO j = 1, Active_hrus

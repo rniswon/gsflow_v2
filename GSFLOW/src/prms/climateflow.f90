@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2023-01-11'
+      character(len=*), parameter :: Version_climateflow = '2023-03-16'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -87,8 +87,8 @@
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Strm_seg_in(:), strm_seg_interflow_in(:), strm_seg_sroff_in(:), strm_seg_gwflow_in(:)
       ! Surface-Depression Storage
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open(:), Dprst_vol_clos(:), Dprst_stor_hru(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_open_in(:), Dprst_total_open_out(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_clos_in(:), Dprst_total_clos_out(:)
+      REAL, SAVE, ALLOCATABLE :: Dprst_total_open_in(:), Dprst_total_open_out(:)
+      REAL, SAVE, ALLOCATABLE :: Dprst_total_clos_in(:), Dprst_total_clos_out(:)
       ! gwflow
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwres_stor(:)
       ! lakes
@@ -359,12 +359,14 @@ end module PRMS_IT0_VARS
      &         'Saturation vapor pressure for each HRU', &
      &         'kilopascals', Vp_sat)
         ENDIF
-        ALLOCATE ( Humidity_percent(Nhru,MONTHS_PER_YEAR) )
-        IF ( declparam(Et_module, 'humidity_percent', 'nhru,nmonths', 'real', &
-     &       '0.0', '0.0', '100.0', &
-     &       'Monthy humidity for each HRU', &
-     &       'Monthy humidity for each HRU', &
-     &       'percentage')/=0 ) CALL read_error(1, 'humidity_percent')
+        IF ( Et_flag==potet_pm_module .OR. Et_flag==potet_pt_module ) THEN
+          ALLOCATE ( Humidity_percent(Nhru,MONTHS_PER_YEAR) )
+          IF ( declparam(Et_module, 'humidity_percent', 'nhru,nmonths', 'real', &
+     &         '0.0', '0.0', '100.0', &
+     &         'Monthy humidity for each HRU', &
+     &         'Monthy humidity for each HRU', &
+     &         'percentage')/=0 ) CALL read_error(1, 'humidity_percent')
+        ENDIF
       ENDIF
 
       ALLOCATE ( Intcp_transp_on(Nhru) )
@@ -630,16 +632,16 @@ end module PRMS_IT0_VARS
      &       'inches', Dprst_stor_hru)
         ALLOCATE ( Dprst_total_open_in(Nhru), Dprst_total_open_out(Nhru) )
         ALLOCATE ( Dprst_total_clos_in(Nhru), Dprst_total_clos_out(Nhru) )
-        CALL declvar_dble(Srunoff_module, 'dprst_total_open_in', 'nhru', Nhru, &
+        CALL declvar_real(Srunoff_module, 'dprst_total_open_in', 'nhru', Nhru, &
      &       'Total volume flowing in to open surface depressions for each HRU', &
      &       'acre-inches', Dprst_total_open_in)
-        CALL declvar_dble(Srunoff_module, 'dprst_total_open_out', 'nhru', Nhru, &
+        CALL declvar_real(Srunoff_module, 'dprst_total_open_out', 'nhru', Nhru, &
      &       'Total volume flowing out of open surface depressions for each HRU', &
      &       'acre-inches', Dprst_total_open_out)
-        CALL declvar_dble(Srunoff_module, 'dprst_total_clos_in', 'nhru', Nhru, &
+        CALL declvar_real(Srunoff_module, 'dprst_total_clos_in', 'nhru', Nhru, &
      &       'Total volume flowing in to closed surface depressions for each HRU', &
      &       'acre-inches', Dprst_total_clos_in)
-        CALL declvar_dble(Srunoff_module, 'dprst_total_clos_out', 'nhru', Nhru, &
+        CALL declvar_real(Srunoff_module, 'dprst_total_clos_out', 'nhru', Nhru, &
      &       'Total volume flowing out of closed surface depressions for each HRU', &
      &       'acre-inches', Dprst_total_clos_out)
       ENDIF
@@ -1052,7 +1054,7 @@ end module PRMS_IT0_VARS
      &    Temp_module, Stream_order_flag, GSFLOW_flag, Hru_type, &
      &    Precip_module, Solrad_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Et_flag, Dprst_flag, Solrad_flag, &
-     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, AG_flag, Glacier_flag
+     &    Parameter_check_flag, Inputerror_flag, AG_flag, Glacier_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv
@@ -1449,11 +1451,9 @@ end module PRMS_IT0_VARS
         Lwrad_net = 0.0
         Vp_slope = 0.0
         IF ( Et_flag==potet_pm_module .OR. Et_flag==potet_pm_sta_module ) Vp_sat = 0.0
-        IF ( Humidity_cbh_flag==OFF ) THEN
+        IF ( Et_flag==potet_pt_module .OR. Et_flag==potet_pm_module ) THEN
           IF ( getparam_real(Et_module, 'humidity_percent', Nhru*MONTHS_PER_YEAR, Humidity_percent)/=0 ) &
      &         CALL read_error(2, 'humidity_percent')
-        ELSE
-          Humidity_percent = 1.0
         ENDIF
       ENDIF
 ! initialize arrays (dimensioned Nsegment)
@@ -1637,7 +1637,7 @@ end module PRMS_IT0_VARS
       SUBROUTINE precip_form(Precip, Hru_ppt, Hru_rain, Hru_snow, Tmaxf, &
      &           Tminf, Pptmix, Newsnow, Prmx, Tmax_allrain_f, Rain_adj, &
      &           Snow_adj, Adjmix_rain, Hru_area, Sum_obs, Tmax_allsnow_f, Ihru)
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, DEBUG_less
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, DEBUG_minimum
       USE PRMS_MODULE, ONLY: Print_debug !, forcing_check_flag
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       use prms_utils, only: print_date
@@ -1704,7 +1704,7 @@ end module PRMS_IT0_VARS
 
 !      IF ( forcing_check_flag == ACTIVE ) THEN
         IF ( Hru_ppt < 0.0 .OR. Hru_rain < 0.0 .OR. Hru_snow < 0.0 ) THEN
-          IF ( Print_debug > DEBUG_less ) THEN
+          IF ( Print_debug > DEBUG_minimum ) THEN
             PRINT '(A,I0)', 'Warning, adjusted precipitation value(s) < 0.0 for HRU: ', Ihru
             PRINT '(A,F0.4,A,F0.4,A)', '         hru_ppt: ', Hru_ppt, ' hru_rain: ', Hru_rain, ' hru_snow: ', Hru_snow
             CALL print_date(0)
