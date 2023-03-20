@@ -2098,7 +2098,6 @@
         Pk_temp = 0.0 ! [degrees C]
         Pk_def = 0.0 ! [cal/cm^2]
       ENDIF
-      IF ( .NOT.(Pkwater_equiv>0.0D0) ) Pk_den = 0.0
       ! If on melting glacier ice/firn, Ihru_gl >0, so melted active layer (won't melt infinite ice layer)
       IF ( Ihru_gl>0) THEN
         IF ( .NOT.(Pkwater_equiv>0.0D0) ) CALL glacr_states_to_zero(Ihru_gl,0)
