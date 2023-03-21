@@ -1079,10 +1079,10 @@
         Basin_slstor = Basin_slstor + DBLE( Slow_stor(i)*harea )
         Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*perv_frac + Ag_soil_moist(i)*agfrac
         Basin_soil_moist_tot = Basin_soil_moist_tot + DBLE( Soil_moist_tot(i)*harea )
-        IF ( Pref_flow_thrsh(i)>0.0 ) Basin_gvr_stor_frac = Basin_gvr_stor_frac + DBLE( Slow_stor(i)/Pref_flow_thrsh(i)*harea )
+        IF ( Pref_flow_thrsh(i)>0.0 ) Basin_gvr_stor_frac = Basin_gvr_stor_frac + DBLE( (Slow_stor(i)/Pref_flow_thrsh(i))*harea )
         IF ( perv_on_flag==ACTIVE ) THEN
-          Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Soil_moist(i)/Soil_moist_max(i)*perv_area )
-          Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_tot(i)/Soil_zone_max(i)*harea ) !RGN added to avoid divide by zero. 1/20/2022
+          Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( (Soil_moist(i)/Soil_moist_max(i))*perv_area )
+          Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( (Soil_moist_tot(i)/Soil_zone_max(i))*harea ) !RGN added to avoid divide by zero. 1/20/2022
           Basin_soil_lower_stor_frac = Basin_soil_lower_stor_frac + DBLE( Soil_lower_ratio(i)*perv_area )
         ENDIF
         IF ( Soil_rechr_max(i)>0.0 ) Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + &

@@ -499,7 +499,7 @@
                 IF ( frac_ag < Ag_frac(i) ) THEN
                   ! keep same ag depth, send excess to GVR storage
                   to_slow_stor = Ag_soil_moist(i) * (Ag_frac(i) - frac_ag)
-                  PRINT '(A,F0.4,A,F0.4)', ' WARNING, dynamic agriculture fraction reduced from:', Ag_frac(i), ' to:', frac_ag
+                  PRINT '(A,F0.4,A,F0.4)', ' WARNING, dynamic agriculture fraction reduced from: ', Ag_frac(i), ' to:', frac_ag
                   PRINT *, '         ag_soil_moist unchanged'
                   PRINT *, '         excess water added to slow storage of GVR:', to_slow_stor
                   PRINT FMT1, Nowyear, Nowmonth, Nowday

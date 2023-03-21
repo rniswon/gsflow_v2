@@ -1340,8 +1340,6 @@ end module PRMS_IT0_VARS
         ! hru_type = land or swale or glacier
         IF ( .NOT.(Hru_perv(i)>0.0) ) THEN
           ! if no pervious set soil parameters and variables to 0.0
-          Soil_moist_max(i) = 0.0
-          Soil_rechr_max(i) = 0.0
           Soil_moist(i) = 0.0
           Soil_rechr(i) = 0.0
         ENDIF
