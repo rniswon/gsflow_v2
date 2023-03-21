@@ -23,7 +23,7 @@ nlapse                 3
 ==========================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 02/23/2023
+                       Version 5.3.0 03/17/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -61,7 +61,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-02-23
+PRMS Computation Order          gsflow_prms         2023-03-17
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -160,7 +160,7 @@ tmin 16
 Simulation time period: 1971/10/01 00:00:00 to 2015/09/30 00:00:00
 ==========================================================================
 Basin Definition                basin               2023-01-11
-Common States and Fluxes        climateflow         2023-01-11
+Common States and Fluxes        climateflow         2023-03-16
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
@@ -170,7 +170,7 @@ Solar Radiation Distribution    ccsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-02-08
+Snow Dynamics                   snowcomp            2023-03-16
 Glacier Dynamics                glacr_melt          2022-09-07
 Surface Runoff                  srunoff_smidx       2023-02-23
 Soilzone Computations           soilzone            2023-02-23
@@ -239,7 +239,7 @@ Fraction impervious:        0.0687    Fraction pervious:       0.9313
    2005             11.914    8.719    2.657    3.227    0.275
    2006              7.410    5.821    2.472    1.856   -7.021
    2007              5.456    3.508    1.835    2.723   -7.021
-   2008              7.207    5.745    2.206    1.126   -7.040
+   2008              7.207    5.745    2.205    1.126   -7.040
    2009              6.532    5.665    1.543    1.596   -7.021
    2010              8.305    6.780    1.504    1.627   -7.021
    2011              7.586    5.694    1.327    2.169   -7.021
@@ -250,5 +250,5 @@ Fraction impervious:        0.0687    Fraction pervious:       0.9313
  *************************************************************
  Total for run     418.200  279.047    1.062  150.525 -286.767
  *************************************************************
-Execution elapsed time    0 minutes  4.33 seconds
+Execution elapsed time    0 minutes  5.59 seconds
 

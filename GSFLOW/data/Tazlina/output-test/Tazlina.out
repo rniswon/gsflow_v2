@@ -23,7 +23,7 @@ nlapse                 3
 ==========================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 02/23/2023
+                       Version 5.3.0 03/17/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -61,7 +61,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-02-23
+PRMS Computation Order          gsflow_prms         2023-03-17
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -147,7 +147,7 @@ tmin 11
 Simulation time period: 1950/10/01 00:00:00 to 2015/09/30 00:00:00
 ==========================================================================
 Basin Definition                basin               2023-01-11
-Common States and Fluxes        climateflow         2023-01-11
+Common States and Fluxes        climateflow         2023-03-16
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
@@ -157,7 +157,7 @@ Solar Radiation Distribution    ccsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-02-08
+Snow Dynamics                   snowcomp            2023-03-16
 Glacier Dynamics                glacr_melt          2022-09-07
 Surface Runoff                  srunoff_smidx       2023-02-23
 Soilzone Computations           soilzone            2023-02-23
@@ -212,7 +212,7 @@ Fraction impervious:        0.0473    Fraction pervious:       0.9527
    1970             20.362    6.613 -478.075   31.777   -5.110
    1971             20.814    5.986 -495.358   31.807   -5.110
    1972             20.348    6.453 -513.945   32.410   -5.124
-   1973             18.553    7.699 -533.954   30.411   -5.110
+   1973             18.553    7.699 -533.953   30.411   -5.110
    1974             16.708    6.674 -555.498   31.276   -5.110
    1975             22.239    8.024 -572.602   31.137   -5.110
    1976             16.862    6.811 -593.920   31.129   -5.124
@@ -236,11 +236,11 @@ Fraction impervious:        0.0473    Fraction pervious:       0.9527
    1994             11.599    5.926 -905.703   22.382   -5.110
    1995             13.989    6.434 -920.668   22.371   -5.110
    1996              7.477    3.421 -936.931   20.297   -5.124
-   1997             12.083    6.555 -951.686   20.003   -5.110
+   1997             12.083    6.555 -951.685   20.003   -5.110
    1998              9.607    4.447 -965.570   18.908   -5.110
    1999             13.151    6.761 -978.219   18.850   -5.110
    2000             14.011    5.355 -987.795   18.188   -5.124
-   2001             10.796    5.067-1002.000   19.618   -5.110
+   2001             10.796    5.067-1001.999   19.618   -5.110
    2002             10.891    4.713-1013.917   17.753   -4.630
    2003              6.446    3.271-1029.445   18.442    0.153
    2004              4.217    0.855-1044.326   18.099    0.096
@@ -254,9 +254,9 @@ Fraction impervious:        0.0473    Fraction pervious:       0.9527
    2012             10.987    4.891-1120.731   15.958   -5.124
    2013             10.449    3.454-1128.570   14.540   -5.110
    2014             11.748    4.631-1137.944   16.131   -5.110
-   2015              9.247    4.044-1147.030   13.997   -5.110
+   2015              9.247    4.044-1147.029   13.997   -5.110
  *************************************************************
- Total for run    1036.624  384.717-1147.030 1785.852 -316.118
+ Total for run    1036.624  384.717-1147.029 1785.852 -316.118
  *************************************************************
-Execution elapsed time    0 minutes  7.11 seconds
+Execution elapsed time    0 minutes  8.79 seconds
 

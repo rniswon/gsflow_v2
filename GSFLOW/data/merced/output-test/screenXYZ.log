@@ -10,11 +10,11 @@ Executable: ..\..\bin\gsflow
 Control File: .\control\mercdXYZ.control
  WARNING, control parameter not used: aniOutON_OFF, ignored
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/27 18:42:55
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/03/20 19:42:17
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 02/23/2023
+                       Version 5.3.0 03/17/2023
 
 
 ==========================================================================
@@ -26,12 +26,12 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-02-23
+PRMS Computation Order          gsflow_prms         2023-03-17
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 Basin Definition                basin               2023-01-11
-Common States and Fluxes        climateflow         2023-01-11
+Common States and Fluxes        climateflow         2023-03-16
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
@@ -40,7 +40,7 @@ Solar Radiation Distribution    ddsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-02-08
+Snow Dynamics                   snowcomp            2023-03-16
 Surface Runoff                  srunoff_smidx       2023-02-23
 Soilzone Computations           soilzone            2023-02-23
 Groundwater                     gwflow              2022-04-21

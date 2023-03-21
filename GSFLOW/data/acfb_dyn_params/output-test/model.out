@@ -20,7 +20,7 @@ npoigages              6
 ==========================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 02/23/2023
+                       Version 5.3.0 03/17/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -58,7 +58,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-02-23
+PRMS Computation Order          gsflow_prms         2023-03-17
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -89,18 +89,18 @@ runoff 6
 Simulation time period: 1980/01/01 00:00:00 to 1999/12/31 00:00:00
 ==========================================================================
 Basin Definition                basin               2023-01-11
-Common States and Fluxes        climateflow         2023-01-11
+Common States and Fluxes        climateflow         2023-03-16
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
-Time Series Data                dynamic_soil_param  2023-01-11
-Temperature Distribution        climate_hru         2023-02-08
-Precipitation Distribution      climate_hru         2023-02-08
-Solar Radiation Distribution    climate_hru         2023-02-08
-Potential Evapotranspiration    climate_hru         2023-02-08
+Time Series Data                dynamic_soil_param  2023-03-16
+Temperature Distribution        climate_hru         2023-03-16
+Precipitation Distribution      climate_hru         2023-03-16
+Solar Radiation Distribution    climate_hru         2023-03-16
+Potential Evapotranspiration    climate_hru         2023-03-16
 Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-02-08
+Snow Dynamics                   snowcomp            2023-03-16
 Surface Runoff                  srunoff_smidx       2023-02-23
 Soilzone Computations           soilzone            2023-02-23
 Groundwater                     gwflow              2022-04-21
@@ -152,10 +152,10 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
    1995             53.742   20.538    8.244   36.232    1.522
    1996             68.484   18.458    9.548   50.374    1.877
    1997             55.724   19.088    9.751   36.721    1.762
-   1998             63.457   18.715    6.514   50.021    1.816
+   1998             63.457   18.715    6.515   50.021    1.816
    1999             45.071   20.064    5.764   25.833    1.094
  *************************************************************
  Total for run    1110.775  440.221    8.440  711.307   13.445
  *************************************************************
-Execution elapsed time    0 minutes  1.12 seconds
+Execution elapsed time    0 minutes  1.23 seconds
 

@@ -17,7 +17,7 @@ Control File: .\gsflow_modflow_uzfp2.control
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
- Run start date and time (yyyy/mm/dd hh:mm:ss): 2023/02/27 18:48:33
+ Run start date and time (yyyy/mm/dd hh:mm:ss): 2023/03/20 19:42:38
 
 GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
 ==============================================================
@@ -32,8 +32,8 @@ SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
 Steady state simulation successful, used 11 iterations
   
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/27 18:48:35
- Elapsed run time: 2.417 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/03/20 19:42:42
+ Elapsed run time: 3.858 Seconds
 
  Normal termination of simulation
 
