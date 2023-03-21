@@ -1,6 +1,6 @@
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 02/23/2023
+                       Version 5.3.0 03/17/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -38,7 +38,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-02-23
+PRMS Computation Order          gsflow_prms         2023-03-17
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -72,17 +72,17 @@ Simulation time period: 1980/10/01 00:00:00 to 1996/09/30 00:00:00
 ==========================================================================
 Basin Definition                basin               2023-01-11
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2023-01-11
+Common States and Fluxes        climateflow         2023-03-16
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
-Temperature Distribution        climate_hru         2023-02-08
-Precipitation Distribution      climate_hru         2023-02-08
-Solar Radiation Distribution    climate_hru         2023-02-08
-Potential Evapotranspiration    climate_hru         2023-02-08
+Temperature Distribution        climate_hru         2023-03-16
+Precipitation Distribution      climate_hru         2023-03-16
+Solar Radiation Distribution    climate_hru         2023-03-16
+Potential Evapotranspiration    climate_hru         2023-03-16
 Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-02-08
+Snow Dynamics                   snowcomp            2023-03-16
 Surface Runoff                  srunoff_smidx       2023-02-23
 Soilzone Computations           soilzone            2023-02-23
 Groundwater                     gwflow              2022-04-21
@@ -132,5 +132,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  *************************************************************
  Total for run     668.938  375.566    9.201  287.270  260.348
  *************************************************************
-Execution elapsed time    0 minutes  1.48 seconds
+Execution elapsed time    0 minutes  1.95 seconds
 

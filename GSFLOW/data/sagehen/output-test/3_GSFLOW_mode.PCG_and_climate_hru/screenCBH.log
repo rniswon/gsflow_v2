@@ -10,11 +10,11 @@ Executable: ..\..\..\bin\gsflow
 Control File: .\gsflow_climate_hru.control
  WARNING, control parameter not used: solzone_module, ignored
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/27 19:12:30
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/03/20 19:50:17
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 02/23/2023
+                       Version 5.3.0 03/17/2023
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -23,7 +23,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/02/27 19:12:30
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
-                        Github Commit Hash 18fa0b7
+                        Github Commit Hash f563d46
 
 
 ==========================================================================
@@ -35,23 +35,23 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-02-23
+PRMS Computation Order          gsflow_prms         2023-03-17
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 Basin Definition                basin               2023-01-11
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2023-01-11
+Common States and Fluxes        climateflow         2023-03-16
 Potential Solar Radiation       soltab              2022-10-24
 Time Series Data                obs                 2022-09-07
 Timestep Control                prms_time           2022-04-21
-Temperature Distribution        climate_hru         2023-02-08
-Precipitation Distribution      climate_hru         2023-02-08
-Solar Radiation Distribution    climate_hru         2023-02-08
-Potential Evapotranspiration    climate_hru         2023-02-08
+Temperature Distribution        climate_hru         2023-03-16
+Precipitation Distribution      climate_hru         2023-03-16
+Solar Radiation Distribution    climate_hru         2023-03-16
+Potential Evapotranspiration    climate_hru         2023-03-16
 Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-02-08
+Snow Dynamics                   snowcomp            2023-03-16
 Surface Runoff                  srunoff_smidx       2023-02-23
 Soilzone Computations           soilzone            2023-02-23
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
@@ -69,7 +69,7 @@ SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
 ==============================================================
 
 
-Steady state simulation successful, used 368 iterations
+Steady state simulation successful, used 351 iterations
 
 Writing PRMS Water Budget File: ..\output\prms\sagehen_prms_cbh.out
 
@@ -85,12 +85,12 @@ Simulation time period: 1980/10/01 - 1996/09/30
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/02/27 19:27:40
- Elapsed run time: 15 Minutes, 9.867 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/03/20 20:09:07
+ Elapsed run time: 18 Minutes, 50.088 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
- MF iterations:         63701;  SZ iterations:           63663
- Average MF iterations: 10.90;  Average SZ iterations:   10.89
+ MF iterations:         63729;  SZ iterations:           63691
+ Average MF iterations: 10.91;  Average SZ iterations:   10.90
  Maximum MF iterations:    32;  Maximum SZ iterations:      25
 
 mxsziter reached: 13

@@ -1,7 +1,7 @@
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
  DATE: 11 03 1983              CUMULATIVE TIME STEP:    1129
- MODFLOW STRESS PERIOD      1     CURRENT TIME STEP:       7     ITERATIONS:      13
+ MODFLOW STRESS PERIOD      1     CURRENT TIME STEP:       7     ITERATIONS:      16
 
  -----------------------------------------------------------------------------------
 
@@ -17,36 +17,35 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        8925368.24     EVAPOTRANSPIRATION =        2970479.67
+   EVAPOTRANSPIRATION =        8925917.26     EVAPOTRANSPIRATION =        2970703.11
            STREAMFLOW =        6116107.34             STREAMFLOW =        1569209.25
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
-   INFLOWS - OUTFLOWS =        7.8015D+07     INFLOWS - OUTFLOWS =       -1308954.27
+   INFLOWS - OUTFLOWS =        7.8015D+07     INFLOWS - OUTFLOWS =       -1309177.71
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        7.6957D+07         STORAGE CHANGE =       -1510739.89
+ TOTAL STORAGE CHANGE =        7.7059D+07         STORAGE CHANGE =       -1393029.65
        --------------                             --------------
-         LAND SURFACE =        9383001.98           LAND SURFACE =       -4040277.39
-            SOIL ZONE =        3.6210D+07              SOIL ZONE =        1432610.46
-     UNSATURATED ZONE =          -4412.97       UNSATURATED ZONE =          42536.50
-       SATURATED ZONE =        1295599.45         SATURATED ZONE =         205577.47
-                LAKES =        3.0073D+07                  LAKES =         848813.06
+         LAND SURFACE =        9383002.01           LAND SURFACE =       -4040277.36
+            SOIL ZONE =        3.6211D+07              SOIL ZONE =        1432587.81
+     UNSATURATED ZONE =         -11258.74       UNSATURATED ZONE =          42098.14
+       SATURATED ZONE =        1316063.27         SATURATED ZONE =         213656.06
+                LAKES =        3.0161D+07                  LAKES =         958905.69
 
- OVERALL BUDGET ERROR =        1058187.51           BUDGET ERROR =         201785.62
+ OVERALL BUDGET ERROR =         955667.88           BUDGET ERROR =          83851.95
 
-  ***WARNING, FLUX RATES OFF > 3%
 
-  PERCENT DISCREPANCY =              1.14    PERCENT DISCREPANCY =              4.35
+  PERCENT DISCREPANCY =              1.03    PERCENT DISCREPANCY =              1.83
 
 
 
  Number of time steps:      7;  Number of non-convergence:   0
- MF iterations:            68;  SZ iterations:              71
- Average MF iterations:  9.71;  Average SZ iterations:   10.14
- Maximum MF iterations:    16;  Maximum SZ iterations:      17
+ MF iterations:            72;  SZ iterations:              76
+ Average MF iterations: 10.29;  Average SZ iterations:   10.86
+ Maximum MF iterations:    17;  Maximum SZ iterations:      18
 
-MF iteration distribution:      0    0    0    1    1    1    0    0    0    1
-                                0    0    1    1    0    1    0    0    0    0
+MF iteration distribution:      0    0    0    1    1    0    1    0    0    1
+                                0    0    0    1    1    0    1    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
@@ -54,8 +53,8 @@ MF iteration distribution:      0    0    0    1    1    1    0    0    0    1
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
 
-SZ computation distribution:    0    0    0    0    2    1    0    0    0    1
-                                0    0    1    0    1    0    1    0    0    0
+SZ computation distribution:    0    0    0    0    2    0    1    0    0    1
+                                0    0    0    0    1    1    0    1    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
