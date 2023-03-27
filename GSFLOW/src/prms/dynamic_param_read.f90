@@ -342,7 +342,6 @@
       EXTERNAL :: write_dynparam_potet
 ! Local Variables
       INTEGER :: i, ios
-      CHARACTER(LEN=30), PARAMETER :: fmt1 = '(A, I0, ":", I5, 2("/",I2.2))'
 !***********************************************************************
       dynparamrun = 0
 

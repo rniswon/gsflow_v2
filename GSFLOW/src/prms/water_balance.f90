@@ -500,8 +500,6 @@
       IF ( AG_flag == ACTIVE ) THEN
         Basin_capillary_wb = Basin_capillary_wb - Basin_perv_to_gw
         Basin_soilzone_wb = Basin_soilzone_wb + It0_basin_ag_soil_moist - Basin_ag_soil_moist - Basin_ag_actet
-      ELSE
-        Basin_capillary_wb = Basin_capillary_wb - Basin_soil_to_gw
       ENDIF
 
       IF ( DABS(Basin_gravity_wb)>DTOOSMALL ) WRITE ( BALUNT, * ) 'basin gvrbal issue', Basin_gravity_wb, &
