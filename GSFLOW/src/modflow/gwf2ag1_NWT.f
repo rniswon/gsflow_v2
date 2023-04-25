@@ -2456,11 +2456,11 @@
         case ('PA1')
            UNIT = TSPONDETALLUNIT
            WRITE (UNIT, *) 'TIME KPER KSTP NULL ETww ETa NULL'
-        case ('SA2')
+        case ('SL2')
            UNIT = TSSWALLUNIT
         WRITE (UNIT, *) 'TIME KPER KSTP SW-DEMAND SW-DIVERTED ',
      +                     'NULL'
-        case ('SA1')
+        case ('SL1')
            UNIT = TSSWETALLUNIT
         WRITE (UNIT, *) 'TIME KPER KSTP NULL ETww ETa NULL'
         end select
