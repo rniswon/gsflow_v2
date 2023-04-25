@@ -24,6 +24,7 @@
         INTEGER, SAVE, POINTER :: NUMSW, NUMGW, NUMSWET, NUMGWET
         INTEGER, SAVE, POINTER :: NUMPOND, NUMPONDET
         INTEGER, SAVE, POINTER :: TSGWETALLUNIT, TSGWALLUNIT
+        INTEGER, SAVE, POINTER :: TSSWETALLUNIT, TSSWALLUNIT
         INTEGER, SAVE, POINTER :: TSPONDETALLUNIT, TSPONDALLUNIT
         INTEGER, SAVE, POINTER :: NSEGDIMTEMP
         CHARACTER(LEN=16), SAVE, DIMENSION(:), POINTER :: WELAUX
@@ -187,6 +188,7 @@
       ALLOCATE (TSACTIVEPOND, TSACTIVEPONDET)
       ALLOCATE (TSACTIVEALLPOND, TSACTIVEALLPONDET)
       ALLOCATE (TSGWALLUNIT, TSGWETALLUNIT, NSEGDIMTEMP)
+      ALLOCATE (TSSWALLUNIT, TSSWETALLUNIT)
       ALLOCATE (TSPONDALLUNIT, TSPONDETALLUNIT)
       ALLOCATE (NUMPOND, NUMPONDET, NUMTABPOND, MAXVALPOND)
       ALLOCATE (KPEROLD)
@@ -219,6 +221,8 @@
       NUMPONDET = 0
       TSGWETALLUNIT = 0
       TSGWALLUNIT = 0
+      TSSWETALLUNIT = 0
+      TSSWALLUNIT = 0
       TSPONDALLUNIT = 0
       TSPONDETALLUNIT = 0
       WELAUX = ' '
@@ -2205,7 +2209,7 @@
       INTEGER LLOC, ISTART, ISTOP, I, SGNM, UNIT, WLNM
       INTEGER PDNM
       INTEGER ISTARTSAVE, ITEST, NUMGWETALL, NUMGWALL, NUMPONDETALL
-      INTEGER NUMPONDALL
+      INTEGER NUMPONDALL, NUMSWALL, NUMSWETALL
       real :: R
       !character(len=16)  :: text = 'AG'
       character(len=17)  :: char1 = 'TIME SERIES'
@@ -2218,6 +2222,8 @@
       NUMPONDETALL = 0
       NUMPONDALL = 0
       NUMPONDET = 0
+      NUMSWALL = 0
+      NUMSWETALL = 0
       WLNM = 0
       TEST = .FALSE.
       CALL URDCOM(In, IOUT, line)
@@ -2331,7 +2337,17 @@
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
             TSGWALLUNIT = UNIT
             NUMGWALL = 1
-            CALL WRITE_HEADER_AG('AL2', NUMGWET)
+            CALL WRITE_HEADER_AG('SL2', NUMGWALL)
+         case ('DIVERSIONETALL')
+            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
+            TSSWETALLUNIT = UNIT
+            NUMSWETALL = 1
+            CALL WRITE_HEADER_AG('SL1', NUMGWET)
+         case ('DIVERSIONALL')
+            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
+            TSSWALLUNIT = UNIT
+            NUMSWALL = 1
+            CALL WRITE_HEADER_AG('AL2', NUMGWALL)
          case ('PONDETALL')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
             TSPONDETALLUNIT = UNIT
@@ -2360,9 +2376,9 @@
       end do
       !11 - ----output number of files activated for time series output.
       IF ( TEST ) THEN
-        write (iout, 6) NUMSW
+        write (iout, 6) NUMSW + NUMSWALL
         write (iout, 7) NUMGW + NUMGWALL
-        write (iout, 8) NUMSWET
+        write (iout, 8) NUMSWET + NUMSWETALL
         write (iout, 9) NUMGWET + NUMGWETALL        
         write (iout, 10) NUMPONDET + NUMPONDETALL
         write (iout, 11) NUMPOND + NUMPONDALL
@@ -2440,10 +2456,13 @@
         case ('PA1')
            UNIT = TSPONDETALLUNIT
            WRITE (UNIT, *) 'TIME KPER KSTP NULL ETww ETa NULL'
-        case ('PA2')
-           UNIT = TSPONDALLUNIT
-        WRITE (UNIT, *) 'TIME KPER KSTP NULL SEG-INFLOW POND-OUTFLOW ',
-     +                     'POND-STORAGE'
+        case ('SA2')
+           UNIT = TSSWALLUNIT
+        WRITE (UNIT, *) 'TIME KPER KSTP SW-DEMAND SW-DIVERTED ',
+     +                     'NULL'
+        case ('SA1')
+           UNIT = TSSWETALLUNIT
+        WRITE (UNIT, *) 'TIME KPER KSTP NULL ETww ETa NULL'
         end select
       END SUBROUTINE WRITE_HEADER_AG
 
@@ -4002,6 +4021,7 @@
 ! --------------------------------------
 !
       !
+      if ( ISSFLG(kkper) >= 1 ) return
       aettot = DZERO
       pettot = DZERO
       prms_inch2mf_q = DZERO
@@ -4028,6 +4048,81 @@
      +                      Q, QQ, QQQ)
          END DO
       END IF
+      !
+      ! - -------OUTPUT TIME SERIES FOR ALL SEGMENTS DIVERSIONS
+      !
+      Q = DZERO
+      QQ = DZERO
+      QQQ = DZERO
+      I = 0
+      IF (TSSWALLUNIT > 0) THEN
+         DO L = 1, NUMIRRDIVERSION
+            UNIT = TSSWALLUNIT
+            IF ( Model == MODSIM_GSFLOW ) THEN
+              Q = Q + agDemand(L)  !for MODSIM-GSFLOW
+            ELSE
+              Q = Q + demand(L)
+            ENDIF
+            QQ = QQ + DVRSFLW(L)   !consider making this SGOTFLOW
+            QQQ = QQQ + SUPSEG(L)
+         END DO
+         CALL timeseries(unit, Kkper, Kkstp, TOTIM, I,
+     +                      Q, QQ, QQQ)
+      END IF
+            !
+      ! - ----Output time series of ET irrigated by all diversions
+      ! - ----Total ET for all cells irrigated by segments for all diversions
+      !
+      Q = DZERO
+      QQ = DZERO
+      QQQ = DZERO
+      i = 0
+      if (TSSWETALLUNIT) then
+         prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
+         do L = 1, NUMIRRDIVERSION
+            aettot = DZERO
+            pettot = DZERO
+            UNIT = TSSWETUNIT(L)
+            iseg = TSSWETNUM(L)
+            do k = 1, DVRCH(iseg)  !cells per segement
+               IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
+                  IF (GSFLOW_flag == 0) THEN
+                     ic = IRRCOL_SW(k, iseg)
+                     ir = IRRROW_SW(k, iseg)
+                     area = delr(ic)*delc(ir)
+                     pet = PETRATE(ic, ir)*area
+                     uzet = uzfetout(ic, ir)/DELT
+                     aet = gwet(ic, ir) + uzet  !vol rate
+                  ELSE
+                     hru_id = IRRROW_SW(k, iseg)
+                     area = gsflow_ag_area(hru_id)
+                     pet = Potet(hru_id)*area*prms_inch2mf_q
+                     aet = gsflow_ag_actet(hru_id)*area*prms_inch2mf_q
+                     if ( Nhru==Nhrucell ) then
+                       icell = Gvr_cell_id(hru_id)
+                       irow = Gwc_row(icell)
+                       icol = Gwc_col(icell)
+                       uzet = gsflow_ag_frac(hru_id)*
+     +                        UZFETOUT(icol, irow)/DELT
+                       aet = aet + uzet + gsflow_ag_frac(hru_id)*
+     +                                    gwet(icol, irow)
+                     end if
+                  end if
+                  aettot = aettot + aet
+                  pettot = pettot + pet
+               ELSE
+                  dvt = SGOTFLW(iseg)*DVRPERC(k, iseg)
+                  aettot = aettot + dvt*DVEFF(k, iseg)
+                  pettot = aettot
+               END IF
+            end do
+            Q = pettot
+            QQ = aettot
+            QQQ = DZERO
+            CALL timeseries(unit, Kkper, Kkstp, TOTIM, i,
+     +                      Q, QQ, QQQ)
+         end do
+      end if
       !
       ! - -------OUTPUT TIME SERIES FOR INFLOWS AND OUTFLOWS TO PONDS
       !
@@ -4127,8 +4222,7 @@
       QQ = DZERO
       QQQ = DZERO
       if (TSACTIVESWET) then
-      if ( ISSFLG(kkper) == 0 ) 
-     +     prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
+         prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
          do I = 1, NUMSWET
             aettot = DZERO
             pettot = DZERO
@@ -4201,8 +4295,7 @@
          aettot = DZERO
          pettot = DZERO
          IF (TSACTIVEGWET) THEN
-            if ( ISSFLG(kkper) == 0 ) 
-     +           prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
+            prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
             DO I = 1, NUMGWET
                pettot = DZERO
                aettot = DZERO
@@ -4260,9 +4353,8 @@
       QQQ = DZERO
       aettot = DZERO
       pettot = DZERO
-      IF (TSGWETALLUNIT > 0) THEN
-        if ( ISSFLG(kkper) == 0 ) 
-     +    prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
+      IF (TSGWETALLUNIT > 0) THEN 
+         prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
          DO L = 1, NWELLS
             UNIT = TSGWETALLUNIT
             do J = 1, NUMCELLS(L)
@@ -4778,6 +4870,8 @@ C8------RETURN.
       DEALLOCATE(TSGWETNUM)
       DEALLOCATE(SUPSEG)
       DEALLOCATE(TSGWETALLUNIT)
+      DEALLOCATE(TSSWETALLUNIT)
+      DEALLOCATE(TSSWALLUNIT)
       DEALLOCATE(NSEGDIMTEMP)
       DEALLOCATE(LASTREACH)
       DEALLOCATE(KCROPWELL)
