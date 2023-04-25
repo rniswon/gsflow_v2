@@ -4084,6 +4084,7 @@
             pettot = DZERO
             UNIT = TSSWETUNIT(L)
             iseg = TSSWETNUM(L)
+            if ( iseg > 0 ) then
             do k = 1, DVRCH(iseg)  !cells per segement
                IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
                   IF (GSFLOW_flag == 0) THEN
@@ -4116,6 +4117,7 @@
                   pettot = aettot
                END IF
             end do
+            end if
             Q = pettot
             QQ = aettot
             QQQ = DZERO
@@ -4228,6 +4230,7 @@
             pettot = DZERO
             UNIT = TSSWETUNIT(I)
             iseg = TSSWETNUM(I)
+            if ( iseg > 0 ) then
             do k = 1, DVRCH(iseg)  !cells per segement
                IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
                   IF (GSFLOW_flag == 0) THEN
@@ -4260,6 +4263,7 @@
                   pettot = aettot
                END IF
             end do
+            end if
             Q = pettot
             QQ = aettot
             QQQ = DZERO
