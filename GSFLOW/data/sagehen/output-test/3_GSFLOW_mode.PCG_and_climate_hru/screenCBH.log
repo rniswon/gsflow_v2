@@ -10,7 +10,7 @@ Executable: ..\..\..\bin\gsflow
 Control File: .\gsflow_climate_hru.control
  WARNING, control parameter not used: solzone_module, ignored
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/03/20 19:50:17
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/05/11  9:30:21
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -23,7 +23,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/03/20 19:50:17
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
-                        Github Commit Hash f563d46
+                        Github Commit Hash cf8b62c
 
 
 ==========================================================================
@@ -85,8 +85,8 @@ Simulation time period: 1980/10/01 - 1996/09/30
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/03/20 20:09:07
- Elapsed run time: 18 Minutes, 50.088 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/05/11  9:45:49
+ Elapsed run time: 15 Minutes, 27.806 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         63729;  SZ iterations:           63691

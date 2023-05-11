@@ -9,7 +9,7 @@ Executable: ..\..\..\bin\gsflow.exe
 ==========================================================================
 Control File: .\Sagehen_ponds.control
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/03/20 19:40:16
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/05/11  8:46:59
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -22,7 +22,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/03/20 19:40:16
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
-                        Github Commit Hash f563d46
+                        Github Commit Hash cf8b62c
 
 
 ==========================================================================
@@ -462,15 +462,15 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/03/20 19:43:24
- Elapsed run time: 3 Minutes, 7.883 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/05/11  8:49:26
+ Elapsed run time: 2 Minutes, 26.746 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
- MF iterations:         11582;  SZ iterations:           11546
- Average MF iterations:  6.24;  Average SZ iterations:    6.22
+ MF iterations:         11629;  SZ iterations:           11589
+ Average MF iterations:  6.26;  Average SZ iterations:    6.24
  Maximum MF iterations:    72;  Maximum SZ iterations:      50
 
-mxsziter reached: 2
+mxsziter reached: 3
 
  Normal termination of simulation
 
