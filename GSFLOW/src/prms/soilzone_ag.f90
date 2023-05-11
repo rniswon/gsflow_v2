@@ -900,12 +900,16 @@
           IF ( ag_on_flag==ACTIVE ) THEN
             IF ( Iter_aet_flag==ACTIVE ) THEN
               !soilwater_deficit = MAX( sz_deficit_param, ag_soil_moist(i)/ag_soil_moist_max(i) ) irrigation happens at a deficit threshold
-              ag_AETtarget = AET_external(i) ! ??? rsr, should this be PET target
+              ag_AETtarget = AET_external(i)
             ELSE
               ag_AETtarget = Potet(i)
             ENDIF
 
-            ag_avail_targetAET = ag_AETtarget
+            ! assume canopy interception evaporation is accounted for in intcp module, so subtract here
+            ! assume impervious, snow, and dprst evap not in ag fraction
+            ! assume ag fraction only contains irrigated land with vegetation
+            ag_avail_targetAET = ag_AETtarget - Hru_intcpevap(i)
+            IF ( ag_avail_targetAET < 0.0 ) ag_avail_targetAET = 0.0
 
             IF ( ag_avail_targetAET>0.0 ) THEN
               !if ( Ag_soil_moist(i) < Ag_soil_rechr(i) ) print *, 'AG1 szactet, before', i, Ag_soil_moist(i)-Ag_soil_rechr(i), &
@@ -936,11 +940,14 @@
                 ENDIF
               ENDIF
               ag_hruactet = agactet*agfrac
-
-              Unused_ag_et(i) = ag_AETtarget - agactet
             ENDIF
-            unsatisfied_ag_et = ag_AETtarget - agactet
-            !if ( unsatisfied_ag_et<0.0 ) print *, unsatisfied_ag_et, i, 'unsat', soilzone_aet_converge, ag_AETtarget, agactet
+            unsatisfied_ag_et = ag_avail_targetAET - agactet
+            !if ( unsatisfied_ag_et<0.0 ) print *, 'unused ag et problem', unsatisfied_ag_et, i, soilzone_aet_converge, ag_AETtarget, agactet
+            Unused_ag_et(i) = unsatisfied_ag_et
+            ! assume canopy interception is accounted for in intcp module, so add here
+            Ag_actet(i) = agactet + Hru_intcpevap(i)
+          ELSE
+            Ag_actet(i) = 0.0
           ENDIF
 
           avail_potet = Potet(i) - hruactet - ag_hruactet
@@ -951,8 +958,7 @@
      &                           Potet(i), perv_frac, Soil_saturated(i), i, 0)
           ENDIF
         ENDIF
-        Ag_actet(i) = agactet + hruactet * agfrac
-        IF ( Ag_package==ACTIVE ) gsflow_ag_actet(i) = agactet
+        IF ( Ag_package==ACTIVE ) gsflow_ag_actet(i) = Ag_actet(i)
         hru_ag_actet(i) = ag_hruactet
         Hru_actet(i) = hruactet + pervactet*perv_frac + ag_hruactet
         IF ( ag_on_flag==ACTIVE ) THEN
@@ -1156,7 +1162,6 @@
           ag_AET_external_vol = ag_AET_external_vol*Ag_area
           do i = 1, nhru ! temporary to put mask in nhru_summary file
             if (ag_frac(i)>0.0 ) then
-                if (transp_on(i)==OFF) AET_external(i) = -1.0
                 Basin_ag_irrigation_add = Basin_ag_irrigation_add + DBLE( Ag_irrigation_add_vol(i) )
                 if ( ag_irrigation_add(i)>0.0)then
                     if (ag_soil_moist_max(i)-ag_soil_moist(i) < 0.0001 ) then
@@ -1165,13 +1170,9 @@
                         print *, ag_actet(i), aet_external(i)
                     endif
                 endif
-            else
-                AET_external(i) = -1.0
             endif
           enddo
           Basin_ag_irrigation_add = Basin_ag_irrigation_add / Ag_area_total
-        ELSE
-          AET_external = -1.0
         ENDIF
         IF ( num_hrus_ag_iter > 0 ) print '(2(A,I0))', 'number of hrus still iterating on AET: ', num_hrus_ag_iter
         if ( Soil_iter == max_soilzone_ag_iter ) then
