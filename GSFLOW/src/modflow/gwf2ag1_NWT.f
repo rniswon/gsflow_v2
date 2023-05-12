@@ -2337,17 +2337,17 @@
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
             TSGWALLUNIT = UNIT
             NUMGWALL = 1
-            CALL WRITE_HEADER_AG('SL2', NUMGWALL)
+            CALL WRITE_HEADER_AG('AL2', NUMGWALL)
          case ('DIVERSIONETALL')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
             TSSWETALLUNIT = UNIT
             NUMSWETALL = 1
-            CALL WRITE_HEADER_AG('SL1', NUMGWET)
+            CALL WRITE_HEADER_AG('SL1', NUMSWETALL)
          case ('DIVERSIONALL')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
             TSSWALLUNIT = UNIT
             NUMSWALL = 1
-            CALL WRITE_HEADER_AG('AL2', NUMGWALL)
+            CALL WRITE_HEADER_AG('SL2', NUMSWALL)
          case ('PONDETALL')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, UNIT, R, IOUT, IN)
             TSPONDETALLUNIT = UNIT
@@ -4058,13 +4058,16 @@
       IF (TSSWALLUNIT > 0) THEN
          DO L = 1, NUMIRRDIVERSION
             UNIT = TSSWALLUNIT
-            IF ( Model == MODSIM_GSFLOW ) THEN
-              Q = Q + agDemand(L)  !for MODSIM-GSFLOW
-            ELSE
-              Q = Q + demand(L)
-            ENDIF
-            QQ = QQ + DVRSFLW(L)   !consider making this SGOTFLOW
-            QQQ = QQQ + SUPSEG(L)
+            iseg = IRRSEG(L)
+            IF ( iseg > 0 ) THEN
+              IF ( Model == MODSIM_GSFLOW ) THEN
+                Q = Q + agDemand(iseg)  !for MODSIM-GSFLOW
+              ELSE
+                Q = Q + demand(iseg)
+              ENDIF
+              QQ = QQ + DVRSFLW(iseg)   !consider making this SGOTFLOW
+              QQQ = QQQ + SUPSEG(iseg)
+            END IF
          END DO
          CALL timeseries(unit, Kkper, Kkstp, TOTIM, I,
      +                      Q, QQ, QQQ)
@@ -4077,15 +4080,15 @@
       QQ = DZERO
       QQQ = DZERO
       i = 0
-      if (TSSWETALLUNIT) then
+      if ( TSSWETALLUNIT > 0 ) then
          prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
          do L = 1, NUMIRRDIVERSION
             aettot = DZERO
             pettot = DZERO
-            UNIT = TSSWETUNIT(L)
-            iseg = TSSWETNUM(L)
+            UNIT = TSSWETALLUNIT
+            iseg = IRRSEG(L)
             if ( iseg > 0 ) then
-            do k = 1, DVRCH(iseg)  !cells per segement
+              do k = 1, DVRCH(iseg)  !cells per segement
                IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
                   IF (GSFLOW_flag == 0) THEN
                      ic = IRRCOL_SW(k, iseg)
@@ -4116,14 +4119,14 @@
                   aettot = aettot + dvt*DVEFF(k, iseg)
                   pettot = aettot
                END IF
-            end do
+              end do
             end if
             Q = pettot
             QQ = aettot
             QQQ = DZERO
-            CALL timeseries(unit, Kkper, Kkstp, TOTIM, i,
-     +                      Q, QQ, QQQ)
          end do
+         CALL timeseries(unit, Kkper, Kkstp, TOTIM, i,
+     +                      Q, QQ, QQQ)
       end if
       !
       ! - -------OUTPUT TIME SERIES FOR INFLOWS AND OUTFLOWS TO PONDS
@@ -4230,7 +4233,6 @@
             pettot = DZERO
             UNIT = TSSWETUNIT(I)
             iseg = TSSWETNUM(I)
-            if ( iseg > 0 ) then
             do k = 1, DVRCH(iseg)  !cells per segement
                IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
                   IF (GSFLOW_flag == 0) THEN
@@ -4263,7 +4265,6 @@
                   pettot = aettot
                END IF
             end do
-            end if
             Q = pettot
             QQ = aettot
             QQQ = DZERO
