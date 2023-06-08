@@ -93,7 +93,7 @@ contains
                            mappingFileName, xyFileName, Iter_aet_flag, text_restart_flag, irrigation_apply_flag
     use PRMS_CLIMATE_HRU, only: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, Albedo_day, Cloud_cover_day, &
                                 Cbh_check_flag, Windspeed_day, Humidity_day, &
-                                AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
+                                AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file, cbh_active_flag
     use PRMS_DYNAMIC_PARAM_READ, only: wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
                                        potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, dynamic_param_log_file, &
                                        radtrncf_dynamic, fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, &
@@ -372,6 +372,10 @@ contains
     Control_parameter_data(i) % name = 'cbh_check_flag'
     Cbh_check_flag = ACTIVE
     Control_parameter_data(i) % values_int(1) = Cbh_check_flag
+    i = i + 1
+    Control_parameter_data(i) % name = 'cbh_active_flag'
+    cbh_active_flag = OFF
+    Control_parameter_data(i) % values_int(1) = cbh_active_flag
     i = i + 1
     Control_parameter_data(i) % name = 'parameter_check_flag'
     Parameter_check_flag = OFF

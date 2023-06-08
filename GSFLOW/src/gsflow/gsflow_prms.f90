@@ -1140,6 +1140,8 @@
      &     /=0 ) CALL read_error(7, 'nratetbl')
       IF ( decldim('nsnow', 0, MAXDIM, 'Number of snow-depth-measurement stations')/=0 ) CALL read_error(7, 'nsnow')
 
+      IF ( decldim('ncbh', 0, MAXDIM, 'Number of values in each CBH File (active HRUs)')/=0 ) CALL read_error(7, 'ncbh')
+
 ! depletion curves
       IF ( decldim('ndepl', 1, MAXDIM, 'Number of snow-depletion curves')/=0 ) CALL read_error(7, 'ndelp')
       IF ( decldim('ndeplval', 11, MAXDIM, 'Number of values in all snow-depletion curves (set to ndepl*11)')/=0 ) &
