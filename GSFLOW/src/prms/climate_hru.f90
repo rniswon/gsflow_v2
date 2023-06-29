@@ -10,15 +10,17 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2023-03-16'
+        character(len=*), parameter :: Version_climate_hru = '2023-05-17'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit, AET_unit, PET_unit, Irrigated_area_unit
         INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit
+        REAL, ALLOCATABLE :: values(:)
+        INTEGER, ALLOCATABLE :: ivalues(:)
         ! Control Parameters
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Tmin_day, Tmax_day, Precip_day, Potet_day, Swrad_day, Transp_day
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Humidity_day, Windspeed_day, AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Albedo_day, Cloud_cover_day
-        INTEGER, SAVE :: Cbh_check_flag
+        INTEGER, SAVE :: Cbh_check_flag, cbh_active_flag
         ! Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_windspeed, Basin_aet_external, Basin_pet_external, Basin_irrigated_area
         REAL, ALLOCATABLE :: Humidity_hru(:), Windspeed_hru(:), AET_external(:), PET_external(:), Irrigated_area(:)
@@ -26,19 +28,20 @@
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Rain_cbh_adj(:, :), Snow_cbh_adj(:, :), Potet_cbh_adj(:, :)
         REAL, SAVE, ALLOCATABLE :: Tmax_cbh_adj(:, :), Tmin_cbh_adj(:, :)
+        INTEGER, SAVE, ALLOCATABLE :: cbh_hru_id(:)
       END MODULE PRMS_CLIMATE_HRU
 
       INTEGER FUNCTION climate_hru()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, RUN, DECL, INIT, &
      &    MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, CELSIUS, MONTHS_PER_YEAR, DEBUG_less
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
-      use PRMS_READ_PARAM_FILE, only: declparam, getparam_real
+      use PRMS_READ_PARAM_FILE, only: declparam, getparam_real, getparam_int, getdim, decldim
       use PRMS_CONTROL_FILE, only: control_integer, control_string
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Climate_transp_flag, Orad_flag, &
      &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
      &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
      &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, Nowyear, Nowday, forcing_check_flag, Print_debug, &
-     &    irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag
+     &    irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag, Ncbh
       USE PRMS_CLIMATE_HRU
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Ag_Frac
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
@@ -65,17 +68,42 @@
       ierr = 0
       IF ( Process_flag==RUN ) THEN
         IF ( Climate_temp_flag==ACTIVE ) THEN
-          READ ( Tmax_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Tmaxf(i), i=1,Nhru)
-          IF ( ios/=0 ) THEN
-            ierr = 1
-          ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'tmaxf', ios, ierr)
+          IF ( cbh_active_flag == OFF ) THEN
+            READ ( Tmax_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Tmaxf(i), i=1,Nhru)
+          ELSE
+            READ ( Tmax_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh)
           ENDIF
-          READ ( Tmin_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Tminf(i), i=1,Nhru)
           IF ( ios/=0 ) THEN
             ierr = 1
-          ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'tminf', ios, ierr)
+          ELSE
+            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'tmaxf', ios, ierr)
+            IF ( ierr == 0 ) THEN
+              IF ( cbh_active_flag == ACTIVE ) THEN
+                Tmaxf = -999.0
+                DO i = i, Ncbh
+                  Tmaxf(cbh_hru_id(i)) = values(i)
+                ENDDO
+              ENDIF
+            ENDIF
+          ENDIF
+
+          IF ( cbh_active_flag == OFF ) THEN
+            READ ( Tmin_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Tminf(i), i=1,Nhru)
+          ELSE
+            READ ( Tmin_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh)
+          ENDIF
+          IF ( ios/=0 ) THEN
+            ierr = 1
+          ELSE
+            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'tminf', ios, ierr)
+            IF ( ierr == 0 ) THEN
+              IF ( cbh_active_flag == ACTIVE ) THEN
+                Tminf = -999.0
+                DO i = i, Ncbh
+                  Tminf(cbh_hru_id(i)) = values(i)
+                ENDDO
+              ENDIF
+            ENDIF
           ENDIF
           Basin_tmax = 0.0D0
           Basin_tmin = 0.0D0
@@ -83,16 +111,29 @@
         ENDIF
 
         IF ( Climate_precip_flag==ACTIVE ) THEN
-          READ ( Precip_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Hru_ppt(i), i=1,Nhru)
+          IF ( cbh_active_flag == OFF ) THEN
+            READ ( Precip_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Hru_ppt(i), i=1,Nhru)
+          ELSE
+            READ ( Precip_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh)
+          ENDIF
           IF ( ios/=0 ) THEN
             ierr = 1
           ELSE
-            IF ( Ppt_zero_thresh>0.0 ) THEN
-              DO i = 1, Nhru
-                IF ( Hru_ppt(i)<Ppt_zero_thresh ) Hru_ppt(i) = 0.0
-              ENDDO
+            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'hru_ppt', ios, ierr)
+            IF ( ierr == 0 ) THEN
+              IF ( Ppt_zero_thresh>0.0 ) THEN
+                DO jj = 1, Active_hrus
+                  i = Hru_route_order(jj)
+                  IF ( Hru_ppt(i)<Ppt_zero_thresh ) Hru_ppt(i) = 0.0
+                ENDDO
+              ENDIF
+              IF ( cbh_active_flag == ACTIVE ) THEN
+                Hru_ppt = -999.0
+                DO i = i, Ncbh
+                  Hru_ppt(cbh_hru_id(i)) = values(i)
+                ENDDO
+              ENDIF
             ENDIF
-            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'Hru_ppt', ios, ierr)
           ENDIF
           Basin_ppt = 0.0D0
           Basin_rain = 0.0D0
@@ -101,109 +142,248 @@
         ENDIF
 
         IF ( Climate_potet_flag==ACTIVE ) THEN
-          READ ( Et_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Potet(i), i=1,Nhru)
+          IF ( cbh_active_flag == OFF ) THEN
+            READ ( Et_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Potet(i), i=1,Nhru)
+          ELSE
+            READ ( Et_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh)
+          ENDIF
           IF ( ios/=0 ) THEN
             ierr = 1
-          ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'potet', ios, ierr)
+          ELSE
+            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'potet', ios, ierr)
+            IF ( ierr == 0 ) THEN
+              IF ( cbh_active_flag == ACTIVE ) THEN
+                Potet = -999.0
+                DO i = i, Ncbh
+                  Potet(cbh_hru_id(i)) = values(i)
+                ENDDO
+              ENDIF
+            ENDIF
           ENDIF
           Basin_potet = 0.0D0
         ENDIF
 
         IF ( AET_cbh_flag==ACTIVE ) THEN
-          READ ( AET_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (AET_external(i), i=1,Nhru)
+          IF ( cbh_active_flag == OFF ) THEN
+            READ ( AET_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (AET_external(i), i=1,Nhru)
+          ELSE
+            READ ( AET_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh)
+          ENDIF
           IF ( ios/=0 ) THEN
             ierr = 1
-          ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'AET_external', ios, ierr)
+          ELSE
+            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'AET_external', ios, ierr)
+            IF ( ierr == 0 ) THEN
+              IF ( cbh_active_flag == ACTIVE ) THEN
+                AET_external = -999.0
+                DO i = i, Ncbh
+                  AET_external(cbh_hru_id(i)) = values(i)
+                ENDDO
+              ENDIF
+            ENDIF
           ENDIF
           Basin_aet_external = 0.0D0
         ENDIF
 
         IF ( PET_cbh_flag==ACTIVE ) THEN
-          READ ( PET_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (PET_external(i), i=1,Nhru)
+          IF ( cbh_active_flag == OFF ) THEN
+            READ ( PET_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (PET_external(i), i=1,Nhru)
+          ELSE
+            READ ( PET_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh)
+          ENDIF
           IF ( ios/=0 ) THEN
             ierr = 1
-          ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'PET_external', ios, ierr)
+          ELSE
+            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'PET_external', ios, ierr)
+            IF ( ierr == 0 ) THEN
+              IF ( cbh_active_flag == ACTIVE ) THEN
+                PET_external = -999.0
+                DO i = i, Ncbh
+                  PET_external(cbh_hru_id(i)) = values(i)
+                ENDDO
+              ENDIF
+            ENDIF
           ENDIF
           Basin_pet_external = 0.0D0
 
-          num_ag = 0
-          num_pet = 0
-          DO ii = 1, Nhru
-            IF ( PET_external(ii)<AET_external(ii) ) then
-!              PRINT *, yr, mo, dy, ii, PET_external(ii), AET_external(ii), Ag_frac(ii)
-              num_pet = num_pet + 1
-              PET_external(ii) = AET_external(ii)
-            ENDIF
-            IF ( AET_external(ii) < 0.0 .and. AET_external(ii) /= -1.0 ) THEN
-              PRINT '(A,4(I0,1X),A)', 'AET external < 0.0, HRU: ', ii, yr, mo, dy, '; set to 0.0'
-              PRINT *, 'AET, PET, ag_frac:', AET_external(ii), PET_external(ii), Ag_frac(ii)
-              AET_external(ii) = 0.0
-            ENDIF
-            IF ( Ag_frac(ii)>0.0 ) num_ag = num_ag + 1
-          END DO
-          IF ( num_pet>0 ) PRINT '(/,I5,2("/",I0), 2(A,I0),/)', yr, mo, dy, &
-               ' number of AG HRUs: ', num_ag, ', number of OpenET PET < AET: ', num_pet
+          IF ( ierr == 0 ) THEN
+            num_ag = 0
+            num_pet = 0
+            DO jj = 1, Active_hrus
+              ii = Hru_route_order(jj)
+              IF ( PET_external(ii)<AET_external(ii) ) then
+!                PRINT *, yr, mo, dy, ii, PET_external(ii), AET_external(ii), Ag_frac(ii)
+                num_pet = num_pet + 1
+                PET_external(ii) = AET_external(ii)
+              ENDIF
+              IF ( AET_external(ii) < 0.0 .and. AET_external(ii) /= -1.0 ) THEN
+                PRINT '(A,4(I0,1X),A)', 'AET external < 0.0, HRU: ', ii, yr, mo, dy, '; set to 0.0'
+                PRINT *, 'AET, PET, ag_frac:', AET_external(ii), PET_external(ii), Ag_frac(ii)
+                AET_external(ii) = 0.0
+              ENDIF
+              IF ( Ag_frac(ii)>0.0 ) num_ag = num_ag + 1
+            ENDDO
+            IF ( num_pet>0 ) PRINT '(/,I5,2("/",I0), 2(A,I0),/)', yr, mo, dy, &
+                 ' number of AG HRUs: ', num_ag, ', number of OpenET PET < AET: ', num_pet
+          ENDIF
         ENDIF
 
         IF ( irrigated_area_cbh_flag==ACTIVE ) THEN
-          READ ( Irrigated_area_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Irrigated_area(i), i=1,Nhru)
+          IF ( cbh_active_flag == OFF ) THEN
+            READ ( Irrigated_area_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Irrigated_area(i), i=1,Nhru)
+          ELSE
+            READ ( Irrigated_area_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh)
+          ENDIF
           IF ( ios/=0 ) THEN
             ierr = 1
-          ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'irrigated_area', ios, ierr)
+          ELSE
+            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'irrigated_area', ios, ierr)
+            IF ( ierr == 0 ) THEN
+              IF ( cbh_active_flag == ACTIVE ) THEN
+                Irrigated_area = -999.0
+                DO i = i, Ncbh
+                  Irrigated_area(cbh_hru_id(i)) = values(i)
+                ENDDO
+              ENDIF
+            ENDIF
           ENDIF
           Basin_irrigated_area = 0.0D0
         ENDIF
 
         IF ( Climate_swrad_flag==ACTIVE ) THEN
-          IF ( Orad_flag==OFF ) THEN
-            READ ( Swrad_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Swrad(i), i=1,Nhru)
+          IF ( cbh_active_flag == OFF ) THEN
+            IF ( Orad_flag==OFF ) THEN
+              READ ( Swrad_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Swrad(i), i=1,Nhru)
+            ELSE
+              READ ( Swrad_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Swrad(i), i=1,Nhru), Orad
+            ENDIF
           ELSE
-            READ ( Swrad_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Swrad(i), i=1,Nhru), Orad
+            IF ( Orad_flag==OFF ) THEN
+              READ ( Swrad_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh)
+            ELSE
+              READ ( Swrad_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh), Orad
+            ENDIF
           ENDIF
           IF ( ios/=0 ) THEN
             ierr = 1
-          ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'swrad', ios, ierr)
+          ELSE
+            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'swrad', ios, ierr)
+            IF ( ierr == 0 ) THEN
+              IF ( cbh_active_flag == ACTIVE ) THEN
+                Swrad = -999.0
+                DO i = i, Ncbh
+                  Swrad(cbh_hru_id(i)) = values(i)
+                ENDDO
+              ENDIF
+            ENDIF
           ENDIF
           Basin_swrad = 0.0D0
         ENDIF
 
         IF ( Climate_transp_flag==ACTIVE ) THEN
-          READ ( Transp_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Transp_on(i), i=1,Nhru)
+          IF ( cbh_active_flag == OFF ) THEN
+            READ ( Transp_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Transp_on(i), i=1,Nhru)
+          ELSE
+            READ ( Transp_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (ivalues(i), i=1,Ncbh)
+          ENDIF
           IF ( ios/=0 ) THEN
             ierr = 1
-          ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'transp_on', ios, ierr)
+          ELSE
+            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'transp_on', ios, ierr)
+            IF ( ierr == 0 ) THEN
+              IF ( cbh_active_flag == ACTIVE ) THEN
+                Transp_on = -999.0
+                DO i = i, Ncbh
+                  Transp_on(cbh_hru_id(i)) = ivalues(i)
+                ENDDO
+              ENDIF
+            ENDIF
           ENDIF
           Basin_transp_on = OFF
         ENDIF
 
         IF ( Humidity_cbh_flag==ACTIVE ) THEN
-          READ ( Humidity_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Humidity_hru(i), i=1,Nhru)
-          IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'humidity_hru', ios, ierr)
+          IF ( cbh_active_flag == OFF ) THEN
+            READ ( Humidity_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Humidity_hru(i), i=1,Nhru)
+          ELSE
+            READ ( Humidity_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh)
+          ENDIF
+          IF ( ios/=0 ) THEN
+            ierr = 1
+          ELSE
+            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'humidity_hru', ios, ierr)
+            IF ( ierr == 0 ) THEN
+              IF ( cbh_active_flag == ACTIVE ) THEN
+                Humidity_hru = -999.0
+                DO i = i, Ncbh
+                  Humidity_hru(cbh_hru_id(i)) = values(i)
+                ENDDO
+              ENDIF
+            ENDIF
+          ENDIF
           Basin_humidity = 0.0D0
         ENDIF
 
         IF ( Albedo_cbh_flag==ACTIVE ) THEN
-          READ ( Albedo_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Albedo_hru(i), i=1,Nhru)
-          IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'albedo_hru', ios, ierr)
+          IF ( cbh_active_flag == OFF ) THEN
+            READ ( Albedo_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Albedo_hru(i), i=1,Nhru)
+          ELSE
+            READ ( Albedo_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh)
+          ENDIF
+          IF ( ios/=0 ) THEN
+            ierr = 1
+          ELSE
+            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'albedo_hru', ios, ierr)
+            IF ( ierr == 0 ) THEN
+              IF ( cbh_active_flag == ACTIVE ) THEN
+                Albedo_hru = -999.0
+                DO i = i, Ncbh
+                  Albedo_hru(cbh_hru_id(i)) = values(i)
+                ENDDO
+              ENDIF
+            ENDIF
+          ENDIF
         ENDIF
 
         IF ( Cloud_cover_cbh_flag==ACTIVE ) THEN
-          READ ( Cloud_cover_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Cloud_cover_cbh(i), i=1,Nhru)
-          IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'cloud_cover_cbh', ios, ierr)
+          IF ( cbh_active_flag == OFF ) THEN
+            READ ( Cloud_cover_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Cloud_cover_cbh(i), i=1,Nhru)
+          ELSE
+            READ ( Cloud_cover_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh)
+          ENDIF
+          IF ( ios/=0 ) THEN
+            ierr = 1
+          ELSE
+            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'cloud_cover_cbh', ios, ierr)
+            IF ( ierr == 0 ) THEN
+              IF ( cbh_active_flag == ACTIVE ) THEN
+                Cloud_cover_cbh = -999.0
+                DO i = i, Ncbh
+                  Cloud_cover_cbh(cbh_hru_id(i)) = values(i)
+                ENDDO
+              ENDIF
+            ENDIF
+          ENDIF
         ENDIF
 
         IF ( Windspeed_cbh_flag==ACTIVE ) THEN
-          READ ( Windspeed_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Windspeed_hru(i), i=1,Nhru)
+          IF ( cbh_active_flag == OFF ) THEN
+            READ ( Windspeed_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Windspeed_hru(i), i=1,Nhru)
+          ELSE
+            READ ( Windspeed_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh)
+          ENDIF
           IF ( ios/=0 ) THEN
             ierr = 1
-          ELSEIF ( Cbh_check_flag==ACTIVE ) THEN
-            CALL read_cbh_date(yr, mo, dy, 'windspeed_hru', ios, ierr)
+          ELSE
+            IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'windspeed_hru', ios, ierr)
+            IF ( ierr == 0 ) THEN
+              IF ( cbh_active_flag == ACTIVE ) THEN
+                Windspeed_hru = -999.0
+                DO i = i, Ncbh
+                  Windspeed_hru(cbh_hru_id(i)) = values(i)
+                ENDDO
+              ENDIF
+            ENDIF
           ENDIF
           Basin_windspeed = 0.0D0
         ENDIF
@@ -337,6 +517,7 @@
       ELSEIF ( Process_flag==DECL ) THEN
 
         IF ( control_integer(Cbh_check_flag, 'cbh_check_flag')/=0 ) Cbh_check_flag = ACTIVE
+        IF ( control_integer(cbh_active_flag, 'cbh_active_flag')/=0 ) cbh_active_flag = OFF
 
         IF ( Climate_temp_flag==ACTIVE ) &
      &       CALL print_module('Temperature Distribution', MODNAME, Version_climate_hru)
@@ -460,14 +641,33 @@
      &         'decimal fraction')/=0 ) CALL read_error(1, 'potet_cbh_adj')
         ENDIF
 
+        IF ( cbh_active_flag == ACTIVE ) THEN
+          Ncbh = getdim('ncbh')
+          IF ( Ncbh==-1 ) CALL read_error(7, 'ncbh')
+          ALLOCATE ( cbh_hru_id(Ncbh) )
+          IF ( declparam(MODNAME, 'cbh_hru_id', 'ncbh', 'integer', &
+     &         '0', 'bounded', 'nhru', &
+     &         'HRU id for each value in CBH File', &
+     &         'HRU id for each value in CBH File', &
+     &         'none')/=0 ) CALL read_error(1, 'cbh_hru_id')
+        ENDIF
+
       ELSEIF ( Process_flag==INIT ) THEN
         Basin_humidity = 0.0D0
         Basin_windspeed = 0.0D0
         IF ( Humidity_cbh_flag==ACTIVE ) Humidity_hru = 0.0
         IF ( Windspeed_cbh_flag==ACTIVE ) Windspeed_hru = 0.0
+        IF ( cbh_active_flag == ACTIVE ) THEN
+          ALLOCATE ( values(Nhru), ivalues(Nhru) )
+          values = 0.0
+          ivalues = 0
+		ENDIF
 
         istop = 0
         ierr = 0
+        IF ( cbh_active_flag == ACTIVE ) THEN
+          IF ( getparam_int(MODNAME, 'cbh_hru_id', Ncbh, cbh_hru_id)/=0 ) CALL read_error(2, 'cbh_hru_id')
+        ENDIF
 
         IF ( Climate_precip_flag==ACTIVE ) THEN
           IF ( getparam_real(MODNAME, 'rain_cbh_adj', Nhru*MONTHS_PER_YEAR, Rain_cbh_adj)/=0 ) CALL read_error(2, 'rain_cbh_adj')

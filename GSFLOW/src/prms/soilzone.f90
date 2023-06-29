@@ -1129,7 +1129,7 @@
 
         Hru_actet(i) = hruactet + pervactet*perv_frac
         avail_potet = Potet(i) - Hru_actet(i)
-        IF ( Ag_package==ACTIVE ) gsflow_ag_actet = Hru_actet
+        IF ( Ag_package==ACTIVE ) gsflow_ag_actet(i) = Hru_actet(i)
         Perv_actet(i) = pervactet
         hru_perv_actet(i) = pervactet * perv_frac
 
