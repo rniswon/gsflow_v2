@@ -3939,7 +3939,7 @@
       QONLYOLD(l) = QONLY(L)
       RMSEGW(L) = SQRT((aetold - aettotal)**dtwo)
       IF ( NUMCELLS(L) > 0 ) THEN
-        IF ( RMSEGW(L) > zerod2*pettotal ) AGCONVERGE = 0
+        IF ( RMSEGW(L) > AGTOL*pettotal ) AGCONVERGE = 0
       END IF
       AETITERGW(l) = sngl(aettotal)
       QONLY(L) = QONLY(L) + (sone - REAL(AGCONVERGE))*SNGL(factor)
