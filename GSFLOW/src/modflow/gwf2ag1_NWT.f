@@ -639,7 +639,7 @@
             WRITE (IOUT, 37) IWELLCB
             WRITE (IOUT, *)
             !
-            !5 - --- Option to output list for wells
+            !5 - --- Option to output unformatted budget for wells
          case ('WELLCBC')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IWELLCBU, 
      +                  R, IOUT, IN)
@@ -2933,7 +2933,7 @@
          end if
          !
          !7 - -----IF THE CELL IS NO - FLOW OR CONSTANT HEAD, IGNORE IT.
-         ! - ------CHECK IF PUMPING IS NEGATIVE AND REDUCE FOR DRYING CONDITIONS.
+         !
          !
          IF (IBOUND(IC, IR, IL) > 0) THEN
             !
@@ -3000,6 +3000,7 @@
          WELL(NWELVL, L) = SNGL( QQ )
          END IF
       END DO
+C
       DO L = 1, NUMIRRPOND
         IF ( FLOWTHROUGH_POND(L) == 0 ) THEN
 !          IF ( POND(3,L) > 0 .and. NUMCELLSPOND(L) > 0 ) THEN
@@ -3111,37 +3112,17 @@
       !
       IF (iw1 .GT. 1) WRITE (IUNITRAMP, *)
       !
-      ! zero buff array
-      DO 60 IL = 1, NLAY
-      DO 60 IR = 1, NROW
-      DO 60 IC = 1, NCOL
-      BUFF(IC, IR, IL) = SZERO
-60    CONTINUE
-      !
-      ! set sup values to buff
-      DO L = 1, NWELLSTEMP
-        IL = INT( WELL(1, L) )
-        IR = INT( WELL(2, L) )
-        IC = INT( WELL(3, L) )
-        IF ( IBOUND(ic,ir,il) > 0 ) THEN
-          IF ( ICBSUP == 0 ) THEN
-            BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + WELL(4, L)
-          ELSE
-            DO I = 1, NUMSEGS(L)
-              J = DIVERSIONSEG(I, L)
-              BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + SUPSEG(J)
-            END DO
-          END IF
-        END IF
-      END DO
       !
       !14 - -----IF SUP PUMPING WILL BE SAVED AS COMPACT FORMAT,
       ! - ------CALL UBUDSVB TO SAVE THEM.
       
       IF (IBD5.GT.0) THEN
         DO L = 1, NWELLSTEMP
+          IR = INT( WELL(2, L) )
+          IC = INT( WELL(3, L) )
+          IL = INT( WELL(1, L) )
           IF ( ICBSUP == 0 ) THEN
-            Q = WELL(4, L)
+            Q = WELL(NWELVL, L)
           ELSE 
             Q = szero
             DO I = 1, NUMSEGS(L)
