@@ -639,7 +639,7 @@
             WRITE (IOUT, 37) IWELLCB
             WRITE (IOUT, *)
             !
-            !5 - --- Option to output unformatted budget for wells
+            !5 - --- Option to output list for wells
          case ('WELLCBC')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IWELLCBU, 
      +                  R, IOUT, IN)
@@ -2867,13 +2867,14 @@
       IF (IWELLCB .GT. 0 .AND. ICBCFL .NE. 0) IBD1 = IWELLCB
       ! Unformatted cbc budget output for SUP wells
       IF (IWELLCBU .GT. 0) IBD5 = ICBCFL
-      ! Budeget output for segments
+      IF (IWELLCBU .LT. 0) IBD5 = ICBCFL
+      ! Budget output for segments
       IF (ISFRCB .LT. 0 .AND. ICBCFL .NE. 0) IBD2 = IOUT
       IF (ISFRCB .GT. 0 .AND. ICBCFL .NE. 0) IBD2 = ISFRCB
-      ! Budeget output for irrigation segments
+      ! Budget output for irrigation segments
       IF (IRRSFRCB .LT. 0 .AND. ICBCFL .NE. 0) IBD3 = IOUT
       IF (IRRSFRCB .GT. 0 .AND. ICBCFL .NE. 0) IBD3 = IRRSFRCB
-      ! Budeget output for irrigation wells
+      ! Budget output for irrigation wells
       IF (IRRWELLCB .LT. 0 .AND. ICBCFL .NE. 0) IBD4 = IOUT
       IF (IRRWELLCB .GT. 0 .AND. ICBCFL .NE. 0) IBD4 = IRRWELLCB
       ! Budget output for ponds
@@ -2910,14 +2911,9 @@
       IF (IAUXSV .EQ. 0) NAUXWELL = 0
       !
       !2 - ----IF CELL - BY - CELL FLOWS WILL BE SAVED AS A LIST, WRITE HEADER.
-      IF (IBD5 .GT. 0) THEN
-        IF ( ICBSUP == 0 ) THEN
+      IF (IBD5 .EQ. 2) THEN
          CALL UBDSV4(KKSTP, KKPER, TEXT1, NAUXWELL, WELAUX, IWELLCBU,  
      +    NCOL,NROW, NLAY, NWELLS, IOUT, DELT, PERTIM, TOTIM, IBOUND)
-        ELSE
-          CALL UBDSV4(KKSTP, KKPER, TEXT9, NAUXWELL, WELAUX, IWELLCBU,  
-     +    NCOL,NROW, NLAY, NWELLS, IOUT, DELT, PERTIM, TOTIM, IBOUND)
-        END IF
       END IF
       !
       !5 - -----CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
@@ -2990,9 +2986,6 @@
             iw1 = iw1 + 1
          END IF
          !
-         !11A - ----ADD FLOW RATE TO BUFFER.
-         BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + SNGL( QQ )
-         !
          !11D-----FLOW RATE IS ALWAYS NEGATIVE(DISCHARGE) ADD IT TO RATOUT.
          RATOUT = RATOUT - QQ
          !
@@ -3000,7 +2993,6 @@
          WELL(NWELVL, L) = SNGL( QQ )
          END IF
       END DO
-C
       DO L = 1, NUMIRRPOND
         IF ( FLOWTHROUGH_POND(L) == 0 ) THEN
 !          IF ( POND(3,L) > 0 .and. NUMCELLSPOND(L) > 0 ) THEN
@@ -3112,11 +3104,26 @@ C
       !
       IF (iw1 .GT. 1) WRITE (IUNITRAMP, *)
       !
+C
+C------IF CELL-BY-CELL FLOWS WILL BE SAVED AS A 3-D ARRAY,
+C------CALL UBUDSV TO SAVE THEM.
+      IF (IBD5.EQ.1) THEN
+        DO L = 1, NWELLSTEMP
+          IL = INT( WELL(1, L) )
+          IR = INT( WELL(2, L) )
+          IC = INT( WELL(3, L) )
+          IF ( IBOUND(ic,ir,il) > 0 ) THEN
+              BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + WELL(NWELVL, L)
+          END IF
+        END DO
+        CALL UBUDSV(KKSTP,KKPER,TEXT1,IWELLCBU,BUFF,NCOL,NROW,
+     1                          NLAY,IOUT)
+      END IF
       !
       !14 - -----IF SUP PUMPING WILL BE SAVED AS COMPACT FORMAT,
       ! - ------CALL UBUDSVB TO SAVE THEM.
       
-      IF (IBD5.GT.0) THEN
+      IF (IBD5.EQ.2) THEN
         DO L = 1, NWELLSTEMP
           IR = INT( WELL(2, L) )
           IC = INT( WELL(3, L) )
