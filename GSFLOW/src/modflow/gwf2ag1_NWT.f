@@ -2933,7 +2933,7 @@
          end if
          !
          !7 - -----IF THE CELL IS NO - FLOW OR CONSTANT HEAD, IGNORE IT.
-         ! - ------CHECK IF PUMPING IS NEGATIVE AND REDUCE FOR DRYING CONDITIONS.
+         !
          !
          IF (IBOUND(IC, IR, IL) > 0) THEN
             !
@@ -3140,8 +3140,11 @@
       
       IF (IBD5.GT.0) THEN
         DO L = 1, NWELLSTEMP
+          IR = INT( WELL(2, L) )
+          IC = INT( WELL(3, L) )
+          IL = INT( WELL(1, L) )
           IF ( ICBSUP == 0 ) THEN
-            Q = WELL(4, L)
+            Q = WELL(NWELVL, L)
           ELSE 
             Q = szero
             DO I = 1, NUMSEGS(L)
@@ -3939,7 +3942,7 @@
       QONLYOLD(l) = QONLY(L)
       RMSEGW(L) = SQRT((aetold - aettotal)**dtwo)
       IF ( NUMCELLS(L) > 0 ) THEN
-        IF ( RMSEGW(L) > zerod2*pettotal ) AGCONVERGE = 0
+        IF ( RMSEGW(L) > AGTOL*pettotal ) AGCONVERGE = 0
       END IF
       AETITERGW(l) = sngl(aettotal)
       QONLY(L) = QONLY(L) + (sone - REAL(AGCONVERGE))*SNGL(factor)
