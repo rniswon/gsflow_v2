@@ -417,10 +417,11 @@
      &    Hru_frac_perv, Lake_hru_id
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Cfs2inches
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Swrad, Potet, Tminc, Tmaxc, Tavgc, Hru_rain, Hru_snow
-      USE PRMS_FLOWVARS, ONLY: Hru_actet, Ssres_flow, Sroff, Snowcov_area, Snowmelt, Dprst_stor_hru, Hru_intcpstor, &
-     &    Ssres_stor, Soil_moist, Pkwater_equiv, Gwres_stor, Lake_vol, Soil_moist, Soil_moist_max, Hru_impervstor
+      USE PRMS_FLOWVARS, ONLY: Hru_actet, Ssres_flow, Sroff, &
+     &    Ssres_stor, Soil_moist, Pkwater_equiv, Gwres_stor, Lake_vol, Soil_moist_max, &
+     &    Soil_moist_tot, Soil_zone_max, Hru_impervstor, Dprst_stor_hru, Snowcov_area, Snowmelt, Hru_intcpstor
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
-      USE PRMS_SOILZONE, ONLY: Lakein_sz, Recharge, Soil_moist_tot, Soil_zone_max
+      USE PRMS_SOILZONE, ONLY: Lakein_sz, Recharge
       USE PRMS_GWFLOW, ONLY: Gwres_flow
       USE PRMS_MUSKINGUM_LAKE, ONLY: Lake_outcfs
       IMPLICIT NONE

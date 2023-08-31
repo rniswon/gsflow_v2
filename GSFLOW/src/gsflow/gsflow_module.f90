@@ -9,9 +9,9 @@
      &          EQULS = '=========================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 03/17/2023'
-      character(len=*), parameter :: PRMS_versn = '2023-03-17'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 03/17/2023'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.1 09/01/2023'
+      character(len=*), parameter :: PRMS_versn = '2023-09-01'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.2 09/01/2023'
       character(len=*), parameter :: Version_read_control_file = '2022-10-20'
       character(len=*), parameter :: Version_read_parameter_file = '2022-01-12'
       character(len=*), parameter :: Version_read_data_file = '2022-06-02'
@@ -19,7 +19,7 @@
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw, Nstreamtemp
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus, NLAKES_MF, Nreach
-      INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval, Nmap2hru, Nmap, Nsnow, Ncbh
+      INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval, Nmap2hru, Nmap, Nsnow
 ! Global
       !     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 10=MODSIM-GSFLOW; 11=MODSIM-PRMS; 12=MODSIM-MODFLOW; 13=MODSIM; 14=MODSIM-PRMS-LOOSE)
       INTEGER, SAVE :: Model, Process_flag, Call_cascade, PRMS_only, timestep_start_flag

@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2023-02-23'
+      character(len=*), parameter :: Version_srunoff = '2023-08-10'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -602,7 +602,7 @@
 !                  computations using antecedent soil moisture.
 !***********************************************************************
       INTEGER FUNCTION srunoffrun()
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF, DEBUG_WB, LAND, LAKE, GLACIER, SWALE, CASCADE_OFF, CLOSEZERO
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF, DEBUG_WB, LAND, LAKE, GLACIER, SWALE, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Dprst_flag, Cascade_flag, Call_cascade, Frozen_flag, Glacier_flag, &
      &    PRMS_land_iteration_flag, Kkiter, AG_flag, Hru_type, Ag_Package
       USE PRMS_SRUNOFF
@@ -618,7 +618,7 @@
      &    Ag_soil_moist, Ag_soil_rechr, Pk_depth, Snowcov_area, Snow_evap, Snowmelt, Glacrb_melt, &
      &    strm_seg_interflow_in, strm_seg_sroff_in, strm_seg_gwflow_in, Pptmix_nopack
       USE PRMS_IT0_VARS, ONLY: It0_dprst_vol_open, It0_dprst_vol_clos, It0_imperv_stor, It0_soil_moist, &
-                               It0_soil_rechr, It0_ag_soil_moist, It0_ag_soil_rechr, It0_hru_impervstor
+     &                         It0_soil_rechr, It0_ag_soil_moist, It0_ag_soil_rechr, It0_hru_impervstor
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Hru_intcpevap, Net_apply, Intcp_changeover
       IMPLICIT NONE
@@ -857,7 +857,7 @@
 !******Compute HRU weighted average (to units of inches/dt)
           IF ( Cascade_flag>CASCADE_OFF ) THEN
             hru_sroff_down = 0.0D0
-            IF ( srunoff>CLOSEZERO ) THEN
+            IF ( srunoff>0.0 ) THEN
               IF ( Ncascade_hru(i)>0 ) CALL run_cascade_sroff(Ncascade_hru(i), srunoff, hru_sroff_down)
               Hru_hortn_cascflow(i) = hru_sroff_down
               !IF ( Hru_hortn_cascflow(i)<0.0D0 ) Hru_hortn_cascflow(i) = 0.0D0
@@ -866,6 +866,7 @@
               Basin_sroff_down = Basin_sroff_down + hru_sroff_down*Hruarea_dble
             ELSE
               Hru_hortn_cascflow(i) = 0.0D0
+              srunoff = 0.0
             ENDIF
           ENDIF
           Hru_sroffp(i) = Srp*Perv_frac
@@ -881,23 +882,25 @@
 
 !******Compute evaporation from impervious area
         IF ( frzen==OFF ) THEN
-        IF ( Imperv_stor(i)>0.0 ) THEN
-          CALL imperv_et(Imperv_stor(i), Potet(i), Imperv_evap(i), Snowcov_area(i), avail_et)
-          Hru_impervevap(i) = Imperv_evap(i)*Imperv_frac
-          !IF ( Hru_impervevap(i)<0.0 ) Hru_impervevap(i) = 0.0
-          avail_et = avail_et - Hru_impervevap(i)
-          IF ( avail_et<0.0 ) THEN
-             ! sanity check
-!            IF ( avail_et<-NEARZERO ) PRINT*, 'avail_et<0 in srunoff imperv', i, Nowmonth, Nowday, avail_et
-            Hru_impervevap(i) = Hru_impervevap(i) + avail_et
-            IF ( Hru_impervevap(i)<0.0 ) Hru_impervevap(i) = 0.0
-            Imperv_evap(i) = Hru_impervevap(i)/Imperv_frac
-            Imperv_stor(i) = Imperv_stor(i) - avail_et/Imperv_frac
-            avail_et = 0.0
+        IF ( Hruarea_imperv>0.0 ) THEN
+          IF ( Imperv_stor(i)>0.0 ) THEN
+            CALL imperv_et(Imperv_stor(i), Potet(i), Imperv_evap(i), Snowcov_area(i), avail_et)
+            Hru_impervevap(i) = Imperv_evap(i)*Imperv_frac
+            !IF ( Hru_impervevap(i)<0.0 ) Hru_impervevap(i) = 0.0
+            avail_et = avail_et - Hru_impervevap(i)
+            IF ( avail_et<0.0 ) THEN
+               ! sanity check
+!              IF ( avail_et<-NEARZERO ) PRINT*, 'avail_et<0 in srunoff imperv', i, Nowmonth, Nowday, avail_et
+              Hru_impervevap(i) = Hru_impervevap(i) + avail_et
+              IF ( Hru_impervevap(i)<0.0 ) Hru_impervevap(i) = 0.0
+              Imperv_evap(i) = Hru_impervevap(i)/Imperv_frac
+              Imperv_stor(i) = Imperv_stor(i) - avail_et/Imperv_frac
+              avail_et = 0.0
+            ENDIF
+            Basin_imperv_evap = Basin_imperv_evap + DBLE( Hru_impervevap(i)*Hruarea )
+            Hru_impervstor(i) = Imperv_stor(i)*Imperv_frac
+            Basin_imperv_stor = Basin_imperv_stor + DBLE(Imperv_stor(i)*Hruarea_imperv )
           ENDIF
-          Basin_imperv_evap = Basin_imperv_evap + DBLE( Hru_impervevap(i)*Hruarea )
-          Hru_impervstor(i) = Imperv_stor(i)*Imperv_frac
-          Basin_imperv_stor = Basin_imperv_stor + DBLE(Imperv_stor(i)*Hruarea_imperv )
         ENDIF
         ENDIF
 
@@ -1282,8 +1285,8 @@
       USE PRMS_BASIN, ONLY: Dprst_clos_flag, Dprst_frac, &
      &    Dprst_area_clos_max, Dprst_area_open_max, Basin_area_inv, &
      &    Hru_area_dble, Active_hrus, Hru_route_order, Dprst_open_flag
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_vol_clos, &
-     &    Dprst_total_open_in, Dprst_total_open_out, Dprst_total_clos_in, Dprst_total_clos_out, Dprst_stor_hru
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_vol_clos, Dprst_stor_hru, &
+     &    Dprst_total_open_in, Dprst_total_open_out, Dprst_total_clos_in, Dprst_total_clos_out
       use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions
@@ -1712,8 +1715,8 @@
       SUBROUTINE srunoff_restart(In_out)
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Dprst_flag, Frozen_flag, text_restart_flag
-      USE PRMS_FLOWVARS, ONLY: Dprst_stor_hru, Hru_impervstor
       USE PRMS_SRUNOFF
+      USE PRMS_FLOWVARS, ONLY: Dprst_stor_hru, Hru_impervstor
       use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument
