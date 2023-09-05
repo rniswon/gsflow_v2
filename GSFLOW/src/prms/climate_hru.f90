@@ -131,6 +131,7 @@
                 Hru_ppt = -999.0
                 DO i = i, Ncbh
                   Hru_ppt(cbh_hru_id(i)) = values(i)
+                  IF ( Hru_ppt(i)<Ppt_zero_thresh ) Hru_ppt(i) = 0.0
                 ENDDO
               ENDIF
             ENDIF
@@ -211,12 +212,12 @@
             num_pet = 0
             DO jj = 1, Active_hrus
               ii = Hru_route_order(jj)
-              IF ( PET_external(ii)<AET_external(ii) ) then
+              IF ( PET_external(ii)<AET_external(ii) .and. Ag_frac(ii)>0.0 ) then
 !                PRINT *, yr, mo, dy, ii, PET_external(ii), AET_external(ii), Ag_frac(ii)
                 num_pet = num_pet + 1
                 PET_external(ii) = AET_external(ii)
               ENDIF
-              IF ( AET_external(ii) < 0.0 .and. AET_external(ii) /= -1.0 ) THEN
+              IF ( AET_external(ii) < 0.0 .and. AET_external(ii) /= -1.0 .and. Ag_frac(ii)>0.0 ) THEN
                 PRINT '(A,4(I0,1X),A)', 'AET external < 0.0, HRU: ', ii, yr, mo, dy, '; set to 0.0'
                 PRINT *, 'AET, PET, ag_frac:', AET_external(ii), PET_external(ii), Ag_frac(ii)
                 AET_external(ii) = 0.0

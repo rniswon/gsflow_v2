@@ -618,7 +618,7 @@
      &    Ag_soil_moist, Ag_soil_rechr, Pk_depth, Snowcov_area, Snow_evap, Snowmelt, Glacrb_melt, &
      &    strm_seg_interflow_in, strm_seg_sroff_in, strm_seg_gwflow_in, Pptmix_nopack
       USE PRMS_IT0_VARS, ONLY: It0_dprst_vol_open, It0_dprst_vol_clos, It0_imperv_stor, It0_soil_moist, &
-     &                         It0_soil_rechr, It0_ag_soil_moist, It0_ag_soil_rechr, It0_hru_impervstor
+                               It0_soil_rechr, It0_ag_soil_moist, It0_ag_soil_rechr, It0_hru_impervstor
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Hru_intcpevap, Net_apply, Intcp_changeover
       IMPLICIT NONE
@@ -882,25 +882,23 @@
 
 !******Compute evaporation from impervious area
         IF ( frzen==OFF ) THEN
-        IF ( Hruarea_imperv>0.0 ) THEN
-          IF ( Imperv_stor(i)>0.0 ) THEN
-            CALL imperv_et(Imperv_stor(i), Potet(i), Imperv_evap(i), Snowcov_area(i), avail_et)
-            Hru_impervevap(i) = Imperv_evap(i)*Imperv_frac
-            !IF ( Hru_impervevap(i)<0.0 ) Hru_impervevap(i) = 0.0
-            avail_et = avail_et - Hru_impervevap(i)
-            IF ( avail_et<0.0 ) THEN
-               ! sanity check
-!              IF ( avail_et<-NEARZERO ) PRINT*, 'avail_et<0 in srunoff imperv', i, Nowmonth, Nowday, avail_et
-              Hru_impervevap(i) = Hru_impervevap(i) + avail_et
-              IF ( Hru_impervevap(i)<0.0 ) Hru_impervevap(i) = 0.0
-              Imperv_evap(i) = Hru_impervevap(i)/Imperv_frac
-              Imperv_stor(i) = Imperv_stor(i) - avail_et/Imperv_frac
-              avail_et = 0.0
-            ENDIF
-            Basin_imperv_evap = Basin_imperv_evap + DBLE( Hru_impervevap(i)*Hruarea )
-            Hru_impervstor(i) = Imperv_stor(i)*Imperv_frac
-            Basin_imperv_stor = Basin_imperv_stor + DBLE(Imperv_stor(i)*Hruarea_imperv )
+        IF ( Imperv_stor(i)>0.0 ) THEN
+          CALL imperv_et(Imperv_stor(i), Potet(i), Imperv_evap(i), Snowcov_area(i), avail_et)
+          Hru_impervevap(i) = Imperv_evap(i)*Imperv_frac
+          !IF ( Hru_impervevap(i)<0.0 ) Hru_impervevap(i) = 0.0
+          avail_et = avail_et - Hru_impervevap(i)
+          IF ( avail_et<0.0 ) THEN
+             ! sanity check
+!            IF ( avail_et<-NEARZERO ) PRINT*, 'avail_et<0 in srunoff imperv', i, Nowmonth, Nowday, avail_et
+            Hru_impervevap(i) = Hru_impervevap(i) + avail_et
+            IF ( Hru_impervevap(i)<0.0 ) Hru_impervevap(i) = 0.0
+            Imperv_evap(i) = Hru_impervevap(i)/Imperv_frac
+            Imperv_stor(i) = Imperv_stor(i) - avail_et/Imperv_frac
+            avail_et = 0.0
           ENDIF
+          Basin_imperv_evap = Basin_imperv_evap + DBLE( Hru_impervevap(i)*Hruarea )
+          Hru_impervstor(i) = Imperv_stor(i)*Imperv_frac
+          Basin_imperv_stor = Basin_imperv_stor + DBLE(Imperv_stor(i)*Hruarea_imperv )
         ENDIF
         ENDIF
 
@@ -1715,8 +1713,8 @@
       SUBROUTINE srunoff_restart(In_out)
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Dprst_flag, Frozen_flag, text_restart_flag
-      USE PRMS_SRUNOFF
       USE PRMS_FLOWVARS, ONLY: Dprst_stor_hru, Hru_impervstor
+      USE PRMS_SRUNOFF
       use prms_utils, only: check_restart
       IMPLICIT NONE
       ! Argument

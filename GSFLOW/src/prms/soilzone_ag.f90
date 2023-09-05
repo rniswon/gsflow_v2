@@ -381,7 +381,7 @@
 !***********************************************************************
       INTEGER FUNCTION szrun_ag()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAND, LAKE, SWALE, GLACIER, &
-     &    DEBUG_less, ERROR_param, CASCADE_OFF, MODSIM_PRMS, CLOSEZERO
+     &    DEBUG_less, ERROR_param, CASCADE_OFF, MODSIM_PRMS, CLOSEZERO, DEBUG_less
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Dprst_flag, Cascade_flag, &
      &    Frozen_flag, Soilzone_add_water_use, Nowmonth, GSFLOW_flag, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Nowyear, Nowday, &
@@ -580,7 +580,7 @@
           !WARNING, RSR, if hru_actet>water in lake, then budget error
           hruactet = (Potet(i) - hruactet)*Lake_evap_adj(Nowmonth,Lake_hru_id(i))
           IF ( hruactet>Potet(i) ) THEN
-            IF ( Print_debug > -1 ) THEN
+            IF ( Print_debug > DEBUG_less ) THEN
               PRINT *, 'WARNING, lake evap > potet, for HRU:', i, ' potential ET increased to adjusted lake ET'
               PRINT *, hruactet, Potet(i), hruactet - Potet(i)
             ENDIF
@@ -687,7 +687,7 @@
         prefflow = 0.0
         dunnianflw_pfr = 0.0
         IF ( Pref_flow_infil_frac(i)>0.0 ) THEN
-        pref_flow_maxin = 0.0
+          pref_flow_maxin = 0.0
           IF ( ag_water_maxin>0.0 ) THEN
             ag_pref_flow_maxin = ag_water_maxin*Pref_flow_infil_frac(i)
             ag_water_maxin = ag_water_maxin - ag_pref_flow_maxin
@@ -1087,10 +1087,10 @@
         Basin_slstor = Basin_slstor + DBLE( Slow_stor(i)*harea )
         Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*perv_frac + Ag_soil_moist(i)*agfrac
         Basin_soil_moist_tot = Basin_soil_moist_tot + DBLE( Soil_moist_tot(i)*harea )
-        IF ( Soil_moist_max(i)>0.0 ) Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( (Soil_moist(i)/Soil_moist_max(i))*perv_area )
         IF ( Pref_flow_thrsh(i)>0.0 ) Basin_gvr_stor_frac = Basin_gvr_stor_frac + DBLE( (Slow_stor(i)/Pref_flow_thrsh(i))*harea )
-        IF ( Soil_zone_max(i) > 0.0 ) Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( (Soil_moist_tot(i)/Soil_zone_max(i))*harea ) !RGN added to avoid divide by zero. 1/20/2022
         IF ( perv_on_flag==ACTIVE ) THEN
+          IF ( Soil_moist_max(i)>0.0 ) Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( (Soil_moist(i)/Soil_moist_max(i))*perv_area )
+          IF ( Soil_zone_max(i) > 0.0 ) Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( (Soil_moist_tot(i)/Soil_zone_max(i))*harea ) !RGN added to avoid divide by zero. 1/20/2022
           Basin_soil_lower_stor_frac = Basin_soil_lower_stor_frac + DBLE( Soil_lower_ratio(i)*perv_area )
         ENDIF
         IF ( Soil_rechr_max(i)>0.0 ) Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + &
