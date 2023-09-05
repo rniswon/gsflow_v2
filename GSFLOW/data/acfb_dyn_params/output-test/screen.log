@@ -13,16 +13,16 @@ Control File: .\control\control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.0 03/17/2023
+                         Version: 2.3.1 09/01/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/05/11  8:42:19
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 12:46:02
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 03/17/2023
+                       Version 5.2.2 09/01/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -65,29 +65,30 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-03-17
+PRMS Computation Order          gsflow_prms         2023-09-01
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 Basin Definition                basin               2023-01-11
-Common States and Fluxes        climateflow         2023-03-16
+Common States and Fluxes        climateflow         2023-08-10
 Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2022-09-07
+Time Series Data                obs                 2023-08-30
 Timestep Control                prms_time           2022-04-21
 Time Series Data                dynamic_soil_param  2023-03-16
-Temperature Distribution        climate_hru         2023-03-16
-Precipitation Distribution      climate_hru         2023-03-16
-Solar Radiation Distribution    climate_hru         2023-03-16
-Potential Evapotranspiration    climate_hru         2023-03-16
+Temperature Distribution        climate_hru         2023-08-10
+Precipitation Distribution      climate_hru         2023-08-10
+Solar Radiation Distribution    climate_hru         2023-08-10
+Potential Evapotranspiration    climate_hru         2023-08-10
 Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-03-16
-Surface Runoff                  srunoff_smidx       2023-02-23
-Soilzone Computations           soilzone            2023-02-23
+Snow Dynamics                   snowcomp            2023-08-14
+Surface Runoff                  srunoff_smidx       2023-08-10
+Soilzone Computations           soilzone            2023-08-10
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing Init         routing             2022-09-07
 Streamflow Routing              muskingum           2021-11-19
 Output Summary                  basin_sum           2022-09-01
+Water Balance Computations      water_balance       2023-01-17
 Output Summary                  nhru_summary        2022-09-07
 Statistics Variables Output     statvar_out         2021-09-08
 Output Summary                  prms_summary        2023-01-26
@@ -121,9 +122,9 @@ Simulation time period: 1980/01/01 - 1999/12/31
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/05/11  8:42:19
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 12:46:02
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/05/11  8:42:20
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 12:46:03
 
-Execution elapsed time    0 minutes  1.00 seconds
+Execution elapsed time    0 minutes  1.36 seconds
 

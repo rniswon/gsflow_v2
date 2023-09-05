@@ -10,11 +10,11 @@ Executable: ..\..\bin\gsflow
 Control File: .\control\mercdIDE.control
  WARNING, control parameter not used: aniOutON_OFF, ignored
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/05/11  8:49:13
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 12:51:35
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 03/17/2023
+                       Version 5.2.2 09/01/2023
 
 
 ==========================================================================
@@ -26,23 +26,23 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-03-17
+PRMS Computation Order          gsflow_prms         2023-09-01
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 Basin Definition                basin               2023-01-11
-Common States and Fluxes        climateflow         2023-03-16
+Common States and Fluxes        climateflow         2023-08-10
 Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2022-09-07
+Time Series Data                obs                 2023-08-30
 Timestep Control                prms_time           2022-04-21
 Temp & Precip Distribution      ide_dist            2022-09-07
 Solar Radiation Distribution    ddsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-03-16
-Surface Runoff                  srunoff_smidx       2023-02-23
-Soilzone Computations           soilzone            2023-02-23
+Snow Dynamics                   snowcomp            2023-08-14
+Surface Runoff                  srunoff_smidx       2023-08-10
+Soilzone Computations           soilzone            2023-08-10
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing              strmflow            2021-11-19
 Output Summary                  basin_sum           2022-09-01

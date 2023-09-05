@@ -1,8 +1,8 @@
 ==========================================================================
 Command line: 
-..\..\bin\gsflow  -C.\control\mercdXYZ.control
+..\..\bin\gsflow  -C.\control\mercdXYZ.control -set print_debug 1
 
-number of command line words: 2
+number of command line words: 5
 
 Executable: ..\..\bin\gsflow
 
@@ -10,11 +10,56 @@ Executable: ..\..\bin\gsflow
 Control File: .\control\mercdXYZ.control
  WARNING, control parameter not used: aniOutON_OFF, ignored
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/05/11  8:49:11
+PRMS command line argument 2: -set
+PRMS command line argument 3: print_debug
+PRMS command line argument 4: 1
+==========================================================================
+
+
+
+                          U.S. Geological Survey
+        Coupled Groundwater and Surface-water FLOW model (GSFLOW)
+                         Version: 2.3.1 09/01/2023
+
+    An integration of the Precipitation-Runoff Modeling System (PRMS)
+    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
+
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 12:51:38
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 03/17/2023
+                       Version 5.2.2 09/01/2023
+
+        Process            Available Modules
+--------------------------------------------------------------------
+  Basin Definition: basin
+    Cascading Flow: cascade
+  Time Series Data: obs, water_use_read, dynamic_param_read
+                    dynamic_soil_param_read
+   Potet Solar Rad: soltab
+  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,
+                    temp_map
+       Precip Dist: precip_1sta, precip_laps, precip_dist2,
+                    climate_hru, precip_map
+Temp & Precip Dist: xyz_dist, ide_dist
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
+Transpiration Dist: transp_tindex, climate_hru, transp_frost
+      Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
+                    potet_hs, potet_pt, potet_pm, potet_pm_sta
+      Interception: intcp
+Snow & Glacr Dynam: snowcomp, glacr_melt
+    Surface Runoff: srunoff_smidx, srunoff_carea
+         Soil Zone: soilzone, soilzone_ag
+       Groundwater: gwflow
+Streamflow Routing: strmflow, strmflow_in_out, muskingum,
+                    muskingum_lake, muskingum_mann, segment_to_hru
+Streamflow Charact: strmflow_character
+Stream Temperature: stream_temp
+    Output Summary: basin_sum, subbasin, map_results, prms_summary,
+                    nhru_summary, nsub_summary, water_balance
+                    basin_summary, nsegment_summary, statvar_out
+     Preprocessing: write_climate_hru, frost_date
+--------------------------------------------------------------------
 
 
 ==========================================================================
@@ -26,29 +71,36 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-03-17
+PRMS Computation Order          gsflow_prms         2023-09-01
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 Basin Definition                basin               2023-01-11
-Common States and Fluxes        climateflow         2023-03-16
+Common States and Fluxes        climateflow         2023-08-10
 Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2022-09-07
+Time Series Data                obs                 2023-08-30
 Timestep Control                prms_time           2022-04-21
 Temp & Precip Distribution      xyz_dist            2022-09-07
 Solar Radiation Distribution    ddsolrad            2022-09-01
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-03-16
-Surface Runoff                  srunoff_smidx       2023-02-23
-Soilzone Computations           soilzone            2023-02-23
+Snow Dynamics                   snowcomp            2023-08-14
+Surface Runoff                  srunoff_smidx       2023-08-10
+Soilzone Computations           soilzone            2023-08-10
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing              strmflow            2021-11-19
 Output Summary                  basin_sum           2022-09-01
+Water Balance Computations      water_balance       2023-01-17
 Statistics Variables Output     statvar_out         2021-09-08
 Output Summary                  prms_summary        2023-01-26
 ==============================================================
+
+Using Control File: .\control\mercdXYZ.control
+
+
+Using Parameter File: ./input/mercdXYZ.param
+
 
 Writing PRMS Water Budget File: ./output/prmsXYZ.out
 
@@ -60,4 +112,67 @@ Writing PRMS Water Budget File: ./output/prmsXYZ.out
 Simulation time period: 1993/10/01 - 1995/09/30
 
 ==========================================================================
+
+Change over storage:.00030; HRU: 1 1994 10 1
+Change over storage:.00408; HRU: 2 1994 10 1
+Change over storage:.00099; HRU: 5 1994 10 1
+Change over storage:.00031; HRU: 6 1994 10 1
+Change over storage:.00146; HRU: 7 1994 10 1
+Change over storage:.00055; HRU: 8 1994 10 1
+Change over storage:.00402; HRU: 10 1994 10 1
+Change over storage:.00036; HRU: 11 1994 10 1
+Change over storage:.00044; HRU: 14 1994 10 1
+Change over storage:.00057; HRU: 15 1994 10 1
+Change over storage:.00069; HRU: 16 1994 10 1
+Change over storage:.00228; HRU: 17 1994 10 1
+Change over storage:.00086; HRU: 19 1994 10 1
+Change over storage:.00003; HRU: 20 1994 10 1
+Change over storage:.00170; HRU: 21 1994 10 1
+Change over storage:.00094; HRU: 23 1994 10 1
+Change over storage:.00020; HRU: 29 1994 10 1
+Change over storage:.00217; HRU: 38 1994 10 1
+Change over storage:.00006; HRU: 39 1994 10 1
+Change over storage:.00350; HRU: 46 1994 10 1
+Change over storage:.00006; HRU: 47 1994 10 1
+Change over storage:.00177; HRU: 49 1994 10 1
+Change over storage:.00084; HRU: 50 1994 10 1
+Change over storage:.00309; HRU: 55 1994 10 1
+Change over storage:.00301; HRU: 57 1994 10 1
+Change over storage:.00060; HRU: 58 1994 10 1
+Change over storage:.00046; HRU: 59 1994 10 1
+Change over storage:.00195; HRU: 60 1994 10 1
+Change over storage:.00354; HRU: 61 1994 10 1
+Change over storage:.00047; HRU: 64 1994 10 1
+Change over storage:.00045; HRU: 65 1994 10 1
+Change over storage:.00298; HRU: 66 1994 10 1
+Change over storage:.00302; HRU: 67 1994 10 1
+Change over storage:.00079; HRU: 68 1994 10 1
+Change over storage:.00069; HRU: 69 1994 10 1
+Change over storage:.00106; HRU: 70 1994 10 1
+Change over storage:.00239; HRU: 72 1994 10 1
+Change over storage:.00127; HRU: 73 1994 10 1
+Change over storage:.00138; HRU: 74 1994 10 1
+Change over storage:.00012; HRU: 76 1994 10 1
+Change over storage:.00402; HRU: 77 1994 10 1
+Change over storage:.00070; HRU: 78 1994 10 1
+Change over storage:.00187; HRU: 81 1994 10 1
+Change over storage:.00040; HRU: 82 1994 10 1
+Change over storage:.00004; HRU: 83 1994 10 1
+Change over storage:.00115; HRU: 84 1994 10 1
+Change over storage:.00070; HRU: 85 1994 10 1
+Change over storage:.00085; HRU: 86 1994 10 1
+Change over storage:.00085; HRU: 87 1994 10 1
+Change over storage:.00099; HRU: 88 1994 10 1
+Change over storage:.00172; HRU: 89 1994 10 1
+Change over storage:.00098; HRU: 90 1994 10 1
+
+                          ===========================
+                          Normal completion of GSFLOW
+                          ===========================
+
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 12:51:38
+
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 12:51:38
+
+Execution elapsed time    0 minutes  0.41 seconds
 

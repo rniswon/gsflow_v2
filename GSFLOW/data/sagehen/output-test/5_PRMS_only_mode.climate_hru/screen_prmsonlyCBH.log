@@ -1,19 +1,64 @@
 ==========================================================================
 Command line: 
-..\..\..\bin\gsflow  .\prms_climate_hru.control
+..\..\..\bin\gsflow  .\prms_climate_hru.control -set print_debug 1
 
-number of command line words: 2
+number of command line words: 5
 
 Executable: ..\..\..\bin\gsflow
 
 ==========================================================================
 Control File: .\prms_climate_hru.control
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/05/11  8:58:43
+PRMS command line argument 2: -set
+PRMS command line argument 3: print_debug
+PRMS command line argument 4: 1
+==========================================================================
+
+
+
+                          U.S. Geological Survey
+        Coupled Groundwater and Surface-water FLOW model (GSFLOW)
+                         Version: 2.3.1 09/01/2023
+
+    An integration of the Precipitation-Runoff Modeling System (PRMS)
+    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
+
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 13:00:57
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 03/17/2023
+                       Version 5.2.2 09/01/2023
+
+        Process            Available Modules
+--------------------------------------------------------------------
+  Basin Definition: basin
+    Cascading Flow: cascade
+  Time Series Data: obs, water_use_read, dynamic_param_read
+                    dynamic_soil_param_read
+   Potet Solar Rad: soltab
+  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,
+                    temp_map
+       Precip Dist: precip_1sta, precip_laps, precip_dist2,
+                    climate_hru, precip_map
+Temp & Precip Dist: xyz_dist, ide_dist
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
+Transpiration Dist: transp_tindex, climate_hru, transp_frost
+      Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
+                    potet_hs, potet_pt, potet_pm, potet_pm_sta
+      Interception: intcp
+Snow & Glacr Dynam: snowcomp, glacr_melt
+    Surface Runoff: srunoff_smidx, srunoff_carea
+         Soil Zone: soilzone, soilzone_ag
+       Groundwater: gwflow
+Streamflow Routing: strmflow, strmflow_in_out, muskingum,
+                    muskingum_lake, muskingum_mann, segment_to_hru
+Streamflow Charact: strmflow_character
+Stream Temperature: stream_temp
+    Output Summary: basin_sum, subbasin, map_results, prms_summary,
+                    nhru_summary, nsub_summary, water_balance
+                    basin_summary, nsegment_summary, statvar_out
+     Preprocessing: write_climate_hru, frost_date
+--------------------------------------------------------------------
 
 
 ==========================================================================
@@ -25,31 +70,39 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-03-17
+PRMS Computation Order          gsflow_prms         2023-09-01
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 Basin Definition                basin               2023-01-11
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2023-03-16
+Common States and Fluxes        climateflow         2023-08-10
 Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2022-09-07
+Time Series Data                obs                 2023-08-30
 Timestep Control                prms_time           2022-04-21
-Temperature Distribution        climate_hru         2023-03-16
-Precipitation Distribution      climate_hru         2023-03-16
-Solar Radiation Distribution    climate_hru         2023-03-16
-Potential Evapotranspiration    climate_hru         2023-03-16
+Temperature Distribution        climate_hru         2023-08-10
+Precipitation Distribution      climate_hru         2023-08-10
+Solar Radiation Distribution    climate_hru         2023-08-10
+Potential Evapotranspiration    climate_hru         2023-08-10
 Transpiration Distribution      transp_tindex       2021-09-07
 Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-03-16
-Surface Runoff                  srunoff_smidx       2023-02-23
-Soilzone Computations           soilzone            2023-02-23
+Snow Dynamics                   snowcomp            2023-08-14
+Surface Runoff                  srunoff_smidx       2023-08-10
+Soilzone Computations           soilzone            2023-08-10
 Groundwater                     gwflow              2022-04-21
 Streamflow Routing              strmflow            2021-11-19
 Output Summary                  basin_sum           2022-09-01
+Water Balance Computations      water_balance       2023-01-17
 Output Summary                  subbasin            2022-09-07
 Output Summary                  nhru_summary        2022-09-07
+WARNING, parameter: tsta_elev is ignored as it is not used
 ==============================================================
+
+Using Control File: .\prms_climate_hru.control
+
+
+Using Parameter File: ..\input\prms\prms_climate_hru.params
+
 
 Writing PRMS Water Budget File: ..\output\prms\sagehen_prms_only_cbh.out
 
@@ -61,4 +114,15 @@ Writing PRMS Water Budget File: ..\output\prms\sagehen_prms_only_cbh.out
 Simulation time period: 1980/10/01 - 1996/09/30
 
 ==========================================================================
+
+
+                          ===========================
+                          Normal completion of GSFLOW
+                          ===========================
+
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 13:00:57
+
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 13:00:59
+
+Execution elapsed time    0 minutes  2.04 seconds
 
