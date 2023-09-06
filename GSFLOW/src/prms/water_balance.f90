@@ -152,14 +152,14 @@
      &    Basin_area_inv, Dprst_area_max, Hru_percent_imperv, Dprst_frac, Cov_type, Hru_storage, Hru_area, Ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Basin_ppt, Hru_rain, Hru_snow, Newsnow, Pptmix
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Soil_to_gw, Soil_to_ssr, &
-     &    Infil, Soil_moist_max, Ssr_to_gw, Ssres_flow, Basin_soil_to_gw, Soil_moist, Ssres_stor, &
+     &    Infil, Soil_moist_max, Ssr_to_gw, Ssres_flow, Basin_soil_to_gw, Soil_moist, Ssres_stor, Pref_flow_stor, &
      &    Slow_flow, Basin_perv_et, Basin_ssflow, Basin_swale_et, Slow_stor, Ssres_in, Soil_rechr, &
      &    Basin_lakeevap, Sroff, Hru_actet, Pkwater_equiv, Gwres_stor, Dprst_vol_open, Dprst_vol_clos, Basin_sroff, &
-     &    Snowmelt, Snow_evap, Snowcov_area, Pptmix_nopack, Glacrb_melt, Basin_pweqv, &
-     &    Dprst_stor_hru, Hru_impervstor, Hru_intcpstor, Pref_flow_stor, Intcp_stor, Ag_soil_moist, Basin_ag_soil_moist
-      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_pkwater_equiv, It0_ssres_stor, It0_basin_soil_moist, &
-                               It0_basin_ssstor, It0_dprst_stor_hru, It0_hru_impervstor, &
-                               It0_hru_intcpstor, It0_ag_soil_moist, It0_basin_ag_soil_moist
+     &    Dprst_stor_hru, Hru_impervstor, Hru_intcpstor, Soil_moist_tot, &
+     &    Intcp_stor, Ag_soil_moist, Basin_ag_soil_moist, Snowmelt, Snow_evap, Snowcov_area, Pptmix_nopack, Glacrb_melt, Basin_pweqv
+      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_ssres_stor, It0_basin_soil_moist, &
+                               It0_basin_ssstor, It0_dprst_stor_hru, It0_hru_impervstor, It0_hru_intcpstor
+      USE PRMS_IT0_VARS, ONLY: It0_pkwater_equiv, It0_ag_soil_moist, It0_basin_ag_soil_moist
       USE PRMS_SET_TIME, ONLY: Nowtime
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_INTCP, ONLY: Basin_net_ppt, Basin_intcp_evap, Basin_changeover, &
@@ -179,10 +179,10 @@
      &    Perv_actet, Cap_infil_tot, Pref_flow_infil, Cap_waterin, Upslope_interflow, &
      &    Upslope_dunnianflow, Pref_flow, Soil_lower, Gvr2pfr, Basin_ssin, &
      &    Basin_lakeinsz, Basin_dunnian, Pref_flow_max, Pref_flow_den, Pref_flow_thrsh, &
-     &    Basin_sm2gvr_max, Basin_cap_infil_tot, Basin_slowflow, Basin_capwaterin, &
+     &    Basin_sm2gvr_max, Basin_cap_infil_tot, Basin_slowflow, &
      &    Basin_dunnian_gvr, Basin_pref_flow_infil, Basin_dninterflow, Basin_pref_stor, Basin_dunnian_pfr, &
-     &    Basin_dncascadeflow, Basin_sm2gvr, Basin_prefflow, Basin_slstor, Basin_gvr2pfr, &
-     &    Hru_sz_cascadeflow, Pfr_dunnian_flow, Grav_dunnian_flow, Basin_dndunnianflow, Soil_moist_tot
+     &    Basin_dncascadeflow, Basin_capwaterin, Basin_sm2gvr, Basin_prefflow, Basin_slstor, Basin_gvr2pfr, &
+     &    Hru_sz_cascadeflow, Pfr_dunnian_flow, Grav_dunnian_flow, Basin_dndunnianflow
       USE PRMS_SOILZONE_AG, ONLY: Ag_cap_infil_tot, hru_ag_actet, perv_soil_to_gvr, perv_soil_to_gw, &
      &    Basin_perv_to_gw, Basin_ag_actet
       USE PRMS_GWFLOW, ONLY: Basin_dnflow, Basin_gwsink, Basin_gwstor_minarea_wb, Gwres_flow, &
@@ -487,7 +487,7 @@
 
 ! soilzone
       Basin_capillary_wb = It0_basin_soil_moist - Basin_soil_moist - &
-     &                     Basin_perv_et - Basin_sm2gvr_max + Basin_cap_infil_tot
+     &                     Basin_perv_et - Basin_sm2gvr_max + Basin_cap_infil_tot - Basin_soil_to_gw
       Basin_gravity_wb = It0_basin_ssstor - Basin_ssstor + Basin_sm2gvr - Basin_dncascadeflow - &
      &                   Basin_ssflow - Basin_sz2gw - Basin_dunnian + Basin_dunnian_pfr - &
      &                   Basin_swale_et + Basin_pref_flow_infil

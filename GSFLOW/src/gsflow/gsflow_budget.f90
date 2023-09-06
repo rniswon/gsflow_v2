@@ -5,7 +5,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2022-12-19'
+      character(len=*), parameter :: Version_gsflow_budget = '2023-09-01'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -267,7 +267,6 @@
 !Warning, modifies Basin_ssstor, and Gw2sm_grav
       USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop !, Basin_dprst_volcl
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
-      USE GSFPRMS2MF, ONLY: activeHru_inactiveCell
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, SNGL
@@ -291,8 +290,7 @@
         Gw2sm(i) = 0.0
         Gw_rejected(i) = 0.0
         Actet_gw(i) = 0.0
-        IF ( activeHru_inactiveCell(i) == 0 ) &
-             Slow_stor(i) = 0.0 !don't reset Slow_stor if inactive cell and HRU active
+        Slow_stor(i) = 0.0 !shouldn't be reset if any cells of HRU inactive and HRU active
 !        Uzf_infil_map(i) = 0.0
 !        Sat_recharge(i) = 0.0
 !        Mfoutflow_to_gvr(i) = 0.0

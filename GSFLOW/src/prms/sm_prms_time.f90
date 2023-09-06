@@ -54,12 +54,12 @@ contains
           It0_soil_moist = Soil_moist
           It0_soil_rechr = Soil_rechr
           It0_ssres_stor = Ssres_stor
+          It0_hru_impervstor = Hru_impervstor
           It0_slow_stor = Slow_stor
           It0_pref_flow_stor = Pref_flow_stor
           It0_pkwater_equiv = Pkwater_equiv
           IF ( Ag_package==ACTIVE ) Hru_ag_irr = 0.0 ! 
           IF ( GSFLOW_flag==ACTIVE ) It0_gravity_stor_res = Gravity_stor_res
-          IF ( GSFLOW_flag==ACTIVE .OR. Print_debug==DEBUG_WB ) It0_hru_impervstor = Hru_impervstor
           IF ( PRMS_land_iteration_flag==CANOPY .OR. Print_debug==DEBUG_WB ) It0_hru_intcpstor = Hru_intcpstor
           IF ( PRMS_land_iteration_flag==CANOPY ) THEN
             It0_intcp_transp_on = Intcp_transp_on

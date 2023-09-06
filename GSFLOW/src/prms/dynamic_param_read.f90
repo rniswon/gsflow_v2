@@ -558,7 +558,6 @@
       SUBROUTINE write_dynoutput(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less
       USE PRMS_MODULE, ONLY: Print_debug, Nowyear, Nowmonth, Nowday
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -567,12 +566,11 @@
       INTEGER, INTENT(OUT) :: Updated_hrus(Dim)
       CHARACTER(LEN=*), INTENT(IN) :: Param_name
 ! Local Variables
-      INTEGER i, j, num
+      INTEGER i, num
 !***********************************************************************
       Updated_hrus = 0
       num = 0
-      DO j = 1, Active_hrus
-        i = Hru_route_order(j)
+      DO i = 1, Dim
         IF ( Values(i)<0.0 ) THEN
           Values(i) = Param(i)
         ELSEIF ( Values(i)/=Param(i) ) THEN
@@ -595,7 +593,6 @@
       SUBROUTINE write_dynparam_int(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less
       USE PRMS_MODULE, ONLY: Print_debug, Nowyear, Nowmonth, Nowday
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -604,12 +601,11 @@
       INTEGER, INTENT(OUT) :: Updated_hrus(Dim)
       CHARACTER(LEN=*), INTENT(IN) :: Param_name
 ! Local Variables
-      INTEGER i, j, num
+      INTEGER i, num
 !***********************************************************************
       Updated_hrus = 0
       num = 0
-      DO j = 1, Active_hrus
-        i = Hru_route_order(j)
+      DO i = 1, Dim
         IF ( Values(i)<0 ) CYCLE
         IF ( Values(i)/=Param(i) ) THEN
           num = num + 1
@@ -632,7 +628,6 @@
       SUBROUTINE write_dynparam(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less
       USE PRMS_MODULE, ONLY: Print_debug, Nowyear, Nowmonth, Nowday
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -641,12 +636,11 @@
       INTEGER, INTENT(OUT) :: Updated_hrus(Dim)
       CHARACTER(LEN=*), INTENT(IN) :: Param_name
 ! Local Variables
-      INTEGER i, j, num
+      INTEGER i, num
 !***********************************************************************
       Updated_hrus = 0
       num = 0
-      DO j = 1, Active_hrus
-        i = Hru_route_order(j)
+      DO i = 1, Dim
         IF ( Values(i)<0.0 ) CYCLE
         IF ( Values(i)/=Param(i) ) THEN
           Param(i) = Values(i)
@@ -667,9 +661,7 @@
 !     Values are read in, Parm are are updated or old
 !***********************************************************************
 !      SUBROUTINE write_dynparam_dble(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
-!      USE PRMS_CONSTANTS, ONLY: DEBUG_less, DEBUG_minimum
 !      USE PRMS_MODULE, ONLY: Print_debug, Nowyear, Nowmonth, Nowday
-!      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
 !      IMPLICIT NONE
 ! Arguments
 !      INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -680,12 +672,11 @@
 ! Functions
 !      INTRINSIC :: DBLE, SNGL
 ! Local Variables
-!      INTEGER i, j, num
+!      INTEGER i, num
 !***********************************************************************
 !      Updated_hrus = 0
 !      num = 0
-!      DO j = 1, Active_hrus
-!        i = Hru_route_order(j)
+!      DO i = 1, Dim
 !        IF ( Values(i)<0.0 ) CYCLE
 !        IF ( Values(i)/=SNGL(Param(i)) ) THEN
 !          Param(i) = DBLE( Values(i) )
@@ -708,7 +699,6 @@
       SUBROUTINE write_dynparam_potet(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less
       USE PRMS_MODULE, ONLY: Print_debug, Nowyear, Nowmonth, Nowday
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Output_unit, Dim
@@ -717,12 +707,11 @@
       INTEGER, INTENT(OUT) :: Updated_hrus(Dim)
       CHARACTER(LEN=*), INTENT(IN) :: Param_name
 ! Local Variables
-      INTEGER i, j, num
+      INTEGER i, num
 !***********************************************************************
       Updated_hrus = 0
       num = 0
-      DO j = 1, Active_hrus
-        i = Hru_route_order(j)
+      DO i = 1, Dim
         IF ( Values(i)/=Param(i) ) THEN
           Param(i) = Values(i)
           num = num + 1

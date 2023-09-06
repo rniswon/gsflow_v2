@@ -370,15 +370,15 @@
       ENDIF
 
       IF ( Model==CLIMATE ) THEN
-        IF ( Process_flag==RUN ) RETURN
-        IF ( Process_flag==CLEAN ) STOP
+        CALL summary_output()
+        RETURN
       ENDIF
 
 ! frost_date is a pre-process module
       IF ( Model==FROST ) THEN
         ierr = frost_date()
-        IF ( Process_flag==RUN ) RETURN
-        IF ( Process_flag==CLEAN ) STOP
+        CALL summary_output()
+        RETURN
       ENDIF
 
       IF ( Cloud_flag==ACTIVE ) CALL cloud_cover()
@@ -398,11 +398,8 @@
       ENDIF
 
       IF ( Model==TRANSPIRE ) THEN
-        IF ( Process_flag==RUN ) THEN
-          CALL summary_output()
-          RETURN
-        ENDIF
-        IF ( Process_flag==CLEAN ) RETURN
+        CALL summary_output()
+        RETURN
       ENDIF
 
       IF ( Climate_potet_flag==OFF ) THEN
@@ -425,15 +422,13 @@
 
       IF ( Model==WRITE_CLIMATE ) THEN
         ierr = write_climate_hru()
-        IF ( Process_flag==RUN ) RETURN
+        CALL summary_output()
+        RETURN
       ENDIF
 
       IF ( Model==POTET ) THEN
-        IF ( Process_flag==RUN ) THEN
-          CALL summary_output()
-          RETURN
-        ENDIF
-        IF ( Process_flag==CLEAN ) STOP
+        CALL summary_output()
+        RETURN
       ENDIF
 
 ! intcp, snowcomp, glacr, srunoff, soilzone_ag, and soilzone for GSFLOW are in the MODFLOW iteration loop
@@ -482,6 +477,8 @@
             ENDIF
 
             IF ( seg2hru_flag==ACTIVE ) CALL segment_to_hru()
+
+            !IF ( Stream_order_flag==ACTIVE ) ierr = strmflow_character()
 
             IF ( Stream_temp_flag==ACTIVE ) THEN
                  ierr = strmflow_character()
@@ -651,7 +648,7 @@
      &        '    An integration of the Precipitation-Runoff Modeling System (PRMS)', /, &
      &        '    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)', /)
 
-      IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = 0
+      IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = OFF
       IF ( control_integer(forcing_check_flag, 'forcing_check_flag')/=0 ) forcing_check_flag = OFF
       IF ( control_integer(seg2hru_flag, 'seg2hru_flag')/=0 ) seg2hru_flag = OFF
 
@@ -1140,8 +1137,6 @@
      &     /=0 ) CALL read_error(7, 'nratetbl')
       IF ( decldim('nsnow', 0, MAXDIM, 'Number of snow-depth-measurement stations')/=0 ) CALL read_error(7, 'nsnow')
 
-      IF ( decldim('ncbh', 0, MAXDIM, 'Number of values in each CBH File (active HRUs)')/=0 ) CALL read_error(7, 'ncbh')
-
 ! depletion curves
       IF ( decldim('ndepl', 1, MAXDIM, 'Number of snow-depletion curves')/=0 ) CALL read_error(7, 'ndelp')
       IF ( decldim('ndeplval', 11, MAXDIM, 'Number of values in all snow-depletion curves (set to ndepl*11)')/=0 ) &
@@ -1187,6 +1182,11 @@
 
       Ngw = getdim('ngw')
       IF ( Ngw==-1 ) CALL read_error(7, 'ngw')
+
+      IF ( Nssr /= Nhru .OR. Ngw /= Nhru) THEN
+        PRINT *, 'ERROR, nhru, nssr, and ngw must be equal nssr=', Nssr, ' nhru=', Nhru, ' ngw=', Ngw
+        Inputerror_flag = 1
+      ENDIF
 
       Ntemp = getdim('ntemp')
       IF ( Ntemp==-1 ) CALL read_error(6, 'ntemp')
@@ -1277,6 +1277,9 @@
       IF ( Nmap2hru==-1 ) CALL read_error(6, 'nmap2hru')
       Nmap = getdim('nmap')
       IF ( Nmap==-1 ) CALL read_error(6, 'nmap')
+
+      Nstreamtemp = getdim('nstreamtemp')
+      IF ( Nstreamtemp==-1 ) CALL read_error(6, 'nstreamtemp')
 
       Water_use_flag = OFF
       IF ( Nwateruse>0 ) THEN

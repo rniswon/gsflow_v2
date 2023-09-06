@@ -670,7 +670,7 @@
 ! calculate the station mean by month
 !
       DO m = 1, MONTHS_PER_YEAR
-        CALL mean_by_month(PptMTH(1, m), TminMTH(1, m), TmaxMTH(1, m),
+        CALL mean_by_month(PptMTH(:, m), TminMTH(:, m), TmaxMTH(:, m),
      +                     Meanppt(m), Meantmax(m), Meantmin(m),
      +                     Rain_meanx(m), Rain_meany(m), Rain_meanz(m),
      +                     Temp_meanx(m), Temp_meany(m), Temp_meanz(m))
@@ -694,12 +694,12 @@
 !***********************************************************************
       xyzrun = 0
 
-      CALL xyz_temp_run(Max_lapse(1, Nowmonth), Min_lapse(1, Nowmonth),
+      CALL xyz_temp_run(Max_lapse(:, Nowmonth), Min_lapse(:, Nowmonth),
      +                  Meantmax(Nowmonth), Meantmin(Nowmonth),
      +                  Temp_meanx(Nowmonth), Temp_meany(Nowmonth),
      +                  Temp_meanz(Nowmonth))
 
-      CALL xyz_rain_run(Ppt_lapse(1, Nowmonth), Rain_meanx(Nowmonth),
+      CALL xyz_rain_run(Ppt_lapse(:, Nowmonth), Rain_meanx(Nowmonth),
      +                  Rain_meany(Nowmonth), Rain_meanz(Nowmonth),
      +                  Meanppt(Nowmonth), Rain_code(Nowmonth))
 

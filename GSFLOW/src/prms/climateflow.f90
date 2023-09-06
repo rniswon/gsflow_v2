@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2023-03-16'
+      character(len=*), parameter :: Version_climateflow = '2023-08-10'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -78,6 +78,7 @@
       REAL, SAVE, ALLOCATABLE :: Soil_to_ssr(:), Ssres_in(:)
       REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:), Pref_flow_stor(:)
       REAL, SAVE, ALLOCATABLE :: Ssres_stor(:), Ssres_flow(:), Soil_rechr(:)
+      REAL, SAVE, ALLOCATABLE :: Soil_lower_stor_max(:), Soil_moist_tot(:), Soil_zone_max(:)
       REAL, SAVE, ALLOCATABLE :: Gravity_stor_res(:)
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_moist, Basin_ag_soil_rechr
       REAL, SAVE, ALLOCATABLE :: gsflow_ag_actet(:), Ag_soil_moist(:), Ag_soil_rechr(:), Ag_soil_rechr_max(:)
@@ -103,7 +104,7 @@
       REAL, SAVE, ALLOCATABLE :: Glacier_frac(:), Alt_above_ela(:), Glrette_frac(:), Glacrb_melt(:)
 !   Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Soil_moist_max(:), Soil_rechr_max(:), Sat_threshold(:)
-      REAL, SAVE, ALLOCATABLE :: Snowinfil_max(:), Imperv_stor_max(:)
+      REAL, SAVE, ALLOCATABLE :: Snowinfil_max(:), Imperv_stor_max(:), Ssstor_init_frac(:)
       REAL, SAVE, ALLOCATABLE :: Soil_moist_init_frac(:), Soil_rechr_init_frac(:), Soil_rechr_max_frac(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_moist_max(:), Ag_soil_rechr_max_frac(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_moist_init_frac(:), Ag_soil_rechr_init_frac(:)
@@ -158,7 +159,7 @@ end module PRMS_IT0_VARS
      &    ddsolrad_module, ccsolrad_module, CANOPY
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, Nhrucell, &
      &    Init_vars_from_file, Temp_flag, Precip_flag, Glacier_flag, &
-     &    Strmflow_module, Temp_module, Stream_order_flag, &
+     &    Strmflow_module, Temp_module, Stream_order_flag, Humidity_cbh_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, &
      &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, no_snow_flag
@@ -359,7 +360,7 @@ end module PRMS_IT0_VARS
      &         'Saturation vapor pressure for each HRU', &
      &         'kilopascals', Vp_sat)
         ENDIF
-        IF ( Et_flag==potet_pm_module .OR. Et_flag==potet_pt_module ) THEN
+        IF ( (Et_flag==potet_pm_module .OR. Et_flag==potet_pt_module .AND. Humidity_cbh_flag==OFF) ) THEN
           ALLOCATE ( Humidity_percent(Nhru,MONTHS_PER_YEAR) )
           IF ( declparam(Et_module, 'humidity_percent', 'nhru,nmonths', 'real', &
      &         '0.0', '0.0', '100.0', &
@@ -434,8 +435,18 @@ end module PRMS_IT0_VARS
      &     'Storage of capillary reservoir for each HRU', &
      &     'inches', Soil_moist)
 
+      ALLOCATE ( Soil_moist_tot(Nhru), Soil_lower_stor_max(Nhru) )
+      CALL declvar_real(Soilzone_module, 'soil_moist_tot', 'nhru', Nhru, &
+     &     'Total soil-zone water storage (soil_moist + ssres_stor)', &
+     &     'inches', Soil_moist_tot)
+
+      ALLOCATE ( Soil_zone_max(Nhru) )
+!      CALL declvar_real(Soilzone_module, 'soil_zone_max', 'nhru', Nhru, &
+!     &     'Maximum storage of all soil zone reservoirs', &
+!     &     'inches', Soil_zone_max)/=0
+
       ALLOCATE ( Pref_flow_stor(Nhru), It0_pref_flow_stor(Nhru) )
-      CALL declvar_real(MODNAME, 'pref_flow_stor', 'nhru', Nhru, &
+      CALL declvar_real(Soilzone_module, 'pref_flow_stor', 'nhru', Nhru, &
      &     'Storage in preferential-flow reservoir for each HRU', &
      &     'inches', Pref_flow_stor)
 
@@ -515,7 +526,7 @@ end module PRMS_IT0_VARS
      &     'Surface runoff to the stream network for each HRU', &
      &     'inches', Sroff)
 
-      ALLOCATE ( Hru_impervstor(Nhru) )
+      ALLOCATE ( Hru_impervstor(Nhru), It0_hru_impervstor(Nhru) )
       CALL declvar_real(Srunoff_module, 'hru_impervstor', 'nhru', Nhru, &
      &     'HRU area-weighted average storage on impervious area for each HRU', &
      &     'inches', Hru_impervstor)
@@ -947,7 +958,7 @@ end module PRMS_IT0_VARS
 
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
         IF ( PRMS4_flag==ACTIVE ) THEN
-          IF ( declparam(MODNAME, 'soil_rechr_init', 'nhru', 'real', &
+          IF ( declparam(Soilzone_module, 'soil_rechr_init', 'nhru', 'real', &
      &         '1.0', '0.0', '20.0', &
      &         'Initial storage of water for soil recharge zone', &
      &         'Initial storage for soil recharge zone (upper part of'// &
@@ -955,12 +966,12 @@ end module PRMS_IT0_VARS
      &         ' evaporation and transpiration) for each HRU; must be'// &
      &         ' less than or equal to soil_moist_init', &
      &         'inches')/=0 ) CALL read_error(1, 'soil_rechr_init')
-          IF ( declparam(MODNAME, 'soil_moist_init', 'nhru', 'real', &
+          IF ( declparam(Soilzone_module, 'soil_moist_init', 'nhru', 'real', &
      &         '3.0', '0.0', '20.0', &
      &         'Initial value of available water in capillary reservoir', &
      &         'Initial value of available water in capillary reservoir for each HRU', &
      &         'inches')/=0 ) CALL read_error(1, 'soil_moist_init')
-          IF ( declparam(MODNAME, 'ssstor_init', 'nssr', 'real', &
+          IF ( declparam(Soilzone_module, 'ssstor_init', 'nssr', 'real', &
      &         '0.0', '0.0', '10.0', &
      &         'Initial storage in each GVR and PFR', &
      &         'Initial storage of the gravity and preferential-flow reservoirs for each HRU', &
@@ -980,6 +991,7 @@ end module PRMS_IT0_VARS
      &         'Initial fraction available water in the capillary reservoir', &
      &         'Initial fraction of available water in the capillary reservoir (fraction of soil_moist_max for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'soil_moist_init_frac')
+          ALLOCATE ( Ssstor_init_frac(Nhru) )
           IF ( declparam(Soilzone_module, 'ssstor_init_frac', 'nssr', 'real', &
      &         '0.0', '0.0', '1.0', &
      &         'Initial fraction of available water in the gravity plus preferential-flow reservoirs', &
@@ -1054,7 +1066,7 @@ end module PRMS_IT0_VARS
      &    Temp_module, Stream_order_flag, GSFLOW_flag, Hru_type, &
      &    Precip_module, Solrad_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Et_flag, Dprst_flag, Solrad_flag, &
-     &    Parameter_check_flag, Inputerror_flag, AG_flag, Glacier_flag
+     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, AG_flag, Glacier_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv
@@ -1198,7 +1210,7 @@ end module PRMS_IT0_VARS
       ENDIF
 
       IF ( Use_pandata==ACTIVE ) THEN
-        IF ( getparam_int(MODNAME, 'hru_pansta', Nhru, Hru_pansta)/=0 ) CALL read_error(2, 'hru_pansta')
+        IF ( getparam_int('intcp', 'hru_pansta', Nhru, Hru_pansta)/=0 ) CALL read_error(2, 'hru_pansta')
         IF ( Parameter_check_flag>0 ) &
      &       CALL checkdim_bounded_limits('hru_pansta', 'nevap', Hru_pansta, Nhru, 0, Nevap, Inputerror_flag)
       ENDIF
@@ -1234,11 +1246,12 @@ end module PRMS_IT0_VARS
      &         CALL read_error(2, 'soil_moist_init_frac')
           IF ( getparam_real(Soilzone_module, 'soil_rechr_init_frac', Nhru, Soil_rechr_init_frac)/=0 ) &
      &         CALL read_error(2, 'soil_rechr_init_frac')
-          IF ( getparam_real(Soilzone_module, 'ssstor_init_frac', Nssr, Ssres_stor)/=0 ) &
+          IF ( getparam_real(Soilzone_module, 'ssstor_init_frac', Nssr, Ssstor_init_frac)/=0 ) &
      &         CALL read_error(2, 'ssstor_init_frac')
           Soil_rechr = Soil_rechr_init_frac * Soil_rechr_max
           Soil_moist = Soil_moist_init_frac * Soil_moist_max
-          Ssres_stor = Ssres_stor*Sat_threshold
+          Ssres_stor = Ssstor_init_frac * Sat_threshold
+          DEALLOCATE ( Ssstor_init_frac )
         ENDIF
         Slow_stor = Ssres_stor
       ENDIF
@@ -1450,8 +1463,10 @@ end module PRMS_IT0_VARS
         Vp_slope = 0.0
         IF ( Et_flag==potet_pm_module .OR. Et_flag==potet_pm_sta_module ) Vp_sat = 0.0
         IF ( Et_flag==potet_pt_module .OR. Et_flag==potet_pm_module ) THEN
-          IF ( getparam_real(Et_module, 'humidity_percent', Nhru*MONTHS_PER_YEAR, Humidity_percent)/=0 ) &
-     &         CALL read_error(2, 'humidity_percent')
+          IF ( Humidity_cbh_flag==OFF ) THEN
+            IF ( getparam_real(Et_module, 'humidity_percent', Nhru*MONTHS_PER_YEAR, Humidity_percent)/=0 ) &
+     &           CALL read_error(2, 'humidity_percent')
+          ENDIF
         ENDIF
       ENDIF
 ! initialize arrays (dimensioned Nsegment)
@@ -1635,8 +1650,8 @@ end module PRMS_IT0_VARS
       SUBROUTINE precip_form(Precip, Hru_ppt, Hru_rain, Hru_snow, Tmaxf, &
      &           Tminf, Pptmix, Newsnow, Prmx, Tmax_allrain_f, Rain_adj, &
      &           Snow_adj, Adjmix_rain, Hru_area, Sum_obs, Tmax_allsnow_f, Ihru)
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, DEBUG_minimum
-      USE PRMS_MODULE, ONLY: Print_debug !, forcing_check_flag
+      USE PRMS_CONSTANTS, ONLY: NEARZERO !, ACTIVE, DEBUG_minimum
+!      USE PRMS_MODULE, ONLY: Print_debug, forcing_check_flag
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       use prms_utils, only: print_date
       IMPLICIT NONE
@@ -1702,11 +1717,11 @@ end module PRMS_IT0_VARS
 
 !      IF ( forcing_check_flag == ACTIVE ) THEN
         IF ( Hru_ppt < 0.0 .OR. Hru_rain < 0.0 .OR. Hru_snow < 0.0 ) THEN
-          IF ( Print_debug > DEBUG_minimum ) THEN
+!          IF ( Print_debug > DEBUG_minimum ) THEN
             PRINT '(A,I0)', 'Warning, adjusted precipitation value(s) < 0.0 for HRU: ', Ihru
             PRINT '(A,F0.4,A,F0.4,A)', '         hru_ppt: ', Hru_ppt, ' hru_rain: ', Hru_rain, ' hru_snow: ', Hru_snow
             CALL print_date(0)
-          ENDIF
+!          ENDIF
         ENDIF
 !      ENDIF
 

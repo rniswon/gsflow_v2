@@ -10,10 +10,10 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2023-05-17'
+        character(len=*), parameter :: Version_climate_hru = '2023-08-10'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit, AET_unit, PET_unit, Irrigated_area_unit
-        INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit
+        INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit, Ncbh
         REAL, ALLOCATABLE :: values(:)
         INTEGER, ALLOCATABLE :: ivalues(:)
         ! Control Parameters
@@ -32,7 +32,7 @@
       END MODULE PRMS_CLIMATE_HRU
 
       INTEGER FUNCTION climate_hru()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, RUN, DECL, INIT, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, RUN, DECL, INIT, MAXDIM, &
      &    MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, CELSIUS, MONTHS_PER_YEAR, DEBUG_less
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real, getparam_int, getdim, decldim
@@ -41,7 +41,7 @@
      &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
      &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
      &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, Nowyear, Nowday, forcing_check_flag, Print_debug, &
-     &    irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag, Ncbh
+     &    irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag
       USE PRMS_CLIMATE_HRU
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Ag_Frac
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
@@ -131,6 +131,7 @@
                 Hru_ppt = -999.0
                 DO i = i, Ncbh
                   Hru_ppt(cbh_hru_id(i)) = values(i)
+                  IF ( Hru_ppt(i)<Ppt_zero_thresh ) Hru_ppt(i) = 0.0
                 ENDDO
               ENDIF
             ENDIF
@@ -211,12 +212,12 @@
             num_pet = 0
             DO jj = 1, Active_hrus
               ii = Hru_route_order(jj)
-              IF ( PET_external(ii)<AET_external(ii) ) then
+              IF ( PET_external(ii)<AET_external(ii) .and. Ag_frac(ii)>0.0 ) then
 !                PRINT *, yr, mo, dy, ii, PET_external(ii), AET_external(ii), Ag_frac(ii)
                 num_pet = num_pet + 1
                 PET_external(ii) = AET_external(ii)
               ENDIF
-              IF ( AET_external(ii) < 0.0 .and. AET_external(ii) /= -1.0 ) THEN
+              IF ( AET_external(ii) < 0.0 .and. AET_external(ii) /= -1.0 .and. Ag_frac(ii)>0.0 ) THEN
                 PRINT '(A,4(I0,1X),A)', 'AET external < 0.0, HRU: ', ii, yr, mo, dy, '; set to 0.0'
                 PRINT *, 'AET, PET, ag_frac:', AET_external(ii), PET_external(ii), Ag_frac(ii)
                 AET_external(ii) = 0.0
@@ -518,6 +519,7 @@
 
         IF ( control_integer(Cbh_check_flag, 'cbh_check_flag')/=0 ) Cbh_check_flag = ACTIVE
         IF ( control_integer(cbh_active_flag, 'cbh_active_flag')/=0 ) cbh_active_flag = OFF
+        IF ( decldim('ncbh', 0, MAXDIM, 'Number of values in each CBH File (active HRUs)')/=0 ) CALL read_error(7, 'ncbh')
 
         IF ( Climate_temp_flag==ACTIVE ) &
      &       CALL print_module('Temperature Distribution', MODNAME, Version_climate_hru)
@@ -658,16 +660,14 @@
         IF ( Humidity_cbh_flag==ACTIVE ) Humidity_hru = 0.0
         IF ( Windspeed_cbh_flag==ACTIVE ) Windspeed_hru = 0.0
         IF ( cbh_active_flag == ACTIVE ) THEN
+          IF ( getparam_int(MODNAME, 'cbh_hru_id', Ncbh, cbh_hru_id)/=0 ) CALL read_error(2, 'cbh_hru_id')
           ALLOCATE ( values(Nhru), ivalues(Nhru) )
           values = 0.0
           ivalues = 0
-		ENDIF
+        ENDIF
 
         istop = 0
         ierr = 0
-        IF ( cbh_active_flag == ACTIVE ) THEN
-          IF ( getparam_int(MODNAME, 'cbh_hru_id', Ncbh, cbh_hru_id)/=0 ) CALL read_error(2, 'cbh_hru_id')
-        ENDIF
 
         IF ( Climate_precip_flag==ACTIVE ) THEN
           IF ( getparam_real(MODNAME, 'rain_cbh_adj', Nhru*MONTHS_PER_YEAR, Rain_cbh_adj)/=0 ) CALL read_error(2, 'rain_cbh_adj')

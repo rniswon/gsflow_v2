@@ -236,14 +236,15 @@
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Imperv_stor, Sat_threshold, &
      &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor, &
      &    Slow_stor, Pref_flow_stor, Basin_soil_moist, Basin_ssstor, Hru_impervstor, Dprst_stor_hru, &
+     &    Soil_zone_max, Soil_moist_tot, Soil_lower_stor_max, &
      &    Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, Ag_soil_rechr_max, Ag_soil_rechr_max_frac, &
      &    Basin_ag_soil_moist, Basin_ag_soil_rechr
-      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_imperv_stor, It0_hru_impervstor, &
-                               It0_ag_soil_moist, It0_ag_soil_rechr, It0_dprst_vol_open, It0_dprst_vol_clos, &
-                               It0_dprst_stor_hru, It0_slow_stor, It0_ssres_stor
       USE PRMS_SRUNOFF, ONLY:  Dprst_depth_avg, Op_flow_thres, Dprst_vol_open_max, Dprst_vol_clos_max, &
      &    Dprst_vol_thres_open, Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac
-      USE PRMS_SOILZONE, ONLY: Soil_zone_max, Soil_moist_tot, Soil_lower_stor_max, Replenish_frac
+      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_basin_soil_moist, It0_dprst_stor_hru, It0_hru_impervstor, &
+     &                         It0_basin_ssstor, It0_ssres_stor, It0_imperv_stor, It0_soil_rechr, It0_slow_stor, &
+     &                         It0_ag_soil_moist, It0_ag_soil_rechr, It0_dprst_vol_open, It0_dprst_vol_clos
+      USE PRMS_SOILZONE, ONLY: Replenish_frac
       USE PRMS_SOILZONE_AG, ONLY: Ag_soil_lower_stor_max, Ag_replenish_frac
       use prms_utils, only: is_eof, error_stop
       IMPLICIT NONE
@@ -351,7 +352,7 @@
               PRINT 9001, 'soil_moist_max', 0.00001, i, Soil_moist_max(i), 0.00001
               Soil_moist_max(i) = 0.00001
             ENDIF
-            IF ( PRMS4_flag==0 ) Soil_rechr_max(i) = Soil_moist_max(i)*Soil_rechr_max_frac(i)
+            IF ( PRMS4_flag==OFF ) Soil_rechr_max(i) = Soil_moist_max(i)*Soil_rechr_max_frac(i)
             IF ( Soil_rechr_max(i)<0.00001 ) THEN
               PRINT 9001, 'soil_rechr_max', 0.00001, i, Soil_rechr_max(i), 0.00001
               Soil_rechr_max(i) = 0.00001
@@ -663,11 +664,12 @@
           Basin_soil_moist = 0.0D0
           DO j = 1, Active_hrus
             i = Hru_route_order(j)
-            It0_soil_moist(i) = Soil_moist(i)
-            It0_soil_rechr(i) = Soil_rechr(i)
             Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*Hru_perv(i) )
           ENDDO
           Basin_soil_moist = Basin_soil_moist * Basin_area_inv
+          It0_soil_moist = Soil_moist
+          It0_soil_rechr = Soil_rechr
+          It0_basin_soil_moist = Basin_soil_moist
         ENDIF
         IF ( it0_imperv_flag==ACTIVE ) THEN
           It0_imperv_stor = Imperv_stor
@@ -677,25 +679,26 @@
           Basin_ssstor = 0.0D0
           DO j = 1, Active_hrus
             i = Hru_route_order(j)
-            It0_slow_stor(i) = Slow_stor(i)
-            It0_ssres_stor(i) = Slow_stor(i) + Pref_flow_stor(i)
             Ssres_stor(i) = Slow_stor(i) + Pref_flow_stor(i)
             Basin_ssstor = Basin_ssstor + DBLE( Ssres_stor(i)*Hru_area(i) )
           ENDDO
           Basin_ssstor = Basin_ssstor * Basin_area_inv
+          It0_ssres_stor = Ssres_stor
+          It0_slow_stor = Slow_stor
+          It0_basin_ssstor = Basin_ssstor
         ENDIF
         IF ( check_ag_frac==ACTIVE ) THEN
           Basin_ag_soil_moist = 0.0D0
           Basin_ag_soil_rechr = 0.0D0
           DO j = 1, Active_hrus
             i = Hru_route_order(j)
-            It0_ag_soil_moist(i) = Ag_soil_moist(i)
-            It0_ag_soil_rechr(i) = Ag_soil_rechr(i)
             Basin_ag_soil_moist = Basin_ag_soil_moist + DBLE( Ag_soil_moist(i)*Ag_area(i) )
             Basin_ag_soil_rechr = Basin_ag_soil_rechr + DBLE( Ag_soil_rechr(i)*Ag_area(i) )
           ENDDO
           Basin_ag_soil_moist = Basin_ag_soil_moist * Basin_area_inv
           Basin_ag_soil_rechr = Basin_ag_soil_rechr * Basin_area_inv
+          It0_ag_soil_moist = Ag_soil_moist
+          It0_ag_soil_rechr = Ag_soil_rechr
         ENDIF
         IF ( it0_dprst_flag==ACTIVE ) THEN
           It0_dprst_vol_open = Dprst_vol_open

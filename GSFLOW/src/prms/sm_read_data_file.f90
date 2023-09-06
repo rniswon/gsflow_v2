@@ -216,7 +216,7 @@ contains
 !***********************************************************************
   module subroutine check_data_variables(Varname, Numvalues, Values, Iflag, Iret)
       USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
-      USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Nstreamtemp
+      USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Nstreamtemp, Nratetbl
       USE PRMS_OBS, ONLY: Nlakeelev, Nwind, Nhumid, &
      &    Tmin, Tmax, Precip, Snowdepth, Runoff, Pan_evap, Wind_speed, Humidity, Solrad, &
      &    Gate_ht, Lake_elev, Rain_day, Runoff_units, Streamflow_cfs, Streamflow_cms, Stream_temp
@@ -315,9 +315,9 @@ contains
         ENDIF
       ELSEIF ( Varname(:7)=='gate_ht' ) THEN
         IF ( Iflag==0 ) THEN
-          IF ( Numvalues/=Nlakeelev ) THEN
+          IF ( Numvalues/=Nratetbl ) THEN
             Iret = -1
-            ndim = Nlakeelev
+            ndim = Nratetbl
           ENDIF
         ELSE
           DO i = 1, Numvalues

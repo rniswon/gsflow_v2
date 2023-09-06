@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2023-02-23'
+      character(len=*), parameter :: Version_srunoff = '2023-08-10'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -602,7 +602,7 @@
 !                  computations using antecedent soil moisture.
 !***********************************************************************
       INTEGER FUNCTION srunoffrun()
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF, DEBUG_WB, LAND, LAKE, GLACIER, SWALE, CASCADE_OFF, CLOSEZERO
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF, DEBUG_WB, LAND, LAKE, GLACIER, SWALE, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Dprst_flag, Cascade_flag, Call_cascade, Frozen_flag, Glacier_flag, &
      &    PRMS_land_iteration_flag, Kkiter, AG_flag, Hru_type, Ag_Package
       USE PRMS_SRUNOFF
@@ -857,7 +857,7 @@
 !******Compute HRU weighted average (to units of inches/dt)
           IF ( Cascade_flag>CASCADE_OFF ) THEN
             hru_sroff_down = 0.0D0
-            IF ( srunoff>CLOSEZERO ) THEN
+            IF ( srunoff>0.0 ) THEN
               IF ( Ncascade_hru(i)>0 ) CALL run_cascade_sroff(Ncascade_hru(i), srunoff, hru_sroff_down)
               Hru_hortn_cascflow(i) = hru_sroff_down
               !IF ( Hru_hortn_cascflow(i)<0.0D0 ) Hru_hortn_cascflow(i) = 0.0D0
@@ -866,6 +866,7 @@
               Basin_sroff_down = Basin_sroff_down + hru_sroff_down*Hruarea_dble
             ELSE
               Hru_hortn_cascflow(i) = 0.0D0
+              srunoff = 0.0
             ENDIF
           ENDIF
           Hru_sroffp(i) = Srp*Perv_frac
@@ -1282,8 +1283,8 @@
       USE PRMS_BASIN, ONLY: Dprst_clos_flag, Dprst_frac, &
      &    Dprst_area_clos_max, Dprst_area_open_max, Basin_area_inv, &
      &    Hru_area_dble, Active_hrus, Hru_route_order, Dprst_open_flag
-      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_vol_clos, &
-     &    Dprst_total_open_in, Dprst_total_open_out, Dprst_total_clos_in, Dprst_total_clos_out, Dprst_stor_hru
+      USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_vol_clos, Dprst_stor_hru, &
+     &    Dprst_total_open_in, Dprst_total_open_out, Dprst_total_clos_in, Dprst_total_clos_out
       use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions
