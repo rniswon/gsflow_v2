@@ -648,7 +648,7 @@
           IF ( Ncbh==-1 ) CALL read_error(7, 'ncbh')
           ALLOCATE ( cbh_hru_id(Ncbh) )
           IF ( declparam(MODNAME, 'cbh_hru_id', 'ncbh', 'integer', &
-     &         '0', 'bounded', 'nhru', &
+     &         '1', 'bounded', 'nhru', &
      &         'HRU id for each value in CBH File', &
      &         'HRU id for each value in CBH File', &
      &         'none')/=0 ) CALL read_error(1, 'cbh_hru_id')
