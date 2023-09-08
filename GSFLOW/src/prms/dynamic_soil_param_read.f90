@@ -370,6 +370,7 @@
               PRINT 9001, 'ag_soil_moist_max', 0.00001, i, Ag_soil_moist_max(i), 0.00001
               Ag_soil_moist_max(i) = 0.00001
             ENDIF
+            Ag_soil_rechr_max(i) = Ag_soil_moist_max(i) * Ag_soil_rechr_max_frac(i)
             IF ( Ag_soil_rechr_max(i)<0.00001 ) THEN
               PRINT 9001, 'ag_soil_rechr_max', 0.00001, i, Ag_soil_rechr_max(i), 0.00001
               Ag_soil_rechr_max(i) = 0.00001
