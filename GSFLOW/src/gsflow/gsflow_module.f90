@@ -116,7 +116,7 @@
       DOUBLE PRECISION, SAVE :: Modflow_time_in_stress, Modflow_skip_time
       DOUBLE PRECISION, SAVE :: Mft_to_sec, Totalarea_mf
       DOUBLE PRECISION, SAVE :: Mfl2_to_acre, Mfl3_to_ft3, Sfr_conv
-      DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs
+      DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs, MFQ_to_inch_acres_dble
       REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t
       REAL, SAVE :: MFQ_to_inch_acres, Acre_inches_to_mfl3_sngl
       DOUBLE PRECISION, SAVE :: mfstrt_jul  !RGN to get MF to stop at End_time for MODFLOW only

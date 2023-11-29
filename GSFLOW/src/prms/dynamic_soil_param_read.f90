@@ -384,8 +384,8 @@
           ENDIF
 
           IF ( check_dprst_depth_flag==ACTIVE ) THEN
-            Dprst_vol_clos_max(i) = Dprst_area_clos_max(i)*Dprst_depth_avg(i)
-            Dprst_vol_open_max(i) = Dprst_area_open_max(i)*Dprst_depth_avg(i)
+            Dprst_vol_clos_max(i) = Dprst_area_clos_max(i)*DBLE(Dprst_depth_avg(i))
+            Dprst_vol_open_max(i) = Dprst_area_open_max(i)*DBLE(Dprst_depth_avg(i))
             Dprst_vol_thres_open(i) = Dprst_vol_open_max(i)*DBLE(Op_flow_thres(i))
           ENDIF
         ENDDO

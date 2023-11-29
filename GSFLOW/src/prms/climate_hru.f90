@@ -33,7 +33,7 @@
 
       INTEGER FUNCTION climate_hru()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, RUN, DECL, INIT, MAXDIM, &
-     &    MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, CELSIUS, MM, MONTHS_PER_YEAR, DEBUG_less
+     &    MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, MM, MONTHS_PER_YEAR, DEBUG_less
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real, getparam_int, getdim, decldim
       use PRMS_CONTROL_FILE, only: control_integer, control_string
@@ -893,13 +893,13 @@
 !***********************************************************************
       SUBROUTINE check_cbh_value(Var, Var_value, Lower_val, Upper_val, Missing)
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
+      !use prms_utils, only: print_date
 ! Argument
       REAL, INTENT(IN) :: Var_value(*), Lower_val, Upper_val
       CHARACTER(LEN=*), INTENT(IN) :: Var
       INTEGER, INTENT(INOUT) :: Missing
 ! Functions
       !INTRINSIC :: ISNAN
-      !EXTERNAL :: print_date
 ! Local Variables
       INTEGER :: i, j
 !***********************************************************************

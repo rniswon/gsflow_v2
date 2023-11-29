@@ -200,7 +200,6 @@
       SUBROUTINE basin_summaryrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MEAN_MONTHLY, YEARLY
       use PRMS_MMFAPI, only: getvar_dble
-      use prms_utils, only: read_error
       USE PRMS_MODULE, ONLY: Start_month, Start_day, End_year, End_month, End_day, Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN_SUMMARY
       USE PRMS_SET_TIME, ONLY: Modays

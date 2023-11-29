@@ -2050,7 +2050,7 @@ C
      &    Mfl2_to_acre, Mfl3_to_ft3, Mfl_to_inch, Sfr_conv,
      &    Acre_inches_to_mfl3, Inch_to_mfl_t, Mfl3t_to_cfs,
      &    Mfvol2inch_conv, Gvr2cell_conv, Mfq2inch_conv,
-     &    Acre_inches_to_mfl3_sngl
+     &    Acre_inches_to_mfl3_sngl, MFQ_to_inch_acres_dble
       IMPLICIT NONE
 ! Local Variables
       REAL :: inch_to_mfl
@@ -2087,7 +2087,8 @@ C
       Mfl_to_inch = 1.0/inch_to_mfl
       Mfl2_to_acre = Mfl2_to_acre/FT2_PER_ACRE
       Inch_to_mfl_t = inch_to_mfl/DELT  ! will need to move if DELT allowed to change
-      MFQ_to_inch_acres = SNGL( DELT*Mfl2_to_acre*Mfl_to_inch )
+      MFQ_to_inch_acres = DELT*Mfl2_to_acre*Mfl_to_inch
+      MFQ_to_inch_acres_dble = DBLE( MFQ_to_inch_acres )
 
       Sfr_conv = Mft_to_sec/Mfl3_to_ft3
       Mfl3t_to_cfs = Mfl3_to_ft3/Mft_to_sec
