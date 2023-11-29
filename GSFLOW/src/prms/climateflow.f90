@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2023-08-10'
+      character(len=*), parameter :: Version_climateflow = '2023-10-17'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -83,13 +83,12 @@
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_moist, Basin_ag_soil_rechr
       REAL, SAVE, ALLOCATABLE :: gsflow_ag_actet(:), Ag_soil_moist(:), Ag_soil_rechr(:), Ag_soil_rechr_max(:)
       ! srunoff
-      REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:)
-      REAL, SAVE, ALLOCATABLE :: Hru_impervstor(:)
+      REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:), Hru_impervstor(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Strm_seg_in(:), strm_seg_interflow_in(:), strm_seg_sroff_in(:), strm_seg_gwflow_in(:)
       ! Surface-Depression Storage
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open(:), Dprst_vol_clos(:), Dprst_stor_hru(:)
-      REAL, SAVE, ALLOCATABLE :: Dprst_total_open_in(:), Dprst_total_open_out(:)
-      REAL, SAVE, ALLOCATABLE :: Dprst_total_clos_in(:), Dprst_total_clos_out(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_open_in(:), Dprst_total_open_out(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_clos_in(:), Dprst_total_clos_out(:)
       ! gwflow
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwres_stor(:)
       ! lakes
@@ -324,7 +323,6 @@ end module PRMS_IT0_VARS
 
 ! Potential ET Variables
       ALLOCATE ( Potet(Nhru) )
-      IF ( Nlake > 0 ) ALLOCATE ( It0_potet(Nhru) )
       CALL declvar_real(Et_module, 'potet', 'nhru', Nhru, &
      &     'Potential ET for each HRU', &
      &     'inches', Potet)
@@ -470,10 +468,6 @@ end module PRMS_IT0_VARS
      &     'Basin area-weighted average ET from capillary reservoirs', &
      &     'inches', Basin_perv_et)
 
-      CALL declvar_dble(Soilzone_module, 'basin_lakeevap', 'one', 1, &
-     &     'Basin area-weighted average lake evaporation', &
-     &     'inches', Basin_lakeevap)
-
       ALLOCATE ( Ssres_in(Nssr) )
       CALL declvar_real(Soilzone_module, 'ssres_in', 'nssr', Nssr, &
      &     'Inflow to the gravity and preferential-flow reservoirs for each HRU', &
@@ -501,7 +495,6 @@ end module PRMS_IT0_VARS
      &       'inches', Gravity_stor_res)
       ENDIF
 
-
 ! gwflow
       IF ( GSFLOW_flag==OFF ) THEN
         ALLOCATE ( Gwres_stor(Nhru) )
@@ -526,6 +519,10 @@ end module PRMS_IT0_VARS
      &     'Surface runoff to the stream network for each HRU', &
      &     'inches', Sroff)
 
+      CALL declvar_dble(Srunoff_module, 'basin_sroff', 'one', 1, &
+     &     'Basin area-weighted average surface runoff to the stream network', &
+     &     'inches', Basin_sroff)
+
       ALLOCATE ( Hru_impervstor(Nhru), It0_hru_impervstor(Nhru) )
       CALL declvar_real(Srunoff_module, 'hru_impervstor', 'nhru', Nhru, &
      &     'HRU area-weighted average storage on impervious area for each HRU', &
@@ -549,10 +546,6 @@ end module PRMS_IT0_VARS
      &       'Interflow to each stream segment as a result of cascading flow in each stream segment', &
      &       'cfs', strm_seg_interflow_in)
       ENDIF
-
-      CALL declvar_dble(Srunoff_module, 'basin_sroff', 'one', 1, &
-     &     'Basin area-weighted average surface runoff to the stream network', &
-     &     'inches', Basin_sroff)
 
 ! stream flow
       CALL declvar_dble(Strmflow_module, 'basin_cfs', 'one', 1, &
@@ -616,16 +609,19 @@ end module PRMS_IT0_VARS
      &       'cfs', Seg_upstream_inflow)
       ENDIF
 
-      CALL declvar_dble(Strmflow_module, 'basin_lake_stor', 'one', 1, &
-     &     'Basin volume-weighted average storage for all lakes using broad-crested weir or gate opening routing', &
-     &     'inches', Basin_lake_stor)
-
-      IF ( Nlake>0 ) THEN
+      IF ( Nlake>0 ) THEN 
+        ALLOCATE ( It0_potet(Nhru) )
+        CALL declvar_dble(Soilzone_module, 'basin_lakeevap', 'one', 1, &
+     &       'Basin area-weighted average lake evaporation', &
+     &       'inches', Basin_lakeevap)
         ALLOCATE ( Lake_vol(Nlake) )
         CALL declvar_dble(Strmflow_module, 'lake_vol', 'nlake', Nlake, &
      &       'Storage in each lake using broad-crested weir or gate opening routing', &
      &       'acre-feet', Lake_vol)
       ENDIF
+      CALL declvar_dble(Strmflow_module, 'basin_lake_stor', 'one', 1, &
+     &     'Basin volume-weighted average storage for all lakes using broad-crested weir or gate opening routing', &
+     &     'inches', Basin_lake_stor)
 
       IF ( Dprst_flag==ACTIVE ) THEN
         ALLOCATE ( It0_dprst_vol_open(Nhru), It0_dprst_vol_clos(Nhru) )
@@ -643,16 +639,16 @@ end module PRMS_IT0_VARS
      &       'inches', Dprst_stor_hru)
         ALLOCATE ( Dprst_total_open_in(Nhru), Dprst_total_open_out(Nhru) )
         ALLOCATE ( Dprst_total_clos_in(Nhru), Dprst_total_clos_out(Nhru) )
-        CALL declvar_real(Srunoff_module, 'dprst_total_open_in', 'nhru', Nhru, &
+        CALL declvar_dble(Srunoff_module, 'dprst_total_open_in', 'nhru', Nhru, &
      &       'Total volume flowing in to open surface depressions for each HRU', &
      &       'acre-inches', Dprst_total_open_in)
-        CALL declvar_real(Srunoff_module, 'dprst_total_open_out', 'nhru', Nhru, &
+        CALL declvar_dble(Srunoff_module, 'dprst_total_open_out', 'nhru', Nhru, &
      &       'Total volume flowing out of open surface depressions for each HRU', &
      &       'acre-inches', Dprst_total_open_out)
-        CALL declvar_real(Srunoff_module, 'dprst_total_clos_in', 'nhru', Nhru, &
+        CALL declvar_dble(Srunoff_module, 'dprst_total_clos_in', 'nhru', Nhru, &
      &       'Total volume flowing in to closed surface depressions for each HRU', &
      &       'acre-inches', Dprst_total_clos_in)
-        CALL declvar_real(Srunoff_module, 'dprst_total_clos_out', 'nhru', Nhru, &
+        CALL declvar_dble(Srunoff_module, 'dprst_total_clos_out', 'nhru', Nhru, &
      &       'Total volume flowing out of closed surface depressions for each HRU', &
      &       'acre-inches', Dprst_total_clos_out)
       ENDIF
@@ -1063,13 +1059,13 @@ end module PRMS_IT0_VARS
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nevap, Nlake, Ntemp, Nrain, Nsol, &
      &    Print_debug, Init_vars_from_file, Temp_flag, Precip_flag, &
-     &    Temp_module, Stream_order_flag, GSFLOW_flag, Hru_type, &
-     &    Precip_module, Solrad_module, Et_module, PRMS4_flag, &
+     &    Temp_module, Precip_module, Solrad_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Et_flag, Dprst_flag, Solrad_flag, &
-     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, AG_flag, Glacier_flag
+     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, Glacier_flag, Stream_order_flag, &
+     &    GSFLOW_flag, AG_flag, Hru_type
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
-      USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv
+      USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv, Hru_area, Basin_area_inv
       use prms_utils, only: c_to_f, checkdim_bounded_limits, checkdim_param_limits, f_to_c, read_error
       IMPLICIT NONE
 ! Local variables
@@ -1348,6 +1344,8 @@ end module PRMS_IT0_VARS
              DEALLOCATE ( Soil_moist_init_frac, Soil_rechr_init_frac )
       ENDIF
       ! check parameters
+      Basin_soil_moist = 0.0D0 ! set because these are saved in It0 variables in prms_time
+      Basin_ssstor = 0.0D0
       DO i = 1, Nhru
         IF ( Hru_type(i)==INACTIVE .OR. Hru_type(i)==LAKE ) CYCLE
         ! hru_type = land or swale or glacier
@@ -1356,24 +1354,26 @@ end module PRMS_IT0_VARS
           Soil_moist(i) = 0.0
           Soil_rechr(i) = 0.0
         ENDIF
-!        IF ( Soil_moist_max(i)<0.00001 ) THEN
-!          IF ( Parameter_check_flag>0 ) THEN
-!            PRINT 9006, i, Soil_moist_max(i)
-!            ierr = 1
-!          ELSE
-!            Soil_moist_max(i) = 0.00001
-!            IF ( Print_debug>DEBUG_less ) PRINT 9008, i
-!          ENDIF
-!        ENDIF
-!        IF ( Soil_rechr_max(i)<0.00001 ) THEN
-!          IF ( Parameter_check_flag>0 ) THEN
-!            PRINT 9007, i, Soil_rechr_max(i)
-!            ierr = 1
-!          ELSE
-!            Soil_rechr_max(i) = 0.00001
-!            IF ( Print_debug>DEBUG_less ) PRINT 9009, i
-!          ENDIF
-!        ENDIF
+        IF ( AG_flag==OFF ) THEN
+          IF ( Soil_moist_max(i)<0.00001 ) THEN
+            IF ( Parameter_check_flag>0 ) THEN
+              PRINT 9006, i, Soil_moist_max(i)
+              ierr = 1
+            ELSE
+              Soil_moist_max(i) = 0.00001
+              IF ( Print_debug>DEBUG_less ) PRINT 9008, i
+            ENDIF
+          ENDIF
+          IF ( Soil_rechr_max(i)<0.00001 ) THEN
+            IF ( Parameter_check_flag>0 ) THEN
+              PRINT 9007, i, Soil_rechr_max(i)
+              ierr = 1
+            ELSE
+              Soil_rechr_max(i) = 0.00001
+              IF ( Print_debug>DEBUG_less ) PRINT 9009, i
+            ENDIF
+          ENDIF
+        ENDIF
         IF ( Soil_rechr_max(i)>Soil_moist_max(i) ) THEN
           IF ( Parameter_check_flag>0 ) THEN
             PRINT 9002, i, Soil_rechr_max(i), Soil_moist_max(i)
@@ -1419,7 +1419,11 @@ end module PRMS_IT0_VARS
             Ssres_stor(i) = Sat_threshold(i)
           ENDIF
         ENDIF
+        Basin_soil_moist = Basin_soil_moist + Soil_moist(i) * Hru_perv(i)
+        Basin_ssstor = Basin_ssstor + Ssres_stor(i) * Hru_area(i)
       ENDDO
+      Basin_soil_moist = Basin_soil_moist * Basin_area_inv
+      Basin_ssstor = Basin_ssstor * Basin_area_inv
 
       IF ( ierr>0 ) STOP ERROR_PARAM
 
@@ -1427,7 +1431,7 @@ end module PRMS_IT0_VARS
 
       IF ( getparam_real(Srunoff_module, 'imperv_stor_max', Nhru, Imperv_stor_max)/=0 ) CALL read_error(2, 'imperv_stor_max')
 
-! initialize arrays (dimensioned Nhru)
+! initialize arrays (dimensioned Nhru) as needed if inactive HRUs
       Tmaxf = 0.0
       Tminf = 0.0
       Tavgf = 0.0
@@ -1469,52 +1473,14 @@ end module PRMS_IT0_VARS
           ENDIF
         ENDIF
       ENDIF
-! initialize arrays (dimensioned Nsegment)
-      IF ( Stream_order_flag==ACTIVE ) THEN
-        Seg_upstream_inflow = 0.0D0
-        Seg_lateral_inflow = 0.0D0
-      ENDIF
 
 ! initialize scalers
-      Basin_temp = 0.0D0
-      Basin_tmax = 0.0D0
-      Basin_tmin = 0.0D0
-      Basin_ppt = 0.0D0
-      Basin_obs_ppt = 0.0D0
-      Basin_rain = 0.0D0
-      Basin_snow = 0.0D0
-      Basin_horad = 0.0D0
-      Basin_potsw = 0.0D0
-      Basin_swrad = 0.0D0
-      Basin_potet = 0.0D0
       Basin_humidity = 0.0D0
-      Basin_orad = 0.0D0
-      Basin_perv_et = 0.0D0
-      Basin_actet = 0.0D0
       Basin_lakeevap = 0.0D0
-      Basin_swale_et = 0.0D0
-      Basin_soil_to_gw = 0.0D0
-      Basin_ssflow = 0.0D0
-      Basin_sroff = 0.0D0
-      Solrad_tmax = 0.0
-      Solrad_tmin = 0.0
-      Basin_cfs = 0.0D0
-      Basin_cms = 0.0D0
-      Basin_stflow_in = 0.0D0
-      Basin_stflow_out = 0.0D0
-      Basin_ssflow_cfs = 0.0D0
-      Basin_sroff_cfs = 0.0D0
-      Basin_gwflow_cfs = 0.0D0
       Flow_out = 0.0D0
-      Orad = 0.0
-
-      Snow_evap = 0.0
-      Snowmelt = 0.0
 
       IF ( Init_vars_from_file>0 .OR. ierr>0 ) RETURN
 
-      Basin_soil_moist = 0.0D0
-      Basin_ssstor = 0.0D0
       Basin_lake_stor = 0.0D0
       Basin_transp_on = OFF
 ! initialize arrays (dimensioned Nsegment)
@@ -1525,10 +1491,7 @@ end module PRMS_IT0_VARS
       Transp_on = OFF
 ! initialize storage variables
       Imperv_stor = 0.0
-      Basin_pweqv = 0.0D0
       Pkwater_equiv = 0.0D0
-      Pk_depth = 0.0D0
-      Snowcov_area = 0.0
       IF ( Glacier_flag==1 ) THEN
         Glacrb_melt = 0.0
         Glacier_frac = 0.0
@@ -1553,10 +1516,10 @@ end module PRMS_IT0_VARS
  9023 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max', 2F10.5)
  9024 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max', 2F10.5)
  9025 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr > ag_soil_moist based on init and max values', 2F10.5)
-! 9006 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_max < 0.00001', F10.5)
-! 9007 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max < 0.00001', F10.5)
-! 9008 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_moist_max < 0.00001, set to 0.00001')
-! 9009 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr_max < 0.00001, set to 0.00001')
+ 9006 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_max < 0.00001', F10.5)
+ 9007 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max < 0.00001', F10.5)
+ 9008 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_moist_max < 0.00001, set to 0.00001')
+ 9009 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr_max < 0.00001, set to 0.00001')
  9012 FORMAT ('WARNING, HRU: ', I0, ' soil_rechr_max > soil_moist_max,', 2F10.5, /, 9X, &
      &        'soil_rechr_max set to soil_moist_max')
  9013 FORMAT ('WARNING, HRU: ', I0, ' soil_rechr_init > soil_rechr_max,', 2F10.5, /, 9X, &
@@ -1582,7 +1545,7 @@ end module PRMS_IT0_VARS
       SUBROUTINE temp_set(Ihru, Tmax, Tmin, Tmaxf, Tminf, Tavgf, Tmaxc, Tminc, Tavgc, Hru_area)
       USE PRMS_CLIMATEVARS, ONLY: Basin_temp, Basin_tmax, Basin_tmin, Temp_units, Tmax_hru, Tmin_hru
       USE PRMS_CONSTANTS, ONLY: MINTEMP, MAXTEMP, ERROR_temp, DEBUG_less, ACTIVE
-      USE PRMS_MODULE, ONLY: Print_debug, forcing_check_flag
+      USE PRMS_MODULE, ONLY: forcing_check_flag, Print_debug
       use prms_utils, only: c_to_f, f_to_c, print_date
       IMPLICIT NONE
 ! Arguments
@@ -1650,7 +1613,7 @@ end module PRMS_IT0_VARS
       SUBROUTINE precip_form(Precip, Hru_ppt, Hru_rain, Hru_snow, Tmaxf, &
      &           Tminf, Pptmix, Newsnow, Prmx, Tmax_allrain_f, Rain_adj, &
      &           Snow_adj, Adjmix_rain, Hru_area, Sum_obs, Tmax_allsnow_f, Ihru)
-      USE PRMS_CONSTANTS, ONLY: NEARZERO !, ACTIVE, DEBUG_minimum
+!      USE PRMS_CONSTANTS, ONLY: ACTIVE, DEBUG_minimum
 !      USE PRMS_MODULE, ONLY: Print_debug, forcing_check_flag
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       use prms_utils, only: print_date
@@ -1692,7 +1655,7 @@ end module PRMS_IT0_VARS
           PRINT *, 'ERROR, tmax < tmin (degrees Fahrenheit), tmax:', Tmaxf, ' tmin:', TminF
           CALL print_date(1)
         ENDIF
-        IF ( ABS(tdiff)<NEARZERO ) tdiff = 0.0001
+        IF ( ABS(tdiff)<0.0001 ) tdiff = 0.0001
         Prmx = ((Tmaxf-Tmax_allsnow_f)/tdiff)*Adjmix_rain
         IF ( Prmx<0.0 ) Prmx = 0.0
 

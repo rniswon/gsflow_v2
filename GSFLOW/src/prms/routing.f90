@@ -315,7 +315,7 @@
       use prms_utils, only: read_error, write_outfile
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: MOD
+      INTRINSIC :: MOD, ABS
 ! Local Variables
       INTEGER :: i, j, test, lval, toseg, iseg, isegerr, ierr, eseg
       REAL :: k, x, d, x_max, velocity
@@ -333,28 +333,7 @@
      &       Strmflow_flag==strmflow_muskingum_mann_module ) Segment_delta_flow = 0.0D0
       ENDIF
 
-      IF ( Hru_seg_cascades==ACTIVE ) THEN
-        Seginc_potet = 0.0D0
-        Seginc_gwflow = 0.0D0
-        Seginc_ssflow = 0.0D0
-        Seginc_sroff = 0.0D0
-        Seginc_swrad = 0.0D0
-        Seg_gwflow = 0.0D0
-        Seg_ssflow = 0.0D0
-        Seg_sroff = 0.0D0
-      ENDIF
       Hru_outflow = 0.0D0
-      Flow_to_ocean = 0.0D0
-      Flow_to_great_lakes = 0.0D0
-      Flow_out_region = 0.0D0
-      Flow_out_NHM = 0.0D0
-      Flow_terminus = 0.0D0
-      Flow_to_lakes = 0.0D0
-      Flow_in_nation = 0.0D0
-      Flow_in_region = 0.0D0
-      Flow_headwater = 0.0D0
-      Flow_in_great_lakes = 0.0D0
-      Flow_replacement = 0.0D0
 
       Cfs2acft = Timestep_seconds/FT2_PER_ACRE
 
@@ -651,8 +630,7 @@
 !     route_run - Computes segment flow states and fluxes
 !***********************************************************************
       INTEGER FUNCTION route_run()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, FT2_PER_ACRE, &
-     &    NEARZERO, DNEARZERO, OUTFLOW_SEGMENT, ERROR_param, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, OUTFLOW_SEGMENT, &
      &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
      &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
       USE PRMS_MODULE, ONLY: Nsegment, Cascade_flag, Glacier_flag
@@ -674,8 +652,6 @@
 !***********************************************************************
       route_run = 0
 
-      Cfs2acft = Timestep_seconds/FT2_PER_ACRE
-
 ! seg variables are not computed if cascades are active as hru_segment is ignored
       IF ( Hru_seg_cascades==ACTIVE ) THEN
         ! add hru_ppt, hru_actet
@@ -688,6 +664,7 @@
         Seg_sroff = 0.0D0
         Seg_ssflow = 0.0D0
       ENDIF
+
       IF ( Cascade_flag==CASCADE_OFF ) THEN
         Seg_lateral_inflow = 0.0D0
       ELSE ! use strm_seg_in for cascade_flag = 1 (CASCADE_NORMAL) or 2 (CASCADE_HRU_SEGMENT)

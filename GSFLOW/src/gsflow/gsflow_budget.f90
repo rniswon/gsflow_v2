@@ -270,10 +270,10 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, SNGL
-!      EXTERNAL MODFLOW_GET_STORAGE_BCF, MODFLOW_GET_STORAGE_LPF
-!      EXTERNAL MODFLOW_GET_STORAGE_UPW
-      EXTERNAL MODFLOW_VB_DECODE, getStreamFlow, getPump
-!     EXTERNAL getHeads, print_date
+!      EXTERNAL :: MODFLOW_GET_STORAGE_BCF, MODFLOW_GET_STORAGE_LPF
+!      EXTERNAL :: MODFLOW_GET_STORAGE_UPW
+      EXTERNAL :: MODFLOW_VB_DECODE, getStreamFlow, getPump
+!     EXTERNAL :: getHeads, print_date
 ! Local Variables
       INTEGER :: i, ihru, icell, irow, icol, ii, lake
       REAL :: flux_change, gwdisch, harea, inches_on_lake, pct
@@ -625,7 +625,7 @@
       USE GWFNWTMODULE,ONLY: Icell
       IMPLICIT NONE
 ! Functions
-      INTRINSIC ABS
+      INTRINSIC :: ABS
 ! Local Variables
       INTEGER :: i, j, k, kt, IJ
       DOUBLE PRECISION :: tled, rho1, rho2

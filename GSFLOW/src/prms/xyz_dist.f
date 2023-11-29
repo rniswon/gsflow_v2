@@ -690,7 +690,7 @@
       USE PRMS_OBS, ONLY: Rain_code
       IMPLICIT NONE
 ! Functions
-      EXTERNAL xyz_temp_run, xyz_rain_run
+      EXTERNAL :: xyz_temp_run, xyz_rain_run
 !***********************************************************************
       xyzrun = 0
 
@@ -714,7 +714,7 @@
       SUBROUTINE xyz_temp_run(Max_lapse, Min_lapse, Meantmax, Meantmin,
      +                        Temp_meanx, Temp_meany, Temp_meanz)
       USE PRMS_CONSTANTS, ONLY: DNEARZERO, GLACIER
-      USE PRMS_MODULE, ONLY: Glacier_flag, Nrain, Hru_type, Nowmonth
+      USE PRMS_MODULE, ONLY: Glacier_flag, Nrain, Nowmonth, Hru_type
       USE PRMS_XYZ_DIST, ONLY: MRUx, MRUy, Tmax_rain_sta, Solradelev,
      +    Tmin_rain_sta, Temp_nuse, Tmin_add, Tmin_div, Tmax_add,
      +    Tmax_div, Temp_nsta, X_div, Y_div, Z_div, X_add, Y_add, Z_add,

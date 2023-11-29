@@ -495,7 +495,7 @@
       use prms_utils, only: write_outfile
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: SNGL, ABS, DBLE
+      INTRINSIC :: ABS, DBLE
       EXTERNAL :: header_print
 ! Local variables
       INTEGER :: i, j, wyday, endrun, monthdays

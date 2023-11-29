@@ -144,6 +144,8 @@
       USE PRMS_STRMFLOW_CHARACTER
       USE PRMS_FLOWVARS, ONLY: Seg_outflow
       IMPLICIT NONE
+! Functions
+      INTRINSIC :: SNGL
 ! Local Variables
       INTEGER :: i
 !***********************************************************************

@@ -71,7 +71,7 @@
           heat_flux = 0.0 ! Irmak and others (2012) says equal to zero for daily time step ! G
 
 ! Dew point temperature (Lawrence(2005) eqn. 8), degrees C
-! Hru_humidity_sta is input as percent so divided by 100 to be in units of decimal fraction
+! Humidity is input as percent so divided by 100 to be in units of decimal fraction
           A1 = 17.625
           B1 = 243.04
           t1 = A1 * Tavgc(i) / (B1 + Tavgc(i))

@@ -118,7 +118,7 @@
       use prms_utils, only: PRMS_open_module_file, read_error
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: SIN, COS, DBLE
+      INTRINSIC :: SIN, COS, DBLE, SNGL
 !     INTRINSIC :: ASIN
       EXTERNAL :: compute_soltab
 ! Local Variables
@@ -220,7 +220,7 @@
       ENDIF
 
       DEALLOCATE ( Hru_slope )
-      IF ( Glacier_flag==OFF ) DEALLOCATE ( Hru_aspect )
+      IF ( Glacier_flag==OFF ) DEALLOCATE ( Hru_aspect, Hru_lat )
 
       END FUNCTION sthinit
 
@@ -234,10 +234,10 @@
       USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, DNEARZERO
       USE PRMS_SOLTAB, ONLY: PI, TWOPI, RADIANS, PI_12
       IMPLICIT NONE
-      EXTERNAL compute_t
+      EXTERNAL :: compute_t
 !     Functions
       DOUBLE PRECISION, EXTERNAL :: func3
-      INTRINSIC ASIN, SIN, COS, ATAN, ABS
+      INTRINSIC :: ASIN, SIN, COS, ATAN, ABS
 !     Arguments
       INTEGER, INTENT(IN) :: Hru_type, Id
       DOUBLE PRECISION, INTENT(IN), DIMENSION(MAX_DAYS_PER_YEAR) :: Obliquity, Solar_declination
@@ -375,7 +375,7 @@
       SUBROUTINE compute_t(Lat, Solar_declination, T)
       USE PRMS_SOLTAB, ONLY: PI
       IMPLICIT NONE
-      INTRINSIC TAN, ACOS
+      INTRINSIC :: TAN, ACOS
 ! Arguments
       DOUBLE PRECISION, INTENT(IN) :: Lat, Solar_declination
       DOUBLE PRECISION, INTENT(OUT) :: T
@@ -410,7 +410,7 @@
       DOUBLE PRECISION FUNCTION func3(V, W, X, Y, R1, Solar_declination)
       USE PRMS_SOLTAB, ONLY: PI_12
       IMPLICIT NONE
-      INTRINSIC SIN, COS
+      INTRINSIC :: SIN, COS
 ! Arguments
       DOUBLE PRECISION, INTENT(IN) :: V, W, X, Y, R1, Solar_declination
 !***********************************************************************

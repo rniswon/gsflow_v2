@@ -64,7 +64,7 @@
       INTEGER FUNCTION basdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Dprst_flag, Lake_route_flag, &
-     &    PRMS4_flag, GSFLOW_flag, Glacier_flag, AG_flag
+     &    PRMS4_flag, Glacier_flag, GSFLOW_flag, AG_flag
       use PRMS_MMFAPI, only: declvar_real, declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_BASIN
@@ -496,8 +496,15 @@
             Hru_perv(i) = 0.0
             Hru_frac_perv(i) = 0.0
           ENDIF
-        ELSEIF ( Hru_frac_perv(i)<0.00099 .AND. Print_debug>DEBUG_less ) THEN
-          PRINT *, 'WARNING, pervious fraction recommended to be >= 0.001 for HRU:', i
+        ELSEIF ( Hru_frac_perv(i)<0.00001 .AND. AG_flag==OFF ) THEN
+          PRINT *, 'ERROR, pervious fraction must be >= 0.00001 for HRU:', i
+          PRINT *, '       pervious fraction is 1.0 - hru_percent_imperv - dprst_frac'
+          PRINT *, '       pervious fraction:', Hru_frac_perv(i)
+          PRINT *, '       impervious fraction:', Hru_percent_imperv(i)
+          IF ( Dprst_flag==ACTIVE ) PRINT *, '       depression storage fraction:', Dprst_frac(i)
+          basinit = 1
+        ELSEIF ( Hru_frac_perv(i)<0.00001 .AND. Print_debug>DEBUG_less ) THEN
+          PRINT *, 'WARNING, pervious fraction recommended to be >= 0.00001 for HRU:', i
           PRINT *, '         hru_frac_perv = 1.0 - hru_percent_imperv - dprst_frac - ag_frac'
           IF ( Hru_frac_perv(i) < CLOSEZERO ) THEN
             IF ( Dprst_frac(i) > 0.0 ) THEN

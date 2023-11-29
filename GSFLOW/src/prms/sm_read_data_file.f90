@@ -159,7 +159,7 @@ contains
       use prms_utils, only: read_error
       IMPLICIT NONE
       ! Functions
-      INTRINSIC TRANSFER
+      INTRINSIC :: TRANSFER
       ! Local Variables
       INTEGER datatime(6), jj, ios, column_end, column, nvals, var_id, i
       !real :: foo
@@ -215,7 +215,7 @@ contains
 ! check_data_variables - Check data variables and dimensions
 !***********************************************************************
   module subroutine check_data_variables(Varname, Numvalues, Values, Iflag, Iret)
-      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
+      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV, CMS
       USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Nstreamtemp, Nratetbl
       USE PRMS_OBS, ONLY: Nlakeelev, Nwind, Nhumid, &
      &    Tmin, Tmax, Precip, Snowdepth, Runoff, Pan_evap, Wind_speed, Humidity, Solrad, &
@@ -290,7 +290,7 @@ contains
           DO i = 1, Numvalues
             Runoff(i) = Values(i)
           ENDDO
-          IF ( Runoff_units==1 ) THEN
+          IF ( Runoff_units==CMS ) THEN
             DO i = 1, Nobs
               Streamflow_cms(i) = DBLE( Runoff(i) )
               Streamflow_cfs(i) = Streamflow_cms(i)/CFS2CMS_CONV

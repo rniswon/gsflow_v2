@@ -448,7 +448,7 @@
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: compute_ela_aar
-      INTRINSIC :: ABS, SQRT, SNGL, REAL
+      INTRINSIC :: ABS, SQRT, REAL
       EXTERNAL :: tag_count, sort5, glacr_restart
 ! Local Variables
       INTEGER :: i, j, ii, jj, o, p, hru_flowline(Nhru), toflowline(Nhru), doela, termh, len_str
@@ -890,7 +890,7 @@
 ! Functions
       INTEGER, EXTERNAL :: compute_ela_mb, compute_ela_aar, recompute_soltab
       INTRINSIC :: ABS, EXP, SUM, SQRT, ISNAN, SNGL, DBLE
-      EXTERNAL :: tag_count, bottom
+      EXTERNAL :: tag_count, bottom, yearly_ca_coef
 ! Local Variables
       INTEGER :: i, j, ii, jj, o, p, stact_hrus, endact_hrus, next, curr, keep, doela, dosol
       INTEGER :: thecase(Nhru), toflowline(Nhru), count_delta(Nhru), lowpt(Nhru), lowest(Nhru)
@@ -1944,7 +1944,7 @@
       IMPLICIT NONE
       INTEGER, PARAMETER :: N = 101
 ! Functions
-      EXTERNAL :: cumtrapzv, spline, splint, solve_poly
+      EXTERNAL :: cumtrapzv, spline, splint, solve_poly, getf_fgrad
       INTRINSIC :: MIN, MAX, ISNAN, SQRT
 ! Arguments
       INTEGER, INTENT(IN) :: Gln, Topn, Gl_top(Ntp), Gt(Ntp), Toflowline(Ntp), Botwrite

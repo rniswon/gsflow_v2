@@ -415,7 +415,7 @@
       USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop, Basin_dprst_volcl
       use prms_utils, only: read_error
       IMPLICIT NONE
-      EXTERNAL GSF_PRINT, gsflow_sum_restart, MODFLOW_SFR_GET_STORAGE
+      EXTERNAL :: GSF_PRINT, gsflow_sum_restart, MODFLOW_SFR_GET_STORAGE
 !***********************************************************************
       gsfsuminit = 0
 
@@ -579,7 +579,7 @@
      &    Basin_cap_infil_tot, Basin_pref_flow_infil, Basin_sz2gw, &
      &    Basin_sm2gvr, Basin_gvr2sm, Basin_gvr2pfr, Basin_dunnian,  Basin_dncascadeflow
       IMPLICIT NONE
-      INTRINSIC DBLE
+      INTRINSIC :: DBLE
 ! Local variables
       DOUBLE PRECISION :: obsq_cfs !, obsq_cms
 !     REAL :: gw_out, basinreachlatflowm3
@@ -997,8 +997,8 @@
       USE PRMS_MODULE, ONLY: KKITER, Have_lakes, Nowyear, Nowmonth, Nowday, Gsf_unt
       USE GWFSFRMODULE, ONLY: STRMDELSTOR_RATE, STRMDELSTOR_CUM, IRTFLG
       IMPLICIT NONE
-      INTRINSIC ABS
-      EXTERNAL GSFFMTNUM
+      INTRINSIC :: ABS
+      EXTERNAL :: GSFFMTNUM
 ! Arguments
       INTEGER :: Kkper, Kkstp, Nstep
 ! Local Variables
@@ -1191,7 +1191,7 @@
 !     FORMAT VALUE BASED ON VALUE SIZE
 !     ******************************************************************
       IMPLICIT NONE
-      INTRINSIC ABS, INT
+      INTRINSIC :: ABS, INT
 ! Arguments
       DOUBLE PRECISION, INTENT(IN) :: Val
       CHARACTER(LEN=*), INTENT(OUT) :: Strng

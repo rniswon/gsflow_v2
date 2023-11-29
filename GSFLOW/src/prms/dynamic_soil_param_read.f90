@@ -384,8 +384,8 @@
           ENDIF
 
           IF ( check_dprst_depth_flag==ACTIVE ) THEN
-            Dprst_vol_clos_max(i) = DBLE( Dprst_area_clos_max(i)*Dprst_depth_avg(i) )
-            Dprst_vol_open_max(i) = DBLE( Dprst_area_open_max(i)*Dprst_depth_avg(i) )
+            Dprst_vol_clos_max(i) = Dprst_area_clos_max(i)*Dprst_depth_avg(i)
+            Dprst_vol_open_max(i) = Dprst_area_open_max(i)*Dprst_depth_avg(i)
             Dprst_vol_thres_open(i) = Dprst_vol_open_max(i)*DBLE(Op_flow_thres(i))
           ENDIF
         ENDDO
@@ -602,20 +602,20 @@
                 ENDIF
                 IF ( frac_dprst>0.0 ) THEN
                   ! update variables as dprst could have gone from positive value to 0 and not get updated in srunoff
-                  IF ( Dprst_vol_open_max(i)>0.0 ) THEN
-                    Dprst_vol_open_frac(i) = SNGL( Dprst_vol_open(i)/Dprst_vol_open_max(i) )
+                  IF ( Dprst_vol_open_max(i)>0.0D0 ) THEN
+                    Dprst_vol_open_frac(i) = Dprst_vol_open(i)/Dprst_vol_open_max(i)
                   ELSE
                     Dprst_vol_open_frac(i) = 0.0D0
                   ENDIF
-                  IF ( Dprst_vol_clos_max(i)>0.0 ) THEN
-                    Dprst_vol_clos_frac(i) = SNGL( Dprst_vol_clos(i)/Dprst_vol_clos_max(i) )
+                  IF ( Dprst_vol_clos_max(i)>0.0D0 ) THEN
+                    Dprst_vol_clos_frac(i) = Dprst_vol_clos(i)/Dprst_vol_clos_max(i)
                   ELSE
                     Dprst_vol_clos_frac(i) = 0.0D0
                   ENDIF
-                  IF ( Dprst_vol_open_max(i)+Dprst_vol_clos_max(i)>0.0 ) THEN
-                    Dprst_vol_frac(i) = SNGL( (Dprst_vol_open(i)+Dprst_vol_clos(i))/(Dprst_vol_open_max(i)+Dprst_vol_clos_max(i)) )
+                  IF ( Dprst_vol_open_max(i)+Dprst_vol_clos_max(i)>0.0D0 ) THEN
+                    Dprst_vol_frac(i) = (Dprst_vol_open(i)+Dprst_vol_clos(i))/(Dprst_vol_open_max(i)+Dprst_vol_clos_max(i))
                   ELSE
-                    Dprst_vol_frac(i) = 0.0
+                    Dprst_vol_frac(i) = 0.0D0
                   ENDIF
                 ENDIF
               ENDIF

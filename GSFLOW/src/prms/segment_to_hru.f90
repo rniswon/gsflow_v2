@@ -7,7 +7,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Streamflow'
         character(len=*), parameter :: MODNAME = 'segment_to_hru'
-        character(len=*), parameter :: Version_segment_to_hru = '2022-06-06'
+        character(len=*), parameter :: Version_segment_to_hru = '2023-08-10'
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Segment_outflow_id(:)
       END MODULE PRMS_SEGMENT_TO_HRU
