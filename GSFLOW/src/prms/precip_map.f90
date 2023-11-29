@@ -35,7 +35,6 @@
      &    Basin_ppt, Basin_snow, Basin_rain, Basin_obs_ppt, Tmax_allsnow_f
       use prms_utils, only: find_current_time, find_header_end, print_date, print_module, read_error
 ! Functions
-      INTRINSIC :: SNGL
       EXTERNAL :: precip_form
 ! Local Variables
       INTEGER :: yr, mo, dy, i, hr, mn, sec, ierr, ios, j, kg, kh, istop

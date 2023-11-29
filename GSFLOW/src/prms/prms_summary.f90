@@ -6,7 +6,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Output Summary'
         character(len=*), parameter :: MODNAME = 'prms_summary'
-        character(len=*), parameter :: Version_prms_summary = '2023-01-26'
+        character(len=*), parameter :: Version_prms_summary = '2023-09-13'
         INTEGER, PARAMETER :: NVARS = 51
         INTEGER, SAVE :: Iunit
         INTEGER, SAVE, ALLOCATABLE :: Gageid_len(:)
@@ -48,7 +48,7 @@
       use prms_utils, only: checkdim_bounded_limits, print_module, PRMS_open_output_file, read_error
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: MAX !, CHAR, INDEX
+      INTRINSIC :: CHAR, INDEX, MAX
       EXTERNAL :: statvar_to_csv
 ! Local Variables
       INTEGER :: i, ios, idim !, statsON_OFF
@@ -137,9 +137,6 @@
         ELSE
           Cfs_strings = ' cfs'
         ENDIF
-
-        Basin_total_storage = 0.0D0
-        Basin_surface_storage = 0.0D0
 
         IF ( Npoigages>0 ) THEN
 !          IF ( getparam_int(MODNAME, 'parent_poigages', Npoigages, Parent_poigages)/=0 ) &

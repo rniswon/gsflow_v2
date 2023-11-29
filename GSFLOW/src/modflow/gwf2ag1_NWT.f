@@ -1049,8 +1049,6 @@
       USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS
       USE PRMS_MODULE, ONLY: Nhru
-      !USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
-      !USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS:
@@ -2475,7 +2473,7 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: DELR, DELC, IBOUND, HNEW, LBOTM, BOTM,
-     +                  RHS, IUNIT
+     +                  RHS !, IUNIT
       USE GWFBASMODULE, ONLY: TOTIM
       USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: SEG, DVRSFLW, SGOTFLW !, NUMTAB_SFR
@@ -2726,7 +2724,7 @@
       ! divide segment diversion into pond inflows
       DO L = 1, NUMIRRPOND
         K = NUMCELLSPOND(L)
-        SUBVOL = PONDFLOW(L)
+        SUBVOL = DBLE(PONDFLOW(L))
         DO IPC = 1, K
           dvt = IRRFIELDFACTPOND(IPC, L)*SUBVOL
           dvt = (done-IRRFACTPOND(IPC, L))*dvt
@@ -2785,7 +2783,7 @@
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_total_open_in,
      +    Dprst_total_open_out
-      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
+      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres_dble, MFQ_to_inch_acres
       IMPLICIT NONE
       ! ARGUMENTS:
       ! - -----------------------------------------------------------------
@@ -3184,7 +3182,7 @@ C------CALL UBUDSV TO SAVE THEM.
       
       QPOND = DZERO
       DO L = 1, NUMIRRPOND
-        QPOND = QPOND + PONDFLOW(L)
+        QPOND = QPOND + DBLE(PONDFLOW(L))
       END DO
       RIN = QPOND
       QPOND = DZERO
@@ -3193,22 +3191,24 @@ C------CALL UBUDSV TO SAVE THEM.
       DELSTOR = DZERO
       DO L = 1, NUMIRRPOND
         K = NUMCELLSPOND(L)
-        SUBVOL = PONDFLOW(L)
+        SUBVOL = DBLE(PONDFLOW(L))
         DO IPC = 1, K
           QPOND = QPOND + PONDIRRPRMS(IPC, L)
         END DO
       END DO
       ROUT = QPOND
-      DELIN = 0.0D0
-      DELOUT = 0.0D0
+      DELIN = DZERO
+      DELOUT = DZERO
       IF ( ISSFLG(kkper) == 0 ) THEN
         DO L = 1, NUMIRRPOND
           ipond = IRRPONDVAR(L)
-          DELIN = DELIN + Dprst_total_open_in(ipond)/MFQ_to_inch_acres
+          DELIN = DELIN + Dprst_total_open_in(ipond)/
+     +                    MFQ_to_inch_acres_dble
           DELOUT = DELOUT + Dprst_total_open_out(ipond)/
-     +                      MFQ_to_inch_acres 
-          PONDSTORNEW(L) = Dprst_vol_open(ipond)/MFQ_to_inch_acres
-          DELSTOR = DELSTOR + PONDSTORNEW(L) - PONDSTOROLD(L)
+     +                      MFQ_to_inch_acres_dble 
+          PONDSTORNEW(L) = SNGL( Dprst_vol_open(ipond))/
+     +                           MFQ_to_inch_acres
+          DELSTOR = DELSTOR + DBLE(PONDSTORNEW(L) - PONDSTOROLD(L))
         END DO  
       END IF
       DELIN = DELIN - RIN
@@ -3428,7 +3428,7 @@ C------CALL UBUDSV TO SAVE THEM.
 !      double precision :: tot1,tot2,tot3,tot4,tot5
       integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
-      double precision :: set_factor, etdif
+      double precision :: set_factor !, etdif
       INTRINSIC :: ABS
 ! --------------------------------------------------
 !
@@ -3556,10 +3556,10 @@ C------CALL UBUDSV TO SAVE THEM.
 !     check if there are active irrigation ponds for this stress period.
 !
       if ( NUMIRRPONDSP == 0 ) THEN
-          PONDFLOW = DZERO
-          PETPOND = DZERO
-          PONDFLOWOLD = DZERO
-          AETITERPOND = DZERO
+          PONDFLOW = SZERO
+          PETPOND = SZERO
+          PONDFLOWOLD = SZERO
+          AETITERPOND = SZERO
           return
       end if
       !
@@ -3587,9 +3587,9 @@ C------CALL UBUDSV TO SAVE THEM.
         end do
         ! convert PRMS ET deficit to MODFLOW flow
         aetold = AETITERPOND(i)
-        PETPOND(i) = pettotal
-        sup = PONDFLOW(i)
-        supold = PONDFLOWOLD(i)
+        PETPOND(i) = SNGL(pettotal)
+        sup = DBLE(PONDFLOW(i))
+        supold = DBLE(PONDFLOWOLD(i))
         PONDFLOWOLD(i) = PONDFLOW(i)
         factor = set_factor(ipond, aetold, pettotal, aettotal, sup,
      +                      supold, kper, kstp, kiter)
@@ -3603,7 +3603,7 @@ C------CALL UBUDSV TO SAVE THEM.
         AETITERPOND(i) = SNGL(aettotal)
         saveflow = PONDFLOW(i)
         if ( kiter == 1 ) then
-          PONDFLOWOLD(i) = dzero
+          PONDFLOWOLD(i) = szero
           PONDFLOW(i) = PONDFLOW(i) + SNGL(factor)
           PONDSEGFLOW(i) = PONDFLOW(i)
         else
@@ -3615,8 +3615,8 @@ C------CALL UBUDSV TO SAVE THEM.
         !set max pond irrigation rate
         !
         !1 limit pond outflow to pond storage
-        pondstor = It0_dprst_vol_open(ipond)/MFQ_to_inch_acres
-        if ( pondstor < dzero ) pondstor = dzero
+        pondstor = SNGL(It0_dprst_vol_open(ipond))/MFQ_to_inch_acres
+        if ( pondstor < szero ) pondstor = szero
         totstor = pondstor/DELT + PONDSEGFLOW(i)
         !
         !set pond inflow using demand.
@@ -3994,7 +3994,7 @@ C------CALL UBUDSV TO SAVE THEM.
       USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet, Dprst_vol_open
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row,
-     +                      Mfq_to_inch_acres
+     +                      Mfq_to_inch_acres, MFQ_to_inch_acres_dble
       IMPLICIT NONE
 ! --------------------------------------
       !arguments
@@ -4131,9 +4131,9 @@ C------CALL UBUDSV TO SAVE THEM.
                 UNIT = TSPONDUNIT(j)
                 Q = PONDSEGFLOW(I)
                 QQ = PONDFLOW(I)
-                QQQ = 0.0
+                QQQ = DZERO
                 if ( dprst_flag == 1 )   !uncommment this and next line
-     +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+     +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres_dble
                 CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
      +                          Q, QQ, QQQ)
               END IF
@@ -4153,8 +4153,8 @@ C------CALL UBUDSV TO SAVE THEM.
           do i = 1, NUMIRRPOND
              hru_id = IRRPONDVAR(i)  !these are hru ids for ponds
              if ( hru_id == k ) then
-               Q = PETPOND(i)
-               QQ = AETITERPOND(i)
+               Q = DBLE(PETPOND(i))
+               QQ = DBLE(AETITERPOND(i))
                QQQ = DZERO
                unit = TSPONDETUNIT(j)
                CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,
@@ -4199,8 +4199,8 @@ C------CALL UBUDSV TO SAVE THEM.
         unit = TSPONDETALLUNIT
         hru_id = 0  !dummy value for all ponds
         do i = 1, NUMIRRPONDSP
-          Q = Q + PETPOND(i)
-          QQ = QQ + AETITERPOND(i)
+          Q = Q + DBLE(PETPOND(i))
+          QQ = QQ + DBLE(AETITERPOND(i))
           QQQ = DZERO
         end do
         CALL timeseries(unit, Kkper, Kkstp, TOTIM, hru_id,

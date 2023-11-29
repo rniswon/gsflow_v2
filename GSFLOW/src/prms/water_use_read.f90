@@ -65,7 +65,7 @@
       use prms_utils, only: error_stop, find_current_file_time, find_header_end, print_module, PRMS_open_module_file, read_error
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: SNGL, DBLE
+      INTRINSIC :: DBLE
       EXTERNAL :: read_event
 ! Local Variables
       INTEGER, SAVE :: external_unit, external_next_year, external_next_month, external_next_day

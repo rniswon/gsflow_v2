@@ -469,7 +469,7 @@ contains
     ! Arguments
     character(LEN=*), intent(IN) :: Varname
     ! Functions
-    intrinsic TRIM
+    intrinsic :: TRIM
     ! Local Variables
     integer :: i
     !***********************************************************************

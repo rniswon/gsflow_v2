@@ -17,7 +17,7 @@
       DOUBLE PRECISION, SAVE :: Monthdays
       INTEGER, SAVE, ALLOCATABLE :: Monthlyunit(:), Yearlyunit(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Nsegment_var_monthly(:, :), Nsegment_var_yearly(:, :)
-! Paramters
+! Parameters
       INTEGER, SAVE, ALLOCATABLE :: Nhm_seg(:)
 ! Control Parameters
       INTEGER, SAVE :: NsegmentOutVars, NsegmentOut_freq, NsegmentOut_format

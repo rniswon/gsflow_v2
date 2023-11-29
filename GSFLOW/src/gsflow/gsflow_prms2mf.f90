@@ -167,7 +167,7 @@
       use prms_utils, only: read_error
       USE GLOBAL, ONLY: NLAY, NROW, NCOL
       IMPLICIT NONE
-      INTRINSIC ABS, DBLE
+      INTRINSIC :: ABS, DBLE
 ! Local Variables
       INTEGER :: is, i, ii, ierr, ihru, icell, irow, icol
 !     INTEGER :: iseg, max_seg, irch
@@ -412,7 +412,7 @@
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: toStream
-      EXTERNAL Bin_percolation, toIrr
+      EXTERNAL :: Bin_percolation, toIrr
 ! Local Variables
       INTEGER :: irow, icol, ik, jk, ii, ilake
       INTEGER :: j, icell, ihru, is_draining
@@ -533,7 +533,7 @@
       USE PRMS_MODULE, ONLY: Nsegment
       USE PRMS_FLOWVARS, ONLY: Strm_seg_in
       IMPLICIT NONE
-      INTRINSIC SNGL
+      INTRINSIC :: SNGL
 ! Local Variables
       INTEGER :: j, k, iseg
 !     INTEGER :: num_rch
@@ -614,7 +614,7 @@
       USE GLOBAL, ONLY: HNEW, BOTM, IBOUND, NLAY
       USE PRMS_MODULE, ONLY: Ngwcell
       IMPLICIT NONE
-      INTRINSIC ABS
+      INTRINSIC :: ABS
 ! Local Variables
       INTEGER :: icell, irow, icol, ij1, ij2, land, ij2m1, ill
       REAL :: finfvks, finfprms, finf_temp, celtop

@@ -245,7 +245,7 @@
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
      &    Hru_frac_perv, Lake_hru_id
       USE PRMS_FLOWVARS, ONLY: Ssres_stor, Soil_moist, Pkwater_equiv, Gwres_stor, Sroff, Ssres_flow, Lake_vol, &
-                               Dprst_stor_hru, Hru_impervstor, Hru_intcpstor
+     &    Hru_impervstor, Dprst_stor_hru, Hru_intcpstor
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Cfs2inches
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
       USE PRMS_SOILZONE, ONLY: Lakein_sz

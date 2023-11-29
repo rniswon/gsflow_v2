@@ -7,7 +7,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'obs'
-      character(len=*), parameter :: Version_obs = '2023-08-30'
+      character(len=*), parameter :: Version_obs = '2023-10-06'
       INTEGER, SAVE :: Nlakeelev, Nwind, Nhumid, Rain_flag
 !   Declared Variables
       INTEGER, SAVE :: Rain_day
@@ -163,7 +163,7 @@
       ENDIF
 
       IF ( Nstreamtemp>0 ) THEN
-        ALLOCATE ( Stream_temp(Nwind) )
+        ALLOCATE ( Stream_temp(Nstreamtemp) )
         CALL declvar_real(MODNAME, 'stream_temp', 'nstreamtemp', Nstreamtemp, &
      &       'Stream temperature at each measurement station', &
      &       'degrees Celsius', Stream_temp)
@@ -213,7 +213,7 @@
       INTEGER FUNCTION obsinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR, CFS
       use PRMS_READ_PARAM_FILE, only: getparam_int
-      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Nstreamtemp
+      USE PRMS_MODULE, ONLY: Nobs
       USE PRMS_OBS
       use prms_utils, only: read_error
       IMPLICIT NONE
@@ -229,24 +229,6 @@
         IF ( getparam_int(MODNAME, 'rain_code', MONTHS_PER_YEAR, Rain_code)/=0 ) CALL read_error(2, 'rain_code')
       ENDIF
 
-      IF ( Nobs>0 ) THEN
-        Runoff = 0.0
-        Streamflow_cfs = 0.0D0
-        Streamflow_cms = 0.0D0
-      ENDIF
-      IF ( Nrain>0 ) Precip = 0.0
       Rain_day = OFF
-      IF ( Ntemp>0 ) THEN
-        Tmax = 0.0
-        Tmin = 0.0
-      ENDIF
-      IF ( Nsol>0 ) Solrad = 0.0
-      IF ( Nevap>0 ) Pan_evap = 0.0
-      IF ( Nsnow>0 ) Snowdepth = 0.0
-      IF ( Nlakeelev>0 ) Lake_elev = 0.0
-      IF ( Nratetbl>0 ) Gate_ht = 0.0
-      IF ( Nhumid>0 ) Humidity = 0.0
-      IF ( Nwind>0 ) Wind_speed = 0.0
-      IF ( Nstreamtemp>0 ) Stream_temp = 0.0
 
       END FUNCTION obsinit

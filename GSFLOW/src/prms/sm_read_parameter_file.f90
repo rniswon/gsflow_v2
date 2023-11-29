@@ -12,7 +12,7 @@ contains
     use prms_utils, only: numchars, PRMS_open_input_file, read_error, write_outfile
     implicit none
       ! Functions
-    intrinsic TRIM
+    intrinsic :: TRIM
     ! Local Variables
     character(LEN=16) :: string, dimname
     character(LEN=MAXLINE_LENGTH) :: line
@@ -953,7 +953,7 @@ contains
 
 !***********************************************************************
 ! setdimension
-! set dimension value in data structure based on value in Paramter File
+! set dimension value in data structure based on value in Parameter File
 !***********************************************************************
   module subroutine setdimension(Dimname, Dim)
     use prms_utils, only: numchars

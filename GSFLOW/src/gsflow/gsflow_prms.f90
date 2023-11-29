@@ -48,10 +48,9 @@
       INTEGER, EXTERNAL :: strmflow, subbasin, basin_sum, map_results, write_climate_hru
       INTEGER, EXTERNAL :: strmflow_in_out, muskingum, muskingum_lake
       INTEGER, EXTERNAL :: water_use_read, dynamic_param_read, potet_pm_sta
-      INTEGER, EXTERNAL :: stream_temp, glacr
-      INTEGER, EXTERNAL :: dynamic_soil_param_read, strmflow_character
+      INTEGER, EXTERNAL :: stream_temp, glacr, dynamic_soil_param_read, strmflow_character
       EXTERNAL :: precip_map, temp_map, segment_to_hru
-      EXTERNAL :: water_balance, cloud_cover
+      EXTERNAL :: water_balance
       EXTERNAL :: prms_summary, convert_params, gsflow_prms2modsim, gsflow_modsim2prms
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
 ! Local Variables
@@ -93,10 +92,8 @@
       ELSEIF ( Process_flag==DECL ) THEN
         CALL DATE_AND_TIME(VALUES=Elapsed_time_start)
         Execution_time_start = Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
-     &                         Elapsed_time_start(7) + Elapsed_time_start(8)*0.001
+     &                         Elapsed_time_start(7) + INT(Elapsed_time_start(8)*0.001)
         PRINT 9003, 'start', (Elapsed_time_start(i),i=1,3), (Elapsed_time_start(i),i=5,7)
-
-
         IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active, GSFLOW, PRMS, MODSIM-PRMS, MODSIM-PRMS_AG
           IF ( check_dims(Nsegshold, Nlakeshold)/=0 ) ERROR STOP ERROR_dim
 
@@ -116,7 +113,7 @@
      &        '       Precip Dist: precip_1sta, precip_laps, precip_dist2,', /, &
      &        '                    climate_hru, precip_map', /, &
      &        'Temp & Precip Dist: xyz_dist, ide_dist', /, &
-     &        '    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover', /, &
+     &        '    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru', /, &
      &        'Transpiration Dist: transp_tindex, climate_hru, transp_frost', /, &
      &        '      Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,', /, &
      &        '                    potet_hs, potet_pt, potet_pm, potet_pm_sta', /, &
@@ -381,8 +378,6 @@
         RETURN
       ENDIF
 
-      IF ( Cloud_flag==ACTIVE ) CALL cloud_cover()
-
       IF ( Climate_swrad_flag==0 ) THEN
         IF ( Solrad_flag==ddsolrad_module ) THEN
           ierr = ddsolrad()
@@ -440,7 +435,6 @@
         ierr = intcp()
 
         IF ( no_snow_flag==OFF ) THEN
-          ! rsr, need to do something if snow_cbh_flag=1
           ierr = snowcomp()
 
           IF ( Glacier_flag==1 ) ierr = glacr()
@@ -477,8 +471,6 @@
             ENDIF
 
             IF ( seg2hru_flag==ACTIVE ) CALL segment_to_hru()
-
-            !IF ( Stream_order_flag==ACTIVE ) ierr = strmflow_character()
 
             IF ( Stream_temp_flag==ACTIVE ) THEN
                  ierr = strmflow_character()
@@ -547,7 +539,7 @@
       ELSEIF ( Process_flag==CLEAN ) THEN
         CALL DATE_AND_TIME(VALUES=Elapsed_time_end)
         Execution_time_end = Elapsed_time_end(5)*3600 + Elapsed_time_end(6)*60 + &
-     &                       Elapsed_time_end(7) + Elapsed_time_end(8)*0.001
+     &                       Elapsed_time_end(7) + INT(Elapsed_time_end(8)*0.001)
         Elapsed_time = Execution_time_end - Execution_time_start
         Elapsed_time_minutes = INT(Elapsed_time/60.0)
         IF ( PRMS_only==ACTIVE ) THEN
@@ -579,7 +571,7 @@
      &          '  Set control parameter parameter_check_flag to 0 after', &
      &          '  all parameter values are valid.'
           PRINT '(/,A,/,A,/,A,/,A,/,A,/)', &
-     &          'If input errors are related to paramters used for automated', &
+     &          'If input errors are related to parameters used for automated', &
      &          'calibration processes, with CAUTION, set control parameter', &
      &          'parameter_check_flag to 0. After calibration set the', &
      &          'parameter_check_flag to 1 to verify that those calibration', &
@@ -953,14 +945,12 @@
       ENDIF
 
       IF ( control_integer(Orad_flag, 'orad_flag')/=0 ) Orad_flag = OFF
-      Cloud_flag = OFF
       IF ( Solrad_module(:8)=='ddsolrad' ) THEN
         Solrad_flag = ddsolrad_module
       ELSEIF ( Solrad_module(:11)=='climate_hru' ) THEN
         Solrad_flag = climate_hru_module
         Climate_swrad_flag = ACTIVE
       ELSEIF ( Solrad_module(:8)=='ccsolrad' ) THEN
-        Cloud_flag = ACTIVE
         Solrad_flag = ccsolrad_module
       ELSE
         PRINT '(/,2A)', 'ERROR, invalid solrad_module value: ', Solrad_module
@@ -1305,7 +1295,7 @@
 
       IF ( Nsegment<1 ) THEN
         IF ( Stream_order_flag==ACTIVE .OR. Call_cascade==1 ) THEN
-          PRINT *, 'ERROR, streamflow and cascade routing require nsegment > 0, specified as:', Nsegment
+          PRINT *, 'ERROR, streamflow and cascade routing requires nsegment > 0, specified as:', Nsegment
           Inputerror_flag = 1
         ENDIF
       ENDIF

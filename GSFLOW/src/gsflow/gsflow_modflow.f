@@ -44,7 +44,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
      &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,',
      &        /, 25X, 'AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
 
-        WRITE(*,'(24X,A)') 'Github Commit Hash d48bb09'
+        WRITE(*,'(24X,A)') 'Github Commit Hash b401d0a'
 
         ! Allocate local module variables
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
@@ -475,7 +475,7 @@ c     USE LMGMODULE
       INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms
       EXTERNAL :: MODSIM2SFR, SFR2MODSIM, LAK2MODSIM
-      INTRINSIC MIN
+      INTRINSIC :: MIN
 ! Local Variables
       INTEGER :: retval, KITER, iss, iprt, I !, II, IBDRET
 !      INTEGER :: IC1, IC2, IR1, IR2, IL1, IL2, IDIR
@@ -1471,7 +1471,7 @@ C
       USE PRMS_SET_TIME, ONLY: Timestep_seconds
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
-      INTRINSIC ABS
+      INTRINSIC :: ABS
 !***********************************************************************
 C7------SIMULATE EACH STRESS PERIOD.
         IF ( KSTP == 0 ) KKSTP = 1
@@ -1618,7 +1618,7 @@ C
      1    Nowyear, Nowmonth, Nowday, Model, mf_nowtime
       use prms_utils, only: compute_julday
       IMPLICIT NONE
-      INTRINSIC DBLE
+      INTRINSIC :: DBLE
 ! Local Variables
       INTEGER :: KPERTEST, now
 !     ------------------------------------------------------------------
@@ -1919,7 +1919,7 @@ C
      &    Totalarea_mf
       USE GWFUZFMODULE, ONLY: IUZFBND
       IMPLICIT NONE
-      INTRINSIC DBLE
+      INTRINSIC :: DBLE
 ! Local Variables
       INTEGER :: icell, ierr, i, irow, icol
       DOUBLE PRECISION :: pctdiff
@@ -2050,7 +2050,7 @@ C
      &    Mfl2_to_acre, Mfl3_to_ft3, Mfl_to_inch, Sfr_conv,
      &    Acre_inches_to_mfl3, Inch_to_mfl_t, Mfl3t_to_cfs,
      &    Mfvol2inch_conv, Gvr2cell_conv, Mfq2inch_conv,
-     &    Acre_inches_to_mfl3_sngl
+     &    Acre_inches_to_mfl3_sngl, MFQ_to_inch_acres_dble
       IMPLICIT NONE
 ! Local Variables
       REAL :: inch_to_mfl
@@ -2087,7 +2087,8 @@ C
       Mfl_to_inch = 1.0/inch_to_mfl
       Mfl2_to_acre = Mfl2_to_acre/FT2_PER_ACRE
       Inch_to_mfl_t = inch_to_mfl/DELT  ! will need to move if DELT allowed to change
-      MFQ_to_inch_acres = SNGL( DELT*Mfl2_to_acre*Mfl_to_inch )
+      MFQ_to_inch_acres = DELT*Mfl2_to_acre*Mfl_to_inch
+      MFQ_to_inch_acres_dble = DBLE( MFQ_to_inch_acres )
 
       Sfr_conv = Mft_to_sec/Mfl3_to_ft3
       Mfl3t_to_cfs = Mfl3_to_ft3/Mft_to_sec

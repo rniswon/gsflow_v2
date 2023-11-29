@@ -414,7 +414,7 @@
               WRITE ( Yrunit(jj), 9002 ) Prevyr, Prevmo, Prevday, ' Basin yearly mean:', Basin_var_yr(jj)
 
               IF ( Mapflg==ACTIVE ) THEN
-                CALL write_results(Yrunit(jj), Map_var_yr(1,jj))
+                CALL write_results(Yrunit(jj), Map_var_yr(:,jj))
               ELSE
                 Map_var_id = 0.0D0
                 DO k = 1, Nhrucell
@@ -486,7 +486,7 @@
 
           WRITE ( Dailyunit(jj), 9002 ) Nowyear, Nowmonth, Nowday, ' Basin daily mean:', Basin_var_daily(jj)
           IF ( Mapflg==1 ) THEN
-            CALL write_results(Dailyunit(jj), Map_var_daily(1,jj))
+            CALL write_results(Dailyunit(jj), Map_var_daily(:,jj))
           ELSE
             Map_var_id = 0.0D0
             DO k = 1, Nhrucell
@@ -517,7 +517,7 @@
 
             WRITE ( Weekunit(jj), 9002 ) Nowyear, Nowmonth, Nowday, ' Basin weekly mean:', Basin_var_week(jj)
             IF ( Mapflg==ACTIVE ) THEN
-              CALL write_results(Weekunit(jj), Map_var_week(1,jj))
+              CALL write_results(Weekunit(jj), Map_var_week(:,jj))
             ELSE
               Map_var_id = 0.0D0
               DO k = 1, Nhrucell
@@ -552,7 +552,7 @@
             WRITE ( Monunit(jj), 9002 ) Nowyear, Nowmonth, Nowday, &
      &                                  ' Basin monthly mean:', Basin_var_mon(jj)
             IF ( Mapflg==ACTIVE ) THEN
-              CALL write_results(Monunit(jj), Map_var_mon(1,jj))
+              CALL write_results(Monunit(jj), Map_var_mon(:,jj))
             ELSE
               Map_var_id = 0.0D0
               DO k = 1, Nhrucell
@@ -588,7 +588,7 @@
      &              Nowyear, Nowmonth, Nowday, ' Basin simulation mean:', Basin_var_tot(jj)
 
             IF ( Mapflg==ACTIVE ) THEN
-              CALL write_results(Totunit(jj), Map_var_tot(1,jj))
+              CALL write_results(Totunit(jj), Map_var_tot(:,jj))
             ELSE
               Map_var_id = 0.0D0
               DO k = 1, Nhrucell

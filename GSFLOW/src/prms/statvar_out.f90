@@ -153,7 +153,7 @@
       use prms_utils, only: error_stop, read_error
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
-      INTRINSIC SNGL, FLOAT, TRIM
+      INTRINSIC :: SNGL, FLOAT, TRIM
 ! Local Variables
       INTEGER :: jj, nvals, nc, nvalues
       INTEGER, ALLOCATABLE, TARGET :: values_int(:)

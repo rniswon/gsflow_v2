@@ -303,7 +303,7 @@
       REAL, INTENT(IN) :: Hru_elev, Tsta_elev_laps, Tsta_elev_base
       REAL, INTENT(OUT) :: Elfac
 ! Functions
-      INTRINSIC ABS
+      INTRINSIC :: ABS
 ! Local Variables
       REAL :: tdiff
 !***********************************************************************

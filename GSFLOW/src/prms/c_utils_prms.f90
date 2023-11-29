@@ -16,8 +16,7 @@ module prms_utils
   end interface
 
   interface
-    module subroutine find_cbh_header_end(Iunit, Fname, Paramname, Iret, Cbh_flag)
-      integer, intent(IN) :: Cbh_flag
+    module subroutine find_cbh_header_end(Iunit, Fname, Paramname, Iret)
       integer, intent(OUT) :: Iunit
       integer, intent(INOUT) :: Iret
       character(LEN=*), intent(IN) :: Fname, Paramname

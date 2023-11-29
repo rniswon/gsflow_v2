@@ -17,7 +17,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Groundwater'
       character(len=6), parameter :: MODNAME = 'gwflow'
-      character(len=*), parameter :: Version_gwflow = '2022-04-21'
+      character(len=*), parameter :: Version_gwflow = '2023-11-13'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea(:), Gwin_dprst(:)
       DOUBLE PRECISION, SAVE :: Basin_gw_upslope
       INTEGER, SAVE :: Gwminarea_flag
@@ -49,7 +49,7 @@
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: gwflowdecl, gwflowinit, gwflowrun
-      EXTERNAL gwflow_restart
+      EXTERNAL :: gwflow_restart
 !***********************************************************************
       gwflow = 0
 
@@ -287,12 +287,12 @@
       Gwminarea_flag = OFF
       Gwstor_minarea = 0.0D0
       Gwstor_minarea_wb = 0.0D0
-      Basin_gwstor_minarea_wb = 0.0D0
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==6 ) THEN
         IF ( getparam_real(MODNAME, 'gwstor_init', Ngw, Gwstor_init)/=0 ) CALL read_error(2, 'gwstor_init')
         Gwres_stor = DBLE( Gwstor_init )
         DEALLOCATE ( Gwstor_init )
       ENDIF
+
       Basin_gwstor = 0.0D0
       DO j = 1, Active_gwrs
         i = Gwr_route_order(j)
@@ -354,9 +354,6 @@
         ENDDO
       ENDIF
 
-      Basin_gwflow = 0.0D0
-      Basin_gwsink = 0.0D0
-      Basin_gwin = 0.0D0
       Basin_gw_upslope = 0.0D0
       Basin_dnflow = 0.0D0
       Basin_lake_seep = 0.0D0
@@ -521,32 +518,29 @@
 
         gwsink = 0.0D0
         IF ( gwstor<0.0D0 ) THEN ! could happen with water use
-          IF ( Print_debug>DEBUG_less ) PRINT *, 'Warning, groundwater reservoir for HRU:', i, ' is < 0.0', gwstor
-          gwflow = 0.0D0
-          Gwres_sink(i) = 0.0
-        ELSE
-
+          IF ( Print_debug>DEBUG_less ) PRINT *, 'Warning, groundwater reservoir for HRU:', i, ' is < 0.0, set to 0.0', gwstor
+          gwstor = 0.0D0
+        ENDIF
 ! Compute groundwater discharge
-          gwflow = gwstor*DBLE( Gwflow_coef(i) )
+        gwflow = gwstor*DBLE( Gwflow_coef(i) )
 
 ! Reduce storage by outflow
-          gwstor = gwstor - gwflow
+        gwstor = gwstor - gwflow
 
-          IF ( Gwsink_coef(i)>0.0 ) THEN
-            gwsink = MIN( gwstor*DBLE( Gwsink_coef(i) ), gwstor ) ! if gwsink_coef > 1, could have had negative gwstor
-            gwstor = gwstor - gwsink
-          ENDIF
+        IF ( Gwsink_coef(i)>0.0 ) THEN
+          gwsink = MIN( gwstor*DBLE( Gwsink_coef(i) ), gwstor ) ! if gwsink_coef > 1, could have had negative gwstor
+          gwstor = gwstor - gwsink
+        ENDIF
 ! if gwr_swale_flag = 1 swale GWR flow goes to sink, 2 included in stream network and cascades
 ! maybe gwr_swale_flag = 3 abs(hru_segment) so hru_segment could be changed from 0 to allow HRU swales
-          IF ( Gwr_swale_flag==ACTIVE ) THEN
-            IF ( Gwr_type(i)==SWALE ) THEN
-              gwsink = gwsink + gwflow
-              gwflow = 0.0D0
-            ENDIF
+        IF ( Gwr_swale_flag==ACTIVE ) THEN
+          IF ( Gwr_type(i)==SWALE ) THEN
+            gwsink = gwsink + gwflow
+            gwflow = 0.0D0
           ENDIF
-          Gwres_sink(i) = SNGL( gwsink/gwarea )
-          Basin_gwsink = Basin_gwsink + gwsink
         ENDIF
+        Gwres_sink(i) = SNGL( gwsink/gwarea )
+        Basin_gwsink = Basin_gwsink + gwsink
         Basin_gwstor = Basin_gwstor + gwstor
 
         Gwres_flow(i) = SNGL( gwflow/gwarea )

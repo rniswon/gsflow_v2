@@ -27,7 +27,7 @@ contains
   end subroutine find_current_time
 
 !***********************************************************************
-!     Read File dynamic paramter file to current time
+!     Read File dynamic parameter file to current time
 !***********************************************************************
   module subroutine find_current_file_time(Iunit, Year, Month, Day, Year_file, Month_file, Day_file)
     implicit none
@@ -94,12 +94,11 @@ contains
 !***********************************************************************
 !   Read CBH File to line before data starts
 !***********************************************************************
-  module subroutine find_cbh_header_end(Iunit, Fname, Paramname, Iret, Cbh_flag)
+  module subroutine find_cbh_header_end(Iunit, Fname, Paramname, Iret)
     use PRMS_CONSTANTS, only: DEBUG_less
     use PRMS_MODULE, only: Nhru, Orad_flag, Print_debug
     implicit none
     ! Argument
-    integer, intent(IN) :: Cbh_flag
     integer, intent(OUT) :: Iunit
     integer, intent(INOUT) :: Iret
     character(LEN=*), intent(IN) :: Fname, Paramname
@@ -131,7 +130,6 @@ contains
           Iret = 1
           exit
         elseif (dum == '####') then
-          if (Cbh_flag == 0) exit
           backspace Iunit
           backspace Iunit
           if (Orad_flag == 1 .and. Paramname(:5) == 'swrad') backspace Iunit ! backspace again as swrad CBH file contains orad as last column
@@ -160,7 +158,7 @@ contains
     end if
 
     end subroutine find_cbh_header_end
-    
+
 !***********************************************************************
 ! Read file to line before data starts
 !***********************************************************************
@@ -502,7 +500,7 @@ contains
     ! Arguments
     integer, intent(IN) :: Year
     ! Functions
-    intrinsic MOD
+    intrinsic :: MOD
     !***********************************************************************
     leap_day = 0
     ! Check if leapyear - Start by identifying all years not divisible by 4
@@ -700,7 +698,7 @@ contains
     integer, intent(OUT) :: Year, Month, Day
     integer, intent(IN) :: Julday
     ! Functions
-    intrinsic FLOOR, NINT
+    intrinsic :: FLOOR, NINT
     ! Local Variables
     integer m, n
     !***********************************************************************
@@ -846,7 +844,7 @@ contains
     ! Argument
     character(LEN=*), intent(IN) :: String
     ! Functions
-    intrinsic INDEX, CHAR, LEN_TRIM
+    intrinsic :: INDEX, CHAR, LEN_TRIM
     !***********************************************************************
     numchars = index(String, char(0))
     if (numchars == 0) numchars = index(String, ' ')
@@ -871,7 +869,7 @@ contains
     ! Arguments
     character(LEN=*), intent(IN) :: Description, Modname, Versn
     ! Functions
-    intrinsic TRIM, LEN_TRIM, MAX
+    intrinsic :: TRIM, LEN_TRIM, MAX
     ! Local Variables
     integer nvers, nmod, nblanks, nblanks2
     character(LEN=24) :: blanks

@@ -4,7 +4,7 @@
       MODULE PRMS_BASIN_SUMMARY
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
       IMPLICIT NONE
-      ! Module Variables
+! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'basin_summary'
       character(len=*), parameter :: Version_basin_summary = '2021-11-19'
@@ -14,9 +14,9 @@
       INTEGER, SAVE :: Daily_flag, Yeardays, Monthly_flag
       DOUBLE PRECISION, SAVE :: Monthdays
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Basin_var_daily(:), Basin_var_monthly(:), Basin_var_yearly(:)
-      ! Parameters
+! Parameters
       INTEGER, SAVE, ALLOCATABLE :: Nhm_id(:)
-      ! Control Parameters
+! Control Parameters
       INTEGER, SAVE :: BasinOutVars, BasinOut_freq
       CHARACTER(LEN=36), SAVE, ALLOCATABLE :: BasinOutVar_names(:)
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: BasinOutBaseFileName

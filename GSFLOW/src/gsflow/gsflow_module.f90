@@ -9,9 +9,9 @@
      &          EQULS = '=========================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.1 09/01/2023'
-      character(len=*), parameter :: PRMS_versn = '2023-09-01'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.2 09/01/2023'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.1 11/24/2023'
+      character(len=*), parameter :: PRMS_versn = '2023-11-24'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.2 11/24/2023'
       character(len=*), parameter :: Version_read_control_file = '2022-10-20'
       character(len=*), parameter :: Version_read_parameter_file = '2022-01-12'
       character(len=*), parameter :: Version_read_data_file = '2022-06-02'
@@ -27,7 +27,7 @@
       INTEGER, SAVE :: Transp_flag, Sroff_flag, Solrad_flag, Et_flag, AG_flag
       INTEGER, SAVE :: Climate_temp_flag, Climate_precip_flag, Climate_potet_flag, Climate_transp_flag
       INTEGER, SAVE :: Lake_route_flag, Strmflow_flag, Stream_order_flag
-      INTEGER, SAVE :: Temp_flag, Precip_flag, Climate_hru_flag, Climate_swrad_flag, Cloud_flag, Gsf_unt
+      INTEGER, SAVE :: Temp_flag, Precip_flag, Climate_hru_flag, Climate_swrad_flag, Gsf_unt
       INTEGER, SAVE :: Precip_combined_flag, Temp_combined_flag, Muskingum_flag
       INTEGER, SAVE :: Inputerror_flag, Timestep
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag, Albedo_cbh_flag, Cloud_cover_cbh_flag
@@ -116,7 +116,7 @@
       DOUBLE PRECISION, SAVE :: Modflow_time_in_stress, Modflow_skip_time
       DOUBLE PRECISION, SAVE :: Mft_to_sec, Totalarea_mf
       DOUBLE PRECISION, SAVE :: Mfl2_to_acre, Mfl3_to_ft3, Sfr_conv
-      DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs
+      DOUBLE PRECISION, SAVE :: Acre_inches_to_mfl3, Mfl3t_to_cfs, MFQ_to_inch_acres_dble
       REAL, SAVE :: Mft_to_days, Mfl_to_inch, Inch_to_mfl_t
       REAL, SAVE :: MFQ_to_inch_acres, Acre_inches_to_mfl3_sngl
       DOUBLE PRECISION, SAVE :: mfstrt_jul  !RGN to get MF to stop at End_time for MODFLOW only

@@ -19,7 +19,7 @@
       DOUBLE PRECISION, SAVE :: Monthdays
       INTEGER, SAVE, ALLOCATABLE :: Monthlyunit(:), Yearlyunit(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Nhru_var_monthly(:, :), Nhru_var_yearly(:, :)
-! Paramters
+! Parameters
       INTEGER, SAVE, ALLOCATABLE :: Nhm_id(:)
 ! Control Parameters
       INTEGER, SAVE :: NhruOutVars, NhruOut_freq, NhruOut_format, NhruOutNcol, outputSelectDatesON_OFF
@@ -320,6 +320,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL, DBLE
+      EXTERNAL :: read_event_date
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day, write_date
 !***********************************************************************
@@ -487,14 +488,12 @@
 !*****************************
       SUBROUTINE read_event_date(Iunit, Next_yr, Next_mo, Next_day)
       USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
-      USE PRMS_CONSTANTS, ONLY: ERROR_water_use, ACTIVE, OFF
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
       use prms_utils, only: is_eof
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Iunit
       INTEGER, INTENT (INOUT) :: Next_yr, Next_mo, Next_day
-! Funcions
-      EXTERNAL :: check_event, set_transfers
 ! Local Variables
       INTEGER keep_reading
 !*******************************************************************************

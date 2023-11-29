@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2023-03-16'
+      character(len=*), parameter :: Version_stream_temp = '2023-10-04'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -524,9 +524,9 @@
             PRINT *, 'ERROR, seg_length too small for segment:', i, ', value:', Seg_length(i)
             ierr = 1
          ENDIF
-         IF ( Seg_slope(i)<0.00001 ) THEN
-            IF ( Print_debug>DEBUG_LESS ) PRINT *, 'WARNING, seg_slope < 0.00001, set to 0.00001', i, Seg_slope(i)
-            Seg_slope(i) = 0.00001
+         IF ( Seg_slope(i)<0.0000001 ) THEN
+            IF ( Print_debug>DEBUG_LESS ) PRINT *, 'WARNING, seg_slope < 0.0000001, set to 0.0000001', i, Seg_slope(i)
+            Seg_slope(i) = 0.0000001
          ENDIF
       ENDDO
 
@@ -724,7 +724,7 @@
 
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: DBLE
+      INTRINSIC :: DBLE, sngl
       REAL, EXTERNAL :: twavg, twmax, get_segwidth
       EXTERNAL :: equilb, lat_inflow, shday
 ! Local Variables
@@ -746,7 +746,7 @@
          ENDDO
       ELSEIF ( Strmtemp_humidity_flag==2 ) THEN ! use station data
          DO i = 1, Nsegment
-            Seg_humid(i) = Humidity(Seg_humidity_sta(i))
+            Seg_humid(i) = Humidity(Seg_humidity_sta(i)) * 0.01
          ENDDO
       ELSE
          Seg_humid = 0.0
@@ -792,7 +792,7 @@
 
 ! Compute segment humidity if info is specified in CBH as time series by HRU
          IF ( Strmtemp_humidity_flag==0 ) then
-            Seg_humid(i) = Seg_humid(i) + Humidity_hru(j)/100.0*harea
+            Seg_humid(i) = Seg_humid(i) + Humidity_hru(j)*0.01*harea
          endif
 
 ! Figure out the contributions of the HRUs to each segment for these drivers.
@@ -946,7 +946,7 @@
 !      &        fs, " seg_tave_water = ", Seg_tave_water(i), " troff = " , Seg_tave_air(i), " up_temp = ", up_temp
 !         endif
 
-         if (seg_outflow(i) <= NEARZERO) then
+         if (.not.(seg_outflow(i)>0.0)) then
             if (Seg_tave_water(i) > -99.0) then
                ! This segment has upstream HRUs somewhere, but the current day's flow is zero
                Seg_tave_water(i) = NOFLOW_TEMP
@@ -1439,7 +1439,6 @@
 !      Voe    = OFFSET, EAST SIDE VEGETATION
 !      Vow    = OFFSET, WEST SIDE VEGETATION
 !
-      USE PRMS_CONSTANTS, ONLY: NEARZERO
       USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_STRMTEMP, ONLY: Azrh, Alte, Altw, Seg_daylight, &
      &    PI, HALF_PI, Cos_seg_lat, Sin_seg_lat, Cos_lat_decl, Horizontal_hour_angle, &
@@ -1465,7 +1464,7 @@
 
 ! if the segment has no width (no flow) set the return values to 0.0
 ! and return to avoid dividing by 0.0
-      if (seg_width(seg_id) <= NEARZERO) then
+      if (.not.(seg_width(seg_id) > 0.0)) then
          shade = 0.0
          svi = 0.0
          return
@@ -1727,7 +1726,7 @@
       USE PRMS_STRMTEMP, ONLY: HALF_PI, Maxiter_sntemp
       IMPLICIT NONE
 ! Functions
-      INTRINSIC ASIN, ABS, COS, SIN
+      INTRINSIC :: ASIN, ABS, COS, SIN
 ! Arguments
       REAL, INTENT(IN):: Coso, Sino, Sin_d, Az, Almn, Almx
 ! Local Variables

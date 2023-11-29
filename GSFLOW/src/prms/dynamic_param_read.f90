@@ -337,7 +337,6 @@
       use prms_utils, only: is_eof, error_stop
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: SNGL, DBLE
       EXTERNAL :: write_dynoutput, write_dynparam, write_dynparam_int
       EXTERNAL :: write_dynparam_potet
 ! Local Variables

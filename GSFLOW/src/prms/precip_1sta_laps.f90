@@ -228,7 +228,7 @@
       INTEGER, INTENT(IN) :: Ihru, Hru_psta, Hru_plaps
       REAL, INTENT(IN) :: Hru_elev
 ! Functions
-      INTRINSIC ABS
+      INTRINSIC :: ABS
 ! Local Variables
       INTEGER :: j
       REAL :: elp_diff, elh_diff, pmo_diff, pmo_rate, adj_p

@@ -84,7 +84,7 @@
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Streamflow Routing'
       character(len=14), parameter :: MODNAME = 'muskingum_mann'
-      character(len=*), parameter :: Version_muskingum = '2021-11-19'
+      character(len=*), parameter :: Version_muskingum = '2023-10-06'
 !   Local Variables
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
@@ -147,26 +147,13 @@
 !    muskingum_init - Get and check parameter values and initialize variables
 !***********************************************************************
       INTEGER FUNCTION muskingum_init()
-      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file
+      USE PRMS_MODULE, ONLY: Init_vars_from_file
       USE PRMS_MUSKINGUM
-      USE PRMS_BASIN, ONLY: Basin_area_inv
-      USE PRMS_FLOWVARS, ONLY: Seg_outflow
-      USE PRMS_SET_TIME, ONLY: Cfs_conv
-      USE PRMS_ROUTING, ONLY: Basin_segment_storage
       IMPLICIT NONE
-! Local Variables
-      INTEGER :: i
 !***********************************************************************
       muskingum_init = 0
 
-      !Seg_outflow will have been initialized to Segment_flow_init in PRMS_ROUTING
       IF ( Init_vars_from_file==0 ) Outflow_ts = 0.0D0
-
-      Basin_segment_storage = 0.0D0
-      DO i = 1, Nsegment
-        Basin_segment_storage = Basin_segment_storage + Seg_outflow(i)
-      ENDDO
-      Basin_segment_storage = Basin_segment_storage*Basin_area_inv/Cfs_conv
 
       END FUNCTION muskingum_init
 
