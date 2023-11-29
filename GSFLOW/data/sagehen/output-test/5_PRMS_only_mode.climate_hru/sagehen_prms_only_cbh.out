@@ -27,7 +27,7 @@ ndays                366
 ==========================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2 09/01/2023
+                       Version 5.2.2 11/24/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -41,7 +41,7 @@ ndays                366
        Precip Dist: precip_1sta, precip_laps, precip_dist2,
                     climate_hru, precip_map
 Temp & Precip Dist: xyz_dist, ide_dist
-    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
 Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
                     potet_hs, potet_pt, potet_pm, potet_pm_sta
@@ -65,7 +65,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-09-01
+PRMS Computation Order          gsflow_prms         2023-11-24
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -99,23 +99,23 @@ Simulation time period: 1980/10/01 00:00:00 to 1996/09/30 00:00:00
 ==========================================================================
 Basin Definition                basin               2023-01-11
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2023-08-10
+Common States and Fluxes        climateflow         2023-10-17
 Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2023-08-30
+Time Series Data                obs                 2023-10-06
 Timestep Control                prms_time           2022-04-21
 Temperature Distribution        climate_hru         2023-08-10
 Precipitation Distribution      climate_hru         2023-08-10
 Solar Radiation Distribution    climate_hru         2023-08-10
 Potential Evapotranspiration    climate_hru         2023-08-10
 Transpiration Distribution      transp_tindex       2021-09-07
-Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-08-14
-Surface Runoff                  srunoff_smidx       2023-08-10
-Soilzone Computations           soilzone            2023-08-10
-Groundwater                     gwflow              2022-04-21
+Canopy Interception             intcp               2023-11-24
+Snow Dynamics                   snowcomp            2023-11-28
+Surface Runoff                  srunoff_smidx       2023-11-28
+Soilzone Computations           soilzone            2023-11-02
+Groundwater                     gwflow              2023-11-13
 Streamflow Routing              strmflow            2021-11-19
 Output Summary                  basin_sum           2022-09-01
-Water Balance Computations      water_balance       2023-01-17
+Water Balance Computations      water_balance       2023-11-28
 Output Summary                  subbasin            2022-09-07
 Output Summary                  nhru_summary        2022-09-07
 ==============================================================
@@ -142,23 +142,23 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  -------------------------------------------------------------
  initial                               3.100
    1981             27.189   19.067    4.270    6.952    6.181
-   1982             76.778   29.392   12.426   39.230   36.819
-   1983             64.524   31.231   12.109   33.609   38.374
+   1982             76.778   29.391   12.426   39.231   36.819
+   1983             64.524   31.231   12.110   33.609   38.374
    1984             52.146   30.128   10.188   23.939   26.168
-   1985             29.538   21.655    7.270   10.801   11.260
-   1986             60.447   28.780   10.553   28.384   27.044
-   1987             17.887   15.674    5.118    7.649    6.438
-   1988             21.214   17.017    3.583    5.731    4.140
-   1989             43.851   25.299    6.349   15.787   12.683
-   1990             29.970   23.055    6.013    7.251    6.491
-   1991             25.841   21.756    4.058    6.039    5.574
-   1992             21.591   15.507    3.678    6.464    3.847
-   1993             55.061   27.465    6.867   24.408   18.886
+   1985             29.538   21.649    7.272   10.805   11.260
+   1986             60.447   28.780   10.554   28.384   27.044
+   1987             17.887   15.672    5.118    7.652    6.438
+   1988             21.214   17.015    3.583    5.733    4.140
+   1989             43.851   25.297    6.349   15.788   12.683
+   1990             29.970   23.054    6.012    7.252    6.491
+   1991             25.841   21.753    4.057    6.044    5.574
+   1992             21.591   15.507    3.677    6.464    3.847
+   1993             55.061   27.459    6.867   24.412   18.886
    1994             20.340   15.534    5.025    6.648    4.182
-   1995             69.736   29.133    8.175   37.453   29.493
+   1995             69.736   29.130    8.175   37.456   29.493
    1996             52.824   24.872    9.201   26.925   22.769
  *************************************************************
- Total for run     668.938  375.566    9.201  287.270  260.348
+ Total for run     668.938  375.541    9.201  287.295  260.348
  *************************************************************
-Execution elapsed time    0 minutes  2.04 seconds
+Execution elapsed time    0 minutes  2.00 seconds
 

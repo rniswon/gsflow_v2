@@ -13,17 +13,17 @@ Control File: .\gsflow_gsflow_LowTrig.control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.1 09/01/2023
+                         Version: 2.3.1 11/24/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  Warning, dimension: nlake_hrus is not needed as value specified as 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 13:04:22
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:37:21
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2 09/01/2023
+                       Version 5.2.2 11/24/2023
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -37,7 +37,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 13:04:22
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash d48bb09
+                        Github Commit Hash b401d0a
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -51,7 +51,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 13:04:22
        Precip Dist: precip_1sta, precip_laps, precip_dist2,
                     climate_hru, precip_map
 Temp & Precip Dist: xyz_dist, ide_dist
-    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
 Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
                     potet_hs, potet_pt, potet_pm, potet_pm_sta
@@ -80,25 +80,25 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-09-01
+PRMS Computation Order          gsflow_prms         2023-11-24
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 Basin Definition                basin               2023-01-11
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2023-08-10
+Common States and Fluxes        climateflow         2023-10-17
 Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2023-08-30
+Time Series Data                obs                 2023-10-06
 Timestep Control                prms_time           2022-04-21
 Temperature Distribution        temp_1sta           2022-09-08
 Precipitation Distribution      precip_1sta         2022-09-07
-Solar Radiation Distribution    ddsolrad            2022-09-01
+Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-08-14
-Surface Runoff                  srunoff_smidx       2023-08-10
-Soilzone Computations           soilzone            2023-08-10
+Canopy Interception             intcp               2023-11-24
+Snow Dynamics                   snowcomp            2023-11-28
+Surface Runoff                  srunoff_smidx       2023-11-28
+Soilzone Computations           soilzone            2023-11-02
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2023-09-01
@@ -305,6 +305,9 @@ These values are set to zero for GSFLOW simulations
 Date: 1992/06/01; Stress: 22; Step: 1; Simulation step: 610
                   MF iterations: 9; SZ iterations: 9
 
+Date: 1992/06/17; Stress: 22; Step: 17; Simulation step: 626
+                  MF iterations: 81; SZ iterations: 50
+
 
 ***WARNING***
 Non-zero values were specified for precipitation,
@@ -490,9 +493,6 @@ These values are set to zero for GSFLOW simulations
 
 Date: 1994/06/01; Stress: 46; Step: 1; Simulation step: 1340
                   MF iterations: 5; SZ iterations: 5
-
-Date: 1994/06/20; Stress: 46; Step: 20; Simulation step: 1359
-                  MF iterations: 78; SZ iterations: 50
 
 
 ***WARNING***
@@ -681,7 +681,7 @@ Date: 1996/06/01; Stress: 70; Step: 1; Simulation step: 2071
                   MF iterations: 7; SZ iterations: 7
 
 Date: 1996/06/06; Stress: 70; Step: 6; Simulation step: 2076
-                  MF iterations: 467; SZ iterations: 50
+                  MF iterations: 462; SZ iterations: 50
 
 
 ***WARNING***
@@ -755,6 +755,9 @@ These values are set to zero for GSFLOW simulations
 Date: 1997/04/01; Stress: 80; Step: 1; Simulation step: 2375
                   MF iterations: 6; SZ iterations: 6
 
+Date: 1997/04/02; Stress: 80; Step: 2; Simulation step: 2376
+                  MF iterations: 90; SZ iterations: 50
+
 
 ***WARNING***
 Non-zero values were specified for precipitation,
@@ -804,16 +807,16 @@ Date: 1997/12/01; Stress: 88; Step: 1; Simulation step: 2619
                   MF iterations: 4; SZ iterations: 4
 
 Date: 1997/12/14; Stress: 88; Step: 14; Simulation step: 2632
-                  MF iterations: 381; SZ iterations: 50
+                  MF iterations: 200; SZ iterations: 50
 
 Date: 1997/12/15; Stress: 88; Step: 15; Simulation step: 2633
-                  MF iterations: 213; SZ iterations: 50
+                  MF iterations: 134; SZ iterations: 50
 
 Date: 1997/12/16; Stress: 88; Step: 16; Simulation step: 2634
                   MF iterations: 161; SZ iterations: 50
 
 Date: 1997/12/17; Stress: 88; Step: 17; Simulation step: 2635
-                  MF iterations: 440; SZ iterations: 50
+                  MF iterations: 164; SZ iterations: 50
 
 
 ***WARNING***
@@ -1056,30 +1059,30 @@ Date: 2000/10/01; Stress: 122; Step: 1; Simulation step: 3654
                   MF iterations: 7; SZ iterations: 7
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/09/05 13:10:03
- Elapsed run time: 5 Minutes, 40.927 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/29 11:42:05
+ Elapsed run time: 4 Minutes, 43.775 Seconds
 
  Number of time steps:   3684;  Number of non-convergence:   0
- MF iterations:         24839;  SZ iterations:           23199
- Average MF iterations:  6.74;  Average SZ iterations:    6.30
- Maximum MF iterations:   467;  Maximum SZ iterations:      50
+ MF iterations:         24379;  SZ iterations:           23221
+ Average MF iterations:  6.62;  Average SZ iterations:    6.30
+ Maximum MF iterations:   462;  Maximum SZ iterations:      50
 
-mxsziter reached: 9
+mxsziter reached: 10
 
-MF iteration distribution:      0    0   90  405  637 1208  879  279  106   28
-                                4    2   10    5    4    3    1    0    1    0
+MF iteration distribution:      0    0   89  406  637 1207  878  280  105   29
+                                4    3    9    4    5    2    1    0    2    1
                                 1    1    4    1    0    0    0    0    1    0
                                 0    0    0    1    0    0    1    0    1    0
-                                0    0    0    0    0    0    0    1    1    0
-                                0    0    0    0    0    0    0    1    0    0
+                                0    0    0    0    0    0    0    0    1    0
                                 0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    1    0    7
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    1    0    0    0    0    0    9
 
-SZ computation distribution:    0    0   90  405  637 1208  879  279  106   28
-                                4    2   10    5    4    3    1    0    1    0
+SZ computation distribution:    0    0   89  406  637 1207  878  280  105   29
+                                4    3    9    4    5    2    1    0    2    1
                                 1    1    4    1    0    0    0    0    1    0
                                 0    0    0    1    0    0    1    0    1    0
-                                0    0    0    0    0    0    0    1    1    9
+                                0    0    0    0    0    0    0    0    1   10
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0

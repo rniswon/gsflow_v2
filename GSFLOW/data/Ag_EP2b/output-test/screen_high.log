@@ -13,17 +13,17 @@ Control File: .\gsflow_gsflow_HighTrig.control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.1 09/01/2023
+                         Version: 2.3.1 11/24/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  Warning, dimension: nlake_hrus is not needed as value specified as 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 12:58:51
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:32:19
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2 09/01/2023
+                       Version 5.2.2 11/24/2023
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -37,7 +37,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 12:58:51
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash d48bb09
+                        Github Commit Hash b401d0a
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -51,7 +51,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 12:58:51
        Precip Dist: precip_1sta, precip_laps, precip_dist2,
                     climate_hru, precip_map
 Temp & Precip Dist: xyz_dist, ide_dist
-    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
 Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
                     potet_hs, potet_pt, potet_pm, potet_pm_sta
@@ -80,25 +80,25 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-09-01
+PRMS Computation Order          gsflow_prms         2023-11-24
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 Basin Definition                basin               2023-01-11
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2023-08-10
+Common States and Fluxes        climateflow         2023-10-17
 Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2023-08-30
+Time Series Data                obs                 2023-10-06
 Timestep Control                prms_time           2022-04-21
 Temperature Distribution        temp_1sta           2022-09-08
 Precipitation Distribution      precip_1sta         2022-09-07
-Solar Radiation Distribution    ddsolrad            2022-09-01
+Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-08-14
-Surface Runoff                  srunoff_smidx       2023-08-10
-Soilzone Computations           soilzone            2023-08-10
+Canopy Interception             intcp               2023-11-24
+Snow Dynamics                   snowcomp            2023-11-28
+Surface Runoff                  srunoff_smidx       2023-11-28
+Soilzone Computations           soilzone            2023-11-02
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2023-09-01
@@ -304,6 +304,9 @@ These values are set to zero for GSFLOW simulations
 
 Date: 1992/06/01; Stress: 22; Step: 1; Simulation step: 610
                   MF iterations: 9; SZ iterations: 9
+
+Date: 1992/06/17; Stress: 22; Step: 17; Simulation step: 626
+                  MF iterations: 81; SZ iterations: 50
 
 
 ***WARNING***
@@ -744,10 +747,7 @@ Date: 1997/04/01; Stress: 80; Step: 1; Simulation step: 2375
                   MF iterations: 6; SZ iterations: 6
 
 Date: 1997/04/02; Stress: 80; Step: 2; Simulation step: 2376
-                  MF iterations: 571; SZ iterations: 50
-
-Date: 1997/04/03; Stress: 80; Step: 3; Simulation step: 2377
-                  MF iterations: 551; SZ iterations: 50
+                  MF iterations: 128; SZ iterations: 50
 
 
 ***WARNING***
@@ -798,13 +798,16 @@ Date: 1997/12/01; Stress: 88; Step: 1; Simulation step: 2619
                   MF iterations: 4; SZ iterations: 4
 
 Date: 1997/12/14; Stress: 88; Step: 14; Simulation step: 2632
-                  MF iterations: 236; SZ iterations: 50
+                  MF iterations: 321; SZ iterations: 50
 
 Date: 1997/12/15; Stress: 88; Step: 15; Simulation step: 2633
-                  MF iterations: 191; SZ iterations: 50
+                  MF iterations: 212; SZ iterations: 50
 
 Date: 1997/12/16; Stress: 88; Step: 16; Simulation step: 2634
-                  MF iterations: 264; SZ iterations: 50
+                  MF iterations: 161; SZ iterations: 50
+
+Date: 1997/12/17; Stress: 88; Step: 17; Simulation step: 2635
+                  MF iterations: 259; SZ iterations: 50
 
 
 ***WARNING***
@@ -1053,28 +1056,28 @@ Date: 2000/10/01; Stress: 122; Step: 1; Simulation step: 3654
                   MF iterations: 7; SZ iterations: 7
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/09/05 13:04:22
- Elapsed run time: 5 Minutes, 30.016 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/29 11:37:21
+ Elapsed run time: 5 Minutes, 1.279 Seconds
 
  Number of time steps:   3684;  Number of non-convergence:   0
- MF iterations:         25173;  SZ iterations:           23330
- Average MF iterations:  6.83;  Average SZ iterations:    6.33
- Maximum MF iterations:   571;  Maximum SZ iterations:      50
+ MF iterations:         24490;  SZ iterations:           23358
+ Average MF iterations:  6.65;  Average SZ iterations:    6.34
+ Maximum MF iterations:   321;  Maximum SZ iterations:      50
 
 mxsziter reached: 10
 
-MF iteration distribution:      0    0   90  404  629 1197  844  293  148   26
-                                6    2   10    3    3    3    1    3    0    0
-                                1    1    4    1    0    0    0    0    1    0
+MF iteration distribution:      0    0   90  403  629 1195  845  294  148   26
+                                5    2   11    3    3    4    1    1    1    0
+                                1    1    4    1    0    0    0    1    1    0
                                 0    0    0    1    0    0    1    0    1    0
                                 0    0    0    0    0    0    0    0    1    0
-                                0    0    0    0    0    0    0    0    0    1
+                                0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    1    1
-                                0    0    0    0    0    0    0    0    0    7
+                                0    0    0    0    0    0    0    0    0    8
 
-SZ computation distribution:    0    0   90  404  629 1197  844  293  148   26
-                                6    2   10    3    3    3    1    3    0    0
-                                1    1    4    1    0    0    0    0    1    0
+SZ computation distribution:    0    0   90  403  629 1195  845  294  148   26
+                                5    2   11    3    3    4    1    1    1    0
+                                1    1    4    1    0    0    0    1    1    0
                                 0    0    0    1    0    0    1    0    1    0
                                 0    0    0    0    0    0    0    0    1   10
                                 0    0    0    0    0    0    0    0    0    0

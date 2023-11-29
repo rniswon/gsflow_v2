@@ -10,11 +10,11 @@ Executable: ..\..\..\bin\gsflow
 Control File: .\gsflow_climate_hru.control
  WARNING, control parameter not used: solzone_module, ignored
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 13:23:42
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 12:00:33
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2 09/01/2023
+                       Version 5.2.2 11/24/2023
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -23,7 +23,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 13:23:42
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
-                        Github Commit Hash d48bb09
+                        Github Commit Hash b401d0a
 
 
 ==========================================================================
@@ -35,25 +35,25 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-09-01
+PRMS Computation Order          gsflow_prms         2023-11-24
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 Basin Definition                basin               2023-01-11
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2023-08-10
+Common States and Fluxes        climateflow         2023-10-17
 Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2023-08-30
+Time Series Data                obs                 2023-10-06
 Timestep Control                prms_time           2022-04-21
 Temperature Distribution        climate_hru         2023-08-10
 Precipitation Distribution      climate_hru         2023-08-10
 Solar Radiation Distribution    climate_hru         2023-08-10
 Potential Evapotranspiration    climate_hru         2023-08-10
 Transpiration Distribution      transp_tindex       2021-09-07
-Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-08-14
-Surface Runoff                  srunoff_smidx       2023-08-10
-Soilzone Computations           soilzone            2023-08-10
+Canopy Interception             intcp               2023-11-24
+Snow Dynamics                   snowcomp            2023-11-28
+Surface Runoff                  srunoff_smidx       2023-11-28
+Soilzone Computations           soilzone            2023-11-02
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2023-09-01
@@ -85,12 +85,12 @@ Simulation time period: 1980/10/01 - 1996/09/30
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/09/05 13:40:22
- Elapsed run time: 16 Minutes, 40.162 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/29 12:16:39
+ Elapsed run time: 16 Minutes, 5.857 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
- MF iterations:         63706;  SZ iterations:           63668
- Average MF iterations: 10.90;  Average SZ iterations:   10.89
+ MF iterations:         63743;  SZ iterations:           63705
+ Average MF iterations: 10.91;  Average SZ iterations:   10.90
  Maximum MF iterations:    32;  Maximum SZ iterations:      25
 
 mxsziter reached: 13

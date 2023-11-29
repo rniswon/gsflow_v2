@@ -13,17 +13,17 @@ Control File: .\Sagehen_ponds.control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.1 09/01/2023
+                         Version: 2.3.1 11/24/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  Warning, dimension: nlake_hrus is not needed as value specified as 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 12:49:27
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:32:00
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2 09/01/2023
+                       Version 5.2.2 11/24/2023
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -37,7 +37,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 12:49:27
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash d48bb09
+                        Github Commit Hash b401d0a
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -51,7 +51,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 12:49:27
        Precip Dist: precip_1sta, precip_laps, precip_dist2,
                     climate_hru, precip_map
 Temp & Precip Dist: xyz_dist, ide_dist
-    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
 Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
                     potet_hs, potet_pt, potet_pm, potet_pm_sta
@@ -80,26 +80,26 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-09-01
+PRMS Computation Order          gsflow_prms         2023-11-24
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
 Basin Definition                basin               2023-01-11
 Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2023-08-10
+Common States and Fluxes        climateflow         2023-10-17
 Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2023-08-30
+Time Series Data                obs                 2023-10-06
 Timestep Control                prms_time           2022-04-21
 Temperature Distribution        temp_1sta           2022-09-08
 Precipitation Distribution      precip_1sta         2022-09-07
-Solar Radiation Distribution    ddsolrad            2022-09-01
+Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2021-09-07
 Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2023-08-14
-Surface Runoff                  srunoff_smidx       2023-08-10
-Soilzone Computations           soilzone            2023-08-10
-Soilzone Computations           soilzone_ag         2023-08-10
+Canopy Interception             intcp               2023-11-24
+Snow Dynamics                   snowcomp            2023-11-28
+Surface Runoff                  srunoff_smidx       2023-11-28
+Soilzone Computations           soilzone            2023-11-02
+Soilzone Computations           soilzone_ag         2023-11-13
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2023-09-01
@@ -721,30 +721,30 @@ Date: 1995/10/01; Stress: 62; Step: 1; Simulation step: 1827
                   MF iterations: 6; SZ iterations: 6
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/09/05 12:52:05
- Elapsed run time: 2 Minutes, 37.154 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/29 11:34:22
+ Elapsed run time: 2 Minutes, 21.836 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
- MF iterations:         11852;  SZ iterations:           11830
- Average MF iterations:  6.38;  Average SZ iterations:    6.37
+ MF iterations:         11839;  SZ iterations:           11817
+ Average MF iterations:  6.38;  Average SZ iterations:    6.36
  Maximum MF iterations:    72;  Maximum SZ iterations:      50
 
 mxsziter reached: 1
 
-MF iteration distribution:      0    0   26  200  318  469  490  256   64   16
-                                3    2    3    2    1    2    1    0    0    0
-                                0    0    0    1    0    0    0    0    1    0
+MF iteration distribution:      0    0   26  200  318  471  487  256   66   17
+                                2    2    3    2    1    2    1    0    0    0
+                                0    0    0    0    0    0    0    0    1    0
                                 0    0    0    0    0    0    0    0    0    0
-                                0    0    1    0    0    0    0    0    0    0
+                                0    0    0    0    0    1    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    1    0    0    0    0    0    0    0    0
 
-SZ computation distribution:    0    0   26  200  318  469  490  256   64   16
-                                3    2    3    2    1    2    1    0    0    0
-                                0    0    0    1    0    0    0    0    1    0
+SZ computation distribution:    0    0   26  200  318  471  487  256   66   17
+                                2    2    3    2    1    2    1    0    0    0
+                                0    0    0    0    0    0    0    0    1    0
                                 0    0    0    0    0    0    0    0    0    0
-                                0    0    1    0    0    0    0    0    0    1
+                                0    0    0    0    0    1    0    0    0    1
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0

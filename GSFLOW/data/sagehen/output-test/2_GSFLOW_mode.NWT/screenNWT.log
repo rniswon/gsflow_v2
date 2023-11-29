@@ -27,9 +27,9 @@ PRMS command line argument 15: csv_output_file
 PRMS command line argument 16: ..\output\gsflow_NWT.csv
 ==========================================================================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/09/05 14:00:58
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 13:02:39
 
-                        Github Commit Hash d48bb09
+                        Github Commit Hash b401d0a
 
 Steady state simulation successful, used 59 iterations
  WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
@@ -39,8 +39,8 @@ Steady state simulation successful, used 59 iterations
  WARNING, parameter: pref_flow_infil_frac is not specified
           Set to default value:  -1.000000    
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/09/05 14:15:01
- Elapsed run time: 14 Minutes, 3.338 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/29 13:15:45
+ Elapsed run time: 13 Minutes, 5.910 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         45409;  SZ iterations:           45409
