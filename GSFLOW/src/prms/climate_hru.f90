@@ -57,7 +57,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
-      EXTERNAL :: precip_form, read_cbh_date, check_cbh_value, check_cbh_intvalue
+      EXTERNAL :: precip_form, read_cbh_date, check_cbh_value, check_cbh_intvalue, temp_set
 ! Local Variables
       INTEGER :: yr, mo, dy, i, hr, mn, sec, jj, ierr, istop, missing, ios !, write_tmin_tmax
       INTEGER :: ii, num_ag, num_pet

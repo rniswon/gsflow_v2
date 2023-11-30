@@ -4,17 +4,17 @@
 ! the climate_hru module
 !***********************************************************************
       INTEGER FUNCTION write_climate_hru()
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, RUN, DECL, INIT, CLEAN, OFF, ERROR_write
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, RUN, DECL, INIT, CLEAN, OFF, ERROR_write, FAHRENHEIT, INCHES, INCH2MM
       use PRMS_CONTROL_FILE, only: control_string
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Climate_temp_flag, Climate_precip_flag, &
      &    Climate_swrad_flag, Climate_potet_flag, Climate_transp_flag, Nowyear, Nowmonth, Nowday
-      USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Tminf, Hru_ppt, Potet, Swrad, Orad, Transp_on
+      USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Tminf, Hru_ppt, Potet, Swrad, Orad, Transp_on, Tmaxc, Tminc, Precip_units, Temp_units
       use prms_utils, only: print_module, PRMS_open_output_file, read_error
       IMPLICIT NONE
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'Preprocessing'
       character(len=*), parameter :: MODNAME = 'write_climate_hru'
-      character(len=*), parameter :: Version_write_climate_hru = '2021-11-19'
+      character(len=*), parameter :: Version_write_climate_hru = '2023-11-24'
       INTEGER, SAVE :: tmax_unit, tmin_unit, precip_unit, potet_unit, swrad_unit, transp_unit
       INTEGER :: i, ios, ierr
       CHARACTER(LEN=32), SAVE :: fmt1, fmt2, fmt3
@@ -26,10 +26,21 @@
 !***Run Procedure***
       IF ( Process_flag==RUN ) THEN
         IF ( Climate_temp_flag==OFF ) THEN
-          WRITE ( tmax_unit, fmt1 ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tmaxf(i), i=1,Nhru)
-          WRITE ( tmin_unit, fmt1 ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tminf(i), i=1,Nhru)
+          IF ( Temp_units==FAHRENHEIT ) THEN
+            WRITE ( tmax_unit, fmt1 ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tmaxf(i), i=1,Nhru)
+            WRITE ( tmin_unit, fmt1 ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tminf(i), i=1,Nhru)
+          ELSE
+            WRITE ( tmax_unit, fmt1 ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tmaxc(i), i=1,Nhru)
+            WRITE ( tmin_unit, fmt1 ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tminc(i), i=1,Nhru)
+          ENDIF
         ENDIF
-        IF ( Climate_precip_flag==OFF ) WRITE ( precip_unit, fmt1 ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Hru_ppt(i), i=1,Nhru)
+        IF ( Climate_precip_flag==OFF ) THEN
+          IF ( Precip_units==INCHES ) THEN
+            WRITE ( precip_unit, fmt1 ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Hru_ppt(i), i=1,Nhru)
+          ELSE
+            WRITE ( precip_unit, fmt1 ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Hru_ppt(i)*INCH2MM, i=1,Nhru)
+          ENDIF
+        ENDIF
         IF ( Climate_potet_flag==OFF ) WRITE ( potet_unit, fmt1 ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Potet(i), i=1,Nhru)
         IF ( Climate_swrad_flag==OFF) WRITE ( swrad_unit, fmt2 ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Swrad(i), i=1,Nhru), Orad
         IF ( Climate_transp_flag==OFF ) WRITE ( transp_unit, fmt3 ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Transp_on(i), i=1,Nhru)
@@ -125,7 +136,7 @@
 
  9001 FORMAT ( 'Generated for climate_hru module', /, A, I8, /, 40('#') )
  9002 FORMAT ( 'Generated for climate_hru module', /, A, I8, /, 'orad 1', /, 40('#') )
- 9003 FORMAT ( '(I4,2I3,3I2,',I8,'E12.4)' )
+ 9003 FORMAT ( '(I4,2I3,3I2,',I8,'E12.5)' )
  9004 FORMAT ( '(I4,2I3,3I2,',I8,'I3)' )
 
       END FUNCTION write_climate_hru

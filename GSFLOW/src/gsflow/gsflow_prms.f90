@@ -367,14 +367,15 @@
       ENDIF
 
       IF ( Model==CLIMATE ) THEN
+        IF ( Process_flag==DECL ) CALL read_parameter_file_params()
         CALL summary_output()
         RETURN
       ENDIF
 
 ! frost_date is a pre-process module
       IF ( Model==FROST ) THEN
+        IF ( Process_flag==DECL ) CALL read_parameter_file_params()
         ierr = frost_date()
-        CALL summary_output()
         RETURN
       ENDIF
 
@@ -393,6 +394,7 @@
       ENDIF
 
       IF ( Model==TRANSPIRE ) THEN
+        IF ( Process_flag==DECL ) CALL read_parameter_file_params()
         CALL summary_output()
         RETURN
       ENDIF
@@ -417,7 +419,7 @@
 
       IF ( Model==WRITE_CLIMATE ) THEN
         ierr = write_climate_hru()
-        CALL summary_output()
+        IF ( Process_flag==DECL ) CALL read_parameter_file_params()
         RETURN
       ENDIF
 
