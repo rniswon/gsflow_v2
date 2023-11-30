@@ -18,7 +18,7 @@ Control File: .\control\control
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:28:48
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:42:41
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -120,9 +120,9 @@ Simulation time period: 1980/01/01 - 1999/12/31
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:28:48
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:42:41
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:28:49
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:42:42
 
 Execution elapsed time    0 minutes  1.00 seconds
 

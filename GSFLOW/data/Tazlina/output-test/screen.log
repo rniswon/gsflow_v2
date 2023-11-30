@@ -20,7 +20,7 @@ Control File: .\control\Tazlina.control
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  WARNING, control parameter not in Control File: mbInit_flag, set to 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:40:01
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:52:23
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -485,9 +485,9 @@ Simulation time period: 1950/10/01 - 2015/09/30
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:40:01
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:52:23
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:40:07
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:52:28
 
-Execution elapsed time    0 minutes  6.00 seconds
+Execution elapsed time    0 minutes  5.00 seconds
 

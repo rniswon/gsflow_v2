@@ -26,7 +26,7 @@ Control File: .\modflow.control
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
- Run start date and time (yyyy/mm/dd hh:mm:ss): 2023/11/29 11:53:06
+ Run start date and time (yyyy/mm/dd hh:mm:ss): 2023/11/30  9:07:02
 
 GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
 ==============================================================
@@ -50,8 +50,8 @@ Steady state simulation successful, used 351 iterations
   
  Solving:  Stress period:     2    Time step:     1    Groundwater-Flow Eqn.
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/29 11:53:07
- Elapsed run time: 1.730 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/30  9:07:03
+ Elapsed run time: 1.575 Seconds
 
  Normal termination of simulation
 

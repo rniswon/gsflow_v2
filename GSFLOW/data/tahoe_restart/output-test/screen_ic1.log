@@ -44,7 +44,7 @@ PRMS command line argument 24: ..\output\PRMS\prms_ic_1
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:50:01
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 19:39:56
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -62,7 +62,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:50:01
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash b401d0a
+                        Github Commit Hash 2714be8
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -4085,8 +4085,8 @@ Date: 1983/09/01; Stress: 1; Step: 1066; Simulation step: 1066
                   MF iterations: 21; SZ iterations: 21
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/29 12:06:43
- Elapsed run time: 16 Minutes, 41.389 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/29 19:55:08
+ Elapsed run time: 15 Minutes, 11.929 Seconds
 
  Number of time steps:   1066;  Number of non-convergence:   0
  MF iterations:         20805;  SZ iterations:           20839

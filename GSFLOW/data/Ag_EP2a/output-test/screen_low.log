@@ -9,7 +9,7 @@ Executable: ..\..\..\bin\gsflow.exe
 ==========================================================================
 Control File: .\gsflow_gsflowLowKc.control
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:34:04
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:47:07
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -22,7 +22,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:34:04
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
-                        Github Commit Hash b401d0a
+                        Github Commit Hash 2714be8
 
 
 ==========================================================================
@@ -341,8 +341,8 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/29 11:36:11
- Elapsed run time: 2 Minutes, 7.472 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/30  8:48:50
+ Elapsed run time: 1 Minutes, 42.864 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
  MF iterations:         11503;  SZ iterations:           11492

@@ -29,7 +29,7 @@ PRMS command line argument 10: ..\output\prms\prms_only.out
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:42:37
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:38:06
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -127,9 +127,9 @@ Simulation time period: 1980/10/01 - 1984/01/30
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:42:37
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:38:06
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:42:37
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:38:06
 
 Execution elapsed time    0 minutes  0.00 seconds
 

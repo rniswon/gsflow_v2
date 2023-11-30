@@ -22,7 +22,7 @@ Control File: .\control\gulkana.control
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  WARNING, control parameter not in Control File: mbInit_flag, set to 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:38:27
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:50:01
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -128,9 +128,9 @@ Simulation time period: 1971/10/01 - 2015/09/30
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:38:27
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:50:01
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:38:30
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:50:04
 
 Execution elapsed time    0 minutes  3.00 seconds
 

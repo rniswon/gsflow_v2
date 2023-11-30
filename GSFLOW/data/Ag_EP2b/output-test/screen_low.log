@@ -19,7 +19,7 @@ Control File: .\gsflow_gsflow_LowTrig.control
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  Warning, dimension: nlake_hrus is not needed as value specified as 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:37:21
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  9:00:34
 
 
                Precipitation-Runoff Modeling System (PRMS)
@@ -37,7 +37,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 11:37:21
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash b401d0a
+                        Github Commit Hash 2714be8
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -1059,8 +1059,8 @@ Date: 2000/10/01; Stress: 122; Step: 1; Simulation step: 3654
                   MF iterations: 7; SZ iterations: 7
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/29 11:42:05
- Elapsed run time: 4 Minutes, 43.775 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/30  9:04:42
+ Elapsed run time: 4 Minutes, 8.395 Seconds
 
  Number of time steps:   3684;  Number of non-convergence:   0
  MF iterations:         24379;  SZ iterations:           23221
