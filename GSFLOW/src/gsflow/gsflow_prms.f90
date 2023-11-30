@@ -417,7 +417,7 @@
 
       IF ( Model==WRITE_CLIMATE ) THEN
         ierr = write_climate_hru()
-        CALL summary_output()
+        IF ( Process_flag==DECL ) CALL read_parameter_file_params()
         RETURN
       ENDIF
 

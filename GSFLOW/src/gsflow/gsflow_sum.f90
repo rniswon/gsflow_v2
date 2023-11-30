@@ -416,6 +416,7 @@
       use prms_utils, only: read_error
       IMPLICIT NONE
       EXTERNAL :: GSF_PRINT, gsflow_sum_restart, MODFLOW_SFR_GET_STORAGE
+      EXTERNAL :: BASIN_GET_STORAGE
 !***********************************************************************
       gsfsuminit = 0
 
@@ -580,6 +581,7 @@
      &    Basin_sm2gvr, Basin_gvr2sm, Basin_gvr2pfr, Basin_dunnian,  Basin_dncascadeflow
       IMPLICIT NONE
       INTRINSIC :: DBLE
+      EXTERNAL :: MODFLOW_VB_DECODE, MODFLOW_SFR_GET_STORAGE, BASIN_GET_STORAGE, GSFSUMREPORT
 ! Local variables
       DOUBLE PRECISION :: obsq_cfs !, obsq_cms
 !     REAL :: gw_out, basinreachlatflowm3

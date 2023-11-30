@@ -28,7 +28,7 @@
       USE PRMS_STATVAR_OUT, ONLY: Statvar_unit
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: statvar_outinit, statvar_outrun
+      EXTERNAL :: statvar_outinit, statvar_outrun, statvar_outdecl
 !***********************************************************************
       IF ( Process_flag==RUN ) THEN
         CALL statvar_outrun()
