@@ -1033,7 +1033,7 @@
      + 'SERIES INPUT FILE. A MAXIMUM OF ', I10,
      + ' ROW ENTRIES WILL BE READ FROM EACH FILE')
 48    FORMAT(1X, ' Convergence on AET will be checked ',
-     + 'For convergence. A fraction of PET equal to ', e10.5,
+     + 'For convergence. A fraction of PET equal to ', e12.5,
      + ' will be used to determine convergence, and a',
      + ' maximum of ',i6,'iterations')
       END SUBROUTINE
