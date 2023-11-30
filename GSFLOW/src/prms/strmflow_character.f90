@@ -6,16 +6,14 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Characteristics'
       character(len=18), parameter :: MODNAME = 'strmflow_character'
-      character(len=*), parameter :: Version_strmflow_character = '2022-09-28'
+      character(len=*), parameter :: Version_strmflow_character = '2023-11-24'
 
 !   Declared Variables
       REAL, SAVE, ALLOCATABLE :: Seg_width(:), Seg_depth(:), Seg_area(:)
-      REAL, SAVE, ALLOCATABLE :: Seg_velocity(:)
+      REAL, SAVE, ALLOCATABLE :: Seg_velocity(:), seg_res_time(:)
 !   Segment Parameters
       REAL, SAVE, ALLOCATABLE :: width_alpha(:), width_m(:)
       REAL, SAVE, ALLOCATABLE :: depth_alpha(:), depth_m(:)
-!   Conversions
-      REAL, PARAMETER :: CFS_TO_CMS = 0.028316847
       END MODULE PRMS_STRMFLOW_CHARACTER
 
 !***********************************************************************
@@ -54,7 +52,7 @@
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: INDEX
- !***********************************************************************
+!***********************************************************************
       strmflow_character_decl = 0
 
       CALL print_module(MODDESC, MODNAME, Version_strmflow_character)
@@ -79,6 +77,11 @@
       CALL declvar_real( MODNAME, 'seg_velocity', 'nsegment', Nsegment, &
      &     'Mean velocity of flow in each segment', &
      &     'meters per second', Seg_velocity )
+
+      ALLOCATE ( seg_res_time(Nsegment) )
+      CALL declvar_real( MODNAME, 'seg_res_time', 'nsegment', Nsegment, &
+     &     'Mean resisdence time of water in each segment', &
+     &     'seconds', seg_res_time )
 
       ALLOCATE ( width_alpha(Nsegment) )
       IF ( declparam( MODNAME, 'width_alpha', 'nsegment', 'real', &
@@ -139,33 +142,38 @@
 !     strmflow_character_run - Computes streamflow characteristics
 !***********************************************************************
       INTEGER FUNCTION strmflow_character_run()
-      USE PRMS_CONSTANTS, ONLY: NEARZERO
+      USE PRMS_CONSTANTS, ONLY: DNEARZERO, CLOSEZERO, CFS2CMS_CONV
       USE PRMS_MODULE, ONLY: Nsegment
       USE PRMS_STRMFLOW_CHARACTER
       USE PRMS_FLOWVARS, ONLY: Seg_outflow
+      USE PRMS_ROUTING, ONLY: Seg_length
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL
 ! Local Variables
       INTEGER :: i
+      REAL :: segflow
 !***********************************************************************
       strmflow_character_run = 0
 
       DO i = 1, Nsegment
-         if (seg_outflow(i) > NEARZERO) then
-            Seg_width(i) = width_alpha(i) * (SNGL(Seg_outflow(i)) * CFS_TO_CMS) ** width_m(i)
-            Seg_depth(i) = depth_alpha(i) * (SNGL(Seg_outflow(i)) * CFS_TO_CMS) ** depth_m(i)
+         if (Seg_outflow(i) > DNEARZERO) then
+            segflow = SNGL( Seg_outflow(i) * CFS2CMS_CONV )
+            Seg_width(i) = width_alpha(i) * (segflow ** width_m(i))
+            Seg_depth(i) = depth_alpha(i) * (segflow ** depth_m(i))
             Seg_area(i) = Seg_width(i) * Seg_depth(i)
-            if (seg_area(i) > NEARZERO) then
-               Seg_velocity(i) = SNGL(Seg_outflow(i)) * CFS_TO_CMS / Seg_area(i)
+            if (Seg_area(i) > CLOSEZERO) then
+               Seg_velocity(i) = segflow / Seg_area(i)
             else
                Seg_velocity(i) = 0.0
             endif
+            seg_res_time(i) = (Seg_area(i) * Seg_length(i)) / segflow
          else
             Seg_width(i) = 0.0
             Seg_depth(i) = 0.0
             Seg_area(i) = 0.0
             Seg_velocity(i) = 0.0
+            seg_res_time(i) = 0.0
          endif
       ENDDO
 
