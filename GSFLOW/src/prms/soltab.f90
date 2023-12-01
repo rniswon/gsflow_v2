@@ -357,9 +357,8 @@
           PRINT *, 'WARNING: solar table value for day:', jd, &
      &             ' computed as:', solt, ' set to', 0.0, &
      &             ' for HRU:', Id, ' hru_type:', Hru_type
-          PRINT *, 'slope, aspect, latitude, cossl', Slope, Aspect, Latitude, Cossl
+          PRINT *, 'slope, aspect, latitude, cossl, sunh', Slope, Aspect, Latitude, Cossl, sunh
           solt = 0.0D0
-          PRINT *, Slope, Aspect, Latitude, Cossl, sunh
           PRINT *, t0, t1, t2, t3, t6, t7, d
         ENDIF
         IF ( sunh<DNEARZERO ) sunh = 0.0D0
