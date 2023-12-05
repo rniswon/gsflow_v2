@@ -64,7 +64,11 @@
           IF ( ios/=0 ) THEN
             ierr = 1
           ELSE
-            WRITE ( tmax_unit, 9001 ) 'tmaxf', Nhru
+            IF ( Temp_units==FAHRENHEIT ) THEN
+              WRITE ( tmax_unit, 9001 ) 'tmaxf', Nhru
+            ELSE
+              WRITE ( tmax_unit, 9001 ) 'tmaxc', Nhru
+            ENDIF
           ENDIF
 
           IF ( control_string(Tmin_day, 'tmin_day')/=0 ) CALL read_error(5, 'tmin_day')
@@ -72,7 +76,11 @@
           IF ( ios/=0 ) THEN
             ierr = 1
           ELSE
-            WRITE ( tmin_unit, 9001 ) 'tminf', Nhru
+            IF ( Temp_units==FAHRENHEIT ) THEN
+              WRITE ( tmin_unit, 9001 ) 'tminf', Nhru
+            ELSE
+              WRITE ( tmin_unit, 9001 ) 'tminc', Nhru
+            ENDIF
           ENDIF
         ENDIF
 
@@ -136,7 +144,7 @@
 
  9001 FORMAT ( 'Generated for climate_hru module', /, A, I8, /, 40('#') )
  9002 FORMAT ( 'Generated for climate_hru module', /, A, I8, /, 'orad 1', /, 40('#') )
- 9003 FORMAT ( '(I4,2I3,3I2,',I8,'E12.5)' )
+ 9003 FORMAT ( '(I4,2I3,3I2,',I8,'F10.5)' )
  9004 FORMAT ( '(I4,2I3,3I2,',I8,'I3)' )
 
       END FUNCTION write_climate_hru
