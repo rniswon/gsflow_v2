@@ -109,7 +109,7 @@
       IF ( declparam(MODNAME, 'rain_mon', 'nhru,nmonths', 'real', &
      &     '1.0', '0.0', '50.0', &
      &     'Rain adjustment factor, by month for each HRU', &
-     &     'Monthly (January to December) factor to rain on each HRU'// &
+     &     'Monthly (January to December) factor applied to rain on each HRU'// &
      &     ' to adjust precipitation distributed to each HRU to'// &
      &     ' account for differences in elevation, and so forth', &
      &     'precip_units')/=0 ) CALL read_error(1, 'rain_mon')
@@ -118,7 +118,7 @@
       IF ( declparam(MODNAME, 'snow_mon', 'nhru,nmonths', 'real', &
      &     '1.0', '0.0', '50.0', &
      &     'Rain adjustment factor, by month for each HRU', &
-     &     'Monthly (January to December) factor to snow on each HRU'// &
+     &     'Monthly (January to December) factor applied to snow on each HRU'// &
      &     ' to adjust precipitation distributed to each HRU to'// &
      &     ' account for differences in elevation, and so forth', &
      &     'precip_units')/=0 ) CALL read_error(1, 'snow_mon')

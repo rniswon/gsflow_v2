@@ -95,7 +95,8 @@
      +     '-0.4', '-0.5', '3.0',
      +     'Monthly (January to December) snow downscaling adjustment'//
      +     ' factor for each precipitation measurement station',
-     +     'Monthly (January to December) snow downscaling adjustment'//
+     +     'Monthly (January to December) multiplicative snow'//
+     +     ' downscaling adjustment'//
      +     ' factor for each precipitation measurement station',
      +     'decimal fraction')/=0 ) CALL read_error(1, 'adjust_snow')
 
@@ -104,7 +105,8 @@
      +     '-0.4', '-0.5', '3.0',
      +     'Monthly (January to December) rain downscaling adjustment'//
      +     ' factor for each precipitation measurement station',
-     +     'Monthly (January to December) rain downscaling adjustment'//
+     +     'Monthly (January to December) multiplicative rain'//
+     +     ' downscaling adjustment'//
      +     ' factor for each precipitation measurement station',
      +     'decimal fraction')/=0 ) CALL read_error(1, 'adjust_rain')
 

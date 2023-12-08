@@ -600,7 +600,7 @@
           IF ( declparam(MODNAME, 'tmax_cbh_adj', 'nhru,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
      &         'Monthly maximum temperature adjustment factor for each HRU', &
-     &         'Monthly (January to December) adjustment factor to maximum air temperature for each HRU,'// &
+     &         'Monthly (January to December) additive adjustment factor to maximum air temperature for each HRU,'// &
      &         ' estimated on the basis of slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_cbh_adj')
 
@@ -608,7 +608,7 @@
           IF ( declparam(MODNAME, 'tmin_cbh_adj', 'nhru,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
      &         'Monthly minimum temperature adjustment factor for each HRU', &
-     &         'Monthly (January to December) adjustment factor to minimum air temperature for each HRU,'// &
+     &         'Monthly (January to December) additive adjustment factor to minimum air temperature for each HRU,'// &
      &         ' estimated on the basis of slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmin_cbh_adj')
         ENDIF
@@ -618,7 +618,7 @@
           IF ( declparam(MODNAME, 'rain_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '2.0', &
      &         'Rain adjustment factor, by month for each HRU', &
-     &         'Monthly (January to December) adjustment factor to'// &
+     &         'Monthly (January to December) multiplicative adjustment factor to'// &
      &         ' measured precipitation determined to be rain on'// &
      &         ' each HRU to account for differences in elevation, and so forth', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'rain_cbh_adj')
@@ -627,7 +627,7 @@
           IF ( declparam(MODNAME, 'snow_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '2.0', &
      &         'Snow adjustment factor, by month for each HRU', &
-     &         'Monthly (January to December) adjustment factor to'// &
+     &         'Monthly (January to December) multiplicative adjustment factor to'// &
      &         ' measured precipitation determined to be snow on'// &
      &         ' each HRU to account for differences in elevation, and so forth', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'snow_cbh_adj')
@@ -638,7 +638,7 @@
           IF ( declparam(MODNAME, 'potet_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '1.5', &
      &         'Potential ET adjustment factor, by month for each HRU', &
-     &         'Monthly (January to December) adjustment factor to'// &
+     &         'Monthly (January to December) multiplicative adjustment factor to'// &
      &         ' potential evapotranspiration specified in CBH Files for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'potet_cbh_adj')
         ENDIF

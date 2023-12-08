@@ -158,7 +158,8 @@
         IF ( declparam(MODNAME, 'pt_alpha', 'nhru,nmonths', 'real', &
      &       '1.26', '1.0', '2.0', &
      &       'Potential ET adjustment factor - Priestly-Taylor', &
-     &       'Monthly (January to December) adjustment factor used in Priestly-Taylor potential ET computations for each HRU', &
+     &       'Monthly (January to December) multiplicative adjustment factor used in Priestly-Taylor' // &
+     &       ' potential ET computations for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'pt_alpha')
 
 !******Get parameters

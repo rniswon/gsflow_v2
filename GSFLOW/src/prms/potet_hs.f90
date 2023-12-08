@@ -60,7 +60,8 @@
         IF ( declparam(MODNAME, 'hs_krs', 'nhru,nmonths', 'real', &
      &       '0.0135', '0.01', '0.24', &
      &       'Potential ET adjustment factor - Hargreaves-Samani', &
-     &       'Monthly (January to December) adjustment factor used in Hargreaves-Samani potential ET computations for each HRU', &
+     &       'Monthly (January to December) multiplicative adjustment factor used in Hargreaves-Samani'// &
+     &       ' potential ET computations for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'hs_krs')
 
 !******Get parameters

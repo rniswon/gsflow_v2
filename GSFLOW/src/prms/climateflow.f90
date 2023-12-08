@@ -793,7 +793,7 @@ end module PRMS_IT0_VARS
       IF ( declparam(Precip_module, 'adjmix_rain', 'nhru,nmonths', 'real', &
      &     '1.0', '0.0', '3.0', &
      &     'Adjustment factor for rain in a rain/snow mix', &
-     &     'Monthly (January to December) factor to adjust rain proportion in a mixed rain/snow event', &
+     &     'Monthly (January to December) multiplicative factor to adjust rain proportion in a mixed rain/snow event', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'adjmix_rain')
 
       IF ( declparam(Precip_module, 'ppt_zero_thresh', 'one', 'real', &
@@ -865,14 +865,14 @@ end module PRMS_IT0_VARS
         IF ( declparam(Solrad_module, 'radj_sppt', 'nhru', 'real', &
      &       '0.44', '0.0', '1.0', &
      &       'Adjustment to solar radiation on precipitation day - summer', &
-     &       'Adjustment factor for computed solar radiation for summer day with greater than'// &
+     &       'Multiplicative adjustment factor for computed solar radiation for summer day with greater than'// &
      &       ' ppt_rad_adj inches of precipitation for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'radj_sppt')
         ALLOCATE ( Radj_wppt(Nhru) )
         IF ( declparam(Solrad_module, 'radj_wppt', 'nhru', 'real', &
      &       '0.5', '0.0', '1.0', &
      &       'Adjustment to solar radiation on precipitation day - winter', &
-     &       'Adjustment factor for computed solar radiation for winter day with greater than'// &
+     &       'Multiplicative adjustment factor for computed solar radiation for winter day with greater than'// &
      &       ' ppt_rad_adj inches of precipitation for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'radj_wppt')
         ALLOCATE ( Radmax(Nhru,MONTHS_PER_YEAR) )
