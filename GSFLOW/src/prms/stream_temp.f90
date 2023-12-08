@@ -197,8 +197,8 @@
       IF ( declparam( MODNAME, 'lat_temp_adj', 'nsegment,nmonths', 'real', &
      &     '0.0', '-5.0', '5.0', &
      &     'Correction factor to adjust the bias of the temperature of the lateral inflow', &
-     &     'Correction factor to adjust the bias of the temperature of the lateral inflow', &
-     &     'decimal fraction')/=0 ) CALL read_error(1, 'lat_temp_adj')
+     &     'Additive correction factor to adjust the bias of the temperature of the lateral inflow', &
+     &     'degrees Celsius')/=0 ) CALL read_error(1, 'lat_temp_adj')
 
       ALLOCATE ( Seg_length(Nsegment) )
       IF ( declparam( MODNAME, 'seg_length', 'nsegment', 'real', &

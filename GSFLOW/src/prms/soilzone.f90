@@ -424,7 +424,7 @@
         IF ( declparam(MODNAME, 'lake_evap_adj', 'nmonths,nlake', 'real', &
      &       '1.0', '0.5', '1.5', &
      &       'Monthly potet factor to adjust potet on lakes', &
-     &       'Monthly (January to December) adjustment factor for potential ET for each lake', &
+     &       'Monthly (January to December) multiplicative adjustment factor for potential ET for each lake', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'lake_evap_adj')
       ENDIF
 
@@ -499,7 +499,7 @@
      &     '1.0', '0.0', '3.0', &
      &     'Coefficient to route water from subsurface to groundwater storage', &
      &     'Non-linear coefficient in equation used to route water'// &
-     &     ' from the gravity reservoir groundwater storage for each HRU', &
+     &     ' from the gravity reservoir to groundwater storage for each HRU', &
      &     'none')/=0 ) CALL read_error(1, 'ssr2gw_exp')
 
       END FUNCTION szdecl

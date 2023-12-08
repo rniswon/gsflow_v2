@@ -80,7 +80,7 @@
 
       ALLOCATE ( seg_res_time(Nsegment) )
       CALL declvar_real( MODNAME, 'seg_res_time', 'nsegment', Nsegment, &
-     &     'Mean resisdence time of water in each segment', &
+     &     'Mean residence time of water in each segment', &
      &     'seconds', seg_res_time )
 
       ALLOCATE ( width_alpha(Nsegment) )

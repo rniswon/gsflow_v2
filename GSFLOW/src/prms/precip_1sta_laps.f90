@@ -125,14 +125,14 @@
           IF ( declparam(MODNAME, 'rain_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.2', '10.0', &
      &         'Monthly rain adjustment factor for each HRU', &
-     &         'Monthly (January to December) factor to adjust measured rain on each HRU'// &
+     &         'Monthly (January to December) multiplicative factor to adjust measured rain on each HRU'// &
      &         ' to account for differences in elevation, and so forth', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'rain_adj')
 
           IF ( declparam(MODNAME, 'snow_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.2', '5.0', &
      &         'Monthly snow adjustment factor for each HRU', &
-     &         'Monthly (January to December) factor to adjust measured snow on each HRU'// &
+     &         'Monthly (January to December) multiplicative factor to adjust measured snow on each HRU'// &
      &         ' to account for differences in elevation, and so forth', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'snow_adj')
         ENDIF
