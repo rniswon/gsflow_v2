@@ -2,7 +2,6 @@
 !     Modules PRMS_MODULE and GSFMODFLOW
 !***********************************************************************
   MODULE PRMS_MODULE
-    USE ISO_FORTRAN_ENV
     USE PRMS_CONSTANTS
       IMPLICIT NONE
       character(LEN=74), parameter :: &
