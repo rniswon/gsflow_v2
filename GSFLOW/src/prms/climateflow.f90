@@ -985,7 +985,7 @@ end module PRMS_IT0_VARS
           IF ( declparam(Soilzone_module, 'soil_moist_init_frac', 'nhru', 'real', &
      &         '0.0', '0.0', '1.0', &
      &         'Initial fraction available water in the capillary reservoir', &
-     &         'Initial fraction of available water in the capillary reservoir (fraction of soil_moist_max for each HRU', &
+     &         'Initial fraction of available water in the capillary reservoir (fraction of soil_moist_max) for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'soil_moist_init_frac')
           ALLOCATE ( Ssstor_init_frac(Nhru) )
           IF ( declparam(Soilzone_module, 'ssstor_init_frac', 'nssr', 'real', &

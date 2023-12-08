@@ -127,7 +127,7 @@
       IF ( declparam(MODNAME, 'psta_mon', 'nrain,nmonths', 'real', &
      &     '1.0', '0.0000001', '50.0', &
      &     'Monthly precipitation for each of the nrain precipitation measurement stations', &
-     &     'Monthly (January to December) factor to precipitation'// &
+     &     'Monthly (January to December) factor applied to precipitation'// &
      &     ' at each measured station to adjust precipitation distributed to each HRU to'// &
      &     ' account for differences in elevation, and so forth', &
      &     'precip_units')/=0 ) CALL read_error(1, 'psta_mon')

@@ -136,7 +136,7 @@
       ENDIF
       IF ( Cascade_flag/=CASCADE_HRU_SEGMENT ) THEN
         IF ( declparam(MODNAME, 'cascade_tol', 'one', 'real', &
-     &       '5.0', '0.0', '99.0', &
+     &       '0.0', '0.0', '99.0', &
      &       'Cascade area below which a cascade link is ignored', &
      &       'Cascade area below which a cascade link is ignored', &
      &       'acres')/=0 ) CALL read_error(1, 'cascade_tol')
