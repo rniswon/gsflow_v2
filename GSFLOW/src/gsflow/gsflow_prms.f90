@@ -34,7 +34,7 @@
      &                                   LAKEVOL(Nlakeshold), &
      &                                   LAKEVAP(Nlakeshold)
 ! Functions
-      INTRINSIC :: DATE_AND_TIME, INT
+      INTRINSIC :: DATE_AND_TIME, INT, FLOAT
       INTEGER, EXTERNAL :: basin, climateflow
       INTEGER, EXTERNAL :: cascade, obs, soltab, transp_tindex
       INTEGER, EXTERNAL :: transp_frost, frost_date, routing
@@ -91,8 +91,8 @@
 
       ELSEIF ( Process_flag==DECL ) THEN
         CALL DATE_AND_TIME(VALUES=Elapsed_time_start)
-        Execution_time_start = Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
-     &                         Elapsed_time_start(7) + INT(Elapsed_time_start(8)*0.001)
+        Execution_time_start = FLOAT(Elapsed_time_start(5)*3600 + Elapsed_time_start(6)*60 + &
+     &                         Elapsed_time_start(7)) + FLOAT(Elapsed_time_start(8))*0.001
         PRINT 9003, 'start', (Elapsed_time_start(i),i=1,3), (Elapsed_time_start(i),i=5,7)
         IF ( PRMS_flag==ACTIVE ) THEN ! PRMS is active, GSFLOW, PRMS, MODSIM-PRMS, MODSIM-PRMS_AG
           IF ( check_dims(Nsegshold, Nlakeshold)/=0 ) ERROR STOP ERROR_dim
@@ -540,8 +540,8 @@
         RETURN
       ELSEIF ( Process_flag==CLEAN ) THEN
         CALL DATE_AND_TIME(VALUES=Elapsed_time_end)
-        Execution_time_end = Elapsed_time_end(5)*3600 + Elapsed_time_end(6)*60 + &
-     &                       Elapsed_time_end(7) + INT(Elapsed_time_end(8)*0.001)
+        Execution_time_end = FLOAT(Elapsed_time_end(5)*3600 + Elapsed_time_end(6)*60 + &
+     &                       Elapsed_time_end(7)) + FLOAT(Elapsed_time_end(8))*0.001
         Elapsed_time = Execution_time_end - Execution_time_start
         Elapsed_time_minutes = INT(Elapsed_time/60.0)
         IF ( PRMS_only==ACTIVE ) THEN
@@ -550,7 +550,7 @@
             PRINT 9003, 'start', (Elapsed_time_start(i),i=1,3), (Elapsed_time_start(i),i=5,7)
             PRINT 9003, 'end  ', (Elapsed_time_end(i),i=1,3), (Elapsed_time_end(i),i=5,7)
             PRINT '(A,I5,A,F6.2,A,/)', 'Execution elapsed time', Elapsed_time_minutes, ' minutes', &
-     &                                 Elapsed_time - Elapsed_time_minutes*60.0, ' seconds'
+     &                                 Elapsed_time - FLOAT(Elapsed_time_minutes)*60.0, ' seconds'
           ENDIF
         ENDIF
         IF ( Print_debug>DEBUG_minimum ) &
