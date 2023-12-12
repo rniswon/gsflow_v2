@@ -9,11 +9,11 @@ Executable: ..\..\..\bin\gsflow.exe
 ==========================================================================
 Control File: .\gsflow_gsflowHighKc.control
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:45:21
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/12/12 11:01:36
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2 11/24/2023
+                       Version 5.2.2.1 12/15/2023
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -22,7 +22,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  8:45:21
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
-                        Github Commit Hash 2714be8
+                        Github Commit Hash dcb5350
 
 
 ==========================================================================
@@ -34,7 +34,7 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-11-24
+PRMS Computation Order          gsflow_prms         2023-12-15
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -341,8 +341,8 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/30  8:47:07
- Elapsed run time: 1 Minutes, 45.772 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/12/12 11:03:37
+ Elapsed run time: 2 Minutes, 0.877 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
  MF iterations:         11627;  SZ iterations:           11598

@@ -23,7 +23,7 @@ nlapse                 3
 ==========================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2 11/24/2023
+                       Version 5.2.2.1 12/15/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -61,7 +61,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-11-24
+PRMS Computation Order          gsflow_prms         2023-12-15
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -249,5 +249,5 @@ Fraction impervious:        0.0687    Fraction pervious:       0.9313
  *************************************************************
  Total for run     418.200  279.047    1.062   32.273 -286.767
  *************************************************************
-Execution elapsed time    0 minutes  3.00 seconds
+Execution elapsed time    0 minutes  3.05 seconds
 

@@ -28,7 +28,7 @@ ncol                   1
 ==========================================================================
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2 11/24/2023
+                       Version 5.2.2.1 12/15/2023
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -66,7 +66,7 @@ Stream Temperature: stream_temp
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-11-24
+PRMS Computation Order          gsflow_prms         2023-12-15
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -144,5 +144,5 @@ DPRST area:                  22.42    Fraction DPRST:          0.0033
 Agriculture area:            67.91    Fraction AG:             0.0101
 
 
-Execution elapsed time    1 minutes 51.00 seconds
+Execution elapsed time    2 minutes  8.32 seconds
 

@@ -10,11 +10,11 @@ Executable: ..\..\..\bin\gsflow
 Control File: .\gsflow_climate_hru.control
  WARNING, control parameter not used: solzone_module, ignored
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  9:07:55
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/12/12 11:30:56
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2 11/24/2023
+                       Version 5.2.2.1 12/15/2023
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -23,7 +23,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/30  9:07:55
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
-                        Github Commit Hash 2714be8
+                        Github Commit Hash dcb5350
 
 
 ==========================================================================
@@ -35,7 +35,7 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-11-24
+PRMS Computation Order          gsflow_prms         2023-12-15
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -85,8 +85,8 @@ Simulation time period: 1980/10/01 - 1996/09/30
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/30  9:22:26
- Elapsed run time: 14 Minutes, 31.561 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/12/12 11:45:35
+ Elapsed run time: 14 Minutes, 38.890 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         63743;  SZ iterations:           63705

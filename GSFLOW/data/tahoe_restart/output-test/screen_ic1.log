@@ -39,16 +39,16 @@ PRMS command line argument 24: ..\output\PRMS\prms_ic_1
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.1 11/24/2023
+                         Version: 2.3.1 12/15/2023
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 19:39:56
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/12/12 11:24:03
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2 11/24/2023
+                       Version 5.2.2.1 12/15/2023
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -62,7 +62,7 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/11/29 19:39:56
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash 2714be8
+                        Github Commit Hash dcb5350
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -105,7 +105,7 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-11-24
+PRMS Computation Order          gsflow_prms         2023-12-15
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
@@ -4085,8 +4085,8 @@ Date: 1983/09/01; Stress: 1; Step: 1066; Simulation step: 1066
                   MF iterations: 21; SZ iterations: 21
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/11/29 19:55:08
- Elapsed run time: 15 Minutes, 11.929 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/12/12 11:39:31
+ Elapsed run time: 15 Minutes, 27.924 Seconds
 
  Number of time steps:   1066;  Number of non-convergence:   0
  MF iterations:         20805;  SZ iterations:           20839
