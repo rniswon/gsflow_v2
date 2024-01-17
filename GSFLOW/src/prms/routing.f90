@@ -6,10 +6,10 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2022-09-07'
+      character(len=*), parameter :: Version_routing = '2024-01-10'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
-      INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades
+      INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades, special_seg_type_flag
       INTEGER, SAVE, ALLOCATABLE :: Segment_order(:), Segment_up(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Segment_hruarea(:)
       !CHARACTER(LEN=32), SAVE :: Outfmt
@@ -64,7 +64,7 @@
      &    strmflow_muskingum_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
       use PRMS_MMFAPI, only: declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Init_vars_from_file, Strmflow_flag, Cascade_flag
+      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Init_vars_from_file, Strmflow_flag, Cascade_flag, Stream_temp_flag
       USE PRMS_ROUTING
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -137,13 +137,6 @@
      &       'Mannings roughness coefficient for each segment', &
      &       'dimensionless')/=0 ) CALL read_error(1, 'mann_n')
 
-        ALLOCATE ( Seg_length(Nsegment) )
-        IF ( declparam( MODNAME, 'seg_length', 'nsegment', 'real', &
-     &       '1000.0', '1.0', '100000.0', &
-     &       'Length of each segment', &
-     &       'Length of each segment', &
-     &       'meters')/=0 ) CALL read_error(1, 'seg_length')
-
         ALLOCATE ( Seg_depth(Nsegment) )
         IF ( declparam(MODNAME, 'seg_depth', 'nsegment', 'real', &
      &       '1.0', '0.03', '250.0', &
@@ -153,7 +146,14 @@
      &       'meters')/=0 ) CALL read_error(1, 'seg_depth')
       ENDIF
 
-      IF ( Strmflow_flag==strmflow_muskingum_mann_module ) THEN
+      IF ( Strmflow_flag==strmflow_muskingum_mann_module .OR. Stream_temp_flag==ACTIVE ) THEN
+        ALLOCATE ( Seg_length(Nsegment) )
+        IF ( declparam( MODNAME, 'seg_length', 'nsegment', 'real', &
+     &       '1000.0', '1.0', '100000.0', &
+     &       'Length of each segment', &
+     &       'Length of each segment', &
+     &       'meters')/=0 ) CALL read_error(1, 'seg_length')
+
         ALLOCATE ( Seg_slope(Nsegment) )
         IF ( declparam( MODNAME, 'seg_slope', 'nsegment', 'real', &
      &       '0.0001', '0.0000001', '2.0', &
@@ -306,7 +306,7 @@
      &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
      &    strmflow_muskingum_module, strmflow_in_out_module, DEBUG_LESS
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Init_vars_from_file, Print_debug, &
+      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Init_vars_from_file, Print_debug, Stream_temp_flag, &
      &    Strmflow_flag, Water_use_flag, Segment_transferON_OFF, Inputerror_flag, Parameter_check_flag
       USE PRMS_ROUTING
       USE PRMS_SET_TIME, ONLY: Timestep_seconds
@@ -334,16 +334,35 @@
       ENDIF
 
       Hru_outflow = 0.0D0
+      Flow_to_ocean = 0.0D0
+      Flow_to_great_lakes = 0.0D0
+      Flow_out_region = 0.0D0
+      Flow_out_NHM = 0.0D0
+      Flow_terminus = 0.0D0
+      Flow_to_lakes = 0.0D0
+      Flow_in_nation = 0.0D0
+      Flow_in_region = 0.0D0
+      Flow_headwater = 0.0D0
+      Flow_in_great_lakes = 0.0D0
+      Flow_replacement = 0.0D0
 
       Cfs2acft = Timestep_seconds/FT2_PER_ACRE
 
+      special_seg_type_flag = OFF
       IF ( getparam_int(MODNAME, 'segment_type', Nsegment, Segment_type)/=0 ) CALL read_error(2, 'segment_type')
       DO i = 1, Nsegment
-        Segment_type(i) = MOD( Segment_type(i), 100 )
+        IF ( Segment_type(i) > 0 ) THEN
+          special_seg_type_flag = ACTIVE
+          IF ( Segment_type(i) > 99 ) Segment_type(i) = MOD( Segment_type(i), 100 )
+        ENDIF
       ENDDO
 
       IF ( Strmflow_flag==strmflow_muskingum_mann_module ) THEN
         IF ( getparam_real(MODNAME, 'mann_n', Nsegment, Mann_n)/=0 ) CALL read_error(2, 'mann_n')
+        IF ( getparam_real(MODNAME, 'seg_depth', Nsegment, seg_depth)/=0 ) CALL read_error(2, 'seg_depth')
+      ENDIF
+
+      IF ( Strmflow_flag==strmflow_muskingum_mann_module .OR. Stream_temp_flag==ACTIVE ) THEN
         IF ( getparam_real( MODNAME, 'seg_length', Nsegment, Seg_length)/=0 ) CALL read_error(2, 'seg_length')
         IF ( getparam_real( MODNAME, 'seg_slope', Nsegment, Seg_slope)/=0 ) CALL read_error(2, 'seg_slope')
 ! find segments that are too short and print them out as they are found
@@ -363,7 +382,6 @@
            Inputerror_flag = ierr
            RETURN
         ENDIF
-        IF ( getparam_real(MODNAME, 'seg_depth', Nsegment, seg_depth)/=0 ) CALL read_error(2, 'seg_depth')
       ENDIF
 
       IF ( getparam_int(MODNAME, 'tosegment', Nsegment, Tosegment)/=0 ) CALL read_error(2, 'tosegment')

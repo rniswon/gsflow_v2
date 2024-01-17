@@ -7,7 +7,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Transpiration Distribution'
         character(len=*), parameter :: MODNAME = 'transp_frost'
-        character(len=*), parameter :: Version_transp = '2021-11-19'
+        character(len=*), parameter :: Version_transp = '2023-11-01'
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Fall_frost(:), Spring_frost(:)
       END MODULE PRMS_TRANSP_FROST
@@ -64,13 +64,6 @@
         IF ( getparam_int(MODNAME, 'spring_frost', Nhru, Spring_frost)/=0 ) CALL read_error(2, 'spring_frost')
         IF ( getparam_int(MODNAME, 'fall_frost', Nhru, Fall_frost)/=0 ) CALL read_error(2, 'fall_frost')
 
-        DO j = 1, Active_hrus
-          i = Hru_route_order(j)
-          IF ( Jsol>=Spring_frost(i) .AND. Jsol<=Fall_frost(i) ) THEN
-            Transp_on(i) = ACTIVE
-            Basin_transp_on = ACTIVE
-          ENDIF
-        ENDDO
       ENDIF
 
       END FUNCTION transp_frost

@@ -7,7 +7,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_hamon'
-        character(len=*), parameter :: Version_potet = '2021-11-19'
+        character(len=*), parameter :: Version_potet = '2021-08-13'
         DOUBLE PRECISION, PARAMETER :: ONE_12TH = 1.0D0/12.0D0
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Hamon_coef(:, :)

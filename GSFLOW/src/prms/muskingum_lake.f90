@@ -97,7 +97,7 @@
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       character(len=*), parameter :: MODDESC = 'Streamflow & Lake Routing'
       character(len=14), parameter :: MODNAME = 'muskingum_lake'
-      character(len=*), parameter :: Version_muskingum_lake = '2022-10-24'
+      character(len=*), parameter :: Version_muskingum_lake = '2024-01-1'
       INTEGER, SAVE :: Obs_flag, Linear_flag, Weir_flag, Gate_flag, Puls_flag
       INTEGER, SAVE :: Secondoutflow_flag
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
@@ -877,7 +877,7 @@
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_WATER_USE, ONLY: Lake_transfer, Lake_gain
       USE PRMS_ROUTING, ONLY: Use_transfer_segment, Segment_delta_flow, Basin_segment_storage, &
-     &    Obsin_segment, Segment_order, Tosegment, C0, C1, C2, Ts, Ts_i, Obsout_segment, &
+     &    Obsin_segment, Segment_order, Tosegment, C0, C1, C2, Ts, Ts_i, Obsout_segment, special_seg_type_flag, &
      &    Flow_to_ocean, Flow_to_great_lakes, Flow_out_region, Flow_out_NHM, Segment_type, Flow_terminus, &
      &    Flow_to_lakes, Flow_replacement, Flow_in_region, Flow_in_nation, Flow_headwater, Flow_in_great_lakes
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
@@ -1082,17 +1082,19 @@
 
       Basin_segment_storage = 0.0D0
       Flow_out = 0.0D0
-      Flow_to_lakes = 0.0D0
-      Flow_to_ocean = 0.0D0
-      Flow_to_great_lakes = 0.0D0
-      Flow_out_region = 0.0D0
-      Flow_out_NHM = 0.0D0
-      Flow_in_region = 0.0D0
-      Flow_terminus = 0.0D0
-      Flow_in_nation = 0.0D0
-      Flow_headwater = 0.0D0
-      Flow_in_great_lakes = 0.0D0
-      Flow_replacement = 0.0D0
+      IF ( special_seg_type_flag == ACTIVE ) THEN
+        Flow_to_lakes = 0.0D0
+        Flow_to_ocean = 0.0D0
+        Flow_to_great_lakes = 0.0D0
+        Flow_out_region = 0.0D0
+        Flow_out_NHM = 0.0D0
+        Flow_in_region = 0.0D0
+        Flow_terminus = 0.0D0
+        Flow_in_nation = 0.0D0
+        Flow_headwater = 0.0D0
+        Flow_in_great_lakes = 0.0D0
+        Flow_replacement = 0.0D0
+      ENDIF
       ! add water balance check
       DO i = 1, Nsegment
         segtype = Segment_type(i)
@@ -1102,31 +1104,33 @@
         Seg_upstream_inflow(i) = Currinsum(i) * ONE_24TH
 ! Flow_out is the total flow out of the basin, which allows for multiple outlets
 ! includes closed basins (tosegment=0)
-        IF ( segtype==1 ) THEN
-          Flow_headwater = Flow_headwater + segout
-        ELSEIF ( segtype==2 ) THEN
-          Flow_to_lakes = Flow_to_lakes + segout
-          lakeid = Lake_segment_id(i)
-          Lake_outcms(lakeid) = Lake_outcfs(lakeid)*CFS2CMS_CONV
-          Basin_lake_stor = Basin_lake_stor + Lake_vol(Lakeid)*12.0D0
-        ELSEIF ( segtype==3 ) THEN
-          Flow_replacement = Flow_replacement + segout
-        ELSEIF ( segtype==4 ) THEN
-          Flow_in_nation = Flow_in_nation + segout
-        ELSEIF ( segtype==5 ) THEN
-          Flow_out_NHM = Flow_out_NHM + segout
-        ELSEIF ( segtype==6 ) THEN
-          Flow_in_region = Flow_in_region + segout
-        ELSEIF ( segtype==7 ) THEN
-          Flow_out_region = Flow_out_region + segout
-        ELSEIF ( segtype==8 ) THEN
-          Flow_to_ocean = Flow_to_ocean + segout
-        ELSEIF ( segtype==9 ) THEN
-          Flow_terminus = Flow_terminus + segout
-        ELSEIF ( segtype==10 ) THEN
-          Flow_in_great_lakes = Flow_in_great_lakes + segout
-        ELSEIF ( segtype==11 ) THEN
-          Flow_to_great_lakes = Flow_to_great_lakes + segout
+        IF ( special_seg_type_flag == ACTIVE ) THEN
+          IF ( segtype==1 ) THEN
+            Flow_headwater = Flow_headwater + segout
+          ELSEIF ( segtype==2 ) THEN
+            Flow_to_lakes = Flow_to_lakes + segout
+            lakeid = Lake_segment_id(i)
+            Lake_outcms(lakeid) = Lake_outcfs(lakeid)*CFS2CMS_CONV
+            Basin_lake_stor = Basin_lake_stor + Lake_vol(Lakeid)*12.0D0
+          ELSEIF ( segtype==3 ) THEN
+            Flow_replacement = Flow_replacement + segout
+          ELSEIF ( segtype==4 ) THEN
+            Flow_in_nation = Flow_in_nation + segout
+          ELSEIF ( segtype==5 ) THEN
+            Flow_out_NHM = Flow_out_NHM + segout
+          ELSEIF ( segtype==6 ) THEN
+            Flow_in_region = Flow_in_region + segout
+          ELSEIF ( segtype==7 ) THEN
+            Flow_out_region = Flow_out_region + segout
+          ELSEIF ( segtype==8 ) THEN
+            Flow_to_ocean = Flow_to_ocean + segout
+          ELSEIF ( segtype==9 ) THEN
+            Flow_terminus = Flow_terminus + segout
+          ELSEIF ( segtype==10 ) THEN
+            Flow_in_great_lakes = Flow_in_great_lakes + segout
+          ELSEIF ( segtype==11 ) THEN
+            Flow_to_great_lakes = Flow_to_great_lakes + segout
+          ENDIF
         ENDIF
         IF ( Tosegment(i)==OUTFLOW_SEGMENT ) Flow_out = Flow_out + segout
         Segment_delta_flow(i) = Segment_delta_flow(i) + Seg_inflow(i) - segout

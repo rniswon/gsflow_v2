@@ -11,8 +11,8 @@ MODULE PRMS_CONSTANTS
     real(REALsize), parameter :: NEARZERO = 1.0E-6
     real(DOUBLEsize), parameter :: DNEARZERO = EPSILON(0.0D0) ! 2.220446049250313E-016
     real(DOUBLEsize), PARAMETER :: ZERO_SNOWPACK = EPSILON(0.0D0)
-    !real(DOUBLEsize), PARAMETER :: ZERO_SNOWPACK = 1.0D-016
-    !real(DOUBLEsize), PARAMETER :: ZERO_SNOWPACK = 1.0D-12
+    !real(DOUBLEsize), PARAMETER :: ZERO_SNOWPACK = 1.0D-16
+    real(DOUBLEsize), PARAMETER :: DCLOSEZERO = 1.0D-12
 
     integer, parameter :: MAXFILE_LENGTH = 256
     integer, parameter :: MAXLINE_LENGTH = 256

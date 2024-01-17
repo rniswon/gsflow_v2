@@ -15,7 +15,7 @@
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Preprocessing'
       character(len=*), parameter :: MODNAME = 'frost_date'
-      character(len=*), parameter :: Version_frost_date = '2021-11-22'
+      character(len=*), parameter :: Version_frost_date = '2020-12-02'
 ! Functions
       INTRINSIC :: NINT, DBLE
       INTEGER, EXTERNAL :: get_season

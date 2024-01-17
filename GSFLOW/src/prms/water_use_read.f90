@@ -8,7 +8,7 @@
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'water_use_read'
-      character(len=*), parameter :: Version_water_use_read = '2022-09-07'
+      character(len=*), parameter :: Version_water_use_read = '2023-11-01'
 
       ! transfer type
       integer, parameter :: STREAM = 1

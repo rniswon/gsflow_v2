@@ -23,12 +23,12 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2023-11-28'
+      character(len=*), parameter :: Version_snowcomp = '2024-01-11'
       INTEGER, SAVE :: Ihru, Active_glacier
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
       REAL, SAVE, ALLOCATABLE :: Snowcov_areasv(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Scrv(:), Pss(:), Pksv(:), Pst(:), snarea_thresh_dble(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Scrv(:), Pss(:), Pksv(:), Pst(:)
       REAL, SAVE, ALLOCATABLE :: Salb(:), Slst(:)
       CHARACTER(LEN=110), SAVE :: Buffer
       REAL, SAVE :: Swe_array(12)
@@ -586,7 +586,7 @@
      &       'none')/=0 ) CALL read_error(1, 'snarea_d')
       ENDIF
 
-      ALLOCATE ( Snarea_thresh(Nhru), snarea_thresh_dble(Nhru) )
+      ALLOCATE ( Snarea_thresh(Nhru) )
       IF ( declparam(MODNAME, 'snarea_thresh', 'nhru', 'real', &
      &     '50.0', '0.0', '200.0', &
      &     'Maximum threshold water equivalent for snow depletion', &
@@ -741,8 +741,6 @@
         ENDDO
       ENDIF
       IF ( getparam_real(MODNAME, 'snarea_thresh', Nhru, Snarea_thresh)/=0 ) CALL read_error(2, 'snarea_thresh')
-      snarea_thresh_dble = DBLE( Snarea_thresh )
-      DEALLOCATE ( Snarea_thresh )
       IF ( getparam_real(MODNAME, 'albset_rnm', 1, Albset_rnm)/=0 ) CALL read_error(2, 'albset_rnm')
       IF ( getparam_real(MODNAME, 'albset_rna', 1, Albset_rna)/=0 ) CALL read_error(2, 'albset_rna')
       IF ( getparam_real(MODNAME, 'albset_sna', 1, Albset_sna)/=0 ) CALL read_error(2, 'albset_sna')
@@ -760,7 +758,6 @@
         Glacr_evap = 0.0
       ENDIF
 
-      Ai = 0.0D0
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==3 ) THEN
         IF ( getparam_real(MODNAME, 'snowpack_init', Nhru, Snowpack_init)/=0 ) CALL read_error(2, 'snowpack_init')
         Pkwater_equiv = 0.0D0
@@ -768,6 +765,7 @@
         Pk_den = 0.0
         Pk_ice = 0.0
         Freeh2o = 0.0
+        Ai = 0.0D0
         Snowcov_area = 0.0
         Basin_pweqv = 0.0D0
         Basin_snowdepth = 0.0D0
@@ -782,7 +780,7 @@
             Pk_ice(i) = SNGL( Pkwater_equiv(i) )
             Freeh2o(i) = Pk_ice(i)*Freeh2o_cap(i)
             Ai(i) = Pkwater_equiv(i) ! [inches]
-            IF ( Ai(i)>snarea_thresh_dble(i) ) Ai(i) = snarea_thresh_dble(i) ! [inches]
+            IF ( Ai(i)>DBLE(Snarea_thresh(i)) ) Ai(i) = DBLE( Snarea_thresh(i) ) ! [inches]
             IF ( Ai(i)>0.0D0 ) THEN
               Frac_swe(i) = SNGL( Pkwater_equiv(i)/Ai(i) ) ! [fraction]
               Frac_swe(i) = MIN( 1.0, Frac_swe(i) )
@@ -1223,7 +1221,7 @@
           ! calculate the new snow covered area
           CALL snowcov(Iasw(i), Newsnow(i), Snowcov_area(i), &
      &                 Snarea_curve(:, k), Pkwater_equiv(i), Pst(i), &
-     &                 snarea_thresh_dble(i), Net_snow(i), Scrv(i), &
+     &                 Snarea_thresh(i), Net_snow(i), Scrv(i), &
      &                 Pksv(i), Snowcov_areasv(i), Ai(i), Frac_swe(i))
 
           ! HRU STEP 3 - COMPUTE THE NEW ALBEDO
@@ -1263,7 +1261,7 @@
           ! Could use equation from Swinbank 63 using Temp, a is -13.638, b is 6.148
           ! temparature is halfway between the minimum and average temperature for the day
           !temp = (Tminc(i)+Tavgc(i))*0.5
-          !emis = ((temp+273.16)**(Emis_coefb-4.0))*(10.0**(Emis_coefa+1.0))/5.670373E−8 ! /by Stefan Boltzmann in SI units
+          !emis = ((temp+273.16)**(Emis_coefb-4.0))*(10.0**(Emis_coefa+1.0))/5.670373E-8 ! /by Stefan Boltzmann in SI units
           ! If there is any precipitation in the HRU, reset the
           ! emissivity to 1
           IF ( Hru_ppt(i)>0.0 ) emis = 1.0 ! [fraction of radiation]
@@ -1865,7 +1863,7 @@
 ! Functions
       EXTERNAL :: glacr_states_to_zero
 ! Local Variables
-      REAL :: calnd, dif
+      DOUBLE PRECISION :: calnd, dif
 !***********************************************************************
 
       ! Loss of heat is handled differently if there is liquid water in
@@ -1882,18 +1880,18 @@
       ELSE
         ! calculate the total amount of heat per area that can be
         ! released by free water freezing
-        calnd = Freeh2o*203.2 ! [cal/cm^2]
+        calnd = DBLE( Freeh2o )*203.2D0 ! [cal/cm^2]
         ! determine the difference between heat in free water and the
         ! heat that can be absorbed by new snow (without melting)
         ! remember that cal is a negative number
-        dif = SNGL(Cal) + calnd ! [cal/cm^2]
+        dif = Cal + calnd ! [cal/cm^2]
 
         ! The effect of freezing water depends on whether all or only
         ! part of the liquid water freezes
         ! 2 options below (if-then, else)
 
         ! (2) Only part of free water freezes
-        IF ( dif>0.0 ) THEN
+        IF ( dif>0.0D0 ) THEN
           ! the calories absorbed by the new snow freezes some
           ! of the free water
           ! (increase in ice, decrease in free water)
@@ -1901,12 +1899,12 @@
           Freeh2o = Freeh2o - SNGL(-Cal/203.2D0) ! [inches]
           RETURN
         ! (1) All free water freezes
-        ELSE ! IF ( dif<=0.0 ) THEN
+        ELSE ! IF ( dif<=0.0D0 ) THEN
           ! if all the water freezes, then the remaining heat
           ! that can be absorbed by new snow (that which is not
           ! provided by freezing free water) becomes the new pack
           ! heat deficit
-          IF ( dif<0.0 ) Pk_def = DBLE(-dif) ! [cal/cm^2]
+          IF ( dif<0.0D0 ) Pk_def = -dif ! [cal/cm^2]
           ! free pack water becomes ice
           Pk_ice = Pk_ice + Freeh2o ! [inches]
           Freeh2o = 0.0 ! [inches]
@@ -2691,7 +2689,7 @@
           ! If all pack ice is removed, then there cannot be a
           ! heat deficit
           Freeh2o = Freeh2o + Pk_ice ! bug fix found by James 9/21/23
-          if (freeh2o<0.0D0) Freeh2o = 0.0D0
+          IF (Freeh2o<0.0D0) Freeh2o = 0.0D0
           !Freeh2o = 0.0
           Pk_ice = 0.0
           Pk_def = 0.0D0
@@ -2758,8 +2756,8 @@
 ! Arguments
       INTEGER, INTENT(IN) :: Newsnow
       INTEGER, INTENT(INOUT) :: Iasw
-      REAL, INTENT(IN) :: Net_snow, Snarea_curve(11)
-      DOUBLE PRECISION, INTENT(IN) :: Pkwater_equiv, Snarea_thresh
+      REAL, INTENT(IN) :: Snarea_thresh, Net_snow, Snarea_curve(11)
+      DOUBLE PRECISION, INTENT(IN) :: Pkwater_equiv
       REAL, INTENT(INOUT) :: Snowcov_area
       DOUBLE PRECISION, INTENT(OUT) :: Ai
       REAL, INTENT(INOUT) :: Snowcov_areasv
@@ -2783,11 +2781,11 @@
       ! Set ai to the maximum packwater equivalent, but no higher than
       ! the threshold for complete snow cover
       Ai = Pst ! [inches]
-      IF ( Ai>Snarea_thresh ) Ai = Snarea_thresh ! [inches]
+      IF ( Ai>DBLE(Snarea_thresh) ) Ai = DBLE( Snarea_thresh ) ! [inches]
 
       ! calculate the ratio of the current packwater equivalent to
       ! the maximum packwater equivalent for the given snowpack
-      IF ( Ai>0.0D0 ) THEN
+      IF ( Ai>ZERO_SNOWPACK ) THEN
         Frac_swe = SNGL( Pkwater_equiv/Ai ) ! [fraction]
         Frac_swe = MIN( 1.0, Frac_swe )
       ELSE

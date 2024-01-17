@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2023-10-04'
+      character(len=*), parameter :: Version_stream_temp = '2024-01-11'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -22,6 +22,7 @@
       REAL, SAVE, ALLOCATABLE :: gw_sum(:), ss_sum(:)
       REAL, SAVE, ALLOCATABLE ::  gw_silo(:,:), ss_silo(:,:)
       REAL, SAVE, ALLOCATABLE :: hru_area_sum(:)
+      REAL, SAVE, ALLOCATABLE :: Seg_length_km(:)
       INTEGER, SAVE, ALLOCATABLE :: upstream_count(:)
       INTEGER, SAVE, ALLOCATABLE :: upstream_idx(:,:)
       INTEGER, SAVE ::  gw_index, ss_index
@@ -32,8 +33,6 @@
       REAL, SAVE, ALLOCATABLE :: Seg_tave_air(:), Seg_melt(:), Seg_rain(:)
       DOUBLE PRECISION, ALLOCATABLE :: Seg_potet(:)
 !   Segment Parameters
-      REAL, SAVE, ALLOCATABLE :: Seg_length(:) !, Mann_n(:)
-      REAL, SAVE, ALLOCATABLE :: Seg_slope(:)
       REAL, SAVE, ALLOCATABLE :: Stream_tave_init(:)
       INTEGER, SAVE:: Maxiter_sntemp
       REAL, SAVE, ALLOCATABLE :: Seg_humidity(:, :)
@@ -200,20 +199,7 @@
      &     'Additive correction factor to adjust the bias of the temperature of the lateral inflow', &
      &     'degrees Celsius')/=0 ) CALL read_error(1, 'lat_temp_adj')
 
-      ALLOCATE ( Seg_length(Nsegment) )
-      IF ( declparam( MODNAME, 'seg_length', 'nsegment', 'real', &
-     &     '1000.0', '1.0', '100000.0', &
-     &     'Length of each segment', &
-     &     'Length of each segment', &
-     &     'meters')/=0 ) CALL read_error(1, 'seg_length')
-
-      ALLOCATE ( Seg_slope(Nsegment) )
-      IF ( declparam( MODNAME, 'seg_slope', 'nsegment', 'real', &
-     &     '0.0001', '0.0000001', '2.0', &
-     &     'Surface slope of each segment', &
-     &     'Surface slope of each segment as approximation for bed slope of stream', &
-     &     'decimal fraction')/=0 ) CALL read_error(1, 'seg_slope')
-
+      ALLOCATE ( Seg_length_km(Nsegment) )
       IF ( Stream_temp_shade_flag==OFF ) THEN
          ALLOCATE ( Azrh(Nsegment) )
          IF ( declparam( MODNAME, 'azrh', 'nsegment', 'real', &
@@ -400,13 +386,13 @@
 !    stream_temp_init - Initialize module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION stream_temp_init()
-      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, MONTHS_PER_YEAR, OFF, NEARZERO, ERROR_param, DAYS_YR, DEBUG_LESS
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, MONTHS_PER_YEAR, OFF, NEARZERO, ERROR_param, DAYS_YR
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag, Inputerror_flag, Print_debug
+      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag, Inputerror_flag
       USE PRMS_STRMTEMP
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_OBS, ONLY: Nhumid
-      USE PRMS_ROUTING, ONLY: Hru_segment, Tosegment, Segment_order, Segment_up
+      USE PRMS_ROUTING, ONLY: Hru_segment, Tosegment, Segment_order, Segment_up, Seg_length
       use prms_utils, only: checkdim_param_limits, error_stop, read_error
       IMPLICIT NONE
 ! Functions
@@ -421,7 +407,6 @@
       IF ( getparam_real( MODNAME, 'albedo', 1, Albedo)/=0 ) CALL read_error(2, 'albedo')
       IF ( getparam_real( MODNAME, 'lat_temp_adj', Nsegment*MONTHS_PER_YEAR, lat_temp_adj)/=0 ) &
      &     CALL read_error(2, 'lat_temp_adj')
-      IF ( getparam_real( MODNAME, 'seg_length', Nsegment, Seg_length)/=0 ) CALL read_error(2, 'seg_length')
 
       IF (getparam_real(MODNAME, 'seg_lat', Nsegment, Seg_lat)/=0 ) CALL read_error(2, 'seg_lat')
 !     Convert latitude from degrees to radians
@@ -430,9 +415,7 @@
       IF (getparam_real(MODNAME, 'seg_elev', Nsegment, Seg_elev)/=0 ) CALL read_error(2, 'seg_elev')
 
 ! convert stream length in meters to km
-      Seg_length = Seg_length / 1000.0
-
-      IF ( getparam_real( MODNAME, 'seg_slope', Nsegment, Seg_slope)/=0 ) CALL read_error(2, 'seg_slope')
+      Seg_length_km = Seg_length / 1000.0
 
       IF ( Stream_temp_shade_flag==OFF ) THEN
          IF ( getparam_real( MODNAME, 'azrh', Nsegment, Azrh)/=0 ) CALL read_error(2, 'azrh')
@@ -459,16 +442,21 @@
       IF ( getparam_int( MODNAME, 'maxiter_sntemp', 1, Maxiter_sntemp)/=0 ) CALL read_error(2, 'maxiter_sntemp')
       IF ( getparam_int( MODNAME, 'tempIN_segment', Nsegment, tempIN_segment)/=0 ) CALL read_error(2, 'tempIN_segment')
 
-      ierr = 0
       IF ( Strmtemp_humidity_flag==1 ) THEN
          IF ( getparam_real( MODNAME, 'seg_humidity', Nsegment*MONTHS_PER_YEAR, Seg_humidity)/=0 ) &
      &      CALL read_error(2, 'seg_humidity')
       ELSEIF ( Strmtemp_humidity_flag==2 ) THEN ! use station data
          IF ( getparam_int(MODNAME, 'seg_humidity_sta', Nsegment, Seg_humidity_sta)/=0 ) &
      &      CALL read_error(2, 'seg_humidity_sta')
+         ierr = 0
          DO i = 1, Nsegment
             CALL checkdim_param_limits(i, 'seg_humidity_sta', 'nhumid', Seg_humidity_sta(i), 1, Nhumid, ierr)
          ENDDO
+         IF ( ierr==1 ) THEN
+           Inputerror_flag = ierr
+           RETURN
+         ENDIF
+
       ENDIF
 
 ! Initialize declared variables
@@ -517,24 +505,6 @@
          IF ( i==0 ) CYCLE
          Seg_hru_count(i) = Seg_hru_count(i) + 1
       ENDDO
-
-! find segments that are too short and print them out as they are found
-      DO i = 1, Nsegment
-         IF ( Seg_length(i)<NEARZERO ) THEN
-            PRINT *, 'ERROR, seg_length too small for segment:', i, ', value:', Seg_length(i)
-            ierr = 1
-         ENDIF
-         IF ( Seg_slope(i)<0.0000001 ) THEN
-            IF ( Print_debug>DEBUG_LESS ) PRINT *, 'WARNING, seg_slope < 0.0000001, set to 0.0000001', i, Seg_slope(i)
-            Seg_slope(i) = 0.0000001
-         ENDIF
-      ENDDO
-
-! exit if there are any segments that are too short
-      IF ( ierr==1 ) THEN
-         Inputerror_flag = ierr
-         RETURN
-      ENDIF
 
       Seg_close = Segment_up ! assign upstream values
       DO j = 1, Nsegment ! set values based on routing order for segments without associated HRUs
@@ -1056,7 +1026,7 @@
 
 !             Compute the daily mean water temperature
               ! In: t_o, qlat, seg_tave_lat(i), te, ak1, ak2, i, seg_width, seg_length
-              Seg_tave_water(i) = twavg(fs, t_o, qlat, seg_tave_lat(i), te, ak1, ak2, seg_width(i), seg_length(i))
+              Seg_tave_water(i) = twavg(fs, t_o, qlat, seg_tave_lat(i), te, ak1, ak2, seg_width(i), seg_length_km(i))
 
           else
               ! bad t_o value
@@ -1145,7 +1115,7 @@
       Ql = SNGL( Qlat )
 
 ! This is confused logic coment out here and compute the terms as needed below
-!      b = (Ql / Seg_length) + ((Ak1 * Seg_width) / 4182.0E03)
+!      b = (Ql / Seg_length_km) + ((Ak1 * Seg_width) / 4182.0E03)
 !      IF ( b < NEARZERO ) b = NEARZERO ! rsr, don't know what value this should be to avoid divide by 0
 !      r = 1.0 + (Ql / q_init)
 !      IF ( r < NEARZERO ) r = NEARZERO
@@ -1222,9 +1192,9 @@
 
       USE PRMS_CONSTANTS, ONLY: NEARZERO, CFS2CMS_CONV
       USE PRMS_STRMTEMP, ONLY: ZERO_C, Seg_humid, Press, MPS_CONVERT, &
-     &    Seg_ccov, Seg_potet, Albedo, seg_tave_gw, Seg_slope
+     &    Seg_ccov, Seg_potet, Albedo, seg_tave_gw
       USE PRMS_FLOWVARS, ONLY: Seg_inflow
-      USE PRMS_ROUTING, ONLY: Seginc_swrad
+      USE PRMS_ROUTING, ONLY: Seginc_swrad, Seg_slope
       USE PRMS_STRMFLOW_CHARACTER, ONLY: Seg_width
       use prms_utils, only: sat_vapor_press_poly
       IMPLICIT NONE
