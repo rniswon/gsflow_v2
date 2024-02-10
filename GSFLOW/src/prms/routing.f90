@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2024-01-16'
+      character(len=*), parameter :: Version_routing = '2024-02-09'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades, special_seg_type_flag
@@ -315,7 +315,7 @@
       use prms_utils, only: read_error, write_outfile
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: MOD, ABS, DBLE
+      INTRINSIC :: MOD, DBLE, ABS
 ! Local Variables
       INTEGER :: i, j, test, lval, toseg, iseg, isegerr, ierr, eseg
       REAL :: k, x, d, x_max, velocity
@@ -651,7 +651,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, OUTFLOW_SEGMENT, &
      &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
      &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT, GLACIER
-      USE PRMS_MODULE, ONLY: Nsegment, Cascade_flag, Hru_type
+      USE PRMS_MODULE, ONLY: Nsegment, Cascade_flag, Glacier_flag, Hru_type
       USE PRMS_ROUTING
       USE PRMS_BASIN, ONLY: Hru_area_dble, Hru_route_order, Active_hrus
       USE PRMS_CLIMATEVARS, ONLY: Swrad, Potet
@@ -695,7 +695,9 @@
         Hru_outflow(j) = DBLE( (Sroff(j) + Ssres_flow(j) + Gwres_flow(j)) )*tocfs
         ! Note: glacr_flow (from glacier or snowfield) is added as a gain, outside stream network addition
         ! glacr_flow in inch^3, 1728=12^3
-        IF ( Hru_type(j)==GLACIER ) Hru_outflow(j) = Hru_outflow(j) + DBLE( Glacr_flow(j) ) / 1728.0D0 / Timestep_seconds
+        IF ( Glacier_flag==ACTIVE ) THEN
+          IF ( Hru_type(j)==GLACIER ) Hru_outflow(j) = Hru_outflow(j) + DBLE( Glacr_flow(j) ) / 1728.0D0 / Timestep_seconds
+        ENDIF
         IF ( Hru_seg_cascades==ACTIVE ) THEN
           i = Hru_segment(j)
           IF ( i>0 ) THEN

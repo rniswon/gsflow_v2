@@ -601,7 +601,7 @@
 ! Arguments
       INTEGER, INTENT(IN) :: Iunit, Src_type
       INTEGER, INTENT (INOUT) :: Next_yr, Next_mo, Next_day
-! Funcions
+! Functions
       EXTERNAL :: check_event, set_transfers
 ! Local Variables
       INTEGER src_id, dest_type, dest_id, keep_reading, ignore
