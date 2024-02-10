@@ -50,8 +50,6 @@
       use PRMS_READ_PARAM_FILE, only: declparam
       use prms_utils, only: read_error, print_module
       IMPLICIT NONE
-! Functions
-      INTRINSIC :: INDEX
 !***********************************************************************
       strmflow_character_decl = 0
 

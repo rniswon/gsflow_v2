@@ -14,6 +14,13 @@ MODULE PRMS_CONSTANTS
     !real(DOUBLEsize), PARAMETER :: ZERO_SNOWPACK = 1.0D-16
     real(DOUBLEsize), PARAMETER :: DCLOSEZERO = 1.0D-12
 
+    real(DOUBLEsize), parameter :: PI = ACOS(-1.0D0) ! ABOUT 3.1415926535898
+    real(DOUBLEsize), parameter :: TWOPI = 2.0D0*PI ! ABOUT 6.2831853071786
+    real(DOUBLEsize), parameter :: HALF_PI = ACOS(0.0D0)
+    real(DOUBLEsize), parameter :: PI_4 = PI/4.0D0
+    real(DOUBLEsize), parameter :: RADIANS = PI / 180.0D0 ! ABOUT 0.017453292519943
+    real(DOUBLEsize), parameter :: PI_12 = 12.0D0 / PI ! ABOUT 3.8197186342055
+
     integer, parameter :: MAXFILE_LENGTH = 256
     integer, parameter :: MAXLINE_LENGTH = 256
     integer, parameter :: MAXDATALINE_LENGTH = 60000
@@ -21,13 +28,16 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: MAXDESCRIPTION_LENGTH = 512
     integer, parameter :: MAXCMDLINE_LENGTH = 512
     integer, parameter :: MAXDIM = 500
-    integer, parameter :: MONTHS_PER_YEAR = 12
+    integer, parameter :: Nmonths = 12
     integer, parameter :: MAX_DAYS_PER_YEAR = 366
     integer, parameter :: DAYS_PER_YEAR = 365
     real(REALsize), parameter :: DAYS_YR = 365.242
+!    real(REALsize), parameter :: DAYS_YR = 365.256 ! https://en.wikipedia.org/wiki/Earth%27s_orbit
     real(DOUBLEsize), parameter :: DAYS_IN_YEAR = 365.242D0
     real(DOUBLEsize), parameter :: SECS_PER_DAY = 86400.0D0
     real(DOUBLEsize), parameter :: SECS_PER_HOUR = 3600.0D0
+    real(DOUBLEsize), parameter :: DEGDAY = 360.0D0 / DAYS_IN_YEAR
+    real(DOUBLEsize), parameter :: DEGDAYRAD = DEGDAY * RADIANS ! about 0.00143356672
     real(DOUBLEsize), parameter :: FT2_PER_ACRE = 43560.0D0
     real(DOUBLEsize), parameter :: INCHES_PER_FOOT = 12.0D0
     real(DOUBLEsize), parameter :: CFS2CMS_CONV = 0.028316847D0

@@ -3,7 +3,10 @@
 ! linear reservoirs (snow, firn, ice) with time lapses and ability
 ! to advance or retreat according to Bahr(1997) volume-area scaling.
 ! This theory has been advanced according to Arendt and others(2006) for
-! the scaling constants and Luthi(2009).
+! the scaling constants and Luthi(2009) to get a glacier height at ELA.
+! Firn layer can shrink or grow, de Woul(2006) says that the changing
+! area of the firn highly affects the timing of the peak flows. ELA
+! postion is found from the AAR0 ratios in Kern and Laszlo(2010).
 !
 ! ELAs are computed yearly, as well as mass balance, maximum/winter and
 ! minimum/summer. These can be used for calibration. Note that the calculation
@@ -34,12 +37,18 @@
 ! HRUs containing insubstantial (relative to basin) glaciers have their glaciated
 ! fraction as glrette_frac(i)>0 (but <1)
 !
+! If Glacier HRUs are determined by elevation, corresponding branch HRU's in same glacier
+! have same mean elevation, Hru_elev_ts. This will ensure that the ELA's
+! across the branches in the same glacier are at the same elevation.
+!
 ! NOTE: Multiple branches are possible in the melt generation, but basal topography
 ! calculations will be mathematically unsound as each branch will be considered a
 ! different glacier.
 !
 ! modified June 2012 by Steve Regan
+! modified Jan 2015 by AE Van Beusekom
 ! modified Jan 2017 by AE Van Beusekom
+! modified January 2024 by Steve Regan
 ! dedicated calibration variables removed 2019
 !
 !***********************************************************************
@@ -50,7 +59,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2023-11-01'
+      character(len=*), parameter :: Version_glacr = '2024-01-15'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -85,7 +94,7 @@
       REAL, SAVE :: Max_gldepth
       REAL, SAVE, ALLOCATABLE :: Glacrva_coef(:), Glacrva_exp(:), Hru_length(:), Hru_width(:)
       REAL, SAVE, ALLOCATABLE :: Stor_ice(:,:), Stor_snow(:,:), Stor_firn(:,:)
-      REAL, SAVE, ALLOCATABLE :: Hru_slope(:), Abl_elev_range(:)
+      REAL, SAVE, ALLOCATABLE :: Abl_elev_range(:)
 
       END MODULE PRMS_GLACR
 
@@ -143,7 +152,7 @@
 !     glacrdecl - declare parameters and variables for glacier runoff
 !***********************************************************************
       INTEGER FUNCTION glacrdecl()
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: Nmonths
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file
@@ -362,13 +371,6 @@
      &     ' glacier melt flows, for non-glacier HRUs that do not flow to another HRU enter 0', &
      &     'none')/=0 ) CALL read_error(1, 'tohru')
 
-      ALLOCATE ( Hru_slope(Nhru) )
-      IF ( declparam(MODNAME, 'hru_slope', 'nhru', 'real', &
-     &     '0.0', '0.0', '10.0', &
-     &     'HRU slope', &
-     &     'Slope of each HRU, specified as change in vertical length divided by change in horizontal length', &
-     &     'decimal fraction')/=0 ) CALL read_error(1, 'hru_slope')
-
       IF ( declparam(MODNAME, 'max_gldepth', 'one', 'real', &
            '1.5', '0.1', '3.0', &
            'Upper bound on glacier thickness, thickest glacier measured is Taku at 1.5 km, ice sheet 3 km', &
@@ -389,21 +391,21 @@
            'Volume area exponential coefficient for glaciers, average value by region', &
            'none')/=0 ) CALL read_error(1, 'glacrva_exp')
 
-      ALLOCATE ( Stor_ice(Nhru,MONTHS_PER_YEAR) )
+      ALLOCATE ( Stor_ice(Nhru,Nmonths) )
       IF ( declparam(MODNAME, 'stor_ice', 'nhru,nmonths', 'real', &
            '10.0', '5.0', '29.0', &
            'Monthly Storage coefficient for ice melt on glaciers', &
            'Monthly (January to December) Storage coefficient for ice melt on glaciers', &
            'hours')/=0 ) CALL read_error(1, 'stor_ice')
 
-      ALLOCATE ( Stor_snow(Nhru,MONTHS_PER_YEAR) )
+      ALLOCATE ( Stor_snow(Nhru,Nmonths) )
       IF ( declparam(MODNAME, 'stor_snow', 'nhru,nmonths', 'real', &
            '80.0', '30.0', '149.0', &
            'Monthly Storage coefficient for snow melt on glaciers', &
            'Monthly (January to December) Storage coefficient for snow melt on glaciers', &
            'hours')/=0 ) CALL read_error(1, 'stor_snow')
 
-      ALLOCATE ( Stor_firn(Nhru,MONTHS_PER_YEAR) )
+      ALLOCATE ( Stor_firn(Nhru,Nmonths) )
       IF ( declparam(MODNAME, 'stor_firn', 'nhru,nmonths', 'real', &
            '400.0', '150.0', '1000.0', &
            'Monthly Storage coefficient for firn melt on glaciers', &
@@ -437,13 +439,14 @@
 !     glacrinit - Initialize glacr module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION glacrinit()
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, GLACIER, LAND
+      USE PRMS_CONSTANTS, ONLY: GLACIER, LAND
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Hru_type
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Nhru_nmonths, Hru_type
       USE PRMS_GLACR
       USE PRMS_BASIN, ONLY: Hru_area, Hru_elev_ts, Active_hrus, Hru_route_order, &
      &    Basin_area_inv, Hru_elev_meters
       USE PRMS_FLOWVARS, ONLY: Glacier_frac, Alt_above_ela, Glrette_frac
+      USE PRMS_SOLTAB, ONLY: Hru_slope
       use prms_utils, only: get_ftnunit, read_error
       IMPLICIT NONE
 ! Functions
@@ -469,14 +472,13 @@
       IF ( getparam_real(MODNAME, 'max_gldepth', 1, Max_gldepth)/=0 ) CALL read_error(2, 'max_gldepth')
       IF ( getparam_real(MODNAME, 'glacrva_coef', Nhru, Glacrva_coef)/=0 ) CALL read_error(2, 'glacrva_coef')
       IF ( getparam_real(MODNAME, 'glacrva_exp', Nhru, Glacrva_exp)/=0 ) CALL read_error(2, 'glacrva_exp')
-      IF ( getparam_real(MODNAME, 'stor_ice', Nhru*MONTHS_PER_YEAR, Stor_ice)/=0 ) CALL read_error(2, 'stor_ice')
-      IF ( getparam_real(MODNAME, 'stor_snow', Nhru*MONTHS_PER_YEAR, Stor_snow)/=0 ) CALL read_error(2, 'stor_snow')
-      IF ( getparam_real(MODNAME, 'stor_firn', Nhru*MONTHS_PER_YEAR, Stor_firn)/=0 ) CALL read_error(2, 'stor_firn')
+      IF ( getparam_real(MODNAME, 'stor_ice', Nhru_nmonths, Stor_ice)/=0 ) CALL read_error(2, 'stor_ice')
+      IF ( getparam_real(MODNAME, 'stor_snow', Nhru_nmonths, Stor_snow)/=0 ) CALL read_error(2, 'stor_snow')
+      IF ( getparam_real(MODNAME, 'stor_firn', Nhru_nmonths, Stor_firn)/=0 ) CALL read_error(2, 'stor_firn')
       IF ( getparam_real(MODNAME, 'hru_length', Nhru, Hru_length)/=0 ) CALL read_error(2, 'hru_length')
       IF ( getparam_real(MODNAME, 'hru_width', Nhru, Hru_width)/=0 ) CALL read_error(2, 'hru_width')
       IF ( getparam_real(MODNAME, 'abl_elev_range', Nhru, Abl_elev_range)/=0 ) CALL read_error(2, 'abl_elev_range')
       IF ( getparam_int(MODNAME, 'tohru', Nhru, Tohru)/=0 ) CALL read_error(2, 'tohru')
-      IF ( getparam_real(MODNAME, 'hru_slope', Nhru, Hru_slope)/=0 ) CALL read_error(2, 'hru_slope')
       IF ( Init_vars_from_file==0 ) THEN
         Alt_above_ela = 0.0
         Prev_out = 0.0
@@ -917,7 +919,7 @@
       lowest = 0
       count_delta = 0
       count_delta2 = 0
-      delta_areayr = 0.0
+      delta_areayr = 0.0D0
       delta_vol = 0.0D0
       lowpt = 0
       stact_hrus = 0
@@ -939,7 +941,7 @@
       Gl_ice_melt = 0.0
       Glacr_flow = 0.0
       Basin_snowicecov = Basin_snowicecov*Acre_inch2/Basin_area_inv
-      gl_gain = 0.D0
+      gl_gain = 0.0D0
 !
 ! Start of year calculations after have a year of data
       IF ( Julwater==1 .AND. Nowyear>=Start_year+1) THEN
@@ -1041,7 +1043,7 @@
                 aream(cell_id(i)) = ode_area(i) !indexed by terminus HRU
                 Basin_gl_storstart = Basin_gl_storstart+ ode_vol(i) !in km^3
               ENDDO
-              Basin_gl_storstart =  (Basin_gl_storstart*(39370.1**3.0)/Acre_inch2)*Basin_area_inv
+              Basin_gl_storstart =  (Basin_gl_storstart*(39370.1D0**3.0D0)/Acre_inch2)*Basin_area_inv
             ELSE
               DO i = 1, Nhrugl
                 volm(cell_id(i)) = 0.0   !indexed by terminus HRU
@@ -1404,7 +1406,7 @@
             gl_gain(j) = DBLE(gl_snow - gl_evap)
             gl_total(j) = -Hru_glres_melt(j) + gl_gain(j)
             !this is daily mass balance on glacier part of HRU in inches, divide by glacier_frac so averaged over glaciated part of HRU only
-            Hru_mb_yrcumul(j) = Hru_mb_yrcumul(j) + gl_total(j)/Glacier_frac(j)
+            Hru_mb_yrcumul(j) = Hru_mb_yrcumul(j) + gl_total(j)/DBLE(Glacier_frac(j))
             Basin_gl_top_gain = Basin_gl_top_gain + gl_gain(j)*Hru_area_inch2(j)
             !postive indicates snow, negative indicates melt
           ENDIF
@@ -1517,7 +1519,7 @@
                     IF ( Glacrmelt(j)-Net_rain(j)*Glacier_frac(j)>NEARZERO ) &
      &                     volresv_ice =  DBLE(Glacrmelt(j)-Net_rain(j)*Glacier_frac(j))*Hru_area_inch2(j)
                     IF ( volresv_ice>DNEARZERO ) in_top_melt_ice(jj, ii) = in_top_melt_ice(jj, ii)+ volresv_ice
-                    delta_vol(o) = delta_vol(o) + gl_total(j)*Hru_area_inch2(j)/0.917
+                    delta_vol(o) = delta_vol(o) + gl_total(j)*Hru_area_inch2(j)/0.917D0
                     ! divide by density ratio to get in volume, if were all converted to ice (by end of year)
                   ENDIF
                 ENDIF
@@ -1547,8 +1549,8 @@
               IF ( jj==1 .AND. thecase(ii)==1 ) stor = Stor_snow(Term(o),Nowmonth)/24.0  !days
               IF ( jj==2 .AND. thecase(ii)==2 ) stor = Stor_ice(Term(o),Nowmonth)/24.0  !days
             ENDDO
-            tot_reserv(jj) = Prev_out(p, jj)*EXP(-1.0/stor) + in_top_melt_tot(jj)*(1.0-EXP(-1.0/stor))
-            tot_reservi(jj) = Prev_outi(p, jj)*EXP(-1.0/stor) + in_top_melt_itot(jj)*(1.0-EXP(-1.0/stor))
+            tot_reserv(jj) = DBLE(Prev_out(p, jj)*EXP(-1.0/stor)) + in_top_melt_tot(jj)*DBLE((1.0-EXP(-1.0/stor)))
+            tot_reservi(jj) = DBLE(Prev_outi(p, jj)*EXP(-1.0/stor)) + in_top_melt_itot(jj)*DBLE((1.0-EXP(-1.0/stor)))
             Gl_ice_melt(p) = Gl_ice_melt(p) + SNGL(tot_reservi(jj))
             Gl_top_melt(p) = Gl_top_melt(p) + SNGL(tot_reserv(jj))
             Prev_out(p, jj) = SNGL(in_top_melt_tot(jj))
@@ -1574,7 +1576,7 @@
               IF ( Hru_type(i)==GLACIER ) THEN !find a i in glacier
                 IF ( Glacr_tag(i)==Glacr_tag(j) .AND. Hru_elev_ts(i)>=Hru_elev_ts(j) ) THEN
                 !will add self (i=j) and everything above
-                  tot_delta_mb(j) = tot_delta_mb(j) + Hru_mb_yrcumul(i)*Glacier_frac(i)*Hru_area_inch2(i)
+                  tot_delta_mb(j) = tot_delta_mb(j) + Hru_mb_yrcumul(i)*DBLE(Glacier_frac(i))*Hru_area_inch2(i)
                 ENDIF
               ENDIF
             ENDDO
@@ -1598,7 +1600,7 @@
             Basin_gl_top_melt = Basin_gl_top_melt + DBLE(Glrette_melt(j))*Hru_area_inch2(j)
             Basin_gl_top_gain = Basin_gl_top_gain + DBLE(gl_gain(j))*Hru_area_inch2(j)
             Basin_snowicecov = Basin_snowicecov + DBLE(( 1.-Snowcov_area(j) )*Glrette_frac(j))*Hru_area_inch2(j)
-            Glacr_flow(j) = REAL(Glrette_melt(j)*Hru_area_inch2(j))
+            Glacr_flow(j) = Glrette_melt(j)*SNGL(Hru_area_inch2(j))
           ENDIF
         ENDDO
       ENDIF
@@ -1704,9 +1706,9 @@
 
       DO o = 1, Ngl
         p = Glacr_tag(Term(o)) !index by Glacr_tag
-        IF ( Prev_area(Term(o))<1.0*Convert_units ) aar = 0.44
+        IF ( Prev_area(Term(o))<DBLE(1.0*Convert_units) ) aar = 0.44
         !for glaciers area <1km^2
-        IF ( Prev_area(Term(o))>=4.0*Convert_units ) aar = 0.64
+        IF ( Prev_area(Term(o))>=DBLE(4.0*Convert_units) ) aar = 0.64
         !for glaciers area >4km^2
         elaarea = SNGL(Prev_area(Term(o)))*aar
 !aar is percentage of area from top down, from Kern and Laszlo 2010
@@ -1749,39 +1751,26 @@
 ! of changing slope
 !***********************************************************************
       INTEGER FUNCTION recompute_soltab()
-      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, GLACIER
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, GLACIER, PI, DEGDAYRAD
       USE PRMS_MODULE, ONLY: Hru_type
       USE PRMS_GLACR, ONLY: Hru_slope_ts
-      USE PRMS_SOLTAB, ONLY: Hru_aspect, Hru_cossl, PI, RADIANS, &
-     &    Soltab_potsw, Soltab_sunhrs, Solar_declination, ECCENTRICY, DEGDAY, DEGDAYRAD
+      USE PRMS_SOLTAB, ONLY: Hru_aspect, Hru_cossl, obliquity, &
+     &    Soltab_potsw, Soltab_sunhrs, Solar_declination, ECCENTRICY
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_lat
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SIN, COS, FLOAT, SNGL
       EXTERNAL :: compute_soltab
 ! Local Variables
-      INTEGER :: jd, n, nn
-      DOUBLE PRECISION :: obliquity(MAX_DAYS_PER_YEAR)
-      DOUBLE PRECISION :: y, y2, y3, jddbl
+      INTEGER :: n, nn
 !***********************************************************************
       recompute_soltab = 0
-! initialize
-      DO jd = 1, MAX_DAYS_PER_YEAR
-        jddbl = DBLE(jd)
-        obliquity(jd) = 1.0D0 - (ECCENTRICY*COS((jddbl-3.0D0)*DEGDAYRAD))
-        y = DEGDAYRAD*(jddbl-1.0D0) ! assume noon
-        y2 = 2.0D0*y
-        y3 = 3.0D0*y
-        Solar_declination(jd) = 0.006918D0 - 0.399912D0*COS(y) + 0.070257D0*SIN(y) &
-     &                          - 0.006758D0*COS(y2) + 0.000907D0*SIN(y2) &
-     &                          - 0.002697D0*COS(y3) + 0.00148D0*SIN(y3)
-      ENDDO
 !   Module Variables
       DO nn = 1, Active_hrus
         n = Hru_route_order(nn)
         IF ( Hru_type(n)==GLACIER ) THEN !only call if glacier HRU and could have changed
-          Soltab_sunhrs(1, n) = 0.0
-          Soltab_potsw(1, n) = 0.0
+          Soltab_sunhrs(1, n) = 0.0D0
+          Soltab_potsw(1, n) = 0.0D0
           CALL compute_soltab(obliquity, Solar_declination, Hru_slope_ts(n), Hru_aspect(n), &
      &                      Hru_lat(n), Hru_cossl(n), Soltab_potsw(:, n), &
      &                      Soltab_sunhrs(:, n), Hru_type(n), n)
@@ -2984,7 +2973,7 @@
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: N
-      INTEGER, INTENT(OUT) :: Iwksp(N)
+      INTEGER, INTENT(INOUT) :: Iwksp(N)
       REAL, INTENT(INOUT) :: Ra(N), Rb(N), Rc(N), Rd(N), Re(N)
       REAL, INTENT(OUT) :: Wksp(N)
 ! Functions

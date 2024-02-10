@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2024-01-10'
+      character(len=*), parameter :: Version_routing = '2024-01-16'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades, special_seg_type_flag
@@ -315,7 +315,7 @@
       use prms_utils, only: read_error, write_outfile
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: MOD, ABS
+      INTRINSIC :: MOD, ABS, DBLE
 ! Local Variables
       INTEGER :: i, j, test, lval, toseg, iseg, isegerr, ierr, eseg
       REAL :: k, x, d, x_max, velocity
@@ -401,8 +401,8 @@
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 ) THEN
         IF ( getparam_real(MODNAME, 'segment_flow_init',  Nsegment, Segment_flow_init)/=0 ) &
      &       CALL read_error(2,'segment_flow_init')
+        Seg_outflow = DBLE( Segment_flow_init )
         DO i = 1, Nsegment
-          Seg_outflow(i) = Segment_flow_init(i)
           IF ( Tosegment(i)>0 ) Seg_inflow(Tosegment(i)) = Seg_outflow(i)
         ENDDO
         DEALLOCATE ( Segment_flow_init )
@@ -650,10 +650,10 @@
       INTEGER FUNCTION route_run()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, OUTFLOW_SEGMENT, &
      &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
-     &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
-      USE PRMS_MODULE, ONLY: Nsegment, Cascade_flag, Glacier_flag
+     &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT, GLACIER
+      USE PRMS_MODULE, ONLY: Nsegment, Cascade_flag, Hru_type
       USE PRMS_ROUTING
-      USE PRMS_BASIN, ONLY: Hru_area, Hru_route_order, Active_hrus
+      USE PRMS_BASIN, ONLY: Hru_area_dble, Hru_route_order, Active_hrus
       USE PRMS_CLIMATEVARS, ONLY: Swrad, Potet
       USE PRMS_SET_TIME, ONLY: Timestep_seconds, Cfs_conv
       USE PRMS_FLOWVARS, ONLY: Ssres_flow, Sroff, Seg_lateral_inflow, Strm_seg_in !, Seg_outflow
@@ -691,24 +691,24 @@
 
       DO jj = 1, Active_hrus
         j = Hru_route_order(jj)
-        tocfs = DBLE( Hru_area(j) )*Cfs_conv
+        tocfs = Hru_area_dble(j) * Cfs_conv
         Hru_outflow(j) = DBLE( (Sroff(j) + Ssres_flow(j) + Gwres_flow(j)) )*tocfs
         ! Note: glacr_flow (from glacier or snowfield) is added as a gain, outside stream network addition
         ! glacr_flow in inch^3, 1728=12^3
-        IF ( Glacier_flag==1 ) Hru_outflow(j) = Hru_outflow(j) + Glacr_flow(j)/1728.0/Timestep_seconds
+        IF ( Hru_type(j)==GLACIER ) Hru_outflow(j) = Hru_outflow(j) + DBLE( Glacr_flow(j) ) / 1728.0D0 / Timestep_seconds
         IF ( Hru_seg_cascades==ACTIVE ) THEN
           i = Hru_segment(j)
           IF ( i>0 ) THEN
-            Seg_gwflow(i) = Seg_gwflow(i) + Gwres_flow(j)
-            Seg_sroff(i) = Seg_sroff(i) + Sroff(j)
-            Seg_ssflow(i) = Seg_ssflow(i) + Ssres_flow(j)
+            Seg_gwflow(i) = Seg_gwflow(i) + DBLE( Gwres_flow(j) )
+            Seg_sroff(i) = Seg_sroff(i) + DBLE( Sroff(j) )
+            Seg_ssflow(i) = Seg_ssflow(i) + DBLE( Ssres_flow(j) )
             ! if cascade_flag = CASCADE_HRU_SEGMENT, seg_lateral_inflow set with strm_seg_in
             IF ( Cascade_flag==CASCADE_OFF ) Seg_lateral_inflow(i) = Seg_lateral_inflow(i) + Hru_outflow(j)
             Seginc_sroff(i) = Seginc_sroff(i) + DBLE( Sroff(j) )*tocfs
             Seginc_ssflow(i) = Seginc_ssflow(i) + DBLE( Ssres_flow(j) )*tocfs
             Seginc_gwflow(i) = Seginc_gwflow(i) + DBLE( Gwres_flow(j) )*tocfs
-            Seginc_swrad(i) = Seginc_swrad(i) + DBLE( Swrad(j)*Hru_area(j) )
-            Seginc_potet(i) = Seginc_potet(i) + DBLE( Potet(j)*Hru_area(j) )
+            Seginc_swrad(i) = Seginc_swrad(i) + DBLE( Swrad(j) ) * Hru_area_dble(j)
+            Seginc_potet(i) = Seginc_potet(i) + DBLE( Potet(j) ) * Hru_area_dble(j)
           ENDIF
         ENDIF
       ENDDO
@@ -733,7 +733,7 @@
       ELSE !     IF ( Noarea_flag==ACTIVE ) THEN
         DO i = 1, Nsegment
 ! This reworked by markstrom
-          IF ( Segment_hruarea(i)>NEARZERO ) THEN
+          IF ( Segment_hruarea(i) > 0.0D0 ) THEN
             Seginc_swrad(i) = Seginc_swrad(i)/Segment_hruarea(i)
             Seginc_potet(i) = Seginc_potet(i)/Segment_hruarea(i)
           ELSE
@@ -742,7 +742,7 @@
             this_seg = i
             found = .false.
             do
-              if (Segment_hruarea(this_seg) <= NEARZERO) then
+              if ( .not.(Segment_hruarea(this_seg) > 0.0D0) ) then
 
                  ! Hit the headwater segment without finding any HRUs (i.e. sources of streamflow)
                  if (segment_up(this_seg) == 0) then
@@ -767,7 +767,7 @@
               this_seg = i
               found = .false.
               do
-                if (Segment_hruarea(this_seg) <= NEARZERO) then
+                if ( .not.(Segment_hruarea(this_seg) > 0.0D0) ) then
 
                    ! Hit the terminal segment without finding any HRUs (i.e. sources of streamflow)
                    if (Tosegment(this_seg) == OUTFLOW_SEGMENT) then
@@ -789,8 +789,8 @@
               if (.not. found) then
 !                write(*,*) "route_run: no upstream or downstream HRU found for segment ", i
 !                write(*,*) "    no values for seginc_swrad and seginc_potet"
-                Seginc_swrad(i) = -99.9
-                Seginc_potet(i) = -99.9
+                Seginc_swrad(i) = -99.9D0
+                Seginc_potet(i) = -99.9D0
               endif
             endif
           ENDIF

@@ -7,7 +7,7 @@ submodule(PRMS_CONTROL_FILE) sm_read_control_file
   use GSFMODFLOW, only: Modflow_name, Modflow_time_zero
   use PRMS_MAP_RESULTS, only: NmapOutVars, MapOutVar_names
   use PRMS_STATVAR_OUT, only: statvarOut_format, nstatVars, statVar_element, statVar_names
-  use PRMS_NHRU_SUMMARY, only: NhruOutVars, NhruOut_freq, NhruOutBaseFileName, NhruOutVar_names, NhruOut_format, NhruOutNcol
+  use PRMS_NHRU_SUMMARY, only: NhruOutVars, NhruOut_freq, NhruOutBaseFileName, NhruOutVar_names, NhruOut_format, NhruOutNcol, write_binary_cbh
   use PRMS_NSUB_SUMMARY, only: NsubOutVars, NsubOut_freq, NsubOutBaseFileName, NsubOutVar_names, NsubOut_format
   use PRMS_BASIN_SUMMARY, only: BasinOutVars, BasinOut_freq, BasinOutBaseFileName, BasinOutVar_names
   use PRMS_NSEGMENT_SUMMARY, only: NsegmentOutVars, NsegmentOut_freq, NsegmentOutBaseFileName, &
@@ -320,6 +320,9 @@ contains
     Control_parameter_data(i) % values_character(1) = Cloud_cover_day
     Control_parameter_data(i) % data_type = CHAR_TYPE
 
+    i = i + 1
+    Control_parameter_data(i) % name = 'write_binary_cbh'
+    write_binary_cbh = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'nhruOutON_OFF'
     NhruOutON_OFF = OFF

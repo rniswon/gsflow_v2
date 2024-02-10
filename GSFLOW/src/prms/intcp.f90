@@ -269,8 +269,8 @@
 ! Newsnow and Pptmix can be modfied, WARNING!!!
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, &
      &    Hru_snow, Transp_on, Potet, Use_pandata, Hru_pansta, Epan_coef, Potet_sublim
-      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Intcp_transp_on, Intcp_stor, Hru_intcpstor
-      USE PRMS_IT0_VARS, ONLY: It0_hru_intcpstor, It0_intcp_transp_on, It0_intcp_stor
+      USE PRMS_FLOWVARS, ONLY: Intcp_transp_on, Intcp_stor, Hru_intcpstor
+      USE PRMS_IT0_VARS, ONLY: It0_pkwater_equiv, It0_hru_intcpstor, It0_intcp_transp_on, It0_intcp_stor
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_OBS, ONLY: Pan_evap
       use prms_utils, only: error_stop
@@ -286,7 +286,7 @@
 !***********************************************************************
       intrun = 0
 
-      ! pkwater_equiv is from last time step
+      ! It0_pkwater_equiv is from last time step
       IF ( PRMS_land_iteration_flag==CANOPY ) THEN
         IF ( Kkiter>1 ) THEN
           Intcp_stor = It0_intcp_stor
@@ -407,7 +407,7 @@
               ELSEIF ( Cov_type(i)==GRASSES ) THEN ! cov_type = 1
                 !rsr, 03/24/2008 intercept rain on snow-free grass,
                 !rsr             when not a mixed event
-                IF ( .not.(Pkwater_equiv(i)>0.0D0) .AND. netsnow<CLOSEZERO ) THEN ! changed from NEARZERO to CLOSEZERO 11/24/2023
+                IF ( .not.(It0_pkwater_equiv(i)>0.0D0) .AND. netsnow<CLOSEZERO ) THEN ! changed from NEARZERO to CLOSEZERO 11/24/2023
                   CALL intercept(Hru_rain(i), stor_max_rain, cov, intcpstor, netrain)
                   !rsr 03/24/2008
                   !it was decided to leave the water in intcpstor rather
