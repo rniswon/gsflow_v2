@@ -14,9 +14,9 @@
       END MODULE PRMS_POTET_HAMON
 
       INTEGER FUNCTION potet_hamon()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, Nmonths
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real
-      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nowmonth
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nowmonth, Nhru_nmonths
       USE PRMS_POTET_HAMON
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc
@@ -54,7 +54,7 @@
       ELSEIF ( Process_flag==DECL ) THEN
         CALL print_module(MODDESC, MODNAME, Version_potet)
 
-        ALLOCATE ( Hamon_coef(Nhru,MONTHS_PER_YEAR) )
+        ALLOCATE ( Hamon_coef(Nhru,Nmonths) )
         IF ( declparam(MODNAME, 'hamon_coef', 'nhru,nmonths', 'real', &
      &       '0.0055', '0.004', '0.008', &
      &       'Monthly air temperature coefficient - Hamon', &
@@ -63,7 +63,7 @@
 
 !******Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam_real(MODNAME, 'hamon_coef', Nhru*MONTHS_PER_YEAR, Hamon_coef)/=0 ) CALL read_error(2, 'hamon_coef')
+        IF ( getparam_real(MODNAME, 'hamon_coef', Nhru_nmonths, Hamon_coef)/=0 ) CALL read_error(2, 'hamon_coef')
       ENDIF
 
       END FUNCTION potet_hamon

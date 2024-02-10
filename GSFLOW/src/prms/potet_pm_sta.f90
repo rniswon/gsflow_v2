@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_pm_sta'
-        character(len=*), parameter :: Version_potet = '2023-11-01'
+        character(len=*), parameter :: Version_potet = '2024-01-15'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Pm_n_coef(:, :), Pm_d_coef(:, :), Crop_coef(:, :)
         INTEGER, SAVE, ALLOCATABLE :: Hru_windspeed_sta(:), Hru_humidity_sta(:)
@@ -19,9 +19,9 @@
 
 !***********************************************************************
       INTEGER FUNCTION potet_pm_sta()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR, INCH2MM
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, Nmonths, INCH2MM
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real, getparam_int
-      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Parameter_check_flag, Inputerror_flag, Nowmonth
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Parameter_check_flag, Inputerror_flag, Nowmonth, Nhru_nmonths
       USE PRMS_POTET_PM_STA
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Swrad, Tminc, Tmaxc, &
@@ -97,13 +97,13 @@
 ! are cases when soltab is zero for certain HRUs (depending on slope/aspect)
 ! for certain months. If this value is zero, reset it to a small value so
 ! there is no divide by zero.
-          IF (Soltab_potsw(Jday,i) <= 10.0) THEN
+          IF ( .not.(Soltab_potsw(Jday,i) > 10.0D0) ) THEN
             stab = 10.0
           ELSE
             stab = SNGL( Soltab_potsw(Jday,i) )
           ENDIF
 
-          IF (Swrad(i) <= 10.0) THEN
+          IF ( .not.(Swrad(i) > 10.0) ) THEN
             sw = 10.5
           ELSE
             sw = Swrad(i)
@@ -146,21 +146,21 @@
         CALL print_module(MODDESC, MODNAME, Version_potet)
 
         ! Declare Parameters
-        ALLOCATE ( Pm_n_coef(Nhru,MONTHS_PER_YEAR) )
+        ALLOCATE ( Pm_n_coef(Nhru,Nmonths) )
         IF ( declparam(MODNAME, 'pm_n_coef', 'nhru,nmonths', 'real', &
      &       '900.0', '850.0', '950.0', &
      &       'Penman-Monteith coefficient', &
      &       'Monthly (January to December) Penman-Monteith potential ET N temperauture coefficient for each HRU', &
      &       'degrees Celsius per day')/=0 ) CALL read_error(1, 'pm_n_coef')
 
-        ALLOCATE ( Pm_d_coef(Nhru,MONTHS_PER_YEAR) )
+        ALLOCATE ( Pm_d_coef(Nhru,Nmonths) )
         IF ( declparam(MODNAME, 'pm_d_coef', 'nhru,nmonths', 'real', &
      &       '0.34', '0.25', '0.45', &
      &       'Penman-Monteith coefficient', &
      &       'Monthly (January to December) Penman-Monteith potential ET D wind-speed coefficient for each HRU', &
      &       'seconds/meters')/=0 ) CALL read_error(1, 'pm_d_coef')
 
-        ALLOCATE ( Crop_coef(Nhru,MONTHS_PER_YEAR) )
+        ALLOCATE ( Crop_coef(Nhru,Nmonths) )
         IF ( declparam(MODNAME, 'crop_coef', 'nhru,nmonths', 'real', &
      &       '1.0', '0.0', '2.0', &
      &       'Crop coefficient for each HRU', &
@@ -184,9 +184,9 @@
 !******Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
         Vp_sat = 0.0
-        IF ( getparam_real(MODNAME, 'pm_n_coef', Nhru*MONTHS_PER_YEAR, Pm_n_coef)/=0 ) CALL read_error(2, 'pm_n_coef')
-        IF ( getparam_real(MODNAME, 'pm_d_coef', Nhru*MONTHS_PER_YEAR, Pm_d_coef)/=0 ) CALL read_error(2, 'pm_d_coef')
-        IF ( getparam_real(MODNAME, 'crop_coef', Nhru*MONTHS_PER_YEAR, Crop_coef)/=0 ) CALL read_error(2, 'crop_coef')
+        IF ( getparam_real(MODNAME, 'pm_n_coef', Nhru_nmonths, Pm_n_coef)/=0 ) CALL read_error(2, 'pm_n_coef')
+        IF ( getparam_real(MODNAME, 'pm_d_coef', Nhru_nmonths, Pm_d_coef)/=0 ) CALL read_error(2, 'pm_d_coef')
+        IF ( getparam_real(MODNAME, 'crop_coef', Nhru_nmonths, Crop_coef)/=0 ) CALL read_error(2, 'crop_coef')
         IF ( getparam_int(MODNAME, 'hru_windspeed_sta', Nhru, Hru_windspeed_sta)/=0 ) CALL read_error(2,'hru_windspeed_sta')
         IF ( getparam_int(MODNAME, 'hru_humidity_sta', Nhru, Hru_humidity_sta)/=0 ) CALL read_error(2, 'hru_humidity_sta')
         IF ( Parameter_check_flag>0 ) THEN
