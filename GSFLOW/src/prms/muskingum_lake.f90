@@ -6,7 +6,9 @@
 !
 ! gwflow goes to GWR instead of to the lake unless specified as
 ! going to stream segment associated with the lake, which would be a
-! problem
+! problem, thus gw_upslope usually goes to GWR under the lake,
+! but is included in strm_seg_in if gwflow is associated with a stream
+! segment, set in gwflow, 06/15/2009
 !
 ! nlake_hrus set to nlake for version 5.0.0, nlake_hrus to be added in 5.0.1
 ! in future this module may be used for muskingum only, so would need to
@@ -602,7 +604,7 @@
       INTEGER FUNCTION muskingum_lake_init()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, DNEARZERO, LAKE, ERROR_dim, CASCADE_OFF, CASCADE_HRU_SEGMENT
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nsegment, Nhru, Nratetbl, Nlake, Init_vars_from_file, Cascade_flag, Inputerror_flag
+      USE PRMS_MODULE, ONLY: Nsegment, Nhru, Nratetbl, Nlake, Nobs, Init_vars_from_file, Cascade_flag, Inputerror_flag
       USE PRMS_MUSKINGUM_LAKE
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_route_order, Gwr_type, &
      &    Lake_hru_id, Weir_gate_flag, Lake_type, Puls_lin_flag
@@ -826,8 +828,8 @@
 !            ENDIF
 !          ENDIF
         ELSEIF ( Lake_type(j)==6 ) THEN
-          IF ( Obsout_lake(j)==0 ) THEN
-            PRINT *, 'ERROR, obsout_lake value = 0 for lake:', j, Obsout_lake(j)
+          IF ( Obsout_lake(j)==0 .OR. Obsout_lake(j)>Nobs ) THEN
+            PRINT *, 'ERROR, obsout_lake value = 0 or > nobs for lake:', j, Obsout_lake(j)
             ierr = 1
           ENDIF
         ENDIF
@@ -1401,7 +1403,7 @@
 
         gate2 = Ngate
         gate1 = Ngate - 1
-        IF ( Gate_ht<=Tbl_gate(Ngate) ) THEN
+        IF ( .not.(Gate_ht>Tbl_gate(Ngate)) ) THEN
           DO mm = 1, Ngate
             IF ( Tbl_gate(mm)>Gate_ht ) THEN
               IF ( mm==1 ) THEN
