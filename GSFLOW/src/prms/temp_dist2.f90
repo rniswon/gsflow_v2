@@ -13,12 +13,12 @@
 ! Variables needed from DATA FILE: tmax, tmin
 !***********************************************************************
       MODULE PRMS_TEMP_DIST2
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: Nmonths
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Temperature Distribution'
       character(len=10), parameter :: MODNAME = 'temp_dist2'
-      character(len=*), parameter :: Version_temp = '2021-09-07'
+      character(len=*), parameter :: Version_temp = '2024-01-15'
       INTEGER, SAVE, ALLOCATABLE :: N_tsta(:), Nuse_tsta(:, :)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dist(:, :)
       REAL, SAVE, ALLOCATABLE :: Delv(:, :), Elfac(:, :)
@@ -28,9 +28,9 @@
 !   Declared Parameters
       INTEGER, SAVE :: Max_tsta
       REAL, SAVE :: Dist_max
-      REAL, SAVE :: Monmin(MONTHS_PER_YEAR), Monmax(MONTHS_PER_YEAR)
-      REAL, SAVE :: Lapsemin_min(MONTHS_PER_YEAR), Lapsemin_max(MONTHS_PER_YEAR)
-      REAL, SAVE :: Lapsemax_min(MONTHS_PER_YEAR), Lapsemax_max(MONTHS_PER_YEAR)
+      REAL, SAVE :: Monmin(Nmonths), Monmax(Nmonths)
+      REAL, SAVE :: Lapsemin_min(Nmonths), Lapsemin_max(Nmonths)
+      REAL, SAVE :: Lapsemax_min(Nmonths), Lapsemax_max(Nmonths)
       REAL, SAVE, ALLOCATABLE :: Tsta_xlong(:), Tsta_ylat(:)
       REAL, SAVE, ALLOCATABLE :: Hru_xlong(:), Hru_ylat(:)
       END MODULE PRMS_TEMP_DIST2
@@ -202,11 +202,11 @@
 !                 - get parameter values, compute elfac, dist
 !***********************************************************************
       INTEGER FUNCTION t2dist2init()
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DNEARZERO, NEARZERO
+      USE PRMS_CONSTANTS, ONLY: DNEARZERO, NEARZERO
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY:  Nhru, Ntemp, Init_vars_from_file
       USE PRMS_TEMP_DIST2
-      USE PRMS_BASIN, ONLY: Hru_elev
+      USE PRMS_BASIN, ONLY: Hru_elev_ts
       USE PRMS_CLIMATEVARS, ONLY: Tsta_elev
       use prms_utils, only: read_error
       IMPLICIT NONE
@@ -224,20 +224,20 @@
       IF ( getparam_int(MODNAME, 'max_tsta', 1, Max_tsta)/=0 ) CALL read_error(2, 'max_tsta')
       IF ( Max_tsta==0 ) Max_tsta = Ntemp
 
-      IF ( getparam_real(MODNAME, 'monmin', MONTHS_PER_YEAR, Monmin)/=0 ) CALL read_error(2, 'monmin')
+      IF ( getparam_real(MODNAME, 'monmin', Nmonths, Monmin)/=0 ) CALL read_error(2, 'monmin')
 
-      IF ( getparam_real(MODNAME, 'monmax', MONTHS_PER_YEAR, Monmax)/=0 ) CALL read_error(2, 'monmax')
+      IF ( getparam_real(MODNAME, 'monmax', Nmonths, Monmax)/=0 ) CALL read_error(2, 'monmax')
 
-      IF ( getparam_real(MODNAME, 'lapsemin_min', MONTHS_PER_YEAR, Lapsemin_min) &
+      IF ( getparam_real(MODNAME, 'lapsemin_min', Nmonths, Lapsemin_min) &
      &     /=0 ) CALL read_error(2, 'lapsemin_min')
 
-      IF ( getparam_real(MODNAME, 'lapsemin_max', MONTHS_PER_YEAR, Lapsemin_max) &
+      IF ( getparam_real(MODNAME, 'lapsemin_max', Nmonths, Lapsemin_max) &
      &     /=0 ) CALL read_error(2, 'lapsemin_max')
 
-      IF ( getparam_real(MODNAME, 'lapsemax_min', MONTHS_PER_YEAR, Lapsemax_min) &
+      IF ( getparam_real(MODNAME, 'lapsemax_min', Nmonths, Lapsemax_min) &
      &     /=0 ) CALL read_error(2, 'lapsemax_min')
 
-      IF ( getparam_real(MODNAME, 'lapsemax_max', MONTHS_PER_YEAR, Lapsemax_max) &
+      IF ( getparam_real(MODNAME, 'lapsemax_max', Nmonths, Lapsemax_max) &
      &     /=0 ) CALL read_error(2, 'lapsemax_max')
 
       IF ( getparam_real(MODNAME, 'tsta_xlong', Ntemp, Tsta_xlong) &
@@ -267,7 +267,7 @@
       nuse_tsta_dist = 0.0D0
       DO i = 1, Nhru
         DO k = 1, Ntemp
-          Elfac(i, k) = (Hru_elev(i)-Tsta_elev(k))/1000.0
+          Elfac(i, k) = (Hru_elev_ts(i)-Tsta_elev(k))/1000.0
           distx = DBLE( (Hru_xlong(i)-Tsta_xlong(k))**2 )
           disty = DBLE( (Hru_ylat(i)-Tsta_ylat(k))**2 )
           distance = DSQRT(distx+disty)
@@ -444,7 +444,7 @@
           PRINT *, ' set values using monmax and monmin', tmx, tmn
           CALL print_date(1)
         ENDIF
-        IF ( tmx<=tmn ) tmx = tmn + 0.01D0
+        IF ( .not.(tmx>tmn) ) tmx = tmn + 0.01D0
 
         tmx_sngl = SNGL( tmx )
         tmn_sngl = SNGL( tmn )

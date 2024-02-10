@@ -6,17 +6,18 @@
 ! measurement gage efficiency
 !***********************************************************************
       MODULE PRMS_TEMP_MAP
-        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, MONTHS_PER_YEAR
+        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, Nmonths
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Temperature Distribution'
         character(len=*), parameter :: MODNAME = 'temp_map'
         character(len=*), parameter :: Version_temp_map = '2023-11-01'
         INTEGER, SAVE :: Tmax_unit, Tmin_unit
+        REAL, SAVE, ALLOCATABLE :: Tmax_map_values(:), Tmin_map_values(:)
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
-        REAL, SAVE, ALLOCATABLE :: Hru2map_pct(:), Tmax_map_values(:), Tmin_map_values(:), Precip_map_values(:)
-        REAL, SAVE, ALLOCATABLE :: Tmax_map_adj(:, :), Tmin_map_adj(:, :), Precip_map_adj(:, :)
+        REAL, SAVE, ALLOCATABLE :: Hru2map_pct(:)
+        REAL, SAVE, ALLOCATABLE :: Tmax_map_adj(:, :), Tmin_map_adj(:, :)
         ! parameters in basin:
         !    hru_area
         ! Control Parameters
@@ -24,7 +25,7 @@
       END MODULE PRMS_TEMP_MAP
 
       SUBROUTINE temp_map()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MAXFILE_LENGTH, MONTHS_PER_YEAR, temp_map_module
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MAXFILE_LENGTH, temp_map_module
       use PRMS_CONTROL_FILE, only: control_string
       use PRMS_READ_PARAM_FILE, only: decldim, declparam, getdim, getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Process_flag, Start_year, Start_month, Start_day, Nmap2hru, Nmap, Nowmonth
@@ -76,14 +77,14 @@
         ALLOCATE ( Tmax_map_values(Nmap), Tmin_map_values(Nmap) )
 
 ! Declare parameters
-        ALLOCATE ( Tmax_map_adj(Nmap,MONTHS_PER_YEAR) )
+        ALLOCATE ( Tmax_map_adj(Nmap,Nmonths) )
         IF ( declparam(MODNAME, 'tmax_map_adj', 'nmap,nmonths', 'real', &
      &       '0.0', '-10.0', '10.0', &
      &       'Monthly maximum temperature adjustment factor for each mapped spatial unit', &
      &       'Monthly (January to December) additive adjustment factor to maximum air temperature for each mapped,'// &
      &       ' spatial unit estimated on the basis of slope and aspect', &
      &       'temp_units')/=0 ) CALL read_error(1, 'tmax_map_adj')
-        ALLOCATE ( Tmin_map_adj(Nmap,MONTHS_PER_YEAR) )
+        ALLOCATE ( Tmin_map_adj(Nmap,Nmonths) )
         IF ( declparam(MODNAME, 'tmin_map_adj', 'nmap,nmonths', 'real', &
      &       '0.0', '-10.0', '10.0', &
      &       'Monthly minimum temperature adjustment factor for each mapped spatial unit', &
@@ -121,9 +122,9 @@
 
         istop = 0
         ierr = 0
-        IF ( getparam_real(MODNAME, 'tmax_map_adj', Nmap*MONTHS_PER_YEAR, Tmax_map_adj)/=0 ) &
+        IF ( getparam_real(MODNAME, 'tmax_map_adj', Nmap*Nmonths, Tmax_map_adj)/=0 ) &
      &       CALL read_error(2, 'tmax_map_adj')
-        IF ( getparam_real(MODNAME, 'tmin_map_adj', Nmap*MONTHS_PER_YEAR, Tmin_map_adj)/=0 ) &
+        IF ( getparam_real(MODNAME, 'tmin_map_adj', Nmap*Nmonths, Tmin_map_adj)/=0 ) &
      &       CALL read_error(2, 'tmin_map_adj')
         IF ( control_string(Tmax_map_file, 'tmax_map_file')/=0 ) CALL read_error(5, 'tmax_map_file')
         IF ( control_string(Tmin_map_file, 'tmin_map_file')/=0 ) CALL read_error(5, 'tmin_map_file')

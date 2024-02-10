@@ -521,7 +521,6 @@
       ENDDO
 
       !convert first as subbasins don't have to be in order
-      dmy1 = 0.0D0
       DO j = 1, Nsub
         subarea = Sub_area(j)
         Sub_inq(j) = Qsub(j)*Cfs_conv

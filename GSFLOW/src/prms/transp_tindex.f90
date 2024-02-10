@@ -16,7 +16,7 @@
       END MODULE PRMS_TRANSP_TINDEX
 
       INTEGER FUNCTION transp_tindex()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, FAHRENHEIT, MONTHS_PER_YEAR, READ_INIT, SAVE_INIT
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, FAHRENHEIT, Nmonths, READ_INIT, SAVE_INIT
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Save_vars_to_file, Init_vars_from_file, Start_month, Start_day, Nowmonth, Nowday
       USE PRMS_TRANSP_TINDEX
@@ -114,11 +114,11 @@
             Transp_tmax_f(i) = c_to_f(Transp_tmax(i))
           ENDDO
         ENDIF
-        !DEALLOCATE ( Transp_tmax )
+        DEALLOCATE ( Transp_tmax )
 
         IF ( Init_vars_from_file==0 ) Tmax_sum = 0.0
 
-        motmp = Start_month + MONTHS_PER_YEAR
+        motmp = Start_month + Nmonths
         Transp_check = OFF
         Basin_transp_on = OFF
         DO j = 1, Active_hrus
@@ -132,7 +132,7 @@
           ELSEIF ( Transp_end(i)>Transp_beg(i) ) THEN
             IF ( Start_month>Transp_beg(i) .AND. Start_month<Transp_end(i) ) Transp_on(i) = ACTIVE
           ELSE
-            IF ( Start_month>Transp_beg(i) .OR. motmp<Transp_end(i)+MONTHS_PER_YEAR ) Transp_on(i) = ACTIVE
+            IF ( Start_month>Transp_beg(i) .OR. motmp<Transp_end(i)+Nmonths ) Transp_on(i) = ACTIVE
           ENDIF
           IF ( Basin_transp_on==OFF ) THEN
             IF ( Transp_on(i)==ACTIVE ) Basin_transp_on = ACTIVE
