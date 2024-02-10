@@ -8,9 +8,9 @@
      &          EQULS = '=========================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.1 12/15/2023'
-      character(len=*), parameter :: PRMS_versn = '2023-12-15'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.2.2.1 12/15/2023'
+      character(len=*), parameter :: GSFLOW_versn = '2.3.0 02/22/2024'
+      character(len=*), parameter :: PRMS_versn = '2024-02-10'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 02/10/2024'
       character(len=*), parameter :: Version_read_control_file = '2022-10-20'
       character(len=*), parameter :: Version_read_parameter_file = '2022-01-12'
       character(len=*), parameter :: Version_read_data_file = '2022-06-02'
@@ -36,7 +36,7 @@
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Dynamic_soil_flag, Water_use_flag, Soilzone_add_water_use
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
-      INTEGER, SAVE :: Nowyear, Nowmonth, Nowday
+      INTEGER, SAVE :: Nowyear, Nowmonth, Nowday, Nhru_nmonths
       INTEGER, SAVE :: Gwr_transfer_water_use, Gwr_add_water_use
       INTEGER, SAVE :: Lake_transfer_water_use, Lake_add_water_use
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time

@@ -6,12 +6,12 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2022-02-19'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2024-02-10'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
       ! Number of stream reaches in each stream segment
-      INTEGER, SAVE, ALLOCATABLE :: Numreach_segment(:)
+      INTEGER, SAVE, ALLOCATABLE :: Numreach_segment(:), activeHru_inactiveCell(:), inactiveHru_activeCell(:)
       REAL, SAVE, ALLOCATABLE :: Excess(:)
       DOUBLE PRECISION, SAVE :: Totalarea
 !   Declared Variables
@@ -291,12 +291,16 @@
       Cell_drain_rate = 0.0 ! dimension ngwcell
       finf_cell = 0.0 ! dimension ngwcell
 
+      ALLOCATE ( activeHru_inactiveCell(Nhru) )
+      ALLOCATE ( inactiveHru_activeCell(Nhru) )
       ierr = 0
       IF ( Nhru/=Nhrucell ) THEN
         ALLOCATE ( hru_pct(Nhru), newpct(Nhru), temp_pct(Nhrucell) )
         hru_pct = 0.0D0
         newpct = 0.0D0
       ENDIF
+      activeHru_inactiveCell = 0
+      inactiveHru_activeCell = 0
       DO i = 1, Nhrucell
         ihru = Gvr_hru_id(i)
         IF ( Nhru/=Nhrucell ) THEN
@@ -310,12 +314,15 @@
         icol = Gwc_col(icell)
         IF ( Print_debug>DEBUG_less ) THEN
           IF ( Hru_type(ihru)==0 ) THEN
-            IF ( IUZFBND(icol, irow)/=0 ) &
-     &           PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
+            IF ( IUZFBND(icol, irow)/=0 ) THEN
+              PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
+              inactiveHru_activeCell(ihru) = 1
+            ENDIF
           ENDIF
           IF ( IUZFBND(icol, irow)==0 ) THEN
             IF ( Hru_type(ihru) > 0 ) then
                 PRINT *, 'WARNING, UZF cell inactive, irow:', irow, ' icol:',icol,'icell:',icell, ' HRU is active:', ihru
+                activeHru_inactiveCell(ihru) = 1
             end if
           ENDIF
         ENDIF

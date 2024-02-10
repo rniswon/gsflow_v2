@@ -135,6 +135,8 @@
 
         ENDIF
 
+        WRITE(*,'(/,4X,A,/)') 'Github Commit Hash 95924d7053e26baac6416b9cbe55049cd546ac19'
+
         IF ( GSFLOW_flag==ACTIVE ) ierr = gsfdecl()
         IF ( Model==MODSIM_MODFLOW ) THEN
           Nsegshold = NSS
@@ -593,7 +595,7 @@
  9001 FORMAT (/, 26X, 27('='), /, 26X, 'Normal completion of GSFLOW', /, 26X, 27('='), /)
  9002 FORMAT (//, A, /, 'Please give careful consideration to fixing all ERROR and WARNING messages', /, A)
  9003 FORMAT ('Execution ', A, ' date and time (yyyy/mm/dd hh:mm:ss)', I5, 2('/',I2.2), I3, 2(':',I2.2), /)
- 9004 FORMAT (/, 2A, /)
+ 9004 FORMAT (/, 2A)
 
       END SUBROUTINE gsflow_prms
 
@@ -644,7 +646,6 @@
 
       IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = OFF
       IF ( control_integer(forcing_check_flag, 'forcing_check_flag')/=0 ) forcing_check_flag = OFF
-      IF ( control_integer(seg2hru_flag, 'seg2hru_flag')/=0 ) seg2hru_flag = OFF
 
       IF ( control_string(Model_mode, 'model_mode')/=0 ) CALL read_error(5, 'model_mode')
       IF ( Model_mode(:4)=='    ' ) Model_mode = 'GSFLOW5'
@@ -806,19 +807,12 @@
         IF ( control_string(Var_save_file, 'var_save_file')/=0 ) CALL read_error(5, 'var_save_file')
       ENDIF
 
-      Temp_module = 'temp_1sta'
       IF ( control_string(Temp_module, 'temp_module')/=0 ) CALL read_error(5, 'temp_module')
-      Precip_module = 'precip_1sta'
       IF ( control_string(Precip_module, 'precip_module')/=0 ) CALL read_error(5, 'precip_module')
-      Transp_module = 'transp_index'
       IF ( control_string(Transp_module, 'transp_module')/=0 ) CALL read_error(5, 'transp_module')
-      Et_module = 'potet_jh'
       IF ( control_string(Et_module, 'et_module')/=0 ) CALL read_error(5, 'et_module')
-      Srunoff_module = 'srunoff_smidx'
       IF ( control_string(Srunoff_module, 'srunoff_module')/=0 ) CALL read_error(5, 'srunoff_module')
-      Solrad_module = 'ddsolrad'
       IF ( control_string(Solrad_module, 'solrad_module')/=0 ) CALL read_error(5, 'solrad_module')
-      Soilzone_module = 'soilzone'
       IF ( control_string(Soilzone_module, 'soilzone_module')/=0 ) CALL read_error(5, 'soilzone_module')
       AG_flag = OFF
       IF ( Soilzone_module=='soilzone_ag' ) AG_flag = ACTIVE
@@ -928,6 +922,7 @@
       IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
       IF ( control_integer(Iter_aet_flag, 'iter_aet_flag')/=0 ) Iter_aet_flag = OFF
       IF ( control_integer(snow_cloudcover_flag, 'snow_cloudcover_flag')/=0 ) snow_cloudcover_flag = OFF
+      IF ( control_integer(seg2hru_flag, 'seg2hru_flag')/=0 ) seg2hru_flag = OFF
 
       IF ( control_integer(Humidity_cbh_flag, 'humidity_cbh_flag')/=0 ) Humidity_cbh_flag = OFF
       IF ( control_integer(Windspeed_cbh_flag, 'windspeed_cbh_flag')/=0 ) Windspeed_cbh_flag = OFF
@@ -986,11 +981,13 @@
         PRINT '(/,2A)', 'ERROR, invalid strmflow_module value: ', Strmflow_module
         Inputerror_flag = 1
       ENDIF
+
       Stream_order_flag = OFF
       IF ( Strmflow_flag>1 .AND. PRMS_flag==ACTIVE ) THEN
           !print *, nsegment, strmflow_flag, strmflow_module
         Stream_order_flag = ACTIVE ! strmflow_in_out, muskingum, muskingum_lake, muskingum_mann
       ENDIF
+
 ! cascade dimensions
       IF ( decldim('ncascade', 0, MAXDIM, &
      &     'Number of HRU links for cascading flow')/=0 ) CALL read_error(7, 'ncascade')
@@ -1168,6 +1165,7 @@
 
       Nhru = getdim('nhru')
       IF ( Nhru==-1 ) CALL read_error(7, 'nhru')
+      Nhru_nmonths = Nhru * Nmonths
 
       Nssr = getdim('nssr')
       IF ( Nssr==-1 ) CALL read_error(7, 'nssr')
@@ -1296,8 +1294,8 @@
       ENDIF
 
       IF ( Nsegment<1 ) THEN
-        IF ( Stream_order_flag==ACTIVE .OR. Call_cascade==1 ) THEN
-          PRINT *, 'ERROR, streamflow and cascade routing requires nsegment > 0, specified as:', Nsegment
+        IF ( Stream_order_flag==ACTIVE .OR. Call_cascade==ACTIVE ) THEN
+          PRINT *, 'ERROR, streamflow and cascade routing require nsegment > 0, specified as:', Nsegment
           Inputerror_flag = 1
         ENDIF
       ENDIF
@@ -1556,7 +1554,7 @@
 !     gsflow_prms_restart - write or read restart file
 !***********************************************************************
       SUBROUTINE gsflow_prms_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: OFF
+      USE PRMS_CONSTANTS, ONLY: OFF, SAVE_INIT
       USE PRMS_MODULE
       use prms_utils, only: check_restart, check_restart_dimen
       IMPLICIT NONE
@@ -1570,11 +1568,11 @@
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: model_test
       CHARACTER(LEN=11) :: module_name
 !***********************************************************************
-      IF ( In_out==0 ) THEN
+      IF ( In_out==SAVE_INIT ) THEN
         IF ( text_restart_flag==OFF ) THEN
           WRITE ( Restart_outunit ) MODNAME
           WRITE ( Restart_outunit ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
-                  Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
+     &            Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
           WRITE ( Restart_outunit ) Starttime, Endtime
         ELSE
           WRITE ( Restart_outunit, * ) MODNAME
@@ -1588,7 +1586,7 @@
           READ ( Restart_inunit ) module_name
           CALL check_restart(MODNAME, module_name)
           READ ( Restart_inunit ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
-                 cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
+     &           cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
           READ ( Restart_inunit ) start_time, end_time
         ELSE
           READ ( Restart_inunit, * ) module_name
@@ -1645,7 +1643,10 @@
             ierr = 1
           ENDIF
         ENDIF
-        IF ( ierr==1 ) ERROR STOP ERROR_restart
+        IF ( ierr==1 ) THEN
+          PRINT *, 'ERROR READING RESTART FILE'
+          ERROR STOP ERROR_restart
+        ENDIF
       ENDIF
       END SUBROUTINE gsflow_prms_restart
 
