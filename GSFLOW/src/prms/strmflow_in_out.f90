@@ -51,18 +51,19 @@
           IF ( Obsin_segment(iorder)>0 ) Seg_upstream_inflow(iorder) = Streamflow_cfs(Obsin_segment(iorder))
           Seg_inflow(iorder) = Seg_upstream_inflow(iorder) + Seg_lateral_inflow(iorder)
           IF ( Obsout_segment(iorder)>0 ) THEN
-            segout = Streamflow_cfs(Obsout_segment(iorder))
+            Seg_outflow(iorder) = Streamflow_cfs(Obsout_segment(iorder))
           ELSE
-            segout = Seg_inflow(iorder)
+            Seg_outflow(iorder) = Seg_inflow(iorder)
           ENDIF
 
-          IF ( segout < 0.0D0 ) THEN
+          IF ( Seg_outflow(iorder) < 0.0D0 ) THEN
             IF ( Print_debug>DEBUG_less ) THEN
-              PRINT *, 'WARNING, negative flow from segment:', iorder, ' flow:', segout
+              PRINT *, 'WARNING, negative flow from segment:', iorder, ' flow:', Seg_outflow(iorder)
               PRINT *, '         likely a water-use specification or replacement flow issue'
             ENDIF
           ENDIF
 
+          segout = Seg_outflow(iorder)
 ! Flow_out is the total flow out of the basin, which allows for multiple outlets
 ! includes closed basins (tosegment=0)
           IF ( special_seg_type_flag == ACTIVE ) THEN
@@ -95,7 +96,6 @@
           ELSE
             Seg_upstream_inflow(toseg) = Seg_upstream_inflow(toseg) + segout
           ENDIF
-          Seg_outflow(iorder) = segout
         ENDDO
 
         area_fac = Cfs_conv*Active_area

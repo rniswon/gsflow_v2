@@ -6,10 +6,10 @@ contains
   integer module function prms_time()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, YEAR, MONTH, DAY, HOUR, MINUTE, MAX_DAYS_PER_YEAR, DAYS_PER_YEAR, &
                                 ACTIVE, OFF, NORTHERN, FT2_PER_ACRE, SECS_PER_HOUR, INCHES_PER_FOOT, SECS_PER_DAY, &
-                                ERROR_time, DEBUG_WB, CANOPY
+                                ERROR_time, CANOPY
       use PRMS_MMFAPI, only: dattim, deltim
       USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime, Nowyear, Nowmonth, Nowday, Dprst_flag, &
-                             GSFLOW_flag, PRMS_land_iteration_flag, AG_flag, Print_debug, &
+                             GSFLOW_flag, PRMS_land_iteration_flag, AG_flag, &
                              Ag_package, Hru_ag_irr, timestep_start_flag, Nlake
       USE PRMS_BASIN, ONLY: Hemisphere, Basin_area_inv
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Pkwater_equiv, Hru_intcpstor, &
@@ -60,12 +60,12 @@ contains
           It0_pkwater_equiv = Pkwater_equiv
           IF ( Ag_package==ACTIVE ) Hru_ag_irr = 0.0 ! 
           IF ( GSFLOW_flag==ACTIVE ) It0_gravity_stor_res = Gravity_stor_res
-          IF ( PRMS_land_iteration_flag==CANOPY .OR. Print_debug==DEBUG_WB ) It0_hru_intcpstor = Hru_intcpstor
+          It0_hru_intcpstor = Hru_intcpstor
           IF ( PRMS_land_iteration_flag==CANOPY ) THEN
             It0_intcp_transp_on = Intcp_transp_on
             It0_intcp_stor = Intcp_stor
           ENDIF
-          IF ( PRMS_land_iteration_flag>0 .OR. Print_debug==DEBUG_WB ) It0_imperv_stor = Imperv_stor
+          It0_imperv_stor = Imperv_stor
           IF ( Dprst_flag==ACTIVE ) THEN
             It0_dprst_vol_open = Dprst_vol_open
             It0_dprst_vol_clos = Dprst_vol_clos

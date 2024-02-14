@@ -2,7 +2,7 @@
 ! Maximum, minimum, average temperatures, and precipitation are distributed to each HRU
 ! using temperature and/or precipitation data input as a time series of gridded
 ! or other spatial units using an area-weighted method and correction factors to
-! account for differences in altitude, spatial variation, topography, and
+! account for differences in altitude, spatial variation, topography, and 
 ! measurement gage efficiency
 !***********************************************************************
       MODULE PRMS_PRECIP_MAP
@@ -24,7 +24,7 @@
       END MODULE PRMS_PRECIP_MAP
 
       SUBROUTINE precip_map()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, OFF, MM, MM2INCH, Nmonths, precip_map_module
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, OFF, MM, MM2INCH, MONTHS_PER_YEAR, precip_map_module
       use PRMS_CONTROL_FILE, only: control_string
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Process_flag, Start_year, Start_month, Start_day, Nmap2hru, Nmap, Nowmonth
@@ -87,7 +87,7 @@
         ALLOCATE ( Precip_map_values(Nmap) )
 
 ! Declare parameters
-        ALLOCATE ( Precip_map_adj(Nmap,Nmonths) )
+        ALLOCATE ( Precip_map_adj(Nmap,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'precip_map_adj', 'nmap,nmonths', 'real', &
      &     '1.0', '0.5', '2.0', &
      &     'Monthly rain adjustment factor for each mapped spatial unit', &
@@ -125,7 +125,7 @@
 
         istop = 0
         ierr = 0
-        IF ( getparam_real(MODNAME, 'precip_map_adj', Nmap*Nmonths, Precip_map_adj)/=0 ) &
+        IF ( getparam_real(MODNAME, 'precip_map_adj', Nmap*MONTHS_PER_YEAR, Precip_map_adj)/=0 ) &
      &       CALL read_error(2, 'precip_map_adj')
         IF ( control_string(Precip_map_file, 'precip_map_file')/=0 ) CALL read_error(5, 'precip_map_file')
         CALL find_header_end(Precip_unit, Precip_map_file, ierr)
