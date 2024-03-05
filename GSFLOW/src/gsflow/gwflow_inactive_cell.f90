@@ -201,8 +201,7 @@
       INTRINSIC :: DBLE, DABS, SNGL, MIN
 ! Local Variables
       INTEGER :: i, j
-      DOUBLE PRECISION :: dnflow
-      DOUBLE PRECISION :: gwin, gwstor, gwflow, gwarea
+      DOUBLE PRECISION :: gwin, gwstor, gwflow, gwarea, dnflow
 !***********************************************************************
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         Gw_upslope = 0.0D0

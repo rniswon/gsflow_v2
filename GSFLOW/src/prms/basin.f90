@@ -17,9 +17,9 @@
       INTEGER, SAVE :: Weir_gate_flag, Puls_lin_flag
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_area_dble(:), Lake_area(:)
 !   Declared Variables
-      REAL, SAVE, ALLOCATABLE :: Hru_frac_perv(:), Ag_area(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_frac_perv(:), Hru_frac_imperv(:), Hru_frac_dprst(:), Ag_area(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_area_max(:)
-      REAL, SAVE, ALLOCATABLE :: Hru_perv(:), Hru_imperv(:), Hru_frac_imperv(:), Hru_frac_dprst(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_perv(:), Hru_imperv(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_area_open_max(:), Dprst_area_clos_max(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_storage(:)
       REAL, SAVE, ALLOCATABLE :: Hru_elev_ts(:)
@@ -28,9 +28,9 @@
       INTEGER, SAVE :: Elev_units
       INTEGER, SAVE, ALLOCATABLE :: Cov_type(:), Ag_cov_type(:)
       INTEGER, SAVE, ALLOCATABLE :: Lake_hru_id(:), Lake_type(:) !not needed if no lakes
-      REAL, SAVE, ALLOCATABLE :: Hru_area(:), Hru_percent_imperv(:), Hru_elev(:), Hru_lat(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_area(:), Hru_elev(:), Hru_lat(:) ! , Hru_percent_imperv(:)
       REAL, SAVE, ALLOCATABLE :: Covden_sum(:), Covden_win(:)
-      REAL, SAVE, ALLOCATABLE :: Dprst_frac_open(:), Dprst_area(:), Dprst_frac(:)
+      REAL, SAVE, ALLOCATABLE :: Dprst_frac_open(:), Dprst_area(:) !, Dprst_frac(:)
       REAL, SAVE, ALLOCATABLE :: Ag_frac(:)
       END MODULE PRMS_BASIN
 
@@ -64,7 +64,7 @@
       INTEGER FUNCTION basdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Dprst_flag, Lake_route_flag, &
-     &    PRMS4_flag, Glacier_flag, GSFLOW_flag, AG_flag
+     &    PRMS4_flag, Glacier_flag, AG_flag, gwflow_flag
       use PRMS_MMFAPI, only: declvar_real, declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_BASIN
@@ -77,7 +77,7 @@
 
 ! Declared Variables
       ALLOCATE ( Hru_elev_ts(Nhru) )
-      IF ( Glacier_flag==1 ) THEN
+      IF ( Glacier_flag==ACTIVE ) THEN
         CALL declvar_real(MODNAME, 'hru_elev_ts', 'nhru', Nhru, &
      &       'HRU elevation for timestep, which can change for glaciers', &
      &       'elev_units', Hru_elev_ts)
@@ -98,7 +98,7 @@
 
       ALLOCATE ( Hru_frac_imperv(Nhru) )
       CALL declvar_real(MODNAME, 'hru_frac_imperv', 'nhru', Nhru, &
-     &     'Proportion of each HRU area that is impervious', &
+     &     'Fraction of each HRU area that is impervious', &
      &     'decimal fraction', Hru_frac_imperv)
 
       ALLOCATE ( Hru_perv(Nhru) )
@@ -118,9 +118,8 @@
 
       ALLOCATE ( Hru_frac_dprst(Nhru) ) ! this can change with dynamic parameters
       IF ( Dprst_flag==ACTIVE ) THEN
-        ALLOCATE ( Dprst_frac(Nhru) )
         CALL declvar_real(MODNAME, 'hru_frac_dprst', 'nhru', Nhru, &
-     &       'Proportion of each HRU area that is surface-depression storage', &
+     &       'Fraction of each HRU area that is surface-depression storage', &
      &       'decimal fraction', Hru_frac_dprst)
 
         ALLOCATE ( Dprst_area_max(Nhru) )
@@ -138,6 +137,7 @@
      &       'Aggregate sum of closed surface-depression storage areas of each HRU', &
      &       'acres', Dprst_area_clos_max)
 
+!        ALLOCATE ( Dprst_frac(Nhru) )
         IF ( PRMS4_flag==ACTIVE ) THEN
           ALLOCATE ( Dprst_area(Nhru) )
           IF ( declparam(MODNAME, 'dprst_area', 'nhru', 'real', &
@@ -173,7 +173,7 @@
       ALLOCATE ( Hru_route_order(Nhru) )
 ! gwflow inactive for GSFLOW mode so arrays not allocated
 ! when GSFLOW can run in multi-mode will need these arrays
-      IF ( GSFLOW_flag==OFF ) ALLOCATE ( Gwr_route_order(Nhru), Gwr_type(Nhru) )
+      IF ( gwflow_flag==ACTIVE ) ALLOCATE ( Gwr_route_order(Nhru), Gwr_type(Nhru) )
 !      ALLOCATE ( Hru_elev_feet(Nhru) )
       ALLOCATE ( Hru_elev_meters(Nhru) )
 
@@ -202,7 +202,7 @@
      &     'HRU latitude', 'Latitude of each HRU', &
      &     'degrees North')/=0 ) CALL read_error(1, 'hru_lat')
 
-      ALLOCATE ( Hru_percent_imperv(Nhru) )
+!      ALLOCATE ( Hru_percent_imperv(Nhru) )
       IF ( declparam(MODNAME, 'hru_percent_imperv', 'nhru', 'real', &
      &     '0.0', '0.0', '0.999', &
      &     'HRU percent impervious', 'Fraction of each HRU area that is impervious', &
@@ -290,9 +290,10 @@
      &    INACTIVE, LAKE, FEET, ERROR_basin, DEBUG_minimum, &
      &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, CLOSEZERO, ERROR_param, CANOPY !, METERS2FEET, SWALE
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, irrigation_apply_flag, &
-     &    Dprst_flag, Lake_route_flag, PRMS4_flag, GSFLOW_flag, PRMS_VERSION, &
-     &    Starttime, Endtime, Parameter_check_flag, AG_flag, Ag_package !, Frozen_flag
+      USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, &
+     &    Dprst_flag, Lake_route_flag, PRMS4_flag, PRMS_VERSION, &
+     &    Hru_type, irrigation_apply_flag, gwflow_flag, AG_flag, Ag_package, &
+     &    Starttime, Endtime, Parameter_check_flag !, Frozen_flag
       USE PRMS_BASIN
       use prms_utils, only: checkdim_bounded_limits, error_stop, read_error, write_outfile
       IMPLICIT NONE
@@ -323,7 +324,10 @@
       IF ( getparam_real(MODNAME, 'covden_sum', Nhru, Covden_sum)/=0 ) CALL read_error(2, 'covden_sum')
       IF ( getparam_real(MODNAME, 'covden_win', Nhru, Covden_win)/=0 ) CALL read_error(2, 'covden_win')
       IF ( getparam_int(MODNAME, 'elev_units', 1, Elev_units)/=0 ) CALL read_error(2, 'elev_units')
-      IF ( getparam_real(MODNAME, 'hru_percent_imperv', Nhru, Hru_percent_imperv)/=0 ) CALL read_error(2, 'hru_percent_imperv')
+      IF ( getparam_real(MODNAME, 'hru_percent_imperv', Nhru, Hru_frac_imperv)/=0 ) CALL read_error(2, 'hru_percent_imperv')
+!      IF ( getparam_real(MODNAME, 'hru_percent_imperv', Nhru, Hru_percent_imperv)/=0 ) CALL read_error(2, 'hru_percent_imperv')
+!      Hru_frac_imperv = Hru_percent_imperv
+!      DEALLOCATE ( Hru_percent_imperv ) ! since it can change, use hru_frac_imperv and hru_frac_dprst
       IF ( AG_flag==ACTIVE ) THEN
         IF ( getparam_real(MODNAME, 'ag_frac', Nhru, Ag_frac)/=0 ) CALL read_error(2, 'ag_frac')
         IF ( getparam_int(MODNAME, 'ag_cov_type', Nhru, Ag_cov_type)/=0 ) CALL read_error(2, 'ag_cov_type')
@@ -337,18 +341,21 @@
       IF ( Dprst_flag==ACTIVE ) THEN
         IF ( getparam_real(MODNAME, 'dprst_frac_open', Nhru, Dprst_frac_open)/=0 ) CALL read_error(2, 'dprst_frac_open')
         IF ( PRMS4_flag==ACTIVE ) THEN
-          IF ( getparam_real(MODNAME, 'dprst_frac_hru', Nhru, Dprst_frac)/=0 ) CALL read_error(2, 'dprst_frac_hru')
-          IF ( Dprst_frac(1)>-1.0 ) THEN
+          IF ( getparam_real(MODNAME, 'dprst_frac_hru', Nhru, Hru_frac_dprst)/=0 ) CALL read_error(2, 'dprst_frac_hru')
+!          IF ( getparam_real(MODNAME, 'dprst_frac_hru', Nhru, Dprst_frac)/=0 ) CALL read_error(2, 'dprst_frac_hru')
+!          IF ( Dprst_frac(1)>-1.0 ) THEN
+          IF ( Hru_frac_dprst(1)>-1.0 ) THEN
             IF ( Print_debug>DEBUG_less ) PRINT *, 'Using dprst_frac_hru instead of dprst_area'
             dprst_frac_flag = 1
           ELSE
             IF ( getparam_real(MODNAME, 'dprst_area', Nhru, Dprst_area)/=0 ) CALL read_error(2, 'dprst_area')
           ENDIF
         ELSE
-          IF ( getparam_real(MODNAME, 'dprst_frac', Nhru, Dprst_frac)/=0 ) CALL read_error(2, 'dprst_frac')
+          IF ( getparam_real(MODNAME, 'dprst_frac', Nhru, Hru_frac_dprst)/=0 ) CALL read_error(2, 'dprst_frac')
+!          IF ( getparam_real(MODNAME, 'dprst_frac', Nhru, Dprst_frac)/=0 ) CALL read_error(2, 'dprst_frac')
         ENDIF
-        Hru_frac_dprst = Dprst_frac
-        DEALLOCATE ( Dprst_frac ) ! don't use as it can be changed with dynamic parameters
+!        Hru_frac_dprst = Dprst_frac
+!        DEALLOCATE ( Dprst_frac ) ! don't use as it can be changed with dynamic parameters
       ELSE
         Hru_frac_dprst = 0.0
       ENDIF
@@ -400,8 +407,6 @@
       Hru_perv = 0.0
       Hru_storage = 0.0D0
       Hru_route_order = 0
-      Hru_frac_imperv = Hru_percent_imperv
-      DEALLOCATE ( Hru_percent_imperv ) ! since they can change, use hru_frac_imperv and hru_frac_dprst
       Imperv_flag = OFF
       j = 0
       DO i = 1, Nhru
@@ -466,7 +471,7 @@
             Ag_area(i) = Ag_frac(i) * harea
             basin_ag_area = basin_ag_area + DBLE( Ag_area(i) )
             non_perv = Ag_frac(i) + Hru_frac_imperv(i) + Hru_frac_dprst(i)
-            IF ( non_perv > 1.0 ) CALL adjust_fractions( i, non_perv, Hru_frac_dprst(i), Hru_frac_imperv(i) )
+            IF ( non_perv > 1.0 ) CALL adjust_fractions( i, non_perv, Hru_frac_dprst(i), Hru_frac_imperv(i), Ag_frac(i) )
             perv_area = perv_area - Ag_area(i)
           ENDIF
         ENDIF
@@ -576,7 +581,7 @@
       Active_area = Land_area + Water_area
 
       Active_gwrs = Active_hrus
-      IF ( GSFLOW_flag==OFF ) THEN
+      IF ( gwflow_flag==ACTIVE ) THEN
         Gwr_type = Hru_type
         Gwr_route_order = Hru_route_order
       ENDIF
@@ -635,7 +640,7 @@
         CALL write_outfile(' ')
         WRITE (buffer, 9003) 'Model domain area:   ', Totarea, '    Active basin area:', Active_area
         CALL write_outfile(buffer)
-        WRITE (buffer, 9004) 'Fraction impervious:', basin_imperv, '    Fraction pervious: ', basin_perv
+        WRITE (buffer, 9004)   'Fraction impervious:', basin_imperv, '    Fraction pervious: ', basin_perv
         CALL write_outfile(buffer)
         IF ( Water_area>0.0D0 ) THEN
           WRITE (buffer, 9004) 'Lake area:          ', Water_area,   '    Fraction lakes:    ', Water_area*Basin_area_inv
@@ -662,13 +667,13 @@
 !***********************************************************************
 ! Adjust DPRST and impervious fractions when adding ag_frac > 1.0
 !***********************************************************************
-    SUBROUTINE adjust_fractions(Hru_id, Non_perv, Dprst_frac, Imperv_frac)
+    SUBROUTINE adjust_fractions(Hru_id, Non_perv, Dprst_frac, Imperv_frac, Ag_frac)
       use prms_constants, only: CLOSEZERO
       IMPLICIT NONE
       INTRINSIC :: ABS
 ! Arguments
       INTEGER, INTENT(IN) :: Hru_id
-      REAL, INTENT(IN) :: Non_perv
+      REAL, INTENT(IN) :: Non_perv, Ag_frac
       REAL, INTENT(INOUT) :: Dprst_frac, Imperv_frac
 ! Local Variables
       REAL :: excess, dprst_adj
@@ -676,6 +681,8 @@
       excess = Non_perv - 1.0
       PRINT '(A,I0,A,F0.6)', 'WARNING, ag_frac + hru_percent_imperv + dprst_frac > 1.0; HRU: ', Hru_id, '; excess: ', excess
       PRINT *, '        dprst_frac and/or hru_percent_imperv adjusted'
+      PRINT '(9X,3(A,F0.6))', 'initial values:  dprst_frac: ', Dprst_frac, ' ; hru_percent_imperv: ', Imperv_frac, &
+                           '; ag_frac: ', Ag_frac
       IF ( Dprst_frac > 0.0 ) THEN
         dprst_adj = Dprst_frac - excess
         IF ( dprst_adj > 0.0 ) THEN
@@ -691,4 +698,6 @@
         IF ( Imperv_frac < 0.0 ) PRINT *, 'WARNING, hru_percent_imperv < 0 after adjustment, set to 0, imperv_frac:', Imperv_frac
         Imperv_frac = 0.0
       ENDIF
+      PRINT '(9X,3(A,F0.6))', 'adjusted values: dprst_frac: ', Dprst_frac, ' ; hru_percent_imperv: ', Imperv_frac, &
+                           '; ag_frac: ', Ag_frac
     END SUBROUTINE adjust_fractions

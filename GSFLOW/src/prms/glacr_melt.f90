@@ -152,7 +152,7 @@
 !     glacrdecl - declare parameters and variables for glacier runoff
 !***********************************************************************
       INTEGER FUNCTION glacrdecl()
-      USE PRMS_CONSTANTS, ONLY: Nmonths
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file
@@ -187,7 +187,7 @@
      &     'inches', Basin_gl_ice_melt)
 
       ALLOCATE ( Gl_mb_yrcumul(Nhru) )
-      CALL declvar_dble(MODNAME, 'gl_mb_yrcumul', 'nhru', Nhru, &
+      CALL declvar_dble(MODNAME, 'gl_mb_yrcumul', 'nhru', Nhru,          &
      &     'Yearly mass balance for each glacier, indexed by Glacr_tag', &
      &     'inches', Gl_mb_yrcumul)
 
@@ -196,13 +196,13 @@
      &     'Cumulative mass balance for each glacier since start day, indexed by Glacr_tag', &
      &     'inches', Gl_mb_cumul)
 
-      CALL declvar_dble(MODNAME, 'basin_gl_area', 'one', 1, &
-     &     'Basin area-weighted average glacier-covered area', &
+      CALL declvar_dble(MODNAME, 'basin_gl_area', 'one', 1,      &
+     &     'Basin area-weighted average glacier-covered area',   &
      &     'decimal fraction', Basin_gl_area)
 
       ALLOCATE ( Gl_area(Nhru) )
-      CALL declvar_dble(MODNAME, 'gl_area', 'nhru', Nhru, &
-     &     'Area of each glacier, indexed by Glacr_tag', &
+      CALL declvar_dble(MODNAME, 'gl_area', 'nhru', Nhru,      &
+     &     'Area of each glacier, indexed by Glacr_tag',       &
      &     'acres', Gl_area)
 
       ALLOCATE ( Glnet_ar_delta(Nhru) )
@@ -212,17 +212,17 @@
 
       ALLOCATE ( Glacr_flow(Nhru) )
       CALL declvar_real(MODNAME, 'glacr_flow', 'nhru', Nhru, &
-     &     'Glacier melt and rain from HRU to stream network, only nonzero at termini HRUs and snowfield HRUs', &
+     &     'Glacier melt and rain from HRU to stream network, only nonzero at termini HRUs and snowfield HRUs',  &
      &     'inches cubed', Glacr_flow)
 
       ALLOCATE ( Delta_volyr(Nhru) )
       CALL declvar_dble(MODNAME, 'delta_volyr', 'nhru', Nhru, &
-     &     'Year total volume change for each glacier, indexed by Glacr_tag', &
+     &     'Year total volume change for each glacier, indexed by Glacr_tag',          &
      &     'inches cubed', Delta_volyr)
 
       ALLOCATE ( Hru_mb_yrcumul(Nhru) )
-      CALL declvar_dble(MODNAME, 'hru_mb_yrcumul', 'nhru', Nhru, &
-     &     'Mass balance for a glacier HRU, cumulative for year', &
+      CALL declvar_dble(MODNAME, 'hru_mb_yrcumul', 'nhru', Nhru,        &
+     &     'Mass balance for a glacier HRU, cumulative for year',       &
      &     'inches', Hru_mb_yrcumul)
 
       ALLOCATE ( Top_tag(Nhru) )
@@ -231,8 +231,8 @@
      &     'none', Top_tag)
 
       ALLOCATE ( Glacr_tag(Nhru) )
-      CALL declvar_int(MODNAME, 'glacr_tag', 'nhru', Nhru, &
-     &     'Identifies which glacier each HRU belongs to', &
+      CALL declvar_int(MODNAME, 'glacr_tag', 'nhru', Nhru,              &
+     &     'Identifies which glacier each HRU belongs to',              &
      &     'none', Glacr_tag)
 
       ALLOCATE ( Prev_area(Nhru) )
@@ -271,8 +271,8 @@
      &     'none', Ela)
 
       ALLOCATE ( Top(Nhru) )
-      CALL declvar_int(MODNAME, 'top', 'nhru', Nhru, &
-     &     'HRU number at tops of each glacier, Ntp of these', &
+      CALL declvar_int(MODNAME, 'top', 'nhru', Nhru,                    &
+     &     'HRU number at tops of each glacier, Ntp of these',          &
      &     'none', Top)
 
       ALLOCATE ( Term(Nhru) )
@@ -311,8 +311,8 @@
      &     'inches', Gl_ice_melt)
 
       ALLOCATE ( Basal_elev(Nhru) )
-      CALL declvar_real(MODNAME, 'basal_elev', 'nhru', Nhru, &
-     &     'Glacier basal elevation mean over HRU', &
+      CALL declvar_real(MODNAME, 'basal_elev', 'nhru', Nhru,            &
+     &     'Glacier basal elevation mean over HRU',                     &
      &     'elev_units', Basal_elev)
 
       ALLOCATE ( Keep_gl(Nhru,Seven) )
@@ -391,21 +391,21 @@
            'Volume area exponential coefficient for glaciers, average value by region', &
            'none')/=0 ) CALL read_error(1, 'glacrva_exp')
 
-      ALLOCATE ( Stor_ice(Nhru,Nmonths) )
+      ALLOCATE ( Stor_ice(Nhru,MONTHS_PER_YEAR) )
       IF ( declparam(MODNAME, 'stor_ice', 'nhru,nmonths', 'real', &
            '10.0', '5.0', '29.0', &
            'Monthly Storage coefficient for ice melt on glaciers', &
            'Monthly (January to December) Storage coefficient for ice melt on glaciers', &
            'hours')/=0 ) CALL read_error(1, 'stor_ice')
 
-      ALLOCATE ( Stor_snow(Nhru,Nmonths) )
+      ALLOCATE ( Stor_snow(Nhru,MONTHS_PER_YEAR) )
       IF ( declparam(MODNAME, 'stor_snow', 'nhru,nmonths', 'real', &
            '80.0', '30.0', '149.0', &
            'Monthly Storage coefficient for snow melt on glaciers', &
            'Monthly (January to December) Storage coefficient for snow melt on glaciers', &
            'hours')/=0 ) CALL read_error(1, 'stor_snow')
 
-      ALLOCATE ( Stor_firn(Nhru,Nmonths) )
+      ALLOCATE ( Stor_firn(Nhru,MONTHS_PER_YEAR) )
       IF ( declparam(MODNAME, 'stor_firn', 'nhru,nmonths', 'real', &
            '400.0', '150.0', '1000.0', &
            'Monthly Storage coefficient for firn melt on glaciers', &
@@ -439,11 +439,11 @@
 !     glacrinit - Initialize glacr module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION glacrinit()
-      USE PRMS_CONSTANTS, ONLY: GLACIER, LAND
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, GLACIER, LAND
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Nhru_nmonths, Hru_type
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Hru_type
       USE PRMS_GLACR
-      USE PRMS_BASIN, ONLY: Hru_area, Hru_elev_ts, Active_hrus, Hru_route_order, &
+      USE PRMS_BASIN, ONLY: Hru_area_dble, Hru_elev_ts, Active_hrus, Hru_route_order, &
      &    Basin_area_inv, Hru_elev_meters
       USE PRMS_FLOWVARS, ONLY: Glacier_frac, Alt_above_ela, Glrette_frac
       USE PRMS_SOLTAB, ONLY: Hru_slope
@@ -472,9 +472,9 @@
       IF ( getparam_real(MODNAME, 'max_gldepth', 1, Max_gldepth)/=0 ) CALL read_error(2, 'max_gldepth')
       IF ( getparam_real(MODNAME, 'glacrva_coef', Nhru, Glacrva_coef)/=0 ) CALL read_error(2, 'glacrva_coef')
       IF ( getparam_real(MODNAME, 'glacrva_exp', Nhru, Glacrva_exp)/=0 ) CALL read_error(2, 'glacrva_exp')
-      IF ( getparam_real(MODNAME, 'stor_ice', Nhru_nmonths, Stor_ice)/=0 ) CALL read_error(2, 'stor_ice')
-      IF ( getparam_real(MODNAME, 'stor_snow', Nhru_nmonths, Stor_snow)/=0 ) CALL read_error(2, 'stor_snow')
-      IF ( getparam_real(MODNAME, 'stor_firn', Nhru_nmonths, Stor_firn)/=0 ) CALL read_error(2, 'stor_firn')
+      IF ( getparam_real(MODNAME, 'stor_ice', Nhru*MONTHS_PER_YEAR, Stor_ice)/=0 ) CALL read_error(2, 'stor_ice')
+      IF ( getparam_real(MODNAME, 'stor_snow', Nhru*MONTHS_PER_YEAR, Stor_snow)/=0 ) CALL read_error(2, 'stor_snow')
+      IF ( getparam_real(MODNAME, 'stor_firn', Nhru*MONTHS_PER_YEAR, Stor_firn)/=0 ) CALL read_error(2, 'stor_firn')
       IF ( getparam_real(MODNAME, 'hru_length', Nhru, Hru_length)/=0 ) CALL read_error(2, 'hru_length')
       IF ( getparam_real(MODNAME, 'hru_width', Nhru, Hru_width)/=0 ) CALL read_error(2, 'hru_width')
       IF ( getparam_real(MODNAME, 'abl_elev_range', Nhru, Abl_elev_range)/=0 ) CALL read_error(2, 'abl_elev_range')
@@ -705,7 +705,7 @@
         glacier_frac_use = 0.0
         DO jj = 1, Active_hrus
           j = Hru_route_order(jj)
-          Hru_area_inch2(j) = Hru_area(j)*Acre_inch2
+          Hru_area_inch2(j) = Hru_area_dble(j)*Acre_inch2
           IF ( Hru_type(j)==GLACIER ) THEN
             glacier_frac_use(j)= Glacier_frac(j)
             !should be end of extensions or branches-- will fail if don't set up with indices stacked
@@ -941,7 +941,7 @@
       Gl_ice_melt = 0.0
       Glacr_flow = 0.0
       Basin_snowicecov = Basin_snowicecov*Acre_inch2/Basin_area_inv
-      gl_gain = 0.0D0
+      gl_gain = 0.D0
 !
 ! Start of year calculations after have a year of data
       IF ( Julwater==1 .AND. Nowyear>=Start_year+1) THEN
@@ -1751,11 +1751,11 @@
 ! of changing slope
 !***********************************************************************
       INTEGER FUNCTION recompute_soltab()
-      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, GLACIER, PI, DEGDAYRAD
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, GLACIER
       USE PRMS_MODULE, ONLY: Hru_type
       USE PRMS_GLACR, ONLY: Hru_slope_ts
-      USE PRMS_SOLTAB, ONLY: Hru_aspect, Hru_cossl, obliquity, &
-     &    Soltab_potsw, Soltab_sunhrs, Solar_declination, ECCENTRICY
+      USE PRMS_SOLTAB, ONLY: Hru_aspect, Hru_cossl, PI, RADIANS, &
+     &    Soltab_potsw, Soltab_sunhrs, Solar_declination, ECCENTRICY, obliquity
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_lat
       IMPLICIT NONE
 ! Functions

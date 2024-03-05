@@ -15,21 +15,13 @@ module prms_utils
     end subroutine
   end interface
 
-  interface
-    module subroutine find_cbh_header_end(Iunit, Fname, Paramname, Iret)
-      integer, intent(OUT) :: Iunit
-      integer, intent(INOUT) :: Iret
-      character(LEN=*), intent(IN) :: Fname, Paramname
-    end subroutine
-    end interface
-
     interface
     module subroutine find_header_end(Iunit, Fname, Iret)
       integer, intent(OUT) :: Iunit
       integer, intent(INOUT) :: Iret
       character(LEN=*), intent(IN) :: Fname
     end subroutine
-    end interface
+  end interface
     
   interface
     module subroutine is_eof(Iunit, Next_yr, Next_mo, Next_day)

@@ -11,17 +11,26 @@
 !   50 pp.
 !***********************************************************************
       MODULE PRMS_SOLTAB
-      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: DAYS_IN_YEAR, MAX_DAYS_PER_YEAR
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Potential Solar Radiation'
       character(len=*), parameter :: MODNAME = 'soltab'
       character(len=*), parameter :: Version_soltab = '2024-01-22'
+      DOUBLE PRECISION, PARAMETER :: PI=ACOS(-1.0D0) ! ABOUT 3.1415926535898D0
+      DOUBLE PRECISION, PARAMETER :: RADIANS=PI/180.0D0, TWOPI=2.0D0*PI
+      DOUBLE PRECISION, PARAMETER :: PI_12=12.0D0/PI
+! TWOPI = 6.2831853071786
+! RADIANS = 0.017453292519943
+! PI_12 = 3.8197186342055
       DOUBLE PRECISION, PARAMETER :: ECCENTRICY = 0.01671D0
 !      DOUBLE PRECISION, PARAMETER :: ECCENTRICY = 0.01671123D0 ! https://www.vcalc.com/search/?text=eccentricity
       ! 0.016723401  daily change -1.115E-09, eccen = 0.016723401 + (julhour-julhour(1966,1,0,18))+dmin/60)/24*-1.115E-09
       ! julday(1966,1,0.75 UT) = 2439126.25
       ! eccen = 0.01675104-0.00004180*T-0.000000126*T**2  T is julian centuries (days time from epoch, is GMT from Jan 0.0
+      DOUBLE PRECISION, PARAMETER :: DEGDAY = 360.0D0/DAYS_IN_YEAR
+      DOUBLE PRECISION, PARAMETER :: DEGDAYRAD = DEGDAY*RADIANS ! about 0.00143356672
+! DEGDAY = 360 degrees/days in year
       DOUBLE PRECISION, SAVE :: Solar_declination(MAX_DAYS_PER_YEAR), Soltab_basinpotsw(MAX_DAYS_PER_YEAR)
       !DOUBLE PRECISION, SAVE :: Ecentricity(MAX_DAYS_PER_YEAR)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_cossl(:), Soltab_sunhrs(:, :)
@@ -106,7 +115,7 @@
 !               for each HRU for each day of the year.
 !***********************************************************************
       INTEGER FUNCTION sthinit()
-      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, DEBUG_SOLTAB, OFF, TWOPI, DEGDAYRAD
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, DEBUG_SOLTAB, OFF
       use PRMS_READ_PARAM_FILE, only: getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag, Hru_type
       USE PRMS_SOLTAB
@@ -146,29 +155,28 @@
         ! dayangle = (2*PI*(Jday-1))/365 = DEGDAYRAD*(jddbl-1.0D0) = day angle in radians
         ! eccentricity = 1.00011D0 + 0.034221D0*COS(dayangle) + 0.00128D0*SIN(dayangle) + 0.000719D0*COS(2.0D0*dayangle) + 0.000077D0*SIN(2.0D0*dayangle)
 !rsr .0172 = 2PI/365 = RADIAN_YEAR = DEGDAYRAD
-        ! eccentricity = (r_0/r)^2 = 1.00011+0.034221 cos?G+0.00128 sin?G+0.000719 cos?2G+0.000077 sin?2G
-        ! G = (2p(J-1))/365 = DEGDAYRAD*(jddbl-1.0D0) = day angle
-        !dayangle = (TWOPI*(jddbl-1.0D0))/365.242D0 ! DEGDAYRAD*(jddbl-1.0D0) ! assume noon (12pm)
-!       y = DEGDAYRAD*(jddbl-1.0D0 +(hour-12.0D0)/24.0D0)
-        y = DEGDAYRAD*(jddbl-1.0D0) ! assume noon
-!        Eccentricity(jd) = 1.00011D0 + 0.034221D0*COS(y) + 0.00128D0*SIN(y) + 0.000719D0*COS(2.0D0*y) &
-!                           + 0.000077D0*SIN(2.0D0*y) ! https://csdms.colorado.edu/wiki/Model_help:TopoFlow-Meteorology
-        ! daily change -1.115E-09, eccen = 0.016723401 + (julhour-julhour(1966,1,0,18))+dmin/60)/24*-1.115E-09
-        ! julday(1966,1,0.75 UT) = 2439126.25
-        ! eccen = 0.01675104-0.00004180*T-0.000000126*T**2  T is julian centuries (days time from epoch, is GMT from Jan 0.0
-
 !rsr01/2006 commented out equations from Llowd W. Swift paper 2/1976
 !       obliquity(jd) = 1.0D0 - (0.0167D0*COS((jd-3)*0.0172D0))
         obliquity(jd) = 1.0D0 - (ECCENTRICY*COS((jddbl-3.0D0)*DEGDAYRAD))
-!        obliquity(jd) = 1.0D0 - (Eccentricity(jd)*COS((jddbl-3.0D0)*DEGDAYRAD))
 !       Solar_declination(jd) = 0.007D0 - (0.4067D0*COS((jd+10)*0.0172D0))
 !       Solar_declination(jd) = ASIN(0.39785D0 * SIN( (278.9709D0+DEGDAY*jd)*RADIANS + 1.9163D0*RADIANS * SIN((356.6153D0+DEGDAY*jd)*RADIANS )) )
         ! hour = 12.0D0
+!       y = DEGDAYRAD*(jddbl-1.0D0 +(hour-12.0D0)/24.0D0)
+        y = DEGDAYRAD*(jddbl-1.0D0) ! assume noon
         y2 = 2.0D0*y
         y3 = 3.0D0*y
         Solar_declination(jd) = 0.006918D0 - 0.399912D0*COS(y) + 0.070257D0*SIN(y) &
      &                          - 0.006758D0*COS(y2) + 0.000907D0*SIN(y2) &
      &                          - 0.002697D0*COS(y3) + 0.00148D0*SIN(y3)
+        ! eccentricity = (r_0/r)^2 = 1.00011+0.034221 cos?G+0.00128 sin?G+0.000719 cos?2G+0.000077 sin?2G
+        ! G = (2p(J-1))/365 = DEGDAYRAD*(jddbl-1.0D0) = day angle
+        !dayangle = (TWOPI*(jddbl-1.0D0))/365.242D0 ! DEGDAYRAD*(jddbl-1.0D0) ! assume noon (12pm)
+!        Eccentricity(jd) = 1.00011D0 + 0.034221D0*COS(y) + 0.00128D0*SIN(y) + 0.000719D0*COS(2.0D0*y) &
+!                           + 0.000077D0*SIN(2.0D0*y) ! https://csdms.colorado.edu/wiki/Model_help:TopoFlow-Meteorology
+        ! daily change -1.115E-09, eccen = 0.016723401 + (julhour-julhour(1966,1,0,18))+dmin/60)/24*-1.115E-09
+        ! julday(1966,1,0.75 UT) = 2439126.25
+        ! eccen = 0.01675104-0.00004180*T-0.000000126*T**2  T is julian centuries (days time from epoch, is GMT from Jan 0.0
+!        obliquity(jd) = 1.0D0 - (Eccentricity(jd)*COS((jddbl-3.0D0)*DEGDAYRAD))
       ENDDO
 
 !   Module Variables
@@ -248,7 +256,8 @@
      &                          Latitude, Cossl, Soltab, Sunhrs, Hru_type, Id)
 !      SUBROUTINE compute_soltab(Obliquity, Solar_declination, Slope, Aspect, &
 !     &                          Latitude, Cossl, Soltab, Sunhrs, Sunset_angle, Hru_type, Id)
-      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, DNEARZERO, PI, TWOPI, RADIANS, PI_12
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, DNEARZERO
+      USE PRMS_SOLTAB, ONLY: PI, TWOPI, RADIANS, PI_12
       IMPLICIT NONE
       EXTERNAL :: compute_t
 !     Functions
@@ -389,7 +398,7 @@
 !***********************************************************************
 !***********************************************************************
       SUBROUTINE compute_t(Lat, Solar_declination, T)
-      USE PRMS_CONSTANTS, ONLY: PI
+      USE PRMS_SOLTAB, ONLY: PI
       IMPLICIT NONE
       INTRINSIC :: TAN, ACOS
 ! Arguments
@@ -424,7 +433,7 @@
 !***********************************************************************
 !***********************************************************************
       DOUBLE PRECISION FUNCTION func3(V, W, X, Y, R1, Solar_declination)
-      USE PRMS_CONSTANTS, ONLY: PI_12
+      USE PRMS_SOLTAB, ONLY: PI_12
       IMPLICIT NONE
       INTRINSIC :: SIN, COS
 ! Arguments

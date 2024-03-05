@@ -21,21 +21,18 @@
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Crad_coef(:, :), Crad_exp(:, :)
         REAL, SAVE, ALLOCATABLE :: Ccov_slope(:, :), Ccov_intcp(:, :)
-        REAL, SAVE, ALLOCATABLE :: Ppt_rad_adj(:, :)
-        REAL, SAVE, ALLOCATABLE :: Radj_sppt(:), Radj_wppt(:), Radmax(:, :)
-        REAL, SAVE :: Rad_conv
       END MODULE PRMS_CCSOLRAD
 !***********************************************************************
       INTEGER FUNCTION ccsolrad()
       use PRMS_MMFAPI, only: declvar_real, declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, DEBUG_less, Nmonths, ACTIVE, OFF
-      USE PRMS_MODULE, ONLY: Process_flag, Print_debug, Nhru, Nsol, Nowmonth, Nhru_nmonths, Cloud_cover_cbh_flag
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, DEBUG_less, MONTHS_PER_YEAR, ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: Process_flag, Print_debug, Nhru, Nsol, Cloud_cover_cbh_flag, Nowmonth
       USE PRMS_CCSOLRAD
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv
       USE PRMS_CLIMATEVARS, ONLY: Swrad, Basin_orad, Orad_hru, &
-     &    Hru_solsta, Basin_horad, Basin_potsw, Basin_swrad, Basin_solsta, Orad, Hru_ppt, &
-     &    Tmax_hru, Tmin_hru, Solsta_flag
+     &    Rad_conv, Hru_solsta, Basin_horad, Basin_potsw, Basin_swrad, Basin_solsta, Orad, Hru_ppt, &
+     &    Tmax_hru, Tmin_hru, Solsta_flag, Radj_sppt, Radj_wppt, Ppt_rad_adj, Radmax
       USE PRMS_CLIMATE_HRU, ONLY: Cloud_cover_cbh
       USE PRMS_SOLTAB, ONLY: Soltab_potsw, Soltab_basinpotsw, Hru_cossl, Soltab_horad_potsw
       USE PRMS_SET_TIME, ONLY: Jday, Summer_flag
@@ -130,7 +127,6 @@
       ELSEIF ( Process_flag==DECL ) THEN
         CALL print_module(MODDESC, MODNAME, Version_ccsolrad)
 
-        ! Declare Parameters
         ALLOCATE ( Cloud_radadj(Nhru) )
         CALL declvar_real(MODNAME, 'cloud_radadj', 'nhru', Nhru, &
      &       'Radiation adjustment for cloud cover of each HRU', &
@@ -150,94 +146,47 @@
      &       'decimal fraction', Basin_cloud_cover)
 
         ! Declare Parameters
-        ALLOCATE ( Crad_coef(Nhru,Nmonths) )
+        ALLOCATE ( Crad_coef(Nhru,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'crad_coef', 'nhru,nmonths', 'real', &
      &       '0.4', '0.1', '0.7', &
      &       'Coefficient in cloud cover-solar radiation relationship', &
      &       'Coefficient(B) in Thompson(1976) equation;' // &
      &       ' varies by region, contour map of values in reference', &
      &       'none')/=0 ) CALL read_error(1, 'crad_coef')
-
-        ALLOCATE ( Crad_exp(Nhru,Nmonths) )
+        ALLOCATE ( Crad_exp(Nhru,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'crad_exp', 'nhru,nmonths', 'real', &
      &       '0.61', '0.2', '0.8', &
      &       'Exponent in cloud cover-solar radiation relationship', &
      &       'Exponent(P) in Thompson(1976) equation', &
      &       'none')/=0 ) CALL read_error(1, 'crad_exp')
 
-        ALLOCATE ( Ccov_slope(Nhru,Nmonths) )
+        ALLOCATE ( Ccov_slope(Nhru,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'ccov_slope', 'nhru,nmonths', 'real', &
      &       '-0.13', '-0.5', '-0.01', &
      &       'Slope in temperature cloud cover relationship', &
      &       'Monthly (January to December) coefficient in cloud-cover relationship', &
      &       'none')/=0 ) CALL read_error(1, 'ccov_slope')
 
-        ALLOCATE ( Ccov_intcp(Nhru,Nmonths) )
+        ALLOCATE ( Ccov_intcp(Nhru,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'ccov_intcp', 'nhru,nmonths', 'real', &
      &       '1.83', '0.0', '5.0', &
      &       'Intercept in temperature cloud cover relationship', &
      &       'Monthly (January to December) intercept in cloud-cover relationship', &
      &       'none')/=0 ) CALL read_error(1, 'ccov_intcp')
 
-        ALLOCATE ( Ppt_rad_adj(Nhru,Nmonths) )
-        IF ( declparam(MODNAME, 'ppt_rad_adj', 'nhru,nmonths', 'real', &
-     &       '0.02', '0.0', '0.5', &
-     &       'Radiation reduced if HRU precipitation above this value', &
-     &       'Monthly minimum precipitation, if HRU precipitation exceeds this value, radiation is'// &
-     &       ' multiplied by radj_sppt or radj_wppt adjustment factor', &
-     &       'inches')/=0 ) CALL read_error(1, 'ppt_rad_adj')
-
-      ALLOCATE ( Radj_sppt(Nhru) )
-      IF ( declparam(MODNAME, 'radj_sppt', 'nhru', 'real', &
-     &     '0.44', '0.0', '1.0', &
-     &     'Adjustment to solar radiation on precipitation day - summer', &
-     &     'Multiplicative adjustment factor for computed solar radiation for summer day with greater than'// &
-     &     ' ppt_rad_adj inches of precipitation for each HRU', &
-     &     'decimal fraction')/=0 ) CALL read_error(1, 'radj_sppt')
-
-      ALLOCATE ( Radj_wppt(Nhru) )
-      IF ( declparam(MODNAME, 'radj_wppt', 'nhru', 'real', &
-     &     '0.5', '0.0', '1.0', &
-     &     'Adjustment to solar radiation on precipitation day - winter', &
-     &     'Multiplicative adjustment factor for computed solar radiation for winter day with greater than'// &
-     &     ' ppt_rad_adj inches of precipitation for each HRU', &
-     &     'decimal fraction')/=0 ) CALL read_error(1, 'radj_wppt')
-
-        ALLOCATE ( Radmax(Nhru,Nmonths) )
-        IF ( declparam(MODNAME, 'radmax', 'nhru,nmonths', 'real', &
-     &       '0.8', '0.1', '1.0', &
-     &       'Maximum fraction of potential solar radiation', &
-     &       'Monthly (January to December) maximum fraction of the potential solar radiation'// &
-     &       ' that may reach the ground due to haze, dust, smog, and so forth, for each HRU', &
-     &       'decimal fraction')/=0 ) CALL read_error(1, 'radmax')
-
-        IF ( Nsol > 0 ) THEN
-          IF ( declparam(MODNAME, 'rad_conv', 'one', 'real', &
-     &         '1.0', '0.1', '100.0', &
-     &         'Conversion factor to Langleys for measured radiation', &
-     &         'Conversion factor to Langleys for measured solar radiation', &
-     &         'Langleys/radiation units')/=0 ) CALL read_error(1, 'rad_conv')
-        ENDIF
-
       ELSEIF ( Process_flag==INIT ) THEN
 ! Get parameters
-        IF ( getparam_real(MODNAME, 'crad_coef', Nhru_nmonths, Crad_coef)/=0 ) CALL read_error(2, 'crad_coef')
-        IF ( getparam_real(MODNAME, 'crad_exp', Nhru_nmonths, Crad_exp)/=0 ) CALL read_error(2, 'crad_exp')
-        IF ( getparam_real(MODNAME, 'ccov_slope', Nhru_nmonths, Ccov_slope)/=0 ) CALL read_error(2, 'ccov_slope')
-        IF ( getparam_real(MODNAME, 'ccov_intcp', Nhru_nmonths, Ccov_intcp)/=0 ) CALL read_error(2, 'ccov_intcp')
-        IF ( getparam_real(MODNAME, 'ppt_rad_adj', Nhru_nmonths, Ppt_rad_adj)/=0 ) CALL read_error(2, 'ppt_rad_adj')
-        IF ( getparam_real(MODNAME, 'radmax', Nhru_nmonths, Radmax)/=0 ) CALL read_error(2, 'radmax')
-        IF ( getparam_real(MODNAME, 'radj_sppt', Nhru, Radj_sppt)/=0 ) CALL read_error(2, 'radj_sppt')
-        IF ( getparam_real(MODNAME, 'radj_wppt', Nhru, Radj_wppt)/=0 ) CALL read_error(2, 'radj_wppt')
+        IF ( getparam_real(MODNAME, 'crad_coef', Nhru*MONTHS_PER_YEAR, Crad_coef)/=0 ) CALL read_error(2, 'crad_coef')
+        IF ( getparam_real(MODNAME, 'crad_exp', Nhru*MONTHS_PER_YEAR, Crad_exp)/=0 ) CALL read_error(2, 'crad_exp')
+        IF ( getparam_real(MODNAME, 'ccov_slope', Nhru*MONTHS_PER_YEAR, Ccov_slope)/=0 ) CALL read_error(2, 'ccov_slope')
+        IF ( getparam_real(MODNAME, 'ccov_intcp', Nhru*MONTHS_PER_YEAR, Ccov_intcp)/=0 ) CALL read_error(2, 'ccov_intcp')
 
         Cloud_radadj = 0.0
         Cloud_cover_hru = 0.0
 
         Observed_flag = OFF
-        IF ( Nsol > 0 ) THEN
-          IF ( getparam_real(MODNAME, 'rad_conv', 1, Rad_conv)/=0 ) CALL read_error(2, 'rad_conv')
-          IF ( Basin_solsta>0 ) Observed_flag = ACTIVE
-        ENDIF
+        IF ( Nsol>0 .AND. Basin_solsta>0 ) Observed_flag = ACTIVE
+
       ENDIF
 
       END FUNCTION ccsolrad

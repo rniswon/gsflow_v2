@@ -153,7 +153,7 @@
 !***********************************************************************
       INTEGER FUNCTION prms2mfinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_param, ACTIVE, OFF
-      USE PRMS_MODULE, ONLY: Hru_type
+      USE PRMS_MODULE, ONLY: Hru_type, activeHRU_inactiveCELL_flag
       use PRMS_READ_PARAM_FILE, only: getparam_real
       USE GSFPRMS2MF
       USE GWFUZFMODULE, ONLY: NTRAIL, NWAV, IUZFBND
@@ -291,16 +291,18 @@
       Cell_drain_rate = 0.0 ! dimension ngwcell
       finf_cell = 0.0 ! dimension ngwcell
 
-      ALLOCATE ( activeHru_inactiveCell(Nhru) )
-      ALLOCATE ( inactiveHru_activeCell(Nhru) )
+      IF ( activeHRU_inactiveCELL_flag == ACTIVE ) THEN
+        ALLOCATE ( activeHru_inactiveCell(Nhru) )
+        ALLOCATE ( inactiveHru_activeCell(Nhru) )
+        activeHru_inactiveCell = 0
+        inactiveHru_activeCell = 0
+      ENDIF
       ierr = 0
       IF ( Nhru/=Nhrucell ) THEN
         ALLOCATE ( hru_pct(Nhru), newpct(Nhru), temp_pct(Nhrucell) )
         hru_pct = 0.0D0
         newpct = 0.0D0
       ENDIF
-      activeHru_inactiveCell = 0
-      inactiveHru_activeCell = 0
       DO i = 1, Nhrucell
         ihru = Gvr_hru_id(i)
         IF ( Nhru/=Nhrucell ) THEN
@@ -316,13 +318,13 @@
           IF ( Hru_type(ihru)==0 ) THEN
             IF ( IUZFBND(icol, irow)/=0 ) THEN
               PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
-              inactiveHru_activeCell(ihru) = 1
+              IF ( activeHRU_inactiveCELL_flag == ACTIVE ) inactiveHru_activeCell(ihru) = 1
             ENDIF
           ENDIF
           IF ( IUZFBND(icol, irow)==0 ) THEN
             IF ( Hru_type(ihru) > 0 ) then
                 PRINT *, 'WARNING, UZF cell inactive, irow:', irow, ' icol:',icol,'icell:',icell, ' HRU is active:', ihru
-                activeHru_inactiveCell(ihru) = 1
+                IF ( activeHRU_inactiveCELL_flag == ACTIVE ) activeHru_inactiveCell(ihru) = 1
             end if
           ENDIF
         ENDIF

@@ -18,9 +18,9 @@
 
 !***********************************************************************
       INTEGER FUNCTION potet_pt()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, Nmonths, OFF, INCH2CM
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR, OFF, INCH2CM
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real
-      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Humidity_cbh_flag, Nowmonth, Nhru_nmonths
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Humidity_cbh_flag, Nowmonth
       USE PRMS_POTET_PT
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Swrad, Tminc, Tmaxc, &
@@ -44,7 +44,7 @@
 !******Compute "EQUIVALENT" EVAPOTRANSPIRATION, EEQ (IN./DAY),
 !...USING PRIESTLY-TAYLOR METHOD. THE VARIBLES ARE CALCULATED
 !...USING FORMULAS GIVEN IN JENSEN, 1990.
-        IF ( Humidity_cbh_flag==OFF ) Humidity_hru = Humidity_percent(:, Nowmonth)
+        IF ( Humidity_cbh_flag==OFF ) Humidity_hru = Humidity_percent(1, Nowmonth)
         ! next three lines were in loop, moved out since just setting constants
         A1 = 17.625
         B1 = 243.04
@@ -68,7 +68,7 @@
 !...LATENT HEAT OF VAPORIZATION AT AVG TEMPERATURE, CAL/GRAM:
           ! elh = 597.3 - 0.5653*Tavgc(i) ! same as potet_jh
 !...LATENT HEAT OF VAPORIZATION AT AVG TEMPERATURE, JOULES/GRAM:
-          elh = (597.3 - 0.5653*Tavgc(i)) * 4.184
+          elh = (597.3 - 0.5653*Tavgc(i)) * 4.184 
           ! elh = 2501.0 - 2.361*Tavgc(i)
           ! elh = 2500.8 - 2.36*Tavgc(i) + 0.0016*Tavgc(i)**2 - 0.00006*Tavgc(i)**3
 
@@ -96,8 +96,8 @@
           !A1 = 17.625 !moved outside loop
           !B1 = 243.04 !moved outside loop
           t1 = A1 * Tavgc(i) / (B1 + Tavgc(i))
-          num = B1 * (LOG(Humidity_hru(i)/100.0) + t1)
-          den = A1 - LOG(Humidity_hru(i)/100.0) - t1
+          num = B1 * (LOG(Humidity_hru(i)/100.0) + t1) 
+          den = A1 - LOG(Humidity_hru(i)/100.0) - t1 
           Tempc_dewpt(i) = num / den
 
 ! Actual vapor pressure (Irmak eqn. 12), KPA
@@ -129,7 +129,7 @@
 ! Net radiation (Irmak eqn. 8) MJ / m2 / day
 ! 1 Langley = 0.04184 MJ/m2
           net_rad = Swrad(i)*0.04184 - Lwrad_net(i) - heat_flux
-
+          
 !...COMPUTE EEQ, CM/DAY
 !...net_rad in units of MJ/m2
 !...elh (LATENT HEAT OF VAPORIZATION) in units of JOULES/GRAM:
@@ -154,7 +154,7 @@
         CALL print_module(MODDESC, MODNAME, Version_potet)
 
         ! Declare Parameters
-        ALLOCATE ( Pt_alpha(Nhru,Nmonths) )
+        ALLOCATE ( Pt_alpha(Nhru,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'pt_alpha', 'nhru,nmonths', 'real', &
      &       '1.26', '1.0', '2.0', &
      &       'Potential ET adjustment factor - Priestly-Taylor', &
@@ -164,7 +164,7 @@
 
 !******Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( getparam_real(MODNAME, 'pt_alpha', Nhru_nmonths, Pt_alpha)/=0 ) CALL read_error(2, 'pt_alpha')
+        IF ( getparam_real(MODNAME, 'pt_alpha', Nhru*MONTHS_PER_YEAR, Pt_alpha)/=0 ) CALL read_error(2, 'pt_alpha')
 
       ENDIF
 

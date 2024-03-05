@@ -9,8 +9,8 @@
       character(len=*), parameter :: MODNAME = 'nhru_summary'
       character(len=*), parameter :: Version_nhru_summary = '2024-02-08'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear, nrows
-      INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nhru_var_type(:), Nhru_var_int(:, :)
-      REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
+      INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nhru_var_type(:), Nhru_var_int(:, :), hru_ids(:), nhm_ids(:)
+      REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :), daily_values(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Nhru_var_dble(:, :)
       CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2, Output_fmt3, Output_fmtint
       CHARACTER(LEN=48), SAVE :: Output_grid_fmt, Output_grid_fmtint, Output_date_fmt, Output_date_fmt3, Output_fmt3int
@@ -22,7 +22,7 @@
 ! Parameters
       INTEGER, SAVE, ALLOCATABLE :: Nhm_id(:)
 ! Control Parameters
-      INTEGER, SAVE :: NhruOutVars, NhruOut_freq, NhruOut_format, NhruOutNcol, outputSelectDatesON_OFF, write_binary_cbh
+      INTEGER, SAVE :: NhruOutVars, NhruOut_freq, NhruOut_format, NhruOutNcol, outputSelectDatesON_OFF, write_binary_nhru_flag
       CHARACTER(LEN=36), SAVE, ALLOCATABLE :: NhruOutVar_names(:)
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: NhruOutBaseFileName, selectDatesFileName
       END MODULE PRMS_NHRU_SUMMARY
@@ -92,7 +92,7 @@
         IF ( control_string(selectDatesFileName, 'selectDatesFileName')/=0 ) CALL read_error(5, 'selectDatesFileName')
       ENDIF
 
-      IF ( control_integer(write_binary_cbh, 'write_binary_cbh')/=0 ) write_binary_cbh = 0
+      IF ( control_integer(write_binary_nhru_flag, 'write_binary_nhru_flag')/=0 ) write_binary_nhru_flag = 0
 
       IF ( NhruOutVars==0 ) THEN
         CALL error_stop('nhru_summary requested with nhruOutVars equal 0', ERROR_control)
@@ -208,7 +208,7 @@
       IF ( NhruOut_freq==DAILY .OR. NhruOut_freq==DAILY_MONTHLY ) THEN
         Daily_flag = ACTIVE
         ALLOCATE ( Dailyunit(NhruOutVars) )
-        Dailyunit = 0
+        Dailyunit = 831
       ENDIF
 
       Monthly_flag = OFF
@@ -218,7 +218,7 @@
         Yeardays = 0
         ALLOCATE ( Nhru_var_yearly(Nhru, NhruOutVars), Yearlyunit(NhruOutVars) )
         Nhru_var_yearly = 0.0D0
-        Yearlyunit = 0
+        Yearlyunit = 931
         IF ( NhruOut_format==1 ) THEN
           WRITE ( Output_fmt3, 9003 ) Nhru
         ELSEIF ( NhruOut_format==2 ) THEN
@@ -236,33 +236,37 @@
         Monthdays = 0.0D0
         ALLOCATE ( Nhru_var_monthly(Nhru, NhruOutVars), Monthlyunit(NhruOutVars) )
         Nhru_var_monthly = 0.0D0
-        Monthlyunit = 0
+        Monthlyunit = 731
       ENDIF
 
       IF ( NhruOutON_OFF==2 ) THEN
         IF ( getparam_int(MODNAME, 'nhm_id', Nhru, Nhm_id)/=0 ) CALL read_error(2, 'nhm_id')
+      ELSE
+        ALLOCATE ( hru_ids(nhru) )
+        DO jj = 1, nhru
+          hru_ids(jj) = jj
+        ENDDO
       ENDIF
-      WRITE ( Output_fmt2, 9002 ) Nhru
-      ALLOCATE ( Nhru_var_daily(Nhru, NhruOutVars) )
+      WRITE ( Output_fmt2, 9002 ) '("Date",', Nhru, '(", ",I0) )'
+      ALLOCATE ( Nhru_var_daily(Nhru, NhruOutVars), daily_values(Nhru) )
       Nhru_var_daily = 0.0
       file_suffix = '.csv'
-      IF ( write_binary_cbh == ACTIVE ) file_suffix = '.bin'
-      print *, write_binary_cbh, file_suffix
+      IF ( write_binary_nhru_flag == ACTIVE ) file_suffix = '.bin'
       DO jj = 1, NhruOutVars
         IF ( Daily_flag==ACTIVE ) THEN
           fileName = NhruOutBaseFileName(:numchars(NhruOutBaseFileName))//NhruOutVar_names(jj)(:Nc_vars(jj))//file_suffix
-          CALL PRMS_open_output_file(Dailyunit(jj), fileName, 'xxx', write_binary_cbh, ios)
+          CALL PRMS_open_output_file(Dailyunit(jj), fileName, 'xxx', write_binary_nhru_flag, ios)
           IF ( ios/=0 ) CALL error_stop('in nhru_summary, daily', ERROR_open_out)
           CALL write_header_date( Dailyunit(jj) )
         ENDIF
         IF ( NhruOut_freq>MEAN_MONTHLY ) THEN
           IF ( NhruOut_freq==MEAN_YEARLY ) THEN
             fileName = NhruOutBaseFileName(:numchars(NhruOutBaseFileName))//NhruOutVar_names(jj)(:Nc_vars(jj))//'_meanyearly'//file_suffix
-            CALL PRMS_open_output_file(Yearlyunit(jj), fileName, 'xxx', write_binary_cbh, ios)
+            CALL PRMS_open_output_file(Yearlyunit(jj), fileName, 'xxx', write_binary_nhru_flag, ios)
             IF ( ios/=0 ) CALL error_stop('in nhru_summary, mean yearly', ERROR_open_out)
           ELSE  !IF ( NhruOut_freq==YEARLY ) THEN
             fileName = NhruOutBaseFileName(:numchars(NhruOutBaseFileName))//NhruOutVar_names(jj)(:Nc_vars(jj))//'_yearly'//file_suffix
-            CALL PRMS_open_output_file(Yearlyunit(jj), fileName, 'xxx', write_binary_cbh, ios)
+            CALL PRMS_open_output_file(Yearlyunit(jj), fileName, 'xxx', write_binary_nhru_flag, ios)
             IF ( ios/=0 ) CALL error_stop('in nhru_summary, yearly', ERROR_open_out)
           ENDIF
           CALL write_header_date( Yearlyunit(jj) )
@@ -271,11 +275,11 @@
           IF ( NhruOut_freq==MEAN_MONTHLY ) THEN
             fileName = NhruOutBaseFileName(:numchars(NhruOutBaseFileName))//NhruOutVar_names(jj)(:Nc_vars(jj))// &
      &                 '_meanmonthly.csv'
-            CALL PRMS_open_output_file(Monthlyunit(jj), fileName, 'xxx', write_binary_cbh, ios)
+            CALL PRMS_open_output_file(Monthlyunit(jj), fileName, 'xxx', write_binary_nhru_flag, ios)
             IF ( ios/=0 ) CALL error_stop('in nhru_summary, mean monthly', ERROR_open_out)
           ELSE
             fileName = NhruOutBaseFileName(:numchars(NhruOutBaseFileName))//NhruOutVar_names(jj)(:Nc_vars(jj))//'_monthly'//file_suffix
-            CALL PRMS_open_output_file(Monthlyunit(jj), fileName, 'xxx', write_binary_cbh, ios)
+            CALL PRMS_open_output_file(Monthlyunit(jj), fileName, 'xxx', write_binary_nhru_flag, ios)
             IF ( ios/=0 ) CALL error_stop('in nhru_summary, monthly', ERROR_open_out)
           ENDIF
           CALL write_header_date( Monthlyunit(jj) )
@@ -283,7 +287,7 @@
       ENDDO
 
  9001 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',ES10.3))')
- 9002 FORMAT ('("Date"',I0,'('', ''I0))')
+ 9002 FORMAT (A,I0,A)
  9003 FORMAT ('(I4,', I0,'('','',ES10.3))')
  9004 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',I0))')
  9005 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',F0.4))')
@@ -464,25 +468,23 @@
 !*****************************
       SUBROUTINE write_header_date(Iunit)
       USE PRMS_CONSTANTS, ONLY: OFF
-      USE PRMS_MODULE, ONLY: NhruOutON_OFF, Nhru
-      USE PRMS_NHRU_SUMMARY, ONLY: write_binary_cbh, Output_fmt2, Nhm_id
+      USE PRMS_MODULE, ONLY: NhruOutON_OFF
+      USE PRMS_NHRU_SUMMARY, ONLY: write_binary_nhru_flag, Output_fmt2, Nhm_id, hru_ids
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Iunit
-! Local Variables
-      INTEGER :: j
 !*******************************************************************************
       IF ( NhruOutON_OFF==1 ) THEN
-        IF ( write_binary_cbh == OFF ) THEN
-          WRITE ( Iunit, Output_fmt2 ) (j, j=1,Nhru)
+        IF ( write_binary_nhru_flag == OFF ) THEN
+          WRITE ( Iunit, Output_fmt2 ) hru_ids
         ELSE
-          WRITE ( Iunit ) 'Date', (j, j=1,Nhru)
+          WRITE ( Iunit ) 'Date', hru_ids
         ENDIF
       ELSE
-        IF ( write_binary_cbh == OFF ) THEN
-          WRITE ( Iunit, Output_fmt2 ) (Nhm_id(j), j=1,Nhru)
+        IF ( write_binary_nhru_flag == OFF ) THEN
+          WRITE ( Iunit, Output_fmt2 ) Nhm_id
         ELSE
-          WRITE ( Iunit ) 'Date', (Nhm_id(j), j=1,Nhru)
+          WRITE ( Iunit ) 'Date', Nhm_id
         ENDIF
       ENDIF
 
@@ -494,7 +496,7 @@
       SUBROUTINE write_CBH_yearly_values( ivar )
       USE PRMS_CONSTANTS, ONLY: OFF, INT_TYPE
       USE PRMS_MODULE, ONLY: Nhru
-      USE PRMS_NHRU_SUMMARY, ONLY: NhruOutNcol, write_binary_cbh, Nhru_var_type, Lastyear, &
+      USE PRMS_NHRU_SUMMARY, ONLY: NhruOutNcol, write_binary_nhru_flag, Nhru_var_type, Lastyear, &
           Nhru_var_int, Nhru_var_yearly, Output_fmt3, Output_fmt3int, Output_date_fmt3, &
           Output_grid_fmtint, Output_grid_fmt, Yearlyunit, nrows
       IMPLICIT NONE
@@ -507,13 +509,13 @@
 !*******************************************************************************
       IF ( Nhru_var_type(ivar) /= INT_TYPE ) THEN
         IF ( NhruOutNcol == Nhru ) THEN
-          IF ( write_binary_cbh == OFF ) THEN
+          IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Yearlyunit(ivar), Output_fmt3 ) Lastyear, (Nhru_var_yearly(j,ivar), j=1,Nhru)
           ELSE
-            WRITE ( Yearlyunit(ivar) ) Lastyear, (',', Nhru_var_yearly(j,ivar), j=1,Nhru)
+            WRITE ( Yearlyunit(ivar) ) Lastyear, (Nhru_var_yearly(j,ivar), j=1,Nhru)
           ENDIF
         ELSE
-          IF ( write_binary_cbh == OFF ) THEN
+          IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Yearlyunit(ivar), Output_date_fmt3 ) Lastyear
             WRITE ( Yearlyunit(ivar), Output_grid_fmt ) (Nhru_var_yearly(j,ivar), j=1,Nhru)
           ELSE
@@ -532,13 +534,13 @@
           Nhru_var_int(i, ivar) = INT( Nhru_var_yearly(i, ivar) )
         ENDDO
         IF ( NhruOutNcol==Nhru ) THEN
-          IF ( write_binary_cbh == OFF ) THEN
+          IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Yearlyunit(ivar), Output_fmt3int ) Lastyear, (Nhru_var_int(j,ivar), j=1,Nhru)
           ELSE
             WRITE ( Yearlyunit(ivar) ) Lastyear, (Nhru_var_int(j,ivar), j=1,Nhru)
           ENDIF
         ELSE
-          IF ( write_binary_cbh == OFF ) THEN
+          IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Yearlyunit(ivar), Output_date_fmt3) Lastyear
             WRITE ( Yearlyunit(ivar), Output_grid_fmtint) (Nhru_var_int(j,ivar), j=1,Nhru)
           ELSE
@@ -562,7 +564,7 @@
       SUBROUTINE write_cbh_monthly_values( ivar )
       USE PRMS_CONSTANTS, ONLY: OFF, INT_TYPE
       USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday
-      USE PRMS_NHRU_SUMMARY, ONLY: NhruOutNcol, write_binary_cbh, Nhru_var_type, nrows, &
+      USE PRMS_NHRU_SUMMARY, ONLY: NhruOutNcol, write_binary_nhru_flag, Nhru_var_type, nrows, &
           Nhru_var_int, Nhru_var_monthly, Output_fmtint, Output_fmt, Output_date_fmt, &
           Output_grid_fmtint, Output_grid_fmt, Monthlyunit
       IMPLICIT NONE
@@ -575,13 +577,13 @@
 !*******************************************************************************
       IF ( Nhru_var_type(ivar) /= INT_TYPE ) THEN
         IF ( NhruOutNcol == Nhru ) THEN
-          IF ( write_binary_cbh == OFF ) THEN
+          IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Monthlyunit(ivar), Output_fmt) Nowyear, Nowmonth, Nowday, (Nhru_var_monthly(j,ivar), j=1,Nhru)
           ELSE
             WRITE ( Monthlyunit(ivar) ) Nowyear, Nowmonth, Nowday, (Nhru_var_monthly(j,ivar), j=1,Nhru)
           ENDIF
         ELSE
-          IF ( write_binary_cbh == OFF ) THEN
+          IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Monthlyunit(ivar), Output_date_fmt) Nowyear, Nowmonth, Nowday
             WRITE ( Monthlyunit(ivar), Output_grid_fmt) (Nhru_var_monthly(j,ivar), j=1,Nhru)
           ELSE
@@ -600,13 +602,13 @@
           Nhru_var_int(i, ivar) = INT( Nhru_var_monthly(i, ivar) )
         ENDDO
         IF ( NhruOutNcol==Nhru ) THEN
-          IF ( write_binary_cbh == OFF ) THEN
+          IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Monthlyunit(ivar), Output_fmtint) Nowyear, Nowmonth, Nowday, (Nhru_var_int(j,ivar), j=1,Nhru)
           ELSE
             WRITE ( Monthlyunit(ivar) ) Nowyear, Nowmonth, Nowday, (Nhru_var_int(j,ivar), j=1,Nhru)
           ENDIF
         ELSE
-          IF ( write_binary_cbh == OFF ) THEN
+          IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Monthlyunit(jj), Output_date_fmt) Nowyear, Nowmonth, Nowday
             WRITE ( Monthlyunit(jj), Output_grid_fmtint) (Nhru_var_int(j,jj), j=1,Nhru)
           ELSE
@@ -630,9 +632,9 @@
       SUBROUTINE write_cbh_daily_values( ivar )
       USE PRMS_CONSTANTS, ONLY: OFF, INT_TYPE
       USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday
-      USE PRMS_NHRU_SUMMARY, ONLY: NhruOutNcol, write_binary_cbh, Nhru_var_type, &
+      USE PRMS_NHRU_SUMMARY, ONLY: NhruOutNcol, write_binary_nhru_flag, Nhru_var_type, &
           Nhru_var_int, Nhru_var_daily, Output_date_fmt, Output_fmt, Output_fmtint, &
-          Output_grid_fmtint, Output_grid_fmt, Dailyunit, nrows
+          Output_grid_fmtint, Output_grid_fmt, Dailyunit, nrows, daily_values
 ! Arguments
       INTEGER, INTENT(IN) :: ivar
 ! Functions
@@ -642,13 +644,14 @@
 !*******************************************************************************
       IF ( Nhru_var_type(ivar) /= INT_TYPE ) THEN
         IF ( NhruOutNcol == Nhru ) THEN
-          IF ( write_binary_cbh == OFF ) THEN
+          IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Dailyunit(ivar), Output_fmt) Nowyear, Nowmonth, Nowday, (Nhru_var_daily(j,ivar), j=1,Nhru)
           ELSE
-            WRITE ( Dailyunit(ivar) ) Nowyear, Nowmonth, Nowday, (Nhru_var_daily(j,ivar), j=1,Nhru)
+            daily_values = Nhru_var_daily(:,ivar)
+            WRITE ( Dailyunit(ivar) ) Nowyear, Nowmonth, Nowday, daily_values
           ENDIF
         ELSE
-          IF ( write_binary_cbh == OFF ) THEN
+          IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Dailyunit(ivar), Output_date_fmt) Nowyear, Nowmonth, Nowday
             WRITE ( Dailyunit(ivar), Output_grid_fmt) (Nhru_var_daily(j,ivar), j=1,Nhru)
           ELSE
@@ -664,13 +667,13 @@
         ENDIF
       ELSE
         IF ( NhruOutNcol==Nhru ) THEN
-          IF ( write_binary_cbh == OFF ) THEN
+          IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Dailyunit(ivar), Output_fmtint) Nowyear, Nowmonth, Nowday, (Nhru_var_int(j,ivar), j=1,Nhru)
           ELSE
             WRITE ( Dailyunit(ivar) ) Nowyear, Nowmonth, Nowday, (Nhru_var_int(j,ivar), j=1,Nhru)
           ENDIF
         ELSE
-          IF ( write_binary_cbh == OFF ) THEN
+          IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Dailyunit(ivar), Output_date_fmt) Nowyear, Nowmonth, Nowday
             WRITE ( Dailyunit(ivar), Output_grid_fmtint) (Nhru_var_int(j,ivar), j=1,Nhru)
           ELSE

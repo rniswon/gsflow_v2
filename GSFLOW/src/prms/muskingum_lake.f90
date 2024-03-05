@@ -714,7 +714,7 @@
         IF ( getparam_real(MODNAME, 'tbl_gate', Ngate, Tbl_gate)/=0 ) CALL read_error(2, 'tbl_gate')
         IF ( getparam_int(MODNAME, 'ratetbl_lake', Nratetbl, Ratetbl_lake)/=0 ) CALL read_error(2, 'ratetbl_lake')
         IF ( Gate_flag==1 ) THEN
-          IF ( getparam_int(MODNAME, 'lake_out2', Nlake, Lake_out2)/=0 ) CALL read_error(2, 'lake_out2')
+          IF ( getparam_int(MODNAME, 'lake_out2', Nlake, Lake_out2)/=0  ) CALL read_error(2, 'lake_out2')
           DO j = 1, Nlake
             IF ( Lake_out2(j)==1 ) Secondoutflow_flag = ACTIVE
           ENDDO
@@ -1145,7 +1145,7 @@
       Basin_cfs = Flow_out
       Basin_stflow_out = Basin_cfs / area_fac
       Basin_cms = Basin_cfs*CFS2CMS_CONV
-      IF ( Glacier_flag==1 ) THEN
+      IF ( Glacier_flag==ACTIVE ) THEN
         Basin_stflow_in = Basin_stflow_in + Basin_gl_top_melt
         Basin_gl_ice_cfs = Basin_gl_ice_melt*area_fac
         Basin_gl_cfs = Basin_gl_top_melt*area_fac
@@ -1403,7 +1403,7 @@
 
         gate2 = Ngate
         gate1 = Ngate - 1
-        IF ( .not.(Gate_ht>Tbl_gate(Ngate)) ) THEN
+        IF ( Gate_ht<=Tbl_gate(Ngate) ) THEN
           DO mm = 1, Ngate
             IF ( Tbl_gate(mm)>Gate_ht ) THEN
               IF ( mm==1 ) THEN

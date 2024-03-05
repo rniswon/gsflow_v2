@@ -11,16 +11,16 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_pm'
-        character(len=*), parameter :: Version_potet = '2023-11-01'
+        character(len=*), parameter :: Version_potet = '2024-01-15'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Pm_n_coef(:, :), Pm_d_coef(:, :), Crop_coef(:, :)
       END MODULE PRMS_POTET_PM
 
 !***********************************************************************
       INTEGER FUNCTION potet_pm()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, Nmonths, OFF, INCH2MM
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR, OFF, INCH2MM
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real
-      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Humidity_cbh_flag, Nowmonth, Nhru_nmonths
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Humidity_cbh_flag, Nowmonth
       USE PRMS_POTET_PM
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Swrad, Tminc, Tmaxc, &
@@ -34,13 +34,13 @@
       INTRINSIC :: DBLE, LOG, SNGL
 ! Local Variables
       INTEGER :: i, j
-      REAL :: elh, prsr, psycnst, heat_flux, net_rad, vp_deficit, a, b, c
+      REAL :: elh, prsr, psycnst, heat_flux, net_rad, vp_deficit, a, b, c 
       REAL :: A1, B1, t1, num, den, stab, sw
 !***********************************************************************
       potet_pm = 0
 
       IF ( Process_flag==RUN ) THEN
-        IF ( Humidity_cbh_flag==OFF ) Humidity_hru = Humidity_percent(:, Nowmonth)
+        IF ( Humidity_cbh_flag==OFF ) Humidity_hru = Humidity_percent(1, Nowmonth) 
         Basin_potet = 0.0D0
         Basin_humidity = 0.0D0
         DO j = 1, Active_hrus
@@ -53,7 +53,7 @@
 !...LATENT HEAT OF VAPORIZATION AT AVG TEMPERATURE, CAL/GRAM:
           ! elh = 597.3 - 0.5653*Tavgc(i) ! same as potet_jh
 !...LATENT HEAT OF VAPORIZATION AT AVG TEMPERATURE, JOULES/GRAM:
-          elh = (597.3 - 0.5653*Tavgc(i)) * 4.184
+          elh = (597.3 - 0.5653*Tavgc(i)) * 4.184 
           ! elh = 2501.0 - 2.361*Tavgc(i)
           ! elh = 2500.8 - 2.36*Tavgc(i) + 0.0016*Tavgc(i)**2 - 0.00006*Tavgc(i)**3
 
@@ -146,21 +146,21 @@
         CALL print_module(MODDESC, MODNAME, Version_potet)
 
         ! Declare Parameters
-        ALLOCATE ( Pm_n_coef(Nhru,Nmonths) )
+        ALLOCATE ( Pm_n_coef(Nhru,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'pm_n_coef', 'nhru,nmonths', 'real', &
      &       '900.0', '850.0', '950.0', &
      &       'Penman-Monteith coefficient', &
      &       'Monthly (January to December) Penman-Monteith potential ET N temperauture coefficient for each HRU', &
      &       'degrees Celsius per day')/=0 ) CALL read_error(1, 'pm_n_coef')
 
-        ALLOCATE ( Pm_d_coef(Nhru,Nmonths) )
+        ALLOCATE ( Pm_d_coef(Nhru,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'pm_d_coef', 'nhru,nmonths', 'real', &
      &       '0.34', '0.25', '0.45', &
      &       'Penman-Monteith coefficient', &
      &       'Monthly (January to December) Penman-Monteith potential ET D wind-speed coefficient for each HRU', &
      &       'seconds/meters')/=0 ) CALL read_error(1, 'pm_d_coef')
 
-        ALLOCATE ( Crop_coef(Nhru,Nmonths) )
+        ALLOCATE ( Crop_coef(Nhru,MONTHS_PER_YEAR) )
         IF ( declparam(MODNAME, 'crop_coef', 'nhru,nmonths', 'real', &
      &       '1.0', '0.0', '2.0', &
      &       'Crop coefficient for each HRU', &
@@ -170,9 +170,9 @@
 !******Get parameters
       ELSEIF ( Process_flag==INIT ) THEN
         Vp_sat = 0.0
-        IF ( getparam_real(MODNAME, 'pm_n_coef', Nhru_nmonths, Pm_n_coef)/=0 ) CALL read_error(2, 'pm_n_coef')
-        IF ( getparam_real(MODNAME, 'pm_d_coef', Nhru_nmonths, Pm_d_coef)/=0 ) CALL read_error(2, 'pm_d_coef')
-        IF ( getparam_real(MODNAME, 'crop_coef', Nhru_nmonths, Crop_coef)/=0 ) CALL read_error(2, 'crop_coef')
+        IF ( getparam_real(MODNAME, 'pm_n_coef', Nhru*MONTHS_PER_YEAR, Pm_n_coef)/=0 ) CALL read_error(2, 'pm_n_coef')
+        IF ( getparam_real(MODNAME, 'pm_d_coef', Nhru*MONTHS_PER_YEAR, Pm_d_coef)/=0 ) CALL read_error(2, 'pm_d_coef')
+        IF ( getparam_real(MODNAME, 'crop_coef', Nhru*MONTHS_PER_YEAR, Crop_coef)/=0 ) CALL read_error(2, 'crop_coef')
 
       ENDIF
 

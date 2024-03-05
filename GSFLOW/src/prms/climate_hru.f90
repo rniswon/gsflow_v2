@@ -12,19 +12,24 @@
         character(len=*), parameter :: MODNAME = 'climate_hru'
         character(len=*), parameter :: Version_climate_hru = '2024-01-08'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
-        INTEGER, SAVE :: Humidity_unit, Windspeed_unit, AET_unit, PET_unit, Irrigated_area_unit
+        INTEGER, SAVE :: Humidity_unit, Windspeed_unit
         INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit, Ncbh
+        INTEGER, SAVE :: AET_unit, PET_unit, Irrigated_area_unit
+        INTEGER, SAVE :: yr, mo, dy
         REAL, ALLOCATABLE :: values(:)
         INTEGER, ALLOCATABLE :: ivalues(:)
         ! Control Parameters
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Tmin_day, Tmax_day, Precip_day, Potet_day, Swrad_day, Transp_day
-        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Humidity_day, Windspeed_day, AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
+        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Humidity_day, Windspeed_day
+        CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Albedo_day, Cloud_cover_day
         INTEGER, SAVE :: Cbh_check_flag, cbh_active_flag
         ! Declared Variables
-        DOUBLE PRECISION, SAVE :: Basin_windspeed, Basin_aet_external, Basin_pet_external, Basin_irrigated_area
-        REAL, ALLOCATABLE :: Humidity_hru(:), Windspeed_hru(:), AET_external(:), PET_external(:), Irrigated_area(:)
+        DOUBLE PRECISION, SAVE :: Basin_windspeed
+        DOUBLE PRECISION, SAVE :: Basin_aet_external, Basin_pet_external, Basin_irrigated_area
+        REAL, ALLOCATABLE :: Humidity_hru(:), Windspeed_hru(:)
         REAL, ALLOCATABLE :: Albedo_hru(:), Cloud_cover_cbh(:)
+        REAL, ALLOCATABLE :: AET_external(:), PET_external(:), Irrigated_area(:)
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Rain_cbh_adj(:, :), Snow_cbh_adj(:, :), Potet_cbh_adj(:, :)
         REAL, SAVE, ALLOCATABLE :: Tmax_cbh_adj(:, :), Tmin_cbh_adj(:, :)
@@ -32,16 +37,16 @@
       END MODULE PRMS_CLIMATE_HRU
 
       INTEGER FUNCTION climate_hru()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, RUN, DECL, INIT, MAXDIM, &
-     &    MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, MM, Nmonths, DEBUG_less
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, RUN, DECL, INIT, &
+     &    MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, MM, MONTHS_PER_YEAR, MAXDIM, DEBUG_less
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real, getparam_int, getdim, decldim
       use PRMS_CONTROL_FILE, only: control_integer, control_string
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Climate_transp_flag, Orad_flag, &
      &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
-     &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, Nhru_nmonths, &
-     &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, Nowyear, Nowday, forcing_check_flag, Print_debug, &
-     &    irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag
+     &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
+     &    irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag, &
+     &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, Nowyear, Nowday, forcing_check_flag, Print_debug
       USE PRMS_CLIMATE_HRU
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Ag_Frac
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
@@ -53,13 +58,14 @@
      &    Transp_on, Basin_transp_on, Tmax_allsnow_f, Basin_humidity, Ppt_zero_thresh
       USE PRMS_SET_TIME, ONLY: Jday
       USE PRMS_SOLTAB, ONLY: Soltab_basinpotsw, Hru_cossl, Soltab_potsw
-      use prms_utils, only: find_current_time, find_cbh_header_end, print_date, print_module, read_error
+      use prms_utils, only: find_current_time, print_date, print_module, read_error
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DBLE, SNGL
-      EXTERNAL :: precip_form, read_cbh_date, check_cbh_value, check_cbh_intvalue, temp_set, read_cbh_values
+      EXTERNAL :: precip_form, temp_set, find_cbh_header_end
+      EXTERNAL :: read_cbh_date, check_cbh_value, check_cbh_intvalue, read_cbh_values
 ! Local Variables
-      INTEGER :: yr, mo, dy, i, hr, mn, sec, jj, ierr, istop, missing, ios !, write_tmin_tmax
+      INTEGER :: i, hr, mn, sec, jj, ierr, istop, missing, ios !, write_tmin_tmax
       INTEGER :: ii, num_ag, num_pet
       DOUBLE PRECISION :: sum_obs
       REAL :: tmax_hru, tmin_hru, ppt, harea !, foo
@@ -76,7 +82,7 @@
         ENDIF
 
         IF ( Climate_precip_flag==ACTIVE ) CALL read_cbh_values('hru_ppt', Precip_unit, Hru_ppt, ierr)
-        IF ( ierr == 0 ) THEN
+        IF ( ierr==0 ) THEN
           IF ( Ppt_zero_thresh>0.0 ) THEN
             DO jj = 1, Active_hrus
               i = Hru_route_order(jj)
@@ -131,7 +137,7 @@
         ENDIF
 
         IF ( Climate_swrad_flag==ACTIVE ) THEN
-          IF ( cbh_active_flag == OFF ) THEN
+          IF ( cbh_active_flag==OFF ) THEN
             IF ( Orad_flag==OFF ) THEN
               READ ( Swrad_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Swrad(i), i=1,Nhru)
             ELSE
@@ -149,7 +155,7 @@
           ELSE
             IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'swrad', ios, ierr)
             IF ( ierr == 0 ) THEN
-              IF ( cbh_active_flag == ACTIVE ) THEN
+              IF ( cbh_active_flag==ACTIVE ) THEN
                 Swrad = -999.0
                 DO i = i, Ncbh
                   Swrad(cbh_hru_id(i)) = values(i)
@@ -161,7 +167,7 @@
         ENDIF
 
         IF ( Climate_transp_flag==ACTIVE ) THEN
-          IF ( cbh_active_flag == OFF ) THEN
+          IF ( cbh_active_flag==OFF ) THEN
             READ ( Transp_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Transp_on(i), i=1,Nhru)
           ELSE
             READ ( Transp_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (ivalues(i), i=1,Ncbh)
@@ -170,8 +176,8 @@
             ierr = ierr + 1
           ELSE
             IF ( Cbh_check_flag==ACTIVE ) CALL read_cbh_date(yr, mo, dy, 'transp_on', ios, ierr)
-            IF ( ierr == 0 ) THEN
-              IF ( cbh_active_flag == ACTIVE ) THEN
+            IF ( ierr==0 ) THEN
+              IF ( cbh_active_flag==ACTIVE ) THEN
                 Transp_on = -999
                 DO i = i, Ncbh
                   Transp_on(cbh_hru_id(i)) = ivalues(i)
@@ -241,7 +247,7 @@
 
           IF ( Climate_temp_flag==ACTIVE ) THEN
             IF ( forcing_check_flag==ACTIVE ) THEN
-              IF ( Tminf(i) > Tmaxf(i))  THEN
+              IF ( Tminf(i)>Tmaxf(i))  THEN
                 IF ( Print_debug > DEBUG_less ) PRINT *, 'WARNING, CBH tmin > tmax, HRU, date, tmin, tmax, diff:', &
                                                          i, Nowyear, Nowmonth, Nowday, Tminf(i), Tmaxf(i), Tmaxf(i) - Tminf(i)
 !                write_tmin_tmax = 1
@@ -286,7 +292,7 @@
           IF ( PET_cbh_flag==ACTIVE ) Basin_pet_external = Basin_pet_external + DBLE( PET_external(i)*harea )
           IF ( irrigated_area_cbh_flag==ACTIVE ) Basin_irrigated_area = Basin_irrigated_area + DBLE( Irrigated_area(i)*harea )
         ENDDO
-!        IF ( write_tmin_tmax == 1 ) THEN
+!        IF ( write_tmin_tmax==1 ) THEN
 !          WRITE ( 863,  '(I4,2I3,3I2,128F7.2)' ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tmaxf(i), i=1,Nhru)
 !          WRITE ( 864, '(I4,2I3,3I2,128F7.2)' ) Nowyear, Nowmonth, Nowday, 0, 0, 0, (Tminf(i), i=1,Nhru)
 !        ENDIF
@@ -404,7 +410,7 @@
 
 !   Declared Parameters
         IF ( Climate_temp_flag==ACTIVE ) THEN
-          ALLOCATE ( Tmax_cbh_adj(Nhru,Nmonths) )
+          ALLOCATE ( Tmax_cbh_adj(Nhru,MONTHS_PER_YEAR) )
           IF ( declparam(MODNAME, 'tmax_cbh_adj', 'nhru,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
      &         'Monthly maximum temperature adjustment factor for each HRU', &
@@ -412,7 +418,7 @@
      &         ' estimated on the basis of slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_cbh_adj')
 
-          ALLOCATE ( Tmin_cbh_adj(Nhru,Nmonths) )
+          ALLOCATE ( Tmin_cbh_adj(Nhru,MONTHS_PER_YEAR) )
           IF ( declparam(MODNAME, 'tmin_cbh_adj', 'nhru,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
      &         'Monthly minimum temperature adjustment factor for each HRU', &
@@ -422,7 +428,7 @@
         ENDIF
 
         IF ( Climate_precip_flag==ACTIVE ) THEN
-          ALLOCATE ( Rain_cbh_adj(Nhru,Nmonths) )
+          ALLOCATE ( Rain_cbh_adj(Nhru,MONTHS_PER_YEAR) )
           IF ( declparam(MODNAME, 'rain_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '2.0', &
      &         'Rain adjustment factor, by month for each HRU', &
@@ -431,7 +437,7 @@
      &         ' each HRU to account for differences in elevation, and so forth', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'rain_cbh_adj')
 
-          ALLOCATE ( Snow_cbh_adj(Nhru,Nmonths) )
+          ALLOCATE ( Snow_cbh_adj(Nhru,MONTHS_PER_YEAR) )
           IF ( declparam(MODNAME, 'snow_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '2.0', &
      &         'Snow adjustment factor, by month for each HRU', &
@@ -442,7 +448,7 @@
         ENDIF
 
         IF ( Climate_potet_flag==ACTIVE ) THEN
-          ALLOCATE ( Potet_cbh_adj(Nhru,Nmonths) )
+          ALLOCATE ( Potet_cbh_adj(Nhru,MONTHS_PER_YEAR) )
           IF ( declparam(MODNAME, 'potet_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '1.5', &
      &         'Potential ET adjustment factor, by month for each HRU', &
@@ -451,7 +457,7 @@
      &         'decimal fraction')/=0 ) CALL read_error(1, 'potet_cbh_adj')
         ENDIF
 
-        IF ( cbh_active_flag == ACTIVE ) THEN
+        IF ( cbh_active_flag==ACTIVE ) THEN
           Ncbh = getdim('ncbh')
           IF ( Ncbh==-1 ) CALL read_error(7, 'ncbh')
           ALLOCATE ( cbh_hru_id(Ncbh) )
@@ -463,7 +469,7 @@
         ENDIF
 
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( cbh_active_flag == ACTIVE ) THEN
+        IF ( cbh_active_flag==ACTIVE ) THEN
           IF ( getparam_int(MODNAME, 'cbh_hru_id', Ncbh, cbh_hru_id)/=0 ) CALL read_error(2, 'cbh_hru_id')
           ALLOCATE ( values(Nhru), ivalues(Nhru) )
         ENDIF
@@ -472,8 +478,8 @@
         ierr = 0
 
         IF ( Climate_precip_flag==ACTIVE ) THEN
-          IF ( getparam_real(MODNAME, 'rain_cbh_adj', Nhru_nmonths, Rain_cbh_adj)/=0 ) CALL read_error(2, 'rain_cbh_adj')
-          IF ( getparam_real(MODNAME, 'snow_cbh_adj', Nhru_nmonths, Snow_cbh_adj)/=0 ) CALL read_error(2, 'snow_cbh_adj')
+          IF ( getparam_real(MODNAME, 'rain_cbh_adj', Nhru*MONTHS_PER_YEAR, Rain_cbh_adj)/=0 ) CALL read_error(2, 'rain_cbh_adj')
+          IF ( getparam_real(MODNAME, 'snow_cbh_adj', Nhru*MONTHS_PER_YEAR, Snow_cbh_adj)/=0 ) CALL read_error(2, 'snow_cbh_adj')
 
           IF ( control_string(Precip_day, 'precip_day')/=0 ) CALL read_error(5, 'precip_day')
           CALL find_cbh_header_end(Precip_unit, Precip_day, 'precip_day', ierr)
@@ -489,8 +495,8 @@
         ENDIF
 
         IF ( Climate_temp_flag==ACTIVE ) THEN
-          IF ( getparam_real(MODNAME, 'tmax_cbh_adj', Nhru_nmonths, Tmax_cbh_adj)/=0 ) CALL read_error(2, 'tmax_cbh_adj')
-          IF ( getparam_real(MODNAME, 'tmin_cbh_adj', Nhru_nmonths, Tmin_cbh_adj)/=0 ) CALL read_error(2, 'tmin_cbh_adj')
+          IF ( getparam_real(MODNAME, 'tmax_cbh_adj', Nhru*MONTHS_PER_YEAR, Tmax_cbh_adj)/=0 ) CALL read_error(2, 'tmax_cbh_adj')
+          IF ( getparam_real(MODNAME, 'tmin_cbh_adj', Nhru*MONTHS_PER_YEAR, Tmin_cbh_adj)/=0 ) CALL read_error(2, 'tmin_cbh_adj')
 
           IF ( control_string(Tmax_day, 'tmax_day')/=0 ) CALL read_error(5, 'tmax_day')
           IF ( control_string(Tmin_day, 'tmin_day')/=0 ) CALL read_error(5, 'tmin_day')
@@ -517,7 +523,7 @@
         ENDIF
 
         IF ( Climate_potet_flag==ACTIVE ) THEN
-          IF ( getparam_real(MODNAME, 'potet_cbh_adj', Nhru_nmonths, Potet_cbh_adj)/=0 ) &
+          IF ( getparam_real(MODNAME, 'potet_cbh_adj', Nhru*MONTHS_PER_YEAR, Potet_cbh_adj)/=0 ) &
      &         CALL read_error(2, 'potet_cbh_adj')
           IF ( control_string(Potet_day, 'potet_day')/=0 ) CALL read_error(5, 'potet_day')
           CALL find_cbh_header_end(Et_unit, Potet_day, 'potet_day', ierr)
@@ -684,7 +690,7 @@
       right_day = 1
       IF ( Year/=Nowyear .OR. Month/=Nowmonth .OR. Day/=Nowday ) right_day = 0
       IF ( Ios/=0 .OR. right_day==0 ) THEN
-        PRINT *, 'ERROR, reading CBH File, variable: ', Var, ' IOSTAT=', Ios
+        PRINT *, 'ERROR, reading CBH File, variable: ', Var, ' IOSTAT=', Ios 
         IF ( Ios==-1 ) THEN
           PRINT *, '       End-of-File found'
         ELSEIF ( right_day==0 ) THEN
@@ -758,7 +764,7 @@
       SUBROUTINE read_cbh_values(Vartype, CBH_unit, New_values, Iret)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Nhru
-      USE PRMS_CLIMATE_HRU, ONLY: cbh_active_flag, Ncbh, values, cbh_hru_id, Cbh_check_flag
+      USE PRMS_CLIMATE_HRU, ONLY: cbh_active_flag, Ncbh, values, cbh_hru_id, Cbh_check_flag, yr, mo, dy
       IMPLICIT NONE
 ! Argument
       CHARACTER(LEN=*), INTENT(IN) :: Vartype
@@ -768,7 +774,7 @@
 ! Functions
       EXTERNAL :: read_cbh_date
 ! Local Variables
-      INTEGER :: i, yr, mo, dy, hr, mn, sec, ios
+      INTEGER :: i, hr, mn, sec, ios
 !***********************************************************************
       IF ( cbh_active_flag == OFF ) THEN
         READ ( CBH_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (New_values(i), i=1,Nhru)
@@ -797,3 +803,72 @@
      !   write(888,'(F0.5)') (new_values(i),i=1,nhru)
       ENDIF
       END SUBROUTINE read_cbh_values
+
+!***********************************************************************
+!   Read CBH File to line before data starts
+!***********************************************************************
+  subroutine find_cbh_header_end(Iunit, Fname, Paramname, Iret)
+    use PRMS_CONSTANTS, only: DEBUG_less
+    use PRMS_MODULE, only: Nhru, Orad_flag, Print_debug
+    use prms_utils, only: get_ftnunit
+    implicit none
+    ! Argument
+    integer, intent(OUT) :: Iunit
+    integer, intent(INOUT) :: Iret
+    character(LEN=*), intent(IN) :: Fname, Paramname
+    ! Functions
+    intrinsic :: trim
+    ! Local Variables
+    integer :: i, ios, dim
+    character(LEN=4) :: dum
+    !***********************************************************************
+    Iret = 0
+    Iunit = get_ftnunit(6777)
+    open (Iunit, FILE=trim(Fname), STATUS='OLD', IOSTAT=ios)
+    if (ios /= 0) then
+      if (Iret == 2) then ! this signals climate_hru to ignore the Humidity CBH file, could add other files
+        Iret = 0
+        if (Print_debug > DEBUG_less) &
+   &         write (*, '(/,A,/,A,/,A)') 'WARNING, optional CBH file not found, will use associated parameter values'
+      else
+        write (*, '(/,A,/,A,/,A)') 'ERROR reading file:', Fname, 'check to be sure the input file exists'
+        Iret = 1
+      end if
+    else
+      ! read to line before data starts in each file
+      i = 0
+      do while (i == 0)
+        read (Iunit, FMT='(A4)', IOSTAT=ios) dum
+        if (ios /= 0) then
+          write (*, '(/,A,/,A,/,A)') 'ERROR reading file:', Fname, 'check to be sure the input file is in correct format'
+          Iret = 1
+          exit
+        elseif (dum == '####') then
+          backspace Iunit
+          backspace Iunit
+          if (Orad_flag == 1 .and. Paramname(:5) == 'swrad') backspace Iunit ! backspace again as swrad CBH file contains orad as last column
+          read (Iunit, *, IOSTAT=ios) dum, dim
+          if (ios /= 0) then
+            write (*, '(/,A,/,A,/,A)') 'ERROR reading file:', Fname, 'check to be sure dimension line is in correct format'
+            Iret = 1
+            exit
+          end if
+          if (dim /= Nhru) then
+            print '(/,2(A,I0))', '***CBH file dimension incorrect*** nhru= ', Nhru, ' CBH dimension= ', dim, ' File: '//Fname
+            print *, 'ERROR: update Control File with correct CBH files'
+            Iret = 1
+            exit
+          end if
+          read (Iunit, FMT='(A4)', IOSTAT=ios) dum
+          if (ios /= 0) then
+            write (*, '(/,A,/,A,/)') 'ERROR reading file:', Fname
+            Iret = 1
+            exit
+          end if
+          if (Orad_flag == 1 .and. Paramname(:5) == 'swrad') read (Iunit, FMT='(A4)') dum ! read again as swrad CBH file contains orad as last column
+          i = 1
+        end if
+      end do
+    end if
+
+    end subroutine find_cbh_header_end

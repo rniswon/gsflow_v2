@@ -292,7 +292,6 @@
         Gwres_stor = DBLE( Gwstor_init )
         DEALLOCATE ( Gwstor_init )
       ENDIF
-
       Basin_gwstor = 0.0D0
       DO j = 1, Active_gwrs
         i = Gwr_route_order(j)
@@ -581,7 +580,7 @@
 !     Compute cascading GW flow
 !***********************************************************************
       SUBROUTINE rungw_cascade(Igwr, Ncascade_gwr, Gwres_flow, Dnflow)
-      USE PRMS_FLOWVARS, ONLY: Strm_seg_in, strm_seg_gwflow_in
+      USE PRMS_FLOWVARS, ONLY: Strm_seg_in
       USE PRMS_GWFLOW, ONLY: Gw_upslope
       USE PRMS_CASCADE, ONLY: Gwr_down, Gwr_down_frac, Cascade_gwr_area
       ! Cfs_conv converts acre-inches per timestep to cfs
@@ -595,7 +594,6 @@
       DOUBLE PRECISION, INTENT(OUT) :: Dnflow
 ! Local variables
       INTEGER :: j, k
-      DOUBLE PRECISION :: gwflow_in
 !***********************************************************************
       Dnflow = 0.0D0
       DO k = 1, Ncascade_gwr
@@ -608,9 +606,7 @@
 ! if gwr_down(k, Igwr) < 0, cascade contributes to a stream
         ELSEIF ( j<0 ) THEN
           j = IABS( j )
-          gwflow_in = DBLE( Gwres_flow*Cascade_gwr_area(k, Igwr) )*Cfs_conv
-          strm_seg_gwflow_in(j) = strm_seg_gwflow_in(j) + gwflow_in
-          Strm_seg_in(j) = Strm_seg_in(j) + gwflow_in
+          Strm_seg_in(j) = Strm_seg_in(j) + DBLE( Gwres_flow*Cascade_gwr_area(k, Igwr) )*Cfs_conv
         ENDIF
       ENDDO
 

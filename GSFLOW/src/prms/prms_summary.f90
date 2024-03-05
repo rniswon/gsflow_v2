@@ -32,14 +32,14 @@
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_soil_to_gw, &
      &    Basin_lakeevap, Basin_perv_et, Basin_actet, Basin_lake_stor, &
      &    Basin_gwflow_cfs, Basin_sroff_cfs, Basin_ssflow_cfs, Basin_cfs, Basin_stflow_in, &
-     &    Basin_stflow_out, Seg_outflow, Pref_flag, Basin_soil_rechr, Basin_pweqv
+     &    Basin_stflow_out, Seg_outflow, Basin_pweqv
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_INTCP, ONLY: Basin_intcp_evap, Basin_intcp_stor
       USE PRMS_SNOW, ONLY: Basin_snowevap, Basin_snowmelt, Basin_snowcov, Basin_pk_precip
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_dprst_evap, Basin_imperv_evap, Basin_dprst_seep, &
      &    Basin_dprst_volop, Basin_dprst_volcl, Basin_hortonian
       USE PRMS_SOILZONE, ONLY: Basin_capwaterin, Basin_pref_flow_infil, Basin_prefflow, Basin_recharge, Basin_slowflow, &
-     &    Basin_pref_stor, Basin_slstor, Basin_sz2gw, Basin_dunnian
+     &    Basin_pref_stor, Basin_slstor, Basin_soil_rechr, Basin_sz2gw, Basin_dunnian
       USE PRMS_GWFLOW, ONLY: Basin_gwstor, Basin_gwin, Basin_gwsink, Basin_gwflow, &
      &    Basin_gwstor_minarea_wb, Basin_dnflow
       use PRMS_CONTROL_FILE, only: control_string
@@ -56,12 +56,6 @@
       CHARACTER(LEN=10) :: chardate
 !***********************************************************************
       IF ( Process_flag==RUN ) THEN
-        IF ( Pref_flag == OFF ) THEN
-          Basin_pref_flow_infil = 0.0D0
-          Basin_prefflow = 0.0D0
-          Basin_pref_stor = 0.0D0
-          Basin_dunnian = 0.0D0
-        ENDIF
         DO i = 1, Npoigages
           Segmentout(i) = Seg_outflow(Poi_gage_segment(i))
 !          Gageout(i) = Streamflow_cfs(Parent_poigages(i))
@@ -73,7 +67,7 @@
      &                        Basin_imperv_stor + Basin_lake_stor + Basin_dprst_volop + Basin_dprst_volcl
         Basin_surface_storage = Basin_intcp_stor + Basin_pweqv + Basin_imperv_stor + Basin_lake_stor + &
      &                          Basin_dprst_volop + Basin_dprst_volcl
-        IF ( CsvON_OFF==ACTIVE ) THEN
+        IF ( CsvON_OFF==1 ) THEN
           WRITE ( chardate, '(I4.4,2("-",I2.2))' ) Nowyear, Nowmonth, Nowday
           WRITE ( Iunit, Fmt2 ) chardate, &
      &            Basin_potet, Basin_actet, Basin_dprst_evap, Basin_imperv_evap, Basin_intcp_evap, Basin_lakeevap, &
@@ -91,7 +85,10 @@
      &            Basin_cfs, Basin_gwflow_cfs, Basin_sroff_cfs, Basin_ssflow_cfs, gageflow, &
      &            (Segmentout(i), i = 1, Npoigages)
 !     &            (Segmentout(i), Gageout(i), i = 1, Npoigages)
-        ELSE
+        ELSEIF ( CsvON_OFF==3 ) THEN
+          WRITE ( chardate, '(I4.4,2("-",I2.2))' ) Nowyear, Nowmonth, Nowday
+          WRITE ( Iunit, Fmt2 ) chardate, (Segmentout(i), i = 1, Npoigages)
+        ELSEIF ( CsvON_OFF==2 ) THEN
           WRITE ( chardate, '(I4.4,2(1X,I2.2))' ) Nowyear, Nowmonth, Nowday
           WRITE ( Iunit, Fmt2 ) chardate, (Segmentout(i), i = 1, Npoigages)
         ENDIF
@@ -138,11 +135,11 @@
 !        ALLOCATE ( Gageout(idim) )
         Streamflow_pairs = ' '
 !        Cfs_strings = ',cfs,cfs'
-        IF ( CsvON_OFF==ACTIVE ) THEN
+        IF ( CsvON_OFF==1 .OR. CsvON_OFF==3 ) THEN
           Cfs_strings = ',cfs'
-        ELSE
-          Cfs_strings = ' cfs'
 !          Cfs_strings = ',cfs,cfs'
+        ELSEIF ( CsvON_OFF==2 ) THEN
+          Cfs_strings = ' cfs'
         ENDIF
 
         IF ( Npoigages>0 ) THEN
@@ -165,7 +162,7 @@
             IF ( Gageid_len(i)<1 ) Gageid_len(i) = 0
             IF ( Gageid_len(i)>0 ) THEN
               IF ( Gageid_len(i)>15 ) Gageid_len(i) = 15
-              IF ( CsvON_OFF==ACTIVE ) THEN
+              IF ( CsvON_OFF==1 .OR. CsvON_OFF==3 ) THEN
                 WRITE (Streamflow_pairs(i), '(A,I0,2A)' ) ',seg_outflow_', Poi_gage_segment(i), '_gage_', &
      &                                                    Poi_gage_id(i)(:Gageid_len(i))
               ELSE
@@ -187,7 +184,7 @@
           ENDDO
         ENDIF
 
-        IF ( CsvON_OFF==ACTIVE ) THEN
+        IF ( CsvON_OFF==1 ) THEN
           WRITE ( Fmt, '(A,I0,A)' ) '( ', Npoigages+14, 'A )'
           WRITE ( Iunit, Fmt ) 'Date,', &
      &            'basin_potet,basin_actet,basin_dprst_evap,basin_imperv_evap,basin_intcp_evap,basin_lakeevap,', &
@@ -223,6 +220,12 @@
 
           WRITE ( Fmt2, '(A,I0,A)' )  '( A,', Npoigages+NVARS, '(",",F0.4) )'
 !        WRITE ( Fmt2, '(A,I0,A)' )  '( A,', 2*Npoigages+NVARS, '(",",SPES10.3) )'
+        ELSEIF ( CsvON_OFF==3 ) THEN
+          WRITE ( Fmt, '(A,I0,A)' ) '( ', Npoigages+1, 'A )'
+          WRITE ( Fmt2, '(A,I0,A)' )  '( A,', Npoigages, '(",",F0.4) )'
+          WRITE ( Iunit, Fmt ) 'Date', &
+     &            (Streamflow_pairs(i)(:Gageid_len(i)+20), i = 1, Npoigages)
+          WRITE ( Iunit, Fmt ) 'Date', (Cfs_strings(i), i = 1, Npoigages)
         ELSE
           WRITE ( Fmt, '(A,I0,A)' ) '( ', Npoigages+1, 'A )'
           WRITE ( Iunit, Fmt ) 'Date', &

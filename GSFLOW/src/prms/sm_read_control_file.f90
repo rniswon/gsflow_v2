@@ -7,7 +7,8 @@ submodule(PRMS_CONTROL_FILE) sm_read_control_file
   use GSFMODFLOW, only: Modflow_name, Modflow_time_zero
   use PRMS_MAP_RESULTS, only: NmapOutVars, MapOutVar_names
   use PRMS_STATVAR_OUT, only: statvarOut_format, nstatVars, statVar_element, statVar_names
-  use PRMS_NHRU_SUMMARY, only: NhruOutVars, NhruOut_freq, NhruOutBaseFileName, NhruOutVar_names, NhruOut_format, NhruOutNcol, write_binary_cbh
+  use PRMS_NHRU_SUMMARY, only: NhruOutVars, NhruOut_freq, NhruOutBaseFileName, NhruOutVar_names, NhruOut_format, NhruOutNcol, &
+                               write_binary_nhru_flag, outputSelectDatesON_OFF
   use PRMS_NSUB_SUMMARY, only: NsubOutVars, NsubOut_freq, NsubOutBaseFileName, NsubOutVar_names, NsubOut_format
   use PRMS_BASIN_SUMMARY, only: BasinOutVars, BasinOut_freq, BasinOutBaseFileName, BasinOutVar_names
   use PRMS_NSEGMENT_SUMMARY, only: NsegmentOutVars, NsegmentOut_freq, NsegmentOutBaseFileName, &
@@ -86,11 +87,7 @@ contains
   !***********************************************************************
   module subroutine setup_cont()
     use PRMS_CONSTANTS, only: DEBUG_normal, ACTIVE, OFF
-    use PRMS_MODULE, only: Print_debug, Dprst_flag, Cascade_flag, Soilzone_aet_flag, PRMS_land_iteration_flag, &
-                           Albedo_cbh_flag, Cloud_cover_cbh_flag, Csv_output_file, irrigated_area_module, AET_module, &
-                           PET_ag_module, selectDatesFileName, outputSelectDatesON_OFF, Gsf_rpt, Rpt_days, snow_cloudcover_flag, &
-                           Dyn_ag_frac_flag, Dyn_ag_soil_flag, &
-                           mappingFileName, xyFileName, Iter_aet_flag, text_restart_flag, irrigation_apply_flag
+    use PRMS_MODULE
     use PRMS_CLIMATE_HRU, only: Precip_day, Tmax_day, Tmin_day, Potet_day, Transp_day, Swrad_day, Albedo_day, Cloud_cover_day, &
                                 Cbh_check_flag, Windspeed_day, Humidity_day, &
                                 AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file, cbh_active_flag
@@ -321,8 +318,8 @@ contains
     Control_parameter_data(i) % data_type = CHAR_TYPE
 
     i = i + 1
-    Control_parameter_data(i) % name = 'write_binary_cbh'
-    write_binary_cbh = OFF
+    Control_parameter_data(i) % name = 'write_binary_nhru_flag'
+    write_binary_nhru_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'nhruOutON_OFF'
     NhruOutON_OFF = OFF
@@ -388,6 +385,9 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'seg2hru_flag'
     seg2hru_flag = OFF
+    i = i + 1
+    Control_parameter_data(i) % name = 'activeHRU_inactiveCELL_flag'
+    activeHRU_inactiveCELL_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'dprst_flag'
     Dprst_flag = OFF

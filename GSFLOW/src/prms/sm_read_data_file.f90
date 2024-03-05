@@ -216,8 +216,8 @@ contains
 !***********************************************************************
   module subroutine check_data_variables(Varname, Numvalues, Values, Iflag, Iret)
       USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV, CMS
-      USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Nstreamtemp, Nratetbl
-      USE PRMS_OBS, ONLY: Nlakeelev, Nwind, Nhumid, &
+      USE PRMS_MODULE, ONLY: Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Nratetbl
+      USE PRMS_OBS, ONLY: Nlakeelev, Nwind, Nhumid, Nstreamtemp, &
      &    Tmin, Tmax, Precip, Snowdepth, Runoff, Pan_evap, Wind_speed, Humidity, Solrad, &
      &    Gate_ht, Lake_elev, Rain_day, Runoff_units, Streamflow_cfs, Streamflow_cms, Stream_temp
       USE PRMS_CLIMATEVARS, ONLY: Ppt_zero_thresh

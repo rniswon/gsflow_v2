@@ -280,7 +280,7 @@
       USE PRMS_SET_TIME, ONLY: Modays
       use prms_utils, only: read_error
       IMPLICIT NONE
-! FUNCTIONS
+! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: SNGL, DBLE
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day

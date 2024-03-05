@@ -14,6 +14,8 @@
 !   Segment Parameters
       REAL, SAVE, ALLOCATABLE :: width_alpha(:), width_m(:)
       REAL, SAVE, ALLOCATABLE :: depth_alpha(:), depth_m(:)
+!   Conversions
+      REAL, PARAMETER :: CFS_TO_CMS = 0.028316847
       END MODULE PRMS_STRMFLOW_CHARACTER
 
 !***********************************************************************
@@ -140,7 +142,7 @@
 !     strmflow_character_run - Computes streamflow characteristics
 !***********************************************************************
       INTEGER FUNCTION strmflow_character_run()
-      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV
+      USE PRMS_CONSTANTS, ONLY: NEARZERO
       USE PRMS_MODULE, ONLY: Nsegment
       USE PRMS_STRMFLOW_CHARACTER
       USE PRMS_FLOWVARS, ONLY: Seg_outflow
@@ -155,12 +157,12 @@
       strmflow_character_run = 0
 
       DO i = 1, Nsegment
-         if ( .not.(Seg_outflow(i) < 0.0D0) ) then
-            segflow = SNGL( Seg_outflow(i) * CFS2CMS_CONV )
+         if (seg_outflow(i) > NEARZERO) then
+            segflow = SNGL(Seg_outflow(i)) * CFS_TO_CMS
             Seg_width(i) = width_alpha(i) * (segflow ** width_m(i))
             Seg_depth(i) = depth_alpha(i) * (segflow ** depth_m(i))
             Seg_area(i) = Seg_width(i) * Seg_depth(i)
-            if ( .not.(Seg_area(i)) < 0.0 ) then
+            if (seg_area(i) > NEARZERO) then
                Seg_velocity(i) = segflow / Seg_area(i)
             else
                Seg_velocity(i) = 0.0

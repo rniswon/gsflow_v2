@@ -5,27 +5,26 @@ contains
 !***********************************************************************
   integer module function prms_time()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, YEAR, MONTH, DAY, HOUR, MINUTE, MAX_DAYS_PER_YEAR, DAYS_PER_YEAR, &
-                                ACTIVE, OFF, NORTHERN, FT2_PER_ACRE, SECS_PER_HOUR, INCHES_PER_FOOT, SECS_PER_DAY, &
-                                ERROR_time, CANOPY
+     &    ACTIVE, OFF, NORTHERN, FT2_PER_ACRE, SECS_PER_HOUR, INCHES_PER_FOOT, SECS_PER_DAY, ERROR_time, CANOPY
       use PRMS_MMFAPI, only: dattim, deltim
       USE PRMS_MODULE, ONLY: Process_flag, Timestep, Starttime, Nowyear, Nowmonth, Nowday, Dprst_flag, &
                              GSFLOW_flag, PRMS_land_iteration_flag, AG_flag, &
                              Ag_package, Hru_ag_irr, timestep_start_flag, Nlake
       USE PRMS_BASIN, ONLY: Hemisphere, Basin_area_inv
-      USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Pkwater_equiv, Hru_intcpstor, &
-                               Ssres_stor, Slow_stor, Pref_flow_stor, Basin_ssstor, &
-                               Basin_soil_moist, Intcp_transp_on, Dprst_stor_hru, Intcp_stor, &
+      USE PRMS_FLOWVARS, ONLY: Soil_moist, Ssres_stor, Basin_ssstor, Soil_rechr, &
+                               Hru_intcpstor, Slow_stor, Pref_flow_stor, Intcp_transp_on, Intcp_stor, &
                                Gravity_stor_res, Ag_soil_moist, Ag_soil_rechr, Imperv_stor, &
-                               Dprst_vol_open, Dprst_vol_clos, Hru_impervstor, &
-                               Basin_ag_soil_moist, Basin_ag_soil_rechr
+                               Dprst_vol_open, Dprst_vol_clos, Basin_ag_soil_moist, Basin_ag_soil_rechr, &
+                               Basin_soil_moist, Dprst_stor_hru, Hru_impervstor, Pkwater_equiv
       USE PRMS_CLIMATEVARS, ONLY: Potet
-      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_pkwater_equiv, &
-                               It0_hru_intcpstor, It0_ssres_stor, It0_slow_stor, It0_pref_flow_stor, &
-                               It0_basin_ssstor, It0_basin_soil_moist, It0_potet, &
-                               It0_intcp_transp_on, It0_dprst_stor_hru, It0_intcp_stor, &
-                               It0_gravity_stor_res, It0_ag_soil_moist, It0_ag_soil_rechr, It0_imperv_stor, &
-                               It0_hru_impervstor, It0_dprst_vol_open, It0_dprst_vol_clos, &
-                               It0_basin_ag_soil_moist, It0_basin_ag_soil_rechr
+      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_ssres_stor, It0_soil_rechr, &
+                               It0_basin_ssstor, It0_basin_soil_moist, It0_dprst_stor_hru, &
+                               It0_hru_intcpstor, It0_slow_stor, It0_pref_flow_stor, &
+                               It0_potet, It0_intcp_transp_on, It0_intcp_stor, &
+                               It0_gravity_stor_res, It0_ag_soil_moist, It0_ag_soil_rechr, &
+                               It0_dprst_vol_open, It0_dprst_vol_clos, It0_imperv_stor, &
+                               It0_basin_ag_soil_moist, It0_basin_ag_soil_rechr, &
+                               It0_hru_impervstor, It0_pkwater_equiv
       use PRMS_DATA_FILE, only: read_data_line
       use prms_utils, only: leap_day, julian_day, compute_julday, print_module
       IMPLICIT NONE
