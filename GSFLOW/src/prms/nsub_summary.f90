@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsub_summary'
-      character(len=*), parameter :: Version_nsub_summary = '2022-09-07'
+      character(len=*), parameter :: Version_nsub_summary = '2023-11-01'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsub_var_type(:), Nsub_var_size(:)
       REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
@@ -67,9 +67,7 @@
 !     declare parameters and variables
 !***********************************************************************
       SUBROUTINE nsub_summarydecl()
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, DNEARZERO, &
-     &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, &
-     &    REAL_TYPE, DBLE_TYPE, RUN, DECL, INIT, CLEAN
+      USE PRMS_CONSTANTS, ONLY: ERROR_control, DAILY, YEARLY
       use PRMS_CONTROL_FILE, only: control_integer, control_string, control_string_array
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Nsub
@@ -114,7 +112,7 @@
 !     Initialize module values
 !***********************************************************************
       SUBROUTINE nsub_summaryinit()
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, DNEARZERO, &
+      USE PRMS_CONSTANTS, ONLY: ERROR_control, ERROR_open_out, DNEARZERO, &
      &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, REAL_TYPE, DBLE_TYPE
       use PRMS_MMFAPI, only: getvartype, getvarsize
       use PRMS_READ_PARAM_FILE, only: getparam_int
@@ -297,7 +295,7 @@
       USE PRMS_SET_TIME, ONLY: Modays
       use prms_utils, only: read_error
       IMPLICIT NONE
-! FUNCTIONS
+! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: SNGL, DBLE
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day, k

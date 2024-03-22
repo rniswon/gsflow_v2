@@ -19,7 +19,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Temperature Distribution'
         character(len=9), SAVE :: MODNAME
-        character(len=*), parameter :: Version_temp = '2022-09-08'
+        character(len=*), parameter :: Version_temp = '2023-11-01'
         INTEGER, SAVE, ALLOCATABLE :: Tmax_cnt(:), Tmin_cnt(:), Nuse_tsta(:)
         REAL, SAVE, ALLOCATABLE :: Elfac(:), Tmax_prev(:), Tmin_prev(:)
         REAL, SAVE, ALLOCATABLE :: Tcrn(:), Tcrx(:) ! temp_1sta
@@ -110,7 +110,7 @@
             j = Hru_route_order(jj)
             k = Hru_tsta(j)
             IF ( Nowday==1 ) THEN
-              IF ( Glacier_flag==1 ) THEN
+              IF ( Glacier_flag==ACTIVE ) THEN
                 ! Hru_elev_ts is the antecedent glacier elevation
                 IF ( Hru_type(j)==GLACIER ) Elfac(j) = (Hru_elev_ts(j) - Tsta_elev(k))/1000.0
               ENDIF
@@ -127,7 +127,7 @@
             j = Hru_route_order(jj)
             k = Hru_tsta(j)
             l = Hru_tlaps(j)
-            IF ( Glacier_flag==1 ) THEN
+            IF ( Glacier_flag==ACTIVE ) THEN
               ! Hru_elev_ts is the antecedent glacier elevation
               IF ( Hru_type(j)==GLACIER ) CALL compute_temp_laps(Elfac(j), Hru_elev_ts(j), Tsta_elev(l), Tsta_elev(k))
             ENDIF

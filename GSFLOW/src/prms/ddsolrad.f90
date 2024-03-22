@@ -14,7 +14,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Solar Radiation Distribution'
         character(len=*), parameter :: MODNAME = 'ddsolrad'
-        character(len=*), parameter :: Version_ddsolrad = '2023-10-04'
+        character(len=*), parameter :: Version_ddsolrad = '2024-02-08'
         INTEGER, SAVE :: Observed_flag
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Radadj_slope(:, :), Radadj_intcp(:, :)
@@ -75,7 +75,7 @@
           IF ( Hru_ppt(j)>Ppt_rad_adj(j,Nowmonth) ) THEN
             IF ( Tmax_hru(j)<Tmax_index(j,Nowmonth) ) THEN
               pptadj = Radj_sppt(j)
-              IF ( Tmax_hru(j)>=Tmax_allrain(j,Nowmonth) ) THEN
+              IF ( .not.(Tmax_hru(j)<Tmax_allrain(j,Nowmonth)) ) THEN
                 IF ( Summer_flag==OFF ) pptadj = Radj_wppt(j) ! Winter
               ELSE
                 pptadj = Radj_wppt(j)
@@ -94,7 +94,7 @@
 
           ! https://www.omnicalculator.com/physics/cloud-base
 !         cloud base = (temperature - dew point) / 4.4 * 1000 + elevation, altitude of clouds
-!In this formula, the temperature and dew point are expressed in degrees Fahrenheits and the elevation and cloud base altitude are expressed in feet.
+!In this formula, the temperature and dew point are expressed in degrees Fahrenheits and the elevation and cloud base altitude are expressed in feet. 
 !Make sure to adjust the result afterwards if you're using the SI units!
 
           IF ( Solsta_flag==1 ) THEN
@@ -117,8 +117,7 @@
 ! in Alaska, there are HRUs on certain days when the sun never rises, so this equation doesn't work
 ! when soltab_potsw, soltab_horad_potsw, or orad_hru are 0.0
 
-!          Swrad(j) = SNGL( Soltab_potsw(Jday, j)/Soltab_horad_potsw(Jday, j)*DBLE(Orad_hru(j))/Hru_cossl(j) )
-          if ( Soltab_potsw(jday, j) > 0.0 .and. Soltab_horad_potsw(jday, j) > 0.0 .and. Orad_hru(j) > 0.0 ) then
+          if ( Soltab_potsw(jday, j) > 0.0D0 .and. Soltab_horad_potsw(jday, j) > 0.0D0 .and. Orad_hru(j) > 0.0 ) then
              Swrad(j) = SNGL( Soltab_potsw(Jday, j)/Soltab_horad_potsw(Jday, j)*DBLE(Orad_hru(j))/Hru_cossl(j) )
           else
              Swrad(j) = 0.0
@@ -128,7 +127,7 @@
           Basin_swrad = Basin_swrad + DBLE( Swrad(j)*Hru_area(j) )
         ENDDO
         Basin_orad = Basin_orad*Basin_area_inv
-        IF ( Observed_flag==1 ) THEN
+        IF ( Observed_flag==ACTIVE ) THEN
           Orad = Solrad(Basin_solsta)*Rad_conv
         ELSE
           Orad = SNGL( Basin_orad )

@@ -84,7 +84,7 @@
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Streamflow Routing'
       character(len=14), parameter :: MODNAME = 'muskingum_mann'
-      character(len=*), parameter :: Version_muskingum = '2023-10-06'
+      character(len=*), parameter :: Version_muskingum = '2023-11-01'
 !   Local Variables
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
@@ -161,7 +161,7 @@
 !     muskingum_run - Compute routing summary values
 !***********************************************************************
       INTEGER FUNCTION muskingum_run()
-      USE PRMS_CONSTANTS, ONLY: CFS2CMS_CONV, OUTFLOW_SEGMENT, ERROR_streamflow
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, CFS2CMS_CONV, OUTFLOW_SEGMENT, ERROR_streamflow
       USE PRMS_MODULE, ONLY: Nsegment, Glacier_flag
       USE PRMS_MUSKINGUM
       USE PRMS_BASIN, ONLY: Basin_area_inv, Basin_gl_cfs, Basin_gl_ice_cfs
@@ -171,7 +171,7 @@
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_ROUTING, ONLY: Use_transfer_segment, Segment_delta_flow, Basin_segment_storage, &
-     &    Obsin_segment, Segment_order, Tosegment, C0, C1, C2, Ts, Ts_i, Obsout_segment, &
+     &    Obsin_segment, Segment_order, Tosegment, C0, C1, C2, Ts, Ts_i, Obsout_segment, special_seg_type_flag, &
      &    Flow_to_ocean, Flow_to_great_lakes, Flow_out_region, Flow_out_NHM, Segment_type, Flow_terminus, &
      &    Flow_to_lakes, Flow_replacement, Flow_in_region, Flow_in_nation, Flow_headwater, Flow_in_great_lakes
       USE PRMS_GLACR, ONLY: Basin_gl_top_melt, Basin_gl_ice_melt
@@ -290,17 +290,19 @@
 
       Basin_segment_storage = 0.0D0
       Flow_out = 0.0D0
-      Flow_to_lakes = 0.0D0
-      Flow_to_ocean = 0.0D0
-      Flow_to_great_lakes = 0.0D0
-      Flow_out_region = 0.0D0
-      Flow_out_NHM = 0.0D0
-      Flow_in_region = 0.0D0
-      Flow_terminus = 0.0D0
-      Flow_in_nation = 0.0D0
-      Flow_headwater = 0.0D0
-      Flow_in_great_lakes = 0.0D0
-      Flow_replacement = 0.0D0
+      IF ( special_seg_type_flag == ACTIVE ) THEN
+        Flow_to_lakes = 0.0D0
+        Flow_to_ocean = 0.0D0
+        Flow_to_great_lakes = 0.0D0
+        Flow_out_region = 0.0D0
+        Flow_out_NHM = 0.0D0
+        Flow_in_region = 0.0D0
+        Flow_terminus = 0.0D0
+        Flow_in_nation = 0.0D0
+        Flow_headwater = 0.0D0
+        Flow_in_great_lakes = 0.0D0
+        Flow_replacement = 0.0D0
+      ENDIF
       DO i = 1, Nsegment
         Seg_outflow(i) = Seg_outflow(i) * ONE_24TH
         segout = Seg_outflow(i)
@@ -309,28 +311,30 @@
         Seg_upstream_inflow(i) = Currinsum(i) * ONE_24TH
 ! Flow_out is the total flow out of the basin, which allows for multiple outlets
 ! includes closed basins (tosegment=0)
-        IF ( segtype==1 ) THEN
-          Flow_headwater = Flow_headwater + segout
-        ELSEIF ( segtype==2 ) THEN
-          Flow_to_lakes = Flow_to_lakes + segout
-        ELSEIF ( segtype==3 ) THEN
-          Flow_replacement = Flow_replacement + segout
-        ELSEIF ( segtype==4 ) THEN
-          Flow_in_nation = Flow_in_nation + segout
-        ELSEIF ( segtype==5 ) THEN
-          Flow_out_NHM = Flow_out_NHM + segout
-        ELSEIF ( segtype==6 ) THEN
-          Flow_in_region = Flow_in_region + segout
-        ELSEIF ( segtype==7 ) THEN
-          Flow_out_region = Flow_out_region + segout
-        ELSEIF ( segtype==8 ) THEN
-          Flow_to_ocean = Flow_to_ocean + segout
-        ELSEIF ( segtype==9 ) THEN
-          Flow_terminus = Flow_terminus + segout
-        ELSEIF ( segtype==10 ) THEN
-          Flow_in_great_lakes = Flow_in_great_lakes + segout
-        ELSEIF ( segtype==11 ) THEN
-          Flow_to_great_lakes = Flow_to_great_lakes + segout
+        IF ( special_seg_type_flag == ACTIVE ) THEN
+          IF ( segtype==1 ) THEN
+            Flow_headwater = Flow_headwater + segout
+          ELSEIF ( segtype==2 ) THEN
+            Flow_to_lakes = Flow_to_lakes + segout
+          ELSEIF ( segtype==3 ) THEN
+            Flow_replacement = Flow_replacement + segout
+          ELSEIF ( segtype==4 ) THEN
+            Flow_in_nation = Flow_in_nation + segout
+          ELSEIF ( segtype==5 ) THEN
+            Flow_out_NHM = Flow_out_NHM + segout
+          ELSEIF ( segtype==6 ) THEN
+            Flow_in_region = Flow_in_region + segout
+          ELSEIF ( segtype==7 ) THEN
+            Flow_out_region = Flow_out_region + segout
+          ELSEIF ( segtype==8 ) THEN
+            Flow_to_ocean = Flow_to_ocean + segout
+          ELSEIF ( segtype==9 ) THEN
+            Flow_terminus = Flow_terminus + segout
+          ELSEIF ( segtype==10 ) THEN
+            Flow_in_great_lakes = Flow_in_great_lakes + segout
+          ELSEIF ( segtype==11 ) THEN
+            Flow_to_great_lakes = Flow_to_great_lakes + segout
+          ENDIF
         ENDIF
         IF ( Tosegment(i)==OUTFLOW_SEGMENT ) Flow_out = Flow_out + segout
         Segment_delta_flow(i) = Segment_delta_flow(i) + Seg_inflow(i) - segout
@@ -343,7 +347,7 @@
       Basin_cfs = Flow_out
       Basin_stflow_out = Basin_cfs / area_fac
       Basin_cms = Basin_cfs*CFS2CMS_CONV
-      IF ( Glacier_flag==1 ) THEN
+      IF ( Glacier_flag==ACTIVE ) THEN
         Basin_stflow_in = Basin_stflow_in + Basin_gl_top_melt
         Basin_gl_ice_cfs = Basin_gl_ice_melt*area_fac
         Basin_gl_cfs = Basin_gl_top_melt*area_fac

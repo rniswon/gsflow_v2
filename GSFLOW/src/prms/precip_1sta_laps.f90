@@ -21,7 +21,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=11) :: MODNAME
-        character(len=*), parameter :: Version_precip = '2022-09-07'
+        character(len=*), parameter :: Version_precip = '2023-11-01'
         INTEGER, SAVE, ALLOCATABLE :: Psta_nuse(:)
         REAL, SAVE, ALLOCATABLE :: Rain_adj_lapse(:, :), Snow_adj_lapse(:, :), Precip_local(:)
         ! Declared Parameters
@@ -85,7 +85,7 @@
           Newsnow(i) = OFF
           Pptmix(i) = OFF
           ppt = Precip_local(Hru_psta(i))
-          IF ( Glacier_flag==1 ) THEN
+          IF ( Glacier_flag==ACTIVE ) THEN
             IF ( Hru_type(i)==GLACIER ) THEN
               ! Hru_elev_ts is the antecedent glacier elevation
               IF ( Precip_flag==precip_laps_module ) CALL compute_precip_laps(i, Hru_plaps(i), Hru_psta(i), Hru_elev_ts(i))
@@ -240,7 +240,7 @@
         pmo_diff = Pmn_mo(Hru_plaps, j) - Pmn_mo(Hru_psta, j)
         pmo_rate = pmo_diff / elp_diff
         adj_p = (pmo_rate*elh_diff)/Pmn_mo(Hru_psta, j)
-        IF ( Padj_sn(Hru_psta, j)>=0.0 ) THEN
+        IF ( .not.(Padj_sn(Hru_psta, j)<0.0) ) THEN
           Snow_adj_lapse(Ihru, j) = 1.0 + Padj_sn(Hru_psta, j)*adj_p
         ELSE
           Snow_adj_lapse(Ihru, j) = -Padj_sn(Hru_psta, j)

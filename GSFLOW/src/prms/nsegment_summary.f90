@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsegment_summary'
-      character(len=*), parameter :: Version_nsegment_summary = '2022-09-07'
+      character(len=*), parameter :: Version_nsegment_summary = '2023-11-01'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsegment_var_type(:)
       REAL, SAVE, ALLOCATABLE :: Nsegment_var_daily(:, :)
@@ -280,7 +280,7 @@
       USE PRMS_SET_TIME, ONLY: Modays
       use prms_utils, only: read_error
       IMPLICIT NONE
-! FUNCTIONS
+! FUNCTIONS AND SUBROUTINES
       INTRINSIC :: SNGL, DBLE
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day

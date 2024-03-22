@@ -9,7 +9,7 @@
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Convert PRMS parameters'
       character(len=*), parameter :: MODNAME = 'convert_params'
-      character(len=*), parameter :: Version_convert_params = '2021-11-19'
+      character(len=*), parameter :: Version_convert_params = '2020-12-02'
       INTRINSIC :: MIN
 ! Parameters
       REAL, SAVE, ALLOCATABLE :: Soil_rechr_init(:), Soil_moist_init(:), Soil_rechr_max(:)
@@ -264,7 +264,7 @@
 !     &           'Fraction of pervious surface runoff that flows into surface-depression storage', &
 !     &           'Fraction of pervious surface runoff that'// &
 !     &           ' flows into surface-depression storage; the remainder'// &
-!     &           ' flows to a stream network for each HRU', &
+!     &           ' flows to the stream network for each HRU', &
 !     &           'decimal fraction')/=0 ) CALL read_error(1, 'sro_to_dprst')
             ALLOCATE ( Dprst_area(Nhru) )
             IF ( declparam(MODNAME, 'dprst_area', 'nhru', 'real', &

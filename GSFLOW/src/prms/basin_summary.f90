@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'basin_summary'
-      character(len=*), parameter :: Version_basin_summary = '2021-11-19'
+      character(len=*), parameter :: Version_basin_summary = '2023-11-01'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear, Dailyunit, Monthlyunit, Yearlyunit, Basin_var_type
       INTEGER, SAVE, ALLOCATABLE :: Nc_vars(:)
       CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2, Output_fmt3

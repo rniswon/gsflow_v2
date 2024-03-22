@@ -7,8 +7,8 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'obs'
-      character(len=*), parameter :: Version_obs = '2023-10-06'
-      INTEGER, SAVE :: Nlakeelev, Nwind, Nhumid, Rain_flag
+      character(len=*), parameter :: Version_obs = '2023-11-01'
+      INTEGER, SAVE :: Nlakeelev, Nwind, Nhumid, Rain_flag, Nstreamtemp
 !   Declared Variables
       INTEGER, SAVE :: Rain_day
       REAL, SAVE, ALLOCATABLE :: Pan_evap(:), Runoff(:), Precip(:)
@@ -59,6 +59,8 @@
      &     'Maximum number of lake elevations for any rating table data set')/=0 ) CALL read_error(7, 'nlakeelev')
       IF ( decldim('nwind', 0, MAXDIM, 'Number of wind-speed measurement stations')/=0 ) CALL read_error(7, 'nwind')
       IF ( decldim('nhumid', 0, MAXDIM, 'Number of relative humidity measurement stations')/=0 ) CALL read_error(7, 'nhumid')
+      IF ( decldim('nstreamtemp', 0, MAXDIM, 'Number of stream temperature replacement segments')/=0 ) &
+     &     CALL read_error(7, 'nstreamtemp')
 
       END FUNCTION obssetdims
 
@@ -71,7 +73,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, xyz_dist_module
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getdim
-      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Nstreamtemp, Precip_flag
+      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Precip_flag
       USE PRMS_OBS
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -133,6 +135,8 @@
       IF ( Nwind==-1 ) CALL read_error(6, 'nwind')
       Nlakeelev = getdim('nlakeelev')
       IF ( Nlakeelev==-1 ) CALL read_error(6, 'nlakeelev')
+      Nstreamtemp = getdim('nstreamtemp')
+      IF ( Nstreamtemp==-1 ) CALL read_error(6, 'nstreamtemp')
 
       IF ( Nsnow>0 ) THEN
         ALLOCATE ( Snowdepth(Nsnow) )
