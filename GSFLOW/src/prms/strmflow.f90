@@ -15,7 +15,7 @@
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing'
       character(len=*), parameter :: MODNAME = 'strmflow'
-      character(len=*), parameter :: Version_strmflow = '2021-11-19'
+      character(len=*), parameter :: Version_strmflow = '2020-08-03'
       double precision :: area_fac
 !***********************************************************************
       strmflow = 0

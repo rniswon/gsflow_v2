@@ -7,7 +7,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Transpiration Distribution'
         character(len=13), parameter :: MODNAME = 'transp_tindex'
-        character(len=*), parameter :: Version_transp = '2021-09-07'
+        character(len=*), parameter :: Version_transp = '2023-11-01'
         INTEGER, SAVE, ALLOCATABLE :: Transp_check(:)
         REAL, SAVE, ALLOCATABLE :: Tmax_sum(:), Transp_tmax_f(:)
         ! Declared Parameters
@@ -21,7 +21,7 @@
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Save_vars_to_file, Init_vars_from_file, Start_month, Start_day, Nowmonth, Nowday
       USE PRMS_TRANSP_TINDEX
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
-      USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Temp_units, Transp_on, Basin_transp_on
+      USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Temp_units, Transp_on, Basin_transp_on 
       use prms_utils, only: c_to_f, print_module, read_error
       IMPLICIT NONE
 ! Functions
@@ -114,7 +114,7 @@
             Transp_tmax_f(i) = c_to_f(Transp_tmax(i))
           ENDDO
         ENDIF
-        !DEALLOCATE ( Transp_tmax )
+        DEALLOCATE ( Transp_tmax )
 
         IF ( Init_vars_from_file==0 ) Tmax_sum = 0.0
 

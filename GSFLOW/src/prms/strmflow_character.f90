@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Characteristics'
       character(len=18), parameter :: MODNAME = 'strmflow_character'
-      character(len=*), parameter :: Version_strmflow_character = '2023-11-24'
+      character(len=*), parameter :: Version_strmflow_character = '2024-01-11'
 
 !   Declared Variables
       REAL, SAVE, ALLOCATABLE :: Seg_width(:), Seg_depth(:), Seg_area(:)
@@ -14,6 +14,8 @@
 !   Segment Parameters
       REAL, SAVE, ALLOCATABLE :: width_alpha(:), width_m(:)
       REAL, SAVE, ALLOCATABLE :: depth_alpha(:), depth_m(:)
+!   Conversions
+      REAL, PARAMETER :: CFS_TO_CMS = 0.028316847
       END MODULE PRMS_STRMFLOW_CHARACTER
 
 !***********************************************************************
@@ -50,8 +52,6 @@
       use PRMS_READ_PARAM_FILE, only: declparam
       use prms_utils, only: read_error, print_module
       IMPLICIT NONE
-! Functions
-      INTRINSIC :: INDEX
 !***********************************************************************
       strmflow_character_decl = 0
 
@@ -142,7 +142,7 @@
 !     strmflow_character_run - Computes streamflow characteristics
 !***********************************************************************
       INTEGER FUNCTION strmflow_character_run()
-      USE PRMS_CONSTANTS, ONLY: DNEARZERO, CLOSEZERO, CFS2CMS_CONV
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, DNEARZERO
       USE PRMS_MODULE, ONLY: Nsegment
       USE PRMS_STRMFLOW_CHARACTER
       USE PRMS_FLOWVARS, ONLY: Seg_outflow
@@ -158,11 +158,11 @@
 
       DO i = 1, Nsegment
          if (Seg_outflow(i) > DNEARZERO) then
-            segflow = SNGL( Seg_outflow(i) * CFS2CMS_CONV )
+            segflow = SNGL(Seg_outflow(i)) * CFS_TO_CMS
             Seg_width(i) = width_alpha(i) * (segflow ** width_m(i))
             Seg_depth(i) = depth_alpha(i) * (segflow ** depth_m(i))
             Seg_area(i) = Seg_width(i) * Seg_depth(i)
-            if (Seg_area(i) > CLOSEZERO) then
+            if (Seg_area(i) > NEARZERO) then
                Seg_velocity(i) = segflow / Seg_area(i)
             else
                Seg_velocity(i) = 0.0

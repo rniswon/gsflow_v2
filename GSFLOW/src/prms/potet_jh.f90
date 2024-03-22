@@ -8,7 +8,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_jh'
-        character(len=*), parameter :: Version_potet = '2021-11-19'
+        character(len=*), parameter :: Version_potet = '2021-08-13'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Jh_coef(:, :), Jh_coef_hru(:)
       END MODULE PRMS_POTET_JH
@@ -32,7 +32,7 @@
 
       IF ( Process_flag==RUN ) THEN
 !***********************************************************************
-! 597.3 cal/gm at 0 C is the energy required to change the state of
+! 597.3 cal/gm at 0 C is the energy required to change the state of 
 ! water to vapor
 ! elh is the latent heat of vaporization (not including the *2.54)
         Basin_potet = 0.0D0

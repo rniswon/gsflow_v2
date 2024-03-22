@@ -10,12 +10,12 @@
       USE PRMS_MODULE, ONLY: Process_flag, Nhru
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Hemisphere
       USE PRMS_CLIMATEVARS, ONLY: Tmin_hru
-      USE PRMS_SET_TIME, ONLY: Jsol
+      USE PRMS_SET_TIME, ONLY: Jsol, Yrdays
       use prms_utils, only: PRMS_open_module_file, print_module, read_error, write_integer_param
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Preprocessing'
       character(len=*), parameter :: MODNAME = 'frost_date'
-      character(len=*), parameter :: Version_frost_date = '2021-11-22'
+      character(len=*), parameter :: Version_frost_date = '2024-01-05'
 ! Functions
       INTRINSIC :: NINT, DBLE
       INTEGER, EXTERNAL :: get_season
@@ -57,6 +57,14 @@
         ENDIF
         oldSeason = season
 
+        IF ( Hemisphere==NORTHERN ) THEN ! set in run as could be a leap year
+          spring1 = 1
+          fall1 = Yrdays
+        ELSE
+          spring1 = Yrdays
+          fall1 = 1
+        ENDIF
+
 ! If this is the first timestep of fall, unset the CurrentFallFrost
 ! variable. Also since we are finished looking for spring frosts,
 ! add the CurrentSpringFrost dates to the spring_frost variable
@@ -89,13 +97,13 @@
         IF ( season==2 ) THEN
           DO jj = 1, Active_hrus
             j = Hru_route_order(jj)
-            IF ( Tmin_hru(j)<=Frost_temp(j) .AND. currentFallFrost(j)==0 ) currentFallFrost(j) = Jsol
+            IF ( .not.(Tmin_hru(j)>Frost_temp(j)) .AND. currentFallFrost(j)==0 ) currentFallFrost(j) = Jsol
           ENDDO
 ! This is the spring phase, look for the latest spring frost.
         ELSE
           DO jj = 1, Active_hrus
             j = Hru_route_order(jj)
-            IF ( Tmin_hru(j)<=Frost_temp(j) ) currentSpringFrost(j) = Jsol
+            IF ( .not.(Tmin_hru(j)>Frost_temp(j)) ) currentSpringFrost(j) = Jsol
           ENDDO
         ENDIF
 
@@ -125,13 +133,6 @@
         springFrostCount = 0
         CALL PRMS_open_module_file(Iunit, 'frost_date.param')
         oldSeason = get_season()
-        IF ( Hemisphere==NORTHERN ) THEN
-          spring1 = 1
-          fall1 = DAYS_PER_YEAR
-        ELSE
-          spring1 = DAYS_PER_YEAR
-          fall1 = 1
-        ENDIF
 
       ELSEIF ( Process_flag==CLEAN ) THEN
         basin_fall_frost = 0.0D0
@@ -143,7 +144,7 @@
           IF ( fallFrostCount==0 ) fallFrostCount = 1
           spring_frost(j) = NINT( springFrostSum(j)/DBLE( springFrostCount ) )
           fall_frost(j) = fall_frost(j) + 10
-          IF ( fall_frost(j)>DAYS_PER_YEAR ) fall_frost(j) = DAYS_PER_YEAR
+          IF ( fall_frost(j)>DAYS_PER_YEAR ) fall_frost(j) = DAYS_PER_YEAR ! using 365 doesn't account for leap years in sum
           spring_frost(j) = spring_frost(j) + 10
           IF ( spring_frost(j)>DAYS_PER_YEAR ) spring_frost(j) = spring_frost(j) - DAYS_PER_YEAR
           basin_fall_frost = basin_fall_frost + fall_frost(j)*Hru_area(j)

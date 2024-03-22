@@ -2,21 +2,22 @@
 ! Maximum, minimum, average temperatures, and precipitation are distributed to each HRU
 ! using temperature and/or precipitation data input as a time series of gridded
 ! or other spatial units using an area-weighted method and correction factors to
-! account for differences in altitude, spatial variation, topography, and
+! account for differences in altitude, spatial variation, topography, and 
 ! measurement gage efficiency
 !***********************************************************************
       MODULE PRMS_TEMP_MAP
-        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, MONTHS_PER_YEAR
+        USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
         IMPLICIT NONE
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Temperature Distribution'
         character(len=*), parameter :: MODNAME = 'temp_map'
-        character(len=*), parameter :: Version_temp_map = '2022-09-07'
+        character(len=*), parameter :: Version_temp_map = '2023-11-01'
         INTEGER, SAVE :: Tmax_unit, Tmin_unit
+        REAL, SAVE, ALLOCATABLE :: Tmax_map_values(:), Tmin_map_values(:)
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
-        REAL, SAVE, ALLOCATABLE :: Hru2map_pct(:), Tmax_map_values(:), Tmin_map_values(:), Precip_map_values(:)
-        REAL, SAVE, ALLOCATABLE :: Tmax_map_adj(:, :), Tmin_map_adj(:, :), Precip_map_adj(:, :)
+        REAL, SAVE, ALLOCATABLE :: Hru2map_pct(:)
+        REAL, SAVE, ALLOCATABLE :: Tmax_map_adj(:, :), Tmin_map_adj(:, :)
         ! parameters in basin:
         !    hru_area
         ! Control Parameters

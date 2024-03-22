@@ -8,7 +8,7 @@ module PRMS_SET_TIME
   !   Local Variables
   character(len=*), parameter :: MODDESC = 'Timestep Control'
   character(len=*), parameter :: MODNAME = 'prms_time'
-  character(len=*), parameter :: Version_prms_time = '2022-04-21'
+  character(len=*), parameter :: Version_prms_time = '2023-11-01'
 
   integer, save :: Modays(MONTHS_PER_YEAR), Yrdays, Summer_flag, Jday, Jsol, Julwater
   integer, save :: Nowtime(6), Nowhour, Nowminute, Julian_day_absolute

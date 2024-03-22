@@ -2,7 +2,7 @@
 ! Routes water between segments in the system as inflow equals outflow
 !***********************************************************************
       INTEGER FUNCTION strmflow_in_out()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, DEBUG_less, OUTFLOW_SEGMENT, CFS2CMS_CONV
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, DEBUG_less, OUTFLOW_SEGMENT, CFS2CMS_CONV, ACTIVE
       USE PRMS_MODULE, ONLY: Nsegment, Process_flag, Print_debug
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_BASIN, ONLY: Active_area
@@ -12,14 +12,15 @@
      &    Seg_inflow, Seg_outflow, Seg_upstream_inflow, Seg_lateral_inflow, Flow_out, Basin_sroff
       USE PRMS_ROUTING, ONLY: Obsin_segment, Segment_order, Tosegment, Obsout_segment, Segment_type, &
      &    Flow_to_lakes, Flow_to_ocean, Flow_to_great_lakes, Flow_out_region, Flow_replacement, &
-     &    Flow_out_NHM, Flow_terminus, Flow_in_region, Flow_in_nation, Flow_headwater, Flow_in_great_lakes
+     &    Flow_out_NHM, Flow_terminus, Flow_in_region, Flow_in_nation, Flow_headwater, Flow_in_great_lakes, &
+     &    special_seg_type_flag
       USE PRMS_OBS, ONLY: Streamflow_cfs
       use prms_utils, only: print_module
       IMPLICIT NONE
 ! Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing'
       character(len=*), parameter :: MODNAME = 'strmflow_in_out'
-      character(len=*), parameter :: Version_strmflow = '2020-11-19'
+      character(len=*), parameter :: Version_strmflow = '2024-01-11'
       INTEGER :: i, iorder, toseg, segtype
       DOUBLE PRECISION :: area_fac, segout
 !***********************************************************************
@@ -30,17 +31,19 @@
         Seg_outflow = 0.0D0
         Seg_upstream_inflow = 0.0D0
         Flow_out = 0.0D0
-        Flow_to_lakes = 0.0D0
-        Flow_to_ocean = 0.0D0
-        Flow_to_great_lakes = 0.0D0
-        Flow_out_region = 0.0D0
-        Flow_out_NHM = 0.0D0
-        Flow_in_region = 0.0D0
-        Flow_terminus = 0.0D0
-        Flow_in_nation = 0.0D0
-        Flow_headwater = 0.0D0
-        Flow_in_great_lakes = 0.0D0
-        Flow_replacement = 0.0D0
+        IF ( special_seg_type_flag == ACTIVE ) THEN
+          Flow_to_lakes = 0.0D0
+          Flow_to_ocean = 0.0D0
+          Flow_to_great_lakes = 0.0D0
+          Flow_out_region = 0.0D0
+          Flow_out_NHM = 0.0D0
+          Flow_in_region = 0.0D0
+          Flow_terminus = 0.0D0
+          Flow_in_nation = 0.0D0
+          Flow_headwater = 0.0D0
+          Flow_in_great_lakes = 0.0D0
+          Flow_replacement = 0.0D0
+        ENDIF
         DO i = 1, Nsegment
           iorder = Segment_order(i)
           toseg = Tosegment(iorder)
@@ -53,7 +56,7 @@
             Seg_outflow(iorder) = Seg_inflow(iorder)
           ENDIF
 
-          IF ( Seg_outflow(iorder) < 0.0 ) THEN
+          IF ( Seg_outflow(iorder) < 0.0D0 ) THEN
             IF ( Print_debug>DEBUG_less ) THEN
               PRINT *, 'WARNING, negative flow from segment:', iorder, ' flow:', Seg_outflow(iorder)
               PRINT *, '         likely a water-use specification or replacement flow issue'
@@ -63,28 +66,30 @@
           segout = Seg_outflow(iorder)
 ! Flow_out is the total flow out of the basin, which allows for multiple outlets
 ! includes closed basins (tosegment=0)
-          IF ( segtype==1 ) THEN
-            Flow_headwater = Flow_headwater + segout
-          ELSEIF ( segtype==2 ) THEN
-            Flow_to_lakes = Flow_to_lakes + segout
-          ELSEIF ( segtype==3 ) THEN
-            Flow_replacement = Flow_replacement + segout
-          ELSEIF ( segtype==4 ) THEN
-            Flow_in_nation = Flow_in_nation + segout
-          ELSEIF ( segtype==5 ) THEN
-            Flow_out_NHM = Flow_out_NHM + segout
-          ELSEIF ( segtype==6 ) THEN
-            Flow_in_region = Flow_in_region + segout
-          ELSEIF ( segtype==7 ) THEN
-            Flow_out_region = Flow_out_region + segout
-          ELSEIF ( segtype==8 ) THEN
-            Flow_to_ocean = Flow_to_ocean + segout
-          ELSEIF ( segtype==9 ) THEN
-            Flow_terminus = Flow_terminus + segout
-          ELSEIF ( segtype==10 ) THEN
-            Flow_in_great_lakes = Flow_in_great_lakes + segout
-          ELSEIF ( segtype==11 ) THEN
-            Flow_to_great_lakes = Flow_to_great_lakes + segout
+          IF ( special_seg_type_flag == ACTIVE ) THEN
+            IF ( segtype==1 ) THEN
+              Flow_headwater = Flow_headwater + segout
+            ELSEIF ( segtype==2 ) THEN
+              Flow_to_lakes = Flow_to_lakes + segout
+            ELSEIF ( segtype==3 ) THEN
+              Flow_replacement = Flow_replacement + segout
+            ELSEIF ( segtype==4 ) THEN
+              Flow_in_nation = Flow_in_nation + segout
+            ELSEIF ( segtype==5 ) THEN
+              Flow_out_NHM = Flow_out_NHM + segout
+            ELSEIF ( segtype==6 ) THEN
+              Flow_in_region = Flow_in_region + segout
+            ELSEIF ( segtype==7 ) THEN
+              Flow_out_region = Flow_out_region + segout
+            ELSEIF ( segtype==8 ) THEN
+              Flow_to_ocean = Flow_to_ocean + segout
+            ELSEIF ( segtype==9 ) THEN
+              Flow_terminus = Flow_terminus + segout
+            ELSEIF ( segtype==10 ) THEN
+              Flow_in_great_lakes = Flow_in_great_lakes + segout
+            ELSEIF ( segtype==11 ) THEN
+              Flow_to_great_lakes = Flow_to_great_lakes + segout
+            ENDIF
           ENDIF
           IF ( toseg==OUTFLOW_SEGMENT ) THEN
             Flow_out = Flow_out + segout
