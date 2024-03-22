@@ -18,7 +18,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Temperature Distribution'
       character(len=10), parameter :: MODNAME = 'temp_dist2'
-      character(len=*), parameter :: Version_temp = '2021-11-19'
+      character(len=*), parameter :: Version_temp = '2021-09-07'
       INTEGER, SAVE, ALLOCATABLE :: N_tsta(:), Nuse_tsta(:, :)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dist(:, :)
       REAL, SAVE, ALLOCATABLE :: Delv(:, :), Elfac(:, :)
@@ -320,7 +320,7 @@
 !                  available period of record
 !***********************************************************************
       INTEGER FUNCTION t2dist2run()
-      USE PRMS_CONSTANTS, ONLY: DNEARZERO, MAXTEMP, MINTEMP, ERROR_data, GLACIER
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, DNEARZERO, MAXTEMP, MINTEMP, ERROR_data, GLACIER
       USE PRMS_MODULE, ONLY: Ntemp, Glacier_flag, Nowmonth, Hru_type
       USE PRMS_TEMP_DIST2
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Hru_elev_ts
@@ -419,7 +419,7 @@
 
         DO kk = 1, N_tsta(j)
           k = Nuse_tsta(kk, j)
-          IF ( Hru_type(j)==GLACIER .AND. Glacier_flag==1 ) Elfac(j, k) = (Hru_elev_ts(j)-Tsta_elev(k))/1000.0
+          IF ( Hru_type(j)==GLACIER .AND. Glacier_flag==ACTIVE ) Elfac(j, k) = (Hru_elev_ts(j)-Tsta_elev(k))/1000.0
 
 ! check for missing or bad temps
           IF ( Tmax(k)<mn ) CYCLE

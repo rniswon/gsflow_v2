@@ -17,7 +17,7 @@
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=*), parameter :: MODNAME = 'precip_dist2'
-        character(len=*), parameter :: Version_precip = '2021-11-19'
+        character(len=*), parameter :: Version_precip = '2024-01-15'
         INTEGER, SAVE, ALLOCATABLE :: N_psta(:), Nuse_psta(:, :)
         DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dist2(:, :)
 !   Declared Parameters
@@ -166,9 +166,9 @@
 !     pptdist2init - Initialize precipitation module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION pptdist2init()
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DNEARZERO
+      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, DNEARZERO, NEARZERO
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Nrain
+      USE PRMS_MODULE, ONLY: Nhru, Nrain, Inputerror_flag, Parameter_check_flag
       USE PRMS_PRECIP_DIST2
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       use prms_utils, only: read_error
@@ -176,7 +176,7 @@
 ! Functions
       INTRINSIC :: DSQRT, DABS, DBLE
 ! Local Variables
-      INTEGER :: i, k, n, kk, kkbig, jj
+      INTEGER :: i, k, n, kk, kkbig, jj, j
       DOUBLE PRECISION :: distx, disty, distance, big_dist, dist, dist_max_dble
       DOUBLE PRECISION, ALLOCATABLE :: nuse_psta_dist(:, :)
 !***********************************************************************
@@ -192,6 +192,7 @@
       IF ( getparam_int(MODNAME, 'max_psta', 1, Max_psta) &
      &     /=0 ) CALL read_error(2, 'max_psta')
       IF ( Max_psta==0 ) Max_psta = Nrain
+      IF ( Max_psta>Nrain ) Max_psta = Nrain
 
 !      IF ( getparam_real(MODNAME, 'maxmon_prec', MONTHS_PER_YEAR, Maxmon_prec) &
 !           /=0 ) CALL read_error(2, 'maxmon_prec')
@@ -258,10 +259,22 @@
               ENDIF
             ENDIF
           ENDIF
+          DO j = 1, MONTHS_PER_YEAR
+            IF ( Psta_mon(k,j)<NEARZERO ) THEN
+              PRINT *, 'psta_mon needs to be at least:', NEARZERO
+              IF ( Parameter_check_flag>0 ) THEN
+                PRINT *, 'ERROR, HRU:', k, 'month:', j, ', psta_mon:', Psta_mon(k, j)
+                Inputerror_flag = 1
+              ELSE
+                PRINT *, 'WARNING, HRU:', k, 'month:', j, ', psta_mon:', Psta_mon(k, j), ') set to', NEARZERO
+                Psta_mon(k, j) = NEARZERO
+              ENDIF
+            ENDIF
+          ENDDO
         ENDDO
       ENDDO
       DEALLOCATE ( nuse_psta_dist )
-      ! DEALLOCATE ( Psta_xlong, Psta_ylat, Hru_xlong, Hru_ylat )
+      DEALLOCATE ( Psta_xlong, Psta_ylat, Hru_xlong, Hru_ylat )
 
       END FUNCTION pptdist2init
 
@@ -270,7 +283,7 @@
 !                   depth for each HRU, and basin weighted avg. precip
 !***********************************************************************
       INTEGER FUNCTION pptdist2run()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, ERROR_data, CELSIUS, INCH2MM
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, ERROR_data, MM, INCH2MM
       USE PRMS_MODULE, ONLY: Nowmonth
       USE PRMS_PRECIP_DIST2
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv
@@ -369,7 +382,7 @@
 
         IF ( sumdist>0.0D0 ) ppt = SNGL( ppt_dble/sumdist )
 
-        IF ( Precip_units==CELSIUS ) ppt = ppt/INCH2MM
+        IF ( Precip_units==MM ) ppt = ppt/INCH2MM
         Hru_ppt(i) = ppt
         sum_obs = sum_obs + DBLE( ppt*Hru_area(i) )
 
@@ -384,7 +397,7 @@
        ! precipitation is a mixture of rain and snow
         ELSE
           tdiff = Tmaxf(i) - Tminf(i)
-          IF ( ABS(tdiff)<NEARZERO ) tdiff = 0.01
+          IF ( ABS(tdiff)<0.00001 ) tdiff = 0.00001
           Prmx(i) = ((Tmaxf(i)-Tmax_allsnow_f(i, Nowmonth))/tdiff)*Adjmix_rain(i, Nowmonth)
 
 !******Unless mixture adjustment raises the proportion of rain to

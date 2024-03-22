@@ -16,14 +16,15 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Potential Solar Radiation'
       character(len=*), parameter :: MODNAME = 'soltab'
-      character(len=*), parameter :: Version_soltab = '2022-10-24'
-      DOUBLE PRECISION, PARAMETER :: PI=3.1415926535898D0
+      character(len=*), parameter :: Version_soltab = '2024-01-22'
+      DOUBLE PRECISION, PARAMETER :: PI=ACOS(-1.0D0) ! ABOUT 3.1415926535898D0
       DOUBLE PRECISION, PARAMETER :: RADIANS=PI/180.0D0, TWOPI=2.0D0*PI
       DOUBLE PRECISION, PARAMETER :: PI_12=12.0D0/PI
 ! TWOPI = 6.2831853071786
 ! RADIANS = 0.017453292519943
 ! PI_12 = 3.8197186342055
       DOUBLE PRECISION, PARAMETER :: ECCENTRICY = 0.01671D0
+!      DOUBLE PRECISION, PARAMETER :: ECCENTRICY = 0.01671123D0 ! https://www.vcalc.com/search/?text=eccentricity
       ! 0.016723401  daily change -1.115E-09, eccen = 0.016723401 + (julhour-julhour(1966,1,0,18))+dmin/60)/24*-1.115E-09
       ! julday(1966,1,0.75 UT) = 2439126.25
       ! eccen = 0.01675104-0.00004180*T-0.000000126*T**2  T is julian centuries (days time from epoch, is GMT from Jan 0.0
@@ -31,9 +32,12 @@
       DOUBLE PRECISION, PARAMETER :: DEGDAYRAD = DEGDAY*RADIANS ! about 0.00143356672
 ! DEGDAY = 360 degrees/days in year
       DOUBLE PRECISION, SAVE :: Solar_declination(MAX_DAYS_PER_YEAR), Soltab_basinpotsw(MAX_DAYS_PER_YEAR)
+      !DOUBLE PRECISION, SAVE :: Ecentricity(MAX_DAYS_PER_YEAR)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_cossl(:), Soltab_sunhrs(:, :)
+      DOUBLE PRECISION, SAVE :: obliquity(MAX_DAYS_PER_YEAR)
 !   Declared Variables
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Soltab_potsw(:, :), Soltab_horad_potsw(:, :)
+!       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Sunset_angle(:, :)
 !   Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Hru_aspect(:), Hru_slope(:)
       END MODULE PRMS_SOLTAB
@@ -86,6 +90,7 @@
 !     &     'Langleys', Soltab_horad_potsw)
 
       ALLOCATE ( Hru_cossl(Nhru), Soltab_sunhrs(MAX_DAYS_PER_YEAR, Nhru) )
+!       ALLOCATE ( Sunset_angle(MAX_DAYS_PER_YEAR, Nhru) )
 
 !   Declared Parameters
       ALLOCATE ( Hru_slope(Nhru) )
@@ -122,11 +127,12 @@
 !     INTRINSIC :: ASIN
       EXTERNAL :: compute_soltab
 ! Local Variables
-      CHARACTER(LEN=12) :: output_path
-      INTEGER :: jd, j, n, file_unit, nn
+      CHARACTER(LEN=21) :: output_path, Output_fmt, Output_fmt2
+      INTEGER :: jd, j, n, file_unit, nn, i
       REAL :: lat
-      DOUBLE PRECISION :: basin_cossl
-      DOUBLE PRECISION :: basin_sunhrs(MAX_DAYS_PER_YEAR), obliquity(MAX_DAYS_PER_YEAR)
+      DOUBLE PRECISION :: basin_cossl !, dayangle
+      DOUBLE PRECISION :: basin_sunhrs(MAX_DAYS_PER_YEAR)
+!      DOUBLE PRECISION :: basin_angle(MAX_DAYS_PER_YEAR)
       DOUBLE PRECISION :: y, y2, y3, jddbl
 !***********************************************************************
       sthinit = 0
@@ -162,12 +168,22 @@
         Solar_declination(jd) = 0.006918D0 - 0.399912D0*COS(y) + 0.070257D0*SIN(y) &
      &                          - 0.006758D0*COS(y2) + 0.000907D0*SIN(y2) &
      &                          - 0.002697D0*COS(y3) + 0.00148D0*SIN(y3)
+        ! eccentricity = (r_0/r)^2 = 1.00011+0.034221 cos?G+0.00128 sin?G+0.000719 cos?2G+0.000077 sin?2G
+        ! G = (2p(J-1))/365 = DEGDAYRAD*(jddbl-1.0D0) = day angle
+        !dayangle = (TWOPI*(jddbl-1.0D0))/365.242D0 ! DEGDAYRAD*(jddbl-1.0D0) ! assume noon (12pm)
+!        Eccentricity(jd) = 1.00011D0 + 0.034221D0*COS(y) + 0.00128D0*SIN(y) + 0.000719D0*COS(2.0D0*y) &
+!                           + 0.000077D0*SIN(2.0D0*y) ! https://csdms.colorado.edu/wiki/Model_help:TopoFlow-Meteorology
+        ! daily change -1.115E-09, eccen = 0.016723401 + (julhour-julhour(1966,1,0,18))+dmin/60)/24*-1.115E-09
+        ! julday(1966,1,0.75 UT) = 2439126.25
+        ! eccen = 0.01675104-0.00004180*T-0.000000126*T**2  T is julian centuries (days time from epoch, is GMT from Jan 0.0
+!        obliquity(jd) = 1.0D0 - (Eccentricity(jd)*COS((jddbl-3.0D0)*DEGDAYRAD))
       ENDDO
 
 !   Module Variables
       Soltab_sunhrs = 0.0D0
       Soltab_potsw = 0.0D0
       Soltab_horad_potsw = 0.0D0
+      ! Sunset_angle = 0.0D0
       Hru_cossl = 0.0D0
       DO nn = 1, Active_hrus
         n = Hru_route_order(nn)
@@ -177,38 +193,71 @@
         CALL compute_soltab(obliquity, Solar_declination, Hru_slope(n), Hru_aspect(n), &
      &                      Hru_lat(n), Hru_cossl(n), Soltab_potsw(:, n), &
      &                      Soltab_sunhrs(:, n), Hru_type(n), n)
+!        CALL compute_soltab(obliquity, Solar_declination, 0.0, 0.0, Hru_lat(n), &
+!     &                      Hru_cossl(n), Soltab_horad_potsw(:, n), &
+!     &                      Soltab_sunhrs(:, n), Sunset_angle(:, n), Hru_type(n), n)
+!        CALL compute_soltab(obliquity, Solar_declination, Hru_slope(n), Hru_aspect(n), &
+!     &                      Hru_lat(n), Hru_cossl(n), Soltab_potsw(:, n), &
+!     &                      Soltab_sunhrs(:, n), Sunset_angle(:, n), Hru_type(n), n)
       ENDDO
 
       lat = SNGL( Basin_lat )
       CALL compute_soltab(obliquity, Solar_declination, 0.0, 0.0, lat, basin_cossl, &
      &                    Soltab_basinpotsw, basin_sunhrs, 0, 0)
+!      CALL compute_soltab(obliquity, Solar_declination, 0.0, 0.0, lat, basin_cossl, &
+!     &                    Soltab_basinpotsw, basin_sunhrs, basin_angle, 0, 0)
 
       IF ( Print_debug==DEBUG_SOLTAB ) THEN
-        output_path = 'soltab_debug'
+        WRITE ( Output_fmt2, 9001 ) Nhru
+        WRITE ( Output_fmt, 9002 ) Nhru
+ 9001   FORMAT ('('I0,'(I0,","))')
+ 9002   FORMAT ('('I0,'(F0.3,","))')
+
         PRINT *, ''
-        PRINT *, 'soltab debug data written to: ', output_path
-        CALL PRMS_open_module_file(file_unit, output_path)
-        DO n = 1, Nhru
-          WRITE ( file_unit, * ) 'HRU:', n
-          WRITE ( file_unit, * ) '***Soltab_sunhrs***'
-          WRITE ( file_unit, '(13F8.3)' ) (Soltab_sunhrs(j,n), j=1,MAX_DAYS_PER_YEAR)
-          WRITE ( file_unit, * ) '***Soltab_potsw***'
-          WRITE ( file_unit, '(13F8.3)' ) (Soltab_potsw(j,n), j=1,MAX_DAYS_PER_YEAR)
+        output_path = 'soltab_sunhrs.csv'
+        PRINT *, 'soltab_sunhrs values written to: ', output_path(:17)
+        CALL PRMS_open_module_file(file_unit, output_path(:17))
+        WRITE ( file_unit, Output_fmt2) (j, j=1,Nhru)
+        DO i = 1, MAX_DAYS_PER_YEAR
+          WRITE ( file_unit, Output_fmt) (soltab_sunhrs(i,j), j=1,Nhru)
         ENDDO
-!       WRITE ( file_unit, * ) obliquity, Solar_declination
-        WRITE ( file_unit, * ) 2.0D0/(obliquity(356)*obliquity(356)), 2.0D0/(obliquity(10)*obliquity(10)), &
-     &                         2.0D0/(obliquity(23)*obliquity(23)), 2.0D0/(obliquity(38)*obliquity(38)), &
-     &                         2.0D0/(obliquity(51)*obliquity(51)), 2.0D0/(obliquity(66)*obliquity(66)), &
-     &                         2.0D0/(obliquity(80)*obliquity(80)), 2.0D0/(obliquity(94)*obliquity(94)), &
-     &                         2.0D0/(obliquity(109)*obliquity(109)), 2.0D0/(obliquity(123)*obliquity(123)), &
-     &                         2.0D0/(obliquity(138)*obliquity(138)), 2.0D0/(obliquity(152)*obliquity(152)), &
-     &                         2.0D0/(obliquity(173)*obliquity(173))
-        WRITE ( file_unit, * ) Solar_declination(356), Solar_declination(10), Solar_declination(23), &
-     &                         Solar_declination(38), Solar_declination(51), Solar_declination(66), &
-     &                         Solar_declination(80), Solar_declination(94), Solar_declination(109), &
-     &                         Solar_declination(123), Solar_declination(138), Solar_declination(152), &
-     &                         Solar_declination(173)
         CLOSE ( file_unit )
+
+        output_path = 'soltab_potsw.csv'
+        PRINT *, 'soltab_potsw values written to: ', output_path(:17)
+        CALL PRMS_open_module_file(file_unit, output_path(:16))
+        WRITE ( file_unit, Output_fmt2) (j, j=1,Nhru)
+        DO i = 1, MAX_DAYS_PER_YEAR
+          WRITE ( file_unit, Output_fmt) (soltab_potsw(i,j), j=1,Nhru)
+        ENDDO
+        CLOSE ( file_unit )
+        !
+        output_path = 'obliquity.csv'
+        PRINT *, 'obliquity values written to: ', output_path(:13)
+        CALL PRMS_open_module_file(file_unit, output_path(:13))
+        WRITE ( file_unit, Output_fmt2) (j, j=1,Nhru)
+        WRITE ( file_unit, Output_fmt) (obliquity(j), j=1,Nhru)
+        CLOSE ( file_unit )
+        
+        output_path = 'solar_declination.csv'
+        PRINT *, 'solar_declination values written to: ', output_path
+        CALL PRMS_open_module_file(file_unit, output_path)
+        WRITE ( file_unit, Output_fmt2) (j, j=1,Nhru)
+        WRITE ( file_unit, Output_fmt) (Solar_declination(j), j=1,Nhru)
+        CLOSE ( file_unit )
+        
+     !   WRITE ( file_unit, * ) 2.0D0/(obliquity(356)*obliquity(356)), 2.0D0/(obliquity(10)*obliquity(10)), &
+     !&                         2.0D0/(obliquity(23)*obliquity(23)), 2.0D0/(obliquity(38)*obliquity(38)), &
+     !&                         2.0D0/(obliquity(51)*obliquity(51)), 2.0D0/(obliquity(66)*obliquity(66)), &
+     !&                         2.0D0/(obliquity(80)*obliquity(80)), 2.0D0/(obliquity(94)*obliquity(94)), &
+     !&                         2.0D0/(obliquity(109)*obliquity(109)), 2.0D0/(obliquity(123)*obliquity(123)), &
+     !&                         2.0D0/(obliquity(138)*obliquity(138)), 2.0D0/(obliquity(152)*obliquity(152)), &
+     !&                         2.0D0/(obliquity(173)*obliquity(173))
+     !   WRITE ( file_unit, * ) Solar_declination(356), Solar_declination(10), Solar_declination(23), &
+     !&                         Solar_declination(38), Solar_declination(51), Solar_declination(66), &
+     !&                         Solar_declination(80), Solar_declination(94), Solar_declination(109), &
+     !&                         Solar_declination(123), Solar_declination(138), Solar_declination(152), &
+     !&                         Solar_declination(173)
 ! from original soltab
 !     data obliquity/2.06699,2.06317,2.05582,2.04520,2.03243,2.01706,2.00080,
 !    +1.98553,1.96990,1.95714,1.94689,1.94005,1.93616/
@@ -219,8 +268,7 @@
 !     data jday/356,10,23,38,51,66,80,94,109,123,138,152,173/
       ENDIF
 
-      DEALLOCATE ( Hru_slope )
-      IF ( Glacier_flag==OFF ) DEALLOCATE ( Hru_aspect, Hru_lat )
+      IF ( Glacier_flag==OFF ) DEALLOCATE ( Hru_aspect, Hru_slope, Hru_lat )
 
       END FUNCTION sthinit
 
@@ -231,6 +279,8 @@
 !***********************************************************************
       SUBROUTINE compute_soltab(Obliquity, Solar_declination, Slope, Aspect, &
      &                          Latitude, Cossl, Soltab, Sunhrs, Hru_type, Id)
+!      SUBROUTINE compute_soltab(Obliquity, Solar_declination, Slope, Aspect, &
+!     &                          Latitude, Cossl, Soltab, Sunhrs, Sunset_angle, Hru_type, Id)
       USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, DNEARZERO
       USE PRMS_SOLTAB, ONLY: PI, TWOPI, RADIANS, PI_12
       IMPLICIT NONE
@@ -243,7 +293,7 @@
       DOUBLE PRECISION, INTENT(IN), DIMENSION(MAX_DAYS_PER_YEAR) :: Obliquity, Solar_declination
       REAL, INTENT(IN) :: Slope, Aspect, Latitude
       DOUBLE PRECISION, INTENT(OUT) :: Cossl
-      DOUBLE PRECISION, INTENT(OUT), DIMENSION(MAX_DAYS_PER_YEAR) :: Soltab, Sunhrs
+      DOUBLE PRECISION, INTENT(OUT), DIMENSION(MAX_DAYS_PER_YEAR) :: Soltab, Sunhrs !, Sunset_angle
 !     Local Variables
       INTEGER :: jd
       DOUBLE PRECISION :: a, x0, x1, x2, r0, r1, d1, t, sunh, solt
@@ -364,6 +414,7 @@
         IF ( sunh<DNEARZERO ) sunh = 0.0D0
         Sunhrs(jd) = sunh
         Soltab(jd) = solt
+        ! Sunset_angle(jd) = t3*PI_12
 
       ENDDO
 
@@ -387,7 +438,7 @@
 !  Solar_declination is the declination of the sun on a day
 !  T is the angle hour from the local meridian (local solar noon) to the
 !  sunrise (negative) or sunset (positive).  The Earth rotates at the angular
-!  speed of 15 degrees/hour (2 pi / 24 hour in radians) and, therefore, T/15 degress (T*24/pi
+!  speed of 15 degrees/hour (2 pi / 24 hour in radians) and, therefore, T/15 degrees (T*24/pi
 !  in radians) gives the time of sunrise as the number of hours before the local
 !  noon, or the time of sunset as the number of hours after the local noon.
 !  Here the term local noon indicates the local time when the sun is exactly to
