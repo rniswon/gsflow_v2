@@ -11,7 +11,7 @@
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
       ! Number of stream reaches in each stream segment
-      INTEGER, SAVE, ALLOCATABLE :: Numreach_segment(:), activeHru_inactiveCell(:), inactiveHru_activeCell(:)
+      INTEGER, SAVE, ALLOCATABLE :: Numreach_segment(:), activeHru_inactiveCell(:)
       REAL, SAVE, ALLOCATABLE :: Excess(:)
       DOUBLE PRECISION, SAVE :: Totalarea
 !   Declared Variables
@@ -153,7 +153,7 @@
 !***********************************************************************
       INTEGER FUNCTION prms2mfinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_param, ACTIVE, OFF
-      USE PRMS_MODULE, ONLY: Hru_type, activeHRU_inactiveCELL_flag
+      USE PRMS_MODULE, ONLY: Hru_type
       use PRMS_READ_PARAM_FILE, only: getparam_real
       USE GSFPRMS2MF
       USE GWFUZFMODULE, ONLY: NTRAIL, NWAV, IUZFBND
@@ -291,18 +291,14 @@
       Cell_drain_rate = 0.0 ! dimension ngwcell
       finf_cell = 0.0 ! dimension ngwcell
 
-      IF ( activeHRU_inactiveCELL_flag == ACTIVE ) THEN
-        ALLOCATE ( activeHru_inactiveCell(Nhru) )
-        ALLOCATE ( inactiveHru_activeCell(Nhru) )
-        activeHru_inactiveCell = 0
-        inactiveHru_activeCell = 0
-      ENDIF
+      ALLOCATE ( activeHru_inactiveCell(Nhru) )
       ierr = 0
       IF ( Nhru/=Nhrucell ) THEN
         ALLOCATE ( hru_pct(Nhru), newpct(Nhru), temp_pct(Nhrucell) )
         hru_pct = 0.0D0
         newpct = 0.0D0
       ENDIF
+      activeHru_inactiveCell = 0
       DO i = 1, Nhrucell
         ihru = Gvr_hru_id(i)
         IF ( Nhru/=Nhrucell ) THEN
@@ -316,15 +312,13 @@
         icol = Gwc_col(icell)
         IF ( Print_debug>DEBUG_less ) THEN
           IF ( Hru_type(ihru)==0 ) THEN
-            IF ( IUZFBND(icol, irow)/=0 ) THEN
-              PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
-              IF ( activeHRU_inactiveCELL_flag == ACTIVE ) inactiveHru_activeCell(ihru) = 1
-            ENDIF
+            IF ( IUZFBND(icol, irow)/=0 ) &
+     &           PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
           ENDIF
           IF ( IUZFBND(icol, irow)==0 ) THEN
             IF ( Hru_type(ihru) > 0 ) then
                 PRINT *, 'WARNING, UZF cell inactive, irow:', irow, ' icol:',icol,'icell:',icell, ' HRU is active:', ihru
-                IF ( activeHRU_inactiveCELL_flag == ACTIVE ) activeHru_inactiveCell(ihru) = 1
+                activeHru_inactiveCell(ihru) = 1
             end if
           ENDIF
         ENDIF
@@ -495,7 +489,7 @@
 !-----------------------------------------------------------------------
         IF ( Sm2gw_grav(j)>0.0 ) THEN
 
-          IF ( IUZFOPT<=0 ) THEN !ERIC 20210107: NWAVST is dimensioned (1, 1) if IUZFOPT == 0.
+          IF ( IUZFOPT==0 ) THEN !ERIC 20210107: NWAVST is dimensioned (1, 1) if IUZFOPT == 0.
             Cell_drain_rate(icell) = Cell_drain_rate(icell) + Sm2gw_grav(j)*Gvr2cell_conv(j)
             Gw_rejected_grav(j) = 0.0
             is_draining = 1

@@ -142,7 +142,7 @@
 !     strmflow_character_run - Computes streamflow characteristics
 !***********************************************************************
       INTEGER FUNCTION strmflow_character_run()
-      USE PRMS_CONSTANTS, ONLY: NEARZERO
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, DNEARZERO
       USE PRMS_MODULE, ONLY: Nsegment
       USE PRMS_STRMFLOW_CHARACTER
       USE PRMS_FLOWVARS, ONLY: Seg_outflow
@@ -157,12 +157,12 @@
       strmflow_character_run = 0
 
       DO i = 1, Nsegment
-         if (seg_outflow(i) > NEARZERO) then
+         if (Seg_outflow(i) > DNEARZERO) then
             segflow = SNGL(Seg_outflow(i)) * CFS_TO_CMS
             Seg_width(i) = width_alpha(i) * (segflow ** width_m(i))
             Seg_depth(i) = depth_alpha(i) * (segflow ** depth_m(i))
             Seg_area(i) = Seg_width(i) * Seg_depth(i)
-            if (seg_area(i) > NEARZERO) then
+            if (Seg_area(i) > NEARZERO) then
                Seg_velocity(i) = segflow / Seg_area(i)
             else
                Seg_velocity(i) = 0.0

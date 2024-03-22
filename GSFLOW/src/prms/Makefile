@@ -40,7 +40,6 @@ LIBOBJS = \
         potet_pan.o \
         potet_hamon.o \
         ddsolrad.o \
-        cloud_cover.o \
         ccsolrad.o \
         ide_dist.o \
         xyz_dist.o \
@@ -275,9 +274,6 @@ convert_params.o: convert_params.f90 prms_module.mod prms_read_param_file.mod
 
 glacr_melt.o: glacr_melt.f90 prms_control_file.mod prms_read_param_file.mod prms_snow.mod prms_intcp.mod prms_soltab.mod prms_constants.mod
 	$(FC) -c $(FFLAGS) glacr_melt.f90
-
-cloud_cover.o: cloud_cover.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod prms_climatevars.mod prms_soltab.mod prms_set_time.mod prms_obs.mod prms_constants.mod
-	$(FC) -c $(FFLAGS) cloud_cover.f90
 
 soilzone_ag.o: soilzone_ag.f90 prms_module.mod prms_read_param_file.mod prms_basin.mod prms_flowvars.mod prms_snow.mod prms_climatevars.mod prms_cascade.mod prms_set_time.mod prms_intcp.mod prms_srunoff.mod prms_constants.mod prms_climate_hru.mod gsfmodsim2prms.mod
 	$(FC) -c $(FFLAGS) soilzone_ag.f90

@@ -8,13 +8,13 @@
      &          EQULS = '=========================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.3.0 02/22/2024'
-      character(len=*), parameter :: PRMS_versn = '2024-03-01'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 5.3.0 03/01/2024'
-      character(len=*), parameter :: Version_read_control_file = '2022-10-20'
-      character(len=*), parameter :: Version_read_parameter_file = '2022-01-12'
-      character(len=*), parameter :: Version_read_data_file = '2022-06-02'
-      CHARACTER(len=8), SAVE :: Process
+      character(len=*), parameter :: GSFLOW_versn = '2.2.0 03/22/2024'
+      character(len=*), parameter :: PRMS_versn = '2024-03-10'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 6.0.0 03/10/2024'
+      character(len=*), parameter :: Version_read_control_file = '2024-03-01'
+      character(len=*), parameter :: Version_read_parameter_file = '2024-03-01'
+      character(len=*), parameter :: Version_read_data_file = '2023-06-02'
+      CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus
@@ -31,18 +31,17 @@
       INTEGER, SAVE :: Precip_combined_flag, Temp_combined_flag, Muskingum_flag
       INTEGER, SAVE :: Inputerror_flag, Timestep
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag, Albedo_cbh_flag, Cloud_cover_cbh_flag
-      INTEGER, SAVE :: PRMS_flag, GSFLOW_flag, PRMS4_flag
+      INTEGER, SAVE :: PRMS4_flag, PRMS_flag, GSFLOW_flag, PRMS_only, Gsf_unt
       INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Grid_flag, Ag_package, MODSIM_flag, AG_flag, gwflow_flag
-      INTEGER, SAVE :: Canopy_iter, irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag, Gsf_unt
+      INTEGER, SAVE :: Canopy_iter, irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag
       INTEGER, SAVE :: PRMS_output_unit, Restart_inunit, Restart_outunit
       INTEGER, SAVE :: Dynamic_flag, Dynamic_soil_flag, Water_use_flag, Soilzone_add_water_use
-      INTEGER, SAVE :: PRMS_only, timestep_start_flag
       INTEGER, SAVE :: Elapsed_time_start(8), Elapsed_time_end(8), Elapsed_time_minutes
       INTEGER, SAVE :: Nowyear, Nowmonth, Nowday
       INTEGER, SAVE :: Gwr_transfer_water_use, Gwr_add_water_use
       INTEGER, SAVE :: Lake_transfer_water_use, Lake_add_water_use
       REAL, SAVE :: Execution_time_start, Execution_time_end, Elapsed_time
-      INTEGER, SAVE :: mf_timestep, startday, endday, mf_nowtime, Number_timesteps
+      INTEGER, SAVE :: mf_timestep, startday, endday, mf_nowtime, Number_timesteps, timestep_start_flag
       INTEGER, SAVE :: num_words_command_line
       character(LEN=MAXCMDLINE_LENGTH) command_line, command_line_modsim
 !   Declared Variables
@@ -75,8 +74,8 @@
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Temp_module, Srunoff_module, Et_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Strmflow_module, Transp_module
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: Model_mode, Precip_module, Solrad_module
-      CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: irrigated_area_module, AET_module, PET_ag_module
       CHARACTER(LEN=11), SAVE :: Soilzone_module
+      CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: irrigated_area_module, AET_module, PET_ag_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
       INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF
       INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag

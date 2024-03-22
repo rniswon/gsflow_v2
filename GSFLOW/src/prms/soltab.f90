@@ -127,8 +127,8 @@
 !     INTRINSIC :: ASIN
       EXTERNAL :: compute_soltab
 ! Local Variables
-      CHARACTER(LEN=12) :: output_path
-      INTEGER :: jd, j, n, file_unit, nn
+      CHARACTER(LEN=21) :: output_path, Output_fmt, Output_fmt2
+      INTEGER :: jd, j, n, file_unit, nn, i
       REAL :: lat
       DOUBLE PRECISION :: basin_cossl !, dayangle
       DOUBLE PRECISION :: basin_sunhrs(MAX_DAYS_PER_YEAR)
@@ -208,31 +208,56 @@
 !     &                    Soltab_basinpotsw, basin_sunhrs, basin_angle, 0, 0)
 
       IF ( Print_debug==DEBUG_SOLTAB ) THEN
-        output_path = 'soltab_debug'
+        WRITE ( Output_fmt2, 9001 ) Nhru
+        WRITE ( Output_fmt, 9002 ) Nhru
+ 9001   FORMAT ('('I0,'(I0,","))')
+ 9002   FORMAT ('('I0,'(F0.3,","))')
+
         PRINT *, ''
-        PRINT *, 'soltab debug data written to: ', output_path
-        CALL PRMS_open_module_file(file_unit, output_path)
-        DO n = 1, Nhru
-          WRITE ( file_unit, * ) 'HRU:', n
-          WRITE ( file_unit, * ) '***Soltab_sunhrs***'
-          WRITE ( file_unit, '(13F8.3)' ) (Soltab_sunhrs(j,n), j=1,MAX_DAYS_PER_YEAR)
-          WRITE ( file_unit, * ) '***Soltab_potsw***'
-          WRITE ( file_unit, '(13F8.3)' ) (Soltab_potsw(j,n), j=1,MAX_DAYS_PER_YEAR)
+        output_path = 'soltab_sunhrs.csv'
+        PRINT *, 'soltab_sunhrs values written to: ', output_path(:17)
+        CALL PRMS_open_module_file(file_unit, output_path(:17))
+        WRITE ( file_unit, Output_fmt2) (j, j=1,Nhru)
+        DO i = 1, MAX_DAYS_PER_YEAR
+          WRITE ( file_unit, Output_fmt) (soltab_sunhrs(i,j), j=1,Nhru)
         ENDDO
-!       WRITE ( file_unit, * ) obliquity, Solar_declination
-        WRITE ( file_unit, * ) 2.0D0/(obliquity(356)*obliquity(356)), 2.0D0/(obliquity(10)*obliquity(10)), &
-     &                         2.0D0/(obliquity(23)*obliquity(23)), 2.0D0/(obliquity(38)*obliquity(38)), &
-     &                         2.0D0/(obliquity(51)*obliquity(51)), 2.0D0/(obliquity(66)*obliquity(66)), &
-     &                         2.0D0/(obliquity(80)*obliquity(80)), 2.0D0/(obliquity(94)*obliquity(94)), &
-     &                         2.0D0/(obliquity(109)*obliquity(109)), 2.0D0/(obliquity(123)*obliquity(123)), &
-     &                         2.0D0/(obliquity(138)*obliquity(138)), 2.0D0/(obliquity(152)*obliquity(152)), &
-     &                         2.0D0/(obliquity(173)*obliquity(173))
-        WRITE ( file_unit, * ) Solar_declination(356), Solar_declination(10), Solar_declination(23), &
-     &                         Solar_declination(38), Solar_declination(51), Solar_declination(66), &
-     &                         Solar_declination(80), Solar_declination(94), Solar_declination(109), &
-     &                         Solar_declination(123), Solar_declination(138), Solar_declination(152), &
-     &                         Solar_declination(173)
         CLOSE ( file_unit )
+
+        output_path = 'soltab_potsw.csv'
+        PRINT *, 'soltab_potsw values written to: ', output_path(:17)
+        CALL PRMS_open_module_file(file_unit, output_path(:16))
+        WRITE ( file_unit, Output_fmt2) (j, j=1,Nhru)
+        DO i = 1, MAX_DAYS_PER_YEAR
+          WRITE ( file_unit, Output_fmt) (soltab_potsw(i,j), j=1,Nhru)
+        ENDDO
+        CLOSE ( file_unit )
+        !
+        output_path = 'obliquity.csv'
+        PRINT *, 'obliquity values written to: ', output_path(:13)
+        CALL PRMS_open_module_file(file_unit, output_path(:13))
+        WRITE ( file_unit, Output_fmt2) (j, j=1,Nhru)
+        WRITE ( file_unit, Output_fmt) (obliquity(j), j=1,Nhru)
+        CLOSE ( file_unit )
+        
+        output_path = 'solar_declination.csv'
+        PRINT *, 'solar_declination values written to: ', output_path
+        CALL PRMS_open_module_file(file_unit, output_path)
+        WRITE ( file_unit, Output_fmt2) (j, j=1,Nhru)
+        WRITE ( file_unit, Output_fmt) (Solar_declination(j), j=1,Nhru)
+        CLOSE ( file_unit )
+        
+     !   WRITE ( file_unit, * ) 2.0D0/(obliquity(356)*obliquity(356)), 2.0D0/(obliquity(10)*obliquity(10)), &
+     !&                         2.0D0/(obliquity(23)*obliquity(23)), 2.0D0/(obliquity(38)*obliquity(38)), &
+     !&                         2.0D0/(obliquity(51)*obliquity(51)), 2.0D0/(obliquity(66)*obliquity(66)), &
+     !&                         2.0D0/(obliquity(80)*obliquity(80)), 2.0D0/(obliquity(94)*obliquity(94)), &
+     !&                         2.0D0/(obliquity(109)*obliquity(109)), 2.0D0/(obliquity(123)*obliquity(123)), &
+     !&                         2.0D0/(obliquity(138)*obliquity(138)), 2.0D0/(obliquity(152)*obliquity(152)), &
+     !&                         2.0D0/(obliquity(173)*obliquity(173))
+     !   WRITE ( file_unit, * ) Solar_declination(356), Solar_declination(10), Solar_declination(23), &
+     !&                         Solar_declination(38), Solar_declination(51), Solar_declination(66), &
+     !&                         Solar_declination(80), Solar_declination(94), Solar_declination(109), &
+     !&                         Solar_declination(123), Solar_declination(138), Solar_declination(152), &
+     !&                         Solar_declination(173)
 ! from original soltab
 !     data obliquity/2.06699,2.06317,2.05582,2.04520,2.03243,2.01706,2.00080,
 !    +1.98553,1.96990,1.95714,1.94689,1.94005,1.93616/

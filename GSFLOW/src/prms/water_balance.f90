@@ -151,7 +151,7 @@
      &    Infil, Soil_moist_max, Ssr_to_gw, Ssres_flow, Basin_soil_to_gw, Soil_moist, Ssres_stor, Pref_flow_stor, &
      &    Slow_flow, Basin_perv_et, Basin_ssflow, Basin_swale_et, Slow_stor, Ssres_in, Soil_rechr, &
      &    Basin_lakeevap, Sroff, Hru_actet, Pkwater_equiv, Gwres_stor, Dprst_vol_open, Dprst_vol_clos, Basin_sroff, &
-     &    Dprst_stor_hru, Hru_impervstor, Soil_moist_tot, Hru_intcpstor, Glacrb_melt, &
+     &    Dprst_stor_hru, Hru_impervstor, Soil_moist_tot, Hru_intcpstor, &
      &    Intcp_stor, Ag_soil_moist, Basin_ag_soil_moist, Snowmelt, Snow_evap, Snowcov_area, Pptmix_nopack, Basin_pweqv
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_ssres_stor, It0_basin_soil_moist, &
                                It0_ag_soil_moist, It0_basin_ag_soil_moist, It0_hru_intcpstor, &
@@ -163,7 +163,7 @@
      &    Srain_intcp, Wrain_intcp, Snow_intcp, Intcp_evap, &
      &    Canopy_covden, Intcp_changeover, Net_ppt, Last_basin_intcp_stor, &
      &    Net_apply, Gain_inches, Use_transfer_intcp, Basin_hru_apply, Basin_net_apply
-      USE PRMS_SNOW, ONLY: Basin_snowmelt, Basin_snowevap, Basin_snowcov, Pk_precip
+      USE PRMS_SNOW, ONLY: Basin_snowmelt, Basin_snowevap, Basin_snowcov, Pk_precip, Glacrb_melt
 !      USE PRMS_GLACR, ONLY: Glacr_flow
       USE PRMS_SRUNOFF, ONLY: Basin_infil, Hru_hortn_cascflow, Upslope_hortonian, &
      &    Basin_sroffp, Basin_sroffi, Basin_dprst_sroff, Basin_sroff_down, &

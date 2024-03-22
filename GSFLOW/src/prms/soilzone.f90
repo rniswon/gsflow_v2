@@ -19,7 +19,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2024-02-28'
+      character(len=*), parameter :: Version_soilzone = '2024-03-21'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -27,7 +27,7 @@
 !   GSFLOW variables
       INTEGER, SAVE, ALLOCATABLE :: Hru_gvr_count(:), Hru_gvr_index(:, :), Hrucheck(:)
       REAL, SAVE, ALLOCATABLE :: Replenish_frac(:)
-      REAL, SAVE, ALLOCATABLE :: It0_sroff(:), It0_hortonian_flow(:)
+      REAL, SAVE, ALLOCATABLE :: It0_sroff(:), It0_hru_sroffp(:), It0_hortonian_flow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_strm_seg_in(:)
       DOUBLE PRECISION, SAVE :: Basin_sz_gwin
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gvr_hru_pct_adjusted(:)
@@ -110,7 +110,7 @@
 !     hru_area, slowcoef_sq, gvr_hru_id
 !***********************************************************************
       INTEGER FUNCTION szdecl()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, CASCADE_OFF, MONTHS_PER_YEAR, ERROR_dim, OFF
+      USE PRMS_CONSTANTS, ONLY: ERROR_dim, ACTIVE, OFF, CASCADE_OFF, MONTHS_PER_YEAR
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getdim
       USE PRMS_MODULE, ONLY: Nhru, Nsegment, Nlake, Nhrucell, Print_debug, Cascade_flag, Frozen_flag, &
@@ -419,7 +419,7 @@
       ENDIF
 
       IF ( GSFLOW_flag==ACTIVE .OR. Iter_aet_flag==ACTIVE ) THEN
-        ALLOCATE ( It0_sroff(Nhru), It0_hortonian_flow(Nhru) )
+        ALLOCATE ( It0_sroff(Nhru), It0_hru_sroffp(Nhru), It0_hortonian_flow(Nhru) )
         IF ( Cascade_flag>CASCADE_OFF ) ALLOCATE ( It0_strm_seg_in(Nsegment) )
       ENDIF
 
@@ -533,7 +533,8 @@
       USE PRMS_FLOWVARS, ONLY: Soil_moist_max, Soil_rechr_max, &
      &    Ssres_stor, Basin_ssstor, Basin_soil_moist, Slow_stor, &
      &    Pref_flow_stor, Soil_moist_tot, Soil_zone_max, Dprst_stor_hru, Soil_lower_stor_max, Hru_impervstor, &
-     &    Soil_moist, Sat_threshold, Soil_rechr, Pkwater_equiv, Hru_intcpstor, Gravity_stor_res
+     &    Hru_intcpstor, Gravity_stor_res, &
+     &    Soil_moist, Sat_threshold, Soil_rechr, Pkwater_equiv
       use prms_utils, only: checkdim_bounded_limits, error_stop, read_error
       IMPLICIT NONE
 ! Functions
@@ -652,22 +653,20 @@
         perv_area = Hru_perv(i)
         Soil_zone_max(i) = Sat_threshold(i) + Soil_moist_max(i)*Hru_frac_perv(i)
         Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*Hru_frac_perv(i)
-        IF ( perv_area>0.0 ) THEN
-          Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Soil_moist(i)/Soil_moist_max(i)*perv_area )
-          Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)
-          Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
-          IF ( Soil_lower_stor_max(i)>0.0 ) Soil_lower_ratio(i) = Soil_lower(i)/Soil_lower_stor_max(i)
-          Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_tot(i)/Soil_zone_max(i)*hruarea )
-          Basin_soil_lower_stor_frac = Basin_soil_lower_stor_frac + DBLE( Soil_lower_ratio(i)*perv_area )
-          IF ( Soil_rechr_max(i)>0.0 ) Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + &
-       &       DBLE( Soil_rechr(i)/Soil_rechr_max(i)*perv_area )
-          Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*perv_area )
-          Basin_soil_moist_tot = Basin_soil_moist_tot + DBLE( Soil_moist_tot(i)*hruarea )
-          Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(i)*perv_area )
-        ENDIF
+        Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Soil_moist(i)/Soil_moist_max(i)*perv_area )
+        Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)
+        Soil_lower_stor_max(i) = Soil_moist_max(i) - Soil_rechr_max(i)
+        IF ( Soil_lower_stor_max(i)>0.0 ) Soil_lower_ratio(i) = Soil_lower(i)/Soil_lower_stor_max(i)
+        Basin_sz_stor_frac = Basin_sz_stor_frac + DBLE( Soil_moist_tot(i)/Soil_zone_max(i)*hruarea )
+        Basin_soil_lower_stor_frac = Basin_soil_lower_stor_frac + DBLE( Soil_lower_ratio(i)*perv_area )
+        IF ( Soil_rechr_max(i)>0.0 ) Basin_soil_rechr_stor_frac = Basin_soil_rechr_stor_frac + &
+             DBLE( Soil_rechr(i)/Soil_rechr_max(i)*perv_area )
+        Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(i)*perv_area )
+        Basin_soil_moist_tot = Basin_soil_moist_tot + DBLE( Soil_moist_tot(i)*hruarea )
         ! rsr, 6/12/2014 potential problem for GSFLOW if sum of slow_stor /= gravity_stor_res
         Basin_slstor = Basin_slstor + DBLE( Slow_stor(i)*hruarea )
         Basin_ssstor = Basin_ssstor + DBLE( Ssres_stor(i)*hruarea )
+        Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(i)*perv_area )
         IF ( Pref_flow_thrsh(i)>0.0 ) THEN
           Basin_pref_stor = Basin_pref_stor + DBLE( Pref_flow_stor(i)*hruarea )
           IF ( Pref_flow_max(i)>0.0 ) Basin_pfr_stor_frac = Basin_pfr_stor_frac + &
@@ -717,7 +716,7 @@
       &          Gravity_stor_res(i) = Ssres_stor(ihru)
             Hru_gvr_count(ihru) = Hru_gvr_count(ihru) + 1
             IF ( Hru_gvr_count(ihru)>Max_gvrs ) Max_gvrs = Hru_gvr_count(ihru)
-            IF ( Soil_moist_max(ihru)>0.0 ) Replenish_frac(ihru) = Soil_rechr_max(ihru)/Soil_moist_max(ihru)
+            Replenish_frac(ihru) = Soil_rechr_max(ihru)/Soil_moist_max(ihru)
           ENDIF
         ENDDO
         ALLOCATE ( Hru_gvr_index(Max_gvrs, Nhru) )
@@ -767,7 +766,8 @@
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
      &    Lake_hru_id, Cov_type, Numlake_hrus, Hru_area_dble, gsflow_ag_area
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Transp_on, Potet, Basin_potet
-! WARNING!!! Sroff, Basin_sroff, and Strm_seg_in can be updated
+! WARNING!!! sroff and basin_sroff can be updated due to Dunnian flow
+! WARNING!!! Strm_seg_in can be updated
 ! WARNING!!! if frozen sroff, basin_sroff, hortonian_flow, and basin_hortonian can be updated
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_actet, Hru_actet, &
      &    Ssres_flow, Soil_to_gw, Basin_soil_to_gw, Ssr_to_gw, &
@@ -784,13 +784,13 @@
       USE PRMS_CASCADE, ONLY: Ncascade_hru
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_INTCP, ONLY: Hru_intcpevap
-      USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Dprst_evap_hru, Dprst_seep_hru, Frozen, Hortonian_flow, Basin_hortonian
+      USE PRMS_SRUNOFF, ONLY: Hru_impervevap, Dprst_evap_hru, Dprst_seep_hru, Frozen, Hortonian_flow, Basin_hortonian, Hru_sroffp
       use prms_utils, only: print_date
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MIN, ABS, MAX, SNGL, DBLE
-      EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow
-      EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars
+      EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades
+      EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars, compute_gravflow
 ! Local Variables
       INTEGER :: i, k, update_potet, compute_lateral, j, igvr
       REAL :: dunnianflw, interflow, perv_area, harea
@@ -815,6 +815,7 @@
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             It0_sroff = Sroff
+            It0_hru_sroffp = Hru_sroffp
             It0_hortonian_flow = Hortonian_flow
             It0_strm_seg_in = Strm_seg_in
           ENDIF
@@ -831,6 +832,7 @@
           IF ( PRMS_land_iteration_flag==OFF ) THEN
             ! computed in srunoff
             Sroff = It0_sroff
+            Hru_sroffp = It0_hru_sroffp
             Hortonian_flow = It0_hortonian_flow
             Strm_seg_in = It0_strm_seg_in
           ENDIF
@@ -1079,7 +1081,7 @@
         ELSE
           availh2o = Slow_stor(i) + gvr_maxin
           IF ( compute_lateral==ACTIVE ) THEN
-          IF ( Pref_flow_thrsh(i)>0.0 ) topfr = MAX( 0.0, availh2o-Pref_flow_thrsh(i) )
+            IF ( Pref_flow_thrsh(i)>0.0 ) topfr = MAX( 0.0, availh2o-Pref_flow_thrsh(i) )
             ssresin = gvr_maxin - topfr
             Slow_stor(i) = availh2o - topfr
             ! compute slow contribution to interflow, if any
@@ -1137,13 +1139,47 @@
      &                           Soil_type(i), Soil_moist(i), Soil_rechr(i), pervactet, avail_potet, &
      &                           Snow_free(i), Potet_rechr(i), Potet_lower(i), &
      &                           Potet(i), perv_frac, Soil_saturated(i), i, 0)
+            ! sanity check
+!            IF ( pervactet>avail_potet ) THEN
+!              Soil_moist(i) = Soil_moist(i) + pervactet - avail_potet
+!              pervactet = avail_potet
+!              PRINT *, 'perv_et problem', pervactet, Avail_potet
+!            ENDIF
           ENDIF
         ENDIF
 
+        ! sanity check
+!        IF ( Soil_moist(i)<0.0 ) THEN
+!          IF ( Print_debug>DEBUG_less ) PRINT *, i, Soil_moist(i), ' negative'
+!          IF ( pervactet>=ABS(Soil_moist(i)) ) THEN
+!            pervactet = pervactet + Soil_moist(i)
+!            Soil_moist(i) = 0.0
+!          ENDIF
+!          IF ( Soil_moist(i)<-NEARZERO ) THEN
+!            IF ( Print_debug>DEBUG_less ) PRINT *, 'HRU:', i, ' soil_moist<0.0', Soil_moist(i)
+!          ENDIF
+!          Soil_moist(i) = 0.0
+!        ENDIF
+
         hru_perv_actet(i) = pervactet * perv_frac
-        Hru_actet(i) = hruactet + pervactet*perv_frac
-        IF ( Ag_package==ACTIVE ) gsflow_ag_actet(i) = Hru_actet(i)
+        Hru_actet(i) = hruactet + hru_perv_actet(i)
+        ! sanity check
+!        avail_potet = Potet(i) - Hru_actet(i)
+!        IF ( avail_potet<0.0 ) THEN
+!          IF ( Print_debug>DEBUG_less ) THEN
+!            IF ( avail_potet<-NEARZERO ) PRINT *, 'hru_actet>potet', i, &
+!     &           Nowmonth, Nowday, Hru_actet(i), Potet(i), avail_potet
+!          ENDIF
+!          Hru_actet(i) = Potet(i)
+!          tmp = avail_potet/perv_frac
+!          pervactet = pervactet + tmp
+!          Soil_moist(i) = Soil_moist(i) - tmp
+!          Soil_rechr(i) = Soil_rechr(i) - tmp
+!          IF ( Soil_rechr(i)<0.0 ) Soil_rechr(i) = 0.0
+!          IF ( Soil_moist(i)<0.0 ) Soil_moist(i) = 0.0
+!        ENDIF
         Perv_actet(i) = pervactet
+        IF ( Ag_package==ACTIVE ) gsflow_ag_actet(i) = Hru_actet(i)
 
 ! soil_moist & soil_rechr multiplied by perv_area instead of harea
         Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)
@@ -1248,7 +1284,7 @@
         Basin_slstor = Basin_slstor + DBLE( Slow_stor(i)*harea )
         Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*perv_frac
         Basin_soil_moist_tot = Basin_soil_moist_tot + DBLE( Soil_moist_tot(i)*harea )
-        IF ( Soil_moist_max(i)>0.0 ) Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Soil_moist(i)/Soil_moist_max(i)*perv_area )
+        Basin_cpr_stor_frac = Basin_cpr_stor_frac + DBLE( Soil_moist(i)/Soil_moist_max(i)*perv_area )
         IF ( Pref_flag == ACTIVE ) THEN
           IF ( Pref_flow_thrsh(i)>0.0 ) THEN
             Basin_gvr_stor_frac = Basin_gvr_stor_frac + DBLE( Slow_stor(i)/Pref_flow_thrsh(i)*harea )
@@ -1823,6 +1859,8 @@
       IMPLICIT NONE
 !***********************************************************************
       Basin_recharge = 0.0D0
+      Basin_gvr2sm = 0.0D0
+      Basin_sz_gwin = 0.0D0
       Basin_ssin = 0.0D0
       Basin_sm2gvr = 0.0D0
       Basin_sz2gw = 0.0D0

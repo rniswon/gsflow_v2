@@ -64,9 +64,10 @@
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor(:), Hru_intcpstor(:)
       ! snow
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pkwater_equiv(:)
       DOUBLE PRECISION, SAVE :: Basin_pweqv
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pkwater_equiv(:), Pk_depth(:)
-      REAL, SAVE, ALLOCATABLE :: Snowmelt(:), Snow_evap(:), Snowcov_area(:), Glacrb_melt(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pk_depth(:)
+      REAL, SAVE, ALLOCATABLE :: Snowmelt(:), Snow_evap(:), Snowcov_area(:)
       INTEGER, SAVE, ALLOCATABLE :: Pptmix_nopack(:)
       ! soilzone
       DOUBLE PRECISION, SAVE :: Basin_ssflow, Basin_soil_to_gw
@@ -673,17 +674,8 @@ end module PRMS_IT0_VARS
      &       'Flag indicating that a mixed precipitation event has'// &
      &       ' occurred with no snowpack present on an HRU (1), otherwise (0)', &
      &       'none', Pptmix_nopack)
-        ALLOCATE ( Glacrb_melt(Nhru) )
-        CALL declvar_real('snowcomp', 'glacrb_melt', 'nhru', Nhru, &
-             'Glacier or glacierette basal melt, goes to soil', &
-             'inches/day', Glacrb_melt)
-      ELSE
-        Snowcov_area = 0.0
-        Snow_evap = 0.0
-        Snowmelt = 0.0
-        Pptmix_nopack = 0
-        Glacrb_melt = 0.0
       ENDIF
+
 ! glacier variables
       IF ( Glacier_flag==ACTIVE ) THEN
         ALLOCATE ( Glacier_frac(Nhru) )
@@ -1215,7 +1207,7 @@ end module PRMS_IT0_VARS
       ELSE
         IF ( getparam_real(Soilzone_module, 'soil_rechr_max_frac', Nhru, Soil_rechr_max_frac)/=0 ) &
      &       CALL read_error(2, 'soil_rechr_max_frac')
-        Soil_rechr_max = Soil_rechr_max_frac * Soil_moist_max
+        Soil_rechr_max = Soil_rechr_max_frac*Soil_moist_max
       ENDIF
 
       ierr = 0
@@ -1236,8 +1228,8 @@ end module PRMS_IT0_VARS
      &         CALL read_error(2, 'soil_rechr_init_frac')
           IF ( getparam_real(Soilzone_module, 'ssstor_init_frac', Nssr, Ssres_stor)/=0 ) &
      &         CALL read_error(2, 'ssstor_init_frac')
-          Soil_rechr = Soil_rechr_init_frac * Soil_rechr_max
-          Soil_moist = Soil_moist_init_frac * Soil_moist_max
+          Soil_rechr = Soil_rechr_init_frac*Soil_rechr_max
+          Soil_moist = Soil_moist_init_frac*Soil_moist_max
           Ssres_stor = Ssres_stor*Sat_threshold
         ENDIF
         Slow_stor = Ssres_stor
@@ -1337,6 +1329,7 @@ end module PRMS_IT0_VARS
         IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) &
              DEALLOCATE ( Soil_moist_init_frac, Soil_rechr_init_frac )
       ENDIF
+
       ! check parameters
       Basin_soil_moist = 0.0D0 ! set because these are saved in It0 variables in prms_time
       Basin_ssstor = 0.0D0
@@ -1473,6 +1466,11 @@ end module PRMS_IT0_VARS
       Basin_lakeevap = 0.0D0
       Flow_out = 0.0D0
 
+      Snow_evap = 0.0
+      Snowmelt = 0.0
+      Snowcov_area = 0.0
+      Pptmix_nopack = OFF
+
       IF ( Init_vars_from_file>0 .OR. ierr>0 ) RETURN
 
       Basin_lake_stor = 0.0D0
@@ -1491,7 +1489,7 @@ end module PRMS_IT0_VARS
         Alt_above_ela = 0.0
         Glrette_frac = 0.0
       ENDIF
-      IF ( gwflow_flag==ACTIVE ) Gwres_stor = 0.0D0 ! not needed for GSFLOW without active HRUs and inactive Cells
+      IF ( gwflow_flag==ACTIVE ) Gwres_stor = 0.0D0 ! not needed for GSFLOW unless activeHRU_inactiveCELL_flag = 1
       IF ( Dprst_flag==ACTIVE ) THEN
         Dprst_vol_open = 0.0D0
         Dprst_vol_clos = 0.0D0
@@ -1605,7 +1603,7 @@ end module PRMS_IT0_VARS
      &           Tminf, Pptmix, Newsnow, Prmx, Tmax_allrain_f, Rain_adj, &
      &           Snow_adj, Adjmix_rain, Hru_area, Sum_obs, Tmax_allsnow_f, Ihru)
       USE PRMS_CONSTANTS, ONLY: ACTIVE !, DEBUG_minimum
-      USE PRMS_MODULE, ONLY: Print_debug, forcing_check_flag
+      USE PRMS_MODULE, ONLY: forcing_check_flag !, Print_debug
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       use prms_utils, only: print_date
       IMPLICIT NONE
