@@ -14,17 +14,17 @@ Control File: .\control\Tazlina.control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.1 12/15/2023
+                         Version: 2.3.1 01/16/2024
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  WARNING, control parameter not in Control File: mbInit_flag, set to 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/12/12 11:04:59
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/01/17 17:37:13
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2.1 12/15/2023
+                       Version 5.2.2 01/16/2024
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -67,34 +67,37 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-12-15
+PRMS Computation Order          gsflow_prms         2024-01-16
+
+            Github Commit Hash 114215cca63e4e0f201277553edb92ed7098af6f
+
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
-Basin Definition                basin               2023-01-11
-Common States and Fluxes        climateflow         2023-10-17
-Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2023-10-06
-Timestep Control                prms_time           2022-04-21
-Temp & Precip Distribution      xyz_dist            2022-09-07
+Basin Definition                basin               2023-11-01
+Common States and Fluxes        climateflow         2024-01-16
+Potential Solar Radiation       soltab              2023-11-01
+Time Series Data                obs                 2023-11-01
+Timestep Control                prms_time           2023-11-01
+Temp & Precip Distribution      xyz_dist            2023-11-01
 Solar Radiation Distribution    ccsolrad            2023-11-13
-Transpiration Distribution      transp_tindex       2021-09-07
-Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2023-11-24
-Snow Dynamics                   snowcomp            2023-11-28
-Glacier Dynamics                glacr_melt          2022-09-07
+Transpiration Distribution      transp_tindex       2023-11-01
+Potential Evapotranspiration    potet_jh            2021-08-13
+Canopy Interception             intcp               2024-01-10
+Snow Dynamics                   snowcomp            2024-01-11
+Glacier Dynamics                glacr_melt          2023-11-01
  Parameter: hru_slope declared more than once
  First declared by module: glacr_melt
  Also declared by module: glacr_melt
  Model uses values based on first declare
-Surface Runoff                  srunoff_smidx       2023-11-28
-Soilzone Computations           soilzone            2023-11-02
+Surface Runoff                  srunoff_smidx       2024-01-16
+Soilzone Computations           soilzone            2024-01-10
 Groundwater                     gwflow              2023-11-13
-Streamflow Routing Init         routing             2022-09-07
-Streamflow Routing              muskingum           2023-10-06
-Output Summary                  basin_sum           2022-09-01
+Streamflow Routing Init         routing             2024-01-10
+Streamflow Routing              muskingum           2023-11-01
+Output Summary                  basin_sum           2023-11-01
 Statistics Variables Output     statvar_out         2021-09-08
-Output Summary                  prms_summary        2023-09-13
+Output Summary                  prms_summary        2023-11-01
 WARNING, parameter: poi_type is ignored as it is not used
 WARNING, parameter: stage_coef is ignored as it is not used
 WARNING, parameter: soil_moist_init is ignored as it is not used
@@ -485,9 +488,9 @@ Simulation time period: 1950/10/01 - 2015/09/30
                           Normal completion of GSFLOW
                           ===========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/12/12 11:04:59
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/01/17 17:37:13
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2023/12/12 11:05:05
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/01/17 17:37:19
 
-Execution elapsed time    0 minutes  5.97 seconds
+Execution elapsed time    0 minutes  5.68 seconds
 

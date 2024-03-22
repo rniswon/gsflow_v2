@@ -9,11 +9,11 @@ Executable: ..\..\..\bin\gsflow.exe
 ==========================================================================
 Control File: .\Sagehen_ponds.control
 ==========================================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/12/12 11:01:48
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/01/17 17:27:35
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2.1 12/15/2023
+                       Version 5.2.2 01/16/2024
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -22,7 +22,6 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/12/12 11:01:48
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
-                        Github Commit Hash dcb5350
 
 
 ==========================================================================
@@ -34,33 +33,36 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-12-15
+PRMS Computation Order          gsflow_prms         2024-01-16
+
+            Github Commit Hash 114215cca63e4e0f201277553edb92ed7098af6f
+
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
-Basin Definition                basin               2023-01-11
-Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2023-10-17
-Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2023-10-06
-Timestep Control                prms_time           2022-04-21
-Temperature Distribution        temp_1sta           2022-09-08
-Precipitation Distribution      precip_1sta         2022-09-07
+Basin Definition                basin               2023-11-01
+Cascading Flow                  cascade             2023-11-01
+Common States and Fluxes        climateflow         2024-01-16
+Potential Solar Radiation       soltab              2023-11-01
+Time Series Data                obs                 2023-11-01
+Timestep Control                prms_time           2023-11-01
+Temperature Distribution        temp_1sta           2023-11-01
+Precipitation Distribution      precip_1sta         2023-11-01
 Solar Radiation Distribution    ddsolrad            2023-10-04
-Transpiration Distribution      transp_tindex       2021-09-07
-Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2023-11-24
-Snow Dynamics                   snowcomp            2023-11-28
-Surface Runoff                  srunoff_smidx       2023-11-28
-Soilzone Computations           soilzone            2023-11-02
-Soilzone Computations           soilzone_ag         2023-11-13
+Transpiration Distribution      transp_tindex       2023-11-01
+Potential Evapotranspiration    potet_jh            2021-08-13
+Canopy Interception             intcp               2024-01-10
+Snow Dynamics                   snowcomp            2024-01-11
+Surface Runoff                  srunoff_smidx       2024-01-16
+Soilzone Computations           soilzone            2024-01-10
+Soilzone Computations           soilzone_ag         2024-01-10
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2023-09-01
 GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
-Output Summary                  nhru_summary        2022-09-07
-Output Summary                  basin_summary       2021-11-19
-Output Summary                  nsegment_summary    2022-09-07
+Output Summary                  nhru_summary        2023-11-01
+Output Summary                  basin_summary       2023-11-01
+Output Summary                  nsegment_summary    2023-11-01
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
 ==============================================================
@@ -462,15 +464,15 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/12/12 11:03:54
- Elapsed run time: 2 Minutes, 6.049 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/01/17 17:29:49
+ Elapsed run time: 2 Minutes, 13.907 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
- MF iterations:         11607;  SZ iterations:           11571
- Average MF iterations:  6.25;  Average SZ iterations:    6.23
+ MF iterations:         11509;  SZ iterations:           11487
+ Average MF iterations:  6.20;  Average SZ iterations:    6.19
  Maximum MF iterations:    72;  Maximum SZ iterations:      50
 
-mxsziter reached: 2
+mxsziter reached: 1
 
  Normal termination of simulation
 

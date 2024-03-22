@@ -19,9 +19,12 @@ ngw                   27
 npoigages              6
 ==========================================================================
 
-               Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2.1 12/15/2023
 
+
+               Precipitation-Runoff Modeling System (PRMS)
+                       Version 6.0.0 03/10/2024
+
+--------------------------------------------------------------------
         Process            Available Modules
 --------------------------------------------------------------------
   Basin Definition: basin
@@ -53,15 +56,19 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
+    Github Commit Hash a036995c883ac16cd752bd73b6def0958eae4ae1
+
 
     Active modules listed in the order in which they are called
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-12-15
-Read Control File               read_control_file   2022-10-20
-Read Parameter File             read_parameter_file 2022-01-12
-Read Data File                  read_data_file      2022-06-02
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/03/21 16:01:26
+
+PRMS Computation Order          gsflow_prms         2024-03-10
+Read Control File               read_control_file   2024-03-01
+Read Parameter File             read_parameter_file 2024-03-01
+Read Data File                  read_data_file      2023-06-02
 
 
 ==========================================================================
@@ -88,36 +95,34 @@ runoff 6
  Data File time period: 1950/01/01 00:00:00 to 1999/12/31 00:00:00
 Simulation time period: 1980/01/01 00:00:00 to 1999/12/31 00:00:00
 ==========================================================================
-Basin Definition                basin               2023-01-11
-Common States and Fluxes        climateflow         2023-10-17
-Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2023-10-06
-Timestep Control                prms_time           2022-04-21
+Basin Definition                basin               2024-01-22
+Common States and Fluxes        climateflow         2024-01-28
+Potential Solar Radiation       soltab              2024-01-22
+Time Series Data                obs                 2023-11-01
+Timestep Control                prms_time           2023-11-01
 Time Series Data                dynamic_soil_param  2023-03-16
-Temperature Distribution        climate_hru         2023-08-10
-Precipitation Distribution      climate_hru         2023-08-10
-Solar Radiation Distribution    climate_hru         2023-08-10
-Potential Evapotranspiration    climate_hru         2023-08-10
-Transpiration Distribution      transp_tindex       2021-09-07
-Canopy Interception             intcp               2023-11-24
-Snow Dynamics                   snowcomp            2023-11-28
-Surface Runoff                  srunoff_smidx       2023-11-28
-Soilzone Computations           soilzone            2023-11-02
-Groundwater                     gwflow              2023-11-13
-Streamflow Routing Init         routing             2022-09-07
-Streamflow Routing              muskingum           2023-10-06
-Output Summary                  basin_sum           2022-09-01
-Water Balance Computations      water_balance       2023-11-28
-Output Summary                  nhru_summary        2022-09-07
+Temperature Distribution        climate_hru         2024-01-08
+Precipitation Distribution      climate_hru         2024-01-08
+Solar Radiation Distribution    climate_hru         2024-01-08
+Potential Evapotranspiration    climate_hru         2024-01-08
+Transpiration Distribution      transp_tindex       2023-11-01
+Canopy Interception             intcp               2024-01-10
+Snow Dynamics                   snowcomp            2024-02-28
+Surface Runoff                  srunoff_smidx       2024-03-21
+Soilzone Computations           soilzone            2024-03-21
+Groundwater                     gwflow              2024-01-22
+Streamflow Routing Init         routing             2024-02-09
+Streamflow Routing              muskingum           2023-11-01
+Output Summary                  basin_sum           2024-01-22
+Water Balance Computations      water_balance       2024-02-07
+Output Summary                  nhru_summary        2024-03-13
 Statistics Variables Output     statvar_out         2021-09-08
-Output Summary                  prms_summary        2023-09-13
+Output Summary                  prms_summary        2024-01-15
 ==============================================================
 
 Using Control File: .\control\control
 
-
 Using Parameter File: ./input/params
-
 
 
 Start time: 1980/01/01 00:00:00
@@ -158,5 +163,5 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
  *************************************************************
  Total for run    1110.775  440.221    8.439  693.939   13.445
  *************************************************************
-Execution elapsed time    0 minutes  1.16 seconds
+Execution elapsed time    0 minutes  1.32 seconds
 

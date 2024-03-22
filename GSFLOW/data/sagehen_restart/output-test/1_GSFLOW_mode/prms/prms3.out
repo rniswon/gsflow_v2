@@ -26,9 +26,12 @@ nmonths               12
 ndays                366
 ==========================================================================
 
-               Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2.1 12/15/2023
 
+
+               Precipitation-Runoff Modeling System (PRMS)
+                       Version 6.0.0 03/10/2024
+
+--------------------------------------------------------------------
         Process            Available Modules
 --------------------------------------------------------------------
   Basin Definition: basin
@@ -60,15 +63,19 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
+    Github Commit Hash a036995c883ac16cd752bd73b6def0958eae4ae1
+
 
     Active modules listed in the order in which they are called
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-12-15
-Read Control File               read_control_file   2022-10-20
-Read Parameter File             read_parameter_file 2022-01-12
-Read Data File                  read_data_file      2022-06-02
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/03/21 16:09:04
+
+PRMS Computation Order          gsflow_prms         2024-03-10
+Read Control File               read_control_file   2024-03-01
+Read Parameter File             read_parameter_file 2024-03-01
+Read Data File                  read_data_file      2023-06-02
 
 
 ==========================================================================
@@ -97,26 +104,26 @@ runoff 1
  Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
 Simulation time period: 1983/09/09 00:00:00 to 1983/09/15 00:00:00
 ==========================================================================
-Basin Definition                basin               2023-01-11
-Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2023-10-17
-Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2023-10-06
-Timestep Control                prms_time           2022-04-21
-Temperature Distribution        climate_hru         2023-08-10
-Precipitation Distribution      climate_hru         2023-08-10
-Solar Radiation Distribution    ddsolrad            2023-10-04
-Transpiration Distribution      transp_tindex       2021-09-07
-Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2023-11-24
-Snow Dynamics                   snowcomp            2023-11-28
-Surface Runoff                  srunoff_smidx       2023-11-28
-Soilzone Computations           soilzone            2023-11-02
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
+Basin Definition                basin               2024-01-22
+Cascading Flow                  cascade             2023-11-01
+Common States and Fluxes        climateflow         2024-01-28
+Potential Solar Radiation       soltab              2024-01-22
+Time Series Data                obs                 2023-11-01
+Timestep Control                prms_time           2023-11-01
+Temperature Distribution        climate_hru         2024-01-08
+Precipitation Distribution      climate_hru         2024-01-08
+Solar Radiation Distribution    ddsolrad            2024-02-08
+Transpiration Distribution      transp_tindex       2023-11-01
+Potential Evapotranspiration    potet_jh            2021-08-13
+Canopy Interception             intcp               2024-01-10
+Snow Dynamics                   snowcomp            2024-02-28
+Surface Runoff                  srunoff_smidx       2024-03-21
+Soilzone Computations           soilzone            2024-03-21
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-02-10
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
-GSFLOW Output Budget Summary    gsflow_budget       2023-09-01
-GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
-Output Summary                  subbasin            2022-09-07
+GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
+GSFLOW Output CSV Summary       gsflow_sum          2024-02-14
+Output Summary                  subbasin            2023-11-01
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
 UZF-NWT Package                 gwf2uzf1_NWT        2022-10-18
@@ -124,9 +131,7 @@ SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
 
 Using Control File: .\gsflow.control
 
-
 Using Parameter File: ../input/prms/prms.params
-
 
 
 Start time: 1983/09/09 00:00:00
@@ -137,5 +142,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    0 minutes  1.71 seconds
+Execution elapsed time    0 minutes  2.15 seconds
 

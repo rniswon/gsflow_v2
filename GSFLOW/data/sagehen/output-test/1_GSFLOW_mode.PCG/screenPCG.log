@@ -14,16 +14,19 @@ Control File: .\gsflow.control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.1 12/15/2023
+                         Version: 2.3.0 02/22/2024
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/12/12 11:13:30
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/02/12  9:11:28
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2.1 12/15/2023
+                       Version 5.3.0 02/10/2024
+
+    Github Commit Hash 0d26b8d6740fc0ce1daf69b61fd98270bd0ef386
+
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -37,7 +40,6 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2023/12/12 11:13:30
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash dcb5350
 
         Process            Available Modules
 --------------------------------------------------------------------
@@ -80,30 +82,30 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2023-12-15
+PRMS Computation Order          gsflow_prms         2024-02-10
 Read Control File               read_control_file   2022-10-20
 Read Parameter File             read_parameter_file 2022-01-12
 Read Data File                  read_data_file      2022-06-02
-Basin Definition                basin               2023-01-11
-Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2023-10-17
-Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2023-10-06
-Timestep Control                prms_time           2022-04-21
-Temperature Distribution        temp_1sta           2022-09-08
-Precipitation Distribution      precip_1sta         2022-09-07
-Solar Radiation Distribution    ddsolrad            2023-10-04
-Transpiration Distribution      transp_tindex       2021-09-07
-Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2023-11-24
-Snow Dynamics                   snowcomp            2023-11-28
-Surface Runoff                  srunoff_smidx       2023-11-28
-Soilzone Computations           soilzone            2023-11-02
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
+Basin Definition                basin               2024-01-22
+Cascading Flow                  cascade             2023-11-01
+Common States and Fluxes        climateflow         2024-01-16
+Potential Solar Radiation       soltab              2024-01-22
+Time Series Data                obs                 2024-01-22
+Timestep Control                prms_time           2023-11-01
+Temperature Distribution        temp_1sta           2023-11-01
+Precipitation Distribution      precip_1sta         2023-11-01
+Solar Radiation Distribution    ddsolrad            2024-02-08
+Transpiration Distribution      transp_tindex       2023-11-01
+Potential Evapotranspiration    potet_jh            2021-08-13
+Canopy Interception             intcp               2024-01-10
+Snow Dynamics                   snowcomp            2024-02-08
+Surface Runoff                  srunoff_smidx       2024-02-09
+Soilzone Computations           soilzone            2024-02-07
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-02-10
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2023-09-01
 GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
-Output Summary                  subbasin            2022-09-07
+Output Summary                  subbasin            2023-11-01
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
 ==============================================================
@@ -125,13 +127,11 @@ Steady state simulation successful, used 351 iterations
 
 Using Control File: .\gsflow.control
 
-
 Using Parameter File: ..\input\prms\gsflow.params
-
 
 Writing PRMS Water Budget File: ..\output\prms\sagehen_prms.out
 
- WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
+WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
 
 Percent difference between GVR mapping and active model domain: -0.1110223D-13
 
@@ -310,7 +310,7 @@ Date: 1985/02/01; Stress: 2; Step: 1585; Simulation step: 1585
                   MF iterations: 8; SZ iterations: 8
 
 Date: 1985/03/01; Stress: 2; Step: 1613; Simulation step: 1613
-                  MF iterations: 11; SZ iterations: 11
+                  MF iterations: 12; SZ iterations: 12
 
 Date: 1985/04/01; Stress: 2; Step: 1644; Simulation step: 1644
                   MF iterations: 7; SZ iterations: 7
@@ -346,7 +346,7 @@ Date: 1986/02/01; Stress: 2; Step: 1950; Simulation step: 1950
                   MF iterations: 14; SZ iterations: 14
 
 Date: 1986/03/01; Stress: 2; Step: 1978; Simulation step: 1978
-                  MF iterations: 17; SZ iterations: 17
+                  MF iterations: 16; SZ iterations: 16
 
 Date: 1986/04/01; Stress: 2; Step: 2009; Simulation step: 2009
                   MF iterations: 23; SZ iterations: 23
@@ -727,28 +727,28 @@ Date: 1996/09/01; Stress: 2; Step: 5815; Simulation step: 5815
                   MF iterations: 13; SZ iterations: 13
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2023/12/12 11:28:57
- Elapsed run time: 15 Minutes, 26.061 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/02/12  9:26:43
+ Elapsed run time: 15 Minutes, 15.034 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
- MF iterations:         64664;  SZ iterations:           64595
- Average MF iterations: 11.07;  Average SZ iterations:   11.05
+ MF iterations:         64655;  SZ iterations:           64586
+ Average MF iterations: 11.06;  Average SZ iterations:   11.05
  Maximum MF iterations:    34;  Maximum SZ iterations:      25
 
 mxsziter reached: 15
 
-MF iteration distribution:      0    0    0   39  348  432  813  545  371  430
-                              482  390  352  400  316  179  113  126  118  166
-                              109   69   24    5    2    1    2    2    3    3
+MF iteration distribution:      0    0    0   39  348  433  810  548  371  430
+                              477  397  349  404  315  178  110  127  118  166
+                              108   70   25    4    2    1    2    2    3    3
                                 0    2    1    1    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
 
-SZ computation distribution:    0    0    0   39  348  432  813  545  371  430
-                              482  390  352  400  316  179  113  126  118  166
-                              109   69   24    5   17    0    0    0    0    0
+SZ computation distribution:    0    0    0   39  348  433  810  548  371  430
+                              477  397  349  404  315  178  110  127  118  166
+                              108   70   25    4   17    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
