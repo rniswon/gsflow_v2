@@ -10,7 +10,7 @@
       character(len=*), parameter :: Version_nhru_summary = '2024-03-13'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear, nrows
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nhru_var_type(:), Nhru_var_int(:, :), hru_ids(:), nhm_ids(:)
-      REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :), daily_values(:)
+      REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :), daily_values(:), monthly_values(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Nhru_var_dble(:, :)
       CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2, Output_fmt3, Output_fmtint
       CHARACTER(LEN=48), SAVE :: Output_grid_fmt, Output_grid_fmtint, Output_date_fmt, Output_date_fmt3, Output_fmt3int
@@ -258,10 +258,12 @@
         ENDDO
       ENDIF
       WRITE ( Output_fmt2, 9002 ) '("Date",', Nhru, '(", ",I0) )'
-      ALLOCATE ( Nhru_var_daily(Nhru, NhruOutVars), daily_values(Nhru) )
+      ALLOCATE ( Nhru_var_daily(Nhru, NhruOutVars) )
+      IF ( write_binary_nhru_flag == 2 .AND. Daily_flag ) ALLOCATE( daily_values(Nhru) )
+      IF ( write_binary_nhru_flag == 2 .AND. Monthly_flag == ACTIVE ) ALLOCATE( monthly_values(Nhru) )
       Nhru_var_daily = 0.0
       file_suffix = '.csv'
-      IF ( write_binary_nhru_flag == ACTIVE ) file_suffix = '.bin'
+      IF ( write_binary_nhru_flag > 0 ) file_suffix = '.bin'
       DO jj = 1, NhruOutVars
         IF ( Daily_flag==ACTIVE ) THEN
           fileName = NhruOutBaseFileName(:numchars(NhruOutBaseFileName))//NhruOutVar_names(jj)(:Nc_vars(jj))//file_suffix
@@ -279,12 +281,17 @@
             CALL PRMS_open_output_file(Yearlyunit(jj), fileName, 'xxx', write_binary_nhru_flag, ios)
             IF ( ios/=0 ) CALL error_stop('in nhru_summary, yearly', ERROR_open_out)
           ENDIF
-          CALL write_header_date( Yearlyunit(jj) )
+          IF ( write_binary_nhru_flag /= 2 ) CALL write_header_date( Yearlyunit(jj) )
         ENDIF
         IF ( Monthly_flag==ACTIVE ) THEN
           IF ( NhruOut_freq==MEAN_MONTHLY ) THEN
-            fileName = NhruOutBaseFileName(:numchars(NhruOutBaseFileName))//NhruOutVar_names(jj)(:Nc_vars(jj))// &
-     &                 '_meanmonthly.csv'
+            IF ( write_binary_nhru_flag == 0 ) THEN
+              fileName = NhruOutBaseFileName(:numchars(NhruOutBaseFileName))//NhruOutVar_names(jj)(:Nc_vars(jj))// &
+     &                   '_meanmonthly.csv'
+            ELSE
+              fileName = NhruOutBaseFileName(:numchars(NhruOutBaseFileName))//NhruOutVar_names(jj)(:Nc_vars(jj))// &
+     &                   '_meanmonthly.bin'
+            ENDIF
             CALL PRMS_open_output_file(Monthlyunit(jj), fileName, 'xxx', write_binary_nhru_flag, ios)
             IF ( ios/=0 ) CALL error_stop('in nhru_summary, mean monthly', ERROR_open_out)
           ELSE
@@ -292,7 +299,7 @@
             CALL PRMS_open_output_file(Monthlyunit(jj), fileName, 'xxx', write_binary_nhru_flag, ios)
             IF ( ios/=0 ) CALL error_stop('in nhru_summary, monthly', ERROR_open_out)
           ENDIF
-          CALL write_header_date( Monthlyunit(jj) )
+          IF ( write_binary_nhru_flag /= 2 ) CALL write_header_date( Monthlyunit(jj) )
         ENDIF
       ENDDO
 
@@ -572,16 +579,18 @@
 ! Write CBH monthly values
 !*****************************
       SUBROUTINE write_cbh_monthly_values( ivar )
-      USE PRMS_CONSTANTS, ONLY: OFF, INT_TYPE
-      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday
+      USE PRMS_CONSTANTS, ONLY: OFF, INT_TYPE, ACTIVE
+      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, Timestep, Number_timesteps, GSFLOW_flag
+      USE GSFMODFLOW, ONLY: KSTP, KPER
+      USE GWFBASMODULE, ONLY: TOTIM, PERTIM
       USE PRMS_NHRU_SUMMARY, ONLY: NhruOutNcol, write_binary_nhru_flag, Nhru_var_type, nrows, &
           Nhru_var_int, Nhru_var_monthly, Output_fmtint, Output_fmt, Output_date_fmt, &
-          Output_grid_fmtint, Output_grid_fmt, Monthlyunit
+          Output_grid_fmtint, Output_grid_fmt, Monthlyunit, monthly_values, bin_var_names
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: ivar
 ! Functions
-      INTRINSIC :: INT
+      INTRINSIC :: INT, SNGL
 ! Local Variables
       INTEGER :: i, j, jj, first, last
 !*******************************************************************************
@@ -590,7 +599,18 @@
           IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Monthlyunit(ivar), Output_fmt) Nowyear, Nowmonth, Nowday, (Nhru_var_monthly(j,ivar), j=1,Nhru)
           ELSE
-            WRITE ( Monthlyunit(ivar) ) Nowyear, Nowmonth, Nowday, (Nhru_var_monthly(j,ivar), j=1,Nhru)
+            monthly_values = SNGL( Nhru_var_monthly(1,ivar) )
+            IF ( write_binary_nhru_flag == 1 ) THEN
+              WRITE ( Monthlyunit(ivar) ) Nowyear, Nowmonth, Nowday, (Nhru_var_monthly(j,ivar), j=1,Nhru)
+            ELSE
+              !Record 1: KSTP,KPER,PERTIM,TOTIM,TEXT,NHRU,1,1
+              IF ( GSFLOW_flag == ACTIVE ) THEN
+                WRITE ( Monthlyunit(ivar) ) KSTP,KPER,PERTIM,TOTIM,bin_var_names(ivar),Nhru,1,1
+              ELSE
+                WRITE ( Monthlyunit(ivar) ) Timestep,1,1.0,Number_timesteps,bin_var_names(ivar),Nhru,1,1
+              ENDIF
+              WRITE ( Monthlyunit(ivar) ) monthly_values
+            ENDIF
           ENDIF
         ELSE
           IF ( write_binary_nhru_flag == OFF ) THEN
@@ -643,7 +663,7 @@
       USE PRMS_CONSTANTS, ONLY: OFF, INT_TYPE, ACTIVE
       USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, Timestep, Number_timesteps, GSFLOW_flag
       USE GSFMODFLOW, ONLY: KSTP, KPER
-      USE GWFBASMODULE, ONLY: TOTIM
+      USE GWFBASMODULE, ONLY: TOTIM, PERTIM
       USE PRMS_NHRU_SUMMARY, ONLY: NhruOutNcol, write_binary_nhru_flag, Nhru_var_type, &
           Nhru_var_int, Nhru_var_daily, Output_date_fmt, Output_fmt, Output_fmtint, &
           Output_grid_fmtint, Output_grid_fmt, Dailyunit, nrows, daily_values, bin_var_names
@@ -665,9 +685,9 @@
             ELSE
               !Record 1: KSTP,KPER,PERTIM,TOTIM,TEXT,NHRU,1,1
               IF ( GSFLOW_flag == ACTIVE ) THEN
-                WRITE ( Dailyunit(ivar) ) KSTP,KPER,PERTIM,TOTIM,bin_var_names(ivar), Nhru,1,1
+                WRITE ( Dailyunit(ivar) ) KSTP,KPER,PERTIM,TOTIM,bin_var_names(ivar),Nhru,1,1
               ELSE
-                WRITE ( Dailyunit(ivar) ) Timestep,1,1.0,Number_timesteps,bin_var_names(ivar), Nhru,1,1
+                WRITE ( Dailyunit(ivar) ) Timestep,1,1.0,Number_timesteps,bin_var_names(ivar),Nhru,1,1
               ENDIF
               WRITE ( Dailyunit(ivar) ) daily_values
             ENDIF
