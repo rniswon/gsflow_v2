@@ -8,7 +8,7 @@
       ! Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'water_use_read'
-      character(len=*), parameter :: Version_water_use_read = '2022-09-07'
+      character(len=*), parameter :: Version_water_use_read = '2023-11-01'
 
       ! transfer type
       integer, parameter :: STREAM = 1
@@ -80,7 +80,7 @@
       ! Types
       ! (1) stream segments; (2) groundwater reservoirs; (3) surface-depression storage;
       ! (4) external locations; (5) lakes; (6) capillary reservoir of the soil zone;
-      ! (7) internal consumptive-use locations; and (8) plant canopy.
+      ! (7) internal consumptive-use locations; and (8) plant canopy. 
 !***********************************************************************
       water_use_read = 0
 
@@ -124,7 +124,7 @@
           Total_segment_gain = 0.0D0
           Segment_gain = 0.0
         ENDIF
-
+          
         IF ( Lake_transferON_OFF==ACTIVE ) THEN
           CALL read_event(lake_unit, LAKE, lake_next_year, lake_next_month, lake_next_day)
           Total_lake_transfer = 0.0D0
@@ -464,7 +464,7 @@
         CALL PRMS_open_module_file(Outunit, 'water_use.out')
         WRITE ( Outunit, 10 ) 'Simulation Start Date:', year, month, day, '   End Date:', &
      &                         End_year, End_month, End_day
-10      FORMAT ( 'Water Use Summary File', /, 2(A, I5, 2('/',I2.2)), / )
+10      FORMAT ( 'Water Use Summary File', /, 2(A, I5, 2('/',I2.2)), / ) 
 
         istop = 0
         IF ( Segment_transferON_OFF==ACTIVE ) THEN ! type STREAM
@@ -601,7 +601,7 @@
 ! Arguments
       INTEGER, INTENT(IN) :: Iunit, Src_type
       INTEGER, INTENT (INOUT) :: Next_yr, Next_mo, Next_day
-! Funcions
+! Functions
       EXTERNAL :: check_event, set_transfers
 ! Local Variables
       INTEGER src_id, dest_type, dest_id, keep_reading, ignore

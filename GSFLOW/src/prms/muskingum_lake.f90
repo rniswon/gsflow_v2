@@ -6,7 +6,9 @@
 !
 ! gwflow goes to GWR instead of to the lake unless specified as
 ! going to stream segment associated with the lake, which would be a
-! problem
+! problem, thus gw_upslope usually goes to GWR under the lake,
+! but is included in strm_seg_in if gwflow is associated with a stream
+! segment, set in gwflow, 06/15/2009
 !
 ! nlake_hrus set to nlake for version 5.0.0, nlake_hrus to be added in 5.0.1
 ! in future this module may be used for muskingum only, so would need to
@@ -97,7 +99,7 @@
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       character(len=*), parameter :: MODDESC = 'Streamflow & Lake Routing'
       character(len=14), parameter :: MODNAME = 'muskingum_lake'
-      character(len=*), parameter :: Version_muskingum_lake = '2022-10-24'
+      character(len=*), parameter :: Version_muskingum_lake = '2024-01-1'
       INTEGER, SAVE :: Obs_flag, Linear_flag, Weir_flag, Gate_flag, Puls_flag
       INTEGER, SAVE :: Secondoutflow_flag
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
@@ -602,7 +604,7 @@
       INTEGER FUNCTION muskingum_lake_init()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS2CMS_CONV, DNEARZERO, LAKE, ERROR_dim, CASCADE_OFF, CASCADE_HRU_SEGMENT
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nsegment, Nhru, Nratetbl, Nlake, Init_vars_from_file, Cascade_flag, Inputerror_flag
+      USE PRMS_MODULE, ONLY: Nsegment, Nhru, Nratetbl, Nlake, Nobs, Init_vars_from_file, Cascade_flag, Inputerror_flag
       USE PRMS_MUSKINGUM_LAKE
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_route_order, Gwr_type, &
      &    Lake_hru_id, Weir_gate_flag, Lake_type, Puls_lin_flag
@@ -712,7 +714,7 @@
         IF ( getparam_real(MODNAME, 'tbl_gate', Ngate, Tbl_gate)/=0 ) CALL read_error(2, 'tbl_gate')
         IF ( getparam_int(MODNAME, 'ratetbl_lake', Nratetbl, Ratetbl_lake)/=0 ) CALL read_error(2, 'ratetbl_lake')
         IF ( Gate_flag==1 ) THEN
-          IF ( getparam_int(MODNAME, 'lake_out2', Nlake, Lake_out2)/=0 ) CALL read_error(2, 'lake_out2')
+          IF ( getparam_int(MODNAME, 'lake_out2', Nlake, Lake_out2)/=0  ) CALL read_error(2, 'lake_out2')
           DO j = 1, Nlake
             IF ( Lake_out2(j)==1 ) Secondoutflow_flag = ACTIVE
           ENDDO
@@ -826,8 +828,8 @@
 !            ENDIF
 !          ENDIF
         ELSEIF ( Lake_type(j)==6 ) THEN
-          IF ( Obsout_lake(j)==0 ) THEN
-            PRINT *, 'ERROR, obsout_lake value = 0 for lake:', j, Obsout_lake(j)
+          IF ( Obsout_lake(j)==0 .OR. Obsout_lake(j)>Nobs ) THEN
+            PRINT *, 'ERROR, obsout_lake value = 0 or > nobs for lake:', j, Obsout_lake(j)
             ierr = 1
           ENDIF
         ENDIF
@@ -877,7 +879,7 @@
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_WATER_USE, ONLY: Lake_transfer, Lake_gain
       USE PRMS_ROUTING, ONLY: Use_transfer_segment, Segment_delta_flow, Basin_segment_storage, &
-     &    Obsin_segment, Segment_order, Tosegment, C0, C1, C2, Ts, Ts_i, Obsout_segment, &
+     &    Obsin_segment, Segment_order, Tosegment, C0, C1, C2, Ts, Ts_i, Obsout_segment, special_seg_type_flag, &
      &    Flow_to_ocean, Flow_to_great_lakes, Flow_out_region, Flow_out_NHM, Segment_type, Flow_terminus, &
      &    Flow_to_lakes, Flow_replacement, Flow_in_region, Flow_in_nation, Flow_headwater, Flow_in_great_lakes
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
@@ -1082,17 +1084,19 @@
 
       Basin_segment_storage = 0.0D0
       Flow_out = 0.0D0
-      Flow_to_lakes = 0.0D0
-      Flow_to_ocean = 0.0D0
-      Flow_to_great_lakes = 0.0D0
-      Flow_out_region = 0.0D0
-      Flow_out_NHM = 0.0D0
-      Flow_in_region = 0.0D0
-      Flow_terminus = 0.0D0
-      Flow_in_nation = 0.0D0
-      Flow_headwater = 0.0D0
-      Flow_in_great_lakes = 0.0D0
-      Flow_replacement = 0.0D0
+      IF ( special_seg_type_flag == ACTIVE ) THEN
+        Flow_to_lakes = 0.0D0
+        Flow_to_ocean = 0.0D0
+        Flow_to_great_lakes = 0.0D0
+        Flow_out_region = 0.0D0
+        Flow_out_NHM = 0.0D0
+        Flow_in_region = 0.0D0
+        Flow_terminus = 0.0D0
+        Flow_in_nation = 0.0D0
+        Flow_headwater = 0.0D0
+        Flow_in_great_lakes = 0.0D0
+        Flow_replacement = 0.0D0
+      ENDIF
       ! add water balance check
       DO i = 1, Nsegment
         segtype = Segment_type(i)
@@ -1102,31 +1106,33 @@
         Seg_upstream_inflow(i) = Currinsum(i) * ONE_24TH
 ! Flow_out is the total flow out of the basin, which allows for multiple outlets
 ! includes closed basins (tosegment=0)
-        IF ( segtype==1 ) THEN
-          Flow_headwater = Flow_headwater + segout
-        ELSEIF ( segtype==2 ) THEN
-          Flow_to_lakes = Flow_to_lakes + segout
-          lakeid = Lake_segment_id(i)
-          Lake_outcms(lakeid) = Lake_outcfs(lakeid)*CFS2CMS_CONV
-          Basin_lake_stor = Basin_lake_stor + Lake_vol(Lakeid)*12.0D0
-        ELSEIF ( segtype==3 ) THEN
-          Flow_replacement = Flow_replacement + segout
-        ELSEIF ( segtype==4 ) THEN
-          Flow_in_nation = Flow_in_nation + segout
-        ELSEIF ( segtype==5 ) THEN
-          Flow_out_NHM = Flow_out_NHM + segout
-        ELSEIF ( segtype==6 ) THEN
-          Flow_in_region = Flow_in_region + segout
-        ELSEIF ( segtype==7 ) THEN
-          Flow_out_region = Flow_out_region + segout
-        ELSEIF ( segtype==8 ) THEN
-          Flow_to_ocean = Flow_to_ocean + segout
-        ELSEIF ( segtype==9 ) THEN
-          Flow_terminus = Flow_terminus + segout
-        ELSEIF ( segtype==10 ) THEN
-          Flow_in_great_lakes = Flow_in_great_lakes + segout
-        ELSEIF ( segtype==11 ) THEN
-          Flow_to_great_lakes = Flow_to_great_lakes + segout
+        IF ( special_seg_type_flag == ACTIVE ) THEN
+          IF ( segtype==1 ) THEN
+            Flow_headwater = Flow_headwater + segout
+          ELSEIF ( segtype==2 ) THEN
+            Flow_to_lakes = Flow_to_lakes + segout
+            lakeid = Lake_segment_id(i)
+            Lake_outcms(lakeid) = Lake_outcfs(lakeid)*CFS2CMS_CONV
+            Basin_lake_stor = Basin_lake_stor + Lake_vol(Lakeid)*12.0D0
+          ELSEIF ( segtype==3 ) THEN
+            Flow_replacement = Flow_replacement + segout
+          ELSEIF ( segtype==4 ) THEN
+            Flow_in_nation = Flow_in_nation + segout
+          ELSEIF ( segtype==5 ) THEN
+            Flow_out_NHM = Flow_out_NHM + segout
+          ELSEIF ( segtype==6 ) THEN
+            Flow_in_region = Flow_in_region + segout
+          ELSEIF ( segtype==7 ) THEN
+            Flow_out_region = Flow_out_region + segout
+          ELSEIF ( segtype==8 ) THEN
+            Flow_to_ocean = Flow_to_ocean + segout
+          ELSEIF ( segtype==9 ) THEN
+            Flow_terminus = Flow_terminus + segout
+          ELSEIF ( segtype==10 ) THEN
+            Flow_in_great_lakes = Flow_in_great_lakes + segout
+          ELSEIF ( segtype==11 ) THEN
+            Flow_to_great_lakes = Flow_to_great_lakes + segout
+          ENDIF
         ENDIF
         IF ( Tosegment(i)==OUTFLOW_SEGMENT ) Flow_out = Flow_out + segout
         Segment_delta_flow(i) = Segment_delta_flow(i) + Seg_inflow(i) - segout
@@ -1139,7 +1145,7 @@
       Basin_cfs = Flow_out
       Basin_stflow_out = Basin_cfs / area_fac
       Basin_cms = Basin_cfs*CFS2CMS_CONV
-      IF ( Glacier_flag==1 ) THEN
+      IF ( Glacier_flag==ACTIVE ) THEN
         Basin_stflow_in = Basin_stflow_in + Basin_gl_top_melt
         Basin_gl_ice_cfs = Basin_gl_ice_melt*area_fac
         Basin_gl_cfs = Basin_gl_top_melt*area_fac

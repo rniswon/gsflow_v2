@@ -7,7 +7,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Cascading Flow'
       character(len=*), parameter :: MODNAME = 'cascade'
-      character(len=*), parameter :: Version_cascade = '2021-11-19'
+      character(len=*), parameter :: Version_cascade = '2023-11-01'
       INTEGER, SAVE :: MSGUNT
       INTEGER, SAVE :: Iorder, Igworder, Ndown
 !   Computed Variables
@@ -209,7 +209,7 @@
       cascinit = 0
 
       IF ( Cascade_flag==CASCADE_HRU_SEGMENT ) THEN
-        Cascade_tol = 5.0
+        Cascade_tol = 0.0
         Cascade_flg = 1
         Circle_switch = 0
       ELSE
@@ -265,7 +265,7 @@
           ENDDO
         ENDIF
         IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
-          WRITE ( MSGUNT, 9002 )
+          WRITE ( MSGUNT, 9002 ) 
           k = 0
           DO ii = 1, Active_gwrs
             i = Gwr_route_order(ii)

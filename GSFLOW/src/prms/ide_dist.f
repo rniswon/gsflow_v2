@@ -15,7 +15,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'ide_dist'
-      character(len=*), parameter :: Version_ide_dist = '2022-09-07'
+      character(len=*), parameter :: Version_ide_dist = '2023-11-01'
       INTEGER, SAVE :: Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Dalr
@@ -445,9 +445,9 @@
 ! Arguments
       REAL, INTENT(IN) :: Temp_wght_dist, Temp_wght_elev
 ! Local Variables
-      INTEGER n, nn, itype
-      REAL x, y, z, x1, tmax_hru, tmin_hru
-      REAL centroid_x, centroid_y, dat_dist, dat_elev
+      INTEGER :: n, nn, itype
+      REAL :: x, y, z, x1, tmax_hru, tmin_hru
+      REAL :: centroid_x, centroid_y, dat_dist, dat_elev
 !***********************************************************************
       ide_temp_run = 0
 

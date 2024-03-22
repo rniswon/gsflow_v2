@@ -1,4 +1,4 @@
-! utils_prms.f90 2022-06-02
+! utils_prms.f90 2024-01-11
 
 submodule(prms_utils) sm_utils_prms
 
@@ -90,74 +90,6 @@ contains
     end if
     backspace Iunit
   end subroutine find_current_file_time
-
-!***********************************************************************
-!   Read CBH File to line before data starts
-!***********************************************************************
-  module subroutine find_cbh_header_end(Iunit, Fname, Paramname, Iret)
-    use PRMS_CONSTANTS, only: DEBUG_less
-    use PRMS_MODULE, only: Nhru, Orad_flag, Print_debug
-    implicit none
-    ! Argument
-    integer, intent(OUT) :: Iunit
-    integer, intent(INOUT) :: Iret
-    character(LEN=*), intent(IN) :: Fname, Paramname
-    ! Functions
-    intrinsic :: trim
-    ! Local Variables
-    integer :: i, ios, dim
-    character(LEN=4) :: dum
-    !***********************************************************************
-    if (Iret /= 2) Iret = 0
-    Iunit = get_ftnunit(7777)
-    open (Iunit, FILE=trim(Fname), STATUS='OLD', IOSTAT=ios)
-    if (ios /= 0) then
-      if (Iret == 2) then ! this signals climate_hru to ignore the Humidity CBH file, could add other files
-        Iret = 0
-        if (Print_debug > DEBUG_less) &
-   &         write (*, '(/,A,/,A,/,A)') 'WARNING, optional CBH file not found, will use associated parameter values'
-      else
-        write (*, '(/,A,/,A,/,A)') 'ERROR reading file:', Fname, 'check to be sure the input file exists'
-        Iret = 1
-      end if
-    else
-      ! read to line before data starts in each file
-      i = 0
-      do while (i == 0)
-        read (Iunit, FMT='(A4)', IOSTAT=ios) dum
-        if (ios /= 0) then
-          write (*, '(/,A,/,A,/,A)') 'ERROR reading file:', Fname, 'check to be sure the input file is in correct format'
-          Iret = 1
-          exit
-        elseif (dum == '####') then
-          backspace Iunit
-          backspace Iunit
-          if (Orad_flag == 1 .and. Paramname(:5) == 'swrad') backspace Iunit ! backspace again as swrad CBH file contains orad as last column
-          read (Iunit, *, IOSTAT=ios) dum, dim
-          if (ios /= 0) then
-            write (*, '(/,A,/,A,/,A)') 'ERROR reading file:', Fname, 'check to be sure dimension line is in correct format'
-            Iret = 1
-            exit
-          end if
-          if (dim /= Nhru) then
-            print '(/,2(A,I0))', '***CBH file dimension incorrect*** nhru= ', Nhru, ' CBH dimension= ', dim, ' File: '//Fname
-            print *, 'ERROR: update Control File with correct CBH files'
-            Iret = 1
-            exit
-          end if
-          read (Iunit, FMT='(A4)', IOSTAT=ios) dum
-          if (ios /= 0) then
-            write (*, '(/,A,/,A,/)') 'ERROR reading file:', Fname
-            Iret = 1
-            exit
-          end if
-          if (Orad_flag == 1 .and. Paramname(:5) == 'swrad') read (Iunit, FMT='(A4)') dum ! read again as swrad CBH file contains orad as last column
-          i = 1
-        end if
-      end do
-    end if
-
-    end subroutine find_cbh_header_end
 
 !***********************************************************************
 ! Read file to line before data starts
