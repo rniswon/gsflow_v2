@@ -1605,7 +1605,7 @@
       USE GLOBAL, ONLY: IUNIT, ISSFLG 
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open
       USE PRMS_IT0_VARS, ONLY: It0_dprst_vol_open
-      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres
+      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres_dble
       USE GWFBASMODULE, ONLY: TOTIM
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
@@ -1711,10 +1711,10 @@
       IF ( ISSFLG(kper) == 0 ) THEN
         do i = 1, NUMIRRPOND
           ipond = IRRPONDVAR(i)  !these are hru ids for ponds
-          PONDSTOROLD(i) = SNGL(It0_dprst_vol_open(ipond))
-     +                       /MFQ_to_inch_acres
-          PONDSTORNEW(i) = SNGL(Dprst_vol_open(ipond))
-     +                       /MFQ_to_inch_acres
+          PONDSTOROLD(i) = SNGL(It0_dprst_vol_open(ipond)
+     +                          /MFQ_to_inch_acres_dble )
+          PONDSTORNEW(i) = SNGL( Dprst_vol_open(ipond)
+     +                           /MFQ_to_inch_acres_dble )
         end do
       END IF
 !
@@ -2487,6 +2487,8 @@
       INTEGER, INTENT(IN) :: KKPER, KKSTP, KKITER, Iunitnwt
       INTEGER, INTENT(INOUT) :: agconverge
       !
+      INTRINSIC :: DBLE
+      !
       ! VARIABLES:
       ! - -----------------------------------------------------------------
       INTEGER :: L, I, J, ISTSG, ICOUNT, IRR, ICC, IC, IR, IL, IJ !, ID
@@ -2736,7 +2738,7 @@
       !
         iseg = int(POND(3,L))
         IF ( iseg > 0 .AND. FLOWTHROUGH_POND(L) == 1 ) THEN
-          SEG(2,iseg) = dzero
+          SEG(2,iseg) = szero
         END IF
       END DO
       !
@@ -2783,7 +2785,7 @@
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE PRMS_FLOWVARS, ONLY: Dprst_vol_open, Dprst_total_open_in,
      +    Dprst_total_open_out
-      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres_dble, MFQ_to_inch_acres
+      USE GSFMODFLOW, ONLY: MFQ_to_inch_acres_dble
       IMPLICIT NONE
       ! ARGUMENTS:
       ! - -----------------------------------------------------------------
@@ -2909,9 +2911,14 @@
       IF (IAUXSV .EQ. 0) NAUXWELL = 0
       !
       !2 - ----IF CELL - BY - CELL FLOWS WILL BE SAVED AS A LIST, WRITE HEADER.
-      IF (IBD5 .EQ. 2) THEN
+      IF (IBD5 .GT. 0) THEN
+        IF ( ICBSUP == 0 ) THEN
          CALL UBDSV4(KKSTP, KKPER, TEXT1, NAUXWELL, WELAUX, IWELLCBU,  
      +    NCOL,NROW, NLAY, NWELLS, IOUT, DELT, PERTIM, TOTIM, IBOUND)
+        ELSE
+          CALL UBDSV4(KKSTP, KKPER, TEXT9, NAUXWELL, WELAUX, IWELLCBU,  
+     +    NCOL,NROW, NLAY, NWELLS, IOUT, DELT, PERTIM, TOTIM, IBOUND)
+        END IF
       END IF
       !
       !5 - -----CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
@@ -2927,7 +2934,7 @@
          end if
          !
          !7 - -----IF THE CELL IS NO - FLOW OR CONSTANT HEAD, IGNORE IT.
-         !
+         ! - ------CHECK IF PUMPING IS NEGATIVE AND REDUCE FOR DRYING CONDITIONS.
          !
          IF (IBOUND(IC, IR, IL) > 0) THEN
             !
@@ -2983,6 +2990,9 @@
             WRITE (IUNITRAMP, 500) IL, IR, IC, QSAVE, Q, hh, bbot
             iw1 = iw1 + 1
          END IF
+         !
+         !11A - ----ADD FLOW RATE TO BUFFER.
+         BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + SNGL( QQ )
          !
          !11D-----FLOW RATE IS ALWAYS NEGATIVE(DISCHARGE) ADD IT TO RATOUT.
          RATOUT = RATOUT - QQ
@@ -3102,32 +3112,37 @@
       !
       IF (iw1 .GT. 1) WRITE (IUNITRAMP, *)
       !
-C
-C------IF CELL-BY-CELL FLOWS WILL BE SAVED AS A 3-D ARRAY,
-C------CALL UBUDSV TO SAVE THEM.
-      IF (IBD5.EQ.1) THEN
-        DO L = 1, NWELLSTEMP
-          IL = INT( WELL(1, L) )
-          IR = INT( WELL(2, L) )
-          IC = INT( WELL(3, L) )
-          IF ( IBOUND(ic,ir,il) > 0 ) THEN
-              BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + WELL(NWELVL, L)
+      ! zero buff array
+      DO 60 IL = 1, NLAY
+      DO 60 IR = 1, NROW
+      DO 60 IC = 1, NCOL
+      BUFF(IC, IR, IL) = SZERO
+60    CONTINUE
+      !
+      ! set sup values to buff
+      DO L = 1, NWELLSTEMP
+        IL = INT( WELL(1, L) )
+        IR = INT( WELL(2, L) )
+        IC = INT( WELL(3, L) )
+        IF ( IBOUND(ic,ir,il) > 0 ) THEN
+          IF ( ICBSUP == 0 ) THEN
+            BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + WELL(4, L)
+          ELSE
+            DO I = 1, NUMSEGS(L)
+              J = DIVERSIONSEG(I, L)
+              BUFF(IC, IR, IL) = BUFF(IC, IR, IL) + SUPSEG(J)
+            END DO
           END IF
-        END DO
-        CALL UBUDSV(KKSTP,KKPER,TEXT1,IWELLCBU,BUFF,NCOL,NROW,
-     1                          NLAY,IOUT)
-      END IF
+        END IF
+      END DO
       !
       !14 - -----IF SUP PUMPING WILL BE SAVED AS COMPACT FORMAT,
       ! - ------CALL UBUDSVB TO SAVE THEM.
       
-      IF (IBD5.EQ.2) THEN
+      IF (IBD5.GT.0) THEN
         DO L = 1, NWELLSTEMP
-          IR = INT( WELL(2, L) )
-          IC = INT( WELL(3, L) )
-          IL = INT( WELL(1, L) )
           IF ( ICBSUP == 0 ) THEN
-            Q = WELL(NWELVL, L)
+            Q = WELL(4, L)
           ELSE 
             Q = szero
             DO I = 1, NUMSEGS(L)
@@ -3206,9 +3221,9 @@ C------CALL UBUDSV TO SAVE THEM.
      +                    MFQ_to_inch_acres_dble
           DELOUT = DELOUT + Dprst_total_open_out(ipond)/
      +                      MFQ_to_inch_acres_dble 
-          PONDSTORNEW(L) = SNGL( Dprst_vol_open(ipond))/
-     +                           MFQ_to_inch_acres
-          DELSTOR = DELSTOR + DBLE(PONDSTORNEW(L) - PONDSTOROLD(L))
+          PONDSTORNEW(L) = SNGL( Dprst_vol_open(ipond)/
+     +                           MFQ_to_inch_acres_dble )
+          DELSTOR = DELSTOR + DBLE( PONDSTORNEW(L) - PONDSTOROLD(L) )
         END DO  
       END IF
       DELIN = DELIN - RIN
@@ -3372,7 +3387,7 @@ C------CALL UBUDSV TO SAVE THEM.
         AETITERSW(ISEG) = SNGL(aettotal)
         if ( kiter == 2 ) then
           SUPACT(iseg) = SNGL(factor)
-          SUPACTOLD(ISEG) = dzero
+          SUPACTOLD(ISEG) = szero
         else
           SUPACTOLD(ISEG) = DVRSFLW(iseg)
           SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
@@ -3428,7 +3443,7 @@ C------CALL UBUDSV TO SAVE THEM.
 !      double precision :: tot1,tot2,tot3,tot4,tot5
       integer :: k, iseg, hru_id, i, icell, irow, icol
       external :: set_factor
-      double precision :: set_factor !, etdif
+      double precision :: set_factor, etdif
       INTRINSIC :: ABS
 ! --------------------------------------------------
 !
@@ -3491,7 +3506,7 @@ C------CALL UBUDSV TO SAVE THEM.
         AETITERSW(ISEG) = SNGL(aettotal)
         if ( kiter <= 2 ) then
           SUPACT(iseg) = SNGL(factor)
-          SUPACTOLD(ISEG) = dzero
+          SUPACTOLD(ISEG) = szero
         else
           SUPACTOLD(ISEG) = DVRSFLW(iseg)
           SUPACT(iseg) = SUPACT(iseg) + 
@@ -3535,7 +3550,7 @@ C------CALL UBUDSV TO SAVE THEM.
       USE PRMS_IT0_VARS, ONLY: It0_dprst_vol_open
 !     +    , Dprst_total_open_in, Dprst_total_open_out
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
-     +                      MFQ_to_inch_acres
+     +                      MFQ_to_inch_acres_dble
       USE GLOBAL, ONLY: ISSFLG
 !      USE GWFSFRMODULE, ONLY: DVRSFLW
       IMPLICIT NONE
@@ -3556,10 +3571,10 @@ C------CALL UBUDSV TO SAVE THEM.
 !     check if there are active irrigation ponds for this stress period.
 !
       if ( NUMIRRPONDSP == 0 ) THEN
-          PONDFLOW = SZERO
-          PETPOND = SZERO
-          PONDFLOWOLD = SZERO
-          AETITERPOND = SZERO
+          PONDFLOW = szero
+          PETPOND = szero
+          PONDFLOWOLD = szero
+          AETITERPOND = szero
           return
       end if
       !
@@ -3587,9 +3602,9 @@ C------CALL UBUDSV TO SAVE THEM.
         end do
         ! convert PRMS ET deficit to MODFLOW flow
         aetold = AETITERPOND(i)
-        PETPOND(i) = SNGL(pettotal)
-        sup = DBLE(PONDFLOW(i))
-        supold = DBLE(PONDFLOWOLD(i))
+        PETPOND(i) = pettotal
+        sup = PONDFLOW(i)
+        supold = PONDFLOWOLD(i)
         PONDFLOWOLD(i) = PONDFLOW(i)
         factor = set_factor(ipond, aetold, pettotal, aettotal, sup,
      +                      supold, kper, kstp, kiter)
@@ -3615,8 +3630,9 @@ C------CALL UBUDSV TO SAVE THEM.
         !set max pond irrigation rate
         !
         !1 limit pond outflow to pond storage
-        pondstor = SNGL(It0_dprst_vol_open(ipond))/MFQ_to_inch_acres
-        if ( pondstor < szero ) pondstor = szero
+        pondstor = SNGL( It0_dprst_vol_open(ipond)
+     +                   /MFQ_to_inch_acres_dble )
+        if ( pondstor < 0.0 ) pondstor = 0.0
         totstor = pondstor/DELT + PONDSEGFLOW(i)
         !
         !set pond inflow using demand.
@@ -3632,7 +3648,7 @@ C------CALL UBUDSV TO SAVE THEM.
   !    etdif = pettotal - aettotal
   !        write(999,33)i,kper,kstp,kiter,PONDFLOW(I),
   !   +                 PONDSEGFLOW(I),pettotal,aettotal,
-  !   +    It0_dprst_vol_open(ipond)/MFQ_to_inch_acres,factor,
+  !   +    It0_dprst_vol_open(ipond)/MFQ_to_inch_acres_dble,factor,
   !   +    hru_actet(5389),potet(5389)
   !      endif
   !33  format(4i5,8e20.10)
@@ -3927,7 +3943,7 @@ C------CALL UBUDSV TO SAVE THEM.
       QONLYOLD(l) = QONLY(L)
       RMSEGW(L) = SQRT((aetold - aettotal)**dtwo)
       IF ( NUMCELLS(L) > 0 ) THEN
-        IF ( RMSEGW(L) > AGTOL*pettotal ) AGCONVERGE = 0
+        IF ( RMSEGW(L) > zerod2*pettotal ) AGCONVERGE = 0
       END IF
       AETITERGW(l) = sngl(aettotal)
       QONLY(L) = QONLY(L) + (sone - REAL(AGCONVERGE))*SNGL(factor)
@@ -3994,7 +4010,7 @@ C------CALL UBUDSV TO SAVE THEM.
       USE PRMS_CLIMATEVARS, ONLY: Potet
       USE PRMS_FLOWVARS, ONLY: gsflow_ag_actet, Dprst_vol_open
       USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch, Gwc_col, Gwc_row,
-     +                      Mfq_to_inch_acres, MFQ_to_inch_acres_dble
+     +                      MFQ_to_inch_acres_dble
       IMPLICIT NONE
 ! --------------------------------------
       !arguments
@@ -4129,8 +4145,8 @@ C------CALL UBUDSV TO SAVE THEM.
               hru_id = IRRPONDVAR(i)  !these are hru ids for ponds
               IF ( hru_id == k ) THEN
                 UNIT = TSPONDUNIT(j)
-                Q = PONDSEGFLOW(I)
-                QQ = PONDFLOW(I)
+                Q = DBLE(PONDSEGFLOW(I))
+                QQ = DBLE(PONDFLOW(I))
                 QQQ = DZERO
                 if ( dprst_flag == 1 )   !uncommment this and next line
      +               QQQ = Dprst_vol_open(hru_id)/MFQ_to_inch_acres_dble
@@ -4179,7 +4195,7 @@ C------CALL UBUDSV TO SAVE THEM.
            sub = DZERO
            if ( dprst_flag == 1 ) then    !uncomment this and next 4 lines
              if ( ISSFLG(kkper) == 0 ) sub = 
-     +            Dprst_vol_open(hru_id)/MFQ_to_inch_acres
+     +            Dprst_vol_open(hru_id)/MFQ_to_inch_acres_dble
              if ( sub < DZERO ) sub = DZERO
              QQQ = QQQ + sub
            end if
@@ -4775,7 +4791,7 @@ C
 C
 C2------Set diversion demand from that calculated from AG.
 C 
-        if ( kkiter == 1 ) DIVERSIONIRRPRMS = dzero
+        if ( kkiter == 1 ) DIVERSIONIRRPRMS = szero
         do i = 1, NUMIRRDIVERSIONSP
           iseg = IRRSEG(i)        
           !IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN

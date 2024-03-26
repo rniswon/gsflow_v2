@@ -44,7 +44,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
      &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,',
      &        /, 25X, 'AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
 
-        WRITE(*,'(24X,A)') 'Github Commit Hash 9c856ec'
+        WRITE(*,'(24X,A)') 'Github Commit Hash cf8b62c'
 
         ! Allocate local module variables
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
@@ -382,7 +382,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       IF ( GSFLOW_flag==ACTIVE ) THEN
         IF(IUNIT(55).GT.0) IGSFLOW = 1
         CALL set_cell_values()
-        IF ( Init_vars_from_file>OFF )
+        IF ( Init_vars_from_file>0 )
      &       CALL gsflow_modflow_restart(READ_INIT)
         CALL check_gvr_cell_pct()
         ! make the default number of soilzone iterations equal to the
@@ -666,7 +666,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                 retval = intcp()
                 IF ( no_snow_flag==OFF ) THEN
                   retval = snowcomp()
-                  IF ( Glacier_flag==1 ) THEN
+                  IF ( Glacier_flag==ACTIVE ) THEN
                     retval = glacr()
                   ENDIF
                 ENDIF
@@ -2079,7 +2079,7 @@ C
       ELSEIF ( LENUNI==3 ) THEN
 ! Modflow in centimeters
         inch_to_mfl = 2.54
-        Mfl2_to_acre = 328.0839895*328.0839895
+        Mfl2_to_acre = 328.0839895D0 * 328.0839895D0
         Mfl3_to_ft3 = 328.0839895D0**3.0D0
       ELSE
         CALL error_stop('invalid MODFLOW Length unit', ERROR_modflow)
@@ -2087,7 +2087,7 @@ C
       Mfl_to_inch = 1.0/inch_to_mfl
       Mfl2_to_acre = Mfl2_to_acre/FT2_PER_ACRE
       Inch_to_mfl_t = inch_to_mfl/DELT  ! will need to move if DELT allowed to change
-      MFQ_to_inch_acres = DELT*Mfl2_to_acre*Mfl_to_inch
+      MFQ_to_inch_acres = SNGL( Mfl2_to_acre) * DELT * Mfl_to_inch
       MFQ_to_inch_acres_dble = DBLE( MFQ_to_inch_acres )
 
       Sfr_conv = Mft_to_sec/Mfl3_to_ft3

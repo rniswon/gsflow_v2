@@ -590,9 +590,10 @@
 ! Arguments
       INTEGER, INTENT(IN) :: ivar
 ! Functions
-      INTRINSIC :: INT, SNGL
+      INTRINSIC :: INT, SNGL, DBLE
 ! Local Variables
       INTEGER :: i, j, jj, first, last
+      DOUBLE PRECISION :: tot_time, per_time
 !*******************************************************************************
       IF ( Nhru_var_type(ivar) /= INT_TYPE ) THEN
         IF ( NhruOutNcol == Nhru ) THEN
@@ -605,9 +606,12 @@
             ELSE
               !Record 1: KSTP,KPER,PERTIM,TOTIM,TEXT,NHRU,1,1
               IF ( GSFLOW_flag == ACTIVE ) THEN
-                WRITE ( Monthlyunit(ivar) ) KSTP,KPER,PERTIM,TOTIM,bin_var_names(ivar),Nhru,1,1
+                tot_time = DBLE( TOTIM )
+                per_time = DBLE( PERTIM )
+                WRITE ( Monthlyunit(ivar) ) KSTP,KPER,per_time,tot_time,bin_var_names(ivar),Nhru,1,1
               ELSE
-                WRITE ( Monthlyunit(ivar) ) Timestep,1,1.0,Number_timesteps,bin_var_names(ivar),Nhru,1,1
+                tot_time = DBLE( Number_timesteps )
+                WRITE ( Monthlyunit(ivar) ) Timestep,1,1.0D0,Number_timesteps,bin_var_names(ivar),Nhru,1,1
               ENDIF
               WRITE ( Monthlyunit(ivar) ) monthly_values
             ENDIF
@@ -673,6 +677,7 @@
       INTRINSIC :: INT
 ! Local Variables
       INTEGER :: j, jj, first, last
+      DOUBLE PRECISION :: tot_time, per_time
 !*******************************************************************************
       IF ( Nhru_var_type(ivar) /= INT_TYPE ) THEN
         IF ( NhruOutNcol == Nhru ) THEN
@@ -685,9 +690,12 @@
             ELSE
               !Record 1: KSTP,KPER,PERTIM,TOTIM,TEXT,NHRU,1,1
               IF ( GSFLOW_flag == ACTIVE ) THEN
-                WRITE ( Dailyunit(ivar) ) KSTP,KPER,PERTIM,TOTIM,bin_var_names(ivar),Nhru,1,1
+                tot_time = DBLE( TOTIM )
+                per_time = DBLE( PERTIM )
+                WRITE ( Dailyunit(ivar) ) KSTP,KPER,per_time,tot_time,bin_var_names(ivar),Nhru,1,1
               ELSE
-                WRITE ( Dailyunit(ivar) ) Timestep,1,1.0,Number_timesteps,bin_var_names(ivar),Nhru,1,1
+                tot_time = DBLE( Number_timesteps )
+                WRITE ( Dailyunit(ivar) ) Timestep,1,1.0D0,tot_time,bin_var_names(ivar),Nhru,1,1
               ENDIF
               WRITE ( Dailyunit(ivar) ) daily_values
             ENDIF

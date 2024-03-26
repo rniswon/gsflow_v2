@@ -58,12 +58,12 @@
 !     dynsoilparaminit - open files, read to start time, initialize flags and arrays
 !***********************************************************************
       INTEGER FUNCTION dynsoilparaminit()
-        USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, OFF, ERROR_dynamic, DEBUG_minimum
-        use PRMS_CONTROL_FILE, only: control_string
-        USE PRMS_MODULE, ONLY: Nhru, Print_debug, Start_year, Start_month, Start_day, &
-     &      Dyn_imperv_flag, Dyn_dprst_flag, Dyn_soil_flag, Dprst_flag, PRMS4_flag, Dyn_ag_soil_flag, AG_flag, Dyn_ag_frac_flag
-        USE PRMS_DYNAMIC_SOIL_PARAM_READ
-        use prms_utils, only: error_stop, find_current_file_time, find_header_end, PRMS_open_output_file, read_error, numchars
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dynamic, DEBUG_minimum
+      use PRMS_CONTROL_FILE, only: control_string
+      USE PRMS_MODULE, ONLY: Nhru, Print_debug, Start_year, Start_month, Start_day, &
+     &    Dyn_imperv_flag, Dyn_dprst_flag, Dyn_soil_flag, Dprst_flag, PRMS4_flag, Dyn_ag_soil_flag, AG_flag, Dyn_ag_frac_flag
+      USE PRMS_DYNAMIC_SOIL_PARAM_READ
+      use prms_utils, only: error_stop, find_current_file_time, find_header_end, PRMS_open_output_file, read_error, numchars
       IMPLICIT NONE
 ! Local Variables
       INTEGER :: year, month, day, istop, ierr
@@ -230,20 +230,21 @@
      &    AG_flag, Hru_type, GSFLOW_flag, Ag_package, irrigation_apply_flag
       USE PRMS_DYNAMIC_SOIL_PARAM_READ
       USE PRMS_BASIN, ONLY: Hru_area, Dprst_clos_flag, gsflow_ag_area, gsflow_ag_frac, &
-     &    Hru_percent_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Dprst_frac, Dprst_open_flag, &
+     &    Hru_frac_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Hru_frac_dprst, Dprst_open_flag, &
      &    Dprst_area_max, Dprst_area_open_max, Dprst_area_clos_max, Dprst_frac_open, &
-     &    Hru_area_dble, Dprst_area, Active_hrus, Hru_route_order, Basin_area_inv, Ag_area, Ag_frac
+     &    Hru_area_dble, Dprst_area, Active_hrus, Hru_route_order, Basin_area_inv, Imperv_flag, Ag_area, Ag_frac
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Imperv_stor, Sat_threshold, &
      &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor, &
      &    Slow_stor, Pref_flow_stor, Basin_soil_moist, Basin_ssstor, Hru_impervstor, Dprst_stor_hru, &
      &    Soil_zone_max, Soil_moist_tot, Soil_lower_stor_max, &
      &    Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, Ag_soil_rechr_max, Ag_soil_rechr_max_frac, &
      &    Basin_ag_soil_moist, Basin_ag_soil_rechr
+      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_basin_soil_moist, It0_soil_rechr, It0_hru_impervstor, &
+                               It0_dprst_stor_hru, It0_ssres_stor, It0_basin_ssstor, &
+                               It0_imperv_stor, It0_ag_soil_moist, It0_ag_soil_rechr, &
+                               It0_dprst_vol_open, It0_dprst_vol_clos, It0_slow_stor
       USE PRMS_SRUNOFF, ONLY:  Dprst_depth_avg, Op_flow_thres, Dprst_vol_open_max, Dprst_vol_clos_max, &
      &    Dprst_vol_thres_open, Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac
-      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_basin_soil_moist, It0_dprst_stor_hru, It0_hru_impervstor, &
-     &                         It0_basin_ssstor, It0_ssres_stor, It0_imperv_stor, It0_soil_rechr, It0_slow_stor, &
-     &                         It0_ag_soil_moist, It0_ag_soil_rechr, It0_dprst_vol_open, It0_dprst_vol_clos
       USE PRMS_SOILZONE, ONLY: Replenish_frac
       USE PRMS_SOILZONE_AG, ONLY: Ag_soil_lower_stor_max, Ag_replenish_frac
       use prms_utils, only: is_eof, error_stop
@@ -253,9 +254,10 @@
       EXTERNAL :: write_dynoutput, write_dynparam, write_dynparam_int
       EXTERNAL :: write_dynparam_potet
 ! Local Variables
-      INTEGER :: i, j, istop, check_dprst_depth_flag, check_sm_max_flag, adjust_dprst_fractions, adjust_imperv_fractions
-      INTEGER :: check_ag_max_flag, ios, check_fractions, check_imperv, check_ag_frac, check_dprst_frac
-      INTEGER :: it0_sm_flag, it0_grav_flag, it0_dprst_flag, it0_imperv_flag
+      INTEGER :: i, j, istop, check_dprst_depth_flag, check_sm_max_flag
+      INTEGER :: ios, check_fractions, check_imperv, check_dprst_frac
+      INTEGER :: it0_sm_flag, it0_grav_flag, it0_dprst_flag
+      INTEGER :: check_ag_max_flag, adjust_dprst_fractions, adjust_imperv_fractions, check_ag_frac, it0_imperv_flag
       REAL :: harea, frac_imperv, tmp, frac_dprst, frac_ag, to_slow_stor, frac_perv
       CHARACTER(LEN=30), PARAMETER :: FMT1 = '(I5, 2("/",I2.2))'
 !***********************************************************************
@@ -408,11 +410,12 @@
             READ ( Imperv_frac_unit, *, iostat=ios ) Imperv_next_yr, Imperv_next_mo, Imperv_next_day, temp_imperv_frac
             if (ios /= 0) call error_stop('reading impervious dynamic parameter file', ERROR_dynamic)
             ! temp_imperv_frac has new values, Hru_percent_imperv has old values
-            CALL write_dynoutput(Output_unit, Nhru, Updated_hrus, temp_imperv_frac, Hru_percent_imperv, 'hru_percent_imperv')
+            CALL write_dynoutput(Output_unit, Nhru, Updated_hrus, temp_imperv_frac, Hru_frac_imperv, 'hru_percent_imperv')
             ! temp_imperv_frac has new values with negative values set to the old value
             CALL is_eof(Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day)
             check_imperv = ACTIVE
             check_fractions = ACTIVE
+            Imperv_flag = ACTIVE
           ENDIF
         ENDIF
       ENDIF
@@ -423,7 +426,7 @@
         IF ( Dprst_frac_next_mo/=0 ) THEN
           IF ( Dprst_frac_next_yr==Nowyear .AND. Dprst_frac_next_mo==Nowmonth .AND. Dprst_frac_next_day==Nowday ) THEN
             READ ( Dprst_frac_unit, * ) Dprst_frac_next_yr, Dprst_frac_next_mo, Dprst_frac_next_day, temp_dprst_frac
-            CALL write_dynoutput(Output_unit, Nhru, Updated_hrus, temp_dprst_frac, Dprst_frac, 'dprst_frac')
+            CALL write_dynoutput(Output_unit, Nhru, Updated_hrus, temp_dprst_frac, Hru_frac_dprst, 'dprst_frac')
             CALL is_eof(Dprst_frac_unit, Dprst_frac_next_yr, Dprst_frac_next_mo, Dprst_frac_next_day)
             check_dprst_frac = ACTIVE
             check_fractions = ACTIVE
@@ -453,11 +456,11 @@
           adjust_dprst_fractions = OFF
           adjust_imperv_fractions = OFF
 
-          ! temp_imperv_frac has new values with negative values set to the old value, Hru_percent_imperv has old values
+          ! temp_imperv_frac has new values with negative values set to the old value, Hru_frac_imperv has old values
           IF ( check_imperv==ACTIVE ) THEN
             frac_imperv = temp_imperv_frac(i)
           ELSE
-            frac_imperv = Hru_percent_imperv(i)
+            frac_imperv = Hru_frac_imperv(i)
           ENDIF
 
           frac_dprst = 0.0
@@ -465,7 +468,7 @@
             ! temp_dprst_frac has new values with negative values set to the old value, Dprst_frac has old values
             frac_dprst = temp_dprst_frac(i)
           ELSE
-            IF ( Dprst_flag==ACTIVE ) frac_dprst = Dprst_frac(i)
+            IF ( Dprst_flag==ACTIVE ) frac_dprst = Hru_frac_dprst(i)
           ENDIF
 
           IF ( frac_imperv+frac_dprst > 0.999 ) THEN
@@ -561,10 +564,10 @@
           IF ( check_imperv==ACTIVE .OR. adjust_imperv_fractions==ACTIVE ) THEN
             IF ( Imperv_stor(i)>0.0 ) THEN
               IF ( frac_imperv>0.0 ) THEN
-                Imperv_stor(i) = Imperv_stor(i)*Hru_percent_imperv(i)/frac_imperv
+                Imperv_stor(i) = Imperv_stor(i)*Hru_frac_imperv(i)/frac_imperv
                 it0_imperv_flag = ACTIVE
               ELSE
-                tmp = Imperv_stor(i)*Hru_percent_imperv(i)
+                tmp = Imperv_stor(i)*Hru_frac_imperv(i)
                 PRINT *, 'WARNING, impervious changed to 0 in dynamic parameter module with impervious storage > 0'
                 PRINT *, '         this storage is added to slow storage of gravity reservoir:', tmp, '; HRU: ', i
                 PRINT FMT1, Nowyear, Nowmonth, Nowday
@@ -574,8 +577,9 @@
               ENDIF
             ENDIF
             Hru_impervstor(i) = Imperv_stor(i)*frac_imperv
-            Hru_percent_imperv(i) = frac_imperv
+            Hru_frac_imperv(i) = frac_imperv
             Hru_imperv(i) = harea*frac_imperv
+            IF ( frac_imperv > 0.0 ) Imperv_flag = ACTIVE
           ENDIF
 
           ! adjust dprst volume if dprst_frac > and frac_dprst = 0, otherwise leave volume adjust for srunoff
@@ -591,7 +595,7 @@
               tmp = SNGL( Dprst_vol_open(i) + Dprst_vol_clos(i) )
               IF ( tmp > 0.0 ) THEN
                 IF ( .NOT.(frac_dprst)>0.0 .AND. tmp>0.0 ) THEN
-                  tmp = ( tmp / Dprst_area(i) ) * Dprst_frac(i)
+                  tmp = ( tmp / Dprst_area(i) ) * Hru_frac_dprst(i)
                   PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0 in dynamic parameter module'
                   PRINT *, '         storage added to slow storage of the gravity reservoir:', tmp, '; HRU: ', i
                   PRINT FMT1, Nowyear, Nowmonth, Nowday
@@ -619,7 +623,7 @@
                   ENDIF
                 ENDIF
               ENDIF
-              Dprst_frac(i) = frac_dprst
+              Hru_frac_dprst(i) = frac_dprst
               Dprst_area_max(i) = frac_dprst*harea
               Dprst_area_open_max(i) = Dprst_area_max(i)*Dprst_frac_open(i)
               Dprst_area_clos_max(i) = Dprst_area_max(i) - Dprst_area_open_max(i)
@@ -629,6 +633,26 @@
           ENDIF
 
           frac_perv = 1.0 - (frac_imperv + frac_dprst + frac_ag)
+
+          IF ( frac_perv<0.0 ) THEN
+            IF ( frac_perv < -CLOSEZERO ) THEN
+              PRINT *, 'ERROR, pervious < 0 for HRU:', i
+              PRINT *, '       pervious fraction equals 1.0 - hru_percent_imperv - dprst_frac - ag_frac'
+              PRINT *, '       pervious fraction:', frac_perv
+              PRINT *, '       impervious fraction:', Hru_frac_imperv(i)
+              IF ( Dprst_flag==ACTIVE ) PRINT *, '       depression storage fraction:', Hru_frac_dprst(i)
+              istop = 1
+              CYCLE
+            ENDIF
+          ELSEIF ( frac_perv<0.00001 .AND. AG_flag==OFF ) THEN
+            PRINT *, 'ERROR, pervious fraction must be >= 0.00001 for HRU:', i
+            PRINT *, '       pervious fraction is 1.0 - hru_percent_imperv - dprst_frac'
+            PRINT *, '       pervious fraction:', frac_perv
+            PRINT *, '       impervious fraction:', Hru_frac_imperv(i)
+            IF ( Dprst_flag==ACTIVE ) PRINT *, '       depression storage fraction:', Hru_frac_dprst(i)
+            istop = 1
+            CYCLE
+          ENDIF
 
           IF ( frac_perv>0.0 ) THEN
             ! adjust pervious area and capillary storage for dynamic parameters
@@ -672,10 +696,6 @@
           It0_soil_rechr = Soil_rechr
           It0_basin_soil_moist = Basin_soil_moist
         ENDIF
-        IF ( it0_imperv_flag==ACTIVE ) THEN
-          It0_imperv_stor = Imperv_stor
-          It0_hru_impervstor = Hru_impervstor
-        ENDIF
         IF ( it0_grav_flag == ACTIVE ) THEN
           Basin_ssstor = 0.0D0
           DO j = 1, Active_hrus
@@ -685,8 +705,8 @@
           ENDDO
           Basin_ssstor = Basin_ssstor * Basin_area_inv
           It0_ssres_stor = Ssres_stor
-          It0_slow_stor = Slow_stor
           It0_basin_ssstor = Basin_ssstor
+          It0_slow_stor = Slow_stor
         ENDIF
         IF ( check_ag_frac==ACTIVE ) THEN
           Basin_ag_soil_moist = 0.0D0
@@ -707,6 +727,10 @@
           Dprst_stor_hru = (Dprst_vol_open+Dprst_vol_clos) / Hru_area_dble
           It0_dprst_stor_hru = Dprst_stor_hru
         ENDIF
+        IF ( it0_imperv_flag==ACTIVE ) THEN
+          It0_imperv_stor = Imperv_stor
+          It0_hru_impervstor = Hru_impervstor
+        ENDIF
         IF ( Ag_package==ACTIVE ) THEN
           IF ( irrigation_apply_flag == CANOPY ) THEN
               gsflow_ag_area = Hru_area ! apply irrigation to canopy, which adjusts for covden
@@ -718,7 +742,6 @@
               gsflow_ag_area = Hru_perv ! apply irrigation to pervious area in soilzone module
               gsflow_ag_frac = Hru_frac_perv
           ENDIF
-
         ENDIF
       ENDIF
 

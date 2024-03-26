@@ -5,7 +5,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2023-09-01'
+      character(len=*), parameter :: Version_gsflow_budget = '2024-02-14'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
@@ -23,7 +23,7 @@
 !     Budget module to convert PRMS & MODFLOW states for use by GSFLOW
 !     ******************************************************************
       INTEGER FUNCTION gsflow_budget()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, SAVE_INIT, READ_INIT, RUN, DECL, INIT, CLEAN
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, SAVE_INIT, READ_INIT, RUN, DECL, INIT, CLEAN
       USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file, Init_vars_from_file
       IMPLICIT NONE
 ! Functions
@@ -37,7 +37,7 @@
       ELSEIF ( Process_flag==DECL ) THEN
         gsflow_budget = gsfbuddecl()
       ELSEIF ( Process_flag==INIT ) THEN
-        IF ( Init_vars_from_file>OFF ) CALL gsflow_budget_restart(READ_INIT)
+        IF ( Init_vars_from_file>0 ) CALL gsflow_budget_restart(READ_INIT)
         gsflow_budget = gsfbudinit()
       ELSEIF ( Process_flag==CLEAN ) THEN
         IF ( Save_vars_to_file==ACTIVE ) CALL gsflow_budget_restart(SAVE_INIT)
@@ -193,7 +193,7 @@
 !     gsfbudinit - Initialize GSFBUDGET module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION gsfbudinit()
-      USE PRMS_CONSTANTS, ONLY: ERROR_dim, OFF
+      USE PRMS_CONSTANTS, ONLY: ERROR_dim
       USE GSFBUDGET
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Nhru
       USE GWFSFRMODULE, ONLY: NSTRM
@@ -211,7 +211,7 @@
 
       Reach_cfs = 0.0 ! dimension NSTRM
       Reach_wse = 0.0 ! dimension NSTRM
-      IF ( Init_vars_from_file==OFF ) THEN
+      IF ( Init_vars_from_file==0 ) THEN
         Unsat_S = UZTSRAT(6)
         IF ( IUNIT(1)>0 ) CALL MODFLOW_GET_STORAGE_BCF()
         IF ( IUNIT(23)>0 ) CALL MODFLOW_GET_STORAGE_LPF()
@@ -267,6 +267,7 @@
 !Warning, modifies Basin_ssstor, and Gw2sm_grav
       USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop !, Basin_dprst_volcl
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
+      USE GSFPRMS2MF, ONLY: activeHru_inactiveCell
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, SNGL
@@ -290,7 +291,8 @@
         Gw2sm(i) = 0.0
         Gw_rejected(i) = 0.0
         Actet_gw(i) = 0.0
-        Slow_stor(i) = 0.0 !shouldn't be reset if any cells of HRU inactive and HRU active
+        IF ( activeHru_inactiveCell(i) == 0 ) &
+             Slow_stor(i) = 0.0 !don't reset Slow_stor if inactive cell and HRU active
 !        Uzf_infil_map(i) = 0.0
 !        Sat_recharge(i) = 0.0
 !        Mfoutflow_to_gvr(i) = 0.0
@@ -503,11 +505,13 @@
       USE GWFBASMODULE, ONLY: DELT
       USE GWFBCFMODULE, ONLY: LAYCON, SC1, SC2
       IMPLICIT NONE
+! Functions
+      INTRINSIC :: DBLE
 ! Local Variables
       INTEGER :: i, j, k, kt, lc
       DOUBLE PRECISION :: tled, top, bot, rho, storage, head
 !***********************************************************************
-      tled = 1.0D0/DELT
+      tled = 1.0D0/DBLE(DELT)
       Sat_S = 0.0D0
 
 !5------LOOP THROUGH EVERY CELL IN THE GRID.
@@ -562,11 +566,13 @@
       USE GWFBASMODULE, ONLY: DELT
       USE GWFLPFMODULE, ONLY: LAYTYP, SC1, SC2
       IMPLICIT NONE
+! Functions
+      INTRINSIC :: DBLE
 ! Local Variables
       INTEGER :: i, j, k, kt, lc
       DOUBLE PRECISION :: tled, top, bot, rho, storage, head
 !***********************************************************************
-      tled = 1.0D0/DELT
+      tled = 1.0D0/DBLE(DELT)
       Sat_S = 0.0D0
 
 !5------LOOP THROUGH EVERY CELL IN THE GRID.
@@ -619,36 +625,27 @@
       SUBROUTINE MODFLOW_GET_STORAGE_UPW()
       USE GSFBUDGET, ONLY: Sat_S
       USE PRMS_CONSTANTS, ONLY: NEARZERO
-      USE GLOBAL, ONLY: NCOL, NROW, NLAY, IBOUND, BOTM, HNEW, LBOTM, HOLD
-      USE GWFBASMODULE, ONLY: DELT
+      USE GLOBAL, ONLY: NCOL, NROW, NLAY, IBOUND, BOTM, LBOTM
       USE GWFUPWMODULE, ONLY: SC1, SC2UPW, Sn
       USE GWFNWTMODULE,ONLY: Icell
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: ABS
+      INTRINSIC :: ABS, DBLE
 ! Local Variables
-      INTEGER :: i, j, k, kt, IJ
-      DOUBLE PRECISION :: tled, rho1, rho2
-      DOUBLE PRECISION :: ZERO, ONE, HSING, HLD, tp, bt, thick
+      INTEGER :: i, j, k, IJ
+      DOUBLE PRECISION :: rho1, rho2
+      DOUBLE PRECISION :: tp, bt, thick
       DOUBLE PRECISION :: strg
 !***********************************************************************
-      tled = 1.0D0/DELT
       Sat_S = 0.0D0
-
-      ZERO=0.0D0
-      ONE=1.0D0
-      TLED=ONE/DBLE(DELT)
 !C
 !C1------LOOP THROUGH EVERY CELL IN THE GRID.
-      KT=0
       DO 300 K=1,NLAY
       DO 300 I=1,NROW
       DO 300 J=1,NCOL
 !C
 !C2------SKIP NO-FLOW AND CONSTANT-HEAD CELLS.
       IF(IBOUND(J,I,K).LE.0) GO TO 300
-      HSING=HNEW(J,I,K)
-      HLD = DBLE(HOLD(J,I,K))
 !C
 !C3----TWO STORAGE CAPACITIES, USE YIELD (SC2) IF SPECIFIED.
       TP=dble(BOTM(J,I,LBOTM(K)-1))

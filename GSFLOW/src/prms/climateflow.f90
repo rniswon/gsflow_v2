@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2023-10-17'
+      character(len=*), parameter :: Version_climateflow = '2024-01-28'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -64,8 +64,9 @@
       INTEGER, SAVE, ALLOCATABLE :: Intcp_transp_on(:)
       REAL, SAVE, ALLOCATABLE :: Intcp_stor(:), Hru_intcpstor(:)
       ! snow
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pkwater_equiv(:)
       DOUBLE PRECISION, SAVE :: Basin_pweqv
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pkwater_equiv(:), Pk_depth(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pk_depth(:)
       REAL, SAVE, ALLOCATABLE :: Snowmelt(:), Snow_evap(:), Snowcov_area(:)
       INTEGER, SAVE, ALLOCATABLE :: Pptmix_nopack(:)
       ! soilzone
@@ -76,17 +77,19 @@
       REAL, SAVE, ALLOCATABLE :: Hru_actet(:), Soil_moist(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_ssr(:), Ssres_in(:)
-      REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:), Pref_flow_stor(:)
+      REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:)
       REAL, SAVE, ALLOCATABLE :: Ssres_stor(:), Ssres_flow(:), Soil_rechr(:)
-      REAL, SAVE, ALLOCATABLE :: Soil_lower_stor_max(:), Soil_moist_tot(:), Soil_zone_max(:)
+      REAL, SAVE, ALLOCATABLE :: Pref_flow_stor(:), Soil_lower_stor_max(:), Soil_moist_tot(:), Soil_zone_max(:)
       REAL, SAVE, ALLOCATABLE :: Gravity_stor_res(:)
       DOUBLE PRECISION, SAVE :: Basin_ag_soil_moist, Basin_ag_soil_rechr
       REAL, SAVE, ALLOCATABLE :: gsflow_ag_actet(:), Ag_soil_moist(:), Ag_soil_rechr(:), Ag_soil_rechr_max(:)
       ! srunoff
-      REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:), Hru_impervstor(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Strm_seg_in(:), strm_seg_interflow_in(:), strm_seg_sroff_in(:), strm_seg_gwflow_in(:)
+      REAL, SAVE, ALLOCATABLE :: Sroff(:), Imperv_stor(:), Infil(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_impervstor(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Strm_seg_in(:)
       ! Surface-Depression Storage
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open(:), Dprst_vol_clos(:), Dprst_stor_hru(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open(:), Dprst_vol_clos(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_stor_hru(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_open_in(:), Dprst_total_open_out(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_clos_in(:), Dprst_total_clos_out(:)
       ! gwflow
@@ -100,10 +103,10 @@
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Seg_upstream_inflow(:), Seg_lateral_inflow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Seg_outflow(:), Seg_inflow(:)
       ! glacr
-      REAL, SAVE, ALLOCATABLE :: Glacier_frac(:), Alt_above_ela(:), Glrette_frac(:), Glacrb_melt(:)
+      REAL, SAVE, ALLOCATABLE :: Glacier_frac(:), Alt_above_ela(:), Glrette_frac(:)
 !   Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Soil_moist_max(:), Soil_rechr_max(:), Sat_threshold(:)
-      REAL, SAVE, ALLOCATABLE :: Snowinfil_max(:), Imperv_stor_max(:), Ssstor_init_frac(:)
+      REAL, SAVE, ALLOCATABLE :: Snowinfil_max(:), Imperv_stor_max(:)
       REAL, SAVE, ALLOCATABLE :: Soil_moist_init_frac(:), Soil_rechr_init_frac(:), Soil_rechr_max_frac(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_moist_max(:), Ag_soil_rechr_max_frac(:)
       REAL, SAVE, ALLOCATABLE :: Ag_soil_moist_init_frac(:), Ag_soil_rechr_init_frac(:)
@@ -114,12 +117,13 @@ module PRMS_IT0_VARS
 !   Global Variables
        DOUBLE PRECISION, SAVE :: It0_basin_ssstor, It0_basin_soil_moist
        DOUBLE PRECISION, SAVE :: It0_basin_ag_soil_moist, It0_basin_ag_soil_rechr
+       REAL, SAVE, ALLOCATABLE :: It0_soil_moist(:), It0_soil_rechr(:), It0_hru_impervstor(:), It0_ssres_stor(:)
+       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:), It0_dprst_stor_hru(:)
        INTEGER, SAVE, ALLOCATABLE :: It0_intcp_transp_on(:)
-       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_dprst_vol_open(:), It0_dprst_vol_clos(:), It0_dprst_stor_hru(:)
-       REAL, SAVE, ALLOCATABLE :: It0_soil_moist(:), It0_soil_rechr(:), It0_imperv_stor(:), It0_hru_impervstor(:)
-       REAL, SAVE, ALLOCATABLE :: It0_slow_stor(:), It0_pref_flow_stor(:), It0_ssres_stor(:)
+       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_dprst_vol_open(:), It0_dprst_vol_clos(:)
+       REAL, SAVE, ALLOCATABLE :: It0_imperv_stor(:)
+       REAL, SAVE, ALLOCATABLE :: It0_slow_stor(:), It0_pref_flow_stor(:)
        REAL, SAVE, ALLOCATABLE :: It0_intcp_stor(:), It0_gravity_stor_res(:), It0_potet(:)
-       DOUBLE PRECISION, SAVE, ALLOCATABLE :: It0_pkwater_equiv(:)
        REAL, SAVE, ALLOCATABLE :: It0_ag_soil_moist(:), It0_ag_soil_rechr(:), It0_hru_intcpstor(:)
 end module PRMS_IT0_VARS
 
@@ -154,14 +158,14 @@ end module PRMS_IT0_VARS
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR, ERROR_dim, &
      &    potet_pt_module, potet_pm_module, potet_pm_sta_module, climate_hru_module, &
      &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
-     &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
+     &    temp_laps_module, temp_sta_module, temp_dist2_module, &
      &    ddsolrad_module, ccsolrad_module, CANOPY
-      USE PRMS_MODULE, ONLY: Nhru, Nssr, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, Nhrucell, &
+      USE PRMS_MODULE, ONLY: Nhru, Nssr, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, &
      &    Init_vars_from_file, Temp_flag, Precip_flag, Glacier_flag, &
      &    Strmflow_module, Temp_module, Stream_order_flag, Humidity_cbh_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
-     &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, &
-     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, no_snow_flag
+     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, no_snow_flag, gwflow_flag, Nhrucell, &
+     &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag
       use PRMS_MMFAPI, only: declvar_int, declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_CLIMATEVARS
@@ -453,13 +457,6 @@ end module PRMS_IT0_VARS
      &     'Actual ET for each HRU', &
      &     'inches', Hru_actet)
 
-      IF ( GSFLOW_flag==ACTIVE ) THEN
-        ALLOCATE ( gsflow_ag_actet(Nhru) )
-        CALL declvar_real(Soilzone_module, 'gsflow_ag_actet', 'nhru', Nhru, &
-     &       'Agriculture actual ET for GSFLOW simulations for each HRU', &
-     &       'inches', gsflow_ag_actet)
-      ENDIF
-
       CALL declvar_dble(Soilzone_module, 'basin_actet', 'one', 1, &
      &     'Basin area-weighted average actual ET', &
      &     'inches', Basin_actet)
@@ -488,6 +485,10 @@ end module PRMS_IT0_VARS
      &     'inches', Basin_soil_to_gw)
 
       IF ( GSFLOW_flag==ACTIVE ) THEN
+        ALLOCATE ( gsflow_ag_actet(Nhru) )
+        CALL declvar_real(Soilzone_module, 'gsflow_ag_actet', 'nhru', Nhru, &
+     &       'Agriculture actual ET for GSFLOW simulations for each HRU', &
+     &       'inches', gsflow_ag_actet)
         IF ( Nhrucell<-1 ) CALL error_stop('dimension nhrucell not specified > 0', ERROR_dim)
         ALLOCATE ( Gravity_stor_res(Nhrucell), It0_gravity_stor_res(Nhrucell) )
         CALL declvar_real(Soilzone_module, 'gravity_stor_res', 'nhrucell', Nhrucell, &
@@ -496,7 +497,7 @@ end module PRMS_IT0_VARS
       ENDIF
 
 ! gwflow
-      IF ( GSFLOW_flag==OFF ) THEN
+      IF ( gwflow_flag==ACTIVE ) THEN
         ALLOCATE ( Gwres_stor(Nhru) )
         CALL declvar_dble('gwflow', 'gwres_stor', 'ngw', Nhru, &
      &       'Storage in each GWR', &
@@ -533,18 +534,6 @@ end module PRMS_IT0_VARS
         CALL declvar_dble(Srunoff_module, 'strm_seg_in', 'nsegment', Nsegment, &
      &       'Flow in stream segments as a result of cascading flow in each stream segment', &
      &       'cfs', Strm_seg_in)
-        ALLOCATE ( strm_seg_gwflow_in(Nsegment) )
-        CALL declvar_dble(Srunoff_module, 'strm_seg_gwflow_in', 'nsegment', Nsegment, &
-     &       'Groundwater flow to each stream segment as a result of cascading flow in each stream segment', &
-     &       'cfs', strm_seg_gwflow_in)
-        ALLOCATE ( strm_seg_sroff_in(Nsegment) )
-        CALL declvar_dble(Srunoff_module, 'strm_seg_sroff_in', 'nsegment', Nsegment, &
-     &       'Surface-runoff flow to each stream segment as a result of cascading flow in each stream segment', &
-     &       'cfs', strm_seg_sroff_in)
-        ALLOCATE ( strm_seg_interflow_in(Nsegment) )
-        CALL declvar_dble(Srunoff_module, 'strm_seg_interflow_in', 'nsegment', Nsegment, &
-     &       'Interflow to each stream segment as a result of cascading flow in each stream segment', &
-     &       'cfs', strm_seg_interflow_in)
       ENDIF
 
 ! stream flow
@@ -653,15 +642,14 @@ end module PRMS_IT0_VARS
      &       'acre-inches', Dprst_total_clos_out)
       ENDIF
 
-      ALLOCATE ( Pkwater_equiv(Nhru) )
+      ALLOCATE ( Pkwater_equiv(Nhru), It0_pkwater_equiv(Nhru) )
       ALLOCATE ( Pk_depth(Nhru) )
       ALLOCATE ( Snowcov_area(Nhru) )
       ALLOCATE ( Snow_evap(Nhru) )
       ALLOCATE ( Snowmelt(Nhru) )
       ALLOCATE ( Pptmix_nopack(Nhru) )
-      ALLOCATE ( It0_pkwater_equiv(Nhru) )
       IF ( no_snow_flag==OFF ) THEN
-        CALL declvar_dble(MODNAME, 'basin_pweqv', 'one', 1, &
+        CALL declvar_dble('snowcomp', 'basin_pweqv', 'one', 1, &
      &       'Basin area-weighted average snowpack water equivalent (not including glacier)', &
      &       'inches', Basin_pweqv)
         CALL declvar_dble('snowcomp', 'pkwater_equiv', 'nhru', Nhru, &
@@ -687,12 +675,13 @@ end module PRMS_IT0_VARS
      &       ' occurred with no snowpack present on an HRU (1), otherwise (0)', &
      &       'none', Pptmix_nopack)
       ENDIF
+
 ! glacier variables
-      IF ( Glacier_flag==1 ) THEN
+      IF ( Glacier_flag==ACTIVE ) THEN
         ALLOCATE ( Glacier_frac(Nhru) )
         CALL declvar_real('glacr_melt', 'glacier_frac', 'nhru', Nhru, &
-     &     'Fraction of glaciation (0=none; 1=100%)', &
-     &     'decimal fraction', Glacier_frac)
+     &       'Fraction of glaciation (0=none; 1=100%)', &
+     &       'decimal fraction', Glacier_frac)
 
         ALLOCATE ( Glrette_frac(Nhru) )
         CALL declvar_real('glacr_melt', 'glrette_frac', 'nhru', Nhru, &
@@ -703,11 +692,6 @@ end module PRMS_IT0_VARS
         CALL declvar_real('glacr_melt', 'alt_above_ela', 'nhru', Nhru, &
      &       'Altitude above equilibrium line altitude (ELA)', &
      &       'elev_units', Alt_above_ela)
-
-        ALLOCATE ( Glacrb_melt(Nhru) )
-        CALL declvar_real('glacr_melt', 'glacrb_melt', 'nhru', Nhru, &
-             'Glacier or glacierette basal melt, goes to soil', &
-             'inches/day', Glacrb_melt)
       ENDIF
 
       ! Allocate local variables
@@ -820,7 +804,7 @@ end module PRMS_IT0_VARS
       IF ( Temp_flag==temp_1sta_module .OR. Temp_flag==temp_sta_module .OR. Temp_flag==temp_laps_module &
      &     .OR. Temp_flag==temp_dist2_module ) THEN
         IF ( declparam(Temp_module, 'basin_tsta', 'one', 'integer', &
-     &       '1', 'bounded', 'ntemp', &
+     &       '0', 'bounded', 'ntemp', &
      &       'Index of main temperature station', &
      &       'Index of temperature station used to compute basin temperature values', &
      &       'none')/=0 ) CALL read_error(1, 'basin_tsta')
@@ -892,7 +876,7 @@ end module PRMS_IT0_VARS
      &     'decimal fraction')/=0 ) CALL read_error(1, 'epan_coef')
 
       Use_pandata = OFF
-      IF ( (Nevap>0 .AND. Et_flag==potet_pan_module) ) THEN
+      IF ( Nevap>0 ) THEN
         Use_pandata = ACTIVE
         ALLOCATE ( Hru_pansta(Nhru) )
         IF ( declparam(Et_module, 'hru_pansta', 'nhru', 'integer', &
@@ -987,7 +971,6 @@ end module PRMS_IT0_VARS
      &         'Initial fraction available water in the capillary reservoir', &
      &         'Initial fraction of available water in the capillary reservoir (fraction of soil_moist_max) for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'soil_moist_init_frac')
-          ALLOCATE ( Ssstor_init_frac(Nhru) )
           IF ( declparam(Soilzone_module, 'ssstor_init_frac', 'nssr', 'real', &
      &         '0.0', '0.0', '1.0', &
      &         'Initial fraction of available water in the gravity plus preferential-flow reservoirs', &
@@ -1054,15 +1037,16 @@ end module PRMS_IT0_VARS
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR, DEBUG_less, &
      &    potet_pt_module, potet_pm_module, potet_pm_sta_module, climate_hru_module, &
      &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
-     &    temp_laps_module, temp_sta_module, temp_dist2_module, potet_pan_module, &
+     &    temp_laps_module, temp_sta_module, temp_dist2_module, &
      &    FEET, FEET2METERS, METERS2FEET, FAHRENHEIT, INACTIVE, LAKE, ERROR_PARAM, ddsolrad_module, ccsolrad_module
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nevap, Nlake, Ntemp, Nrain, Nsol, &
      &    Print_debug, Init_vars_from_file, Temp_flag, Precip_flag, &
-     &    Temp_module, Precip_module, Solrad_module, Et_module, PRMS4_flag, &
+     &    Temp_module, Stream_order_flag, Glacier_flag, &
+     &    Precip_module, Solrad_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Et_flag, Dprst_flag, Solrad_flag, &
-     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, Glacier_flag, Stream_order_flag, &
-     &    GSFLOW_flag, AG_flag, Hru_type
+     &    AG_flag, Hru_type, gwflow_flag, GSFLOW_flag, &
+     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       USE PRMS_BASIN, ONLY: Elev_units, Active_hrus, Hru_route_order, Hru_perv, Hru_area, Basin_area_inv
@@ -1128,7 +1112,7 @@ end module PRMS_IT0_VARS
         ENDDO
       ELSE
         IF ( getparam_real(Precip_module, 'tmax_allrain_offset', Nhru*MONTHS_PER_YEAR, Tmax_allrain_offset)/=0 ) &
-     &       CALL read_error(2, 'tmax_allrain_offset')
+     &                     CALL read_error(2, 'tmax_allrain_offset')
       ENDIF
 
       ! Set tmax_allrain in units of the input values
@@ -1206,7 +1190,7 @@ end module PRMS_IT0_VARS
       ENDIF
 
       IF ( Use_pandata==ACTIVE ) THEN
-        IF ( getparam_int('intcp', 'hru_pansta', Nhru, Hru_pansta)/=0 ) CALL read_error(2, 'hru_pansta')
+        IF ( getparam_int(MODNAME, 'hru_pansta', Nhru, Hru_pansta)/=0 ) CALL read_error(2, 'hru_pansta')
         IF ( Parameter_check_flag>0 ) &
      &       CALL checkdim_bounded_limits('hru_pansta', 'nevap', Hru_pansta, Nhru, 0, Nevap, Inputerror_flag)
       ENDIF
@@ -1223,7 +1207,7 @@ end module PRMS_IT0_VARS
       ELSE
         IF ( getparam_real(Soilzone_module, 'soil_rechr_max_frac', Nhru, Soil_rechr_max_frac)/=0 ) &
      &       CALL read_error(2, 'soil_rechr_max_frac')
-        Soil_rechr_max = Soil_rechr_max_frac * Soil_moist_max
+        Soil_rechr_max = Soil_rechr_max_frac*Soil_moist_max
       ENDIF
 
       ierr = 0
@@ -1242,15 +1226,17 @@ end module PRMS_IT0_VARS
      &         CALL read_error(2, 'soil_moist_init_frac')
           IF ( getparam_real(Soilzone_module, 'soil_rechr_init_frac', Nhru, Soil_rechr_init_frac)/=0 ) &
      &         CALL read_error(2, 'soil_rechr_init_frac')
-          IF ( getparam_real(Soilzone_module, 'ssstor_init_frac', Nssr, Ssstor_init_frac)/=0 ) &
+          IF ( getparam_real(Soilzone_module, 'ssstor_init_frac', Nssr, Ssres_stor)/=0 ) &
      &         CALL read_error(2, 'ssstor_init_frac')
-          Soil_rechr = Soil_rechr_init_frac * Soil_rechr_max
-          Soil_moist = Soil_moist_init_frac * Soil_moist_max
-          Ssres_stor = Ssstor_init_frac * Sat_threshold
-          DEALLOCATE ( Ssstor_init_frac )
+          Soil_rechr = Soil_rechr_init_frac*Soil_rechr_max
+          Soil_moist = Soil_moist_init_frac*Soil_moist_max
+          Ssres_stor = Ssres_stor*Sat_threshold
         ENDIF
         Slow_stor = Ssres_stor
       ENDIF
+
+      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) &
+           Pref_flow_stor = 0.0 ! needs to always have a value, restart value saved in Initial Conditions File
 
       IF ( AG_flag==ACTIVE ) THEN
         IF ( getparam_real(Soilzone_module, 'ag_soil_moist_max', Nhru, Ag_soil_moist_max)/=0 ) &
@@ -1343,6 +1329,7 @@ end module PRMS_IT0_VARS
         IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) &
              DEALLOCATE ( Soil_moist_init_frac, Soil_rechr_init_frac )
       ENDIF
+
       ! check parameters
       Basin_soil_moist = 0.0D0 ! set because these are saved in It0 variables in prms_time
       Basin_ssstor = 0.0D0
@@ -1479,6 +1466,11 @@ end module PRMS_IT0_VARS
       Basin_lakeevap = 0.0D0
       Flow_out = 0.0D0
 
+      Snow_evap = 0.0
+      Snowmelt = 0.0
+      Snowcov_area = 0.0
+      Pptmix_nopack = OFF
+
       IF ( Init_vars_from_file>0 .OR. ierr>0 ) RETURN
 
       Basin_lake_stor = 0.0D0
@@ -1492,15 +1484,12 @@ end module PRMS_IT0_VARS
 ! initialize storage variables
       Imperv_stor = 0.0
       Pkwater_equiv = 0.0D0
-      IF ( Glacier_flag==1 ) THEN
-        Glacrb_melt = 0.0
+      IF ( Glacier_flag==ACTIVE ) THEN
         Glacier_frac = 0.0
         Alt_above_ela = 0.0
         Glrette_frac = 0.0
       ENDIF
-      Slow_stor = 0.0
-      Pptmix_nopack = OFF
-      IF ( GSFLOW_flag==OFF ) Gwres_stor = 0.0D0 ! not needed for GSFLOW
+      IF ( gwflow_flag==ACTIVE ) Gwres_stor = 0.0D0 ! not needed for GSFLOW unless activeHRU_inactiveCELL_flag = 1
       IF ( Dprst_flag==ACTIVE ) THEN
         Dprst_vol_open = 0.0D0
         Dprst_vol_clos = 0.0D0
@@ -1508,33 +1497,33 @@ end module PRMS_IT0_VARS
 ! initialize arrays (dimensioned nlake)
       IF ( Nlake>0 ) Lake_vol = 0.0D0
 
- 9002 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max > soil_moist_max', 2F10.5)
- 9003 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_init > soil_rechr_max', 2F10.5)
- 9004 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_init > soil_moist_max', 2F10.5)
- 9005 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr > soil_moist based on init and max values', 2F10.5)
- 9022 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_max_frac > 1.0', F10.5)
- 9023 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max', 2F10.5)
- 9024 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max', 2F10.5)
- 9025 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr > ag_soil_moist based on init and max values', 2F10.5)
- 9006 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_max < 0.00001', F10.5)
- 9007 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max < 0.00001', F10.5)
+ 9002 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max > soil_moist_max', 2F15.9)
+ 9003 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_init > soil_rechr_max', 2F15.9)
+ 9004 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_init > soil_moist_max', 2F15.9)
+ 9005 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr > soil_moist based on init and max values', 2F15.9)
+ 9022 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_max_frac > 1.0', F15.9)
+ 9023 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max', 2F15.9)
+ 9024 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max', 2F15.9)
+ 9025 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr > ag_soil_moist based on init and max values', 2F15.9)
+ 9006 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_max < 0.00001', F15.9)
+ 9007 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max < 0.00001', F15.9)
  9008 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_moist_max < 0.00001, set to 0.00001')
  9009 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr_max < 0.00001, set to 0.00001')
- 9012 FORMAT ('WARNING, HRU: ', I0, ' soil_rechr_max > soil_moist_max,', 2F10.5, /, 9X, &
+ 9012 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr_max > soil_moist_max,', 2F15.9, /, 9X, &
      &        'soil_rechr_max set to soil_moist_max')
- 9013 FORMAT ('WARNING, HRU: ', I0, ' soil_rechr_init > soil_rechr_max,', 2F10.5, /, 9X, &
+ 9013 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr_init > soil_rechr_max,', 2F15.9, /, 9X, &
      &        'soil_rechr set to soil_rechr_max')
- 9014 FORMAT ('WARNING, HRU: ', I0, ' soil_moist_init > soil_moist_max,', 2F10.5, /, 9X, &
+ 9014 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_moist_init > soil_moist_max,', 2F15.9, /, 9X, &
      &        'soil_moist set to soil_moist_max')
- 9015 FORMAT ('WARNING, HRU: ', I0, ' soil_rechr_init > soil_moist_init,', 2F10.5, /, 9X, &
-     &        'soil_rechr set to soil_moist based on init and max values')
- 9032 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_max_frac > 1.0,', F10.5, /, 9X, &
+ 9015 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr > soil_moist,', 2F15.9, /, 9X, &
+     &        'soil_rechr set to soil_moist based on initial and maximum values')
+ 9032 FORMAT (/,'WARNING, HRU: ', I0, ' ag_soil_rechr_max_frac > 1.0,', F15.9, /, 9X, &
      &        'ag_soil_rechr_max_frac set to 1.0')
- 9033 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max,', 2F10.5, /, 9X, &
+ 9033 FORMAT (/,'WARNING, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max,', 2F15.9, /, 9X, &
      &        'ag_soil_rechr set to ag_soil_rechr_max')
- 9034 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max,', 2F10.5, /, 9X, &
+ 9034 FORMAT (/,'WARNING, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max,', 2F15.9, /, 9X, &
      &        'ag_soil_moist set to ag_soil_moist_max')
- 9035 FORMAT ('WARNING, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_moist_init,', 2F10.5, /, 9X, &
+ 9035 FORMAT (/,'WARNING, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_moist_init,', 2F15.9, /, 9X, &
      &        'ag_soil_rechr set to ag_soil_moist based on init and max values')
 
       END FUNCTION climateflow_init
@@ -1613,8 +1602,8 @@ end module PRMS_IT0_VARS
       SUBROUTINE precip_form(Precip, Hru_ppt, Hru_rain, Hru_snow, Tmaxf, &
      &           Tminf, Pptmix, Newsnow, Prmx, Tmax_allrain_f, Rain_adj, &
      &           Snow_adj, Adjmix_rain, Hru_area, Sum_obs, Tmax_allsnow_f, Ihru)
-!      USE PRMS_CONSTANTS, ONLY: ACTIVE, DEBUG_minimum
-!      USE PRMS_MODULE, ONLY: Print_debug, forcing_check_flag
+      USE PRMS_CONSTANTS, ONLY: ACTIVE !, DEBUG_minimum
+      USE PRMS_MODULE, ONLY: forcing_check_flag !, Print_debug
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       use prms_utils, only: print_date
       IMPLICIT NONE
@@ -1635,7 +1624,7 @@ end module PRMS_IT0_VARS
 
 !******If maximum temperature is below or equal to the base temperature
 !******for snow then precipitation is all snow
-      IF ( Tmaxf<=Tmax_allsnow_f ) THEN
+      IF ( .not.(Tmaxf>Tmax_allsnow_f) ) THEN
         Hru_ppt = Precip*Snow_adj
         Hru_snow = Hru_ppt
         Newsnow = 1
@@ -1643,7 +1632,7 @@ end module PRMS_IT0_VARS
 !******If minimum temperature is above base temperature for snow or
 !******maximum temperature is above all_rain temperature then
 !******precipitation is all rain
-      ELSEIF ( Tminf>Tmax_allsnow_f .OR. Tmaxf>=Tmax_allrain_f ) THEN
+      ELSEIF ( Tminf>Tmax_allsnow_f .OR. .not.(Tmaxf<Tmax_allrain_f) ) THEN
         Hru_ppt = Precip*Rain_adj
         Hru_rain = Hru_ppt
         Prmx = 1.0
@@ -1655,7 +1644,7 @@ end module PRMS_IT0_VARS
           PRINT *, 'ERROR, tmax < tmin (degrees Fahrenheit), tmax:', Tmaxf, ' tmin:', TminF
           CALL print_date(1)
         ENDIF
-        IF ( ABS(tdiff)<0.0001 ) tdiff = 0.0001
+        IF ( ABS(tdiff)<0.00001 ) tdiff = 0.00001
         Prmx = ((Tmaxf-Tmax_allsnow_f)/tdiff)*Adjmix_rain
         IF ( Prmx<0.0 ) Prmx = 0.0
 
@@ -1663,7 +1652,7 @@ end module PRMS_IT0_VARS
 !******greater than or equal to 1.0 in which case it all rain
 !******If not, it is a rain/snow mixture
         IF ( Prmx<1.0 ) THEN
-          Pptmix = 1
+          Pptmix = ACTIVE
           Hru_ppt = Precip*Snow_adj
           Hru_rain = Prmx*Hru_ppt
           Hru_snow = Hru_ppt - Hru_rain
@@ -1678,7 +1667,7 @@ end module PRMS_IT0_VARS
       Basin_rain = Basin_rain + DBLE( Hru_rain*Hru_area )
       Basin_snow = Basin_snow + DBLE( Hru_snow*Hru_area )
 
-!      IF ( forcing_check_flag == ACTIVE ) THEN
+      IF ( forcing_check_flag == ACTIVE ) THEN
         IF ( Hru_ppt < 0.0 .OR. Hru_rain < 0.0 .OR. Hru_snow < 0.0 ) THEN
 !          IF ( Print_debug > DEBUG_minimum ) THEN
             PRINT '(A,I0)', 'Warning, adjusted precipitation value(s) < 0.0 for HRU: ', Ihru
@@ -1686,7 +1675,7 @@ end module PRMS_IT0_VARS
             CALL print_date(0)
 !          ENDIF
         ENDIF
-!      ENDIF
+      ENDIF
 
       END SUBROUTINE precip_form
 
@@ -1695,8 +1684,8 @@ end module PRMS_IT0_VARS
 !***********************************************************************
       SUBROUTINE climateflow_restart(In_out)
       USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, OFF
-      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Glacier_flag, GSFLOW_flag, &
-     &    Dprst_flag, Stream_order_flag, Nlake, AG_flag, text_restart_flag
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Glacier_flag, &
+     &    Dprst_flag, Stream_order_flag, Nlake, AG_flag, text_restart_flag, gwflow_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
       use prms_utils, only: check_restart
@@ -1712,7 +1701,7 @@ end module PRMS_IT0_VARS
         WRITE ( Restart_outunit ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
         WRITE ( Restart_outunit ) Transp_on
         WRITE ( Restart_outunit ) Pkwater_equiv
-        IF ( Glacier_flag==1 ) THEN
+        IF ( Glacier_flag==ACTIVE ) THEN
           WRITE ( Restart_outunit) Glacier_frac
           WRITE ( Restart_outunit) Glrette_frac
           WRITE ( Restart_outunit) Alt_above_ela
@@ -1722,7 +1711,7 @@ end module PRMS_IT0_VARS
         WRITE ( Restart_outunit ) Ssres_stor
         WRITE ( Restart_outunit ) Soil_rechr
         WRITE ( Restart_outunit ) Imperv_stor
-        IF ( GSFLOW_flag==OFF ) WRITE ( Restart_outunit ) Gwres_stor
+        IF ( gwflow_flag==ACTIVE ) WRITE ( Restart_outunit ) Gwres_stor
         IF ( Dprst_flag==ACTIVE ) THEN
           WRITE ( Restart_outunit ) Dprst_vol_open
           WRITE ( Restart_outunit ) Dprst_vol_clos
@@ -1741,7 +1730,7 @@ end module PRMS_IT0_VARS
         WRITE ( Restart_outunit, * ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
         WRITE ( Restart_outunit, * ) Transp_on
         WRITE ( Restart_outunit, * ) Pkwater_equiv
-        IF ( Glacier_flag==1 ) THEN
+        IF ( Glacier_flag==ACTIVE ) THEN
           WRITE ( Restart_outunit, * ) Glacier_frac
           WRITE ( Restart_outunit, * ) Glrette_frac
           WRITE ( Restart_outunit, * ) Alt_above_ela
@@ -1751,7 +1740,7 @@ end module PRMS_IT0_VARS
         WRITE ( Restart_outunit, * ) Ssres_stor
         WRITE ( Restart_outunit, * ) Soil_rechr
         WRITE ( Restart_outunit, * ) Imperv_stor
-        IF ( GSFLOW_flag==OFF ) WRITE ( Restart_outunit, * ) Gwres_stor
+        IF ( gwflow_flag==ACTIVE ) WRITE ( Restart_outunit, * ) Gwres_stor
         IF ( Dprst_flag==ACTIVE ) THEN
           WRITE ( Restart_outunit, * ) Dprst_vol_open
           WRITE ( Restart_outunit, * ) Dprst_vol_clos
@@ -1773,7 +1762,7 @@ end module PRMS_IT0_VARS
         READ ( Restart_inunit ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
         READ ( Restart_inunit ) Transp_on
         READ ( Restart_inunit ) Pkwater_equiv
-        IF ( Glacier_flag==1 ) THEN
+        IF ( Glacier_flag==ACTIVE ) THEN
           READ ( Restart_inunit) Glacier_frac
           READ ( Restart_inunit) Glrette_frac
           READ ( Restart_inunit) Alt_above_ela
@@ -1783,7 +1772,7 @@ end module PRMS_IT0_VARS
         READ ( Restart_inunit ) Ssres_stor
         READ ( Restart_inunit ) Soil_rechr
         READ ( Restart_inunit ) Imperv_stor
-        IF ( GSFLOW_flag==OFF ) READ ( Restart_inunit ) Gwres_stor
+        IF ( gwflow_flag==ACTIVE ) READ ( Restart_inunit ) Gwres_stor
         IF ( Dprst_flag==ACTIVE ) THEN
           READ ( Restart_inunit ) Dprst_vol_open
           READ ( Restart_inunit ) Dprst_vol_clos
@@ -1803,7 +1792,7 @@ end module PRMS_IT0_VARS
         READ ( Restart_inunit, * ) Basin_transp_on, Basin_soil_moist, Basin_ssstor, Basin_lake_stor
         READ ( Restart_inunit, * ) Transp_on
         READ ( Restart_inunit, * ) Pkwater_equiv
-        IF ( Glacier_flag==1 ) THEN
+        IF ( Glacier_flag==ACTIVE ) THEN
           READ ( Restart_inunit, * ) Glacier_frac
           READ ( Restart_inunit, * ) Glrette_frac
           READ ( Restart_inunit, * ) Alt_above_ela
@@ -1813,7 +1802,7 @@ end module PRMS_IT0_VARS
         READ ( Restart_inunit, * ) Ssres_stor
         READ ( Restart_inunit, * ) Soil_rechr
         READ ( Restart_inunit, * ) Imperv_stor
-        IF ( GSFLOW_flag==OFF ) READ ( Restart_inunit, * ) Gwres_stor
+        IF ( gwflow_flag==ACTIVE ) READ ( Restart_inunit, * ) Gwres_stor
         IF ( Dprst_flag==ACTIVE ) THEN
           READ ( Restart_inunit, * ) Dprst_vol_open
           READ ( Restart_inunit, * ) Dprst_vol_clos
