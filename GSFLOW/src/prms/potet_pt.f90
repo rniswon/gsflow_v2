@@ -44,7 +44,6 @@
 !******Compute "EQUIVALENT" EVAPOTRANSPIRATION, EEQ (IN./DAY),
 !...USING PRIESTLY-TAYLOR METHOD. THE VARIBLES ARE CALCULATED
 !...USING FORMULAS GIVEN IN JENSEN, 1990.
-        IF ( Humidity_cbh_flag==OFF ) Humidity_hru = Humidity_percent(1, Nowmonth)
         ! next three lines were in loop, moved out since just setting constants
         A1 = 17.625
         B1 = 243.04
@@ -68,7 +67,7 @@
 !...LATENT HEAT OF VAPORIZATION AT AVG TEMPERATURE, CAL/GRAM:
           ! elh = 597.3 - 0.5653*Tavgc(i) ! same as potet_jh
 !...LATENT HEAT OF VAPORIZATION AT AVG TEMPERATURE, JOULES/GRAM:
-          elh = (597.3 - 0.5653*Tavgc(i)) * 4.184 
+          elh = (597.3 - 0.5653*Tavgc(i)) * 4.184
           ! elh = 2501.0 - 2.361*Tavgc(i)
           ! elh = 2500.8 - 2.36*Tavgc(i) + 0.0016*Tavgc(i)**2 - 0.00006*Tavgc(i)**3
 
@@ -96,8 +95,9 @@
           !A1 = 17.625 !moved outside loop
           !B1 = 243.04 !moved outside loop
           t1 = A1 * Tavgc(i) / (B1 + Tavgc(i))
-          num = B1 * (LOG(Humidity_hru(i)/100.0) + t1) 
-          den = A1 - LOG(Humidity_hru(i)/100.0) - t1 
+          IF ( Humidity_cbh_flag==OFF ) Humidity_hru(i) = Humidity_percent(i, Nowmonth)
+          num = B1 * (LOG(Humidity_hru(i)/100.0) + t1)
+          den = A1 - LOG(Humidity_hru(i)/100.0) - t1
           Tempc_dewpt(i) = num / den
 
 ! Actual vapor pressure (Irmak eqn. 12), KPA
@@ -109,13 +109,13 @@
 ! are cases when soltab is zero for certain HRUs (depending on slope/aspect)
 ! for certain months. If this value is zero, reset it to a small value so
 ! there is no divide by zero.
-          IF (.not.(Soltab_potsw(Jday,i) > 10.0D0)) THEN
+          IF (Soltab_potsw(Jday,i) <= 10.0) THEN
             stab = 10.0
           ELSE
             stab = SNGL( Soltab_potsw(Jday,i) )
           ENDIF
 
-          IF ( .not.( Swrad(i) > 10.0) ) THEN
+          IF (Swrad(i) <= 10.0) THEN
             sw = 10.5
           ELSE
             sw = Swrad(i)
@@ -129,7 +129,7 @@
 ! Net radiation (Irmak eqn. 8) MJ / m2 / day
 ! 1 Langley = 0.04184 MJ/m2
           net_rad = Swrad(i)*0.04184 - Lwrad_net(i) - heat_flux
-          
+
 !...COMPUTE EEQ, CM/DAY
 !...net_rad in units of MJ/m2
 !...elh (LATENT HEAT OF VAPORIZATION) in units of JOULES/GRAM:

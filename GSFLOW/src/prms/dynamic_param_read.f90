@@ -660,6 +660,7 @@
 !     Values are read in, Parm are are updated or old
 !***********************************************************************
 !      SUBROUTINE write_dynparam_dble(Output_unit, Dim, Updated_hrus, Values, Param, Param_name)
+!      USE PRMS_CONSTANTS, ONLY: DEBUG_less, DEBUG_minimum
 !      USE PRMS_MODULE, ONLY: Print_debug, Nowyear, Nowmonth, Nowday
 !      IMPLICIT NONE
 ! Arguments

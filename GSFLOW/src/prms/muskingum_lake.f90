@@ -714,7 +714,7 @@
         IF ( getparam_real(MODNAME, 'tbl_gate', Ngate, Tbl_gate)/=0 ) CALL read_error(2, 'tbl_gate')
         IF ( getparam_int(MODNAME, 'ratetbl_lake', Nratetbl, Ratetbl_lake)/=0 ) CALL read_error(2, 'ratetbl_lake')
         IF ( Gate_flag==1 ) THEN
-          IF ( getparam_int(MODNAME, 'lake_out2', Nlake, Lake_out2)/=0  ) CALL read_error(2, 'lake_out2')
+          IF ( getparam_int(MODNAME, 'lake_out2', Nlake, Lake_out2)/=0 ) CALL read_error(2, 'lake_out2')
           DO j = 1, Nlake
             IF ( Lake_out2(j)==1 ) Secondoutflow_flag = ACTIVE
           ENDDO

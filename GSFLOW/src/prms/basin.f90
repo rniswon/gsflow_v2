@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2024-01-22'
+      character(len=*), parameter :: Version_basin = '2024-04-04'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag, Imperv_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area, Ag_area_total
@@ -17,7 +17,8 @@
       INTEGER, SAVE :: Weir_gate_flag, Puls_lin_flag
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_area_dble(:), Lake_area(:)
 !   Declared Variables
-      REAL, SAVE, ALLOCATABLE :: Hru_frac_perv(:), Hru_frac_imperv(:), Hru_frac_dprst(:), Ag_area(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_frac_perv(:), Ag_area(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_frac_imperv(:), Hru_frac_dprst(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_area_max(:)
       REAL, SAVE, ALLOCATABLE :: Hru_perv(:), Hru_imperv(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_area_open_max(:), Dprst_area_clos_max(:)
@@ -64,7 +65,7 @@
       INTEGER FUNCTION basdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Dprst_flag, Lake_route_flag, &
-     &    PRMS4_flag, Glacier_flag, AG_flag, gwflow_flag
+     &    PRMS4_flag, gwflow_flag, Glacier_flag, AG_flag
       use PRMS_MMFAPI, only: declvar_real, declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_BASIN
@@ -286,14 +287,13 @@
 !               and compute reservoir areas
 !**********************************************************************
       INTEGER FUNCTION basinit()
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, &
-     &    INACTIVE, LAKE, FEET, ERROR_basin, DEBUG_minimum, &
-     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, CLOSEZERO, ERROR_param, CANOPY !, METERS2FEET, SWALE
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CLOSEZERO, &
+     &    INACTIVE, LAKE, FEET, ERROR_basin, DEBUG_minimum, ERROR_param, &
+     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, CANOPY !, METERS2FEET, SWALE
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, &
-     &    Dprst_flag, Lake_route_flag, PRMS4_flag, PRMS_VERSION, &
-     &    Hru_type, irrigation_apply_flag, gwflow_flag, AG_flag, Ag_package, &
-     &    Starttime, Endtime, Parameter_check_flag !, Frozen_flag
+      USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, irrigation_apply_flag, &
+     &    Dprst_flag, Lake_route_flag, PRMS4_flag, gwflow_flag, PRMS_VERSION, &
+     &    Starttime, Endtime, Parameter_check_flag, AG_flag, Ag_package !, Frozen_flag
       USE PRMS_BASIN
       use prms_utils, only: checkdim_bounded_limits, error_stop, read_error, write_outfile
       IMPLICIT NONE
@@ -311,14 +311,6 @@
       IF ( getparam_real(MODNAME, 'hru_area', Nhru, Hru_area)/=0 ) CALL read_error(2, 'hru_area')
       IF ( getparam_real(MODNAME, 'hru_elev', Nhru, Hru_elev)/=0 ) CALL read_error(2, 'hru_elev')
       Hru_elev_ts = Hru_elev
-      IF ( Elev_units==FEET ) THEN
-!        Hru_elev_feet = Hru_elev_ts
-        Hru_elev_meters = Hru_elev_ts * FEET2METERS
-      ELSE
-!        Hru_elev_feet = Hru_elev_ts * METERS2FEET
-        Hru_elev_meters = Hru_elev_ts
-      ENDIF
-
       IF ( getparam_real(MODNAME, 'hru_lat', Nhru, Hru_lat)/=0 ) CALL read_error(2, 'hru_lat')
       IF ( getparam_int(MODNAME, 'cov_type', Nhru, Cov_type)/=0 ) CALL read_error(2, 'cov_type')
       IF ( getparam_real(MODNAME, 'covden_sum', Nhru, Covden_sum)/=0 ) CALL read_error(2, 'covden_sum')
@@ -453,6 +445,13 @@
         ENDIF
 
         Basin_lat = Basin_lat + DBLE( Hru_lat(i)*harea )
+        IF ( Elev_units==FEET ) THEN
+!          Hru_elev_feet(i) = Hru_elev(i)
+          Hru_elev_meters(i) = Hru_elev(i)*FEET2METERS
+        ELSE
+!          Hru_elev_feet(i) = Hru_elev(i)*METERS2FEET
+          Hru_elev_meters(i) = Hru_elev(i)
+        ENDIF
         j = j + 1
         Hru_route_order(j) = i
 
@@ -626,7 +625,7 @@
         IF ( Water_area>0.0D0 ) PRINT *,   'Fraction lakes              = ', Water_area*Basin_area_inv
         IF ( Dprst_flag==ACTIVE ) PRINT *, 'Fraction storage area       = ', basin_dprst*Basin_area_inv
         IF ( AG_flag==ACTIVE ) PRINT *,    'Fraction area               = ', basin_ag_area
-        PRINT *, ' '
+!        PRINT *, ' '
       ENDIF
 
 !     print out start and end times
@@ -654,7 +653,7 @@
           WRITE (buffer, 9005) 'Agriculture area:    ', basin_ag_area*Active_area, '    Fraction AG:      ', basin_ag_area
           CALL write_outfile(buffer)
         ENDIF
-        CALL write_outfile(' ')
+!        CALL write_outfile(' ')
       ENDIF
 
  9002 FORMAT (A, I4.2, 2('/', I2.2), I3.2, 2(':', I2.2))

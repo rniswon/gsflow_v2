@@ -648,9 +648,9 @@
 !     route_run - Computes segment flow states and fluxes
 !***********************************************************************
       INTEGER FUNCTION route_run()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, OUTFLOW_SEGMENT, GLACIER, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, OUTFLOW_SEGMENT, GLACIER, &
      &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
-     &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
+     &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT !, FT2_PER_ACRE
       USE PRMS_MODULE, ONLY: Nsegment, Cascade_flag, Glacier_flag, Hru_type
       USE PRMS_ROUTING
       USE PRMS_BASIN, ONLY: Hru_area_dble, Hru_route_order, Active_hrus
@@ -669,6 +669,8 @@
       LOGICAL :: found
 !***********************************************************************
       route_run = 0
+
+!      Cfs2acft = Timestep_seconds/FT2_PER_ACRE
 
 ! seg variables are not computed if cascades are active as hru_segment is ignored
       IF ( Hru_seg_cascades==ACTIVE ) THEN
@@ -734,7 +736,7 @@
       ELSE !     IF ( Noarea_flag==ACTIVE ) THEN
         DO i = 1, Nsegment
 ! This reworked by markstrom
-          IF ( Segment_hruarea(i)>NEARZERO ) THEN
+          IF ( Segment_hruarea(i)>0.0 ) THEN
             Seginc_swrad(i) = Seginc_swrad(i)/Segment_hruarea(i)
             Seginc_potet(i) = Seginc_potet(i)/Segment_hruarea(i)
           ELSE

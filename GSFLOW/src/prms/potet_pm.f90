@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_pm'
-        character(len=*), parameter :: Version_potet = '2024-01-15'
+        character(len=*), parameter :: Version_potet = '2023-03-16'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Pm_n_coef(:, :), Pm_d_coef(:, :), Crop_coef(:, :)
       END MODULE PRMS_POTET_PM
@@ -34,13 +34,12 @@
       INTRINSIC :: DBLE, LOG, SNGL
 ! Local Variables
       INTEGER :: i, j
-      REAL :: elh, prsr, psycnst, heat_flux, net_rad, vp_deficit, a, b, c 
+      REAL :: elh, prsr, psycnst, heat_flux, net_rad, vp_deficit, a, b, c
       REAL :: A1, B1, t1, num, den, stab, sw
 !***********************************************************************
       potet_pm = 0
 
       IF ( Process_flag==RUN ) THEN
-        IF ( Humidity_cbh_flag==OFF ) Humidity_hru = Humidity_percent(1, Nowmonth) 
         Basin_potet = 0.0D0
         Basin_humidity = 0.0D0
         DO j = 1, Active_hrus
@@ -53,7 +52,7 @@
 !...LATENT HEAT OF VAPORIZATION AT AVG TEMPERATURE, CAL/GRAM:
           ! elh = 597.3 - 0.5653*Tavgc(i) ! same as potet_jh
 !...LATENT HEAT OF VAPORIZATION AT AVG TEMPERATURE, JOULES/GRAM:
-          elh = (597.3 - 0.5653*Tavgc(i)) * 4.184 
+          elh = (597.3 - 0.5653*Tavgc(i)) * 4.184
           ! elh = 2501.0 - 2.361*Tavgc(i)
           ! elh = 2500.8 - 2.36*Tavgc(i) + 0.0016*Tavgc(i)**2 - 0.00006*Tavgc(i)**3
 
@@ -75,6 +74,7 @@
           A1 = 17.625
           B1 = 243.04
           t1 = A1 * Tavgc(i) / (B1 + Tavgc(i))
+          IF ( Humidity_cbh_flag==OFF ) Humidity_hru(i) = Humidity_percent(i, Nowmonth)
           num = B1 * (LOG(Humidity_hru(i)/100.0) + t1)
           den = A1 - LOG(Humidity_hru(i)/100.0) - t1
           Tempc_dewpt(i) = num / den
@@ -97,13 +97,13 @@
 ! are cases when soltab is zero for certain HRUs (depending on slope/aspect)
 ! for certain months. If this value is zero, reset it to a small value so
 ! there is no divide by zero.
-          IF ( .not.(Soltab_potsw(Jday,i) > 10.0D0) ) THEN
+          IF (Soltab_potsw(Jday,i) <= 10.0) THEN
             stab = 10.0
           ELSE
             stab = SNGL( Soltab_potsw(Jday,i) )
           ENDIF
 
-          IF ( .not.(Swrad(i) > 10.0) ) THEN
+          IF (Swrad(i) <= 10.0) THEN
             sw = 10.5
           ELSE
             sw = Swrad(i)

@@ -239,10 +239,10 @@
      &    Soil_zone_max, Soil_moist_tot, Soil_lower_stor_max, &
      &    Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, Ag_soil_rechr_max, Ag_soil_rechr_max_frac, &
      &    Basin_ag_soil_moist, Basin_ag_soil_rechr
-      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_basin_soil_moist, It0_soil_rechr, It0_hru_impervstor, &
-                               It0_dprst_stor_hru, It0_ssres_stor, It0_basin_ssstor, &
-                               It0_imperv_stor, It0_ag_soil_moist, It0_ag_soil_rechr, &
-                               It0_dprst_vol_open, It0_dprst_vol_clos, It0_slow_stor
+      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_imperv_stor, It0_hru_impervstor, &
+                               It0_ag_soil_moist, It0_ag_soil_rechr, It0_dprst_vol_open, It0_dprst_vol_clos, &
+                               It0_dprst_stor_hru, It0_slow_stor, It0_ssres_stor, &
+                               It0_basin_soil_moist, It0_basin_ssstor
       USE PRMS_SRUNOFF, ONLY:  Dprst_depth_avg, Op_flow_thres, Dprst_vol_open_max, Dprst_vol_clos_max, &
      &    Dprst_vol_thres_open, Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac
       USE PRMS_SOILZONE, ONLY: Replenish_frac
@@ -415,7 +415,7 @@
             CALL is_eof(Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day)
             check_imperv = ACTIVE
             check_fractions = ACTIVE
-            Imperv_flag = ACTIVE
+            Imperv_flag = OFF
           ENDIF
         ENDIF
       ENDIF

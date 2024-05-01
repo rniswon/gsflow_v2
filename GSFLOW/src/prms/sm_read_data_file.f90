@@ -25,7 +25,6 @@ contains
 !***********************************************************************
       CALL PRMS_open_input_file(Datafile_unit, Data_file, 'data_file', 0, ios)
       IF ( ios/=0 ) ERROR STOP ERROR_open_in
-      CALL write_outfile(' ')
       CALL write_outfile(EQULS)
       CALL write_outfile('Using PRMS Data File: '//Data_file)
 ! Echo Data File Header and comment lines

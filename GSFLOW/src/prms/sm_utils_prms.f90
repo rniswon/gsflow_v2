@@ -316,8 +316,8 @@ contains
       read (*, *)
     end if
 9001 format('WARNING, module versions are not identical', /, &
-      &        'Executable version: ', A, /, &
-      &        'Parameter File version: ', A,/)
+            'Executable version: ', A, /, &
+            'Parameter File version: ', A,/)
   end subroutine version_check
 
 !**********************************************************************
@@ -395,11 +395,11 @@ contains
     real, intent(IN) :: Tempc
     !***********************************************************************
     sat_vapor_press_poly = 6.11176750 + 0.443986062 * Tempc &
-    &                       + 0.0143053301 * Tempc**2 &
-    &                       + 0.265027242E-03 * Tempc**3 &
-    &                       + 0.302246994E-05 * Tempc**4 &
-    &                       + 0.203886313E-07 * Tempc**5 &
-    &                       + 0.638780966E-10 * Tempc**6
+                           + 0.0143053301 * Tempc**2 &
+                           + 0.265027242E-03 * Tempc**3 &
+                           + 0.302246994E-05 * Tempc**4 &
+                           + 0.203886313E-07 * Tempc**5 &
+                           + 0.638780966E-10 * Tempc**6
     ! Mastin documentation for potet_dpm
     !      sat_vapor_press_poly = 23.38*exp(18.1-5303.3/(Tempc+273.0))
     ! Mastin documentation for param_leaf-loss.aml
@@ -615,7 +615,7 @@ contains
     !      ENDIF
     !      compute_julday = Day + (153*mo - 457) / 5 + 365*yr + (yr/4) - (yr/100) + (yr/400) + 1721118.5
     compute_julday = Day - 32075 + 1461 * (Year + 4800 + (Month - 14) / 12) / 4 + 367 * (Month - 2 - (Month - 14) / 12 * 12) &
-    &    / 12 - 3 * ((Year + 4900 + (Month - 14) / 12) / 100) / 4
+                     / 12 - 3 * ((Year + 4900 + (Month - 14) / 12) / 100) / 4
 
   end function compute_julday
 
@@ -708,8 +708,8 @@ contains
     end if
     if (ios /= 0) then
       write (*, '(/,2A,/,A,/,2A,/)') 'ERROR opening input file: ', Fname(:nchars), &
-     &                               'check to be sure the input file exists', &
-     &                               'file specified by control parameter: ', Paramname
+                                     'check to be sure the input file exists', &
+                                     'file specified by control parameter: ', Paramname
       Iret = 1
     end if
   end subroutine PRMS_open_input_file
@@ -738,7 +738,7 @@ contains
 
     if (ios /= 0) then
       write (*, '(/,A,/,A,/)') 'ERROR opening output file:', Fname(:nchars), &
-      &                             'check to be sure the pathname is valid and the file is not open'
+                               'check to be sure the pathname is valid and the file is not open'
       write (*, '(2A,/)') 'file specified by control parameter: ', Paramname
       Iret = 1
     end if
@@ -757,12 +757,12 @@ contains
     ! Local Variables
     integer :: ios, nchars
     !***********************************************************************
-      Iunit = get_ftnunit(8888)
-      nchars = numchars(Fname)
+    Iunit = get_ftnunit(8888)
+    nchars = numchars(Fname)
     open (Iunit, FILE=Fname(:nchars), STATUS='REPLACE', IOSTAT=ios)
     if (ios /= 0) then
       write (*, '(/,A,/,A,/)') 'ERROR opening water balance output file:', Fname(:nchars), &
-     &                         'check to be sure the pathname is valid and the file is not open'
+                               'check to be sure the pathname is valid and the file is not open'
       ERROR stop ERROR_open_in
     end if
   end subroutine PRMS_open_module_file
@@ -828,7 +828,7 @@ contains
     character(LEN=*), intent(IN) :: Modname, Restart_module
     !***********************************************************************
     if (Restart_module /= Modname) then
-      print *, 'ERROR READING RESTART FILE, expecting module: ', Modname, ' found: ', Restart_module
+      print *, ', reading restart file, expecting module: ', Modname, ' found: ', Restart_module
       ERROR stop ERROR_restart
     end if
   end subroutine check_restart

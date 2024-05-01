@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2024-01-11'
+      character(len=*), parameter :: Version_stream_temp = '2024-04-04'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -736,7 +736,7 @@
 ! DANGER HACK
 ! On restart, sometimes soltab_potsw comes in as zero. It should never be zero as
 ! this results in divide by 0.0
-         if ( .not.(Soltab_potsw(jday, j) > 10.0D0) ) then
+         if (Soltab_potsw(jday, j) <= 10.0D0) then
             ccov = 1.0 - (Swrad(j) / 10.0 * sngl(Hru_cossl(j)))
          else
             ccov = 1.0 - (Swrad(j) / sngl(Soltab_potsw(jday, j)) * sngl(Hru_cossl(j)))
@@ -762,7 +762,7 @@
 
 ! Compute segment humidity if info is specified in CBH as time series by HRU
          IF ( Strmtemp_humidity_flag==0 ) then
-            Seg_humid(i) = Seg_humid(i) + Humidity_hru(j)*0.01*harea
+            Seg_humid(i) = Seg_humid(i) + Humidity_hru(j)/100.0*harea
          endif
 
 ! Figure out the contributions of the HRUs to each segment for these drivers.
@@ -916,7 +916,7 @@
 !      &        fs, " seg_tave_water = ", Seg_tave_water(i), " troff = " , Seg_tave_air(i), " up_temp = ", up_temp
 !         endif
 
-         if (.not.(seg_outflow(i)>0.0)) then
+         if (.not.(seg_outflow(i)>0.0D0)) then
             if (Seg_tave_water(i) > -99.0) then
                ! This segment has upstream HRUs somewhere, but the current day's flow is zero
                Seg_tave_water(i) = NOFLOW_TEMP

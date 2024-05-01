@@ -21,7 +21,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=11) :: MODNAME
-        character(len=*), parameter :: Version_precip = '2023-11-01'
+        character(len=*), parameter :: Version_precip = '2024-04-30'
         INTEGER, SAVE, ALLOCATABLE :: Psta_nuse(:)
         REAL, SAVE, ALLOCATABLE :: Rain_adj_lapse(:, :), Snow_adj_lapse(:, :), Precip_local(:)
         ! Declared Parameters
@@ -40,7 +40,7 @@
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_area, Hru_route_order, Basin_area_inv, Hru_elev_ts
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Prmx, Basin_ppt, &
      &    Basin_rain, Basin_snow, Hru_ppt, Hru_rain, Hru_snow, &
-     &    Basin_obs_ppt, Tmaxf, Tminf, Tmax_allrain_f, Tmax_allsnow_f, &
+     &    Basin_obs_ppt, Tmaxf, Tminf, Tavgf, Tmax_allrain_f, Tmax_allsnow_f, &
      &    Adjmix_rain, Precip_units
       USE PRMS_OBS, ONLY: Precip
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_int, getparam_real
@@ -93,7 +93,7 @@
           ENDIF
           IF ( ppt>0.0 ) &
      &         CALL precip_form(ppt, Hru_ppt(i), Hru_rain(i), Hru_snow(i), Tmaxf(i), &
-     &                          Tminf(i), Pptmix(i), Newsnow(i), Prmx(i), &
+     &                          Tminf(i), Tavgf(i), Pptmix(i), Newsnow(i), Prmx(i), &
      &                          Tmax_allrain_f(i,Nowmonth), Rain_adj_lapse(i,Nowmonth), Snow_adj_lapse(i,Nowmonth), &
      &                          Adjmix_rain(i,Nowmonth), Hru_area(i), sum_obs, Tmax_allsnow_f(i,Nowmonth), i)
         ENDDO
@@ -240,7 +240,7 @@
         pmo_diff = Pmn_mo(Hru_plaps, j) - Pmn_mo(Hru_psta, j)
         pmo_rate = pmo_diff / elp_diff
         adj_p = (pmo_rate*elh_diff)/Pmn_mo(Hru_psta, j)
-        IF ( .not.(Padj_sn(Hru_psta, j)<0.0) ) THEN
+        IF ( Padj_sn(Hru_psta, j)>=0.0 ) THEN
           Snow_adj_lapse(Ihru, j) = 1.0 + Padj_sn(Hru_psta, j)*adj_p
         ELSE
           Snow_adj_lapse(Ihru, j) = -Padj_sn(Hru_psta, j)

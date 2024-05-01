@@ -15,7 +15,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'ide_dist'
-      character(len=*), parameter :: Version_ide_dist = '2023-11-01'
+      character(len=*), parameter :: Version_ide_dist = '2024-04-30'
       INTEGER, SAVE :: Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Dalr
@@ -602,7 +602,7 @@
      +    Tmax_allsnow_sta, Tmax_allrain_sta
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus,
      +    Hru_route_order, Hru_elev_meters
-      USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Tminf, Newsnow, Pptmix,
+      USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Tminf, Tavgf, Newsnow, Pptmix,
      +    Hru_ppt, Hru_rain, Hru_snow, Basin_rain,
      +    Basin_ppt, Prmx, Basin_snow, Psta_elev_meters, Basin_obs_ppt,
      +    Precip_units, Tmax_allsnow_f, Tmax_allrain_f, Adjmix_rain
@@ -698,8 +698,8 @@
         IF ( ppt>0.0 ) THEN
           IF ( Precip_units==MM ) ppt = ppt*MM2INCH
           CALL precip_form(ppt, Hru_ppt(n), Hru_rain(n), Hru_snow(n),
-     +         Tmaxf(n), Tminf(n), Pptmix(n), Newsnow(n), Prmx(n),
-     +         Tmax_allrain_f(n,Nowmonth), 1.0, 1.0,
+     +         Tmaxf(n), Tminf(n), Tavgf(n), Pptmix(n), Newsnow(n),
+     +         Prmx(n), Tmax_allrain_f(n,Nowmonth), 1.0, 1.0,
      +         Adjmix_rain(n,Nowmonth), Hru_area(n), sum_obs,
      +         Tmax_allsnow_f(n,Nowmonth), n)
         ENDIF
