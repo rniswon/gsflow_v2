@@ -9,8 +9,10 @@
       character(len=*), parameter :: MODNAME = 'nhru_summary'
       character(len=*), parameter :: Version_nhru_summary = '2024-04-04'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear, nrows
-      INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nhru_var_type(:), Nhru_var_int(:, :), hru_ids(:), nhm_ids(:)
-      REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :), daily_values(:), monthly_values(:)
+      INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nhru_var_type(:), Nhru_var_int(:, :)
+      INTEGER, SAVE, ALLOCATABLE :: hru_ids(:), nhm_ids(:)
+      REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
+      REAL, SAVE, ALLOCATABLE :: daily_values(:), monthly_values(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Nhru_var_dble(:, :)
       CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2, Output_fmt3, Output_fmtint
       CHARACTER(LEN=48), SAVE :: Output_grid_fmt, Output_grid_fmtint, Output_date_fmt, Output_date_fmt3, Output_fmt3int
@@ -23,7 +25,8 @@
 ! Parameters
       INTEGER, SAVE, ALLOCATABLE :: Nhm_id(:)
 ! Control Parameters
-      INTEGER, SAVE :: NhruOutVars, NhruOut_freq, NhruOut_format, NhruOutNcol, outputSelectDatesON_OFF, write_binary_nhru_flag
+      INTEGER, SAVE :: NhruOutVars, NhruOut_freq, NhruOut_format, NhruOutNcol, outputSelectDatesON_OFF 
+      INTEGER, SAVE :: write_binary_nhru_flag
       CHARACTER(LEN=36), SAVE, ALLOCATABLE :: NhruOutVar_names(:)
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: NhruOutBaseFileName, selectDatesFileName
       END MODULE PRMS_NHRU_SUMMARY
@@ -136,7 +139,8 @@
       INTRINSIC :: MIN
       EXTERNAL :: write_header_date, to_upper
 ! Local Variables
-      INTEGER :: ios, ierr, size, jj, values_lastrow, nc
+      INTEGER :: ios, ierr, size, jj
+      INTEGER :: values_lastrow, nc
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
       CHARACTER(LEN=4) ::file_suffix
 !***********************************************************************
@@ -219,7 +223,7 @@
       IF ( NhruOut_freq==DAILY .OR. NhruOut_freq==DAILY_MONTHLY ) THEN
         Daily_flag = ACTIVE
         ALLOCATE ( Dailyunit(NhruOutVars) )
-        Dailyunit = 831
+        Dailyunit = 0
       ENDIF
 
       Monthly_flag = OFF
@@ -229,7 +233,7 @@
         Yeardays = 0
         ALLOCATE ( Nhru_var_yearly(Nhru, NhruOutVars), Yearlyunit(NhruOutVars) )
         Nhru_var_yearly = 0.0D0
-        Yearlyunit = 931
+        Yearlyunit = 0
         IF ( NhruOut_format==1 ) THEN
           WRITE ( Output_fmt3, 9003 ) Nhru
         ELSEIF ( NhruOut_format==2 ) THEN
@@ -247,7 +251,7 @@
         Monthdays = 0.0D0
         ALLOCATE ( Nhru_var_monthly(Nhru, NhruOutVars), Monthlyunit(NhruOutVars) )
         Nhru_var_monthly = 0.0D0
-        Monthlyunit = 731
+        Monthlyunit = 0
       ENDIF
 
       IF ( NhruOutON_OFF==2 ) THEN
@@ -258,7 +262,7 @@
           hru_ids(jj) = jj
         ENDDO
       ENDIF
-      WRITE ( Output_fmt2, 9002 ) '("Date",', Nhru, '(", ",I0) )'
+      WRITE ( Output_fmt2, 9002 ) Nhru
       ALLOCATE ( Nhru_var_daily(Nhru, NhruOutVars) )
       IF ( write_binary_nhru_flag == 2 .AND. Daily_flag==ACTIVE ) ALLOCATE( daily_values(Nhru) )
       IF ( write_binary_nhru_flag == 2 .AND. Monthly_flag == ACTIVE ) ALLOCATE( monthly_values(Nhru) )
@@ -305,7 +309,7 @@
       ENDDO
 
  9001 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',ES10.3))')
- 9002 FORMAT (A,I0,A)
+ 9002 FORMAT ('("Date"',I0,'('', ''I0))')
  9003 FORMAT ('(I4,', I0,'('','',ES10.3))')
  9004 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',I0))')
  9005 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',F0.4))')

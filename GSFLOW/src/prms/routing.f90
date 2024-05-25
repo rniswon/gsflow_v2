@@ -315,7 +315,7 @@
       use prms_utils, only: read_error, write_outfile
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: MOD, DBLE, ABS
+      INTRINSIC :: MOD, ABS, DBLE, maxval
 ! Local Variables
       INTEGER :: i, j, test, lval, toseg, iseg, isegerr, ierr, eseg
       REAL :: k, x, d, x_max, velocity
@@ -350,12 +350,14 @@
 
       special_seg_type_flag = OFF
       IF ( getparam_int(MODNAME, 'segment_type', Nsegment, Segment_type)/=0 ) CALL read_error(2, 'segment_type')
-      DO i = 1, Nsegment
-        IF ( Segment_type(i) > 0 ) THEN
-          special_seg_type_flag = ACTIVE
+      IF ( maxval(Segment_type) == 0 ) THEN
+        special_seg_type_flag = OFF
+      ELSE
+        special_seg_type_flag = ACTIVE
+        DO i = 1, Nsegment
           IF ( Segment_type(i) > 99 ) Segment_type(i) = MOD( Segment_type(i), 100 )
-        ENDIF
-      ENDDO
+        ENDDO
+      ENDIF
 
       IF ( Strmflow_flag==strmflow_muskingum_mann_module ) THEN
         IF ( getparam_real(MODNAME, 'mann_n', Nsegment, Mann_n)/=0 ) CALL read_error(2, 'mann_n')
@@ -648,12 +650,12 @@
 !     route_run - Computes segment flow states and fluxes
 !***********************************************************************
       INTEGER FUNCTION route_run()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, OUTFLOW_SEGMENT, GLACIER, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, OUTFLOW_SEGMENT, GLACIER, NEARZERO, &
      &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
      &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT !, FT2_PER_ACRE
       USE PRMS_MODULE, ONLY: Nsegment, Cascade_flag, Glacier_flag, Hru_type
       USE PRMS_ROUTING
-      USE PRMS_BASIN, ONLY: Hru_area_dble, Hru_route_order, Active_hrus
+      USE PRMS_BASIN, ONLY: Hru_area, Hru_route_order, Active_hrus
       USE PRMS_CLIMATEVARS, ONLY: Swrad, Potet
       USE PRMS_SET_TIME, ONLY: Timestep_seconds, Cfs_conv
       USE PRMS_FLOWVARS, ONLY: Ssres_flow, Sroff, Seg_lateral_inflow, Strm_seg_in !, Seg_outflow
@@ -692,7 +694,7 @@
 
       DO jj = 1, Active_hrus
         j = Hru_route_order(jj)
-        tocfs = Hru_area_dble(j) * Cfs_conv
+        tocfs = DBLE( Hru_area(j) )*Cfs_conv
         Hru_outflow(j) = DBLE( (Sroff(j) + Ssres_flow(j) + Gwres_flow(j)) )*tocfs
         ! Note: glacr_flow (from glacier or snowfield) is added as a gain, outside stream network addition
         ! glacr_flow in inch^3, 1728=12^3
@@ -710,8 +712,8 @@
             Seginc_sroff(i) = Seginc_sroff(i) + DBLE( Sroff(j) )*tocfs
             Seginc_ssflow(i) = Seginc_ssflow(i) + DBLE( Ssres_flow(j) )*tocfs
             Seginc_gwflow(i) = Seginc_gwflow(i) + DBLE( Gwres_flow(j) )*tocfs
-            Seginc_swrad(i) = Seginc_swrad(i) + DBLE( Swrad(j) ) * Hru_area_dble(j)
-            Seginc_potet(i) = Seginc_potet(i) + DBLE( Potet(j) ) * Hru_area_dble(j)
+            Seginc_swrad(i) = Seginc_swrad(i) + DBLE( Swrad(j)*Hru_area(j) )
+            Seginc_potet(i) = Seginc_potet(i) + DBLE( Potet(j)*Hru_area(j) )
           ENDIF
         ENDIF
       ENDDO
@@ -736,7 +738,7 @@
       ELSE !     IF ( Noarea_flag==ACTIVE ) THEN
         DO i = 1, Nsegment
 ! This reworked by markstrom
-          IF ( Segment_hruarea(i)>0.0 ) THEN
+          IF ( Segment_hruarea(i)>NEARZERO ) THEN
             Seginc_swrad(i) = Seginc_swrad(i)/Segment_hruarea(i)
             Seginc_potet(i) = Seginc_potet(i)/Segment_hruarea(i)
           ELSE
@@ -745,7 +747,7 @@
             this_seg = i
             found = .false.
             do
-              if ( .not.(Segment_hruarea(this_seg) > 0.0) ) then
+              if (Segment_hruarea(this_seg) <= NEARZERO) then
 
                  ! Hit the headwater segment without finding any HRUs (i.e. sources of streamflow)
                  if (segment_up(this_seg) == 0) then
@@ -770,7 +772,7 @@
               this_seg = i
               found = .false.
               do
-                if ( .not.(Segment_hruarea(this_seg) > 0.0) ) then
+                if (Segment_hruarea(this_seg) <= NEARZERO) then
 
                    ! Hit the terminal segment without finding any HRUs (i.e. sources of streamflow)
                    if (Tosegment(this_seg) == OUTFLOW_SEGMENT) then

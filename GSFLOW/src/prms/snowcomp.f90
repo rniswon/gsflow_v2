@@ -24,7 +24,7 @@
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
       character(len=*), parameter :: Version_snowcomp = '2024-04-30'
-      INTEGER, SAVE :: Ihru, Active_glacier, snowpack_to_zero_flag
+      INTEGER, SAVE :: Active_glacier, Ihru, snowpack_to_zero_flag
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
       REAL, SAVE, ALLOCATABLE :: Snowcov_areasv(:)
@@ -820,6 +820,8 @@
         IF ( getparam_real(MODNAME, 'glacier_frac_init', Nhru, Glacier_frac_init)/=0 ) CALL read_error(2, 'glacier_frac_init')
         Glacr_albedo = 0.0
         Glacier_frac = Glacier_frac_init
+        IF ( getparam_real(MODNAME, 'glrette_frac_init', Nhru, Glrette_frac_init)/=0 ) CALL read_error(2, 'glrette_frac_init')
+        Glrette_frac = Glrette_frac_init
         DO j = 1, Active_hrus
           i = Hru_route_order(j)
           IF ( Glacier_frac(i)>0.0 ) THEN
@@ -880,9 +882,9 @@
 !***********************************************************************
       INTEGER FUNCTION snorun()
       USE PRMS_CONSTANTS, ONLY: LAKE, LAND, GLACIER, SHRUBS, FEET, &
-     &    INCH2M, FEET2METERS, ZERO_SNOWPACK, ACTIVE, OFF, DEBUG_less, DAYS_YR, PRMS6, DEBUG_minimum, CANOPY
+     &    INCH2M, FEET2METERS, ZERO_SNOWPACK, ACTIVE, OFF, DEBUG_less, DAYS_YR, DEBUG_minimum, CANOPY
       USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag, Start_year, Hru_type, &
-     &    Nowyear, Nowmonth, Albedo_cbh_flag, snow_cloudcover_flag, Model, &
+     &    Nowyear, Nowmonth, Albedo_cbh_flag, snow_cloudcover_flag, PRMS6_flag, &
      &    Nowday, PRMS_land_iteration_flag, Kkiter
       USE PRMS_SNOW
       USE PRMS_SOLTAB, ONLY: Soltab_horad_potsw, Soltab_potsw, Hru_cossl
@@ -1055,7 +1057,7 @@
         ! - reset the counter for the number of days a snowpack is at 0 deg Celsius
         !rsr, do we want to reset all HRUs, what about Southern Hemisphere
         IF ( Julwater==1 ) THEN
-          IF ( Model==PRMS6 ) THEN
+          IF ( PRMS6_flag==ACTIVE ) THEN
             Pss(i) = It0_pkwater_equiv(i) ! [inches]
           ELSE
             Pss(i) = 0.0D0 ! [inches]
@@ -1110,7 +1112,7 @@
             Yrdays5 = Yrdays5 + 1
             Glacr_air_5avtemp(i) = ( Glacr_air_5avtemp(i)*(Yrdays5-1)+ Tavgc(i) )/Yrdays5
           ENDIF
-          ! Do for every time step
+! Do for every time step
           Ann_tempc(i) = ( Ann_tempc(i)*(Julwater-1)+ Tavgc(i) )/Julwater
           Glacr_5avsnow(i) = Glacr_5avsnow(i) + Net_snow(i)/5.0
         ENDIF
@@ -1242,8 +1244,8 @@
         IF ( Active_glacier>OFF ) THEN
           IF ( Active_glacier==1 ) Glacrcov_area(i) =(1.0-Snowcov_area(i))*Glacier_frac(i)
           IF ( Active_glacier==2 ) Glacrcov_area(i) =(1.0-Snowcov_area(i))*Glrette_frac(i)
-          ! Albedo so transition snow to ice smooothly, see Oerlemans 1992, this is albedo if snowcovered ice too
-          ! Albedo can be input in a CBH File when albedo_cbh_flag = ACTIVE
+! Albedo so transition snow to ice smooothly, see Oerlemans 1992, this is albedo if snowcovered ice too
+! Albedo can be input in a CBH File when albedo_cbh_flag = ACTIVE
           IF ( Albedo_cbh_flag==OFF ) THEN
             Albedo(i) = Albedo(i) - (Albedo(i)-Glacr_albedo(i))*EXP(-5.0*SNGL(Pkwater_equiv(i))*INCH2M)
             IF ( Albedo(i)<0.08 ) Albedo(i)=0.08 !See Brock 2000
@@ -1434,7 +1436,8 @@
             ! adjusted by the albedo (some is reflected back into the
             ! atmoshphere) and the transmission coefficient (some is
             ! intercepted by the winter vegetative canopy)
-            sw = Swrad(i) * (1.0 - Albedo(i)) * Rad_trncf(i) ! [cal/cm^2] or [Langleys]
+            sw = Swrad(i)*(1.0-Albedo(i))*Rad_trncf(i) ! [cal/cm^2]
+                                                       ! or [Langleys]
             CALL snowbal(niteda, Tstorm_mo(i,Nowmonth), Iasw(i), &
      &                   temp, esv, Hru_ppt(i), trd, Emis_noppt(i), &
      &                   Canopy_covden(i), cec, Pkwater_equiv(i), &
@@ -1609,8 +1612,8 @@
      &           Freeh2o, Snowcov_area, Snowmelt, Pk_depth, Pss, Pst, &
      &           Net_snow, Pk_den, Pptmix_nopack, Pk_precip, Tmax_allrain_c, Tmax_allsnow_c, &
      &           Freeh2o_cap, GlacierFlag)
-      USE PRMS_CONSTANTS, ONLY: CLOSEZERO, INCH2CM, ACTIVE, OFF, PRMS6 !, ZERO_SNOWPACK
-      USE PRMS_MODULE, ONLY: Model
+      USE PRMS_CONSTANTS, ONLY: CLOSEZERO, INCH2CM, ACTIVE, OFF !, ZERO_SNOWPACK
+      USE PRMS_MODULE, ONLY: PRMS6_flag
       USE PRMS_SNOW, ONLY: Active_glacier
       IMPLICIT NONE
 ! Functions
@@ -1659,7 +1662,7 @@
           IF ( Pptmix==ACTIVE ) THEN
             ! If there is any rain, the rain temperature is halfway between the maximum
             ! temperature and the allsnow temperature
-            IF ( Model==PRMS6 ) THEN
+            IF ( PRMS6_flag==ACTIVE ) THEN
               train = (Tavgc+Tmax_allrain_c)*0.5 ! [degrees C]
             ELSE
               train = (Tmaxc+Tmax_allsnow_c)*0.5 ! [degrees C]
@@ -1672,7 +1675,7 @@
             ! temperature is halfway between the maximum daily temperature
             ! and maximum temperature for which all precipitation is snow
             IF ( train<CLOSEZERO ) THEN
-              IF ( Model==PRMS6 ) THEN
+              IF ( PRMS6_flag==ACTIVE ) THEN
                 train = (Tavgc+Tmax_allrain_c)*0.5 ! [degrees C]
               ELSE
                 train = (Tmaxc+Tmax_allsnow_c)*0.5 ! [degrees C]
@@ -2654,11 +2657,13 @@
       REAL, INTENT(OUT) :: Snow_evap, Freeh2o
 ! Local Variables
       REAL :: avail_et, cal, ez
+      DOUBLE PRECISION :: ez_dble
 !***********************************************************************
       ! the amount of evaporation affecting the snowpack is the
       ! total evaporation potential minus the evaporation from
       ! the interception storage
       ez = Potet_sublim*Potet*Snowcov_area - Hru_intcpevap ! [inches]
+      ez_dble = DBLE( ez )
 
       ! The effects of evaporation depend on whether there is any
       ! potential for evaporation, and if the potential evapotation
@@ -2669,14 +2674,14 @@
       ! if on snow over glacier or active_layer and have excess energy from day over
       !        depth can evap from layer thickness, add depth to that layer
       IF ( Active_glacier>OFF ) THEN
-        IF ( DBLE(ez)>Pkwater_equiv ) Pkwater_equiv = DBLE(ez)
+        IF ( ez_dble>Pkwater_equiv ) Pkwater_equiv = ez_dble
       ENDIF
       IF ( ez<CLOSEZERO ) THEN
         Snow_evap = 0.0 ! [inches]
 
       ! (2) Enough potential evaporation to entirely deplete
       !     the snowpack...
-      ELSEIF ( DBLE(ez)>=Pkwater_equiv ) THEN
+      ELSEIF ( ez_dble>=Pkwater_equiv ) THEN
         ! Set the evaporation to the pack water equivalent and set
         ! all snowpack variables to no-snowpack values
         Snow_evap = SNGL(Pkwater_equiv) ! [inches]
@@ -2712,7 +2717,7 @@
           Pk_def = Pk_def + cal
         ENDIF
         ! Remove the evaporated water from the pack water equivalent
-        Pkwater_equiv = Pkwater_equiv - DBLE(ez)
+        Pkwater_equiv = Pkwater_equiv - ez_dble
         Snow_evap = ez
         !! JLM: if pk_ice < 0, that difference should be taken from freeh2o
         !! JLM: taking ez from pkwater_equiv is inconsistent with only taking

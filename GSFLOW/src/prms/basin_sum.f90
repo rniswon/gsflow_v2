@@ -7,14 +7,15 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=9), parameter :: MODNAME = 'basin_sum'
-      character(len=*), parameter :: Version_basin_sum = '2024-04-`0'
+      character(len=*), parameter :: Version_basin_sum = '2024-04-30'
 
       INTEGER, SAVE :: BALUNT, Totdays
       INTEGER, SAVE :: Header_prt, Endjday
       CHARACTER(LEN=32) :: Buffer32
       CHARACTER(LEN=40) :: Buffer40
       CHARACTER(LEN=48) :: Buffer48
-      CHARACTER(LEN=80) :: Buffer80
+      CHARACTER(LEN=63) :: Buffer63
+      CHARACTER(LEN=81) :: Buffer81
       CHARACTER(LEN=120) :: Buffer120
       CHARACTER(LEN=151) :: Buffer151
       CHARACTER(LEN=151), PARAMETER :: DASHS = ' --------------------------------------------------------'// &
@@ -574,10 +575,10 @@
           CALL write_outfile(Buffer40)
 
         ELSEIF ( Print_type==1 ) THEN
-          WRITE ( Buffer120, "(I7,2I5,2F9.3,F10.3,4F9.3)" ) Nowyear, &
+          WRITE ( Buffer81, "(I7,2I5,2F9.3,F10.3,4F9.3)" ) Nowyear, &
      &            Nowmonth, Nowday, Basin_ppt, Basin_actet, Basin_storage, &
      &            Basin_stflow_out, Obsq_inches, wat_bal, Watbal_sum
-          CALL write_outfile(Buffer120(:81))
+          CALL write_outfile(Buffer81)
 
         ELSEIF ( Print_type==2 ) THEN
           WRITE ( Buffer151, 9001 ) Nowyear, Nowmonth, Nowday, Basin_swrad, &
@@ -652,10 +653,10 @@
 
           ELSEIF ( Print_type==1 ) THEN
             IF ( Dprt ) CALL write_outfile(DASHS(:63))
-            WRITE ( Buffer80, "(I7,I5,5X,2F9.3,F10.3,2F9.3)" ) Nowyear, &
+            WRITE ( Buffer63, "(I7,I5,5X,2F9.3,F10.3,2F9.3)" ) Nowyear, &
      &              Nowmonth, Basin_ppt_mo, Basin_actet_mo, Basin_storage, &
      &              Basin_stflow_mo, Obsq_inches_mo
-            CALL write_outfile(Buffer80(:63))
+            CALL write_outfile(Buffer63)
             IF ( Dprt ) CALL write_outfile(DASHS(:63))
 
           ELSEIF ( Print_type==2 ) THEN
@@ -712,9 +713,9 @@
 ! ****annual summary here
           ELSEIF ( Print_type==1 ) THEN
             IF ( Mprt .OR. Dprt ) CALL write_outfile(EQULS(:63))
-            WRITE ( Buffer80, "(I7,10X,2F9.3,F10.3,2F9.3)" ) Nowyear, Basin_ppt_yr, &
+            WRITE ( Buffer63, "(I7,10X,2F9.3,F10.3,2F9.3)" ) Nowyear, Basin_ppt_yr, &
      &              Basin_actet_yr, Basin_storage, Basin_stflow_yr, Obsq_inches_yr
-            CALL write_outfile(Buffer80(:63))
+            CALL write_outfile(Buffer63)
             IF ( Mprt .OR. Dprt ) CALL write_outfile(EQULS(:63))
 
           ELSEIF ( Print_type==2 ) THEN
@@ -796,9 +797,9 @@
 
           ELSEIF ( Print_type==1 ) THEN
             CALL write_outfile(STARS(:63))
-            WRITE ( Buffer80, 9005 ) ' Total for run', Basin_ppt_tot, &
+            WRITE ( Buffer63, 9005 ) ' Total for run', Basin_ppt_tot, &
      &              Basin_actet_tot, Basin_storage, Basin_stflow_tot, Obsq_inches_tot
-            CALL write_outfile(Buffer80(:63))
+            CALL write_outfile(Buffer63)
             CALL write_outfile(STARS(:63))
 
           ELSEIF ( Print_type==2 ) THEN
@@ -830,7 +831,7 @@
 ! This writes the measured and simulated table header.
 !***********************************************************************
       SUBROUTINE header_print(Print_type)
-      USE PRMS_BASINSUM, ONLY: DASHS, Buffer80, Print_freq, Header_prt
+      USE PRMS_BASINSUM, ONLY: DASHS, Buffer81, Print_freq, Header_prt, Buffer63
       use prms_utils, only: write_outfile
       IMPLICIT NONE
 ! Arguments
@@ -839,9 +840,9 @@
       CALL write_outfile(' ')
 !  This writes the water balance table header.
       IF ( Header_prt==3 ) THEN
-        CALL write_outfile('   Year Month Day   Precip     ET    Storage S-Runoff M-Runoff')
-        WRITE (Buffer80, 9002)
-        CALL write_outfile(Buffer80(:63))
+        CALL write_outfile('   Year Month Day   Precip     ET    Storage  S-Runoff M-Runoff')
+        WRITE (Buffer63, 9002)
+        CALL write_outfile(Buffer63)
         CALL write_outfile(DASHS(:63))
 
       ELSEIF ( Print_type==0 ) THEN
@@ -856,9 +857,9 @@
 !  This writes the water balance table header.
       ELSEIF ( Print_type==1 ) THEN
         CALL write_outfile('   Year Month Day   Precip     ET    Storage  S-Runoff M-Runoff   Watbal  WBalSum')
-        WRITE (Buffer80, 9001)
-        CALL write_outfile(Buffer80)
-        CALL write_outfile(DASHS(:80))
+        WRITE (Buffer81, 9001)
+        CALL write_outfile(Buffer81)
+        CALL write_outfile(DASHS(:81))
 
 !  This writes the detailed table header.
       ELSEIF ( Print_type==2 ) THEN

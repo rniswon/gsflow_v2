@@ -265,7 +265,7 @@
           ENDDO
         ENDIF
         IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
-          WRITE ( MSGUNT, 9002 )
+          WRITE ( MSGUNT, 9002 ) 
           k = 0
           DO ii = 1, Active_gwrs
             i = Gwr_route_order(ii)

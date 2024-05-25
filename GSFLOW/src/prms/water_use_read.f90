@@ -52,9 +52,8 @@
       INTEGER FUNCTION water_use_read()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, &
      &    RUN, DECL, INIT, CLEAN, ERROR_water_use, strmflow_noroute_module, strmflow_muskingum_lake_module
-     use PRMS_CONTROL_FILE, only: control_string
-     use PRMS_MMFAPI, only: declvar_dble, declvar_real
-     use PRMS_READ_PARAM_FILE, only: decldim, getdim
+      use PRMS_CONTROL_FILE, only: control_string
+      use PRMS_MMFAPI, only: declvar_dble, declvar_real
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nsegment, Nwateruse, Nexternal, Nconsumed, &
      &    Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
      &    External_transferON_OFF, Dprst_transferON_OFF, Dprst_flag, Strmflow_flag, &
@@ -80,7 +79,7 @@
       ! Types
       ! (1) stream segments; (2) groundwater reservoirs; (3) surface-depression storage;
       ! (4) external locations; (5) lakes; (6) capillary reservoir of the soil zone;
-      ! (7) internal consumptive-use locations; and (8) plant canopy.
+      ! (7) internal consumptive-use locations; and (8) plant canopy. 
 !***********************************************************************
       water_use_read = 0
 
@@ -124,7 +123,7 @@
           Total_segment_gain = 0.0D0
           Segment_gain = 0.0
         ENDIF
-
+          
         IF ( Lake_transferON_OFF==ACTIVE ) THEN
           CALL read_event(lake_unit, LAKE, lake_next_year, lake_next_month, lake_next_day)
           Total_lake_transfer = 0.0D0
@@ -464,7 +463,7 @@
         CALL PRMS_open_module_file(Outunit, 'water_use.out')
         WRITE ( Outunit, 10 ) 'Simulation Start Date:', year, month, day, '   End Date:', &
      &                         End_year, End_month, End_day
-10      FORMAT ( 'Water Use Summary File', /, 2(A, I5, 2('/',I2.2)), / )
+10      FORMAT ( 'Water Use Summary File', /, 2(A, I5, 2('/',I2.2)), / ) 
 
         istop = 0
         IF ( Segment_transferON_OFF==ACTIVE ) THEN ! type STREAM

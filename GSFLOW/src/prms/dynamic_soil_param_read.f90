@@ -236,13 +236,13 @@
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Imperv_stor, Sat_threshold, &
      &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor, &
      &    Slow_stor, Pref_flow_stor, Basin_soil_moist, Basin_ssstor, Hru_impervstor, Dprst_stor_hru, &
-     &    Soil_zone_max, Soil_moist_tot, Soil_lower_stor_max, &
+     &    Soil_zone_max, Soil_lower_stor_max, &
      &    Ag_soil_moist, Ag_soil_rechr, Ag_soil_moist_max, Ag_soil_rechr_max, Ag_soil_rechr_max_frac, &
      &    Basin_ag_soil_moist, Basin_ag_soil_rechr
-      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_soil_rechr, It0_imperv_stor, It0_hru_impervstor, &
+      USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_basin_soil_moist, It0_soil_rechr, &
+                               It0_ssres_stor, It0_basin_ssstor, It0_imperv_stor, It0_hru_impervstor, &
                                It0_ag_soil_moist, It0_ag_soil_rechr, It0_dprst_vol_open, It0_dprst_vol_clos, &
-                               It0_dprst_stor_hru, It0_slow_stor, It0_ssres_stor, &
-                               It0_basin_soil_moist, It0_basin_ssstor
+                               It0_dprst_stor_hru, It0_slow_stor
       USE PRMS_SRUNOFF, ONLY:  Dprst_depth_avg, Op_flow_thres, Dprst_vol_open_max, Dprst_vol_clos_max, &
      &    Dprst_vol_thres_open, Dprst_vol_open_frac, Dprst_vol_clos_frac, Dprst_vol_frac
       USE PRMS_SOILZONE, ONLY: Replenish_frac
@@ -386,8 +386,8 @@
           ENDIF
 
           IF ( check_dprst_depth_flag==ACTIVE ) THEN
-            Dprst_vol_clos_max(i) = Dprst_area_clos_max(i)*DBLE(Dprst_depth_avg(i))
-            Dprst_vol_open_max(i) = Dprst_area_open_max(i)*DBLE(Dprst_depth_avg(i))
+            Dprst_vol_clos_max(i) = DBLE( Dprst_area_clos_max(i)*Dprst_depth_avg(i) )
+            Dprst_vol_open_max(i) = DBLE( Dprst_area_open_max(i)*Dprst_depth_avg(i) )
             Dprst_vol_thres_open(i) = Dprst_vol_open_max(i)*DBLE(Op_flow_thres(i))
           ENDIF
         ENDDO
@@ -607,19 +607,19 @@
                 IF ( frac_dprst>0.0 ) THEN
                   ! update variables as dprst could have gone from positive value to 0 and not get updated in srunoff
                   IF ( Dprst_vol_open_max(i)>0.0D0 ) THEN
-                    Dprst_vol_open_frac(i) = Dprst_vol_open(i)/Dprst_vol_open_max(i)
+                    Dprst_vol_open_frac(i) = SNGL( Dprst_vol_open(i)/Dprst_vol_open_max(i) )
                   ELSE
-                    Dprst_vol_open_frac(i) = 0.0D0
+                    Dprst_vol_open_frac(i) = 0.0
                   ENDIF
                   IF ( Dprst_vol_clos_max(i)>0.0D0 ) THEN
-                    Dprst_vol_clos_frac(i) = Dprst_vol_clos(i)/Dprst_vol_clos_max(i)
+                    Dprst_vol_clos_frac(i) = SNGL( Dprst_vol_clos(i)/Dprst_vol_clos_max(i) )
                   ELSE
-                    Dprst_vol_clos_frac(i) = 0.0D0
+                    Dprst_vol_clos_frac(i) = 0.0
                   ENDIF
                   IF ( Dprst_vol_open_max(i)+Dprst_vol_clos_max(i)>0.0D0 ) THEN
-                    Dprst_vol_frac(i) = (Dprst_vol_open(i)+Dprst_vol_clos(i))/(Dprst_vol_open_max(i)+Dprst_vol_clos_max(i))
+                    Dprst_vol_frac(i) = SNGL( (Dprst_vol_open(i)+Dprst_vol_clos(i))/(Dprst_vol_open_max(i)+Dprst_vol_clos_max(i)) )
                   ELSE
-                    Dprst_vol_frac(i) = 0.0D0
+                    Dprst_vol_frac(i) = 0.0
                   ENDIF
                 ENDIF
               ENDIF
@@ -750,10 +750,8 @@
           i = Hru_route_order(j)
           IF ( Hru_type(i)==LAKE ) CYCLE ! skip lake
           Soil_zone_max(i) = Sat_threshold(i) + Soil_moist_max(i)*Hru_frac_perv(i)
-          Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*Hru_frac_perv(i)
           IF ( GSFLOW_flag==ACTIVE .AND. Soil_moist_max(i)>0.0 ) Replenish_frac(i) = Soil_rechr_max(i)/Soil_moist_max(i)
           IF ( AG_flag==ACTIVE ) THEN
-            Soil_moist_tot(i) = Soil_moist_tot(i) + Ag_soil_moist(i)*Ag_frac(i)
             IF ( GSFLOW_flag==ACTIVE .AND. Ag_soil_moist_max(i)>0.0 ) &
                  Ag_replenish_frac(i) = ag_soil_rechr_max(i)/Ag_soil_moist_max(i)
           ENDIF

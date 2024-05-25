@@ -23,6 +23,7 @@ C     ******************************************************************
 !     ------------------------------------------------------------------
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
+     +                       , githash
       USE GSFMODFLOW
       IMPLICIT NONE
 !***********************************************************************
@@ -44,7 +45,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
      &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,',
      &        /, 25X, 'AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
 
-        WRITE(*,'(24X,A)') 'Github Commit Hash cf8b62c'
+        WRITE(*,'(24X,A)') githash
 
         ! Allocate local module variables
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
@@ -132,7 +133,7 @@ C4------OPEN NAME FILE.
 C
 C5------Get current date and time, assign to IBDT, and write to screen
       CALL DATE_AND_TIME(VALUES=IBDT)
-      IF ( Model>GSFLOW )
+      IF ( Model==MODFLOW .OR. Model==MODSIM_MODFLOW )
      &     WRITE(*,2) (IBDT(I),I=1,3),(IBDT(I),I=5,7)
     2 FORMAT(' Run start date and time (yyyy/mm/dd hh:mm:ss): ',
      &       I0,'/',I2.2,'/',I2.2,I3,2(':',I2.2),/)
@@ -1835,7 +1836,7 @@ C
           END DO
         END DO
         IF ( TESTSFR>1.0 ) THEN
-          IF ( Print_debug>DEBUG_minimum ) PRINT 10
+          IF ( Print_debug==0 ) PRINT 10
         END IF
       END IF
 ! Zero LAK flows (PPT, EVAP, RUNOFF, SP.WITHDRAWL).
@@ -1850,7 +1851,7 @@ C
         RNF = 0.0
         WTHDRW = 0.0
         IF ( TESTLAK>1.0 ) THEN
-          IF ( Print_debug>DEBUG_minimum ) PRINT 11
+          IF ( Print_debug==0 ) PRINT 11
         END IF
       END IF
 

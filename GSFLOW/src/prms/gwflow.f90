@@ -269,7 +269,7 @@
       USE PRMS_MODULE, ONLY: Ngw, Nlake, Print_debug, Init_vars_from_file, &
      &    Dprst_flag, Inputerror_flag, Gwr_swale_flag
       USE PRMS_GWFLOW
-      USE PRMS_BASIN, ONLY: Gwr_type, Hru_area_dble, Basin_area_inv, Active_gwrs, Gwr_route_order, &
+      USE PRMS_BASIN, ONLY: Gwr_type, Hru_area, Basin_area_inv, Active_gwrs, Gwr_route_order, &
      &                      Lake_hru_id, Weir_gate_flag, Hru_storage
       USE PRMS_FLOWVARS, ONLY: Gwres_stor
       use prms_utils, only: read_error
@@ -295,10 +295,10 @@
       Basin_gwstor = 0.0D0
       DO j = 1, Active_gwrs
         i = Gwr_route_order(j)
-        Basin_gwstor = Basin_gwstor + Gwres_stor(i) * Hru_area_dble(i)
+        Basin_gwstor = Basin_gwstor + Gwres_stor(i)*DBLE(Hru_area(i))
         IF ( Gwstor_min(i)>0.0 ) THEN
           Gwminarea_flag = 1
-          Gwstor_minarea(i) = DBLE( Gwstor_min(i) ) * Hru_area_dble(i)
+          Gwstor_minarea(i) = DBLE( Gwstor_min(i)*Hru_area(i) )
         ENDIF
         IF ( Gwflow_coef(i)>1.0 ) THEN
           IF ( Print_debug>DEBUG_less ) PRINT *, 'WARNING, gwflow_coef value > 1.0 for GWR:', i, Gwflow_coef(i)
@@ -376,7 +376,7 @@
      &    Gwr_add_water_use, Gwr_transfer_water_use, Nowyear, Nowmonth, Nowday
       USE PRMS_GWFLOW
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, Lake_type, &
-     &    Basin_area_inv, Gwr_type, Lake_hru_id, Weir_gate_flag, Hru_area_dble, Hru_storage
+     &    Basin_area_inv, Hru_area, Gwr_type, Lake_hru_id, Weir_gate_flag, Hru_area_dble, Hru_storage
       USE PRMS_FLOWVARS, ONLY: Soil_to_gw, Ssr_to_gw, Sroff, Ssres_flow, Gwres_stor, Lake_vol
       USE PRMS_CASCADE, ONLY: Ncascade_gwr
       USE PRMS_SET_TIME, ONLY: Cfs_conv
@@ -465,8 +465,8 @@
         gwarea = Hru_area_dble(i)
         gwstor = Gwres_stor(i)*gwarea ! acre-inches
         ! soil_to_gw is for whole HRU, not just perv
-        Gw_in_soil(i) = DBLE( Soil_to_gw(i) ) * gwarea
-        Gw_in_ssr(i) = DBLE( Ssr_to_gw(i) ) * gwarea
+        Gw_in_soil(i) = DBLE( Soil_to_gw(i)*Hru_area(i) )
+        Gw_in_ssr(i) = DBLE( Ssr_to_gw(i)*Hru_area(i) )
         gwin = Gw_in_soil(i) + Gw_in_ssr(i)
         IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
           gwin = gwin + Gw_upslope(i)
@@ -558,7 +558,7 @@
         ENDIF
         Basin_gwflow = Basin_gwflow + DBLE(Gwres_flow(i))*gwarea
 
-        ! leave gwin in acre-inches
+        ! leave gwin in inch-acres
         Gwres_in(i) = gwin
         Gwres_stor(i) = gwstor/gwarea
         Hru_lateral_flow(i) = DBLE( Gwres_flow(i) + Sroff(i) + Ssres_flow(i) )

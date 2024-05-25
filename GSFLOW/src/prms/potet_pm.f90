@@ -34,7 +34,7 @@
       INTRINSIC :: DBLE, LOG, SNGL
 ! Local Variables
       INTEGER :: i, j
-      REAL :: elh, prsr, psycnst, heat_flux, net_rad, vp_deficit, a, b, c
+      REAL :: elh, prsr, psycnst, heat_flux, net_rad, vp_deficit, a, b, c 
       REAL :: A1, B1, t1, num, den, stab, sw
 !***********************************************************************
       potet_pm = 0
@@ -52,7 +52,7 @@
 !...LATENT HEAT OF VAPORIZATION AT AVG TEMPERATURE, CAL/GRAM:
           ! elh = 597.3 - 0.5653*Tavgc(i) ! same as potet_jh
 !...LATENT HEAT OF VAPORIZATION AT AVG TEMPERATURE, JOULES/GRAM:
-          elh = (597.3 - 0.5653*Tavgc(i)) * 4.184
+          elh = (597.3 - 0.5653*Tavgc(i)) * 4.184 
           ! elh = 2501.0 - 2.361*Tavgc(i)
           ! elh = 2500.8 - 2.36*Tavgc(i) + 0.0016*Tavgc(i)**2 - 0.00006*Tavgc(i)**3
 

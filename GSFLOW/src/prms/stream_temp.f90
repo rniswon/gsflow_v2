@@ -92,7 +92,7 @@
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, OFF, DAYS_PER_YEAR
       use PRMS_CONTROL_FILE, only: control_integer
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
-      use PRMS_READ_PARAM_FILE, only: declparam, getdim
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag
       USE PRMS_STRMTEMP
       use prms_utils, only: print_module, read_error

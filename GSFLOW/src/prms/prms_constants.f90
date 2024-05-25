@@ -175,7 +175,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: ERROR_module = 16
     integer, parameter :: ERROR_lake = 17
     integer, parameter :: ERROR_soilzone = 18
-!    integer, parameter :: ERROR_precip = 19
+!    integer, parameter :: ERROR_precip = 19        ! not used
 
       ! debug print flag:
       ! -2=DEBUG_minimum

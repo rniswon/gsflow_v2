@@ -828,7 +828,7 @@ contains
     character(LEN=*), intent(IN) :: Modname, Restart_module
     !***********************************************************************
     if (Restart_module /= Modname) then
-      print *, ', reading restart file, expecting module: ', Modname, ' found: ', Restart_module
+      print *, 'ERROR, reading restart file, expecting module: ', Modname, ' found: ', Restart_module
       ERROR stop ERROR_restart
     end if
   end subroutine check_restart
