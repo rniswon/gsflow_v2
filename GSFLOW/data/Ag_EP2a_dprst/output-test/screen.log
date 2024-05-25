@@ -10,20 +10,18 @@ Executable: ..\..\..\bin\gsflow.exe
 Control File: .\Sagehen_ponds.control
 ==========================================================================
 
-
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.1 01/16/2024
+                         Version: 2.4.0 05/01/2024
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  Warning, dimension: nlake_hrus is not needed as value specified as 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/01/17 17:27:41
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2 01/16/2024
+                       Version 6.0.0 05/01/2024
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -37,7 +35,9 @@ Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/01/17 17:27:41
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
+                        Github Commit Hash 62761520d4284c8e7d0114d7d16c69c508494832 [6276152] branch 5.2.2.2
 
+--------------------------------------------------------------------
         Process            Available Modules
 --------------------------------------------------------------------
   Basin Definition: basin
@@ -69,45 +69,47 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
+Github Commit Hash 62761520d4284c8e7d0114d7d16c69c508494832 [6276152] branch 5.2.2.2
+
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:10:57
+
 
 ==========================================================================
 Please give careful consideration to fixing all ERROR and WARNING messages
 ==========================================================================
 
 
+--------------------------------------------------------------------
     Active modules listed in the order in which they are called
-
+--------------------------------------------------------------------
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2024-01-16
-
-            Github Commit Hash 114215cca63e4e0f201277553edb92ed7098af6f
-
-Read Control File               read_control_file   2022-10-20
-Read Parameter File             read_parameter_file 2022-01-12
-Read Data File                  read_data_file      2022-06-02
-Basin Definition                basin               2023-11-01
+PRMS Computation Order          gsflow_prms         2024-05-01
+Read Control File               read_control_file   2024-03-01
+Read Parameter File             read_parameter_file 2024-03-01
+Read Data File                  read_data_file      2023-06-02
+Basin Definition                basin               2024-04-04
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-01-16
-Potential Solar Radiation       soltab              2023-11-01
+Common States and Fluxes        climateflow         2024-04-30
+Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
 Temperature Distribution        temp_1sta           2023-11-01
-Precipitation Distribution      precip_1sta         2023-11-01
+Precipitation Distribution      precip_1sta         2024-04-30
 Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
-Canopy Interception             intcp               2024-01-10
-Snow Dynamics                   snowcomp            2024-01-11
-Surface Runoff                  srunoff_smidx       2024-01-16
-Soilzone Computations           soilzone            2024-01-10
-Soilzone Computations           soilzone_ag         2024-01-10
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
+Canopy Interception             intcp               2024-04-04
+Snow Dynamics                   snowcomp            2024-04-30
+Surface Runoff                  srunoff_smidx       2024-04-04
+Soilzone Computations           soilzone            2024-05-24
+Soilzone Computations           soilzone_ag         2024-05-24
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-02-10
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
-GSFLOW Output Budget Summary    gsflow_budget       2023-09-01
-GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
-Output Summary                  nhru_summary        2023-11-01
-Output Summary                  basin_summary       2023-11-01
+GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
+GSFLOW Output CSV Summary       gsflow_sum          2024-02-14
+Output Summary                  nhru_summary        2024-04-04
+Output Summary                  basin_summary       2021-08-13
 Output Summary                  nsegment_summary    2023-11-01
 WARNING, parameter: mapvars_freq is ignored as it is not used
 WARNING, parameter: mapvars_units is ignored as it is not used
@@ -140,16 +142,14 @@ Steady state simulation successful, used 89 iterations
 
 Using Control File: .\Sagehen_ponds.control
 
-
 Using Parameter File: ..\input\prms\sagehen_grid_v5_highKc.params
 
-
 Writing PRMS Water Budget File: ..\output\prms\sagehen_HighKc.out
-
  WARNING, ag_soil_moist_init_frac not specified, substituting soil_moist_init_fr
  ac
  WARNING, ag_soil_rechr_init_frac not specified, substituting soil_rechr_init_fr
  ac
+
  WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
  WARNING, ag_soil_type not specified, substituting soil_type
  WARNING, ag_covden_sum not specified, substituting covden_sum
@@ -276,7 +276,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1991/08/01; Stress: 12; Step: 1; Simulation step: 305
-                  MF iterations: 7; SZ iterations: 7
+                  MF iterations: 8; SZ iterations: 8
 
 
 ***WARNING***
@@ -666,7 +666,7 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 Date: 1995/04/01; Stress: 56; Step: 1; Simulation step: 1644
-                  MF iterations: 7; SZ iterations: 7
+                  MF iterations: 8; SZ iterations: 8
 
 
 ***WARNING***
@@ -723,30 +723,30 @@ Date: 1995/10/01; Stress: 62; Step: 1; Simulation step: 1827
                   MF iterations: 6; SZ iterations: 6
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/01/17 17:30:01
- Elapsed run time: 2 Minutes, 18.851 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/05/24 20:13:05
+ Elapsed run time: 2 Minutes, 7.480 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
- MF iterations:         11874;  SZ iterations:           11852
- Average MF iterations:  6.39;  Average SZ iterations:    6.38
- Maximum MF iterations:    72;  Maximum SZ iterations:      50
+ MF iterations:         11894;  SZ iterations:           11865
+ Average MF iterations:  6.40;  Average SZ iterations:    6.39
+ Maximum MF iterations:    74;  Maximum SZ iterations:      50
 
-mxsziter reached: 1
+mxsziter reached: 2
 
-MF iteration distribution:      0    0   26  200  320  468  479  244   83   20
-                                3    2    3    2    1    2    1    0    0    0
-                                0    0    0    0    0    0    0    0    1    0
-                                0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    1    0    0    0
+MF iteration distribution:      0    0   27  196  321  465  479  249   83   20
+                                3    2    3    2    1    1    2    0    0    0
+                                0    0    0    1    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
-                                0    1    0    0    0    0    0    0    0    0
+                                0    0    0    0    1    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    1    0    0    0    0    0    0
 
-SZ computation distribution:    0    0   26  200  320  468  479  244   83   20
-                                3    2    3    2    1    2    1    0    0    0
-                                0    0    0    0    0    0    0    0    1    0
+SZ computation distribution:    0    0   27  196  321  465  479  249   83   20
+                                3    2    3    2    1    1    2    0    0    0
+                                0    0    0    1    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    1    0    0    1
+                                0    0    0    0    0    0    0    0    0    2
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0

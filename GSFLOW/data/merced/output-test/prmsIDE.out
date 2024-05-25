@@ -1,7 +1,9 @@
 
-               Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2 01/16/2024
 
+               Precipitation-Runoff Modeling System (PRMS)
+                       Version 6.0.0 05/01/2024
+
+--------------------------------------------------------------------
         Process            Available Modules
 --------------------------------------------------------------------
   Basin Definition: basin
@@ -33,16 +35,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
+Github Commit Hash 62761520d4284c8e7d0114d7d16c69c508494832 [6276152] branch 5.2.2.2
 
-    Active modules listed in the order in which they are called
-
-        Process                    Module         Version Date
-==============================================================
-PRMS Computation Order          gsflow_prms         2024-01-16
-Read Control File               read_control_file   2022-10-20
-Read Parameter File             read_parameter_file 2022-01-12
-Read Data File                  read_data_file      2022-06-02
-
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:36:52
 
 ==========================================================================
 Using PRMS Data File: ./input/mercd.data
@@ -144,31 +139,39 @@ runoff 1
  Data File time period: 1993/10/01 00:00:00 to 1995/09/30 00:00:00
 Simulation time period: 1993/10/01 00:00:00 to 1995/09/30 00:00:00
 ==========================================================================
-Basin Definition                basin               2023-11-01
-Common States and Fluxes        climateflow         2024-01-16
-Potential Solar Radiation       soltab              2023-11-01
+
+--------------------------------------------------------------------
+    Active modules listed in the order in which they are called
+--------------------------------------------------------------------
+        Process                    Module         Version Date
+==============================================================
+PRMS Computation Order          gsflow_prms         2024-05-01
+Read Control File               read_control_file   2024-03-01
+Read Parameter File             read_parameter_file 2024-03-01
+Read Data File                  read_data_file      2023-06-02
+Basin Definition                basin               2024-04-04
+Common States and Fluxes        climateflow         2024-04-30
+Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
-Temp & Precip Distribution      ide_dist            2023-11-01
+Temp & Precip Distribution      ide_dist            2024-04-30
 Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
-Canopy Interception             intcp               2024-01-10
-Snow Dynamics                   snowcomp            2024-01-11
-Surface Runoff                  srunoff_smidx       2024-01-16
-Soilzone Computations           soilzone            2024-01-10
-Groundwater                     gwflow              2023-11-13
-Streamflow Routing              strmflow            2021-11-19
-Output Summary                  basin_sum           2023-11-01
+Canopy Interception             intcp               2024-04-04
+Snow Dynamics                   snowcomp            2024-04-30
+Surface Runoff                  srunoff_smidx       2024-04-04
+Soilzone Computations           soilzone            2024-05-24
+Groundwater                     gwflow              2024-01-22
+Streamflow Routing              strmflow            2020-08-03
+Output Summary                  basin_sum           2024-04-30
 Statistics Variables Output     statvar_out         2021-09-08
-Output Summary                  prms_summary        2023-11-01
+Output Summary                  prms_summary        2024-04-30
 ==============================================================
 
 Using Control File: .\control\mercdIDE.control
 
-
 Using Parameter File: ./input/mercdIDE.param
-
 
 
 Start time: 1993/10/01 00:00:00
@@ -181,12 +184,12 @@ Fraction impervious:        0.0001    Fraction pervious:       0.9999
 
 
 
-   Year Month Day   Precip     ET    Storage S-Runoff M-Runoff
-                  (inches) (inches) (inches) (inches) (inches)
- -------------------------------------------------------------
- initial                               7.288
- *************************************************************
- Total for run     100.986   43.033    7.839   57.401   67.341
- *************************************************************
-Execution elapsed time    0 minutes  0.27 seconds
+   Year Month Day   Precip     ET    Storage  S-Runoff M-Runoff
+                  (inches) (inches)  (inches) (inches) (inches)
+ --------------------------------------------------------------
+ initial                                7.288
+ **************************************************************
+ Total for run     100.986   43.034     7.834   57.405   67.341
+ **************************************************************
+Execution elapsed time    0 minutes  0.24 seconds
 

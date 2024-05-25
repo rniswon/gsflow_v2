@@ -1,7 +1,7 @@
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
  DATE: 10 13 1983              CUMULATIVE TIME STEP:    1108
- MODFLOW STRESS PERIOD      1     CURRENT TIME STEP:       7     ITERATIONS:      16
+ MODFLOW STRESS PERIOD      1     CURRENT TIME STEP:       7     ITERATIONS:      10
 
  -----------------------------------------------------------------------------------
 
@@ -17,35 +17,36 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        1.3956D+07     EVAPOTRANSPIRATION =        1898457.27
+   EVAPOTRANSPIRATION =        1.3965D+07     EVAPOTRANSPIRATION =        1899076.14
            STREAMFLOW =        2638013.31             STREAMFLOW =         381722.84
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
-   INFLOWS - OUTFLOWS =       -1.6594D+07     INFLOWS - OUTFLOWS =       -2280180.11
+   INFLOWS - OUTFLOWS =       -1.6603D+07     INFLOWS - OUTFLOWS =       -2280798.98
              --------                                   --------
 
- TOTAL STORAGE CHANGE =       -1.6595D+07         STORAGE CHANGE =       -2274870.64
+ TOTAL STORAGE CHANGE =       -1.5553D+07         STORAGE CHANGE =       -2282382.40
        --------------                             --------------
-         LAND SURFACE =         -88993.13           LAND SURFACE =         -18220.42
-            SOIL ZONE =       -6936047.01              SOIL ZONE =        -880881.60
-     UNSATURATED ZONE =        -406194.47       UNSATURATED ZONE =         -58751.65
-       SATURATED ZONE =       -1466784.69         SATURATED ZONE =        -206045.84
-                LAKES =       -7697208.00                  LAKES =       -1110971.12
+         LAND SURFACE =         957591.72           LAND SURFACE =         -18220.42
+            SOIL ZONE =       -6946734.43              SOIL ZONE =        -882257.58
+     UNSATURATED ZONE =        -403355.55       UNSATURATED ZONE =         -51523.39
+       SATURATED ZONE =       -1451500.39         SATURATED ZONE =        -212876.39
+                LAKES =       -7709347.94                  LAKES =       -1117504.62
 
- OVERALL BUDGET ERROR =           1294.40           BUDGET ERROR =          -5309.47
+ OVERALL BUDGET ERROR =       -1049688.15           BUDGET ERROR =           1583.42
 
+  ***WARNING, CUMULATIVE VOLUME OFF > 5%
 
-  PERCENT DISCREPANCY =              0.01    PERCENT DISCREPANCY =             -0.23
+  PERCENT DISCREPANCY =             -6.53    PERCENT DISCREPANCY =              0.07
 
 
 
  Number of time steps:      7;  Number of non-convergence:   0
- MF iterations:            81;  SZ iterations:              81
- Average MF iterations: 11.57;  Average SZ iterations:   11.57
- Maximum MF iterations:    16;  Maximum SZ iterations:      16
+ MF iterations:            78;  SZ iterations:              78
+ Average MF iterations: 11.14;  Average SZ iterations:   11.14
+ Maximum MF iterations:    15;  Maximum SZ iterations:      15
 
-MF iteration distribution:      0    0    0    0    0    1    0    0    1    0
-                                1    2    0    0    1    1    0    0    0    0
+MF iteration distribution:      0    0    0    0    0    1    0    0    0    2
+                                0    2    1    0    1    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
@@ -53,8 +54,8 @@ MF iteration distribution:      0    0    0    0    0    1    0    0    1    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
 
-SZ computation distribution:    0    0    0    0    0    1    0    0    1    0
-                                1    2    0    0    1    1    0    0    0    0
+SZ computation distribution:    0    0    0    0    0    1    0    0    0    2
+                                0    2    1    0    1    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0

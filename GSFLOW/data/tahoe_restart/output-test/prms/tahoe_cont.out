@@ -28,9 +28,8 @@ one                    1
 ==========================================================================
 
 
-
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 03/10/2024
+                       Version 6.0.0 05/01/2024
 
 --------------------------------------------------------------------
         Process            Available Modules
@@ -66,18 +65,7 @@ Stream Temperature: stream_temp
 
     Github Commit Hash a036995c883ac16cd752bd73b6def0958eae4ae1
 
-
-    Active modules listed in the order in which they are called
-
-        Process                    Module         Version Date
-==============================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/03/21 16:02:34
-
-PRMS Computation Order          gsflow_prms         2024-03-10
-Read Control File               read_control_file   2024-03-01
-Read Parameter File             read_parameter_file 2024-03-01
-Read Data File                  read_data_file      2023-06-02
-
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/21 10:23:11
 
 ==========================================================================
 Using PRMS Data File: ../input/prms/tahoe.data
@@ -215,21 +203,31 @@ rain_day 0
  Data File time period: 1980/10/01 00:00:00 to 2011/09/30 00:00:00
 Simulation time period: 1980/10/01 00:00:00 to 1984/01/30 00:00:00
 ==========================================================================
-Basin Definition                basin               2024-01-22
+
+--------------------------------------------------------------------
+    Active modules listed in the order in which they are called
+--------------------------------------------------------------------
+        Process                    Module         Version Date
+==============================================================
+PRMS Computation Order          gsflow_prms         2024-05-01
+Read Control File               read_control_file   2024-03-01
+Read Parameter File             read_parameter_file 2024-03-01
+Read Data File                  read_data_file      2023-06-02
+Basin Definition                basin               2024-04-04
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-01-28
+Common States and Fluxes        climateflow         2024-04-30
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
 Temperature Distribution        temp_laps           2023-11-01
-Precipitation Distribution      precip_1sta         2023-11-01
-Solar Radiation Distribution    ddsolrad            2024-02-08
+Precipitation Distribution      precip_1sta         2024-04-30
+Solar Radiation Distribution    ddsolrad            2024-04-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
-Canopy Interception             intcp               2024-01-10
-Snow Dynamics                   snowcomp            2024-02-28
-Surface Runoff                  srunoff_smidx       2024-03-21
-Soilzone Computations           soilzone            2024-03-21
+Canopy Interception             intcp               2024-04-04
+Snow Dynamics                   snowcomp            2024-04-30
+Surface Runoff                  srunoff_smidx       2024-04-04
+Soilzone Computations           soilzone            2024-04-30
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-02-10
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
@@ -253,7 +251,5 @@ End time:   1984/01/30 00:00:00
 Model domain area:       577870.77    Active basin area:    325452.62
 Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
-
-
-Execution elapsed time   16 minutes 40.81 seconds
+Execution elapsed time   18 minutes 39.87 seconds
 

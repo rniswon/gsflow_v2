@@ -20,9 +20,8 @@ npoigages              6
 ==========================================================================
 
 
-
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 03/10/2024
+                       Version 6.0.0 05/01/2024
 
 --------------------------------------------------------------------
         Process            Available Modules
@@ -56,20 +55,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-    Github Commit Hash a036995c883ac16cd752bd73b6def0958eae4ae1
+Github Commit Hash 62761520d4284c8e7d0114d7d16c69c508494832 [6276152] branch 5.2.2.2
 
-
-    Active modules listed in the order in which they are called
-
-        Process                    Module         Version Date
-==============================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/03/21 16:01:26
-
-PRMS Computation Order          gsflow_prms         2024-03-10
-Read Control File               read_control_file   2024-03-01
-Read Parameter File             read_parameter_file 2024-03-01
-Read Data File                  read_data_file      2023-06-02
-
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:09:07
 
 ==========================================================================
 Using PRMS Data File: ./input/data
@@ -95,29 +83,39 @@ runoff 6
  Data File time period: 1950/01/01 00:00:00 to 1999/12/31 00:00:00
 Simulation time period: 1980/01/01 00:00:00 to 1999/12/31 00:00:00
 ==========================================================================
-Basin Definition                basin               2024-01-22
-Common States and Fluxes        climateflow         2024-01-28
+
+--------------------------------------------------------------------
+    Active modules listed in the order in which they are called
+--------------------------------------------------------------------
+        Process                    Module         Version Date
+==============================================================
+PRMS Computation Order          gsflow_prms         2024-05-01
+Read Control File               read_control_file   2024-03-01
+Read Parameter File             read_parameter_file 2024-03-01
+Read Data File                  read_data_file      2023-06-02
+Basin Definition                basin               2024-04-04
+Common States and Fluxes        climateflow         2024-04-30
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
 Time Series Data                dynamic_soil_param  2023-03-16
-Temperature Distribution        climate_hru         2024-01-08
-Precipitation Distribution      climate_hru         2024-01-08
-Solar Radiation Distribution    climate_hru         2024-01-08
-Potential Evapotranspiration    climate_hru         2024-01-08
+Temperature Distribution        climate_hru         2024-04-30
+Precipitation Distribution      climate_hru         2024-04-30
+Solar Radiation Distribution    climate_hru         2024-04-30
+Potential Evapotranspiration    climate_hru         2024-04-30
 Transpiration Distribution      transp_tindex       2023-11-01
-Canopy Interception             intcp               2024-01-10
-Snow Dynamics                   snowcomp            2024-02-28
-Surface Runoff                  srunoff_smidx       2024-03-21
-Soilzone Computations           soilzone            2024-03-21
+Canopy Interception             intcp               2024-04-04
+Snow Dynamics                   snowcomp            2024-04-30
+Surface Runoff                  srunoff_smidx       2024-04-04
+Soilzone Computations           soilzone            2024-05-24
 Groundwater                     gwflow              2024-01-22
 Streamflow Routing Init         routing             2024-02-09
 Streamflow Routing              muskingum           2023-11-01
-Output Summary                  basin_sum           2024-01-22
-Water Balance Computations      water_balance       2024-02-07
-Output Summary                  nhru_summary        2024-03-13
+Output Summary                  basin_sum           2024-04-30
+Water Balance Computations      water_balance       2024-04-04
+Output Summary                  nhru_summary        2024-04-04
 Statistics Variables Output     statvar_out         2021-09-08
-Output Summary                  prms_summary        2024-01-15
+Output Summary                  prms_summary        2024-04-30
 ==============================================================
 
 Using Control File: .\control\control
@@ -136,32 +134,32 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
 
 
 
-   Year Month Day   Precip     ET    Storage S-Runoff M-Runoff
-                  (inches) (inches) (inches) (inches) (inches)
- -------------------------------------------------------------
- initial                              31.824
-   1980             50.492   20.614   14.833   46.869   -8.693
-   1981             36.476   24.842    6.166   20.301   -6.454
-   1982             53.278   23.751    8.130   27.563    1.270
-   1983             58.857   24.024    8.746   34.218    2.090
-   1984             68.655   24.052    8.959   44.390    2.016
-   1985             47.006   25.716    8.467   21.782    1.000
-   1986             33.959   23.836    5.468   13.122    0.790
-   1987             55.549   23.340    5.827   31.850    1.274
-   1988             43.376   21.421    7.541   20.240    0.772
-   1989             64.192   23.192   15.292   33.249    1.682
-   1990             57.834   22.970    8.848   41.308    2.017
-   1991             62.933   24.460   10.193   37.128    1.979
-   1992             55.188   20.022   12.004   33.355    1.587
-   1993             60.054   19.307    5.494   47.257    2.159
-   1994             63.330   18.327   11.052   39.444    1.640
-   1995             53.742   20.538    8.240   36.015    1.522
-   1996             68.484   18.458    9.521   48.745    1.877
-   1997             55.724   19.088    9.749   36.409    1.762
-   1998             63.457   18.715    6.481   48.008    1.816
-   1999             45.071   20.064    5.762   25.726    1.094
- *************************************************************
- Total for run    1110.775  440.221    8.439  693.939   13.445
- *************************************************************
-Execution elapsed time    0 minutes  1.32 seconds
+   Year Month Day   Precip     ET    Storage  S-Runoff M-Runoff
+                  (inches) (inches)  (inches) (inches) (inches)
+ --------------------------------------------------------------
+ initial                               31.824
+   1980             50.492   20.614    14.833   46.869   -8.693
+   1981             36.476   24.842     6.166   20.301   -6.454
+   1982             53.278   23.751     8.130   27.563    1.270
+   1983             58.857   24.024     8.746   34.218    2.090
+   1984             68.655   24.052     8.959   44.390    2.016
+   1985             47.006   25.716     8.467   21.782    1.000
+   1986             33.959   23.836     5.468   13.122    0.790
+   1987             55.549   23.340     5.827   31.850    1.274
+   1988             43.376   21.421     7.541   20.240    0.772
+   1989             64.192   23.192    15.292   33.249    1.682
+   1990             57.834   22.970     8.848   41.308    2.017
+   1991             62.933   24.460    10.193   37.128    1.979
+   1992             55.188   20.022    12.004   33.355    1.587
+   1993             60.054   19.307     5.494   47.257    2.159
+   1994             63.330   18.327    11.052   39.444    1.640
+   1995             53.742   20.538     8.240   36.015    1.522
+   1996             68.484   18.458     9.521   48.745    1.877
+   1997             55.724   19.088     9.749   36.409    1.762
+   1998             63.457   18.715     6.481   48.008    1.816
+   1999             45.071   20.064     5.762   25.726    1.094
+ **************************************************************
+ Total for run    1110.775  440.221     8.439  693.939   13.445
+ **************************************************************
+Execution elapsed time    0 minutes  1.10 seconds
 

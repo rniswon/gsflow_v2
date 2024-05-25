@@ -13,21 +13,20 @@ Control File: .\control\gulkana.control
  WARNING, control parameter not used: mbInit_flag, ignored
 ==========================================================================
 
-
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.1 01/16/2024
+                         Version: 2.4.0 05/01/2024
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
  WARNING, control parameter not in Control File: mbInit_flag, set to 0
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/01/17 17:35:10
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.2.2 01/16/2024
+                       Version 6.0.0 05/01/2024
 
+--------------------------------------------------------------------
         Process            Available Modules
 --------------------------------------------------------------------
   Basin Definition: basin
@@ -59,47 +58,45 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
+Github Commit Hash 62761520d4284c8e7d0114d7d16c69c508494832 [6276152] branch 5.2.2.2
+
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:37:31
+
 
 ==========================================================================
 Please give careful consideration to fixing all ERROR and WARNING messages
 ==========================================================================
 
 
+--------------------------------------------------------------------
     Active modules listed in the order in which they are called
-
+--------------------------------------------------------------------
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2024-01-16
-
-            Github Commit Hash 114215cca63e4e0f201277553edb92ed7098af6f
-
-Read Control File               read_control_file   2022-10-20
-Read Parameter File             read_parameter_file 2022-01-12
-Read Data File                  read_data_file      2022-06-02
-Basin Definition                basin               2023-11-01
-Common States and Fluxes        climateflow         2024-01-16
-Potential Solar Radiation       soltab              2023-11-01
+PRMS Computation Order          gsflow_prms         2024-05-01
+Read Control File               read_control_file   2024-03-01
+Read Parameter File             read_parameter_file 2024-03-01
+Read Data File                  read_data_file      2023-06-02
+Basin Definition                basin               2024-04-04
+Common States and Fluxes        climateflow         2024-04-30
+Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
-Temp & Precip Distribution      xyz_dist            2023-11-01
-Solar Radiation Distribution    ccsolrad            2023-11-13
+Temp & Precip Distribution      xyz_dist            2024-04-30
+Solar Radiation Distribution    ccsolrad            2024-04-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
-Canopy Interception             intcp               2024-01-10
-Snow Dynamics                   snowcomp            2024-01-11
-Glacier Dynamics                glacr_melt          2023-11-01
- Parameter: hru_slope declared more than once
- First declared by module: glacr_melt
- Also declared by module: glacr_melt
- Model uses values based on first declare
-Surface Runoff                  srunoff_smidx       2024-01-16
-Soilzone Computations           soilzone            2024-01-10
-Groundwater                     gwflow              2023-11-13
-Streamflow Routing Init         routing             2024-01-10
+Canopy Interception             intcp               2024-04-04
+Snow Dynamics                   snowcomp            2024-04-30
+Glacier Dynamics                glacr_melt          2024-04-04
+Surface Runoff                  srunoff_smidx       2024-04-04
+Soilzone Computations           soilzone            2024-05-24
+Groundwater                     gwflow              2024-01-22
+Streamflow Routing Init         routing             2024-02-09
 Streamflow Routing              muskingum           2023-11-01
-Output Summary                  basin_sum           2023-11-01
+Output Summary                  basin_sum           2024-04-30
 Statistics Variables Output     statvar_out         2021-09-08
-Output Summary                  prms_summary        2023-11-01
+Output Summary                  prms_summary        2024-04-30
 WARNING, parameter: poi_type is ignored as it is not used
 WARNING, parameter: stage_coef is ignored as it is not used
 WARNING, parameter: net_mbc_zero is ignored as it is not used
@@ -110,13 +107,9 @@ WARNING, parameter: snowfld_frac_init is ignored as it is not used
 
 Using Control File: .\control\gulkana.control
 
-
 Using Parameter File: ./input/gulkana.par
 
-
 Writing PRMS Water Budget File: ./output/gulkana.out
-
- WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
   
  WARNING, parameter: pref_flow_infil_frac is not specified
           Set to default value:  -1.000000    
@@ -127,13 +120,15 @@ Simulation time period: 1971/10/01 - 2015/09/30
 ==========================================================================
 
 
-                          ===========================
-                          Normal completion of GSFLOW
-                          ===========================
+                          =========================
+                          Normal completion of PRMS
+                          =========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/01/17 17:35:10
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/01/17 17:35:13
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:37:31
 
-Execution elapsed time    0 minutes  2.80 seconds
+
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:37:34
+
+Execution elapsed time    0 minutes  2.60 seconds
 

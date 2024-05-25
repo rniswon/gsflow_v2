@@ -10,19 +10,17 @@ Executable: ..\..\..\bin\gsflow
 Control File: .\prms_map_results.control
 ==========================================================================
 
-
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.2.0 03/22/2024
+                         Version: 2.4.0 05/01/2024
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
 
 
-
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 03/10/2024
+                       Version 6.0.0 05/01/2024
 
 --------------------------------------------------------------------
         Process            Available Modules
@@ -56,40 +54,43 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-    Github Commit Hash a036995c883ac16cd752bd73b6def0958eae4ae1
+Github Commit Hash 62761520d4284c8e7d0114d7d16c69c508494832 [6276152] branch 5.2.2.2
+
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:05:36
 
 
+==========================================================================
+Please give careful consideration to fixing all ERROR and WARNING messages
+==========================================================================
 
 
-
+--------------------------------------------------------------------
     Active modules listed in the order in which they are called
-
+--------------------------------------------------------------------
         Process                    Module         Version Date
 ==============================================================
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/03/21 16:58:22
-
-PRMS Computation Order          gsflow_prms         2024-03-10
+PRMS Computation Order          gsflow_prms         2024-05-01
 Read Control File               read_control_file   2024-03-01
 Read Parameter File             read_parameter_file 2024-03-01
 Read Data File                  read_data_file      2023-06-02
-Basin Definition                basin               2024-01-22
+Basin Definition                basin               2024-04-04
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-01-28
+Common States and Fluxes        climateflow         2024-04-30
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
 Temperature Distribution        temp_1sta           2023-11-01
-Precipitation Distribution      precip_1sta         2023-11-01
-Solar Radiation Distribution    ddsolrad            2024-02-08
+Precipitation Distribution      precip_1sta         2024-04-30
+Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
-Canopy Interception             intcp               2024-01-10
-Snow Dynamics                   snowcomp            2024-02-28
-Surface Runoff                  srunoff_smidx       2024-03-21
-Soilzone Computations           soilzone            2024-03-21
+Canopy Interception             intcp               2024-04-04
+Snow Dynamics                   snowcomp            2024-04-30
+Surface Runoff                  srunoff_smidx       2024-04-04
+Soilzone Computations           soilzone            2024-05-24
 Groundwater                     gwflow              2024-01-22
 Streamflow Routing              strmflow            2020-08-03
-Output Summary                  basin_sum           2024-01-22
+Output Summary                  basin_sum           2024-04-30
 Output Summary                  map_results         2023-11-01
 Output Summary                  subbasin            2023-11-01
 Output Summary                  nsub_summary        2023-11-01
@@ -107,7 +108,7 @@ Using Parameter File: ..\input\prms\prms.params
 
 Writing PRMS Water Budget File: ..\output\prms\sagehen_prms_map.out
 
-WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
+ WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
   
  WARNING, parameter: pref_flow_infil_frac is not specified
           Set to default value:  -1.000000    
@@ -121,9 +122,11 @@ Simulation time period: 1980/10/01 - 1996/09/30
                           Normal completion of PRMS
                           =========================
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/03/21 16:58:22
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/03/21 16:58:23
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:05:36
 
-Execution elapsed time    0 minutes  1.04 seconds
+
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:05:37
+
+Execution elapsed time    0 minutes  1.05 seconds
 

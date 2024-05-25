@@ -1,7 +1,7 @@
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
  DATE: 09 22 1983              CUMULATIVE TIME STEP:    1087
- MODFLOW STRESS PERIOD      1     CURRENT TIME STEP:       7     ITERATIONS:      15
+ MODFLOW STRESS PERIOD      1     CURRENT TIME STEP:       7     ITERATIONS:      51
 
  -----------------------------------------------------------------------------------
 
@@ -17,48 +17,49 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        1.5507D+07     EVAPOTRANSPIRATION =        1948784.55
+   EVAPOTRANSPIRATION =        1.5512D+07     EVAPOTRANSPIRATION =        1948767.39
            STREAMFLOW =        1.2560D+07             STREAMFLOW =        2349880.75
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
-   INFLOWS - OUTFLOWS =       -1.0063D+07     INFLOWS - OUTFLOWS =        1.3705D+07
+   INFLOWS - OUTFLOWS =       -1.0068D+07     INFLOWS - OUTFLOWS =        1.3705D+07
              --------                                   --------
 
- TOTAL STORAGE CHANGE =       -1.0099D+07         STORAGE CHANGE =        1.3668D+07
+ TOTAL STORAGE CHANGE =       -7861331.22         STORAGE CHANGE =        1.3709D+07
        --------------                             --------------
-         LAND SURFACE =        -249747.81           LAND SURFACE =         227693.84
-            SOIL ZONE =        7230418.39              SOIL ZONE =        1.0719D+07
-     UNSATURATED ZONE =        -600733.94       UNSATURATED ZONE =         -97486.87
-       SATURATED ZONE =       -1147559.36         SATURATED ZONE =         171912.11
-                LAKES =       -1.5332D+07                  LAKES =        2646378.75
+         LAND SURFACE =        1945538.34           LAND SURFACE =         227693.84
+            SOIL ZONE =        7230616.30              SOIL ZONE =        1.0719D+07
+     UNSATURATED ZONE =        -619332.53       UNSATURATED ZONE =        -115765.34
+       SATURATED ZONE =       -1121427.08         SATURATED ZONE =         198217.95
+                LAKES =       -1.5297D+07                  LAKES =        2679723.00
 
- OVERALL BUDGET ERROR =          36553.14           BUDGET ERROR =          37627.73
+ OVERALL BUDGET ERROR =       -2206376.99           BUDGET ERROR =          -3585.09
 
+  ***WARNING, CUMULATIVE VOLUME OFF > 5%
 
-  PERCENT DISCREPANCY =              0.13    PERCENT DISCREPANCY =              0.21
+  PERCENT DISCREPANCY =             -8.18    PERCENT DISCREPANCY =             -0.02
 
 
 
  Number of time steps:      7;  Number of non-convergence:   0
- MF iterations:           168;  SZ iterations:             168
- Average MF iterations: 24.00;  Average SZ iterations:   24.00
- Maximum MF iterations:    68;  Maximum SZ iterations:      68
+ MF iterations:           162;  SZ iterations:             162
+ Average MF iterations: 23.14;  Average SZ iterations:   23.14
+ Maximum MF iterations:    51;  Maximum SZ iterations:      51
 
-MF iteration distribution:      0    0    0    0    1    0    0    0    0    0
-                                0    0    1    0    1    1    0    0    0    0
-                                0    1    0    0    0    0    0    0    1    0
+MF iteration distribution:      0    0    0    0    0    0    0    0    0    0
+                                0    0    2    1    0    1    0    0    0    0
+                                0    0    0    0    0    1    0    0    1    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
+                                1    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    1    0    0
                                 0    0    0    0    0    0    0    0    0    0
 
-SZ computation distribution:    0    0    0    0    1    0    0    0    0    0
-                                0    0    1    0    1    1    0    0    0    0
-                                0    1    0    0    0    0    0    0    1    0
+SZ computation distribution:    0    0    0    0    0    0    0    0    0    0
+                                0    0    2    1    0    1    0    0    0    0
+                                0    0    0    0    0    1    0    0    1    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
+                                1    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    1    0    0
                                 0    0    0    0    0    0    0    0    0    0
 

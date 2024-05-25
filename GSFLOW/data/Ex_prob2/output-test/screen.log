@@ -17,7 +17,7 @@ Control File: .\gsflow_modflow_2.control
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
- Run start date and time (yyyy/mm/dd hh:mm:ss): 2024/01/17 17:28:52
+ Run start date and time (yyyy/mm/dd hh:mm:ss): 2024/05/21 10:10:43
 
 GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
 ==============================================================
@@ -30,8 +30,8 @@ SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
   
   
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/01/17 17:29:02
- Elapsed run time: 9.902 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/05/21 10:10:52
+ Elapsed run time: 9.550 Seconds
 
  Normal termination of simulation
 
