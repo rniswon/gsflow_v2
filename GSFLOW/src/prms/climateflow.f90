@@ -1146,12 +1146,12 @@ end module PRMS_IT0_VARS
         Tmax_allrain = Tmax_allrain_f
       ELSE
         Tmax_allsnow_c = Tmax_allsnow
-        DO j = 1, MONTHS_PER_YEAR
-          DO i = 1, Nhru
-            Tmax_allsnow_f(i, j) = c_to_f(Tmax_allsnow(i,j))
-            Tmax_allrain(i, j) = Tmax_allsnow(i, j) + Tmax_allrain_offset(i, j)
-            Tmax_allrain_f(i, j) = c_to_f(Tmax_allrain(i,j))
-            Tmax_allrain_c(i, j) = Tmax_allrain(i, j)
+        DO i = 1, MONTHS_PER_YEAR
+          DO j = 1, Nhru
+            Tmax_allsnow_f(j, i) = c_to_f(Tmax_allsnow(j,i))
+            Tmax_allrain(j, i) = Tmax_allsnow(j, i) + Tmax_allrain_offset(j, i)
+            Tmax_allrain_f(j, i) = c_to_f(Tmax_allrain(j,i))
+            Tmax_allrain_c(j, i) = Tmax_allrain(j, i)
           ENDDO
         ENDDO
       ENDIF
@@ -1654,7 +1654,7 @@ end module PRMS_IT0_VARS
         Hru_ppt = Precip*Rain_adj
         Hru_rain = Hru_ppt
         Prmx = 1.0
-      ELSEIF ( PRMS6_flag==OFF .AND. Tminf>Tmax_allsnow_f .OR. Tmaxf>=Tmax_allrain_f ) THEN
+      ELSEIF ( PRMS6_flag==OFF .AND. (Tminf>Tmax_allsnow_f .OR. Tmaxf>=Tmax_allrain_f) ) THEN
         Hru_ppt = Precip*Rain_adj
         Hru_rain = Hru_ppt
         Prmx = 1.0
