@@ -313,14 +313,14 @@
       INTEGER FUNCTION sumbinit()
       USE PRMS_CONSTANTS, ONLY: OFF, ERROR_param
       use PRMS_READ_PARAM_FILE, only: getparam_int
-      USE PRMS_MODULE, ONLY: Nobs, Init_vars_from_file, Print_debug
+      USE PRMS_MODULE, ONLY: Nobs, Init_vars_from_file, Print_debug, Inputerror_flag
       USE PRMS_BASINSUM
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_lake_stor, Basin_pweqv
       USE PRMS_INTCP, ONLY: Basin_intcp_stor
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_dprst_volcl, Basin_dprst_volop
       USE PRMS_GWFLOW, ONLY: Basin_gwstor
       USE PRMS_ROUTING, ONLY: Basin_segment_storage
-      use prms_utils, only: julian_day, PRMS_open_module_file, read_error, write_outfile, error_stop
+      use prms_utils, only: julian_day, PRMS_open_module_file, read_error, write_outfile, checkdim_param_limits
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MAX, MOD
@@ -336,8 +336,7 @@
         IF ( Outlet_sta==0 ) THEN
           Outlet_sta = 1
         ELSEIF ( Outlet_sta>Nobs ) THEN
-          PRINT *, 'ERROR, invalid value specified for outlet_sta:', Outlet_sta
-          CALL error_stop('outlet_sta is specified > nobs', ERROR_param)
+          CALL checkdim_param_limits(1, 'outlet_sta', 'nobs', Outlet_sta, 1, Nobs, Inputerror_flag)
         ENDIF
       ENDIF
 

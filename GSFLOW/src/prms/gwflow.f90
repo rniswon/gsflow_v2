@@ -28,7 +28,7 @@
       DOUBLE PRECISION, SAVE :: Basin_gwin, Basin_lake_seep
       DOUBLE PRECISION, SAVE :: Basin_gwstor_minarea_wb
       REAL, SAVE, ALLOCATABLE :: Gwres_flow(:), Gwres_sink(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gw_upslope(:), Gwres_in(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwres_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_gw_cascadeflow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gw_in_soil(:), Gw_in_ssr(:), Hru_lateral_flow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea_wb(:), Hru_streamflow_out(:), Lakein_gwflow(:)
@@ -87,11 +87,6 @@
 
 ! cascading variables and parameters
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
-        ALLOCATE ( Gw_upslope(Ngw) )
-        CALL declvar_dble(MODNAME, 'gw_upslope', 'ngw', Ngw, &
-     &       'Groundwater flow received from upslope GWRs for each GWR', &
-     &       'acre-inches', Gw_upslope)
-
         ALLOCATE ( Hru_gw_cascadeflow(Ngw) )
         CALL declvar_dble(MODNAME, 'hru_gw_cascadeflow', 'ngw', Ngw, &
      &       'Cascading groundwater flow from each GWR', &
@@ -377,7 +372,7 @@
       USE PRMS_GWFLOW
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, Lake_type, &
      &    Basin_area_inv, Hru_area, Gwr_type, Lake_hru_id, Weir_gate_flag, Hru_area_dble, Hru_storage
-      USE PRMS_FLOWVARS, ONLY: Soil_to_gw, Ssr_to_gw, Sroff, Ssres_flow, Gwres_stor, Lake_vol
+      USE PRMS_FLOWVARS, ONLY: Soil_to_gw, Ssr_to_gw, Sroff, Ssres_flow, Gwres_stor, Lake_vol, Gw_upslope
       USE PRMS_CASCADE, ONLY: Ncascade_gwr
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
@@ -581,8 +576,7 @@
 !     Compute cascading GW flow
 !***********************************************************************
       SUBROUTINE rungw_cascade(Igwr, Ncascade_gwr, Gwres_flow, Dnflow)
-      USE PRMS_FLOWVARS, ONLY: Strm_seg_in
-      USE PRMS_GWFLOW, ONLY: Gw_upslope
+      USE PRMS_FLOWVARS, ONLY: Strm_seg_in, Gw_upslope
       USE PRMS_CASCADE, ONLY: Gwr_down, Gwr_down_frac, Cascade_gwr_area
       ! Cfs_conv converts acre-inches per timestep to cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv

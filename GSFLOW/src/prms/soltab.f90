@@ -35,7 +35,6 @@
       !DOUBLE PRECISION, SAVE :: Ecentricity(MAX_DAYS_PER_YEAR)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_cossl(:), Soltab_sunhrs(:, :)
       DOUBLE PRECISION, SAVE :: obliquity(MAX_DAYS_PER_YEAR)
-!   Declared Variables
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Soltab_potsw(:, :), Soltab_horad_potsw(:, :)
 !       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Sunset_angle(:, :)
 !   Declared Parameters

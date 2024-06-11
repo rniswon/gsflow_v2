@@ -128,11 +128,11 @@
 !     Initialize module values
 !***********************************************************************
       SUBROUTINE nhru_summaryinit()
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, &
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_open_out, &
      &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, REAL_TYPE, DBLE_TYPE, INT_TYPE
       use PRMS_MMFAPI, only: getvartype, getvarsize
       use PRMS_READ_PARAM_FILE, only: getparam_int
-      USE PRMS_MODULE, ONLY: Nhru, NhruOutON_OFF, Prms_warmup, Start_year, Start_month, Start_day
+      USE PRMS_MODULE, ONLY: Nhru, NhruOutON_OFF, Prms_warmup, Start_year, Start_month, Start_day, Inputerror_flag
       USE PRMS_NHRU_SUMMARY
       use prms_utils, only: error_stop, find_current_file_time, find_header_end, numchars, PRMS_open_output_file, read_error
       IMPLICIT NONE
@@ -209,7 +209,10 @@
           CALL to_upper( bin_var_names(jj) )
         ENDIF
       ENDDO
-      IF ( ierr==1 ) ERROR STOP ERROR_control
+      IF ( ierr==1 ) THEN
+        Inputerror_flag = 1
+        RETURN
+      ENDIF
       IF ( Double_vars==ACTIVE ) THEN
         ALLOCATE ( Nhru_var_dble(Nhru, NhruOutVars) )
         Nhru_var_dble = 0.0D0

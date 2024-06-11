@@ -153,7 +153,7 @@
      &    Infil, Soil_moist_max, Ssr_to_gw, Ssres_flow, Basin_soil_to_gw, Soil_moist, Ssres_stor, Pref_flow_stor, &
      &    Slow_flow, Basin_perv_et, Basin_ssflow, Basin_swale_et, Slow_stor, Ssres_in, Soil_rechr, &
      &    Basin_lakeevap, Sroff, Hru_actet, Pkwater_equiv, Gwres_stor, Dprst_vol_open, Dprst_vol_clos, Basin_sroff, &
-     &    Dprst_stor_hru, Hru_impervstor, Hru_intcpstor, &
+     &    Dprst_stor_hru, Hru_impervstor, Hru_intcpstor, Gw_upslope, &
      &    Intcp_stor, Ag_soil_moist, Basin_ag_soil_moist, Snowmelt, Snow_evap, Snowcov_area, Pptmix_nopack, Basin_pweqv
       USE PRMS_IT0_VARS, ONLY: It0_soil_moist, It0_ssres_stor, It0_basin_soil_moist, &
                                It0_ag_soil_moist, It0_basin_ag_soil_moist, It0_hru_intcpstor, &
@@ -185,17 +185,17 @@
       USE PRMS_SOILZONE_AG, ONLY: Ag_cap_infil_tot, hru_ag_actet, perv_soil_to_gvr, perv_soil_to_gw, &
      &    Basin_perv_to_gw, Basin_ag_actet
       USE PRMS_GWFLOW, ONLY: Basin_dnflow, Basin_gwsink, Basin_gwstor_minarea_wb, Gwres_flow, &
-     &    Basin_gwstor, Basin_gwflow, Basin_gw_upslope, Basin_gwin, Gwres_sink, Hru_gw_cascadeflow, Gw_upslope, &
+     &    Basin_gwstor, Basin_gwflow, Basin_gw_upslope, Basin_gwin, Gwres_sink, Hru_gw_cascadeflow, &
      &    Gwminarea_flag, Gwstor_minarea_wb, Gwin_dprst, Gwres_in
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, DBLE, SNGL, DABS
 ! Local Variables
       INTEGER :: i, k
-      REAL :: last_sm, last_ss, soilbal, perv_frac, gvrbal, test, waterin, waterout, hrubal, delta_stor
+      REAL :: last_sm, last_ss, soilbal, perv_frac, gvrbal, test, waterin, waterout, hrubal, delta_stor_sngl
       REAL :: delstor, robal, gmelt, harea
       DOUBLE PRECISION :: basin_bal, bsmbal, soil_in, gwbal, gwup, basin_robal, bsnobal
-      DOUBLE PRECISION :: hru_out, hru_in, wbal, pptbal, brobal, dprst_hru_wb, harea_dble
+      DOUBLE PRECISION :: hru_out, hru_in, wbal, delta_stor, pptbal, brobal, dprst_hru_wb, harea_dble
       DOUBLE PRECISION :: dprst_stor
       CHARACTER(LEN=*), PARAMETER :: fmt1 = '(A, I5, 2("/",I2.2))'
 !***********************************************************************
@@ -260,7 +260,7 @@
         ENDIF
 
 ! srunoff balance
-        delta_stor = It0_hru_impervstor(i) - Hru_impervstor(i)
+        delta_stor_sngl = It0_hru_impervstor(i) - Hru_impervstor(i)
         waterout = Infil(i)*perv_frac + Hru_impervevap(i) + Hortonian_flow(i) ! Hortonian_flow includes dprst runoff, if any
         gmelt = 0.0
         IF ( Glacier_flag == ACTIVE ) gmelt = Glacrb_melt(i) ! ?? what about Glacr_flow(i); units inches cubed
@@ -276,9 +276,9 @@
         IF ( Cascade_flag>CASCADE_OFF ) waterin = waterin + SNGL( Upslope_hortonian(i) - Hru_hortn_cascflow(i) )
         IF ( Dprst_flag==ACTIVE ) THEN
           waterout = waterout + Dprst_evap_hru(i) + SNGL( Dprst_seep_hru(i) ) ! ??- Dprst_in(i) - Dprst_insroff_hru(i)
-          delta_stor = delta_stor + SNGL( It0_dprst_stor_hru(i) - Dprst_stor_hru(i) )
+          delta_stor_sngl = delta_stor_sngl + SNGL( It0_dprst_stor_hru(i) - Dprst_stor_hru(i) )
         ENDIF
-        robal = waterin + delta_stor - waterout
+        robal = waterin + delta_stor_sngl - waterout
         IF ( AG_flag==ACTIVE ) robal = robal - Infil_ag(i)*Ag_frac(i)
         basin_robal = basin_robal + DBLE( robal )
         IF ( ABS(robal)>TOOSMALL ) THEN

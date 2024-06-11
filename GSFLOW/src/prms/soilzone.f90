@@ -11,7 +11,7 @@
 !    computes interflow to stream or cascade
 !    adjusts storage in soil zone
 !    sends dunnian runoff to stream or cascade by adding to sroff
-!    sends capillary inflow for frozen HRUs to sroff and hortonian_flow
+!    sends capillary inflow for frozen HRUs to sroff
 !    allows dprst seepage and evaporation when frozen
 !    allows impervious evaporation when frozen
 !    computes drainage to groundwater
@@ -56,6 +56,7 @@
       REAL, SAVE, ALLOCATABLE :: Pref_flow(:)
       REAL, SAVE, ALLOCATABLE :: Pref_flow_infil(:), Pref_flow_in(:)
       REAL, SAVE, ALLOCATABLE :: Hru_sz_cascadeflow(:), Swale_actet(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_dunnian_cascadeflow(:), Hru_interflow_cascadeflow(:)
       REAL, SAVE, ALLOCATABLE :: Pref_flow_max(:), Snow_free(:)
       REAL, SAVE, ALLOCATABLE :: Cap_waterin(:), Soil_lower(:)
       REAL, SAVE, ALLOCATABLE :: Potet_lower(:), Potet_rechr(:), Soil_lower_ratio(:)
@@ -284,6 +285,16 @@
         CALL declvar_real(MODNAME, 'hru_sz_cascadeflow', 'nhru', Nhru, &
      &       'Cascading interflow and Dunnian surface runoff from each HRU', &
      &       'inches', Hru_sz_cascadeflow)
+
+        ALLOCATE ( Hru_dunnian_cascadeflow(Nhru) )
+        CALL declvar_real(MODNAME, 'hru_dunnian_cascadeflow', 'nhru', Nhru, &
+     &       'Cascading Dunnian surface runoff from each HRU', &
+     &       'inches', Hru_dunnian_cascadeflow)
+
+        ALLOCATE ( Hru_interflow_cascadeflow(Nhru) )
+        CALL declvar_real(MODNAME, 'hru_interflow_cascadeflow', 'nhru', Nhru, &
+     &       'Cascading interflow from each HRU', &
+     &       'inches', Hru_interflow_cascadeflow)
 
         IF ( Nlake>0 ) THEN
           ALLOCATE ( Lakein_sz(Nhru) )
@@ -559,13 +570,6 @@
         IF ( getparam_real(MODNAME, 'fastcoef_lin', Nhru, Fastcoef_lin)/=0 ) CALL read_error(2, 'fastcoef_lin')
         IF ( getparam_real(MODNAME, 'fastcoef_sq', Nhru, Fastcoef_sq)/=0 ) CALL read_error(2, 'fastcoef_sq')
       ENDIF
-      ! initialize because they are declared
-      Basin_pref_stor = 0.0D0
-      Basin_pref_flow_infil = 0.0D0
-      Basin_dunnian_pfr = 0.0D0
-      Basin_gvr2pfr = 0.0D0
-      Basin_prefflow = 0.0D0
-      Basin_pfr_stor_frac = 0.0D0
 
       IF ( getparam_real(MODNAME, 'ssr2gw_rate', Nssr, Ssr2gw_rate)/=0 ) CALL read_error(2, 'ssr2gw_rate')
       IF ( getparam_real(MODNAME, 'ssr2gw_exp', Nssr, Ssr2gw_exp)/=0 ) CALL read_error(2, 'ssr2gw_exp')
@@ -595,6 +599,15 @@
       Soil_lower_ratio = 0.0
       Pref_flow_thrsh = 0.0
       Pref_flow_max = 0.0
+
+      ! initialize because they are declared, no longer in init_basin_vars
+      Basin_pref_stor = 0.0D0
+      Basin_pref_flow_infil = 0.0D0
+      Basin_dunnian_pfr = 0.0D0
+      Basin_gvr2pfr = 0.0D0
+      Basin_prefflow = 0.0D0
+      Basin_pfr_stor_frac = 0.0D0
+
       DO i = 1, Nhru
 
 ! WARNING changing parameter values as invalid for these HRU types, need to be 0 for computations below
@@ -728,10 +741,10 @@
 !***********************************************************************
       INTEGER FUNCTION szrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAKE, SWALE, &
-     &    DEBUG_less, ERROR_param, CASCADE_OFF, CLOSEZERO, MODSIM_PRMS, MODSIM_PRMS_LOOSE
+     &    DEBUG_less, ERROR_param, CASCADE_OFF, MODSIM_PRMS, MODSIM_PRMS_LOOSE
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, &
      &    Frozen_flag, Soilzone_add_water_use, Nowmonth, GSFLOW_flag, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Model, Dprst_ag_gain !, Nowyear, Nowday
+     &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Model, Dprst_ag_gain !, Nowyear, Nowday, CLOSEZERO
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -815,6 +828,8 @@
         Upslope_interflow = 0.0D0
         Upslope_dunnianflow = 0.0D0
         Hru_sz_cascadeflow = 0.0
+        Hru_dunnian_cascadeflow = 0.0
+        Hru_interflow_cascadeflow = 0.0
         Basin_lakeinsz = 0.0D0
         Basin_dninterflow = 0.0D0
         Basin_dndunnianflow = 0.0D0
@@ -1124,6 +1139,21 @@
         hru_perv_actet(i) = pervactet * perv_frac
         Hru_actet(i) = hruactet + hru_perv_actet(i)
         IF ( Ag_package==ACTIVE ) gsflow_ag_actet = Hru_actet
+
+        ! sanity check
+!        IF ( avail_potet<0.0 ) THEN
+!          IF ( Print_debug>-1 ) THEN
+!            IF ( avail_potet<-NEARZERO ) PRINT *, 'hru_actet>potet', i, &
+!     &           Nowmonth, Nowday, Hru_actet(i), Potet(i), avail_potet
+!          ENDIF
+!          Hru_actet(i) = Potet(i)
+!          tmp = avail_potet/perv_frac
+!          pervactet = pervactet + tmp
+!          Soil_moist(i) = Soil_moist(i) - tmp
+!          Soil_rechr(i) = Soil_rechr(i) - tmp
+!          IF ( Soil_rechr(i)<0.0 ) Soil_rechr(i) = 0.0
+!          IF ( Soil_moist(i)<0.0 ) Soil_moist(i) = 0.0
+!        ENDIF
         Perv_actet(i) = pervactet
 
 ! soil_moist & soil_rechr multiplied by perv_area instead of harea
@@ -1141,7 +1171,7 @@
           Dunnian_flow(i) = dunnianflw
           IF ( Cascade_flag>CASCADE_OFF ) THEN
             IF ( Ncascade_hru(i)>0 ) THEN
-              IF ( interflow+dunnianflw>CLOSEZERO ) THEN
+              IF ( interflow+dunnianflw>NEARZERO ) THEN
                 dnslowflow = 0.0
                 dnpreflow = 0.0
                 dndunn = 0.0
@@ -1151,6 +1181,8 @@
                 Basin_dninterflow = Basin_dninterflow + DBLE( (dnslowflow+dnpreflow)*harea )
                 Basin_dndunnianflow = Basin_dndunnianflow + DBLE( dndunn*harea )
                 Hru_sz_cascadeflow(i) = dnslowflow + dnpreflow + dndunn
+                Hru_dunnian_cascadeflow(i) = dndunn
+                Hru_interflow_cascadeflow(i) = dnslowflow + dnpreflow
                 Basin_dncascadeflow = Basin_dncascadeflow + DBLE( Hru_sz_cascadeflow(i)*harea )
               ENDIF
             ENDIF

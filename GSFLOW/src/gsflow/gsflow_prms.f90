@@ -18,7 +18,7 @@
       use PRMS_READ_PARAM_FILE, only: declparam, check_parameters, getparam_int, getparam_real, &
                                       read_parameter_file_dimens, read_parameter_file_params, setup_params
       use PRMS_SET_TIME, only: prms_time
-      use prms_utils, only: error_stop, numchars, print_module, PRMS_open_output_file, read_error, module_error
+      use prms_utils, only: error_stop, numchars, print_module, PRMS_open_output_file, read_error
       USE MF_DLL, ONLY: gsfdecl, MFNWT_RUN, MFNWT_CLEAN, MFNWT_OCBUDGET, MFNWT_INIT
       USE GWFSFRMODULE, ONLY: NSS
       IMPLICIT NONE
@@ -334,7 +334,6 @@
       ENDIF
       IF ( Process_flag/=RUN .AND. PRMS_flag==ACTIVE ) THEN
         ierr = basin()
-        IF ( ierr/=0 ) CALL module_error('basin', Arg, ierr)
 
         IF ( Call_cascade==ACTIVE ) ierr = cascade()
 
@@ -474,6 +473,8 @@
           ierr = soilzone_ag()
         ENDIF
 
+        IF ( activeHRU_inactiveCELL_flag == ACTIVE ) CALL gwflow_inactive_cell()
+
         IF ( gwflow_flag == ACTIVE ) THEN
           IF ( Model==PRMS ) THEN
             ierr = gwflow()
@@ -500,8 +501,6 @@
             IF ( Print_debug>DEBUG_minimum ) ierr = basin_sum()
 
             IF ( Print_debug==DEBUG_WB ) CALL water_balance()
-          ELSEIF ( activeHRU_inactiveCELL_flag == ACTIVE ) THEN
-            CALL gwflow_inactive_cell()
           ENDIF
         ENDIF
       ENDIF
@@ -680,9 +679,9 @@
         PRMS4_flag = ACTIVE
         IF ( Model_mode(:5)=='PRMS5' .OR. Model_mode(:5)=='prms5' ) PRMS4_flag = OFF
         IF ( Model_mode(:5)=='PRMS6' .OR. Model_mode(:5)=='prms6' ) THEN
-          Model = PRMS6
           PRMS4_flag = OFF
-          PRMS6_flag = OFF
+          Model = PRMS6
+          PRMS6_flag = ACTIVE
         ENDIF
         PRMS_only = ACTIVE
       ELSEIF ( Model_mode(:6)=='GSFLOW' .OR. Model_mode(:6)=='gsflow' ) THEN
@@ -1076,10 +1075,10 @@
       IF ( control_integer(Dyn_ag_soil_flag, 'dyn_ag_soil_flag')/=0 ) Dyn_ag_soil_flag = OFF
       Dynamic_flag = OFF
       Dynamic_soil_flag = OFF
-      IF ( Dyn_intcp_flag/=0 .OR. Dyn_covden_flag/=0 .OR. &
-     &     Dyn_potet_flag/=OFF .OR. Dyn_covtype_flag/=0 .OR. Dyn_transp_flag/=0 .OR. &
-     &     Dyn_radtrncf_flag/=OFF .OR. Dyn_sro2dprst_perv_flag/=0 .OR. Dyn_sro2dprst_imperv_flag/=OFF .OR. &
-     &     Dyn_fallfrost_flag/=OFF .OR. Dyn_springfrost_flag/=0 .OR. Dyn_snareathresh_flag/=0 .OR. &
+      IF ( Dyn_intcp_flag/=OFF .OR. Dyn_covden_flag/=OFF .OR. &
+     &     Dyn_potet_flag/=OFF .OR. Dyn_covtype_flag/=OFF .OR. Dyn_transp_flag/=OFF .OR. &
+     &     Dyn_radtrncf_flag/=OFF .OR. Dyn_sro2dprst_perv_flag/=OFF .OR. Dyn_sro2dprst_imperv_flag/=OFF .OR. &
+     &     Dyn_fallfrost_flag/=OFF .OR. Dyn_springfrost_flag/=OFF .OR. Dyn_snareathresh_flag/=OFF .OR. &
      &     Dyn_transp_on_flag/=OFF ) Dynamic_flag = ACTIVE
       IF ( Dyn_imperv_flag/=OFF .OR. Dyn_dprst_flag/=OFF .OR. Dyn_soil_flag/=OFF .OR. &
      &     Dyn_ag_frac_flag==ACTIVE .OR. Dyn_ag_soil_flag==ACTIVE ) Dynamic_soil_flag = ACTIVE
@@ -1219,7 +1218,7 @@
       ENDIF
       IF ( Cascadegw_flag==CASCADEGW_SAME ) Ncascdgw = Ncascade
       IF ( Ncascade==0 ) Cascade_flag = CASCADE_OFF
-      IF ( Ncascdgw==0 .OR. gwflow_flag==OFF ) Cascadegw_flag = CASCADEGW_OFF
+      IF ( (Ncascdgw==0 .OR. gwflow_flag==OFF) .AND. activeHRU_inactiveCELL_flag==OFF ) Cascadegw_flag = CASCADEGW_OFF
       IF ( Model==MODFLOW .OR. Model==MODSIM_MODFLOW .OR. Model==MODSIM ) THEN ! only call if PRMS not active
         Cascadegw_flag = CASCADEGW_OFF
         Cascade_flag = CASCADE_OFF

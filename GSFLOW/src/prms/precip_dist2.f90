@@ -171,7 +171,7 @@
       USE PRMS_MODULE, ONLY: Nhru, Nrain, Inputerror_flag, Parameter_check_flag
       USE PRMS_PRECIP_DIST2
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
-      use prms_utils, only: read_error
+      use prms_utils, only: read_error, checkdim_param_limits
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: DSQRT, DABS, DBLE
@@ -191,8 +191,7 @@
 
       IF ( getparam_int(MODNAME, 'max_psta', 1, Max_psta) &
      &     /=0 ) CALL read_error(2, 'max_psta')
-      IF ( Max_psta==0 ) Max_psta = Nrain
-      IF ( Max_psta>Nrain ) Max_psta = Nrain
+      CALL checkdim_param_limits(1, 'max_psta', 'nrain', Max_psta, 1, Nrain, Inputerror_flag)
 
 !      IF ( getparam_real(MODNAME, 'maxmon_prec', MONTHS_PER_YEAR, Maxmon_prec) &
 !           /=0 ) CALL read_error(2, 'maxmon_prec')

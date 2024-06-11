@@ -93,7 +93,7 @@
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_open_in(:), Dprst_total_open_out(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_total_clos_in(:), Dprst_total_clos_out(:)
       ! gwflow
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwres_stor(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwres_stor(:), Gw_upslope(:)
       ! lakes
       DOUBLE PRECISION, SAVE :: Basin_lake_stor
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Lake_vol(:)
@@ -160,12 +160,12 @@ end module PRMS_IT0_VARS
      &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
      &    temp_laps_module, temp_sta_module, temp_dist2_module, &
      &    ddsolrad_module, ccsolrad_module, CANOPY
-      USE PRMS_MODULE, ONLY: Nhru, Nssr, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, Nhrucell, &
+      USE PRMS_MODULE, ONLY: Nhru, Nssr, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, Ngw, Inputerror_flag, &
      &    Init_vars_from_file, Temp_flag, Precip_flag, Glacier_flag, &
      &    Strmflow_module, Temp_module, Stream_order_flag, PRMS6_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, Humidity_cbh_flag, &
-     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, no_snow_flag, gwflow_flag
+     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, no_snow_flag, gwflow_flag, Nhrucell
       use PRMS_MMFAPI, only: declvar_int, declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_CLIMATEVARS
@@ -493,10 +493,14 @@ end module PRMS_IT0_VARS
 
 ! gwflow
       IF ( gwflow_flag==ACTIVE ) THEN
-        ALLOCATE ( Gwres_stor(Nhru) )
+        ALLOCATE ( Gwres_stor(Ngw) )
         CALL declvar_dble('gwflow', 'gwres_stor', 'ngw', Nhru, &
      &       'Storage in each GWR', &
      &       'inches', Gwres_stor)
+        ALLOCATE ( Gw_upslope(Ngw) )
+        CALL declvar_dble(MODNAME, 'gw_upslope', 'ngw', Ngw, &
+     &       'Groundwater flow received from upslope GWRs for each GWR', &
+     &       'acre-inches', Gw_upslope)
       ENDIF
 
 ! srunoff
@@ -563,7 +567,7 @@ end module PRMS_IT0_VARS
       IF ( Call_cascade==1 .OR. Stream_order_flag==ACTIVE ) THEN
         IF ( Nsegment==0 ) THEN
           PRINT *, 'ERROR, nsegment=0, must be > 0 for selected module options'
-          ERROR STOP ERROR_dim
+          Inputerror_flag = 1
         ENDIF
       ENDIF
 
@@ -1046,7 +1050,7 @@ end module PRMS_IT0_VARS
      &    potet_pt_module, potet_pm_module, potet_pm_sta_module, climate_hru_module, &
      &    precip_laps_module, xyz_dist_module, ide_dist_module, temp_1sta_module, &
      &    temp_laps_module, temp_sta_module, temp_dist2_module, &
-     &    FEET, FEET2METERS, METERS2FEET, FAHRENHEIT, INACTIVE, LAKE, ERROR_PARAM, ddsolrad_module, ccsolrad_module
+     &    FEET, FEET2METERS, METERS2FEET, FAHRENHEIT, INACTIVE, LAKE, ddsolrad_module, ccsolrad_module
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nevap, Nlake, Ntemp, Nrain, Nsol, &
      &    Print_debug, Init_vars_from_file, Temp_flag, Precip_flag, &
@@ -1061,7 +1065,7 @@ end module PRMS_IT0_VARS
       use prms_utils, only: c_to_f, checkdim_bounded_limits, checkdim_param_limits, f_to_c, read_error
       IMPLICIT NONE
 ! Local variables
-      INTEGER :: i, j, ierr
+      INTEGER :: i, j
 !***********************************************************************
       climateflow_init = 0
 
@@ -1229,7 +1233,6 @@ end module PRMS_IT0_VARS
         Soil_rechr_max = Soil_rechr_max_frac * Soil_moist_max
       ENDIF
 
-      ierr = 0
       IF ( Init_vars_from_file==OFF .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
         IF ( PRMS4_flag==ACTIVE ) THEN
           ! use PRMS4 parameters
@@ -1298,7 +1301,7 @@ end module PRMS_IT0_VARS
           IF ( Ag_soil_rechr_max_frac(i) > 1.0 ) THEN
             IF ( Parameter_check_flag>0 ) THEN
               PRINT 9022, i, Ag_soil_rechr_max_frac(i)
-              ierr = 1
+              Inputerror_flag = 1
             ELSE
               IF ( Print_debug>DEBUG_less ) PRINT 9032, i, Ag_soil_rechr_max_frac(i)
               Ag_soil_rechr_max_frac(i) = 1.0
@@ -1316,7 +1319,7 @@ end module PRMS_IT0_VARS
           IF ( Ag_soil_rechr(i)>Ag_soil_rechr_max(i) ) THEN
             IF ( Parameter_check_flag>0 ) THEN
               PRINT 9023, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
-              ierr = 1
+              Inputerror_flag = 1
             ELSE
               IF ( Print_debug>DEBUG_less ) PRINT 9033, i, Ag_soil_rechr(i), Ag_soil_rechr_max(i)
               Ag_soil_rechr(i) = Ag_soil_rechr_max(i)
@@ -1325,7 +1328,7 @@ end module PRMS_IT0_VARS
           IF ( Ag_soil_moist(i)>Ag_soil_moist_max(i) ) THEN
             IF ( Parameter_check_flag>0 ) THEN
               PRINT 9024, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
-              ierr = 1
+              Inputerror_flag = 1
             ELSE
               IF ( Print_debug>DEBUG_less ) PRINT 9034, i, Ag_soil_moist(i), Ag_soil_moist_max(i)
               Ag_soil_moist(i) = Ag_soil_moist_max(i)
@@ -1334,7 +1337,7 @@ end module PRMS_IT0_VARS
           IF ( Ag_soil_rechr(i)>Ag_soil_moist(i) ) THEN
             IF ( Parameter_check_flag>0 ) THEN
               PRINT 9025, i, Ag_soil_rechr(i), Ag_soil_moist(i)
-              ierr = 1
+              Inputerror_flag = 1
             ELSE
               IF ( Print_debug>DEBUG_less ) PRINT 9035, i, Ag_soil_rechr(i), Ag_soil_moist(i)
               Ag_soil_rechr(i) = Ag_soil_moist(i)
@@ -1364,7 +1367,7 @@ end module PRMS_IT0_VARS
           IF ( Soil_moist_max(i)<0.00001 ) THEN
             IF ( Parameter_check_flag>0 ) THEN
               PRINT 9006, i, Soil_moist_max(i)
-              ierr = 1
+              Inputerror_flag = 1
             ELSE
               Soil_moist_max(i) = 0.00001
               IF ( Print_debug>DEBUG_less ) PRINT 9008, i
@@ -1373,7 +1376,7 @@ end module PRMS_IT0_VARS
           IF ( Soil_rechr_max(i)<0.00001 ) THEN
             IF ( Parameter_check_flag>0 ) THEN
               PRINT 9007, i, Soil_rechr_max(i)
-              ierr = 1
+              Inputerror_flag = 1
             ELSE
               Soil_rechr_max(i) = 0.00001
               IF ( Print_debug>DEBUG_less ) PRINT 9009, i
@@ -1383,7 +1386,7 @@ end module PRMS_IT0_VARS
         IF ( Soil_rechr_max(i)>Soil_moist_max(i) ) THEN
           IF ( Parameter_check_flag>0 ) THEN
             PRINT 9002, i, Soil_rechr_max(i), Soil_moist_max(i)
-            ierr = 1
+            Inputerror_flag = 1
           ELSE
             IF ( Print_debug>DEBUG_less ) PRINT 9012, i, Soil_rechr_max(i), Soil_moist_max(i)
             Soil_rechr_max(i) = Soil_moist_max(i)
@@ -1392,7 +1395,7 @@ end module PRMS_IT0_VARS
         IF ( Soil_rechr(i)>Soil_rechr_max(i) ) THEN
           IF ( Parameter_check_flag>0 ) THEN
             PRINT 9003, i, Soil_rechr(i), Soil_rechr_max(i)
-            ierr = 1
+            Inputerror_flag = 1
           ELSE
             IF ( Print_debug>DEBUG_less ) PRINT 9013, i, Soil_rechr(i), Soil_rechr_max(i)
             Soil_rechr(i) = Soil_rechr_max(i)
@@ -1401,7 +1404,7 @@ end module PRMS_IT0_VARS
         IF ( Soil_moist(i)>Soil_moist_max(i) ) THEN
           IF ( Parameter_check_flag>0 ) THEN
             PRINT 9004, i, Soil_moist(i), Soil_moist_max(i)
-            ierr = 1
+            Inputerror_flag = 1
           ELSE
             IF ( Print_debug>DEBUG_less ) PRINT 9014, i, Soil_moist(i), Soil_moist_max(i)
             Soil_moist(i) = Soil_moist_max(i)
@@ -1410,7 +1413,7 @@ end module PRMS_IT0_VARS
         IF ( Soil_rechr(i)>Soil_moist(i) ) THEN
           IF ( Parameter_check_flag>0 ) THEN
             PRINT 9005, i, Soil_rechr(i), Soil_moist(i)
-            ierr = 1
+            Inputerror_flag = 1
           ELSE
             IF ( Print_debug>DEBUG_less ) PRINT 9015, i, Soil_rechr(i), Soil_moist(i)
             Soil_rechr(i) = Soil_moist(i)
@@ -1419,7 +1422,7 @@ end module PRMS_IT0_VARS
         IF ( Ssres_stor(i)>Sat_threshold(i) ) THEN
           IF ( Parameter_check_flag>0 ) THEN
             PRINT *, 'ERROR, HRU:', i, Ssres_stor(i), Sat_threshold(i), ' ssres_stor > sat_threshold'
-            ierr = 1
+            Inputerror_flag = 1
           ELSE
             PRINT *, 'WARNING, HRU:', i, Ssres_stor(i), Sat_threshold(i), ' ssres_stor > sat_threshold, ssres_stor set to max'
             Ssres_stor(i) = Sat_threshold(i)
@@ -1430,8 +1433,6 @@ end module PRMS_IT0_VARS
       ENDDO
       Basin_soil_moist = Basin_soil_moist * Basin_area_inv
       Basin_ssstor = Basin_ssstor * Basin_area_inv
-
-      IF ( ierr>0 ) STOP ERROR_PARAM
 
       IF ( getparam_real(Srunoff_module, 'snowinfil_max', Nhru, Snowinfil_max)/=0 ) CALL read_error(2, 'snowinfil_max')
 
@@ -1488,10 +1489,9 @@ end module PRMS_IT0_VARS
 
       Snow_evap = 0.0
       Snowmelt = 0.0
-      Snowcov_area = 0.0
       Pptmix_nopack = OFF
 
-      IF ( Init_vars_from_file>0 .OR. ierr>0 ) RETURN
+      IF ( Init_vars_from_file>0 ) RETURN
 
 ! initialize arrays (dimensioned Nsegment)
       IF ( Stream_order_flag==ACTIVE ) THEN
@@ -1502,6 +1502,7 @@ end module PRMS_IT0_VARS
 ! initialize storage variables
       Imperv_stor = 0.0
       Pkwater_equiv = 0.0D0
+      Snowcov_area = 0.0
       IF ( Glacier_flag==ACTIVE ) THEN
         Glacier_frac = 0.0
         Alt_above_ela = 0.0

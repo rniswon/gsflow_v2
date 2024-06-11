@@ -262,7 +262,7 @@
 ! Functions
       INTRINSIC :: DBLE
 ! Local Variables
-      INTEGER i, ii, ierr
+      INTEGER i, ii
 !***********************************************************************
       ideinit = 0
 
@@ -316,14 +316,14 @@
      +     Ndist_psta)/=0 ) CALL read_error(2, 'ndist_psta')
       IF ( Ndist_psta==0 ) THEN
         PRINT *, 'ERROR, need to specify ndist_psta > 0'
-        ierr = 1
+        Inputerror_flag = 1
       ENDIF
 
       IF ( getparam_int(MODNAME, 'ndist_tsta', 1,
      +     Ndist_tsta)/=0 ) CALL read_error(2, 'ndist_tsta')
       IF ( Ndist_tsta==0 ) THEN
         PRINT *, 'ERROR, need to specify ndist_tsta > 0'
-        ierr = 1
+        Inputerror_flag = 1
       ENDIF
 
       IF ( getparam_real(MODNAME, 'tmax_allrain_sta',
@@ -353,7 +353,6 @@
       Basin_centroid_x = Basin_centroid_x*Basin_area_inv
       Basin_centroid_y = Basin_centroid_y*Basin_area_inv
 
-      ierr = 0
       Temp_nsta = 0
       Temp_nuse = 0
       DO i = 1, Ntemp
@@ -365,7 +364,7 @@
       IF ( Temp_nsta<2 ) THEN
         PRINT *, 'ERROR, need to select at least 2 temperature stations'
         PRINT *, '       using tsta_nuse for ide_dist'
-        ierr = 1
+        Inputerror_flag = 1
       ENDIF
 
       Rain_nsta = 0
@@ -379,11 +378,7 @@
       IF ( Rain_nsta<2 ) THEN
         PRINT*,'ERROR, need to select at least 2 precipitation stations'
         PRINT *, '       using psta_nuse for ide_dist'
-        ierr = 1
-      ENDIF
-      IF ( ierr==1 ) THEN
         Inputerror_flag = 1
-        RETURN
       ENDIF
 
       DO i = 1, 12

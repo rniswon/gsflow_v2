@@ -348,7 +348,6 @@
 
       Cfs2acft = Timestep_seconds/FT2_PER_ACRE
 
-      special_seg_type_flag = OFF
       IF ( getparam_int(MODNAME, 'segment_type', Nsegment, Segment_type)/=0 ) CALL read_error(2, 'segment_type')
       IF ( maxval(Segment_type) == 0 ) THEN
         special_seg_type_flag = OFF
@@ -361,7 +360,7 @@
 
       IF ( Strmflow_flag==strmflow_muskingum_mann_module ) THEN
         IF ( getparam_real(MODNAME, 'mann_n', Nsegment, Mann_n)/=0 ) CALL read_error(2, 'mann_n')
-        IF ( getparam_real(MODNAME, 'seg_depth', Nsegment, seg_depth)/=0 ) CALL read_error(2, 'seg_depth')
+        IF ( getparam_real(MODNAME, 'seg_depth', Nsegment, Seg_depth)/=0 ) CALL read_error(2, 'seg_depth')
       ENDIF
 
       IF ( Strmflow_flag==strmflow_muskingum_mann_module .OR. Stream_temp_flag==ACTIVE ) THEN

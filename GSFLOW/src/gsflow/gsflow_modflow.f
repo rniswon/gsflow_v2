@@ -444,7 +444,7 @@ C
      &    MODSIM_MODFLOW
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, no_snow_flag,
      &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
-     &    PRMS_land_iteration_flag,
+     &    PRMS_land_iteration_flag, activeHRU_inactiveCELL_flag,
      &    Model, GSFLOW_flag, Print_debug, Soilzone_module
       use prms_utils, only: error_stop
 C1------USE package modules.
@@ -476,6 +476,7 @@ c     USE LMGMODULE
       INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms
       EXTERNAL :: MODSIM2SFR, SFR2MODSIM, LAK2MODSIM
+      EXTERNAL :: gwflow_inactive_cell
       INTRINSIC :: MIN
 ! Local Variables
       INTEGER :: retval, KITER, iss, iprt, I !, II, IBDRET
@@ -672,22 +673,14 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                   ENDIF
                 ENDIF
               ENDIF
-              IF ( PRMS_land_iteration_flag>0 ) THEN
-                retval = srunoff()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'srunoff', retval
-                  RETURN
-                ENDIF
-              ENDIF
+              IF ( PRMS_land_iteration_flag>0 ) retval = srunoff()
               IF ( AG_flag==ACTIVE ) THEN
                 retval = soilzone_ag()
               ELSE
                 retval = soilzone()
               ENDIF
-              IF ( retval/=0 ) THEN
-                PRINT 9001, Soilzone_module, retval
-                RETURN
-              ENDIF
+              IF ( activeHRU_inactiveCELL_flag == ACTIVE )
+     &             CALL gwflow_inactive_cell()
               retval = gsflow_prms2mf()
               Sziters = Sziters + 1
               Maxgziter = KKITER
@@ -809,10 +802,6 @@ C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
               ENDIF
               IF ( PRMS_land_iteration_flag>0 ) THEN
                 retval = srunoff()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'srunoff', retval
-                  RETURN
-                ENDIF
               ENDIF
               !IF ( Szcheck==ACTIVE ) retval = gsflow_mf2prms()  RGN+RSR 12/14/2022
               IF ( AG_flag==ACTIVE ) THEN
@@ -820,10 +809,8 @@ C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
               ELSE
                 retval = soilzone()
               ENDIF
-              IF ( retval/=0 ) THEN
-                PRINT 9001, Soilzone_module, retval
-                RETURN
-              ENDIF
+              IF ( activeHRU_inactiveCELL_flag == ACTIVE )
+     &             CALL gwflow_inactive_cell()
               retval = gsflow_prms2mf()
             END IF
 C
@@ -840,9 +827,6 @@ C
 !          kkiter = itreal
       !move above and executed when AFR = TRUE
           IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(2,Igrid)
-C
- 9001 FORMAT ('ERROR in ', A, ' module, arg = run.',
-     &        ' Called from MFNWT_RUN.', /, 'Return val =', I2)
 C
       IF (Model>=10 .AND. iss==0) THEN
         IF(IUNIT(44).GT.0) CALL SFR2MODSIM(EXCHANGE, Diversions, 

@@ -400,7 +400,7 @@
       INTRINSIC :: COS, SIN, ABS, SIGN, ASIN, maxval
       REAL, EXTERNAL :: solalt
 ! Local Variables
-      INTEGER :: i, j, k, iseg, ierr, ii, this_seg
+      INTEGER :: i, j, k, iseg, ii, this_seg
       REAL :: tan_d, tano, sinhro, temp, decl, cos_d, tanod, alrs
 !***********************************************************************
       stream_temp_init = 0
@@ -449,14 +449,10 @@
       ELSEIF ( Strmtemp_humidity_flag==2 ) THEN ! use station data
          IF ( getparam_int(MODNAME, 'seg_humidity_sta', Nsegment, Seg_humidity_sta)/=0 ) &
      &      CALL read_error(2, 'seg_humidity_sta')
-         ierr = 0
          DO i = 1, Nsegment
-            CALL checkdim_param_limits(i, 'seg_humidity_sta', 'nhumid', Seg_humidity_sta(i), 1, Nhumid, ierr)
+            CALL checkdim_param_limits(i, 'seg_humidity_sta', 'nhumid', Seg_humidity_sta(i), 1, Nhumid, Inputerror_flag)
          ENDDO
-         IF ( ierr==1 ) THEN
-           Inputerror_flag = ierr
-           RETURN
-         ENDIF
+         IF ( Inputerror_flag>0 ) RETURN
       ENDIF
 
 ! Initialize declared variables

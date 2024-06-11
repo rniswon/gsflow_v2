@@ -496,11 +496,11 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, smidx_module, carea_module, CASCADE_OFF
       use PRMS_READ_PARAM_FILE, only: getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Init_vars_from_file, &
-     &    Dprst_flag, Cascade_flag, Sroff_flag, Frozen_flag, AG_flag !, Parameter_check_flag
+     &    Dprst_flag, Cascade_flag, Sroff_flag, Call_cascade, Frozen_flag, AG_flag !, Parameter_check_flag
       USE PRMS_SRUNOFF
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       use prms_utils, only: read_error
-      USE PRMS_FLOWVARS, ONLY: Hru_impervstor !, Soil_moist_max
+      USE PRMS_FLOWVARS, ONLY: Hru_impervstor, Strm_seg_in, Basin_sroff !, Soil_moist_max
       IMPLICIT NONE
 ! Functions
       EXTERNAL :: dprst_init
@@ -515,6 +515,7 @@
       Hru_sroffi = 0.0
       Hru_sroffp = 0.0
       Hru_impervevap = 0.0
+      IF ( Call_cascade==ACTIVE ) Strm_seg_in = 0.0D0
       IF ( Cascade_flag>CASCADE_OFF ) THEN
         Hru_hortn_cascflow = 0.0D0
         IF ( Nlake>0 ) Hortonian_lakes = 0.0D0
@@ -522,8 +523,10 @@
 
       Basin_sroffi = 0.0D0
       Basin_sroffp = 0.0D0
+      Basin_infil = 0.0D0
+      Basin_sroff = 0.0D0
       Basin_imperv_evap = 0.0D0
-      Basin_imperv_stor = 0.0D0
+      Basin_hortonian = 0.0D0
       Basin_dprst_sroff = 0.0D0
       Basin_dprst_evap = 0.0D0
       Basin_dprst_seep = 0.0D0
@@ -531,9 +534,15 @@
       Basin_sroff_down = 0.0D0
       Basin_hortonian_lakes = 0.0D0
       Basin_contrib_fraction = 0.0D0
-      Basin_dprst_volop = 0.0D0
-      Basin_dprst_volcl = 0.0D0
+      Srp = 0.0
+      Sri = 0.0
+      Sra = 0.0
+      Sroff_ag = 0.0
+
       IF ( Init_vars_from_file==OFF ) THEN
+        Basin_imperv_stor = 0.0D0
+        Basin_dprst_volop = 0.0D0
+        Basin_dprst_volcl = 0.0D0
         Hru_impervstor = 0.0
         Frozen = OFF
         IF ( Frozen_flag==ACTIVE ) THEN
@@ -541,7 +550,6 @@
           Cfgi_prev = 0.0
         ENDIF
       ENDIF
-      Sroff_ag = 0.0
 
       IF ( getparam_real(MODNAME, 'carea_max', Nhru, Carea_max)/=0 ) CALL read_error(2, 'carea_max')
 
@@ -870,7 +878,7 @@
           Basin_apply_sroff = Basin_apply_sroff + DBLE( Sra*perv_area )
         ENDIF
 
-!******Compute runoff for depression storage area
+!******Compute runoff and storage for depression storage area
         IF ( Dprst_flag==ACTIVE ) THEN
           dprst_chk = OFF
           IF ( Dprst_area_max(i)>0.0 ) THEN
@@ -1352,6 +1360,23 @@
 
 ! reset Sroff as it accumulates flow to streams
       Runoff = Runoff - SNGL( Hru_sroff_down )
+!      IF ( Runoff<0.0 ) THEN
+!        IF ( Runoff<-NEARZERO ) THEN
+!          IF ( Print_debug>-1 ) PRINT *, 'runoff < NEARZERO', Runoff
+!          IF ( Hru_sroff_down>ABS(Runoff) ) THEN
+!            Hru_sroff_down = Hru_sroff_down - Runoff
+!          ELSE
+!            DO k = 1, Ncascade_hru
+!              j = Hru_down(k, Ihru)
+!              IF ( Strm_seg_in(j)>ABS(Runoff) ) THEN
+!                Strm_seg_in(j) = Strm_seg_in(j) - Runoff
+!                EXIT
+!              ENDIF
+!            ENDDO
+!          ENDIF
+!        ENDIF
+!        Runoff = 0.0
+!      ENDIF
 
       END SUBROUTINE run_cascade_sroff
 
