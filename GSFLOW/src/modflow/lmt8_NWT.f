@@ -24,12 +24,14 @@ C
      +                            ISFRFLOWS,ILAKFLOWS,
      +                            NLAKCON
         INTEGER, SAVE, DIMENSION(:,:), POINTER :: IGWET
+        INTEGER, SAVE, DIMENSION(:,:), POINTER :: IUZFRCH
        TYPE LMTTYPE
          INTEGER, POINTER :: ISSMT3D,IUMT3D,ILMTFMT,ISFRLAKCONNECT,
      +                       ISFRUZFCONNECT,ILAKUZFCONNECT,NPCKGTXT,
      +                       ISNKUZFCONNECT,IUZFFLOWS,ISFRFLOWS,
      +                       ILAKFLOWS,NLAKCON
          INTEGER, DIMENSION(:,:), POINTER :: IGWET
+         INTEGER, DIMENSION(:,:), POINTER :: IUZFRCH
        END TYPE
        TYPE(LMTTYPE), SAVE  :: LMTDAT(14)
       END MODULE LMTMODULE
@@ -46,7 +48,7 @@ C THE 'EXTENDED' HEADER OPTION IS THE DEFAULT. THE RESULTING LINK FILE
 C IS COMPATIBLE WITH MT3DMS VERSION [4.00] OR LATER OR MT3D-USGS VERSION
 C [1.00] OR LATER.
 !rgn------REVISION NUMBER CHANGED TO INDICATE MODIFICATIONS FOR NWT 
-!rgn------NEW VERSION NUMBER 1.1.4, 4/01/2018
+!rgn------NEW VERSION NUMBER 1.3.0, 7/01/2022
 C **********************************************************************
 C last modified: 06-23-2016
 C last modified: 10-21-2010 swm: added MTMNW1 & MTMNW2
@@ -57,17 +59,17 @@ C
       USE LMTMODULE,ONLY:ISSMT3D,IUMT3D,ILMTFMT,ILAKUZFCONNECT,
      &                   ISFRUZFCONNECT,ISFRLAKCONNECT,ISNKUZFCONNECT,
      &                   NPCKGTXT,IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,
-     &                   NLAKCON,IGWET
+     &                   NLAKCON,IGWET,IUZFRCH
       USE GWFUZFMODULE, ONLY:IUZFOPT,IRUNFLG,IETFLG,IRUNBND,IUZFBND
       USE GWFSFRMODULE, ONLY:IOTSG,IDIVAR,NSS,ITRFLG,FLOWTYPE
       USE GWFLAKMODULE, ONLY:LKFLOWTYPE,NLKFLWTYP
+      USE openspec
 C
 C--USE FILE SPECIFICATION of MODFLOW-2005
       INTEGER       I,INUNIT,IGRID,IU,ILMTHEAD,INLMT,IFLEN,NC,LLOC,
      &              ITYP1,ITYP2,N,INAME,INAM1,INAM2,ISTART,ISTOP,J,K
      &              
       REAL          R
-      INCLUDE       'openspec.inc'
       LOGICAL       LOP,FIRSTVAL
       CHARACTER*4   CUNIT(NIUNIT), SETDEFLT
       CHARACTER*200 LINE,FNAME,NME
@@ -82,6 +84,7 @@ C     -----------------------------------------------------------------
      +         ISFRLAKCONNECT,ISNKUZFCONNECT,NPCKGTXT,IUZFFLOWS,
      +         ISFRFLOWS,ILAKFLOWS,NLAKCON)
       ALLOCATE(IGWET(NCOL,NROW))
+      ALLOCATE(IUZFRCH(NCOL,NROW))
       NPCKGTXT=0
       SETDEFLT='NA'
 C
@@ -449,9 +452,18 @@ C--ENSURE A UNIQUE UNIT NUMBER FOR LINK-MT3DMS OUTPUT FILE
      &        I4,' ALREADY IN USE;' 
      &       /1X,'SPECIFY A UNIQUE UNIT NUMBER.')   
 C
-C--OPEN THE LINK-MT3DMS OUTPUT FILE NEEDED BY MT3DMS
+C--OPEN THE LINK-MT3DMS OUTPUT FILE NEEDED BY MT3DMS (or MT3D-USGS)
 C--AND PRINT AN IDENTIFYING MESSAGE IN MODFLOW OUTPUT FILE  
       INQUIRE(UNIT=IUMT3D,OPENED=LOP)
+      IF(LOP.AND.ILMTFMT.EQ.1) THEN
+        WRITE(IOUT,1020)
+        WRITE(*,1020)
+        CALL USTOP(' ')
+      ENDIF
+ 1020 FORMAT(/1X,'LINKER FILE PREVIOUSLY LISTED IN THE MODFLOW NAME '
+     &       /1X,'FILE. REMOVE ITS LISTING FROM WITHIN THE NAME FILE '
+     &       /1X,'AND PROVIDE LINKER FILE NAME AND UNIT NUMBER ONLY IN '
+     &       /1X,'THE LMT INPUT FILE.  STOPPING MODEL.')
       IF(LOP) THEN
         REWIND (IUMT3D)
       ELSE
@@ -2396,9 +2408,20 @@ C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,BOTM,LBOTM,HNEW
       USE GWFWELMODULE,ONLY:NWELLS,WELL,PSIRAMP
       USE GWFUPWMODULE,ONLY:LAYTYPUPW
+!External function interface
+      INTERFACE 
+        FUNCTION SMOOTH3(H,T,B,dQ)
+        DOUBLE PRECISION SMOOTH3
+        DOUBLE PRECISION, INTENT(IN) :: H
+        DOUBLE PRECISION, INTENT(IN) :: T
+        DOUBLE PRECISION, INTENT(IN) :: B
+        DOUBLE PRECISION, INTENT(OUT) :: dQ
+        END FUNCTION SMOOTH3
+      END INTERFACE
+!External function interface
       CHARACTER*16 TEXT
       double precision bbot, Hh, cof1, cof2, cof3, Qp, x, s
-      double precision ttop
+      double precision ttop, dQp
 C      
 C--SET POINTERS FOR THE CURRENT GRID   
 cswm: already set in      CALL SGWF2WEL7PNT(IGRID)
@@ -2426,32 +2449,23 @@ C
 C--IF CELL IS EXTERNAL Q=0
         Q=ZERO
         IF(IBOUND(IC,IR,IL).GT.0) THEN
-          Q=WELL(4,L)
-          IF ( IUNITUPW.GT.0 ) THEN
+          Qsave=WELL(4,L)
+C
+          IF ( Qsave.LT.zero  .AND. Iunitnwt.NE.0) THEN
             IF ( LAYTYPUPW(il).GT.0 ) THEN
               bbot = Botm(IC, IR, Lbotm(IL))
               ttop = Botm(IC, IR, Lbotm(IL)-1)
               Hh = HNEW(ic,ir,il)
-              x = (Hh-bbot)
-              s = PSIRAMP
-              s = s*(Ttop-Bbot)
-              aa = -1.0d0/(s**2.0d0)
-              b = 2.0d0/s
-              cof1 = x**2.0D0
-              cof2 = -(2.0D0*x)/(s**3.0D0)
-              cof3 = 3.0D0/(s**2.0D0)
-              Qp = cof1*(cof2+cof3)
-              IF ( x.LT.0.0D0 ) THEN
-                Qp = 0.0D0
-              ELSEIF ( x-s.GT.-1.0e-14 ) THEN
-                Qp = 1.0D0
-              END IF
-              IF ( Qp.LT.1.0 ) THEN
-                Q = Q*Qp
-              END IF
+              Qp = smooth3(Hh,Ttop,Bbot,dQp)
+              Q = Qsave*Qp
+            ELSE
+              Q = Qsave
             END IF
+          ELSE
+            Q = Qsave
           END IF
         END IF
+C
         IF(ILMTFMT.EQ.0) THEN
           WRITE(IUMT3D) IL,IR,IC,Q
         ELSEIF(ILMTFMT.EQ.1) THEN
@@ -3469,15 +3483,14 @@ C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW,HOLD,
      &                      BUFF,BOTM,DELR,DELC
       USE GWFBASMODULE,ONLY:DELT
-      USE LMTMODULE,   ONLY:IUZFFLOWS,IGWET
+      USE LMTMODULE,   ONLY:IUZFFLOWS,IGWET,IUZFRCH
       USE GWFUZFMODULE,ONLY:SEEPOUT,IUZHOLD,numcells,IUZFBND,RTSOLFL,
-     &                      NUZTOP,GWET,UZFLWT,IETFLG
+     &                      NUZTOP,GWET,UZFLWT,IETFLG,LAYNUM
 C
       IMPLICIT NONE
 C
       CHARACTER*16 TEXT,TEXT2
       INTEGER I,J,K,l,ll,IR,IC,IL,KPER,KSTP,ILMTFMT,IUMT3D,ISSMT3D,IGRID
-      INTEGER, DIMENSION(NCOL,NROW) :: IUZFRCH
       REAL cellarea,ZERO,TLED,ONE
 C--SET POINTERS FOR THE CURRENT GRID      
 C  ALREADY SET IN GWF2RCH7BD?
@@ -3525,7 +3538,7 @@ C--MANIPULATE IUZFRCH
                 IUZFRCH(J,I)=1
               ELSEIF(NUZTOP.EQ.2) THEN ! Recharge to and discharge from the layer specified in IUZFBND
                 IUZFRCH(J,I)=IUZFBND(J,I)
-                BUFF(J,I,1)=BUFF(J,I,IUZFBND(J,I))
+                BUFF(J,I,1)=BUFF(J,I,IUZFBND(J,I))  !Not sure about this line (RGN 11/6/2019)
               ENDIF
             ENDIF
           ENDDO
@@ -3546,6 +3559,11 @@ C--MANIPULATE IUZFRCH
             ENDDO
           ENDDO
         ENDDO
+      ELSE IF(NUZTOP.EQ.4) THEN
+        K=LAYNUM(J,I)
+        IF (IBOUND(J,I,K).GT.0) THEN
+          IUZFRCH(J,I)= K
+        END IF
       ENDIF
 C
 C--WRITE AN IDENTIFYING HEADER
@@ -4291,11 +4309,12 @@ C
      &        USERFLOW,TRBFLW_TOT
       DOUBLE PRECISION CLOSEZERO
       LOGICAL WRITEVAL
-      REAL, DIMENSION(5,NSTRM)   :: SFRFLOWVAL
+      REAL, ALLOCATABLE          :: SFRFLOWVAL(:,:)
       CHARACTER*16, DIMENSION(5) :: PRNTSFRQTYP
       LOGICAL, DIMENSION(5)      :: MASK
 C
       DIMENSION LASTRCH(NSS)
+      ALLOCATE(SFRFLOWVAL(5,NSTRM))
 C
       PRNTSFRQTYP=''
       IF(ISFRFLOWS.EQ.0) THEN
@@ -4773,6 +4792,7 @@ C-------WRITE INFLOW SEGMENT, REACH, FLOW RATE, AND DISPERSION FLAG
         !  ENDIF
         !ENDIF
 C
+      IF(ALLOCATED(SFRFLOWVAL)) DEALLOCATE(SFRFLOWVAL)
 C
       RETURN
       END
@@ -5129,6 +5149,8 @@ C
      + DEALLOCATE(LMTDAT(IGRID)%NLAKCON)
       IF(ASSOCIATED(LMTDAT(IGRID)%IGWET))
      + DEALLOCATE(LMTDAT(IGRID)%IGWET)
+      IF(ASSOCIATED(LMTDAT(IGRID)%IUZFRCH))
+     + DEALLOCATE(LMTDAT(IGRID)%IUZFRCH)
 C      
 c      
 C
