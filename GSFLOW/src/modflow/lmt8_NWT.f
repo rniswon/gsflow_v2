@@ -63,13 +63,13 @@ C
       USE GWFUZFMODULE, ONLY:IUZFOPT,IRUNFLG,IETFLG,IRUNBND,IUZFBND
       USE GWFSFRMODULE, ONLY:IOTSG,IDIVAR,NSS,ITRFLG,FLOWTYPE
       USE GWFLAKMODULE, ONLY:LKFLOWTYPE,NLKFLWTYP
-      USE openspec
 C
 C--USE FILE SPECIFICATION of MODFLOW-2005
       INTEGER       I,INUNIT,IGRID,IU,ILMTHEAD,INLMT,IFLEN,NC,LLOC,
      &              ITYP1,ITYP2,N,INAME,INAM1,INAM2,ISTART,ISTOP,J,K
      &              
       REAL          R
+      INCLUDE       'openspec.inc'
       LOGICAL       LOP,FIRSTVAL
       CHARACTER*4   CUNIT(NIUNIT), SETDEFLT
       CHARACTER*200 LINE,FNAME,NME
@@ -2449,23 +2449,32 @@ C
 C--IF CELL IS EXTERNAL Q=0
         Q=ZERO
         IF(IBOUND(IC,IR,IL).GT.0) THEN
-          Qsave=WELL(4,L)
-C
-          IF ( Qsave.LT.zero  .AND. Iunitnwt.NE.0) THEN
+          Q=WELL(4,L)
+          IF ( IUNITUPW.GT.0 ) THEN
             IF ( LAYTYPUPW(il).GT.0 ) THEN
               bbot = Botm(IC, IR, Lbotm(IL))
               ttop = Botm(IC, IR, Lbotm(IL)-1)
               Hh = HNEW(ic,ir,il)
-              Qp = smooth3(Hh,Ttop,Bbot,dQp)
-              Q = Qsave*Qp
-            ELSE
-              Q = Qsave
+              x = (Hh-bbot)
+              s = PSIRAMP
+              s = s*(Ttop-Bbot)
+              aa = -1.0d0/(s**2.0d0)
+              b = 2.0d0/s
+              cof1 = x**2.0D0
+              cof2 = -(2.0D0*x)/(s**3.0D0)
+              cof3 = 3.0D0/(s**2.0D0)
+              Qp = cof1*(cof2+cof3)
+              IF ( x.LT.0.0D0 ) THEN
+                Qp = 0.0D0
+              ELSEIF ( x-s.GT.-1.0e-14 ) THEN
+                Qp = 1.0D0
+              END IF
+              IF ( Qp.LT.1.0 ) THEN
+                Q = Q*Qp
+              END IF
             END IF
-          ELSE
-            Q = Qsave
           END IF
         END IF
-C
         IF(ILMTFMT.EQ.0) THEN
           WRITE(IUMT3D) IL,IR,IC,Q
         ELSEIF(ILMTFMT.EQ.1) THEN
@@ -3483,7 +3492,7 @@ C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW,HOLD,
      &                      BUFF,BOTM,DELR,DELC
       USE GWFBASMODULE,ONLY:DELT
-      USE LMTMODULE,   ONLY:IUZFFLOWS,IGWET,IUZFRCH
+      USE LMTMODULE,   ONLY:IUZFFLOWS,IGWET
       USE GWFUZFMODULE,ONLY:SEEPOUT,IUZHOLD,numcells,IUZFBND,RTSOLFL,
      &                      NUZTOP,GWET,UZFLWT,IETFLG,LAYNUM
 C
@@ -3491,6 +3500,7 @@ C
 C
       CHARACTER*16 TEXT,TEXT2
       INTEGER I,J,K,l,ll,IR,IC,IL,KPER,KSTP,ILMTFMT,IUMT3D,ISSMT3D,IGRID
+      INTEGER, DIMENSION(NCOL,NROW) :: IUZFRCH
       REAL cellarea,ZERO,TLED,ONE
 C--SET POINTERS FOR THE CURRENT GRID      
 C  ALREADY SET IN GWF2RCH7BD?
@@ -3538,7 +3548,7 @@ C--MANIPULATE IUZFRCH
                 IUZFRCH(J,I)=1
               ELSEIF(NUZTOP.EQ.2) THEN ! Recharge to and discharge from the layer specified in IUZFBND
                 IUZFRCH(J,I)=IUZFBND(J,I)
-                BUFF(J,I,1)=BUFF(J,I,IUZFBND(J,I))  !Not sure about this line (RGN 11/6/2019)
+                BUFF(J,I,1)=BUFF(J,I,IUZFBND(J,I))
               ENDIF
             ENDIF
           ENDDO
