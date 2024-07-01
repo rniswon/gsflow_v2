@@ -220,7 +220,6 @@
 
       IF ( Cascade_flag>CASCADE_OFF ) CALL init_cascade(cascinit)
 
-      iret = 0
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         ALLOCATE ( Gwr_down(Ndown,Ngw), Gwr_down_frac(Ndown,Ngw), Cascade_gwr_area(Ndown,Ngw) )
 !        ALLOCATE ( Gwr_down_fracwt(Ndown,Ngw) )

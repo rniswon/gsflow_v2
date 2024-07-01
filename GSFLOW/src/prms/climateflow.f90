@@ -1370,17 +1370,17 @@ end module PRMS_IT0_VARS
               PRINT 9006, i, Soil_moist_max(i)
               Inputerror_flag = 1
             ELSE
-              Soil_moist_max(i) = 0.0001
+              Soil_moist_max(i) = 0.00001
               IF ( Print_debug>DEBUG_less ) PRINT 9008, i
               bad_soil_moist_max = bad_soil_moist_max + 1
             ENDIF
           ENDIF
-          IF ( Soil_rechr_max(i)<0.0001 ) THEN
+          IF ( Soil_rechr_max(i)<0.00001 ) THEN
             IF ( Parameter_check_flag>0 ) THEN
               PRINT 9007, i, Soil_rechr_max(i)
               Inputerror_flag = 1
             ELSE
-              Soil_rechr_max(i) = 0.0001
+              Soil_rechr_max(i) = 0.00001
               IF ( Print_debug>DEBUG_less ) PRINT 9009, i
             ENDIF
           ENDIF
@@ -1527,10 +1527,10 @@ end module PRMS_IT0_VARS
  9023 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max', 2F15.9)
  9024 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max', 2F15.9)
  9025 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr > ag_soil_moist based on init and max values', 2F15.9)
- 9006 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_max < 0.0001', F15.9)
- 9007 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max < 0.0001', F15.9)
- 9008 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_moist_max < 0.0001, set to 0.0001')
- 9009 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr_max < 0.0001, set to 0.0001')
+ 9006 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_max < 0.00001', F15.9)
+ 9007 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max < 0.00001', F15.9)
+ 9008 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_moist_max < 0.00001, set to 0.00001')
+ 9009 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr_max < 0.00001, set to 0.00001')
  9012 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr_max > soil_moist_max,', 2F15.9, /, 9X, &
      &        'soil_rechr_max set to soil_moist_max')
  9013 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr_init > soil_rechr_max,', 2F15.9, /, 9X, &

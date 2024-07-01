@@ -16,8 +16,8 @@
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Groundwater'
-      character(len=6), parameter :: MODNAME = 'gwflow'
-      character(len=*), parameter :: Version_gwflow = '2024-01-22'
+      character(len=*), parameter :: MODNAME = 'gwflow'
+      character(len=*), parameter :: Version_gwflow = '2024-05-30'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea(:), Gwin_dprst(:)
       DOUBLE PRECISION, SAVE :: Basin_gw_upslope
       INTEGER, SAVE :: Gwminarea_flag
@@ -29,7 +29,7 @@
       DOUBLE PRECISION, SAVE :: Basin_gwstor_minarea_wb
       REAL, SAVE, ALLOCATABLE :: Gwres_flow(:), Gwres_sink(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwres_in(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_gw_cascadeflow(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_gw_cascadeflow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gw_in_soil(:), Gw_in_ssr(:), Hru_lateral_flow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea_wb(:), Hru_streamflow_out(:), Lakein_gwflow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Lake_seepage(:), Gw_seep_lakein(:), Lake_seepage_gwr(:)
@@ -88,7 +88,7 @@
 ! cascading variables and parameters
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         ALLOCATE ( Hru_gw_cascadeflow(Ngw) )
-        CALL declvar_dble(MODNAME, 'hru_gw_cascadeflow', 'ngw', Ngw, &
+        CALL declvar_real(MODNAME, 'hru_gw_cascadeflow', 'ngw', Ngw, &
      &       'Cascading groundwater flow from each GWR', &
      &       'inches', Hru_gw_cascadeflow)
 
@@ -384,14 +384,14 @@
       INTRINSIC :: DBLE, DABS, SNGL, MIN
 ! Local Variables
       INTEGER :: i, j, jj, jjj
-      DOUBLE PRECISION :: dnflow
+      REAL :: dnflow
       DOUBLE PRECISION :: gwin, gwstor, gwsink, gwflow, gwstor_last, seepage, gwarea, inch2acre_feet
 !***********************************************************************
       gwflowrun = 0
 
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         Gw_upslope = 0.0D0
-        Hru_gw_cascadeflow = 0.0D0
+        Hru_gw_cascadeflow = 0.0
         Basin_dnflow = 0.0D0
         Basin_gw_upslope = 0.0D0
         IF ( Nlake>0 ) Lakein_gwflow = 0.0D0
@@ -546,7 +546,7 @@
           IF ( Ncascade_gwr(i)>0 ) THEN
             CALL rungw_cascade(i, Ncascade_gwr(i), Gwres_flow(i), dnflow)
             Hru_gw_cascadeflow(i) = dnflow
-            Basin_dnflow = Basin_dnflow + dnflow*gwarea
+            Basin_dnflow = Basin_dnflow + DBLE( dnflow*Hru_area(i) )
           ELSEIF ( Gwr_type(i)==LAKE ) THEN
             Lakein_gwflow(Lake_hru_id(i)) = Lakein_gwflow(Lake_hru_id(i)) + Gwres_flow(i)
           ENDIF
@@ -586,18 +586,18 @@
 ! Arguments
       INTEGER, INTENT(IN) :: Igwr, Ncascade_gwr
       REAL, INTENT(INOUT) :: Gwres_flow
-      DOUBLE PRECISION, INTENT(OUT) :: Dnflow
+      REAL, INTENT(OUT) :: Dnflow
 ! Local variables
       INTEGER :: j, k
 !***********************************************************************
-      Dnflow = 0.0D0
+      Dnflow = 0.0
       DO k = 1, Ncascade_gwr
         j = Gwr_down(k, Igwr)
         ! Gwres_flow is in inches
 ! if gwr_down(k, Igwr) > 0, cascade contributes to a downslope GWR
         IF ( j>0 ) THEN
           Gw_upslope(j) = Gw_upslope(j) + DBLE( Gwres_flow*Cascade_gwr_area(k, Igwr) )
-          Dnflow = Dnflow + DBLE( Gwres_flow*Gwr_down_frac(k, Igwr) )
+          Dnflow = Dnflow + Gwres_flow*Gwr_down_frac(k, Igwr)
 ! if gwr_down(k, Igwr) < 0, cascade contributes to a stream
         ELSEIF ( j<0 ) THEN
           j = IABS( j )
@@ -606,7 +606,7 @@
       ENDDO
 
       ! gwres_flow reduced by cascading flow to HRUs
-      Gwres_flow = Gwres_flow - SNGL( Dnflow )
+      Gwres_flow = Gwres_flow - Dnflow
       IF ( Gwres_flow<0.0 ) Gwres_flow = 0.0
 
       END SUBROUTINE rungw_cascade

@@ -366,7 +366,7 @@ contains
 
     i = i + 1
     Control_parameter_data(i) % name = 'subbasin_flag'
-    Subbasin_flag = OFF
+    Subbasin_flag = ACTIVE
     Control_parameter_data(i) % values_int(1) = Subbasin_flag
     i = i + 1
     Control_parameter_data(i) % name = 'cbh_check_flag'
@@ -393,11 +393,11 @@ contains
     Dprst_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'cascade_flag'
-    Cascade_flag = OFF
+    Cascade_flag = ACTIVE
     Control_parameter_data(i) % values_int(1) = Cascade_flag
     i = i + 1
     Control_parameter_data(i) % name = 'cascadegw_flag'
-    Cascadegw_flag = OFF
+    Cascadegw_flag = ACTIVE
     Control_parameter_data(i) % values_int(1) = Cascadegw_flag
     i = i + 1
     Control_parameter_data(i) % name = 'frozen_flag'

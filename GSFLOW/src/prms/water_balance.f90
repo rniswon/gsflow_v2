@@ -399,7 +399,7 @@
           hru_in = hru_in + Upslope_dunnianflow(i) + Upslope_interflow(i) + Upslope_hortonian(i)
         ENDIF
         IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
-          hru_out = hru_out + Hru_gw_cascadeflow(i)
+          hru_out = hru_out + DBLE( Hru_gw_cascadeflow(i) )
           hru_in = hru_in + Gw_upslope(i)/harea_dble
         ENDIF
 !        Hru_runoff(i) = hru_out - DBLE( Hru_actet(i) )
@@ -436,7 +436,7 @@
         ENDIF
 
         wbal = Gwstor_ante(i) + Gwres_in(i)/harea_dble - Gwres_stor(i) - DBLE( Gwres_sink(i) + Gwres_flow(i) )
-        IF ( Cascadegw_flag>CASCADEGW_OFF ) wbal = wbal - Hru_gw_cascadeflow(i)
+        IF ( Cascadegw_flag>CASCADEGW_OFF ) wbal = wbal - DBLE( Hru_gw_cascadeflow(i) )
         IF ( Gwminarea_flag==ACTIVE ) wbal = wbal + Gwstor_minarea_wb(i)
         gwup = 0.0D0
         IF ( Cascadegw_flag>CASCADEGW_OFF ) gwup = Gw_upslope(i)
@@ -517,7 +517,7 @@
 
 ! soilzone
       Basin_capillary_wb = It0_basin_soil_moist - Basin_soil_moist - &
-     &                     Basin_perv_et - Basin_sm2gvr_max + Basin_cap_infil_tot !- Basin_soil_to_gw
+     &                     Basin_perv_et - Basin_sm2gvr_max + Basin_cap_infil_tot - Basin_soil_to_gw
       Basin_gravity_wb = It0_basin_ssstor - Basin_ssstor + Basin_sm2gvr - Basin_dncascadeflow - &
      &                   Basin_ssflow - Basin_sz2gw - Basin_dunnian + Basin_dunnian_pfr - &
      &                   Basin_swale_et + Basin_pref_flow_infil

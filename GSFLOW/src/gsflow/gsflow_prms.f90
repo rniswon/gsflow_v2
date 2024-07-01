@@ -1119,7 +1119,7 @@
 
 ! cascade
       ! if cascade_flag = 2 (CASCADE_HRU_SEGMENT), use hru_segment parameter for cascades, ncascade=ncascdgw=nhru (typical polygon HRUs)
-      IF ( control_integer(Cascade_flag, 'cascade_flag')/=0 ) Cascade_flag = OFF
+      IF ( control_integer(Cascade_flag, 'cascade_flag')/=0 ) Cascade_flag = ACTIVE
       ! if cascadegw_flag = 2 (CASCADEGW_SAME), use same cascades as HRUs
       IF ( control_integer(Cascadegw_flag, 'cascadegw_flag')/=0 ) Cascadegw_flag = OFF
 
@@ -1223,7 +1223,7 @@
         Cascadegw_flag = CASCADEGW_OFF
         Cascade_flag = CASCADE_OFF
       ENDIF
-      IF ( Cascade_flag>CASCADE_OFF .OR. Cascadegw_flag>CASCADEGW_OFF .AND. Model/=CONVERT ) THEN
+      IF ( (Cascade_flag>CASCADE_OFF .OR. Cascadegw_flag>CASCADEGW_OFF) .AND. Model/=CONVERT ) THEN
         Call_cascade = ACTIVE
       ELSE
         Call_cascade = OFF

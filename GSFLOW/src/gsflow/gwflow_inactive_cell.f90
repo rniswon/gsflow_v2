@@ -1,12 +1,20 @@
 !***********************************************************************
-! Sums inflow to and outflow from PRMS ground-water reservoirs for inactive MF cells
-! outflow can be routed to downslope ground-water reservoirs and stream
-! segments. No PRMS water use or lakes or minimum area or sink or swales
+! Sums inflow to and outflow from PRMS ground-water reservoirs for inactive MF cells; outflow
+! can be routed to downslope ground-water reservoirs and stream
+! segments. Lakes are not allowed.
+!
 ! Can be used for depression storage
+!***********************************************************************
+! Modified 7/1997 J. Vaccaro to set a minimum value for groundwater flow
+! by reading in a minimum ground-water storage value for each groundwater
+! reservoir, if this value is set=0, then standard PRMS routine module.
+! A minimum may represent an injection well, intrabasin transfer,
+! contribution from larger regional gw system, or past residual storage
+! modified 10/1/2008 rsregan to include Vaccaro code
 !***********************************************************************
       MODULE PRMS_GWFLOW_INACTIVE_CELL
       IMPLICIT NONE
-      ! Local Variables
+!   Local Variables
       character(len=*), parameter :: MODDESC = 'Groundwater'
       character(len=*), parameter :: MODNAME = 'gwflow_inactive_cell'
       character(len=*), parameter :: Version_gwflow = '2024-05-30'
@@ -14,16 +22,16 @@
       DOUBLE PRECISION, SAVE :: Basin_gw_upslope
       INTEGER, SAVE :: Gwminarea_flag
       DOUBLE PRECISION, SAVE :: Basin_dnflow
-      ! Declared Variables
+! Declared Variables
       DOUBLE PRECISION, SAVE :: Basin_gwstor, Basin_gwflow, Basin_gwsink
       DOUBLE PRECISION, SAVE :: Basin_gwin
       DOUBLE PRECISION, SAVE :: Basin_gwstor_minarea_wb
       REAL, SAVE, ALLOCATABLE :: Gwres_flow(:), Gwres_sink(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwres_in(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_gw_cascadeflow(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_gw_cascadeflow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gw_in_soil(:), Gw_in_ssr(:), Hru_lateral_flow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea_wb(:), Hru_streamflow_out(:)
-      ! Declared Parameters
+! Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Gwflow_coef(:), Gwsink_coef(:)
       REAL, SAVE, ALLOCATABLE :: Gwstor_init(:), Gwstor_min(:)
       END MODULE PRMS_GWFLOW_INACTIVE_CELL
@@ -35,9 +43,9 @@
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT
       USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
-      ! Functions
+! Functions
       EXTERNAL :: gwflow_inactivecell_run, gwflow_inactivecell_decl, gwflow_inactivecell_init
-      !***********************************************************************
+!***********************************************************************
       IF ( Process_flag==RUN ) THEN
         CALL gwflow_inactivecell_run()
       ELSEIF ( Process_flag==DECL ) THEN
@@ -61,13 +69,13 @@
       USE PRMS_GWFLOW_INACTIVE_CELL
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
-      !***********************************************************************
+!***********************************************************************
       CALL print_module(MODDESC, MODNAME, Version_gwflow)
 
-      ! cascading variables and parameters
+! cascading variables and parameters
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         ALLOCATE ( Hru_gw_cascadeflow(Ngw) )
-        CALL declvar_dble(MODNAME, 'hru_gw_cascadeflow', 'ngw', Ngw, &
+        CALL declvar_real(MODNAME, 'hru_gw_cascadeflow', 'ngw', Ngw, &
      &       'Cascading groundwater flow from each GWR', &
      &       'inches', Hru_gw_cascadeflow)
       ENDIF
@@ -187,9 +195,9 @@
       use prms_utils, only: read_error
       IMPLICIT NONE
       INTRINSIC :: DBLE
-      ! Local Variables
+! Local Variables
       INTEGER :: i, j
-      !***********************************************************************
+!***********************************************************************
       IF ( getparam_real(MODNAME, 'gwflow_coef', Ngw, Gwflow_coef)/=0 ) CALL read_error(2, 'gwflow_coef')
       IF ( getparam_real(MODNAME, 'gwsink_coef', Ngw, Gwsink_coef)/=0 ) CALL read_error(2, 'gwsink_coef')
       IF ( getparam_real(MODNAME, 'gwstor_min', Ngw, Gwstor_min)/=0 ) CALL read_error(2, 'gwstor_min')
@@ -225,7 +233,7 @@
             IF ( Print_debug>DEBUG_less ) PRINT *, 'WARNING, GWR:', i, &
        &         ' is treated as a swale, flow sent to basin_cfs and hru_segment if > 0'
           ELSE
-            ! maybe gwr_swale_flag = 3 abs(hru_segment) so hru_segment could be changed from 0 to allow HRU swales
+! maybe gwr_swale_flag = 3 abs(hru_segment) so hru_segment could be changed from 0 to allow HRU swales
             PRINT *, 'ERROR, invalid gwr_swale_flag value, specified as:', gwr_swale_flag
             Inputerror_flag = 1
           ENDIF
@@ -251,7 +259,8 @@
       END SUBROUTINE gwflow_inactivecell_init
 
 !***********************************************************************
-!     gwflow_inactivecell_run - Computes groundwater flow to streamflow
+!     gwflow_inactivecell_run - Computes groundwater flow to streamflow and to
+!                               groundwater sink
 !***********************************************************************
       SUBROUTINE gwflow_inactivecell_run()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, SWALE, DEBUG_less, CASCADEGW_OFF, ERROR_water_use
@@ -260,7 +269,7 @@
       USE PRMS_GWFLOW_INACTIVE_CELL
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, &
      &    Basin_area_inv, Hru_area, Gwr_type, Hru_area_dble, Hru_storage
-      USE PRMS_FLOWVARS, ONLY: Ssr_to_gw, Sroff, Ssres_flow, Gwres_stor, Gw_upslope !, Soil_to_gw
+      USE PRMS_FLOWVARS, ONLY: Soil_to_gw, Ssr_to_gw, Sroff, Ssres_flow, Gwres_stor, Gw_upslope
       USE PRMS_CASCADE, ONLY: Ncascade_gwr
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
@@ -269,17 +278,17 @@
       USE GSFPRMS2MF, ONLY: activeHru_inactiveCell
       use prms_utils, only: print_date
       IMPLICIT NONE
-      ! Functions
+! Functions
       EXTERNAL :: rungw_inactive_cell_cascade
       INTRINSIC :: DBLE, DABS, SNGL, MIN
-      ! Local Variables
+! Local Variables
       INTEGER :: i, j
-      DOUBLE PRECISION :: dnflow
+      REAL :: dnflow
       DOUBLE PRECISION :: gwin, gwstor, gwsink, gwflow, gwstor_last, gwarea
-      !***********************************************************************
+!***********************************************************************
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         Gw_upslope = 0.0D0
-        Hru_gw_cascadeflow = 0.0D0
+        Hru_gw_cascadeflow = 0.0
         Basin_dnflow = 0.0D0
         Basin_gw_upslope = 0.0D0
       ENDIF
@@ -295,7 +304,7 @@
           gwarea = Hru_area_dble(i)
           gwstor = Gwres_stor(i)*gwarea ! acre-inches
           ! soil_to_gw is for whole HRU, not just perv
-          ! Gw_in_soil(i) = DBLE( Soil_to_gw(i)*Hru_area(i) ) ! soil_to_gw added to sm2gw_grav
+          Gw_in_soil(i) = DBLE( Soil_to_gw(i)*Hru_area(i) )
           Gw_in_ssr(i) = DBLE( Ssr_to_gw(i)*Hru_area(i) )
           gwin = Gw_in_soil(i) + Gw_in_ssr(i)
           IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
@@ -318,7 +327,7 @@
               IF ( gwstor<0.0D0 ) THEN
                 IF ( Print_debug>DEBUG_less ) PRINT *, 'Warning, groundwater reservoir for HRU:', i, &
      &                                                 ' is < 0.0 with gwstor_min active', gwstor
-                !ERROR STOP ERROR_var
+!              ERROR STOP ERROR_var
               ENDIF
               gwstor_last = gwstor
               gwstor = Gwstor_minarea(i)
@@ -353,18 +362,18 @@
             gwstor = 0.0D0
           ELSE
 
-          ! Compute groundwater discharge
+! Compute groundwater discharge
           gwflow = gwstor*DBLE( Gwflow_coef(i) )
 
-          ! Reduce storage by outflow
+! Reduce storage by outflow
           gwstor = gwstor - gwflow
 
             IF ( Gwsink_coef(i)>0.0 ) THEN
               gwsink = MIN( gwstor*DBLE( Gwsink_coef(i) ), gwstor ) ! if gwsink_coef > 1, could have had negative gwstor
               gwstor = gwstor - gwsink
             ENDIF
-            ! if gwr_swale_flag = 1 swale GWR flow goes to sink, 2 included in stream network and cascades
-            ! maybe gwr_swale_flag = 3 abs(hru_segment) so hru_segment could be changed from 0 to allow HRU swales
+! if gwr_swale_flag = 1 swale GWR flow goes to sink, 2 included in stream network and cascades
+! maybe gwr_swale_flag = 3 abs(hru_segment) so hru_segment could be changed from 0 to allow HRU swales
             IF ( Gwr_swale_flag==ACTIVE ) THEN
               IF ( Gwr_type(i)==SWALE ) THEN
                 gwsink = gwsink + gwflow
@@ -396,7 +405,7 @@
         ELSE
           ! a gw cascade could go to active HRU/cell, so add to potential draing to MODFLOW
           ! gw cascades to segments are already accounted for
-          IF ( Gw_upslope(i) > 0.0 ) Sm2gw_grav(i) = Sm2gw_grav(i) + Gw_upslope(i)
+          IF ( Gw_upslope(i) > 0.0D0 ) Sm2gw_grav(i) = Sm2gw_grav(i) + SNGL( Gw_upslope(i) )
         ENDIF
       ENDDO
 
@@ -419,24 +428,24 @@
       ! Cfs_conv converts acre-inches per timestep to cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       IMPLICIT NONE
-      ! Functions
+! Functions
       INTRINSIC :: IABS, DBLE
-      ! Arguments
+! Arguments
       INTEGER, INTENT(IN) :: Igwr, Ncascade_gwr
       REAL, INTENT(INOUT) :: Gwres_flow
-      DOUBLE PRECISION, INTENT(OUT) :: Dnflow
-      ! Local variables
+      REAL, INTENT(OUT) :: Dnflow
+! Local variables
       INTEGER :: j, k
 !***********************************************************************
-      Dnflow = 0.0D0
+      Dnflow = 0.0
       DO k = 1, Ncascade_gwr
         j = Gwr_down(k, Igwr)
         ! Gwres_flow is in inches
-        ! if gwr_down(k, Igwr) > 0, cascade contributes to a downslope GWR
+! if gwr_down(k, Igwr) > 0, cascade contributes to a downslope GWR
         IF ( j>0 ) THEN
           Gw_upslope(j) = Gw_upslope(j) + DBLE( Gwres_flow*Cascade_gwr_area(k, Igwr) )
-          Dnflow = Dnflow + DBLE( Gwres_flow*Gwr_down_frac(k, Igwr) )
-        ! if gwr_down(k, Igwr) < 0, cascade contributes to a stream
+          Dnflow = Dnflow + Gwres_flow*Gwr_down_frac(k, Igwr)
+! if gwr_down(k, Igwr) < 0, cascade contributes to a stream
         ELSEIF ( j<0 ) THEN
           j = IABS( j )
           Strm_seg_in(j) = Strm_seg_in(j) + DBLE( Gwres_flow*Cascade_gwr_area(k, Igwr) )*Cfs_conv
@@ -444,7 +453,7 @@
       ENDDO
 
       ! gwres_flow reduced by cascading flow to HRUs
-      Gwres_flow = Gwres_flow - SNGL( Dnflow )
+      Gwres_flow = Gwres_flow - Dnflow
       IF ( Gwres_flow<0.0 ) Gwres_flow = 0.0
 
       END SUBROUTINE rungw_inactive_cell_cascade
