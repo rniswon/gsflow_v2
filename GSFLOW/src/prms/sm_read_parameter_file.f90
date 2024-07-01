@@ -1162,7 +1162,7 @@ contains
               else ! 2d
                 do j = 1, Parameter_data(found)%num_dim1
                   do jj = 1, Parameter_data(found)%num_dim2
-                    Parameter_data(found)%values_int_2d(jj, j) = Ivalues(1)
+                    Parameter_data(found)%values_int_2d(j, jj) = Ivalues(1)
                   end do
                 end do
               end if

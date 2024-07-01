@@ -342,7 +342,7 @@
 
       ELSEIF ( Process_flag==DECL ) THEN
 
-        IF ( control_integer(Cbh_check_flag, 'cbh_check_flag')/=0 ) Cbh_check_flag = ACTIVE
+        IF ( control_integer(Cbh_check_flag, 'cbh_check_flag')/=0 ) Cbh_check_flag = OFF
         IF ( control_integer(cbh_active_flag, 'cbh_active_flag')/=0 ) cbh_active_flag = OFF
 
         IF ( Climate_temp_flag==ACTIVE ) &
@@ -767,6 +767,7 @@
 ! Local Variables
       INTEGER :: i, yr, mo, dy, hr, mn, sec, ios
 !***********************************************************************
+!      new_values = -999999.0
       IF ( cbh_active_flag == OFF ) THEN
         READ ( CBH_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (New_values(i), i=1,Nhru)
       ELSE
@@ -792,6 +793,7 @@
           ENDIF
         ELSE
           IF ( ios /= 0 ) PRINT *, 'WARNING, possible CBH read issue: ', vartype, yr, mo, dy, ios
+!          IF ( ios /= 0 ) write(991,*) new_values
         ENDIF
       ENDIF
       END SUBROUTINE read_cbh_values
