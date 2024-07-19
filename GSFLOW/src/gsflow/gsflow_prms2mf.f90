@@ -153,7 +153,7 @@
 !***********************************************************************
       INTEGER FUNCTION prms2mfinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_param, ACTIVE, OFF
-      USE PRMS_MODULE, ONLY: Hru_type
+      USE PRMS_MODULE, ONLY: Hru_type, one_subbasin_flag
       use PRMS_READ_PARAM_FILE, only: getparam_real
       USE GSFPRMS2MF
       USE GWFUZFMODULE, ONLY: NTRAIL, NWAV, IUZFBND
@@ -165,11 +165,11 @@
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Basin_area_inv, Hru_area
       USE PRMS_SOILZONE, ONLY: Gvr_hru_id, Gvr_hru_pct_adjusted
       use prms_utils, only: read_error
-      USE GLOBAL, ONLY: NLAY, NROW, NCOL
+      USE GLOBAL, ONLY: NLAY, NROW, NCOL, IBOUND
       IMPLICIT NONE
       INTRINSIC :: ABS, DBLE
 ! Local Variables
-      INTEGER :: is, i, ii, ierr, ihru, icell, irow, icol
+      INTEGER :: is, i, ii, ierr, ihru, icell, irow, icol, jj
 !     INTEGER :: iseg, max_seg, irch
 !     INTEGER, ALLOCATABLE, DIMENSION(:) :: nseg_rch
       DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: hru_pct, newpct
@@ -312,8 +312,16 @@
         icol = Gwc_col(icell)
         IF ( Print_debug>DEBUG_less ) THEN
           IF ( Hru_type(ihru)==0 ) THEN
-            IF ( IUZFBND(icol, irow)/=0 ) &
-     &           PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
+            IF ( IUZFBND(icol, irow)/=0 ) THEN
+              IF ( one_subbasin_flag==0 ) THEN
+                PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
+              ELSE
+                IUZFBND(icol, irow) = 0
+                DO jj = 1, NLAY
+                  IBOUND(icol, irow, jj) = 0
+                ENDDO
+              ENDIF
+            ENDIF
           ENDIF
           IF ( IUZFBND(icol, irow)==0 ) THEN
             IF ( Hru_type(ihru) > 0 ) then

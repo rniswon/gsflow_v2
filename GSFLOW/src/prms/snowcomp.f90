@@ -773,14 +773,18 @@
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==3 ) THEN
         IF ( getparam_real(MODNAME, 'snowpack_init', Nhru, Snowpack_init)/=0 ) CALL read_error(2, 'snowpack_init')
         Pkwater_equiv = DBLE( Snowpack_init )
-        Pk_depth = Pkwater_equiv/DBLE( Den_init )
-        Pk_den = SNGL( Pkwater_equiv/Pk_depth )
+        Pk_depth = 0.0
+        Pk_den = 0.0
         Pk_ice = SNGL( Pkwater_equiv )
         Freeh2o = Pk_ice*Freeh2o_cap
         Ai = 0.0D0
         Snowcov_area = 0.0
         DO j = 1, Active_hrus
           i = Hru_route_order(j)
+          IF ( .not.(Den_init(i)>0.0) ) THEN
+            IF ( Print_debug>-1 ) PRINT *, 'WARNING, den_init for HRU:', i, ' specified = 0.0, set to 0.1'
+            Den_init(i) = 0.1 ! to avoid divide by zero potential
+          ENDIF
           IF ( Pkwater_equiv(i)>0.0D0 ) THEN
             Ai(i) = Pkwater_equiv(i) ! [inches]
             IF ( Ai(i)>snarea_thresh_dble(i) ) Ai(i) = snarea_thresh_dble(i) ! [inches]
@@ -789,6 +793,8 @@
               Frac_swe(i) = MIN( 1.0, Frac_swe(i) )
             ENDIF
             CALL sca_deplcrv(Snowcov_area(i), Snarea_curve(:,Hru_deplcrv(i)), Frac_swe(i))
+            Pk_depth(i) = Pkwater_equiv(i)/DBLE( Den_init(i) )
+            Pk_den = SNGL( Pkwater_equiv(i)/Pk_depth(i) )
           ENDIF
         ENDDO
         DEALLOCATE ( Snowpack_init )

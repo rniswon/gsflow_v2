@@ -32,6 +32,7 @@
       REAL, SAVE, ALLOCATABLE :: Hru_area(:), Hru_elev(:), Hru_lat(:) ! , Hru_percent_imperv(:)
       REAL, SAVE, ALLOCATABLE :: Covden_sum(:), Covden_win(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_frac_open(:), Dprst_area(:) !, Dprst_frac(:)
+      INTEGER, SAVE, ALLOCATABLE :: Hru_subbasin(:)
       REAL, SAVE, ALLOCATABLE :: Ag_frac(:)
       END MODULE PRMS_BASIN
 
@@ -65,7 +66,7 @@
       INTEGER FUNCTION basdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Dprst_flag, Lake_route_flag, &
-     &    PRMS4_flag, gwflow_flag, Glacier_flag, AG_flag, activeHRU_inactiveCELL_flag
+     &    PRMS4_flag, gwflow_flag, Glacier_flag, AG_flag, activeHRU_inactiveCELL_flag, Nsub
       use PRMS_MMFAPI, only: declvar_real, declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_BASIN
@@ -281,6 +282,15 @@
         ALLOCATE ( Lake_area(1) )
       ENDIF
 
+      IF ( Nsub>0 ) THEN
+        ALLOCATE ( Hru_subbasin(Nhru) )
+        IF ( declparam(MODNAME, 'hru_subbasin', 'nhru', 'integer', &
+     &       '0', 'bounded', 'nsub', &
+     &       'Index of subbasin assigned to each HRU', &
+     &       'Index of subbasin assigned to each HRU', &
+     &       'none')/=0 ) CALL read_error(1, 'hru_subbasin')
+      ENDIF
+
       END FUNCTION basdecl
 
 !**********************************************************************
@@ -295,7 +305,7 @@
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, irrigation_apply_flag, &
      &    Dprst_flag, Lake_route_flag, PRMS4_flag, gwflow_flag, PRMS_VERSION, &
      &    Starttime, Endtime, Parameter_check_flag, Inputerror_flag, &
-     &    AG_flag, Ag_package, activeHRU_inactiveCELL_flag !, Frozen_flag
+     &    AG_flag, Ag_package, activeHRU_inactiveCELL_flag, Nsub, one_subbasin_flag !, Frozen_flag
       USE PRMS_BASIN
       use prms_utils, only: checkdim_bounded_limits, error_stop, read_error, write_outfile
       IMPLICIT NONE
@@ -376,6 +386,9 @@
       ELSE
         Lake_hru_id = 0
       ENDIF
+      IF ( Nsub>0 ) THEN
+        IF ( getparam_int(MODNAME, 'hru_subbasin', Nhru, Hru_subbasin)/=0 ) CALL read_error(2, 'hru_subbasin')
+      ENDIF
 
       Basin_gl_cfs = 0.0D0
       Basin_gl_ice_cfs = 0.0D0
@@ -411,6 +424,11 @@
         perv_area = harea
 
         IF ( Hru_type(i)==INACTIVE ) CYCLE
+
+        IF ( one_subbasin_flag>0 ) THEN
+          IF ( Hru_subbasin(i) /= one_subbasin_flag ) Hru_type(i) = 0
+        ENDIF
+
 ! ????????? need to fix for lakes with multiple HRUs and PRMS lake routing ????????
         IF ( Hru_type(i)==LAKE ) THEN
           Numlake_hrus = Numlake_hrus + 1

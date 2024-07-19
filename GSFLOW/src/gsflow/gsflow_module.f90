@@ -64,7 +64,7 @@
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
       INTEGER, SAVE :: Prms_warmup, statsON_OFF
-      INTEGER, SAVE :: Frozen_flag, Glacier_flag
+      INTEGER, SAVE :: Frozen_flag, Glacier_flag, one_subbasin_flag
       INTEGER, SAVE :: PRMS_land_iteration_flag, Iter_aet_flag, text_restart_flag
       INTEGER, SAVE :: irrigation_apply_flag, Dyn_ag_frac_flag, Dyn_ag_soil_flag, activeHRU_inactiveCELL_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
