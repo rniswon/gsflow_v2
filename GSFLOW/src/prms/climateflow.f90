@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2024-04-30'
+      character(len=*), parameter :: Version_climateflow = '2024-08-09'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -1365,12 +1365,12 @@ end module PRMS_IT0_VARS
           Soil_rechr(i) = 0.0
         ENDIF
         IF ( AG_flag==OFF ) THEN
-          IF ( Soil_moist_max(i)<0.0001 ) THEN
+          IF ( Soil_moist_max(i)<0.001 ) THEN
             IF ( Parameter_check_flag>0 ) THEN
               PRINT 9006, i, Soil_moist_max(i)
               Inputerror_flag = 1
             ELSE
-              Soil_moist_max(i) = 0.00001
+              Soil_moist_max(i) = 0.001
               IF ( Print_debug>DEBUG_less ) PRINT 9008, i
               bad_soil_moist_max = bad_soil_moist_max + 1
             ENDIF
@@ -1433,7 +1433,7 @@ end module PRMS_IT0_VARS
         Basin_soil_moist = Basin_soil_moist + Soil_moist(i) * Hru_perv(i)
         Basin_ssstor = Basin_ssstor + Ssres_stor(i) * Hru_area(i)
       ENDDO
-      if ( bad_soil_moist_max>0 ) WRITE(*,'(/,A,I0)') 'WARNING, number of soil_moist_max < 0.0001: ', bad_soil_moist_max
+      IF ( bad_soil_moist_max > 0 ) WRITE(*,'(/,A,I0)') 'WARNING, number of soil_moist_max < 0.001: ', bad_soil_moist_max
       Basin_soil_moist = Basin_soil_moist * Basin_area_inv
       Basin_ssstor = Basin_ssstor * Basin_area_inv
 
@@ -1527,9 +1527,9 @@ end module PRMS_IT0_VARS
  9023 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr_init > ag_soil_rechr_max', 2F15.9)
  9024 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_moist_init > ag_soil_moist_max', 2F15.9)
  9025 FORMAT (/, 'ERROR, HRU: ', I0, ' ag_soil_rechr > ag_soil_moist based on init and max values', 2F15.9)
- 9006 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_max < 0.00001', F15.9)
+ 9006 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_moist_max < 0.001', F15.9)
  9007 FORMAT (/, 'ERROR, HRU: ', I0, ' soil_rechr_max < 0.00001', F15.9)
- 9008 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_moist_max < 0.00001, set to 0.00001')
+ 9008 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_moist_max < 0.001, set to 0.001')
  9009 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr_max < 0.00001, set to 0.00001')
  9012 FORMAT (/, 'WARNING, HRU: ', I0, ' soil_rechr_max > soil_moist_max,', 2F15.9, /, 9X, &
      &        'soil_rechr_max set to soil_moist_max')

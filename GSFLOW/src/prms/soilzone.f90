@@ -752,8 +752,8 @@
 !             and groundwater reservoirs
 !***********************************************************************
       INTEGER FUNCTION szrun()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, LAKE, SWALE, &
-     &    DEBUG_less, ERROR_param, CASCADE_OFF, MODSIM_PRMS, MODSIM_PRMS_LOOSE
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, LAKE, SWALE, &
+     &    DEBUG_less, ERROR_param, CASCADE_OFF, MODSIM_PRMS, MODSIM_PRMS_LOOSE !, NEARZERO
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, &
      &    Frozen_flag, Soilzone_add_water_use, Nowmonth, GSFLOW_flag, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Model, Dprst_ag_gain !, Nowyear, Nowday, CLOSEZERO

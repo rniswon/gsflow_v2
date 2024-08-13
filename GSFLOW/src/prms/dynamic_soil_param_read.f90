@@ -9,7 +9,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Time Series Data'
         character(len=*), parameter :: MODNAME = 'dynamic_soil_param_read'
-        character(len=*), parameter :: Version_dynamic_soil_param_read = '2023-03-16'
+        character(len=*), parameter :: Version_dynamic_soil_param_read = '2024-08-09'
         INTEGER, SAVE :: Imperv_frac_unit, Imperv_next_yr, Imperv_next_mo, Imperv_next_day, Imperv_frac_flag
         INTEGER, SAVE :: Imperv_stor_next_yr, Imperv_stor_next_mo, Imperv_stor_next_day, Imperv_stor_unit
         INTEGER, SAVE :: Soil_rechr_next_yr, Soil_rechr_next_mo, Soil_rechr_next_day, Soil_rechr_unit
@@ -350,9 +350,9 @@
           i = Hru_route_order(j)
           IF ( Hru_type(i)==LAKE ) CYCLE ! skip lake HRUs
           IF ( check_sm_max_flag==ACTIVE ) THEN
-            IF ( Soil_moist_max(i)<0.00001 .AND. AG_flag==OFF ) THEN
-              PRINT 9001, 'soil_moist_max', 0.00001, i, Soil_moist_max(i), 0.00001
-              Soil_moist_max(i) = 0.00001
+            IF ( Soil_moist_max(i)<0.001 .AND. AG_flag==OFF ) THEN
+              PRINT 9001, 'soil_moist_max', 0.001, i, Soil_moist_max(i), 0.001
+              Soil_moist_max(i) = 0.001
             ENDIF
             IF ( PRMS4_flag==OFF ) Soil_rechr_max(i) = Soil_moist_max(i)*Soil_rechr_max_frac(i)
             IF ( Soil_rechr_max(i)<0.00001 ) THEN
@@ -368,9 +368,9 @@
           ENDIF
 
           IF ( check_ag_max_flag==ACTIVE ) THEN
-            IF ( Ag_soil_moist_max(i)<0.00001 ) THEN
-              PRINT 9001, 'ag_soil_moist_max', 0.00001, i, Ag_soil_moist_max(i), 0.00001
-              Ag_soil_moist_max(i) = 0.00001
+            IF ( Ag_soil_moist_max(i)<0.001 ) THEN
+              PRINT 9001, 'ag_soil_moist_max', 0.001, i, Ag_soil_moist_max(i), 0.001
+              Ag_soil_moist_max(i) = 0.001
             ENDIF
             Ag_soil_rechr_max(i) = Ag_soil_moist_max(i) * Ag_soil_rechr_max_frac(i)
             IF ( Ag_soil_rechr_max(i)<0.00001 ) THEN

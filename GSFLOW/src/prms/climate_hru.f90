@@ -10,12 +10,12 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2024-04-30'
+        character(len=*), parameter :: Version_climate_hru = '2024-08-09'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit
         INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit, istop
         INTEGER, SAVE :: AET_unit, PET_unit, Irrigated_area_unit
-        REAL, ALLOCATABLE :: values(:)
+        REAL, ALLOCATABLE :: values(:) !!, active_values(:)
         INTEGER, ALLOCATABLE :: ivalues(:)
         ! Control Parameters
         CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Tmin_day, Tmax_day, Precip_day, Potet_day, Swrad_day, Transp_day
@@ -669,6 +669,13 @@
           ERROR STOP ERROR_cbh
         ENDIF
 
+!!        allocate(active_values(Active_hrus))
+!!        DO jj = 1, Active_hrus
+!!          i = Hru_route_order(jj)
+!!          write(7777,'(I0)') i
+!!          cbh_hru_id(jj) = i
+!!        ENDDO
+
       ENDIF
 
       END FUNCTION climate_hru
@@ -680,7 +687,7 @@
       USE PRMS_MODULE, ONLY: Nowyear, Nowmonth, Nowday
       USE PRMS_CLIMATE_HRU, ONLY: istop
       IMPLICIT NONE
-! Argument
+! Arguments
       INTEGER, INTENT(IN) :: Year, Month, Day
       CHARACTER(LEN=*), INTENT(IN) :: Var
 ! Local Variables
@@ -702,7 +709,7 @@
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       !use prms_utils, only: print_date
       IMPLICIT NONE
-! Argument
+! Arguments
       REAL, INTENT(IN) :: Var_value(*), Lower_val, Upper_val
       CHARACTER(LEN=*), INTENT(IN) :: Var
       INTEGER, INTENT(INOUT) :: Missing
@@ -733,7 +740,7 @@
       SUBROUTINE check_cbh_intvalue(Var, Var_value, Lower_val, Upper_val, Missing)
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       IMPLICIT NONE
-! Argument
+! Arguments
       INTEGER, INTENT(IN) :: Var_value(*), Lower_val, Upper_val
       CHARACTER(LEN=*), INTENT(IN) :: Var
       INTEGER, INTENT(INOUT) :: Missing
@@ -758,20 +765,25 @@
       USE PRMS_MODULE, ONLY: Nhru, Ncbh
       USE PRMS_CLIMATE_HRU, ONLY: cbh_active_flag, values, cbh_hru_id, Cbh_check_flag, istop
       IMPLICIT NONE
-! Argument
+! Arguments
       CHARACTER(LEN=*), INTENT(IN) :: Vartype
       INTEGER, INTENT(IN) :: CBH_unit
       REAL, INTENT(INOUT) :: New_values(Nhru)
 ! Functions
-      EXTERNAL :: read_cbh_date
+      EXTERNAL :: read_cbh_date !!, write_cbh_values
 ! Local Variables
       INTEGER :: i, yr, mo, dy, hr, mn, sec, ios
 !***********************************************************************
-!      new_values = -999999.0
       IF ( cbh_active_flag == OFF ) THEN
+        !new_values = -999.0
         READ ( CBH_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (New_values(i), i=1,Nhru)
       ELSE
+        !values = -999.0
         READ ( CBH_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (values(i), i=1,Ncbh)
+        New_values = -999.0
+        DO i = 1, Ncbh
+          New_values(cbh_hru_id(i)) = values(i)
+        ENDDO
       ENDIF
       IF ( ios==-1 ) THEN
         PRINT *, 'ERROR, reading CBH File, variable: ', vartype, yr, mo, dy
@@ -784,30 +796,46 @@
             istop = 1
           ELSE
             CALL read_cbh_date(yr, mo, dy, Vartype)
-            IF ( cbh_active_flag == ACTIVE ) THEN
-              New_values = -999.0
-              DO i = i, Ncbh
-                New_values(cbh_hru_id(i)) = values(i)
-              ENDDO
-            ENDIF
           ENDIF
         ELSE
-          IF ( ios /= 0 ) PRINT *, 'WARNING, possible CBH read issue: ', vartype, yr, mo, dy, ios
-!          IF ( ios /= 0 ) write(991,*) new_values
+          IF ( ios /= 0 ) THEN
+            PRINT *, 'WARNING, possible CBH read issue: ', vartype, yr, mo, dy, ios
+            !write(991,*) vartype
+            !IF ( cbh_active_flag == OFF ) THEN
+            !  write(991,*) New_values
+            !  do i = 1, Nhru
+            !    if(New_values(i)<-998.0) then
+            !      write(991,*) 'value i:', i
+            !      exit
+            !    endif
+            !   enddo
+            !ELSE
+            !  write(991,*) values
+            !  do i = 1, Ncbh
+            !    if(values(i)<-998.0) then
+            !      write(991,*) 'value i:', i
+            !      exit
+            !    endif
+            !  enddo
+            !ENDIF
+          ENDIF
         ENDIF
       ENDIF
+!!      if(vartype=='tminf') CALL write_cbh_values(CBH_unit+123,yr, mo, dy, New_values)
+!!      if(vartype=='tmaxf') CALL write_cbh_values(CBH_unit+123,yr, mo, dy, New_values)
+!!      if(vartype=='hru_ppt') CALL write_cbh_values(CBH_unit+123,yr, mo, dy, New_values)
       END SUBROUTINE read_cbh_values
 
 !***********************************************************************
 !   Read CBH File to line before data starts
 !***********************************************************************
   subroutine find_cbh_header_end(Iunit, Fname, Paramname, Iflag)
-    use PRMS_CONSTANTS, only: DEBUG_less
-    use PRMS_MODULE, only: Nhru, Orad_flag, Print_debug
+    use PRMS_CONSTANTS, only: DEBUG_less, OFF
+    use PRMS_MODULE, only: Nhru, Orad_flag, Print_debug, Ncbh
     use prms_utils, only: get_ftnunit
-    use PRMS_CLIMATE_HRU, only: istop
+    use PRMS_CLIMATE_HRU, only: istop, cbh_active_flag
     implicit none
-    ! Argument
+    ! Arguments
     integer, intent(OUT) :: Iunit
     integer, intent(IN) :: Iflag
     character(LEN=*), intent(IN) :: Fname, Paramname
@@ -846,11 +874,20 @@
             istop = 1
             exit
           end if
-          if (dim /= Nhru) then
-            print '(/,2(A,I0))', '***CBH file dimension incorrect*** nhru= ', Nhru, ' CBH dimension= ', dim, ' File: '//Fname
-            print *, 'ERROR: update Control File with correct CBH files'
-            istop = 1
-            exit
+          if (cbh_active_flag == OFF) then
+            if (dim /= Nhru) then
+              print '(/,2(A,I0))', '***CBH file dimension incorrect*** nhru= ', Nhru, ' CBH dimension= ', dim, ' File: '//Fname
+              print *, 'ERROR: update Control File with correct CBH files'
+              istop = 1
+              exit
+            end if
+          else
+            if (dim /= Ncbh) then
+              print '(/,2(A,I0))', '***CBH file dimension incorrect*** ncbh= ', Ncbh, ' CBH dimension= ', dim, ' File: '//Fname
+              print *, 'ERROR: update Control File with correct CBH files'
+              istop = 1
+              exit
+            end if
           end if
           read (Iunit, FMT='(A4)', IOSTAT=ios) dum
           if (ios /= 0) then
@@ -865,3 +902,22 @@
     end if
 
     end subroutine find_cbh_header_end
+
+!***********************************************************************
+!     Write active CBH values
+!***********************************************************************
+!!     SUBROUTINE write_cbh_values(CBH_unit, yr, mo, dy, New_values)
+!!     USE PRMS_MODULE, ONLY: Nhru, Ncbh
+!!     USE PRMS_CLIMATE_HRU, ONLY: active_values, cbh_hru_id
+!!     IMPLICIT NONE
+!! Arguments
+!!     INTEGER, INTENT(IN) :: yr, mo, dy, CBH_unit
+!!     REAL, INTENT(INOUT) :: New_values(Nhru)
+!! Local Variables
+!!     INTEGER :: j
+!!***********************************************************************
+!!      DO j = 1, Ncbh
+!!        active_values(j) = New_values(cbh_hru_id(j))
+!!      ENDDO
+!!      WRITE ( CBH_unit, '(6I4," ",367495(F0.3," "))' ) yr, mo, dy, 0, 0, 0, active_values
+!!    END SUBROUTINE write_cbh_values

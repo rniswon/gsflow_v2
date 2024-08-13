@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2024-05-30'
+      character(len=*), parameter :: Version_basin = '2024-08-09'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag, Imperv_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area, Ag_area_total
@@ -414,20 +414,20 @@
       Hru_perv = 0.0
       Hru_storage = 0.0D0
       Hru_route_order = 0
+      Hru_area_dble = DBLE( Hru_area )
       Imperv_flag = OFF
       j = 0
       DO i = 1, Nhru
         harea = Hru_area(i)
-        harea_dble = DBLE( harea )
-        Hru_area_dble(i) = harea_dble
+        harea_dble = Hru_area_dble(i)
         Totarea = Totarea + harea_dble
         perv_area = harea
 
-        IF ( Hru_type(i)==INACTIVE ) CYCLE
-
         IF ( one_subbasin_flag>0 ) THEN
-          IF ( Hru_subbasin(i) /= one_subbasin_flag ) Hru_type(i) = 0
+          IF ( Hru_subbasin(i) /= one_subbasin_flag ) Hru_type(i) = INACTIVE
         ENDIF
+
+        IF ( Hru_type(i)==INACTIVE ) CYCLE
 
 ! ????????? need to fix for lakes with multiple HRUs and PRMS lake routing ????????
         IF ( Hru_type(i)==LAKE ) THEN
@@ -673,6 +673,7 @@
           WRITE (buffer, 9005) 'Agriculture area:    ', basin_ag_area*Active_area, '    Fraction AG:      ', basin_ag_area
           CALL write_outfile(buffer)
         ENDIF
+        IF ( Active_hrus/=Nhru ) PRINT *, 'Active HRUs: ', Active_hrus, '   Inactive HRUs: ', Nhru - Active_hrus
         CALL write_outfile(' ')
       ENDIF
 

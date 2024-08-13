@@ -773,7 +773,7 @@
       IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==3 ) THEN
         IF ( getparam_real(MODNAME, 'snowpack_init', Nhru, Snowpack_init)/=0 ) CALL read_error(2, 'snowpack_init')
         Pkwater_equiv = DBLE( Snowpack_init )
-        Pk_depth = 0.0
+        Pk_depth = 0.0D0
         Pk_den = 0.0
         Pk_ice = SNGL( Pkwater_equiv )
         Freeh2o = Pk_ice*Freeh2o_cap
