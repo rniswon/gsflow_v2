@@ -7,7 +7,7 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'basin_summary'
-      character(len=*), parameter :: Version_basin_summary = '2023-11-01'
+      character(len=*), parameter :: Version_basin_summary = '2021-08-13'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear, Dailyunit, Monthlyunit, Yearlyunit, Basin_var_type
       INTEGER, SAVE, ALLOCATABLE :: Nc_vars(:)
       CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2, Output_fmt3
@@ -95,10 +95,10 @@
 !***********************************************************************
       SUBROUTINE basin_summaryinit()
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ACTIVE, OFF, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, DAILY, MONTHLY, &
-     &    DBLE_TYPE, ERROR_control, ERROR_open_out
+     &    DBLE_TYPE, ERROR_open_out
       use PRMS_MMFAPI, only: getvarsize, getvartype
       use PRMS_READ_PARAM_FILE, only: getparam_int
-      USE PRMS_MODULE, ONLY: Start_year, Prms_warmup, BasinOutON_OFF, Nhru
+      USE PRMS_MODULE, ONLY: Start_year, Prms_warmup, BasinOutON_OFF, Nhru, Inputerror_flag
       USE PRMS_BASIN_SUMMARY
       use prms_utils, only: error_stop, numchars, PRMS_open_output_file, read_error
       IMPLICIT NONE
@@ -129,7 +129,7 @@
           ierr = 1
         ENDIF
       ENDDO
-      IF ( ierr==1 ) ERROR STOP ERROR_control
+
       ALLOCATE ( Basin_var_daily(BasinOutVars) )
       Basin_var_daily = 0.0D0
 
@@ -155,6 +155,11 @@
 
       IF ( BasinOutON_OFF==2 ) THEN
         IF ( getparam_int(MODNAME, 'nhm_id', Nhru, Nhm_id)/=0 ) CALL read_error(2, 'nhm_id')
+      ENDIF
+
+      IF ( ierr==1 ) THEN
+        Inputerror_flag = 1
+        RETURN
       ENDIF
 
       IF ( Daily_flag==ACTIVE ) THEN

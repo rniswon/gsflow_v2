@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2024-01-22'
+      character(len=*), parameter :: Version_basin = '2024-08-09'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag, Imperv_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area, Ag_area_total
@@ -17,7 +17,8 @@
       INTEGER, SAVE :: Weir_gate_flag, Puls_lin_flag
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_area_dble(:), Lake_area(:)
 !   Declared Variables
-      REAL, SAVE, ALLOCATABLE :: Hru_frac_perv(:), Hru_frac_imperv(:), Hru_frac_dprst(:), Ag_area(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_frac_perv(:), Ag_area(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_frac_imperv(:), Hru_frac_dprst(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_area_max(:)
       REAL, SAVE, ALLOCATABLE :: Hru_perv(:), Hru_imperv(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_area_open_max(:), Dprst_area_clos_max(:)
@@ -31,6 +32,7 @@
       REAL, SAVE, ALLOCATABLE :: Hru_area(:), Hru_elev(:), Hru_lat(:) ! , Hru_percent_imperv(:)
       REAL, SAVE, ALLOCATABLE :: Covden_sum(:), Covden_win(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_frac_open(:), Dprst_area(:) !, Dprst_frac(:)
+      INTEGER, SAVE, ALLOCATABLE :: Hru_subbasin(:)
       REAL, SAVE, ALLOCATABLE :: Ag_frac(:)
       END MODULE PRMS_BASIN
 
@@ -64,7 +66,7 @@
       INTEGER FUNCTION basdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Dprst_flag, Lake_route_flag, &
-     &    PRMS4_flag, Glacier_flag, AG_flag, gwflow_flag
+     &    PRMS4_flag, gwflow_flag, Glacier_flag, AG_flag, activeHRU_inactiveCELL_flag, Nsub
       use PRMS_MMFAPI, only: declvar_real, declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_BASIN
@@ -173,7 +175,8 @@
       ALLOCATE ( Hru_route_order(Nhru) )
 ! gwflow inactive for GSFLOW mode so arrays not allocated
 ! when GSFLOW can run in multi-mode will need these arrays
-      IF ( gwflow_flag==ACTIVE ) ALLOCATE ( Gwr_route_order(Nhru), Gwr_type(Nhru) )
+      IF ( gwflow_flag==ACTIVE .OR. activeHRU_inactiveCELL_flag == ACTIVE ) &
+           ALLOCATE ( Gwr_route_order(Nhru), Gwr_type(Nhru) )
 !      ALLOCATE ( Hru_elev_feet(Nhru) )
       ALLOCATE ( Hru_elev_meters(Nhru) )
 
@@ -279,6 +282,15 @@
         ALLOCATE ( Lake_area(1) )
       ENDIF
 
+      IF ( Nsub>0 ) THEN
+        ALLOCATE ( Hru_subbasin(Nhru) )
+        IF ( declparam(MODNAME, 'hru_subbasin', 'nhru', 'integer', &
+     &       '0', 'bounded', 'nsub', &
+     &       'Index of subbasin assigned to each HRU', &
+     &       'Index of subbasin assigned to each HRU', &
+     &       'none')/=0 ) CALL read_error(1, 'hru_subbasin')
+      ENDIF
+
       END FUNCTION basdecl
 
 !**********************************************************************
@@ -286,14 +298,14 @@
 !               and compute reservoir areas
 !**********************************************************************
       INTEGER FUNCTION basinit()
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, &
-     &    INACTIVE, LAKE, FEET, ERROR_basin, DEBUG_minimum, &
-     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, CLOSEZERO, ERROR_param, CANOPY !, METERS2FEET, SWALE
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CLOSEZERO, &
+     &    INACTIVE, LAKE, FEET, DEBUG_minimum, ERROR_param, &
+     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, CANOPY !, METERS2FEET, SWALE
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, &
-     &    Dprst_flag, Lake_route_flag, PRMS4_flag, PRMS_VERSION, &
-     &    Hru_type, irrigation_apply_flag, gwflow_flag, AG_flag, Ag_package, &
-     &    Starttime, Endtime, Parameter_check_flag !, Frozen_flag
+      USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, irrigation_apply_flag, &
+     &    Dprst_flag, Lake_route_flag, PRMS4_flag, gwflow_flag, PRMS_VERSION, &
+     &    Starttime, Endtime, Parameter_check_flag, Inputerror_flag, &
+     &    AG_flag, Ag_package, activeHRU_inactiveCELL_flag, Nsub, one_subbasin_flag !, Frozen_flag
       USE PRMS_BASIN
       use prms_utils, only: checkdim_bounded_limits, error_stop, read_error, write_outfile
       IMPLICIT NONE
@@ -311,14 +323,6 @@
       IF ( getparam_real(MODNAME, 'hru_area', Nhru, Hru_area)/=0 ) CALL read_error(2, 'hru_area')
       IF ( getparam_real(MODNAME, 'hru_elev', Nhru, Hru_elev)/=0 ) CALL read_error(2, 'hru_elev')
       Hru_elev_ts = Hru_elev
-      IF ( Elev_units==FEET ) THEN
-!        Hru_elev_feet = Hru_elev_ts
-        Hru_elev_meters = Hru_elev_ts * FEET2METERS
-      ELSE
-!        Hru_elev_feet = Hru_elev_ts * METERS2FEET
-        Hru_elev_meters = Hru_elev_ts
-      ENDIF
-
       IF ( getparam_real(MODNAME, 'hru_lat', Nhru, Hru_lat)/=0 ) CALL read_error(2, 'hru_lat')
       IF ( getparam_int(MODNAME, 'cov_type', Nhru, Cov_type)/=0 ) CALL read_error(2, 'cov_type')
       IF ( getparam_real(MODNAME, 'covden_sum', Nhru, Covden_sum)/=0 ) CALL read_error(2, 'covden_sum')
@@ -382,6 +386,9 @@
       ELSE
         Lake_hru_id = 0
       ENDIF
+      IF ( Nsub>0 ) THEN
+        IF ( getparam_int(MODNAME, 'hru_subbasin', Nhru, Hru_subbasin)/=0 ) CALL read_error(2, 'hru_subbasin')
+      ENDIF
 
       Basin_gl_cfs = 0.0D0
       Basin_gl_ice_cfs = 0.0D0
@@ -407,16 +414,21 @@
       Hru_perv = 0.0
       Hru_storage = 0.0D0
       Hru_route_order = 0
+      Hru_area_dble = DBLE( Hru_area )
       Imperv_flag = OFF
       j = 0
       DO i = 1, Nhru
         harea = Hru_area(i)
-        harea_dble = DBLE( harea )
-        Hru_area_dble(i) = harea_dble
+        harea_dble = Hru_area_dble(i)
         Totarea = Totarea + harea_dble
         perv_area = harea
 
+        IF ( one_subbasin_flag>0 ) THEN
+          IF ( Hru_subbasin(i) /= one_subbasin_flag ) Hru_type(i) = INACTIVE
+        ENDIF
+
         IF ( Hru_type(i)==INACTIVE ) CYCLE
+
 ! ????????? need to fix for lakes with multiple HRUs and PRMS lake routing ????????
         IF ( Hru_type(i)==LAKE ) THEN
           Numlake_hrus = Numlake_hrus + 1
@@ -427,25 +439,25 @@
             IF ( lakeid>Numlakes_check ) Numlakes_check = lakeid
           ELSE
             PRINT *, 'ERROR, hru_type = 2 for HRU:', i, ' and lake_hru_id = 0'
-            basinit = 1
+            Inputerror_flag = 1
             CYCLE
           ENDIF
           IF ( Nlake==0 ) THEN
             PRINT *, 'ERROR, hru_type = 2 for HRU:', i, ' and dimension nlake = 0'
-            basinit = 1
+            Inputerror_flag = 1
             CYCLE
           ENDIF
         ELSE
           Land_area = Land_area + harea_dble ! swale or land or glacier
           IF ( Lake_hru_id(i)>0 ) THEN
             PRINT *, 'ERROR, HRU:', i, ' specifed to be a lake by lake_hru_id but hru_type not equal 2'
-            basinit = 1
+            Inputerror_flag = 1
             CYCLE
           ENDIF
           !IF ( Frozen_flag==ACTIVE ) THEN ! water on frozen swales added to storage
           !  IF ( Hru_type(i)==SWALE ) THEN
           !    PRINT *, 'ERROR, a swale HRU cannot be frozen for CFGI, HRU:', i
-          !    basinit = 1
+          !    Inputerror_flag = 1
           !    CYCLE
           !  ENDIF
           !ENDIF
@@ -453,6 +465,13 @@
         ENDIF
 
         Basin_lat = Basin_lat + DBLE( Hru_lat(i)*harea )
+        IF ( Elev_units==FEET ) THEN
+!          Hru_elev_feet(i) = Hru_elev(i)
+          Hru_elev_meters(i) = Hru_elev(i)*FEET2METERS
+        ELSE
+!          Hru_elev_feet(i) = Hru_elev(i)*METERS2FEET
+          Hru_elev_meters(i) = Hru_elev(i)
+        ENDIF
         j = j + 1
         Hru_route_order(j) = i
 
@@ -480,7 +499,7 @@
           Imperv_flag = ACTIVE
           IF ( Hru_frac_imperv(i)>0.99999 ) THEN
             PRINT *, 'ERROR, hru_percent_imperv > 0.999999 for HRU:', i, ' value:', Hru_frac_imperv(i)
-            basinit = 1
+            Inputerror_flag = 1
           ENDIF
           Hru_imperv(i) = Hru_frac_imperv(i)*harea
           basin_imperv = basin_imperv + DBLE( Hru_imperv(i) )
@@ -492,7 +511,7 @@
             Dprst_area_max(i) = Hru_frac_dprst(i)*harea
             IF ( Hru_frac_dprst(i)>0.99999 ) THEN
               PRINT *, 'ERROR, dprst_frac > 0.999999 for HRU:', i, ' value:', Hru_frac_dprst(i)
-              basinit = 1
+              Inputerror_flag = 1
             ENDIF
           ELSE
             Dprst_area_max(i) = Dprst_area(i)
@@ -532,7 +551,7 @@
           PRINT *, '       pervious fraction:', Hru_frac_perv(i)
           PRINT *, '       impervious fraction:', Hru_frac_imperv(i)
           IF ( Dprst_flag==ACTIVE ) PRINT *, '       depression storage fraction:', Hru_frac_dprst(i)
-          basinit = 1
+          Inputerror_flag = 1
         ELSEIF ( Hru_frac_perv(i)<0.00001 .AND. Print_debug>DEBUG_less ) THEN
           PRINT *, 'WARNING, pervious fraction recommended to be >= 0.00001 for HRU:', i
           PRINT *, '         hru_frac_perv = 1.0 - hru_percent_imperv - dprst_frac - ag_frac'
@@ -559,29 +578,29 @@
 !          PRINT *, 'ERROR, number of lake HRUs specified in hru_type'
 !          PRINT *, 'does not equal dimension nlake:', Nlake, ', number of lake HRUs:', Numlake_hrus
 !          PRINT *, 'For PRMS lake routing each lake must be a single HRU'
-!          basinit = 1
+!          Inputerror_flag = 1
 !        ENDIF
         IF ( Numlakes_check/=Nlake ) THEN
           PRINT *, 'ERROR, number of lakes specified in lake_hru_id'
           PRINT *, 'does not equal dimension nlake:', Nlake, ', number of lakes:', Numlakes_check
           PRINT *, 'For PRMS lake routing each lake must be a single HRU'
-          basinit = 1
+          Inputerror_flag = 1
         ENDIF
         DO i = 1, Numlakes_check
           IF ( Lake_area(i)<DNEARZERO ) THEN
             PRINT *, 'ERROR, Lake:', i, ' has 0 area, thus no value of lake_hru_id is associated with the lake'
-            basinit = 1
+            Inputerror_flag = 1
           ENDIF
         ENDDO
       ENDIF
 
-      IF ( basinit==1 ) ERROR STOP ERROR_basin
+      IF ( Inputerror_flag==1 ) RETURN
 
       Active_hrus = j
       Active_area = Land_area + Water_area
 
       Active_gwrs = Active_hrus
-      IF ( gwflow_flag==ACTIVE ) THEN
+      IF ( gwflow_flag==ACTIVE .OR. activeHRU_inactiveCELL_flag == ACTIVE ) THEN
         Gwr_type = Hru_type
         Gwr_route_order = Hru_route_order
       ENDIF
@@ -654,6 +673,7 @@
           WRITE (buffer, 9005) 'Agriculture area:    ', basin_ag_area*Active_area, '    Fraction AG:      ', basin_ag_area
           CALL write_outfile(buffer)
         ENDIF
+        IF ( Active_hrus/=Nhru ) PRINT *, 'Active HRUs: ', Active_hrus, '   Inactive HRUs: ', Nhru - Active_hrus
         CALL write_outfile(' ')
       ENDIF
 

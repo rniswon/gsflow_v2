@@ -7,14 +7,15 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=9), parameter :: MODNAME = 'basin_sum'
-      character(len=*), parameter :: Version_basin_sum = '2024-01-22'
+      character(len=*), parameter :: Version_basin_sum = '2024-04-30'
 
       INTEGER, SAVE :: BALUNT, Totdays
       INTEGER, SAVE :: Header_prt, Endjday
       CHARACTER(LEN=32) :: Buffer32
       CHARACTER(LEN=40) :: Buffer40
       CHARACTER(LEN=48) :: Buffer48
-      CHARACTER(LEN=80) :: Buffer80
+      CHARACTER(LEN=63) :: Buffer63
+      CHARACTER(LEN=81) :: Buffer81
       CHARACTER(LEN=120) :: Buffer120
       CHARACTER(LEN=151) :: Buffer151
       CHARACTER(LEN=151), PARAMETER :: DASHS = ' --------------------------------------------------------'// &
@@ -312,14 +313,14 @@
       INTEGER FUNCTION sumbinit()
       USE PRMS_CONSTANTS, ONLY: OFF, ERROR_param
       use PRMS_READ_PARAM_FILE, only: getparam_int
-      USE PRMS_MODULE, ONLY: Nobs, Init_vars_from_file, Print_debug
+      USE PRMS_MODULE, ONLY: Nobs, Init_vars_from_file, Print_debug, Inputerror_flag
       USE PRMS_BASINSUM
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_lake_stor, Basin_pweqv
       USE PRMS_INTCP, ONLY: Basin_intcp_stor
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_dprst_volcl, Basin_dprst_volop
       USE PRMS_GWFLOW, ONLY: Basin_gwstor
       USE PRMS_ROUTING, ONLY: Basin_segment_storage
-      use prms_utils, only: julian_day, PRMS_open_module_file, read_error, write_outfile, error_stop
+      use prms_utils, only: julian_day, PRMS_open_module_file, read_error, write_outfile, checkdim_param_limits
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: MAX, MOD
@@ -335,8 +336,7 @@
         IF ( Outlet_sta==0 ) THEN
           Outlet_sta = 1
         ELSEIF ( Outlet_sta>Nobs ) THEN
-          PRINT *, 'ERROR, invalid value specified for outlet_sta:', Outlet_sta
-          CALL error_stop('outlet_sta is specified > nobs', ERROR_param)
+          CALL checkdim_param_limits(1, 'outlet_sta', 'nobs', Outlet_sta, 1, Nobs, Inputerror_flag)
         ENDIF
       ENDIF
 
@@ -458,8 +458,8 @@
         CALL header_print(Print_type)
 ! Print span dashes and initial storage
         IF ( Print_type==1 ) THEN
-          WRITE (Buffer48, "(' initial', 27X,F9.3)") Basin_storage
-          CALL write_outfile(Buffer48(:44))
+          WRITE (Buffer48, "(' initial', 27X,F10.3)") Basin_storage
+          CALL write_outfile(Buffer48(:45))
 
         ELSEIF ( Print_type==2 ) THEN
           WRITE (Buffer120, 9001) Basin_intcp_stor, &
@@ -574,10 +574,10 @@
           CALL write_outfile(Buffer40)
 
         ELSEIF ( Print_type==1 ) THEN
-          WRITE ( Buffer80, "(I7,2I5,7F9.3)" ) Nowyear, &
+          WRITE ( Buffer81, "(I7,2I5,2F9.3,F10.3,4F9.3)" ) Nowyear, &
      &            Nowmonth, Nowday, Basin_ppt, Basin_actet, Basin_storage, &
      &            Basin_stflow_out, Obsq_inches, wat_bal, Watbal_sum
-          CALL write_outfile(Buffer80)
+          CALL write_outfile(Buffer81)
 
         ELSEIF ( Print_type==2 ) THEN
           WRITE ( Buffer151, 9001 ) Nowyear, Nowmonth, Nowday, Basin_swrad, &
@@ -651,12 +651,12 @@
             IF ( Dprt ) CALL write_outfile(DASHS(:40))
 
           ELSEIF ( Print_type==1 ) THEN
-            IF ( Dprt ) CALL write_outfile(DASHS(:62))
-            WRITE ( Buffer80, "(I7,I5,5X,5F9.3)" ) Nowyear, &
+            IF ( Dprt ) CALL write_outfile(DASHS(:63))
+            WRITE ( Buffer63, "(I7,I5,5X,2F9.3,F10.3,2F9.3)" ) Nowyear, &
      &              Nowmonth, Basin_ppt_mo, Basin_actet_mo, Basin_storage, &
      &              Basin_stflow_mo, Obsq_inches_mo
-            CALL write_outfile(Buffer80(:62))
-            IF ( Dprt ) CALL write_outfile(DASHS(:62))
+            CALL write_outfile(Buffer63)
+            IF ( Dprt ) CALL write_outfile(DASHS(:63))
 
           ELSEIF ( Print_type==2 ) THEN
             IF ( Dprt ) CALL write_outfile(DASHS)
@@ -711,11 +711,11 @@
 
 ! ****annual summary here
           ELSEIF ( Print_type==1 ) THEN
-            IF ( Mprt .OR. Dprt ) CALL write_outfile(EQULS(:62))
-            WRITE ( Buffer80, "(I7,10X,5F9.3)" ) Nowyear, Basin_ppt_yr, &
+            IF ( Mprt .OR. Dprt ) CALL write_outfile(EQULS(:63))
+            WRITE ( Buffer63, "(I7,10X,2F9.3,F10.3,2F9.3)" ) Nowyear, Basin_ppt_yr, &
      &              Basin_actet_yr, Basin_storage, Basin_stflow_yr, Obsq_inches_yr
-            CALL write_outfile(Buffer80(:62))
-            IF ( Mprt .OR. Dprt ) CALL write_outfile(EQULS(:62))
+            CALL write_outfile(Buffer63)
+            IF ( Mprt .OR. Dprt ) CALL write_outfile(EQULS(:63))
 
           ELSEIF ( Print_type==2 ) THEN
             Basin_swrad_yr = Basin_swrad_yr/yrdays_dble
@@ -795,11 +795,11 @@
             CALL write_outfile(STARS(:40))
 
           ELSEIF ( Print_type==1 ) THEN
-            CALL write_outfile(STARS(:62))
-            WRITE ( Buffer80, 9005 ) ' Total for run', Basin_ppt_tot, &
+            CALL write_outfile(STARS(:63))
+            WRITE ( Buffer63, 9005 ) ' Total for run', Basin_ppt_tot, &
      &              Basin_actet_tot, Basin_storage, Basin_stflow_tot, Obsq_inches_tot
-            CALL write_outfile(Buffer80(:62))
-            CALL write_outfile(STARS(:62))
+            CALL write_outfile(Buffer63)
+            CALL write_outfile(STARS(:63))
 
           ELSEIF ( Print_type==2 ) THEN
             Obs_runoff_tot = Obs_runoff_tot/Totdays
@@ -819,7 +819,7 @@
 
  9001 FORMAT (I6, 2I3, F5.0, 2F5.1, 2F7.2, 2F6.2, 2F7.2, F6.2, F6.3, F7.3, 2F6.3, 3F7.2, F7.4, F9.1, F9.2, F7.2)
  9004 FORMAT (A, 13X, 2F7.2, F12.1, 2F7.2, 2F6.2, F7.2, 2F6.2, 4F7.2, F9.1, F9.2, F7.2)
- 9005 FORMAT (A, 3X, 6F9.3)
+ 9005 FORMAT (A, 3X, 2F9.3,F10.3,2F9.3)
  9006 FORMAT (I6, I3, 3X, 3F5.1, 2F7.2, F12.1, 2F7.2, 2F6.2, F7.2, 2F6.2, 3F7.2, F9.1, F9.2, 2F7.2)
  9007 FORMAT (I6, 6X, 3F5.1, 2F7.2, 2F6.2, 2F7.2, 2F6.2, F7.2, 2F6.2, 3F7.2, F9.2, F9.2, 2F7.2)
 
@@ -830,7 +830,7 @@
 ! This writes the measured and simulated table header.
 !***********************************************************************
       SUBROUTINE header_print(Print_type)
-      USE PRMS_BASINSUM, ONLY: DASHS, Buffer80, Print_freq, Header_prt
+      USE PRMS_BASINSUM, ONLY: DASHS, Buffer81, Print_freq, Header_prt, Buffer63
       use prms_utils, only: write_outfile
       IMPLICIT NONE
 ! Arguments
@@ -839,10 +839,10 @@
       CALL write_outfile(' ')
 !  This writes the water balance table header.
       IF ( Header_prt==3 ) THEN
-        CALL write_outfile('   Year Month Day   Precip     ET    Storage S-Runoff M-Runoff')
-        WRITE (Buffer80, 9002)
-        CALL write_outfile(Buffer80(:62))
-        CALL write_outfile(DASHS(:62))
+        CALL write_outfile('   Year Month Day   Precip     ET    Storage  S-Runoff M-Runoff')
+        WRITE (Buffer63, 9002)
+        CALL write_outfile(Buffer63)
+        CALL write_outfile(DASHS(:63))
 
       ELSEIF ( Print_type==0 ) THEN
         IF ( Print_freq==1 ) THEN
@@ -855,10 +855,10 @@
 
 !  This writes the water balance table header.
       ELSEIF ( Print_type==1 ) THEN
-        CALL write_outfile('   Year Month Day   Precip     ET    Storage S-Runoff M-Runoff   Watbal  WBalSum')
-        WRITE (Buffer80, 9001)
-        CALL write_outfile(Buffer80)
-        CALL write_outfile(DASHS(:80))
+        CALL write_outfile('   Year Month Day   Precip     ET    Storage  S-Runoff M-Runoff   Watbal  WBalSum')
+        WRITE (Buffer81, 9001)
+        CALL write_outfile(Buffer81)
+        CALL write_outfile(DASHS(:81))
 
 !  This writes the detailed table header.
       ELSEIF ( Print_type==2 ) THEN
@@ -871,7 +871,7 @@
       ENDIF
 
  9001 FORMAT (17X, 7(' (inches)'))
- 9002 FORMAT (17X, 5(' (inches)'))
+ 9002 FORMAT (17X, 2(' (inches)'), 1('  (inches)'), 2(' (inches)'))
 
       END SUBROUTINE header_print
 

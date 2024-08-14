@@ -52,9 +52,8 @@
       INTEGER FUNCTION water_use_read()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, &
      &    RUN, DECL, INIT, CLEAN, ERROR_water_use, strmflow_noroute_module, strmflow_muskingum_lake_module
-     use PRMS_CONTROL_FILE, only: control_string
-     use PRMS_MMFAPI, only: declvar_dble, declvar_real
-     use PRMS_READ_PARAM_FILE, only: decldim, getdim
+      use PRMS_CONTROL_FILE, only: control_string
+      use PRMS_MMFAPI, only: declvar_dble, declvar_real
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nsegment, Nwateruse, Nexternal, Nconsumed, &
      &    Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
      &    External_transferON_OFF, Dprst_transferON_OFF, Dprst_flag, Strmflow_flag, &

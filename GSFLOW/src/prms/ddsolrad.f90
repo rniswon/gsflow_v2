@@ -14,7 +14,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Solar Radiation Distribution'
         character(len=*), parameter :: MODNAME = 'ddsolrad'
-        character(len=*), parameter :: Version_ddsolrad = '2024-02-08'
+        character(len=*), parameter :: Version_ddsolrad = '2023-10-04'
         INTEGER, SAVE :: Observed_flag
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Radadj_slope(:, :), Radadj_intcp(:, :)
@@ -75,7 +75,7 @@
           IF ( Hru_ppt(j)>Ppt_rad_adj(j,Nowmonth) ) THEN
             IF ( Tmax_hru(j)<Tmax_index(j,Nowmonth) ) THEN
               pptadj = Radj_sppt(j)
-              IF ( .not.(Tmax_hru(j)<Tmax_allrain(j,Nowmonth)) ) THEN
+              IF ( Tmax_hru(j)>=Tmax_allrain(j,Nowmonth) ) THEN
                 IF ( Summer_flag==OFF ) pptadj = Radj_wppt(j) ! Winter
               ELSE
                 pptadj = Radj_wppt(j)
@@ -117,7 +117,8 @@
 ! in Alaska, there are HRUs on certain days when the sun never rises, so this equation doesn't work
 ! when soltab_potsw, soltab_horad_potsw, or orad_hru are 0.0
 
-          if ( Soltab_potsw(jday, j) > 0.0D0 .and. Soltab_horad_potsw(jday, j) > 0.0D0 .and. Orad_hru(j) > 0.0 ) then
+!          Swrad(j) = SNGL( Soltab_potsw(Jday, j)/Soltab_horad_potsw(Jday, j)*DBLE(Orad_hru(j))/Hru_cossl(j) )
+          if ( Soltab_potsw(jday, j) > 0.0 .and. Soltab_horad_potsw(jday, j) > 0.0 .and. Orad_hru(j) > 0.0 ) then
              Swrad(j) = SNGL( Soltab_potsw(Jday, j)/Soltab_horad_potsw(Jday, j)*DBLE(Orad_hru(j))/Hru_cossl(j) )
           else
              Swrad(j) = 0.0

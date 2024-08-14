@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Potential Evapotranspiration'
         character(len=*), parameter :: MODNAME = 'potet_pm_sta'
-        character(len=*), parameter :: Version_potet = '2024-01-15'
+        character(len=*), parameter :: Version_potet = '2021-08-13'
         ! Declared Parameters
         REAL, SAVE, ALLOCATABLE :: Pm_n_coef(:, :), Pm_d_coef(:, :), Crop_coef(:, :)
         INTEGER, SAVE, ALLOCATABLE :: Hru_windspeed_sta(:), Hru_humidity_sta(:)
@@ -97,13 +97,13 @@
 ! are cases when soltab is zero for certain HRUs (depending on slope/aspect)
 ! for certain months. If this value is zero, reset it to a small value so
 ! there is no divide by zero.
-          IF ( .not.(Soltab_potsw(Jday,i) > 10.0D0) ) THEN
+          IF (Soltab_potsw(Jday,i) <= 10.0) THEN
             stab = 10.0
           ELSE
             stab = SNGL( Soltab_potsw(Jday,i) )
           ENDIF
 
-          IF ( .not.(Swrad(i) > 10.0) ) THEN
+          IF (Swrad(i) <= 10.0) THEN
             sw = 10.5
           ELSE
             sw = Swrad(i)

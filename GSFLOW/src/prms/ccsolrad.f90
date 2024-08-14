@@ -13,7 +13,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Solar Radiation Distribution'
         character(len=*), parameter :: MODNAME = 'ccsolrad'
-        character(len=*), parameter :: Version_ccsolrad = '2024-02-08'
+        character(len=*), parameter :: Version_ccsolrad = '2024-04-04'
         INTEGER, SAVE :: Observed_flag
         ! Declared Variables
         DOUBLE PRECISION, SAVE :: Basin_radadj, Basin_cloud_cover
@@ -104,13 +104,7 @@
               ENDIF
             ENDIF
           ENDIF
-! in Alaska, there are HRUs on certain days when the sun never rises, so this equation doesn't work
-! when soltab_potsw or hru_cossl are 0.0
-          if ( Soltab_potsw(jday, j) > 0.0D0 .and. Hru_cossl(j) > 0.0D0 ) then
-             Swrad(j) = SNGL( Soltab_potsw(Jday, j)*DBLE( Cloud_radadj(j))/Hru_cossl(j) )
-          else
-             Swrad(j) = 0.0
-          endif
+          Swrad(j) = SNGL( Soltab_potsw(Jday, j)*DBLE( Cloud_radadj(j))/Hru_cossl(j) )
           Basin_swrad = Basin_swrad + DBLE( Swrad(j)*Hru_area(j) )
         ENDDO
         Basin_orad = Basin_orad*Basin_area_inv

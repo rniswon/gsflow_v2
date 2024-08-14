@@ -6,16 +6,16 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2024-02-09'
+      character(len=*), parameter :: Version_routing = '2024-08-13'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades, special_seg_type_flag
       INTEGER, SAVE, ALLOCATABLE :: Segment_order(:), Segment_up(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Segment_hruarea(:)
       !CHARACTER(LEN=32), SAVE :: Outfmt
       INTEGER, SAVE, ALLOCATABLE :: Ts_i(:)
       REAL, SAVE, ALLOCATABLE :: Ts(:), C0(:), C1(:), C2(:)
 !   Declared Variables
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Segment_hruarea(:), Segmentcum_hruarea(:), Seg_upstream_hruarea(:)
       DOUBLE PRECISION, SAVE :: Basin_segment_storage
       DOUBLE PRECISION, SAVE :: Flow_to_lakes, Flow_to_ocean, Flow_to_great_lakes, Flow_out_region
       DOUBLE PRECISION, SAVE :: Flow_in_region, Flow_in_nation, Flow_headwater, Flow_out_NHM
@@ -23,6 +23,8 @@
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Seginc_ssflow(:), Seginc_sroff(:), Segment_delta_flow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Seginc_gwflow(:), Seginc_swrad(:), Seginc_potet(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_outflow(:), Seg_ssflow(:), Seg_sroff(:), Seg_gwflow(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Segcum_ssflow(:), Segcum_sroff(:), Segcum_gwflow(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Seg_upstream_ssflow(:), Seg_upstream_sroff(:), Seg_upstream_gwflow(:)
 !   Declared Parameters
       INTEGER, SAVE, ALLOCATABLE :: Segment_type(:), Tosegment(:), Hru_segment(:), Obsin_segment(:), Obsout_segment(:)
       REAL, SAVE, ALLOCATABLE :: K_coef(:), X_coef(:)
@@ -277,24 +279,75 @@
 
         ALLOCATE ( Seg_ssflow(Nsegment) )
         CALL declvar_dble(MODNAME, 'seg_ssflow', 'nsegment', Nsegment, &
-     &       'Area-weighted average interflow for each segment from HRUs contributing flow to the segment and upstream HRUs', &
+     &       'Area-weighted average interflow for each segment from HRUs contributing flow to the segment', &
      &       'inches', Seg_ssflow)
 
         ALLOCATE ( Seg_gwflow(Nsegment) )
         CALL declvar_dble(MODNAME, 'seg_gwflow', 'nsegment', Nsegment, &
-     &       'Area-weighted average groundwater discharge for each segment from'// &
-     &       ' HRUs contributing flow to the segment and upstream HRUs', &
+     &       'Area-weighted average groundwater flow for each segment from'// &
+     &       ' HRUs contributing flow to the segment', &
      &       'inches', Seg_gwflow)
 
         ALLOCATE ( Seg_sroff(Nsegment) )
         CALL declvar_dble(MODNAME, 'seg_sroff', 'nsegment', Nsegment, &
      &       'Area-weighted average surface runoff for each segment from'// &
-     &       ' HRUs contributing flow to the segment and upstream HRUs', &
+     &       ' HRUs contributing flow to the segment', &
      &       'inches', Seg_sroff)
+
+        ALLOCATE ( Segcum_ssflow(Nsegment) )
+        CALL declvar_dble(MODNAME, 'segcum_ssflow', 'nsegment', Nsegment, &
+     &       'Area-weighted average interflow for each segment from HRUs contributing flow to the segment'// &
+     &        ' including upstream HRUs', &
+     &       'cfs', Segcum_ssflow)
+
+        ALLOCATE ( Segcum_gwflow(Nsegment) )
+        CALL declvar_dble(MODNAME, 'segcum_gwflow', 'nsegment', Nsegment, &
+     &       'Area-weighted average groundwater flow for each segment from'// &
+     &       ' HRUs contributing flow to the segment including upstream HRUs', &
+     &       'cfs', Segcum_gwflow)
+
+        ALLOCATE ( Segcum_sroff(Nsegment) )
+        CALL declvar_dble(MODNAME, 'segcum_sroff', 'nsegment', Nsegment, &
+     &       'Area-weighted average surface runoff for each segment from'// &
+     &       ' HRUs contributing flow to the segment', &
+     &       'cfs', Segcum_sroff)
+
+        ALLOCATE ( Seg_upstream_ssflow(Nsegment) )
+        CALL declvar_dble(MODNAME, 'seg_upstream_ssflow', 'nsegment', Nsegment, &
+     &       'Area-weighted average interflow for each segment from upstream HRUs', &
+     &       'cfs', Seg_upstream_ssflow)
+
+        ALLOCATE ( Seg_upstream_gwflow(Nsegment) )
+        CALL declvar_dble(MODNAME, 'seg_upstream_gwflow', 'nsegment', Nsegment, &
+     &       'Area-weighted average groundwater flow for each segment from'// &
+     &       ' HRUs contributing flow to the segment including upstream HRUs', &
+     &       'cfs', Seg_upstream_gwflow)
+
+        ALLOCATE ( Seg_upstream_sroff(Nsegment) )
+        CALL declvar_dble(MODNAME, 'seg_upstream_sroff', 'nsegment', Nsegment, &
+     &       'Area-weighted average surface runoff for each segment from'// &
+     &       ' HRUs contributing flow to the segment', &
+     &       'cfs', Seg_upstream_sroff)
+
+        ALLOCATE( Segment_hruarea(Nsegment) )
+        CALL declvar_dble(MODNAME, 'segment_hruarea', 'one', 1, &
+     &       'Contributing area to each segment', &
+     &       'acres', Segment_hruarea)
+
       ENDIF
 
+      ALLOCATE( Segmentcum_hruarea(Nsegment) )
+      CALL declvar_dble(MODNAME, 'segmentcum_hruarea', 'one', 1, &
+     &     'Contributing area to each segment including upslope HRUs', &
+     &     'acres', Segmentcum_hruarea)
+
+      ALLOCATE( Seg_upstream_hruarea(Nsegment) )
+      CALL declvar_dble(MODNAME, 'seg_upstream_hruarea', 'one', 1, &
+     &     'Contributing area to each segment from upslope HRUs', &
+     &     'acres', Seg_upstream_hruarea)
+
       ! local arrays
-      ALLOCATE ( Segment_order(Nsegment), Segment_up(Nsegment), Segment_hruarea(Nsegment) )
+      ALLOCATE ( Segment_order(Nsegment), Segment_up(Nsegment) )
 
       END FUNCTION routingdecl
 
@@ -302,7 +355,7 @@
 !     routinginit - check for validity of parameters
 !**********************************************************************
       INTEGER FUNCTION routinginit()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, FT2_PER_ACRE, NEARZERO, DNEARZERO, OUTFLOW_SEGMENT, ERROR_param, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, FT2_PER_ACRE, NEARZERO, OUTFLOW_SEGMENT, ERROR_param, &
      &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
      &    strmflow_muskingum_module, strmflow_in_out_module, DEBUG_LESS
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
@@ -315,9 +368,9 @@
       use prms_utils, only: read_error, write_outfile
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: MOD, DBLE, ABS
+      INTRINSIC :: MOD, ABS, DBLE, maxval
 ! Local Variables
-      INTEGER :: i, j, test, lval, toseg, iseg, isegerr, ierr, eseg
+      INTEGER :: i, j, test, lval, toseg, iseg, isegerr, ierr, eseg, iorder
       REAL :: k, x, d, x_max, velocity
       INTEGER, ALLOCATABLE :: x_off(:)
       CHARACTER(LEN=10) :: buffer
@@ -348,18 +401,19 @@
 
       Cfs2acft = Timestep_seconds/FT2_PER_ACRE
 
-      special_seg_type_flag = OFF
       IF ( getparam_int(MODNAME, 'segment_type', Nsegment, Segment_type)/=0 ) CALL read_error(2, 'segment_type')
-      DO i = 1, Nsegment
-        IF ( Segment_type(i) > 0 ) THEN
-          special_seg_type_flag = ACTIVE
+      IF ( maxval(Segment_type) == 0 ) THEN
+        special_seg_type_flag = OFF
+      ELSE
+        special_seg_type_flag = ACTIVE
+        DO i = 1, Nsegment
           IF ( Segment_type(i) > 99 ) Segment_type(i) = MOD( Segment_type(i), 100 )
-        ENDIF
-      ENDDO
+        ENDDO
+      ENDIF
 
       IF ( Strmflow_flag==strmflow_muskingum_mann_module ) THEN
         IF ( getparam_real(MODNAME, 'mann_n', Nsegment, Mann_n)/=0 ) CALL read_error(2, 'mann_n')
-        IF ( getparam_real(MODNAME, 'seg_depth', Nsegment, seg_depth)/=0 ) CALL read_error(2, 'seg_depth')
+        IF ( getparam_real(MODNAME, 'seg_depth', Nsegment, Seg_depth)/=0 ) CALL read_error(2, 'seg_depth')
       ENDIF
 
       IF ( Strmflow_flag==strmflow_muskingum_mann_module .OR. Stream_temp_flag==ACTIVE ) THEN
@@ -421,7 +475,7 @@
         Segment_area = 0.0D0
         DO j = 1, Nsegment
           Segment_area = Segment_area + Segment_hruarea(j)
-          IF ( Segment_hruarea(j)<DNEARZERO ) THEN
+          IF ( .not.(Segment_hruarea(j)>0.0D0) ) THEN
             Noarea_flag = ACTIVE
             IF ( Parameter_check_flag>0 ) THEN
               WRITE ( buffer, '(I10)' ) j
@@ -512,6 +566,15 @@
 !        PRINT '(10I5)', Tosegment
 !      ENDIF
       DEALLOCATE ( x_off )
+
+      Segmentcum_hruarea = 0.0D0
+      Seg_upstream_hruarea = 0.0D0
+      DO i = 1, Nsegment
+        iseg = Hru_segment(i)
+        iorder = Segment_order(i)
+        Segmentcum_hruarea(iorder) = Segmentcum_hruarea(iorder) + Seg_upstream_hruarea(iorder)
+        IF ( toseg>0 ) Seg_upstream_hruarea(toseg) = Seg_upstream_hruarea(toseg) + Segment_hruarea(iorder)
+      ENDDO
 
       IF ( Strmflow_flag==strmflow_in_out_module ) RETURN
 !
@@ -648,12 +711,12 @@
 !     route_run - Computes segment flow states and fluxes
 !***********************************************************************
       INTEGER FUNCTION route_run()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, NEARZERO, OUTFLOW_SEGMENT, GLACIER, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, OUTFLOW_SEGMENT, GLACIER, &
      &    strmflow_muskingum_mann_module, strmflow_muskingum_lake_module, &
-     &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
+     &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT !, FT2_PER_ACRE
       USE PRMS_MODULE, ONLY: Nsegment, Cascade_flag, Glacier_flag, Hru_type
       USE PRMS_ROUTING
-      USE PRMS_BASIN, ONLY: Hru_area_dble, Hru_route_order, Active_hrus
+      USE PRMS_BASIN, ONLY: Hru_area, Hru_route_order, Active_hrus
       USE PRMS_CLIMATEVARS, ONLY: Swrad, Potet
       USE PRMS_SET_TIME, ONLY: Timestep_seconds, Cfs_conv
       USE PRMS_FLOWVARS, ONLY: Ssres_flow, Sroff, Seg_lateral_inflow, Strm_seg_in !, Seg_outflow
@@ -664,11 +727,13 @@
 ! Functions
       INTRINSIC :: DBLE
 ! Local Variables
-      INTEGER :: i, j, jj, this_seg
+      INTEGER :: i, j, jj, this_seg, iorder, toseg
       DOUBLE PRECISION :: tocfs
       LOGICAL :: found
 !***********************************************************************
       route_run = 0
+
+!      Cfs2acft = Timestep_seconds/FT2_PER_ACRE
 
 ! seg variables are not computed if cascades are active as hru_segment is ignored
       IF ( Hru_seg_cascades==ACTIVE ) THEN
@@ -690,7 +755,7 @@
 
       DO jj = 1, Active_hrus
         j = Hru_route_order(jj)
-        tocfs = Hru_area_dble(j) * Cfs_conv
+        tocfs = DBLE( Hru_area(j) )*Cfs_conv
         Hru_outflow(j) = DBLE( (Sroff(j) + Ssres_flow(j) + Gwres_flow(j)) )*tocfs
         ! Note: glacr_flow (from glacier or snowfield) is added as a gain, outside stream network addition
         ! glacr_flow in inch^3, 1728=12^3
@@ -700,16 +765,16 @@
         IF ( Hru_seg_cascades==ACTIVE ) THEN
           i = Hru_segment(j)
           IF ( i>0 ) THEN
-            Seg_gwflow(i) = Seg_gwflow(i) + DBLE( Gwres_flow(j) )
-            Seg_sroff(i) = Seg_sroff(i) + DBLE( Sroff(j) )
-            Seg_ssflow(i) = Seg_ssflow(i) + DBLE( Ssres_flow(j) )
+            Seg_gwflow(i) = Seg_gwflow(i) + DBLE( Gwres_flow(j)*Hru_area(j) )
+            Seg_sroff(i) = Seg_sroff(i) + DBLE( Sroff(j)*Hru_area(j) )
+            Seg_ssflow(i) = Seg_ssflow(i) + DBLE( Ssres_flow(j)*Hru_area(j) )
             ! if cascade_flag = CASCADE_HRU_SEGMENT, seg_lateral_inflow set with strm_seg_in
             IF ( Cascade_flag==CASCADE_OFF ) Seg_lateral_inflow(i) = Seg_lateral_inflow(i) + Hru_outflow(j)
             Seginc_sroff(i) = Seginc_sroff(i) + DBLE( Sroff(j) )*tocfs
             Seginc_ssflow(i) = Seginc_ssflow(i) + DBLE( Ssres_flow(j) )*tocfs
             Seginc_gwflow(i) = Seginc_gwflow(i) + DBLE( Gwres_flow(j) )*tocfs
-            Seginc_swrad(i) = Seginc_swrad(i) + DBLE( Swrad(j) ) * Hru_area_dble(j)
-            Seginc_potet(i) = Seginc_potet(i) + DBLE( Potet(j) ) * Hru_area_dble(j)
+            Seginc_swrad(i) = Seginc_swrad(i) + DBLE( Swrad(j)*Hru_area(j) )
+            Seginc_potet(i) = Seginc_potet(i) + DBLE( Potet(j)*Hru_area(j) )
           ENDIF
         ENDIF
       ENDDO
@@ -720,64 +785,53 @@
         ENDDO
       ENDIF
 
-      IF ( Cascade_flag>CASCADE_OFF ) RETURN
-
-! Divide solar radiation and PET by sum of HRU area to get avarage
-      IF ( Noarea_flag==OFF ) THEN
+      IF ( Hru_seg_cascades==ACTIVE ) THEN
+        Segcum_gwflow = 0.0D0
+        Segcum_ssflow = 0.0D0
+        Segcum_sroff = 0.0D0
+        Seg_upstream_gwflow = 0.0D0
+        Seg_upstream_ssflow = 0.0D0
+        Seg_upstream_sroff = 0.0D0
         DO i = 1, Nsegment
-          Seginc_swrad(i) = Seginc_swrad(i)/Segment_hruarea(i)
-          Seginc_potet(i) = Seginc_potet(i)/Segment_hruarea(i)
-        ENDDO
-
-! If there are no HRUs associated with a segment, then figure out some
-! other way to get the solar radiation, the following is not great
-      ELSE !     IF ( Noarea_flag==ACTIVE ) THEN
-        DO i = 1, Nsegment
-! This reworked by markstrom
-          IF ( Segment_hruarea(i)>NEARZERO ) THEN
+          iorder = Segment_order(i)
+          toseg = Tosegment(iorder)
+          Segcum_gwflow(iorder) = Segcum_gwflow(iorder) + Seg_upstream_gwflow(iorder)
+          Segcum_ssflow(iorder) = Segcum_ssflow(iorder) + Seg_upstream_ssflow(iorder)
+          Segcum_sroff(iorder) = Segcum_sroff(iorder) + Seg_upstream_sroff(iorder)
+          IF ( toseg>0 ) THEN
+            Seg_upstream_gwflow(toseg) = Seg_upstream_gwflow(toseg) + Seginc_gwflow(iorder)
+            Seg_upstream_ssflow(toseg) = Seg_upstream_ssflow(toseg) + Seginc_ssflow(iorder)
+            Seg_upstream_sroff(toseg) = Seg_upstream_sroff(toseg) + Seginc_sroff(iorder)
+          ENDIF
+! Divide components of flow, solar radiation and PET by sum of HRU area to get avarage
+          IF ( Segment_hruarea(i)>0.0D0 ) THEN
             Seginc_swrad(i) = Seginc_swrad(i)/Segment_hruarea(i)
             Seginc_potet(i) = Seginc_potet(i)/Segment_hruarea(i)
-          ELSE
-
-! Segment does not have any HRUs, check upstream segments.
-            this_seg = i
-            found = .false.
-            do
-              if ( .not.(Segment_hruarea(this_seg) > 0.0) ) then
-
-                 ! Hit the headwater segment without finding any HRUs (i.e. sources of streamflow)
-                 if (segment_up(this_seg) == 0) then
-                     found = .false.
-                     exit
-                 endif
-
-                 ! There is an upstream segment, check that segment for HRUs
-                 this_seg = segment_up(this_seg)
-              else
-                  ! This segment has HRUs so there will be swrad and potet
-                  Seginc_swrad(i) = Seginc_swrad(this_seg)/Segment_hruarea(this_seg)
-                  Seginc_potet(i) = Seginc_potet(this_seg)/Segment_hruarea(this_seg)
-                  found = .true.
-                  exit
-              endif
-            enddo
-
-            if (.not. found) then
-! Segment does not have any upstream segments with HRUs, check downstream segments.
-
+            Seg_gwflow(i) = Seg_gwflow(i)/Segment_hruarea(i)
+            Seg_ssflow(i) = Seg_ssflow(i)/Segment_hruarea(i)
+            Seg_sroff(i) = Seg_sroff(i)/Segment_hruarea(i)
+          ENDIF
+        ENDDO
+        IF ( Noarea_flag==ACTIVE ) THEN
+          ! If there are no HRUs associated with a segment, then figure out some
+          ! other way to get the solar radiation, the following is not great
+          DO i = 1, Nsegment
+            ! This reworked by markstrom
+            IF ( .not.(Segment_hruarea(i)>0.0D0) ) THEN
+              ! Segment does not have any HRUs, check upstream segments.
               this_seg = i
               found = .false.
               do
-                if ( .not.(Segment_hruarea(this_seg) > 0.0) ) then
+                if ( .not.(Segment_hruarea(this_seg) > 0.0D0) ) then
 
-                   ! Hit the terminal segment without finding any HRUs (i.e. sources of streamflow)
-                   if (Tosegment(this_seg) == OUTFLOW_SEGMENT) then
-                     found = .false.
-                     exit
+                   ! Hit the headwater segment without finding any HRUs (i.e. sources of streamflow)
+                   if (segment_up(this_seg) == 0) then
+                       found = .false.
+                       exit
                    endif
 
-                   ! There is a downstream segment, check that segment for HRUs
-                   this_seg = Tosegment(this_seg)
+                   ! There is an upstream segment, check that segment for HRUs
+                   this_seg = segment_up(this_seg)
                 else
                     ! This segment has HRUs so there will be swrad and potet
                     Seginc_swrad(i) = Seginc_swrad(this_seg)/Segment_hruarea(this_seg)
@@ -788,14 +842,40 @@
               enddo
 
               if (.not. found) then
-!                write(*,*) "route_run: no upstream or downstream HRU found for segment ", i
-!                write(*,*) "    no values for seginc_swrad and seginc_potet"
-                Seginc_swrad(i) = -99.9D0
-                Seginc_potet(i) = -99.9D0
+                ! Segment does not have any upstream segments with HRUs, check downstream segments.
+
+                this_seg = i
+                found = .false.
+                do
+                  if (.not.(Segment_hruarea(this_seg) > 0.0D0) ) then
+
+                     ! Hit the terminal segment without finding any HRUs (i.e. sources of streamflow)
+                     if (Tosegment(this_seg) == OUTFLOW_SEGMENT) then
+                       found = .false.
+                       exit
+                     endif
+
+                     ! There is a downstream segment, check that segment for HRUs
+                     this_seg = Tosegment(this_seg)
+                  else
+                      ! This segment has HRUs so there will be swrad and potet
+                      Seginc_swrad(i) = Seginc_swrad(this_seg)/Segment_hruarea(this_seg)
+                      Seginc_potet(i) = Seginc_potet(this_seg)/Segment_hruarea(this_seg)
+                      found = .true.
+                      exit
+                  endif
+                enddo
+
+                if (.not. found) then
+                  !write(*,*) "route_run: no upstream or downstream HRU found for segment ", i
+                  !write(*,*) "    no values for seginc_swrad and seginc_potet"
+                  Seginc_swrad(i) = -99.9D0
+                  Seginc_potet(i) = -99.9D0
+                endif
               endif
-            endif
-          ENDIF
-        ENDDO
+            ENDIF
+          ENDDO
+        ENDIF
       ENDIF
 
       END FUNCTION route_run

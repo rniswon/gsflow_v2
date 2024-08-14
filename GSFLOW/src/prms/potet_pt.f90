@@ -44,7 +44,6 @@
 !******Compute "EQUIVALENT" EVAPOTRANSPIRATION, EEQ (IN./DAY),
 !...USING PRIESTLY-TAYLOR METHOD. THE VARIBLES ARE CALCULATED
 !...USING FORMULAS GIVEN IN JENSEN, 1990.
-        IF ( Humidity_cbh_flag==OFF ) Humidity_hru = Humidity_percent(1, Nowmonth)
         ! next three lines were in loop, moved out since just setting constants
         A1 = 17.625
         B1 = 243.04
@@ -96,6 +95,7 @@
           !A1 = 17.625 !moved outside loop
           !B1 = 243.04 !moved outside loop
           t1 = A1 * Tavgc(i) / (B1 + Tavgc(i))
+          IF ( Humidity_cbh_flag==OFF ) Humidity_hru(i) = Humidity_percent(i, Nowmonth)
           num = B1 * (LOG(Humidity_hru(i)/100.0) + t1) 
           den = A1 - LOG(Humidity_hru(i)/100.0) - t1 
           Tempc_dewpt(i) = num / den
@@ -109,13 +109,13 @@
 ! are cases when soltab is zero for certain HRUs (depending on slope/aspect)
 ! for certain months. If this value is zero, reset it to a small value so
 ! there is no divide by zero.
-          IF (.not.(Soltab_potsw(Jday,i) > 10.0D0)) THEN
+          IF (Soltab_potsw(Jday,i) <= 10.0) THEN
             stab = 10.0
           ELSE
             stab = SNGL( Soltab_potsw(Jday,i) )
           ENDIF
 
-          IF ( .not.( Swrad(i) > 10.0) ) THEN
+          IF (Swrad(i) <= 10.0) THEN
             sw = 10.5
           ELSE
             sw = Swrad(i)

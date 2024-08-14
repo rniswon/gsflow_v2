@@ -59,7 +59,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2024-01-15'
+      character(len=*), parameter :: Version_glacr = '2024-04-04'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -552,6 +552,9 @@
         ENDIF
       ENDDO
 
+      xrawm = 0.0
+      urawm = 0.0
+
       IF ( count>0 ) THEN
   ! Number the glaciers and tags parts that belong together
         CALL tag_count(1, hru_flowline, toflowline, glacier_frac_use)
@@ -891,7 +894,7 @@
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: compute_ela_mb, compute_ela_aar, recompute_soltab
-      INTRINSIC :: ABS, EXP, SUM, SQRT, ISNAN, SNGL, DBLE
+      INTRINSIC :: ABS, EXP, SUM, SQRT, SNGL, DBLE
       EXTERNAL :: tag_count, bottom, yearly_ca_coef
 ! Local Variables
       INTEGER :: i, j, ii, jj, o, p, stact_hrus, endact_hrus, next, curr, keep, doela, dosol
@@ -1769,8 +1772,8 @@
       DO nn = 1, Active_hrus
         n = Hru_route_order(nn)
         IF ( Hru_type(n)==GLACIER ) THEN !only call if glacier HRU and could have changed
-          Soltab_sunhrs(1, n) = 0.0D0
-          Soltab_potsw(1, n) = 0.0D0
+   !       Soltab_sunhrs(1, n) = 0.0D0
+   !       Soltab_potsw(1, n) = 0.0D0
           CALL compute_soltab(obliquity, Solar_declination, Hru_slope_ts(n), Hru_aspect(n), &
      &                      Hru_lat(n), Hru_cossl(n), Soltab_potsw(:, n), &
      &                      Soltab_sunhrs(:, n), Hru_type(n), n)
@@ -1934,7 +1937,7 @@
       INTEGER, PARAMETER :: N = 101
 ! Functions
       EXTERNAL :: cumtrapzv, spline, splint, solve_poly, getf_fgrad
-      INTRINSIC :: MIN, MAX, ISNAN, SQRT
+      INTRINSIC :: MIN, MAX, SQRT, ABS
 ! Arguments
       INTEGER, INTENT(IN) :: Gln, Topn, Gl_top(Ntp), Gt(Ntp), Toflowline(Ntp), Botwrite
       REAL, INTENT(IN) :: Ela_elevt(Ntp), Frawt(Nhrugl)
@@ -1972,6 +1975,15 @@
       spg = 0     !streams per glacier
       balt = 0.0  !initialize
       hvec = 0.0
+      uraw = 0.0
+      xraw = 0.0
+      xrawm = 0.0
+      hraw = 0.0
+      hrawe = 0.0
+      rline = 0.0
+      zraw_av = 0.0
+      zraw = 0.0
+      y2dd = 0.0
       DO j = 1, Ntp
         next_do(j) = Ntp + 10000
       ENDDO
@@ -2338,8 +2350,12 @@
 !  but then would change when got off glacier
 ! Top and bottom of glacier affected by steep negative slope and steep positive slope respectively, may want to exclude
             dv1k = dv(1)*kk(thestr)/divu !in km
-            plinetop = hraw(1)/(dv1k**(1.0/2.1))
-            IF ( dv1k==0.0 ) plinetop = 0.0
+            IF ( dv1k==0.0 ) THEN
+              plinetop = 0.0
+            ELSE
+              IF ( dv1k<0.0 ) dv1k = ABS( dv1k ) ! rsr, 4/4/2024 next statement is not allowed for negative values
+              plinetop = hraw(1)/(dv1k**(1.0/2.1))
+            ENDIF
             zraw_av(len_str+2) = ((urawtop(thestr)- ( plinetop/(rline(1)+1.0)*dv1k**(rline(1)+1.0) )/hraw(1)) &
      &                 + urawterm(thestr))*divu
             zraw_av(len_str+1) = urawterm(thestr)*divu
@@ -2457,7 +2473,6 @@
       USE PRMS_FLOWVARS, ONLY: Glacier_frac
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: ISNAN
       EXTERNAL :: cumtrapzv, getf_fgrad
 ! Arguments
       REAL, INTENT(IN) :: Frawt(Nhrugl), Ela_elevt(Ntp)

@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=*), parameter :: MODNAME = 'precip_map'
-        character(len=*), parameter :: Version_precip_map = '2023-11-01'
+        character(len=*), parameter :: Version_precip_map = '2024-04-30'
         INTEGER, SAVE :: Precip_unit
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
@@ -31,7 +31,7 @@
       USE PRMS_PRECIP_MAP
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Hru_rain, Hru_snow, Prmx, Pptmix, Newsnow, &
-     &    Precip_units, Tmax_allrain_f, Adjmix_rain, Tmaxf, Tminf, &
+     &    Precip_units, Tmax_allrain_f, Adjmix_rain, Tmaxf, Tminf, Tavgf, &
      &    Basin_ppt, Basin_snow, Basin_rain, Basin_obs_ppt, Tmax_allsnow_f
       use prms_utils, only: find_current_time, find_header_end, print_date, print_module, read_error
 ! Functions
@@ -67,7 +67,7 @@
             IF ( Precip_units==MM ) Hru_ppt(i) = Hru_ppt(i)*MM2INCH
             ppt = Hru_ppt(i)
             CALL precip_form(ppt, Hru_ppt(i), Hru_rain(i), Hru_snow(i), &
-     &                       Tmaxf(i), Tminf(i), Pptmix(i), Newsnow(i), &
+     &                       Tmaxf(i), Tminf(i), Tavgf(i), Pptmix(i), Newsnow(i), &
      &                       Prmx(i), Tmax_allrain_f(i,Nowmonth), 1.0, 1.0, &
      &                       Adjmix_rain(i,Nowmonth), harea, Basin_obs_ppt, Tmax_allsnow_f(i,Nowmonth), i)
           ELSEIF ( Hru_ppt(i)<0.0 ) THEN

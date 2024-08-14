@@ -23,6 +23,7 @@ C     ******************************************************************
 !     ------------------------------------------------------------------
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
+!     +                       , githash
       USE GSFMODFLOW
       IMPLICIT NONE
 !***********************************************************************
@@ -44,7 +45,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
      &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,',
      &        /, 25X, 'AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
 
-        WRITE(*,'(24X,A)') 'Github Commit Hash cf8b62c'
+!        WRITE(*,'(24X,A)') githash
 
         ! Allocate local module variables
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
@@ -132,7 +133,7 @@ C4------OPEN NAME FILE.
 C
 C5------Get current date and time, assign to IBDT, and write to screen
       CALL DATE_AND_TIME(VALUES=IBDT)
-      IF ( Model>GSFLOW )
+      IF ( Model==MODFLOW .OR. Model==MODSIM_MODFLOW )
      &     WRITE(*,2) (IBDT(I),I=1,3),(IBDT(I),I=5,7)
     2 FORMAT(' Run start date and time (yyyy/mm/dd hh:mm:ss): ',
      &       I0,'/',I2.2,'/',I2.2,I3,2(':',I2.2),/)
@@ -443,7 +444,7 @@ C
      &    MODSIM_MODFLOW
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, no_snow_flag,
      &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
-     &    PRMS_land_iteration_flag,
+     &    PRMS_land_iteration_flag, activeHRU_inactiveCELL_flag,
      &    Model, GSFLOW_flag, Print_debug, Soilzone_module
       use prms_utils, only: error_stop
 C1------USE package modules.
@@ -475,6 +476,7 @@ c     USE LMGMODULE
       INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms
       EXTERNAL :: MODSIM2SFR, SFR2MODSIM, LAK2MODSIM
+      EXTERNAL :: gwflow_inactive_cell
       INTRINSIC :: MIN
 ! Local Variables
       INTEGER :: retval, KITER, iss, iprt, I !, II, IBDRET
@@ -671,22 +673,14 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                   ENDIF
                 ENDIF
               ENDIF
-              IF ( PRMS_land_iteration_flag>0 ) THEN
-                retval = srunoff()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'srunoff', retval
-                  RETURN
-                ENDIF
-              ENDIF
+              IF ( PRMS_land_iteration_flag>0 ) retval = srunoff()
               IF ( AG_flag==ACTIVE ) THEN
                 retval = soilzone_ag()
               ELSE
                 retval = soilzone()
               ENDIF
-              IF ( retval/=0 ) THEN
-                PRINT 9001, Soilzone_module, retval
-                RETURN
-              ENDIF
+              IF ( activeHRU_inactiveCELL_flag == ACTIVE )
+     &             CALL gwflow_inactive_cell()
               retval = gsflow_prms2mf()
               Sziters = Sziters + 1
               Maxgziter = KKITER
@@ -808,10 +802,6 @@ C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
               ENDIF
               IF ( PRMS_land_iteration_flag>0 ) THEN
                 retval = srunoff()
-                IF ( retval/=0 ) THEN
-                  PRINT 9001, 'srunoff', retval
-                  RETURN
-                ENDIF
               ENDIF
               !IF ( Szcheck==ACTIVE ) retval = gsflow_mf2prms()  RGN+RSR 12/14/2022
               IF ( AG_flag==ACTIVE ) THEN
@@ -819,10 +809,8 @@ C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
               ELSE
                 retval = soilzone()
               ENDIF
-              IF ( retval/=0 ) THEN
-                PRINT 9001, Soilzone_module, retval
-                RETURN
-              ENDIF
+              IF ( activeHRU_inactiveCELL_flag == ACTIVE )
+     &             CALL gwflow_inactive_cell()
               retval = gsflow_prms2mf()
             END IF
 C
@@ -839,9 +827,6 @@ C
 !          kkiter = itreal
       !move above and executed when AFR = TRUE
           IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(2,Igrid)
-C
- 9001 FORMAT ('ERROR in ', A, ' module, arg = run.',
-     &        ' Called from MFNWT_RUN.', /, 'Return val =', I2)
 C
       IF (Model>=10 .AND. iss==0) THEN
         IF(IUNIT(44).GT.0) CALL SFR2MODSIM(EXCHANGE, Diversions, 
@@ -1835,7 +1820,7 @@ C
           END DO
         END DO
         IF ( TESTSFR>1.0 ) THEN
-          IF ( Print_debug>DEBUG_minimum ) PRINT 10
+          IF ( Print_debug==0 ) PRINT 10
         END IF
       END IF
 ! Zero LAK flows (PPT, EVAP, RUNOFF, SP.WITHDRAWL).
@@ -1850,7 +1835,7 @@ C
         RNF = 0.0
         WTHDRW = 0.0
         IF ( TESTLAK>1.0 ) THEN
-          IF ( Print_debug>DEBUG_minimum ) PRINT 11
+          IF ( Print_debug==0 ) PRINT 11
         END IF
       END IF
 

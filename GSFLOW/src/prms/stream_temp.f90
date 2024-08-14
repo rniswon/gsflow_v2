@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2024-01-11'
+      character(len=*), parameter :: Version_stream_temp = '2024-04-04'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -92,7 +92,7 @@
       USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, OFF, DAYS_PER_YEAR
       use PRMS_CONTROL_FILE, only: control_integer
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
-      use PRMS_READ_PARAM_FILE, only: declparam, getdim
+      use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag
       USE PRMS_STRMTEMP
       use prms_utils, only: print_module, read_error
@@ -400,7 +400,7 @@
       INTRINSIC :: COS, SIN, ABS, SIGN, ASIN, maxval
       REAL, EXTERNAL :: solalt
 ! Local Variables
-      INTEGER :: i, j, k, iseg, ierr, ii, this_seg
+      INTEGER :: i, j, k, iseg, ii, this_seg
       REAL :: tan_d, tano, sinhro, temp, decl, cos_d, tanod, alrs
 !***********************************************************************
       stream_temp_init = 0
@@ -449,14 +449,10 @@
       ELSEIF ( Strmtemp_humidity_flag==2 ) THEN ! use station data
          IF ( getparam_int(MODNAME, 'seg_humidity_sta', Nsegment, Seg_humidity_sta)/=0 ) &
      &      CALL read_error(2, 'seg_humidity_sta')
-         ierr = 0
          DO i = 1, Nsegment
-            CALL checkdim_param_limits(i, 'seg_humidity_sta', 'nhumid', Seg_humidity_sta(i), 1, Nhumid, ierr)
+            CALL checkdim_param_limits(i, 'seg_humidity_sta', 'nhumid', Seg_humidity_sta(i), 1, Nhumid, Inputerror_flag)
          ENDDO
-         IF ( ierr==1 ) THEN
-           Inputerror_flag = ierr
-           RETURN
-         ENDIF
+         IF ( Inputerror_flag>0 ) RETURN
       ENDIF
 
 ! Initialize declared variables
@@ -736,7 +732,7 @@
 ! DANGER HACK
 ! On restart, sometimes soltab_potsw comes in as zero. It should never be zero as
 ! this results in divide by 0.0
-         if ( .not.(Soltab_potsw(jday, j) > 10.0D0) ) then
+         if (Soltab_potsw(jday, j) <= 10.0D0) then
             ccov = 1.0 - (Swrad(j) / 10.0 * sngl(Hru_cossl(j)))
          else
             ccov = 1.0 - (Swrad(j) / sngl(Soltab_potsw(jday, j)) * sngl(Hru_cossl(j)))
@@ -762,7 +758,7 @@
 
 ! Compute segment humidity if info is specified in CBH as time series by HRU
          IF ( Strmtemp_humidity_flag==0 ) then
-            Seg_humid(i) = Seg_humid(i) + Humidity_hru(j)*0.01*harea
+            Seg_humid(i) = Seg_humid(i) + Humidity_hru(j)/100.0*harea
          endif
 
 ! Figure out the contributions of the HRUs to each segment for these drivers.
@@ -916,7 +912,7 @@
 !      &        fs, " seg_tave_water = ", Seg_tave_water(i), " troff = " , Seg_tave_air(i), " up_temp = ", up_temp
 !         endif
 
-         if (.not.(seg_outflow(i)>0.0)) then
+         if (.not.(seg_outflow(i)>0.0D0)) then
             if (Seg_tave_water(i) > -99.0) then
                ! This segment has upstream HRUs somewhere, but the current day's flow is zero
                Seg_tave_water(i) = NOFLOW_TEMP

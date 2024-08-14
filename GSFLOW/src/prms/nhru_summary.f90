@@ -7,10 +7,12 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nhru_summary'
-      character(len=*), parameter :: Version_nhru_summary = '2024-03-13'
+      character(len=*), parameter :: Version_nhru_summary = '2024-04-04'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear, nrows
-      INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nhru_var_type(:), Nhru_var_int(:, :), hru_ids(:), nhm_ids(:)
-      REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :), daily_values(:), monthly_values(:)
+      INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nhru_var_type(:), Nhru_var_int(:, :)
+      INTEGER, SAVE, ALLOCATABLE :: hru_ids(:), nhm_ids(:)
+      REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
+      REAL, SAVE, ALLOCATABLE :: daily_values(:), monthly_values(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Nhru_var_dble(:, :)
       CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2, Output_fmt3, Output_fmtint
       CHARACTER(LEN=48), SAVE :: Output_grid_fmt, Output_grid_fmtint, Output_date_fmt, Output_date_fmt3, Output_fmt3int
@@ -23,7 +25,8 @@
 ! Parameters
       INTEGER, SAVE, ALLOCATABLE :: Nhm_id(:)
 ! Control Parameters
-      INTEGER, SAVE :: NhruOutVars, NhruOut_freq, NhruOut_format, NhruOutNcol, outputSelectDatesON_OFF, write_binary_nhru_flag
+      INTEGER, SAVE :: NhruOutVars, NhruOut_freq, NhruOut_format, NhruOutNcol, outputSelectDatesON_OFF 
+      INTEGER, SAVE :: write_binary_nhru_flag
       CHARACTER(LEN=36), SAVE, ALLOCATABLE :: NhruOutVar_names(:)
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: NhruOutBaseFileName, selectDatesFileName
       END MODULE PRMS_NHRU_SUMMARY
@@ -125,18 +128,19 @@
 !     Initialize module values
 !***********************************************************************
       SUBROUTINE nhru_summaryinit()
-      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_control, ERROR_open_out, &
+      USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ERROR_open_out, &
      &    DAILY, MONTHLY, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, YEARLY, ACTIVE, OFF, REAL_TYPE, DBLE_TYPE, INT_TYPE
       use PRMS_MMFAPI, only: getvartype, getvarsize
       use PRMS_READ_PARAM_FILE, only: getparam_int
-      USE PRMS_MODULE, ONLY: Nhru, NhruOutON_OFF, Prms_warmup, Start_year, Start_month, Start_day
+      USE PRMS_MODULE, ONLY: Nhru, NhruOutON_OFF, Prms_warmup, Start_year, Start_month, Start_day, Inputerror_flag
       USE PRMS_NHRU_SUMMARY
       use prms_utils, only: error_stop, find_current_file_time, find_header_end, numchars, PRMS_open_output_file, read_error
       IMPLICIT NONE
       INTRINSIC :: MIN
-      EXTERNAL :: write_header_date
+      EXTERNAL :: write_header_date, to_upper
 ! Local Variables
-      INTEGER :: ios, ierr, size, jj, values_lastrow, nc
+      INTEGER :: ios, ierr, size, jj
+      INTEGER :: values_lastrow, nc
       CHARACTER(LEN=MAXFILE_LENGTH) :: fileName
       CHARACTER(LEN=4) ::file_suffix
 !***********************************************************************
@@ -202,9 +206,13 @@
         IF ( write_binary_nhru_flag == 2 ) THEN
           nc = MIN( Nc_vars(jj), 16 )
           bin_var_names(jj) = NhruOutVar_names(jj)(:nc)
+          CALL to_upper( bin_var_names(jj) )
         ENDIF
       ENDDO
-      IF ( ierr==1 ) ERROR STOP ERROR_control
+      IF ( ierr==1 ) THEN
+        Inputerror_flag = 1
+        RETURN
+      ENDIF
       IF ( Double_vars==ACTIVE ) THEN
         ALLOCATE ( Nhru_var_dble(Nhru, NhruOutVars) )
         Nhru_var_dble = 0.0D0
@@ -218,7 +226,7 @@
       IF ( NhruOut_freq==DAILY .OR. NhruOut_freq==DAILY_MONTHLY ) THEN
         Daily_flag = ACTIVE
         ALLOCATE ( Dailyunit(NhruOutVars) )
-        Dailyunit = 831
+        Dailyunit = 0
       ENDIF
 
       Monthly_flag = OFF
@@ -228,7 +236,7 @@
         Yeardays = 0
         ALLOCATE ( Nhru_var_yearly(Nhru, NhruOutVars), Yearlyunit(NhruOutVars) )
         Nhru_var_yearly = 0.0D0
-        Yearlyunit = 931
+        Yearlyunit = 0
         IF ( NhruOut_format==1 ) THEN
           WRITE ( Output_fmt3, 9003 ) Nhru
         ELSEIF ( NhruOut_format==2 ) THEN
@@ -246,7 +254,7 @@
         Monthdays = 0.0D0
         ALLOCATE ( Nhru_var_monthly(Nhru, NhruOutVars), Monthlyunit(NhruOutVars) )
         Nhru_var_monthly = 0.0D0
-        Monthlyunit = 731
+        Monthlyunit = 0
       ENDIF
 
       IF ( NhruOutON_OFF==2 ) THEN
@@ -257,9 +265,9 @@
           hru_ids(jj) = jj
         ENDDO
       ENDIF
-      WRITE ( Output_fmt2, 9002 ) '("Date",', Nhru, '(", ",I0) )'
+      WRITE ( Output_fmt2, 9002 ) Nhru
       ALLOCATE ( Nhru_var_daily(Nhru, NhruOutVars) )
-      IF ( write_binary_nhru_flag == 2 .AND. Daily_flag ) ALLOCATE( daily_values(Nhru) )
+      IF ( write_binary_nhru_flag == 2 .AND. Daily_flag==ACTIVE ) ALLOCATE( daily_values(Nhru) )
       IF ( write_binary_nhru_flag == 2 .AND. Monthly_flag == ACTIVE ) ALLOCATE( monthly_values(Nhru) )
       Nhru_var_daily = 0.0
       file_suffix = '.csv'
@@ -304,7 +312,7 @@
       ENDDO
 
  9001 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',ES10.3))')
- 9002 FORMAT (A,I0,A)
+ 9002 FORMAT ('("Date"',I0,'('', ''I0))')
  9003 FORMAT ('(I4,', I0,'('','',ES10.3))')
  9004 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',I0))')
  9005 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',F0.4))')
@@ -337,7 +345,7 @@
       USE PRMS_SET_TIME, ONLY: Modays
       use prms_utils, only: read_error
       IMPLICIT NONE
-! FUNCTIONS AND SUBROUTINES
+! Functions and subroutines
       INTRINSIC :: SNGL, DBLE
       EXTERNAL :: read_event_date
       EXTERNAL :: write_CBH_yearly_values, write_CBH_monthly_values, write_CBH_daily_values
@@ -580,7 +588,8 @@
 !*****************************
       SUBROUTINE write_cbh_monthly_values( ivar )
       USE PRMS_CONSTANTS, ONLY: OFF, INT_TYPE, ACTIVE
-      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, Timestep, Number_timesteps, GSFLOW_flag
+      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, Timestep, GSFLOW_flag
+      USE PRMS_SET_TIME, ONLY: Modays
       USE GSFMODFLOW, ONLY: KSTP, KPER
       USE GWFBASMODULE, ONLY: TOTIM, PERTIM
       USE PRMS_NHRU_SUMMARY, ONLY: NhruOutNcol, write_binary_nhru_flag, Nhru_var_type, nrows, &
@@ -590,50 +599,48 @@
 ! Arguments
       INTEGER, INTENT(IN) :: ivar
 ! Functions
-      INTRINSIC :: INT, SNGL, DBLE
+      INTRINSIC :: INT, SNGL, FLOAT
 ! Local Variables
       INTEGER :: i, j, jj, first, last
-      DOUBLE PRECISION :: tot_time, per_time
+      REAL :: months_real, ts_real
 !*******************************************************************************
+      monthly_values = SNGL( Nhru_var_monthly(:,ivar) )
       IF ( Nhru_var_type(ivar) /= INT_TYPE ) THEN
         IF ( NhruOutNcol == Nhru ) THEN
           IF ( write_binary_nhru_flag == OFF ) THEN
-            WRITE ( Monthlyunit(ivar), Output_fmt) Nowyear, Nowmonth, Nowday, (Nhru_var_monthly(j,ivar), j=1,Nhru)
+            WRITE ( Monthlyunit(ivar), Output_fmt) Nowyear, Nowmonth, Nowday, monthly_values
           ELSE
-            monthly_values = SNGL( Nhru_var_monthly(1,ivar) )
             IF ( write_binary_nhru_flag == 1 ) THEN
-              WRITE ( Monthlyunit(ivar) ) Nowyear, Nowmonth, Nowday, (Nhru_var_monthly(j,ivar), j=1,Nhru)
+              WRITE ( Monthlyunit(ivar) ) Nowyear, Nowmonth, Nowday, monthly_values
             ELSE
               !Record 1: KSTP,KPER,PERTIM,TOTIM,TEXT,NHRU,1,1
               IF ( GSFLOW_flag == ACTIVE ) THEN
-                tot_time = DBLE( TOTIM )
-                per_time = DBLE( PERTIM )
-                WRITE ( Monthlyunit(ivar) ) KSTP,KPER,per_time,tot_time,bin_var_names(ivar),Nhru,1,1
+                WRITE ( Monthlyunit(ivar) ) KSTP,KPER,PERTIM,TOTIM,bin_var_names(ivar),Nhru,1,1,monthly_values
               ELSE
-                tot_time = DBLE( Number_timesteps )
-                WRITE ( Monthlyunit(ivar) ) Timestep,1,1.0D0,Number_timesteps,bin_var_names(ivar),Nhru,1,1
+                months_real = FLOAT( Modays(Nowmonth) )
+                ts_real = FLOAT( Timestep )
+                WRITE ( Monthlyunit(ivar) ) 1,Timestep,months_real,ts_real,bin_var_names(ivar),Nhru,1,1,monthly_values
               ENDIF
-              WRITE ( Monthlyunit(ivar) ) monthly_values
             ENDIF
           ENDIF
         ELSE
           IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Monthlyunit(ivar), Output_date_fmt) Nowyear, Nowmonth, Nowday
-            WRITE ( Monthlyunit(ivar), Output_grid_fmt) (Nhru_var_monthly(j,ivar), j=1,Nhru)
+            WRITE ( Monthlyunit(ivar), Output_grid_fmt) monthly_values
           ELSE
             WRITE ( Monthlyunit(ivar) ) Nowyear, Nowmonth, Nowday
             first = 1
             DO jj = 1, nrows
               last = first + NhruOutNcol
               IF ( last > Nhru ) last = Nhru
-              WRITE ( Monthlyunit(ivar) ) (Nhru_var_monthly(j,ivar), j=first,last)
+              WRITE ( Monthlyunit(ivar) ) (monthly_values(j), j=first,last)
               first = last + 1
             ENDDO
           ENDIF
         ENDIF
       ELSE
         DO i = 1, Nhru
-          Nhru_var_int(i, ivar) = INT( Nhru_var_monthly(i, ivar) )
+          Nhru_var_int(i, ivar) = INT( monthly_values(i) )
         ENDDO
         IF ( NhruOutNcol==Nhru ) THEN
           IF ( write_binary_nhru_flag == OFF ) THEN
@@ -665,7 +672,8 @@
 !*****************************
       SUBROUTINE write_cbh_daily_values( ivar )
       USE PRMS_CONSTANTS, ONLY: OFF, INT_TYPE, ACTIVE
-      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, Timestep, Number_timesteps, GSFLOW_flag
+      USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, Timestep, GSFLOW_flag
+      USE PRMS_SET_TIME, ONLY: Modays
       USE GSFMODFLOW, ONLY: KSTP, KPER
       USE GWFBASMODULE, ONLY: TOTIM, PERTIM
       USE PRMS_NHRU_SUMMARY, ONLY: NhruOutNcol, write_binary_nhru_flag, Nhru_var_type, &
@@ -677,40 +685,38 @@
       INTRINSIC :: INT
 ! Local Variables
       INTEGER :: j, jj, first, last
-      DOUBLE PRECISION :: tot_time, per_time
+      REAL :: months_real, ts_real
 !*******************************************************************************
+      daily_values = Nhru_var_daily(:,ivar)
       IF ( Nhru_var_type(ivar) /= INT_TYPE ) THEN
         IF ( NhruOutNcol == Nhru ) THEN
           IF ( write_binary_nhru_flag == OFF ) THEN
-            WRITE ( Dailyunit(ivar), Output_fmt) Nowyear, Nowmonth, Nowday, (Nhru_var_daily(j,ivar), j=1,Nhru)
+            WRITE ( Dailyunit(ivar), Output_fmt) Nowyear, Nowmonth, Nowday, daily_values
           ELSE
-            daily_values = Nhru_var_daily(:,ivar)
             IF ( write_binary_nhru_flag == 1 ) THEN
               WRITE ( Dailyunit(ivar) ) Nowyear, Nowmonth, Nowday, daily_values
             ELSE
               !Record 1: KSTP,KPER,PERTIM,TOTIM,TEXT,NHRU,1,1
               IF ( GSFLOW_flag == ACTIVE ) THEN
-                tot_time = DBLE( TOTIM )
-                per_time = DBLE( PERTIM )
-                WRITE ( Dailyunit(ivar) ) KSTP,KPER,per_time,tot_time,bin_var_names(ivar),Nhru,1,1
+                WRITE ( Dailyunit(ivar) ) KSTP,KPER,PERTIM,TOTIM,bin_var_names(ivar),Nhru,1,1,daily_values
               ELSE
-                tot_time = DBLE( Number_timesteps )
-                WRITE ( Dailyunit(ivar) ) Timestep,1,1.0D0,tot_time,bin_var_names(ivar),Nhru,1,1
+                months_real = FLOAT( Modays(Nowmonth) )
+                ts_real = FLOAT( Timestep )
+                WRITE ( Dailyunit(ivar) ) 1,Timestep,months_real,ts_real,bin_var_names(ivar),Nhru,1,1,daily_values
               ENDIF
-              WRITE ( Dailyunit(ivar) ) daily_values
             ENDIF
           ENDIF
         ELSE
           IF ( write_binary_nhru_flag == OFF ) THEN
             WRITE ( Dailyunit(ivar), Output_date_fmt) Nowyear, Nowmonth, Nowday
-            WRITE ( Dailyunit(ivar), Output_grid_fmt) (Nhru_var_daily(j,ivar), j=1,Nhru)
+            WRITE ( Dailyunit(ivar), Output_grid_fmt) daily_values
           ELSE
             WRITE ( Dailyunit(ivar) ) Nowyear, Nowmonth, Nowday
             first = 1
             DO jj = 1, nrows
               last = first + NhruOutNcol
               IF ( last > Nhru ) last = Nhru
-              WRITE ( Dailyunit(ivar) ) (Nhru_var_daily(j,ivar), j=first,last)
+              WRITE ( Dailyunit(ivar) ) (daily_values(j), j=first,last)
               first = last + 1
             ENDDO
           ENDIF
@@ -740,3 +746,22 @@
       ENDIF
 
       END SUBROUTINE write_cbh_daily_values
+
+!*****************************
+! Convert String to Upper Case
+!*****************************
+      SUBROUTINE to_upper( string )
+      use prms_utils, only: error_stop, numchars
+! Arguments
+      CHARACTER(LEN=*), INTENT(INOUT) :: string
+! Functions
+      INTRINSIC :: ICHAR, CHAR
+! Local Variables
+      INTEGER :: idiff, nchars, i
+!*******************************************************************************
+      idiff = ICHAR('a') - ICHAR('A')
+      nchars = numchars(string)
+      DO i = 1, nchars
+        IF ( string(i:i) >= 'a' .AND. string(i:i) <= 'z') string(i:i) = CHAR(ICHAR(string(i:i)) - idiff)
+      ENDDO
+      END SUBROUTINE to_upper

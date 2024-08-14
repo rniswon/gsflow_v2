@@ -97,13 +97,13 @@
         IF ( season==2 ) THEN
           DO jj = 1, Active_hrus
             j = Hru_route_order(jj)
-            IF ( .not.(Tmin_hru(j)>Frost_temp(j)) .AND. currentFallFrost(j)==0 ) currentFallFrost(j) = Jsol
+            IF ( Tmin_hru(j)<=Frost_temp(j) .AND. currentFallFrost(j)==0 ) currentFallFrost(j) = Jsol
           ENDDO
 ! This is the spring phase, look for the latest spring frost.
         ELSE
           DO jj = 1, Active_hrus
             j = Hru_route_order(jj)
-            IF ( .not.(Tmin_hru(j)>Frost_temp(j)) ) currentSpringFrost(j) = Jsol
+            IF ( Tmin_hru(j)<=Frost_temp(j) ) currentSpringFrost(j) = Jsol
           ENDDO
         ENDIF
 

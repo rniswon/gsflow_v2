@@ -20,8 +20,6 @@
       INTEGER, SAVE, ALLOCATABLE :: Monthlyunit(:), Yearlyunit(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Nsub_var_monthly(:, :), Nsub_var_yearly(:, :)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Sub_area(:)
-!   Declared Parameters
-      INTEGER, SAVE, ALLOCATABLE :: Hru_subbasin(:)
 ! Control Parameters
       INTEGER, SAVE :: NsubOutVars, NsubOut_freq, NsubOut_format
       CHARACTER(LEN=36), SAVE, ALLOCATABLE :: NsubOutVar_names(:)
@@ -70,7 +68,7 @@
       USE PRMS_CONSTANTS, ONLY: ERROR_control, DAILY, YEARLY
       use PRMS_CONTROL_FILE, only: control_integer, control_string, control_string_array
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Nsub
+      USE PRMS_MODULE, ONLY: Nsub
       USE PRMS_NSUB_SUMMARY
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -99,12 +97,7 @@
         IF ( control_string(NsubOutBaseFileName, 'nsubOutBaseFileName')/=0 ) CALL read_error(5, 'nsubOutBaseFileName')
       ENDIF
 
-      ALLOCATE ( Hru_subbasin(Nhru), Sub_area(Nsub) )
-      IF ( declparam(MODNAME, 'hru_subbasin', 'nhru', 'integer', &
-     &     '0', 'bounded', 'nsub', &
-     &     'Index of subbasin assigned to each HRU', &
-     &     'Index of subbasin assigned to each HRU', &
-     &     'none')/=0 ) CALL read_error(1, 'hru_subbasin')
+      ALLOCATE ( Sub_area(Nsub) )
 
       END SUBROUTINE nsub_summarydecl
 
@@ -118,7 +111,7 @@
       use PRMS_READ_PARAM_FILE, only: getparam_int
       USE PRMS_MODULE, ONLY: Nhru, Nsub, Inputerror_flag, Start_year, Prms_warmup
       USE PRMS_NSUB_SUMMARY
-      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order
+      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, Hru_subbasin
       use prms_utils, only: error_stop, numchars, PRMS_open_output_file, read_error
       IMPLICIT NONE
 ! Local Variables
@@ -255,7 +248,6 @@
         ENDIF
       ENDDO
 
-      IF ( getparam_int(MODNAME, 'hru_subbasin', Nhru, Hru_subbasin)/=0 ) CALL read_error(2, 'hru_subbasin')
       Sub_area = 0.0D0
       DO i = 1, Active_hrus
         j = Hru_route_order(i)
@@ -291,11 +283,11 @@
       use PRMS_MMFAPI, only: getvar_dble, getvar_real
       USE PRMS_MODULE, ONLY: Nhru, Nsub, Start_month, Start_day, End_year, End_month, End_day, Nowyear, Nowmonth, Nowday
       USE PRMS_NSUB_SUMMARY
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area_dble
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area_dble, Hru_subbasin
       USE PRMS_SET_TIME, ONLY: Modays
       use prms_utils, only: read_error
       IMPLICIT NONE
-! FUNCTIONS AND SUBROUTINES
+! Functions
       INTRINSIC :: SNGL, DBLE
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day, k

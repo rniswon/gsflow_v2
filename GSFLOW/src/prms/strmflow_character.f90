@@ -87,28 +87,28 @@
       IF ( declparam( MODNAME, 'width_alpha', 'nsegment', 'real', &
      &     '7.2', '2.6', '20.2', &
      &     'Alpha coefficient in power function for width calculation', &
-     &     'Alpha coefficient in power function for width calculation (for units M and CMS)', &
+     &     'Alpha coefficient in power function for width calculation (for units m and cms)', &
      &     'meters')/=0 ) CALL read_error(1, 'width_alpha')
 
       ALLOCATE ( width_m(Nsegment) )
       IF ( declparam( MODNAME, 'width_m', 'nsegment', 'real', &
      &     '0.5', '0.48', '0.52', &
      &     'M value in power function for width calculation', &
-     &     'M value in power function for width calculation (for units M and CMS)', &
+     &     'M value in power function for width calculation (for units m and cms)', &
      &     'none')/=0 ) CALL read_error(1, 'width_m')
 
       ALLOCATE ( depth_alpha(Nsegment) )
       IF ( declparam( MODNAME, 'depth_alpha', 'nsegment', 'real', &
     &      '0.27', '0.12', '0.63', &
      &     'Alpha coefficient in power function for depth calculation', &
-     &     'Alpha coefficient in power function for depth calculation (for units M and CMS)', &
+     &     'Alpha coefficient in power function for depth calculation (for units m and cms)', &
      &     'meters')/=0 ) CALL read_error(1, 'depth_alpha')
 
       ALLOCATE ( depth_m(Nsegment) )
       IF ( declparam( MODNAME, 'depth_m', 'nsegment', 'real', &
      &     '0.39', '0.38', '0.40', &
      &     'M value in power function for depth calculation', &
-     &     'M value in power function for depth calculation (for units M and CMS)', &
+     &     'M value in power function for depth calculation (for units m and cms)', &
      &     'meters')/=0 ) CALL read_error(1, 'depth_m')
 
       END FUNCTION strmflow_character_decl
@@ -142,7 +142,7 @@
 !     strmflow_character_run - Computes streamflow characteristics
 !***********************************************************************
       INTEGER FUNCTION strmflow_character_run()
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, DNEARZERO
+      USE PRMS_CONSTANTS, ONLY: NEARZERO
       USE PRMS_MODULE, ONLY: Nsegment
       USE PRMS_STRMFLOW_CHARACTER
       USE PRMS_FLOWVARS, ONLY: Seg_outflow
@@ -157,7 +157,7 @@
       strmflow_character_run = 0
 
       DO i = 1, Nsegment
-         if (Seg_outflow(i) > DNEARZERO) then
+         if (Seg_outflow(i) > 0.0D0) then
             segflow = SNGL(Seg_outflow(i)) * CFS_TO_CMS
             Seg_width(i) = width_alpha(i) * (segflow ** width_m(i))
             Seg_depth(i) = depth_alpha(i) * (segflow ** depth_m(i))

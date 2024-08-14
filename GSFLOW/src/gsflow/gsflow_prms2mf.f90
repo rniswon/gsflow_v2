@@ -6,7 +6,7 @@
 !   Module Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW PRMS to MODFLOW'
       character(len=*), parameter :: MODNAME = 'gsflow_prms2mf'
-      character(len=*), parameter :: Version_gsflow_prms2mf = '2024-02-10'
+      character(len=*), parameter :: Version_gsflow_prms2mf = '2024-05-30'
       REAL, PARAMETER :: SZ_CHK = 0.00001
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
@@ -153,7 +153,7 @@
 !***********************************************************************
       INTEGER FUNCTION prms2mfinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_param, ACTIVE, OFF
-      USE PRMS_MODULE, ONLY: Hru_type
+      USE PRMS_MODULE, ONLY: Hru_type, one_subbasin_flag
       use PRMS_READ_PARAM_FILE, only: getparam_real
       USE GSFPRMS2MF
       USE GWFUZFMODULE, ONLY: NTRAIL, NWAV, IUZFBND
@@ -165,11 +165,11 @@
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Basin_area_inv, Hru_area
       USE PRMS_SOILZONE, ONLY: Gvr_hru_id, Gvr_hru_pct_adjusted
       use prms_utils, only: read_error
-      USE GLOBAL, ONLY: NLAY, NROW, NCOL
+      USE GLOBAL, ONLY: NLAY, NROW, NCOL, IBOUND
       IMPLICIT NONE
       INTRINSIC :: ABS, DBLE
 ! Local Variables
-      INTEGER :: is, i, ii, ierr, ihru, icell, irow, icol
+      INTEGER :: is, i, ii, ierr, ihru, icell, irow, icol, jj
 !     INTEGER :: iseg, max_seg, irch
 !     INTEGER, ALLOCATABLE, DIMENSION(:) :: nseg_rch
       DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: hru_pct, newpct
@@ -312,8 +312,16 @@
         icol = Gwc_col(icell)
         IF ( Print_debug>DEBUG_less ) THEN
           IF ( Hru_type(ihru)==0 ) THEN
-            IF ( IUZFBND(icol, irow)/=0 ) &
-     &           PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
+            IF ( IUZFBND(icol, irow)/=0 ) THEN
+              IF ( one_subbasin_flag==0 ) THEN
+                PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
+              ELSE
+                IUZFBND(icol, irow) = 0
+                DO jj = 1, NLAY
+                  IBOUND(icol, irow, jj) = 0
+                ENDDO
+              ENDIF
+            ENDIF
           ENDIF
           IF ( IUZFBND(icol, irow)==0 ) THEN
             IF ( Hru_type(ihru) > 0 ) then
@@ -400,7 +408,7 @@
 !***********************************************************************
       INTEGER FUNCTION prms2mfrun()
       USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Dprst_flag, Ag_package, Hru_type
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Dprst_flag, Ag_package, Hru_type, activeHRU_inactiveCELL_flag
       USE GSFPRMS2MF
       USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3_sngl, Gwc_row, Gwc_col, Mft_to_days
       USE GLOBAL, ONLY: IBOUND
@@ -409,7 +417,7 @@
       USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK !, NLAKES
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Lake_hru_id !, Lake_area
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
-      USE PRMS_FLOWVARS, ONLY: Hru_actet
+      USE PRMS_FLOWVARS, ONLY: Hru_actet, Gw_upslope
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
       USE PRMS_SOILZONE, ONLY: Sm2gw_grav, Lakein_sz, Hrucheck, Gvr_hru_id, Unused_potet, Gvr_hru_pct_adjusted
       IMPLICIT NONE
@@ -419,6 +427,7 @@
 ! Local Variables
       INTEGER :: irow, icol, ik, jk, ii, ilake
       INTEGER :: j, icell, ihru, is_draining
+      REAL :: avail_h2o
 !***********************************************************************
       prms2mfrun = 0
 
@@ -464,6 +473,12 @@
       Cell_drain_rate = 0.0 ! should just be active cells
       finf_cell = 0.0
       Gw_rejected_grav = Sm2gw_grav ! assume all is rejected to start with
+      IF ( activeHRU_inactiveCELL_flag == ACTIVE ) THEN
+        DO j = 1, Active_hrus
+          ihru = Hru_route_order(j)
+          IF ( activeHRU_inactiveCell(ihru) == 0 ) Gw_rejected_grav(ihru) = Gw_rejected_grav(ihru) + Gw_upslope(ihru)
+        ENDDO
+      ENDIF
       is_draining = 0
 
       DO j = 1, Nhrucell
@@ -487,10 +502,14 @@
 ! If UZF cell is inactive OR if too many waves then dump water back into
 ! the soilzone
 !-----------------------------------------------------------------------
-        IF ( Sm2gw_grav(j)>0.0 ) THEN
+        avail_h2o = Sm2gw_grav(j)
+        IF ( activeHRU_inactiveCELL_flag == ACTIVE ) THEN
+          IF ( activeHRU_inactiveCell(j) == 0 ) avail_h2o = avail_h2o + Gw_upslope(j)
+        ENDIF
+        IF ( avail_h2o>0.0 ) THEN
 
           IF ( IUZFOPT==0 ) THEN !ERIC 20210107: NWAVST is dimensioned (1, 1) if IUZFOPT == 0.
-            Cell_drain_rate(icell) = Cell_drain_rate(icell) + Sm2gw_grav(j)*Gvr2cell_conv(j)
+            Cell_drain_rate(icell) = Cell_drain_rate(icell) + avail_h2o*Gvr2cell_conv(j)
             Gw_rejected_grav(j) = 0.0
             is_draining = 1
 
@@ -498,7 +517,7 @@
 !-----------------------------------------------------------------------
 ! Convert drainage from inches to MF Length/Time
 !-----------------------------------------------------------------------
-            Cell_drain_rate(icell) = Cell_drain_rate(icell) + Sm2gw_grav(j)*Gvr2cell_conv(j)
+            Cell_drain_rate(icell) = Cell_drain_rate(icell) + avail_h2o*Gvr2cell_conv(j)
             Gw_rejected_grav(j) = 0.0
             is_draining = 1
           ENDIF

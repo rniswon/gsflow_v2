@@ -24,7 +24,7 @@
       character(len=*), parameter :: MODDESC =
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'xyz_dist'
-      character(len=*), parameter :: Version_xyz_dist = '2023-11-01'
+      character(len=*), parameter :: Version_xyz_dist = '2024-04-30'
       INTEGER, SAVE :: Nlapse, Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Basin_centroid_x, Basin_centroid_y
@@ -716,7 +716,7 @@
       SUBROUTINE xyz_temp_run(Max_lapse, Min_lapse, Meantmax, Meantmin,
      +                        Temp_meanx, Temp_meany, Temp_meanz)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, DNEARZERO, GLACIER
-      USE PRMS_MODULE, ONLY: Glacier_flag, Nrain, Nowmonth, Hru_type
+      USE PRMS_MODULE, ONLY: Glacier_flag, Nrain, Hru_type, Nowmonth
       USE PRMS_XYZ_DIST, ONLY: MRUx, MRUy, Tmax_rain_sta, Solradelev,
      +    Tmin_rain_sta, Temp_nuse, Tmin_add, Tmin_div, Tmax_add,
      +    Tmax_div, Temp_nsta, X_div, Y_div, Z_div, X_add, Y_add, Z_add,
@@ -963,7 +963,7 @@
      +    Tmax_allsnow_dist, Tmax_allrain_dist, Adjust_snow, Adjust_rain
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus,
      +    Hru_route_order
-      USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Tminf, Newsnow, Pptmix,
+      USE PRMS_CLIMATEVARS, ONLY: Tmaxf, Tminf, Tavgf, Newsnow, Pptmix,
      +    Hru_ppt, Hru_rain, Hru_snow, Basin_rain,
      +    Basin_ppt, Prmx, Basin_snow, Psta_elev, Basin_obs_ppt,
      +    Precip_units, Tmax_allsnow_f, Adjmix_rain, Tmax_allrain_f
@@ -1152,7 +1152,7 @@
           IF ( ppt>NEARZERO ) THEN
             IF ( Precip_units==MM ) ppt = ppt*MM2INCH
             CALL precip_form(ppt, Hru_ppt(i), Hru_rain(i),
-     +           Hru_snow(i), Tmaxf(i), Tminf(i), Pptmix(i),
+     +           Hru_snow(i), Tmaxf(i), Tminf(i), Tavgf(i), Pptmix(i),
      +           Newsnow(i), Prmx(i), Tmax_allrain_f(i,Nowmonth), 1.0,
      +           1.0, Adjmix_rain(i,Nowmonth), Hru_area(i), sum_obs,
      +           Tmax_allsnow_f(i,Nowmonth), i)

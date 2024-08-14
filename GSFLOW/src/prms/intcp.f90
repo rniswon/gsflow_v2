@@ -8,7 +8,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Canopy Interception'
       character(len=5), parameter :: MODNAME = 'intcp'
-      character(len=*), parameter :: Version_intcp = '2024-01-10'
+      character(len=*), parameter :: Version_intcp = '2024-04-04'
       DOUBLE PRECISION, SAVE :: Last_basin_intcp_stor
       INTEGER, SAVE :: Use_transfer_intcp
       INTEGER, PARAMETER :: RAIN = 0, SNOW = 1
@@ -258,10 +258,10 @@
 !              and evaporation for each HRU
 !***********************************************************************
       INTEGER FUNCTION intrun()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, ZERO_SNOWPACK, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, NEARZERO, ZERO_SNOWPACK, &
      &    DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param, CANOPY
-      USE PRMS_MODULE, ONLY: Print_debug, Nowyear, Nowmonth, Nowday, &
-     &    Ag_package, Hru_ag_irr, irrigation_apply_flag, Hru_type, PRMS_land_iteration_flag, Kkiter
+      USE PRMS_MODULE, ONLY: Print_debug, PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Nowday, &
+     &    Ag_package, Hru_ag_irr, irrigation_apply_flag, Hru_type
       USE PRMS_INTCP
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Covden_win, Covden_sum, &
      &    Hru_route_order, Hru_area, Cov_type, Ag_frac, gsflow_ag_area !, Ag_cov_type
@@ -269,8 +269,8 @@
 ! Newsnow and Pptmix can be modfied, WARNING!!!
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, &
      &    Hru_snow, Transp_on, Potet, Use_pandata, Hru_pansta, Epan_coef, Potet_sublim
-      USE PRMS_FLOWVARS, ONLY: Intcp_transp_on, Intcp_stor, Hru_intcpstor
-      USE PRMS_IT0_VARS, ONLY: It0_pkwater_equiv, It0_hru_intcpstor, It0_intcp_transp_on, It0_intcp_stor
+      USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Intcp_transp_on, Intcp_stor, Hru_intcpstor
+      USE PRMS_IT0_VARS, ONLY: It0_hru_intcpstor, It0_intcp_transp_on, It0_intcp_stor
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_OBS, ONLY: Pan_evap
       use prms_utils, only: error_stop
@@ -286,7 +286,7 @@
 !***********************************************************************
       intrun = 0
 
-      ! It0_pkwater_equiv is from last time step
+      ! pkwater_equiv is from last time step
       IF ( PRMS_land_iteration_flag==CANOPY ) THEN
         IF ( Kkiter>1 ) THEN
           Intcp_stor = It0_intcp_stor
@@ -407,7 +407,7 @@
               ELSEIF ( Cov_type(i)==GRASSES ) THEN ! cov_type = 1
                 !rsr, 03/24/2008 intercept rain on snow-free grass,
                 !rsr             when not a mixed event
-                IF ( It0_pkwater_equiv(i)<ZERO_SNOWPACK .AND. .not.(netsnow>0.0) ) THEN ! changed from NEARZERO to .not.>0 02/17/2024
+                IF ( Pkwater_equiv(i)<ZERO_SNOWPACK .AND. netsnow<NEARZERO ) THEN
                   CALL intercept(Hru_rain(i), stor_max_rain, cov, intcpstor, netrain)
                   !rsr 03/24/2008
                   !it was decided to leave the water in intcpstor rather
@@ -426,7 +426,7 @@
             IF ( cov>0.0 ) THEN
               IF ( Cov_type(i)>GRASSES ) THEN ! cov_type > 1
                 CALL intercept(Hru_snow(i), Snow_intcp(i), cov, intcpstor, netsnow)
-                IF ( .not.(netsnow>0.0) ) THEN   !rsr, added 3/9/2006, changed from NEARZERO to .not.>0 02/17/2024
+                IF ( netsnow<NEARZERO ) THEN   !rsr, added 3/9/2006
                   netrain = netrain + netsnow
                   netsnow = 0.0
                   Newsnow(i) = OFF
@@ -492,7 +492,7 @@
 
         ! if precipitation assume no evaporation or sublimation
         IF ( intcpstor>0.0 ) THEN
-          IF ( .not.(Hru_ppt(i)>0.0) ) THEN ! changed from NEARZERO to .not.>0 01/17/2024
+          IF ( Hru_ppt(i)<NEARZERO ) THEN
 
             evrn = Potet(i)/Epan_coef(i, Nowmonth)
             evsn = Potet_sublim(i)*Potet(i)
@@ -543,9 +543,10 @@
         IF ( intcpstor>0.0 ) Intcp_on(i) = ACTIVE
         Hru_intcpstor(i) = intcpstor*cov
         Intcp_changeover(i) = changeover + extra_water
-        Net_rain(i) = netrain
+        IF ( Intcp_changeover(i)>0.0 .AND. netsnow>0.0 ) Pptmix(i) = ACTIVE
+        Net_rain(i) = netrain + Intcp_changeover(i) ! 4/2/2024 ***CAUTION*** adding changeover to net_rain
         Net_snow(i) = netsnow
-        Net_ppt(i) = netrain + netsnow
+        Net_ppt(i) = Net_rain(i) + netsnow
 
         !rsr, question about depression storage for basin_net_ppt???
         !     my assumption is that cover density is for the whole HRU
@@ -554,8 +555,8 @@
         Basin_net_rain = Basin_net_rain + DBLE( Net_rain(i)*harea )
         Basin_intcp_stor = Basin_intcp_stor + DBLE( intcpstor*cov*harea )
         Basin_intcp_evap = Basin_intcp_evap + DBLE( intcpevap*cov*harea )
-        IF ( changeover>0.0 ) THEN
-          IF ( Print_debug>DEBUG_less ) PRINT '(A,F0.5,A,4(1X,I0))', 'Change over storage:', changeover, '; HRU:', i, &
+        IF ( Intcp_changeover(i)>0.0 ) THEN
+          IF ( Print_debug>DEBUG_less ) PRINT '(A,F0.5,A,4(1X,I0))', 'Change over storage added to net_rain:', Intcp_changeover(i), '; HRU:', i, &
      &                                                               Nowyear, Nowmonth, Nowday
           Basin_changeover = Basin_changeover + DBLE( Intcp_changeover(i)*harea )
         ENDIF

@@ -611,7 +611,7 @@
       USE PRMS_FLOWVARS, ONLY: Seg_outflow, Basin_lake_stor, Lake_vol
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_ROUTING, ONLY: Basin_segment_storage, Segment_type, Hru_segment
-      use prms_utils, only: error_stop, read_error
+      use prms_utils, only: error_stop, read_error, checkdim_param_limits
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, NINT, DBLE, DABS
@@ -714,7 +714,7 @@
         IF ( getparam_real(MODNAME, 'tbl_gate', Ngate, Tbl_gate)/=0 ) CALL read_error(2, 'tbl_gate')
         IF ( getparam_int(MODNAME, 'ratetbl_lake', Nratetbl, Ratetbl_lake)/=0 ) CALL read_error(2, 'ratetbl_lake')
         IF ( Gate_flag==1 ) THEN
-          IF ( getparam_int(MODNAME, 'lake_out2', Nlake, Lake_out2)/=0  ) CALL read_error(2, 'lake_out2')
+          IF ( getparam_int(MODNAME, 'lake_out2', Nlake, Lake_out2)/=0 ) CALL read_error(2, 'lake_out2')
           DO j = 1, Nlake
             IF ( Lake_out2(j)==1 ) Secondoutflow_flag = ACTIVE
           ENDDO
@@ -828,10 +828,8 @@
 !            ENDIF
 !          ENDIF
         ELSEIF ( Lake_type(j)==6 ) THEN
-          IF ( Obsout_lake(j)==0 .OR. Obsout_lake(j)>Nobs ) THEN
-            PRINT *, 'ERROR, obsout_lake value = 0 or > nobs for lake:', j, Obsout_lake(j)
-            ierr = 1
-          ENDIF
+          IF ( Obsout_lake(j)==0 .OR. Obsout_lake(j)>Nobs ) &
+               CALL checkdim_param_limits(j, 'obsout_lake', 'nobs', Obsout_lake(i), 1, Nobs, ierr)
         ENDIF
         IF ( ierr==1 ) THEN
           Inputerror_flag = 1
@@ -874,7 +872,7 @@
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_cms, Basin_gwflow_cfs, Basin_ssflow_cfs, &
      &    Basin_stflow_out, Basin_cfs, Basin_stflow_in, Basin_sroff_cfs, Seg_inflow, Seg_outflow, &
-     &    Seg_upstream_inflow, Seg_lateral_inflow, Flow_out, Basin_lake_stor, Hru_actet, Lake_vol, Basin_sroff
+     &    Seg_upstream_inflow, Seg_lateral_inflow, Flow_out, Basin_lake_stor, Hru_actet, Lake_vol, Basin_sroff, Gw_upslope
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_WATER_USE, ONLY: Lake_transfer, Lake_gain
@@ -885,7 +883,7 @@
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
       USE PRMS_GLACR, ONLY: Basin_gl_top_melt, Basin_gl_ice_melt
       USE PRMS_SOILZONE, ONLY: Upslope_dunnianflow, Upslope_interflow
-      USE PRMS_GWFLOW, ONLY: Basin_gwflow, Lake_seepage, Gw_seep_lakein, Gw_upslope
+      USE PRMS_GWFLOW, ONLY: Basin_gwflow, Lake_seepage, Gw_seep_lakein
       use prms_utils, only: error_stop
       IMPLICIT NONE
 ! Functions
