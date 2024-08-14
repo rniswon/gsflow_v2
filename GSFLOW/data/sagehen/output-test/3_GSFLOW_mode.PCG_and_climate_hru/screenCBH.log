@@ -22,9 +22,8 @@ Control File: .\gsflow_climate_hru.control
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
-                        Github Commit Hash 89c4762 master branch
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13 10:02:23
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  8:07:44
 
 
 ==========================================================================
@@ -89,8 +88,8 @@ Simulation time period: 1980/10/01 - 1996/09/30
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/13 10:18:06
- Elapsed run time: 15 Minutes, 43.230 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/14  8:22:56
+ Elapsed run time: 15 Minutes, 11.175 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         63717;  SZ iterations:           63680

@@ -35,7 +35,6 @@ Control File: .\Sagehen_ponds.control
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash 89c4762 master branch
 
 --------------------------------------------------------------------
         Process            Available Modules
@@ -69,9 +68,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash 89c4762 master branch
+Github Commit Hash b7b217f master branch
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13  8:07:48
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  7:45:58
 
 
 ==========================================================================
@@ -726,8 +725,8 @@ Date: 1995/10/01; Stress: 62; Step: 1; Simulation step: 1827
                   MF iterations: 6; SZ iterations: 6
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/13  8:09:58
- Elapsed run time: 2 Minutes, 9.452 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/14  7:48:08
+ Elapsed run time: 2 Minutes, 10.228 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
  MF iterations:         11894;  SZ iterations:           11865

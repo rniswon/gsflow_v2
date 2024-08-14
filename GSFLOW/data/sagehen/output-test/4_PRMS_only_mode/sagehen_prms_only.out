@@ -62,9 +62,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash 89c4762 master branch
+Github Commit Hash b7b217f master branch
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13  8:32:44
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  7:11:31
 
 ==========================================================================
 Using PRMS Data File: ..\input\prms\sagehen.data
@@ -118,7 +118,7 @@ Snow Dynamics                   snowcomp            2024-04-30
 Surface Runoff                  srunoff_smidx       2024-04-04
 Soilzone Computations           soilzone            2024-06-20
 Groundwater                     gwflow              2024-05-30
-Streamflow Routing Init         routing             2024-02-09
+Streamflow Routing Init         routing             2024-08-13
 Streamflow Routing              strmflow_in_out     2024-01-11
 Output Summary                  basin_sum           2024-04-30
 Output Summary                  subbasin            2023-11-01
@@ -164,5 +164,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  **************************************************************
  Total for run     668.938  375.572     9.202  287.264  260.348
  **************************************************************
-Execution elapsed time:     0 minutes  1.15 seconds
+Execution elapsed time:     0 minutes  0.99 seconds
 

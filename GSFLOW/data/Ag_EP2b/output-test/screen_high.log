@@ -35,7 +35,6 @@ Control File: .\gsflow_gsflow_HighTrig.control
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash 89c4762 master branch
 
 --------------------------------------------------------------------
         Process            Available Modules
@@ -69,9 +68,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash 89c4762 master branch
+Github Commit Hash b7b217f master branch
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13  7:51:02
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  7:46:11
 
 
 ==========================================================================
@@ -1052,8 +1051,8 @@ Date: 2000/10/01; Stress: 122; Step: 1; Simulation step: 3654
                   MF iterations: 7; SZ iterations: 7
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/13  7:56:03
- Elapsed run time: 5 Minutes, 0.175 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/14  7:51:12
+ Elapsed run time: 5 Minutes, 0.927 Seconds
 
  Number of time steps:   3684;  Number of non-convergence:   0
  MF iterations:         23885;  SZ iterations:           23240

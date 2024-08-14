@@ -56,9 +56,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash 89c4762 master branch
+Github Commit Hash b7b217f master branch
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13  8:11:03
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  7:42:34
 
 ==========================================================================
 Using PRMS Data File: .\input\acf.data
@@ -401,7 +401,7 @@ Snow Dynamics                   snowcomp            2024-04-30
 Surface Runoff                  srunoff_smidx       2024-04-04
 Soilzone Computations           soilzone            2024-06-20
 Groundwater                     gwflow              2024-05-30
-Streamflow Routing Init         routing             2024-02-09
+Streamflow Routing Init         routing             2024-08-13
 Streamflow Routing              muskingum           2023-11-01
 Output Summary                  basin_sum           2024-04-30
 Water Balance Computations      water_balance       2024-04-04
@@ -1241,5 +1241,5 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
  ***************************************
  Total for run        159.12    22642.64
  ***************************************
-Execution elapsed time:     0 minutes  0.55 seconds
+Execution elapsed time:     0 minutes  0.58 seconds
 

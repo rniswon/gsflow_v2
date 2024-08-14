@@ -21,9 +21,8 @@ Control File: .\gsflow_gsflowLowKc.control
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
-                        Github Commit Hash 89c4762 master branch
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13  8:20:40
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  7:48:12
 
 
 ==========================================================================
@@ -94,8 +93,8 @@ Simulation time period: 1990/10/01 - 1995/10/31
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/13  8:22:54
- Elapsed run time: 2 Minutes, 13.642 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/14  7:50:19
+ Elapsed run time: 2 Minutes, 6.389 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
  MF iterations:         11661;  SZ iterations:           11615

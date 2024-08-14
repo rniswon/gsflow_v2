@@ -60,7 +60,6 @@ PRMS command line argument 24: ..\output\PRMS\prms_ic_1
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash 89c4762 master branch
 
 --------------------------------------------------------------------
         Process            Available Modules
@@ -94,9 +93,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash 89c4762 master branch
+Github Commit Hash b7b217f master branch
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13  9:58:16
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  8:08:01
 
 
 ==========================================================================
@@ -4083,8 +4082,8 @@ Date: 1983/09/01; Stress: 1; Step: 1066; Simulation step: 1066
                   MF iterations: 23; SZ iterations: 23
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/13 10:14:34
- Elapsed run time: 16 Minutes, 17.286 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/14  8:23:54
+ Elapsed run time: 15 Minutes, 52.634 Seconds
 
  Number of time steps:   1066;  Number of non-convergence:   0
  MF iterations:         21027;  SZ iterations:           21063

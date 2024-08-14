@@ -1,6 +1,5 @@
 @ECHO OFF
 ..\..\bin\gsflow .\control\control > .\output\screen.log
-copy dynamic_soil_parameter.out .\output
-del dynamic_soil_parameter.out
+move /y dynamic_soil_parameter.out .\output
 ECHO.
 ECHO Run complete.
