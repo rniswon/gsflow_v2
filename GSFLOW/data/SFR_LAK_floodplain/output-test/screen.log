@@ -17,9 +17,9 @@ Control File: .\gsflow_modflow_fp.control
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
- Run start date and time (yyyy/mm/dd hh:mm:ss): 2024/05/21 10:20:58
+ Run start date and time (yyyy/mm/dd hh:mm:ss): 2024/08/13  7:53:07
 
-GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
+GSFLOW MODFLOW main             gsflow_modflow      2024-06-01
 ==============================================================
 MODFLOW Packages
 ==============================================================
@@ -33,8 +33,8 @@ LAK-NWT Package                 gwf2lak7_NWT        2021-09-28
 Steady state simulation successful, used 5 iterations
   
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/05/21 10:20:59
- Elapsed run time: 1.071 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/13  7:53:08
+ Elapsed run time: 1.005 Seconds
 
  Normal termination of simulation
 

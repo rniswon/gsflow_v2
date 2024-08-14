@@ -1,8 +1,8 @@
 ==========================================================================
 Command line: 
-..\..\bin\gsflow  -C.\control\mercdXYZ.control -set print_debug 1
+..\..\bin\gsflow  -C.\control\mercdXYZ.control
 
-number of command line words: 5
+number of command line words: 2
 
 Executable: ..\..\bin\gsflow
 
@@ -10,59 +10,12 @@ Executable: ..\..\bin\gsflow
 Control File: .\control\mercdXYZ.control
  WARNING, control parameter not used: aniOutON_OFF, ignored
 ==========================================================================
-PRMS command line argument 2: -set
-PRMS command line argument 3: print_debug
-PRMS command line argument 4: 1
-==========================================================================
-
-
-                          U.S. Geological Survey
-        Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.4.0 05/01/2024
-
-    An integration of the Precipitation-Runoff Modeling System (PRMS)
-    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
-
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 05/01/2024
+                       Version 6.0.0 09/01/2024
 
---------------------------------------------------------------------
-        Process            Available Modules
---------------------------------------------------------------------
-  Basin Definition: basin
-    Cascading Flow: cascade
-  Time Series Data: obs, water_use_read, dynamic_param_read
-                    dynamic_soil_param_read
-   Potet Solar Rad: soltab
-  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,
-                    temp_map
-       Precip Dist: precip_1sta, precip_laps, precip_dist2,
-                    climate_hru, precip_map
-Temp & Precip Dist: xyz_dist, ide_dist
-    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
-Transpiration Dist: transp_tindex, climate_hru, transp_frost
-      Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
-                    potet_hs, potet_pt, potet_pm, potet_pm_sta
-      Interception: intcp
-Snow & Glacr Dynam: snowcomp, glacr_melt
-    Surface Runoff: srunoff_smidx, srunoff_carea
-         Soil Zone: soilzone, soilzone_ag
-       Groundwater: gwflow
-Streamflow Routing: strmflow, strmflow_in_out, muskingum,
-                    muskingum_lake, muskingum_mann, segment_to_hru
-Streamflow Charact: strmflow_character
-Stream Temperature: stream_temp
-    Output Summary: basin_sum, subbasin, map_results, prms_summary,
-                    nhru_summary, nsub_summary, water_balance
-                    basin_summary, nsegment_summary, statvar_out
-     Preprocessing: write_climate_hru, frost_date
---------------------------------------------------------------------
-
-Github Commit Hash 62761520d4284c8e7d0114d7d16c69c508494832 [6276152] branch 5.2.2.2
-
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:36:54
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13  7:58:11
 
 
 ==========================================================================
@@ -75,12 +28,12 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 --------------------------------------------------------------------
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2024-05-01
-Read Control File               read_control_file   2024-03-01
-Read Parameter File             read_parameter_file 2024-03-01
+PRMS Computation Order          gsflow_prms         2024-09-01
+Read Control File               read_control_file   2024-08-01
+Read Parameter File             read_parameter_file 2024-06-21
 Read Data File                  read_data_file      2023-06-02
-Basin Definition                basin               2024-04-04
-Common States and Fluxes        climateflow         2024-04-30
+Basin Definition                basin               2024-08-09
+Common States and Fluxes        climateflow         2024-08-09
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
@@ -91,18 +44,13 @@ Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
 Snow Dynamics                   snowcomp            2024-04-30
 Surface Runoff                  srunoff_smidx       2024-04-04
-Soilzone Computations           soilzone            2024-05-24
-Groundwater                     gwflow              2024-01-22
+Soilzone Computations           soilzone            2024-06-20
+Groundwater                     gwflow              2024-05-30
 Streamflow Routing              strmflow            2020-08-03
 Output Summary                  basin_sum           2024-04-30
-Water Balance Computations      water_balance       2024-04-04
 Statistics Variables Output     statvar_out         2021-09-08
 Output Summary                  prms_summary        2024-04-30
 ==============================================================
-
-Using Control File: .\control\mercdXYZ.control
-
-Using Parameter File: ./input/mercdXYZ.param
 
 Writing PRMS Water Budget File: ./output/prmsXYZ.out
   
@@ -112,69 +60,4 @@ Writing PRMS Water Budget File: ./output/prmsXYZ.out
 Simulation time period: 1993/10/01 - 1995/09/30
 
 ==========================================================================
-
-Change over storage added to net_rain:.00030; HRU: 1 1994 10 1
-Change over storage added to net_rain:.00408; HRU: 2 1994 10 1
-Change over storage added to net_rain:.00099; HRU: 5 1994 10 1
-Change over storage added to net_rain:.00031; HRU: 6 1994 10 1
-Change over storage added to net_rain:.00146; HRU: 7 1994 10 1
-Change over storage added to net_rain:.00055; HRU: 8 1994 10 1
-Change over storage added to net_rain:.00402; HRU: 10 1994 10 1
-Change over storage added to net_rain:.00036; HRU: 11 1994 10 1
-Change over storage added to net_rain:.00044; HRU: 14 1994 10 1
-Change over storage added to net_rain:.00057; HRU: 15 1994 10 1
-Change over storage added to net_rain:.00069; HRU: 16 1994 10 1
-Change over storage added to net_rain:.00228; HRU: 17 1994 10 1
-Change over storage added to net_rain:.00086; HRU: 19 1994 10 1
-Change over storage added to net_rain:.00003; HRU: 20 1994 10 1
-Change over storage added to net_rain:.00170; HRU: 21 1994 10 1
-Change over storage added to net_rain:.00094; HRU: 23 1994 10 1
-Change over storage added to net_rain:.00020; HRU: 29 1994 10 1
-Change over storage added to net_rain:.00217; HRU: 38 1994 10 1
-Change over storage added to net_rain:.00006; HRU: 39 1994 10 1
-Change over storage added to net_rain:.00350; HRU: 46 1994 10 1
-Change over storage added to net_rain:.00006; HRU: 47 1994 10 1
-Change over storage added to net_rain:.00177; HRU: 49 1994 10 1
-Change over storage added to net_rain:.00084; HRU: 50 1994 10 1
-Change over storage added to net_rain:.00309; HRU: 55 1994 10 1
-Change over storage added to net_rain:.00301; HRU: 57 1994 10 1
-Change over storage added to net_rain:.00060; HRU: 58 1994 10 1
-Change over storage added to net_rain:.00046; HRU: 59 1994 10 1
-Change over storage added to net_rain:.00195; HRU: 60 1994 10 1
-Change over storage added to net_rain:.00354; HRU: 61 1994 10 1
-Change over storage added to net_rain:.00047; HRU: 64 1994 10 1
-Change over storage added to net_rain:.00045; HRU: 65 1994 10 1
-Change over storage added to net_rain:.00298; HRU: 66 1994 10 1
-Change over storage added to net_rain:.00302; HRU: 67 1994 10 1
-Change over storage added to net_rain:.00079; HRU: 68 1994 10 1
-Change over storage added to net_rain:.00069; HRU: 69 1994 10 1
-Change over storage added to net_rain:.00106; HRU: 70 1994 10 1
-Change over storage added to net_rain:.00239; HRU: 72 1994 10 1
-Change over storage added to net_rain:.00127; HRU: 73 1994 10 1
-Change over storage added to net_rain:.00138; HRU: 74 1994 10 1
-Change over storage added to net_rain:.00012; HRU: 76 1994 10 1
-Change over storage added to net_rain:.00402; HRU: 77 1994 10 1
-Change over storage added to net_rain:.00070; HRU: 78 1994 10 1
-Change over storage added to net_rain:.00187; HRU: 81 1994 10 1
-Change over storage added to net_rain:.00040; HRU: 82 1994 10 1
-Change over storage added to net_rain:.00004; HRU: 83 1994 10 1
-Change over storage added to net_rain:.00115; HRU: 84 1994 10 1
-Change over storage added to net_rain:.00070; HRU: 85 1994 10 1
-Change over storage added to net_rain:.00085; HRU: 86 1994 10 1
-Change over storage added to net_rain:.00085; HRU: 87 1994 10 1
-Change over storage added to net_rain:.00099; HRU: 88 1994 10 1
-Change over storage added to net_rain:.00172; HRU: 89 1994 10 1
-Change over storage added to net_rain:.00098; HRU: 90 1994 10 1
-
-                          =========================
-                          Normal completion of PRMS
-                          =========================
-
-
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:36:54
-
-
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:36:54
-
-Execution elapsed time    0 minutes  0.20 seconds
 

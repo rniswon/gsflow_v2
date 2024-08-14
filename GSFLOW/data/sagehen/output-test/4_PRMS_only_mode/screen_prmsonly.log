@@ -1,23 +1,18 @@
 ==========================================================================
 Command line: 
-..\..\..\bin\gsflow  .\prms.control -set print_debug 1
+..\..\..\bin\gsflow  .\prms.control
 
-number of command line words: 5
+number of command line words: 2
 
 Executable: ..\..\..\bin\gsflow
 
 ==========================================================================
 Control File: .\prms.control
 ==========================================================================
-PRMS command line argument 2: -set
-PRMS command line argument 3: print_debug
-PRMS command line argument 4: 1
-==========================================================================
-
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.4.0 05/01/2024
+                         Version: 2.4.0 09/01/2024
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
@@ -25,7 +20,7 @@ PRMS command line argument 4: 1
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 05/01/2024
+                       Version 6.0.0 09/01/2024
 
 --------------------------------------------------------------------
         Process            Available Modules
@@ -59,9 +54,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash 62761520d4284c8e7d0114d7d16c69c508494832 [6276152] branch 5.2.2.2
+Github Commit Hash 89c4762 master branch
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:04:37
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13  8:32:44
 
 
 ==========================================================================
@@ -74,13 +69,13 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 --------------------------------------------------------------------
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2024-05-01
-Read Control File               read_control_file   2024-03-01
-Read Parameter File             read_parameter_file 2024-03-01
+PRMS Computation Order          gsflow_prms         2024-09-01
+Read Control File               read_control_file   2024-08-01
+Read Parameter File             read_parameter_file 2024-06-21
 Read Data File                  read_data_file      2023-06-02
-Basin Definition                basin               2024-04-04
+Basin Definition                basin               2024-08-09
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-04-30
+Common States and Fluxes        climateflow         2024-08-09
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
@@ -92,12 +87,11 @@ Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
 Snow Dynamics                   snowcomp            2024-04-30
 Surface Runoff                  srunoff_smidx       2024-04-04
-Soilzone Computations           soilzone            2024-05-24
-Groundwater                     gwflow              2024-01-22
+Soilzone Computations           soilzone            2024-06-20
+Groundwater                     gwflow              2024-05-30
 Streamflow Routing Init         routing             2024-02-09
 Streamflow Routing              strmflow_in_out     2024-01-11
 Output Summary                  basin_sum           2024-04-30
-Water Balance Computations      water_balance       2024-04-04
 Output Summary                  subbasin            2023-11-01
 Output Summary                  nhru_summary        2024-04-04
 Output Summary                  basin_summary       2021-08-13
@@ -113,6 +107,8 @@ Writing PRMS Water Budget File: ..\output\prms\sagehen_prms_only.out
   
  WARNING, parameter: pref_flow_infil_frac is not specified
           Set to default value:  -1.000000    
+ WARNING, parameter: cascade_min is not specified
+          Set to default value:  1.0000000E-06
 
 Simulation time period: 1980/10/01 - 1996/09/30
 
@@ -124,10 +120,10 @@ Simulation time period: 1980/10/01 - 1996/09/30
                           =========================
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:04:37
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13  8:32:44
 
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:04:39
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13  8:32:45
 
-Execution elapsed time    0 minutes  1.32 seconds
+Execution elapsed time    0 minutes  1.15 seconds
 

@@ -77,7 +77,7 @@
      UNSATURATED ZONE =         -10105.64       UNSATURATED ZONE =          -5043.96
        SATURATED ZONE =         -16119.41         SATURATED ZONE =          -8488.58
 
- OVERALL BUDGET ERROR =        -583693.59           BUDGET ERROR =             -2.12
+ OVERALL BUDGET ERROR =        -583693.60           BUDGET ERROR =             -2.12
 
   ***WARNING, CUMULATIVE VOLUME OFF > 5%
 
@@ -163,7 +163,7 @@
      UNSATURATED ZONE =         -19784.11       UNSATURATED ZONE =          -4792.35
        SATURATED ZONE =         -34183.50         SATURATED ZONE =          -9014.23
 
- OVERALL BUDGET ERROR =        -583697.69           BUDGET ERROR =             -1.99
+ OVERALL BUDGET ERROR =        -583697.70           BUDGET ERROR =             -1.99
 
   ***WARNING, CUMULATIVE VOLUME OFF > 5%
 
@@ -245,11 +245,11 @@
  TOTAL STORAGE CHANGE =         654122.54         STORAGE CHANGE =          65763.78
        --------------                             --------------
          LAND SURFACE =         539320.61           LAND SURFACE =          27039.52
-            SOIL ZONE =         196275.08              SOIL ZONE =          52243.13
+            SOIL ZONE =         196275.09              SOIL ZONE =          52243.14
      UNSATURATED ZONE =         -29396.89       UNSATURATED ZONE =          -4720.24
        SATURATED ZONE =         -52076.27         SATURATED ZONE =          -8798.63
 
- OVERALL BUDGET ERROR =        -583701.66           BUDGET ERROR =             -2.15
+ OVERALL BUDGET ERROR =        -583701.67           BUDGET ERROR =             -2.15
 
   ***WARNING, CUMULATIVE VOLUME OFF > 5%
 

@@ -23,7 +23,7 @@ C     ******************************************************************
 !     ------------------------------------------------------------------
       USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
-     +                       , githash
+!     +                       , githash
       USE GSFMODFLOW
       IMPLICIT NONE
 !***********************************************************************
@@ -45,7 +45,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
      &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,',
      &        /, 25X, 'AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
 
-        WRITE(*,'(24X,A)') githash
+!        WRITE(*,'(24X,A)') githash
 
         ! Allocate local module variables
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )

@@ -18,4 +18,5 @@ data 80  ..\output\modflow\sagehen_sfrseg13.out
 data 81  ..\output\modflow\sagehen_sfrseg15.out
 data 82  ..\output\modflow\sagehen_sfrseg16.out
 data 83  ..\output\modflow\sagehen_sfrseg17.out
-DATA(BINARY) 101 ..\output\modflow\uzfbudget.out
+DATA(BINARY) 101 ..\output\modflow\uzfbudget2.out
+DATA(BINARY) 70 ..\output\modflow\uzfbudget1.out

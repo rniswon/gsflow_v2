@@ -67,10 +67,10 @@
      GW BOUNDARY FLOW =           1435.32       GW BOUNDARY FLOW =            717.61
                 WELLS =           2682.94                  WELLS =           1327.96
 
-   INFLOWS - OUTFLOWS =        -154338.34     INFLOWS - OUTFLOWS =         -65557.57
+   INFLOWS - OUTFLOWS =        -154338.34     INFLOWS - OUTFLOWS =         -65557.56
              --------                                   --------
 
- TOTAL STORAGE CHANGE =         337375.74         STORAGE CHANGE =         -65555.73
+ TOTAL STORAGE CHANGE =         337375.74         STORAGE CHANGE =         -65555.72
        --------------                             --------------
          LAND SURFACE =         479283.40           LAND SURFACE =          -5362.57
             SOIL ZONE =        -112499.95              SOIL ZONE =         -45301.88
@@ -161,7 +161,7 @@
          LAND SURFACE =         472712.18           LAND SURFACE =          -1493.27
             SOIL ZONE =        -151439.00              SOIL ZONE =         -18881.05
      UNSATURATED ZONE =         -20801.94       UNSATURATED ZONE =          -5508.94
-       SATURATED ZONE =         -39032.96         SATURATED ZONE =          -9795.66
+       SATURATED ZONE =         -39032.96         SATURATED ZONE =          -9795.67
 
  OVERALL BUDGET ERROR =        -491718.09           BUDGET ERROR =             -2.05
 
@@ -245,11 +245,11 @@
  TOTAL STORAGE CHANGE =         143191.30         STORAGE CHANGE =         -63995.79
        --------------                             --------------
          LAND SURFACE =         460330.84           LAND SURFACE =          -6715.05
-            SOIL ZONE =        -226630.51              SOIL ZONE =         -41906.98
+            SOIL ZONE =        -226630.51              SOIL ZONE =         -41906.99
      UNSATURATED ZONE =         -31994.78       UNSATURATED ZONE =          -5653.13
        SATURATED ZONE =         -58514.25         SATURATED ZONE =          -9720.63
 
- OVERALL BUDGET ERROR =        -491722.45           BUDGET ERROR =             -2.25
+ OVERALL BUDGET ERROR =        -491722.45           BUDGET ERROR =             -2.24
 
   ***WARNING, CUMULATIVE VOLUME OFF > 5%
 
@@ -285,7 +285,7 @@
    INFLOWS - OUTFLOWS =        -410734.52     INFLOWS - OUTFLOWS =         -62203.37
              --------                                   --------
 
- TOTAL STORAGE CHANGE =          80990.37         STORAGE CHANGE =         -62200.94
+ TOTAL STORAGE CHANGE =          80990.37         STORAGE CHANGE =         -62200.93
        --------------                             --------------
          LAND SURFACE =         454193.37           LAND SURFACE =          -6137.47
             SOIL ZONE =        -267216.64              SOIL ZONE =         -40586.13

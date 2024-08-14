@@ -27,7 +27,7 @@ PRMS command line argument 15: csv_output_file
 PRMS command line argument 16: ..\output\gsflow_NWT.csv
 ==========================================================================
 
-                        Github Commit Hash 62761520d4284c8e7d0114d7d16c69c508494832 [6276152] branch 5.2.2.2
+                        Github Commit Hash 89c4762 master branch
 
 Steady state simulation successful, used 59 iterations
 
@@ -37,12 +37,14 @@ Steady state simulation successful, used 59 iterations
           Set to default value:           0
  WARNING, parameter: pref_flow_infil_frac is not specified
           Set to default value:  -1.000000    
+ WARNING, parameter: cascade_min is not specified
+          Set to default value:  1.0000000E-06
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/05/24 20:49:19
- Elapsed run time: 12 Minutes, 34.087 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/13 12:57:39
+ Elapsed run time: 12 Minutes, 34.474 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
- MF iterations:         45423;  SZ iterations:           45423
+ MF iterations:         45418;  SZ iterations:           45418
  Average MF iterations:  7.77;  Average SZ iterations:    7.77
  Maximum MF iterations:    24;  Maximum SZ iterations:      24
 

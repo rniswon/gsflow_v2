@@ -29,11 +29,11 @@
  TOTAL STORAGE CHANGE =        3001522.02         STORAGE CHANGE =        3001522.02
        --------------                             --------------
          LAND SURFACE =        2961972.65           LAND SURFACE =        2961972.65
-            SOIL ZONE =          38080.55              SOIL ZONE =          38080.55
+            SOIL ZONE =          38080.56              SOIL ZONE =          38080.56
      UNSATURATED ZONE =           8473.90       UNSATURATED ZONE =           8473.90
        SATURATED ZONE =          -7005.08         SATURATED ZONE =          -7005.08
 
- OVERALL BUDGET ERROR =       -1960988.25           BUDGET ERROR =       -1960988.25
+ OVERALL BUDGET ERROR =       -1960988.26           BUDGET ERROR =       -1960988.26
 
   ***WARNING, CUMULATIVE VOLUME OFF > 5%
   ***CAUTION, FLUX RATES OFF > 10%
@@ -202,7 +202,7 @@
  TOTAL STORAGE CHANGE =        4572576.25         STORAGE CHANGE =         -45316.18
        --------------                             --------------
          LAND SURFACE =        4690823.40           LAND SURFACE =         -12680.97
-            SOIL ZONE =        -111905.18              SOIL ZONE =         -29104.50
+            SOIL ZONE =        -111905.17              SOIL ZONE =         -29104.50
      UNSATURATED ZONE =          32680.53       UNSATURATED ZONE =           4599.07
        SATURATED ZONE =         -39022.50         SATURATED ZONE =          -8129.78
 
@@ -245,7 +245,7 @@
  TOTAL STORAGE CHANGE =        5385498.30         STORAGE CHANGE =         812922.05
        --------------                             --------------
          LAND SURFACE =        5424676.82           LAND SURFACE =         733853.43
-            SOIL ZONE =         -32083.65              SOIL ZONE =          79821.53
+            SOIL ZONE =         -32083.64              SOIL ZONE =          79821.53
      UNSATURATED ZONE =          39568.90       UNSATURATED ZONE =           6888.37
        SATURATED ZONE =         -46663.78         SATURATED ZONE =          -7641.28
 
@@ -288,7 +288,7 @@
  TOTAL STORAGE CHANGE =        6908035.24         STORAGE CHANGE =        1522536.94
        --------------                             --------------
          LAND SURFACE =        6948839.48           LAND SURFACE =        1524162.66
-            SOIL ZONE =         -32517.83              SOIL ZONE =           -434.18
+            SOIL ZONE =         -32517.82              SOIL ZONE =           -434.18
      UNSATURATED ZONE =          46431.95       UNSATURATED ZONE =           6863.05
        SATURATED ZONE =         -54718.36         SATURATED ZONE =          -8054.58
 

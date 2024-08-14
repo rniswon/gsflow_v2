@@ -13,7 +13,7 @@ Control File: .\gsflow.control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.4.0 05/01/2024
+                         Version: 2.4.0 09/01/2024
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
@@ -21,7 +21,7 @@ Control File: .\gsflow.control
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 05/01/2024
+                       Version 6.0.0 09/01/2024
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -35,7 +35,7 @@ Control File: .\gsflow.control
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
-                        Github Commit Hash 62761520d4284c8e7d0114d7d16c69c508494832 [6276152] branch 5.2.2.2
+                        Github Commit Hash 89c4762 master branch
 
 --------------------------------------------------------------------
         Process            Available Modules
@@ -69,9 +69,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash 62761520d4284c8e7d0114d7d16c69c508494832 [6276152] branch 5.2.2.2
+Github Commit Hash 89c4762 master branch
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:07:41
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13  9:40:46
 
 
 ==========================================================================
@@ -84,13 +84,13 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 --------------------------------------------------------------------
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2024-05-01
-Read Control File               read_control_file   2024-03-01
-Read Parameter File             read_parameter_file 2024-03-01
+PRMS Computation Order          gsflow_prms         2024-09-01
+Read Control File               read_control_file   2024-08-01
+Read Parameter File             read_parameter_file 2024-06-21
 Read Data File                  read_data_file      2023-06-02
-Basin Definition                basin               2024-04-04
+Basin Definition                basin               2024-08-09
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-04-30
+Common States and Fluxes        climateflow         2024-08-09
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
@@ -102,14 +102,14 @@ Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
 Snow Dynamics                   snowcomp            2024-04-30
 Surface Runoff                  srunoff_smidx       2024-04-04
-Soilzone Computations           soilzone            2024-05-24
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-02-10
+Soilzone Computations           soilzone            2024-06-20
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
 GSFLOW Output CSV Summary       gsflow_sum          2024-02-14
 Output Summary                  subbasin            2023-11-01
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
+GSFLOW MODFLOW main             gsflow_modflow      2024-06-01
 ==============================================================
 MODFLOW Packages
 ==============================================================
@@ -147,6 +147,8 @@ Writing GSFLOW CSV File: ..\output\gsflow.csv
           Set to default value:           0
  WARNING, parameter: pref_flow_infil_frac is not specified
           Set to default value:  -1.000000    
+ WARNING, parameter: cascade_min is not specified
+          Set to default value:  1.0000000E-06
 
 Simulation time period: 1980/10/01 - 1996/09/30
 
@@ -273,7 +275,7 @@ Date: 1984/01/01; Stress: 2; Step: 1188; Simulation step: 1188
                   MF iterations: 13; SZ iterations: 13
 
 Date: 1984/02/01; Stress: 2; Step: 1219; Simulation step: 1219
-                  MF iterations: 10; SZ iterations: 10
+                  MF iterations: 9; SZ iterations: 9
 
 Date: 1984/03/01; Stress: 2; Step: 1248; Simulation step: 1248
                   MF iterations: 10; SZ iterations: 10
@@ -291,7 +293,7 @@ Date: 1984/07/01; Stress: 2; Step: 1370; Simulation step: 1370
                   MF iterations: 16; SZ iterations: 16
 
 Date: 1984/08/01; Stress: 2; Step: 1401; Simulation step: 1401
-                  MF iterations: 14; SZ iterations: 14
+                  MF iterations: 15; SZ iterations: 15
 
 Date: 1984/09/01; Stress: 2; Step: 1432; Simulation step: 1432
                   MF iterations: 12; SZ iterations: 12
@@ -699,7 +701,7 @@ Date: 1995/11/01; Stress: 2; Step: 5510; Simulation step: 5510
                   MF iterations: 12; SZ iterations: 12
 
 Date: 1995/12/01; Stress: 2; Step: 5540; Simulation step: 5540
-                  MF iterations: 12; SZ iterations: 12
+                  MF iterations: 11; SZ iterations: 11
 
 Date: 1996/01/01; Stress: 2; Step: 5571; Simulation step: 5571
                   MF iterations: 13; SZ iterations: 13
@@ -729,28 +731,28 @@ Date: 1996/09/01; Stress: 2; Step: 5815; Simulation step: 5815
                   MF iterations: 13; SZ iterations: 13
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/05/24 20:22:58
- Elapsed run time: 15 Minutes, 17.230 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/13  9:56:21
+ Elapsed run time: 15 Minutes, 34.393 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
- MF iterations:         64611;  SZ iterations:           64543
- Average MF iterations: 11.06;  Average SZ iterations:   11.04
+ MF iterations:         64597;  SZ iterations:           64528
+ Average MF iterations: 11.05;  Average SZ iterations:   11.04
  Maximum MF iterations:    34;  Maximum SZ iterations:      25
 
 mxsziter reached: 15
 
-MF iteration distribution:      0    0    0   37  356  443  808  526  384  424
-                              468  406  354  400  315  179  112  122  128  163
-                              105   70   23    5    1    3    1    1    2    3
+MF iteration distribution:      0    0    0   37  356  443  808  531  384  421
+                              466  404  356  398  319  180  110  121  130  161
+                              104   71   23    5    1    3    0    2    2    3
                                 1    2    1    1    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
 
-SZ computation distribution:    0    0    0   37  356  443  808  526  384  424
-                              468  406  354  400  315  179  112  122  128  163
-                              105   70   23    5   16    0    0    0    0    0
+SZ computation distribution:    0    0    0   37  356  443  808  531  384  421
+                              466  404  356  398  319  180  110  121  130  161
+                              104   71   23    5   16    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0

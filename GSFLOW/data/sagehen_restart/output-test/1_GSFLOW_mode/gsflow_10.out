@@ -62,7 +62,7 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =          65473.60     EVAPOTRANSPIRATION =          34359.20
+   EVAPOTRANSPIRATION =          65473.59     EVAPOTRANSPIRATION =          34359.20
            STREAMFLOW =          11532.50             STREAMFLOW =           6907.14
      GW BOUNDARY FLOW =           1435.11       GW BOUNDARY FLOW =            717.64
                 WELLS =           1747.34                  WELLS =            872.58
@@ -249,7 +249,7 @@
      UNSATURATED ZONE =         -28033.56       UNSATURATED ZONE =          -3961.81
        SATURATED ZONE =         -51749.49         SATURATED ZONE =          -8019.54
 
- OVERALL BUDGET ERROR =        -397250.96           BUDGET ERROR =             -2.55
+ OVERALL BUDGET ERROR =        -397250.96           BUDGET ERROR =             -2.56
 
   ***WARNING, CUMULATIVE VOLUME OFF > 5%
 

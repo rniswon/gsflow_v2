@@ -23,7 +23,7 @@ npoigages              6
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 05/01/2024
+                       Version 6.0.0 09/01/2024
 
 --------------------------------------------------------------------
         Process            Available Modules
@@ -57,9 +57,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash 62761520d4284c8e7d0114d7d16c69c508494832 [6276152] branch 5.2.2.2
+Github Commit Hash 89c4762 master branch
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/05/24 20:09:56
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13  8:15:15
 
 ==========================================================================
 Using PRMS Data File: ./input/data
@@ -91,26 +91,26 @@ Simulation time period: 1980/01/01 00:00:00 to 1999/12/31 00:00:00
 --------------------------------------------------------------------
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2024-05-01
-Read Control File               read_control_file   2024-03-01
-Read Parameter File             read_parameter_file 2024-03-01
+PRMS Computation Order          gsflow_prms         2024-09-01
+Read Control File               read_control_file   2024-08-01
+Read Parameter File             read_parameter_file 2024-06-21
 Read Data File                  read_data_file      2023-06-02
-Basin Definition                basin               2024-04-04
-Common States and Fluxes        climateflow         2024-04-30
+Basin Definition                basin               2024-08-09
+Common States and Fluxes        climateflow         2024-08-09
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
 Time Series Data                water_use_read      2023-11-01
-Temperature Distribution        climate_hru         2024-04-30
-Precipitation Distribution      climate_hru         2024-04-30
-Solar Radiation Distribution    climate_hru         2024-04-30
-Potential Evapotranspiration    climate_hru         2024-04-30
+Temperature Distribution        climate_hru         2024-08-09
+Precipitation Distribution      climate_hru         2024-08-09
+Solar Radiation Distribution    climate_hru         2024-08-09
+Potential Evapotranspiration    climate_hru         2024-08-09
 Transpiration Distribution      transp_tindex       2023-11-01
 Canopy Interception             intcp               2024-04-04
 Snow Dynamics                   snowcomp            2024-04-30
 Surface Runoff                  srunoff_smidx       2024-04-04
-Soilzone Computations           soilzone            2024-05-24
-Groundwater                     gwflow              2024-01-22
+Soilzone Computations           soilzone            2024-06-20
+Groundwater                     gwflow              2024-05-30
 Streamflow Routing Init         routing             2024-02-09
 Streamflow Routing              muskingum           2023-11-01
 Output Summary                  basin_sum           2024-04-30
@@ -157,11 +157,11 @@ DPRST area:               76833.59    Fraction DPRST:          0.1025
    1994             63.330   23.963    12.556   32.720    1.640
    1995             53.742   26.685     9.363   30.250    1.522
    1996             68.484   24.683    10.856   42.307    1.877
-   1997             55.724   25.731    11.176   29.673    1.762
+   1997             55.724   25.731    11.176   29.674    1.762
    1998             63.457   25.341     7.028   41.417    1.816
    1999             45.071   27.058     6.400   17.608    1.094
  **************************************************************
  Total for run    1110.775  507.968    10.154  622.340   13.445
  **************************************************************
-Execution elapsed time    0 minutes  1.06 seconds
+Execution elapsed time:     0 minutes  1.13 seconds
 
