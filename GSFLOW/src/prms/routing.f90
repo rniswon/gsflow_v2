@@ -173,9 +173,6 @@
      &     ' 9=sink; 10=inbound from Great Lakes; 11=outbound to Great Lakes)', &
      &     'none')/=0 ) CALL read_error(1, 'segment_type')
 
-      ! user updated values if different than tosegment_orig
-      ! -5 = outbound from NHM; -6 = inbound from region; -7 = outbound from region;
-      ! -8 = drains to ocean; -11 = drains to Great Lake
       ALLOCATE ( Tosegment(Nsegment) )
       IF ( declparam(MODNAME, 'tosegment', 'nsegment', 'integer', &
      &     '0', '0', '9999999', &

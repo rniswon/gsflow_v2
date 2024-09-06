@@ -442,7 +442,7 @@ C
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
      &    ERROR_time, ERROR_modflow, MODSIM_GSFLOW, GSFLOW, CANOPY,
      &    MODSIM_MODFLOW
-      USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, no_snow_flag,
+      USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, snow_flag,
      &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
      &    PRMS_land_iteration_flag, activeHRU_inactiveCELL_flag,
      &    Model, GSFLOW_flag, Print_debug, Soilzone_module
@@ -666,7 +666,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
      2            Model==MODSIM_GSFLOW) ) THEN
               IF ( PRMS_land_iteration_flag==CANOPY ) THEN
                 retval = intcp()
-                IF ( no_snow_flag==OFF ) THEN
+                IF ( snow_flag==ACTIVE ) THEN
                   retval = snowcomp()
                   IF ( Glacier_flag==ACTIVE ) THEN
                     retval = glacr()

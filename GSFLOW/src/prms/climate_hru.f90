@@ -164,7 +164,7 @@
             IF ( istop==0 ) THEN
               IF ( cbh_active_flag==ACTIVE ) THEN
                 Swrad = -999.0
-                DO i = i, Ncbh
+                DO i = 1, Ncbh
                   Swrad(cbh_hru_id(i)) = values(i)
                 ENDDO
               ENDIF
@@ -190,7 +190,7 @@
             IF ( istop==0 ) THEN
               IF ( cbh_active_flag==ACTIVE ) THEN
                 Transp_on = -999
-                DO i = i, Ncbh
+                DO i = 1, Ncbh
                   Transp_on(cbh_hru_id(i)) = ivalues(i)
                 ENDDO
               ENDIF

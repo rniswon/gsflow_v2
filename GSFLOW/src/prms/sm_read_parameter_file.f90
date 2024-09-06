@@ -435,15 +435,15 @@ contains
       read (defvalue, *) ctemp
       Parameter_data(Num_parameters)%def_char = ctemp
       if (Parameter_data(Num_parameters)%num_dimens == 1) then
-        !if (Parameter_data(Num_parameters)%scalar_flag == 1) then
-        !  allocate (Parameter_data(Num_parameters)%values_char_0d)
-        !  Parameter_data(Num_parameters)%values_char_0d = ctemp
-        !else
+        if (Parameter_data(Num_parameters)%scalar_flag == 1) then
+          allocate (Parameter_data(Num_parameters)%values_char_0d)
+          Parameter_data(Num_parameters)%values_char_0d = ctemp
+        else
           allocate (Parameter_data(Num_parameters)%values_char_1d(numvalues))
           do i = 1, numvalues
             Parameter_data(Num_parameters)%values_char_1d(i) = ctemp
           end do
-        !end if
+        end if
       !else
       !  allocate (Parameter_data(Num_parameters)%values_char_2d(Parameter_data(Num_parameters)%num_dim1, nvals2))
       !  do i = 1, Parameter_data(Num_parameters)%num_dim1
@@ -1056,7 +1056,7 @@ contains
 !***********************************************************************
   module subroutine setparam(Paramname, Numvalues, Data_type, Num_dims, Dim_string, Values, Ivalues, Cvalues)
     use PRMS_CONSTANTS, ONLY: ERROR_param
-    use PRMS_MODULE, only: Nhru, Ndepl
+    use PRMS_MODULE, only: Ndepl, Nhru, Nsub, Nmonths
     implicit none
     ! Arguments
     integer, intent(IN) :: Numvalues, Data_type, Num_dims, Ivalues(:)
@@ -1066,8 +1066,8 @@ contains
     ! Functions
     intrinsic :: TRIM, INDEX
     ! Local Variables
-    integer :: found, i, ii, j, jj, k, ierr, iflg, comma, nvals
-    character(LEN=16) :: dimen1
+    integer :: found, i, ii, j, jj, k, ierr
+    integer :: nmonths_flag, nsub_flag, nhru_flag
 !***********************************************************************
     ierr = 0
     found = 0
@@ -1079,7 +1079,16 @@ contains
           print *, 'ERROR, Parameter: ', Paramname, ' data type does not match declared data type'
         end if
 
-        if (Parameter_data(i)%numvals == Numvalues) then
+        nmonths_flag = 0
+        nsub_flag = 0
+        nhru_flag = 0
+        if (Num_dims == 1) then
+          if (trim(Dim_string(1)) == 'nmonths') nmonths_flag = 1
+          if (trim(Dim_string(1)) == 'nsub') nsub_flag = 1
+          if (trim(Dim_string(1)) == 'nhru') nhru_flag = 1
+        endif
+
+        if (Parameter_data(found)%numvals == Numvalues) then
           if (Data_type == 2) then
             if (Parameter_data(found)%scalar_flag == 1) then
               Parameter_data(found)%values_real_0d = Values(1)
@@ -1094,9 +1103,10 @@ contains
                 enddo
 !                Parameter_data(found)%values_real_2d = reshape(Values, (/11, Ndepl/))
               else
-                do j = 1, Numvalues
-                  Parameter_data(found)%values_real_1d(j) = Values(j)
-                end do
+                !do j = 1, Numvalues
+                !  Parameter_data(found)%values_real_1d(j) = Values(j)
+                !end do
+                Parameter_data(found)%values_real_1d = Values
               end if
             else ! 2d
               k = 0
@@ -1125,90 +1135,68 @@ contains
             end if
           else  ! Data_type == 4 
             if (Parameter_data(found)%scalar_flag == 1) then
-!              Parameter_data(found)%values_char_0d = Cvalues(1)
+              Parameter_data(found)%values_char_0d = Cvalues(1)
             elseif (Parameter_data(found)%num_dimens == 1) then
               do j = 1, Numvalues
                 Parameter_data(found)%values_char_1d(j) = Cvalues(j)
               end do
-!            else ! 2d
-!              k = 0
-!              do jj = 1, Parameter_data(found)%num_dim2
-!                do j = 1, Parameter_data(found)%num_dim1
-!                  k = k + 1
-!                  Parameter_data(found)%values_char_2d(j, jj) = Cvalues(k)
-!                end do
-!              end do
+            else ! 2d
+              PRINT *, 'ERROR, character parameters cannot be two dimensional'
+              ierr = 1
+              !k = 0
+              !do jj = 1, Parameter_data(found)%num_dim2
+              !  do j = 1, Parameter_data(found)%num_dim1
+              !    k = k + 1
+              !    Parameter_data(found)%values_char_2d(j, jj) = Cvalues(k)
+              !  end do
+              !end do
             end if
           end if
         else ! check for flexible dimension
           if (Numvalues == 1) then ! set all values to single value
             if (Data_type == 2) then
               if (Parameter_data(found)%num_dimens == 1) then
-                do j = 1, Parameter_data(found)%num_dim1
-                  Parameter_data(found)%values_real_1d(j) = Values(1)
-                end do
+                !do j = 1, Parameter_data(found)%num_dim1
+                !  Parameter_data(found)%values_real_1d(j) = Values(1)
+                !end do
+                Parameter_data(found)%values_real_1d = Values(1)
               else ! 2d
-                do j = 1, Parameter_data(found)%num_dim2
-                  do jj = 1, Parameter_data(found)%num_dim1
-                    Parameter_data(found)%values_real_2d(jj, j) = Values(1)
-                  end do
-                end do
+                !do j = 1, Parameter_data(found)%num_dim2
+                !  do jj = 1, Parameter_data(found)%num_dim1
+                !    Parameter_data(found)%values_real_2d(jj, j) = Values(1)
+                !  end do
+                !end do
+                Parameter_data(found)%values_real_2d = Values(1)
               end if
-            else ! data_type 1
+            elseif (Data_type == 1) then ! data_type 1
               if (Parameter_data(found)%num_dimens == 1) then
-                do j = 1, Parameter_data(found)%num_dim1
-                  Parameter_data(found)%values_int_1d(j) = Ivalues(1)
-                end do
+                !do j = 1, Parameter_data(found)%num_dim1
+                !  Parameter_data(found)%values_int_1d(j) = Ivalues(1)
+                !end do
+                Parameter_data(found)%values_int_1d = Ivalues(1)
               else ! 2d
-                do j = 1, Parameter_data(found)%num_dim1
-                  do jj = 1, Parameter_data(found)%num_dim2
-                    Parameter_data(found)%values_int_2d(j, jj) = Ivalues(1)
-                  end do
-                end do
+                !do j = 1, Parameter_data(found)%num_dim1
+                !  do jj = 1, Parameter_data(found)%num_dim2
+                !    Parameter_data(found)%values_int_2d(j, jj) = Ivalues(1)
+                !  end do
+                !end do
+                Parameter_data(found)%values_int_2d = Ivalues(1)
+              end if
+            elseif (Data_type == 4) then ! data_type 4
+              if (Parameter_data(found)%num_dimens == 1) then
+                !do j = 1, Parameter_data(found)%num_dim1
+                !  Parameter_data(found)%values_char_1d(j) = Cvalues(1)
+                !end do
+                Parameter_data(found)%values_char_1d = Cvalues(1)
+              !else ! no 2d character parameters
+              !  Parameter_data(found)%values_char_2d = Cvalues(1)
               end if
             end if
-          else
-            nvals = Parameter_data(found)%numvals / 12
-            if (nvals * 12 /= Parameter_data(found)%numvals) then
-              iflg = 0
-              if (Num_dims == 1 .and. trim(Dim_string(1)) == 'nmonths') iflg = 1
-              if (Num_dims == 2) then
-                if (trim(Dim_string(2)) == 'nmonths') iflg = 1
-              end if
-              if (iflg == 1) then
-                print *, 'ERROR, parameter not evenly divisible by 12'
-                print *, '       number of parameter values expected:', Parameter_data(i)%numvals
-                print *, '       number of parameter values specified:', Numvalues
-                ERROR stop ERROR_param
-              end if
-            end if
-            comma = index(Parameter_data(found)%dimen_names, ',')
-            if (comma == 0) then
-              dimen1 = trim(Parameter_data(found)%dimen_names)
-            else
-              dimen1 = Parameter_data(found)%dimen_names(:(comma - 1))
-            end if
-
-            ! DANGER, messy IF's
-            iflg = 0
-            if (Numvalues == 12 .and. Nhru /= 12 .and. Num_dims == 1 .and. trim(Dim_string(1)) == 'nmonths') iflg = 2 ! set monthly
-            if (Numvalues == Nhru .and. Num_dims == 1 .and. trim(Dim_string(1)) /= 'nmonths') iflg = 3 ! set nhru, nmonths
-
-            k = 0
-            if (iflg == 3) then ! 12 sets of nhru values
-              do j = 1, 12
-                do ii = 1, nvals
-                  if (Data_type == 2) then
-                    Parameter_data(found)%values_real_2d(ii, j) = Values(ii)
-                  else
-                    Parameter_data(found)%values_int_2d(ii, j) = Ivalues(ii)
-                  end if
-                end do
-              end do
-            elseif (iflg == 2) then ! dim sets of 12
-              do j = 1, 12
-                do ii = 1, nvals
-                  k = k + 1
+          else ! WARNING: not checking for character parameters or double
+            ! first dimension is nhru, nssr, or ngw, passing a different dimension
+            if (nmonths_flag == 1) then
+              do j = 1, Nmonths
+                do ii = 1, Parameter_data(found)%num_dim1
                   if (Data_type == 2) then
                     Parameter_data(found)%values_real_2d(ii, j) = Values(j)
                   else
@@ -1216,25 +1204,34 @@ contains
                   end if
                 end do
               end do
+            else if (nsub_flag == 1) then
+              do j = 1, Nsub
+                do ii = 1, Parameter_data(found)%num_dim1
+                  if (Data_type == 2) then
+                    Parameter_data(found)%values_real_2d(ii, j) = Values(j)
+                  else
+                    Parameter_data(found)%values_int_2d(ii, j) = Ivalues(j)
+                  end if
+                end do
+              end do
+            else if (nhru_flag == 1) then
+              do j = 1, Nhru
+                do ii = 1, Parameter_data(found)%num_dim2
+                  if (Data_type == 2) then
+                    Parameter_data(found)%values_real_2d(j, ii) = Values(j)
+                  else
+                    Parameter_data(found)%values_int_2d(j, ii) = Ivalues(j)
+                  end if
+                end do
+              end do
             else
-!              print *, '??? not sure this can happen'
-!              DO ii = 1, nvals
-!                DO j = 1, 12
-!                  k = k + 1
-!                  IF ( Data_type==2 ) THEN
-!                    Parameter_data(found)%values_real_1d(k) = Values(ii)
-!                  ELSE
-!                    Parameter_data(found)%values_int_1d(k) = Ivalues(ii)
-!                  ENDIF
-!                ENDDO
-!              ENDDO
-                !!!!!! add parameter expansion !!!!!!!!!! for nsub
-                ierr = 1
               print *, 'ERROR, Parameter: ', Paramname, ' number of values in getparam does not match declared number of values'
+              print *, '       number of parameter values expected:', Parameter_data(found)%numvals
+              print *, '       number of parameter values specified:', Numvalues
+              ierr = 1
             end if
           end if
         end if
-        exit
       end if
     end do
 

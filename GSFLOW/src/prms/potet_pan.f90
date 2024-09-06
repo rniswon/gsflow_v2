@@ -13,7 +13,7 @@
       END MODULE PRMS_POTET_PAN
 
       INTEGER FUNCTION potet_pan()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, DEBUG_less, ERROR_dim, READ_INIT, SAVE_INIT
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, DEBUG_less, ERROR_dim, READ_INIT, SAVE_INIT, ERROR_param
       USE PRMS_MODULE, ONLY: Process_flag, Nevap, Print_debug, Save_vars_to_file, Init_vars_from_file, Nowmonth
       USE PRMS_POTET_PAN
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order
@@ -64,6 +64,14 @@
         ELSE
           Last_pan_evap = 0.0
         ENDIF
+
+        DO j = 1, Active_hrus
+          i = Hru_route_order(j)
+          IF ( Hru_pansta(i)==0 .OR. Hru_pansta(i)>Nevap ) THEN
+            CALL error_stop('all hru_pansta values must be > 0 and <= nevap', ERROR_param)
+            EXIT
+          ENDIF
+        ENDDO
 
       ELSEIF ( Process_flag==CLEAN ) THEN
         IF ( Save_vars_to_file==ACTIVE ) CALL potet_pan_restart(SAVE_INIT)

@@ -99,7 +99,7 @@
       IF ( NsegmentOutON_OFF==2 ) THEN
         ALLOCATE ( Nhm_seg(Nsegment) )
         IF ( declparam(MODNAME, 'nhm_seg', 'nsegment', 'integer', &
-     &       '0', '0', '9999999', &
+     &       '1', '1', '9999999', &
      &       'National Hydrologic Model segment ID', 'National Hydrologic Model segment ID', &
      &       'none')/=0 ) CALL read_error(1, 'nhm_seg')
       ENDIF

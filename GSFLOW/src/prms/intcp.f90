@@ -498,8 +498,10 @@
             evsn = Potet_sublim(i)*Potet(i)
 
             IF ( Use_pandata==ACTIVE ) THEN
-              evrn = Pan_evap(Hru_pansta(i))
-              IF ( evrn<0.0 ) evrn = 0.0
+              IF ( Hru_pansta(i)>0 ) THEN
+                evrn = Pan_evap(Hru_pansta(i))
+                IF ( evrn<0.0 ) evrn = 0.0
+              ENDIF
             ENDIF
 
 !******Compute snow interception loss

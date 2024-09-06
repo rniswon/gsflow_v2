@@ -4256,7 +4256,7 @@ C
       IF ( IBUDFL.GT.0 ) WRITE (IOUT, 9015)
 C67-----FORMATS.
  9002 FORMAT (1X//,'UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR ', 
-     +        ' TIME STEP', I6, ' STRESS PERIOD ', I4, /2X, 78('-')//) !gsf
+     +        ' TIME STEP', I6, ' STRESS PERIOD ', I5, /2X, 78('-')//) !gsf
  9003 FORMAT (1X, /5X, 'CUMULATIVE VOLUMES', 6X, 'L**3', 7X, 
      +        'RATES FOR THIS TIME STEP', 6X, 'L**3/T'/5X, 18('-'), 17X,
      +        24('-')//11X, 'IN:', 38X, 'IN:'/11X, '---', 38X, '---')
