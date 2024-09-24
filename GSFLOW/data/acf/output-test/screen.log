@@ -55,9 +55,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash b7b217f master branch
+Github Commit Hash 87c870f3a2809a167698e4f88a354886415f6afa
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  7:42:34
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:24:06
 
 
 ==========================================================================
@@ -72,7 +72,7 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 ==============================================================
 PRMS Computation Order          gsflow_prms         2024-09-01
 Read Control File               read_control_file   2024-08-01
-Read Parameter File             read_parameter_file 2024-06-21
+Read Parameter File             read_parameter_file 2024-08-27
 Read Data File                  read_data_file      2023-06-02
 Basin Definition                basin               2024-08-09
 Common States and Fluxes        climateflow         2024-08-09
@@ -128,10 +128,10 @@ Simulation time period: 1988/10/01 - 1990/09/30
                           =========================
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  7:42:34
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:24:06
 
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  7:42:35
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:24:07
 
 Execution elapsed time    0 minutes  0.58 seconds
 

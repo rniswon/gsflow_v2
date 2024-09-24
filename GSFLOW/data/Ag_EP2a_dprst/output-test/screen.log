@@ -68,9 +68,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash b7b217f master branch
+Github Commit Hash 87c870f3a2809a167698e4f88a354886415f6afa
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  7:45:58
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:30:52
 
 
 ==========================================================================
@@ -85,7 +85,7 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 ==============================================================
 PRMS Computation Order          gsflow_prms         2024-09-01
 Read Control File               read_control_file   2024-08-01
-Read Parameter File             read_parameter_file 2024-06-21
+Read Parameter File             read_parameter_file 2024-08-27
 Read Data File                  read_data_file      2023-06-02
 Basin Definition                basin               2024-08-09
 Cascading Flow                  cascade             2023-11-01
@@ -725,8 +725,8 @@ Date: 1995/10/01; Stress: 62; Step: 1; Simulation step: 1827
                   MF iterations: 6; SZ iterations: 6
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/14  7:48:08
- Elapsed run time: 2 Minutes, 10.228 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/09/24 11:33:05
+ Elapsed run time: 2 Minutes, 13.000 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
  MF iterations:         11894;  SZ iterations:           11865

@@ -15,7 +15,7 @@ Control File: .\control\mercdXYZ.control
                Precipitation-Runoff Modeling System (PRMS)
                        Version 6.0.0 09/01/2024
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/13  7:58:11
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:33:27
 
 
 ==========================================================================
@@ -30,7 +30,7 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 ==============================================================
 PRMS Computation Order          gsflow_prms         2024-09-01
 Read Control File               read_control_file   2024-08-01
-Read Parameter File             read_parameter_file 2024-06-21
+Read Parameter File             read_parameter_file 2024-08-27
 Read Data File                  read_data_file      2023-06-02
 Basin Definition                basin               2024-08-09
 Common States and Fluxes        climateflow         2024-08-09

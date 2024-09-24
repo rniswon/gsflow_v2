@@ -92,7 +92,7 @@
  #Sagehen Simulation -- Example problem for GSFLOW
  #  (File modified for version 1.1.00 release)
     2 LAYERS        73 ROWS        81 COLUMNS
-    2 STRESS PERIOD(S) IN SIMULATION
+     2 STRESS PERIOD(S) IN SIMULATION
  MODEL TIME UNIT IS DAYS
  MODEL LENGTH UNIT IS METERS
   Confining bed flag for each layer:
@@ -10492,7 +10492,7 @@ SELECTED MODEL CELLS ARE:
                             STEADY-STATE DAMPING PARAMETER =    0.50000E-01
                                TRANSIENT DAMPING PARAMETER =    0.70000E+00
 1
-                            STRESS PERIOD NO.    1, LENGTH =   1.000000    
+                            STRESS PERIOD NO.     1, LENGTH =   1.000000    
                             -----------------------------------------------
 
                               NUMBER OF TIME STEPS =     1
@@ -16323,7 +16323,7 @@ SELECTED MODEL CELLS ARE:
 
 
 
- OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    1
+ OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP    1
     SAVE BUDGET
 
 
@@ -16571,7 +16571,7 @@ SELECTED MODEL CELLS ARE:
  UBDSV3 SAVING "  STORAGE CHANGE" ON UNIT 101 AT TIME STEP 1, STRESS PERIOD 1
 
 
-UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD    1
+UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD     1
   ------------------------------------------------------------------------------
 
 
@@ -16605,7 +16605,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
 
 1
-  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD   1
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD    1
   ------------------------------------------------------------------------------
 
      CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
@@ -16642,7 +16642,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
 
 
-         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD    1
+         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD     1
                     SECONDS     MINUTES      HOURS       DAYS        YEARS
                     -----------------------------------------------------------
    TIME STEP LENGTH  86400.      1440.0      24.000      1.0000     2.73785E-03
@@ -16650,7 +16650,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
          TOTAL TIME  86400.      1440.0      24.000      1.0000     2.73785E-03
 1
 1
-                            STRESS PERIOD NO.    2, LENGTH =   1.000000    
+                            STRESS PERIOD NO.     2, LENGTH =   1.000000    
                             -----------------------------------------------
 
                               NUMBER OF TIME STEPS =     1
@@ -16685,7 +16685,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
 
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP    1
+ NO OUTPUT CONTROL FOR STRESS PERIOD     2   TIME STEP    1
 
 
 
@@ -16922,7 +16922,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
 
 
-UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD    2
+UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD     2
   ------------------------------------------------------------------------------
 
 
@@ -16956,7 +16956,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
 
 1
-  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD   2
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD    2
   ------------------------------------------------------------------------------
 
      CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
@@ -16993,7 +16993,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
 
 
-         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD    2
+         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD     2
                     SECONDS     MINUTES      HOURS       DAYS        YEARS
                     -----------------------------------------------------------
    TIME STEP LENGTH  86400.      1440.0      24.000      1.0000     2.73785E-03
@@ -17002,6 +17002,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/14  7:40:09
- Elapsed run time: 1.503 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/09/24 11:36:38
+ Elapsed run time: 1.719 Seconds
 

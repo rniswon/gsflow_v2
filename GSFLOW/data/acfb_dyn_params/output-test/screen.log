@@ -8,6 +8,16 @@ Executable: ..\..\bin\gsflow
 
 ==========================================================================
 Control File: .\control\control
+ WARNING, control parameter not used: aniOutON_OFF, ignored
+ WARNING, control parameter not used: aniOutVar_names, ignored
+ WARNING, control parameter not used: ani_output_file, ignored
+ WARNING, control parameter not used: dispGraphsBuffSize, ignored
+ WARNING, control parameter not used: dispVar_element, ignored
+ WARNING, control parameter not used: dispVar_names, ignored
+ WARNING, control parameter not used: dispVar_plot, ignored
+ WARNING, control parameter not used: initial_deltat, ignored
+ WARNING, control parameter not used: naniOutVars, ignored
+ WARNING, control parameter not used: ndispGraphs, ignored
 ==========================================================================
 
                           U.S. Geological Survey
@@ -54,9 +64,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash b7b217f master branch
+Github Commit Hash 87c870f3a2809a167698e4f88a354886415f6afa
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  7:43:22
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:24:41
 
 
 ==========================================================================
@@ -71,7 +81,7 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 ==============================================================
 PRMS Computation Order          gsflow_prms         2024-09-01
 Read Control File               read_control_file   2024-08-01
-Read Parameter File             read_parameter_file 2024-06-21
+Read Parameter File             read_parameter_file 2024-08-27
 Read Data File                  read_data_file      2023-06-02
 Basin Definition                basin               2024-08-09
 Common States and Fluxes        climateflow         2024-08-09
@@ -92,7 +102,6 @@ Groundwater                     gwflow              2024-05-30
 Streamflow Routing Init         routing             2024-08-13
 Streamflow Routing              muskingum           2023-11-01
 Output Summary                  basin_sum           2024-04-30
-Water Balance Computations      water_balance       2024-04-04
 Output Summary                  nhru_summary        2024-04-04
 Statistics Variables Output     statvar_out         2021-09-08
 Output Summary                  prms_summary        2024-04-30
@@ -125,10 +134,10 @@ Simulation time period: 1980/01/01 - 1999/12/31
                           =========================
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  7:43:22
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:24:41
 
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/08/14  7:43:23
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:24:42
 
-Execution elapsed time    0 minutes  1.22 seconds
+Execution elapsed time    0 minutes  0.98 seconds
 

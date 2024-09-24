@@ -96,7 +96,7 @@
  #Sagehen Simulation -- Example problem for GSFLOW
  #  (File modified for version 1.1.00 release)
     2 LAYERS        73 ROWS        81 COLUMNS
-    2 STRESS PERIOD(S) IN SIMULATION
+     2 STRESS PERIOD(S) IN SIMULATION
  MODEL TIME UNIT IS DAYS
  MODEL LENGTH UNIT IS METERS
   Confining bed flag for each layer:
@@ -9841,7 +9841,7 @@ SELECTED MODEL CELLS ARE:
  
  MNWPRNT =            2
 1
-                            STRESS PERIOD NO.    1, LENGTH =   1.000000    
+                            STRESS PERIOD NO.     1, LENGTH =   1.000000    
                             -----------------------------------------------
 
                               NUMBER OF TIME STEPS =     1
@@ -10761,7 +10761,7 @@ MNW2 Well Well-G               active, desired Q =  0.0000E+00 for stress period
  WELLNAME = WELL-H              
 MNW2 Well Well-H               active, desired Q =  0.0000E+00 for stress period    1
 
- OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    1
+ OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP    1
     PRINT BUDGET
     PRINT HEAD FOR ALL LAYERS
     SAVE HEAD FOR ALL LAYERS
@@ -10785,7 +10785,7 @@ MNW2 Well Well-H               active, desired Q =  0.0000E+00 for stress period
  READING FILE ON UNIT   90:
   READING DATA FOR RESTART MNW2
 1
-                            STRESS PERIOD NO.    2, LENGTH =   5844.000    
+                            STRESS PERIOD NO.     2, LENGTH =   5844.000    
                             -----------------------------------------------
 
                               NUMBER OF TIME STEPS =  5844
@@ -10864,11 +10864,11 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
 
  OUTPUT CONTROL WAS SPECIFIED FOR A NONEXISTENT TIME STEP
  OR OUTPUT CONTROL DATA ARE NOT ENTERED IN ASCENDING ORDER
- OUTPUT CONTROL STRESS PERIOD    2   TIME STEP   28
- MODEL STRESS PERIOD    2   TIME STEP 1066
+ OUTPUT CONTROL STRESS PERIOD     2   TIME STEP   28
+ MODEL STRESS PERIOD     2   TIME STEP 1066
  APPLYING THE SPECIFIED OUTPUT CONTROL TO THE CURRENT TIME STEP
 
- OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP 1066
+ OUTPUT CONTROL FOR STRESS PERIOD     2   TIME STEP 1066
     PRINT BUDGET
 
 
@@ -11106,7 +11106,7 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
 
 
 
-UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP  1066 STRESS PERIOD    2
+UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP  1066 STRESS PERIOD     2
   ------------------------------------------------------------------------------
 
 
@@ -11164,7 +11164,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP  1066 STRESS PERIOD   
   MNW2 WELL: WELL-H               Qnet =   3.012764082654940E-008  < Qdes
    Q  updated because of Hlim constraint
 1
-  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP 1066, STRESS PERIOD   2
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP 1066, STRESS PERIOD    2
   ------------------------------------------------------------------------------
 
      CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
@@ -11203,7 +11203,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP  1066 STRESS PERIOD   
 
 
 
-         TIME SUMMARY AT END OF TIME STEP 1066 IN STRESS PERIOD    2
+         TIME SUMMARY AT END OF TIME STEP 1066 IN STRESS PERIOD     2
                     SECONDS     MINUTES      HOURS       DAYS        YEARS
                     -----------------------------------------------------------
    TIME STEP LENGTH  86400.      1440.0      24.000      1.0000     2.73785E-03
@@ -11250,7 +11250,7 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
        AND A TOTAL OF         15 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP 1067
+ NO OUTPUT CONTROL FOR STRESS PERIOD     2   TIME STEP 1067
  
   MNW2 WELL: WELL-A               Qnet =   2.821643085848535E-008  < Qdes
    Q  updated because of Hlim constraint
@@ -11315,7 +11315,7 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
        AND A TOTAL OF         15 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP 1068
+ NO OUTPUT CONTROL FOR STRESS PERIOD     2   TIME STEP 1068
  
   MNW2 WELL: WELL-A               Qnet =   2.592973928627895E-008  < Qdes
    Q  updated because of Hlim constraint
@@ -11380,7 +11380,7 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
        AND A TOTAL OF         15 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP 1069
+ NO OUTPUT CONTROL FOR STRESS PERIOD     2   TIME STEP 1069
  
   MNW2 WELL: WELL-A               Qnet =   3.082196911585733E-008  < Qdes
    Q  updated because of Hlim constraint
@@ -11445,7 +11445,7 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
        AND A TOTAL OF         15 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP 1070
+ NO OUTPUT CONTROL FOR STRESS PERIOD     2   TIME STEP 1070
  
   MNW2 WELL: WELL-A               Qnet =   2.766951516519622E-008  < Qdes
    Q  updated because of Hlim constraint
@@ -11510,7 +11510,7 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
        AND A TOTAL OF         14 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP 1071
+ NO OUTPUT CONTROL FOR STRESS PERIOD     2   TIME STEP 1071
  
   MNW2 WELL: WELL-A               Qnet =   2.961543474344630E-008  < Qdes
    Q  updated because of Hlim constraint
@@ -11575,7 +11575,7 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
        AND A TOTAL OF         14 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP 1072
+ NO OUTPUT CONTROL FOR STRESS PERIOD     2   TIME STEP 1072
  
   MNW2 WELL: WELL-A               Qnet =   2.608419034932918E-008  < Qdes
    Q  updated because of Hlim constraint
@@ -11611,6 +11611,6 @@ WELL-H           2   6.635        1955.       1855.       1955.       1865.     
   WRITING DATA FOR RESTART MNW2
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/08/14  8:13:23
- Elapsed run time: 1.861 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/09/24 12:13:35
+ Elapsed run time: 1.683 Seconds
 
