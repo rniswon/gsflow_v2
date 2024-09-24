@@ -344,6 +344,7 @@ prms_potet_pm.mod: potet_pm.o
 prms_potet_pt.mod: potet_pt.o
 prms_potet_hs.mod: potet_hs.o
 prms_potet_hamon.mod: potet_hamon.o
+prms_strmflow_character.mod: strmflow_character.o
 prms_mmfapi.mod: c_mmf_utils.o
 prms_read_param_file.mod: c_read_parameter_file.o
 prms_utils.mod: c_utils_prms.o

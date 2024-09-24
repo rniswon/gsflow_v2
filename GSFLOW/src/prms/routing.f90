@@ -564,14 +564,16 @@
 !      ENDIF
       DEALLOCATE ( x_off )
 
-      Segmentcum_hruarea = 0.0D0
-      Seg_upstream_hruarea = 0.0D0
-      DO i = 1, Nsegment
-        iseg = Hru_segment(i)
-        iorder = Segment_order(i)
-        Segmentcum_hruarea(iorder) = Segmentcum_hruarea(iorder) + Seg_upstream_hruarea(iorder)
-        IF ( toseg>0 ) Seg_upstream_hruarea(toseg) = Seg_upstream_hruarea(toseg) + Segment_hruarea(iorder)
-      ENDDO
+      IF ( Hru_seg_cascades==ACTIVE ) THEN
+        Segmentcum_hruarea = 0.0D0
+        Seg_upstream_hruarea = 0.0D0
+        DO i = 1, Nsegment
+          iseg = Hru_segment(i)
+          iorder = Segment_order(i)
+          Segmentcum_hruarea(iorder) = Segmentcum_hruarea(iorder) + Seg_upstream_hruarea(iorder)
+          IF ( toseg>0 ) Seg_upstream_hruarea(toseg) = Seg_upstream_hruarea(toseg) + Segment_hruarea(iorder)
+        ENDDO
+      ENDIF
 
       IF ( Strmflow_flag==strmflow_in_out_module ) RETURN
 !

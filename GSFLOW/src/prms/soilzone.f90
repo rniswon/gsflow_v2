@@ -562,7 +562,6 @@
 
       IF ( getparam_real(MODNAME, 'slowcoef_lin', Nhru, Slowcoef_lin)/=0 ) CALL read_error(2, 'slowcoef_lin')
       IF ( getparam_real(MODNAME, 'slowcoef_sq', Nhru, Slowcoef_sq)/=0 ) CALL read_error(2, 'slowcoef_sq')
-
       IF ( getparam_real(MODNAME, 'pref_flow_den', Nhru, Pref_flow_den)/=0 ) CALL read_error(2, 'pref_flow_den')
       Pref_flag = OFF
       IF ( maxval(Pref_flow_den) > 0.0 ) THEN
@@ -606,6 +605,7 @@
       IF ( Cascade_flag>CASCADE_OFF ) THEN
         IF ( getparam_real(MODNAME, 'cascade_min', 1, cascade_min)/=0 ) CALL read_error(2, 'cascade_min')
       ENDIF
+
       Swale_limit = 0.0
       Grav_dunnian_flow = 0.0
       Soil_lower_ratio = 0.0

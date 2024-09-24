@@ -726,8 +726,6 @@
           Inputerror_flag = 1
         ENDIF
       ENDIF
-      gwflow_flag = ACTIVE
-      IF ( GSFLOW_flag == ACTIVE .AND. activeHRU_inactiveCELL_flag == OFF ) gwflow_flag = OFF
 
       ! get simulation start_time and end_time
       Starttime = -1
@@ -947,6 +945,8 @@
       IF ( control_integer(snow_cloudcover_flag, 'snow_cloudcover_flag')/=0 ) snow_cloudcover_flag = OFF
       IF ( control_integer(seg2hru_flag, 'seg2hru_flag')/=0 ) seg2hru_flag = OFF
       IF ( control_integer(activeHRU_inactiveCELL_flag, 'activeHRU_inactiveCELL_flag')/=0 ) activeHRU_inactiveCELL_flag = OFF
+      gwflow_flag = ACTIVE
+      IF ( GSFLOW_flag == ACTIVE .AND. activeHRU_inactiveCELL_flag == OFF ) gwflow_flag = OFF
 
       IF ( control_integer(Humidity_cbh_flag, 'humidity_cbh_flag')/=0 ) Humidity_cbh_flag = OFF
       IF ( control_integer(Windspeed_cbh_flag, 'windspeed_cbh_flag')/=0 ) Windspeed_cbh_flag = OFF
