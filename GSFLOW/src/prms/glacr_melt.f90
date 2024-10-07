@@ -1754,7 +1754,7 @@
 ! of changing slope
 !***********************************************************************
       INTEGER FUNCTION recompute_soltab()
-      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, GLACIER
+      USE PRMS_CONSTANTS, ONLY: GLACIER
       USE PRMS_MODULE, ONLY: Hru_type
       USE PRMS_GLACR, ONLY: Hru_slope_ts
       USE PRMS_SOLTAB, ONLY: Hru_aspect, Hru_cossl, PI, RADIANS, &

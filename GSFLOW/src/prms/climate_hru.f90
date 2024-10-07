@@ -46,8 +46,7 @@
      &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
      &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, &
      &    Nowyear, Nowday, forcing_check_flag, Print_debug, Ncbh, PRMS6_flag, &
-     &    irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag, &
-     &    Nowyear, Nowday, forcing_check_flag, Print_debug
+     &    irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag
       USE PRMS_CLIMATE_HRU
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Ag_Frac
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
