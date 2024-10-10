@@ -575,7 +575,7 @@ C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
      2                                       IGRID,IUNIT(54))  !SWR - JDH
           IF(IUNIT(66).GT.0) CALL GWF2AG7AD(IUNIT(66),KKPER)
 
-          IF ( Model==MODFLOW .or. Model==MODSIM_MODFLOW ) THEN ! ??? what about MODSIM-MODFLOW ???
+          IF ( Model==MODFLOW .or. Model==MODSIM_MODFLOW ) THEN
 C
 C---------INDICATE IN PRINTOUT THAT SOLUTION IS FOR HEADS
             iprt = 0
@@ -604,7 +604,7 @@ C7C2----ITERATIVELY FORMULATE AND SOLVE THE FLOW EQUATIONS.
            ITREAL = 0
 C
 C0----Plug in MODSIM values before PRMS-MODFLOW iterations
-           IF ( Model>=MODSIM_GSFLOW ) THEN
+           IF ( Model==MODSIM_GSFLOW .or. Model==MODSIM_MODFLOW ) THEN
              IF(IUNIT(44).GT.0.AND.iss==0) CALL MODSIM2SFR(Diversions)
            ENDIF
 C
@@ -1525,47 +1525,48 @@ C     ************************************************************************
 C     WRITE RASTERS OF GROUNDWATER/SURFACE-WATER INTERACTION
 C     
 C     ************************************************************************
-      SUBROUTINE MFNWT_WRITERAS(KPER) BIND(C,NAME="MFNWT_WRITERAS")
+C      SUBROUTINE MFNWT_WRITERAS(KPER) BIND(C,NAME="MFNWT_WRITERAS")
 C
-      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_WRITERAS
+C      !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_WRITERAS
 C
-      USE GLOBAL,       ONLY: NROW,NCOL
-      USE GWFSFRMODULE, ONLY: NSTRM,ISTRM,STRM
-      IMPLICIT NONE
-      INTEGER, INTENT(in)  :: KPER
-      INTEGER I,N,IRCH,JRCH,I1
-!      CHARACTER*256 str1,str2
-!      INTEGER*4 Y,ls1,ls2
-      REAL    FLOBOT
-      REAL, DIMENSION(NROW*NCOL) :: GWSWI
-      CHARACTER OUTFILE*255,FMT*18,X1*20
+C      USE GLOBAL,       ONLY: NROW,NCOL
+C      USE GWFSFRMODULE, ONLY: NSTRM,ISTRM,STRM
+C      IMPLICIT NONE
+C      INTEGER, INTENT(in)  :: KPER
+C      INTEGER I,N,IRCH,JRCH,I1
+C      CHARACTER*256 str1,str2
+C      INTEGER*4 Y,ls1,ls2
+C      REAL    FLOBOT
+C     REAL, DIMENSION(NROW*NCOL) :: GWSWI
+C      CHARACTER OUTFILE*255,FMT*18
+C      CHARACTER X1*20
 C
 C--INITIALIZE ARRAY THAT WILL STORE GROUNDWATER SURFACE WATER INTERACTION
 C  USE NODATA_VALUE TO INITIALIZE THE ARRAY
-      DO I=1,NROW*NCOL
-          GWSWI(I)=2446527.9909387
-      ENDDO
+C      DO I=1,NROW*NCOL
+C          GWSWI(I)=2446527.9909387
+C      ENDDO
 C
-      DO I=1,NSTRM
-          IRCH=ISTRM(2,I)
-          JRCH=ISTRM(3,I)
-          FLOBOT=STRM(11,I)
-          N=(IRCH-1)*NCOL+JRCH
-          IF (GWSWI(N).NE.2446527.9909387) THEN
-            GWSWI(N) = GWSWI(N) + FLOBOT
-          ELSE
-            GWSWI(N)=FLOBOT
-          ENDIF
-      ENDDO
+C      DO I=1,NSTRM
+C          IRCH=ISTRM(2,I)
+C          JRCH=ISTRM(3,I)
+C          FLOBOT=STRM(11,I)
+C          N=(IRCH-1)*NCOL+JRCH
+C          IF (GWSWI(N).NE.2446527.9909387) THEN
+C            GWSWI(N) = GWSWI(N) + FLOBOT
+C          ELSE
+C            GWSWI(N)=FLOBOT
+C          ENDIF
+C      ENDDO
 C
 C--WRITE THE ARRAY TO A TEXT FILE BASED FOR THE CURRENT TIME STEP
-      FMT='(I4.4)'
-      I1=KPER
-      WRITE(X1,FMT) I1
-      OUTFILE='H:\\MODSIM_MODFLOW_New
-     &\\ET_Computation_For_MODSIM-MODFLOW_MIF_FullIrr_SAcc_NewHD
-     &\\Source_Code_Coupling\\MODSIMStreamAquifer\\GWSWI_Rasters
-     &\\GWSWI_'//TRIM(X1)//'.TXT'
+!      FMT='(I4.4)'
+!      I1=KPER
+!      WRITE(X1,FMT) I1
+!      OUTFILE='H:\\MODSIM_MODFLOW_New
+!     &\\ET_Computation_For_MODSIM-MODFLOW_MIF_FullIrr_SAcc_NewHD
+!     &\\Source_Code_Coupling\\MODSIMStreamAquifer\\GWSWI_Rasters
+!     &\\GWSWI_'//TRIM(X1)//'.TXT'
 !C--REMOVE SPACES FROM THE LONG STRING
 !      ls1 = len_trim(OUTFILE)
 !      ls2 = 0
@@ -1576,20 +1577,20 @@ C--WRITE THE ARRAY TO A TEXT FILE BASED FOR THE CURRENT TIME STEP
 !        ENDIF
 !      ENDDO
       
-      OPEN(201,FILE=OUTFILE)
-      WRITE(201,*) "ncols         133"
-      WRITE(201,*) "nrows         64"
-      WRITE(201,*) "xllcorner     278826.60355005"
-      WRITE(201,*) "yllcorner     4343615.4021448"
-      WRITE(201,*) "cellsize      400"
-      WRITE(201,*) "NODATA_value  -999.99"
-      DO I=1,NROW
-        WRITE(201,'(1000F11.2)') ((-1*GWSWI(N)*35.315/86400),
-     &                            N=(I-1)*NCOL+1,I*NCOL)
-      ENDDO
-      CLOSE(201)
+C      OPEN(201,FILE=OUTFILE)
+C      WRITE(201,*) "ncols         133"
+C      WRITE(201,*) "nrows         64"
+C      WRITE(201,*) "xllcorner     278826.60355005"
+C      WRITE(201,*) "yllcorner     4343615.4021448"
+C     WRITE(201,*) "cellsize      400"
+C     WRITE(201,*) "NODATA_value  -999.99"
+C     DO I=1,NROW
+C       WRITE(201,'(1000F11.2)') ((-1*GWSWI(N)*35.315/86400),
+C    &                            N=(I-1)*NCOL+1,I*NCOL)
+C     ENDDO
+C     CLOSE(201)
 C
-      END SUBROUTINE MFNWT_WRITERAS
+C      END SUBROUTINE MFNWT_WRITERAS
 C     
 C
 !     ******************************************************************
