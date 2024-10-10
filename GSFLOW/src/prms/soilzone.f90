@@ -55,8 +55,8 @@
       REAL, SAVE, ALLOCATABLE :: Dunnian_flow(:), Cap_infil_tot(:)
       REAL, SAVE, ALLOCATABLE :: Pref_flow(:)
       REAL, SAVE, ALLOCATABLE :: Pref_flow_infil(:), Pref_flow_in(:)
-      REAL, SAVE, ALLOCATABLE :: Hru_sz_cascadeflow(:), Swale_actet(:)
-      REAL, SAVE, ALLOCATABLE :: Hru_dunnian_cascadeflow(:), Hru_interflow_cascadeflow(:)
+      REAL, SAVE, ALLOCATABLE :: Swale_actet(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_dunnian_cascadeflow(:), Hru_interflow_cascadeflow(:), Hru_sz_cascadeflow(:)
       REAL, SAVE, ALLOCATABLE :: Pref_flow_max(:), Snow_free(:)
       REAL, SAVE, ALLOCATABLE :: Cap_waterin(:), Soil_lower(:)
       REAL, SAVE, ALLOCATABLE :: Potet_lower(:), Potet_rechr(:), Soil_lower_ratio(:)
@@ -283,17 +283,17 @@
      &       'inches', Upslope_dunnianflow)
 
         ALLOCATE ( Hru_sz_cascadeflow(Nhru) )
-        CALL declvar_real(MODNAME, 'hru_sz_cascadeflow', 'nhru', Nhru, &
+        CALL declvar_dble(MODNAME, 'hru_sz_cascadeflow', 'nhru', Nhru, &
      &       'Cascading interflow and Dunnian surface runoff from each HRU', &
      &       'inches', Hru_sz_cascadeflow)
 
         ALLOCATE ( Hru_dunnian_cascadeflow(Nhru) )
-        CALL declvar_real(MODNAME, 'hru_dunnian_cascadeflow', 'nhru', Nhru, &
+        CALL declvar_dble(MODNAME, 'hru_dunnian_cascadeflow', 'nhru', Nhru, &
      &       'Cascading Dunnian surface runoff from each HRU', &
      &       'inches', Hru_dunnian_cascadeflow)
 
         ALLOCATE ( Hru_interflow_cascadeflow(Nhru) )
-        CALL declvar_real(MODNAME, 'hru_interflow_cascadeflow', 'nhru', Nhru, &
+        CALL declvar_dble(MODNAME, 'hru_interflow_cascadeflow', 'nhru', Nhru, &
      &       'Cascading interflow from each HRU', &
      &       'inches', Hru_interflow_cascadeflow)
 
@@ -839,9 +839,9 @@
       IF ( Cascade_flag>CASCADE_OFF ) THEN
         Upslope_interflow = 0.0D0
         Upslope_dunnianflow = 0.0D0
-        Hru_sz_cascadeflow = 0.0
-        Hru_dunnian_cascadeflow = 0.0
-        Hru_interflow_cascadeflow = 0.0
+        Hru_sz_cascadeflow = 0.0D0
+        Hru_dunnian_cascadeflow = 0.0D0
+        Hru_interflow_cascadeflow = 0.0D0
         Basin_lakeinsz = 0.0D0
         Basin_dninterflow = 0.0D0
         Basin_dndunnianflow = 0.0D0
@@ -1192,10 +1192,10 @@
      &                                dnpreflow, dndunn)
                 Basin_dninterflow = Basin_dninterflow + DBLE( (dnslowflow+dnpreflow)*harea )
                 Basin_dndunnianflow = Basin_dndunnianflow + DBLE( dndunn*harea )
-                Hru_sz_cascadeflow(i) = dnslowflow + dnpreflow + dndunn
-                Hru_dunnian_cascadeflow(i) = dndunn
-                Hru_interflow_cascadeflow(i) = dnslowflow + dnpreflow
-                Basin_dncascadeflow = Basin_dncascadeflow + DBLE( Hru_sz_cascadeflow(i)*harea )
+                Hru_sz_cascadeflow(i) = DBLE( dnslowflow + dnpreflow + dndunn )
+                Hru_dunnian_cascadeflow(i) = DBLE( dndunn )
+                Hru_interflow_cascadeflow(i) = DBLE( dnslowflow + dnpreflow )
+                Basin_dncascadeflow = Basin_dncascadeflow + Hru_sz_cascadeflow(i)*Hru_area_dble(i)
               ENDIF
             ENDIF
           ENDIF

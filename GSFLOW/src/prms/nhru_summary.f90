@@ -365,7 +365,7 @@
       use PRMS_MMFAPI, only: getvar_dble, getvar_int, getvar_real
       USE PRMS_MODULE, ONLY: Nhru, Start_month, Start_day, End_year, End_month, End_day, Nowyear, Nowmonth, Nowday, Hru_type
       USE PRMS_NHRU_SUMMARY
-      USE PRMS_SET_TIME, ONLY: Modays, yrdays
+      USE PRMS_SET_TIME, ONLY: Modays
       use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions and subroutines

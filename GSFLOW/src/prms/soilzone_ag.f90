@@ -485,9 +485,9 @@
       IF ( Cascade_flag>CASCADE_OFF ) THEN
         Upslope_interflow = 0.0D0
         Upslope_dunnianflow = 0.0D0
-        Hru_sz_cascadeflow = 0.0
-        Hru_dunnian_cascadeflow = 0.0
-        Hru_interflow_cascadeflow = 0.0
+        Hru_sz_cascadeflow = 0.0D0
+        Hru_dunnian_cascadeflow = 0.0D0
+        Hru_interflow_cascadeflow = 0.0D0
         Basin_lakeinsz = 0.0D0
         Basin_dninterflow = 0.0D0
         Basin_dndunnianflow = 0.0D0
@@ -1022,10 +1022,10 @@
      &                                dnpreflow, dndunn)
                 Basin_dninterflow = Basin_dninterflow + DBLE( (dnslowflow+dnpreflow)*harea )
                 Basin_dndunnianflow = Basin_dndunnianflow + DBLE( dndunn*harea )
-                Hru_sz_cascadeflow(i) = dnslowflow + dnpreflow + dndunn
-                Hru_dunnian_cascadeflow(i) = dndunn
-                Hru_interflow_cascadeflow(i) = dnslowflow + dnpreflow
-                Basin_dncascadeflow = Basin_dncascadeflow + DBLE( Hru_sz_cascadeflow(i)*harea )
+                Hru_sz_cascadeflow(i) = DBLE( dnslowflow + dnpreflow + dndunn )
+                Hru_dunnian_cascadeflow(i) = DBLE( dndunn )
+                Hru_interflow_cascadeflow(i) = DBLE( dnslowflow + dnpreflow )
+                Basin_dncascadeflow = Basin_dncascadeflow + Hru_sz_cascadeflow(i)*Hru_area_dble(i)
               ENDIF
             ENDIF
           ENDIF
