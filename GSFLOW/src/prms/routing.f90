@@ -173,9 +173,6 @@
      &     ' 9=sink; 10=inbound from Great Lakes; 11=outbound to Great Lakes)', &
      &     'none')/=0 ) CALL read_error(1, 'segment_type')
 
-      ! user updated values if different than tosegment_orig
-      ! -5 = outbound from NHM; -6 = inbound from region; -7 = outbound from region;
-      ! -8 = drains to ocean; -11 = drains to Great Lake
       ALLOCATE ( Tosegment(Nsegment) )
       IF ( declparam(MODNAME, 'tosegment', 'nsegment', 'integer', &
      &     '0', '0', '9999999', &
@@ -567,14 +564,16 @@
 !      ENDIF
       DEALLOCATE ( x_off )
 
-      Segmentcum_hruarea = 0.0D0
-      Seg_upstream_hruarea = 0.0D0
-      DO i = 1, Nsegment
-        iseg = Hru_segment(i)
-        iorder = Segment_order(i)
-        Segmentcum_hruarea(iorder) = Segmentcum_hruarea(iorder) + Seg_upstream_hruarea(iorder)
-        IF ( toseg>0 ) Seg_upstream_hruarea(toseg) = Seg_upstream_hruarea(toseg) + Segment_hruarea(iorder)
-      ENDDO
+      IF ( Hru_seg_cascades==ACTIVE ) THEN
+        Segmentcum_hruarea = 0.0D0
+        Seg_upstream_hruarea = 0.0D0
+        DO i = 1, Nsegment
+          iseg = Hru_segment(i)
+          iorder = Segment_order(i)
+          Segmentcum_hruarea(iorder) = Segmentcum_hruarea(iorder) + Seg_upstream_hruarea(iorder)
+          IF ( toseg>0 ) Seg_upstream_hruarea(toseg) = Seg_upstream_hruarea(toseg) + Segment_hruarea(iorder)
+        ENDDO
+      ENDIF
 
       IF ( Strmflow_flag==strmflow_in_out_module ) RETURN
 !

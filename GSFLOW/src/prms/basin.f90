@@ -16,6 +16,8 @@
       INTEGER, SAVE, ALLOCATABLE :: Gwr_type(:), Hru_route_order(:), Gwr_route_order(:)
       INTEGER, SAVE :: Weir_gate_flag, Puls_lin_flag
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_area_dble(:), Lake_area(:)
+!!      LOGICAL, ALLOCATABLE, SAVE :: active_mask(:)
+!!      INTEGER, ALLOCATABLE, SAVE :: active_mask_hru(:)
 !   Declared Variables
       REAL, SAVE, ALLOCATABLE :: Hru_frac_perv(:), Ag_area(:)
       REAL, SAVE, ALLOCATABLE :: Hru_frac_imperv(:), Hru_frac_dprst(:)
@@ -598,6 +600,19 @@
 
       Active_hrus = j
       Active_area = Land_area + Water_area
+
+!!      ! Create mask of only active HRUs
+!!      allocate( active_mask(nhru)
+!!      active_mask = .false.
+!!      where (hru_type /= INACTIVE) active_mask = .true.
+!!      active_mask_hru(Active_hrus) )
+!!      j = 0
+!!      do i = 1, Nhru
+!!          if ( active_mask(i) ) then
+!!              j = j + 1
+!!              active_mask_hru(j) = i
+!!          endif
+!!      enddo
 
       Active_gwrs = Active_hrus
       IF ( gwflow_flag==ACTIVE .OR. activeHRU_inactiveCELL_flag == ACTIVE ) THEN

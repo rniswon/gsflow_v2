@@ -165,7 +165,7 @@ end module PRMS_IT0_VARS
      &    Strmflow_module, Temp_module, Stream_order_flag, PRMS6_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, Humidity_cbh_flag, &
-     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, no_snow_flag, gwflow_flag, Nhrucell
+     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, snow_flag, gwflow_flag, Nhrucell
       use PRMS_MMFAPI, only: declvar_int, declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_CLIMATEVARS
@@ -648,7 +648,7 @@ end module PRMS_IT0_VARS
       ALLOCATE ( Snowmelt(Nhru) )
       ALLOCATE ( Pptmix_nopack(Nhru) )
       ALLOCATE ( It0_pkwater_equiv(Nhru) )
-      IF ( no_snow_flag==OFF ) THEN
+      IF ( snow_flag==ACTIVE ) THEN
         CALL declvar_dble('snowcomp', 'basin_pweqv', 'one', 1, &
      &       'Basin area-weighted average snowpack water equivalent (not including glacier)', &
      &       'inches', Basin_pweqv)
@@ -1097,7 +1097,7 @@ end module PRMS_IT0_VARS
           IF ( getparam_real(Temp_module, 'tmax_adj', Nhru*MONTHS_PER_YEAR, Tmax_aspect_adjust)/=0 ) &
                         CALL read_error(2, 'tmax_adj')
         ENDIF
-      ENDIF
+     ENDIF
 
       IF ( getparam_int(Temp_module, 'temp_units', 1, Temp_units)/=0 ) CALL read_error(2, 'temp_units')
 

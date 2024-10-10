@@ -35,7 +35,7 @@
         REAL, SAVE, ALLOCATABLE :: Temp(:), Potet_coef(:, :)
 ! Control Parameters
         CHARACTER(LEN=MAXFILE_LENGTH) :: wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic
-        CHARACTER(LEN=MAXFILE_LENGTH) :: potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic
+        CHARACTER(LEN=MAXFILE_LENGTH) :: potet_coef_dynamic, transpbeg_dynamic, transpend_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: radtrncf_dynamic, dynamic_param_log_file
         CHARACTER(LEN=MAXFILE_LENGTH) :: fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, snareathresh_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn
@@ -165,8 +165,8 @@
 
       IF ( Dyn_potet_flag>OFF ) THEN
         ALLOCATE ( Potet_coef(Nhru,MONTHS_PER_YEAR) )
-        IF ( control_string(potetcoef_dynamic, 'potetcoef_dynamic')/=0 ) CALL read_error(5, 'potetcoef_dynamic')
-        CALL find_header_end(Potetcoef_unit, potetcoef_dynamic, ierr)
+        IF ( control_string(potet_coef_dynamic, 'potet_coef_dynamic')/=0 ) CALL read_error(5, 'potet_coef_dynamic')
+        CALL find_header_end(Potetcoef_unit, potet_coef_dynamic, ierr)
         IF ( ierr==0 ) THEN
           CALL find_current_file_time(Potetcoef_unit, year, month, day, Potetcoef_next_yr, Potetcoef_next_mo, Potetcoef_next_day)
         ELSE

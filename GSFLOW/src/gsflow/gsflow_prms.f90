@@ -453,7 +453,7 @@
       IF ( (PRMS_land_iteration_flag < 2 .AND. PRMS_flag==ACTIVE) .OR. Process_flag/=RUN ) THEN
         ierr = intcp()
 
-        IF ( no_snow_flag==OFF ) THEN
+        IF ( snow_flag==ACTIVE ) THEN
           ierr = snowcomp()
 
          IF ( Glacier_flag==ACTIVE ) ierr = glacr()
@@ -680,7 +680,6 @@
         IF ( Model_mode(:5)=='PRMS5' .OR. Model_mode(:5)=='prms5' ) PRMS4_flag = OFF
         IF ( Model_mode(:5)=='PRMS6' .OR. Model_mode(:5)=='prms6' ) THEN
           PRMS4_flag = OFF
-          Model = PRMS6
           PRMS6_flag = ACTIVE
         ENDIF
         PRMS_only = ACTIVE
@@ -727,8 +726,6 @@
           Inputerror_flag = 1
         ENDIF
       ENDIF
-      gwflow_flag = ACTIVE
-      IF ( GSFLOW_flag == ACTIVE .AND. activeHRU_inactiveCELL_flag == OFF ) gwflow_flag = OFF
 
       ! get simulation start_time and end_time
       Starttime = -1
@@ -948,6 +945,8 @@
       IF ( control_integer(snow_cloudcover_flag, 'snow_cloudcover_flag')/=0 ) snow_cloudcover_flag = OFF
       IF ( control_integer(seg2hru_flag, 'seg2hru_flag')/=0 ) seg2hru_flag = OFF
       IF ( control_integer(activeHRU_inactiveCELL_flag, 'activeHRU_inactiveCELL_flag')/=0 ) activeHRU_inactiveCELL_flag = OFF
+      gwflow_flag = ACTIVE
+      IF ( GSFLOW_flag == ACTIVE .AND. activeHRU_inactiveCELL_flag == OFF ) gwflow_flag = OFF
 
       IF ( control_integer(Humidity_cbh_flag, 'humidity_cbh_flag')/=0 ) Humidity_cbh_flag = OFF
       IF ( control_integer(Windspeed_cbh_flag, 'windspeed_cbh_flag')/=0 ) Windspeed_cbh_flag = OFF
@@ -1055,7 +1054,7 @@
       IF ( decldim('nmap', 0, MAXDIM, 'Number of mapped values')/=0 ) CALL read_error(7, 'nmap')
       ! 0 = no glacier simulation; 1 = glacr_melt (Ashley) simulation; 2 = Anderson method
       IF ( control_integer(Glacier_flag, 'glacier_flag')/=0 ) Glacier_flag = OFF
-      IF ( control_integer(no_snow_flag, 'no_snow_flag')/=0 ) no_snow_flag = OFF
+      IF ( control_integer(snow_flag, 'snow_flag')/=0 ) snow_flag = ACTIVE
       IF ( control_integer(Frozen_flag, 'frozen_flag')/=0 ) Frozen_flag = OFF
       IF ( control_integer(Dyn_imperv_flag, 'dyn_imperv_flag')/=0 ) Dyn_imperv_flag = OFF
       IF ( control_integer(Dyn_intcp_flag, 'dyn_intcp_flag')/=0 ) Dyn_intcp_flag = OFF
@@ -1120,9 +1119,9 @@
 
 ! cascade
       ! if cascade_flag = 2 (CASCADE_HRU_SEGMENT), use hru_segment parameter for cascades, ncascade=ncascdgw=nhru (typical polygon HRUs)
-      IF ( control_integer(Cascade_flag, 'cascade_flag')/=0 ) Cascade_flag = ACTIVE
+      IF ( control_integer(Cascade_flag, 'cascade_flag')/=0 ) Cascade_flag = CASCADE_NORMAL
       ! if cascadegw_flag = 2 (CASCADEGW_SAME), use same cascades as HRUs
-      IF ( control_integer(Cascadegw_flag, 'cascadegw_flag')/=0 ) Cascadegw_flag = OFF
+      IF ( control_integer(Cascadegw_flag, 'cascadegw_flag')/=0 ) Cascadegw_flag = CASCADE_NORMAL
 
 ! spatial units
       IF ( decldim('ngw', 1, MAXDIM, 'Number of GWRs')/=0 ) CALL read_error(7, 'ngw')
@@ -1158,6 +1157,7 @@
       IF ( declfix('ndays', MAX_DAYS_PER_YEAR, MAX_DAYS_PER_YEAR, 'Maximum number of days in a year ')/=0 ) &
      &     CALL read_error(7, 'ndays')
       IF ( declfix('nmonths', 12, 12, 'Number of months in a year')/=0 ) CALL read_error(7, 'nmonths')
+      Nmonths = 12
       IF ( declfix('one', 1, 1, 'Number of values for scaler array')/=0 ) CALL read_error(7, 'one')
 
       IF ( Inputerror_flag==1 ) THEN
@@ -1591,7 +1591,7 @@
       INTRINSIC :: TRIM
       ! Local Variables
       INTEGER :: nhru_test, dprst_test, nsegment_test, temp_test, et_test, ierr, time_step
-      INTEGER :: cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, start_time(6), end_time(6)
+      INTEGER :: nhrucell_test, nlake_test, transp_test, start_time(6), end_time(6)
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: model_test
       CHARACTER(LEN=11) :: module_name
 !***********************************************************************
@@ -1599,12 +1599,12 @@
         IF ( text_restart_flag==OFF ) THEN
           WRITE ( Restart_outunit ) MODNAME
           WRITE ( Restart_outunit ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
-     &            Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
+     &            Nhrucell, Nlake, Transp_flag, Model_mode
           WRITE ( Restart_outunit ) Starttime, Endtime
         ELSE
           WRITE ( Restart_outunit, * ) MODNAME
           WRITE ( Restart_outunit, * ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
-                  Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
+                  Nhrucell, Nlake, Transp_flag, Model_mode
           WRITE ( Restart_outunit, * ) Starttime, Endtime
         ENDIF
       ELSE
@@ -1613,13 +1613,13 @@
           READ ( Restart_inunit ) module_name
           CALL check_restart(MODNAME, module_name)
           READ ( Restart_inunit ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
-     &           cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
+     &           nhrucell_test, nlake_test, transp_test, model_test
           READ ( Restart_inunit ) start_time, end_time
         ELSE
           READ ( Restart_inunit, * ) module_name
           CALL check_restart(MODNAME, module_name)
           READ ( Restart_inunit, * ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
-                 cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
+                 nhrucell_test, nlake_test, transp_test, model_test
           READ ( Restart_inunit, * ) start_time, end_time
         ENDIF
         IF ( Print_debug>DEBUG_minimum ) PRINT 4, EQULS, 'Simulation time period of Restart File:', &
@@ -1637,16 +1637,6 @@
         IF ( Dprst_flag/=dprst_test ) THEN
           PRINT *, 'ERROR, Initial Conditions File saved for model with dprst_flag=', dprst_test
           PRINT *, '       Current model has dprst_flag=', Dprst_flag, ' they must be equal'
-          ierr = 1
-        ENDIF
-        IF ( Cascade_flag/=cascade_test ) THEN
-          PRINT *, 'ERROR, Initial Conditions File saved for model with cascade_flag=', cascade_test
-          PRINT *, '       Current model has cascade_flag=', Cascade_flag, ' they must be equal'
-          ierr = 1
-        ENDIF
-        IF ( Cascadegw_flag/=cascdgw_test ) THEN
-          PRINT *, 'ERROR, Initial Conditions File saved for model with cascadegw_flag=', cascdgw_test
-          PRINT *, '       Current model has cascadegw_flag=', Cascadegw_flag, ' they must be equal'
           ierr = 1
         ENDIF
         CALL check_restart_dimen('nsegment', nsegment_test, Nsegment, ierr)

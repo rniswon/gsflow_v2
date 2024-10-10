@@ -92,7 +92,7 @@ contains
                                 Cbh_check_flag, Windspeed_day, Humidity_day, &
                                 AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file, cbh_active_flag
     use PRMS_DYNAMIC_PARAM_READ, only: wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
-                                       potetcoef_dynamic, transpbeg_dynamic, transpend_dynamic, dynamic_param_log_file, &
+                                       potet_coef_dynamic, transpbeg_dynamic, transpend_dynamic, dynamic_param_log_file, &
                                        radtrncf_dynamic, fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, &
                                        covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn, &
                                        snareathresh_dynamic
@@ -410,8 +410,9 @@ contains
     Control_parameter_data(i) % name = 'glacier_flag'
     Glacier_flag = OFF
     i = i + 1
-    Control_parameter_data(i) % name = 'no_snow_flag'
-    no_snow_flag = OFF
+    Control_parameter_data(i) % name = 'snow_flag'
+    snow_flag = ACTIVE
+    Control_parameter_data(i) % values_int(1) = snow_flag
 !    i = i + 1
 !    Control_parameter_data(i) % name = 'ag_gravity_flag'
 !    Ag_gravity_flag = OFF
@@ -864,8 +865,8 @@ contains
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'potetcoef_dynamic'
-    Potetcoef_dynamic = 'dyn_potet_coef.param'
-    Control_parameter_data(i) % values_character(1) = Potetcoef_dynamic
+    Potet_coef_dynamic = 'dyn_potet_coef.param'
+    Control_parameter_data(i) % values_character(1) = Potet_coef_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'transpbeg_dynamic'

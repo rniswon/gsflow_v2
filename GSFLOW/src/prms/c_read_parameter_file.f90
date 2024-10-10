@@ -20,7 +20,7 @@ module PRMS_READ_PARAM_FILE
     integer, pointer :: values_int_1d(:)
     integer, pointer :: values_int_2d(:, :)
     real :: maximum, minimum, default_real
-    character(LEN=16), pointer :: values_char_1d(:)
+    character(LEN=16), pointer :: values_char_1d(:), values_char_0d
   end type PRMS_parameter
 
   type(PRMS_parameter), save, allocatable :: Parameter_data(:)

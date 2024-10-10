@@ -3030,7 +3030,7 @@
 !   Snowpack has been completely depleted, reset all states to no-snowpack values
 !***********************************************************************
       SUBROUTINE snow_states_to_zero()
-      USE PRMS_SNOW, ONLY: Ihru, Lst, Iasw, Snsv, Albedo, Pk_den,  &
+      USE PRMS_SNOW, ONLY: Ihru, Lst, Iasw, Snsv, Albedo, Pk_den, &
                            Pk_def, Pk_temp, Pk_ice, Freeh2o, Snowcov_areasv, &
                            Frac_swe, Pss, Pst, Ai, Scrv, Pksv
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Snowcov_area, Pk_depth

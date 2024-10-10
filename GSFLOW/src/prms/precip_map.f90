@@ -1,6 +1,6 @@
 !***********************************************************************
-! Maximum, minimum, average temperatures, and precipitation are distributed to each HRU
-! using temperature and/or precipitation data input as a time series of gridded
+! Precipitation are distributed to each HRU
+! using precipitation data input as a time series of gridded
 ! or other spatial units using an area-weighted method and correction factors to
 ! account for differences in altitude, spatial variation, topography, and 
 ! measurement gage efficiency

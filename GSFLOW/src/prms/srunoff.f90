@@ -899,13 +899,13 @@
         IF ( lateral_flow_flag==ACTIVE .AND. active_glacier==OFF ) THEN ! could be a glacier-capable HRU with no ice
           ! Srp, Sri, and Sroff_ag can be reduced in dprst_comp, so compute here
           ! Sroff_ag, Sri and Srp = 0 for swales
-          runoff = runoff + Srp*perv_area + Sri*Hruarea_imperv
+          runoff = runoff + DBLE( Srp*perv_area + Sri*Hruarea_imperv )
           IF ( ag_on == ACTIVE ) THEN
     !        apply_sroff = DBLE( Sroff_ag*Ag_area(i) ) ! may want apply_sroff be a declared variable
             Basin_apply_sroff = Basin_apply_sroff + DBLE( Sroff_ag*Ag_area(i) )
-            runoff = runoff + Sroff_ag*Ag_area(i)
+            runoff = runoff + DBLE( Sroff_ag*Ag_area(i) )
           ENDIF
-          srunoff = runoff / Hruarea
+          srunoff = SNGL( runoff / Hruarea_dble )
 
 !******Compute HRU weighted average (to units of inches/dt)
           IF ( Cascade_flag>CASCADE_OFF ) THEN

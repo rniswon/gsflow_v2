@@ -1,8 +1,8 @@
 !***********************************************************************
 !     Modules PRMS_MODULE and GSFMODFLOW
 !***********************************************************************
-  MODULE PRMS_MODULE
-    USE PRMS_CONSTANTS
+      MODULE PRMS_MODULE
+      USE PRMS_CONSTANTS
       IMPLICIT NONE
       character(LEN=*), parameter :: &
      &          EQULS = '=========================================================================='
@@ -11,14 +11,14 @@
       character(len=*), parameter :: GSFLOW_versn = '2.4.0 09/01/2024'
       character(len=*), parameter :: PRMS_versn = '2024-09-01'
       character(len=*), parameter :: PRMS_VERSION = 'Version 6.0.0 09/01/2024'
-      character(len=*), parameter :: githash = 'Github Commit Hash b7b217f master branch'
+      character(len=*), parameter :: githash = 'Github Commit Hash 87c870f3a2809a167698e4f88a354886415f6afa'
       character(len=*), parameter :: Version_read_control_file = '2024-08-01'
-      character(len=*), parameter :: Version_read_parameter_file = '2024-06-21'
+      character(len=*), parameter :: Version_read_parameter_file = '2024-08-27'
       character(len=*), parameter :: Version_read_data_file = '2023-06-02'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw, Ncbh
-      INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus
+      INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus, Nmonths
       INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval, Nmap2hru, Nmap, Nsnow
       INTEGER, SAVE :: NLAKES_MF, Nreach
 ! Global
@@ -69,7 +69,7 @@
       INTEGER, SAVE :: irrigation_apply_flag, Dyn_ag_frac_flag, Dyn_ag_soil_flag, activeHRU_inactiveCELL_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
       INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, snow_cloudcover_flag
-      INTEGER, SAVE :: seg2hru_flag, no_snow_flag, forcing_check_flag
+      INTEGER, SAVE :: seg2hru_flag, snow_flag, forcing_check_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName, Data_file, Stat_var_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Csv_output_file, Model_control_file, Param_file
@@ -85,7 +85,7 @@
       INTEGER, SAVE :: Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, Dyn_springfrost_flag
       INTEGER, SAVE :: Gwr_transferON_OFF, External_transferON_OFF, Segment_transferON_OFF, Lake_transferON_OFF
       INTEGER, SAVE :: Gsf_rpt, Rpt_days
-    END MODULE PRMS_MODULE
+      END MODULE PRMS_MODULE
 
     MODULE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH
