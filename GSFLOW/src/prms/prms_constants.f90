@@ -136,11 +136,13 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: PRMS = 1
     integer, parameter :: PRMS6 = 6
     integer, parameter :: MODFLOW = 2
-    integer, parameter :: MODSIM_PRMS = 3
-    integer, parameter :: MODSIM_PRMS_LOOSE = 4
+	
+	integer, parameter :: MODSIM_PRMS = 3
     integer, parameter :: MODSIM_GSFLOW = 10
     integer, parameter :: MODSIM_MODFLOW = 11
-    integer, parameter :: MODSIM = 12
+    integer, parameter :: MODSIM = 13
+    integer, parameter :: MODSIM_PRMS_LOOSE = 14
+	
     integer, parameter :: RUN = 0
     integer, parameter :: DECL = 1
     integer, parameter :: INIT = 2
