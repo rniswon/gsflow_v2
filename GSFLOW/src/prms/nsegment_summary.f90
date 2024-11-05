@@ -12,7 +12,7 @@
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsegment_var_type(:)
       REAL, SAVE, ALLOCATABLE :: Nsegment_var_daily(:, :)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Nsegment_var_dble(:, :)
-      CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2, Output_fmt3
+      CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2 !, Output_fmt3
       INTEGER, SAVE :: Daily_flag, Double_vars, Yeardays, Monthly_flag
       DOUBLE PRECISION, SAVE :: Monthdays
       INTEGER, SAVE, ALLOCATABLE :: Monthlyunit(:), Yearlyunit(:)
@@ -180,17 +180,17 @@
      &             Yearlyunit(NsegmentOutVars) )
         Nsegment_var_yearly = 0.0D0
         Yearlyunit = 0
-        IF ( NsegmentOut_format==1 ) THEN
-          WRITE ( Output_fmt3, 9003 ) Nsegment
-        ELSEIF ( NsegmentOut_format==2 ) THEN
-          WRITE ( Output_fmt3, 9010 ) Nsegment
-        ELSEIF ( NsegmentOut_format==3 ) THEN
-          WRITE ( Output_fmt3, 9009 ) Nsegment
-        ELSEIF ( NsegmentOut_format==4 ) THEN
-          WRITE ( Output_fmt3, 9008 ) Nsegment
-        ELSEIF ( NsegmentOut_format==5 ) THEN
-          WRITE ( Output_fmt3, 9011 ) Nsegment
-        ENDIF
+        !IF ( NsegmentOut_format==1 ) THEN
+        !  WRITE ( Output_fmt3, 9003 ) Nsegment
+        !ELSEIF ( NsegmentOut_format==2 ) THEN
+        !  WRITE ( Output_fmt3, 9010 ) Nsegment
+        !ELSEIF ( NsegmentOut_format==3 ) THEN
+        !  WRITE ( Output_fmt3, 9009 ) Nsegment
+        !ELSEIF ( NsegmentOut_format==4 ) THEN
+        !  WRITE ( Output_fmt3, 9008 ) Nsegment
+        !ELSEIF ( NsegmentOut_format==5 ) THEN
+        !  WRITE ( Output_fmt3, 9011 ) Nsegment
+        !ENDIF
       ENDIF
       IF ( Monthly_flag==ACTIVE ) THEN
         Monthdays = 0.0D0
@@ -289,7 +289,7 @@
 ! Functions
       INTRINSIC :: SNGL, DBLE
 ! Local Variables
-      INTEGER :: j, i, jj, write_month, last_day
+      INTEGER :: j, i, jj, write_month, last_day, save_year, save_month, save_day
 !***********************************************************************
       IF ( Begin_results==OFF ) THEN
         IF ( Nowyear==Begyr .AND. Nowmonth==Start_month .AND. Nowday==Start_day ) THEN
@@ -326,7 +326,7 @@
                   Nsegment_var_yearly(i, jj) = Nsegment_var_yearly(i, jj)/Yeardays
                 ENDDO
               ENDIF
-              WRITE ( Yearlyunit(jj), Output_fmt3) Lastyear, (Nsegment_var_yearly(j,jj), j=1,Nsegment)
+              WRITE ( Yearlyunit(jj), Output_fmt) save_year, save_month, save_day, (Nsegment_var_yearly(j,jj), j=1,Nsegment)
             ENDDO
             Nsegment_var_yearly = 0.0D0
             Yeardays = 0
@@ -334,6 +334,9 @@
           ENDIF
         ENDIF
         Yeardays = Yeardays + 1
+        save_year = Nowyear
+        save_month = Nowmonth
+        save_day = Nowday
       ELSEIF ( Monthly_flag==ACTIVE ) THEN
         ! check for last day of month and simulation
         IF ( Nowday==Modays(Nowmonth) ) THEN

@@ -408,6 +408,8 @@
                 !rsr, 03/24/2008 intercept rain on snow-free grass,
                 !rsr             when not a mixed event
                 IF ( Pkwater_equiv(i)<ZERO_SNOWPACK .AND. netsnow<NEARZERO ) THEN
+                  netrain = netrain + netsnow ! to make sure tiny snow accounted for
+                  netsnow = 0.0
                   CALL intercept(Hru_rain(i), stor_max_rain, cov, intcpstor, netrain)
                   !rsr 03/24/2008
                   !it was decided to leave the water in intcpstor rather

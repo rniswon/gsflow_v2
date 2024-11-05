@@ -544,7 +544,7 @@
      &    Init_vars_from_file, Cascade_flag, GSFLOW_flag, Parameter_check_flag, Inputerror_flag, Hru_type
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_SOILZONE
-      USE PRMS_BASIN, ONLY: Hru_perv, Active_hrus, Hru_route_order, Hru_storage, Hru_area, Hru_frac_perv
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_storage, Hru_frac_perv
       USE PRMS_FLOWVARS, ONLY: Soil_moist_max, Soil_rechr_max, &
      &    Ssres_stor, Slow_stor, Pref_flow_stor, Soil_zone_max, Soil_lower_stor_max, &
      &    Soil_moist, Sat_threshold, Soil_rechr, Dprst_stor_hru, Hru_impervstor, &
@@ -556,7 +556,6 @@
       INTRINSIC :: MIN, DBLE, maxval
 ! Local Variables
       INTEGER :: i, ii, ihru, icnt, j
-      REAL :: hruarea, perv_area
 !***********************************************************************
       szinit = 0
 
@@ -668,8 +667,6 @@
           ENDIF
         ENDIF
 
-        hruarea = Hru_area(i)
-        perv_area = Hru_perv(i)
         Soil_zone_max(i) = Sat_threshold(i) + Soil_moist_max(i)*Hru_frac_perv(i)
         Soil_moist_tot(i) = Ssres_stor(i) + Soil_moist(i)*Hru_frac_perv(i)
         Soil_lower(i) = Soil_moist(i) - Soil_rechr(i)
@@ -753,10 +750,10 @@
 !***********************************************************************
       INTEGER FUNCTION szrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, LAKE, SWALE, &
-     &    DEBUG_less, ERROR_param, CASCADE_OFF, MODSIM_PRMS, MODSIM_PRMS_LOOSE !, NEARZERO
-      USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascade_flag, &
+     &    DEBUG_less, CASCADE_OFF, ERROR_param, MODSIM_PRMS, MODSIM_PRMS_LOOSE !, NEARZERO, CLOSEZERO
+      USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Nlake, &
      &    Frozen_flag, Soilzone_add_water_use, Nowmonth, GSFLOW_flag, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
-     &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Model, Dprst_ag_gain !, Nowyear, Nowday, CLOSEZERO
+     &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Model, Dprst_ag_gain !, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, &
      &    Hru_route_order, Active_hrus, Basin_area_inv, Hru_area, &
@@ -789,12 +786,13 @@
       EXTERNAL :: compute_soilmoist, compute_szactet, compute_cascades, compute_gravflow
       EXTERNAL :: compute_interflow, compute_gwflow, init_basin_vars
 ! Local Variables
-      INTEGER :: i, k, compute_lateral, j, igvr, update_potet
+      INTEGER :: i, k, update_potet, compute_lateral, j, igvr
       REAL :: dunnianflw, interflow, perv_area, harea
-      REAL :: dnslowflow, dnpreflow, dndunn, availh2o, avail_potet, hruactet
+      DOUBLE PRECISION :: dnslowflow, dnpreflow, dndunn
+      REAL :: availh2o, avail_potet, hruactet
       REAL :: gvr_maxin, topfr !, tmp
       REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin
-      REAL :: perv_frac, capacity, capwater_maxin, ssresin, dunnianflw_frz
+      REAL :: perv_frac, capwater_maxin, ssresin, dunnianflw_frz, capacity
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin
       DOUBLE PRECISION :: gwin
       INTEGER :: cfgi_frozen_hru
@@ -1184,17 +1182,17 @@
           IF ( Cascade_flag>CASCADE_OFF ) THEN
             IF ( Ncascade_hru(i)>0 ) THEN
               IF ( interflow+dunnianflw>cascade_min ) THEN
-                dnslowflow = 0.0
-                dnpreflow = 0.0
-                dndunn = 0.0
+                dnslowflow = 0.0D0
+                dnpreflow = 0.0D0
+                dndunn = 0.0D0
                 CALL compute_cascades(i, Ncascade_hru(i), Slow_flow(i), &
      &                                prefflow, Dunnian_flow(i), dnslowflow, &
      &                                dnpreflow, dndunn)
-                Basin_dninterflow = Basin_dninterflow + DBLE( (dnslowflow+dnpreflow)*harea )
-                Basin_dndunnianflow = Basin_dndunnianflow + DBLE( dndunn*harea )
-                Hru_sz_cascadeflow(i) = DBLE( dnslowflow + dnpreflow + dndunn )
-                Hru_dunnian_cascadeflow(i) = DBLE( dndunn )
-                Hru_interflow_cascadeflow(i) = DBLE( dnslowflow + dnpreflow )
+                Basin_dninterflow = Basin_dninterflow + (dnslowflow+dnpreflow)*Hru_area_dble(i)
+                Basin_dndunnianflow = Basin_dndunnianflow + dndunn*Hru_area_dble(i)
+                Hru_sz_cascadeflow(i) = dnslowflow + dnpreflow + dndunn
+                Hru_dunnian_cascadeflow(i) = dndunn
+                Hru_interflow_cascadeflow(i) = dnslowflow + dnpreflow
                 Basin_dncascadeflow = Basin_dncascadeflow + Hru_sz_cascadeflow(i)*Hru_area_dble(i)
               ENDIF
             ENDIF
@@ -1611,7 +1609,7 @@
 ! Arguments
       INTEGER, INTENT(IN) :: Ihru, Ncascade_hru
       REAL, INTENT(INOUT) :: Dunnian, Slowflow, Preflow
-      REAL, INTENT(INOUT) :: Dnslowflow, Dnpreflow, Dndunnflow
+      DOUBLE PRECISION, INTENT(INOUT) :: Dnslowflow, Dnpreflow, Dndunnflow
 ! Local Variables
       INTEGER :: j, k
       REAL :: frac, fracwt
@@ -1624,9 +1622,9 @@
           fracwt = Hru_down_fracwt(k, Ihru)
           Upslope_interflow(j) = Upslope_interflow(j) + DBLE( (Slowflow+Preflow)*fracwt )
           Upslope_dunnianflow(j) = Upslope_dunnianflow(j) + DBLE( Dunnian*fracwt )
-          Dnslowflow = Dnslowflow + Slowflow*frac
-          Dnpreflow = Dnpreflow + Preflow*frac
-          Dndunnflow = Dndunnflow + Dunnian*frac
+          Dnslowflow = Dnslowflow + DBLE( Slowflow*frac )
+          Dnpreflow = Dnpreflow + DBLE( Preflow*frac )
+          Dndunnflow = Dndunnflow + DBLE( Dunnian*frac )
 ! if hru_down(k, Ihru) < 0, cascade contributes to a stream
         ELSEIF ( j<0 ) THEN
           j = IABS(j)
