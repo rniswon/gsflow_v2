@@ -39,8 +39,8 @@ Steady state simulation successful, used 59 iterations
  WARNING, parameter: cascade_min is not specified
           Set to default value:  1.0000000E-06
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/09/24 13:23:19
- Elapsed run time: 12 Minutes, 50.245 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/11/05 11:21:03
+ Elapsed run time: 12 Minutes, 42.168 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         45418;  SZ iterations:           45418

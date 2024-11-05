@@ -17,45 +17,45 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        8925560.96     EVAPOTRANSPIRATION =        2970937.65
+   EVAPOTRANSPIRATION =        8924802.82     EVAPOTRANSPIRATION =        2970559.54
            STREAMFLOW =        6116110.34             STREAMFLOW =        1569209.25
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
-   INFLOWS - OUTFLOWS =        7.8015D+07     INFLOWS - OUTFLOWS =       -1309412.24
+   INFLOWS - OUTFLOWS =        7.8016D+07     INFLOWS - OUTFLOWS =       -1309034.14
              --------                                   --------
 
- TOTAL STORAGE CHANGE =        7.7821D+07         STORAGE CHANGE =       -1410525.59
+ TOTAL STORAGE CHANGE =        7.8217D+07         STORAGE CHANGE =       -1403481.72
        --------------                             --------------
          LAND SURFACE =        1.0172D+07           LAND SURFACE =       -4040277.36
-            SOIL ZONE =        3.6218D+07              SOIL ZONE =        1431577.26
-     UNSATURATED ZONE =          -9075.24       UNSATURATED ZONE =          39981.35
-       SATURATED ZONE =        1322195.46         SATURATED ZONE =         213378.91
-                LAKES =        3.0117D+07                  LAKES =         944814.25
+            SOIL ZONE =        3.6218D+07              SOIL ZONE =        1431871.06
+     UNSATURATED ZONE =         -22986.24       UNSATURATED ZONE =          42995.76
+       SATURATED ZONE =        1354012.38         SATURATED ZONE =         198214.50
+                LAKES =        3.0495D+07                  LAKES =         963714.31
 
- OVERALL BUDGET ERROR =         194106.53           BUDGET ERROR =         101113.35
+ OVERALL BUDGET ERROR =        -201018.01           BUDGET ERROR =          94447.59
 
 
-  PERCENT DISCREPANCY =              0.21    PERCENT DISCREPANCY =              2.20
+  PERCENT DISCREPANCY =             -0.22    PERCENT DISCREPANCY =              2.06
 
 
 
  Number of time steps:      7;  Number of non-convergence:   0
- MF iterations:            69;  SZ iterations:              73
- Average MF iterations:  9.86;  Average SZ iterations:   10.43
- Maximum MF iterations:    16;  Maximum SZ iterations:      17
+ MF iterations:            85;  SZ iterations:              87
+ Average MF iterations: 12.14;  Average SZ iterations:   12.43
+ Maximum MF iterations:    22;  Maximum SZ iterations:      22
 
-MF iteration distribution:      0    0    0    1    2    0    0    0    0    1
+MF iteration distribution:      0    0    0    0    2    0    0    0    0    1
+                                0    0    0    2    1    0    0    0    0    0
+                                0    1    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+                                0    0    0    0    0    0    0    0    0    0
+
+SZ computation distribution:    0    0    0    0    2    0    0    0    0    1
                                 0    0    0    1    1    1    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
-
-SZ computation distribution:    0    0    0    0    3    0    0    0    0    1
-                                0    0    0    0    1    1    1    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
+                                0    1    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0

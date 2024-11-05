@@ -37,7 +37,7 @@ Stream Temperature: stream_temp
 
 Github Commit Hash 87c870f3a2809a167698e4f88a354886415f6afa
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 12:06:20
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/04 18:08:35
 
 ==========================================================================
 Using PRMS Data File: ..\input\prms\sagehen.data
@@ -87,7 +87,7 @@ Solar Radiation Distribution    climate_hru         2024-08-09
 Potential Evapotranspiration    climate_hru         2024-08-09
 Transpiration Distribution      transp_tindex       2023-11-01
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2024-04-30
+Snow Dynamics                   snowcomp            2024-09-01
 Surface Runoff                  srunoff_smidx       2024-04-04
 Soilzone Computations           soilzone            2024-06-20
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
@@ -113,5 +113,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time:    14 minutes 44.89 seconds
+Execution elapsed time:    14 minutes 34.30 seconds
 

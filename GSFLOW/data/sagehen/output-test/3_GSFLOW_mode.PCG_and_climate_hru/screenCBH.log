@@ -23,7 +23,7 @@ Control File: .\gsflow_climate_hru.control
                       SWR1 Version 1.04.0 09/15/2016
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 12:06:20
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/04 18:08:35
 
 
 ==========================================================================
@@ -52,7 +52,7 @@ Solar Radiation Distribution    climate_hru         2024-08-09
 Potential Evapotranspiration    climate_hru         2024-08-09
 Transpiration Distribution      transp_tindex       2023-11-01
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2024-04-30
+Snow Dynamics                   snowcomp            2024-09-01
 Surface Runoff                  srunoff_smidx       2024-04-04
 Soilzone Computations           soilzone            2024-06-20
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
@@ -88,8 +88,8 @@ Simulation time period: 1980/10/01 - 1996/09/30
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/09/24 12:21:05
- Elapsed run time: 14 Minutes, 44.773 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/11/04 18:23:09
+ Elapsed run time: 14 Minutes, 34.191 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         63717;  SZ iterations:           63680

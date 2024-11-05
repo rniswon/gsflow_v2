@@ -22,7 +22,7 @@ Control File: .\gsflow_gsflowLowKc.control
                       SWR1 Version 1.04.0 09/15/2016
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:31:26
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 11:54:13
 
 
 ==========================================================================
@@ -51,14 +51,14 @@ Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2024-04-30
+Snow Dynamics                   snowcomp            2024-09-01
 Surface Runoff                  srunoff_smidx       2024-04-04
 Soilzone Computations           soilzone            2024-06-20
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
 GSFLOW Output CSV Summary       gsflow_sum          2024-02-14
-Output Summary                  nhru_summary        2024-04-04
+Output Summary                  nhru_summary        2024-09-01
 Output Summary                  basin_summary       2021-08-13
 Output Summary                  nsegment_summary    2023-11-01
 ==============================================================
@@ -93,8 +93,8 @@ Simulation time period: 1990/10/01 - 1995/10/31
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/09/24 11:33:44
- Elapsed run time: 2 Minutes, 18.509 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/11/05 11:56:20
+ Elapsed run time: 2 Minutes, 7.143 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
  MF iterations:         11661;  SZ iterations:           11615

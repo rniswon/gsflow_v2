@@ -63,9 +63,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash 87c870f3a2809a167698e4f88a354886415f6afa
+Github Commit Hash fcfb7ffe944c80fb9aef27ab96c2b99837741ef1
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 12:12:03
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 12:31:57
 
 ==========================================================================
 Using PRMS Data File: ../input/prms/tahoe.data
@@ -225,7 +225,7 @@ Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2024-04-30
+Snow Dynamics                   snowcomp            2024-09-01
 Surface Runoff                  srunoff_smidx       2024-04-04
 Soilzone Computations           soilzone            2024-06-20
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
@@ -253,5 +253,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time:     0 minutes  3.85 seconds
+Execution elapsed time:     0 minutes  4.74 seconds
 

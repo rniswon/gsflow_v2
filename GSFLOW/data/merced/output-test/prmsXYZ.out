@@ -35,9 +35,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash 87c870f3a2809a167698e4f88a354886415f6afa
+Github Commit Hash fcfb7ffe944c80fb9aef27ab96c2b99837741ef1
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:33:27
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 11:53:51
 
 ==========================================================================
 Using PRMS Data File: ./input/mercd.data
@@ -159,12 +159,13 @@ Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2024-04-30
+Snow Dynamics                   snowcomp            2024-09-01
 Surface Runoff                  srunoff_smidx       2024-04-04
 Soilzone Computations           soilzone            2024-06-20
 Groundwater                     gwflow              2024-05-30
 Streamflow Routing              strmflow            2020-08-03
 Output Summary                  basin_sum           2024-04-30
+Output Summary                  nhru_summary        2024-09-01
 Statistics Variables Output     statvar_out         2021-09-08
 Output Summary                  prms_summary        2024-04-30
 ==============================================================

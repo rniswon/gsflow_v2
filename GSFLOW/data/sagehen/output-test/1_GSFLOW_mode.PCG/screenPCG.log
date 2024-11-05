@@ -68,9 +68,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash 87c870f3a2809a167698e4f88a354886415f6afa
+Github Commit Hash fcfb7ffe944c80fb9aef27ab96c2b99837741ef1
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:37:40
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 12:08:05
 
 
 ==========================================================================
@@ -99,7 +99,7 @@ Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2024-04-30
+Snow Dynamics                   snowcomp            2024-09-01
 Surface Runoff                  srunoff_smidx       2024-04-04
 Soilzone Computations           soilzone            2024-06-20
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
@@ -730,8 +730,8 @@ Date: 1996/09/01; Stress: 2; Step: 5815; Simulation step: 5815
                   MF iterations: 13; SZ iterations: 13
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/09/24 11:53:45
- Elapsed run time: 16 Minutes, 4.315 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/11/05 12:23:38
+ Elapsed run time: 15 Minutes, 33.152 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         64597;  SZ iterations:           64528

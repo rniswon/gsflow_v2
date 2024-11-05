@@ -62,9 +62,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash 87c870f3a2809a167698e4f88a354886415f6afa
+Github Commit Hash fcfb7ffe944c80fb9aef27ab96c2b99837741ef1
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:41:32
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 11:57:32
 
 ==========================================================================
 Using PRMS Data File: ../input/prms/sagehen.data
@@ -114,7 +114,7 @@ Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2024-04-30
+Snow Dynamics                   snowcomp            2024-09-01
 Surface Runoff                  srunoff_smidx       2024-04-04
 Soilzone Computations           soilzone            2024-06-20
 Groundwater                     gwflow              2024-05-30
@@ -1121,7 +1121,7 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
    1983    6    3    0.000    0.065    41.597    0.392    0.586   -0.000    0.000
    1983    6    4    0.162    0.135    40.974    0.650    0.621    0.000    0.000
    1983    6    5    0.000    0.143    40.311    0.520    0.600   -0.000    0.000
-   1983    6    6    0.000    0.195    39.513    0.603    0.625   -0.000    0.000
+   1983    6    6    0.000    0.195    39.513    0.603    0.625    0.000    0.000
    1983    6    7    0.000    0.249    38.598    0.666    0.632    0.000    0.000
    1983    6    8    0.000    0.159    37.954    0.485    0.607   -0.000    0.000
    1983    6    9    0.000    0.172    37.275    0.508    0.611    0.000    0.000
@@ -1146,7 +1146,7 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
    1983    6   28    0.000    0.194    27.219    0.242    0.298    0.000    0.000
    1983    6   29    0.000    0.213    26.760    0.246    0.284   -0.000    0.000
    1983    6   30    0.000    0.149    26.420    0.190    0.267   -0.000    0.000
-   1983    7    1    0.000    0.232    25.954    0.234    0.263    0.000    0.000
+   1983    7    1    0.000    0.232    25.954    0.234    0.263   -0.000    0.000
    1983    7    2    0.000    0.119    25.681    0.155    0.253    0.000    0.000
    1983    7    3    0.000    0.213    25.268    0.200    0.232   -0.000    0.000
    1983    7    4    0.000    0.292    24.760    0.216    0.225   -0.000    0.000
@@ -1360,5 +1360,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
    1984    1   28    0.000    0.066    39.756    0.018    0.035    0.000    0.000
    1984    1   29    0.000    0.064    39.674    0.018    0.035    0.000    0.000
    1984    1   30    0.000    0.073    39.583    0.018    0.035   -0.000    0.000
-Execution elapsed time:     0 minutes  0.38 seconds
+Execution elapsed time:     0 minutes  0.29 seconds
 

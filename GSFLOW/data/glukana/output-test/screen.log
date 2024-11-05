@@ -58,9 +58,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash 87c870f3a2809a167698e4f88a354886415f6afa
+Github Commit Hash fcfb7ffe944c80fb9aef27ab96c2b99837741ef1
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:32:48
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 11:53:28
 
 
 ==========================================================================
@@ -87,7 +87,7 @@ Solar Radiation Distribution    ccsolrad            2024-04-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2024-04-30
+Snow Dynamics                   snowcomp            2024-09-01
 Glacier Dynamics                glacr_melt          2024-04-04
 Surface Runoff                  srunoff_smidx       2024-04-04
 Soilzone Computations           soilzone            2024-06-20
@@ -125,10 +125,10 @@ Simulation time period: 1971/10/01 - 2015/09/30
                           =========================
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:32:48
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 11:53:28
 
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/09/24 11:32:50
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 11:53:31
 
-Execution elapsed time    0 minutes  2.71 seconds
+Execution elapsed time    0 minutes  2.80 seconds
 
