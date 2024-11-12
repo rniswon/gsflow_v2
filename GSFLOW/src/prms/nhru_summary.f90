@@ -466,6 +466,11 @@
                   ENDDO
                 ENDIF
               ENDIF
+              IF ( last_day==ACTIVE ) THEN
+                save_year = Nowyear
+                save_month = Nowmonth
+                save_day = Nowday
+              ENDIF
               CALL write_CBH_values(jj, Yearlyunit(jj), Nhru_var_type(jj), 3)
             ENDDO
             Nhru_var_yearly = 0.0D0

@@ -7,7 +7,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=9), parameter :: MODNAME = 'basin_sum'
-      character(len=*), parameter :: Version_basin_sum = '2024-04-30'
+      character(len=*), parameter :: Version_basin_sum = '2024-09-01'
 
       INTEGER, SAVE :: BALUNT, Totdays
       INTEGER, SAVE :: Header_prt, Endjday
@@ -504,13 +504,12 @@
       INTRINSIC :: ABS, DBLE
       EXTERNAL :: header_print
 ! Local variables
-      INTEGER :: i, j, wyday, endrun, monthdays
-      DOUBLE PRECISION :: wat_bal, obsrunoff, yrdays_dble
+      INTEGER :: i, j, wyday, endrun
+      DOUBLE PRECISION :: wat_bal, obsrunoff, yrdays_dble, monthdays
 !***********************************************************************
       sumbrun = 0
 
       wyday = Julwater
-      yrdays_dble = DBLE( Yrdays )
 
       IF ( Nowyear==End_year .AND. Jday==Endjday ) THEN
         endrun = 1
@@ -634,7 +633,7 @@
       Basin_lakeevap_mo = Basin_lakeevap_mo + Basin_lakeevap
 
       IF ( Nowday==Modays(Nowmonth) ) THEN
-        monthdays = Modays(Nowmonth)
+        monthdays = DBLE( Modays(Nowmonth) )
         Basin_swrad_mo = Basin_swrad_mo/monthdays
         Basin_max_temp_mo = Basin_max_temp_mo/monthdays
         Basin_min_temp_mo = Basin_min_temp_mo/monthdays
@@ -700,6 +699,7 @@
         ENDDO
 
         IF ( wyday==Yrdays ) THEN
+          yrdays_dble = DBLE( Yrdays )
           IF ( Print_type==0 ) THEN
 
             Obs_runoff_yr = Obs_runoff_yr/yrdays_dble

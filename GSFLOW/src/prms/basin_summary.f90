@@ -7,12 +7,11 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'basin_summary'
-      character(len=*), parameter :: Version_basin_summary = '2021-08-13'
+      character(len=*), parameter :: Version_basin_summary = '2024-09-01'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear, Dailyunit, Monthlyunit, Yearlyunit, Basin_var_type
       INTEGER, SAVE, ALLOCATABLE :: Nc_vars(:)
-      CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2, Output_fmt3
-      INTEGER, SAVE :: Daily_flag, Yeardays, Monthly_flag
-      DOUBLE PRECISION, SAVE :: Monthdays
+      CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2 !, Output_fmt3
+      INTEGER, SAVE :: Daily_flag, Yeardays, Monthly_flag, Monthdays, save_year, save_month, save_day
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Basin_var_daily(:), Basin_var_monthly(:), Basin_var_yearly(:)
 ! Parameters
       INTEGER, SAVE, ALLOCATABLE :: Nhm_id(:)
@@ -95,7 +94,7 @@
 !***********************************************************************
       SUBROUTINE basin_summaryinit()
       USE PRMS_CONSTANTS, ONLY: MAXFILE_LENGTH, ACTIVE, OFF, DAILY_MONTHLY, MEAN_MONTHLY, MEAN_YEARLY, DAILY, MONTHLY, &
-     &    DBLE_TYPE, ERROR_open_out
+     &    DBLE_TYPE, ERROR_open_out, YEARLY
       use PRMS_MMFAPI, only: getvarsize, getvartype
       use PRMS_READ_PARAM_FILE, only: getparam_int
       USE PRMS_MODULE, ONLY: Start_year, Prms_warmup, BasinOutON_OFF, Nhru, Inputerror_flag
@@ -143,10 +142,10 @@
         Yeardays = 0
         ALLOCATE ( Basin_var_yearly(BasinOutVars) )
         Basin_var_yearly = 0.0D0
-        WRITE ( Output_fmt3, 9003 ) BasinOutVars
+        !WRITE ( Output_fmt3, 9003 ) BasinOutVars
       ENDIF
       IF ( Monthly_flag==ACTIVE ) THEN
-        Monthdays = 0.0D0
+        Monthdays = 0
         ALLOCATE ( Basin_var_monthly(BasinOutVars) )
         Basin_var_monthly = 0.0D0
       ENDIF
@@ -175,7 +174,7 @@
         IF ( ios/=0 ) CALL error_stop('in basin_summary, mean yearly', ERROR_open_out)
         IF ( BasinOutON_OFF==2 ) WRITE ( Yearlyunit, '(A, 1X, I0)') 'nhm_id:', Nhm_id(1)
         WRITE ( Yearlyunit, Output_fmt2 ) (BasinOutVar_names(jj)(:Nc_vars(jj)), jj=1, BasinOutVars)
-      ELSEIF ( BasinOut_freq==MEAN_YEARLY ) THEN
+      ELSEIF ( BasinOut_freq==YEARLY ) THEN
         fileName = BasinOutBaseFileName(:numchars(BasinOutBaseFileName))//'_yearly.csv'
         CALL PRMS_open_output_file(Yearlyunit, fileName, 'basin_summary, yearly', 0, ios)
         IF ( ios/=0 ) CALL error_stop('in basin_summary, yearly', ERROR_open_out)
@@ -203,7 +202,7 @@
 !     Output set of declared variables in CSV format
 !***********************************************************************
       SUBROUTINE basin_summaryrun()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MEAN_MONTHLY, YEARLY
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MEAN_MONTHLY, MEAN_YEARLY
       use PRMS_MMFAPI, only: getvar_dble
       USE PRMS_MODULE, ONLY: Start_month, Start_day, End_year, End_month, End_day, Nowyear, Nowmonth, Nowday
       USE PRMS_BASIN_SUMMARY
@@ -211,6 +210,7 @@
       IMPLICIT NONE
 ! Local Variables
       INTEGER :: jj, write_month, last_day
+      DOUBLE PRECISION :: yeardays_dble, monthdays_dble
 !***********************************************************************
       IF ( Begin_results==OFF ) THEN
         IF ( Nowyear==Begyr .AND. Nowmonth==Start_month .AND. Nowday==Start_day ) THEN
@@ -232,16 +232,28 @@
         IF ( Nowyear==End_year .AND. Nowmonth==End_month .AND. Nowday==End_day ) last_day = ACTIVE
         IF ( Lastyear/=Nowyear .OR. last_day==ACTIVE ) THEN
           IF ( (Nowmonth==Start_month .AND. Nowday==Start_day) .OR. last_day==ACTIVE ) THEN
-            DO jj = 1, BasinOutVars
-              IF ( BasinOut_freq==YEARLY ) Basin_var_yearly(jj) = Basin_var_yearly(jj)/Yeardays
-            ENDDO
-            WRITE ( Yearlyunit, Output_fmt3) Lastyear, (Basin_var_yearly(jj), jj=1, BasinOutVars)
+            yeardays_dble = DBLE( Yeardays )
+            IF ( BasinOut_freq==MEAN_YEARLY ) THEN
+              DO jj = 1, BasinOutVars
+                Basin_var_yearly(jj) = Basin_var_yearly(jj)/yeardays_dble
+              ENDDO
+            ENDIF
+            IF ( last_day==ACTIVE ) THEN
+              save_year = Nowyear
+              save_month = Nowmonth
+              save_day = Nowday
+            ENDIF
+            !WRITE ( Yearlyunit, Output_fmt3) Lastyear, (Basin_var_yearly(jj), jj=1, BasinOutVars)
+            WRITE ( Yearlyunit, Output_fmt) save_year, save_month, save_day, (Basin_var_yearly(jj), jj=1, BasinOutVars)
             Basin_var_yearly = 0.0D0
             Yeardays = 0
             Lastyear = Nowyear
           ENDIF
         ENDIF
         Yeardays = Yeardays + 1
+        save_year = Nowyear
+        save_month = Nowmonth
+        save_day = Nowday
       ELSEIF ( Monthly_flag==ACTIVE ) THEN
         ! check for last day of month and simulation
         IF ( Nowday==Modays(Nowmonth) ) THEN
@@ -251,7 +263,7 @@
             IF ( Nowday==End_day ) write_month = ACTIVE
           ENDIF
         ENDIF
-        Monthdays = Monthdays + 1.0D0
+        Monthdays = Monthdays + 1
       ENDIF
 
       IF ( BasinOut_freq>MEAN_MONTHLY ) THEN
@@ -262,10 +274,11 @@
       ENDIF
 
       IF ( Monthly_flag==ACTIVE ) THEN
+        monthdays_dble = DBLE( Monthdays )
         DO jj = 1, BasinOutVars
           Basin_var_monthly(jj) = Basin_var_monthly(jj) + Basin_var_daily(jj)
           IF ( write_month==ACTIVE ) THEN
-            IF ( BasinOut_freq==MEAN_MONTHLY ) Basin_var_monthly(jj) = Basin_var_monthly(jj)/Monthdays
+            IF ( BasinOut_freq==MEAN_MONTHLY ) Basin_var_monthly(jj) = Basin_var_monthly(jj)/monthdays_dble
           ENDIF
         ENDDO
       ENDIF
@@ -273,7 +286,7 @@
       IF ( Daily_flag==ACTIVE ) WRITE ( Dailyunit, Output_fmt) Nowyear, Nowmonth, Nowday, (Basin_var_daily(jj), jj=1,BasinOutVars)
       IF ( write_month==ACTIVE ) THEN
         WRITE ( Monthlyunit, Output_fmt) Nowyear, Nowmonth, Nowday, (Basin_var_monthly(jj), jj=1,BasinOutVars)
-        Monthdays = 0.0D0
+        Monthdays = 0
         Basin_var_monthly = 0.0D0
       ENDIF
 
