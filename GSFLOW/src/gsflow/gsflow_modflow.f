@@ -6,7 +6,7 @@ C
 !***********************************************************************
 !     GSFLOW module that replaces MF_NWT.f
 !***********************************************************************
-
+ 
 C     ******************************************************************
 C     MAIN CODE FOR U.S. GEOLOGICAL SURVEY MODULAR MODEL -- MODFLOW-NWT
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
@@ -25,7 +25,7 @@ C     ******************************************************************
      +                          MODFLOW, MODSIM_MODFLOW
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
      +                       , githash, Model
-       USE GSFMODFLOW
+      USE GSFMODFLOW
       IMPLICIT NONE
 !***********************************************************************
       gsfdecl = 0
@@ -61,7 +61,7 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 !     MFNWT_INIT - Initialize MODFLOW module - get parameter values
 !***********************************************************************
       SUBROUTINE MFNWT_INIT(AFR, Diversions, Idivert,EXCHANGE,DELTAVOL,
-     &                      LAKEVOL, Nsegshold, Nlakeshold, agDemand)
+     &                      LAKEVOL, Nsegshold, Nlakeshold, agDemand) 
 !     ------------------------------------------------------------------
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
@@ -148,7 +148,7 @@ C4------OPEN NAME FILE.
 C
 C5------Get current date and time, assign to IBDT, and write to screen
       CALL DATE_AND_TIME(VALUES=IBDT)
-      IF ( Model==MODFLOW .or. Model==MODSIM_MODFLOW )
+      IF ( Model==MODFLOW .OR. Model==MODSIM_MODFLOW )
      &     WRITE(*,2) (IBDT(I),I=1,3),(IBDT(I),I=5,7)
     2 FORMAT(' Run start date and time (yyyy/mm/dd hh:mm:ss): ',
      &       I0,'/',I2.2,'/',I2.2,I3,2(':',I2.2),/)
@@ -404,7 +404,7 @@ C7------SIMULATE EACH STRESS PERIOD.
         ! make the default number of soilzone iterations equal to the
         ! maximum MF iterations, which is a good practice using NWT and cells=nhru
         IF ( Mxsziter<1 ) THEN
-          PRINT '(/,A)',
+          print '(/,A)',
      &          'WARNING, mxsziter not specified, substituting MXITER'
           Mxsziter = MXITER
         ENDIF
@@ -455,7 +455,7 @@ C
 !     ------------------------------------------------------------------
       USE GSFMODFLOW
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, ACTIVE, OFF,
-     &    ERROR_time, ERROR_modflow, GSFLOW, CANOPY, MODSIM_GSFLOW,
+     &    ERROR_time, ERROR_modflow, MODSIM_GSFLOW, GSFLOW, CANOPY,
      &    MODSIM_MODFLOW
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, snow_flag,
      &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
@@ -490,13 +490,13 @@ c     USE LMGMODULE
       INTEGER, EXTERNAL :: soilzone, soilzone_ag
       INTEGER, EXTERNAL :: srunoff, intcp, snowcomp, glacr
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms
-      EXTERNAL :: MODSIM2SFR, SFR2MODSIM, LAK2MODSIM, GWF2SFR7AD
+      EXTERNAL :: MODSIM2SFR, SFR2MODSIM, LAK2MODSIM
       EXTERNAL :: gwflow_inactive_cell
       EXTERNAL :: GWF2UPWUPDATE, GWF2BAS7AD, GWF2UPW1AD, GWF2CHD7AD
       EXTERNAL :: GWF2BCF7AD, GWF2RES7AD, GWF2LPF7AD, GWF2HUF7AD
       EXTERNAL :: GWF2FHB7AD, GWF2LAK7AD, GWF2UZF1AD, GWF2SWI2AD
       EXTERNAL :: GWF2MNW27BCF, GWF2MNW27LPF, GWF2MNW27HUF, GWF2MNW27UPW
-      EXTERNAL :: GWF2MNW27AD, GWF2MNW17AD, USTOP, UMESPR
+      EXTERNAL :: GWF2MNW27AD, GWF2MNW17AD, USTOP, UMESPR, GWF2SFR7AD
       EXTERNAL :: GWF2SWR7AD, GWF2AG7AD, GWF2ETS7FM, GWF2DRT7FM
       EXTERNAL :: GWF2BAS7FM, GWF2BCF7FM, GWF2UPWFMS, GWF2LPF7FM
       EXTERNAL :: GWF2HUF7FM, GWF2HFB7FM, GWF2WEL7FM, GWF2DRN7FM
@@ -685,7 +685,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF(IUNIT(40).GT.0) CALL GWF2DRT7FM(IGRID)
 !            IF(IUNIT(61).GT.0) CALL FMP2FM(KKITER,KKPER,KKSTP,ISTARTFL, !FMP2FM CALL ADDED BY SCHMID
 !     1                              IUNIT(44),IUNIT(52),IUNIT(55),IGRID)
-            IF ( MODSIM_flag==1 .AND. iss==0 ) THEN
+            IF (MODSIM_flag==1 .AND. iss==0) THEN
               IF( IUNIT(66).GT.0 ) CALL MODSIM2AG(Diversions)
             END IF
 
@@ -719,10 +719,10 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
               IF ( KKITER==Mxsziter+1 ) Stopcount = Stopcount + 1
             ENDIF
             IF(IUNIT(22).GT.0) CALL GWF2LAK7FM(KKITER,KKPER,KKSTP,
-     1                                     IUNIT(44),IUNIT(55),IGRID)  !RGN 9/21/2021 to keep seepage from lake in UZF
+     1                                     IUNIT(44),IUNIT(55),IGRID) 
             IF(IUNIT(55).GT.0) CALL GWF2UZF1FM(KKPER,KKSTP,KKITER,
      1                           IUNIT(44),IUNIT(22),IUNIT(63),
-     2                           IUNIT(64),IGRID)  !SWR - JDH ADDED IUNIT(64)
+     2                           IUNIT(64),IGRID)  
             !IF (MODSIM_flag==1 .AND. iss==0) THEN
             !  IF( IUNIT(66).GT.0 ) CALL MODSIM2AG(Diversions)
             !END IF
@@ -730,7 +730,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
      +         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
             IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,
      1                              IUNIT(22),IUNIT(63),IUNIT(8),
-     2                              IUNIT(55),IGRID)   !cjm (added IUNIT(8))
+     2                              IUNIT(55),IGRID)
             IF(IUNIT(66).GT.0 .AND. Model /= MODSIM_GSFLOW )
      +         CALL GWF2AG7FM(Kkper, Kkstp, Kkiter,IUNIT(63),AGCONVERGE)
      !!       IF(IUNIT(44).GT.0) CALL GWF2SFR7FM(KKITER,KKPER,KKSTP,
@@ -848,23 +848,21 @@ C7C2C---IF CONVERGENCE CRITERION HAS BEEN MET STOP ITERATING.
 C
             IF (ICNVG.EQ.1) GOTO 33
             IF ( Szcheck==ACTIVE .AND. GSFLOW_flag==1 )
-     &          retval = gsflow_mf2prms()
+     1       retval = gsflow_mf2prms()
 !  30      CONTINUE
           END DO
           KITER = MXITER
 C
    33     CONTINUE
 !          kkiter = itreal
-          !move above and executed when AFR = TRUE
+      !move above and executed when AFR = TRUE
           IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(2,Igrid)
 C
       IF (MODSIM_flag==1 .AND. iss==0) THEN
         IF(IUNIT(44).GT.0) CALL SFR2MODSIM(EXCHANGE, Diversions, 
      1                             Idivert, Nsegshold, Timestep, KITER)
-
         IF(IUNIT(44).GT.0) CALL LAK2MODSIM(DELTAVOL, LAKEVOL, 
      1                              Diversions, Nsegshold)
-
         IF( IUNIT(66).GT.0 ) CALL AG2MODSIM(agDemand)
       END IF
       END SUBROUTINE MFNWT_RUN
@@ -1595,7 +1593,7 @@ C      INTEGER I,N,IRCH,JRCH,I1
 C      CHARACTER*256 str1,str2
 C      INTEGER*4 Y,ls1,ls2
 C      REAL    FLOBOT
-C      REAL, DIMENSION(NROW*NCOL) :: GWSWI
+C     REAL, DIMENSION(NROW*NCOL) :: GWSWI
 C      CHARACTER OUTFILE*255,FMT*18
 C      CHARACTER X1*20
 C
@@ -1696,8 +1694,8 @@ C
 !***********************************************************************
       SUBROUTINE SET_STRESS_DATES(AFR, Diversions, Idivert, 
      &    EXCHANGE, DELTAVOL, LAKEVOL,Nsegshold, Nlakeshold, agDemand)
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_restart, ERROR_time,
-     &    MODFLOW, MODSIM_MODFLOW
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW,
+     &    ERROR_restart, ERROR_time, MODSIM_MODFLOW
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Kkiter, Model,
      &    Start_year, Start_month, Start_day, Print_debug
       use prms_utils, only: compute_julday, error_stop
@@ -2083,9 +2081,10 @@ C
 ! Set conversion factors to go to and from PRMS and MF units
 !***********************************************************************
       SUBROUTINE SETCONVFACTORS()
-      USE PRMS_CONSTANTS, ONLY: FT2_PER_ACRE, MODFLOW, ERROR_modflow,OFF
+      USE PRMS_CONSTANTS, ONLY: FT2_PER_ACRE, MODFLOW, ERROR_modflow,
+     &                          OFF,MODSIM_MODFLOW
       USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Model, Gvr_cell_pct,
-     &    GSFLOW_flag, MODSIM_MODFLOW
+     &    GSFLOW_flag
       use prms_utils, only: error_stop
       USE GLOBAL, ONLY: ITMUNI, LENUNI, IOUT
       USE GWFBASMODULE, ONLY: DELT
@@ -2100,8 +2099,8 @@ C
       INTEGER :: i
 !***********************************************************************
       IF ( LENUNI<1 .OR. ITMUNI<1 .OR. LENUNI>3 .OR. ITMUNI>6 ) THEN
-        IF ((Model==MODFLOW .or. Model==MODSIM_MODFLOW) .AND.
-     &      (LENUNI==0.OR.ITMUNI==0) ) RETURN
+        IF ( (Model==MODFLOW .or. Model==MODSIM_MODFLOW) .AND. 
+     &       (LENUNI==0.OR.ITMUNI==0) ) RETURN
         WRITE ( IOUT, 9001 ) LENUNI, ITMUNI
         PRINT 9001, LENUNI, ITMUNI
         ERROR STOP ERROR_modflow

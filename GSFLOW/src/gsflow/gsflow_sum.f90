@@ -518,7 +518,7 @@
       USE GSFMODFLOW, ONLY: Mfl3t_to_cfs, KKSTP, KKPER, Maxgziter
       USE GSFBUDGET, ONLY: NetBoundaryFlow2Sat_Q, Gw_bnd_in, Gw_bnd_out, Well_in, Basin_szreject, &
      &    Well_out, Stream_inflow, Basin_gw2sm, Sat_dS, StreamExchng2Sat_Q, Unsat_S, Sat_S, Basin_actetgw, Basin_fluxchange
-      USE GSFPRMS2MF, ONLY: Basin_gw_upslope_to_MF !, Basin_reach_latflow
+!      USE GSFPRMS2MF, ONLY: Basin_gw_upslope_to_MF, Basin_reach_latflow
       USE GWFUZFMODULE, ONLY: UZTSRAT
       USE GWFSFRMODULE, ONLY: SFRUZBD, STRMDELSTOR_RATE, SFRRATIN, SFRRATOUT, IRTFLG, TOTSPFLOW, SFRUZINFIL
       USE GWFLAKMODULE, ONLY: TOTGWIN_LAK, TOTGWOT_LAK, TOTDELSTOR_LAK, &

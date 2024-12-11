@@ -252,7 +252,7 @@
 !      USE GLOBAL, ONLY: IUNIT
 !Warning, modifies Gw_rejected_grav
       USE GSFPRMS2MF, ONLY: Excess, Gw_rejected_grav
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Hru_type, Ag_package, Dprst_flag !, Gvr_cell_pct, Print_debug
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Hru_type, Ag_package, Dprst_flag, activeHru_inactiveCell !, Gvr_cell_pct, Print_debug
       USE GWFBASMODULE, ONLY: VBVL, DELT
       USE GWFUZFMODULE, ONLY: SEEPOUT, UZFETOUT, UZTSRAT, REJ_INF, GWET !, UZOLSFLX, UZFLWT
       USE GWFLAKMODULE, ONLY: EVAP, SURFA
@@ -288,11 +288,15 @@
       Gw2sm = 0.0
       Gw_rejected = 0.0
       Actet_gw = 0.0
-      Slow_stor = 0.0 !don't reset Slow_stor if inactive cell and HRU active
 !      Uzf_infil_map = 0.0
 !      Sat_recharge = 0.0
 !      Mfoutflow_to_gvr = 0.0
       Fluxchange = 0.0
+      DO ii = 1, Active_hrus
+        i = Hru_route_order(ii)
+        IF ( activeHru_inactiveCell(i) == 0 ) &
+             Slow_stor(i) = 0.0 !don't reset Slow_stor if inactive cell and HRU active
+      ENDDO
       Streamflow_sfr = 0.0 ! dimension nsegment
       Seepage_reach_sfr = 0.0 ! dimension nreach
       Seepage_segment_sfr = 0.0 ! dimension nsegment
