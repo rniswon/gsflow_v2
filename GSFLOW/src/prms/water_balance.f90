@@ -6,7 +6,7 @@
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Water Balance Computations'
         character(len=*), parameter :: MODNAME_WB = 'water_balance'
-        character(len=*), parameter :: Version_water_balance = '2024-04-04'
+        character(len=*), parameter :: Version_water_balance = '2024-12-02'
         INTEGER, SAVE :: BALUNT, SZUNIT, GWUNIT, INTCPUNT, SROUNIT, SNOWUNIT
         REAL, PARAMETER :: TOOSMALL = 3.1E-05, SMALL = 1.0E-04, BAD = 1.0E-03
         DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 1.0D-05
@@ -512,6 +512,9 @@
       ELSEIF ( DABS(basin_robal)>DTOOSMALL ) THEN
         WRITE ( BALUNT, 9003 ) 'possible srunoff basin water balance rounding issue', &
      &                         Nowyear, Nowmonth, Nowday, basin_robal, brobal, Basin_net_ppt, Basin_net_snow, Basin_net_rain
+        WRITE ( BALUNT, * ) Basin_sroff, Basin_infil, Basin_imperv_evap, &
+     &          Basin_imperv_stor, Basin_dprst_evap, Basin_dprst_seep, &
+     &          Basin_sroffp, Basin_sroffi, Basin_dprst_sroff, Basin_dunnian
         WRITE ( BALUNT, '(A,/)' ) '################################'
       ENDIF
 

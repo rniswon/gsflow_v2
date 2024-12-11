@@ -13,7 +13,7 @@ Control File: .\gsflow_climate_hru.control
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 09/01/2024
+                       Version 6.0.0 12/01/2024
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -23,7 +23,7 @@ Control File: .\gsflow_climate_hru.control
                       SWR1 Version 1.04.0 09/15/2016
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/04 18:08:35
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/12/10 20:40:42
 
 
 ==========================================================================
@@ -38,11 +38,11 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 ==============================================================
 PRMS Computation Order          gsflow_prms         2024-09-01
 Read Control File               read_control_file   2024-08-01
-Read Parameter File             read_parameter_file 2024-08-27
+Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
 Basin Definition                basin               2024-08-09
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-08-09
+Common States and Fluxes        climateflow         2024-11-26
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
@@ -53,8 +53,8 @@ Potential Evapotranspiration    climate_hru         2024-08-09
 Transpiration Distribution      transp_tindex       2023-11-01
 Canopy Interception             intcp               2024-04-04
 Snow Dynamics                   snowcomp            2024-09-01
-Surface Runoff                  srunoff_smidx       2024-04-04
-Soilzone Computations           soilzone            2024-06-20
+Surface Runoff                  srunoff_smidx       2024-10-09
+Soilzone Computations           soilzone            2024-12-06
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
@@ -88,8 +88,8 @@ Simulation time period: 1980/10/01 - 1996/09/30
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/11/04 18:23:09
- Elapsed run time: 14 Minutes, 34.191 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/12/10 20:54:54
+ Elapsed run time: 14 Minutes, 11.571 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         63717;  SZ iterations:           63680

@@ -658,11 +658,11 @@
         ELSE ! IF ( write_binary_nhru_flag == 2 ) THEN flopy format
           ! Record 1: KSTP,KPER,PERTIM,TOTIM,TEXT,NHRU,1,1
           !   where
-          !   KSTP is the time step number;
-          !   KPER is the stress period number;
-          !   PERTIM is the time value for the current stress period
-          !   TOTIM is the total simulation time;
-          !   TEXT is a character string (character*16);
+          !   KSTP is the time step number; (year)
+          !   KPER is the stress period number; (month)
+          !   PERTIM is the time value for the current stress period (day)
+          !   TOTIM is the total simulation time; (timestep)
+          !   TEXT is a character string (character*16); (bin_var_names)
           !   DATA is HRU data of size (NHRU).
           ! Record 2: (DATA(N),N=1,NHRU)
           ! flopy format

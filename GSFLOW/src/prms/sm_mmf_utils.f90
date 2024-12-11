@@ -457,7 +457,7 @@ contains
         return
       end if
     end do
-    print *, 'ERROR variable: ', trim(Variable_data(i)%variable_name), ' not available'
+    print *, 'ERROR variable: ', trim(Variable_data(i)%variable_name), ' is not available for output'
     ERROR stop ERROR_var
   end function getvar_id
 

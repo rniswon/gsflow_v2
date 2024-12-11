@@ -72,7 +72,7 @@ contains
       call setdimension(dimname, dimen_value)
 
       if (dimen_value == 0) then
-        if (Print_debug > DEBUG_less) print *, 'Warning, dimension: ', dimname(:nchars), ' is not needed as value specified as 0'
+        if (Print_debug > DEBUG_less) print *, 'Warning, dimension: ', dimname(:nchars), ' is not needed, value specified = 0'
       end if
       if (Print_debug > DEBUG_less) then
         write (dimstring, '(A,I8)') dimname, dimen_value

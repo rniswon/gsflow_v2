@@ -301,7 +301,7 @@
 !**********************************************************************
       INTEGER FUNCTION basinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CLOSEZERO, &
-     &    INACTIVE, LAKE, FEET, DEBUG_minimum, ZERO_SNOWPACK, ERROR_param, &
+     &    INACTIVE, LAKE, FEET, DEBUG_minimum, ERROR_param, &
      &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, CANOPY !, METERS2FEET, SWALE
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, irrigation_apply_flag, &
@@ -424,7 +424,7 @@
         harea_dble = Hru_area_dble(i)
         Totarea = Totarea + harea_dble
         perv_area = harea
-        Snowpack_threshold(i) = harea_dble * ZERO_SNOWPACK
+        Snowpack_threshold(i) = harea_dble * 1.0E-17
 
         IF ( one_subbasin_flag>0 ) THEN
           IF ( Hru_subbasin(i) /= one_subbasin_flag ) Hru_type(i) = INACTIVE

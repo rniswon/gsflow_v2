@@ -1,7 +1,7 @@
 1
  SUMMARY VOLUMETRIC BUDGET FOR GSFLOW 
  DATE: 09 08 1983              CUMULATIVE TIME STEP:    1073
- MODFLOW STRESS PERIOD      1     CURRENT TIME STEP:       7     ITERATIONS:      16
+ MODFLOW STRESS PERIOD      1     CURRENT TIME STEP:       7     ITERATIONS:      26
 
  -----------------------------------------------------------------------------------
 
@@ -17,48 +17,48 @@
 
                                     OUT                                        OUT
                                     ---                                        ---
-   EVAPOTRANSPIRATION =        2.1059D+07     EVAPOTRANSPIRATION =        3080416.70
+   EVAPOTRANSPIRATION =        2.1056D+07     EVAPOTRANSPIRATION =        3079365.43
            STREAMFLOW =        9762283.25             STREAMFLOW =        1401931.88
      GW BOUNDARY FLOW =                         GW BOUNDARY FLOW =                  
 
-   INFLOWS - OUTFLOWS =       -3.0822D+07     INFLOWS - OUTFLOWS =       -4482348.57
+   INFLOWS - OUTFLOWS =       -3.0818D+07     INFLOWS - OUTFLOWS =       -4481297.30
              --------                                   --------
 
- TOTAL STORAGE CHANGE =       -2.6265D+07         STORAGE CHANGE =       -4484916.89
+ TOTAL STORAGE CHANGE =       -2.6259D+07         STORAGE CHANGE =       -4477943.95
        --------------                             --------------
          LAND SURFACE =        3124470.00           LAND SURFACE =        -157327.51
-            SOIL ZONE =       -7197039.76              SOIL ZONE =        -950352.79
-     UNSATURATED ZONE =        -587205.26       UNSATURATED ZONE =         -91940.18
-       SATURATED ZONE =       -1745054.67         SATURATED ZONE =        -240428.66
-                LAKES =       -1.9860D+07                  LAKES =       -3044867.75
+            SOIL ZONE =       -7197042.24              SOIL ZONE =        -950015.85
+     UNSATURATED ZONE =        -583468.49       UNSATURATED ZONE =         -78059.97
+       SATURATED ZONE =       -1747401.72         SATURATED ZONE =        -254705.11
+                LAKES =       -1.9855D+07                  LAKES =       -3037835.50
 
- OVERALL BUDGET ERROR =       -4556889.81           BUDGET ERROR =           2568.31
+ OVERALL BUDGET ERROR =       -4559273.77           BUDGET ERROR =          -3353.36
 
   ***WARNING, CUMULATIVE VOLUME OFF > 5%
 
-  PERCENT DISCREPANCY =            -15.96    PERCENT DISCREPANCY =              0.06
+  PERCENT DISCREPANCY =            -15.98    PERCENT DISCREPANCY =             -0.07
 
 
 
  Number of time steps:      7;  Number of non-convergence:   0
- MF iterations:           138;  SZ iterations:             138
- Average MF iterations: 19.71;  Average SZ iterations:   19.71
- Maximum MF iterations:    28;  Maximum SZ iterations:      28
+ MF iterations:           163;  SZ iterations:             163
+ Average MF iterations: 23.29;  Average SZ iterations:   23.29
+ Maximum MF iterations:    42;  Maximum SZ iterations:      42
 
 MF iteration distribution:      0    0    0    0    0    0    0    0    0    0
-                                0    1    0    0    0    1    0    1    1    0
-                                0    1    1    0    0    0    0    1    0    0
+                                0    1    1    0    0    1    0    0    0    0
+                                0    0    0    0    0    2    0    1    0    0
                                 0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
+                                0    1    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
 
 SZ computation distribution:    0    0    0    0    0    0    0    0    0    0
-                                0    1    0    0    0    1    0    1    1    0
-                                0    1    1    0    0    0    0    1    0    0
+                                0    1    1    0    0    1    0    0    0    0
+                                0    0    0    0    0    2    0    1    0    0
                                 0    0    0    0    0    0    0    0    0    0
-                                0    0    0    0    0    0    0    0    0    0
+                                0    1    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0

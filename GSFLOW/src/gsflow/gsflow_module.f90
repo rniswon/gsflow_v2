@@ -8,12 +8,12 @@
      &          EQULS = '=========================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 09/01/2024'
-      character(len=*), parameter :: PRMS_versn = '2024-09-01'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 6.0.0 09/01/2024'
-      character(len=*), parameter :: githash = 'Github Commit Hash fcfb7ffe944c80fb9aef27ab96c2b99837741ef1'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 12/11/2024'
+      character(len=*), parameter :: PRMS_versn = '2024-12-11'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 6.0.0 12/01/2024'
+      character(len=*), parameter :: githash = 'Github Commit Hash a4cffeceecab925507a192e0f4822c89f8f37065'
       character(len=*), parameter :: Version_read_control_file = '2024-08-01'
-      character(len=*), parameter :: Version_read_parameter_file = '2024-08-27'
+      character(len=*), parameter :: Version_read_parameter_file = '2024-11-25'
       character(len=*), parameter :: Version_read_data_file = '2023-06-02'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
@@ -46,6 +46,7 @@
       INTEGER, SAVE :: Dynamic_soil_flag
       INTEGER, SAVE :: mf_timestep, startday, endday, mf_nowtime, Number_timesteps, timestep_start_flag
       INTEGER, SAVE :: num_words_command_line
+      INTEGER, SAVE, ALLOCATABLE :: activeHru_inactiveCell(:)
       character(LEN=MAXCMDLINE_LENGTH) command_line, command_line_modsim
 !   Declared Variables
       INTEGER, SAVE :: Kkiter
@@ -93,7 +94,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW MODFLOW main'
       character(len=14), parameter :: MODNAME = 'gsflow_modflow'
-      character(len=*), parameter :: Version_gsflow_modflow='2024-06-01'
+      character(len=*), parameter :: Version_gsflow_modflow='2024-12-11'
       character(len=*), parameter :: MODDESC_UZF = 'UZF-NWT Package'
       character(len=*), parameter :: MODDESC_SFR = 'SFR-NWT Package'
       character(len=*), parameter :: MODDESC_LAK = 'LAK-NWT Package'

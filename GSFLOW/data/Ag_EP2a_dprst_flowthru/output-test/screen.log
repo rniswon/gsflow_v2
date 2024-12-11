@@ -12,7 +12,7 @@ Control File: .\Sagehen_ponds.control
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 09/01/2024
+                       Version 6.0.0 12/01/2024
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -22,7 +22,7 @@ Control File: .\Sagehen_ponds.control
                       SWR1 Version 1.04.0 09/15/2016
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 12:07:53
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/12/10 20:08:45
 
 
 ==========================================================================
@@ -37,11 +37,11 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 ==============================================================
 PRMS Computation Order          gsflow_prms         2024-09-01
 Read Control File               read_control_file   2024-08-01
-Read Parameter File             read_parameter_file 2024-08-27
+Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
 Basin Definition                basin               2024-08-09
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-08-09
+Common States and Fluxes        climateflow         2024-11-26
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
@@ -52,16 +52,16 @@ Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
 Snow Dynamics                   snowcomp            2024-09-01
-Surface Runoff                  srunoff_smidx       2024-04-04
-Soilzone Computations           soilzone            2024-06-20
-Soilzone Computations           soilzone_ag         2024-06-20
+Surface Runoff                  srunoff_smidx       2024-10-09
+Soilzone Computations           soilzone            2024-12-06
+Soilzone Computations           soilzone_ag         2024-12-10
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
 GSFLOW Output CSV Summary       gsflow_sum          2024-02-14
 Output Summary                  nhru_summary        2024-09-01
-Output Summary                  basin_summary       2021-08-13
-Output Summary                  nsegment_summary    2023-11-01
+Output Summary                  basin_summary       2024-09-01
+Output Summary                  nsegment_summary    2024-09-01
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2024-06-01
 ==============================================================
@@ -112,8 +112,362 @@ Simulation time period: 1990/10/01 - 1995/10/31
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/11/05 12:10:02
- Elapsed run time: 2 Minutes, 8.942 Seconds
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+***WARNING***
+Non-zero values were specified for precipitation,
+streamflow, and ET for streams in MODFLOW input files.
+These values are set to zero for GSFLOW simulations
+
+
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/12/10 20:11:15
+ Elapsed run time: 2 Minutes, 29.814 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
  MF iterations:         11551;  SZ iterations:           11527

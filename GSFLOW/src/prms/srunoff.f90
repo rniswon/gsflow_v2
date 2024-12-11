@@ -25,7 +25,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Surface Runoff'
       character(LEN=13), save :: MODNAME
-      character(len=*), parameter :: Version_srunoff = '2024-04-04'
+      character(len=*), parameter :: Version_srunoff = '2024-10-09'
       INTEGER, SAVE :: Ihru
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_thres_open(:), Dprst_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Dprst_vol_open_max(:), Dprst_vol_clos_max(:)
@@ -623,12 +623,11 @@
 !                  computations using antecedent soil moisture.
 !***********************************************************************
       INTEGER FUNCTION srunoffrun()
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF, LAKE, GLACIER, CASCADE_OFF, &
-     &                          SWALE, ZERO_SNOWPACK
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF, LAKE, GLACIER, CASCADE_OFF, SWALE
       USE PRMS_MODULE, ONLY: Dprst_flag, Cascade_flag, Call_cascade, Frozen_flag, Glacier_flag, &
      &    PRMS_land_iteration_flag, Kkiter, AG_flag, Hru_type, Ag_Package
       USE PRMS_SRUNOFF
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, &
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Snowpack_threshold, &
      &    Hru_perv, Hru_imperv, Hru_frac_imperv, Hru_frac_perv, &
      &    Dprst_area_max, Hru_area, Basin_area_inv, &
      &    Dprst_area_clos_max, Dprst_area_open_max, Hru_area_dble, Imperv_flag, Ag_area
@@ -797,7 +796,7 @@
 
 !******There was no snowmelt but a snowpack may exist.  If there is
 !******no snowpack then check for rain on a snowfree HRU.
-        ELSEIF ( Pkwater_equiv(i)<ZERO_SNOWPACK ) THEN
+        ELSEIF ( Pkwater_equiv(i)<Snowpack_threshold(i) ) THEN
 
 !      If no snowmelt and no snowpack but there was net snow then
 !      snowpack was small and was lost to sublimation.

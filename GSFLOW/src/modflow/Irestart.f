@@ -7,6 +7,8 @@ C
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,     ONLY:IOUT, IUNIT
+      EXTERNAL :: WRITE_HEADS, WRITE_UZF, WRITE_SFR, WRITE_LAK, 
+     &            WRITE_MNW2
 C
 !     CHARACTER*200 LINE
 C     ------------------------------------------------------------------
@@ -32,6 +34,7 @@ C
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,     ONLY:IOUT, IUNIT
+      EXTERNAL :: READ_HEADS, READ_UZF, READ_SFR, READ_LAK, READ_MNW2
 C     ------------------------------------------------------------------
 C
 C7C2----CHECK FOR RESTART
@@ -334,6 +337,7 @@ C
      +                      IXSEC,IUNIT
       USE GWFBASMODULE,ONLY:HNOFLO
       USE GWFNWTMODULE, ONLY:HITER
+      EXTERNAL :: U2DREL_RST
       INTEGER, INTENT(IN) :: IOUT, IURESTARTHEAD
       DOUBLE PRECISION HNF
       INTEGER K, KK, I, J
@@ -478,6 +482,7 @@ C     ------------------------------------------------------------------
 !!      USE GWFBASMODULE,ONLY:PERTIM,TOTIM,LBHDSV,CHEDFM,IOFLG
       USE GSFMODFLOW, ONLY: KKPER, KKSTP
 C
+      EXTERNAL :: ULASAV
       INTEGER, INTENT(IN) :: IHEDFM
       INTEGER K, I, J, IFIRST, KK, IHEDUN !, KL
       CHARACTER*16 TEXT

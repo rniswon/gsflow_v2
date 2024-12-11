@@ -17,7 +17,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Groundwater'
       character(len=*), parameter :: MODNAME = 'gwflow'
-      character(len=*), parameter :: Version_gwflow = '2024-05-30'
+      character(len=*), parameter :: Version_gwflow = '2024-12-02'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea(:), Gwin_dprst(:)
       DOUBLE PRECISION, SAVE :: Basin_gw_upslope
       INTEGER, SAVE :: Gwminarea_flag
@@ -29,7 +29,7 @@
       DOUBLE PRECISION, SAVE :: Basin_gwstor_minarea_wb
       REAL, SAVE, ALLOCATABLE :: Gwres_flow(:), Gwres_sink(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwres_in(:)
-      REAL, SAVE, ALLOCATABLE :: Hru_gw_cascadeflow(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_gw_cascadeflow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gw_in_soil(:), Gw_in_ssr(:), Hru_lateral_flow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea_wb(:), Hru_streamflow_out(:), Lakein_gwflow(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Lake_seepage(:), Gw_seep_lakein(:), Lake_seepage_gwr(:)
@@ -48,13 +48,13 @@
       USE PRMS_MODULE, ONLY: Process_flag, Init_vars_from_file, Save_vars_to_file
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: gwflowdecl, gwflowinit, gwflowrun
-      EXTERNAL :: gwflow_restart
+      INTEGER, EXTERNAL :: gwflowdecl, gwflowinit
+      EXTERNAL :: gwflow_restart, gwflowrun
 !***********************************************************************
       gwflow = 0
 
       IF ( Process_flag==RUN ) THEN
-        gwflow = gwflowrun()
+        CALL gwflowrun()
       ELSEIF ( Process_flag==DECL ) THEN
         gwflow = gwflowdecl()
       ELSEIF ( Process_flag==INIT ) THEN
@@ -88,7 +88,7 @@
 ! cascading variables and parameters
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         ALLOCATE ( Hru_gw_cascadeflow(Ngw) )
-        CALL declvar_real(MODNAME, 'hru_gw_cascadeflow', 'ngw', Ngw, &
+        CALL declvar_dble(MODNAME, 'hru_gw_cascadeflow', 'ngw', Ngw, &
      &       'Cascading groundwater flow from each GWR', &
      &       'inches', Hru_gw_cascadeflow)
 
@@ -351,9 +351,7 @@
       Basin_gw_upslope = 0.0D0
       Basin_dnflow = 0.0D0
       Basin_lake_seep = 0.0D0
-      Gwres_flow = 0.0
       Gwres_in = 0.0
-      Gwres_sink = 0.0
       Gw_in_ssr = 0.0D0
       Gw_in_soil = 0.0D0
       Hru_streamflow_out = 0.0D0
@@ -365,7 +363,7 @@
 !     gwflowrun - Computes groundwater flow to streamflow and to
 !                 groundwater sink
 !***********************************************************************
-      INTEGER FUNCTION gwflowrun()
+      SUBROUTINE gwflowrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, LAKE, SWALE, DEBUG_less, CASCADEGW_OFF, ERROR_water_use
       USE PRMS_MODULE, ONLY: Nlake, Print_debug, Dprst_flag, Cascadegw_flag, Gwr_swale_flag, &
      &    Gwr_add_water_use, Gwr_transfer_water_use, Nowyear, Nowmonth, Nowday
@@ -374,6 +372,7 @@
      &    Basin_area_inv, Hru_area, Gwr_type, Lake_hru_id, Weir_gate_flag, Hru_area_dble, Hru_storage
       USE PRMS_FLOWVARS, ONLY: Soil_to_gw, Ssr_to_gw, Sroff, Ssres_flow, Gwres_stor, Lake_vol, Gw_upslope
       USE PRMS_CASCADE, ONLY: Ncascade_gwr
+      USE PRMS_SOILZONE, ONLY: cascade_min
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
       USE PRMS_WATER_USE, ONLY: Gwr_transfer, Gwr_gain
@@ -387,11 +386,9 @@
       REAL :: dnflow
       DOUBLE PRECISION :: gwin, gwstor, gwsink, gwflow, gwstor_last, seepage, gwarea, inch2acre_feet
 !***********************************************************************
-      gwflowrun = 0
-
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
         Gw_upslope = 0.0D0
-        Hru_gw_cascadeflow = 0.0
+        Hru_gw_cascadeflow = 0.0D0
         Basin_dnflow = 0.0D0
         Basin_gw_upslope = 0.0D0
         IF ( Nlake>0 ) Lakein_gwflow = 0.0D0
@@ -455,6 +452,8 @@
       Basin_gwstor = 0.0D0
       Basin_gwsink = 0.0D0
       Basin_gwin = 0.0D0
+      Gwres_flow = 0.0
+      Gwres_sink = 0.0
       DO j = 1, Active_gwrs
         i = Gwr_route_order(j)
         gwarea = Hru_area_dble(i)
@@ -482,7 +481,7 @@
           IF ( gwstor<Gwstor_minarea(i) ) THEN
             IF ( gwstor<0.0D0 ) THEN
               IF ( Print_debug>DEBUG_less ) PRINT *, 'Warning, groundwater reservoir for HRU:', i, &
-     &                                       ' is < 0.0 with gwstor_min active', gwstor
+                                                     ' is < 0.0 with gwstor_min active', gwstor
 !              ERROR STOP ERROR_var
             ENDIF
             gwstor_last = gwstor
@@ -492,7 +491,7 @@
             Basin_gwstor_minarea_wb = Basin_gwstor_minarea_wb + Gwstor_minarea_wb(i)
             Gwstor_minarea_wb(i) = Gwstor_minarea_wb(i)/gwarea
             IF ( Print_debug>DEBUG_less ) PRINT *, 'Added to gwres_stor as storage < gwstor_min to GWR:', i, &
-     &                                             ' amount:', Gwstor_minarea_wb(i)
+                                                   ' amount:', Gwstor_minarea_wb(i)
           ELSE
             Gwstor_minarea_wb(i) = 0.0D0
           ENDIF
@@ -502,7 +501,7 @@
           IF ( Gwr_transfer(i)>0.0 ) THEN
             IF ( SNGL(gwstor*Cfs_conv)<Gwr_transfer(i) ) THEN
               PRINT *, 'ERROR, not enough storage for transfer from groundwater reservoir storage:', &
-     &                  i, ' Date:', Nowyear, Nowmonth, Nowday
+                       i, ' Date:', Nowyear, Nowmonth, Nowday
               PRINT *, '       storage: ', gwstor, '; transfer: ', Gwr_transfer(i)/Cfs_conv
               ERROR STOP ERROR_water_use
             ENDIF
@@ -514,22 +513,19 @@
         IF ( gwstor<0.0D0 ) THEN ! could happen with water use
           IF ( Print_debug>DEBUG_less ) PRINT *, 'Warning, groundwater reservoir for HRU:', i, ' is < 0.0, set to 0.0', gwstor
           gwflow = 0.0D0
-          Gwres_sink(i) = 0.0
           gwstor = 0.0D0
-        ELSE
-
-! Compute groundwater discharge
+        ELSEIF ( gwstor>0.0D0 ) THEN
+          ! Compute groundwater discharge
           gwflow = gwstor*DBLE( Gwflow_coef(i) )
-
-! Reduce storage by outflow
+          ! Reduce storage by outflow
           gwstor = gwstor - gwflow
 
           IF ( Gwsink_coef(i)>0.0 ) THEN
             gwsink = MIN( gwstor*DBLE( Gwsink_coef(i) ), gwstor ) ! if gwsink_coef > 1, could have had negative gwstor
             gwstor = gwstor - gwsink
           ENDIF
-! if gwr_swale_flag = 1 swale GWR flow goes to sink, 2 included in stream network and cascades
-! maybe gwr_swale_flag = 3 abs(hru_segment) so hru_segment could be changed from 0 to allow HRU swales
+          ! if gwr_swale_flag = 1 swale GWR flow goes to sink, 2 included in stream network and cascades
+          ! maybe gwr_swale_flag = 3 abs(hru_segment) so hru_segment could be changed from 0 to allow HRU swales
           IF ( Gwr_swale_flag==ACTIVE ) THEN
             IF ( Gwr_type(i)==SWALE ) THEN
               gwsink = gwsink + gwflow
@@ -538,17 +534,19 @@
           ENDIF
           Gwres_sink(i) = SNGL( gwsink/gwarea )
           Basin_gwsink = Basin_gwsink + gwsink
+          Basin_gwstor = Basin_gwstor + gwstor
+          Gwres_flow(i) = SNGL( gwflow/gwarea )
         ENDIF
-        Basin_gwstor = Basin_gwstor + gwstor
 
-        Gwres_flow(i) = SNGL( gwflow/gwarea )
         IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
-          IF ( Ncascade_gwr(i)>0 ) THEN
-            CALL rungw_cascade(i, Ncascade_gwr(i), Gwres_flow(i), dnflow)
-            Hru_gw_cascadeflow(i) = dnflow
-            Basin_dnflow = Basin_dnflow + DBLE( dnflow*Hru_area(i) )
-          ELSEIF ( Gwr_type(i)==LAKE ) THEN
-            Lakein_gwflow(Lake_hru_id(i)) = Lakein_gwflow(Lake_hru_id(i)) + Gwres_flow(i)
+          IF ( Gwres_flow(i)>cascade_min ) THEN ! don't cascade small flows
+            IF ( Ncascade_gwr(i)>0 ) THEN
+              CALL rungw_cascade(i, Ncascade_gwr(i), Gwres_flow(i), dnflow)
+              Hru_gw_cascadeflow(i) = DBLE( dnflow )
+              Basin_dnflow = Basin_dnflow + Hru_gw_cascadeflow(i)*gwarea
+            ELSEIF ( Gwr_type(i)==LAKE ) THEN
+              Lakein_gwflow(Lake_hru_id(i)) = Lakein_gwflow(Lake_hru_id(i)) + Gwres_flow(i)
+            ENDIF
           ENDIF
         ENDIF
         Basin_gwflow = Basin_gwflow + DBLE(Gwres_flow(i))*gwarea
@@ -570,7 +568,7 @@
       Basin_gwstor_minarea_wb = Basin_gwstor_minarea_wb*Basin_area_inv
       Basin_dnflow = Basin_dnflow*Basin_area_inv
 
-      END FUNCTION gwflowrun
+      END SUBROUTINE gwflowrun
 
 !***********************************************************************
 !     Compute cascading GW flow

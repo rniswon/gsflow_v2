@@ -1,67 +1,20 @@
 ==========================================================================
 Command line: 
-..\..\..\bin\gsflow  .\prms_climate_hru.control -set print_debug 1
+..\..\..\bin\gsflow  .\prms_climate_hru.control
 
-number of command line words: 5
+number of command line words: 2
 
 Executable: ..\..\..\bin\gsflow
 
 ==========================================================================
 Control File: .\prms_climate_hru.control
 ==========================================================================
-PRMS command line argument 2: -set
-PRMS command line argument 3: print_debug
-PRMS command line argument 4: 1
-==========================================================================
-
-
-                          U.S. Geological Survey
-        Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.4.0 09/01/2024
-
-    An integration of the Precipitation-Runoff Modeling System (PRMS)
-    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
-
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 09/01/2024
+                       Version 6.0.0 12/01/2024
 
---------------------------------------------------------------------
-        Process            Available Modules
---------------------------------------------------------------------
-  Basin Definition: basin
-    Cascading Flow: cascade
-  Time Series Data: obs, water_use_read, dynamic_param_read
-                    dynamic_soil_param_read
-   Potet Solar Rad: soltab
-  Temperature Dist: temp_1sta, temp_laps, temp_dist2, climate_hru,
-                    temp_map
-       Precip Dist: precip_1sta, precip_laps, precip_dist2,
-                    climate_hru, precip_map
-Temp & Precip Dist: xyz_dist, ide_dist
-    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
-Transpiration Dist: transp_tindex, climate_hru, transp_frost
-      Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
-                    potet_hs, potet_pt, potet_pm, potet_pm_sta
-      Interception: intcp
-Snow & Glacr Dynam: snowcomp, glacr_melt
-    Surface Runoff: srunoff_smidx, srunoff_carea
-         Soil Zone: soilzone, soilzone_ag
-       Groundwater: gwflow
-Streamflow Routing: strmflow, strmflow_in_out, muskingum,
-                    muskingum_lake, muskingum_mann, segment_to_hru
-Streamflow Charact: strmflow_character
-Stream Temperature: stream_temp
-    Output Summary: basin_sum, subbasin, map_results, prms_summary,
-                    nhru_summary, nsub_summary, water_balance
-                    basin_summary, nsegment_summary, statvar_out
-     Preprocessing: write_climate_hru, frost_date
---------------------------------------------------------------------
-
-Github Commit Hash fcfb7ffe944c80fb9aef27ab96c2b99837741ef1
-
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 12:05:04
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/12/10 20:22:14
 
 
 ==========================================================================
@@ -76,11 +29,11 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 ==============================================================
 PRMS Computation Order          gsflow_prms         2024-09-01
 Read Control File               read_control_file   2024-08-01
-Read Parameter File             read_parameter_file 2024-08-27
+Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
 Basin Definition                basin               2024-08-09
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-08-09
+Common States and Fluxes        climateflow         2024-11-26
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
@@ -91,20 +44,14 @@ Potential Evapotranspiration    climate_hru         2024-08-09
 Transpiration Distribution      transp_tindex       2023-11-01
 Canopy Interception             intcp               2024-04-04
 Snow Dynamics                   snowcomp            2024-09-01
-Surface Runoff                  srunoff_smidx       2024-04-04
-Soilzone Computations           soilzone            2024-06-20
-Groundwater                     gwflow              2024-05-30
+Surface Runoff                  srunoff_smidx       2024-10-09
+Soilzone Computations           soilzone            2024-12-06
+Groundwater                     gwflow              2024-12-02
 Streamflow Routing              strmflow            2020-08-03
-Output Summary                  basin_sum           2024-04-30
-Water Balance Computations      water_balance       2024-04-04
+Output Summary                  basin_sum           2024-09-01
 Output Summary                  subbasin            2023-11-01
 Output Summary                  nhru_summary        2024-09-01
-WARNING, parameter: tsta_elev is ignored as it is not used
 ==============================================================
-
-Using Control File: .\prms_climate_hru.control
-
-Using Parameter File: ..\input\prms\prms_climate_hru.params
 
 Writing PRMS Water Budget File: ..\output\prms\sagehen_prms_only_cbh.out
 
@@ -118,17 +65,4 @@ Writing PRMS Water Budget File: ..\output\prms\sagehen_prms_only_cbh.out
 Simulation time period: 1980/10/01 - 1996/09/30
 
 ==========================================================================
-
-
-                          =========================
-                          Normal completion of PRMS
-                          =========================
-
-
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 12:05:04
-
-
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 12:05:06
-
-Execution elapsed time    0 minutes  1.74 seconds
 

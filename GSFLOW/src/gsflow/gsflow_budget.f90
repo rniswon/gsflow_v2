@@ -267,7 +267,6 @@
 !Warning, modifies Basin_ssstor, and Gw2sm_grav
       USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop !, Basin_dprst_volcl
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
-      USE GSFPRMS2MF, ONLY: activeHru_inactiveCell
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: ABS, SNGL
@@ -286,18 +285,14 @@
       area_fac = Cfs_conv*Active_area
       Basin_ssflow_cfs = Basin_ssflow*area_fac
       Basin_sroff_cfs = Basin_sroff*area_fac
-      DO ii = 1, Active_hrus
-        i = Hru_route_order(ii)
-        Gw2sm(i) = 0.0
-        Gw_rejected(i) = 0.0
-        Actet_gw(i) = 0.0
-        IF ( activeHru_inactiveCell(i) == 0 ) &
-             Slow_stor(i) = 0.0 !don't reset Slow_stor if inactive cell and HRU active
-!        Uzf_infil_map(i) = 0.0
-!        Sat_recharge(i) = 0.0
-!        Mfoutflow_to_gvr(i) = 0.0
-        Fluxchange(i) = 0.0
-      ENDDO
+      Gw2sm = 0.0
+      Gw_rejected = 0.0
+      Actet_gw = 0.0
+      Slow_stor = 0.0 !don't reset Slow_stor if inactive cell and HRU active
+!      Uzf_infil_map = 0.0
+!      Sat_recharge = 0.0
+!      Mfoutflow_to_gvr = 0.0
+      Fluxchange = 0.0
       Streamflow_sfr = 0.0 ! dimension nsegment
       Seepage_reach_sfr = 0.0 ! dimension nreach
       Seepage_segment_sfr = 0.0 ! dimension nsegment
@@ -312,7 +307,7 @@
 !        Uzf_infil_map(ihru) = Uzf_infil_map(ihru) + UZOLSFLX(icol, irow)*Gvr_cell_pct(i)*pct*Cellarea(icell)*DELT
 !        Sat_recharge(ihru) = Sat_recharge(ihru) + UZFLWT(icol, irow)*Gvr_hru_pct_adjusted(i)
 !        Mfoutflow_to_gvr(ihru) = Mfoutflow_to_gvr(ihru) + (SEEPOUT(icol,irow)+GWET(icol,irow))*pct
-        IF ( Hrucheck(ihru)/=1 ) CYCLE ! don't compute the rest if inactive or lake HRU, not sure about 3 variable prior
+        IF ( Hrucheck(ihru)/=1 ) CYCLE ! don't compute the rest if inactive or lake HRU, not sure about 3 variables prior
 !-----------------------------------------------------------------------
 ! Add any excess infiltration to Gw_rejected array
 ! rejected can be added now as water would not have been used for

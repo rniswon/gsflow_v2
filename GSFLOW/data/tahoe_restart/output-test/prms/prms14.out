@@ -29,7 +29,7 @@ one                    1
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 09/01/2024
+                       Version 6.0.0 12/01/2024
 
 --------------------------------------------------------------------
         Process            Available Modules
@@ -63,9 +63,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash fcfb7ffe944c80fb9aef27ab96c2b99837741ef1
+Github Commit Hash a4cffeceecab925507a192e0f4822c89f8f37065
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 12:32:46
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/12/10 20:44:49
 
 ==========================================================================
 Using PRMS Data File: ../input/prms/tahoe.data
@@ -211,11 +211,11 @@ Simulation time period: 1983/11/25 00:00:00 to 1983/12/01 00:00:00
 ==============================================================
 PRMS Computation Order          gsflow_prms         2024-09-01
 Read Control File               read_control_file   2024-08-01
-Read Parameter File             read_parameter_file 2024-08-27
+Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
 Basin Definition                basin               2024-08-09
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-08-09
+Common States and Fluxes        climateflow         2024-11-26
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
@@ -226,8 +226,8 @@ Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
 Snow Dynamics                   snowcomp            2024-09-01
-Surface Runoff                  srunoff_smidx       2024-04-04
-Soilzone Computations           soilzone            2024-06-20
+Surface Runoff                  srunoff_smidx       2024-10-09
+Soilzone Computations           soilzone            2024-12-06
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
@@ -253,5 +253,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time:     0 minutes  4.16 seconds
+Execution elapsed time:     0 minutes  5.81 seconds
 

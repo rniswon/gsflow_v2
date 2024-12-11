@@ -31,7 +31,7 @@ PRMS command line argument 10: ..\output\prms\prms_only.out
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 09/01/2024
+                       Version 6.0.0 12/01/2024
 
 --------------------------------------------------------------------
         Process            Available Modules
@@ -65,9 +65,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash fcfb7ffe944c80fb9aef27ab96c2b99837741ef1
+Github Commit Hash a4cffeceecab925507a192e0f4822c89f8f37065
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 11:57:32
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/12/10 20:31:21
 
 
 ==========================================================================
@@ -82,11 +82,11 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 ==============================================================
 PRMS Computation Order          gsflow_prms         2024-09-01
 Read Control File               read_control_file   2024-08-01
-Read Parameter File             read_parameter_file 2024-08-27
+Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
 Basin Definition                basin               2024-08-09
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-08-09
+Common States and Fluxes        climateflow         2024-11-26
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
@@ -97,13 +97,13 @@ Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
 Snow Dynamics                   snowcomp            2024-09-01
-Surface Runoff                  srunoff_smidx       2024-04-04
-Soilzone Computations           soilzone            2024-06-20
-Groundwater                     gwflow              2024-05-30
+Surface Runoff                  srunoff_smidx       2024-10-09
+Soilzone Computations           soilzone            2024-12-06
+Groundwater                     gwflow              2024-12-02
 Streamflow Routing              strmflow            2020-08-03
-Output Summary                  basin_sum           2024-04-30
+Output Summary                  basin_sum           2024-09-01
 Output Summary                  subbasin            2023-11-01
-Output Summary                  basin_summary       2021-08-13
+Output Summary                  basin_summary       2024-09-01
 WARNING, parameter: mxsziter is ignored as it is not used
 WARNING, parameter: id_obsrunoff is ignored as it is not used
 WARNING, parameter: tsta_elev is ignored as it is not used
@@ -127,15 +127,15 @@ Simulation time period: 1980/10/01 - 1984/01/30
 ==========================================================================
 
 
-                          =========================
-                          Normal completion of PRMS
-                          =========================
+                          ===========================
+                          Normal completion of GSFLOW
+                          ===========================
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 11:57:32
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/12/10 20:31:21
 
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/11/05 11:57:32
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2024/12/10 20:31:21
 
-Execution elapsed time    0 minutes  0.29 seconds
+Execution elapsed time    0 minutes  0.36 seconds
 
