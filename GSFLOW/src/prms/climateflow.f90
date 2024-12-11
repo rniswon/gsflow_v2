@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2024-08-09'
+      character(len=*), parameter :: Version_climateflow = '2024-11-26'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -70,14 +70,14 @@
       REAL, SAVE, ALLOCATABLE :: Snowmelt(:), Snow_evap(:), Snowcov_area(:)
       INTEGER, SAVE, ALLOCATABLE :: Pptmix_nopack(:)
       ! soilzone
-      DOUBLE PRECISION, SAVE :: Basin_ssflow, Basin_soil_to_gw
+      DOUBLE PRECISION, SAVE :: Basin_ssflow, Basin_soil_to_gw, Basin_soil_to_prmsgw
       DOUBLE PRECISION, SAVE :: Basin_actet, Basin_lakeevap
       DOUBLE PRECISION, SAVE :: Basin_swale_et, Basin_perv_et, Basin_sroff
       DOUBLE PRECISION, SAVE :: Basin_soil_moist, Basin_ssstor
       REAL, SAVE, ALLOCATABLE :: Hru_actet(:), Soil_moist(:)
-      REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:)
+      REAL, SAVE, ALLOCATABLE :: Soil_to_gw(:), Slow_flow(:), Soil_to_prmsgw(:)
       REAL, SAVE, ALLOCATABLE :: Soil_to_ssr(:), Ssres_in(:)
-      REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:)
+      REAL, SAVE, ALLOCATABLE :: Ssr_to_gw(:), Slow_stor(:), Ssr_to_prmsgw(:)
       REAL, SAVE, ALLOCATABLE :: Ssres_stor(:), Ssres_flow(:), Soil_rechr(:)
       REAL, SAVE, ALLOCATABLE :: Pref_flow_stor(:), Soil_lower_stor_max(:), Soil_zone_max(:)
       REAL, SAVE, ALLOCATABLE :: Gravity_stor_res(:)
@@ -165,7 +165,7 @@ end module PRMS_IT0_VARS
      &    Strmflow_module, Temp_module, Stream_order_flag, PRMS6_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, Humidity_cbh_flag, &
-     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, snow_flag, gwflow_flag, Nhrucell
+     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, snow_flag, gwflow_flag, Nhrucell, activeHRU_inactiveCELL_flag
       use PRMS_MMFAPI, only: declvar_int, declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_CLIMATEVARS
@@ -396,6 +396,13 @@ end module PRMS_IT0_VARS
      &     'Drainage from the gravity-reservoir to the associated GWR for each HRU', &
      &     'inches', Ssr_to_gw)
 
+      IF ( activeHRU_inactiveCELL_flag == ACTIVE ) THEN
+        ALLOCATE ( Ssr_to_prmsgw(Nssr) )
+        CALL declvar_real(Soilzone_module, 'ssr_to_prmsgw', 'nssr', Nssr, &
+     &       'Drainage from the gravity-reservoir to the associated PRMS GWR for each HRU', &
+     &       'inches', Ssr_to_prmsgw)
+      ENDIF
+
       ALLOCATE ( Ssres_stor(Nssr), It0_ssres_stor(Nhru) )
       CALL declvar_real(Soilzone_module, 'ssres_stor', 'nssr', Nssr, &
      &     'Storage in the gravity and preferential-flow reservoirs for each HRU', &
@@ -469,6 +476,13 @@ end module PRMS_IT0_VARS
       CALL declvar_real(Soilzone_module, 'soil_to_gw', 'nhru', Nhru, &
      &     'Portion of excess flow to the capillary reservoir that drains to the associated GWR for each HRU', &
      &     'inches', Soil_to_gw)
+
+      IF ( activeHRU_inactiveCELL_flag == ACTIVE ) THEN
+        ALLOCATE ( Soil_to_prmsgw(Nhru) )
+        CALL declvar_real(Soilzone_module, 'soil_to_prmsgw', 'nhru', Nhru, &
+     &       'Portion of excess flow to the capillary reservoir that drains to the associated PRMS GWR for each HRU', &
+     &       'inches', Soil_to_prmsgw)
+      ENDIF
 
       ALLOCATE ( Soil_to_ssr(Nhru) )
       CALL declvar_real(Soilzone_module, 'soil_to_ssr', 'nhru', Nhru, &
@@ -766,8 +780,7 @@ end module PRMS_IT0_VARS
      &       ' when precipitation is assumed to be rain; if HRU air'// &
      &       ' temperature is greater than or equal to this value, precipitation is rain', &
      &       'temp_units')/=0 ) CALL read_error(1, 'tmax_allrain')
-      ENDIF
-      IF ( PRMS4_flag==OFF ) THEN
+      ELSE
         IF ( declparam(Precip_module, 'tmax_allrain_offset', 'nhru,nmonths', 'real', &
      &       '1.0', '0.0', '50.0', &
      &       'Precipitation is rain if HRU max temperature >= tmax_allsnow + this value', &
@@ -968,8 +981,7 @@ end module PRMS_IT0_VARS
      &         'Initial storage in each GVR and PFR', &
      &         'Initial storage of the gravity and preferential-flow reservoirs for each HRU', &
      &         'inches')/=0 ) CALL read_error(1, 'ssstor_init')
-        ENDIF
-        IF ( PRMS4_flag==OFF ) THEN
+        ELSE
           ALLOCATE ( Soil_rechr_init_frac(Nhru) )
           IF ( declparam(Soilzone_module, 'soil_rechr_init_frac', 'nhru', 'real', &
      &         '0.0', '0.0', '1.0', &
@@ -1736,6 +1748,7 @@ end module PRMS_IT0_VARS
         WRITE ( Restart_outunit ) Ssres_stor
         WRITE ( Restart_outunit ) Soil_rechr
         WRITE ( Restart_outunit ) Imperv_stor
+        WRITE ( Restart_outunit ) Pref_flow_stor
         IF ( gwflow_flag==ACTIVE ) WRITE ( Restart_outunit ) Gwres_stor
         IF ( Dprst_flag==ACTIVE ) THEN
           WRITE ( Restart_outunit ) Dprst_vol_open
@@ -1764,6 +1777,7 @@ end module PRMS_IT0_VARS
         WRITE ( Restart_outunit, * ) Ssres_stor
         WRITE ( Restart_outunit, * ) Soil_rechr
         WRITE ( Restart_outunit, * ) Imperv_stor
+        WRITE ( Restart_outunit, * ) Pref_flow_stor
         IF ( gwflow_flag==ACTIVE ) WRITE ( Restart_outunit, * ) Gwres_stor
         IF ( Dprst_flag==ACTIVE ) THEN
           WRITE ( Restart_outunit, * ) Dprst_vol_open
@@ -1795,6 +1809,7 @@ end module PRMS_IT0_VARS
         READ ( Restart_inunit ) Ssres_stor
         READ ( Restart_inunit ) Soil_rechr
         READ ( Restart_inunit ) Imperv_stor
+        READ ( Restart_inunit ) Pref_flow_stor
         IF ( gwflow_flag==ACTIVE ) READ ( Restart_inunit ) Gwres_stor
         IF ( Dprst_flag==ACTIVE ) THEN
           READ ( Restart_inunit ) Dprst_vol_open
@@ -1824,6 +1839,7 @@ end module PRMS_IT0_VARS
         READ ( Restart_inunit, * ) Ssres_stor
         READ ( Restart_inunit, * ) Soil_rechr
         READ ( Restart_inunit, * ) Imperv_stor
+        READ ( Restart_inunit, * ) Pref_flow_stor
         IF ( gwflow_flag==ACTIVE ) READ ( Restart_inunit, * ) Gwres_stor
         IF ( Dprst_flag==ACTIVE ) THEN
           READ ( Restart_inunit, * ) Dprst_vol_open

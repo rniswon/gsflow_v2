@@ -8,7 +8,7 @@
 !***********************************************************************
       SUBROUTINE gsflow_prms(Process_mode, AFR, MS_GSF_converge, Nsegshold, Nlakeshold, &
      &                       Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, LAKEVAP, agDemand) BIND(C,NAME="gsflow_prms")
-      
+
       !DEC$ ATTRIBUTES DLLEXPORT :: gsflow_prms
       USE PRMS_CONSTANTS, ONLY: ERROR_control, CANOPY
       use PRMS_CONTROL_FILE, only: read_control_file
@@ -215,6 +215,8 @@
 
         Grid_flag = OFF
         IF ( Nhru==Nhrucell ) Grid_flag = ACTIVE
+        ALLOCATE ( activeHru_inactiveCell(Nhru) )
+        activeHru_inactiveCell = OFF
         IF ( GSFLOW_flag==ACTIVE ) THEN
           IF ( Nhru==Nhrucell ) THEN
             Gvr_cell_pct = 1.0
@@ -369,6 +371,13 @@
         ENDIF
       ENDIF
 
+! frost_date is a pre-process module
+      IF ( Model==FROST ) THEN
+        IF ( Process_flag==DECL ) CALL read_parameter_file_params()
+        ierr = frost_date()
+        RETURN
+      ENDIF
+
       IF ( Climate_precip_flag==OFF ) THEN
         IF ( Precip_combined_flag==ACTIVE ) THEN
           ierr = precip_1sta_laps()
@@ -382,13 +391,6 @@
       IF ( Model==CLIMATE ) THEN
         IF ( Process_flag==DECL ) CALL read_parameter_file_params()
         CALL summary_output()
-        RETURN
-      ENDIF
-
-! frost_date is a pre-process module
-      IF ( Model==FROST ) THEN
-        IF ( Process_flag==DECL ) CALL read_parameter_file_params()
-        ierr = frost_date()
         RETURN
       ENDIF
 
@@ -473,7 +475,7 @@
           ierr = soilzone_ag()
         ENDIF
 
-        IF ( activeHRU_inactiveCELL_flag == ACTIVE ) CALL gwflow_inactive_cell()
+        IF ( activeHRU_inactiveCELL_flag == ACTIVE .AND. Process_flag==RUN ) CALL gwflow_inactive_cell()
 
         IF ( gwflow_flag == ACTIVE ) THEN
           IF ( Model==PRMS ) THEN
@@ -528,7 +530,7 @@
 ! They still need to be called for declare, initialize and cleanup
         ELSE !IF ( Process_flag/=RUN ) THEN
           ierr = gsflow_prms2mf()
-
+          IF ( activeHRU_inactiveCELL_flag == ACTIVE ) CALL gwflow_inactive_cell() ! need to call gwflow_inactive for declare&init after prms2mf
           ierr = gsflow_mf2prms()
         ENDIF
 
@@ -610,7 +612,7 @@
       ENDIF
 
     4 FORMAT (/, 2(A, I5, 2('/',I2.2)), //, A, /)
- 9001 FORMAT (/, 26X, 25('='), /, 26X, 'Normal completion of PRMS', /, 26X, 25('='), /)
+ 9001 FORMAT (/, 26X, 27('='), /, 26X, 'Normal completion of GSFLOW', /, 26X, 27('='), /)
  9002 FORMAT (/, A, /, 'Please give careful consideration to fixing all ERROR and WARNING messages', /, A, /)
  9003 FORMAT (/,'Execution ', A, ' date and time (yyyy/mm/dd hh:mm:ss)', I5, 2('/',I2.2), I3, 2(':',I2.2), /)
  9004 FORMAT (/, 2A)
@@ -662,7 +664,7 @@
      &        '    An integration of the Precipitation-Runoff Modeling System (PRMS)', /, &
      &        '    and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)', /)
 
-      IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = OFF
+      IF ( control_integer(Parameter_check_flag, 'parameter_check_flag')/=0 ) Parameter_check_flag = 0
       IF ( control_integer(forcing_check_flag, 'forcing_check_flag')/=0 ) forcing_check_flag = OFF
 
       IF ( control_string(Model_mode, 'model_mode')/=0 ) CALL read_error(5, 'model_mode')
@@ -678,7 +680,7 @@
         Model = PRMS
         PRMS4_flag = ACTIVE
         IF ( Model_mode(:5)=='PRMS5' .OR. Model_mode(:5)=='prms5' ) PRMS4_flag = OFF
-        IF ( Model_mode(:5)=='PRMS6' .OR. Model_mode(:5)=='prms6' ) THEN
+        IF ( Model_mode(:5)=='PRMS6' .OR. Model_mode(:5)=='prms6' .OR. Model_mode(:5)=='GSFLOW6' ) THEN
           PRMS4_flag = OFF
           PRMS6_flag = ACTIVE
         ENDIF
@@ -946,7 +948,9 @@
       IF ( control_integer(seg2hru_flag, 'seg2hru_flag')/=0 ) seg2hru_flag = OFF
       IF ( control_integer(activeHRU_inactiveCELL_flag, 'activeHRU_inactiveCELL_flag')/=0 ) activeHRU_inactiveCELL_flag = OFF
       gwflow_flag = ACTIVE
-      IF ( GSFLOW_flag == ACTIVE .AND. activeHRU_inactiveCELL_flag == OFF ) gwflow_flag = OFF
+      IF ( GSFLOW_flag == ACTIVE .AND. activeHRU_inactiveCELL_flag == OFF .OR. Model==MODFLOW .OR. Model==MODSIM_MODFLOW ) &
+           gwflow_flag = OFF
+      IF ( GSFLOW_flag /= ACTIVE .AND. activeHRU_inactiveCELL_flag == ACTIVE ) activeHRU_inactiveCELL_flag = OFF
 
       IF ( control_integer(Humidity_cbh_flag, 'humidity_cbh_flag')/=0 ) Humidity_cbh_flag = OFF
       IF ( control_integer(Windspeed_cbh_flag, 'windspeed_cbh_flag')/=0 ) Windspeed_cbh_flag = OFF
@@ -1023,12 +1027,10 @@
       IF ( control_integer(Dprst_flag, 'dprst_flag')/=0 ) Dprst_flag = OFF
       IF ( control_integer(Dprst_transfer_water_use, 'dprst_transfer_water_use')/=0 ) Dprst_transfer_water_use = OFF
       IF ( control_integer(Dprst_add_water_use, 'dprst_add_water_use')/=0 ) Dprst_add_water_use = OFF
-      ! 0 = off, 1 = on, 2 = lauren version, 3 = CSV for POIs
-      IF ( control_integer(CsvON_OFF, 'csvON_OFF')/=0 ) CsvON_OFF = OFF
 
       IF ( PRMS_only==ACTIVE ) THEN
-        PRMS_land_iteration_flag = 0
-        irrigation_apply_flag = 0
+        PRMS_land_iteration_flag = OFF
+        irrigation_apply_flag = OFF
       ELSE
         ! irrigation_apply_flag 0 = off; 1 = pervious, 2 apply to canopy; 3 apply irrigation in ag fraction
         ! these are for GSFLOW5 with AG package ACTIVE
@@ -1037,6 +1039,8 @@
         IF ( control_integer(PRMS_land_iteration_flag, 'PRMS_land_iteration_flag')/=0 ) PRMS_land_iteration_flag = OFF
       ENDIF
 
+      ! 0 = off, 1 = on, 2 = lauren version, 3 = CSV for POIs
+      IF ( control_integer(CsvON_OFF, 'csvON_OFF')/=0 ) CsvON_OFF = OFF
 ! map results dimensions
       IF ( control_integer(MapOutON_OFF, 'mapOutON_OFF')/=0 ) MapOutON_OFF = OFF
       idim = 0
@@ -1316,7 +1320,7 @@
       ENDIF
 
       Stream_order_flag = 0
-      IF ( Nsegment>0 .AND. Strmflow_flag>1 ) THEN
+      IF ( Nsegment>0 .AND. Strmflow_flag>1 .AND. PRMS_only==ACTIVE ) THEN
         Stream_order_flag = 1 ! strmflow_in_out, muskingum, muskingum_lake, muskingum_mann
       ENDIF
 
@@ -1591,7 +1595,7 @@
       INTRINSIC :: TRIM
       ! Local Variables
       INTEGER :: nhru_test, dprst_test, nsegment_test, temp_test, et_test, ierr, time_step
-      INTEGER :: nhrucell_test, nlake_test, transp_test, start_time(6), end_time(6)
+      INTEGER :: cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, start_time(6), end_time(6)
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: model_test
       CHARACTER(LEN=11) :: module_name
 !***********************************************************************
@@ -1599,12 +1603,12 @@
         IF ( text_restart_flag==OFF ) THEN
           WRITE ( Restart_outunit ) MODNAME
           WRITE ( Restart_outunit ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
-     &            Nhrucell, Nlake, Transp_flag, Model_mode
+     &            Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
           WRITE ( Restart_outunit ) Starttime, Endtime
         ELSE
           WRITE ( Restart_outunit, * ) MODNAME
           WRITE ( Restart_outunit, * ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
-                  Nhrucell, Nlake, Transp_flag, Model_mode
+                  Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
           WRITE ( Restart_outunit, * ) Starttime, Endtime
         ENDIF
       ELSE
@@ -1613,13 +1617,13 @@
           READ ( Restart_inunit ) module_name
           CALL check_restart(MODNAME, module_name)
           READ ( Restart_inunit ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
-     &           nhrucell_test, nlake_test, transp_test, model_test
+     &           cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
           READ ( Restart_inunit ) start_time, end_time
         ELSE
           READ ( Restart_inunit, * ) module_name
           CALL check_restart(MODNAME, module_name)
           READ ( Restart_inunit, * ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
-                 nhrucell_test, nlake_test, transp_test, model_test
+                 cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
           READ ( Restart_inunit, * ) start_time, end_time
         ENDIF
         IF ( Print_debug>DEBUG_minimum ) PRINT 4, EQULS, 'Simulation time period of Restart File:', &
@@ -1637,6 +1641,16 @@
         IF ( Dprst_flag/=dprst_test ) THEN
           PRINT *, 'ERROR, Initial Conditions File saved for model with dprst_flag=', dprst_test
           PRINT *, '       Current model has dprst_flag=', Dprst_flag, ' they must be equal'
+          ierr = 1
+        ENDIF
+        IF ( Cascade_flag/=cascade_test ) THEN
+          PRINT *, 'ERROR, Initial Conditions File saved for model with cascade_flag=', cascade_test
+          PRINT *, '       Current model has cascade_flag=', Cascade_flag, ' they must be equal'
+          ierr = 1
+        ENDIF
+        IF ( Cascadegw_flag/=cascdgw_test ) THEN
+          PRINT *, 'ERROR, Initial Conditions File saved for model with cascadegw_flag=', cascdgw_test
+          PRINT *, '       Current model has cascadegw_flag=', Cascadegw_flag, ' they must be equal'
           ierr = 1
         ENDIF
         CALL check_restart_dimen('nsegment', nsegment_test, Nsegment, ierr)

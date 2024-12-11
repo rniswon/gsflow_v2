@@ -15,7 +15,7 @@
       REAL, SAVE, ALLOCATABLE :: Dprst_frac_clos(:), gsflow_ag_area(:), gsflow_ag_frac(:)
       INTEGER, SAVE, ALLOCATABLE :: Gwr_type(:), Hru_route_order(:), Gwr_route_order(:)
       INTEGER, SAVE :: Weir_gate_flag, Puls_lin_flag
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_area_dble(:), Lake_area(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_area_dble(:), Lake_area(:), Snowpack_threshold(:)
 !!      LOGICAL, ALLOCATABLE, SAVE :: active_mask(:)
 !!      INTEGER, ALLOCATABLE, SAVE :: active_mask_hru(:)
 !   Declared Variables
@@ -183,7 +183,7 @@
       ALLOCATE ( Hru_elev_meters(Nhru) )
 
       ! Declared Parameters
-      ALLOCATE ( Hru_area(Nhru), Hru_area_dble(Nhru) )
+      ALLOCATE ( Hru_area(Nhru), Hru_area_dble(Nhru), Snowpack_threshold(Nhru) )
       IF ( declparam(MODNAME, 'hru_area', 'nhru', 'real', &
      &     '1.0', '0.0001', '1.0E9', &
      &     'HRU area', 'Area of each HRU', &
@@ -424,6 +424,7 @@
         harea_dble = Hru_area_dble(i)
         Totarea = Totarea + harea_dble
         perv_area = harea
+        Snowpack_threshold(i) = harea_dble * 1.0E-17
 
         IF ( one_subbasin_flag>0 ) THEN
           IF ( Hru_subbasin(i) /= one_subbasin_flag ) Hru_type(i) = INACTIVE

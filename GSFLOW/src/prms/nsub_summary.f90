@@ -7,16 +7,15 @@
 ! Module Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'nsub_summary'
-      character(len=*), parameter :: Version_nsub_summary = '2023-11-01'
+      character(len=*), parameter :: Version_nsub_summary = '2024-09-01'
       INTEGER, SAVE :: Begin_results, Begyr, Lastyear
       INTEGER, SAVE, ALLOCATABLE :: Dailyunit(:), Nc_vars(:), Nsub_var_type(:), Nsub_var_size(:)
       REAL, SAVE, ALLOCATABLE :: Nhru_var_daily(:, :)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Nhru_var_dble(:, :), Nsub_var_dble(:, :), Nsub_var_daily(:, :)
       REAL, SAVE, ALLOCATABLE :: Nsub_var_single(:, :)
-      CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2, Output_fmt3
-      INTEGER, SAVE :: Daily_flag, Nhru_double_vars, Yeardays, Monthly_flag
-      INTEGER, SAVE :: Nsub_single_vars, Nsub_vars, Nhru_vars
-      DOUBLE PRECISION, SAVE :: Monthdays
+      CHARACTER(LEN=48), SAVE :: Output_fmt, Output_fmt2 !, Output_fmt3
+      INTEGER, SAVE :: Daily_flag, Yeardays, Monthly_flag, Monthdays
+      INTEGER, SAVE :: Nsub_single_vars, Nsub_vars, Nhru_vars, save_year, save_month, save_day
       INTEGER, SAVE, ALLOCATABLE :: Monthlyunit(:), Yearlyunit(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Nsub_var_monthly(:, :), Nsub_var_yearly(:, :)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Sub_area(:)
@@ -135,7 +134,6 @@
         WRITE ( Output_fmt, 9012 ) Nsub
       ENDIF
 
-      Nhru_double_vars = OFF
       Nsub_single_vars = OFF
       Nsub_vars = OFF
       Nhru_vars = OFF
@@ -151,7 +149,6 @@
         Nsub_var_size(jj) = getvarsize(NsubOutVar_names(jj)(:Nc_vars(jj)))
         IF ( Nsub_var_size(jj)==Nhru ) THEN
           Nhru_vars = ACTIVE
-          IF ( Nsub_var_type(jj)==DBLE_TYPE ) Nhru_double_vars = ACTIVE
         ELSEIF ( Nsub_var_size(jj)==Nsub ) THEN
           Nsub_vars = ACTIVE
           IF ( Nsub_var_type(jj)==REAL_TYPE ) Nsub_single_vars = ACTIVE
@@ -164,10 +161,8 @@
       IF ( ierr==1 ) ERROR STOP ERROR_control
 
       IF ( Nhru_vars==ACTIVE ) THEN
-        IF ( Nhru_double_vars==ACTIVE ) THEN
-          ALLOCATE ( Nhru_var_dble(Nhru, NsubOutVars) )
-          Nhru_var_dble = 0.0D0
-        ENDIF
+        ALLOCATE ( Nhru_var_dble(Nhru, NsubOutVars) )
+        Nhru_var_dble = 0.0D0
         ALLOCATE ( Nhru_var_daily(Nhru, NsubOutVars) )
         Nhru_var_daily = 0.0
       ENDIF
@@ -196,20 +191,20 @@
         ALLOCATE ( Nsub_var_yearly(Nsub, NsubOutVars), Yearlyunit(NsubOutVars) )
         Nsub_var_yearly = 0.0D0
         Yearlyunit = 0
-        IF ( NsubOut_format==1 ) THEN
-          WRITE ( Output_fmt3, 9003 ) Nsub
-        ELSEIF ( NsubOut_format==2 ) THEN
-          WRITE ( Output_fmt3, 9010 ) Nsub
-        ELSEIF ( NsubOut_format==3 ) THEN
-          WRITE ( Output_fmt3, 9009 ) Nsub
-        ELSEIF ( NsubOut_format==4 ) THEN
-          WRITE ( Output_fmt3, 9008 ) Nsub
-        ELSEIF ( NsubOut_format==5 ) THEN
-          WRITE ( Output_fmt3, 9011 ) Nsub
-        ENDIF
+        !IF ( NsubOut_format==1 ) THEN
+        !  WRITE ( Output_fmt3, 9003 ) Nsub
+        !ELSEIF ( NsubOut_format==2 ) THEN
+        !  WRITE ( Output_fmt3, 9010 ) Nsub
+        !ELSEIF ( NsubOut_format==3 ) THEN
+        !  WRITE ( Output_fmt3, 9009 ) Nsub
+        !ELSEIF ( NsubOut_format==4 ) THEN
+        !  WRITE ( Output_fmt3, 9008 ) Nsub
+        !ELSEIF ( NsubOut_format==5 ) THEN
+        !  WRITE ( Output_fmt3, 9011 ) Nsub
+        !ENDIF
       ENDIF
       IF ( Monthly_flag==ACTIVE ) THEN
-        Monthdays = 0.0D0
+        Monthdays = 0
         ALLOCATE ( Nsub_var_monthly(Nsub, NsubOutVars), Monthlyunit(NsubOutVars) )
         Nsub_var_monthly = 0.0D0
         Monthlyunit = 0
@@ -263,14 +258,14 @@
 
  9001 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',ES10.3))')
  9002 FORMAT ('("Date"',I0,'('', ''I0))')
- 9003 FORMAT ('(I4,', I0,'('','',ES10.3))')
+ !9003 FORMAT ('(I4,', I0,'('','',ES10.3))')
  9005 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',F0.4))')
  9006 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',F0.3))')
  9007 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',F0.2))')
- 9008 FORMAT ('(I4,', I0,'('','',F0.4))')
- 9009 FORMAT ('(I4,', I0,'('','',F0.3))')
- 9010 FORMAT ('(I4,', I0,'('','',F0.2))')
- 9011 FORMAT ('(I4,', I0,'('','',F0.5))')
+ !9008 FORMAT ('(I4,', I0,'('','',F0.4))')
+ !9009 FORMAT ('(I4,', I0,'('','',F0.3))')
+ !9010 FORMAT ('(I4,', I0,'('','',F0.2))')
+ !9011 FORMAT ('(I4,', I0,'('','',F0.5))')
  9012 FORMAT ('(I4, 2(''-'',I2.2),',I0,'('','',F0.5))')
 
       END SUBROUTINE nsub_summaryinit
@@ -288,9 +283,10 @@
       use prms_utils, only: read_error
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: SNGL, DBLE
+      INTRINSIC :: DBLE
 ! Local Variables
       INTEGER :: j, i, jj, write_month, last_day, k
+      DOUBLE PRECISION :: yeardays_dble, monthdays_dble
 !***********************************************************************
       IF ( Begin_results==OFF ) THEN
         IF ( Nowyear==Begyr .AND. Nowmonth==Start_month .AND. Nowday==Start_day ) THEN
@@ -306,8 +302,10 @@
         IF ( Nsub_var_type(jj)==REAL_TYPE ) THEN
           IF ( Nsub_var_size(jj)==Nhru ) THEN
             CALL getvar_real(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nhru, Nhru_var_daily(:, jj))
+            Nhru_var_dble(:, jj) = DBLE( Nhru_var_daily(:, jj) )
           ELSE
             CALL getvar_real(MODNAME, NsubOutVar_names(jj)(:Nc_vars(jj)), Nsub, Nsub_var_single(:, jj))
+            Nsub_var_dble(:, jj) = DBLE( Nsub_var_single(:, jj) )
           ENDIF
         ELSEIF ( Nsub_var_type(jj)==DBLE_TYPE ) THEN
           IF ( Nsub_var_size(jj)==Nhru ) THEN
@@ -324,20 +322,27 @@
         IF ( Nowyear==End_year .AND. Nowmonth==End_month .AND. Nowday==End_day ) last_day = ACTIVE
         IF ( Lastyear/=Nowyear .OR. last_day==ACTIVE ) THEN
           IF ( (Nowmonth==Start_month .AND. Nowday==Start_day) .OR. last_day==ACTIVE ) THEN
+            yeardays_dble = DBLE( Yeardays )
             DO jj = 1, NsubOutVars
               IF ( Nsub_var_size(jj)==Nhru ) THEN
                 DO k = 1, Nsub
-                  IF ( NsubOut_freq==MEAN_YEARLY ) Nsub_var_yearly(k, jj) = Nsub_var_yearly(k, jj)/Yeardays
+                  IF ( NsubOut_freq==MEAN_YEARLY ) Nsub_var_yearly(k, jj) = Nsub_var_yearly(k, jj)/yeardays_dble
                   Nsub_var_yearly(k, jj) = Nsub_var_yearly(k, jj)/Sub_area(k)
                 ENDDO
               ELSE
                 IF ( NsubOut_freq==MEAN_YEARLY ) THEN
                   DO k = 1, Nsub
-                    Nsub_var_yearly(k, jj) = Nsub_var_yearly(k, jj)/Yeardays
+                    Nsub_var_yearly(k, jj) = Nsub_var_yearly(k, jj)/yeardays_dble
                   ENDDO
                 ENDIF
               ENDIF
-              WRITE ( Yearlyunit(jj), Output_fmt3) Lastyear, (Nsub_var_yearly(j,jj), j=1,Nsub)
+              IF ( last_day==ACTIVE ) THEN
+                save_year = Nowyear
+                save_month = Nowmonth
+                save_day = Nowday
+              ENDIF
+              !WRITE ( Yearlyunit(jj), Output_fmt3) Nowyear, Nowmonth, Nowday, (Nsub_var_yearly(j,jj), j=1,Nsub)
+              WRITE ( Yearlyunit(jj), Output_fmt) save_year, save_month, save_day, (Nsub_var_yearly(j,jj), j=1,Nsub)
             ENDDO
             Nsub_var_yearly = 0.0D0
             Yeardays = 0
@@ -345,6 +350,9 @@
           ENDIF
         ENDIF
         Yeardays = Yeardays + 1
+        save_year = Nowyear
+        save_month = Nowmonth
+        save_day = Nowday
       ELSEIF ( Monthly_flag==ACTIVE ) THEN
         ! check for last day of month and simulation
         IF ( Nowday==Modays(Nowmonth) ) THEN
@@ -354,30 +362,7 @@
             IF ( Nowday==End_day ) write_month = ACTIVE
           ENDIF
         ENDIF
-        Monthdays = Monthdays + 1.0D0
-      ENDIF
-
-      IF ( Nhru_double_vars==ACTIVE ) THEN
-        DO jj = 1, NsubOutVars
-          IF ( Nsub_var_type(jj)==DBLE_TYPE ) THEN
-            IF ( Nsub_var_size(jj)/=Nhru ) CYCLE
-            DO j = 1, Active_hrus
-              i = Hru_route_order(j)
-              Nhru_var_daily(i, jj) = SNGL( Nhru_var_dble(i, jj) )
-            ENDDO
-          ENDIF
-        ENDDO
-      ENDIF
-
-      IF ( Nsub_single_vars==ACTIVE ) THEN
-        DO jj = 1, NsubOutVars
-          IF ( Nsub_var_type(jj)==REAL_TYPE ) THEN
-            IF ( Nsub_var_size(jj)/=Nsub ) CYCLE
-            DO i = 1, Nsub
-              Nsub_var_dble(i, jj) = DBLE( Nsub_var_single(i, jj) )
-            ENDDO
-          ENDIF
-        ENDDO
+        Monthdays = Monthdays + 1
       ENDIF
 
       IF ( NsubOut_freq>MEAN_MONTHLY ) THEN
@@ -386,7 +371,7 @@
             DO j = 1, Active_hrus
               i = Hru_route_order(j)
               k = Hru_subbasin(j)
-              IF ( k>0 ) Nsub_var_yearly(k, jj) = Nsub_var_yearly(k, jj) + DBLE( Nhru_var_daily(i, jj) )*Hru_area_dble(i)
+              IF ( k>0 ) Nsub_var_yearly(k, jj) = Nsub_var_yearly(k, jj) + Nhru_var_dble(i, jj)*Hru_area_dble(i)
             ENDDO
           ELSE
             DO i = 1, Nsub
@@ -399,21 +384,24 @@
 
       IF ( Monthly_flag==ACTIVE ) THEN
         DO jj = 1, NsubOutVars
+          monthdays_dble = DBLE( Monthdays )
           IF ( Nsub_var_size(jj)==Nhru ) THEN
             DO j = 1, Active_hrus
               i = Hru_route_order(j)
               k = Hru_subbasin(j)
-              IF ( k>0 ) Nsub_var_monthly(k, jj) = Nsub_var_monthly(k, jj) + DBLE( Nhru_var_daily(i, jj) )*Hru_area_dble(i)
+              IF ( k>0 ) Nsub_var_monthly(k, jj) = Nsub_var_monthly(k, jj) + Nhru_var_dble(i, jj)*Hru_area_dble(i)
             ENDDO
             DO k = 1, Nsub
               IF ( write_month==ACTIVE ) THEN
-                IF ( NsubOut_freq==MEAN_MONTHLY ) Nsub_var_monthly(k, jj) = Nsub_var_monthly(k, jj)/Monthdays/Sub_area(k)
+                Nsub_var_monthly(k, jj) = Nsub_var_monthly(k, jj)/Sub_area(k)
+                IF ( NsubOut_freq==MEAN_MONTHLY ) Nsub_var_monthly(k, jj) = Nsub_var_monthly(k, jj)/monthdays_dble
               ENDIF
             ENDDO
           ELSE
             DO i = 1, Nsub
               Nsub_var_monthly(i, jj) = Nsub_var_monthly(i, jj) + Nsub_var_dble(i, jj)
-              IF ( write_month==ACTIVE ) Nsub_var_monthly(i, jj) = Nsub_var_monthly(i, jj)/Monthdays
+              IF ( write_month==ACTIVE .AND. NsubOut_freq==MEAN_MONTHLY ) &
+                   Nsub_var_monthly(i, jj) = Nsub_var_monthly(i, jj)/monthdays_dble
             ENDDO
           ENDIF
         ENDDO
@@ -426,7 +414,7 @@
             DO j = 1, Active_hrus
               i = Hru_route_order(j)
               k = Hru_subbasin(i)
-              IF ( k>0 ) Nsub_var_daily(k, jj) = Nsub_var_daily(k, jj) + DBLE( Nhru_var_daily(i, jj) )*Hru_area_dble(i)
+              IF ( k>0 ) Nsub_var_daily(k, jj) = Nsub_var_daily(k, jj) + Nhru_var_dble(i, jj)*Hru_area_dble(i)
             ENDDO
             DO k = 1, Nsub
               Nsub_var_dble(k, jj) = Nsub_var_daily(k, jj)/Sub_area(k)
@@ -441,7 +429,7 @@
      &       Nowmonth, Nowday, (Nsub_var_monthly(j,jj), j=1,Nsub)
       ENDDO
       IF ( write_month==ACTIVE ) THEN
-        Monthdays = 0.0D0
+        Monthdays = 0
         Nsub_var_monthly = 0.0D0
       ENDIF
 

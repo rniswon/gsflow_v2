@@ -11,9 +11,10 @@
       DOUBLE PRECISION, PARAMETER :: PCT_CHK = 0.000005D0
       INTEGER, SAVE :: NTRAIL_CHK, Nlayp1
       ! Number of stream reaches in each stream segment
-      INTEGER, SAVE, ALLOCATABLE :: Numreach_segment(:), activeHru_inactiveCell(:)
+      INTEGER, SAVE, ALLOCATABLE :: Numreach_segment(:)
       REAL, SAVE, ALLOCATABLE :: Excess(:)
-      DOUBLE PRECISION, SAVE :: Totalarea
+      DOUBLE PRECISION, SAVE :: Totalarea, Gwactive_inactive_area
+      DOUBLE PRECISION, SAVE :: Basin_gw_upslope_to_MF, Active_MF_area
 !   Declared Variables
       DOUBLE PRECISION, SAVE :: Basin_reach_latflow, Net_sz2gw
 !     INTEGER, SAVE, ALLOCATABLE :: Reach_id(:,:)
@@ -153,23 +154,23 @@
 !***********************************************************************
       INTEGER FUNCTION prms2mfinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ERROR_param, ACTIVE, OFF
-      USE PRMS_MODULE, ONLY: Hru_type, one_subbasin_flag
+      USE PRMS_MODULE, ONLY: Hru_type, one_subbasin_flag, activeHru_inactiveCell_flag, activeHru_inactiveCell
       use PRMS_READ_PARAM_FILE, only: getparam_real
       USE GSFPRMS2MF
       USE GWFUZFMODULE, ONLY: NTRAIL, NWAV, IUZFBND
       USE GWFSFRMODULE, ONLY: ISEG, NSS
       USE GWFLAKMODULE, ONLY: NLAKES, IGSFLOWLAK
-      USE GSFMODFLOW, ONLY: Gwc_row, Gwc_col
+      USE GSFMODFLOW, ONLY: Gwc_row, Gwc_col, Mfl2_to_acre, Cellarea
       USE PRMS_MODULE, ONLY: Nhru, Nsegment, Nlake, Print_debug, &
      &    Nhrucell, Ngwcell, Gvr_cell_id, Have_lakes
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Basin_area_inv, Hru_area
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Basin_area_inv, Hru_area, Active_area
       USE PRMS_SOILZONE, ONLY: Gvr_hru_id, Gvr_hru_pct_adjusted
-      use prms_utils, only: read_error
+      USE prms_utils, only: read_error
       USE GLOBAL, ONLY: NLAY, NROW, NCOL, IBOUND
       IMPLICIT NONE
       INTRINSIC :: ABS, DBLE
 ! Local Variables
-      INTEGER :: is, i, ii, ierr, ihru, icell, irow, icol, jj
+      INTEGER :: is, i, ii, ierr, ihru, icell, irow, icol, jj, inactiveCell_count
 !     INTEGER :: iseg, max_seg, irch
 !     INTEGER, ALLOCATABLE, DIMENSION(:) :: nseg_rch
       DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:) :: hru_pct, newpct
@@ -291,14 +292,14 @@
       Cell_drain_rate = 0.0 ! dimension ngwcell
       finf_cell = 0.0 ! dimension ngwcell
 
-      ALLOCATE ( activeHru_inactiveCell(Nhru) )
       ierr = 0
       IF ( Nhru/=Nhrucell ) THEN
         ALLOCATE ( hru_pct(Nhru), newpct(Nhru), temp_pct(Nhrucell) )
         hru_pct = 0.0D0
         newpct = 0.0D0
       ENDIF
-      activeHru_inactiveCell = 0
+      inactiveCell_count = 0
+      IF ( activeHru_inactiveCell_flag == ACTIVE ) Gwactive_inactive_area = 0.0D0
       DO i = 1, Nhrucell
         ihru = Gvr_hru_id(i)
         IF ( Nhru/=Nhrucell ) THEN
@@ -310,27 +311,37 @@
 !        IF ( icell==0 ) CYCLE ! don't need as icell must be > 0
         irow = Gwc_row(icell)
         icol = Gwc_col(icell)
-        IF ( Print_debug>DEBUG_less ) THEN
-          IF ( Hru_type(ihru)==0 ) THEN
-            IF ( IUZFBND(icol, irow)/=0 ) THEN
-              IF ( one_subbasin_flag==0 ) THEN
-                PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
-              ELSE
-                IUZFBND(icol, irow) = 0
-                DO jj = 1, NLAY
-                  IBOUND(icol, irow, jj) = 0
-                ENDDO
-              ENDIF
+        IF ( Hru_type(ihru)==0 ) THEN
+          IF ( IUZFBND(icol, irow)/=0 ) THEN
+            IF ( one_subbasin_flag==0 ) THEN
+              IF ( Print_debug>DEBUG_less ) PRINT *, 'WARNING, HRU inactive & UZF cell active, irow:', irow, 'icell:', icell, ' HRU:', ihru
+            ELSE
+              IUZFBND(icol, irow) = 0
+              DO jj = 1, NLAY
+                IBOUND(icol, irow, jj) = 0
+              ENDDO
             ENDIF
           ENDIF
-          IF ( IUZFBND(icol, irow)==0 ) THEN
-            IF ( Hru_type(ihru) > 0 ) then
-                PRINT *, 'WARNING, UZF cell inactive, irow:', irow, ' icol:',icol,'icell:',icell, ' HRU is active:', ihru
-                activeHru_inactiveCell(ihru) = 1
-            end if
+        ENDIF
+        IF ( IUZFBND(icol, irow)==0 ) THEN
+          IF ( Hru_type(ihru)/=0 ) THEN
+            PRINT *, 'WARNING, UZF cell inactive, irow:', irow, ' icol:',icol,'icell:',icell, ' HRU is active:', ihru
+            inactiveCell_count = inactiveCell_count + 1
+            IF ( activeHru_inactiveCell_flag == ACTIVE ) THEN
+              activeHru_inactiveCell(ihru) = ACTIVE
+              Gwactive_inactive_area = Gwactive_inactive_area + Cellarea(icell)
+            ENDIF
           ENDIF
         ENDIF
       ENDDO
+      IF ( inactiveCell_count == 0 ) THEN
+!**          PRINT *, 'no activeHru_inactiveCell'
+        activeHru_inactiveCell_flag = OFF
+      ELSE
+        PRINT *, '*********'
+        PRINT *, 'Number of active HRUs over inactive MF cells:', inactiveCell_count
+        PRINT *, 'Active/inactive GW area:', Gwactive_inactive_area
+      ENDIF
       IF ( ierr==1 ) ERROR STOP ERROR_param
 
       IF ( Nhru/=Nhrucell ) THEN
@@ -393,6 +404,7 @@
       NTRAIL_CHK = NWAV - 3*NTRAIL + 1
 
       IF ( Nhru/=Nhrucell ) DEALLOCATE ( Gvr_hru_pct )
+      Active_MF_area = Active_area / Mfl2_to_acre
 
  9001 FORMAT ('ERROR, HRU:', I7, ' is specified as a lake (hru_type=2) and lake_hru_id is specified as 0', /, &
      &        'The associated MODFLOW lake must be specified as the value of lake_hru_id for this HRU')
@@ -407,19 +419,21 @@
 !        It produces cell_drain in MODFLOW units.
 !***********************************************************************
       INTEGER FUNCTION prms2mfrun()
-      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE
-      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Dprst_flag, Ag_package, Hru_type, activeHRU_inactiveCELL_flag
+      USE PRMS_CONSTANTS, ONLY: NEARZERO, ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: Nhrucell, Gvr_cell_id, Have_lakes, Dprst_flag, Ag_package, Hru_type, &
+                             activeHRU_inactiveCELL_flag, activeHru_inactiveCell
       USE GSFPRMS2MF
       USE GSFMODFLOW, ONLY: Gvr2cell_conv, Acre_inches_to_mfl3_sngl, Gwc_row, Gwc_col, Mft_to_days
       USE GLOBAL, ONLY: IBOUND
       USE GWFAGMODULE, ONLY: NUMIRRPOND
       USE GWFUZFMODULE, ONLY: IUZFBND, NWAVST, PETRATE, FINF, IUZFOPT !, IGSFLOW
       USE GWFLAKMODULE, ONLY: RNF, EVAPLK, PRCPLK !, NLAKES
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Lake_hru_id !, Lake_area
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Lake_hru_id, Hru_area_dble, Basin_area_inv !, Lake_area
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt
-      USE PRMS_FLOWVARS, ONLY: Hru_actet, Gw_upslope
+      USE PRMS_FLOWVARS, ONLY: Hru_actet
       USE PRMS_SRUNOFF, ONLY: Hortonian_lakes
       USE PRMS_SOILZONE, ONLY: Sm2gw_grav, Lakein_sz, Hrucheck, Gvr_hru_id, Unused_potet, Gvr_hru_pct_adjusted
+      USE PRMS_GWFLOW_INACTIVE_CELL, ONLY: Gw_upslope_to_MF
       IMPLICIT NONE
 ! FUNCTIONS AND SUBROUTINES
       INTEGER, EXTERNAL :: toStream
@@ -427,7 +441,6 @@
 ! Local Variables
       INTEGER :: irow, icol, ik, jk, ii, ilake
       INTEGER :: j, icell, ihru, is_draining
-      REAL :: avail_h2o
 !***********************************************************************
       prms2mfrun = 0
 
@@ -473,23 +486,32 @@
       Cell_drain_rate = 0.0 ! should just be active cells
       finf_cell = 0.0
       Gw_rejected_grav = Sm2gw_grav ! assume all is rejected to start with
-      IF ( activeHRU_inactiveCELL_flag == ACTIVE ) THEN
-        DO j = 1, Active_hrus
-          ihru = Hru_route_order(j)
-          IF ( activeHRU_inactiveCell(ihru) == 0 ) Gw_rejected_grav(ihru) = Gw_rejected_grav(ihru) + Gw_upslope(ihru)
-        ENDDO
-      ENDIF
       is_draining = 0
+      Basin_gw_upslope_to_MF = 0.0D0
 
       DO j = 1, Nhrucell
         ihru = Gvr_hru_id(j)
         IF ( Hrucheck(ihru)==0 ) CYCLE ! make sure to skip lake and inactive HRUs
+        if ( activeHRU_inactiveCELL_flag == ACTIVE ) THEN
+          IF ( activeHRU_inactiveCELL(ihru) == OFF ) THEN
+            IF ( Gw_upslope_to_MF(ihru) > 0.0 ) THEN
+              Gw_rejected_grav(j) = Gw_rejected_grav(j) + Gw_upslope_to_MF(ihru)
+              Basin_gw_upslope_to_MF = Basin_gw_upslope_to_MF * Hru_area_dble(ihru)
+            ENDIF
+          ELSEIF ( activeHRU_inactiveCELL(ihru) == ACTIVE ) THEN
+            if(Sm2gw_grav(ihru)>0.0) print *, 'Sm2gw_grav****', ihru, Sm2gw_grav(ihru)
+            Sm2gw_grav(ihru) = 0.0
+            Gw_rejected_grav(ihru) = 0.0
+            CYCLE
+          ENDIF
+        ENDIF
         icell = Gvr_cell_id(j)
 !        IF ( icell==0 ) CYCLE ! don't need as icell must be > 0
         irow = Gwc_row(icell)
         icol = Gwc_col(icell)
 
         IF ( IUZFBND(icol, irow)==0 ) CYCLE
+
         jk = 0
         ik = 1
         DO WHILE ( jk==0 .AND. ik<Nlayp1 )
@@ -502,14 +524,10 @@
 ! If UZF cell is inactive OR if too many waves then dump water back into
 ! the soilzone
 !-----------------------------------------------------------------------
-        avail_h2o = Sm2gw_grav(j)
-        IF ( activeHRU_inactiveCELL_flag == ACTIVE ) THEN
-          IF ( activeHRU_inactiveCell(j) == 0 ) avail_h2o = avail_h2o + Gw_upslope(j)
-        ENDIF
-        IF ( avail_h2o>0.0 ) THEN
+        IF ( Sm2gw_grav(j)>0.0 ) THEN
 
           IF ( IUZFOPT==0 ) THEN !ERIC 20210107: NWAVST is dimensioned (1, 1) if IUZFOPT == 0.
-            Cell_drain_rate(icell) = Cell_drain_rate(icell) + avail_h2o*Gvr2cell_conv(j)
+            Cell_drain_rate(icell) = Cell_drain_rate(icell) + Sm2gw_grav(j)*Gvr2cell_conv(j)
             Gw_rejected_grav(j) = 0.0
             is_draining = 1
 
@@ -517,11 +535,22 @@
 !-----------------------------------------------------------------------
 ! Convert drainage from inches to MF Length/Time
 !-----------------------------------------------------------------------
-            Cell_drain_rate(icell) = Cell_drain_rate(icell) + avail_h2o*Gvr2cell_conv(j)
+            Cell_drain_rate(icell) = Cell_drain_rate(icell) + Sm2gw_grav(j)*Gvr2cell_conv(j)
             Gw_rejected_grav(j) = 0.0
             is_draining = 1
           ENDIF
         ENDIF
+
+        IF ( activeHRU_inactiveCELL_flag == ACTIVE ) THEN
+          IF ( Gw_upslope_to_MF(j)>0.0 ) THEN
+            IF ( activeHRU_inactiveCELL(ihru) == OFF ) THEN
+              Cell_drain_rate(icell) = Cell_drain_rate(icell) + Gw_upslope_to_MF(j)*Gvr2cell_conv(j)
+              Gw_rejected_grav(j) = 0.0
+              is_draining = 1
+            ENDIF
+          ENDIF
+        ENDIF
+
 !-----------------------------------------------------------------------
 ! Get the remaining potet from the HRU and put it into the cell
 ! Unused_potet() is in inches
@@ -532,6 +561,7 @@
           IF ( Unused_potet(ihru)<0.0 ) Unused_potet(ihru) = 0.0
         ENDIF
       ENDDO
+      Basin_gw_upslope_to_MF = Basin_gw_upslope_to_MF * Basin_area_inv
 
 !-----------------------------------------------------------------------
 ! Bin precolation in cell_drain_rate

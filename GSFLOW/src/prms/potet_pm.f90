@@ -40,6 +40,7 @@
       potet_pm = 0
 
       IF ( Process_flag==RUN ) THEN
+        IF ( Humidity_cbh_flag==OFF ) Humidity_hru = Humidity_percent(:, Nowmonth) 
         Basin_potet = 0.0D0
         Basin_humidity = 0.0D0
         DO j = 1, Active_hrus
@@ -74,7 +75,6 @@
           A1 = 17.625
           B1 = 243.04
           t1 = A1 * Tavgc(i) / (B1 + Tavgc(i))
-          IF ( Humidity_cbh_flag==OFF ) Humidity_hru(i) = Humidity_percent(i, Nowmonth)
           num = B1 * (LOG(Humidity_hru(i)/100.0) + t1)
           den = A1 - LOG(Humidity_hru(i)/100.0) - t1
           Tempc_dewpt(i) = num / den

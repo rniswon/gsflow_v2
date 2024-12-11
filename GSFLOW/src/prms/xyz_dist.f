@@ -179,15 +179,15 @@
       ALLOCATE ( MRUx(Nhru) )
       IF ( declparam(MODNAME, 'hru_x', 'nhru', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
-     +     'X for each HRU (albers)',
-     +     'Longitude (X) for each HRU in albers projection',
+     +     'X for each HRU (Albers)',
+     +     'Longitude (X) for each HRU in Albers projection',
      +     'meters')/=0 ) CALL read_error(1, 'hru_x')
 
       ALLOCATE ( MRUy(Nhru) )
       IF ( declparam(MODNAME, 'hru_y', 'nhru', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
-     +     'Y for each HRU (albers)',
-     +     'Latitude (Y) for each HRU in albers projection',
+     +     'Y for each HRU (Albers)',
+     +     'Latitude (Y) for each HRU in Albers projection',
      +     'meters')/=0 ) CALL read_error(1, 'hru_y')
 
       ALLOCATE ( Max_lapse(MAXLAPSE,MONTHS_PER_YEAR) )
@@ -217,33 +217,33 @@
       ALLOCATE ( Temp_STAx(Ntemp), Temp_STAelev(Ntemp) )
       IF ( declparam(MODNAME, 'tsta_x', 'ntemp', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
-     +     'X for each temperature station (albers)',
+     +     'X for each temperature station (Albers)',
      +     'Longitude (X) for each air-temperature-measurement'//
-     +     ' station in albers projection',
+     +     ' station in Albers projection',
      +     'meters')/=0 ) CALL read_error(1, 'tsta_x')
 
       ALLOCATE ( Temp_STAy(Ntemp) )
       IF ( declparam(MODNAME, 'tsta_y', 'ntemp', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
-     +     'Y for each temperature station (albers)',
+     +     'Y for each temperature station (Albers)',
      +     'Latitude (Y) for each air-temperature-measurement'//
-     +     ' station in albers projection',
+     +     ' station in Albers projection',
      +     'meters')/=0 ) CALL read_error(1, 'tsta_y')
 
       ALLOCATE ( Rain_STAx(Nrain), Pstaelev(Nrain) )
       IF ( declparam(MODNAME, 'psta_x', 'nrain', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
-     +     'X for each precipitation station (albers)',
+     +     'X for each precipitation station (Albers)',
      +     'Longitude (X) for each precipitation measurement station'//
-     +     ' in albers projection',
+     +     ' in Albers projection',
      +     'meters')/=0 ) CALL read_error(1, 'psta_x')
 
       ALLOCATE ( Rain_STAy(Nrain) )
       IF ( declparam(MODNAME, 'psta_y', 'nrain', 'real',
      +     '0.0', '-1.0E7', '1.0E7',
-     +     'Y for each precipitation station (albers)',
+     +     'Y for each precipitation station (Albers)',
      +     'Latitude (Y) for each precipitation measurement station'//
-     +     ' in albers projection',
+     +     ' in Albers projection',
      +     'meters')/=0 ) CALL read_error(1, 'psta_y')
 
       ALLOCATE ( Tsta_nuse(Ntemp), Temp_nuse(Ntemp) )

@@ -21,9 +21,10 @@ C     ******************************************************************
 !     ------------------------------------------------------------------
 !        SPECIFICATIONS:
 !     ------------------------------------------------------------------
-      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: DEBUG_minimum, DEBUG_less, ACTIVE,
+     +                          MODFLOW, MODSIM_MODFLOW
       USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Print_debug, GSFLOW_flag
-!     +                       , githash
+     +                       , githash, Model
       USE GSFMODFLOW
       IMPLICIT NONE
 !***********************************************************************
@@ -45,7 +46,8 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
      &        /, 25X, 'HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,',
      &        /, 25X, 'AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT', /)
 
-!        WRITE(*,'(24X,A)') githash
+      IF ( Model==MODFLOW .OR. Model==MODSIM_MODFLOW )
+     &     PRINT *, githash
 
         ! Allocate local module variables
         ALLOCATE ( Mfq2inch_conv(Nhrucell), Mfvol2inch_conv(Nhrucell) )
@@ -64,9 +66,8 @@ C2------WRITE BANNER TO SCREEN AND DEFINE CONSTANTS.
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GSFMODFLOW
-      USE PRMS_CONSTANTS, ONLY: MODFLOW, GSFLOW, ACTIVE, OFF,
-     &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT,
-     &    MODSIM_MODFLOW
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MODFLOW, MODSIM_MODFLOW,
+     &    DEBUG_minimum, DEBUG_less, ERROR_modflow, READ_INIT
       USE PRMS_MODULE, ONLY: Mxsziter, EQULS, Init_vars_from_file,
      &    Kper_mfo, Have_lakes, NLAKES_MF, Ag_package, Model,
      &    GSFLOW_flag, Print_debug, AG_flag
@@ -91,6 +92,20 @@ C1------USE package modules.
      &                                   agDemand(Nsegshold)
 ! Functions
       INTRINSIC :: DBLE
+      EXTERNAL :: GWF2BAS7AR, USTOP, GWF2BCF7AR, GWF2LPF7AR
+      EXTERNAL :: GWF2HUF7AR, GWF2NWT1AR, GWF2UPW1AR, GWF2WEL7AR
+      EXTERNAL :: GWF2DRN7AR, GWF2RIV7AR, GWF2EVT7AR, GWF2GHB7AR
+      EXTERNAL :: GWF2RCH7AR, GWF2FHB7AR, GWF2RES7AR, GWF2STR7AR
+      EXTERNAL :: GWF2IBS7AR, GWF2CHD7AR, GWF2HFB7AR, GWF2SFR7AR
+      EXTERNAL :: GWF2GAG7AR, GWF2DRT7AR, GWF2LAK7AR, GWF2ETS7AR
+      EXTERNAL :: GWF2SUB7AR, GWF2UZF1AR, SIP7AR, DE47AR, PCG7AR
+      EXTERNAL :: GWF2MNW17AR, GWF2WNW27AR, GWF2SWR7AR, GWF2SWI7AR
+      EXTERNAL :: GWF2HFB7UPW, GWF2MNW27AR, GWF2MNW2I7AR, GWF2SWT7AR
+      EXTERNAL :: GWF2SWI2AR, GWF2AG7AR
+      EXTERNAL :: GWF2HYD7BAS7AR, GWF2HYD7IBS7AR, GWF2HYD7SUB7AR
+      EXTERNAL :: GWF2HYD7STR7AR, GWF2HYD7SFR7AR, LMT8BAS7AR
+      EXTERNAL :: OBS2BAS7AR, OBS2DRN7AR, OBS2RIV7AR, OBS2GHB7AR
+      EXTERNAL :: OBS2STR7AR, OBS2CHD7AR
 ! Local Variables
       INTEGER :: MAXUNIT, NC
 C
@@ -367,7 +382,7 @@ C7------SIMULATE EACH STRESS PERIOD.
       IF ( IUNIT(10)>0 ) solver = 'DE47'
 !      IF ( IUNIT(42)>0 ) solver = 'GMG'
       IF ( Print_debug>DEBUG_less ) THEN
-        PRINT '(A,/)', EQULS
+        PRINT '(A,/)', EQULS(:62)
         WRITE(*,490)'Using NAME file: ', FNAME(1:NC)
         PRINT 14, solver
       ENDIF
@@ -445,7 +460,7 @@ C
       USE PRMS_MODULE, ONLY: Kper_mfo, Kkiter, Timestep, snow_flag,
      &    Init_vars_from_file, Mxsziter, Glacier_flag, AG_flag,
      &    PRMS_land_iteration_flag, activeHRU_inactiveCELL_flag,
-     &    Model, GSFLOW_flag, Print_debug, Soilzone_module
+     &    Model, GSFLOW_flag, Print_debug, MODSIM_flag
       use prms_utils, only: error_stop
 C1------USE package modules.
       USE GLOBAL
@@ -477,13 +492,30 @@ c     USE LMGMODULE
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms
       EXTERNAL :: MODSIM2SFR, SFR2MODSIM, LAK2MODSIM
       EXTERNAL :: gwflow_inactive_cell
+      EXTERNAL :: GWF2UPWUPDATE, GWF2BAS7AD, GWF2UPW1AD, GWF2CHD7AD
+      EXTERNAL :: GWF2BCF7AD, GWF2RES7AD, GWF2LPF7AD, GWF2HUF7AD
+      EXTERNAL :: GWF2FHB7AD, GWF2LAK7AD, GWF2UZF1AD, GWF2SWI2AD
+      EXTERNAL :: GWF2MNW27BCF, GWF2MNW27LPF, GWF2MNW27HUF, GWF2MNW27UPW
+      EXTERNAL :: GWF2MNW27AD, GWF2MNW17AD, USTOP, UMESPR, GWF2SFR7AD
+      EXTERNAL :: GWF2SWR7AD, GWF2AG7AD, GWF2ETS7FM, GWF2DRT7FM
+      EXTERNAL :: GWF2BAS7FM, GWF2BCF7FM, GWF2UPWFMS, GWF2LPF7FM
+      EXTERNAL :: GWF2HUF7FM, GWF2HFB7FM, GWF2WEL7FM, GWF2DRN7FM
+      EXTERNAL :: GWF2RIV7FM, GWF2LAK7ST, GWF2EVT7FM, MODSIM2AG
+      EXTERNAL :: GWF2GHB7FM, GWF2RCH7FM, SIP7PNT, SIP7AP
+      EXTERNAL :: GWF2FHB7FM, GWF2RES7FM, GWF2STR7FM, GWF2IBS7FM
+      EXTERNAL :: GWF2LAK7FM, GWF2UZF1FM, GWF2AG7FM, GWF2SFR7FM
+      EXTERNAL :: GWF2MNW27FM, GWF2MNW17FM, GWF2SUB7FM, GWF2SWT7FM
+      EXTERNAL :: DE47PNT, DE47AP, PCG7PNT, PCG7AP, GWF2LPF7BDADJ
+      EXTERNAL :: GWF2SWR7FM, GWF2SWI2FM, GWF2NWT1FM, GWF2SWR7CV
+      EXTERNAL :: AG2MODSIM, GWF2BAS7OC, GWF2BCH7BDS, GWF2BCF7BDCH
+      EXTERNAL :: GWF2BCF7BDADJ, GWF2LPF7BDS, GWF2LPF7BDCH
       INTRINSIC :: MIN
 ! Local Variables
       INTEGER :: retval, KITER, iss, iprt, I !, II, IBDRET
 !      INTEGER :: IC1, IC2, IR1, IR2, IL1, IL2, IDIR
 !      REAL :: BUDPERC
 !***********************************************************************
-!     Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 10=MODSIM-GSFLOW; 11=MODSIM-PRMS; 12=MODSIM-MODFLOW; 13=MODSIM)
+!     Model (0=GSFLOW; 2=MODFLOW; 10=MODSIM-GSFLOW; 11=MODSIM-MODFLOW)
 C
 C7------SIMULATE EACH STRESS PERIOD.
       IF ( Steady_state.EQ.1 ) THEN
@@ -504,7 +536,7 @@ C7------SIMULATE EACH STRESS PERIOD.
           KSTP = 0
         END IF
         CALL MFNWT_RDSTRESS() ! second time in run, read restart
-        IF ( Model==GSFLOW .or. Model==MODSIM_GSFLOW ) THEN    !RGN added check for MF only mode 2/21/19
+        IF ( GSFLOW_flag==ACTIVE ) THEN    !RGN added check for MF only mode 2/21/19
           IF ( ISSFLG(KKPER).EQ.1 ) CALL error_stop
      &         ('cannot run steady state after first stress period.',
      &          ERROR_modflow)
@@ -519,9 +551,7 @@ C7------SIMULATE EACH STRESS PERIOD.
 C
 C7C-----SIMULATE EACH TIME STEP.
 !gsf    DO 90 KSTP = 1, NSTP(KPER) ! maybe a problem, need loop for MFNWT and probably MODSIM
-          IF(AFR) THEN
-            KSTP = KSTP + 1
-          ENDIF
+          IF(AFR) KSTP = KSTP + 1
           KKSTP = KSTP
           IF ( IUNIT(63).GT.0 )itreal = 0
 C
@@ -604,7 +634,7 @@ C7C2----ITERATIVELY FORMULATE AND SOLVE THE FLOW EQUATIONS.
            ITREAL = 0
 C
 C0----Plug in MODSIM values before PRMS-MODFLOW iterations
-           IF ( Model==MODSIM_GSFLOW .or. Model==MODSIM_MODFLOW ) THEN
+           IF ( MODSIM_flag==1 ) THEN
              IF(IUNIT(44).GT.0.AND.iss==0) CALL MODSIM2SFR(Diversions)
            ENDIF
 C
@@ -655,7 +685,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF(IUNIT(40).GT.0) CALL GWF2DRT7FM(IGRID)
 !            IF(IUNIT(61).GT.0) CALL FMP2FM(KKITER,KKPER,KKSTP,ISTARTFL, !FMP2FM CALL ADDED BY SCHMID
 !     1                              IUNIT(44),IUNIT(52),IUNIT(55),IGRID)
-            IF (Model>=10 .AND. iss==0) THEN
+            IF (MODSIM_flag==1 .AND. iss==0) THEN
               IF( IUNIT(66).GT.0 ) CALL MODSIM2AG(Diversions)
             END IF
 
@@ -693,7 +723,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
             IF(IUNIT(55).GT.0) CALL GWF2UZF1FM(KKPER,KKSTP,KKITER,
      1                           IUNIT(44),IUNIT(22),IUNIT(63),
      2                           IUNIT(64),IGRID)  
-            !IF (Model>=10 .AND. iss==0) THEN
+            !IF (MODSIM_flag==1 .AND. iss==0) THEN
             !  IF( IUNIT(66).GT.0 ) CALL MODSIM2AG(Diversions)
             !END IF
             IF(IUNIT(66).GT.0 .AND. Model == MODSIM_GSFLOW )
@@ -817,7 +847,7 @@ C
 C7C2C---IF CONVERGENCE CRITERION HAS BEEN MET STOP ITERATING.
 C
             IF (ICNVG.EQ.1) GOTO 33
-            IF ( Szcheck==ACTIVE .AND. .NOT.(Model==MODSIM_GSFLOW) )
+            IF ( Szcheck==ACTIVE .AND. GSFLOW_flag==1 )
      1       retval = gsflow_mf2prms()
 !  30      CONTINUE
           END DO
@@ -828,16 +858,11 @@ C
       !move above and executed when AFR = TRUE
           IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(2,Igrid)
 C
-      IF (Model>=10 .AND. iss==0) THEN
+      IF (MODSIM_flag==1 .AND. iss==0) THEN
         IF(IUNIT(44).GT.0) CALL SFR2MODSIM(EXCHANGE, Diversions, 
      1                             Idivert, Nsegshold, Timestep, KITER)
-      ENDIF
-C
-      IF (Model>=10 .AND. iss==0) THEN
         IF(IUNIT(44).GT.0) CALL LAK2MODSIM(DELTAVOL, LAKEVOL, 
      1                              Diversions, Nsegshold)
-      ENDIF
-      IF (Model>=10 .AND. iss==0) THEN
         IF( IUNIT(66).GT.0 ) CALL AG2MODSIM(agDemand)
       END IF
       END SUBROUTINE MFNWT_RUN
@@ -880,7 +905,7 @@ C     ************************************************************************
 C      
       !DEC$ ATTRIBUTES DLLEXPORT :: MFNWT_OCBUDGET
 C
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, DEBUG_LESS, MODFLOW, OFF
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_less
       USE GLOBAL
       USE GWFBASMODULE
       USE GWFHUFMODULE, ONLY:IOHUFHDS,IOHUFFLWS
@@ -889,8 +914,24 @@ C
       USE GWFNWTMODULE, ONLY:ICNVGFLG
       USE GSFMODFLOW
       USE PRMS_MODULE, ONLY: Print_debug, Timestep, Kkiter,
-     +    Nowyear, Nowmonth, Nowday, Model
+     +    Nowyear, Nowmonth, Nowday, MODSIM_flag
       IMPLICIT NONE
+      EXTERNAL :: GWF2BAS7OC, GWF2BCF7BDS, GWF2BCF7BDCH, GWF2UPWBDADJ
+      EXTERNAL :: GWF2BCF7BDADJ, GWF2LPF7BDS, GWF2LPF7BDCH, USTOP
+      EXTERNAL :: GWF2LPF7BDADJ, GWF2UPWBDS, GWF2UPWBDCH, GWF2HUF7BDS
+      EXTERNAL :: GWF2HUF7BDCH, GWF2HUF7BDADJ, GWF2WEL7BD, GWF2DRN7BD
+      EXTERNAL :: GWF2RIV7BD, GWF2EVT7BD, GWF2FHB7BD, GWF2RES7BD
+      EXTERNAL :: GWF2STR7BD, GWF2IBS7BD, GWF2ETS7BD, GWF2DRT7BD
+      EXTERNAL :: GWF2GHB7BD, GWF2RCH7BD, GWF2LAK7ST, MODSIM2AG
+      EXTERNAL :: GWF2SFR7BD, GWF2LAK7BD, GWF2UZF1BD, GWF2MNW27BD
+      EXTERNAL :: GWF2MNW17BD, GWF2SUB7BD, GWF2SWT7BD, GWF2SWR7B
+      EXTERNAL :: GWF2SWI2BD, GWF2AG7BD, LMT8BD, GWF2NWT1BD
+      EXTERNAL :: OBS2BAS7SE, OBS2RIV7SE, OBS2GHB7SE, OBS2STR7SE
+      EXTERNAL :: OBS2CHD7SE, GWF2HYD7BAS7SE, GWF2HYD7IBS7SE
+      EXTERNAL :: GWF2HYD7SFR7SE, GWF2HYD7SUB7SE, GWF2HYD7STR7SE
+      EXTERNAL :: GWF2SWR7BD, OBS2DRN7SE, GWF2BAS7OT, GWF2IBS7OT
+      EXTERNAL :: GWF2HUF7OT, GWF2MNW2I7OT, GWF2SUB7OT, GWF2SWT7OT
+      EXTERNAL :: GWF2HYD7BAS7OT, GWF2MNW17OT
       INTRINSIC :: MIN
       INTEGER :: IBDRET, IC1, IC2, IR1, IR2, IL1, IL2, IDIR, ii, 
      +           Nsegshold, ISS
@@ -991,7 +1032,7 @@ C7C4----CALCULATE BUDGET TERMS. SAVE CELL-BY-CELL FLOW TERMS.
           IF(IUNIT(19).GT.0) CALL GWF2IBS7BD(KKSTP,KKPER,IGRID)
           IF(IUNIT(39).GT.0) CALL GWF2ETS7BD(KKSTP,KKPER,IGRID)
           IF(IUNIT(40).GT.0) CALL GWF2DRT7BD(KKSTP,KKPER,IGRID)
-          IF (Model>=10 .AND. iss==0) THEN
+          IF (MODSIM_flag==1 .AND. iss==0) THEN
             IF( IUNIT(66).GT.0 ) CALL MODSIM2AG(Diversions)
           END IF
           IF(IUNIT(44).GT.0) CALL GWF2SFR7BD(KKSTP,KKPER,IUNIT(15),
@@ -1136,6 +1177,20 @@ C
       USE GWFNWTMODULE, ONLY:LINMETH
       IMPLICIT NONE
       EXTERNAL :: RESTART1WRITE
+      EXTERNAL :: GWF2SUB7SV, OBS2BAS7OT, OBS2RIV7OT, OBS2GHB7OT
+      EXTERNAL :: OBS2STR7OT, OBS2CHD7OT, GWF2SWR7OT
+      EXTERNAL :: SGWF2BAS7PNT, GWF2BCF7DA, GWF2WEL7DA, GWF2DRN7DA
+      EXTERNAL :: GWF2RIV7DA, GWF2EVT7DA, GWF2GHB7DA, GWF2RCH7DA
+      EXTERNAL :: SIP7DA, DE47DA, PCG7DA, GMRES7DA, XMD7DA, GWF2NWT1D
+      EXTERNAL :: GWF2UPW1DA, GWF2FHB7DA, GWF2RES7DA, GWF2STR7DA
+      EXTERNAL :: GWF2IBS7DA, OBS2DRN7OT, GWF2HYD7DA, LMT8DA, GWF2AG7DA
+      EXTERNAL :: GWF2CHD7DA, GWF2HFB7DA, GWF2LAK7DA
+      EXTERNAL :: GWF2LPF7DA, GWF2HUF7DA, GWF2ETS7DA, GWF2DRT7DA
+      EXTERNAL :: GWF2SFR7DA, GWF2GAG7DA, GWF2MNW27DA, GWF2MNW2I7DA
+      EXTERNAL :: GWF2MNW17DA, GWF2SUB7DA, GWF2UZF1DA, GWF2SWT7DA
+      EXTERNAL :: GWF2SWR7DA, GWF2SWI2DA, OBS2BAS7DA, OBS2DRN7DA
+      EXTERNAL :: OBS2RIV7DA, OBS2GHB7DA, OBS2STR7DA, OBS2CHD7DA
+      EXTERNAL :: GWF2NWT1DA, GWF2BAS7DA, USTOP
 !***********************************************************************
 C
 C8------END OF SIMULATION
@@ -1276,6 +1331,7 @@ C     ******************************************************************
 C        SPECIFICATIONS:
 C
 C     ------------------------------------------------------------------
+      EXTERNAL :: USTOP
       CHARACTER*(*) FNAME
 !      CHARACTER*200 COMLIN
       LOGICAL EXISTS
@@ -1638,8 +1694,8 @@ C
 !***********************************************************************
       SUBROUTINE SET_STRESS_DATES(AFR, Diversions, Idivert, 
      &    EXCHANGE, DELTAVOL, LAKEVOL,Nsegshold, Nlakeshold, agDemand)
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW, GSFLOW,
-     &    ERROR_restart, ERROR_time, ERROR_modflow, MODSIM_MODFLOW
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, MODFLOW,
+     &    ERROR_restart, ERROR_time, MODSIM_MODFLOW
       USE PRMS_MODULE, ONLY: Init_vars_from_file, Kkiter, Model,
      &    Start_year, Start_month, Start_day, Print_debug
       use prms_utils, only: compute_julday, error_stop
@@ -1821,7 +1877,7 @@ C
           END DO
         END DO
         IF ( TESTSFR>1.0 ) THEN
-          IF ( Print_debug==0 ) PRINT 10
+          IF ( Print_debug>DEBUG_minimum ) PRINT 10
         END IF
       END IF
 ! Zero LAK flows (PPT, EVAP, RUNOFF, SP.WITHDRAWL).
@@ -1836,7 +1892,7 @@ C
         RNF = 0.0
         WTHDRW = 0.0
         IF ( TESTLAK>1.0 ) THEN
-          IF ( Print_debug==0 ) PRINT 11
+          IF ( Print_debug>DEBUG_minimum ) PRINT 11
         END IF
       END IF
 
