@@ -1550,8 +1550,7 @@
         ENDIF
 
         ! Sum volumes for basin totals
-        Snowmelt(i) = Snowmelt(i) * frac !don't include stuff melting into glacier
-        Basin_snowmelt = Basin_snowmelt + DBLE( Snowmelt(i)*Hru_area(i) ) 
+        Basin_snowmelt = Basin_snowmelt + DBLE( Snowmelt(i)*Hru_area(i)*frac ) !don't include stuff melting into glacier
         Basin_pweqv = Basin_pweqv + Pkwater_equiv(i)*Hru_area_dble(i)
         Basin_snowevap = Basin_snowevap + DBLE( Snow_evap(i)*Hru_area(i) )
         Basin_snowcov = Basin_snowcov + DBLE( Snowcov_area(i)*Hru_area(i) )

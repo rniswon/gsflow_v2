@@ -6,7 +6,7 @@
 !   Local Variables
         character(len=*), parameter :: MODDESC = 'Water Balance Computations'
         character(len=*), parameter :: MODNAME_WB = 'water_balance'
-        character(len=*), parameter :: Version_water_balance = '2024-12-02'
+        character(len=*), parameter :: Version_water_balance = '2024-12-15'
         INTEGER, SAVE :: BALUNT, SZUNIT, GWUNIT, INTCPUNT, SROUNIT, SNOWUNIT
         REAL, PARAMETER :: TOOSMALL = 3.1E-05, SMALL = 1.0E-04, BAD = 1.0E-03
         DOUBLE PRECISION, PARAMETER :: DSMALL = 1.0D-04, DTOOSMALL = 1.0D-05
@@ -141,13 +141,13 @@
 !     water_balance_run - Computes balance for each HRU and model domain
 !***********************************************************************
       SUBROUTINE water_balance_run()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, ZERO_SNOWPACK, LAKE, CASCADE_OFF, CASCADEGW_OFF, OFF
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, LAKE, CASCADE_OFF, CASCADEGW_OFF, OFF
       USE PRMS_MODULE, ONLY: Cascade_flag, Cascadegw_flag, Dprst_flag, Glacier_flag, Nowyear, Nowmonth, Nowday, &
      &    Hru_type, AG_flag
       USE PRMS_WATER_BALANCE
       USE PRMS_BASIN, ONLY: Hru_route_order, Active_hrus, Hru_frac_perv, Hru_area_dble, Hru_perv, &
      &    Basin_area_inv, Dprst_area_max, Hru_frac_imperv, Hru_frac_dprst, Cov_type, Hru_storage, &
-     &    Covden_win, Covden_sum, Hru_area, Ag_frac
+     &    Covden_win, Covden_sum, Hru_area, Snowpack_threshold, Ag_frac
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Basin_ppt, Hru_rain, Hru_snow, Pptmix, Potet
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Soil_to_gw, Soil_to_ssr, &
      &    Infil, Soil_moist_max, Ssr_to_gw, Ssres_flow, Basin_soil_to_gw, Soil_moist, Ssres_stor, Pref_flow_stor, &
@@ -237,7 +237,7 @@
         ENDIF
 
         ! Skip the HRU if there is no snowpack and no new snow
-        IF ( It0_pkwater_equiv(i)>ZERO_SNOWPACK .OR. Net_snow(i)>0.0 ) THEN
+        IF ( It0_pkwater_equiv(i)>Snowpack_threshold(i) .OR. Net_snow(i)>0.0 ) THEN
           hrubal = SNGL( It0_pkwater_equiv(i) - Pkwater_equiv(i) ) - Snow_evap(i) - Snowmelt(i)
           IF ( Pptmix_nopack(i)==ACTIVE ) THEN
             hrubal = hrubal + Net_snow(i)
@@ -268,7 +268,7 @@
         IF ( Pptmix_nopack(i) == ACTIVE ) waterin = waterin + Net_rain(i)
         IF ( Snowmelt(i)>0.0 ) THEN
           waterin = waterin + Snowmelt(i)
-        ELSEIF ( Pkwater_equiv(i)<ZERO_SNOWPACK ) THEN
+        ELSEIF ( Pkwater_equiv(i)<Snowpack_threshold(i) ) THEN
           IF ( .not.(Net_snow(i)>0.0) .AND. Net_rain(i)>0.0 ) THEN
             IF ( .not.(Pk_precip(i)>0.0) .AND. Pptmix_nopack(i) == OFF ) waterin = waterin + Net_rain(i)
           ENDIF
