@@ -51,7 +51,7 @@
       INTEGER, EXTERNAL :: stream_temp, glacr, dynamic_soil_param_read, strmflow_character
       INTEGER, EXTERNAL :: soilzone_ag
       EXTERNAL :: precip_map, temp_map, segment_to_hru, gwflow_inactive_cell
-      EXTERNAL :: water_balance, prms_summary, convert_params
+      EXTERNAL :: water_balance, prms_summary, convert_params, input_error
       EXTERNAL :: gsflow_prms2modsim, gsflow_modsim2prms
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
 ! Local Variables
@@ -375,6 +375,7 @@
       IF ( Model==FROST ) THEN
         IF ( Process_flag==DECL ) CALL read_parameter_file_params()
         ierr = frost_date()
+        IF ( Inputerror_flag == 1 ) CALL input_error()
         RETURN
       ENDIF
 
@@ -390,6 +391,7 @@
 
       IF ( Model==CLIMATE ) THEN
         IF ( Process_flag==DECL ) CALL read_parameter_file_params()
+        IF ( Inputerror_flag == 1 ) CALL input_error()
         CALL summary_output()
         RETURN
       ENDIF
@@ -410,6 +412,7 @@
 
       IF ( Model==TRANSPIRE ) THEN
         IF ( Process_flag==DECL ) CALL read_parameter_file_params()
+        IF ( Inputerror_flag == 1 ) CALL input_error()
         CALL summary_output()
         RETURN
       ENDIF
@@ -435,11 +438,13 @@
       IF ( Model==WRITE_CLIMATE ) THEN
         ierr = write_climate_hru()
         IF ( Process_flag==DECL ) CALL read_parameter_file_params()
+        IF ( Inputerror_flag == 1 ) CALL input_error()
         RETURN
       ENDIF
 
       IF ( Model==POTET ) THEN
         IF ( Process_flag==DECL ) CALL read_parameter_file_params()
+        IF ( Inputerror_flag == 1 ) CALL input_error()
         CALL summary_output()
         RETURN
       ENDIF
@@ -590,19 +595,8 @@
         IF ( Model==CONVERT ) CALL convert_params()
       ELSEIF ( Process_flag==INIT ) THEN
         CALL check_parameters()
-        IF ( Inputerror_flag==1 ) THEN
-          PRINT '(//,A,//,A,/,A,/,A)', '**Fix input errors in your Parameter File to continue**', &
-     &          '  Set control parameter parameter_check_flag to 0 after', &
-     &          '  all parameter values are valid.'
-          PRINT '(/,A,/,A,/,A,/,A,/,A,/)', &
-     &          'If input errors are related to parameters used for automated', &
-     &          'calibration processes, with CAUTION, set control parameter', &
-     &          'parameter_check_flag to 0. After calibration set the', &
-     &          'parameter_check_flag to 1 to verify that those calibration', &
-     &          'parameters have valid and compatible values.'
-        ENDIF
         IF ( Parameter_check_flag==2 ) STOP
-        IF ( Inputerror_flag==1 ) ERROR STOP ERROR_param
+        IF ( Inputerror_flag==1 ) CALL input_error()
         IF ( Model==CONVERT ) THEN
           CALL convert_params()
           STOP
@@ -1516,6 +1510,25 @@
       IF ( ierr==1 ) ERROR STOP ERROR_control
 
       END SUBROUTINE check_module_names
+
+!***********************************************************************
+      SUBROUTINE input_error()
+!***********************************************************************
+      USE PRMS_CONSTANTS, ONLY: ERROR_param
+      IMPLICIT NONE
+!***********************************************************************
+      PRINT '(//,A,//,A,/,A,/,A)', '**Fix input errors in your Parameter File to continue**', &
+            '  Set control parameter parameter_check_flag to 0 after', &
+            '  all parameter values are valid.'
+      PRINT '(/,A,/,A,/,A,/,A,/,A,/)', &
+            'If input errors are related to parameters used for automated', &
+            'calibration processes, with CAUTION, set control parameter', &
+            'parameter_check_flag to 0. After calibration set the', &
+            'parameter_check_flag to 1 to verify that those calibration', &
+            'parameters have valid and compatible values.'
+      ERROR STOP ERROR_param
+
+      END SUBROUTINE input_error
 
 !***********************************************************************
 !     gsflow_prmsSettings - set MODSIM variables set in PRMS

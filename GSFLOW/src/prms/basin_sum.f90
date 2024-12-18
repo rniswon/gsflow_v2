@@ -7,7 +7,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=9), parameter :: MODNAME = 'basin_sum'
-      character(len=*), parameter :: Version_basin_sum = '2024-09-01'
+      character(len=*), parameter :: Version_basin_sum = '2024-12-01'
 
       INTEGER, SAVE :: BALUNT, Totdays
       INTEGER, SAVE :: Header_prt, Endjday
@@ -311,9 +311,9 @@
 !     sumbinit - Initialize basinsum module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION sumbinit()
-      USE PRMS_CONSTANTS, ONLY: OFF, ERROR_param
+      USE PRMS_CONSTANTS, ONLY: OFF, ACTIVE
       use PRMS_READ_PARAM_FILE, only: getparam_int
-      USE PRMS_MODULE, ONLY: Nobs, Init_vars_from_file, Print_debug, Inputerror_flag
+      USE PRMS_MODULE, ONLY: Nobs, Init_vars_from_file, Print_debug, Inputerror_flag, Stream_order_flag
       USE PRMS_BASINSUM
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_lake_stor, Basin_pweqv
       USE PRMS_INTCP, ONLY: Basin_intcp_stor
@@ -451,7 +451,8 @@
       Basin_storage = Basin_soil_moist + Basin_intcp_stor + &
      &                Basin_gwstor + Basin_ssstor + Basin_pweqv + &
      &                Basin_imperv_stor + Basin_lake_stor + &
-     &                Basin_dprst_volop + Basin_dprst_volcl + Basin_segment_storage
+     &                Basin_dprst_volop + Basin_dprst_volcl
+      IF ( Stream_order_flag == ACTIVE ) Basin_storage = Basin_storage + Basin_segment_storage
 !glacier storage not known at start
 
       IF ( Print_freq/=0 ) THEN
@@ -481,7 +482,8 @@
 !***********************************************************************
       INTEGER FUNCTION sumbrun()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, strmflow_muskingum_lake_module
-      USE PRMS_MODULE, ONLY: Nobs, Print_debug, End_year, Strmflow_flag, Glacier_flag, Nowyear, Nowmonth, Nowday, Nratetbl
+      USE PRMS_MODULE, ONLY: Nobs, Print_debug, End_year, Strmflow_flag, Glacier_flag, Nowyear, Nowmonth, Nowday, Nratetbl, &
+          Stream_order_flag
       USE PRMS_BASINSUM
       USE PRMS_BASIN, ONLY: Active_area, Active_hrus, Hru_route_order
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, &
@@ -522,11 +524,12 @@
       Last_basin_stor = Basin_storage
       Basin_storage = Basin_soil_moist + Basin_intcp_stor + &
      &                Basin_gwstor + Basin_ssstor + Basin_pweqv + &
-     &                Basin_imperv_stor + Basin_lake_stor + Basin_dprst_volop + Basin_dprst_volcl + Basin_segment_storage
+     &                Basin_imperv_stor + Basin_lake_stor + Basin_dprst_volop + Basin_dprst_volcl
 ! Basin_storage doesn't include any processes on glacier
 ! In glacier module, Basin_gl_storstart is an estimate for starting glacier volume, but only
 !   includes glaciers that have depth estimates and these are known to be iffy
       IF ( Glacier_flag==ACTIVE ) Basin_storage = Basin_storage + Basin_gl_storage
+      IF ( Stream_order_flag == ACTIVE )  Basin_storage = Basin_storage + Basin_segment_storage
 
 ! volume calculation for storage
       Basin_storvol = Basin_storage*Active_area

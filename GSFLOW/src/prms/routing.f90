@@ -173,9 +173,6 @@
      &     ' 9=sink; 10=inbound from Great Lakes; 11=outbound to Great Lakes)', &
      &     'none')/=0 ) CALL read_error(1, 'segment_type')
 
-      ! user updated values if different than tosegment_orig
-      ! -5 = outbound from NHM; -6 = inbound from region; -7 = outbound from region;
-      ! -8 = drains to ocean; -11 = drains to Great Lake
       ALLOCATE ( Tosegment(Nsegment) )
       IF ( declparam(MODNAME, 'tosegment', 'nsegment', 'integer', &
      &     '0', '0', '9999999', &
@@ -381,8 +378,7 @@
 
       IF ( Init_vars_from_file==0 ) THEN
         Basin_segment_storage = 0.0D0
-        IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
-     &       Strmflow_flag==strmflow_muskingum_mann_module ) Segment_delta_flow = 0.0D0
+        Segment_delta_flow = 0.0D0
       ENDIF
 
       Hru_outflow = 0.0D0

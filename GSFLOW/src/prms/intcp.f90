@@ -258,13 +258,13 @@
 !              and evaporation for each HRU
 !***********************************************************************
       INTEGER FUNCTION intrun()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, NEARZERO, ZERO_SNOWPACK, &
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DEBUG_WB, NEARZERO, &
      &    DEBUG_less, LAKE, BARESOIL, GRASSES, ERROR_param, CANOPY
       USE PRMS_MODULE, ONLY: Print_debug, PRMS_land_iteration_flag, Kkiter, Nowyear, Nowmonth, Nowday, &
      &    Ag_package, Hru_ag_irr, irrigation_apply_flag, Hru_type
       USE PRMS_INTCP
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Covden_win, Covden_sum, &
-     &    Hru_route_order, Hru_area, Cov_type, Ag_frac, gsflow_ag_area !, Ag_cov_type
+     &    Hru_route_order, Hru_area, Cov_type, Snowpack_threshold, Ag_frac, gsflow_ag_area !, Ag_cov_type
       USE PRMS_WATER_USE, ONLY: Canopy_gain ! need to add ag apply ???
 ! Newsnow and Pptmix can be modfied, WARNING!!!
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Hru_rain, Hru_ppt, &
@@ -407,7 +407,7 @@
               ELSEIF ( Cov_type(i)==GRASSES ) THEN ! cov_type = 1
                 !rsr, 03/24/2008 intercept rain on snow-free grass,
                 !rsr             when not a mixed event
-                IF ( Pkwater_equiv(i)<ZERO_SNOWPACK .AND. netsnow<NEARZERO ) THEN
+                IF ( Pkwater_equiv(i)<Snowpack_threshold(i) .AND. netsnow<NEARZERO ) THEN
                   netrain = netrain + netsnow ! to make sure tiny snow accounted for
                   netsnow = 0.0
                   CALL intercept(Hru_rain(i), stor_max_rain, cov, intcpstor, netrain)

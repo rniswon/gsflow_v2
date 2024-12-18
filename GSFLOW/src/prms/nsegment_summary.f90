@@ -304,7 +304,7 @@
       DO jj = 1, NsegmentOutVars
         IF ( Nsegment_var_type(jj)==REAL_TYPE ) THEN
           CALL getvar_real(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, Nsegment_var_daily(:, jj))
-          Nsegment_var_dble(:, jj) = Nsegment_var_daily(:, jj)
+          Nsegment_var_dble(:, jj) = DBLE( Nsegment_var_daily(:, jj) )
         ELSEIF ( Nsegment_var_type(jj)==DBLE_TYPE ) THEN
           CALL getvar_dble(MODNAME, NsegmentOutVar_names(jj)(:Nc_vars(jj)), Nsegment, Nsegment_var_dble(:, jj))
         ENDIF
