@@ -496,7 +496,7 @@ end module PRMS_IT0_VARS
       IF ( GSFLOW_flag==ACTIVE ) THEN
         ALLOCATE ( gsflow_ag_actet(Nhru) )
         CALL declvar_real(Soilzone_module, 'gsflow_ag_actet', 'nhru', Nhru, &
-     &       'Agriculture actual ET for GSFLOW simulations for each HRU', &
+     &       'Actual ET for irrigated area on each HRU in GSFLOW simulations', &
      &       'inches', gsflow_ag_actet)
         IF ( Nhrucell<-1 ) CALL error_stop('dimension nhrucell not specified > 0', ERROR_dim)
         ALLOCATE ( Gravity_stor_res(Nhrucell), It0_gravity_stor_res(Nhrucell) )
@@ -745,14 +745,14 @@ end module PRMS_IT0_VARS
      &         '0.0', '0.0', '50.0', &
      &         'HRU maximum temperature adjustment as offset from tmin_adj', &
      &         'Monthly (January to December) additive adjustment to maximum temperature for each HRU' // &
-     &         ' as offset from tmin_adj, estimated on the basis of slope and aspect', &
+     &         ' as offset from tmin_adj, estimated based on slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_adj_offset')
         ELSE
           IF ( declparam(Temp_module, 'tmax_adj', 'nhru,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
      &         'HRU maximum temperature adjustment', &
      &         'Monthly (January to December) additive adjustment to maximum temperature for each HRU,' // &
-     &         ' estimated on the basis of slope and aspect', &
+     &         ' estimated based on slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_adj')
         ENDIF
 
@@ -760,7 +760,7 @@ end module PRMS_IT0_VARS
         IF ( declparam(Temp_module, 'tmin_adj', 'nhru,nmonths', 'real', &
      &       '0.0', '-10.0', '10.0', &
      &       'HRU minimum temperature adjustment', &
-     &       'Adjustment to minimum temperature for each HRU, estimated on the basis of slope and aspect', &
+     &       'Adjustment to minimum temperature for each HRU, estimated based on slope and aspect', &
      &       'temp_units')/=0 ) CALL read_error(1, 'tmin_adj')
       ENDIF
 
@@ -889,7 +889,7 @@ end module PRMS_IT0_VARS
      &       '0.8', '0.1', '1.0', &
      &       'Maximum fraction of potential solar radiation', &
      &       'Monthly (January to December) maximum fraction of the potential solar radiation'// &
-     &       ' that may reach the ground due to haze, dust, smog, and so forth, for each HRU', &
+     &       ' that may reach the ground due to haze, dust, smog, and other factors, for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'radmax')
       ENDIF
 
@@ -1006,20 +1006,20 @@ end module PRMS_IT0_VARS
 
       IF ( AG_flag==ACTIVE ) THEN
         CALL declvar_dble(Soilzone_module, 'basin_ag_soil_moist', 'one', 1, &
-     &       'Basin area-weighted average soil agricultural capillary reservoir storage', &
+     &       'Basin area-weighted average capillary reservoir storage for the irrigated areae', &
      &       'inches', Basin_ag_soil_moist)
         CALL declvar_dble(Soilzone_module, 'basin_ag_soil_rechr', 'one', 1, &
-     &       'Basin area-weighted average storage for the agricultural recharge zone;'//&
-     &       ' upper portion of agricultura capillary reservoir where both evaporation and transpiration occurs', &
+     &       'Basin area-weighted average storage for the recharge zone; upper portion of', &
+     &       ' capillary reservoir for the irrigated area where both evaporation and transpiration occur'//&
      &       'inches', Basin_ag_soil_rechr)
         ALLOCATE ( Ag_soil_moist(Nhru), It0_ag_soil_moist(Nhru) )
         CALL declvar_real(Soilzone_module, 'ag_soil_moist', 'nhru', Nhru, &
-     &       'Storage of soil agriculture capillary reservoir for each HRU', &
+     &       'Water storage in the capillary reservoir of the irrigated area for each HRU', &
      &       'inches', Ag_soil_moist)
         ALLOCATE ( Ag_soil_rechr(Nhru), It0_ag_soil_rechr(Nhru) )
         CALL declvar_real(Soilzone_module, 'ag_soil_rechr', 'nhru', Nhru, &
-     &       'Storage for upper portion of the soil agriculture capillary reservoir that is available for both'// &
-     &       ' evaporation and transpiration', &
+     &       'Water storage for upper portion in the capillary reservoir of the irrigated area for each HRU that // &
+    &        ' is available for both evaporation and transpiration', &
      &       'inches', Ag_soil_rechr)
         ALLOCATE ( Ag_soil_moist_max(Nhru) )
         IF ( declparam(Soilzone_module, 'ag_soil_moist_max', 'nhru', 'real', &

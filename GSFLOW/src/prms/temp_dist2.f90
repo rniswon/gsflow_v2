@@ -118,16 +118,16 @@
       IF ( declparam(MODNAME, 'monmin', 'nmonths', 'real', &
      &     '-60.0', '-60.0', '65.0', &
      &     'Daily minimum temperature', &
-     &     'Monthly minimum air temperature to constrain lowest'// &
-     &     ' minimum measured air temperatures for bad values based'// &
+     &     'Monthly minimum air temperature to constrain'// &
+     &     ' minimum measured air temperatures for erroneous values based'// &
      &     ' on historical temperature for all measurement stations', &
      &     'temp_units')/=0 ) CALL read_error(1, 'monmin')
 
       IF ( declparam(MODNAME, 'monmax', 'nmonths', 'real', &
      &     '100.0', '0.0', '115.0', &
      &     'Daily maximum temperature', &
-     &     'Monthly maximum air temperature to constrain lowest'// &
-     &     ' minimum measured air temperatures for bad values based'// &
+     &     'Monthly maximum air temperature to constrain'// &
+     &     ' minimum measured air temperatures for erroneous values based'// &
      &     ' on historical temperature for all measurement stations', &
      &     'temp_units')/=0 ) CALL read_error(1, 'monmax')
 
@@ -135,7 +135,7 @@
      &     '-4.0', '-7.0', '-3.0', &
      &     'Monthly minimum lapse rate for minimum temperature', &
      &     'Monthly (January to December) minimum lapse rate to'// &
-     &     ' constrain lowest minimum lapse rate on the basis of historical'// &
+     &     ' constrain lowest minimum lapse rate based on historical'// &
      &     ' daily air temperatures for all air-temperature measurement stations', &
      &     'temp_units/feet')/=0 ) CALL read_error(1, 'lapsemin_min')
 
@@ -143,7 +143,7 @@
      &     '3.0', '-2.0', '4.0', &
      &     'Monthly maximum lapse rate for minimum temperature', &
      &     'Monthly (January to December) minimum lapse rate to'// &
-     &     ' constrain lowest maximum lapse rate on the basis of historical'// &
+     &     ' constrain lowest maximum lapse rate based on historical'// &
      &     ' daily air temperatures for all air-temperature measurement stations', &
      &     'temp_units/feet')/=0 ) CALL read_error(1, 'lapsemin_max')
 
@@ -151,7 +151,7 @@
      &     '-6.5', '-7.0', '-3.0', &
      &     'Monthly minimum lapse rate for maximum temperature', &
      &     'Monthly (January to December) maximum lapse rate to'// &
-     &     ' constrain lowest minimum lapse rate on the basis of historical'// &
+     &     ' constrain lowest minimum lapse rate based on historical'// &
      &     ' daily air temperatures for all air-temperature measurement stations', &
      &     'temp_units/feet')/=0 ) CALL read_error(1, 'lapsemax_min')
 
@@ -159,7 +159,7 @@
      &     '2.0', '-3.0', '3.0', &
      &     'Monthly maximum lapse rate for maximum temperature', &
      &     'Monthly (January to December) maximum lapse rate to'// &
-     &     ' constrain lowest maximum lapse rate on the basis of historical'// &
+     &     ' constrain lowest maximum lapse rate based on historical'// &
      &     ' daily air temperatures for all air-temperature measurement stations', &
      &     'temp_units/feet')/=0 ) CALL read_error(1, 'lapsemax_max')
 

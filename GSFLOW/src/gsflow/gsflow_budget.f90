@@ -72,31 +72,31 @@
      &     'L3/T', NetBoundaryFlow2Sat_Q)
 
       CALL declvar_dble(MODNAME, 'StreamExchng2Sat_Q', 'one', 1, &
-     &     'Volumetric flow rate of exchange betweeen streams and the saturated'// &
+     &     'Volumetric flow rate of exchange between streams and the saturated'// &
      &     ' zone (value is equal to Strm2UZGW minus SatDisch2Stream_Q, where a'// &
      &     ' negative value indicates a net loss from streams)', &
      &     'L3/T', StreamExchng2Sat_Q)
 
       CALL declvar_dble(MODNAME, 'Stream2Unsat_Q', 'one', 1, &
-     &     'Volumetric flow rate betweeen streams and the unsaturated'// &
+     &     'Volumetric flow rate between streams and the unsaturated'// &
      &     ' zone (value is equal to Strm2UZGW minus SatDisch2Stream_Q, where a'// &
      &     ' negative value indicates a net loss from streams)', &
      &     'L3/T', Stream2Unsat_Q)
 
       CALL declvar_dble(MODNAME, 'LakeExchng2Sat_Q', 'one', 1, &
-     &     'Volumetric flow rate of exchange betweeen lakes and the saturated'// &
+     &     'Volumetric flow rate of exchange between lakes and the saturated'// &
      &     ' zone (value is equal to Strm2UZGW minus SatDisch2Stream_Q, where a'// &
      &     ' negative value indicates a net loss from streams)', &
      &     'L3/T', LakeExchng2Sat_Q)
 
       CALL declvar_dble(MODNAME, 'Lake2Unsat_Q', 'one', 1, &
-     &     'Volumetric flow rate betweeen lakes and the unsaturated'// &
+     &     'Volumetric flow rate between lakes and the unsaturated'// &
      &     ' zone (value is equal to Strm2UZGW minus SatDisch2Stream_Q, where a'// &
      &     ' negative value indicates a net loss from streams)', &
      &     'L3/T', Lake2Unsat_Q)
 
       CALL declvar_dble(MODNAME, 'stream_inflow', 'one', 1, &
-     &     'Specified volumetric stream inflow rate into model ', &
+     &     'Specified volumetric stream flow rate into model ', &
      &     'L3/T', Stream_inflow)
 
       CALL declvar_dble(MODNAME, 'Unsat_S', 'one', 1, &
@@ -112,11 +112,11 @@
      &     'L3', Sat_dS)
 
       CALL declvar_dble(MODNAME, 'total_pump', 'one', 1, &
-     &     'Total pumpage from all cells', &
+     &     'Total pumping from all cells', &
      &     'L3', Total_pump)
 
       CALL declvar_dble(MODNAME, 'total_pump_cfs', 'one', 1, &
-     &     'Total pumpage from all cells', &
+     &     'Total pumping from all cells', &
      &     'cfs', Total_pump_cfs)
 
       ALLOCATE (Reach_cfs(Nreach))

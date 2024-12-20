@@ -577,8 +577,8 @@
         ALLOCATE ( Lake_out2(Nlake) )
         IF ( declparam(MODNAME, 'lake_out2', 'nlake', 'integer', &
      &       '0', '0', '1', &
-     &       'Switch to specify a second outlet from a lake', &
-     &       'Switch to specify a second outlet from each lake using gate opening routing (0=no; 1=yes)', &
+     &       'Flag to specify a second outlet from a lake', &
+     &       'Flag to specify a second outlet from each lake using gate opening routing (0=no; 1=yes)', &
      &       'none')/=0 ) CALL read_error(1, 'lake_out2')
 
         ALLOCATE ( Lake_out2_a(Nlake) )

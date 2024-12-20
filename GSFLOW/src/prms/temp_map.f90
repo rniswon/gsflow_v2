@@ -83,14 +83,14 @@
      &         '0.0', '0.0', '50.0', &
      &         'Monthly maximum temperature adjustment factor as an offset from tmin_map_adj for each mapped spatial unit', &
      &         'Monthly (January to December) additive adjustment factor to maximum air temperature as an offset from' // &
-     &         ' tmin_map_adj for each mapped, spatial unit estimated on the basis of slope and aspect', &
+     &         ' tmin_map_adj for each mapped, spatial unit estimated based on slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_map_adj_offset')
         ELSE
           IF ( declparam(MODNAME, 'tmax_map_adj', 'nmap,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
      &         'Monthly maximum temperature adjustment factor for each mapped spatial unit', &
      &         'Monthly (January to December) additive adjustment factor to maximum air temperature for each mapped,'// &
-     &         ' spatial unit estimated on the basis of slope and aspect', &
+     &         ' spatial unit estimated based on slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_map_adj')
         ENDIF
         ALLOCATE ( Tmin_map_adj(Nmap,MONTHS_PER_YEAR) )
@@ -98,7 +98,7 @@
      &       '0.0', '-10.0', '10.0', &
      &       'Monthly minimum temperature adjustment factor for each mapped spatial unit', &
      &       'Monthly (January to December) additive adjustment factor to minimum air temperature for each'// &
-     &       ' mapped spatial unit, estimated on the basis of slope and aspect', &
+     &       ' mapped spatial unit, estimated based on slope and aspect', &
      &       'temp_units')/=0 ) CALL read_error(1, 'tmin_map_adj')
 
         ALLOCATE ( Hru2map_id(Nmap2hru) )

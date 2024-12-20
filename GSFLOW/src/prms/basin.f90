@@ -216,11 +216,11 @@
       ALLOCATE ( Ag_area(Nhru) )
       IF ( AG_flag==ACTIVE ) THEN
         CALL declvar_dble(MODNAME, 'basin_ag_area', 'one', 1, &
-     &       'Basin area-weighted agricultural area', &
+     &       'Basin area-weighted irrigated area', &
      &       'cfs', basin_ag_area)
 
         CALL declvar_real(MODNAME, 'ag_area', 'nhru', Nhru, &
-     &       'Area of HRU that is used for agriculture', &
+     &       'Irrigated area of each HRU', &
      &       'acres', Ag_area)
 
         ALLOCATE ( Ag_frac(Nhru) )

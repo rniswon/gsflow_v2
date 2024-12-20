@@ -171,7 +171,7 @@
      &         'Current iteration in GSFLOW simulation', 'none', KKITER)
           ALLOCATE ( Hru_ag_irr(Nhru) )
           CALL declvar_real(MODNAME, 'hru_ag_irr', 'nhru', Nhru, &
-     &         'Irrigation added to soilzone from MODFLOW wells', 'acre-inches', Hru_ag_irr)
+     &         'Water added to soilzone from MODFLOW wells for potential use as irrigation', 'acre-inches', Hru_ag_irr)
           Hru_ag_irr = 0.0
           ALLOCATE ( Dprst_ag_gain(Nhru) )
           CALL declvar_real(MODNAME, 'dprst_ag_gain', 'nhru', Nhru, &

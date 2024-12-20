@@ -427,14 +427,14 @@
      &           'Monthly maximum temperature adjustment factor as an offset from tmin_cbh_adj for each HRU', &
      &           'Monthly (January to December) additive adjustment factor to maximum air temperature as an'// &
      &           ' offset from tmin_cbh_adj for each HRU,'// &
-     &           ' estimated on the basis of slope and aspect', &
+     &           ' estimated based on slope and aspect', &
      &           'temp_units')/=0 ) CALL read_error(1, 'tmax_cbh_adj_offset')
           ELSE
             IF ( declparam(MODNAME, 'tmax_cbh_adj', 'nhru,nmonths', 'real', &
      &           '0.0', '-10.0', '10.0', &
      &           'Monthly maximum temperature adjustment factor for each HRU', &
      &           'Monthly (January to December) additive adjustment factor to maximum air temperature for each HRU,'// &
-     &           ' estimated on the basis of slope and aspect', &
+     &           ' estimated based on slope and aspect', &
      &           'temp_units')/=0 ) CALL read_error(1, 'tmax_cbh_adj')
           ENDIF
 
@@ -443,7 +443,7 @@
      &         '0.0', '-10.0', '10.0', &
      &         'Monthly minimum temperature adjustment factor for each HRU', &
      &         'Monthly (January to December) additive adjustment factor to minimum air temperature for each HRU,'// &
-     &         ' estimated on the basis of slope and aspect', &
+     &         ' estimated based on slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmin_cbh_adj')
         ENDIF
 
@@ -454,7 +454,7 @@
      &         'Rain adjustment factor, by month for each HRU', &
      &         'Monthly (January to December) multiplicative adjustment factor to'// &
      &         ' measured precipitation determined to be rain on'// &
-     &         ' each HRU to account for differences in elevation, and so forth', &
+     &         ' each HRU to account for differences in elevation and other factors', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'rain_cbh_adj')
 
           ALLOCATE ( Snow_cbh_adj(Nhru,MONTHS_PER_YEAR) )
@@ -463,7 +463,7 @@
      &         'Snow adjustment factor, by month for each HRU', &
      &         'Monthly (January to December) multiplicative adjustment factor to'// &
      &         ' measured precipitation determined to be snow on'// &
-     &         ' each HRU to account for differences in elevation, and so forth', &
+     &         ' each HRU to account for differences in elevation and other factors', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'snow_cbh_adj')
         ENDIF
 

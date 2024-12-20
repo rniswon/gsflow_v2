@@ -286,7 +286,7 @@
      &     'L3/T', Lake2Sat_Q)
 
       CALL declvar_dble(MODNAME, 'Lake_dS', 'one', 1, &
-     &     'Change in lake storage', &
+     &     'Change in volume of water in lakese', &
      &     'L3', Lake_dS)
 
       CALL declvar_dble(MODNAME, 'SatDisch2Lake_Q', 'one', 1, &

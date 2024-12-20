@@ -324,7 +324,7 @@
      +     '1.0', '-1.0E7', '1.0E7',
      +     'X divisor term for climate station transform',
      +     'Standard deviation for the climate station transformation'//
-     +     ' equation for the longitude (X) coordinate (not 0.0)',
+     +     ' equation for the longitude (X) coordinate (cannot be 0.0)',
      +     'meters')/=0 ) CALL read_error(1, 'x_div')
 
       IF ( declparam(MODNAME, 'y_add', 'one', 'real',
@@ -338,7 +338,7 @@
      +     '1.0', '-1.0E7', '1.0E7',
      +     'Y divisor term for climate station transform',
      +     'Standard deviation for the climate station transformation'//
-     +     ' equation for the latitude (Y) coordinate (not 0.0)',
+     +     ' equation for the latitude (Y) coordinate (cannot be 0.0)',
      +     'meters')/=0 ) CALL read_error(1, 'y_div')
 
       IF ( declparam(MODNAME, 'z_add', 'one', 'real',
@@ -352,7 +352,7 @@
      +     '1.0', '-1.0E7', '1.0E7',
      +     'Z divisor term for climate station transform',
      +     'Standard deviation for the climate station transformation'//
-     +     ' equation for the elevation (Z) coordinate (not 0.0)',
+     +     ' equation for the elevation (Z) coordinate (cannot be 0.0)',
      +     'meters')/=0 ) CALL read_error(1, 'z_div')
 
       IF ( declparam(MODNAME, 'tmax_add', 'one', 'real',
@@ -369,7 +369,7 @@
      +     ' transform',
      +     'Standard deviation for the air-temperature-measurement'//
      +     ' station transformation'//
-     +     ' equation for maximum temperature (not 0.0)',
+     +     ' equation for maximum temperature (cannot be 0.0)',
      +     'temp_units')/=0 ) CALL read_error(1, 'tmax_div')
 
       IF ( declparam(MODNAME, 'tmin_add', 'one', 'real',
@@ -386,7 +386,7 @@
      +     '-measurement station transformation transform',
      +     'Standard deviation for the air-temperature-measurement'//
      +     ' station transformation'//
-     +     ' equation for minimum temperature (not 0.0)',
+     +     ' equation for minimum temperature (cannot be 0.0)',
      +     'temp_units')/=0 ) CALL read_error(1, 'tmin_div')
 
       IF ( declparam(MODNAME, 'ppt_add', 'one', 'real',
@@ -402,7 +402,7 @@
      +     'Precipitation divisor term for precipitation measurement'//
      +     ' station transform',
      +     'Standard deviation for the precipitation measurement'//
-     +     ' station transformation equation (not 0.0)',
+     +     ' station transformation equation (cannot be 0.0)',
      +     'precip_units')/=0 ) CALL read_error(1, 'ppt_div')
 
       IF ( declparam(MODNAME, 'conv_flag', 'one', 'integer',

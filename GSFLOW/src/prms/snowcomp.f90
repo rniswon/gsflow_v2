@@ -398,7 +398,7 @@
       ALLOCATE ( Lso(Nhru) )
       CALL declvar_int(MODNAME, 'lso', 'nhru', Nhru, &
      &     'Counter for tracking the number of days the snowpack is at or above 0 degrees Celsius', &
-     &     'number of iterations', Lso)
+     &     'number of days', Lso)
 
       !rpayn commented
       ALLOCATE ( Lst(Nhru) )
