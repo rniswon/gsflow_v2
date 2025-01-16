@@ -91,15 +91,15 @@
         IF ( declparam(MODNAME, 'precip_map_adj', 'nmap,nmonths', 'real', &
      &     '1.0', '0.5', '2.0', &
      &     'Monthly rain adjustment factor for each mapped spatial unit', &
-     &     'Monthly (January to December) multiplicative adjustment factor to mapped precipitation to account for'// &
-     &     ' differences in elevation, and so forth', &
+     &     'Monthly (January to December) multiplicative adjustment factor to mapped precipitation that accounts for'// &
+     &     ' differences in elevation and other factors', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'precip_map_adj')
 
         ALLOCATE ( Hru2map_id(Nmap2hru) )
         IF ( declparam(MODNAME, 'hru2map_id', 'nmap2hru', 'integer', &
      &       '1', 'bounded', 'nhru', &
-     &       'HRU identification number for each HRU to mapped spatial units intersection', &
-     &       'HRU identification number for each HRU to mapped spatial units intersection', &
+     &       'Identification number for each HRU to mapped spatial units intersection', &
+     &       'Identification number for each HRU to mapped spatial units intersection', &
      &       'none')/=0 ) CALL read_error(1, 'hru2map_id')
 
         !rsr, bounded value could be a problem if number of mapped spatial units > nhru

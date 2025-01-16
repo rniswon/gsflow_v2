@@ -577,8 +577,8 @@
         ALLOCATE ( Lake_out2(Nlake) )
         IF ( declparam(MODNAME, 'lake_out2', 'nlake', 'integer', &
      &       '0', '0', '1', &
-     &       'Switch to specify a second outlet from a lake', &
-     &       'Switch to specify a second outlet from each lake using gate opening routing (0=no; 1=yes)', &
+     &       'Flag to specify a second outlet from a lake', &
+     &       'Flag to specify a second outlet from each lake using gate opening routing (0=no; 1=yes)', &
      &       'none')/=0 ) CALL read_error(1, 'lake_out2')
 
         ALLOCATE ( Lake_out2_a(Nlake) )
@@ -991,8 +991,11 @@
 ! current inflow to the segment is the time weighted average of the outflow
 ! of the upstream segments plus the lateral HRU inflow plus any gains.
           currin = Seg_lateral_inflow(iorder) !note, this routes to inlet
-
-          IF ( Obsin_segment(iorder)>0 ) Seg_upstream_inflow(iorder) = Streamflow_cfs(Obsin_segment(iorder))
+          IF ( Obsin_segment(iorder)>0 ) THEN
+            IF ( .not.(Streamflow_cfs(Obsin_segment(iorder))<0.0)) &
+                 CALL error_stop('negative replacement streamflow in muskingum', ERROR_streamflow)
+            Seg_upstream_inflow(iorder) = Streamflow_cfs(Obsin_segment(iorder))
+          ENDIF
           currin = currin + Seg_upstream_inflow(iorder)
           Seg_inflow(iorder) = Seg_inflow(iorder) + currin
           Inflow_ts(iorder) = Inflow_ts(iorder) + currin

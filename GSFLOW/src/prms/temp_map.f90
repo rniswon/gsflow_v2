@@ -28,7 +28,7 @@
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MAXFILE_LENGTH, MONTHS_PER_YEAR, temp_map_module, ACTIVE
       use PRMS_CONTROL_FILE, only: control_string
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Process_flag, Start_year, Start_month, Start_day, Nmap2hru, Nmap, Nowmonth, PRMS6_flag
+      USE PRMS_MODULE, ONLY: Process_flag, Start_year, Start_month, Start_day, Nmap2hru, Nmap, Nowmonth, bias_adjust_flag
       USE PRMS_TEMP_MAP
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
@@ -78,19 +78,19 @@
 
 ! Declare parameters
         ALLOCATE ( Tmax_map_adj(Nmap,MONTHS_PER_YEAR) )
-        IF ( PRMS6_flag==ACTIVE ) THEN
+        IF ( bias_adjust_flag==ACTIVE ) THEN
           IF ( declparam(MODNAME, 'tmax_map_adj_offset', 'nmap,nmonths', 'real', &
      &         '0.0', '0.0', '50.0', &
      &         'Monthly maximum temperature adjustment factor as an offset from tmin_map_adj for each mapped spatial unit', &
      &         'Monthly (January to December) additive adjustment factor to maximum air temperature as an offset from' // &
-     &         ' tmin_map_adj for each mapped, spatial unit estimated on the basis of slope and aspect', &
+     &         ' tmin_map_adj for each mapped, spatial unit estimated based on slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_map_adj_offset')
         ELSE
           IF ( declparam(MODNAME, 'tmax_map_adj', 'nmap,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
      &         'Monthly maximum temperature adjustment factor for each mapped spatial unit', &
      &         'Monthly (January to December) additive adjustment factor to maximum air temperature for each mapped,'// &
-     &         ' spatial unit estimated on the basis of slope and aspect', &
+     &         ' spatial unit estimated based on slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_map_adj')
         ENDIF
         ALLOCATE ( Tmin_map_adj(Nmap,MONTHS_PER_YEAR) )
@@ -98,7 +98,7 @@
      &       '0.0', '-10.0', '10.0', &
      &       'Monthly minimum temperature adjustment factor for each mapped spatial unit', &
      &       'Monthly (January to December) additive adjustment factor to minimum air temperature for each'// &
-     &       ' mapped spatial unit, estimated on the basis of slope and aspect', &
+     &       ' mapped spatial unit, estimated based on slope and aspect', &
      &       'temp_units')/=0 ) CALL read_error(1, 'tmin_map_adj')
 
         ALLOCATE ( Hru2map_id(Nmap2hru) )
@@ -133,7 +133,7 @@
         ierr = 0
         IF ( getparam_real(MODNAME, 'tmin_map_adj', Nmap*MONTHS_PER_YEAR, Tmin_map_adj)/=0 ) &
      &       CALL read_error(2, 'tmin_map_adj')
-        IF ( PRMS6_flag==ACTIVE ) THEN
+        IF ( bias_adjust_flag==ACTIVE ) THEN
           IF ( getparam_real(MODNAME, 'tmax_map_adj_offset', Nmap*MONTHS_PER_YEAR, Tmax_map_adj_offset)/=0 ) &
      &         CALL read_error(2, 'tmax_map_adj_offset')
           Tmax_map_adj = Tmin_map_adj + Tmax_map_adj_offset

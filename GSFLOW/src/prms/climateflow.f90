@@ -162,7 +162,7 @@ end module PRMS_IT0_VARS
      &    ddsolrad_module, ccsolrad_module, CANOPY
       USE PRMS_MODULE, ONLY: Nhru, Nssr, Nsegment, Nevap, Nlake, Ntemp, Nrain, Nsol, Ngw, Inputerror_flag, &
      &    Init_vars_from_file, Temp_flag, Precip_flag, Glacier_flag, &
-     &    Strmflow_module, Temp_module, Stream_order_flag, PRMS6_flag, &
+     &    Strmflow_module, Temp_module, Stream_order_flag, bias_adjust_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, Humidity_cbh_flag, &
      &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, snow_flag, gwflow_flag, Nhrucell, activeHRU_inactiveCELL_flag
@@ -496,7 +496,7 @@ end module PRMS_IT0_VARS
       IF ( GSFLOW_flag==ACTIVE ) THEN
         ALLOCATE ( gsflow_ag_actet(Nhru) )
         CALL declvar_real(Soilzone_module, 'gsflow_ag_actet', 'nhru', Nhru, &
-     &       'Agriculture actual ET for GSFLOW simulations for each HRU', &
+     &       'Actual ET for irrigated area on each HRU in GSFLOW simulations', &
      &       'inches', gsflow_ag_actet)
         IF ( Nhrucell<-1 ) CALL error_stop('dimension nhrucell not specified > 0', ERROR_dim)
         ALLOCATE ( Gravity_stor_res(Nhrucell), It0_gravity_stor_res(Nhrucell) )
@@ -739,20 +739,20 @@ end module PRMS_IT0_VARS
       IF ( Temp_flag==temp_1sta_module .OR. Temp_flag==temp_laps_module .OR. Temp_flag==temp_dist2_module .OR. &
      &     Temp_flag==ide_dist_module .OR. Temp_flag==xyz_dist_module .OR. Temp_flag==temp_sta_module ) THEN
         ALLOCATE ( Tmax_aspect_adjust(Nhru,MONTHS_PER_YEAR) )
-        IF ( PRMS6_flag==ACTIVE ) THEN
+        IF ( bias_adjust_flag==ACTIVE ) THEN
           ALLOCATE ( Tmax_adj_offset(Nhru,MONTHS_PER_YEAR) )
           IF ( declparam(Temp_module, 'tmax_adj_offset', 'nhru,nmonths', 'real', &
      &         '0.0', '0.0', '50.0', &
      &         'HRU maximum temperature adjustment as offset from tmin_adj', &
      &         'Monthly (January to December) additive adjustment to maximum temperature for each HRU' // &
-     &         ' as offset from tmin_adj, estimated on the basis of slope and aspect', &
+     &         ' as offset from tmin_adj, estimated based on slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_adj_offset')
         ELSE
           IF ( declparam(Temp_module, 'tmax_adj', 'nhru,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
      &         'HRU maximum temperature adjustment', &
      &         'Monthly (January to December) additive adjustment to maximum temperature for each HRU,' // &
-     &         ' estimated on the basis of slope and aspect', &
+     &         ' estimated based on slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_adj')
         ENDIF
 
@@ -760,7 +760,7 @@ end module PRMS_IT0_VARS
         IF ( declparam(Temp_module, 'tmin_adj', 'nhru,nmonths', 'real', &
      &       '0.0', '-10.0', '10.0', &
      &       'HRU minimum temperature adjustment', &
-     &       'Adjustment to minimum temperature for each HRU, estimated on the basis of slope and aspect', &
+     &       'Adjustment to minimum temperature for each HRU, estimated based on slope and aspect', &
      &       'temp_units')/=0 ) CALL read_error(1, 'tmin_adj')
       ENDIF
 
@@ -889,7 +889,7 @@ end module PRMS_IT0_VARS
      &       '0.8', '0.1', '1.0', &
      &       'Maximum fraction of potential solar radiation', &
      &       'Monthly (January to December) maximum fraction of the potential solar radiation'// &
-     &       ' that may reach the ground due to haze, dust, smog, and so forth, for each HRU', &
+     &       ' that may reach the ground due to haze, dust, smog, and other factors, for each HRU', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'radmax')
       ENDIF
 
@@ -1006,20 +1006,20 @@ end module PRMS_IT0_VARS
 
       IF ( AG_flag==ACTIVE ) THEN
         CALL declvar_dble(Soilzone_module, 'basin_ag_soil_moist', 'one', 1, &
-     &       'Basin area-weighted average soil agricultural capillary reservoir storage', &
+     &       'Basin area-weighted average capillary reservoir storage for the irrigated areae', &
      &       'inches', Basin_ag_soil_moist)
         CALL declvar_dble(Soilzone_module, 'basin_ag_soil_rechr', 'one', 1, &
-     &       'Basin area-weighted average storage for the agricultural recharge zone;'//&
-     &       ' upper portion of agricultura capillary reservoir where both evaporation and transpiration occurs', &
+     &       'Basin area-weighted average storage for the recharge zone; upper portion of', &
+     &       ' capillary reservoir for the irrigated area where both evaporation and transpiration occur'//&
      &       'inches', Basin_ag_soil_rechr)
         ALLOCATE ( Ag_soil_moist(Nhru), It0_ag_soil_moist(Nhru) )
         CALL declvar_real(Soilzone_module, 'ag_soil_moist', 'nhru', Nhru, &
-     &       'Storage of soil agriculture capillary reservoir for each HRU', &
+     &       'Water storage in the capillary reservoir of the irrigated area for each HRU', &
      &       'inches', Ag_soil_moist)
         ALLOCATE ( Ag_soil_rechr(Nhru), It0_ag_soil_rechr(Nhru) )
         CALL declvar_real(Soilzone_module, 'ag_soil_rechr', 'nhru', Nhru, &
-     &       'Storage for upper portion of the soil agriculture capillary reservoir that is available for both'// &
-     &       ' evaporation and transpiration', &
+     &       'Water storage for upper portion in the capillary reservoir of the irrigated area for each HRU that' // &
+    &        ' is available for both evaporation and transpiration', &
      &       'inches', Ag_soil_rechr)
         ALLOCATE ( Ag_soil_moist_max(Nhru) )
         IF ( declparam(Soilzone_module, 'ag_soil_moist_max', 'nhru', 'real', &
@@ -1069,7 +1069,7 @@ end module PRMS_IT0_VARS
      &    Temp_module, Stream_order_flag, Glacier_flag, &
      &    Precip_module, Solrad_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Et_flag, Dprst_flag, Solrad_flag, &
-     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, PRMS6_flag, &
+     &    Parameter_check_flag, Inputerror_flag, Humidity_cbh_flag, bias_adjust_flag, &
      &    GSFLOW_flag, Hru_type, AG_flag, gwflow_flag
       USE PRMS_CLIMATEVARS
       USE PRMS_FLOWVARS
@@ -1100,7 +1100,7 @@ end module PRMS_IT0_VARS
      &     Temp_flag==ide_dist_module .OR. Temp_flag==xyz_dist_module .OR. Temp_flag==temp_sta_module ) THEN
         IF ( getparam_real(Temp_module, 'tmin_adj', Nhru*MONTHS_PER_YEAR, Tmin_aspect_adjust)/=0 ) &
                            CALL read_error(2, 'tmin_adj')
-        IF ( PRMS6_flag==ACTIVE ) THEN
+        IF ( bias_adjust_flag==ACTIVE ) THEN
           IF ( getparam_real(Temp_module, 'tmax_adj_offset', Nhru*MONTHS_PER_YEAR, Tmax_adj_offset)/=0 ) &
                         CALL read_error(2, 'tmax_adj_offset')
           Tmax_aspect_adjust = Tmin_aspect_adjust + Tmax_adj_offset
@@ -1637,7 +1637,7 @@ end module PRMS_IT0_VARS
      &           Tminf, Tavgf, Pptmix, Newsnow, Prmx, Tmax_allrain_f, Rain_adj, &
      &           Snow_adj, Adjmix_rain, Hru_area, Sum_obs, Tmax_allsnow_f, Ihru)
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF !, DEBUG_minimum
-      USE PRMS_MODULE, ONLY: forcing_check_flag, PRMS6_flag !, Print_debug
+      USE PRMS_MODULE, ONLY: forcing_check_flag, bias_adjust_flag !, Print_debug
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
       use prms_utils, only: print_date
       IMPLICIT NONE
@@ -1666,11 +1666,11 @@ end module PRMS_IT0_VARS
 !******If minimum temperature is above base temperature for snow or
 !******maximum temperature is above all_rain temperature then
 !******precipitation is all rain
-      ELSEIF ( PRMS6_flag==ACTIVE .AND. .not.(Tavgf<Tmax_allrain_f) ) THEN
+      ELSEIF ( bias_adjust_flag==ACTIVE .AND. .not.(Tavgf<Tmax_allrain_f) ) THEN
         Hru_ppt = Precip*Rain_adj
         Hru_rain = Hru_ppt
         Prmx = 1.0
-      ELSEIF ( PRMS6_flag==OFF .AND. (Tminf>Tmax_allsnow_f .OR. Tmaxf>=Tmax_allrain_f) ) THEN
+      ELSEIF ( bias_adjust_flag==OFF .AND. (Tminf>Tmax_allsnow_f .OR. Tmaxf>=Tmax_allrain_f) ) THEN
         Hru_ppt = Precip*Rain_adj
         Hru_rain = Hru_ppt
         Prmx = 1.0

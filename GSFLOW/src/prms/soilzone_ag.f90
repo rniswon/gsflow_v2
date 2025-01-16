@@ -116,7 +116,7 @@
 ! Agriculture variables and parameters
       ALLOCATE ( ag_soil_to_gw(Nhru) )
       CALL declvar_real(MODNAME, 'ag_soil_to_gw', 'nhru', Nhru, &
-     &     'Direct recharge from agriculture capillary reservoir to groundwater reservior for each HRU', &
+     &     'Direct recharge from capillary reservoir for the irrigated area to groundwater reservoir for each HRU', &
      &     'inches', ag_soil_to_gw)
 
 !      IF ( Cascade_flag>OFF ) THEN
@@ -129,12 +129,12 @@
 
       ALLOCATE ( Ag_actet(Nhru) )
       CALL declvar_real(MODNAME, 'ag_actet', 'nhru', Nhru, &
-     &     'Actual ET for agriculture capillary reservoir for each HRU', &
+     &     'Actual ET in capillary reservoir for irrigated fraction of each HRU', &
      &     'inches', Ag_actet)
 
       ALLOCATE ( hru_ag_actet(Nhru) )
       CALL declvar_real(MODNAME, 'hru_ag_actet', 'nhru', Nhru, &
-     &     'Actual ET for agriculture capillary reservoir averaged over each HRU', &
+     &     'Actual ET for irrigated area portion of capillary reservoir averaged over irrigated area of HRU', &
      &     'inches', hru_ag_actet)
 
       ALLOCATE ( Unused_ag_et(Nhru) )
@@ -144,12 +144,12 @@
 
       ALLOCATE ( Ag_hortonian(Nhru) )
       CALL declvar_real(MODNAME, 'ag_hortonian', 'nhru', Nhru, &
-     &     'Hortonian surface runoff that flows to the stream network from the agriculture fraction of each HRU', &
+     &     'Hortonian surface runoff that flows to the stream network from the irrigated area of each HRU', &
      &     'inches', Ag_hortonian)
 
       ALLOCATE ( ag_soil_to_gvr(Nhru) )
       CALL declvar_real(MODNAME, 'ag_soil_to_gvr', 'nhru', Nhru, &
-     &     'Excess capillary water that flows to the agriculture gravity reservoir from the agriculture fraction of each HRU', &
+     &     'Excess capillary water that flows to the gravity reservoir from the irrigated area of each HRU', &
      &     'inches', ag_soil_to_gvr)
 
       CALL declvar_dble(MODNAME, 'Basin_ag_irrigation_add', 'one', 1, &
@@ -158,7 +158,7 @@
 
       ALLOCATE ( Ag_irrigation_add(Nhru) )
       CALL declvar_real(MODNAME, 'ag_irrigation_add', 'nhru', Nhru, &
-     &     'Irrigation water added to agriculture fraction when ag_actet < AET_external for each HRU', &
+     &     'Irrigation water added to irrigated area when ag_actet < AET_external for each HRU', &
      &     'inches', Ag_irrigation_add)
 
       ALLOCATE ( Ag_soilwater_deficit(Nhru) )
@@ -168,24 +168,24 @@
 
       ALLOCATE ( Ag_irrigation_add_vol(Nhru) )
       CALL declvar_real(MODNAME, 'ag_irrigation_add_vol', 'nhru', Nhru, &
-     &     'Irrigation water added to agriculture fraction when ag_actet < AET_external for each HRU', &
+     &     'Irrigation water added to irrigated area when ag_actet < AET_external for each HRU', &
      &     'acre-inches', Ag_irrigation_add_vol)
 
       ALLOCATE ( ag_AET_external_vol(Nhru) )
       CALL declvar_real(MODNAME, 'ag_AET_external_vol', 'nhru', Nhru, &
-     &     'OpenET actual evapotranspiration for transpiration days for each HRU', &
+     &     'External actual evapotranspiration used as a target for simulating actual ET during'// &
+     &     ' transpiration days for the irrigated fraction of each HRU', &
      &     'acre-inches', ag_AET_external_vol)
 
       ALLOCATE ( Ag_soil_lower(Nhru), Ag_soil_lower_stor_max(Nhru) )
       CALL declvar_real(MODNAME, 'ag_soil_lower', 'nhru', Nhru, &
-     &   'Storage in the lower zone of the agriculture'// &
-     &   ' reservoir that is only available for transpiration for each HRU', &
+     &   'Storage in the lower zone of the irrigated area that is only available for transpiration for each HRU', &
      &   'inches', Ag_soil_lower)
 
       IF ( GSFLOW_flag==ACTIVE ) THEN
         ALLOCATE ( Gvr2ag(Nhru), Ag_replenish_frac(Nhru) )
         CALL declvar_real(MODNAME, 'gvr2ag', 'nhru', Nhru, &
-     &       'Gravity flow to agriculture soil replenishment for each HRU', &
+     &       'Gravity flow to the capillary reservoir replenishment for irrigated area of each HRU', &
      &       'inches', Gvr2ag)
         ALLOCATE ( Gvr_maxin(Nhrucell) )
         CALL declvar_real(MODNAME, 'gvr_maxin', 'nhrucell', Nhru, &
@@ -195,22 +195,22 @@
 
       ALLOCATE ( Ag_potet_lower(Nhru) ) !, Ag_water_maxin(Nhru) )
       CALL declvar_real(MODNAME, 'ag_potet_lower', 'nhru', Nhru, &
-     &     'Potential ET in the lower zone of the agriculture reservoir for each HRU', &
+     &     'Potential ET in the lower zone of the agriculture reservoir for the irrigated fraction of each HRU', &
      &     'inches', Ag_potet_lower)
 
       ALLOCATE ( Ag_potet_rechr(Nhru) )
       CALL declvar_real(MODNAME, 'ag_potet_rechr', 'nhru', Nhru, &
-     &     'Potential ET in the recharge zone of the agriculture reservoir for each HRU', &
+     &     'Potential ET in the recharge zone of the agriculture reservoir for the irrigated fraction of each HRU', &
      &     'inches', Ag_potet_rechr)
 
       ALLOCATE ( Ag_soil_saturated(Nhru) )
       CALL declvar_int(MODNAME, 'ag_soil_saturated', 'nhru', Nhru, &
-     &     'Flag set if infiltration saturates capillary reservoir (0=no, 1=yes)', &
+     &     'Flag set if infiltration saturates capillary reservoir for the irrigated area of the HRU (0=no, 1=yes)', &
      &     'none', Ag_soil_saturated)
 
       ALLOCATE ( Ag_cap_infil_tot(Nhru), Ag_water_in(Nhru) )
       CALL declvar_real(MODNAME, 'ag_water_in', 'nhru', Nhru, &
-     &     'Total water into the agriculture reservoir for each HRU', &
+     &     'Total water into the capillary reservoir in the irrigated area for each HRU', &
      &     'inches', Ag_water_in)
 
       IF ( Iter_aet_flag==ACTIVE ) THEN
@@ -237,7 +237,7 @@
       ALLOCATE ( Ag_soil_type(Nhru) )
       IF ( declparam(MODNAME, 'ag_soil_type', 'nhru', 'integer', &
      &     '-1', '-1', '3', &
-     &     'Agriculture soil type', 'Soil type of agriculture in each HRU (1=sand; 2=loam; 3=clay)', &
+     &     'Agriculture soil type', 'Soil type of agriculture fraction in each HRU (1=sand; 2=loam; 3=clay)', &
      &     'none')/=0 ) CALL read_error(1, 'ag_soil_type')
 
 !      ALLOCATE ( Ag_crop_type(Nhru) ) ! find Mastin's code on different crops

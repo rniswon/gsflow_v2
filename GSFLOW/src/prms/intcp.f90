@@ -102,7 +102,7 @@
      &       'Application method of irrigation water', &
      &       'Application method of irrigation water for each HRU (0 = sprinkler method with interception only;'// &
      &       ' 1=ditch/drip method with no interception; 2=ignore; 3=sprinkler across whole HRU with interception'// &
-     &       ' and throughfall; 4=sprinkler method with amount of water applied on the basis of cover density,'// &
+     &       ' and throughfall; 4=sprinkler method with amount of water applied based on cover density,'// &
      &       ' such as a living filter), for options 1, 2, and 3 irrigation water is specified as an'// &
      &       ' HRU-area weighted average value', &
      &       'none')/=0 ) CALL read_error(1, 'irr_type')

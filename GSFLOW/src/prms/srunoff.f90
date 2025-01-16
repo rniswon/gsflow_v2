@@ -275,7 +275,7 @@
 
         ALLOCATE ( Hru_hortn_cascflow(Nhru) )
         CALL declvar_dble(MODNAME, 'hru_hortn_cascflow', 'nhru', Nhru, &
-     &       'Cascading Hortonian surface runoff leaving each HRU', &
+     &       'Cascading Hortonian surface runoff flowing out of each HRU', &
      &       'inches', Hru_hortn_cascflow)
 
         IF ( Nlake>0 ) THEN
@@ -469,14 +469,14 @@
      &       'inches', Basin_infil_ag)
 
         CALL declvar_real(MODNAME, 'infil_ag', 'nhru', Nhru, &
-     &       'Infiltration to the agriculture reservoirs for each HRU', &
+     &       'Infiltration to the irrigated area fraction of each HRU', &
      &       'inches', Infil_ag)
         CALL declvar_dble(MODNAME, 'basin_ag_contrib_fraction', 'one', 1, &
-     &       'Basin area-weighted average contributing area of the agriculture area of each HRU', &
+     &       'Basin area-weighted average contributing area of the irrigated area of each HRU', &
      &       'decimal fraction', basin_ag_contrib_fraction)
         ALLOCATE ( ag_contrib_fraction(Nhru) )
         CALL declvar_real(MODNAME, 'ag_contrib_fraction', 'nhru', Nhru, &
-     &       'Contributing area of each HRU agriculture area', &
+     &       'Fraction of irrigated area for each HRU', &
      &       'decimal fraction', ag_contrib_fraction)
 !       ALLOCATE ( Sro_to_dprst_ag(Nhru) )
 !       IF ( declparam(MODNAME, 'sro_to_dprst_ag', 'nhru', 'real', &

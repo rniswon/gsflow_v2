@@ -378,7 +378,8 @@
 
       IF ( Init_vars_from_file==0 ) THEN
         Basin_segment_storage = 0.0D0
-        Segment_delta_flow = 0.0D0
+        IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
+     &       Strmflow_flag==strmflow_muskingum_mann_module ) Segment_delta_flow = 0.0D0
       ENDIF
 
       Hru_outflow = 0.0D0

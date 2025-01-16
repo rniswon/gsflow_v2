@@ -93,7 +93,7 @@
       IF ( declparam(MODNAME, 'maxday_prec', 'one', 'real', &
      &     '15.0', '0.0', '20.0', &
      &     'Maximum daily precipitation for any weather site', &
-     &     'Maximum measured precipitation value above which precipitation is assumed to be in error', &
+     &     'Maximum measured precipitation value above which precipitation is assumed to be an error', &
      &     'precip_units')/=0 ) CALL read_error(1, 'maxday_prec')
 
 !      ALLOCATE ( Maxmon_prec(MONTHS_PER_YEAR) )
@@ -111,7 +111,7 @@
      &     'Rain adjustment factor, by month for each HRU', &
      &     'Monthly (January to December) factor applied to rain on each HRU'// &
      &     ' to adjust precipitation distributed to each HRU to'// &
-     &     ' account for differences in elevation, and so forth', &
+     &     ' account for differences in elevation and other factors', &
      &     'precip_units')/=0 ) CALL read_error(1, 'rain_mon')
 
       ALLOCATE ( Snow_mon(Nhru, MONTHS_PER_YEAR) )
@@ -120,7 +120,7 @@
      &     'Rain adjustment factor, by month for each HRU', &
      &     'Monthly (January to December) factor applied to snow on each HRU'// &
      &     ' to adjust precipitation distributed to each HRU to'// &
-     &     ' account for differences in elevation, and so forth', &
+     &     ' account for differences in elevation and other factors', &
      &     'precip_units')/=0 ) CALL read_error(1, 'snow_mon')
 
       ALLOCATE ( Psta_mon(Nrain, MONTHS_PER_YEAR) )
@@ -129,7 +129,7 @@
      &     'Monthly precipitation for each of the nrain precipitation measurement stations', &
      &     'Monthly (January to December) factor applied to precipitation'// &
      &     ' at each measured station to adjust precipitation distributed to each HRU to'// &
-     &     ' account for differences in elevation, and so forth', &
+     &     ' account for differences in elevation and other factors', &
      &     'precip_units')/=0 ) CALL read_error(1, 'psta_mon')
 
       ALLOCATE ( Psta_xlong(Nrain) )

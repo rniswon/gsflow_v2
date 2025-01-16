@@ -534,6 +534,9 @@ contains
     Control_parameter_data(i) % name = 'cloud_cover_cbh_flag'
     Cloud_cover_cbh_flag = OFF
     i = i + 1
+    Control_parameter_data(i) % name = 'bias_adjust_flag'
+    bias_adjust_flag = OFF
+    i = i + 1
     Control_parameter_data(i) % name = 'irrigation_apply_flag'
     irrigation_apply_flag = OFF
     i = i + 1

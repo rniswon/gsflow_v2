@@ -245,7 +245,7 @@
 
       ALLOCATE ( hru_perv_actet(Nhru) )
       CALL declvar_real(MODNAME, 'hru_perv_actet', 'nhru', Nhru, &
-     &     'Actual ET from the capillary reservoir as HRU value', &
+     &     'Actual ET from the capillary reservoir for each HRU', &
      &     'inches', hru_perv_actet)
 
       ! added to be compatible with ssflow_prms

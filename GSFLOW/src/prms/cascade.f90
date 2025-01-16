@@ -149,8 +149,8 @@
 
         IF ( declparam(MODNAME, 'circle_switch', 'one', 'integer', &
      &       '1', '0', '1', &
-     &       'Switch to check for circles', &
-     &       'Switch to check for circles (0=no check; 1=check)', &
+     &       'Flag to check for circles', &
+     &       'Flag to check for circles (0=no check; 1=check)', &
      &       'none')/=0 ) CALL read_error(1, 'circle_switch')
       ENDIF
 
