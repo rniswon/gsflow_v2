@@ -217,7 +217,7 @@
      &     'Bed slope of each segment', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'seg_slope')
 
-      IF ( Stream_temp_shade_flag==OFF .OR. Model==DOCUMENTATION ) THEN
+      IF ( Stream_temp_shade_flag==OFF ) THEN
          ALLOCATE ( Azrh(Nsegment) )
          IF ( declparam( MODNAME, 'azrh', 'nsegment', 'real', &
      &       '0.0', '-1.5708', '1.5708', &
@@ -409,7 +409,7 @@
       USE PRMS_STRMTEMP
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_OBS, ONLY: Nhumid
-      USE PRMS_ROUTING, ONLY: Hru_segment, Tosegment, Segment_order, Segment_up, Seg_length
+      USE PRMS_ROUTING, ONLY: Hru_segment, Tosegment, Segment_order, Segment_up
       use prms_utils, only: checkdim_param_limits, error_stop, read_error
       IMPLICIT NONE
 ! Functions
@@ -424,7 +424,7 @@
       IF ( getparam_real( MODNAME, 'albedo', 1, Albedo)/=0 ) CALL read_error(2, 'albedo')
       IF ( getparam_real( MODNAME, 'lat_temp_adj', Nsegment*MONTHS_PER_YEAR, lat_temp_adj)/=0 ) &
      &     CALL read_error(2, 'lat_temp_adj')
-      IF ( getparam_real( MODNAME, 'seg_length', Nsegment, 'real', Seg_length)/=0 ) CALL read_error(2, 'seg_length')
+      IF ( getparam_real( MODNAME, 'seg_length', Nsegment, Seg_length)/=0 ) CALL read_error(2, 'seg_length')
 
       IF (getparam_real(MODNAME, 'seg_lat', Nsegment, Seg_lat)/=0 ) CALL read_error(2, 'seg_lat')
 !     Convert latitude from degrees to radians
@@ -435,7 +435,7 @@
 ! convert stream length in meters to km
       Seg_length = Seg_length / 1000.0
 
-      IF ( getparam_real( MODNAME, 'seg_slope', Nsegment, 'real', Seg_slope)/=0 ) CALL read_error(2, 'seg_slope')
+      IF ( getparam_real( MODNAME, 'seg_slope', Nsegment, Seg_slope)/=0 ) CALL read_error(2, 'seg_slope')
 
       IF ( Stream_temp_shade_flag==OFF ) THEN
          IF ( getparam_real( MODNAME, 'azrh', Nsegment, Azrh)/=0 ) CALL read_error(2, 'azrh')
