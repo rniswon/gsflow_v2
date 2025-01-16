@@ -61,7 +61,6 @@
 		<File RelativePath="..\GSFLOW\src\prms\ccsolrad.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\climate_hru.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\climateflow.f90"/>
-		<File RelativePath="..\GSFLOW\src\prms\cloud_cover.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\convert_params.f90"/>
 		<File RelativePath="..\GSFLOW\src\prms\ddsolrad.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\de47_NWT.f"/>
@@ -113,6 +112,7 @@
 		<File RelativePath="..\GSFLOW\src\modflow\gwf2wel7_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwflakmodule_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\gwflow.f90"/>
+		<File RelativePath="..\GSFLOW\src\gsflow\gwflow_inactive_cell.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwfsfrmodule_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwfuzfmodule_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\hufutl7.f"/>
