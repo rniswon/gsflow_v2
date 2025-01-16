@@ -45,7 +45,7 @@
      &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
      &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
      &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, &
-     &    Nowyear, Nowday, forcing_check_flag, Print_debug, Ncbh, PRMS6_flag, &
+     &    Nowyear, Nowday, forcing_check_flag, Print_debug, Ncbh, bias_adjust_flag, &
      &    irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag
       USE PRMS_CLIMATE_HRU
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Ag_Frac
@@ -420,7 +420,7 @@
 !   Declared Parameters
         IF ( Climate_temp_flag==ACTIVE ) THEN
           ALLOCATE ( Tmax_cbh_adj(Nhru,MONTHS_PER_YEAR) )
-          IF ( PRMS6_flag==ACTIVE ) THEN
+          IF ( bias_adjust_flag==ACTIVE ) THEN
             ALLOCATE ( Tmax_cbh_adj_offset(Nhru,MONTHS_PER_YEAR) )
             IF ( declparam(MODNAME, 'tmax_cbh_adj_offset', 'nhru,nmonths', 'real', &
      &           '0.0', '0.0', '50.0', &
@@ -512,7 +512,7 @@
         IF ( Climate_temp_flag==ACTIVE ) THEN
           IF ( getparam_real(MODNAME, 'tmin_cbh_adj', Nhru*MONTHS_PER_YEAR, Tmin_cbh_adj)/=0 ) &
                              CALL read_error(2, 'tmin_cbh_adj')
-          IF ( PRMS6_flag==ACTIVE ) THEN
+          IF ( bias_adjust_flag==ACTIVE ) THEN
             IF ( getparam_real(MODNAME, 'tmax_cbh_adj_offset', Nhru*MONTHS_PER_YEAR, Tmax_cbh_adj_offset)/=0 ) &
                           CALL read_error(2, 'tmax_cbh_adj_offset')
             Tmax_cbh_adj = Tmin_cbh_adj + Tmax_cbh_adj_offset

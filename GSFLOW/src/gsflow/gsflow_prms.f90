@@ -51,7 +51,7 @@
       INTEGER, EXTERNAL :: stream_temp, glacr, dynamic_soil_param_read, strmflow_character
       INTEGER, EXTERNAL :: soilzone_ag
       EXTERNAL :: precip_map, temp_map, segment_to_hru, gwflow_inactive_cell
-      EXTERNAL :: water_balance, prms_summary, convert_params, input_error
+      EXTERNAL :: water_balance, prms_summary, convert_params
       EXTERNAL :: gsflow_prms2modsim, gsflow_modsim2prms
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
 ! Local Variables
@@ -375,7 +375,7 @@
       IF ( Model==FROST ) THEN
         IF ( Process_flag==DECL ) CALL read_parameter_file_params()
         ierr = frost_date()
-        IF ( Inputerror_flag == 1 ) CALL input_error()
+        IF ( Inputerror_flag == 1 .OR. Parameter_check_flag==2 ) CALL input_error()
         RETURN
       ENDIF
 
@@ -391,7 +391,7 @@
 
       IF ( Model==CLIMATE ) THEN
         IF ( Process_flag==DECL ) CALL read_parameter_file_params()
-        IF ( Inputerror_flag == 1 ) CALL input_error()
+        IF ( Inputerror_flag == 1 .OR. Parameter_check_flag==2 ) CALL input_error()
         CALL summary_output()
         RETURN
       ENDIF
@@ -412,7 +412,7 @@
 
       IF ( Model==TRANSPIRE ) THEN
         IF ( Process_flag==DECL ) CALL read_parameter_file_params()
-        IF ( Inputerror_flag == 1 ) CALL input_error()
+        IF ( Inputerror_flag == 1 .OR. Parameter_check_flag==2 ) CALL input_error()
         CALL summary_output()
         RETURN
       ENDIF
@@ -438,13 +438,13 @@
       IF ( Model==WRITE_CLIMATE ) THEN
         ierr = write_climate_hru()
         IF ( Process_flag==DECL ) CALL read_parameter_file_params()
-        IF ( Inputerror_flag == 1 ) CALL input_error()
+        IF ( Inputerror_flag == 1 .OR. Parameter_check_flag==2 ) CALL input_error()
         RETURN
       ENDIF
 
       IF ( Model==POTET ) THEN
         IF ( Process_flag==DECL ) CALL read_parameter_file_params()
-        IF ( Inputerror_flag == 1 ) CALL input_error()
+        IF ( Inputerror_flag == 1 .OR. Parameter_check_flag==2 ) CALL input_error()
         CALL summary_output()
         RETURN
       ENDIF
@@ -595,10 +595,10 @@
         IF ( Model==CONVERT ) CALL convert_params()
       ELSEIF ( Process_flag==INIT ) THEN
         CALL check_parameters()
-        IF ( Parameter_check_flag==2 ) STOP
-        IF ( Inputerror_flag==1 ) CALL input_error()
+        IF ( Inputerror_flag==1 .OR. Parameter_check_flag==2 ) CALL input_error()
         IF ( Model==CONVERT ) THEN
           CALL convert_params()
+          PRINT *, 'File PRMS_4.params or PRMS_5.params contain the converted parameters'
           STOP
         ENDIF
         IF ( Print_debug>DEBUG_minimum ) &
@@ -664,7 +664,6 @@
       IF ( control_string(Model_mode, 'model_mode')/=0 ) CALL read_error(5, 'model_mode')
       IF ( Model_mode(:4)=='    ' ) Model_mode = 'GSFLOW5'
       PRMS4_flag = OFF
-      PRMS6_flag = OFF
       PRMS_flag = ACTIVE
       GSFLOW_flag = OFF
       PRMS_only = OFF
@@ -674,10 +673,6 @@
         Model = PRMS
         PRMS4_flag = ACTIVE
         IF ( Model_mode(:5)=='PRMS5' .OR. Model_mode(:5)=='prms5' ) PRMS4_flag = OFF
-        IF ( Model_mode(:5)=='PRMS6' .OR. Model_mode(:5)=='prms6' .OR. Model_mode(:5)=='GSFLOW6' ) THEN
-          PRMS4_flag = OFF
-          PRMS6_flag = ACTIVE
-        ENDIF
         PRMS_only = ACTIVE
       ELSEIF ( Model_mode(:6)=='GSFLOW' .OR. Model_mode(:6)=='gsflow' ) THEN
         Model = GSFLOW
@@ -950,6 +945,7 @@
       IF ( control_integer(Windspeed_cbh_flag, 'windspeed_cbh_flag')/=0 ) Windspeed_cbh_flag = OFF
       IF ( control_integer(Albedo_cbh_flag, 'albedo_cbh_flag')/=0 ) Albedo_cbh_flag = OFF
       IF ( control_integer(Cloud_cover_cbh_flag, 'cloud_cover_cbh_flag')/=0 ) Cloud_cover_cbh_flag = OFF
+      IF ( control_integer(bias_adjust_flag, 'bias_adjust_flag')/=0 ) bias_adjust_flag = OFF
       IF ( Et_flag==potet_pm_module .OR. Et_flag==potet_pt_module .OR. &
      &     (Stream_temp_flag==ACTIVE .AND. Strmtemp_humidity_flag==OFF) ) Humidity_cbh_flag = ACTIVE
       IF ( Et_flag==potet_pm_module ) Windspeed_cbh_flag = ACTIVE
@@ -1035,6 +1031,7 @@
 
       ! 0 = off, 1 = on, 2 = lauren version, 3 = CSV for POIs
       IF ( control_integer(CsvON_OFF, 'csvON_OFF')/=0 ) CsvON_OFF = OFF
+
 ! map results dimensions
       IF ( control_integer(MapOutON_OFF, 'mapOutON_OFF')/=0 ) MapOutON_OFF = OFF
       idim = 0
@@ -1515,6 +1512,7 @@
       SUBROUTINE input_error()
 !***********************************************************************
       USE PRMS_CONSTANTS, ONLY: ERROR_param
+      USE PRMS_MODULE, ONLY: Parameter_check_flag
       IMPLICIT NONE
 !***********************************************************************
       PRINT '(//,A,//,A,/,A,/,A)', '**Fix input errors in your Parameter File to continue**', &
@@ -1526,6 +1524,7 @@
             'parameter_check_flag to 0. After calibration set the', &
             'parameter_check_flag to 1 to verify that those calibration', &
             'parameters have valid and compatible values.'
+      IF ( Parameter_check_flag==2 ) STOP
       ERROR STOP ERROR_param
 
       END SUBROUTINE input_error

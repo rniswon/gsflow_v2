@@ -8,7 +8,7 @@
      &          EQULS = '=========================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 12/11/2024'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 12/20/2024'
       character(len=*), parameter :: PRMS_versn = '2024-12-20'
       character(len=*), parameter :: PRMS_VERSION = 'Version 6.0.0 12/20/2024'
       character(len=*), parameter :: githash = 'Github Commit Hash a4cffeceecab925507a192e0f4822c89f8f37065'
@@ -32,7 +32,7 @@
       INTEGER, SAVE :: Precip_combined_flag, Temp_combined_flag, Muskingum_flag
       INTEGER, SAVE :: Inputerror_flag, Timestep
       INTEGER, SAVE :: Humidity_cbh_flag, Windspeed_cbh_flag, Albedo_cbh_flag, Cloud_cover_cbh_flag
-      INTEGER, SAVE :: PRMS4_flag, PRMS6_flag
+      INTEGER, SAVE :: PRMS4_flag, bias_adjust_flag
       INTEGER, SAVE :: PRMS_flag, GSFLOW_flag, PRMS_only, Gsf_unt
       INTEGER, SAVE :: Kper_mfo, Kkstp_mfo, Have_lakes, Grid_flag, Ag_package, MODSIM_flag, AG_flag, gwflow_flag
       INTEGER, SAVE :: Canopy_iter, irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag

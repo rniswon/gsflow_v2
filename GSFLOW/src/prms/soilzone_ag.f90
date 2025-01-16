@@ -173,7 +173,7 @@
 
       ALLOCATE ( ag_AET_external_vol(Nhru) )
       CALL declvar_real(MODNAME, 'ag_AET_external_vol', 'nhru', Nhru, &
-     &     'External actual evapotranspiration used as a target for simulating actual ET during', &
+     &     'External actual evapotranspiration used as a target for simulating actual ET during'// &
      &     ' transpiration days for the irrigated fraction of each HRU', &
      &     'acre-inches', ag_AET_external_vol)
 

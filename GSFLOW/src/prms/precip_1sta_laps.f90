@@ -126,7 +126,7 @@
      &         '1.0', '0.2', '10.0', &
      &         'Monthly rain adjustment factor for each HRU', &
      &         'Monthly (January to December) multiplicative factor to adjust measured rain on each HRU'// &
-     &         ' to account for differences in elevationand other factors', &
+     &         ' to account for differences in elevation and other factors', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'rain_adj')
 
           IF ( declparam(MODNAME, 'snow_adj', 'nhru,nmonths', 'real', &

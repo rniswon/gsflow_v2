@@ -134,9 +134,7 @@ MODULE PRMS_CONSTANTS
     ! model_mode
     integer, parameter :: GSFLOW = 0
     integer, parameter :: PRMS = 1
-    integer, parameter :: PRMS6 = 6
     integer, parameter :: MODFLOW = 2
-
     integer, parameter :: MODSIM_PRMS = 3
     integer, parameter :: MODSIM_GSFLOW = 10
     integer, parameter :: MODSIM_MODFLOW = 11
