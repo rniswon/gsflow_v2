@@ -108,7 +108,7 @@
       IF ( declparam( MODNAME, 'depth_m', 'nsegment', 'real', &
      &     '0.39', '0.38', '0.40', &
      &     'M value in power function for depth calculation', &
-     &     'M value in power function for depth calculation (for units M and CMS)', &
+     &     'M value in power function for depth calculation (for units m and cms)', &
      &     'meters')/=0 ) CALL read_error(1, 'depth_m')
 
       END FUNCTION strmflow_character_decl

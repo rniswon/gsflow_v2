@@ -23,7 +23,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2024-09-01'
+      character(len=*), parameter :: Version_snowcomp = '2025-01-21'
       INTEGER, SAVE :: Active_glacier, Ihru
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -249,7 +249,7 @@
         ALLOCATE ( Glacr_pk_def(Nhru) )
         CALL declvar_real(MODNAME, 'glacr_pk_def', 'nhru', Nhru, &
      &       'Heat deficit, amount of heat necessary to make the glacier'// &
-     &       ' or or glacierette snowpack isothermal at 0 degrees Celsius', &
+     &       ' or glacierette snowpack isothermal at 0 degrees Celsius', &
      &       'Langleys', Glacr_pk_def)
 
         ALLOCATE ( Glacr_pk_den(Nhru) )
