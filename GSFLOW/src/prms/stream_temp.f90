@@ -6,8 +6,8 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2024-12-04'
-      INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:), Seg_close(:)
+      character(len=*), parameter :: Version_stream_temp = '2025-01-22'
+      INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), Seg_carea_inv(:), seg_tave_sroff(:), seg_tave_lat(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
 
@@ -38,7 +38,7 @@
       INTEGER, SAVE:: Maxiter_sntemp
       REAL, SAVE, ALLOCATABLE :: Seg_humidity(:, :)
       REAL, SAVE, ALLOCATABLE :: lat_temp_adj(:, :)
-      INTEGER, SAVE, ALLOCATABLE :: Seg_humidity_sta(:), tempIN_segment(:)
+      INTEGER, SAVE, ALLOCATABLE :: Seg_humidity_sta(:), tempIN_segment(:), seg_close(:)
 !   Shade Parameters needed if stream_temp_shade_flag = 0
       REAL, SAVE, ALLOCATABLE :: Azrh(:), Alte(:), Altw(:), Vce(:)
       REAL, SAVE, ALLOCATABLE :: Vdemx(:), Vhe(:), Voe(:), Vcw(:), Vdwmx(:), Vhw(:), Vow(:)
@@ -182,7 +182,6 @@
       ALLOCATE (Press(Nsegment) )
       ALLOCATE ( Seg_hru_count(Nsegment) )
       ALLOCATE (Seg_carea_inv(Nsegment) )
-      ALLOCATE ( Seg_close(Nsegment) )
       ALLOCATE (gw_sum(Nsegment), ss_sum(Nsegment))
       ALLOCATE (gw_silo(nsegment,DAYS_PER_YEAR), ss_silo(nsegment,DAYS_PER_YEAR))
 ! markstro
@@ -359,6 +358,17 @@
      &     'Index of streamflow temperature in Data File that replaces temperature in a segment', &
      &     'none')/=0 ) CALL read_error(1, 'tempIN_segment')
 
+      ! If a segment does not have any HRUs, need to find the closest one for elevation and latitude info
+      ! NOTE: seg_close variable can go upstream, downstream, or offstream looking for the "closest" segment with
+      ! an HRU. This is not approprite to use in a situation where computed values are going to be taken from
+      ! the closest HRU (i.e. flow).
+      ALLOCATE ( seg_close(Nsegment) )
+      IF ( declparam(MODNAME, 'seg_close', 'nsegment', 'integer', &
+     &     '-1', '9999999', 'nsegment', &
+     &     'Index of closest segment from elevation and latitude for each a segment', &
+     &     'Index of closest segment from elevation and latitude for each a segment', &
+     &     'none')/=0 ) CALL read_error(1, 'seg_close')
+
       IF ( Strmtemp_humidity_flag==ACTIVE ) THEN  ! specified constant
          ALLOCATE ( Seg_humidity(Nsegment, MONTHS_PER_YEAR) )
          IF ( declparam( MODNAME, 'seg_humidity', 'nsegment,nmonths', 'real', &
@@ -461,6 +471,7 @@
       IF ( getparam_real( MODNAME, 'melt_temp', 1, Melt_temp)/=0 ) CALL read_error(2, 'melt_temp')
       IF ( getparam_int( MODNAME, 'maxiter_sntemp', 1, Maxiter_sntemp)/=0 ) CALL read_error(2, 'maxiter_sntemp')
       IF ( getparam_int( MODNAME, 'tempIN_segment', Nsegment, tempIN_segment)/=0 ) CALL read_error(2, 'tempIN_segment')
+      IF ( getparam_int( MODNAME, 'seg_close', Nsegment, seg_close)/=0 ) CALL read_error(2, 'seg_close')
 
       ierr = 0
       IF ( Strmtemp_humidity_flag==1 ) THEN
@@ -540,17 +551,13 @@
          RETURN
       ENDIF
 
-      Seg_close = Segment_up ! assign upstream values
+      if ( seg_close(1)==-1 ) then
+          seg_close = Segment_up
+          print *, 'WARNING, seg_close not specified so setting to segment_up'
+      endif
       DO j = 1, Nsegment ! set values based on routing order for segments without associated HRUs
          i = Segment_order(j)
 
-      ! If a segment does not have any HRUs, need to find the closest one for elevation and latitude info
-      ! NOTE: seg_close variable can go upstream, downstream, or offstream looking for the "closest" segment with
-      ! an HRU. This is not approprite to use in a situation where computed values are going to be taken from
-      ! the closest HRU (i.e. flow).
-      !
-      ! This does work for NHM network (most comprehensive test).
-      !
          IF ( Seg_hru_count(i)==0 ) THEN
             IF ( Segment_up(i)==0 ) THEN
                IF ( Tosegment(i)>0 ) THEN ! assign downstream values

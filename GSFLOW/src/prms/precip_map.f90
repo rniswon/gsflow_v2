@@ -11,7 +11,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Precipitation Distribution'
         character(len=*), parameter :: MODNAME = 'precip_map'
-        character(len=*), parameter :: Version_precip_map = '2024-04-30'
+        character(len=*), parameter :: Version_precip_map = '2025-01-21'
         INTEGER, SAVE :: Precip_unit
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
@@ -91,7 +91,7 @@
         IF ( declparam(MODNAME, 'precip_map_adj', 'nmap,nmonths', 'real', &
      &     '1.0', '0.5', '2.0', &
      &     'Monthly rain adjustment factor for each mapped spatial unit', &
-     &     'Monthly (January to December) multiplicative adjustment factor to mapped precipitation that accounts for'// &
+     &     'Monthly (January to December) multiplicative adjustment factor to mapped precipitation to account for'// &
      &     ' differences in elevation and other factors', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'precip_map_adj')
 

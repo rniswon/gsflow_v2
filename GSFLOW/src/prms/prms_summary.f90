@@ -6,7 +6,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Output Summary'
         character(len=*), parameter :: MODNAME = 'prms_summary'
-        character(len=*), parameter :: Version_prms_summary = '2024-12-01'
+        character(len=*), parameter :: Version_prms_summary = '2025-01-16'
         INTEGER, PARAMETER :: NVARS = 51
         INTEGER, SAVE :: Iunit, nobs_npoigages
         INTEGER, SAVE, ALLOCATABLE :: Gageid_len(:)

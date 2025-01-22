@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2024-08-13'
+      character(len=*), parameter :: Version_routing = '2025-01-21'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades, special_seg_type_flag
@@ -143,7 +143,7 @@
         IF ( declparam(MODNAME, 'seg_depth', 'nsegment', 'real', &
      &       '1.0', '0.03', '250.0', &
      &       'Segment river depth', &
-     &       'Segment river depth at bankfull; shallowest depth from Blackburn-Lynch (2017);'//&
+     &       'Segment river depth at bankfull; shallowest depth from Blackburn-Lynch (2017); '//&
      &       'Congo is deepest at 250 m but in the US it is probably the Hudson at 66 m', &
      &       'meters')/=0 ) CALL read_error(1, 'seg_depth')
       ENDIF
