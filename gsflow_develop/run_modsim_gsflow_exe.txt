@@ -1,0 +1,3 @@
+C:\Users\rniswon\Documents\Data\Git\modsim.git\MWC_MMS\MWC_MS_GSF_Run\bin\x64\Release
+
+move MWC_MIDSIMutls.
