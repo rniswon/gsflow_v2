@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2025-01-21'
+      character(len=*), parameter :: Version_routing = '2025-01-30'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades, special_seg_type_flag
@@ -151,7 +151,7 @@
       IF ( Strmflow_flag==strmflow_muskingum_mann_module .OR. Stream_temp_flag==ACTIVE ) THEN
         ALLOCATE ( Seg_length(Nsegment) )
         IF ( declparam( MODNAME, 'seg_length', 'nsegment', 'real', &
-     &       '1000.0', '1.0', '100000.0', &
+     &       '1000.0', '0.001', '200000.0', &
      &       'Length of each segment', &
      &       'Length of each segment', &
      &       'meters')/=0 ) CALL read_error(1, 'seg_length')
@@ -418,9 +418,13 @@
 ! find segments that are too short and print them out as they are found
         ierr = 0
         DO i = 1, Nsegment
-           IF ( Seg_length(i)<NEARZERO ) THEN
-              PRINT *, 'ERROR, seg_length too small for segment:', i, ', value:', Seg_length(i)
-              ierr = 1
+           IF ( Seg_length(i)<1.0 ) THEN
+             IF ( Seg_length(i)<NEARZERO ) THEN
+                PRINT *, 'ERROR, seg_length too small for segment:', i, ', value:', Seg_length(i)
+                ierr = 1
+             ELSEIF ( Print_debug < DEBUG_LESS )THEN
+                PRINT *, 'WARNING, seg_length < 1.0 for segment:', i, ', value:', Seg_length(i)
+             ENDIF
            ENDIF
            IF ( Seg_slope(i)<0.0000001 ) THEN
              IF ( Print_debug>DEBUG_LESS ) PRINT *, 'WARNING, seg_slope < 0.0000001, set to 0.0000001', i, Seg_slope(i)
