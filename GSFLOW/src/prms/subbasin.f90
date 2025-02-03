@@ -232,7 +232,7 @@
       INTEGER FUNCTION subinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, CFS2CMS_CONV, LAKE, DNEARZERO
       USE PRMS_MODULE, ONLY: Nsub, Print_debug, &
-     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Hru_type
+     &    Inputerror_flag, Dprst_flag, Lake_route_flag, Hru_type, gwflow_flag
       use PRMS_READ_PARAM_FILE, only: getparam_int
       USE PRMS_SUBBASIN
       USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
@@ -309,7 +309,7 @@
         k = Hru_subbasin(j)
         IF ( k>0 ) THEN
           harea = Hru_area_dble(j)
-          gwstor = Gwres_stor(j)*harea
+          IF ( gwflow_flag==ACTIVE ) gwstor = Gwres_stor(j)*harea
           IF ( Hru_type(j)/=LAKE ) THEN
             soilstor = DBLE(Soil_moist(j)*Hru_frac_perv(j) + Ssres_stor(j))*harea
             snowstor = Pkwater_equiv(j)*harea
