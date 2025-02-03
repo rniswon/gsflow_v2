@@ -44,7 +44,7 @@
  # MODFLOW2005 Discretization Input File
  # Test Problem 3 for UPW Package and NWT Solver
     1 LAYERS        80 ROWS        80 COLUMNS
-    1 STRESS PERIOD(S) IN SIMULATION
+     1 STRESS PERIOD(S) IN SIMULATION
  MODEL TIME UNIT IS DAYS
  MODEL LENGTH UNIT IS UNDEFINED
   Confining bed flag for each layer:
@@ -2119,7 +2119,7 @@
 
      0 Recharge parameters
 1
-                            STRESS PERIOD NO.    1, LENGTH =   365.0000    
+                            STRESS PERIOD NO.     1, LENGTH =   365.0000    
                             -----------------------------------------------
 
                               NUMBER OF TIME STEPS =     1
@@ -3085,7 +3085,7 @@
        AND A TOTAL OF        915 INNER ITERATIONS.
     ------------------------------------------------
 
- OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    1
+ OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP    1
     PRINT HEAD FOR ALL LAYERS
     SAVE HEAD FOR ALL LAYERS
 1
@@ -3742,9 +3742,9 @@
        -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.    
        -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.    
 
- HEAD WILL BE SAVED ON UNIT   30 AT END OF TIME STEP    1, STRESS PERIOD    1
+ HEAD WILL BE SAVED ON UNIT   30 AT END OF TIME STEP    1, STRESS PERIOD     1
 1
-  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD   1
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD    1
   ------------------------------------------------------------------------------
 
      CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
@@ -3775,7 +3775,7 @@
 
 
 
-         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD    1
+         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD     1
                     SECONDS     MINUTES      HOURS       DAYS        YEARS
                     -----------------------------------------------------------
    TIME STEP LENGTH 3.15360E+07 5.25600E+05  8760.0      365.00     0.99932    
@@ -3784,6 +3784,6 @@
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/21 19:37:15
- Elapsed run time: 0.599 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/03  9:40:11
+ Elapsed run time: 0.609 Seconds
 

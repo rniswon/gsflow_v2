@@ -60,11 +60,6 @@ executable_model
 4
 gsflow
 ####
-executable_desc
-1
-4
-GSFLOW version 2.3.0 release
-####
 data_file
 1
 4

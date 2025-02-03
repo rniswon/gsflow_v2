@@ -46,7 +46,7 @@
 
  DISCRETIZATION INPUT DATA READ FROM UNIT   10
    14 LAYERS        40 ROWS        40 COLUMNS
-    3 STRESS PERIOD(S) IN SIMULATION
+     3 STRESS PERIOD(S) IN SIMULATION
  MODEL TIME UNIT IS DAYS
  MODEL LENGTH UNIT IS UNDEFINED
   Confining bed flag for each layer:
@@ -592,7 +592,7 @@
 
      0 Recharge parameters
 1
-                            STRESS PERIOD NO.    1, LENGTH =   190.0000    
+                            STRESS PERIOD NO.     1, LENGTH =   190.0000    
                             -----------------------------------------------
 
                               NUMBER OF TIME STEPS =    10
@@ -714,7 +714,7 @@
        AND A TOTAL OF         23 INNER ITERATIONS.
     ------------------------------------------------
 
- OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    1
+ OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP    1
     SAVE BUDGET
     PRINT HEAD FOR ALL LAYERS
     PRINT BUDGET
@@ -3092,9 +3092,9 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 
- HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP    1, STRESS PERIOD    1
+ HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP    1, STRESS PERIOD     1
 1
-  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD   1
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD    1
   ------------------------------------------------------------------------------
 
      CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
@@ -3125,7 +3125,7 @@
 
 
 
-         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD    1
+         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD     1
                     SECONDS     MINUTES      HOURS       DAYS        YEARS
                     -----------------------------------------------------------
    TIME STEP LENGTH 1.64160E+06  27360.      456.00      19.000     5.20192E-02
@@ -3148,7 +3148,7 @@
        AND A TOTAL OF         11 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    2
+ NO OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP    2
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -3164,7 +3164,7 @@
        AND A TOTAL OF          8 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    3
+ NO OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP    3
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -3180,7 +3180,7 @@
        AND A TOTAL OF          9 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    4
+ NO OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP    4
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -3197,7 +3197,7 @@
        AND A TOTAL OF         10 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    5
+ NO OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP    5
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -3213,7 +3213,7 @@
        AND A TOTAL OF          9 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    6
+ NO OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP    6
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -3229,7 +3229,7 @@
        AND A TOTAL OF          9 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    7
+ NO OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP    7
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -3245,7 +3245,7 @@
        AND A TOTAL OF          8 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    8
+ NO OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP    8
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -3261,7 +3261,7 @@
        AND A TOTAL OF          8 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    9
+ NO OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP    9
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -3277,7 +3277,7 @@
        AND A TOTAL OF          8 INNER ITERATIONS.
     ------------------------------------------------
 
- OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP   10
+ OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP   10
     SAVE BUDGET
     PRINT HEAD FOR ALL LAYERS
     PRINT BUDGET
@@ -5655,9 +5655,9 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 
- HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP   10, STRESS PERIOD    1
+ HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP   10, STRESS PERIOD     1
 1
-  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP   10, STRESS PERIOD   1
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP   10, STRESS PERIOD    1
   ------------------------------------------------------------------------------
 
      CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
@@ -5688,7 +5688,7 @@
 
 
 
-         TIME SUMMARY AT END OF TIME STEP   10 IN STRESS PERIOD    1
+         TIME SUMMARY AT END OF TIME STEP   10 IN STRESS PERIOD     1
                     SECONDS     MINUTES      HOURS       DAYS        YEARS
                     -----------------------------------------------------------
    TIME STEP LENGTH 1.64160E+06  27360.      456.00      19.000     5.20192E-02
@@ -5696,7 +5696,7 @@
          TOTAL TIME 1.64160E+07 2.73600E+05  4560.0      190.00     0.52019    
 1
 1
-                            STRESS PERIOD NO.    2, LENGTH =   518.0000    
+                            STRESS PERIOD NO.     2, LENGTH =   518.0000    
                             -----------------------------------------------
 
                               NUMBER OF TIME STEPS =     2
@@ -5721,7 +5721,7 @@
        AND A TOTAL OF         14 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP    1
+ NO OUTPUT CONTROL FOR STRESS PERIOD     2   TIME STEP    1
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -5737,7 +5737,7 @@
        AND A TOTAL OF         11 INNER ITERATIONS.
     ------------------------------------------------
 
- OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP    2
+ OUTPUT CONTROL FOR STRESS PERIOD     2   TIME STEP    2
     SAVE BUDGET
     PRINT HEAD FOR ALL LAYERS
     PRINT BUDGET
@@ -8115,9 +8115,9 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 
- HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP    2, STRESS PERIOD    2
+ HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP    2, STRESS PERIOD     2
 1
-  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    2, STRESS PERIOD   2
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    2, STRESS PERIOD    2
   ------------------------------------------------------------------------------
 
      CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
@@ -8148,7 +8148,7 @@
 
 
 
-         TIME SUMMARY AT END OF TIME STEP    2 IN STRESS PERIOD    2
+         TIME SUMMARY AT END OF TIME STEP    2 IN STRESS PERIOD     2
                     SECONDS     MINUTES      HOURS       DAYS        YEARS
                     -----------------------------------------------------------
    TIME STEP LENGTH 2.23776E+07 3.72960E+05  6216.0      259.00     0.70910    
@@ -8156,7 +8156,7 @@
          TOTAL TIME 6.11712E+07 1.01952E+06  16992.      708.00      1.9384    
 1
 1
-                            STRESS PERIOD NO.    3, LENGTH =   1922.000    
+                            STRESS PERIOD NO.     3, LENGTH =   1922.000    
                             -----------------------------------------------
 
                               NUMBER OF TIME STEPS =    17
@@ -8181,7 +8181,7 @@
        AND A TOTAL OF         10 INNER ITERATIONS.
     ------------------------------------------------
 
- OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP    1
+ OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP    1
     SAVE BUDGET
     PRINT HEAD FOR ALL LAYERS
     SAVE HEAD FOR ALL LAYERS
@@ -10558,11 +10558,11 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 
- HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP    1, STRESS PERIOD    3
+ HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP    1, STRESS PERIOD     3
 
 
 
-         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD    3
+         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD     3
                     SECONDS     MINUTES      HOURS       DAYS        YEARS
                     -----------------------------------------------------------
    TIME STEP LENGTH 9.76828E+06 1.62805E+05  2713.4      113.06     0.30954    
@@ -10584,7 +10584,7 @@
        AND A TOTAL OF          9 INNER ITERATIONS.
     ------------------------------------------------
 
- OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP    2
+ OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP    2
     SAVE BUDGET
     PRINT HEAD FOR ALL LAYERS
     SAVE HEAD FOR ALL LAYERS
@@ -12961,11 +12961,11 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 
- HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP    2, STRESS PERIOD    3
+ HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP    2, STRESS PERIOD     3
 
 
 
-         TIME SUMMARY AT END OF TIME STEP    2 IN STRESS PERIOD    3
+         TIME SUMMARY AT END OF TIME STEP    2 IN STRESS PERIOD     3
                     SECONDS     MINUTES      HOURS       DAYS        YEARS
                     -----------------------------------------------------------
    TIME STEP LENGTH 9.76828E+06 1.62805E+05  2713.4      113.06     0.30954    
@@ -12987,7 +12987,7 @@
        AND A TOTAL OF          9 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP    3
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP    3
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13003,7 +13003,7 @@
        AND A TOTAL OF          9 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP    4
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP    4
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13019,7 +13019,7 @@
        AND A TOTAL OF         10 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP    5
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP    5
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13035,7 +13035,7 @@
        AND A TOTAL OF         10 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP    6
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP    6
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13051,7 +13051,7 @@
        AND A TOTAL OF          9 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP    7
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP    7
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13067,7 +13067,7 @@
        AND A TOTAL OF          9 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP    8
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP    8
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13083,7 +13083,7 @@
        AND A TOTAL OF         10 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP    9
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP    9
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13099,7 +13099,7 @@
        AND A TOTAL OF         10 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP   10
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP   10
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13115,7 +13115,7 @@
        AND A TOTAL OF         10 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP   11
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP   11
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13131,7 +13131,7 @@
        AND A TOTAL OF         10 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP   12
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP   12
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13147,7 +13147,7 @@
        AND A TOTAL OF         10 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP   13
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP   13
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13163,7 +13163,7 @@
        AND A TOTAL OF         10 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP   14
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP   14
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13179,7 +13179,7 @@
        AND A TOTAL OF          9 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP   15
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP   15
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13194,7 +13194,7 @@
        AND A TOTAL OF          9 INNER ITERATIONS.
     ------------------------------------------------
 
- NO OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP   16
+ NO OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP   16
  
  SOLVING FOR HEAD 
                                                    Max.-Head-Change                        Max.-Flux-Residual
@@ -13209,7 +13209,7 @@
        AND A TOTAL OF          9 INNER ITERATIONS.
     ------------------------------------------------
 
- OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP   17
+ OUTPUT CONTROL FOR STRESS PERIOD     3   TIME STEP   17
     SAVE BUDGET
     PRINT HEAD FOR ALL LAYERS
     PRINT BUDGET
@@ -15587,9 +15587,9 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 
- HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP   17, STRESS PERIOD    3
+ HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP   17, STRESS PERIOD     3
 1
-  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP   17, STRESS PERIOD   3
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP   17, STRESS PERIOD    3
   ------------------------------------------------------------------------------
 
      CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
@@ -15620,7 +15620,7 @@
 
 
 
-         TIME SUMMARY AT END OF TIME STEP   17 IN STRESS PERIOD    3
+         TIME SUMMARY AT END OF TIME STEP   17 IN STRESS PERIOD     3
                     SECONDS     MINUTES      HOURS       DAYS        YEARS
                     -----------------------------------------------------------
    TIME STEP LENGTH 9.76828E+06 1.62805E+05  2713.4      113.06     0.30954    
@@ -15629,6 +15629,6 @@
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/21 19:37:00
- Elapsed run time: 8.242 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/03  9:39:31
+ Elapsed run time: 10.196 Seconds
 

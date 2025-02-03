@@ -46,7 +46,7 @@
 
  DISCRETIZATION INPUT DATA READ FROM UNIT    3
     1 LAYERS         1 ROWS       100 COLUMNS
-    1 STRESS PERIOD(S) IN SIMULATION
+     1 STRESS PERIOD(S) IN SIMULATION
  MODEL TIME UNIT IS DAYS
  MODEL LENGTH UNIT IS METERS
   Confining bed flag for each layer:
@@ -189,7 +189,7 @@
 
      0 Recharge parameters
 1
-                            STRESS PERIOD NO.    1, LENGTH =   1.000000    
+                            STRESS PERIOD NO.     1, LENGTH =   1.000000    
                             -----------------------------------------------
 
                               NUMBER OF TIME STEPS =     1
@@ -215,7 +215,7 @@
        AND A TOTAL OF         11 INNER ITERATIONS.
     ------------------------------------------------
 
- OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    1
+ OUTPUT CONTROL FOR STRESS PERIOD     1   TIME STEP    1
     PRINT BUDGET
     SAVE BUDGET
     PRINT HEAD FOR ALL LAYERS
@@ -243,9 +243,9 @@
       23.5967 23.6475 23.6960 23.7423 23.7865 23.8284 23.8682 23.9059 23.9414 23.9748 24.0060 24.0351 24.0621 24.0870 24.1099
       24.1306 24.1492 24.1658 24.1802 24.1926 24.2030 24.2112 24.2174 24.2216 24.2236
 
- HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP    1, STRESS PERIOD    1
+ HEAD WILL BE SAVED ON UNIT   51 AT END OF TIME STEP    1, STRESS PERIOD     1
 1
-  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD   1
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD    1
   ------------------------------------------------------------------------------
 
      CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
@@ -276,7 +276,7 @@
 
 
 
-         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD    1
+         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD     1
                     SECONDS     MINUTES      HOURS       DAYS        YEARS
                     -----------------------------------------------------------
    TIME STEP LENGTH  86400.      1440.0      24.000      1.0000     2.73785E-03
@@ -285,6 +285,6 @@
 1
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/21 19:36:35
- Elapsed run time: 0.033 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/03  9:39:03
+ Elapsed run time: 0.055 Seconds
 

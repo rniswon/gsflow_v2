@@ -1,10 +1,10 @@
-====================================================================
+==========================================================================
 Using PRMS Parameter File: .\input\acf.params
 Description: ACF coarse-resolution model v6 5/17/2011
-====================================================================
+==========================================================================
 Comment lines:
 Version: 1.7
-====================================================================
+==========================================================================
 Using dimensions    number
 nmonths               12
 nrain                 79
@@ -18,11 +18,13 @@ nobs                  58
 ndeplval              22
 nhru                 258
 ngw                  258
-====================================================================
+==========================================================================
+
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 12/20/2022
+                       Version 6.0.0 02/01/2025
 
+--------------------------------------------------------------------
         Process            Available Modules
 --------------------------------------------------------------------
   Basin Definition: basin
@@ -35,7 +37,7 @@ ngw                  258
        Precip Dist: precip_1sta, precip_laps, precip_dist2,
                     climate_hru, precip_map
 Temp & Precip Dist: xyz_dist, ide_dist
-    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
 Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
                     potet_hs, potet_pt, potet_pm, potet_pm_sta
@@ -54,21 +56,14 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
+Github Commit Hash b155a56c363022bd1881cb4dba3fabc15912152f
 
-    Active modules listed in the order in which they are called
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03  9:36:10
 
-        Process                    Module         Version Date
-==============================================================
-PRMS Computation Order          gsflow_prms         2022-12-20
-Read Control File               read_control_file   2022-10-20
-Read Parameter File             read_parameter_file 2022-01-12
-Read Data File                  read_data_file      2022-06-02
-
-
-====================================================================
+==========================================================================
 Using PRMS Data File: .\input\acf.data
 Title: Created by Downsizer
-====================================================================
+==========================================================================
 Comment lines:
 ////////////////////////////////////////////////////////////
 // Station metadata (listed in the same order as the data):
@@ -371,38 +366,48 @@ Comment lines:
 ////////////////////////////////////////////////////////////
 // Unit: temperature = "fahrenheit " precipitation = in per "day " runoff = ft3
 ////////////////////////////////////////////////////////////
-====================================================================
+==========================================================================
 measured variables
 tmax 79
 tmin 79
 precip 79
 runoff 58
-====================================================================
+==========================================================================
  Data File time period: 1988/10/01 00:00:00 to 1990/09/30 00:00:00
 Simulation time period: 1988/10/01 00:00:00 to 1990/09/30 00:00:00
-====================================================================
-Basin Definition                basin               2022-09-20
-Common States and Fluxes        climateflow         2022-12-06
-Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2022-09-07
-Timestep Control                prms_time           2022-04-21
-Temperature Distribution        climate_hru         2022-09-07
-Precipitation Distribution      climate_hru         2022-09-07
-Solar Radiation Distribution    climate_hru         2022-09-07
-Potential Evapotranspiration    climate_hru         2022-09-07
-Transpiration Distribution      transp_tindex       2021-09-07
-Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2022-09-07
-Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2022-12-19
-Groundwater                     gwflow              2022-04-21
-Streamflow Routing Init         routing             2022-09-07
-Streamflow Routing              muskingum           2021-11-19
-Output Summary                  basin_sum           2022-09-01
-Output Summary                  nhru_summary        2022-09-07
-Output Summary                  basin_summary       2021-11-19
+==========================================================================
+
+--------------------------------------------------------------------
+    Active modules listed in the order in which they are called
+--------------------------------------------------------------------
+        Process                    Module         Version Date
+==============================================================
+PRMS Computation Order          gsflow_prms         2025-02-01
+Read Control File               read_control_file   2025-01-16
+Read Parameter File             read_parameter_file 2024-11-25
+Read Data File                  read_data_file      2023-06-02
+Basin Definition                basin               2024-08-09
+Common States and Fluxes        climateflow         2025-01-16
+Potential Solar Radiation       soltab              2024-01-22
+Time Series Data                obs                 2023-11-01
+Timestep Control                prms_time           2023-11-01
+Temperature Distribution        climate_hru         2025-01-16
+Precipitation Distribution      climate_hru         2025-01-16
+Solar Radiation Distribution    climate_hru         2025-01-16
+Potential Evapotranspiration    climate_hru         2025-01-16
+Transpiration Distribution      transp_tindex       2023-11-01
+Canopy Interception             intcp               2024-04-04
+Snow Dynamics                   snowcomp            2025-01-21
+Surface Runoff                  srunoff_smidx       2024-10-09
+Soilzone Computations           soilzone            2024-12-06
+Groundwater                     gwflow              2024-12-01
+Streamflow Routing Init         routing             2025-01-30
+Streamflow Routing              muskingum           2025-01-16
+Output Summary                  basin_sum           2024-12-01
+Output Summary                  nhru_summary        2024-09-01
+Output Summary                  basin_summary       2024-09-01
 Statistics Variables Output     statvar_out         2021-09-08
-Output Summary                  prms_summary        2022-10-26
+Output Summary                  prms_summary        2025-01-16
 ==============================================================
 
 Using Control File: .\control\acf.control
@@ -625,7 +630,7 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1989    3          191.61    17098.42
  ---------------------------------------
    1989    4    1     132.00    20976.38
-   1989    4    2     127.00    19007.86
+   1989    4    2     127.00    19007.85
    1989    4    3     137.00    17479.53
    1989    4    4     170.00    16614.09
    1989    4    5     215.00    16095.18
@@ -727,7 +732,7 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1989    7    1     226.00    50381.99
    1989    7    2     213.00    45604.19
    1989    7    3     335.00    40945.80
-   1989    7    4     382.00    36804.40
+   1989    7    4     382.00    36804.39
    1989    7    5     309.00    33515.91
    1989    7    6     405.00    31368.70
    1989    7    7     507.00    31149.41
@@ -1020,7 +1025,7 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
    1990    3   24     356.00   159176.47
    1990    3   25     336.00   146484.36
    1990    3   26     327.00   122078.57
-   1990    3   27     305.00    96874.40
+   1990    3   27     305.00    96874.39
    1990    3   28     287.00    76158.84
    1990    3   29     286.00    60651.20
    1990    3   30     289.00    49398.93
@@ -1235,5 +1240,5 @@ DPRST area:              192395.73    Fraction DPRST:          0.0157
  ***************************************
  Total for run        159.12    22642.64
  ***************************************
-Execution elapsed time    0 minutes  0.55 seconds
+Execution elapsed time:     0 minutes  0.63 seconds
 

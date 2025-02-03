@@ -1,10 +1,10 @@
-====================================================================
+==========================================================================
 Using PRMS Parameter File: ../input/prms/prms.params
 Description: Sagehen Parameter File with 128 HRUs, 201 reaches, segments, cascading flow
-====================================================================
+==========================================================================
 Comment lines:
 Version: 1.7
-====================================================================
+==========================================================================
 Using dimensions    number
 nrain                  2
 ncascade             317
@@ -24,11 +24,13 @@ nsub                   2
 one                    1
 nmonths               12
 ndays                366
-====================================================================
+==========================================================================
+
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 12/20/2022
+                       Version 6.0.0 02/01/2025
 
+--------------------------------------------------------------------
         Process            Available Modules
 --------------------------------------------------------------------
   Basin Definition: basin
@@ -41,7 +43,7 @@ ndays                366
        Precip Dist: precip_1sta, precip_laps, precip_dist2,
                     climate_hru, precip_map
 Temp & Precip Dist: xyz_dist, ide_dist
-    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
 Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
                     potet_hs, potet_pt, potet_pm, potet_pm_sta
@@ -60,21 +62,14 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
+Github Commit Hash b155a56c363022bd1881cb4dba3fabc15912152f
 
-    Active modules listed in the order in which they are called
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 10:28:31
 
-        Process                    Module         Version Date
-==============================================================
-PRMS Computation Order          gsflow_prms         2022-12-20
-Read Control File               read_control_file   2022-10-20
-Read Parameter File             read_parameter_file 2022-01-12
-Read Data File                  read_data_file      2022-06-02
-
-
-====================================================================
+==========================================================================
 Using PRMS Data File: ../input/prms/sagehen.data
 Title: Sagehen Data File: Independence Lake and Sagehen Creek data staions
-====================================================================
+==========================================================================
 Comment lines:
 // tmax stations are:
 //   INDEPENDENCE LAKE
@@ -87,38 +82,48 @@ Comment lines:
 //   SAGEHEN CREEK
 // runoff value is:
 //   10343500 	SAGEHEN C NR TRUCKEE C
-====================================================================
+==========================================================================
 measured variables
 tmax 2
 tmin 2
 precip 2
 runoff 1
-====================================================================
+==========================================================================
  Data File time period: 1980/10/01 00:00:00 to 2004/04/25 00:00:00
 Simulation time period: 1983/10/14 00:00:00 to 1983/10/20 00:00:00
-====================================================================
-Basin Definition                basin               2022-09-20
-Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-12-06
-Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2022-09-07
-Timestep Control                prms_time           2022-04-21
-Temperature Distribution        climate_hru         2022-09-07
-Precipitation Distribution      climate_hru         2022-09-07
-Solar Radiation Distribution    ddsolrad            2022-09-01
-Transpiration Distribution      transp_tindex       2021-09-07
-Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2022-09-07
-Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2022-12-19
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
-GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
-GSFLOW Output Budget Summary    gsflow_budget       2022-12-19
-GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
-Output Summary                  subbasin            2022-09-07
+==========================================================================
+
+--------------------------------------------------------------------
+    Active modules listed in the order in which they are called
+--------------------------------------------------------------------
+        Process                    Module         Version Date
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
+PRMS Computation Order          gsflow_prms         2025-02-01
+Read Control File               read_control_file   2025-01-16
+Read Parameter File             read_parameter_file 2024-11-25
+Read Data File                  read_data_file      2023-06-02
+Basin Definition                basin               2024-08-09
+Cascading Flow                  cascade             2023-11-01
+Common States and Fluxes        climateflow         2025-01-16
+Potential Solar Radiation       soltab              2024-01-22
+Time Series Data                obs                 2023-11-01
+Timestep Control                prms_time           2023-11-01
+Temperature Distribution        climate_hru         2025-01-16
+Precipitation Distribution      climate_hru         2025-01-16
+Solar Radiation Distribution    ddsolrad            2023-10-04
+Transpiration Distribution      transp_tindex       2023-11-01
+Potential Evapotranspiration    potet_jh            2021-08-13
+Canopy Interception             intcp               2024-04-04
+Snow Dynamics                   snowcomp            2025-01-21
+Surface Runoff                  srunoff_smidx       2024-10-09
+Soilzone Computations           soilzone            2024-12-06
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
+GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
+GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
+GSFLOW Output CSV Summary       gsflow_sum          2024-02-14
+Output Summary                  subbasin            2024-12-01
+==============================================================
+GSFLOW MODFLOW main             gsflow_modflow      2024-12-11
 UZF-NWT Package                 gwf2uzf1_NWT        2022-10-18
 SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
 
@@ -135,5 +140,5 @@ Model domain area:         6782.50    Active basin area:      6782.50
 Fraction impervious:        0.0000    Fraction pervious:       1.0000
 
 
-Execution elapsed time    0 minutes  2.16 seconds
+Execution elapsed time:     0 minutes  1.96 seconds
 

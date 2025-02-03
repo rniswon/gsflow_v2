@@ -13,6 +13,7 @@ diversionirrlist -2
 timeseries_diversion
 timeseries_diversionet
 timeseries_well
+wellcbc 107 0
 end
 # AG time series
 time series

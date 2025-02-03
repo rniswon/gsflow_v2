@@ -30,3 +30,4 @@ data           103   ..\output\modflow\sagehensfr18_HighKc.out
 data           104   ..\output\modflow\sagehensfr19_HighKc.out
 data           105   ..\output\modflow\sagehensfret18_HighKc.out
 data           106   ..\output\modflow\sagehensfret19_HighKc.out
+data(BINARY)   107   ..\output\modflow\agsupwells_HighKc.cbc

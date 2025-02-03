@@ -278,11 +278,6 @@ soilzone_module
 4
 soilzone_ag
 ####
-executable_desc
-1
-4
-GSFLOW version 2.3.0 release
-####
 executable_model
 1
 4

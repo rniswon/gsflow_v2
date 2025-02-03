@@ -1,4 +1,4 @@
-====================================================================
+==========================================================================
 Command line: 
 ..\..\..\bin\gsflow  .\gsflow.control
 
@@ -6,27 +6,27 @@ number of command line words: 2
 
 Executable: ..\..\..\bin\gsflow
 
+==========================================================================
 Control File: .\gsflow.control
-====================================================================
  WARNING, control parameter not used: solzone_module, ignored
-====================================================================
-
+==========================================================================
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.3.0 12/20/2022
+                         Version: 2.4.0 02/01/2025
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
 
 
+
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 5.3.0 12/20/2022
+                       Version 6.0.0 02/01/2025
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
                          WITH NEWTON FORMULATION
-                         Version 1.3.0 06/01/202
+                         Version 1.3.0 06/01/2022
               BASED ON MODFLOW-2005 Version 1.12.0 02/03/2017
                       SWR1 Version 1.04.0 09/15/2016
 
@@ -35,12 +35,8 @@ Control File: .\gsflow.control
                          HFB, HUF, LAK LPF, MNW1, MNW2, NWT, PCG,
                          AG, SFR, SIP, UPW, UZF, WEL, SWI, SWT, LMT
 
- 
-                     Github Commit Hash 0a338c0                                 
-                                                                                
-                                           
- 
 
+--------------------------------------------------------------------
         Process            Available Modules
 --------------------------------------------------------------------
   Basin Definition: basin
@@ -53,7 +49,7 @@ Control File: .\gsflow.control
        Precip Dist: precip_1sta, precip_laps, precip_dist2,
                     climate_hru, precip_map
 Temp & Precip Dist: xyz_dist, ide_dist
-    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru, cloud_cover
+    Solar Rad Dist: ccsolrad, ddsolrad, climate_hru
 Transpiration Dist: transp_tindex, climate_hru, transp_frost
       Potential ET: potet_hamon, potet_jh, potet_pan, climate_hru,
                     potet_hs, potet_pt, potet_pm, potet_pm_sta
@@ -72,48 +68,55 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
+Github Commit Hash b155a56c363022bd1881cb4dba3fabc15912152f
+
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 10:56:45
+
 
 ==========================================================================
 Please give careful consideration to fixing all ERROR and WARNING messages
 ==========================================================================
 
 
+--------------------------------------------------------------------
     Active modules listed in the order in which they are called
-
+--------------------------------------------------------------------
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2022-12-20
-Read Control File               read_control_file   2022-10-20
-Read Parameter File             read_parameter_file 2022-01-12
-Read Data File                  read_data_file      2022-06-02
-Basin Definition                basin               2022-09-20
-Cascading Flow                  cascade             2021-11-19
-Common States and Fluxes        climateflow         2022-12-06
-Potential Solar Radiation       soltab              2022-10-24
-Time Series Data                obs                 2022-09-07
-Timestep Control                prms_time           2022-04-21
-Temperature Distribution        temp_1sta           2022-09-08
-Precipitation Distribution      precip_1sta         2022-09-07
-Solar Radiation Distribution    ddsolrad            2022-09-01
-Transpiration Distribution      transp_tindex       2021-09-07
-Potential Evapotranspiration    potet_jh            2021-11-19
-Canopy Interception             intcp               2022-10-26
-Snow Dynamics                   snowcomp            2022-09-07
-Surface Runoff                  srunoff_smidx       2022-11-02
-Soilzone Computations           soilzone            2022-12-19
-GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2022-02-19
+PRMS Computation Order          gsflow_prms         2025-02-01
+Read Control File               read_control_file   2025-01-16
+Read Parameter File             read_parameter_file 2024-11-25
+Read Data File                  read_data_file      2023-06-02
+Basin Definition                basin               2024-08-09
+Cascading Flow                  cascade             2023-11-01
+Common States and Fluxes        climateflow         2025-01-16
+Potential Solar Radiation       soltab              2024-01-22
+Time Series Data                obs                 2023-11-01
+Timestep Control                prms_time           2023-11-01
+Temperature Distribution        temp_1sta           2023-11-01
+Precipitation Distribution      precip_1sta         2025-01-16
+Solar Radiation Distribution    ddsolrad            2023-10-04
+Transpiration Distribution      transp_tindex       2023-11-01
+Potential Evapotranspiration    potet_jh            2021-08-13
+Canopy Interception             intcp               2024-04-04
+Snow Dynamics                   snowcomp            2025-01-21
+Surface Runoff                  srunoff_smidx       2024-10-09
+Soilzone Computations           soilzone            2024-12-06
+GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
-GSFLOW Output Budget Summary    gsflow_budget       2022-12-19
-GSFLOW Output CSV Summary       gsflow_sum          2022-08-26
-Output Summary                  subbasin            2022-09-07
+GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
+GSFLOW Output CSV Summary       gsflow_sum          2024-02-14
+Output Summary                  subbasin            2024-12-01
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2022-10-20
-====================================================================
+GSFLOW MODFLOW main             gsflow_modflow      2024-12-11
+==============================================================
 MODFLOW Packages
-====================================================================
+==============================================================
 UZF-NWT Package                 gwf2uzf1_NWT        2022-10-18
 SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
-====================================================================
+==============================================================
+
+==============================================================
 
 Using NAME file: ..\input\modflow\sagehen.nam
 
@@ -129,6 +132,8 @@ Using Parameter File: ..\input\prms\gsflow.params
 
 Writing PRMS Water Budget File: ..\output\prms\sagehen_prms.out
 
+ WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
+
 Percent difference between GVR mapping and active model domain: -0.1110223D-13
 
 Water Budget print frequency is:   7
@@ -136,10 +141,17 @@ Water Budget print frequency is:   7
 Writing GSFLOW Water Budget File: ..\output\gsflow.out
 
 Writing GSFLOW CSV File: ..\output\gsflow.csv
+  
+ WARNING, parameter: irr_type is not specified
+          Set to default value:           0
+ WARNING, parameter: pref_flow_infil_frac is not specified
+          Set to default value:  -1.000000    
+ WARNING, parameter: cascade_min is not specified
+          Set to default value:  1.0000000E-06
 
 Simulation time period: 1980/10/01 - 1996/09/30
 
-====================================================================
+==========================================================================
 
 Date: 1980/10/01; Stress: 2; Step: 1; Simulation step: 1
                   MF iterations: 7; SZ iterations: 7
@@ -214,7 +226,7 @@ Date: 1982/09/01; Stress: 2; Step: 701; Simulation step: 701
                   MF iterations: 18; SZ iterations: 18
 
 Date: 1982/10/01; Stress: 2; Step: 731; Simulation step: 731
-                  MF iterations: 16; SZ iterations: 16
+                  MF iterations: 15; SZ iterations: 15
 
 Date: 1982/11/01; Stress: 2; Step: 762; Simulation step: 762
                   MF iterations: 14; SZ iterations: 14
@@ -262,7 +274,7 @@ Date: 1984/01/01; Stress: 2; Step: 1188; Simulation step: 1188
                   MF iterations: 13; SZ iterations: 13
 
 Date: 1984/02/01; Stress: 2; Step: 1219; Simulation step: 1219
-                  MF iterations: 10; SZ iterations: 10
+                  MF iterations: 9; SZ iterations: 9
 
 Date: 1984/03/01; Stress: 2; Step: 1248; Simulation step: 1248
                   MF iterations: 10; SZ iterations: 10
@@ -280,7 +292,7 @@ Date: 1984/07/01; Stress: 2; Step: 1370; Simulation step: 1370
                   MF iterations: 16; SZ iterations: 16
 
 Date: 1984/08/01; Stress: 2; Step: 1401; Simulation step: 1401
-                  MF iterations: 14; SZ iterations: 14
+                  MF iterations: 15; SZ iterations: 15
 
 Date: 1984/09/01; Stress: 2; Step: 1432; Simulation step: 1432
                   MF iterations: 12; SZ iterations: 12
@@ -598,7 +610,7 @@ Date: 1993/05/01; Stress: 2; Step: 4596; Simulation step: 4596
                   MF iterations: 18; SZ iterations: 18
 
 Date: 1993/06/01; Stress: 2; Step: 4627; Simulation step: 4627
-                  MF iterations: 21; SZ iterations: 21
+                  MF iterations: 20; SZ iterations: 20
 
 Date: 1993/07/01; Stress: 2; Step: 4657; Simulation step: 4657
                   MF iterations: 22; SZ iterations: 22
@@ -700,7 +712,7 @@ Date: 1996/03/01; Stress: 2; Step: 5631; Simulation step: 5631
                   MF iterations: 16; SZ iterations: 16
 
 Date: 1996/04/01; Stress: 2; Step: 5662; Simulation step: 5662
-                  MF iterations: 14; SZ iterations: 14
+                  MF iterations: 13; SZ iterations: 13
 
 Date: 1996/05/01; Stress: 2; Step: 5692; Simulation step: 5692
                   MF iterations: 15; SZ iterations: 15
@@ -718,28 +730,28 @@ Date: 1996/09/01; Stress: 2; Step: 5815; Simulation step: 5815
                   MF iterations: 13; SZ iterations: 13
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/20 12:18:22
- Elapsed run time: 21 Minutes, 16.129 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/03 11:11:24
+ Elapsed run time: 14 Minutes, 39.356 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
- MF iterations:         64611;  SZ iterations:           64543
- Average MF iterations: 11.06;  Average SZ iterations:   11.04
+ MF iterations:         64597;  SZ iterations:           64528
+ Average MF iterations: 11.05;  Average SZ iterations:   11.04
  Maximum MF iterations:    34;  Maximum SZ iterations:      25
 
 mxsziter reached: 15
 
-MF iteration distribution:      0    0    0   37  357  441  809  528  383  424
-                              466  402  359  399  315  180  112  123  129  161
-                              106   69   23    5    1    3    1    1    2    3
+MF iteration distribution:      0    0    0   37  356  443  808  531  384  421
+                              466  404  356  398  319  180  110  121  130  161
+                              104   71   23    5    1    3    0    2    2    3
                                 1    2    1    1    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
 
-SZ computation distribution:    0    0    0   37  357  441  809  528  383  424
-                              466  402  359  399  315  180  112  123  129  161
-                              106   69   23    5   16    0    0    0    0    0
+SZ computation distribution:    0    0    0   37  356  443  808  531  384  421
+                              466  404  356  398  319  180  110  121  130  161
+                              104   71   23    5   16    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0
                                 0    0    0    0    0    0    0    0    0    0

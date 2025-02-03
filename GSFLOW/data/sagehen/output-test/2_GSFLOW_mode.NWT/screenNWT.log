@@ -1,4 +1,4 @@
-====================================================================
+==========================================================================
 Command line: 
 ..\..\..\bin\gsflow  .\gsflow.control -set modflow_name ..\input\modflow\sagehen_NWT.nam -set subbasin_flag 0 -set print_debug -2 -set gsflow_output_file ..\output\gsflow_nwt.out -set csv_output_file ..\output\gsflow_NWT.csv
 
@@ -6,10 +6,10 @@ number of command line words: 17
 
 Executable: ..\..\..\bin\gsflow
 
+==========================================================================
 Control File: .\gsflow.control
-====================================================================
  WARNING, control parameter not used: solzone_module, ignored
-====================================================================
+==========================================================================
 PRMS command line argument 2: -set
 PRMS command line argument 3: modflow_name
 PRMS command line argument 4: ..\input\modflow\sagehen_NWT.nam
@@ -25,18 +25,22 @@ PRMS command line argument 13: ..\output\gsflow_nwt.out
 PRMS command line argument 14: -set
 PRMS command line argument 15: csv_output_file
 PRMS command line argument 16: ..\output\gsflow_NWT.csv
-====================================================================
- 
-                     Github Commit Hash 0a338c0                                 
-                                                                                
-                                           
- 
+==========================================================================
+
 
 Steady state simulation successful, used 59 iterations
-	Closing GSFLOW simulation ...
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/12/21 21:06:36
- Elapsed run time: 14 Minutes, 41.801 Seconds
+ WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
+  
+ WARNING, parameter: irr_type is not specified
+          Set to default value:           0
+ WARNING, parameter: pref_flow_infil_frac is not specified
+          Set to default value:  -1.000000    
+ WARNING, parameter: cascade_min is not specified
+          Set to default value:  1.0000000E-06
+
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/03 11:51:39
+ Elapsed run time: 12 Minutes, 44.755 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         45418;  SZ iterations:           45418
@@ -45,5 +49,3 @@ Steady state simulation successful, used 59 iterations
 
  Normal termination of simulation
 
-Simulation finished.
- 
