@@ -28,7 +28,7 @@ ndays                366
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 12/01/2024
+                       Version 6.0.0 02/01/2025
 
 --------------------------------------------------------------------
         Process            Available Modules
@@ -62,9 +62,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash a4cffeceecab925507a192e0f4822c89f8f37065
+Github Commit Hash fc8e5194eee5e9e2fb51c708dc04871408aa6eea
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/12/10 20:22:43
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 13:59:00
 
 ==========================================================================
 Using PRMS Data File: ..\input\prms\sagehen.data
@@ -98,30 +98,30 @@ Simulation time period: 1980/10/01 00:00:00 to 1996/09/30 00:00:00
 --------------------------------------------------------------------
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2024-09-01
-Read Control File               read_control_file   2024-08-01
+PRMS Computation Order          gsflow_prms         2025-02-01
+Read Control File               read_control_file   2025-01-16
 Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
 Basin Definition                basin               2024-08-09
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-11-26
+Common States and Fluxes        climateflow         2025-01-16
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
 Temperature Distribution        temp_1sta           2023-11-01
-Precipitation Distribution      precip_1sta         2024-04-30
+Precipitation Distribution      precip_1sta         2025-01-16
 Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2024-09-01
+Snow Dynamics                   snowcomp            2025-01-21
 Surface Runoff                  srunoff_smidx       2024-10-09
 Soilzone Computations           soilzone            2024-12-06
-Groundwater                     gwflow              2024-12-02
+Groundwater                     gwflow              2024-12-01
 Streamflow Routing              strmflow            2020-08-03
-Output Summary                  basin_sum           2024-09-01
+Output Summary                  basin_sum           2024-12-01
 Output Summary                  map_results         2023-11-01
-Output Summary                  subbasin            2023-11-01
+Output Summary                  subbasin            2024-12-01
 Output Summary                  nsub_summary        2024-09-01
 Statistics Variables Output     statvar_out         2021-09-08
 ==============================================================
@@ -164,5 +164,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  **************************************************************
  Total for run     668.938  375.572     9.202  287.264  260.348
  **************************************************************
-Execution elapsed time:     0 minutes  1.21 seconds
+Execution elapsed time:     0 minutes  1.20 seconds
 

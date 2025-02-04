@@ -13,7 +13,7 @@ Control File: .\gsflow_climate_hru.control
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 12/01/2024
+                       Version 6.0.0 02/01/2025
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -23,7 +23,7 @@ Control File: .\gsflow_climate_hru.control
                       SWR1 Version 1.04.0 09/15/2016
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/12/10 20:40:42
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 14:52:06
 
 
 ==========================================================================
@@ -36,32 +36,32 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 --------------------------------------------------------------------
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2024-09-01
-Read Control File               read_control_file   2024-08-01
+PRMS Computation Order          gsflow_prms         2025-02-01
+Read Control File               read_control_file   2025-01-16
 Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
 Basin Definition                basin               2024-08-09
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-11-26
+Common States and Fluxes        climateflow         2025-01-16
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
-Temperature Distribution        climate_hru         2024-08-09
-Precipitation Distribution      climate_hru         2024-08-09
-Solar Radiation Distribution    climate_hru         2024-08-09
-Potential Evapotranspiration    climate_hru         2024-08-09
+Temperature Distribution        climate_hru         2025-01-16
+Precipitation Distribution      climate_hru         2025-01-16
+Solar Radiation Distribution    climate_hru         2025-01-16
+Potential Evapotranspiration    climate_hru         2025-01-16
 Transpiration Distribution      transp_tindex       2023-11-01
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2024-09-01
+Snow Dynamics                   snowcomp            2025-01-21
 Surface Runoff                  srunoff_smidx       2024-10-09
 Soilzone Computations           soilzone            2024-12-06
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
 GSFLOW Output CSV Summary       gsflow_sum          2024-02-14
-Output Summary                  subbasin            2023-11-01
+Output Summary                  subbasin            2024-12-01
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2024-06-01
+GSFLOW MODFLOW main             gsflow_modflow      2024-12-11
 ==============================================================
 MODFLOW Packages
 ==============================================================
@@ -88,8 +88,8 @@ Simulation time period: 1980/10/01 - 1996/09/30
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/12/10 20:54:54
- Elapsed run time: 14 Minutes, 11.571 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/03 15:06:26
+ Elapsed run time: 14 Minutes, 19.830 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         63717;  SZ iterations:           63680

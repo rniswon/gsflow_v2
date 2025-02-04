@@ -12,9 +12,9 @@ Control File: .\prms_climate_hru.control
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 12/01/2024
+                       Version 6.0.0 02/01/2025
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/12/10 20:22:14
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 13:59:55
 
 
 ==========================================================================
@@ -27,29 +27,29 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 --------------------------------------------------------------------
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2024-09-01
-Read Control File               read_control_file   2024-08-01
+PRMS Computation Order          gsflow_prms         2025-02-01
+Read Control File               read_control_file   2025-01-16
 Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
 Basin Definition                basin               2024-08-09
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-11-26
+Common States and Fluxes        climateflow         2025-01-16
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
-Temperature Distribution        climate_hru         2024-08-09
-Precipitation Distribution      climate_hru         2024-08-09
-Solar Radiation Distribution    climate_hru         2024-08-09
-Potential Evapotranspiration    climate_hru         2024-08-09
+Temperature Distribution        climate_hru         2025-01-16
+Precipitation Distribution      climate_hru         2025-01-16
+Solar Radiation Distribution    climate_hru         2025-01-16
+Potential Evapotranspiration    climate_hru         2025-01-16
 Transpiration Distribution      transp_tindex       2023-11-01
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2024-09-01
+Snow Dynamics                   snowcomp            2025-01-21
 Surface Runoff                  srunoff_smidx       2024-10-09
 Soilzone Computations           soilzone            2024-12-06
-Groundwater                     gwflow              2024-12-02
+Groundwater                     gwflow              2024-12-01
 Streamflow Routing              strmflow            2020-08-03
-Output Summary                  basin_sum           2024-09-01
-Output Summary                  subbasin            2023-11-01
+Output Summary                  basin_sum           2024-12-01
+Output Summary                  subbasin            2024-12-01
 Output Summary                  nhru_summary        2024-09-01
 ==============================================================
 

@@ -48,7 +48,7 @@ statVar_element
 executable_model
 1
 4
-../../bin/prms
+../../bin/gsflow
 ####
 aniOutON_OFF
 1
@@ -189,11 +189,6 @@ init_vars_from_file
 1
 1
 0
-####
-executable_desc
-1
-4
-GSFLOW version 2.3.0 release
 ####
 csv_output_file
 1

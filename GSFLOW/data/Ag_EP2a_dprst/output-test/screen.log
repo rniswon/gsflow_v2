@@ -12,7 +12,7 @@ Control File: .\Sagehen_ponds.control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.4.0 09/01/2024
+                         Version: 2.4.0 02/01/2025
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
@@ -21,7 +21,7 @@ Control File: .\Sagehen_ponds.control
 
 
                Precipitation-Runoff Modeling System (PRMS)
-                       Version 6.0.0 12/01/2024
+                       Version 6.0.0 02/01/2025
 
                             MODFLOW-NWT-SWR1 
   U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
@@ -68,9 +68,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash a4cffeceecab925507a192e0f4822c89f8f37065
+Github Commit Hash fc8e5194eee5e9e2fb51c708dc04871408aa6eea
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2024/12/10 20:08:37
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 12:57:32
 
 
 ==========================================================================
@@ -83,23 +83,23 @@ Please give careful consideration to fixing all ERROR and WARNING messages
 --------------------------------------------------------------------
         Process                    Module         Version Date
 ==============================================================
-PRMS Computation Order          gsflow_prms         2024-09-01
-Read Control File               read_control_file   2024-08-01
+PRMS Computation Order          gsflow_prms         2025-02-01
+Read Control File               read_control_file   2025-01-16
 Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
 Basin Definition                basin               2024-08-09
 Cascading Flow                  cascade             2023-11-01
-Common States and Fluxes        climateflow         2024-11-26
+Common States and Fluxes        climateflow         2025-01-16
 Potential Solar Radiation       soltab              2024-01-22
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
 Temperature Distribution        temp_1sta           2023-11-01
-Precipitation Distribution      precip_1sta         2024-04-30
+Precipitation Distribution      precip_1sta         2025-01-16
 Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2024-09-01
+Snow Dynamics                   snowcomp            2025-01-21
 Surface Runoff                  srunoff_smidx       2024-10-09
 Soilzone Computations           soilzone            2024-12-06
 Soilzone Computations           soilzone_ag         2024-12-10
@@ -120,7 +120,7 @@ WARNING, parameter: print_type is ignored as it is not used
 WARNING, parameter: szconverge is ignored as it is not used
 WARNING, parameter: nrow is ignored as it is not used
 ==============================================================
-GSFLOW MODFLOW main             gsflow_modflow      2024-06-01
+GSFLOW MODFLOW main             gsflow_modflow      2024-12-11
 ==============================================================
 MODFLOW Packages
 ==============================================================
@@ -129,7 +129,7 @@ SFR-NWT Package                 gwf2sfr7_NWT        2022-10-18
 AG-NWT Package                  gwf2ag1_NWT_ponds   2022-10-18
 ==============================================================
 
-==========================================================================
+==============================================================
 
 Using NAME file: .\sagehen_ponds.nam
 
@@ -725,8 +725,8 @@ Date: 1995/10/01; Stress: 62; Step: 1; Simulation step: 1827
                   MF iterations: 6; SZ iterations: 6
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2024/12/10 20:11:11
- Elapsed run time: 2 Minutes, 33.202 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/03 13:00:19
+ Elapsed run time: 2 Minutes, 46.434 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
  MF iterations:         11894;  SZ iterations:           11865

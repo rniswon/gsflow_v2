@@ -164,11 +164,6 @@ executable_model
 4
 ..\..\..\bin\gsflow
 ####
-executable_desc
-1
-4
-GSFLOW version 2.3.0 release
-####
 subbasin_flag
 1
 1
