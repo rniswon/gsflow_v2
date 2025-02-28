@@ -13,7 +13,7 @@ Control File: .\control\Tazlina.control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.4.0 02/01/2025
+                         Version: 2.4.0 03/01/2025
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
@@ -56,9 +56,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash b155a56c363022bd1881cb4dba3fabc15912152f
+Github Commit Hash 25f61fe10733e5ba1ddac095e8546342764675cf
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 10:19:04
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/28 12:25:37
 
 
 ==========================================================================
@@ -75,9 +75,9 @@ PRMS Computation Order          gsflow_prms         2025-02-01
 Read Control File               read_control_file   2025-01-16
 Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
-Basin Definition                basin               2024-08-09
+Basin Definition                basin               2025-02-26
 Common States and Fluxes        climateflow         2025-01-16
-Potential Solar Radiation       soltab              2024-01-22
+Potential Solar Radiation       soltab              2025-02-21
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
 Temp & Precip Distribution      xyz_dist            2024-04-30
@@ -85,20 +85,20 @@ Solar Radiation Distribution    ccsolrad            2024-04-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2025-01-21
-Glacier Dynamics                glacr_melt          2024-04-04
+Snow Dynamics                   snowcomp            2025-02-18
+Glacier Dynamics                glacr_melt          2025-02-10
  Parameter: hru_slope declared more than once
  First declared by module: glacr_melt
  Also declared by module: glacr_melt
  Model uses values based on first declare
 Surface Runoff                  srunoff_smidx       2024-10-09
-Soilzone Computations           soilzone            2024-12-06
+Soilzone Computations           soilzone            2025-02-27
 Groundwater                     gwflow              2024-12-01
-Streamflow Routing Init         routing             2025-01-30
-Streamflow Routing              muskingum           2025-01-16
+Streamflow Routing Init         routing             2025-02-19
+Streamflow Routing              muskingum           2025-02-11
 Output Summary                  basin_sum           2024-12-01
 Statistics Variables Output     statvar_out         2021-09-08
-Output Summary                  prms_summary        2025-01-16
+Output Summary                  prms_summary        2025-02-10
 WARNING, parameter: poi_type is ignored as it is not used
 WARNING, parameter: stage_coef is ignored as it is not used
 WARNING, parameter: soil_moist_init is ignored as it is not used
@@ -664,10 +664,10 @@ Simulation time period: 1950/10/01 - 2015/09/30
                           ===========================
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 10:19:04
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/28 12:25:37
 
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 10:19:11
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2025/02/28 12:25:46
 
-Execution elapsed time    0 minutes  6.67 seconds
+Execution elapsed time    0 minutes  8.89 seconds
 

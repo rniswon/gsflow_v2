@@ -458,7 +458,8 @@
       INTEGER FUNCTION xyzinit()
       USE PRMS_CONSTANTS, ONLY: FEET2METERS
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Nrain, Ntemp, Inputerror_flag
+      USE PRMS_MODULE, ONLY: Nhru, Nrain, Ntemp, Inputerror_flag,
+     +                       Nmonths
       USE PRMS_XYZ_DIST
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv,
      +    Hru_elev_ts, Active_hrus, Hru_route_order

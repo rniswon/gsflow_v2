@@ -13,7 +13,7 @@ Control File: .\gsflow.control
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.4.0 02/01/2025
+                         Version: 2.4.0 03/01/2025
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
@@ -68,9 +68,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash b155a56c363022bd1881cb4dba3fabc15912152f
+Github Commit Hash 25f61fe10733e5ba1ddac095e8546342764675cf
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 10:56:45
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/28 12:29:38
 
 
 ==========================================================================
@@ -87,26 +87,26 @@ PRMS Computation Order          gsflow_prms         2025-02-01
 Read Control File               read_control_file   2025-01-16
 Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
-Basin Definition                basin               2024-08-09
-Cascading Flow                  cascade             2023-11-01
+Basin Definition                basin               2025-02-26
+Cascading Flow                  cascade             2025-02-27
 Common States and Fluxes        climateflow         2025-01-16
-Potential Solar Radiation       soltab              2024-01-22
+Potential Solar Radiation       soltab              2025-02-21
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
-Temperature Distribution        temp_1sta           2023-11-01
-Precipitation Distribution      precip_1sta         2025-01-16
+Temperature Distribution        temp_1sta           2025-01-11
+Precipitation Distribution      precip_1sta         2025-02-12
 Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2025-01-21
+Snow Dynamics                   snowcomp            2025-02-18
 Surface Runoff                  srunoff_smidx       2024-10-09
-Soilzone Computations           soilzone            2024-12-06
+Soilzone Computations           soilzone            2025-02-27
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
 GSFLOW Output CSV Summary       gsflow_sum          2024-02-14
-Output Summary                  subbasin            2024-12-01
+Output Summary                  subbasin            2025-02-10
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2024-12-11
 ==============================================================
@@ -142,12 +142,12 @@ Writing GSFLOW Water Budget File: ..\output\gsflow.out
 
 Writing GSFLOW CSV File: ..\output\gsflow.csv
   
+ WARNING, parameter: cascade_min is not specified
+          Set to default value:  1.0000000E-06
  WARNING, parameter: irr_type is not specified
           Set to default value:           0
  WARNING, parameter: pref_flow_infil_frac is not specified
           Set to default value:  -1.000000    
- WARNING, parameter: cascade_min is not specified
-          Set to default value:  1.0000000E-06
 
 Simulation time period: 1980/10/01 - 1996/09/30
 
@@ -730,8 +730,8 @@ Date: 1996/09/01; Stress: 2; Step: 5815; Simulation step: 5815
                   MF iterations: 13; SZ iterations: 13
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/03 11:11:24
- Elapsed run time: 14 Minutes, 39.356 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/28 12:46:27
+ Elapsed run time: 16 Minutes, 48.759 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         64597;  SZ iterations:           64528

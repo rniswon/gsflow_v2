@@ -63,9 +63,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash b155a56c363022bd1881cb4dba3fabc15912152f
+Github Commit Hash 25f61fe10733e5ba1ddac095e8546342764675cf
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 10:54:02
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/28 13:35:33
 
 ==========================================================================
 Using PRMS Data File: ../input/prms/tahoe.data
@@ -213,26 +213,26 @@ PRMS Computation Order          gsflow_prms         2025-02-01
 Read Control File               read_control_file   2025-01-16
 Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
-Basin Definition                basin               2024-08-09
-Cascading Flow                  cascade             2023-11-01
+Basin Definition                basin               2025-02-26
+Cascading Flow                  cascade             2025-02-27
 Common States and Fluxes        climateflow         2025-01-16
-Potential Solar Radiation       soltab              2024-01-22
+Potential Solar Radiation       soltab              2025-02-21
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
-Temperature Distribution        temp_laps           2023-11-01
-Precipitation Distribution      precip_1sta         2025-01-16
+Temperature Distribution        temp_laps           2025-01-11
+Precipitation Distribution      precip_1sta         2025-02-12
 Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2025-01-21
+Snow Dynamics                   snowcomp            2025-02-18
 Surface Runoff                  srunoff_smidx       2024-10-09
-Soilzone Computations           soilzone            2024-12-06
+Soilzone Computations           soilzone            2025-02-27
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
 GSFLOW Output CSV Summary       gsflow_sum          2024-02-14
-Output Summary                  subbasin            2024-12-01
+Output Summary                  subbasin            2025-02-10
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2024-12-11
 UZF-NWT Package                 gwf2uzf1_NWT        2022-10-18
@@ -253,5 +253,5 @@ Fraction impervious:        0.0022    Fraction pervious:       0.6180
 Lake area:             123607.0564    Fraction lakes:          0.3798
 
 
-Execution elapsed time:     0 minutes  5.98 seconds
+Execution elapsed time:     0 minutes  6.35 seconds
 

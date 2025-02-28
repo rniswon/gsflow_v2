@@ -269,9 +269,9 @@
       USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascadegw_flag, Gwr_swale_flag, &
      &    Gwr_add_water_use, Gwr_transfer_water_use, Nowyear, Nowmonth, Nowday, KKITER, activeHru_inactiveCell
       USE PRMS_GWFLOW_INACTIVE_CELL
-      USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, &
+      USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, Hru_lateral_flow, &
      &    Basin_area_inv, Hru_area, Gwr_type, Hru_area_dble, Hru_storage
-      USE PRMS_FLOWVARS, ONLY: Soil_to_prmsgw, Ssr_to_prmsgw, Sroff, Ssres_flow, Gwres_stor, Gw_upslope
+      USE PRMS_FLOWVARS, ONLY: Soil_to_prmsgw, Ssr_to_prmsgw, Gwres_stor, Gw_upslope
       USE PRMS_CASCADE, ONLY: Ncascade_gwr, cascade_min
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru

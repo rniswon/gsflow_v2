@@ -14,7 +14,7 @@ Control File: .\prms_climate_hru.control
                Precipitation-Runoff Modeling System (PRMS)
                        Version 6.0.0 02/01/2025
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03  9:41:53
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/28 12:59:45
 
 
 ==========================================================================
@@ -31,25 +31,25 @@ PRMS Computation Order          gsflow_prms         2025-02-01
 Read Control File               read_control_file   2025-01-16
 Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
-Basin Definition                basin               2024-08-09
-Cascading Flow                  cascade             2023-11-01
+Basin Definition                basin               2025-02-26
+Cascading Flow                  cascade             2025-02-27
 Common States and Fluxes        climateflow         2025-01-16
-Potential Solar Radiation       soltab              2024-01-22
+Potential Solar Radiation       soltab              2025-02-21
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
-Temperature Distribution        climate_hru         2025-01-16
-Precipitation Distribution      climate_hru         2025-01-16
-Solar Radiation Distribution    climate_hru         2025-01-16
-Potential Evapotranspiration    climate_hru         2025-01-16
+Temperature Distribution        climate_hru         2025-02-25
+Precipitation Distribution      climate_hru         2025-02-25
+Solar Radiation Distribution    climate_hru         2025-02-25
+Potential Evapotranspiration    climate_hru         2025-02-25
 Transpiration Distribution      transp_tindex       2023-11-01
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2025-01-21
+Snow Dynamics                   snowcomp            2025-02-18
 Surface Runoff                  srunoff_smidx       2024-10-09
-Soilzone Computations           soilzone            2024-12-06
+Soilzone Computations           soilzone            2025-02-27
 Groundwater                     gwflow              2024-12-01
 Streamflow Routing              strmflow            2020-08-03
 Output Summary                  basin_sum           2024-12-01
-Output Summary                  subbasin            2024-12-01
+Output Summary                  subbasin            2025-02-10
 Output Summary                  nhru_summary        2024-09-01
 ==============================================================
 
@@ -57,10 +57,10 @@ Writing PRMS Water Budget File: ..\output\prms\sagehen_prms_only_cbh.out
 
  WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
   
- WARNING, parameter: pref_flow_infil_frac is not specified
-          Set to default value:  -1.000000    
  WARNING, parameter: cascade_min is not specified
           Set to default value:  1.0000000E-06
+ WARNING, parameter: pref_flow_infil_frac is not specified
+          Set to default value:  -1.000000    
 
 Simulation time period: 1980/10/01 - 1996/09/30
 

@@ -23,7 +23,7 @@ Control File: .\gsflow_climate_hru.control
                       SWR1 Version 1.04.0 09/15/2016
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 11:18:12
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/28 12:08:54
 
 
 ==========================================================================
@@ -40,26 +40,26 @@ PRMS Computation Order          gsflow_prms         2025-02-01
 Read Control File               read_control_file   2025-01-16
 Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
-Basin Definition                basin               2024-08-09
-Cascading Flow                  cascade             2023-11-01
+Basin Definition                basin               2025-02-26
+Cascading Flow                  cascade             2025-02-27
 Common States and Fluxes        climateflow         2025-01-16
-Potential Solar Radiation       soltab              2024-01-22
+Potential Solar Radiation       soltab              2025-02-21
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
-Temperature Distribution        climate_hru         2025-01-16
-Precipitation Distribution      climate_hru         2025-01-16
-Solar Radiation Distribution    climate_hru         2025-01-16
-Potential Evapotranspiration    climate_hru         2025-01-16
+Temperature Distribution        climate_hru         2025-02-25
+Precipitation Distribution      climate_hru         2025-02-25
+Solar Radiation Distribution    climate_hru         2025-02-25
+Potential Evapotranspiration    climate_hru         2025-02-25
 Transpiration Distribution      transp_tindex       2023-11-01
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2025-01-21
+Snow Dynamics                   snowcomp            2025-02-18
 Surface Runoff                  srunoff_smidx       2024-10-09
-Soilzone Computations           soilzone            2024-12-06
+Soilzone Computations           soilzone            2025-02-27
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
 GSFLOW Output CSV Summary       gsflow_sum          2024-02-14
-Output Summary                  subbasin            2024-12-01
+Output Summary                  subbasin            2025-02-10
 ==============================================================
 GSFLOW MODFLOW main             gsflow_modflow      2024-12-11
 ==============================================================
@@ -76,20 +76,20 @@ Writing PRMS Water Budget File: ..\output\prms\sagehen_prms_cbh.out
 
  WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
   
+ WARNING, parameter: cascade_min is not specified
+          Set to default value:  1.0000000E-06
  WARNING, parameter: irr_type is not specified
           Set to default value:           0
  WARNING, parameter: pref_flow_infil_frac is not specified
           Set to default value:  -1.000000    
- WARNING, parameter: cascade_min is not specified
-          Set to default value:  1.0000000E-06
 
 Simulation time period: 1980/10/01 - 1996/09/30
 
 ==========================================================================
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/03 11:32:51
- Elapsed run time: 14 Minutes, 38.698 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/28 12:26:24
+ Elapsed run time: 17 Minutes, 29.219 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         63717;  SZ iterations:           63680

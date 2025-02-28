@@ -32,15 +32,15 @@ Steady state simulation successful, used 59 iterations
 
  WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
   
+ WARNING, parameter: cascade_min is not specified
+          Set to default value:  1.0000000E-06
  WARNING, parameter: irr_type is not specified
           Set to default value:           0
  WARNING, parameter: pref_flow_infil_frac is not specified
           Set to default value:  -1.000000    
- WARNING, parameter: cascade_min is not specified
-          Set to default value:  1.0000000E-06
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/03 11:51:39
- Elapsed run time: 12 Minutes, 44.755 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/28 13:14:47
+ Elapsed run time: 14 Minutes, 27.608 Seconds
 
  Number of time steps:   5844;  Number of non-convergence:   0
  MF iterations:         45418;  SZ iterations:           45418

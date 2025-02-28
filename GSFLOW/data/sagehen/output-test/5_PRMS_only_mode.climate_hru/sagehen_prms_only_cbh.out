@@ -35,9 +35,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash b155a56c363022bd1881cb4dba3fabc15912152f
+Github Commit Hash 25f61fe10733e5ba1ddac095e8546342764675cf
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03  9:41:53
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/28 12:59:45
 
 ==========================================================================
 Using PRMS Data File: ..\input\prms\sagehen.data
@@ -75,25 +75,25 @@ PRMS Computation Order          gsflow_prms         2025-02-01
 Read Control File               read_control_file   2025-01-16
 Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
-Basin Definition                basin               2024-08-09
-Cascading Flow                  cascade             2023-11-01
+Basin Definition                basin               2025-02-26
+Cascading Flow                  cascade             2025-02-27
 Common States and Fluxes        climateflow         2025-01-16
-Potential Solar Radiation       soltab              2024-01-22
+Potential Solar Radiation       soltab              2025-02-21
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
-Temperature Distribution        climate_hru         2025-01-16
-Precipitation Distribution      climate_hru         2025-01-16
-Solar Radiation Distribution    climate_hru         2025-01-16
-Potential Evapotranspiration    climate_hru         2025-01-16
+Temperature Distribution        climate_hru         2025-02-25
+Precipitation Distribution      climate_hru         2025-02-25
+Solar Radiation Distribution    climate_hru         2025-02-25
+Potential Evapotranspiration    climate_hru         2025-02-25
 Transpiration Distribution      transp_tindex       2023-11-01
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2025-01-21
+Snow Dynamics                   snowcomp            2025-02-18
 Surface Runoff                  srunoff_smidx       2024-10-09
-Soilzone Computations           soilzone            2024-12-06
+Soilzone Computations           soilzone            2025-02-27
 Groundwater                     gwflow              2024-12-01
 Streamflow Routing              strmflow            2020-08-03
 Output Summary                  basin_sum           2024-12-01
-Output Summary                  subbasin            2024-12-01
+Output Summary                  subbasin            2025-02-10
 Output Summary                  nhru_summary        2024-09-01
 ==============================================================
 
@@ -135,5 +135,5 @@ Fraction impervious:        0.0000    Fraction pervious:       1.0000
  **************************************************************
  Total for run     668.938  375.566     9.201  287.270  260.348
  **************************************************************
-Execution elapsed time:     0 minutes  1.45 seconds
+Execution elapsed time:     0 minutes  1.61 seconds
 

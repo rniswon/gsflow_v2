@@ -22,7 +22,7 @@ Control File: .\gsflow_gsflowHighKc.control
                       SWR1 Version 1.04.0 09/15/2016
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03  9:38:16
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/28 12:00:51
 
 
 ==========================================================================
@@ -39,21 +39,21 @@ PRMS Computation Order          gsflow_prms         2025-02-01
 Read Control File               read_control_file   2025-01-16
 Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
-Basin Definition                basin               2024-08-09
-Cascading Flow                  cascade             2023-11-01
+Basin Definition                basin               2025-02-26
+Cascading Flow                  cascade             2025-02-27
 Common States and Fluxes        climateflow         2025-01-16
-Potential Solar Radiation       soltab              2024-01-22
+Potential Solar Radiation       soltab              2025-02-21
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
-Temperature Distribution        temp_1sta           2023-11-01
-Precipitation Distribution      precip_1sta         2025-01-16
+Temperature Distribution        temp_1sta           2025-01-11
+Precipitation Distribution      precip_1sta         2025-02-12
 Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2025-01-21
+Snow Dynamics                   snowcomp            2025-02-18
 Surface Runoff                  srunoff_smidx       2024-10-09
-Soilzone Computations           soilzone            2024-12-06
+Soilzone Computations           soilzone            2025-02-27
 GSFLOW PRMS to MODFLOW          gsflow_prms2mf      2024-05-30
 GSFLOW MODFLOW to PRMS          gsflow_mf2prms      2022-02-18
 GSFLOW Output Budget Summary    gsflow_budget       2024-02-14
@@ -79,14 +79,14 @@ Writing PRMS Water Budget File: ..\output\prms\sagehen_HighKc.out
 
  WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
   
+ WARNING, parameter: cascade_min is not specified
+          Set to default value:  1.0000000E-06
  WARNING, parameter: ppt_zero_thresh is not specified
           Set to default value:  0.0000000E+00
  WARNING, parameter: irr_type is not specified
           Set to default value:           0
  WARNING, parameter: pref_flow_infil_frac is not specified
           Set to default value:  -1.000000    
- WARNING, parameter: cascade_min is not specified
-          Set to default value:  1.0000000E-06
 
 Simulation time period: 1990/10/01 - 1995/10/31
 
@@ -345,8 +345,8 @@ streamflow, and ET for streams in MODFLOW input files.
 These values are set to zero for GSFLOW simulations
 
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/03  9:40:40
- Elapsed run time: 2 Minutes, 23.359 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2025/02/28 12:04:06
+ Elapsed run time: 3 Minutes, 14.627 Seconds
 
  Number of time steps:   1857;  Number of non-convergence:   0
  MF iterations:         11765;  SZ iterations:           11702

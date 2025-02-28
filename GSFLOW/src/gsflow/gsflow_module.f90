@@ -11,7 +11,7 @@
       character(len=*), parameter :: GSFLOW_versn = '2.4.0 03/01/2025'
       character(len=*), parameter :: PRMS_versn = '2025-02-01'
       character(len=*), parameter :: PRMS_VERSION = 'Version 6.0.0 02/01/2025'
-      character(len=*), parameter :: githash = 'Github Commit Hash fc8e5194eee5e9e2fb51c708dc04871408aa6eea'
+      character(len=*), parameter :: githash = 'Github Commit Hash 25f61fe10733e5ba1ddac095e8546342764675cf'
       character(len=*), parameter :: Version_read_control_file = '2025-01-16'
       character(len=*), parameter :: Version_read_parameter_file = '2024-11-25'
       character(len=*), parameter :: Version_read_data_file = '2023-06-02'

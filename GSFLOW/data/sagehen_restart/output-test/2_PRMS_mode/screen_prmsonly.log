@@ -23,7 +23,7 @@ PRMS command line argument 10: ..\output\prms\prms_only.out
 
                           U.S. Geological Survey
         Coupled Groundwater and Surface-water FLOW model (GSFLOW)
-                         Version: 2.4.0 02/01/2025
+                         Version: 2.4.0 03/01/2025
 
     An integration of the Precipitation-Runoff Modeling System (PRMS)
     and the Modular Groundwater Model (MODFLOW-NWT and MODFLOW-2005)
@@ -65,9 +65,9 @@ Stream Temperature: stream_temp
      Preprocessing: write_climate_hru, frost_date
 --------------------------------------------------------------------
 
-Github Commit Hash b155a56c363022bd1881cb4dba3fabc15912152f
+Github Commit Hash 25f61fe10733e5ba1ddac095e8546342764675cf
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 10:15:07
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/28 12:12:57
 
 
 ==========================================================================
@@ -84,25 +84,25 @@ PRMS Computation Order          gsflow_prms         2025-02-01
 Read Control File               read_control_file   2025-01-16
 Read Parameter File             read_parameter_file 2024-11-25
 Read Data File                  read_data_file      2023-06-02
-Basin Definition                basin               2024-08-09
-Cascading Flow                  cascade             2023-11-01
+Basin Definition                basin               2025-02-26
+Cascading Flow                  cascade             2025-02-27
 Common States and Fluxes        climateflow         2025-01-16
-Potential Solar Radiation       soltab              2024-01-22
+Potential Solar Radiation       soltab              2025-02-21
 Time Series Data                obs                 2023-11-01
 Timestep Control                prms_time           2023-11-01
-Temperature Distribution        climate_hru         2025-01-16
-Precipitation Distribution      climate_hru         2025-01-16
+Temperature Distribution        climate_hru         2025-02-25
+Precipitation Distribution      climate_hru         2025-02-25
 Solar Radiation Distribution    ddsolrad            2023-10-04
 Transpiration Distribution      transp_tindex       2023-11-01
 Potential Evapotranspiration    potet_jh            2021-08-13
 Canopy Interception             intcp               2024-04-04
-Snow Dynamics                   snowcomp            2025-01-21
+Snow Dynamics                   snowcomp            2025-02-18
 Surface Runoff                  srunoff_smidx       2024-10-09
-Soilzone Computations           soilzone            2024-12-06
+Soilzone Computations           soilzone            2025-02-27
 Groundwater                     gwflow              2024-12-01
 Streamflow Routing              strmflow            2020-08-03
 Output Summary                  basin_sum           2024-12-01
-Output Summary                  subbasin            2024-12-01
+Output Summary                  subbasin            2025-02-10
 Output Summary                  basin_summary       2024-09-01
 WARNING, parameter: mxsziter is ignored as it is not used
 WARNING, parameter: id_obsrunoff is ignored as it is not used
@@ -117,10 +117,10 @@ Writing PRMS Water Budget File: ..\output\prms\prms_only.out
 
  WARNING, pref_flow_infil_frac not specified, substituting pref_flow_den
   
- WARNING, parameter: pref_flow_infil_frac is not specified
-          Set to default value:  -1.000000    
  WARNING, parameter: cascade_min is not specified
           Set to default value:  1.0000000E-06
+ WARNING, parameter: pref_flow_infil_frac is not specified
+          Set to default value:  -1.000000    
 
 Simulation time period: 1980/10/01 - 1984/01/30
 
@@ -132,10 +132,10 @@ Simulation time period: 1980/10/01 - 1984/01/30
                           ===========================
 
 
-Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 10:15:07
+Execution start date and time (yyyy/mm/dd hh:mm:ss) 2025/02/28 12:12:57
 
 
-Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2025/02/03 10:15:07
+Execution end   date and time (yyyy/mm/dd hh:mm:ss) 2025/02/28 12:12:57
 
-Execution elapsed time    0 minutes  0.36 seconds
+Execution elapsed time    0 minutes  0.52 seconds
 
