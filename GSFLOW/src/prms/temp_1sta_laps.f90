@@ -19,7 +19,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Temperature Distribution'
         character(len=9), SAVE :: MODNAME
-        character(len=*), parameter :: Version_temp = '2023-11-01'
+        character(len=*), parameter :: Version_temp = '2025-01-11'
         INTEGER, SAVE, ALLOCATABLE :: Tmax_cnt(:), Tmin_cnt(:), Nuse_tsta(:)
         REAL, SAVE, ALLOCATABLE :: Elfac(:), Tmax_prev(:), Tmin_prev(:)
         REAL, SAVE, ALLOCATABLE :: Tcrn(:), Tcrx(:) ! temp_1sta
@@ -32,10 +32,10 @@
 
       INTEGER FUNCTION temp_1sta_laps()
         USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE, OFF, &
-     &      GLACIER, DEBUG_less, MONTHS_PER_YEAR, ERROR_temp, &
+     &      GLACIER, DEBUG_less, ERROR_temp, &
      &      MINTEMP, MAXTEMP, NEARZERO, temp_1sta_module, temp_laps_module, READ_INIT, SAVE_INIT
         USE PRMS_MODULE, ONLY: Process_flag, Nhru, Ntemp, Print_debug, Init_vars_from_file, Save_vars_to_file, &
-     &      Temp_flag, Inputerror_flag, Start_month, Glacier_flag, Nowmonth, Nowday, Hru_type
+     &      Temp_flag, Inputerror_flag, Start_month, Glacier_flag, Nowmonth, Nowday, Hru_type, Nmonths
       USE PRMS_TEMP_1STA_LAPS
       USE PRMS_BASIN, ONLY: Hru_elev_ts, Hru_area, Active_hrus, Hru_route_order, Basin_area_inv
       USE PRMS_CLIMATEVARS, ONLY: Tmax_aspect_adjust, Tmin_aspect_adjust, Tsta_elev, &
@@ -110,7 +110,7 @@
             j = Hru_route_order(jj)
             k = Hru_tsta(j)
             IF ( Nowday==1 ) THEN
-              IF ( Glacier_flag==ACTIVE ) THEN
+              IF ( Glacier_flag==1 ) THEN
                 ! Hru_elev_ts is the antecedent glacier elevation
                 IF ( Hru_type(j)==GLACIER ) Elfac(j) = (Hru_elev_ts(j) - Tsta_elev(k))/1000.0
               ENDIF
@@ -127,7 +127,7 @@
             j = Hru_route_order(jj)
             k = Hru_tsta(j)
             l = Hru_tlaps(j)
-            IF ( Glacier_flag==ACTIVE ) THEN
+            IF ( Glacier_flag==1 ) THEN
               ! Hru_elev_ts is the antecedent glacier elevation
               IF ( Hru_type(j)==GLACIER ) CALL compute_temp_laps(Elfac(j), Hru_elev_ts(j), Tsta_elev(l), Tsta_elev(k))
             ENDIF
@@ -187,7 +187,7 @@
 
         IF ( Temp_flag==temp_1sta_module ) THEN
           ALLOCATE ( Tcrn(Nhru), Tcrx(Nhru) )
-          ALLOCATE ( Tmax_lapse(Nhru, MONTHS_PER_YEAR) )
+          ALLOCATE ( Tmax_lapse(Nhru, Nmonths) )
           IF ( declparam(MODNAME, 'tmax_lapse', 'nhru,nmonths', 'real', &
      &         '3.0', '-20.0', '20.0', &
      &         'Monthly maximum temperature lapse rate for each HRU', &
@@ -196,7 +196,7 @@
      &         'temp_units/elev_units')/=0 ) CALL read_error(1, 'tmax_lapse')
 ! 3 degC/ 1000 ft is adiabatic, or 9.8 degC/ 1000 m, or 5.4 degF/ 1000 ft, or 17.64 degF /1000 m
 
-          ALLOCATE ( Tmin_lapse(Nhru, MONTHS_PER_YEAR) )
+          ALLOCATE ( Tmin_lapse(Nhru, Nmonths) )
           IF ( declparam(MODNAME, 'tmin_lapse', 'nhru,nmonths', 'real', &
      &         '3.0', '-20.0', '20.0', &
      &         'Monthly minimum temperature lapse rate for each HRU', &
@@ -208,7 +208,7 @@
         IF ( Temp_flag==temp_laps_module ) THEN
           ALLOCATE ( Hru_tlaps(Nhru) )
           IF ( declparam(MODNAME, 'hru_tlaps', 'nhru', 'integer', &
-     &         '0', 'bounded', 'ntemp', &
+     &         '1', 'bounded', 'ntemp', &
      &         'Index of lapse temperature station for each HRU', &
      &         'Index of the lapse temperature station used for lapse rate calculations', &
      &         'none')/=0 ) CALL read_error(1, 'hru_tlaps')
@@ -228,8 +228,8 @@
 
         ! Initialize variables, get parameter values, compute Elfac
         IF ( Temp_flag==temp_1sta_module ) THEN
-          IF ( getparam_real(MODNAME, 'tmin_lapse', Nhru*MONTHS_PER_YEAR, Tmin_lapse)/=0 ) CALL read_error(2, 'tmin_lapse')
-          IF ( getparam_real(MODNAME, 'tmax_lapse', Nhru*MONTHS_PER_YEAR, Tmax_lapse)/=0 ) CALL read_error(2, 'tmax_lapse')
+          IF ( getparam_real(MODNAME, 'tmin_lapse', Nhru*Nmonths, Tmin_lapse)/=0 ) CALL read_error(2, 'tmin_lapse')
+          IF ( getparam_real(MODNAME, 'tmax_lapse', Nhru*Nmonths, Tmax_lapse)/=0 ) CALL read_error(2, 'tmax_lapse')
         ELSEIF ( Temp_flag==temp_laps_module ) THEN
           IF ( getparam_int(MODNAME, 'hru_tlaps', Nhru, Hru_tlaps)/=0 ) CALL read_error(2, 'hru_tlaps')
         ENDIF

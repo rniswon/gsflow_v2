@@ -6,7 +6,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Output Summary'
         character(len=*), parameter :: MODNAME = 'prms_summary'
-        character(len=*), parameter :: Version_prms_summary = '2025-01-16'
+        character(len=*), parameter :: Version_prms_summary = '2025-02-10'
         INTEGER, PARAMETER :: NVARS = 51
         INTEGER, SAVE :: Iunit, nobs_npoigages
         INTEGER, SAVE, ALLOCATABLE :: Gageid_len(:)
@@ -137,7 +137,7 @@
 !     &         'none')/=0 ) CALL read_error(1, 'parent_poigages')
           ALLOCATE ( Poi_gage_segment(Npoigages) )
           IF ( declparam(MODNAME, 'poi_gage_segment', 'npoigages', 'integer', &
-     &         '0', 'bounded', 'nsegment', &
+     &         '1', 'bounded', 'nsegment', &
      &         'Segment index for each POI gage', &
      &         'Segment index for each POI gage', &
      &         'none')/=0 ) CALL read_error(1, 'poi_gage_segment')

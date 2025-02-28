@@ -273,7 +273,7 @@
 !      EXTERNAL :: MODFLOW_GET_STORAGE_BCF, MODFLOW_GET_STORAGE_LPF
 !      EXTERNAL :: MODFLOW_GET_STORAGE_UPW
       EXTERNAL :: MODFLOW_VB_DECODE, getStreamFlow, getPump
-!     EXTERNAL :: getHeads, print_date
+!      use prms_utils, only: print_date
 ! Local Variables
       INTEGER :: i, ihru, icell, irow, icol, ii, lake
       REAL :: flux_change, gwdisch, harea, inches_on_lake, pct

@@ -1146,7 +1146,7 @@
       Basin_cfs = Flow_out
       Basin_stflow_out = Basin_cfs / area_fac
       Basin_cms = Basin_cfs*CFS2CMS_CONV
-      IF ( Glacier_flag==ACTIVE ) THEN
+      IF ( Glacier_flag==1 ) THEN
         Basin_stflow_in = Basin_stflow_in + Basin_gl_top_melt
         Basin_gl_ice_cfs = Basin_gl_ice_melt*area_fac
         Basin_gl_cfs = Basin_gl_top_melt*area_fac

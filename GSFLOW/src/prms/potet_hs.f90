@@ -15,9 +15,9 @@
       END MODULE PRMS_POTET_HS
 
       INTEGER FUNCTION potet_hs()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MONTHS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real
-      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nowmonth
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nowmonth, Nmonths
       USE PRMS_POTET_HS
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Tminc, Tmaxc, Swrad
@@ -56,7 +56,7 @@
       ELSEIF ( Process_flag==DECL ) THEN
         CALL print_module(MODDESC, MODNAME, Version_potet)
 
-        ALLOCATE ( Hs_krs(Nhru,MONTHS_PER_YEAR) )
+        ALLOCATE ( Hs_krs(Nhru,Nmonths) )
         IF ( declparam(MODNAME, 'hs_krs', 'nhru,nmonths', 'real', &
      &       '0.0135', '0.01', '0.24', &
      &       'Potential ET adjustment factor - Hargreaves-Samani', &
@@ -66,7 +66,7 @@
 
 !******Get parameters
       ELSEIF ( Process_FLAG==INIT ) THEN
-        IF ( getparam_real(MODNAME, 'hs_krs', Nhru*MONTHS_PER_YEAR, Hs_krs)/=0 ) CALL read_error(2, 'hs_krs')
+        IF ( getparam_real(MODNAME, 'hs_krs', Nhru*Nmonths, Hs_krs)/=0 ) CALL read_error(2, 'hs_krs')
       ENDIF
 
       END FUNCTION potet_hs

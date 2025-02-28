@@ -528,8 +528,8 @@
 ! Basin_storage doesn't include any processes on glacier
 ! In glacier module, Basin_gl_storstart is an estimate for starting glacier volume, but only
 !   includes glaciers that have depth estimates and these are known to be iffy
-      IF ( Glacier_flag==ACTIVE ) Basin_storage = Basin_storage + Basin_gl_storage
-      IF ( Stream_order_flag == ACTIVE )  Basin_storage = Basin_storage + Basin_segment_storage
+      IF ( Glacier_flag==1 ) Basin_storage = Basin_storage + Basin_gl_storage
+      IF ( Stream_order_flag == 1 )  Basin_storage = Basin_storage + Basin_segment_storage
 
 ! volume calculation for storage
       Basin_storvol = Basin_storage*Active_area
@@ -541,7 +541,7 @@
       wat_bal = Last_basin_stor - Basin_storage + Basin_ppt + Basin_gwstor_minarea_wb &
      &          - Basin_actet - Basin_stflow_out - Basin_gwsink
       IF ( Strmflow_flag == strmflow_muskingum_lake_module .AND. Nratetbl > 0 ) wat_bal = wat_bal - Basin_2ndstflow
-      IF ( Glacier_flag==ACTIVE ) wat_bal = wat_bal + Basin_glacrb_melt + Basin_gl_top_melt - Basin_glacrevap
+      IF ( Glacier_flag==1 ) wat_bal = wat_bal + Basin_glacrb_melt + Basin_gl_top_melt - Basin_glacrevap
 
       IF ( Basin_stflow_out>0.0 ) THEN
         Basin_runoff_ratio = Basin_ppt/Basin_stflow_out

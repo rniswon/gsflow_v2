@@ -25,10 +25,10 @@
       END MODULE PRMS_TEMP_MAP
 
       SUBROUTINE temp_map()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MAXFILE_LENGTH, MONTHS_PER_YEAR, temp_map_module, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MAXFILE_LENGTH, temp_map_module, ACTIVE
       use PRMS_CONTROL_FILE, only: control_string
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Process_flag, Start_year, Start_month, Start_day, Nmap2hru, Nmap, Nowmonth, bias_adjust_flag
+      USE PRMS_MODULE, ONLY: Process_flag, Start_year, Start_month, Start_day, Nmap2hru, Nmap, Nowmonth, bias_adjust_flag, Nmonths
       USE PRMS_TEMP_MAP
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
@@ -39,7 +39,7 @@
       EXTERNAL :: temp_set
 ! Local Variables
       INTEGER :: yr, mo, dy, i, hr, mn, sec, ierr, ios, j, kg, kh, istop
-      REAL :: tmax_hru, tmin_hru, harea
+      REAL :: tmax_hru, tmin_hru
 !***********************************************************************
        IF ( Process_flag==RUN ) THEN
         READ ( Tmax_unit, *, IOSTAT=ios ) yr, mo, dy, hr, mn, sec, (Tmax_map_values(i), i=1,Nmap)
@@ -59,11 +59,10 @@
 
         DO j = 1, Active_hrus
           i = Hru_route_order(j)
-          harea = Hru_area(i)
           tmax_hru = Tmaxf(i)
           tmin_hru = Tminf(i)
           CALL temp_set(i, tmax_hru, tmin_hru, Tmaxf(i), Tminf(i), &
-     &                    Tavgf(i), Tmaxc(i), Tminc(i), Tavgc(i), harea)
+     &                  Tavgf(i), Tmaxc(i), Tminc(i), Tavgc(i), Hru_area(i))
         ENDDO
         Basin_tmax = Basin_tmax*Basin_area_inv
         Basin_tmin = Basin_tmin*Basin_area_inv
@@ -77,7 +76,7 @@
         ALLOCATE ( Tmax_map_values(Nmap), Tmin_map_values(Nmap) )
 
 ! Declare parameters
-        ALLOCATE ( Tmax_map_adj(Nmap,MONTHS_PER_YEAR) )
+        ALLOCATE ( Tmax_map_adj(Nmap,Nmonths) )
         IF ( bias_adjust_flag==ACTIVE ) THEN
           IF ( declparam(MODNAME, 'tmax_map_adj_offset', 'nmap,nmonths', 'real', &
      &         '0.0', '0.0', '50.0', &
@@ -93,7 +92,7 @@
      &         ' spatial unit estimated based on slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_map_adj')
         ENDIF
-        ALLOCATE ( Tmin_map_adj(Nmap,MONTHS_PER_YEAR) )
+        ALLOCATE ( Tmin_map_adj(Nmap,Nmonths) )
         IF ( declparam(MODNAME, 'tmin_map_adj', 'nmap,nmonths', 'real', &
      &       '0.0', '-10.0', '10.0', &
      &       'Monthly minimum temperature adjustment factor for each mapped spatial unit', &
@@ -131,15 +130,15 @@
 
         istop = 0
         ierr = 0
-        IF ( getparam_real(MODNAME, 'tmin_map_adj', Nmap*MONTHS_PER_YEAR, Tmin_map_adj)/=0 ) &
+        IF ( getparam_real(MODNAME, 'tmin_map_adj', Nmap*Nmonths, Tmin_map_adj)/=0 ) &
      &       CALL read_error(2, 'tmin_map_adj')
         IF ( bias_adjust_flag==ACTIVE ) THEN
-          IF ( getparam_real(MODNAME, 'tmax_map_adj_offset', Nmap*MONTHS_PER_YEAR, Tmax_map_adj_offset)/=0 ) &
+          IF ( getparam_real(MODNAME, 'tmax_map_adj_offset', Nmap*Nmonths, Tmax_map_adj_offset)/=0 ) &
      &         CALL read_error(2, 'tmax_map_adj_offset')
           Tmax_map_adj = Tmin_map_adj + Tmax_map_adj_offset
           DEALLOCATE ( Tmax_map_adj_offset )
         ELSE
-          IF ( getparam_real(MODNAME, 'tmax_map_adj', Nmap*MONTHS_PER_YEAR, Tmax_map_adj)/=0 ) &
+          IF ( getparam_real(MODNAME, 'tmax_map_adj', Nmap*Nmonths, Tmax_map_adj)/=0 ) &
      &         CALL read_error(2, 'tmax_map_adj')
         ENDIF
         IF ( control_string(Tmax_map_file, 'tmax_map_file')/=0 ) CALL read_error(5, 'tmax_map_file')

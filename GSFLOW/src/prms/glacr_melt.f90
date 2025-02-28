@@ -59,7 +59,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Glacier Dynamics'
       character(len=10), parameter :: MODNAME = 'glacr_melt'
-      character(len=*), parameter :: Version_glacr = '2024-04-04'
+      character(len=*), parameter :: Version_glacr = '2025-02-10'
       ! Ngl - Number of glaciers counted by termini
       ! Ntp - Number of tops of glaciers, so max glaciers that could ever split in two
       ! Nhrugl - Number of at least partially glacierized hrus at initiation
@@ -152,10 +152,9 @@
 !     glacrdecl - declare parameters and variables for glacier runoff
 !***********************************************************************
       INTEGER FUNCTION glacrdecl()
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Nmonths
       use prms_utils, only: print_module, read_error
       USE PRMS_GLACR
       IMPLICIT NONE
@@ -398,21 +397,21 @@
            'Volume area exponential coefficient for glaciers, average value by region', &
            'none')/=0 ) CALL read_error(1, 'glacrva_exp')
 
-      ALLOCATE ( Stor_ice(Nhru,MONTHS_PER_YEAR) )
+      ALLOCATE ( Stor_ice(Nhru,Nmonths) )
       IF ( declparam(MODNAME, 'stor_ice', 'nhru,nmonths', 'real', &
            '10.0', '5.0', '29.0', &
            'Monthly Storage coefficient for ice melt on glaciers', &
            'Monthly (January to December) Storage coefficient for ice melt on glaciers', &
            'hours')/=0 ) CALL read_error(1, 'stor_ice')
 
-      ALLOCATE ( Stor_snow(Nhru,MONTHS_PER_YEAR) )
+      ALLOCATE ( Stor_snow(Nhru,Nmonths) )
       IF ( declparam(MODNAME, 'stor_snow', 'nhru,nmonths', 'real', &
            '80.0', '30.0', '149.0', &
            'Monthly Storage coefficient for snow melt on glaciers', &
            'Monthly (January to December) Storage coefficient for snow melt on glaciers', &
            'hours')/=0 ) CALL read_error(1, 'stor_snow')
 
-      ALLOCATE ( Stor_firn(Nhru,MONTHS_PER_YEAR) )
+      ALLOCATE ( Stor_firn(Nhru,Nmonths) )
       IF ( declparam(MODNAME, 'stor_firn', 'nhru,nmonths', 'real', &
            '400.0', '150.0', '1000.0', &
            'Monthly Storage coefficient for firn melt on glaciers', &
@@ -446,9 +445,9 @@
 !     glacrinit - Initialize glacr module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION glacrinit()
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, GLACIER, LAND
+      USE PRMS_CONSTANTS, ONLY: GLACIER, LAND
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Hru_type
+      USE PRMS_MODULE, ONLY: Nhru, Init_vars_from_file, Hru_type, Nmonths
       USE PRMS_GLACR
       USE PRMS_BASIN, ONLY: Hru_area_dble, Hru_elev_ts, Active_hrus, Hru_route_order, &
      &    Basin_area_inv, Hru_elev_meters
@@ -478,9 +477,9 @@
       IF ( getparam_real(MODNAME, 'max_gldepth', 1, Max_gldepth)/=0 ) CALL read_error(2, 'max_gldepth')
       IF ( getparam_real(MODNAME, 'glacrva_coef', Nhru, Glacrva_coef)/=0 ) CALL read_error(2, 'glacrva_coef')
       IF ( getparam_real(MODNAME, 'glacrva_exp', Nhru, Glacrva_exp)/=0 ) CALL read_error(2, 'glacrva_exp')
-      IF ( getparam_real(MODNAME, 'stor_ice', Nhru*MONTHS_PER_YEAR, Stor_ice)/=0 ) CALL read_error(2, 'stor_ice')
-      IF ( getparam_real(MODNAME, 'stor_snow', Nhru*MONTHS_PER_YEAR, Stor_snow)/=0 ) CALL read_error(2, 'stor_snow')
-      IF ( getparam_real(MODNAME, 'stor_firn', Nhru*MONTHS_PER_YEAR, Stor_firn)/=0 ) CALL read_error(2, 'stor_firn')
+      IF ( getparam_real(MODNAME, 'stor_ice', Nhru*Nmonths, Stor_ice)/=0 ) CALL read_error(2, 'stor_ice')
+      IF ( getparam_real(MODNAME, 'stor_snow', Nhru*Nmonths, Stor_snow)/=0 ) CALL read_error(2, 'stor_snow')
+      IF ( getparam_real(MODNAME, 'stor_firn', Nhru*Nmonths, Stor_firn)/=0 ) CALL read_error(2, 'stor_firn')
       IF ( getparam_real(MODNAME, 'hru_length', Nhru, Hru_length)/=0 ) CALL read_error(2, 'hru_length')
       IF ( getparam_real(MODNAME, 'hru_width', Nhru, Hru_width)/=0 ) CALL read_error(2, 'hru_width')
       IF ( getparam_real(MODNAME, 'abl_elev_range', Nhru, Abl_elev_range)/=0 ) CALL read_error(2, 'abl_elev_range')
@@ -892,7 +891,7 @@
       USE PRMS_MODULE, ONLY: Nhru, Start_year, Nowyear, Nowmonth, Hru_type
       USE PRMS_GLACR
       USE PRMS_BASIN, ONLY: Hru_elev_ts, Basin_area_inv, Active_hrus, &
-     &    Hru_route_order, Elev_units, Hru_elev
+     &    Hru_route_order, Elev_units, Hru_elev_ts
       USE PRMS_SET_TIME, ONLY: Julwater
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow
       USE PRMS_SNOW, ONLY: Glacrmelt, Glacr_air_deltemp, Glacr_delsnow, &
@@ -970,7 +969,7 @@
           IF ( MBinit_flag==2 ) THEN
             doela = compute_ela_aar() !want steady state ELA estimation for fraw calc
             DO j = 1, Ntp
-              ela_elevt(j)=Hru_elev(Ela(j)) !will scale inside subroutine, want initial one without _ts
+              ela_elevt(j)=Hru_elev_ts(Ela(j)) !will scale inside subroutine, want initial one without _ts
               IF ( Elev_units==FEET ) ela_elevt(j) = ela_elevt(j)*FEET2METERS !put in meters
             ENDDO
           ENDIF
@@ -1064,13 +1063,13 @@
             DO i = 1, Nhrugl
 ! Need to do this so that Hru_elev_ts is actually the same as Hru_elev before melt in terminus
               IF ( Glacier_frac(cell_id(i))>NEARZERO) THEN !only effects terminus
-                Glacr_elev_init(cell_id(i)) = (Hru_elev(cell_id(i)) - (1.0-Glacier_frac(cell_id(i))) &
+                Glacr_elev_init(cell_id(i)) = (Hru_elev_ts(cell_id(i)) - (1.0-Glacier_frac(cell_id(i))) &
      &                                 *Basal_elev((cell_id(i))))/Glacier_frac(cell_id(i))
                 Glacr_slope_init(cell_id(i)) = (Hru_slope_ts(cell_id(i)) - (1.0-Glacier_frac(cell_id(i))) &
      &                                 *Basal_slope((cell_id(i))))/Glacier_frac(cell_id(i))
               ENDIF
               IF (botwrite==1) WRITE ( Output_unit, '(I5,6F13.5)' ) cell_id(i), Basal_elev(cell_id(i)), &
-     &          Glacr_elev_init(cell_id(i)), Hru_elev(cell_id(i)), Basal_slope(cell_id(i)), Hru_slope_ts(cell_id(i)), &
+     &          Glacr_elev_init(cell_id(i)), Hru_elev_ts(cell_id(i)), Basal_slope(cell_id(i)), Hru_slope_ts(cell_id(i)), &
      &          Glacr_slope_init(cell_id(i))
             ENDDO
           ENDIF
@@ -1765,7 +1764,7 @@
       USE PRMS_CONSTANTS, ONLY: GLACIER
       USE PRMS_MODULE, ONLY: Hru_type
       USE PRMS_GLACR, ONLY: Hru_slope_ts
-      USE PRMS_SOLTAB, ONLY: Hru_aspect, Hru_cossl, PI, RADIANS, &
+      USE PRMS_SOLTAB, ONLY: Hru_aspect, Hru_cossl, PI, RADIANS, Sunset_angle, &
      &    Soltab_potsw, Soltab_sunhrs, Solar_declination, ECCENTRICY, obliquity
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_lat
       IMPLICIT NONE
@@ -1784,7 +1783,7 @@
    !       Soltab_potsw(1, n) = 0.0D0
           CALL compute_soltab(obliquity, Solar_declination, Hru_slope_ts(n), Hru_aspect(n), &
      &                      Hru_lat(n), Hru_cossl(n), Soltab_potsw(:, n), &
-     &                      Soltab_sunhrs(:, n), Hru_type(n), n)
+     &                      Soltab_sunhrs(:, n), Sunset_angle(:, n), Hru_type(n), n)
         ENDIF
       ENDDO
 !
@@ -2398,6 +2397,8 @@
       REAL, INTENT(IN) :: sh(Nhrugl+2)
       REAL, INTENT(INOUT) :: fraw(Nhrugl)
       REAL, INTENT(OUT) :: fd(Nhrugl), frawe(2)
+! Function
+      INTRINSIC :: ABS
 ! Local Variables
       INTEGER :: i, ela_i
       REAL :: ela_x, high, low, add0, cons, aarA, sl_acc, sl_abl, frawm(Nhrugl+2)
@@ -2416,7 +2417,7 @@
         ENDIF
       ELSEIF (Mbinit_flag==2) THEN !Farinotti method, using ela_x
         DO i = 1, len_str
-          IF (ela_elev-uraw(i)<0.0001) THEN !has rounding errors
+          IF (ABS(ela_elev-uraw(i))<0.00001) THEN !has rounding errors
             ela_x=xraw(i)
             ela_i=i
           ENDIF

@@ -463,7 +463,7 @@
         IF ( snow_flag==ACTIVE ) THEN
           ierr = snowcomp()
 
-         IF ( Glacier_flag==ACTIVE ) ierr = glacr()
+         IF ( Glacier_flag==1 ) ierr = glacr()
         ENDIF
       ENDIF
 
@@ -1606,7 +1606,7 @@
       ! Functions
       INTRINSIC :: TRIM
       ! Local Variables
-      INTEGER :: nhru_test, dprst_test, nsegment_test, temp_test, et_test, ierr, time_step
+      INTEGER :: nhru_test, dprst_test, nsegment_test, temp_test, et_test, ierr, time_step, ag_test
       INTEGER :: cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, start_time(6), end_time(6)
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: model_test
       CHARACTER(LEN=11) :: module_name
@@ -1615,12 +1615,12 @@
         IF ( text_restart_flag==OFF ) THEN
           WRITE ( Restart_outunit ) MODNAME
           WRITE ( Restart_outunit ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
-     &            Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
+     &            Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode, Ag_flag
           WRITE ( Restart_outunit ) Starttime, Endtime
         ELSE
           WRITE ( Restart_outunit, * ) MODNAME
           WRITE ( Restart_outunit, * ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
-                  Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode
+                  Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode, Ag_flag
           WRITE ( Restart_outunit, * ) Starttime, Endtime
         ENDIF
       ELSE
@@ -1629,13 +1629,13 @@
           READ ( Restart_inunit ) module_name
           CALL check_restart(MODNAME, module_name)
           READ ( Restart_inunit ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
-     &           cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
+     &           cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test, ag_test
           READ ( Restart_inunit ) start_time, end_time
         ELSE
           READ ( Restart_inunit, * ) module_name
           CALL check_restart(MODNAME, module_name)
           READ ( Restart_inunit, * ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
-                 cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test
+                 cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test, ag_test
           READ ( Restart_inunit, * ) start_time, end_time
         ENDIF
         IF ( Print_debug>DEBUG_minimum ) PRINT 4, EQULS, 'Simulation time period of Restart File:', &
@@ -1685,6 +1685,10 @@
             PRINT *, 'ERROR, Cannot switch to/from transp_tindex module for restart simulations'
             ierr = 1
           ENDIF
+        ENDIF
+        IF ( Ag_flag/=ag_test ) THEN
+          PRINT *, 'ERROR, Cannot switch to/from soilzone module for restart simulations'
+          ierr = 1
         ENDIF
         IF ( ierr==1 ) THEN
           PRINT *, 'ERROR, reading restart file'

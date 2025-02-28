@@ -2,7 +2,6 @@
 ! Reads and stores observed data from all specified measurement stations
 !***********************************************************************
       MODULE PRMS_OBS
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
@@ -18,7 +17,7 @@
       ! Lake Module Variables
       REAL, SAVE, ALLOCATABLE :: Gate_ht(:), Lake_elev(:)
 !   Declared Parameters
-      INTEGER, SAVE :: Runoff_units, Rain_code(MONTHS_PER_YEAR)
+      INTEGER, SAVE :: Runoff_units, Rain_code(12)
       END MODULE PRMS_OBS
 
 !***********************************************************************
@@ -215,9 +214,9 @@
 !     obsinit - initializes obs module
 !***********************************************************************
       INTEGER FUNCTION obsinit()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR, CFS
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS
       use PRMS_READ_PARAM_FILE, only: getparam_int
-      USE PRMS_MODULE, ONLY: Nobs
+      USE PRMS_MODULE, ONLY: Nobs, Nmonths
       USE PRMS_OBS
       use prms_utils, only: read_error
       IMPLICIT NONE
@@ -230,7 +229,7 @@
       ENDIF
 
       IF ( Rain_flag==ACTIVE ) THEN
-        IF ( getparam_int(MODNAME, 'rain_code', MONTHS_PER_YEAR, Rain_code)/=0 ) CALL read_error(2, 'rain_code')
+        IF ( getparam_int(MODNAME, 'rain_code', Nmonths, Rain_code)/=0 ) CALL read_error(2, 'rain_code')
       ENDIF
 
       Rain_day = OFF

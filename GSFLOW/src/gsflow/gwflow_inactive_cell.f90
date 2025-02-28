@@ -17,7 +17,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Groundwater'
       character(len=*), parameter :: MODNAME = 'gwflow_inactive_cell'
-      character(len=*), parameter :: Version_gwflow = '2024-12-01'
+      character(len=*), parameter :: Version_gwflow = '2025-02-28'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea(:), Gwin_dprst(:), It0_gwres_stor(:)
       DOUBLE PRECISION, SAVE :: Basin_gw_upslope
       INTEGER, SAVE :: Gwminarea_flag
@@ -30,7 +30,7 @@
       REAL, SAVE, ALLOCATABLE :: Gwres_flow(:), Gwres_sink(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwres_in(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_gw_cascadeflow(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gw_in_soil(:), Gw_in_ssr(:), Hru_lateral_flow(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gw_in_soil(:), Gw_in_ssr(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gwstor_minarea_wb(:), Hru_streamflow_out(:)
 ! Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Gwflow_coef(:), Gwsink_coef(:)
@@ -128,11 +128,6 @@
      &     'Total flow to stream network from each HRU', &
      &     'cfs', Hru_streamflow_out)
 
-      ALLOCATE ( Hru_lateral_flow(Nhru) )
-      CALL declvar_dble(MODNAME, 'hru_lateral_flow', 'nhru', Nhru, &
-     &     'Lateral flow to stream network from each HRU', &
-     &     'inches', Hru_lateral_flow)
-
       ALLOCATE ( Gwstor_minarea(Ngw), It0_gwres_stor(Ngw), Gw_upslope_to_MF(Ngw) )
       IF ( Dprst_flag==1 ) ALLOCATE ( Gwin_dprst(Ngw) )
 
@@ -191,7 +186,7 @@
      &    Dprst_flag, Inputerror_flag, Gwr_swale_flag, activeHRU_inactiveCELL
       USE PRMS_GWFLOW_INACTIVE_CELL
       USE PRMS_BASIN, ONLY: Gwr_type, Hru_area, Basin_area_inv, Active_gwrs, Gwr_route_order, &
-     &                      Hru_storage
+     &                      Hru_storage, Hru_lateral_flow
       USE PRMS_FLOWVARS, ONLY: Gwres_stor
       use prms_utils, only: read_error
       IMPLICIT NONE
@@ -277,8 +272,7 @@
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, &
      &    Basin_area_inv, Hru_area, Gwr_type, Hru_area_dble, Hru_storage
       USE PRMS_FLOWVARS, ONLY: Soil_to_prmsgw, Ssr_to_prmsgw, Sroff, Ssres_flow, Gwres_stor, Gw_upslope
-      USE PRMS_CASCADE, ONLY: Ncascade_gwr
-      USE PRMS_SOILZONE, ONLY: cascade_min
+      USE PRMS_CASCADE, ONLY: Ncascade_gwr, cascade_min
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
       USE PRMS_WATER_USE, ONLY: Gwr_transfer, Gwr_gain
@@ -419,7 +413,7 @@
         ! leave gwin in inch-acres
         Gwres_in(i) = gwin
         Gwres_stor(i) = gwstor/gwarea
-        Hru_lateral_flow(i) = DBLE( Gwres_flow(i) + Sroff(i) + Ssres_flow(i) )
+        Hru_lateral_flow(i) = DBLE( Gwres_flow(i) )
         ! Cfs_conv converts acre-inches per timestep to cfs
         Hru_streamflow_out(i) = gwarea*Cfs_conv*Hru_lateral_flow(i)
         Hru_storage(i) = Hru_storage(i) + Gwres_stor(i)

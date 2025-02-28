@@ -84,7 +84,7 @@
       IMPLICIT NONE
       character(len=*), parameter :: MODDESC = 'Streamflow Routing'
       character(len=14), parameter :: MODNAME = 'muskingum_mann'
-      character(len=*), parameter :: Version_muskingum = '2025-01-16'
+      character(len=*), parameter :: Version_muskingum = '2025-02-11'
 !   Local Variables
       DOUBLE PRECISION, PARAMETER :: ONE_24TH = 1.0D0 / 24.0D0
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Currinsum(:), Pastin(:), Pastout(:)
@@ -364,7 +364,7 @@
       Basin_cfs = Flow_out
       Basin_stflow_out = Basin_cfs / area_fac
       Basin_cms = Basin_cfs*CFS2CMS_CONV
-      IF ( Glacier_flag==ACTIVE ) THEN
+      IF ( Glacier_flag==1 ) THEN
         Basin_stflow_in = Basin_stflow_in + Basin_gl_top_melt
         Basin_gl_ice_cfs = Basin_gl_ice_melt*area_fac
         Basin_gl_cfs = Basin_gl_top_melt*area_fac

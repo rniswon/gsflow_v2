@@ -263,7 +263,7 @@
         delta_stor_sngl = It0_hru_impervstor(i) - Hru_impervstor(i)
         waterout = Infil(i)*perv_frac + Hru_impervevap(i) + Hortonian_flow(i) ! Hortonian_flow includes dprst runoff, if any
         gmelt = 0.0
-        IF ( Glacier_flag == ACTIVE ) gmelt = Glacrb_melt(i) ! ?? what about Glacr_flow(i); units inches cubed
+        IF ( Glacier_flag == 1 ) gmelt = Glacrb_melt(i) ! ?? what about Glacr_flow(i); units inches cubed
         waterin = gmelt + Net_apply(i) !; net_apply = 0 if no application
         IF ( Pptmix_nopack(i) == ACTIVE ) waterin = waterin + Net_rain(i)
         IF ( Snowmelt(i)>0.0 ) THEN

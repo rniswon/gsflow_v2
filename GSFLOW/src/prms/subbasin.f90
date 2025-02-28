@@ -15,7 +15,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Output Summary'
       character(len=*), parameter :: MODNAME = 'subbasin'
-      character(len=*), parameter :: Version_subbasin = '2024-12-01'
+      character(len=*), parameter :: Version_subbasin = '2025-02-10'
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Qsub(:), Sub_area(:), Laststor(:)
       INTEGER, SAVE, ALLOCATABLE :: Tree(:, :)
 !   Declared Variables
@@ -353,7 +353,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, CFS2CMS_CONV, LAKE, CASCADE_OFF
       USE PRMS_MODULE, ONLY: Nsub, Dprst_flag, Lake_route_flag, Cascade_flag, Hru_type, gwflow_flag
       USE PRMS_SUBBASIN
-      USE PRMS_BASIN, ONLY: Hru_area_dble, Active_hrus, Hru_route_order, &
+      USE PRMS_BASIN, ONLY: Hru_area, Hru_area_dble, Active_hrus, Hru_route_order, &
      &    Hru_frac_perv, Lake_hru_id, Hru_subbasin
       USE PRMS_SET_TIME, ONLY: Cfs_conv, Cfs2inches
       USE PRMS_CLIMATEVARS, ONLY: Hru_ppt, Swrad, Potet, Tminc, Tmaxc, Tavgc, Hru_rain, Hru_snow
@@ -369,7 +369,8 @@
       INTRINSIC :: DBLE
 ! Local Variables
       INTEGER :: j, jj, k
-      DOUBLE PRECISION :: harea, srq, ssq, gwq, dmy, dmy1, subarea
+      REAL :: harea
+      DOUBLE PRECISION :: harea_dble, srq, ssq, gwq, dmy, dmy1, subarea
       DOUBLE PRECISION :: soilstor, snowstor, landstor, dmy2
 !***********************************************************************
       subrun = 0
@@ -407,14 +408,15 @@
         ! k indicates which HRU is in which subbasin
         k = Hru_subbasin(j)
         IF ( k>0 ) THEN
-          harea = Hru_area_dble(j)
+          harea = Hru_area(j)
+          harea_dble = Hru_area_dble(j)
           IF ( Hru_type(j)/=LAKE ) THEN
-            srq = DBLE(Sroff(j))*harea
-            ssq = DBLE(Ssres_flow(j))*harea
-            soilstor = DBLE(Soil_moist(j)*Hru_frac_perv(j) + Ssres_stor(j))*harea
-            snowstor = Pkwater_equiv(j)*harea
-            landstor = DBLE(Hru_intcpstor(j)+Hru_impervstor(j))*harea
-            IF ( Dprst_flag==ACTIVE ) landstor = landstor + Dprst_stor_hru(j)*harea
+            srq = DBLE( Sroff(j)*harea )
+            ssq = DBLE( Ssres_flow(j)*harea )
+            soilstor = DBLE( Soil_moist(j)*Hru_frac_perv(j) + Ssres_stor(j)*harea )
+            snowstor = Pkwater_equiv(j)*harea_dble
+            landstor = DBLE( (Hru_intcpstor(j)+Hru_impervstor(j))*harea )
+            IF ( Dprst_flag==ACTIVE ) landstor = landstor + Dprst_stor_hru(j)*harea_dble
           ELSE
             soilstor = 0.0D0
             snowstor = 0.0D0
@@ -425,8 +427,8 @@
               srq = Lake_outcfs(Lake_hru_id(j))*Cfs2inches
               ssq = 0.0D0
             ELSEIF ( Cascade_flag>CASCADE_OFF ) THEN
-              srq = Hortonian_lakes(j)*harea
-              ssq = Lakein_sz(j)*harea
+              srq = Hortonian_lakes(j)*harea_dble
+              ssq = Lakein_sz(j)*harea_dble
             ELSE
               srq = 0.0D0
               ssq = 0.0D0
@@ -435,27 +437,27 @@
           Qsub(k) = Qsub(k) + srq + ssq
           Subinc_interflow(k) = Subinc_interflow(k) + ssq
           Subinc_sroff(k) = Subinc_sroff(k) + srq
-          Subinc_precip(k) = Subinc_precip(k) + DBLE(Hru_ppt(j))*harea
-          Subinc_rain(k) = Subinc_rain(k) + DBLE(Hru_rain(j))*harea
-          Subinc_snow(k) = Subinc_snow(k) + DBLE(Hru_snow(j))*harea
-          Subinc_actet(k) = Subinc_actet(k) + DBLE(Hru_actet(j))*harea
-          Subinc_snowmelt(k) = Subinc_snowmelt(k) + DBLE(Snowmelt(j))*harea
-          Subinc_pkweqv(k) = Subinc_pkweqv(k) + Pkwater_equiv(j)*harea
-          Subinc_snowcov(k) = Subinc_snowcov(k) + DBLE(Snowcov_area(j))*harea
-          Subinc_potet(k) = Subinc_potet(k) + DBLE(Potet(j))*harea
-          Subinc_swrad(k) = Subinc_swrad(k) + DBLE(Swrad(j))*harea
-          Subinc_tminc(k) = Subinc_tminc(k) + DBLE(Tminc(j))*harea
-          Subinc_tmaxc(k) = Subinc_tmaxc(k) + DBLE(Tmaxc(j))*harea
-          Subinc_tavgc(k) = Subinc_tavgc(k) + DBLE(Tavgc(j))*harea
+          Subinc_precip(k) = Subinc_precip(k) + DBLE( Hru_ppt(j)*harea )
+          Subinc_rain(k) = Subinc_rain(k) + DBLE( Hru_rain(j)*harea )
+          Subinc_snow(k) = Subinc_snow(k) + DBLE( Hru_snow(j)*harea )
+          Subinc_actet(k) = Subinc_actet(k) + DBLE( Hru_actet(j)*harea )
+          Subinc_snowmelt(k) = Subinc_snowmelt(k) + DBLE( Snowmelt(j)*harea )
+          Subinc_pkweqv(k) = Subinc_pkweqv(k) + Pkwater_equiv(j)*harea_dble
+          Subinc_snowcov(k) = Subinc_snowcov(k) + DBLE( Snowcov_area(j)*harea )
+          Subinc_potet(k) = Subinc_potet(k) + DBLE( Potet(j)*harea )
+          Subinc_swrad(k) = Subinc_swrad(k) + DBLE( Swrad(j)*harea )
+          Subinc_tminc(k) = Subinc_tminc(k) + DBLE( Tminc(j)*harea )
+          Subinc_tmaxc(k) = Subinc_tmaxc(k) + DBLE( Tmaxc(j)*harea )
+          Subinc_tavgc(k) = Subinc_tavgc(k) + DBLE( Tavgc(j)*harea )
           Subinc_recharge(k) = Subinc_recharge(k) + Recharge(j)*harea
-          IF ( Soil_zone_max(j)>0.0 ) Subinc_szstor_frac(k) = Subinc_szstor_frac(k) + Soil_moist_tot(j)/Soil_zone_max(j)*harea
-          IF ( Soil_moist_max(j)>0.0 ) Subinc_capstor_frac(k) = Subinc_capstor_frac(k) + Soil_moist(j)/Soil_moist_max(j)*harea
+          IF ( Soil_zone_max(j)>0.0 ) Subinc_szstor_frac(k) = Subinc_szstor_frac(k) + DBLE( Soil_moist_tot(j)/Soil_zone_max(j)*harea )
+          IF ( Soil_moist_max(j)>0.0 ) Subinc_capstor_frac(k) = Subinc_capstor_frac(k) + DBLE( Soil_moist(j)/Soil_moist_max(j)*harea )
           Subinc_stor(k) = Subinc_stor(k) + soilstor + snowstor + landstor
           IF ( gwflow_flag==ACTIVE ) THEN
             gwq = DBLE(Gwres_flow(j))*harea
             Qsub(k) = Qsub(k) + gwq
             Subinc_gwflow(k) = Subinc_gwflow(k) + gwq
-            Subinc_stor(k) = Subinc_stor(k) + Gwres_stor(j)*harea
+            Subinc_stor(k) = Subinc_stor(k) + Gwres_stor(j)*harea_dble
           ENDIF
         ENDIF
       ENDDO
@@ -496,10 +498,10 @@
       ENDDO
 
       !get cumulative subbasin flows
+      IF ( gwflow_flag==ACTIVE ) Sub_gwflow = Subinc_gwflow
+      Sub_sroff = Subinc_sroff
+      Sub_interflow = Subinc_interflow
       DO j = 1, Nsub
-        Sub_sroff(j) = Subinc_sroff(j)
-        Sub_interflow(j) = Subinc_interflow(j)
-        IF ( gwflow_flag==ACTIVE ) Sub_gwflow(j) = Subinc_gwflow(j)
         DO k = 1, Nsub
           IF ( Tree(j,k)/=0 ) THEN
             IF ( gwflow_flag==ACTIVE ) Sub_gwflow(j) = Sub_gwflow(j) + Subinc_gwflow(k)

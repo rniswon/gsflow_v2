@@ -69,13 +69,13 @@
 !     dynparaminit - open files, read to start time, initialize flags and arrays
 !***********************************************************************
       INTEGER FUNCTION dynparaminit()
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, OFF, ERROR_dynamic, DEBUG_minimum
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dynamic, DEBUG_minimum
       use PRMS_CONTROL_FILE, only: control_string
       USE PRMS_MODULE, ONLY: Nhru, Print_debug, Start_year, Start_month, Start_day, &
      &    Dyn_intcp_flag, Dyn_covden_flag, &
      &    Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
      &    Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dyn_fallfrost_flag, &
-     &    Dyn_springfrost_flag, Dyn_snareathresh_flag
+     &    Dyn_springfrost_flag, Dyn_snareathresh_flag, Nmonths
       USE PRMS_DYNAMIC_PARAM_READ
       use prms_utils, only: error_stop, find_current_file_time, find_header_end, PRMS_open_output_file, read_error, numchars
       IMPLICIT NONE
@@ -164,7 +164,7 @@
       ENDIF
 
       IF ( Dyn_potet_flag>OFF ) THEN
-        ALLOCATE ( Potet_coef(Nhru,MONTHS_PER_YEAR) )
+        ALLOCATE ( Potet_coef(Nhru,Nmonths) )
         IF ( control_string(potet_coef_dynamic, 'potet_coef_dynamic')/=0 ) CALL read_error(5, 'potet_coef_dynamic')
         CALL find_header_end(Potetcoef_unit, potet_coef_dynamic, ierr)
         IF ( ierr==0 ) THEN

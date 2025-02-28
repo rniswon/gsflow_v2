@@ -698,7 +698,7 @@ C7C2A---FORMULATE THE FINITE DIFFERENCE EQUATIONS.
                 retval = intcp()
                 IF ( snow_flag==ACTIVE ) THEN
                   retval = snowcomp()
-                  IF ( Glacier_flag==ACTIVE ) THEN
+                  IF ( Glacier_flag==1 ) THEN
                     retval = glacr()
                   ENDIF
                 ENDIF
@@ -826,7 +826,7 @@ C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
               IF ( PRMS_land_iteration_flag==CANOPY ) THEN
                 retval = intcp()
                 retval = snowcomp()
-                IF ( Glacier_flag==ACTIVE ) THEN
+                IF ( Glacier_flag==1 ) THEN
                   retval = glacr()
                 ENDIF
               ENDIF

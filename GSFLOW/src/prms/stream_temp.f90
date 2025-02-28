@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Stream Temperature'
       character(len=11), parameter :: MODNAME = 'stream_temp'
-      character(len=*), parameter :: Version_stream_temp = '2025-01-30'
+      character(len=*), parameter :: Version_stream_temp = '2025-02-11'
       INTEGER, SAVE, ALLOCATABLE :: Seg_hru_count(:)
       REAL, SAVE, ALLOCATABLE ::  seg_tave_ss(:), seg_tave_sroff(:), seg_tave_lat(:) !, Seg_carea_inv(:)
       REAL, SAVE, ALLOCATABLE :: seg_tave_gw(:), Flowsum(:)
@@ -55,7 +55,7 @@
       INTRINSIC :: ACOS
       REAL, PARAMETER :: HALF_PI = ACOS(0.0), ZERO_C = 273.16
       REAL, PARAMETER :: PI = ACOS(-1.0)
-      REAL, PARAMETER :: DEG_TO_RAD = PI / 180.0, NOFLOW_TEMP = -98.9
+      REAL, PARAMETER :: DEG_TO_RAD = PI / 180.0, TWO_PI = 2.0*PI, NOFLOW_TEMP = -98.9
       DOUBLE PRECISION :: MPS_CONVERT = 2.93981481D-07
       END MODULE PRMS_STRMTEMP
 
@@ -90,11 +90,11 @@
 !   Declared Parameters
 !***********************************************************************
       INTEGER FUNCTION stream_temp_decl()
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR, ACTIVE, OFF, DAYS_PER_YEAR
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, DAYS_PER_YEAR
       use PRMS_CONTROL_FILE, only: control_integer
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag
+      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag, Nmonths
       USE PRMS_STRMTEMP
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -195,7 +195,7 @@
      &     'Short-wave solar radiation reflected by streams', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'albedo')
 
-      ALLOCATE(lat_temp_adj(Nsegment,MONTHS_PER_YEAR))
+      ALLOCATE(lat_temp_adj(Nsegment,Nmonths))
       IF ( declparam( MODNAME, 'lat_temp_adj', 'nsegment,nmonths', 'real', &
      &     '0.0', '-5.0', '5.0', &
      &     'Correction factor to adjust the bias of the temperature of the lateral inflow', &
@@ -358,7 +358,7 @@
      &     'none')/=0 ) CALL read_error(1, 'tempIN_segment')
 
       IF ( Strmtemp_humidity_flag==ACTIVE ) THEN  ! specified constant
-         ALLOCATE ( Seg_humidity(Nsegment, MONTHS_PER_YEAR) )
+         ALLOCATE ( Seg_humidity(Nsegment, Nmonths) )
          IF ( declparam( MODNAME, 'seg_humidity', 'nsegment,nmonths', 'real', &
      &       '0.7', '0.0', '1.0', &
      &       'Mean monthly humidity for each segment', &
@@ -401,9 +401,9 @@
 !    stream_temp_init - Initialize module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION stream_temp_init()
-      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, MONTHS_PER_YEAR, OFF, NEARZERO, ERROR_param, DAYS_YR
+      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, OFF, NEARZERO, ERROR_param, DAYS_YR
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag, Inputerror_flag
+      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag, Inputerror_flag, Nmonths
       USE PRMS_STRMTEMP
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
       USE PRMS_OBS, ONLY: Nhumid
@@ -420,7 +420,7 @@
       stream_temp_init = 0
 
       IF ( getparam_real( MODNAME, 'albedo', 1, Albedo)/=0 ) CALL read_error(2, 'albedo')
-      IF ( getparam_real( MODNAME, 'lat_temp_adj', Nsegment*MONTHS_PER_YEAR, lat_temp_adj)/=0 ) &
+      IF ( getparam_real( MODNAME, 'lat_temp_adj', Nsegment*Nmonths, lat_temp_adj)/=0 ) &
      &     CALL read_error(2, 'lat_temp_adj')
 
       IF (getparam_real(MODNAME, 'seg_lat', Nsegment, Seg_lat)/=0 ) CALL read_error(2, 'seg_lat')
@@ -460,7 +460,7 @@
 
       ierr = 0
       IF ( Strmtemp_humidity_flag==1 ) THEN
-         IF ( getparam_real( MODNAME, 'seg_humidity', Nsegment*MONTHS_PER_YEAR, Seg_humidity)/=0 ) &
+         IF ( getparam_real( MODNAME, 'seg_humidity', Nsegment*Nmonths, Seg_humidity)/=0 ) &
      &      CALL read_error(2, 'seg_humidity')
       ELSEIF ( Strmtemp_humidity_flag==2 ) THEN ! use station data
          IF ( getparam_int(MODNAME, 'seg_humidity_sta', Nsegment, Seg_humidity_sta)/=0 ) &
@@ -575,7 +575,7 @@
             tano = Sin_seg_lat(i) / Cos_seg_lat(i)
             DO k = 1, MAX_DAYS_PER_YEAR
 !  DECLINATION TRIGONOMETRIC PARAMETERS
-               decl = 0.40928 * COS(((2.0 * PI) / DAYS_YR) * (172.0 - k))
+               decl = 0.40928 * COS(((TWO_PI) / DAYS_YR) * (172.0 - k))
                cos_d = COS(decl)
                Sin_declination(k, i) = SIN(decl) ! sin_d
 
@@ -717,7 +717,7 @@
 
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: DBLE, sngl
+      INTRINSIC :: DBLE, SNGL
       REAL, EXTERNAL :: twavg, twmax, get_segwidth
       EXTERNAL :: compute_running_ave_air_temp
       EXTERNAL :: equilb, lat_inflow, shday
@@ -759,9 +759,9 @@
 ! On restart, sometimes soltab_potsw comes in as zero. It should never be zero as
 ! this results in divide by 0.0
          if (Soltab_potsw(jday, j) <= 10.0D0) then
-            ccov = 1.0 - (Swrad(j) / 10.0 * sngl(Hru_cossl(j)))
+            ccov = 1.0 - (Swrad(j) / 10.0 * SNGL(Hru_cossl(j)))
          else
-            ccov = 1.0 - (Swrad(j) / sngl(Soltab_potsw(jday, j)) * sngl(Hru_cossl(j)))
+            ccov = 1.0 - (Swrad(j) / SNGL(Soltab_potsw(jday, j)) * SNGL(Hru_cossl(j)))
          endif
 
          if (ccov .ne. ccov) then
@@ -802,7 +802,7 @@
          IF ( Seg_hru_count(i)>0 ) THEN
 !            carea = Seg_carea_inv(i)
             Seg_ccov(i) = Seg_ccov(i) / hru_area_sum(i)
-            Seg_potet(i) = Seg_potet(i) / dble(hru_area_sum(i))
+            Seg_potet(i) = Seg_potet(i) / DBLE(hru_area_sum(i))
             Seg_tave_air(i) = Seg_tave_air(i) / hru_area_sum(i)
             Seg_melt(i) = Seg_melt(i) / hru_area_sum(i)
             Seg_rain(i) = Seg_rain(i) / hru_area_sum(i)

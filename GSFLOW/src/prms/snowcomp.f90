@@ -23,7 +23,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2025-01-21'
+      character(len=*), parameter :: Version_snowcomp = '2025-02-18'
       INTEGER, SAVE :: Active_glacier, Ihru
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -120,10 +120,10 @@
 !     glacr_freeh2o_cap, glacr_layer, glacier_frac_init, groundmelt
 !***********************************************************************
       INTEGER FUNCTION snodecl()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR, CANOPY
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CANOPY
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file, Glacier_flag, Snarea_curve_flag, PRMS_land_iteration_flag
+      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file, Glacier_flag, Snarea_curve_flag, PRMS_land_iteration_flag, Nmonths
       USE PRMS_SNOW
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -191,7 +191,7 @@
         Swe_array = 0.0
       ENDIF
 
-      IF ( Glacier_flag==ACTIVE ) THEN
+      IF ( Glacier_flag==1 ) THEN
         CALL declvar_int(MODNAME, 'yrdays5', 'one', 1, &
      &     'Number of days since last 5-year mark', &
      &     'none', Yrdays5)
@@ -455,7 +455,7 @@
      &     'decimal fraction', Frac_swe)
 
 ! declare parameters
-      IF ( Glacier_flag==ACTIVE ) THEN
+      IF ( Glacier_flag==1 ) THEN
         ALLOCATE ( Albedo_coef(Nhru) )
         IF ( declparam(MODNAME, 'albedo_coef', 'nhru', 'real', &
      &       '0.137', '0.1', '0.3', &
@@ -637,7 +637,7 @@
      &     'Average emissivity of air on days without precipitation for each HRU', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'emis_noppt')
 
-      ALLOCATE ( Cecn_coef(Nhru,MONTHS_PER_YEAR) )
+      ALLOCATE ( Cecn_coef(Nhru,Nmonths) )
       IF ( declparam(MODNAME, 'cecn_coef', 'nhru,nmonths', 'real', &
      &     '5.0', '0.02', '20.0', &
      &     'Monthly convection condensation energy coefficient for each HRU', &
@@ -652,7 +652,7 @@
      &     ' decimal fraction of the frozen water content of the snowpack (pk_ice)', &
      &     'decimal fraction')/=0 ) CALL read_error(1, 'freeh2o_cap')
 
-      ALLOCATE ( Tstorm_mo(Nhru,MONTHS_PER_YEAR) )
+      ALLOCATE ( Tstorm_mo(Nhru,Nmonths) )
       IF ( declparam(MODNAME, 'tstorm_mo', 'nhru,nmonths', 'integer', &
      &     '0', '0', '1', &
      &     'Set to 1 if thunderstorms prevalent during month for each HRU', &
@@ -676,9 +676,9 @@
 !               compute initial values
 !***********************************************************************
       INTEGER FUNCTION snoinit()
-      USE PRMS_CONSTANTS, ONLY: LAND, GLACIER, FEET, FEET2METERS, ACTIVE, OFF, MONTHS_PER_YEAR, DEBUG_less, DEBUG_minimum
+      USE PRMS_CONSTANTS, ONLY: LAND, GLACIER, FEET, FEET2METERS, OFF, DEBUG_less, DEBUG_minimum
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Print_debug, Init_vars_from_file, Glacier_flag, Snarea_curve_flag, Hru_type
+      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Print_debug, Init_vars_from_file, Glacier_flag, Snarea_curve_flag, Hru_type, Nmonths
       USE PRMS_SNOW
       USE PRMS_BASIN, ONLY: Hru_route_order, Active_hrus, Elev_units, Snowpack_threshold
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela, Snowcov_area, Pk_depth
@@ -697,7 +697,7 @@
 !***********************************************************************
       snoinit = 0
 
-      IF ( Glacier_flag==ACTIVE ) THEN
+      IF ( Glacier_flag==1 ) THEN
         IF ( getparam_real(MODNAME, 'glacr_freeh2o_cap', Nhru, Glacr_freeh2o_cap)/=0 ) CALL read_error(2, 'glacr_freeh2o_cap')
         IF ( getparam_real(MODNAME, 'albedo_ice', Nhru, Albedo_ice)/=0 ) CALL read_error(2, 'albedo_ice')
         IF ( getparam_real(MODNAME, 'albedo_coef', Nhru, Albedo_coef)/=0 ) CALL read_error(2, 'albedo_coef')
@@ -742,16 +742,16 @@
       IF ( getparam_real(MODNAME, 'albset_sna', 1, Albset_sna)/=0 ) CALL read_error(2, 'albset_sna')
       IF ( getparam_real(MODNAME, 'albset_snm', 1, Albset_snm)/=0 ) CALL read_error(2, 'albset_snm')
       IF ( getparam_real(MODNAME, 'emis_noppt', Nhru, Emis_noppt)/=0 ) CALL read_error(2, 'emis_noppt')
-      IF ( getparam_real(MODNAME, 'cecn_coef', Nhru*MONTHS_PER_YEAR, Cecn_coef)/=0 ) CALL read_error(2, 'cecn_coef')
+      IF ( getparam_real(MODNAME, 'cecn_coef', Nhru*Nmonths, Cecn_coef)/=0 ) CALL read_error(2, 'cecn_coef')
       IF ( getparam_real(MODNAME, 'freeh2o_cap', Nhru, Freeh2o_cap)/=0 ) CALL read_error(2, 'freeh2o_cap')
-      IF ( getparam_int(MODNAME, 'tstorm_mo', Nhru*MONTHS_PER_YEAR, Tstorm_mo)/=0 ) CALL read_error(2, 'tstorm_mo')
+      IF ( getparam_int(MODNAME, 'tstorm_mo', Nhru*Nmonths, Tstorm_mo)/=0 ) CALL read_error(2, 'tstorm_mo')
 
       Frac_swe = 0.0
       Acum = acum_init
       Amlt = amlt_init
       Basin_glacrb_melt = 0.0D0
       Basin_glacrevap = 0.0D0
-      IF ( Glacier_flag==ACTIVE ) THEN
+      IF ( Glacier_flag==1 ) THEN
         Glacrb_melt = 0.0
         Glacrmelt = 0.0
         Glacr_evap = 0.0
@@ -818,7 +818,7 @@
       Pksv = 0.0D0
 
       IF ( Glacier_flag==2 ) Gmelt_to_soil = 0.0
-      IF ( Glacier_flag==ACTIVE ) THEN ! do here when not a restart simulation
+      IF ( Glacier_flag==1 ) THEN ! do here when not a restart simulation
         IF ( getparam_real(MODNAME, 'glacier_frac_init', Nhru, Glacier_frac_init)/=0 ) CALL read_error(2, 'glacier_frac_init')
         Glacr_albedo = 0.0
         Glacier_frac = Glacier_frac_init
@@ -977,7 +977,7 @@
       Basin_pk_precip = 0.0D0
       Basin_snowdepth = 0.0D0
       Basin_tcal = 0.0D0
-      IF ( Glacier_flag==ACTIVE ) THEN
+      IF ( Glacier_flag==1 ) THEN
         Basin_snowicecov = 0.0D0
         Basin_glacrb_melt = 0.0D0
         Basin_glacrevap = 0.0D0
@@ -1014,7 +1014,7 @@
 
         Active_glacier = OFF
         isglacier = OFF
-        IF ( Glacier_flag==ACTIVE ) THEN
+        IF ( Glacier_flag==1 ) THEN
           IF ( Hru_type(i)==GLACIER .OR. Hru_type(i)==LAND ) THEN
             Glacrmelt(i) = 0.0 ! [inches]
             Glacrb_melt(i) = 0.0 ! [inches]
@@ -1579,7 +1579,7 @@
       Basin_pk_precip = Basin_pk_precip*Basin_area_inv
       Basin_snowdepth = Basin_snowdepth*Basin_area_inv
       Basin_tcal = Basin_tcal*Basin_area_inv
-      IF ( Glacier_flag==ACTIVE ) THEN
+      IF ( Glacier_flag==1 ) THEN
         Basin_glacrb_melt = Basin_glacrb_melt*Basin_area_inv
         Basin_glacrevap = Basin_glacrevap*Basin_area_inv
         Basin_snowicecov = Basin_snowcov
@@ -1603,7 +1603,7 @@
      &           Freeh2o, Snowcov_area, Snowmelt, Pk_depth, Pss, Pst, &
      &           Net_snow, Pk_den, Pptmix_nopack, Pk_precip, Tmax_allsnow_c, &
      &           Freeh2o_cap, Tmax_allrain_c, Ihru_gl)
-      USE PRMS_CONSTANTS, ONLY: CLOSEZERO, INCH2CM, ACTIVE, OFF, DEBUG_less
+      USE PRMS_CONSTANTS, ONLY: CLOSEZERO, INCH2CM, ACTIVE, OFF, DEBUG_LESS
       USE PRMS_MODULE, ONLY: bias_adjust_flag, Print_debug
       USE PRMS_SNOW, ONLY: Ihru
       IMPLICIT NONE
@@ -1932,7 +1932,7 @@
         IF ( Pkwater_equiv<0.0D0 ) THEN
           IF ( Print_debug>DEBUG_less ) PRINT *, 'WARNING, snowpack issue in caloss, negative pkwater_equiv, HRU:', &
      &                                           Ihru, ' value:', Pkwater_equiv, ' set to 0.0'
-           CALL snow_states_to_zero()
+          CALL snow_states_to_zero()
         ENDIF
         ! If on melting glacier ice/firn, Ihru_gl >0, so melted active layer (won't melt infinite ice layer)
         If (Ihru_gl>0) CALL glacr_states_to_zero(Ihru_gl,0)
@@ -2644,7 +2644,7 @@
       ! the amount of evaporation affecting the snowpack is the
       ! total evaporation potential minus the evaporation from
       ! the interception storage
-      ez = Potet_sublim*Potet*Snowcov_area - Hru_intcpevap ! [inches]
+      ez = (Potet_sublim*Potet*Snowcov_area) - Hru_intcpevap ! [inches]
       ez_dble = DBLE( ez )
 
       ! The effects of evaporation depend on whether there is any
@@ -3036,7 +3036,7 @@
 !     snowcomp_restart - write or read snowcomp restart file
 !***********************************************************************
       SUBROUTINE snowcomp_restart(In_out)
-      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, ACTIVE, OFF
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, OFF
       USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, Glacier_flag, text_restart_flag
       USE PRMS_SNOW
       USE PRMS_FLOWVARS, ONLY: Snowcov_area, Pk_depth
@@ -3072,7 +3072,7 @@
         WRITE ( Restart_outunit ) Pst
         WRITE ( Restart_outunit ) Snsv
         WRITE ( Restart_outunit ) Pk_depth
-        IF ( Glacier_flag==ACTIVE ) THEN
+        IF ( Glacier_flag==1 ) THEN
           WRITE ( Restart_outunit ) Glacr_albedo
           WRITE ( Restart_outunit ) Glacr_pk_den
           WRITE ( Restart_outunit ) Glacr_pk_ice
@@ -3113,7 +3113,7 @@
         WRITE ( Restart_outunit, * ) Pst
         WRITE ( Restart_outunit, * ) Snsv
         WRITE ( Restart_outunit, * ) Pk_depth
-        IF ( Glacier_flag==ACTIVE ) THEN
+        IF ( Glacier_flag==1 ) THEN
           WRITE ( Restart_outunit, * ) Glacr_albedo
           WRITE ( Restart_outunit, * ) Glacr_pk_den
           WRITE ( Restart_outunit, * ) Glacr_pk_ice
@@ -3157,7 +3157,7 @@
         READ ( Restart_inunit ) Pst
         READ ( Restart_inunit ) Snsv
         READ ( Restart_inunit ) Pk_depth
-        IF ( Glacier_flag==ACTIVE ) THEN
+        IF ( Glacier_flag==1 ) THEN
           READ ( Restart_inunit ) Glacr_albedo
           READ ( Restart_inunit ) Glacr_pk_den
           READ ( Restart_inunit ) Glacr_pk_ice
@@ -3199,7 +3199,7 @@
         READ ( Restart_inunit, * ) Pst
         READ ( Restart_inunit, * ) Snsv
         READ ( Restart_inunit, * ) Pk_depth
-        IF ( Glacier_flag==ACTIVE ) THEN
+        IF ( Glacier_flag==1 ) THEN
           READ ( Restart_inunit, * ) Glacr_albedo
           READ ( Restart_inunit, * ) Glacr_pk_den
           READ ( Restart_inunit, * ) Glacr_pk_ice

@@ -748,7 +748,7 @@
         glcrmltb = 0.0 ! glacier
         active_glacier = OFF ! not a glacier or unglaciated glacier HRU
         glacier_free = 1.0
-        IF ( Glacier_flag==ACTIVE ) THEN ! should frozen ground be triggered if glacier_frac > 0.75 (maybe a parameter)?
+        IF ( Glacier_flag==1 ) THEN ! should frozen ground be triggered if glacier_frac > 0.75 (maybe a parameter)?
           IF ( Hru_type(i)==GLACIER ) THEN
             glcrmltb = Glacrb_melt(i)
             IF ( Glacier_frac(i)>0.0 ) active_glacier = ACTIVE

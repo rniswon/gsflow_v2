@@ -7,7 +7,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Cascading Flow'
       character(len=*), parameter :: MODNAME = 'cascade'
-      character(len=*), parameter :: Version_cascade = '2023-11-01'
+      character(len=*), parameter :: Version_cascade = '2025-02-27'
       INTEGER, SAVE :: MSGUNT
       INTEGER, SAVE :: Iorder, Igworder, Ndown
 !   Computed Variables
@@ -36,7 +36,7 @@
 !           area routes flow.
 !   Declared Parameters
       INTEGER, SAVE :: Cascade_flg, Circle_switch
-      REAL, SAVE :: Cascade_tol
+      REAL, SAVE :: Cascade_tol, cascade_min
       INTEGER, SAVE, ALLOCATABLE :: Hru_up_id(:), Hru_strmseg_down_id(:), Hru_down_id(:)
       INTEGER, SAVE, ALLOCATABLE :: Gw_up_id(:), Gw_strmseg_down_id(:), Gw_down_id(:)
       INTEGER, SAVE, ALLOCATABLE :: Hru_segment(:)
@@ -70,10 +70,10 @@
 !   Declared Parameters
 !     hru_up_id, hru_down_id, hru_pct_up, hru_strmseg_down_id
 !     gw_up_id, gw_down_id, gw_pct_up, gw_strmseg_down_id
-!     hru_area, cascade_tol, cascade_flg, circle_switch
+!     hru_area, cascade_tol, cascade_flg, circle_switch, cascade_min
 !***********************************************************************
       INTEGER FUNCTION cascdecl()
-      USE PRMS_CONSTANTS, ONLY: CASCADE_OFF, CASCADE_HRU_SEGMENT, CASCADE_NORMAL, CASCADEGW_OFF
+      USE PRMS_CONSTANTS, ONLY: CASCADE_OFF, CASCADE_HRU_SEGMENT, CASCADE_NORMAL, CASCADEGW_OFF, DEBUG_CASCADE
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Ngw, Ncascade, Ncascdgw, Print_debug, Cascade_flag, Cascadegw_flag
       USE PRMS_CASCADE
@@ -90,7 +90,7 @@
 
       IF ( Cascadegw_flag>CASCADEGW_OFF ) ALLOCATE ( Ncascade_gwr(Ngw) )
 
-      IF ( Print_debug==13 ) CALL PRMS_open_module_file(MSGUNT, 'cascade.msgs')
+      IF ( Print_debug==DEBUG_CASCADE ) CALL PRMS_open_module_file(MSGUNT, 'cascade.msgs')
 
 ! declare HRU cascade parameters
       IF ( Cascade_flag>CASCADE_OFF ) THEN
@@ -160,6 +160,13 @@
         ALLOCATE ( Gw_down_id(Ncascdgw) )
         ALLOCATE ( Gw_pct_up(Ncascdgw) )
       ENDIF
+
+      IF ( declparam(MODNAME, 'cascade_min', 'one', 'real', &
+     &     '0.000001', '0.0', '0.01', &
+     &     'Cascade minimum', &
+     &     'Minimum depth of interflow + Dunnian flow to cascade', &
+     &     'inches')/=0 ) CALL read_error(1,'cascade_min')
+
       IF ( Cascadegw_flag==CASCADE_NORMAL ) THEN
 ! declare GWR cascade parameters
         IF ( declparam(MODNAME, 'gw_up_id', 'ncascdgw', 'integer', &
@@ -194,7 +201,7 @@
 !     cascinit - Initialize cascade module - get parameter values,
 !***********************************************************************
       INTEGER FUNCTION cascinit()
-      USE PRMS_CONSTANTS, ONLY: OFF, ERROR_cascades, CASCADE_OFF, CASCADE_HRU_SEGMENT, CASCADE_NORMAL, CASCADEGW_OFF
+      USE PRMS_CONSTANTS, ONLY: OFF, CASCADE_OFF, CASCADE_HRU_SEGMENT, CASCADE_NORMAL, CASCADEGW_OFF, DEBUG_CASCADE
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Ngw, Print_debug, Cascade_flag, Cascadegw_flag, Gwr_swale_flag, Inputerror_flag, Hru_type
       USE PRMS_CASCADE
@@ -218,6 +225,8 @@
         IF ( getparam_int(MODNAME, 'circle_switch', 1, Circle_switch)/=0 ) CALL read_error(2, 'circle_switch')
       ENDIF
 
+      IF ( getparam_real(MODNAME, 'cascade_min', 1, cascade_min)/=0 ) CALL read_error(2, 'cascade_min')
+
       IF ( Cascade_flag>CASCADE_OFF ) CALL init_cascade(cascinit)
 
       IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
@@ -239,7 +248,7 @@
             ENDDO
           ENDDO
         ENDIF
-        IF ( Gwr_swale_flag==OFF ) THEN
+        IF ( Gwr_swale_flag==0 ) THEN
           DO ii = 1, Active_gwrs
             i = Gwr_route_order(ii)
             IF ( Gwr_type(i)==3 ) THEN
@@ -250,7 +259,7 @@
         ENDIF
       ENDIF
 
-      IF ( Print_debug==13 ) THEN
+      IF ( Print_debug==DEBUG_CASCADE ) THEN
         IF ( Cascade_flag>CASCADE_OFF ) THEN
           WRITE ( MSGUNT, 9001 )
           k = 0
@@ -263,7 +272,7 @@
           ENDDO
         ENDIF
         IF ( Cascadegw_flag>CASCADEGW_OFF ) THEN
-          WRITE ( MSGUNT, 9002 ) 
+          WRITE ( MSGUNT, 9002 )
           k = 0
           DO ii = 1, Active_gwrs
             i = Gwr_route_order(ii)
@@ -287,7 +296,7 @@
 !     cascclean - deallocation arrays
 !***********************************************************************
       INTEGER FUNCTION cascclean()
-      USE PRMS_MODULE, ONLY: CASCADE_OFF, CASCADEGW_OFF
+      USE PRMS_MODULE, ONLY: CASCADE_OFF, CASCADEGW_OFF, Print_debug, DEBUG_CASCADE
       USE PRMS_CASCADE
       USE PRMS_MODULE, ONLY: Cascade_flag, Cascadegw_flag
       IMPLICIT NONE
@@ -300,15 +309,17 @@
         DEALLOCATE ( Gwr_down, Gwr_down_frac, Cascade_gwr_area )
 !       DEALLOCATE ( Gwr_down_fracwt )
       ENDIF
+      IF ( Print_debug==DEBUG_CASCADE ) CLOSE ( MSGUNT )
 
       cascclean = 0
+
       END FUNCTION cascclean
 
 !***********************************************************************
 ! Initialize cascading flow variables
 !***********************************************************************
       SUBROUTINE init_cascade(Iret)
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, INACTIVE, LAKE, SWALE, CASCADE_HRU_SEGMENT, CASCADE_NORMAL
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, INACTIVE, LAKE, SWALE, CASCADE_HRU_SEGMENT, CASCADE_NORMAL, DEBUG_CASCADE
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nsegment, Ncascade, Ncascdgw, Print_debug, Cascade_flag, Cascadegw_flag, Hru_type
       USE PRMS_CASCADE
@@ -382,7 +393,7 @@
       ENDIF
 
 ! ??rsr, why 15??
-      IF ( Ndown>15 .AND. Print_debug==13 ) WRITE ( MSGUNT, * ) 'possible ndown issue', Ndown
+      IF ( Ndown>15 .AND. Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, * ) 'possible ndown issue', Ndown
 
 ! allocate HRU variables
       ALLOCATE ( Hru_down(Ndown,Nhru), Cascade_area(Ndown,Nhru) )
@@ -407,30 +418,30 @@
         istrm = Hru_strmseg_down_id(i)
 
         IF ( frac<0.00001 ) THEN
-          IF ( Print_debug==13 ) WRITE (MSGUNT, 9004) 'Cascade ignored as hru_pct_up=0.0', &
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE (MSGUNT, 9004) 'Cascade ignored as hru_pct_up=0.0', &
      &                                                i, kup, jdn, frac, istrm
         ELSEIF ( istrm>Nsegment ) THEN
-          IF ( Print_debug==13 ) WRITE (MSGUNT, 9004) 'Cascade ignored as segment>nsegment', &
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE (MSGUNT, 9004) 'Cascade ignored as segment>nsegment', &
      &                                                i, kup, jdn, frac, istrm
         ELSEIF ( kup<1 .AND. jdn==0 ) THEN
-          IF ( Print_debug==13 ) WRITE (MSGUNT, 9004) 'Cascade ignored as up and down HRU = 0', &
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE (MSGUNT, 9004) 'Cascade ignored as up and down HRU = 0', &
      &                                                i, kup, jdn, frac, istrm
         ELSEIF ( istrm==0 .AND. jdn==0 ) THEN
-          IF ( Print_debug==13 ) WRITE ( MSGUNT, 9004 ) 'Cascade ignored as down HRU and segment = 0', &
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9004 ) 'Cascade ignored as down HRU and segment = 0', &
      &                                                  i, kup, jdn, frac, istrm
         ELSEIF ( Hru_type(kup)==INACTIVE ) THEN
-          IF ( Print_debug==13 ) WRITE (MSGUNT, 9004) 'Cascade ignored as up HRU is inactive', &
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE (MSGUNT, 9004) 'Cascade ignored as up HRU is inactive', &
      &                                                i, kup, jdn, frac, istrm
         ELSEIF ( Hru_type(kup)==SWALE ) THEN
-          IF ( Print_debug==13 ) WRITE (MSGUNT, 9004) 'Cascade ignored as up HRU is a swale', &
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE (MSGUNT, 9004) 'Cascade ignored as up HRU is a swale', &
      &                                                i, kup, jdn, frac, istrm
         ELSEIF ( Hru_type(kup)==LAKE .AND. istrm<1 ) THEN
-          IF ( Print_debug==13 ) WRITE ( MSGUNT, 9004 ) 'Cascade ignored as lake HRU cannot cascade to an HRU', &
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9004 ) 'Cascade ignored as lake HRU cannot cascade to an HRU', &
      &                                                  i, kup, jdn, frac, istrm
         ELSE
           IF ( jdn>0 .AND. istrm<1 ) THEN
             IF ( Hru_type(jdn)==INACTIVE ) THEN
-              IF ( Print_debug==13 ) WRITE ( MSGUNT, 9004 ) &
+              IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9004 ) &
      &             'Cascade ignored as down HRU is inactive', i, kup, jdn, frac, istrm
               CYCLE
             ENDIF
@@ -439,7 +450,7 @@
           carea = frac*Hru_area(kup)
           ! get rid of small cascades, redistribute fractions
           IF ( carea<Cascade_tol .AND. frac<0.075 ) THEN
-            IF ( Print_debug==13 ) WRITE ( MSGUNT, 9005 ) i, kup, jdn, frac*100.0, carea
+            IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9005 ) i, kup, jdn, frac*100.0, carea
           ELSEIF ( Cascade_flg==1 ) THEN
             IF ( frac>hru_frac(kup) ) THEN
               hru_frac(kup) = frac
@@ -455,7 +466,7 @@
             hru_frac(kup) = hru_frac(kup) + frac
             IF ( hru_frac(kup)>1.0 ) THEN
               IF ( hru_frac(kup)>1.00001 ) THEN
-                IF ( Print_debug==13 ) WRITE ( MSGUNT, 9004 ) &
+                IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9004 ) &
      &               'Addition of cascade link makes contributing area add up to > 1.0, thus fraction reduced', &
      &               i, kup, jdn, hru_frac(kup), istrm
               ENDIF
@@ -497,8 +508,8 @@
             IF ( dnhru==Hru_down(j, i) ) THEN
               Hru_down(j, i) = 0
               Hru_down_frac(k, i) = Hru_down_frac(k, i) + Hru_down_frac(j, i)
-              IF ( Hru_down_frac(k, i)>1.00001 ) THEN
-                IF ( Print_debug==13 ) THEN
+              IF ( Hru_down_frac(k, i)>1.0 ) THEN
+                IF ( Print_debug==DEBUG_CASCADE ) THEN
                   WRITE ( MSGUNT, * ) 'Combining cascade links makes contributing area add up to > 1.0, thus fraction reduced.'
                   WRITE ( MSGUNT, * ) 'Up HRU:', i, ' Down HRU:', dnhru
                 ENDIF
@@ -507,10 +518,10 @@
               IF ( dnhru<0 ) THEN
 ! two cascades to same stream segment, combine
 !                IF ( Print_debug>DEBUG_less ) PRINT 9002, i, 'stream segment', ABS(dnhru)
-                IF ( Print_debug==13 ) WRITE ( MSGUNT, 9002 ) i, 'stream segment', ABS( dnhru )
+                IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9002 ) i, 'stream segment', ABS( dnhru )
               ELSE
 ! two cascades to same HRU, combine
-                IF ( Print_debug==13 ) WRITE ( MSGUNT, 9002 ) i, 'downslope HRU', dnhru
+                IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9002 ) i, 'downslope HRU', dnhru
               ENDIF
               Ncascade_hru(i) = Ncascade_hru(i) - 1
             ENDIF
@@ -525,7 +536,7 @@
 
       CALL order_hrus(Iret)
 
-      IF ( Print_debug==13 ) THEN
+      IF ( Print_debug==DEBUG_CASCADE ) THEN
         WRITE ( MSGUNT, 9001 )
         WRITE ( MSGUNT, 9003 ) (Hru_route_order(i), i=1, Iorder)
       ENDIF
@@ -535,9 +546,9 @@
  9001 FORMAT (/, 'HRU routing order:')
  9002 FORMAT ('*** WARNING, combined multiple cascade paths from HRU:', I7, ' to ', A, ':', I7)
  9003 FORMAT (10I7)
- 9004 FORMAT ('*** WARNING, ', A, /, '    Cascade:', I7, '; up HRU:', &
+ 9004 FORMAT ('WARNING, ', A, /, '    Cascade:', I7, '; up HRU:', &
      &        I7, '; down HRU:', I7, '; up fraction:', F8.4, '; stream segment:', I5)
- 9005 FORMAT ('*** WARNING, ignoring small cascade, carea<cascade_tol', &
+ 9005 FORMAT ('WARNING, ignoring small cascade, carea<cascade_tol', &
      &        /, '    Cascade:', I7, '; HRU up:', I7, '; HRU down:', I7, &
      &        '; fraction up:', F8.2, '; cascade area:', F8.2)
 
@@ -547,7 +558,7 @@
 ! order hrus allowing many to 1
 !***********************************************************************
       SUBROUTINE order_hrus(Iret)
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, INACTIVE, LAND, LAKE, SWALE, GLACIER
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, INACTIVE, LAND, SWALE, GLACIER, DEBUG_CASCADE
       USE PRMS_CASCADE, ONLY: Hru_down, Iorder, MSGUNT, Circle_switch, Ncascade_hru
       USE PRMS_MODULE, ONLY: Nhru, Print_debug, Hru_type
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
@@ -606,7 +617,7 @@
         IF ( up_id_count(i)==0 ) THEN
           !HRU does not receive or cascade flow - swale
           IF ( (Hru_type(i)==LAND.OR.Hru_type(i)==GLACIER) .AND. Ncascade_hru(i)==0 ) THEN
-            IF ( Print_debug==13 ) WRITE ( MSGUNT, 9008 ) i
+            IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9008 ) i
             PRINT 9008, i
             Hru_type(i) = SWALE
             type_flag = 1
@@ -615,7 +626,7 @@
         ENDIF
         IF ( (Hru_type(i)==LAND.OR.Hru_type(i)==GLACIER) .AND. Ncascade_hru(i)==0 ) THEN
           !HRU does not cascade flow - swale
-          IF ( Print_debug==13 ) WRITE ( MSGUNT, 9009 ) i
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9009 ) i
           PRINT 9009, i
           Hru_type(i) = SWALE
           type_flag = 1
@@ -655,7 +666,7 @@
         ENDDO
         IF ( circle_flg==1 ) THEN
           PRINT 9005
-          IF ( Print_debug==13 ) WRITE ( MSGUNT, 9005 )
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9005 )
           Iret = 1
           RETURN
         ENDIF
@@ -693,11 +704,11 @@
           DO i = 1, Nhru
             IF ( is_hru_on_list(i)==0 ) THEN
               PRINT *, 'HRU not in order:', i
-              IF ( Print_debug==13 ) WRITE ( MSGUNT, * ) 'HRU not in order:', i
+              IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, * ) 'HRU not in order:', i
             ENDIF
           ENDDO
           PRINT 9002, (Hru_route_order(i), i=1, Iorder)
-          IF ( Print_debug==13 ) THEN
+          IF ( Print_debug==DEBUG_CASCADE ) THEN
             WRITE (MSGUNT, *) 'ERROR, no HRUs added to routing order on last pass through cascades, possible circles'
             WRITE ( MSGUNT, 9001 ) Iorder
             WRITE ( MSGUNT, 9002 ) (Hru_route_order(i), i=1, Iorder)
@@ -708,7 +719,7 @@
       ENDDO
       DEALLOCATE ( hrus_up_list, up_id_count, dn_id_count )
 
-      IF ( Print_debug==13 ) THEN
+      IF ( Print_debug==DEBUG_CASCADE ) THEN
         WRITE ( MSGUNT, 9003 ) nroots
         WRITE ( MSGUNT, 9002 ) (roots(i), i=1, nroots)
       ENDIF
@@ -716,35 +727,35 @@
 
       IF ( Iorder/=Active_hrus ) THEN
         PRINT 9004, Iorder, Nhru, Active_hrus
-        IF ( Print_debug==13 ) WRITE ( MSGUNT, 9004 ) Iorder, Nhru, Active_hrus
+        IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9004 ) Iorder, Nhru, Active_hrus
         DO i = 1, Nhru
           IF ( is_hru_on_list(i)==0 ) THEN
             IF ( Hru_type(i)/=INACTIVE ) THEN
               PRINT 9006, i
-              IF ( Print_debug==13 ) WRITE ( MSGUNT, 9006 ) i
+              IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9006 ) i
               Iret = 1
             ELSE
-              IF ( Print_debug==13 ) WRITE ( MSGUNT, 9007 ) i
+              IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9007 ) i
             ENDIF
           ENDIF
         ENDDO
       ENDIF
       DEALLOCATE ( is_hru_on_list )
 
- 9001 FORMAT (/, I7, ' HRUs in routing order)')
- 9002 FORMAT (12I7)
+ 9001 FORMAT (/, I0, ' HRUs in routing order)')
+ 9002 FORMAT (12I8)
  9003 FORMAT (/, I6, ' HRUs that do not cascade to another HRU (roots)')
  9004 FORMAT (/, 'WARNING, not all HRUs are included in the cascading pattern, likely circle or inactive HRUs', //, &
-     &        'Number of HRUs in pattern:', I7, ', number of HRUs:', I7, &
-     &        ', Active HRUs:', I7, //, 'HRUs not in routing order:')
+     &        'Number of HRUs in pattern: ', I0, ', number of HRUs: ', I0, &
+     &        ', Active HRUs: ', I0, //, 'HRUs not in routing order:')
  9005 FORMAT (/, 'ERROR, circular HRU path found', /)
  9006 FORMAT (I7, ' missing')
  9007 FORMAT (I7, ' inactive')
- 9008 FORMAT ('WARNING, HRU', I7, ' does not cascade or receive flow', /, &
-     &        9X, 'and was specified as hru_type = 1,', /, 9X, &
+ 9008 FORMAT ('WARNING, HRU: ', I0, ' does not cascade or receive flow', /, &
+     &        9X, 'and was specified as hru_type = 1 (land),', /, 9X, &
      &        'hru_type was changed to 3 (swale)', /)
- 9009 FORMAT ('WARNING, HRU', I7, ' receives flow but does not cascade', &
-     &        /, 9X, 'and was specified as hru_type 1,', /, 9X, &
+ 9009 FORMAT ('WARNING, HRU: ', I0, ' receives flow but does not cascade', &
+     &        /, 9X, 'and was specified as hru_type 1 (land),', /, 9X, &
      &        'hru_type was changed to 3 (swale)', /)
 
       END SUBROUTINE order_hrus
@@ -753,7 +764,7 @@
 ! Initialize cascading flow variables
 !***********************************************************************
       SUBROUTINE initgw_cascade(Iret)
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, DEBUG_CASCADE
       USE PRMS_MODULE, ONLY: Ngw, Nsegment, Ncascdgw, Print_debug, Gwr_swale_flag
       USE PRMS_CASCADE
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, Gwr_type, Hru_area
@@ -782,7 +793,7 @@
         Ncascade_gwr(i) = 0
       ENDDO
 
-      IF ( Print_debug==13 ) WRITE ( MSGUNT, * )
+      IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, * )
 
       DO i = 1, Ncascdgw
         kup = Gw_up_id(i)
@@ -796,23 +807,23 @@
         istrm = Gw_strmseg_down_id(i)
 
         IF ( frac<0.00001 ) THEN
-          IF ( Print_debug==13 ) WRITE ( MSGUNT, 9004 ) 'Cascade ignored as gw_pct_up=0.0', &
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9004 ) 'Cascade ignored as gw_pct_up=0.0', &
      &                                                  i, kup, jdn, frac, istrm
         ELSEIF ( istrm>Nsegment ) THEN
-          IF ( Print_debug==13 ) WRITE (MSGUNT, 9004) 'Cascade ignored as segment>nsegment', &
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE (MSGUNT, 9004) 'Cascade ignored as segment>nsegment', &
      &                                                i, kup, jdn, frac, istrm
         ELSEIF ( kup<1 .AND. jdn==0 ) THEN
-          IF ( Print_debug==13 ) WRITE (MSGUNT, 9004) 'Cascade ignored as up and down GWR = 0', &
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE (MSGUNT, 9004) 'Cascade ignored as up and down GWR = 0', &
      &                                                i, kup, jdn, frac, istrm
         ELSEIF ( istrm==0 .AND. jdn==0 ) THEN
-          IF ( Print_debug==13 ) WRITE ( MSGUNT, 9004 ) 'Cascade ignored as down GWR and segment = 0', &
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9004 ) 'Cascade ignored as down GWR and segment = 0', &
      &                                                  i, kup, jdn, frac, istrm
         ELSEIF ( Gwr_type(kup)==0 ) THEN
-          IF ( Print_debug==13 ) WRITE (MSGUNT, 9004) 'Cascade ignored as up GWR is inactive', &
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE (MSGUNT, 9004) 'Cascade ignored as up GWR is inactive', &
      &                                                i, kup, jdn, frac, istrm
         ELSEIF ( Gwr_type(kup)==3 ) THEN
           IF ( Gwr_swale_flag>0 ) THEN
-            IF ( Print_debug==13 ) WRITE ( MSGUNT, 9004 ) 'Cascade ignored as up GWR is a swale', &
+            IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9004 ) 'Cascade ignored as up GWR is a swale', &
      &                                                    i, kup, jdn, frac, istrm
           ELSE
             PRINT 9004, 'ERROR, Cascade as up GWR specified as a swale and gwr_swale_flag = 0', &
@@ -821,7 +832,7 @@
         ELSE
           IF ( jdn>0 .AND. istrm<1 ) THEN
             IF ( Gwr_type(jdn)==0 ) THEN
-              IF ( Print_debug==13 ) WRITE ( MSGUNT, 9004 ) 'Cascade ignored as down GWR is inactive', &
+              IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9004 ) 'Cascade ignored as down GWR is inactive', &
      &                                                      i, kup, jdn, frac, istrm
               CYCLE
             ENDIF
@@ -831,7 +842,7 @@
 !         IF ( jdn>0 ) THEN
 !           IF ( Gwr_type(jdn)==2 .AND. istrm>1 ) THEN
 !             istrm = 0
-!             IF ( Print_debug==13 ) WRITE (MSGUNT, 9004) &
+!             IF ( Print_debug==DEBUG_CASCADE ) WRITE (MSGUNT, 9004) &
 !    &             'Up GWR of a lake GWR cannot cascade to stream segment, gw_strmseg_down_id set to 0', &
 !    &             i, kup, jdn, frac, istrm
 !           ENDIF
@@ -840,7 +851,7 @@
           carea = frac*Hru_area(kup)
           ! get rid of small cascades, redistribute fractions
           IF ( carea<Cascade_tol .AND. frac<0.075 ) THEN
-            IF ( Print_debug==13 ) WRITE ( MSGUNT, 9005 ) i, kup, jdn, frac*100.0, carea
+            IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9005 ) i, kup, jdn, frac*100.0, carea
           ELSEIF ( Cascade_flg==1 ) THEN
             IF ( frac>gwr_frac(kup) ) THEN
               gwr_frac(kup) = frac
@@ -856,7 +867,7 @@
             gwr_frac(kup) = gwr_frac(kup) + frac
             IF ( gwr_frac(kup)>1.0 ) THEN
               IF ( gwr_frac(kup)>1.00001 ) THEN
-                IF ( Print_debug==13 ) WRITE ( MSGUNT, 9004 ) &
+                IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9004 ) &
      &               'Addition of GWR cascade link makes contributing area add up to > 1.0, thus fraction reduced', &
      &               i, kup, jdn, gwr_frac(kup), istrm
               ENDIF
@@ -895,8 +906,8 @@
             IF ( dngwr==Gwr_down(j, i) ) THEN
               Gwr_down(j, i) = 0
               Gwr_down_frac(k, i) = Gwr_down_frac(k, i) + Gwr_down_frac(j, i)
-              IF ( Gwr_down_frac(k, i)>1.00001 ) THEN
-                IF ( Print_debug==13 ) THEN
+              IF ( Gwr_down_frac(k, i)>1.0 ) THEN
+                IF ( Print_debug==DEBUG_CASCADE ) THEN
                   WRITE ( MSGUNT, * ) 'Combining cascade links makes contributing area add up to > 1.0, thus fraction reduced'
                   WRITE ( MSGUNT,* ) 'Up GWR:', i, ' Down GWR:', dngwr
                 ENDIF
@@ -905,10 +916,10 @@
               IF ( dngwr<0 ) THEN
 ! two cascades to same stream segment, combine
 !                IF ( Print_debug>DEBUG_less ) PRINT 9002, i, 'stream segment', ABS(dngwr)
-                IF ( Print_debug==13 ) WRITE ( MSGUNT, 9002 ) i, 'stream segment', ABS( dngwr )
+                IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9002 ) i, 'stream segment', ABS( dngwr )
               ELSE
 ! two cascades to same HRU, combine
-                IF ( Print_debug==13 ) WRITE ( MSGUNT, 9002 ) i, 'downslope GWR', dngwr
+                IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9002 ) i, 'downslope GWR', dngwr
               ENDIF
               Ncascade_gwr(i) = Ncascade_gwr(i) - 1
             ENDIF
@@ -923,7 +934,7 @@
 
       CALL order_gwrs(Iret)
 
-      IF ( Print_debug==13 ) THEN
+      IF ( Print_debug==DEBUG_CASCADE ) THEN
         WRITE ( MSGUNT, 9001 )
         WRITE ( MSGUNT, 9003 ) (Gwr_route_order(i), i=1, Igworder)
       ENDIF
@@ -931,13 +942,13 @@
       DEALLOCATE ( Gw_strmseg_down_id, Gw_up_id, Gw_down_id, Gw_pct_up )
 
  9001 FORMAT (/, 'GWR routing order:')
- 9002 FORMAT ('WARNING, combined multiple cascade paths from GWR:', I7, ' to ', A, ':', I7)
+ 9002 FORMAT ('WARNING, combined multiple cascade paths from GWR: ', I0, ' to ', A, ': ', I0)
  9003 FORMAT (10I7)
- 9004 FORMAT ('*** WARNING, ', A, /, '    Cascade:', I7, '; up GWR:', &
-     &        I7, '; down GWR:', I7, '; up fraction:', F8.4, '; stream segment:', I5)
- 9005 FORMAT ('*** WARNING, ignoring small cascade, carea<cascade_tol', &
-     &        /, '    Cascade:', I7, '; GWR up:', I7, '; GWR down:', I7, &
-     &        '; fraction up:', F8.2, '; cascade area:', F8.2)
+ 9004 FORMAT ('WARNING, ', A, /, '    Cascade: ', I0, '; up GWR: ', &
+     &        I0, '; down GWR: ', I0, '; up fraction: ', F0.4, '; stream segment: ', I0)
+ 9005 FORMAT ('WARNING, ignoring small cascade, carea<cascade_tol', &
+     &        /, '    Cascade: ', I0, '; GWR up: ', I0, '; GWR down: ', I0, &
+     &        '; fraction up: ', F0.4, '; cascade area: ', F0.4)
 
       END SUBROUTINE initgw_cascade
 
@@ -946,6 +957,7 @@
 !***********************************************************************
       SUBROUTINE order_gwrs(Iret)
       USE PRMS_MODULE, ONLY: Ngw, Print_debug, Gwr_swale_flag
+      USE PRMS_CONSTANTS, ONLY: DEBUG_CASCADE
       USE PRMS_CASCADE, ONLY: Gwr_down, Igworder, MSGUNT, Circle_switch, Ncascade_gwr
       USE PRMS_BASIN, ONLY: Active_gwrs, Gwr_route_order, Gwr_type
       use prms_utils, only: PRMS_open_module_file
@@ -1004,13 +1016,13 @@
             IF ( Gwr_swale_flag>0 ) THEN
               IF ( Gwr_type(i)==1 ) THEN
                 PRINT 9008, i
-                IF ( Print_debug==13 ) WRITE ( MSGUNT, 9008 ) i
+                IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9008 ) i
                 Gwr_type(i) = 3
                 swalegwr = 2
               ENDIF
             ELSE
               PRINT 9010, i
-              IF ( Print_debug==13 ) WRITE ( MSGUNT, 9010 ) i
+              IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9010 ) i
               swalegwr = 1
               CYCLE
             ENDIF
@@ -1021,13 +1033,13 @@
           IF ( Gwr_swale_flag>0 ) THEN
             IF ( Gwr_type(i)==1 ) THEN
               PRINT 9009, i
-              IF ( Print_debug==13 ) WRITE ( MSGUNT, 9009 ) i
+              IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9009 ) i
               Gwr_type(i) = 3
               swalegwr = 2
             ENDIF
           ELSE
             PRINT 9011, i
-            IF ( Print_debug==13 ) WRITE ( MSGUNT, 9011 ) i
+            IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9011 ) i
             swalegwr = 1
           ENDIF
         ELSE
@@ -1070,7 +1082,7 @@
         ENDDO
         IF ( circle_flg==1 ) THEN
           PRINT 9005
-          IF ( Print_debug==13 ) WRITE ( MSGUNT, 9005 )
+          IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9005 )
           Iret = 1
           RETURN
         ENDIF
@@ -1109,11 +1121,11 @@
           DO i = 1, Ngw
             IF ( is_gwr_on_list(i)==0 ) THEN
               PRINT *, 'GWR not in routing order', i
-              IF ( Print_debug==13 ) WRITE ( MSGUNT, * ) 'GWR not in routing order', i
+              IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, * ) 'GWR not in routing order', i
             ENDIF
           ENDDO
           PRINT 9002, (Gwr_route_order(i), i=1, Igworder)
-          IF ( Print_debug==13 ) THEN
+          IF ( Print_debug==DEBUG_CASCADE ) THEN
             WRITE ( MSGUNT, * ) 'ERROR, no GWRs added to routing order on last pass through cascades, possible circles'
             WRITE ( MSGUNT, * ) '       active GWRs:', Active_gwrs, '; number in routing order:', Igworder
             WRITE ( MSGUNT, 9001 ) Igworder
@@ -1125,7 +1137,7 @@
       ENDDO
       DEALLOCATE ( gwrs_up_list, up_id_count, dn_id_count )
 
-      IF ( Print_debug==13 ) THEN
+      IF ( Print_debug==DEBUG_CASCADE ) THEN
         WRITE ( MSGUNT, 9003 ) nroots
         WRITE ( MSGUNT, 9002 ) (roots(i), i=1, nroots)
       ENDIF
@@ -1133,15 +1145,15 @@
 
       IF ( Igworder/=Active_gwrs ) THEN
         PRINT 9004, Igworder, Ngw, Active_gwrs
-        IF ( Print_debug==13 ) WRITE ( MSGUNT, 9004 ) Igworder, Ngw, Active_gwrs
+        IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9004 ) Igworder, Ngw, Active_gwrs
         DO i = 1, Ngw
           IF ( is_gwr_on_list(i)==0 ) THEN
             IF ( Gwr_type(i)/=0 ) THEN
               PRINT 9006, i
-              IF ( Print_debug==13 ) WRITE ( MSGUNT, 9006 ) i
+              IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9006 ) i
               Iret = 1
             ELSE
-              IF ( Print_debug==13 ) WRITE ( MSGUNT, 9007 ) i
+              IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, 9007 ) i
             ENDIF
           ENDIF
         ENDDO
@@ -1202,6 +1214,7 @@
 !***********************************************************************
       SUBROUTINE check_path(Npath, Path, Circle_flg, Nup)
       USE PRMS_MODULE, ONLY: Print_debug
+      USE PRMS_CONSTANTS, ONLY: DEBUG_CASCADE
       USE PRMS_CASCADE, ONLY: MSGUNT
       IMPLICIT NONE
 !     Functions
@@ -1224,7 +1237,7 @@
       ENDDO
 
       IF ( Circle_flg==1 .OR. Nup==0 ) THEN
-        IF ( Print_debug==13 ) THEN
+        IF ( Print_debug==DEBUG_CASCADE ) THEN
           WRITE ( MSGUNT, * ) 'Cascade Path with', Npath, ' links'
           DO i = 1, Npath, 10
             n = MIN( Npath, i+9 )

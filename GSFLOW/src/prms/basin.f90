@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Basin Definition'
       character(len=*), parameter :: MODNAME = 'basin'
-      character(len=*), parameter :: Version_basin = '2024-08-09'
+      character(len=*), parameter :: Version_basin = '2025-02-26'
       INTEGER, SAVE :: Numlake_hrus, Active_hrus, Active_gwrs, Numlakes_check
       INTEGER, SAVE :: Hemisphere, Dprst_clos_flag, Dprst_open_flag, Imperv_flag
       DOUBLE PRECISION, SAVE :: Land_area, Water_area, Ag_area_total
@@ -24,14 +24,14 @@
       REAL, SAVE, ALLOCATABLE :: Dprst_area_max(:)
       REAL, SAVE, ALLOCATABLE :: Hru_perv(:), Hru_imperv(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_area_open_max(:), Dprst_area_clos_max(:)
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_storage(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_storage(:), Hru_lateral_flow(:)
       REAL, SAVE, ALLOCATABLE :: Hru_elev_ts(:)
       DOUBLE PRECISION, SAVE :: Basin_gl_cfs, Basin_gl_ice_cfs, basin_ag_area
 !   Declared Parameters
       INTEGER, SAVE :: Elev_units
       INTEGER, SAVE, ALLOCATABLE :: Cov_type(:), Ag_cov_type(:)
       INTEGER, SAVE, ALLOCATABLE :: Lake_hru_id(:), Lake_type(:) !not needed if no lakes
-      REAL, SAVE, ALLOCATABLE :: Hru_area(:), Hru_elev(:), Hru_lat(:) ! , Hru_percent_imperv(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_area(:), Hru_lat(:) ! , Hru_percent_imperv(:)
       REAL, SAVE, ALLOCATABLE :: Covden_sum(:), Covden_win(:)
       REAL, SAVE, ALLOCATABLE :: Dprst_frac_open(:), Dprst_area(:) !, Dprst_frac(:)
       INTEGER, SAVE, ALLOCATABLE :: Hru_subbasin(:)
@@ -42,11 +42,12 @@
 !     Main basin routine
 !***********************************************************************
       INTEGER FUNCTION basin()
-      USE PRMS_CONSTANTS, ONLY: DECL, INIT
-      USE PRMS_MODULE, ONLY: Process_flag
+      USE PRMS_CONSTANTS, ONLY: DECL, INIT, CLEAN, ACTIVE, SAVE_INIT
+      USE PRMS_MODULE, ONLY: Process_flag, Save_vars_to_file
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: basdecl, basinit
+      EXTERNAL :: basin_restart
 !***********************************************************************
       basin = 0
 
@@ -54,6 +55,8 @@
         basin = basdecl()
       ELSEIF ( Process_flag==INIT ) THEN
         basin = basinit()
+      ELSEIF ( Process_flag==CLEAN ) THEN
+        IF ( Save_vars_to_file==ACTIVE ) CALL basin_restart(SAVE_INIT)
       ENDIF
 
       END FUNCTION basin
@@ -81,11 +84,11 @@
 
 ! Declared Variables
       ALLOCATE ( Hru_elev_ts(Nhru) )
-      IF ( Glacier_flag==ACTIVE ) THEN
-        CALL declvar_real(MODNAME, 'hru_elev_ts', 'nhru', Nhru, &
-     &       'HRU elevation for timestep, which can change for glaciers', &
-     &       'elev_units', Hru_elev_ts)
+      CALL declvar_real(MODNAME, 'hru_elev_ts', 'nhru', Nhru, &
+     &     'HRU elevation for timestep, which can change for glaciers', &
+     &     'elev_units', Hru_elev_ts)
 
+      IF ( Glacier_flag==1 ) THEN
         CALL declvar_dble(MODNAME, 'basin_gl_ice_cfs', 'one', 1, &
      &       'Basin glacier ice (firn) melt leaving the basin through the stream network', &
      &       'cfs', Basin_gl_ice_cfs)
@@ -119,6 +122,11 @@
       CALL declvar_dble(MODNAME, 'hru_storage', 'nhru', Nhru, &
      &     'Storage for each HRU', &
      &     'inches', Hru_storage)
+
+      ALLOCATE ( Hru_lateral_flow(Nhru) )
+      CALL declvar_dble(MODNAME, 'hru_lateral_flow', 'nhru', Nhru, &
+     &     'Lateral flow to stream network from each HRU', &
+     &     'inches', Hru_lateral_flow)
 
       ALLOCATE ( Hru_frac_dprst(Nhru) ) ! this can change with dynamic parameters
       IF ( Dprst_flag==ACTIVE ) THEN
@@ -195,7 +203,7 @@
      &     'Flag to indicate the units of the elevation values (0=feet; 1=meters)', &
      &     'none')/=0 ) CALL read_error(1, 'elev_units')
 
-      ALLOCATE ( Hru_elev(Nhru) )
+      !ALLOCATE ( Hru_elev(Nhru) ) ! setting hru_elev_ts in getparam, so don't need to allocate
       IF ( declparam(MODNAME, 'hru_elev', 'nhru', 'real', &
      &     '0.0', '-1000.0', '30000.0', &
      &     'HRU mean elevation', 'Mean elevation for each HRU', &
@@ -300,19 +308,19 @@
 !               and compute reservoir areas
 !**********************************************************************
       INTEGER FUNCTION basinit()
-      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CLOSEZERO, &
+      USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CLOSEZERO, READ_INIT, &
      &    INACTIVE, LAKE, FEET, DEBUG_minimum, ERROR_param, &
      &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, CANOPY !, METERS2FEET, SWALE
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, irrigation_apply_flag, &
      &    Dprst_flag, Lake_route_flag, PRMS4_flag, gwflow_flag, PRMS_VERSION, &
-     &    Starttime, Endtime, Parameter_check_flag, Inputerror_flag, &
+     &    Starttime, Endtime, Parameter_check_flag, Inputerror_flag, Init_vars_from_file, &
      &    AG_flag, Ag_package, activeHRU_inactiveCELL_flag, Nsub, one_subbasin_flag !, Frozen_flag
       USE PRMS_BASIN
       use prms_utils, only: checkdim_bounded_limits, error_stop, read_error, write_outfile
       IMPLICIT NONE
 ! Functions
-      EXTERNAL :: adjust_fractions
+      EXTERNAL :: adjust_fractions, basin_restart
       INTRINSIC :: DBLE
 ! Local Variables
       CHARACTER(LEN=69) :: buffer
@@ -323,8 +331,11 @@
       basinit = 0
 
       IF ( getparam_real(MODNAME, 'hru_area', Nhru, Hru_area)/=0 ) CALL read_error(2, 'hru_area')
-      IF ( getparam_real(MODNAME, 'hru_elev', Nhru, Hru_elev)/=0 ) CALL read_error(2, 'hru_elev')
-      Hru_elev_ts = Hru_elev
+      IF ( Init_vars_from_file==ACTIVE ) THEN
+        CALL basin_restart(READ_INIT)
+      ELSE
+        IF ( getparam_real(MODNAME, 'hru_elev', Nhru, Hru_elev_ts)/=0 ) CALL read_error(2, 'hru_elev')
+      ENDIF
       IF ( getparam_real(MODNAME, 'hru_lat', Nhru, Hru_lat)/=0 ) CALL read_error(2, 'hru_lat')
       IF ( getparam_int(MODNAME, 'cov_type', Nhru, Cov_type)/=0 ) CALL read_error(2, 'cov_type')
       IF ( getparam_real(MODNAME, 'covden_sum', Nhru, Covden_sum)/=0 ) CALL read_error(2, 'covden_sum')
@@ -415,6 +426,7 @@
       Hru_imperv = 0.0
       Hru_perv = 0.0
       Hru_storage = 0.0D0
+      Hru_lateral_flow = 0.0D0
       Hru_route_order = 0
       Hru_area_dble = DBLE( Hru_area )
       Imperv_flag = OFF
@@ -469,11 +481,11 @@
 
         Basin_lat = Basin_lat + DBLE( Hru_lat(i)*harea )
         IF ( Elev_units==FEET ) THEN
-!          Hru_elev_feet(i) = Hru_elev(i)
-          Hru_elev_meters(i) = Hru_elev(i)*FEET2METERS
+!          Hru_elev_feet(i) = Hru_elev_ts(i)
+          Hru_elev_meters(i) = Hru_elev_ts(i)*FEET2METERS
         ELSE
-!          Hru_elev_feet(i) = Hru_elev(i)*METERS2FEET
-          Hru_elev_meters(i) = Hru_elev(i)
+!          Hru_elev_feet(i) = Hru_elev_ts(i)*METERS2FEET
+          Hru_elev_meters(i) = Hru_elev_ts(i)
         ENDIF
         j = j + 1
         Hru_route_order(j) = i
@@ -675,7 +687,7 @@
         CALL write_outfile(' ')
         WRITE (buffer, 9003) 'Model domain area:   ', Totarea, '    Active basin area:', Active_area
         CALL write_outfile(buffer)
-        WRITE (buffer, 9004)   'Fraction impervious:', basin_imperv, '    Fraction pervious: ', basin_perv
+        WRITE (buffer, 9004) 'Fraction impervious:', basin_imperv, '    Fraction pervious: ', basin_perv
         CALL write_outfile(buffer)
         IF ( Water_area>0.0D0 ) THEN
           WRITE (buffer, 9004) 'Lake area:          ', Water_area,   '    Fraction lakes:    ', Water_area*Basin_area_inv
@@ -704,7 +716,7 @@
 ! Adjust DPRST and impervious fractions when adding ag_frac > 1.0
 !***********************************************************************
     SUBROUTINE adjust_fractions(Hru_id, Non_perv, Dprst_frac, Imperv_frac, Ag_frac)
-      use prms_constants, only: CLOSEZERO
+      USE PRMS_CONSTANTS, ONLY: CLOSEZERO
       IMPLICIT NONE
       INTRINSIC :: ABS
 ! Arguments
@@ -736,4 +748,39 @@
       ENDIF
       PRINT '(9X,3(A,F0.6))', 'adjusted values: dprst_frac: ', Dprst_frac, ' ; hru_percent_imperv: ', Imperv_frac, &
                            '; ag_frac: ', Ag_frac
-    END SUBROUTINE adjust_fractions
+      END SUBROUTINE adjust_fractions
+
+!***********************************************************************
+!     Write to or read from restart file
+!***********************************************************************
+      SUBROUTINE basin_restart(In_out)
+      USE PRMS_CONSTANTS, ONLY: SAVE_INIT, OFF
+      USE PRMS_MODULE, ONLY: Restart_outunit, Restart_inunit, text_restart_flag
+      USE PRMS_BASIN, ONLY: MODNAME, Hru_elev_ts
+      use prms_utils, only: check_restart
+      IMPLICIT NONE
+      ! Argument
+      INTEGER, INTENT(IN) :: In_out
+      ! Local Variable
+      CHARACTER(LEN=5) :: module_name
+!***********************************************************************
+      IF ( In_out==SAVE_INIT ) THEN
+        IF ( text_restart_flag==OFF ) THEN
+          WRITE ( Restart_outunit ) MODNAME
+          WRITE ( Restart_outunit ) Hru_elev_ts
+        ELSE
+          WRITE ( Restart_outunit, * ) MODNAME
+          WRITE ( Restart_outunit, * ) Hru_elev_ts
+        ENDIF
+      ELSE
+        IF ( text_restart_flag==OFF ) THEN
+          READ ( Restart_inunit ) module_name
+          CALL check_restart(MODNAME, module_name)
+          READ ( Restart_inunit ) Hru_elev_ts
+        ELSE
+          READ ( Restart_inunit, * ) module_name
+          CALL check_restart(MODNAME, module_name)
+          READ ( Restart_inunit, * ) Hru_elev_ts
+        ENDIF
+      ENDIF
+      END SUBROUTINE basin_restart

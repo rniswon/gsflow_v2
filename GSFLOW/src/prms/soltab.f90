@@ -16,13 +16,11 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Potential Solar Radiation'
       character(len=*), parameter :: MODNAME = 'soltab'
-      character(len=*), parameter :: Version_soltab = '2024-01-22'
-      DOUBLE PRECISION, PARAMETER :: PI=ACOS(-1.0D0) ! ABOUT 3.1415926535898D0
-      DOUBLE PRECISION, PARAMETER :: RADIANS=PI/180.0D0, TWOPI=2.0D0*PI
-      DOUBLE PRECISION, PARAMETER :: PI_12=12.0D0/PI
-! TWOPI = 6.2831853071786
-! RADIANS = 0.017453292519943
-! PI_12 = 3.8197186342055
+      character(len=*), parameter :: Version_soltab = '2025-02-21'
+      DOUBLE PRECISION, PARAMETER :: PI=ACOS(-1.0D0)      ! ABOUT 3.1415926535898D0
+      double precision, parameter :: TWOPI = 2.0D0*PI     ! ABOUT 6.2831853071786
+      DOUBLE PRECISION, PARAMETER :: RADIANS=PI/180.0D0   ! ~ 0.017453292519943
+      DOUBLE PRECISION, PARAMETER :: PI_12=12.0D0/PI      !  ~ 3.8197186342055
       DOUBLE PRECISION, PARAMETER :: ECCENTRICY = 0.01671D0
 !      DOUBLE PRECISION, PARAMETER :: ECCENTRICY = 0.01671123D0 ! https://www.vcalc.com/search/?text=eccentricity
       ! 0.016723401  daily change -1.115E-09, eccen = 0.016723401 + (julhour-julhour(1966,1,0,18))+dmin/60)/24*-1.115E-09
@@ -35,8 +33,10 @@
       !DOUBLE PRECISION, SAVE :: Ecentricity(MAX_DAYS_PER_YEAR)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_cossl(:), Soltab_sunhrs(:, :)
       DOUBLE PRECISION, SAVE :: obliquity(MAX_DAYS_PER_YEAR)
+!   Declared Variables
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Soltab_potsw(:, :), Soltab_horad_potsw(:, :)
-!       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Sunset_angle(:, :)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Sunset_angle(:, :)
+      DOUBLE PRECISION :: basin_angle(MAX_DAYS_PER_YEAR)
 !   Declared Parameters
       REAL, SAVE, ALLOCATABLE :: Hru_aspect(:), Hru_slope(:)
       END MODULE PRMS_SOLTAB
@@ -67,8 +67,8 @@
 !     hru_aspect, hru_lat, hru_slope
 !***********************************************************************
       INTEGER FUNCTION sthdecl()
-      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR
       use PRMS_READ_PARAM_FILE, only: declparam
+      !use PRMS_MMFAPI, only: declvar_dble
       USE PRMS_MODULE, ONLY: Nhru
       USE PRMS_SOLTAB
       use prms_utils, only: print_module, read_error
@@ -89,7 +89,7 @@
 !     &     'Langleys', Soltab_horad_potsw)
 
       ALLOCATE ( Hru_cossl(Nhru), Soltab_sunhrs(MAX_DAYS_PER_YEAR, Nhru) )
-!       ALLOCATE ( Sunset_angle(MAX_DAYS_PER_YEAR, Nhru) )
+      ALLOCATE ( Sunset_angle(MAX_DAYS_PER_YEAR, Nhru) )
 
 !   Declared Parameters
       ALLOCATE ( Hru_slope(Nhru) )
@@ -131,7 +131,6 @@
       REAL :: lat
       DOUBLE PRECISION :: basin_cossl !, dayangle
       DOUBLE PRECISION :: basin_sunhrs(MAX_DAYS_PER_YEAR)
-!      DOUBLE PRECISION :: basin_angle(MAX_DAYS_PER_YEAR)
       DOUBLE PRECISION :: y, y2, y3, jddbl
 !***********************************************************************
       sthinit = 0
@@ -151,60 +150,53 @@
    !&              cos(lat)*cos(declin)*cos(jday*2.0_SHR_KIND_R8*pi + lon)
 
         ! Eccentricity from equation E-2 (Dingman, S. L., 1994, Physical Hydrology. Englewood Cliffs, NJ: Prentice Hall, 575 p.)
-        ! dayangle = (2*PI*(Jday-1))/365 = DEGDAYRAD*(jddbl-1.0D0) = day angle in radians
+        ! dayangle = (2*PI*(Jday-1+(hour-12/24)))/365 = DEGDAYRAD*(jddbl-1.0D0) = day angle in radians, 366 for leap years
+        !dayangle = (TWOPI*(jddbl-1.0D0))/Yrdays ! DEGDAYRAD*(jddbl-1.0D0) ! assume noon (12pm)
         ! eccentricity = 1.00011D0 + 0.034221D0*COS(dayangle) + 0.00128D0*SIN(dayangle) + 0.000719D0*COS(2.0D0*dayangle) + 0.000077D0*SIN(2.0D0*dayangle)
 !rsr .0172 = 2PI/365 = RADIAN_YEAR = DEGDAYRAD
+        ! G = (2p(J-1))/365 = DEGDAYRAD*(jddbl-1.0D0) = day angle
+        ! eccentricity = (r_0/r)^2 = 1.00011+0.034221 cos?G+0.00128 sin?G+0.000719 cos?2G+0.000077 sin?2G
+!       y = DEGDAYRAD*(jddbl-1.0D0 + (hour-12.0D0)/24.0D0)
+        y = DEGDAYRAD*(jddbl-1.0D0) ! assume noon
+!!        Eccentricity(jd) = 1.00011D0 + 0.034221D0*COS(y) + 0.00128D0*SIN(y) + 0.000719D0*COS(2.0D0*y) &
+!!                           + 0.000077D0*SIN(2.0D0*y) ! https://csdms.colorado.edu/wiki/Model_help:TopoFlow-Meteorology
+        ! julday(1966,1,0.75 UT) = 2439126.25
+        ! eccen = 0.01675104-0.00004180*T-0.000000126*T**2  T is julian centuries (days time from epoch, is GMT from Jan 0.0
+        ! daily change -1.115E-09, eccen = 0.016723401 + (julhour-julhour(1966,1,0,18))+dmin/60)/24*-1.115E-09
 !rsr01/2006 commented out equations from Llowd W. Swift paper 2/1976
 !       obliquity(jd) = 1.0D0 - (0.0167D0*COS((jd-3)*0.0172D0))
         obliquity(jd) = 1.0D0 - (ECCENTRICY*COS((jddbl-3.0D0)*DEGDAYRAD))
 !       Solar_declination(jd) = 0.007D0 - (0.4067D0*COS((jd+10)*0.0172D0))
 !       Solar_declination(jd) = ASIN(0.39785D0 * SIN( (278.9709D0+DEGDAY*jd)*RADIANS + 1.9163D0*RADIANS * SIN((356.6153D0+DEGDAY*jd)*RADIANS )) )
         ! hour = 12.0D0
-!       y = DEGDAYRAD*(jddbl-1.0D0 +(hour-12.0D0)/24.0D0)
-        y = DEGDAYRAD*(jddbl-1.0D0) ! assume noon
+
         y2 = 2.0D0*y
         y3 = 3.0D0*y
         Solar_declination(jd) = 0.006918D0 - 0.399912D0*COS(y) + 0.070257D0*SIN(y) &
      &                          - 0.006758D0*COS(y2) + 0.000907D0*SIN(y2) &
      &                          - 0.002697D0*COS(y3) + 0.00148D0*SIN(y3)
-        ! eccentricity = (r_0/r)^2 = 1.00011+0.034221 cos?G+0.00128 sin?G+0.000719 cos?2G+0.000077 sin?2G
-        ! G = (2p(J-1))/365 = DEGDAYRAD*(jddbl-1.0D0) = day angle
-        !dayangle = (TWOPI*(jddbl-1.0D0))/365.242D0 ! DEGDAYRAD*(jddbl-1.0D0) ! assume noon (12pm)
-!        Eccentricity(jd) = 1.00011D0 + 0.034221D0*COS(y) + 0.00128D0*SIN(y) + 0.000719D0*COS(2.0D0*y) &
-!                           + 0.000077D0*SIN(2.0D0*y) ! https://csdms.colorado.edu/wiki/Model_help:TopoFlow-Meteorology
-        ! daily change -1.115E-09, eccen = 0.016723401 + (julhour-julhour(1966,1,0,18))+dmin/60)/24*-1.115E-09
-        ! julday(1966,1,0.75 UT) = 2439126.25
-        ! eccen = 0.01675104-0.00004180*T-0.000000126*T**2  T is julian centuries (days time from epoch, is GMT from Jan 0.0
-!        obliquity(jd) = 1.0D0 - (Eccentricity(jd)*COS((jddbl-3.0D0)*DEGDAYRAD))
+
       ENDDO
 
 !   Module Variables
       Soltab_sunhrs = 0.0D0
       Soltab_potsw = 0.0D0
       Soltab_horad_potsw = 0.0D0
-      ! Sunset_angle = 0.0D0
+      Sunset_angle = 0.0D0
       Hru_cossl = 0.0D0
       DO nn = 1, Active_hrus
         n = Hru_route_order(nn)
         CALL compute_soltab(obliquity, Solar_declination, 0.0, 0.0, Hru_lat(n), &
      &                      Hru_cossl(n), Soltab_horad_potsw(:, n), &
-     &                      Soltab_sunhrs(:, n), Hru_type(n), n)
+     &                      Soltab_sunhrs(:, n), Sunset_angle(:, n), Hru_type(n), n)
         CALL compute_soltab(obliquity, Solar_declination, Hru_slope(n), Hru_aspect(n), &
      &                      Hru_lat(n), Hru_cossl(n), Soltab_potsw(:, n), &
-     &                      Soltab_sunhrs(:, n), Hru_type(n), n)
-!        CALL compute_soltab(obliquity, Solar_declination, 0.0, 0.0, Hru_lat(n), &
-!     &                      Hru_cossl(n), Soltab_horad_potsw(:, n), &
-!     &                      Soltab_sunhrs(:, n), Sunset_angle(:, n), Hru_type(n), n)
-!        CALL compute_soltab(obliquity, Solar_declination, Hru_slope(n), Hru_aspect(n), &
-!     &                      Hru_lat(n), Hru_cossl(n), Soltab_potsw(:, n), &
-!     &                      Soltab_sunhrs(:, n), Sunset_angle(:, n), Hru_type(n), n)
+     &                      Soltab_sunhrs(:, n), Sunset_angle(:, n), Hru_type(n), n)
       ENDDO
 
       lat = SNGL( Basin_lat )
       CALL compute_soltab(obliquity, Solar_declination, 0.0, 0.0, lat, basin_cossl, &
-     &                    Soltab_basinpotsw, basin_sunhrs, 0, 0)
-!      CALL compute_soltab(obliquity, Solar_declination, 0.0, 0.0, lat, basin_cossl, &
-!     &                    Soltab_basinpotsw, basin_sunhrs, basin_angle, 0, 0)
+     &                    Soltab_basinpotsw, basin_sunhrs, basin_angle, 0, 0)
 
       IF ( Print_debug==DEBUG_SOLTAB ) THEN
         WRITE ( Output_fmt2, 9001 ) Nhru
@@ -278,22 +270,20 @@
 !  for each HRU for each day of the year.
 !***********************************************************************
       SUBROUTINE compute_soltab(Obliquity, Solar_declination, Slope, Aspect, &
-     &                          Latitude, Cossl, Soltab, Sunhrs, Hru_type, Id)
-!      SUBROUTINE compute_soltab(Obliquity, Solar_declination, Slope, Aspect, &
-!     &                          Latitude, Cossl, Soltab, Sunhrs, Sunset_angle, Hru_type, Id)
+     &                          Latitude, Cossl, Soltab, Sunhrs, Sunset_angle, Hru_type, Id)
       USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, DNEARZERO
       USE PRMS_SOLTAB, ONLY: PI, TWOPI, RADIANS, PI_12
       IMPLICIT NONE
       EXTERNAL :: compute_t
 !     Functions
       DOUBLE PRECISION, EXTERNAL :: func3
-      INTRINSIC :: ASIN, SIN, COS, ATAN, ABS
+      INTRINSIC :: ASIN, SIN, COS, ATAN, ABS, DBLE
 !     Arguments
       INTEGER, INTENT(IN) :: Hru_type, Id
       DOUBLE PRECISION, INTENT(IN), DIMENSION(MAX_DAYS_PER_YEAR) :: Obliquity, Solar_declination
       REAL, INTENT(IN) :: Slope, Aspect, Latitude
       DOUBLE PRECISION, INTENT(OUT) :: Cossl
-      DOUBLE PRECISION, INTENT(OUT), DIMENSION(MAX_DAYS_PER_YEAR) :: Soltab, Sunhrs !, Sunset_angle
+      DOUBLE PRECISION, INTENT(OUT), DIMENSION(MAX_DAYS_PER_YEAR) :: Soltab, Sunhrs, Sunset_angle
 !     Local Variables
       INTEGER :: jd
       DOUBLE PRECISION :: a, x0, x1, x2, r0, r1, d1, t, sunh, solt
@@ -305,10 +295,10 @@
 
       sl = ATAN(Slope)
       Cossl = COS(sl)
-      a = Aspect*RADIANS
+      a = DBLE( Aspect )*RADIANS
 
 ! x0 latitude of HRU
-      x0 = Latitude*RADIANS
+      x0 = DBLE( Latitude )*RADIANS
 
 ! x1 latitude of equivalent slope
 ! This is equation 13 from Lee, 1963
@@ -414,7 +404,7 @@
         IF ( sunh<DNEARZERO ) sunh = 0.0D0
         Sunhrs(jd) = sunh
         Soltab(jd) = solt
-        ! Sunset_angle(jd) = t3*PI_12
+        Sunset_angle(jd) = t3*PI_12
 
       ENDDO
 

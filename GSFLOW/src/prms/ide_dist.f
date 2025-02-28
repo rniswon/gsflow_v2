@@ -9,7 +9,6 @@
 ! Lauren Hay, November 2004
 !***********************************************************************
       MODULE PRMS_IDE
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC =
@@ -20,8 +19,8 @@
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Dalr
       DOUBLE PRECISION, SAVE :: Basin_centroid_x, Basin_centroid_y
-      REAL, SAVE :: Temp_wght_elev(MONTHS_PER_YEAR)
-      REAL, SAVE :: Prcp_wght_elev(MONTHS_PER_YEAR)
+      REAL, SAVE :: Temp_wght_elev(12)
+      REAL, SAVE :: Prcp_wght_elev(12)
       REAL, SAVE, ALLOCATABLE :: Precip_ide(:)
 !   Declared Variables
       REAL, SAVE, ALLOCATABLE :: Tmax_rain_sta(:), Tmin_rain_sta(:)
@@ -34,8 +33,8 @@
       INTEGER, SAVE :: Ndist_tsta, Ndist_psta
       REAL, SAVE :: Dist_exp
       REAL, SAVE, ALLOCATABLE :: Adjust_snow(:, :), Adjust_rain(:, :)
-      REAL, SAVE :: Temp_wght_dist(MONTHS_PER_YEAR)
-      REAL, SAVE :: Prcp_wght_dist(MONTHS_PER_YEAR)
+      REAL, SAVE :: Temp_wght_dist(12)
+      REAL, SAVE :: Prcp_wght_dist(12)
       REAL, SAVE, ALLOCATABLE :: Tmax_allsnow_sta(:, :)
       REAL, SAVE, ALLOCATABLE :: Tmax_allrain_sta(:, :)
       END MODULE PRMS_IDE
@@ -68,7 +67,7 @@
       INTEGER FUNCTION idedecl()
       use PRMS_MMFAPI, only: declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Ntemp, Nrain
+      USE PRMS_MODULE, ONLY: Nhru, Ntemp, Nrain, Nmonths
       USE PRMS_IDE
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -90,7 +89,7 @@
      +     'degrees Fahrenheit', Tmin_rain_sta)
 
 ! declare parameters
-      ALLOCATE ( Adjust_snow(Nrain,MONTHS_PER_YEAR) )
+      ALLOCATE ( Adjust_snow(Nrain,Nmonths) )
       IF ( declparam(MODNAME, 'adjust_snow', 'nrain,nmonths', 'real',
      +     '-0.4', '-0.5', '3.0',
      +     'Monthly (January to December) snow downscaling adjustment'//
@@ -100,7 +99,7 @@
      +     ' factor for each precipitation measurement station',
      +     'decimal fraction')/=0 ) CALL read_error(1, 'adjust_snow')
 
-      ALLOCATE ( Adjust_rain(Nrain,MONTHS_PER_YEAR) )
+      ALLOCATE ( Adjust_rain(Nrain,Nmonths) )
       IF ( declparam(MODNAME, 'adjust_rain', 'nrain,nmonths', 'real',
      +     '-0.4', '-0.5', '3.0',
      +     'Monthly (January to December) rain downscaling adjustment'//
@@ -221,7 +220,7 @@
      +     ' distance calculations',
      +     'none')/=0 ) CALL read_error(1, 'ndist_tsta')
 
-      ALLOCATE ( Tmax_allrain_sta(Nrain,MONTHS_PER_YEAR) )
+      ALLOCATE ( Tmax_allrain_sta(Nrain,Nmonths) )
       IF ( declparam(MODNAME, 'tmax_allrain_sta', 'nrain,nmonths',
      +     'real', '38.0', '-8.0', '75.0',
      +     'Precipitation is rain if HRU max temperature >= this value',
@@ -232,7 +231,7 @@
      +     ' precipitation is rain',
      +     'temp_units')/=0 ) CALL read_error(1, 'tmax_allrain_sta')
 
-      ALLOCATE ( Tmax_allsnow_sta(Nrain,MONTHS_PER_YEAR) )
+      ALLOCATE ( Tmax_allsnow_sta(Nrain,Nmonths) )
       IF ( declparam(MODNAME, 'tmax_allsnow_sta', 'nrain,nmonths',
      +     'real', '32.0', '-10.0', '40.0',
      +     'Maximum temperature when precipitation is all snow',
@@ -253,7 +252,7 @@
       INTEGER FUNCTION ideinit()
       USE PRMS_CONSTANTS, ONLY: ACTIVE
       use PRMS_READ_PARAM_FILE, only: getparam_real, getparam_int
-      USE PRMS_MODULE, ONLY: Nhru, Ntemp, Nrain, Inputerror_flag
+      USE PRMS_MODULE, ONLY: Nhru, Ntemp, Nrain, Inputerror_flag,Nmonths
       USE PRMS_IDE
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv,
      +    Active_hrus, Hru_route_order
@@ -270,10 +269,10 @@
       Tmax_rain_sta = 0.0
       Tmin_rain_sta = 0.0
 
-      IF ( getparam_real(MODNAME, 'adjust_rain',Nrain*MONTHS_PER_YEAR,
+      IF ( getparam_real(MODNAME, 'adjust_rain',Nrain*Nmonths,
      +     Adjust_rain)/=0 ) CALL read_error(2, 'adjust_rain')
 
-      IF ( getparam_real(MODNAME, 'adjust_snow',Nrain*MONTHS_PER_YEAR,
+      IF ( getparam_real(MODNAME, 'adjust_snow',Nrain*Nmonths,
      +     Adjust_snow)/=0 ) CALL read_error(2, 'adjust_snow')
 
       IF ( getparam_real(MODNAME, 'solrad_elev', 1, Solrad_elev)
@@ -303,10 +302,10 @@
       IF ( getparam_int(MODNAME, 'psta_nuse', Nrain,
      +     Psta_nuse)/=0 ) CALL read_error(2, 'psta_nuse')
 
-      IF ( getparam_real(MODNAME, 'temp_wght_dist', MONTHS_PER_YEAR,
+      IF ( getparam_real(MODNAME, 'temp_wght_dist', Nmonths,
      +     Temp_wght_dist)/=0 ) CALL read_error(2, 'temp_wght_dist')
 
-      IF ( getparam_real(MODNAME, 'prcp_wght_dist', MONTHS_PER_YEAR,
+      IF ( getparam_real(MODNAME, 'prcp_wght_dist', Nmonths,
      +     Prcp_wght_dist)/=0 ) CALL read_error(2, 'prcp_wght_dist')
 
       IF ( getparam_real(MODNAME, 'dist_exp', 1, Dist_exp)
@@ -326,12 +325,10 @@
         Inputerror_flag = 1
       ENDIF
 
-      IF ( getparam_real(MODNAME, 'tmax_allrain_sta',
-     +     Nrain*MONTHS_PER_YEAR,
+      IF ( getparam_real(MODNAME, 'tmax_allrain_sta', Nrain*Nmonths,
      +     Tmax_allrain_sta)/=0 ) CALL read_error(2, 'tmax_allrain_sta')
 
-      IF ( getparam_real(MODNAME, 'tmax_allsnow_sta',
-     +     Nrain*MONTHS_PER_YEAR,
+      IF ( getparam_real(MODNAME, 'tmax_allsnow_sta', Nrain*Nmonths,
      +     Tmax_allsnow_sta)/=0 ) CALL read_error(2, 'tmax_allsnow_sta')
 
 ! dry adiabatic lapse rate (DALR) when extrapolating
@@ -381,7 +378,7 @@
         Inputerror_flag = 1
       ENDIF
 
-      DO i = 1, 12
+      DO i = 1, Nmonths
         Temp_wght_elev(i) = 1.0 - Temp_wght_dist(i)
         Prcp_wght_elev(i) = 1.0 - Prcp_wght_dist(i)
       ENDDO
