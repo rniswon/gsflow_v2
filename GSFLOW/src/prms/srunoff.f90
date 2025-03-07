@@ -1030,9 +1030,10 @@
 !***********************************************************************
       SUBROUTINE compute_infil(Net_rain, Net_ppt, Snowmelt, Pk_precip, Net_apply, &
      &                         Snowinfil_max, Net_snow, Pkwater_equiv, Infil, hru_flag)
-      USE PRMS_CONSTANTS, ONLY: ZERO_SNOWPACK, ACTIVE, CASCADE_OFF, OFF
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, CASCADE_OFF, OFF
       USE PRMS_MODULE, ONLY: Cascade_flag
       USE PRMS_SRUNOFF, ONLY: Upslope_hortonian, Ihru, Srp, Sra
+      USE PRMS_BASIN, ONLY: Snowpack_threshold
       USE PRMS_FLOWVARS, ONLY: Pptmix_nopack
       IMPLICIT NONE
 ! Arguments
@@ -1080,7 +1081,7 @@
       IF ( Snowmelt>0.0 ) THEN ! includes glacier melt, if any
         Infil = Infil + Snowmelt
         IF ( hru_flag==1 ) THEN
-          IF ( Pkwater_equiv>0.0D0 .OR. .not.(Net_ppt-Net_snow>0.0) ) THEN
+          IF ( Pkwater_equiv>Snowpack_threshold(Ihru) .OR. .not.(Net_ppt-Net_snow>0.0) ) THEN
 !******Pervious area computations
             CALL check_capacity(Snowinfil_max, Infil)
 !******Snowmelt occurred and depleted the snowpack
@@ -1092,7 +1093,7 @@
 !******There was no snowmelt but a snowpack may exist.  If there is
 !******no snowpack then check for rain on a snowfree HRU.
 
-      ELSEIF ( Pkwater_equiv<ZERO_SNOWPACK ) THEN
+      ELSEIF ( Pkwater_equiv<Snowpack_threshold(Ihru) ) THEN
 
 !       If no snowmelt and no snowpack but there was net snow then
 !       snowpack was small and was lost to sublimation.
@@ -1121,9 +1122,10 @@
       SUBROUTINE compute_infil_ag_glcr(Net_rain, Net_ppt, Snowmelt, Pk_precip, Net_apply, &
      &                                 Snowinfil_max, Net_snow, Pkwater_equiv, Infil, hru_flag, glacier_free, &
      &                                 Perv_on, Ag_on, Infil_ag)
-      USE PRMS_CONSTANTS, ONLY: ZERO_SNOWPACK, LAND, ACTIVE, CASCADE_OFF, OFF
+      USE PRMS_CONSTANTS, ONLY: LAND, ACTIVE, CASCADE_OFF, OFF
       USE PRMS_MODULE, ONLY: Cascade_flag
       USE PRMS_SRUNOFF, ONLY: Upslope_hortonian, Ihru, Srp, Sra, Sroff_ag
+      USE PRMS_BASIN, ONLY: Snowpack_threshold
       USE PRMS_FLOWVARS, ONLY: Pptmix_nopack
       IMPLICIT NONE
 ! Arguments
@@ -1189,7 +1191,7 @@
         IF ( Perv_on==ACTIVE ) Infil = Infil + avail_water
         IF ( Ag_on==ACTIVE ) Infil_ag = Infil_ag + avail_water
         IF ( hru_flag==1 ) THEN
-          IF ( Pkwater_equiv>0.0D0 .OR. .not.(Net_ppt-Net_snow>0.0) ) THEN
+          IF ( Pkwater_equiv>Snowpack_threshold(Ihru) .OR. .not.(Net_ppt-Net_snow>0.0) ) THEN
 !******Pervious area computations
             IF ( Perv_on==ACTIVE ) CALL check_capacity(Snowinfil_max, Infil)
 !******agriculture area computations
@@ -1205,7 +1207,7 @@
 !******There was no snowmelt but a snowpack may exist.  If there is
 !******no snowpack then check for rain on a snowfree HRU.
 
-      ELSEIF ( Pkwater_equiv<ZERO_SNOWPACK ) THEN
+      ELSEIF ( Pkwater_equiv<Snowpack_threshold(Ihru) ) THEN
 
 !       If no snowmelt and no snowpack but there was net snow then
 !       snowpack was small and was lost to sublimation.
@@ -1615,14 +1617,14 @@
       IF ( Ag_package==ACTIVE ) inflow = inflow + Dprst_ag_gain(Ihru) ! gain in acre-inches
 
       IF ( Dprst_area_open_max>0.0 ) THEN
-        Dprst_in = DBLE( inflow*Dprst_area_open_max ) ! inch-acres
+        Dprst_in = DBLE( inflow*Dprst_area_open_max ) ! acre-inches
         Dprst_vol_open = Dprst_vol_open + Dprst_in
       ENDIF
       open_in = Dprst_in
 
       clos_in = 0.0D0
       IF ( Dprst_area_clos_max>0.0 ) THEN
-        tmp1 = DBLE( inflow*Dprst_area_clos_max ) ! inch-acres
+        tmp1 = DBLE( inflow*Dprst_area_clos_max ) ! acre-inches
         clos_in = tmp1
         Dprst_vol_clos = Dprst_vol_clos + tmp1
         Dprst_in = Dprst_in + tmp1

@@ -4,6 +4,7 @@
 ! to advance or retreat according to Bahr(1997) volume-area scaling.
 ! This theory has been advanced according to Arendt and others(2006) for
 ! the scaling constants and Luthi(2009) to get a glacier height at ELA.
+! height, ELA height, etc-- because this more complex theory exists
 ! Firn layer can shrink or grow, de Woul(2006) says that the changing
 ! area of the firn highly affects the timing of the peak flows. ELA
 ! postion is found from the AAR0 ratios in Kern and Laszlo(2010).
@@ -46,6 +47,7 @@
 ! different glacier.
 !
 ! modified June 2012 by Steve Regan
+! modified July 2012 by AE Van Beusekom
 ! modified Jan 2015 by AE Van Beusekom
 ! modified Jan 2017 by AE Van Beusekom
 ! modified January 2024 by Steve Regan
@@ -66,10 +68,13 @@
 !#of cells=Nhrugl,#of streams=Ntp,#of cells/stream<=Ntp, #of glaciers<=Nhru
       INTEGER, SAVE :: Nglres, Ngl, Ntp, Nhrugl, MbInit_flag, Output_unit, Fraw_unit, All_unit
       INTEGER, SAVE :: Seven, Four, Glac_HRUnum_down
-      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Hru_area_inch2(:), Gl_mbc_yrend(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Gl_mbc_yrend(:)
+      REAL, SAVE, ALLOCATABLE :: Hru_area_inch2(:)
       REAL, PARAMETER :: Gravity = 9.8 ! m/s2
+!      REAL, PARAMETER :: Viscosity = 2.0E12 ! Pa s=kg/m/s
       REAL, PARAMETER :: Aflow = 1.e-25 ! Pa^-3/s, Farinotti 2009 could be 2.4e-24, could be 1e-26 see Patterson 2010
       REAL, PARAMETER :: Density = 917.0 ! kg/m3
+!      REAL, PARAMETER :: Gamma = 1.375 ! from Arendt et al 2006
       DOUBLE PRECISION, PARAMETER :: Acre_inch2 = 43560.0D0*12.0D0*12.0D0
 
       !****************************************************************
@@ -456,7 +461,7 @@
       IMPLICIT NONE
 ! Functions
       INTEGER, EXTERNAL :: compute_ela_aar
-      INTRINSIC :: ABS, SQRT, REAL
+      INTRINSIC :: ABS, SQRT, FLOAT, SNGL
       EXTERNAL :: tag_count, sort5, glacr_restart
 ! Local Variables
       INTEGER :: i, j, ii, jj, o, p, hru_flowline(Nhru), toflowline(Nhru), doela, termh, len_str
@@ -582,8 +587,8 @@
           j = Hru_route_order(jj)
           IF ( Hru_type(j)==GLACIER ) THEN
             Nhrugl = Nhrugl + 1
-            cell_idm(Nhrugl) = REAL(j)
-            str_idm(Nhrugl) = REAL(hru_flowline(j))
+            cell_idm(Nhrugl) = FLOAT(j)
+            str_idm(Nhrugl) = FLOAT(hru_flowline(j))
             uraw0(Nhrugl) = Hru_elev_meters(j) !inital Hru_elev in meters
             xraw0(Nhrugl) = hru_dcum(j) - Hru_length(j)*0.5 !in km, put it at middle
             hrawt(Nhrugl) = Hru_width(j) !in km
@@ -602,8 +607,8 @@
               ie(j) = jj - 1  !end of string
               DO i = is(j), ie(j) !divide up
                 ra(i-is(j)+1) = xraw0(i)
-                rb(i-is(j)+1) = REAL(str_idm(i))
-                rc(i-is(j)+1) = REAL(cell_idm(i))
+                rb(i-is(j)+1) = str_idm(i)
+                rc(i-is(j)+1) = cell_idm(i)
                 rd(i-is(j)+1) = uraw0(i)
                 re(i-is(j)+1) = hrawt(i)
               ENDDO
@@ -628,8 +633,8 @@
         ie(Ntp) = Nhrugl
         DO i = is(Ntp), ie(Ntp) !divide up
           ra(i-is(Ntp)+1) = xraw0(i)
-          rb(i-is(Ntp)+1) = REAL(str_idm(i))
-          rc(i-is(Ntp)+1) = REAL(cell_idm(i))
+          rb(i-is(Ntp)+1) = str_idm(i)
+          rc(i-is(Ntp)+1) = cell_idm(i)
           rd(i-is(Ntp)+1) = uraw0(i)
           re(i-is(Ntp)+1) = hrawt(i)
         ENDDO
@@ -663,6 +668,10 @@
           DO j = 1, Ntp
             IF ( i>=is(j) .AND. i<=ie(j) ) THEN
               ll(j) = xrawterm(j)*divu  ! in m
+!              kk(j) = ((divu*Viscosity/ll(j))/(((Density*Gravity)**nn) &
+!                      *(ll(j)**(nn+1))))**(1.0/(2.0*nn+2))
+!             kk(j)=1.0E-2
+! kk is generalized coefficient of sliding- don't know if correct
               xrawt(i) = xraw0(i)*divu/ll(j)
               urawt(i) = uraw0(i)/divu-urawterm(j) !in km
             ENDIF
@@ -715,7 +724,7 @@
         glacier_frac_use = 0.0
         DO jj = 1, Active_hrus
           j = Hru_route_order(jj)
-          Hru_area_inch2(j) = Hru_area_dble(j)*Acre_inch2
+          Hru_area_inch2(j) = SNGL( Hru_area_dble(j)*Acre_inch2 )
           IF ( Hru_type(j)==GLACIER ) THEN
             glacier_frac_use(j)= Glacier_frac(j)
             !should be end of extensions or branches-- will fail if don't set up with indices stacked
@@ -734,7 +743,7 @@
         add_area = 0.0D0
         DO i = 1, Ntp !do for all glacier capable hrus
         ! will add self and everything above so cumulative area from top of flowline
-          curr_area(Top(i)) = DBLE(Glacier_frac(Top(i)))*Hru_area_inch2(Top(i))
+          curr_area(Top(i)) = DBLE(Glacier_frac(Top(i))*Hru_area_inch2(Top(i)))
           prev = Top(i)
           DO WHILE ( Tohru(prev)>0 )
             IF ( Glacr_tag(Tohru(prev))==Glacr_tag(Top(i)) ) THEN
@@ -742,7 +751,7 @@
             ! and then should go off area of branch
             ! making it so has no connected branches because branching bottom calculations don't work
               IF ( Tohru(prev)==prev-1 ) THEN
-                curr_area(Tohru(prev)) = DBLE(Glacier_frac(Tohru(prev)))*Hru_area_inch2(Tohru(prev)) &
+                curr_area(Tohru(prev)) = DBLE(Glacier_frac(Tohru(prev))*Hru_area_inch2(Tohru(prev))) &
        &                                 + curr_area(prev)
                 prev = Tohru(prev)
               ELSE !a branch join
@@ -782,7 +791,7 @@
         ENDDO
         DO i = 1, Active_hrus
           j = Hru_route_order(i)
-          IF ( Hru_type(j)==LAND ) Basin_gl_area = Basin_gl_area + DBLE(Glrette_frac(j))*Hru_area_inch2(j)
+          IF ( Hru_type(j)==LAND ) Basin_gl_area = Basin_gl_area + DBLE(Glrette_frac(j)*Hru_area_inch2(j))
         ENDDO
   !
         doela = compute_ela_aar() !no previous years MB, get ELA from AAR ratio, need Prev_area
@@ -1097,7 +1106,7 @@
             add_area = 0.0D0
             DO i = 1, Ntp !do for all glacier capable hrus
             ! will add self and everything above so cumulative area from top of flowline
-              curr_area(Top(i)) = DBLE(Glacier_frac(Top(i)))*Hru_area_inch2(Top(i))
+              curr_area(Top(i)) = DBLE(Glacier_frac(Top(i))*Hru_area_inch2(Top(i)))
               prev = Top(i)
               DO WHILE ( Tohru(prev)>0 )
                 IF ( Glacr_tag(Tohru(prev))==Glacr_tag(Top(i)) ) THEN
@@ -1105,7 +1114,7 @@
                 ! and then should go off area of branch
                 ! making it so has no connected branches because branching bottom calculations don't work
                   IF ( Tohru(prev)==prev-1 ) THEN
-                    curr_area(Tohru(prev)) = DBLE(Glacier_frac(Tohru(prev)))*Hru_area_inch2(Tohru(prev)) &
+                    curr_area(Tohru(prev)) = DBLE(Glacier_frac(Tohru(prev))*Hru_area_inch2(Tohru(prev))) &
        &                                 + curr_area(prev)
                     prev = Tohru(prev)
                   ELSE !a branch join
@@ -1147,11 +1156,11 @@
 !
 ! Do retreat/advance on whole glacier at end of year
 ! last year's area/volume is previous area
-          Prev_area = 0.D0
+          Prev_area = 0.0D0
           add_area = 0.0D0
           DO i = 1, Ntp !do for all glacier capable hrus
           ! will add self and everything above so cumulative area from top of flowline
-            Prev_area(Top(i)) = DBLE(Glacier_frac(Top(i)))*Hru_area_inch2(Top(i))
+            Prev_area(Top(i)) = DBLE(Glacier_frac(Top(i))*Hru_area_inch2(Top(i)))
             prev = Top(i)
             DO WHILE ( Tohru(prev)>0 )
               IF ( Glacr_tag(Tohru(prev))==Glacr_tag(Top(i)) ) THEN
@@ -1159,7 +1168,7 @@
               ! and then should go off area of branch
               ! making it so has no connected branches because branching bottom calculations don't work
                 IF ( Tohru(prev)==prev-1 ) THEN
-                  Prev_area(Tohru(prev)) = DBLE(Glacier_frac(Tohru(prev)))*Hru_area_inch2(Tohru(prev)) &
+                  Prev_area(Tohru(prev)) = DBLE(Glacier_frac(Tohru(prev))*Hru_area_inch2(Tohru(prev))) &
        &                                 + Prev_area(prev)
                   prev = Tohru(prev)
                 ELSE !a branch join
@@ -1194,7 +1203,7 @@
             IF ( Prev_vol(p)+Delta_volyr(p)<DNEARZERO ) THEN !lost whole glacier
               delta_areayr(o) = -Prev_area(Term(o))
             ELSEIF ( Delta_volyr(p)/=0.0D0 ) THEN
-              delta_areayr(o) = ((Prev_vol(p)+Delta_volyr(p))/DBLE(ca))**(1.D0/DBLE(Glacrva_exp(Term(o)))) - Prev_area(Term(o))
+              delta_areayr(o) = ((Prev_vol(p)+Delta_volyr(p))/DBLE(ca**(1.0/Glacrva_exp(Term(o))))) - Prev_area(Term(o))
             ELSEIF ( ABS(Delta_volyr(p))<DNEARZERO ) THEN
               delta_areayr(o) = 0.0D0
             ENDIF
@@ -1210,14 +1219,14 @@
 ! in advancing glacier, get rid of total snow till furthest possible
 !  terminus of glacier (not letting the glaciers combine) THIS WILL BE DICTATED BY THE HRU MAP
               glacrold = Glacier_frac(curr)
-              Glacier_frac(curr) = (Glacier_frac(curr)*SNGL(Hru_area_inch2(curr))+remain) &
-     &                         /SNGL(Hru_area_inch2(curr)) !all in inches
+              Glacier_frac(curr) = (Glacier_frac(curr)*Hru_area_inch2(curr)+remain) &
+     &                         /Hru_area_inch2(curr) !all in inches
               IF ( Glacier_frac(curr)>1.0 ) THEN !glacier can't be more than full, look for next to advance in to
                 Glacier_frac(curr) = 1.0
                 next = Tohru(curr) !find next to expand in to, could be another glacier then will go to its terminus
                 IF ( next==0 ) THEN
                   ! can't advance anymore
-                  remain = remain - (1.0-glacrold)*SNGL(Hru_area_inch2(curr))
+                  remain = remain - (1.0-glacrold)*Hru_area_inch2(curr)
                   IF ( remain/Hru_area_inch2(curr)<=NEARZERO ) remain = 0.0
                   extra_vol = Prev_vol(Term(o)) + Delta_volyr(p) - &
      &              DBLE(ca)*(Prev_area(Term(o))+delta_areayr(o)-DBLE(remain))**DBLE(Glacrva_exp(Term(o)))
@@ -1225,7 +1234,7 @@
                   EXIT
                 ENDIF
               ENDIF
-              remain = remain - (Glacier_frac(curr)-glacrold)*SNGL(Hru_area_inch2(curr))
+              remain = remain - (Glacier_frac(curr)-glacrold)*Hru_area_inch2(curr)
               IF ( remain/Hru_area_inch2(curr)<=NEARZERO ) THEN !limit of accuracy for reals
                 remain = 0.0
               ENDIF
@@ -1257,11 +1266,11 @@
                 IF ( lowpt(o)==oldlow ) EXIT !got to end of glacier since terminus is also top of glacier, so all gone
               ENDIF
               glacrold = Glacier_frac(lowpt(o))
-              Glacier_frac(lowpt(o)) = (glacrold*SNGL(Hru_area_inch2(lowpt(o)))+remain) &
-     &                              /SNGL(Hru_area_inch2(lowpt(o)))
+              Glacier_frac(lowpt(o)) = (glacrold*Hru_area_inch2(lowpt(o))+remain) &
+     &                              /Hru_area_inch2(lowpt(o))
               IF ( Glacier_frac(lowpt(o))<NEARZERO ) Glacier_frac(lowpt(o)) = 0.0
               !glacier is gone in this hru, look for next glacier-full hru
-              remain = remain + (glacrold-Glacier_frac(lowpt(o)))*SNGL(Hru_area_inch2(lowpt(o)))
+              remain = remain + (glacrold-Glacier_frac(lowpt(o)))*Hru_area_inch2(lowpt(o))
               IF ( remain/Hru_area_inch2(lowpt(o))>-NEARZERO ) THEN !limit of accuracy for reals
                 remain = 0.0
               ENDIF
@@ -1286,8 +1295,8 @@
           add_areap = 0.0D0
           DO i = 1, Ntp !do for all glacier capable hrus
           ! will add self and everything above so cumulative area from top of flowline
-            curr_area(Top(i)) = DBLE(Glacier_frac(Top(i)))*Hru_area_inch2(Top(i))
-            curr_areap(Top(i)) = DBLE(glacier_fracp(Top(i)))*Hru_area_inch2(Top(i))
+            curr_area(Top(i)) = DBLE(Glacier_frac(Top(i))*Hru_area_inch2(Top(i)))
+            curr_areap(Top(i)) = DBLE(glacier_fracp(Top(i))*Hru_area_inch2(Top(i)))
             prev = Top(i)
             DO WHILE ( Tohru(prev)>0 )
               IF ( Glacr_tag(Tohru(prev))==Glacr_tag(Top(i)) ) THEN
@@ -1295,9 +1304,9 @@
               ! and then should go off area of branch
               ! making it so has no connected branches because branching bottom calculations don't work
                 IF ( Tohru(prev)==prev-1 ) THEN
-                  curr_area(Tohru(prev)) = DBLE(Glacier_frac(Tohru(prev)))*Hru_area_inch2(Tohru(prev)) &
+                  curr_area(Tohru(prev)) = DBLE(Glacier_frac(Tohru(prev))*Hru_area_inch2(Tohru(prev))) &
        &                                 + curr_area(prev)
-                  curr_areap(Tohru(prev)) = DBLE(glacier_fracp(Tohru(prev)))*Hru_area_inch2(Tohru(prev)) &
+                  curr_areap(Tohru(prev)) = DBLE(glacier_fracp(Tohru(prev))*Hru_area_inch2(Tohru(prev))) &
        &                                 + curr_areap(prev)
                   prev = Tohru(prev)
                 ELSE !a branch join
@@ -1389,7 +1398,7 @@
           ENDIF
           DO i = 1, Active_hrus !every year
             j = Hru_route_order(i)
-            Basin_gl_area = Basin_gl_area + DBLE(Glrette_frac(j))*Hru_area_inch2(j) !keep in inches
+            Basin_gl_area = Basin_gl_area + DBLE(Glrette_frac(j)*Hru_area_inch2(j)) !keep in inches
           ENDDO
         ENDIF
 
@@ -1417,7 +1426,7 @@
             gl_total(j) = -Hru_glres_melt(j) + gl_gain(j)
             !this is daily mass balance on glacier part of HRU in inches, divide by glacier_frac so averaged over glaciated part of HRU only
             Hru_mb_yrcumul(j) = Hru_mb_yrcumul(j) + gl_total(j)/DBLE(Glacier_frac(j))
-            Basin_gl_top_gain = Basin_gl_top_gain + gl_gain(j)*Hru_area_inch2(j)
+            Basin_gl_top_gain = Basin_gl_top_gain + gl_gain(j)*DBLE( Hru_area_inch2(j) )
             !postive indicates snow, negative indicates melt
           ENDIF
         ENDIF
@@ -1522,14 +1531,14 @@
      &                  (Top_tag(j)==Top_tag(stact_hrus) .OR.           &
      &                  (Top_tag(j)==-1.AND.count_delta(j)==0)) ) THEN
                     count_delta(j) = 1
-                    volresv = DBLE(Hru_glres_melt(j))*Hru_area_inch2(j)
+                    volresv = DBLE(Hru_glres_melt(j)*Hru_area_inch2(j))
                     IF ( volresv>DNEARZERO ) in_top_melt(jj, ii) = in_top_melt(jj, ii)+ volresv
                     ! all excess rain is included in melt, rain on ice goes into reservoirs
                     ! should be true unless Glacrmelt==0
                     IF ( Glacrmelt(j)-Net_rain(j)*Glacier_frac(j)>NEARZERO ) &
-     &                     volresv_ice =  DBLE(Glacrmelt(j)-Net_rain(j)*Glacier_frac(j))*Hru_area_inch2(j)
+     &                     volresv_ice =  DBLE(Glacrmelt(j)-Net_rain(j)*Glacier_frac(j)*Hru_area_inch2(j))
                     IF ( volresv_ice>DNEARZERO ) in_top_melt_ice(jj, ii) = in_top_melt_ice(jj, ii)+ volresv_ice
-                    delta_vol(o) = delta_vol(o) + gl_total(j)*Hru_area_inch2(j)/0.917D0
+                    delta_vol(o) = delta_vol(o) + gl_total(j)*DBLE( Hru_area_inch2(j)/0.917 )
                     ! divide by density ratio to get in volume, if were all converted to ice (by end of year)
                   ENDIF
                 ENDIF
@@ -1586,11 +1595,11 @@
               IF ( Hru_type(i)==GLACIER ) THEN !find a i in glacier
                 IF ( Glacr_tag(i)==Glacr_tag(j) .AND. Hru_elev_ts(i)>=Hru_elev_ts(j) ) THEN
                 !will add self (i=j) and everything above
-                  tot_delta_mb(j) = tot_delta_mb(j) + Hru_mb_yrcumul(i)*DBLE(Glacier_frac(i))*Hru_area_inch2(i)
+                  tot_delta_mb(j) = tot_delta_mb(j) + Hru_mb_yrcumul(i)*DBLE(Glacier_frac(i)*Hru_area_inch2(i))
                 ENDIF
               ENDIF
             ENDDO
-            Basin_snowicecov = Basin_snowicecov + DBLE(( 1.-Snowcov_area(j) )*Glacier_frac(j))*Hru_area_inch2(j)
+            Basin_snowicecov = Basin_snowicecov + DBLE(( 1.-Snowcov_area(j) )*Glacier_frac(j)*Hru_area_inch2(j))
           ENDIF
         ENDDO
         DO o = 1, Ngl
@@ -1606,11 +1615,11 @@
           IF ( Hru_type(j)==LAND .AND. Glrette_frac(j)>NEARZERO) THEN
             ! all excess rain is included in melt, should be true unless Glacrmelt==0
             IF ( Glacrmelt(j)-Net_rain(j)*Glrette_frac(j)>NEARZERO ) &
-     &        Basin_gl_ice_melt = Basin_gl_ice_melt + DBLE(Glacrmelt(j)-Net_rain(j)*Glrette_frac(j))*Hru_area_inch2(j)
-            Basin_gl_top_melt = Basin_gl_top_melt + DBLE(Glrette_melt(j))*Hru_area_inch2(j)
-            Basin_gl_top_gain = Basin_gl_top_gain + DBLE(gl_gain(j))*Hru_area_inch2(j)
-            Basin_snowicecov = Basin_snowicecov + DBLE(( 1.-Snowcov_area(j) )*Glrette_frac(j))*Hru_area_inch2(j)
-            Glacr_flow(j) = Glrette_melt(j)*SNGL(Hru_area_inch2(j))
+     &        Basin_gl_ice_melt = Basin_gl_ice_melt + DBLE(Glacrmelt(j)-Net_rain(j)*Glrette_frac(j)*Hru_area_inch2(j))
+            Basin_gl_top_melt = Basin_gl_top_melt + DBLE(Glrette_melt(j)*Hru_area_inch2(j))
+            Basin_gl_top_gain = Basin_gl_top_gain + gl_gain(j)*DBLE(Hru_area_inch2(j))
+            Basin_snowicecov = Basin_snowicecov + DBLE(( 1.-Snowcov_area(j) )*Glrette_frac(j)*Hru_area_inch2(j))
+            Glacr_flow(j) = Glrette_melt(j)*Hru_area_inch2(j)
           ENDIF
         ENDDO
       ENDIF
@@ -1716,9 +1725,9 @@
 
       DO o = 1, Ngl
         p = Glacr_tag(Term(o)) !index by Glacr_tag
-        IF ( Prev_area(Term(o))<DBLE(1.0*Convert_units) ) aar = 0.44
+        IF ( SNGL(Prev_area(Term(o)))<1.0*Convert_units ) aar = 0.44
         !for glaciers area <1km^2
-        IF ( Prev_area(Term(o))>=DBLE(4.0*Convert_units) ) aar = 0.64
+        IF ( SNGL(Prev_area(Term(o)))>=4.0*Convert_units ) aar = 0.64
         !for glaciers area >4km^2
         elaarea = SNGL(Prev_area(Term(o)))*aar
 !aar is percentage of area from top down, from Kern and Laszlo 2010
@@ -1775,7 +1784,6 @@
       INTEGER :: n, nn
 !***********************************************************************
       recompute_soltab = 0
-!   Module Variables
       DO nn = 1, Active_hrus
         n = Hru_route_order(nn)
         IF ( Hru_type(n)==GLACIER ) THEN !only call if glacier HRU and could have changed
@@ -2284,6 +2292,14 @@
 ! We know H(x)-- solved for it, rearrange: P(x)=H(x)/dflow^R(x)
 ! Cross section area S(x) by integrating H(x,d) over depth from 0 to dmax=dflow
 ! S(x)=(1/(R(x)+1))*P(x)*dflow^(R(x)+1)
+!Also, in steady state, so vol==area^(1.375) dimensionless (constant =1
+! for steady state).In unsteady state = (1+cM)*area^(1.375)
+! where vol_us==vol_s + int(H(x)*c)dx = area^(1.375)+cM*area^(1.375)
+! and cM= yz-u
+!Vol also =S(x) integrated over x
+!Equate volume expressions and sub in R expression for P, solve for R
+!==> (1+cM)area^(1.375)=int((2/3)*H(x)*dflow-(1/6)*R(x)*dflow^2)dx
+!==> 6*(1+cM)(-area^(1.375)+int((2/3)*H(x)*dflow)dx)=int(R(x)*dflow^2)dx
 !
       DO i = 1, Ntp
         DO j = 1, Ntp
