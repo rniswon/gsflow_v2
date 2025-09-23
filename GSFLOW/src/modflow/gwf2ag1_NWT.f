@@ -3463,6 +3463,11 @@
 !        tot4= DZERO
 !        tot5=DZERO
         iseg = IRRSEG(i)
+! added this code to allow irrigation to be applied independent of demand
+        if ( IRRPERIODSEG(iseg) > 0 ) then
+          SEG(2, iseg) = demand(ISEG)
+          go to 300
+        end if
 !        IF (DEMAND(iseg) < zerod7) goto 300
         !
         !1 - -----loop over hrus irrigated by diversion
