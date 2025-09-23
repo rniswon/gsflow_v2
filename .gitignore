@@ -2,3 +2,5 @@ GSFLOW/bin/gsflow.exe
 *.mod
 *.o
 *.a
+gsflow_develop/gsflow_modsim.u2d
+gsflow_develop/run_modsim_gsflow_exe.txt
