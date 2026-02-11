@@ -866,7 +866,7 @@
      +                //' SFR2 or PRMS must be active for this option')
             END IF
             WRITE (IOUT, *)
-            WRITE (IOUT, 35) NUMIRRDIVERSION
+            WRITE (IOUT, 35) MAXCELLSDIVERSION
             WRITE (IOUT, *)
             found = .true.
          case ('ETDEMAND')
@@ -1004,7 +1004,7 @@
      +      I10,' CELLS/RHUS.')
 35    FORMAT(1X, 'OPTION TO APPLY SURFACE WATER AS IRRIGATION IS ',
      +      'ACTIVE.'
-     +  , ' DIVERTED SURFACE WATER WILL BE APPLIED TO ', I10, 
+     +  , ' DIVERTED SURFACE WATER WILL BE APPLIED USING ', I10, 
      +    ' CELLS/RHUS.')
 36    FORMAT(1X, 'THE MAXIMUM NUMBER OF WELLS FOR SUPPLEMENTING'
      +  , ' DIVERSIONS OR APPLYING IRRIGATION IS ', I10, ' WELLS.')
@@ -3463,6 +3463,11 @@
 !        tot4= DZERO
 !        tot5=DZERO
         iseg = IRRSEG(i)
+! added this code to allow irrigation to be applied independent of demand
+        if ( IRRPERIODSEG(iseg) > 0 ) then
+          SEG(2, iseg) = demand(ISEG)
+          go to 300
+        end if
 !        IF (DEMAND(iseg) < zerod7) goto 300
         !
         !1 - -----loop over hrus irrigated by diversion
