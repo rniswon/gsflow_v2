@@ -4,3 +4,6 @@ GSFLOW/bin/gsflow.exe
 *.a
 gsflow_develop/gsflow_modsim.u2d
 gsflow_develop/run_modsim_gsflow_exe.txt
+GSFLOW/data/Ag_EP2a/output
+gsflow_develop/.vs/*
+gsflow_develop/gsflow_develop/gsflow/x64/*
