@@ -33,10 +33,9 @@
       USE PRMS_FLOWVARS, ONLY: Basin_soil_moist, Basin_ssstor, Basin_soil_to_gw, &
      &    Basin_lakeevap, Basin_perv_et, Basin_actet, Basin_lake_stor, &
      &    Basin_gwflow_cfs, Basin_sroff_cfs, Basin_ssflow_cfs, Basin_cfs, Basin_stflow_in, &
-     &    Basin_stflow_out, Seg_outflow, Basin_pweqv
+     &    Basin_stflow_out, Seg_outflow, Basin_pweqv, Basin_snowevap, Basin_snowmelt, Basin_snowcov, Basin_pk_precip
       USE PRMS_OBS, ONLY: Streamflow_cfs
       USE PRMS_INTCP, ONLY: Basin_intcp_evap, Basin_intcp_stor
-      USE PRMS_SNOW, ONLY: Basin_snowevap, Basin_snowmelt, Basin_snowcov, Basin_pk_precip
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_stor, Basin_dprst_evap, Basin_imperv_evap, Basin_dprst_seep, &
      &    Basin_dprst_volop, Basin_dprst_volcl, Basin_hortonian
       USE PRMS_SOILZONE, ONLY: Basin_capwaterin, Basin_pref_flow_infil, Basin_prefflow, Basin_recharge, Basin_slowflow, &
@@ -126,7 +125,7 @@
      &       'Basin area-weighted average storage in all water storage reservoirs', &
      &       'inches', Basin_total_storage)
         CALL declvar_dble(MODNAME, 'basin_surface_storage', 'one', 1, &
-     &       'Basin area-weighted average storage in all surface water storage reservoirs', &
+     &       'Basin area-weighted average storage in all above soil water storage reservoirs', &
      &       'inches', Basin_surface_storage)
 
         IF ( Npoigages>0 ) THEN

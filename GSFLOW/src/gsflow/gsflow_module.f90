@@ -8,19 +8,19 @@
      &          EQULS = '=========================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 03/01/2025'
-      character(len=*), parameter :: PRMS_versn = '2025-02-01'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 6.0.0 02/01/2025'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 03/30/2026'
+      character(len=*), parameter :: PRMS_versn = '2026-03-30'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 6.1.0 03/30/2026'
       character(len=*), parameter :: githash = 'Github Commit Hash 25f61fe10733e5ba1ddac095e8546342764675cf'
       character(len=*), parameter :: Version_read_control_file = '2025-01-16'
-      character(len=*), parameter :: Version_read_parameter_file = '2024-11-25'
+      character(len=*), parameter :: Version_read_parameter_file = '2025-09-01'
       character(len=*), parameter :: Version_read_data_file = '2023-06-02'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw, Ncbh
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus, Nmonths
       INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval, Nmap2hru, Nmap, Nsnow
-      INTEGER, SAVE :: NLAKES_MF, Nreach
+      INTEGER, SAVE :: NLAKES_MF, Nreach, Nlakeelev, Nwind, Nhumid, Nstreamtemp
 ! Global
       ! Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 3=MODSIM-PRMS; 4=MODSIM-PRMS-LOOSE; 10=MODSIM-GSFLOW; 12=MODSIM-MODFLOW; 13=MODSIM)
       INTEGER, SAVE :: Model, Process_flag, Call_cascade
@@ -82,7 +82,7 @@
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: irrigated_area_module, AET_module, PET_ag_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
       INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF
-      INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag
+      INTEGER, SAVE :: Dyn_snareathresh_flag
       INTEGER, SAVE :: Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, Dyn_springfrost_flag
       INTEGER, SAVE :: Gwr_transferON_OFF, External_transferON_OFF, Segment_transferON_OFF, Lake_transferON_OFF
       INTEGER, SAVE :: Gsf_rpt, Rpt_days

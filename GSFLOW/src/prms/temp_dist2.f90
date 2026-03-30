@@ -318,7 +318,7 @@
 !                  available period of record
 !***********************************************************************
       INTEGER FUNCTION t2dist2run()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, DNEARZERO, MAXTEMP, MINTEMP, ERROR_data, GLACIER
+      USE PRMS_CONSTANTS, ONLY: DNEARZERO, MAXTEMP, MINTEMP, ERROR_data, GLACIER
       USE PRMS_MODULE, ONLY: Ntemp, Glacier_flag, Nowmonth, Hru_type
       USE PRMS_TEMP_DIST2
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv, Hru_elev_ts

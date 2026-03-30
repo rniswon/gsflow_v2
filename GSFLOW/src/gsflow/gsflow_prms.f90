@@ -11,7 +11,7 @@
 
       !DEC$ ATTRIBUTES DLLEXPORT :: gsflow_prms
       USE PRMS_CONSTANTS, ONLY: ERROR_control, CANOPY
-      use PRMS_CONTROL_FILE, only: read_control_file
+      use PRMS_CONTROL_FILE, only: read_control_file, control_integer
       use PRMS_DATA_FILE, only: read_prms_data_file
       use PRMS_MMFAPI, only: Num_variables, Variable_data, MAXVARIABLES, declvar_int, declvar_real
       USE PRMS_MODULE
@@ -146,7 +146,7 @@
         IF ( Print_debug>DEBUG_minimum ) THEN
           IF ( Print_debug>DEBUG_less ) THEN
             PRINT 15
-            WRITE (*,'(A)') githash
+            WRITE (*,'(4X,A)') githash
           ENDIF
           WRITE ( PRMS_output_unit, 15 )
           WRITE ( PRMS_output_unit, '(A)' ) githash
@@ -1032,6 +1032,12 @@
       ! 0 = off, 1 = on, 2 = lauren version, 3 = CSV for POIs
       IF ( control_integer(CsvON_OFF, 'csvON_OFF')/=0 ) CsvON_OFF = OFF
 
+      IF ( decldim('nlakeelev', 0, MAXDIM, &
+     &     'Maximum number of lake elevations for any rating table data set')/=0 ) CALL read_error(7, 'nlakeelev')
+      IF ( decldim('nwind', 0, MAXDIM, 'Number of wind-speed measurement stations')/=0 ) CALL read_error(7, 'nwind')
+      IF ( decldim('nhumid', 0, MAXDIM, 'Number of relative humidity measurement stations')/=0 ) CALL read_error(7, 'nhumid')
+      IF ( decldim('nstreamtemp', 0, MAXDIM, 'Number of stream temperature replacement segments')/=0 ) &
+     &     CALL read_error(7, 'nstreamtemp')
 ! map results dimensions
       IF ( control_integer(MapOutON_OFF, 'mapOutON_OFF')/=0 ) MapOutON_OFF = OFF
       idim = 0
@@ -1065,7 +1071,6 @@
       IF ( control_integer(Dyn_fallfrost_flag, 'dyn_fallfrost_flag')/=0 ) Dyn_fallfrost_flag = OFF
       IF ( control_integer(Dyn_springfrost_flag, 'dyn_springfrost_flag')/=0 ) Dyn_springfrost_flag = OFF
       IF ( control_integer(Dyn_snareathresh_flag, 'dyn_snareathresh_flag')/=0 ) Dyn_snareathresh_flag = OFF
-      IF ( control_integer(Dyn_transp_on_flag, 'dyn_transp_on_flag')/=0 ) Dyn_transp_on_flag = OFF
       IF ( control_integer(Dyn_ag_frac_flag, 'dyn_ag_frac_flag')/=0 ) Dyn_ag_frac_flag = OFF
       IF ( control_integer(Dyn_ag_soil_flag, 'dyn_ag_soil_flag')/=0 ) Dyn_ag_soil_flag = OFF
       Dynamic_flag = OFF
@@ -1073,8 +1078,7 @@
       IF ( Dyn_intcp_flag/=OFF .OR. Dyn_covden_flag/=OFF .OR. &
      &     Dyn_potet_flag/=OFF .OR. Dyn_covtype_flag/=OFF .OR. Dyn_transp_flag/=OFF .OR. &
      &     Dyn_radtrncf_flag/=OFF .OR. Dyn_sro2dprst_perv_flag/=OFF .OR. Dyn_sro2dprst_imperv_flag/=OFF .OR. &
-     &     Dyn_fallfrost_flag/=OFF .OR. Dyn_springfrost_flag/=OFF .OR. Dyn_snareathresh_flag/=OFF .OR. &
-     &     Dyn_transp_on_flag/=OFF ) Dynamic_flag = ACTIVE
+     &     Dyn_fallfrost_flag/=OFF .OR. Dyn_springfrost_flag/=OFF .OR. Dyn_snareathresh_flag/=OFF ) Dynamic_flag = ACTIVE
       IF ( Dyn_imperv_flag/=OFF .OR. Dyn_dprst_flag/=OFF .OR. Dyn_soil_flag/=OFF .OR. &
      &     Dyn_ag_frac_flag==ACTIVE .OR. Dyn_ag_soil_flag==ACTIVE ) Dynamic_soil_flag = ACTIVE
       IF ( control_integer(Gwr_transferON_OFF, 'gwr_transferON_OFF')/=0) Gwr_transferON_OFF = OFF
@@ -1082,6 +1086,11 @@
       IF ( control_integer(Dprst_transferON_OFF, 'dprst_transferON_OFF')/=0 ) Dprst_transferON_OFF = OFF
       IF ( control_integer(Segment_transferON_OFF, 'segment_transferON_OFF')/=0 ) Segment_transferON_OFF = OFF
       IF ( control_integer(Lake_transferON_OFF, 'lake_transferON_OFF')/=0 ) Lake_transferON_OFF = OFF
+      IF ( GSFLOW_flag==ACTIVE ) THEN
+          Segment_transferON_OFF = OFF
+          Lake_transferON_OFF = OFF
+          Gwr_transferON_OFF = OFF
+      ENDIF
       IF ( control_integer(Gwr_swale_flag, 'gwr_swale_flag')/=0 ) Gwr_swale_flag = OFF
       IF ( control_integer(Gsf_rpt, 'gsf_rpt')/=0 ) CALL read_error(5, 'gsf_rpt')
       IF ( control_integer(Rpt_days, 'rpt_days')/=0 ) CALL read_error(5, 'rpt_days')
@@ -1288,6 +1297,17 @@
       Nmap = getdim('nmap')
       IF ( Nmap==-1 ) CALL read_error(6, 'nmap')
 
+      Nsnow = getdim('nsnow')
+      IF ( Nsnow==-1 ) CALL read_error(6, 'nsnow')
+      Nhumid = getdim('nhumid')
+      IF ( Nhumid==-1 ) CALL read_error(6, 'nhumid')
+      Nwind = getdim('nwind')
+      IF ( Nwind==-1 ) CALL read_error(6, 'nwind')
+      Nlakeelev = getdim('nlakeelev')
+      IF ( Nlakeelev==-1 ) CALL read_error(6, 'nlakeelev')
+      Nstreamtemp = getdim('nstreamtemp')
+      IF ( Nstreamtemp==-1 ) CALL read_error(6, 'nstreamtemp')
+
       Water_use_flag = OFF
       IF ( Nwateruse>0 ) THEN
         IF ( Segment_transferON_OFF==ACTIVE .OR. Gwr_transferON_OFF==ACTIVE .OR. External_transferON_OFF==ACTIVE .OR. &
@@ -1316,8 +1336,9 @@
       ENDIF
 
       IF ( Nsegment<1 ) THEN
-        IF ( Stream_order_flag==1 .OR. Call_cascade==1 ) THEN
-          PRINT *, 'ERROR, streamflow and cascade routing require nsegment > 0, specified as:', Nsegment
+!        IF ( Stream_order_flag==1 .OR. Call_cascade==1 ) THEN
+        IF ( Stream_order_flag==1 ) THEN ! can cascade without segments
+          PRINT *, 'ERROR, streamflow requires nsegment > 0, specified as:', Nsegment
           Inputerror_flag = 1
         ENDIF
       ENDIF
@@ -1608,6 +1629,9 @@
       ! Local Variables
       INTEGER :: nhru_test, dprst_test, nsegment_test, temp_test, et_test, ierr, time_step, ag_test
       INTEGER :: cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, start_time(6), end_time(6)
+      INTEGER :: ncascade_test, ncascdgw_test, ngwcell_test, nlake_hrus_test, ntemp_test
+      INTEGER :: nrain_test, nsol_test, nobs_test, nevap_test, nsnow_test
+      INTEGER :: nreach_test, nlakeelev_test, nwind_test, nhumid_test, nstreamtemp_test
       CHARACTER(LEN=MAXCONTROL_LENGTH) :: model_test
       CHARACTER(LEN=11) :: module_name
 !***********************************************************************
@@ -1617,11 +1641,15 @@
           WRITE ( Restart_outunit ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
      &            Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode, Ag_flag
           WRITE ( Restart_outunit ) Starttime, Endtime
+          WRITE ( Restart_outunit ) Ncascade, Ncascdgw, Ngwcell, Nlake_hrus, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow
+          WRITE ( Restart_outunit ) Nreach, Nlakeelev, Nwind, Nhumid, Nstreamtemp
         ELSE
           WRITE ( Restart_outunit, * ) MODNAME
           WRITE ( Restart_outunit, * ) Timestep, Nhru, Dprst_flag, Nsegment, Temp_flag, Et_flag, &
                   Cascade_flag, Cascadegw_flag, Nhrucell, Nlake, Transp_flag, Model_mode, Ag_flag
           WRITE ( Restart_outunit, * ) Starttime, Endtime
+          WRITE ( Restart_outunit, * ) Ncascade, Ncascdgw, Ngwcell, Nlake_hrus, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow
+          WRITE ( Restart_outunit, * ) Nreach, Nlakeelev, Nwind, Nhumid, Nstreamtemp
         ENDIF
       ELSE
         ierr = 0
@@ -1631,12 +1659,18 @@
           READ ( Restart_inunit ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
      &           cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test, ag_test
           READ ( Restart_inunit ) start_time, end_time
+          READ ( Restart_outunit ) ncascade_test, ncascdgw_test, ngwcell_test, nlake_hrus_test, &
+                  ntemp_test, nrain_test, nsol_test, nobs_test, nevap_test, nsnow_test
+          READ ( Restart_outunit ) nreach_test, nlakeelev_test, nwind_test, nhumid_test, nstreamtemp_test
         ELSE
           READ ( Restart_inunit, * ) module_name
           CALL check_restart(MODNAME, module_name)
           READ ( Restart_inunit, * ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
                  cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test, ag_test
           READ ( Restart_inunit, * ) start_time, end_time
+          READ ( Restart_outunit, * ) ncascade_test, ncascdgw_test, ngwcell_test, nlake_hrus_test, &
+                 ntemp_test, nrain_test, nsol_test, nobs_test, nevap_test, nsnow_test
+          READ ( Restart_outunit, * ) nreach_test, nlakeelev_test, nwind_test, nhumid_test, nstreamtemp_test
         ENDIF
         IF ( Print_debug>DEBUG_minimum ) PRINT 4, EQULS, 'Simulation time period of Restart File:', &
      &       start_time(1), start_time(2), start_time(3), ' -', end_time(1), end_time(2), end_time(3), &
@@ -1650,6 +1684,22 @@
         CALL check_restart_dimen('nhru', nhru_test, Nhru, ierr)
         CALL check_restart_dimen('nhrucell', nhrucell_test, Nhrucell, ierr)
         CALL check_restart_dimen('nlake', nlake_test, Nlake, ierr)
+        CALL check_restart_dimen('ncascade', ncascade_test, Ncascade, ierr)
+        CALL check_restart_dimen('ncascdgw', ncascdgw_test, Ncascdgw, ierr)
+        CALL check_restart_dimen('ngwcell', ngwcell_test, Ngwcell, ierr)
+        CALL check_restart_dimen('nlake_hrus', nlake_hrus_test, Nlake_hrus, ierr)
+        CALL check_restart_dimen('ntemp', ntemp_test, Ntemp, ierr)
+        CALL check_restart_dimen('nlake', nlake_test, Nlake, ierr)
+        CALL check_restart_dimen('nrain', nrain_test, Nrain, ierr)
+        CALL check_restart_dimen('nsol', nsol_test, Nsol, ierr)
+        CALL check_restart_dimen('nobs', nobs_test, Nobs, ierr)
+        CALL check_restart_dimen('nevap', nevap_test, Nevap, ierr)
+        CALL check_restart_dimen('nsnow', nsnow_test, Nsnow, ierr)
+        CALL check_restart_dimen('nreach', nreach_test, Nreach, ierr)
+        CALL check_restart_dimen('nlakeelev', nlakeelev_test, Nlakeelev, ierr)
+        CALL check_restart_dimen('nwind', nwind_test, Nwind, ierr)
+        CALL check_restart_dimen('nhumid', nhumid_test, Nhumid, ierr)
+        CALL check_restart_dimen('nstreamtemp', nstreamtemp_test, Nstreamtemp, ierr)
         IF ( Dprst_flag/=dprst_test ) THEN
           PRINT *, 'ERROR, Initial Conditions File saved for model with dprst_flag=', dprst_test
           PRINT *, '       Current model has dprst_flag=', Dprst_flag, ' they must be equal'

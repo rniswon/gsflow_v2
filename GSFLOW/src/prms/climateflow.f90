@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Common States and Fluxes'
       character(len=11), parameter :: MODNAME = 'climateflow'
-      character(len=*), parameter :: Version_climateflow = '2025-01-16'
+      character(len=*), parameter :: Version_climateflow = '2026-03-28'
       INTEGER, SAVE :: Use_pandata, Solsta_flag
       ! Tmax_hru and Tmin_hru are in temp_units
       REAL, SAVE, ALLOCATABLE :: Tmax_hru(:), Tmin_hru(:)
@@ -66,8 +66,9 @@
       REAL, SAVE, ALLOCATABLE :: Intcp_stor(:), Hru_intcpstor(:)
       ! snow
       DOUBLE PRECISION, SAVE :: Basin_pweqv
+     DOUBLE PRECISION, SAVE :: Basin_snowmelt, Basin_snowevap, Basin_snowcov, Basin_pk_precip, Basin_snowdepth
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pkwater_equiv(:), Pk_depth(:)
-      REAL, SAVE, ALLOCATABLE :: Snowmelt(:), Snow_evap(:), Snowcov_area(:)
+      REAL, SAVE, ALLOCATABLE :: Snowmelt(:), Snow_evap(:), Snowcov_area(:), Pk_precip(:)
       INTEGER, SAVE, ALLOCATABLE :: Pptmix_nopack(:)
       ! soilzone
       DOUBLE PRECISION, SAVE :: Basin_ssflow, Basin_soil_to_gw, Basin_soil_to_prmsgw
@@ -165,7 +166,7 @@ end module PRMS_IT0_VARS
      &    Strmflow_module, Temp_module, Stream_order_flag, bias_adjust_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, Humidity_cbh_flag, &
-     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, snow_flag, gwflow_flag, Nhrucell, activeHRU_inactiveCELL_flag
+     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, gwflow_flag, Nhrucell, activeHRU_inactiveCELL_flag
       use PRMS_MMFAPI, only: declvar_int, declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_CLIMATEVARS
@@ -543,7 +544,11 @@ end module PRMS_IT0_VARS
      &     'inches', Hru_impervstor)
 
       IF ( Call_cascade==ACTIVE ) THEN
-        ALLOCATE ( Strm_seg_in(Nsegment) )
+        IF ( Nsegment > 0 ) THEN
+          ALLOCATE ( Strm_seg_in(Nsegment) )
+        ELSE
+          ALLOCATE ( Strm_seg_in(1) )
+        ENDIF
         CALL declvar_dble(Srunoff_module, 'strm_seg_in', 'nsegment', Nsegment, &
      &       'Flow in stream segments as a result of cascading flow in each stream segment', &
      &       'cfs', Strm_seg_in)
@@ -578,7 +583,8 @@ end module PRMS_IT0_VARS
      &     'Basin area-weighted average of groundwater flow to the stream network', &
      &     'cfs', Basin_gwflow_cfs)
 
-      IF ( Call_cascade==1 .OR. Stream_order_flag==ACTIVE ) THEN
+      !IF ( Call_cascade==1 .OR. Stream_order_flag==ACTIVE ) THEN
+      IF ( Stream_order_flag==ACTIVE ) THEN
         IF ( Nsegment==0 ) THEN
           PRINT *, 'ERROR, nsegment=0, must be > 0 for selected module options'
           Inputerror_flag = 1
@@ -662,33 +668,7 @@ end module PRMS_IT0_VARS
       ALLOCATE ( Snowmelt(Nhru) )
       ALLOCATE ( Pptmix_nopack(Nhru) )
       ALLOCATE ( It0_pkwater_equiv(Nhru) )
-      IF ( snow_flag==ACTIVE ) THEN
-        CALL declvar_dble('snowcomp', 'basin_pweqv', 'one', 1, &
-     &       'Basin area-weighted average snowpack water equivalent (not including glacier)', &
-     &       'inches', Basin_pweqv)
-        CALL declvar_dble('snowcomp', 'pkwater_equiv', 'nhru', Nhru, &
-     &       'Snowpack water equivalent on each HRU', &
-     &       'inches', Pkwater_equiv)
-        CALL declvar_dble('snowcomp', 'It0_pkwater_equiv', 'nhru', Nhru, &
-     &       'Antecedent snowpack water equivalent on each HRU', &
-     &       'inches', It0_pkwater_equiv)
-        CALL declvar_dble('snowcomp', 'pk_depth', 'nhru', Nhru, &
-     &       'Depth of snowpack on each HRU', &
-     &       'inches', Pk_depth)
-        CALL declvar_real('snowcomp', 'snowcov_area', 'nhru', Nhru, &
-     &       'Snow-covered area on each HRU prior to melt and sublimation unless snowpack depleted', &
-     &       'decimal fraction', Snowcov_area)
-        CALL declvar_real('snowcomp', 'snow_evap', 'nhru', Nhru, &
-     &       'Evaporation and sublimation from snowpack on each HRU', &
-     &       'inches', Snow_evap)
-        CALL declvar_real('snowcomp', 'snowmelt', 'nhru', Nhru, &
-     &       'Snowmelt from snowpack on each HRU (not including snow on glacier)', &
-     &       'inches', Snowmelt)
-        CALL declvar_int('snowcomp', 'pptmix_nopack', 'nhru', Nhru, &
-     &       'Flag indicating that a mixed precipitation event has'// &
-     &       ' occurred with no snowpack present on an HRU (1), otherwise (0)', &
-     &       'none', Pptmix_nopack)
-      ENDIF
+      ALLOCATE ( Pk_precip(Nhru) )
 
 ! glacier variables
       IF ( Glacier_flag==1 ) THEN
@@ -1444,6 +1424,12 @@ end module PRMS_IT0_VARS
         ENDIF
         Basin_soil_moist = Basin_soil_moist + Soil_moist(i) * Hru_perv(i)
         Basin_ssstor = Basin_ssstor + Ssres_stor(i) * Hru_area(i)
+        DO j = 1, Nmonths
+          IF ( Epan_coef(i,j)<0.0000001 ) THEN
+            PRINT *, 'ERROR, HRU:', i, ', month:', j, '; epan_coef must be > 0.0000001'
+            Inputerror_flag = 1
+          ENDIF
+        ENDDO
       ENDDO
       IF ( bad_soil_moist_max > 0 ) WRITE(*,'(/,A,I0)') 'WARNING, number of soil_moist_max < 0.001: ', bad_soil_moist_max
       Basin_soil_moist = Basin_soil_moist * Basin_area_inv
@@ -1497,13 +1483,21 @@ end module PRMS_IT0_VARS
       ENDIF
 
 ! initialize scalers
+      Basin_potet = 0.0D0
       Basin_humidity = 0.0D0
       Basin_lakeevap = 0.0D0
       Basin_lake_stor = 0.0D0
+      Basin_snowmelt = 0.0D0
+      Basin_snowevap = 0.0D0
+      Basin_snowcov = 0.0D0
+      Basin_snowdepth = 0.0D0
+      Basin_pk_precip = 0.0D0
+      Basin_pweqv = 0.0D0
       Flow_out = 0.0D0
 
       Snow_evap = 0.0
       Snowmelt = 0.0
+      Pk_precip = 0.0
       Pptmix_nopack = OFF
 
       IF ( Init_vars_from_file>0 ) RETURN

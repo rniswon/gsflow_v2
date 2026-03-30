@@ -408,8 +408,9 @@
 
       DO i = 1, Ncascade
         kup = Hru_up_id(i)
-        IF ( kup<1 ) THEN
-          PRINT *, 'Cascade ignored as hru_up_id<1, cascade:', i, ', hru_up_id:', kup
+        IF ( kup<1 .AND. Hru_strmseg_down_id(i)<1 ) THEN
+          PRINT *, 'Cascade ignored as hru_up_id<1 and Hru_strmseg_down_id<1, cascade:', i, &
+                 ', hru_up_id:', kup, ', Hru_strmseg_down_id:', Hru_strmseg_down_id(i) 
           CYCLE
         ENDIF
         jdn = Hru_down_id(i)

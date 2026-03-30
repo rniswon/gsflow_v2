@@ -13,9 +13,10 @@
         character(len=*), parameter :: MODNAME = 'precip_map'
         character(len=*), parameter :: Version_precip_map = '2025-02-03'
         INTEGER, SAVE :: Precip_unit
+        REAL, SAVE, ALLOCATABLE ::  Precip_map_values(:)
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Hru2map_id(:), Map2hru_id(:)
-        REAL, SAVE, ALLOCATABLE :: Hru2map_pct(:), Precip_map_values(:)
+        REAL, SAVE, ALLOCATABLE :: Hru2map_pct(:)
         REAL, SAVE, ALLOCATABLE :: Precip_map_adj(:, :)
         ! parameters in basin:
         !    hru_area

@@ -403,10 +403,9 @@
       INTEGER FUNCTION stream_temp_init()
       USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, OFF, NEARZERO, ERROR_param, DAYS_YR
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag, Inputerror_flag, Nmonths
+      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag, Inputerror_flag, Nmonths, Nhumid
       USE PRMS_STRMTEMP
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
-      USE PRMS_OBS, ONLY: Nhumid
       USE PRMS_ROUTING, ONLY: Hru_segment, Tosegment, Segment_order, Segment_up, Seg_length
       use prms_utils, only: checkdim_param_limits, error_stop, read_error
       IMPLICIT NONE

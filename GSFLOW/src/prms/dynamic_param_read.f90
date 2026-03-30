@@ -1,7 +1,7 @@
 !***********************************************************************
 ! Read and makes available dynamic parameters cov_type, rad_trncf,
 ! transp_beg, transp_end, covden_sum, covden_win, fall_frost, spring_frost
-! sro_to_dprst, sro_to_imperv, snarea_thresh, jh_coef, jh_coef_hru,
+! sro_to_dprst_perv, sro_to_dprst_imperv, snarea_thresh, jh_coef, jh_coef_hru,
 ! pm_n_coef, pm_d_coef, pt_alpha, hs_krs, hamon_coef, potet_cbh_adj,
 ! wrain_intcp, srain_intcp, snow_intcp by HRU from pre-processed files.
 ! These parameters can be input for any date within the simulation time
@@ -37,7 +37,7 @@
         CHARACTER(LEN=MAXFILE_LENGTH) :: wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: potet_coef_dynamic, transpbeg_dynamic, transpend_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: radtrncf_dynamic, dynamic_param_log_file
-        CHARACTER(LEN=MAXFILE_LENGTH) :: fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, snareathresh_dynamic
+        CHARACTER(LEN=MAXFILE_LENGTH) :: fallfrost_dynamic, springfrost_dynamic, snareathresh_dynamic
         CHARACTER(LEN=MAXFILE_LENGTH) :: covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn
       END MODULE PRMS_DYNAMIC_PARAM_READ
 
@@ -73,7 +73,7 @@
       use PRMS_CONTROL_FILE, only: control_string
       USE PRMS_MODULE, ONLY: Nhru, Print_debug, Start_year, Start_month, Start_day, &
      &    Dyn_intcp_flag, Dyn_covden_flag, &
-     &    Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
+     &    Dyn_covtype_flag, Dyn_potet_flag, Dyn_transp_flag, Dyn_radtrncf_flag, &
      &    Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Transp_flag, Dyn_fallfrost_flag, &
      &    Dyn_springfrost_flag, Dyn_snareathresh_flag, Nmonths
       USE PRMS_DYNAMIC_PARAM_READ
@@ -287,17 +287,6 @@
         ENDIF
       ENDIF
 
-      IF ( Dyn_transp_on_flag==ACTIVE ) THEN
-        IF ( control_string(transp_on_dynamic, 'transp_on_dynamic')/=0 ) CALL read_error(5, 'transp_on_dynamic')
-        CALL find_header_end(Transp_event_unit, transp_on_dynamic, ierr)
-        IF ( ierr==0 ) THEN
-          CALL find_current_file_time(Transp_event_unit, year, month, day, Transp_event_next_yr, Transp_event_next_mo, &
-     &                                Transp_event_next_day)
-        ELSE
-          istop = 1
-        ENDIF
-      ENDIF
-
       IF ( Print_debug>DEBUG_minimum ) THEN
         IF ( control_string(dynamic_param_log_file, 'dynamic_param_log_file')/=0 ) CALL read_error(5, 'dynamic_param_log_file')
         CALL PRMS_open_output_file(Output_unit, dynamic_param_log_file, 'dynamic_param_log_file', 0, ierr)
@@ -317,12 +306,12 @@
      &    potet_jh_module, potet_pan_module, potet_hamon_module, potet_hs_module, &
      &    potet_pt_module, potet_pm_module, climate_hru_module
       USE PRMS_MODULE, ONLY: Nhru, Nowyear, Nowmonth, Nowday, &
-     &    Dyn_covtype_flag, Dyn_potet_flag, Dyn_radtrncf_flag, Dyn_transp_on_flag, &
+     &    Dyn_covtype_flag, Dyn_potet_flag, Dyn_radtrncf_flag, &
      &    Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, &
      &    Dyn_snareathresh_flag, Et_flag
       USE PRMS_DYNAMIC_PARAM_READ
       USE PRMS_BASIN, ONLY: Cov_type, Covden_win, Covden_sum
-      USE PRMS_CLIMATEVARS, ONLY: Transp_on, Epan_coef
+      USE PRMS_CLIMATEVARS, ONLY: Epan_coef
       USE PRMS_POTET_JH, ONLY: Jh_coef, Jh_coef_hru
       USE PRMS_POTET_PM, ONLY: Pm_n_coef, Pm_d_coef
       USE PRMS_POTET_PT, ONLY: Pt_alpha
@@ -534,17 +523,6 @@
             if (ios /= 0) call error_stop('reading sro_to_imperv dynamic parameter file', ERROR_dynamic)
             CALL write_dynparam(Output_unit, Nhru, Updated_hrus, Temp, Sro_to_dprst_imperv, 'sro_to_dprst_imperv')
             CALL is_eof(Sro_to_imperv_unit, Sro_to_imperv_next_yr, Sro_to_imperv_next_mo, Sro_to_imperv_next_day)
-          ENDIF
-        ENDIF
-      ENDIF
-
-      IF ( Dyn_transp_on_flag==ACTIVE ) THEN
-        IF ( Transp_event_next_mo/=0 ) THEN
-          IF ( Transp_event_next_yr==Nowyear .AND. Transp_event_next_mo==Nowmonth .AND. Transp_event_next_day==Nowday ) THEN
-            READ ( Transp_event_unit, *, IOSTAT=ios ) Transp_event_next_yr, Transp_event_next_mo, Transp_event_next_day, Itemp
-            if (ios /= 0) call error_stop('reading transp_on dynamic parameter file', ERROR_dynamic)
-            CALL write_dynparam_int(Output_unit, Nhru, Updated_hrus, Itemp, Transp_on, 'transp_on_event')
-            CALL is_eof(Transp_event_unit, Transp_event_next_yr, Transp_event_next_mo, Transp_event_next_day)
           ENDIF
         ENDIF
       ENDIF

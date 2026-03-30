@@ -22,12 +22,12 @@
       INTEGER FUNCTION potet_pm_sta()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, INCH2MM
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real, getparam_int
-      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Parameter_check_flag, Inputerror_flag, Nowmonth, Nmonths
+      USE PRMS_MODULE, ONLY: Process_flag, Nhru, Parameter_check_flag, Inputerror_flag, Nowmonth, Nmonths, Nwind, Nhumid
       USE PRMS_POTET_PM_STA
       USE PRMS_BASIN, ONLY: Basin_area_inv, Active_hrus, Hru_area, Hru_route_order, Hru_elev_meters
       USE PRMS_CLIMATEVARS, ONLY: Basin_potet, Potet, Tavgc, Swrad, Tminc, Tmaxc, &
      &    Tempc_dewpt, Vp_actual, Lwrad_net, Vp_slope, Vp_sat, Basin_humidity
-      USE PRMS_OBS, ONLY: Humidity, Wind_speed, Nwind, Nhumid
+      USE PRMS_OBS, ONLY: Humidity, Wind_speed
       USE PRMS_SOLTAB, ONLY: Soltab_potsw
       USE PRMS_SET_TIME, ONLY: Jday
       use prms_utils, only: checkdim_param_limits, print_module, read_error, sat_vapor_press !, sat_vapor_press_poly

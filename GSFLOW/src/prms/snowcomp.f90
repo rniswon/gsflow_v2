@@ -23,7 +23,7 @@
       !   Local Variables
       character(len=*), parameter :: MODDESC = 'Snow Dynamics'
       character(len=8), parameter :: MODNAME = 'snowcomp'
-      character(len=*), parameter :: Version_snowcomp = '2025-02-18'
+      character(len=*), parameter :: Version_snowcomp = '2026-03-12'
       INTEGER, SAVE :: Active_glacier, Ihru
       INTEGER, SAVE, ALLOCATABLE :: Int_alb(:)
       REAL, SAVE :: Acum(MAXALB), Amlt(MAXALB)
@@ -40,13 +40,11 @@
       INTEGER :: Yrdays5
       INTEGER, SAVE, ALLOCATABLE :: Lst(:)
       INTEGER, SAVE, ALLOCATABLE :: Iasw(:), Iso(:), Mso(:), Lso(:)
-      DOUBLE PRECISION, SAVE :: Basin_snowmelt, Basin_tcal
-      DOUBLE PRECISION, SAVE :: Basin_snowcov, Basin_snowevap
-      DOUBLE PRECISION, SAVE :: Basin_snowdepth, Basin_pk_precip
+      DOUBLE PRECISION, SAVE :: Basin_tcal
       REAL, SAVE, ALLOCATABLE :: Albedo(:), Pk_temp(:), Pk_den(:)
       REAL, SAVE, ALLOCATABLE :: Pk_def(:), Pk_ice(:), Freeh2o(:)
       REAL, SAVE, ALLOCATABLE :: Tcal(:)
-      REAL, SAVE, ALLOCATABLE :: Snsv(:), Pk_precip(:)
+      REAL, SAVE, ALLOCATABLE :: Snsv(:)
       REAL, SAVE, ALLOCATABLE :: Frac_swe(:)
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Ai(:)
       DOUBLE PRECISION, SAVE :: Basin_glacrevap, Basin_snowicecov, Basin_glacrb_melt
@@ -124,6 +122,9 @@
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file, Glacier_flag, Snarea_curve_flag, PRMS_land_iteration_flag, Nmonths
+      USE PRMS_FLOWVARS, ONLY: Pk_precip, Basin_pweqv, Pkwater_equiv, Pk_depth, Snowcov_area, Basin_pk_precip, &
+                               Snow_evap, Snowmelt, Pptmix_nopack, Basin_snowmelt, Basin_snowevap, Basin_snowcov, Basin_snowdepth
+      USE PRMS_IT0_VARS, ONLY: It0_pkwater_equiv
       USE PRMS_SNOW
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -172,6 +173,32 @@
       CALL declvar_int(MODNAME, 'int_alb', 'nhru', Nhru, &
      &     'Flag to indicate (1: accumulation season curve; 2: use of the melt season curve)', &
      &     'none', Int_alb)
+
+      CALL declvar_dble('snowcomp', 'basin_pweqv', 'one', 1, &
+     &     'Basin area-weighted average snowpack water equivalent (not including glacier)', &
+     &     'inches', Basin_pweqv)
+      CALL declvar_dble('snowcomp', 'pkwater_equiv', 'nhru', Nhru, &
+     &     'Snowpack water equivalent on each HRU', &
+     &     'inches', Pkwater_equiv)
+      CALL declvar_dble('snowcomp', 'It0_pkwater_equiv', 'nhru', Nhru, &
+     &     'Antecedent snowpack water equivalent on each HRU', &
+     &     'inches', It0_pkwater_equiv)
+      CALL declvar_dble('snowcomp', 'pk_depth', 'nhru', Nhru, &
+     &     'Depth of snowpack on each HRU', &
+     &     'inches', Pk_depth)
+      CALL declvar_real('snowcomp', 'snowcov_area', 'nhru', Nhru, &
+     &     'Snow-covered area on each HRU prior to melt and sublimation unless snowpack depleted', &
+     &     'decimal fraction', Snowcov_area)
+      CALL declvar_real('snowcomp', 'snow_evap', 'nhru', Nhru, &
+     &     'Evaporation and sublimation from snowpack on each HRU', &
+     &     'inches', Snow_evap)
+      CALL declvar_real('snowcomp', 'snowmelt', 'nhru', Nhru, &
+     &     'Snowmelt from snowpack on each HRU (not including snow on glacier)', &
+     &     'inches', Snowmelt)
+      CALL declvar_int('snowcomp', 'pptmix_nopack', 'nhru', Nhru, &
+     &     'Flag indicating that a mixed precipitation event has'// &
+     &     ' occurred with no snowpack present on an HRU (1), otherwise (0)', &
+     &     'none', Pptmix_nopack)
 
 ! Glacier declares
       IF ( Glacier_flag==2 ) THEN
@@ -330,7 +357,6 @@
      &     'Basin area-weighted average snow depth', &
      &     'inches', Basin_snowdepth)
 
-      ALLOCATE ( Pk_precip(Nhru) )
       CALL declvar_real(MODNAME, 'pk_precip', 'nhru', Nhru, &
      &     'Precipitation added to snowpack for each HRU', &
      &     'inches', Pk_precip)
@@ -896,7 +922,8 @@
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Orad, Basin_horad, Potet_sublim, &
      &    Hru_ppt, Prmx, Tmaxc, Tminc, Tavgc, Swrad, Potet, Transp_on, Tmax_allsnow_c, Tmax_allrain_c
       USE PRMS_FLOWVARS, ONLY: Pkwater_equiv, Glacier_frac, Glrette_frac, Alt_above_ela, &
-     &    Snow_evap, Snowmelt, Snowcov_area, Pptmix_nopack, Pk_depth, Basin_pweqv
+     &    Snow_evap, Snowmelt, Snowcov_area, Pptmix_nopack, Pk_depth, Basin_pweqv, &
+     &    Pk_precip, Basin_snowmelt, Basin_snowevap, Basin_snowcov, Basin_snowdepth, Basin_pk_precip
       USE PRMS_IT0_VARS, ONLY: It0_pkwater_equiv
       USE PRMS_SET_TIME, ONLY: Jday, Julwater
       USE PRMS_INTCP, ONLY: Net_rain, Net_snow, Net_ppt, Canopy_covden, Hru_intcpevap
@@ -1863,7 +1890,7 @@
 !        heat energy has occurred.
 !***********************************************************************
       SUBROUTINE caloss(Cal, Pkwater_equiv, Pk_def, Pk_temp, Pk_ice, Freeh2o, Ihru_gl)
-      USE PRMS_CONSTANTS, ONLY: OFF, DEBUG_LESS
+      USE PRMS_CONSTANTS, ONLY: DEBUG_LESS
       USE PRMS_MODULE, ONLY: Print_debug
       USE PRMS_SNOW, ONLY: Ihru
       IMPLICIT NONE

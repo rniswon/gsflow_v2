@@ -53,7 +53,7 @@ contains
       read (control_unit, '(A)', IOSTAT=ios) string
       if (ios == -1) exit ! found end of Control File
       if (ios /= 0) call read_error(12, 'missing #### delimiter')
-      if (string(:4) /= '####') cycle ! skip until delimiter found, such as blank of // comment lines
+      if (string(:4) /= '####') cycle ! skip until delimiter found, such as blank or // comment lines
       read (control_unit, '(A)', IOSTAT=ios) paramname ! parameter name
       if (ios /= 0) call read_error(5, 'missing parameter name')
       read (control_unit, *, IOSTAT=ios) numvalues
@@ -93,7 +93,7 @@ contains
                                 AET_cbh_file, PET_cbh_file, irrigated_area_cbh_file, cbh_active_flag
     use PRMS_DYNAMIC_PARAM_READ, only: wrain_intcp_dynamic, srain_intcp_dynamic, snow_intcp_dynamic, covtype_dynamic, &
                                        potet_coef_dynamic, transpbeg_dynamic, transpend_dynamic, dynamic_param_log_file, &
-                                       radtrncf_dynamic, fallfrost_dynamic, springfrost_dynamic, transp_on_dynamic, &
+                                       radtrncf_dynamic, fallfrost_dynamic, springfrost_dynamic, &
                                        covden_sum_dynamic, covden_win_dynamic, sro2dprst_perv_dyn, sro2dprst_imperv_dyn, &
                                        snareathresh_dynamic
     use PRMS_DYNAMIC_SOIL_PARAM_READ, only: imperv_frac_dynamic, imperv_stor_dynamic, dprst_depth_dynamic, dprst_frac_dynamic, &
@@ -401,7 +401,7 @@ contains
     Control_parameter_data(i) % values_int(1) = Cascade_flag
     i = i + 1
     Control_parameter_data(i) % name = 'cascadegw_flag'
-    Cascadegw_flag = ACTIVE
+    Cascadegw_flag = 2
     Control_parameter_data(i) % values_int(1) = Cascadegw_flag
     i = i + 1
     Control_parameter_data(i) % name = 'frozen_flag'
@@ -520,7 +520,7 @@ contains
     PRMS_land_iteration_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'soilzone_aet_flag'
-    Soilzone_aet_flag = OFF
+    Soilzone_aet_flag = ACTIVE
     i = i + 1
     Control_parameter_data(i) % name = 'iter_aet_flag'
     Iter_aet_flag = OFF
@@ -552,9 +552,6 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'dyn_transp_flag'
     Dyn_transp_flag = OFF
-    i = i + 1
-    Control_parameter_data(i) % name = 'dyn_transp_on_flag'
-    Dyn_transp_on_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'dyn_sro2dprst_perv_flag'
     Dyn_sro2dprst_perv_flag = OFF
@@ -677,7 +674,7 @@ contains
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'executable_desc'
-    Executable_desc = 'GSFLOW Fortran-only'
+    Executable_desc = 'GSFLOW Version 2.4.0'
     Control_parameter_data(i) % values_character(1) = Executable_desc
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
@@ -867,7 +864,7 @@ contains
     Control_parameter_data(i) % values_character(1) = Covden_win_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
-    Control_parameter_data(i) % name = 'potetcoef_dynamic'
+    Control_parameter_data(i) % name = 'potet_coef_dynamic'
     Potet_coef_dynamic = 'dyn_potet_coef.param'
     Control_parameter_data(i) % values_character(1) = Potet_coef_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
@@ -915,11 +912,6 @@ contains
     Control_parameter_data(i) % name = 'sro2dprst_imperv_dynamic'
     Sro2dprst_imperv_dyn = 'dyn_sro_to_dprst_imperv.param'
     Control_parameter_data(i) % values_character(1) = Sro2dprst_imperv_dyn
-    Control_parameter_data(i) % data_type = CHAR_TYPE
-    i = i + 1
-    Control_parameter_data(i) % name = 'transp_on_dynamic'
-    Transp_on_dynamic = 'dyn_transp_on.param'
-    Control_parameter_data(i) % values_character(1) = Transp_on_dynamic
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'selectDatesFileName'
@@ -972,7 +964,7 @@ contains
     !      Control_parameter_data(i)%values_character(1) = Gwres_flow_day
     !      Control_parameter_data(i)%data_type = CHAR_TYPE
     i = i + 1
-    Control_parameter_data(i) % name = 'mbinit_flag'
+    Control_parameter_data(i) % name = 'Mbinit_flag'
     Mbinit_flag = OFF
 
     Num_control_parameters = i

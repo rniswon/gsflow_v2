@@ -27,7 +27,7 @@
       ! julday(1966,1,0.75 UT) = 2439126.25
       ! eccen = 0.01675104-0.00004180*T-0.000000126*T**2  T is julian centuries (days time from epoch, is GMT from Jan 0.0
       DOUBLE PRECISION, PARAMETER :: DEGDAY = 360.0D0/DAYS_IN_YEAR
-      DOUBLE PRECISION, PARAMETER :: DEGDAYRAD = DEGDAY*RADIANS ! about 0.00143356672
+      DOUBLE PRECISION, PARAMETER :: DEGDAYRAD = DEGDAY*RADIANS ! about 0.017203
 ! DEGDAY = 360 degrees/days in year
       DOUBLE PRECISION, SAVE :: Solar_declination(MAX_DAYS_PER_YEAR), Soltab_basinpotsw(MAX_DAYS_PER_YEAR)
       !DOUBLE PRECISION, SAVE :: Ecentricity(MAX_DAYS_PER_YEAR)
@@ -88,8 +88,18 @@
 !     &     'Potential solar radiation on a horizontal plane for each Julian Day, for each HRU', &
 !     &     'Langleys', Soltab_horad_potsw)
 
+!      CALL declvar_dble(MODNAME, 'soltab_basinpotsw', 'ndays', MAX_DAYS_PER_YEAR, &
+!     &     'Potential solar radiation on a horizontal plane for each Julian Day, for the centroid of the model domain', &
+!     &     'Langleys', Soltab_basinpotsw)
+
       ALLOCATE ( Hru_cossl(Nhru), Soltab_sunhrs(MAX_DAYS_PER_YEAR, Nhru) )
       ALLOCATE ( Sunset_angle(MAX_DAYS_PER_YEAR, Nhru) )
+     ! CALL declvar_dble(MODNAME, 'soltab_sunhrs', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
+     !&     'Hours between sunrise and sunset for each Julian Day, for each HRU', &
+     !&     'hours', Soltab_sunhrs)
+     ! CALL declvar_dble(MODNAME, 'sunset_angle', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
+     !&     'Sunset angle for each Julian Day, for each HRU', &
+     !&     'hours', Sunset_angle)
 
 !   Declared Parameters
       ALLOCATE ( Hru_slope(Nhru) )
@@ -114,7 +124,7 @@
 !               for each HRU for each day of the year.
 !***********************************************************************
       INTEGER FUNCTION sthinit()
-      USE PRMS_CONSTANTS, ONLY: MAX_DAYS_PER_YEAR, DEBUG_SOLTAB, OFF
+      USE PRMS_CONSTANTS, ONLY: DEBUG_SOLTAB, OFF
       use PRMS_READ_PARAM_FILE, only: getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Print_debug, Glacier_flag, Hru_type
       USE PRMS_SOLTAB

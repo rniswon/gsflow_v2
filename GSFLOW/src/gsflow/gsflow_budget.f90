@@ -5,11 +5,11 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'GSFLOW Output Budget Summary'
       character(len=13), parameter :: MODNAME = 'gsflow_budget'
-      character(len=*), parameter :: Version_gsflow_budget = '2024-02-14'
+      character(len=*), parameter :: Version_gsflow_budget = '2026-03-28'
       INTEGER, SAVE :: Nreach
       INTEGER, SAVE :: Vbnm_index(14)
       DOUBLE PRECISION, SAVE :: Gw_bnd_in, Gw_bnd_out, Well_in, Well_out, Basin_actetgw, Basin_fluxchange
-      REAL, SAVE, ALLOCATABLE :: Fluxchange(:)
+      DOUBLE PRECISION, SAVE, ALLOCATABLE :: Fluxchange(:)
 !   Declared Variables
       DOUBLE PRECISION, SAVE :: Total_pump, Total_pump_cfs, StreamExchng2Sat_Q, Stream2Unsat_Q, Sat_S
       DOUBLE PRECISION, SAVE :: Stream_inflow, Basin_gw2sm, NetBoundaryFlow2Sat_Q
@@ -47,8 +47,6 @@
 
 !***********************************************************************
 !     gsfbuddecl - set up parameters
-!   Declared Parameters
-!     hru_area, gvr_hru_id, gvr_cell_id, lake_hru_id
 !***********************************************************************
       INTEGER FUNCTION gsfbuddecl()
       USE GSFBUDGET
@@ -152,20 +150,26 @@
      &     'Total actual ET from each GW cell and PRMS soil zone', &
      &     'inches', Actet_tot_gwsz)
 
-      ALLOCATE (Streamflow_sfr(Nsegment))
-      CALL declvar_real(MODNAME, 'streamflow_sfr', 'nsegment', Nsegment, &
-     &     'Streamflow as computed by SFR for each segment', &
-     &     'cfs', Streamflow_sfr)
+      if ( Nsegment>0 ) then
+        ALLOCATE (Streamflow_sfr(Nsegment))
+        CALL declvar_real(MODNAME, 'streamflow_sfr', 'nsegment', Nsegment, &
+     &       'Streamflow as computed by SFR for each segment', &
+     &       'cfs', Streamflow_sfr)
 
-      ALLOCATE (Seepage_reach_sfr(Nreach))
-      CALL declvar_real(MODNAME, 'seepage_reach_sfr', 'nreach', Nreach, &
-     &     'Seepage as computed by SFR for each reach', &
-     &     'cfs', Seepage_reach_sfr)
+        ALLOCATE (Seepage_reach_sfr(Nreach))
+        CALL declvar_real(MODNAME, 'seepage_reach_sfr', 'nreach', Nreach, &
+     &       'Seepage as computed by SFR for each reach', &
+     &       'cfs', Seepage_reach_sfr)
 
-      ALLOCATE (Seepage_segment_sfr(Nsegment))
-      CALL declvar_real(MODNAME, 'seepage_segment_sfr', 'nsegment', Nsegment, &
-     &     'Seepage as computed by SFR for each segment', &
-     &     'cfs', Seepage_segment_sfr)
+        ALLOCATE (Seepage_segment_sfr(Nsegment))
+        CALL declvar_real(MODNAME, 'seepage_segment_sfr', 'nsegment', Nsegment, &
+     &       'Seepage as computed by SFR for each segment', &
+     &       'cfs', Seepage_segment_sfr)
+      else
+          ALLOCATE (Streamflow_sfr(1))
+          ALLOCATE (Seepage_reach_sfr(1))
+          ALLOCATE (Seepage_segment_sfr(1))
+      endif
 
       ALLOCATE ( Gw_rejected(Nhru) )
       CALL declvar_real(MODNAME, 'gw_rejected', 'nhru', Nhru, &
@@ -190,7 +194,7 @@
       END FUNCTION gsfbuddecl
 
 !***********************************************************************
-!     gsfbudinit - Initialize GSFBUDGET module - get parameter values
+!     gsfbudinit - Initialize GSFBUDGET module
 !***********************************************************************
       INTEGER FUNCTION gsfbudinit()
       USE PRMS_CONSTANTS, ONLY: ERROR_dim
@@ -259,7 +263,7 @@
 !Warning, modifies Basin_gwflow_cfs, Basin_cfs, Basin_cms, Basin_stflow,
 !                  Basin_ssflow_cfs, Basin_sroff_cfs
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Active_area, &
-     &    Basin_area_inv, Hru_area, Lake_hru_id, Lake_area
+     &    Basin_area_inv, Hru_area, Lake_hru_id, Lake_area, Hru_area_dble
       USE PRMS_FLOWVARS, ONLY: Basin_ssflow, Basin_lakeevap, Hru_actet, Basin_sroff, &
      &    Basin_actet, Basin_ssstor, Ssres_stor, Slow_stor, Basin_ssflow_cfs, Basin_sroff_cfs, &
      &    Basin_gwflow_cfs, Pref_flow_stor, Gravity_stor_res, Dprst_vol_open !, Dprst_vol_clos
@@ -269,7 +273,7 @@
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
       IMPLICIT NONE
 ! Functions
-      INTRINSIC :: ABS, SNGL
+      INTRINSIC :: ABS, SNGL, DBLE
 !      EXTERNAL :: MODFLOW_GET_STORAGE_BCF, MODFLOW_GET_STORAGE_LPF
 !      EXTERNAL :: MODFLOW_GET_STORAGE_UPW
       EXTERNAL :: MODFLOW_VB_DECODE, getStreamFlow, getPump
@@ -285,18 +289,21 @@
       area_fac = Cfs_conv*Active_area
       Basin_ssflow_cfs = Basin_ssflow*area_fac
       Basin_sroff_cfs = Basin_sroff*area_fac
+
       Gw2sm = 0.0
       Gw_rejected = 0.0
       Actet_gw = 0.0
 !      Uzf_infil_map = 0.0
 !      Sat_recharge = 0.0
 !      Mfoutflow_to_gvr = 0.0
-      Fluxchange = 0.0
+      Fluxchange = 0.0D0
+
       DO ii = 1, Active_hrus
         i = Hru_route_order(ii)
         IF ( activeHru_inactiveCell(i) == 0 ) &
              Slow_stor(i) = 0.0 !don't reset Slow_stor if inactive cell and HRU active
       ENDDO
+
       Streamflow_sfr = 0.0 ! dimension nsegment
       Seepage_reach_sfr = 0.0 ! dimension nreach
       Seepage_segment_sfr = 0.0 ! dimension nsegment
@@ -324,7 +331,7 @@
         gwdisch = SEEPOUT(icol, irow)*Mfq2inch_conv(i)
 ! flux equals current minus last GW discharge used with soilzone, usually iteration before convergence
         flux_change = gwdisch - Gw2sm_grav(i) ! gw2sm_grav last set in gsflow_mf2prms with values last used by soilzone
-        Fluxchange(Ihru) = Fluxchange(Ihru) + flux_change*pct
+        Fluxchange(Ihru) = Fluxchange(Ihru) + DBLE(flux_change*pct)
         IF ( ABS(flux_change)<CLOSEZERO ) flux_change = 0.0 ! assume round-off error, so set to zero
         !Gw_rejected_grav includes rejected soil_to_gw
         Gw_rejected_grav(i) = Gw_rejected_grav(i) + Excess(icell)*Mfl_to_inch + REJ_INF(icol, irow)*Mfq2inch_conv(i)
@@ -344,6 +351,7 @@
       Basin_actet = 0.0D0
       Basin_slstor = 0.0D0
       Basin_fluxchange = 0.0D0
+
       DO ii = 1, Active_hrus
         i = Hru_route_order(ii)
         harea = Hru_area(i)
@@ -378,7 +386,7 @@
         Basin_ssstor = Basin_ssstor + Ssres_stor(i)*harea
         Basin_szreject = Basin_szreject + Gw_rejected(i)*harea
         Basin_slstor = Basin_slstor + Slow_stor(i)*harea
-        Basin_fluxchange = Basin_fluxchange + Fluxchange(i)*harea
+        Basin_fluxchange = Basin_fluxchange + Fluxchange(i)*Hru_area_dble(i)
         IF ( Dprst_flag == ACTIVE .AND. Ag_package == ACTIVE ) THEN
           Basin_dprst_volop = Basin_dprst_volop + Dprst_vol_open(i)
 !          Basin_dprst_volcl = Basin_dprst_volcl + Dprst_vol_clos(i)

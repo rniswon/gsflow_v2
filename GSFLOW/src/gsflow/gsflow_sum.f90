@@ -286,7 +286,7 @@
      &     'L3/T', Lake2Sat_Q)
 
       CALL declvar_dble(MODNAME, 'Lake_dS', 'one', 1, &
-     &     'Change in volume of water in lakese', &
+     &     'Change in volume of water in lakes', &
      &     'L3', Lake_dS)
 
       CALL declvar_dble(MODNAME, 'SatDisch2Lake_Q', 'one', 1, &
@@ -527,11 +527,10 @@
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_OBS, ONLY: Runoff, Runoff_units
       USE PRMS_CLIMATEVARS, ONLY: Basin_ppt, Basin_rain, Basin_snow
-      USE PRMS_FLOWVARS, ONLY: Basin_perv_et, Basin_swale_et, &
+      USE PRMS_FLOWVARS, ONLY: Basin_perv_et, Basin_swale_et, Basin_snowmelt, Basin_snowevap, &
      &    Basin_lakeevap, Basin_soil_to_gw, Basin_ssflow, Basin_actet, &
      &    Basin_sroff, Basin_soil_moist, Basin_ssstor, Basin_cfs, Basin_soil_to_prmsgw
       USE PRMS_IT0_VARS, ONLY: It0_basin_soil_moist, It0_basin_ssstor
-      USE PRMS_SNOW, ONLY: Basin_snowmelt, Basin_snowevap
       USE PRMS_SRUNOFF, ONLY: Basin_imperv_evap, &
      &    Basin_hortonian, Basin_hortonian_lakes, &
      &    Basin_infil, Basin_dprst_evap, Basin_dprst_volop, Basin_dprst_volcl
@@ -821,6 +820,7 @@
 !        print *, totsurfot_lak, totevap_lak, totgwot_lak, totrunf_lak
 !        print *, totsurfin_lak, totgwin_lak
       END IF
+
       Rate_pweqv = SnowPweqv_S - Last_SnowPweqv_S
       Cum_pweqv = Cum_pweqv + Rate_pweqv*DELT
 
@@ -1074,8 +1074,7 @@
       cumvol_in = Cumvol_precip + Cumvol_strmin + Cumvol_gwbndin + Cumvol_wellin
       ! rsr, need lake pipeline in???
 !     &            + Cumvol_lakin - Cumvol_lakeppt
-      cumvol_out = Cumvol_et + Cumvol_strmot + Cumvol_gwbndot + &
-     &             Cumvol_wellot
+      cumvol_out = Cumvol_et + Cumvol_strmot + Cumvol_gwbndot + Cumvol_wellot
       ! rsr, need lake pipeline out???
 !     &             + Cumvol_lakot - Cumvol_lakeevap - Cumvol_uzfet
       cumdiff = cumvol_in - cumvol_out

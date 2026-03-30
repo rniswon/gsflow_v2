@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2025-02-27'
+      character(len=*), parameter :: Version_soilzone = '2026-03-28'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -116,7 +116,7 @@
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nhru, Nsegment, Nlake, Nhrucell, Print_debug, Cascade_flag, &
-     &    Cascade_flag, GSFLOW_flag, Iter_aet_flag, Nmonths
+     &    GSFLOW_flag, Iter_aet_flag, Nmonths
       USE PRMS_SOILZONE
       use prms_utils, only: error_stop, print_module, PRMS_open_module_file, read_error
       IMPLICIT NONE
@@ -430,7 +430,13 @@
 
       IF ( GSFLOW_flag==ACTIVE .OR. Iter_aet_flag==ACTIVE ) THEN
         ALLOCATE ( It0_sroff(Nhru), It0_hru_sroffp(Nhru), It0_hortonian_flow(Nhru) )
-        IF ( Cascade_flag>CASCADE_OFF ) ALLOCATE ( It0_strm_seg_in(Nsegment) )
+        IF ( Cascade_flag>CASCADE_OFF ) THEN
+          IF ( Nsegment > 0 ) THEN
+            ALLOCATE ( It0_strm_seg_in(Nsegment) )
+          ELSE
+            ALLOCATE ( It0_strm_seg_in(1) )
+          ENDIF
+        ENDIF
       ENDIF
 
 ! Allocate arrays for local and variables from other modules
