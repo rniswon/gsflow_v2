@@ -5,7 +5,7 @@
 		<Platform Name="x64"/>
 	</Platforms>
 	<Configurations>
-		<Configuration Name="Debug|Win32" UseCompiler="ifortCompiler" ConfigurationType="typeDynamicLibrary">
+		<Configuration Name="Debug|Win32" UseCompiler="ifxCompiler" ConfigurationType="typeDynamicLibrary">
 			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
 			<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemWindows" LinkDLL="true"/>
 			<Tool Name="VFResourceCompilerTool"/>
@@ -38,8 +38,8 @@
 			<Tool Name="VFPostBuildEventTool"/>
 			<Tool Name="VFManifestTool" SuppressStartupBanner="true"/>
 		</Configuration>
-		<Configuration Name="Release|x64" UseCompiler="ifortCompiler" ConfigurationType="typeDynamicLibrary">
-			<Tool Name="VFFortranCompilerTool" AdditionalOptions="/libs:static" SuppressStartupBanner="true" EnableRecursion="true" FloatingPointModel="source" FloatingPointSpeculation="fpSpeculationSafe" RuntimeLibrary="rtMultiThreadedDLL"/>
+		<Configuration Name="Release|x64" UseCompiler="ifxCompiler" ConfigurationType="typeDynamicLibrary">
+			<Tool Name="VFFortranCompilerTool" AdditionalOptions="/libs:static" SuppressStartupBanner="true" EnableRecursion="true" FloatingPointModel="source" FloatingPointSpeculation="fpSpeculationSafe"/>
 			<Tool Name="VFLinkerTool" SuppressStartupBanner="true" SubSystem="subSystemWindows" LinkDLL="true"/>
 			<Tool Name="VFResourceCompilerTool"/>
 			<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
@@ -75,12 +75,12 @@
 			<File RelativePath="..\GSFLOW\src\prms\frost_date.f90"/>
 			<File RelativePath="..\GSFLOW\src\prms\glacr_melt.f90"/>
 			<File RelativePath="..\GSFLOW\src\gsflow\gsflow_budget.f90"/>
+			<File RelativePath="..\GSFLOW\src\gsflow\gsflow_fortran.f90"/>
 			<File RelativePath="..\GSFLOW\src\gsflow\gsflow_mf2prms.f90"/>
 			<File RelativePath="..\GSFLOW\src\gsflow\gsflow_modflow.f"/>
 			<File RelativePath="..\GSFLOW\src\gsflow\gsflow_modsim2prms.f90"/>
 			<File RelativePath="..\GSFLOW\src\gsflow\gsflow_module.f90"/>
-			<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms.f90">
-			</File>
+			<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms.f90"/>
 			<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms2mf.f90"/>
 			<File RelativePath="..\GSFLOW\src\gsflow\gsflow_prms2modsim.f90"/>
 			<File RelativePath="..\GSFLOW\src\gsflow\gsflow_sum.f90"/>
