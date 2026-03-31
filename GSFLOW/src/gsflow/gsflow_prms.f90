@@ -1659,18 +1659,18 @@
           READ ( Restart_inunit ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
      &           cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test, ag_test
           READ ( Restart_inunit ) start_time, end_time
-          READ ( Restart_outunit ) ncascade_test, ncascdgw_test, ngwcell_test, nlake_hrus_test, &
+          READ ( Restart_inunit ) ncascade_test, ncascdgw_test, ngwcell_test, nlake_hrus_test, &
                   ntemp_test, nrain_test, nsol_test, nobs_test, nevap_test, nsnow_test
-          READ ( Restart_outunit ) nreach_test, nlakeelev_test, nwind_test, nhumid_test, nstreamtemp_test
+          READ ( Restart_inunit ) nreach_test, nlakeelev_test, nwind_test, nhumid_test, nstreamtemp_test
         ELSE
           READ ( Restart_inunit, * ) module_name
           CALL check_restart(MODNAME, module_name)
           READ ( Restart_inunit, * ) time_step, nhru_test, dprst_test, nsegment_test, temp_test, et_test, &
                  cascade_test, cascdgw_test, nhrucell_test, nlake_test, transp_test, model_test, ag_test
           READ ( Restart_inunit, * ) start_time, end_time
-          READ ( Restart_outunit, * ) ncascade_test, ncascdgw_test, ngwcell_test, nlake_hrus_test, &
+          READ ( Restart_inunit, * ) ncascade_test, ncascdgw_test, ngwcell_test, nlake_hrus_test, &
                  ntemp_test, nrain_test, nsol_test, nobs_test, nevap_test, nsnow_test
-          READ ( Restart_outunit, * ) nreach_test, nlakeelev_test, nwind_test, nhumid_test, nstreamtemp_test
+          READ ( Restart_inunit, * ) nreach_test, nlakeelev_test, nwind_test, nhumid_test, nstreamtemp_test
         ENDIF
         IF ( Print_debug>DEBUG_minimum ) PRINT 4, EQULS, 'Simulation time period of Restart File:', &
      &       start_time(1), start_time(2), start_time(3), ' -', end_time(1), end_time(2), end_time(3), &
