@@ -116,7 +116,7 @@ C     ------------------------------------------------------------------
       IF(IUNIT(49).GT.0) THEN
         ALLOCATE (NINTOT)                             !EDM - FOR LMT
       ENDIF
-      ALLOCATE (FACTOR,FACTORKH,FACTORKV)
+      ALLOCATE (FACTOR)
 C1------IDENTIFY PACKAGE AND INITIALIZE NSTRM.
       WRITE (IOUT, 9001) In
  9001 FORMAT (1X, /, ' SFR7 -- STREAMFLOW ROUTING PACKAGE, '
