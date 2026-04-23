@@ -21,6 +21,7 @@
       use prms_utils, only: error_stop, numchars, print_module, PRMS_open_output_file, read_error
       USE MF_DLL, ONLY: gsfdecl, MFNWT_RUN, MFNWT_CLEAN, MFNWT_OCBUDGET, MFNWT_INIT
       USE GWFSFRMODULE, ONLY: NSS
+      USE GLOBAL, ONLY: IUNIT
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Process_mode
@@ -246,6 +247,10 @@
             PRINT *, 'ERROR, NLAKES not equal to Nlake'
             PRINT *, '       NLAKES=', NLAKES_MF, '; Nlake=', Nlake
             ERROR STOP ERROR_modflow
+          ENDIF
+          IF (IUNIT(44) == 0) THEN
+            ALLOCATE ( NSS )
+            NSS = 0
           ENDIF
           IF ( Nsegment/=NSS ) THEN
             PRINT *, 'ERROR, NSS not equal to nsegment'
