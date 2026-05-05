@@ -81,7 +81,7 @@ C1------USE package modules.
       INTEGER :: I
       INCLUDE 'openspec.inc'
 ! Arguments
-      INTEGER, INTENT(IN) :: AFR
+      LOGICAL, INTENT(IN) :: AFR
       INTEGER, INTENT(IN) :: Nsegshold
       INTEGER, INTENT(INOUT) :: Idivert(Nsegshold)
       INTEGER, INTENT(INOUT) :: Nlakeshold
@@ -551,12 +551,12 @@ C7------SIMULATE EACH STRESS PERIOD.
 C
 C7C-----SIMULATE EACH TIME STEP.
 !gsf    DO 90 KSTP = 1, NSTP(KPER) ! maybe a problem, need loop for MFNWT and probably MODSIM
-          IF(AFR>0) KSTP = KSTP + 1
+          IF(AFR) KSTP = KSTP + 1
           KKSTP = KSTP
           IF ( IUNIT(63).GT.0 )itreal = 0
 C
 C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
-          IF (AFR>0) THEN
+          IF (AFR) THEN
             IF(IUNIT(62).GT.0 ) CALL GWF2UPWUPDATE(1,Igrid)
             CALL GWF2BAS7AD(KKPER,KKSTP,IGRID)
             IF(IUNIT(62).GT.0) CALL GWF2UPW1AD(IGRID)
@@ -1708,7 +1708,7 @@ C
       USE OBSBASMODULE, ONLY: OBSTART,ITS
       IMPLICIT NONE
       ! Arguments
-      INTEGER, INTENT(IN) :: AFR
+      LOGICAL, INTENT(IN) :: AFR
       INTEGER, INTENT(IN) :: Nsegshold, Nlakeshold
       INTEGER, INTENT(INOUT) :: Idivert(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)

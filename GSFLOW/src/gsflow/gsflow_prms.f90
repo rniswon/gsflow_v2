@@ -27,7 +27,7 @@
       INTEGER, INTENT(IN) :: Process_mode
       INTEGER, INTENT(INOUT) :: Nsegshold, Nlakeshold
       INTEGER, INTENT(INOUT) :: Idivert(Nsegshold)
-      INTEGER, INTENT(INOUT) :: AFR, MS_GSF_converge
+      LOGICAL, INTENT(INOUT) :: AFR, MS_GSF_converge
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: agDemand(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(Nlakeshold), &
@@ -81,7 +81,7 @@
 
       IF ( Process_flag==RUN ) THEN
         IF ( Model==MODSIM_MODFLOW ) THEN
-          IF ( MS_GSF_converge==0 ) THEN
+          IF ( .NOT. MS_GSF_converge ) THEN
             CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold, agDemand)  !SOLVE GW SW EQUATIONS FOR MODSIM-MODFLOW ITERATION
           ELSE !IF( MS_GSF_converge ) THEN
             CALL MFNWT_OCBUDGET(agDemand, Diversions, Nsegshold)
@@ -89,7 +89,7 @@
           RETURN
         ENDIF
         IF ( Model==MODSIM_PRMS .OR. Model==MODSIM_PRMS_LOOSE ) THEN
-          IF ( AFR==0 .AND. Ag_package==OFF ) RETURN !do not return if diversion applied to soils
+          IF ( AFR .AND. Ag_package==OFF ) RETURN !do not return if diversion applied to soils
         ENDIF
 
       ELSEIF ( Process_flag==DECL ) THEN
@@ -351,7 +351,7 @@
         ierr = obs()
       ENDIF
 
-    IF ( AFR>0 ) THEN
+    IF ( AFR ) THEN
       ierr = prms_time()
 
       IF ( Water_use_flag==ACTIVE ) ierr = water_use_read()
@@ -531,7 +531,7 @@
       IF ( GSFLOW_flag==ACTIVE ) THEN
 
         IF ( Process_flag==RUN ) THEN
-          IF ( MS_GSF_converge==0 ) THEN
+          IF ( MS_GSF_converge ) THEN
             CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold, agDemand)  !SOLVE GW SW EQUATIONS FOR MODSIM-GSFLOW ITERATION
           ENDIF
 
@@ -544,7 +544,7 @@
           ierr = gsflow_mf2prms()
         ENDIF
 
-        IF ( MS_GSF_converge>0 .OR. Process_flag/=RUN .OR. Model==GSFLOW ) THEN
+        IF ( MS_GSF_converge .OR. Process_flag/=RUN .OR. Model==GSFLOW ) THEN
 
           IF ( Process_flag==RUN ) CALL MFNWT_OCBUDGET(agDemand, Diversions, Nsegshold)
 
@@ -555,7 +555,7 @@
       ENDIF
 
       IF ( Model==MODSIM_GSFLOW ) THEN
-        IF ( Process_flag==0 .AND. MS_GSF_converge==0 ) RETURN
+        IF ( Process_flag==0 .AND. MS_GSF_converge ) RETURN
       ENDIF
 
       IF ( MapOutON_OFF>OFF ) ierr = map_results()
@@ -631,7 +631,7 @@
       USE MF_DLL, ONLY: gsfdecl, MFNWT_RUN, MFNWT_INIT, MFNWT_CLEAN, MFNWT_OCBUDGET
       IMPLICIT NONE
 ! Arguments
-      INTEGER, INTENT(IN) :: AFR
+      LOGICAL, INTENT(IN) :: AFR
       INTEGER, INTENT(INOUT) :: Nsegshold, Nlakeshold
       INTEGER, INTENT(INOUT) :: Idivert(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold)
