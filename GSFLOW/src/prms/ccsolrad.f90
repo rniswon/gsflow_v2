@@ -26,8 +26,8 @@
       INTEGER FUNCTION ccsolrad()
       use PRMS_MMFAPI, only: declvar_real, declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, DEBUG_less, MONTHS_PER_YEAR, ACTIVE, OFF
-      USE PRMS_MODULE, ONLY: Process_flag, Print_debug, Nhru, Nsol, Cloud_cover_cbh_flag, Nowmonth
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, DEBUG_less, ACTIVE, OFF
+      USE PRMS_MODULE, ONLY: Process_flag, Print_debug, Nhru, Nsol, Cloud_cover_cbh_flag, Nowmonth, Nmonths
       USE PRMS_CCSOLRAD
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Hru_area, Basin_area_inv
       USE PRMS_CLIMATEVARS, ONLY: Swrad, Basin_orad, Orad_hru, &
@@ -140,28 +140,28 @@
      &       'decimal fraction', Basin_cloud_cover)
 
         ! Declare Parameters
-        ALLOCATE ( Crad_coef(Nhru,MONTHS_PER_YEAR) )
+        ALLOCATE ( Crad_coef(Nhru,Nmonths) )
         IF ( declparam(MODNAME, 'crad_coef', 'nhru,nmonths', 'real', &
      &       '0.4', '0.1', '0.7', &
      &       'Coefficient in cloud cover-solar radiation relationship', &
      &       'Coefficient(B) in Thompson(1976) equation;' // &
      &       ' varies by region, contour map of values in reference', &
      &       'none')/=0 ) CALL read_error(1, 'crad_coef')
-        ALLOCATE ( Crad_exp(Nhru,MONTHS_PER_YEAR) )
+        ALLOCATE ( Crad_exp(Nhru,Nmonths) )
         IF ( declparam(MODNAME, 'crad_exp', 'nhru,nmonths', 'real', &
      &       '0.61', '0.2', '0.8', &
      &       'Exponent in cloud cover-solar radiation relationship', &
      &       'Exponent(P) in Thompson(1976) equation', &
      &       'none')/=0 ) CALL read_error(1, 'crad_exp')
 
-        ALLOCATE ( Ccov_slope(Nhru,MONTHS_PER_YEAR) )
+        ALLOCATE ( Ccov_slope(Nhru,Nmonths) )
         IF ( declparam(MODNAME, 'ccov_slope', 'nhru,nmonths', 'real', &
      &       '-0.13', '-0.5', '-0.01', &
      &       'Slope in temperature cloud cover relationship', &
      &       'Monthly (January to December) coefficient in cloud-cover relationship', &
      &       'none')/=0 ) CALL read_error(1, 'ccov_slope')
 
-        ALLOCATE ( Ccov_intcp(Nhru,MONTHS_PER_YEAR) )
+        ALLOCATE ( Ccov_intcp(Nhru,Nmonths) )
         IF ( declparam(MODNAME, 'ccov_intcp', 'nhru,nmonths', 'real', &
      &       '1.83', '0.0', '5.0', &
      &       'Intercept in temperature cloud cover relationship', &
@@ -170,10 +170,10 @@
 
       ELSEIF ( Process_flag==INIT ) THEN
 ! Get parameters
-        IF ( getparam_real(MODNAME, 'crad_coef', Nhru*MONTHS_PER_YEAR, Crad_coef)/=0 ) CALL read_error(2, 'crad_coef')
-        IF ( getparam_real(MODNAME, 'crad_exp', Nhru*MONTHS_PER_YEAR, Crad_exp)/=0 ) CALL read_error(2, 'crad_exp')
-        IF ( getparam_real(MODNAME, 'ccov_slope', Nhru*MONTHS_PER_YEAR, Ccov_slope)/=0 ) CALL read_error(2, 'ccov_slope')
-        IF ( getparam_real(MODNAME, 'ccov_intcp', Nhru*MONTHS_PER_YEAR, Ccov_intcp)/=0 ) CALL read_error(2, 'ccov_intcp')
+        IF ( getparam_real(MODNAME, 'crad_coef', Nhru*Nmonths, Crad_coef)/=0 ) CALL read_error(2, 'crad_coef')
+        IF ( getparam_real(MODNAME, 'crad_exp', Nhru*Nmonths, Crad_exp)/=0 ) CALL read_error(2, 'crad_exp')
+        IF ( getparam_real(MODNAME, 'ccov_slope', Nhru*Nmonths, Ccov_slope)/=0 ) CALL read_error(2, 'ccov_slope')
+        IF ( getparam_real(MODNAME, 'ccov_intcp', Nhru*Nmonths, Ccov_intcp)/=0 ) CALL read_error(2, 'ccov_intcp')
 
         Cloud_radadj = 0.0
         Cloud_cover_hru = 0.0

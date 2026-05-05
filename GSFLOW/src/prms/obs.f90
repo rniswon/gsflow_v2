@@ -2,13 +2,12 @@
 ! Reads and stores observed data from all specified measurement stations
 !***********************************************************************
       MODULE PRMS_OBS
-      USE PRMS_CONSTANTS, ONLY: MONTHS_PER_YEAR
       IMPLICIT NONE
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Time Series Data'
       character(len=*), parameter :: MODNAME = 'obs'
       character(len=*), parameter :: Version_obs = '2023-11-01'
-      INTEGER, SAVE :: Nlakeelev, Nwind, Nhumid, Rain_flag, Nstreamtemp
+      INTEGER, SAVE :: Rain_flag
 !   Declared Variables
       INTEGER, SAVE :: Rain_day
       REAL, SAVE, ALLOCATABLE :: Pan_evap(:), Runoff(:), Precip(:)
@@ -18,7 +17,7 @@
       ! Lake Module Variables
       REAL, SAVE, ALLOCATABLE :: Gate_ht(:), Lake_elev(:)
 !   Declared Parameters
-      INTEGER, SAVE :: Runoff_units, Rain_code(MONTHS_PER_YEAR)
+      INTEGER, SAVE :: Runoff_units, Rain_code(12)
       END MODULE PRMS_OBS
 
 !***********************************************************************
@@ -29,40 +28,18 @@
       USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Functions
-      INTEGER, EXTERNAL :: obsdecl, obsinit, obsrun, obssetdims
+      INTEGER, EXTERNAL :: obsdecl, obsinit, obsrun
 !***********************************************************************
       obs = 0
 
 ! obsrun not needed as data file is read in read_data_file and variables are set there
-      IF ( Process_flag==SETDIMENS ) THEN
-        obs = obssetdims()
-      ELSEIF ( Process_flag==DECL ) THEN
+      IF ( Process_flag==DECL ) THEN
         obs = obsdecl()
       ELSEIF ( Process_flag==INIT ) THEN
         obs = obsinit()
       ENDIF
 
       END FUNCTION obs
-
-!***********************************************************************
-!     obssetdims - declares obs module specific dimensions
-!***********************************************************************
-      INTEGER FUNCTION obssetdims()
-      USE PRMS_CONSTANTS, ONLY: MAXDIM
-      use PRMS_READ_PARAM_FILE, only: decldim
-      use prms_utils, only: read_error
-      IMPLICIT NONE
-!***********************************************************************
-      obssetdims = 0
-
-      IF ( decldim('nlakeelev', 0, MAXDIM, &
-     &     'Maximum number of lake elevations for any rating table data set')/=0 ) CALL read_error(7, 'nlakeelev')
-      IF ( decldim('nwind', 0, MAXDIM, 'Number of wind-speed measurement stations')/=0 ) CALL read_error(7, 'nwind')
-      IF ( decldim('nhumid', 0, MAXDIM, 'Number of relative humidity measurement stations')/=0 ) CALL read_error(7, 'nhumid')
-      IF ( decldim('nstreamtemp', 0, MAXDIM, 'Number of stream temperature replacement segments')/=0 ) &
-     &     CALL read_error(7, 'nstreamtemp')
-
-      END FUNCTION obssetdims
 
 !***********************************************************************
 !     obsdecl - makes public variable declarations for the obs module
@@ -72,8 +49,9 @@
       INTEGER FUNCTION obsdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, xyz_dist_module
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
-      use PRMS_READ_PARAM_FILE, only: declparam, getdim
-      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Precip_flag
+      use PRMS_READ_PARAM_FILE, only: declparam
+      USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Precip_flag, &
+          Nhumid, Nwind, Nstreamtemp, Nlakeelev
       USE PRMS_OBS
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -126,17 +104,6 @@
      &       'Solar radiation at each measurement station', &
      &       'Langleys', Solrad)
       ENDIF
-
-      Nsnow = getdim('nsnow')
-      IF ( Nsnow==-1 ) CALL read_error(6, 'nsnow')
-      Nhumid = getdim('nhumid')
-      IF ( Nhumid==-1 ) CALL read_error(6, 'nhumid')
-      Nwind = getdim('nwind')
-      IF ( Nwind==-1 ) CALL read_error(6, 'nwind')
-      Nlakeelev = getdim('nlakeelev')
-      IF ( Nlakeelev==-1 ) CALL read_error(6, 'nlakeelev')
-      Nstreamtemp = getdim('nstreamtemp')
-      IF ( Nstreamtemp==-1 ) CALL read_error(6, 'nstreamtemp')
 
       IF ( Nsnow>0 ) THEN
         ALLOCATE ( Snowdepth(Nsnow) )
@@ -215,9 +182,9 @@
 !     obsinit - initializes obs module
 !***********************************************************************
       INTEGER FUNCTION obsinit()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, MONTHS_PER_YEAR, CFS
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CFS
       use PRMS_READ_PARAM_FILE, only: getparam_int
-      USE PRMS_MODULE, ONLY: Nobs
+      USE PRMS_MODULE, ONLY: Nobs, Nmonths
       USE PRMS_OBS
       use prms_utils, only: read_error
       IMPLICIT NONE
@@ -230,7 +197,7 @@
       ENDIF
 
       IF ( Rain_flag==ACTIVE ) THEN
-        IF ( getparam_int(MODNAME, 'rain_code', MONTHS_PER_YEAR, Rain_code)/=0 ) CALL read_error(2, 'rain_code')
+        IF ( getparam_int(MODNAME, 'rain_code', Nmonths, Rain_code)/=0 ) CALL read_error(2, 'rain_code')
       ENDIF
 
       Rain_day = OFF

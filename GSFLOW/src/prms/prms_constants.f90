@@ -15,7 +15,6 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: MAXDESCRIPTION_LENGTH = 512
     integer, parameter :: MAXCMDLINE_LENGTH = 512
     integer, parameter :: MAXDIM = 500
-    integer, parameter :: MONTHS_PER_YEAR = 12
     integer, parameter :: MAX_DAYS_PER_YEAR = 366
     integer, parameter :: DAYS_PER_YEAR = 365
     real, parameter :: DAYS_YR = 365.242
@@ -79,13 +78,14 @@ MODULE PRMS_CONSTANTS
 ! Documentation of modules for the modular modeling system of the U.S. Geological Survey: 
 ! U.S. Geological Survey Scientific Investigations Report 2006-5318, 30 p.
 !    integer, parameter :: WINTER_WHEAT_SUMMER = 5
-!    integer, parameter :: WINTER_WHEAT_FALLOW = 5
+!    integer, parameter :: WINTER_WHEAT_FALLOW = 6
 !    integer, parameter :: ORCHARD = 7
 !    integer, parameter :: ALFALFA = 8
 !    integer, parameter :: ROW_CROPS = 9
 !    integer, parameter :: WATER = 10
 !    integer, parameter :: CORN = 11
 !    integer, parameter :: POTATO = 12
+!    integer, parameter :: BAREGROUND = 13
 !    integer, parameter :: LENTIL = 14
 !    integer, parameter :: SPRING_WHEAT = 15
 !    integer, parameter :: IMPERVIOUS = 16
@@ -131,7 +131,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: CASCADEGW_OFF = 0
     integer, parameter :: CASCADEGW_SAME = 2
 
-    ! model_mode
+    ! model_mode; model_mode > 20 special PRMS modes
     integer, parameter :: GSFLOW = 0
     integer, parameter :: PRMS = 1
     integer, parameter :: MODFLOW = 2
@@ -140,7 +140,6 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: MODSIM_MODFLOW = 11
     integer, parameter :: MODSIM = 13
     integer, parameter :: MODSIM_PRMS_LOOSE = 14
-
     integer, parameter :: RUN = 0
     integer, parameter :: DECL = 1
     integer, parameter :: INIT = 2
@@ -188,6 +187,7 @@ MODULE PRMS_CONSTANTS
     integer, parameter :: DEBUG_normal = 0
     integer, parameter :: DEBUG_WB = 1
     integer, parameter :: DEBUG_SOLTAB = 5
+    integer, parameter :: DEBUG_CASCADE = 7
 
 ! module flags
     integer, parameter :: precip_1sta_module = 1, precip_laps_module = 2, precip_dist2_module = 3

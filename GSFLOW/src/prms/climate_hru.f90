@@ -10,7 +10,7 @@
         ! Local Variables
         character(len=*), parameter :: MODDESC = 'Climate Input'
         character(len=*), parameter :: MODNAME = 'climate_hru'
-        character(len=*), parameter :: Version_climate_hru = '2025-01-16'
+        character(len=*), parameter :: Version_climate_hru = '2025-02-25'
         INTEGER, SAVE :: Precip_unit, Tmax_unit, Tmin_unit, Et_unit, Swrad_unit, Transp_unit
         INTEGER, SAVE :: Humidity_unit, Windspeed_unit
         INTEGER, SAVE :: Albedo_unit, Cloud_cover_unit, istop
@@ -37,14 +37,14 @@
 
       INTEGER FUNCTION climate_hru()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, RUN, DECL, INIT, &
-     &    MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, MM, MONTHS_PER_YEAR, DEBUG_less
+     &    MM2INCH, MINTEMP, MAXTEMP, ERROR_cbh, MM, DEBUG_less
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_real, getparam_int
       use PRMS_CONTROL_FILE, only: control_integer, control_string
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Climate_transp_flag, Orad_flag, &
      &    Climate_precip_flag, Climate_temp_flag, Climate_potet_flag, Climate_swrad_flag, &
      &    Start_year, Start_month, Start_day, Humidity_cbh_flag, Windspeed_cbh_flag, &
-     &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, &
+     &    Albedo_cbh_flag, Cloud_cover_cbh_flag, Nowmonth, Nmonths, &
      &    Nowyear, Nowday, forcing_check_flag, Print_debug, Ncbh, bias_adjust_flag, &
      &    irrigated_area_cbh_flag, AET_cbh_flag, PET_cbh_flag
       USE PRMS_CLIMATE_HRU
@@ -419,9 +419,9 @@
 
 !   Declared Parameters
         IF ( Climate_temp_flag==ACTIVE ) THEN
-          ALLOCATE ( Tmax_cbh_adj(Nhru,MONTHS_PER_YEAR) )
+          ALLOCATE ( Tmax_cbh_adj(Nhru,Nmonths) )
           IF ( bias_adjust_flag==ACTIVE ) THEN
-            ALLOCATE ( Tmax_cbh_adj_offset(Nhru,MONTHS_PER_YEAR) )
+            ALLOCATE ( Tmax_cbh_adj_offset(Nhru,Nmonths) )
             IF ( declparam(MODNAME, 'tmax_cbh_adj_offset', 'nhru,nmonths', 'real', &
      &           '0.0', '0.0', '50.0', &
      &           'Monthly maximum temperature adjustment factor as an offset from tmin_cbh_adj for each HRU', &
@@ -438,7 +438,7 @@
      &           'temp_units')/=0 ) CALL read_error(1, 'tmax_cbh_adj')
           ENDIF
 
-          ALLOCATE ( Tmin_cbh_adj(Nhru,MONTHS_PER_YEAR) )
+          ALLOCATE ( Tmin_cbh_adj(Nhru,Nmonths) )
           IF ( declparam(MODNAME, 'tmin_cbh_adj', 'nhru,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
      &         'Monthly minimum temperature adjustment factor for each HRU', &
@@ -448,7 +448,7 @@
         ENDIF
 
         IF ( Climate_precip_flag==ACTIVE ) THEN
-          ALLOCATE ( Rain_cbh_adj(Nhru,MONTHS_PER_YEAR) )
+          ALLOCATE ( Rain_cbh_adj(Nhru,Nmonths) )
           IF ( declparam(MODNAME, 'rain_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '2.0', &
      &         'Rain adjustment factor, by month for each HRU', &
@@ -457,7 +457,7 @@
      &         ' each HRU to account for differences in elevation and other factors', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'rain_cbh_adj')
 
-          ALLOCATE ( Snow_cbh_adj(Nhru,MONTHS_PER_YEAR) )
+          ALLOCATE ( Snow_cbh_adj(Nhru,Nmonths) )
           IF ( declparam(MODNAME, 'snow_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '2.0', &
      &         'Snow adjustment factor, by month for each HRU', &
@@ -468,7 +468,7 @@
         ENDIF
 
         IF ( Climate_potet_flag==ACTIVE ) THEN
-          ALLOCATE ( Potet_cbh_adj(Nhru,MONTHS_PER_YEAR) )
+          ALLOCATE ( Potet_cbh_adj(Nhru,Nmonths) )
           IF ( declparam(MODNAME, 'potet_cbh_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.5', '1.5', &
      &         'Potential ET adjustment factor, by month for each HRU', &
@@ -495,8 +495,8 @@
         istop = 0
 
         IF ( Climate_precip_flag==ACTIVE ) THEN
-          IF ( getparam_real(MODNAME, 'rain_cbh_adj', Nhru*MONTHS_PER_YEAR, Rain_cbh_adj)/=0 ) CALL read_error(2, 'rain_cbh_adj')
-          IF ( getparam_real(MODNAME, 'snow_cbh_adj', Nhru*MONTHS_PER_YEAR, Snow_cbh_adj)/=0 ) CALL read_error(2, 'snow_cbh_adj')
+          IF ( getparam_real(MODNAME, 'rain_cbh_adj', Nhru*Nmonths, Rain_cbh_adj)/=0 ) CALL read_error(2, 'rain_cbh_adj')
+          IF ( getparam_real(MODNAME, 'snow_cbh_adj', Nhru*Nmonths, Snow_cbh_adj)/=0 ) CALL read_error(2, 'snow_cbh_adj')
 
           IF ( control_string(Precip_day, 'precip_day')/=0 ) CALL read_error(5, 'precip_day')
           CALL find_cbh_header_end(Precip_unit, Precip_day, 'precip_day', 1)
@@ -510,15 +510,15 @@
         ENDIF
 
         IF ( Climate_temp_flag==ACTIVE ) THEN
-          IF ( getparam_real(MODNAME, 'tmin_cbh_adj', Nhru*MONTHS_PER_YEAR, Tmin_cbh_adj)/=0 ) &
+          IF ( getparam_real(MODNAME, 'tmin_cbh_adj', Nhru*Nmonths, Tmin_cbh_adj)/=0 ) &
                              CALL read_error(2, 'tmin_cbh_adj')
           IF ( bias_adjust_flag==ACTIVE ) THEN
-            IF ( getparam_real(MODNAME, 'tmax_cbh_adj_offset', Nhru*MONTHS_PER_YEAR, Tmax_cbh_adj_offset)/=0 ) &
+            IF ( getparam_real(MODNAME, 'tmax_cbh_adj_offset', Nhru*Nmonths, Tmax_cbh_adj_offset)/=0 ) &
                           CALL read_error(2, 'tmax_cbh_adj_offset')
             Tmax_cbh_adj = Tmin_cbh_adj + Tmax_cbh_adj_offset
             DEALLOCATE ( Tmax_cbh_adj_offset )
           ELSE
-            IF ( getparam_real(MODNAME, 'tmax_cbh_adj', Nhru*MONTHS_PER_YEAR, Tmax_cbh_adj)/=0 ) &
+            IF ( getparam_real(MODNAME, 'tmax_cbh_adj', Nhru*Nmonths, Tmax_cbh_adj)/=0 ) &
                           CALL read_error(2, 'tmax_cbh_adj')
           ENDIF
           IF ( control_string(Tmax_day, 'tmax_day')/=0 ) CALL read_error(5, 'tmax_day')
@@ -542,7 +542,7 @@
         ENDIF
 
         IF ( Climate_potet_flag==ACTIVE ) THEN
-          IF ( getparam_real(MODNAME, 'potet_cbh_adj', Nhru*MONTHS_PER_YEAR, Potet_cbh_adj)/=0 ) &
+          IF ( getparam_real(MODNAME, 'potet_cbh_adj', Nhru*Nmonths, Potet_cbh_adj)/=0 ) &
      &         CALL read_error(2, 'potet_cbh_adj')
           IF ( control_string(Potet_day, 'potet_day')/=0 ) CALL read_error(5, 'potet_day')
           CALL find_cbh_header_end(Et_unit, Potet_day, 'potet_day', 1)

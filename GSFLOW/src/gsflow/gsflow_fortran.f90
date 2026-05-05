@@ -8,14 +8,17 @@
       IMPLICIT NONE
 ! Local Variables
       INTEGER :: i
-      LOGICAL :: AFR, MS_GSF_converge
+!      LOGICAL :: AFR, MS_GSF_converge
+      INTEGER :: AFR, MS_GSF_converge
       INTEGER :: Nsegshold, Nlakeshold
       INTEGER, ALLOCATABLE :: Idivert(:)
       DOUBLE PRECISION, ALLOCATABLE :: Diversions(:), LAKEVOL(:), LAKEVAP(:)
       DOUBLE PRECISION, ALLOCATABLE :: agDemand(:), DELTAVOL(:), EXCHANGE(:)
 !***********************************************************************
-      AFR = .TRUE.
-      MS_GSF_converge = .FALSE.
+!      AFR = .TRUE.
+!      MS_GSF_converge = .FALSE.
+      AFR = 0
+      MS_GSF_converge = 0
       Nlakeshold = 1
       Nsegshold = 1
       ALLOCATE ( Idivert(Nlakeshold), DELTAVOL(Nlakeshold),LAKEVOL(Nlakeshold), LAKEVAP(Nlakeshold)  )

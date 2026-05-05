@@ -7,11 +7,13 @@
 !     gvr_hru_id, gvr_cell_id
 !     ******************************************************************
       INTEGER FUNCTION gsflow_mf2prms()
-      USE PRMS_CONSTANTS, ONLY: ACTIVE, RUN, DECL
-      USE PRMS_MODULE, ONLY: Process_flag, Nhrucell, Gvr_cell_id, Ag_package, Dprst_flag, Dprst_ag_gain, Hru_ag_irr
+      USE PRMS_CONSTANTS, ONLY: ACTIVE, RUN, DECL, SWALE
+      USE PRMS_MODULE, ONLY: Process_flag, Nhrucell, Gvr_cell_id, Ag_package, Dprst_flag, Dprst_ag_gain, Hru_ag_irr, &
+                             gw2dprst_swale_flag, Have_swales
       use prms_utils, only: print_module
       USE GSFMODFLOW, ONLY: Mfq2inch_conv, Gwc_col, Gwc_row, MFQ_to_inch_acres
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Gw2sm_grav
+      USE PRMS_SRUNOFF, ONLY: Gw2dprst
       USE GWFUZFMODULE, ONLY: SEEPOUT
       USE GWFAGMODULE, ONLY: NUMIRRWELSP, IRRWELVAR, NUMCELLS, WELLIRRPRMS, IRRROW_SW, &
      &                       NUMIRRDIVERSIONSP, IRRSEG, DVRCH, DIVERSIONIRRPRMS, IRRROW_GW, &
@@ -28,8 +30,13 @@
 
       IF ( Process_flag==RUN ) THEN
         DO i = 1, Nhrucell
-          IF ( Hrucheck(Gvr_hru_id(i))==1 ) &
-     &         Gw2sm_grav(i) = SEEPOUT(Gwc_col(Gvr_cell_id(i)), Gwc_row(Gvr_cell_id(i)))*Mfq2inch_conv(i)
+          IF ( Hrucheck(Gvr_hru_id(i))==1 ) THEN
+            IF ( gw2dprst_swale_flag == ACTIVE .AND. Gvr_hru_id(i) == SWALE ) THEN
+              Gw2dprst(i) = SEEPOUT(Gwc_col(Gvr_cell_id(i)), Gwc_row(Gvr_cell_id(i)))*Mfq2inch_conv(i)
+            ELSE
+              Gw2sm_grav(i) = SEEPOUT(Gwc_col(Gvr_cell_id(i)), Gwc_row(Gvr_cell_id(i)))*Mfq2inch_conv(i)
+            ENDIF
+          ENDIF
         ENDDO
 !
 ! Add irrigation to HRU from AG Package

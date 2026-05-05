@@ -501,7 +501,7 @@
           ELSEIF ( activeHRU_inactiveCELL(ihru) == ACTIVE ) THEN
             if(Sm2gw_grav(ihru)>0.0) print *, 'Sm2gw_grav****', ihru, Sm2gw_grav(ihru)
             Sm2gw_grav(ihru) = 0.0
-            Gw_rejected_grav(ihru) = 0.0
+            Gw_rejected_grav(j) = 0.0
             CYCLE
           ENDIF
         ENDIF

@@ -142,7 +142,6 @@
 !     strmflow_character_run - Computes streamflow characteristics
 !***********************************************************************
       INTEGER FUNCTION strmflow_character_run()
-      USE PRMS_CONSTANTS, ONLY: NEARZERO
       USE PRMS_MODULE, ONLY: Nsegment
       USE PRMS_STRMFLOW_CHARACTER
       USE PRMS_FLOWVARS, ONLY: Seg_outflow
@@ -162,7 +161,7 @@
             Seg_width(i) = width_alpha(i) * (segflow ** width_m(i))
             Seg_depth(i) = depth_alpha(i) * (segflow ** depth_m(i))
             Seg_area(i) = Seg_width(i) * Seg_depth(i)
-            if (Seg_area(i) > NEARZERO) then
+            if ( Seg_area(i) > 0.0 ) then
                Seg_velocity(i) = segflow / Seg_area(i)
             else
                Seg_velocity(i) = 0.0

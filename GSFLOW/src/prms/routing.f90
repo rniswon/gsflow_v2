@@ -6,7 +6,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Streamflow Routing Init'
       character(len=7), parameter :: MODNAME = 'routing'
-      character(len=*), parameter :: Version_routing = '2025-01-30'
+      character(len=*), parameter :: Version_routing = '2025-02-19'
       DOUBLE PRECISION, SAVE :: Cfs2acft
       DOUBLE PRECISION, SAVE :: Segment_area
       INTEGER, SAVE :: Use_transfer_segment, Noarea_flag, Hru_seg_cascades, special_seg_type_flag
@@ -718,7 +718,7 @@
      &    strmflow_muskingum_module, strmflow_in_out_module, CASCADE_OFF, CASCADE_HRU_SEGMENT !, FT2_PER_ACRE
       USE PRMS_MODULE, ONLY: Nsegment, Cascade_flag, Glacier_flag, Hru_type
       USE PRMS_ROUTING
-      USE PRMS_BASIN, ONLY: Hru_area, Hru_route_order, Active_hrus
+      USE PRMS_BASIN, ONLY: Hru_area, Hru_route_order, Active_hrus, Hru_area_dble
       USE PRMS_CLIMATEVARS, ONLY: Swrad, Potet
       USE PRMS_SET_TIME, ONLY: Timestep_seconds, Cfs_conv
       USE PRMS_FLOWVARS, ONLY: Ssres_flow, Sroff, Seg_lateral_inflow, Strm_seg_in !, Seg_outflow
@@ -749,6 +749,7 @@
         Seg_sroff = 0.0D0
         Seg_ssflow = 0.0D0
       ENDIF
+
       IF ( Cascade_flag==CASCADE_OFF ) THEN
         Seg_lateral_inflow = 0.0D0
       ELSE ! use strm_seg_in for cascade_flag = 1 (CASCADE_NORMAL) or 2 (CASCADE_HRU_SEGMENT)
@@ -757,12 +758,12 @@
 
       DO jj = 1, Active_hrus
         j = Hru_route_order(jj)
-        tocfs = DBLE( Hru_area(j) )*Cfs_conv
+        tocfs = Hru_area_dble(j)*Cfs_conv
         Hru_outflow(j) = DBLE( (Sroff(j) + Ssres_flow(j) + Gwres_flow(j)) )*tocfs
         ! Note: glacr_flow (from glacier or snowfield) is added as a gain, outside stream network addition
         ! glacr_flow in inch^3, 1728=12^3
-        IF ( Glacier_flag==ACTIVE ) THEN
-          IF ( Hru_type(j)==GLACIER ) Hru_outflow(j) = Hru_outflow(j) + DBLE( Glacr_flow(j) ) / 1728.0D0 / Timestep_seconds
+        IF ( Glacier_flag==1 ) THEN
+          IF ( Hru_type(j)==GLACIER ) Hru_outflow(j) = Hru_outflow(j) + DBLE( Glacr_flow(j) / 1728.0 / Timestep_seconds )
         ENDIF
         IF ( Hru_seg_cascades==ACTIVE ) THEN
           i = Hru_segment(j)

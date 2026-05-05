@@ -8,19 +8,19 @@
      &          EQULS = '=========================================================================='
       character(len=*), parameter :: MODDESC = 'PRMS Computation Order'
       character(len=11), parameter :: MODNAME = 'gsflow_prms'
-      character(len=*), parameter :: GSFLOW_versn = '2.4.0 02/01/2025'
-      character(len=*), parameter :: PRMS_versn = '2025-02-01'
-      character(len=*), parameter :: PRMS_VERSION = 'Version 6.0.0 02/01/2025'
-      character(len=*), parameter :: githash = 'Github Commit Hash fc8e5194eee5e9e2fb51c708dc04871408aa6eea'
+      character(len=*), parameter :: GSFLOW_versn = '2.4.0 03/30/2026'
+      character(len=*), parameter :: PRMS_versn = '2026-03-30'
+      character(len=*), parameter :: PRMS_VERSION = 'Version 6.1.0 03/30/2026'
+      character(len=*), parameter :: githash = 'Github Commit Hash 25f61fe10733e5ba1ddac095e8546342764675cf'
       character(len=*), parameter :: Version_read_control_file = '2025-01-16'
-      character(len=*), parameter :: Version_read_parameter_file = '2024-11-25'
+      character(len=*), parameter :: Version_read_parameter_file = '2025-09-01'
       character(len=*), parameter :: Version_read_data_file = '2023-06-02'
       CHARACTER(LEN=8), SAVE :: Process
 ! Dimensions
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw, Ncbh
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus, Nmonths
       INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval, Nmap2hru, Nmap, Nsnow
-      INTEGER, SAVE :: NLAKES_MF, Nreach
+      INTEGER, SAVE :: NLAKES_MF, Nreach, Nlakeelev, Nwind, Nhumid, Nstreamtemp
 ! Global
       ! Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 3=MODSIM-PRMS; 4=MODSIM-PRMS-LOOSE; 10=MODSIM-GSFLOW; 12=MODSIM-MODFLOW; 13=MODSIM)
       INTEGER, SAVE :: Model, Process_flag, Call_cascade
@@ -64,7 +64,7 @@
       INTEGER, SAVE :: Init_vars_from_file, Save_vars_to_file, Orad_flag, Cascade_flag, Cascadegw_flag
       INTEGER, SAVE :: NhruOutON_OFF, Gwr_swale_flag, NsubOutON_OFF, BasinOutON_OFF, NsegmentOutON_OFF
       INTEGER, SAVE :: Stream_temp_flag, Strmtemp_humidity_flag, Stream_temp_shade_flag
-      INTEGER, SAVE :: Prms_warmup, statsON_OFF
+      INTEGER, SAVE :: Prms_warmup, statsON_OFF, gw2dprst_swale_flag
       INTEGER, SAVE :: Frozen_flag, Glacier_flag, one_subbasin_flag
       INTEGER, SAVE :: PRMS_land_iteration_flag, Iter_aet_flag, text_restart_flag
       INTEGER, SAVE :: irrigation_apply_flag, Dyn_ag_frac_flag, Dyn_ag_soil_flag, activeHRU_inactiveCELL_flag
@@ -82,10 +82,11 @@
       CHARACTER(LEN=MAXCONTROL_LENGTH), SAVE :: irrigated_area_module, AET_module, PET_ag_module
       INTEGER, SAVE :: Dyn_imperv_flag, Dyn_intcp_flag, Dyn_covden_flag, Dyn_covtype_flag, Dyn_transp_flag, Dyn_potet_flag
       INTEGER, SAVE :: Dyn_soil_flag, Dyn_radtrncf_flag, Dyn_dprst_flag,  Dprst_transferON_OFF
-      INTEGER, SAVE :: Dyn_snareathresh_flag, Dyn_transp_on_flag
+      INTEGER, SAVE :: Dyn_snareathresh_flag
       INTEGER, SAVE :: Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, Dyn_springfrost_flag
       INTEGER, SAVE :: Gwr_transferON_OFF, External_transferON_OFF, Segment_transferON_OFF, Lake_transferON_OFF
       INTEGER, SAVE :: Gsf_rpt, Rpt_days
+      INTEGER, SAVE :: Have_swales
       END MODULE PRMS_MODULE
 
     MODULE GSFMODFLOW

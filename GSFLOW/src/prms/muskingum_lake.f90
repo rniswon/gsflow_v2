@@ -754,6 +754,13 @@
             Din1(i) = DBLE( Lake_din1(i) )
           ENDDO
         ENDIF
+      ENDIF
+
+      IF ( Puls_flag==ACTIVE ) THEN
+        IF ( Mxnsos==0 ) CALL error_stop('dimension mxnsos = 0 and Puls routing requested', ERROR_dim)
+        IF ( getparam_real(MODNAME, 'o2', Mxnsos*Nlake, O2)/=0 ) CALL read_error(2, 'o2')
+        IF ( getparam_real(MODNAME, 's2', Mxnsos*Nlake, S2)/=0 ) CALL read_error(2, 's2')
+        IF ( getparam_int(MODNAME, 'nsos', Nlake, Nsos)/=0 ) CALL read_error(2, 'nsos')
         DO i = 1, Nlake
           IF ( Lake_type(i)==1 ) THEN
             kk = Nsos(i)
@@ -763,13 +770,6 @@
             ENDIF
           ENDIF
         ENDDO
-      ENDIF
-
-      IF ( Puls_flag==ACTIVE ) THEN
-        IF ( Mxnsos==0 ) CALL error_stop('dimension mxnsos = 0 and Puls routing requested', ERROR_dim)
-        IF ( getparam_real(MODNAME, 'o2', Mxnsos*Nlake, O2)/=0 ) CALL read_error(2, 'o2')
-        IF ( getparam_real(MODNAME, 's2', Mxnsos*Nlake, S2)/=0 ) CALL read_error(2, 's2')
-        IF ( getparam_int(MODNAME, 'nsos', Nlake, Nsos)/=0 ) CALL read_error(2, 'nsos')
       ENDIF
 
       IF ( Linear_flag==ACTIVE ) THEN
@@ -1146,7 +1146,7 @@
       Basin_cfs = Flow_out
       Basin_stflow_out = Basin_cfs / area_fac
       Basin_cms = Basin_cfs*CFS2CMS_CONV
-      IF ( Glacier_flag==ACTIVE ) THEN
+      IF ( Glacier_flag==1 ) THEN
         Basin_stflow_in = Basin_stflow_in + Basin_gl_top_melt
         Basin_gl_ice_cfs = Basin_gl_ice_melt*area_fac
         Basin_gl_cfs = Basin_gl_top_melt*area_fac
