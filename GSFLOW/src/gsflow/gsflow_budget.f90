@@ -334,8 +334,8 @@
 ! flux equals current minus last GW discharge used with soilzone, usually iteration before convergence
         flux_change = gwdisch - Gw2sm_grav(i) ! gw2sm_grav last set in gsflow_mf2prms with values last used by soilzone
         IF ( gw2dprst_swale_flag == ACTIVE ) flux_change = flux_change - Gw2dprst(ihru) ! Gw2dprst last set in gsflow_mf2prms with values last used by srunoff
-        Fluxchange(ihru) = Fluxchange(ihru) + DBLE(flux_change*pct)
         IF ( ABS(flux_change)<CLOSEZERO ) flux_change = 0.0 ! assume round-off error, so set to zero
+        Fluxchange(ihru) = Fluxchange(ihru) + DBLE(flux_change*pct)
         !Gw_rejected_grav includes rejected soil_to_gw
         Gw_rejected_grav(i) = Gw_rejected_grav(i) + Excess(icell)*Mfl_to_inch + REJ_INF(icol, irow)*Mfq2inch_conv(i)
 
