@@ -89,7 +89,7 @@
           RETURN
         ENDIF
         IF ( Model==MODSIM_PRMS .OR. Model==MODSIM_PRMS_LOOSE ) THEN
-          IF ( AFR .AND. Ag_package==OFF ) RETURN !do not return if diversion applied to soils
+          IF ( .NOT. AFR .AND. Ag_package==OFF ) RETURN !do not return if diversion applied to soils
         ENDIF
 
       ELSEIF ( Process_flag==DECL ) THEN
@@ -531,7 +531,7 @@
       IF ( GSFLOW_flag==ACTIVE ) THEN
 
         IF ( Process_flag==RUN ) THEN
-          IF ( MS_GSF_converge ) THEN
+          IF ( .NOT. MS_GSF_converge ) THEN
             CALL MFNWT_RUN(AFR, Diversions, Idivert, EXCHANGE, DELTAVOL, LAKEVOL, Nsegshold, Nlakeshold, agDemand)  !SOLVE GW SW EQUATIONS FOR MODSIM-GSFLOW ITERATION
           ENDIF
 
@@ -555,7 +555,7 @@
       ENDIF
 
       IF ( Model==MODSIM_GSFLOW ) THEN
-        IF ( Process_flag==0 .AND. MS_GSF_converge ) RETURN
+        IF ( Process_flag==0 .AND. .NOT. MS_GSF_converge ) RETURN
       ENDIF
 
       IF ( MapOutON_OFF>OFF ) ierr = map_results()

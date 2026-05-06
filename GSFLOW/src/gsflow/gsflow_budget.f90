@@ -47,6 +47,8 @@
 
 !***********************************************************************
 !     gsfbuddecl - set up parameters
+!   Declared Parameters
+!     hru_area, gvr_hru_id, gvr_cell_id, lake_hru_id
 !***********************************************************************
       INTEGER FUNCTION gsfbuddecl()
       USE GSFBUDGET
@@ -194,7 +196,7 @@
       END FUNCTION gsfbuddecl
 
 !***********************************************************************
-!     gsfbudinit - Initialize GSFBUDGET module
+!     gsfbudinit - Initialize GSFBUDGET module - get parameter values
 !***********************************************************************
       INTEGER FUNCTION gsfbudinit()
       USE PRMS_CONSTANTS, ONLY: ERROR_dim
@@ -240,7 +242,6 @@
 !  This will make "run" figure out the vbnm order.
       Vbnm_index = -1
       ALLOCATE ( Fluxchange(Nhru) )
-      Gw_rejected = 0.0
 
       END FUNCTION gsfbudinit
 
@@ -269,7 +270,7 @@
      &    Basin_actet, Basin_ssstor, Ssres_stor, Slow_stor, Basin_ssflow_cfs, Basin_sroff_cfs, &
      &    Basin_gwflow_cfs, Pref_flow_stor, Gravity_stor_res, Dprst_vol_open, Dprst_vol_clos
       USE PRMS_SET_TIME, ONLY: Cfs_conv
-      !Warning, modifies Basin_ssstor, Gw2sm_grav, and Gwsm_dprst
+      !Warning, modifies Basin_ssstor and Gw2sm_grav
       USE PRMS_SRUNOFF, ONLY: Basin_dprst_volop, Basin_dprst_volcl, Gw2dprst
       USE PRMS_SOILZONE, ONLY: Hrucheck, Gvr_hru_id, Basin_slstor, Gw2sm_grav, Gvr_hru_pct_adjusted
       IMPLICIT NONE
@@ -278,7 +279,7 @@
 !      EXTERNAL :: MODFLOW_GET_STORAGE_BCF, MODFLOW_GET_STORAGE_LPF
 !      EXTERNAL :: MODFLOW_GET_STORAGE_UPW
       EXTERNAL :: MODFLOW_VB_DECODE, getStreamFlow, getPump
-!      use prms_utils, only: print_date
+!     EXTERNAL :: getHeads
 ! Local Variables
       INTEGER :: i, ihru, icell, irow, icol, ii, lake
       REAL :: flux_change, gwdisch, harea, inches_on_lake, pct
@@ -331,27 +332,30 @@
 !-----------------------------------------------------------------------
         gwdisch = SEEPOUT(icol, irow)*Mfq2inch_conv(i)
 ! flux equals current minus last GW discharge used with soilzone, usually iteration before convergence
-        flux_change = gwdisch - Gw2sm_grav(i)
+        flux_change = gwdisch - Gw2sm_grav(i) ! gw2sm_grav last set in gsflow_mf2prms with values last used by soilzone
         IF ( gw2dprst_swale_flag == ACTIVE ) flux_change = flux_change - Gw2dprst(ihru) ! Gw2dprst last set in gsflow_mf2prms with values last used by srunoff
-        Fluxchange(Ihru) = Fluxchange(Ihru) + DBLE(flux_change*pct)
+        Fluxchange(ihru) = Fluxchange(ihru) + DBLE(flux_change*pct)
         IF ( ABS(flux_change)<CLOSEZERO ) flux_change = 0.0 ! assume round-off error, so set to zero
         !Gw_rejected_grav includes rejected soil_to_gw
         Gw_rejected_grav(i) = Gw_rejected_grav(i) + Excess(icell)*Mfl_to_inch + REJ_INF(icol, irow)*Mfq2inch_conv(i)
-        Gw_rejected(ihru) = Gw_rejected(ihru) + Gw_rejected_grav(i)*pct
 
+        Gw2sm_grav(i) = gwdisch
         IF ( Have_swales == ACTIVE ) THEN
           IF ( gw2dprst_swale_flag == ACTIVE .AND. ihru == SWALE ) THEN
-            Gw2dprst(i) = gwdisch ! set in mf2prms
-          ELSE
-            Gw2sm_grav(i) = gwdisch ! set in mf2prms
+            Gw2dprst(i) = gwdisch
+            Gw2sm_grav(i) = 0.0
           ENDIF
-        ELSE
-          Gw2sm_grav(i) = gwdisch ! set in mf2prms
         ENDIF
-        Gw2sm(ihru) = Gw2sm(ihru) + gwdisch*pct
         Gravity_stor_res(i) = Gravity_stor_res(i) + Gw_rejected_grav(i) + flux_change
-        Slow_stor(ihru) = Slow_stor(ihru) + Gravity_stor_res(i)*pct
         Actet_gw(ihru) = Actet_gw(ihru) + (GWET(icol,irow) + UZFETOUT(icol, irow))*Mfvol2inch_conv(i)*pct
+      ENDDO
+
+      DO i = 1, Nhrucell
+        ihru = Gvr_hru_id(i)
+        pct = SNGL( Gvr_hru_pct_adjusted(i) )
+        Gw_rejected(ihru) = Gw_rejected(ihru) + Gw_rejected_grav(i)*pct
+        Gw2sm(ihru) = Gw2sm(ihru) + Gw2sm_grav(i)*pct
+        Slow_stor(ihru) = Slow_stor(ihru) + Gravity_stor_res(i)*pct
       ENDDO
 
       Basin_ssstor = 0.0D0
@@ -390,13 +394,13 @@
         Actet_tot_gwsz(i) = Hru_actet(i) + Actet_gw(i)
         !rsr, need to adjust hru_actet for UZF
         Hru_actet(i) = Actet_tot_gwsz(i)
-        Basin_actet = Basin_actet + Hru_actet(i)*harea
-        Basin_actetgw = Basin_actetgw + Actet_gw(i)*harea
-        Basin_gw2sm = Basin_gw2sm + Gw2sm(i)*harea
+        Basin_actet = Basin_actet + DBLE( Hru_actet(i)*harea )
+        Basin_actetgw = Basin_actetgw + DBLE( Actet_gw(i)*harea )
+        Basin_gw2sm = Basin_gw2sm + DBLE( Gw2sm(i)*harea )
         Ssres_stor(i) = Slow_stor(i) + Pref_flow_stor(i)
-        Basin_ssstor = Basin_ssstor + Ssres_stor(i)*harea
-        Basin_szreject = Basin_szreject + Gw_rejected(i)*harea
-        Basin_slstor = Basin_slstor + Slow_stor(i)*harea
+        Basin_ssstor = Basin_ssstor + DBLE( Ssres_stor(i)*harea )
+        Basin_szreject = Basin_szreject + DBLE( Gw_rejected(i)*harea )
+        Basin_slstor = Basin_slstor + DBLE( Slow_stor(i)*harea )
         Basin_fluxchange = Basin_fluxchange + Fluxchange(i)*Hru_area_dble(i)
         IF ( Dprst_flag == ACTIVE .AND. Ag_package == ACTIVE ) THEN
           Basin_dprst_volop = Basin_dprst_volop + Dprst_vol_open(i)
