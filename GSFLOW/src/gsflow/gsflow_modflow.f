@@ -478,7 +478,7 @@ c     USE LMGMODULE
       IMPLICIT NONE
 ! Arguments
       INTEGER, INTENT(IN) :: Nsegshold, Nlakeshold
-      INTEGER, INTENT(IN) :: AFR
+      LOGICAL, INTENT(IN) :: AFR
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold),
      &                                   EXCHANGE(Nsegshold)
       DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(Nlakeshold),
