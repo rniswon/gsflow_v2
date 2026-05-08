@@ -21,7 +21,7 @@
 !***********************************************************************
       SUBROUTINE water_balance()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN
-      USE PRMS_MODULE, ONLY: Process_flag
+      USE PRMS_MODULE, ONLY: Process_flag, snow_flag
       USE PRMS_WATER_BALANCE
       IMPLICIT NONE
 ! Functions
@@ -39,7 +39,7 @@
         CLOSE ( INTCPUNT )
         CLOSE ( GWUNIT )
         CLOSE ( SROUNIT )
-        CLOSE ( SNOWUNIT )
+        IF ( snow_flag ) CLOSE ( SNOWUNIT )
       ENDIF
 
       END SUBROUTINE water_balance
@@ -49,7 +49,7 @@
       SUBROUTINE water_balance_decl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, CASCADE_OFF
       use PRMS_MMFAPI, only: declvar_dble
-      USE PRMS_MODULE, ONLY: Nhru, Cascade_flag, Dprst_flag
+      USE PRMS_MODULE, ONLY: Nhru, Cascade_flag, Dprst_flag, snow_flag
       USE PRMS_WATER_BALANCE
       USE PRMS_SRUNOFF, ONLY: MODNAME
       use prms_utils, only: print_module, PRMS_open_module_file, read_error
@@ -88,8 +88,10 @@
       CALL PRMS_open_module_file(INTCPUNT, 'intcp.wbal')
       WRITE ( INTCPUNT, 9003 )
 
-      CALL PRMS_open_module_file(SNOWUNIT, 'snowcomp.wbal')
-      WRITE ( SNOWUNIT, 9007 )
+      IF ( snow_flag==ACTIVE ) THEN
+        CALL PRMS_open_module_file(SNOWUNIT, 'snowcomp.wbal')
+        WRITE ( SNOWUNIT, 9007 )
+      ENDIF
 
       CALL PRMS_open_module_file(SROUNIT, MODNAME//'.wbal')
       IF ( Cascade_flag>CASCADE_OFF ) THEN
@@ -143,7 +145,7 @@
       SUBROUTINE water_balance_run()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, LAKE, CASCADE_OFF, CASCADEGW_OFF, OFF
       USE PRMS_MODULE, ONLY: Cascade_flag, Cascadegw_flag, Dprst_flag, Glacier_flag, Nowyear, Nowmonth, Nowday, &
-     &    Hru_type, AG_flag
+     &    Hru_type, AG_flag, snow_flag
       USE PRMS_WATER_BALANCE
       USE PRMS_BASIN, ONLY: Hru_route_order, Active_hrus, Hru_frac_perv, Hru_area_dble, Hru_perv, &
      &    Basin_area_inv, Dprst_area_max, Hru_frac_imperv, Hru_frac_dprst, Cov_type, Hru_storage, &
@@ -237,26 +239,28 @@
         ENDIF
 
         ! Skip the HRU if there is no snowpack and no new snow
-        IF ( It0_pkwater_equiv(i)>Snowpack_threshold(i) .OR. Net_snow(i)>0.0 ) THEN
-          hrubal = SNGL( It0_pkwater_equiv(i) - Pkwater_equiv(i) ) - Snow_evap(i) - Snowmelt(i)
-          IF ( Pptmix_nopack(i)==ACTIVE ) THEN
-            hrubal = hrubal + Net_snow(i)
-          ELSE
-            hrubal = hrubal + Net_ppt(i)
-          ENDIF
-          IF ( ABS(hrubal)>TOOSMALL ) THEN
-            IF ( ABS(hrubal)>SMALL ) THEN
-              WRITE ( BALUNT, * ) 'Possible HRU snow water balance error'
+        IF ( snow_flag==ACTIVE ) THEN
+          IF ( It0_pkwater_equiv(i)>Snowpack_threshold(i) .OR. Net_snow(i)>0.0 ) THEN
+            hrubal = SNGL( It0_pkwater_equiv(i) - Pkwater_equiv(i) ) - Snow_evap(i) - Snowmelt(i)
+            IF ( Pptmix_nopack(i)==ACTIVE ) THEN
+              hrubal = hrubal + Net_snow(i)
             ELSE
-              WRITE ( BALUNT, * ) 'Possible HRU snow rounding issue'
+              hrubal = hrubal + Net_ppt(i)
             ENDIF
-            WRITE ( BALUNT, * ) i, hrubal, Nowyear, Nowmonth, Nowday, &
-     &              It0_pkwater_equiv(i), Pkwater_equiv(i), Snow_evap(i), &
-     &              Snowmelt(i), Net_ppt(i), Net_snow(i), Net_rain(i), &
-     &              Hru_snow(i), Pptmix(i), Pptmix_nopack(i), Intcp_changeover(i)
-            WRITE ( BALUNT, '(A,/)' ) '*******************************'
+            IF ( ABS(hrubal)>TOOSMALL ) THEN
+              IF ( ABS(hrubal)>SMALL ) THEN
+                WRITE ( BALUNT, * ) 'Possible HRU snow water balance error'
+              ELSE
+                WRITE ( BALUNT, * ) 'Possible HRU snow rounding issue'
+              ENDIF
+              WRITE ( BALUNT, * ) i, hrubal, Nowyear, Nowmonth, Nowday, &
+     &                It0_pkwater_equiv(i), Pkwater_equiv(i), Snow_evap(i), &
+     &                Snowmelt(i), Net_ppt(i), Net_snow(i), Net_rain(i), &
+     &                Hru_snow(i), Pptmix(i), Pptmix_nopack(i), Intcp_changeover(i)
+              WRITE ( BALUNT, '(A,/)' ) '*******************************'
+            ENDIF
+            bsnobal = bsnobal + DBLE(hrubal*harea)
           ENDIF
-          bsnobal = bsnobal + DBLE(hrubal*harea)
         ENDIF
 
 ! srunoff balance

@@ -366,7 +366,7 @@ contains
 
     i = i + 1
     Control_parameter_data(i) % name = 'subbasin_flag'
-    Subbasin_flag = ACTIVE
+    Subbasin_flag = OFF
     Control_parameter_data(i) % values_int(1) = Subbasin_flag
     i = i + 1
     Control_parameter_data(i) % name = 'one_subbasin_flag'
