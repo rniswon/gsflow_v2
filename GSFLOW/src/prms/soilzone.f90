@@ -21,7 +21,7 @@
 !   Local Variables
       character(len=*), parameter :: MODDESC = 'Soilzone Computations'
       character(len=8), parameter :: MODNAME = 'soilzone'
-      character(len=*), parameter :: Version_soilzone = '2026-03-28'
+      character(len=*), parameter :: Version_soilzone = '2025-02-27'
       INTEGER, SAVE :: DBGUNT
       INTEGER, SAVE :: Max_gvrs, Et_type, Pref_flag
       REAL, SAVE, ALLOCATABLE :: Gvr2pfr(:), Swale_limit(:)
@@ -716,7 +716,6 @@
         ALLOCATE ( Hru_gvr_index(Max_gvrs, Nhru) )
         Hru_gvr_index = 0
         IF ( Nhru==Nhrucell ) THEN
-          Gvr_hru_pct_adjusted = 1.0D0
           IF ( Max_gvrs/=1 ) &
      &         CALL error_stop('nhru=nhrucell, but, gvr_hru_id array specifies more than one GVR for an HRU', ERROR_dim)
           DO j = 1, Active_hrus

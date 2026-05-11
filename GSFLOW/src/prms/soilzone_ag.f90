@@ -546,7 +546,6 @@
       unsatisfied_big = 0.0
       add_estimated_irrigation = OFF
       num_hrus_ag_iter = 0
-      Basin_gvr_stor_frac = 0.0D0
       adjust_sroff = OFF
 
 ! ***************************************

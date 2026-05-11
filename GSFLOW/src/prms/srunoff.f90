@@ -486,11 +486,11 @@
 !     &      ' surface-depression storage; the remainder flows to a stream network for each HRU', &
 !     &      'decimal fraction')/=0 ) CALL read_error(1, 'sro_to_dprst_ag')
       ENDIF
-      
+
       IF ( gw2dprst_swale_flag == ACTIVE ) THEN
         ALLOCATE ( Gw2dprst(Nhru) )
         CALL declvar_real(MODNAME, 'gw2dprst', 'nhru', Nhru, &
-     &       'Groundwater discharge to surface depression storage', &
+     &       'Groundwater discharge to surface depression storage added to swale HRUs', &
      &       'inches', Gw2dprst)
         Gw2dprst = 0.0
       ENDIF

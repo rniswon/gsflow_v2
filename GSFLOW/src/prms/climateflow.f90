@@ -66,7 +66,7 @@
       REAL, SAVE, ALLOCATABLE :: Intcp_stor(:), Hru_intcpstor(:)
       ! snow
       DOUBLE PRECISION, SAVE :: Basin_pweqv
-     DOUBLE PRECISION, SAVE :: Basin_snowmelt, Basin_snowevap, Basin_snowcov, Basin_pk_precip, Basin_snowdepth
+      DOUBLE PRECISION, SAVE :: Basin_snowmelt, Basin_snowevap, Basin_snowcov, Basin_pk_precip, Basin_snowdepth
       DOUBLE PRECISION, SAVE, ALLOCATABLE :: Pkwater_equiv(:), Pk_depth(:)
       REAL, SAVE, ALLOCATABLE :: Snowmelt(:), Snow_evap(:), Snowcov_area(:), Pk_precip(:)
       INTEGER, SAVE, ALLOCATABLE :: Pptmix_nopack(:)

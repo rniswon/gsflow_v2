@@ -20,7 +20,7 @@
 !***********************************************************************
 !***********************************************************************
       SUBROUTINE water_balance()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, CLEAN, ACTIVE
       USE PRMS_MODULE, ONLY: Process_flag, snow_flag
       USE PRMS_WATER_BALANCE
       IMPLICIT NONE
@@ -39,7 +39,7 @@
         CLOSE ( INTCPUNT )
         CLOSE ( GWUNIT )
         CLOSE ( SROUNIT )
-        IF ( snow_flag ) CLOSE ( SNOWUNIT )
+        IF ( snow_flag==ACTIVE ) CLOSE ( SNOWUNIT )
       ENDIF
 
       END SUBROUTINE water_balance
