@@ -148,7 +148,7 @@
      &       'none')/=0 ) CALL read_error(1, 'cascade_flg')
 
         IF ( declparam(MODNAME, 'circle_switch', 'one', 'integer', &
-     &       '1', '0', '1', &
+     &       '0', '0', '1', &
      &       'Flag to check for circles', &
      &       'Flag to check for circles (0=no check; 1=check)', &
      &       'none')/=0 ) CALL read_error(1, 'circle_switch')
@@ -701,13 +701,14 @@
           ENDIF
         ENDDO
         IF ( added==0 ) THEN
-          PRINT *, 'ERROR, no HRUs added to routing order on last pass through cascades, possible circles'
+          PRINT '(/,A)', 'ERROR, no HRUs added to routing order on last pass through cascades, possible circles'
           DO i = 1, Nhru
             IF ( is_hru_on_list(i)==0 ) THEN
-              PRINT *, 'HRU not in order:', i
+              PRINT '(/,A,I0)', 'HRU not in order: ', i
               IF ( Print_debug==DEBUG_CASCADE ) WRITE ( MSGUNT, * ) 'HRU not in order:', i
             ENDIF
           ENDDO
+          PRINT '(/,A,/)', 'HRU routing order'
           PRINT 9002, (Hru_route_order(i), i=1, Iorder)
           IF ( Print_debug==DEBUG_CASCADE ) THEN
             WRITE (MSGUNT, *) 'ERROR, no HRUs added to routing order on last pass through cascades, possible circles'
@@ -715,7 +716,7 @@
             WRITE ( MSGUNT, 9002 ) (Hru_route_order(i), i=1, Iorder)
           ENDIF
           Iret = 1
-          RETURN
+          STOP
         ENDIF
       ENDDO
       DEALLOCATE ( hrus_up_list, up_id_count, dn_id_count )
