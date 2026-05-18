@@ -232,7 +232,7 @@
       USE PRMS_BASIN, ONLY: Hru_area, Dprst_clos_flag, gsflow_ag_area, gsflow_ag_frac, &
      &    Hru_frac_imperv, Hru_frac_perv, Hru_imperv, Hru_perv, Hru_frac_dprst, Dprst_open_flag, &
      &    Dprst_area_max, Dprst_area_open_max, Dprst_area_clos_max, Dprst_frac_open, &
-     &    Hru_area_dble, Dprst_area, Active_hrus, Hru_route_order, Basin_area_inv, Imperv_flag, Ag_area, Ag_frac
+     &    Hru_area_dble, Active_hrus, Hru_route_order, Basin_area_inv, Imperv_flag, Ag_area, Ag_frac
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Soil_rechr, Imperv_stor, Sat_threshold, &
      &    Soil_rechr_max, Soil_moist_max, Imperv_stor_max, Dprst_vol_open, Dprst_vol_clos, Ssres_stor, &
      &    Slow_stor, Pref_flow_stor, Basin_soil_moist, Basin_ssstor, Hru_impervstor, Dprst_stor_hru, &
@@ -595,7 +595,7 @@
               tmp = SNGL( Dprst_vol_open(i) + Dprst_vol_clos(i) )
               IF ( tmp > 0.0 ) THEN
                 IF ( .NOT.(frac_dprst)>0.0 .AND. tmp>0.0 ) THEN
-                  tmp = ( tmp / Dprst_area(i) ) * Hru_frac_dprst(i)
+                  tmp = ( tmp / Dprst_area_max(i) ) * Hru_frac_dprst(i)
                   PRINT *, 'WARNING, dprst_frac reduced to 0 with storage > 0 in dynamic parameter module'
                   PRINT *, '         storage added to slow storage of the gravity reservoir:', tmp, '; HRU: ', i
                   PRINT FMT1, Nowyear, Nowmonth, Nowday
