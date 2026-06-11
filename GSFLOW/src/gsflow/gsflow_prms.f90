@@ -13,7 +13,7 @@
       USE PRMS_CONSTANTS, ONLY: ERROR_control, CANOPY
       use PRMS_CONTROL_FILE, only: read_control_file, control_integer
       use PRMS_DATA_FILE, only: read_prms_data_file
-      use PRMS_MMFAPI, only: Num_variables, Variable_data, MAXVARIABLES, declvar_int, declvar_real
+      use PRMS_MMFAPI, only: Num_variables, Variable_data, MAXVARIABLES, declvar_int, declvar_real, print_variables
       USE PRMS_MODULE
       use PRMS_READ_PARAM_FILE, only: declparam, check_parameters, getparam_int, getparam_real, &
                                       read_parameter_file_dimens, read_parameter_file_params, setup_params
@@ -52,7 +52,7 @@
       INTEGER, EXTERNAL :: stream_temp, glacr, dynamic_soil_param_read, strmflow_character
       INTEGER, EXTERNAL :: soilzone_ag
       EXTERNAL :: precip_map, temp_map, segment_to_hru, gwflow_inactive_cell
-      EXTERNAL :: water_balance, prms_summary, convert_params
+      EXTERNAL :: water_balance, prms_summary, convert_params, module_doc
       EXTERNAL :: gsflow_prms2modsim, gsflow_modsim2prms
       INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_mf2prms, gsflow_budget, gsflow_sum
 ! Local Variables
@@ -167,7 +167,7 @@
      &       'HRU type', 'Type of each HRU (0=inactive; 1=land; 2=lake; 3=swale; 4=glacier)', &
      &       'none')/=0 ) CALL read_error(1, 'hru_type')
 
-        IF ( GSFLOW_flag==ACTIVE ) THEN
+        IF ( GSFLOW_flag==ACTIVE .OR. documentation_files_flag == ACTIVE ) THEN
           CALL declvar_int(MODNAME, 'KKITER', 'one', 1, &
      &         'Current iteration in GSFLOW simulation', 'none', KKITER)
           ALLOCATE ( Hru_ag_irr(Nhru) )
@@ -190,7 +190,7 @@
      &         'Maximum number of iterations soilzone states are computed', &
      &         'none')/=0 ) CALL read_error(1, 'mxsziter')
           ALLOCATE ( Gvr_cell_pct(Nhrucell) )
-          IF ( Nhru/=Nhrucell ) THEN
+          IF ( Nhru/=Nhrucell .OR. documentation_files_flag == ACTIVE ) THEN
             IF ( declparam(MODNAME, 'gvr_cell_pct', 'nhrucell', 'real', &
      &           '0.0', '0.0', '1.0', &
      &           'Proportion of the grid cell associated with each GVR', &
@@ -208,6 +208,9 @@
         !IF ( MODSIM_flag==ACTIVE ) ALLOCATE ( Lake_In_Out_vol(Nlake) )
 
         Timestep = 0
+
+        IF ( documentation_files_flag == ACTIVE ) CALL module_doc()
+
         IF ( Init_vars_from_file>OFF ) CALL gsflow_prms_restart(READ_INIT)
 
       ELSEIF ( Process_flag==INIT ) THEN ! PRMS is active, GSFLOW and/or MODSIM could be active
@@ -600,6 +603,10 @@
         IF ( Model==CONVERT ) CALL convert_params()
       ELSEIF ( Process_flag==INIT ) THEN
         CALL check_parameters()
+        IF ( print_parameter_file_flag == 1 .OR. documentation_files_flag == 1 ) THEN
+            CALL print_variables()
+            stop
+        ENDIF
         IF ( Inputerror_flag==1 .OR. Parameter_check_flag==2 ) CALL input_error()
         IF ( Model==CONVERT ) THEN
           CALL convert_params()
@@ -937,6 +944,8 @@
 
       IF ( control_integer(Snarea_curve_flag, 'snarea_curve_flag')/=0 ) Snarea_curve_flag = OFF
       IF ( control_integer(Soilzone_aet_flag, 'soilzone_aet_flag')/=0 ) Soilzone_aet_flag = OFF
+      IF ( control_integer(soilzone_replenish_flag, 'soilzone_replenish_flag')/=0 ) soilzone_replenish_flag = OFF
+      if ( GSFLOW_flag==ACTIVE ) soilzone_replenish_flag = ACTIVE
       IF ( control_integer(Iter_aet_flag, 'iter_aet_flag')/=0 ) Iter_aet_flag = OFF
       IF ( control_integer(snow_cloudcover_flag, 'snow_cloudcover_flag')/=0 ) snow_cloudcover_flag = OFF
       IF ( control_integer(seg2hru_flag, 'seg2hru_flag')/=0 ) seg2hru_flag = OFF
@@ -1170,6 +1179,8 @@
       IF ( declfix('nmonths', 12, 12, 'Number of months in a year')/=0 ) CALL read_error(7, 'nmonths')
       Nmonths = 12
       IF ( declfix('one', 1, 1, 'Number of values for scaler array')/=0 ) CALL read_error(7, 'one')
+      IF ( declfix('nlapse', 3, 3, 'Number of lapse rates in X, Y, and Z directions')/=0 ) CALL read_error(7, 'nlapse')
+      Nlapse = 3
 
       IF ( Inputerror_flag==1 ) THEN
         PRINT '(//,A,/,A)', '**FIX input errors in your Control File to continue**', &
@@ -1755,3 +1766,151 @@
       END SUBROUTINE gsflow_prms_restart
 
       END MODULE PRMS_DLL
+
+!**********************************************************************
+!     Module documentation
+!**********************************************************************
+      SUBROUTINE module_doc()
+      USE PRMS_MODULE
+      USE PRMS_READ_PARAM_FILE, ONLY: check_parameters
+      use PRMS_MMFAPI, only: print_variables
+      IMPLICIT NONE
+! Functions
+      INTEGER, EXTERNAL :: basin, climateflow
+      INTEGER, EXTERNAL :: cascade, obs, soltab, transp_tindex
+      INTEGER, EXTERNAL :: transp_frost, frost_date, routing
+      INTEGER, EXTERNAL :: temp_1sta_laps, temp_dist2
+      INTEGER, EXTERNAL :: precip_1sta_laps, climate_hru
+      INTEGER, EXTERNAL :: precip_dist2, xyz_dist, ide_dist
+      INTEGER, EXTERNAL :: ddsolrad, ccsolrad
+      INTEGER, EXTERNAL :: potet_jh, potet_hamon, potet_hs, potet_pt, potet_pm
+      INTEGER, EXTERNAL :: intcp, snowcomp, gwflow, srunoff, soilzone_ag
+      INTEGER, EXTERNAL :: subbasin, basin_sum, map_results
+      INTEGER, EXTERNAL :: muskingum_lake, stream_temp, strmflow_character, muskingum_lake_setdims
+      EXTERNAL :: nhru_summary, prms_summary, water_balance, nsub_summary, basin_summary, nsegment_summary
+      INTEGER, EXTERNAL :: water_use_read, potet_pm_sta, glacr
+      INTEGER, EXTERNAL :: gsflow_prms2mf, gsflow_budget, gsflow_sum
+      EXTERNAL :: precip_map, temp_map, segment_to_hru
+! Local variable
+      INTEGER :: test
+!**********************************************************************
+
+      Nratetbl = 1
+      Nwateruse = 1
+      Nexternal = 1
+      Nconsumed = 1
+      Npoigages = 1
+      Ncascade = 1
+      Ncascdgw = 1
+      Ncbh = 1
+      Nsub = 1
+      Nhrucell = Nhru
+      Nlake = 1
+      Ngwcell = 1
+      Nlake_hrus = 1
+      Ntemp = 2
+      Nrain = 2
+      Nsol = 1
+      Nsegment = 1
+      Ndepl = 1
+      Nobs = 1
+      Nevap = 1
+      Ndeplval = 1
+      Nmap2hru = 1
+      Nmap = 1
+      Nsnow = 1
+      Nreach = 1
+      Nlakeelev = 1
+      Nwind = 1
+      Nhumid = 1
+      Nstreamtemp = 1
+
+      Climate_swrad_flag = 1
+      Humidity_cbh_flag = 1
+      Windspeed_cbh_flag = 1
+      Albedo_cbh_flag = 1
+      Cloud_cover_cbh_flag = 1
+      irrigated_area_cbh_flag = 1
+      AET_cbh_flag = 1
+      PET_cbh_flag = 1
+      Soilzone_add_water_use = 1
+      Gwr_transferON_OFF = 1
+      Lake_transferON_OFF = 1
+      NsegmentOutON_OFF = 1
+      Dprst_transferON_OFF = 1
+      Glacier_flag = 1
+      Dprst_flag = 1
+      AG_flag = 1
+      Lake_route_flag = 1
+      Climate_precip_flag = 1
+      Climate_potet_flag = 1
+      Cascade_flag = 1
+      Frozen_flag = 1
+      GSFLOW_flag = 1
+      Iter_aet_flag = 1
+      snow_flag = 1
+      Cascadegw_flag = 1
+      Init_vars_from_file = 0
+      Print_debug = 0
+
+      ! call all modules
+      test = basin()
+      test = cascade()
+      test = climateflow()
+      test = soltab()
+      test = obs()
+      test = water_use_read()
+      test = temp_1sta_laps()
+      test = temp_dist2()
+      test = xyz_dist()
+      test = ide_dist()
+      CALL temp_map()
+      CALL precip_map()
+      test = climate_hru()
+      test = precip_1sta_laps()
+      test = precip_dist2()
+      test = ddsolrad()
+      test = ccsolrad()
+      test = transp_tindex()
+      test = frost_date()
+      test = transp_frost()
+      test = potet_jh()
+      test = potet_hamon()
+      test = potet_hs()
+      test = potet_pt()
+      test = potet_pm()
+      test = potet_pm_sta()
+      test = intcp()
+      test = snowcomp()
+      test = srunoff()
+      test = glacr()
+      test = soilzone_ag()
+      test = gsflow_prms2mf()
+      test = gsflow_budget()
+      test = gsflow_sum()
+      test = gwflow()
+      test = routing()
+      test = muskingum_lake_setdims()
+      test = muskingum_lake()
+      test = stream_temp()
+      CALL segment_to_hru()
+      test = strmflow_character()
+      test = basin_sum()
+      test = map_results()
+      CALL nhru_summary()
+      CALL nsegment_summary()
+      CALL prms_summary()
+      CALL water_balance()
+      test = subbasin()
+      CALL check_parameters()
+      CALL print_variables()
+
+      PRINT 9001
+
+      STOP
+
+ 9001 FORMAT (//, ' All available modules have been called.', /, &
+     &        ' All parameters have been declared.', /, &
+     &        ' Note, no simulation was computed.', /)
+
+      END SUBROUTINE module_doc

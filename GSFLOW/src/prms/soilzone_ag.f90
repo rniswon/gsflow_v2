@@ -121,7 +121,7 @@
 
 !      IF ( Cascade_flag>OFF ) THEN
 !        ALLOCATE ( Ag_upslope_dunnian(Nhru) )
-!        CALL declvar_dble(MODNAME_AG, 'ag_upslope_dunnian', 'nhru', Nhru, &
+!        CALL declvar _dble(MODNAME_AG, 'ag_upslope_dunnian', 'nhru', Nhru, &
 !     &       'Cascading Dunnian surface runoff that'// &
 !     &       ' flows to the agriculture capillary reservoir of each downslope HRU for each upslope HRU', &
 !     &       'inches', Ag_upslope_dunnian)
@@ -241,7 +241,7 @@
      &     'none')/=0 ) CALL read_error(1, 'ag_soil_type')
 
 !      ALLOCATE ( Ag_crop_type(Nhru) ) ! find Mastin's code on different crops
-!      IF ( declparam(MODNAME_AG, 'ag_crop_type', 'nhru', 'integer', &
+!      IF ( decl param(MODNAME_AG, 'ag_crop_type', 'nhru', 'integer', &
 !     &     '3', '0', '4', &
 !     &     'Agriculture cover type designation for each HRU', &
 !     &     'Vegetation cover type for agriculture in each HRU (0=none;'// &
@@ -364,7 +364,8 @@
       USE PRMS_MODULE, ONLY: Print_debug, Dprst_flag, Cascade_flag, Nlake, &
      &    Frozen_flag, Soilzone_add_water_use, Nowmonth, GSFLOW_flag, Hru_ag_irr, Ag_package, PRMS_land_iteration_flag, &
      &    Soilzone_aet_flag, Hru_type, timestep_start_flag, Model, Dprst_ag_gain, &
-     &    activeHru_inactiveCell_flag, activeHru_inactiveCell, Iter_aet_flag, irrigation_apply_flag, Nhru, Nowyear, Nowday
+     &    activeHru_inactiveCell_flag, activeHru_inactiveCell, soilzone_replenish_flag, &
+     &    Iter_aet_flag, irrigation_apply_flag, Nhru, Nowyear, Nowday
       USE PRMS_SOILZONE
       USE PRMS_SOILZONE_AG
       USE PRMS_BASIN, ONLY: Hru_perv, Hru_frac_perv, Hru_storage, Hru_lateral_flow, &
@@ -407,7 +408,7 @@
       DOUBLE PRECISION :: dnslowflow, dnpreflow, dndunn
       REAL :: availh2o, avail_potet, hruactet
       REAL :: topfr !, tmp
-      REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin
+      REAL :: dunnianflw_pfr, dunnianflw_gvr, pref_flow_maxin, to_sm
       REAL :: perv_frac, capwater_maxin, ssresin, dunnianflw_frz, capacity
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin, cap_pref_flow_maxin
       REAL :: ag_upflow_max, ag_capacity, agfrac, ag_avail_potet, ag_potet, unsatisfied_ag_et
@@ -869,9 +870,20 @@
             ssresin = Soil_to_ssr(i) - topfr
             Slow_stor(i) = availh2o - topfr
             ! compute slow contribution to interflow, if any
-            IF ( Slow_stor(i)>0.0 ) &
-     &           CALL compute_interflow(Slowcoef_lin(i), Slowcoef_sq(i), &
-     &                                  ssresin, Slow_stor(i), Slow_flow(i))
+            IF ( Slow_stor(i)>0.0 ) THEN
+              CALL compute_interflow(Slowcoef_lin(i), Slowcoef_sq(i), &
+     &                               ssresin, Slow_stor(i), Slow_flow(i))
+              ! add water to capillary if water in gravity reservoir
+              IF ( soilzone_replenish_flag==ACTIVE ) THEN
+                ! capacity for whole HRU
+                capacity = Soil_moist_max(i) - Soil_moist(i)
+                IF ( capacity>0.0 ) THEN
+                  to_sm = min(capacity, Slow_stor(i) )
+                  Soil_moist(i) = Soil_moist(i) + to_sm
+                  Slow_stor(i) = Slow_stor(i) - to_sm*perv_frac
+                ENDIF
+              ENDIF
+            ENDIF
           ELSE ! compute_lateral==OFF
             Slow_stor(i) = availh2o
           ENDIF
@@ -910,9 +922,9 @@
             ENDIF
             Basin_pref_stor = Basin_pref_stor + DBLE( Pref_flow_stor(i)*harea )
             Basin_pfr_stor_frac = Basin_pfr_stor_frac + DBLE( Pref_flow_stor(i)/Pref_flow_max(i)*harea )
+          ELSE
+            IF ( compute_lateral==ACTIVE ) dunnianflw_gvr = topfr  !?? is this right
           ENDIF
-        ELSEIF ( .not.(Pref_flow_max(i)>0.0) ) THEN
-          IF ( compute_lateral==ACTIVE ) dunnianflw_gvr = topfr  !?? is this right
         ENDIF
         Gvr2pfr(i) = topfr
 
@@ -1281,7 +1293,7 @@
         ENDDO
         Basin_potet = Basin_potet*Basin_area_inv
       ENDIF
-      IF ( adjust_sroff==ACTIVE ) THEN !WARNING, RSR, Sroff can include Hortonian from ag fraction
+      IF ( GSFLOW_flag==ACTIVE .OR. adjust_sroff==ACTIVE ) THEN !WARNING, RSR, Sroff can include Hortonian from ag fraction
         Basin_hortonian = 0.0D0
         Basin_sroff = 0.0D0
         Basin_sroffp = 0.0D0

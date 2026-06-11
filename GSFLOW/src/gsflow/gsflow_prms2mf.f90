@@ -76,12 +76,12 @@
      &     'L3/T', Net_sz2gw)
 
 !      ALLOCATE (Reach_latflow(Nreach))
-!      CALL declvar_dble(MODNAME, 'reach_latflow', 'nreach', Nreach, &
+!      CALL declvar _dble(MODNAME, 'reach_latflow', 'nreach', Nreach, &
 !     &     'Lateral flow (surface runoff and interflow) into each stream reach', &
 !     &     'cfs', Reach_latflow)
 
 !      ALLOCATE (Reach_id(Nreach, Nsegment))
-!      CALL declvar_int(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, &
+!      CALL declvar _int(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, &
 !     &     'Mapping of reach id by segment id', &
 !     &     'none', Reach_id)
 
@@ -118,7 +118,7 @@
         ! new parameter segment_reach_fraction or reach_carea or change cascade
         ! procedure to cascade flow to reaches instead of segments
 !        ALLOCATE (Segment_reach_fraction(Nreach))
-!        IF ( declparam(MODNAME, 'segment_reach_fraction', 'nreach', 'real', &
+!        IF ( decl param(MODNAME, 'segment_reach_fraction', 'nreach', 'real', &
 !      &      '0.0', '0.0', '1.0', &
 !      &      'Proportion of each segment that contributes flow to a stream reach', &
 !      &      'Proportion of each segment that contributes flow to a stream reach', &

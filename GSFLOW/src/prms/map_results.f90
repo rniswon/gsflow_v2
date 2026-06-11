@@ -65,7 +65,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, ERROR_dim
       use PRMS_READ_PARAM_FILE, only: declparam
       use PRMS_CONTROL_FILE, only: control_integer, control_string_array
-      USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Ngwcell, MapOutON_OFF
+      USE PRMS_MODULE, ONLY: Nhru, Nhrucell, Ngwcell, MapOutON_OFF, documentation_files_flag
       USE PRMS_MAP_RESULTS
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -77,6 +77,7 @@
       CALL print_module(MODDESC, MODNAME, Version_map_results)
 
       IF ( control_integer(NmapOutVars, 'nmapOutVars')/=0 ) NmapOutVars = 0
+      IF ( documentation_files_flag==1 ) NmapOutVars = 1
       IF ( NmapOutVars==0 ) THEN
         PRINT *, 'WARNING, map_results requested with nmapOutVars equal 0'
         PRINT *, 'no map_results output is produced'
@@ -126,7 +127,7 @@
      &     'Number of columns for each row of the mapped results', &
      &     'none')/=0 ) CALL read_error(1, 'ncol')
 
-      IF ( Mapflg==OFF ) THEN
+      IF ( Mapflg==OFF .OR. documentation_files_flag==1 ) THEN
         IF ( declparam(MODNAME, 'gvr_cell_id', 'nhrucell', 'integer', &
      &       '0', 'bounded', 'ngwcell', &
      &       'Corresponding grid cell id associated with each GVR', &

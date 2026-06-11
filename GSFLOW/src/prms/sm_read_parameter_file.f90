@@ -7,15 +7,16 @@ contains
 ! Read Parameter File Dimensions
 !***********************************************************************
   module subroutine read_parameter_file_dimens()
-    use PRMS_CONSTANTS, only: MAXLINE_LENGTH, DEBUG_less
-    use PRMS_MODULE, only: Print_debug, EQULS, Param_file
+    use PRMS_CONSTANTS, only: MAXLINE_LENGTH, DEBUG_less, ERROR_open_out
+    use PRMS_MODULE, only: Print_debug, EQULS, Param_file, documentation_files_flag, &
+                           print_parameter_file_flag, param_file_unit
     use prms_utils, only: numchars, PRMS_open_input_file, read_error, write_outfile
     implicit none
       ! Functions
     intrinsic :: TRIM
     ! Local Variables
     character(LEN=16) :: string, dimname
-    character(LEN=MAXLINE_LENGTH) :: line
+    character(LEN=MAXLINE_LENGTH) :: line, header
     character(LEN=24) :: dimstring
     integer nchars, ios, dimen_value
     !***********************************************************************
@@ -27,10 +28,10 @@ contains
     end if
 
     ! Echo Parmeter File Header and comment lines
-    read (Param_unit, FMT='(A)', IOSTAT=ios) line
+    read (Param_unit, FMT='(A)', IOSTAT=ios) header
     if (ios /= 0) call read_error(13, 'description')
     if (Print_debug > DEBUG_less) then
-      call write_outfile('Description: '//trim(line))
+      call write_outfile('Description: '//trim(header))
       call write_outfile(EQULS)
       call write_outfile('Comment lines:')
     end if
@@ -50,10 +51,15 @@ contains
     end if
 
     ! Read all dimensions
+    if ( print_parameter_file_flag == 1 .AND. documentation_files_flag == 0 ) then
+      write (param_file_unit, '(A)') trim( header )
+      write (param_file_unit, '(A)') line(:16)
+    endif
 
     do
       read (Param_unit, '(A)', IOSTAT=ios) string
-      if (ios == -1) call read_error(13, 'end of file found before parameter section')
+!      if (ios == -1) call read_error(13, 'end of file found before parameter section')
+      if (ios == -1) exit
       if (ios /= 0) call read_error(11, 'missing dimension #### delimiter')
       if (string(:4) == '    ') cycle
       if (string(:2) == '//') cycle
@@ -69,7 +75,11 @@ contains
       read (Param_unit, *, IOSTAT=ios) dimen_value
       if (ios /= 0) call read_error(11, 'missing dimension value')
 
+      if ( documentation_files_flag == 0 ) &
+           write (param_file_unit, '(A, /, A, / I0)') '####', trim(dimname), dimen_value
+
       call setdimension(dimname, dimen_value)
+      print '(3A,I8)', 'Dimension ', dimname(:10), ' = ', dimen_value
 
       if (dimen_value == 0) then
         if (Print_debug > DEBUG_less) print *, 'Warning, dimension: ', dimname(:nchars), ' is not needed, value specified = 0'
@@ -211,21 +221,119 @@ contains
 ! Check for parameters declared but not in Parameter File
 !***********************************************************************
   module subroutine check_parameters()
+    use PRMS_CONSTANTS, only: ERROR_open_out
+    use PRMS_MODULE, only: print_parameter_file_flag, param_out_unit, param_file_unit, &
+        documentation_files_flag
+    use prms_utils, only: PRMS_open_output_file, write_integer_param, write_real_param, numchars, &
+        write_2d_real_param, write_2d_param, write_string_param
     implicit none
     ! Functions
-    intrinsic :: trim
+    intrinsic :: trim, index
     ! Local Variables
-    integer :: i
+    integer :: i, ndimens, num_values, dimen1, dimen2, scalar
+    integer :: ndimen, comma, ivalues(1)
+    real :: values(1)
+    character (len=16) :: dim_name1, dim_name2, dimenname, cvalues(1)
+    !integer :: j, k
+    !character(len=8) :: fmt
     !***********************************************************************
     print *, ' '
+    if ( print_parameter_file_flag == 1 .or. documentation_files_flag == 1 ) then
+      write (param_out_unit, '(A)' ) '** Parameters **'
+      if ( documentation_files_flag == 0 ) write (param_file_unit, '(A)' ) '** Parameters **'
+    endif
     do i = 1, Num_parameters
       if (Parameter_data(i)%decl_flag == 1 .and. Parameter_data(i)%read_flag == 0) then
         print *, 'WARNING, parameter: ', trim(Parameter_data(i)%param_name), ' is not specified'
+        Parameter_data(i)%scalar_flag = 2
         if (Parameter_data(i)%data_flag == 1) then
           print *, '         Set to default value:', Parameter_data(i)%default_int
         elseif (Parameter_data(i)%data_flag == 2) then
           print *, '         Set to default value:', Parameter_data(i)%default_real
         end if
+      end if
+
+      if ( print_parameter_file_flag == 1 .or. documentation_files_flag == 1 ) then
+          num_values = Parameter_data(i)%numvals
+          scalar = Parameter_data(i)%scalar_flag
+          ndimens = Parameter_data(i)%num_dimens
+          dimen1 = Parameter_data(i)%num_dim1
+          dimen2 = Parameter_data(i)%num_dim2
+
+          write (param_out_unit, '(A, /, A, /, 2A)') '####', trim(Parameter_data(i)%param_name), &
+                 'Declared by module: ', trim(Parameter_data(i)%module_name)
+          write (param_out_unit,'(A)') trim(Parameter_data(i)%long_description)
+          write (param_out_unit,'(2A)') 'Units: ', trim(Parameter_data(i)%units)
+          write (param_out_unit,'(2A)') 'Maximum Dimension: ', trim(Parameter_data(i)%dimen_names)
+          if ( scalar > 0 ) then
+              write (param_out_unit,'(2A)') 'File Dimension: ', 'one'
+              write (param_out_unit,'(A, I0)') 'Number of values: ', 1
+          else
+              write (param_out_unit,'(2A)') 'File Dimension: ', trim(Parameter_data(i)%filedimen_names)
+              write (param_out_unit,'(A, I0)') 'Number of values: ', num_values
+          endif
+
+          if (Parameter_data(i)%data_flag == 2) then
+              write (param_out_unit,'(A, F0.5)') 'Default: ', Parameter_data(i)%default_real
+              write (param_out_unit,'(A, F0.5, A, F0.5)') 'Value range: ', Parameter_data(i)%minimum, ' - ', &
+                     Parameter_data(i)%maximum
+              if ( documentation_files_flag == 0 ) then
+                  if ( num_values == 1 .and. scalar > 0 ) then
+                      values(1) = Parameter_data(i)%values_real_0d
+                      CALL write_real_param( param_file_unit, trim(Parameter_data(i)%param_name), trim(Parameter_data(i)%dimen_names), &
+                                             dimen1, values )
+                  elseif ( ndimens == 1 ) then
+                      CALL write_real_param( param_file_unit, trim(Parameter_data(i)%param_name), trim(Parameter_data(i)%dimen_names), &
+                                             dimen1, Parameter_data(i)%values_real_1d )
+                  else
+                      ! get dimension names
+                      dimenname = trim( Parameter_data(i)%dimen_names )
+                      ndimen = numchars(dimenname)
+                      comma = index(dimenname, ',')
+                      dim_name1 = Parameter_data(i)%dimen_names(:(comma - 1))
+                      dim_name2 = Parameter_data(i)%dimen_names((comma + 1):ndimen)
+                      CALL write_2D_real_param(param_file_unit, trim(Parameter_data(i)%param_name), trim(dim_name1), dimen1, &
+                                                trim(dim_name2), Dimen2, Parameter_data(i)%values_real_2d)
+                  end if
+              end if
+          elseif (Parameter_data(i)%data_flag == 1) then
+              write (param_out_unit,'(A, I0)') 'Default: ', Parameter_data(i)%default_int
+              write (param_out_unit,'(A, I0, A, I0)') 'Value range: ', Parameter_data(i)%minimum_int, ' - ', &
+                     Parameter_data(i)%maximum_int
+              if ( documentation_files_flag == 0 ) then
+                  if ( num_values == 1) then
+                      ivalues(1) = Parameter_data(i)%values_int_0d
+                      CALL write_integer_param( param_file_unit, trim(Parameter_data(i)%param_name), trim(Parameter_data(i)%dimen_names), &
+                      dimen1, ivalues )
+                  elseif ( ndimens == 1 ) then
+                      CALL write_integer_param( param_file_unit, trim(Parameter_data(i)%param_name), trim(Parameter_data(i)%dimen_names), &
+                                                dimen1, Parameter_data(i)%values_int_1d )
+                  else
+                      ! get dimension names
+                      dimenname = trim( Parameter_data(i)%dimen_names )
+                      ndimen = numchars(dimenname)
+                      comma = index(dimenname, ',')
+                      dim_name1 = Parameter_data(i)%dimen_names(:(comma - 1))
+                      dim_name2 = Parameter_data(i)%dimen_names((comma + 1):ndimen)
+                      CALL write_2D_param(param_file_unit, trim(Parameter_data(i)%param_name), trim(dim_name1), dimen1, &
+                                          trim(dim_name2), Dimen2, Parameter_data(i)%values_int_2d)
+                  end if
+              end if
+          elseif (Parameter_data(i)%data_flag == 4) then
+              write (param_out_unit,'(2A)') 'Default: ', Parameter_data(i)%def_value
+              write (param_out_unit,'(4A)') 'Value range: ', trim(Parameter_data(i)%min_value), ' - ', trim(Parameter_data(i)%max_value)
+              if ( documentation_files_flag == 0 ) then
+                  if ( num_values == 1) then
+                      cvalues(1) = Parameter_data(i)%values_char_0d
+                      CALL write_string_param( param_file_unit, trim(Parameter_data(i)%param_name), trim(Parameter_data(i)%dimen_names), &
+                      dimen1, cvalues )
+                  elseif ( ndimens == 1 ) then
+                      CALL write_string_param( param_file_unit, trim(Parameter_data(i)%param_name), trim(Parameter_data(i)%dimen_names), &
+                                               dimen1, Parameter_data(i)%values_char_1d )
+                  end if
+              end if
+              
+          end if
       end if
     end do
 
@@ -259,6 +367,7 @@ contains
       Parameter_data(i)%module_name = ' '
       Parameter_data(i)%units = ' '
       Parameter_data(i)%dimen_names = ' '
+      Parameter_data(i)%filedimen_names = ' '
       Parameter_data(i)%maximum = 0.0
       Parameter_data(i)%minimum = 0.0
       Parameter_data(i)%default_real = 0.0
@@ -411,6 +520,9 @@ contains
           if (trim(dimen1) == 'ndeplval') then
             ! Special case to handle snarea_curve
             allocate (Parameter_data(Num_parameters)%values_real_2d(11, Ndepl))
+            Parameter_data(Num_parameters)%num_dimens = 2
+            Parameter_data(Num_parameters)%num_dim1 = 11
+            Parameter_data(Num_parameters)%num_dim2 = Ndepl
             do i = 1, Ndepl
               do j = 1, 11
                 Parameter_data(Num_parameters)%values_real_2d(j, i) = temp
@@ -1154,6 +1266,7 @@ contains
           end if
         else ! check for flexible dimension
           if (Numvalues == 1) then ! set all values to single value
+            Parameter_data(i)%scalar_flag = 2
             if (Data_type == 2) then
               if (Parameter_data(found)%num_dimens == 1) then
                 !do j = 1, Parameter_data(found)%num_dim1

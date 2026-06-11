@@ -66,7 +66,7 @@
       USE PRMS_CONSTANTS, ONLY: ERROR_control, DAILY, YEARLY
       use PRMS_CONTROL_FILE, only: control_integer, control_string, control_string_array
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nsegment, NsegmentOutON_OFF
+      USE PRMS_MODULE, ONLY: Nsegment, NsegmentOutON_OFF, documentation_files_flag
       USE PRMS_NSEGMENT_SUMMARY
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -83,6 +83,7 @@
       IF ( control_integer(NsegmentOut_format, 'nsegmentOut_format')/=0 ) NsegmentOut_format = 1
       IF ( NsegmentOut_format<1 .OR. NsegmentOut_format>5 ) CALL error_stop('invalid nsegmentOut_format value', ERROR_control)
 
+      IF ( documentation_files_flag==1 ) NsegmentOutVars = 1
       IF ( NsegmentOutVars==0 ) THEN
         CALL error_stop('nsegment_summary requested with nsegmentOutVars equal 0', ERROR_control)
       ELSE
@@ -95,7 +96,7 @@
         IF ( control_string(NsegmentOutBaseFileName, 'nsegmentOutBaseFileName')/=0 ) CALL read_error(5, 'nsegmentOutBaseFileName')
       ENDIF
 
-      IF ( NsegmentOutON_OFF==2 ) THEN
+      IF ( NsegmentOutON_OFF==2 .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Nhm_seg(Nsegment) )
         IF ( declparam(MODNAME, 'nhm_seg', 'nsegment', 'integer', &
      &       '1', '1', '9999999', &

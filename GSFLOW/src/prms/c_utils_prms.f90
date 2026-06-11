@@ -57,6 +57,14 @@ module prms_utils
   end interface
 
   interface
+    module subroutine write_string_param(Iunit, Parm_name, Dimen_name, Dimen, Values)
+      integer, intent(IN) :: Iunit, Dimen
+      character(LEN=*), intent(IN) :: Values(Dimen)
+      character(LEN=*), intent(IN) :: Parm_name, Dimen_name
+    end subroutine
+  end interface
+
+  interface
     module subroutine write_double_param(Iunit, Parm_name, Dimen_name, Dimen, Values)
       !***********************************************************************
       implicit none
@@ -85,6 +93,26 @@ module prms_utils
     end subroutine
   end interface
 
+  interface
+    module subroutine write_2D_param(Iunit, Parm_name, Dimen_name1, Dimen1, &
+                                     Dimen_name2, Dimen2, Values)
+      integer, intent(IN) :: Dimen1, Dimen2, Iunit
+      integer, intent(IN) :: Values(Dimen1, Dimen2)
+      character(LEN=*), intent(IN) :: Parm_name
+      character(LEN=*), intent(IN) :: Dimen_name1, Dimen_name2
+    end subroutine
+  end interface
+    
+  interface
+    module subroutine write_2D_real_param(Iunit, Parm_name, Dimen_name1, Dimen1, &
+                                          Dimen_name2, Dimen2, Values)
+      integer, intent(IN) :: Dimen1, Dimen2, Iunit
+      real, intent(IN) :: Values(Dimen1, Dimen2)
+      character(LEN=*), intent(IN) :: Parm_name
+      character(LEN=*), intent(IN) :: Dimen_name1, Dimen_name2
+    end subroutine
+  end interface 
+    
   interface
     module subroutine write_2D_double_array_grid(Iunit, Parm_name, Dimen_name1, &
                                                  Dimen1, Dimen_name2, Dimen2, Values)
@@ -246,6 +274,14 @@ module prms_utils
   end interface
 
   interface
+    module subroutine checkdim_bounded_limits_active(Param, Bound, Param_value, Num_values, Lower_val, Upper_val, Iret)
+      character(LEN=*), intent(IN) :: Param, Bound
+      integer, intent(IN) :: Num_values, Param_value(Num_values), Lower_val, Upper_val
+      integer, intent(OUT) :: Iret
+    end subroutine
+  end interface
+
+  interface
     module subroutine check_param_zero(Indx, Param, Param_value, Iret)
       integer, intent(IN) :: Indx
       real, intent(IN) :: Param_value
@@ -262,3 +298,4 @@ module prms_utils
   end interface
 
 end module
+

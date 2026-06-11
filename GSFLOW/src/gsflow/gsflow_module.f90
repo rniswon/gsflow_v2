@@ -20,7 +20,7 @@
       INTEGER, SAVE :: Nratetbl, Nwateruse, Nexternal, Nconsumed, Npoigages, Ncascade, Ncascdgw, Ncbh
       INTEGER, SAVE :: Nhru, Nssr, Ngw, Nsub, Nhrucell, Nlake, Ngwcell, Nlake_hrus, Nmonths
       INTEGER, SAVE :: Ntemp, Nrain, Nsol, Nsegment, Ndepl, Nobs, Nevap, Ndeplval, Nmap2hru, Nmap, Nsnow
-      INTEGER, SAVE :: NLAKES_MF, Nreach, Nlakeelev, Nwind, Nhumid, Nstreamtemp
+      INTEGER, SAVE :: NLAKES_MF, Nreach, Nlakeelev, Nwind, Nhumid, Nstreamtemp, Nlapse
 ! Global
       ! Model (0=GSFLOW; 1=PRMS; 2=MODFLOW; 3=MODSIM-PRMS; 4=MODSIM-PRMS-LOOSE; 10=MODSIM-GSFLOW; 12=MODSIM-MODFLOW; 13=MODSIM)
       INTEGER, SAVE :: Model, Process_flag, Call_cascade
@@ -69,7 +69,7 @@
       INTEGER, SAVE :: PRMS_land_iteration_flag, Iter_aet_flag, text_restart_flag
       INTEGER, SAVE :: irrigation_apply_flag, Dyn_ag_frac_flag, Dyn_ag_soil_flag, activeHRU_inactiveCELL_flag
       INTEGER, SAVE :: Dprst_add_water_use, Dprst_transfer_water_use
-      INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, snow_cloudcover_flag
+      INTEGER, SAVE :: Snarea_curve_flag, Soilzone_aet_flag, snow_cloudcover_flag, soilzone_replenish_flag
       INTEGER, SAVE :: seg2hru_flag, snow_flag, forcing_check_flag
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Model_output_file, Var_init_file, Var_save_file
       CHARACTER(LEN=MAXFILE_LENGTH), SAVE :: Gsflow_output_file, selectDatesFileName, Data_file, Stat_var_file
@@ -86,6 +86,7 @@
       INTEGER, SAVE :: Dyn_sro2dprst_perv_flag, Dyn_sro2dprst_imperv_flag, Dyn_fallfrost_flag, Dyn_springfrost_flag
       INTEGER, SAVE :: Gwr_transferON_OFF, External_transferON_OFF, Segment_transferON_OFF, Lake_transferON_OFF
       INTEGER, SAVE :: Gsf_rpt, Rpt_days
+      INTEGER, SAVE :: print_parameter_file_flag, param_out_unit, var_out_unit, param_file_unit, documentation_files_flag
       INTEGER, SAVE :: Have_swales
       END MODULE PRMS_MODULE
 

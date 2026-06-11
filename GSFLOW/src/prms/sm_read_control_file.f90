@@ -204,7 +204,7 @@ contains
     Control_parameter_data(i) % data_type = CHAR_TYPE
     i = i + 1
     Control_parameter_data(i) % name = 'csv_output_file'
-    Csv_output_file = 'prms_summary.csv'
+    Csv_output_file = 'gsflow_summary.csv'
     Control_parameter_data(i) % values_character(1) = Csv_output_file
     Control_parameter_data(i) % data_type = CHAR_TYPE
 
@@ -524,6 +524,9 @@ contains
     i = i + 1
     Control_parameter_data(i) % name = 'soilzone_aet_flag'
     Soilzone_aet_flag = ACTIVE
+    i = i + 1
+    Control_parameter_data(i) % name = 'soilzone_replenish_flag'
+    soilzone_replenish_flag = OFF
     i = i + 1
     Control_parameter_data(i) % name = 'iter_aet_flag'
     Iter_aet_flag = OFF
@@ -979,14 +982,15 @@ contains
   !***********************************************************************
   module subroutine get_control_filename()
     use PRMS_CONSTANTS, ONLY: ERROR_control, OFF
-    use PRMS_MODULE, only: EQULS, Model_control_file, command_line, num_words_command_line, command_line_modsim, MODSIM_flag
-    use prms_utils, only: error_stop
+    use PRMS_MODULE, only: EQULS, Model_control_file, command_line, num_words_command_line, command_line_modsim, MODSIM_flag, &
+        print_parameter_file_flag, param_out_unit, var_out_unit, param_file_unit, documentation_files_flag, GSFLOW_versn
+    use prms_utils, only: error_stop, PRMS_open_output_file
     implicit none
     ! Functions
-    intrinsic :: trim, GET_COMMAND, scan, verify
+    intrinsic :: trim, GET_COMMAND, scan, verify, DATE_AND_TIME, index
     ! Local Variables
     logical :: exists
-    integer :: istart, iend
+    integer :: istart, iend, iret, date(8)
     !***********************************************************************
     ! This routine expects the Control File name to be the first argument
     IF ( MODSIM_flag == OFF ) THEN
@@ -1000,6 +1004,31 @@ contains
     print '(/,A,I0)', 'number of command line words: ', num_words_command_line
     istart = 1
     iend = scan(command_line(istart:), ' ,') - 1               !-- Find the first blank.
+
+    print_parameter_file_flag = 0
+    if ( index(command_line(istart:), '-print') > 0 ) print_parameter_file_flag = 1
+    documentation_files_flag = 0
+    if ( index(command_line(istart:), '-documentation') > 0 ) documentation_files_flag = 1
+
+    if ( print_parameter_file_flag == 1 .OR. documentation_files_flag == 1 ) then
+      CALL DATE_AND_TIME(VALUES=date)
+      CALL PRMS_open_output_file(param_out_unit, 'parameter.print', 'parameter.print', 0, iret)
+      IF ( iret/=0 ) ERROR STOP ERROR_open_out
+      write (param_out_unit, '(A)') '*** Written by gsflow -print option ***'
+      write (param_out_unit, 9001) GSFLOW_versn, date(1), date(2), date(3)
+      CALL PRMS_open_output_file(var_out_unit, 'variable_print.out', 'variable_print.out', 0, iret)
+      IF ( iret/=0 ) ERROR STOP ERROR_open_out
+      write (var_out_unit, '(A)') '*** Written by gsflow -print option ***'
+      write (var_out_unit, 9001) GSFLOW_versn, date(1), date(2), date(3)
+      if ( documentation_files_flag == 0 ) then
+        CALL PRMS_open_output_file(param_file_unit, 'parameter_file.out', 'parameter_file.out', 0, iret)
+        IF ( iret/=0 ) ERROR STOP ERROR_open_out
+        write (param_file_unit, '(A)') '*** Written by gsflow -print option ***'
+        write (param_file_unit, 9001) GSFLOW_versn, date(1), date(2), date(3)
+      endif
+ 9001 format('    gsflow version: ', A, /, '    Date created: ', I4, 2('/', I2.2), I3.2, ':', I2.2,/)
+    endif
+
     Model_control_file = ' '
     IF ( MODSIM_flag == OFF ) THEN
       print '(/,2A)', 'Executable: ', command_line(istart:iend)
@@ -1061,7 +1090,7 @@ contains
       istart = verify(command_line(istart:), ' ,') + istart - 1      !-- Find next non-blank and set result to end of word
       iend = scan(command_line(istart:), ' ,') - 2 + istart          !-- Find the first blank; end of control file path
       command_line_arg = trim( command_line(istart:iend) )
-      print '(A,I0,2A)', 'PRMS command line argument ', i-1, ': ', trim( command_line_arg )
+      print '(A,I0,2A)', 'Command line argument ', i-1, ': ', trim( command_line_arg )
 
       if (trim(command_line_arg) == '-set') then
         i = i + 1
@@ -1069,7 +1098,7 @@ contains
         istart = verify(command_line(istart:), ' ,') + istart - 1       !-- Find next non-blank and set result to end of word
         iend = scan(command_line(istart:), ' ,') - 2 + istart           !-- Find the first blank; end of control file path
         command_line_arg = trim( command_line(istart:iend) )
-        print '(A,I0,2A)', 'PRMS command line argument ', i-1, ': ', trim( command_line_arg )
+        print '(A,I0,2A)', 'Command line argument ', i-1, ': ', trim( command_line_arg )
         index = 0
         do j = 1, Num_control_parameters
           if (trim(command_line_arg) == trim(Control_parameter_data(j) % name)) then
@@ -1087,7 +1116,7 @@ contains
           istart = verify(command_line(istart:), ' ,') + istart - 1  !-- Find next non-blank and set result to end of word
           iend = scan(command_line(istart:), ' ,') - 2 + istart      !-- Find the first blank; end of control file path
           command_line_arg = trim( command_line(istart:iend) )
-          print '(A,I0,2A)', 'PRMS command line argument ', i-1, ': ', trim( command_line_arg )
+          print '(A,I0,2A)', 'Command line argument ', i-1, ': ', trim( command_line_arg )
           if (param_type == 1) then
               read (command_line_arg, *, IOSTAT=status) Control_parameter_data(index) % values_int(j)
               if (status /= 0) call error_stop('reading integer control parameter value', ERROR_control)

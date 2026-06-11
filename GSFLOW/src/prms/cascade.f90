@@ -75,7 +75,8 @@
       INTEGER FUNCTION cascdecl()
       USE PRMS_CONSTANTS, ONLY: CASCADE_OFF, CASCADE_HRU_SEGMENT, CASCADE_NORMAL, CASCADEGW_OFF, DEBUG_CASCADE
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Ngw, Ncascade, Ncascdgw, Print_debug, Cascade_flag, Cascadegw_flag
+      USE PRMS_MODULE, ONLY: Nhru, Ngw, Ncascade, Ncascdgw, Print_debug, &
+                             Cascade_flag, Cascadegw_flag, documentation_files_flag
       USE PRMS_CASCADE
       use prms_utils, only: print_module, PRMS_open_module_file, read_error
       IMPLICIT NONE
@@ -99,7 +100,7 @@
         ALLOCATE ( Hru_down_id(Ncascade) )
         ALLOCATE ( Hru_pct_up(Ncascade) )
       ENDIF
-      IF ( Cascade_flag==CASCADE_NORMAL ) THEN
+      IF ( Cascade_flag==CASCADE_NORMAL .OR. documentation_files_flag==1 ) THEN
         IF ( declparam(MODNAME, 'hru_up_id', 'ncascade', 'integer', &
      &       '0', 'bounded', 'nhru', &
      &       'Index of HRU containing cascade area', &
@@ -125,7 +126,7 @@
      &       ' to a downslope HRU or stream segment for cascade area', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'hru_pct_up')
       ENDIF
-      IF ( Cascade_flag==CASCADE_HRU_SEGMENT ) THEN ! use hru_segment to define simple cascades
+      IF ( Cascade_flag==CASCADE_HRU_SEGMENT .OR. documentation_files_flag==1 ) THEN ! use hru_segment to define simple cascades
         ALLOCATE ( Hru_segment(Nhru) )
         IF ( declparam(MODNAME, 'hru_segment', 'nhru', 'integer', &
      &       '0', 'bounded', 'nsegment', &
@@ -134,7 +135,7 @@
      &       ' (surface runoff, interflow, and groundwater discharge)', &
      &       'none')/=0 ) CALL read_error(1, 'hru_segment')
       ENDIF
-      IF ( Cascade_flag/=CASCADE_HRU_SEGMENT ) THEN
+      IF ( Cascade_flag/=CASCADE_HRU_SEGMENT .OR. documentation_files_flag==1 ) THEN
         IF ( declparam(MODNAME, 'cascade_tol', 'one', 'real', &
      &       '0.0', '0.0', '99.0', &
      &       'Cascade area below which a cascade link is ignored', &
@@ -167,7 +168,7 @@
      &     'Minimum depth of interflow + Dunnian flow to cascade', &
      &     'inches')/=0 ) CALL read_error(1,'cascade_min')
 
-      IF ( Cascadegw_flag==CASCADE_NORMAL ) THEN
+      IF ( Cascadegw_flag==CASCADE_NORMAL .OR. documentation_files_flag==1 ) THEN
 ! declare GWR cascade parameters
         IF ( declparam(MODNAME, 'gw_up_id', 'ncascdgw', 'integer', &
      &       '0', 'bounded', 'ngw', &
@@ -542,6 +543,9 @@
         WRITE ( MSGUNT, 9003 ) (Hru_route_order(i), i=1, Iorder)
       ENDIF
 
+      !do k = 1,ncascade
+      !    write(99,'(3(i0,", "), F5.0, 3(i0,", "), F5.0)' ) Hru_up_id(k), Hru_down_id(k), Hru_strmseg_down_id(k), Hru_pct_up(k), Gw_up_id(k), Gw_down_id(k), Gw_strmseg_down_id(k), Gw_pct_up(k)
+      !enddo
       DEALLOCATE ( Hru_up_id, Hru_pct_up, Hru_down_id, Hru_strmseg_down_id )
 
  9001 FORMAT (/, 'HRU routing order:')

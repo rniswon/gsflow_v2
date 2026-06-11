@@ -207,7 +207,7 @@
       USE PRMS_CONSTANTS, ONLY: CASCADE_OFF, ERROR_dim
       use PRMS_MMFAPI, only: declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam, getdim
-      USE PRMS_MODULE, ONLY: Nsegment, Nratetbl, Nlake, Init_vars_from_file, Cascade_flag
+      USE PRMS_MODULE, ONLY: Nsegment, Nratetbl, Nlake, Init_vars_from_file, Cascade_flag, documentation_files_flag
       USE PRMS_MUSKINGUM_LAKE
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -232,32 +232,45 @@
       Nstage3 = 0
       Ngate4 = 0
       Nstage4 = 0
-      IF ( Nratetbl>4 ) THEN
-        PRINT *, 'dimension nratetbl specified as:', Nratetbl
-        CALL error_stop('lake routing allows a maximum of 4 rating tables', ERROR_dim)
-      ENDIF
-      IF ( Nratetbl>0 ) THEN
-        Ngate = getdim('ngate')
-        IF ( Ngate==-1 ) CALL read_error(6, 'ngate')
-        Nstage = getdim('nstage')
-        IF ( Nstage==-1 ) CALL read_error(6, 'nstage')
-        IF ( Nratetbl>1 ) THEN
-          Ngate2 = getdim('ngate2')
-          IF ( Ngate2==-1 ) CALL read_error(6, 'ngate2')
-          Nstage2 = getdim('nstage2')
-          IF ( Nstage2==-1 ) CALL read_error(6, 'nstage2')
-          IF ( Nratetbl>2 ) THEN
-            Ngate3 = getdim('ngate3')
-            IF ( Ngate3==-1 ) CALL read_error(6, 'ngate3')
-            Nstage3 = getdim('nstage3')
-            IF ( Nstage3==-1 ) CALL read_error(6, 'nstage3')
-            IF ( Nratetbl==4 ) THEN
-              Ngate4 = getdim('ngate4')
-              IF ( Ngate4==-1 ) CALL read_error(6, 'ngate4')
-              Nstage4 = getdim('nstage4')
-              IF ( Nstage4==-1 ) CALL read_error(6, 'nstage4')
+      IF ( documentation_files_flag==0 ) THEN
+        IF ( Nratetbl>4 ) THEN
+          PRINT *, 'dimension nratetbl specified as:', Nratetbl
+          CALL error_stop('lake routing allows a maximum of 4 rating tables', ERROR_dim)
+        ENDIF
+        IF ( Nratetbl>0 ) THEN
+          Ngate = getdim('ngate')
+          IF ( Ngate==-1 ) CALL read_error(6, 'ngate')
+          Nstage = getdim('nstage')
+          IF ( Nstage==-1 ) CALL read_error(6, 'nstage')
+          IF ( Nratetbl>1 ) THEN
+            Ngate2 = getdim('ngate2')
+            IF ( Ngate2==-1 ) CALL read_error(6, 'ngate2')
+            Nstage2 = getdim('nstage2')
+            IF ( Nstage2==-1 ) CALL read_error(6, 'nstage2')
+            IF ( Nratetbl>2 ) THEN
+              Ngate3 = getdim('ngate3')
+              IF ( Ngate3==-1 ) CALL read_error(6, 'ngate3')
+              Nstage3 = getdim('nstage3')
+              IF ( Nstage3==-1 ) CALL read_error(6, 'nstage3')
+              IF ( Nratetbl==4 ) THEN
+                Ngate4 = getdim('ngate4')
+                IF ( Ngate4==-1 ) CALL read_error(6, 'ngate4')
+                Nstage4 = getdim('nstage4')
+                IF ( Nstage4==-1 ) CALL read_error(6, 'nstage4')
+              ENDIF
             ENDIF
           ENDIF
+        ELSE
+          Nratetbl = 1
+          Ngate = 1
+          Nstage = 1
+          Ngate2 = 1
+          Nstage2 = 1
+          Ngate3 = 1
+          Nstage3 = 1
+          Ngate4 = 1
+          Nstage4 = 1
+          Mxnsos = 1
         ENDIF
         IF ( Nstage<1 .OR. Ngate<1 ) CALL error_stop('nratetbl>0 and nstage or ngate = 0', ERROR_dim)
         IF ( Nratetbl>1 ) THEN

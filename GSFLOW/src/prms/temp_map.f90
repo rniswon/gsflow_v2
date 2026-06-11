@@ -25,10 +25,11 @@
       END MODULE PRMS_TEMP_MAP
 
       SUBROUTINE temp_map()
-      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MAXFILE_LENGTH, temp_map_module, ACTIVE
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, MAXFILE_LENGTH, temp_map_module, ACTIVE, OFF
       use PRMS_CONTROL_FILE, only: control_string
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_int, getparam_real
-      USE PRMS_MODULE, ONLY: Process_flag, Start_year, Start_month, Start_day, Nmap2hru, Nmap, Nowmonth, bias_adjust_flag, Nmonths
+      USE PRMS_MODULE, ONLY: Process_flag, Start_year, Start_month, Start_day, Nmap2hru, &
+                             Nmap, Nowmonth, bias_adjust_flag, Nmonths, documentation_files_flag
       USE PRMS_TEMP_MAP
       USE PRMS_BASIN, ONLY: Hru_area, Basin_area_inv, Active_hrus, Hru_route_order
       USE PRMS_CLIMATEVARS, ONLY: Solrad_tmax, Solrad_tmin, Basin_temp, &
@@ -77,14 +78,15 @@
 
 ! Declare parameters
         ALLOCATE ( Tmax_map_adj(Nmap,Nmonths) )
-        IF ( bias_adjust_flag==ACTIVE ) THEN
+        IF ( bias_adjust_flag==ACTIVE .OR. documentation_files_flag==1 ) THEN
           IF ( declparam(MODNAME, 'tmax_map_adj_offset', 'nmap,nmonths', 'real', &
      &         '0.0', '0.0', '50.0', &
      &         'Monthly maximum temperature adjustment factor as an offset from tmin_map_adj for each mapped spatial unit', &
      &         'Monthly (January to December) additive adjustment factor to maximum air temperature as an offset from' // &
      &         ' tmin_map_adj for each mapped, spatial unit estimated based on slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_map_adj_offset')
-        ELSE
+        ENDIF
+        IF ( bias_adjust_flag==OFF .OR. documentation_files_flag==1 ) THEN
           IF ( declparam(MODNAME, 'tmax_map_adj', 'nmap,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
      &         'Monthly maximum temperature adjustment factor for each mapped spatial unit', &

@@ -8,21 +8,25 @@
         character(len=*), parameter :: MODDESC = 'Streamflow'
         character(len=*), parameter :: MODNAME = 'segment_to_hru'
         character(len=*), parameter :: Version_segment_to_hru = '2023-08-10'
+        DOUBLE PRECISION :: Basin_segment_to_soilmoist
         ! Declared Parameters
         INTEGER, SAVE, ALLOCATABLE :: Segment_outflow_id(:)
+        ! Declared Variables
+        REAL, SAVE, ALLOCATABLE :: Segment_to_soilmoist(:)
       END MODULE PRMS_SEGMENT_TO_HRU
 
       SUBROUTINE segment_to_hru()
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, OFF
-      USE PRMS_MODULE, ONLY: Process_flag, Nsegment, AG_flag
+      USE PRMS_MODULE, ONLY: Process_flag, Nsegment, AG_flag, Nhru
       USE PRMS_SEGMENT_TO_HRU
-      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Basin_area_inv, Hru_perv, Ag_frac
+      USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order, Basin_area_inv, Hru_perv, Ag_area, Hru_frac_perv, Hru_storage
       USE PRMS_FLOWVARS, ONLY: Soil_moist, Basin_soil_moist, Seg_outflow, Soil_rechr, Soil_rechr_max, &
           Ag_soil_moist, Ag_soil_rechr, Ag_soil_rechr_max, Basin_ag_soil_moist, Basin_ag_soil_rechr
-      USE PRMS_SOILZONE, ONLY: Basin_soil_rechr
+      USE PRMS_SOILZONE, ONLY: Basin_soil_rechr, Cap_waterin
       USE PRMS_SET_TIME, ONLY: Cfs_conv
       use PRMS_READ_PARAM_FILE, only: declparam, getparam_int
       use prms_utils, only: print_module, read_error
+      use PRMS_MMFAPI, only: declvar_real
       IMPLICIT NONE
 ! Functions
       INTRINSIC :: SNGL, DBLE
@@ -31,22 +35,27 @@
       REAL :: flow
 !***********************************************************************
       IF ( Process_flag==RUN ) THEN
+        Basin_segment_to_soilmoist = 0.0D0
         IF ( AG_flag==OFF ) THEN
           DO i = 1, Nsegment
             ihru = Segment_outflow_id(i)
             IF ( ihru>0 ) THEN
               flow = SNGL(Seg_outflow(i)/Cfs_conv)/Hru_perv(ihru)
+              Segment_to_soilmoist(ihru) = flow
               Soil_moist(ihru) = Soil_moist(ihru) + flow
               Soil_rechr(ihru) = Soil_rechr(ihru) + flow
+              Cap_waterin(ihru) = Cap_waterin(ihru) + flow
               IF ( Soil_rechr(ihru) > Soil_rechr_max(ihru) ) Soil_rechr(ihru) = Soil_rechr_max(ihru)
+              Hru_storage(ihru) = Hru_storage(ihru) + flow*Hru_frac_perv(ihru)
+              Basin_segment_to_soilmoist = Basin_segment_to_soilmoist + DBLE( flow*Hru_perv(ihru) )
             ENDIF
           ENDDO
           Basin_soil_moist = 0.0D0
           Basin_soil_rechr = 0.0D0
           DO j = 1, Active_hrus
             ihru = Hru_route_order(j)
-            Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(ihru)*Hru_perv(i) )
-            Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(ihru)*Hru_perv(i) )
+            Basin_soil_moist = Basin_soil_moist + DBLE( Soil_moist(ihru)*Hru_perv(ihru) )
+            Basin_soil_rechr = Basin_soil_rechr + DBLE( Soil_rechr(ihru)*Hru_perv(ihru) )
           ENDDO
           Basin_soil_moist = Basin_soil_moist*Basin_area_inv
           Basin_soil_rechr = Basin_soil_rechr*Basin_area_inv
@@ -54,22 +63,24 @@
           DO i = 1, Nsegment
             ihru = Segment_outflow_id(i)
             IF ( ihru>0 ) THEN
-              flow = SNGL(Seg_outflow(i)/Cfs_conv)/Ag_frac(ihru)
+              flow = SNGL(Seg_outflow(i)/Cfs_conv)/Ag_area(ihru)
               Ag_soil_moist(ihru) = Ag_soil_moist(ihru) + flow
               Ag_soil_rechr(ihru) = Ag_soil_rechr(ihru) + flow
               IF ( Ag_soil_rechr(ihru) > Ag_soil_rechr_max(ihru) ) Ag_soil_rechr(ihru) = Ag_soil_rechr_max(ihru)
+              Basin_segment_to_soilmoist = Basin_segment_to_soilmoist + DBLE( flow*Ag_area(ihru) )
             ENDIF
           ENDDO
           Basin_ag_soil_moist = 0.0D0
           Basin_ag_soil_rechr = 0.0D0
           DO j = 1, Active_hrus
             ihru = Hru_route_order(j)
-            Basin_ag_soil_moist = Basin_ag_soil_moist + DBLE( Ag_soil_moist(ihru)*Ag_frac(i) )
-            Basin_ag_soil_rechr = Basin_ag_soil_rechr + DBLE( Ag_soil_rechr(ihru)*Ag_frac(i) )
+            Basin_ag_soil_moist = Basin_ag_soil_moist + DBLE( Ag_soil_moist(ihru)*Ag_area(ihru) )
+            Basin_ag_soil_rechr = Basin_ag_soil_rechr + DBLE( Ag_soil_rechr(ihru)*Ag_area(ihru) )
           ENDDO
           Basin_ag_soil_moist = Basin_ag_soil_moist*Basin_area_inv
           Basin_ag_soil_rechr = Basin_ag_soil_rechr*Basin_area_inv
         ENDIF
+        Basin_segment_to_soilmoist = Basin_segment_to_soilmoist * Basin_area_inv
 
       ELSEIF ( Process_flag==DECL ) THEN
         CALL print_module(MODDESC, MODNAME, Version_segment_to_hru)
@@ -80,6 +91,10 @@
      &       'Identification number of HRU that receives outflow from a segment', &
      &       'Identification number of HRU that receives outflow from a segment', &
      &       'none')/=0 ) CALL read_error(1, 'segment_outflow_id')
+        ALLOCATE ( Segment_to_soilmoist(Nhru) )
+        CALL declvar_real(MODNAME, 'segment_to_soilmoist', 'nhru', Nhru, &
+     &                    'Flow from segment to HRU capillary reservoir', 'none', Segment_to_soilmoist)
+        Segment_to_soilmoist = 0.0
 
       ELSEIF ( Process_flag==INIT ) THEN
         IF ( getparam_int(MODNAME, 'segment_outflow_id', Nsegment, &

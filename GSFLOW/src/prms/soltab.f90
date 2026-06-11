@@ -79,25 +79,25 @@
       CALL print_module(MODDESC, MODNAME, Version_soltab)
 
       ALLOCATE ( Soltab_potsw(MAX_DAYS_PER_YEAR, Nhru) )
-!      CALL declvar_dble(MODNAME, 'soltab_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
+!      CALL declvar _dble(MODNAME, 'soltab_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
 !     &     'Potential solar radiation for each Julian Day, for each HRU', &
 !     &     'Langleys', Soltab_potsw)
 
       ALLOCATE ( Soltab_horad_potsw(MAX_DAYS_PER_YEAR, Nhru) )
-!      CALL declvar_dble(MODNAME, 'soltab_horad_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
+!      CALL declvar _dble(MODNAME, 'soltab_horad_potsw', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
 !     &     'Potential solar radiation on a horizontal plane for each Julian Day, for each HRU', &
 !     &     'Langleys', Soltab_horad_potsw)
 
-!      CALL declvar_dble(MODNAME, 'soltab_basinpotsw', 'ndays', MAX_DAYS_PER_YEAR, &
+!      CALL declvar _dble(MODNAME, 'soltab_basinpotsw', 'ndays', MAX_DAYS_PER_YEAR, &
 !     &     'Potential solar radiation on a horizontal plane for each Julian Day, for the centroid of the model domain', &
 !     &     'Langleys', Soltab_basinpotsw)
 
       ALLOCATE ( Hru_cossl(Nhru), Soltab_sunhrs(MAX_DAYS_PER_YEAR, Nhru) )
       ALLOCATE ( Sunset_angle(MAX_DAYS_PER_YEAR, Nhru) )
-     ! CALL declvar_dble(MODNAME, 'soltab_sunhrs', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
+     ! CALL declvar _dble(MODNAME, 'soltab_sunhrs', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
      !&     'Hours between sunrise and sunset for each Julian Day, for each HRU', &
      !&     'hours', Soltab_sunhrs)
-     ! CALL declvar_dble(MODNAME, 'sunset_angle', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
+     ! CALL declvar _dble(MODNAME, 'sunset_angle', 'ndays,nhru', MAX_DAYS_PER_YEAR*Nhru, &
      !&     'Sunset angle for each Julian Day, for each HRU', &
      !&     'hours', Sunset_angle)
 

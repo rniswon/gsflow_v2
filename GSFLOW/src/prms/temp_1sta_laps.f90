@@ -35,7 +35,7 @@
      &    GLACIER, DEBUG_less, ERROR_temp, &
      &    MINTEMP, MAXTEMP, NEARZERO, temp_1sta_module, temp_laps_module, READ_INIT, SAVE_INIT
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Ntemp, Print_debug, Init_vars_from_file, Save_vars_to_file, &
-     &    Temp_flag, Inputerror_flag, Start_month, Glacier_flag, Nowmonth, Nowday, Hru_type, Nmonths
+     &    Temp_flag, Inputerror_flag, Start_month, Glacier_flag, Nowmonth, Nowday, Hru_type, Nmonths, documentation_files_flag
       USE PRMS_TEMP_1STA_LAPS
       USE PRMS_BASIN, ONLY: Hru_elev_ts, Hru_area, Active_hrus, Hru_route_order, Basin_area_inv
       USE PRMS_CLIMATEVARS, ONLY: Tmax_aspect_adjust, Tmin_aspect_adjust, Tsta_elev, &
@@ -185,7 +185,7 @@
         ALLOCATE ( Elfac(Nhru), Nuse_tsta(Ntemp) )
         ALLOCATE ( Tmin_cnt(Ntemp), Tmax_cnt(Ntemp), Tmax_prev(Ntemp), Tmin_prev(Ntemp) )
 
-        IF ( Temp_flag==temp_1sta_module ) THEN
+        IF ( Temp_flag==temp_1sta_module .OR. documentation_files_flag==1 ) THEN
           ALLOCATE ( Tcrn(Nhru), Tcrx(Nhru) )
           ALLOCATE ( Tmax_lapse(Nhru, Nmonths) )
           IF ( declparam(MODNAME, 'tmax_lapse', 'nhru,nmonths', 'real', &
@@ -205,7 +205,7 @@
      &         'temp_units/elev_units')/=0 ) CALL read_error(1, 'tmin_lapse')
         ENDIF
 
-        IF ( Temp_flag==temp_laps_module ) THEN
+        IF ( Temp_flag==temp_laps_module .OR. documentation_files_flag==1 ) THEN
           ALLOCATE ( Hru_tlaps(Nhru) )
           IF ( declparam(MODNAME, 'hru_tlaps', 'nhru', 'integer', &
      &         '1', 'bounded', 'ntemp', &
