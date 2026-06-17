@@ -796,7 +796,7 @@
       REAL :: perv_frac, capwater_maxin, ssresin, dunnianflw_frz, capacity
       REAL :: cap_upflow_max, unsatisfied_et, pervactet, prefflow, ag_water_maxin, cap_pref_flow_maxin
       DOUBLE PRECISION :: gwin
-      INTEGER :: cfgi_frozen_hru, adjust_sroff
+      INTEGER :: cfgi_frozen_hru !, adjust_sroff
 !***********************************************************************
       szrun = 0
 
@@ -887,7 +887,7 @@
       update_potet = OFF
       IF ( Soilzone_add_water_use==ACTIVE ) Soilzone_gain_hru = 0.0
       Basin_gvr_stor_frac = 0.0D0
-      adjust_sroff = OFF
+!      adjust_sroff = OFF
       DO k = 1, Active_hrus
         i = Hru_route_order(k)
 
@@ -1054,7 +1054,7 @@
             Hortonian_flow(i) = Hortonian_flow(i) + capwater_maxin * perv_frac
             dunnianflw_frz = capwater_maxin * perv_frac
             capwater_maxin = 0.0
-            adjust_sroff = ACTIVE
+!            adjust_sroff = ACTIVE
           ELSE
             Soil_moist(i) = Soil_moist(i) + capwater_maxin*perv_frac
             Soil_rechr(i) = Soil_rechr(i) + capwater_maxin*perv_frac
@@ -1153,8 +1153,12 @@
               Pref_flow_stor(i) = Pref_flow_stor(i) + topfr
             ENDIF
             Basin_pref_stor = Basin_pref_stor + DBLE( Pref_flow_stor(i)*harea )
+            Basin_pfr_stor_frac = Basin_pfr_stor_frac + DBLE( Pref_flow_stor(i)/Pref_flow_max(i)*harea )
           ELSE
-            IF ( compute_lateral==ACTIVE ) dunnianflw_gvr = topfr  !?? is this right
+            IF ( compute_lateral==ACTIVE ) THEN
+              dunnianflw_gvr = topfr  !?? is this right
+              topfr = 0.0
+            ENDIF
           ENDIF
         ENDIF
         Gvr2pfr(i) = topfr
@@ -1226,7 +1230,7 @@
 
 ! treat dunnianflw as surface runoff to streams
           Sroff(i) = Sroff(i) + Dunnian_flow(i)
-          adjust_sroff = ACTIVE
+!          adjust_sroff = ACTIVE
           Basin_dunnian = Basin_dunnian + DBLE( Dunnian_flow(i)*harea )
           Ssres_stor(i) = Slow_stor(i)
           IF ( Pref_flag == ACTIVE ) Ssres_stor(i) = Ssres_stor(i) + Pref_flow_stor(i)
@@ -1349,7 +1353,7 @@
         ENDDO
         Basin_potet = Basin_potet*Basin_area_inv
       ENDIF
-      IF ( GSFLOW_flag==ACTIVE .OR. adjust_sroff==ACTIVE ) THEN
+!      IF ( adjust_sroff==ACTIVE ) THEN !WARNING, RSR, Sroff can include Hortonian from ag fraction
         Basin_hortonian = 0.0D0
         Basin_sroff = 0.0D0
         Basin_sroffp = 0.0D0
@@ -1362,7 +1366,7 @@
         Basin_hortonian = Basin_hortonian * Basin_area_inv
         Basin_sroff = Basin_sroff * Basin_area_inv
         Basin_sroffp = Basin_sroffp * Basin_area_inv
-      ENDIF
+!      ENDIF
 
       END FUNCTION szrun
 

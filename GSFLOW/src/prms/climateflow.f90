@@ -546,12 +546,12 @@ end module PRMS_IT0_VARS
       IF ( Call_cascade==ACTIVE ) THEN
         IF ( Nsegment > 0 ) THEN
           ALLOCATE ( Strm_seg_in(Nsegment) )
+          CALL declvar_dble(Srunoff_module, 'strm_seg_in', 'nsegment', Nsegment, &
+     &         'Flow in stream segments as a result of cascading flow in each stream segment', &
+     &         'cfs', Strm_seg_in)
         ELSE
           ALLOCATE ( Strm_seg_in(1) )
         ENDIF
-        CALL declvar_dble(Srunoff_module, 'strm_seg_in', 'nsegment', Nsegment, &
-     &       'Flow in stream segments as a result of cascading flow in each stream segment', &
-     &       'cfs', Strm_seg_in)
       ENDIF
 
 ! stream flow
@@ -1106,8 +1106,7 @@ end module PRMS_IT0_VARS
 
       IF ( Temp_flag==temp_1sta_module .OR. Temp_flag==temp_laps_module .OR. Temp_flag==temp_sta_module ) THEN
         IF ( getparam_int(Temp_module, 'hru_tsta', Nhru, Hru_tsta)/=0 ) CALL read_error(2, 'hru_tsta')
-        IF ( Parameter_check_flag>0 ) &
-     &       CALL checkdim_bounded_limits('hru_tsta', 'ntemp', Hru_tsta, Nhru, 0, Ntemp, Inputerror_flag)
+        CALL checkdim_bounded_limits('hru_tsta', 'ntemp', Hru_tsta, Nhru, 0, Ntemp, Inputerror_flag)
       ENDIF
 
       IF ( getparam_real(Precip_module, 'tmax_allsnow', Nhru*Nmonths, Tmax_allsnow)/=0 ) &

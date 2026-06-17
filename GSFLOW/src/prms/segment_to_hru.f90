@@ -93,7 +93,7 @@
      &       'none')/=0 ) CALL read_error(1, 'segment_outflow_id')
         ALLOCATE ( Segment_to_soilmoist(Nhru) )
         CALL declvar_real(MODNAME, 'segment_to_soilmoist', 'nhru', Nhru, &
-     &                    'Flow from segment to HRU capillary reservoir', 'none', Segment_to_soilmoist)
+     &                    'Flow from segment to HRU capillary reservoir', 'inches', Segment_to_soilmoist)
         Segment_to_soilmoist = 0.0
 
       ELSEIF ( Process_flag==INIT ) THEN

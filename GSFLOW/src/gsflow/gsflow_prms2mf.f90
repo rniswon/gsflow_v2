@@ -105,10 +105,14 @@
      &   'inches', Gw_rejected_grav)
 
       !rsr, all reaches receive same precentage of flow to each segment
-      ALLOCATE (Segment_pct_area(Nsegment))
-!      CALL declvar_dble(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, &
-!     &     'Proportion of each segment that contributes flow to a stream reach', &
-!     &     'decimal fraction', Segment_pct_area)
+      if ( Nsegment>0 ) THEN
+        ALLOCATE (Segment_pct_area(Nsegment))
+!        CALL declvar_dble(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, &
+!     &       'Proportion of each segment that contributes flow to a stream reach', &
+!     &       'decimal fraction', Segment_pct_area)
+      else
+        ALLOCATE (Segment_pct_area(1))
+      endif
 
       ! Allocate local arrays
       ALLOCATE ( Excess(Ngwcell) )
@@ -207,7 +211,11 @@
         IF ( getparam_real('prms2mf', 'gvr_hru_pct', Nhrucell, Gvr_hru_pct)/=0 ) CALL read_error(2, 'gvr_hru_pct')
       ENDIF
 
-      ALLOCATE ( Numreach_segment(Nsegment) )
+      if ( Nsegment>0 ) THEN
+          ALLOCATE ( Numreach_segment(Nsegment) )
+      else
+          ALLOCATE ( Numreach_segment(1) )
+      endif
       DO i = 1, Nsegment
         Numreach_segment(i) = ISEG(4, i)
         IF ( Numreach_segment(i)<1 ) THEN

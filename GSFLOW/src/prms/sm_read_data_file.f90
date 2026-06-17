@@ -40,8 +40,8 @@ contains
         IF ( ios/=0 ) CALL read_error(13, 'comment')
         IF ( line(:4)=='    ' ) CYCLE
         IF ( line(:2)=='//' .OR. line(:1)=='"' ) CALL write_outfile(TRIM(line))
-        IF ( line(:4)=='####' ) EXIT
         num_vars = num_vars + 1
+        IF ( line(:4)=='####' ) EXIT
       ENDDO
       IF ( line(:4)/='####' ) CALL error_stop('invalid Data File, data section not found', ERROR_read)
       CALL write_outfile(EQULS)

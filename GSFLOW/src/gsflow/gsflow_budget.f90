@@ -152,7 +152,7 @@
      &     'Total actual ET from each GW cell and PRMS soil zone', &
      &     'inches', Actet_tot_gwsz)
 
-      if ( Nsegment>0 ) then
+      IF ( Nsegment>0 ) THEN
         ALLOCATE (Streamflow_sfr(Nsegment))
         CALL declvar_real(MODNAME, 'streamflow_sfr', 'nsegment', Nsegment, &
      &       'Streamflow as computed by SFR for each segment', &
