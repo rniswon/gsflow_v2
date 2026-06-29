@@ -53,7 +53,7 @@
       USE PRMS_CONSTANTS, ONLY: DAILY, YEARLY, ERROR_control
       use PRMS_READ_PARAM_FILE, only: declparam
       use PRMS_CONTROL_FILE, only: control_string_array, control_integer, control_string
-      USE PRMS_MODULE, ONLY: BasinOutON_OFF, Nhru
+      USE PRMS_MODULE, ONLY: BasinOutON_OFF, Nhru, documentation_files_flag
       USE PRMS_BASIN_SUMMARY
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -79,7 +79,7 @@
       ENDIF
 
 ! Declared Parameters
-      IF ( BasinOutON_OFF==2 ) THEN
+      IF ( BasinOutON_OFF==2 .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Nhm_id(Nhru) )
         IF ( declparam(MODNAME, 'nhm_id', 'nhru', 'integer', &
      &       '1', '1', '9999999', &

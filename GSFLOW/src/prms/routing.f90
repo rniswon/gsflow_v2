@@ -66,7 +66,7 @@
      &    strmflow_muskingum_module, CASCADE_OFF, CASCADE_HRU_SEGMENT
       use PRMS_MMFAPI, only: declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Init_vars_from_file, Strmflow_flag, Cascade_flag, Stream_temp_flag
+      USE PRMS_MODULE, ONLY: Nhru, Nsegment, Init_vars_from_file, Strmflow_flag, Cascade_flag, Stream_temp_flag, documentation_files_flag
       USE PRMS_ROUTING
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -131,7 +131,7 @@
       ! 11 = outbound to Great Lakes; 12 = ephemeral; + 100 user updated; 1000 user virtual segment
       ! 100 = user normal; 101 - 108 = not used; 109 sink (tosegment used by Lumen)
 
-      IF ( Strmflow_flag==strmflow_muskingum_mann_module ) THEN
+      IF ( Strmflow_flag==strmflow_muskingum_mann_module .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Mann_n(Nsegment) )
         IF ( declparam( MODNAME, 'mann_n', 'nsegment', 'real', &
      &       '0.04', '0.001', '0.15', &
@@ -148,7 +148,7 @@
      &       'meters')/=0 ) CALL read_error(1, 'seg_depth')
       ENDIF
 
-      IF ( Strmflow_flag==strmflow_muskingum_mann_module .OR. Stream_temp_flag==ACTIVE ) THEN
+      IF ( Strmflow_flag==strmflow_muskingum_mann_module .OR. Stream_temp_flag==ACTIVE .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Seg_length(Nsegment) )
         IF ( declparam( MODNAME, 'seg_length', 'nsegment', 'real', &
      &       '1000.0', '0.001', '200000.0', &
@@ -181,7 +181,7 @@
      &     ' streamflow flows, for segments that do not flow to another segment enter 0', &
      &     'none')/=0 ) CALL read_error(1, 'tosegment')
 
-      IF ( Cascade_flag==CASCADE_OFF .OR. Cascade_flag==CASCADE_HRU_SEGMENT ) THEN
+      IF ( (Cascade_flag==CASCADE_OFF .OR. Cascade_flag==CASCADE_HRU_SEGMENT) .AND. documentation_files_flag==0 ) THEN
         Hru_seg_cascades = ACTIVE
         ALLOCATE ( Hru_segment(Nhru) )
         IF ( declparam(MODNAME, 'hru_segment', 'nhru', 'integer', &
@@ -219,7 +219,7 @@
 
       IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
      &     Strmflow_flag==strmflow_muskingum_mann_module ) ALLOCATE ( K_coef(Nsegment) )
-      IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module ) THEN
+      IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. documentation_files_flag==1 ) THEN
         IF ( declparam(MODNAME, 'K_coef', 'nsegment', 'real', &
      &       '1.0', '0.01', '24.0', &
      &       'Muskingum storage coefficient', &
@@ -230,7 +230,7 @@
       ENDIF
 
       IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. Strmflow_flag==strmflow_muskingum_module .OR. &
-     &     Strmflow_flag==strmflow_muskingum_mann_module ) THEN
+     &     Strmflow_flag==strmflow_muskingum_mann_module .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( X_coef(Nsegment) )
         IF ( declparam(MODNAME, 'x_coef', 'nsegment', 'real', &
      &       '0.2', '0.0', '0.5', &
@@ -248,7 +248,7 @@
      &       'cfs', Segment_delta_flow)
       ENDIF
 
-      IF ( Hru_seg_cascades==ACTIVE ) THEN
+      IF ( Hru_seg_cascades==ACTIVE .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Seginc_potet(Nsegment) )
         CALL declvar_dble(MODNAME, 'seginc_potet', 'nsegment', Nsegment, &
      &       'Area-weighted average potential ET for each segment from HRUs contributing flow to the segment', &

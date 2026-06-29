@@ -94,7 +94,7 @@
       use PRMS_CONTROL_FILE, only: control_integer
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag, Nmonths
+      USE PRMS_MODULE, ONLY: Nsegment, Init_vars_from_file, Strmtemp_humidity_flag, Nmonths, documentation_files_flag
       USE PRMS_STRMTEMP
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -204,7 +204,7 @@
 
       ALLOCATE ( Seg_length_km(Nsegment) )
 
-      IF ( Stream_temp_shade_flag==OFF ) THEN
+      IF ( Stream_temp_shade_flag==OFF .OR. documentation_files_flag==1 ) THEN
          ALLOCATE ( Azrh(Nsegment) )
          IF ( declparam( MODNAME, 'azrh', 'nsegment', 'real', &
      &       '0.0', '-1.5708', '1.5708', &
@@ -297,17 +297,17 @@
      &       'meters')/=0 ) CALL read_error(1, 'vow')
       ENDIF
 
-      IF ( Stream_temp_shade_flag==ACTIVE ) THEN
+      IF ( Stream_temp_shade_flag==ACTIVE .OR. documentation_files_flag==1 ) THEN
          ALLOCATE ( Segshade_sum(Nsegment) )
          IF ( declparam( MODNAME, 'segshade_sum', 'nsegment', 'real', &
-     &       '0.0', '0.0', '1.0.', &
+     &       '0.0', '0.0', '1.0', &
      &       'Total shade fraction for summer vegetation', &
      &       'Total shade fraction for summer vegetation; required when stream_temp_flag=1', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'segshade_sum')
 
          ALLOCATE ( Segshade_win(Nsegment) )
          IF ( declparam( MODNAME, 'segshade_win', 'nsegment', 'real', &
-     &       '0.0', '0.0', '1.0.', &
+     &       '0.0', '0.0', '1.0', &
      &       'Total shade fraction for winter vegetation', &
      &       'Total shade fraction for winter vegetation; required when stream_temp_flag=1', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'segshade_win')
@@ -357,7 +357,7 @@
      &     'Index of streamflow temperature in Data File that replaces temperature in a segment', &
      &     'none')/=0 ) CALL read_error(1, 'tempIN_segment')
 
-      IF ( Strmtemp_humidity_flag==ACTIVE ) THEN  ! specified constant
+      IF ( Strmtemp_humidity_flag==ACTIVE .OR. documentation_files_flag==1 ) THEN  ! specified constant
          ALLOCATE ( Seg_humidity(Nsegment, Nmonths) )
          IF ( declparam( MODNAME, 'seg_humidity', 'nsegment,nmonths', 'real', &
      &       '0.7', '0.0', '1.0', &

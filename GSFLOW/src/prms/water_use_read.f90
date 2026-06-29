@@ -55,7 +55,7 @@
       use PRMS_CONTROL_FILE, only: control_string
       use PRMS_MMFAPI, only: declvar_dble, declvar_real
       USE PRMS_MODULE, ONLY: Process_flag, Nhru, Nsegment, Nwateruse, Nexternal, Nconsumed, &
-     &    Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, &
+     &    Segment_transferON_OFF, Gwr_transferON_OFF, Lake_transferON_OFF, documentation_files_flag, &
      &    External_transferON_OFF, Dprst_transferON_OFF, Dprst_flag, Strmflow_flag, &
      &    Inputerror_flag, Start_year, Start_month, Start_day, Soilzone_add_water_use, &
      &    End_year, End_month, End_day, Dprst_transfer_water_use, Dprst_add_water_use, &
@@ -281,7 +281,7 @@
         ENDIF
 
         Segment_transfers_on = OFF
-        IF ( Strmflow_flag>strmflow_noroute_module ) THEN
+        IF ( Strmflow_flag>strmflow_noroute_module .OR. documentation_files_flag==1 ) THEN
           IF ( Segment_transferON_OFF==ACTIVE ) THEN
             Segment_transfers_on = ACTIVE
             ALLOCATE ( Segment_transfer(Nsegment) )
@@ -340,7 +340,7 @@
      &       'cfs', Total_gwr_gain)
 
         Lake_transfers_on = OFF
-        IF ( Strmflow_flag==strmflow_muskingum_lake_module ) THEN
+        IF ( Strmflow_flag==strmflow_muskingum_lake_module .OR. documentation_files_flag==1 ) THEN
           IF ( Lake_transferON_OFF==ACTIVE ) THEN
             Lake_transfers_on = ACTIVE
             ALLOCATE ( Lake_transfer(Nhru) )

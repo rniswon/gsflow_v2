@@ -70,7 +70,7 @@
 !***********************************************************************
       INTEGER FUNCTION basdecl()
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF
-      USE PRMS_MODULE, ONLY: Nhru, Nlake, Dprst_flag, Lake_route_flag, &
+      USE PRMS_MODULE, ONLY: Nhru, Nlake, Dprst_flag, Lake_route_flag, documentation_files_flag, &
      &    PRMS4_flag, gwflow_flag, Glacier_flag, AG_flag, activeHRU_inactiveCELL_flag, Nsub
       use PRMS_MMFAPI, only: declvar_real, declvar_dble
       use PRMS_READ_PARAM_FILE, only: declparam
@@ -150,7 +150,7 @@
      &       'acres', Dprst_area_clos_max)
 
 !        ALLOCATE ( Dprst_frac(Nhru) )
-        IF ( PRMS4_flag==ACTIVE ) THEN
+        IF ( PRMS4_flag==ACTIVE .OR. documentation_files_flag==1 ) THEN
           ALLOCATE ( Dprst_area(Nhru) )
           IF ( declparam(MODNAME, 'dprst_area', 'nhru', 'real', &
      &         '0.0', '0.0', '1.0E9', &
@@ -163,7 +163,7 @@
      &         'Fraction of each HRU area that has surface depressions', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'dprst_frac_hru')
         ENDIF
-        IF ( PRMS4_flag==OFF ) THEN
+        IF ( PRMS4_flag==OFF .OR. documentation_files_flag==1 ) THEN
           IF ( declparam(MODNAME, 'dprst_frac', 'nhru', 'real', &
      &         '0.0', '0.0', '0.999', &
      &         'Fraction of each HRU area that has surface depressions', &
@@ -310,7 +310,7 @@
       INTEGER FUNCTION basinit()
       USE PRMS_CONSTANTS, ONLY: DEBUG_less, ACTIVE, OFF, CLOSEZERO, READ_INIT, &
      &    INACTIVE, LAKE, FEET, DEBUG_minimum, ERROR_param, &
-     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, CANOPY, SWALE !, METERS2FEET, SWALE
+     &    NORTHERN, SOUTHERN, FEET2METERS, DNEARZERO, CANOPY, SWALE !, METERS2FEET
       use PRMS_READ_PARAM_FILE, only: getparam_int, getparam_real
       USE PRMS_MODULE, ONLY: Nhru, Nlake, Print_debug, Hru_type, irrigation_apply_flag, &
      &    Dprst_flag, Lake_route_flag, PRMS4_flag, gwflow_flag, PRMS_VERSION, &
@@ -354,6 +354,7 @@
         ENDIF
       ENDIF
 
+      ! parameter dprst_frac read into array hru_frac_dprst to accommodate dynamic parameters
       dprst_frac_flag = 0
       IF ( Dprst_flag==ACTIVE ) THEN
         IF ( getparam_real(MODNAME, 'dprst_frac_open', Nhru, Dprst_frac_open)/=0 ) CALL read_error(2, 'dprst_frac_open')
@@ -431,12 +432,14 @@
       Hru_area_dble = DBLE( Hru_area )
       Imperv_flag = OFF
       j = 0
+      Have_swales = OFF
       DO i = 1, Nhru
         harea = Hru_area(i)
         harea_dble = Hru_area_dble(i)
         Totarea = Totarea + harea_dble
         perv_area = harea
         Snowpack_threshold(i) = harea_dble * 1.0E-17
+        IF ( Hru_type(i)==SWALE ) Have_swales = ACTIVE
 
         IF ( one_subbasin_flag>0 ) THEN
           IF ( Hru_subbasin(i) /= one_subbasin_flag ) Hru_type(i) = INACTIVE
@@ -476,7 +479,6 @@
           !    CYCLE
           !  ENDIF
           !ENDIF
-          IF ( Hru_type(i)==SWALE ) Have_swales = ACTIVE
 
         ENDIF
 

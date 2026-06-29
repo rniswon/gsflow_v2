@@ -35,7 +35,7 @@
       USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT, ACTIVE, OFF, GLACIER, &
      &    DEBUG_less, MM, MM2INCH, precip_1sta_module, precip_laps_module
       USE PRMS_MODULE, ONLY: Nhru, Nrain, Process_flag, Inputerror_flag, Precip_flag, &
-     &    Print_debug, Glacier_flag, Nowmonth, Hru_type, Nmonths
+     &    Print_debug, Glacier_flag, Nowmonth, Hru_type, Nmonths, documentation_files_flag
       USE PRMS_PRECIP_1STA_LAPS
       USE PRMS_BASIN, ONLY: Active_hrus, Hru_area, Hru_route_order, Basin_area_inv, Hru_elev_ts
       USE PRMS_CLIMATEVARS, ONLY: Newsnow, Pptmix, Prmx, Basin_ppt, &
@@ -121,7 +121,7 @@
      &       'none')/=0 ) CALL read_error(1, 'hru_psta')
 
         ALLOCATE ( Rain_adj_lapse(Nhru, Nmonths), Snow_adj_lapse(Nhru, Nmonths) )
-        IF ( Precip_flag==precip_1sta_module ) THEN
+        IF ( Precip_flag==precip_1sta_module .OR. documentation_files_flag==1 ) THEN
           IF ( declparam(MODNAME, 'rain_adj', 'nhru,nmonths', 'real', &
      &         '1.0', '0.2', '10.0', &
      &         'Monthly rain adjustment factor for each HRU', &
@@ -137,7 +137,7 @@
      &         'decimal fraction')/=0 ) CALL read_error(1, 'snow_adj')
         ENDIF
 
-        IF ( Precip_flag==precip_laps_module ) THEN
+        IF ( Precip_flag==precip_laps_module .OR. documentation_files_flag==1 ) THEN
           ALLOCATE ( Padj_rn(Nrain, Nmonths) )
           IF ( declparam(MODNAME, 'padj_rn', 'nrain,nmonths', 'real', &
      &         '1.0', '-2.0', '10.0', &

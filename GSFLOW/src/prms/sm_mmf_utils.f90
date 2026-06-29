@@ -628,7 +628,7 @@ contains
   end subroutine dattim
 
 !***********************************************************************
-! getvarsize - return the number of values for a parameter
+! getvarsize - return the number of values for a variable
 !***********************************************************************
   integer module function getvarsize(Varname)
     implicit none
@@ -653,5 +653,26 @@ contains
       ERROR stop ERROR_var
     end if
   end function
+
+!***********************************************************************
+! print_variables - Print meta data for declared variables
+!***********************************************************************
+  module subroutine print_variables()
+    use PRMS_MODULE, only: var_out_unit
+    implicit none
+    ! Functions
+    intrinsic :: trim
+    ! Local Variables
+    integer :: i
+    !***********************************************************************
+    do i = 1, Num_variables
+       write (var_out_unit, '(A, /, A, /, 2A)') '####', trim(Variable_data(i)%variable_name), &
+              'Declared by module: ', trim(Variable_data(i)%module_name)
+       write (var_out_unit,'(2A)') 'Description: ', trim(Variable_data(i)%description)
+       write (var_out_unit,'(2A)') 'Units: ', trim(Variable_data(i)%units)
+       write (var_out_unit,'(2A)') 'Dimension: ', trim(Variable_data(i)%dimen_names)
+       write (var_out_unit,'(2A)') 'Data Type: ',trim(Variable_data(i)%data_type)
+    end do
+  end subroutine
 
 end submodule

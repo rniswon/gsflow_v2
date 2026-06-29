@@ -121,7 +121,8 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, CANOPY
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file, Glacier_flag, Snarea_curve_flag, PRMS_land_iteration_flag, Nmonths
+      USE PRMS_MODULE, ONLY: Nhru, Ndepl, Init_vars_from_file, Glacier_flag, &
+                             Snarea_curve_flag, PRMS_land_iteration_flag, Nmonths, documentation_files_flag
       USE PRMS_FLOWVARS, ONLY: Pk_precip, Basin_pweqv, Pkwater_equiv, Pk_depth, Snowcov_area, Basin_pk_precip, &
                                Snow_evap, Snowmelt, Pptmix_nopack, Basin_snowmelt, Basin_snowevap, Basin_snowcov, Basin_snowdepth
       USE PRMS_IT0_VARS, ONLY: It0_pkwater_equiv
@@ -578,7 +579,7 @@
 
       ALLOCATE ( Hru_deplcrv(Nhru) )
       ALLOCATE ( Snarea_curve(11, Ndepl) )
-      IF ( Snarea_curve_flag==0 ) THEN
+      IF ( Snarea_curve_flag==0 .OR. documentation_files_flag==1 ) THEN
         IF ( declparam(MODNAME, 'hru_deplcrv', 'nhru', 'integer', &
      &       '1', 'bounded', 'ndepl', &
      &       'Index number for snowpack areal depletion curve', &
@@ -591,7 +592,7 @@
      &       ' curve (0.0 to 1.0 in 0.1 increments)', &
      &       'decimal fraction')/=0 ) CALL read_error(1, 'snarea_curve')
       ENDIF
-      IF ( Snarea_curve_flag==1 ) THEN
+      IF ( Snarea_curve_flag==1 .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Snarea_a(Nhru) )
         IF ( declparam(MODNAME, 'snarea_a', 'nhru', 'real', &
      &       '0.0', '0.0', '1.0', &

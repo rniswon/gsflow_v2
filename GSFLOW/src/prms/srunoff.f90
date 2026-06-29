@@ -105,7 +105,7 @@
       USE PRMS_CONSTANTS, ONLY: ACTIVE, OFF, smidx_module, carea_module, CASCADE_OFF
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, Nlake, Init_vars_from_file, &
+      USE PRMS_MODULE, ONLY: Nhru, Nlake, Init_vars_from_file, documentation_files_flag, &
      &    Dprst_flag, Cascade_flag, Sroff_flag, PRMS4_flag, Frozen_flag, AG_flag, gw2dprst_swale_flag
       USE PRMS_SRUNOFF
       use prms_utils, only: print_module, read_error
@@ -174,7 +174,7 @@
      &     'inches', Hru_sroffi)
 
      ! ALLOCATE ( Hru_sroffa(Nhru) )
-     ! CALL declvar_real(MODNAME, 'hru_sroffa', 'nhru', Nhru, &
+     ! CALL declvar _real(MODNAME, 'hru_sroffa', 'nhru', Nhru, &
      !&     'HRU area-weighted average surface runoff from net application water for pervious area for each HRU', &
      !&     'inches', Hru_sroffa)
 
@@ -221,7 +221,7 @@
      &       'acres', Dprst_area_clos)
 
 !        ALLOCATE ( Upslope_dprst_hortonian(Nhru) )
-!        CALL declvar_dble(MODNAME, 'upslope_dprst_hortonian', 'nhru', Nhru, &
+!        CALL declvar _dble(MODNAME, 'upslope_dprst_hortonian', 'nhru', Nhru, &
 !     &       'Upslope surface-depression spillage and interflow for each HRU',   &
 !     &       'inches', Upslope_dprst_hortonian)
 
@@ -321,7 +321,7 @@
       ENDIF
 
 ! Declare parameters
-      IF ( Sroff_flag==smidx_module ) THEN
+      IF ( Sroff_flag==smidx_module .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Smidx_coef(Nhru) )
         IF ( declparam(MODNAME, 'smidx_coef', 'nhru', 'real', &
      &       '0.005', '0.0', '1.0', &
@@ -336,7 +336,7 @@
      &       '1.0/inch')/=0 ) CALL read_error(1, 'smidx_exp')
       ENDIF
 
-      IF ( Sroff_flag==carea_module ) THEN
+      IF ( Sroff_flag==carea_module .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Carea_min(Nhru), Carea_dif(Nhru) )
         IF ( declparam(MODNAME, 'carea_min', 'nhru', 'real', &
      &       '0.2', '0.0', '1.0', &
@@ -394,7 +394,7 @@
      &       'decimal fraction')/=0 ) CALL read_error(1, 'op_flow_thres')
 
         ALLOCATE ( Sro_to_dprst_perv(Nhru) )
-        IF ( PRMS4_flag==ACTIVE ) THEN
+        IF ( PRMS4_flag==ACTIVE .OR. documentation_files_flag==1 ) THEN
           IF ( declparam(MODNAME, 'sro_to_dprst', 'nhru', 'real', &
      &         '0.2', '0.0', '1.0', &
      &         'Fraction of pervious surface runoff that flows into surface-depression storage', &
@@ -403,7 +403,7 @@
      &         ' flows to the stream network for each HRU', &
      &         'decimal fraction')/=0 ) CALL read_error(1, 'sro_to_dprst')
         ENDIF
-        IF ( PRMS4_flag==OFF ) THEN
+        IF ( PRMS4_flag==OFF .OR. documentation_files_flag==1 ) THEN
           IF ( declparam(MODNAME, 'sro_to_dprst_perv', 'nhru', 'real', &
      &         '0.2', '0.0', '1.0', &
      &         'Fraction of pervious surface runoff that flows into surface-depression storage', &
@@ -479,7 +479,7 @@
      &       'Fraction of irrigated area for each HRU', &
      &       'decimal fraction', ag_contrib_fraction)
 !       ALLOCATE ( Sro_to_dprst_ag(Nhru) )
-!       IF ( declparam(MODNAME, 'sro_to_dprst_ag', 'nhru', 'real', &
+!       IF ( decl param(MODNAME, 'sro_to_dprst_ag', 'nhru', 'real', &
 !     &      '0.2', '0.0', '1.0', &
 !     &      'Fraction of agricultural surface runoff that flows into surface-depression storage', &
 !     &      'Fraction of agricultural surface runoff that flows into'// &
@@ -487,7 +487,7 @@
 !     &      'decimal fraction')/=0 ) CALL read_error(1, 'sro_to_dprst_ag')
       ENDIF
 
-      IF ( gw2dprst_swale_flag == ACTIVE ) THEN
+      IF ( gw2dprst_swale_flag == ACTIVE .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Gw2dprst(Nhru) )
         CALL declvar_real(MODNAME, 'gw2dprst', 'nhru', Nhru, &
      &       'Groundwater discharge to surface depression storage added to swale HRUs', &
@@ -1436,7 +1436,7 @@
       END SUBROUTINE check_capacity_ag
 
 !***********************************************************************
-! Initialize depression storage area hydrology
+!     dprst_init - Initialize depression storage area hydrology
 !***********************************************************************
       SUBROUTINE dprst_init()
       USE PRMS_SRUNOFF
@@ -1576,7 +1576,7 @@
       END SUBROUTINE dprst_init
 
 !***********************************************************************
-!     Compute depression storage area hydrology
+!     dprst_comp - Compute depression storage area hydrology
 !***********************************************************************
       SUBROUTINE dprst_comp(Dprst_vol_clos, Dprst_area_clos_max, Dprst_area_clos, &
      &           Dprst_vol_open_max, Dprst_vol_open, Dprst_area_open_max, Dprst_area_open, &

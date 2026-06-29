@@ -51,7 +51,7 @@
       use PRMS_MMFAPI, only: declvar_dble, declvar_int, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_MODULE, ONLY: Nratetbl, Ntemp, Nrain, Nsol, Nobs, Nevap, Nsnow, Precip_flag, &
-          Nhumid, Nwind, Nstreamtemp, Nlakeelev
+          Nhumid, Nwind, Nstreamtemp, Nlakeelev, documentation_files_flag
       USE PRMS_OBS
       use prms_utils, only: print_module, read_error
       IMPLICIT NONE
@@ -143,7 +143,7 @@
 !   Declared Parameters
       Rain_flag = OFF
       IF ( Precip_flag==xyz_dist_module ) Rain_flag = ACTIVE
-      IF ( Rain_flag==ACTIVE ) THEN
+      IF ( Rain_flag==ACTIVE .OR. documentation_files_flag==1 ) THEN
         CALL declvar_int(MODNAME, 'rain_day', 'one', 1, &
      &       'Flag to set the form of any precipitation to rain (0=determine form; 1=rain)', &
      &       'none', Rain_day)

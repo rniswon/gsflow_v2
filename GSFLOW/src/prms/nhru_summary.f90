@@ -76,7 +76,7 @@
       USE PRMS_CONSTANTS, ONLY: ERROR_control, DAILY, YEARLY, ACTIVE, OFF
       use PRMS_CONTROL_FILE, only: control_integer, control_string, control_string_array
       use PRMS_READ_PARAM_FILE, only: declparam
-      USE PRMS_MODULE, ONLY: Nhru, NhruOutON_OFF
+      USE PRMS_MODULE, ONLY: Nhru, NhruOutON_OFF, documentation_files_flag
       USE PRMS_NHRU_SUMMARY
       use prms_utils, only: error_stop, print_module, read_error
       IMPLICIT NONE
@@ -86,6 +86,7 @@
       CALL print_module(MODDESC, MODNAME, Version_nhru_summary)
 
       IF ( control_integer(NhruOutVars, 'nhruOutVars')/=0 ) NhruOutVars = 0
+      IF ( documentation_files_flag==1 ) NhruOutvars = 1
       ! 1 = daily, 2 = monthly, 3 = both, 4 = mean monthly, 5 = mean yearly, 6 = yearly total
       IF ( control_integer(NhruOut_freq, 'nhruOut_freq')/=0 ) NhruOut_freq = 0
       IF ( NhruOut_freq<DAILY .OR. NhruOut_freq>YEARLY ) CALL error_stop('invalid nhruOut_freq value', ERROR_control)
@@ -119,7 +120,7 @@
       ENDIF
 
 ! Declared Parameters
-      IF ( NhruOutON_OFF==2 ) THEN
+      IF ( NhruOutON_OFF==2 .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Nhm_id(Nhru) )
         IF ( declparam(MODNAME, 'nhm_id', 'nhru', 'integer', &
      &       '1', '1', '9999999', &
@@ -285,11 +286,11 @@
         Nhru_int_var_monthly = 0
       ENDIF
 
+      ALLOCATE ( hru_ids(Nhru) )
       IF ( NhruOutON_OFF==2 ) THEN
         IF ( getparam_int(MODNAME, 'nhm_id', Nhru, Nhm_id)/=0 ) CALL read_error(2, 'nhm_id')
       ELSE
-        ALLOCATE ( hru_ids(nhru) )
-        DO jj = 1, nhru
+        DO jj = 1, Nhru
           hru_ids(jj) = jj
         ENDDO
       ENDIF
@@ -602,7 +603,7 @@
         ELSE
           WRITE ( Iunit ) 'Date', hru_ids
         ENDIF
-      ELSE ! can only be write_binary_nhru_flag = 1
+      ELSE ! can only be write_binary_nhru_flag = 1 ! for MODFLOW utility
         IF ( write_binary_nhru_flag == OFF ) THEN
           WRITE ( Iunit, Output_fmt2 ) Nhm_id
         ELSE

@@ -166,7 +166,7 @@ end module PRMS_IT0_VARS
      &    Strmflow_module, Temp_module, Stream_order_flag, bias_adjust_flag, &
      &    Precip_module, Solrad_module, Transp_module, Et_module, PRMS4_flag, &
      &    Soilzone_module, Srunoff_module, Call_cascade, Et_flag, Dprst_flag, Solrad_flag, Humidity_cbh_flag, &
-     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, gwflow_flag, Nhrucell, activeHRU_inactiveCELL_flag
+     &    AG_flag, PRMS_land_iteration_flag, GSFLOW_flag, gwflow_flag, Nhrucell, activeHRU_inactiveCELL_flag, documentation_files_flag
       use PRMS_MMFAPI, only: declvar_int, declvar_dble, declvar_real
       use PRMS_READ_PARAM_FILE, only: declparam
       USE PRMS_CLIMATEVARS
@@ -305,7 +305,7 @@ end module PRMS_IT0_VARS
      &     'Basin area-weighted average shortwave radiation', &
      &     'Langleys', Basin_potsw)
 
-      IF ( Solrad_flag==ddsolrad_module .OR. Solrad_flag==ccsolrad_module ) THEN
+      IF ( Solrad_flag==ddsolrad_module .OR. Solrad_flag==ccsolrad_module .OR. documentation_files_flag==1 ) THEN
         CALL declvar_dble(Solrad_module, 'basin_orad', 'one', 1, &
      &       'Basin area-weighted average solar radiation on a horizontal surface', &
      &       'Langleys', Basin_orad)
@@ -337,7 +337,7 @@ end module PRMS_IT0_VARS
      &     'inches', Basin_potet)
 
       IF ( Et_flag==potet_pt_module .OR. Et_flag==potet_pm_module .OR. &
-     &     Et_flag==potet_pm_sta_module ) THEN
+     &     Et_flag==potet_pm_sta_module .OR. documentation_files_flag==1 ) THEN
         CALL declvar_dble(Et_module, 'basin_humidity', 'one', 1, &
      &       'Basin area-weighted average humidity', &
      &       'percentage', Basin_humidity)
@@ -357,13 +357,13 @@ end module PRMS_IT0_VARS
         CALL declvar_real(Et_module, 'vp_slope', 'nhru', Nhru, &
      &       'Slope of saturation vapor pressure versus air temperature curve for each HRU', &
      &       'kilopascals/degrees Celsius', Vp_slope)
-        IF ( Et_flag==potet_pm_module .OR. Et_flag==potet_pm_sta_module ) THEN
+        IF ( Et_flag==potet_pm_module .OR. Et_flag==potet_pm_sta_module .OR. documentation_files_flag==1 ) THEN
           ALLOCATE ( Vp_sat(Nhru) )
           CALL declvar_real(Et_module, 'vp_sat', 'nhru', Nhru, &
      &         'Saturation vapor pressure for each HRU', &
      &         'kilopascals', Vp_sat)
         ENDIF
-        IF ( (Et_flag==potet_pm_module .OR. Et_flag==potet_pt_module .AND. Humidity_cbh_flag==OFF) ) THEN
+        IF ( (Et_flag==potet_pm_module .OR. Et_flag==potet_pt_module .AND. Humidity_cbh_flag==OFF) .OR. documentation_files_flag==1 ) THEN
           ALLOCATE ( Humidity_percent(Nhru,Nmonths) )
           IF ( declparam(Et_module, 'humidity_percent', 'nhru,nmonths', 'real', &
      &         '0.0', '0.0', '100.0', &
@@ -397,7 +397,7 @@ end module PRMS_IT0_VARS
      &     'Drainage from the gravity-reservoir to the associated GWR for each HRU', &
      &     'inches', Ssr_to_gw)
 
-      IF ( activeHRU_inactiveCELL_flag == ACTIVE ) THEN
+      IF ( activeHRU_inactiveCELL_flag == ACTIVE .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Ssr_to_prmsgw(Nssr) )
         CALL declvar_real(Soilzone_module, 'ssr_to_prmsgw', 'nssr', Nssr, &
      &       'Drainage from the gravity-reservoir to the associated PRMS GWR for each HRU', &
@@ -446,7 +446,7 @@ end module PRMS_IT0_VARS
      &     'inches', Soil_moist)
 
       ALLOCATE ( Soil_zone_max(Nhru), Soil_lower_stor_max(Nhru) )
-!      CALL declvar_real(Soilzone_module, 'soil_zone_max', 'nhru', Nhru, &
+!      CALL declvar _real(Soilzone_module, 'soil_zone_max', 'nhru', Nhru, &
 !     &     'Maximum storage of all soil zone reservoirs', &
 !     &     'inches', Soil_zone_max)/=0
 
@@ -478,7 +478,7 @@ end module PRMS_IT0_VARS
      &     'Portion of excess flow to the capillary reservoir that drains to the associated GWR for each HRU', &
      &     'inches', Soil_to_gw)
 
-      IF ( activeHRU_inactiveCELL_flag == ACTIVE ) THEN
+      IF ( activeHRU_inactiveCELL_flag == ACTIVE .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Soil_to_prmsgw(Nhru) )
         CALL declvar_real(Soilzone_module, 'soil_to_prmsgw', 'nhru', Nhru, &
      &       'Portion of excess flow to the capillary reservoir that drains to the associated PRMS GWR for each HRU', &
@@ -494,7 +494,7 @@ end module PRMS_IT0_VARS
      &     'Basin average excess flow to capillary reservoirs that drains to GWRs', &
      &     'inches', Basin_soil_to_gw)
 
-      IF ( GSFLOW_flag==ACTIVE ) THEN
+      IF ( GSFLOW_flag==ACTIVE .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( gsflow_ag_actet(Nhru) )
         CALL declvar_real(Soilzone_module, 'gsflow_ag_actet', 'nhru', Nhru, &
      &       'Actual ET for irrigated area on each HRU in GSFLOW simulations', &
@@ -546,12 +546,12 @@ end module PRMS_IT0_VARS
       IF ( Call_cascade==ACTIVE ) THEN
         IF ( Nsegment > 0 ) THEN
           ALLOCATE ( Strm_seg_in(Nsegment) )
+          CALL declvar_dble(Srunoff_module, 'strm_seg_in', 'nsegment', Nsegment, &
+     &         'Flow in stream segments as a result of cascading flow in each stream segment', &
+     &         'cfs', Strm_seg_in)
         ELSE
           ALLOCATE ( Strm_seg_in(1) )
         ENDIF
-        CALL declvar_dble(Srunoff_module, 'strm_seg_in', 'nsegment', Nsegment, &
-     &       'Flow in stream segments as a result of cascading flow in each stream segment', &
-     &       'cfs', Strm_seg_in)
       ENDIF
 
 ! stream flow
@@ -698,7 +698,7 @@ end module PRMS_IT0_VARS
       ALLOCATE ( Tmax_allrain_c(Nhru,Nmonths) )
 
 ! Declare Parameters
-      IF ( Temp_flag<climate_hru_module ) THEN
+      IF ( Temp_flag<climate_hru_module .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Tsta_elev(Ntemp) )
         IF ( declparam(Temp_module, 'tsta_elev', 'ntemp', 'real', &
      &       '0.0', '-300.0', '30000.0', &
@@ -707,7 +707,7 @@ end module PRMS_IT0_VARS
      &       'elev_units')/=0 ) CALL read_error(1, 'tsta_elev')
       ENDIF
 
-      IF ( Temp_flag==temp_1sta_module .OR. Temp_flag==temp_laps_module .OR. Temp_flag==temp_sta_module ) THEN
+      IF ( Temp_flag==temp_1sta_module .OR. Temp_flag==temp_laps_module .OR. Temp_flag==temp_sta_module .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Hru_tsta(Nhru) )
         IF ( declparam(Temp_module, 'hru_tsta', 'nhru', 'integer', &
      &       '0', 'bounded', 'ntemp', &
@@ -717,9 +717,9 @@ end module PRMS_IT0_VARS
       ENDIF
 
       IF ( Temp_flag==temp_1sta_module .OR. Temp_flag==temp_laps_module .OR. Temp_flag==temp_dist2_module .OR. &
-     &     Temp_flag==ide_dist_module .OR. Temp_flag==xyz_dist_module .OR. Temp_flag==temp_sta_module ) THEN
+     &     Temp_flag==ide_dist_module .OR. Temp_flag==xyz_dist_module .OR. Temp_flag==temp_sta_module .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Tmax_aspect_adjust(Nhru,Nmonths) )
-        IF ( bias_adjust_flag==ACTIVE ) THEN
+        IF ( bias_adjust_flag==ACTIVE .OR. documentation_files_flag==1 ) THEN
           ALLOCATE ( Tmax_adj_offset(Nhru,Nmonths) )
           IF ( declparam(Temp_module, 'tmax_adj_offset', 'nhru,nmonths', 'real', &
      &         '0.0', '0.0', '50.0', &
@@ -727,7 +727,8 @@ end module PRMS_IT0_VARS
      &         'Monthly (January to December) additive adjustment to maximum temperature for each HRU' // &
      &         ' as offset from tmin_adj, estimated based on slope and aspect', &
      &         'temp_units')/=0 ) CALL read_error(1, 'tmax_adj_offset')
-        ELSE
+        ENDIF
+        IF ( bias_adjust_flag==OFF .OR. documentation_files_flag==1 ) THEN
           IF ( declparam(Temp_module, 'tmax_adj', 'nhru,nmonths', 'real', &
      &         '0.0', '-10.0', '10.0', &
      &         'HRU maximum temperature adjustment', &
@@ -752,7 +753,7 @@ end module PRMS_IT0_VARS
      &     'decimal fraction')/=0 ) CALL read_error(1, 'potet_sublim')
 
       ALLOCATE ( Tmax_allrain_offset(Nhru,Nmonths), Tmax_allrain(Nhru,Nmonths) )
-      IF ( PRMS4_flag==ACTIVE ) THEN
+      IF ( PRMS4_flag==ACTIVE .OR. documentation_files_flag==1 ) THEN
         IF ( declparam(Precip_module, 'tmax_allrain', 'nhru,nmonths', 'real', &
      &       '38.0', '-8.0', '75.0', &
      &       'Precipitation is rain if HRU max temperature >= this value', &
@@ -760,7 +761,8 @@ end module PRMS_IT0_VARS
      &       ' when precipitation is assumed to be rain; if HRU air'// &
      &       ' temperature is greater than or equal to this value, precipitation is rain', &
      &       'temp_units')/=0 ) CALL read_error(1, 'tmax_allrain')
-      ELSE
+      ENDIF
+      IF ( PRMS4_flag==OFF .OR. documentation_files_flag==1 ) THEN
         IF ( declparam(Precip_module, 'tmax_allrain_offset', 'nhru,nmonths', 'real', &
      &       '1.0', '0.0', '50.0', &
      &       'Precipitation is rain if HRU max temperature >= tmax_allsnow + this value', &
@@ -821,7 +823,7 @@ end module PRMS_IT0_VARS
      &     'Units for measured precipitation (0=inches; 1=mm)', &
      &     'none')/=0 ) CALL read_error(1, 'precip_units')
 
-      IF ( Solrad_flag==ddsolrad_module .OR. Solrad_flag==ccsolrad_module ) THEN
+      IF ( Solrad_flag==ddsolrad_module .OR. Solrad_flag==ccsolrad_module .OR. documentation_files_flag==1 ) THEN
         IF ( Nsol>0 ) THEN
           IF ( declparam(Solrad_module, 'rad_conv', 'one', 'real', &
      &         '1.0', '0.1', '100.0', &
@@ -908,7 +910,7 @@ end module PRMS_IT0_VARS
      &     'inches')/=0 ) CALL read_error(1, 'soil_moist_max')
 
       ALLOCATE ( Soil_rechr_max(Nhru) )
-      IF ( PRMS4_flag==ACTIVE ) THEN
+      IF ( PRMS4_flag==ACTIVE .OR. documentation_files_flag==1 ) THEN
         IF ( declparam(Soilzone_module, 'soil_rechr_max', 'nhru', 'real', &
      &       '1.5', '0.0', '30.0', &
      &       'Maximum storage for soil recharge zone', &
@@ -917,7 +919,7 @@ end module PRMS_IT0_VARS
      &       ' evaporation and transpiration); must be less than or equal to soil_moist_max', &
      &       'inches')/=0 ) CALL read_error(1, 'soil_rechr_max')
       ENDIF
-      IF ( PRMS4_flag==OFF ) THEN
+      IF ( PRMS4_flag==OFF .OR. documentation_files_flag==1 ) THEN
         ALLOCATE ( Soil_rechr_max_frac(Nhru) )
         IF ( declparam(Soilzone_module, 'soil_rechr_max_frac', 'nhru', 'real', &
      &       '1.0', '0.0', '1.0', &
@@ -941,8 +943,8 @@ end module PRMS_IT0_VARS
      &     'Maximum impervious area retention storage for each HRU', &
      &     'inches')/=0 ) CALL read_error(1, 'imperv_stor_max')
 
-      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 ) THEN
-        IF ( PRMS4_flag==ACTIVE ) THEN
+      IF ( Init_vars_from_file==0 .OR. Init_vars_from_file==2 .OR. Init_vars_from_file==5 .OR. documentation_files_flag==1 ) THEN
+        IF ( PRMS4_flag==ACTIVE .OR. documentation_files_flag==1 ) THEN
           IF ( declparam(Soilzone_module, 'soil_rechr_init', 'nhru', 'real', &
      &         '1.0', '0.0', '20.0', &
      &         'Initial storage of water for soil recharge zone', &
@@ -961,7 +963,8 @@ end module PRMS_IT0_VARS
      &         'Initial storage in each GVR and PFR', &
      &         'Initial storage of the gravity and preferential-flow reservoirs for each HRU', &
      &         'inches')/=0 ) CALL read_error(1, 'ssstor_init')
-        ELSE
+        ENDIF
+        IF ( PRMS4_flag==OFF .OR. documentation_files_flag==1 ) THEN
           ALLOCATE ( Soil_rechr_init_frac(Nhru) )
           IF ( declparam(Soilzone_module, 'soil_rechr_init_frac', 'nhru', 'real', &
      &         '0.0', '0.0', '1.0', &
@@ -1103,8 +1106,7 @@ end module PRMS_IT0_VARS
 
       IF ( Temp_flag==temp_1sta_module .OR. Temp_flag==temp_laps_module .OR. Temp_flag==temp_sta_module ) THEN
         IF ( getparam_int(Temp_module, 'hru_tsta', Nhru, Hru_tsta)/=0 ) CALL read_error(2, 'hru_tsta')
-        IF ( Parameter_check_flag>0 ) &
-     &       CALL checkdim_bounded_limits('hru_tsta', 'ntemp', Hru_tsta, Nhru, 0, Ntemp, Inputerror_flag)
+        CALL checkdim_bounded_limits('hru_tsta', 'ntemp', Hru_tsta, Nhru, 0, Ntemp, Inputerror_flag)
       ENDIF
 
       IF ( getparam_real(Precip_module, 'tmax_allsnow', Nhru*Nmonths, Tmax_allsnow)/=0 ) &

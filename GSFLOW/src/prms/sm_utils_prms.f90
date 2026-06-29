@@ -241,6 +241,24 @@ contains
   end subroutine write_real_param
 
 !***********************************************************************
+  module subroutine write_string_param(Iunit, Parm_name, Dimen_name, Dimen, Values)
+!***********************************************************************
+    implicit none
+    ! Arguments
+    integer, intent(IN) :: Iunit, Dimen
+    character(LEN=*), intent(IN) :: Values(Dimen)
+    character(LEN=*), intent(IN) :: Parm_name, Dimen_name
+    ! Local Variables
+    integer i
+    character(LEN=48), parameter :: fmt1 = '("####", /, A, /, "1", /, A, /, I0, /, "4")'
+    !***********************************************************************
+    write (Iunit, fmt1) Parm_name, Dimen_name, Dimen
+    do i = 1, Dimen
+      write (Iunit, '(A)') trim( Values(i) )
+    end do
+  end subroutine write_string_param
+
+!***********************************************************************
   module subroutine write_double_param(Iunit, Parm_name, Dimen_name, Dimen, Values)
 !***********************************************************************
     implicit none
@@ -278,6 +296,48 @@ contains
       end do
     end do
   end subroutine write_2D_double_param
+
+!***********************************************************************
+  module subroutine write_2D_param(Iunit, Parm_name, Dimen_name1, Dimen1, Dimen_name2, Dimen2, Values)
+!***********************************************************************
+    implicit none
+    ! Arguments
+    integer, intent(IN) :: Dimen1, Dimen2, Iunit
+    integer, intent(IN) :: Values(Dimen1, Dimen2)
+    character(LEN=*), intent(IN) :: Parm_name
+    character(LEN=*), intent(IN) :: Dimen_name1, Dimen_name2
+    ! Local Variables
+    integer i, j
+    character(LEN=46), parameter :: fmt1 = '("####", /, A, /, "2", /, A, /, A, /, I0, "1")'
+    !***********************************************************************
+    write (Iunit, fmt1) Parm_name, Dimen_name1, Dimen_name2, Dimen1 * Dimen2
+    do i = 1, Dimen2
+      do j = 1, Dimen1
+        write (Iunit, *) Values(j, i)
+      end do
+    end do
+  end subroutine write_2D_param
+
+!***********************************************************************
+  module subroutine write_2D_real_param(Iunit, Parm_name, Dimen_name1, Dimen1, Dimen_name2, Dimen2, Values)
+!***********************************************************************
+    implicit none
+    ! Arguments
+    integer, intent(IN) :: Dimen1, Dimen2, Iunit
+    real, intent(IN) :: Values(Dimen1, Dimen2)
+    character(LEN=*), intent(IN) :: Parm_name
+    character(LEN=*), intent(IN) :: Dimen_name1, Dimen_name2
+    ! Local Variables
+    integer i, j
+    character(LEN=50), parameter :: fmt1 = '("####", /, A, /, "2", /, A, /, A, /, I0, /, "2")'
+    !***********************************************************************
+    write (Iunit, fmt1) Parm_name, Dimen_name1, Dimen_name2, Dimen1 * Dimen2
+    do i = 1, Dimen2
+      do j = 1, Dimen1
+        write (Iunit, *) Values(j, i)
+      end do
+    end do
+  end subroutine write_2D_real_param
 
 !***********************************************************************
   module subroutine write_2D_double_array_grid(Iunit, Parm_name, Dimen_name1, Dimen1, Dimen_name2, Dimen2, Values)
@@ -350,13 +410,13 @@ contains
     elseif (Iflag == 9) then
       print *, 'Read error for Data File variable: ', Name
     elseif (Iflag == 10) then
-      print *, 'Open error of Control File ', Name
+      print *, 'Open error for Control File ', Name
     elseif (Iflag == 11) then
-      print *, 'Read error of Parameter File ', Name
+      print *, 'Read error from Parameter File ', Name
     elseif (Iflag == 12) then
-      print *, 'Read error of Control File ', Name
+      print *, 'Read error from Control File ', Name
     elseif (Iflag == 13) then
-      print *, 'Read error of Data File ', Name
+      print *, 'Read error from Data File ', Name
     elseif (Iflag == 14) then
       print *, 'Control parameter not found: ', Name
     elseif (Iflag == 15) then
@@ -957,4 +1017,28 @@ contains
     print '(/,A,I0,2A,/)', 'ERROR ', Ierr, ', ', Msg
     ERROR stop - 1
   end subroutine error_stop
-end submodule
+
+!***********************************************************************
+!     Check parameter values against bounded dimension
+!***********************************************************************
+  module subroutine checkdim_bounded_limits_active(Param, Bound, Param_value, Num_values, Lower_val, Upper_val, Iret)
+    USE PRMS_BASIN, ONLY: Active_hrus, Hru_route_order
+    ! Arguments
+    character(LEN=*), intent(IN) :: Param, Bound
+    integer, intent(IN) :: Num_values, Param_value(Num_values), Lower_val, Upper_val
+    integer, intent(OUT) :: Iret
+    ! Local Variable
+    integer :: i, j
+    !***********************************************************************
+    do j = 1, Active_hrus
+      i = Hru_route_order(j)
+      if (Param_value(i) < Lower_val .or. Param_value(i) > Upper_val) then
+        print *, 'ERROR, out-of-bounds value for bounded parameter: ', Param
+        print '(A,I0,A,I0)', '       value:  ', Param_value(i), '; array index: ', i
+        print '(A,I0,3A,I0,/)', '       minimum: ', Lower_val, '; maximum is dimension ', Bound, ' = ', Upper_val
+        Iret = 1
+      end if
+    end do
+    end subroutine checkdim_bounded_limits_active
+    
+    end submodule

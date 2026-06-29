@@ -76,12 +76,12 @@
      &     'L3/T', Net_sz2gw)
 
 !      ALLOCATE (Reach_latflow(Nreach))
-!      CALL declvar_dble(MODNAME, 'reach_latflow', 'nreach', Nreach, &
+!      CALL declvar _dble(MODNAME, 'reach_latflow', 'nreach', Nreach, &
 !     &     'Lateral flow (surface runoff and interflow) into each stream reach', &
 !     &     'cfs', Reach_latflow)
 
 !      ALLOCATE (Reach_id(Nreach, Nsegment))
-!      CALL declvar_int(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, &
+!      CALL declvar _int(MODNAME, 'reach_id', 'nsegment,nreach', Nsegment*Nreach, &
 !     &     'Mapping of reach id by segment id', &
 !     &     'none', Reach_id)
 
@@ -105,10 +105,14 @@
      &   'inches', Gw_rejected_grav)
 
       !rsr, all reaches receive same precentage of flow to each segment
-      ALLOCATE (Segment_pct_area(Nsegment))
-!      CALL declvar_dble(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, &
-!     &     'Proportion of each segment that contributes flow to a stream reach', &
-!     &     'decimal fraction', Segment_pct_area)
+      if ( Nsegment>0 ) THEN
+        ALLOCATE (Segment_pct_area(Nsegment))
+!        CALL declvar_dble(MODNAME, 'segment_pct_area', 'nsegment', Nsegment, &
+!     &       'Proportion of each segment that contributes flow to a stream reach', &
+!     &       'decimal fraction', Segment_pct_area)
+      else
+        ALLOCATE (Segment_pct_area(1))
+      endif
 
       ! Allocate local arrays
       ALLOCATE ( Excess(Ngwcell) )
@@ -118,7 +122,7 @@
         ! new parameter segment_reach_fraction or reach_carea or change cascade
         ! procedure to cascade flow to reaches instead of segments
 !        ALLOCATE (Segment_reach_fraction(Nreach))
-!        IF ( declparam(MODNAME, 'segment_reach_fraction', 'nreach', 'real', &
+!        IF ( decl param(MODNAME, 'segment_reach_fraction', 'nreach', 'real', &
 !      &      '0.0', '0.0', '1.0', &
 !      &      'Proportion of each segment that contributes flow to a stream reach', &
 !      &      'Proportion of each segment that contributes flow to a stream reach', &
@@ -207,7 +211,11 @@
         IF ( getparam_real('prms2mf', 'gvr_hru_pct', Nhrucell, Gvr_hru_pct)/=0 ) CALL read_error(2, 'gvr_hru_pct')
       ENDIF
 
-      ALLOCATE ( Numreach_segment(Nsegment) )
+      if ( Nsegment>0 ) THEN
+          ALLOCATE ( Numreach_segment(Nsegment) )
+      else
+          ALLOCATE ( Numreach_segment(1) )
+      endif
       DO i = 1, Nsegment
         Numreach_segment(i) = ISEG(4, i)
         IF ( Numreach_segment(i)<1 ) THEN

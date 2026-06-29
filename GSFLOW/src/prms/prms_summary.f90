@@ -130,7 +130,7 @@
 
         IF ( Npoigages>0 ) THEN
 !          ALLOCATE ( Parent_poigages(Npoigages) )
-!          IF ( declparam(MODNAME, 'parent_poigages', 'npoigages', 'integer', &
+!          IF ( decl param(MODNAME, 'parent_poigages', 'npoigages', 'integer', &
 !     &         '1', '1', '1000000', &
 !     &         'Lumen index in parent model','Lumen index in parent model',&
 !     &         'none')/=0 ) CALL read_error(1, 'parent_poigages')

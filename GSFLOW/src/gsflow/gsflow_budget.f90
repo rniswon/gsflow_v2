@@ -152,7 +152,7 @@
      &     'Total actual ET from each GW cell and PRMS soil zone', &
      &     'inches', Actet_tot_gwsz)
 
-      if ( Nsegment>0 ) then
+      IF ( Nsegment>0 ) THEN
         ALLOCATE (Streamflow_sfr(Nsegment))
         CALL declvar_real(MODNAME, 'streamflow_sfr', 'nsegment', Nsegment, &
      &       'Streamflow as computed by SFR for each segment', &
@@ -179,17 +179,17 @@
      &     'inches', Gw_rejected)
 
 !       ALLOCATE ( Uzf_infil_map(Nhru) )
-!       CALL declvar_real(MODNAME, 'uzf_infil_map', 'nhru', Nhru, &
+!       CALL declvar _real(MODNAME, 'uzf_infil_map', 'nhru', Nhru, &
 !      &     'HRU total gravity drainage to UZF cells', 'L3', &
 !      &     Uzf_infil_map)
 
 !       ALLOCATE ( Sat_recharge(Nhru) )
-!       CALL declvar_real(MODNAME, 'sat_recharge', 'nhru', Nhru, &
+!       CALL declvar _real(MODNAME, 'sat_recharge', 'nhru', Nhru, &
 !      &     'HRU total recharge to the saturated zone', 'L3', &
 !      &     Sat_recharge)
 
 !       ALLOCATE ( Mfoutflow_to_gvr(Nhru) )
-!       CALL declvar_real(MODNAME, 'mfoutflow_to_gvr', 'nhru', Nhru, &
+!       CALL declvar _real(MODNAME, 'mfoutflow_to_gvr', 'nhru', Nhru, &
 !      &     'MODFLOW total discharge and ET to each HRU', 'L3', &
 !      &     Mfoutflow_to_gvr)
 

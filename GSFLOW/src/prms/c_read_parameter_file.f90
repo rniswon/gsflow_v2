@@ -2,7 +2,7 @@ module PRMS_READ_PARAM_FILE
   use PRMS_CONSTANTS, only: MAXCONTROL_LENGTH, MAXFILE_LENGTH, MAXLINE_LENGTH
   implicit none
   ! DANGER, DANGER, hard coded maximum number of paraemters and dimensions, DANGER, DANGER
-  integer, parameter :: MAXDIMENSIONS = 48, MAXPARAMETERS = 256
+  integer, parameter :: MAXDIMENSIONS = 48, MAXPARAMETERS = 350
   integer, save :: Num_parameters, Num_dimensions
 
   type PRMS_parameter
@@ -11,7 +11,7 @@ module PRMS_READ_PARAM_FILE
     integer :: numvals, data_flag, decl_flag, read_flag, nchars, id_num, scalar_flag
     integer :: default_int, maximum_int, minimum_int, num_dimens, num_dim1, num_dim2
     character(LEN=MAXCONTROL_LENGTH) :: max_value, min_value, def_value, data_type
-    character(LEN=MAXCONTROL_LENGTH) :: dimen_names, module_name, units
+    character(LEN=MAXCONTROL_LENGTH) :: dimen_names, module_name, units, filedimen_names
     character(LEN=16) :: def_char
     real, pointer :: values_real_0d ! Scalars
     real, pointer :: values_real_1d(:)

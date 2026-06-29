@@ -24,7 +24,7 @@
      +                               'Temp & Precip Distribution'
       character(len=*), parameter :: MODNAME = 'xyz_dist'
       character(len=*), parameter :: Version_xyz_dist = '2024-04-30'
-      INTEGER, SAVE :: Nlapse, Temp_nsta, Rain_nsta
+      INTEGER, SAVE :: Temp_nsta, Rain_nsta
       INTEGER, SAVE, ALLOCATABLE :: Rain_nuse(:), Temp_nuse(:)
       DOUBLE PRECISION, SAVE :: Basin_centroid_x, Basin_centroid_y
       DOUBLE PRECISION, SAVE :: Meantmax(12)
@@ -74,7 +74,7 @@
 !     Main xyz_dist routine
 !***********************************************************************
       INTEGER FUNCTION xyz_dist()
-      USE PRMS_CONSTANTS, ONLY: RUN, SETDIMENS, DECL, INIT
+      USE PRMS_CONSTANTS, ONLY: RUN, DECL, INIT
       USE PRMS_MODULE, ONLY: Process_flag
       IMPLICIT NONE
 ! Functions
@@ -84,8 +84,6 @@
 
       IF ( Process_flag==RUN ) THEN
         xyz_dist = xyzrun()
-      ELSEIF ( Process_flag==SETDIMENS ) THEN
-        xyz_dist = xyzsetdims()
       ELSEIF ( Process_flag==DECL ) THEN
         xyz_dist = xyzdecl()
       ELSEIF ( Process_flag==INIT ) THEN
@@ -94,23 +92,6 @@
 
       END FUNCTION xyz_dist
 
-!***********************************************************************
-!     xyzsetdims - declares xyz_dist specific dimensions
-!***********************************************************************
-      INTEGER FUNCTION xyzsetdims()
-      USE PRMS_XYZ_DIST, ONLY: Nlapse
-      use PRMS_READ_PARAM_FILE, only: declfix
-      use prms_utils, only: read_error
-      IMPLICIT NONE
-!***********************************************************************
-      xyzsetdims = 0
-
-      IF ( declfix('nlapse', 3, 3,
-     +     'Number of lapse rates in X, Y, and Z directions')
-     +     /=0 ) CALL read_error(7, 'nlapse')
-      Nlapse = 3
-
-      END FUNCTION xyzsetdims
 !***********************************************************************
 
 !***********************************************************************
@@ -412,7 +393,7 @@
      +     'none')/=0 ) CALL read_error(1, 'conv_flag')
 
       !ALLOCATE ( Tmax_allrain_sta(Nrain,Nmonths) )
-      ! IF ( declparam(MODNAME, 'tmax_allrain_sta', 'nrain,nmonths',
+      ! IF ( decl param(MODNAME, 'tmax_allrain_sta', 'nrain,nmonths',
       !+     'real', '38.0', '-8.0', '45.0',
       !+     'Precipitation is rain if HRU max temperature >= this value',
       !+     'Monthly (January to December) maximum air temperature'//
@@ -422,7 +403,7 @@
       !+     'temp_units')/=0 ) CALL read_error(1, 'tmax_allrain_sta')
 
       !ALLOCATE ( Tmax_allsnow_sta(Nrain,Nmonths) )
-      ! IF ( declparam(MODNAME, 'tmax_allsnow_sta', 'nrain,nmonths',
+      ! IF ( decl param(MODNAME, 'tmax_allsnow_sta', 'nrain,nmonths',
       !+     'real', '32.0', '-10.0', '40.0',
       !+     'Maximum temperature when precipitation is all snow',
       !+     'Maximum air temperature when precipitation is assumed'//

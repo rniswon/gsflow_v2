@@ -7,7 +7,7 @@ module PRMS_MMFAPI
   use PRMS_CONSTANTS, only: MAXCONTROL_LENGTH, MAXFILE_LENGTH, MAXLINE_LENGTH
   implicit none
 
-  integer, parameter :: MAXVARIABLES = 512
+  integer, parameter :: MAXVARIABLES = 725
 
   integer, save:: Num_variables
 
@@ -222,6 +222,11 @@ module PRMS_MMFAPI
     module subroutine getvalues_int_2d(param_id, Values)
       integer, intent(IN) :: param_id
       integer, intent(OUT) :: Values(:, :)
+    end subroutine
+  end interface
+
+  interface
+    module subroutine print_variables()
     end subroutine
   end interface
 

@@ -259,7 +259,7 @@
 
            IF ( Dprst_flag==ACTIVE ) THEN
 !            ALLOCATE ( Sro_to_dprst(Nhru) )
-!            IF ( declparam(MODNAME, 'sro_to_dprst', 'nhru', 'real', &
+!            IF ( decl param(MODNAME, 'sro_to_dprst', 'nhru', 'real', &
 !     &           '0.2', '0.0', '1.0', &
 !     &           'Fraction of pervious surface runoff that flows into surface-depression storage', &
 !     &           'Fraction of pervious surface runoff that'// &
