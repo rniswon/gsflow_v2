@@ -978,6 +978,11 @@
      +   'IS GREATER THAN THE MAXIMUM NUMBER OF AG WELLS: ', MXWELL
          CALL USTOP(' NUMSUP IS GREATER THAN MAX AG WELLS')
       END IF
+      IF (NUMSUP > MXWELL) THEN
+         WRITE (IOUT, *) 'THE VALUE SPECIFIED FOR NUMSUP: ', NUMSUP,
+     +   'IS GREATER THAN THE MAXIMUM NUMBER OF AG WELLS: ', MXWELL
+         CALL USTOP(' NUMSUP IS GREATER THAN MAX AG WELLS')
+      END IF
       IF (ETDEMANDFLAG > 0 .AND. TRIGGERFLAG > 0 ) THEN
           WRITE (IOUT, *) 'ETDEMAND AND ETTRIGGER: ',
      +   'ARE BOTH ACTIVE. ONLY ONE CAN BE USED AT A TIME '
@@ -1746,6 +1751,7 @@
       CHARACTER(LEN=200)::LINE
       INTEGER :: IERR, LLOC, ISTART, ISTOP, J, ISPWL
       INTEGER :: NMSG, K, L, LL
+      INTEGER :: ISPWL_L, ISPWL_LL
       REAL :: R
       ! - -----------------------------------------------------------------
       !
@@ -1773,6 +1779,17 @@
          CALL USTOP('ERROR IN STRESS PERIOD INFORMATION FOR '//
      +                 'SUP WELLS')
       END IF
+
+C     Clear previous active supplemental-well data before reading
+C     a new stress-period list.  Do not do this for ITMP < 0,
+C     because that case reuses the previous stress-period data.
+      SUPWELVAR = 0
+      NUMSEGS = 0
+      DIVERSIONSEG = 0
+      FRACSUP = szero
+      FRACSUPMAX = szero
+      NUMSUPWELLSEG = 1
+
       IERR = 0
       DO J = 1, NUMSUPSP
          LLOC = 1
@@ -1818,17 +1835,41 @@
 !106   FORMAT('***Error in SUP WEL*** cell row or column number for '
 !     + , 'supplemental well specified as zero. Model stopping')
       !
-      !4 - ---CALCULATE THE NUMBER OF SUPWELLS ASSOCIATED WITH A DIVERSION SEGEMENT
+C4----CALCULATE THE NUMBER OF ACTIVE SUPPLEMENTAL WELLS
+C     ASSOCIATED WITH THE SAME PRIMARY DIVERSION SEGMENT.
+C
+C     DIVERSIONSEG is indexed by actual AG well number:
+C       DIVERSIONSEG(K, ISPWL)
+C
+C     SUPWELVAR stores the actual AG well number for each active
+C     supplemental-well entry in this stress period.  Therefore,
+C     use SUPWELVAR(L) and SUPWELVAR(LL), not L and LL directly.
+
       NUMSUPWELLSEG = 1
-      DO L = 1, MXWELL
-         DO LL = L + 1, MXWELL
-            IF (DIVERSIONSEG(1, LL) == DIVERSIONSEG(1, L))
-     +         NUMSUPWELLSEG(L) = NUMSUPWELLSEG(L) + 1
+
+      DO L = 1, NUMSUPSP
+         ISPWL_L = SUPWELVAR(L)
+         IF (ISPWL_L <= 0) CYCLE
+         IF (ISPWL_L > MXWELL) CYCLE
+         IF (NUMSEGS(ISPWL_L) <= 0) CYCLE
+
+         NUMSUPWELLSEG(ISPWL_L) = 0
+
+         DO LL = 1, NUMSUPSP
+            ISPWL_LL = SUPWELVAR(LL)
+            IF (ISPWL_LL <= 0) CYCLE
+            IF (ISPWL_LL > MXWELL) CYCLE
+            IF (NUMSEGS(ISPWL_LL) <= 0) CYCLE
+
+            IF (DIVERSIONSEG(1, ISPWL_LL) ==
+     +          DIVERSIONSEG(1, ISPWL_L)) THEN
+               NUMSUPWELLSEG(ISPWL_L) =
+     +              NUMSUPWELLSEG(ISPWL_L) + 1
+            END IF
          END DO
-         DO LL = 1, L - 1
-            IF (DIVERSIONSEG(1, LL) == DIVERSIONSEG(1, L))
-     +         NUMSUPWELLSEG(L) = NUMSUPWELLSEG(L) + 1
-         END DO
+
+         IF (NUMSUPWELLSEG(ISPWL_L) < 1)
+     +      NUMSUPWELLSEG(ISPWL_L) = 1
       END DO
       RETURN
       END
