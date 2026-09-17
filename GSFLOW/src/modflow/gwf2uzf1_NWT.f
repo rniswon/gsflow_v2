@@ -1592,8 +1592,6 @@ C
         DO ll = 1, NUMCELLS
           ir = IUZHOLD(1, ll)
           ic = IUZHOLD(2, ll)
-          IF ( IUZFBND(ic,ir).GT.0 ) THEN
-            l = l + 1
 C
 C16-----SEARCH FOR UPPERMOST ACTIVE CELL.
             IF ( IUZFBND(ic, ir).GT.0 ) THEN
@@ -1645,9 +1643,12 @@ C16B-----SEARCH FOR UPPER MOST ACTIVE CELL WITH A WATER LEVEL.
                     land = il
                     il = ABS(IUZFBND(ic, ir))
                 end if
+                IF ( IBOUND(ic, ir, il).LT.0 ) IUZFBND(ic, ir) = 0
+                IF ( IUZFBND(ic,ir).GT.0 ) THEN
+                  l = l + 1
 crgn changed HNEW(ic, ir, il) to h in next line.
                 HLDUZF(ic, ir) = h
-                IF ( IBOUND(ic, ir, il).LT.0 ) IUZFBND(ic, ir) = 0
+                !IF ( IBOUND(ic, ir, il).LT.0 ) IUZFBND(ic, ir) = 0
                 IF ( IUZFOPT.GT.0 ) THEN
 C
 C17-----SET CELL TOP, LENGTH, WIDTH AND WATER TABLE ELEVATION.
