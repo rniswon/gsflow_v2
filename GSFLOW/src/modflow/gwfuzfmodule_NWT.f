@@ -60,6 +60,37 @@
         DOUBLE PRECISION, SAVE, DIMENSION(:,:,:),POINTER :: UZTOTBAL
         DOUBLE PRECISION, SAVE, DIMENSION(:,:,:),POINTER :: GRIDSTOR
         DOUBLE PRECISION, SAVE, DIMENSION(:,:,:),POINTER :: GRIDET
+!     By-cell wave state. The second index is the model layer and the
+!     third index is the active UZF column. These arrays are used when
+!     the water table is below the uppermost active layer.
+        INTEGER, ALLOCATABLE, SAVE :: NWAVLAY(:,:)
+        INTEGER, ALLOCATABLE, SAVE :: LAYREADY(:)
+        INTEGER, ALLOCATABLE, SAVE :: KWTHOLD(:,:)
+        DOUBLE PRECISION, SAVE :: FMRISING
+        DOUBLE PRECISION, SAVE :: RECHABSUM
+        DOUBLE PRECISION, SAVE :: COLSTOR0
+        DOUBLE PRECISION, ALLOCATABLE, SAVE :: RECHABS(:)
+        INTEGER, ALLOCATABLE, SAVE :: ITRLAY(:,:,:)
+        INTEGER, ALLOCATABLE, SAVE :: LTRLAY(:,:,:)
+        DOUBLE PRECISION, ALLOCATABLE, SAVE :: UZTHLAY(:,:,:)
+        DOUBLE PRECISION, ALLOCATABLE, SAVE :: UZDPLAY(:,:,:)
+        DOUBLE PRECISION, ALLOCATABLE, SAVE :: UZSPLAY(:,:,:)
+        DOUBLE PRECISION, ALLOCATABLE, SAVE :: UZFLLAY(:,:,:)
+        DOUBLE PRECISION, ALLOCATABLE, SAVE :: UZOLSLAY(:,:)
+        DOUBLE PRECISION, ALLOCATABLE, SAVE :: WTH(:,:)
+        DOUBLE PRECISION, ALLOCATABLE, SAVE :: WDP(:,:)
+        DOUBLE PRECISION, ALLOCATABLE, SAVE :: WSP(:,:)
+        DOUBLE PRECISION, ALLOCATABLE, SAVE :: WFL(:,:)
+        INTEGER, ALLOCATABLE, SAVE :: WITR(:,:)
+        INTEGER, ALLOCATABLE, SAVE :: WLTR(:,:)
+        INTEGER, ALLOCATABLE, SAVE :: WNWAV(:)
+!     Cell properties, one value per layer. The 2-D arrays above keep
+!     the land-layer value for the single-profile path.
+        REAL, ALLOCATABLE, SAVE :: VKSLAY(:,:,:)
+        REAL, ALLOCATABLE, SAVE :: EPSLAY(:,:,:)
+        REAL, ALLOCATABLE, SAVE :: THTSLAY(:,:,:)
+        REAL, ALLOCATABLE, SAVE :: THTRLAY(:,:,:)
+        REAL, ALLOCATABLE, SAVE :: THTILAY(:,:,:)
       TYPE GWFUZFTYPE
         INTEGER,     POINTER   ::NUZTOP, IUZFOPT, IRUNFLG, IETFLG, IUZM
         INTEGER,     POINTER   ::IUZFCB1, IUZFCB2, NTRAIL, NWAV, NSETS

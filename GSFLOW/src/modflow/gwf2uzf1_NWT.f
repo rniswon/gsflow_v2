@@ -118,6 +118,7 @@ C     READ AND CHECK VARIABLES THAT REMAIN CONSTANT
 !rgn------NEW VERSION NUMBER 1.1.5, 9/10/2019
 C     ******************************************************************
       USE GWFUZFMODULE
+      USE UZF_BYCELL_NWT, ONLY: SYNC_COLUMN_PROPS
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ITRSS, ISSFLG, 
      +                        DELR, DELC, IBOUND, LBOTM, BOTM, IUNIT
       USE GLOBAL,       ONLY: ITMUNI, LENUNI, LAYHDT
@@ -141,7 +142,7 @@ C     ------------------------------------------------------------------
      +        iuzcol, iuzflg, iuzlay, iuzopt, iuzrow, l, ncck, ncth, 
      +        nlth, nrck, nrnc, nrth, i, icheck, kkrch, k, NPP, MXVL !,
 !     +        llocsave, icheck2
-      REAL r, sy, fkmin, fkmax, range, finc, thick, smooth
+      REAL r, sy, syk, fkmin, fkmax, range, finc, thick, smooth
 !      INTEGER intchk, Iostat
       CHARACTER(LEN=200) line
       CHARACTER(LEN=24) aname(9)
@@ -192,7 +193,7 @@ C     ------------------------------------------------------------------
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE.
       WRITE (IOUT, 9001) In
- 9001 FORMAT (1X, /' UZF1 -- UNSATURATED FLOW PACKAGE, VERSION 1.5', 
+ 9001 FORMAT (1X, /' UZF1 -- CELL-BASED UNSATURATED FLOW, VERSION 1.5', 
      +        ', 09/10/2019', /, 9X, 'INPUT READ FROM UNIT', I3)
 C
 C2A------COMMENTS/FIRST LINE.
@@ -475,6 +476,40 @@ cdep changed allocation of UZOLSFLX 7/30/08
       ITRLIT = 0
       ALLOCATE (ITRLST(NWAV,IUZM))
       ITRLST = 0
+      IF ( IUZFOPT.GT.0 .AND. NLAY.GT.1 ) THEN
+        ALLOCATE (NWAVLAY(NLAY,IUZM), LAYREADY(IUZM))
+        ALLOCATE (KWTHOLD(NCOL,NROW))
+        ALLOCATE (RECHABS(NLAY))
+        NWAVLAY = 1
+        LAYREADY = 0
+        KWTHOLD = 0
+        RECHABS = 0.0D0
+        FMRISING = 0.0D0
+        RECHABSUM = 0.0D0
+        ALLOCATE (UZTHLAY(NWAV,NLAY,IUZM), UZDPLAY(NWAV,NLAY,IUZM))
+        ALLOCATE (UZSPLAY(NWAV,NLAY,IUZM), UZFLLAY(NWAV,NLAY,IUZM))
+        ALLOCATE (ITRLAY(NWAV,NLAY,IUZM), LTRLAY(NWAV,NLAY,IUZM))
+        ALLOCATE (UZOLSLAY(NLAY,IUZM))
+        UZTHLAY = 0.0D0
+        UZDPLAY = 0.0D0
+        UZSPLAY = 0.0D0
+        UZFLLAY = 0.0D0
+        ITRLAY = 0
+        LTRLAY = 0
+        UZOLSLAY = 0.0D0
+        ALLOCATE (WTH(NWAV,NLAY), WDP(NWAV,NLAY))
+        ALLOCATE (WSP(NWAV,NLAY), WFL(NWAV,NLAY))
+        ALLOCATE (WITR(NWAV,NLAY), WLTR(NWAV,NLAY), WNWAV(NLAY))
+        WTH = 0.0D0
+        WDP = 0.0D0
+        WSP = 0.0D0
+        WFL = 0.0D0
+        WITR = 0
+        WLTR = 0
+        WNWAV = 1
+        WRITE (IOUT, 9191)
+ 9191   FORMAT (1X, 'UZF KINEMATIC WAVES ARE ROUTED BY CELL')
+      END IF
       IF ( RTSOLUTE.GT.0 ) THEN
         ALLOCATE (RTSOLWC(NLAY,NCOL*NROW))
         RTSOLWC = 0.0
@@ -497,6 +532,18 @@ C8------PRINT OPTION CODE WHEN NUZTOP IS WITHIN SPECIFIED RANGE.
         iuzflg = 0
       ELSE
         iuzflg = 1
+        IF ( ALLOCATED(VKSLAY) ) DEALLOCATE (VKSLAY, EPSLAY, THTSLAY,
+     +                                        THTRLAY, THTILAY)
+        ALLOCATE (VKSLAY(NCOL,NROW,NLAY), EPSLAY(NCOL,NROW,NLAY))
+        ALLOCATE (THTSLAY(NCOL,NROW,NLAY), THTRLAY(NCOL,NROW,NLAY))
+        ALLOCATE (THTILAY(NCOL,NROW,NLAY))
+        VKSLAY = 0.0
+        EPSLAY = 0.0
+        THTSLAY = 0.0
+        THTRLAY = 0.0
+        THTILAY = 0.0
+        WRITE (IOUT, 9192) NLAY
+ 9192   FORMAT (1X, 'UZF CELL PROPERTIES ARE READ BY LAYER. NLAY = ', I5)
       END IF
 C
 C8b-----Set flag for determining if FINF will be provided by PRMS.
@@ -555,8 +602,11 @@ C
       END IF
 C
 C12-----READ VERTICAL HYDRAULIC CONDUCTIVITY FROM UZF INPUT FILE.
+C       One array per layer, as in the cell-based UZF input.
       IF ( abs(IUZFOPT).EQ.1 ) THEN    !RGN 2/6/17
-        CALL U2DREL(VKS, aname(6), NROW, NCOL, 0, In, IOUT)
+        DO k = 1, NLAY
+        CALL U2DREL(VKS, aname(6), NROW, NCOL, k, In, IOUT)
+        IF ( ALLOCATED(VKSLAY) ) VKSLAY(:,:,k) = VKS(:,:)
 C
 C13-----CHECK FOR ERRORS IN VERTICAL HYDRAULIC CONDUCTIVITY
         DO nrck = 1, NROW
@@ -575,6 +625,8 @@ C13-----CHECK FOR ERRORS IN VERTICAL HYDRAULIC CONDUCTIVITY
             IF ( iflgbnd.EQ.0 ) IUZFBND(ncck, nrck) = 0
           END DO
         END DO
+        END DO
+        IF ( ALLOCATED(VKSLAY) ) CALL SYNC_COLUMN_PROPS
       END IF
 C
 C12b-----READ SURFACE CONDUCTIVITY FROM UZF INPUT FILE.
@@ -612,16 +664,23 @@ C13b-----CHECK FOR ERRORS IN SURFACE K
 !
       IF ( iuzflg.GT.0 ) THEN
 C
-C14-----READ BROOKS-COREY EPSILON ASSUMING IT IS CONSTANT THROUGHOUT
-C        VERTICAL COLUMN.
-        CALL U2DREL(EPS, aname(5), NUZRW, NUZCL, 0, In, IOUT)
+C14-----READ BROOKS-COREY EPSILON FOR EACH LAYER.
+        DO k = 1, NLAY
+          CALL U2DREL(EPS, aname(5), NUZRW, NUZCL, k, In, IOUT)
+          EPSLAY(:,:,k) = EPS(:,:)
+        END DO
 C
-C15-----READ SATURATED WATER CONTENT FOR UNSATURATED ZONE ASSUMING IT
-C       IS CONSTANT THROUGHOUT VERTICAL COLUMN.
-        CALL U2DREL(THTS, aname(3), NUZRW, NUZCL, 0, In, IOUT)
+C15-----READ SATURATED WATER CONTENT FOR EACH LAYER.
+        DO k = 1, NLAY
+          CALL U2DREL(THTS, aname(3), NUZRW, NUZCL, k, In, IOUT)
+          THTSLAY(:,:,k) = THTS(:,:)
+        END DO
 C
         IF ( ITHTRFLG.GT.0 )THEN
-          CALL U2DREL(THTR, aname(4), NUZRW, NUZCL, 0, In, IOUT)
+          DO k = 1, NLAY
+            CALL U2DREL(THTR, aname(4), NUZRW, NUZCL, k, In, IOUT)
+            THTRLAY(:,:,k) = THTR(:,:)
+          END DO
         END IF
 C
 C15-----READ AIR ENTRY PRESSURE FOR UNSATURATED ZONE ASSUMING IT
@@ -633,11 +692,15 @@ C15-----READ AIR ENTRY PRESSURE FOR UNSATURATED ZONE ASSUMING IT
 C       IS CONSTANT THROUGHOUT VERTICAL COLUMN.
 !        CALL U2DREL(H_ROOT, aname(3), NUZRW, NUZCL, 0, In, IOUT)
 C
-C16-----READ INITIAL WATER CONTENT FOR UNSATURATED ZONE ASSUMING IT
-C         IS CONSTANT THROUGHOUT VERTICAL COLUMN. DO NOT READ
+C16-----READ INITIAL WATER CONTENT FOR EACH LAYER. DO NOT READ
 C         INITIAL WATER CONTENT IF PERIOD IS STEADY STATE.
-        IF ( ISSFLG(1).EQ.0 .OR. ITHTIFLG.GT.0 )  
-     +       CALL U2DREL(THTI, aname(8), NUZRW, NUZCL, 0, In, IOUT)
+        IF ( ISSFLG(1).EQ.0 .OR. ITHTIFLG.GT.0 ) THEN
+          DO k = 1, NLAY
+            CALL U2DREL(THTI, aname(8), NUZRW, NUZCL, k, In, IOUT)
+            THTILAY(:,:,k) = THTI(:,:)
+          END DO
+        END IF
+        CALL SYNC_COLUMN_PROPS
 C
 C17-----CHECK FOR ERRORS IN EPS, THTS, AND THTI ARRAYS.
         DO nrck = 1, NUZRW
@@ -664,6 +727,16 @@ C17-----CHECK FOR ERRORS IN EPS, THTS, AND THTI ARRAYS.
                   iflgbnd = 0
                 END IF
               END IF
+              DO k = 1, NLAY
+                IF ( THTSLAY(ncck, nrck, k).LT.CLOSEZERO .OR.
+     +               EPSLAY(ncck, nrck, k).LT.CLOSEZERO ) THEN
+                  iflgbnd = 0
+                END IF
+                IF ( (ISSFLG(1).EQ.0 .OR. ITHTIFLG.GT.0) .AND.
+     +               THTILAY(ncck, nrck, k).LT.CLOSEZERO ) THEN
+                  iflgbnd = 0
+                END IF
+              END DO
               IF ( EPS(ncck, nrck).LT.CLOSEZERO ) THEN
                 WRITE (IOUT, 9016) nrck, ncck, EPS(ncck, nrck)
  9016           FORMAT (1X/, 'BROOKS-COREY EPSILON FOR CELL AT ROW ', 
@@ -761,6 +834,52 @@ C use LPF SC2, Iunitlpf>0
                     isyflg = 0
                     THTR(ncth, nrth) = 0.0D0
                   END IF
+                  IF ( ALLOCATED(THTRLAY) ) THEN
+                    DO iuzlay = 1, NLAY
+                      syk = 0.0
+                      IF ( Iunitlpf.GT.0 ) THEN
+                        IF ( LAYHDT(iuzlay).GT.0 ) THEN
+                          syk = SCLPF(ncth, nrth, iuzlay)/
+     +                         (DELR(ncth)*DELC(nrth))
+                        END IF
+                      ELSE IF ( Iunitupw.GT.0 ) THEN
+                        IF ( LAYHDT(iuzlay).EQ.0 ) THEN
+                          thick = BOTM(ncth, nrth, LBOTM(iuzlay)-1) -
+     +                            BOTM(ncth, nrth, LBOTM(iuzlay))
+                          IF ( thick.GT.1.0E-7 ) THEN
+                            syk = SC2UPW(ncth, nrth, iuzlay)/
+     +                           (thick*DELR(ncth)*DELC(nrth))
+                          END IF
+                        ELSE
+                          syk = SC2UPW(ncth, nrth, iuzlay)/
+     +                         (DELR(ncth)*DELC(nrth))
+                        END IF
+                      ELSE IF ( Iunitbcf.GT.0 ) THEN
+                        IF ( LAYCON(iuzlay).LT.2 ) THEN
+                          syk = SC1(ncth, nrth, iuzlay)/
+     +                         (DELR(ncth)*DELC(nrth))
+                        ELSE
+                          kkrch = 0
+                          DO k = 1, iuzlay
+                            IF ( LAYCON(k).EQ.3 .OR. LAYCON(k).EQ.2 )
+     +                        kkrch = kkrch + 1
+                          END DO
+                          IF ( kkrch.GT.0 ) THEN
+                            syk = SC2(ncth, nrth, kkrch)/
+     +                           (DELR(ncth)*DELC(nrth))
+                          END IF
+                        END IF
+                      ELSE IF ( Iunithuf.GT.0 ) THEN
+                        syk = SC2HUF(ncth, nrth)
+                      END IF
+                      IF ( syk.GT.0.0 ) THEN
+                        THTRLAY(ncth, nrth, iuzlay) =
+     +                    THTSLAY(ncth, nrth, iuzlay) - syk
+                      ELSE
+                        THTRLAY(ncth, nrth, iuzlay) = 0.0
+                      END IF
+                    END DO
+                  END IF
                 ELSE IF ( ibndflg.EQ.0 ) THEN
                   isyflg = 0
                 END IF
@@ -793,7 +912,23 @@ C       UNSATURATED FLOW AT CELL INACTIVE.
               END IF
             END DO
           END DO
-        END IF   
+        END IF
+        IF ( ALLOCATED(THTRLAY) ) THEN
+          DO k = 1, NLAY
+            DO nrck = 1, NROW
+              DO ncck = 1, NCOL
+                IF ( IUZFBND(ncck, nrck).GT.0 ) THEN
+                  IF ( THTILAY(ncck, nrck, k).LT.
+     +                 THTRLAY(ncck, nrck, k) ) THEN
+                    THTILAY(ncck, nrck, k) =
+     +                  THTRLAY(ncck, nrck, k)
+                  END IF
+                END IF
+              END DO
+            END DO
+          END DO
+        END IF
+        CALL SYNC_COLUMN_PROPS
       END IF
 C
 C21-----READ FILES FOR PRINTING TIME SERIES WATER CONTENT PROFILES.
@@ -1170,7 +1305,8 @@ C     PROPERTY FLOW PACKAGE
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 C     VERSION 1.0.5:  April 5, 2012
 C     ******************************************************************
-      USE GWFUZFMODULE, ONLY: VKS, IUZFBND, CLOSEZERO, NUZTOP, LAYNUM
+      USE GWFUZFMODULE, ONLY: VKS, IUZFBND, CLOSEZERO, NUZTOP, LAYNUM,
+     +                        VKSLAY
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, IBOUND, BOTM, 
      +                        LAYHDT
       USE GWFLPFMODULE, ONLY: LAYVKA, VKA, HK
@@ -1187,7 +1323,7 @@ C    ------------------------------------------------------------------
 C    ------------------------------------------------------------------
 C    LOCAL VARIABLES
 C    ------------------------------------------------------------------
-      INTEGER krck, ncck, nrck, iflgbnd, il, ill, nlayp1
+      INTEGER krck, ncck, nrck, iflgbnd, il, ill, nlayp1, klay
       REAL celthick
 C    ******************************************************************
       nlayp1 = NLAY + 1
@@ -1284,6 +1420,25 @@ CRGN made il = 0 when all layers for column are inactive 2/21/08
             END IF
             IF ( iflgbnd.EQ.0 ) IUZFBND(ncck, nrck) = 0
             END IF
+          END IF
+          IF ( ALLOCATED(VKSLAY) ) THEN
+            DO klay = 1, NLAY
+              IF ( Iunitlpf.GT.0 ) THEN
+                IF ( LAYVKA(klay).EQ.0 ) THEN
+                  VKSLAY(ncck, nrck, klay) = VKA(ncck, nrck, klay)
+                ELSE IF ( VKA(ncck, nrck, klay).GT.CLOSEZERO ) THEN
+                  VKSLAY(ncck, nrck, klay) = HK(ncck, nrck, klay)/
+     +                                       VKA(ncck, nrck, klay)
+                END IF
+              ELSE IF ( Iunitupw.GT.0 ) THEN
+                IF ( LAYVKAUPW(klay).EQ.0 ) THEN
+                  VKSLAY(ncck, nrck, klay) = VKAUPW(ncck, nrck, klay)
+                ELSE IF ( VKAUPW(ncck, nrck, klay).GT.CLOSEZERO ) THEN
+                  VKSLAY(ncck, nrck, klay) = HKUPW(ncck, nrck, klay)/
+     +                                       VKAUPW(ncck, nrck, klay)
+                END IF
+              END IF
+            END DO
           END IF
         END DO
       END DO
@@ -1851,6 +2006,7 @@ C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
 C     VERSION 1.1.4:  April 29, 2018
 C     ******************************************************************
       USE GWFUZFMODULE
+      USE UZF_BYCELL_NWT, ONLY: SET_RECHLAY
 !      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
 !     +                        HNEW, BOTM, LBOTM
       IMPLICIT NONE
@@ -1867,14 +2023,17 @@ C     -----------------------------------------------------------------
 !      INTEGER :: IC, IR, IL, ILL, LL, IBND
 C     -----------------------------------------------------------------
 C
-      IF ( NUZTOP.NE.4 ) RETURN
 C1------SET POINTERS FOR THE CURRENT GRID.
       CALL SGWF2UZF1PNT(Igrid)
 C      
 C2------CALL SETLAY TO SET GWF LAYER
 C       FOR EACH TIME STEP.
 C
-      IF ( KKPER+KKSTP > 2 ) CALL SETLAY(KKSTP)
+      IF ( NUZTOP.EQ.4 .AND. KKPER+KKSTP.GT.2 ) CALL SETLAY(KKSTP)
+C
+C3------FREEZE THE RECHARGE LAYER FROM THE STARTING HEADS. LATER
+C       ITERATIONS IN THIS TIME STEP KEEP RECHARGE ON THIS LAYER.
+      IF ( ALLOCATED(KWTHOLD) ) CALL SET_RECHLAY
       END SUBROUTINE GWF2UZF1AD
 C
 C
@@ -1963,6 +2122,7 @@ C     ******************************************************************
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFAGMODULE, ONLY: DIVERSIONIRRUZF,NUMIRRDIVERSION,
      +                        WELLIRRUZF,NUMIRRWEL
+      USE UZF_BYCELL_NWT, ONLY: UZFLOW_BYCELL
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -1981,9 +2141,10 @@ C     -----------------------------------------------------------------
       REAL finfsaveadd
       INTEGER ic, il, ill, ir, iset, iss, iwav, l, numwaves,
      +        land, idelt, ik, ll, extflg !, idr, i
-      INTEGER lakflg, lakid, ibnd, ij, nlayp1, lakflginf
+      INTEGER lakflg, lakid, ibnd, ij, nlayp1, lakflginf, kwt, iluse
       DOUBLE PRECISION oldsflx, surflux, dlength, h, celtop, deltinc,
      +                 zoldist, totflux, etact, rateud, hld, htest1,
+     +                 fmstor, hwtab,
      +                 htest2, flength, width, thr, cellarea, fact,
      +                 totfluxtot, totetact, csep, csepmx,seepoutcheck,
      +                 rhsnew, hcofold, hcofnew, rhsold, fkseep, 
@@ -2156,6 +2317,26 @@ C3------SEARCH FOR UPPERMOST ACTIVE CELL.
           hld = HLDUZF(ic, ir)
 ! Added code to test for BCF or LPF
           IF ( ABS(SNGL(hld)-Hdry).LT.CLOSEZERO ) hld = h
+          kwt = il
+          iluse = il
+          hwtab = h
+C         Recharge stays on the layer that held the water table at the
+C         start of this time step. A rising head fills the layer above
+C         through groundwater flow; UZF recharge moves up next step.
+          IF ( ALLOCATED(KWTHOLD) .AND. il.GT.0 ) THEN
+            IF ( KWTHOLD(ic, ir).GE.il .AND.
+     +           KWTHOLD(ic, ir).LE.NLAY ) THEN
+              kwt = KWTHOLD(ic, ir)
+              iluse = kwt
+              IF ( kwt.GT.il ) THEN
+                IF ( IBOUND(ic, ir, kwt).GT.0 ) THEN
+                  hwtab = HNEW(ic, ir, kwt)
+                ELSE
+                  hwtab = BOTM(ic, ir, kwt)
+                END IF
+              END IF
+            END IF
+          END IF
           IF ( NUZTOP.EQ.1 ) THEN
             celtop = BOTM(ic, ir, 0) - 0.5 * SURFDEP
             celthick = BOTM(ic, ir, 0) - BOTM(ic, ir, 1)
@@ -2248,9 +2429,13 @@ C5------CALL UZFLOW TO ROUTE WAVES FOR LATEST ITERATION.
                 END IF
                 surflux = finfact
                 oldsflx = UZOLSFLX(ic, ir)
-      !if(ir==6.and.ic==4.and.kkper==5.and.kkstp==2)then
-      !write(777,*)kkiter,surflux,totetact
-      !end if
+                IF ( kwt.GT.il ) THEN
+                  CALL UZFLOW_BYCELL(l, ic, ir, il, kwt, celtop, hwtab,
+     +                 surflux, deltinc, idelt, thr, ths, fks,
+     +                 epsilon, rateud, rootdp, wiltwc, 0,
+     +                 totfluxtot, etact, fmstor, kkper)
+                  totetact = etact
+                ELSE
                 DO ik = 1, idelt
                   totflux = 0.0D0
                   etact = 0.0D0
@@ -2265,14 +2450,25 @@ C5------CALL UZFLOW TO ROUTE WAVES FOR LATEST ITERATION.
                   totetact = totetact + etact
                   zoldist = dlength
                 END DO
+                END IF
                 totflux = totfluxtot
                 etact = totetact
                 UZFETOUT(ic, ir) = etact*cellarea
                 IF ( totflux.LT.0.0D0 ) THEN
                   totflux = 0.0D0
                 ELSE
-                  RHS(ic, ir, il) = RHS(ic, ir, il) - 
+                  RHS(ic, ir, iluse) = RHS(ic, ir, iluse) - 
      +                              (totflux*cellarea/DELT)
+                END IF
+C               Storage swallowed by a rising water table in a layer
+C               above the starting water table recharges that layer.
+                IF ( kwt.GT.il .AND. ALLOCATED(RECHABS) ) THEN
+                  DO ik = il, kwt-1
+                    IF ( RECHABS(ik).GT.0.0D0 ) THEN
+                      RHS(ic, ir, ik) = RHS(ic, ir, ik) -
+     +                             (RECHABS(ik)*cellarea/DELT)
+                    END IF
+                  END DO
                 END IF
               ELSE
                 IF ( finfact.LT.finfhold ) THEN
@@ -2513,6 +2709,7 @@ C     ******************************************************************
       USE GWFAGMODULE, ONLY: DIVERSIONIRRUZF, NUMIRRDIVERSION, 
      +                        WELLIRRUZF, NUMIRRWEL
       USE GWFSFRMODULE, ONLY: FNETSEEP
+      USE UZF_BYCELL_NWT, ONLY: UZFLOW_BYCELL
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -2526,11 +2723,11 @@ C     -----------------------------------------------------------------
       DOUBLE PRECISION oldsflx, surflux, dlength, zoldist, totflux, fm, 
      +                 etact, rateud, htest1, htest2, h, hld, celtop,  
      +                 flength, width, uzstorhold, hdif,fluxdif, thr,  
-     +                 cellarea, prcntdif, depthsave
+     +                 cellarea, prcntdif, depthsave, hwtab
       DOUBLE PRECISION small, acumdif, aratdif, unsatvol, unsatrat,
      +                 cumdiff, ratedif, fact, totetact, totfluxtot,
      +                 deltinc, fkseep, trhs, thcof, hh, dET, s, x, c, 
-     +                 etgw, fkreject, extdp
+     +                 etgw, fkreject, extdp, fmstor
       REAL avdpt, avwat, bigvl1, bigvl2, depthinc, epsilon, 
      +     eps_m1, ftheta1, ftheta2, finfsaveadd ! , etdp
       REAL fhold, fks, fminn, gcumin, gcumrch, gdelstor, gdlstr, ghdif, 
@@ -2545,7 +2742,7 @@ C     -----------------------------------------------------------------
      +        iog, ir, iset, iss, iuzcol, iuzn, iuzopt, iuzrat, iuzrow, 
      +        j, jj, jk, land, nwavm1, nwaves, idelt, ik, ll, ibnd, iret
       INTEGER k, kknt, l, loop, numwaves, numwavhld, nuzc, nuzr, jm1
-      INTEGER lakflg, lakid, nlayp1, lakflginf, extflg
+      INTEGER lakflg, lakid, nlayp1, lakflginf, extflg, kwt, bycell
       CHARACTER(LEN=16) textrch, textet, textexfl, textinf !, textinf2
       CHARACTER(LEN=16) uzsttext, uzettext, uzinftxt, txthold,textrej
       CHARACTER(LEN=16) netrchtext, netdistext
@@ -2777,6 +2974,24 @@ C7------PRINT WARNING WHEN NUZTOP IS 3 AND ALL LAYERS ARE INACTIVE.
           hld = HLDUZF(ic, ir)
           IF ( ABS(SNGL(hld)-HDRY).LT.CLOSEZERO ) hld = h
           HLDUZF(ic, ir) = h
+          kwt = il
+          bycell = 0
+          hwtab = h
+C         Same recharge layer as formulation, fixed at the start of
+C         the time step.
+          IF ( ALLOCATED(KWTHOLD) .AND. il.GT.0 ) THEN
+            IF ( KWTHOLD(ic, ir).GE.il .AND.
+     +           KWTHOLD(ic, ir).LE.NLAY ) THEN
+              kwt = KWTHOLD(ic, ir)
+              IF ( kwt.GT.il ) THEN
+                IF ( IBOUND(ic, ir, kwt).GT.0 ) THEN
+                  hwtab = HNEW(ic, ir, kwt)
+                ELSE
+                  hwtab = BOTM(ic, ir, kwt)
+                END IF
+              END IF
+            END IF
+          END IF
           IF ( NUZTOP.EQ.1 ) THEN
             celtop = BOTM(ic, ir, 0) - 0.5D0*SURFDEP
             celthick = BOTM(ic, ir, 0) - BOTM(ic, ir, 1)
@@ -2982,7 +3197,7 @@ C13-----UPDATE UNSATURATED ZONE WAVES WHEN THE WATER TABLE REMAINS
 C         BELOW LAND SURFACE AND CALCULATE CHANGE IN STORAGE.         
           ELSE IF ( hdif.LT.1.0E-5 .AND. nwaves.EQ.1 .AND. 
      +              fluxdif.LT.1.0E-9 .AND. htest1.LT.2.0E-5 .AND. 
-     +              IETFLG.EQ.0 ) THEN
+     +              IETFLG.EQ.0 .AND. kwt.LE.il ) THEN
             IF ( IUZFOPT.GT.0 ) THEN
               IF ( ibnd.GT.0 ) THEN
                 IF ( iss.EQ.0 ) THEN
@@ -3012,6 +3227,16 @@ C         BELOW LAND SURFACE AND CALCULATE CHANGE IN STORAGE.
                   surflux = finfhold
                   oldsflx = UZOLSFLX(ic, ir)
                   numwaves = NWAVST(ic, ir)
+                  IF ( kwt.GT.il ) THEN
+                    CALL UZFLOW_BYCELL(l, ic, ir, il, kwt, celtop, hwtab,
+     +                   surflux, deltinc, idelt, thr, ths, fks,
+     +                   epsilon, rateud, rootdp, wiltwc, 1,
+     +                   totfluxtot, etact, fmstor, kkper)
+                    uzstorhold = COLSTOR0*cellarea
+                    totflux = totfluxtot
+                    bycell = 1
+                    loop = 0
+                  ELSE
                   DO ik = 1, idelt
                     totflux = 0.0D0
                     etact = 0.0D0
@@ -3030,8 +3255,9 @@ C         BELOW LAND SURFACE AND CALCULATE CHANGE IN STORAGE.
                   totflux = totfluxtot
                   etact = totetact
                   loop = 1
-                  ick = 0
                   NWAVST(ic, ir) = numwaves
+                  END IF
+                  ick = 0
                   IF ( loop.GT.0 ) THEN
 C
 C15-----CALCULATE CHANGE IN UNSATURATED ZONE STORAGE WHEN WATER TABLE
@@ -3318,6 +3544,10 @@ C          TABLE DECLINES.
                       UZDPST(iset, l) = celtop - h
                     END IF                    
                     UZFLWT(ic, ir) = totflux*cellarea
+                  ELSE IF ( bycell.EQ.1 ) THEN
+                    UZSTOR(ic, ir) = fmstor*cellarea
+                    DELSTOR(ic, ir) = UZSTOR(ic, ir) - uzstorhold
+                    UZFLWT(ic, ir) = (totflux+RECHABSUM)*cellarea
                   ELSE
                     UZFLWT(ic, ir) = 0.0D0
                   END IF
@@ -3364,6 +3594,18 @@ C          DROPS BELOW LAND SURFACE.
                   surflux = finfhold
                   oldsflx = 0.0D0
                   numwaves = 1
+                  IF ( kwt.GT.il ) THEN
+                    CALL UZFLOW_BYCELL(l, ic, ir, il, kwt, celtop, hwtab,
+     +                   surflux, deltinc, idelt, thr, ths, fks,
+     +                   epsilon, rateud, rootdp, wiltwc, 1,
+     +                   totfluxtot, etact, fmstor, kkper)
+                    uzstorhold = COLSTOR0*cellarea
+                    totflux = totfluxtot
+                    UZSTOR(ic, ir) = fmstor*cellarea
+                    DELSTOR(ic, ir) = UZSTOR(ic, ir) - uzstorhold
+                    UZFLWT(ic, ir) = (totflux+RECHABSUM)*cellarea
+                    GOTO 887
+                  END IF
                   DO ik = 1, idelt
                     totflux = 0.0D0
                     etact = 0.0D0
@@ -3436,7 +3678,7 @@ C          DROPS BELOW LAND SURFACE.
             ELSE
               UZFLWT(ic, ir) = finfact*cellarea*DELT
             END IF
-            UZOLSFLX(ic, ir) = finfact
+  887       UZOLSFLX(ic, ir) = finfact
 C
 C27-----CALCULATE ET DEMAND LEFT FOR GROUND WATER.
 C
@@ -4294,7 +4536,7 @@ C     COMPUTE WAVE INTERACTION WITHIN AN UNSATURATED FLOW CELL
 C     VERSION 1.0.5:  April 5, 2012
 C     ******************************************************************
       USE GWFUZFMODULE, ONLY: NWAV, THETAB, FLUXB, IETFLG, NEARZERO,
-     +                        ZEROD6, ZEROD7, ZEROD9
+     +                        ZEROD6, ZEROD7, ZEROD9, FMRISING
       USE GLOBAL,       ONLY: ITMUNI, LENUNI, IOUT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -4388,6 +4630,7 @@ C1------DETERMINE IF WATER TABLE IS RISING OR FALLING.
         dlength2 = Zoldist + 1.0D0
       END IF
       fm = 0.0D0
+      FMRISING = 0.0D0
       THETAB = Theta(Jpnt)
       FLUXB = Flux(Jpnt)
       Totalflux = 0.00D0
@@ -4449,6 +4692,7 @@ C3------CALCULATE VOLUME OF WATER BELOW WATER TABLE.
           fm = (Depth(Jpnt)-dlength2)*(Theta(Jpnt)-Thetar)
         END IF
         Dlength = dlength2
+        FMRISING = fm
         Totalflux = Totalflux + fm
         IF ( Totalflux.LT.NEARZERO ) Totalflux = 0.0D0
       END IF
@@ -5834,6 +6078,14 @@ C     ARGUMENTS
 C     ------------------------------------------------------------------
       INTEGER Igrid
 C     ------------------------------------------------------------------
+      IF ( ALLOCATED(UZTHLAY) ) THEN
+        DEALLOCATE (UZTHLAY, UZDPLAY, UZSPLAY, UZFLLAY)
+        DEALLOCATE (ITRLAY, LTRLAY, UZOLSLAY)
+        DEALLOCATE (NWAVLAY, LAYREADY, KWTHOLD, RECHABS)
+        DEALLOCATE (WTH, WDP, WSP, WFL, WITR, WLTR, WNWAV)
+      END IF
+      IF ( ALLOCATED(VKSLAY) ) DEALLOCATE (VKSLAY, EPSLAY, THTSLAY,
+     +                                     THTRLAY, THTILAY)
       DEALLOCATE (GWFUZFDAT(Igrid)%MORE)
       DEALLOCATE (GWFUZFDAT(Igrid)%CHECKTIME)
       DEALLOCATE (GWFUZFDAT(Igrid)%LAYNUM)
