@@ -37,6 +37,7 @@ LIBOBJS = \
         gwf2ag1_NWT.o \
         gwf2wel7_NWT.o \
         gwf2uzf1_NWT.o \
+        uzf_bycell_nwt.o \
         gwf2ghb7_NWT.o \
         gwf2fhb7.o \
         gwf2mnw17_NWT.o \
@@ -126,8 +127,11 @@ gwf2ag1_NWT.o: gwf2ag1_NWT.f gwf2bas7_NWT.o NWT1_module.o gwf2upw1.o prms_module
 gwf2sfr7_NWT.o: gwf2sfr7_NWT.f gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwf2lpf7.o gwf2bcf7.o gwf2huf7.o gwf2upw1.o gwfuzfmodule_NWT.o NWT1_module.o gwflakmodule_NWT.o prms_constants.mod prms_module.mod
 	$(FC) $(FFLAGS) -c gwf2sfr7_NWT.f
 
-gwf2uzf1_NWT.o: gwf2uzf1_NWT.f gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwf2lpf7.o gwf2bcf7.o gwf2huf7.o gwf2upw1.o gwfuzfmodule_NWT.o NWT1_module.o gwflakmodule_NWT.o
+gwf2uzf1_NWT.o: gwf2uzf1_NWT.f gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwf2lpf7.o gwf2bcf7.o gwf2huf7.o gwf2upw1.o gwfuzfmodule_NWT.o NWT1_module.o gwflakmodule_NWT.o uzf_bycell_nwt.o
 	$(FC) $(FFLAGS) -c gwf2uzf1_NWT.f
+
+uzf_bycell_nwt.o: uzf_bycell_nwt.f90 gwfuzfmodule_NWT.o gwf2bas7_NWT.o
+	$(FC) $(FFLAGS) -c uzf_bycell_nwt.f90
 
 gwf2mnw17_NWT.o: gwf2mnw17_NWT.f gwf2bas7_NWT.o sip7_NWT.o de47_NWT.o pcg7_NWT.o NWT1_module.o gwf2bcf7.o gwf2lpf7.o gwf2huf7.o gwf2upw1.o
 	$(FC) $(FFLAGS) -c gwf2mnw17_NWT.f

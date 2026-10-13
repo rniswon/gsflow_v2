@@ -108,7 +108,9 @@
 		<File RelativePath="..\GSFLOW\src\modflow\gwf2swr7util.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwf2swt7.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwf2upw1.f"/>
-		<File RelativePath="..\GSFLOW\src\modflow\gwf2uzf1_NWT.f"/>
+		<File RelativePath="..\GSFLOW\src\modflow\gwf2uzf1_read_nwt.f"/>
+<File RelativePath="..\GSFLOW\src\modflow\uzfcell_nwt.f90"/>
+<File RelativePath="..\GSFLOW\src\modflow\gwf2uzf_cell_nwt.f90"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwf2wel7_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\modflow\gwflakmodule_NWT.f"/>
 		<File RelativePath="..\GSFLOW\src\prms\gwflow.f90"/>
