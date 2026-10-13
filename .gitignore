@@ -14,4 +14,23 @@ gsflow_develop/x64/Debug/*.*
 gsflow_develop/gsflow_develop.vfproj.rniswon.user
 gsflow_develop/.vs/gsflow_develop/v16/*.*
 
+# Generated results from model runs. Files already tracked in these
+# folders, such as readme.txt and comparison workbooks, stay in the repo.
+GSFLOW/data/**/output/**
+
+# Local run logs and debug dumps
+*.log
+GSFLOW/data/**/uzf_cellbal*.txt
+
+# Compiler and debugger products
+*.pdb
+*.ilk
+*.exp
+
+# Visual Studio and Intel Fortran local files
+.vs/
+*.user
+gsflow_develop/gsflow_develop/gsflow/*.u2d
+gsflow_develop/gsflow_develop/gsflow/x64/
+
 

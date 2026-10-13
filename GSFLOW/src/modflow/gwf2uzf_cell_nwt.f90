@@ -94,7 +94,7 @@ subroutine UZF_NWT_BUILD()
   use UZFCELL, only: setdata, sethead, setwaves, set_seepk, get_wcnew, &
                      ivertcon, nwav, wcnew, wcold, celbot
   use GWFUZFMODULE, only: IUZFBND, NSETS, NTRAIL, SURFDEP, Iseepreject, &
-                          SURFK, VKS, EPS, THTS, THTR, THTI, LAYNUM
+                          SURFK, VKS, EPS, THTS, THTR, THTI, LAYNUM, IWCRD
   use GLOBAL, only: NCOL, NROW, NLAY, IBOUND, HNEW, DELR, DELC, BOTM, IOUT
   use GWFBASMODULE, only: HDRY
   implicit none
@@ -106,6 +106,7 @@ subroutine UZF_NWT_BUILD()
     end function uzf_nwt_active
   end interface
 
+  if (IWCRD > 0) call uzf_nwt_read_wcavg()
   call uzf_nwt_release_cells()
   n = 0
   do ir = 1, NROW
@@ -267,7 +268,6 @@ subroutine GWF2UZF1BD(Kkstp, Kkper, Iunitlak, Iunitsfr, Igrid)
   double precision :: rch, etr, sto, infl, gwr, seep, rej, qsto, h, uzvol, thk, uzvolsum
   double precision, allocatable :: holdtab(:)
   double precision :: ratin, ratout, ratout2
-  double precision :: vin, vout, ds, resid
   character(len=16) :: textrch, textet, textexfl
   data textrch/'    UZF RECHARGE'/
   data textet/'           GW ET'/
@@ -365,25 +365,10 @@ subroutine GWF2UZF1BD(Kkstp, Kkper, Iunitlak, Iunitsfr, Igrid)
   VBNM(MSUM) = textexfl
   MSUM = MSUM + 1
 
-  if (IBUDFL > 0 .and. IUZFOPT > 0) then
-    vin = infl * DELT
-    vout = etr * DELT + rch * DELT
-    ds = sto * DELT
-    resid = vin - vout - ds
-    write(IOUT, '(/1X,A,I6,A,I6)') 'UZF CELL BUDGET  TIME STEP', Kkstp, &
-      '  STRESS PERIOD', Kkper
-    write(IOUT, '(1X,A,1PE14.6,A,1PE14.6)') '    INFILTRATION', infl, &
-      '   VOLUME', vin
-    write(IOUT, '(1X,A,1PE14.6,A,1PE14.6)') '          UZF ET', etr, &
-      '   VOLUME', etr * DELT
-    write(IOUT, '(1X,A,1PE14.6,A,1PE14.6)') '    UZF RECHARGE', rch, &
-      '   VOLUME', rch * DELT
-    write(IOUT, '(1X,A,1PE14.6,A,1PE14.6)') '  STORAGE CHANGE', sto, &
-      '   VOLUME', ds
-    write(IOUT, '(1X,A,1PE14.6)') ' UZ BALANCE (IN-ET-RECHARGE-STORAGE)', resid
-    write(IOUT, '(1X,A,1PE14.6,A,1PE14.6)') ' SURFACE LEAKAGE', seep, &
-      '   GW ET', gwr
-  end if
+  call uzf_nwt_write_budget(IOUT, IBUDFL, IUZFOPT, Kkstp, Kkper, &
+                            CUMUZVOL(1), CUMUZVOL(2), CUMUZVOL(3), &
+                            CUMUZVOL(4), UZTSRAT(1), UZTSRAT(2), &
+                            UZTSRAT(3), UZTSRAT(4))
 
   ibd = 0
   if (IUZFCB1 /= 0) ibd = ICBCFL
@@ -409,6 +394,7 @@ subroutine GWF2UZF1BD(Kkstp, Kkper, Iunitlak, Iunitsfr, Igrid)
     call UBUDSV(Kkstp, Kkper, textexfl, abs(IUZFCB1), BUFF, NCOL, NROW, &
                 NLAY, IOUT)
   end if
+  call uzf_nwt_save_wcavg(Kkstp, Kkper)
 end subroutine GWF2UZF1BD
 
 
@@ -580,3 +566,234 @@ subroutine uzf_nwt_props(ic, ir, k, vk, tr, ts, ti, ep)
   if (allocated(THTILAY)) ti = dble(THTILAY(ic, ir, k))
   if (allocated(EPSLAY)) ep = dble(EPSLAY(ic, ir, k))
 end subroutine uzf_nwt_props
+
+
+subroutine uzf_nwt_save_wcavg(kstp, kper)
+! Write one volume-averaged water content per cell when the output
+! control file saves heads. The average is taken above the water table.
+! A fully saturated cell is stored as the saturated water content.
+  use UZF_NWT_MAP, only: nuzf, cell_ic, cell_ir, cell_k
+  use UZFCELL, only: celtop, celbot, watab, thts, get_wcnew
+  use GWFUZFMODULE, only: IWCUN
+  use GLOBAL, only: IOUT, NCOL, NROW, NLAY
+  use GWFBASMODULE, only: IHEDUN, IOFLG, PERTIM, TOTIM
+  implicit none
+  integer, intent(in) :: kstp, kper
+  integer :: n, ic, ir, k, layer
+  real, allocatable :: wc(:, :, :)
+  real, allocatable :: blay(:, :)
+  double precision :: thk
+  character(len=16) :: text
+  logical :: save_any
+  if (IWCUN <= 0 .or. IHEDUN <= 0) return
+  if (.not. associated(IOFLG)) return
+  save_any = .false.
+  do k = 1, NLAY
+    if (IOFLG(k, 3) /= 0) save_any = .true.
+  end do
+  if (.not. save_any) return
+  allocate(wc(NCOL, NROW, NLAY))
+  wc = 0.0
+  do n = 1, nuzf
+    ic = cell_ic(n)
+    ir = cell_ir(n)
+    k = cell_k(n)
+    thk = celtop(n) - max(celbot(n), watab(n))
+    if (thk > 0.0d0) then
+      wc(ic, ir, k) = real(get_wcnew(n))
+    else
+      wc(ic, ir, k) = real(thts(n))
+    end if
+  end do
+  text = 'UZF CELLAVG WC  '
+  allocate(blay(NCOL, NROW))
+  write(IOUT, '(1X,A,I5,A,I8,A,I8)') &
+    'UZF CELL-AVERAGE WATER CONTENT SAVED ON UNIT ', IWCUN, &
+    ' AT END OF TIME STEP ', kstp, ', STRESS PERIOD ', kper
+  do layer = 1, NLAY
+    if (IOFLG(layer, 3) == 0) cycle
+    blay = wc(:, :, layer)
+    call ULASAV(blay, text, kstp, kper, PERTIM, TOTIM, NCOL, NROW, &
+                layer, IWCUN)
+  end do
+  flush(IWCUN)
+end subroutine uzf_nwt_save_wcavg
+
+
+subroutine uzf_nwt_read_wcavg()
+! Read the last saved cell-average water content and store it as the
+! initial content. setwaves applies that content above the water table.
+  use GWFUZFMODULE, only: IWCRD, THTI, THTILAY, THTRLAY, THTSLAY, THTR, THTS
+  use GLOBAL, only: IOUT, NCOL, NROW, NLAY
+  implicit none
+  integer :: ios, nrec, kstp, kper, ncolr, nrowr, ilay, ic, ir, k, napply
+  integer :: lastk, lasts
+  real :: pertim, totim, wmin, wmax, w
+  real :: tr, ts
+  character(len=16) :: text
+  real, allocatable :: hold(:, :, :)
+  real, allocatable :: blay(:, :)
+  allocate(hold(NCOL, NROW, NLAY), blay(NCOL, NROW))
+  hold = -1.0
+  nrec = 0
+  lastk = 0
+  lasts = 0
+  do
+    read(IWCRD, iostat=ios) kstp, kper, pertim, totim, text, ncolr, nrowr, ilay
+    if (ios /= 0) exit
+    if (ncolr /= NCOL .or. nrowr /= NROW .or. ilay < 1 .or. ilay > NLAY) &
+      call USTOP('UZF water-content record does not match the grid')
+    read(IWCRD, iostat=ios) ((blay(ic, ir), ic=1, NCOL), ir=1, NROW)
+    if (ios /= 0) call USTOP('UZF water-content record is incomplete')
+    hold(:, :, ilay) = blay
+    nrec = nrec + 1
+    lastk = kper
+    lasts = kstp
+  end do
+  if (nrec < 1) call USTOP('UZF water-content file has no records')
+  napply = 0
+  wmin = 0.0
+  wmax = 0.0
+  do k = 1, NLAY
+    do ir = 1, NROW
+      do ic = 1, NCOL
+        if (hold(ic, ir, k) < 0.0) cycle
+        if (allocated(THTRLAY)) then
+          tr = THTRLAY(ic, ir, k)
+          ts = THTSLAY(ic, ir, k)
+        else
+          tr = THTR(ic, ir)
+          ts = THTS(ic, ir)
+        end if
+        if (ts <= tr) cycle
+        w = hold(ic, ir, k)
+        if (w <= 1.0e-6) cycle
+        if (w < tr - 1.0e-5 .or. w > ts + 1.0e-5) cycle
+        if (w < tr) w = tr
+        if (w > ts) w = ts
+        if (allocated(THTILAY)) then
+          THTILAY(ic, ir, k) = w
+        else
+          THTI(ic, ir) = w
+        end if
+        if (napply == 0) then
+          wmin = w
+          wmax = w
+        else
+          if (w < wmin) wmin = w
+          if (w > wmax) wmax = w
+        end if
+        napply = napply + 1
+      end do
+    end do
+  end do
+  if (napply < 1) call USTOP('UZF water-content file has no UZF cells')
+  write(IOUT, '(1X,A,I5)') &
+    'UZF READ CELL-AVERAGE WATER CONTENT FROM UNIT ', IWCRD
+  write(IOUT, '(1X,A,I8,A,I8)') &
+    'LAST RECORD IS STRESS PERIOD ', lastk, ' TIME STEP ', lasts
+  write(IOUT, '(1X,A,I8,A,1PG14.6,A,1PG14.6)') &
+    'CELLS SET ABOVE THE WATER TABLE = ', napply, ' MIN = ', wmin, ' MAX = ', wmax
+end subroutine uzf_nwt_read_wcavg
+
+
+subroutine uzf_nwt_write_budget(iout, ibudfl, iuzfopt, kstp, kper, &
+                                c1v, c2v, c3v, c4v, r1v, r2v, r3v, r4v)
+! Standard unsaturated-zone volumetric budget. Cumulative volumes are
+! on the left and rates for this time step are on the right.
+  implicit none
+  integer, intent(in) :: iout, ibudfl, iuzfopt, kstp, kper
+  double precision, intent(in) :: c1v, c2v, c3v, c4v
+  double precision, intent(in) :: r1v, r2v, r3v, r4v
+  double precision :: totvin, totvot, totrin, totrot, fmax
+  double precision :: prcntercum, prcnterrat
+  character(len=17) :: c1, r1, c2, r2, c3, r3, c4, r4, cd, rd
+  character(len=16) :: infl, uzet, rch, stor
+  if (ibudfl <= 0 .or. iuzfopt <= 0) return
+  infl = '    INFILTRATION'
+  uzet = '          UZF ET'
+  rch = '    UZF RECHARGE'
+  stor = '  STORAGE CHANGE'
+  call uzf_nwt_fmt17(c1v, c1)
+  call uzf_nwt_fmt17(r1v, r1)
+  call uzf_nwt_fmt17(c2v, c2)
+  call uzf_nwt_fmt17(r2v, r2)
+  call uzf_nwt_fmt17(c3v, c3)
+  call uzf_nwt_fmt17(r3v, r3)
+  call uzf_nwt_fmt17(c4v, c4)
+  call uzf_nwt_fmt17(r4v, r4)
+  if (c4v > 0.0d0) then
+    totvin = c1v
+    totvot = c2v + c3v + c4v
+  else
+    totvin = c1v - c4v
+    totvot = c2v + c3v
+  end if
+  if (r4v > 0.0d0) then
+    totrin = r1v
+    totrot = r2v + r3v + r4v
+  else
+    totrin = r1v - r4v
+    totrot = r2v + r3v
+  end if
+  prcntercum = 0.0d0
+  prcnterrat = 0.0d0
+  if (abs(totvin + totvot) > 1.0d-15) &
+    prcntercum = 100.0d0 * (totvin - totvot) / (totvin + totvot) / 2.0d0
+  if (abs(totrin + totrot) > 1.0d-15) then
+    fmax = totrin
+    if (fmax < totrot) fmax = totrot
+    prcnterrat = 100.0d0 * (totrin - totrot) / fmax
+  end if
+  call uzf_nwt_fmt17(c1v - (c2v + c3v), cd)
+  call uzf_nwt_fmt17(r1v - (r2v + r3v), rd)
+  write(iout, 9002) kstp, kper
+  write(iout, 9003)
+  write(iout, 9004) infl, c1, infl, r1
+  write(iout, 9005)
+  write(iout, 9004) uzet, c2, uzet, r2
+  write(iout, 9004) rch, c3, rch, r3
+  write(iout, 9006) cd, rd
+  write(iout, 9007)
+  write(iout, 9004) stor, c4, stor, r4
+  write(iout, 9008)
+  write(iout, 9009) prcntercum, prcnterrat
+9002 format(1X//,'UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR ', &
+           ' TIME STEP', I6, ' STRESS PERIOD ', I5, /2X, 78('-')//)
+9003 format(1X, /5X, 'CUMULATIVE VOLUMES', 6X, 'L**3', 7X, &
+           'RATES FOR THIS TIME STEP', 6X, 'L**3/T'/5X, 18('-'), 17X, &
+           24('-')//11X, 'IN:', 38X, 'IN:'/11X, '---', 38X, '---')
+9004 format(1X, 3X, A16, ' =', A17, 6X, A16, ' =', A17)
+9005 format(1X, /10X, 'OUT:', 37X, 'OUT:'/10X, 4('-'), 37X, 4('-'))
+9006 format(1X, /12X, 'IN - OUT =', A, 14X, 'IN - OUT =', A)
+9007 format(1X, /10X, 'STORAGE:', 33X, 'STORAGE:'/10X, 8('-'), 33X, &
+           8('-'))
+9008 format(1X, /1X, &
+           'PERCENT DISCREPANCY IS DIFFERENCE BETWEEN IN-OUT', &
+           ' MINUS CHANGE IN STORAGE', 1X, /1X, &
+           'DIVIDED BY THE AVERAGE OF IN', ' AND OUT TIMES 100')
+9009 format(1X, /1X, 'PERCENT DISCREPANCY =', F15.2, 5X, &
+           'PERCENT DISCREPANCY =', F15.2, ///)
+end subroutine uzf_nwt_write_budget
+
+
+subroutine uzf_nwt_fmt17(val, text)
+  implicit none
+  double precision, intent(in) :: val
+  character(len=17), intent(out) :: text
+  character(len=32) :: buf
+  integer :: n
+  double precision :: a
+  a = abs(val)
+  if (a == 0.0d0 .or. (a >= 1.0d-3 .and. a < 1.0d8)) then
+    write(buf, '(F17.4)') val
+  else
+    write(buf, '(1PE22.6E4)') val
+  end if
+  n = len_trim(buf)
+  if (n <= 17) then
+    text = adjustr(buf(1:n))
+  else
+    text = buf(n - 16:n)
+  end if
+end subroutine uzf_nwt_fmt17

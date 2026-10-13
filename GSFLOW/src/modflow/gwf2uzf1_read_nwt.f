@@ -585,7 +585,14 @@ C       IS CONSTANT THROUGHOUT VERTICAL COLUMN.
 C
 C16-----READ INITIAL WATER CONTENT FOR EACH LAYER. DO NOT READ
 C         INITIAL WATER CONTENT IF PERIOD IS STEADY STATE.
-        IF ( ISSFLG(1).EQ.0 .OR. ITHTIFLG.GT.0 ) THEN
+C         A water-content restart supplies the values later, so the
+C         UZF file does not need a THTI array in that case.
+        IF ( IWCRD.GT.0 ) THEN
+          DO k = 1, NLAY
+            THTI(:,:) = THTSLAY(:,:,k)
+            THTILAY(:,:,k) = THTSLAY(:,:,k)
+          END DO
+        ELSE IF ( ISSFLG(1).EQ.0 .OR. ITHTIFLG.GT.0 ) THEN
           DO k = 1, NLAY
             CALL U2DREL(THTI, aname(8), NUZRW, NUZCL, k, In, IOUT)
             THTILAY(:,:,k) = THTI(:,:)
@@ -1020,6 +1027,8 @@ C     ------------------------------------------------------------------
       IHEADER = 0
       LLOC=1
       found = .false.
+      IWCUN = 0
+      IWCRD = 0
       CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
         ! determine the type of header (-1=error, 0=noheader, 1=old style, 2=new style)
       select case(line(istart:istop))
@@ -1119,6 +1128,16 @@ C     ------------------------------------------------------------------
      +                 'FILES WITH UNIT NUMBERS ',I10,I10, 
      +                 ', RESPECTIVELY')
 
+          case('WCSAVE')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IWCUN,R,IOUT,IN)
+            WRITE(IOUT,'(1X,A,I5)')
+     +        'CELL-AVERAGE WATER CONTENT WILL BE SAVED ON UNIT ',
+     +        IWCUN
+          case('WCREAD')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IWCRD,R,IOUT,IN)
+            WRITE(IOUT,'(1X,A,I5)')
+     +        'CELL-AVERAGE WATER CONTENT WILL BE READ FROM UNIT ',
+     +        IWCRD
           case ('END')
             write(iout,'(/1x,a)') 'END PROCESSING '//
      +            trim(adjustl(text)) //' OPTIONS'
@@ -1160,6 +1179,18 @@ C     ------------------------------------------------------------------
           WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
           WRITE(iout,*)
           found = .true.
+        case('WCSAVE')
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IWCUN,R,IOUT,IN)
+          WRITE(IOUT,'(1X,A,I5)')
+     +      'CELL-AVERAGE WATER CONTENT WILL BE SAVED ON UNIT ',
+     +      IWCUN
+          found = .true.
+        case('WCREAD')
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IWCRD,R,IOUT,IN)
+          WRITE(IOUT,'(1X,A,I5)')
+     +      'CELL-AVERAGE WATER CONTENT WILL BE READ FROM UNIT ',
+     +      IWCRD
+          found = .true.
         case('#')              !IN CASE A COMMENT IS ADDED TO THE END OF THE LINE. 10/19/2017
           WRITE(iout,*)
           WRITE(IOUT,'(A)')' COMMENT "#" ENCOUNTERED. EXITING OPTIONS'
@@ -1183,6 +1214,9 @@ C     ------------------------------------------------------------------
           CALL USTOP('Invalid '//trim(adjustl(text))
      +                   //' Option: '//LINE(ISTART:ISTOP))
         end if
+      END IF
+      IF ( IWCUN.GT.0 .AND. IWCUN.EQ.IWCRD ) THEN
+        CALL USTOP('UZF WCSAVE and WCREAD must use different units')
       END IF
       END SUBROUTINE
 C
