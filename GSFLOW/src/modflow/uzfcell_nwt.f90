@@ -241,20 +241,29 @@ contains
     if (sclfac > DONE) sclfac = DONE
   end function calc_lin_scaling_fac
 
-  function get_storage_change(top_in, bot_in, carea, hold, hnew, wcold_in, &
-                              wcnew_in, thtr_in, delt_in, iss) result(qsto)
-    double precision, intent(in) :: top_in, bot_in, hold, hnew
-    double precision, intent(in) :: wcold_in, wcnew_in, thtr_in, carea, delt_in
+  function cell_unsat_storage(icell, head) result(fm)
+    ! Mobile unsaturated storage (length) from kinematic waves above head.
+    ! Must be called with the wave state that belongs to that head/time.
+    integer, intent(in) :: icell
+    double precision, intent(in) :: head
+    double precision :: fm
+    double precision :: thk, d
+    thk = celtop(icell) - max(celbot(icell), head)
+    fm = DZERO
+    if (thk > DZERO) then
+      d = thk
+      fm = unsat_stor(icell, d)
+      if (fm < DZERO) fm = DZERO
+    end if
+  end function cell_unsat_storage
+
+  function get_storage_change(carea, storold, stornew, delt_in, iss) result(qsto)
+    ! Storage-change rate from start/end wave storage lengths (L3/T).
     integer, intent(in) :: iss
+    double precision, intent(in) :: carea, storold, stornew, delt_in
     double precision :: qsto
-    double precision :: thknew, thkold
-    if (iss == 0) then
-      thknew = top_in - max(bot_in, hnew)
-      thkold = top_in - max(bot_in, hold)
-      qsto = DZERO
-      if (thknew > DZERO) qsto = qsto + thknew * (wcnew_in - thtr_in)
-      if (thkold > DZERO) qsto = qsto - thkold * (wcold_in - thtr_in)
-      qsto = qsto * carea / delt_in
+    if (iss == 0 .and. delt_in > DZERO) then
+      qsto = (stornew - storold) * carea / delt_in
     else
       qsto = DZERO
     end if
@@ -1847,14 +1856,15 @@ contains
     top = celtop(icell)
     bot = celbot(icell)
     thk = top - max(bot, hgwf)
+    theta_r = thtr(icell)
     if (thk > DZERO) then
-      theta_r = thtr(icell)
       d = thk
       fm = unsat_stor(icell, d)
       watercontent = fm / thk
       watercontent = watercontent + theta_r
     else
-      watercontent = DZERO
+      ! Saturated cell: no UZ column; report saturated content.
+      watercontent = thts(icell)
     end if
   end function get_wcnew
 

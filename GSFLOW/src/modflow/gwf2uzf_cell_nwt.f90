@@ -256,8 +256,8 @@ subroutine GWF2UZF1BD(Kkstp, Kkper, Iunitlak, Iunitsfr, Igrid)
   use UZF_NWT_MAP, only: nuzf, cell_ic, cell_ir, cell_k
   use UZFCELL, only: totflux, uzfarea, surfseep, cell_finf => finf, &
                      cell_rej => finf_rej, etact, cell_gwet => gwet, celtop, &
-                     celbot, watab, watabold, wcold, cell_thtr => thtr, landflag, &
-                     get_storage_change, get_wcnew, wcnew
+                     celbot, watab, watabold, wcold, landflag, &
+                     cell_unsat_storage, get_storage_change, get_wcnew, wcnew
   use GWFUZFMODULE, only: UZFLWT, SEEPOUT, REJ_INF, UZFETOUT, GWET, DELSTOR, &
                           UZSTOR, EXCESPP, UZTSRAT, CUMUZVOL, IUZFOPT, IUZFCB1
   use GLOBAL, only: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, HNEW, BUFF
@@ -265,8 +265,9 @@ subroutine GWF2UZF1BD(Kkstp, Kkper, Iunitlak, Iunitsfr, Igrid)
   implicit none
   integer, intent(in) :: Kkstp, Kkper, Iunitlak, Iunitsfr, Igrid
   integer :: n, ic, ir, k, iss, ibd
-  double precision :: rch, etr, sto, infl, gwr, seep, rej, qsto, h, uzvol, thk, uzvolsum
-  double precision, allocatable :: holdtab(:)
+  double precision :: rch, etr, sto, infl, gwr, seep, rej, qsto, uzvol, uzvolsum
+  double precision :: storold, stornew, deltd
+  double precision, allocatable :: stor0(:)
   double precision :: ratin, ratout, ratout2
   character(len=16) :: textrch, textet, textexfl
   data textrch/'    UZF RECHARGE'/
@@ -277,6 +278,7 @@ subroutine GWF2UZF1BD(Kkstp, Kkper, Iunitlak, Iunitsfr, Igrid)
   if (nuzf == 0) return
   iss = 0
   if (ISSFLG(Kkper) /= 0) iss = 1
+  deltd = dble(DELT)
   UZFLWT = 0.0
   SEEPOUT = 0.0
   REJ_INF = 0.0
@@ -286,8 +288,11 @@ subroutine GWF2UZF1BD(Kkstp, Kkper, Iunitlak, Iunitsfr, Igrid)
   UZSTOR = 0.0
   EXCESPP = 0.0
   UZTSRAT = 0.0
-  allocate(holdtab(nuzf))
-  holdtab = watabold
+  ! Snapshot start-of-step wave storage before routing (same role as COLSTOR0).
+  allocate(stor0(nuzf))
+  do n = 1, nuzf
+    stor0(n) = cell_unsat_storage(n, watabold(n))
+  end do
   call uzf_nwt_apply_land()
   call uzf_nwt_solve(.false., Kkper)
 
@@ -303,19 +308,17 @@ subroutine GWF2UZF1BD(Kkstp, Kkper, Iunitlak, Iunitsfr, Igrid)
     ic = cell_ic(n)
     ir = cell_ir(n)
     k = cell_k(n)
-    h = watab(n)
-    qsto = get_storage_change(celtop(n), celbot(n), uzfarea(n), holdtab(n), &
-                              h, wcold(n), get_wcnew(n), cell_thtr(n), dble(DELT), iss)
+    storold = stor0(n)
+    stornew = cell_unsat_storage(n, watab(n))
+    qsto = get_storage_change(uzfarea(n), storold, stornew, deltd, iss)
     wcnew(n) = get_wcnew(n)
+    wcold(n) = wcnew(n)
     UZFLWT(ic, ir) = UZFLWT(ic, ir) + real(totflux(n) * uzfarea(n))
     SEEPOUT(ic, ir) = SEEPOUT(ic, ir) + real(surfseep(n))
     UZFETOUT(ic, ir) = UZFETOUT(ic, ir) + real(etact(n) * uzfarea(n) / DELT)
     GWET(ic, ir) = GWET(ic, ir) + real(cell_gwet(n))
     DELSTOR(ic, ir) = DELSTOR(ic, ir) + real(qsto * DELT)
-    thk = celtop(n) - max(celbot(n), watab(n))
-    uzvol = 0.0d0
-    if (thk > 0.0d0) uzvol = thk * (get_wcnew(n) - cell_thtr(n)) * uzfarea(n)
-    if (uzvol < 0.0d0) uzvol = 0.0d0
+    uzvol = stornew * uzfarea(n)
     UZSTOR(ic, ir) = UZSTOR(ic, ir) + real(uzvol)
     uzvolsum = uzvolsum + uzvol
     if (landflag(n) == 1) then
@@ -329,6 +332,7 @@ subroutine GWF2UZF1BD(Kkstp, Kkper, Iunitlak, Iunitsfr, Igrid)
     gwr = gwr + cell_gwet(n)
     seep = seep + surfseep(n)
   end do
+  deallocate(stor0)
 
   UZTSRAT(1) = real(infl)
   UZTSRAT(2) = real(etr)
