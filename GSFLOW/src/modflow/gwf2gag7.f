@@ -156,7 +156,7 @@ C     ******************************************************************
       USE GLOBAL,       ONLY:IOUT,IUNIT
       USE GWFGAGMODULE
       USE GWFLAKMODULE, ONLY:NLAKES,STAGES,VOL,CLAKE
-      USE GWFSFRMODULE, ONLY:NSTRM,ISTRM,IDIVAR
+      USE GWFSFRMODULE, ONLY:NSTRM,ISTRM,IDIVAR,IRTFLG
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
@@ -259,6 +259,10 @@ Cdep  Revised output to include precipitation, et, and runoff
 Cdep  Revised output to include precipitation, et, and runoff
                      IF(IUNITUZF.LE.0) THEN
                        WRITE (IG3,265)
+                     ELSE IF(IRTFLG.GT.0) THEN
+C     Transient routing stores a reach volume. Keep Strm.Del.Stor.
+C     on the UZF listing.
+                       WRITE (IG3,271)
                      ELSE
                        WRITE (IG3,266)
                      END IF
@@ -500,6 +504,11 @@ C     minor format adjustments below by LFK, July 2006
      +           'Precip.',14X,'ET',6X,'SFR-Runoff',6X,
      +           'UZF-Runoff',5X,'Conductance',8X,'HeadDiff',
      *           7X,'Hyd.Grad. "')
+ 271  FORMAT (5X,'"DATA: Time',11X,'Stage',12X,'Flow',
+     *           11X,'Depth',11X,'Width',6X,'Midpt-Flow',9X,
+     +           'Precip.',14X,'ET',6X,'SFR-Runoff',6X,
+     +           'UZF-Runoff',5X,'Conductance',8X,'HeadDiff',
+     *           7X,'Hyd.Grad.',7X,'Strm.Del.Stor."')
  267  FORMAT (5X,'"DATA: Time',11X,'Stage',7X,
      *           'Max.-Rate',3X,'Rate-Diverted',3X,
      *           'Upstream-Flow "')
@@ -886,7 +895,7 @@ C     EACH TIME SERIES IS WRITTEN TO A SEPERATE FILE
 C     ******************************************************************
       USE GWFGAGMODULE
       USE GWFSFRMODULE, ONLY:NSTRM,NUMAVE,IDIVAR,STRM,ISEG,SEG,SGOTFLW,
-     1                       AVWAT,WAT1,AVDPT
+     1                       AVWAT,WAT1,AVDPT,IRTFLG
 C     ------------------------------------------------------------------
 
       CHARACTER*50  LFRMAT
@@ -946,6 +955,12 @@ C5------GET VARIABLE OUTTYPE.
      *                       DEPTH,STRM(5,II),SFRQ(1,II),STRM(14,II),
      +                       STRM(13,II),STRM(12,II),
      *                       STRM(16,II),STRM(17,II),STRM(18,II)
+                     ELSE IF(IRTFLG.GT.0) THEN
+                       WRITE (IG3,271) GAGETM,STRM(15,II),STRM(9,II),
+     *                       DEPTH,STRM(5,II),SFRQ(1,II),STRM(14,II),
+     +                       STRM(13,II),STRM(12,II),STRM(24,II),
+     *                       STRM(16,II),STRM(17,II),STRM(18,II),
+     *                       STRM(30,II)
                      ELSE
                        WRITE (IG3,266) GAGETM,STRM(15,II),STRM(9,II),
      *                       DEPTH,STRM(5,II),SFRQ(1,II),STRM(14,II),
@@ -1045,6 +1060,7 @@ C
  260  FORMAT (4X,1PE14.7,2X,5(1PE14.7,2X))
  265  FORMAT (4X,1PE14.7,2X,4(1PE14.7,2X),7(1PE14.7,2X))
  266  FORMAT (4X,1PE14.7,2X,4(1PE14.7,2X),8(1PE14.7,2X))
+ 271  FORMAT (4X,1PE14.7,2X,4(1PE14.7,2X),9(1PE14.7,2X))
  270  FORMAT (4X,1PE14.7,2X,2(1PE14.7,2X),2(1PE14.7,2X))
  275  FORMAT (4X,1PE14.7,2X,5(1PE14.7,2X),3(1PE14.7,2X))
  280  FORMAT (4X,1PE14.7)

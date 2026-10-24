@@ -27,6 +27,7 @@ contains
     if (allocated(watab)) deallocate(watab, watabold)
     if (allocated(vks)) deallocate(vks, seepk, surfdep)
     if (allocated(surflux)) deallocate(surflux, surfluxbelow, surfseep)
+    if (allocated(soilheadd)) deallocate(soilheadd)
     if (allocated(gwpet)) deallocate(gwpet, landflag, ivertcon, wtbelow)
     if (allocated(pet_spec)) deallocate(pet_spec, extdp_spec, extwc_spec)
     if (allocated(ha_spec)) deallocate(ha_spec, hroot_spec, rootact_spec)
@@ -57,6 +58,8 @@ contains
     allocate(watab(n), watabold(n))
     allocate(vks(n), seepk(n), surfdep(n))
     allocate(surflux(n), surfluxbelow(n), surfseep(n))
+    allocate(soilheadd(n))
+    soilheadd = 0.0d0
     allocate(gwpet(n), landflag(n), ivertcon(n), wtbelow(n))
     allocate(pet_spec(n), extdp_spec(n), extwc_spec(n))
     allocate(ha_spec(n), hroot_spec(n), rootact_spec(n))
@@ -404,8 +407,9 @@ end subroutine GWF2UZF1BD
 
 subroutine uzf_nwt_solve(reset_state, Kkper)
   use UZF_NWT_MAP, only: nuzf, cell_ic, cell_ir, cell_k
-  use UZFCELL, only: solve, setgwpet, simgwet, setbelowpet, celbot, ivertcon
-  use GWFUZFMODULE, only: IETFLG, Iseepsupress
+  use UZFCELL, only: solve, setgwpet, simgwet, setbelowpet, celbot, ivertcon, &
+                     surfseep, landflag
+  use GWFUZFMODULE, only: IETFLG, Iseepsupress, SEEPOUT
   use GLOBAL, only: IBOUND, HNEW, RHS, HCOF, ISSFLG, IOUT
   use GWFBASMODULE, only: HDRY
   implicit none
@@ -457,6 +461,9 @@ subroutine uzf_nwt_solve(reset_state, Kkper)
       RHS(ic, ir, k) = RHS(ic, ir, k) + rhsadd
       HCOF(ic, ir, k) = HCOF(ic, ir, k) + hcofadd
     end if
+    ! The next soil-zone pass reads SEEPOUT. Keep it current during
+    ! formulation. The budget overwrites this after the time step.
+    if (reset_state .and. landflag(n) == 1) SEEPOUT(ic, ir) = real(surfseep(n))
   end do
 end subroutine uzf_nwt_solve
 

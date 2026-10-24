@@ -52,6 +52,8 @@ module UZFCELL
   double precision, allocatable :: watab(:), watabold(:)
   double precision, allocatable :: vks(:), seepk(:), surfdep(:)
   double precision, allocatable :: surflux(:), surfluxbelow(:), surfseep(:)
+  ! Lagged gravity-reservoir depth, in MODFLOW length, added to the land surface.
+  double precision, allocatable :: soilheadd(:)
   double precision, allocatable :: gwpet(:)
   integer, allocatable :: landflag(:), ivertcon(:)
   ! 1 when the water table is below this cell at the start of the time
@@ -756,6 +758,18 @@ contains
     seepk(icell) = sk
   end subroutine set_seepk
 
+  subroutine clear_uzf_soil_head()
+    if (allocated(soilheadd)) soilheadd = DZERO
+  end subroutine clear_uzf_soil_head
+
+  subroutine set_uzf_soil_head(icell, depth)
+    integer, intent(in) :: icell
+    double precision, intent(in) :: depth
+    if (.not. allocated(soilheadd)) return
+    if (icell < 1 .or. icell > size(soilheadd)) return
+    soilheadd(icell) = depth
+  end subroutine set_uzf_soil_head
+
   subroutine gwseep(icell, deriv, scale, hgwf, trhs, thcof, seep)
     ! -- dummy
     integer, intent(in) :: icell
@@ -766,7 +780,7 @@ contains
     double precision, intent(out) :: scale
     double precision, intent(in) :: hgwf
     ! -- local
-    double precision :: x, range, y, deriv1, d1, d2, Q
+    double precision :: x, range, y, deriv1, d1, d2, Q, pe
     !
     seep = DZERO
     deriv = DZERO
@@ -776,11 +790,16 @@ contains
     scale = DZERO
     Q = uzfarea(icell) * seepk(icell)
     range = surfdep(icell)
-    x = hgwf - celtop(icell)
+    ! The soil-zone head is the land surface plus the lagged gravity depth.
+    pe = celtop(icell)
+    if (allocated(soilheadd)) then
+      if (icell >= 1 .and. icell <= size(soilheadd)) pe = pe + soilheadd(icell)
+    end if
+    x = hgwf - pe
     call sCubicLinear(x, range, deriv1, y)
     scale = y
-    seep = scale * Q * (hgwf - celtop(icell)) / range
-    trhs = scale * Q * celtop(icell) / range
+    seep = scale * Q * x / range
+    trhs = scale * Q * pe / range
     thcof = -scale * Q / range
     d1 = -deriv1 * Q * x / range
     d2 = -scale * Q / range

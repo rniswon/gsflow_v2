@@ -580,6 +580,7 @@
       Excess = 0.0 ! dimension ngwcell
       FINF = 0.0
       IF ( is_draining==1 ) CALL Bin_percolation()
+      CALL set_soil_head()
 
       END FUNCTION prms2mfrun
 
@@ -753,3 +754,49 @@
       ENDDO
 
       END SUBROUTINE Bin_percolation
+
+!***********************************************************************
+!     set_soil_head - lagged gravity depth on each UZF land cell
+!     Grav_uz_depth is inches and already includes the previous
+!     iteration's groundwater discharge. The result is a length added
+!     to the land-surface elevation by UZF seepage.
+!***********************************************************************
+      SUBROUTINE set_soil_head()
+      USE PRMS_MODULE, ONLY: Nhrucell, Ngwcell, Gvr_cell_id, Gvr_cell_pct
+      USE PRMS_SOILZONE, ONLY: Grav_uz_depth
+      USE GSFMODFLOW, ONLY: Mfl_to_inch
+      USE GLOBAL, ONLY: NCOL
+      USE UZF_NWT_MAP, ONLY: nuzf, nuzf_built, cell_ic, cell_ir
+      USE UZFCELL, ONLY: landflag, clear_uzf_soil_head, set_uzf_soil_head
+      IMPLICIT NONE
+      INTEGER :: i, n, icell
+      DOUBLE PRECISION :: pct
+      DOUBLE PRECISION, ALLOCATABLE :: depth(:), wgt(:)
+!***********************************************************************
+      CALL clear_uzf_soil_head()
+      IF ( nuzf_built==0 .OR. nuzf<1 ) RETURN
+      IF ( .NOT.ALLOCATED(Grav_uz_depth) ) RETURN
+      IF ( Ngwcell<1 .OR. NCOL<1 ) RETURN
+      ALLOCATE ( depth(Ngwcell), wgt(Ngwcell) )
+      depth = 0.0D0
+      wgt = 0.0D0
+      DO i = 1, Nhrucell
+        IF ( Grav_uz_depth(i)<=0.0 ) CYCLE
+        icell = Gvr_cell_id(i)
+        IF ( icell<1 .OR. icell>Ngwcell ) CYCLE
+        pct = DBLE( Gvr_cell_pct(i) )
+        IF ( pct<=0.0D0 ) CYCLE
+        depth(icell) = depth(icell) + DBLE(Grav_uz_depth(i))*pct
+        wgt(icell) = wgt(icell) + pct
+      ENDDO
+      DO icell = 1, Ngwcell
+        IF ( wgt(icell)>0.0D0 ) depth(icell) = &
+     &      (depth(icell)/wgt(icell)) / DBLE(Mfl_to_inch)
+      ENDDO
+      DO n = 1, nuzf
+        IF ( landflag(n)/=1 ) CYCLE
+        icell = (cell_ir(n)-1)*NCOL + cell_ic(n)
+        IF ( icell<1 .OR. icell>Ngwcell ) CYCLE
+        IF ( depth(icell)>0.0D0 ) CALL set_uzf_soil_head(n, depth(icell))
+      ENDDO
+      END SUBROUTINE set_soil_head

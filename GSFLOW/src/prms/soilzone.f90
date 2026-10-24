@@ -64,7 +64,7 @@
       INTEGER, SAVE, ALLOCATABLE :: Soil_saturated(:)
 !   GSFLOW Declared Variables
       DOUBLE PRECISION, SAVE :: Basin_gvr2sm
-      REAL, SAVE, ALLOCATABLE :: Sm2gw_grav(:), Gw2sm_grav(:)
+      REAL, SAVE, ALLOCATABLE :: Sm2gw_grav(:), Gw2sm_grav(:), Grav_uz_depth(:)
       REAL, SAVE, ALLOCATABLE :: Gvr2sm(:), Grav_gwin(:)
 !   Declared Parameters
       INTEGER, SAVE, ALLOCATABLE :: Soil_type(:), Gvr_hru_id(:)
@@ -391,6 +391,8 @@
       IF ( GSFLOW_flag==ACTIVE ) THEN
         IF ( Nhrucell<-1 ) CALL error_stop('dimension nhrucell not specified > 0', ERROR_dim)
         ALLOCATE ( Sm2gw_grav(Nhrucell) )
+        ALLOCATE ( Grav_uz_depth(Nhrucell) )
+        Grav_uz_depth = 0.0
         CALL declvar_real(MODNAME, 'sm2gw_grav', 'nhrucell', Nhrucell, &
      &       'Drainage from each gravity reservoir to each MODFLOW cell', &
      &       'inches', Sm2gw_grav)
@@ -833,6 +835,7 @@
           ENDIF
         ENDIF
         Sm2gw_grav = 0.0
+        IF ( ALLOCATED(Grav_uz_depth) ) Grav_uz_depth = 0.0
         IF ( activeHru_inactiveCell_flag == ACTIVE ) THEN
           Basin_soil_to_prmsgw = 0.0D0
           Basin_sz2gwprms = 0.0D0
@@ -1697,7 +1700,7 @@
       USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug
       USE PRMS_FLOWVARS, ONLY: Gravity_stor_res
       USE PRMS_SOILZONE, ONLY: Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, &
-     &    Gw2sm_grav, Gvr_hru_pct_adjusted
+     &    Gw2sm_grav, Gvr_hru_pct_adjusted, Grav_uz_depth
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
       IMPLICIT NONE
 ! Functions
@@ -1736,6 +1739,15 @@
         input = Gvr_maxin + Gw2sm_grav(igvr)
         depth = Gravity_stor_res(igvr) + input
         IF ( depth>0.0 .AND. Capacity>0.0 ) CALL check_gvr_sm(Capacity, depth, frac, Gvr2sm, input)
+!       Water depth after the lagged groundwater discharge is added.
+!       Interflow and ssr2gw have not removed it yet.
+        IF ( ALLOCATED(Grav_uz_depth) ) THEN
+          IF ( depth>0.0 ) THEN
+            Grav_uz_depth(igvr) = depth
+          ELSE
+            Grav_uz_depth(igvr) = 0.0
+          ENDIF
+        ENDIF
 
         IF ( Compute_lateral==ACTIVE ) THEN
           extra_water = MAX( 0.0, depth-Pref_flow_thrsh )

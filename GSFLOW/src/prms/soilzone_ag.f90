@@ -468,6 +468,7 @@
       ENDIF
       IF ( timestep_start_flag == ACTIVE ) timestep_start_flag = OFF
       IF ( GSFLOW_flag==ACTIVE ) Sm2gw_grav = 0.0
+      IF ( ALLOCATED(Grav_uz_depth) ) Grav_uz_depth = 0.0
       !max_irrigation = 0.0
       Ag_actet = 0.0
       IF ( activeHru_inactiveCell_flag == ACTIVE ) THEN
@@ -1327,7 +1328,7 @@
       USE PRMS_MODULE, ONLY: Dprst_flag, Print_debug
       USE PRMS_FLOWVARS, ONLY: Gravity_stor_res
       USE PRMS_SOILZONE, ONLY: Sm2gw_grav, Hru_gvr_count, Hru_gvr_index, &
-     &    Gw2sm_grav, Gvr_hru_pct_adjusted
+     &    Gw2sm_grav, Gvr_hru_pct_adjusted, Grav_uz_depth
       USE PRMS_SRUNOFF, ONLY: Dprst_seep_hru
       IMPLICIT NONE
 ! Functions
@@ -1368,6 +1369,15 @@
         depth = Gravity_stor_res(igvr) + input
         IF ( depth > 0.0 .AND. Ag_capacity > 0.0 ) CALL check_gvr_sm(Ag_capacity, depth, frac, Gvr2ag, input)
         IF ( depth>0.0 .AND. Capacity>0.0 ) CALL check_gvr_sm(Capacity, depth, frac, Gvr2sm, input)
+!       Water depth after the lagged groundwater discharge is added.
+!       Interflow and ssr2gw have not removed it yet.
+        IF ( ALLOCATED(Grav_uz_depth) ) THEN
+          IF ( depth>0.0 ) THEN
+            Grav_uz_depth(igvr) = depth
+          ELSE
+            Grav_uz_depth(igvr) = 0.0
+          ENDIF
+        ENDIF
 
         IF ( Compute_lateral==ACTIVE ) THEN
           extra_water = MAX( 0.0, depth-Pref_flow_thrsh )
