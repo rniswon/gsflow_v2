@@ -767,13 +767,12 @@
       USE GSFMODFLOW, ONLY: Mfl_to_inch
       USE GLOBAL, ONLY: NCOL
       USE UZF_NWT_MAP, ONLY: nuzf, nuzf_built, cell_ic, cell_ir
-      USE UZFCELL, ONLY: landflag, clear_uzf_soil_head, set_uzf_soil_head
+      USE UZFCELL, ONLY: landflag, set_uzf_soil_head
       IMPLICIT NONE
       INTEGER :: i, n, icell
       DOUBLE PRECISION :: pct
       DOUBLE PRECISION, ALLOCATABLE :: depth(:), wgt(:)
 !***********************************************************************
-      CALL clear_uzf_soil_head()
       IF ( nuzf_built==0 .OR. nuzf<1 ) RETURN
       IF ( .NOT.ALLOCATED(Grav_uz_depth) ) RETURN
       IF ( Ngwcell<1 .OR. NCOL<1 ) RETURN
@@ -796,7 +795,10 @@
       DO n = 1, nuzf
         IF ( landflag(n)/=1 ) CYCLE
         icell = (cell_ir(n)-1)*NCOL + cell_ic(n)
-        IF ( icell<1 .OR. icell>Ngwcell ) CYCLE
-        IF ( depth(icell)>0.0D0 ) CALL set_uzf_soil_head(n, depth(icell))
+        IF ( icell>=1 .AND. icell<=Ngwcell ) THEN
+          CALL set_uzf_soil_head(n, depth(icell))
+        ELSE
+          CALL set_uzf_soil_head(n, 0.0D0)
+        ENDIF
       ENDDO
       END SUBROUTINE set_soil_head

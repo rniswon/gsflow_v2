@@ -123,6 +123,8 @@ contains
       y = DONE
       dydx = DZERO
     end if
+    ! dydx above is dy/d(x/range). Callers need dy/dx.
+    dydx = dydx / s
   end subroutine sCubicLinear
 
   subroutine sCubic(x, range, dydx, y)
@@ -763,11 +765,21 @@ contains
   end subroutine clear_uzf_soil_head
 
   subroutine set_uzf_soil_head(icell, depth)
+    ! Blend toward the new gravity depth. The seepage face conductance is
+    ! K*area/surfdep, so a full update would multiply the depth error by
+    ! about K*dt/surfdep and the outer iteration would reverse each pass.
+    ! The relaxed value has the same solution once the depth stops changing.
     integer, intent(in) :: icell
     double precision, intent(in) :: depth
+    double precision :: gain, omega, range
     if (.not. allocated(soilheadd)) return
     if (icell < 1 .or. icell > size(soilheadd)) return
-    soilheadd(icell) = depth
+    range = surfdep(icell)
+    if (range < DPREC) range = DPREC
+    gain = seepk(icell) * dble(DELT) / range
+    if (gain < DZERO) gain = DZERO
+    omega = DONE / (DONE + gain)
+    soilheadd(icell) = soilheadd(icell) + omega * (depth - soilheadd(icell))
   end subroutine set_uzf_soil_head
 
   subroutine gwseep(icell, deriv, scale, hgwf, trhs, thcof, seep)

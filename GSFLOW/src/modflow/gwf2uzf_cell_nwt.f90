@@ -461,11 +461,46 @@ subroutine uzf_nwt_solve(reset_state, Kkper)
       RHS(ic, ir, k) = RHS(ic, ir, k) + rhsadd
       HCOF(ic, ir, k) = HCOF(ic, ir, k) + hcofadd
     end if
-    ! The next soil-zone pass reads SEEPOUT. Keep it current during
-    ! formulation. The budget overwrites this after the time step.
+    ! Formulation value only. UZF_NWT_SEEPOUT replaces it after the solve.
     if (reset_state .and. landflag(n) == 1) SEEPOUT(ic, ir) = real(surfseep(n))
   end do
 end subroutine uzf_nwt_solve
+
+
+subroutine UZF_NWT_SEEPOUT()
+  ! Replace SEEPOUT with discharge at the head from the latest solve.
+  ! gsflow_mf2prms reads SEEPOUT for the next soil-zone pass.
+  use UZF_NWT_MAP, only: nuzf, nuzf_built, cell_ic, cell_ir, cell_k
+  use UZFCELL, only: landflag, surfseep, gwseep
+  use GWFUZFMODULE, only: SEEPOUT
+  use GLOBAL, only: IBOUND, HNEW
+  use GWFBASMODULE, only: HDRY
+  implicit none
+  integer :: n, ic, ir, k
+  double precision :: h, seep, deriv, scale, trhs, thcof
+  if (nuzf_built == 0 .or. nuzf < 1) return
+  if (.not. associated(SEEPOUT)) return
+  do n = 1, nuzf
+    if (landflag(n) /= 1) cycle
+    ic = cell_ic(n)
+    ir = cell_ir(n)
+    k = cell_k(n)
+    if (IBOUND(ic, ir, k) == 0) then
+      surfseep(n) = 0.0d0
+      SEEPOUT(ic, ir) = 0.0
+      cycle
+    end if
+    h = HNEW(ic, ir, k)
+    if (h == dble(HDRY) .or. h >= 1.0d29) then
+      surfseep(n) = 0.0d0
+      SEEPOUT(ic, ir) = 0.0
+      cycle
+    end if
+    call gwseep(n, deriv, scale, h, trhs, thcof, seep)
+    surfseep(n) = seep
+    SEEPOUT(ic, ir) = real(seep)
+  end do
+end subroutine UZF_NWT_SEEPOUT
 
 
 subroutine uzf_nwt_apply_land()
