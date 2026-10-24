@@ -815,9 +815,6 @@ c            END IF
              ITREAL2 = ITREAL
           ENDIF
           IF(IERR.EQ.1) CALL USTOP(' ')
-C     Seepage at the updated head. The value formed before the solve
-C     overstates discharge when the water table is above the soil head.
-          IF(IUNIT(55).GT.0) CALL UZF_NWT_SEEPOUT()
 C
 C-------ENSURE CONVERGENCE OF SWR - BASEFLOW CHANGES LESS THAN TOLF - JDH
             IF(IUNIT(64).GT.0) THEN

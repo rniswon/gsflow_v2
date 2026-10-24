@@ -765,21 +765,13 @@ contains
   end subroutine clear_uzf_soil_head
 
   subroutine set_uzf_soil_head(icell, depth)
-    ! Blend toward the new gravity depth. The seepage face conductance is
-    ! K*area/surfdep, so a full update would multiply the depth error by
-    ! about K*dt/surfdep and the outer iteration would reverse each pass.
-    ! The relaxed value has the same solution once the depth stops changing.
+    ! Full lagged gravity depth. The next groundwater pass sees this
+    ! value; it is not blended.
     integer, intent(in) :: icell
     double precision, intent(in) :: depth
-    double precision :: gain, omega, range
     if (.not. allocated(soilheadd)) return
     if (icell < 1 .or. icell > size(soilheadd)) return
-    range = surfdep(icell)
-    if (range < DPREC) range = DPREC
-    gain = seepk(icell) * dble(DELT) / range
-    if (gain < DZERO) gain = DZERO
-    omega = DONE / (DONE + gain)
-    soilheadd(icell) = soilheadd(icell) + omega * (depth - soilheadd(icell))
+    soilheadd(icell) = depth
   end subroutine set_uzf_soil_head
 
   subroutine gwseep(icell, deriv, scale, hgwf, trhs, thcof, seep)
@@ -792,36 +784,49 @@ contains
     double precision, intent(out) :: scale
     double precision, intent(in) :: hgwf
     ! -- local
-    double precision :: x, range, y, deriv1, d1, d2, Q, pe
+    double precision :: depth, thick, csepmx, t, f, dfdt, dqseepdh, land
+    double precision, parameter :: SEEP_SMOOTH = 1.0d-2
+    double precision, parameter :: FKSEEP = 1.0d0
     !
     seep = DZERO
     deriv = DZERO
-    deriv1 = DZERO
-    d1 = DZERO
-    d2 = DZERO
+    trhs = DZERO
+    thcof = DZERO
     scale = DZERO
-    Q = uzfarea(icell) * seepk(icell)
-    range = surfdep(icell)
-    ! The soil-zone head is the land surface plus the lagged gravity depth.
-    pe = celtop(icell)
+    ! Same discharge face as GSFLOW-USG. Conductance is area / (0.5 *
+    ! thickness) with unit conductivity. The ramp is 1 cm. SURFDEP stays
+    ! an infiltration property. A land cell stores its top half of
+    ! SURFDEP below the land surface, so the face is put back on the
+    ! land surface and then raised by the lagged gravity depth.
+    land = celtop(icell)
+    thick = land - celbot(icell)
+    if (landflag(icell) == 1) then
+      land = land + DHALF * surfdep(icell)
+      thick = thick + DHALF * surfdep(icell)
+    end if
+    depth = hgwf - land
     if (allocated(soilheadd)) then
-      if (icell >= 1 .and. icell <= size(soilheadd)) pe = pe + soilheadd(icell)
+      if (icell >= 1 .and. icell <= size(soilheadd)) depth = depth - soilheadd(icell)
     end if
-    x = hgwf - pe
-    call sCubicLinear(x, range, deriv1, y)
-    scale = y
-    seep = scale * Q * x / range
-    trhs = scale * Q * pe / range
-    thcof = -scale * Q / range
-    d1 = -deriv1 * Q * x / range
-    d2 = -scale * Q / range
-    deriv = d1 + d2
-    if (seep < DZERO) then
-      seep = DZERO
-      deriv = DZERO
-      trhs = DZERO
-      thcof = DZERO
+    if (thick <= DZERO .or. uzfarea(icell) <= DZERO) return
+    if (depth <= DZERO) return
+    csepmx = FKSEEP * uzfarea(icell) / (DHALF * thick)
+    if (csepmx <= DZERO) return
+    if (depth < SEEP_SMOOTH) then
+      t = depth / SEEP_SMOOTH
+      f = DTWO * t * t - t * t * t
+      dfdt = DFOUR * t - DTHREE * t * t
+      seep = csepmx * SEEP_SMOOTH * f
+      dqseepdh = csepmx * dfdt
+      scale = f
+    else
+      seep = csepmx * depth
+      dqseepdh = csepmx
+      scale = DONE
     end if
+    ! deriv stays zero. The caller adds thcof to HCOF and -trhs to RHS.
+    thcof = -dqseepdh
+    trhs = dqseepdh * hgwf - seep
   end subroutine gwseep
 
 
