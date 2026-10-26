@@ -786,18 +786,18 @@ contains
     ! -- local
     double precision :: depth, thick, csepmx, t, f, dfdt, dqseepdh, land
     double precision, parameter :: SEEP_SMOOTH = 1.0d-2
-    double precision, parameter :: FKSEEP = 1.0d0
     !
     seep = DZERO
     deriv = DZERO
     trhs = DZERO
     thcof = DZERO
     scale = DZERO
-    ! Same discharge face as GSFLOW-USG. Conductance is area / (0.5 *
-    ! thickness) with unit conductivity. The ramp is 1 cm. SURFDEP stays
-    ! an infiltration property. A land cell stores its top half of
-    ! SURFDEP below the land surface, so the face is put back on the
-    ! land surface and then raised by the lagged gravity depth.
+    ! Same discharge face as GSFLOW-USG. Conductance is K*area / (0.5 *
+    ! thickness) with K = seepk (cell vertical K, same as legacy gwseep).
+    ! The ramp is 1 cm. SURFDEP stays an infiltration property. A land
+    ! cell stores its top half of SURFDEP below the land surface, so the
+    ! face is put back on the land surface and then raised by the lagged
+    ! gravity depth.
     land = celtop(icell)
     thick = land - celbot(icell)
     if (landflag(icell) == 1) then
@@ -810,7 +810,7 @@ contains
     end if
     if (thick <= DZERO .or. uzfarea(icell) <= DZERO) return
     if (depth <= DZERO) return
-    csepmx = FKSEEP * uzfarea(icell) / (DHALF * thick)
+    csepmx = seepk(icell) * uzfarea(icell) / (DHALF * thick)
     if (csepmx <= DZERO) return
     if (depth < SEEP_SMOOTH) then
       t = depth / SEEP_SMOOTH
