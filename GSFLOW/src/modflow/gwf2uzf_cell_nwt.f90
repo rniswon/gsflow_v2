@@ -1,8 +1,9 @@
 !> @brief NWT driver for the cell unsaturated-zone solver.
 !!
-!! One profile is stored for each active UZF layer. Infiltration is
-!! applied only to the land-surface cell, and the result is written to
-!! the structured right-hand side and conductance.
+!! One profile is stored for each active MODFLOW layer from NUZTOP through
+!! NLAY (NUZTOP = land-surface layer when IUZFOPT > 0). Infiltration is
+!! applied only on the land-surface profile; recharge to GW uses the cell
+!! that contains the water table (see freeze_rech in uzfcell_nwt.f90).
 module UZF_NWT_MAP
   integer, save :: nuzf = 0
   integer, save :: nwave = 0
@@ -97,7 +98,8 @@ subroutine UZF_NWT_BUILD()
   use UZFCELL, only: setdata, sethead, setwaves, set_seepk, get_wcnew, &
                      ivertcon, nwav, wcnew, wcold, celbot
   use GWFUZFMODULE, only: IUZFBND, NSETS, NTRAIL, SURFDEP, Iseepreject, &
-                          SURFK, VKS, EPS, THTS, THTR, THTI, LAYNUM, IWCRD
+                          SURFK, VKS, EPS, THTS, THTR, THTI, LAYNUM, IWCRD, &
+                          NUZTOP
   use GLOBAL, only: NCOL, NROW, NLAY, IBOUND, HNEW, DELR, DELC, BOTM, IOUT
   use GWFBASMODULE, only: HDRY
   implicit none
@@ -191,8 +193,9 @@ subroutine UZF_NWT_BUILD()
     wcnew(n) = get_wcnew(n)
     wcold(n) = wcnew(n)
   end do
-  write(IOUT, '(1X,A,I8,A)') 'UZF CELL PROFILES BUILT:', nuzf, &
-    ' (ONE PER ACTIVE LAYER)'
+  write(IOUT, '(1X,A,I8,A,I3,A,I3,A)') &
+    'UZF CELL PROFILES BUILT:', nuzf, &
+    ' (LAYERS ', NUZTOP, ' THROUGH ', NLAY, ' WHERE ACTIVE)'
 end subroutine UZF_NWT_BUILD
 
 
@@ -207,7 +210,7 @@ subroutine GWF2UZF1AD(In, Kkper, Kkstp, Igrid)
   use UZF_NWT_MAP, only: nuzf, cell_ic, cell_ir, cell_k
   use UZFCELL, only: sethead, advance, watab, watabold, celbot, wtbelow, &
                      wcnew, wcold
-  use GWFUZFMODULE, only: NUZTOP
+  use GWFUZFMODULE, only: NUZTOP, IUZFOPT
   use GLOBAL, only: IBOUND, HNEW
   use GWFBASMODULE, only: HDRY
   implicit none
@@ -216,7 +219,8 @@ subroutine GWF2UZF1AD(In, Kkper, Kkstp, Igrid)
   double precision :: h
 
   call SGWF2UZF1PNT(Igrid)
-  if (NUZTOP == 4 .and. Kkper + Kkstp > 2) call SETLAY(Kkstp)
+  ! Legacy recharge option 4 only; by-cell UZF routes recharge via the solver.
+  if (IUZFOPT <= 0 .and. NUZTOP == 4 .and. Kkper + Kkstp > 2) call SETLAY(Kkstp)
   if (nuzf == 0) return
   do n = 1, nuzf
     ic = cell_ic(n)
@@ -523,19 +527,29 @@ end subroutine uzf_nwt_apply_land
 
 
 subroutine uzf_nwt_limits(ic, ir, k1, k2)
-  use GWFUZFMODULE, only: NUZTOP, IUZFBND
+  ! By-cell UZF: NUZTOP is the MODFLOW layer index of the land surface.
+  ! k1/k2 are the first and last layer in the vertical UZF stack for this
+  ! column (recharge coupling uses the water-table cell, not NUZTOP).
+  use GWFUZFMODULE, only: NUZTOP, IUZFOPT, IUZFBND
   use GLOBAL, only: NLAY
   implicit none
   integer, intent(in) :: ic, ir
   integer, intent(out) :: k1, k2
-  k1 = 1
-  k2 = NLAY
-  if (NUZTOP == 1) then
-    k2 = 1
-  else if (NUZTOP == 2) then
-    k1 = abs(IUZFBND(ic, ir))
+  if (IUZFOPT > 0) then
+    k1 = NUZTOP
     if (k1 < 1) k1 = 1
     if (k1 > NLAY) k1 = NLAY
+    k2 = NLAY
+  else
+    k1 = 1
+    k2 = NLAY
+    if (NUZTOP == 1) then
+      k2 = 1
+    else if (NUZTOP == 2) then
+      k1 = abs(IUZFBND(ic, ir))
+      if (k1 < 1) k1 = 1
+      if (k1 > NLAY) k1 = NLAY
+    end if
   end if
 end subroutine uzf_nwt_limits
 

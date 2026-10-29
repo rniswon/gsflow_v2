@@ -442,7 +442,18 @@ C8b-----Set flag for determining if FINF will be provided by PRMS.
 C       A value of zero means that FINF will not be set by PRMS.
       IGSFLOW = 0
       
-      IF ( NUZTOP.GE.1 .AND. NUZTOP.LE.5 ) THEN
+      IF ( iuzflg .EQ. 1 ) THEN
+        IF ( NUZTOP.GE.1 .AND. NUZTOP.LE.NLAY ) THEN
+          WRITE (IOUT, 9193) NUZTOP
+ 9193     FORMAT (1X, 'CELL UZF: NUZTOP = ', I5, ' IS LAND-SURFACE ',
+     +            'MODFLOW LAYER; RECHARGE TO GW USES WATER TABLE')
+        ELSE
+          WRITE (IOUT, 9194) NUZTOP, NLAY
+ 9194     FORMAT (1X, 'ILLEGAL NUZTOP FOR CELL UZF (NUZTOP = ', I5,
+     +            ', NLAY = ', I5, ') -- SIMULATION ABORTING')
+          CALL USTOP(' ')
+        END IF
+      ELSE IF ( NUZTOP.GE.1 .AND. NUZTOP.LE.5 ) THEN
         IF ( NUZTOP.EQ.1 ) WRITE (IOUT, 9009)
  9009   FORMAT (' OPTION 1 -- RECHARGE IN UZF TO TOP LAYER ONLY ')
         IF ( NUZTOP.EQ.2 ) WRITE (IOUT, 9010)
