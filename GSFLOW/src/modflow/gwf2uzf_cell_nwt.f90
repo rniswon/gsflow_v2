@@ -156,6 +156,10 @@ subroutine UZF_NWT_BUILD()
         area = dble(DELR(ic)) * dble(DELC(ir))
         sd = 0.0d0
         if (prev == 0) then
+          ! GSFLOW land surface / surface leakage use model-top elevation.
+          ! When upper MODFLOW layers are inactive, k may be deep but PRMS
+          ! FINF and gwseep still reference the top of the grid (BOTM L=0).
+          top = dble(BOTM(ic, ir, 0))
           sd = dble(SURFDEP)
           if (sd > 0.9d0 * (top - bot)) sd = 0.9d0 * (top - bot)
           if (sd < 0.0d0) sd = 0.0d0
