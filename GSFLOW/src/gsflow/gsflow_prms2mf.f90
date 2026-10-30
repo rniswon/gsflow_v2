@@ -671,7 +671,8 @@
       SUBROUTINE Bin_percolation()
       USE GSFPRMS2MF, ONLY: Excess, Cell_drain_rate, Net_sz2gw, finf_cell
       USE GSFMODFLOW, ONLY: Cellarea, Gwc_row, Gwc_col !, Mft_to_days
-      USE GWFUZFMODULE, ONLY: FINF, VKS, FBINS, IUZFBND, NUZTOP, SURFDEP
+      USE GWFUZFMODULE, ONLY: FINF, VKS, FBINS, IUZFBND, NUZTOP, SURFDEP, &
+                              LAYNUM, IUZFOPT
       USE GLOBAL, ONLY: HNEW, BOTM, IBOUND, NLAY
       USE PRMS_MODULE, ONLY: Ngwcell
       IMPLICIT NONE
@@ -689,8 +690,25 @@
           icol = Gwc_col(icell)
           land = ABS(IUZFBND(icol, irow))
           IF ( NUZTOP==1 ) THEN
+! Physical land surface (PRMS FINF is per column at the top of the stack).
             celtop = BOTM(icol, irow, 0) - 0.5 * SURFDEP
-!          ELSEIF ( NUZTOP == 3 .OR. NUZTOP == 5 ) THEN
+! For WT/binning use uppermost active layer — same as cell-UZF land profile
+! (inactive L1 over active L2 is common). LAYNUM is set in UZF_NWT_BUILD.
+            land = 1
+            IF ( IUZFOPT.GT.0 .AND. LAYNUM(icol, irow).GT.0 ) THEN
+              land = LAYNUM(icol, irow)
+            ELSE
+              ill = 1
+              DO WHILE ( ill.LE.NLAY )
+                IF ( IBOUND(icol, irow, ill).GT.0 ) THEN
+                  land = ill
+                  EXIT
+                ELSE IF ( IBOUND(icol, irow, ill).LT.0 ) THEN
+                  EXIT
+                END IF
+                ill = ill + 1
+              END DO
+            END IF
           ELSEIF ( NUZTOP == 5 ) THEN
             ill = 1
             land = 1
@@ -707,6 +725,7 @@
           ELSE
             celtop = BOTM(icol, irow, land-1) - 0.5 * SURFDEP
           END IF
+          IF ( IBOUND(icol, irow, land).LE.0 ) CYCLE
 !-----------------------------------------------------------------------
 ! VKS in L/T, FINF in L/T
 !-----------------------------------------------------------------------

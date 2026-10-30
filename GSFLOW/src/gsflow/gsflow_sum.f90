@@ -781,7 +781,8 @@
      &          Precip_Q, NetBoundaryFlow2Sat_Q, NetWellFlow_Q, BoundaryStreamFlow_Q, &
      &          CanopyEvap_Q, SnowEvap_Q, ImpervEvap_Q, DprstEvap_Q, CapET_Q, SwaleEvap_Q, UnsatET_Q, SatET_Q, LakeEvap_Q, &
      &          DunnInterflow2Lake_Q, HortSroff2Lake_Q, Lake2Unsat_Q, LakeExchng2Sat_Q, &
-     &          SoilDrainage2Unsat_Q, Sat2Grav_Q, RechargeUnsat2Sat_Q, Infil2Soil_Q, KKITER
+     &          PotGravDrn2Unsat_Q, UnsatDrainageExcess_Q, SoilDrainage2Unsat_Q, Sat2Grav_Q, &
+     &          RechargeUnsat2Sat_Q, Infil2Soil_Q, KKITER
       ENDIF
 
 !     DANGER strmin set to zero
@@ -945,7 +946,7 @@
      &       ',Precip_Q,NetBoundaryFlow2Sat_Q,NetWellFlow_Q,BoundaryStreamFlow_Q', &
      &       ',CanopyEvap_Q,SnowEvap_Q,ImpervEvap_Q,DprstEvap_Q,CapET_Q,SwaleEvap_Q,UnsatET_Q,SatET_Q,LakeEvap_Q', &
      &       ',DunnInterflow2Lake_Q,HortSroff2Lake_Q,Lake2Unsat_Q,LakeExchng2Sat_Q', &
-     &       ',SoilDrainage2Unsat_Q,Sat2Grav_Q,RechargeUnsat2Sat_Q,Infil2Soil_Q,KKITER')
+     &       ',PotGravDrn2Unsat_Q,UnsatDrainageExcess_Q,SoilDrainage2Unsat_Q,Sat2Grav_Q,RechargeUnsat2Sat_Q,Infil2Soil_Q,KKITER')
       END SUBROUTINE GSF_HEADERS
 
 !***********************************************************************
