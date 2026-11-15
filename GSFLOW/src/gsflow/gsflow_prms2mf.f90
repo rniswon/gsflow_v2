@@ -671,18 +671,19 @@
       SUBROUTINE Bin_percolation()
       USE GSFPRMS2MF, ONLY: Excess, Cell_drain_rate, Net_sz2gw, finf_cell
       USE GSFMODFLOW, ONLY: Cellarea, Gwc_row, Gwc_col !, Mft_to_days
-      USE GWFUZFMODULE, ONLY: FINF, VKS, FBINS, IUZFBND, NUZTOP, SURFDEP, &
+      USE GWFUZFMODULE, ONLY: FINF, VKS, IUZFBND, NUZTOP, SURFDEP, &
                               LAYNUM, IUZFOPT
+      USE UZFCELL, ONLY: finf_binned
       USE GLOBAL, ONLY: HNEW, BOTM, IBOUND, NLAY
       USE PRMS_MODULE, ONLY: Ngwcell
       IMPLICIT NONE
-      INTRINSIC :: ABS
+      INTRINSIC :: ABS, SNGL, DBLE
 ! Local Variables
-      INTEGER :: icell, irow, icol, ij1, ij2, land, ij2m1, ill
+      INTEGER :: icell, irow, icol, land, ill
       REAL :: finfvks, finfprms, finf_temp, celtop
 !***********************************************************************
 !-----------------------------------------------------------------------
-! loop on cells
+! loop on cells — PRMS gravity drainage snapped through UZFCELL bin_finf
 !-----------------------------------------------------------------------
       DO icell = 1, Ngwcell
         IF ( Cell_drain_rate(icell)>0.0 ) THEN
@@ -727,41 +728,12 @@
           END IF
           IF ( IBOUND(icol, irow, land).LE.0 ) CYCLE
 !-----------------------------------------------------------------------
-! VKS in L/T, FINF in L/T
+! VKS / bin via bin_finf (same routine used by uzf_nwt_apply_land)
 !-----------------------------------------------------------------------
           finfvks = VKS(icol, irow)
           finfprms = Cell_drain_rate(icell)
-          IF ( finfprms>finfvks ) THEN
-! reject part, as infiltration exceeds VKS, don't bin
-            finf_temp = finfvks
-! bin when water table is below celtop
-          ELSE IF ( HNEW( icol, irow, land )<celtop ) THEN
-!-----------------------------------------------------------------------
-! can accept all infiltration, bin to avoid too many waves.
-!-----------------------------------------------------------------------
-            finf_temp = finfprms
-            IF ( finf_temp<FBINS(1) ) THEN
-              finf_temp = 0.0       ! reject small values
-            ELSE
-              IF ( finf_temp<FBINS(25) ) THEN
-                ij1 = 25
-                ij2 = 1
-              ELSE
-                ij1 = 51
-                ij2 = 25
-              ENDIF
-              ij2m1 = ij2 - 1
-              DO WHILE ( ij1>ij2m1 )
-                IF ( finf_temp>=FBINS(ij1) ) THEN
-                  finf_temp = FBINS(ij1)  ! set to bin value
-                  EXIT
-                ENDIF
-                ij1 = ij1 - 1
-              ENDDO
-            ENDIF
-          ELSE
-            finf_temp = finfprms
-          ENDIF
+          finf_temp = SNGL(finf_binned(DBLE(finfprms), DBLE(finfvks), &
+     &                              HNEW(icol, irow, land), DBLE(celtop)))
 !-----------------------------------------------------------------------
 ! Put excess >VKS + bin difference in Excess array
 !-----------------------------------------------------------------------

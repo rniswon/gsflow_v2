@@ -73,6 +73,7 @@ module UZFCELL
   ! Log-spaced infiltration bins (L/T). PRMS drainage is snapped to these
   ! rates so small changes do not create a new kinematic wave every step.
   double precision :: fbins(51) = 0.0d0
+  integer, save, public :: nact_finf_bins = 51
 
   double precision, allocatable :: uzth_iter(:), uzdp_iter(:)
   double precision, allocatable :: uzfl_iter(:), uzsp_iter(:)
@@ -455,6 +456,53 @@ contains
       end if
     end if
   end function bin_finf
+
+
+  function bin_finf20(finfprms, vks_in, hgwf, celtop_in) result(finf_temp)
+    ! Same snapping rules as bin_finf, but 20 log-spaced bins (fbins(1:20)).
+    ! Upper bin edge is model max VKS, not the legacy 86400 m/d nature cap.
+    double precision, intent(in) :: finfprms, vks_in, hgwf, celtop_in
+    double precision :: finf_temp
+    integer, parameter :: nb = 20
+    integer, parameter :: imid = nb / 2
+    integer :: ij1, ij2, ij2m1
+    finf_temp = finfprms
+    if (finfprms > vks_in) then
+      finf_temp = vks_in
+    else if (hgwf < celtop_in) then
+      if (finf_temp < fbins(1)) then
+        finf_temp = DZERO
+      else
+        if (finf_temp < fbins(imid)) then
+          ij1 = imid
+          ij2 = 1
+        else
+          ij1 = nb
+          ij2 = imid
+        end if
+        ij2m1 = ij2 - 1
+        do while (ij1 > ij2m1)
+          if (finf_temp >= fbins(ij1)) then
+            finf_temp = fbins(ij1)
+            exit
+          end if
+          ij1 = ij1 - 1
+        end do
+      end if
+    end if
+  end function bin_finf20
+
+
+  function finf_binned(finfprms, vks_in, hgwf, celtop_in) result(finf_temp)
+    ! Route to bin_finf20 when nact_finf_bins == 20, else legacy 51-bin bin_finf.
+    double precision, intent(in) :: finfprms, vks_in, hgwf, celtop_in
+    double precision :: finf_temp
+    if (nact_finf_bins == 20) then
+      finf_temp = bin_finf20(finfprms, vks_in, hgwf, celtop_in)
+    else
+      finf_temp = bin_finf(finfprms, vks_in, hgwf, celtop_in)
+    end if
+  end function finf_binned
 
 
   subroutine setdatauzfarea(icell, areamult)

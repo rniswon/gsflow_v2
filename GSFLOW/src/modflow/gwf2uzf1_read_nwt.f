@@ -971,6 +971,10 @@ C
         IF ( ABS(IUZFOPT).NE.1 ) CALL SGWF2UZF1VKS(Iunithuf, Iunitlpf,
      +                                             Iunitupw)
       END IF
+C30-----BIN INFILTRATION RATES (by-cell: 20 bins, fkmax = model VKS).
+      IF ( IUZFOPT.GT.0 .AND. NLAY.GT.1 ) THEN
+        CALL SGWF2UZF1BUILD20FBINS()
+      ELSE
       fkmax = 86400.0
       fkmin = 1.0E-4
       IF ( ITMUNI.EQ.1 ) THEN
@@ -993,16 +997,16 @@ C
         fkmax = fkmax*100.0
         fkmin = fkmin*100.0
       END IF 
+      NACTFINFBIN = 51
       range=LOG(fkmax)-LOG(fkmin)
       finc=range/50.0
       FBINS(1) = LOG(fkmin)
-C
-C30-----BIN INFILTRATION RATES.
       DO ivol = 2, 51
         FBINS(ivol) = FBINS(ivol-1)+ finc
         FBINS(ivol-1) = EXP(FBINS(ivol-1))
       END DO
       FBINS(51) = EXP(FBINS(51))
+      END IF
 C
 C31-----BUILD ONE CELL PROFILE PER LAYER, THEN SAVE POINTERS.
       CALL UZF_NWT_BUILD()
@@ -2432,4 +2436,70 @@ C     ------------------------------------------------------------------
       GWFUZFDAT(Igrid)%ROOTACT=>ROOTACT
 C
       END SUBROUTINE SGWF2UZF1PSV
+
+C-------SUBROUTINE SGWF2UZF1MODELVKSMAX
+      SUBROUTINE SGWF2UZF1MODELVKSMAX(fkmax)
+C     Maximum saturated vertical K (VKS) on active UZF cells, all layers.
+      USE GWFUZFMODULE, ONLY: VKS, VKSLAY, IUZFBND, CLOSEZERO
+      USE GLOBAL, ONLY: NCOL, NROW, NLAY
+      IMPLICIT NONE
+      REAL, INTENT(INOUT) :: fkmax
+      INTEGER :: ic, ir, k
+      fkmax = 0.0
+      DO k = 1, NLAY
+        DO ir = 1, NROW
+          DO ic = 1, NCOL
+            IF ( IUZFBND(ic, ir).NE.0 ) THEN
+              IF ( ALLOCATED(VKSLAY) ) THEN
+                IF ( VKSLAY(ic, ir, k).GT.fkmax ) 
+     c               fkmax = VKSLAY(ic, ir, k)
+              ELSE IF ( VKS(ic, ir).GT.fkmax ) THEN
+                fkmax = VKS(ic, ir)
+              END IF
+            END IF
+          END DO
+        END DO
+      END DO
+      IF ( fkmax.LE.CLOSEZERO ) fkmax = 1.0E-2
+      END SUBROUTINE SGWF2UZF1MODELVKSMAX
+
+C-------SUBROUTINE SGWF2UZF1BUILD20FBINS
+      SUBROUTINE SGWF2UZF1BUILD20FBINS()
+C     Twenty log-spaced FINF snap bins from fkmin to max model VKS.
+      USE GWFUZFMODULE, ONLY: FBINS, NACTFINFBIN
+      USE GLOBAL, ONLY: IOUT, ITMUNI, LENUNI
+      IMPLICIT NONE
+      INTEGER :: ivol
+      REAL :: fkmin, fkmax, range, finc
+      CALL SGWF2UZF1MODELVKSMAX(fkmax)
+      fkmin = 1.0E-4
+      IF ( ITMUNI.EQ.1 ) THEN
+        fkmin = fkmin/86400.0
+      ELSE IF ( ITMUNI.EQ.2 ) THEN
+        fkmin = fkmin/1440.0
+      ELSE IF ( ITMUNI.EQ.3 ) THEN
+        fkmin = fkmin/24.0
+      ELSE IF ( ITMUNI.EQ.5 ) THEN
+        fkmin = fkmin*365.0
+      END IF
+      IF ( LENUNI.EQ.1 ) THEN
+        fkmin = fkmin/0.3048
+      ELSE IF ( LENUNI.EQ.3 ) THEN
+        fkmin = fkmin*100.0
+      END IF
+      IF ( fkmax.LE.fkmin ) fkmax = fkmin * 1000.0
+      NACTFINFBIN = 20
+      range = LOG(fkmax) - LOG(fkmin)
+      finc = range / 19.0
+      FBINS = 0.0
+      FBINS(1) = LOG(fkmin)
+      DO ivol = 2, 20
+        FBINS(ivol) = FBINS(ivol-1) + finc
+        FBINS(ivol-1) = EXP(FBINS(ivol-1))
+      END DO
+      FBINS(20) = EXP(FBINS(20))
+      WRITE (IOUT, '(1X,A,I0,A,1PE12.4,A,1PE12.4,A,1PE12.4)')
+     +    'UZF FINF BINS (', NACTFINFBIN, ') FROM ', FBINS(1),
+     +    ' TO ', FBINS(20), ' (FKMAX=MODEL VKS ', fkmax, ')'
+      END SUBROUTINE SGWF2UZF1BUILD20FBINS
 

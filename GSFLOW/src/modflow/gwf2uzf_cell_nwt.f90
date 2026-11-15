@@ -96,10 +96,10 @@ subroutine UZF_NWT_BUILD()
   use UZF_NWT_MAP, only: nuzf, nwave, nuzf_built, cell_ic, cell_ir, cell_k, &
                          uzf_nwt_release_cells, uzf_nwt_allocate_cells
   use UZFCELL, only: setdata, sethead, setwaves, set_seepk, get_wcnew, &
-                     ivertcon, nwav, wcnew, wcold, celbot
+                     ivertcon, nwav, wcnew, wcold, celbot, fbins, nact_finf_bins
   use GWFUZFMODULE, only: IUZFBND, NSETS, NTRAIL, SURFDEP, Iseepreject, &
                           SURFK, VKS, EPS, THTS, THTR, THTI, LAYNUM, IWCRD, &
-                          NUZTOP
+                          NUZTOP, NACTFINFBIN, FBINS_PKG => FBINS
   use GLOBAL, only: NCOL, NROW, NLAY, IBOUND, HNEW, DELR, DELC, BOTM, IOUT
   use GWFBASMODULE, only: HDRY
   implicit none
@@ -133,6 +133,17 @@ subroutine UZF_NWT_BUILD()
   if (ntr < 1) ntr = 1
   if (ntr > nwave - 1) ntr = nwave - 1
   call uzf_nwt_allocate_cells(nuzf, nwave)
+  ! Land-surface FINF binning (finf_binned) uses UZFCELL fbins. Keep in sync
+  ! with GWFUZFMODULE FBINS built in GWF2UZF1AR for PRMS Bin_percolation.
+  nact_finf_bins = NACTFINFBIN
+  if (nact_finf_bins < 1) nact_finf_bins = 51
+  if (nact_finf_bins > 51) nact_finf_bins = 51
+  do n = 1, nact_finf_bins
+    fbins(n) = dble(FBINS_PKG(n))
+  end do
+  write(IOUT, '(1X,A,I0,A,1PE12.4,A,1PE12.4)') &
+    'UZF CELL INFILTRATION BINS (', nact_finf_bins, ') FROM ', &
+    fbins(1), ' TO ', fbins(nact_finf_bins)
 
   n = 0
   do ir = 1, NROW
@@ -476,18 +487,22 @@ end subroutine uzf_nwt_solve
 
 subroutine uzf_nwt_apply_land()
   use UZF_NWT_MAP, only: nuzf, cell_ic, cell_ir, cell_k
-  use UZFCELL, only: landflag, ivertcon, setdatafinf, setdataet, setdataetwc
+  use UZFCELL, only: landflag, ivertcon, setdatafinf, setdataet, setdataetwc, &
+                     finf_binned, celtop, celbot
   use GWFUZFMODULE
-  use GLOBAL, only: IUNIT, DELR, DELC
+  use GLOBAL, only: IUNIT, DELR, DELC, IBOUND, HNEW
+  use GWFBASMODULE, only: HDRY
   use GWFAGMODULE, only: DIVERSIONIRRUZF, NUMIRRDIVERSION, WELLIRRUZF, NUMIRRWEL
   implicit none
-  integer :: n, ic, ir, jbelow
+  integer :: n, ic, ir, jbelow, k
   real :: hold, cap, pet, depth, wilt
+  double precision :: hold_d, h
 
   do n = 1, nuzf
     if (landflag(n) /= 1) cycle
     ic = cell_ic(n)
     ir = cell_ir(n)
+    k = cell_k(n)
     hold = FINF(ic, ir)
     if (ISAVEFINF + IGSFLOW == 2) then
       if (associated(FINFSAVE)) hold = hold + FINFSAVE(ic, ir)
@@ -510,7 +525,14 @@ subroutine uzf_nwt_apply_land()
       end if
     end if
     if (hold < 0.0) hold = 0.0
-    call setdatafinf(n, dble(hold))
+    ! Snap land-surface infiltration onto kinematic bins (PRMS + other adds).
+    h = celbot(n)
+    if (IBOUND(ic, ir, k) /= 0) then
+      if (HNEW(ic, ir, k) /= dble(HDRY) .and. HNEW(ic, ir, k) < 1.0d29) &
+        h = HNEW(ic, ir, k)
+    end if
+    hold_d = finf_binned(dble(hold), dble(cap), h, celtop(n))
+    call setdatafinf(n, hold_d)
   end do
 
   if (IETFLG <= 0) return

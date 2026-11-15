@@ -869,7 +869,10 @@
       Last_Dprst_S = Dprst_S
       Last_gwprms_S = Gwprms_S
 
- 9001 FORMAT (2(I2.2, '/'), I4, 38(',', E15.7), ',', I5)
+! Must match GSF_HEADERS / WRITE list: Date + 40 reals + KKITER.
+! (Was 38 before by-cell UZF added RechargeUnsat2Sat_Q and Infil2Soil_Q;
+!  under-count forced a format rescan -> wrapped lines and **** overflow.)
+ 9001 FORMAT (2(I2.2, '/'), I4, 40(',', E15.7), ',', I5)
  9002 FORMAT (I5, 2('/', I2.2), 1X, F0.3, 32(1X,F0.1))
       END FUNCTION gsfsumrun
 

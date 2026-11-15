@@ -185,7 +185,7 @@
      &    Basin_dunnian_gvr, Basin_pref_flow_infil, Basin_dninterflow, Basin_pref_stor, Basin_dunnian_pfr, &
      &    Basin_dncascadeflow, Basin_capwaterin, Basin_sm2gvr, Basin_prefflow, Basin_slstor, Basin_gvr2pfr, &
      &    Hru_sz_cascadeflow, Pfr_dunnian_flow, Grav_dunnian_flow, Basin_dndunnianflow, &
-     &    Soil_moist_tot, Pref_flag
+     &    Soil_moist_tot
       USE PRMS_SOILZONE_AG, ONLY: Ag_cap_infil_tot, hru_ag_actet, perv_soil_to_gvr, perv_soil_to_gw, &
      &    Basin_perv_to_gw, Basin_ag_actet
       USE PRMS_GWFLOW, ONLY: Basin_dnflow, Basin_gwsink, Basin_gwstor_minarea_wb, Gwres_flow, &
@@ -345,7 +345,7 @@
         ENDIF
         gvrbal = last_ss - Ssres_stor(i) + Soil_to_ssr(i) - Ssr_to_gw(i) - Swale_actet(i) - Dunnian_flow(i) &
      &           - Ssres_flow(i)
-        IF ( Pref_flag == ACTIVE ) gvrbal = gvrbal + Pfr_dunnian_flow(i) + Pref_flow_infil(i)
+        gvrbal = gvrbal + Pfr_dunnian_flow(i) + Pref_flow_infil(i)
         IF ( Cascade_flag>CASCADE_OFF ) gvrbal = gvrbal - SNGL( Hru_sz_cascadeflow(i) )
         test = ABS( gvrbal )
         IF ( test>TOOSMALL ) THEN
@@ -353,12 +353,12 @@
           WRITE ( BALUNT, * ) gvrbal, last_ss, Ssres_stor(i), Ssr_to_gw(i), Swale_actet(i), &
      &            Dunnian_flow(i), Ssres_flow(i), Ssres_in(i), Grav_dunnian_flow(i), Slow_flow(i), Soil_to_ssr(i), &
      &            perv_frac, Slow_stor(i), Infil(i)
-          IF ( Pref_flag == ACTIVE ) WRITE ( BALUNT, * ) 'PFR', Pfr_dunnian_flow(i), Pref_flow_thrsh(i), &
+          WRITE ( BALUNT, * ) 'PFR', Pfr_dunnian_flow(i), Pref_flow_thrsh(i), &
      &            Pref_flow_infil(i), Pref_flow(i), Gvr2pfr(i), Pref_flow_stor(i), Pref_flow_max(i), Pref_flow_den(i)
           IF ( Cascade_flag>CASCADE_OFF ) WRITE ( BALUNT, * ) 'sz cascade', Hru_sz_cascadeflow(i)
         ENDIF
 
-        IF ( Pref_flag == ACTIVE ) waterin = waterin + Pref_flow_infil(i) + Pfr_dunnian_flow(i)
+        waterin = waterin + Pref_flow_infil(i) + Pfr_dunnian_flow(i)
         waterout = Ssr_to_gw(i) + Ssres_flow(i) + Soil_to_gw(i) + Swale_actet(i) + Perv_actet(i)*perv_frac &
      &             + Dunnian_flow(i)
         IF ( AG_flag==ACTIVE ) THEN
@@ -389,13 +389,12 @@
      &            Soil_moist(i), Ssres_stor(i), Perv_actet(i), Ssr_to_gw(i), Slow_flow(i), Ssres_flow(i), &
      &            Soil_to_gw(i), Slow_stor(i), Soil_rechr(i), &
      &            Soil_lower(i), Soil_to_ssr(i), waterin, Swale_actet(i)
-          IF ( Pref_flag == ACTIVE ) &
-               WRITE ( BALUNT, * ) Pref_flow(i), Pref_flow_infil(i), Pref_flow_stor(i), Pref_flow_den(i)
+          WRITE ( BALUNT, * ) Pref_flow(i), Pref_flow_infil(i), Pref_flow_stor(i), Pref_flow_den(i)
           IF ( Cascade_flag>CASCADE_OFF ) WRITE ( BALUNT, * ) 'cascade', Upslope_dunnianflow(i), Upslope_interflow(i), &
      &                                                        Hru_sz_cascadeflow(i), Ncascade_hru(i)
           WRITE ( BALUNT, * ) Hru_perv(i), perv_frac, (Infil(i)*perv_frac), Cap_infil_tot(i)
           WRITE ( BALUNT, * ) Dunnian_flow(i)
-          IF ( Pref_flag==ACTIVE ) WRITE ( BALUNT, * )  Pfr_dunnian_flow(i)
+          WRITE ( BALUNT, * )  Pfr_dunnian_flow(i)
           IF ( AG_flag==ACTIVE ) WRITE ( BALUNT, * ) &
                'ag', It0_ag_soil_moist(i), Ag_soil_moist(i), Ag_frac(i), Ag_cap_infil_tot(i), hru_ag_actet(i)
           IF ( seg2hru_flag==ACTIVE ) WRITE ( BALUNT, * ) 'seg_to_hru', Segment_to_soilmoist(i)
@@ -421,7 +420,7 @@
           WRITE ( BALUNT, * ) 'Possible HRU water balance issue:', wbal, '; HRU:', i, ' hru_type:', Hru_type(i), '; area:', harea
           WRITE ( BALUNT, * ) 'fluxes', Sroff(i), Gwres_flow(i), Ssres_flow(i), Hru_actet(i), Gwres_sink(i), &
        &                      Intcp_changeover(i), Dunnian_flow(i)
-          IF ( Pref_flag == ACTIVE ) WRITE ( BALUNT, * ) 'PFR', Pfr_dunnian_flow(i)
+          WRITE ( BALUNT, * ) 'PFR', Pfr_dunnian_flow(i)
           WRITE ( BALUNT, * ) 'ppt', Hru_snow(i), Hru_rain(i), Hru_ppt(i), Net_rain(i), Net_snow(i), Net_ppt(i), &
        &                      Pptmix(i)
           WRITE(balunt,*) 'snow', It0_pkwater_equiv(i), Pkwater_equiv(i), Snow_evap(i), Snowmelt(i), Pptmix_nopack(i), Pk_precip(i)
